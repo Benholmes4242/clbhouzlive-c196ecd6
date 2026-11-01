@@ -137,15 +137,16 @@ describe('News page head and freshness', () => {
     expect(screen.getByRole('button', { name: 'Search stories' })).toBeTruthy();
   });
   it('shares the overview freshness rule: a story opened there is not new here', () => {
+    // Baseline 3h ago: lead (2h) and arc-0 (now) are newer; everything else predates it.
     localStorage.setItem(NEWS_LAST_SEEN, String(NOW.getTime() - 3 * 3600e3));
-    localStorage.setItem(NEWS_OPENED, JSON.stringify(['lead']));
-    mountPage();
-    // lead (2h ago) is opened; yours (5h ago) predates the baseline.
-    expect(document.querySelector('.tour-news-fresh')).toBeNull();
-    localStorage.setItem(NEWS_OPENED, JSON.stringify([]));
-    cleanup();
+    localStorage.setItem(NEWS_OPENED, JSON.stringify(['arc-0']));
     mountPage();
     expect(document.querySelector('.tour-news-fresh')).toHaveTextContent('1 new since your last visit');
+    cleanup();
+    // Both newer stories already opened (e.g. on the overview) — nothing is new.
+    localStorage.setItem(NEWS_OPENED, JSON.stringify(['lead', 'arc-0']));
+    mountPage();
+    expect(document.querySelector('.tour-news-fresh')).toBeNull();
   });
   it('hides the new line on a first visit', () => {
     mountPage();
@@ -299,10 +300,14 @@ describe('News page Top stories and archive', () => {
   it('groups the archive This week / Last week / month / month with year, weekday under the day', () => {
     mountPage();
     const headings = [...document.querySelectorAll('.tour-news-grp')].map((el) => el.textContent);
-    expect(headings).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025', 'JUNE 2025']);
+    expect(headings).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025']);
     const firstRow = document.querySelector('.tour-news-ar');
     expect(firstRow?.querySelector('.tour-news-ar-date b')).toHaveTextContent('28');
     expect(firstRow?.querySelector('.tour-news-ar-date small')).toHaveTextContent('WED');
+    // The second page carries the older month groups.
+    fireEvent.click(screen.getByRole('button', { name: 'Show older stories' }));
+    const after = [...document.querySelectorAll('.tour-news-grp')].map((el) => el.textContent);
+    expect(after).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025', 'JUNE 2025', 'MARCH 2025']);
   });
   it('fades opened stories and swaps the reading time for ✓ Read', () => {
     localStorage.setItem(NEWS_OPENED, JSON.stringify(['arc-0']));
