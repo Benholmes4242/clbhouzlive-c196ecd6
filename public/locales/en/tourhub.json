@@ -100,7 +100,37 @@
       "daysSuffix": "D"
     },
     "row": {
-      "countdownIn": "IN {{n}}D"
+      "countdownIn": "IN {{n}}D",
+      "defends": "DEFENDS",
+      "purse": "PURSE",
+      "leads": "LEADS · R{{round}}",
+      "lead": "LEAD · R{{round}}",
+      "won": "WON",
+      "tied": "{{count}} tied"
+    },
+    "nextMajor": {
+      "label": "NEXT MAJOR",
+      "days_one": "DAY",
+      "days_other": "DAYS"
+    },
+    "week": {
+      "last": "LAST WEEK",
+      "this": "THIS WEEK",
+      "next": "NEXT WEEK",
+      "events_one": "{{count}} event",
+      "events_other": "{{count}} events"
+    },
+    "tag": {
+      "major": "MAJOR",
+      "seasonFinale": "SEASON FINALE",
+      "playoffs": "PLAYOFFS",
+      "team": "TEAM"
+    },
+    "you": {
+      "inFieldOne": "★ {{name}} in the field",
+      "inFieldTwo": "★ {{a}} and {{b}} in the field",
+      "inFieldMany": "★ {{a}}, {{b}} and {{count}} others in the field",
+      "playedHere": "You've played here"
     }
   },
   "overview": {

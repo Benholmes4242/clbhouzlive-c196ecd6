@@ -88,7 +88,35 @@
       "defendsSuffix": "{{name}} defends"
     },
     "row": {
-      "countdownIn": "IN {{n}}D"
+      "countdownIn": "IN {{n}}D",
+      "defends": "디펜딩",
+      "purse": "상금",
+      "leads": "선두 · R{{round}}",
+      "lead": "공동 선두 · R{{round}}",
+      "won": "우승",
+      "tied": "{{count}}명 동률"
+    },
+    "nextMajor": {
+      "label": "다음 메이저",
+      "days_other": "일"
+    },
+    "week": {
+      "last": "지난주",
+      "this": "이번 주",
+      "next": "다음 주",
+      "events_other": "{{count}}개 이벤트"
+    },
+    "tag": {
+      "major": "메이저",
+      "seasonFinale": "시즌 피날레",
+      "playoffs": "플레이오프",
+      "team": "단체전"
+    },
+    "you": {
+      "inFieldOne": "★ {{name}} 출전",
+      "inFieldTwo": "★ {{a}}, {{b}} 출전",
+      "inFieldMany": "★ {{a}}, {{b}} 외 {{count}}명 출전",
+      "playedHere": "플레이한 코스"
     }
   },
   "overview": {

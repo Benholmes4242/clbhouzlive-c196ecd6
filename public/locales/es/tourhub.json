@@ -88,7 +88,37 @@
       "defendsSuffix": "{{name}} defends"
     },
     "row": {
-      "countdownIn": "EN {{n}}D"
+      "countdownIn": "EN {{n}}D",
+      "defends": "DEFIENDE",
+      "purse": "BOLSA",
+      "leads": "LIDERA · R{{round}}",
+      "lead": "LÍDER · R{{round}}",
+      "won": "GANÓ",
+      "tied": "{{count}} empatados"
+    },
+    "nextMajor": {
+      "label": "PRÓXIMO MAJOR",
+      "days_one": "DÍA",
+      "days_other": "DÍAS"
+    },
+    "week": {
+      "last": "LA SEMANA PASADA",
+      "this": "ESTA SEMANA",
+      "next": "LA PRÓXIMA SEMANA",
+      "events_one": "{{count}} evento",
+      "events_other": "{{count}} eventos"
+    },
+    "tag": {
+      "major": "MAJOR",
+      "seasonFinale": "FINAL DE TEMPORADA",
+      "playoffs": "PLAYOFFS",
+      "team": "POR EQUIPOS"
+    },
+    "you": {
+      "inFieldOne": "★ {{name}} en el campo",
+      "inFieldTwo": "★ {{a}} y {{b}} en el campo",
+      "inFieldMany": "★ {{a}}, {{b}} y {{count}} más en el campo",
+      "playedHere": "Has jugado aquí"
     }
   },
   "overview": {

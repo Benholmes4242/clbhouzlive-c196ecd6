@@ -31,7 +31,8 @@ import {
   type DefendingChampionEntry,
 } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
-import { monthKey, monthLabelFromKey, todayNoonMs, daysUntil } from './timelineUtils';
+import { weekKey, todayNoonMs, daysUntil, currentRoundFromScores } from './timelineUtils';
+import { rowTourIndex } from './scheduleRules';
 
 // ─── Season → tournament resolution ───────────────────────────────────────
 
@@ -55,6 +56,7 @@ interface SrTournamentRow {
   venue_country: string | null;
   purse: number | null;
   defending_champion: string | null;
+  event_type?: string | null;
   golf_course_id?: string | null;
   course?: CoursePlaceJoin | CoursePlaceJoin[];
   season?: { tour_name: string | null; tour_full_name: string | null } | null;
@@ -135,7 +137,7 @@ async function probeAndFetchTournaments(
     const { data, error } = await supabase
       .from('sr_tournaments')
       .select(
-        `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, golf_course_id, season:sr_seasons(tour_name, tour_full_name), ${TOURNAMENT_COURSE_PLACE_JOIN}`,
+        `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, event_type, golf_course_id, season:sr_seasons(tour_name, tour_full_name), ${TOURNAMENT_COURSE_PLACE_JOIN}`,
       )
       .in('season_id', idsToQuery)
       .order('start_date', { ascending: true });
@@ -155,9 +157,8 @@ export type EventState = 'completed' | 'live' | 'upcoming';
 
 export interface SeasonEvent {
   id: string;
-  /** Canonical tour slug for the row. Populated only in All Tours (merged)
-   *  mode so SeasonRow can render a per-row tour chip. Undefined in single-
-   *  tour mode where the header/context already communicates the tour. */
+  /** Canonical tour slug for the row. Populated in BOTH modes: the rebuilt
+   *  row always prints a tour label and weeks sort by tour order. */
   tourSlug?: TourId;
   name: string;
   venueName: string | null;
@@ -166,6 +167,10 @@ export interface SeasonEvent {
   coursePlace?: string | null;
   venueCountry: string | null;
   purse: number | null;
+  /** sr_tournaments.event_type — 'team' drives the TEAM tag. */
+  eventType: string | null;
+  /** Linked course id — drives the member's "You've played here" line. */
+  golfCourseId: string | null;
   startDate: string;
   endDate: string;
   status: string;
@@ -199,21 +204,22 @@ export interface SeasonEvent {
     score: number | null;
     /** Rows sharing position 1 (1 = outright leader). */
     tiedCount: number;
+    /** Current round (1–4), derived from the latest non-null round score. */
+    currentRound: number | null;
   } | null;
   /** Defending champion (upcoming rows). */
   defendingChampion?: DefendingChampionEntry | null;
 }
 
-export interface MonthGroup {
-  key: string; // yyyy-MM
-  label: string; // "APRIL 2026"
+export interface WeekGroup {
+  key: string; // yyyy-MM-dd of the week's Monday
   events: SeasonEvent[];
 }
 
 export interface SeasonTimeline {
   seasonName: string | null;
   seasonYear: number | null;
-  months: MonthGroup[];
+  weeks: WeekGroup[];
   totalEvents: number;
   currentEventNumber: number | null; // 1-based; null when no anchor
   anchorEventId: string | null; // this-week row, else next upcoming
@@ -345,12 +351,15 @@ export function useSeasonTimeline(
 
       const evt: SeasonEvent = {
         id: r.id,
+        tourSlug: tour,
         name: r.name,
         venueName: r.venue_name,
         venueCity: r.venue_city,
         coursePlace: linkedTournamentPlace(r.golf_course_id, r.course),
         venueCountry: r.venue_country,
         purse: r.purse,
+        eventType: r.event_type ?? null,
+        golfCourseId: r.golf_course_id ?? null,
         startDate: r.start_date,
         endDate: r.end_date,
         status: r.status,
@@ -394,6 +403,7 @@ export function useSeasonTimeline(
             totalText: l.displayScore || '',
             score: l.score ?? null,
             tiedCount: l.tiedCount ?? 1,
+            currentRound: currentRoundFromScores(l),
           };
         } else {
           evt.leader = null;
@@ -428,26 +438,31 @@ export function useSeasonTimeline(
       }
     }
 
-    // Month bucket, preserve sort order.
+    // Week bucket (Monday→Sunday), preserve sort order; within a week sort by
+    // start date then the schedule tour order (BRIEF_TOUR_SCHEDULE_REBUILT §3).
     const buckets = new Map<string, SeasonEvent[]>();
     for (const e of decorated) {
-      const k = monthKey(e.startDate);
+      const k = weekKey(e.startDate);
       const arr = buckets.get(k) ?? [];
       arr.push(e);
       buckets.set(k, arr);
     }
-    const months: MonthGroup[] = Array.from(buckets.entries())
+    const weeks: WeekGroup[] = Array.from(buckets.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([k, arr]) => ({
         key: k,
-        label: monthLabelFromKey(k),
-        events: arr,
+        events: arr.sort(
+          (a, b) =>
+            a.startDate.localeCompare(b.startDate) ||
+            rowTourIndex(a.tourSlug) - rowTourIndex(b.tourSlug) ||
+            a.name.localeCompare(b.name),
+        ),
       }));
 
     return {
       seasonName: season?.name ?? null,
       seasonYear: season?.year ?? null,
-      months,
+      weeks,
       totalEvents: total,
       currentEventNumber,
       anchorEventId: anchorId,

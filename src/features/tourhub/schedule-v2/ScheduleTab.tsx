@@ -1,9 +1,12 @@
 /**
- * schedule-v2/ScheduleTab — "The Season" open-ledger schedule view.
+ * schedule-v2/ScheduleTab — the rebuilt Tour Schedule
+ * (BRIEF_TOUR_SCHEDULE_REBUILT, schedule-signed-off.html).
  *
- * Analytical grammar: overview-matched row hairlines, one filled (INK) jump
- * control, and a three-up figures header. The one app amber marks completed-row
- * CHAMPION labels; the KICKER and deliberate controls retain their INK treatment.
+ * Weeks, not months: events group into Monday→Sunday weeks with sticky
+ * LAST/THIS/NEXT WEEK headers; THIS WEEK is lightly shaded and is the anchor
+ * the page opens on. A next-major card sits above the list when an upcoming
+ * major exists for the current lens. The "This week" pill appears only when
+ * the THIS WEEK section is fully off screen and smooth-scrolls back to it.
  *
  * The tour chip row is this page's ONLY tour control by design —
  * TourSelectionContext is scoped to the overview hero. ?tour= is honoured once
@@ -24,17 +27,32 @@ import { tournamentRoute } from '../routes';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useSeasonTimeline, type SeasonEvent } from './useSeasonTimeline';
 import { useMergedSchedule } from './useMergedSchedule';
-import { SeasonRow } from './SeasonRow';
+import { SeasonRow, type SeasonRowYou } from './SeasonRow';
+import { useScheduleFieldPlayers } from './useScheduleFieldPlayers';
+import { useTourPlayerFollows } from '../leaderboard/useTourPlayerFollows';
+import { useComingUpOwnRounds } from '../overview/data/useComingUpOwnRounds';
+import { displayEventName } from '../overview/sections/ComingUp';
 import { getScrollAncestor, scrollElementIntoView } from '@/lib/getScrollParent';
+import { currentWeekKey, weekRelation } from './timelineUtils';
+import {
+  followedFieldNames,
+  nextMajorDateLabel,
+  venueLine,
+  weekRangeLabel,
+} from './scheduleRules';
 import {
   FONT,
   HAIRLINE_INK_10,
   INK,
   INK_FAINT,
   INK_MUTE,
-  LIVE_DOT,
   TOUR_CANVAS,
+  WHITE_ALPHA_06,
 } from '../_shared/tokens';
+
+const PANEL = '#141418';
+const THIS_WEEK_BG = 'rgba(255,255,255,0.025)';
+const THIS_WEEK_HEADER_BG = '#0E0E11';
 
 const KICKER: React.CSSProperties = {
   fontSize: 11,
@@ -65,26 +83,25 @@ export function ScheduleTab() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const monthHeaderRef = useRef<HTMLDivElement | null>(null);
+  const weekHeaderRef = useRef<HTMLDivElement | null>(null);
   const [anchorFar, setAnchorFar] = useState(false);
   const viewTrackedRef = useRef(false);
 
   // The sticky chips row is GONE (BRIEF_TOUR_HEADER_ONE_ROW): the tour control
   // now lives in the island's left capsule. --tour-chips-h is still read by the
-  // month-header offset and the anchor scroll maths, and both readers carry a
+  // week-header offset and the anchor scroll maths, and both readers carry a
   // 47px fallback — so it must be written as 0, never left unset.
   useEffect(() => {
     document.documentElement.style.setProperty('--tour-chips-h', '0px');
   }, []);
 
-
   // Per-section tour lens (local state, All Tours allowed). Seeded ONCE from
   // ?tour= when it names a known tour; All Tours (null) stays the default.
   const [tourLens, setTourLens] = useState<TourId | null>(() => {
     const param = searchParams.get('tour');
-    /* `?tour=all` is an EXPLICIT All Tours request from a caller that knows the
-       member's lens (Coming Up's FULL SCHEDULE row). It must beat the stored
-       single tour, otherwise a see-all silently narrows the scope. */
+    /* `?tour=all` is an EXPLICIT All Tours request from a caller that knows
+       the member's lens (Coming Up's FULL SCHEDULE row). It must beat the
+       stored single tour, otherwise a see-all silently narrows the scope. */
     if (param === 'all') return null;
     if (param && Object.prototype.hasOwnProperty.call(TOUR_CONFIG, param)) {
       return param as TourId;
@@ -104,14 +121,14 @@ export function ScheduleTab() {
 
   const activeTour: TourId | 'all' = tourLens ?? 'all';
 
-  // Publish the month header's real outer height so the anchor scroll offset
-  // clears BOTH sticky layers (chips row + month header).
+  // Publish the week header's real outer height so the anchor scroll offset
+  // clears BOTH sticky layers (chips row + week header).
   useEffect(() => {
-    const el = monthHeaderRef.current;
+    const el = weekHeaderRef.current;
     if (!el) return;
     const publish = () => {
       document.documentElement.style.setProperty(
-        '--tour-month-h',
+        '--tour-week-h',
         `${Math.round(el.offsetHeight)}px`,
       );
     };
@@ -119,10 +136,10 @@ export function ScheduleTab() {
     const ro = new ResizeObserver(publish);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [timeline?.months.length]);
+  }, [timeline?.weeks.length]);
 
   const allEvents = useMemo<SeasonEvent[]>(
-    () => (timeline ? timeline.months.flatMap((m) => m.events) : []),
+    () => (timeline ? timeline.weeks.flatMap((w) => w.events) : []),
     [timeline],
   );
   const anchorEvent = useMemo(
@@ -136,6 +153,51 @@ export function ScheduleTab() {
         ? 'upcoming'
         : 'none';
 
+  // ── Member signals (§5/§7): follows, fields, own courses — all batched ──
+  const { ids: followedIds } = useTourPlayerFollows();
+  const upcomingForField = useMemo(
+    () =>
+      allEvents
+        .filter((e) => e.state === 'upcoming')
+        .map((e) => ({ id: e.id, startDate: e.startDate })),
+    [allEvents],
+  );
+  const liveIds = useMemo(
+    () => allEvents.filter((e) => e.state === 'live').map((e) => e.id),
+    [allEvents],
+  );
+  const fieldMap = useScheduleFieldPlayers(upcomingForField, liveIds);
+  const courseIds = useMemo(
+    () =>
+      allEvents
+        .map((e) => e.golfCourseId)
+        .filter((id): id is string => Boolean(id)),
+    [allEvents],
+  );
+  const ownRounds = useComingUpOwnRounds(courseIds);
+
+  const youByEvent = useMemo(() => {
+    const map = new Map<string, SeasonRowYou>();
+    for (const e of allEvents) {
+      const protagonistId =
+        e.state === 'completed'
+          ? (e.champion?.playerId ?? null)
+          : e.state === 'live'
+            ? (e.leader?.playerId ?? null)
+            : null;
+      map.set(e.id, {
+        followedPlayerId:
+          protagonistId && followedIds.has(protagonistId) ? protagonistId : null,
+        fieldNames:
+          e.state === 'upcoming' || e.state === 'live'
+            ? followedFieldNames(fieldMap.get(e.id), followedIds)
+            : [],
+        playedHere: e.golfCourseId ? (ownRounds?.has(e.golfCourseId) ?? false) : false,
+      });
+    }
+    return map;
+  }, [allEvents, followedIds, fieldMap, ownRounds]);
+
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
   const anchorId = timeline?.anchorEventId ?? null;
   const computeOffset = () => {
@@ -144,11 +206,11 @@ export function ScheduleTab() {
        IS "0px" and the fallback must only cover an unset/NaN read. */
     const chipsRaw = parseInt(rootStyles.getPropertyValue('--tour-chips-h'), 10);
     const chipsH = Number.isNaN(chipsRaw) ? 47 : chipsRaw;
-    const monthH =
-      parseInt(rootStyles.getPropertyValue('--tour-month-h'), 10) || 32;
+    const weekH =
+      parseInt(rootStyles.getPropertyValue('--tour-week-h'), 10) || 41;
     const headerH =
       parseInt(rootStyles.getPropertyValue('--tour-header-h'), 10) || 0;
-    return headerH + chipsH + monthH + 20;
+    return headerH + chipsH + weekH;
   };
   useEffect(() => {
     if (!anchorId) return;
@@ -181,23 +243,25 @@ export function ScheduleTab() {
     };
   }, [anchorId, activeTour]);
 
+  const thisWeekKey = useMemo(() => currentWeekKey(), [timeline?.totalEvents]);
+  const hasThisWeek = !!timeline?.weeks.some((w) => w.key === thisWeekKey);
+
   const scrollToAnchor = useCallback(() => {
     if (!anchorId) return;
     analyticsEvents.track('tour_schedule_jump_tapped', {
       anchor_state: anchorState,
     });
-    const el = document.getElementById(`sv2-row-${anchorId}`);
+    const section = document.getElementById('sv2-week-this');
+    const el = section ?? document.getElementById(`sv2-row-${anchorId}`);
     if (!el) return;
-    scrollElementIntoView(el, { offset: computeOffset(), behavior: 'auto' });
+    scrollElementIntoView(el, { offset: computeOffset(), behavior: 'smooth' });
   }, [anchorId, anchorState]);
 
-  // ── "Far from today" detector — anchor >1.5 viewports off-screen ────────
+  // ── "This week" visibility — the THIS WEEK section fully off screen ────
   useEffect(() => {
-    if (!anchorId) {
-      setAnchorFar(false);
-      return;
-    }
-    const el = document.getElementById(`sv2-row-${anchorId}`);
+    const section = document.getElementById('sv2-week-this');
+    const row = anchorId ? document.getElementById(`sv2-row-${anchorId}`) : null;
+    const el = section ?? row;
     if (!el) {
       setAnchorFar(false);
       return;
@@ -208,9 +272,18 @@ export function ScheduleTab() {
     const compute = () => {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
-      const center = rect.top + rect.height / 2;
-      const dist = Math.abs(center - vh / 2);
-      setAnchorFar(dist > vh * 1.5);
+      if (section) {
+        // Fully off screen: entirely above the sticky header or below the fold.
+        const rootStyles = getComputedStyle(document.documentElement);
+        const headerH =
+          parseInt(rootStyles.getPropertyValue('--tour-header-h'), 10) || 0;
+        setAnchorFar(rect.bottom <= headerH || rect.top >= vh);
+      } else {
+        // No THIS WEEK section (off-season): the former anchor-distance rule.
+        const center = rect.top + rect.height / 2;
+        const dist = Math.abs(center - vh / 2);
+        setAnchorFar(dist > vh * 1.5);
+      }
     };
     const onScroll = () => {
       if (ticking) return;
@@ -223,7 +296,7 @@ export function ScheduleTab() {
     compute();
     target.addEventListener('scroll', onScroll, { passive: true } as AddEventListenerOptions);
     return () => target.removeEventListener('scroll', onScroll as EventListener);
-  }, [anchorId, timeline?.totalEvents]);
+  }, [anchorId, timeline?.totalEvents, hasThisWeek]);
 
   // ── Row navigation ─────────────────────────────────────────────────────
   const onSelectEvent = useCallback(
@@ -266,8 +339,7 @@ export function ScheduleTab() {
     tourLens ?? 'all',
   );
 
-
-  // ── Header figures ─────────────────────────────────────────────────────
+  // ── Header figures + next major ────────────────────────────────────────
   const yearLabel = timeline?.seasonYear ?? new Date().getFullYear();
   const played = useMemo(
     () => allEvents.filter((e) => e.state === 'completed').length,
@@ -277,12 +349,13 @@ export function ScheduleTab() {
     () => allEvents.filter((e) => e.state === 'upcoming').length,
     [allEvents],
   );
-  const nextMajorDays = useMemo(() => {
-    const hit = allEvents.find(
-      (e) => e.state === 'upcoming' && e.isMajor && e.daysAway !== null,
-    );
-    return hit?.daysAway ?? null;
-  }, [allEvents]);
+  const nextMajor = useMemo(
+    () =>
+      allEvents.find(
+        (e) => e.state === 'upcoming' && e.isMajor && e.daysAway !== null,
+      ) ?? null,
+    [allEvents],
+  );
 
   const progressPct = useMemo(() => {
     if (!timeline || timeline.totalEvents === 0) return 0;
@@ -303,7 +376,7 @@ export function ScheduleTab() {
     });
   }, [hasTimeline, timeline, tourLens, anchorState]);
 
-  let monthHeaderAttached = false;
+  let weekHeaderAttached = false;
 
   return (
     <div
@@ -357,13 +430,6 @@ export function ScheduleTab() {
                 label={t('schedule.stats.remaining')}
                 value={String(remaining)}
               />
-              {nextMajorDays !== null && (
-                <StatCell
-                  label={t('schedule.stats.nextMajor')}
-                  value={String(nextMajorDays)}
-                  suffix={t('schedule.stats.daysSuffix')}
-                />
-              )}
             </div>
             {timeline!.totalEvents > 0 && (
               <div
@@ -387,6 +453,71 @@ export function ScheduleTab() {
           </div>
         ) : null}
       </div>
+
+      {/* NEXT MAJOR — takes the former header figure's place (§2). */}
+      {!isLoading && nextMajor ? (
+        <button
+          type="button"
+          onClick={() => onSelectEvent(nextMajor)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            width: 'calc(100% - 32px)',
+            margin: '18px 16px 6px',
+            padding: 14,
+            borderRadius: 16,
+            background: PANEL,
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: INK,
+            textAlign: 'left',
+            cursor: 'pointer',
+            fontFamily: FONT,
+          }}
+        >
+          <span style={{ flex: 'none', width: 64, textAlign: 'center' }}>
+            <span
+              className="num"
+              style={{ display: 'block', fontSize: 26, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}
+            >
+              {nextMajor.daysAway}
+            </span>
+            <span
+              style={{
+                display: 'block',
+                marginTop: 4,
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                color: INK_FAINT,
+              }}
+            >
+              {t('schedule.nextMajor.days', { count: nextMajor.daysAway ?? 0 })}
+            </span>
+          </span>
+          <span style={{ minWidth: 0 }}>
+            <span
+              style={{
+                display: 'block',
+                fontSize: 9.5,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                color: INK_FAINT,
+              }}
+            >
+              {t('schedule.nextMajor.label')}
+            </span>
+            <span style={{ display: 'block', marginTop: 3, fontSize: 16, fontWeight: 800 }}>
+              {displayEventName(nextMajor.name)}
+            </span>
+            <span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: INK_MUTE }}>
+              {[nextMajor.venueName, nextMajorDateLabel(nextMajor.startDate)]
+                .filter(Boolean)
+                .join(' · ')}
+            </span>
+          </span>
+        </button>
+      ) : null}
 
       {/* BODY — page owns the scroll (no inner scroller). */}
       <div style={{ position: 'relative' }}>
@@ -431,28 +562,66 @@ export function ScheduleTab() {
           <TourHubEmptyState variant="schedule" />
         ) : (
           <>
-            {timeline!.months.map((group) => {
-              const attachRef = !monthHeaderAttached;
-              if (attachRef) monthHeaderAttached = true;
+            {timeline!.weeks.map((group) => {
+              const attachRef = !weekHeaderAttached;
+              if (attachRef) weekHeaderAttached = true;
+              const relation = weekRelation(group.key);
+              const isThis = relation === 'this';
+              const leftLabel =
+                relation === 'last'
+                  ? t('schedule.week.last')
+                  : relation === 'this'
+                    ? t('schedule.week.this')
+                    : relation === 'next'
+                      ? t('schedule.week.next')
+                      : weekRangeLabel(group.key);
+              const rightLabel =
+                relation === 'other'
+                  ? null
+                  : `${weekRangeLabel(group.key)}${
+                      isThis
+                        ? ` · ${t('schedule.week.events', { count: group.events.length })}`
+                        : ''
+                    }`;
               return (
-                <section key={group.key}>
+                <section
+                  key={group.key}
+                  id={isThis ? 'sv2-week-this' : undefined}
+                  style={isThis ? { background: THIS_WEEK_BG } : undefined}
+                >
                   <div
-                    ref={attachRef ? monthHeaderRef : undefined}
+                    ref={attachRef ? weekHeaderRef : undefined}
                     style={{
                       position: 'sticky',
                       top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 0px) - 1px)',
                       zIndex: 2,
-                      background: TOUR_CANVAS,
-                      padding: '14px 24px 6px',
-                      // READ 11: the month group heading is language.
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: '0.14em',
-                      color: INK_MUTE,
-                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      justifyContent: 'space-between',
+                      background: isThis ? THIS_WEEK_HEADER_BG : TOUR_CANVAS,
+                      padding: '22px 24px 8px',
+                      borderBottom: `1px solid ${WHITE_ALPHA_06}`,
                     }}
                   >
-                    {group.label}
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        color: isThis ? INK : INK_MUTE,
+                      }}
+                    >
+                      {leftLabel}
+                    </span>
+                    {rightLabel ? (
+                      <span
+                        className="num"
+                        style={{ fontSize: 12, fontWeight: 600, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {rightLabel}
+                      </span>
+                    ) : null}
                   </div>
                   <div>
                     {group.events.map((evt, eventIndex) => {
@@ -461,6 +630,7 @@ export function ScheduleTab() {
                         <div key={evt.id} id={`sv2-row-${evt.id}`}>
                           <SeasonRow
                             event={evt}
+                            you={youByEvent.get(evt.id)}
                             isAnchor={isAnchor}
                             last={eventIndex === group.events.length - 1}
                             onSelect={onSelectEvent}
@@ -480,48 +650,51 @@ export function ScheduleTab() {
         )}
       </div>
 
-      {/* Jump control — the one filled button on this surface, and it is INK. */}
+      {/* This week — centred glass pill, 16px above the bottom nav (§6). */}
       {anchorId && anchorFar && createPortal(
         <button
           type="button"
           onClick={scrollToAnchor}
-          aria-label={t('schedule.floating.today')}
+          aria-label={t('schedule.floating.thisWeek')}
           style={{
             position: 'fixed',
-            bottom: 'calc(6rem + 2px)',
-            right: 'calc(1rem + 48px)',
+            bottom: 'calc(var(--bottom-nav-height, 96px) + 16px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
             zIndex: 39,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            height: 28,
-            padding: '0 12px',
+            height: 40,
+            padding: '0 16px',
             borderRadius: 999,
-            background: INK,
-            color: TOUR_CANVAS,
-            border: 'none',
+            background: 'rgba(20,20,24,0.92)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+            color: INK,
             fontFamily: FONT,
-            fontSize: 11,
+            fontSize: 13,
             fontWeight: 700,
-            letterSpacing: '0.10em',
-            textTransform: 'uppercase',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
             cursor: 'pointer',
             WebkitTapHighlightColor: 'transparent',
           }}
         >
-          {anchorState === 'live' && (
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                background: LIVE_DOT,
-                display: 'inline-block',
-              }}
-            />
-          )}
-          {t('schedule.floating.today')}
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+          {t('schedule.floating.thisWeek')}
         </button>,
         document.body,
       )}

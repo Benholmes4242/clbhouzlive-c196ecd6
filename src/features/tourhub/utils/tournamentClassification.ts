@@ -58,7 +58,8 @@ const CHAMPIONS_MAJOR_KEYWORDS = [
   'senior open',
   'kaulig companies',
   'senior players',
-  'charles schwab cup championship',
+  // 'charles schwab cup championship' is the Champions Tour SEASON FINALE,
+  // not one of its five majors (BRIEF_TOUR_SCHEDULE_REBUILT §1).
 ];
 
 // --- SIGNATURE EVENTS (by tour) ---

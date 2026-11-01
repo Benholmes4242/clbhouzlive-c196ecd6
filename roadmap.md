@@ -1427,3 +1427,8 @@
 - [x] + sheet (BizcSheet, 3 rows, Share a round hidden without connection/rounds), round picker (useAllScores, newest first, 30/page), course picker (useCourseSearch, 44px white-caret field); sends via existing msg_send with round_share/course_share types.
 - [x] Round card (useRoundShareCards, one RPC per page, AC1 strip colours, RoundDetailSheet on tap) and course card (by-id course read + useCourseListRanks, /courses/{id} on tap); both fall back to plain body bubbles. Inbox preview needed no change.
 - [x] Approved MS1 line-400 cast applied; tsc fully clean. New ms3MessagesShare.test.tsx (14). Full sharded suite 5,569/5,569 across 525 files (+14/+1 vs 5,555/524). Signed-in live verification unavailable.
+
+## TOUR SCHEDULE REBUILT (schedule-signed-off.html)
+- [x] All sections built; see TOUR_SCHEDULE_REBUILD_REPORT.md. Schwab keyword removed (consumers listed); week grouping + sticky headers + THIS WEEK shading; next-major card; SeasonRow rebuilt; amber member lines; This week pill; locales x6.
+- [x] scheduleRebuild.test.tsx (+15) + scheduleSeasonRow.test.tsx rewritten (5->11, old/new assertions quoted in report). Full shards 5,590/5,590 across 526 files (+21/+1 vs 5,569/525); tsgo clean.
+- [x] 390x844 capture: guest gate redirects /tour?tab=schedule to / signed-out, so page visuals are unit-tested; member-only amber lines unit-tested via the you prop. Signed-in device check outstanding.
