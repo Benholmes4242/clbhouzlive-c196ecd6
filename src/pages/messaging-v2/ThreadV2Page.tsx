@@ -24,7 +24,10 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSharedGroundOne } from '@/hooks/messaging/useSharedGround';
 import { useMessagesStagePhoto } from '@/hooks/messaging/useMessagesStagePhoto';
 import { SharedGroundStrip } from './SharedGroundStrip';
+import { HeadToHeadCard } from './HeadToHeadCard';
 import { PlayingOffRail } from './PlayingOffRail';
+import { compareRouteFor } from '@/components/friend-sheet/useMemberTapResolver';
+import { formatDayMonthShortGB } from '@/i18n/format';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
 import '@/features/messaging-dark/messages-dark.css';
 
