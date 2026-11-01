@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Courses photo cards — top scrims and Latest holes kicker
+- [x] SCRIMS 2 authorises gradient-only test selector and explicit isolated media-0/scrim-1/text-2 stacks in Latest holes and Latest courses; shared player unchanged.
+- [ ] Run focused/full shards, verify live stack, rename stop report and reconcile expected5,377/516 plus new cases.
 - [x] Add the shared 40% top scrim to the four requested card types; preserve every bottom scrim and all other sections.
 - [x] Change only Latest holes kicker; retarget its existing protecting test under brief authority.
 - [ ] Caption investigation: source and passing 0:11 video fixture retain course/member/date text; specific live row/data cause remains unverified. No caption fix made.
