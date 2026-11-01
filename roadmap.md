@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Courses hero — place line and scrim
-- [ ] Combine current location/list/tail beneath name in amber, remove Courses kicker, add opt-in masthead colour and taller scrim; detail hero unchanged.
-- [ ] Run focused and sharded checks; name inherited News observer failures without correcting them; report diff and test-count delta.
+- [x] Combined current location/list/tail beneath name in amber; no Courses kicker; opt-in masthead colour and taller scrim. Detail hero unchanged.
+- [x] Focused14/14; all full shards executed5370/515:5367 passed and the same3 inherited News observer failures, no new failures. Added10/+1, no existing assertion edits. See COURSES_HERO_PLACE_SCRIM_REPORT.md.
+- [ ] Authenticated live Courses verification unavailable: external_unmanaged; component fixture checks only.
 
 ## Tour Overview — News rebuild
 - [x] Implemented Overview-only opt-in shapes, freshness/details/player chips and one filtered board read observing the existing tournament cache; six locale catalogues updated. Existing selector and News defaults unchanged.
