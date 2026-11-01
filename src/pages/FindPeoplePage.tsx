@@ -561,7 +561,7 @@ function FollowPill({
       return;
     }
     const prev = followed;
-    markFollowed(key.slice(2) ? targetActorId : targetActorId, !prev);
+    markFollowed(key, !prev);
     setPending(true);
     try {
       await toggle.mutateAsync({
