@@ -1,5 +1,22 @@
 # Post flow — completed-edit stop
 
+## Approved test-isolation follow-up — 1 November, 18:31 UTC
+The cached-count stop is cleared. Added `resetCourseCatalogueCountForTests()` in `useCourseCatalogueCount.ts` to reset `countRead` only when explicitly called by tests; `postFlowScreens.test.tsx` calls it in `beforeEach`. The application's session cache and both search fields remain unchanged. No other component change.
+
+**Focused command:** `bunx vitest run src/test/postFlowScreens.test.tsx --maxWorkers=2 --reporter=json --outputFile=/tmp/post-flow-isolation/screens.json` — **21/21 passed**.
+
+**Full-suite commands**, each with `--maxWorkers=2 --reporter=json`:
+- `bunx vitest run --shard=1/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/post-flow-isolation/shard1.json` — **1,333/1,333**, 130 files.
+- `bunx vitest run --shard=2/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/post-flow-isolation/shard2.json` — **1,299/1,299**, 130 files.
+- `bunx vitest run --shard=3/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/post-flow-isolation/shard3.json` — **1,397/1,397**, 130 files.
+- `bunx vitest run --shard=4/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/post-flow-isolation/shard4.json` — **1,401/1,401**, 129 files.
+
+**Total: 5,430/5,430 across 519 files; zero failed or skipped tests.** Before this follow-up: expected 5,430/519, not previously verified; after: verified 5,430/519, **no inventory change**. Against last full green 5,380/516, **+50 tests/+3 files**, reconciled entirely by `src/test/postFlowRules.test.ts` (28), `src/test/postFlowScreens.test.tsx` (21), and `src/test/postFlowNoMember.test.tsx` (1); all now pass.
+
+No test deleted, renamed or rewritten. Only the approved import and setup call changed in the screen test file. AST comparison against the saved pre-edit file verifies all **33 assertion statements** byte-identical, including the named case `both search fields share exactly one head-only rounded catalogue read` and its assertion `expect(h.reads.filter(r=>r.ops.some((o:any)=>o[0]==='select'&&o[2]?.head))).toHaveLength(1);`. Reason: isolate each test's recorded reads while retaining the one-read shared-cache requirement.
+
+Automatic preview signal: **2026-11-01T18:31:41Z — build OK**. No manual build/typecheck or protected changes. This follow-up verifies test isolation and the full suite; it does not supply the outstanding real member-post/scheduled-post or Median-device evidence recorded below. Earlier stops below are historical and superseded by these passing results.
+
 ## Approved null-guard follow-up — 1 November, 18:29 UTC
 Applied Ben's exact return guard in `usePostCourseGroups.ts:52`, guarding both state objects before reading `.rows`. Existing member-read effect already returns without a userId. No other component changed in this follow-up.
 

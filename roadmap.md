@@ -2,13 +2,13 @@
 
 ## Post flow — signed-off tagging, posting and schedule
 - [x] Applied Ben's exact component null guard; postFlowScreens byte-identical by SHA256. Two-case rerun: single-select passes, cached-count assertion fails at postFlowScreens.test.tsx:27:511 `AssertionError: expected [] to have a length of 1 but got +0`. No further correction/rerun after failure; automatic build OK18:29:17Z.
-- [ ] Approved test-isolation follow-up: add a test-only catalogue-promise reset and call it before each postFlowScreens case, preserve every assertion, rerun that file and all full shards. Expected5430/519 (+50/+3 versus full green5380/516) awaits verification; see POST_FLOW_STOP_REPORT.md.
+- [x] Approved test-isolation follow-up: test-only catalogue-promise reset called in postFlowScreens beforeEach; all33 assertion statements unchanged by AST comparison. File21/21; full shards1333+1299+1397+1401=5430/5430 across519, zero failed/skipped. No inventory change this follow-up; +50/+3 vs5380/516 = postFlowRules28, postFlowScreens21, postFlowNoMember1. Automatic build OK18:31:41Z; see POST_FLOW_STOP_REPORT.md.
 - [ ] Rebuild the course tag sheet and real-photo Where tile, preserving ordered multi-select, single-select and photo-date reasons.
 - [ ] Rebuild upload progress, posted facts/actions and scheduled confirmation; preserve background uploads, failure handling and plain edit confirmation.
 - [ ] Rebuild Schedule with actor-scoped best-hour read, native minute-precision time input and countdown; preserve publishing and scheduled list.
 - [x] Ben authorised StageComposer handoffs; share one cached head-only course count, round down to thousands, loading/error fallback Search any course.
 - [ ] Run focused checks and full shards against 5,380/516; reconcile changed assertions and inventory; capture reachable 390×844 comparisons and report Median/real-post limits.
-- [ ] STOP: focused100 executed/98 passed/2 failed; both new postFlowScreens cases hit usePostCourseGroups.ts:52:47 `TypeError: Cannot read properties of null (reading 'rows')` without userId. No fix/rerun after failure. Ben must authorise null guard; report POST_FLOW_STOP_REPORT.md. Expected inventory5429/518 (+49/+2) unverified; automatic build OK18:23:52Z. Member screens/Median proof unavailable external_unmanaged.
+- [x] Historical post-flow null-guard and cached-read stops cleared by Ben's authorised source guard and test-isolation reset; all full-suite tests pass. Member screens/Median proof remains unavailable external_unmanaged.
 
 ## Courses photo cards — top scrims and Latest holes kicker
 - [x] SCRIMS 2 authorises gradient-only test selector and explicit isolated media-0/scrim-1/text-2 stacks in Latest holes and Latest courses; shared player unchanged.
