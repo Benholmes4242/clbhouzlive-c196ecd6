@@ -21,7 +21,7 @@ export function onCourse(entries: BoardEntry[], round: number | null) {
 }
 export function situation(entries: BoardEntry[], round: number | null, total: number | null) {
   const summary = leaderSummary(entries);
-  if (!summary || !entries.some(e => startedRound(e,round))) return null;
+  if (!summary || !entries.some(e => startedRound(e,round) || [e.round_1,e.round_2,e.round_3,e.round_4].some(v=>v!=null))) return null;
   const tied = entries.filter(e => e.score === summary.leader.score);
   const values = { name:surnameOf(summary.leader.player?.full_name ?? ''), other:surnameOf(tied[1]?.player?.full_name ?? ''), count:summary.count, margin:summary.lead, score:summary.leader.score, round };
   if (summary.count > 1) return { key:summary.count === 2 ? 'shareTwo' : 'shareMany', values };
