@@ -25,7 +25,12 @@ import { getActorRouteByType } from '@/types/actor';
 import { resolveKind, composeCommentBody, ACT, type KindSpec } from './ledgerKinds';
 import { activityRoundId, type ActivityRoundSummary } from '../hooks/useActivityRoundSummaries';
 import { ActivityRoundContent, ActivityRoundTile } from './ActivityRoundContent';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
 import '../activity-rounds.css';
+
+/** AC2 §3: crown and legend rows show the shortened course name (bolded);
+ * every other kind keeps the full server name. */
+const CROWN_LEGEND_TYPES = new Set(['crown_taken', 'crown_lost', 'legend_earned', 'legend_lost']);
 
 
 const SF_STACK =
@@ -444,12 +449,27 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
         <span style={{ fontWeight: 700, color: ACT.GOLD }}>{data.achievement_name}</span>
       </>
     );
-  } else if (spec.bold === 'course_name' && data.course_name && !body.includes(data.course_name)) {
-    bodyNode = (
-      <>
-        {bodyNode} <span style={{ fontWeight: 700 }}>{data.course_name}</span>
-      </>
-    );
+  } else if (spec.bold === 'course_name' && data.course_name) {
+    const fullName = data.course_name;
+    const isCrownLegend = CROWN_LEGEND_TYPES.has(row.notif_type);
+    if (isCrownLegend && body.includes(fullName)) {
+      // Crown/legend copy names the full course; swap in the bolded short
+      // name in place so the rest of the sentence stays exactly as served.
+      const at = body.indexOf(fullName);
+      bodyNode = (
+        <>
+          {renderBody(body.slice(0, at), row.actor_display_name)}
+          <span style={{ fontWeight: 700 }}>{shortCourseName(fullName)}</span>
+          {body.slice(at + fullName.length)}
+        </>
+      );
+    } else if (!body.includes(fullName)) {
+      bodyNode = (
+        <>
+          {bodyNode} <span style={{ fontWeight: 700 }}>{isCrownLegend ? shortCourseName(fullName) : fullName}</span>
+        </>
+      );
+    }
   }
 
   return (
