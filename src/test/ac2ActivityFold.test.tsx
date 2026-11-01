@@ -26,8 +26,8 @@ vi.mock('@/features/activity-v2/hooks/useActivityRoundSummaries', async (importO
 vi.mock('@/hooks/useUnreadNotifications', () => ({ useUnreadNotifications: () => ({ unreadCount: 0 }) }));
 vi.mock('@/features/activity-v2/hooks/useRecordsUnreadCount', () => ({ useRecordsUnreadCount: () => ({ data: 0 }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
-vi.mock('@/hooks/useHideBottomNav', () => ({ useHideBottomNav: () => {} }));
-vi.mock('@/hooks/useHideHeader', () => ({ useHideHeader: () => {} }));
+vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: () => {} }));
+vi.mock('@/hooks/useHeaderVisibility', () => ({ useHideHeader: () => {} }));
 vi.mock('@/components/layout/ManagePageShell', () => ({ ManagePageShell: ({ title, belowTitle, children }: { title: string; belowTitle?: React.ReactNode; children: React.ReactNode }) => <div><h1>{title}</h1>{belowTitle}{children}</div> }));
 vi.mock('@/features/activity-v2/components/FriendRequestsRail', () => ({ FriendRequestsRail: () => null }));
 vi.mock('@/features/social-suggestions/SuggestedGolfersBlock', () => ({ SuggestedGolfersBlock: () => null }));
@@ -158,7 +158,8 @@ describe('AC2 crown and legend rows', () => {
   it('leaves non-crown course names full length', () => {
     const review: ActivityFeedRowV2 = { ...round('rev'), notif_type: 'friend_course_review', message: 'Actor rev reviewed a course', data: { course_name: 'Sundridge Park Golf Club (West)' } };
     const { container } = render(<MemoryRouter><LedgerRow row={review} onMarkRead={vi.fn()} onLongPress={vi.fn()} /></MemoryRouter>);
-    expect(container.querySelector('span[style*="font-weight: 700"]')).toHaveTextContent('Sundridge Park Golf Club (West)');
+    const bolds = [...container.querySelectorAll('span[style*="font-weight: 700"]')];
+    expect(bolds.at(-1)).toHaveTextContent('Sundridge Park Golf Club (West)');
   });
 });
 
