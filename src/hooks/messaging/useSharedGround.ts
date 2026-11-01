@@ -13,10 +13,11 @@
  * rounds, capped at the twelve rows that fit on screen. Threads with a zero
  * count never issue a detail query, which is the common case.
  *
- * DEDUPE (a real fault in the RPC, handled here): detect_shared_rounds joins
- * whs_scores on (play_date, course_id) with no cardinality guard, so a member
- * with two rounds the same day at the same course against a rival with two
- * produces four rows. We collapse on (play_date, course_id) and keep the first.
+ * DEDUPE (MS2 §1): detect_shared_rounds joins whs_scores on (play_date,
+ * course_id) with no cardinality guard, so a member with two rounds the same
+ * day at the same course against a rival with two produces four rows.
+ * fetchSharedRounds now dedupes before counting, so the count, the records
+ * and the 90-day figure all describe real rounds.
  */
 
 import { useMemo } from 'react';
@@ -24,8 +25,13 @@ import { useQueries } from '@tanstack/react-query';
 import {
   fetchSharedRounds,
   fetchSharedRoundCounts,
+  dedupeSharedRounds,
   type SharedRoundResult,
 } from '@/lib/whs/api';
+
+// MS2 §1 — the helper moved to lib/whs/api; re-export so existing imports
+// (ms1MessagesHeadToHead.test) keep working.
+export { dedupeSharedRounds };
 
 export interface SharedGround {
   /** Rounds played together, most recent first, deduped. */
