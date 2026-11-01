@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Tour Overview — Also this week
-- [ ] Resolve eligibility conflict: the brief freezes isAlsoThisWeek (completed events excluded), while section 4 and the signed-off mock require finished events.
+- [x] Eligibility ruling: completed slides from the last three days join unchanged live/upcoming rules; preserve order, viewing-event exclusion and four-event cap.
 - [ ] Rebuild event presentation, batched reads, shared leaderboard rules and locale strings; preserve navigation, score colours and guest gating.
 - [ ] Make World Rankings falls muted; run full suite in shards against 5,004/502 and capture 390×844 comparisons.
 
