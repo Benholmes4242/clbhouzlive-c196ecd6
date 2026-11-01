@@ -34,7 +34,7 @@ export function NewsEventCard({ tournamentId, follows }: { tournamentId: string;
   const { data: tournament, isPending } = useTourTournament(tournamentId);
   const state = useMemo(() => {
     if (!tournament) return null;
-    const t0 = tournament as Record<string, unknown>;
+    const t0 = tournament as unknown as Record<string, unknown>;
     return deriveHeroState({
       id: t0.id,
       name: t0.name,
