@@ -4,7 +4,7 @@
 - [x] Add one summary RPC read per loaded feed page, keyed by sorted round ids; loading/errors remain not ready.
 - [x] Render signed-off round sentence/meta, score tile and hole strip; preserve scorecard taps, grouping and Records wording.
 - [x] Replace unread wash/right dot with neutral ground/white left dot; Tour-destination system rows get optional tour_short_name or Tour tiles.
-- [x] Focused149/149; full shards5458/5458 across520 (+28/+1 versus5430/519 solely ac1ActivityRounds); existing tests unchanged. See AC1_ACTIVITY_STOP_REPORT.md.
+- [x] Focused149/149; full shards5458/5458 across520 (+28/+1 versus5430/519 solely ac1ActivityRounds); existing tests unchanged. AC1.1 type fix at line 103 applied; typecheck clean; shards re-run 5458/5458 across520. See AC1_ACTIVITY_REPORT.md.
 - [ ] STOP: src/test/ac1ActivityRounds.test.tsx(103,60) TS2345: Argument of type '(holes: any) => void' is not assignable to parameter of type '() => Awaitable<void>'. Target signature provides too few arguments. Expected 1 or more, but got 0. Await fixture-table typing authorisation; no correction/rerun. Browser geometry/colours and real member readback unverified.
 
 ## Post flow — signed-off tagging, posting and schedule
