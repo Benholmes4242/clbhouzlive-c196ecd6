@@ -1,13 +1,13 @@
 # Roadmap
 
-## Tour News page rebuild (news-page-signed-off.html)
-- [ ] Page head: "Tour News" 26/800 + 38px search button; shared new-since-last-visit line (newsVisit.ts).
-- [ ] Lead story 440px hero, bottom-only overlay; event card (deriveHeroState before/live/finished) replaces ticker; no marquee.
-- [ ] Your players (members only, 30 days, ≤3, excl. lead); Top stories pair+3 rows; details line gains like/comment counts; no like/comment buttons on page.
-- [ ] By event chips from one sr_tournaments read (displayEventName), filter archive only, 3+ rule; archive grouped This week/Last week/month(+year), date blocks, read styling, Show older stories.
-- [ ] Search: 46px field + Cancel, server read on tour_stories (headline/standfirst/kicker ilike, lens, 50, 250ms debounce, ≥2 chars), underlined matches, empty message.
-- [ ] Reuse newsVisit/overviewNewsRules/OverviewNewsStory; StoryPage and overview News untouched; StoryLeaderboardStrip stays for StoryPage only.
-- [ ] Tests per brief §11; full shards vs 5,482/521; 390×844 captures vs mock; report.
+## Tour News page rebuild (news-page-signed-off.html) — DONE
+- [x] Page head: "Tour News" 26/800 + 38px search button; shared new-since-last-visit line (newsVisit.ts).
+- [x] Lead story 440px hero, bottom-only overlay; event card (deriveHeroState before/live/finished) replaces ticker; no marquee.
+- [x] Your players (members only, 30 days, ≤3, excl. lead); Top stories pair+3 rows; details line gains like/comment counts; no like/comment buttons on page.
+- [x] By event chips from one sr_tournaments read (displayEventName), filter archive only, 3+ rule; archive grouped This week/Last week/month(+year), date blocks, read styling, Show older stories.
+- [x] Search: 46px field + Cancel, server read on tour_stories (headline/standfirst/kicker ilike, lens, 50, 250ms debounce, ≥2 chars), underlined matches, empty message.
+- [x] Reuse newsVisit/overviewNewsRules/OverviewNewsStory; StoryPage and overview News untouched; StoryLeaderboardStrip stays for StoryPage only.
+- [x] Tests per brief §11 (31 new); full shards 5,513/5,513 across 522 files (+31/+1 vs 5,482/521); tsc clean; report in TOUR_NEWS_PAGE_REPORT.md. Screenshots skipped per Ben — guest join card covers the section, visuals unit-tested.
 
 ## AC2 — Activity folding rounds and crown rows
 - [x] Fold 3+ read round rows in non-New day sections into one row at the newest's position; unread never fold; other types untouched (All and Friends chips only).
