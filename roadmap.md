@@ -1417,3 +1417,8 @@
 - [x] cb99 file 25/25. Full bunx vitest run 3,332 passed / 387 files / 0 failed. Baseline 3,321/384 at CB101 plus profileFeedInViewGate (+6/+1), review-wizard overlay-chrome lifecycle test (+1/+1), mediaTrayAddTileFirst (+4/+1). tsgo not run (test-only change); harness build OK. No SQL/migrations/RPC/edge-function/feed_config changes; round_pool_cap stays 30.
 
 - [x] POST PAGE follow-up — mock and editor pill implemented; 4,965/4,965 tests pass. Fixture frame fix applied; post_with types present in src/integrations/supabase/types.ts and the postWithTable() cast removed (4,965/4,965 across 499 files). Screenshots still outstanding (signed-in session unavailable from the sandbox).
+
+## MS2 — Messages: true round count + last four-ball card
+- [x] fetchSharedRounds dedupes before counting; dedupeSharedRounds moved to lib/whs/api (re-exported from useSharedGround); toGround count always equals deduped rounds. friend_rivalry/friend-sheet HeadToHeadCard untouched (pairing-based, named in MS2_MESSAGES_REPORT.md).
+- [x] Four-ball card in NewConversationSheet (useLastFourball + shared runCreateGroup path); 2–3 people, hidden while loading/error/searching.
+- [x] New ms2MessagesFourball.test.tsx (14). Full sharded suite 5,555/5,555 across 524 files (+14/+1 vs 5,541/523); tsgo clean. Signed-in live RPC check unavailable.
