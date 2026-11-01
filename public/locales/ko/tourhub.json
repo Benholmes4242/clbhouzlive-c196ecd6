@@ -147,7 +147,9 @@
         "r2d": "Race to Dubai",
         "rolex": "Rolex Rankings"
       },
-      "movementBasis": "Positions moved over {{days}} days"
+      "movementBasis": "Positions moved over {{days}} days",
+      "eventsLeft_one": " with <b>{{count}}</b> event left.",
+      "eventsLeft_other": " with <b>{{count}}</b> events left."
     },
     "leaderRow": {
       "tiedAtTop_one": "{{count}} tied at the top",
