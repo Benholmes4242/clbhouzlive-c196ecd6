@@ -71,7 +71,7 @@ describe('SeasonRow rebuilt grammar', () => {
     expect(name.style.display).toBe('-webkit-box'); // two-line clamp (jsdom drops -webkit-line-clamp)
     const venue = screen.getByText('Trump International Golf Links (Ireland) · Clare');
     expect(venue.style.textOverflow).toBe('ellipsis');
-    expect(screen.getByText('Thu 10 – Sun 13 Sep')).toBeInTheDocument();
+    expect(screen.getByText('Thu 10 – Sun 13 Sept')).toBeInTheDocument();
   });
 
   it('completed: WON stack with headshot, surname and score coloured by getScoreColor', () => {
