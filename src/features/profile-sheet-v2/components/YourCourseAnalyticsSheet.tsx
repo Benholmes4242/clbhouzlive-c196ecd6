@@ -840,7 +840,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           analyticsEvents.track('course_analytics_row_expanded', {
             course_id: course.course_id,
             rounds: course.rounds_count,
-            
+
           });
         }
         return next;
@@ -848,6 +848,34 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
     },
     [],
   );
+
+  /** YC1 sort chips: track the choice, never re-track the current one. */
+  const chooseSort = useCallback((next: CourseSort) => {
+    setSort((prev) => {
+      if (prev !== next) analyticsEvents.track('course_analytics_sort', { sort: next });
+      return next;
+    });
+  }, []);
+
+  /** YC1 tile tap: expand that course's card and scroll it into view. */
+  const focusCourse = useCallback((course: UserAnalyticsCourse) => {
+    setExpandedIds((prev) => {
+      if (prev.has(course.course_id)) return prev;
+      const next = new Set(prev);
+      next.add(course.course_id);
+      analyticsEvents.track('course_analytics_row_expanded', {
+        course_id: course.course_id,
+        rounds: course.rounds_count,
+      });
+      return next;
+    });
+    // After the expand paints, bring the card into view.
+    setTimeout(() => {
+      cardRefs.current
+        .get(course.course_id)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
+  }, []);
 
   const signedBaseline = baseline != null ? fmtSigned(baseline, 1) : null;
   const subLine =
