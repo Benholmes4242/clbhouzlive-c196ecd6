@@ -1,6 +1,7 @@
 # Roadmap
 
 ## YC2 — Your courses opened card
+- [ ] Latest brief `YC2_-_Your_courses_sheet_the_opened_course_pasted.md` / `yc2-open-card.html`: stop for data-scope ruling. Brief requires every round for all-round average/count and best-ever round; `useMyRoundsByCourse.ts:27,29,50,59` currently caps history at 20/course and 2,000 total. No source change or implementation before ruling; YC1 remains frozen.
 - [ ] Rebuild the expanded card in YourCourseAnalyticsSheet.tsx per the uploaded YC2 brief/mock; keep YC1 list intact; add yc2YourCourses tests and blended regression. YC1 shipped: 5,202/5,202 across 510 (+30/+1 vs 5,172/509).
 
 ## Tour Overview — World rankings rebuild
