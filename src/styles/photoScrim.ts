@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
  * or a glass chip over a photograph (BRIEF_APP_WIDE_SCRIM,
  * CORRECTION_APP_WIDE_SCRIM).
  *
- * Two tokens, and only two:
+ * Default photo treatments (plus the explicit Courses hero exception below):
  *
  *   SCRIM_STANDOUT     the bottom-weighted gradient, for FULL-BLEED photo
  *                      surfaces (cards, tiles, media trays, posters).
@@ -40,6 +40,10 @@ import type { CSSProperties } from 'react';
 /** The one gradient. Terminates transparent at 32% — it never meets a surface. */
 export const SCRIM_STANDOUT =
   'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)';
+
+/** Taller than SCRIM_STANDOUT to cover the Courses hero's name, place, blurb and fact. */
+export const SCRIM_HERO_TALL =
+  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 60%)';
 
 /** The one chip class. Carries both the flat fallback and the blurred branch. */
 export const CHIP_GLASS_CLASS = 'standout-figure-chip';

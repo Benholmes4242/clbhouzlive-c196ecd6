@@ -8,6 +8,8 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
  * (macro area), then a hairline above whatever each hero puts beneath it.
  * Region and macro area arrive as separate fields from each hero's source;
  * never split a joined display string to feed this.
+ * Courses opts out of the kicker and supplies its combined amber place;
+ * placeColor is opt-in so the course-detail head retains its original ink.
  */
 
 const HERO_HAIRLINE = 'rgba(255,255,255,0.18)';
@@ -92,6 +94,7 @@ export interface CourseMastheadProps {
   kicker: string | null;
   name: string;
   place: string | null;
+  placeColor?: string;
   /** Each hero keeps its own clamp; undefined = no clamp. */
   nameClamp?: number;
   /** Rendered left of the name block, baseline-aligned (Courses ranked variant). */
@@ -109,7 +112,7 @@ export function MastheadRule({ children }: { children: React.ReactNode }) {
 }
 
 export const CourseMasthead: React.FC<CourseMastheadProps> = ({
-  kicker, name, place, nameClamp, nameLead, as = 'div', children,
+  kicker, name, place, placeColor = PLACE_INK, nameClamp, nameLead, as = 'div', children,
 }) => {
   const NameTag = as;
   const clamp: React.CSSProperties = nameClamp
@@ -122,7 +125,7 @@ export const CourseMasthead: React.FC<CourseMastheadProps> = ({
         {nameLead}
         <div style={{ minWidth: 0, flex: 1 }}>
           <NameTag style={{ ...MASTHEAD_NAME, ...clamp }}>{name}</NameTag>
-          {place && <div style={MASTHEAD_PLACE}>{place}</div>}
+          {place && <div style={{ ...MASTHEAD_PLACE, color: placeColor }}>{place}</div>}
         </div>
       </div>
       {children != null && children !== false && <MastheadRule>{children}</MastheadRule>}
