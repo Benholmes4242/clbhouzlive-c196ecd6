@@ -25,7 +25,7 @@ export function orderedNewsPlayers(story: TourStory, follows: Set<string>): stri
   return [...ids.filter(id => follows.has(id)), ...ids.filter(id => !follows.has(id))];
 }
 export interface NewsPlayer { id: string; surname: string; followed: boolean; live: boolean; position?: string; score?: string; color?: string; thru?: string }
-export interface NewsPresentation { isNew: boolean; liveRound: number | null; players: NewsPlayer[]; followedPlayer?: NewsPlayer; now?: Date }
+export interface NewsPresentation { isNew: boolean; liveRound: number | null; players: NewsPlayer[]; followedPlayer?: NewsPlayer; now?: Date; /** Opt-in (News page): like/comment counts for the details line. */ engagement?: { likes: number; comments: number } }
 export function newsPlayers(story: TourStory, follows: Set<string>, names: Map<string, string>, board: BoardEntry[], round: number | null): NewsPlayer[] {
   return orderedNewsPlayers(story, follows).flatMap(id => {
     const entry = board.find(row => row.player?.id === id);
