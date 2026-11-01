@@ -51,6 +51,7 @@ interface MergedRow {
   venue_country: string | null;
   purse: number | null;
   defending_champion: string | null;
+  event_type?: string | null;
   golf_course_id?: string | null;
   course?: CoursePlaceJoin | CoursePlaceJoin[];
   season?: { tour_name: string | null; tour_full_name: string | null } | null;
