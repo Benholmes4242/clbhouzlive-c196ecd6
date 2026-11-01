@@ -25,7 +25,6 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { toast } from '@/lib/toast';
 import { getProfilePathById } from '@/lib/profileRoutes';
-import { businessCategoryWord } from '@/lib/business/businessHero';
 import { useGlobalSearchV2 } from '@/features/search-v2/hooks/useGlobalSearchV2';
 import { businessCategoryLabel } from '@/features/find-people/railRules';
 import { navClub, navPerson } from '@/features/search-v2/lib/searchNavigation';
