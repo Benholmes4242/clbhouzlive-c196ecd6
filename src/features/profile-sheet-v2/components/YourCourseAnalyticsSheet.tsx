@@ -1174,17 +1174,26 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
             </div>
           ) : showList ? (
             <>
-              <div style={CARD_LIST}>
+              {/* Course cards carry their own 10px top margin and 16px
+                  gutters (YC1); the wrapper only registers refs so a tile tap
+                  can scroll its card into view. */}
+              <div>
                 {listItems.map((c) => (
-                  <AnalyticsCourseRow
+                  <div
                     key={c.course_id}
-                    course={c}
-                    expanded={expandedIds.has(c.course_id)}
-                    onToggle={() => toggle(c)}
-                    onOpen={(from) => go(c.course_id, from)}
-                    trend={roundsByCourse?.get(c.course_id)}
-                  />
-
+                    ref={(el) => {
+                      if (el) cardRefs.current.set(c.course_id, el);
+                      else cardRefs.current.delete(c.course_id);
+                    }}
+                  >
+                    <AnalyticsCourseRow
+                      course={c}
+                      expanded={expandedIds.has(c.course_id)}
+                      onToggle={() => toggle(c)}
+                      onOpen={(from) => go(c.course_id, from)}
+                      trend={roundsByCourse?.get(c.course_id)}
+                    />
+                  </div>
                 ))}
               </div>
 
