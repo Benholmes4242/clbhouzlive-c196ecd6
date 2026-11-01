@@ -361,15 +361,16 @@ function RailCardView({
 
       {/* Avatar: golfer squircle; business logo or white initials tile. */}
       {isPerson ? (
-        <SquircleAvatar
-          src={card.person.profile_photo_url ?? undefined}
-          alt={name}
-          userId={card.person.user_id}
-          size={64}
-          fallback={name.charAt(0)}
-          hairlineRing
-          style={{ margin: '4px auto 0' }}
-        />
+        <div style={{ margin: '4px auto 0', width: 64 }}>
+          <SquircleAvatar
+            src={card.person.profile_photo_url ?? undefined}
+            alt={name}
+            userId={card.person.user_id}
+            size={64}
+            fallback={name.charAt(0)}
+            hairlineRing
+          />
+        </div>
       ) : card.business.logo_url ? (
         <div
           style={{
