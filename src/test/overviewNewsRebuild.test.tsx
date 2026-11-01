@@ -21,8 +21,9 @@ const wrap = (node: React.ReactNode) => render(<I18nextProvider i18n={i18n}><Mem
 const playersStory = story('a', { body_blocks: [{ type: 'player', player_id: 'a' }, { type: 'stat', player_id: 'b' }, { type: 'round', player_id: 'a', tournament_id: 't' }, { type: 'player', player_id: 'c' }, { type: 'player', player_id: 'd' }] });
 const names = new Map(['a','b','c','d'].map(id => [id, `Player ${id.toUpperCase()}`]));
 const board = (id: string, values: Partial<BoardEntry> = {}): BoardEntry => ({ id: `row-${id}`, player: { id, full_name: `Player ${id.toUpperCase()}` }, position: 2, position_tied: true, score: -15, today: -4, today_round: 4, thru: 9, ...values });
+const original = window.IntersectionObserver;
 beforeEach(() => localStorage.clear());
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers(); });
+afterEach(() => { cleanup(); window.IntersectionObserver = original; vi.restoreAllMocks(); vi.useRealTimers(); });
 
 describe('device News freshness', () => {
   it('first visit marks nothing', () => expect(isNewStory(story(), readNewsVisit())).toBe(false));
@@ -40,18 +41,18 @@ describe('device News freshness', () => {
     vi.useFakeTimers(); vi.setSystemTime(now);
     if (!first) localStorage.setItem(NEWS_LAST_SEEN,String(now.getTime()-1000));
     let callback: IntersectionObserverCallback | undefined;
-    vi.stubGlobal('IntersectionObserver',class { constructor(cb: IntersectionObserverCallback){callback=cb;} observe(){} disconnect(){} });
+    window.IntersectionObserver = class { constructor(cb: IntersectionObserverCallback){callback=cb;} observe(){} disconnect(){} } as unknown as typeof window.IntersectionObserver;
     function Test(){const {ref,visit}=useNewsVisit();return <section ref={ref} data-new={isNewStory(story(),visit)} />;}
     const r=render(<Test />);
     act(()=>callback?.([{isIntersecting:true,intersectionRatio:.5} as IntersectionObserverEntry],{} as IntersectionObserver));
     act(()=>vi.advanceTimersByTime(999)); expect(localStorage.getItem(NEWS_LAST_SEEN)).toBe(first?null:String(now.getTime()-1000));
-    act(()=>vi.advanceTimersByTime(1));expect(localStorage.getItem(NEWS_LAST_SEEN)).toBe(String(now.getTime()+1000));expect(r.container.querySelector('section')?.getAttribute('data-new')).toBe(String(!first));vi.unstubAllGlobals();
+    act(()=>vi.advanceTimersByTime(1));expect(localStorage.getItem(NEWS_LAST_SEEN)).toBe(String(now.getTime()+1000));expect(r.container.querySelector('section')?.getAttribute('data-new')).toBe(String(!first));
   });
   it('visibility below half cancels the pending baseline', () => {
     vi.useFakeTimers();let callback:IntersectionObserverCallback|undefined;
-    vi.stubGlobal('IntersectionObserver',class{constructor(cb:IntersectionObserverCallback){callback=cb;}observe(){}disconnect(){}});
+    window.IntersectionObserver = class{constructor(cb:IntersectionObserverCallback){callback=cb;}observe(){}disconnect(){}} as unknown as typeof window.IntersectionObserver;
     function Test(){const {ref}=useNewsVisit();return <section ref={ref}/>;}render(<Test/>);
-    act(()=>callback?.([{isIntersecting:true,intersectionRatio:.5} as IntersectionObserverEntry],{} as IntersectionObserver));act(()=>vi.advanceTimersByTime(500));act(()=>callback?.([{isIntersecting:true,intersectionRatio:.49} as IntersectionObserverEntry],{} as IntersectionObserver));act(()=>vi.advanceTimersByTime(1000));expect(localStorage.getItem(NEWS_LAST_SEEN)).toBeNull();vi.unstubAllGlobals();
+    act(()=>callback?.([{isIntersecting:true,intersectionRatio:.5} as IntersectionObserverEntry],{} as IntersectionObserver));act(()=>vi.advanceTimersByTime(500));act(()=>callback?.([{isIntersecting:true,intersectionRatio:.49} as IntersectionObserverEntry],{} as IntersectionObserver));act(()=>vi.advanceTimersByTime(1000));expect(localStorage.getItem(NEWS_LAST_SEEN)).toBeNull();
   });
 });
 
