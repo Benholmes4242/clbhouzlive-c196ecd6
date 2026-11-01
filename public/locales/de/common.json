@@ -836,5 +836,59 @@
       "coursesKicker": "Courses",
       "tourKicker": "Tour"
     }
+  },
+  "findPeople": {
+    "title": "Leute finden",
+    "searchPlaceholder": "Golfer und Unternehmen suchen",
+    "chip": {
+      "suggested": "Vorschläge",
+      "golfers": "Golfer",
+      "businesses": "Unternehmen"
+    },
+    "loading": "Wird geladen…",
+    "empty": "Noch keine Vorschläge. Suche oben oder lade Freunde ein.",
+    "noResults": "Keine Treffer.",
+    "follow": "Folgen",
+    "following": "Gefolgt",
+    "followAll": "Allen {{count}} folgen",
+    "followingAll": "Allen gefolgt",
+    "followers": "{{count}} Follower",
+    "followers_one": "{{count}} Follower",
+    "inviteLine": "Lade Freunde ein, die noch nicht auf clbhouz sind",
+    "inviteAction": "Freunde einladen",
+    "reason": {
+      "club": "Mitglied bei {{club}}",
+      "playedWith": "{{course}}, {{date}}",
+      "playedWithCourse": "{{course}}",
+      "playedWithDate": "{{date}}",
+      "playedWithFallback": "Hat mit dir gespielt",
+      "reciprocal": "Folgt dir",
+      "course": "Spielt {{course}}",
+      "clubmateMutual": "Gefolgt von {{count}} aus {{club}}",
+      "mutual": "Gefolgt von {{count}}, denen du folgst",
+      "popular": "Beliebt auf clbhouz",
+      "active": "{{count}} Runden in den letzten zwei Wochen",
+      "recentlyJoined": "Neu auf clbhouz"
+    },
+    "bizReason": {
+      "yourClubSuggested": "Dein Club · {{category}}",
+      "yourClubCity": "{{category}} · {{city}}",
+      "categoryOnly": "{{category}}",
+      "nearClubMiles": "{{category}} · {{miles}} Meilen",
+      "popularCity": "{{category}} · {{city}}"
+    },
+    "group": {
+      "fromClub": "Aus {{club}}",
+      "playedWith": "Hat mit dir gespielt",
+      "playsCourses": "Spielt deine Plätze",
+      "popular": "Beliebt auf clbhouz",
+      "followsYou": "Folgt dir",
+      "known": "Gefolgt von Leuten, die du kennst",
+      "active": "Spielt derzeit",
+      "new": "Neu auf clbhouz",
+      "yourClub": "Dein Club",
+      "nearClub": "Nahe {{club}}",
+      "coaches": "Trainer und Akademien"
+    }
   }
 }
