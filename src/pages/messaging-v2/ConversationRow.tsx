@@ -131,6 +131,40 @@ function resolveContext(
   });
 }
 
+/**
+ * MS1 §5 — the inbox third line when the partner has shared rounds:
+ * "{count} rounds together · you lead {w}–{l}" / "{name} leads {l}–{w}" /
+ * "all square {w}–{l}" from the POINTS record. The record part is ink/600.
+ * When the record isn't loaded yet (outside the batch detail limit) the line
+ * is the count alone. Returns null when there are no shared rounds, so the
+ * caller keeps today's context line.
+ */
+export function inboxRecordLine(
+  ground: SharedGround,
+  rivalFirstName: string,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): { count: string; record: string | null } {
+  const count = t('context.roundsTogether', {
+    count: ground.count,
+    defaultValue: `${ground.count} rounds together`,
+  });
+  const rec = ground.record;
+  if (!rec) return { count, record: null };
+  const { w, l } = rec.points;
+  const record =
+    w > l
+      ? t('context.youLead', { w, l, defaultValue: `you lead ${w}–${l}` })
+      : l > w
+        ? t('context.rivalLeads', {
+            name: rivalFirstName,
+            w: l,
+            l: w,
+            defaultValue: `${rivalFirstName} leads ${l}–${w}`,
+          })
+        : t('context.allSquare', { w, l, defaultValue: `all square ${w}–${l}` });
+  return { count, record };
+}
+
 export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
   const { t } = useTranslation('messaging');
   const navigate = useNavigate();
