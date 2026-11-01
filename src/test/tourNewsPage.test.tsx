@@ -298,13 +298,16 @@ describe('News page Top stories and archive', () => {
     expect(new Set(labels).size).toBe(labels.length);
   });
   it('groups the archive This week / Last week / month / month with year, weekday under the day', () => {
+    // With p1 followed, 'yours' sits in Your players and the archive is
+    // exactly the eleven dated stories.
+    h.follows = new Set(['p1']);
     mountPage();
     const headings = [...document.querySelectorAll('.tour-news-grp')].map((el) => el.textContent);
-    expect(headings).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025']);
+    expect(headings).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025', 'JUNE 2025']);
     const firstRow = document.querySelector('.tour-news-ar');
     expect(firstRow?.querySelector('.tour-news-ar-date b')).toHaveTextContent('28');
     expect(firstRow?.querySelector('.tour-news-ar-date small')).toHaveTextContent('WED');
-    // The second page carries the older month groups.
+    // The second page carries the oldest month group.
     fireEvent.click(screen.getByRole('button', { name: 'Show older stories' }));
     const after = [...document.querySelectorAll('.tour-news-grp')].map((el) => el.textContent);
     expect(after).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025', 'JUNE 2025', 'MARCH 2025']);
