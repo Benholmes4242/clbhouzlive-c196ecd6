@@ -200,22 +200,27 @@ describe('AC2 page folding', () => {
   it('folds three read rounds on All and keeps the unread round and like row unfolded', () => {
     h.feed = feedFor([round('u', { is_read: false }), ...rows]);
     h.summaries = summaries;
-    mountPage();
+    const { container } = mountPage();
     expect(screen.getByTestId('activity-fold-row')).toHaveTextContent('4 golfers posted rounds');
-    expect(screen.getByText(/Actor u shared a round/)).toBeTruthy();
+    const sentences = [...container.querySelectorAll('.activity-round-sentence')].map((el) => el.textContent);
+    expect(sentences).toEqual(['Actor u shared a round']);
     expect(screen.getByText(/liked your post/)).toBeTruthy();
-    expect(screen.queryByText(/Actor a shared a round/)).toBeNull();
   });
 
   it('opens in place in score order with the not-ready round last, changes the day label and never marks read', () => {
     h.feed = feedFor(rows);
     h.summaries = summaries;
-    mountPage();
+    const { container } = mountPage();
     fireEvent.click(screen.getByTestId('activity-fold-row'));
     expect(screen.queryByTestId('activity-fold-row')).toBeNull();
     expect(screen.getByText('Today · 4 golfers posted rounds')).toBeTruthy();
-    const sentences = screen.getAllByText(/shared a round/).map((el) => el.textContent);
-    expect(sentences).toEqual(['Actor b shared a round.', 'Actor c shared a round.', 'Actor a shared a round.', 'Actor d shared a round.']);
+    const sentences = [...container.querySelectorAll('.activity-round-sentence')].map((el) => el.textContent);
+    expect(sentences).toEqual([
+      'Actor b shot 75 at Sundridge Park · East',
+      'Actor c shot 80 at Sundridge Park · East',
+      'Actor a shot 84 at Sundridge Park · East',
+      'Actor d shared a round',
+    ]);
     expect(screen.getByRole('button', { name: 'Show less' })).toBeTruthy();
     expect(h.markRead).not.toHaveBeenCalled();
   });
@@ -259,10 +264,10 @@ describe('AC2 page folding', () => {
   it('never folds on the Mentions chip', () => {
     h.feed = feedFor(rows);
     h.summaries = summaries;
-    mountPage();
+    const { container } = mountPage();
     fireEvent.click(screen.getByRole('button', { name: 'Mentions' }));
     expect(screen.queryByTestId('activity-fold-row')).toBeNull();
-    expect(screen.getAllByText(/shared a round/)).toHaveLength(4);
+    expect(container.querySelectorAll('.activity-round-sentence')).toHaveLength(4);
   });
 
   it('never folds the New chip', () => {
