@@ -132,7 +132,22 @@
     "rankings": {
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
-      "movementBasis": "Positions moved over {{days}} days"
+      "leadsBy": "<b>{{name}}</b> leads by <b>{{gap}}</b> points",
+      "clauseTwice": ", more than twice anyone else's total",
+      "clauseNearly": ", nearly twice anyone else's total",
+      "clauseEnd": ".",
+      "eventsLeft": " with <b>{{count}}</b> events left.",
+      "level": "<b>{{name}}</b> and <b>{{other}}</b> are level on <b>{{points}}</b> points.",
+      "colRank": "Rank",
+      "colPlayer": "Player",
+      "colPoints": "Points",
+      "colWins": "Wins",
+      "colSince": "Since {{date}}",
+      "yourPlayers": "Your players",
+      "followedCount_one": "{{count}} followed",
+      "followedCount_other": "{{count}} followed",
+      "climbLabel": "Biggest climb in the top 50",
+      "climbLine": "{{name}} <up>▲{{count}}</up> <m>to {{ordinal}} since {{date}}</m>"
     },
     "alsoThisWeek": {
       "title": "Also this week",

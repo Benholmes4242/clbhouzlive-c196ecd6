@@ -91,6 +91,16 @@ export interface RankingsBoardResult {
   rows: RankingsRow[];
   /** Days between the compared snapshots, or null when this board has no history. */
   basisDays: number | null;
+  /** The comparison snapshot's date (World only) — feeds the "SINCE {d MMM}" header. */
+  comparisonDate: string | null;
+  /** The latest ranking_date (World only) — anchors the climber's 180-day history read. */
+  latestDate: string | null;
+  /** Comparison-snapshot ranks for EVERY player (World only), so followed
+   *  players below the five get a movement figure without another read. */
+  comparisonRanks: Record<string, number> | null;
+  /** Remaining events in the tour's current season (season boards only), or
+   *  null when they cannot be counted from sr_tournaments. */
+  eventsLeft: number | null;
 }
 
 function isoMinusDays(iso: string, days: number): string {
@@ -132,6 +142,8 @@ async function fetchComparisonSnapshot(
 }
 
 async function fetchOwgr(): Promise<RankingsBoardResult> {
+  // The read covers the top 50 (was 40): the five shown are unchanged, and the
+  // biggest-climb card is picked from the same fifty.
   const { data, error } = await supabase
     .from('sr_world_rankings')
     .select(`
@@ -142,13 +154,13 @@ async function fetchOwgr(): Promise<RankingsBoardResult> {
     `)
     .order('ranking_date', { ascending: false })
     .order('rank', { ascending: true })
-    .limit(40);
+    .limit(50);
   if (error) throw error;
   const latest = data?.[0]?.ranking_date ?? null;
   const rows = (data ?? [])
     .filter((r: any) => r.ranking_date === latest)
     .filter((r: any) => r.player && r.rank > 0)
-    .slice(0, 5);
+    .slice(0, 50);
   const [statsMap, comparison] = await Promise.all([
     fetchOwgrStats(rows.map((r: any) => r.player.id)),
     latest ? fetchComparisonSnapshot(latest) : Promise.resolve(null),
@@ -157,6 +169,10 @@ async function fetchOwgr(): Promise<RankingsBoardResult> {
     comparison && latest ? daysBetween(latest, comparison.date) : null;
   return {
     basisDays,
+    comparisonDate: comparison?.date ?? null,
+    latestDate: latest,
+    comparisonRanks: comparison ? Object.fromEntries(comparison.ranks) : null,
+    eventsLeft: null,
     rows: rows.map((r: any) => {
       const s = statsMap.get(r.player.id);
       const older = comparison?.ranks.get(r.player.id) ?? null;
@@ -179,6 +195,38 @@ async function fetchOwgr(): Promise<RankingsBoardResult> {
   };
 }
 
+
+/** tour_season_rankings tour_code -> sr_seasons tour_name (verified: EURO/LPGA/PGAD/LIV). */
+const SEASON_SR_TOUR: Record<'euro' | 'lpga' | 'liv' | 'pgad', string> = {
+  euro: 'EURO',
+  lpga: 'LPGA',
+  liv: 'LIV',
+  pgad: 'PGAD',
+};
+
+/**
+ * "with {n} events left": sr_tournaments rows in the tour's current season
+ * (the same year the board read uses) whose status is scheduled or created —
+ * i.e. not yet played. Any read failure -> null and the clause is omitted.
+ */
+async function countEventsLeft(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Promise<number | null> {
+  const year = new Date().getFullYear();
+  const { data: seasons, error: sErr } = await supabase
+    .from('sr_seasons')
+    .select('id')
+    .eq('tour_name', SEASON_SR_TOUR[tourCode])
+    .eq('year', year);
+  if (sErr) return null;
+  const seasonIds = ((seasons ?? []) as any[]).map((s) => s.id);
+  if (seasonIds.length === 0) return null;
+  const { count, error: tErr } = await supabase
+    .from('sr_tournaments')
+    .select('id', { count: 'exact', head: true })
+    .in('season_id', seasonIds)
+    .in('status', ['scheduled', 'created']);
+  if (tErr || count == null) return null;
+  return count;
+}
 
 async function fetchSeasonBoard(
   tourCode: 'euro' | 'lpga' | 'liv' | 'pgad',
@@ -225,6 +273,10 @@ async function fetchSeasonBoard(
     // boards carry NO delta at all rather than a week-shaped number sitting
     // beside a 90-day one on the World board.
     basisDays: null,
+    comparisonDate: null,
+    latestDate: null,
+    comparisonRanks: null,
+    eventsLeft: await countEventsLeft(tourCode),
     rows: rows.map((r) => {
       const pid = r.player_id ?? r.manual_player_id ?? null;
       const joined = pid ? playerMap.get(pid) : null;

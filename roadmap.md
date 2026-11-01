@@ -1,5 +1,12 @@
 # Roadmap
 
+## YC2 — Your courses opened card
+- [ ] Rebuild the expanded card in YourCourseAnalyticsSheet.tsx per the uploaded YC2 brief/mock; keep YC1 list intact; add yc2YourCourses tests and blended regression. YC1 shipped: 5,202/5,202 across 510 (+30/+1 vs 5,172/509).
+
+## Tour Overview — World rankings rebuild
+- [x] Data report: latest 2026-10-26 (500 rows); previous 2026-10-19/10-12/10-05; 90-day window resolves to 2026-07-27 (basisDays 91). Events left counted from sr_tournaments status scheduled/created in the board's season year (EURO 2026: 2).
+- [ ] Rebuilt section: sentence, column header, headshot+flag rows, points bars, Your players, biggest-climb card; locales in six catalogues; worldRankingsRebuild tests; full shards; 390×844 proof.
+
 ## IF1 — Connected Invite friends sheet
 - [ ] Rebuild connected header, figures, club/activity/invited groups and rows; preserve unconnected state, shared hook order and existing share paths.
 - [ ] Add sequential bulk invites with per-success analytics, partial-failure toast and sent-invite invalidation.
