@@ -116,8 +116,8 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     expect(cards[1].querySelector('video')).toBeNull(); expect(cards[2].querySelector('video')).toBeNull();
   });
   it('video duration formats longer than one minute', () => { f.latest[0] = latest('first', { media_type: 'video', duration_seconds: 75 }); mountRail(); expect(screen.getByText('1:15')).toBeInTheDocument(); });
-  it('the kicker reads "Hole by hole"', () => {
-    mountRail(); expect(screen.getByText('Hole by hole')).toBeInTheDocument(); expect(screen.getByText('Latest holes')).toBeInTheDocument();
+  it('the kicker reads "Through members\' eyes"', () => {
+    mountRail(); expect(screen.getByText("Through members' eyes")).toBeInTheDocument(); expect(screen.getByText('Latest holes')).toBeInTheDocument();
   });
   it('a tap opens the canonical viewer readOnly on the tapped shot across the whole rail', () => {
     mountRail(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' }));

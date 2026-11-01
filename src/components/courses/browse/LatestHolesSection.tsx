@@ -8,7 +8,7 @@ import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import { latestHolesToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { SCRIM_STANDOUT, SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
 import { useSectionReady } from './PageLoadGate';
 import { useIsGuest } from '@/features/guest/useIsGuest';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -70,6 +70,7 @@ function LatestHoleCard({ row, onOpen }: { row: LatestHoleMedia; onOpen: (row: L
         ? <HoleInlineVideo media={row} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
         : <img src={row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />}
       <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT }} />
+      <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP }} />
       <div className="latest-hole-figure">
         <div className="latest-hole-number">{row.hole_no}</div>
         <div className="latest-hole-label">{row.par != null ? `Par ${row.par}${row.yards != null ? ` · ${row.yards} yds` : ''}` : 'Hole'}</div>
@@ -128,7 +129,7 @@ export function LatestHolesSection() {
   if (isLoading) return <LatestHolesShell />;
   if (!visible) return null;
   return <section style={SECTION_WRAP}>
-    <SectionHead tone="amber" kicker="Hole by hole" title="Latest holes" />
+    <SectionHead tone="amber" kicker="Through members' eyes" title="Latest holes" />
     <div ref={railRef} className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP, willChange: 'transform' }}>
       {rows.map(row => <LatestHoleCard key={row.id} row={row} onOpen={onOpen} />)}
       {isFetchingNextPage && <LatestHoleSkeletonCard />}

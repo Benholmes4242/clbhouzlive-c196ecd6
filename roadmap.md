@@ -1,5 +1,11 @@
 # Roadmap
 
+## Courses photo cards — top scrims and Latest holes kicker
+- [x] Add the shared 40% top scrim to the four requested card types; preserve every bottom scrim and all other sections.
+- [x] Change only Latest holes kicker; retarget its existing protecting test under brief authority.
+- [ ] Caption investigation: source and passing 0:11 video fixture retain course/member/date text; specific live row/data cause remains unverified. No caption fix made.
+- [ ] STOP: coursesPhotoTopScrims.test.tsx:52:20, LatestCoursesSection layer assertion: “expected [ …(3) ] to have a length of 2 but got 3”. Selector also counts the positioned image. No correction/rerun after failure; await authorization. Focused53 passed/1 failed/54 across4; full shards not run. Expected inventory5,377/516 (+7/+1 vs5,370/515), not a verified full result. See COURSES_PHOTO_TOP_SCRIMS_STOP_REPORT.md. Historical News failures already resolved by approved prior correction; News untouched.
+
 ## News observer — approved test-only correction
 - [x] Direct observer assignment/restoration in overviewNewsRebuild only; all59 assertion statements exactly preserved, all66 cases retained. No component changes.
 - [x] Focused148/148; full5370/5370 across515, +132/+4 vs5238/511 (YC2 46, News66+10, Courses10). Fresh390×844 comparison inspected; guest card covers News, visuals unit-tested. See TOUR_NEWS_OBSERVER_FIX_REPORT.md.
