@@ -75,7 +75,7 @@ describe('SeasonRow rebuilt grammar', () => {
   });
 
   it('completed: WON stack with headshot, surname and score coloured by getScoreColor', () => {
-    const { container } = render(<SeasonRow event={event())} onSelect={() => {}} />);
+    const { container } = render(<SeasonRow event={event()} onSelect={() => {}} />);
     const rc = rightColumn(container);
     const label = rc.querySelector('span') as HTMLElement;
     expect(label.style.letterSpacing).toBe('0.12em');
