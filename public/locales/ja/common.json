@@ -888,6 +888,19 @@
       "yourClub": "あなたのクラブ",
       "nearClub": "{{club}}の近く",
       "coaches": "コーチとアカデミー"
+    },
+    "rail": {
+      "title": "Who to follow",
+      "seeAll": "See all",
+      "sub": "Golfers and clubs you might know",
+      "hide": "Hide {{name}}",
+      "dismissError": "Couldn't hide that. Try again.",
+      "reason": {
+        "club": "Also a member at {{club}}",
+        "playedWith": "Played {{course}} with you",
+        "playedWithFallback": "Played with you",
+        "yourClub": "Your club"
+      }
     }
   }
 }
