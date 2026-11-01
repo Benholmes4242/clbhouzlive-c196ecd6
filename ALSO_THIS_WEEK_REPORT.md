@@ -1,4 +1,44 @@
-# Also this week — stopped validation
+# Also this week — follow-up validation stopped
+
+## November 1 authorised follow-up
+- Applied exactly `initImmediate:false` → `initAsync:false` in the existing provider fixture; no other fixture change.
+- In `islandsNav.test.tsx` case **shows the move, sparkline and stats once data settles**, inserted `vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date('2026-10-15T12:00:00Z'));`. Existing afterEach now calls cleanup then `vi.useRealTimers()`. Neither timers nor requestAnimationFrame is faked. Component unchanged.
+- That case's old and new assertion is identical: `expect(dialog.textContent).toContain('▾ 0.2 this month');`. Reason: eliminate the first/second-of-month fixture assumption without weakening the assertion. No cases deleted or renamed.
+- Added 23 cases to `alsoWeekRebuild.test.tsx` and new `alsoWeekSection.test.tsx` (6 cases), including all state labels, calculated sentences, two-live count, hidden count, viewed-event exclusion, carousel order/cap and canonical event navigation with `{referrer:{kind:'overview'}}`.
+- Added all 33 weekly locale keys to de/es/ja/ko/en-XA, retaining interpolation tokens. English already contained them. de/es/ja/ko remain disabled as before; en ships, en-XA is dev-only. No locale enablement changed.
+- AGENTS.md pointer skipped as explicitly instructed; ownership headers retained.
+- Automatic preview validation at **06:59:57Z: build OK**, with the earlier type error absent.
+
+### New stop — three new assertions
+Command: `bunx vitest run src/test/alsoWeekRebuild.test.tsx src/test/alsoWeekSection.test.tsx src/test/alsoWeekReads.test.ts src/test/islandsNav.test.tsx src/test/tourOverviewDesignA.test.ts src/test/tourOverviewMovementColumn.test.ts`
+
+**145 passed / 3 failed / 148 executed, six files (five passed, one failed).** Both authorised fixes passed. Canonical navigation and heading tests passed. Full-suite shards were not started after these failures, under the stop rule.
+
+```text
+FAIL src/test/alsoWeekRebuild.test.tsx > remaining signed-off event states > one followed player uses singular field sentence
+AssertionError: expected 'JA1 of your players is in the field' to be '1 of your players is in the field' // Object.is equality
+src/test/alsoWeekRebuild.test.tsx:83:249
+
+FAIL src/test/alsoWeekRebuild.test.tsx > remaining signed-off event states > multiple followed players use plural field sentence and three faces maximum
+AssertionError: expected 'JAJBJC4 of your players are in the fi…' to be '4 of your players are in the field' // Object.is equality
+Expected: "4 of your players are in the field"
+Received: "JAJBJC4 of your players are in the field"
+src/test/alsoWeekRebuild.test.tsx:84:350
+
+FAIL src/test/alsoWeekRebuild.test.tsx > remaining signed-off event states > ranking falls use dim not danger and rises retain TREND_UP
+AssertionError: expected '' to be 'var(--tour-board-dim)' // Object.is equality
+src/test/alsoWeekRebuild.test.tsx:88:229
+```
+The first two accidentally include avatar fallback initials because the query addresses the whole facepile-plus-sentence container. Proposed correction: query `.also-yours > span:last-child` for the sentence, retaining identical expected singular/plural values and the face-count assertion. The third uses jsdom inline CSS-variable parsing, which drops the value; proposed correction: assert the existing `data-movement-tone=fall` structure, with the canonical token mapping checked from source or a browser (not by changing the component). No corrections applied without authorisation.
+
+### Inventory reconciliation and proof
+- Last executed full suite remains the previous **5,038 passed / 1 failed / 5,039 executed across 504 files**; this is historical, not a fresh full-suite result.
+- Current inventory relative to requested **5,004/502 baseline**: **+64 tests/+3 files = 5,068 tests/505 files**, pending full execution. New files: `alsoWeekRebuild.test.tsx` (55), `alsoWeekReads.test.ts` (3), `alsoWeekSection.test.tsx` (6). Since the previous attempt: +23 in rebuild and +6 section/+1 file. Authorised fixture fixes change no counts.
+- Existing `section.png` and `comparison.png` suffice; no new screenshots taken. Today has one live and one finished event; **two-live, final-round-in-progress and starting-this-week states are covered by unit tests only**, not live screenshots. Member follows also remain unit-only.
+- No SQL, migrations, feed_config, provider, RPC/edge/native/Median changes; cap remains 30.
+
+---
+## Previous attempt (historical)
 
 ## Implemented
 - Event rows, calculated state sentences, chase, top-three/tie board, followed-player rows, finished winner block, starting facts/draw facepile.
@@ -47,8 +87,7 @@ Unrelated to changed Tour files: fixture `iso(2)` is now 30 October, whereas tod
 - Current eligible section has **one live and one finished** event; two live events and a starting-this-week event cannot be shown without changing the frozen selection. Member followed rows have unit coverage only.
 - Event tap navigation has not yet been exercised end-to-end; more mock state/coverage verification remains outstanding.
 
-## Outstanding
-- Clear the two validation stops above, then rerun full suite.
-- Add remaining locale keys beyond English and complete all requested specific state/heading/navigation tests.
-- Place the architecture pointer within AGENTS.md budget: attempted addition was refused (12,498 > 12,288 bytes). Local ownership headers already exist; no existing rule compressed.
+## Current outstanding
+- Authorise correction of the three new assertions above, then rerun targeted checks and full suite in shards.
+- Locale keys and additional state/heading/navigation coverage are now added. AGENTS.md pointer skipped by ruling.
 - No SQL, migrations, RPC/edge/provider/native/Median/feed_config changes; round_pool_cap remains 30.

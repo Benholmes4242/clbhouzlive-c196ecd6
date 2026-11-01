@@ -4,7 +4,8 @@
 - [x] Eligibility ruling: completed slides from the last three days join unchanged live/upcoming rules; preserve order, viewing-event exclusion and four-event cap.
 - [x] Rebuilt event presentation, batched reads and shared score/tie helpers; added English locale strings and muted World Rankings falls.
 - [x] Authorised fixture fixes: initAsync:false and Date-only clock pin in the one islandsNav test; unchanged assertion. AGENTS.md pointer explicitly skipped.
-- [ ] Complete remaining locale/state/heading/navigation coverage and rerun shards. Existing section.png/comparison.png suffice; two-live, final-round and upcoming proof is unit-only.
+- [x] Added all six locale catalogues' keys and remaining state/heading/navigation coverage. Existing section.png/comparison.png suffice; two-live, final-round and upcoming proof is unit-only.
+- [ ] STOP: three new assertions in alsoWeekRebuild.test.tsx:83/84/88 (avatar initials included in sentence queries; jsdom drops CSS-variable colour). Await exact test correction authorisation, then rerun targeted/full shards. See ALSO_THIS_WEEK_REPORT.md.
 
 ## Tour leaderboard rebuild
 - [x] Source confirms whole-field sr_scorecards sync; tour_player_follows already typed; FullBoardSheet already shares BoardTable's column header.
