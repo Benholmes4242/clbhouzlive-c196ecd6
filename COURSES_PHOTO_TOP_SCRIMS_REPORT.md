@@ -1,4 +1,42 @@
-# Courses photo cards — stopped on new test failure
+# Courses photo cards — authorised fixes complete
+
+## SCRIMS 2 result
+All full-suite shards passed: **5,380/5,380 across 516 files**, zero failures. Shards: **1,332 + 1,260 + 1,387 + 1,401**.
+
+Exact commands: `bunx vitest run --shard=$i/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/courses-scrims2/suite/shard-$i.json`, for i=1,2,3,4. Focused command is the same four-file command recorded below: **57/57 across 4 files**.
+
+Count reconciliation: expected prior inventory **5,377/516 → 5,380/516 (+3/+0)**. Last executed green full baseline **5,370/515 → 5,380/516 (+10/+1)**. All ten additions are in `coursesPhotoTopScrims.test.tsx`: its original seven cases plus three stack cases below. No case deletions, no renames in SCRIMS 2.
+
+### Authorised test selector: old → new
+The shared four-card parameterised test retained all four case names and `expect(layers).toHaveLength(2)` unchanged.
+- Old: `children.filter(child => child.style.position === 'absolute' && child.style.inset === '0' || child.classList.contains('latest-hole-scrim'))`
+- New: `children.filter(child => child.style.background.includes('linear-gradient'))`
+- Why: the old selector counted the inset-0 image as a third layer. The new selector admits only gradients as explicitly authorised.
+- jsdom 20 rejects gradient assignments (`style.background` becomes empty). A file-local accessor spy retains React's actual assigned gradient strings while delegating other background values to the original accessor; it is restored after every test. No component changes for the test harness.
+- The existing bottom-source assertion now checks `background: SCRIM_STANDOUT` rather than `background: SCRIM_STANDOUT }`, because the authorised `zIndex: 1` field follows it. The exact recipe assertion and two-layer assertion are unchanged. Latest courses' literal 45% assertion is unchanged.
+
+`coursesPhotoTopScrims.test.tsx`: **7 → 10 cases**. Added:
+- `Latest holes video uses an isolated media-0 scrim-1 text-2 stack`
+- `Latest holes image uses an isolated media-0 scrim-1 text-2 stack`
+- `Latest courses large video and small posters keep overlays above isolated media`
+
+### Places changed and player audit
+- **Latest holes:** isolated card; new absolute media wrapper at 0 contains image or shared player; direct shared player host is assigned 0 by local CSS. Both scrims at 1; figure, caption and duration chip at 2. Existing geometry and image cover fitting preserved.
+- **Latest courses big tile:** isolated tile; shared player contained by absolute media wrapper at 0; image alternative at 0; original 45% bottom and 40% top scrims at 1; shot count/label and course/credit at 2.
+- **Latest courses small tiles:** still poster-only, no inline player added. Isolated cells, images at 0, video disc and existing +N overlay at 2; dimensions and content unchanged.
+- **PhotoFigureCard and HardestSection:** audited; neither renders an inline video, so no further stacking changes required.
+- `HoleInlineVideo.tsx` is unchanged. Its host (`return <div ref={hostRef} className="absolute inset-0">`, line 55) declares no z-index above 0. The nested video has opacity/transition but cannot escape the local media wrapper's 0 stacking context.
+- No new module or shared-player ownership change introduced; local stack stays owned by the two rail card implementations.
+
+### Live caption verification
+At `http://localhost:8080/courses`, the actual first Latest holes card is a **0:11 video** and visibly shows **2 / PAR 5 · 584 YDS / Tralee Golf Club / Andrew Yetzes · Apr 2026**. This resolves the earlier unknown caption cause as an overlay-stacking fault, not absent metadata; no row repair or fallback was necessary.
+
+Browser computed styles confirmed card `isolation: isolate`, media wrapper 0, actual player host 0, both scrims 1 and all three overlay groups 2, each positioned. The element screenshot `/tmp/browser/courses-scrims2/first-hole.png` was inspected and shows all labels over the video. No guest layer covered this card. This is actual public-preview evidence, not authenticated membership or persistence proof.
+
+Latest automatic preview signal: **build OK at 2026-11-01T17:41:30Z**. No manual build/typecheck run. No current/pre-existing suite failures; historical News failures listed below all pass in this full run. All protected backend/configuration/native scope remains untouched.
+
+---
+## Historical first-pass stop (resolved by SCRIMS 2)
 
 ## Diff
 - `src/styles/photoScrim.ts`: adds `SCRIM_STANDOUT_TOP`, exactly `linear-gradient(180deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 40%)`, with the requested one-line comment. `SCRIM_STANDOUT` and all other tokens unchanged.
