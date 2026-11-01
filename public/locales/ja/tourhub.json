@@ -88,7 +88,35 @@
       "defendsSuffix": "{{name}} defends"
     },
     "row": {
-      "countdownIn": "IN {{n}}D"
+      "countdownIn": "IN {{n}}D",
+      "defends": "ディフェンディング",
+      "purse": "賞金",
+      "leads": "首位 · R{{round}}",
+      "lead": "首位タイ · R{{round}}",
+      "won": "優勝",
+      "tied": "{{count}}人タイ"
+    },
+    "nextMajor": {
+      "label": "次のメジャー",
+      "days_other": "日"
+    },
+    "week": {
+      "last": "先週",
+      "this": "今週",
+      "next": "来週",
+      "events_other": "{{count}} イベント"
+    },
+    "tag": {
+      "major": "メジャー",
+      "seasonFinale": "シーズン最終戦",
+      "playoffs": "プレーオフ",
+      "team": "団体戦"
+    },
+    "you": {
+      "inFieldOne": "★ {{name}}が出場",
+      "inFieldTwo": "★ {{a}}と{{b}}が出場",
+      "inFieldMany": "★ {{a}}、{{b}}ほか{{count}}名が出場",
+      "playedHere": "プレーしたコース"
     }
   },
   "overview": {

@@ -88,7 +88,37 @@
       "defendsSuffix": "[~~{{name}} đéƒéñđš~~]"
     },
     "row": {
-      "countdownIn": "[~~IN {{n}}D~~]"
+      "countdownIn": "[~~IN {{n}}D~~]",
+      "defends": "[~~ḊÉƑÉŃḊŠ~~]",
+      "purse": "[~~ƤŮŘŠÉ~~]",
+      "leads": "[~~ĻÉÁḊŠ · R{{round}}~~]",
+      "lead": "[~~ĻÉÁḊ · R{{round}}~~]",
+      "won": "[~~ẂŐŃ~~]",
+      "tied": "[~~{{count}} ţíéḋ~~]"
+    },
+    "nextMajor": {
+      "label": "[~~ŃÉẊŤ ṀÁĴŐŘ~~]",
+      "days_one": "[~~ḊÁẎ~~]",
+      "days_other": "[~~ḊÁẎŠ~~]"
+    },
+    "week": {
+      "last": "[~~ĻÁŠŤ ẂÉÉǨ~~]",
+      "this": "[~~ŤĤÍŠ ẂÉÉǨ~~]",
+      "next": "[~~ŃÉẊŤ ẂÉÉǨ~~]",
+      "events_one": "[~~{{count}} éṽéńţ~~]",
+      "events_other": "[~~{{count}} éṽéńţš~~]"
+    },
+    "tag": {
+      "major": "[~~ṀÁĴŐŘ~~]",
+      "seasonFinale": "[~~ŠÉÁŠŐŃ ƑÍŃÁĻÉ~~]",
+      "playoffs": "[~~ƤĻÁÝŐƑƑŠ~~]",
+      "team": "[~~ŤÉÁṀ~~]"
+    },
+    "you": {
+      "inFieldOne": "[~~★ {{name}} íń ţĥé ƒíélḋ~~]",
+      "inFieldTwo": "[~~★ {{a}} áńḋ {{b}} íń ţĥé ƒíélḋ~~]",
+      "inFieldMany": "[~~★ {{a}}, {{b}} áńḋ {{count}} őţĥéŕš íń ţĥé ƒíélḋ~~]",
+      "playedHere": "[~~Ýőú'ṽé ƥĺáýéḋ ĥéŕé~~]"
     }
   },
   "overview": {

@@ -88,7 +88,37 @@
       "defendsSuffix": "{{name}} defends"
     },
     "row": {
-      "countdownIn": "IN {{n}}T"
+      "countdownIn": "IN {{n}}T",
+      "defends": "TITELHALTER",
+      "purse": "PREISGELD",
+      "leads": "FÜHRT · R{{round}}",
+      "lead": "FÜHRUNG · R{{round}}",
+      "won": "SIEGER",
+      "tied": "{{count}} geteilt"
+    },
+    "nextMajor": {
+      "label": "NÄCHSTES MAJOR",
+      "days_one": "TAG",
+      "days_other": "TAGE"
+    },
+    "week": {
+      "last": "LETZTE WOCHE",
+      "this": "DIESE WOCHE",
+      "next": "NÄCHSTE WOCHE",
+      "events_one": "{{count}} Event",
+      "events_other": "{{count}} Events"
+    },
+    "tag": {
+      "major": "MAJOR",
+      "seasonFinale": "SAISONFINALE",
+      "playoffs": "PLAYOFFS",
+      "team": "TEAM"
+    },
+    "you": {
+      "inFieldOne": "★ {{name}} ist im Feld",
+      "inFieldTwo": "★ {{a}} und {{b}} sind im Feld",
+      "inFieldMany": "★ {{a}}, {{b}} und {{count}} weitere im Feld",
+      "playedHere": "Du hast hier gespielt"
     }
   },
   "overview": {
