@@ -22957,6 +22957,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_post_best_hour: {
+        Args: { p_actor_id: string; p_actor_type: string; p_tz?: string }
+        Returns: {
+          active_followers: number
+          hour_of_day: number
+          total_active: number
+        }[]
+      }
       get_post_course_context: {
         Args: { p_course_ids: string[] }
         Returns: {
