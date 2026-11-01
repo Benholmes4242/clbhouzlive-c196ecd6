@@ -176,7 +176,37 @@
       "linkLabel": "Full schedule",
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
-      "subline": "투어 일정"
+      "subline": "투어 일정",
+      "next": "NEXT",
+      "purse": "PURSE",
+      "winner": "TO THE WINNER",
+      "par": "Par",
+      "yards": "YDS",
+      "calendar": "Add to calendar",
+      "preview": "Event preview",
+      "defends": "<b>{{name}}</b> defends.",
+      "wonAt": "Won last year at <b>{{score}}</b>",
+      "playoff": ", in a playoff.",
+      "margin_one": ", by one.",
+      "margin_other": ", by {{count}}.",
+      "played": "You've played {{course}}.",
+      "best_one": "Your best there: <b>{{gross}}</b> in {{count}} round",
+      "best_other": "Your best there: <b>{{gross}}</b> in {{count}} rounds",
+      "playedHere": "You've played here",
+      "tags": {
+        "major": "MAJOR",
+        "finale": "SEASON FINALE",
+        "playoffs": "PLAYOFFS",
+        "team": "TEAM"
+      },
+      "countdown": {
+        "today": "today",
+        "tomorrow": "tomorrow",
+        "days_one": "in {{count}} day",
+        "days_other": "in {{count}} days",
+        "weeks_one": "in {{count}} wks",
+        "weeks_other": "in {{count}} wks"
+      }
     },
     "onTheCourse": {
       "eyebrow": "On the course",
