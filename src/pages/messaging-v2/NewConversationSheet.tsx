@@ -46,6 +46,8 @@ import {
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { usePlayedWith } from '@/hooks/messaging/usePlayedWith';
 import { useSharedGroundBatch } from '@/hooks/messaging/useSharedGround';
+import { useLastFourball, type FourballMember } from '@/hooks/messaging/useLastFourball';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
@@ -122,6 +124,8 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
 
   const { user } = useSupabaseSession();
   const playedWith = usePlayedWith(user?.id, open);
+  // MS2 §2 — the last round's playing partners, for the four-ball card.
+  const fourball = useLastFourball(user?.id, open);
 
   // Where and when, from the thread strip's own cache keys.
   const playedIds = useMemo(
@@ -222,37 +226,55 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
     }
   }, [actor, selected, busy, navigate, handleClose]);
 
-  const createGroup = useCallback(async () => {
-    if (!actor || selected.length < 2 || busy) return;
-    setBusy(true);
-    try {
-      const members = selected.map((s) => ({
-        actor_type: s.actor_type,
-        actor_id: s.actor_id,
-      }));
-      const finalTitle =
-        title.trim() ||
-        selected
-          .map((s) => s.name.split(' ')[0])
-          .slice(0, 4)
-          .join(', ');
-      const { data, error } = await supabase.rpc('msg_create_group', {
-        p_as_actor_type: actor.actorType,
-        p_as_actor_id: actor.actorId,
-        p_title: finalTitle,
-        p_members: members as unknown as Json,
-        p_avatar_url: undefined,
-      });
-      if (error) throw error;
-      const id = data as unknown as string;
-      handleClose();
-      navigate(`/messages/${id}`);
-    } catch (e) {
-      console.error(e);
-      toast.error('Could not create group');
-      setBusy(false);
-    }
-  }, [actor, selected, title, busy, navigate, handleClose]);
+  /** The sheet's one group-creation path — footer selection and MS2 four-ball. */
+  const runCreateGroup = useCallback(
+    async (members: Candidate[]) => {
+      if (!actor || members.length < 2 || busy) return;
+      setBusy(true);
+      try {
+        const finalTitle =
+          title.trim() ||
+          members
+            .map((s) => s.name.split(' ')[0])
+            .slice(0, 4)
+            .join(', ');
+        const { data, error } = await supabase.rpc('msg_create_group', {
+          p_as_actor_type: actor.actorType,
+          p_as_actor_id: actor.actorId,
+          p_title: finalTitle,
+          p_members: members.map((s) => ({
+            actor_type: s.actor_type,
+            actor_id: s.actor_id,
+          })) as unknown as Json,
+          p_avatar_url: undefined,
+        });
+        if (error) throw error;
+        const id = data as unknown as string;
+        handleClose();
+        navigate(`/messages/${id}`);
+      } catch (e) {
+        console.error(e);
+        toast.error('Could not create group');
+        setBusy(false);
+      }
+    },
+    [actor, title, busy, navigate, handleClose],
+  );
+
+  const createGroup = useCallback(() => {
+    void runCreateGroup(selected);
+  }, [runCreateGroup, selected]);
+
+  /** MS2 §2 — "Start a group" with exactly the four-ball's members. */
+  const startFourballGroup = useCallback(() => {
+    const members: Candidate[] = (fourball.data ?? []).map((m) => ({
+      actor_type: 'personal',
+      actor_id: m.user_id,
+      name: m.display_name,
+      avatar_url: m.profile_photo_url,
+    }));
+    void runCreateGroup(members);
+  }, [fourball.data, runCreateGroup]);
 
   /** §4 the footer states the selection, and names a group before it exists. */
   const footerLabel =
