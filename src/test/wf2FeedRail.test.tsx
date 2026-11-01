@@ -379,12 +379,12 @@ describe('WhoToFollowRail', () => {
 
   it('closes the rail when every card in the slot is gone', () => {
     vi.useFakeTimers();
-    h.people = people(4);
+    h.people = people(6);
     h.biz = [];
     renderRail(1);
-    // Dismissing three of four leaves one card — below the 3-card minimum —
+    // Dismissing four of six leaves two cards — below the 3-card minimum —
     // so the rail closes and unmounts.
-    for (const name of ['Golfer 1', 'Golfer 2', 'Golfer 3']) {
+    for (const name of ['Golfer 1', 'Golfer 2', 'Golfer 3', 'Golfer 4']) {
       fireEvent.click(screen.getByLabelText(`Hide ${name}`));
       act(() => { vi.advanceTimersByTime(250); });
     }
