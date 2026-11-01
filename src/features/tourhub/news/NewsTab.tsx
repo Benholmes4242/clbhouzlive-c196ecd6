@@ -349,7 +349,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   }
 
   return (
-    <div ref={visitRef} className="tour-news" style={{ fontFamily: FONT }}>
+    <div ref={visitRef as React.MutableRefObject<HTMLDivElement | null>} className="tour-news" style={{ fontFamily: FONT }}>
       {searchOpen ? (
         <div className="tour-news-searchbar" data-testid="tour-news-searchbar">
           <Search size={16} aria-hidden />
