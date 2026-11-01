@@ -4,9 +4,10 @@
 - [ ] Rebuild the expanded card in YourCourseAnalyticsSheet.tsx per the uploaded YC2 brief/mock; keep YC1 list intact; add yc2YourCourses tests and blended regression. YC1 shipped: 5,202/5,202 across 510 (+30/+1 vs 5,172/509).
 
 ## Tour Overview — World rankings rebuild
-- [ ] Follow-up: omit zero events; count-driven singular/plural in every locale; identify former shard-2 failure and run its file three times; full shards against 5,172/509; World/Race to Dubai 390×844 comparisons.
+- [x] Follow-up: zero omitted, count-driven singular/plural in all six locales; four new cases; full shards 1262+1247+1350+1379=5238/5238 across511 (+66/+2 vs5172/509: YC1 30/+1, Rankings36/+1). Existing assertions unchanged; previous rankings count corrected from reported36 to restored32 before four additions. See WORLD_RANKINGS_FOLLOWUP_REPORT.md.
+- [ ] Identify former shard-2 failure and run its file three times: blocked by lost sandbox output; neither prior message nor surviving logs names the case/file. No invented identification or three-pass claim.
 - [x] Data report: latest 2026-10-26 (500 rows); previous 2026-10-19/10-12/10-05; 90-day window resolves to 2026-07-27 (basisDays 91). Events left counted from sr_tournaments status scheduled/created in the board's season year (EURO 2026: 2).
-- [ ] Rebuilt section: sentence, column header, headshot+flag rows, points bars, Your players, biggest-climb card; locales in six catalogues; worldRankingsRebuild tests; full shards; 390×844 proof.
+- [x] Rebuilt section verified by unit tests/full shards; 390×844 World and blocked Race-to-Dubai attempt captured beside mock in /tmp/browser/world-rankings. Guest shade covers section and prevents board switch; Race live state/pixel parity unverified. Your players unit-only. Automatic build OK14:06:40Z.
 
 ## IF1 — Connected Invite friends sheet
 - [ ] Rebuild connected header, figures, club/activity/invited groups and rows; preserve unconnected state, shared hook order and existing share paths.
