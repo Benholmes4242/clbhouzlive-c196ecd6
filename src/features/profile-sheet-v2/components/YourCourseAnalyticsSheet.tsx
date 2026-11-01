@@ -26,21 +26,28 @@ import {
   StatRow,
   Action,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { LABEL as LABEL_METRICS, KICKER as KICKER_METRICS, TITLE as TITLE_METRICS, FIGS } from '@/lib/tokens/type';
+import { LABEL as LABEL_METRICS, FIGS } from '@/lib/tokens/type';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
+import { formatMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 import { useMyRoundsByCourse, type CourseRoundPoint } from '@/hooks/gam/useMyRoundsByCourse';
 import { RAMP_DIST } from '@/features/courses/components/holes/analytical/tokens';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
+import {
+  figureLabel,
+  fmtListDate,
+  isEarlyData,
+  pickTiles,
+  sortCourses,
+  type CourseSort,
+} from '@/features/profile-sheet-v2/components/yourCoursesListRules';
 
 import monotonePath from '@/lib/charts/monotonePath';
 
 /** Canonical metrics from the shared module; this sheet keeps its palette. */
 const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
-const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
-const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const CHEVRON = '\u203A';
 const DOT = '\u00B7';
@@ -162,6 +169,59 @@ const CARD_LIST: React.CSSProperties = {
   gap: 10,
 };
 
+/**
+ * YC1 LIST CARD. The course rows own their shell: #17171B, the 8% hairline,
+ * radius 18, and their own 10px top margin / 16px gutters (search result
+ * rows keep the shared CARD above). Open state keeps the settled 28% ring.
+ */
+const COURSE_CARD = (open = false): React.CSSProperties => ({
+  background: '#17171B',
+  border: `1px solid ${open ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.08)'}`,
+  borderRadius: 18,
+  overflow: 'hidden',
+  margin: '10px 16px 0',
+});
+
+/** The inline "Early data" tag: never full width, sits after the meta text. */
+const EARLY_TAG: React.CSSProperties = {
+  display: 'inline-block',
+  fontSize: 10.5,
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  color: A.MUTE,
+  border: '1px solid rgba(255,255,255,0.18)',
+  borderRadius: 999,
+  padding: '1px 7px',
+  marginLeft: 6,
+  verticalAlign: 1,
+};
+
+/**
+ * THE COLLAPSED LIST BAR (YC1 §5). Height 6, radius 9, four segments with
+ * 2px gaps, widths from the EXACT percentages in the RAMP_DIST colours.
+ * Eagles hold a 0.6% floor when their count is above zero and are hidden at
+ * zero — unlike the expanded DistributionBar, empty buckets leave no
+ * hairline here.
+ */
+const ListBar: React.FC<{ segs: Seg[] }> = ({ segs }) => (
+  <span
+    className="yc1-list-bar"
+    style={{ display: 'flex', height: 6, borderRadius: 9, overflow: 'hidden', gap: 2 }}
+  >
+    {segs.map((s) => {
+      if ((s.count ?? 0) === 0) return null;
+      const pct = s.pctExact ?? s.pct ?? 0;
+      const width = s.key === 'eagles' ? Math.max(pct, 0.6) : pct;
+      return (
+        <i
+          key={s.key}
+          style={{ display: 'block', height: 6, width: `${width}%`, background: s.bg }}
+        />
+      );
+    })}
+  </span>
+);
+
 
 function Row({
   title,
@@ -217,34 +277,6 @@ function Row({
   );
 }
 
-/**
- * Down caret for the rows that EXPAND IN PLACE. Deliberately NOT the right
- * chevron used by the rows that navigate: two behaviours, two glyphs.
- */
-function ExpandCaret({ open }: { open: boolean }) {
-  return (
-    <svg
-      width={14}
-      height={14}
-      viewBox="0 0 14 14"
-      aria-hidden="true"
-      style={{
-        display: 'block',
-        transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-        transition: 'transform 160ms ease',
-      }}
-    >
-      <path
-        d="M3.5 5.5 L7 9 L10.5 5.5"
-        fill="none"
-        stroke={A.DIM}
-        strokeWidth={2.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function hasScoringData(course: UserAnalyticsCourse): boolean {
   // Gate on COUNTS, not percentages: a course with rounds but no hole-level
@@ -445,9 +477,7 @@ function AnalyticsCourseRow({
 
   const meta = [
     t('yourCourses.roundsCount', { count: course.rounds_count }),
-    course.last_played
-      ? t('yourCourses.lastPlayedMeta', { date: formatDayMonthYearShortGB(course.last_played) })
-      : null,
+    course.last_played ? fmtListDate(course.last_played) : null,
   ]
     .filter(Boolean)
     .join(` ${DOT} `);
@@ -491,107 +521,89 @@ function AnalyticsCourseRow({
     : [];
 
 
+  const early = isEarlyData(course);
+  const rounds = course.rounds_count ?? 0;
+  const figLabel = figureLabel(rounds);
+
+  /**
+   * YC1 COLLAPSED CARD. Name (shortened) left, figure right, meta under the
+   * name, bar under both. The figure mutes under 10 rounds and the meta
+   * carries the inline "Early data" tag. Courses with no hole data keep
+   * their tap-to-navigate chevron; expanding cards carry NO chevron.
+   */
   const body = (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: hasScoring ? '1fr 16px 52px 14px' : '1fr 16px 52px',
-        gap: '0 10px',
-        alignItems: 'end',
-        minWidth: 0,
-      }}
-    >
-      <div style={{ minWidth: 0 }}>
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 14,
-            color: A.INK,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {course.course_name}
-        </div>
-        <div
-          style={{
-            ...LABEL,
-            // The shared LABEL tracking (0.13em) is tuned for two- or three-word
-            // captions. This line runs to ~24 characters, where that tracking costs
-            // more width than the words do. Relaxed HERE ONLY.
-            letterSpacing: '0.06em',
-            color: A.MUTE,
-            marginTop: 4,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {meta}
-        </div>
-      </div>
-
-      {!hasScoring && (
-        <span
-          style={{
-            color: A.DIM,
-            fontSize: 16,
-            lineHeight: 1.2,
-            alignSelf: 'start',
-            gridColumn: avgVal != null ? 2 : 3,
-          }}
-        >
-          {CHEVRON}
-        </span>
-      )}
-
-      {avgVal != null && (
-        <div style={{ width: 52, textAlign: 'right', minWidth: 0, gridColumn: 3 }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: A.INK }}>
-            {fmtSigned(avgVal, 1)}
-          </div>
+    <div style={{ minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              ...LABEL,
-              letterSpacing: '0.06em',
-              color: A.MUTE,
-              marginTop: 3,
+              fontWeight: 600,
+              fontSize: 16,
+              color: A.INK,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            {t('yourCourses.avgToPar')}
+            {shortCourseName(course.course_name)}
+          </div>
+          <div style={{ fontSize: 12.5, color: A.MUTE, marginTop: 3 }}>
+            {meta}
+            {early && <span style={EARLY_TAG}>{t('yourCourses.earlyData')}</span>}
           </div>
         </div>
-      )}
 
-      {hasScoring && (
-        <span
-          style={{
-            gridColumn: 4,
-            alignSelf: 'center',
-            // The grid's 10px column gap plus this -2px lands the caret 8px
-            // from the AVG block, per spec.
-            marginLeft: -2,
-          }}
-        >
-          <ExpandCaret open={expanded} />
-        </span>
-      )}
+        <div style={{ textAlign: 'right', flex: 'none' }}>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 19,
+              letterSpacing: '-0.02em',
+              color: early ? A.MUTE : A.INK,
+            }}
+          >
+            {avgVal != null ? fmtSigned(avgVal, 1) : <span style={{ color: A.DIM }}>–</span>}
+          </div>
+          {avgVal != null && (
+            <div style={{ fontSize: 11, color: A.DIM, marginTop: 1 }}>
+              {figLabel === 'a-round'
+                ? t('yourCourses.figARound')
+                : figLabel === 'one-round'
+                  ? t('yourCourses.figOneRound')
+                  : t('yourCourses.figNRounds', { count: rounds })}
+            </div>
+          )}
+        </div>
+
+        {!hasScoring && (
+          <span
+            style={{
+              color: A.DIM,
+              fontSize: 16,
+              lineHeight: 1.2,
+              alignSelf: 'center',
+              flex: 'none',
+            }}
+          >
+            {CHEVRON}
+          </span>
+        )}
+      </div>
 
       {/*
         COLLAPSED: the bar sits under the header — it is the only thing making
-        a 33-course list scannable.
+        a long list scannable.
         EXPANDED: the trend takes this slot and the bar moves down to sit
         directly above the percentages it describes.
       */}
       {hasScoring && !expanded && (
-        <span style={{ gridColumn: '1 / -1', marginTop: 9 }}>
-          <DistributionBar segs={segs} />
+        <span style={{ display: 'block', marginTop: 12 }}>
+          <ListBar segs={segs} />
         </span>
       )}
 
       {hasScoring && expanded && (
-        <span style={{ gridColumn: '1 / -1', marginTop: 10, display: 'block' }}>
+        <span style={{ marginTop: 10, display: 'block' }}>
           <div style={{ ...LABEL, marginBottom: 2 }}>{t('yourCourses.trendLabel')}</div>
           {trendPoints.length >= 2 ? (
             <RoundsTrend points={trendPoints} gradientId={`ycat-${course.course_id}`} />
@@ -607,14 +619,13 @@ function AnalyticsCourseRow({
           )}
         </span>
       )}
-
     </div>
   );
 
   const shell: React.CSSProperties = {
     display: 'block',
     width: '100%',
-    padding: '14px 20px',
+    padding: '14px 16px',
     background: 'transparent',
     border: 0,
     textAlign: 'left',
@@ -624,7 +635,7 @@ function AnalyticsCourseRow({
   // No distribution: same card, right chevron, tap-to-navigate.
   if (!hasScoring) {
     return (
-      <div style={CARD()}>
+      <div style={COURSE_CARD()}>
         <button
           type="button"
           onClick={() => onOpen('row')}
@@ -638,13 +649,13 @@ function AnalyticsCourseRow({
   }
 
   return (
-    <div style={CARD(expanded)}>
+    <div style={COURSE_CARD(expanded)}>
 
       <button type="button" onClick={onToggle} aria-expanded={expanded} style={{ ...shell, cursor: 'pointer' }}>
         {body}
       </button>
       {expanded && (
-        <div style={{ padding: '0 20px 14px' }}>
+        <div style={{ padding: '0 16px 14px' }}>
           {/* The bar and its percentages belong together. */}
           <div style={{ marginBottom: 8 }}>
             <DistributionBar segs={segs} />
@@ -711,10 +722,12 @@ function AnalyticsCourseRow({
 export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, synced }: Props) {
   const { t } = useTranslation('courses');
   const [q, setQ] = useState('');
-  /** Focus lives on the wrapper, not the input: the wrapper owns the paint. */
-  const [searchFocused, setSearchFocused] = useState(false);
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  /** YC1 sort: Recent is the order the list has always used. */
+  const [sort, setSort] = useState<CourseSort>('recent');
+  /** Card elements by course id, so a tile tap can scroll its card into view. */
+  const cardRefs = useRef(new Map<string, HTMLDivElement>());
 
   // SETTLED IS NOT "NOT LOADING": this query is disabled until the sheet opens.
   const { data: myCourses = [], isLoading: fetching, isFetched } = useUserAnalyticsCourses({ enabled: open });
@@ -732,18 +745,15 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
 
   // Sorted CLIENT-SIDE, not in the RPC: gam_user_courses is shared with the
   // Phase C rail and the Phase E chip provider, which want most-played first.
-  // Nulls last, ties broken on rounds so a same-day pair is stable.
-  const listItems = useMemo<UserAnalyticsCourse[]>(() => {
-    return [...myCourses].sort((a, b) => {
-      const ta = a.last_played ? Date.parse(a.last_played) : null;
-      const tb = b.last_played ? Date.parse(b.last_played) : null;
-      if (ta == null && tb == null) return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
-      if (ta == null) return 1;
-      if (tb == null) return -1;
-      if (tb !== ta) return tb - ta;
-      return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
-    });
-  }, [myCourses]);
+  // The three YC1 orders live in yourCoursesListRules; Recent is the order
+  // this list has always used (last played first, nulls last, ties on rounds).
+  const listItems = useMemo<UserAnalyticsCourse[]>(
+    () => sortCourses(myCourses, sort),
+    [myCourses, sort],
+  );
+
+  /** YC1 header tiles: best/worst scoring among 10+-round courses. */
+  const tiles = useMemo(() => pickTiles(myCourses), [myCourses]);
 
   /**
    * The member's own pooled average, used ONLY by the header sheetSub (it no
@@ -829,7 +839,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           analyticsEvents.track('course_analytics_row_expanded', {
             course_id: course.course_id,
             rounds: course.rounds_count,
-            
+
           });
         }
         return next;
@@ -837,6 +847,34 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
     },
     [],
   );
+
+  /** YC1 sort chips: track the choice, never re-track the current one. */
+  const chooseSort = useCallback((next: CourseSort) => {
+    setSort((prev) => {
+      if (prev !== next) analyticsEvents.track('course_analytics_sort', { sort: next });
+      return next;
+    });
+  }, []);
+
+  /** YC1 tile tap: expand that course's card and scroll it into view. */
+  const focusCourse = useCallback((course: UserAnalyticsCourse) => {
+    setExpandedIds((prev) => {
+      if (prev.has(course.course_id)) return prev;
+      const next = new Set(prev);
+      next.add(course.course_id);
+      analyticsEvents.track('course_analytics_row_expanded', {
+        course_id: course.course_id,
+        rounds: course.rounds_count,
+      });
+      return next;
+    });
+    // After the expand paints, bring the card into view.
+    setTimeout(() => {
+      cardRefs.current
+        .get(course.course_id)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
+  }, []);
 
   const signedBaseline = baseline != null ? fmtSigned(baseline, 1) : null;
   const subLine =
@@ -872,67 +910,211 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           ...FIGS,
         }}
       >
-        {/* Fixed header (does NOT scroll) */}
-        <div style={{ padding: '8px 20px 12px', flexShrink: 0 }}>
-          <div style={KICKER}>{t('yourCourses.sheetEyebrow')}</div>
+        {/* Fixed header (does NOT scroll): title, line, search, tiles, sort,
+            legend — YC1 §§1-4. The kicker and the old uppercase stats line are
+            gone; the counts line is sentence case. */}
+        <div style={{ padding: '0 16px', flexShrink: 0 }}>
           <h2
             id="your-course-analytics-title"
             style={{
-              margin: '4px 0 0',
-              ...TITLE,
+              margin: '6px 0 0',
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: A.INK,
             }}
           >
             {t('yourCourses.sheetTitle')}
           </h2>
-          {showList && <div style={{ ...LABEL, marginTop: 5 }}>{subLine}</div>}
-        </div>
+          {showList && (
+            <div style={{ fontSize: 14, color: A.MUTE, marginTop: 4 }}>{subLine}</div>
+          )}
 
-        {/* Fixed search field (only when we already have a list) */}
-        {showSearchField && (
-          <div style={{ padding: '0 20px 12px', flexShrink: 0 }}>
-            {/* CANONICAL FIELD TREATMENT. REST 6% fill / 10% border, FOCUS 10%
-                fill / 28% border, both channels stepping on 140ms ease, radius
-                14 (sq-sm), height 44. The wrapper carries the paint and the
-                focus state; the <input> stays transparent and borderless so
-                there is exactly one visible box. A.TRACK — the progress-bar
-                track — used to be the fill here; it is not a field token. */}
+          {/* Search: existing behaviour, YC1 paint — 44 high, radius 14,
+              #1E1E23 with the 8% hairline, 15px text, white caret. */}
+          {showSearchField && (
+            <div style={{ marginTop: 14 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  height: 44,
+                  background: '#1E1E23',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 14,
+                  padding: '0 13px',
+                }}
+              >
+                <Search size={13} color={q ? 'rgba(255,255,255,0.62)' : A.DIM} />
+                <input
+                  type="text"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder={t('yourCourses.searchPlaceholder')}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: 15,
+                    fontFamily: SANS,
+                    color: 'rgba(255,255,255,0.96)',
+                    caretColor: '#FFFFFF',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                  }}
+                  className="cas-search-input"
+                />
+                <style>{`.cas-search-input::placeholder{color:rgba(255,255,255,0.38);}`}</style>
+              </div>
+            </div>
+          )}
+
+          {/* Tiles: where you score best / where it bites (10+ rounds only). */}
+          {showList && tiles && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
+                gap: 8,
+                marginTop: 14,
+              }}
+            >
+              {(
+                [
+                  { label: t('yourCourses.tileBest'), course: tiles.best },
+                  { label: t('yourCourses.tileBites'), course: tiles.bites },
+                ] as const
+              ).map(({ label, course }) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => focusCourse(course)}
+                  style={{
+                    background: '#1E1E23',
+                    border: 0,
+                    borderRadius: 14,
+                    padding: '11px 12px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontFamily: SANS,
+                    minWidth: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 9.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: A.DIM,
+                    }}
+                  >
+                    {label}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 15,
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      color: A.INK,
+                      marginTop: 5,
+                    }}
+                  >
+                    {shortCourseName(course.course_name)}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 12.5,
+                      color: A.MUTE,
+                      marginTop: 2,
+                    }}
+                  >
+                    {t('yourCourses.tileLine', {
+                      avg: fmtSigned(course.avg_to_par as number, 1),
+                      rounds: course.rounds_count,
+                    })}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Sort chips: chosen is ink on canvas, unchosen a 14% hairline. */}
+          {showList && (
+            <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
+              {(
+                [
+                  { id: 'recent', label: t('yourCourses.sortRecent') },
+                  { id: 'most-played', label: t('yourCourses.sortMostPlayed') },
+                  { id: 'best-for-you', label: t('yourCourses.sortBestForYou') },
+                ] as const
+              ).map((s) => {
+                const on = sort === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => chooseSort(s.id)}
+                    style={{
+                      height: 32,
+                      padding: '0 13px',
+                      borderRadius: 999,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      fontFamily: SANS,
+                      cursor: 'pointer',
+                      border: `1px solid ${on ? A.INK : 'rgba(255,255,255,0.14)'}`,
+                      background: on ? A.INK : 'transparent',
+                      color: on ? '#0B0B0D' : A.MUTE,
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Legend: one line, the four RAMP_DIST buckets. */}
+          {showList && (
             <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: 7,
-                height: 44,
-                background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
-                borderRadius: 14,
-                padding: '0 13px',
-                transition: 'background 140ms ease, border-color 140ms ease',
+                gap: 12,
+                margin: '12px 2px 0',
+                fontSize: 11.5,
+                color: A.MUTE,
               }}
             >
-              <Search size={13} color={q ? 'rgba(255,255,255,0.62)' : A.DIM} />
-              <input
-                type="text"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                placeholder={t('yourCourses.searchPlaceholder')}
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: 14,
-                  fontFamily: SANS,
-                  color: 'rgba(255,255,255,0.96)',
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                }}
-                className="cas-search-input"
-              />
-              <style>{`.cas-search-input::placeholder{color:rgba(255,255,255,0.38);}`}</style>
+              {(
+                [
+                  [RAMP_DIST.eagles, t('yourCourses.legendEagles')],
+                  [RAMP_DIST.birdie, t('yourCourses.legendBirdie')],
+                  [RAMP_DIST.par, t('yourCourses.legendPar')],
+                  [RAMP_DIST.bogey, t('yourCourses.legendBogey')],
+                ] as const
+              ).map(([color, label]) => (
+                <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <i
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 2,
+                      background: color,
+                      display: 'inline-block',
+                    }}
+                  />
+                  {label}
+                </span>
+              ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Scrollable region - flex:1 + minHeight:0 lets it shrink so
             overflowY actually engages. overscrollBehavior: contain stops
@@ -991,17 +1173,26 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
             </div>
           ) : showList ? (
             <>
-              <div style={CARD_LIST}>
+              {/* Course cards carry their own 10px top margin and 16px
+                  gutters (YC1); the wrapper only registers refs so a tile tap
+                  can scroll its card into view. */}
+              <div>
                 {listItems.map((c) => (
-                  <AnalyticsCourseRow
+                  <div
                     key={c.course_id}
-                    course={c}
-                    expanded={expandedIds.has(c.course_id)}
-                    onToggle={() => toggle(c)}
-                    onOpen={(from) => go(c.course_id, from)}
-                    trend={roundsByCourse?.get(c.course_id)}
-                  />
-
+                    ref={(el) => {
+                      if (el) cardRefs.current.set(c.course_id, el);
+                      else cardRefs.current.delete(c.course_id);
+                    }}
+                  >
+                    <AnalyticsCourseRow
+                      course={c}
+                      expanded={expandedIds.has(c.course_id)}
+                      onToggle={() => toggle(c)}
+                      onOpen={(from) => go(c.course_id, from)}
+                      trend={roundsByCourse?.get(c.course_id)}
+                    />
+                  </div>
                 ))}
               </div>
 

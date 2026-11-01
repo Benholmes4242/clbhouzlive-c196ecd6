@@ -2250,6 +2250,23 @@
     "pillParsLong": "pars",
     "pillParsShort": "PAR",
     "roundsCount_one": "{{count}} round",
-    "roundsCount_other": "{{count}} rounds"
+    "roundsCount_other": "{{count}} rounds",
+    "sheetTitle": "Your courses",
+    "sheetSub": "{{courses}} courses · {{rounds}} rounds · {{avg}} a round on average",
+    "sheetSubNoAvg": "{{courses}} courses · {{rounds}} rounds",
+    "tileBest": "Where you score best",
+    "tileBites": "Where it bites",
+    "tileLine": "{{avg}} a round · {{rounds}} rounds",
+    "sortRecent": "Recent",
+    "sortMostPlayed": "Most played",
+    "sortBestForYou": "Best for you",
+    "legendEagles": "Eagle+",
+    "legendBirdie": "Birdie",
+    "legendPar": "Par",
+    "legendBogey": "Bogey+",
+    "earlyData": "Early data",
+    "figARound": "a round",
+    "figOneRound": "one round",
+    "figNRounds": "{{count}} rounds"
   }
 }
