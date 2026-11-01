@@ -205,6 +205,7 @@ const EARLY_TAG: React.CSSProperties = {
  */
 const ListBar: React.FC<{ segs: Seg[] }> = ({ segs }) => (
   <span
+    className="yc1-list-bar"
     style={{ display: 'flex', height: 6, borderRadius: 9, overflow: 'hidden', gap: 2 }}
   >
     {segs.map((s) => {
