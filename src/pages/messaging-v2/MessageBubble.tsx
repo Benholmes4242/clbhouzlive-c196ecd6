@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { Check, AlertCircle, Clock, Flag, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ReportSheet } from "@/components/moderation/ReportSheet";
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { ThreadMessage, MessageReaction, MessageAttachment, MessageAction } from '@/types/messaging';
 import { MessageImage } from './MessageImage';
 import { VoiceNote } from './VoiceNote';
