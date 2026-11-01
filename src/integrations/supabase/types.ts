@@ -20151,10 +20151,9 @@ export type Database = {
       compute_player_ratings: { Args: never; Returns: undefined }
       contains_banned_term: { Args: { _text: string }; Returns: boolean }
       count_orphan_posts: { Args: never; Returns: number }
-      count_shared_rounds_batch: {
-        Args: { p_target_ids: string[] }
-        Returns: Json
-      }
+      count_shared_rounds_batch:
+        | { Args: { p_target_ids: string[] }; Returns: Json }
+        | { Args: { p_target_ids: string[]; p_user_id: string }; Returns: Json }
       create_business_account: {
         Args: {
           p_category?: string
@@ -22690,6 +22689,17 @@ export type Database = {
           par: number
           par_count: number
           times_played: number
+        }[]
+      }
+      get_my_last_fourball: {
+        Args: never
+        Returns: {
+          course_name: string
+          display_name: string
+          play_date: string
+          profile_photo_url: string
+          user_id: string
+          username: string
         }[]
       }
       get_my_nemesis_holes: {

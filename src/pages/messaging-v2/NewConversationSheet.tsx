@@ -46,6 +46,8 @@ import {
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { usePlayedWith } from '@/hooks/messaging/usePlayedWith';
 import { useSharedGroundBatch } from '@/hooks/messaging/useSharedGround';
+import { useLastFourball, type FourballMember } from '@/hooks/messaging/useLastFourball';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
@@ -122,6 +124,8 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
 
   const { user } = useSupabaseSession();
   const playedWith = usePlayedWith(user?.id, open);
+  // MS2 §2 — the last round's playing partners, for the four-ball card.
+  const fourball = useLastFourball(user?.id, open);
 
   // Where and when, from the thread strip's own cache keys.
   const playedIds = useMemo(
@@ -222,37 +226,76 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
     }
   }, [actor, selected, busy, navigate, handleClose]);
 
-  const createGroup = useCallback(async () => {
-    if (!actor || selected.length < 2 || busy) return;
-    setBusy(true);
-    try {
-      const members = selected.map((s) => ({
-        actor_type: s.actor_type,
-        actor_id: s.actor_id,
-      }));
-      const finalTitle =
-        title.trim() ||
-        selected
-          .map((s) => s.name.split(' ')[0])
-          .slice(0, 4)
-          .join(', ');
-      const { data, error } = await supabase.rpc('msg_create_group', {
-        p_as_actor_type: actor.actorType,
-        p_as_actor_id: actor.actorId,
-        p_title: finalTitle,
-        p_members: members as unknown as Json,
-        p_avatar_url: undefined,
-      });
-      if (error) throw error;
-      const id = data as unknown as string;
-      handleClose();
-      navigate(`/messages/${id}`);
-    } catch (e) {
-      console.error(e);
-      toast.error('Could not create group');
-      setBusy(false);
-    }
-  }, [actor, selected, title, busy, navigate, handleClose]);
+  /** The sheet's one group-creation path — footer selection and MS2 four-ball. */
+  const runCreateGroup = useCallback(
+    async (members: Candidate[]) => {
+      if (!actor || members.length < 2 || busy) return;
+      setBusy(true);
+      try {
+        const finalTitle =
+          title.trim() ||
+          members
+            .map((s) => s.name.split(' ')[0])
+            .slice(0, 4)
+            .join(', ');
+        const { data, error } = await supabase.rpc('msg_create_group', {
+          p_as_actor_type: actor.actorType,
+          p_as_actor_id: actor.actorId,
+          p_title: finalTitle,
+          p_members: members.map((s) => ({
+            actor_type: s.actor_type,
+            actor_id: s.actor_id,
+          })) as unknown as Json,
+          p_avatar_url: undefined,
+        });
+        if (error) throw error;
+        const id = data as unknown as string;
+        handleClose();
+        navigate(`/messages/${id}`);
+      } catch (e) {
+        console.error(e);
+        toast.error('Could not create group');
+        setBusy(false);
+      }
+    },
+    [actor, title, busy, navigate, handleClose],
+  );
+
+  const createGroup = useCallback(() => {
+    void runCreateGroup(selected);
+  }, [runCreateGroup, selected]);
+
+  /** MS2 §2 — "Start a group" with exactly the four-ball's members. */
+  const startFourballGroup = useCallback(() => {
+    const members: Candidate[] = (fourball.data ?? []).map((m) => ({
+      actor_type: 'personal',
+      actor_id: m.user_id,
+      name: m.display_name,
+      avatar_url: m.profile_photo_url,
+    }));
+    void runCreateGroup(members);
+  }, [fourball.data, runCreateGroup]);
+
+  const fourballMembers = useMemo(() => fourball.data ?? [], [fourball.data]);
+  /** MS2 §2 — nothing with 0/1 people, while loading, on error, or searching. */
+  const showFourball =
+    query.trim().length === 0 &&
+    !fourball.isLoading &&
+    !fourball.isError &&
+    fourballMembers.length >= 2;
+
+  /** "Simon, Chris and Matt · Sundridge Park · West, 11 Oct" (MS2 §2). */
+  const fourballLine = useMemo(() => {
+    if (fourballMembers.length < 2) return null;
+    const first = fourballMembers.map((m) => (m.display_name ?? '').split(' ')[0]);
+    const names = `${first.slice(0, -1).join(', ')} and ${first[first.length - 1]}`;
+    const course = shortCourseName(fourballMembers[0].course_name ?? '');
+    const d = new Date(fourballMembers[0].play_date);
+    const when = Number.isNaN(d.getTime())
+      ? ''
+      : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+    return `${names} · ${course}, ${when}`;
+  }, [fourballMembers]);
 
   /** §4 the footer states the selection, and names a group before it exists. */
   const footerLabel =
@@ -416,6 +459,61 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             }}
           />
         </div>
+
+        {/* MS2 §2 — the last round's playing partners, under the search field. */}
+        {showFourball && fourballLine && (
+          <div
+            data-testid="fourball-card"
+            style={{ margin: '14px 16px 0', background: '#1E1E23', borderRadius: 16, padding: 14 }}
+          >
+            <div style={{ display: 'flex' }}>
+              {fourballMembers.map((m: FourballMember, i: number) => (
+                <div
+                  key={m.user_id}
+                  style={{
+                    marginLeft: i === 0 ? 0 : -8,
+                    border: '2px solid #1E1E23',
+                    borderRadius: '34%',
+                    lineHeight: 0,
+                  }}
+                >
+                  <SquircleAvatar
+                    src={m.profile_photo_url ?? undefined}
+                    userId={m.user_id}
+                    alt={m.display_name}
+                    size={34}
+                  />
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: MSG.INK, marginTop: 10 }}>
+              {fourballMembers.length === 3
+                ? t('compose.lastFourball', { defaultValue: 'Your last four-ball' })
+                : t('compose.lastThreeball', { defaultValue: 'Your last three-ball' })}
+            </div>
+            <div style={{ fontSize: 13, color: MSG.INK_3, marginTop: 2 }}>{fourballLine}</div>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={startFourballGroup}
+              className="active:opacity-80"
+              style={{
+                marginTop: 12,
+                height: 36,
+                padding: '0 18px',
+                borderRadius: 999,
+                border: 'none',
+                background: '#FFFFFF',
+                color: MSG.BLACK,
+                fontSize: 14,
+                fontWeight: 600,
+                opacity: busy ? 0.6 : 1,
+              }}
+            >
+              {t('compose.startGroup', { defaultValue: 'Start a group' })}
+            </button>
+          </div>
+        )}
 
         {/* Group title (only when 2+ selected) */}
         {selected.length >= 2 && (

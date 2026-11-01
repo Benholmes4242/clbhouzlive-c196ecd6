@@ -1196,8 +1196,29 @@ const EMPTY_SHARED_ROUNDS: SharedRoundsResult = {
 };
 
 /**
+ * MS2 §1 — detect_shared_rounds joins whs_scores on (play_date, course_id)
+ * with no cardinality guard, so a day where both players post two rounds
+ * returns four rows. Collapse on (play_date, course_id), keep the first,
+ * most recent first. Lives here so fetchSharedRounds counts real rounds;
+ * re-exported from useSharedGround for existing imports.
+ */
+export function dedupeSharedRounds(rounds: SharedRoundResult[]): SharedRoundResult[] {
+  const seen = new Set<string>();
+  const out: SharedRoundResult[] = [];
+  for (const r of rounds) {
+    const key = `${r.play_date}|${r.course_id ?? r.course_name ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(r);
+  }
+  return out.sort((a, b) => (a.play_date < b.play_date ? 1 : -1));
+}
+
+/**
  * Fetch H2H shared rounds between the user and a target friend.
  * Returns empty result for non-Clbhouz friends (no whs_scores rows).
+ * MS2 §1: rows are deduped BEFORE counting, so shared_rounds_count, the
+ * records and the 90-day figure all describe real rounds.
  */
 export async function fetchSharedRounds(
   userId: string,
@@ -1211,7 +1232,7 @@ export async function fetchSharedRounds(
   });
   if (error) throw error;
 
-  const rounds = ((data as any[]) ?? []) as SharedRoundResult[];
+  const rounds = dedupeSharedRounds(((data as any[]) ?? []) as SharedRoundResult[]);
   const stableford = { wins: 0, losses: 0, ties: 0 };
   const gross = { wins: 0, losses: 0, ties: 0 };
   const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000;
