@@ -338,7 +338,31 @@ export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
             {preview}
           </span>
 
-          {context ? (
+          {/* MS1 §5 — shared rounds: "{count} rounds together · you lead 6–3"
+              with the record in ink/600; count alone until the record loads;
+              today's context line when there are no shared rounds. */}
+          {ground && ground.count > 0 && !isGroup && !identity.isBusiness ? (
+            (() => {
+              const line = inboxRecordLine(
+                ground,
+                identity.name.trim().split(/\s+/)[0] || identity.name,
+                t as never,
+              );
+              return (
+                <span className="truncate" style={{ ...MT.CONTEXT, minWidth: 0 }}>
+                  {line.count}
+                  {line.record ? (
+                    <>
+                      {' · '}
+                      <em style={{ fontStyle: 'normal', color: MSG.INK, fontWeight: 600 }}>
+                        {line.record}
+                      </em>
+                    </>
+                  ) : null}
+                </span>
+              );
+            })()
+          ) : context ? (
             <span className="truncate" style={{ ...MT.CONTEXT, minWidth: 0 }}>
               {context}
             </span>

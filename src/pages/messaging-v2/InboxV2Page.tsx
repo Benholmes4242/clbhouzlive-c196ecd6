@@ -29,7 +29,7 @@ import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { RailChips } from '@/components/ui/RailChips';
 import { MemberRailTile } from './MemberRailTile';
-import { formatRelative } from '@/i18n/format';
+import { formatDayMonthShortGB } from '@/i18n/format';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isSpeakableThread } from './messagePreview';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
