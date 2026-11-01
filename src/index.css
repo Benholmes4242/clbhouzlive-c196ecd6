@@ -26,6 +26,15 @@
 }
 
 :root {
+  --invite-panel: #1E1E23;
+  --invite-ink: #F8FAFC;
+  --invite-on-ink: #0B0B0D;
+  --invite-mute: rgba(248,250,252,.62);
+  --invite-dim: rgba(248,250,252,.42);
+  --invite-line: rgba(255,255,255,.06);
+  --invite-search-line: rgba(255,255,255,.08);
+  --invite-pill-line: rgba(255,255,255,.18);
+  --invite-fall: #34D399;
   --coming-panel: #141418;
   --coming-photo-shade: linear-gradient(180deg, rgba(10,10,12,.05) 0%, rgba(10,10,12,.25) 45%, rgba(20,20,24,.96) 100%);
   --coming-own-tile: rgba(247,147,30,.12);
