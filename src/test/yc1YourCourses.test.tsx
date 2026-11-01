@@ -336,6 +336,7 @@ describe('sheet rendering', () => {
     const row = screen.getByRole('button', { name: /Mystery/ });
     expect(row.textContent).toContain('›');
     fireEvent.click(row);
-    expect(nav).toHaveBeenCalledWith(expect.stringContaining('/courses/'));
+    // The sheet closes first and navigates on a short delay.
+    await vi.waitFor(() => expect(nav).toHaveBeenCalledWith(expect.stringContaining('/courses/')));
   });
 });
