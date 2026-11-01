@@ -403,6 +403,7 @@ export function useSeasonTimeline(
             totalText: l.displayScore || '',
             score: l.score ?? null,
             tiedCount: l.tiedCount ?? 1,
+            currentRound: currentRoundFromScores(l),
           };
         } else {
           evt.leader = null;

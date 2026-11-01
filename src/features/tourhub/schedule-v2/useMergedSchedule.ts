@@ -215,6 +215,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
               totalText: l.displayScore || '',
               score: l.score ?? null,
               tiedCount: l.tiedCount ?? 1,
+              currentRound: currentRoundFromScores(l),
             }
           : null;
       } else {
