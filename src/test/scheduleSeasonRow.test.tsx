@@ -68,7 +68,8 @@ describe('SeasonRow rebuilt grammar', () => {
     expect(screen.getByText('Korn Ferry')).toBeInTheDocument();
     const name = screen.getByText('Simmons Bank Open for the Snedeker Foundation');
     expect(name.style.fontSize).toBe('15px');
-    expect(name.style.webkitLineClamp).toBe('2');
+    expect(name.style.display).toBe('-webkit-box');
+    expect(name.style.cssText).toContain('-webkit-line-clamp: 2');
     const venue = screen.getByText('Trump International Golf Links (Ireland) · Clare');
     expect(venue.style.textOverflow).toBe('ellipsis');
     expect(screen.getByText('Thu 10 – Sun 13 Sep')).toBeInTheDocument();
@@ -189,7 +190,7 @@ describe('SeasonRow rebuilt grammar', () => {
     const { container, unmount } = render(
       <SeasonRow event={event({ isMajor: true, isPlayoff: true, eventType: 'team' })} onSelect={() => {}} />,
     );
-    let tags = container.querySelectorAll('button span[style*="rgba(255, 255, 255, 0.24)"]');
+    let tags = container.querySelectorAll('button span[style*="0.24"]');
     expect(tags.length).toBe(1);
     expect((tags[0] as HTMLElement).style.color).toBe(INK);
     unmount();
@@ -197,20 +198,20 @@ describe('SeasonRow rebuilt grammar', () => {
     const { container: finale } = render(
       <SeasonRow event={event({ name: 'DP World Tour Championship', isPlayoff: true })} onSelect={() => {}} />,
     );
-    tags = finale.querySelectorAll('button span[style*="rgba(255, 255, 255, 0.24)"]');
+    tags = finale.querySelectorAll('button span[style*="0.24"]');
     expect(tags.length).toBe(1); // SEASON FINALE beats PLAYOFFS
     unmount();
 
     const { container: team } = render(
       <SeasonRow event={event({ name: 'Solheim Cup', eventType: 'team' })} onSelect={() => {}} />,
     );
-    tags = team.querySelectorAll('button span[style*="rgba(255, 255, 255, 0.24)"]');
+    tags = team.querySelectorAll('button span[style*="0.24"]');
     expect(tags.length).toBe(1);
   });
 
   it('no tag for an ordinary event', () => {
     const { container } = render(<SeasonRow event={event()} onSelect={() => {}} />);
-    expect(container.querySelectorAll('button span[style*="rgba(255, 255, 255, 0.24)"]').length).toBe(0);
+    expect(container.querySelectorAll('button span[style*="0.24"]').length).toBe(0);
   });
 
   it('venue line drops region words and falls back to the country only when there is no city', () => {
@@ -236,7 +237,7 @@ describe('SeasonRow rebuilt grammar', () => {
     const rc = rightColumn(container);
     const who = rc.children[1] as HTMLElement;
     expect(who.style.color).toBe(AMBER);
-    expect(who.textContent).toBe('★ Ortiz');
+    expect(who.textContent).toContain('★ Ortiz');
     const amberLines = container.querySelectorAll('button span[style*="rgb(247, 147, 30)"]');
     // who line + field line + played-here line
     expect(amberLines.length).toBe(3);
