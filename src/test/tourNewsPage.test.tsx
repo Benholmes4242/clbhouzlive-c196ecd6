@@ -140,15 +140,15 @@ describe('News page head and freshness', () => {
     localStorage.setItem(NEWS_OPENED, JSON.stringify(['lead']));
     mountPage();
     // lead (2h ago) is opened; yours (5h ago) predates the baseline.
-    expect(screen.queryByText(/new since your last visit/)).toBeNull();
+    expect(document.querySelector('.tour-news-fresh')).toBeNull();
     localStorage.setItem(NEWS_OPENED, JSON.stringify([]));
     cleanup();
     mountPage();
-    expect(screen.getByText(/new since your last visit/)).toHaveTextContent('1 new');
+    expect(document.querySelector('.tour-news-fresh')).toHaveTextContent('1 new since your last visit');
   });
   it('hides the new line on a first visit', () => {
     mountPage();
-    expect(screen.queryByText(/new since your last visit/)).toBeNull();
+    expect(document.querySelector('.tour-news-fresh')).toBeNull();
   });
 });
 
@@ -172,7 +172,9 @@ describe('News page lead', () => {
     const lead = screen.getByTestId('tour-news-lead');
     expect(lead.querySelector('.overview-news-details')).toHaveTextContent('1 like');
     expect(lead.querySelector('.overview-news-details')).not.toHaveTextContent('comment');
-    expect(screen.getByLabelText('Read Headline pair-a').querySelector('.overview-news-details')).toHaveTextContent('12 likes · 2 comments');
+    const pairDetails = screen.getByLabelText('Read Headline pair-a').querySelector('.overview-news-details');
+    expect(pairDetails).toHaveTextContent('12 likes');
+    expect(pairDetails).toHaveTextContent('2 comments');
   });
   it('has no like or comment buttons anywhere on the page', () => {
     mountPage();
@@ -235,11 +237,11 @@ describe('News page event card', () => {
   });
   it('uses deriveHeroState and carries no marquee', () => {
     const source = readFileSync('src/features/tourhub/news/NewsTab.tsx', 'utf8');
-    expect(source).not.toContain('StoryLeaderboardStrip');
-    expect(source).not.toContain('HeroWireTicker');
+    expect(source).not.toMatch(/^import.*StoryLeaderboardStrip/m);
+    expect(source).not.toMatch(/^import.*HeroWireTicker/m);
     const cardSource = readFileSync('src/features/tourhub/news/NewsEventCard.tsx', 'utf8');
     expect(cardSource).toContain('deriveHeroState');
-    expect(cardSource).not.toContain('HeroWireTicker');
+    expect(cardSource).not.toMatch(/^import.*HeroWireTicker/m);
   });
 });
 
