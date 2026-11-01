@@ -171,6 +171,58 @@ const CARD_LIST: React.CSSProperties = {
   gap: 10,
 };
 
+/**
+ * YC1 LIST CARD. The course rows own their shell: #17171B, the 8% hairline,
+ * radius 18, and their own 10px top margin / 16px gutters (search result
+ * rows keep the shared CARD above). Open state keeps the settled 28% ring.
+ */
+const COURSE_CARD = (open = false): React.CSSProperties => ({
+  background: '#17171B',
+  border: `1px solid ${open ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.08)'}`,
+  borderRadius: 18,
+  overflow: 'hidden',
+  margin: '10px 16px 0',
+});
+
+/** The inline "Early data" tag: never full width, sits after the meta text. */
+const EARLY_TAG: React.CSSProperties = {
+  display: 'inline-block',
+  fontSize: 10.5,
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  color: A.MUTE,
+  border: '1px solid rgba(255,255,255,0.18)',
+  borderRadius: 999,
+  padding: '1px 7px',
+  marginLeft: 6,
+  verticalAlign: 1,
+};
+
+/**
+ * THE COLLAPSED LIST BAR (YC1 §5). Height 6, radius 9, four segments with
+ * 2px gaps, widths from the EXACT percentages in the RAMP_DIST colours.
+ * Eagles hold a 0.6% floor when their count is above zero and are hidden at
+ * zero — unlike the expanded DistributionBar, empty buckets leave no
+ * hairline here.
+ */
+const ListBar: React.FC<{ segs: Seg[] }> = ({ segs }) => (
+  <span
+    style={{ display: 'flex', height: 6, borderRadius: 9, overflow: 'hidden', gap: 2 }}
+  >
+    {segs.map((s) => {
+      if ((s.count ?? 0) === 0) return null;
+      const pct = s.pctExact ?? s.pct ?? 0;
+      const width = s.key === 'eagles' ? Math.max(pct, 0.6) : pct;
+      return (
+        <i
+          key={s.key}
+          style={{ display: 'block', height: 6, width: `${width}%`, background: s.bg }}
+        />
+      );
+    })}
+  </span>
+);
+
 
 function Row({
   title,
@@ -226,34 +278,6 @@ function Row({
   );
 }
 
-/**
- * Down caret for the rows that EXPAND IN PLACE. Deliberately NOT the right
- * chevron used by the rows that navigate: two behaviours, two glyphs.
- */
-function ExpandCaret({ open }: { open: boolean }) {
-  return (
-    <svg
-      width={14}
-      height={14}
-      viewBox="0 0 14 14"
-      aria-hidden="true"
-      style={{
-        display: 'block',
-        transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-        transition: 'transform 160ms ease',
-      }}
-    >
-      <path
-        d="M3.5 5.5 L7 9 L10.5 5.5"
-        fill="none"
-        stroke={A.DIM}
-        strokeWidth={2.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function hasScoringData(course: UserAnalyticsCourse): boolean {
   // Gate on COUNTS, not percentages: a course with rounds but no hole-level
