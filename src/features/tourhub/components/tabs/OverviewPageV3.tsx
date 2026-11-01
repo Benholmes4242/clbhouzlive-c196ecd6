@@ -10,7 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { AlsoThisWeek } from '../../overview/sections/AlsoThisWeek';
 import { WorldRankings } from '../../overview/sections/WorldRankings';
-import { OverviewNews } from '../../overview/sections/OverviewNews';
+import { OverviewNews, selectOverviewNews } from '../../overview/sections/OverviewNews';
+import { useOverviewNewsData } from '../../overview/sections/useOverviewNewsData';
 import { StoryBand, selectOverviewBandStory } from '../../overview/sections/StoryBand';
 import { useTourStories } from '../../news/useTourStories';
 
@@ -41,6 +42,8 @@ export function OverviewPageV3() {
     ? stories.filter((story) => story.tour_slug == null || story.tour_slug === selectedTourSlug)
     : stories;
   const bandStory = selectOverviewBandStory(stories, viewingTournamentId);
+  const newsSelection = selectOverviewNews(newsStories, bandStory?.id);
+  const newsPresentation = useOverviewNewsData(newsSelection.hero ? [newsSelection.hero, ...newsSelection.features, ...newsSelection.rows] : []);
 
   // The overview's island label describes the lens used by its sections, not
   // the tour of whichever tournament happens to be visible in the hero.
@@ -104,7 +107,7 @@ export function OverviewPageV3() {
               <AlsoThisWeek />
               <ComingUpSlot />
               <WorldRankings />
-              <OverviewNews stories={newsStories} excludeId={bandStory?.id} />
+              <OverviewNews stories={newsStories} excludeId={bandStory?.id} presentations={newsPresentation} />
 
               {/* The shared page shell reserves the measured bottom-nav clearance. */}
             </div>

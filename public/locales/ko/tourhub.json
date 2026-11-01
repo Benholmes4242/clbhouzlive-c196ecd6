@@ -92,6 +92,16 @@
     }
   },
   "overview": {
+    "news": {
+      "title": "News",
+      "all": "All news",
+      "newSince_one": "<b>{{count}} new</b> since your last visit",
+      "newSince_other": "<b>{{count}} new</b> since your last visit",
+      "minutes": "{{count}} min read",
+      "minutesShort": "{{count}} min",
+      "liveRound": "Live · R{{round}}",
+      "thru": "thru {{count}}"
+    },
     "alsoThisWeek": {
       "title": "이번 주 다른 대회",
       "live": "{{count}}개 진행 중",
