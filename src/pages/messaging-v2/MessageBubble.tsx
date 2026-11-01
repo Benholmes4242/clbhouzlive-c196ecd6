@@ -432,7 +432,8 @@ export const MessageBubble: React.FC<Props> = ({
           className="flex items-center gap-1.5"
           style={{ position: "relative", 
             marginTop: 8,
-            paddingLeft: isOutgoing ? 0 : 4,
+            /* MS1 §7 — under the bubble, past the 28px avatar slot + 8px gap. */
+            paddingLeft: isOutgoing ? 0 : 36,
             paddingRight: isOutgoing ? 4 : 0,
           }}
         >
