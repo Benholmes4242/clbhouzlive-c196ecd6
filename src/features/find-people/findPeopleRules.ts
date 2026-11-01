@@ -194,7 +194,7 @@ export function suggestedGroups(people: PersonSuggestion[], biz: BusinessSuggest
   if (club && (clubBiz.length > 0 || clubPeople.length > 0)) {
     groups.push({
       id: 'from-club',
-      label: { key: 'findPeople.group.fromClub', def: `From ${club}`, vars: {} },
+      label: { key: 'findPeople.group.fromClub', def: 'From {{club}}', vars: { club } },
       followAll: true,
       count: clubBiz.length + clubPeople.length,
       businesses: clubBiz,
@@ -250,7 +250,7 @@ export function golferGroups(people: PersonSuggestion[], biz: BusinessSuggestion
   if (club && clubRows.length > 0) {
     out.push({
       id: 'from-club',
-      label: { key: 'findPeople.group.fromClub', def: `From ${club}`, vars: {} },
+      label: { key: 'findPeople.group.fromClub', def: 'From {{club}}', vars: { club } },
       count: clubRows.length,
       people: clubRows,
       businesses: [],
@@ -281,7 +281,7 @@ export function businessGroups(people: PersonSuggestion[], biz: BusinessSuggesti
 
   if (club) {
     push('your-club', { key: 'findPeople.group.yourClub', def: 'Your club' }, byReason(biz, 'your_club'));
-    push('near-club', { key: 'findPeople.group.nearClub', def: `Near ${club}`, vars: {} }, byReason(biz, 'near_club'));
+    push('near-club', { key: 'findPeople.group.nearClub', def: 'Near {{club}}', vars: { club } }, byReason(biz, 'near_club'));
   }
   push('coaches', { key: 'findPeople.group.coaches', def: 'Coaches and academies' }, byReason(biz, 'coach'));
   push('popular', { key: 'findPeople.group.popular', def: 'Popular on clbhouz' }, byReason(biz, 'popular'));
