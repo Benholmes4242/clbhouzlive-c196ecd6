@@ -1,5 +1,11 @@
 # Roadmap
 
+## IF1 — Connected Invite friends sheet
+- [ ] Rebuild connected header, figures, club/activity/invited groups and rows; preserve unconnected state, shared hook order and existing share paths.
+- [ ] Add sequential bulk invites with per-success analytics, partial-failure toast and sent-invite invalidation.
+- [ ] Add if1InviteSheet tests and run existing invite checks/full shards; report inherited Coming up failures without changing them.
+- [ ] Resolve signed-off row conflict: mock Tony has delta without round count, brief requires round-count line for every active pending friend.
+
 ## Tour Overview — Coming up rebuild
 - [x] Ben resolved conflicts: five visible events, weekday/month separate lines; frozen six-row selector remains unchanged.
 - [x] Replaced rail with next-event preview/month list; added own-rounds, photos, defending result, calendar and six catalogues' English keys. No SQL/migrations.
