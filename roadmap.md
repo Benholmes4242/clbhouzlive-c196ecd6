@@ -1436,3 +1436,6 @@
 ## WF1 — Find people page
 - [x] /find-people built to the signed-off mock; /golferstofollow redirects keeping the query; GolfersToFollowV2.tsx deleted; entry points (FriendsEmptyState, ClubsCard, SuggestedGolfersBlock) updated; account glance left alone (no people row to replace).
 - [x] Pure rules + RPC hooks + 23 tests (wf1FindPeople.test.tsx); full shards 5,613/5,613 across 527 files (+23/+1 vs 5,590/526); tsc clean. Report: WF1_FIND_PEOPLE_REPORT.md. Signed-in live check outstanding.
+
+## WF2 — Who to follow rail in the feed
+- [x] Rails at posts 3/15 via CardFeed `renderBeforePost`; Activity block on privacy-safe suggestions; WF2.1 pan-y scroll fix and dim reason lines. 30 tests (wf2FeedRail.test.tsx); full shards 5,643/5,643 across 528 files; tsc + build clean. Report: WF2_FEED_RAIL_REPORT.md. Signed-in device check outstanding.
