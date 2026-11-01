@@ -923,6 +923,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
       return (
         <>
+        {/* WF2: the Who to follow rail renders ABOVE this card, before the
+            divider when they share an index — never a list item. */}
+        {renderBeforePost?.(index)}
         {/* Rendered ABOVE this card rather than as a list item, so the divider
             never occupies an index the video/carousel bookkeeping counts. */}
         {dividerIndex === index && (
@@ -1055,7 +1058,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       commentPreview.map,
       golfTags,
       dividerIndex,
-
+      renderBeforePost,
     ],
   );
 
