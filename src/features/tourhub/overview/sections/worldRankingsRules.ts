@@ -40,8 +40,8 @@ export function fmtPoints(points: number): string {
  * The sentence. Needs the top two rows WITH points; no points -> no sentence.
  * Level at the top wins over every other form. Ratio clauses: No. 1 >= 2x
  * No. 2 -> "more than twice"; >= 1.75x -> "nearly twice"; otherwise plain.
- * `eventsLeft` (season boards only, null when not countable) replaces the
- * closing full stop.
+ * Positive `eventsLeft` (season boards only) replaces the closing full stop;
+ * zero and an uncountable total both omit the clause.
  */
 export function leadSentence(rows: SentenceRow[], eventsLeft: number | null): LeadSentence | null {
   const [first, second] = rows;
@@ -61,7 +61,7 @@ export function leadSentence(rows: SentenceRow[], eventsLeft: number | null): Le
     kind: 'leads',
     values: { name: surnameOf(first.playerName), gap: fmtPoints(p1 - p2) },
     clause,
-    eventsLeft,
+    eventsLeft: eventsLeft === 0 ? null : eventsLeft,
   };
 }
 

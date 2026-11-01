@@ -1,0 +1,48 @@
+# World Rankings follow-up — 1 November 2026
+
+## Delivered
+- Zero events remaining is normalized to null by `leadSentence`, so the events-left clause is omitted and the sentence ends at the full stop.
+- All six locale catalogues now have `overview.rankings.eventsLeft_one` and `eventsLeft_other`. `Trans` receives `count` explicitly to select the correct form. Disabled locales retain approved English copy; no locale switch changed.
+- Four new cases in `src/test/worldRankingsRebuild.test.tsx`: “zero events left is omitted exactly like an uncountable total”; “zero season events ends the sentence at the full stop”; “selects the events-left plural form from count 1”; “selects the events-left plural form from count 2”. These pin zero/null equivalence, the exact full-stop sentence, singular/plural rendering and the emphasized count.
+- No existing test deleted, renamed or rewritten; no existing assertion changed. This follow-up adds four cases to the existing rankings file.
+
+## Earlier shard-2 failure — unavailable evidence
+The previous message reported a mid-run failure during a sandbox interruption but did not name the file or case. Searches of surviving execution logs, reports and that message did not recover its name, error or line. It is not possible to reliably identify the file to run three times. No arbitrary substitute file was chosen and no three-pass claim is made. The earlier implication that this was sandbox instability is unverified, not a diagnosis.
+
+## Tests and accounting
+Targeted command: `bunx vitest run src/test/worldRankingsRebuild.test.tsx` — **36/36**, one file.
+
+Full commands: `bunx vitest run --shard=1/4 --maxWorkers=2` through `--shard=4/4 --maxWorkers=2`.
+
+| Shard | Passed tests | Passed files |
+|---|---:|---:|
+| 1 | 1,262 | 128 |
+| 2 | 1,247 | 128 |
+| 3 | 1,350 | 128 |
+| 4 | 1,379 | 127 |
+| Total | **5,238/5,238** | **511/511** |
+
+Zero failed tests and no Vitest unhandled-errors summary. Raw logs: `/tmp/rankings-check/shard-{1,2,3,4}.log`.
+
+Against the requested **5,172/509** baseline: **+66 tests/+2 files**, comprising `yc1YourCourses.test.tsx` (+30/+1) and `worldRankingsRebuild.test.tsx` (+36/+1, including this follow-up's four cases).
+
+Correction to the earlier report: it claimed 36 rankings cases before this follow-up. The restored source contained **32**, and now runs **36** after four additions. The restored pre-follow-up inventory is therefore **5,234/511**; no evidence supports naming four historical deletions, and none occurred in this follow-up. The final executed total, not the earlier stated targeted count, is authoritative. One broad filename search matched `tournamentContest.ts`; Vitest correctly excludes that non-test file.
+
+Latest automatic preview build: **build OK**, `2026-11-01T14:06:40Z`. No manual build or typecheck was run.
+
+## 390×844 proof
+Browser visited `http://localhost:8080/tourhub` at 390×844, with real guest data. World rendered the expected points sentence, five rows, dated column and live biggest-climb card. There was no horizontal overflow or page error.
+
+The existing guest join card dimmed and covered the section. A normal Race to Dubai click was blocked by `[data-guest-gate-shade]`; it never switched the live board. No forced click, gate removal, session spoofing or access bypass was used.
+
+Evidence under `/tmp/browser/world-rankings/`:
+- `world-live.png`: real World view covered by the guest gate.
+- `r2d-blocked.png`: blocked Race to Dubai attempt, still showing World; **not** a Race to Dubai live-state screenshot.
+- `world-mock.png`, `r2d-mock.png`: signed-off reference sections.
+- `world-comparison.png`, `r2d-comparison.png`: each reference beside its corresponding guest/blocking evidence, not unobstructed parity proof.
+- `capture.log`: DOM observations and blocked-click evidence.
+
+World and Race to Dubai presentation are unit-tested: header structure/nonwrapping, flag geometry, points bars, wins blank/zero, points format, sentences, followed-row highlighting/list order/cap, and climber history rendering. Your players is unit-tested only; no signed-in visual claim is made. Pixel parity and actual Race to Dubai browser state remain unverified because of the gate. Mock example names/counts/date differ from real data by design; existing system typography and shared chips were preserved.
+
+## Protected scope
+No SQL, migrations, backend/RPC changes, native/Median changes, or `feed_config` edits. `round_pool_cap` remains 30. YC2 is not part of this follow-up and remains open.

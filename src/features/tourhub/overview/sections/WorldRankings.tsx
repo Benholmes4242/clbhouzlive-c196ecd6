@@ -99,7 +99,7 @@ function LeadSentence({ rows, eventsLeft }: { rows: RankingsRow[]; eventsLeft: n
           {sentence.clause === 'twice' ? <Trans ns="tourhub" i18nKey="overview.rankings.clauseTwice" /> : null}
           {sentence.clause === 'nearly' ? <Trans ns="tourhub" i18nKey="overview.rankings.clauseNearly" /> : null}
           {sentence.eventsLeft != null ? (
-            <Trans ns="tourhub" i18nKey="overview.rankings.eventsLeft" values={{ count: sentence.eventsLeft }} components={{ b: <strong style={{ color: INK, fontWeight: 700 }} /> }} />
+            <Trans ns="tourhub" i18nKey="overview.rankings.eventsLeft" count={sentence.eventsLeft} values={{ count: sentence.eventsLeft }} components={{ b: <strong style={{ color: INK, fontWeight: 700 }} /> }} />
           ) : (
             <Trans ns="tourhub" i18nKey="overview.rankings.clauseEnd" />
           )}

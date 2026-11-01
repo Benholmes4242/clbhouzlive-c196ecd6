@@ -127,6 +127,12 @@ describe('worldRankingsRules', () => {
     expect(leadSentence([], null)).toBeNull();
   });
 
+  it('zero events left is omitted exactly like an uncountable total', () => {
+    const rows = [{ playerName: 'Rory McIlroy', points: 4210 }, { playerName: 'Tommy Fleetwood', points: 3388 }];
+    expect(leadSentence(rows, 0)).toEqual(leadSentence(rows, null));
+    expect(leadSentence(rows, 0)).toMatchObject({ eventsLeft: null });
+  });
+
   it('picks the largest positive climb; a tie goes to the better current rank', () => {
     const rows = [
       row({ rank: 12, playerId: 'a', movement: 5 }),
@@ -212,6 +218,20 @@ describe('WorldRankings rebuilt section', () => {
   it('renders no sentence when the top rows have no points', () => {
     setup({ board: boardResult({ rows: WORLD_ROWS.map((r) => ({ ...r, points: null })) }) });
     expect(document.querySelector('[data-lead-sentence]')).toBeNull();
+  });
+
+  it('zero season events ends the sentence at the full stop', () => {
+    setup({ seasonBoard: boardResult({ rows: SEASON_ROWS, eventsLeft: 0 }) });
+    fireEvent.click(screen.getByRole('tab', { name: 'Race to Dubai' }));
+    expect(document.querySelector('[data-lead-sentence]')?.textContent).toBe('McIlroy leads by 822 points.');
+  });
+
+  it.each([1, 2])('selects the events-left plural form from count %i', (count) => {
+    setup({ seasonBoard: boardResult({ rows: SEASON_ROWS, eventsLeft: count }) });
+    fireEvent.click(screen.getByRole('tab', { name: 'Race to Dubai' }));
+    const sentence = document.querySelector('[data-lead-sentence]');
+    expect(sentence?.textContent).toBe(`McIlroy leads by 822 points with ${count} ${count === 1 ? 'event' : 'events'} left.`);
+    expect(sentence?.querySelectorAll('strong')[2]?.textContent).toBe(String(count));
   });
 
   it('draws the headshot with the flag on its corner', () => {
