@@ -14,10 +14,11 @@ import CourseTagSheet from '@/features/post-v2/components/CourseTagSheet';
 import ScheduleSheetV2 from '@/features/post-v2/components/ScheduleSheetV2';
 import PostSuccessV2 from '@/features/post-v2/components/PostSuccessV2';
 import {WhereSection} from '@/features/post-v2/components/golf/GolfPostSections';
+import {resetCourseCatalogueCountForTests} from '@/features/post-v2/hooks/useCourseCatalogueCount';
 const i18n=createInstance();void i18n.init({lng:'en',resources:{en:{composer:en,common:{action:{close:'Close',done:'Done'}}}},initAsync:false});
 const mount=(node:React.ReactNode)=>render(<MemoryRouter><I18nextProvider i18n={i18n}>{node}</I18nextProvider></MemoryRouter>);
 const result={kind:'published' as const,postId:'post1',actorName:'Ben',caption:'A round'};
-beforeEach(()=>{h.snapshot=null;h.listener=null;h.reads=[];h.share.mockClear();h.rpc.mockResolvedValue({data:[],error:null});h.search=[];h.club=[];});
+beforeEach(()=>{resetCourseCatalogueCountForTests();h.snapshot=null;h.listener=null;h.reads=[];h.share.mockClear();h.rpc.mockResolvedValue({data:[],error:null});h.search=[];h.club=[];});
 afterEach(()=>{cleanup();vi.useRealTimers();});
 describe('course sheet and photo flows',()=>{
  it('dedupes played before popular and preserves metadata after selection',async()=>{const done=vi.fn();mount(<CourseTagSheet open userId="me" selected={[]} onDone={done} onClose={vi.fn()}/>);await waitFor(()=>expect(document.querySelector('[data-course-group="yourCourses"]')).not.toBeNull());const row=document.querySelector('[data-course="c1"]') as HTMLElement;fireEvent.click(row);expect(row).toHaveAttribute('aria-pressed','true');expect(row.querySelector('img')).toHaveAttribute('src','/cover.jpg');fireEvent.click(screen.getByRole('button',{name:'Done'}));expect(done).toHaveBeenCalledWith([expect.objectContaining({id:'c1',sub_country:'Fife',thumbnail:'/cover.jpg'})]);expect(document.querySelectorAll('[data-course="c1"]')).toHaveLength(1);});
