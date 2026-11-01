@@ -1427,3 +1427,12 @@
 - [x] + sheet (BizcSheet, 3 rows, Share a round hidden without connection/rounds), round picker (useAllScores, newest first, 30/page), course picker (useCourseSearch, 44px white-caret field); sends via existing msg_send with round_share/course_share types.
 - [x] Round card (useRoundShareCards, one RPC per page, AC1 strip colours, RoundDetailSheet on tap) and course card (by-id course read + useCourseListRanks, /courses/{id} on tap); both fall back to plain body bubbles. Inbox preview needed no change.
 - [x] Approved MS1 line-400 cast applied; tsc fully clean. New ms3MessagesShare.test.tsx (14). Full sharded suite 5,569/5,569 across 525 files (+14/+1 vs 5,555/524). Signed-in live verification unavailable.
+
+## TOUR SCHEDULE REBUILT (schedule-signed-off.html)
+- [ ] Remove charles schwab cup championship from CHAMPIONS_MAJOR_KEYWORDS; list getContextLabel/isMajor consumers in report
+- [ ] Week grouping (Mon-Sun) + sticky week headers + THIS WEEK shading in useSeasonTimeline/useMergedSchedule/ScheduleTab
+- [ ] Next-major card replacing next-major header figure
+- [ ] SeasonRow rebuild: date block, tag priority, venue city, date spans, right column DEFENDS/PURSE/LEADS/LEAD/WON, headshots
+- [ ] Amber member lines (followed leader/winner, in-the-field, played here); batched field/own-rounds reads
+- [ ] Restyled This week button (shown when section off screen, smooth scroll)
+- [ ] Locales x6, new tests, rewrite scheduleSeasonRow.test.tsx (quote old/new), full sharded suite, 390x844 screenshots
