@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tour Overview — Also this week
+- [ ] Resolve eligibility conflict: the brief freezes isAlsoThisWeek (completed events excluded), while section 4 and the signed-off mock require finished events.
+- [ ] Rebuild event presentation, batched reads, shared leaderboard rules and locale strings; preserve navigation, score colours and guest gating.
+- [ ] Make World Rankings falls muted; run full suite in shards against 5,004/502 and capture 390×844 comparisons.
+
 ## Tour leaderboard rebuild
 - [x] Source confirms whole-field sr_scorecards sync; tour_player_follows already typed; FullBoardSheet already shares BoardTable's column header.
 - [x] Colour ruling resolved: preserve existing scoreColor.ts and system typography; hero untouched.
