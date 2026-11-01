@@ -1,4 +1,20 @@
-# Also this week — follow-up validation stopped
+# Also this week — follow-up validation passed
+
+## Approved assertion corrections — final result
+Only `src/test/alsoWeekRebuild.test.tsx` test code changed in this follow-up; no component changes. No tests deleted, renamed or added; the same three cases were corrected under explicit approval:
+
+- **one followed player uses singular field sentence**: old `expect(v.container.querySelector('.also-yours')?.textContent).toBe('1 of your players is in the field');`; new `expect(v.container.querySelector('.also-yours > span:last-child')?.textContent).toBe('1 of your players is in the field');`. Reason: target the sentence, not avatar initials.
+- **multiple followed players use plural field sentence and three faces maximum**: old `expect(v.container.querySelector('.also-yours')?.textContent).toBe('4 of your players are in the field');`; new `expect(v.container.querySelector('.also-yours > span:last-child')?.textContent).toBe('4 of your players are in the field');`. Reason: same sentence-only fix. Retained exactly `expect(v.container.querySelectorAll('.also-stack .also-avatar')).toHaveLength(3);`.
+- **ranking falls use dim not danger and rises retain TREND_UP**: replaced old `expect((v.container.querySelector('[data-movement-tone=fall]') as HTMLElement).style.color).toBe('var(--tour-board-dim)');` with `expect(fall).toHaveAttribute('data-movement-tone','fall');`, `expect(rise).toHaveAttribute('data-movement-tone','rise');` and `expect(fall.style.color).not.toBe(normalizeColor(DANGER));`. Retained the rise check, now written `expect(rise.style.color).toBe(normalizeColor(TREND_UP));`. Reason: jsdom drops CSS-variable colour values; attributes verify polarity, and a red inline fall still fails the negative assertion. Added the existing DANGER token import only.
+
+### Final commands and inventory
+- `bunx vitest run src/test/alsoWeekRebuild.test.tsx src/test/alsoWeekSection.test.tsx src/test/alsoWeekReads.test.ts src/test/islandsNav.test.tsx src/test/tourOverviewDesignA.test.ts src/test/tourOverviewMovementColumn.test.ts`: **148/148 passed across 6 files**.
+- `bunx vitest run --shard=1/2`: **2,454/2,454 passed across 253 files**.
+- `bunx vitest run --shard=2/2`: **2,614/2,614 passed across 252 files**.
+- Full suite: **5,068 passed / 0 failed / 5,068 executed across 505 files**, no unhandled errors reported. Against the requested **5,004 tests/502 files** baseline: **+64 tests/+3 files**, entirely `src/test/alsoWeekRebuild.test.tsx` (55), `src/test/alsoWeekReads.test.ts` (3), and `src/test/alsoWeekSection.test.tsx` (6). These are all new test files for this workstream. Inventory before and after this correction is unchanged at **5,068/505**; the earlier 5,039/504 execution predates the +23 rebuild cases and +6 section cases/+1 file.
+- Latest automatic preview validation: **2026-11-01T07:02:54Z — build OK**. No manual build/typecheck run.
+- Existing `section.png` and `comparison.png` remain the proof; no further screenshots taken. Live data has one live and one finished event. **Two-live, final-round-in-progress and starting-this-week states are unit-test-only**, as are member follows. Live event-tap browser navigation remains unverified; canonical destination is covered by the passing unit test.
+- Earlier stops below are historical and resolved. No SQL, migrations, component, RPC/edge/provider/native/Median/feed_config changes in this correction; round_pool_cap remains 30.
 
 ## November 1 authorised follow-up
 - Applied exactly `initImmediate:false` → `initAsync:false` in the existing provider fixture; no other fixture change.
@@ -87,7 +103,7 @@ Unrelated to changed Tour files: fixture `iso(2)` is now 30 October, whereas tod
 - Current eligible section has **one live and one finished** event; two live events and a starting-this-week event cannot be shown without changing the frozen selection. Member followed rows have unit coverage only.
 - Event tap navigation has not yet been exercised end-to-end; more mock state/coverage verification remains outstanding.
 
-## Current outstanding
-- Authorise correction of the three new assertions above, then rerun targeted checks and full suite in shards.
+## Final status
+- Approved correction of the three assertions and targeted/full-suite shards complete; all pass, as recorded above.
 - Locale keys and additional state/heading/navigation coverage are now added. AGENTS.md pointer skipped by ruling.
 - No SQL, migrations, RPC/edge/provider/native/Median/feed_config changes; round_pool_cap remains 30.

@@ -6,7 +6,7 @@
 - [x] Authorised fixture fixes: initAsync:false and Date-only clock pin in the one islandsNav test; unchanged assertion. AGENTS.md pointer explicitly skipped.
 - [x] Added all six locale catalogues' keys and remaining state/heading/navigation coverage. Existing section.png/comparison.png suffice; two-live, final-round and upcoming proof is unit-only.
 - [x] Approved three assertion corrections: sentence-span-only queries preserve copy/three-face limit; movement attributes plus not-DANGER fall and unchanged TREND_UP rise checks. No component changes.
-- [ ] Run targeted validation and full-suite shards; reconcile against 5,004/502. See ALSO_THIS_WEEK_REPORT.md.
+- [x] Targeted148/148; full shards2454+2614=5068/5068 across505. Baseline5004/502 +64/+3: alsoWeekRebuild55, alsoWeekReads3, alsoWeekSection6. No component changes; automatic build OK07:02:54Z. See ALSO_THIS_WEEK_REPORT.md.
 
 ## Tour leaderboard rebuild
 - [x] Source confirms whole-field sr_scorecards sync; tour_player_follows already typed; FullBoardSheet already shares BoardTable's column header.
