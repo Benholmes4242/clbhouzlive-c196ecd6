@@ -209,6 +209,33 @@ export const Composer: React.FC<Props> = ({
     }
   }, [disabled, picking]);
 
+  /** MS3 §2 — tap sends through the existing msg_send path, then closes. */
+  const shareRound = useCallback(
+    (score: WhsScore) => {
+      const course = shortCourseName(score.course?.name ?? '');
+      void send({
+        body: `${score.adjusted_gross} at ${course}`,
+        type: 'round_share',
+        metadata: { whs_score_id: score.id },
+      });
+      setSheet(null);
+    },
+    [send],
+  );
+
+  /** MS3 §3 — the body is the course name; it becomes the inbox preview. */
+  const shareCourse = useCallback(
+    (course: CourseSearchResult) => {
+      void send({
+        body: course.name,
+        type: 'course_share',
+        metadata: { course_id: course.id },
+      });
+      setSheet(null);
+    },
+    [send],
+  );
+
   return (
     <div
       ref={containerRef}
@@ -309,7 +336,7 @@ export const Composer: React.FC<Props> = ({
         <button
           type="button"
           aria-label={t('a11y.attachImage')}
-          onClick={handleAttach}
+          onClick={() => setSheet('actions')}
           disabled={disabled || picking}
           className="active:opacity-60"
           style={{
