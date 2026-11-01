@@ -204,8 +204,9 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
         {t('findPeople.rail.sub', { defaultValue: 'Golfers and clubs you might know' })}
       </div>
 
-      {/* Cards row — sideways drag stays on the rail: pan-x + contained
-          overscroll, so it cannot arm pull-to-refresh or a page swipe. */}
+      {/* Cards row — sideways drags scroll the cards, vertical drags pass
+          through to scroll the feed (pan-x pan-y); contained horizontal
+          overscroll stops either arming pull-to-refresh or a page swipe. */}
       <div
         className="no-scrollbar"
         style={{
@@ -214,7 +215,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
           padding: '12px 16px 0',
           overflowX: 'auto',
           overscrollBehaviorX: 'contain',
-          touchAction: 'pan-x',
+          touchAction: 'pan-x pan-y',
           scrollSnapType: 'x proximity',
           scrollPadding: '0 16px',
         }}
