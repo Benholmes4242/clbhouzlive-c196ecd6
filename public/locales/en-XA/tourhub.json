@@ -92,6 +92,16 @@
     }
   },
   "overview": {
+    "news": {
+      "title": "News",
+      "all": "All news",
+      "newSince_one": "<b>{{count}} new</b> since your last visit",
+      "newSince_other": "<b>{{count}} new</b> since your last visit",
+      "minutes": "{{count}} min read",
+      "minutesShort": "{{count}} min",
+      "liveRound": "Live · R{{round}}",
+      "thru": "thru {{count}}"
+    },
     "alsoThisWeek": {
       "title": "[~~Álsó thís wéék~~]",
       "live": "[~~{{count}} lívé~~]",
