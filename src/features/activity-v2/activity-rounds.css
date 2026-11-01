@@ -1,0 +1,11 @@
+.activity-unread { background: var(--activity-unread); }
+.activity-unread::before { content: ''; position: absolute; left: 5px; top: 50%; width: 6px; height: 6px; border-radius: 50%; background: var(--activity-ink); transform: translateY(-50%); pointer-events: none; }
+.activity-round-row { align-items: center !important; gap: 12px !important; padding: 12px 16px !important; }
+.activity-round-sentence { font-size: 14.5px; line-height: 1.4; color: var(--activity-ink); font-weight: 400; }
+.activity-round-meta { font-size: 12.5px; line-height: 1.4; color: var(--activity-mute); margin-top: 3px; }
+.activity-hole-strip { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 7px; }
+.activity-hole-strip i { width: 9px; height: 4px; border-radius: 2px; flex: 0 0 9px; }
+.activity-score-tile { width: 52px; height: 52px; flex: 0 0 52px; border-radius: 14px; background: var(--activity-tile); color: var(--activity-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+.activity-score-tile b { font-size: 19px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+.activity-score-tile span { font-size: 11px; color: var(--activity-mute); margin-top: 3px; }
+.activity-tour-tile { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 31%; background: var(--activity-tile); color: var(--activity-tour-ink); font-size: 10px; font-weight: 800; letter-spacing: .06em; display: flex; align-items: center; justify-content: center; overflow-wrap: anywhere; text-align: center; }

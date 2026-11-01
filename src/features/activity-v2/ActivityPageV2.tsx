@@ -31,6 +31,7 @@ import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGolfersBlock';
 import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
 import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { activityRoundId, useActivityRoundPages } from './hooks/useActivityRoundSummaries';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -221,6 +222,7 @@ export const ActivityPageV2: React.FC = () => {
    */
   const filter = chipToFilter(chip === 'new' ? 'all' : chip);
   const feed = useActivityFeedV2(filter);
+  const roundSummaries = useActivityRoundPages(feed.data?.pages ?? []);
 
   const [sheetRow, setSheetRow] = useState<ActivityFeedRowV2 | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -444,7 +446,7 @@ export const ActivityPageV2: React.FC = () => {
         <SectionHeader label={label} tone={tone} />
         <div>
           {rows.map((r) => (
-            <LedgerRow key={r.notif_id} row={r} onMarkRead={markRead} onLongPress={openSheet} />
+            <LedgerRow key={r.notif_id} row={r} roundSummary={roundSummaries.get(activityRoundId(r) ?? '')} onMarkRead={markRead} onLongPress={openSheet} />
           ))}
         </div>
       </section>
