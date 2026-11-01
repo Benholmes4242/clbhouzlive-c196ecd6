@@ -25,3 +25,38 @@ export function daysUntil(startDate: string): number | null {
   const t = new Date(`${startDate}T12:00:00Z`).getTime();
   return Math.max(0, Math.ceil((t - todayNoonMs()) / 86_400_000));
 }
+
+// ─── Week helpers (BRIEF_TOUR_SCHEDULE_REBUILT §3) ───────────────────────
+// Golf weeks run Monday→Sunday. All maths is noon-UTC so a member's device
+// timezone can never push an event into the neighbouring week.
+
+/** Monday (noon UTC) of the week containing the ISO date. */
+export function weekMonday(iso: string): Date {
+  const d = new Date(`${iso.slice(0, 10)}T12:00:00Z`);
+  const offset = (d.getUTCDay() + 6) % 7; // days since Monday (Mon=0)
+  d.setUTCDate(d.getUTCDate() - offset);
+  return d;
+}
+
+/** yyyy-MM-dd key of the week's Monday — the WeekGroup key. */
+export function weekKey(iso: string): string {
+  return weekMonday(iso).toISOString().slice(0, 10);
+}
+
+/** The week key containing `now` (device-local today, UTC-noon anchored). */
+export function currentWeekKey(now: Date = new Date()): string {
+  return weekKey(now.toISOString().slice(0, 10));
+}
+
+export type WeekRelation = 'last' | 'this' | 'next' | 'other';
+
+export function weekRelation(key: string, now: Date = new Date()): WeekRelation {
+  const cur = currentWeekKey(now);
+  if (key === cur) return 'this';
+  const WEEK_MS = 7 * 86_400_000;
+  const monday = new Date(`${key}T12:00:00Z`).getTime();
+  const curMs = new Date(`${cur}T12:00:00Z`).getTime();
+  if (monday === curMs - WEEK_MS) return 'last';
+  if (monday === curMs + WEEK_MS) return 'next';
+  return 'other';
+}
