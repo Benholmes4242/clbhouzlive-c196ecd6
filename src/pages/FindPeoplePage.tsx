@@ -574,7 +574,7 @@ function FollowPill({
         isFollowing: prev,
       });
     } catch {
-      markFollowed(targetActorId, prev);
+      markFollowed(key, prev);
       toast.error(prev ? 'Could not unfollow' : 'Could not follow');
     } finally {
       setPending(false);
