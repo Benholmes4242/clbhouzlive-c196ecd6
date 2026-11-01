@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { catalogueThousands } from '../lib/postFlowRules';
 let countRead: Promise<number | null> | null = null;
+/** Test isolation only; app callers retain the session-cached promise. */
+export function resetCourseCatalogueCountForTests() { countRead = null; }
 export function readCourseCatalogueCount(): Promise<number | null> {
   if (!countRead) countRead = (async () => {
     try {
