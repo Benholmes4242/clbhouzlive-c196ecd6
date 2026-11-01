@@ -222,13 +222,13 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           >
             {dateSpanLabel(event.startDate, event.endDate)}
           </span>
-          {fieldLine ? (
+          {fieldNames.length > 0 ? (
             <span style={{ display: 'block', marginTop: 7, fontSize: 12, fontWeight: 600, color: AMBER }}>
               {fieldLine}
             </span>
           ) : null}
           {you?.playedHere ? (
-            <span style={{ display: 'block', marginTop: fieldLine ? 3 : 7, fontSize: 12, fontWeight: 600, color: AMBER }}>
+            <span style={{ display: 'block', marginTop: fieldNames.length > 0 ? 3 : 7, fontSize: 12, fontWeight: 600, color: AMBER }}>
               {t('schedule.you.playedHere')}
             </span>
           ) : null}

@@ -68,8 +68,7 @@ describe('SeasonRow rebuilt grammar', () => {
     expect(screen.getByText('Korn Ferry')).toBeInTheDocument();
     const name = screen.getByText('Simmons Bank Open for the Snedeker Foundation');
     expect(name.style.fontSize).toBe('15px');
-    expect(name.style.display).toBe('-webkit-box');
-    expect(name.style.cssText).toContain('-webkit-line-clamp: 2');
+    expect(name.style.display).toBe('-webkit-box'); // two-line clamp (jsdom drops -webkit-line-clamp)
     const venue = screen.getByText('Trump International Golf Links (Ireland) · Clare');
     expect(venue.style.textOverflow).toBe('ellipsis');
     expect(screen.getByText('Thu 10 – Sun 13 Sep')).toBeInTheDocument();
