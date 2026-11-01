@@ -32,6 +32,8 @@ import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGo
 import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
 import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { activityRoundId, useActivityRoundPages } from './hooks/useActivityRoundSummaries';
+import { foldKey, openOrder, segmentRows, type FoldSegment } from './activityFoldRules';
+import { ActivityFoldedRoundsRow } from './components/ActivityFoldedRoundsRow';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -226,6 +228,9 @@ export const ActivityPageV2: React.FC = () => {
 
   const [sheetRow, setSheetRow] = useState<ActivityFeedRowV2 | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  /** AC2: open fold identities. Page state only — survives feed refetches,
+   * resets when the page unmounts. Opening never marks anything read. */
+  const [openFolds, setOpenFolds] = useState<Set<string>>(new Set());
 
   const firstPage = feed.data?.pages?.[0] ?? [];
   const allRows: ActivityFeedRowV2[] = useMemo(
