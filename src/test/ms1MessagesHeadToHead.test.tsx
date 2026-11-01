@@ -417,3 +417,86 @@ describe('ThreadV2Page header', () => {
     expect(container.textContent).toContain('104 rounds together · last 29 Oct');
   });
 });
+
+describe('MessageBubble incoming avatar (MS1 §7)', () => {
+  const message = (over: Record<string, unknown> = {}) => ({
+    id: 'm1',
+    conversation_id: 'c1',
+    sender_actor_type: 'personal',
+    sender_actor_id: 'thomas',
+    sender_user_id: 'thomas',
+    sender_name: 'Thomas Holmes',
+    sender_avatar_url: null,
+    sender_username: 'thomas',
+    sender_verified: null,
+    type: 'text',
+    body: 'Hello',
+    attachments: null,
+    metadata: null,
+    reply_to_id: null,
+    reply_preview: null,
+    edited_at: null,
+    deleted_at: null,
+    created_at: '2026-10-29T06:44:00Z',
+    reactions: [],
+    status: 'sent',
+    ...over,
+  });
+
+  it('gives the incoming row 16px left padding and a 28px avatar slot', async () => {
+    const { MessageBubble } = await import('@/pages/messaging-v2/MessageBubble');
+    const { container } = render(
+      <MemoryRouter>
+        <MessageBubble
+          message={message() as never}
+          isOutgoing={false}
+          isFirstOfRun
+          isLastOfRun
+          showTicks={false}
+        />
+      </MemoryRouter>,
+    );
+    const row = container.firstElementChild as HTMLElement;
+    expect(row.style.paddingLeft).toBe('16px');
+    const slot = screen.getByTestId('incoming-avatar-slot');
+    expect(slot.style.width).toBe('28px');
+    expect(slot.style.height).toBe('28px');
+    // Last of run: the avatar itself renders inside the slot.
+    expect(slot.firstElementChild).not.toBeNull();
+  });
+
+  it('reserves the slot but hides the avatar mid-run', async () => {
+    const { MessageBubble } = await import('@/pages/messaging-v2/MessageBubble');
+    render(
+      <MemoryRouter>
+        <MessageBubble
+          message={message() as never}
+          isOutgoing={false}
+          isFirstOfRun
+          isLastOfRun={false}
+          showTicks={false}
+        />
+      </MemoryRouter>,
+    );
+    const slot = screen.getByTestId('incoming-avatar-slot');
+    expect(slot.style.width).toBe('28px');
+    expect(slot.firstElementChild).toBeNull();
+  });
+
+  it('renders no avatar slot on outgoing bubbles', async () => {
+    const { MessageBubble } = await import('@/pages/messaging-v2/MessageBubble');
+    const { container } = render(
+      <MemoryRouter>
+        <MessageBubble
+          message={message() as never}
+          isOutgoing
+          isFirstOfRun
+          isLastOfRun
+          showTicks={false}
+        />
+      </MemoryRouter>,
+    );
+    expect(screen.queryByTestId('incoming-avatar-slot')).toBeNull();
+    expect((container.firstElementChild as HTMLElement).style.paddingLeft).toBe('');
+  });
+});
