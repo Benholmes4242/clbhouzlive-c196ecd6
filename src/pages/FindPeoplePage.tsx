@@ -646,6 +646,7 @@ function FollowAllButton({
         await toggle.mutateAsync({
           targetActorType: 'business',
           targetActorId: b.business_id,
+          targetUserId: undefined,
           viewerActorType,
           viewerActorId,
           viewerUserId: user.id,
