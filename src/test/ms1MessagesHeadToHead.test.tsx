@@ -4,7 +4,7 @@
  * beyond the brief's own copy; the react-i18next mock returns defaultValue.
  */
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -77,7 +77,6 @@ vi.mock('@/pages/messaging-v2/ConversationSettingsSheet', () => ({
   ConversationSettingsSheet: () => null,
 }));
 vi.mock('@/pages/messaging-v2/PlayingOffRail', () => ({ PlayingOffRail: () => null }));
-vi.mock('@/pages/messaging-v2/MessageBubble', () => ({ MessageBubble: () => null }));
 
 import {
   headToHead,
