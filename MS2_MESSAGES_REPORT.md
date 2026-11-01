@@ -42,3 +42,7 @@ Brief: `MS2 — Messages the true round count and pasted.md`; mock `ms2-fourball
 
 ## Unverified
 - Signed-in device check of the card against the live `get_my_last_fourball` RPC (no authenticated session available from the sandbox).
+
+## Addendum — typecheck
+- The harness typecheck flagged three errors in the NEW ms2 test file (mock signature: `vi.fn(() => …)` spread and `mockImplementation` arity). Fixed test-only: `rpcMock` is now `vi.fn((..._args: any[]) => …)`; runtime behaviour identical, ms2 file re-run 14/14 green.
+- PRE-EXISTING, NOT TOUCHED: `src/test/ms1MessagesHeadToHead.test.tsx(400,66)` — `Property 'style' does not exist on type 'Element'` (`firstElementChild!.style`). Present in the harness log at 20:58:43Z, before any MS2 edit; the test passes at runtime (vitest does not typecheck). Left unchanged — editing an MS1 test needs explicit authorisation. A one-cast fix (`as HTMLElement`) is ready if approved.
