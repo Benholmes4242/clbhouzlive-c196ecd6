@@ -156,7 +156,7 @@ export function useSharedGroundBatch(
     }
     detailIds.forEach((id, i) => {
       const rows = (details[i]?.data?.shared_round_results ?? []) as SharedRoundResult[];
-      if (rows.length > 0) out[id] = toGround(rows, counts[id] ?? undefined);
+      if (rows.length > 0) out[id] = toGround(rows);
     });
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -182,11 +182,7 @@ export function useSharedGroundOne(
   })[0];
 
   const ground = useMemo(
-    () =>
-      toGround(
-        (q.data?.shared_round_results ?? []) as SharedRoundResult[],
-        typeof q.data?.shared_rounds_count === 'number' ? q.data.shared_rounds_count : undefined,
-      ),
+    () => toGround((q.data?.shared_round_results ?? []) as SharedRoundResult[]),
     [q.data],
   );
 
