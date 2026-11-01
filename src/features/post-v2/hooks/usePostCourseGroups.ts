@@ -49,5 +49,5 @@ export function usePostCourseGroups(open: boolean, userId: string | null | undef
     }
     void read.then(rows=>{if(live)setClub({key:clubKey,rows});});return()=>{live=false;};
   },[open,clubKey]);
-  return { member:member?.key===userId?member.rows:[], club:clubKey && club?.key===clubKey?club.rows:[] };
+  return { member: member && userId && member.key === userId ? member.rows : [], club: clubKey && club && club.key === clubKey ? club.rows : [] };
 }

@@ -7,6 +7,7 @@ November 1 post-flow brief/mock govern changed sheets/screens. Keep multi-course
 No amber buttons; white primary and outlined secondary. Amber only Played date. No new negative tracking; keep system typography, never load retired Geist.
 Ben authorised required StageComposer handoffs and confirmed result reporting through postWith, shotTagWrites and postUploadController; never claim notified/added from a selection whose write failed.
 Both course-search fields share ONE cached golf_courses count with head:true. Round DOWN to nearest thousand, formatted e.g. Search 23,000 courses. Loading/error: Search any course. No hardcoded catalogue figure or second read.
+Without a member id, YOUR COURSES is empty and performs no member read; never access null member state through undefined-key equality. Ben authorised only the component guard correction, preserving both failed tests' assertions.
 Real course cover or 6% white flag tile, never gradient; missing covers get one id read. Selected rows retain photo/sub_country. Groups club-business own courses, poster played newest five, popular; first-group dedupe. Search name/county fetch50/show20; exact/prefix/word-prefix/contains then played-first/A-Z.
 Posting neutral accent, real stages/progress, Keep using closes without cancelling uploads. Toast Your post is live.; scheduled UK date/24h.
 Posted conditional confirmed facts, Share link/View post, no auto-dismiss. Scheduled card/View scheduled/Done, no auto-dismiss; best-hour sentence only when selected hour matches.

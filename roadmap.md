@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Post flow — signed-off tagging, posting and schedule
+- [ ] Approved follow-up: apply exact component-only null guard, preserve both failing assertions, verify no-member empty/no-read rule, rerun focused checks and all full shards.
 - [ ] Rebuild the course tag sheet and real-photo Where tile, preserving ordered multi-select, single-select and photo-date reasons.
 - [ ] Rebuild upload progress, posted facts/actions and scheduled confirmation; preserve background uploads, failure handling and plain edit confirmation.
 - [ ] Rebuild Schedule with actor-scoped best-hour read, native minute-precision time input and countdown; preserve publishing and scheduled list.
