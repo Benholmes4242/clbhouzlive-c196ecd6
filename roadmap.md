@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tour Overview — News rebuild
+- [ ] Rebuild Overview-only story shapes, visit freshness, details and followed/live player chips; preserve News-tab defaults and selector/navigation.
+- [ ] Add batched live board reads using existing overview tournaments/cadence, all locale keys and rule/regression tests.
+- [ ] Run full-suite shards against 5,284/512 and capture 390×844 section beside mock; report guest/member limits.
+
 ## YC2 — Your courses opened card
 - [x] User ruling: remove the 20-round per-course cap, preserve the single read and global 2,000-row ceiling; n is returned 18-hole history count, not card count.
 - [x] Rebuilt opened card, preserving YC1 list/bar; added 46 YC2 cases and blended flow. Targeted 76/76; full shards 5,284/5,284 across 512 (+46/+1 vs 5,238/511); automatic build OK. See YC2_REPORT.md.
