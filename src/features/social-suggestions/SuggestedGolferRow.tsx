@@ -42,8 +42,10 @@ export function reasonText(
   }
 }
 
-/** A4.4 - club and reciprocal describe real relationships, so they take amber. */
-export function reasonIsAmber(r: SuggestedGolfer['reason_type']): boolean {
+/** A4.4 - club and reciprocal describe real relationships, so they take amber.
+ *  WF2 widened the parameter to string so the Activity block can apply the
+ *  same rule to get_people_suggestions rows; the rule itself is unchanged. */
+export function reasonIsAmber(r: string): boolean {
   return r === 'club' || r === 'reciprocal';
 }
 

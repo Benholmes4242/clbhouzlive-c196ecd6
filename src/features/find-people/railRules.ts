@@ -1,0 +1,137 @@
+/**
+ * WF2 — pure rules for the Who to follow rail in the Clubhouse feed
+ * (wf2-feed-rail.html, signed off).
+ *
+ * The rail shows the SAME suggestions as Find people (get_people_suggestions /
+ * get_suggested_businesses via usePeopleSuggestions) in a feed-specific order:
+ * the your_club business first, then golfers in the server's order, with the
+ * next non-your_club business (coach, near_club, popular — server order) after
+ * every 3 golfers. Businesses left over once the golfers run out are NOT
+ * appended: the brief defines the interleave only, so this module never
+ * invents a position the server did not imply.
+ *
+ * No locale, no DOM, no network: reason lines are { key, def, vars } Copy
+ * descriptors the component hands to t(), same as findPeopleRules.
+ */
+import { shortCourseName } from '@/lib/courses/shortCourseName';
+import { businessCategoryWord } from '@/lib/business/businessHero';
+import {
+  businessReason,
+  golferReason,
+  type BusinessSuggestion,
+  type Copy,
+  type PersonSuggestion,
+} from './findPeopleRules';
+
+export type RailCard =
+  | { kind: 'person'; person: PersonSuggestion }
+  | { kind: 'business'; business: BusinessSuggestion };
+
+/** Session-dismissal / followed-set key: `p:{user_id}` or `b:{business_id}`. */
+export function railCardId(card: RailCard): string {
+  return card.kind === 'person' ? `p:${card.person.user_id}` : `b:${card.business.business_id}`;
+}
+
+/** The suggestion_dismissals row identity for a card. */
+export function railCardActor(card: RailCard): { actor_type: 'personal' | 'business'; actor_id: string } {
+  return card.kind === 'person'
+    ? { actor_type: 'personal', actor_id: card.person.user_id }
+    : { actor_type: 'business', actor_id: card.business.business_id };
+}
+
+/** The card's reason_type, for analytics. */
+export function railCardReasonType(card: RailCard): string {
+  return card.kind === 'person' ? card.person.reason_type : card.business.reason_type;
+}
+
+/**
+ * Rail order (WF2 §1): the your_club business first (if any), then golfers in
+ * the order the server returned them, with the next non-your_club business
+ * after every 3 golfers.
+ */
+export function railCards(people: PersonSuggestion[], biz: BusinessSuggestion[]): RailCard[] {
+  const out: RailCard[] = [];
+  for (const b of biz) {
+    if (b.reason_type === 'your_club') out.push({ kind: 'business', business: b });
+  }
+  const rest = biz.filter((b) => b.reason_type !== 'your_club');
+  let restIdx = 0;
+  people.forEach((p, i) => {
+    out.push({ kind: 'person', person: p });
+    if ((i + 1) % 3 === 0 && restIdx < rest.length) {
+      out.push({ kind: 'business', business: rest[restIdx] });
+      restIdx += 1;
+    }
+  });
+  return out;
+}
+
+export const RAIL_SLOT_SIZE = 10;
+export const RAIL_MIN_CARDS = 3;
+
+/**
+ * Slot 1 takes cards 0–9, slot 2 takes cards 10–19 (WF2 §1). Cards hidden
+ * this session are filtered out BEFORE slicing, so the rest close up. A slot
+ * with fewer than 3 cards renders nothing.
+ */
+export function railSlotCards(cards: RailCard[], slot: 1 | 2, hidden: ReadonlySet<string>): RailCard[] {
+  const visible = cards.filter((c) => !hidden.has(railCardId(c)));
+  const slice = visible.slice((slot - 1) * RAIL_SLOT_SIZE, slot * RAIL_SLOT_SIZE);
+  return slice.length >= RAIL_MIN_CARDS ? slice : [];
+}
+
+/**
+ * Feed placement (WF2 §2): the rail sits after the 3rd post (slot 1, above
+ * postIndex 3) and after the 15th post (slot 2, above postIndex 15). No rail
+ * in a feed with fewer than 4 posts.
+ */
+export function railSlotForPostIndex(postIndex: number, postCount: number): 1 | 2 | null {
+  if (postCount < 4) return null;
+  if (postIndex === 3) return 1;
+  if (postIndex === 15) return 2;
+  return null;
+}
+
+/**
+ * Rail golfer reason (WF2 §5): a club golfer reads "Also a member at {club}"
+ * and played_with reads "Played {shortCourseName} with you" (no course:
+ * "Played with you"); every other golfer reason is the Find people line.
+ */
+export function railGolferReason(g: PersonSuggestion): Copy | null {
+  if (g.reason_type === 'club') {
+    return {
+      key: 'findPeople.rail.reason.club',
+      def: 'Also a member at {{club}}',
+      vars: { club: g.reason_club_name ?? '' },
+    };
+  }
+  if (g.reason_type === 'played_with') {
+    const course = shortCourseName(g.reason_course_name ?? '');
+    return course
+      ? { key: 'findPeople.rail.reason.playedWith', def: 'Played {{course}} with you', vars: { course } }
+      : { key: 'findPeople.rail.reason.playedWithFallback', def: 'Played with you' };
+  }
+  return golferReason(g);
+}
+
+/**
+ * Rail business reason (WF2 §5): the your_club business reads "Your club";
+ * every other business uses the Find people Businesses-tab line with the same
+ * category label the page uses.
+ */
+export function railBusinessReason(b: BusinessSuggestion, categoryLabel: string): Copy | null {
+  if (b.reason_type === 'your_club') {
+    return { key: 'findPeople.rail.reason.yourClub', def: 'Your club' };
+  }
+  return businessReason(b, 'businesses', categoryLabel);
+}
+
+/**
+ * The Find people page's categoryOf, moved here (WF2 §5) so the page and the
+ * rail share one category label. No copy change on the page.
+ */
+export function businessCategoryLabel(b: BusinessSuggestion): string {
+  return b.category === 'Golf Club'
+    ? 'Golf club'
+    : businessCategoryWord(b.category, (_key, fallback) => fallback);
+}

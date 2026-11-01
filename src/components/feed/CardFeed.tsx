@@ -229,6 +229,13 @@ export interface CardFeedProps {
   /** Home only (BRIEF_ROUND_TILE_1): round traces draw on the card canvas
    *  under the text block, never over the photograph. */
   homeRoundPlot?: boolean;
+  /** Clubhouse only (WF2): renders ABOVE the post card at the given postIndex
+   *  (the Who to follow rail), the way UpToDateDivider does — never spliced
+   *  into the item array, so postIndex, Virtuoso keys, snapshot restore and
+   *  the video/carousel bookkeeping are unchanged. Must be a stable callback;
+   *  the rail fetches its own data. When the divider shares the index the
+   *  rail goes first. */
+  renderBeforePost?: (postIndex: number) => React.ReactNode;
 }
 
 export interface CardFeedHandle {
@@ -278,6 +285,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   featuredDecisions,
   homeRails = false,
   homeRoundPlot = false,
+  renderBeforePost,
 }, ref) {
 
   /* A round post renders the round card or nothing — see dropUnresolvedRounds.
@@ -915,6 +923,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
       return (
         <>
+        {/* WF2: the Who to follow rail renders ABOVE this card, before the
+            divider when they share an index — never a list item. */}
+        {renderBeforePost?.(index)}
         {/* Rendered ABOVE this card rather than as a list item, so the divider
             never occupies an index the video/carousel bookkeeping counts. */}
         {dividerIndex === index && (
@@ -1047,7 +1058,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       commentPreview.map,
       golfTags,
       dividerIndex,
-
+      renderBeforePost,
     ],
   );
 

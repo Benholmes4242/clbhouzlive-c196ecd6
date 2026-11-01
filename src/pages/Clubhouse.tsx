@@ -31,6 +31,8 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 // ── New feed components ──
 import { CardFeed } from '@/components/feed/CardFeed';
+import { WhoToFollowRail } from '@/features/find-people/WhoToFollowRail';
+import { railSlotForPostIndex } from '@/features/find-people/railRules';
 import { FeedErrorBoundary } from '@/components/feed/FeedErrorBoundary';
 import { safeInitialState } from '@/components/feed/feedSnapshot';
 import type { StateSnapshot } from 'react-virtuoso';
@@ -220,6 +222,15 @@ const ClubhouseContent = () => {
   const FEED_SCOPE = 'clubhouse:suggested';
 
   const posts = activeFeed.posts;
+  // WF2 — Who to follow rail above posts 3 and 15. The callback must stay
+  // identity-stable (CardFeed's itemContent depends on it), so the post count
+  // reaches it through a ref and the rail fetches its own data.
+  const postsLenRef = useRef(0);
+  postsLenRef.current = posts.length;
+  const renderBeforePost = useCallback((postIndex: number) => {
+    const slot = railSlotForPostIndex(postIndex, postsLenRef.current);
+    return slot ? <WhoToFollowRail slot={slot} /> : null;
+  }, []);
   // Reversible editorial injection: remove this one call and pass `posts`
   // directly to CardFeed to restore a social-only Clubhouse feed.
   // CLUBHOUSE_WIRE_STORIES off: feedItems is undefined and CardFeed takes its
@@ -637,7 +648,8 @@ const ClubhouseContent = () => {
               posts={posts}
                feedItems={feedItems}
               homeRails
-              homeRoundPlot
+               homeRoundPlot
+              renderBeforePost={renderBeforePost}
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
               postScoreIdMap={postScoreIdMap}
