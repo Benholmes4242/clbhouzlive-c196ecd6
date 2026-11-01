@@ -34,7 +34,7 @@ export function comingDateBlock(start: string) {
 }
 export function comingMoney(amount?: number | null, currency?: string | null): string | null {
   if (amount == null || amount <= 0 || !currency) return null;
-  try { return new Intl.NumberFormat('en-GB', { style: 'currency', currency, currencyDisplay: 'narrowSymbol', notation: 'compact', maximumFractionDigits: 1 }).format(amount).replace(/M$/, 'm').replace(/K$/, 'k'); } catch { return null; }
+  try { return new Intl.NumberFormat('en-GB', { style: 'currency', currency, currencyDisplay: 'narrowSymbol', notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(amount).replace(/M$/, 'm').replace(/K$/, 'k'); } catch { return null; }
 }
 export function defendingResult(champion: string | null, finishers?: LastYearFinisher[] | null) {
   if (!champion) return null;
