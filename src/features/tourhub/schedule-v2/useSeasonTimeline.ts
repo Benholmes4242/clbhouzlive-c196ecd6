@@ -204,21 +204,22 @@ export interface SeasonEvent {
     score: number | null;
     /** Rows sharing position 1 (1 = outright leader). */
     tiedCount: number;
+    /** Current round (1–4), derived from the latest non-null round score. */
+    currentRound: number | null;
   } | null;
   /** Defending champion (upcoming rows). */
   defendingChampion?: DefendingChampionEntry | null;
 }
 
-export interface MonthGroup {
-  key: string; // yyyy-MM
-  label: string; // "APRIL 2026"
+export interface WeekGroup {
+  key: string; // yyyy-MM-dd of the week's Monday
   events: SeasonEvent[];
 }
 
 export interface SeasonTimeline {
   seasonName: string | null;
   seasonYear: number | null;
-  months: MonthGroup[];
+  weeks: WeekGroup[];
   totalEvents: number;
   currentEventNumber: number | null; // 1-based; null when no anchor
   anchorEventId: string | null; // this-week row, else next upcoming
