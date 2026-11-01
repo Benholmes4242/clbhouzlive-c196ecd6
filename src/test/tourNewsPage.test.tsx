@@ -451,7 +451,7 @@ describe('News search read', () => {
       { id: 's3', slug: 's3', headline: 'Rahm three', standfirst: null, kicker: null, body_blocks: [], image_url: null, image_credit: null, tour_slug: null, tournament_id: null, published_at: '2026-10-17T10:00:00' },
     ];
     const calls = searchBuilder(rows);
-    const { useNewsSearch } = await import('@/features/tourhub/news/newsPageData');
+    const { useNewsSearch } = await vi.importActual<typeof import('@/features/tourhub/news/newsPageData')>('@/features/tourhub/news/newsPageData');
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>
     );
