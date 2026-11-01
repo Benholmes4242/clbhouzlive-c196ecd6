@@ -1,8 +1,9 @@
 # Roadmap
 
 ## YC2 — Your courses opened card
-- [ ] Latest brief `YC2_-_Your_courses_sheet_the_opened_course_pasted.md` / `yc2-open-card.html`: stop for data-scope ruling. Brief requires every round for all-round average/count and best-ever round; `useMyRoundsByCourse.ts:27,29,50,59` currently caps history at 20/course and 2,000 total. No source change or implementation before ruling; YC1 remains frozen.
-- [ ] Rebuild the expanded card in YourCourseAnalyticsSheet.tsx per the uploaded YC2 brief/mock; keep YC1 list intact; add yc2YourCourses tests and blended regression. YC1 shipped: 5,202/5,202 across 510 (+30/+1 vs 5,172/509).
+- [x] User ruling: remove the 20-round per-course cap, preserve the single read and global 2,000-row ceiling; n is returned 18-hole history count, not card count.
+- [x] Rebuilt opened card, preserving YC1 list/bar; added 46 YC2 cases and blended flow. Targeted 76/76; full shards 5,284/5,284 across 512 (+46/+1 vs 5,238/511); automatic build OK. See YC2_REPORT.md.
+- [ ] Signed-in live verification and screenshot parity: blocked by external_unmanaged authentication; real-sheet/hook flow unit-tested, no browser-proof claim.
 
 ## Tour Overview — World rankings rebuild
 - [x] Follow-up: zero omitted, count-driven singular/plural in all six locales; four new cases; full shards 1262+1247+1350+1379=5238/5238 across511 (+66/+2 vs5172/509: YC1 30/+1, Rankings36/+1). Existing assertions unchanged; previous rankings count corrected from reported36 to restored32 before four additions. See WORLD_RANKINGS_FOLLOWUP_REPORT.md.
