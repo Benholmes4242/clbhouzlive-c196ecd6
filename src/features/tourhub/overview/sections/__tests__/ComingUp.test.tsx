@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import * as useComingUpHook from '../../data/useComingUp';
 import { I18nextProvider } from 'react-i18next';
 import i18next from 'i18next';
-import en from '../../../../../../../public/locales/en/tourhub.json';
+import en from '../../../../../../public/locales/en/tourhub.json';
 vi.mock('../../../hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
 vi.mock('../../../hooks/useTournamentLastYearTop4', () => ({ useTournamentLastYearTop4: () => ({ data: null }) }));
 vi.mock('../../data/useComingUpOwnRounds', () => ({ useComingUpOwnRounds: () => undefined }));
