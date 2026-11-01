@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Post flow — signed-off tagging, posting and schedule
+- [x] Applied Ben's exact component null guard; postFlowScreens byte-identical by SHA256. Two-case rerun: single-select passes, cached-count assertion fails at postFlowScreens.test.tsx:27:511 `AssertionError: expected [] to have a length of 1 but got +0`. No further correction/rerun after failure; automatic build OK18:29:17Z.
+- [ ] New stop: resolve session-cached count versus per-case read-recorder reset under Ben's authorisation, then run focused/full shards. Added no-member empty/no-read rule test1/+1, not yet run. Expected5430/519 (+50/+3 versus full green5380/516) remains unverified; see POST_FLOW_STOP_REPORT.md.
 - [ ] Rebuild the course tag sheet and real-photo Where tile, preserving ordered multi-select, single-select and photo-date reasons.
 - [ ] Rebuild upload progress, posted facts/actions and scheduled confirmation; preserve background uploads, failure handling and plain edit confirmation.
 - [ ] Rebuild Schedule with actor-scoped best-hour read, native minute-precision time input and countdown; preserve publishing and scheduled list.

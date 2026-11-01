@@ -1,5 +1,25 @@
 # Post flow — completed-edit stop
 
+## Approved null-guard follow-up — 1 November, 18:29 UTC
+Applied Ben's exact return guard in `usePostCourseGroups.ts:52`, guarding both state objects before reading `.rows`. Existing member-read effect already returns without a userId. No other component changed in this follow-up.
+
+Both original tests and every assertion in `postFlowScreens.test.tsx` remain byte-identical, verified with `sha256sum -c /tmp/post-flow-guard/screens-before.sha256` → `src/test/postFlowScreens.test.tsx: OK`.
+
+Command: `bunx vitest run src/test/postFlowScreens.test.tsx -t 'single selection commits and closes on tap|both search fields share exactly one head-only rounded catalogue read' --maxWorkers=2 --reporter=json --outputFile=/tmp/post-flow-guard/two-cases.json`
+
+**Two cases executed: 1 passed, 1 failed; 19 other cases skipped by the filter.** The null crash no longer occurs; single-select commit/close passes. The second case now reaches its unchanged count assertion and fails:
+```
+AssertionError: expected [] to have a length of 1 but got +0
+    at /dev-server/src/test/postFlowScreens.test.tsx:27:511
+```
+Case: `course sheet and photo flows both search fields share exactly one head-only rounded catalogue read`.
+
+The catalogue read is session-cached while this test file resets `h.reads=[]` before every case. The preceding single-select case initiates the one cached count; the later assertion expects another recorded read after the recorder reset. No cache or test change was made after this unexpected failure. Per the stop rule, the focused follow-on command and full shards did not run. No all-pass claim.
+
+Added `src/test/postFlowNoMember.test.tsx`, one rule case asserting empty groups and no reads for undefined/null member IDs; it has **not run** because the two-case command failed first. No existing test deleted, renamed or rewritten in this follow-up. Inventory before follow-up: expected **5,429/518** (unverified full inventory); after: expected **5,430/519**, +1/+1 solely this named rule test. Last full green stays **5,380/516**; cumulative +50/+3 = rules28, screens21, no-member1. Full-suite totals remain unverified.
+
+Automatic preview signal: **2026-11-01T18:29:17Z — build OK**. No manual build/typecheck. Remaining blocker: authorisation to resolve the cached-read/test-recorder mismatch without violating the one-read requirement, then rerun focused/full shards. Existing real-device/member proof limitations below remain unchanged.
+
 ## Status
 Implemented course tagging/photo fallback, shared live catalogue count, Schedule, posting progress, Posted/Scheduled actions and confirmed tag-result handoffs. Not complete or release-verified.
 
