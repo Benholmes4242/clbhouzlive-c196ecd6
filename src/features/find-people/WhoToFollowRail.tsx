@@ -57,6 +57,13 @@ const EMPTY: ReadonlySet<string> = new Set();
 /** Mock: ✕ closes a card over 200ms; the rail closes over the same 200ms. */
 const DISMISS_MS = 200;
 
+/** Test-only: clears the session dismissal and view-event sets. The app never
+ *  calls this — session state is meant to last the session. */
+export function resetWhoToFollowRailSessionForTests() {
+  HIDDEN.clear();
+  VIEWED.clear();
+}
+
 const MUTE = 'rgba(248,250,252,0.62)';
 
 export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
