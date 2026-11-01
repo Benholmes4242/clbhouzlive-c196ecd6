@@ -246,23 +246,27 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
 
     const buckets = new Map<string, SeasonEvent[]>();
     for (const e of decorated) {
-      const k = monthKey(e.startDate);
+      const k = weekKey(e.startDate);
       const arr = buckets.get(k) ?? [];
       arr.push(e);
       buckets.set(k, arr);
     }
-    const months: MonthGroup[] = Array.from(buckets.entries())
+    const weeks: WeekGroup[] = Array.from(buckets.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([k, arr]) => ({
         key: k,
-        label: monthLabelFromKey(k),
-        events: arr,
+        events: arr.sort(
+          (a, b) =>
+            a.startDate.localeCompare(b.startDate) ||
+            rowTourIndex(a.tourSlug) - rowTourIndex(b.tourSlug) ||
+            a.name.localeCompare(b.name),
+        ),
       }));
 
     return {
       seasonName: null,
       seasonYear: year,
-      months,
+      weeks,
       totalEvents: decorated.length,
       currentEventNumber,
       anchorEventId: anchorId,

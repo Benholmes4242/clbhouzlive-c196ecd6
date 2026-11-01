@@ -438,26 +438,31 @@ export function useSeasonTimeline(
       }
     }
 
-    // Month bucket, preserve sort order.
+    // Week bucket (Monday→Sunday), preserve sort order; within a week sort by
+    // start date then the schedule tour order (BRIEF_TOUR_SCHEDULE_REBUILT §3).
     const buckets = new Map<string, SeasonEvent[]>();
     for (const e of decorated) {
-      const k = monthKey(e.startDate);
+      const k = weekKey(e.startDate);
       const arr = buckets.get(k) ?? [];
       arr.push(e);
       buckets.set(k, arr);
     }
-    const months: MonthGroup[] = Array.from(buckets.entries())
+    const weeks: WeekGroup[] = Array.from(buckets.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([k, arr]) => ({
         key: k,
-        label: monthLabelFromKey(k),
-        events: arr,
+        events: arr.sort(
+          (a, b) =>
+            a.startDate.localeCompare(b.startDate) ||
+            rowTourIndex(a.tourSlug) - rowTourIndex(b.tourSlug) ||
+            a.name.localeCompare(b.name),
+        ),
       }));
 
     return {
       seasonName: season?.name ?? null,
       seasonYear: season?.year ?? null,
-      months,
+      weeks,
       totalEvents: total,
       currentEventNumber,
       anchorEventId: anchorId,

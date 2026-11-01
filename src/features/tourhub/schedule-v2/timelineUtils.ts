@@ -48,6 +48,19 @@ export function currentWeekKey(now: Date = new Date()): string {
   return weekKey(now.toISOString().slice(0, 10));
 }
 
+/** Current round (1–4) from a leader's round scores: latest non-null + 1. */
+export function currentRoundFromScores(l: {
+  round1: number | null;
+  round2: number | null;
+  round3: number | null;
+  round4: number | null;
+}): number | null {
+  const played = [l.round1, l.round2, l.round3, l.round4].filter(
+    (v) => v != null,
+  ).length;
+  return Math.min(4, played + 1);
+}
+
 export type WeekRelation = 'last' | 'this' | 'next' | 'other';
 
 export function weekRelation(key: string, now: Date = new Date()): WeekRelation {
