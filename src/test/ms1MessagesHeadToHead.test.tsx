@@ -397,7 +397,7 @@ describe('MemberRailTile', () => {
     expect(nameIdx).toBeGreaterThanOrEqual(0);
     expect(dateIdx).toBeGreaterThan(nameIdx);
     // No bubble element above the avatar.
-    expect(container.querySelector('button')!.firstElementChild!.style.width).toBe('56px');
+    expect((container.querySelector('button')!.firstElementChild as HTMLElement).style.width).toBe('56px');
   });
 });
 
