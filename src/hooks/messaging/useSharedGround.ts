@@ -59,22 +59,10 @@ const EMPTY: SharedGround = {
   record: null,
 };
 
-export function dedupeSharedRounds(rounds: SharedRoundResult[]): SharedRoundResult[] {
-  const seen = new Set<string>();
-  const out: SharedRoundResult[] = [];
-  for (const r of rounds) {
-    const key = `${r.play_date}|${r.course_id ?? r.course_name ?? ''}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(r);
-  }
-  return out.sort((a, b) => (a.play_date < b.play_date ? 1 : -1));
-}
-
 /**
- * MS1 §1 — the record is computed from the DEDUPED rounds, so it can disagree
- * with the server `count` (pairing-based, not deduped) until MS2 fixes the
- * server figure. Returns null when there are no rounds.
+ * MS1 §1 — the record is computed from the DEDUPED rounds. MS2 §1: the count
+ * is now the same deduped figure, so record and count always agree. Returns
+ * null when there are no rounds.
  */
 export function headToHead(rounds: SharedRoundResult[]): HeadToHeadRecord | null {
   const deduped = dedupeSharedRounds(rounds);
@@ -99,20 +87,16 @@ export function headToHead(rounds: SharedRoundResult[]): HeadToHeadRecord | null
 }
 
 /**
- * BRIEF_MESSAGES_DARK §5.2 — THE COUNT MUST NOT DISAGREE WITH THE COMPARE
- * SHEET'S. The compare sheet and the rivalry tiering both read the server's
- * `shared_rounds_count`, which is PAIRING-BASED and NOT DEDUPED (a day where
- * both players post two rounds counts four). So the displayed count is that
- * server figure, verbatim; the dedupe is used ONLY to draw the strip's cards,
- * where two identical cards for one day would be a visible fault.
- * Fixing the pairing fault is a server change and its own brief.
+ * MS2 §1 — the count ALWAYS equals the deduped rounds. fetchSharedRounds
+ * dedupes before counting, so Messages and the compare sheet read the same
+ * real-round figure; there is no pairing-based server count to prefer.
  */
-function toGround(rounds: SharedRoundResult[], serverCount?: number): SharedGround {
+function toGround(rounds: SharedRoundResult[]): SharedGround {
   const deduped = dedupeSharedRounds(rounds);
   if (deduped.length === 0) return EMPTY;
   return {
     rounds: deduped,
-    count: serverCount ?? deduped.length,
+    count: deduped.length,
     lastCourseName: deduped[0].course_name ?? null,
     lastPlayDate: deduped[0].play_date ?? null,
     record: headToHead(deduped),
