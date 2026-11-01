@@ -519,7 +519,7 @@ function BusinessRow({
         <div style={{ fontSize: 12, color: A.DIM, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
           {t('findPeople.followers', {
             count: followers,
-            defaultValue: `${followers} ${followers === 1 ? 'follower' : 'followers'}`,
+            defaultValue: `${followers.toLocaleString('en-GB')} ${followers === 1 ? 'follower' : 'followers'}`,
           })}
         </div>
       </div>
