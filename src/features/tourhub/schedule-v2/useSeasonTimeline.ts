@@ -31,7 +31,8 @@ import {
   type DefendingChampionEntry,
 } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
-import { monthKey, monthLabelFromKey, todayNoonMs, daysUntil } from './timelineUtils';
+import { weekKey, todayNoonMs, daysUntil } from './timelineUtils';
+import { rowTourIndex } from './scheduleRules';
 
 // ─── Season → tournament resolution ───────────────────────────────────────
 

@@ -30,11 +30,12 @@ import {
 } from '../hooks/useTournamentLeadersWinners';
 import { useScheduleDefendingChampionPhotos } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
-import { monthKey, monthLabelFromKey, todayNoonMs, daysUntil } from './timelineUtils';
+import { weekKey, todayNoonMs, daysUntil } from './timelineUtils';
+import { rowTourIndex } from './scheduleRules';
 import type {
   SeasonEvent,
   SeasonTimeline,
-  MonthGroup,
+  WeekGroup,
   EventState,
 } from './useSeasonTimeline';
 
