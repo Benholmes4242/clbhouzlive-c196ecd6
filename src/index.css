@@ -25,6 +25,13 @@
 }
 
 :root {
+  --activity-unread: #141418;
+  --activity-ink: #F8FAFC;
+  --activity-mute: rgba(248,250,252,.62);
+  --activity-tour-ink: rgba(248,250,252,.8);
+  --activity-tile: #1E1E23;
+  --activity-hole-par: rgba(248,250,252,.18);
+  --activity-hole-missing: rgba(248,250,252,.08);
   --pf-canvas: #0A0A0C;
   --pf-sheet: #16161A;
   --pf-panel: #1C1C21;

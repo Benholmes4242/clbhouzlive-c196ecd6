@@ -23,6 +23,9 @@ import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 import { getActivityLink } from '../utils/activityLinks';
 import { getActorRouteByType } from '@/types/actor';
 import { resolveKind, composeCommentBody, ACT, type KindSpec } from './ledgerKinds';
+import { activityRoundId, type ActivityRoundSummary } from '../hooks/useActivityRoundSummaries';
+import { ActivityRoundContent, ActivityRoundTile } from './ActivityRoundContent';
+import '../activity-rounds.css';
 
 
 const SF_STACK =
@@ -30,6 +33,7 @@ const SF_STACK =
 
 interface Props {
   row: ActivityFeedRowV2;
+  roundSummary?: ActivityRoundSummary;
   onMarkRead: (id: string) => void;
   onLongPress: (row: ActivityFeedRowV2) => void;
 }
@@ -253,12 +257,16 @@ const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ cand
 
 // ---------------------------------------------------------------------
 
-export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => {
+export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLongPress }) => {
 
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const location = useLocation();
   const spec = resolveKind(row);
+  const isRound = !!activityRoundId(row);
+  const destination = getActivityLink(row);
+  const isTour = spec.isSystem && /^\/tour(?:\/|\?|$)/.test(destination);
+  const tourShortName = typeof row.data?.tour_short_name === 'string' && row.data.tour_short_name.trim() ? row.data.tour_short_name : 'Tour';
   // C4 — only the daily-cap winner returns a candidate; RPC does all gating.
   const sharePrompt = useSharePromptFor(row.notif_id);
 
@@ -348,7 +356,9 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
 
   // ------- Left visual -------
   let leftVisual: React.ReactNode = null;
-  if (spec.left === 'tile' && spec.tile) {
+  if (isTour) {
+    leftVisual = <div className="activity-tour-tile" data-testid="activity-tour-tile">{tourShortName}</div>;
+  } else if (spec.left === 'tile' && spec.tile) {
     leftVisual = <IconTile spec={spec.tile} />;
   } else if (spec.left === 'stacked_likers') {
     const urls = Array.isArray(row.liker_avatar_urls) ? (row.liker_avatar_urls as string[]) : [];
@@ -378,7 +388,9 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
 
   // ------- Right element -------
   let rightEl: React.ReactNode = null;
-  if (spec.right === 'thumb') {
+  if (isRound) {
+    rightEl = roundSummary ? <ActivityRoundTile summary={roundSummary} /> : null;
+  } else if (spec.right === 'thumb') {
     const src = row.target_poster_url || row.target_course_image || null;
     if (src) {
       rightEl = (
@@ -442,6 +454,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
 
   return (
     <div
+      className={`${isUnread ? 'activity-unread' : ''} ${isRound || isTour ? 'activity-round-row' : ''}`}
       role={isInert ? undefined : 'button'}
       tabIndex={isInert ? undefined : 0}
       onClick={isInert ? undefined : handleClick}
@@ -454,10 +467,8 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         alignItems: 'flex-start',
         gap: 11,
         padding: '9px 18px',
-        // §5.2 THE UNREAD STATE. A 4.5% amber wash was legible on white and is
-        // nothing on #15171F, so the tint is lifted to carry the same job on
-        // dark. The amber dot below is the second, redundant signal.
-        background: isUnread ? 'rgba(247,147,30,0.10)' : 'transparent',
+        // AC1: neutral unread ground and a left-edge white pseudo-element.
+        position: 'relative',
         opacity: 1,
         cursor: isInert ? 'default' : 'pointer',
 
@@ -468,6 +479,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     >
       {leftVisual}
       <div style={{ flex: 1, minWidth: 0 }}>
+        {isRound ? <ActivityRoundContent actor={row.actor_display_name ?? row.actor_username ?? 'Someone'} summary={roundSummary} time={relativeTime(row.created_at)} /> : <>
         <div
           style={{
             // BODY. The action sentence is prose, so it reads at the body tier (14),
@@ -481,25 +493,14 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         >
           {bodyNode}
         </div>
-        <div style={{ fontSize: 11, fontWeight: 500, color: ACT.INK_45, marginTop: 2 }}>
-          {relativeTime(row.created_at)}
+        <div className={isTour ? 'activity-round-meta' : undefined} style={isTour ? undefined : { fontSize: 11, fontWeight: 500, color: ACT.INK_45, marginTop: 2 }}>
+          {isTour && 'Tour · '}{relativeTime(row.created_at)}
         </div>
+        </>}
         {sharePrompt && <SharePromptAction candidate={sharePrompt} />}
 
       </div>
       {rightEl && <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{rightEl}</div>}
-      {isUnread && (
-        <div
-          style={{
-            width: 7,
-            height: 7,
-            borderRadius: '50%',
-            background: ACT.AMBER,
-            marginTop: 8,
-            flexShrink: 0,
-          }}
-        />
-      )}
     </div>
   );
 };
