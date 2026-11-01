@@ -39,6 +39,8 @@ export interface SubmitInput {
   visibility?: PostVisibility;
   /** Played with: member ids written to post_with after the post exists. */
   playedWith?: string[];
+  playedWithPeople?: { id: string; name: string }[];
+  bestHour?: number | null;
   /** Per-photo course tags, carried with the upload job. */
   shotTags?: ShotTagJob;
 }
@@ -87,6 +89,9 @@ export interface SubmitResult {
   actorId?: string | null;
   /** Ordered picked media for the card's media block. `file` is absent for
    *  already-uploaded items (edit path) — those have no local preview. */
+  playedWithNames?: string[];
+  holeTags?: { courseId: string; courseName: string; hole: number }[];
+  bestHour?: number | null;
   mediaPreviews?: { id: string; file?: File; type: 'image' | 'video'; posterTimestamp?: number | null }[];
 }
 
@@ -122,6 +127,8 @@ export function usePostSubmit() {
           caption: input.caption,
           media: input.media.map(m => ({ id: m.id, kind: m.type, previewUrl: m.previewUrl })),
           courseId: input.course?.id,
+          playedWithNames,
+          bestHour: input.bestHour,
           courseName: input.course?.name,
           totalFiles: input.media.length,
           fileProgress: {},
@@ -196,7 +203,13 @@ export function usePostSubmit() {
 
       // Played with: rows after the post exists. The notification is a
       // database trigger on post_with; nothing is sent from here.
-      if (input.playedWith?.length) await writePostWith(postId, userId, input.playedWith);
+      const savedWith = input.playedWith?.length ? await writePostWith(postId, userId, input.playedWith) : [];
+      const playedWithNames = savedWith.flatMap(id => { const p = input.playedWithPeople?.find(p => p.id === id); return p ? [p.name] : []; });
+      const holeTags = Object.values(input.shotTags?.items ?? {}).flatMap(choice => {
+        if (!('hole' in choice.tag)) return [];
+        const course = (input.courses ?? (input.course ? [input.course] : [])).find(c => c.id === choice.courseId);
+        return course ? [{ courseId: course.id, courseName: course.name, hole: choice.tag.hole }] : [];
+      });
 
 
 
@@ -233,6 +246,9 @@ export function usePostSubmit() {
 
       return {
         kind: 'uploading',
+        playedWithNames,
+        holeTags,
+        bestHour: input.bestHour,
         postId,
         jobId,
         scheduledAt: input.scheduledAt?.toISOString(),

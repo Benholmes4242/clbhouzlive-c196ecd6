@@ -45,7 +45,7 @@ import { derivePosterUrl } from '@/uploads/posterUrl';
 import { trackError } from '@/lib/errorTracking';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
-import { writeShotTagAfterUpload, type ShotTagJob } from './shotTagWrites';
+import { writeShotTagAfterUpload, type ShotTagJob, type SavedHoleTag } from './shotTagWrites';
 
 export interface UploadJobContext {
   jobId: string;
@@ -94,6 +94,8 @@ export interface UploadJobSnapshot {
    * file sizes - a wrong estimate would make the bar retreat.
    */
   bytesTotal: number;
+  savedHoleTags?: SavedHoleTag[];
+  currentItemId?: string;
   error?: string;
 }
 
@@ -217,7 +219,7 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
     height: compressed.height ?? null,
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
-  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { url: result.publicUrl });
+  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { url: result.publicUrl }, tag => { (job.snapshot.savedHoleTags ??= []).push(tag); });
 
   uploadEventBus.emit('file:upload-complete', {
     type: 'file:upload-complete',
@@ -296,7 +298,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
     poster_url: posterUrl,
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
-  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { streamId });
+  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { streamId }, tag => { (job.snapshot.savedHoleTags ??= []).push(tag); });
 
   uploadEventBus.emit('file:upload-complete', {
     type: 'file:upload-complete',
@@ -323,6 +325,7 @@ async function runJob(job: InternalJob): Promise<void> {
   const failedIndices: number[] = [];
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
+    job.snapshot.currentItemId = item.id;
     job.snapshot.stage = 'preparing';
     emitSnapshot(job);
     try {

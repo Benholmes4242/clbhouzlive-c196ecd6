@@ -32,31 +32,29 @@ export interface ShotTagJob {
   items: Readonly<Record<string, ShotTagChoice>>;
 }
 
+export interface SavedHoleTag { itemId: string; courseId: string; hole: number }
 export async function writeShotTagAfterUpload(
-  tagJob: ShotTagJob | undefined,
-  memberId: string,
+  tagJob: ShotTagJob | undefined, memberId: string,
   item: { id: string; type: 'image' | 'video'; file?: File },
   uploaded: { url?: string; streamId?: string },
+  onSavedHole?: (tag: SavedHoleTag) => void,
 ): Promise<void> {
   const choice = tagJob?.items[item.id];
   if (!choice || !item.file) return;
   const { tag } = choice;
-  const job = choice;
   try {
     if (isHoleTag(tag)) {
-      if (item.type === 'video') {
-        if (uploaded.streamId) await submitLibraryHoleVideo(item.file, uploaded.streamId, job.courseId, memberId, tag.hole, job.knownHoles);
-      } else if (uploaded.url) {
-        await submitLibraryHolePhoto(item.file, uploaded.url, job.courseId, memberId, tag.hole, job.knownHoles);
+      let saved = false;
+      if (item.type === 'video' && uploaded.streamId) {
+        saved = !!(await submitLibraryHoleVideo(item.file, uploaded.streamId, choice.courseId, memberId, tag.hole, choice.knownHoles));
+      } else if (item.type !== 'video' && uploaded.url) {
+        saved = !!(await submitLibraryHolePhoto(item.file, uploaded.url, choice.courseId, memberId, tag.hole, choice.knownHoles));
       }
+      if (saved) onSavedHole?.({ itemId:item.id, courseId:choice.courseId, hole:tag.hole });
     } else if (item.type === 'video') {
-      if (uploaded.streamId) await submitLibraryPlaceVideo(item.file, uploaded.streamId, job.courseId, memberId, tag.place);
-    } else if (uploaded.url) {
-      await submitLibraryPlacePhoto(item.file, uploaded.url, job.courseId, memberId, tag.place);
-    }
-  } catch (err) {
-    console.warn('[post-v2] shot tag write failed (tag only):', err);
-  }
+      if (uploaded.streamId) await submitLibraryPlaceVideo(item.file, uploaded.streamId, choice.courseId, memberId, tag.place);
+    } else if (uploaded.url) await submitLibraryPlacePhoto(item.file, uploaded.url, choice.courseId, memberId, tag.place);
+  } catch (err) { console.warn('[post-v2] shot tag write failed (tag only):', err); }
 }
 
 /** Existing post media key: the url the Media tab stores for it. */

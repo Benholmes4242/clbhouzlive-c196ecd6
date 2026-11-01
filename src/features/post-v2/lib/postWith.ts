@@ -15,11 +15,12 @@ import { MAX_PLAYED_WITH } from './golfPostRules';
 export const postWithTable = () => supabase.from('post_with');
 
 /** Written after the post row exists. Never self, never past eight. */
-export async function writePostWith(postId: string, authorId: string, userIds: readonly string[]): Promise<void> {
+export async function writePostWith(postId: string, authorId: string, userIds: readonly string[]): Promise<string[]> {
   const ids = [...new Set(userIds)].filter((id) => id !== authorId).slice(0, MAX_PLAYED_WITH);
-  if (!ids.length) return;
+  if (!ids.length) return [];
   const { error } = await postWithTable().insert(ids.map((user_id) => ({ post_id: postId, user_id })));
-  if (error) console.warn('[post-v2] post_with write failed:', error);
+  if (error) { console.warn('[post-v2] post_with write failed:', error); return []; }
+  return ids;
 }
 
 /** Edit mode: bring the post's rows to exactly `next`. */
