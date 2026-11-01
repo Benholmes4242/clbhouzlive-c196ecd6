@@ -723,10 +723,12 @@ function AnalyticsCourseRow({
 export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, synced }: Props) {
   const { t } = useTranslation('courses');
   const [q, setQ] = useState('');
-  /** Focus lives on the wrapper, not the input: the wrapper owns the paint. */
-  const [searchFocused, setSearchFocused] = useState(false);
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  /** YC1 sort: Recent is the order the list has always used. */
+  const [sort, setSort] = useState<CourseSort>('recent');
+  /** Card elements by course id, so a tile tap can scroll its card into view. */
+  const cardRefs = useRef(new Map<string, HTMLDivElement>());
 
   // SETTLED IS NOT "NOT LOADING": this query is disabled until the sheet opens.
   const { data: myCourses = [], isLoading: fetching, isFetched } = useUserAnalyticsCourses({ enabled: open });
@@ -744,18 +746,15 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
 
   // Sorted CLIENT-SIDE, not in the RPC: gam_user_courses is shared with the
   // Phase C rail and the Phase E chip provider, which want most-played first.
-  // Nulls last, ties broken on rounds so a same-day pair is stable.
-  const listItems = useMemo<UserAnalyticsCourse[]>(() => {
-    return [...myCourses].sort((a, b) => {
-      const ta = a.last_played ? Date.parse(a.last_played) : null;
-      const tb = b.last_played ? Date.parse(b.last_played) : null;
-      if (ta == null && tb == null) return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
-      if (ta == null) return 1;
-      if (tb == null) return -1;
-      if (tb !== ta) return tb - ta;
-      return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
-    });
-  }, [myCourses]);
+  // The three YC1 orders live in yourCoursesListRules; Recent is the order
+  // this list has always used (last played first, nulls last, ties on rounds).
+  const listItems = useMemo<UserAnalyticsCourse[]>(
+    () => sortCourses(myCourses, sort),
+    [myCourses, sort],
+  );
+
+  /** YC1 header tiles: best/worst scoring among 10+-round courses. */
+  const tiles = useMemo(() => pickTiles(myCourses), [myCourses]);
 
   /**
    * The member's own pooled average, used ONLY by the header sheetSub (it no
