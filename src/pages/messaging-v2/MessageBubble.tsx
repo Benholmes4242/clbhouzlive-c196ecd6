@@ -352,6 +352,26 @@ export const MessageBubble: React.FC<Props> = ({
       </div>
   );
 
+  /* MS3 §4–§5 — share types draw a card when its data is there, else the body
+     in a normal bubble (read failed, round deleted, not the sender's, missing
+     course). */
+  const courseShareId =
+    message.type === 'course_share' && !isDeleted
+      ? ((message.metadata as { course_id?: unknown } | null)?.course_id as string | undefined)
+      : undefined;
+  const shareContent =
+    message.type === 'round_share' && !isDeleted && roundShareCard ? (
+      <RoundShareCardView
+        card={roundShareCard}
+        isOutgoing={isOutgoing}
+        senderUserId={message.sender_user_id ?? null}
+      />
+    ) : courseShareId ? (
+      <CourseShareCardView courseId={courseShareId} isOutgoing={isOutgoing} fallback={bubbleBody} />
+    ) : (
+      bubbleBody
+    );
+
   return (
     <div
       className="w-full flex flex-col"
@@ -388,10 +408,10 @@ export const MessageBubble: React.FC<Props> = ({
               />
             ) : null}
           </div>
-          {bubbleBody}
+          {shareContent}
         </div>
       ) : (
-        bubbleBody
+        shareContent
       )}
 
       {reactions.length > 0 && !isDeleted ? (
