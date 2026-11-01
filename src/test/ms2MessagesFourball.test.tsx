@@ -195,7 +195,7 @@ describe('four-ball card — MS2 §2', () => {
     fourballState = { data: FOURBALL, isLoading: false, isError: false };
     renderSheet();
     expect(screen.getByTestId('fourball-card')).toBeTruthy();
-    fireEvent.change(screen.getByPlaceholderText('Search people or businesses'), {
+    fireEvent.change(screen.getAllByRole('textbox')[0], {
       target: { value: 'th' },
     });
     expect(screen.queryByTestId('fourball-card')).toBeNull();
