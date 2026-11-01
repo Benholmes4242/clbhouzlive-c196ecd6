@@ -23313,6 +23313,20 @@ export type Database = {
           whs_score_id: string
         }[]
       }
+      get_round_share_cards: {
+        Args: { p_message_ids: string[] }
+        Returns: {
+          course_id: string
+          course_name: string
+          gross: number
+          hole_to_par: number[]
+          holes_played: number
+          message_id: string
+          play_date: string
+          to_par: number
+          whs_score_id: string
+        }[]
+      }
       get_screen_analytics: {
         Args: { p_days?: number }
         Returns: {
