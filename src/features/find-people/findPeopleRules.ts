@@ -66,7 +66,7 @@ export interface PeopleGroup {
 /* ── small formatters ───────────────────────────────────────────────── */
 
 /** "11 Oct" — day + short month, locale-driven, invalid dates → ''. */
-export function shortDayMonth(iso: string | null | undefined, locale = 'en'): string {
+export function shortDayMonth(iso: string | null | undefined, locale = 'en-GB'): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';

@@ -286,7 +286,7 @@ function GroupSection({
           margin: '20px 16px 4px',
         }}
       >
-        <span>{copy(group.label)}</span>
+        <span data-testid="group-label">{copy(group.label)}</span>
         {group.followAll ? (
           <FollowAllButton group={group} followed={followed} markFollowed={markFollowed} />
         ) : (
