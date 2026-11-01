@@ -3,8 +3,8 @@
 ## Tour Overview — Also this week
 - [x] Eligibility ruling: completed slides from the last three days join unchanged live/upcoming rules; preserve order, viewing-event exclusion and four-event cap.
 - [x] Rebuilt event presentation, batched reads and shared score/tie helpers; added English locale strings and muted World Rankings falls.
-- [ ] STOP: harness type error in new test fixture (alsoWeekRebuild.test.tsx:14 initImmediate); full suite unexpected islandsNav.test.tsx:190 month-boundary failure. See ALSO_THIS_WEEK_REPORT.md. No test fixes applied.
-- [ ] Complete remaining locale/test coverage and architecture-note placement after stop is cleared; rerun validation. Guest comparison captured: one live + one finished event; no starting event eligible in current data.
+- [x] Authorised fixture fixes: initAsync:false and Date-only clock pin in the one islandsNav test; unchanged assertion. AGENTS.md pointer explicitly skipped.
+- [ ] Complete remaining locale/state/heading/navigation coverage and rerun shards. Existing section.png/comparison.png suffice; two-live, final-round and upcoming proof is unit-only.
 
 ## Tour leaderboard rebuild
 - [x] Source confirms whole-field sr_scorecards sync; tour_player_follows already typed; FullBoardSheet already shares BoardTable's column header.

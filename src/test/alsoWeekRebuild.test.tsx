@@ -1,6 +1,6 @@
 import { afterEach,describe,expect,it,vi } from 'vitest';
-import { cleanup,render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { cleanup,render,fireEvent } from '@testing-library/react';
+import { MemoryRouter,useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider,initReactI18next } from 'react-i18next';
 import en from '../../public/locales/en/tourhub.json';
@@ -11,7 +11,10 @@ import { boardTieRole } from '@/features/tourhub/leaderboard/leaderboardRules';
 import { todayFromEntry,fmtThru,type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { Movement } from '@/features/tourhub/overview/sections/WorldRankings';
-const i18n=createInstance();i18n.use(initReactI18next).init({lng:'en',resources:{en:{tourhub:en}},interpolation:{escapeValue:false},initImmediate:false});
+import { tournamentRoute } from '@/features/tourhub/routes';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
+import { TREND_UP } from '@/features/tourhub/_shared/tokens';
+const i18n=createInstance();i18n.use(initReactI18next).init({lng:'en',resources:{en:{tourhub:en}},interpolation:{escapeValue:false},initAsync:false});
 afterEach(cleanup);
 function slide(type:HeroSlide['type']='live'):HeroSlide {return {type,tournament:{id:'event',name:'Weekly Event',status:type==='live'?'inprogress':type==='completed'?'closed':'scheduled',startDate:'2026-10-29',endDate:'2026-11-01',currentRound:3,venueName:'Venue',venueCourseName:'Course',venuePar:71,tourSlug:'pga',tourName:'PGA Tour',purse:2100000,currency:'USD',defendingChampion:'John Defender',winnerId:'sr-a'} as HeroSlide['tournament']};}
 function row(id='a',position=1,score=-20,thru:number|null=14):BoardEntry {return {id,position,score,thru,today:-4,today_round:3,round_1:-8,round_2:-8,round_3:-4,player:{id,sr_id:`sr-${id}`,full_name:`John ${id.toUpperCase()}`}};}
@@ -59,3 +62,30 @@ describe('event structures and ranking polarity',()=>{
   it('starting followed-player stack uses published draw',()=>{const p=row().player;if(!p)throw Error('fixture');const v=view(slide('upcoming'),[],new Set(['a']),{first:null,players:[p]});expect(v.container.querySelector('.also-yours')).not.toBeNull();expect(v.container.querySelectorAll('.also-stack .also-avatar')).toHaveLength(1);});
   it('rank fall is muted and rank rise stays a rise',()=>{const v=render(<><Movement value={-3}/><Movement value={4}/></>);expect(v.container.querySelector('[data-movement-tone=fall]')?.textContent).toBe('▼3');expect(v.container.querySelector('[data-movement-tone=rise]')?.textContent).toBe('▲4');});
 });
+
+describe('remaining signed-off event states',()=>{
+  it('four-round event renders ROUND n',()=>{const v=view();expect(v.container.querySelector('.also-state')?.textContent).toBe('ROUND 3');});
+  it('non-four-round event renders ROUND n OF total',()=>{const s=slide();s.tournament.startDate='2026-10-30';s.tournament.currentRound=2;const v=view(s);expect(v.container.querySelector('.also-state')?.textContent).toBe('ROUND 2 OF 3');});
+  it('last scheduled round renders FINAL ROUND',()=>{const s=slide();s.tournament.currentRound=4;const v=view(s);expect(v.container.querySelector('.also-state')?.textContent).toBe('FINAL ROUND');});
+  it('completed event renders FINAL',()=>{const v=view(slide('completed'));expect(v.container.querySelector('.also-state')?.textContent).toBe('FINAL');});
+  it('unknown total renders no OF total',()=>{const s=slide();s.tournament.endDate='';const v=view(s);expect(v.container.querySelector('.also-state')?.textContent).toBe('ROUND 3');expect(v.container.querySelector('.also-sit')?.textContent).toBe('A leads by 2');});
+  it('starts without tee time renders weekday only',()=>{const s=slide('upcoming');s.tournament.startDate='2026-11-05';const v=view(s);expect(v.container.querySelector('.also-state')?.textContent).toBe('STARTS THU');});
+  it('starts with tee time renders device-local time',()=>{const s=slide('upcoming');const tee='2026-11-05T01:30:00Z';const v=view(s,[],new Set(),{first:tee,players:[]});const values=startsValues(s.tournament.startDate,tee);expect(v.container.querySelector('.also-state')?.textContent).toBe(`STARTS ${values?.day} · ${values?.time} YOUR TIME`);expect(v.container.querySelector('.also-state')?.getAttribute('data-state')).toBe('upcoming');});
+  it('earlier round sentence renders calculated margin and holes',()=>{const v=view();expect(v.container.querySelector('.also-sit')?.textContent).toBe('A leads by 2, with 22 holes to play');});
+  it('final-round sentence renders calculated holes remaining',()=>{const s=slide();s.tournament.startDate='2026-10-30';const v=view(s);expect(v.container.querySelector('.also-sit')?.textContent).toBe('A leads by 2, with 4 to play');});
+  it('final-round finished leader renders in-at score',()=>{const s=slide();s.tournament.startDate='2026-10-30';const f=field();f[0].thru=18;const v=view(s,f);expect(v.container.querySelector('.also-sit')?.textContent).toBe('A leads by 2, in at −20');});
+  it('between-round sentence renders next round number',()=>{const f=field().map(e=>({...e,today:null,round_3:null}));const v=view(slide(),f);expect(v.container.querySelector('.also-sit')?.textContent).toBe('A leads by 2 going into round 3');});
+  it('two tied leaders render both surnames and shared score',()=>{const f=field();f[1].score=-20;const v=view(slide(),f);expect(v.container.querySelector('.also-sit')?.textContent).toBe('A and B share the lead at −20');});
+  it('three tied leaders render player count and shared score',()=>{const v=view(slide(),field().map(e=>({...e,score:-20})));expect(v.container.querySelector('.also-sit')?.textContent).toBe('3 players share the lead at −20');});
+  it('before any play renders no sentence or chase',()=>{const v=view(slide(),field().map(e=>({...e,today:null,round_1:null,round_2:null,round_3:null})));expect(v.container.querySelector('.also-sit')).toBeNull();expect(v.container.querySelector('.also-chase')).toBeNull();});
+  it('winner block renders winning margin and closing strokes',()=>{const v=view(slide('completed'));expect(v.container.querySelector('.also-win-line')?.textContent).toBe('A wins by 2');expect(v.container.querySelector('.also-win-sub')?.textContent).toBe('−20 · closing 67');});
+  it('confirmed tied-score winner renders playoff',()=>{const f=field();f[1].score=-20;const v=view(slide('completed'),f);expect(v.container.querySelector('.also-win-line')?.textContent).toBe('A wins in a playoff');});
+  it('one followed player uses singular field sentence',()=>{const p=row().player;if(!p)throw Error('fixture');const v=view(slide('upcoming'),[],new Set(['a']),{first:null,players:[p]});expect(v.container.querySelector('.also-yours')?.textContent).toBe('1 of your players is in the field');});
+  it('multiple followed players use plural field sentence and three faces maximum',()=>{const players=['a','b','c','d'].map(id=>row(id).player).filter((p):p is NonNullable<BoardEntry['player']>=>p!=null);const v=view(slide('upcoming'),[],new Set(['a','b','c','d']),{first:null,players});expect(v.container.querySelector('.also-yours')?.textContent).toBe('4 of your players are in the field');expect(v.container.querySelectorAll('.also-stack .also-avatar')).toHaveLength(3);});
+  it('guest-equivalent empty follows suppress extra rows and field sentence',()=>{const p=row().player;if(!p)throw Error('fixture');const v=view(slide('upcoming'),[],new Set(),{first:null,players:[p]});expect(v.container.querySelector('.also-yours')).toBeNull();});
+  it('followed row has the star and always shows its extra position',()=>{const e=row('d',9);e.position_tied=true;const v=view(slide(),[...field(),e],new Set(['d']));const added=v.container.querySelector('[data-player=d]');expect(added?.querySelector('.also-star')?.textContent).toBe('★');expect(added?.querySelector('.also-pos')?.textContent).toBe('T9');});
+  it('today and total use the existing scoreColor for under over and level',()=>{const f=field().map((e,i)=>({...e,today:[-2,1,0][i],score:[-4,2,0][i]}));const v=view(slide(),f);for(const e of f){const r=v.container.querySelector(`[data-player=${e.player?.id}]`);expect((r?.querySelector('.also-today') as HTMLElement).style.color).toBe(normalizeColor(getScoreColor(e.today,'dark')));expect((r?.querySelector('.also-tot') as HTMLElement).style.color).toBe(normalizeColor(getScoreColor(e.score,'dark')));}});
+  it('ranking falls use dim not danger and rises retain TREND_UP',()=>{const v=render(<><Movement value={-2}/><Movement value={2}/></>);expect((v.container.querySelector('[data-movement-tone=fall]') as HTMLElement).style.color).toBe('var(--tour-board-dim)');expect((v.container.querySelector('[data-movement-tone=rise]') as HTMLElement).style.color).toBe(normalizeColor(TREND_UP));});
+  it('event tap opens canonical tournament overview destination with referrer',()=>{let location:{pathname:string;state:unknown}|undefined;function Probe(){location=useLocation();return null;}const s=slide();const v=render(<MemoryRouter initialEntries={['/tourhub']}><I18nextProvider i18n={i18n}><AlsoWeekEvent slide={s} entries={field()} followed={new Set()}/><Probe/></I18nextProvider></MemoryRouter>);fireEvent.click(v.getByRole('button'));const target=tournamentRoute('event',{kind:'overview'});expect(location?.pathname).toBe(target.to);expect(location?.state).toEqual(target.state);});
+});
+function normalizeColor(color:string){const el=document.createElement('span');el.style.color=color;return el.style.color;}
