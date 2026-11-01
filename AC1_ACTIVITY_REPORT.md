@@ -1,14 +1,14 @@
-# AC1 Activity — completed-edit stop
+# AC1 Activity — final report
 
 ## Status
-Implemented the requested summary-only round rows, score tiles, hole strips, neutral unread ground/left dot and Tour system tiles. **Not complete: automatic typecheck reports the error below.** No correction or rerun after detecting the surviving error, in accordance with Ben's stop rule.
+Implemented the requested summary-only round rows, score tiles, hole strips, neutral unread ground/left dot and Tour system tiles. **Complete.** AC1.1, an authorised test-only type fix, resolved the previously reported typecheck error.
 
 ```
 src/test/ac1ActivityRounds.test.tsx(103,60): error TS2345: Argument of type '(holes: any) => void' is not assignable to parameter of type '() => Awaitable<void>'.
 Target signature provides too few arguments. Expected 1 or more, but got 0.
 ```
 
-The new `it.each([null, []])` empty/null-strip fixture at line 103 executes successfully in Vitest but its callback fails TypeScript's inferred overload. Proposed narrowly scoped follow-up: explicitly type/wrap the two table rows so each supplies one `hole_to_par` argument; retain both assertions and all cases. Await authorisation; no fix applied.
+AC1.1 applied exactly the authorised fix at line 103: `it.each<[number[] | null]>([[null], [[]]])('omits a missing or empty strip %j', holes => { … })`. Each case now supplies its own single argument and the table carries an explicit type. Both cases and both assertions are unchanged; no other line was touched. `npx tsgo --noEmit` exits clean.
 
 ## Diff
 - Added `hooks/useActivityRoundSummaries.ts`: sorted/deduplicated-id queries, viewer-scoped keys, one RPC call per loaded feed page and merged Map; no fallback table reads or stale figures on loading/error.
@@ -32,7 +32,17 @@ Full-suite commands and results:
 - `bunx vitest run --shard=3/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/ac1/shard3.json` — 1,364/1,364, 130 files.
 - `bunx vitest run --shard=4/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/ac1/shard4.json` — 1,456/1,456, 130 files.
 
-Latest automatic build log: **2026-11-01T18:50:50Z**, typecheck error above; no build-clean claim. The shards were already launched when the automatic typecheck signal was inspected. No manual build/typecheck run.
+Latest automatic build log: **2026-11-01T19:07:54Z**, build OK.
+
+## AC1.1 verification (2026-11-01T19:07 UTC)
+- Typecheck: `npx tsgo --noEmit` — exit 0, no errors.
+- Targeted: `npx vitest run src/test/ac1ActivityRounds.test.tsx` — 28/28, file passes.
+- Full suite, sharded (all four passed, zero failures anywhere):
+  - `npx vitest run --shard=1/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/ac11/shard1.json` — 1,333/1,333.
+  - `npx vitest run --shard=2/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/ac11/shard2.json` — 1,305/1,305.
+  - `npx vitest run --shard=3/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/ac11/shard3.json` — 1,364/1,364.
+  - `npx vitest run --shard=4/4 --maxWorkers=2 --reporter=json --outputFile=/tmp/ac11/shard4.json` — 1,456/1,456.
+- Total: **5,458/5,458 across 520 files** — matches the 5,458/520 baseline; test count unchanged by AC1.1 (type-only edit). No pre-existing failures; none named because there are none.
 
 ## Unverified and protected scope
-Browser/computed-colour and signed-off geometry comparisons not performed after the stop; unit checks do not establish exact visual parity or pseudo-element colours. Real signed-in summary readback and scorecard flow remain unverified. No SQL, migrations, RPC/edge edits, feed_config, round_pool_cap, native or Median changes. AC2 batching and Records wording untouched.
+Browser/computed-colour and signed-off geometry comparisons not performed; unit checks do not establish exact visual parity or pseudo-element colours. Real signed-in summary readback and scorecard flow remain unverified. No SQL, migrations, RPC/edge edits, feed_config, round_pool_cap, native or Median changes. AC2 batching and Records wording untouched.

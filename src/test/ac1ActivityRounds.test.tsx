@@ -100,7 +100,7 @@ describe('AC1 round rows', () => {
     expect([...screen.getByTestId('activity-hole-strip').children].map(el => el.getAttribute('data-hole-value'))).toEqual(['-3','-2','-1','0','1','2','3','missing']);
     expect([-3,-2,-1,0,1,2,3,null].map(activityHoleColor)).toEqual([RAMP_DIST.eagles,RAMP_DIST.eagles,RAMP_DIST.birdie,'var(--activity-hole-par)',RAMP_DIST.bogey,RAMP_DIST.double,RAMP_DIST.double,'var(--activity-hole-missing)']);
   });
-  it.each([null, []])('omits a missing or empty strip %j', holes => {
+  it.each<[number[] | null]>([[null], [[]]])('omits a missing or empty strip %j', holes => {
     mount({ hole_to_par: holes });
     expect(screen.queryByTestId('activity-hole-strip')).toBeNull();
   });
