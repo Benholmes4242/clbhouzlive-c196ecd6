@@ -27,6 +27,7 @@ import { toast } from '@/lib/toast';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { businessCategoryWord } from '@/lib/business/businessHero';
 import { useGlobalSearchV2 } from '@/features/search-v2/hooks/useGlobalSearchV2';
+import { businessCategoryLabel } from '@/features/find-people/railRules';
 import { navClub, navPerson } from '@/features/search-v2/lib/searchNavigation';
 import {
   businessInitials,
@@ -82,10 +83,9 @@ export default function FindPeoplePage() {
     [tab, peopleQ.data, bizQ.data],
   );
 
-  const categoryOf = (b: BusinessSuggestion) =>
-    b.category === 'Golf Club'
-      ? 'Golf club'
-      : businessCategoryWord(b.category, (_key, fallback) => fallback);
+  // WF2: the label rule moved to railRules.businessCategoryLabel so the page
+  // and the feed rail share it — same copy as before.
+  const categoryOf = businessCategoryLabel;
 
   const onTab = (next: FindPeopleTab) => {
     const params = new URLSearchParams(searchParams);
