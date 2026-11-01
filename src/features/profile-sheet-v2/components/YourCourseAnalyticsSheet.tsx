@@ -26,9 +26,9 @@ import {
   StatRow,
   Action,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { LABEL as LABEL_METRICS, KICKER as KICKER_METRICS, TITLE as TITLE_METRICS, FIGS } from '@/lib/tokens/type';
+import { LABEL as LABEL_METRICS, FIGS } from '@/lib/tokens/type';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
+import { formatMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
@@ -48,8 +48,6 @@ import monotonePath from '@/lib/charts/monotonePath';
 
 /** Canonical metrics from the shared module; this sheet keeps its palette. */
 const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
-const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
-const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const CHEVRON = '\u203A';
 const DOT = '\u00B7';
