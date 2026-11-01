@@ -159,7 +159,22 @@
         "r2d": "[~~Řáĉé ţő Đúƀáí~~]",
         "rolex": "[~~Řőļéẋ Řáñǩíñĝš~~]"
       },
-      "movementBasis": "[~~Ƥőšíţíőñš mővéđ ővéř {{days}} đáýš~~]"
+      "leadsBy": "[~~<b>{{name}}</b> ļéáđš ƀý <b>{{gap}}</b> ƥőíñţš~~]",
+      "clauseTwice": "[~~, mőřé ţĥáñ ţẃíĉé áñýőñé éļšé'š ţőţáļ~~]",
+      "clauseNearly": "[~~, ñéářļý ţẃíĉé áñýőñé éļšé'š ţőţáļ~~]",
+      "clauseEnd": "[~~.~~]",
+      "eventsLeft": "[~~ ẃíţĥ <b>{{count}}</b> évégñţš ļéƒţ.~~]",
+      "level": "[~~<b>{{name}}</b> áñđ <b>{{other}}</b> ářé ļévéļ őñ <b>{{points}}</b> ƥőíñţš.~~]",
+      "colRank": "[~~Řáñǩ~~]",
+      "colPlayer": "[~~Ƥļáýéř~~]",
+      "colPoints": "[~~Ƥőíñţš~~]",
+      "colWins": "[~~Ŵíñš~~]",
+      "colSince": "[~~Śíñĉé {{date}}~~]",
+      "yourPlayers": "[~~Ýőúř ƥļáýéřš~~]",
+      "followedCount_one": "[~~{{count}} ƒőļļőẃéđ~~]",
+      "followedCount_other": "[~~{{count}} ƒőļļőẃéđ~~]",
+      "climbLabel": "[~~Ɓíĝĝéšţ ĉļímƀ íñ ţĥé ţőƥ 50~~]",
+      "climbLine": "[~~{{name}} <up>▲{{count}}</up> <m>ţő {{ordinal}} šíñĉé {{date}}</m>~~]"
     },
     "leaderRow": {
       "tiedAtTop_one": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
