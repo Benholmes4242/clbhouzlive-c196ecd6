@@ -4,7 +4,7 @@
 - [ ] Rebuild the course tag sheet and real-photo Where tile, preserving ordered multi-select, single-select and photo-date reasons.
 - [ ] Rebuild upload progress, posted facts/actions and scheduled confirmation; preserve background uploads, failure handling and plain edit confirmation.
 - [ ] Rebuild Schedule with actor-scoped best-hour read, native minute-precision time input and countdown; preserve publishing and scheduled list.
-- [ ] Resolve authorised file scope for StageComposer handoffs and catalogue-placeholder conflict before implementation.
+- [x] Ben authorised StageComposer handoffs; share one cached head-only course count, round down to thousands, loading/error fallback Search any course.
 - [ ] Run focused checks and full shards against 5,380/516; reconcile changed assertions and inventory; capture reachable 390×844 comparisons and report Median/real-post limits.
 
 ## Courses photo cards — top scrims and Latest holes kicker

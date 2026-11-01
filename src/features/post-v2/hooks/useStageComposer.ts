@@ -59,8 +59,8 @@ export interface StageCourse {
   id: string;
   name: string;
   country?: string | null;
-  /** Course photo, when the source query fetched one. Optional: the
-   *  post-v2 tagging paths do not need it and do not set it. */
+  sub_country?: string | null;
+  /** Course cover carried by sources; older draft/edit payloads hydrate by id. */
   thumbnail?: string | null;
 }
 
