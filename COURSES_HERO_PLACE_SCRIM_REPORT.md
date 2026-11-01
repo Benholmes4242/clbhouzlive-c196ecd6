@@ -5,7 +5,7 @@
 - `CourseMasthead.tsx`: optional `placeColor` defaults to existing `PLACE_INK`; place style spreads existing `MASTHEAD_PLACE` and overrides only colour. Font size/weight, single line and ellipsis preserved. GolfClubView is unedited and passes no override.
 - `photoScrim.ts`: adds `SCRIM_HERO_TALL = 'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 60%)'` with the requested one-line rationale. Existing `SCRIM_STANDOUT` remains byte-for-byte unchanged at 32%.
 - Courses hero keeps its canon wash; an absolute inset-zero tall scrim follows it, before the text container whose existing z-index remains 1. No other hero adopts this token.
-- Local ownership comments, root ownership pointer, memory and roadmap updated. Exact source diff captured at `/tmp/courses-hero.diff` (temporary sandbox output).
+- Local ownership comments, root ownership pointer, memory and roadmap updated. The source-change summary above records the old-to-new diff.
 
 ## Test changes — old → new
 No existing test is deleted, renamed, rewritten or assertion-modified. Existing `heroScrimCanon.test.ts` remains four cases with unchanged assertions, including both `not.toContain('rgba(0,0,0,0.78)')` checks.
