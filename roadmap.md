@@ -1,5 +1,12 @@
 # Roadmap
 
+## Post flow — signed-off tagging, posting and schedule
+- [ ] Rebuild the course tag sheet and real-photo Where tile, preserving ordered multi-select, single-select and photo-date reasons.
+- [ ] Rebuild upload progress, posted facts/actions and scheduled confirmation; preserve background uploads, failure handling and plain edit confirmation.
+- [ ] Rebuild Schedule with actor-scoped best-hour read, native minute-precision time input and countdown; preserve publishing and scheduled list.
+- [ ] Resolve authorised file scope for StageComposer handoffs and catalogue-placeholder conflict before implementation.
+- [ ] Run focused checks and full shards against 5,380/516; reconcile changed assertions and inventory; capture reachable 390×844 comparisons and report Median/real-post limits.
+
 ## Courses photo cards — top scrims and Latest holes kicker
 - [x] SCRIMS 2 authorises gradient-only test selector and explicit isolated media-0/scrim-1/text-2 stacks in Latest holes and Latest courses; shared player unchanged.
 - [x] Focused57/57; all full shards5,380/5,380 across516 (1332+1260+1387+1401), +3/+0 vs expected5,377/516; +10/+1 vs last green5,370/515, all coursesPhotoTopScrims. No failures. Renamed COURSES_PHOTO_TOP_SCRIMS_REPORT.md records authorised selector/assertion details.
