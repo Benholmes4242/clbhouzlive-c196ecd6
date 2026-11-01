@@ -109,6 +109,7 @@ function toGround(rounds: SharedRoundResult[], serverCount?: number): SharedGrou
     count: serverCount ?? deduped.length,
     lastCourseName: deduped[0].course_name ?? null,
     lastPlayDate: deduped[0].play_date ?? null,
+    record: headToHead(deduped),
   };
 }
 
