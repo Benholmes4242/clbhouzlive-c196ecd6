@@ -478,9 +478,7 @@ function AnalyticsCourseRow({
 
   const meta = [
     t('yourCourses.roundsCount', { count: course.rounds_count }),
-    course.last_played
-      ? t('yourCourses.lastPlayedMeta', { date: formatDayMonthYearShortGB(course.last_played) })
-      : null,
+    course.last_played ? fmtListDate(course.last_played) : null,
   ]
     .filter(Boolean)
     .join(` ${DOT} `);
@@ -524,107 +522,89 @@ function AnalyticsCourseRow({
     : [];
 
 
+  const early = isEarlyData(course);
+  const rounds = course.rounds_count ?? 0;
+  const figLabel = figureLabel(rounds);
+
+  /**
+   * YC1 COLLAPSED CARD. Name (shortened) left, figure right, meta under the
+   * name, bar under both. The figure mutes under 10 rounds and the meta
+   * carries the inline "Early data" tag. Courses with no hole data keep
+   * their tap-to-navigate chevron; expanding cards carry NO chevron.
+   */
   const body = (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: hasScoring ? '1fr 16px 52px 14px' : '1fr 16px 52px',
-        gap: '0 10px',
-        alignItems: 'end',
-        minWidth: 0,
-      }}
-    >
-      <div style={{ minWidth: 0 }}>
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 14,
-            color: A.INK,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {course.course_name}
-        </div>
-        <div
-          style={{
-            ...LABEL,
-            // The shared LABEL tracking (0.13em) is tuned for two- or three-word
-            // captions. This line runs to ~24 characters, where that tracking costs
-            // more width than the words do. Relaxed HERE ONLY.
-            letterSpacing: '0.06em',
-            color: A.MUTE,
-            marginTop: 4,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {meta}
-        </div>
-      </div>
-
-      {!hasScoring && (
-        <span
-          style={{
-            color: A.DIM,
-            fontSize: 16,
-            lineHeight: 1.2,
-            alignSelf: 'start',
-            gridColumn: avgVal != null ? 2 : 3,
-          }}
-        >
-          {CHEVRON}
-        </span>
-      )}
-
-      {avgVal != null && (
-        <div style={{ width: 52, textAlign: 'right', minWidth: 0, gridColumn: 3 }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: A.INK }}>
-            {fmtSigned(avgVal, 1)}
-          </div>
+    <div style={{ minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              ...LABEL,
-              letterSpacing: '0.06em',
-              color: A.MUTE,
-              marginTop: 3,
+              fontWeight: 600,
+              fontSize: 16,
+              color: A.INK,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            {t('yourCourses.avgToPar')}
+            {shortCourseName(course.course_name)}
+          </div>
+          <div style={{ fontSize: 12.5, color: A.MUTE, marginTop: 3 }}>
+            {meta}
+            {early && <span style={EARLY_TAG}>{t('yourCourses.earlyData')}</span>}
           </div>
         </div>
-      )}
 
-      {hasScoring && (
-        <span
-          style={{
-            gridColumn: 4,
-            alignSelf: 'center',
-            // The grid's 10px column gap plus this -2px lands the caret 8px
-            // from the AVG block, per spec.
-            marginLeft: -2,
-          }}
-        >
-          <ExpandCaret open={expanded} />
-        </span>
-      )}
+        <div style={{ textAlign: 'right', flex: 'none' }}>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 19,
+              letterSpacing: '-0.02em',
+              color: early ? A.MUTE : A.INK,
+            }}
+          >
+            {avgVal != null ? fmtSigned(avgVal, 1) : <span style={{ color: A.DIM }}>–</span>}
+          </div>
+          {avgVal != null && (
+            <div style={{ fontSize: 11, color: A.DIM, marginTop: 1 }}>
+              {figLabel === 'a-round'
+                ? t('yourCourses.figARound')
+                : figLabel === 'one-round'
+                  ? t('yourCourses.figOneRound')
+                  : t('yourCourses.figNRounds', { count: rounds })}
+            </div>
+          )}
+        </div>
+
+        {!hasScoring && (
+          <span
+            style={{
+              color: A.DIM,
+              fontSize: 16,
+              lineHeight: 1.2,
+              alignSelf: 'center',
+              flex: 'none',
+            }}
+          >
+            {CHEVRON}
+          </span>
+        )}
+      </div>
 
       {/*
         COLLAPSED: the bar sits under the header — it is the only thing making
-        a 33-course list scannable.
+        a long list scannable.
         EXPANDED: the trend takes this slot and the bar moves down to sit
         directly above the percentages it describes.
       */}
       {hasScoring && !expanded && (
-        <span style={{ gridColumn: '1 / -1', marginTop: 9 }}>
-          <DistributionBar segs={segs} />
+        <span style={{ display: 'block', marginTop: 12 }}>
+          <ListBar segs={segs} />
         </span>
       )}
 
       {hasScoring && expanded && (
-        <span style={{ gridColumn: '1 / -1', marginTop: 10, display: 'block' }}>
+        <span style={{ marginTop: 10, display: 'block' }}>
           <div style={{ ...LABEL, marginBottom: 2 }}>{t('yourCourses.trendLabel')}</div>
           {trendPoints.length >= 2 ? (
             <RoundsTrend points={trendPoints} gradientId={`ycat-${course.course_id}`} />
@@ -640,7 +620,6 @@ function AnalyticsCourseRow({
           )}
         </span>
       )}
-
     </div>
   );
 
