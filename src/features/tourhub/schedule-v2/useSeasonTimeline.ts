@@ -157,9 +157,8 @@ export type EventState = 'completed' | 'live' | 'upcoming';
 
 export interface SeasonEvent {
   id: string;
-  /** Canonical tour slug for the row. Populated only in All Tours (merged)
-   *  mode so SeasonRow can render a per-row tour chip. Undefined in single-
-   *  tour mode where the header/context already communicates the tour. */
+  /** Canonical tour slug for the row. Populated in BOTH modes: the rebuilt
+   *  row always prints a tour label and weeks sort by tour order. */
   tourSlug?: TourId;
   name: string;
   venueName: string | null;
@@ -168,6 +167,10 @@ export interface SeasonEvent {
   coursePlace?: string | null;
   venueCountry: string | null;
   purse: number | null;
+  /** sr_tournaments.event_type — 'team' drives the TEAM tag. */
+  eventType: string | null;
+  /** Linked course id — drives the member's "You've played here" line. */
+  golfCourseId: string | null;
   startDate: string;
   endDate: string;
   status: string;
