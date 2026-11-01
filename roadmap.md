@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Tour Overview — News rebuild
-- [ ] Rebuild Overview-only story shapes, visit freshness, details and followed/live player chips; preserve News-tab defaults and selector/navigation.
-- [ ] Add batched live board reads using existing overview tournaments/cadence, all locale keys and rule/regression tests.
-- [ ] Run full-suite shards against 5,284/512 and capture 390×844 section beside mock; report guest/member limits.
+- [x] Implemented Overview-only opt-in shapes, freshness/details/player chips and one filtered board read observing the existing tournament cache; six locale catalogues updated. Existing selector and News defaults unchanged.
+- [ ] STOP: overviewNewsRebuild.test.tsx:43:8 (two cases) and :52:8 (one case): `TypeError: Cannot redefine property: IntersectionObserver`. No test correction or full-suite run after failure. Targeted145 passed/3 failed/148; added76 across2 files; expected full inventory5360/514 vs5284/512, not executed. See TOUR_NEWS_STOP_REPORT.md.
+- [ ] Full shards and visibility baseline proof await authorization to repair only the three new observer fixtures without changing assertions. Guest shade covers the real390×844 capture; member follows unit-only (external_unmanaged).
 
 ## YC2 — Your courses opened card
 - [x] User ruling: remove the 20-round per-course cap, preserve the single read and global 2,000-row ceiling; n is returned 18-hole history count, not card count.
