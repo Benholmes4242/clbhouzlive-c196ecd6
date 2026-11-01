@@ -1432,3 +1432,7 @@
 - [x] All sections built; see TOUR_SCHEDULE_REBUILD_REPORT.md. Schwab keyword removed (consumers listed); week grouping + sticky headers + THIS WEEK shading; next-major card; SeasonRow rebuilt; amber member lines; This week pill; locales x6.
 - [x] scheduleRebuild.test.tsx (+15) + scheduleSeasonRow.test.tsx rewritten (5->11, old/new assertions quoted in report). Full shards 5,590/5,590 across 526 files (+21/+1 vs 5,569/525); tsgo clean.
 - [x] 390x844 capture: guest gate redirects /tour?tab=schedule to / signed-out, so page visuals are unit-tested; member-only amber lines unit-tested via the you prop. Signed-in device check outstanding.
+
+## WF1 — Find people page
+- [x] /find-people built to the signed-off mock; /golferstofollow redirects keeping the query; GolfersToFollowV2.tsx deleted; entry points (FriendsEmptyState, ClubsCard, SuggestedGolfersBlock) updated; account glance left alone (no people row to replace).
+- [x] Pure rules + RPC hooks + 23 tests (wf1FindPeople.test.tsx); full shards 5,613/5,613 across 527 files (+23/+1 vs 5,590/526); tsc clean. Report: WF1_FIND_PEOPLE_REPORT.md. Signed-in live check outstanding.
