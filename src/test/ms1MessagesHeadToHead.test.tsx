@@ -142,7 +142,6 @@ const renderRow = (ground?: SharedGround) =>
   );
 
 afterEach(() => cleanup());
-import { afterEach } from 'vitest';
 
 describe('headToHead', () => {
   it('dedupes on (play_date, course) before tallying', () => {
