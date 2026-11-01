@@ -263,6 +263,17 @@ describe('WhoToFollowRail', () => {
     expect(h.track).toHaveBeenCalledWith('who_to_follow_see_all', { slot: 1 });
   });
 
+  it('cards row allows vertical feed scroll (touch-action includes pan-y)', () => {
+    h.people = people(4);
+    h.biz = [biz({})];
+    renderRail(1);
+    const row = screen.getByTestId('who-to-follow-rail-1').querySelector('.no-scrollbar') as HTMLElement;
+    expect(row).toBeTruthy();
+    expect(row.style.touchAction).toContain('pan-y');
+    expect(row.style.touchAction).toContain('pan-x');
+    expect(row.style.overscrollBehaviorX).toBe('contain');
+  });
+
   it('renders nothing when the slot has fewer than 3 cards', () => {
     h.people = people(2);
     h.biz = [];
@@ -515,6 +526,18 @@ describe('SuggestedGolfersBlock', () => {
     const nedRow = screen.getByText('No Hcp Ned').closest('[role="button"]') as HTMLElement;
     expect(nedRow.textContent).not.toContain('hcp');
     expect(screen.getByText('+1.2 hcp · 212 rounds')).toBeTruthy();
+  });
+
+  it('no reason line is amber, including club and reciprocal', () => {
+    h.people = [
+      person({ user_id: 'u1', display_name: 'Niall Devins', reason_type: 'club', reason_club_name: 'Sundridge Park' }),
+      person({ user_id: 'u2', display_name: 'Ned', reason_type: 'reciprocal' }),
+    ];
+    renderBlock();
+    for (const el of [screen.getByText('Member at {{club}}'), screen.getByText('Follows you')]) {
+      expect(el.style.color).not.toBe('rgb(247, 147, 30)');
+      expect(el.style.color.toLowerCase()).not.toBe('#f7931e');
+    }
   });
 
   it('See all is mute, not amber', () => {

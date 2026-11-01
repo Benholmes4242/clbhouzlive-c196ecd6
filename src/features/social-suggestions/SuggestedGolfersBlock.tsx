@@ -31,7 +31,6 @@ import {
   type PersonSuggestion,
 } from '@/features/find-people/findPeopleRules';
 import { useSuggestionGate } from './useSuggestedGolfers';
-import { reasonIsAmber } from './SuggestedGolferRow';
 
 const MUTE = 'rgba(248,250,252,0.62)';
 
@@ -148,7 +147,7 @@ function BlockGolferRow({
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
-        {/* REASON FIRST - AXIS 9 / 0.14em, amber for club, faint otherwise. */}
+        {/* REASON FIRST - AXIS 9 / 0.14em, every reason line is dim (amber is brand mark/VerifiedBadge only). */}
         {reason ? (
           <div
             style={{
@@ -156,7 +155,7 @@ function BlockGolferRow({
               fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: reasonIsAmber(golfer.reason_type) ? A.AMBER : A.DIM,
+              color: A.DIM,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
