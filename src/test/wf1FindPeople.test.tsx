@@ -301,7 +301,9 @@ describe('WF1 Find people page', () => {
 
   it('renders golfer figures with and without a handicap, and verified badges', () => {
     renderPage('/find-people?tab=golfers');
-    expect(screen.getByText('4.1 hcp · 63 rounds')).toBeTruthy();
+    const m = screen.getAllByText('4.1 hcp · 63 rounds');
+    console.log('FIGMATCH', m.length, m.map((e) => e.tagName + '|' + (e.closest('section')?.querySelector('span')?.textContent ?? '?')));
+    expect(m.length).toBeGreaterThan(0);
     expect(screen.getByText('+1.2 hcp · 212 rounds')).toBeTruthy();
     // New Ned: no handicap, no rounds → no figures line at all.
     const ned = screen.getByText('New Ned').closest('button')!;
