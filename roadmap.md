@@ -1,5 +1,8 @@
 # Roadmap
 
+## MS1 — Messages head to head, inbox lines, two fixes — DONE
+- [x] headToHead helper + record on SharedGround; thread header 17px + "· last {d MMM}"; HeadToHeadCard (tappable → compare route); SharedGroundStrip restyle (short name, ink/dim scores, outcome line, no amber); inbox record line with count-only fallback; rail date under name (pill removed); incoming avatar 28px slot + 16px padding; image-unavailable investigated (HEIC/.bin vs missing object — Ben's SQL to pin down). 28 new tests; full suite 5,541/5,541 across 522→523 files. Report: MS1_MESSAGES_REPORT.md.
+
 ## Tour News page rebuild (news-page-signed-off.html) — DONE
 - [x] Page head: "Tour News" 26/800 + 38px search button; shared new-since-last-visit line (newsVisit.ts).
 - [x] Lead story 440px hero, bottom-only overlay; event card (deriveHeroState before/live/finished) replaces ticker; no marquee.

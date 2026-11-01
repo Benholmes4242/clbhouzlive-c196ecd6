@@ -29,7 +29,7 @@ import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { RailChips } from '@/components/ui/RailChips';
 import { MemberRailTile } from './MemberRailTile';
-import { formatRelative } from '@/i18n/format';
+import { formatDayMonthShortGB } from '@/i18n/format';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isSpeakableThread } from './messagePreview';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
@@ -282,6 +282,8 @@ const InboxV2Page: React.FC = () => {
                   </button>
                   {starters.map((m) => {
                     const date = railGround[m.userId]?.lastPlayDate ?? m.lastPlayDate;
+                    /* MS1 §6 — the time-since-played moves from the pill above
+                       the avatar to a dim "{d MMM}" line under the first name. */
                     return (
                       <MemberRailTile
                         key={m.userId}
@@ -290,24 +292,8 @@ const InboxV2Page: React.FC = () => {
                         userId={m.userId}
                         name={m.name}
                         label={m.name.split(' ')[0]}
+                        subLabel={date ? formatDayMonthShortGB(date) : null}
                         hairlineRing
-                        bubble={date ? (
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              background: 'rgba(255,255,255,0.09)',
-                              borderRadius: 10,
-                              padding: '4px 7px',
-                              fontSize: 9.5,
-                              lineHeight: 1.25,
-                              color: MSG.INK_2,
-                              marginBottom: 6,
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {formatRelative(date)}
-                          </span>
-                        ) : null}
                       />
                     );
                   })}

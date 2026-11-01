@@ -33,6 +33,16 @@ export interface SharedGround {
   count: number;
   lastCourseName: string | null;
   lastPlayDate: string | null;
+  /** MS1 §1 — the head-to-head record from the deduped rounds; null when none. */
+  record: HeadToHeadRecord | null;
+}
+
+/** MS1 §1 — W/L/H tallies; H is a halved round (the RPC's T). */
+export interface HeadToHeadRecord {
+  points: { w: number; l: number; h: number };
+  gross: { w: number; l: number; h: number };
+  /** Newest first, at most five, from stableford_outcome (T → H). */
+  lastFive: ('W' | 'L' | 'H')[];
 }
 
 const EMPTY: SharedGround = {
@@ -40,6 +50,7 @@ const EMPTY: SharedGround = {
   count: 0,
   lastCourseName: null,
   lastPlayDate: null,
+  record: null,
 };
 
 export function dedupeSharedRounds(rounds: SharedRoundResult[]): SharedRoundResult[] {
@@ -52,6 +63,33 @@ export function dedupeSharedRounds(rounds: SharedRoundResult[]): SharedRoundResu
     out.push(r);
   }
   return out.sort((a, b) => (a.play_date < b.play_date ? 1 : -1));
+}
+
+/**
+ * MS1 §1 — the record is computed from the DEDUPED rounds, so it can disagree
+ * with the server `count` (pairing-based, not deduped) until MS2 fixes the
+ * server figure. Returns null when there are no rounds.
+ */
+export function headToHead(rounds: SharedRoundResult[]): HeadToHeadRecord | null {
+  const deduped = dedupeSharedRounds(rounds);
+  if (deduped.length === 0) return null;
+  const points = { w: 0, l: 0, h: 0 };
+  const gross = { w: 0, l: 0, h: 0 };
+  for (const r of deduped) {
+    if (r.stableford_outcome === 'W') points.w++;
+    else if (r.stableford_outcome === 'L') points.l++;
+    else points.h++;
+    if (r.gross_outcome === 'W') gross.w++;
+    else if (r.gross_outcome === 'L') gross.l++;
+    else gross.h++;
+  }
+  return {
+    points,
+    gross,
+    lastFive: deduped
+      .slice(0, 5)
+      .map((r) => (r.stableford_outcome === 'T' ? 'H' : r.stableford_outcome)),
+  };
 }
 
 /**
@@ -71,6 +109,7 @@ function toGround(rounds: SharedRoundResult[], serverCount?: number): SharedGrou
     count: serverCount ?? deduped.length,
     lastCourseName: deduped[0].course_name ?? null,
     lastPlayDate: deduped[0].play_date ?? null,
+    record: headToHead(deduped),
   };
 }
 

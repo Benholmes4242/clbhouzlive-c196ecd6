@@ -24,7 +24,10 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSharedGroundOne } from '@/hooks/messaging/useSharedGround';
 import { useMessagesStagePhoto } from '@/hooks/messaging/useMessagesStagePhoto';
 import { SharedGroundStrip } from './SharedGroundStrip';
+import { HeadToHeadCard } from './HeadToHeadCard';
 import { PlayingOffRail } from './PlayingOffRail';
+import { compareRouteFor } from '@/components/friend-sheet/useMemberTapResolver';
+import { formatDayMonthShortGB } from '@/i18n/format';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
 import '@/features/messaging-dark/messages-dark.css';
 
@@ -416,9 +419,10 @@ const ThreadV2Page: React.FC = () => {
               />
               <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
                 <div className="flex items-center gap-1.5 min-w-0">
+                  {/* MS1 §2 — the thread name is 17px/600. */}
                   <span
                     className="truncate"
-                    style={{ color: INK, fontSize: 16, fontWeight: 600, lineHeight: '19px', letterSpacing: '-0.012em' }}
+                    style={{ color: INK, fontSize: 17, fontWeight: 600, lineHeight: '20px', letterSpacing: '-0.012em' }}
                   >
                     {header.name}
                   </span>
@@ -426,13 +430,19 @@ const ThreadV2Page: React.FC = () => {
                     <BadgeCheck size={13} style={{ color: SUB, flexShrink: 0 }} />
                   ) : null}
                 </div>
-                {/* Rounds played together beats "last seen" every time. */}
-                <span style={{ ...MT.CONTEXT }}>
+                {/* MS1 §2 — "{count} rounds together · last {d MMM}". */}
+                <span style={{ ...MT.CONTEXT, fontSize: 12.5, fontWeight: 500, letterSpacing: 0 }}>
                   {ground.count > 0
-                    ? t('messaging:header.roundsTogether', {
-                        count: ground.count,
-                        defaultValue: `${ground.count} rounds together`,
-                      })
+                    ? ground.lastPlayDate
+                      ? t('messaging:header.roundsTogetherLast', {
+                          count: ground.count,
+                          date: formatDayMonthShortGB(ground.lastPlayDate),
+                          defaultValue: `${ground.count} rounds together · last ${formatDayMonthShortGB(ground.lastPlayDate)}`,
+                        })
+                      : t('messaging:header.roundsTogether', {
+                          count: ground.count,
+                          defaultValue: `${ground.count} rounds together`,
+                        })
                     : header.secondary}
                 </span>
               </div>
@@ -457,9 +467,20 @@ const ThreadV2Page: React.FC = () => {
             </button>
           </div>
 
-          {/* §4.1 NO SHARED ROUNDS -> NO STRIP. */}
+          {/* §4.1 NO SHARED ROUNDS -> NO STRIP. MS1 §3 — the head-to-head card
+              sits above the strip; the thread already has a compare route via
+              ConversationSettingsSheet, so the card opens it. */}
           {isDirect ? (
-            <SharedGroundStrip ground={ground} rivalFirstName={rivalFirstName} />
+            <>
+              {ground.record ? (
+                <HeadToHeadCard
+                  record={ground.record}
+                  rivalFirstName={rivalFirstName}
+                  onOpen={rivalUserId ? () => navigate(compareRouteFor(rivalUserId)) : undefined}
+                />
+              ) : null}
+              <SharedGroundStrip ground={ground} rivalFirstName={rivalFirstName} />
+            </>
           ) : (detail?.type ?? conv?.type) === 'group' ? (
             <PlayingOffRail
               members={(detail?.members ?? []) as ConversationMember[]}
