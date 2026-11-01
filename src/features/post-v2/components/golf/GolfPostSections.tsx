@@ -14,6 +14,9 @@ import {
   holeLine, isHoleTag, shotTagLabel, VISIBILITY_OPTIONS,
   type PostVisibility, type ShotTag, type WithCandidate,
 } from '../../lib/golfPostRules';
+import { PostCoursePhoto } from '../PostFlowChrome';
+import { useCourseSearchPlaceholder } from '../../hooks/useCourseCatalogueCount';
+import '@/styles/post-flow.css';
 import { GP, chipStyle, labelAction, sectionLabel } from './golfPageTokens';
 
 /* ---- MEDIA STRIP + HOLE LINE ------------------------------------------- */
@@ -103,12 +106,13 @@ export function WhereSection({ course, reason, changing, recent, onChange, onCan
   course: StageCourse | null; reason: string | null; changing: boolean; recent: StageCourse[];
   onChange: () => void; onCancel: () => void; onUntag: () => void; onSearch: () => void; onPick: (c: StageCourse) => void;
 }) {
+  const placeholder = useCourseSearchPlaceholder();
   if (course && !changing) {
     return (
       <div data-testid="where-section" style={{ margin: '18px 16px 0' }}>
         <div style={sectionLabel}><span>Where</span><button type="button" style={labelAction} onClick={onChange}>Change</button></div>
         <div data-testid="where-card" style={{ display: 'flex', alignItems: 'center', gap: 12, background: GP.panel, border: `1px solid ${GP.line}`, borderRadius: 16, padding: 12 }}>
-          <span style={{ width: 44, height: 44, borderRadius: 10, flex: 'none', background: 'linear-gradient(150deg,#5f8f4e,#21401f 60%,#a8c48b)' }} />
+          <PostCoursePhoto course={course} size={44} />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>{course.name}</div>
             <div data-testid="where-reason" style={{ fontSize: 12, color: GP.mute, marginTop: 3, display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -126,7 +130,7 @@ export function WhereSection({ course, reason, changing, recent, onChange, onCan
     <div data-testid="where-section" style={{ margin: '18px 16px 0' }}>
       <div style={sectionLabel}><span>Where</span>{course && <button type="button" style={labelAction} onClick={onCancel}>Cancel</button>}</div>
       <button type="button" onClick={onSearch} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, height: 46, borderRadius: 14, background: GP.panel, border: `1px solid ${GP.line}`, padding: '0 14px', color: GP.dim, fontSize: 14.5, marginBottom: 10, cursor: 'pointer' }}>
-        <Search size={16} color={GP.dim} strokeWidth={2.4} />Search 23,000 courses
+        <Search size={16} color={GP.dim} strokeWidth={2.4} />{placeholder}
       </button>
       {recent.length > 0 && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

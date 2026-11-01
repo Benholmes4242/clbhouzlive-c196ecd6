@@ -14,7 +14,7 @@ import {
 import { deleteDraft } from '@/services/drafts/draftService';
 import { uploadManager } from './UploadManager';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { formatWeekdayMonthDayShortUS, formatTimeHmUS } from '@/i18n/format';
+import { format } from 'date-fns';
 
 
 const TOAST_DURATION_ERROR_MS = 4000;
@@ -32,7 +32,7 @@ export function UploadToastsBridge() {
       if (evt.isScheduled) {
         toast.success('Post scheduled', {
           description: evt.scheduledAt
-            ? `Goes live ${formatWeekdayMonthDayShortUS(new Date(evt.scheduledAt))} at ${formatTimeHmUS(new Date(evt.scheduledAt))}`
+            ? `Goes live ${format(new Date(evt.scheduledAt), 'EEE d MMM')} at ${format(new Date(evt.scheduledAt), 'HH:mm')}`
             : undefined,
 
           duration: 4000,
@@ -41,7 +41,7 @@ export function UploadToastsBridge() {
         toast.success('Your review is live', { duration: 4000 });
         triggerHaptic('success');
       } else {
-        toast.success('Your moment is live.', { duration: 4000 });
+        toast.success('Your post is live.', { duration: 4000 });
         triggerHaptic('success');
       }
 

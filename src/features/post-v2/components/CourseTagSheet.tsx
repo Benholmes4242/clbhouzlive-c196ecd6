@@ -1,438 +1,69 @@
-// CourseTagSheet - multi-select course tagger.
-//
-// BRIEF_CHOOSE_A_COURSE §C — NO CATALOGUE FIGURE IN COPY. This sheet claimed
-// "40,000+ courses" in three places; golf_courses holds 23,296 rows, so the
-// claim was wrong by 17,000 and checkable by any member. The copy now says
-// "Search any course", which is true and cannot go stale. The courses directory
-// sheet already quotes no figure ("Search all courses"), so the two agree.
-// The FIRST selected course is the primary tag (posts.course_id). All
-// selected courses (incl. the first) are written to posts.tagged_course_ids
-// in selection order. Selected courses pin to the top of the list.
-
+/** Signed-off post tagger. Ordered selections are never pinned or re-ranked;
+ * each row keeps its source metadata. Single-select still commits on tap. */
 import { useEffect, useMemo, useState } from 'react';
-import { Check, MapPin, Search, X } from 'lucide-react';
+import { Check, Search } from 'lucide-react';
+import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import type { ActiveActor } from '@/types/actor';
 import BottomSheet from './BottomSheet';
+import { PostCoursePhoto, PostFlowHeader } from './PostFlowChrome';
 import type { StageCourse } from '../hooks/useStageComposer';
 import { usePopularCourses } from '../hooks/usePopularCourses';
+import { usePostCourseGroups } from '../hooks/usePostCourseGroups';
+import { useCourseSearchPlaceholder } from '../hooks/useCourseCatalogueCount';
+import { dedupeGroups, nameParts, rankCourseSearch, type CourseTagRow } from '../lib/postFlowRules';
 import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
-import { CT } from '@/features/_shared/composerTokens';
-import { MEMBER_CELL } from '@/lib/tokens/surfaces';
-
-
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  /** Called with the FULL selection (ordered). Empty array clears the tag. */
-  onDone: (selected: StageCourse[]) => void;
-  /** Current selection to prime the sheet. */
-  selected: StageCourse[];
-  userId?: string | null;
-  title?: string;
-  /** 'single' commits on tap and closes. Default 'multi' for post tagging. */
-  selectionMode?: 'single' | 'multi';
-}
-
-interface Row extends StageCourse {
-  sub_country?: string | null;
-  isHomeClub?: boolean;
-  /** Optional so nothing that builds a Row without it breaks. */
-  thumbnail_image?: string | null;
-}
-
-export default function CourseTagSheet({
-  open,
-  onClose,
-  onDone,
-  selected,
-  userId,
-  title = 'Tag a course',
-  selectionMode = 'multi',
-}: Props) {
-  const isSingle = selectionMode === 'single';
-  const [q, setQ] = useState('');
-  const [rows, setRows] = useState<Row[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [fieldFocused, setFieldFocused] = useState(false);
-  const [draft, setDraft] = useState<StageCourse[]>(selected);
-  const { rows: popular, loaded: popularLoaded } = usePopularCourses(open);
-  const keyboardHeight = useKeyboardHeight();
-
-  // Re-prime the draft whenever the sheet opens.
-  useEffect(() => {
-    if (open) setDraft(selected);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    let cancelled = false;
-    const t = setTimeout(async () => {
-      if (q.trim().length === 0) { setRows([]); setSearching(false); return; }
+import '@/styles/post-flow.css';
+interface Props { open:boolean; onClose:()=>void; onDone:(selected:StageCourse[])=>void; selected:StageCourse[]; userId?:string|null; actor?:ActiveActor|null; title?:string; selectionMode?:'single'|'multi' }
+export default function CourseTagSheet({open,onClose,onDone,selected,userId,actor,title,selectionMode='multi'}:Props) {
+  const {t}=useTranslation('composer');
+  const [q,setQ]=useState(''); const [rows,setRows]=useState<CourseTagRow[]>([]); const [searching,setSearching]=useState(false);
+  const [draft,setDraft]=useState<StageCourse[]>(selected);
+  const {rows:popular,loaded}=usePopularCourses(open); const groups=usePostCourseGroups(open,userId,actor);
+  const placeholder=useCourseSearchPlaceholder(open); const keyboardHeight=useKeyboardHeight();
+  useEffect(()=>{if(open){setDraft(selected);setQ('');}},[open]);
+  useEffect(()=>{
+    if(!open)return;let live=true;
+    const timer=setTimeout(async()=>{
+      if(!q.trim()){setRows([]);setSearching(false);return;}
       setSearching(true);
-      const { data } = await supabase
-        .from('golf_courses')
-        .select('id, name, country, sub_country, thumbnail_image')
-        .ilike('name', `%${q.trim()}%`)
-        .limit(20);
-      if (cancelled) return;
-      setRows((data ?? []) as Row[]);
-      setSearching(false);
-    }, 180);
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [q, open]);
-
-  const showPopular = q.trim().length === 0;
-  const selectedIds = useMemo(() => new Set(draft.map(d => d.id)), [draft]);
-
-  const toggle = (c: StageCourse) => {
-    if (isSingle) { onDone([c]); onClose(); return; }
-    setDraft((cur) => {
-      if (cur.some((r) => r.id === c.id)) return cur.filter((r) => r.id !== c.id);
-      return [...cur, c];
-    });
-  };
-
-  const handleDone = () => {
-    onDone(draft);
-    onClose();
-  };
-
-  // Build pinned + filtered lists so already-selected rows show first.
-  const popularPinned = useMemo(() => {
-    const pinned = draft.filter((d) => popular.some((p) => p.id === d.id));
-    const rest = popular.filter((p) => !selectedIds.has(p.id));
-    return { pinned, rest };
-  }, [popular, draft, selectedIds]);
-
-  const searchPinned = useMemo(() => {
-    const pinned = draft.filter((d) => rows.some((p) => p.id === d.id));
-    const rest = rows.filter((p) => !selectedIds.has(p.id));
-    return { pinned, rest };
-  }, [rows, draft, selectedIds]);
-
-  return (
-    <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight} fixedHeight="60dvh">
-      {/* Fixed-height column: header + search stay pinned, list scrolls internally. */}
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-        {/* Eyebrow header — mirrors the shared @mention sheet chrome */}
-        <div
-          style={{
-            flex: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '4px 16px 8px',
-            borderBottom: '1px solid rgba(255,255,255,0.10)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: CT.secondary,
-            }}
-          >
-            <MapPin size={11} strokeWidth={2.25} color={CT.amber} />
-            {title ?? 'Tag a course'}
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 4 }}
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/*
-          CANONICAL DARK FIELD TREATMENT (MICRO_BRIEF_CANONICAL_FIELD_TREATMENT):
-          radius 14, height 44, REST bg 6% / border 10%, FOCUS bg 10% /
-          border 28%, text 96%, placeholder 38%. Both channels step on focus.
-        */}
-        <div style={{ flex: 'none', padding: '8px 16px 12px' }}>
-          <div style={{ position: 'relative' }}>
-            <Search
-              size={16}
-              color={CT.secondary}
-              style={{ position: 'absolute', top: 14, left: 12 }}
-            />
-            <input
-              autoFocus
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onFocus={() => setFieldFocused(true)}
-              onBlur={() => setFieldFocused(false)}
-              placeholder="Search any course"
-              className="placeholder:text-[rgba(255,255,255,0.38)]"
-              style={{
-                width: '100%',
-                height: 44,
-                padding: '0 12px 0 34px',
-                border: `1px solid ${fieldFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
-                borderRadius: 14,
-                fontSize: 14,
-                outline: 'none',
-                background: fieldFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
-                color: 'rgba(255,255,255,0.96)',
-                transition: 'background 140ms ease, border-color 140ms ease',
-              }}
-            />
-          </div>
-        </div>
-
-
-        {/* Scrolling list region — the only part that grows */}
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', padding: '0 14px' }}>
-          {showPopular ? (
-            <>
-              {!isSingle && popularPinned.pinned.length > 0 && (
-                <>
-                  <SectionLabel>SELECTED</SectionLabel>
-                  {popularPinned.pinned.map((r) => (
-                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null, thumbnail_image: r.thumbnail ?? null }} selected onToggle={toggle} />
-                  ))}
-                </>
-              )}
-              {/* Selected courses NOT in popular list — pin them at the very top */}
-              {!isSingle && draft.filter((d) => !popular.some((p) => p.id === d.id)).length > 0 && popularPinned.pinned.length === 0 && (
-                <>
-                  <SectionLabel>SELECTED</SectionLabel>
-                  {draft.filter((d) => !popular.some((p) => p.id === d.id)).map((r) => (
-                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null, thumbnail_image: r.thumbnail ?? null }} selected onToggle={toggle} />
-                  ))}
-                </>
-              )}
-              {!popularLoaded ? (
-                <>
-                  <CourseRowSkeleton />
-                  <CourseRowSkeleton />
-                  <CourseRowSkeleton />
-                </>
-              ) : popular.length > 0 ? (
-                <>
-                  <SectionLabel>POPULAR ON CLBHOUZ</SectionLabel>
-                  {popularPinned.rest.map(r => (
-                    <CourseRow
-                      key={r.id}
-                      row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country, thumbnail_image: r.thumbnail_image }}
-                      selected={selectedIds.has(r.id)}
-                      onToggle={toggle}
-                    />
-                  ))}
-                  <div style={{ padding: '16px', fontSize: 12, color: CT.secondary }}>
-                    Can't see it? Search any course above.
-                  </div>
-                </>
-              ) : (
-                <div style={{ padding: '32px 16px', fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
-                  Search any course above.
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {!isSingle && searchPinned.pinned.length > 0 && (
-                <>
-                  <SectionLabel>SELECTED</SectionLabel>
-                  {searchPinned.pinned.map((r) => (
-                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null, thumbnail_image: r.thumbnail ?? (r as Row).thumbnail_image ?? null }} selected onToggle={toggle} />
-                  ))}
-                  <SectionLabel>RESULTS</SectionLabel>
-                </>
-              )}
-              {searching && searchPinned.rest.length === 0 ? (
-                <>
-                  <CourseRowSkeleton />
-                  <CourseRowSkeleton />
-                  <CourseRowSkeleton />
-                </>
-              ) : searchPinned.rest.length === 0 && searchPinned.pinned.length === 0 ? (
-                <div style={{ padding: '32px 16px', fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
-                  No courses found for "{q.trim()}"
-                </div>
-              ) : (
-                searchPinned.rest.map(r => (
-                  <CourseRow
-                    key={r.id}
-                    row={r}
-                    selected={selectedIds.has(r.id)}
-                    onToggle={toggle}
-                  />
-                ))
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Done bar — amber; disabled at zero selections still calls onDone
-            to preserve the "clears the tag" behaviour when the user tapped
-            all their picks off, matching today's untag path. */}
-        {!isSingle && (
-          <div
-            style={{
-              flexShrink: 0,
-              padding: '10px 16px max(env(safe-area-inset-bottom), 10px)',
-              borderTop: '1px solid rgba(255,255,255,0.10)',
-              background: CT.cardBg,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
-          >
-            <div style={{ flex: 1, fontSize: 12, color: CT.secondary }}>
-              {draft.length === 0 ? 'No courses selected' : `${draft.length} selected`}
-            </div>
-            <button
-              onClick={handleDone}
-              style={{
-                background: CT.amber,
-                color: CT.dark,
-                border: 0,
-                borderRadius: 999,
-                padding: '8px 18px',
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: 'pointer',
-                opacity: draft.length === 0 && selected.length === 0 ? 0.5 : 1,
-              }}
-            >
-              Done
-            </button>
-          </div>
-        )}
+      const escaped=q.trim().replace(/[\\%_,().]/g,' ');
+      try {
+        const {data,error}=await supabase.from('golf_courses').select('id, name, country, sub_country, thumbnail_image')
+          .or(`name.ilike.%${escaped}%,sub_country.ilike.%${escaped}%`).limit(50);
+        if(live)setRows(error?[]:(data??[]).map(c=>({id:c.id,name:c.name,country:c.country,sub_country:c.sub_country,thumbnail:c.thumbnail_image})));
+      }catch{if(live)setRows([]);}finally{if(live)setSearching(false);}
+    },180);return()=>{live=false;clearTimeout(timer);};
+  },[q,open]);
+  const played=useMemo(()=>new Map(groups.member.flatMap(c=>c.playedAt?[[c.id,c.playedAt] as const]:[])),[groups.member]);
+  const idle=dedupeGroups([groups.club,groups.member,popular.map(c=>({...c,thumbnail:c.thumbnail_image}))]);
+  const results=rankCourseSearch(rows,q,played); const selectedIds=new Set(draft.map(c=>c.id));
+  const toggle=(c:StageCourse)=>{if(selectionMode==='single'){onDone([c]);onClose();return;}setDraft(cur=>cur.some(x=>x.id===c.id)?cur.filter(x=>x.id!==c.id):[...cur,c]);};
+  const labels=['yourClub','yourCourses','popular'];
+  return <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight} fixedHeight="85dvh" surfaceClassName="pf-sheet">
+    <div className="pf" style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
+      <PostFlowHeader title={title??t('postFlow.tagCourse')} onClose={onClose}/>
+      <div className="pf-search"><Search size={16}/><input autoFocus aria-label={t('postFlow.searchAny')} value={q} onChange={e=>setQ(e.target.value)} placeholder={placeholder}/></div>
+      <div className="pf-scroll">
+        {!q.trim()?idle.map((group,i)=>group.length>0?<section key={labels[i]} data-course-group={labels[i]}><div className="pf-group"><span>{t(`postFlow.${labels[i]}`)}</span><span>{i===1?t('postFlow.fromRounds'):''}</span></div>{group.map(c=><CourseRow key={c.id} row={c} selected={selectedIds.has(c.id)} query="" onToggle={toggle}/>)}</section>:null):<section data-course-group="results">
+          <div className="pf-group"><span>{t('postFlow.results')}</span><span>{t('postFlow.resultCount',{count:results.length})}</span></div>
+          {results.map(c=><CourseRow key={c.id} row={c} selected={selectedIds.has(c.id)} query={q} onToggle={toggle}/>)}
+          {searching&&<div role="status" className="pf-empty">{t('postFlow.searching')}</div>}
+          <div className="pf-empty">{t('postFlow.searchHint')}</div>
+        </section>}
+        {!q.trim()&&!loaded&&<div role="status" className="pf-empty">{t('postFlow.searching')}</div>}
       </div>
-    </BottomSheet>
-  );
-}
-
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    // 10px side padding inside the list's 14px gutter keeps the label text
-    // aligned with the row text (14 + 10 = 24px, same as a row's own padding).
-    <div style={{ padding: '10px 10px 6px', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: CT.secondary }}>
-      {children}
+      {selectionMode!=='single'&&<div className="pf-footer"><span className="pf-selected"><b>{t('postFlow.selected',{count:draft.length})}</b>{draft[0]&&<> · {draft[0].name}</>}</span><Button variant="ghost" className="pf-pill" onClick={()=>{onDone(draft);onClose();}}>{t('postFlow.done')}</Button></div>}
     </div>
-  );
+  </BottomSheet>;
 }
-
-function CourseRowSkeleton() {
-  return (
-    <div
-      style={{
-        marginBottom: 8,
-        padding: 10,
-        background: CT.cardBg,
-        border: `1px solid ${CT.hairline}`,
-        borderRadius: 16,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 11,
-      }}
-    >
-      <div className="clb-shimmer-dark" style={{ width: 44, height: 44, borderRadius: 11, backgroundColor: MEMBER_CELL, flex: 'none' }} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div className="clb-shimmer-dark" style={{ height: 12, width: '55%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
-        <div className="clb-shimmer-dark" style={{ height: 10, width: '30%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
-      </div>
-    </div>
-  );
-}
-
-
-
-function CourseRow({
-  row,
-  onToggle,
-  selected = false,
-}: {
-  row: Row;
-  onToggle: (c: StageCourse) => void;
-  selected?: boolean;
-}) {
-  const locality = row.isHomeClub ? 'Your home club' : (row.sub_country || row.country || null);
-  return (
-    <button
-      type="button"
-      onClick={() => onToggle({
-        id: row.id,
-        name: row.name,
-        country: row.country ?? null,
-        thumbnail: row.thumbnail_image ?? null,
-      })}
-      aria-pressed={selected}
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 11,
-        marginBottom: 8,
-        padding: 10,
-        textAlign: 'left',
-        /* The composer's chosen-row fill and border. One step above the
-           card ground, so a chosen row reads as chosen without a second
-           border weight. */
-        background: selected ? '#222A34' : CT.cardBg,
-        border: `1px solid ${selected ? CT.ink : CT.hairline}`,
-        borderRadius: 16,
-        cursor: 'pointer',
-      }}
-    >
-      <span
-        style={{
-          width: 44,
-          height: 44,
-          flexShrink: 0,
-          borderRadius: 11,
-          overflow: 'hidden',
-          background: 'linear-gradient(145deg,#2F5A3C,#16281D)',
-        }}
-      >
-        {row.thumbnail_image && (
-          <img
-            src={row.thumbnail_image}
-            alt=""
-            loading="lazy"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        )}
-      </span>
-      <span style={{ flex: 1, minWidth: 0 }}>
-        <span
-          style={{
-            display: 'block',
-            fontSize: 15,
-            fontWeight: 700,
-            letterSpacing: '-0.01em',
-            color: CT.ink,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {row.name}
-        </span>
-        {locality && (
-          <span
-            style={{
-              display: 'block',
-              marginTop: 2,
-              fontSize: 12,
-              color: row.isHomeClub ? CT.amber : CT.muted,
-              fontWeight: row.isHomeClub ? 700 : 400,
-            }}
-          >
-            {locality}
-          </span>
-        )}
-      </span>
-      {selected && <Check size={17} strokeWidth={3} color={CT.success} style={{ flexShrink: 0 }} />}
-    </button>
-  );
+function CourseRow({row,selected,query,onToggle}:{row:CourseTagRow;selected:boolean;query:string;onToggle:(c:StageCourse)=>void}) {
+  const {t}=useTranslation('composer');const locality=row.isHomeClub?t('postFlow.homeClub'):[row.sub_country,row.country].filter(Boolean).join(' · ');
+  return <Button variant="ghost" className="pf-course-row" data-course={row.id} aria-pressed={selected} onClick={()=>onToggle(row)}>
+    <PostCoursePhoto course={row}/><span style={{minWidth:0}}><span className="pf-course-name">{nameParts(row.name,query).map((p,i)=>p.hit?<mark key={i}>{p.text}</mark>:<span key={i}>{p.text}</span>)}</span>
+      <span className="pf-course-sub">{row.playedAt&&<><span className="pf-played">{t('postFlow.played',{date:format(new Date(`${row.playedAt.slice(0,10)}T12:00:00`),'d MMM')})}</span>{locality?' · ':''}</>}{locality}</span></span>
+    <span className={`pf-check ${selected?'pf-check-on':''}`}>{selected&&<Check size={13} strokeWidth={3.4}/>}</span>
+  </Button>;
 }
