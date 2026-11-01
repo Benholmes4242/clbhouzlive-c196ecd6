@@ -97,7 +97,8 @@ function pageStories(): TourStory[] {
     4, 6,              // last week (Sat 24, Thu 22)
     10, 20,            // earlier October
     40,                // September 2026
-    400, 500,          // 2025
+    400, 500,          // September 2025, June 2025
+    600,               // March 2025 — held back by the first archive page
   ];
   archiveDates.forEach((daysBack, i) => {
     list.push(story(`arc-${i}`, {
@@ -260,9 +261,13 @@ describe('News page Your players', () => {
     const section = screen.getByTestId('tour-news-your-players');
     expect(section).toHaveTextContent('YOUR PLAYERS');
     expect(section).toHaveTextContent('3 stories');
-    expect(screen.getByLabelText('Read Headline y1')).toBeTruthy();
-    expect(screen.getByLabelText('Read Headline y3')).toBeTruthy();
-    expect(screen.queryByLabelText('Read Headline y4')).toBeNull();
+    // The section holds exactly the three newest matches; y4 and the 40-day
+    // story fall through to the ordinary shapes below.
+    const yourRows = section.nextElementSibling;
+    expect(yourRows?.querySelectorAll('[data-news-shape="row"]')).toHaveLength(3);
+    expect(yourRows).toHaveTextContent('Headline y1');
+    expect(yourRows).toHaveTextContent('Headline y3');
+    expect(yourRows).not.toHaveTextContent('Headline y4');
   });
   it('uses the singular count for one story', () => {
     h.follows = new Set(['p1']);
@@ -294,7 +299,7 @@ describe('News page Top stories and archive', () => {
   it('groups the archive This week / Last week / month / month with year, weekday under the day', () => {
     mountPage();
     const headings = [...document.querySelectorAll('.tour-news-grp')].map((el) => el.textContent);
-    expect(headings).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025']);
+    expect(headings).toEqual(['THIS WEEK', 'LAST WEEK', 'OCTOBER', 'SEPTEMBER', 'SEPTEMBER 2025', 'JUNE 2025']);
     const firstRow = document.querySelector('.tour-news-ar');
     expect(firstRow?.querySelector('.tour-news-ar-date b')).toHaveTextContent('28');
     expect(firstRow?.querySelector('.tour-news-ar-date small')).toHaveTextContent('WED');
