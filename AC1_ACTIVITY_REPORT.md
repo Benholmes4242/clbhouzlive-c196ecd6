@@ -45,4 +45,4 @@ Latest automatic build log: **2026-11-01T19:07:54Z**, build OK.
 - Total: **5,458/5,458 across 520 files** — matches the 5,458/520 baseline; test count unchanged by AC1.1 (type-only edit). No pre-existing failures; none named because there are none.
 
 ## Unverified and protected scope
-Browser/computed-colour and signed-off geometry comparisons not performed after the stop; unit checks do not establish exact visual parity or pseudo-element colours. Real signed-in summary readback and scorecard flow remain unverified. No SQL, migrations, RPC/edge edits, feed_config, round_pool_cap, native or Median changes. AC2 batching and Records wording untouched.
+Browser/computed-colour and signed-off geometry comparisons not performed; unit checks do not establish exact visual parity or pseudo-element colours. Real signed-in summary readback and scorecard flow remain unverified. No SQL, migrations, RPC/edge edits, feed_config, round_pool_cap, native or Median changes. AC2 batching and Records wording untouched.
