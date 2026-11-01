@@ -104,8 +104,10 @@ export function golferReason(g: PersonSuggestion): Copy | null {
     case 'played_with': {
       const course = shortCourseName(g.reason_course_name ?? '');
       const when = shortDayMonth(g.reason_date);
-      const line = [course, when].filter(Boolean).join(', ');
-      return { key: 'findPeople.reason.playedWith', def: line || 'Played with you', vars: {} };
+      if (course && when) return { key: 'findPeople.reason.playedWith', def: '{{course}}, {{date}}', vars: { course, date: when } };
+      if (course) return { key: 'findPeople.reason.playedWithCourse', def: '{{course}}', vars: { course } };
+      if (when) return { key: 'findPeople.reason.playedWithDate', def: '{{date}}', vars: { date: when } };
+      return { key: 'findPeople.reason.playedWithFallback', def: 'Played with you' };
     }
     case 'reciprocal':
       return { key: 'findPeople.reason.reciprocal', def: 'Follows you' };
@@ -137,20 +139,26 @@ export function businessReason(
   categoryLabel: string,
 ): Copy | null {
   const cat = categoryLabel;
+  const city = b.city ?? '';
   switch (b.reason_type) {
     case 'your_club':
       if (tab === 'suggested') {
-        return { key: 'findPeople.bizReason.yourClubSuggested', def: `Your club · ${cat}`, vars: {} };
+        return { key: 'findPeople.bizReason.yourClubSuggested', def: 'Your club · {{category}}', vars: { category: cat } };
       }
-      return { key: 'findPeople.bizReason.yourClub', def: [cat, b.city ?? ''].filter(Boolean).join(' · '), vars: {} };
+      return city
+        ? { key: 'findPeople.bizReason.yourClubCity', def: '{{category}} · {{city}}', vars: { category: cat, city } }
+        : { key: 'findPeople.bizReason.categoryOnly', def: '{{category}}', vars: { category: cat } };
     case 'near_club':
     case 'coach': {
       const miles = formatMiles(b.distance_miles);
-      const line = miles ? [cat, `${miles} miles`].filter(Boolean).join(' · ') : cat;
-      return { key: 'findPeople.bizReason.nearClub', def: line, vars: {} };
+      return miles
+        ? { key: 'findPeople.bizReason.nearClubMiles', def: '{{category}} · {{miles}} miles', vars: { category: cat, miles } }
+        : { key: 'findPeople.bizReason.categoryOnly', def: '{{category}}', vars: { category: cat } };
     }
     case 'popular':
-      return { key: 'findPeople.bizReason.popular', def: [cat, b.city ?? ''].filter(Boolean).join(' · '), vars: {} };
+      return city
+        ? { key: 'findPeople.bizReason.popularCity', def: '{{category}} · {{city}}', vars: { category: cat, city } }
+        : { key: 'findPeople.bizReason.categoryOnly', def: '{{category}}', vars: { category: cat } };
     default:
       return null;
   }
