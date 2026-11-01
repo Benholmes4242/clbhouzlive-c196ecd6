@@ -13,6 +13,8 @@ import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { IMMERSIVE_FEED_CANVAS, INK_ON_LIGHT, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { RoundShareCardView, CourseShareCardView } from './ShareCards';
+import type { RoundShareCard } from '@/hooks/messaging/useRoundShareCards';
 
 /**
  * BRIEF_MESSAGES_DARK §6 — AMBER IS NARROWED TO MATCH ECHO. The member's own
@@ -39,6 +41,8 @@ interface Props {
   isLastOfRun: boolean;
   showTicks: boolean;
   onRetry?: (clientId: string) => void;
+  /** MS3 §4 — card data for a round_share message; absent renders the body. */
+  roundShareCard?: RoundShareCard;
 }
 
 function formatTime(iso: string): string {
@@ -81,6 +85,7 @@ export const MessageBubble: React.FC<Props> = ({
   isLastOfRun,
   showTicks,
   onRetry,
+  roundShareCard,
 }) => {
   const { t } = useTranslation('messaging');
   const navigate = useNavigate();
