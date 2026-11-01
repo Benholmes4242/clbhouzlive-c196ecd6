@@ -223,8 +223,10 @@ describe('sheet rendering', () => {
     expect(screen.getByText('Where you score best')).toBeTruthy();
     expect(screen.getByText('Where it bites')).toBeTruthy();
     fireEvent.click(screen.getByText('Where you score best'));
-    const cardButton = screen.getByRole('button', { name: /West Kent/ });
-    expect(cardButton.getAttribute('aria-expanded')).toBe('true');
+    const cardButton = screen
+      .getAllByRole('button', { name: /West Kent/ })
+      .find((b) => b.hasAttribute('aria-expanded'));
+    expect(cardButton?.getAttribute('aria-expanded')).toBe('true');
   });
 
   it('hides the tiles when fewer than two courses qualify', () => {
@@ -304,7 +306,7 @@ describe('sheet rendering', () => {
     expect(without.some((i) => i.style.background.includes('255, 210') || i.style.background.includes('#FFD200'))).toBe(false);
   });
 
-  it('a course with no hole data keeps tap-to-navigate with a chevron and a dim dash', () => {
+  it('a course with no hole data keeps tap-to-navigate with a chevron and a dim dash', async () => {
     const nav = vi.fn();
     state.courses = [
       course({
