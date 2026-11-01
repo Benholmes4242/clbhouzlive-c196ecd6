@@ -1,19 +1,10 @@
 /**
- * timelineUtils — shared date/month helpers for schedule-v2.
+ * timelineUtils — shared date/week helpers for schedule-v2.
  *
  * Deduped from useSeasonTimeline.ts and useMergedSchedule.ts, which carried
- * byte-identical copies. Month labels are locale-driven (formatMonthYearLong)
- * rather than a hardcoded English array.
+ * byte-identical copies. Weeks run Monday→Sunday (BRIEF_TOUR_SCHEDULE_REBUILT
+ * §3); the old month bucketing is gone.
  */
-import { formatMonthYearLong } from '@/i18n/format';
-
-export function monthKey(iso: string): string {
-  return iso.slice(0, 7); // yyyy-MM
-}
-
-export function monthLabelFromKey(key: string): string {
-  return formatMonthYearLong(new Date(`${key}-01T12:00:00Z`)).toUpperCase();
-}
 
 export function todayNoonMs(): number {
   const d = new Date();
