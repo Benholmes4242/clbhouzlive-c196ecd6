@@ -1,5 +1,5 @@
 /**
- * useComingUp — Overview V4 upcoming rail. Next 4 upcoming tournaments
+ * useComingUp — Overview upcoming selection. One event-catalogue read;
  * for the given tour, including days_away and defending champion. Majors
  * from other tours also surface for 'pga'.
  */
@@ -20,6 +20,17 @@ export interface ComingUpRow {
   end_date: string;
   venue: string | null;
   purse: number | null;
+  winning_share?: number | null;
+  venue_par?: number | null;
+  venue_yardage?: number | null;
+  event_type?: string | null;
+  golf_course_id?: string | null;
+  currency?: string | null;
+  venue_name?: string | null;
+  venue_course_name?: string | null;
+  venue_city?: string | null;
+  venue_state?: string | null;
+  venue_country?: string | null;
   /**
    * FIELD SIZE HAS NO SOURCE IN THE FEED. sr_tournaments carries no field/entry
    * count and raw_data has no such key on scheduled events, so this is always
@@ -49,8 +60,8 @@ export function useComingUp(tour: TourId | null, limit = 12) {
         .from('sr_tournaments')
         .select(`
           id, name, start_date, end_date,
-          venue_course_name, venue_name, venue_city, venue_country,
-          purse, defending_champion,
+          venue_course_name, venue_name, venue_city, venue_state, venue_country,
+          purse, winning_share, venue_par, venue_yardage, event_type, golf_course_id, currency, defending_champion,
           season:sr_seasons(tour_name)
         `)
         .in('status', ['scheduled', 'created'])
@@ -76,10 +87,21 @@ export function useComingUp(tour: TourId | null, limit = 12) {
         start_date: r.start_date,
         end_date: r.end_date,
         purse: r.purse ?? null,
+        winning_share: r.winning_share ?? null,
+        venue_par: r.venue_par ?? null,
+        venue_yardage: r.venue_yardage ?? null,
+        event_type: r.event_type ?? null,
+        golf_course_id: r.golf_course_id ?? null,
+        currency: r.currency ?? null,
+        venue_name: r.venue_name ?? null,
+        venue_course_name: r.venue_course_name ?? null,
+        venue_city: r.venue_city ?? null,
+        venue_state: r.venue_state ?? null,
+        venue_country: r.venue_country ?? null,
         field_size: null,
         // CLUB FIRST, COURSE AFTER (see venueLabel.ts). Was course-first, which
         // rendered "Course No. 3" with no club for Presidents Cup.
-        venue: formatVenueLabel(r.venue_name, r.venue_course_name) || [r.venue_city, r.venue_country].filter(Boolean).join(', ') || null,
+        venue: [formatVenueLabel(r.venue_name, r.venue_course_name), [r.venue_city, r.venue_state || r.venue_country].filter(Boolean).join(', ')].filter(Boolean).filter((part, index, parts) => index === 0 || part?.toLowerCase() !== parts[index - 1]?.toLowerCase()).join(' · ') || null,
         days_away: Math.max(0, Math.ceil((new Date(r.start_date).getTime() - now) / DAY)),
         defending_champion: r.defending_champion ?? null,
         isMajor: isMajor(r.name),

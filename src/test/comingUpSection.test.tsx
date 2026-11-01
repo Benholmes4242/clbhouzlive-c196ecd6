@@ -1,0 +1,43 @@
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { describe,it,expect,vi,afterEach,beforeEach } from 'vitest';
+import { MemoryRouter, useLocation } from 'react-router-dom';
+import { I18nextProvider } from 'react-i18next';
+import i18next from 'i18next';
+import en from '../../public/locales/en/tourhub.json';
+import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
+import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
+const state=vi.hoisted(()=>({rows:[] as any[],photos:new Map<string,string>(),own:undefined as Map<string,{best:number,rounds:number}>|undefined,last:null as any}));
+vi.mock('@/features/tourhub/overview/data/useComingUp',()=>({useComingUp:()=>({data:state.rows})}));
+vi.mock('@/features/tourhub/hooks/useBatchCourseImages',()=>({useBatchCourseImages:()=>({data:state.photos})}));
+vi.mock('@/features/tourhub/hooks/useTournamentLastYearTop4',()=>({useTournamentLastYearTop4:()=>({data:state.last})}));
+vi.mock('@/features/tourhub/overview/data/useComingUpOwnRounds',()=>({useComingUpOwnRounds:()=>state.own}));
+const i18n=i18next.createInstance();void i18n.init({lng:'en',fallbackLng:'en',initAsync:false,resources:{en:{tourhub:en}}});
+const row={id:'next',name:'Next Event',start_date:'2026-11-19',end_date:'2026-11-22',venue:'Club · West Course · Surrey',venue_name:'Club',venue_course_name:'West Course',golf_course_id:'c',tour_slug:'lpga',purse:11000000,currency:'USD',defending_champion:null,isMajor:false,isPlayoff:false,days_away:18,field_size:null} satisfies ComingUpRow;
+function Location(){return <output data-testid="location">{useLocation().pathname}{useLocation().search}</output>}
+function mount(){return render(<I18nextProvider i18n={i18n}><MemoryRouter><ComingUp tour="lpga"/><Location/></MemoryRouter></I18nextProvider>)}
+beforeEach(()=>{state.rows=[row];state.photos=new Map();state.own=undefined;state.last=null;vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));});
+afterEach(()=>{cleanup();vi.useRealTimers();});
+describe('Coming up event surfaces',()=>{
+ it('empty selection hides the whole section',()=>{state.rows=[];const {container}=mount();expect(container.querySelector('section')).toBeNull();});
+ it('photo layout uses resolved course image',()=>{state.photos.set('next','/course.jpg');const {container}=mount();expect(container.querySelector('.coming-photo img')).toHaveAttribute('src','/course.jpg');expect(container.querySelector('.coming-plain')).toBeNull();});
+ it('no photo has plain name block and no photo reservation',()=>{const {container}=mount();expect(container.querySelector('.coming-plain')).not.toBeNull();expect(container.querySelector('.coming-photo')).toBeNull();});
+ it('facts omit unknown cells',()=>{const {container}=mount();expect(container.querySelectorAll('.coming-fact')).toHaveLength(1);});
+ it('no facts omits strip',()=>{state.rows=[{...row,purse:null}];const {container}=mount();expect(container.querySelector('.coming-facts')).toBeNull();});
+ it('known purse winning share and par all render',()=>{state.rows=[{...row,winning_share:4000000,venue_par:72,venue_yardage:7002}];const {container}=mount();expect(container.querySelectorAll('.coming-fact')).toHaveLength(3);});
+ it('no champion omits defending line',()=>{const {container}=mount();expect(container.querySelector('.coming-last')).toBeNull();});
+ it('champion with no history keeps defending-only line',()=>{state.rows=[{...row,defending_champion:'Jeeno Thitikul'}];const {container}=mount();expect(container.querySelector('.coming-last')).not.toBeNull();expect(container.querySelectorAll('.coming-last-text b')).toHaveLength(1);});
+ it('matching champion history exposes score beside surname',()=>{state.rows=[{...row,defending_champion:'Jeeno Thitikul'}];state.last=[{rank:'1',name:'Jeeno Thitikul',score:'−22'},{rank:'2',name:'Other Player',score:'−21'}];const {container}=mount();expect(container.querySelectorAll('.coming-last-text b')).toHaveLength(2);});
+ it('member plural rounds renders best gross',()=>{state.own=new Map([['c',{rounds:3,best:84}]]);const {container}=mount();expect(container.querySelector('.coming-yours strong')).toHaveTextContent('84');});
+ it('member singular round renders best gross',()=>{state.own=new Map([['c',{rounds:1,best:80}]]);const {container}=mount();expect(container.querySelector('.coming-yours strong')).toHaveTextContent('80');});
+ it('guest has no played line',()=>{const {container}=mount();expect(container.querySelector('.coming-yours')).toBeNull();});
+ it('member with no rounds at linked course has no played line',()=>{state.own=new Map();const {container}=mount();expect(container.querySelector('.coming-yours')).toBeNull();});
+ it('five-event limit is next plus four rows',()=>{state.rows=Array.from({length:6},(_,i)=>({...row,id:`event${i}`,name:`Event${i}`}));const {container}=mount();expect(container.querySelectorAll('.coming-next')).toHaveLength(1);expect(container.querySelectorAll('.coming-row')).toHaveLength(4);expect(screen.queryByText('Event5')).toBeNull();});
+ it('exclusion applies before five-event cap',()=>{state.rows=[{...row,id:'other'},row];const {container}=render(<I18nextProvider i18n={i18n}><MemoryRouter><ComingUp tour="lpga" excludeId="other"/></MemoryRouter></I18nextProvider>);expect(container.querySelector('[data-coming-next]')).toHaveAttribute('data-coming-next','next');});
+ it('groups month headings without repeating month',()=>{state.rows=[row,{...row,id:'dec',start_date:'2026-12-11'},{...row,id:'jan',start_date:'2027-01-21'},{...row,id:'jan2',start_date:'2027-01-28'}];const {container}=mount();expect(container.querySelectorAll('.coming-month')).toHaveLength(2);});
+ it('row weekday and month are separate spans',()=>{state.rows=[row,{...row,id:'jan',start_date:'2027-01-21'}];const {container}=mount();expect(container.querySelectorAll('.coming-week span')).toHaveLength(2);});
+ it('played course list prefix only appears for own course',()=>{state.rows=[row,{...row,id:'later'}];state.own=new Map([['c',{rounds:1,best:84}]]);const {container}=mount();expect(container.querySelector('.coming-played-prefix')).not.toBeNull();});
+ it('unknown row purse omitted',()=>{state.rows=[row,{...row,id:'later',purse:null}];const {container}=mount();expect(container.querySelector('.coming-purse')).toBeNull();});
+ it('preview retains existing tournament destination',()=>{mount();fireEvent.click(screen.getByRole('button',{name:'Event preview'}));expect(screen.getByTestId('location')).toHaveTextContent('/tourhub/tournament/next');});
+ it('list tap retains existing tournament destination',()=>{state.rows=[row,{...row,id:'later',name:'Later Event'}];const {container}=mount();const button=container.querySelector('.coming-row');if(!button)throw Error('Missing row');fireEvent.click(button);expect(screen.getByTestId('location')).toHaveTextContent('/tourhub/tournament/later');});
+ it('Full schedule retains tour scoping',()=>{mount();fireEvent.click(screen.getByRole('button',{name:/Full schedule/}));expect(screen.getByTestId('location')).toHaveTextContent('/tourhub?tab=schedule&tour=lpga');});
+});
