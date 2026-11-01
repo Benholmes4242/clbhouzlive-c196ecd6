@@ -26,6 +26,7 @@ interface Props {
    * is - only the rgb moves. Defaults to amber so existing callers do not.
    */
   accent?: string;
+  neutralAccent?: boolean;
   /** Provide to make the overlay tap-anywhere-to-close. */
   onTapClose?: () => void;
   /** When true, a muted "TAP ANYWHERE TO CLOSE" hint renders at the bottom. */
@@ -37,6 +38,7 @@ interface Props {
 
 export function ImmersiveSuccessShell({
   accent = CT.amber,
+  neutralAccent = false,
   onTapClose,
   showTapHint,
   padded = true,
@@ -69,7 +71,7 @@ export function ImmersiveSuccessShell({
         inset: 0,
         zIndex: 12500,
         background:
-          `radial-gradient(ellipse 120% 90% at 50% 16%, rgba(${rgb},0.14) 0%, rgba(${rgb},0.05) 32%, ${CT.shellBg} 62%), ${CT.shellBg}`,
+          neutralAccent ? `var(--pf-neutral-accent), var(--pf-canvas)` : `radial-gradient(ellipse 120% 90% at 50% 16%, rgba(${rgb},0.14) 0%, rgba(${rgb},0.05) 32%, ${CT.shellBg} 62%), ${CT.shellBg}`,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         color: 'rgba(255,255,255,0.96)',

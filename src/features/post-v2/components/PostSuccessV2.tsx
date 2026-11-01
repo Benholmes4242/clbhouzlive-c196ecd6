@@ -18,11 +18,16 @@
 //     object URLs (see PostCard) instead of borrowing the composer's.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Clock, AlertTriangle, MapPin } from 'lucide-react';
+import { Clock, AlertTriangle, MapPin, Users, Image as ImageIcon } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import type { SubmitResult } from '../hooks/usePostSubmit';
-import { formatSchedule } from '../lib/formatSchedule';
+import { formatScheduleTime } from '../lib/formatSchedule';
+import { datedSchedule, scheduleDayKey } from '../lib/postFlowRules';
+import { Button } from '@/components/ui/button';
+import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
+import { buildDraftFeedPost } from './golf/PostPreview';
+import '@/styles/post-flow.css';
 import { extractPoster, getCachedPoster } from '../lib/videoPoster';
 import { PlayGlyph } from './SlideThumb';
 import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
@@ -34,200 +39,81 @@ import { SURFACE } from '@/lib/tokens/surface';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 
-const AMBER = CT.amber;
-/** On-dark green: the shell's accent, the LIVE eyebrow. */
+/** Green remains the existing successful-state accent; neutral is opt-in so
+ * review callers of ImmersiveSuccessShell retain their existing defaults. */
 const GREEN_ON_DARK = CT.successOnDark;
 const NEUTRAL = 'rgba(255,255,255,0.5)';
-
-interface Props {
-  result: SubmitResult;
-  onDone: () => void;
-}
-
-export default function PostSuccessV2({ result, onDone }: Props) {
-  const { t } = useTranslation(['composer', 'common']);
-
-  // Auto-dismiss the terminal (non-uploading) variants so edit-save success
-  // closes itself if the user does not tap. Tap remains the immediate path.
-  const isTerminal = result.kind === 'scheduled' || result.kind === 'published';
+interface Props { result: SubmitResult; onDone: () => void; onViewPost?: () => void; onOpenScheduled?: () => void }
+export default function PostSuccessV2(props: Props) {
+  const hasCard = !!(props.result.mediaPreviews?.length || props.result.caption?.trim() || props.result.actorName);
   useEffect(() => {
-    if (!isTerminal) return;
-    const id = window.setTimeout(() => onDone(), 2200);
+    if (props.result.kind !== 'published' || hasCard) return;
+    const id = window.setTimeout(props.onDone, 2200);
     return () => window.clearTimeout(id);
-  }, [isTerminal, onDone]);
-
-  if (result.kind === 'uploading') {
-    return <UploadingState result={result} onDone={onDone} />;
-  }
-
-  if (result.kind === 'scheduled') {
-    const label = result.scheduledAt
-      ? t('composer:success.scheduledFor', { when: formatSchedule(new Date(result.scheduledAt)) })
-      : t('composer:success.scheduled');
-    return (
-      <ImmersiveSuccessShell onTapClose={onDone} showTapHint>
-        <Column>
-          <GlyphTile accent={AMBER}>
-            <Clock size={44} color={AMBER} strokeWidth={2.25} />
-          </GlyphTile>
-          <Label>{label}</Label>
-          <Copy>{t('composer:success.scheduledBody')}</Copy>
-        </Column>
-      </ImmersiveSuccessShell>
-    );
-  }
-
-  // published (text-only, and the edit-save path)
-  return <PostedScreen result={result} onDone={onDone} />;
+  }, [props.result.kind, hasCard, props.onDone]);
+  if (props.result.kind === 'uploading') return <UploadingState {...props} />;
+  if (props.result.kind === 'scheduled') return <ScheduledScreen {...props} />;
+  return <PostedScreen {...props} />;
 }
-
-/** POSTED — the same card, resolved. Green accent, no scrims, LIVE eyebrow. */
-function PostedScreen({ result, onDone }: Props) {
-  const { t } = useTranslation(['composer', 'common']);
-  // The edit-save path arrives with no card facts at all — there is nothing to
-  // render as a card, so it keeps the plain confirmation.
-  const hasCard = !!(result.mediaPreviews?.length || (result.caption ?? '').trim() || result.actorName);
-  if (!hasCard) {
-    return (
-      <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone} showTapHint>
-        <Column>
-          <Label>{t('composer:success.posted')}</Label>
-          <Copy>{t('composer:success.postedBody')}</Copy>
-        </Column>
-      </ImmersiveSuccessShell>
-    );
-  }
-  return (
-    <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone} showTapHint>
-      <Column>
-        <PostCard result={result} completedFiles={result.mediaPreviews?.length ?? 0} resolved />
-        <Status
-          eyebrow={t('composer:success.liveKicker')}
-          eyebrowColor={GREEN_ON_DARK}
-          headline={t('composer:success.posted')}
-        />
-      </Column>
-    </ImmersiveSuccessShell>
-  );
+function PostedScreen({result,onDone,onViewPost}:Props) {
+  const {t}=useTranslation(['composer','common']);
+  const {handleShare}=useClubhouseShare(undefined);
+  const hasCard=!!(result.mediaPreviews?.length || result.caption?.trim() || result.actorName);
+  if(!hasCard) return <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone} showTapHint><Column><Label>{t('composer:success.posted')}</Label><Copy>{t('composer:success.postedBody')}</Copy></Column></ImmersiveSuccessShell>;
+  const names=(result.playedWithNames??[]).map(n=>n.trim().split(/\s+/)[0]).filter(Boolean);
+  const people=names.length===1?names[0]:names.length===2?t('composer:postFlow.twoNames',{first:names[0],second:names[1]}):names.length>2?t('composer:postFlow.otherNames',{first:names[0],count:names.length-1}):null;
+  const tags=result.holeTags??[];
+  const share=()=>{const post=buildDraftFeedPost({caption:result.caption??'',media:[],course:null,actor:{id:result.actorId??'',type:'personal',name:result.actorName??'',avatarUrl:result.actorAvatarUrl??null,username:null},userId:''});handleShare({...post,id:result.postId});};
+  const grouped=[...new Set(tags.map(tag=>tag.courseId))].map(id=>tags.filter(tag=>tag.courseId===id));
+  return <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone}>
+    <div className="pf pf-success"><PostCard result={result} completedFiles={result.mediaPreviews?.length??0} resolved/>
+      <div className="pf-kicker pf-live"><i className="pf-dot"/>{t('composer:postFlow.live')}</div><h2 className="pf-headline">{t('composer:success.posted')}</h2>
+      <div className="pf-facts">
+        {result.courseName&&<Fact icon={<MapPin size={13}/>}>{t('composer:postFlow.taggedAt')} <b>{result.courseName}</b></Fact>}
+        {people&&<Fact icon={<Users size={13}/>}><b>{people}</b> {t('composer:postFlow.notified')}</Fact>}
+        {tags.length===1?<Fact icon={<ImageIcon size={13}/>}><b>{t('composer:postFlow.holeShots',{count:1})}</b> {t('composer:postFlow.addedHole',{hole:tags[0].hole})}</Fact>:grouped.map(group=>group[0]?<Fact key={group[0].courseId} icon={<ImageIcon size={13}/>}><b>{t('composer:postFlow.holeShots',{count:group.length})}</b> {t('composer:postFlow.addedCourse',{course:group[0].courseName})}</Fact>:null)}
+      </div>
+      <div className="pf-actions"><Button variant="ghost" className="pf-pill pf-outline" onClick={e=>{e.stopPropagation();share();}}>{t('composer:postFlow.shareLink')}</Button><Button variant="ghost" className="pf-pill" onClick={e=>{e.stopPropagation();onViewPost?.();}}>{t('composer:postFlow.viewPost')}</Button></div>
+      <div className="pf-hint">{t('composer:postFlow.tapElsewhere')}</div>
+    </div>
+  </ImmersiveSuccessShell>;
 }
-
-type Phase = 'running' | 'complete' | 'failed';
-type UploadStage = UploadJobSnapshot['stage'];
-
-function UploadingState({ result, onDone }: Props) {
-  const { t } = useTranslation(['composer', 'common']);
-  const isUploadingKind = result.kind === 'uploading';
-  const jobId = isUploadingKind ? (result.jobId ?? null) : null;
-  const initial = jobId ? getJobSnapshot(jobId) : null;
-  const [completed, setCompleted] = useState<number>(initial?.completedFiles ?? 0);
-  const [total, setTotal] = useState<number>(initial?.totalFiles ?? (result.mediaPreviews?.length ?? 0));
-  const [phase, setPhase] = useState<Phase>((initial?.phase as Phase) ?? 'running');
-  const [errorText, setErrorText] = useState<string | null>(initial?.error ?? null);
-  const [progress, setProgress] = useState<number>(initial?.overallProgress ?? 0);
-  const [stage, setStage] = useState<UploadStage>(initial?.stage ?? 'preparing');
-  const [bytesUploaded, setBytesUploaded] = useState<number>(initial?.bytesUploaded ?? 0);
-  const [bytesTotal, setBytesTotal] = useState<number>(initial?.bytesTotal ?? 0);
-
-  useEffect(() => {
-    if (!jobId) return;
-    return subscribeToJob(jobId, (s) => {
-      setCompleted(s.completedFiles);
-      setTotal(s.totalFiles);
-      setPhase(s.phase as Phase);
-      setProgress(s.overallProgress);
-      setStage(s.stage);
-      setBytesUploaded(s.bytesUploaded);
-      setBytesTotal(s.bytesTotal);
-      if (s.error) setErrorText(s.error);
-    });
-  }, [jobId]);
-
-  // Auto-dismiss shortly after completion so the user does not need to tap.
-  // Longer than the old 1200ms: the resolved card is now worth looking at.
-  useEffect(() => {
-    if (!isUploadingKind) return;
-    if (phase !== 'complete') return;
-    const id = window.setTimeout(() => onDone(), 2400);
-    return () => window.clearTimeout(id);
-  }, [isUploadingKind, phase, onDone]);
-
-  if (!isUploadingKind) return null;
-
-  const isScheduled = !!result.isScheduled;
-
-  if (phase === 'complete') {
-    // Scheduled keeps its own amber copy; posted becomes the green card.
-    if (isScheduled) {
-      return (
-        <ImmersiveSuccessShell onTapClose={onDone} showTapHint>
-          <Column>
-            <PostCard result={result} completedFiles={total} resolved />
-            <Status
-              eyebrow={t('composer:success.scheduled')}
-              headline={result.scheduledAt ? formatSchedule(new Date(result.scheduledAt)) : t('composer:success.scheduled')}
-              body={t('composer:success.scheduledBody')}
-            />
-          </Column>
-        </ImmersiveSuccessShell>
-      );
-    }
-    return <PostedScreen result={result} onDone={onDone} />;
-  }
-
-  if (phase === 'failed') {
-    const copy = errorText || t('composer:success.uploadFailedFallback');
-    return (
-      <ImmersiveSuccessShell onTapClose={onDone}>
-        <Column>
-          <GlyphTile accent={NEUTRAL} noGlow>
-            <AlertTriangle size={40} color="rgba(255,255,255,0.85)" strokeWidth={2.25} />
-          </GlyphTile>
-          <Label>{t('composer:success.uploadFailed')}</Label>
-          <Copy>{copy}</Copy>
-          <DonePill onClick={onDone} />
-        </Column>
-      </ImmersiveSuccessShell>
-    );
-  }
-
-  return (
-    <ImmersiveSuccessShell onTapClose={onDone}>
-      <Column>
-        <PostCard result={result} completedFiles={completed} />
-        <Status
-          eyebrow={honestEyebrow(total, completed, isScheduled, t)}
-          eyebrowColor={AMBER}
-          progress={isScheduled ? undefined : { pct: progress, stage, bytesUploaded, bytesTotal }}
-          headline={isScheduled ? t('composer:success.scheduled') : t('composer:success.posting')}
-          reassure
-          body={isScheduled && result.scheduledAt
-            ? t('composer:success.uploadingScheduledBody', { when: formatSchedule(new Date(result.scheduledAt)) })
-            : undefined}
-        />
-      </Column>
-    </ImmersiveSuccessShell>
-  );
+function Fact({icon,children}:{icon:React.ReactNode;children:React.ReactNode}){return <div className="pf-fact"><span className="pf-fact-icon">{icon}</span><span>{children}</span></div>;}
+function ScheduledScreen({result,onDone,onOpenScheduled}:Props){
+  const {t}=useTranslation('composer');const target=result.scheduledAt?new Date(result.scheduledAt):null;
+  const dayKey=target?scheduleDayKey(target,new Date()):null;
+  const day=target?(dayKey?t(`postFlow.${dayKey}`):datedSchedule(target)):'';
+  const isBest=target&&result.bestHour!=null&&target.getHours()===result.bestHour;
+  return <ImmersiveSuccessShell neutralAccent onTapClose={onDone}><div className="pf pf-success">
+    <PostCard result={result} completedFiles={result.mediaPreviews?.length??0} resolved mediaHeight={220}/>
+    <div className="pf-kicker"><Clock size={13}/>{t('postFlow.scheduled')}</div>
+    <h2 className="pf-headline">{target?t('postFlow.scheduledHeadline',{day,time:formatScheduleTime(target)}):t('success.scheduled')}</h2>
+    <div className="pf-copy">{isBest&&<>{t('postFlow.bestChosen')} </>}{t('postFlow.scheduledBody')}</div>
+    <div className="pf-actions"><Button variant="ghost" className="pf-pill pf-outline" onClick={e=>{e.stopPropagation();onOpenScheduled?.();}}>{t('postFlow.viewScheduled')}</Button><Button variant="ghost" className="pf-pill" onClick={e=>{e.stopPropagation();onDone();}}>{t('postFlow.done')}</Button></div>
+  </div></ImmersiveSuccessShell>;
 }
-
-/**
- * §2.3 - THE PROGRESS IS HONEST TO WHAT THE UPLOAD REPORTS.
- * A percentage was previously refused here because an image only ever reported
- * 50 then 100. That is fixed: uploadToCloudflareR2 now posts over XHR and
- * reports real bytes through xhr.upload's progress event, so the bar beneath
- * this eyebrow is a continuous byte figure. The eyebrow remains the ITEM
- * counter - a different fact, and both are now true:
- *   > 1 item  -> "UPLOADING · N OF M"  (items-completed, the honest figure)
- *   1 item    -> "UPLOADING"           (no "1 OF 1", no stuck percentage)
- */
-function honestEyebrow(
-  total: number,
-  completed: number,
-  isScheduled: boolean,
-  t: (k: string, o?: Record<string, unknown>) => string,
-): string {
-  const stem = isScheduled ? t('composer:success.scheduled') : t('composer:success.uploadingSimple');
-  if (total > 1) return `${stem} · ${Math.min(completed, total)} of ${total}`;
-  return stem;
+function UploadingState(props:Props){
+  const {result,onDone}=props;const {t}=useTranslation(['composer','common']);
+  const jobId=result.jobId??null;const [snapshot,setSnapshot]=useState<UploadJobSnapshot|null>(()=>jobId?getJobSnapshot(jobId):null);
+  useEffect(()=>{if(!jobId)return;return subscribeToJob(jobId,s=>setSnapshot({...s,savedHoleTags:s.savedHoleTags?[...s.savedHoleTags]:undefined}));},[jobId]);
+  if(snapshot?.phase==='complete'){
+    const confirmed={...result,holeTags:(snapshot.savedHoleTags??[]).flatMap(tag=>{const fact=result.holeTags?.find(f=>f.courseId===tag.courseId&&f.hole===tag.hole);return fact?[fact]:[];})};
+    return result.isScheduled?<ScheduledScreen {...props} result={confirmed}/>:<PostedScreen {...props} result={confirmed}/>;
+  }
+  if(snapshot?.phase==='failed') return <ImmersiveSuccessShell onTapClose={onDone}><Column><GlyphTile accent={NEUTRAL} noGlow><AlertTriangle size={40} color="rgba(255,255,255,0.85)" strokeWidth={2.25}/></GlyphTile><Label>{t('composer:success.uploadFailed')}</Label><Copy>{snapshot.error||t('composer:success.uploadFailedFallback')}</Copy><DonePill onClick={onDone}/></Column></ImmersiveSuccessShell>;
+  const items=result.mediaPreviews??[];
+  const item=items.find(m=>m.id===snapshot?.currentItemId)??items[snapshot?.completedFiles??0];
+  const photos=items.filter(m=>m.type==='image');const photoIndex=item?Math.max(1,photos.findIndex(m=>m.id===item.id)+1):1;
+  const stage=snapshot?.stage??'preparing';const pct=Math.max(0,Math.min(100,snapshot?.overallProgress??0));
+  const stageText=stage==='preparing'?t('composer:postFlow.preparing'):stage==='publishing'?t('composer:postFlow.processing'):item?.type==='video'?<>{t('composer:postFlow.uploadVideo')} · <b>{t('composer:postFlow.videoBytes',{done:Math.round((snapshot?.bytesUploaded??0)/1000000),total:Math.round((snapshot?.bytesTotal??0)/1000000)})}</b></>:t('composer:postFlow.uploadPhoto',{index:photoIndex,count:photos.length});
+  return <ImmersiveSuccessShell neutralAccent onTapClose={onDone}><div className="pf pf-success">
+    <PostCard result={result} completedFiles={snapshot?.completedFiles??0}/>
+    <div className="pf-kicker"><i className="pf-dot"/>{t('composer:postFlow.posting')}</div>
+    <div className="pf-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)}><div className="pf-progress-fill" style={{width:`${pct}%`}}/></div>
+    <div className="pf-stage pf-num"><span>{stageText}</span><span>{Math.round(pct)}%</span></div>
+    <div className="pf-copy">{t('composer:postFlow.background')}</div>
+    <div className="pf-actions pf-actions-single"><Button variant="ghost" className="pf-pill pf-outline" onClick={e=>{e.stopPropagation();onDone();}}>{t('composer:postFlow.keepUsing')}</Button></div>
+  </div></ImmersiveSuccessShell>;
 }
 
 // ---------- the card ----------
@@ -251,7 +137,7 @@ const CELL_GAP = 2;
  * `completedFiles` scrims the cells still in flight; `resolved` clears every
  * scrim regardless.
  */
-export function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; completedFiles: number; resolved?: boolean }) {
+export function PostCard({ result, completedFiles, resolved, mediaHeight }: { result: SubmitResult; completedFiles: number; resolved?: boolean; mediaHeight?: number }) {
   const owned = useOwnedPreviews(result.mediaPreviews);
   const [failed, setFailed] = useState<ReadonlySet<number>>(() => new Set());
   const previews = owned
@@ -278,7 +164,7 @@ export function PostCard({ result, completedFiles, resolved }: { result: SubmitR
       }}
     >
       {previews.length > 0 && (
-        <MediaMosaic previews={previews} completedFiles={completedFiles} resolved={resolved} onCellError={onCellError} />
+        <MediaMosaic previews={previews} completedFiles={completedFiles} resolved={resolved} mediaHeight={mediaHeight} onCellError={onCellError} />
       )}
 
       <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -370,11 +256,13 @@ function MediaMosaic({
   completedFiles,
   resolved,
   onCellError,
+  mediaHeight,
 }: {
   previews: OwnedPreview[];
   completedFiles: number;
   resolved?: boolean;
   onCellError: (key: number) => void;
+  mediaHeight?: number;
 }) {
   const n = previews.length;
   const visible = previews.slice(0, 3);
@@ -384,7 +272,7 @@ function MediaMosaic({
 
   if (n === 1) {
     return (
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: mediaHeight ? undefined : '4 / 5', height: mediaHeight, background: '#000' }}>
         <Cell item={visible[0]} live pending={pending(0)} onError={err(0)} />
       </div>
     );
@@ -392,7 +280,7 @@ function MediaMosaic({
 
   if (n === 2) {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: mediaHeight ? undefined : '4 / 5', height: mediaHeight, background: '#000' }}>
         {visible.map((m, i) => (
           <div key={m.key} style={{ position: 'relative', overflow: 'hidden' }}>
             <Cell item={m} pending={pending(i)} onError={err(i)} />
@@ -403,7 +291,7 @@ function MediaMosaic({
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: mediaHeight ? undefined : '4 / 5', height: mediaHeight, background: '#000' }}>
       <div style={{ gridRow: '1 / span 2', position: 'relative', overflow: 'hidden' }}>
         <Cell item={visible[0]} pending={pending(0)} onError={err(0)} />
       </div>
@@ -478,163 +366,6 @@ function Cell({ item, pending, onError, live = false }: { item: OwnedPreviewBase
         style={{ position: 'absolute', inset: 0, background: surfaceWithAlpha(COMPOSER_SHELL_SURFACE, 0.55), pointerEvents: 'none' }}
       />
     </>
-  );
-}
-
-// ---------- status beneath the card ----------
-
-interface ProgressFacts {
-  pct: number;
-  stage: UploadStage;
-  bytesUploaded: number;
-  bytesTotal: number;
-}
-
-function Status({
-  eyebrow,
-  eyebrowColor,
-  headline,
-  body,
-  reassure,
-  progress,
-}: {
-  eyebrow: string;
-  eyebrowColor?: string;
-  headline: string;
-  body?: string;
-  reassure?: boolean;
-  progress?: ProgressFacts;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <div style={{ width: '100%', maxWidth: CARD_MAX, display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left' }}>
-      <motion.div
-        initial={false}
-        animate={{ color: eyebrowColor ?? 'rgba(255,255,255,0.38)' }}
-        transition={reduce ? { duration: 0 } : { duration: 0.4 }}
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.19em',
-          textTransform: 'uppercase',
-        }}
-      >
-        {eyebrow}
-      </motion.div>
-      {progress && <ProgressBar {...progress} />}
-      <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: 'rgba(255,255,255,0.96)' }}>
-        {headline}
-      </div>
-      {reassure && <Reassurance />}
-      {body && <Body>{body}</Body>}
-    </div>
-  );
-}
-
-const INK_FAINT = 'rgba(255,255,255,0.45)';
-/** Rate EMA smoothing. An instantaneous sample is far too jittery on mobile. */
-const RATE_ALPHA = 0.3;
-/** No countdown before this much sampling, nor below MIN_ETA seconds. */
-const MIN_SAMPLE_MS = 1500;
-const MIN_ETA_S = 3;
-
-/**
- * BRIEF_UPLOAD_PROGRESS S3 - the byte figure beneath the eyebrow. Reads the
- * same job snapshot the eyebrow does; no new subscription or state source.
- */
-function ProgressBar({ pct, stage, bytesUploaded, bytesTotal }: ProgressFacts) {
-  const { t } = useTranslation('composer');
-  const reduce = useReducedMotion();
-  const startRef = useRef<number>(Date.now());
-  const lastRef = useRef<{ t: number; bytes: number } | null>(null);
-  const rateRef = useRef<number>(0);
-  const [eta, setEta] = useState<number | null>(null);
-  // Once a countdown is shown it must not vanish mid-upload.
-  const lockedRef = useRef(false);
-
-  useEffect(() => {
-    const now = Date.now();
-    const last = lastRef.current;
-    if (last && now > last.t) {
-      const inst = ((bytesUploaded - last.bytes) * 1000) / (now - last.t);
-      if (inst >= 0) {
-        rateRef.current = rateRef.current > 0
-          ? RATE_ALPHA * inst + (1 - RATE_ALPHA) * rateRef.current
-          : inst;
-      }
-    }
-    lastRef.current = { t: now, bytes: bytesUploaded };
-
-    const sampled = now - startRef.current >= MIN_SAMPLE_MS;
-    const remaining = Math.max(0, bytesTotal - bytesUploaded);
-    const secs = rateRef.current > 0 ? Math.round(remaining / rateRef.current) : 0;
-
-    if (stage !== 'uploading' && !lockedRef.current) { setEta(null); return; }
-    if (lockedRef.current) { setEta(Math.max(0, secs)); return; }
-    if (sampled && secs > MIN_ETA_S) { lockedRef.current = true; setEta(secs); }
-  }, [bytesUploaded, bytesTotal, stage]);
-
-  const stageWord = stage === 'preparing'
-    ? t('success.stagePreparing')
-    : stage === 'publishing'
-      ? t('success.stagePublishing')
-      : t('success.stageUploading');
-
-  const right = eta != null && eta > 0
-    ? (eta < 60
-        ? t('success.timeLeftSeconds', { n: eta })
-        : t('success.timeLeftMinutes', { m: Math.floor(eta / 60), s: eta % 60 }))
-    : `${Math.round(pct)}%`;
-
-  return (
-    <div style={{ width: '100%', marginTop: 2, marginBottom: 4 }}>
-      <div style={{ height: 3, borderRadius: 999, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
-        <div
-          style={{
-            height: '100%',
-            width: `${Math.max(0, Math.min(100, pct))}%`,
-            borderRadius: 999,
-            background: AMBER,
-            transition: reduce ? 'none' : 'width .18s linear',
-          }}
-        />
-      </div>
-      <div
-        style={{
-          marginTop: 5,
-          display: 'flex',
-          justifyContent: 'space-between',
-          fontSize: 11.5,
-          fontWeight: 600,
-          color: INK_FAINT,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        <span>{stageWord}</span>
-        <span>{right}</span>
-      </div>
-    </div>
-  );
-}
-
-/** §2.4 — the best thing on either screen, given real weight. */
-function Reassurance() {
-  const { t } = useTranslation('composer');
-  return (
-    <div style={{ marginTop: 4 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: '#FFFFFF' }}>{t('success.keepUsing')}</div>
-      <div style={{ fontSize: 11.5, fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
-        {t('success.keepUsingSub')}
-      </div>
-    </div>
-  );
-}
-
-function Body({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.45, color: 'rgba(255,255,255,0.55)' }}>
-      {children}
-    </div>
   );
 }
 

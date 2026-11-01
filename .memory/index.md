@@ -17,6 +17,7 @@
 - **Chevrons**: `›` means navigation only. Expand/toggle/sheet controls use a different affordance.
 
 ## Memories
+- [Signed-off post flow](mem://features/post-studio/post-flow-signed-off) — Shared live catalogue count, confirmed completion facts and exact post sheets/screens.
 - [Discover Course-Led](mem://features/discover/course-led-authority) — Two-tab Discover and featured Courses Played one-card rules
 - [Messaging System](mem://architecture/messaging/system-authority) — Styling for headers, bubbles, sheets, and DB rules
 - [Course Standards](mem://architecture/courses/core-standards) — GB&I standard, flag mappings, naming rules

@@ -6,6 +6,7 @@
 - [ ] Rebuild Schedule with actor-scoped best-hour read, native minute-precision time input and countdown; preserve publishing and scheduled list.
 - [x] Ben authorised StageComposer handoffs; share one cached head-only course count, round down to thousands, loading/error fallback Search any course.
 - [ ] Run focused checks and full shards against 5,380/516; reconcile changed assertions and inventory; capture reachable 390×844 comparisons and report Median/real-post limits.
+- [ ] STOP: focused100 executed/98 passed/2 failed; both new postFlowScreens cases hit usePostCourseGroups.ts:52:47 `TypeError: Cannot read properties of null (reading 'rows')` without userId. No fix/rerun after failure. Ben must authorise null guard; report POST_FLOW_STOP_REPORT.md. Expected inventory5429/518 (+49/+2) unverified; automatic build OK18:23:52Z. Member screens/Median proof unavailable external_unmanaged.
 
 ## Courses photo cards — top scrims and Latest holes kicker
 - [x] SCRIMS 2 authorises gradient-only test selector and explicit isolated media-0/scrim-1/text-2 stacks in Latest holes and Latest courses; shared player unchanged.

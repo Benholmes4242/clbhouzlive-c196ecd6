@@ -264,7 +264,7 @@ describe('wiring', () => {
     const tag = readFileSync('src/features/post-v2/components/CourseTagSheet.tsx', 'utf8');
     expect(tag).not.toContain('excludeReviewedForUserId');
     expect(tag).toContain('autoFocus');
-    expect(tag).toContain(".ilike('name', `%${q.trim()}%`)");
+    expect(tag).toContain(".or(`name.ilike.%${escaped}%,sub_country.ilike.%${escaped}%`).limit(50)");
     expect(readFileSync('src/features/post-v2/StageComposer.tsx', 'utf8')).toContain('CourseTagSheet');
   });
   it('analytics labels are registered', () => {

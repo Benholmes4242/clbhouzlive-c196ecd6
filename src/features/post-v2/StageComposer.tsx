@@ -18,6 +18,7 @@
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
+import { useNavigate } from 'react-router-dom';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Pencil, X } from 'lucide-react';
@@ -96,6 +97,8 @@ interface Props {
 export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId, initialActorType, initialActorId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
+  const navigate = useNavigate();
+  const [scheduleBestHour, setScheduleBestHour] = useState<number | null>(null);
 
   const { activeActor, selectActor, applyDraftActor } = useComposerActor({ initialActorType, initialActorId, ignoreInitial: !!editPostId || !!draftId });
   const composer = useStageComposer();
@@ -586,6 +589,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         authorUsername,
         visibility,
         playedWith: isPersonalActor ? withTagged.map((p) => p.id) : [],
+        playedWithPeople: isPersonalActor ? withTagged.map(p => ({ id:p.id, name:p.name })) : [],
+        bestHour: scheduleBestHour,
         shotTags: newShotTagJob(state.media),
       });
       submittedRef.current = true;
@@ -833,7 +838,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   if (success) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: POST_COMPOSER_Z }}>
-        <PostSuccessV2 result={success} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
+        <PostSuccessV2 result={success} onViewPost={() => { navigate(`/post/${success.postId}`); setSuccess(null); onPosted?.(); onClose(); }}
+          onOpenScheduled={() => setSheet('scheduled')} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
+        <ScheduledPostsSheetV2 open={sheet === 'scheduled'} onClose={() => setSheet(null)} userId={profile?.id} onCountChange={setScheduledCount} />
       </div>
     );
   }
@@ -888,6 +895,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
           onDone={(list) => chooseCourses(list)}
           selected={state.courses}
           userId={profile?.id ?? null}
+          actor={activeActor}
         />
         <ShotTagSheet
           open={tagIndex !== null}
@@ -914,6 +922,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
           open={sheet === 'schedule'}
           onClose={() => setSheet(null)}
           value={state.scheduledAt}
+          actor={activeActor}
+          onBestHour={setScheduleBestHour}
           onChange={setScheduledAt}
           onOpenScheduled={() => setSheet('scheduled')}
           scheduledCount={scheduledCount}
