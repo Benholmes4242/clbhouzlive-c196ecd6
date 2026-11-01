@@ -59,6 +59,9 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
 
 export interface TournamentImageInput {
   id: string;
+  /** Supplied catalogue link (including null) avoids a redundant tournament read.
+   * Omitted preserves every existing caller's resolver behavior. */
+  golf_course_id?: string | null;
   venue_name: string | null;
   venue_course_name?: string | null;
   venue_city?: string | null;
@@ -347,11 +350,15 @@ export function useBatchCourseImages(
       if (rows.length === 0) return result;
 
       // Step 1: linked course photo. A linked course with no photo falls through.
-      const { data: links } = await supabase
+      const missingLinks = rows.filter(t => t.golf_course_id === undefined);
+      const links = missingLinks.length ? (await supabase
         .from('sr_tournaments')
         .select('id, golf_course_id')
-        .in('id', rows.map((t) => t.id));
+        .in('id', missingLinks.map((t) => t.id))).data : [];
       const courseIdByTournament = new Map<string, string>();
+      for (const row of rows) {
+        if (row.golf_course_id) courseIdByTournament.set(row.id, row.golf_course_id);
+      }
       for (const l of (links ?? []) as Array<{ id: string; golf_course_id: string | null }>) {
         if (l.golf_course_id) courseIdByTournament.set(l.id, l.golf_course_id);
       }
