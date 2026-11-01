@@ -13,6 +13,8 @@ import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { IMMERSIVE_FEED_CANVAS, INK_ON_LIGHT, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { RoundShareCardView, CourseShareCardView } from './ShareCards';
+import type { RoundShareCard } from '@/hooks/messaging/useRoundShareCards';
 
 /**
  * BRIEF_MESSAGES_DARK §6 — AMBER IS NARROWED TO MATCH ECHO. The member's own
@@ -39,6 +41,8 @@ interface Props {
   isLastOfRun: boolean;
   showTicks: boolean;
   onRetry?: (clientId: string) => void;
+  /** MS3 §4 — card data for a round_share message; absent renders the body. */
+  roundShareCard?: RoundShareCard;
 }
 
 function formatTime(iso: string): string {
@@ -81,6 +85,7 @@ export const MessageBubble: React.FC<Props> = ({
   isLastOfRun,
   showTicks,
   onRetry,
+  roundShareCard,
 }) => {
   const { t } = useTranslation('messaging');
   const navigate = useNavigate();
@@ -347,6 +352,26 @@ export const MessageBubble: React.FC<Props> = ({
       </div>
   );
 
+  /* MS3 §4–§5 — share types draw a card when its data is there, else the body
+     in a normal bubble (read failed, round deleted, not the sender's, missing
+     course). */
+  const courseShareId =
+    message.type === 'course_share' && !isDeleted
+      ? ((message.metadata as { course_id?: unknown } | null)?.course_id as string | undefined)
+      : undefined;
+  const shareContent =
+    message.type === 'round_share' && !isDeleted && roundShareCard ? (
+      <RoundShareCardView
+        card={roundShareCard}
+        isOutgoing={isOutgoing}
+        senderUserId={message.sender_user_id ?? null}
+      />
+    ) : courseShareId ? (
+      <CourseShareCardView courseId={courseShareId} isOutgoing={isOutgoing} fallback={bubbleBody} />
+    ) : (
+      bubbleBody
+    );
+
   return (
     <div
       className="w-full flex flex-col"
@@ -383,10 +408,10 @@ export const MessageBubble: React.FC<Props> = ({
               />
             ) : null}
           </div>
-          {bubbleBody}
+          {shareContent}
         </div>
       ) : (
-        bubbleBody
+        shareContent
       )}
 
       {reactions.length > 0 && !isDeleted ? (

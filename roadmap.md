@@ -1422,3 +1422,8 @@
 - [x] fetchSharedRounds dedupes before counting; dedupeSharedRounds moved to lib/whs/api (re-exported from useSharedGround); toGround count always equals deduped rounds. friend_rivalry/friend-sheet HeadToHeadCard untouched (pairing-based, named in MS2_MESSAGES_REPORT.md).
 - [x] Four-ball card in NewConversationSheet (useLastFourball + shared runCreateGroup path); 2–3 people, hidden while loading/error/searching.
 - [x] New ms2MessagesFourball.test.tsx (14). Full sharded suite 5,555/5,555 across 524 files (+14/+1 vs 5,541/523); tsgo clean. Signed-in live RPC check unavailable.
+
+## MS3 — Messages: share a round, share a course
+- [x] + sheet (BizcSheet, 3 rows, Share a round hidden without connection/rounds), round picker (useAllScores, newest first, 30/page), course picker (useCourseSearch, 44px white-caret field); sends via existing msg_send with round_share/course_share types.
+- [x] Round card (useRoundShareCards, one RPC per page, AC1 strip colours, RoundDetailSheet on tap) and course card (by-id course read + useCourseListRanks, /courses/{id} on tap); both fall back to plain body bubbles. Inbox preview needed no change.
+- [x] Approved MS1 line-400 cast applied; tsc fully clean. New ms3MessagesShare.test.tsx (14). Full sharded suite 5,569/5,569 across 525 files (+14/+1 vs 5,555/524). Signed-in live verification unavailable.

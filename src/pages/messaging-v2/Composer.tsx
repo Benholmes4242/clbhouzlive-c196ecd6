@@ -1,10 +1,16 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, ArrowUp, X, Play } from 'lucide-react';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection, useAllScores } from '@/lib/whs/hooks';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
+import { ShareActionSheet, ShareRoundSheet, ShareCourseSheet } from './ShareSheets';
+import type { WhsScore } from '@/lib/whs/types';
+import type { CourseSearchResult } from '@/hooks/gam/useCourseSearch';
 
 
 /**
@@ -64,6 +70,17 @@ export const Composer: React.FC<Props> = ({
 
   const { send, sendMedia } = useSendMessage(conversationId);
   const [picking, setPicking] = useState(false);
+  // MS3 §1 — the + sheet and its two pickers.
+  const [sheet, setSheet] = useState<null | 'actions' | 'round' | 'course'>(null);
+  const { user } = useSupabaseSession();
+  const connection = useWhsConnection(user?.id);
+  const allScores = useAllScores(connection.data?.id);
+  const rounds = useMemo(
+    () => (allScores.data ?? []).filter((s) => s.adjusted_gross != null),
+    [allScores.data],
+  );
+  // MS3 §1 — Share a round hides with no WHS connection or no rounds.
+  const canShareRound = !!connection.data && rounds.length > 0;
   const keyboardHeight = useKeyboardHeight();
   const [text, setText] = useState(initialText ?? '');
   const [pending, setPending] = useState<PendingAttachment[]>([]);
@@ -192,6 +209,33 @@ export const Composer: React.FC<Props> = ({
     }
   }, [disabled, picking]);
 
+  /** MS3 §2 — tap sends through the existing msg_send path, then closes. */
+  const shareRound = useCallback(
+    (score: WhsScore) => {
+      const course = shortCourseName(score.course?.name ?? '');
+      void send({
+        body: `${score.adjusted_gross} at ${course}`,
+        type: 'round_share',
+        metadata: { whs_score_id: score.id },
+      });
+      setSheet(null);
+    },
+    [send],
+  );
+
+  /** MS3 §3 — the body is the course name; it becomes the inbox preview. */
+  const shareCourse = useCallback(
+    (course: CourseSearchResult) => {
+      void send({
+        body: course.name,
+        type: 'course_share',
+        metadata: { course_id: course.id },
+      });
+      setSheet(null);
+    },
+    [send],
+  );
+
   return (
     <div
       ref={containerRef}
@@ -292,7 +336,7 @@ export const Composer: React.FC<Props> = ({
         <button
           type="button"
           aria-label={t('a11y.attachImage')}
-          onClick={handleAttach}
+          onClick={() => setSheet('actions')}
           disabled={disabled || picking}
           className="active:opacity-60"
           style={{
@@ -361,6 +405,30 @@ export const Composer: React.FC<Props> = ({
           <ArrowUp size={18} />
         </button>
       </div>
+
+      {/* MS3 §1–§3 — the + sheet and its pickers. */}
+      <ShareActionSheet
+        open={sheet === 'actions'}
+        canShareRound={canShareRound}
+        onClose={() => setSheet(null)}
+        onPickMedia={() => {
+          setSheet(null);
+          void handleAttach();
+        }}
+        onShareRound={() => setSheet('round')}
+        onShareCourse={() => setSheet('course')}
+      />
+      <ShareRoundSheet
+        open={sheet === 'round'}
+        rounds={rounds}
+        onClose={() => setSheet(null)}
+        onPick={shareRound}
+      />
+      <ShareCourseSheet
+        open={sheet === 'course'}
+        onClose={() => setSheet(null)}
+        onPick={shareCourse}
+      />
     </div>
   );
 };

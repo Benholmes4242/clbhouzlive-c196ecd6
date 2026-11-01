@@ -11,6 +11,7 @@ export type MessageType =
   | 'system'
   | 'location'
   | 'course_share'
+  | 'round_share'
   | 'tee_time_share'
   | 'moment_share'
   /**
