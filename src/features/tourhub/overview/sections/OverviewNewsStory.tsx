@@ -16,8 +16,14 @@ export function NewsPlayerChip({ player }: { player: NewsPlayer }) {
 export function NewsDetails({ story, presentation, short }: { story: TourStory; presentation: NewsPresentation; short: boolean }) {
   const { t } = useTranslation('tourhub');
   const details = newsDetails(story, presentation.liveRound, short, presentation.now);
+  /* OPT-IN (BRIEF_TOUR_NEWS_PAGE §6): the News page appends like/comment
+   * counts, only above zero. The overview passes no engagement and renders
+   * exactly as before. */
+  const engagement = presentation.engagement;
   const parts = [presentation.liveRound != null ? <span className="overview-news-live"><i aria-hidden />{t('overview.news.liveRound', { round: presentation.liveRound })}</span> : null,
-    details.tour || null, details.minutes != null ? t(short ? 'overview.news.minutesShort' : 'overview.news.minutes', { count: details.minutes }) : null, details.age || null].filter(Boolean);
+    details.tour || null, details.minutes != null ? t(short ? 'overview.news.minutesShort' : 'overview.news.minutes', { count: details.minutes }) : null, details.age || null,
+    engagement && engagement.likes > 0 ? t('overview.news.likes', { count: engagement.likes }) : null,
+    engagement && engagement.comments > 0 ? t('overview.news.comments', { count: engagement.comments }) : null].filter(Boolean);
   return <div className="overview-news-details">{parts.map((part, index) => <Fragment key={index}>{index > 0 && <span className="overview-news-separator" aria-hidden>·</span>}<span>{part}</span></Fragment>)}</div>;
 }
 export function OverviewNewsStory({ story, onOpen, presentation, shape }: { story: TourStory; onOpen: () => void; presentation: NewsPresentation; shape: 'hero' | 'pair' | 'row' }) {

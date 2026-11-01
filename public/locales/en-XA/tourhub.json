@@ -100,7 +100,11 @@
       "minutes": "{{count}} min read",
       "minutesShort": "{{count}} min",
       "liveRound": "Live · R{{round}}",
-      "thru": "thru {{count}}"
+      "thru": "thru {{count}}",
+      "likes_one": "{{count}} like",
+      "likes_other": "{{count}} likes",
+      "comments_one": "{{count}} comment",
+      "comments_other": "{{count}} comments"
     },
     "alsoThisWeek": {
       "title": "[~~Álsó thís wéék~~]",
@@ -998,6 +1002,16 @@
     "strip": {
       "startsIn": "[STARTS IN]",
       "awaitingScores": "[AWAITING SCORES]"
+    },
+    "page": {
+      "yourPlayersCount_one": "{{count}} story",
+      "yourPlayersCount_other": "{{count}} stories",
+      "searchResults_one": "{{count}} STORY",
+      "searchResults_other": "{{count}} STORIES",
+      "searchEmpty": "No stories match \"{{query}}\".",
+      "searchPlaceholder": "Search stories",
+      "showOlder": "Show older stories",
+      "read": "✓ Read"
     }
   },
   "teeAlert": {

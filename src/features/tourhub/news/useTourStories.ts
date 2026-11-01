@@ -25,11 +25,14 @@ export interface TourStory {
   published_at: string | null;
 }
 
-const COLS =
+/** Exported as STORY_COLS for the News page's search read — one column list,
+ * never a second version. */
+export const STORY_COLS =
   'id, slug, kicker, headline, standfirst, body_blocks, image_url, image_credit, tour_slug, tournament_id, published_at';
+const COLS = STORY_COLS;
 
 /** Rows arrive with body_blocks as raw jsonb; narrow it once, here. */
-function toStory(row: any): TourStory {
+export function toStory(row: any): TourStory {
   return { ...row, body_blocks: parseStoryBlocks(row?.body_blocks) } as TourStory;
 }
 

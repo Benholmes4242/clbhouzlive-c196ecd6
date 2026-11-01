@@ -1,17 +1,29 @@
 /**
- * NewsTab — THE WIRE. The Tour Hub's editorial surface.
+ * NewsTab — TOUR NEWS, REBUILT (BRIEF_TOUR_NEWS_PAGE, signed-off mock).
  *
- * The newest story is PHOTO-LED (176px band); every other story is a row with a
- * 62px thumbnail right. A story with no image falls back to the row treatment
- * even in the lead slot, so the list simply carries no photo-led item that day.
+ * The page no longer runs its hero under the top chrome: a "Tour News" head
+ * with a search button, the shared new-since-last-visit line, a 440px lead
+ * hero with everything at the bottom, a still event card (deriveHeroState,
+ * never a marquee), Your players for members, Top stories, By-event chips
+ * named from one sr_tournaments read, and a grouped archive with read
+ * styling. Search covers EVERY published story server-side.
+ *
+ * REUSED, never forked: newsVisit.ts (a story seen on the overview is not
+ * new here), overviewNewsRules.ts (details line, players-in-the-story) and
+ * OverviewNewsStory.tsx for the pair/row shapes. StoryPage and the overview
+ * News section are untouched; StoryLeaderboardStrip stays for StoryPage.
  *
  * The tour lens comes from the island's picker via useTourLensFromPicker, and
  * the applied slug is published back up so the island label is a readout of
  * THIS list (BRIEF_TOUR_LABEL_FOLLOWS_THE_LIST).
+ *
+ * LeadStory / StoryRow below are legacy exports kept for their existing
+ * importers (amateur surfaces); the rebuilt page does not use them.
  */
-import React, { useMemo, useState } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
@@ -20,33 +32,37 @@ import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './Story
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import { HERO_CANON_WASH } from '../_shared/heroGradient';
 import { StoryRowEngagement } from '@/features/stories/StoryRowEngagement';
-import { StoryLeaderboardStrip } from './StoryLeaderboardStrip';
 import { useStoryEngagement, type StoryEngagement } from '@/features/stories/useStoryEngagement';
-import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
-import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
-import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useIsGuest } from '@/features/guest/useIsGuest';
+import { useTourPlayerFollows } from '../leaderboard/useTourPlayerFollows';
+import { isNewStory, markNewsOpened, useNewsVisit } from './newsVisit';
+import { useOverviewNewsData } from '../overview/sections/useOverviewNewsData';
+import { NewsDetails, OverviewNewsStory } from '../overview/sections/OverviewNewsStory';
+import { NEWS_TOUR_LABELS, type NewsPresentation } from '../overview/sections/overviewNewsRules';
+import { displayEventName } from '../overview/sections/ComingUp';
+import { readingMinutes } from './readingTime';
+import { NewsEventCard } from './NewsEventCard';
+import { useNewsEventNames, useNewsSearch } from './newsPageData';
 import {
-  FeatureStory,
-  GUTTER,
-  HeroStory,
-  KICKER,
-  LoadMoreRow,
-  StoryChipRail,
-  WireItem,
-  WorkhorseRow,
-} from './StoryShapes';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { r } from '@/lib/radius';
-import { scrollPageToTop } from '@/lib/getScrollParent';
+  archiveDay,
+  archiveGroups,
+  archiveMonthShort,
+  archiveWeekday,
+  assignTopStories,
+  eventChips,
+  EVENT_CHIP_MIN,
+  highlightSegments,
+  NEWS_PAGE_SIZE,
+  storyDay,
+  yourPlayersStories,
+} from './newsPageRules';
 
 import {
   FONT,
-  HAIRLINE_INK_10,
   INK,
   INK_FAINT,
   INK_MUTE,
-  TOUR_CANVAS,
   SLATE_100,
 } from '../_shared/tokens';
 
@@ -70,7 +86,7 @@ function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string 
       )}
       {/* A CHARACTER, not a sized div: it shares the text baseline and optical
           centre by construction, and inherits size and colour from the line. */}
-      {kicker && at && <span aria-hidden style={{ flexShrink: 0 }}>{'\u00b7'}</span>}
+      {kicker && at && <span aria-hidden style={{ flexShrink: 0 }}>{'·'}</span>}
       <span style={{ flexShrink: 0 }}><StoryRelativeTime at={at} /></span>
       {trailing && <span style={{ marginLeft: 'auto', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>{trailing}</span>}
     </div>
@@ -211,17 +227,39 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
   );
 }
 
-/**
- * THE WIRE INDEX (BRIEF_WIRE_REDESIGN). Four shapes, each denser than the last:
- * hero, two-up, rows, Latest. The shapes are the SHARED ones in StoryShapes —
- * the amateur index (NewsTabPage, mounted by the Discover NEWS tab and by the
- * /discover/news page) renders the same components at the same sizes.
- *
- * The tour lens stays CLIENT-SIDE (see useTourStories) and re-derives every
- * section, including which tournaments have enough stories for the rail.
- */
-const WIRE_PAGE_SIZE = 10;
+/** THE ARCHIVE ROW. Date block (day over weekday; day over MONTH in search
+ * results), headline, then the tour label (or the story's kicker when it has
+ * no tour) and the reading time — or "✓ Read" once opened. */
+function ArchiveRow({ story, read, query, onOpen }: { story: TourStory; read: boolean; query?: string; onOpen: () => void }) {
+  const { t } = useTranslation('tourhub');
+  const date = storyDay(story.published_at);
+  const label = NEWS_TOUR_LABELS[story.tour_slug ?? ''] || story.kicker?.trim() || '';
+  const headline = query
+    ? highlightSegments(story.headline, query).map((seg, i) => (seg.match ? <mark key={i}>{seg.text}</mark> : <Fragment key={i}>{seg.text}</Fragment>))
+    : story.headline;
+  return (
+    <button type="button" className={`tour-news-ar${read ? ' read' : ''}`} onClick={onOpen} aria-label={`Read ${story.headline}`}>
+      <div className="tour-news-ar-date">
+        <b className="tabular-nums">{date ? archiveDay(date) : ''}</b>
+        <small>{date ? (query ? archiveMonthShort(date) : archiveWeekday(date)) : ''}</small>
+      </div>
+      <div>
+        <h4>{headline}</h4>
+        <div className="tour-news-ar-meta">
+          {label && <span>{label}</span>}
+          {label && <span className="sep" aria-hidden>·</span>}
+          {read ? <span>{t('news.page.read', '✓ Read')}</span> : <span>{t('news.minRead', { n: readingMinutes(story.body_blocks) })}</span>}
+        </div>
+      </div>
+    </button>
+  );
+}
 
+/**
+ * THE REBUILT PAGE. Page size and paging of the archive are as today (ten a
+ * page, in place). Like and comment buttons are gone from this page — counts
+ * live in the details line; the story page keeps the actions.
+ */
 export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
@@ -237,156 +275,215 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   );
 
   const { stories: lensStories, isLoading } = useTourStories(tourLens);
+  const { user } = useSupabaseSession();
+  const guest = useIsGuest();
+  const viewerId = !guest ? user?.id : undefined;
 
-  const [tournament, setTournament] = useState<string | null>(null);
-  const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
-  const [commentsStoryId, setCommentsStoryId] = useState<string | null>(null);
-
-  /**
-   * BY TOURNAMENT, NOT BY TOUR — the tour is already the page's context. A null
-   * tournament_id has nothing to group under and never becomes a chip, though
-   * the story still appears in the page's other shapes. The chip's label is the
-   * story's own kicker: tour_stories carries no tournament name and reading one
-   * would mean a new query, which this brief forbids.
-   */
-  const tournaments = useMemo(() => {
-    const groups = new Map<string, { label: string; count: number }>();
-    for (const s of lensStories) {
-      if (!s.tournament_id) continue;
-      const existing = groups.get(s.tournament_id);
-      if (existing) existing.count += 1;
-      else groups.set(s.tournament_id, { label: (s.kicker || 'Tournament').trim(), count: 1 });
-    }
-    return [...groups.entries()]
-      .map(([key, v]) => ({ key, label: v.label, count: v.count }))
-      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-  }, [lensStories]);
-
-  // TWO CHIPS IS NOT A NAVIGATION: below three tournaments there is no rail,
-  // and any active selection is dropped with it.
-  const railChips = tournaments.length >= 3 ? tournaments : [];
-  const activeTournament = railChips.some((c) => c.key === tournament) ? tournament : null;
-
-  const stories = useMemo(
-    () => (activeTournament ? lensStories.filter((s) => s.tournament_id === activeTournament) : lensStories),
-    [lensStories, activeTournament],
-  );
-
-  const lead = stories[0];
-  const afterLead = stories.slice(1);
-  const twoUp = afterLead.length >= 2 ? afterLead.slice(0, 2) : [];
-  const afterTwoUp = afterLead.slice(twoUp.length);
-  const rows = afterTwoUp.slice(0, 3);
-  const wire = afterTwoUp.slice(3);
-  const visibleWire = wire.slice(0, wireLimit);
-
-  const open = (slug: string) => navigate(`/tour/news/${slug}`);
-
-  /* ONE READ PER WINDOW, never per row: every visible id in a single RPC. */
+  const { ref: visitRef, visit } = useNewsVisit(!isLoading && lensStories.length > 0);
   const { engagementFor } = useStoryEngagement(
     'tour_story',
     useMemo(() => lensStories.map((s) => s.id), [lensStories]),
   );
-  const { stateFor, toggle, unavailable, viewerId } = useContentReactions(
-    useMemo(() => lensStories.map((s) => ({ type: 'tour_story' as const, id: s.id })), [lensStories]),
-  );
-  const engagementAction = (story: TourStory, size = 13) => {
-    const like = stateFor('tour_story', story.id);
-    return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18 }}>
-        <ReactionAction
-          count={like.count}
-          reacted={like.mine}
-          onToggle={() => toggle('tour_story', story.id)}
-          label={like.mine ? 'Unlike story' : 'Like story'}
-          readOnly={!viewerId}
-          hidden={unavailable}
-          size={size}
-        />
-        {viewerId && <CommentAction count={engagementFor(story.id).commentCount} onOpen={() => setCommentsStoryId(story.id)} label="Open story comments" size={size} />}
-      </span>
-    );
+  const { ids: follows } = useTourPlayerFollows(lensStories.length > 0 && !!viewerId);
+  const presentations = useOverviewNewsData(lensStories);
+
+  const [eventFilter, setEventFilter] = useState<string | null>(null);
+  const [archiveLimit, setArchiveLimit] = useState(NEWS_PAGE_SIZE);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const search = useNewsSearch(query, tourLens);
+
+  const presentationFor = (story: TourStory): NewsPresentation => {
+    const base = presentations.get(story.id);
+    const engagement = engagementFor(story.id);
+    return {
+      isNew: isNewStory(story, visit),
+      liveRound: base?.liveRound ?? null,
+      players: base?.players ?? [],
+      followedPlayer: base?.followedPlayer,
+      engagement: { likes: engagement.likeCount, comments: engagement.commentCount },
+    };
   };
 
-  return (
-    <div style={{ fontFamily: FONT }}>
-      {isLoading ? (
-        <div>
-          <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />
-          <div style={{ padding: '0 14px' }}>
-            <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
-            <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
-          </div>
+  const open = (story: TourStory) => {
+    markNewsOpened(story.id);
+    navigate(`/tour/news/${story.slug}`);
+  };
+
+  const lead = lensStories[0];
+  const newCount = lensStories.filter((s) => isNewStory(s, visit)).length;
+  const yourPlayers = viewerId ? yourPlayersStories(lensStories, follows, lead?.id) : [];
+  const shownAbove = new Set<string>([lead?.id, ...yourPlayers.map((s) => s.id)].filter((id): id is string => !!id));
+  const { pair, rows } = assignTopStories(lensStories, shownAbove);
+  const topIds = new Set([...pair, ...rows].map((s) => s.id));
+  const archivePool = lensStories.filter((s) => !shownAbove.has(s.id) && !topIds.has(s.id));
+
+  const chips = eventChips(archivePool);
+  const railChips = chips.length >= EVENT_CHIP_MIN ? chips : [];
+  /* The chip names come from ONE sr_tournaments read, and only when the rail
+   * exists. Until the names resolve there is no rail — never a kicker label. */
+  const { data: eventNames } = useNewsEventNames(railChips.map((c) => c.id));
+  const activeEvent = railChips.some((c) => c.id === eventFilter) ? eventFilter : null;
+  const archiveStories = activeEvent ? archivePool.filter((s) => s.tournament_id === activeEvent) : archivePool;
+  const visibleArchive = archiveStories.slice(0, archiveLimit);
+  const groups = archiveGroups(visibleArchive);
+
+  if (isLoading) {
+    return (
+      <div style={{ fontFamily: FONT }}>
+        <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />
+        <div style={{ padding: '0 14px' }}>
+          <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
+          <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
         </div>
-      ) : !lead ? (
-        <div style={{ padding: immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE }}>
-          {t('news.empty', 'No stories on the wire yet.')}
+      </div>
+    );
+  }
+
+  if (!lead) {
+    return (
+      <div style={{ padding: immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE, fontFamily: FONT }}>
+        {t('news.empty', 'No stories on the wire yet.')}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={visitRef} className="tour-news" style={{ fontFamily: FONT }}>
+      {searchOpen ? (
+        <div className="tour-news-searchbar" data-testid="tour-news-searchbar">
+          <Search size={16} aria-hidden />
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('news.page.searchPlaceholder', 'Search stories')}
+            aria-label={t('news.page.searchPlaceholder', 'Search stories')}
+          />
+          <button type="button" className="tour-news-cancel" onClick={() => { setSearchOpen(false); setQuery(''); }}>
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <header className="tour-news-head">
+          <h1>Tour News</h1>
+          <button type="button" className="tour-news-search-btn" aria-label="Search stories" onClick={() => setSearchOpen(true)}>
+            <Search size={17} aria-hidden />
+          </button>
+        </header>
+      )}
+
+      {searchOpen ? (
+        <div>
+          {search.active && search.settled && (
+            search.results.length > 0 ? (
+              <>
+                <div className="tour-news-grp">{t('news.page.searchResults', { count: search.results.length })}</div>
+                {search.results.map((s) => (
+                  <ArchiveRow key={s.id} story={s} read={visit.openedIds.includes(s.id)} query={search.debounced} onOpen={() => open(s)} />
+                ))}
+              </>
+            ) : (
+              <div className="tour-news-search-empty">{t('news.page.searchEmpty', { query: search.debounced })}</div>
+            )
+          )}
         </div>
       ) : (
         <>
-          <HeroStory
-            story={lead}
-            onOpen={() => open(lead.slug)}
-            engagement={engagementFor(lead.id)}
-            topOffset={immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 13}
-            attachedContent={lead.tournament_id ? <StoryLeaderboardStrip tournamentId={lead.tournament_id} /> : undefined}
-            engagementAction={engagementAction(lead, 14)}
-          />
+          {newCount > 0 && (
+            <div className="tour-news-fresh">
+              <i className="overview-news-dot" aria-hidden />
+              <span><Trans t={t} i18nKey="overview.news.newSince" count={newCount} components={{ b: <b /> }} /></span>
+            </div>
+          )}
 
-          <div style={{ padding: `0 ${GUTTER}px` }}>
-            {twoUp.length === 2 && (
-              <section aria-label="Featured stories" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 9, marginTop: 24 }}>
-                {twoUp.map((s) => (
-                  <FeatureStory key={s.id} story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} engagementAction={engagementAction(s)} />
+          <button type="button" className="tour-news-lead" onClick={() => open(lead)} aria-label={`Read ${lead.headline}`} data-testid="tour-news-lead">
+            {lead.image_url && <img src={lead.image_url} alt="" loading="eager" decoding="async" />}
+            <div className="tour-news-lead-copy">
+              <div className="overview-news-kicker">
+                {presentationFor(lead).isNew && <i className="overview-news-dot" aria-hidden />}
+                <span>{lead.kicker}</span>
+              </div>
+              <h2>{lead.headline}</h2>
+              {lead.standfirst && <p className="tour-news-standfirst">{lead.standfirst}</p>}
+              <NewsDetails story={lead} presentation={presentationFor(lead)} short={false} />
+            </div>
+          </button>
+
+          {lead.tournament_id && <NewsEventCard tournamentId={lead.tournament_id} follows={follows} />}
+
+          {viewerId && yourPlayers.length > 0 && (
+            <>
+              <div className="tour-news-sec you" data-testid="tour-news-your-players">
+                <span>YOUR PLAYERS</span>
+                <span className="count">{t('news.page.yourPlayersCount', { count: yourPlayers.length })}</span>
+              </div>
+              <div className="tour-news-rows">
+                {yourPlayers.map((s) => (
+                  <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="row" />
                 ))}
-              </section>
-            )}
+              </div>
+            </>
+          )}
 
-            {rows.length > 0 && (
-              <section aria-label="More stories" style={{ marginTop: 24 }}>
-                {rows.map((s, index) => (
-                  <div key={s.id} style={{ borderTop: index === 0 ? `1px solid ${HAIRLINE_INK_10}` : 'none', borderBottom: `1px solid ${HAIRLINE_INK_10}` }}>
-                    <WorkhorseRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} engagementAction={engagementAction(s)} />
-                  </div>
+          {(pair.length > 0 || rows.length > 0) && (
+            <>
+              <div className="tour-news-sec"><span>TOP STORIES</span><span /></div>
+              {pair.length === 2 && (
+                <div className="tour-news-pair">
+                  {pair.map((s) => (
+                    <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="pair" />
+                  ))}
+                </div>
+              )}
+              {rows.length > 0 && (
+                <div className="tour-news-rows">
+                  {rows.map((s) => (
+                    <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="row" />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {railChips.length >= EVENT_CHIP_MIN && eventNames && (
+            <>
+              <div className="tour-news-sec"><span>BY EVENT</span><span /></div>
+              <div className="tour-news-events" role="group" aria-label="By event">
+                <button
+                  type="button"
+                  className={`tour-news-chip${activeEvent === null ? ' on' : ''}`}
+                  onClick={() => { setEventFilter(null); setArchiveLimit(NEWS_PAGE_SIZE); }}
+                >
+                  All
+                </button>
+                {railChips.map((chip) => (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    className={`tour-news-chip${activeEvent === chip.id ? ' on' : ''}`}
+                    onClick={() => { setEventFilter(chip.id); setArchiveLimit(NEWS_PAGE_SIZE); }}
+                  >
+                    {displayEventName(eventNames.get(chip.id) ?? '')} <small className="tabular-nums">{chip.count}</small>
+                  </button>
                 ))}
-              </section>
-            )}
+              </div>
+            </>
+          )}
 
-            {railChips.length >= 3 && (
-              <StoryChipRail
-                id="wire-tournaments"
-                heading="By tournament"
-                chips={railChips}
-                allLabel="All"
-                selected={activeTournament}
-                onSelect={(key) => {
-                  setTournament(key);
-                  setWireLimit(WIRE_PAGE_SIZE);
-                  scrollPageToTop('auto');
-                }}
-              />
-            )}
+          {groups.map((group) => (
+            <section key={group.key} aria-label={group.label}>
+              <div className="tour-news-grp">{group.label}</div>
+              {group.stories.map((s) => (
+                <ArchiveRow key={s.id} story={s} read={visit.openedIds.includes(s.id)} onOpen={() => open(s)} />
+              ))}
+            </section>
+          ))}
 
-            {wire.length > 0 && (
-              <section aria-labelledby="wire-latest" style={{ marginTop: 26, borderRadius: r.md, overflow: 'hidden', background: A.PANEL, border: `1px solid ${A.BORDER}` }}>
-                {/* "Latest", NOT "The wire": the page itself is The Wire. */}
-                <h2 id="wire-latest" style={{ ...KICKER, margin: 0, padding: '13px 13px 9px', color: A.INK }}>Latest</h2>
-                {visibleWire.map((s) => (
-                  <WireItem key={s.id} story={s} onOpen={() => open(s.slug)} />
-                ))}
-                {visibleWire.length < wire.length && (
-                  <LoadMoreRow onClick={() => setWireLimit((current) => current + WIRE_PAGE_SIZE)} />
-                )}
-              </section>
-            )}
-          </div>
-          {viewerId && commentsStoryId && (
-            <CommentsSheetV2
-              isOpen
-              onClose={() => setCommentsStoryId(null)}
-              targetType="tour_story"
-              targetId={commentsStoryId}
-            />
+          {visibleArchive.length < archiveStories.length && (
+            <button type="button" className="tour-news-more" onClick={() => setArchiveLimit((current) => current + NEWS_PAGE_SIZE)}>
+              {t('news.page.showOlder', 'Show older stories')}
+            </button>
           )}
         </>
       )}
