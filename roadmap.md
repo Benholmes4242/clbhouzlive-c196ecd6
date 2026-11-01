@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Tour Overview — Coming up rebuild
-- [ ] Resolve signed-off conflicts: frozen six-event selector versus next panel plus four rows; row weekday/month two lines in brief versus one line in mock.
-- [ ] Replace rail with next-event preview and month list; preserve tour scoping, exclusion, heading, routes and guest gating.
-- [ ] Add batched own-rounds figures, course photos, next-event defending result, calendar helper and shipped locales; no SQL or migrations.
-- [ ] Tests and full suite shards against 5,068/505; report changed assertions and new files. Guest LPGA/other-tour comparisons at 390×844.
+- [x] Ben resolved conflicts: five visible events, weekday/month separate lines; frozen six-row selector remains unchanged.
+- [x] Replaced rail with next-event preview/month list; added own-rounds, photos, defending result, calendar and six catalogues' English keys. No SQL/migrations.
+- [ ] STOP: targeted114 passed/3 failed/117 across5; formatter $11.0m instead of $11m, calendar test assumes mixed-case frozen uppercase tour label, old i18n mock lacks Trans. No corrections after failure; COMING_UP_REPORT.md quotes errors/proposed changes.
+- [ ] Remaining coverage and full shards against5,068/505; candidate5,123/508 (+26 rules/+7 reads/+22 section). Guest LPGA/other-tour390×844 comparisons pending stop clearance.
 - [ ] Real-device Median Calendar handoff needs Ben's device; do not invent fallback or claim verification.
 
 ## Tour Overview — Also this week
