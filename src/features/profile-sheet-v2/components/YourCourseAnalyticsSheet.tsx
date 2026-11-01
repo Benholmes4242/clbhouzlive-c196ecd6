@@ -911,67 +911,211 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           ...FIGS,
         }}
       >
-        {/* Fixed header (does NOT scroll) */}
-        <div style={{ padding: '8px 20px 12px', flexShrink: 0 }}>
-          <div style={KICKER}>{t('yourCourses.sheetEyebrow')}</div>
+        {/* Fixed header (does NOT scroll): title, line, search, tiles, sort,
+            legend — YC1 §§1-4. The kicker and the old uppercase stats line are
+            gone; the counts line is sentence case. */}
+        <div style={{ padding: '0 16px', flexShrink: 0 }}>
           <h2
             id="your-course-analytics-title"
             style={{
-              margin: '4px 0 0',
-              ...TITLE,
+              margin: '6px 0 0',
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: A.INK,
             }}
           >
             {t('yourCourses.sheetTitle')}
           </h2>
-          {showList && <div style={{ ...LABEL, marginTop: 5 }}>{subLine}</div>}
-        </div>
+          {showList && (
+            <div style={{ fontSize: 14, color: A.MUTE, marginTop: 4 }}>{subLine}</div>
+          )}
 
-        {/* Fixed search field (only when we already have a list) */}
-        {showSearchField && (
-          <div style={{ padding: '0 20px 12px', flexShrink: 0 }}>
-            {/* CANONICAL FIELD TREATMENT. REST 6% fill / 10% border, FOCUS 10%
-                fill / 28% border, both channels stepping on 140ms ease, radius
-                14 (sq-sm), height 44. The wrapper carries the paint and the
-                focus state; the <input> stays transparent and borderless so
-                there is exactly one visible box. A.TRACK — the progress-bar
-                track — used to be the fill here; it is not a field token. */}
+          {/* Search: existing behaviour, YC1 paint — 44 high, radius 14,
+              #1E1E23 with the 8% hairline, 15px text, white caret. */}
+          {showSearchField && (
+            <div style={{ marginTop: 14 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  height: 44,
+                  background: '#1E1E23',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 14,
+                  padding: '0 13px',
+                }}
+              >
+                <Search size={13} color={q ? 'rgba(255,255,255,0.62)' : A.DIM} />
+                <input
+                  type="text"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder={t('yourCourses.searchPlaceholder')}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: 15,
+                    fontFamily: SANS,
+                    color: 'rgba(255,255,255,0.96)',
+                    caretColor: '#FFFFFF',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                  }}
+                  className="cas-search-input"
+                />
+                <style>{`.cas-search-input::placeholder{color:rgba(255,255,255,0.38);}`}</style>
+              </div>
+            </div>
+          )}
+
+          {/* Tiles: where you score best / where it bites (10+ rounds only). */}
+          {showList && tiles && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
+                gap: 8,
+                marginTop: 14,
+              }}
+            >
+              {(
+                [
+                  { label: t('yourCourses.tileBest'), course: tiles.best },
+                  { label: t('yourCourses.tileBites'), course: tiles.bites },
+                ] as const
+              ).map(({ label, course }) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => focusCourse(course)}
+                  style={{
+                    background: '#1E1E23',
+                    border: 0,
+                    borderRadius: 14,
+                    padding: '11px 12px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontFamily: SANS,
+                    minWidth: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 9.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: A.DIM,
+                    }}
+                  >
+                    {label}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 15,
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      color: A.INK,
+                      marginTop: 5,
+                    }}
+                  >
+                    {shortCourseName(course.course_name)}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 12.5,
+                      color: A.MUTE,
+                      marginTop: 2,
+                    }}
+                  >
+                    {t('yourCourses.tileLine', {
+                      avg: fmtSigned(course.avg_to_par as number, 1),
+                      rounds: course.rounds_count,
+                    })}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Sort chips: chosen is ink on canvas, unchosen a 14% hairline. */}
+          {showList && (
+            <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
+              {(
+                [
+                  { id: 'recent', label: t('yourCourses.sortRecent') },
+                  { id: 'most-played', label: t('yourCourses.sortMostPlayed') },
+                  { id: 'best-for-you', label: t('yourCourses.sortBestForYou') },
+                ] as const
+              ).map((s) => {
+                const on = sort === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => chooseSort(s.id)}
+                    style={{
+                      height: 32,
+                      padding: '0 13px',
+                      borderRadius: 999,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      fontFamily: SANS,
+                      cursor: 'pointer',
+                      border: `1px solid ${on ? A.INK : 'rgba(255,255,255,0.14)'}`,
+                      background: on ? A.INK : 'transparent',
+                      color: on ? '#0B0B0D' : A.MUTE,
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Legend: one line, the four RAMP_DIST buckets. */}
+          {showList && (
             <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: 7,
-                height: 44,
-                background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
-                borderRadius: 14,
-                padding: '0 13px',
-                transition: 'background 140ms ease, border-color 140ms ease',
+                gap: 12,
+                margin: '12px 2px 0',
+                fontSize: 11.5,
+                color: A.MUTE,
               }}
             >
-              <Search size={13} color={q ? 'rgba(255,255,255,0.62)' : A.DIM} />
-              <input
-                type="text"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                placeholder={t('yourCourses.searchPlaceholder')}
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: 14,
-                  fontFamily: SANS,
-                  color: 'rgba(255,255,255,0.96)',
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                }}
-                className="cas-search-input"
-              />
-              <style>{`.cas-search-input::placeholder{color:rgba(255,255,255,0.38);}`}</style>
+              {(
+                [
+                  [RAMP_DIST.eagles, t('yourCourses.legendEagles')],
+                  [RAMP_DIST.birdie, t('yourCourses.legendBirdie')],
+                  [RAMP_DIST.par, t('yourCourses.legendPar')],
+                  [RAMP_DIST.bogey, t('yourCourses.legendBogey')],
+                ] as const
+              ).map(([color, label]) => (
+                <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <i
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 2,
+                      background: color,
+                      display: 'inline-block',
+                    }}
+                  />
+                  {label}
+                </span>
+              ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Scrollable region - flex:1 + minHeight:0 lets it shrink so
             overflowY actually engages. overscrollBehavior: contain stops
