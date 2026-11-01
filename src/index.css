@@ -1,4 +1,3 @@
-/* Typography: SF Pro via the system stack — no webfont requests. */
 
 
 @import './styles/hub-warm.css';
@@ -26,6 +25,13 @@
 }
 
 :root {
+  --yc2-ink: #F8FAFC;
+  --yc2-mute: rgba(248,250,252,.62);
+  --yc2-dim: rgba(248,250,252,.42);
+  --yc2-improved: #34D399;
+  --yc2-average: rgba(248,250,252,.25);
+  --yc2-rule: rgba(255,255,255,.08);
+  --yc2-fact-rule: rgba(255,255,255,.06);
   --invite-panel: #1E1E23;
   --invite-ink: #F8FAFC;
   --invite-on-ink: #0B0B0D;
@@ -5362,3 +5368,25 @@ em-emoji-picker input:focus {
 .review-score-action { width:100%; height:54px; padding:0 12px; border:0; border-radius:16px; background:var(--score-white); color:var(--score-on-white); font-size:16.5px; font-weight:700; letter-spacing:0; white-space:normal; }
 .review-score-action[data-quiet="true"] { background:var(--score-track); color:var(--score-ink); }
 @media(prefers-reduced-motion:reduce) { .review-overall-card[data-pulsing="true"] { animation:none; } .review-score-switch i { transition:none; } }
+
+/* YC2 opened course only; YC1 list/header geometry remains untouched. */
+.yc2-open { border-top: 1px solid var(--yc2-rule); padding-top: 12px; color: var(--yc2-ink); }
+.yc2-trend { margin: 0; font-size: 14.5px; line-height: 1.45; }
+.yc2-improved { color: var(--yc2-improved); font-weight: 600; }
+.yc2-chart { height: 120px; margin-top: 12px; }
+.yc2-chart svg { display: block; width: 100%; height: 120px; overflow: hidden; }
+.yc2-line { stroke: var(--yc2-ink); }
+.yc2-average { stroke: var(--yc2-average); }
+.yc2-average-label { fill: var(--yc2-dim); font-size: 11px; }
+.yc2-best { fill: var(--yc2-improved); }
+.yc2-captions { display: flex; justify-content: space-between; gap: 8px; margin-top: 2px; font-size: 11px; color: var(--yc2-dim); }
+.yc2-captions span:last-child { flex-shrink: 0; }
+.yc2-mix { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 4px; margin-top: 12px; }
+.yc2-mix b { display: block; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.yc2-mix span { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 11.5px; color: var(--yc2-mute); }
+.yc2-mix i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.yc2-facts { margin-top: 12px; }
+.yc2-facts > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--yc2-fact-rule); font-size: 14px; }
+.yc2-facts span { color: var(--yc2-mute); }
+.yc2-facts b { font-weight: 600; text-align: right; }
+.yc2-link { display: flex; justify-content: flex-start; gap: 4px; width: auto; height: auto; padding: 0; margin-top: 14px; border-radius: 0; color: var(--yc2-ink); font-size: 14.5px; font-weight: 600; }

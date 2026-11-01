@@ -3524,7 +3524,19 @@
     "earlyData": "Early data",
     "figARound": "a round",
     "figOneRound": "one round",
-    "figNRounds": "{{count}} rounds"
+    "figNRounds": "{{count}} rounds",
+    "openTrendStart": "Your last 10 here average {{avg}}, ",
+    "openTrendBetter": "{{diff}} better",
+    "openTrendWorse": "{{diff}} worse",
+    "openTrendEnd": " than your {{count}}-round average.",
+    "openTrendInline": "in line with your {{count}}-round average.",
+    "openChartLabel": "Your round scores here",
+    "openAverage": "avg {{avg}}",
+    "openChartCaption": "Higher is better · best round in green",
+    "openLastRounds": "Last {{count}} rounds",
+    "openBestRound": "Best round here",
+    "openCostliestHole": "Hole that costs you most",
+    "openHoleValue": "{{hole}} · {{avg}} a round"
   },
   "common": {
     "done": "Done"

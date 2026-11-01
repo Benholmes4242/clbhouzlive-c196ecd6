@@ -19,16 +19,11 @@ import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import {
   A,
-  BAR_RADIUS,
   CAPTION,
-  NUM,
   SANS,
-  StatRow,
-  Action,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS, FIGS } from '@/lib/tokens/type';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { formatMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
@@ -44,7 +39,8 @@ import {
   type CourseSort,
 } from '@/features/profile-sheet-v2/components/yourCoursesListRules';
 
-import monotonePath from '@/lib/charts/monotonePath';
+import YourCourseOpenContent from './YourCourseOpenContent';
+import { fmtSigned } from './yourCoursesOpenRules';
 
 /** Canonical metrics from the shared module; this sheet keeps its palette. */
 const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
@@ -86,60 +82,12 @@ const DIST = {
   bogeys: RAMP_DIST.bogey,
 } as const;
 
-/**
- * The index card's zone tones. Borrowed, not owned.
- *
- * ZONE, NOT SCORE. These describe a round's position within THIS member's own
- * range at THIS course, so they keep the improvement convention (green good,
- * red bad). The figures beside them keep the to-par convention. Do not unify
- * the two — that is the getScoreColor mistake.
- */
-const ZONE_BEST = A.GREEN;
-const ZONE_MID = A.AMBER;
-const ZONE_OFF = A.RED;
-
-
-/** Zone of one round between the member's worst (0) and best (1) at a course. */
-function zoneColor(v: number, best: number, worst: number): string {
-  const span = worst - best;
-  const p = span <= 0 ? 1 : (worst - v) / span;
-  if (p >= 0.66) return ZONE_BEST;
-  if (p >= 0.33) return ZONE_MID;
-  return ZONE_OFF;
-}
-
-
-
 interface Props {
   open: boolean;
   onClose: () => void;
   onNavigate: (route: string) => void;
   /** True when we know user has a live WHS connection. */
   synced: boolean;
-}
-
-/** Format a signed number to N decimal places: "+1.2", "-0.4", "0.0".
- *  Rounds FIRST and branches on the rounded value, so -0.04 renders "0.0"
- *  and never "-0.0". */
-function fmtSigned(n: number, digits: number): string {
-  const rounded = Number(n.toFixed(digits));
-  const abs = Math.abs(rounded).toFixed(digits);
-  if (rounded > 0) return `+${abs}`;
-  if (rounded < 0) return `-${abs}`;
-  return abs; // exact zero: no sign
-}
-
-/**
- * Rare-outcome rule (moved out of the deleted ScoringPill): a bucket with a
- * non-zero COUNT that would round to 0% renders one decimal place, floored at
- * 0.1%, so a single eagle across 1,800 holes reads "0.1%" and not "0%".
- */
-function fmtBucketPct(pct: number, pctExact: number, count: number): string {
-  if (count > 0 && pct === 0) {
-    const oneDec = Math.max(0.1, Number(pctExact.toFixed(1)));
-    return `${oneDec.toFixed(1)}%`;
-  }
-  return `${pct}%`;
 }
 
 /**
@@ -200,8 +148,7 @@ const EARLY_TAG: React.CSSProperties = {
  * THE COLLAPSED LIST BAR (YC1 §5). Height 6, radius 9, four segments with
  * 2px gaps, widths from the EXACT percentages in the RAMP_DIST colours.
  * Eagles hold a 0.6% floor when their count is above zero and are hidden at
- * zero — unlike the expanded DistributionBar, empty buckets leave no
- * hairline here.
+ * zero — empty buckets leave no hairline here.
  */
 const ListBar: React.FC<{ segs: Seg[] }> = ({ segs }) => (
   <span
@@ -298,148 +245,6 @@ interface Seg {
   pctExact: number;
   count: number;
 }
-
-/**
- * THE DISTRIBUTION BAR. Four segments flexed by their percentages.
- *
- * A bucket with a non-zero count NEVER flexes to nothing — that would undo
- * fmtBucketPct's rule that one eagle in 1,800 holes reads "0.1%". It keeps a
- * 3px floor. A genuinely EMPTY bucket renders a hairline at 0.18 opacity so
- * the bar always reads as four segments rather than three.
- */
-const DistributionBar: React.FC<{ segs: Seg[] }> = ({ segs }) => {
-  const total = segs.reduce((s, x) => s + (x.pctExact ?? x.pct ?? 0), 0) || 1;
-  return (
-    <span
-      style={{
-        display: 'flex',
-        height: 9,
-        borderRadius: BAR_RADIUS,
-        overflow: 'hidden',
-        background: A.TRACK,
-      }}
-    >
-      {segs.map((s) => {
-        const empty = (s.count ?? 0) === 0;
-        const share = ((s.pctExact ?? s.pct ?? 0) / total) * 100;
-        return (
-          <i
-            key={s.key}
-            style={{
-              width: empty ? 2 : `${share}%`,
-              minWidth: empty ? 2 : 3,
-              flexShrink: 0,
-              background: s.bg,
-              opacity: empty ? 0.18 : 1,
-              borderRadius: BAR_RADIUS,
-            }}
-          />
-        );
-      })}
-    </span>
-  );
-};
-
-const TREND_H = 74;
-const TREND_PAD_X = 2;
-const TREND_PAD_Y = 8;
-
-/**
- * "YOUR ROUNDS HERE" — the index card's exact treatment, graded against the
- * member's OWN range at this course: their worst round renders red, their best
- * green.
- *
- * THE AXIS: WORSE IS HIGHER. SVG y grows downward, so the mapping SUBTRACTS.
- * Getting that backwards pins the plot into a sliver at the top and the stroke
- * clips out of existence.
- */
-const RoundsTrend: React.FC<{ points: CourseRoundPoint[]; gradientId: string }> = ({
-  points,
-  gradientId,
-}) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [w, setW] = useState(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const measure = () => setW(el.clientWidth);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const n = points.length;
-  const lo = Math.min(...points.map((p) => p.toPar));
-  const hi = Math.max(...points.map((p) => p.toPar));
-
-  let body: React.ReactNode = null;
-  if (w > 0 && n >= 2) {
-    const ht = TREND_H - TREND_PAD_Y * 2;
-    const span = hi - lo || 1;
-    const xy = points.map((p, i) => ({
-      x: TREND_PAD_X + (i / (n - 1)) * (w - TREND_PAD_X * 2),
-      // WORSE (higher toPar) sits HIGHER on the chart.
-      y: TREND_PAD_Y + (ht - ((p.toPar - lo) / span) * ht),
-    }));
-    const line = monotonePath(xy);
-    const area = `${line} L${xy[n - 1].x.toFixed(2)},${TREND_H} L${xy[0].x.toFixed(2)},${TREND_H} Z`;
-    body = (
-      <svg width={w} height={TREND_H} style={{ display: 'block' }}>
-        <defs>
-          {/* THE COLOUR LIVES IN THE LINE. The fill is one amber wash. */}
-          <linearGradient id={`${gradientId}-fill`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={ZONE_MID} stopOpacity={0.3} />
-            <stop offset="100%" stopColor={ZONE_MID} stopOpacity={0.02} />
-          </linearGradient>
-          {/* One stop per round, so the stroke changes zone along its length. */}
-          <linearGradient id={`${gradientId}-stroke`} x1="0" y1="0" x2="1" y2="0">
-            {points.map((p, i) => (
-              <stop
-                key={i}
-                offset={`${(i / (n - 1)) * 100}%`}
-                stopColor={zoneColor(p.toPar, lo, hi)}
-              />
-            ))}
-          </linearGradient>
-        </defs>
-        <path d={area} fill={`url(#${gradientId}-fill)`} />
-        <path
-          d={line}
-          fill="none"
-          stroke="#FFFFFF"
-          strokeOpacity={0.6}
-          strokeWidth={4.0}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d={line}
-          fill="none"
-          stroke={`url(#${gradientId}-stroke)`}
-          strokeWidth={2.2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  return (
-    <div ref={ref} style={{ height: TREND_H, position: 'relative' }}>
-      {body}
-    </div>
-  );
-};
-
-const TrendLegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-    <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
-    <span style={{ ...LABEL, fontSize: 11, letterSpacing: '0.1em' }}>{label}</span>
-  </span>
-);
-
 
 /**
  * Row for the "my courses" list.
@@ -590,33 +395,10 @@ function AnalyticsCourseRow({
         )}
       </div>
 
-      {/*
-        COLLAPSED: the bar sits under the header — it is the only thing making
-        a long list scannable.
-        EXPANDED: the trend takes this slot and the bar moves down to sit
-        directly above the percentages it describes.
-      */}
-      {hasScoring && !expanded && (
+      {/* YC1 header and collapsed bar remain visible when the card opens. */}
+      {hasScoring && (
         <span style={{ display: 'block', marginTop: 12 }}>
           <ListBar segs={segs} />
-        </span>
-      )}
-
-      {hasScoring && expanded && (
-        <span style={{ marginTop: 10, display: 'block' }}>
-          <div style={{ ...LABEL, marginBottom: 2 }}>{t('yourCourses.trendLabel')}</div>
-          {trendPoints.length >= 2 ? (
-            <RoundsTrend points={trendPoints} gradientId={`ycat-${course.course_id}`} />
-          ) : (
-            <div style={{ ...CAPTION, paddingTop: 6 }}>{t('yourCourses.trendNone')}</div>
-          )}
-          {trendPoints.length >= 2 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 2 }}>
-              <TrendLegendSwatch color={ZONE_OFF} label={t('yourCourses.trendOffBest')} />
-              <TrendLegendSwatch color={ZONE_MID} label={t('yourCourses.trendMid')} />
-              <TrendLegendSwatch color={ZONE_BEST} label={t('yourCourses.trendNearBest')} />
-            </div>
-          )}
         </span>
       )}
     </div>
@@ -656,63 +438,7 @@ function AnalyticsCourseRow({
       </button>
       {expanded && (
         <div style={{ padding: '0 16px 14px' }}>
-          {/* The bar and its percentages belong together. */}
-          <div style={{ marginBottom: 8 }}>
-            <DistributionBar segs={segs} />
-          </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-              gap: 8,
-              marginBottom: 12,
-            }}
-          >
-            {segs.map((s) => (
-              <div key={s.key} style={{ textAlign: 'center', minWidth: 0 }}>
-                {/* Each bucket now owns a hue on the bar, so each label owns
-                    the matching swatch — eagles included. */}
-                <div
-                  style={{
-                    height: 3,
-                    borderRadius: BAR_RADIUS,
-                    background: s.bg,
-                    opacity: (s.count ?? 0) === 0 ? 0.18 : 1,
-                    marginBottom: 6,
-                  }}
-                />
-                <div style={LABEL}>{s.label}</div>
-                <div style={{ ...NUM, fontSize: 15, color: A.INK, marginTop: 2 }}>
-                  {fmtBucketPct(s.pct ?? 0, s.pctExact ?? 0, s.count ?? 0)}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <StatRow
-            size={16}
-            items={[
-              { label: t('yourCourses.colRounds'), value: course.rounds_count },
-              ...(avgVal != null
-                ? // YOUR AVG carries no colour: it is the member's own score.
-
-                  [{ label: t('yourCourses.colYourAvg'), value: fmtSigned(avgVal, 1) }]
-                : []),
-              ...(course.last_played
-                ? [
-                    {
-                      label: t('yourCourses.colLastPlayed'),
-                      value: formatMonthYearShortGB(course.last_played),
-                    },
-                  ]
-                : []),
-            ]}
-          />
-          <Action
-            label={t('yourCourses.openAnalytics')}
-            onClick={() => onOpen('expanded')}
-            style={{ marginTop: 10 }}
-          />
+          <YourCourseOpenContent course={course} points={trendPoints} onOpen={() => onOpen('expanded')} />
         </div>
       )}
     </div>
