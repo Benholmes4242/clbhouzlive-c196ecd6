@@ -16,6 +16,7 @@ import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/Hybri
 import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 import { CourseMasthead, CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
+import { SCRIM_HERO_TALL } from '@/styles/photoScrim';
 
 /**
  * CoursesPageHero
@@ -25,9 +26,9 @@ import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
  * hero (notch bleed, scrim, cover position) and the SAME data source as
  * the old Discover "Standout courses" card (useExploreHero).
  *
- * Scrim treatment: the ONE canon hero wash, HERO_CANON_WASH, applied as an
- * inset-0 overlay over the container image —
- * a single flat layer, uniform top to bottom. No top scrim, no radial ambient.
+ * Courses-only scrim treatment: HERO_CANON_WASH plus SCRIM_HERO_TALL
+ * beneath the bottom-anchored copy. Course-detail and other heroes retain
+ * their own treatment; the placeColor opt-in never changes their defaults.
  *
  * The shared chrome island floats over this hero and is the ONLY safe-area
  * owner. The image itself starts at the physical top, exactly as on Explore.
@@ -181,10 +182,12 @@ function CoursesPageHeroInner() {
           })
         : null;
 
-  /* Region (location_secondary) leads the kicker; the macro area
-     (location_primary) is the PLACE line, taken from the field, not the string. */
-  const kickerParts = hero
-    ? [hero.location_secondary, hero.list_label, eyebrowTail].filter(Boolean)
+  /* Keep the existing field order and tail formatting, now on one place line. */
+  const location = hero
+    ? [hero.location_primary, hero.location_secondary].filter(Boolean).join(', ')
+    : null;
+  const placeParts = hero
+    ? [location, hero.list_label, eyebrowTail].filter(Boolean)
     : [];
 
 
@@ -230,6 +233,10 @@ function CoursesPageHeroInner() {
           background: HERO_CANON_WASH,
         }}
       />
+      <div
+        aria-hidden
+        style={{ position: 'absolute', inset: 0, background: SCRIM_HERO_TALL }}
+      />
       {/* Bottom-anchored identity + CTA — absolute so copy never expands the
           fixed 340px hero. Matches GolfClubView's CourseTitleOverlay. */}
       <div
@@ -246,9 +253,10 @@ function CoursesPageHeroInner() {
           <CourseMastheadSkeleton rowHeight={21} />
         ) : (
           <CourseMasthead
-            kicker={kickerParts.length > 0 ? kickerParts.join(' \u00b7 ') : null}
+            kicker={null}
             name={hero.course_name}
-            place={hero.location_primary ?? null}
+            place={placeParts.length > 0 ? placeParts.join(' \u00b7 ') : null}
+            placeColor={A.AMBER}
             nameClamp={2}
             nameLead={hero.list_rank != null ? (
               <span
