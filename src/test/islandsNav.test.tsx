@@ -77,7 +77,7 @@ beforeEach(() => {
   mockLastRound = null;
 });
 
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.useRealTimers(); });
 
 // ---------------------------------------------------------------------------
 // lastIndexMove (pure)
@@ -173,6 +173,8 @@ describe('IndexGlance', () => {
   });
 
   it('shows the move, sparkline and stats once data settles', () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-15T12:00:00Z'));
     mockHistory = [
       { observed_at: iso(300), handicap_index: 12.2 },
       { observed_at: iso(10), handicap_index: 12.6 },
