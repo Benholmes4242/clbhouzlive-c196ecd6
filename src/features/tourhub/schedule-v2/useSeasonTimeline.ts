@@ -137,7 +137,7 @@ async function probeAndFetchTournaments(
     const { data, error } = await supabase
       .from('sr_tournaments')
       .select(
-        `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, golf_course_id, season:sr_seasons(tour_name, tour_full_name), ${TOURNAMENT_COURSE_PLACE_JOIN}`,
+        `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, event_type, golf_course_id, season:sr_seasons(tour_name, tour_full_name), ${TOURNAMENT_COURSE_PLACE_JOIN}`,
       )
       .in('season_id', idsToQuery)
       .order('start_date', { ascending: true });
