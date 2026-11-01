@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, ArrowUp, X, Play } from 'lucide-react';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
@@ -405,6 +405,30 @@ export const Composer: React.FC<Props> = ({
           <ArrowUp size={18} />
         </button>
       </div>
+
+      {/* MS3 §1–§3 — the + sheet and its pickers. */}
+      <ShareActionSheet
+        open={sheet === 'actions'}
+        canShareRound={canShareRound}
+        onClose={() => setSheet(null)}
+        onPickMedia={() => {
+          setSheet(null);
+          void handleAttach();
+        }}
+        onShareRound={() => setSheet('round')}
+        onShareCourse={() => setSheet('course')}
+      />
+      <ShareRoundSheet
+        open={sheet === 'round'}
+        rounds={rounds}
+        onClose={() => setSheet(null)}
+        onPick={shareRound}
+      />
+      <ShareCourseSheet
+        open={sheet === 'course'}
+        onClose={() => setSheet(null)}
+        onPick={shareCourse}
+      />
     </div>
   );
 };
