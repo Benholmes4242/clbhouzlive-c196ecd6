@@ -6,7 +6,8 @@ import i18next from 'i18next';
 import en from '../../public/locales/en/tourhub.json';
 import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
 import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
-const state=vi.hoisted(()=>({rows:[] as any[],photos:new Map<string,string>(),own:undefined as Map<string,{best:number,rounds:number}>|undefined,last:null as any}));
+const state=vi.hoisted(()=>({rows:[] as any[],photos:new Map<string,string>(),own:undefined as Map<string,{best:number,rounds:number}>|undefined,last:null as any,calendar:vi.fn()}));
+vi.mock('@/features/tourhub/overview/sections/comingUpCalendar',()=>({openComingUpCalendar:state.calendar}));
 vi.mock('@/features/tourhub/overview/data/useComingUp',()=>({useComingUp:()=>({data:state.rows})}));
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages',()=>({useBatchCourseImages:()=>({data:state.photos})}));
 vi.mock('@/features/tourhub/hooks/useTournamentLastYearTop4',()=>({useTournamentLastYearTop4:()=>({data:state.last})}));
@@ -15,9 +16,12 @@ const i18n=i18next.createInstance();void i18n.init({lng:'en',fallbackLng:'en',in
 const row={id:'next',name:'Next Event',start_date:'2026-11-19',end_date:'2026-11-22',venue:'Club · West Course · Surrey',venue_name:'Club',venue_course_name:'West Course',golf_course_id:'c',tour_slug:'lpga',purse:11000000,currency:'USD',defending_champion:null,isMajor:false,isPlayoff:false,days_away:18,field_size:null} satisfies ComingUpRow;
 function Location(){return <output data-testid="location">{useLocation().pathname}{useLocation().search}</output>}
 function mount(){return render(<I18nextProvider i18n={i18n}><MemoryRouter><ComingUp tour="lpga"/><Location/></MemoryRouter></I18nextProvider>)}
-beforeEach(()=>{state.rows=[row];state.photos=new Map();state.own=undefined;state.last=null;vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));});
+beforeEach(()=>{state.rows=[row];state.photos=new Map();state.own=undefined;state.last=null;state.calendar.mockReset();vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));});
 afterEach(()=>{cleanup();vi.useRealTimers();});
 describe('Coming up event surfaces',()=>{
+ it('calendar action hands the selected event to the calendar without opening preview',()=>{mount();fireEvent.click(screen.getByRole('button',{name:'Add to calendar'}));expect(state.calendar).toHaveBeenCalledExactlyOnceWith(row);expect(screen.getByTestId('location')).toHaveTextContent(/^\/$/);});
+ it.each([[0,'−18','−18'],[1,'−22','−21'],[3,'−22','−19']] as const)('defending line retains winning score for margin %i',(_margin,score,runner)=>{state.rows=[{...row,defending_champion:'Jeeno Thitikul'}];state.last=[{rank:'1',name:'Jeeno Thitikul',score},{rank:'2',name:'Other Player',score:runner}];const {container}=mount();expect(container.querySelector('.coming-last-text b.num')).toHaveTextContent(score);expect(container.querySelectorAll('.coming-last-text b')).toHaveLength(2);});
+ it('different history winner never attaches their score to the champion',()=>{state.rows=[{...row,defending_champion:'Jeeno Thitikul'}];state.last=[{rank:'1',name:'Other Player',score:'−22'}];const {container}=mount();expect(container.querySelector('.coming-last')).not.toBeNull();expect(container.querySelector('.coming-last-text b.num')).toBeNull();});
  it('empty selection hides the whole section',()=>{state.rows=[];const {container}=mount();expect(container.querySelector('section')).toBeNull();});
  it('photo layout uses resolved course image',()=>{state.photos.set('next','/course.jpg');const {container}=mount();expect(container.querySelector('.coming-photo img')).toHaveAttribute('src','/course.jpg');expect(container.querySelector('.coming-plain')).toBeNull();});
  it('no photo has plain name block and no photo reservation',()=>{const {container}=mount();expect(container.querySelector('.coming-plain')).not.toBeNull();expect(container.querySelector('.coming-photo')).toBeNull();});

@@ -3,6 +3,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { ComingUp } from '../ComingUp';
 import { BrowserRouter } from 'react-router-dom';
 import * as useComingUpHook from '../../data/useComingUp';
+import { I18nextProvider } from 'react-i18next';
+import i18next from 'i18next';
+import en from '../../../../../../public/locales/en/tourhub.json';
 vi.mock('../../../hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
 vi.mock('../../../hooks/useTournamentLastYearTop4', () => ({ useTournamentLastYearTop4: () => ({ data: null }) }));
 vi.mock('../../data/useComingUpOwnRounds', () => ({ useComingUpOwnRounds: () => undefined }));
@@ -11,11 +14,8 @@ vi.mock('../../data/useComingUp', () => ({
   useComingUp: vi.fn(),
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+const i18n = i18next.createInstance();
+void i18n.init({ lng: 'en', fallbackLng: 'en', initAsync: false, resources: { en: { tourhub: en } } });
 
 const mockData = [
   { id: '1', name: 'Tournament 1', start_date: '2025-01-01', end_date: '2025-01-04', venue: 'Venue 1', tour_slug: 'pga', defending_champion: 'Champ 1', isMajor: false },
@@ -34,13 +34,13 @@ describe('ComingUp component', () => {
     } as any);
 
     render(
-      <BrowserRouter>
+      <I18nextProvider i18n={i18n}><BrowserRouter>
         <ComingUp tour="pga" />
-      </BrowserRouter>
+      </BrowserRouter></I18nextProvider>
     );
 
     // Check title
-    expect(screen.getByText('overview.comingUp.title')).toBeDefined();
+    expect(screen.getByText(i18n.t('overview.comingUp.title', { ns: 'tourhub' }))).toBeDefined();
 
     mockData.slice(0, 5).forEach(item => {
       expect(screen.getByText(item.name)).toBeDefined();

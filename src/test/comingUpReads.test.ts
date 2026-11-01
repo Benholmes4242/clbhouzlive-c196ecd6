@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const mocks=vi.hoisted(()=>({from:vi.fn(),query:vi.fn()}));
 vi.mock('@/integrations/supabase/client',()=>({supabase:{from:mocks.from}}));
 vi.mock('@tanstack/react-query',()=>({useQuery:mocks.query}));
@@ -6,8 +6,12 @@ vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:null})}
 import { loadComingUpOwnRounds } from '@/features/tourhub/overview/data/useComingUpOwnRounds';
 import { useComingUp } from '@/features/tourhub/overview/data/useComingUp';
 import { useBatchCourseImages } from '@/features/tourhub/hooks/useBatchCourseImages';
+import { openComingUpCalendar } from '@/features/tourhub/overview/sections/comingUpCalendar';
+import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 beforeEach(()=>vi.clearAllMocks());
+afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals();vi.useRealTimers();});
 describe('Coming up batched reads',()=>{
+ it.each([[],[{tee_time:'2026-11-19T14:00:00Z'}]])('calendar reads first round-one tee and downloads ICS with tee payload %j',async(data)=>{vi.useFakeTimers();const chain:any={select:vi.fn(()=>chain),eq:vi.fn(()=>chain),not:vi.fn(()=>chain),order:vi.fn(()=>chain),limit:vi.fn().mockResolvedValue({data})};mocks.from.mockReturnValue(chain);const create=vi.fn().mockReturnValue('blob:calendar');const revoke=vi.fn();vi.stubGlobal('URL',Object.assign(class extends URL {},{createObjectURL:create,revokeObjectURL:revoke}));const click=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(function(){expect(this.download).toBe('Event.ics');expect(this.href).toBe('blob:calendar');});await openComingUpCalendar({id:'next',name:'Event',start_date:'2026-11-19',end_date:'2026-11-22',tour_slug:'lpga'} as ComingUpRow);expect(mocks.from).toHaveBeenCalledExactlyOnceWith('sr_tee_times');expect(chain.select).toHaveBeenCalledWith('tee_time');expect(chain.eq).toHaveBeenCalledWith('tournament_id','next');expect(chain.eq).toHaveBeenCalledWith('round_number',1);expect(chain.not).toHaveBeenCalledWith('tee_time','is',null);expect(chain.order).toHaveBeenCalledWith('tee_time',{ascending:true});expect(chain.limit).toHaveBeenCalledWith(1);expect(create.mock.calls[0][0].type).toBe('text/calendar;charset=utf-8');expect(click).toHaveBeenCalledOnce();expect(document.querySelector('a[download]')).toBeNull();vi.advanceTimersByTime(60000);expect(revoke).toHaveBeenCalledExactlyOnceWith('blob:calendar');});
  it('one own-rounds read scopes identity and deduplicates all course ids',async()=>{const chain:any={select:vi.fn(()=>chain),eq:vi.fn(()=>chain),in:vi.fn().mockResolvedValue({data:[{course_id:'c',gross_score:84,holes_played:18}],error:null})};mocks.from.mockReturnValue(chain);expect((await loadComingUpOwnRounds('member',false,['c','b','c'])).get('c')).toEqual({best:84,rounds:1});expect(mocks.from).toHaveBeenCalledExactlyOnceWith('gam_round_stats');expect(chain.select).toHaveBeenCalledWith('course_id, gross_score, holes_played');expect(chain.eq).toHaveBeenCalledWith('user_id','member');expect(chain.in).toHaveBeenCalledWith('course_id',['b','c']);});
  it('guests never read own rounds',async()=>{await loadComingUpOwnRounds('guest',true,['c']);expect(mocks.from).not.toHaveBeenCalled();});
  it('missing identity never reads rounds',async()=>{await loadComingUpOwnRounds(null,false,['c']);expect(mocks.from).not.toHaveBeenCalled();});

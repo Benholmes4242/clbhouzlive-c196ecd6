@@ -9,8 +9,8 @@
 ## Tour Overview — Coming up rebuild
 - [x] Ben resolved conflicts: five visible events, weekday/month separate lines; frozen six-row selector remains unchanged.
 - [x] Replaced rail with next-event preview/month list; added own-rounds, photos, defending result, calendar and six catalogues' English keys. No SQL/migrations.
-- [ ] STOP: targeted114 passed/3 failed/117 across5; formatter $11.0m instead of $11m, calendar test assumes mixed-case frozen uppercase tour label, old i18n mock lacks Trans. No corrections after failure; COMING_UP_REPORT.md quotes errors/proposed changes.
-- [ ] Remaining coverage and full shards against5,068/505; candidate5,123/508 (+26 rules/+7 reads/+22 section). Guest LPGA/other-tour390×844 comparisons pending stop clearance.
+- [x] Approved corrections: whole-money minimumFractionDigits:0; calendar uses sentence-case tourDisplayLabel with SUMMARY:Event · LPGA; only ComingUp.test.tsx replaces its incomplete i18n mock with English provider, preserving structural checks.
+- [x] Remaining coverage: targeted124/124; full shards2506+2666=5172/5172 across509, +104/+4 versus5068/505 (Coming up62 across3 files; intervening IF1 42 across1). Build OK08:26:37Z. Real LPGA/DP World390×844 comparisons captured, but unchanged Join gate covers them; unoccluded match/live calendar tap not claimed. Browser dates neutral/no horizontal overflow. See COMING_UP_REPORT.md.
 - [ ] Real-device Median Calendar handoff needs Ben's device; do not invent fallback or claim verification.
 
 ## Tour Overview — Also this week

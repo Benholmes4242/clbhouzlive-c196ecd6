@@ -1,4 +1,23 @@
-# Tour Overview — Coming up rebuild: stopped
+# Tour Overview — Coming up rebuild: approved corrections complete
+
+## Final verification — 1 November 2026
+- Targeted command: `bunx vitest run src/test/comingUpRules.test.ts src/test/comingUpReads.test.ts src/test/comingUpSection.test.tsx src/features/tourhub/overview/sections/__tests__/ComingUp.test.tsx src/test/tourOverviewDesignA.test.ts --maxWorkers=2`: **124/124 across 5 files**.
+- Full commands: `bunx vitest run --shard=1/2 --maxWorkers=2` and `bunx vitest run --shard=2/2 --maxWorkers=2`. Shard 1 **2,506/2,506 across 255 files**; shard 2 **2,666/2,666 across 254 files**. Total **5,172/5,172 across 509 files**, no failures or unhandled errors.
+- Against **5,068/505**, delta **+104 tests / +4 files**: Coming up adds 62 across `src/test/comingUpRules.test.ts` (26), `src/test/comingUpReads.test.ts` (9), `src/test/comingUpSection.test.tsx` (27); intervening IF1 adds **42**, not the declaration-only count of 28, in `src/test/if1InviteSheet.test.tsx`. Parameterised cases account for the difference. Those are every new test file. No cases deleted.
+- Existing ComingUp component test remains one case. Approved mock replacement uses real `I18nextProvider`, English resource and `initAsync:false`; the heading lookup changes from `expect(screen.getByText('overview.comingUp.title')).toBeDefined()` to `expect(screen.getByText(i18n.t('overview.comingUp.title', { ns: 'tourhub' }))).toBeDefined()`. The five names, sixth-name absence, one next panel, four later rows and no-rail structural assertions stay unchanged.
+- Calendar title assertion: old `expect(ics).toContain('SUMMARY:Event · LPGA Tour')`; new `expect(ics).toContain('SUMMARY:Event · LPGA')`. Production SUMMARY now uses `tourDisplayLabel`, not uppercase `fullTourLabel`; on-screen kickers remain unchanged. Money expectations `$11m` and `€2.5m` unchanged; formatter now sets `minimumFractionDigits:0`.
+- Added seven cases beyond the stopped 55-case Coming up inventory: selected-event calendar action/no preview navigation; defending winning score at margins 0, 1 and 3; mismatched winner has no borrowed score; first-round tee/read/download/revoke cases with and without a published tee. Existing rules cover absent defending data/champion, margin/playoff, singular/plural own rounds and guests.
+- Automatic preview/typecheck **build OK at 08:26:37Z** after correcting the English-resource relative import during the completed edit. No surviving build/type error; no manual build/typecheck run.
+
+## Guest proof and explicit limits
+- Real guest LPGA (TOTO Japan Classic) and DP World Tour (DP World Tour Championship) selected through the live Tour island at **390×844**. Images loaded; section clientWidth and scrollWidth both **390**; LPGA list names use a two-line clamp; no page errors.
+- Browser computed-colour check: panel dates, list days and countdowns **rgb(248, 250, 252)**; weekday/month **rgba(248, 250, 252, 0.42)**, never amber **#F7931E**. This is a real-browser check, not a jsdom CSS assertion.
+- Captures: `/tmp/browser/coming-up/lpga.png`, `euro.png`, `mock.png`, `lpga-comparison.png`, `euro-comparison.png`. Both comparisons were viewed. **The existing scroll-triggered Join card covers/dims both guest captures**; unobstructed visual parity is not claimed. It also intercepts Add to calendar, so live guest calendar download is unverified; the app/gate was not altered or bypassed. Calendar action and ICS download/read lifecycle are covered by tests.
+- Live data differs from the illustrative mock (TOTO, not CME, is next; DP World has one eligible next event). Frozen section heading and system font retained; mock Geist not adopted. Signed-off separate weekday/month ruling retained.
+- You've-played line remains **unit-test-only**, not authenticated member proof. **Median iOS Calendar handoff is left to Ben's device**; desktop or test ICS generation does not establish it, and no fallback was added.
+
+## Historical stop, cleared by this approval
+The following preserves the earlier failure evidence and proposals; its outstanding statements are superseded by the final verification above. Ben rejected the old uppercase-calendar proposal in favour of sentence-case production SUMMARY.
 
 ## Scope and rulings
 Implemented the next-event preview and month list, next-course photo resolver, data-driven tags, own-course figures, defending results, calendar ICS generation, and six locale catalogues. Event selection helper remains unchanged; the rendered selection is capped at five after exclusion, per Ben's answer. Weekday/month use separate lines, per Ben's answer, overriding the mock's single line. System font is preserved; the mock's Geist is not loaded. No new negative tracking.
