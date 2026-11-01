@@ -408,11 +408,11 @@ describe('WhoToFollowRail', () => {
       renderRail(1);
       const el = screen.getByTestId('who-to-follow-rail-1');
       act(() => {
-        cb?.([{ isIntersecting: true, target: el } as IntersectionObserverEntry], {} as IntersectionObserver);
+        cb?.([{ isIntersecting: true, target: el } as unknown as IntersectionObserverEntry], {} as IntersectionObserver);
       });
       expect(h.track).toHaveBeenCalledWith('who_to_follow_viewed', { slot: 1 });
       act(() => {
-        cb?.([{ isIntersecting: true, target: el } as IntersectionObserverEntry], {} as IntersectionObserver);
+        cb?.([{ isIntersecting: true, target: el } as unknown as IntersectionObserverEntry], {} as IntersectionObserver);
       });
       expect(h.track.mock.calls.filter((c) => c[0] === 'who_to_follow_viewed')).toHaveLength(1);
     } finally {
