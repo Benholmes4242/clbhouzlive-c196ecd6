@@ -22,6 +22,8 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { RailChips } from '@/components/ui/RailChips';
+import { OverviewNewsStory } from '../overview/sections/OverviewNewsStory';
+import type { NewsPresentation } from '../overview/sections/overviewNewsRules';
 
 /** A tour story, or an amateur story (which extends it with two extra fields). */
 export interface NewsStory extends TourStory {
@@ -92,6 +94,8 @@ export function wireDate(at: string | null) {
 }
 
 export interface StoryShapeProps {
+  /** Only the Tour Overview supplies this opt-in; News-tab defaults are frozen. */
+  overviewNews?: NewsPresentation;
   story: NewsStory;
   onOpen: () => void;
   engagement?: StoryEngagement | null;
@@ -115,6 +119,7 @@ export function HeroStory({
   attachedContent,
   kicker,
   onImageError,
+  overviewNews,
 }: StoryShapeProps & {
   topOffset?: number | string;
   /** Horizontal type inset; the News tabs retain the canonical 14px default. */
@@ -138,6 +143,7 @@ export function HeroStory({
    */
   onImageError?: () => void;
 }) {
+  if (overviewNews) return <OverviewNewsStory story={story} onOpen={onOpen} presentation={overviewNews} shape="hero" />;
   return (
     <>
       <button type="button" className={storyButtonClass} onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
@@ -172,7 +178,8 @@ export function HeroStory({
 }
 
 /** THE TWO-UP. Needs exactly two; one remainder falls through to the rows. */
-export function FeatureStory({ story, onOpen, engagement, engagementAction, showEngagement = true }: StoryShapeProps & { showEngagement?: boolean }) {
+export function FeatureStory({ story, onOpen, engagement, engagementAction, showEngagement = true, overviewNews }: StoryShapeProps & { showEngagement?: boolean }) {
+  if (overviewNews) return <OverviewNewsStory story={story} onOpen={onOpen} presentation={overviewNews} shape="pair" />;
   return (
     <article style={{ height: 199 }}>
       <button type="button" className={storyButtonClass} onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
@@ -192,7 +199,8 @@ export function FeatureStory({ story, onOpen, engagement, engagementAction, show
 }
 
 /** THE ROW. The workhorse: kicker and date, 14.5 headline, 74px thumbnail. */
-export function WorkhorseRow({ story, onOpen, engagement, engagementAction, showEngagement = true }: StoryShapeProps & { showEngagement?: boolean }) {
+export function WorkhorseRow({ story, onOpen, engagement, engagementAction, showEngagement = true, overviewNews }: StoryShapeProps & { showEngagement?: boolean }) {
+  if (overviewNews) return <OverviewNewsStory story={story} onOpen={onOpen} presentation={overviewNews} shape="row" />;
   return (
     <article style={{ position: 'relative', width: '100%', height: 119, boxSizing: 'border-box', padding: '13px 0' }}>
       <button type="button" className={storyButtonClass} onClick={onOpen} style={{ ...tapReset, display: 'flex', gap: 12 }} aria-label={`Read ${story.headline}`}>

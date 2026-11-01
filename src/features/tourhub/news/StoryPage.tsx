@@ -19,6 +19,7 @@ import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
+import { markNewsOpened } from './newsVisit';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import { HERO_CANON_WASH } from '../_shared/heroGradient';
 import {
@@ -199,6 +200,7 @@ export function StoryPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
   const { data: story, isLoading } = useTourStory(slug);
+  React.useEffect(() => { if (story) markNewsOpened(story.id); }, [story?.id]);
   const { data: more } = useMoreFromTheWire(story?.id);
 
   /* ONE read for the MORE FROM THE WIRE window. */
