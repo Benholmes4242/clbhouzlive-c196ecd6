@@ -166,9 +166,12 @@ export const MessageBubble: React.FC<Props> = ({
   return (
     <div
       className="w-full flex flex-col"
-      style={{ position: "relative", 
+      style={{ position: "relative",
         alignItems: isOutgoing ? 'flex-end' : 'flex-start',
         marginTop: isFirstOfRun ? 10 : 3,
+        /* MS1 §7 — the incoming row carries 16px left padding so the sender
+           avatar sits fully inside the screen (it was clipped to a sliver). */
+        paddingLeft: isOutgoing ? 0 : 16,
       }}
     >
       {!isOutgoing && !isDeleted && (
@@ -176,16 +179,31 @@ export const MessageBubble: React.FC<Props> = ({
           type="button"
           onClick={() => setShowReport(true)}
           aria-label={t('a11y.reportMessage')}
-          style={{ position: "absolute", left: -28, top: "50%", transform: "translateY(-50%)", background: "transparent", border: "none", padding: 4, color: HINT, cursor: "pointer" }}
+          style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", background: "transparent", border: "none", padding: 1, color: HINT, cursor: "pointer" }}
         >
           <Flag size={14} />
         </button>
       )}
-      <div
-        className={!isOutgoing && !isDeleted && !hugMedia ? 'ec-glass' : undefined}
-        style={{
-          position: "relative",
-          maxWidth: '78%',
+      {/* MS1 §7 — incoming bubbles sit beside the sender's 28px avatar (shown
+          on the last bubble of a run; the slot is reserved either way so the
+          bubbles of one sender stay aligned, in group threads too). */}
+      {!isOutgoing ? (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', maxWidth: '100%' }}>
+          <div data-testid="incoming-avatar-slot" style={{ width: 28, height: 28, flex: 'none' }}>
+            {isLastOfRun ? (
+              <SquircleAvatar
+                src={message.sender_avatar_url}
+                userId={message.sender_user_id ?? undefined}
+                alt={message.sender_name ?? ''}
+                size={28}
+              />
+            ) : null}
+          </div>
+          {bubbleBody}
+        </div>
+      ) : (
+        bubbleBody
+      )}
           /* §4.3 A ONE-WORD MESSAGE IS A BUBBLE, NOT A DISC. The floor plus the
              fixed radius means "Hi" comes out as a short rounded rectangle. */
           minWidth: isDeleted || hugMedia ? 0 : 58,
