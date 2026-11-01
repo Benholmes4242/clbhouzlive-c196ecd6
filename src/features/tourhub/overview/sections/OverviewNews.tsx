@@ -24,7 +24,7 @@ export function OverviewNews({ stories, excludeId, presentations }: { stories: T
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
   const { hero, features, rows } = selectOverviewNews(stories, excludeId);
-  const { ref, visit } = useNewsVisit();
+  const { ref, visit } = useNewsVisit(!!hero);
   const shown = hero ? [hero, ...features, ...rows] : [];
   const count = shown.filter(story => isNewStory(story, visit)).length;
   const presentation = (story: TourStory): NewsPresentation => ({ ...(presentations?.get(story.id) ?? { liveRound: null, players: [] }), isNew: isNewStory(story, visit) });

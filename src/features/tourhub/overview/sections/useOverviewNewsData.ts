@@ -49,7 +49,7 @@ export function useOverviewNewsData(stories: TourStory[]) {
   for (const story of stories) {
     const round = rounds.get(story.tournament_id ?? '') ?? null;
     const board: BoardEntry[] = (boards.isError ? [] : boards.data ?? []).filter(entry => entry.tournament_id === story.tournament_id);
-    result.set(story.id, { isNew: false, liveRound: round, players: newsPlayers(story, follows, namesById, board, round) });
+    result.set(story.id, { isNew: false, liveRound: round, players: newsPlayers(story, follows, namesById, board, round), followedPlayer: newsPlayers(story, follows, namesById, board, null)[0] });
   }
   return result;
 }

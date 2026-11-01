@@ -8,6 +8,7 @@ import type { TourStory } from './useTourStories';
 export const NEWS_LAST_SEEN = 'tour-news:lastSeenAt';
 export const NEWS_OPENED = 'tour-news:openedIds';
 const CHANGE = 'tour-news-opened';
+const FAILURE = 'tour-news-storage-failed';
 export interface NewsVisit { lastSeenAt: number | null; openedIds: string[]; available: boolean }
 export function readNewsVisit(): NewsVisit {
   try {
@@ -21,18 +22,18 @@ export function readNewsVisit(): NewsVisit {
 }
 export function markNewsOpened(id: string): boolean {
   const visit = readNewsVisit();
-  if (!visit.available) { window.dispatchEvent(new Event(CHANGE)); return false; }
+  if (!visit.available) { window.dispatchEvent(new Event(FAILURE)); return false; }
   try {
     localStorage.setItem(NEWS_OPENED, JSON.stringify([id, ...visit.openedIds.filter(old => old !== id)].slice(0, 100)));
     window.dispatchEvent(new Event(CHANGE));
     return true;
-  } catch { window.dispatchEvent(new Event(CHANGE)); return false; }
+  } catch { window.dispatchEvent(new Event(FAILURE)); return false; }
 }
 export function isNewStory(story: Pick<TourStory, 'id' | 'published_at'>, visit: NewsVisit): boolean {
   return visit.available && visit.lastSeenAt != null && !visit.openedIds.includes(story.id)
     && Date.parse(story.published_at ?? '') > visit.lastSeenAt;
 }
-export function useNewsVisit() {
+export function useNewsVisit(enabled = true) {
   const ref = useRef<HTMLElement | null>(null);
   const [visit, setVisit] = useState(readNewsVisit);
   useEffect(() => {
@@ -40,12 +41,14 @@ export function useNewsVisit() {
       const read = readNewsVisit();
       setVisit(held => ({ ...held, openedIds: read.openedIds, available: held.available && read.available }));
     };
+    const fail = () => setVisit(held => ({ ...held, available: false }));
+    window.addEventListener(FAILURE, fail);
     window.addEventListener(CHANGE, refresh);
     window.addEventListener('storage', refresh);
-    return () => { window.removeEventListener(CHANGE, refresh); window.removeEventListener('storage', refresh); };
+    return () => { window.removeEventListener(FAILURE, fail); window.removeEventListener(CHANGE, refresh); window.removeEventListener('storage', refresh); };
   }, []);
   useEffect(() => {
-    if (!ref.current || typeof IntersectionObserver === 'undefined' || !visit.available) return;
+    if (!enabled || !ref.current || typeof IntersectionObserver === 'undefined' || !visit.available) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let written = false;
     const cancel = () => { if (timer !== undefined) clearTimeout(timer); timer = undefined; };
@@ -59,6 +62,6 @@ export function useNewsVisit() {
     }, { threshold: 0.5 });
     observer.observe(ref.current);
     return () => { cancel(); observer.disconnect(); };
-  }, [visit.available]);
+  }, [visit.available, enabled]);
   return { ref, visit };
 }

@@ -21,8 +21,9 @@ export function NewsDetails({ story, presentation, short }: { story: TourStory; 
   return <div className="overview-news-details">{parts.map((part, index) => <Fragment key={index}>{index > 0 && <span className="overview-news-separator" aria-hidden>·</span>}<span>{part}</span></Fragment>)}</div>;
 }
 export function OverviewNewsStory({ story, onOpen, presentation, shape }: { story: TourStory; onOpen: () => void; presentation: NewsPresentation; shape: 'hero' | 'pair' | 'row' }) {
+  const followedPlayer = presentation.followedPlayer ?? presentation.players.find(player => player.followed);
   const kicker = <div className="overview-news-kicker">{presentation.isNew && <i className="overview-news-dot" aria-hidden />}<span>{story.kicker}</span></div>;
-  const photo = <div className="overview-news-photo">{story.image_url && <img src={story.image_url} alt="" loading={shape === 'hero' ? 'eager' : 'lazy'} decoding="async" />}{shape === 'pair' && presentation.players.find(player => player.followed) && <div className="overview-news-photo-follow"><NewsPlayerChip player={{ ...presentation.players.find(player => player.followed) as NewsPlayer, live: false }} /></div>}</div>;
+  const photo = <div className="overview-news-photo">{story.image_url && <img src={story.image_url} alt="" loading={shape === 'hero' ? 'eager' : 'lazy'} decoding="async" />}{shape === 'pair' && followedPlayer && <div className="overview-news-photo-follow"><NewsPlayerChip player={{ ...followedPlayer, live: false }} /></div>}</div>;
   const chips = shape !== 'pair' && presentation.players.length > 0 ? <div className="overview-news-players">{presentation.players.map(player => <NewsPlayerChip key={player.id} player={player} />)}</div> : null;
   return <Button variant="ghost" className={`overview-news-story overview-news-${shape}`} onClick={onOpen} aria-label={`Read ${story.headline}`} data-news-shape={shape}>
     {shape !== 'row' && photo}
