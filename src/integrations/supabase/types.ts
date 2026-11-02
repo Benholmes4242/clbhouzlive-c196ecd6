@@ -24051,6 +24051,35 @@ export type Database = {
           value: number
         }[]
       }
+      get_recent_rounds: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_scope?: string
+          p_window?: string
+        }
+        Returns: {
+          avg_topar: number
+          best_topar: number
+          course_handicap: number
+          course_id: string
+          course_name: string
+          course_par: number
+          delta: number
+          display_name: string
+          gross_score: number
+          is_competition: boolean
+          last_better: string
+          net_score: number
+          play_date: string
+          pos: number
+          prior_n: number
+          profile_photo_url: string
+          total_count: number
+          user_id: string
+          whs_score_id: string
+        }[]
+      }
       get_regions_leaderboard: {
         Args: {
           p_current_user_id?: string
