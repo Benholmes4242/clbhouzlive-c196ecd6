@@ -1496,4 +1496,5 @@
 
 ## PROFILE_CLEANUP_V1
 - [x] Verified dependencies; applied dead-file deletions and named cache/comment changes. Business edit simplification applied but not verified.
-- [ ] PROFILE_CLEANUP_V1.1: apply the three authorised editor corrections and canvas assertion removal; recheck and remove the dead header/college chain; run focused and four full shards, conditionally repair only the authorised RS provider harness, and update PROFILE_CLEANUP_V1_REPORT.md.
+- [x] PROFILE_CLEANUP_V1.1: exact editor corrections, authorised canvas assertion removal, five dead header/college deletions; 284/284 focused tests; automatic build OK; report updated.
+- [ ] STOP V1.1: shard 2 ws1WatchTop.test.tsx:318/332 (expected See all button to be null), :407 (multiple See all elements). Shard 1 repeats two known RS provider failures; provider fix deferred by new-failure stop. Four-shard completion and actual after total await ruling; hosted authenticated readback unavailable (external_unmanaged).
