@@ -60,3 +60,54 @@ mocked, supabase client stubbed, i18n courses+tourhub):
 Member surface, the foot removal from the previous change, and the rest of the
 tour tile. No SQL, no migrations, no RPC/edge edits, feed_config untouched,
 round_pool_cap stays at 30, no native/Median changes.
+
+---
+
+# FOLLOW-UP — full-width tour player row (doors flush right)
+
+## Problem
+The right-edge flex values were correct but the tour identity row lived INSIDE
+the head's left column (`scorecardParts.tsx`, `showIdentity && isTour` block),
+so it ended where the score column began and the doors sat mid-tile. The member
+row renders after the head's left/score flex at full width.
+
+## Diff
+`src/features/courses/_shared/scorecard/scorecardParts.tsx` — the only file
+changed:
+- Removed the `showIdentity && isTour` block from the head's left column.
+- Re-rendered it AFTER the head flex, as a full-width sibling with the member
+  row's container: `data-scorecard-player-row`, `display: flex`,
+  `alignItems: center`, `marginTop: 10`, `minWidth: 0`. Headshot stays 22px
+  (tour `srcCandidates` avatar), name 12.5/700 `flex: 1 1 auto` with ellipsis,
+  HandicapChip where it applies, doors wrapper unchanged (`flex: none`,
+  `marginLeft: 10`, `gap: 6`, Course then Profile). The doors' right edge now
+  lines up with the score's right edge above.
+- UNCHANGED: tour head kicker/event/venue/score, the position row and below,
+  and the member surface (`!isTour` row untouched).
+
+## Tests — `src/test/tourScorecardProfileDoor.test.tsx` (7 → 8)
+CHANGED assertion (old nesting asserted the tour surface had no full-width
+player row):
+- OLD: `expect(document.querySelector('[data-scorecard-player-row]')).toBeNull();`
+- NEW: `expect(document.querySelector('[data-scorecard-player-row]')).not.toBeNull();`
+  (comment updated: the tour identity row now renders at full tile width after
+  the head's left/score flex, carrying the same marker as the member row.)
+NEW test "the identity row is a sibling after the head left/score flex, not
+inside the left column": the row's previous sibling is the head flex
+(`display: flex`, `gap: 14px`); the left column (`flex: 1 1 auto`) does not
+contain the row.
+The two earlier right-edge tests (doors last children; long-name truncation)
+pass unchanged against the new placement.
+
+## Results
+- Focused (5 scorecard files): 36/36 passed.
+- `npx tsgo --noEmit`: clean.
+- Full suite in shards (4): 1,410 + 1,378 + 1,438 + 1,477 =
+  **5,703 passed / 5,703 across 532 files**, zero failures. The five
+  pre-existing T100 `GB&I` slab failures were resolved by T100.1 before this
+  follow-up, so none remain. Totals vs the 5,702/532 baseline: +1 test / +0
+  files (the new sibling-placement test).
+
+## Unchanged
+No SQL, no migrations, no RPC/edge edits, feed_config untouched,
+round_pool_cap stays at 30, no native/Median changes.
