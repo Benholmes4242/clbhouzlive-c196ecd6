@@ -171,14 +171,14 @@ describe('TourGlance', () => {
       </MemoryRouter>,
     );
 
-  it('shows the six section tiles when something is live, five otherwise', () => {
+  it('shows the five section tiles when something is live, four otherwise', () => {
     liveTours.data = [{ id: 't1', status: 'inprogress', currentRound: 2 }];
     const { unmount } = renderGlance();
-    expect(screen.getByTestId('tour-glance-sections').querySelectorAll('button')).toHaveLength(6);
+    expect(screen.getByTestId('tour-glance-sections').querySelectorAll('button')).toHaveLength(5);
     unmount();
     liveTours.data = [];
     renderGlance();
-    expect(screen.getByTestId('tour-glance-sections').querySelectorAll('button')).toHaveLength(5);
+    expect(screen.getByTestId('tour-glance-sections').querySelectorAll('button')).toHaveLength(4);
   });
 
   it('lists tour rows from the shared model and selects through selectTour', () => {

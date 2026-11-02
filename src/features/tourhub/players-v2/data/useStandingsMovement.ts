@@ -1,0 +1,19 @@
+/** useStandingsMovement — Map<player_key, moved> from get_tour_standings_movement. Empty until the second weekly snapshot; missing = no movement. */
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { currentSeasonYear } from '../../_shared/stats/useLeaderCategories';
+import type { PlayersTourId } from './usePlayersRanking';
+
+export function useStandingsMovement(tour: PlayersTourId, seasonYear?: number) {
+  const year = seasonYear ?? currentSeasonYear();
+  return useQuery<Map<string, number>>({
+    queryKey: ['players-v2', 'movement', tour, year],
+    enabled: seasonYear !== undefined,
+    staleTime: 30 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_tour_standings_movement', { p_tour: tour, p_year: year });
+      if (error) throw error;
+      return new Map((data ?? []).map((r) => [r.player_key, r.moved]));
+    },
+  });
+}

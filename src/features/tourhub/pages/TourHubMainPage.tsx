@@ -5,7 +5,7 @@ import { TourHubShell } from '../components/TourHubShell';
 import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab } from '../components/tabs';
-import { LeadersTab as LeadersTabV2 } from '@/features/tourhub/leaders-v2/LeadersTab';
+import { legacyTabRedirect } from '@/features/tourhub/players-v2/playersRules';
 import { PlayersTab as PlayersTabV2 } from '@/features/tourhub/players-v2/PlayersTab';
 import { ScheduleTab as ScheduleTabV2 } from '@/features/tourhub/schedule-v2/ScheduleTab';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
@@ -52,7 +52,6 @@ const TAB_TITLES: Record<string, string> = {
   live: 'Leaderboards',
   schedule: 'Schedule',
   players: 'Players',
-  leaderboards: 'Leaders',
 };
 
 /**
@@ -123,7 +122,7 @@ export function TourHubMainPage() {
      arrived. */
   const backMode = false;
   const tabParam = searchParams.get('tab') as TourHubTab | null;
-  const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
+  const [activeTab, setActiveTab] = useState<TourHubTab>(legacyTabRedirect(searchParams) ? 'players' : tabParam || 'overview');
   /* Owned here, not in the bridge: the sub-page shell suppresses the island, so
      its own header carries the tour control and needs the same tile state. */
   const [glanceOpen, setGlanceOpen] = useState(false);
@@ -147,9 +146,13 @@ export function TourHubMainPage() {
   }, [liveTournaments]);
 
   useEffect(() => {
-    if (tabParam === ('player-stats' as string)) {
-      setSearchParams({ tab: 'leaderboards' }, { replace: true });
-      setActiveTab('leaderboards');
+    /* Players build 1: Leaders is gone. Old Leaders links (and the older
+       player-stats alias) land on the full field's Stats lens, replacing
+       history so Back does not bounce through the dead tab. */
+    const legacy = legacyTabRedirect(searchParams);
+    if (legacy) {
+      setSearchParams(legacy, { replace: true });
+      setActiveTab('players');
       return;
     }
 
@@ -189,8 +192,6 @@ export function TourHubMainPage() {
         return <ScheduleTabV2 />;
       case 'players':
         return <PlayersTabV2 />;
-      case 'leaderboards':
-        return <LeadersTabV2 />;
       default:
         return <OverviewTab />;
     }

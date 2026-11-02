@@ -27,7 +27,7 @@ import { TournamentsSection } from './sections/TournamentsSection';
 import { AboutSection } from './sections/AboutSection';
 import { AgainstTheFieldSection } from './sections/AgainstTheFieldSection';
 import { selectPlayerSeason } from './playerSeason';
-import { useLeaderCategories } from '../leaders-v2/data/useLeaderCategories';
+import { useLeaderCategories } from '../_shared/stats/useLeaderCategories';
 import { mapTourSlug } from '../_shared/tourOrder';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { TOUR_CANVAS } from '../_shared/tokens';

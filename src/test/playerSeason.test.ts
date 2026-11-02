@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { TFunction } from 'i18next';
 import type { TourPlayerStatistics } from '@/features/tourhub/hooks/useTourHubData';
-import type { LeaderCategoryDef, LeaderRankMaps } from '@/features/tourhub/leaders-v2/data/useLeaderCategories';
+import type { LeaderCategoryDef, LeaderRankMaps } from '@/features/tourhub/_shared/stats/useLeaderCategories';
 import { selectPlayerSeason } from '@/features/tourhub/player-v2/playerSeason';
 
 const t = ((key: string) => key) as TFunction;

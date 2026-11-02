@@ -16,7 +16,7 @@
  */
 
 import { useState } from 'react';
-import { currentSeasonYear } from '../../leaders-v2/data/useLeaderCategories';
+import { currentSeasonYear } from '../../_shared/stats/useLeaderCategories';
 import { isFinish, isMissedCut, isNonStarter, isWithdrawn, normalizeStatus } from '../../_shared/resultStatus';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

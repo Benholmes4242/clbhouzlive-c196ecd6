@@ -25,7 +25,7 @@ import {
   LEADER_STAT_LABELS,
   currentSeasonYear,
   useLeaderCategories,
-} from '../leaders-v2/data/useLeaderCategories';
+} from '../_shared/stats/useLeaderCategories';
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
 import { TITLE, FIGS } from '@/lib/tokens/type';
 import { playerOrdinal } from './playerOrdinal';

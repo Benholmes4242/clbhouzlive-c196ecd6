@@ -7,5 +7,4 @@ export type TourHubTab =
   | 'news'
   | 'live'
   | 'schedule'
-  | 'players'
-  | 'leaderboards';
+  | 'players';
