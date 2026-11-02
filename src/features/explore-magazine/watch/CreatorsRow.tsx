@@ -1,20 +1,12 @@
-/**
- * WS1 §2 — THE CREATORS ROW (watch-s1.html, signed off — the mock is the spec).
- *
- * For you only, between the chips and the lead. Ben's curated list, newest
- * video first, from get_featured_creators. A creator with a video in the last
- * 7 days wears a white ring and reads "{n} this week"; everyone else reads
- * their area through shortCourseName. The row hides itself, heading included,
- * under CREATORS_MIN; See all appears only above CREATORS_SEE_ALL_MAX and
- * opens a bottom sheet listing every creator with a Follow pill.
- *
- * Guests see nothing: the read is disabled signed out and the RPC returns no
- * rows, and a guest render never reaches here (the row is not mounted).
+/** EXPLORE_TOP_1 people row: server ordering/permissions, one day-post viewer path,
+ * and the existing creator sheet layout. You always stays white (mock-B ruling).
+ * The WS1 export name and data-watch-creators marker remain for existing consumers.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
+import { ChevronRight, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -25,294 +17,117 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { toast } from '@/lib/toast';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useFeaturedCreators, type FeaturedCreator } from './useFeaturedCreators';
-import {
-  CREATORS_SHEET_LIMIT,
-  creatorSecondLine,
-  showsCreatorsRow,
-  showsCreatorsSeeAll,
-} from './watchTopRules';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { loadPublishedViewerPosts } from '@/lib/publishedPostViewer';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { useExplorePeopleRow, type ExplorePerson } from './useExplorePeopleRow';
+import './explore-top.css';
 
-/** watch_creators_viewed fires once per session, at 50% visibility. */
 let viewedThisSession = false;
+export function resetCreatorsRowSessionForTests() { viewedThisSession = false; }
+const MUTE = 'var(--explore-top-mute)';
 
-/** Test-only: clears the session view flag. The app never calls this. */
-export function resetCreatorsRowSessionForTests() {
-  viewedThisSession = false;
+function PersonAvatar({ person, size }: { person: ExplorePerson; size: number }) {
+  return <SquircleAvatar src={person.avatar_url ?? undefined} alt={person.display_name} userId={person.actor_id} size={size} fallback={person.display_name.charAt(0)} hairlineRing />;
 }
 
-const MUTE = 'rgba(248,250,252,0.62)';
-
-function creatorPath(creator: FeaturedCreator): string {
-  return creator.actor_type === 'business'
-    ? `/business/${creator.handle || creator.actor_id}`
-    : getProfilePathById(creator.actor_id, undefined, creator.handle);
-}
-
-/** The second line, shared by the row cell and the sheet row so they cannot
- *  drift: "{n} this week" in ink, otherwise the area, dim. */
-function SecondLine({ creator, size }: { creator: FeaturedCreator; size: number }) {
-  const { t } = useTranslation('courses');
-  const line = creatorSecondLine(creator.videos_7d, creator.area);
-  if (!line) return null;
-  if (line.kind === 'week') {
-    return (
-      <span data-creator-line="week" style={{ display: 'block', marginTop: 1, fontSize: size, fontWeight: 600, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-        {t('amateur.watch.creators.thisWeek', '{{count}} this week', { count: line.count })}
-      </span>
-    );
-  }
-  return (
-    <span data-creator-line="area" style={{ display: 'block', marginTop: 1, fontSize: size, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-      {line.area}
-    </span>
-  );
-}
-
-/** 64px avatar for the row: photo, else a black name tile for a business,
- *  else the member's initials through the canonical squircle fallback. */
-function CreatorAvatar({ creator, size }: { creator: FeaturedCreator; size: number }) {
-  if (creator.actor_type === 'business' && !creator.avatar_url) {
-    return (
-      <span
-        data-creator-avatar="business-tile"
-        style={{
-          display: 'flex',
-          width: size,
-          height: size,
-          borderRadius: '34%',
-          background: '#000000',
-          color: '#FFFFFF',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          fontSize: 9,
-          fontWeight: 700,
-          lineHeight: 1.2,
-          padding: 4,
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-        }}
-      >
-        {creator.display_name}
-      </span>
-    );
-  }
-  return (
-    <SquircleAvatar
-      src={creator.avatar_url ?? undefined}
-      alt={creator.display_name}
-      userId={creator.actor_type === 'personal' ? creator.actor_id : null}
-      size={size}
-      fallback={creator.display_name.charAt(0)}
-      hairlineRing
-    />
-  );
-}
-
-export function CreatorsRow({ userId }: { userId: string | undefined }) {
-  const { t } = useTranslation('courses');
+export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | undefined; onDepart?: () => void }) {
+  const { user } = useSupabaseSession();
+  const signedIn = !!userId && !!user?.id && user.is_anonymous !== true;
+  const people = useExplorePeopleRow(21, signedIn ? userId : undefined);
   const navigate = useNavigate();
-  const creators = useFeaturedCreators(12, !!userId);
+  const location = useLocation();
+  const { activeActor } = useActiveActor();
   const [sheetOpen, setSheetOpen] = useState(false);
-
-  /* watch_creators_viewed — once per session, at 50% visible. */
+  const [pending, setPending] = useState<string | null>(null);
+  const request = useRef(0);
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const count = creators.data?.length ?? 0;
+  const list = people.data ?? [];
+  const others = list.filter((p) => p.tier !== 'you');
+  const you = list.find((p) => p.tier === 'you');
+  const row = [...(you ? [you] : []), ...others.slice(0, 20)];
+  const visible = signedIn && !people.isError && others.length > 0;
   useEffect(() => {
     const el = rootRef.current;
-    if (!el || viewedThisSession || count === 0) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && !viewedThisSession) {
-            viewedThisSession = true;
-            analyticsEvents.track('watch_creators_viewed');
-            obs.disconnect();
-          }
-        }
-      },
-      { threshold: 0.5 },
-    );
+    if (!el || !visible || viewedThisSession) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting && e.intersectionRatio >= 0.5) && !viewedThisSession) {
+        viewedThisSession = true;
+        analyticsEvents.track('explore_row_viewed');
+        obs.disconnect();
+      }
+    }, { threshold: 0.5 });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [count]);
+  }, [visible]);
+  useEffect(() => () => { request.current += 1; }, []);
 
-  if (!userId) return null;
+  const openPerson = async (person: ExplorePerson, position: number) => {
+    if (!signedIn) return;
+    analyticsEvents.track('explore_row_tapped', { tier: person.tier, position, has_new: person.has_new });
+    if (person.tier === 'you') {
+      analyticsEvents.track('explore_row_you_tapped');
+      setSheetOpen(false);
+      usePostStudioStore.getState().openPostStudio({ actorType: 'personal', actorId: userId, returnPath: location.pathname + location.search });
+      return;
+    }
+    if (!person.has_new) {
+      setSheetOpen(false);
+      navigate(getProfilePathById(person.actor_id, undefined, person.handle ?? undefined));
+      return;
+    }
+    const token = ++request.current;
+    setPending(person.actor_id);
+    try {
+      const posts = await loadPublishedViewerPosts(person.new_post_ids, { userId, actorId: activeActor?.id ?? userId ?? null, actorType: activeActor?.type === 'business' ? 'business' : 'personal' });
+      if (request.current !== token) return;
+      if (!posts.length) { toast.error("This post isn't available"); return; }
+      setSheetOpen(false);
+      onDepart();
+      openWithOrigin({ posts, index: 0, originEl: null, openedFrom: 'explore-people', forceStartAtZero: true });
+    } catch {
+      if (request.current === token) toast.error("Couldn't load this post");
+    } finally {
+      if (request.current === token) setPending(null);
+    }
+  };
 
-  /* Skeleton: the heading plus five 64px squircles. */
-  if (!creators.isFetched) {
-    return (
-      <div data-watch-creators="skeleton" aria-hidden>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '22px 16px 12px' }}>
-          <div style={{ width: 76, height: 19, borderRadius: 6, background: A.PANEL }} />
-        </div>
-        <div style={{ display: 'flex', gap: 12, padding: '0 16px', overflow: 'hidden' }}>
-          {Array.from({ length: 5 }, (_, i) => (
-            <span key={i} style={{ flex: 'none', width: 64, height: 64, borderRadius: '34%', background: A.PANEL }} />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  /* Errored or under the minimum: no row, no heading. */
-  if (creators.isError || !showsCreatorsRow(count)) return null;
-  const list = creators.data ?? [];
-
-  return (
-    <div ref={rootRef} data-watch-creators="row">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '22px 16px 6px' }}>
-        <h2 style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, fontFamily: SANS }}>
-          {t('amateur.watch.creators.title', 'Creators')}
-        </h2>
-        {showsCreatorsSeeAll(count) ? (
-          <button
-            type="button"
-            onClick={() => {
-              analyticsEvents.track('watch_creators_see_all');
-              setSheetOpen(true);
-            }}
-            style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 14, fontWeight: 600, color: MUTE }}
-          >
-            {t('amateur.watch.seeAll', 'See all')}
-          </button>
-        ) : null}
-      </div>
-      <div
-        className="no-scrollbar"
-        style={{
-          display: 'flex',
-          gap: 12,
-          /* WS1.2: 6px vertical room so the 4px ring is never clipped;
-           * the heading loses the matching 6px, keeping the gap the same. */
-          padding: '6px 16px',
-          overflowX: 'auto',
-          maxWidth: '100%',
-          overscrollBehaviorX: 'contain',
-          touchAction: 'pan-x pan-y',
-          willChange: 'transform',
-        }}
-      >
-        {list.map((creator, index) => {
-          const active = creator.videos_7d > 0;
-          return (
-            <button
-              key={`${creator.actor_type}:${creator.actor_id}`}
-              type="button"
-              data-watch-creator={creator.actor_type}
-              onClick={() => {
-                analyticsEvents.track('watch_creator_tapped', { actor_type: creator.actor_type, position: index + 1 });
-                navigate(creatorPath(creator));
-              }}
-              style={{
-                flex: 'none',
-                width: 68,
-                padding: 0,
-                border: 0,
-                background: 'transparent',
-                textAlign: 'center',
-                cursor: 'pointer',
-                fontFamily: SANS,
-                color: A.INK,
-              }}
-            >
-              <span
-                data-creator-ring={active ? 'true' : undefined}
-                style={{
-                  /* WS1.2: exactly the avatar's own box, so the ring's 34%
-                   * radius resolves on the avatar's edge, not the line box. */
-                  display: 'flex',
-                  width: 64,
-                  aspectRatio: '1 / 1.05',
-                  borderRadius: '34%',
-                  lineHeight: 0,
-                  margin: '0 auto',
-                  /* A creator with a video this week wears the white ring. */
-                  boxShadow: active ? `0 0 0 2px ${A.CANVAS}, 0 0 0 4px ${A.INK}` : undefined,
-                }}
-              >
-                <CreatorAvatar creator={creator} size={64} />
-              </span>
-              <span style={{ display: 'block', marginTop: 8, fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {creator.display_name}
-              </span>
-              <SecondLine creator={creator} size={11} />
-            </button>
-          );
-        })}
-      </div>
-      {sheetOpen ? <CreatorsSheet onClose={() => setSheetOpen(false)} /> : null}
+  if (!signedIn) return null;
+  if (!people.isFetched) return <div data-watch-creators="skeleton" className="explore-people" aria-hidden><div className="explore-people-scroll">{Array.from({ length: 5 }, (_, i) => <span key={i} className="explore-person"><span className="explore-person-ring explore-person-skeleton" /><span className="explore-name-skeleton" /></span>)}</div></div>;
+  if (!visible) return null;
+  return <div ref={rootRef} data-watch-creators="row" className="explore-people">
+    <div className="explore-people-scroll no-scrollbar">
+      {row.map((person, i) => <Button key={person.actor_id} variant="ghost" className="explore-person" aria-label={person.tier === 'you' ? 'You' : person.display_name} aria-busy={pending === person.actor_id} onClick={() => void openPerson(person, i + 1)}>
+        <span className="explore-person-ring" data-creator-ring={person.has_new ? 'true' : undefined}>
+          <PersonAvatar person={person} size={64} />
+          {person.tier === 'you' ? <span className="explore-person-plus" data-explore-plus aria-hidden><Plus size={10} strokeWidth={4} /></span> : null}
+        </span>
+        <span className="explore-person-name" data-name-ink={person.has_new || person.tier === 'you' ? 'ink' : 'mute'}>{person.tier === 'you' ? 'You' : person.display_name}</span>
+      </Button>)}
+      {others.length >= 21 ? <Button variant="ghost" className="explore-person" onClick={() => { analyticsEvents.track('explore_row_see_all'); setSheetOpen(true); }}><span className="explore-person-see"><ChevronRight size={18} strokeWidth={2.4} /></span><span className="explore-person-name" data-name-ink="mute">See all</span></Button> : null}
     </div>
-  );
+    {sheetOpen ? <CreatorsSheet userId={userId} pending={pending} onClose={() => setSheetOpen(false)} onOpen={openPerson} /> : null}
+  </div>;
 }
 
-/** The See-all sheet: every creator, Find people row design — 44 squircle,
- *  name with VerifiedBadge, the same second line, and a Follow pill. */
-function CreatorsSheet({ onClose }: { onClose: () => void }) {
+function CreatorsSheet({ userId, pending, onClose, onOpen }: { userId: string | undefined; pending: string | null; onClose: () => void; onOpen: (person: ExplorePerson, position: number) => Promise<void> }) {
   const { t } = useTranslation('courses');
-  const navigate = useNavigate();
-  const creators = useFeaturedCreators(CREATORS_SHEET_LIMIT, true);
-  const list = useMemo(() => creators.data ?? [], [creators.data]);
-
-  return (
-    <BottomSheet open onClose={onClose} scrollBody ariaLabelledBy="watch-creators-sheet-title">
-      <div style={{ padding: '0 16px 24px', fontFamily: SANS }}>
-        <h2 id="watch-creators-sheet-title" style={{ margin: 0, padding: '4px 0 12px', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
-          {t('amateur.watch.creators.title', 'Creators')}
-        </h2>
-        {list.map((creator, index) => (
-          <SheetRow key={`${creator.actor_type}:${creator.actor_id}`} creator={creator} divider={index > 0} onOpen={() => {
-            onClose();
-            navigate(creatorPath(creator));
-          }} />
-        ))}
-      </div>
-    </BottomSheet>
-  );
-}
-
-function SheetRow({ creator, divider, onOpen }: { creator: FeaturedCreator; divider: boolean; onOpen: () => void }) {
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onOpen}
-      onKeyDown={(e) => {
-        if (e.target !== e.currentTarget) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onOpen();
-        }
-      }}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '12px 0',
-        cursor: 'pointer',
-        borderTopStyle: divider ? 'solid' : undefined,
-        borderTopWidth: divider ? 0.5 : undefined,
-        borderTopColor: divider ? A.BORDER : undefined,
-        textAlign: 'left',
-      }}
-    >
-      <CreatorAvatar creator={creator} size={44} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, fontWeight: 600, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{creator.display_name}</span>
-          {creator.is_verified ? <VerifiedBadge size="sm" /> : null}
-        </div>
-        <SecondLine creator={creator} size={12} />
-      </div>
-      <CreatorFollowPill creator={creator} />
+  const people = useExplorePeopleRow(50, userId);
+  return <BottomSheet open onClose={onClose} scrollBody ariaLabelledBy="watch-creators-sheet-title">
+    <div style={{ padding: '0 16px 24px', fontFamily: SANS }}>
+      <h2 id="watch-creators-sheet-title" style={{ margin: 0, padding: '4px 0 12px', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>{t('amateur.watch.creators.title', 'Creators')}</h2>
+      {(people.data ?? []).map((person, i) => <div key={person.actor_id} role="button" tabIndex={0} aria-busy={pending === person.actor_id} onClick={() => void onOpen(person, i + 1)} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); void onOpen(person, i + 1); } }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', cursor: 'pointer', borderTop: i ? `0.5px solid ${A.BORDER}` : undefined, textAlign: 'left' }}>
+        <PersonAvatar person={person} size={44} />
+        <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, fontWeight: 600, color: A.INK }}><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{person.tier === 'you' ? 'You' : person.display_name}</span>{person.is_verified ? <VerifiedBadge size="sm" /> : null}</div></div>
+        {person.tier !== 'you' ? <CreatorFollowPill creator={person} /> : null}
+      </div>)}
     </div>
-  );
+  </BottomSheet>;
 }
 
 /** 32px outline pill; Following dims to mute with a 0.1-alpha border — the
  *  Find people pill, through the same canonical useToggleFollow mutation. */
-function CreatorFollowPill({ creator }: { creator: FeaturedCreator }) {
+function CreatorFollowPill({ creator }: { creator: ExplorePerson }) {
   const { t } = useTranslation('common');
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -331,9 +146,9 @@ function CreatorFollowPill({ creator }: { creator: FeaturedCreator }) {
     setPending(true);
     try {
       await toggle.mutateAsync({
-        targetActorType: creator.actor_type,
+        targetActorType: 'personal',
         targetActorId: creator.actor_id,
-        targetUserId: creator.actor_type === 'personal' ? creator.actor_id : undefined,
+        targetUserId: 'personal' === 'personal' ? creator.actor_id : undefined,
         viewerActorType: activeActor?.type ?? 'personal',
         viewerActorId: activeActor?.id ?? user.id,
         viewerUserId: user.id,
