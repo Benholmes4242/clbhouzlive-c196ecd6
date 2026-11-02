@@ -1495,5 +1495,5 @@
 - [ ] WS3 Watch section 3: WS3.1 rulings applied (stand-in, ws2 title, Long form See all + test); STOPPED — rsRoundsShelf 2 tests still fail "No QueryClient set": useToggleFollow inside CreatorSpotlight. Awaiting ruling.
 
 ## PROFILE_CLEANUP_V1
-- [ ] Verify deletion dependencies; remove dead profile/edit code and business create branches; apply named cache/comment corrections.
-- [ ] Apply only authorized test edits (including approved completion-cache assertion removal); run four shards at maxWorkers=2 and report all counts/errors.
+- [x] Verified dependencies; applied dead-file deletions and named cache/comment changes. Business edit simplification applied but not verified.
+- [ ] STOP: focused business suites fail collection; BusinessProfileEditor.tsx:291 "Return statement is not allowed here"; automatic TS1128 at 353. Await correction authorization before reruns/full shards. Authorized test edits applied; 146 collected tests pass. Report PROFILE_CLEANUP_V1_REPORT.md.
