@@ -18,6 +18,8 @@ import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 import { EditProfileCard, type PhotoKind, type PhotoActions } from '@/features/edit-profile/EditProfileCard';
 import { EditProfileYou, type YouFields, type YouPatch, type YouActions } from '@/features/edit-profile/EditProfileYou';
+import { EditProfileType } from '@/features/edit-profile/EditProfileType';
+import { toast } from '@/lib/toast';
 import { EditProfileGolf, type GolfFields, type GolfPatch, type GolfActions } from '@/features/edit-profile/EditProfileGolf';
 import { EditProfileLinksPrivacy, type LinksPrivacyFields, type LinksPrivacyPatch } from '@/features/edit-profile/EditProfileLinksPrivacy';
 import { EditProfileCompletion } from '@/features/edit-profile/EditProfileCompletion';
@@ -70,6 +72,7 @@ export default function EditProfile() {
   const [youNow, setYouNow] = useState<YouPatch>({});
   const [golfNow, setGolfNow] = useState<GolfPatch>({});
   const [linksPrivacyNow, setLinksPrivacyNow] = useState<LinksPrivacyPatch>({});
+  const [creatorNow, setCreatorNow] = useState<boolean | null>(null);
 
   const runSave = (next: typeof form, opts: Parameters<typeof save>[1], onOk?: () => void) => {
     const run = async (): Promise<boolean> => {
@@ -99,6 +102,8 @@ export default function EditProfile() {
     runSave({ ...form, ...golfNow, ...patch }, { profileFields: fields, hasWhsConnection: !!whs }, () => setGolfNow(v => ({ ...v, ...patch })));
   const saveLinksPrivacy = (fields: LinksPrivacyFields, patch: LinksPrivacyPatch) =>
     runSave({ ...form, ...linksPrivacyNow, ...patch }, { profileFields: fields }, () => setLinksPrivacyNow(v => ({ ...v, ...patch })));
+
+  const saveCreator = (on: boolean) => runSave({ ...form, isCreator: on }, { profileFields: 'creator' }, () => { setCreatorNow(on); if (!on) toast('Back to a standard profile'); });
 
   if (loading && !profile) return <ManagePageSkeleton />;
 
@@ -157,6 +162,7 @@ export default function EditProfile() {
             onSave={saveYou}
             onUsernameChanged={(u, at) => setUsernameNow({ username: u, at })}
           />}
+          {profile && <EditProfileType isCreator={creatorNow ?? profile.is_creator ?? false} onSave={saveCreator} />}
           {profile && <EditProfileGolf ref={golfActions} userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
           {profile && <EditProfileLinksPrivacy userId={user?.id ?? ''} form={{ ...form, ...linksPrivacyNow }} handicapVisibility={profile.handicap_visibility === 'friends' || profile.handicap_visibility === 'private' ? profile.handicap_visibility : 'public'} onSave={saveLinksPrivacy} />}
         </main>

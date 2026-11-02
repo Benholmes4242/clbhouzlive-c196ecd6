@@ -231,7 +231,7 @@ describe('BC3 extras card', () => {
     cleanup();
 
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     fireEvent.change(screen.getByTestId('bizc-name').querySelector('input') as HTMLInputElement, { target: { value: 'A Creator' } });
     await waitFor(() => expect((screen.getByTestId('bizc-continue-2') as HTMLButtonElement).disabled).toBe(false));
     fireEvent.click(screen.getByTestId('bizc-continue-2'));

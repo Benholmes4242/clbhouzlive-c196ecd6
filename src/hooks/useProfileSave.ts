@@ -18,7 +18,7 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header'; profileFields?: 'name' | 'bio' | 'location' | 'gender' | 'handicap' | 'homeClub' | 'additionalClubs' | 'websites' | 'socials' | 'homeClubVisibility' | 'additionalClubsVisibility' | 'topTenVisibility' } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header'; profileFields?: 'creator' | 'name' | 'bio' | 'location' | 'gender' | 'handicap' | 'homeClub' | 'additionalClubs' | 'websites' | 'socials' | 'homeClubVisibility' | 'additionalClubsVisibility' | 'topTenVisibility' } = {}
   ): Promise<boolean | 'username_taken'> => {
     const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
@@ -137,6 +137,7 @@ export function useProfileSave(userId: string) {
         const payload: Record<string, unknown> = f === 'name'
           ? { first_name: form.firstName.trim(), last_name: form.lastName.trim(), display_name: form.displayName.trim() }
           : f === 'bio' ? { bio: form.bio.trim() }
+          : f === 'creator' ? { is_creator: form.isCreator }
           : f === 'location' ? { country: form.country.trim(), city: form.city.trim() }
           : f === 'handicap' ? { manual_handicap_index: parseHcpFormString(form.handicapIndex) }
           : f === 'homeClub' ? { home_club: form.homeClubName, primary_club_id: form.primaryClubId }
@@ -151,7 +152,8 @@ export function useProfileSave(userId: string) {
         if (error) throw error;
         if (!data) throw new Error('Profile update did not match any row');
         await queryClient.invalidateQueries({ queryKey: ['profile', userId] });
-        await queryClient.invalidateQueries({ queryKey: ['user-profile'], refetchType: 'all' });
+        await queryClient.invalidateQueries({ queryKey: f === 'creator' ? ['user-profile', userId] : ['user-profile'], refetchType: 'all' });
+        if (f === 'creator') await queryClient.invalidateQueries({ queryKey: ['profile-creator', userId] });
         if (f === 'gender') await queryClient.invalidateQueries({ queryKey: whsKeys.percentile(userId), refetchType: 'all' });
         if (f === 'homeClub') await Promise.all([...INVALIDATE_KEYS, 'home-club-status'].map(key => queryClient.invalidateQueries({ queryKey: [key], refetchType: 'all' })));
         return true;
@@ -161,7 +163,7 @@ export function useProfileSave(userId: string) {
       // It cannot finish onboarding or replace unrelated clubs/privacy fields.
       if (opts.welcomeFields) {
         const payload = opts.welcomeFields === 'identity'
-          ? { first_name: form.firstName.trim(), last_name: form.lastName.trim(), display_name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(), username: form.username.trim().toLowerCase(), username_is_custom: true, profile_photo_url: profilePhotoUrl, updated_at: updatePayload.updated_at }
+          ? { first_name: form.firstName.trim(), last_name: form.lastName.trim(), display_name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(), username: form.username.trim().toLowerCase(), username_is_custom: true, profile_photo_url: profilePhotoUrl, is_creator: form.isCreator, updated_at: updatePayload.updated_at }
           : { primary_club_id: form.primaryClubId, home_club: form.homeClubName, updated_at: updatePayload.updated_at };
         const { data, error } = await supabase.from('user_profiles').update(payload).eq('id', userId).select('id').single();
         if (error?.code === '23505') return 'username_taken';

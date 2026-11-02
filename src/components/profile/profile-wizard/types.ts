@@ -40,6 +40,7 @@ export interface ProfileFormData {
   country: string;
   city: string;
   isPublic: boolean;
+  isCreator: boolean;
   gender: string;
   /** Handicap page stats + peer comparison visibility — 'everyone' | 'friends' | 'nobody'. */
   

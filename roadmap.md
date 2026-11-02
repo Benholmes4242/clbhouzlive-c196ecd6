@@ -1,5 +1,10 @@
 # Roadmap
 
+## CR1 — Self-serve creator choice
+- [ ] Add shared switch, Welcome Continue-only choice and immediate Edit profile save/rollback.
+- [ ] Remove business-create Creator tile and apply only authorised test edits.
+- [ ] Run focused checks and four full shards; reconcile 5,911 tests / 543 files; record screenshots and verification limits in CR1_REPORT.md.
+
 ## Course Media fullscreen shot selection
 - [x] Guard missing shot ids, publish opening index, preserve selected/swiped shots and reject stale hydration.
 - [x] Audit tile identities; ten new regressions; focused 60/60 and full four shards 5,911/5,911 across 543 files (baseline 5,901/542).
