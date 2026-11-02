@@ -66,7 +66,7 @@ export function HundredRail({ tiles, onOpenCourse }: { tiles: Top100CourseProgre
 export function HundredRaceRow({ row, viewerId, total, previousViewer = false, onPress }: { row: CareerRow; viewerId: string; total: number; previousViewer?: boolean; onPress: () => void }) {
   const { t } = useTranslation('courses');
   const self = Boolean(row.is_viewer || row.user_id === viewerId);
-  return <button type="button" className="t100-row" data-race-row={row.user_id} data-viewer={self || undefined} data-after-viewer={previousViewer || undefined} onPress={onPress}>
+  return <button type="button" className="t100-row" data-race-row={row.user_id} data-viewer={self || undefined} data-after-viewer={previousViewer || undefined} onClick={onPress}>
     <span className="t100-position tabular-nums">{row.is_tie ? `T${row.pos}` : row.pos}</span>
     <SquircleAvatar size={34} src={row.photo_url} alt={row.display_name ?? ''} userId={row.user_id} hairlineRing />
     <span className="t100-row-main"><span className="t100-row-name">{row.display_name || t('discover.aMember')}</span>
