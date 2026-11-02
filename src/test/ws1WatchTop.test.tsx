@@ -261,7 +261,7 @@ describe('WS1 chips', () => {
     expect(screen.getByText('From the community')).toBeTruthy();
   });
 
-  it('the community rail's See all routes to /media?kind=community', () => {
+  it("the community rail's See all routes to /media?kind=community", () => {
     /* The rail injects once, after the third long-form card, so the feed
        needs four long rows on screen. */
     f.videos = {
