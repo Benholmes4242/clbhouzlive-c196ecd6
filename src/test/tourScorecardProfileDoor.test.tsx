@@ -79,6 +79,21 @@ describe('Tour scorecard profile door', () => {
 });
 
 describe('Tour scorecard doors at the right edge', () => {
+  it('the identity row is a sibling after the head left/score flex, not inside the left column', () => {
+    mount(<CardScorecardSheet {...tour} onViewProfile={vi.fn()} />);
+    const row = document.querySelector('[data-scorecard-player-row]') as HTMLElement;
+    expect(row).not.toBeNull();
+    // The row follows the head flex (the left/score container, gap 14) directly.
+    const headFlex = row.previousElementSibling as HTMLElement;
+    expect(headFlex).not.toBeNull();
+    expect(headFlex.style.display).toBe('flex');
+    expect(headFlex.style.gap).toBe('14px');
+    // The left column (flex 1 1 auto) must not contain the row.
+    const leftCol = headFlex.firstElementChild as HTMLElement;
+    expect(leftCol.style.flex).toBe('1 1 auto');
+    expect(leftCol.contains(row)).toBe(false);
+  });
+
   it('the doors are the last children of the identity row and the name takes the remaining width', () => {
     mount(<CardScorecardSheet {...tour} onViewProfile={vi.fn()} />);
     const doors = document.querySelector('[data-sheet-doors]') as HTMLElement;
