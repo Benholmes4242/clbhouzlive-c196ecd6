@@ -340,12 +340,14 @@
     },
     "watch": {
       "chip": {
-        "all": "전체",
+        "all": "추천",
         "clips": "클립",
         "forYou": "추천",
         "friends": "친구",
         "videos": "영상",
-        "yourCourses": "내 코스"
+        "yourCourses": "내 코스",
+        "quick": "쇼츠",
+        "long": "롱폼"
       },
       "empty": "아직 볼 내용이 없습니다.",
       "filters": "Watch 필터",
@@ -355,8 +357,19 @@
         "community": "커뮤니티",
         "videos": "영상"
       },
-      "searchPlaceholder": "영상, 클립, 크리에이터 검색",
-      "untitled": "제목 없는 영상"
+      "searchPlaceholder": "동영상 및 크리에이터 검색",
+      "untitled": "제목 없는 영상",
+      "creators": {
+        "title": "크리에이터",
+        "thisWeek": "이번 주 {{count}}개"
+      },
+      "lead": {
+        "kickerNew": "이번 주 새 영상",
+        "kickerLiked": "이번 달 인기",
+        "likes": "좋아요 {{count}}개",
+        "mute": "음소거",
+        "unmute": "음소거 해제"
+      }
     },
     "roundsShelf": {
       "title": "이번 주 라운드",
