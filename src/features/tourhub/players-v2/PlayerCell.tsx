@@ -56,9 +56,9 @@ export function PlayerCell({ rawName, name, tourCode, country, followed, nameSiz
   );
 }
 
-export function PointsBar({ pct, lead }: { pct: number; lead: boolean }) {
+export function PointsBar({ pct, lead, mt = 7 }: { pct: number; lead: boolean; mt?: number }) {
   return (
-    <span data-points-bar style={{ display: 'block', marginTop: 7, height: 3, borderRadius: 2, background: P.HAIR, overflow: 'hidden' }}>
+    <span data-points-bar style={{ display: 'block', marginTop: mt, height: 3, borderRadius: 2, background: P.HAIR, overflow: 'hidden' }}>
       <span style={{ display: 'block', height: '100%', width: `${pct}%`, borderRadius: 2, background: lead ? P.INK : 'rgba(248,250,252,0.5)' }} />
     </span>
   );

@@ -7,7 +7,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Search } from 'lucide-react';
 import { AMBER } from '../../_shared/tokens';
-import { Headshot, Move, PlayerCell, PointsBar } from '../PlayerCell';
+import { Headshot, Move, PlayerCell, PointsBar, useHeadshot } from '../PlayerCell';
 import { FormTiles } from '../field/FormTiles';
 import { P, FIG } from '../playersTokens';
 import type { PageActions, PageData, CardName } from '../pageModel';
@@ -51,17 +51,17 @@ function Kick({ left, right, amber }: { left: string; right?: ReactNode; amber?:
   );
 }
 
-function MiniRow({ p, actions, card, sub, race, leaderPts }: { p: PlayerView; actions: PageActions; card: CardName; sub?: ReactNode; race?: boolean; leaderPts?: number | null }) {
+function MiniRow({ p, actions, card, sub, race, leaderPts, first }: { p: PlayerView; actions: PageActions; card: CardName; sub?: ReactNode; race?: boolean; leaderPts?: number | null; first?: boolean }) {
   return (
     <button
       type="button"
       data-mini-row={p.rank}
       onClick={() => actions.goPlayer(p, card)}
-      style={{ width: '100%', display: 'grid', gridTemplateColumns: race ? '28px minmax(0,1fr) 36px 52px' : '28px minmax(0,1fr) auto 52px', columnGap: 10, alignItems: 'center', minHeight: race ? 52 : 40, padding: 0, border: 0, borderTop: `1px solid ${P.HAIR}`, background: 'transparent', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', color: P.INK }}
+      style={{ width: '100%', display: 'grid', gridTemplateColumns: race ? '28px minmax(0,1fr) 36px 52px' : '28px minmax(0,1fr) auto 52px', columnGap: 10, alignItems: 'center', minHeight: race ? 52 : 40, padding: 0, border: 0, borderTop: first ? 'none' : `1px solid ${P.HAIR}`, background: 'transparent', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', color: P.INK }}
     >
       <span style={{ fontSize: 12.5, fontWeight: 700, color: P.MUTE, ...FIG }}>{p.rank}</span>
       <PlayerCell rawName={p.rawName} name={p.name} tourCode={p.tourCode} country={p.country} followed={p.followed} nameSize={14} sub={sub}
-        bar={race ? <span style={{ display: 'block', marginTop: -1 }}><PointsBar pct={barPct(p.points, leaderPts ?? null)} lead={p.rank === 1} /></span> : undefined} />
+        bar={race ? <PointsBar pct={barPct(p.points, leaderPts ?? null)} lead={p.rank === 1} mt={6} /> : undefined} />
       <Move moved={p.moved} size={11} />
       <span style={{ textAlign: 'right', fontSize: 14, fontWeight: 700, ...FIG }}>{p.points != null ? fmtInt(p.points) : ''}</span>
     </button>
@@ -69,7 +69,7 @@ function MiniRow({ p, actions, card, sub, race, leaderPts }: { p: PlayerView; ac
 }
 
 function Minis({ children }: { children: ReactNode }) {
-  return <div data-minis style={{ marginTop: 8, display: 'flex', flexDirection: 'column' }} className="players-minis">{children}</div>;
+  return <div data-minis style={{ marginTop: 8, display: 'flex', flexDirection: 'column' }}>{children}</div>;
 }
 
 function Hero({ data }: { data: PageData }) {
@@ -113,7 +113,6 @@ function HeroPortrait({ p }: { p: PlayerView }) {
   return <HeroImg rawName={p.rawName} name={p.name} tourCode={p.tourCode} />;
 }
 
-import { useHeadshot } from '../PlayerCell';
 function HeroImg({ rawName, name, tourCode }: { rawName: string; name: string; tourCode: string | null }) {
   const { src, onError } = useHeadshot(rawName, name, tourCode);
   if (!src) return null;
@@ -162,27 +161,18 @@ function LineCard({ stake, data, actions, first }: { stake: Stake; data: PageDat
   const below = data.players.slice(L, L + 3);
   const at = data.players[L - 1];
   const gap = lineGap(data.players, L);
-  const noTop = { borderTop: 'none' } as const;
   return (
     <Card first={first} name="line">
       <Kick left={stake.kicker ?? stake.line_label} right={stake.side ?? undefined} />
       <p style={chStyle}><RichText rich={lineCardLine(stake, gap)} /></p>
       <Minis>
-        {above.map((p, i) => <div key={p.key} style={i === 0 ? undefined : undefined}><MiniRowWrap first={i === 0} p={p} actions={actions} /></div>)}
+        {above.map((p, i) => <MiniRow key={p.key} first={i === 0} p={p} actions={actions} card="line" />)}
         <TheLine label={`${ordinal(L)} · ${at?.points != null ? fmtInt(at.points) : '–'} PTS`} />
-        {below.map((p, i) => <MiniRowWrap key={p.key} first={i === 0} p={p} actions={actions} />)}
+        {below.map((p, i) => <MiniRow key={p.key} first={i === 0} p={p} actions={actions} card="line" />)}
       </Minis>
-      {stake.foot ? <div data-card-foot style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${P.HAIR}`, fontSize: 12, color: P.MUTE, ...noTop, borderTopStyle: 'solid', borderTopWidth: 1, borderTopColor: P.HAIR }}>{stake.foot}</div> : null}
+      {stake.foot ? <div data-card-foot style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${P.HAIR}`, fontSize: 12, color: P.MUTE }}>{stake.foot}</div> : null}
     </Card>
   );
-}
-
-function MiniRowWrap({ p, actions, first, card = 'line', sub }: { p: PlayerView; actions: PageActions; first: boolean; card?: CardName; sub?: ReactNode }) {
-  return <div style={first ? { marginTop: 0 } : undefined} data-first={first || undefined} className={first ? 'mini-first' : undefined}><MiniRowNoTop hideTop={first} p={p} actions={actions} card={card} sub={sub} /></div>;
-}
-
-function MiniRowNoTop({ hideTop, ...rest }: { hideTop: boolean; p: PlayerView; actions: PageActions; card: CardName; sub?: ReactNode; race?: boolean; leaderPts?: number | null }) {
-  return <div style={hideTop ? { marginTop: -1, clipPath: 'inset(1px 0 0 0)' } : undefined}><MiniRow {...rest} /></div>;
 }
 
 function RaceCard({ data, actions, first }: { data: PageData; actions: PageActions; first: boolean }) {
@@ -194,7 +184,7 @@ function RaceCard({ data, actions, first }: { data: PageData; actions: PageActio
     <Card first={first} name="race">
       <Kick left="THE RACE" right={<button type="button" style={moreStyle} onClick={() => actions.openAll({ from: 'race', lens: 'standings' })}>Full standings ›</button>} />
       {line ? <p style={chStyle}><RichText rich={line} /></p> : null}
-      <Minis>{top.map((p, i) => <MiniRowNoTop key={p.key} hideTop={i === 0} p={p} actions={actions} card="race" race leaderPts={leaderPts} />)}</Minis>
+      <Minis>{top.map((p, i) => <MiniRow key={p.key} first={i === 0} p={p} actions={actions} card="race" race leaderPts={leaderPts} />)}</Minis>
     </Card>
   );
 }
@@ -208,7 +198,7 @@ function YourPlayersCard({ data, actions }: { data: PageData; actions: PageActio
       <Kick left="YOUR PLAYERS" amber right={`${followed.length} followed`} />
       <Minis>
         {followed.slice(0, 5).map((p, i) => (
-          <MiniRowNoTop key={p.key} hideTop={i === 0} p={p} actions={actions} card="your_players"
+          <MiniRow key={p.key} first={i === 0} p={p} actions={actions} card="your_players"
             sub={p.rank === 1 ? 'Leading' : leaderPts != null && p.points != null ? `${fmtInt(leaderPts - p.points)} behind` : undefined} />
         ))}
       </Minis>
