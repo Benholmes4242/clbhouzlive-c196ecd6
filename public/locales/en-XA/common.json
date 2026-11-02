@@ -1748,7 +1748,7 @@
     }
   },
   "findPeople": {
-    "title": "Find people",
+    "title": "[~~Éxṗļóřé ţĥé çóɱɱúñíţý~~]",
     "searchPlaceholder": "Search golfers and businesses",
     "chip": {
       "suggested": "Suggested",
@@ -1811,7 +1811,10 @@
         "playedWith": "Played {{course}} with you",
         "playedWithFallback": "Played with you",
         "yourClub": "Your club"
-      }
-    }
+      },
+      "seeAllAria": "[~~Šéé áļļ, Éxṗļóřé ţĥé çóɱɱúñíţý~~]"
+    },
+    "seeAll": "[~~Šéé áļļ {{count}}~~]",
+    "bizJoining": "[~~Móřé çļúƀš áñđ ƀúšíñéššéš ářé ĵóíñíñģ çļƀĥóúź.~~]"
   }
 }

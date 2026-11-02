@@ -837,7 +837,7 @@
     }
   },
   "findPeople": {
-    "title": "사람 찾기",
+    "title": "커뮤니티 둘러보기",
     "searchPlaceholder": "골퍼와 비즈니스 검색",
     "chip": {
       "suggested": "추천",
@@ -900,7 +900,10 @@
         "playedWith": "Played {{course}} with you",
         "playedWithFallback": "Played with you",
         "yourClub": "Your club"
-      }
-    }
+      },
+      "seeAllAria": "모두 보기, 커뮤니티 둘러보기"
+    },
+    "seeAll": "모두 보기 {{count}}",
+    "bizJoining": "더 많은 클럽과 비즈니스가 clbhouz에 참여하고 있습니다."
   }
 }

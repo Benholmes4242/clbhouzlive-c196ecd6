@@ -838,7 +838,7 @@
     }
   },
   "findPeople": {
-    "title": "Leute finden",
+    "title": "Community entdecken",
     "searchPlaceholder": "Golfer und Unternehmen suchen",
     "chip": {
       "suggested": "Vorschläge",
@@ -901,7 +901,10 @@
         "playedWith": "Played {{course}} with you",
         "playedWithFallback": "Played with you",
         "yourClub": "Your club"
-      }
-    }
+      },
+      "seeAllAria": "Alle ansehen, Community entdecken"
+    },
+    "seeAll": "Alle {{count}} ansehen",
+    "bizJoining": "Weitere Clubs und Unternehmen kommen zu clbhouz."
   }
 }
