@@ -334,12 +334,13 @@ describe('RS Rounds this week shelf', () => {
 /* ------------------------------------------------------- Watch placement */
 
 describe('RS shelf placement on Watch', () => {
-  it('shows on the All chip for a signed-in member, after Quick hits, and not on other chips', () => {
+  /* WS1 — chips renamed: All → For you, Quick hits → Shorts. Same shelf rules. */
+  it('shows on the For you chip for a signed-in member, after Quick hits, and not on other chips', () => {
     mount(<WatchFeed userId="me" onDepart={() => {}} />);
     expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: 'Quick hits' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Shorts' }));
     expect(document.querySelector('[data-rounds-shelf]')).toBeNull();
-    fireEvent.click(screen.getByRole('tab', { name: 'All' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'For you' }));
     expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument();
   });
 
