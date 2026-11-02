@@ -13,6 +13,7 @@ import { P, FIG } from '../playersTokens';
 import type { PageActions, PageData, CardName } from '../pageModel';
 import type { PlayerView } from '../playersModel';
 import { statList } from '../playersModel';
+import { LinePicksCard } from '../picks/LinePicksCard';
 import {
   barPct, featuredStakes, fmtInt, fmtWeekdayDate, footerCaption, heroHeadline, heroSub, lineCardLine, lineGap,
   ordinal, OTHER_TILE_KEYS, PGA_TILE_KEYS, raceCardLine, situationSentence, STAT_DEFS, type Rich, type Stake,
@@ -271,7 +272,12 @@ export function FrontPage({ data, actions }: { data: PageData; actions: PageActi
       <Hero data={data} />
       {sentence ? <p data-situation style={{ margin: '18px 24px 0', fontSize: 13.5, lineHeight: 1.45, color: P.MUTE }}><RichText rich={sentence} /></p> : null}
       <Clock data={data} />
-      {lines.map((stake, i) => <LineCard key={stake.after_position} stake={stake} data={data} actions={actions} first={i === 0} />)}
+      {lines.map((stake, i) => (
+        <div key={stake.after_position} style={{ display: 'contents' }}>
+          <LineCard stake={stake} data={data} actions={actions} first={i === 0} />
+          {stake.picks ? <LinePicksCard stake={stake} data={data} /> : null}
+        </div>
+      ))}
       <RaceCard data={data} actions={actions} first={lines.length === 0} />
       <YourPlayersCard data={data} actions={actions} />
       <InFormCard data={data} actions={actions} />
