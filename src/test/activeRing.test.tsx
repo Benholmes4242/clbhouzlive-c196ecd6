@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
@@ -134,8 +135,9 @@ describe('ActiveRing', () => {
     const { container } = render(<ActiveRing active surface="card"><i /></ActiveRing>);
     const outer = container.querySelector('[data-active-ring="on"]') as HTMLElement;
     expect(outer.style.padding).toBe('1.5px');
-    expect(outer.style.backgroundImage).toContain('linear-gradient');
-    expect(ACTIVE_RING_GRADIENT).toContain('#F7931E');
+    // jsdom drops gradients from style, so read the server markup instead.
+    const html = renderToStaticMarkup(<ActiveRing active surface="card"><i /></ActiveRing>);
+    expect(html).toContain(`background:${ACTIVE_RING_GRADIENT}`);
     const gap = container.querySelector('[data-active-ring-gap]') as HTMLElement;
     expect(gap.style.padding).toBe('2px');
     expect(gap.style.background).toBe('rgb(23, 23, 27)');
@@ -144,7 +146,7 @@ describe('ActiveRing', () => {
     const { container } = render(<ActiveRing active={false} surface="canvas"><i /></ActiveRing>);
     const outer = container.querySelector('[data-active-ring="off"]') as HTMLElement;
     expect(outer.style.padding).toBe('3.5px');
-    expect(outer.style.backgroundImage).toBe('');
+    expect(renderToStaticMarkup(<ActiveRing active={false} surface="canvas"><i /></ActiveRing>)).not.toContain('gradient');
     expect(container.querySelector('[data-active-ring-gap]')).toBeNull();
   });
 });

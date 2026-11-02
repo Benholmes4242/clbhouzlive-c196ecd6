@@ -30,7 +30,7 @@ export function ActiveRing({
   return (
     <span
       data-active-ring="on"
-      style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 1.5, borderRadius: '34%', backgroundImage: ACTIVE_RING_GRADIENT }}
+      style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 1.5, borderRadius: '34%', background: ACTIVE_RING_GRADIENT }}
     >
       <span
         data-active-ring-gap=""
