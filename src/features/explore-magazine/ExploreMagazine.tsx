@@ -29,7 +29,6 @@ import {
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
-import { Z } from '@/config/zIndex';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
