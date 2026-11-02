@@ -1490,3 +1490,5 @@
 - [ ] Players season rollover fix — STOPPED: 11 of 12 tests in playersPage.test.tsx fail ("No QueryClient set") because the page now reads the standings season; needs a ruling to add a stand-in for that read to the test.
 
 - [x] Players Build 3 (You and the tour): approved stand-ins added; full suite 5,866/5,866 across 540 files.
+
+- [ ] WS2 Watch section 2: built; STOPPED — 2 rsRoundsShelf placement tests fail "No QueryClient set" (new shelves read through react-query). Awaiting approval for a useWatchMiddle stand-in in that file.
