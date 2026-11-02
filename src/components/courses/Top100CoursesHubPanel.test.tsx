@@ -28,6 +28,7 @@ vi.mock('./browse/PageLoadGate', () => ({
   useSectionReady: () => {},
 }));
 vi.mock('./BrowseCourseCard', () => ({ default: () => null }));
+vi.mock('./top100/Top100RaceSection', () => ({ Top100RaceSection: () => null }));
 
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
@@ -102,12 +103,12 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
     sectionAbsent();
   });
 
-  it('five played renders the heading, figure, grid and legend', () => {
+  it('five played renders the closed Your courses dropdown which opens the grid and legend', () => {
     f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
     mount();
-    expect(screen.getByText('Your hundred')).toBeInTheDocument();
-    expect(screen.getByText('A life in golf, one list')).toBeInTheDocument();
-    expect(screen.getByText('of 100')).toBeInTheDocument();
+    expect(screen.getByText('Your courses')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '#1 Course 1' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
     expect(screen.getByRole('button', { name: '#1 Course 1' })).toBeInTheDocument();
     expect(screen.getByTestId('hundred-legend')).toBeInTheDocument();
   });
@@ -119,14 +120,15 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
     unmount();
     f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
     mount();
-    expect(screen.getByText('Your hundred')).toBeInTheDocument();
+    expect(screen.getByText('Your courses')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
     expect(screen.getByRole('button', { name: '#1 Course 1' })).toBeInTheDocument();
   });
 
   it('switching the active scope from nine played to three removes the section without remounting the page', () => {
     f.progress.mockReturnValue({ data: progressData(9, 3), isLoading: false, isFetchedAfterMount: true });
     mount();
-    expect(screen.getByText('Your hundred')).toBeInTheDocument();
+    expect(screen.getByText('Your courses')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     sectionAbsent();
     // The page itself never remounted: the list head for the new scope is on screen.

@@ -5,8 +5,6 @@
  * layout varies, the SMALLEST settled state is drawn (it can only expand):
  *  - The grid draws all cells in the real 'nobody' fill (cellStyle('nobody')),
  *    no ring, no played/reviewed state: a shell must never claim progress.
- *    The tier line beside the figure appears only when viewerPlayed > 0, so it
- *    is not drawn.
  *  - A top100 card's text block is entirely conditional (members row,
  *    plays-to line, no-round line, and CategoryScores returns null with no
  *    scores), so the smallest settled card is its photo alone.
@@ -19,10 +17,6 @@ import {
 } from '@/components/courses/browse/SectionHead';
 import { TOP100_PHOTO_H } from '../BrowseCourseCard';
 import { TOP100_CARD_GAP } from '../Top100CoursesHubPanel';
-import {
-  cellStyle, HUNDRED_CELL_H, HUNDRED_CELL_RADIUS, HUNDRED_COLS, HUNDRED_FIGURE, HUNDRED_GAP,
-  HUNDRED_GRID_TOP, HUNDRED_LEGEND, hundredGridHeight, hundredRows,
-} from './YourHundredSection';
 import { ARGUMENT_ROW_GAP, ARGUMENT_THUMB } from './TheArgumentSection';
 
 
@@ -40,39 +34,15 @@ function Head({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* The shell reserves the height of a full hundred-course list, computed by the
-   same helper the real grid uses, so the skeleton never jumps on arrival. */
-const SHELL_TOTAL = 100;
-
+/** T100 reserves only the race's slab/rail/three rows; no unknown pinned row
+ * or activity dropdown. Signed-out callers never mount this shell. */
 export function YourHundredShell() {
-  const nobody = cellStyle('nobody');
-  return (
-    <Head>
-      <div style={{ height: HUNDRED_FIGURE.size * HUNDRED_FIGURE.lineHeight, display: 'flex', alignItems: 'flex-end' }}>
-        <Bar style={{ height: HUNDRED_FIGURE.size * HUNDRED_FIGURE.lineHeight, width: 64 }} />
-      </div>
-      <div
-        style={{
-          marginTop: HUNDRED_GRID_TOP, display: 'grid', height: hundredGridHeight(SHELL_TOTAL), gap: HUNDRED_GAP,
-          gridTemplateColumns: `repeat(${HUNDRED_COLS}, 1fr)`, gridTemplateRows: `repeat(${hundredRows(SHELL_TOTAL)}, ${HUNDRED_CELL_H}px)`,
-        }}
-      >
-        {Array.from({ length: SHELL_TOTAL }, (_, i) => (
-          <div key={i} style={{ borderRadius: HUNDRED_CELL_RADIUS, ...nobody }} />
-        ))}
-      </div>
-      <div style={{ marginTop: HUNDRED_LEGEND.marginTop, minHeight: HUNDRED_LEGEND.minHeight, display: 'flex', alignItems: 'center' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: `${HUNDRED_LEGEND.rowGap}px ${HUNDRED_LEGEND.colGap}px` }}>
-          {[0, 1, 2, 3].map((i) => (
-            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: HUNDRED_LEGEND.labelGap, fontSize: HUNDRED_LEGEND.labelSize }}>
-              <span style={{ width: HUNDRED_LEGEND.swatch, height: HUNDRED_LEGEND.swatch, borderRadius: HUNDRED_LEGEND.swatchRadius, ...nobody }} />
-              <Bar style={{ height: HUNDRED_LEGEND.labelSize - 2, width: 88 }} />
-            </span>
-          ))}
-        </div>
-      </div>
-    </Head>
-  );
+  return <div aria-hidden className="t100-shell" data-race-shell>
+    <div className="t100-head"><Bar style={{ height: HEAD_KICKER_SIZE, width: 96 }} /><Bar style={{ marginTop: HEAD_TITLE_GAP, height: HEAD_TITLE_SIZE * HEAD_TITLE_LINE_HEIGHT, width: 160 }} /></div>
+    <Bar className="t100-shell-slab" style={{ borderRadius: 16 }} />
+    <div className="t100-shell-rail">{[0,1,2].map(i => <Bar key={i} style={{ width: 116, height: 80, borderRadius: 12, flex: 'none' }} />)}</div>
+    {[0,1,2].map(i => <div key={i} className="t100-shell-row"><Bar style={{ marginTop: 16, height: 34, width: '80%' }} /></div>)}
+  </div>;
 }
 
 /** The Argument: one row (its smallest settled count). */

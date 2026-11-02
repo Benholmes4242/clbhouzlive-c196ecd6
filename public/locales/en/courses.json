@@ -163,9 +163,7 @@
       "basisFrom": "from {{unit}}",
       "rareAir": "Rare air",
       "featsWindow": "Feats period",
-      "theHundred": "The hundred",
       "top100List": "Top 100 list",
-      "top100Empty": "Nobody has played a course on this list yet.",
       "tiedTop": "Tied at the top",
       "clearOf": "{{n}} clear of {{name}}",
       "climb": "The climb",
@@ -244,9 +242,10 @@
         "cleanCard": "Bogey-free rounds"
       },
       "hundredSlab": {
-        "played": "You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members.",
-        "playedBehind": "You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> behind {{leader}}.",
-        "playedClear": "You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> clear of {{second}}.",
+        "played": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members.",
+        "playedBehind": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> behind {{leader}}.",
+        "playedClear": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> clear of {{second}}.",
+        "playedJoint": "You've played <b>{{n}}</b> of the {{list}} Hundred, joint <b>{{pos}}</b> of <b>{{total}}</b> members.",
         "absent": "You haven't played one of the {{list}} Hundred yet.",
         "nobodyPast": "Nobody past {{n}}"
       },

@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { courseRankLabels, RANK_LIST_BY_SLUG, RANK_LIST_LABEL } from '@/features/courses/_shared/courseRankLabels';
 
-import { SectionHead, HEAD_GAP, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { MEDAL_GOLD } from '@/lib/tokens/medals';
-import {
-  getCurrentMilestoneMeta,
-  getMilestoneMetaByThreshold,
-  getNextMilestone,
-  MILESTONE_TIER_META,
-} from '@/config/achievements';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 
 /**
@@ -19,7 +12,7 @@ import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
  *
  * VIEWER figures only. `viewerPlayed` / `total` come from the per-list row of
  * user_top100_progress_view for the ACTIVE scope (never the global total, never
- * a typed 100). Tiers come from MILESTONE_TIER_META — nothing typed here.
+ * a typed 100). T100 removes tiers; milestone helpers remain in their module.
  *
  * The grid is drawn at the LOADED length (capped at the list total): padding
  * unloaded slots with "nobody yet" cells would assert something false.
@@ -27,8 +20,8 @@ import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 
 /* The two neutral cell fills are the brief's own values and have no owner in
    the token modules yet. Declared once here; flagged in the report. */
-const CELL_MEMBER = 'rgba(255,255,255,0.14)';
-const CELL_NOBODY = 'rgba(255,255,255,0.055)';
+const CELL_MEMBER = 'var(--t100-member)';
+const CELL_NOBODY = 'var(--t100-nobody)';
 
 /* Grid geometry, read by the section AND its shell (BRIEF_COURSES_SKELETONS 3.1,
    BRIEF_YOUR_HUNDRED_1 / HUNDRED_FIT_1). Twelve columns at a 3px gap; the row
@@ -36,9 +29,9 @@ const CELL_NOBODY = 'rgba(255,255,255,0.055)';
    and its skeleton can never disagree. */
 export const HUNDRED_COLS = 12;
 export const HUNDRED_GAP = 3;
-export const HUNDRED_CELL_H = 24;
+export const HUNDRED_CELL_H = 22;
 export const HUNDRED_CELL_RADIUS = 3;
-export const HUNDRED_GRID_TOP = 16;
+export const HUNDRED_GRID_TOP = 14;
 export const hundredRows = (total: number) => Math.ceil(total / HUNDRED_COLS);
 export const hundredGridHeight = (total: number) => {
   const rows = hundredRows(total);
@@ -46,9 +39,9 @@ export const hundredGridHeight = (total: number) => {
 };
 /* Figure and legend slot geometry (3.2). */
 export const HUNDRED_FIGURE = { size: 34, lineHeight: 0.85 } as const;
-export const HUNDRED_LEGEND = { marginTop: 12, minHeight: 52, swatch: 9, swatchRadius: 2, rowGap: 6, colGap: 14, labelGap: 6, labelSize: 10.5 } as const;
+export const HUNDRED_LEGEND = { marginTop: 12, minHeight: 40, swatch: 9, swatchRadius: 2, rowGap: 6, colGap: 14, labelGap: 6, labelSize: 10.5 } as const;
 
-type CellState = 'reviewed' | 'played' | 'member' | 'nobody';
+export type CellState = 'reviewed' | 'played' | 'member' | 'nobody';
 
 /* A square is YOURS when user_course_activity has it — a tracked round OR a
    rating — because that is what the figure above the grid counts, and the two
@@ -56,7 +49,7 @@ type CellState = 'reviewed' | 'played' | 'member' | 'nobody';
    viewerPlayed. Solid = yours and reviewed; ring = yours, not yet reviewed.
    The community side still reads roundsTracked: grey means a member has a
    round here. */
-function cellState(e: Top100Enrichment | undefined): CellState {
+export function cellState(e: Top100Enrichment | undefined): CellState {
   const played = e?.yourActivity === true;
   if (played && e?.ratedByYou) return 'reviewed';
   if (played) return 'played';
@@ -66,8 +59,8 @@ function cellState(e: Top100Enrichment | undefined): CellState {
 
 export function cellStyle(state: CellState): React.CSSProperties {
   switch (state) {
-    case 'reviewed': return { background: A.AMBER };
-    case 'played': return { background: 'transparent', boxShadow: `inset 0 0 0 1.5px ${A.AMBER}` };
+    case 'reviewed': return { background: A.INK };
+    case 'played': return { background: 'transparent', boxShadow: `inset 0 0 0 1.5px ${A.INK}` };
     case 'member': return { background: CELL_MEMBER };
     default: return { background: CELL_NOBODY };
   }
@@ -110,7 +103,7 @@ function StatusLine({ e }: { e: Top100Enrichment | undefined }) {
   if (played && reviewed) {
     return (
       <>
-        <span style={{ color: A.AMBER, fontWeight: 700 }}>You played</span>
+        <span style={{ color: A.INK, fontWeight: 700 }}>You played</span>
         {best}
         {rating ? <> · Reviewed <span style={STRONG}>{rating}</span></> : null}
       </>
@@ -119,7 +112,7 @@ function StatusLine({ e }: { e: Top100Enrichment | undefined }) {
   if (played) {
     return (
       <>
-        <span style={{ color: A.AMBER, fontWeight: 700 }}>You played</span>
+        <span style={{ color: A.INK, fontWeight: 700 }}>You played</span>
         {best}
         <span style={{ color: A.DIM }}> · Not yet reviewed</span>
       </>
@@ -128,7 +121,7 @@ function StatusLine({ e }: { e: Top100Enrichment | undefined }) {
   if (reviewed) {
     return (
       <>
-        <span style={{ color: A.AMBER, fontWeight: 700 }}>You reviewed{rating ? <> <span style={STRONG}>{rating}</span></> : null}</span>
+        <span style={{ color: A.INK, fontWeight: 700 }}>You reviewed{rating ? <> <span style={STRONG}>{rating}</span></> : null}</span>
         {n > 0 ? <> · <span style={STRONG}>{n}</span> members</> : null}
       </>
     );
@@ -179,44 +172,10 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
   const [selected, setSelected] = useState<string | null>(null);
   // A new region is a different hundred: drop the selection.
   useEffect(() => { setSelected(null); }, [courseIds]);
-  const current = getCurrentMilestoneMeta(viewerPlayed);
-  const nextThreshold = getNextMilestone(viewerPlayed);
-  const next = nextThreshold != null ? getMilestoneMetaByThreshold(nextThreshold) : undefined;
   const cells = courseIds.slice(0, total);
-  const listLabel = RANK_LIST_LABEL[RANK_LIST_BY_SLUG[listSlug]] ?? '';
 
   return (
-    <section style={SECTION_WRAP}>
-      <SectionHead kicker="Your hundred" title="A life in golf, one list" />
-      <div style={{ marginTop: HEAD_GAP, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-          <span style={{ fontSize: HUNDRED_FIGURE.size, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: HUNDRED_FIGURE.lineHeight, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-            {viewerPlayed}
-          </span>
-          <span style={{ fontSize: 15, fontWeight: 700, color: A.DIM, fontVariantNumeric: 'tabular-nums' }}>of {total}</span>
-        </div>
-        {/* The club is scoped to ONE list and says so. A list holds 100 courses, so the ladder stops at 100 — do not reintroduce 200/300/400 here. The list name is resolved from RANK_LIST_LABEL, which is the one home for these four names. */}
-        {viewerPlayed > 0 ? (
-          <div style={{ textAlign: 'right' }}>
-            {current ? (
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MEDAL_GOLD }}>
-                {`${listLabel} ${current.tierName}`}
-              </div>
-            ) : null}
-            {current && next && nextThreshold != null ? (
-              <div style={{ fontSize: 11.5, color: A.DIM, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-                {`${nextThreshold - viewerPlayed} more to the ${next.tierName}`}
-              </div>
-            ) : null}
-            {!current ? (
-              <div style={{ fontSize: 11.5, color: A.DIM, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-                {`${MILESTONE_TIER_META[0].threshold - viewerPlayed} more to the ${listLabel} ${MILESTONE_TIER_META[0].tierName}`}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
-
+    <div data-your-hundred-grid>
       <div style={{ marginTop: HUNDRED_GRID_TOP, display: 'grid', gridTemplateColumns: `repeat(${HUNDRED_COLS}, 1fr)`, gridTemplateRows: `repeat(${hundredRows(total)}, ${HUNDRED_CELL_H}px)`, gap: HUNDRED_GAP }}>
         {cells.map((id, i) => (
           <button
@@ -228,7 +187,7 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
             /*
              * The cells are deliberately wider than they are tall. The width falls out of
              * the twelve columns (27px across a 357px run); the height is declared once on
-             * the container as an explicit 24px row track, so the full tap width is kept
+             * the container as an explicit 22px row track, so the full tap width is kept
              * and the grid clears the fold (HUNDRED_FIT_1).
              */
             style={{
@@ -258,6 +217,25 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
       </div>
         )}
       </div>
-    </section>
+    </div>
   );
+}
+
+/** The active activity-progress row controls visibility; the reviewed caption
+ * counts reviewed cells, not a separate server-rated aggregate. List-keyed by
+ * the panel: every visit and every scope change starts closed. */
+export function YourCoursesDropdown(props: Props) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => { setOpen(false); }, [props.listSlug]);
+  if (props.viewerPlayed < 5) return null;
+  const cells = props.courseIds.slice(0, props.total).map(id => cellState(props.enrichment.get(id)));
+  const reviewed = cells.filter(state => state === 'reviewed').length;
+  return <div className="t100-dropdown" data-your-courses>
+    <Button variant="ghost" className="t100-dropdown-header" aria-expanded={open} onClick={() => setOpen(value => !value)}>
+      <span className="t100-mini" aria-hidden>{cells.map((state, i) => <i key={i} data-state={state} />)}</span>
+      <span className="t100-dropdown-copy"><b>Your courses</b><span className="tabular-nums">{props.viewerPlayed} played · {reviewed} reviewed</span></span>
+      {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+    </Button>
+    {open ? <div className="t100-dropdown-body"><YourHundredSection {...props} /></div> : null}
+  </div>;
 }

@@ -16,9 +16,13 @@ import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
-import { YourHundredSection } from './top100/YourHundredSection';
+import { YourCoursesDropdown } from './top100/YourHundredSection';
+import { Top100RaceSection } from './top100/Top100RaceSection';
+import { isGuestUser } from '@/features/guest/useIsGuest';
+import type { RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
+import './top100/t100Race.css';
 import { TheArgumentSection } from './top100/TheArgumentSection';
-import { ArgumentShell, Top100CardListShell, YourHundredShell } from './top100/top100Shells';
+import { ArgumentShell, Top100CardListShell } from './top100/top100Shells';
 
 /** Gap between cards in the Top 100 list; its shell reads this (BRIEF_COURSES_SKELETONS_3A). */
 export const TOP100_CARD_GAP = 24;
@@ -123,6 +127,7 @@ interface Props {
 const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const memberId = user && !isGuestUser(user) ? user.id : undefined;
   const [selectedList, setSelectedList] = useState(savedList);
   const [ranking, setRanking] = useState<Top100Ranking>(savedRanking);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -210,7 +215,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   } = useTop100ProgressForUser(user?.id);
   const viewerList = progress?.lists.find((list) => list.listSlug === renderedList);
   const viewerPlayed = viewerList?.played ?? 0;
-  const viewerRated = viewerList?.rated ?? 0;
 
   /* The tab opens where the member's golf is. This runs ONCE, only when nothing has been chosen — a saved list or a tap in this mount both win over it, because a default that overrides a member's own choice is not a default, it is a bug. A tie for the most played, or none played at all, falls back to Global. It is safe to change the list here because PageLoadGate is already waiting on 'progress', so the page has not painted yet. */
   useEffect(() => {
@@ -306,22 +310,10 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
       <GateReport id="progress" ready={user?.id ? progressFetchedAfterMount : !progressLoading} />
       <GateReport id="enrichment" ready={!enrichmentLoading} />
-      {/* HUNDRED_FIT_1 AXA9/10: below five played on the ACTIVE list the section
-          is absent entirely — no heading, figure, grid, legend or placeholder —
-          and the skeleton must not reserve the space either. viewerPlayed already
-          arrives per-list for the active scope, so this re-evaluates with the chips. */}
-      {user && viewerList && viewerList.total > 0 && courses.length > 0 && viewerPlayed >= 5 ? (
-        <YourHundredSection
-          listSlug={renderedList}
-          viewerPlayed={viewerPlayed}
-          total={viewerList.total}
-          courseIds={ids}
-          enrichment={enrichment}
-          subjects={subjects}
-          onOpenCourse={openCourse}
-        />
-      ) : user && (isLoading || (user?.id ? !progressFetchedAfterMount : progressLoading)) && (!progressFetchedAfterMount || viewerPlayed >= 5) ? (
-        <YourHundredShell />
+      {!memberId ? <GateReport id="race" ready /> : null}
+      {memberId ? <Top100RaceSection viewerId={memberId} list={selectedList as RankListSlug} total={progress?.lists.find(row => row.listSlug === selectedList)?.total ?? 0} onOpenCourse={openCourse} /> : null}
+      {memberId && viewerList && viewerList.total > 0 && courses.length > 0 && viewerPlayed >= 5 && renderedList === selectedList && progressFetchedAfterMount ? (
+        <YourCoursesDropdown key={selectedList} listSlug={selectedList} viewerPlayed={viewerPlayed} total={viewerList.total} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={openCourse} />
       ) : null}
       {argumentHigher.length + argumentLower.length > 0 ? (
         <TheArgumentSection
@@ -423,7 +415,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
 
 export default Top100CoursesHubPanel;
 
-const TOP100_GATE_IDS = ['list', 'progress', 'enrichment'] as const;
+const TOP100_GATE_IDS = ['list', 'progress', 'enrichment', 'race'] as const;
 
 /** Reports panel-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
