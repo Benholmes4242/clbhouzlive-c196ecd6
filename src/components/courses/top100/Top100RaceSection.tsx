@@ -12,10 +12,11 @@ import { hundredSlab, raceRows } from '@/hooks/top100/hundredRaceRules';
 import { RANK_SCOPE_LABEL, type RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
 import { HundredRaceRow, HundredRail, HundredYou } from './HundredRaceParts';
 import { YourHundredShell } from './top100Shells';
+import { useSectionReady } from '../browse/PageLoadGate';
 
 /** T100 race consumes the chip's raw slug, never the previous course-page
  * placeholder slug. See-all owns independent chips, as on the old Rounds page. */
-export function Top100RaceSection({ viewerId, list, total, onOpenCourse, onReady }: { viewerId: string; list: RankListSlug; total: number; onOpenCourse: (id: string) => void; onReady?: (ready: boolean) => void }) {
+export function Top100RaceSection({ viewerId, list, total, onOpenCourse }: { viewerId: string; list: RankListSlug; total: number; onOpenCourse: (id: string) => void }) {
   const board = useTop100Race(viewerId, list);
   const progress = useTop100ListProgress(list, viewerId, viewerId);
   const { t } = useTranslation('courses');
@@ -24,8 +25,7 @@ export function Top100RaceSection({ viewerId, list, total, onOpenCourse, onReady
   const tiles = useMemo(() => [...(progress.data ?? [])].sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)), [progress.data]);
   const { top, pinned } = raceRows(rows, viewerId);
   const loading = board.isPending || board.isPlaceholderData;
-  // Gate readiness is reported through the panel's own hook observer instead.
-  void onReady;
+  useSectionReady('race', !loading && !progress.isPending);
   return <>
     {loading ? <YourHundredShell /> : board.isError ? <section className="t100-race"><div className="t100-head"><SectionHead tone="quiet" kicker="Your hundred" title="The race" /></div><div className="t100-retry">Could not load the race. <Button variant="ghost" onClick={() => board.refetch()}>Retry</Button></div></section> : rows.length > 0 ? <section className="t100-race" data-top100-race>
       <div className="t100-head"><SectionHead tone="quiet" kicker="Your hundred" title="The race" /></div>

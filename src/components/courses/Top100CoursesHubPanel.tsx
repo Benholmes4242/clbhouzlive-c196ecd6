@@ -310,6 +310,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
       <GateReport id="progress" ready={user?.id ? progressFetchedAfterMount : !progressLoading} />
       <GateReport id="enrichment" ready={!enrichmentLoading} />
+      {!memberId ? <GateReport id="race" ready /> : null}
       {memberId ? <Top100RaceSection viewerId={memberId} list={selectedList as RankListSlug} total={progress?.lists.find(row => row.listSlug === selectedList)?.total ?? 0} onOpenCourse={openCourse} /> : null}
       {memberId && viewerList && viewerList.total > 0 && courses.length > 0 && viewerPlayed >= 5 && renderedList === selectedList && progressFetchedAfterMount ? (
         <YourCoursesDropdown key={selectedList} listSlug={selectedList} viewerPlayed={viewerPlayed} total={viewerList.total} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={openCourse} />
@@ -414,7 +415,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
 
 export default Top100CoursesHubPanel;
 
-const TOP100_GATE_IDS = ['list', 'progress', 'enrichment'] as const;
+const TOP100_GATE_IDS = ['list', 'progress', 'enrichment', 'race'] as const;
 
 /** Reports panel-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {

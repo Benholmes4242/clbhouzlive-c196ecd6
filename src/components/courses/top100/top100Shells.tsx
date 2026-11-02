@@ -39,7 +39,7 @@ function Head({ children }: { children: React.ReactNode }) {
 export function YourHundredShell() {
   return <div aria-hidden className="t100-shell" data-race-shell>
     <div className="t100-head"><Bar style={{ height: HEAD_KICKER_SIZE, width: 96 }} /><Bar style={{ marginTop: HEAD_TITLE_GAP, height: HEAD_TITLE_SIZE * HEAD_TITLE_LINE_HEIGHT, width: 160 }} /></div>
-    <Bar className="t100-shell-slab" />
+    <Bar className="t100-shell-slab" style={{ borderRadius: 16 }} />
     <div className="t100-shell-rail">{[0,1,2].map(i => <Bar key={i} style={{ width: 116, height: 80, borderRadius: 12, flex: 'none' }} />)}</div>
     {[0,1,2].map(i => <div key={i} className="t100-shell-row"><Bar style={{ marginTop: 16, height: 34, width: '80%' }} /></div>)}
   </div>;
