@@ -474,46 +474,17 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   const circleSize = useCircleSize(userId, !!userId);
   const openReview = useReviewSheetStore((state) => state.open);
 
-  /* ?view= is written on every switch so page_view paths tell views apart
-     (usePageTracking treats a change in `view` as a screen change). A ?view=
-     on arrival wins over the session memory. */
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [view, setView] = useState<ExploreView>(() => {
+  /* RS — THE VIEW SWITCH IS GONE. Explore is always Watch; a ?view= on arrival
+     still wins over session memory for the views that remain reachable (today
+     only 'watch'; 'all' returns with its trial flag). ?view=scores never
+     reaches here — AmateurPage redirects it to /rounds. */
+  const [searchParams] = useSearchParams();
+  const [view] = useState<ExploreView>(() => {
     const fromUrl = searchParams.get('view') as ExploreView | null;
     return fromUrl && EXPLORE_VIEWS.includes(fromUrl) ? fromUrl : readExploreView();
   });
   const [watchEntry, setWatchEntry] = useState<'all' | 'community'>('all');
   const geography = useViewerScoreScope(userId);
-  /** SCOPED_VIEWS is the register of views that carry a scope row (Scores only;
-   *  its board owns its own scope in useAmateurBoardState). */
-  const scoped = SCOPED_VIEWS.includes(view);
-  void scoped;
-
-  /* PHASE B (BRIEF_EXPLORE_MAGAZINE P1) — SCORES IS A CHIP THAT CAN CHANGE WHAT
-     YOU SEE. The ranked stream is the default and stays the landing experience;
-     no board is applied until the member picks one, so `boardApplied === false` IS
-     the stream. Board state is page-local by design (useAmateurBoardState §1):
-     nothing here is persisted or put in the URL, so leaving Explore resets it.
-     `active` keeps every board read quiet on the other three views and on an
-     untouched Scores view. */
-  /* BRIEF_SCORES_RETIRE_THE_GEOGRAPHY_RAIL §2 — SCORES OPENS ON A BOARD. The
-     board is the landing view now, so the stream and CircleShelf below are
-     unreachable on Scores. They are KEPT ON PURPOSE: changing this flag's
-     INITIAL VALUE to `false` (and re-enabling the Scores stream read) is the
-     one-line change that brings the stream back. */
-  /* A flag only; the board itself is boardState.board. It is `true` for the
-     life of the page: every setBoardApplied call site passes `true` and nothing
-     sets it false, so scoresBoardActive is effectively `view === 'scores'`. */
-  const [boardApplied, setBoardApplied] = useState(true);
-  const [boardPanelOpen, setBoardPanelOpen] = useState(false);
-  /* The title's chevron opens the lightweight ranking picker; the Filters pill opens the panel. */
-  /* The title opens the sheet onto the board choice; Filters opens it without. */
-  const scoresBoardActive = view === 'scores' && boardApplied;
-  /* No initialBoard: the boards open on Most recent via entryBoardFor() (founder decision 2026-10-22, supersedes CB25's 'net'). */
-  const boardState = useAmateurBoardState(
-    view === 'scores' ? userId : undefined,
-    scoresBoardActive || boardPanelOpen,
-  );
 
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   /* §5c THE CLIENT RANKER IS OFF THE PAGE PATH. It is DEAD-LISTED, not deleted:
