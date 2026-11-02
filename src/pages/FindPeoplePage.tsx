@@ -274,6 +274,7 @@ function GroupSection({
   categoryOf,
   followed,
   markFollowed,
+  onTab,
 }: {
   group: PeopleGroup;
   tab: FindPeopleTab;
@@ -281,6 +282,7 @@ function GroupSection({
   categoryOf: (b: BusinessSuggestion) => string;
   followed: ReadonlySet<string>;
   markFollowed: (id: string, on: boolean) => void;
+  onTab: (tab: FindPeopleTab) => void;
 }) {
   const { t } = useTranslation('common');
   const total = group.people.length + group.businesses.length;
@@ -302,6 +304,26 @@ function GroupSection({
         <span data-testid="group-label">{copy(group.label)}</span>
         {group.followAll ? (
           <FollowAllButton group={group} followed={followed} markFollowed={markFollowed} />
+        ) : group.seeAll ? (
+          /* FIX §5 — a capped Suggested group links to its full tab. */
+          <button
+            type="button"
+            onClick={() => onTab(group.seeAll!.tab)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: 0,
+              textTransform: 'none',
+              color: A.INK,
+              fontFamily: ROW_FONT,
+              cursor: 'pointer',
+            }}
+          >
+            {t('findPeople.seeAll', { count: group.seeAll.total, defaultValue: `See all ${group.seeAll.total}` })}
+          </button>
         ) : (
           <span>{group.count ?? total}</span>
         )}
