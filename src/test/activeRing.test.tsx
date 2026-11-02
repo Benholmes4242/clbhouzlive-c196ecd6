@@ -97,7 +97,6 @@ beforeEach(() => {
   h.rpc.mockReset();
   h.rpc.mockImplementation(() => Promise.resolve({ data: h.rows, error: null }));
   resetWhoToFollowRailSessionForTests();
-  vi.stubGlobal('IntersectionObserver', class { observe() {} disconnect() {} });
 });
 afterEach(() => {
   cleanup();
