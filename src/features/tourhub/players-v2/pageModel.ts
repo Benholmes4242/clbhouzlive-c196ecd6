@@ -18,6 +18,8 @@ export interface PageData {
   form: FormEntry<PlayerView>[];
   live: LivePlayerMap;
   updatedAt: string | null;
+  /** Resolved standings season (build 3 hole averages). */
+  season?: number | null;
 }
 
 export type ViewAllFrom = 'button' | 'race' | 'form' | 'stats' | 'search' | 'pill';
