@@ -1,8 +1,10 @@
 # Roadmap
 
-## Round comments over scorecard — STOP
+## Round comments over scorecard — DONE
 - [x] Guarded dismissal, stacked layers and disabled horizontal drag implemented; Ben approved comments-owned guard/history. Other nested callers audited unchanged in ROUND_COMMENTS_SCORECARD_STOP_REPORT.md.
-- [ ] New test fixture omits editComment/deleteComment. Focused42 passed/14 failed/56; CommentsSheetV2.tsx:563:41 `TypeError: Cannot read properties of undefined (reading 'isPending')`. No fix/rerun/full shards; await fixture authorization. Existing37/37 unchanged; candidate5,662/529 versus baseline5,643/528 (+19/+1 new roundCommentsStacked). Preview build OK; signed-in verification external_unmanaged.
+- [x] Authorized idle mutation mock completion cleared the render crashes; four typed-draft tests then exposed hidden comments. Assertions unchanged.
+- [x] Approved stacked-only aria ownership in CommentsSheetV2/ScorecardGlassOverlay preserves foreground portals and hides/restores the scorecard regardless of mount order. Original30 assertion statements unchanged; focused21/21 (19 existing +2 new). Full shards1416+1342+1441+1470=5,669/5,669 across530 (+2/+0 vs prior5667/530; +26/+2 vs last-green5643/528 includes roundComments21 and Tour door5). All four prior draft failures cleared; no new failures. Automatic build OK08:27:19Z. Report ROUND_COMMENTS_SCORECARD_STOP_REPORT.md records completion and historical stops.
+- [ ] Signed-in Activity/device end-to-end verification unavailable: external_unmanaged authentication; real-component regressions cover dismissal and both mount orders.
 
 ## MS1 — Messages head to head, inbox lines, two fixes — DONE
 - [x] headToHead helper + record on SharedGround; thread header 17px + "· last {d MMM}"; HeadToHeadCard (tappable → compare route); SharedGroundStrip restyle (short name, ink/dim scores, outcome line, no amber); inbox record line with count-only fallback; rail date under name (pill removed); incoming avatar 28px slot + 16px padding; image-unavailable investigated (HEIC/.bin vs missing object — Ben's SQL to pin down). 28 new tests; full suite 5,541/5,541 across 522→523 files. Report: MS1_MESSAGES_REPORT.md.

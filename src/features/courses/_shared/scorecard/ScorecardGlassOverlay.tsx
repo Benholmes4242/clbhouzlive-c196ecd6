@@ -51,6 +51,7 @@ export function ScorecardGlassOverlay({
 }: ScorecardGlassOverlayProps) {
   const [mounted, setMounted] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [stackedLayerOpen, setStackedLayerOpen] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [dragY, setDragY] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -79,12 +80,26 @@ export function ScorecardGlassOverlay({
   closeRef.current = onClose;
   horizontalRef.current = onHorizontalDrag;
 
-  // Every floating glass card is modal to assistive technology. Restore the
-  // background on close (including its exit animation) and on unmount.
+  // Stacked comments own the accessible foreground, regardless of portal mount
+  // order. Exempt their portals from this pass; their own pass hides this card.
+  // Observe only changes to the target set, not aria writes or unrelated portals.
   useEffect(() => {
     const card = cardRef.current;
     if (!open || !mounted || presentation !== 'overlay' || !card) return;
-    return hideOthers(card);
+    let targets: Element[] = [];
+    let release: (() => void) | undefined;
+    const apply = () => {
+      const next = Array.from(document.querySelectorAll('[data-stacked-over-sheet="true"]'));
+      if (release && next.length === targets.length && next.every((node, i) => node === targets[i])) return;
+      release?.();
+      targets = next;
+      setStackedLayerOpen(targets.length > 0);
+      release = hideOthers([card, ...targets]);
+    };
+    apply();
+    const observer = new MutationObserver(apply);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-stacked-over-sheet'] });
+    return () => { observer.disconnect(); release?.(); };
   }, [open, mounted, presentation]);
 
   useLayoutEffect(() => {
@@ -327,6 +342,7 @@ export function ScorecardGlassOverlay({
         data-scorecard-glass-card="true"
         role="dialog"
         aria-modal="true"
+        aria-hidden={stackedLayerOpen ? true : undefined}
         onClick={onCardClick}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}

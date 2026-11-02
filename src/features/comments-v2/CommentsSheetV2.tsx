@@ -11,6 +11,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
+import { hideOthers } from 'aria-hidden';
 import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
 import { COMMENTS_SHEET_Z } from '@/lib/zLayers';
 import { Z } from '@/config/zIndex';
@@ -103,6 +104,8 @@ function CommentsSheetV2Inner({
   layer = 'base', onDismissReady,
 }: Props) {
   const [composerFocusToken, setComposerFocusToken] = useState(0);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const { user } = useSupabaseSession();
   const { t } = useTranslation('common');
   const kb = useKeyboardHeight();
@@ -163,6 +166,26 @@ function CommentsSheetV2Inner({
     onDismissReady?.(requestClose);
     return () => onDismissReady?.(null);
   }, [onDismissReady, requestClose]);
+
+  // Stacked-only aria ownership: the foreground keeps both its portals and
+  // hides the scorecard beneath. Reapply when a late-entering scorecard mounts
+  // (Activity deep links mount comments first); release on close/unmount.
+  useLayoutEffect(() => {
+    const backdrop = backdropRef.current;
+    const sheet = sheetRef.current;
+    if (!isOpen || layer !== 'stacked' || !backdrop || !sheet) return;
+    let cards = Array.from(document.querySelectorAll('[data-scorecard-glass-card]'));
+    let release = hideOthers([backdrop, sheet]);
+    const observer = new MutationObserver(() => {
+      const next = Array.from(document.querySelectorAll('[data-scorecard-glass-card]'));
+      if (next.length === cards.length && next.every((node, i) => node === cards[i])) return;
+      release();
+      cards = next;
+      release = hideOthers([backdrop, sheet]);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => { observer.disconnect(); release(); };
+  }, [isOpen, layer]);
 
   useEffect(() => {
     if (!isOpen || layer !== 'stacked') return;
@@ -346,14 +369,17 @@ function CommentsSheetV2Inner({
       {isOpen && (
         <>
           <motion.div
+            ref={backdropRef}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black/40"
             data-comments-backdrop={layer}
+            data-stacked-over-sheet={layer === 'stacked' && isOpen ? 'true' : undefined}
             style={{ zIndex: layer === 'stacked' ? Z.stackedSheetBackdrop : Z.sheetBackdrop }}
             onClick={requestClose}
           />
           <motion.div
+            ref={sheetRef}
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             /* Focus AFTER the open spring settles, never on mount — focusing
@@ -364,6 +390,9 @@ function CommentsSheetV2Inner({
             }}
             className="fixed inset-x-0 bottom-0 w-full md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col"
             data-comments-sheet={layer}
+            data-stacked-over-sheet={layer === 'stacked' && isOpen ? 'true' : undefined}
+            role={layer === 'stacked' ? 'dialog' : undefined}
+            aria-modal={layer === 'stacked' ? true : undefined}
             style={{
               zIndex: layer === 'stacked' ? Z.stackedSheet : Z.sheet,
               background: CANVAS,

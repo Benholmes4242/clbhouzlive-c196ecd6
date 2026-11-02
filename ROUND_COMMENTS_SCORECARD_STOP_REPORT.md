@@ -1,4 +1,19 @@
-# Round comments over the scorecard — STOP
+# Round comments over the scorecard — approved fix complete
+
+## Approved accessibility follow-up — 2 November 2026
+- Changed only `ScorecardGlassOverlay.tsx` and `CommentsSheetV2.tsx` in production code. `RoundDetailSheet.tsx`, other callers, shared draft dialog and backend/configuration files remain unchanged this turn.
+- Stacked backdrop/sheet portals carry `data-stacked-over-sheet="true"` while open. Scorecard `hideOthers` preserves them as additional targets and refreshes only when that target set changes. Its card explicitly reflects stacked foreground ownership with `aria-hidden`.
+- Stacked comments own `hideOthers([backdrop, sheet])`, release it on close/unmount, and refresh when a late scorecard card mounts/unmounts. This covers Activity deep-link mount order. Stacked sheet has dialog semantics; base comments retain their existing semantics and lifecycle.
+- Preserved all **30 original assertion statements byte-for-byte and in order**, verified with a TypeScript AST extraction. No tests deleted, renamed or rewritten. Added two cases: `only stacked comments are accessible and the scorecard is restored on close`; `comments mounted before the late scorecard retain accessibility and restore it on close`.
+- Focused command: `bunx vitest run src/test/roundCommentsStacked.test.tsx --maxWorkers=2`: **21/21 passed** (all original 19, including four typed-draft cases, plus two new regressions; file count 19 → 21).
+- Full-suite commands: `bunx vitest run --shard=1/4 --maxWorkers=2`, then the same command with `--shard=2/4`, `--shard=3/4`, `--shard=4/4`. Each completed successfully. Results: **1,416/133 files; 1,342/133; 1,441/133; 1,470/131** = **5,669/5,669 across 530 files**, no failed/skipped tests or unhandled errors.
+- Reconciliation: previous executed suite **5,663 passed / 4 failed / 5,667 across 530** → **5,669 passed / 0 failed / 5,669 across 530**, solely +2 accessibility regressions in `roundCommentsStacked.test.tsx`. Against last all-green **5,643/528**, +26/+2 = roundCommentsStacked 21/+1 and intervening tourScorecardProfileDoor 5/+1.
+- Four pre-existing typed-draft failures listed below are now cleared. No new failures. Passing tests still emit diagnostic noise, including React act warnings (the new scorecard observer also triggers these in unchanged draft cases); these are not test failures.
+- Automatic preview signal: `/tmp/observability/build-errors.log`, **2026-11-02T08:27:19Z — build OK**. No manual build/typecheck run; harness owns validation.
+- Signed-in Activity/device E2E remains unavailable (`external_unmanaged`). Real component integration regressions prove aria ownership, guard behavior and mount order; no hosted notification/device claim.
+- Protected rules maintained: no SQL/migrations/RPC/edge edits, feed_config untouched, round_pool_cap unchanged at 30, no native/Median changes.
+
+## Historical stop (superseded by the approved fix above)
 
 ## Changes
 - `RoundDetailSheet.tsx`: all scorecard dismissals delegate to the comments' live draft guard while comments are open; otherwise the original `onClose` runs. Horizontal dragging is passed as null while comments are open. Initial opening and the comment-button action are unchanged.
@@ -58,4 +73,4 @@ Signed-in Activity → round → comments end-to-end is unavailable because brow
 
 No SQL, migrations, migration files, deployed RPC/edge-function edits, feed_config edits, round_pool_cap changes, native/Median changes or edits to ScorecardGlassOverlay/CardScorecardSheet.
 
-Next step requires Ben's ruling on the aria layering above (component fix in stacked comments, or a query change) before rerunning the file and full shards.
+Ben approved the component fix; the focused file and all full-suite shards now pass as recorded above.
