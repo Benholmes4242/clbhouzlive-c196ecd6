@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Course Media fullscreen shot selection
-- [ ] Guard missing shot ids, publish opening index, preserve selected/swiped shots and reject stale hydration.
-- [ ] Audit tile identities; add focused regressions and run the four full-suite shards.
-- [ ] Record changed files, totals and verification limits in COURSE_MEDIA_FULLSCREEN_REPORT.md.
+- [x] Guard missing shot ids, publish opening index, preserve selected/swiped shots and reject stale hydration.
+- [x] Audit tile identities; ten new regressions; focused 60/60 and full four shards 5,911/5,911 across 543 files (baseline 5,901/542).
+- [x] Record changed files, totals and verification limits in COURSE_MEDIA_FULLSCREEN_REPORT.md; automatic build OK; standalone typecheck not run by policy; authenticated device readback unavailable (external_unmanaged).
 
 ## WS1 — Explore Watch section 1 — DONE
 - [x] Chips For you · Shorts · Long form via mapWatchFilter (community → For you); signed-in Creators row + lead from existing RPCs; community rail kept.
