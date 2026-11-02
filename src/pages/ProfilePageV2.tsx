@@ -16,6 +16,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 import { compareRouteFor, useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
+import { useProfileCreator, creatorTab } from '@/features/creator/profileCreator';
+import { ProfileVideosTab, CreatorContentSkeleton } from '@/features/creator/ProfileVideosTab';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
 import { usePersonalReviewsCount } from '@/hooks/usePersonalReviewsCount';
@@ -308,10 +310,13 @@ const ProfilePageV2Content: React.FC = () => {
   // 'stats' is the legacy id of the handicap tab: accepted, mapped on read,
   // never emitted.
   const tabFromParam = (tabParam: string | null): string => {
-    const validTabs = ['activity', 'courses', 'rounds', 'top100', 'handicap', 'stats'];
+    const validTabs = ['activity', 'courses', 'rounds', 'top100', 'handicap', 'stats', 'videos'];
     if (!tabParam || !validTabs.includes(tabParam)) return 'activity';
     return tabParam === 'stats' ? 'handicap' : tabParam;
   };
+  const creator = useProfileCreator(profileUserId, !!user?.id && user.is_anonymous !== true);
+  const creatorPending = !!user?.id && !!profileUserId && creator.isPending;
+  const isCreator = getProfileType(profile?.user_type).isPersonal && creator.isSuccess && creator.data?.is_creator === true;
   const initialTab = useMemo(() => tabFromParam(searchParams.get('tab')), []);
 
   // Deep-link consumption for Top-10 comment notifications (Item 2B).
@@ -350,7 +355,8 @@ const ProfilePageV2Content: React.FC = () => {
   // The URL is the source of the tab. A navigation to /profile?tab=handicap
   // while the profile is already mounted (the hero index cell, the /handicap
   // redirect, a sheet link) must switch tabs, not be ignored.
-  const urlTab = tabFromParam(searchParams.get('tab'));
+  const chosenCreatorTab = creatorTab(searchParams.get('tab'), isCreator, creatorPending);
+  const urlTab = tabFromParam(chosenCreatorTab);
   useEffect(() => {
     setActiveSection((cur) => (cur === urlTab ? cur : urlTab));
   }, [urlTab]);
@@ -407,12 +413,18 @@ const ProfilePageV2Content: React.FC = () => {
     const base = allTabs.filter(
       t => t.id !== 'top100' && (t.id !== 'handicap' || showHandicapTab),
     );
+    if (isCreator) base.unshift({ id: 'videos', label: 'Videos' });
     if (!showRoundsTab) return base;
     const at = base.findIndex(t => t.id === 'courses');
     const out = [...base];
     out.splice(at >= 0 ? at + 1 : out.length, 0, { id: 'rounds', label: 'Rounds' });
     return out;
-  }, [allTabs, showRoundsTab, showHandicapTab]);
+  }, [allTabs, showRoundsTab, showHandicapTab, isCreator]);
+
+  useEffect(() => {
+    if (searchParams.get('tab') !== 'videos' || creatorPending || !profile?.id || isCreator) return;
+    setActiveSection('activity'); setSearchParams({ tab: 'activity' }, { replace: true });
+  }, [searchParams, creatorPending, profile?.id, isCreator, setSearchParams]);
 
   // A ?tab=rounds link to a member whose rounds the viewer cannot see lands
   // on Posts, never on a locked or empty tab.
@@ -599,7 +611,7 @@ const ProfilePageV2Content: React.FC = () => {
   const handleTabChange = (tab: string) => {
     setActiveSection(tab);
     if (tab === 'activity') {
-      setSearchParams({}, { replace: true });
+      setSearchParams(isCreator ? { tab: 'activity' } : {}, { replace: true });
     } else {
       setSearchParams({ tab }, { replace: true });
     }
@@ -824,7 +836,10 @@ const ProfilePageV2Content: React.FC = () => {
   const websites = profile?.websites || [];
 
   const getCurrentContent = () => {
-    switch (activeSection) {
+    if (chosenCreatorTab === null) return <CreatorContentSkeleton />;
+    switch (urlTab === 'videos' ? 'videos' : activeSection) {
+      case 'videos':
+        return isCreator && creator.data && profile?.id ? <ProfileVideosTab key={profile.id} userId={profile.id} viewerId={user?.id} summary={creator.data} /> : null;
       case 'activity':
         return (
           <PostsTabContent
@@ -855,6 +870,7 @@ const ProfilePageV2Content: React.FC = () => {
           <ProfileRoundsTab
             userId={profile.id}
             isOwnProfile={isSelf}
+            isCreator={isCreator}
             viewerId={user?.id}
             ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
           />
@@ -903,6 +919,7 @@ const ProfilePageV2Content: React.FC = () => {
           <ProfileHero
             userId={profile.id}
             viewerUserId={user?.id}
+            isCreator={isCreator}
             coachLine={<CoachProfileLine profileUserId={profile.id} viewerId={user?.id} />}
             displayName={displayName}
             avatarUrl={profile.profile_photo_url}
@@ -1332,7 +1349,7 @@ const ProfilePageV2Content: React.FC = () => {
         </section>
 
         {/* Tab Content */}
-        <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
+        <div className={cn(activeSection === 'activity' || activeSection === 'videos' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
           {getCurrentContent()}
         </div>
 

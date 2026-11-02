@@ -46,6 +46,8 @@ interface Props {
   userId: string;
   viewerUserId?: string | null;
   displayName: string;
+  /** Page-owned creator read; hero remains independently renderable. */
+  isCreator?: boolean;
   /** First name for the visitor verdict sentence. */
   ownerFirstName?: string | null;
   /** user_profiles.gender — 'male' | 'female'; anything else reads "their". */
@@ -141,6 +143,7 @@ export const ProfileHero: React.FC<Props> = ({
   userId,
   viewerUserId,
   displayName,
+  isCreator = false,
   ownerFirstName,
   ownerGender,
   avatarUrl,
@@ -368,6 +371,7 @@ export const ProfileHero: React.FC<Props> = ({
         coverUrl={cover}
         onAvatarTap={onAvatarTap}
         displayName={displayName}
+        isCreator={isCreator}
         subline={subline || null}
         afterSubline={coachLine}
         onAddHomeClub={isSelf ? onEdit : undefined}

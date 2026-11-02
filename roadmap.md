@@ -1,5 +1,9 @@
 # Roadmap
 
+## CR2 — Creator profile
+- [x] Add page-owned creator read, cover label, default Videos tab and round-video pills through shared Watch player.
+- [ ] Add regression tests and verify focused/full suite and screenshots; preserve CR1 recorded blockers.
+
 ## CR1 — Self-serve creator choice
 - [x] Add shared switch, Welcome Continue-only choice and immediate Edit profile save/rollback.
 - [x] Remove business-create Creator tile and apply only authorised test edits.

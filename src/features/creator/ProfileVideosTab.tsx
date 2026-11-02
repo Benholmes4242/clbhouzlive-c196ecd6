@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { posterFor } from '@/features/explore-magazine/watch/videoUnit';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { shortCourseName } from '@/lib/shortCourseName';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { creatorDuration, creatorFeedRow, useProfileVideos, type CreatorSummary, type VideoKind } from './profileCreator';

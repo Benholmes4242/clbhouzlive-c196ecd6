@@ -11,6 +11,8 @@
  *    listed and marked, but out of Best, Average, to-par and form.
  */
 import React from 'react';
+import { ProfileRoundVideos, RoundVideoPill } from '@/features/creator/ProfileRoundVideos';
+import type { RoundVideo } from '@/features/creator/profileCreator';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
@@ -37,6 +39,7 @@ import { isFullEighteen, useOwnHandicapVisibility, useProfileRounds, type Profil
 interface Props {
   userId: string;
   isOwnProfile: boolean;
+  isCreator?: boolean;
   viewerId?: string;
   ownerFirstName?: string | null;
 }
@@ -66,7 +69,7 @@ function EmptyRoundsConnection({ userId, children }: { userId: string; children:
   return <>{children}</>;
 }
 
-const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, ownerFirstName = null }) => {
+const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, isCreator = false, ownerFirstName = null }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
   const { data: rounds = [], isLoading } = useProfileRounds(userId);
@@ -153,30 +156,9 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
   const colLabel: React.CSSProperties = { textAlign: 'right', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: RT.DIM };
   let firstInGroup = true;
 
-  return (
-    <div style={{ padding: '8px 18px 32px', fontFamily: SANS }}>
-      {isPrivateOwn ? (
-        <div style={{ background: MEMBER_CELL, borderRadius: 12, padding: '12px 14px', marginBottom: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: CHART.INK }}>
-            {t('rounds.private.title', 'Only you can see this')}
-          </div>
-          <div style={{ marginTop: 4, fontSize: 12, lineHeight: 1.5, color: CHART.MUTE }}>
-            {t('rounds.private.body', 'Your handicap is set to private. To share your rounds, change Handicap visibility in Edit profile.')}
-          </div>
-          <button
-            type="button"
-            onClick={() => navigate('/edit-profile')}
-            style={{ marginTop: 8, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: CHART.INK }}
-          >
-            {t('rounds.private.cta', 'Privacy settings')} ›
-          </button>
-        </div>
-      ) : null}
-
-      <SeasonSection rounds={rounds} year={year} userId={userId} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} />
-      <div style={{ marginTop: 32 }}><YearSection rounds={rounds} year={year} today={today} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} /></div>
-      <div style={{ marginTop: 32 }}><CoursesPlayedSection rounds={rounds} userId={userId} viewerId={viewerId} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} /></div>
-
+  const renderLog = (roundVideos = new Map<string, RoundVideo[]>()) => {
+    firstInGroup = true;
+    return (
       <section style={{ marginTop: 32 }}>
         <div style={KICKER}>Every round</div>
         <div style={TITLE}>The log</div>
@@ -239,6 +221,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
                   </span>
                   <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: RT.DIM, ...TAB }}>
                     <span>{formatDayMonthShortGB(parsePlayDate(r.play_date))}</span>
+                    <RoundVideoPill rows={roundVideos.get(r.whs_score_id) ?? []} self={isOwnProfile} />
                     {medalTotal(r) > 0 ? (
                       <Pill padding="3px 8px">
                         <AwardCluster scale="pill" gold={r.medals_gold ?? 0} silver={r.medals_silver ?? 0} bronze={r.medals_bronze ?? 0} surfaceColor={CHART.CANVAS} />
@@ -283,6 +266,34 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
           </button>
         ) : null}
       </section>
+    );
+  };
+
+  return (
+    <div style={{ padding: '8px 18px 32px', fontFamily: SANS }}>
+      {isPrivateOwn ? (
+        <div style={{ background: MEMBER_CELL, borderRadius: 12, padding: '12px 14px', marginBottom: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: CHART.INK }}>
+            {t('rounds.private.title', 'Only you can see this')}
+          </div>
+          <div style={{ marginTop: 4, fontSize: 12, lineHeight: 1.5, color: CHART.MUTE }}>
+            {t('rounds.private.body', 'Your handicap is set to private. To share your rounds, change Handicap visibility in Edit profile.')}
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/edit-profile')}
+            style={{ marginTop: 8, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: CHART.INK }}
+          >
+            {t('rounds.private.cta', 'Privacy settings')} ›
+          </button>
+        </div>
+      ) : null}
+
+      <SeasonSection rounds={rounds} year={year} userId={userId} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} />
+      <div style={{ marginTop: 32 }}><YearSection rounds={rounds} year={year} today={today} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} /></div>
+      <div style={{ marginTop: 32 }}><CoursesPlayedSection rounds={rounds} userId={userId} viewerId={viewerId} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} /></div>
+
+      {isCreator ? <ProfileRoundVideos userId={userId} viewerId={viewerId} rounds={rounds}>{renderLog}</ProfileRoundVideos> : renderLog()}
 
       <RoundDetailSheet open={openId != null} onClose={() => setOpenId(null)} scoreId={openId} profileUserId={userId} />
     </div>
