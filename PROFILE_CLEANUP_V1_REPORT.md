@@ -1,7 +1,7 @@
-# PROFILE_CLEANUP_V1 — V1.1 verification STOP report
+# PROFILE_CLEANUP_V1 — V1.2 verification STOP report
 
 ## Result
-V1.1 applied all three exact editor corrections and removed the newly authorised header/college chain. The automatic typecheck/build is now clean and all focused checks pass. Full verification **stopped on three newly observed Watch test failures in shard 2**; no test fix or rerun followed that stop. Full-suite completion and authenticated acceptance remain unverified.
+V1.2 applied only the authorised Creators-row test scoping and fresh RS QueryClientProvider. All **5,901 assertions passed across 542 files**, matching the expected inventory exactly, but shard 4 exited with **one new unhandled error**, so the suite is **not clean**. Work stopped without changing or rerunning the implicated test/component. The automatic build is clean.
 
 ## Historical V1 failure (corrected by V1.1)
 The four business test files could not collect: `src/test/be1BusinessEditSettings.test.tsx`, `src/test/be2BusinessPreview.test.tsx`, `src/test/be3BusinessWhereContact.test.tsx`, `src/test/be4BusinessProfileLinks.test.tsx`.
@@ -180,7 +180,7 @@ AssertionError: expected <button type="button" …(1)></button> to be null
 ```text
 TestingLibraryElementError: Found multiple elements with the text: See all
 ```
-The received extra element is a `See all` button. These are newly observed relative to the last reported full run; their pre-cleanup status is not established, so they are not silently labelled pre-existing. No Watch component or assertion change was made.
+The received extra element is a `See all` button. V1.2 confirms these three failures came from WS3.1 commit `5d921a20` adding the correct Long form shelf heading action, not from profile cleanup; whole-feed WS1 selectors also found that action. V1.1 made no Watch component or assertion change; V1.2 scopes only the authorised test queries.
 
 ### Real before/after accounting
 The last reported fully executed baseline remains **5,903 tests / 542 files**, 5,901 passed / the two named RS failures. As previously disclosed, WS3.1 then added the Long form See all case (+1 in `ws3WatchBottom.test.tsx`); V1 removed the three named cases above (−3). V1.1 canvas removes assertions only (0), and the RS harness has not been changed (0). Expected current inventory: **5,901 tests / 542 files** (5,903 + 1 − 3). **Actual full after total is unavailable**, because the new failure stopped execution after two shards. The only newly executed total is the 2,914-test subset above. No test-count difference is hidden as “unchanged”.
@@ -198,3 +198,93 @@ The four business focused files passed, covering the live editor's preview, imme
 - Hosted authenticated rendering/save readback remains unavailable on the external unmanaged Supabase project.
 
 No SQL, migrations, deployed RPC/edge-function changes, feed_config changes, cap changes, native/Median changes, or changes to guest browsing, review wizard, news or round plots in V1.1.
+
+## V1.2 authorised edits and verification
+### Test changes, names preserved
+Only `src/test/ws1WatchTop.test.tsx` and `src/test/rsRoundsShelf.test.tsx` changed in application/test source this follow-up. No component changes. No case was added, removed or renamed; count delta **0 tests / 0 files**.
+
+`WS1 Creators row > hides, heading included, when the read returns fewer than three`:
+```ts
+// Before
+mountFeed();
+expect(screen.queryByText('See all')).toBeNull();
+// After
+const { container } = mountFeed();
+expect(container.querySelector('[data-watch-creators="row"]')).toBeNull();
+```
+The Creators-heading assertion is unchanged. Reason: assert absence of the entire Creators row, not another shelf's correctly present action.
+
+`WS1 Creators row > See all appears only when the read returns more than eight`:
+```ts
+// Before, eight
+expect(screen.queryByText('See all')).toBeNull();
+// After, eight
+expect(within(eight.container.querySelector('[data-watch-creators="row"]') as HTMLElement).queryByText('See all')).toBeNull();
+// Before, nine
+mountFeed();
+expect(screen.getByText('See all')).toBeTruthy();
+// After, nine
+const nine = mountFeed();
+expect(within(nine.container.querySelector('[data-watch-creators="row"]') as HTMLElement).getByText('See all')).toBeTruthy();
+```
+Reason: the eight/nine threshold belongs to the Creators row only. Fixture and other assertions unchanged.
+
+`WS1 Creators row > See all opens the sheet, which lists every creator and follows through useToggleFollow`:
+```ts
+// Before
+mountFeed();
+fireEvent.click(screen.getByText('See all'));
+// After
+const { container } = mountFeed();
+fireEvent.click(within(container.querySelector('[data-watch-creators="row"]') as HTMLElement).getByText('See all'));
+```
+Reason: open the Creators action, not the separate Long form action. All sheet, follow and analytics assertions remain byte-identical.
+
+`rsRoundsShelf.test.tsx`: the existing `mount(node, initial)` helper now wraps the existing router/i18n/routes in `QueryClientProvider` with a fresh `new QueryClient({ defaultOptions: { queries: { retry: false } } })` per render. No assertion, test name, fixture, mock or component changed. This resolves the two reproduced, pre-existing failures:
+- `RS shelf placement on Watch > shows on the For you chip for a signed-in member, after Quick hits, and not on other chips`
+- `RS shelf placement on Watch > is absent for a signed-out visitor`
+Both previously reported `Error: No QueryClient set, use QueryClientProvider to set one`. Both now pass in focused and full shard 1.
+
+### Commands and actual totals
+Focused:
+```text
+bunx vitest run src/test/ws1WatchTop.test.tsx src/test/rsRoundsShelf.test.tsx --maxWorkers=2
+```
+**56/56 passed / 2 files** (WS1 34, RS 22). Output `/tmp/profile-cleanup-v12/focused.log`.
+
+All four full shards executed:
+```text
+bunx vitest run --maxWorkers=2 --shard=1/4
+bunx vitest run --maxWorkers=2 --shard=2/4
+bunx vitest run --maxWorkers=2 --shard=3/4
+bunx vitest run --maxWorkers=2 --shard=4/4
+```
+| Shard | Passed tests | Passed files | Exit | Unhandled errors |
+|---|---:|---:|---:|---:|
+| 1 | 1,481 | 136 | 0 | 0 |
+| 2 | 1,433 | 136 | 0 | 0 |
+| 3 | 1,530 | 136 | 0 | 0 |
+| 4 | 1,457 | 134 | 1 | 1 |
+| Total | **5,901** | **542** | **Not clean** | **1** |
+
+No failing assertions or test files, but Vitest explicitly warns that the unhandled error might cause false positives. Therefore **not a clean suite pass**. Full shard outputs: `/tmp/profile-cleanup-v12/shard1.log` through `shard4.log`. The complete failing shard output is retained in `PROFILE_CLEANUP_V1_V12_FAILING_SHARD_4.log`; earlier V1/V1.1 failing logs remain too.
+
+Actual total matches expected **5,901 tests / 542 files** exactly: baseline last full run 5,903/542, WS3.1 `ws3WatchBottom.test.tsx` adds `Long form's See all selects the Long form chip` (+1), V1 removes the three named tests quoted above (−3), V1.1 canvas source assertions (0), V1.2 scoped queries and RS provider (0). No other inventory differences.
+
+### New failure — STOP (verbatim)
+```text
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+TypeError: scroller?.scrollTo is not a function
+ ❯ Module.scrollPageToTop src/lib/getScrollParent.ts:101:13
+ ❯ WatchFeed.jsxDEV.children.jsxDEV.children.longRows.length.jsxDEV.children.jsxDEV.onSeeAll src/features/explore-magazine/watch/WatchFeed.tsx:637:19
+```
+Vitest identifies `src/test/ws3WatchBottom.test.tsx`; latest potentially responsible case: **`Long form's See all selects the Long form chip`**. That file/helper/component was not changed or rerun. This unhandled error was not among the five known failures authorised in V1.2; it is newly observed and triggers the stop rule. No unapproved stand-in or assertion adjustment applied.
+
+**Build:** `/tmp/observability/build-errors.log` reports `build OK` at `2026-11-02T17:27:50Z`. No manual build/typecheck run; automatic checks own those commands. Production source unchanged in V1.2. Hosted authenticated acceptance remains unverified as recorded above.
+
+### Current remaining blocker (supersedes earlier stop lists)
+Authorisation is needed for the newly observed shard-4 unhandled scroll error before any fix or rerun. The five previous WS1/RS failures now pass; they are no longer open blockers. Full clean-suite acceptance remains pending because shard 4 exited 1 despite all tests passing.
+
+V1.2 touched no guest browsing, review wizard, news, round plots, SQL, migrations, deployed RPCs/edge functions, feed_config, round_pool_cap, native or Median configuration.

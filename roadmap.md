@@ -1497,4 +1497,5 @@
 ## PROFILE_CLEANUP_V1
 - [x] Verified dependencies; applied dead-file deletions and named cache/comment changes. Business edit simplification applied but not verified.
 - [x] PROFILE_CLEANUP_V1.1: exact editor corrections, authorised canvas assertion removal, five dead header/college deletions; 284/284 focused tests; automatic build OK; report updated.
-- [ ] PROFILE_CLEANUP_V1.2: authorised Creators-row query scoping and fresh RS provider; rerun focused checks and all four full shards, reconcile against 5,901/542, and update the existing report. Hosted authenticated readback remains unavailable (external_unmanaged).
+- [x] PROFILE_CLEANUP_V1.2: authorised Creators scoping/RS provider; 56/56 focused tests; all four shards executed, 5,901 assertions/542 files passed; previous five failures pass; build OK; report updated.
+- [ ] STOP V1.2: shard 4 unhandled TypeError "scroller?.scrollTo is not a function", getScrollParent.ts:101 / WatchFeed.tsx:637, latest ws3WatchBottom case "Long form's See all selects the Long form chip". Suite exit 1; exact failing shard retained. Await authorisation before fixes/reruns. Hosted authenticated readback remains unavailable (external_unmanaged).
