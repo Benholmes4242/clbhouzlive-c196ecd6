@@ -84,8 +84,8 @@ import {
 const INSET = 14;
 const CW_W = 184;
 const CW_H = 104;
-const QH_W = 126;
-const QH_H = 224;
+const QH_W = 156;
+const QH_H = 248;
 const CT_W = 124;
 
 /* BRIEF_WATCH_SEE_ALL_IN_PLACE values with no shared token yet. */
@@ -515,7 +515,7 @@ export function WatchFeed({
                     <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: '100%', minWidth: 0 }}>
                       {/* N.2: no autoplay in a 3-across grid. */}
                       <Poster row={row} height={null} aspect="126 / 224" posterH={480} radius={12} autoplay={false} progress={barFor(row)} badge="solid" />
-                      <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32 }}>
+                      <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32, minHeight: 'calc(12.5px * 1.32 * 2)' }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
                       {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{who}</span> : null}
@@ -537,7 +537,7 @@ export function WatchFeed({
                     <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: quickGrid ? '100%' : QH_W, minWidth: 0 }}>
                       {/* N.2: no autoplay in a 3-across grid — three equally central tiles, one playing, reads as failure. */}
                       <Poster row={row} height={quickGrid ? null : QH_H} posterH={480} radius={12} autoplay={!quickGrid} progress={barFor(row)} />
-                      <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>
+                      <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3, minHeight: 'calc(12px * 1.3 * 2)' }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
                       {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}

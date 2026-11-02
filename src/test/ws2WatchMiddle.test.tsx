@@ -106,6 +106,40 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('WS2 order on For you', () => {
+  it('WS4 shelf tiles are 156 wide with a 248 cover-fit poster', () => {
+    const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
+    const tile = container.querySelector<HTMLElement>('[data-watch-card="quick"]');
+    expect(tile?.style.width).toBe('156px');
+    const poster = tile?.querySelector<HTMLElement>('[data-watch-frame]');
+    expect(poster?.style.height).toBe('248px');
+    expect(poster?.querySelector('img')?.style.objectFit).toBe('cover');
+  });
+  it.each([
+    ['all', 'calc(12px * 1.3 * 2)'],
+    ['quick', 'calc(12.5px * 1.32 * 2)'],
+  ])('WS4 %s titles reserve the same two-line space for short and long titles', (filter, minHeight) => {
+    f.clips.data = { pages: [
+      [{ ...hub('short-title', 60), caption: 'One line', creator_display_name: 'First creator' },
+       { ...hub('long-title', 60), caption: 'A longer title that occupies two lines of space on a narrow video tile', creator_display_name: 'Second creator' }],
+    ] };
+    const { container } = wrap(<WatchFeed userId="me" initialFilter={filter} onDepart={() => {}} />);
+    const tiles = container.querySelectorAll('[data-watch-card="quick"]');
+    expect(tiles).toHaveLength(2);
+    for (const tile of tiles) {
+      const creator = tile.querySelector('[data-watch-sub="creator"]');
+      expect(creator).toBeTruthy();
+      const title = creator?.previousElementSibling;
+      expect(title?.getAttribute('style')).toContain(`min-height: ${minHeight}`);
+    }
+  });
+  it('WS4 Shorts grid retains the 126 / 224 aspect and three columns', () => {
+    const { container } = wrap(<WatchFeed userId="me" initialFilter="quick" onDepart={() => {}} />);
+    const grid = container.querySelector<HTMLElement>('[data-watch-grid="quick"]');
+    expect(grid?.style.gridTemplateColumns).toBe('repeat(3, 1fr)');
+    const poster = grid?.querySelector<HTMLElement>('[data-watch-frame]');
+    expect(poster?.style.aspectRatio).toBe('126 / 224');
+    expect(poster?.style.height).toBe('');
+  });
   it('lead → Shorts → Rounds this week → Filmed at your courses → By region → Long form', () => {
     const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const lead = container.querySelector('[data-stub="lead"]')!;
