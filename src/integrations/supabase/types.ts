@@ -5722,6 +5722,27 @@ export type Database = {
         }
         Relationships: []
       }
+      featured_creators: {
+        Row: {
+          actor_id: string
+          actor_type: string
+          added_at: string
+          sort_order: number
+        }
+        Insert: {
+          actor_id: string
+          actor_type: string
+          added_at?: string
+          sort_order?: number
+        }
+        Update: {
+          actor_id?: string
+          actor_type?: string
+          added_at?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       featured_rounds_history: {
         Row: {
           featured_at: string
@@ -21990,6 +22011,21 @@ export type Database = {
           viewer_rounds_with: number
         }[]
       }
+      get_featured_creators: {
+        Args: { p_limit?: number }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          area: string
+          avatar_url: string
+          display_name: string
+          handle: string
+          is_verified: boolean
+          latest_video_at: string
+          sort_order: number
+          videos_7d: number
+        }[]
+      }
       get_featured_groups: {
         Args: { p_round?: number; p_tournament_id: string }
         Returns: Json
@@ -24551,6 +24587,32 @@ export type Database = {
           video_count: number
         }[]
       }
+      get_watch_lead: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          reason: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_watch_mixed_grid: {
         Args: {
           p_cursor?: string
@@ -26668,6 +26730,16 @@ export type Database = {
       viewer_shares_host_club: {
         Args: { _host_id: string; _viewer_id: string }
         Returns: boolean
+      }
+      watch_visible_video_posts: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          created_at: string
+          like_count: number
+          post_id: string
+        }[]
       }
       whs_connection_publicly_visible: {
         Args: { p_connection_id: string }
