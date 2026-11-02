@@ -25,6 +25,11 @@
 }
 
 :root {
+  --suggestion-card: #17171B;
+  --suggestion-ink: #F8FAFC;
+  --suggestion-cover-empty: linear-gradient(135deg, #2A2D35 0%, #1E2027 55%, #17171B 100%);
+  --suggestion-cover-scrim: linear-gradient(180deg, rgba(10,10,12,.10) 0%, rgba(10,10,12,.30) 100%);
+  --suggestion-dismiss: rgba(10,10,12,.55);
   --explore-top-panel: #17171B;
   --explore-top-ink: #F8FAFC;
   --explore-top-canvas: #0B0B0D;

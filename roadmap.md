@@ -1,5 +1,9 @@
 # Roadmap
 
+## Who to follow cover cards
+- [ ] Add one batched cover read, signed-off card cover/overlap/dismiss geometry and 48-hour post wording.
+- [ ] Add regressions, run four full shards from 5,936/545, confirm build and report all changed assertions.
+
 ## EXPLORE_TOP_1
 - [x] Replace only the top controls and Creators row; share deep-link post loading/mapping without changing behaviour.
 - [x] Rewrite the authorised WS1 Creators block and open search first in the separately authorised placeholder case.

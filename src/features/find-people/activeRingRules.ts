@@ -39,5 +39,6 @@ export function activityLine(activity: RecentActivity, now: Date): ActivityLine 
     return { key: 'findPeople.active.postedMinutes', vars: { n: minutes }, def: `Posted ${minutes}m ago` };
   }
   const hours = Math.floor(minutes / 60);
+  if (hours >= 24) return { key: 'findPeople.active.postedYesterday', vars: {}, def: 'Posted yesterday' };
   return { key: 'findPeople.active.postedHours', vars: { n: hours }, def: `Posted ${hours}h ago` };
 }
