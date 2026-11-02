@@ -32,6 +32,7 @@ The shipped components do fire events through the existing `analyticsEvents.trac
   - chip query `getByRole('tab', { name: 'All' })` → `getByRole('tab', { name: 'For you' })`
   - in one test `getByRole('tab', { name: 'Quick hits' })` → `getByRole('tab', { name: 'Shorts' })`
   - added offline mocks for `@/features/explore-magazine/watch/useFeaturedCreators` and `useWatchLead` (both return empty), so its WatchFeed renders make no network reads.
+  - the test now reads `it('shows on the For you chip for a signed-in member, after Quick hits, and not on other chips', ...)` (line 338) — its chip name was updated to match the rename; the shelf rules it checks are unchanged.
   No assertion was deleted or loosened.
 - No other test changed.
 
