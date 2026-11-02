@@ -214,8 +214,8 @@ describe('You and the tour placement', () => {
     const you1 = o1.indexOf('you_and_tour');
     expect(you1).toBeGreaterThan(-1);
     expect(o1[you1 - 1]).toBe('your_players');
-    console.log('ORDER', o1.join(','));
-    if (o1.includes('in_form')) expect(o1.indexOf('in_form')).toBe(you1 + 1);
+    // Everything after the card belongs below In form's slot (In form, then stat leaders).
+    expect(o1.slice(you1 + 1).every((c) => c === 'in_form' || c === 'stat_leaders')).toBe(true);
     a.unmount();
     h.follows = new Set();
     const o2 = order(mount().container);
