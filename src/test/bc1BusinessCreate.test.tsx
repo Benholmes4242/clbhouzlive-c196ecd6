@@ -63,6 +63,11 @@ describe('BC1 route and chrome', () => {
 });
 
 describe('BC1 step 1 selection', () => {
+  it('the create picker offers no Creator tile', () => {
+    renderAt(['/business/create-v2']);
+    expect(document.querySelector('[data-value="Creator"]')).toBeNull();
+    expect(CREATE_CATEGORY_TILES.some(t => t.value === 'Creator')).toBe(false);
+  });
   it('arrives with nothing chosen; selecting enables Continue and moves', () => {
     renderAt(['/business/create-v2']);
     expect(document.querySelectorAll('.bizc-tile[aria-pressed="true"]').length).toBe(0);
