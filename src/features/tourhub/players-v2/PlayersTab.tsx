@@ -100,7 +100,7 @@ export function PlayersTab() {
   // -- Reads
   const { data: race, isError: raceError } = useTourRace(activeTour);
   // Standings read the race's season so they never disagree with the line cards.
-  const raceYear = race ? (race.race ? race.seasonYear : null) : raceError ? null : undefined;
+  const raceYear = race ? (race.race ? race.race.season_year : null) : raceError ? null : undefined;
   const { data: ranking, isLoading: rankingFetching, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour, raceYear);
   const rankingLoading = rankingFetching || raceYear === undefined;
   const { data: liveMap } = useLivePlayerIds();
