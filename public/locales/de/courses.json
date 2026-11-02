@@ -357,6 +357,26 @@
       },
       "searchPlaceholder": "Videos, Clips und Creator suchen",
       "untitled": "Video ohne Titel"
+    },
+    "roundsShelf": {
+      "title": "Runden diese Woche",
+      "subCircle": "Dein Circle, letzte 14 Tage",
+      "subEveryone": "Alle, letzte 14 Tage",
+      "allRounds": "Alle Runden",
+      "door": "Bestenlisten, Feats und jede Runde",
+      "kickerNet": "Netto · Brutto {{gross}}",
+      "kickerComp": " · Wettspiel",
+      "feat": {
+        "ace": "Ass",
+        "albatross": "Albatross",
+        "eagle": "Eagle",
+        "cleanCard": "Bogey-frei"
+      },
+      "latestOf_one": "Die einzige in diesem Jahr",
+      "latestOf_other": "Die neueste von {{events}} in diesem Jahr"
+    },
+    "roundsPage": {
+      "title": "Runden"
     }
   },
   "amateurNews": {
