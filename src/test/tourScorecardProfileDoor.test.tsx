@@ -39,7 +39,9 @@ describe('Tour scorecard profile door', () => {
     // The door sits in the player identity row, beside the player name.
     const row = door?.closest('div');
     expect(row?.textContent).toContain('Kris Ventura');
-    expect(document.querySelector('[data-scorecard-player-row]')).toBeNull();
+    // The tour identity row now renders at full tile width, after the head's
+    // left/score flex, carrying the same marker as the member row.
+    expect(document.querySelector('[data-scorecard-player-row]')).not.toBeNull();
     fireEvent.click(door as Element);
     expect(profile).toHaveBeenCalledOnce();
   });
