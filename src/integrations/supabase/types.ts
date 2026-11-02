@@ -865,6 +865,13 @@ export type Database = {
             foreignKeyName: "business_access_requests_decided_by_fkey"
             columns: ["decided_by"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -895,6 +902,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
@@ -1367,6 +1381,13 @@ export type Database = {
             foreignKeyName: "business_follows_follower_id_fkey"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "business_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -1449,6 +1470,13 @@ export type Database = {
             foreignKeyName: "business_invites_invitee_user_id_fkey"
             columns: ["invitee_user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "business_invites_invitee_user_id_fkey"
+            columns: ["invitee_user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -1522,6 +1550,13 @@ export type Database = {
             foreignKeyName: "business_members_user_profile_id_fkey"
             columns: ["user_profile_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "business_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -1581,6 +1616,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "business_profile_events_business_id_fkey"
             columns: ["business_id"]
@@ -1712,6 +1754,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "business_accounts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_team_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "business_team_members_user_profile_id_fkey"
@@ -1999,6 +2048,13 @@ export type Database = {
             foreignKeyName: "challenges_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "challenges_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -2073,6 +2129,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "championship_seasons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "championship_dispatches_subject_user_id_fkey"
+            columns: ["subject_user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "championship_dispatches_subject_user_id_fkey"
@@ -2273,6 +2336,13 @@ export type Database = {
             foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
             columns: ["requester_user_profile_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -2395,6 +2465,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "business_accounts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "coach_links_user_id_fkey"
@@ -3231,6 +3308,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "season_shop_items"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "cosmetic_loadouts_user_id_fkey"
@@ -4189,6 +4273,13 @@ export type Database = {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -4309,6 +4400,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "stat_browse_base"
             referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "course_requests_home_club_for_user_id_fkey"
+            columns: ["home_club_for_user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "course_requests_home_club_for_user_id_fkey"
@@ -4656,6 +4754,24 @@ export type Database = {
             referencedColumns: ["list_id"]
           },
         ]
+      }
+      creator_explore_hidden: {
+        Row: {
+          added_at: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       creator_profile_events: {
         Row: {
@@ -5812,6 +5928,13 @@ export type Database = {
             foreignKeyName: "follows_follower_user_fk"
             columns: ["follower_user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "follows_follower_user_fk"
+            columns: ["follower_user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -6081,6 +6204,13 @@ export type Database = {
             foreignKeyName: "gam_course_legends_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -6188,6 +6318,13 @@ export type Database = {
           whs_score_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "gam_evaluation_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "gam_evaluation_queue_user_id_fkey"
             columns: ["user_id"]
@@ -6405,6 +6542,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_scores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_notification_outbox_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "gam_notification_outbox_user_id_fkey"
@@ -6674,6 +6818,13 @@ export type Database = {
             foreignKeyName: "gam_round_stats_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -6789,6 +6940,13 @@ export type Database = {
             foreignKeyName: "gam_streaks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "gam_streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -6891,6 +7049,13 @@ export type Database = {
             foreignKeyName: "gam_user_badges_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "gam_user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -6987,6 +7152,13 @@ export type Database = {
             foreignKeyName: "gam_user_milestones_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "gam_user_milestones_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -7037,6 +7209,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "generic_invite_codes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "generic_invite_codes_user_id_fkey"
             columns: ["user_id"]
@@ -7094,6 +7273,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "generic_invite_sends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "generic_invite_sends_user_id_fkey"
             columns: ["user_id"]
@@ -8268,6 +8454,13 @@ export type Database = {
             foreignKeyName: "notifications_actor_fk"
             columns: ["actor_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_fk"
+            columns: ["actor_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -8298,6 +8491,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "notifications_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "notifications_user_fk"
@@ -9685,6 +9885,13 @@ export type Database = {
             foreignKeyName: "posts_user_profile_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -10170,6 +10377,13 @@ export type Database = {
             foreignKeyName: "push_notification_queue_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "push_notification_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -10487,6 +10701,13 @@ export type Database = {
             foreignKeyName: "rivals_rival_user_id_fkey"
             columns: ["rival_user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "rivals_rival_user_id_fkey"
+            columns: ["rival_user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -10517,6 +10738,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "rivals_user_id_fkey"
@@ -10676,6 +10904,13 @@ export type Database = {
             foreignKeyName: "season_badges_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "season_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -10752,6 +10987,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_pass_tiers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "season_pass_tiers_user_id_fkey"
@@ -10850,6 +11092,13 @@ export type Database = {
             foreignKeyName: "season_podium_archive_first_place_user_id_fkey"
             columns: ["first_place_user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_first_place_user_id_fkey"
+            columns: ["first_place_user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -10892,6 +11141,13 @@ export type Database = {
             foreignKeyName: "season_podium_archive_second_place_user_id_fkey"
             columns: ["second_place_user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_second_place_user_id_fkey"
+            columns: ["second_place_user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -10922,6 +11178,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_third_place_user_id_fkey"
+            columns: ["third_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "season_podium_archive_third_place_user_id_fkey"
@@ -11131,6 +11394,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_wrap_cards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "season_wrap_cards_user_id_fkey"
@@ -12857,6 +13127,13 @@ export type Database = {
             foreignKeyName: "streaks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -13457,6 +13734,13 @@ export type Database = {
             foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
             columns: ["reactor_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
+            columns: ["reactor_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -13487,6 +13771,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "top_ten_reactions_target_user_id_profiles_fkey"
@@ -14093,6 +14384,13 @@ export type Database = {
             foreignKeyName: "tour_tee_alerts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "tour_tee_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -14664,6 +14962,13 @@ export type Database = {
             foreignKeyName: "user_bag_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "user_bag_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -14750,6 +15055,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "challenges"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_challenge_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_challenge_progress_user_id_fkey"
@@ -14866,6 +15178,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "season_shop_items"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
@@ -14996,6 +15315,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "stat_browse_base"
             referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "user_course_tracker_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_course_tracker_user_id_fkey"
@@ -15182,6 +15508,13 @@ export type Database = {
             foreignKeyName: "user_exploration_stats_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "user_exploration_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -15266,6 +15599,13 @@ export type Database = {
             foreignKeyName: "user_follows_follower_fk"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "user_follows_follower_fk"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -15296,6 +15636,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_follows_following_fk"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_follows_following_fk"
@@ -15364,6 +15711,13 @@ export type Database = {
             foreignKeyName: "user_friends_friend_fk"
             columns: ["friend_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "user_friends_friend_fk"
+            columns: ["friend_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -15394,6 +15748,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_friends_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_friends_user_fk"
@@ -15470,6 +15831,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "championship_seasons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_hall_of_fame_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_hall_of_fame_user_id_fkey"
@@ -15554,6 +15922,13 @@ export type Database = {
             foreignKeyName: "user_handicap_history_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "user_handicap_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -15623,6 +15998,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_home_clubs_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_home_clubs_user_profile_id_fkey"
@@ -16317,6 +16699,13 @@ export type Database = {
             foreignKeyName: "user_rank_snapshots_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "user_rank_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -16464,6 +16853,13 @@ export type Database = {
             foreignKeyName: "user_rivals_rival_id_fkey"
             columns: ["rival_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "user_rivals_rival_id_fkey"
+            columns: ["rival_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -16494,6 +16890,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_rivals_user_id_fkey"
@@ -16576,6 +16979,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_season_currency_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "user_season_currency_user_id_fkey"
             columns: ["user_id"]
@@ -16730,6 +17140,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "championship_seasons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_season_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_season_stats_user_id_fkey"
@@ -17014,6 +17431,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "stat_browse_base"
             referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "user_top10_exclusions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "user_top10_exclusions_user_id_fkey"
@@ -17387,6 +17811,13 @@ export type Database = {
             foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -17446,6 +17877,13 @@ export type Database = {
           variant?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "welcome_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "welcome_messages_user_id_fkey"
             columns: ["user_id"]
@@ -18471,6 +18909,13 @@ export type Database = {
             foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -18589,6 +19034,13 @@ export type Database = {
           profile_views: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "business_profile_events_business_id_fkey"
             columns: ["business_profile_id"]
@@ -18746,18 +19198,6 @@ export type Database = {
           added_at: string | null
           sort_order: number | null
         }
-        Insert: {
-          actor_id?: string | null
-          actor_type?: string | null
-          added_at?: string | null
-          sort_order?: number | null
-        }
-        Update: {
-          actor_id?: string | null
-          actor_type?: string | null
-          added_at?: string | null
-          sort_order?: number | null
-        }
         Relationships: []
       }
       gam_course_legends_view: {
@@ -18814,6 +19254,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_scores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "gam_course_legends_user_id_fkey"
@@ -18922,6 +19369,13 @@ export type Database = {
             foreignKeyName: "gam_round_stats_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -19004,6 +19458,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "stat_browse_base"
             referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
           },
           {
             foreignKeyName: "gam_course_legends_user_id_fkey"
@@ -19353,6 +19814,13 @@ export type Database = {
             foreignKeyName: "posts_user_profile_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
@@ -19397,6 +19865,13 @@ export type Database = {
           whs_score_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "posts_user_profile_id_fkey"
             columns: ["user_id"]
@@ -19611,6 +20086,13 @@ export type Database = {
           user_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
           {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]

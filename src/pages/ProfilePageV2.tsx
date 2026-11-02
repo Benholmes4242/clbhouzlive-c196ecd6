@@ -314,8 +314,9 @@ const ProfilePageV2Content: React.FC = () => {
     if (!tabParam || !validTabs.includes(tabParam)) return 'activity';
     return tabParam === 'stats' ? 'handicap' : tabParam;
   };
-  const creator = useProfileCreator(profileUserId, !!user?.id && user.is_anonymous !== true);
-  const creatorPending = !!user?.id && !!profileUserId && creator.isPending;
+  const creatorEnabled = !!user?.id && user.is_anonymous !== true && !!profileUserId;
+  const creator = useProfileCreator(profileUserId, creatorEnabled);
+  const creatorPending = creatorEnabled && creator.isPending;
   const isCreator = getProfileType(profile?.user_type).isPersonal && creator.isSuccess && creator.data?.is_creator === true;
   const initialTab = useMemo(() => tabFromParam(searchParams.get('tab')), []);
 

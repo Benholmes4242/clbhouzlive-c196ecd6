@@ -1,5 +1,10 @@
 # Roadmap
 
+## CR2.1 — Creator loading guard
+- [x] Share the non-anonymous, resolved-profile condition between the creator read and pending state in ProfilePageV2 only.
+- [x] Add three whole-page regressions with real QueryClientProvider and MemoryRouter; existing case names/assertions unchanged; focused 11/11.
+- [x] All four full shards pass 5,931/5,931 across 545 files (+3 named CR2.1 cases, no file delta), zero failures/unhandled errors; automatic build OK; CR2_REPORT.md updated.
+
 ## CR1.1 — Authorised stop clearance
 - [x] Apply only optional UserProfile typing, two required form-fixture defaults, target-compatible own-property assertion and three scoped Name-switch queries.
 - [x] Focused154/154; all four full shards5,928/5,928 across545 files,0 failures/unhandled errors; automatic typecheck/build OK. No test-count delta.
@@ -9,7 +14,8 @@
 - [x] Add page-owned creator read, cover label, default Videos tab and round-video pills through shared Watch player.
 - [x] Add eight CR2 regressions; focused11/11; four shards executed5,928/545 with5,926 passing, two pre-existing CR1 failures and0 unhandled errors; report CR2_REPORT.md.
 - [x] CR1.1 resolved the two known tests and four typing errors; current full suite5,928/545 and automatic typecheck/build clean.
-- [ ] Authenticated CR2 screenshots and full-page creator/non-creator navigation checks remain unverified (external_unmanaged).
+- [x] CR2.1 covers whole-page anonymous/pending creator/non-creator navigation with real query/router providers.
+- [ ] Authenticated CR2 screenshots and live member readback remain unavailable (external_unmanaged).
 
 ## CR1 — Self-serve creator choice
 - [x] Add shared switch, Welcome Continue-only choice and immediate Edit profile save/rollback.
