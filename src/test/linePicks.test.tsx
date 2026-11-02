@@ -73,11 +73,15 @@ beforeEach(() => {
   h.result = [{ total_pickers: 312, all_correct: 41, viewer_picks: 0, viewer_correct: 0, settled: false }];
   h.callers = [];
   h.rpc.mockReset();
-  h.rpc.mockImplementation(async (fn: string) => {
+  h.rpc.mockImplementation(async (fn: string, args?: unknown) => {
     if (fn === 'get_line_picks') return { data: h.picks, error: null };
     if (fn === 'get_line_pick_result') return { data: h.result, error: null };
     if (fn === 'get_line_pick_callers') return { data: h.callers, error: null };
-    if (fn === 'set_line_pick') return { data: 1, error: null };
+    if (fn === 'set_line_pick') {
+      const a = args as { p_player_key: string; p_on: boolean };
+      h.picks = (h.picks as Array<{ player_key: string }>).map((p) => (p.player_key === a.p_player_key ? { ...p, mine: a.p_on } : p));
+      return { data: 1, error: null };
+    }
     return { data: null, error: null };
   });
 });
