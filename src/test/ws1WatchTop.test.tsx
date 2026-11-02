@@ -233,6 +233,24 @@ describe('WS1 chips', () => {
   });
 
   it('the community rail is still in For you', () => {
+    /* The rail injects once, after the third long-form card, so the feed
+       needs four long rows on screen. */
+    f.videos = {
+      data: {
+        pages: [[
+          { post_id: 'v1', duration_seconds: 300, creator_display_name: 'A' },
+          { post_id: 'v2', duration_seconds: 300, creator_display_name: 'B' },
+          { post_id: 'v3', duration_seconds: 300, creator_display_name: 'C' },
+          { post_id: 'v4', duration_seconds: 300, creator_display_name: 'D' },
+        ]],
+      },
+      isFetched: true,
+      isError: false,
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      refetch: vi.fn(),
+      fetchNextPage: vi.fn(),
+    };
     f.moments = {
       data: [{ key: 'm1', post: { userId: 'u1', displayName: 'Ann' }, courseName: 'Rosapenna' }],
       isFetched: true,
@@ -338,10 +356,11 @@ describe('WS1 Creators row', () => {
       isFetched: true,
       isError: false,
     };
-    mountFeed();
+    const { container } = mountFeed();
     fireEvent.click(screen.getByText('Name a'));
     expect(screen.getByTestId('loc').getAttribute('data-path')).toBe('/profile/jayk');
-    fireEvent.click(screen.getByText('Golf Life'));
+    /* The black tile and the name line both read "Golf Life"; tap the cell. */
+    fireEvent.click(container.querySelector('[data-watch-creator="business"]')!);
     expect(screen.getByTestId('loc').getAttribute('data-path')).toBe('/business/golf-life');
     expect(f.track).toHaveBeenCalledWith('watch_creator_tapped', { actor_type: 'business', position: 2 });
   });
