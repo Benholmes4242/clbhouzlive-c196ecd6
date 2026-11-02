@@ -119,6 +119,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   /* RS — the page owns its Find-people-style back + title header; no islands
      (the signed-off mock wins over the brief's "same chrome as /amateur"). */
   { match: { exact: '/rounds' },                  spec: { chrome: 'none', tone: 'dark',  bleed: false } },
+  { match: { exact: '/watch/courses' },           spec: { chrome: 'none', tone: 'dark',  bleed: false } },
+  { match: { prefix: '/watch/region/' },          spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/notificationmessages' },    spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/edit-profile' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
   // ── /handicap family — ISLAND (H3): dark tone, back fallback '/profile',
