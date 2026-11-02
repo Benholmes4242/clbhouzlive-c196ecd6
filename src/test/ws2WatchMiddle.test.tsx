@@ -115,7 +115,7 @@ describe('WS2 order on For you', () => {
     const rounds = container.querySelector('[data-stub="rounds"]')!;
     const course = container.querySelector('[data-course-shelf]')!;
     const regions = container.querySelector('[data-regions-shelf]')!;
-    const watch = screen.getByText(courses.amateur.watch.rail.watch);
+    const watch = screen.getByText('Watch');
     const seq = [lead, shorts, rounds, course, regions, watch];
     seq.forEach((el) => expect(el).toBeTruthy());
     for (let i = 0; i < seq.length - 1; i++) expect(before(seq[i], seq[i + 1])).toBe(true);
