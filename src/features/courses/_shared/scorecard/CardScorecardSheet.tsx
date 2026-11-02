@@ -1144,19 +1144,16 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   />
                 </div>
               )}
-              {(isTour || (!engagement && onShareRound)) && <div
+              {/* With no engagement row there is nowhere else for Share to sit. */}
+              {!engagement && onShareRound && <div
                 data-scorecard-exit-links="true"
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: `repeat(${[isTour && onViewCourse, isTour && onViewProfile, !engagement && onShareRound].filter(Boolean).length}, minmax(0, 1fr))`,
+                  gridTemplateColumns: 'minmax(0, 1fr)',
                   marginTop: 14,
                 }}
               >
-                {/* Tour identity and foot are intentionally unchanged by CB61. */}
-                {isTour && onViewCourse && <GlassCardFootAction label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} icon={MapPin} />}
-                {isTour && onViewProfile && <GlassCardFootAction label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} icon={User} />}
-                {/* With no engagement row there is nowhere else for Share to sit. */}
-                {!engagement && onShareRound && <GlassCardFootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />}
+                <GlassCardFootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />
               </div>}
             </div>
           )}
