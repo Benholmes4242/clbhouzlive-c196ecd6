@@ -7,7 +7,7 @@ Harness fix only, `src/test/t100Race.test.tsx:35`:
 - Focused six files (same command as before): **69/69 passed** (was 64/5 failed on escaped "GB&amp;I").
 - `npx tsgo --noEmit`: clean. `npx vite build`: OK (existing chunk-size warning only).
 - Full suite, `vitest --shard=n/4 --maxWorkers=2`: 1,409 + 1,378 + 1,438 + 1,477 = **5,702/5,702 across 532 files**, zero failures. No pre-existing failures.
-- vs baseline 5,669/530: **+33 tests / +2 files** = +30 `t100Race.test.tsx` (new file), −1 deleted Rounds `The Hundred placeholders > heights`, +4 `tourScorecardCourseDoor.test.tsx` (new file, Tour scorecard course-door follow-up). Relocated `theHundred.test.ts` → `hundredRaceRules.test.ts` is file-neutral (its 9→8 is the deleted placeholder test).
+- vs baseline 5,669/530: **+33 tests / +2 files** = +30 `t100Race.test.tsx` (new file), −1 deleted Rounds `The Hundred placeholders > heights`, +4 from the Tour scorecard course-door follow-up (`tourScorecardCourseDoor.test.tsx` new file, 2; `tourScorecardProfileDoor.test.tsx` 5→7). Relocated `theHundred.test.ts` → `hundredRaceRules.test.ts` is file-neutral (its 9→8 is the deleted placeholder test).
 
 ## Changes
 - New `src/hooks/top100/useTop100Race.ts`: extracted career row/useCareerBoard, same RPC/cache key/map/limit100. Signed-in only. Pure helpers live in `hundredRaceRules.ts`; ties omit gap clauses per Ben's ruling.

@@ -3,10 +3,10 @@
 ## Tour scorecard tile — course door and right edge — DONE
 - [x] ScorecardSheet passes a course door handler when the tournament is linked (`/courses/{golf_course_id}`, closes first), undefined otherwise; Profile alone stays at the right edge. scorecardParts tour row already carried the member-row flex values (no edit needed); asserted by tests. src/test/tourScorecardCourseDoor.test.tsx (2 new) + tourScorecardProfileDoor.test.tsx 5→7; no existing assertion changed. Full shards 1,409+1,378(5 pre-existing T100 failures)+1,438+1,477 = 5,697/5,702 across 532 (+33/+2 vs 5,669/530; +4/+1 this follow-up, +29/+1 T100). Five failures are the named T100 GB&I slab cases. Report TOUR_SCORECARD_COURSE_DOOR_REPORT.md; build OK.
 
-## T100 — Top 100 race moves to Courses — STOP
+## T100 — Top 100 race moves to Courses — DONE
 - [x] Extracted career race hook/helpers; active-list neutral race and folded Your courses implemented. Removed only Rounds §7 dependencies/reservation/locales; other sections retained.
 - [ ] Focused64/69: five new slab cases at t100Race.test.tsx:68:34 render GB&amp;I instead of GB&I (`AssertionError` expected literal ampersand). Stop: no fix/rerun/full shards after failure; await interpolation/provider correction authorization, assertions unchanged. Existing39/39 pass. Candidate5,698/531 (+30new−1retired placeholder,+1file) vs last-green5,669/530; NOT full result. Preview build OK08:51:23Z.
-- [ ] Finish full shards and signed-off comparison after stop cleared; signed-in E2E unavailable external_unmanaged. Counting provenance and every changed/deleted test recorded in T100_RACE_REPORT.md; deployed career definition not independently available, no SQL performed.
+- [x] T100.1 harness fix; focused 69/69, tsc+build clean, full 5,702/5,702 across 532. Signed-off comparison not captured; signed-in E2E unavailable external_unmanaged. Counting provenance and every changed/deleted test recorded in T100_RACE_REPORT.md; deployed career definition not independently available, no SQL performed.
 
 ## Round comments over scorecard — DONE
 - [x] Guarded dismissal, stacked layers and disabled horizontal drag implemented; Ben approved comments-owned guard/history. Other nested callers audited unchanged in ROUND_COMMENTS_SCORECARD_STOP_REPORT.md.
