@@ -74,7 +74,7 @@ beforeEach(() => {
   cleanup();
   h.tour = 'pga';
   h.follows = new Set();
-  h.race = raceWith([stake(60, 2), stake(100, 1), stake(125, 3, false)], [{ finished: true }, { finished: true }, { finished: false }, { finished: false }, { finished: false }]);
+  h.race = raceWith([stake(60, 2), stake(100, 1), stake(110, 3, false)], [{ finished: true }, { finished: true }, { finished: false }, { finished: false }, { finished: false }]);
 });
 
 describe('Players front page', () => {
@@ -156,7 +156,7 @@ describe('Players full field', () => {
   it('draws a line after every stake position, featured or not', () => {
     const { container } = mount('/tourhub?tab=players&view=all');
     const lines = [...container.querySelectorAll('[data-field-line]')].map((l) => l.getAttribute('data-field-line'));
-    expect(lines).toEqual(['60', '100', '125']);
+    expect(lines).toEqual(['60', '100', '110']);
     for (const pos of lines) {
       const line = container.querySelector(`[data-field-line="${pos}"]`)!;
       expect(line.previousElementSibling?.getAttribute('data-field-row')).toBe(pos);
