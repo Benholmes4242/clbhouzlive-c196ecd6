@@ -35,6 +35,14 @@ vi.mock('@/features/explore-magazine/watch/useWatchClips', () => ({
   useWatchClips: () => ({ data: { pages: [[]] }, isFetched: true, isError: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() }),
 }));
 vi.mock('@/features/explore-magazine/watch/useWatchSignals', () => ({ useWatchProgress: () => ({ data: new Map() }) }));
+/* WS1 — the Creators row and the lead read their own RPCs; keep them off the
+   network here (no rows, so neither block renders). */
+vi.mock('@/features/explore-magazine/watch/useFeaturedCreators', () => ({
+  useFeaturedCreators: () => ({ data: [], isFetched: true, isError: false }),
+}));
+vi.mock('@/features/explore-magazine/watch/useWatchLead', () => ({
+  useWatchLead: () => ({ data: null, isFetched: true, isError: false }),
+}));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek', () => ({
   useMomentsOfTheWeek: () => ({ data: [], isFetched: true, isError: false, refetch: vi.fn() }),
 }));
