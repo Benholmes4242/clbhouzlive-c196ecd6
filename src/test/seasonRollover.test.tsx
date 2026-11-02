@@ -36,7 +36,7 @@ vi.mock('@/integrations/supabase/client', () => {
 });
 
 const STAKE = { after_position: 100, explainer: 'Full card for 2027.', featured: true, foot: null, kicker: 'THE 100 LINE', line_label: 'The 100 line', pill_label: 'The 100 line', side: null, sort: 1, picks: true, picks_title: 'WHO KEEPS THEIR CARD?', settled_at: '2026-11-23T06:00:00Z' };
-const RACE_2026 = { title: 'FedEx Cup', status: 'live', phase_label: 'FEDEXCUP FALL', phase_start: '2026-09-14', closes_on: '2026-11-22', season_year: 2026, tour_code: 'pga', updated_at: '', picks_close_at: '2026-11-19T12:00:00Z' };
+const RACE_2026 = { title: 'FedEx Cup', status: 'live', phase_label: 'FEDEXCUP FALL', phase_start: '2026-09-14', closes_on: '2026-10-31', season_year: 2026, tour_code: 'pga', updated_at: '', picks_close_at: '2026-11-19T12:00:00Z' };
 
 const seen = vi.hoisted(() => ({ rankingSeason: [] as unknown[], raceSeason: [] as unknown[] }));
 vi.mock('@/features/tourhub/players-v2/data/useTourRace', () => ({
