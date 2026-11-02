@@ -32,7 +32,7 @@ import type { Top100CourseProgress } from '@/hooks/gam/useTop100ListProgress';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 
 const i18n = createInstance();
-void i18n.init({ lng: 'en', initAsync: false, resources: { en: { courses: common } } });
+void i18n.init({ lng: 'en', initAsync: false, interpolation: { escapeValue: false }, resources: { en: { courses: common } } });
 function mount(node: React.ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const wrapper = ({ children }: { children: React.ReactNode }) => <MemoryRouter><QueryClientProvider client={client}><I18nextProvider i18n={i18n}>{children}</I18nextProvider></QueryClientProvider></MemoryRouter>;
