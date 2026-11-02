@@ -1,5 +1,10 @@
 # Roadmap
 
+## EXPLORE_TOP_1
+- [ ] Replace only the top controls and Creators row; share deep-link post loading/mapping without changing behaviour.
+- [ ] Rewrite the authorised WS1 Creators block and open search first in the separately authorised placeholder case.
+- [ ] Run four full shards from baseline 5,932/545, check build, and reconcile every changed case in EXPLORE_TOP_1_REPORT.md.
+
 ## CR2.1 — Creator loading guard
 - [x] Share the non-anonymous, resolved-profile condition between the creator read and pending state in ProfilePageV2 only.
 - [x] Add three whole-page regressions with real QueryClientProvider and MemoryRouter; existing case names/assertions unchanged; focused 11/11.
