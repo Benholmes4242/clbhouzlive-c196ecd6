@@ -28,9 +28,8 @@ import {
   dragNeighbour,
 } from './roundPaging';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
-import { scrollElementIntoView, scrollPageToTop } from '@/lib/getScrollParent';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
-import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -43,25 +42,15 @@ import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
 import { useCircleSize } from '@/features/amateur/useCircleSize';
-import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
-import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
-import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
-import type { RoundPressTarget } from '@/components/explore-tab-new/courseled/StandoutRounds';
 
-import { CircleShelf } from './CircleShelf';
-import { ScoresLeaderboardsPage } from './ScoresLeaderboardsPage';
-import { UnknownConnectionFallback } from './UnknownConnectionFallback';
 import { StandingShelf } from './StandingShelf';
-import { ScoresStandingSlot } from './ConnectStandingInvite';
 
 import { LeadShell, PairShell, ReviewShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
 import { listCourseEvents } from './listCourseEvents';
 import {
   EXPLORE_VIEWS,
-  SCOPED_VIEWS,
   readExploreView,
-  writeExploreView,
   type ExploreView,
 } from './exploreViewMemory';
 /* scoreItem is no longer imported here: the only client-scored items were the
@@ -137,12 +126,9 @@ const VIDEO_TILE = { w: 200, h: 113 };
 type ShelfKind =
   | 'clips'
   /** BRIEF_EXPLORE_ALL_VIDEO §1 — long-form video on All, landscape tiles, NO
-   *  see-all (a member wanting more taps Watch). */
+    *  see-all (a member wanting more taps Watch). */
   | 'videos'
   | 'clubWeek'
-  /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
-   *  newest first. Fixed once at the top of Scores; absent from All and Watch. */
-  | 'circle'
   | 'standing'
   | 'personalBests'
   | 'coursesCounty'
