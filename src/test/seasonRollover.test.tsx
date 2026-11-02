@@ -63,6 +63,8 @@ vi.mock('@/features/tourhub/hooks/useTourLensFromPicker', () => ({ useTourLensFr
 vi.mock('@/features/tourhub/hooks/useTourSelection', () => ({ readStoredTour: () => null }));
 vi.mock('@/features/guest/useGuestActionGate', () => ({ useGuestActionGate: () => () => false }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: null, session: null, loading: false }) }));
+vi.mock('@/features/tourhub/players-v2/you/useYouAndTour', () => ({ useTourHoleAverages: () => ({ data: null }), useMyHoleScoring: () => ({ data: null }) }));
 
 import { effectiveStatus } from '@/features/tourhub/players-v2/playersRules';
 import { resolveStandingsSeason } from '@/features/tourhub/players-v2/data/resolveStandingsSeason';
