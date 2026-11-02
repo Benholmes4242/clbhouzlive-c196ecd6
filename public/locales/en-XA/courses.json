@@ -119,9 +119,7 @@
       "basisFrom": "[~~ƒřőɱ {{unit}}~~]",
       "rareAir": "[~~Řářé áíř~~]",
       "featsWindow": "[~~Ƒéáţš ƥéříőđ~~]",
-      "theHundred": "[~~Ţĥé ĥúñđřéđ~~]",
       "top100List": "[~~Ţőƥ 100 ļíšţ~~]",
-      "top100Empty": "[~~Ñőƀőđý ĥáš ƥļáýéđ á ĉőúřšé őñ ţĥíš ļíšţ ýéţ.~~]",
       "whoLeads": "[~~Ŵĥő ļéáđš ŵĥáţ~~]",
       "tiedTop": "[~~Ţíéđ áţ ţĥé ţőƥ~~]",
       "clearOf": "[~~{{n}} ĉļéář őƒ {{name}}~~]",
@@ -210,11 +208,12 @@
         "cleanCard": "[~~Ɓőĝéý-ƒřéé řőúñđš~~]"
       },
       "hundredSlab": {
-        "played": "[~~Ýőú ĥáṽé ƥļáýéđ <b>{{n}}</b> őƒ ţĥé {{list}} Ĥúñđřéđ — <b>{{pos}}</b> őƒ <b>{{total}}</b> ɱéɱƀéřš.~~]",
-        "playedBehind": "[~~Ýőú ĥáṽé ƥļáýéđ <b>{{n}}</b> őƒ ţĥé {{list}} Ĥúñđřéđ — <b>{{pos}}</b> őƒ <b>{{total}}</b> ɱéɱƀéřš, <b>{{gap}}</b> ƀéĥíñđ {{leader}}.~~]",
-        "playedClear": "[~~Ýőú ĥáṽé ƥļáýéđ <b>{{n}}</b> őƒ ţĥé {{list}} Ĥúñđřéđ — <b>{{pos}}</b> őƒ <b>{{total}}</b> ɱéɱƀéřš, <b>{{gap}}</b> ĉļéář őƒ {{second}}.~~]",
-        "absent": "[~~Ýőú ĥáṽéñ'ţ ƥļáýéđ őñé őƒ ţĥé {{list}} Ĥúñđřéđ ýéţ.~~]",
-        "nobodyPast": "[~~Ñőƀőđý ƥášţ {{n}}~~]"
+        "played": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members.",
+        "playedBehind": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> behind {{leader}}.",
+        "playedClear": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> clear of {{second}}.",
+        "playedJoint": "You've played <b>{{n}}</b> of the {{list}} Hundred, joint <b>{{pos}}</b> of <b>{{total}}</b> members.",
+        "absent": "You haven't played one of the {{list}} Hundred yet.",
+        "nobodyPast": "Nobody past {{n}}"
       },
       "hundredPlayed": "[~~Ƥļáýéđ~~]",
       "coursesOfList": "[~~Ĉőúřšéš őƒ {{n}}~~]",
