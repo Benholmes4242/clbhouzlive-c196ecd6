@@ -392,7 +392,7 @@ function RailCardView({
         /* FIX §1 — fixed-height flex column with the Follow button pinned to
            the bottom, so golfer and business cards align whatever the
            reason/figures content above. */
-        height: 214,
+        height: 220,
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
