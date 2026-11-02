@@ -389,6 +389,13 @@ function RailCardView({
       style={{
         flex: 'none',
         width: closing ? 0 : 172,
+        /* FIX §1 — fixed-height flex column with the Follow button pinned to
+           the bottom, so golfer and business cards align whatever the
+           reason/figures content above. */
+        height: 214,
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
         background: '#17171B',
         border: closing ? 'none' : '1px solid rgba(255,255,255,0.08)',
         borderRadius: 18,
@@ -537,7 +544,8 @@ function RailCardView({
           fontSize: 14,
           fontWeight: 600,
           fontFamily: ROW_FONT,
-          marginTop: 12,
+          /* FIX §1 — pinned to the card's bottom, not spaced from content. */
+          marginTop: 'auto',
           cursor: pending ? 'default' : 'pointer',
           opacity: pending ? 0.7 : 1,
         }}
