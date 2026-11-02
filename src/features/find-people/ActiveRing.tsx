@@ -3,6 +3,8 @@
  * avatar whose account posted, reviewed or played in the last 24 hours
  * (active-ring-signed-off.html). Inactive slots get 3.5px of clear padding so
  * every slot is the same size and nothing shifts when the data arrives.
+ * Rail and Find people share this ring, activeRingRules and one batched
+ * useRecentActivity read per surface, so they cannot drift or fetch per card.
  */
 import type { ReactNode } from 'react';
 
