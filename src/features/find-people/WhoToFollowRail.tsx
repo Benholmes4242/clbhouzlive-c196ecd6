@@ -296,12 +296,16 @@ function RailCardView({
   closing,
   onDismiss,
   markStale,
+  scheduleRemoval,
+  cancelRemoval,
 }: {
   card: RailCard;
   slot: 1 | 2;
   closing: boolean;
   onDismiss: () => void;
   markStale: () => void;
+  scheduleRemoval: (id: string) => void;
+  cancelRemoval: (id: string) => void;
 }) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
@@ -360,6 +364,11 @@ function RailCardView({
         actor_type: actor.actor_type,
         reason_type: railCardReasonType(card),
       });
+      /* FIX §2 — a follow starts the three-second removal; an unfollow inside
+         the window cancels it and the card stays. */
+      const id = railCardId(card);
+      if (prev) cancelRemoval(id);
+      else scheduleRemoval(id);
     } catch {
       setFollowed(prev);
       toast.error(prev ? 'Could not unfollow' : 'Could not follow');
