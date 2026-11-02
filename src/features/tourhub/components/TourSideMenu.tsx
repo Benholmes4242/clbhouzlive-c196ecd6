@@ -50,7 +50,7 @@ export interface TourSideMenuProps {
 // Constants table pattern: destination id is the compare key; labelKey resolves
 // to `tourhub.nav.<key>` at render. IDs remain untranslatable to keep
 // activeTab/onSelectTab comparisons enum-safe.
-const DESTINATIONS: { id: string; labelKey: string; Icon: LucideIcon }[] = [
+export const DESTINATIONS: { id: string; labelKey: string; Icon: LucideIcon }[] = [
   { id: 'overview',     labelKey: 'nav.overview',     Icon: Compass },
   { id: 'news',         labelKey: 'nav.news',         Icon: Newspaper },
   { id: 'live',         labelKey: 'nav.leaderboards', Icon: Trophy },
