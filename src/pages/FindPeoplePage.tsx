@@ -42,6 +42,9 @@ import {
   type PersonSuggestion,
 } from '@/features/find-people/findPeopleRules';
 import { useBusinessSuggestions, usePeopleSuggestions } from '@/features/find-people/usePeopleSuggestions';
+import { ActiveAvatarDoor, ActiveRing } from '@/features/find-people/ActiveRing';
+import { activityLine, type RecentActivity } from '@/features/find-people/activeRingRules';
+import { useRecentActivity } from '@/features/find-people/useRecentActivity';
 
 const HAIRLINE = 'rgba(255,255,255,0.06)';
 const CHIP_BORDER = 'rgba(255,255,255,0.14)';
@@ -85,6 +88,23 @@ export default function FindPeoplePage() {
     () => groupsForTab(tab, peopleQ.data ?? [], bizQ.data ?? []),
     [tab, peopleQ.data, bizQ.data],
   );
+  /** ACTIVE RING — one batched read for every rendered row, display order;
+   *  search results are out of scope. */
+  const activityIds = useMemo(() => {
+    if (searching) return [];
+    const ids: string[] = [];
+    const seen = new Set<string>();
+    for (const g of groups) {
+      for (const id of [...g.businesses.map((b) => b.business_id), ...g.people.map((p) => p.user_id)]) {
+        if (!seen.has(id)) {
+          seen.add(id);
+          ids.push(id);
+        }
+      }
+    }
+    return ids;
+  }, [groups, searching]);
+  const activity = useRecentActivity(activityIds);
 
   // WF2: the label rule moved to railRules.businessCategoryLabel so the page
   // and the feed rail share it — same copy as before.
@@ -247,6 +267,7 @@ export default function FindPeoplePage() {
                 followed={followed}
                 markFollowed={markFollowed}
                 onTab={onTab}
+                activity={activity}
               />
             ))}
             {/* FIX §6 — a thin Businesses tab says more are coming, never an
@@ -275,6 +296,7 @@ function GroupSection({
   followed,
   markFollowed,
   onTab,
+  activity,
 }: {
   group: PeopleGroup;
   tab: FindPeopleTab;
@@ -283,6 +305,7 @@ function GroupSection({
   followed: ReadonlySet<string>;
   markFollowed: (id: string, on: boolean) => void;
   onTab: (tab: FindPeopleTab) => void;
+  activity: Map<string, RecentActivity>;
 }) {
   const { t } = useTranslation('common');
   const total = group.people.length + group.businesses.length;
@@ -341,6 +364,7 @@ function GroupSection({
             followed={followed.has(`b:${b.business_id}`)}
             markFollowed={markFollowed}
             t={t}
+            activity={activity.get(b.business_id)}
           />
         ))}
         {group.people.map((p, i) => (
@@ -351,6 +375,7 @@ function GroupSection({
             followed={followed.has(`p:${p.user_id}`)}
             markFollowed={markFollowed}
             t={t}
+            activity={activity.get(p.user_id)}
           />
         ))}
       </div>
@@ -383,31 +408,42 @@ function GolferRow({
   followed,
   markFollowed,
   t,
+  activity,
 }: {
   golfer: PersonSuggestion;
   showDivider: boolean;
   followed: boolean;
   markFollowed: (id: string, on: boolean) => void;
   t: (k: string, o?: Record<string, unknown>) => string;
+  activity: RecentActivity | undefined;
 }) {
   const navigate = useNavigate();
   const reason = golferReason(golfer);
   const figures = golferFigures(golfer);
   const name = golfer.display_name ?? golfer.username ?? '';
+  const when = whenText(activity, t);
   return (
-    <button
-      type="button"
-      onClick={() => navigate(getProfilePathById(golfer.user_id, undefined, golfer.username))}
-      style={rowStyle(showDivider)}
+    <RowShell
+      open={() => navigate(getProfilePathById(golfer.user_id, undefined, golfer.username))}
+      divider={showDivider}
     >
-      <SquircleAvatar
-        src={golfer.profile_photo_url ?? undefined}
-        alt={name}
-        userId={golfer.user_id}
-        size={44}
-        fallback={name.charAt(0)}
-        hairlineRing
-      />
+      <ActiveAvatarDoor
+        postId={activity?.post_id ?? null}
+        label={t('findPeople.active.open', { name, defaultValue: `Open ${name}'s latest post` })}
+        onOpen={(id) => navigate(`/post/${id}`)}
+      >
+        <ActiveRing active={!!activity} surface="canvas">
+          <SquircleAvatar
+            src={golfer.profile_photo_url ?? undefined}
+            alt={name}
+            userId={golfer.user_id}
+            size={44}
+            fallback={name.charAt(0)}
+            hairlineRing={!activity}
+            hideRing={!!activity}
+          />
+        </ActiveRing>
+      </ActiveAvatarDoor>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
@@ -425,20 +461,10 @@ function GolferRow({
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
           {golfer.is_verified ? <VerifiedBadge size="sm" /> : null}
         </div>
-        {reason ? (
-          <div
-            style={{
-              fontSize: 13,
-              color: 'rgba(248,250,252,0.62)',
-              marginTop: 2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {t(reason.key, { ...reason.vars, defaultValue: reason.def })}
-          </div>
-        ) : null}
+        <ReasonLine
+          when={when}
+          reason={reason ? t(reason.key, { ...reason.vars, defaultValue: reason.def }) : null}
+        />
         {figures ? (
           <div
             style={{
@@ -458,7 +484,58 @@ function GolferRow({
         followed={followed}
         markFollowed={markFollowed}
       />
-    </button>
+    </RowShell>
+  );
+}
+
+/** ACTIVE RING — rows are a div role="button" (a button cannot hold the
+ *  ringed avatar button or the Follow pill). */
+function RowShell({ open, divider, children }: { open: () => void; divider: boolean; children: React.ReactNode }) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open();
+        }
+      }}
+      style={rowStyle(divider)}
+    >
+      {children}
+    </div>
+  );
+}
+
+function whenText(
+  activity: RecentActivity | undefined,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): string | null {
+  if (!activity) return null;
+  const line = activityLine(activity, new Date());
+  return t(line.key, { ...line.vars, defaultValue: line.def });
+}
+
+const REASON_STYLE: React.CSSProperties = {
+  fontSize: 13,
+  color: 'rgba(248,250,252,0.62)',
+  marginTop: 2,
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+};
+
+/** "{when} · {reason}" when active (when in amber 600); unchanged otherwise. */
+function ReasonLine({ when, reason }: { when: string | null; reason: string | null }) {
+  if (!when) return reason ? <div style={REASON_STYLE}>{reason}</div> : null;
+  return (
+    <div data-testid="row-reason" style={REASON_STYLE}>
+      <span style={{ color: '#F7931E', fontWeight: 600 }}>{when}</span>
+      {reason ? ` · ${reason}` : null}
+    </div>
   );
 }
 
@@ -470,6 +547,7 @@ function BusinessRow({
   followed,
   markFollowed,
   t,
+  activity,
 }: {
   biz: BusinessSuggestion;
   tab: FindPeopleTab;
@@ -478,48 +556,55 @@ function BusinessRow({
   followed: boolean;
   markFollowed: (id: string, on: boolean) => void;
   t: (k: string, o?: Record<string, unknown>) => string;
+  activity: RecentActivity | undefined;
 }) {
   const navigate = useNavigate();
   const reason = businessReason(biz, tab, categoryLabel);
   const followers = biz.followers ?? 0;
+  const when = whenText(activity, t);
   return (
-    <button
-      type="button"
-      onClick={() => navigate(`/business/${biz.slug ?? biz.business_id}`)}
-      style={rowStyle(showDivider)}
-    >
-      {biz.logo_url ? (
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: '#F8FAFC',
-            flexShrink: 0,
-          }}
-        >
-          <img src={biz.logo_url} alt={biz.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </div>
-      ) : (
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: '34%',
-            background: '#F8FAFC',
-            color: A.CANVAS,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 14,
-            fontWeight: 700,
-            flexShrink: 0,
-          }}
-        >
-          {businessInitials(biz.name)}
-        </div>
-      )}
+    <RowShell open={() => navigate(`/business/${biz.slug ?? biz.business_id}`)} divider={showDivider}>
+      <ActiveAvatarDoor
+        postId={activity?.post_id ?? null}
+        label={t('findPeople.active.open', { name: biz.name, defaultValue: `Open ${biz.name}'s latest post` })}
+        onOpen={(id) => navigate(`/post/${id}`)}
+      >
+        <ActiveRing active={!!activity} surface="canvas">
+          {biz.logo_url ? (
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '34%',
+                overflow: 'hidden',
+                background: '#F8FAFC',
+                flexShrink: 0,
+              }}
+            >
+              <img src={biz.logo_url} alt={biz.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          ) : (
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '34%',
+                background: '#F8FAFC',
+                color: A.CANVAS,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+                fontWeight: 700,
+                lineHeight: 1,
+                flexShrink: 0,
+              }}
+            >
+              {businessInitials(biz.name)}
+            </div>
+          )}
+        </ActiveRing>
+      </ActiveAvatarDoor>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
@@ -537,20 +622,10 @@ function BusinessRow({
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{biz.name}</span>
           {biz.is_verified ? <VerifiedBadge size="sm" /> : null}
         </div>
-        {reason ? (
-          <div
-            style={{
-              fontSize: 13,
-              color: 'rgba(248,250,252,0.62)',
-              marginTop: 2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {t(reason.key, { ...reason.vars, defaultValue: reason.def })}
-          </div>
-        ) : null}
+        <ReasonLine
+          when={when}
+          reason={reason ? t(reason.key, { ...reason.vars, defaultValue: reason.def }) : null}
+        />
         <div style={{ fontSize: 12, color: A.DIM, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
           {t('findPeople.followers', {
             count: followers,
@@ -564,7 +639,7 @@ function BusinessRow({
         followed={followed}
         markFollowed={markFollowed}
       />
-    </button>
+    </div>
   );
 }
 
