@@ -101,9 +101,9 @@ export function PlayersTab() {
   const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
   const { data: race } = useTourRace(activeTour);
-  const { data: movement } = useStandingsMovement(activeTour);
-  const { data: formMap } = useFieldForm(activeTour);
-  const { data: scorecard } = useScorecardStats(activeTour);
+  const { data: movement } = useStandingsMovement(activeTour, race?.seasonYear);
+  const { data: formMap } = useFieldForm(activeTour, race?.seasonYear);
+  const { data: scorecard } = useScorecardStats(activeTour, race?.seasonYear);
   const { followed } = useTourPlayerFollowsSet();
   const loadedIds = useMemo(() => (ranking?.rows ?? []).map((r) => r.playerId).filter(Boolean), [ranking?.rows]);
   const { data: worldRanks } = useWorldRankLookup(loadedIds);

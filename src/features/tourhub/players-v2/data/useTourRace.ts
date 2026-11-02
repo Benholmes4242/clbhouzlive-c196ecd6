@@ -18,6 +18,10 @@ export type TourRace = Database['public']['Tables']['tour_races']['Row'];
 
 export interface TourRaceResult {
   race: TourRace | null;
+  /** The season the race row belongs to — the newest tour_races year not past
+   *  currentSeasonYear(). Sibling reads use it so a race that is still the
+   *  live one (e.g. a 2026 FedEx Fall in November) is not missed. */
+  seasonYear: number;
   stakes: Stake[];
   events: ClockEvent[];
 }
@@ -30,11 +34,11 @@ export function useTourRace(tour: PlayersTourId) {
     queryKey: ['players-v2', 'race', tour, year],
     staleTime: 30 * 60_000,
     queryFn: async () => {
-      const [raceRes, stakesRes] = await Promise.all([
-        supabase.from('tour_races').select('*').eq('tour_code', tour).eq('season_year', year).maybeSingle(),
-        supabase.from('tour_stakes').select('*').eq('tour_code', tour).eq('season_year', year).order('after_position', { ascending: true }),
-      ]);
+      const raceRes = await supabase.from('tour_races').select('*').eq('tour_code', tour).lte('season_year', year)
+        .order('season_year', { ascending: false }).limit(1).maybeSingle();
       if (raceRes.error) throw raceRes.error;
+      const seasonYear = raceRes.data?.season_year ?? year;
+      const stakesRes = await supabase.from('tour_stakes').select('*').eq('tour_code', tour).eq('season_year', seasonYear).order('after_position', { ascending: true });
       if (stakesRes.error) throw stakesRes.error;
       const race = raceRes.data ?? null;
       const stakes: Stake[] = race ? (stakesRes.data ?? []) : [];
@@ -63,7 +67,7 @@ export function useTourRace(tour: PlayersTourId) {
             finished: FINISHED.has((r.status ?? '').toLowerCase()) || (r.end_date != null && r.end_date < today),
           }));
       }
-      return { race, stakes, events };
+      return { race, seasonYear, stakes, events };
     },
   });
 }

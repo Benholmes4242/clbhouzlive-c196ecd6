@@ -7,10 +7,11 @@ import type { PlayersTourId } from './usePlayersRanking';
 
 export type ScorecardStat = Database['public']['Functions']['get_tour_scorecard_stats']['Returns'][number];
 
-export function useScorecardStats(tour: PlayersTourId) {
-  const year = currentSeasonYear();
+export function useScorecardStats(tour: PlayersTourId, seasonYear?: number) {
+  const year = seasonYear ?? currentSeasonYear();
   return useQuery<Map<string, ScorecardStat>>({
     queryKey: ['players-v2', 'scorecard-stats', tour, year],
+    enabled: seasonYear !== undefined,
     staleTime: 30 * 60_000,
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_tour_scorecard_stats', { p_tour: tour, p_year: year });
