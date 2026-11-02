@@ -24848,6 +24848,31 @@ export type Database = {
           post_count: number
         }[]
       }
+      get_watch_course_videos: {
+        Args: { p_before?: string; p_limit?: number }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_watch_hub_counts: {
         Args: never
         Returns: {
@@ -25035,6 +25060,55 @@ export type Database = {
           user_id: string
           username: string
           why_ai: string
+        }[]
+      }
+      get_watch_region_courses: {
+        Args: { p_region: string }
+        Returns: {
+          course_id: string
+          course_name: string
+          videos: number
+        }[]
+      }
+      get_watch_region_videos: {
+        Args: {
+          p_before?: string
+          p_course_id?: string
+          p_limit?: number
+          p_region: string
+        }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
+          stream_id: string
+          width: number
+        }[]
+      }
+      get_watch_regions: {
+        Args: never
+        Returns: {
+          courses: number
+          is_home: boolean
+          latest_at: string
+          poster_url: string
+          region: string
+          videos: number
         }[]
       }
       get_watch_shorts: {
@@ -27013,6 +27087,31 @@ export type Database = {
       viewer_shares_host_club: {
         Args: { _host_id: string; _viewer_id: string }
         Returns: boolean
+      }
+      watch_video_rows: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
+          stream_id: string
+          width: number
+        }[]
       }
       watch_visible_video_posts: {
         Args: never
