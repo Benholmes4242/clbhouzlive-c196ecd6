@@ -543,6 +543,26 @@
       },
       "searchPlaceholder": "Search videos, clips and creators",
       "untitled": "Untitled video"
+    },
+    "roundsShelf": {
+      "title": "Rounds this week",
+      "subCircle": "Your circle, last 14 days",
+      "subEveryone": "Everyone, last 14 days",
+      "allRounds": "All rounds",
+      "door": "Leaderboards, feats and every round",
+      "kickerNet": "Net · gross {{gross}}",
+      "kickerComp": " · comp",
+      "feat": {
+        "ace": "Ace",
+        "albatross": "Albatross",
+        "eagle": "Eagle",
+        "cleanCard": "Bogey-free"
+      },
+      "latestOf_one": "The only one this year",
+      "latestOf_other": "The latest of {{events}} this year"
+    },
+    "roundsPage": {
+      "title": "Rounds"
     }
   },
   "amateurNews": {

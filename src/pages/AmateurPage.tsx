@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
@@ -50,6 +51,7 @@ export default function AmateurPage() {
   const sessionKnown = !live.loading || lastResolved !== null;
   const user = live.loading ? (lastResolved?.userId ? { id: lastResolved.userId } : null) : live.user;
   const opener = useScorecardOpener();
+  const { search } = useLocation();
 
   useEffect(() => {
     analyticsEvents.track('amateur_page_viewed', {});
@@ -92,6 +94,16 @@ export default function AmateurPage() {
     if (y == null || y < 2) return;
     return restoreAmateurScroll(y);
   }, []);
+
+  /* RS — the Rounds view is its own page now. /amateur?view=scores (and any
+     remembered link to it) lands on /rounds, keeping every other param. The
+     check sits after every hook so the redirect render is hook-complete. */
+  const params = new URLSearchParams(search);
+  if (params.get('view') === 'scores') {
+    params.delete('view');
+    const rest = params.toString();
+    return <Navigate to={`/rounds${rest ? `?${rest}` : ''}`} replace />;
+  }
 
   return (
     <div data-amateur-page="" style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>

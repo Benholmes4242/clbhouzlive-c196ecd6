@@ -357,6 +357,26 @@
       },
       "searchPlaceholder": "영상, 클립, 크리에이터 검색",
       "untitled": "제목 없는 영상"
+    },
+    "roundsShelf": {
+      "title": "이번 주 라운드",
+      "subCircle": "내 서클, 지난 14일",
+      "subEveryone": "전체, 지난 14일",
+      "allRounds": "모든 라운드",
+      "door": "리더보드, 위업, 모든 라운드",
+      "kickerNet": "네트 · 그로스 {{gross}}",
+      "kickerComp": " · 대회",
+      "feat": {
+        "ace": "에이스",
+        "albatross": "알바트로스",
+        "eagle": "이글",
+        "cleanCard": "보기 프리"
+      },
+      "latestOf_one": "올해 유일한 한 번",
+      "latestOf_other": "올해 {{events}}번 중 가장 최근"
+    },
+    "roundsPage": {
+      "title": "라운드"
     }
   },
   "amateurNews": {

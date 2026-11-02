@@ -43,6 +43,7 @@ import {
 import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
 import { useWatchProgress } from './useWatchSignals';
+import { RoundsThisWeekShelf } from './RoundsThisWeekShelf';
 import {
   RAIL_EVERY,
   groupByMember,
@@ -196,6 +197,8 @@ export function WatchFeed({
   onDepart,
   initialFilter = 'all',
   onOpenComments,
+  onOpenRound,
+  onOpenMember,
 }: {
   userId: string | undefined;
   onDepart: () => void;
@@ -203,6 +206,10 @@ export function WatchFeed({
   initialFilter?: WatchFilter;
   /** Opens ExploreMagazine's one mounted CommentsSheetV2 — never a second sheet here. */
   onOpenComments?: (postId: string) => void;
+  /** RS — the rounds shelf's cards open the scorecard sheet Explore hosts. */
+  onOpenRound?: (scoreId: string, ownerUserId: string | null) => void;
+  /** RS — a shelf card's avatar or name opens the member, as elsewhere. */
+  onOpenMember?: (userId: string) => void;
 }) {
   const { t } = useTranslation('courses');
   const [filter, setFilter] = useState<WatchFilter>(initialFilter);
@@ -598,6 +605,13 @@ export function WatchFeed({
               {quickGrid ? quickHeading : quickSection}
               {quickGrid ? <GridShell inset={INSET} radius={12} /> : <ShelfShell tileW={QH_W} tileH={QH_H} heading={false} />}
             </>
+          ) : null}
+
+          {/* RS — ROUNDS THIS WEEK: once, directly after Quick hits, on the All
+              chip only (onAll excludes an active search, like Continue watching).
+              Signed-in members only; the shelf hides itself for guests. */}
+          {onAll ? (
+            <RoundsThisWeekShelf userId={userId} onOpenRound={onOpenRound} onOpenMember={onOpenMember} />
           ) : null}
 
           {/* K.4 — THE LONG-FORM COLUMN, with the community rail once after the third card. */}

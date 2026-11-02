@@ -7,8 +7,11 @@
  * exactly that lifetime.
  */
 
-/** THE TAB STRIP, and nothing else: All, Standings (internally 'scores') and
- *  Watch. The ranker's pool argument is a separate type (StreamPool), because
+/** THE VIEWS. RS (Nov 2026) RETIRED THE ROUNDS/WATCH SWITCH: 'scores' is no
+ *  longer a view Explore can land on — the board moved to its own page at
+ *  /rounds and /amateur?view=scores redirects there. The type keeps 'scores'
+ *  only so dormant code still compiles; EXPLORE_VIEWS must never include it.
+ *  The ranker's pool argument is a separate type (StreamPool), because
  *  'reviews' is a pool with no tab. */
 export type ExploreView = 'all' | 'scores' | 'watch';
 
@@ -20,13 +23,15 @@ export type ExploreView = 'all' | 'scores' | 'watch';
  */
 export const EXPLORE_ALL_TAB_ENABLED = false;
 
-/** The tab strip, in strip order. 'all' leads only while the trial flag is on. */
+/** The reachable views, in strip order. 'all' leads only while the trial flag
+ *  is on; 'scores' is never reachable here any more (RS). */
 export const EXPLORE_VIEWS: ExploreView[] = EXPLORE_ALL_TAB_ENABLED
-  ? ['all', 'scores', 'watch']
-  : ['scores', 'watch'];
+  ? ['all', 'watch']
+  : ['watch'];
 
-/** §1 the views that carry the SCOPE ROW. All and Watch never do. */
-export const SCOPED_VIEWS: ExploreView[] = ['scores'];
+/** §1 the views that carry the SCOPE ROW. None remain on Explore: the scope
+ *  row belonged to Scores, which is /rounds now. */
+export const SCOPED_VIEWS: ExploreView[] = [];
 
 const KEY = 'amateur:view';
 

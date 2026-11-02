@@ -357,6 +357,26 @@
       },
       "searchPlaceholder": "動画・クリップ・クリエイターを検索",
       "untitled": "無題の動画"
+    },
+    "roundsShelf": {
+      "title": "今週のラウンド",
+      "subCircle": "あなたのサークル・過去14日",
+      "subEveryone": "全員・過去14日",
+      "allRounds": "すべてのラウンド",
+      "door": "リーダーボード、偉業、すべてのラウンド",
+      "kickerNet": "ネット · グロス {{gross}}",
+      "kickerComp": " · コンペ",
+      "feat": {
+        "ace": "エース",
+        "albatross": "アルバトロス",
+        "eagle": "イーグル",
+        "cleanCard": "ボギーフリー"
+      },
+      "latestOf_one": "今年唯一の1回",
+      "latestOf_other": "今年 {{events}} 回中の最新"
+    },
+    "roundsPage": {
+      "title": "ラウンド"
     }
   },
   "amateurNews": {

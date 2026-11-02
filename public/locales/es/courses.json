@@ -357,6 +357,26 @@
       },
       "searchPlaceholder": "Busca videos, clips y creadores",
       "untitled": "Video sin titulo"
+    },
+    "roundsShelf": {
+      "title": "Rondas de esta semana",
+      "subCircle": "Tu círculo, últimos 14 días",
+      "subEveryone": "Todos, últimos 14 días",
+      "allRounds": "Todas las rondas",
+      "door": "Clasificaciones, hazañas y cada ronda",
+      "kickerNet": "Neto · bruto {{gross}}",
+      "kickerComp": " · competición",
+      "feat": {
+        "ace": "Hoyo en uno",
+        "albatross": "Albatros",
+        "eagle": "Eagle",
+        "cleanCard": "Sin bogeys"
+      },
+      "latestOf_one": "La única de este año",
+      "latestOf_other": "La última de {{events}} este año"
+    },
+    "roundsPage": {
+      "title": "Rondas"
     }
   },
   "amateurNews": {

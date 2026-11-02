@@ -12,7 +12,6 @@ import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import {
   RoundDetailSheet,
@@ -28,10 +27,8 @@ import {
   dragNeighbour,
 } from './roundPaging';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
-import { scrollElementIntoView, scrollPageToTop } from '@/lib/getScrollParent';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
-import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
-import { Z } from '@/config/zIndex';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -42,26 +39,14 @@ import { useBatchRoundMedals } from './useBatchRoundMedals';
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
-import { useCircleSize } from '@/features/amateur/useCircleSize';
-import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
-import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
-import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
-import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
-import type { RoundPressTarget } from '@/components/explore-tab-new/courseled/StandoutRounds';
 
-import { CircleShelf } from './CircleShelf';
-import { ScoresLeaderboardsPage } from './ScoresLeaderboardsPage';
-import { UnknownConnectionFallback } from './UnknownConnectionFallback';
 import { StandingShelf } from './StandingShelf';
-import { ScoresStandingSlot } from './ConnectStandingInvite';
 
 import { LeadShell, PairShell, ReviewShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
 import { listCourseEvents } from './listCourseEvents';
 import {
   EXPLORE_VIEWS,
-  SCOPED_VIEWS,
   readExploreView,
-  writeExploreView,
   type ExploreView,
 } from './exploreViewMemory';
 /* scoreItem is no longer imported here: the only client-scored items were the
@@ -137,12 +122,9 @@ const VIDEO_TILE = { w: 200, h: 113 };
 type ShelfKind =
   | 'clips'
   /** BRIEF_EXPLORE_ALL_VIDEO §1 — long-form video on All, landscape tiles, NO
-   *  see-all (a member wanting more taps Watch). */
+    *  see-all (a member wanting more taps Watch). */
   | 'videos'
   | 'clubWeek'
-  /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
-   *  newest first. Fixed once at the top of Scores; absent from All and Watch. */
-  | 'circle'
   | 'standing'
   | 'personalBests'
   | 'coursesCounty'
@@ -430,7 +412,6 @@ function MomentsShelf({ pos, onDepart, onOpenCommunity }: { pos: number; onDepar
 }
 
 export function ExploreMagazine({ userId, sessionKnown = true }: { userId: string | undefined; sessionKnown?: boolean }) {
-  const { sentinelRef: chipSentinelRef, stuck: chipsStuck } = useStickySafeAreaState();
   const { t, i18n } = useTranslation('courses');
   const navigate = useNavigate();
   const opener = useScorecardOpener();
@@ -439,7 +420,6 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
      One ref per rendered card, keyed on the stream item id, plus the id of the
      card currently ringed. The ring goes on close. */
   const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
-  const chipBarRef = useRef<HTMLDivElement | null>(null);
   const [sheetSeed, setSheetSeed] = useState<RoundDetailSeed | null>(null);
   /* §3 — the sheet's own session: when it opened, how deep it went, and whether
      the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
@@ -465,9 +445,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   const revealCard = useCallback((id: string) => {
     const el = cardRefs.current.get(id);
     if (!el) return;
-    const bar = chipBarRef.current?.getBoundingClientRect();
-    const chrome = (bar?.height ?? 0) + (bar?.top ?? 0) + 8;
-    scrollElementIntoView(el, { offset: Math.max(56, chrome), behavior: 'smooth' });
+    /* RS — the view chip row is gone; the offset is the islands' height. */
+    scrollElementIntoView(el, { offset: 56, behavior: 'smooth' });
   }, []);
 
   /* G2.6 — THE RING IS GONE. It only ever showed in the gap between the tap and
@@ -485,52 +464,19 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     },
     [queryClient],
   );
-  /* THE SETTLED FOLLOW-SET READ behind the circle slot's two occupants. One
-     definition (src/lib/social/circle.ts), so this gate and the circle shelf's
-     own rows can never disagree. */
-  const circleSize = useCircleSize(userId, !!userId);
   const openReview = useReviewSheetStore((state) => state.open);
 
-  /* ?view= is written on every switch so page_view paths tell views apart
-     (usePageTracking treats a change in `view` as a screen change). A ?view=
-     on arrival wins over the session memory. */
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [view, setView] = useState<ExploreView>(() => {
+  /* RS — THE VIEW SWITCH IS GONE. Explore is always Watch; a ?view= on arrival
+     still wins over session memory for the views that remain reachable (today
+     only 'watch'; 'all' returns with its trial flag). ?view=scores never
+     reaches here — AmateurPage redirects it to /rounds. */
+  const [searchParams] = useSearchParams();
+  const [view] = useState<ExploreView>(() => {
     const fromUrl = searchParams.get('view') as ExploreView | null;
     return fromUrl && EXPLORE_VIEWS.includes(fromUrl) ? fromUrl : readExploreView();
   });
   const [watchEntry, setWatchEntry] = useState<'all' | 'community'>('all');
   const geography = useViewerScoreScope(userId);
-  /** SCOPED_VIEWS is the register of views that carry a scope row (Scores only;
-   *  its board owns its own scope in useAmateurBoardState). */
-  const scoped = SCOPED_VIEWS.includes(view);
-  void scoped;
-
-  /* PHASE B (BRIEF_EXPLORE_MAGAZINE P1) — SCORES IS A CHIP THAT CAN CHANGE WHAT
-     YOU SEE. The ranked stream is the default and stays the landing experience;
-     no board is applied until the member picks one, so `boardApplied === false` IS
-     the stream. Board state is page-local by design (useAmateurBoardState §1):
-     nothing here is persisted or put in the URL, so leaving Explore resets it.
-     `active` keeps every board read quiet on the other three views and on an
-     untouched Scores view. */
-  /* BRIEF_SCORES_RETIRE_THE_GEOGRAPHY_RAIL §2 — SCORES OPENS ON A BOARD. The
-     board is the landing view now, so the stream and CircleShelf below are
-     unreachable on Scores. They are KEPT ON PURPOSE: changing this flag's
-     INITIAL VALUE to `false` (and re-enabling the Scores stream read) is the
-     one-line change that brings the stream back. */
-  /* A flag only; the board itself is boardState.board. It is `true` for the
-     life of the page: every setBoardApplied call site passes `true` and nothing
-     sets it false, so scoresBoardActive is effectively `view === 'scores'`. */
-  const [boardApplied, setBoardApplied] = useState(true);
-  const [boardPanelOpen, setBoardPanelOpen] = useState(false);
-  /* The title's chevron opens the lightweight ranking picker; the Filters pill opens the panel. */
-  /* The title opens the sheet onto the board choice; Filters opens it without. */
-  const scoresBoardActive = view === 'scores' && boardApplied;
-  /* No initialBoard: the boards open on Most recent via entryBoardFor() (founder decision 2026-10-22, supersedes CB25's 'net'). */
-  const boardState = useAmateurBoardState(
-    view === 'scores' ? userId : undefined,
-    scoresBoardActive || boardPanelOpen,
-  );
 
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   /* §5c THE CLIENT RANKER IS OFF THE PAGE PATH. It is DEAD-LISTED, not deleted:
@@ -568,8 +514,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   const chipScope: ScoreScope = 'world';
   const streamGeo = geography.scope;
   const serverScope: ScoreScope = chipScope;
-  /* §2 — no Scores stream read: the Scores view cannot render it. */
-  const server = useExploreStream(userId && serverReady && view !== 'scores' ? userId : undefined, view, serverScope, {
+  /* RS — Scores is /rounds now; every reachable view can render the stream. */
+  const server = useExploreStream(userId && serverReady ? userId : undefined, view, serverScope, {
     clubId: streamGeo.primaryClubId,
     county: streamGeo.county,
     country: streamGeo.country,
@@ -611,7 +557,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   /* THE FALLBACK CONDITION, in one place. While the RPC is still in flight the
      client composition is NOT fetched - the server hook shows its own shells, so
      a member never pays for two rankers. */
-  const fallbackWanted = view !== 'scores' && (!serverView || server.unavailable);
+  const fallbackWanted = !serverView || server.unavailable;
   const stream = useExploreStreamClient(
     fallbackWanted ? userId : undefined,
     view,
@@ -643,8 +589,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
      'amateur.stream.nothingYet' locale keys stay, unused, for Phase E. */
 
   /* THE CANDIDATE INDEX (BRIEF_COURSES_MERGED). One bounded read behind the
-     lead rated rail on All. Scores keeps it enabled as before. */
-  const candidates = useCourseCandidateIndex(view === 'scores' || view === 'all');
+     lead rated rail on All. */
+  const candidates = useCourseCandidateIndex(view === 'all');
 
   /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so the
      server page and the client fallback take the same reveal, sentinel,
@@ -832,25 +778,11 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     'coursesWorld',
     'coursesList',
   ];
-  /* SCORES SHELVES — the four that are about the MEMBER'S OWN GOLF, inserted
-     after 3 cards and every 4 thereafter, then repeated without Your circle.
-     WHY 'standing' IS A SHELF AND NOT A CARD: a shelf may show a position with
-     no motion — that is a standing, and a standing is worth looking at. A CARD
-     must announce a CHANGE, which is the same distinction that retired
-     rank_hold; do not promote this shelf into the card ladder. */
-  /* CHANGE EARNS HEIGHT. The daily/weekly rail leads the repeating cycle;
-     slower standing and county rails follow; the growth prompt is last. */
-  const SCORES_SHELVES: ShelfKind[] = ['clubWeek', 'standing', 'personalBests', 'coursesCounty', 'people'];
-  const shelves: ShelfKind[] =
-    view === 'watch'
-      ? /* WATCH COMPOSES ITS OWN RAILS (BRIEF_WATCH_MIXED_FEED): windows into its
-           own clip and community feeds, with no see-all on any of them. */
-        []
-      : view === 'scores'
-        ? SCORES_SHELVES
-        : ALL_SHELVES;
+  /* RS — the Scores shelf order left with the view; /rounds owns its own
+     sections. Watch composes its own rails (BRIEF_WATCH_MIXED_FEED). */
+  const shelves: ShelfKind[] = view === 'watch' ? [] : ALL_SHELVES;
   const blocks = useMemo(
-    () => buildBlocks(ranked, shelves, false, { repeatShelves: view === 'scores' || view === 'all' }),
+    () => buildBlocks(ranked, shelves, false, { repeatShelves: view === 'all' }),
     [ranked, view, shelves],
   );
   /* §2 THE EARNED HERO IS RETIRED: cardTreatments() and its 1-in-4 positional
@@ -906,25 +838,11 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
 
   const depart = useCallback(() => rememberAmateurScroll(), []);
 
-  const changeView = useCallback(
-    (next: string) => {
-      const value = next as ExploreView;
-      if (!EXPLORE_VIEWS.includes(value)) return;
-      analyticsEvents.track('amateur_view_changed', { from: view, to: value });
-      setView(value);
-      writeExploreView(value);
-      setSearchParams((prev) => { const n = new URLSearchParams(prev); n.set('view', value); return n; }, { replace: true });
-      setRevealed(STREAM_PAGE_SIZE);
-      loggedRef.current = 0;
-      /* A view is not a route: no history entry, no scroll animation. */
-      scrollPageToTop('auto');
-    },
-    [view],
-  );
+  /* RS — no view switch remains, so the community see-all only picks Watch's
+     community entry; the view is already 'watch'. */
   const openCommunity = useCallback(() => {
     setWatchEntry('community');
-    changeView('watch');
-  }, [changeView]);
+  }, []);
 
 
   /* ==================================================================== §2
@@ -1326,30 +1244,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     [opener],
   );
 
-  /* P1 — a board row opens the round it ranks in the same sheet the stream
-     cards use; a row with no round id (a member-only ranking row) opens the
-     member. */
-  const boardRowPress = useCallback(
-    (row: RoundPressTarget) => {
-      if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
-      else opener.openProfile(row.user_id);
-    },
-    [opener],
-  );
-
-  const chips = useMemo(
-    () =>
-      EXPLORE_VIEWS.map((key) => ({
-        id: key,
-        label:
-          key === 'all'
-            ? t('amateur.stream.view.all', 'All')
-            : key === 'scores'
-              ? t('amateur.stream.view.scores', 'Rounds')
-              : t('amateur.stream.view.watch', 'Watch'),
-      })),
-    [t],
-  );
+  /* RS — the board row handler left with the Scores view; /rounds owns it now. */
 
   /** ONE SHELF RENDERER: the stream's every-fourth-card slot. A shelf reports
    *  its own emptiness. */
@@ -1376,36 +1271,10 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
 
                     pos={pos}
                   />
-                ) : shelf === 'circle' ? (
-                  /* THE CIRCLE SLOT HAS TWO OCCUPANTS (BRIEF_EXPLORE_SUGGESTED_GOLFERS §1).
-                     FOLLOWS NOBODY -> suggested golfers; the circle shelf can
-                     never fill for them and skipping it silently means the page
-                     never says the one thing that would improve it (52 of 99
-                     members followed nobody at the last measurement).
-                     FOLLOWS SOMEONE, NO ROUNDS -> nothing. They know who their
-                     circle is; the gate is the FOLLOW SET, never the round count.
-                     UNRESOLVED -> neither, not for one frame. */
-                  !circleSize.isSuccess || circleSize.isFetching ? null : circleSize.data === 0 ? (
-                    <PeopleShelf
-                      viewerId={userId}
-                      clubId={null}
-                      clubName={null}
-                      enabled={!!userId}
-                      pos={pos}
-                      source="suggested"
-                    />
-                  ) : (
-                    <CircleShelf viewerId={userId} pos={pos} />
-                  )
                 ) : shelf === 'standing' ? (
-                  /* SCORES ONLY: a viewer with no connected handicap gets the
-                     connect invitation IN THIS SLOT instead of the standing
-                     shelf (handoff 1.8). All never shows it. */
-                  view === 'scores' ? (
-                    <ScoresStandingSlot viewerId={userId} pos={pos} />
-                  ) : (
-                    <StandingShelf viewerId={userId} pos={pos} />
-                  )
+                  /* RS — the Scores-only connect invitation slot left with the
+                     view; the standing shelf is the only occupant now. */
+                  <StandingShelf viewerId={userId} pos={pos} />
 
                 ) : shelf === 'personalBests' ? (
                   <PersonalBestsShelf viewerId={userId} pos={pos} />
@@ -1485,54 +1354,13 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
        a single call; each card reads its own row out of that response. */
     <FeatRarityProvider ids={roundScoreIds.filter((id): id is string => !!id)}>
     <div data-explore-magazine="" style={{ fontFamily: SANS }}>
-      {/* §3b THE VIEW CHIP ROW starts below the islands because AmateurPage's
-          shell pays CHROME_CLEARANCE. On scroll, the shared islands ride away
-          and this row pins directly beneath the notch. The sentinel drives the
-          one shared safe-area scrim; the scope row remains in normal flow.
-          The active view takes the
-          FILLED ground (applied) and the rest the outline (selectable) —
-          the shared RailChips grammar, not a local look-alike. */}
-      <div ref={chipSentinelRef} style={{ height: 0 }} aria-hidden="true" />
-      <StickySafeAreaScrim visible={chipsStuck} background={A.CANVAS} />
-      <div
-        ref={chipBarRef}
-        data-stuck={chipsStuck ? 'true' : 'false'}
-        style={{
-          position: 'sticky',
-          top: 'var(--sat, env(safe-area-inset-top, 0px))',
-          zIndex: Z.stickyTabs,
-          background: A.CANVAS,
-          padding: '10px 0 12px',
-        }}
-      >
-        <div style={{ paddingInline: CARD_INSET }}>
-          {/* PRIMARY ROW (§1a): the canonical 'md' chip — the same padding and
-              font size as the Courses page sort chips — with the chips sharing
-              the full run between the gutters in equal widths. */}
-          <RailChips
-            options={chips}
-            value={view}
-            onChange={changeView}
-            ariaLabel={t('amateur.stream.views', 'Explore views')}
-            ground="filled-selection"
-            distribute
-          />
-        </div>
-
-      </div>
+      {/* RS — THE VIEW CHIP ROW IS GONE. Explore is always Watch; the Rounds
+          board lives at /rounds. The sticky bar, its sentinel and the shared
+          scrim left with it. */}
 
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
-          (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely; the
-          view chips above stay exactly where they are. */}
-      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} /> : null}
-
-      {/* UNREACHABLE ON SCORES SINCE THE BOARD BECAME THE LANDING VIEW — kept, not
-          dead: see boardApplied. Bringing the stream back is a one-line change. */}
-      {view === 'scores' && !scoresBoardActive ? (
-        <div style={{ marginBottom: BLOCK_GAP }}>
-          <CircleShelf viewerId={userId} pos={0} />
-        </div>
-      ) : null}
+          (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely. */}
+      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} onOpenRound={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)} onOpenMember={(id) => opener.openProfile(id)} /> : null}
       {view === 'all' && featured.isLoading ? (
         <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
           <FeaturedRoundSkeleton />
@@ -1567,30 +1395,12 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         </div>
       ) : null}
 
-      {/* P1 — A PICKED BOARD REPLACES THE RANKED STREAM. The block is the same
-          one the old page rendered (same RPC, same rows, same count line and
-          widening sentence); the way back is STATED above it, because a member
-          who cannot find the stream again will think the app broke. */}
-      {scoresBoardActive ? (
-        <div data-scores-board-container="" style={{ marginBottom: BLOCK_GAP }}>
-          {/* CB46 — instrumentation only; renders nothing. */}
-          <UnknownConnectionFallback userId={userId} />
-          <ScoresLeaderboardsPage
-            userId={userId}
-            sessionKnown={sessionKnown}
-            state={boardState}
-            onRowPress={boardRowPress}
-            onMemberTap={(id) => opener.openProfile(id)}
-            onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
-          />
-        </div>
-      ) : null}
+      {/* RS — the Scores board container left for /rounds, unchanged there. */}
 
       {/* minmax(0,1fr), NOT bare 1fr: a grid item's automatic minimum is its
           min-content, and the kicker/who-line are single-line nowrap — without
           the zero minimum a long course name widens the whole track past the
           viewport at 320px instead of clipping inside the card. */}
-      {!scoresBoardActive ? (
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
         {!source.isFetched && ranked.length === 0 ? (
           <>
@@ -1673,7 +1483,6 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
           </div>
         ) : null}
       </div>
-      ) : null}
 
       {/* The lead shell exists for the case the brief names — a lead arriving
           after a std has already rendered — and is exported from the shells file
@@ -1765,27 +1574,9 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         />
       )}
 
-      {/* P1 — THE BOARD'S PANEL, mounted against the same state the block reads,
-          so the panel's count and the page's rows can never disagree. Picking a
-          board applies it live (boardApplied), and the footer's "Show N rounds"
-          closes onto a body that has already swapped. */}
-      <BoardFilterPanel
-        open={boardPanelOpen}
-        onClose={() => setBoardPanelOpen(false)}
-        userId={userId}
-        board={boardState.board}
-        onBoardChange={(next) => {
-          boardState.changeBoard(next);
-          setBoardApplied(true);
-        }}
-        resultCount={boardState.total}
-        filters={boardState.filters}
-        onChange={boardState.changeFilters}
-        boardChanged={boardState.board !== boardState.entryBoard}
-        canReset={boardState.canReset}
-        onReset={() => { boardState.resetAll(); setBoardApplied(true); }}
-        facets={boardState.facets}
-      />
+      {/* RS — the board's filter panel left with the Scores view. It was
+          already unopenable here (nothing set boardPanelOpen); /rounds keeps
+          the page's own filter UI. */}
     </div>
     </FeatRarityProvider>
   );
