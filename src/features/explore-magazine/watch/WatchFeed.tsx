@@ -395,9 +395,9 @@ export function WatchFeed({
     );
   };
 
-  const settled = (!vParams || videos.isFetched) && (!cParams || clips.isFetched);
+  const settled = videos.isFetched && clips.isFetched;
   const loading = !settled && rows.length === 0;
-  const nothing = !community && settled && quickRows.length === 0 && longRows.length === 0 && !videos.isError && !clips.isError;
+  const nothing = settled && quickRows.length === 0 && longRows.length === 0 && !videos.isError && !clips.isError;
   /* Q.1: the Quick hits heading has ONE home, rendered by both the loading and rows branches,
      so the heading seen while loading can never drift from the one seen once loaded. */
   const quickSection = (
@@ -450,8 +450,8 @@ export function WatchFeed({
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={t('amateur.watch.searchPlaceholder', 'Search videos, clips and creators')}
-          aria-label={t('amateur.watch.searchPlaceholder', 'Search videos, clips and creators')}
+          placeholder={t('amateur.watch.searchPlaceholder', 'Search videos and creators')}
+          aria-label={t('amateur.watch.searchPlaceholder', 'Search videos and creators')}
           style={{
             width: '100%',
             boxSizing: 'border-box',
