@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
-import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import { momentViewerPosts } from '../momentViewerPosts';
 import { RailChips } from '@/components/ui/RailChips';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
@@ -24,12 +23,14 @@ import {
   WATCH_CHIPS,
   allOnly,
   clipParams,
-  isCommunityOnly,
+  mapWatchFilter,
   showsLongForm,
   showsQuickHits,
   videoParams,
   type WatchFilter,
 } from './watchFilters';
+import { CreatorsRow } from './CreatorsRow';
+import { WatchLead } from './WatchLead';
 import {
   AutoplayLayer,
   PosterFallback,
@@ -202,8 +203,10 @@ export function WatchFeed({
 }: {
   userId: string | undefined;
   onDepart: () => void;
-  /** Entry selection, e.g. Explore's community see-all opens on 'community'. */
-  initialFilter?: WatchFilter;
+  /** Entry selection. WS1 — a legacy value ('community', or anything unknown)
+   *  maps through mapWatchFilter: all → For you, quick → Shorts, community →
+   *  For you. */
+  initialFilter?: string;
   /** Opens ExploreMagazine's one mounted CommentsSheetV2 — never a second sheet here. */
   onOpenComments?: (postId: string) => void;
   /** RS — the rounds shelf's cards open the scorecard sheet Explore hosts. */
@@ -212,23 +215,19 @@ export function WatchFeed({
   onOpenMember?: (userId: string) => void;
 }) {
   const { t } = useTranslation('courses');
-  const [filter, setFilter] = useState<WatchFilter>(initialFilter);
+  const [filter, setFilter] = useState<WatchFilter>(() => mapWatchFilter(initialFilter));
   const [query, setQuery] = useState('');
 
   /* THE SEARCH IS SERVER-SIDE: both RPCs take p_search_query. */
   const search = query.trim().length >= 2 ? query.trim() : null;
   const searching = !!search;
-  useEffect(() => {
-    if (searching && filter === 'community') setFilter('all');
-  }, [searching, filter]);
 
   const vParams = videoParams(filter);
   const cParams = clipParams(filter);
-  const videos = useWatchVideos({ userId, mode: vParams?.mode ?? null, search });
-  const clips = useWatchClips({ userId, mode: cParams?.mode ?? null, filter: cParams?.filter, search });
-  const community = isCommunityOnly(filter);
+  const videos = useWatchVideos({ userId, mode: vParams.mode, search });
+  const clips = useWatchClips({ userId, mode: cParams.mode, filter: cParams.filter, search });
   const onAll = allOnly(filter, searching);
-  const moments = useMomentsOfTheWeek(30, { enabled: (onAll || community) && !!userId, candidateLimit: 72 });
+  const moments = useMomentsOfTheWeek(30, { enabled: onAll && !!userId, candidateLimit: 72 });
   const progress = useWatchProgress(userId);
   const { data: myCourses } = useUserAnalyticsCourses({ enabled: !!userId });
   const playedIds = useMemo(
@@ -324,16 +323,13 @@ export function WatchFeed({
     return () => observer.disconnect();
   }, [driver]);
 
+  /* WS1 — For you / Shorts / Long form, in that order. */
   const chipLabel = (key: (typeof WATCH_CHIPS)[number]) =>
     key === 'all'
-      ? t('amateur.watch.chip.all', 'All')
+      ? t('amateur.watch.chip.all', 'For you')
       : key === 'quick'
-        ? t('amateur.watch.chip.quick', 'Quick hits')
-        : key === 'long'
-          ? t('amateur.watch.chip.long', 'Long form')
-            : key === 'community'
-              ? t('amateur.watch.chip.community', 'Community')
-              : (key satisfies never);
+        ? t('amateur.watch.chip.quick', 'Shorts')
+        : t('amateur.watch.chip.long', 'Long form');
   const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
   const openMoment = (moment: Moment, list: Moment[]) => {
@@ -369,14 +365,10 @@ export function WatchFeed({
     if (members.length === 0) return null;
     return (
       <div style={{ paddingBottom: 8 }}>
-        <Section
-          title={t('amateur.watch.rail.community', 'From the community')}
-          seeAll={filter === 'community' ? undefined : t('amateur.watch.seeAll', 'See all')}
-          onSeeAll={filter === 'community' ? undefined : () => {
-            analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments', surface: 'watch' });
-            setFilter('community');
-          }}
-        />
+        {/* WS1 — the Community chip is gone, so the rail has no See all: the
+            full community view it opened left with the chip. The rail itself
+            stays exactly where it was in For you. */}
+        <Section title={t('amateur.watch.rail.community', 'From the community')} />
         <Rail label="community">
           {members.map(({ lead, count }) => (
             <div key={`member:${lead.key}`} data-watch-card="community" style={{ ...cardButton, width: CT_W, cursor: 'default' }}>
@@ -402,9 +394,9 @@ export function WatchFeed({
     );
   };
 
-  const settled = (!vParams || videos.isFetched) && (!cParams || clips.isFetched);
+  const settled = videos.isFetched && clips.isFetched;
   const loading = !settled && rows.length === 0;
-  const nothing = !community && settled && quickRows.length === 0 && longRows.length === 0 && !videos.isError && !clips.isError;
+  const nothing = settled && quickRows.length === 0 && longRows.length === 0 && !videos.isError && !clips.isError;
   /* Q.1: the Quick hits heading has ONE home, rendered by both the loading and rows branches,
      so the heading seen while loading can never drift from the one seen once loaded. */
   const quickSection = (
@@ -457,8 +449,8 @@ export function WatchFeed({
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={t('amateur.watch.searchPlaceholder', 'Search videos, clips and creators')}
-          aria-label={t('amateur.watch.searchPlaceholder', 'Search videos, clips and creators')}
+          placeholder={t('amateur.watch.searchPlaceholder', 'Search videos and creators')}
+          aria-label={t('amateur.watch.searchPlaceholder', 'Search videos and creators')}
           style={{
             width: '100%',
             boxSizing: 'border-box',
@@ -489,44 +481,26 @@ export function WatchFeed({
         <RailChips
           options={chips}
           value={filter}
-          onChange={(next) => setFilter(next as WatchFilter)}
+          onChange={(next) => {
+            const to = next as WatchFilter;
+            if (to !== filter) analyticsEvents.track('watch_chip_changed', { from: filter, to });
+            setFilter(to);
+          }}
           ariaLabel={t('amateur.watch.filters', 'Watch filters')}
           ground="filled-selection"
         />
       </div>
 
-      {community ? (
-        moments.isError ? (
-          <ShelfRetry
-            heading={t('amateur.watch.rail.community', 'From the community')}
-            label={t('amateur.stream.failed', 'This did not load.')}
-            action={t('amateur.stream.retry', 'Try again')}
-            onRetry={() => void moments.refetch()}
-          />
-        ) : !moments.isFetched ? (
-          <ShelfShell tileW={320} tileH={240} />
-        ) : (moments.data ?? []).length === 0 ? (
-          <p style={{ margin: 0, padding: '8px 16px 0', fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-            {t('amateur.watch.empty', 'Nothing to watch here yet.')}
-          </p>
-        ) : (
-          <>
-            {/* BG.3 — the full view keeps its heading, matching Quick hits. No kicker. The moments
-                read is a plain query, not an infinite one: what is loaded IS everything, so the
-                count has one form only and no "Showing" state. */}
-            <h2 style={{ margin: 0, padding: '16px 16px 2px', fontSize: 17, fontWeight: 750, letterSpacing: '-0.01em', color: A.INK }}>
-              {t('amateur.watch.rail.community', 'From the community')}
-            </h2>
-            <div data-watch-count style={{ padding: '2px 16px 12px', fontSize: 11.5, color: COUNT_INK, fontVariantNumeric: 'tabular-nums' }}>
-              {t('amateur.watch.communityMoments', '{{count}} moments', { count: (moments.data ?? []).length })}
-            </div>
-            <div style={{ paddingInline: 16 }}>
-              <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={(m) => openMoment(m, moments.data ?? [])} />
-            </div>
-          </>
-        )
-      ) : (
+      {/* WS1 — THE CREATORS ROW AND THE LEAD: For you only, between the chips
+          and Continue watching. Both hide themselves for guests. */}
+      {onAll ? (
         <>
+          <CreatorsRow userId={userId} />
+          <WatchLead userId={userId} onDepart={onDepart} />
+        </>
+      ) : null}
+
+      <>
           {/* K.2 — CONTINUE WATCHING: All only, only when something is part-watched. */}
           {continueRows.length > 0 ? (
             <>
@@ -672,7 +646,6 @@ export function WatchFeed({
             </p>
           ) : null}
         </>
-      )}
 
       <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
     </div>

@@ -340,12 +340,14 @@
     },
     "watch": {
       "chip": {
-        "all": "Alle",
+        "all": "Für dich",
         "clips": "Clips",
         "forYou": "Für dich",
         "friends": "Freunde",
         "videos": "Videos",
-        "yourCourses": "Deine Plätze"
+        "yourCourses": "Deine Plätze",
+        "quick": "Shorts",
+        "long": "Langform"
       },
       "empty": "Hier gibt es noch nichts zu sehen.",
       "filters": "Watch-Filter",
@@ -355,8 +357,19 @@
         "community": "Aus der Community",
         "videos": "Videos"
       },
-      "searchPlaceholder": "Videos, Clips und Creator suchen",
-      "untitled": "Video ohne Titel"
+      "searchPlaceholder": "Videos und Creator suchen",
+      "untitled": "Video ohne Titel",
+      "creators": {
+        "title": "Creator",
+        "thisWeek": "{{count}} diese Woche"
+      },
+      "lead": {
+        "kickerNew": "Neu diese Woche",
+        "kickerLiked": "Meistgelikt diesen Monat",
+        "likes": "{{count}} Likes",
+        "mute": "Stumm",
+        "unmute": "Ton an"
+      }
     },
     "roundsShelf": {
       "title": "Runden diese Woche",

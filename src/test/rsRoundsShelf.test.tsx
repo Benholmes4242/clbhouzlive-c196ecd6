@@ -35,6 +35,14 @@ vi.mock('@/features/explore-magazine/watch/useWatchClips', () => ({
   useWatchClips: () => ({ data: { pages: [[]] }, isFetched: true, isError: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() }),
 }));
 vi.mock('@/features/explore-magazine/watch/useWatchSignals', () => ({ useWatchProgress: () => ({ data: new Map() }) }));
+/* WS1 — the Creators row and the lead read their own RPCs; keep them off the
+   network here (no rows, so neither block renders). */
+vi.mock('@/features/explore-magazine/watch/useFeaturedCreators', () => ({
+  useFeaturedCreators: () => ({ data: [], isFetched: true, isError: false }),
+}));
+vi.mock('@/features/explore-magazine/watch/useWatchLead', () => ({
+  useWatchLead: () => ({ data: null, isFetched: true, isError: false }),
+}));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek', () => ({
   useMomentsOfTheWeek: () => ({ data: [], isFetched: true, isError: false, refetch: vi.fn() }),
 }));
@@ -326,12 +334,13 @@ describe('RS Rounds this week shelf', () => {
 /* ------------------------------------------------------- Watch placement */
 
 describe('RS shelf placement on Watch', () => {
-  it('shows on the All chip for a signed-in member, after Quick hits, and not on other chips', () => {
+  /* WS1 — chips renamed: All → For you, Quick hits → Shorts. Same shelf rules. */
+  it('shows on the For you chip for a signed-in member, after Quick hits, and not on other chips', () => {
     mount(<WatchFeed userId="me" onDepart={() => {}} />);
     expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: 'Quick hits' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Shorts' }));
     expect(document.querySelector('[data-rounds-shelf]')).toBeNull();
-    fireEvent.click(screen.getByRole('tab', { name: 'All' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'For you' }));
     expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument();
   });
 

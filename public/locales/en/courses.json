@@ -526,12 +526,14 @@
     },
     "watch": {
       "chip": {
-        "all": "All",
+        "all": "For you",
         "clips": "Clips",
         "forYou": "Suggested",
         "friends": "Friends",
         "videos": "Videos",
-        "yourCourses": "Your courses"
+        "yourCourses": "Your courses",
+        "quick": "Shorts",
+        "long": "Long form"
       },
       "empty": "Nothing to watch here yet.",
       "filters": "Watch filters",
@@ -541,8 +543,19 @@
         "community": "From the community",
         "videos": "Videos"
       },
-      "searchPlaceholder": "Search videos, clips and creators",
-      "untitled": "Untitled video"
+      "searchPlaceholder": "Search videos and creators",
+      "untitled": "Untitled video",
+      "creators": {
+        "title": "Creators",
+        "thisWeek": "{{count}} this week"
+      },
+      "lead": {
+        "kickerNew": "New this week",
+        "kickerLiked": "Most liked this month",
+        "likes": "{{count}} likes",
+        "mute": "Mute",
+        "unmute": "Unmute"
+      }
     },
     "roundsShelf": {
       "title": "Rounds this week",

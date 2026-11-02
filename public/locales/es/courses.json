@@ -340,12 +340,14 @@
     },
     "watch": {
       "chip": {
-        "all": "Todo",
+        "all": "Para ti",
         "clips": "Clips",
         "forYou": "Para ti",
         "friends": "Amigos",
         "videos": "Videos",
-        "yourCourses": "Tus campos"
+        "yourCourses": "Tus campos",
+        "quick": "Shorts",
+        "long": "Larga duración"
       },
       "empty": "Aún no hay nada que ver aquí.",
       "filters": "Filtros de Watch",
@@ -355,8 +357,19 @@
         "community": "De la comunidad",
         "videos": "Videos"
       },
-      "searchPlaceholder": "Busca videos, clips y creadores",
-      "untitled": "Video sin titulo"
+      "searchPlaceholder": "Buscar vídeos y creadores",
+      "untitled": "Video sin titulo",
+      "creators": {
+        "title": "Creadores",
+        "thisWeek": "{{count}} esta semana"
+      },
+      "lead": {
+        "kickerNew": "Nuevo esta semana",
+        "kickerLiked": "Más gustado del mes",
+        "likes": "{{count}} me gusta",
+        "mute": "Silenciar",
+        "unmute": "Activar sonido"
+      }
     },
     "roundsShelf": {
       "title": "Rondas de esta semana",

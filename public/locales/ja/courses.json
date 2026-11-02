@@ -340,12 +340,14 @@
     },
     "watch": {
       "chip": {
-        "all": "すべて",
+        "all": "おすすめ",
         "clips": "クリップ",
         "forYou": "おすすめ",
         "friends": "友達",
         "videos": "動画",
-        "yourCourses": "あなたのコース"
+        "yourCourses": "あなたのコース",
+        "quick": "ショート",
+        "long": "長編"
       },
       "empty": "まだ見るものがありません。",
       "filters": "Watch フィルター",
@@ -355,8 +357,19 @@
         "community": "コミュニティから",
         "videos": "動画"
       },
-      "searchPlaceholder": "動画・クリップ・クリエイターを検索",
-      "untitled": "無題の動画"
+      "searchPlaceholder": "動画とクリエイターを検索",
+      "untitled": "無題の動画",
+      "creators": {
+        "title": "クリエイター",
+        "thisWeek": "今週 {{count}} 本"
+      },
+      "lead": {
+        "kickerNew": "今週の新作",
+        "kickerLiked": "今月の人気",
+        "likes": "いいね {{count}} 件",
+        "mute": "ミュート",
+        "unmute": "ミュート解除"
+      }
     },
     "roundsShelf": {
       "title": "今週のラウンド",
