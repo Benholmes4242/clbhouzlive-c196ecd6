@@ -232,6 +232,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
         </div>
         <button
           type="button"
+          aria-label={t('findPeople.rail.seeAllAria', { defaultValue: 'See all, Explore the community' })}
           onClick={() => {
             analyticsEvents.track('who_to_follow_see_all', { slot });
             navigate('/find-people');
@@ -278,6 +279,8 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
             closing={closing.has(railCardId(card))}
             onDismiss={() => dismiss(card)}
             markStale={markStale}
+            scheduleRemoval={scheduleRemoval}
+            cancelRemoval={cancelRemoval}
           />
         ))}
       </div>
