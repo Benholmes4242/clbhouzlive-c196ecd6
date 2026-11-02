@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { readFileSync } from 'node:fs';
 import courses from '../../public/locales/en/courses.json';
@@ -367,35 +368,27 @@ describe('RS /rounds page', () => {
     expect(screen.getByTestId('amateur-route')).toBeInTheDocument();
   });
 
-  it('/amateur?view=scores redirects to /rounds keeping other params', () => {
-    function RoundsMarker() {
-      const { search } = useLocation();
-      return <div data-testid="rounds-marker" data-search={search} />;
-    }
+  const renderAmateur = (entry: string) =>
     render(
-      <MemoryRouter initialEntries={['/amateur?view=scores&tab=x']}>
-        <I18nextProvider i18n={i18n}>
-          <Routes>
-            <Route path="/amateur" element={<AmateurPage />} />
-            <Route path="/rounds" element={<RoundsMarker />} />
-          </Routes>
-        </I18nextProvider>
-      </MemoryRouter>,
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={[entry]}>
+          <I18nextProvider i18n={i18n}>
+            <Routes>
+              <Route path="/amateur" element={<AmateurPage />} />
+              <Route path="/rounds" element={<RoundsMarker />} />
+            </Routes>
+          </I18nextProvider>
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
+
+  it('/amateur?view=scores redirects to /rounds keeping other params', () => {
+    renderAmateur('/amateur?view=scores&tab=x');
     expect(screen.getByTestId('rounds-marker')).toHaveAttribute('data-search', '?tab=x');
   });
 
   it('/amateur without view=scores still renders Explore', () => {
-    render(
-      <MemoryRouter initialEntries={['/amateur?view=watch']}>
-        <I18nextProvider i18n={i18n}>
-          <Routes>
-            <Route path="/amateur" element={<AmateurPage />} />
-            <Route path="/rounds" element={<div data-testid="rounds-marker" />} />
-          </Routes>
-        </I18nextProvider>
-      </MemoryRouter>,
-    );
+    renderAmateur('/amateur?view=watch');
     expect(screen.getByTestId('explore-magazine')).toBeInTheDocument();
   });
 });
