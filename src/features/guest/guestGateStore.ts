@@ -75,6 +75,7 @@ export type GuestAction =
   | 'claim_course'
   | 'request_course'
   | 'report'
+  | 'pick'
   | 'other';
 
 export type GuestCardRequest =

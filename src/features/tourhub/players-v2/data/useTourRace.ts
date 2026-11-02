@@ -64,6 +64,7 @@ export function useTourRace(tour: PlayersTourId) {
             id: r.id,
             name: r.name,
             startDate: r.start_date,
+            endDate: r.end_date,
             finished: FINISHED.has((r.status ?? '').toLowerCase()) || (r.end_date != null && r.end_date < today),
           }));
       }

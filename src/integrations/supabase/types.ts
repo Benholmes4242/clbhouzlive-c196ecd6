@@ -13660,6 +13660,54 @@ export type Database = {
           },
         ]
       }
+      tour_line_picks: {
+        Row: {
+          after_position: number
+          final_position: number | null
+          id: string
+          picked_at: string
+          player_id: string | null
+          player_key: string
+          player_name: string
+          position_at_pick: number | null
+          result: string | null
+          season_year: number
+          settled_at: string | null
+          tour_code: string
+          user_id: string
+        }
+        Insert: {
+          after_position: number
+          final_position?: number | null
+          id?: string
+          picked_at?: string
+          player_id?: string | null
+          player_key: string
+          player_name: string
+          position_at_pick?: number | null
+          result?: string | null
+          season_year: number
+          settled_at?: string | null
+          tour_code: string
+          user_id: string
+        }
+        Update: {
+          after_position?: number
+          final_position?: number | null
+          id?: string
+          picked_at?: string
+          player_id?: string | null
+          player_key?: string
+          player_name?: string
+          position_at_pick?: number | null
+          result?: string | null
+          season_year?: number
+          settled_at?: string | null
+          tour_code?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tour_player_follows: {
         Row: {
           created_at: string
@@ -13709,6 +13757,7 @@ export type Database = {
           closes_on: string | null
           phase_label: string | null
           phase_start: string | null
+          picks_close_at: string | null
           season_year: number
           status: string
           title: string
@@ -13719,6 +13768,7 @@ export type Database = {
           closes_on?: string | null
           phase_label?: string | null
           phase_start?: string | null
+          picks_close_at?: string | null
           season_year: number
           status?: string
           title: string
@@ -13729,6 +13779,7 @@ export type Database = {
           closes_on?: string | null
           phase_label?: string | null
           phase_start?: string | null
+          picks_close_at?: string | null
           season_year?: number
           status?: string
           title?: string
@@ -13857,8 +13908,11 @@ export type Database = {
           id: string
           kicker: string | null
           line_label: string
+          picks: boolean
+          picks_title: string | null
           pill_label: string | null
           season_year: number
+          settled_at: string | null
           side: string | null
           sort: number
           tour_code: string
@@ -13872,8 +13926,11 @@ export type Database = {
           id?: string
           kicker?: string | null
           line_label: string
+          picks?: boolean
+          picks_title?: string | null
           pill_label?: string | null
           season_year: number
+          settled_at?: string | null
           side?: string | null
           sort?: number
           tour_code: string
@@ -13887,8 +13944,11 @@ export type Database = {
           id?: string
           kicker?: string | null
           line_label?: string
+          picks?: boolean
+          picks_title?: string | null
           pill_label?: string | null
           season_year?: number
+          settled_at?: string | null
           side?: string | null
           sort?: number
           tour_code?: string
@@ -22650,6 +22710,48 @@ export type Database = {
           viewer_value: number
         }[]
       }
+      get_line_pick_callers: {
+        Args: {
+          p_after: number
+          p_limit?: number
+          p_tour: string
+          p_year: number
+        }
+        Returns: {
+          correct: number
+          display_name: string
+          is_viewer: boolean
+          last_picked_at: string
+          picks: number
+          profile_photo_url: string
+          rank: number
+          user_id: string
+          username: string
+        }[]
+      }
+      get_line_pick_result: {
+        Args: { p_after: number; p_tour: string; p_year: number }
+        Returns: {
+          all_correct: number
+          settled: boolean
+          total_pickers: number
+          viewer_correct: number
+          viewer_picks: number
+        }[]
+      }
+      get_line_picks: {
+        Args: { p_after: number; p_tour: string; p_year: number }
+        Returns: {
+          final_position: number
+          mine: boolean
+          pickers: number
+          player_key: string
+          player_name: string
+          position_at_pick: number
+          result: string
+          total_pickers: number
+        }[]
+      }
       get_live_course_record_facts: {
         Args: { p_score_ids: string[] }
         Returns: {
@@ -25193,6 +25295,7 @@ export type Database = {
             Args: { p_business_id: string; p_user_profile_id: string }
             Returns: boolean
           }
+      is_countable_member: { Args: { p_user: string }; Returns: boolean }
       is_eg_synced: { Args: { p_user_id: string }; Returns: boolean }
       is_following_actor: {
         Args: {
@@ -25944,6 +26047,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_line_pick: {
+        Args: {
+          p_after: number
+          p_on: boolean
+          p_player_id: string
+          p_player_key: string
+          p_player_name: string
+          p_position: number
+          p_tour: string
+          p_year: number
+        }
+        Returns: number
+      }
       set_member_job_title: {
         Args: {
           _business_id: string
@@ -25964,6 +26080,7 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
+      settle_line_picks: { Args: never; Returns: number }
       settle_weekly_pickem: { Args: never; Returns: number }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }

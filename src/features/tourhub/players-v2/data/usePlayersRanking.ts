@@ -92,10 +92,12 @@ const MIN_RANKING_ROWS = 5;
 /* Season resolution: currentSeasonYear() in _shared/stats/useLeaderCategories
    is the ONE definition. This file had an identical local copy; it is gone. */
 
-async function resolvePgaSeasonId(): Promise<string | null> {
-  const year = currentSeasonYear();
-  // Deterministic probe: prefer current year with stats rows, else walk back.
-  for (const y of [year, year - 1]) {
+async function resolvePgaSeasonId(raceYear: number | null): Promise<string | null> {
+  const year = raceYear ?? currentSeasonYear();
+  // Deterministic probe. With a race row the season is exactly the race's
+  // (standings and line cards must agree); with no race row, prefer the
+  // current year with stats rows, else walk back one season.
+  for (const y of raceYear != null ? [raceYear] : [year, year - 1]) {
     const { data, error } = await supabase
       .from('sr_seasons')
       .select('id')
@@ -152,16 +154,22 @@ const PLAYER_SELECT = 'id, full_name, country, country_code, photo_url, tour_cod
 const SEASON_RANKING_SELECT =
   'player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code, scraped_at, updated_at';
 
-export function usePlayersRanking(tour: PlayersTourId) {
+/**
+ * @param raceYear the race's seasonYear from useTourRace. `undefined` while
+ *   the race read is pending (query waits), `null` when the tour has no race
+ *   row (currentSeasonYear() with the walk-back fallback), else exact.
+ */
+export function usePlayersRanking(tour: PlayersTourId, raceYear?: number | null) {
   const { t, i18n } = useTranslation('tourhub');
   const statLabelFor = (id: PlayersTourId): string => t(STAT_LABEL_KEY[id]);
   return useQuery<RankingResult>({
-    queryKey: ['players-v2', 'ranking', tour, currentSeasonYear(), i18n.language],
+    queryKey: ['players-v2', 'ranking', tour, raceYear ?? currentSeasonYear(), raceYear != null, i18n.language],
+    enabled: raceYear !== undefined,
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
     queryFn: async () => {
       if (tour === 'pga') {
-        const seasonId = await resolvePgaSeasonId();
+        const seasonId = await resolvePgaSeasonId(raceYear ?? null);
         if (!seasonId) return { synced: false, statLabel: null, rows: [] };
         const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
@@ -234,7 +242,7 @@ export function usePlayersRanking(tour: PlayersTourId) {
       }
 
 
-      const year = currentSeasonYear();
+      const year = raceYear ?? currentSeasonYear();
       const primary = await supabase
         .from('tour_season_rankings' as never)
         .select(SEASON_RANKING_SELECT)
@@ -244,7 +252,7 @@ export function usePlayersRanking(tour: PlayersTourId) {
         .limit(400);
       if (primary.error) throw primary.error;
       let rankings = (primary.data ?? []) as unknown as TourSeasonRankingRow[];
-      if (!rankings.length) {
+      if (!rankings.length && raceYear == null) {
         const alt = await supabase
           .from('tour_season_rankings' as never)
           .select(SEASON_RANKING_SELECT)

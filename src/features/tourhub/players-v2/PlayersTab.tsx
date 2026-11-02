@@ -98,9 +98,12 @@ export function PlayersTab() {
   const query = debouncedSearch.trim().toLowerCase();
 
   // -- Reads
-  const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
+  const { data: race, isError: raceError } = useTourRace(activeTour);
+  // Standings read the race's season so they never disagree with the line cards.
+  const raceYear = race ? (race.race ? race.race.season_year : null) : raceError ? null : undefined;
+  const { data: ranking, isLoading: rankingFetching, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour, raceYear);
+  const rankingLoading = rankingFetching || raceYear === undefined;
   const { data: liveMap } = useLivePlayerIds();
-  const { data: race } = useTourRace(activeTour);
   const { data: movement } = useStandingsMovement(activeTour, race?.seasonYear);
   const { data: formMap } = useFieldForm(activeTour, race?.seasonYear);
   const { data: scorecard } = useScorecardStats(activeTour, race?.seasonYear);

@@ -115,6 +115,10 @@ export interface Stake {
   pill_label: string | null;
   side: string | null;
   sort: number;
+  /** Build 2 picks: the stake carries a "who keeps their card?" card. */
+  picks?: boolean;
+  picks_title?: string | null;
+  settled_at?: string | null;
 }
 
 /** Points of the player at `after_position` minus the next player's. */
@@ -172,6 +176,7 @@ export interface ClockEvent {
   id: string;
   name: string;
   startDate: string;
+  endDate?: string | null;
   finished: boolean;
 }
 
