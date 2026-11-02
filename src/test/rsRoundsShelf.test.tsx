@@ -217,7 +217,7 @@ describe('RS Rounds this week shelf', () => {
     expect(screen.getByText('Your circle, last 14 days')).toBeInTheDocument();
     const kinds = Array.from(document.querySelectorAll('[data-rounds-shelf-card]')).map((n) => n.getAttribute('data-rounds-shelf-card'));
     expect(kinds).toEqual(['round', 'round', 'feat', 'round', 'round']);
-    expect(screen.getByText('Royal County Down · Championship · Oct 31')).toBeInTheDocument();
+    expect(screen.getAllByText('Royal County Down · Championship · Oct 31')).toHaveLength(4);
   });
 
   it('falls back to everyone under two circle rows and says so', () => {
