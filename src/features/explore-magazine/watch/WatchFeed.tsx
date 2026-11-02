@@ -43,6 +43,7 @@ import {
 import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
 import { useWatchProgress } from './useWatchSignals';
+import { RoundsThisWeekShelf } from './RoundsThisWeekShelf';
 import {
   RAIL_EVERY,
   groupByMember,
