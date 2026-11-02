@@ -39,7 +39,7 @@ import { buildPlayers, type PlayerView } from './playersModel';
 import { parseLens, rankByForm, type Lens } from './playersRules';
 import { FrontPage, FrontSkeleton } from './front/FrontPage';
 import { FullField } from './field/FullField';
-import type { CardName, PageActions, PageData, ViewAllFrom } from './pageModel';
+import type { CardName, PageActions, PageData } from './pageModel';
 import { P } from './playersTokens';
 
 export function PlayersTab() {
@@ -275,15 +275,13 @@ export function PlayersTab() {
   );
 }
 
+/** Followed tour players as a Set that is stable while the follow list is. */
 function useTourPlayerFollowsSet(): { followed: Set<string> } {
-  const follows = useTourPlayerFollows();
-  const ids = (follows as unknown as { followed?: Iterable<string>; ids?: string[]; data?: string[] });
-  return useMemo(() => {
-    const list = ids.data ?? ids.ids ?? (ids.followed ? [...ids.followed] : []);
-    return { followed: new Set(list) };
-  }, [ids.data, ids.ids, ids.followed]);
+  const { ids } = useTourPlayerFollows();
+  const key = [...ids].sort().join('|');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => ({ followed: new Set(key ? key.split('|') : []) }), [key]);
 }
 
 export default PlayersTab;
 
-export type { ViewAllFrom };

@@ -122,7 +122,7 @@ export function TourHubMainPage() {
      arrived. */
   const backMode = false;
   const tabParam = searchParams.get('tab') as TourHubTab | null;
-  const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
+  const [activeTab, setActiveTab] = useState<TourHubTab>(legacyTabRedirect(searchParams) ? 'players' : tabParam || 'overview');
   /* Owned here, not in the bridge: the sub-page shell suppresses the island, so
      its own header carries the tour control and needs the same tile state. */
   const [glanceOpen, setGlanceOpen] = useState(false);
