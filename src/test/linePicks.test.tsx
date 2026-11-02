@@ -29,7 +29,6 @@ vi.mock('@/features/guest/useGuestActionGate', () => ({ useGuestActionGate: () =
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 
-declare module 'vitest' { interface TestContext { _?: never } }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (h as any).guestGate = undefined;
 
