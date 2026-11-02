@@ -142,3 +142,35 @@ describe('T100 visibility and Rounds removal', () => {
   it('loading reserves slab rail and three rows, no pinned row or dropdown',()=>{f.board.mockReturnValue({isPending:true});race();expect(element('[data-race-shell]')).toBeInTheDocument();expect(document.querySelectorAll('.t100-shell-row')).toHaveLength(3);expect(document.querySelector('[data-your-courses]')).toBeNull();});
   it('Rounds removes section seven and its sheets but retains preceding sections',()=>{const source=readFileSync('src/features/explore-magazine/ScoresLeaderboardsPage.tsx','utf8');expect(source).not.toMatch(/top100SeeAllSheet|top100Sheet|HundredRail|HundredYou|hundredPlaceholderHeight|useCareerBoard/);for(const name of ['StandoutRounds','CompetitionBoards','LeaderboardsSection','RareAirRail','climbPlaced.slice'])expect(source).toContain(name);});
 });
+describe('T100.2 native buttons and short names', () => {
+  const expectNativeButton = (node: HTMLElement) => {
+    expect(node.tagName).toBe('BUTTON');
+    for (const cls of ['h-11', 'px-5', 'py-2.5', 'text-muted-foreground', 'font-medium']) expect(node.className).not.toContain(cls);
+  };
+  it('race rows, rail tiles, See all and the dropdown header are native buttons without the shared Button classes', () => {
+    race();
+    document.querySelectorAll<HTMLElement>('[data-race-row]').forEach(expectNativeButton);
+    document.querySelectorAll<HTMLElement>('.t100-tile').forEach(expectNativeButton);
+    expectNativeButton(screen.getByRole('button', { name: 'See all members' }));
+    cleanup();
+    mount(<YourCoursesDropdown {...dropdownProps} />);
+    expectNativeButton(screen.getByRole('button', { name: /Your courses/ }));
+  });
+  it('row course line and tile name use shortCourseName; the tile aria-label keeps the full name', () => {
+    const full = 'Royal County Down Golf Club (Championship)';
+    f.board.mockReturnValue({ data: [{ ...row('leader', 34, 1), last_course_name: full }], isPending: false, isError: false, isPlaceholderData: false });
+    f.tiles.mockReturnValue({ data: [{ ...tile(0, true), course_name: full }], isPending: false });
+    race();
+    expect(element('[data-race-row="leader"] .t100-row-course').textContent).toBe('Royal County Down · Championship');
+    const tileButton = screen.getByRole('button', { name: full });
+    expect(tileButton.querySelector('.t100-photo-name')?.textContent).toBe('Royal County Down · Championship');
+  });
+  it('See all sheet rows render the same markup as the page rows', () => {
+    race();
+    const pageRow = element('[data-race-row="leader"]').outerHTML;
+    fireEvent.click(screen.getByRole('button', { name: 'See all members' }));
+    const sheet = screen.getByTestId('see-all');
+    expect(sheet.querySelectorAll('[data-race-row]')).toHaveLength(4);
+    expect(sheet.querySelector('[data-race-row="leader"]')?.outerHTML).toBe(pageRow);
+  });
+});
