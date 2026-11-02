@@ -288,3 +288,27 @@ Vitest identifies `src/test/ws3WatchBottom.test.tsx`; latest potentially respons
 Authorisation is needed for the newly observed shard-4 unhandled scroll error before any fix or rerun. The five previous WS1/RS failures now pass; they are no longer open blockers. Full clean-suite acceptance remains pending because shard 4 exited 1 despite all tests passing.
 
 V1.2 touched no guest browsing, review wizard, news, round plots, SQL, migrations, deployed RPCs/edge functions, feed_config, round_pool_cap, native or Median configuration.
+
+## V1.3 — final scroll error cleared
+
+Source: the "TypeError: scroller?.scrollTo is not a function" (getScrollParent.ts:101) came from WS3.1, not the cleanup. Long form's See all calls scrollPageToTop(); jsdom elements have no scrollTo. No component or lib changes.
+
+Authorised test edit (§1), `src/test/ws3WatchBottom.test.tsx`, case "Long form's See all selects the Long form chip" (name unchanged, every existing assertion unchanged):
+
+Before: the case body ran directly with no scrollTo stand-in.
+
+After: the case saves `const originalScrollTo = Element.prototype.scrollTo;`, sets `Element.prototype.scrollTo = scrollTo as never` (`scrollTo = vi.fn()`), wraps the original body in `try { ... } finally { Element.prototype.scrollTo = originalScrollTo; }`, and adds one assertion right after the click:
+`expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));`
+
+Focused file: 20/20 passed.
+
+Final verification (`bunx vitest run --maxWorkers=2 --shard=N/4`):
+| Shard | Files | Tests | Failures | Unhandled errors |
+|---|---|---|---|---|
+| 1/4 | 136 | 1,481 | 0 | 0 |
+| 2/4 | 136 | 1,433 | 0 | 0 |
+| 3/4 | 136 | 1,530 | 0 | 0 |
+| 4/4 | 134 | 1,457 | 0 | 0 |
+| Total | 542 | 5,901 | 0 | 0 |
+
+Test count unchanged (5,901 → 5,901): one assertion added inside an existing case, no tests added or removed. Pre-existing failures: none. Build: clean ("build OK").
