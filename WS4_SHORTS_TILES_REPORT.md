@@ -20,9 +20,19 @@ The existing hub fixture supplies `poster_url: null`, so the tile renders its fa
 
 Automatic build: **build OK**, 2026-11-02T21:35:56Z. Four full shards and live visual checks were not run after the stop.
 
+## Verification
+Focused: `bunx vitest run src/test/ws2WatchMiddle.test.tsx --maxWorkers=2` — **22/22 passed, 1 file**.
+Full suite, four shards, `--maxWorkers=2`, all exit 0, 0 failures, 0 unhandled errors:
+- shard 1/4: 137 files, 1,492 tests
+- shard 2/4: 137 files, 1,470 tests
+- shard 3/4: 137 files, 1,530 tests
+- shard 4/4: 134 files, 1,458 tests
+Total: **5,950 tests / 545 files passing**. Full logs `/tmp/ws4-shard1.log` … `/tmp/ws4-shard4.log`.
+Automatic build: **build OK**, 2026-11-02T21:40:08Z.
+
 ## Inventory
 Last fully passing baseline: **5,946 tests / 545 files**.
-Candidate inventory: **5,950 / 545**, not a full passing total. `ws2WatchMiddle.test.tsx` grows 18→22, adding four cases:
+Now passing: **5,950 / 545**, +4 cases, all from the four new WS4 cases in `ws2WatchMiddle.test.tsx` (18→22):
 - `WS4 shelf tiles are 156 wide with a 248 cover-fit poster`.
 - `WS4 all titles reserve the same two-line space for short and long titles`.
 - `WS4 quick titles reserve the same two-line space for short and long titles`.
