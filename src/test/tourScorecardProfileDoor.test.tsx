@@ -75,3 +75,31 @@ describe('Tour scorecard profile door', () => {
     expect(share).toHaveBeenCalledOnce();
   });
 });
+
+describe('Tour scorecard doors at the right edge', () => {
+  it('the doors are the last children of the identity row and the name takes the remaining width', () => {
+    mount(<CardScorecardSheet {...tour} onViewProfile={vi.fn()} />);
+    const doors = document.querySelector('[data-sheet-doors]') as HTMLElement;
+    expect(doors).not.toBeNull();
+    const row = doors.parentElement as HTMLElement;
+    expect(row.lastElementChild).toBe(doors);
+    const nameSpan = row.querySelector('span[title]') as HTMLElement;
+    expect(nameSpan.style.flex).toBe('1 1 auto');
+    expect(nameSpan.style.minWidth).toBe('0px');
+    expect(nameSpan.style.textOverflow).toBe('ellipsis');
+  });
+
+  it('a long name truncates without moving or wrapping the doors', () => {
+    mount(<CardScorecardSheet {...tour} playerName={'A'.repeat(160)} onViewProfile={vi.fn()} />);
+    const doors = document.querySelector('[data-sheet-doors]') as HTMLElement;
+    expect(doors).not.toBeNull();
+    const row = doors.parentElement as HTMLElement;
+    expect(row.lastElementChild).toBe(doors);
+    const nameSpan = row.querySelector('span[title]') as HTMLElement;
+    expect(nameSpan.style.overflow).toBe('hidden');
+    expect(nameSpan.style.whiteSpace).toBe('nowrap');
+    expect(nameSpan.style.textOverflow).toBe('ellipsis');
+    expect(doors.style.flex).toBe('none');
+    expect(doors.style.marginLeft).toBe('10px');
+  });
+});
