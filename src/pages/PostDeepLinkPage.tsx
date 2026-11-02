@@ -8,7 +8,7 @@ import { Loader2, MapPin } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
-import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
+import { loadPublishedPost, mapPublishedPost } from '@/lib/publishedPostViewer';
 import { MentionText } from '@/components/mentions/MentionText';
 import { INK_ON_LIGHT, POST_DEEP_LINK_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
@@ -80,99 +80,9 @@ const PostDeepLinkPage: React.FC = () => {
       setIsLoading(true);
       if (!postId) { setNotFound(true); setIsLoading(false); return; }
 
-      // Schema-accurate fetch:
-      // - posts has `content` (not `caption`), `post_type`, `status`; no `media_urls`/`rating`
-      // - user_profiles has `profile_photo_url` (no `avatar_url`)
-      // - posts → user_profiles uses the explicit FK `posts_user_profile_id_fkey`
-      //   (there's also `posts_user_id_fkey` to auth.users — must disambiguate)
-      // - ratings live on course_ratings, joined via source_review_id
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          content,
-          post_type,
-          created_at,
-          user_id,
-          actor_type,
-          actor_id,
-          status,
-          course_id,
-          source_review_id,
-          whs_score_id,
-          like_count,
-          comment_count,
-
-          user_profiles!posts_user_profile_id_fkey (
-            id,
-            username,
-            display_name,
-            profile_photo_url,
-            is_verified
-          ),
-          golf_courses (
-            id,
-            name,
-            country,
-            sub_country,
-            region
-          ),
-          course_ratings:source_review_id (
-            id,
-            rating,
-            review
-          ),
-          post_media (
-            id,
-            media_type,
-            media_url,
-            aspect_ratio,
-            width,
-            height,
-            poster_url,
-            stream_id,
-            duration_seconds,
-            display_order
-          )
-        `)
-        .eq('id', postId)
-        .eq('status', 'published')
-        .maybeSingle();
-
-      if (error) {
-        setLoadError(true);
-        setIsLoading(false);
-        return;
-      }
-      if (!data) {
-        setNotFound(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // Block filter — hide posts by users the viewer has blocked (or been
-      // blocked by). USES THE DATABASE FUNCTION are_users_blocked(a, b), the
-      // same one the notification trigger uses, so the two agree by
-      // construction. The previous hand-rolled user_blocks query reinvented it
-      // and got it wrong (nested and() inside .or(), plus a non-existent `id`
-      // column), so it 400'd from the day it was written.
-      if (user?.id && (data as any).user_id && (data as any).user_id !== user.id) {
-        const { data: blocked, error: blockError } = await supabase.rpc('are_users_blocked', {
-          user_a: user.id,
-          user_b: (data as any).user_id,
-        });
-        if (blockError) {
-          // FAIL OPEN, deliberately: a transient lookup failure hiding a friend's
-          // post is worse than a rare missed block, and the post fetch above is
-          // already RLS-protected. Logged so it is never silent again.
-          console.error('[PostDeepLink] are_users_blocked failed, failing open', blockError);
-        } else if (blocked === true) {
-          setNotFound(true);
-          setIsLoading(false);
-          return;
-        }
-      }
-
+      const { data, error } = await loadPublishedPost(postId, user?.id);
+      if (error) { setLoadError(true); setIsLoading(false); return; }
+      if (!data) { setNotFound(true); setIsLoading(false); return; }
 
       const row = data as any;
       const profileRow = row.user_profiles ?? {};
@@ -249,71 +159,7 @@ const PostDeepLinkPage: React.FC = () => {
         golf_courses: courseRow ? { name: courseRow.name, country: courseRow.country } : null,
       });
 
-      // Full FeedPost mapping for the authenticated fullscreen viewer
-      // COUNTS COME FROM THE POST ROW (§3.1). The notification path selected
-      // neither column and hardcoded zero, which is why a liked post opened
-      // from Activity showed an empty heart while the same post in the feed
-      // showed the count. The feed's own select already reads these.
-      const activityPost: ActivityPost = {
-        id: row.id,
-        type: 'post',
-        content: row.content ?? '',
-        likes: row.like_count ?? 0,
-        comments: row.comment_count ?? 0,
-        shares: 0, // posts has no share_count column; shares are not surfaced here
-        timeAgo: '',
-        created_at: row.created_at,
-        course_id: row.course_id ?? null,
-        source_review_id: row.source_review_id ?? null,
-
-        isReview: !!row.source_review_id || row.post_type === 'review',
-        rating: ratingRow?.rating ?? undefined,
-        course: courseRow ? {
-          id: courseRow.id,
-          name: courseRow.name,
-          country: courseRow.country ?? undefined,
-          sub_country: courseRow.sub_country ?? undefined,
-          region: courseRow.region ?? undefined,
-        } : undefined,
-        post_media: (row.post_media ?? []).map((m: any) => ({
-          id: m.id,
-          media_type: m.media_type,
-          media_url: m.media_url,
-          aspect_ratio: m.aspect_ratio,
-          width: m.width,
-          height: m.height,
-          poster_url: m.poster_url,
-          // Stream-backed videos have a NULL media_url; the playable manifest is
-          // built from stream_id downstream (see activityPostMapper).
-          stream_id: m.stream_id ?? null,
-          duration_seconds: m.duration_seconds,
-          display_order: m.display_order,
-        })),
-        user: {
-          id: profileRow.id,
-          display_name: profileRow.display_name,
-          username: profileRow.username,
-          profile_photo_url: profileRow.profile_photo_url,
-        },
-      };
-
-      // THE LIKED FLAG (§3.1). Resolved through viewer_liked_post, which is the
-      // only correct route: round-backed posts store the viewer's like in
-      // content_reactions against whs_score_id, not in post_likes, so reading
-      // post_likes directly here would report false for every round post.
-      let likedByMe = false;
-      if (user?.id) {
-        const { data: liked } = await supabase.rpc('viewer_liked_post', {
-          p_post_id: row.id,
-          // p_viewer is the ACTOR id (post_likes.actor_id = p_viewer).
-          p_viewer: activeActorId ?? user.id,
-          // The ACTIVE actor's flag, never assumed personal.
-          p_actor_type: activeActorType,
-        });
-        likedByMe = liked === true;
-      }
-
-      setFeedPost(mapActivityPostToFeedPost(activityPost, { isLikedByMe: likedByMe }));
+      setFeedPost(await mapPublishedPost(row, { userId: user?.id, actorId: activeActorId, actorType: activeActorType }));
       setIsLoading(false);
 
     }
