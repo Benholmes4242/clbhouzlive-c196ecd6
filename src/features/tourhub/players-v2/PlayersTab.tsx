@@ -137,7 +137,8 @@ export function PlayersTab() {
     form,
     live: liveMap ?? {},
     updatedAt,
-  }), [activeTour, race, players, scorecard, form, liveMap, updatedAt]);
+    season,
+  }), [activeTour, race, players, scorecard, form, liveMap, updatedAt, season]);
 
   // -- Navigation
   const openAll = useCallback<PageActions['openAll']>(({ from, lens: l, stat: s, search: withSearch }) => {

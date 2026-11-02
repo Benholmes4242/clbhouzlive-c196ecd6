@@ -22962,6 +22962,21 @@ export type Database = {
           times_played: number
         }[]
       }
+      get_my_hole_scoring: {
+        Args: { p_limit?: number }
+        Returns: {
+          bogey_rate: number
+          first_played: string
+          holes_par3: number
+          holes_par4: number
+          holes_par5: number
+          last_played: string
+          par3: number
+          par4: number
+          par5: number
+          rounds: number
+        }[]
+      }
       get_my_last_fourball: {
         Args: never
         Returns: {
@@ -24345,6 +24360,17 @@ export type Database = {
         Returns: {
           player_id: string
           starts: Json
+        }[]
+      }
+      get_tour_hole_averages: {
+        Args: { p_tour: string; p_year: number }
+        Returns: {
+          bogey_rate: number
+          holes: number
+          par3: number
+          par4: number
+          par5: number
+          players: number
         }[]
       }
       get_tour_scorecard_stats: {

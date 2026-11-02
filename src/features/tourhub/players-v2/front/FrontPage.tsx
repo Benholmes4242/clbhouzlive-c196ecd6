@@ -14,6 +14,7 @@ import type { PageActions, PageData, CardName } from '../pageModel';
 import type { PlayerView } from '../playersModel';
 import { statList } from '../playersModel';
 import { LinePicksCard } from '../picks/LinePicksCard';
+import { YouAndTourCard } from '../you/YouAndTourCard';
 import {
   barPct, effectiveStatus, todayIso, featuredStakes, fmtInt, fmtWeekdayDate, footerCaption, heroHeadline, heroSub, lineCardLine, lineGap,
   ordinal, OTHER_TILE_KEYS, PGA_TILE_KEYS, raceCardLine, situationSentence, STAT_DEFS, type Rich, type Stake,
@@ -280,6 +281,7 @@ export function FrontPage({ data, actions }: { data: PageData; actions: PageActi
       ))}
       <RaceCard data={data} actions={actions} first={lines.length === 0} />
       <YourPlayersCard data={data} actions={actions} />
+      <YouAndTourCard data={data} />
       <InFormCard data={data} actions={actions} />
       <StatLeadersCard data={data} actions={actions} />
       <button type="button" data-all-players onClick={() => actions.openAll({ from: 'button', lens: 'standings' })}
