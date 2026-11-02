@@ -345,6 +345,7 @@ const MessagingShell = lazy(() => import("./pages/messaging-v2/MessagingShell"))
 const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"));
 const FindPeoplePage = lazy(() => import("./pages/FindPeoplePage"));
 const GolfersToFollowRedirect = lazy(() => import("./pages/FindPeoplePage").then((m) => ({ default: m.GolfersToFollowRedirect })));
+const RoundsPage = lazy(() => import("./pages/RoundsPage"));
 const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProfileSocialRedirect"));
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
 const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
@@ -675,6 +676,8 @@ function AppRoutes() {
         {/* BRIEF_AMATEUR_PAGE — the Amateur destination. Shell, header and hero
             first; the four blocks land beneath the hero one at a time. */}
         <Route path="/amateur" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurPage /></Suspense>} />
+        {/* RS — the Rounds board as its own page; /amateur?view=scores redirects here. */}
+        <Route path="/rounds" element={<Suspense fallback={<GenericPageSkeleton />}><RoundsPage /></Suspense>} />
 
         <Route path="/discover/news" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsPage /></Suspense>} />
         <Route path="/discover/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurStoryPage /></Suspense>} />
