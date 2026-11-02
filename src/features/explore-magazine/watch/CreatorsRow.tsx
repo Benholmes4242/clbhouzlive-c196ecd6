@@ -216,6 +216,7 @@ export function CreatorsRow({ userId }: { userId: string | undefined }) {
               }}
             >
               <span
+                data-creator-ring={active ? 'true' : undefined}
                 style={{
                   display: 'block',
                   width: 64,
