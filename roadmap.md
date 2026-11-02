@@ -1486,4 +1486,5 @@
 - [x] ACTIVE RING — Who to follow rail and Explore the community rows (ACTIVE_RING_REPORT.md)
 
 - [x] Players page Build 1 of 3 — merged Players and Leaders; report PLAYERS_BUILD1_REPORT.md (5,829/537). On-device check with Ben.
-- [ ] Players page Builds 2 and 3 — awaiting briefs.
+- [x] Players page Build 2 — line picks card; report PLAYERS_BUILD2_REPORT.md (5,847/538).
+- [ ] Players page Build 3 — awaiting brief.
