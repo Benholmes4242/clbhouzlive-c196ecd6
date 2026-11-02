@@ -4,7 +4,7 @@ import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import { roundCoursePar } from '@/lib/whs/api';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Share, User } from 'lucide-react';
+import { Share } from 'lucide-react';
 
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { ScorecardGlassOverlay } from './ScorecardGlassOverlay';
@@ -1070,8 +1070,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </>
           )}
 
-          {/* CB61: member doors live in the head; tour exits and Share stay here. */}
-          {(engagement || (isTour && (onViewProfile || onViewCourse)) || onShareRound) && (
+          {/* TOUR SCORECARD TILE — the tour Course/Profile foot actions moved
+              up into the identity row (scorecardParts); with no engagement row
+              and no Share the whole foot block does not render, so the tile
+              ends at the scroll padding below the card. */}
+          {(engagement || onShareRound) && (
             <div
               data-scorecard-interactive="true"
               onClick={(event) => event.stopPropagation()}
@@ -1141,19 +1144,16 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   />
                 </div>
               )}
-              {(isTour || (!engagement && onShareRound)) && <div
+              {/* With no engagement row there is nowhere else for Share to sit. */}
+              {!engagement && onShareRound && <div
                 data-scorecard-exit-links="true"
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: `repeat(${[isTour && onViewCourse, isTour && onViewProfile, !engagement && onShareRound].filter(Boolean).length}, minmax(0, 1fr))`,
+                  gridTemplateColumns: 'minmax(0, 1fr)',
                   marginTop: 14,
                 }}
               >
-                {/* Tour identity and foot are intentionally unchanged by CB61. */}
-                {isTour && onViewCourse && <GlassCardFootAction label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} icon={MapPin} />}
-                {isTour && onViewProfile && <GlassCardFootAction label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} icon={User} />}
-                {/* With no engagement row there is nowhere else for Share to sit. */}
-                {!engagement && onShareRound && <GlassCardFootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />}
+                <GlassCardFootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />
               </div>}
             </div>
           )}

@@ -59,10 +59,10 @@ describe('CB61 player-row doors', () => {
     for (const button of buttons ?? []) fireEvent.click(button);
     expect(share).toHaveBeenCalledOnce();
   });
-  it('tour retains its existing foot doors and does not gain player-row doors', () => {
+  it('tour moves its doors into the identity row and drops the foot actions', () => {
     mount(<CardScorecardSheet {...round} surface="tour" onViewCourse={vi.fn()} onViewProfile={vi.fn()} />);
-    expect(document.querySelector('[data-scorecard-exit-links]')?.querySelectorAll('button').length).toBe(2);
-    expect(document.querySelector('[data-sheet-door]')).toBeNull();
+    expect(document.querySelector('[data-scorecard-exit-links]')).toBeNull();
+    expect(Array.from(document.querySelectorAll('[data-sheet-door]')).map(n => n.getAttribute('data-sheet-door'))).toEqual(['course', 'profile']);
   });
   it('review doors render in the player row with no foot actions', () => {
     mount(<ReviewBottomSheet {...review} />);
