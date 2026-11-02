@@ -24,6 +24,9 @@
  * over the 30-day window. Verified by grepping each name across src/.
  */
 export const RETIRED_EVENTS: Record<string, string> = {
+  watch_creators_viewed: 'Creators row replaced by Explore people row (2 Nov 2026)',
+  watch_creator_tapped: 'Creator taps replaced by Explore day-post/profile taps (2 Nov 2026)',
+  watch_creators_see_all: 'Heading action replaced by Explore people See all tile (2 Nov 2026)',
   // Feed: the Clubhouse feed no longer has switchable tabs — activeTab is the
   // constant FEED_TAB, so the emitting effect can never fire again.
   feed_tab_switch: 'Clubhouse feed tabs removed; activeTab is a constant (Sep 2026)',
