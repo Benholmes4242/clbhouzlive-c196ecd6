@@ -1,60 +1,54 @@
 /**
- * players-v2/PlayersTab - "The Field" - one shared ledger row, a column
- * header, and an honest sample-size caption.
+ * players-v2/PlayersTab — the merged Players page (Players build 1 of 3).
+ * Leaders is folded in: the FRONT PAGE (default) tells the season story, the
+ * FULL FIELD (?view=all&lens=standings|form|stats&stat=<key>) lists everyone.
  *
  * Wiring:
  *   - Tour: LOCAL lens (per-section by design; NOT TourSelectionContext).
- *     ?tour= honored once on mount; ?sort= honored for old inbound links.
- *   - Data: usePlayersRanking(tour) + useLivePlayerIds()
- *     + useWorldRankLookup(loaded ids).
+ *     ?tour= honoured once on mount; Champions excluded; island picker drives it.
+ *   - Reads: usePlayersRanking, useTourRace, useStandingsMovement, useFieldForm,
+ *     useScorecardStats, useTourPlayerFollows, useWorldRankLookup, useLivePlayerIds.
+ *   - Opening the full field pushes history; Back pops it (falls back to a
+ *     replace when the full field was the entry). Lens/stat changes replace.
+ *   - Old ?sort=live / playing-now links open the full field and scroll to the
+ *     first live row.
+ *   - All copy and rules live in playersRules.ts.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Search, X } from 'lucide-react';
 
-import { Skeleton } from '@/components/ui/skeleton';
-import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
-import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
+import { TOUR_CONFIG } from '../hooks/useOverviewData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { FONT, TOUR_CANVAS, INK, INK_MUTE } from '../_shared/tokens';
+import { TourHubEmptyState } from '../components/TourHubEmptyState';
+import { useTourPlayerFollows } from '../leaderboard/useTourPlayerFollows';
 
-import {
-  FONT,
-  HAIRLINE_INK_10,
-  INK,
-  INK_FAINT,
-  INK_MUTE,
-  TOUR_CANVAS,
-  SURFACE,
-  TREND_UP,
-  WHITE_ALPHA_06,
-} from '../_shared/tokens';
-import { getScoreColor } from '../_shared/scoreColor';
-import { MovementFigure } from '../_shared/movement';
-import { fmtScore } from '../utils/fmtScore';
-
-import { usePlayersRanking, type RankedRow, type PlayersTourId } from './data/usePlayersRanking';
+import { usePlayersRanking, type PlayersTourId } from './data/usePlayersRanking';
 import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { useWorldRankLookup } from './data/useWorldRankLookup';
-import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
-import { FIGS } from '@/lib/tokens/type';
-
-
-type SortKey = 'ranking' | 'live';
-
-const SEP = ' · ';
+import { useTourRace } from './data/useTourRace';
+import { useStandingsMovement } from './data/useStandingsMovement';
+import { useFieldForm } from './data/useFieldForm';
+import { useScorecardStats } from './data/useScorecardStats';
+import { buildPlayers, type PlayerView } from './playersModel';
+import { parseLens, rankByForm, type Lens } from './playersRules';
+import { FrontPage, FrontSkeleton } from './front/FrontPage';
+import { FullField } from './field/FullField';
+import type { CardName, PageActions, PageData, ViewAllFrom } from './pageModel';
+import { P } from './playersTokens';
 
 export function PlayersTab() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // -- Per-section tour lens (local state, NO All Tours, PGA default).
-  // ?tour= is honored once on mount for deep-link parity.
   const inboundTour = searchParams.get('tour');
   const storedTour = readStoredTour();
   const initialTour: PlayersTourId =
@@ -64,306 +58,181 @@ export function PlayersTab() {
         ? (storedTour as PlayersTourId)
         : 'pga';
   const [activeTour, setActiveTour] = useState<PlayersTourId>(initialTour);
-
-  // -- Sort (honor inbound ?sort=)
-  const inboundSort = searchParams.get('sort');
-  const [sort, setSortState] = useState<SortKey>(
-    inboundSort === 'live' || inboundSort === 'playing-now' ? 'live' : 'ranking',
-  );
-  const sortRef = useRef<SortKey>(sort);
-  sortRef.current = sort;
-  const setSort = useCallback(
-    (next: SortKey) => {
-      const from = sortRef.current;
-      setSortState(next);
-      if (from !== next) {
-        analyticsEvents.track('tour_players_sort_changed', { from, to: next, tour: activeTour });
-      }
-      setSearchParams(
-        (prev) => {
-          const p = new URLSearchParams(prev);
-          p.set('sort', next);
-          p.set('tab', 'players');
-          return p;
-        },
-        { replace: true },
-      );
-    },
-    [setSearchParams, activeTour],
-  );
-
-  const changeTour = useCallback((next: PlayersTourId) => {
-    setActiveTour(next);
-  }, []);
-
-  /* The island's TourPickerSheet replaces the deleted pills row
-     (BRIEF_TOUR_HEADER_ONE_ROW). This page's lens had showAllTours={false} and
-     excluded 'champ', so the sheet's All-tours row ('all'), 'major' and
-     'champ' have no expression here and are ignored rather than substituted. */
+  const changeTour = useCallback((next: PlayersTourId) => setActiveTour(next), []);
   useTourLensFromPicker<PlayersTourId>(
-    (slug) =>
-      slug !== 'champ' && slug in TOUR_CONFIG ? (slug as PlayersTourId) : undefined,
+    (slug) => (slug !== 'champ' && slug in TOUR_CONFIG ? (slug as PlayersTourId) : undefined),
     changeTour,
     activeTour,
   );
 
+  // -- View state lives in the URL.
+  const view = searchParams.get('view') === 'all' ? 'all' : 'front';
+  const lens = parseLens(searchParams.get('lens'));
+  const stat = searchParams.get('stat') ?? '';
+
+  // Old ?sort=live / playing-now links → the full field, scrolled to the first live row.
+  const scrollLiveRef = useRef(false);
+  useEffect(() => {
+    const sort = searchParams.get('sort');
+    if (sort !== 'live' && sort !== 'playing-now') return;
+    scrollLiveRef.current = true;
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.delete('sort');
+      p.set('tab', 'players');
+      p.set('view', 'all');
+      p.set('lens', 'standings');
+      return p;
+    }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // -- Search
   const [search, setSearch] = useState('');
-  const [searchExpanded, setSearchExpanded] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const debouncedSearch = useDebouncedValue(search, 200);
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (searchExpanded) searchInputRef.current?.focus();
-  }, [searchExpanded]);
+    if (searchOpen && view === 'all') searchRef.current?.focus();
+  }, [searchOpen, view]);
+  const query = debouncedSearch.trim().toLowerCase();
 
-  // -- Data
+  // -- Reads
   const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
-  
-  const loadedIds = useMemo(
-    () => (ranking?.rows ?? []).map((r) => r.playerId).filter(Boolean),
-    [ranking?.rows],
-  );
+  const { data: race } = useTourRace(activeTour);
+  const { data: movement } = useStandingsMovement(activeTour);
+  const { data: formMap } = useFieldForm(activeTour);
+  const { data: scorecard } = useScorecardStats(activeTour);
+  const { followed } = useTourPlayerFollowsSet();
+  const loadedIds = useMemo(() => (ranking?.rows ?? []).map((r) => r.playerId).filter(Boolean), [ranking?.rows]);
   const { data: worldRanks } = useWorldRankLookup(loadedIds);
 
-  // -- Rows: filter by search
-  const filteredRows = useMemo<RankedRow[]>(() => {
-    const rows = ranking?.rows ?? [];
-    const q = debouncedSearch.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((r) => r.name.toLowerCase().includes(q));
-  }, [ranking?.rows, debouncedSearch]);
-
-  // -- Live count from the current filtered view (tour + search)
-  const liveCount = useMemo(
-    () => filteredRows.filter((r) => (liveMap ?? {})[r.playerId]).length,
-    [filteredRows, liveMap],
+  const players = useMemo<PlayerView[]>(
+    () => buildPlayers({ rows: ranking?.rows ?? [], follows: followed, movement, form: formMap, world: worldRanks }),
+    [ranking?.rows, followed, movement, formMap, worldRanks],
   );
+  const form = useMemo(() => rankByForm(players, (p) => p.form), [players]);
+  const updatedAt = useMemo(() => {
+    let best: string | null = null;
+    for (const r of ranking?.rows ?? []) if (r.updatedAt && (!best || r.updatedAt > best)) best = r.updatedAt;
+    return best;
+  }, [ranking?.rows]);
 
-  // -- Sort options: "Playing now" only when somebody is live.
-  const sortOptions = useMemo<SortKey[]>(
-    () => (liveCount > 0 ? ['ranking', 'live'] : ['ranking']),
-    [liveCount],
-  );
+  const data: PageData = useMemo(() => ({
+    tour: activeTour,
+    isPga: activeTour === 'pga',
+    title: race?.race?.title ?? TOUR_CONFIG[activeTour].name,
+    players,
+    race: race?.race ?? null,
+    stakes: race?.stakes ?? [],
+    events: race?.events ?? [],
+    scorecard,
+    form,
+    live: liveMap ?? {},
+    updatedAt,
+  }), [activeTour, race, players, scorecard, form, liveMap, updatedAt]);
 
-  // -- Safety: if live filter becomes empty, revert to ranking
-  useEffect(() => {
-    if (liveCount === 0 && sort === 'live') setSort('ranking');
-  }, [liveCount, sort, setSort]);
+  // -- Navigation
+  const openAll = useCallback<PageActions['openAll']>(({ from, lens: l, stat: s, search: withSearch }) => {
+    analyticsEvents.track('tour_players_view_all_opened', { from, tour: activeTour });
+    const p = new URLSearchParams(searchParams);
+    p.set('tab', 'players');
+    p.set('view', 'all');
+    p.set('lens', l ?? 'standings');
+    if (s) p.set('stat', s); else p.delete('stat');
+    if (withSearch) setSearchOpen(true);
+    navigate({ pathname: location.pathname, search: `?${p.toString()}` }, { state: { playersFrontBack: true } });
+  }, [activeTour, searchParams, navigate, location.pathname]);
 
-  // -- Ordering: "Playing now" floats live players to the top.
-  const orderedRows = useMemo<RankedRow[]>(() => {
-    if (sort !== 'live') return filteredRows;
-    const live: RankedRow[] = [];
-    const rest: RankedRow[] = [];
-    filteredRows.forEach((r) => {
-      if ((liveMap ?? {})[r.playerId]) live.push(r);
-      else rest.push(r);
+  const onBack = useCallback(() => {
+    setSearch('');
+    setSearchOpen(false);
+    if ((location.state as { playersFrontBack?: boolean } | null)?.playersFrontBack) {
+      navigate(-1);
+      return;
+    }
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.delete('view'); p.delete('lens'); p.delete('stat');
+      return p;
+    }, { replace: true });
+  }, [location.state, navigate, setSearchParams]);
+
+  const onLens = useCallback((next: Lens) => {
+    if (next === lens) return;
+    analyticsEvents.track('tour_players_lens_changed', { lens: next, tour: activeTour });
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('lens', next);
+      if (next !== 'stats') p.delete('stat');
+      return p;
+    }, { replace: true });
+  }, [lens, activeTour, setSearchParams]);
+
+  const onStat = useCallback((next: string) => {
+    analyticsEvents.track('tour_players_stat_changed', { stat: next, tour: activeTour });
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('stat', next);
+      return p;
+    }, { replace: true });
+  }, [activeTour, setSearchParams]);
+
+  const goPlayer = useCallback((p: PlayerView, card?: CardName) => {
+    if (!p.playerId) return;
+    if (card) analyticsEvents.track('tour_players_card_tapped', { card, tour: activeTour });
+    analyticsEvents.track('tour_players_row_tapped', {
+      player_id: p.playerId,
+      rank: p.rank,
+      tour: activeTour,
+      is_live: !!(liveMap ?? {})[p.playerId],
+      view,
+      lens: view === 'all' ? lens : null,
     });
-    live.sort((a, b) => {
-      const pa = (liveMap ?? {})[a.playerId]?.position ?? Infinity;
-      const pb = (liveMap ?? {})[b.playerId]?.position ?? Infinity;
-      return pa - pb;
-    });
-    return [...live, ...rest];
-  }, [sort, filteredRows, liveMap]);
+    navigate(`/tourhub/player/${p.playerId}`);
+  }, [activeTour, liveMap, navigate, view, lens]);
 
-
-  const isSearching = debouncedSearch.trim().length > 0;
-  const synced = !!ranking?.synced;
-  const statLabel = ranking?.statLabel ?? null;
-  const loadedCount = ranking?.rows?.length ?? 0;
-
-
-
-  const goPlayer = useCallback(
-    (r: RankedRow) => {
-      if (!r.playerId) return;
-      analyticsEvents.track('tour_players_row_tapped', {
-        player_id: r.playerId,
-        rank: r.rank,
-        tour: activeTour,
-        is_live: !!(liveMap ?? {})[r.playerId],
-        sort,
-      });
-      navigate(`/tourhub/player/${r.playerId}`);
-    },
-    [navigate, activeTour, liveMap, sort],
-  );
+  const actions: PageActions = useMemo(() => ({ openAll, goPlayer }), [openAll, goPlayer]);
 
   // -- Analytics: viewed once per mount after the ranking resolves
   const viewedRef = useRef(false);
   useEffect(() => {
-    if (viewedRef.current) return;
-    if (rankingLoading || rankingError || !ranking) return;
+    if (viewedRef.current || rankingLoading || rankingError || !ranking) return;
     viewedRef.current = true;
     analyticsEvents.track('tour_players_viewed', {
       tour: activeTour,
       rows: ranking.rows.length,
-      live_count: liveCount,
+      live_count: players.filter((p) => p.playerId && (liveMap ?? {})[p.playerId]).length,
       synced: !!ranking.synced,
     });
-  }, [ranking, rankingLoading, rankingError, activeTour, liveCount]);
+  }, [ranking, rankingLoading, rankingError, activeTour, players, liveMap]);
 
   // -- Analytics: searched (debounced value only, never the query text)
   useEffect(() => {
-    const q = debouncedSearch.trim();
-    if (!q) return;
+    if (!query) return;
     analyticsEvents.track('tour_players_searched', {
-      query_length: q.length,
-      results: filteredRows.length,
+      query_length: query.length,
+      results: players.filter((p) => p.name.toLowerCase().includes(query)).length,
       tour: activeTour,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, activeTour]);
+  }, [query, activeTour]);
+
+  // -- Scroll to the first live row for old sort=live links, once rows land.
+  useEffect(() => {
+    if (!scrollLiveRef.current || view !== 'all' || !players.length || !liveMap) return;
+    const el = document.querySelector('[data-field-row][data-live]');
+    if (el) {
+      scrollLiveRef.current = false;
+      (el as HTMLElement).scrollIntoView({ block: 'start' });
+    }
+  }, [view, players.length, liveMap]);
 
   return (
-    <div
-      style={{
-        background: TOUR_CANVAS,
-        minHeight: '100vh',
-        fontFamily: FONT,
-      }}
-    >
-      {/* S4 — the search magnifier no longer owns a header row of its own; it
-          sits inline with the field/sort row below, matching LeaderboardTab's
-          treatment (icon in line with the page title, expand to input). */}
-      {/* THE FIELD and its scope controls share the overview's 24px gutter. */}
-      <div
-        style={{
-          padding: '12px 24px 4px',
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-        }}
-      >
-        <span
-          style={{
-            // AXIS 10: THE FIELD / RANKING header row - a column header, same
-            // call as the hero's TODAY/TOTAL/THRU.
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: INK,
-            textTransform: 'uppercase',
-          }}
-        >
-          {t('players.field.eyebrow')}
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-          {searchExpanded ? (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                height: 30,
-                background: SURFACE,
-                border: `1px solid ${searchFocused ? INK_MUTE : HAIRLINE_INK_10}`,
-                borderRadius: 14,
-                padding: '0 10px',
-                transition: 'background 140ms ease, border-color 140ms ease',
-                minWidth: 0,
-              }}
-            >
-              <Search size={13} color={INK_MUTE} />
-              <input
-                ref={searchInputRef}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                placeholder={t('players.search.placeholder')}
-                className="placeholder:text-[rgba(255,255,255,0.38)]"
-                style={{
-                  width: 132,
-                  border: 'none',
-                  outline: 'none',
-                  fontSize: 13,
-                  fontFamily: 'inherit',
-                  color: INK,
-                  background: 'transparent',
-                  minWidth: 0,
-                }}
-              />
-              <button
-                type="button"
-                aria-label={t('players.search.closeAria')}
-                onClick={() => {
-                  setSearch('');
-                  setSearchExpanded(false);
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 2,
-                  cursor: 'pointer',
-                  display: 'flex',
-                }}
-              >
-                <X size={14} color={INK_MUTE} />
-              </button>
-            </div>
-          ) : (
-            <>
-              {sortOptions.map((k) => {
-            const active = k === sort;
-            return (
-              <button
-                key={k}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setSort(k)}
-                style={{
-                  padding: '5px 10px',
-                  borderRadius: 10,
-                   border: active ? '0.5px solid transparent' : `0.5px solid ${HAIRLINE_INK_10}`,
-                   background: active ? WHITE_ALPHA_06 : 'transparent',
-                   color: active ? INK : INK_MUTE,
-                  fontFamily: 'inherit',
-                  // CAPS BUTTON: two points down from the 13 button base, 0.10em.
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                }}
-              >
-                {k === 'ranking' ? t('players.sort.ranking') : t('players.sort.playingNow')}
-              </button>
-            );
-              })}
-              <button
-                type="button"
-                aria-label={t('players.search.openAria')}
-                onClick={() => setSearchExpanded(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  padding: 2,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexShrink: 0,
-                }}
-              >
-                <Search size={15} color={INK} strokeWidth={2.5} />
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
+    <div data-players-page={view} style={{ background: TOUR_CANVAS, minHeight: '100vh', fontFamily: FONT, color: P.INK }}>
       {rankingLoading ? (
-        <div style={{ padding: '0 24px' }}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="w-full mb-1" style={{ height: 58, borderRadius: 6 }} />
-          ))}
-        </div>
+        <FrontSkeleton />
       ) : rankingError ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
           <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
@@ -380,107 +249,41 @@ export function PlayersTab() {
             {t('players.error.retry', { defaultValue: 'Retry' })}
           </button>
         </div>
-      ) : orderedRows.length === 0 && isSearching ? (
-        <div
-          style={{
-            padding: '40px 24px',
-            textAlign: 'center',
-            fontSize: 12,
-            fontWeight: 500,
-            color: INK_MUTE,
-            letterSpacing: '0.01em',
-            ...FIGS,
-          }}
-        >
-          {t('players.search.noneInField', { count: loadedCount })}
-        </div>
-      ) : orderedRows.length === 0 ? (
+      ) : players.length === 0 ? (
         <TourHubEmptyState variant="players" />
+      ) : view === 'all' ? (
+        <FullField
+          data={data}
+          actions={actions}
+          lens={lens}
+          stat={stat}
+          onLens={onLens}
+          onStat={onStat}
+          onBack={onBack}
+          search={search}
+          onSearch={setSearch}
+          searchOpen={searchOpen}
+          onSearchOpen={setSearchOpen}
+          searchRef={searchRef}
+          query={query}
+        />
       ) : (
-        <div style={{ background: TOUR_CANVAS }}>
-          <RankedPlayerHeader
-            rankLabel={t('players.header.rank')}
-            playerLabel={t('players.header.player')}
-            statLabel={synced ? t('players.header.points', { defaultValue: 'Pts' }) : null}
-          />
-          {orderedRows.map((r, index) => {
-            const live = (liveMap ?? {})[r.playerId];
-            const isLive = !!live;
-            const wr = (worldRanks ?? {})[r.playerId];
-            const careerSegments: React.ReactNode[] = [];
-            if (wr) {
-              careerSegments.push(
-                <span key="wr">
-                  {t('players.sub.worldRank', { rank: wr.rank })}{' '}
-                  <MovementFigure movement={wr.movement} nullPlaceholder="none" variant="inline" />
-                </span>,
-              );
-            }
-            if (synced && r.wins) careerSegments.push(<span key="w">{t('players.sub.wins', { count: r.wins })}</span>);
-            if (synced && r.top10s) careerSegments.push(<span key="t10">{t('players.sub.top10s', { count: r.top10s })}</span>);
-            const sub = careerSegments.length ? careerSegments.map((node, i) => (
-              <span key={i}>{i > 0 ? SEP : ''}{node}</span>
-            )) : null;
-            const posStr = live?.position != null ? `${live.positionTied ? 'T' : ''}${live.position}` : '';
-            const kicker = isLive && live ? (
-              <><span style={{ color: TREND_UP }}>{t('status.live')}</span>{live.tournamentName ? `${SEP}${live.tournamentName}` : ''}</>
-            ) : (
-              t('players.sub.fedexRank', {
-                defaultValue: '{{label}} {{rank}}',
-                label: (statLabel ?? t('players.header.points', { defaultValue: 'Pts' })).replace(/\s*PTS$/i, ''),
-                rank: r.rank,
-              })
-            );
-            const unit = isLive && live ? (
-              <>{posStr ? <span style={{ color: INK_FAINT }}>{posStr}</span> : null}{posStr && live.score != null ? SEP : ''}{live.score != null ? <span style={{ color: getScoreColor(live.score, 'dark') }}>{fmtScore(live.score)}</span> : null}</>
-            ) : t('players.header.points', { defaultValue: 'Pts' });
-
-            return (
-              <RankedPlayerRow
-                key={`${r.playerId || 'none'}-${r.rank}-${r.name}`}
-                rank={r.rank}
-                player={{
-                  playerId: r.playerId,
-                  name: r.name,
-                  country: r.country,
-                  countryCode: r.countryCode,
-                  photoUrl: r.photoUrl,
-                  tourCode: r.tourCode,
-                }}
-                stat={synced ? r.stat : undefined}
-                kicker={kicker}
-                sub={sub}
-                unit={unit}
-                last={index === orderedRows.length - 1}
-                interactive={!!r.playerId}
-                onClick={() => goPlayer(r)}
-              />
-            );
-          })}
-        </div>
+        <FrontPage data={data} actions={actions} />
       )}
-
-      {/* Sample-size caption - shown only when there IS a ranking, so the
-          page can never print "Top 0 by season ranking" over an empty state. */}
-      {loadedCount > 0 && (
-      <div
-        style={{
-          padding: '16px 16px 0',
-          fontSize: 11,
-          fontWeight: 500,
-          color: INK_MUTE,
-          letterSpacing: '0.04em',
-          textAlign: 'center',
-          ...FIGS,
-        }}
-      >
-        {t('players.footer.sample', { count: loadedCount })}
-      </div>
-      )}
-
       <div style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }} />
     </div>
   );
 }
 
+function useTourPlayerFollowsSet(): { followed: Set<string> } {
+  const follows = useTourPlayerFollows();
+  const ids = (follows as unknown as { followed?: Iterable<string>; ids?: string[]; data?: string[] });
+  return useMemo(() => {
+    const list = ids.data ?? ids.ids ?? (ids.followed ? [...ids.followed] : []);
+    return { followed: new Set(list) };
+  }, [ids.data, ids.ids, ids.followed]);
+}
+
 export default PlayersTab;
+
+export type { ViewAllFrom };
