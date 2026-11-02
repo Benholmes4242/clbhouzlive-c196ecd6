@@ -24,12 +24,14 @@ import {
   WATCH_CHIPS,
   allOnly,
   clipParams,
-  isCommunityOnly,
+  mapWatchFilter,
   showsLongForm,
   showsQuickHits,
   videoParams,
   type WatchFilter,
 } from './watchFilters';
+import { CreatorsRow } from './CreatorsRow';
+import { WatchLead } from './WatchLead';
 import {
   AutoplayLayer,
   PosterFallback,
@@ -202,8 +204,10 @@ export function WatchFeed({
 }: {
   userId: string | undefined;
   onDepart: () => void;
-  /** Entry selection, e.g. Explore's community see-all opens on 'community'. */
-  initialFilter?: WatchFilter;
+  /** Entry selection. WS1 — a legacy value ('community', or anything unknown)
+   *  maps through mapWatchFilter: all → For you, quick → Shorts, community →
+   *  For you. */
+  initialFilter?: string;
   /** Opens ExploreMagazine's one mounted CommentsSheetV2 — never a second sheet here. */
   onOpenComments?: (postId: string) => void;
   /** RS — the rounds shelf's cards open the scorecard sheet Explore hosts. */
