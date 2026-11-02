@@ -85,7 +85,7 @@ describe('Tour scorecard doors at the right edge', () => {
     expect(row.lastElementChild).toBe(doors);
     const nameSpan = row.querySelector('span[title]') as HTMLElement;
     expect(nameSpan.style.flex).toBe('1 1 auto');
-    expect(nameSpan.style.minWidth).toBe('0px');
+    expect(nameSpan.style.minWidth).toBe('0'); // jsdom keeps the written '0'
     expect(nameSpan.style.textOverflow).toBe('ellipsis');
   });
 
@@ -99,7 +99,8 @@ describe('Tour scorecard doors at the right edge', () => {
     expect(nameSpan.style.overflow).toBe('hidden');
     expect(nameSpan.style.whiteSpace).toBe('nowrap');
     expect(nameSpan.style.textOverflow).toBe('ellipsis');
-    expect(doors.style.flex).toBe('none');
+    // jsdom expands the written `flex: 'none'` to its longhand form.
+    expect(['none', '0 0 auto']).toContain(doors.style.flex);
     expect(doors.style.marginLeft).toBe('10px');
   });
 });
