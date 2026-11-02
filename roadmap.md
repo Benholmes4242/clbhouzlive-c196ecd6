@@ -3,7 +3,7 @@
 ## WS1 — Explore Watch section 1 — DONE
 - [x] Chips For you · Shorts · Long form via mapWatchFilter (community → For you); signed-in Creators row + lead from existing RPCs; community rail kept.
 - [x] WS1.1 community See all → /media?kind=community (+1 test). Focused 67/67; shards 1,433+1,418+1,449+1,487; current 5,788/536 (+49/+2 vs 5,739/534: Active Ring +15/+1, WS1 +34/+1). Report WS1_WATCH_TOP_REPORT.md.
-- [ ] Ruling needed from Ben: keep or remove the six new watch_* analytics events (see report).
+- [x] Ben's ruling: keep all six watch_* analytics events and their three tests (requested in the WS1 brief). Closed.
 
 ## Tour scorecard tile — course door and right edge — DONE
 - [x] ScorecardSheet passes a course door handler when the tournament is linked (`/courses/{golf_course_id}`, closes first), undefined otherwise; Profile alone stays at the right edge. scorecardParts tour row already carried the member-row flex values (no edit needed); asserted by tests. src/test/tourScorecardCourseDoor.test.tsx (2 new) + tourScorecardProfileDoor.test.tsx 5→7; no existing assertion changed. Full shards 1,409+1,378(5 pre-existing T100 failures)+1,438+1,477 = 5,697/5,702 across 532 (+33/+2 vs 5,669/530; +4/+1 this follow-up, +29/+1 T100). Five failures are the named T100 GB&I slab cases. Report TOUR_SCORECARD_COURSE_DOOR_REPORT.md; build OK.
