@@ -24694,6 +24694,15 @@ export type Database = {
           username: string
         }[]
       }
+      get_suggestion_covers: {
+        Args: { p_business_ids: string[]; p_user_ids: string[] }
+        Returns: {
+          cover_url: string
+          id: string
+          kind: string
+          source: string
+        }[]
+      }
       get_system_state_history: { Args: { p_days?: number }; Returns: Json }
       get_thread: {
         Args: { p_before?: string; p_conversation_id: string; p_limit?: number }

@@ -1,5 +1,11 @@
 # Roadmap
 
+## EXPLORE_TOP_1
+- [x] Replace only the top controls and Creators row; share deep-link post loading/mapping without changing behaviour.
+- [x] Rewrite the authorised WS1 Creators block and open search first in the separately authorised placeholder case.
+- [x] Four full shards pass 5,936/545 (+4 cases in ws1WatchTop only), zero failures/unhandled errors; automatic build OK; EXPLORE_TOP_1_REPORT.md quotes before/after cases.
+- [ ] Member row/viewer/composer readback and screenshot parity blocked by external_unmanaged authentication; public search controls verified.
+
 ## CR2.1 — Creator loading guard
 - [x] Share the non-anonymous, resolved-profile condition between the creator read and pending state in ProfilePageV2 only.
 - [x] Add three whole-page regressions with real QueryClientProvider and MemoryRouter; existing case names/assertions unchanged; focused 11/11.

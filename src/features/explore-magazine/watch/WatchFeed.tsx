@@ -8,6 +8,7 @@ import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { momentViewerPosts } from '../momentViewerPosts';
 import { RailChips } from '@/components/ui/RailChips';
+import { ExploreTopControls } from './ExploreTopControls';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -453,42 +454,11 @@ export function WatchFeed({
 
   return (
     <div style={{ fontFamily: SANS }}>
-      {/* K.9: the search field is unchanged. */}
-      <div style={{ paddingInline: 16, paddingBottom: 12 }}>
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
+      <ExploreTopControls
+          query={query}
+          onQuery={setQuery}
+          sticky={quickGrid}
           placeholder={t('amateur.watch.searchPlaceholder', 'Search videos and creators')}
-          aria-label={t('amateur.watch.searchPlaceholder', 'Search videos and creators')}
-          style={{
-            width: '100%',
-            boxSizing: 'border-box',
-            padding: '10px 12px',
-            borderRadius: 11,
-            border: `1px solid ${A.BORDER}`,
-            background: 'rgba(255,255,255,0.06)',
-            color: A.INK,
-            fontFamily: SANS,
-            fontSize: 13,
-            fontWeight: 500,
-            outline: 'none',
-          }}
-        />
-      </div>
-
-      <div
-        style={
-          quickGrid
-            ? /* BC.1 — sticky, opaque chips in the full view only. The upward
-                 box-shadow bridges the gap to the tab bar with the same canvas,
-                 so the band never reads as divider lines above and below the
-                 pills when content scrolls behind it. */
-              { position: 'sticky', top: 'var(--chrome-total-h, 0px)', zIndex: 3, background: PAGE_CANVAS, boxShadow: `0 -16px 0 0 ${PAGE_CANVAS}`, paddingInline: 16, paddingBlock: '8px 6px' }
-            : { paddingInline: 16, paddingBottom: 4 }
-        }
-      >
-        <RailChips
           options={chips}
           value={filter}
           onChange={(next) => {
@@ -497,15 +467,13 @@ export function WatchFeed({
             setFilter(to);
           }}
           ariaLabel={t('amateur.watch.filters', 'Watch filters')}
-          ground="filled-selection"
-        />
-      </div>
+      />
 
       {/* WS1 — THE CREATORS ROW AND THE LEAD: For you only, between the chips
           and Continue watching. Both hide themselves for guests. */}
       {onAll ? (
         <>
-          <CreatorsRow userId={userId} />
+          <CreatorsRow userId={userId} onDepart={onDepart} />
           <WatchLead userId={userId} onDepart={onDepart} />
         </>
       ) : null}
