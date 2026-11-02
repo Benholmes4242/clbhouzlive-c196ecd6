@@ -355,7 +355,9 @@
       "rail": {
         "clips": "クリップ",
         "community": "コミュニティから",
-        "videos": "動画"
+        "videos": "動画",
+        "shorts": "ショート",
+        "shortsSub": "3分未満"
       },
       "searchPlaceholder": "動画とクリエイターを検索",
       "untitled": "無題の動画",
@@ -369,7 +371,22 @@
         "likes": "いいね {{count}} 件",
         "mute": "ミュート",
         "unmute": "ミュート解除"
-      }
+      },
+      "courseShelf": {
+        "title": "あなたのコースで撮影",
+        "sub": "プレーまたは評価したコース"
+      },
+      "regions": {
+        "title": "地域別",
+        "sub": "動画が撮影された場所",
+        "yourPatch": "ホームエリア"
+      },
+      "grid": {
+        "yourCourses": "あなたのコース",
+        "all": "すべて",
+        "empty": "まだ動画はありません。"
+      },
+      "seeAll": "すべて見る"
     },
     "roundsShelf": {
       "title": "今週のラウンド",

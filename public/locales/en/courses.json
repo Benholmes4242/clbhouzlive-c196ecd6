@@ -541,7 +541,9 @@
       "rail": {
         "clips": "Clips",
         "community": "From the community",
-        "videos": "Videos"
+        "videos": "Videos",
+        "shorts": "Shorts",
+        "shortsSub": "Under three minutes"
       },
       "searchPlaceholder": "Search videos and creators",
       "untitled": "Untitled video",
@@ -555,7 +557,22 @@
         "likes": "{{count}} likes",
         "mute": "Mute",
         "unmute": "Unmute"
-      }
+      },
+      "courseShelf": {
+        "title": "Filmed at your courses",
+        "sub": "Courses you've played or rated"
+      },
+      "regions": {
+        "title": "By region",
+        "sub": "Where the videos were filmed",
+        "yourPatch": "Your patch"
+      },
+      "grid": {
+        "yourCourses": "Your courses",
+        "all": "All",
+        "empty": "No videos here yet."
+      },
+      "seeAll": "See all"
     },
     "roundsShelf": {
       "title": "Rounds this week",

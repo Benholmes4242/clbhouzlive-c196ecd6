@@ -355,7 +355,9 @@
       "rail": {
         "clips": "Clips",
         "community": "De la comunidad",
-        "videos": "Videos"
+        "videos": "Videos",
+        "shorts": "Shorts",
+        "shortsSub": "Menos de tres minutos"
       },
       "searchPlaceholder": "Buscar vídeos y creadores",
       "untitled": "Video sin titulo",
@@ -369,7 +371,22 @@
         "likes": "{{count}} me gusta",
         "mute": "Silenciar",
         "unmute": "Activar sonido"
-      }
+      },
+      "courseShelf": {
+        "title": "Grabado en tus campos",
+        "sub": "Campos que has jugado o valorado"
+      },
+      "regions": {
+        "title": "Por región",
+        "sub": "Dónde se grabaron los vídeos",
+        "yourPatch": "Tu zona"
+      },
+      "grid": {
+        "yourCourses": "Tus campos",
+        "all": "Todos",
+        "empty": "Aún no hay vídeos aquí."
+      },
+      "seeAll": "Ver todo"
     },
     "roundsShelf": {
       "title": "Rondas de esta semana",

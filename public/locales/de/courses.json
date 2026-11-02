@@ -355,7 +355,9 @@
       "rail": {
         "clips": "Clips",
         "community": "Aus der Community",
-        "videos": "Videos"
+        "videos": "Videos",
+        "shorts": "Shorts",
+        "shortsSub": "Unter drei Minuten"
       },
       "searchPlaceholder": "Videos und Creator suchen",
       "untitled": "Video ohne Titel",
@@ -369,7 +371,22 @@
         "likes": "{{count}} Likes",
         "mute": "Stumm",
         "unmute": "Ton an"
-      }
+      },
+      "courseShelf": {
+        "title": "Auf deinen Plätzen gefilmt",
+        "sub": "Plätze, die du gespielt oder bewertet hast"
+      },
+      "regions": {
+        "title": "Nach Region",
+        "sub": "Wo die Videos gefilmt wurden",
+        "yourPatch": "Dein Revier"
+      },
+      "grid": {
+        "yourCourses": "Deine Plätze",
+        "all": "Alle",
+        "empty": "Hier gibt es noch keine Videos."
+      },
+      "seeAll": "Alle ansehen"
     },
     "roundsShelf": {
       "title": "Runden diese Woche",

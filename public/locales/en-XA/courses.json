@@ -506,7 +506,9 @@
       "rail": {
         "clips": "[~~Ĉļíƥš~~]",
         "community": "[~~Ƒřőɱ ţĥé ĉőɱɱúñíţý~~]",
-        "videos": "[~~Ṽíđéőš~~]"
+        "videos": "[~~Ṽíđéőš~~]",
+        "shorts": "Shorts",
+        "shortsSub": "Under three minutes"
       },
       "searchPlaceholder": "[~~Šéářĉĥ ṽíđéőš áñđ ĉřéáţőřš~~]",
       "untitled": "[~~Úñţíţļéđ ṽíđéő~~]",
@@ -520,7 +522,22 @@
         "likes": "[~~{{count}} ļíķéš~~]",
         "mute": "[~~Ṁúţé~~]",
         "unmute": "[~~Úñɱúţé~~]"
-      }
+      },
+      "courseShelf": {
+        "title": "Filmed at your courses",
+        "sub": "Courses you've played or rated"
+      },
+      "regions": {
+        "title": "By region",
+        "sub": "Where the videos were filmed",
+        "yourPatch": "Your patch"
+      },
+      "grid": {
+        "yourCourses": "Your courses",
+        "all": "All",
+        "empty": "No videos here yet."
+      },
+      "seeAll": "See all"
     },
     "roundsShelf": {
       "title": "[~~Řóúñđš ţĥíš ŵééķ~~]",

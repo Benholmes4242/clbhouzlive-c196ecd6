@@ -355,7 +355,9 @@
       "rail": {
         "clips": "클립",
         "community": "커뮤니티",
-        "videos": "영상"
+        "videos": "영상",
+        "shorts": "쇼츠",
+        "shortsSub": "3분 미만"
       },
       "searchPlaceholder": "동영상 및 크리에이터 검색",
       "untitled": "제목 없는 영상",
@@ -369,7 +371,22 @@
         "likes": "좋아요 {{count}}개",
         "mute": "음소거",
         "unmute": "음소거 해제"
-      }
+      },
+      "courseShelf": {
+        "title": "내 코스에서 촬영",
+        "sub": "플레이했거나 평가한 코스"
+      },
+      "regions": {
+        "title": "지역별",
+        "sub": "영상이 촬영된 곳",
+        "yourPatch": "내 구역"
+      },
+      "grid": {
+        "yourCourses": "내 코스",
+        "all": "전체",
+        "empty": "아직 영상이 없어요."
+      },
+      "seeAll": "모두 보기"
     },
     "roundsShelf": {
       "title": "이번 주 라운드",
