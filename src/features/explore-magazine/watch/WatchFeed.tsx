@@ -482,44 +482,26 @@ export function WatchFeed({
         <RailChips
           options={chips}
           value={filter}
-          onChange={(next) => setFilter(next as WatchFilter)}
+          onChange={(next) => {
+            const to = next as WatchFilter;
+            if (to !== filter) analyticsEvents.track('watch_chip_changed', { from: filter, to });
+            setFilter(to);
+          }}
           ariaLabel={t('amateur.watch.filters', 'Watch filters')}
           ground="filled-selection"
         />
       </div>
 
-      {community ? (
-        moments.isError ? (
-          <ShelfRetry
-            heading={t('amateur.watch.rail.community', 'From the community')}
-            label={t('amateur.stream.failed', 'This did not load.')}
-            action={t('amateur.stream.retry', 'Try again')}
-            onRetry={() => void moments.refetch()}
-          />
-        ) : !moments.isFetched ? (
-          <ShelfShell tileW={320} tileH={240} />
-        ) : (moments.data ?? []).length === 0 ? (
-          <p style={{ margin: 0, padding: '8px 16px 0', fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-            {t('amateur.watch.empty', 'Nothing to watch here yet.')}
-          </p>
-        ) : (
-          <>
-            {/* BG.3 — the full view keeps its heading, matching Quick hits. No kicker. The moments
-                read is a plain query, not an infinite one: what is loaded IS everything, so the
-                count has one form only and no "Showing" state. */}
-            <h2 style={{ margin: 0, padding: '16px 16px 2px', fontSize: 17, fontWeight: 750, letterSpacing: '-0.01em', color: A.INK }}>
-              {t('amateur.watch.rail.community', 'From the community')}
-            </h2>
-            <div data-watch-count style={{ padding: '2px 16px 12px', fontSize: 11.5, color: COUNT_INK, fontVariantNumeric: 'tabular-nums' }}>
-              {t('amateur.watch.communityMoments', '{{count}} moments', { count: (moments.data ?? []).length })}
-            </div>
-            <div style={{ paddingInline: 16 }}>
-              <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={(m) => openMoment(m, moments.data ?? [])} />
-            </div>
-          </>
-        )
-      ) : (
+      {/* WS1 — THE CREATORS ROW AND THE LEAD: For you only, between the chips
+          and Continue watching. Both hide themselves for guests. */}
+      {onAll ? (
         <>
+          <CreatorsRow userId={userId} />
+          <WatchLead userId={userId} onDepart={onDepart} />
+        </>
+      ) : null}
+
+      <>
           {/* K.2 — CONTINUE WATCHING: All only, only when something is part-watched. */}
           {continueRows.length > 0 ? (
             <>
