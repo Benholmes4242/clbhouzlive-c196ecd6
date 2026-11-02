@@ -1,5 +1,10 @@
 # Roadmap
 
+## CR2.1 — Creator loading guard
+- [x] Share the non-anonymous, resolved-profile condition between the creator read and pending state in ProfilePageV2 only.
+- [ ] Add three whole-page regressions with real QueryClientProvider and MemoryRouter; existing tests unchanged.
+- [ ] Run all four full shards against 5,928 tests / 545 files, check automatic build, and update CR2_REPORT.md.
+
 ## CR1.1 — Authorised stop clearance
 - [x] Apply only optional UserProfile typing, two required form-fixture defaults, target-compatible own-property assertion and three scoped Name-switch queries.
 - [x] Focused154/154; all four full shards5,928/5,928 across545 files,0 failures/unhandled errors; automatic typecheck/build OK. No test-count delta.
