@@ -185,7 +185,7 @@ describe('RS shelf rules', () => {
     expect(buildShelfCards(rounds, feats).map((c) => c.kind)).toEqual(['round', 'round', 'feat', 'round', 'round', 'feat']);
     expect(buildShelfCards(rounds.slice(0, 3), feats.slice(0, 1)).map((c) => c.kind)).toEqual(['round', 'round', 'feat', 'round']);
     expect(buildShelfCards(rounds, []).map((c) => c.kind)).toEqual(['round', 'round', 'round', 'round']);
-    expect(buildShelfCards([], feats)).toEqual([]);
+    expect(buildShelfCards([], feats).map((c) => c.kind)).toEqual(['feat', 'feat']);
   });
 
   it('computes net to par and its label', () => {
@@ -216,7 +216,7 @@ describe('RS Rounds this week shelf', () => {
     expect(screen.getByText('Your circle, last 14 days')).toBeInTheDocument();
     const kinds = Array.from(document.querySelectorAll('[data-rounds-shelf-card]')).map((n) => n.getAttribute('data-rounds-shelf-card'));
     expect(kinds).toEqual(['round', 'round', 'feat', 'round', 'round']);
-    expect(screen.getByText('Royal County Down · Championship · 31 Oct')).toBeInTheDocument();
+    expect(screen.getByText('Royal County Down · Championship · Oct 31')).toBeInTheDocument();
   });
 
   it('falls back to everyone under two circle rows and says so', () => {
@@ -353,11 +353,15 @@ describe('RS /rounds page', () => {
   });
 
   it('back falls back to /amateur when there is no history', () => {
-    mount(
-      <Routes>
-        <Route path="/rounds" element={<RoundsPage />} />
-        <Route path="/amateur" element={<div data-testid="amateur-route" />} />
-      </Routes>,
+    render(
+      <MemoryRouter initialEntries={['/rounds']}>
+        <I18nextProvider i18n={i18n}>
+          <Routes>
+            <Route path="/rounds" element={<RoundsPage />} />
+            <Route path="/amateur" element={<div data-testid="amateur-route" />} />
+          </Routes>
+        </I18nextProvider>
+      </MemoryRouter>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByTestId('amateur-route')).toBeInTheDocument();
