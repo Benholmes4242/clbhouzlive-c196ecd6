@@ -22640,6 +22640,21 @@ export type Database = {
           why_ai: string
         }[]
       }
+      get_explore_people_row: {
+        Args: { p_limit?: number }
+        Returns: {
+          actor_id: string
+          avatar_url: string
+          display_name: string
+          handle: string
+          has_new: boolean
+          is_creator: boolean
+          is_verified: boolean
+          latest_at: string
+          new_post_ids: string[]
+          tier: string
+        }[]
+      }
       get_explore_recommendations: {
         Args: { p_limit?: number; p_mood: string; p_user_id: string }
         Returns: {
