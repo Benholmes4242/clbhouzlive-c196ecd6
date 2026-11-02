@@ -151,6 +151,16 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
     ? `${target.positionTied ? 'T' : ''}${target.position}`
     : null;
 
+  // FOLLOW-UP — the tour tile's course door: only a tournament linked to a
+  // course opens it; an unlinked event keeps Profile alone at the right edge.
+  const golfCourseId = meta.data?.golf_course_id ?? null;
+  const onViewCourse = golfCourseId
+    ? () => {
+        onClose();
+        navigate(`/courses/${golfCourseId}`);
+      }
+    : undefined;
+
   return (
     <CardScorecardSheet
       open={open && overlayGate.visible}
@@ -185,7 +195,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
         onClose();
         navigate(`/tourhub/player/${target.playerId}`);
       }}
-      onViewCourse={undefined}
+      onViewCourse={onViewCourse}
     />
   );
 }
