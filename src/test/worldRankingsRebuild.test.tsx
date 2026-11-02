@@ -234,14 +234,24 @@ describe('WorldRankings rebuilt section', () => {
     expect(sentence?.querySelectorAll('strong')[2]?.textContent).toBe(String(count));
   });
 
-  it('draws the headshot with the flag on its corner', () => {
+  it('draws the headshot with the flag on its corner, uncropped and without a border', () => {
     setup();
     const flag = document.querySelector('[data-rank-row] [data-flag]') as HTMLElement;
     expect(flag).not.toBeNull();
     expect(flag.style.width).toBe('16px');
-    expect(flag.style.height).toBe('11px');
+    expect(flag.style.height).toBe('12px');
     expect(flag.style.right).toBe('-4px');
     expect(flag.style.bottom).toBe('-3px');
+    // No border, ring or shadow; overflow hidden only rounds the corners.
+    expect(flag.style.border).toBe('');
+    expect(flag.style.boxShadow).toBe('');
+    expect(flag.style.overflow).toBe('hidden');
+    // The flag itself is the wrapper's own 16×12 (CountryFlag sm = w-4 h-3),
+    // so nothing is cropped; its own chip border is removed for this use.
+    const inner = flag.firstElementChild as HTMLElement;
+    expect(inner.className).toContain('w-4');
+    expect(inner.className).toContain('h-3');
+    expect(inner.className).toContain('border-none');
   });
 
   it('scales the points bar against No. 1, whose fill is ink', () => {
