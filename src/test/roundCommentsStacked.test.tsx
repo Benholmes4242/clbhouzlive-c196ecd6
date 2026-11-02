@@ -51,6 +51,7 @@ vi.mock('@/features/courses/_shared/scorecard/CardScorecardSheet', async () => {
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { Z } from '@/config/zIndex';
+import { ScorecardGlassOverlay } from '@/features/courses/_shared/scorecard/ScorecardGlassOverlay';
 
 const i18n = createInstance();
 void i18n.init({ lng: 'en', initAsync: false, resources: { en: { common } } });
@@ -139,6 +140,45 @@ describe('round comments close above the scorecard', () => {
 });
 
 describe('comments layer opt-in', () => {
+  it('only stacked comments are accessible and the scorecard is restored on close', async () => {
+    host(false);
+    expect(screen.getByRole('dialog')).toBe(card());
+    fireEvent.click(screen.getByRole('button', { name: 'Open comments' }));
+    await ready();
+    await waitFor(() => expect(card()).toHaveAttribute('aria-hidden', 'true'));
+    const sheet = el('[data-comments-sheet="stacked"]');
+    expect(sheet).not.toHaveAttribute('aria-hidden', 'true');
+    expect(sheet.closest('[aria-hidden="true"]')).toBeNull();
+    expect(screen.getAllByRole('dialog')).toEqual([sheet]);
+    expect(backdrop()).toHaveAttribute('data-stacked-over-sheet', 'true');
+    expect(sheet).toHaveAttribute('data-stacked-over-sheet', 'true');
+    fireEvent.click(backdrop());
+    await waitFor(() => expect(card()).not.toHaveAttribute('aria-hidden', 'true'));
+    expect(screen.getByRole('dialog')).toBe(card());
+    expect(screen.getByRole('button', { name: 'Open comments' })).toBeInTheDocument();
+  });
+  it('comments mounted before the late scorecard retain accessibility and restore it on close', async () => {
+    function Arrival({ cardReady }: { cardReady: boolean }) {
+      const [commentsOpen, setCommentsOpen] = useState(true);
+      return <>
+        <ScorecardGlassOverlay open contentReady={cardReady} onClose={vi.fn()}><button>Scorecard content</button></ScorecardGlassOverlay>
+        <CommentsSheetV2 isOpen={commentsOpen} layer="stacked" targetType="round" targetId="score" onClose={() => setCommentsOpen(false)} />
+      </>;
+    }
+    const view = mount(<Arrival cardReady={false} />);
+    expect(document.querySelector('[data-scorecard-glass-card]')).toBeNull();
+    expect(screen.getByRole('dialog')).toBe(el('[data-comments-sheet]'));
+    view.rerender(<MemoryRouter><QueryClientProvider client={new QueryClient()}><I18nextProvider i18n={i18n}><Arrival cardReady /></I18nextProvider></QueryClientProvider></MemoryRouter>);
+    await waitFor(() => expect(card()).toHaveAttribute('aria-hidden', 'true'));
+    const sheet = el('[data-comments-sheet]');
+    expect(sheet.closest('[aria-hidden="true"]')).toBeNull();
+    expect(screen.getAllByRole('dialog')).toEqual([sheet]);
+    expect(screen.getByRole('textbox', { name: 'Draft' })).toBeInTheDocument();
+    fireEvent.click(backdrop());
+    await waitFor(() => expect(card()).not.toHaveAttribute('aria-hidden', 'true'));
+    expect(screen.getByRole('dialog')).toBe(card());
+    expect(screen.getByRole('button', { name: 'Scorecard content' })).toBeInTheDocument();
+  });
   it.each([['base', 12002, 12003], ['stacked', 12004, 12005]] as const)('%s uses the specified backdrop and sheet layers', (layer, dim, sheet) => {
     mount(<CommentsSheetV2 isOpen layer={layer} targetType="round" targetId="score" onClose={vi.fn()} />);
     expect(backdrop().style.zIndex).toBe(String(dim)); expect(el('[data-comments-sheet]').style.zIndex).toBe(String(sheet));

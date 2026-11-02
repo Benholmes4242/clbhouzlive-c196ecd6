@@ -1,8 +1,9 @@
 # Roadmap
 
-## Round comments over scorecard — STOP
+## Round comments over scorecard — approved aria ownership fix
 - [x] Guarded dismissal, stacked layers and disabled horizontal drag implemented; Ben approved comments-owned guard/history. Other nested callers audited unchanged in ROUND_COMMENTS_SCORECARD_STOP_REPORT.md.
-- [ ] New test fixture omits editComment/deleteComment. Focused42 passed/14 failed/56; CommentsSheetV2.tsx:563:41 `TypeError: Cannot read properties of undefined (reading 'isPending')`. No fix/rerun/full shards; await fixture authorization. Existing37/37 unchanged; candidate5,662/529 versus baseline5,643/528 (+19/+1 new roundCommentsStacked). Preview build OK; signed-in verification external_unmanaged.
+- [x] Authorized idle mutation mock completion cleared the render crashes; four typed-draft tests then exposed hidden comments. Assertions unchanged.
+- [ ] Apply approved stacked-only aria ownership in CommentsSheetV2/ScorecardGlassOverlay, verify late card mount and restoration, rerun unchanged19 plus new regressions and all shards; report totals. Signed-in verification external_unmanaged.
 
 ## MS1 — Messages head to head, inbox lines, two fixes — DONE
 - [x] headToHead helper + record on SharedGround; thread header 17px + "· last {d MMM}"; HeadToHeadCard (tappable → compare route); SharedGroundStrip restyle (short name, ink/dim scores, outcome line, no amber); inbox record line with count-only fallback; rail date under name (pill removed); incoming avatar 28px slot + 16px padding; image-unavailable investigated (HEIC/.bin vs missing object — Ben's SQL to pin down). 28 new tests; full suite 5,541/5,541 across 522→523 files. Report: MS1_MESSAGES_REPORT.md.
