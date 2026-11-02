@@ -236,17 +236,27 @@ export default function FindPeoplePage() {
             {t('findPeople.empty', { defaultValue: 'No suggestions yet. Search above, or invite friends.' })}
           </div>
         ) : (
-          groups.map((g) => (
-            <GroupSection
-              key={g.id}
-              group={g}
-              tab={tab}
-              copy={copy}
-              categoryOf={categoryOf}
-              followed={followed}
-              markFollowed={markFollowed}
-            />
-          ))
+          <>
+            {groups.map((g) => (
+              <GroupSection
+                key={g.id}
+                group={g}
+                tab={tab}
+                copy={copy}
+                categoryOf={categoryOf}
+                followed={followed}
+                markFollowed={markFollowed}
+                onTab={onTab}
+              />
+            ))}
+            {/* FIX §6 — a thin Businesses tab says more are coming, never an
+                empty page. */}
+            {tab === 'businesses' && groups.reduce((n, g) => n + g.businesses.length, 0) < 3 ? (
+              <div style={{ padding: '18px 16px 0', fontSize: 13, color: 'rgba(248,250,252,0.62)' }}>
+                {t('findPeople.bizJoining', { defaultValue: 'More clubs and businesses are joining clbhouz.' })}
+              </div>
+            ) : null}
+          </>
         )}
       </div>
 
