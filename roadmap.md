@@ -1,5 +1,10 @@
 # Roadmap
 
+## T100 — Top 100 race moves to Courses
+- [ ] Share existing career race hook/helpers; build signed-off active-list race and neutral folded Your courses.
+- [ ] Remove only Rounds §7 and its unused dependencies/locales; preserve other sections and guest behavior.
+- [ ] Add/relocate authorized tests, run focused/full shards, report counting provenance and reconciled totals against5,669/530.
+
 ## Round comments over scorecard — DONE
 - [x] Guarded dismissal, stacked layers and disabled horizontal drag implemented; Ben approved comments-owned guard/history. Other nested callers audited unchanged in ROUND_COMMENTS_SCORECARD_STOP_REPORT.md.
 - [x] Authorized idle mutation mock completion cleared the render crashes; four typed-draft tests then exposed hidden comments. Assertions unchanged.
