@@ -48,6 +48,7 @@ import { useWatchProgress } from './useWatchSignals';
 import { RoundsThisWeekShelf } from './RoundsThisWeekShelf';
 import { CourseVideosShelf, ShelfHeading } from './CourseVideosShelf';
 import { RegionsShelf } from './RegionsShelf';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 import { CreatorSpotlight } from './CreatorSpotlight';
 import { Top100FilmShelf } from './Top100FilmShelf';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
@@ -624,7 +625,18 @@ export function WatchFeed({
           {longRows.length > 0 ? (
             <>
               {/* WS3 §4 — today's Watch column, renamed Long form, in Shorts' heading pattern. */}
-              <ShelfHeading title={t('amateur.watch.rail.longForm', 'Long form')} sub={t('amateur.watch.rail.longFormSub', 'Three minutes and over')} />
+              {/* WS3.1 — See all (mock wins): selects the Long form chip in place and scrolls
+                  to the top of the feed; none once the chip is active, like Shorts. */}
+              <ShelfHeading
+                title={t('amateur.watch.rail.longForm', 'Long form')}
+                sub={t('amateur.watch.rail.longFormSub', 'Three minutes and over')}
+                seeAll={filter === 'long' ? undefined : t('amateur.watch.seeAll', 'See all')}
+                onSeeAll={filter === 'long' ? undefined : () => {
+                  analyticsEvents.track('amateur_shelf_see_all', { kind: 'videos', surface: 'watch' });
+                  setFilter('long');
+                  scrollPageToTop();
+                }}
+              />
               {longRows.map((row, index) => {
                 const p = saved?.get(row.post_id);
                 const part = isPartWatched(row, p);

@@ -1492,4 +1492,4 @@
 - [x] Players Build 3 (You and the tour): approved stand-ins added; full suite 5,866/5,866 across 540 files.
 
 - [x] WS2 Watch section 2: done (WS2.1 approved stand-in added; 5,884/5,884 across 541 files). Report WS2_WATCH_MIDDLE_REPORT.md.
-- [ ] WS3 Watch section 3: built; STOPPED — 2 rsRoundsShelf tests fail "No QueryClient set" (new spotlight/Top 100 reads). Awaiting approval for a useWatchBottom stand-in in that file. Open: Long form See all (mock shows one, brief says unchanged = none).
+- [ ] WS3 Watch section 3: WS3.1 rulings applied (stand-in, ws2 title, Long form See all + test); STOPPED — rsRoundsShelf 2 tests still fail "No QueryClient set": useToggleFollow inside CreatorSpotlight. Awaiting ruling.

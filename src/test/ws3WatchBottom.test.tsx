@@ -340,6 +340,17 @@ describe('WS3 Long form', () => {
     expect(screen.getByText('Three minutes and over')).toBeTruthy();
   });
 
+  it("Long form's See all selects the Long form chip", () => {
+    f.videos.data = { pages: [[longHub('l1')]] };
+    wrap(<WatchFeed userId="me" onDepart={() => {}} />);
+    const chip = () => Array.from(document.querySelectorAll('button')).find((b) => b.textContent === 'Long form')!;
+    expect(chip().getAttribute('aria-pressed') ?? chip().getAttribute('aria-selected')).not.toBe('true');
+    const heading = headingByText('Long form')!.closest('div')!.parentElement!;
+    fireEvent.click(Array.from(heading.querySelectorAll('button')).find((b) => b.textContent === 'See all')!);
+    expect(chip().getAttribute('aria-pressed') ?? chip().getAttribute('aria-selected')).toBe('true');
+    expect(headingByText('Long form')!.closest('div')!.parentElement!.querySelector('button')).toBeNull();
+  });
+
   it('course chip only when the row carries review_course_name, and it routes', () => {
     f.videos.data = { pages: [[longHub('l1', { review_course_id: 'rsg', review_course_name: "Royal St George's Golf Club" }), longHub('l2')]] };
     wrap(<WatchFeed userId="me" onDepart={() => {}} />);

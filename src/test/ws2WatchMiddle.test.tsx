@@ -106,7 +106,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('WS2 order on For you', () => {
-  it('lead → Shorts → Rounds this week → Filmed at your courses → By region → Watch', () => {
+  it('lead → Shorts → Rounds this week → Filmed at your courses → By region → Long form', () => {
     const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const lead = container.querySelector('[data-stub="lead"]')!;
     const shorts = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.tagName === 'B')!;
