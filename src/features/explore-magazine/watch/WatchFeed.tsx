@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
@@ -365,10 +366,12 @@ export function WatchFeed({
     if (members.length === 0) return null;
     return (
       <div style={{ paddingBottom: 8 }}>
-        {/* WS1 — the Community chip is gone, so the rail has no See all: the
-            full community view it opened left with the chip. The rail itself
-            stays exactly where it was in For you. */}
-        <Section title={t('amateur.watch.rail.community', 'From the community')} />
+        {/* WS1.1 — See all opens the media library's Community tab. */}
+        <Section
+          title={t('amateur.watch.rail.community', 'From the community')}
+          seeAll={t('amateur.watch.seeAll', 'See all')}
+          onSeeAll={() => navigate('/media?kind=community')}
+        />
         <Rail label="community">
           {members.map(({ lead, count }) => (
             <div key={`member:${lead.key}`} data-watch-card="community" style={{ ...cardButton, width: CT_W, cursor: 'default' }}>
