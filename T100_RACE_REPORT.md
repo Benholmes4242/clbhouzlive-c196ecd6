@@ -37,3 +37,25 @@ The repository's current view record explicitly states its played definition mat
 
 ## Limits and protected scope
 Signed-in browser proof unavailable (`external_unmanaged`); no screenshot parity claim. No SQL/migrations/migration files/RPC/edge edits, feed_config untouched, round_pool_cap30, no native/Median changes. Frozen chips/shared SectionHead keep existing geometry; mock artwork/names are illustrative, not imported. No release/publish.
+## T100.2 — native buttons, row sizing, short course names (2026-11-02)
+
+Device fault: race rows overlapped because HundredRaceRow, the rail tiles, See all and the Your courses dropdown header all used the shared `<Button variant="ghost">`, whose h-11/px-5/py-2.5/font-medium/text-muted-foreground/active:scale/[&_svg]:size-4 defaults fought the t100 classes.
+
+Diff:
+- HundredRaceParts.tsx — rail tile and HundredRaceRow are now plain `<button type="button">` (classes, data attributes, aria and handlers unchanged); tile name and row course line run through `shortCourseName` ("Royal County Down Golf Club (Championship)" → "Royal County Down · Championship"); tile aria-label keeps the full name. Button import removed.
+- Top100RaceSection.tsx — See all is a plain `<button type="button" className="t100-see">`; the error-state Retry keeps the shared Button (not in the brief's four).
+- YourHundredSection.tsx — dropdown header is a plain `<button type="button" className="t100-dropdown-header">`; Button import removed (its only use).
+- t100Race.css — added a reset for .t100-row/.t100-tile/.t100-see/.t100-dropdown-header (appearance none, background none, border 0, font/color inherit, text-align left, cursor pointer, no active transform, focus-visible outline 2px rgba(248,250,252,0.5) offset 2px); class rules below still own background/padding. Removed `height: auto` from .t100-row (only existed to counter h-11); .t100-shell-row keeps its 76px skeleton reservation (never matched 44px).
+- Icon sizes were already explicit: See all chevron 12, dropdown chevron 18, rail played check 11 — no change needed.
+- See all sheet rows render the identical HundredRaceRow markup as the page rows (same component).
+
+Tests (src/test/t100Race.test.tsx, 30 → 33, +3, none changed or removed):
+- native buttons: rows, tiles, See all and dropdown header are BUTTON without h-11/px-5/py-2.5/text-muted-foreground/font-medium.
+- shortCourseName on the row course line and tile name; tile aria-label keeps the full name.
+- See all sheet rows render the same markup (outerHTML) as the page rows.
+
+Mid-run fault (fixed, component-side): the first row replacement dropped `onClick` (wrote `onPress`), failing 'row tap opens the existing member list-progress sheet'; corrected to `onClick={onPress}`, no test touched.
+
+Results: focused 33/33; `npx tsgo --noEmit` clean; preview build OK. Full suite sharded (--maxWorkers=2): 1410 + 1381 + 1438 + 1477 = **5,706/5,706 across 532 files**, zero failures. Baseline 5,703/532 (after the tour scorecard full-width follow-up) → +3 tests/+0 files, exactly the three new T100.2 tests.
+
+No SQL, no migrations, no RPC/edge edits, feed_config untouched, round_pool_cap 30, no native/Median changes. Signed-in device verification remains with Ben.
