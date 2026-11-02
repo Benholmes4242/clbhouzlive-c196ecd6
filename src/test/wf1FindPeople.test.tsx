@@ -26,6 +26,7 @@ const h = vi.hoisted(() => ({
   bizLoading: false,
   toggle: vi.fn(() => Promise.resolve({ next: true })),
   invite: vi.fn(),
+  hideNav: vi.fn(),
   searchPeople: [] as unknown[],
   searchClubs: [] as unknown[],
 }));
@@ -34,6 +35,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: vi.fn(), fro
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: h.user }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
 vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutateAsync: h.toggle, isPending: false }) }));
+vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: () => h.hideNav() }));
 vi.mock('@/features/find-people/usePeopleSuggestions', () => ({
   usePeopleSuggestions: () => ({ data: h.people, isLoading: h.peopleLoading, isError: false }),
   useBusinessSuggestions: () => ({ data: h.biz, isLoading: h.bizLoading, isError: false }),
@@ -199,15 +201,39 @@ describe('WF1 pure rules', () => {
     expect(businessReason(biz({ reason_type: 'popular', city: null }), 'businesses', 'Media')?.def).toBe('{{category}}');
   });
 
-  it('orders the Suggested groups and caps popular businesses at 3', () => {
+  it('orders the Suggested groups as the best of everything, capped at 5 with See all', () => {
     const manyPopular = [1, 2, 3, 4, 5].map((i) => biz({ business_id: `bp${i}`, reason_type: 'popular' }));
     const groups = suggestedGroups(FULL_PEOPLE, [...FULL_BIZ, ...manyPopular]);
-    expect(groups.map((g) => g.id)).toEqual(['from-club', 'played-with', 'plays-courses', 'popular']);
+    expect(groups.map((g) => g.id)).toEqual([
+      'from-club', 'played-with', 'follows-you', 'plays-courses', 'known', 'popular', 'active', 'new',
+    ]);
     const fromClub = groups[0];
     expect(fromClub.followAll).toBe(true);
     expect(fromClub.businesses[0]?.reason_type).toBe('your_club');
     expect(fromClub.people.every((p) => p.reason_type === 'club')).toBe(true);
-    expect(groups[3].businesses).toHaveLength(3);
+    /* Popular: golfers first, then up to 3 businesses, five rows in all. */
+    const popular = groups.find((g) => g.id === 'popular')!;
+    expect(popular.businesses).toHaveLength(3);
+    expect(popular.people.length + popular.businesses.length).toBeLessThanOrEqual(5);
+    /* Every non-club group carries a See all {total} link to the Golfers tab. */
+    const playedWith = groups.find((g) => g.id === 'played-with')!;
+    expect(playedWith.seeAll).toEqual({ tab: 'golfers', total: 1 });
+  });
+
+  it('caps a Suggested group at five rows and never repeats a person', () => {
+    const seven = [1, 2, 3, 4, 5, 6, 7].map((i) =>
+      person({ user_id: `pw${i}`, reason_type: 'played_with', reason_club_name: null }),
+    );
+    const dup = person({ user_id: 'u-dup', display_name: 'Dup Dan', reason_type: 'popular' });
+    const dupClub = person({ user_id: 'u-dup', display_name: 'Dup Dan', reason_type: 'club' });
+    const groups = suggestedGroups([...seven, dupClub, dup], []);
+    const playedWith = groups.find((g) => g.id === 'played-with')!;
+    expect(playedWith.people).toHaveLength(5);
+    expect(playedWith.seeAll).toEqual({ tab: 'golfers', total: 7 });
+    /* u-dup appears in From {club} first, never again in Popular. */
+    const all = groups.flatMap((g) => g.people.map((p) => p.user_id));
+    expect(all.filter((id) => id === 'u-dup')).toHaveLength(1);
+    expect(groups.find((g) => g.id === 'from-club')!.people.some((p) => p.user_id === 'u-dup')).toBe(true);
   });
 
   it('orders the Golfers groups by reason and hides empty ones', () => {
@@ -255,7 +281,8 @@ describe('WF1 Find people page', () => {
 
   it('renders the header, search field and three chips with ?tab= kept', () => {
     renderPage('/find-people?tab=businesses');
-    expect(screen.getByText('Find people')).toBeTruthy();
+    /* FIX §4 — the page is now "Explore the community". */
+    expect(screen.getByText('Explore the community')).toBeTruthy();
     expect(screen.getByPlaceholderText('Search golfers and businesses')).toBeTruthy();
     const tabs = screen.getAllByRole('tab');
     expect(tabs.map((t) => t.textContent)).toEqual(['Suggested', 'Golfers', 'Businesses']);
@@ -264,15 +291,41 @@ describe('WF1 Find people page', () => {
     expect(screen.getByRole('tab', { name: 'Golfers' }).getAttribute('aria-selected')).toBe('true');
   });
 
-  it('groups the Suggested tab with Follow all on the club group and hides empty groups', () => {
+  it('groups the Suggested tab as the best of everything with Follow all on the club group', () => {
     renderPage();
     const labels = screen.getAllByTestId('group-label').map((el) => el.textContent);
-    expect(labels).toEqual(['From {{club}}', 'Played with you', 'Plays your courses', 'Popular on clbhouz']);
-    expect(labels).not.toContain('Follows you');
+    /* FIX §5 — every group with rows, in the brief's order. */
+    expect(labels).toEqual([
+      'From {{club}}', 'Played with you', 'Follows you', 'Plays your courses',
+      'Followed by people you know', 'Popular on clbhouz', 'Playing lately', 'New to clbhouz',
+    ]);
     expect(screen.getByText('Follow all 2')).toBeTruthy();
     // The your_club business leads the From-club group, before club golfers.
     expect(screen.getByText('Your club · {{category}}')).toBeTruthy();
     expect(screen.getByText('Member at {{club}}')).toBeTruthy();
+  });
+
+  it('See all on a capped Suggested group switches to the Golfers tab', () => {
+    renderPage();
+    const seeAlls = screen.getAllByText(/^See all /);
+    expect(seeAlls.length).toBeGreaterThan(0);
+    fireEvent.click(seeAlls[0]);
+    expect(screen.getByRole('tab', { name: 'Golfers' }).getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('hides the bottom nav while the page is open', () => {
+    renderPage();
+    expect(h.hideNav).toHaveBeenCalled();
+  });
+
+  it('shows the joining line under a thin Businesses tab, never an empty page', () => {
+    h.biz = [biz({})];
+    renderPage('/find-people?tab=businesses');
+    expect(screen.getByText('More clubs and businesses are joining clbhouz.')).toBeTruthy();
+    cleanup();
+    h.biz = FULL_BIZ;
+    renderPage('/find-people?tab=businesses');
+    expect(screen.queryByText('More clubs and businesses are joining clbhouz.')).toBeNull();
   });
 
   it('groups the Golfers tab in the brief order', () => {

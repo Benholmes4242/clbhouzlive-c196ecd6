@@ -1470,3 +1470,9 @@
 - [ ] RoundsThisWeekShelf in WatchFeed after Quick hits, All chip only, signed-in only; circle→everyone fallback <2 rows; feats via useFeatsWindow year, 14-day latest_play_date + score id, order ace/albatross/eagle/clean_card, max 2; card order round,round,feat,round,round,feat; hole strips via useRoundHoleShapes; door row always; skeleton; analytics rounds_shelf_viewed/card_tapped/door_tapped/page_viewed.
 - [ ] Tests: new src/test/rsRoundsShelf.test.tsx per brief; list any changed/deleted old→new.
 - [ ] Full shards vs 5,706/532 baseline; report RS report file.
+
+## RS — Rounds this week shelf (DONE)
+- /rounds page (no islands, mock wins), Explore opens on Watch, switch removed, shelf after Quick hits, ?view=scores redirect, 6 locales. Suite 5,729/5,729 (533 files): +23/+1 vs 5,706/532 (rsRoundsShelf +22, exploreAllTabTrial +1 retitled).
+
+## FIX — Who to follow rail + Find people (DONE)
+- Rail cards fixed-height flex column, Follow pinned bottom; follow removes card after 3s (unfollow cancels, session Set, reduced-motion instant); bottom nav hidden on /find-people; title "Explore the community" (6 locales); Suggested = all 8 groups capped at 5 with See all, dedup; Businesses under-3 line. Item 6: report only, no SQL. Suite 5,739/5,739 (534 files): +10/+1 vs 5,729/533 (wfFixRail +6 new file, wf1FindPeople 23→27).

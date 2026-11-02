@@ -23,6 +23,7 @@ import { InviteSheetContext } from '@/components/invite/InviteSheetProvider';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { toast } from '@/lib/toast';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { useGlobalSearchV2 } from '@/features/search-v2/hooks/useGlobalSearchV2';
@@ -54,6 +55,9 @@ export function GolfersToFollowRedirect() {
 export default function FindPeoplePage() {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
+  /* FIX §3 — a full-screen page with its own back button: the floating nav
+     hides while it is open and returns on leave. */
+  useHideBottomNav();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const tab: FindPeopleTab =
@@ -145,7 +149,7 @@ export default function FindPeoplePage() {
             <ChevronLeft size={18} strokeWidth={2.2} />
           </button>
           <div style={{ flex: 1, textAlign: 'center', marginRight: 36, fontSize: 17, fontWeight: 700 }}>
-            {t('findPeople.title', { defaultValue: 'Find people' })}
+            {t('findPeople.title', { defaultValue: 'Explore the community' })}
           </div>
         </header>
 
@@ -232,17 +236,27 @@ export default function FindPeoplePage() {
             {t('findPeople.empty', { defaultValue: 'No suggestions yet. Search above, or invite friends.' })}
           </div>
         ) : (
-          groups.map((g) => (
-            <GroupSection
-              key={g.id}
-              group={g}
-              tab={tab}
-              copy={copy}
-              categoryOf={categoryOf}
-              followed={followed}
-              markFollowed={markFollowed}
-            />
-          ))
+          <>
+            {groups.map((g) => (
+              <GroupSection
+                key={g.id}
+                group={g}
+                tab={tab}
+                copy={copy}
+                categoryOf={categoryOf}
+                followed={followed}
+                markFollowed={markFollowed}
+                onTab={onTab}
+              />
+            ))}
+            {/* FIX §6 — a thin Businesses tab says more are coming, never an
+                empty page. */}
+            {tab === 'businesses' && groups.reduce((n, g) => n + g.businesses.length, 0) < 3 ? (
+              <div style={{ padding: '18px 16px 0', fontSize: 13, color: 'rgba(248,250,252,0.62)' }}>
+                {t('findPeople.bizJoining', { defaultValue: 'More clubs and businesses are joining clbhouz.' })}
+              </div>
+            ) : null}
+          </>
         )}
       </div>
 
@@ -260,6 +274,7 @@ function GroupSection({
   categoryOf,
   followed,
   markFollowed,
+  onTab,
 }: {
   group: PeopleGroup;
   tab: FindPeopleTab;
@@ -267,6 +282,7 @@ function GroupSection({
   categoryOf: (b: BusinessSuggestion) => string;
   followed: ReadonlySet<string>;
   markFollowed: (id: string, on: boolean) => void;
+  onTab: (tab: FindPeopleTab) => void;
 }) {
   const { t } = useTranslation('common');
   const total = group.people.length + group.businesses.length;
@@ -288,6 +304,26 @@ function GroupSection({
         <span data-testid="group-label">{copy(group.label)}</span>
         {group.followAll ? (
           <FollowAllButton group={group} followed={followed} markFollowed={markFollowed} />
+        ) : group.seeAll ? (
+          /* FIX §5 — a capped Suggested group links to its full tab. */
+          <button
+            type="button"
+            onClick={() => onTab(group.seeAll!.tab)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: 0,
+              textTransform: 'none',
+              color: A.INK,
+              fontFamily: ROW_FONT,
+              cursor: 'pointer',
+            }}
+          >
+            {t('findPeople.seeAll', { count: group.seeAll.total, defaultValue: `See all ${group.seeAll.total}` })}
+          </button>
         ) : (
           <span>{group.count ?? total}</span>
         )}

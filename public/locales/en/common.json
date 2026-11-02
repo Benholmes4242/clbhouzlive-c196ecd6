@@ -1941,7 +1941,7 @@
     }
   },
   "findPeople": {
-    "title": "Find people",
+    "title": "Explore the community",
     "searchPlaceholder": "Search golfers and businesses",
     "chip": {
       "suggested": "Suggested",
@@ -2004,7 +2004,10 @@
         "playedWith": "Played {{course}} with you",
         "playedWithFallback": "Played with you",
         "yourClub": "Your club"
-      }
-    }
+      },
+      "seeAllAria": "See all, Explore the community"
+    },
+    "seeAll": "See all {{count}}",
+    "bizJoining": "More clubs and businesses are joining clbhouz."
   }
 }

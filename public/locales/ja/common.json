@@ -837,7 +837,7 @@
     }
   },
   "findPeople": {
-    "title": "人を探す",
+    "title": "コミュニティを探索",
     "searchPlaceholder": "ゴルファーとビジネスを検索",
     "chip": {
       "suggested": "おすすめ",
@@ -900,7 +900,10 @@
         "playedWith": "Played {{course}} with you",
         "playedWithFallback": "Played with you",
         "yourClub": "Your club"
-      }
-    }
+      },
+      "seeAllAria": "すべて見る、コミュニティを探索"
+    },
+    "seeAll": "すべて見る（{{count}}）",
+    "bizJoining": "さらに多くのクラブやビジネスが clbhouz に参加しています。"
   }
 }
