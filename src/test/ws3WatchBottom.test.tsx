@@ -341,14 +341,22 @@ describe('WS3 Long form', () => {
   });
 
   it("Long form's See all selects the Long form chip", () => {
+    const originalScrollTo = Element.prototype.scrollTo;
+    const scrollTo = vi.fn();
+    Element.prototype.scrollTo = scrollTo as never;
+    try {
     f.videos.data = { pages: [[longHub('l1')]] };
     wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const chip = () => Array.from(document.querySelectorAll('button')).find((b) => b.textContent === 'Long form')!;
     expect(chip().getAttribute('aria-pressed') ?? chip().getAttribute('aria-selected')).not.toBe('true');
     const heading = headingByText('Long form')!.closest('div')!.parentElement!;
     fireEvent.click(Array.from(heading.querySelectorAll('button')).find((b) => b.textContent === 'See all')!);
+    expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
     expect(chip().getAttribute('aria-pressed') ?? chip().getAttribute('aria-selected')).toBe('true');
     expect(headingByText('Long form')!.closest('div')!.parentElement!.querySelector('button')).toBeNull();
+    } finally {
+      Element.prototype.scrollTo = originalScrollTo;
+    }
   });
 
   it('course chip only when the row carries review_course_name, and it routes', () => {
