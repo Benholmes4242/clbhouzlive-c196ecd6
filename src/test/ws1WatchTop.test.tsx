@@ -288,7 +288,7 @@ describe('WS1 chips', () => {
     };
     mountFeed();
     const heading = screen.getByText('From the community');
-    const section = heading.closest('div')!.parentElement!;
+    const section = heading.closest('div')!;
     fireEvent.click(within(section).getByRole('button'));
     const loc = screen.getByTestId('loc');
     expect(loc.getAttribute('data-path')).toBe('/media');

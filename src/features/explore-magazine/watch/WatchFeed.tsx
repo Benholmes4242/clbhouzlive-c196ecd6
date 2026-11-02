@@ -216,6 +216,7 @@ export function WatchFeed({
   onOpenMember?: (userId: string) => void;
 }) {
   const { t } = useTranslation('courses');
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<WatchFilter>(() => mapWatchFilter(initialFilter));
   const [query, setQuery] = useState('');
 
