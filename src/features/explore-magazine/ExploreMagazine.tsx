@@ -522,8 +522,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   const chipScope: ScoreScope = 'world';
   const streamGeo = geography.scope;
   const serverScope: ScoreScope = chipScope;
-  /* §2 — no Scores stream read: the Scores view cannot render it. */
-  const server = useExploreStream(userId && serverReady && view !== 'scores' ? userId : undefined, view, serverScope, {
+  /* RS — Scores is /rounds now; every reachable view can render the stream. */
+  const server = useExploreStream(userId && serverReady ? userId : undefined, view, serverScope, {
     clubId: streamGeo.primaryClubId,
     county: streamGeo.county,
     country: streamGeo.country,
@@ -565,7 +565,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   /* THE FALLBACK CONDITION, in one place. While the RPC is still in flight the
      client composition is NOT fetched - the server hook shows its own shells, so
      a member never pays for two rankers. */
-  const fallbackWanted = view !== 'scores' && (!serverView || server.unavailable);
+  const fallbackWanted = !serverView || server.unavailable;
   const stream = useExploreStreamClient(
     fallbackWanted ? userId : undefined,
     view,
@@ -597,8 +597,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
      'amateur.stream.nothingYet' locale keys stay, unused, for Phase E. */
 
   /* THE CANDIDATE INDEX (BRIEF_COURSES_MERGED). One bounded read behind the
-     lead rated rail on All. Scores keeps it enabled as before. */
-  const candidates = useCourseCandidateIndex(view === 'scores' || view === 'all');
+     lead rated rail on All. */
+  const candidates = useCourseCandidateIndex(view === 'all');
 
   /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so the
      server page and the client fallback take the same reveal, sentinel,
@@ -786,25 +786,11 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     'coursesWorld',
     'coursesList',
   ];
-  /* SCORES SHELVES — the four that are about the MEMBER'S OWN GOLF, inserted
-     after 3 cards and every 4 thereafter, then repeated without Your circle.
-     WHY 'standing' IS A SHELF AND NOT A CARD: a shelf may show a position with
-     no motion — that is a standing, and a standing is worth looking at. A CARD
-     must announce a CHANGE, which is the same distinction that retired
-     rank_hold; do not promote this shelf into the card ladder. */
-  /* CHANGE EARNS HEIGHT. The daily/weekly rail leads the repeating cycle;
-     slower standing and county rails follow; the growth prompt is last. */
-  const SCORES_SHELVES: ShelfKind[] = ['clubWeek', 'standing', 'personalBests', 'coursesCounty', 'people'];
-  const shelves: ShelfKind[] =
-    view === 'watch'
-      ? /* WATCH COMPOSES ITS OWN RAILS (BRIEF_WATCH_MIXED_FEED): windows into its
-           own clip and community feeds, with no see-all on any of them. */
-        []
-      : view === 'scores'
-        ? SCORES_SHELVES
-        : ALL_SHELVES;
+  /* RS — the Scores shelf order left with the view; /rounds owns its own
+     sections. Watch composes its own rails (BRIEF_WATCH_MIXED_FEED). */
+  const shelves: ShelfKind[] = view === 'watch' ? [] : ALL_SHELVES;
   const blocks = useMemo(
-    () => buildBlocks(ranked, shelves, false, { repeatShelves: view === 'scores' || view === 'all' }),
+    () => buildBlocks(ranked, shelves, false, { repeatShelves: view === 'all' }),
     [ranked, view, shelves],
   );
   /* §2 THE EARNED HERO IS RETIRED: cardTreatments() and its 1-in-4 positional
@@ -860,25 +846,11 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
 
   const depart = useCallback(() => rememberAmateurScroll(), []);
 
-  const changeView = useCallback(
-    (next: string) => {
-      const value = next as ExploreView;
-      if (!EXPLORE_VIEWS.includes(value)) return;
-      analyticsEvents.track('amateur_view_changed', { from: view, to: value });
-      setView(value);
-      writeExploreView(value);
-      setSearchParams((prev) => { const n = new URLSearchParams(prev); n.set('view', value); return n; }, { replace: true });
-      setRevealed(STREAM_PAGE_SIZE);
-      loggedRef.current = 0;
-      /* A view is not a route: no history entry, no scroll animation. */
-      scrollPageToTop('auto');
-    },
-    [view],
-  );
+  /* RS — no view switch remains, so the community see-all only picks Watch's
+     community entry; the view is already 'watch'. */
   const openCommunity = useCallback(() => {
     setWatchEntry('community');
-    changeView('watch');
-  }, [changeView]);
+  }, []);
 
 
   /* ==================================================================== §2
