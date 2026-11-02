@@ -47,12 +47,17 @@ import {
   railSlotCards,
   type RailCard,
 } from './railRules';
+import { ActiveAvatarDoor, ActiveRing } from './ActiveRing';
+import { activityLine, type RecentActivity } from './activeRingRules';
+import { useRecentActivity } from './useRecentActivity';
 
 /** Cards hidden this session — shared by both slots and across feed remounts. */
 const HIDDEN = new Set<string>();
 /** Slots whose 50%-visible view event already fired this session. */
 const VIEWED = new Set<number>();
 const EMPTY: ReadonlySet<string> = new Set();
+
+const actorIdOf = (card: RailCard) => (card.kind === 'person' ? card.person.user_id : card.business.business_id);
 
 /** Mock: ✕ closes a card over 200ms; the rail closes over the same 200ms. */
 const DISMISS_MS = 200;
@@ -92,6 +97,9 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
     () => railSlotCards(ordered, slot, HIDDEN),
     [ordered, slot, hiddenTick],
   );
+  /** ACTIVE RING — one batched read for the slot's cards, in display order. */
+  const activityIds = useMemo(() => all.map(actorIdOf), [all]);
+  const activity = useRecentActivity(activityIds);
 
   /** WF2 §7 — mark both suggestion queries stale WITHOUT refetching. */
   const markStale = () => {
@@ -281,6 +289,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
             markStale={markStale}
             scheduleRemoval={scheduleRemoval}
             cancelRemoval={cancelRemoval}
+            activity={activity.get(actorIdOf(card))}
           />
         ))}
       </div>
@@ -298,6 +307,7 @@ function RailCardView({
   markStale,
   scheduleRemoval,
   cancelRemoval,
+  activity,
 }: {
   card: RailCard;
   slot: 1 | 2;
@@ -306,6 +316,7 @@ function RailCardView({
   markStale: () => void;
   scheduleRemoval: (id: string) => void;
   cancelRemoval: (id: string) => void;
+  activity: RecentActivity | undefined;
 }) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
@@ -323,6 +334,8 @@ function RailCardView({
   const reason: Copy | null = isPerson
     ? railGolferReason(card.person)
     : railBusinessReason(card.business, businessCategoryLabel(card.business));
+  const line = activity ? activityLine(activity, new Date()) : null;
+  const when = line ? t(line.key, { ...line.vars, defaultValue: line.def }) : '';
   const followers = !isPerson ? card.business.followers ?? 0 : 0;
   const figures = isPerson
     ? golferFigures(card.person)
@@ -392,7 +405,7 @@ function RailCardView({
         /* FIX §1 — fixed-height flex column with the Follow button pinned to
            the bottom, so golfer and business cards align whatever the
            reason/figures content above. */
-        height: 220,
+        height: 252,
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
@@ -436,50 +449,61 @@ function RailCardView({
         <X size={14} strokeWidth={2} />
       </button>
 
-      {/* Avatar: golfer squircle; business logo or white initials tile. */}
-      {isPerson ? (
-        <div style={{ margin: '4px auto 0', width: 64 }}>
-          <SquircleAvatar
-            src={card.person.profile_photo_url ?? undefined}
-            alt={name}
-            userId={card.person.user_id}
-            size={64}
-            fallback={name.charAt(0)}
-            hairlineRing
-          />
-        </div>
-      ) : card.business.logo_url ? (
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: '#F8FAFC',
-            margin: '4px auto 0',
-          }}
+      {/* Avatar: golfer squircle; business logo or white initials tile, inside
+          the ACTIVE RING slot (ringed avatars open the latest post). */}
+      <div style={{ margin: '4px auto 0', display: 'flex' }}>
+        <ActiveAvatarDoor
+          postId={activity?.post_id ?? null}
+          label={t('findPeople.active.open', { name, defaultValue: `Open ${name}'s latest post` })}
+          onOpen={(id) => navigate(`/post/${id}`)}
         >
-          <img src={card.business.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </div>
-      ) : (
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: '34%',
-            background: '#F8FAFC',
-            color: A.CANVAS,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 18,
-            fontWeight: 700,
-            margin: '4px auto 0',
-          }}
-        >
-          {businessInitials(name)}
-        </div>
-      )}
+          <ActiveRing active={!!activity} surface="card">
+            {isPerson ? (
+              <div style={{ width: 64 }}>
+                <SquircleAvatar
+                  src={card.person.profile_photo_url ?? undefined}
+                  alt={name}
+                  userId={card.person.user_id}
+                  size={64}
+                  fallback={name.charAt(0)}
+                  hairlineRing={!activity}
+                  hideRing={!!activity}
+                />
+              </div>
+            ) : card.business.logo_url ? (
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '34%',
+                  overflow: 'hidden',
+                  background: '#F8FAFC',
+                }}
+              >
+                <img src={card.business.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            ) : (
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '34%',
+                  background: '#F8FAFC',
+                  color: A.CANVAS,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 18,
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+              >
+                {businessInitials(name)}
+              </div>
+            )}
+          </ActiveRing>
+        </ActiveAvatarDoor>
+      </div>
 
       <div
         style={{
@@ -528,6 +552,25 @@ function RailCardView({
         }}
       >
         {figures}
+      </div>
+
+      {/* ACTIVE RING — when line; empty but height-holding when unringed. */}
+      <div
+        data-testid="rail-when"
+        style={{
+          marginTop: 4,
+          height: 15,
+          lineHeight: '15px',
+          fontSize: 11,
+          fontWeight: 600,
+          color: '#F7931E',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          maxWidth: '100%',
+        }}
+      >
+        {when}
       </div>
 
       <button
