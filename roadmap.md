@@ -1,5 +1,10 @@
 # Roadmap
 
+## Course Media fullscreen shot selection
+- [ ] Guard missing shot ids, publish opening index, preserve selected/swiped shots and reject stale hydration.
+- [ ] Audit tile identities; add focused regressions and run the four full-suite shards.
+- [ ] Record changed files, totals and verification limits in COURSE_MEDIA_FULLSCREEN_REPORT.md.
+
 ## WS1 — Explore Watch section 1 — DONE
 - [x] Chips For you · Shorts · Long form via mapWatchFilter (community → For you); signed-in Creators row + lead from existing RPCs; community rail kept.
 - [x] WS1.1 community See all → /media?kind=community (+1 test). Focused 67/67; shards 1,433+1,418+1,449+1,487; current 5,788/536 (+49/+2 vs 5,739/534: Active Ring +15/+1, WS1 +34/+1). Report WS1_WATCH_TOP_REPORT.md.

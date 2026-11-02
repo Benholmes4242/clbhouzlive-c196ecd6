@@ -4,7 +4,9 @@
  * parallel with the media pages; tagged library shots join by canonical media
  * identity through Map lookups; hole attribution keeps get_hole_media
  * authority. A tap opens at once from the warm build, or from the page's own
- * known shots, then hydrates in place keeping the current shot. No new RPCs. */
+ * known shots, then hydrates in place keeping the current shot. Each opening
+ * owns its options object; late hydration cannot replace a newer opening.
+ * The opening index is published synchronously, before pager callbacks. No new RPCs. */
 import { useCallback, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -87,8 +89,8 @@ export function pageGalleryShots(posts: readonly FeedPost[], holeTags: readonly 
   return galleryShots([...posts, ...extra], holeTags, placeTags);
 }
 
-const findStart = (list: readonly GalleryShot[], startShotId?: string, holeNo?: number, startKey?: string) =>
-  list.find(shot => shot.id === startShotId || shot.holeTag?.id === startShotId || shot.placeTag?.id === startShotId)
+export const findStart = (list: readonly GalleryShot[], startShotId?: string, holeNo?: number, startKey?: string) =>
+  (startShotId ? list.find(shot => shot.id === startShotId || shot.holeTag?.id === startShotId || shot.placeTag?.id === startShotId) : undefined)
   ?? (startKey ? list.find(shot => holeMediaKey(shot.item) === startKey) : undefined)
   ?? (holeNo ? list.find(shot => shot.holeTag?.hole_no === holeNo) : undefined) ?? list[0];
 
@@ -98,24 +100,28 @@ export function useCourseGallery({ courseId, courseName, userId, holes, scored, 
 }) {
   const cache = useQueryClient();
   const { activeActor } = useActiveActor();
-  const opening = useRef(false);
+  const opening = useRef(0);
   const args = useMemo(() => ({ courseId, courseName, userId: userId ?? '', actorType: activeActor?.type, actorId: activeActor?.id, holeTags, placeTags }),
     [courseId, courseName, userId, activeActor?.type, activeActor?.id, holeTags, placeTags]);
   const key = courseGalleryKey(args);
   const build = useQuery({ queryKey: key, enabled: !!userId && tagsReady, staleTime: 60_000, retry: false, queryFn: () => buildCourseGallery(cache, args) });
   const built = build.data;
-  return useCallback(async (filter: GalleryFilter, startShotId: string | undefined, originEl: HTMLElement | null, entry: string, holeNo?: number) => {
-    if (!userId || opening.current) return;
-    opening.current = true;
+  return useCallback(async (filter: GalleryFilter, startShotId: string | undefined, originEl: HTMLElement | null, entry: string, holeNo?: number, startKey?: string) => {
+    if (!userId) return;
+    const token = ++opening.current;
+    let openedOptions: ReturnType<typeof useFullscreenFeedStore.getState>['courseGallery'] = null;
+    let openingIndex = 0;
     const open = (shots: GalleryShot[]) => {
+      if (opening.current !== token) return false;
       const data = { shots, holes, scored };
       const list = filteredGallery(shots, filter);
-      const start = findStart(list, startShotId, holeNo);
+      const start = findStart(list, startShotId, holeNo, startKey);
       if (!start) return false;
       const options = { courseId, courseName, filter, startShotId: start.id };
-      openWithOrigin({ posts: galleryPost(list, options), index: 0, originEl, mediaId: start.id, posterUrl: start.item.thumbnailUrl ?? start.item.imageUrl,
+      openedOptions = options;
+      openingIndex = list.indexOf(start);
+      openWithOrigin({ posts: galleryPost(list, options), index: 0, mediaIndex: openingIndex, originEl, mediaId: start.id, posterUrl: start.item.thumbnailUrl ?? start.item.imageUrl,
         openedFrom: 'course-media', options: { readOnly: true, syntheticPosts: true, courseGallery: options, galleryData: data } });
-      opening.current = false;
       void analyticsEvents.track('course_gallery_open', { filter, entry });
       return true;
     };
@@ -127,16 +133,17 @@ export function useCourseGallery({ courseId, courseName, userId, holes, scored, 
       if (!opened) { open(shots); return; }
       const state = useFullscreenFeedStore.getState();
       const current = state.courseGallery;
-      if (!state.isOpen || !current || current.courseId !== courseId || !state.galleryData) return;
+      if (opening.current !== token || !state.isOpen || !current || current !== openedOptions || !state.galleryData) return;
       const shown = filteredGallery(state.galleryData.shots, current.filter);
-      const now = shown[state.activePagerIdx] ?? shown[0];
+      const now = state.activePagerIdx === openingIndex
+        ? shown.find(shot => shot.id === state.mediaId) ?? shown[state.activePagerIdx]
+        : shown[state.activePagerIdx];
       const list = filteredGallery(shots, current.filter);
       const keep = now ? findStart(list, now.id, now.holeTag?.hole_no, holeMediaKey(now.item)) : list[0];
       if (!keep) return;
       const next = { ...current, startShotId: keep.id };
       state.replaceGallery(galleryPost(list, next), next, { shots, holes, scored });
     } catch { /* Refused source/identity reads never invent a gallery. */ }
-    finally { opening.current = false; }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cache, built, key.join('|'), args, courseId, courseName, userId, holes, scored, holeTags, placeTags, pagePosts]);
 }
