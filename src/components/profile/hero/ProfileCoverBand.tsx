@@ -1,7 +1,7 @@
 /**
  * ProfileCoverBand — BRIEF_PROFILE_TOP_REBUILD §A. The ONE home for the
- * personal profile's 176px cover band: photograph, wash, ramp, status-bar
- * guard and the identity row. The business profile keeps HeroShell; this band
+ * personal profile's aspect-ratio cover band (PERSONAL_COVER_ASPECT_CSS):
+ * photograph, wash, ramp, status-bar guard and the identity row. This band
  * is personal-only and never carries HeroShell's square pinned-height logic.
  */
 import React from 'react';

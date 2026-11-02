@@ -22,7 +22,7 @@ const AMBER = '#F7931E';
 const STORAGE_KEY = 'gender_prompt_seen';
 
 // Female first in this sheet (per brief). Values match the exact enum
-// used by ManageProfile / useProfileSave so the write shape is identical.
+// used by EditProfile / useProfileSave so the write shape is identical.
 const GENDER_OPTIONS = [
   { value: 'female', label: 'Female' },
   { value: 'male', label: 'Male' },
@@ -119,6 +119,7 @@ export const GenderPromptSheet: React.FC = () => {
       markSeen();
 
       queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
       queryClient.invalidateQueries({ queryKey: whsKeys.percentile(user.id) });
 
       setOpen(false);

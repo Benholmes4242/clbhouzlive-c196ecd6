@@ -147,7 +147,6 @@ describe('EP4 handicap shares unchanged Settings source', () => {
     expect(h.update.mock.calls).toEqual([[{ handicap_visibility: 'friends' }], [{ handicap_visibility: 'private' }]]);
   });
   it('legacy ManageProfile is independent and Settings reads the same hook without a handicap writer', () => {
-    expect(readFileSync('src/pages/ManageProfile.tsx', 'utf8')).not.toContain('EditProfileLinksPrivacy');
     const settings = readFileSync('src/components/settings/SettingsTabContent.tsx', 'utf8');
     expect(settings).toContain('const privacy = usePrivacySettings(');
     expect(settings).not.toContain('onChange={privacy.setHandicapVisibilityLevel}');

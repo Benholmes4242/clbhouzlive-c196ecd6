@@ -1,5 +1,5 @@
-/** Canonical Edit profile. Auth, back and
- * the ?tab= param behave as ManageProfile's do; photos save one field at once
+/** Canonical Edit profile. Auth, back and the ?tab= param are owned here;
+ * photos save one field at once
  * through useProfileSave's opt-in photoField partial. EP2 adds the You group,
  * whose sheets save their own columns through the profileFields partial.
  * EP3 golf patches share that saved/retry line without touching visibility. */

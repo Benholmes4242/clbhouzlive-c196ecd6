@@ -33,6 +33,7 @@ export function useSetHomeClub() {
     },
     onSuccess: ({ userId }) => {
       qc.invalidateQueries({ queryKey: ['user-profile', userId] });
+      qc.invalidateQueries({ queryKey: ['profile', userId] });
       qc.invalidateQueries({ queryKey: ['profile-clubs'] });
       qc.invalidateQueries({ queryKey: ['home-club-status', userId] });
     },

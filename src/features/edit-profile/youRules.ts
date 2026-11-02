@@ -2,7 +2,7 @@
  * columns useProfileSave writes; username syntax is the setup rule. */
 export { WELCOME_USERNAME_RE as USERNAME_RE } from '@/features/onboarding/welcomeRules';
 
-/** Same values as ManageProfile / GenderPromptSheet; the column CHECK owns them. */
+/** Same values as useProfileSave / GenderPromptSheet; the column CHECK owns them. */
 export const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },

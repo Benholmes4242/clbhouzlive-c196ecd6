@@ -71,5 +71,4 @@ describe('EP3 existing limits and sync time', () => {
   it('plus range remains through +10', () => { expect(validOwnHandicap('+10')).toBe(true); expect(validOwnHandicap('+10.1')).toBe(false); });
   it('empty clears and malformed figures cannot save', () => { expect(validOwnHandicap('')).toBe(true); expect(validOwnHandicap('1.2.3')).toBe(false); });
   it('today uses time and previous days use date', () => { const now = new Date(2026, 9, 29, 12); expect(syncLabel(new Date(2026, 9, 29, 8).toISOString(), now)).toBe('synced 08:00'); expect(syncLabel(new Date(2026, 9, 28, 8).toISOString(), now)).toBe('synced 28 Oct'); });
-  it('ManageProfile remains independent', () => { expect(readFileSync('src/pages/ManageProfile.tsx', 'utf8')).not.toContain('EditProfileGolf'); });
 });

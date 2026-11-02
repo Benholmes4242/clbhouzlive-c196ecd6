@@ -1493,3 +1493,7 @@
 
 - [x] WS2 Watch section 2: done (WS2.1 approved stand-in added; 5,884/5,884 across 541 files). Report WS2_WATCH_MIDDLE_REPORT.md.
 - [ ] WS3 Watch section 3: WS3.1 rulings applied (stand-in, ws2 title, Long form See all + test); STOPPED — rsRoundsShelf 2 tests still fail "No QueryClient set": useToggleFollow inside CreatorSpotlight. Awaiting ruling.
+
+## PROFILE_CLEANUP_V1
+- [ ] Verify deletion dependencies; remove dead profile/edit code and business create branches; apply named cache/comment corrections.
+- [ ] Apply only authorized test edits (including approved completion-cache assertion removal); run four shards at maxWorkers=2 and report all counts/errors.

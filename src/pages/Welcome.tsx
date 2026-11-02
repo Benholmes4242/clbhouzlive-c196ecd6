@@ -25,7 +25,7 @@ import { canContinueIdentity, readWelcomeProgress, welcomeName, usernameSeed, us
 import '@/styles/welcome.css';
 
 /** OB1 owns first-sign-in only. Partial saves reuse useProfileSave; normal
- * ManageProfile and the canonical WHS controller retain their default behavior. */
+ * EditProfile and the canonical WHS controller retain their default behavior. */
 export default function Welcome() {
   useHideBottomNav(); useHideHeader();
   const { user, loading: sessionLoading } = useSupabaseSession(); const profile = useProfileData();
@@ -95,7 +95,6 @@ function WelcomeFlow({ user, profile }: { user: NonNullable<ReturnType<typeof us
       const { data, error } = await supabase.from('user_profiles').update({ has_completed_onboarding: true, updated_at: new Date().toISOString() }).eq('id', user.id).select('id').single();
       if (error || !data) { if (skip) analyticsEvents.track('onboarding_skip_failed', { reason: error?.code === 'PGRST116' || !data ? 'zero_rows' : 'update_error', code: error?.code ?? null, message: error?.message ?? 'update matched no row' }); throw error ?? new Error('Could not complete setup.'); }
       if (skip) analyticsEvents.track('onboarding_skip_succeeded', { user_id: user.id }); else analyticsEvents.track('onboarding_finished', { connected: !!connection.data || connectedNow, course_set: !!progress.course, follows: progress.follows, destination });
-      qc.setQueryData(['onboarding-status', user.id], { hasCompletedOnboarding: true, userType: profile.user_type });
       void qc.invalidateQueries({ queryKey: ['profile', user.id] }); navigate(destination === 'courses' ? '/courses' : destination === 'top100' ? '/courses?tab=top100' : '/', { replace: true });
     } catch { setMessage(t('welcome.saveFailed', { defaultValue: 'Could not save. Please try again.' })); } finally { setBusy(false); }
   };
