@@ -14,7 +14,7 @@ import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { getThumbnailUrl } from '@/utils/thumbnail';
-import { MessageCircle } from 'lucide-react';
+import { MapPin, MessageCircle } from 'lucide-react';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { reactionKindFor } from '@/lib/reactionKind';

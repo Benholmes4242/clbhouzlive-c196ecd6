@@ -508,7 +508,9 @@
         "community": "[~~Ƒřőɱ ţĥé ĉőɱɱúñíţý~~]",
         "videos": "[~~Ṽíđéőš~~]",
         "shorts": "Shorts",
-        "shortsSub": "Under three minutes"
+        "shortsSub": "Under three minutes",
+        "longForm": "Long form",
+        "longFormSub": "Three minutes and over"
       },
       "searchPlaceholder": "[~~Šéářĉĥ ṽíđéőš áñđ ĉřéáţőřš~~]",
       "untitled": "[~~Úñţíţļéđ ṽíđéő~~]",
@@ -537,7 +539,21 @@
         "all": "All",
         "empty": "No videos here yet."
       },
-      "seeAll": "See all"
+      "seeAll": "See all",
+      "spotlight": {
+        "title": "Creator to follow",
+        "follow": "Follow",
+        "following": "Following",
+        "handicap": "Handicap",
+        "rounds": "Rounds",
+        "courses": "Courses",
+        "videos": "Videos",
+        "filmed": "Courses filmed"
+      },
+      "top100": {
+        "title": "Top 100 on film",
+        "sub": "The lists, filmed by members"
+      }
     },
     "roundsShelf": {
       "title": "[~~Řóúñđš ţĥíš ŵééķ~~]",
