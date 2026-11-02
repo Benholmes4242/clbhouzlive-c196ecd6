@@ -81,9 +81,9 @@ function StandingsList({ data, actions, rows }: { data: PageData; actions: PageA
             </>
           );
         } else {
-          const g = gapLineFor(p.rank, p.points, data.players, featured.length ? data.stakes : data.stakes);
+          const g = gapLineFor(p.rank, p.points, data.players, featured);
           sub = g
-            ? <><span style={{ color: P.INK, fontWeight: 600 }}>{fmtInt(g.pts)} pts {g.kind}</span>{g.kind === 'clear' ? ` of ${g.other}` : ` of ${g.other}`}</>
+            ? <><span style={{ color: P.INK, fontWeight: 600 }}>{fmtInt(g.pts)} pts {g.kind}</span>{` of ${g.other}`}</>
             : careerLine({ world: p.world, wins: p.wins, top10s: p.top10s, events: p.events }) || undefined;
         }
         const stake = stakeAt.get(p.rank);
