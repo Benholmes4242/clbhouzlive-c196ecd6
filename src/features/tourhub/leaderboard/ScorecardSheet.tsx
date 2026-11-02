@@ -195,7 +195,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
         onClose();
         navigate(`/tourhub/player/${target.playerId}`);
       }}
-      onViewCourse={undefined}
+      onViewCourse={onViewCourse}
     />
   );
 }
