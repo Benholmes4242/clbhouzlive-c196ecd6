@@ -117,7 +117,7 @@ describe('stat sentence gap phrases', () => {
   const two = (key: string, a: number, b: number) => rankStat(STAT_DEFS[key], [{ row: { name: 'Scottie Scheffler' }, value: a }, { row: { name: 'Matt Fitzpatrick' }, value: b }]);
   it.each([
     ['scoring_avg', 68.62, 69.03, 'Scheffler leads scoring at 68.62, 0.41 a round better than Matt Fitzpatrick.'],
-    ['strokes_gained_putting', 0.76, 0.5, 'Scheffler leads sg putting at +0.76, 0.26 clear of Matt Fitzpatrick.'],
+    ['strokes_gained_putting', 0.76, 0.5, 'Scheffler leads SG putting at +0.76, 0.26 clear of Matt Fitzpatrick.'],
     ['drive_avg', 330.3, 325.1, 'Scheffler leads driving distance at 330.3, 5.2 yards longer than Matt Fitzpatrick.'],
     ['gir_pct', 74.1, 72.6, 'Scheffler leads greens hit at 74.1%, 1.5 points ahead of Matt Fitzpatrick.'],
     ['earnings', 30_900_000, 20_000_000, 'Scheffler leads earnings at $30.9m, $10.9m ahead of Matt Fitzpatrick.'],

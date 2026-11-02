@@ -530,6 +530,11 @@ function gapPhrase(d: StatDef, gap: number): string {
   }
 }
 
+/** Lower-cases the stat name but keeps acronyms: "Scoring" → "scoring", "SG putting" stays. */
+function lowerStat(label: string): string {
+  return /^[A-Z]{2}/.test(label) ? label : label.charAt(0).toLowerCase() + label.slice(1);
+}
+
 function joinNames(names: string[]): string {
   if (names.length <= 1) return names.join('');
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
@@ -541,12 +546,12 @@ export function statSentence<R extends { name: string }>(d: StatDef, entries: St
   if (d.kind === 'rank') return `${surname(lead.row.name)} is the highest-ranked player here, at No. ${lead.display}.`;
   const shared = entries.filter((e) => e.rank === 1);
   if (d.kind === 'count' && shared.length > 1) {
-    return `${shared.length} players share the lead on ${lead.display} ${d.label.toLowerCase()}: ${joinNames(shared.map((e) => e.row.name))}.`;
+    return `${shared.length} players share the lead on ${lead.display} ${lowerStat(d.label)}: ${joinNames(shared.map((e) => e.row.name))}.`;
   }
   const second = entries.find((e) => e.rank > 1);
-  if (!second) return `${surname(lead.row.name)} leads ${d.label.toLowerCase()} at ${lead.display}.`;
+  if (!second) return `${surname(lead.row.name)} leads ${lowerStat(d.label)} at ${lead.display}.`;
   const gap = Math.abs(lead.value - second.value);
-  return `${surname(lead.row.name)} leads ${d.label.toLowerCase()} at ${lead.display}, ${gapPhrase(d, gap)} ${second.row.name}.`;
+  return `${surname(lead.row.name)} leads ${lowerStat(d.label)} at ${lead.display}, ${gapPhrase(d, gap)} ${second.row.name}.`;
 }
 
 export function statCaption(d: StatDef, n: number, isPga: boolean): string {
