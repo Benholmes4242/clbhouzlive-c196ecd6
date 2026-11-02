@@ -25,6 +25,20 @@
 }
 
 :root {
+  --t100-panel: #17171B;
+  --t100-ink: #F8FAFC;
+  --t100-canvas: #0B0B0D;
+  --t100-mute: rgba(248,250,252,.62);
+  --t100-dim: rgba(248,250,252,.42);
+  --t100-track: rgba(255,255,255,.08);
+  --t100-hair: rgba(255,255,255,.06);
+  --t100-viewer: rgba(255,255,255,.05);
+  --t100-fill: rgba(248,250,252,.55);
+  --t100-leader: rgba(248,250,252,.5);
+  --t100-member: rgba(255,255,255,.14);
+  --t100-nobody: rgba(255,255,255,.055);
+  --t100-photo-scrim: linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.78));
+  --t100-photo-shadow: 0 1px 4px rgba(0,0,0,.9);
   --activity-unread: #141418;
   --activity-ink: #F8FAFC;
   --activity-mute: rgba(248,250,252,.62);
