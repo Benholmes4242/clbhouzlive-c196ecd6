@@ -11,6 +11,7 @@ const h = vi.hoisted(() => ({
   user: null as { id: string } | null,
   myScoring: null as unknown,
   holeAverages: null as unknown,
+  form: new Map() as Map<string, unknown>,
 }));
 
 function rankedRow(i: number) {
@@ -28,7 +29,7 @@ vi.mock('@/features/tourhub/players-v2/data/usePlayersRanking', () => ({
 vi.mock('@/features/tourhub/players-v2/data/useLivePlayerIds', () => ({ useLivePlayerIds: () => ({ data: {} }) }));
 vi.mock('@/features/tourhub/players-v2/data/useWorldRankLookup', () => ({ useWorldRankLookup: () => ({ data: {} }) }));
 vi.mock('@/features/tourhub/players-v2/data/useStandingsMovement', () => ({ useStandingsMovement: () => ({ data: new Map() }) }));
-vi.mock('@/features/tourhub/players-v2/data/useFieldForm', () => ({ useFieldForm: () => ({ data: new Map() }) }));
+vi.mock('@/features/tourhub/players-v2/data/useFieldForm', () => ({ useFieldForm: () => ({ data: h.form }) }));
 vi.mock('@/features/tourhub/players-v2/data/useScorecardStats', () => ({
   useScorecardStats: () => ({ data: new Map(Array.from({ length: 120 }, (_, i) => [`p${i + 1}`, { player_id: `p${i + 1}`, rounds: 40, holes: 720, scoring_avg: 70, birdies_per_round: 4, bogey_rate: 0.12, par3: 0.1, par4: 0.05, par5: -0.4 }])) }),
 }));
@@ -83,6 +84,7 @@ beforeEach(() => {
   h.user = null;
   h.myScoring = null;
   h.holeAverages = null;
+  h.form = new Map();
   h.race = raceWith([stake(60, 2), stake(100, 1), stake(110, 3, false)], [{ finished: true }, { finished: true }, { finished: false }, { finished: false }, { finished: false }]);
 });
 
@@ -207,18 +209,19 @@ describe('You and the tour placement', () => {
     h.user = { id: 'u1' };
     h.myScoring = { rounds: 20, holes_par3: 80, holes_par4: 200, holes_par5: 80, par3: 0.82, par4: 0.86, par5: 0.71, bogey_rate: 0.62 };
     h.holeAverages = { players: 70, holes: 10000, par3: -0.004, par4: -0.062, par5: -0.508, bogey_rate: 0.137 };
+    const st = (pos: number) => ({ label: String(pos), position: pos, missed: false, date: '2027-01-01', eventName: 'Event' });
+    h.form = new Map(['p1', 'p2', 'p3'].map((id, i) => [id, [st(i + 1), st(i + 2), st(i + 3)]]));
     h.follows = new Set(['p11']);
     const order = (c: HTMLElement) => [...c.querySelectorAll('[data-front-card]')].map((e) => e.getAttribute('data-front-card'));
     const a = mount();
     const o1 = order(a.container);
     const you1 = o1.indexOf('you_and_tour');
     expect(you1).toBeGreaterThan(-1);
-    expect(o1[you1 - 1]).toBe('your_players');
-    // Everything after the card belongs below In form's slot (In form, then stat leaders).
-    expect(o1.slice(you1 + 1).every((c) => c === 'in_form' || c === 'stat_leaders')).toBe(true);
+    expect(o1.slice(you1 - 1, you1 + 2)).toEqual(['your_players', 'you_and_tour', 'in_form']);
     a.unmount();
     h.follows = new Set();
     const o2 = order(mount().container);
-    expect(o2[o2.indexOf('you_and_tour') - 1]).toBe('race');
+    const you2 = o2.indexOf('you_and_tour');
+    expect(o2.slice(you2 - 1, you2 + 2)).toEqual(['race', 'you_and_tour', 'in_form']);
   });
 });
