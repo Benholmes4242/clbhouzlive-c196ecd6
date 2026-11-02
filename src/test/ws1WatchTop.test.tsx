@@ -313,9 +313,9 @@ describe('WS1 chips', () => {
 describe('WS1 Creators row', () => {
   it('hides, heading included, when the read returns fewer than three', () => {
     f.creators = { data: [creator('a'), creator('b')], isFetched: true, isError: false };
-    mountFeed();
+    const { container } = mountFeed();
     expect(screen.queryByText('Creators')).toBeNull();
-    expect(screen.queryByText('See all')).toBeNull();
+    expect(container.querySelector('[data-watch-creators="row"]')).toBeNull();
   });
 
   it('shows the skeleton while loading: the heading place plus five squircles', () => {
@@ -329,11 +329,11 @@ describe('WS1 Creators row', () => {
   it('See all appears only when the read returns more than eight', () => {
     f.creators = { data: Array.from({ length: 8 }, (_, i) => creator(`c${i}`)), isFetched: true, isError: false };
     const eight = mountFeed();
-    expect(screen.queryByText('See all')).toBeNull();
+    expect(within(eight.container.querySelector('[data-watch-creators="row"]') as HTMLElement).queryByText('See all')).toBeNull();
     eight.unmount();
     f.creators = { data: Array.from({ length: 9 }, (_, i) => creator(`c${i}`)), isFetched: true, isError: false };
-    mountFeed();
-    expect(screen.getByText('See all')).toBeTruthy();
+    const nine = mountFeed();
+    expect(within(nine.container.querySelector('[data-watch-creators="row"]') as HTMLElement).getByText('See all')).toBeTruthy();
   });
 
   it('a creator with a video this week wears the ring and reads "{n} this week"', () => {
@@ -403,8 +403,8 @@ describe('WS1 Creators row', () => {
     const nine = Array.from({ length: 9 }, (_, i) => creator(`c${i}`));
     f.creators = { data: nine, isFetched: true, isError: false };
     f.creatorsSheet = { data: [...nine, creator('extra')], isFetched: true, isError: false };
-    mountFeed();
-    fireEvent.click(screen.getByText('See all'));
+    const { container } = mountFeed();
+    fireEvent.click(within(container.querySelector('[data-watch-creators="row"]') as HTMLElement).getByText('See all'));
     expect(f.track).toHaveBeenCalledWith('watch_creators_see_all');
     const sheet = screen.getByTestId('bottom-sheet');
     expect(within(sheet).getByText('Name extra')).toBeTruthy();
