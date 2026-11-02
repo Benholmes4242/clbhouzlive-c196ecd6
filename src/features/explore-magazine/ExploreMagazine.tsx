@@ -1252,30 +1252,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     [opener],
   );
 
-  /* P1 — a board row opens the round it ranks in the same sheet the stream
-     cards use; a row with no round id (a member-only ranking row) opens the
-     member. */
-  const boardRowPress = useCallback(
-    (row: RoundPressTarget) => {
-      if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
-      else opener.openProfile(row.user_id);
-    },
-    [opener],
-  );
-
-  const chips = useMemo(
-    () =>
-      EXPLORE_VIEWS.map((key) => ({
-        id: key,
-        label:
-          key === 'all'
-            ? t('amateur.stream.view.all', 'All')
-            : key === 'scores'
-              ? t('amateur.stream.view.scores', 'Rounds')
-              : t('amateur.stream.view.watch', 'Watch'),
-      })),
-    [t],
-  );
+  /* RS — the board row handler left with the Scores view; /rounds owns it now. */
 
   /** ONE SHELF RENDERER: the stream's every-fourth-card slot. A shelf reports
    *  its own emptiness. */
@@ -1302,36 +1279,10 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
 
                     pos={pos}
                   />
-                ) : shelf === 'circle' ? (
-                  /* THE CIRCLE SLOT HAS TWO OCCUPANTS (BRIEF_EXPLORE_SUGGESTED_GOLFERS §1).
-                     FOLLOWS NOBODY -> suggested golfers; the circle shelf can
-                     never fill for them and skipping it silently means the page
-                     never says the one thing that would improve it (52 of 99
-                     members followed nobody at the last measurement).
-                     FOLLOWS SOMEONE, NO ROUNDS -> nothing. They know who their
-                     circle is; the gate is the FOLLOW SET, never the round count.
-                     UNRESOLVED -> neither, not for one frame. */
-                  !circleSize.isSuccess || circleSize.isFetching ? null : circleSize.data === 0 ? (
-                    <PeopleShelf
-                      viewerId={userId}
-                      clubId={null}
-                      clubName={null}
-                      enabled={!!userId}
-                      pos={pos}
-                      source="suggested"
-                    />
-                  ) : (
-                    <CircleShelf viewerId={userId} pos={pos} />
-                  )
                 ) : shelf === 'standing' ? (
-                  /* SCORES ONLY: a viewer with no connected handicap gets the
-                     connect invitation IN THIS SLOT instead of the standing
-                     shelf (handoff 1.8). All never shows it. */
-                  view === 'scores' ? (
-                    <ScoresStandingSlot viewerId={userId} pos={pos} />
-                  ) : (
-                    <StandingShelf viewerId={userId} pos={pos} />
-                  )
+                  /* RS — the Scores-only connect invitation slot left with the
+                     view; the standing shelf is the only occupant now. */
+                  <StandingShelf viewerId={userId} pos={pos} />
 
                 ) : shelf === 'personalBests' ? (
                   <PersonalBestsShelf viewerId={userId} pos={pos} />
