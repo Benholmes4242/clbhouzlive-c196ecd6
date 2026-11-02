@@ -190,7 +190,9 @@ beforeEach(() => {
   f.attachTileHls.mockClear();
   f.follow.mutateAsync.mockClear();
   ioCallbacks.length = 0;
-  Object.defineProperty(window, 'IntersectionObserver', { writable: true, configurable: true, value: ControllableIO });
+  /* The setup's IntersectionObserver is writable but not configurable, so
+     assign rather than redefine. */
+  window.IntersectionObserver = ControllableIO as unknown as typeof IntersectionObserver;
   resetCreatorsRowSessionForTests();
   resetWatchLeadSessionForTests();
 });
