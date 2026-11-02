@@ -28,6 +28,7 @@ export interface UserProfile {
   user_type?: string | null;
   profile_type?: ProfileType | null;
   is_public?: boolean | null;
+  is_creator: boolean;
   is_official_club?: boolean | null;
   has_completed_onboarding?: boolean | null;
   mini_card_crop_x?: number | null;

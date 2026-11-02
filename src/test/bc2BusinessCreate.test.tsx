@@ -353,13 +353,13 @@ describe('BC2 everyone-else branch', () => {
   it('the country defaults from the profile and the address waits without one', async () => {
     s.tables['user_profiles'] = [{ id: 'me', country: 'United Kingdom' }];
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('bizc-country-line').textContent).toContain('United Kingdom'));
     expect(screen.getByTestId('address-autocomplete').getAttribute('data-country')).toBe('GB');
     cleanup();
     s.tables['user_profiles'] = [{ id: 'me', country: null }];
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('bizc-country-line').textContent).toContain('Choose a country'));
     expect(screen.getByTestId('address-autocomplete').getAttribute('data-disabled')).toBe('true');
   });
@@ -367,7 +367,7 @@ describe('BC2 everyone-else branch', () => {
   it('Change opens the country picker and Drop a pin opens the pin sheet', async () => {
     s.tables['user_profiles'] = [{ id: 'me', country: 'United Kingdom' }];
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('bizc-country-line').textContent).toContain('United Kingdom'));
     fireEvent.click(screen.getByText('Change'));
     expect(screen.getByTestId('bizc-country-picker')).toBeTruthy();
@@ -385,7 +385,7 @@ describe('BC2 everyone-else branch', () => {
     s.rpcs['get_course_stats_batch'] = (a: { p_course_ids: string[] }) =>
       a.p_course_ids.map(id => ({ course_id: id, rounds_tracked: id === 'n1' ? 4000 : 120 }));
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('address-autocomplete').getAttribute('data-country')).toBe('GB'));
     fireEvent.click(screen.getByTestId('address-pick'));
     const card = await screen.findByTestId('bizc-area-card');
@@ -399,7 +399,7 @@ describe('BC2 everyone-else branch', () => {
     s.rpcs['get_nearby_courses'] = [{ course_id: 'n1', course_name: 'Near One', distance_km: 1.9 }];
     s.rpcs['get_course_stats_batch'] = new Error('boom');
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('address-autocomplete').getAttribute('data-country')).toBe('GB'));
     fireEvent.click(screen.getByTestId('address-pick'));
     const card = await screen.findByTestId('bizc-area-card');
@@ -411,7 +411,7 @@ describe('BC2 everyone-else branch', () => {
     s.tables['user_profiles'] = [{ id: 'me', country: 'United Kingdom' }];
     s.rpcs['get_nearby_courses'] = [];
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('address-autocomplete').getAttribute('data-country')).toBe('GB'));
     fireEvent.click(screen.getByTestId('address-pick'));
     await waitFor(() => expect(screen.getByTestId('address-value')).toBeTruthy());
@@ -420,7 +420,7 @@ describe('BC2 everyone-else branch', () => {
     s.tables['user_profiles'] = [{ id: 'me', country: 'United Kingdom' }];
     s.rpcs['get_nearby_courses'] = new Error('boom');
     renderAt(['/business/create-v2']);
-    toStep2('Creator');
+    toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('address-autocomplete').getAttribute('data-country')).toBe('GB'));
     fireEvent.click(screen.getByTestId('address-pick'));
     await waitFor(() => expect(screen.getByTestId('address-value')).toBeTruthy());

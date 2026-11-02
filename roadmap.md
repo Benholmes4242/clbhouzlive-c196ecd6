@@ -1,5 +1,10 @@
 # Roadmap
 
+## CR1 — Self-serve creator choice
+- [x] Add shared switch, Welcome Continue-only choice and immediate Edit profile save/rollback.
+- [x] Remove business-create Creator tile and apply only authorised test edits.
+- [ ] STOP: focused 152/154; two ep2 Name switch queries find multiple switches; automatic typecheck reports four errors. Await authorisation; full shards/screenshots not run. Inventory 5,920/544 (+8 creator cases +1 no-tile case), not full passing total. See CR1_REPORT.md.
+
 ## Course Media fullscreen shot selection
 - [x] Guard missing shot ids, publish opening index, preserve selected/swiped shots and reject stale hydration.
 - [x] Audit tile identities; ten new regressions; focused 60/60 and full four shards 5,911/5,911 across 543 files (baseline 5,901/542).

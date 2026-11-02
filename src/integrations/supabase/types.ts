@@ -5722,7 +5722,7 @@ export type Database = {
         }
         Relationships: []
       }
-      featured_creators: {
+      featured_creators_all: {
         Row: {
           actor_id: string
           actor_type: string
@@ -15817,6 +15817,7 @@ export type Database = {
           id: string
           instagram_handle: string
           is_business_verified: boolean | null
+          is_creator: boolean
           is_official_club: boolean | null
           is_public: boolean | null
           is_staff_account: boolean
@@ -15947,6 +15948,7 @@ export type Database = {
           id: string
           instagram_handle?: string
           is_business_verified?: boolean | null
+          is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_staff_account?: boolean
@@ -16077,6 +16079,7 @@ export type Database = {
           id?: string
           instagram_handle?: string
           is_business_verified?: boolean | null
+          is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_staff_account?: boolean
@@ -18733,6 +18736,27 @@ export type Database = {
           stream_id: string | null
           thumbnail_url: string | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      featured_creators: {
+        Row: {
+          actor_id: string | null
+          actor_type: string | null
+          added_at: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_type?: string | null
+          added_at?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_type?: string | null
+          added_at?: string | null
+          sort_order?: number | null
         }
         Relationships: []
       }
@@ -23345,6 +23369,15 @@ export type Database = {
       }
       get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
       get_pro_hole_data_queue: { Args: never; Returns: Json }
+      get_profile_creator: {
+        Args: { p_user_id: string }
+        Returns: {
+          is_creator: boolean
+          long_form: number
+          shorts: number
+          videos: number
+        }[]
+      }
       get_profile_posts: {
         Args: {
           p_actor_id: string
@@ -23409,6 +23442,32 @@ export type Database = {
           width: number
         }[]
       }
+      get_profile_round_videos: {
+        Args: { p_dates: string[]; p_score_ids: string[]; p_user_id: string }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
+          score_id: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_profile_rounds: {
         Args: { p_user_id: string }
         Returns: {
@@ -23433,6 +23492,36 @@ export type Database = {
           play_date: string
           total_holes: number
           whs_score_id: string
+        }[]
+      }
+      get_profile_videos: {
+        Args: {
+          p_before?: string
+          p_kind?: string
+          p_limit?: number
+          p_user_id: string
+        }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
+          stream_id: string
+          width: number
         }[]
       }
       get_publication_stats: {

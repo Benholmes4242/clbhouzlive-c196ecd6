@@ -31,6 +31,7 @@ interface RawProfile {
   country?: string | null;
   city?: string | null;
   is_public?: boolean | null;
+  is_creator?: boolean;
   gender?: string | null;
   social_links?: {
     instagram?: string | null;
@@ -84,6 +85,7 @@ function makeInitial(profile: RawProfile | null | undefined): ProfileFormData {
     country: profile?.country ?? '',
     city: profile?.city ?? '',
     isPublic: profile?.is_public ?? true,
+    isCreator: profile?.is_creator ?? false,
     gender: profile?.gender ?? '',
     
   };
@@ -155,6 +157,7 @@ export function useProfileForm(profile: RawProfile | null | undefined, loading?:
       form.handicapIndex !== initialData.handicapIndex ||
       
       form.isPublic !== initialData.isPublic ||
+      form.isCreator !== initialData.isCreator ||
       form.country !== initialData.country ||
       form.city !== initialData.city ||
       form.instagramHandle !== initialData.instagramHandle ||

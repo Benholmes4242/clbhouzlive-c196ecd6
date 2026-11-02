@@ -63,6 +63,11 @@ describe('BC1 route and chrome', () => {
 });
 
 describe('BC1 step 1 selection', () => {
+  it('the create picker offers no Creator tile', () => {
+    renderAt(['/business/create-v2']);
+    expect(document.querySelector('[data-value="Creator"]')).toBeNull();
+    expect(CREATE_CATEGORY_TILES.some(t => t.value === 'Creator')).toBe(false);
+  });
   it('arrives with nothing chosen; selecting enables Continue and moves', () => {
     renderAt(['/business/create-v2']);
     expect(document.querySelectorAll('.bizc-tile[aria-pressed="true"]').length).toBe(0);
@@ -77,8 +82,8 @@ describe('BC1 step 1 selection', () => {
   });
   it('maps every stored value to BUSINESS_CATEGORIES exactly once', () => {
     const values = CREATE_CATEGORY_TILES.map(t => t.value);
-    expect(values.length).toBe(BUSINESS_CATEGORIES.length);
-    expect([...values].sort()).toEqual([...BUSINESS_CATEGORIES].sort());
+    expect(values.length).toBe(BUSINESS_CATEGORIES.filter(v => v !== 'Creator').length);
+    expect([...values].sort()).toEqual(BUSINESS_CATEGORIES.filter(v => v !== 'Creator').sort());
     for (const v of values) expect(BUSINESS_CATEGORIES).toContain(v);
   });
   it('the draft stores the value, not the display label', () => {
@@ -103,14 +108,14 @@ describe('BC1 step 1 selection', () => {
 describe('BC1 history', () => {
   it('Continue pushes a step; back returns with selection kept; back on step 1 leaves', async () => {
     renderAt(['/before', '/business/create-v2'], 1);
-    fireEvent.click(tile('Creator'));
+    fireEvent.click(tile('Brand / Manufacturer'));
     fireEvent.click(cont());
-    /* BC2: step 2 is now the real branch screen; Creator takes the
+    /* BC2: step 2 is now the real branch screen; Brand / Manufacturer takes the
      * everyone-else branch. */
     expect(screen.getByTestId('bizc-step-2').getAttribute('data-branch')).toBe('other');
     expect(screen.getByTestId('bizc-progress').querySelectorAll('i[data-complete="true"]').length).toBe(2);
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    await waitFor(() => expect(tile('Creator').getAttribute('aria-pressed')).toBe('true'));
+    await waitFor(() => expect(tile('Brand / Manufacturer').getAttribute('aria-pressed')).toBe('true'));
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByRole('alertdialog')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
