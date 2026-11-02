@@ -74,5 +74,5 @@ export function HundredRaceRow({ row, viewerId, total, previousViewer = false, o
       <span className="t100-row-track" aria-hidden><span data-row-progress style={{ width: `${raceShare(Number(row.value), total) * 100}%` }} /></span>
     </span>
     <span className="t100-value tabular-nums">{row.value}</span>
-  </Button>;
+  </button>;
 }
