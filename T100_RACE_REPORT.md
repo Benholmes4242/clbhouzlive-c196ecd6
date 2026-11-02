@@ -1,27 +1,13 @@
-# T100 race — stopped at focused tests
+# T100 race — complete
 
-## Result
-Race extracted from Rounds to Courses → Top 100, active-list career query and progress rail retained, folded Your courses implemented. Not verified complete: stopped immediately on five new test failures; no correction, rerun, full shards or browser comparison after failure.
+## Result (T100.1)
+Harness fix only, `src/test/t100Race.test.tsx:35`:
+`void i18n.init({ lng: 'en', initAsync: false, resources: … })` → `void i18n.init({ lng: 'en', initAsync: false, interpolation: { escapeValue: false }, resources: … })`. Matches app `src/i18n/index.ts:91`. No expected text, assertion or case changed.
 
-Command:
-`bunx vitest run src/test/t100Race.test.tsx src/hooks/top100/hundredRaceRules.test.ts src/components/courses/Top100CoursesHubPanel.test.tsx src/test/yourHundredPeek.test.tsx src/features/explore-magazine/__tests__/scoresLeadBoard.test.tsx src/features/explore-magazine/__tests__/gateScopeSwitch.test.tsx --maxWorkers=2`
-
-**64 passed / 5 failed / 69 total across 6 files.** New T100 file25/30; other five files39/39. No pre-existing test failures identified. Preview latest signal **2026-11-02T08:51:23Z build OK**; earlier intermediate missing-helper import error superseded after relocation. No manual build/typecheck.
-
-## Stop error
-All five cases in `src/test/t100Race.test.tsx:68:34`, under `T100 slab and progress`:
-- behind uses signed-off copy and bold figures without an em dash
-- leading uses signed-off copy and bold figures without an em dash
-- no gap uses signed-off copy and bold figures without an em dash
-- tie uses signed-off copy and bold figures without an em dash
-- absent uses signed-off copy and bold figures without an em dash
-
-```text
-AssertionError: expected 'You\'ve played 23 of the GB&amp;I Hun…' to be 'You\'ve played 23 of the GB&I Hundred…' // Object.is equality
-Expected: "You've played 23 of the GB&I Hundred, 3rd of 31 members and 11 behind leader."
-Received: "You've played 23 of the GB&amp;I Hundred, 3rd of 31 members and 11 behind leader."
-```
-All five share the escaped ampersand in the test's real i18next provider. No assertion weakened and no fix applied after this failure. Requires authorization to correct the interpolation/provider configuration while keeping all expected text unchanged, then rerun and finish.
+- Focused six files (same command as before): **69/69 passed** (was 64/5 failed on escaped "GB&amp;I").
+- `npx tsgo --noEmit`: clean. `npx vite build`: OK (existing chunk-size warning only).
+- Full suite, `vitest --shard=n/4 --maxWorkers=2`: 1,409 + 1,378 + 1,438 + 1,477 = **5,702/5,702 across 532 files**, zero failures. No pre-existing failures.
+- vs baseline 5,669/530: **+33 tests / +2 files** = +30 `t100Race.test.tsx` (new file), −1 deleted Rounds `The Hundred placeholders > heights`, +4 `tourScorecardCourseDoor.test.tsx` (new file, Tour scorecard course-door follow-up). Relocated `theHundred.test.ts` → `hundredRaceRules.test.ts` is file-neutral (its 9→8 is the deleted placeholder test).
 
 ## Changes
 - New `src/hooks/top100/useTop100Race.ts`: extracted career row/useCareerBoard, same RPC/cache key/map/limit100. Signed-in only. Pure helpers live in `hundredRaceRules.ts`; ties omit gap clauses per Ben's ruling.
@@ -37,7 +23,7 @@ All five share the escaped ampersand in the test's real i18next provider. No ass
 - Removed locale keys `amateur.leaderboards.theHundred` and `amateur.leaderboards.top100Empty` where present in six courses catalogues. Replaced hundredSlab played/behind/clear strings and added playedJoint; absent/nobodyPast preserved semantically. Other Top100 sheet keys retained.
 
 ## Test accounting / authorized changes
-Last all-green full suite **5,669/5,669 across530**. Candidate inventory **5,698 across531**, NOT a full-suite result: +30 new `t100Race.test.tsx`, −1 retired Rounds placeholder test; relocated file has no file-count delta. No full-suite run performed here.
+Last all-green full suite **5,669/5,669 across530**. Candidate inventory was 5,698 across 531 before the course-door follow-up; final full suite 5,702/532 above: +30 new `t100Race.test.tsx`, −1 retired Rounds placeholder test; relocated file has no file-count delta. 
 - Relocated `theHundred.test.ts` (9→8): `mid-table: behind the leader by the gap` expected object gained `tie:false` to encode the new server tie flag; clause/count assertions remain.
 - Relocated rail case renamed `beyond view, the tile before the target lands at the edge: (index − 1) × 116 − 16` → `(index − 1) × 124 − 16`. Assertions `expect(hundredRailScroll(3,16,430)).toBe(216)` →232; `(37,16,430)).toBe(4160)` →4448. Signed-off116px tiles plus8px gap replace108+8; algorithm unchanged.
 - Deleted only `The Hundred placeholders > heights`: `expect(HUNDRED_SLAB_HEIGHT).toBe(88)`, `expect(HUNDRED_STRIP_HEIGHT).toBe(88)`, `expect(HUNDRED_ROWS_HEIGHT).toBe(144)`, `expect(hundredPlaceholderHeight(false)).toBe(288)`, `expect(hundredPlaceholderHeight(true)).toBe(476)`. The Rounds section/reservations are explicitly removed; new race loading shape covered in T100 file.

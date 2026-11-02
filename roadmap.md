@@ -6,7 +6,7 @@
 ## T100 — Top 100 race moves to Courses — STOP
 - [x] Extracted career race hook/helpers; active-list neutral race and folded Your courses implemented. Removed only Rounds §7 dependencies/reservation/locales; other sections retained.
 - [ ] Focused64/69: five new slab cases at t100Race.test.tsx:68:34 render GB&amp;I instead of GB&I (`AssertionError` expected literal ampersand). Stop: no fix/rerun/full shards after failure; await interpolation/provider correction authorization, assertions unchanged. Existing39/39 pass. Candidate5,698/531 (+30new−1retired placeholder,+1file) vs last-green5,669/530; NOT full result. Preview build OK08:51:23Z.
-- [ ] Finish full shards and signed-off comparison after stop cleared; signed-in E2E unavailable external_unmanaged. Counting provenance and every changed/deleted test recorded in T100_RACE_STOP_REPORT.md; deployed career definition not independently available, no SQL performed.
+- [ ] Finish full shards and signed-off comparison after stop cleared; signed-in E2E unavailable external_unmanaged. Counting provenance and every changed/deleted test recorded in T100_RACE_REPORT.md; deployed career definition not independently available, no SQL performed.
 
 ## Round comments over scorecard — DONE
 - [x] Guarded dismissal, stacked layers and disabled horizontal drag implemented; Ben approved comments-owned guard/history. Other nested callers audited unchanged in ROUND_COMMENTS_SCORECARD_STOP_REPORT.md.
