@@ -1,12 +1,11 @@
-# WS4 Shorts tiles — stopped on new test failure
+# WS4 Shorts tiles — complete
 
 ## Implemented
 Only four presentation values changed in `WatchFeed.tsx`: QH_W 126→156, QH_H 224→248, shelf title minHeight `calc(12px * 1.3 * 2)`, and Shorts grid title minHeight `calc(12.5px * 1.32 * 2)`. Skeleton uses the same size constants. Grid aspect remains `126 / 224`. No other page behaviour or protected backend/configuration changed.
 
-## Verification stop
-Command: `bunx vitest run src/test/ws2WatchMiddle.test.tsx --maxWorkers=2`.
-Result: **21 passing, 1 failing / 22 cases / 1 file**.
-Full output: `/tmp/ws4/focused.log`.
+## Authorised fixture fix (Ben, 21:39 UTC)
+In the new `WS4 shelf tiles are 156 wide with a 248 cover-fit poster` case only, `f.clips.data` now supplies a local spread copy of the shared `hub()` fixture with `poster_url: 'https://x/clip1.jpg'`. The shared `hub()` fixture is untouched, so no other case's data changed. With a poster present, the tile renders its image and the cover-fit assertion passes.
+
 
 New failure, verbatim:
 ```text
