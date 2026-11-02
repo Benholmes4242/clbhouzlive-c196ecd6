@@ -91,6 +91,7 @@ beforeEach(() => {
   h.people = [
     person({ user_id: 'u-ring', display_name: 'Danny Holmes', username: 'danny' }),
     person({ user_id: 'u-plain', display_name: 'David Lang', username: 'david' }),
+    person({ user_id: 'u-third', display_name: 'Simon Savage', username: 'simon' }),
   ];
   h.biz = [];
   h.rows = [{ actor_id: 'u-ring', kind: 'round', post_id: 'post-9', created_at: NOW.toISOString(), course_name: 'Sundridge Park Golf Club (East)' }];
@@ -133,7 +134,7 @@ describe('ActiveRing', () => {
     const { container } = render(<ActiveRing active surface="card"><i /></ActiveRing>);
     const outer = container.querySelector('[data-active-ring="on"]') as HTMLElement;
     expect(outer.style.padding).toBe('1.5px');
-    expect(outer.style.background).toContain('linear-gradient');
+    expect(outer.style.backgroundImage).toContain('linear-gradient');
     expect(ACTIVE_RING_GRADIENT).toContain('#F7931E');
     const gap = container.querySelector('[data-active-ring-gap]') as HTMLElement;
     expect(gap.style.padding).toBe('2px');
@@ -143,7 +144,7 @@ describe('ActiveRing', () => {
     const { container } = render(<ActiveRing active={false} surface="canvas"><i /></ActiveRing>);
     const outer = container.querySelector('[data-active-ring="off"]') as HTMLElement;
     expect(outer.style.padding).toBe('3.5px');
-    expect(outer.style.background).toBe('');
+    expect(outer.style.backgroundImage).toBe('');
     expect(container.querySelector('[data-active-ring-gap]')).toBeNull();
   });
 });
