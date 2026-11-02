@@ -647,7 +647,6 @@ export function WatchFeed({
             </p>
           ) : null}
         </>
-      )}
 
       <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
     </div>
