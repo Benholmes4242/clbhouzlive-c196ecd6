@@ -13,6 +13,8 @@ import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
 import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
 import { COMMENTS_SHEET_Z } from '@/lib/zLayers';
+import { Z } from '@/config/zIndex';
+import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
 import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -90,11 +92,15 @@ interface Props {
   /** Open with the composer already focused — for entry points that are
    *  themselves a comment affordance (the fullscreen viewer's bar). */
   autoFocusComposer?: boolean;
+  layer?: 'base' | 'stacked';
+  /** Expose the existing draft guard to the scorecard's dismissal wrapper. */
+  onDismissReady?: (dismiss: (() => void) | null) => void;
 }
 
 function CommentsSheetV2Inner({
   isOpen, onClose, targetType, targetId, targetSecondaryId, initialCommentId,
   autoFocusComposer = false,
+  layer = 'base', onDismissReady,
 }: Props) {
   const [composerFocusToken, setComposerFocusToken] = useState(0);
   const { user } = useSupabaseSession();
@@ -138,7 +144,7 @@ function CommentsSheetV2Inner({
      (reported up by CommentComposer, which stays the owner of those fields)
      and an in-progress edit of an existing comment. Either one is lost by a
      dismissal, so both gate it.
-     REPORTED, NOT FIXED HERE: this sheet is its own portal overlay, not the
+     BASE ONLY: this sheet is its own portal overlay, not the
      shared BottomSheet, so it has no Escape handler and no sheet-stack history
      entry — backdrop tap is its only dismiss path, and hardware back leaves
      the route with the sheet open. Migrating it to BottomSheet is a separate
@@ -150,6 +156,33 @@ function CommentsSheetV2Inner({
   const draftDirty =
     composerDirty || (editing != null && editText.trim() !== (editing.content ?? '').trim());
   const { requestClose, confirmOpen, discard, keepEditing } = useDraftDismissGuard(draftDirty, onClose);
+
+  // Stacked comments own dismissal; base callers retain their existing lifecycle.
+  // Publish the guard, never raw onClose, so the host cannot discard a draft.
+  useEffect(() => {
+    onDismissReady?.(requestClose);
+    return () => onDismissReady?.(null);
+  }, [onDismissReady, requestClose]);
+
+  useEffect(() => {
+    if (!isOpen || layer !== 'stacked') return;
+    // The scorecard mounts its portal in an effect. Register after that commit,
+    // so the comments marker is above, never below, the scorecard marker.
+    let entry: ReturnType<typeof pushSheetEntry> = null;
+    const frame = requestAnimationFrame(() => { entry = pushSheetEntry(requestClose); });
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopPropagation();
+      requestClose();
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('keydown', onKey, true);
+      releaseSheetEntry(entry);
+    };
+  }, [isOpen, layer, requestClose]);
 
   /* PERSISTED, NOT JUST GUARDED (BRIEF_SHEET_BACK_BEHAVIOUR_05 §2). The guard
      above only asks; it cannot survive a hardware back, which this sheet does
@@ -315,7 +348,9 @@ function CommentsSheetV2Inner({
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[12002] bg-black/40"
+            className="fixed inset-0 bg-black/40"
+            data-comments-backdrop={layer}
+            style={{ zIndex: layer === 'stacked' ? Z.stackedSheetBackdrop : Z.sheetBackdrop }}
             onClick={requestClose}
           />
           <motion.div
@@ -327,8 +362,10 @@ function CommentsSheetV2Inner({
             onAnimationComplete={() => {
               if (autoFocusComposer && isOpen) setComposerFocusToken((n) => n + 1);
             }}
-            className="fixed inset-x-0 bottom-0 z-[12003] w-full md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col"
+            className="fixed inset-x-0 bottom-0 w-full md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col"
+            data-comments-sheet={layer}
             style={{
+              zIndex: layer === 'stacked' ? Z.stackedSheet : Z.sheet,
               background: CANVAS,
               borderRadius: '20px 20px 0 0',
               maxHeight: '85dvh',
