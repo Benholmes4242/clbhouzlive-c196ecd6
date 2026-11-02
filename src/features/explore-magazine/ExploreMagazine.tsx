@@ -12,7 +12,6 @@ import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import {
   RoundDetailSheet,
@@ -41,8 +40,6 @@ import { useBatchRoundMedals } from './useBatchRoundMedals';
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
-import { useCircleSize } from '@/features/amateur/useCircleSize';
-import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 
 import { StandingShelf } from './StandingShelf';
 
@@ -468,10 +465,6 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     },
     [queryClient],
   );
-  /* THE SETTLED FOLLOW-SET READ behind the circle slot's two occupants. One
-     definition (src/lib/social/circle.ts), so this gate and the circle shelf's
-     own rows can never disagree. */
-  const circleSize = useCircleSize(userId, !!userId);
   const openReview = useReviewSheetStore((state) => state.open);
 
   /* RS — THE VIEW SWITCH IS GONE. Explore is always Watch; a ?view= on arrival
