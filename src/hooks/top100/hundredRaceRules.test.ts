@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  firstUnplayedIndex, hundredRailScroll, hundredVisibleTiles, hundredSlab, hundredPlaceholderHeight,
-  HUNDRED_SLAB_HEIGHT, HUNDRED_STRIP_HEIGHT, HUNDRED_ROWS_HEIGHT,
-} from '../theHundred';
+  firstUnplayedIndex, hundredRailScroll, hundredVisibleTiles, hundredSlab,
+} from './hundredRaceRules';
 
 const row = (user_id: string, value: number, pos: number, is_viewer = false) => ({
   user_id, display_name: user_id, value, pos, total_members: 58, is_viewer,
@@ -11,7 +10,7 @@ const row = (user_id: string, value: number, pos: number, is_viewer = false) => 
 describe('The Hundred slab', () => {
   it('mid-table: behind the leader by the gap', () => {
     expect(hundredSlab([row('a', 37, 1), row('b', 20, 2), row('me', 12, 3, true)], 'me'))
-      .toEqual({ kind: 'played', n: 12, pos: 3, total: 58, clause: { kind: 'behind', gap: 25, leader: 'a' } });
+      .toEqual({ kind: 'played', n: 12, pos: 3, total: 58, tie: false, clause: { kind: 'behind', gap: 25, leader: 'a' } });
   });
   it('leading: clear of second', () => {
     const s = hundredSlab([row('me', 37, 1, true), row('b', 30, 2)], 'me');
@@ -43,18 +42,9 @@ describe('The Hundred rail scroll', () => {
     expect(hundredRailScroll(1, 16, 430)).toBe(0);
     expect(hundredRailScroll(2, 16, 430)).toBe(0);
   });
-  it('beyond view, the tile before the target lands at the edge: (index − 1) × 116 − 16', () => {
-    expect(hundredRailScroll(3, 16, 430)).toBe(216);
-    expect(hundredRailScroll(37, 16, 430)).toBe(4160);
+  it('beyond view, the tile before the target lands at the edge: (index − 1) × 124 − 16', () => {
+    expect(hundredRailScroll(3, 16, 430)).toBe(232);
+    expect(hundredRailScroll(37, 16, 430)).toBe(4448);
   });
 });
 
-describe('The Hundred placeholders', () => {
-  it('heights', () => {
-    expect(HUNDRED_SLAB_HEIGHT).toBe(88);
-    expect(HUNDRED_STRIP_HEIGHT).toBe(88);
-    expect(HUNDRED_ROWS_HEIGHT).toBe(144);
-    expect(hundredPlaceholderHeight(false)).toBe(288);
-    expect(hundredPlaceholderHeight(true)).toBe(476);
-  });
-});
