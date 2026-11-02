@@ -35,7 +35,6 @@ const SECTIONS: { id: string; labelKey: string; icon: TourIconName }[] = [
   { id: 'live', labelKey: 'nav.leaderboards', icon: 'trophy' },
   { id: 'schedule', labelKey: 'nav.schedule', icon: 'cal' },
   { id: 'players', labelKey: 'nav.players', icon: 'users' },
-  { id: 'leaderboards', labelKey: 'nav.leaders', icon: 'board' },
 ];
 
 export interface TourGlanceProps {

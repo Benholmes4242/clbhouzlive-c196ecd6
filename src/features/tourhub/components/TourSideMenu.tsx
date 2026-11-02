@@ -22,7 +22,7 @@ import {
   Trophy,
   CalendarDays,
   Users,
-  BarChart3,
+
   Settings,
   User,
   LogOut,
@@ -56,7 +56,6 @@ const DESTINATIONS: { id: string; labelKey: string; Icon: LucideIcon }[] = [
   { id: 'live',         labelKey: 'nav.leaderboards', Icon: Trophy },
   { id: 'schedule',     labelKey: 'nav.schedule',     Icon: CalendarDays },
   { id: 'players',      labelKey: 'nav.players',      Icon: Users },
-  { id: 'leaderboards', labelKey: 'nav.leaders',      Icon: BarChart3 },
 ];
 
 

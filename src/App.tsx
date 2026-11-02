@@ -385,7 +385,7 @@ const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => 
 
 const TournamentDetailPage = lazy(() => import("./features/tourhub/tournament-v2/TournamentPage").then(m => ({ default: m.TournamentPage })));
 const PlayerProfilePage = lazy(() => import("./features/tourhub/player-v2/PlayerPage").then(m => ({ default: m.PlayerPage })));
-const SeasonStatsIndex = lazy(() => import("./features/tourhub/leaders-v2/SeasonStatsIndex"));
+const SeasonStatsRedirect = lazy(() => import("./features/tourhub/players-v2/SeasonStatsRedirect"));
 
 
 // Continue Watching mini-player (queue drawer + full-screen modal deleted in PR-5).
@@ -821,7 +821,7 @@ function AppRoutes() {
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<TournamentPageSkeleton />}><TournamentDetailPage /></Suspense>} />
         
         <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<PlayerPageSkeleton />}><PlayerProfilePage /></Suspense>} />
-        <Route path="/tourhub/season-stats" element={<Suspense fallback={<GenericPageSkeleton />}><SeasonStatsIndex /></Suspense>} />
+        <Route path="/tourhub/season-stats" element={<Suspense fallback={<GenericPageSkeleton />}><SeasonStatsRedirect /></Suspense>} />
         {/* TC1 (2026-09-20): the college hub, yearbook, profile and compare pages
             were retired for lack of use. Shared and bookmarked college URLs must
             still resolve, so every /tourhub/college-golf* path lands on Tour Hub
