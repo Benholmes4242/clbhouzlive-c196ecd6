@@ -2,7 +2,7 @@
  * THE ONE FIELD VOCABULARY for both profile editors.
  *
  * Replaces business/editor/editorStyles.ts (deleted) and the ad-hoc field
- * classes that were repeated inside ManageProfile. Personal and business
+ * classes formerly repeated in the legacy personal editor. Personal and business
  * already share their shell (SectionCard); they now share their fields too.
  *
  * Type scale is the lighter business scale from BRIEF_BUSINESS_INSIGHTS:

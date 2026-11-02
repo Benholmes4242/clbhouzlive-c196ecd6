@@ -205,11 +205,3 @@ describe('EP2 Bio, Location, Gender', () => {
   });
 });
 
-describe('EP2 leaves /edit-profile alone', () => {
-  it('ManageProfile does not import the new You group', () => {
-    const src = readFileSync('src/pages/ManageProfile.tsx', 'utf8');
-    expect(src).not.toContain('EditProfileYou');
-    expect(src).toContain('<LocationSection');
-    expect(src).not.toContain('appearance="card"');
-  });
-});

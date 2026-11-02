@@ -29,8 +29,8 @@ export interface BusinessCategoryOption {
  * IMPORTANT: When adding new categories, add them here so they
  * appear consistently in create and edit flows.
  * 
- * NOTE: 'Creator' category enables creator features (Insights, Analytics)
- * for team/brand accounts that produce content.
+ * NOTE: Insights is gated by membership.canViewInsights; no category gates
+ * Insights or Analytics access.
  */
 export const BUSINESS_CATEGORIES_WITH_ICONS = [
   { value: 'Golf Club', label: 'Golf Club', icon: Flag },

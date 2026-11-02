@@ -26,12 +26,6 @@ vi.mock('@/lib/toast', () => ({ toast: Object.assign(vi.fn(), { error: vi.fn(), 
 vi.mock('@/components/profile/edit-v2/HeaderPhotoCard', () => ({ HeaderPhotoCard: () => null }));
 vi.mock('@/components/profile/edit-v2/ProfilePhotoCard', () => ({ ProfilePhotoCard: () => null }));
 vi.mock('@/components/profile/edit-v2/CoverGuidance', () => ({ CoverGuidance: () => null }));
-vi.mock('@/components/business/editor/IdentitySection', () => ({ IdentitySection: ({ businessName, setBusinessName }: { businessName: string; setBusinessName: (s: string) => void }) => <input aria-label="Business name" value={businessName} onChange={e => setBusinessName(e.target.value)} /> }));
-vi.mock('@/components/business/editor/LocationContactSection', () => ({ LocationContactSection: ({ website, setWebsite }: { website: string; setWebsite: (value: string) => void }) => <input aria-label="Website" value={website} onChange={event => setWebsite(event.target.value)} /> }));
-vi.mock('@/components/business/editor/FacilitiesSection', () => ({ FacilitiesSection: ({ amenities, setAmenities }: { amenities: string[]; setAmenities: (value: string[]) => void }) => <input aria-label="Facilities" value={amenities.join(',')} onChange={event => setAmenities([event.target.value])} /> }));
-vi.mock('@/components/business/editor/PrimaryActionSection', () => ({ PrimaryActionSection: () => null }));
-vi.mock('@/components/business/editor/OpeningHoursSection', () => ({ OpeningHoursSection: () => null }));
-vi.mock('@/components/business/editor/SocialSection', () => ({ SocialSection: () => null }));
 vi.mock('@/components/business/PinDropModal', () => ({ PinDropModal: () => null }));
 vi.mock('@/components/business/RequestAccessModal', () => ({ RequestAccessModal: () => null }));
 vi.mock('@/components/business/RequestClubModal', () => ({ RequestClubModal: () => null }));

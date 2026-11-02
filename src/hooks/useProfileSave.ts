@@ -250,8 +250,6 @@ export function useProfileSave(userId: string) {
           queryClient.invalidateQueries({ queryKey: [key], refetchType: 'all' })
         )
       );
-      // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
-      queryClient.invalidateQueries({ queryKey: ['onboarding-status', userId] });
 
       // When gender changes, the WHS percentile benchmark (men's vs women's
       // pro distribution) must recompute. Invalidation matches
