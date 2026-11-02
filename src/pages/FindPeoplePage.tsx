@@ -23,6 +23,7 @@ import { InviteSheetContext } from '@/components/invite/InviteSheetProvider';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { toast } from '@/lib/toast';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { useGlobalSearchV2 } from '@/features/search-v2/hooks/useGlobalSearchV2';
@@ -54,6 +55,9 @@ export function GolfersToFollowRedirect() {
 export default function FindPeoplePage() {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
+  /* FIX §3 — a full-screen page with its own back button: the floating nav
+     hides while it is open and returns on leave. */
+  useHideBottomNav();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const tab: FindPeopleTab =
@@ -145,7 +149,7 @@ export default function FindPeoplePage() {
             <ChevronLeft size={18} strokeWidth={2.2} />
           </button>
           <div style={{ flex: 1, textAlign: 'center', marginRight: 36, fontSize: 17, fontWeight: 700 }}>
-            {t('findPeople.title', { defaultValue: 'Find people' })}
+            {t('findPeople.title', { defaultValue: 'Explore the community' })}
           </div>
         </header>
 
