@@ -1443,3 +1443,8 @@
 
 ## WF2 — Who to follow rail in the feed
 - [x] Rails at posts 3/15 via CardFeed `renderBeforePost`; Activity block on privacy-safe suggestions; WF2.1 pan-y scroll fix and dim reason lines. 30 tests (wf2FeedRail.test.tsx); full shards 5,643/5,643 across 528 files; tsc + build clean. Report: WF2_FEED_RAIL_REPORT.md. Signed-in device check outstanding.
+
+## TOUR SCORECARD TILE — profile door in the player row
+- [x] Tour identity row gains the shared SheetDoorButton doors (course first, then profile, handlers only); name keeps flex 1 ellipsis. Tour Course/Profile foot actions removed; foot renders only for engagement/Share. Overlay has no minimum height to remove (reported).
+- [x] New tourScorecardProfileDoor.test.tsx (5); cb61 tour assertion updated (old/new quoted in TOUR_SCORECARD_PROFILE_DOOR_REPORT.md). Full shards 5,663/5,667 across 530 files — the 4 failures are the pre-existing roundCommentsStacked typed-draft cases awaiting Ben's ruling; no new failures. tsgo clean; build OK.
+- [x] Live 390x844 tour-scorecard capture impossible (external_unmanaged auth; guest row tap inert); visuals unit-tested, mock captured at /tmp/browser/tour-scorecard/mock_390x844.png. Signed-in device check outstanding.
