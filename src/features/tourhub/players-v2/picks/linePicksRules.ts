@@ -70,16 +70,21 @@ export function openLine(L: number): string {
   return `Pick up to three players from ${ordinal(L - 2)} to ${ordinal(L + 3)} to finish inside the top ${L}. The bar is how many clbhouz members picked them.`;
 }
 
+/** Event names that already start with "The" would read "the The RSM Classic". */
+export function eventName(name: string): string {
+  return name.replace(/^the\s+/i, '');
+}
+
 export function openFoot(mine: number, total: number, lastEvent: string): string {
   const you = mine > 0 ? `You've picked ${mine} of ${MAX_PICKS}. ` : '';
-  const rest = `Settled after the ${lastEvent}, with a leaderboard of who called it.`;
+  const rest = `Settled after the ${eventName(lastEvent)}, with a leaderboard of who called it.`;
   if (total === 0) return `${you}Be the first to pick. ${rest}`;
   return `${you}${total.toLocaleString('en-GB')} members have picked. ${rest}`;
 }
 
 /** Closed line: event end date in the future → its weekday; past → "Settled on Monday." */
 export function closedLine(lastEvent: string, endDate: string | null | undefined, now: Date): string {
-  const head = `The ${lastEvent} is under way.`;
+  const head = `The ${eventName(lastEvent)} is under way.`;
   if (!endDate) return `${head} Settled on Monday.`;
   const ended = `${endDate}T23:59:59Z` < now.toISOString();
   return ended ? `${head} Settled on Monday.` : `${head} Settled when it finishes on ${fmtDddd(endDate)}.`;

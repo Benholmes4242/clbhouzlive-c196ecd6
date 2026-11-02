@@ -33,7 +33,7 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } 
 (h as any).guestGate = undefined;
 
 import { LinePicksCard } from '@/features/tourhub/players-v2/picks/LinePicksCard';
-import { callersList, orderByFinal, resolvePickState, memberShare, settledLine } from '@/features/tourhub/players-v2/picks/linePicksRules';
+import { openFoot, callersList, orderByFinal, resolvePickState, memberShare, settledLine } from '@/features/tourhub/players-v2/picks/linePicksRules';
 import { usePlayersRanking } from '@/features/tourhub/players-v2/data/usePlayersRanking';
 import type { PageData } from '@/features/tourhub/players-v2/pageModel';
 import type { PlayerView } from '@/features/tourhub/players-v2/playersModel';
@@ -151,6 +151,13 @@ describe('Open state', () => {
     const { container } = mount(<LinePicksCard stake={stake()} data={pageData()} now={NOW} />);
     await waitFor(() => expect(container.querySelectorAll('[data-pick-row]').length).toBe(8));
     expect([...container.querySelectorAll('[data-pick-row]')].map((r) => r.getAttribute('data-pick-row'))).toEqual(['98', '99', '100', '101', '102', '103', '95', '110']);
+  });
+});
+
+describe('open foot', () => {
+  it('an event already named "The …" is not doubled', () => {
+    expect(openFoot(0, 0, 'The RSM Classic')).toBe('Be the first to pick. Settled after the RSM Classic, with a leaderboard of who called it.');
+    expect(openFoot(2, 312, 'RSM Classic')).toBe("You've picked 2 of 3. 312 members have picked. Settled after the RSM Classic, with a leaderboard of who called it.");
   });
 });
 
