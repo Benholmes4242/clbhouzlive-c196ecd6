@@ -639,7 +639,7 @@ function BusinessRow({
         followed={followed}
         markFollowed={markFollowed}
       />
-    </div>
+    </RowShell>
   );
 }
 
