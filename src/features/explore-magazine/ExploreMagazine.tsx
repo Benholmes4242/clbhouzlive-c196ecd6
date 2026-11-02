@@ -416,7 +416,6 @@ function MomentsShelf({ pos, onDepart, onOpenCommunity }: { pos: number; onDepar
 }
 
 export function ExploreMagazine({ userId, sessionKnown = true }: { userId: string | undefined; sessionKnown?: boolean }) {
-  const { sentinelRef: chipSentinelRef, stuck: chipsStuck } = useStickySafeAreaState();
   const { t, i18n } = useTranslation('courses');
   const navigate = useNavigate();
   const opener = useScorecardOpener();
@@ -425,7 +424,6 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
      One ref per rendered card, keyed on the stream item id, plus the id of the
      card currently ringed. The ring goes on close. */
   const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
-  const chipBarRef = useRef<HTMLDivElement | null>(null);
   const [sheetSeed, setSheetSeed] = useState<RoundDetailSeed | null>(null);
   /* §3 — the sheet's own session: when it opened, how deep it went, and whether
      the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
@@ -451,9 +449,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   const revealCard = useCallback((id: string) => {
     const el = cardRefs.current.get(id);
     if (!el) return;
-    const bar = chipBarRef.current?.getBoundingClientRect();
-    const chrome = (bar?.height ?? 0) + (bar?.top ?? 0) + 8;
-    scrollElementIntoView(el, { offset: Math.max(56, chrome), behavior: 'smooth' });
+    /* RS — the view chip row is gone; the offset is the islands' height. */
+    scrollElementIntoView(el, { offset: 56, behavior: 'smooth' });
   }, []);
 
   /* G2.6 — THE RING IS GONE. It only ever showed in the gap between the tap and
