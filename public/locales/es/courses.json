@@ -357,7 +357,9 @@
         "community": "De la comunidad",
         "videos": "Videos",
         "shorts": "Shorts",
-        "shortsSub": "Menos de tres minutos"
+        "shortsSub": "Menos de tres minutos",
+        "longForm": "Long form",
+        "longFormSub": "Three minutes and over"
       },
       "searchPlaceholder": "Buscar vídeos y creadores",
       "untitled": "Video sin titulo",
@@ -386,7 +388,21 @@
         "all": "Todos",
         "empty": "Aún no hay vídeos aquí."
       },
-      "seeAll": "Ver todo"
+      "seeAll": "Ver todo",
+      "spotlight": {
+        "title": "Creator to follow",
+        "follow": "Follow",
+        "following": "Following",
+        "handicap": "Handicap",
+        "rounds": "Rounds",
+        "courses": "Courses",
+        "videos": "Videos",
+        "filmed": "Courses filmed"
+      },
+      "top100": {
+        "title": "Top 100 on film",
+        "sub": "The lists, filmed by members"
+      }
     },
     "roundsShelf": {
       "title": "Rondas de esta semana",

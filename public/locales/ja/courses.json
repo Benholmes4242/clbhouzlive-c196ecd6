@@ -357,7 +357,9 @@
         "community": "コミュニティから",
         "videos": "動画",
         "shorts": "ショート",
-        "shortsSub": "3分未満"
+        "shortsSub": "3分未満",
+        "longForm": "Long form",
+        "longFormSub": "Three minutes and over"
       },
       "searchPlaceholder": "動画とクリエイターを検索",
       "untitled": "無題の動画",
@@ -386,7 +388,21 @@
         "all": "すべて",
         "empty": "まだ動画はありません。"
       },
-      "seeAll": "すべて見る"
+      "seeAll": "すべて見る",
+      "spotlight": {
+        "title": "Creator to follow",
+        "follow": "Follow",
+        "following": "Following",
+        "handicap": "Handicap",
+        "rounds": "Rounds",
+        "courses": "Courses",
+        "videos": "Videos",
+        "filmed": "Courses filmed"
+      },
+      "top100": {
+        "title": "Top 100 on film",
+        "sub": "The lists, filmed by members"
+      }
     },
     "roundsShelf": {
       "title": "今週のラウンド",

@@ -2,6 +2,7 @@
  * WS2 §5 — THE WATCH GRID PAGES (signed-off watch-s2 mock B).
  *   /watch/region/:region  every video filmed in a region, chips per course
  *   /watch/courses         videos at the viewer's courses, no chips
+ *   /watch/top100          WS3 — Top 100 on film, no sub, no chips
  * Chrome 'none', dark; Find people / Rounds header. 3-column grid, 30 per page,
  * keyset on the last created_at, one sentinel. Tap opens the canonical viewer on
  * the tile with the loaded list (the viewer has no live append, so swipe stays
@@ -21,7 +22,7 @@ import { coursesLabel, videosLabel } from '@/features/explore-magazine/watch/wat
 import { DurationChip } from '@/features/explore-magazine/watch/CourseVideosShelf';
 import { openVideoList } from '@/features/explore-magazine/watch/openVideoList';
 
-export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' }) {
+export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | 'top100' }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const params = useParams<{ region: string }>();
@@ -34,7 +35,7 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' }) 
   const courses = useRegionCourses(userId, region);
   const meta = region ? (regions.data ?? []).find((r) => r.region === region) : undefined;
 
-  const src: GridSource = useMemo(() => (kind === 'courses' ? { kind: 'courses' } : { kind: 'region', region: region ?? '', courseId }), [kind, region, courseId]);
+  const src: GridSource = useMemo(() => (kind === 'courses' ? { kind: 'courses' } : kind === 'top100' ? { kind: 'top100' } : { kind: 'region', region: region ?? '', courseId }), [kind, region, courseId]);
   const grid = useGridVideos(userId, src);
   const rows = useMemo(() => (grid.data?.pages ?? []).flat(), [grid.data]);
 
@@ -56,7 +57,7 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' }) 
     return () => io.disconnect();
   }, [grid]);
 
-  const title = kind === 'courses' ? t('amateur.watch.grid.yourCourses', 'Your courses') : region;
+  const title = kind === 'courses' ? t('amateur.watch.grid.yourCourses', 'Your courses') : kind === 'top100' ? t('amateur.watch.top100.title', 'Top 100 on film') : region;
   const sub = kind === 'region' && meta ? `${videosLabel(Number(meta.videos))} \u00b7 ${coursesLabel(Number(meta.courses))}` : null;
 
   const chip = (id: string | null, label: string) => {
@@ -128,3 +129,4 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' }) 
 
 export function WatchRegionPage() { return <WatchGridPage kind="region" />; }
 export function WatchCoursesPage() { return <WatchGridPage kind="courses" />; }
+export function WatchTop100Page() { return <WatchGridPage kind="top100" />; }

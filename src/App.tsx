@@ -348,6 +348,7 @@ const GolfersToFollowRedirect = lazy(() => import("./pages/FindPeoplePage").then
 const RoundsPage = lazy(() => import("./pages/RoundsPage"));
 const WatchRegionPage = lazy(() => import("./pages/WatchGridPage").then((m) => ({ default: m.WatchRegionPage })));
 const WatchCoursesPage = lazy(() => import("./pages/WatchGridPage").then((m) => ({ default: m.WatchCoursesPage })));
+const WatchTop100Page = lazy(() => import("./pages/WatchGridPage").then((m) => ({ default: m.WatchTop100Page })));
 const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProfileSocialRedirect"));
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
 const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
@@ -683,6 +684,7 @@ function AppRoutes() {
         {/* WS2 — the Watch grid pages. */}
         <Route path="/watch/region/:region" element={<Suspense fallback={<GenericPageSkeleton />}><WatchRegionPage /></Suspense>} />
         <Route path="/watch/courses" element={<Suspense fallback={<GenericPageSkeleton />}><WatchCoursesPage /></Suspense>} />
+        <Route path="/watch/top100" element={<Suspense fallback={<GenericPageSkeleton />}><WatchTop100Page /></Suspense>} />
 
         <Route path="/discover/news" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsPage /></Suspense>} />
         <Route path="/discover/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurStoryPage /></Suspense>} />

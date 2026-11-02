@@ -48,6 +48,9 @@ import { useWatchProgress } from './useWatchSignals';
 import { RoundsThisWeekShelf } from './RoundsThisWeekShelf';
 import { CourseVideosShelf, ShelfHeading } from './CourseVideosShelf';
 import { RegionsShelf } from './RegionsShelf';
+import { CreatorSpotlight } from './CreatorSpotlight';
+import { Top100FilmShelf } from './Top100FilmShelf';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
 import {
   RAIL_EVERY,
   groupByMember,
@@ -221,6 +224,8 @@ export function WatchFeed({
   const navigate = useNavigate();
   const [filter, setFilter] = useState<WatchFilter>(() => mapWatchFilter(initialFilter));
   const [query, setQuery] = useState('');
+  /* WS3 — one spotlight pick per Explore visit: minted on mount, held across chips. */
+  const [visitKey] = useState(() => `${Date.now()}:${Math.random().toString(36).slice(2)}`);
 
   /* THE SEARCH IS SERVER-SIDE: both RPCs take p_search_query. */
   const search = query.trim().length >= 2 ? query.trim() : null;
@@ -598,6 +603,10 @@ export function WatchFeed({
             <>
               <CourseVideosShelf userId={userId} onDepart={onDepart} />
               <RegionsShelf userId={userId} />
+              {/* WS3 — CREATOR TO FOLLOW and TOP 100 ON FILM: For you only, after By
+                  region and before Long form. Both hide for guests and thin data. */}
+              <CreatorSpotlight userId={userId} visitKey={visitKey} onDepart={onDepart} />
+              <Top100FilmShelf userId={userId} onDepart={onDepart} />
             </>
           ) : null}
 
@@ -614,7 +623,8 @@ export function WatchFeed({
           ) : null}
           {longRows.length > 0 ? (
             <>
-              <Section title={t('amateur.watch.rail.watch', 'Watch')} />
+              {/* WS3 §4 — today's Watch column, renamed Long form, in Shorts' heading pattern. */}
+              <ShelfHeading title={t('amateur.watch.rail.longForm', 'Long form')} sub={t('amateur.watch.rail.longFormSub', 'Three minutes and over')} />
               {longRows.map((row, index) => {
                 const p = saved?.get(row.post_id);
                 const part = isPartWatched(row, p);
@@ -623,6 +633,9 @@ export function WatchFeed({
                     <VideoCard
                       row={row}
                       onPress={() => open('video', longPosts, longRows, index)}
+                      courseChip={row.review_course_id && row.review_course_name
+                        ? { name: shortCourseName(row.review_course_name), onPress: () => navigate(`/courses/${row.review_course_id}`) }
+                        : null}
                       progress={barFor(row)}
                       reason={reasonLine({
                         partWatched: part,

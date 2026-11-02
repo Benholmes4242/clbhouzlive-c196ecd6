@@ -25,12 +25,12 @@ export const shelfRow: React.CSSProperties = {
   overscrollBehaviorX: 'contain', touchAction: 'pan-x pan-y', willChange: 'transform',
 };
 
-export function ShelfHeading({ title, sub, seeAll, onSeeAll }: { title: string; sub: string; seeAll?: string; onSeeAll?: () => void }) {
+export function ShelfHeading({ title, sub, seeAll, onSeeAll }: { title: string; sub?: string; seeAll?: string; onSeeAll?: () => void }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '28px 16px 10px' }}>
       <div>
         <b style={{ display: 'block', fontSize: 19, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>{title}</b>
-        <span style={{ display: 'block', fontSize: 12.5, color: A.DIM, marginTop: 2 }}>{sub}</span>
+        {sub ? <span style={{ display: 'block', fontSize: 12.5, color: A.DIM, marginTop: 2 }}>{sub}</span> : null}
       </div>
       {onSeeAll ? (
         <button type="button" onClick={onSeeAll} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 14, fontWeight: 600, color: A.MUTE }}>
@@ -41,10 +41,10 @@ export function ShelfHeading({ title, sub, seeAll, onSeeAll }: { title: string; 
   );
 }
 
-export function DurationChip({ seconds, top, right, size }: { seconds: number | null | undefined; top: number; right: number; size: number }) {
+export function DurationChip({ seconds, top, right, size, bottom }: { seconds: number | null | undefined; top?: number; right: number; size: number; bottom?: number }) {
   if (!seconds) return null;
   return (
-    <span data-duration style={{ position: 'absolute', top, right, zIndex: 1, background: 'rgba(0,0,0,0.62)', borderRadius: 6, padding: '2px 6px', fontSize: size, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: A.INK }}>
+    <span data-duration style={{ position: 'absolute', top, bottom, right, zIndex: 1, background: 'rgba(0,0,0,0.62)', borderRadius: 6, padding: '2px 6px', fontSize: size, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: A.INK }}>
       {formatDuration(seconds)}
     </span>
   );

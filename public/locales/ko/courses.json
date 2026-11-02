@@ -357,7 +357,9 @@
         "community": "커뮤니티",
         "videos": "영상",
         "shorts": "쇼츠",
-        "shortsSub": "3분 미만"
+        "shortsSub": "3분 미만",
+        "longForm": "Long form",
+        "longFormSub": "Three minutes and over"
       },
       "searchPlaceholder": "동영상 및 크리에이터 검색",
       "untitled": "제목 없는 영상",
@@ -386,7 +388,21 @@
         "all": "전체",
         "empty": "아직 영상이 없어요."
       },
-      "seeAll": "모두 보기"
+      "seeAll": "모두 보기",
+      "spotlight": {
+        "title": "Creator to follow",
+        "follow": "Follow",
+        "following": "Following",
+        "handicap": "Handicap",
+        "rounds": "Rounds",
+        "courses": "Courses",
+        "videos": "Videos",
+        "filmed": "Courses filmed"
+      },
+      "top100": {
+        "title": "Top 100 on film",
+        "sub": "The lists, filmed by members"
+      }
     },
     "roundsShelf": {
       "title": "이번 주 라운드",

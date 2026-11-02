@@ -14,7 +14,7 @@ import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { getThumbnailUrl } from '@/utils/thumbnail';
-import { MessageCircle } from 'lucide-react';
+import { MapPin, MessageCircle } from 'lucide-react';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { reactionKindFor } from '@/lib/reactionKind';
@@ -194,8 +194,11 @@ export function VideoCard({
   engagement,
   reason = null,
   progress = null,
+  courseChip = null,
 }: {
   row: HubRpcRow;
+  /** WS3 §4 — the course chip under the meta line, only when the row carries a course. */
+  courseChip?: { name: string; onPress: () => void } | null;
   onPress: () => void;
   size?: 'full' | 'rail';
   /** Watch stays full-bleed; All wears the inset magazine-card geometry. */
@@ -383,6 +386,19 @@ export function VideoCard({
                 }}
               >
                 {reason.text}
+              </span>
+            ) : null}
+            {courseChip ? (
+              <span
+                role="link"
+                tabIndex={0}
+                data-watch-course-chip
+                onClick={(e) => { e.stopPropagation(); courseChip.onPress(); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); e.preventDefault(); courseChip.onPress(); } }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 8, height: 26, padding: '0 10px', borderRadius: 999, background: '#1E1E23', fontSize: 12, fontWeight: 600, color: A.MUTE, maxWidth: '100%', cursor: 'pointer' }}
+              >
+                <MapPin size={12} strokeWidth={2.2} aria-hidden style={{ flex: 'none' }} />
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{courseChip.name}</span>
               </span>
             ) : null}
           </span>
