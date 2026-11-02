@@ -17,10 +17,6 @@ vi.mock('@/hooks/useBusinessProfile', () => ({ useBusinessProfile: () => ({ data
 vi.mock('@/hooks/useBusinessMembership', () => ({ useBusinessMembership: () => ({ data: { role: fixture.role }, isLoading: false }) }));
 vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: () => {} }));
 vi.mock('@/hooks/useBusinessImageUpload', () => ({ useBusinessImageUpload: () => ({ uploadLogo: vi.fn(), uploadCover: vi.fn(), removeLogo: vi.fn(), removeCover: vi.fn() }) }));
-vi.mock('@/components/business/editor/FacilitiesSection', () => ({ FacilitiesSection: ({ amenities, setAmenities }: { amenities: string[]; setAmenities: (value: string[]) => void }) => <input aria-label="Facilities" value={amenities.join(',')} onChange={e => setAmenities([e.target.value])} /> }));
-vi.mock('@/components/business/editor/PrimaryActionSection', () => ({ PrimaryActionSection: () => null }));
-vi.mock('@/components/business/editor/OpeningHoursSection', () => ({ OpeningHoursSection: () => null }));
-vi.mock('@/components/business/editor/SocialSection', () => ({ SocialSection: () => null }));
 vi.mock('@/components/business/RequestAccessModal', () => ({ RequestAccessModal: () => null }));
 vi.mock('@/components/business/RequestClubModal', () => ({ RequestClubModal: () => null }));
 vi.mock('@/components/map/MapPreview', () => ({ MapPreview: (props: unknown) => { fixture.map(props); return <div data-testid="be3-map" />; } }));

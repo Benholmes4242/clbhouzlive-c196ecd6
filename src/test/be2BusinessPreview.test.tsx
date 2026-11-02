@@ -22,11 +22,6 @@ vi.mock('@/hooks/useBusinessProfile', () => ({ useBusinessProfile: () => ({ data
 vi.mock('@/hooks/useBusinessMembership', () => ({ useBusinessMembership: () => ({ data: { role: state.role }, isLoading: false }) }));
 vi.mock('@/hooks/useBusinessImageUpload', () => ({ useBusinessImageUpload: () => ({ uploadLogo, uploadCover, removeLogo, removeCover }) }));
 vi.mock('@/lib/toast', () => ({ toast: Object.assign(vi.fn(), { error: vi.fn(), success: vi.fn(), warning: vi.fn() }) }));
-vi.mock('@/components/business/editor/FacilitiesSection', () => ({ FacilitiesSection: ({ amenities, setAmenities }: { amenities: string[]; setAmenities: (value: string[]) => void }) => <input aria-label="Legacy facilities" value={amenities.join(',')} onChange={event => setAmenities([event.target.value])} /> }));
-vi.mock('@/components/business/editor/PrimaryActionSection', () => ({ PrimaryActionSection: () => null }));
-vi.mock('@/components/business/editor/SocialSection', () => ({ SocialSection: () => null }));
-vi.mock('@/components/business/editor/LocationContactSection', () => ({ LocationContactSection: ({ website, setWebsite }: { website: string; setWebsite: (s: string) => void }) => <input aria-label="Legacy website" type="url" value={website} onChange={e => setWebsite(e.target.value)} /> }));
-vi.mock('@/components/business/editor/OpeningHoursSection', () => ({ OpeningHoursSection: () => null }));
 vi.mock('@/components/business/PinDropModal', () => ({ PinDropModal: () => null }));
 vi.mock('@/components/business/RequestAccessModal', () => ({ RequestAccessModal: () => null }));
 vi.mock('@/components/business/RequestClubModal', () => ({ RequestClubModal: () => null }));
