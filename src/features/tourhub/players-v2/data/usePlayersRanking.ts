@@ -21,7 +21,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { currentSeasonYear } from '../../leaders-v2/data/useLeaderCategories';
+import { currentSeasonYear } from '../../_shared/stats/useLeaderCategories';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
@@ -66,7 +66,7 @@ const STAT_LABEL_KEY: Record<PlayersTourId, string> = {
  */
 const MIN_RANKING_ROWS = 5;
 
-/* Season resolution: currentSeasonYear() in leaders-v2/data/useLeaderCategories
+/* Season resolution: currentSeasonYear() in _shared/stats/useLeaderCategories
    is the ONE definition. This file had an identical local copy; it is gone. */
 
 async function resolvePgaSeasonId(): Promise<string | null> {

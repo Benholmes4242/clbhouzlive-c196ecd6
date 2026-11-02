@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fmtScore } from '../utils/fmtScore';
 import { supabase } from '@/integrations/supabase/client';
 import { formatCurrencyUsd } from '@/i18n/format';
-import { currentSeasonYear } from '../leaders-v2/data/useLeaderCategories';
+import { currentSeasonYear } from '../_shared/stats/useLeaderCategories';
 import { isMissedCut, isNonStarter, isWithdrawn, normalizeStatus } from '../_shared/resultStatus';
 
 export interface PlayerTournamentResult {

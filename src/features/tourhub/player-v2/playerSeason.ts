@@ -6,7 +6,7 @@ import {
   POINTS_LABEL_KEY_BY_TOUR,
   type LeaderCategoryDef,
   type LeaderRankMaps,
-} from '../leaders-v2/data/useLeaderCategories';
+} from '../_shared/stats/useLeaderCategories';
 import type { TourId } from '../hooks/useOverviewData';
 import { playerOrdinal } from './playerOrdinal';
 import { isFinish } from '../_shared/resultStatus';

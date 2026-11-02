@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { BoardEntry } from '../leaderboard/BoardTable';
 // Single definition of which season is current; do not re-derive it here.
-import { currentSeasonYear } from '../leaders-v2/data/useLeaderCategories';
+import { currentSeasonYear } from '../_shared/stats/useLeaderCategories';
 
 // Major tour code override — Sportradar stores Grand Slams under EURO season
 const MAJOR_NAMES_TO_PGA: string[] = [
