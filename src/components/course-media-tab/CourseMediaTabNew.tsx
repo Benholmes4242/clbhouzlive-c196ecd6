@@ -259,7 +259,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {photoState !== 'B' && photoState !== 'C' && <div className="media-v3-grid"><CourseMediaCanonGrid
         ref={gridRef}
         posts={posts}
-        onOpenGallery={(post, origin) => { void openGallery('all', post.mediaItems[0]?.id, origin, 'everything'); }}
+        onOpenGallery={(post, origin) => { const item = post.mediaItems[0]; void openGallery('all', item?.id, origin, 'everything', undefined, item ? holeMediaKey(item) : undefined); }}
         postsForFullscreen={postsForFullscreen}
         isLoading={isLoading}
         isError={isError}
