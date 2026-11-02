@@ -59,6 +59,8 @@ export interface PeopleGroup {
   count?: number;
   /** The From-{club} group on Suggested carries the Follow-all action. */
   followAll?: boolean;
+  /** FIX §5 — a capped Suggested group links See all {total} to its full tab. */
+  seeAll?: { tab: FindPeopleTab; total: number };
   people: PersonSuggestion[];
   businesses: BusinessSuggestion[];
 }
@@ -182,59 +184,76 @@ export function clubNameFrom(people: PersonSuggestion[], biz: BusinessSuggestion
 const byReason = <T extends { reason_type: string }>(rows: T[], ...types: string[]): T[] =>
   rows.filter((r) => types.includes(r.reason_type));
 
-/** Suggested tab: From {club} (club business first, then club golfers) with
- *  Follow all, Played with you, Plays your courses, Popular on clbhouz
- *  (popular golfers, then up to 3 popular businesses). Empty groups hidden. */
+/** FIX §5 — every Suggested group shows at most five rows. */
+export const SUGGESTED_CAP = 5;
+
+/** Suggested tab (FIX §5): the best of EVERYTHING, in the brief's order —
+ *  From {club} (club business first, then club golfers) with Follow all,
+ *  Played with you, Follows you, Plays your courses, Followed by people you
+ *  know, Popular on clbhouz (golfers, then up to 3 businesses), Playing
+ *  lately, New to clbhouz. Every group caps at five rows with a See all
+ *  {total} link to its full tab; a person appears once, in their first
+ *  group; empty groups stay hidden. */
 export function suggestedGroups(people: PersonSuggestion[], biz: BusinessSuggestion[]): PeopleGroup[] {
   const club = clubNameFrom(people, biz);
   const groups: PeopleGroup[] = [];
+  const seen = new Set<string>();
+  /* A person appears once, in their first group. */
+  const fresh = (rows: PersonSuggestion[]) =>
+    rows.filter((p) => {
+      if (seen.has(p.user_id)) return false;
+      seen.add(p.user_id);
+      return true;
+    });
+  const push = (id: string, label: Copy, rows: PersonSuggestion[], bizRows: BusinessSuggestion[] = []) => {
+    const ppl = fresh(rows);
+    const total = ppl.length + bizRows.length;
+    if (total === 0) return;
+    const peopleShown = ppl.slice(0, SUGGESTED_CAP);
+    groups.push({
+      id,
+      label,
+      count: total,
+      seeAll: { tab: 'golfers', total },
+      people: peopleShown,
+      businesses: bizRows.slice(0, SUGGESTED_CAP - peopleShown.length),
+    });
+  };
 
   const clubBiz = byReason(biz, 'your_club');
   const clubPeople = byReason(people, 'club');
-  if (club && (clubBiz.length > 0 || clubPeople.length > 0)) {
-    groups.push({
-      id: 'from-club',
-      label: { key: 'findPeople.group.fromClub', def: 'From {{club}}', vars: { club } },
-      followAll: true,
-      count: clubBiz.length + clubPeople.length,
-      businesses: clubBiz,
-      people: clubPeople,
-    });
+  if (club) {
+    const ppl = fresh(clubPeople);
+    const total = clubBiz.length + ppl.length;
+    if (total > 0) {
+      const bizShown = clubBiz.slice(0, SUGGESTED_CAP);
+      groups.push({
+        id: 'from-club',
+        label: { key: 'findPeople.group.fromClub', def: 'From {{club}}', vars: { club } },
+        followAll: true,
+        count: total,
+        businesses: bizShown,
+        people: ppl.slice(0, SUGGESTED_CAP - bizShown.length),
+      });
+    }
   }
 
-  const playedWith = byReason(people, 'played_with');
-  if (playedWith.length > 0) {
-    groups.push({
-      id: 'played-with',
-      label: { key: 'findPeople.group.playedWith', def: 'Played with you' },
-      count: playedWith.length,
-      people: playedWith,
-      businesses: [],
-    });
-  }
-
-  const playsCourses = byReason(people, 'course');
-  if (playsCourses.length > 0) {
-    groups.push({
-      id: 'plays-courses',
-      label: { key: 'findPeople.group.playsCourses', def: 'Plays your courses' },
-      count: playsCourses.length,
-      people: playsCourses,
-      businesses: [],
-    });
-  }
-
-  const popularPeople = byReason(people, 'popular');
-  const popularBiz = byReason(biz, 'popular').slice(0, 3);
-  if (popularPeople.length > 0 || popularBiz.length > 0) {
-    groups.push({
-      id: 'popular',
-      label: { key: 'findPeople.group.popular', def: 'Popular on clbhouz' },
-      people: popularPeople,
-      businesses: popularBiz,
-    });
-  }
-
+  push('played-with', { key: 'findPeople.group.playedWith', def: 'Played with you' }, byReason(people, 'played_with'));
+  push('follows-you', { key: 'findPeople.group.followsYou', def: 'Follows you' }, byReason(people, 'reciprocal'));
+  push('plays-courses', { key: 'findPeople.group.playsCourses', def: 'Plays your courses' }, byReason(people, 'course'));
+  push(
+    'known',
+    { key: 'findPeople.group.known', def: 'Followed by people you know' },
+    byReason(people, 'clubmate_mutual', 'mutual'),
+  );
+  push(
+    'popular',
+    { key: 'findPeople.group.popular', def: 'Popular on clbhouz' },
+    byReason(people, 'popular'),
+    byReason(biz, 'popular').slice(0, 3),
+  );
+  push('active', { key: 'findPeople.group.active', def: 'Playing lately' }, byReason(people, 'active'));
+  push('new', { key: 'findPeople.group.new', def: 'New to clbhouz' }, byReason(people, 'recently_joined'));
   return groups;
 }
 
