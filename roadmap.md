@@ -1487,7 +1487,6 @@
 
 - [x] Players page Build 1 of 3 — merged Players and Leaders; report PLAYERS_BUILD1_REPORT.md (5,829/537). On-device check with Ben.
 - [x] Players page Build 2 — line picks card; report PLAYERS_BUILD2_REPORT.md (5,847/538).
-- [ ] Players page Build 3 — awaiting brief.
 - [ ] Players season rollover fix — STOPPED: 11 of 12 tests in playersPage.test.tsx fail ("No QueryClient set") because the page now reads the standings season; needs a ruling to add a stand-in for that read to the test.
 
 - [x] Players Build 3 (You and the tour): approved stand-ins added; full suite 5,866/5,866 across 540 files.
