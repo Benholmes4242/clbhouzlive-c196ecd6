@@ -43,6 +43,13 @@ vi.mock('@/features/explore-magazine/watch/useFeaturedCreators', () => ({
 vi.mock('@/features/explore-magazine/watch/useWatchLead', () => ({
   useWatchLead: () => ({ data: null, isFetched: true, isError: false }),
 }));
+/* WS2 — the course and region shelves read their own RPCs; empty here. */
+vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
+  useCourseVideos: () => ({ data: [], isLoading: false, isError: false }),
+  useWatchRegions: () => ({ data: [], isLoading: false, isError: false }),
+  useRegionCourses: () => ({ data: [], isLoading: false, isError: false }),
+  useGridVideos: () => ({ data: undefined, isLoading: false, isError: false, hasNextPage: false, fetchNextPage: () => {} }),
+}));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek', () => ({
   useMomentsOfTheWeek: () => ({ data: [], isFetched: true, isError: false, refetch: vi.fn() }),
 }));

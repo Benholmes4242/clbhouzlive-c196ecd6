@@ -1491,4 +1491,4 @@
 
 - [x] Players Build 3 (You and the tour): approved stand-ins added; full suite 5,866/5,866 across 540 files.
 
-- [ ] WS2 Watch section 2: built; STOPPED — 2 rsRoundsShelf placement tests fail "No QueryClient set" (new shelves read through react-query). Awaiting approval for a useWatchMiddle stand-in in that file.
+- [x] WS2 Watch section 2: done (WS2.1 approved stand-in added; 5,884/5,884 across 541 files). Report WS2_WATCH_MIDDLE_REPORT.md.
