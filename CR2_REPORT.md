@@ -1,5 +1,49 @@
 # CR2 — Creator profile verification report
 
+## CR2.1 — Final verification, 2 November 2026
+**Current result: 5,931 / 5,931 tests passing across 545 files; zero failures and zero unhandled errors. Automatic build is clean.** This section supersedes the historical CR2 stop and whole-page test gap recorded below.
+
+### Fix and scope
+Only ProfilePageV2's creator wiring changed: `creatorEnabled = !!user?.id && user.is_anonymous !== true && !!profileUserId` is passed to `useProfileCreator`, and `creatorPending = creatorEnabled && creator.isPending`. A disabled anonymous creator query no longer holds the default content in a permanent skeleton. No guest-browsing module changed.
+
+### Added whole-page regressions
+`src/test/cr2CreatorProfile.test.tsx` grows from 8 to 11 cases. Its eight existing case names and assertion statements remain unchanged; no test was deleted, renamed or rewritten. Three added cases reconcile the full-suite delta from the last green CR1.1 baseline **5,928 / 545** to **5,931 / 545**:
+- `anonymous whole-page default shows Posts without a creator skeleton or creator read` — real ProfilePageV2 with anonymous viewer id, Posts content, no busy creator grid, no get_profile_creator call, disabled query fetchStatus idle, no Videos tab.
+- `signed-in whole-page creator default waits in the skeleton then shows Videos without Posts flashing` — deferred real creator query, skeleton before resolution, no Posts render at any time, Videos body after resolution.
+- `signed-in whole-page non-creator defaults to Posts and replaces a Videos deep link with Posts` — Posts after the summary, no Videos tab, canonical `?tab=activity`, actual router REPLACE action, and Back reaching the previous entry rather than the rejected link.
+
+All three render the actual page with a fresh real QueryClientProvider and MemoryRouter/Routes. The creator hook, Videos body and profile chip navigation are real; unrelated profile reads, heavy hero/modal surfaces and the Posts body use dependency stand-ins. Router and React Query are not mocked. The deep-link case saves and restores jsdom's scrollIntoView stand-in in finally. Existing profile tests pass unchanged.
+
+### Commands and full outputs
+Focused: `bunx vitest run src/test/cr2CreatorProfile.test.tsx --maxWorkers=2` — **11 / 11**, 1 file; `/tmp/cr21/focused.log`.
+
+Full suite commands: `bunx vitest run --maxWorkers=2 --shard=N/4`, each N = 1, 2, 3, 4, all completed in full.
+
+| Shard | Files passing | Tests passing | Failures | Unhandled errors | Exit |
+|---|---:|---:|---:|---:|---:|
+|1|137|1,492|0|0|0|
+|2|137|1,455|0|0|0|
+|3|137|1,526|0|0|0|
+|4|134|1,458|0|0|0|
+|Total|545|5,931|0|0|0|
+
+Complete outputs retained at `/tmp/cr21/shard1.log` through `/tmp/cr21/shard4.log`. Latest automatic build entry: `=== build 2026-11-02T19:30:51Z ===` followed by `build OK`. No manual build/typecheck run.
+
+### Pre-existing failures and verification limits
+There are **no remaining pre-existing failures**. The historically named CR1 cases in ep2EditProfileYou.test.tsx (`toggle starts off when the display name is first + last, and Golfers see follows it`; `toggle starts on for a differing display name`) and four CR1 typing errors were already cleared by CR1.1 before this request; no further edits to those files in CR2.1.
+
+Whole-page anonymous, pending creator and non-creator navigation paths are now covered by real-provider regression tests. Live authenticated browser readback and mock screenshots remain unavailable for external_unmanaged authentication; no live-member screenshot claim is made.
+
+### Files touched by CR2.1
+- src/pages/ProfilePageV2.tsx
+- src/test/cr2CreatorProfile.test.tsx
+- CR2_REPORT.md
+- roadmap.md
+
+No SQL, migrations, migration files, deployed RPC/edge function edits, feed_config changes, round_pool_cap changes (remains 30), native/Median configuration changes, guest-browsing modules, review wizard, news or round plots changes.
+
+## Historical CR2 implementation and initial stop
+
 ## Result and outstanding gates
 Implemented page-owned get_profile_creator read, optional prop forwarding through ProfileHero to ProfileCoverBand, Creator pill for every qualifying personal member, first/default Videos tab, accepted videos deep links, pending-content skeleton, non-creator replacement to Posts, three counted chips, 30-row cursor paging, shared Watch fullscreen playback, and round date-line video pills with isolated taps. Existing profile content and rounds ordering remain unchanged. RPC named columns are locally adapted to HubRpcRow before toFeedPosts, preserving captions, owner identity and creation dates.
 
