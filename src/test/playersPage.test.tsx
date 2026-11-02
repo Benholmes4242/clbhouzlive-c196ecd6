@@ -30,6 +30,7 @@ vi.mock('@/features/tourhub/players-v2/data/useScorecardStats', () => ({
   useScorecardStats: () => ({ data: new Map(Array.from({ length: 120 }, (_, i) => [`p${i + 1}`, { player_id: `p${i + 1}`, rounds: 40, holes: 720, scoring_avg: 70, birdies_per_round: 4, bogey_rate: 0.12, par3: 0.1, par4: 0.05, par5: -0.4 }])) }),
 }));
 vi.mock('@/features/tourhub/players-v2/data/useTourRace', () => ({ useTourRace: () => ({ data: h.race }) }));
+vi.mock('@/features/tourhub/players-v2/data/resolveStandingsSeason', () => ({ useStandingsSeason: () => ({ data: 2027, isError: false }) }));
 vi.mock('@/features/tourhub/leaderboard/useTourPlayerFollows', () => ({ useTourPlayerFollows: () => ({ ids: h.follows, busy: false, error: null, toggle: vi.fn() }) }));
 vi.mock('@/features/tourhub/hooks/useTourLensFromPicker', () => ({ useTourLensFromPicker: () => {} }));
 vi.mock('@/features/tourhub/hooks/useTourSelection', () => ({ readStoredTour: () => null }));
