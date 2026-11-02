@@ -368,6 +368,11 @@ describe('RS /rounds page', () => {
     expect(screen.getByTestId('amateur-route')).toBeInTheDocument();
   });
 
+  function RoundsMarker() {
+    const { search } = useLocation();
+    return <div data-testid="rounds-marker" data-search={search} />;
+  }
+
   const renderAmateur = (entry: string) =>
     render(
       <QueryClientProvider client={new QueryClient()}>
