@@ -1,5 +1,9 @@
 # Roadmap
 
+## Round comments over scorecard — in progress
+- [ ] Independent guarded dismissal, stacked layers and disabled horizontal round drag; preserve Activity arrival and return.
+- [ ] Audit other nested comments callers without changing them; add regressions, run full shards and report against 5,643/528.
+
 ## MS1 — Messages head to head, inbox lines, two fixes — DONE
 - [x] headToHead helper + record on SharedGround; thread header 17px + "· last {d MMM}"; HeadToHeadCard (tappable → compare route); SharedGroundStrip restyle (short name, ink/dim scores, outcome line, no amber); inbox record line with count-only fallback; rail date under name (pill removed); incoming avatar 28px slot + 16px padding; image-unavailable investigated (HEIC/.bin vs missing object — Ben's SQL to pin down). 28 new tests; full suite 5,541/5,541 across 522→523 files. Report: MS1_MESSAGES_REPORT.md.
 

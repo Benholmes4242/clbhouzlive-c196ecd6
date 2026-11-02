@@ -9,10 +9,12 @@
  * Thin wrapper around the canonical CardScorecardSheet ("The Card").
  * The dedicated route opts into page presentation; all other callers use the
  * floating glass overlay. `variant` remains ignored for compatibility.
+ * Stacked comments own a guarded close/history entry; the scorecard delegates
+ * all dismissals to that guard while open, keeping draft and return ownership.
  */
 
 import { DIAG_ON, roundDiag } from '@/diag/roundPushDiag'; // TEMPORARY diag
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -429,6 +431,17 @@ export const RoundDetailSheet: React.FC<Props> = ({
    * renders from live data the moment it is in hand.
    */
   const [commentsOpen, setCommentsOpen] = useState(initialCommentsOpen);
+  const commentsDismissRef = useRef<(() => void) | null>(null);
+  const registerCommentsDismiss = useCallback((dismiss: (() => void) | null) => {
+    commentsDismissRef.current = dismiss;
+  }, []);
+  const closeScorecard = () => {
+    if (commentsOpen) {
+      commentsDismissRef.current?.();
+      return;
+    }
+    onClose();
+  };
   useEffect(() => {
     if (open) setCommentsOpen(initialCommentsOpen);
   }, [open, initialCommentsOpen, scoreId]);
@@ -465,7 +478,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       featRarity={featRarity}
       roundResults={roundAwardsQuery.data ?? null}
       open={cardOpen}
-      onClose={onClose}
+      onClose={closeScorecard}
       eyebrowText={eyebrowText}
       dateLongText={dateLongText}
       courseName={courseName}
@@ -511,7 +524,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyToPar={toParVal}
       presentation={presentation}
       engagement={engagement}
-      onHorizontalDrag={onHorizontalDrag}
+      onHorizontalDrag={commentsOpen ? null : onHorizontalDrag}
       onStatsSeen={onStatsSeen}
       pageShift={pageShift}
       pagePreview={pagePreview}
@@ -520,6 +533,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
     {commentsOpen && scoreId && (
       <CommentsSheetV2
         isOpen
+        layer="stacked"
+        onDismissReady={registerCommentsDismiss}
         onClose={() => setCommentsOpen(false)}
         targetType="round"
         targetId={scoreId}

@@ -27,6 +27,8 @@ export const Z = {
   hub: 12000,           // Hub modal shell
   sheetBackdrop: 12002, // Bottom sheet backdrop
   sheet: 12003,         // Bottom sheet surface
+  stackedSheetBackdrop: 12004, // Comments dim above the scorecard
+  stackedSheet: 12005,         // Comments opened from the scorecard
   echo: 11500,          // Echo floating orb + radial fan
   createGame: 11800,    // Create Game modal (above Hub)
   aiOverlay: 11100,     // AI Chat overlay (above Hub)
@@ -68,6 +70,8 @@ export const Z = {
     hub: { zIndex: 12000 },
     sheetBackdrop: { zIndex: 12002 },
     sheet: { zIndex: 12003 },
+    stackedSheetBackdrop: { zIndex: 12004 },
+    stackedSheet: { zIndex: 12005 },
     echo: { zIndex: 11500 },
     createGame: { zIndex: 11800 },
     aiOverlay: { zIndex: 11100 },
