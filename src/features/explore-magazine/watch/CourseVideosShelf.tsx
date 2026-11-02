@@ -41,10 +41,10 @@ export function ShelfHeading({ title, sub, seeAll, onSeeAll }: { title: string; 
   );
 }
 
-export function DurationChip({ seconds, top, right, size }: { seconds: number | null | undefined; top: number; right: number; size: number }) {
+export function DurationChip({ seconds, top, right, size, bottom }: { seconds: number | null | undefined; top?: number; right: number; size: number; bottom?: number }) {
   if (!seconds) return null;
   return (
-    <span data-duration style={{ position: 'absolute', top, right, zIndex: 1, background: 'rgba(0,0,0,0.62)', borderRadius: 6, padding: '2px 6px', fontSize: size, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: A.INK }}>
+    <span data-duration style={{ position: 'absolute', top, bottom, right, zIndex: 1, background: 'rgba(0,0,0,0.62)', borderRadius: 6, padding: '2px 6px', fontSize: size, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: A.INK }}>
       {formatDuration(seconds)}
     </span>
   );

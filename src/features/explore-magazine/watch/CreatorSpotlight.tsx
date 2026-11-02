@@ -115,7 +115,7 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
               {businessInitials(row.display_name ?? '')}
             </span>
           ) : (
-            <SquircleAvatar size={56} src={row.avatar_url} alt={row.display_name ?? ''} userId={business ? null : row.actor_id} hideRing={false} thinRing />
+            <SquircleAvatar size={56} src={row.avatar_url} alt={row.display_name ?? ''} userId={business ? null : row.actor_id} />
           )}
           <div style={{ minWidth: 0, flex: 1 }}>
             <b data-spotlight-name style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 17, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -167,7 +167,7 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
                 >
                   {v.poster_url ? <img src={v.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
                   <span style={{ position: 'absolute', inset: 0 }}>
-                    <DurationChip seconds={v.duration_seconds} top={undefined as unknown as number} right={6} size={10.5} bottom={6} />
+                    <DurationChip seconds={v.duration_seconds} bottom={6} right={6} size={10.5} />
                   </span>
                 </button>
               );
