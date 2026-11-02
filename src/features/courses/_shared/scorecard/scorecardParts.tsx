@@ -451,13 +451,22 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
                 style={{
                   fontSize: 12.5, fontWeight: 700,
                   color: isOwner ? A.AMBER : A.INK,
-                  flex: '0 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 }}
                 title={playerName as string}
               >
                 {playerName}
               </span>
               {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
+              {/* TOUR SCORECARD TILE — the Profile door moves up from the foot
+                  into this row, the same SheetDoorButton the member head uses;
+                  a course door, if a tour caller ever passes one, sits first. */}
+              {(onViewCourse || onViewProfile) && (
+                <span data-sheet-doors="true" style={{ display: 'flex', gap: 6, flex: 'none', marginLeft: 10 }}>
+                  {onViewCourse && <SheetDoorButton door="course" label={t('courses:scorecard.viewCourse')} icon={MapPin} onClick={onViewCourse} />}
+                  {onViewProfile && <SheetDoorButton door="profile" label={t('courses:scorecard.viewProfile')} icon={User} onClick={onViewProfile} />}
+                </span>
+              )}
             </div>
           )}
         </div>
