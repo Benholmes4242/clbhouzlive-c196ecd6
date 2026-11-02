@@ -1,4 +1,66 @@
-# CR1 — STOP report
+# CR1 — Final report (CR1.1 verified)
+
+
+## CR1.1 final verification — 2 November 2026
+Only the five authorised files below changed, plus this report and roadmap. Switch behaviour, profile page, fallback read and root AGENTS.md are unchanged.
+
+- `src/hooks/useUserProfile.tsx`: `is_creator: boolean;` → `is_creator?: boolean;`.
+- `src/test/ep3EditProfileGolf.test.tsx`: required fixture now includes `isCreator: false`; nothing else changed.
+- `src/test/ep4LinksPrivacy.test.tsx`: required fixture now includes `isCreator: false`; nothing else changed.
+- `src/test/cr1CreatorChoice.test.tsx`, case **Skip never writes the toggled creator choice**: `expect(h.update.mock.calls.every(([v]) => !Object.hasOwn(v, 'is_creator'))).toBe(true);` → `expect(h.update.mock.calls.every(([v]) => !Object.prototype.hasOwnProperty.call(v, 'is_creator'))).toBe(true);`. Same assertion, target-compatible own-property check.
+- `src/test/ep2EditProfileYou.test.tsx`: only the three authorised Name sheet queries below changed; case names and all assertions preserved.
+
+### Exact scoped-query before and after
+**toggle starts off when the display name is first + last, and Golfers see follows it**
+Before:
+```tsx
+expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'false');
+fireEvent.click(screen.getByRole('switch'));
+```
+After:
+```tsx
+expect(within(screen.getByTestId('ep-sheet-name')).getByRole('switch')).toHaveAttribute('aria-checked', 'false');
+fireEvent.click(within(screen.getByTestId('ep-sheet-name')).getByRole('switch'));
+```
+**toggle starts on for a differing display name**
+Before:
+```tsx
+expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
+```
+After:
+```tsx
+expect(within(screen.getByTestId('ep-sheet-name')).getByRole('switch')).toHaveAttribute('aria-checked', 'true');
+```
+These are authorised query-scoping edits, not deleted, renamed or rewritten test cases. No assertion removed, no test added or removed in CR1.1.
+
+### Counts and commands
+Immediate baseline before CR1.1: CR2 executed **5,928 tests / 545 files**, **5,926 passed**, two known CR1 failures, zero unhandled errors. After CR1.1: **5,928 / 545 passed**, zero failures, zero unhandled errors. Delta **0 tests / 0 files**.
+The brief's **5,920 / 544** was the earlier CR1 inventory; intervening CR2 added eight named cases in `src/test/cr2CreatorProfile.test.tsx` and one file. No tests were removed to match the older total.
+
+Focused command:
+`bunx vitest run src/test/cr1CreatorChoice.test.tsx src/test/ep2EditProfileYou.test.tsx src/test/ep3EditProfileGolf.test.tsx src/test/ep4LinksPrivacy.test.tsx src/test/ob1Welcome.test.tsx --maxWorkers=2`
+Result: **154 / 154**, **5 files**. Full output: `/tmp/cr11/focused.log`.
+
+Full commands: `bunx vitest run --maxWorkers=2 --shard=N/4`, separately for N=1,2,3,4.
+| Shard | Tests passed | Files passed | Failures | Unhandled errors |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 1,489 | 137 | 0 | 0 |
+| 2 | 1,455 | 137 | 0 | 0 |
+| 3 | 1,526 | 137 | 0 | 0 |
+| 4 | 1,458 | 134 | 0 | 0 |
+| Total | 5,928 | 545 | 0 | 0 |
+Full outputs retained: `/tmp/cr11/shard1.log` through `/tmp/cr11/shard4.log`.
+Automatic typecheck/build latest signal: `=== build 2026-11-02T19:05:56Z ===` / `build OK`. No manual build or typecheck run, following project harness instructions.
+
+### Pre-existing failures, now resolved
+The two EP2 multiple-switch failures and all four type errors quoted in the historical stop sections below are resolved by the exact authorised changes. No pre-existing failures remain in the full-suite or automatic check outputs; no new failures occurred.
+
+### Screenshot limitation
+The requested Welcome off/on and Edit profile → Profile type screenshots against `creator-choice.html` remain **unverified**: authentication status is `external_unmanaged`, so managed authenticated checks are unavailable. No credentials requested, fabricated session, mocked live screenshot or signed-out substitute used. Actual authenticated persistence/readback remains unverified; tests verify behaviour with controlled service responses. No app changes made to enable screenshots.
+
+The earlier STOP sections below are retained as historical evidence, not the current verification status. Header ownership notes are accepted per CR1.1 §5; root AGENTS.md remains unchanged and no relocation is pending.
+
+## Historical CR1 stop
 
 ## Status
 Shared neutral creator switch, Welcome card under Username, Continue-only identity persistence, immediate Edit profile partial save/rollback, off-only success toast, scoped cache invalidations, toggle analytics and creation-only Creator tile removal are implemented. Profile page (CR2) unchanged.

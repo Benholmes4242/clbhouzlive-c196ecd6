@@ -45,7 +45,7 @@ describe('CR1 creator persistence', () => {
   it('Skip never writes the toggled creator choice', async () => {
     render(<Welcome />, { wrapper }); fireEvent.click(await screen.findByRole('switch', { name: 'I make golf videos' })); fireEvent.click(screen.getByRole('button', { name: 'Skip' }));
     await waitFor(() => expect(h.update).toHaveBeenCalledWith({ has_completed_onboarding: true, updated_at: expect.any(String) }));
-    expect(h.update.mock.calls.every(([v]) => !Object.hasOwn(v, 'is_creator'))).toBe(true);
+    expect(h.update.mock.calls.every(([v]) => !Object.prototype.hasOwnProperty.call(v, 'is_creator'))).toBe(true);
   });
   it('Welcome starts on for an existing creator', async () => { h.creator = true; render(<Welcome />, { wrapper }); await waitFor(() => expect(screen.getByRole('switch', { name: 'I make golf videos' })).toHaveAttribute('aria-checked', 'true')); });
   it('form hydration maps the creator flag and defaults missing values off', async () => {

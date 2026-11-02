@@ -63,18 +63,18 @@ describe('EP2 You group', () => {
 describe('EP2 Name', () => {
   it('toggle starts off when the display name is first + last, and Golfers see follows it', () => {
     mount(); open('name');
-    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'false');
+    expect(within(screen.getByTestId('ep-sheet-name')).getByRole('switch')).toHaveAttribute('aria-checked', 'false');
     expect(screen.getByTestId('ep-shown').querySelector('b')?.textContent).toBe('Benjamin Holmes');
     fireEvent.change(screen.getByLabelText('First'), { target: { value: 'Ben' } });
     expect(screen.getByTestId('ep-shown').querySelector('b')?.textContent).toBe('Ben Holmes');
-    fireEvent.click(screen.getByRole('switch'));
+    fireEvent.click(within(screen.getByTestId('ep-sheet-name')).getByRole('switch'));
     fireEvent.change(screen.getByLabelText('Display name'), { target: { value: 'Benny' } });
     expect(screen.getByTestId('ep-shown').querySelector('b')?.textContent).toBe('Benny');
     expect(screen.getByTestId('ep-display-count').textContent).toBe('5/50');
   });
   it('toggle starts on for a differing display name', () => {
     h.profile = { ...base, display_name: 'Benny H' }; mount(); open('name');
-    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
+    expect(within(screen.getByTestId('ep-sheet-name')).getByRole('switch')).toHaveAttribute('aria-checked', 'true');
     expect((screen.getByLabelText('Display name') as HTMLInputElement).value).toBe('Benny H');
   });
   it('Save writes the three fields in one partial save and closes', async () => {

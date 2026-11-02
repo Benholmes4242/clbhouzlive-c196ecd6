@@ -1,14 +1,20 @@
 # Roadmap
 
+## CR1.1 — Authorised stop clearance
+- [x] Apply only optional UserProfile typing, two required form-fixture defaults, target-compatible own-property assertion and three scoped Name-switch queries.
+- [x] Focused154/154; all four full shards5,928/5,928 across545 files,0 failures/unhandled errors; automatic typecheck/build OK. No test-count delta.
+- [ ] CR1 authenticated screenshots/readback blocked by external_unmanaged auth; no credentials requested.
+
 ## CR2 — Creator profile
 - [x] Add page-owned creator read, cover label, default Videos tab and round-video pills through shared Watch player.
 - [x] Add eight CR2 regressions; focused11/11; four shards executed5,928/545 with5,926 passing, two pre-existing CR1 failures and0 unhandled errors; report CR2_REPORT.md.
-- [ ] Await CR1 failure/type authorisation; four pre-existing type errors keep build unclean. Authenticated screenshots and full-page creator/non-creator navigation checks remain unverified (external_unmanaged).
+- [x] CR1.1 resolved the two known tests and four typing errors; current full suite5,928/545 and automatic typecheck/build clean.
+- [ ] Authenticated CR2 screenshots and full-page creator/non-creator navigation checks remain unverified (external_unmanaged).
 
 ## CR1 — Self-serve creator choice
 - [x] Add shared switch, Welcome Continue-only choice and immediate Edit profile save/rollback.
 - [x] Remove business-create Creator tile and apply only authorised test edits.
-- [ ] STOP: focused 152/154; two ep2 Name switch queries find multiple switches; automatic typecheck reports four errors. Await authorisation; full shards/screenshots not run. Inventory 5,920/544 (+8 creator cases +1 no-tile case), not full passing total. See CR1_REPORT.md.
+- [x] CR1.1 cleared the authorised test/type stop; focused154/154 and full5,928/545 passed, automatic checks clean. See CR1_REPORT.md; screenshot blocker recorded above.
 
 ## Course Media fullscreen shot selection
 - [x] Guard missing shot ids, publish opening index, preserve selected/swiped shots and reject stale hydration.
