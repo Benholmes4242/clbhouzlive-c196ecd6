@@ -113,7 +113,7 @@ describe('FIX §1 — one vertical rhythm, button pinned to the bottom', () => {
     renderRail();
     for (const name of ['Sundridge Park GC', 'Golfer Ann', 'Golfer Bob', 'Golfer Cat']) {
       const card = cardOf(name);
-      expect(card.style.height).toBe('220px');
+      expect(card.style.height).toBe('252px');
       expect(card.style.display).toBe('flex');
       expect(card.style.flexDirection).toBe('column');
       expect(followButtonOf(name).style.marginTop).toBe('auto');

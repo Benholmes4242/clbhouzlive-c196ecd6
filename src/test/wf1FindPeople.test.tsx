@@ -360,7 +360,7 @@ describe('WF1 Find people page', () => {
     expect(screen.getByText('4.1 hcp · 63 rounds')).toBeTruthy();
     expect(screen.getByText('+1.2 hcp · 212 rounds')).toBeTruthy();
     // New Ned: no handicap, no rounds → no figures line at all.
-    const ned = screen.getByText('New Ned').closest('button')!;
+    const ned = screen.getByText('New Ned').closest('[role="button"]')!;
     expect(ned.textContent).not.toContain('hcp');
     expect(ned.textContent).not.toContain('rounds');
     // Danny Holmes is verified; Niall Devins is not.
@@ -375,7 +375,7 @@ describe('WF1 Find people page', () => {
 
   it('follows and unfollows a golfer through the existing mutation', async () => {
     renderPage('/find-people?tab=golfers');
-    const row = screen.getByText('Niall Devins').closest('button')!;
+    const row = screen.getByText('Niall Devins').closest('[role="button"]')!;
     const pill = row.querySelectorAll('button')[0];
     expect(pill.textContent).toBe('Follow');
     fireEvent.click(pill);
@@ -392,7 +392,7 @@ describe('WF1 Find people page', () => {
 
   it('follows a business through the existing mutation', async () => {
     renderPage('/find-people?tab=businesses');
-    const row = screen.getByText('Sundridge Park GC').closest('button')!;
+    const row = screen.getByText('Sundridge Park GC').closest('[role="button"]')!;
     const pill = row.querySelectorAll('button')[0];
     fireEvent.click(pill);
     await waitFor(() => expect(pill.textContent).toBe('Following'));
