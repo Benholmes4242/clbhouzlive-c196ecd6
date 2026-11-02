@@ -1,7 +1,7 @@
 /**
  * ACTIVE RING — a 1.5px gradient ring and 2px surface-coloured gap round an
- * avatar whose account posted, reviewed or played in the last 24 hours
- * (active-ring-signed-off.html). Inactive slots get 3.5px of clear padding so
+ * avatar whose account posted, reviewed or played in the last 48 hours
+ * (active-ring-signed-off.html). Inactive card slots get card padding so
  * every slot is the same size and nothing shifts when the data arrives.
  * Rail and Find people share this ring, activeRingRules and one batched
  * useRecentActivity read per surface, so they cannot drift or fetch per card.
@@ -24,7 +24,7 @@ export function ActiveRing({
 }) {
   if (!active) {
     return (
-      <span data-active-ring="off" style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 3.5, borderRadius: '34%' }}>
+      <span data-active-ring="off" style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 3.5, borderRadius: '34%', background: surface === 'card' ? CARD_SURFACE : undefined }}>
         {children}
       </span>
     );

@@ -1824,7 +1824,8 @@
       "postedReview": "Posted a review",
       "postedJustNow": "Posted just now",
       "postedMinutes": "Posted {{n}}m ago",
-      "postedHours": "Posted {{n}}h ago"
+      "postedHours": "Posted {{n}}h ago",
+      "postedYesterday": "Posted yesterday"
     }
   }
 }

@@ -46,6 +46,9 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } 
 import { activityLine, type RecentActivity } from '@/features/find-people/activeRingRules';
 import { ActiveRing, ACTIVE_RING_GRADIENT } from '@/features/find-people/ActiveRing';
 import { useRecentActivity } from '@/features/find-people/useRecentActivity';
+import { useSuggestionCovers } from '@/features/find-people/useSuggestionCovers';
+import { SuggestionCover } from '@/features/find-people/SuggestionCover';
+import { railCardId } from '@/features/find-people/railRules';
 import { WhoToFollowRail, resetWhoToFollowRailSessionForTests } from '@/features/find-people/WhoToFollowRail';
 import FindPeoplePage from '@/pages/FindPeoplePage';
 import { InviteSheetContext } from '@/components/invite/InviteSheetProvider';
@@ -106,6 +109,13 @@ afterEach(() => {
 });
 
 describe('activityLine', () => {
+  it.each([
+    [23 * 60 + 59, 'findPeople.active.postedHours', { n: 23 }],
+    [24 * 60, 'findPeople.active.postedYesterday', {}],
+    [47 * 60, 'findPeople.active.postedYesterday', {}],
+  ])('post at %i minutes uses the correct age bucket', (minutes, key, vars) => {
+    expect(activityLine(act({ created_at: ago(Number(minutes) * 60_000) }), NOW)).toMatchObject({ key, vars });
+  });
   it('round with a course reads Played {course}, shortened', () => {
     const c = 'Sundridge Park Golf Club (East)';
     expect(activityLine(act({ kind: 'round', course_name: c }), NOW).def).toBe(`Played ${shortCourseName(c)}`);
@@ -153,6 +163,19 @@ describe('ActiveRing', () => {
 
 describe('WhoToFollowRail', () => {
   const cardOf = (name: string) => screen.getByText(name).closest('[role="button"]') as HTMLElement;
+  it('makes one cover call for all slot cards and keeps cover dismissal isolated', async () => {
+    h.rpc.mockImplementation((name: string) => Promise.resolve({ error: null, data: name === 'get_suggestion_covers'
+      ? [{ kind: 'person', id: 'u-plain', cover_url: 'https://media.clbhouz.co.uk/cover.jpg', source: 'own' }]
+      : h.rows }));
+    wrap(<WhoToFollowRail slot={1} />);
+    await waitFor(() => expect(cardOf('David Lang').querySelector('[data-suggestion-cover="image"]')).toBeTruthy());
+    expect(h.rpc.mock.calls.filter(([name]) => name === 'get_suggestion_covers')).toHaveLength(1);
+    expect(h.rpc).toHaveBeenCalledWith('get_suggestion_covers', { p_user_ids: ['u-ring', 'u-plain', 'u-third'], p_business_ids: [] });
+    expect(cardOf('Danny Holmes').querySelector('[data-suggestion-cover="plain"]')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Hide David Lang' }));
+    await waitFor(() => expect(screen.queryByText('David Lang')).toBeNull());
+    expect(screen.queryByTestId('probe')).toBeNull();
+  });
 
   it('a ringed card shows the when line and its avatar opens the post, not the profile', async () => {
     wrap(<WhoToFollowRail slot={1} />);
@@ -162,7 +185,7 @@ describe('WhoToFollowRail', () => {
     fireEvent.click(btn);
     expect(screen.getByTestId('probe').textContent).toBe('/post/post-9');
   });
-  it('an unringed card has an empty when line of the same height and no avatar button; cards are 252 tall', async () => {
+  it('an unringed card has an empty when line of the same height and no avatar button; cards are 266 tall', async () => {
     wrap(<WhoToFollowRail slot={1} />);
     await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
     const card = cardOf('David Lang');
@@ -170,8 +193,8 @@ describe('WhoToFollowRail', () => {
     expect(when.textContent).toBe('');
     expect(when.style.height).toBe('15px');
     expect(screen.queryByRole('button', { name: "Open David Lang's latest post" })).toBeNull();
-    expect(card.style.height).toBe('252px');
-    expect(cardOf('Danny Holmes').style.height).toBe('252px');
+    expect(card.style.height).toBe('266px');
+    expect(cardOf('Danny Holmes').style.height).toBe('266px');
   });
 });
 
@@ -221,6 +244,64 @@ describe('useRecentActivity', () => {
   it('is disabled with no ids', async () => {
     renderHook(() => useRecentActivity([]), { wrapper: qcWrap });
     await new Promise((r) => setTimeout(r, 20));
+    expect(h.rpc).not.toHaveBeenCalled();
+  });
+});
+
+describe('SuggestionCover', () => {
+  it('renders a sized lazy decorative image and scrim, then falls back on error', () => {
+    const { container } = render(<SuggestionCover url="https://media.clbhouz.co.uk/cover.jpg" />);
+    const image = container.querySelector('img');
+    expect(image?.getAttribute('src')).toContain('width=344');
+    expect(image?.getAttribute('alt')).toBe('');
+    expect(image?.getAttribute('loading')).toBe('lazy');
+    expect(image?.getAttribute('decoding')).toBe('async');
+    expect(container.querySelector('.suggestion-cover-scrim')).toBeTruthy();
+    if (!image) throw new Error('Expected cover image');
+    fireEvent.error(image);
+    expect(container.querySelector('[data-suggestion-cover="plain"]')).toBeTruthy();
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.querySelector('.suggestion-cover-scrim')).toBeNull();
+  });
+  it('renders the plain material without an image or scrim when no cover exists', () => {
+    const { container } = render(<SuggestionCover />);
+    expect(container.querySelector('[data-suggestion-cover="plain"]')).toBeTruthy();
+    expect(container.querySelector('img, .suggestion-cover-scrim')).toBeNull();
+  });
+});
+
+describe('useSuggestionCovers', () => {
+  function wrapper({ children }: { children: React.ReactNode }) {
+    const [client] = React.useState(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }));
+    return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  }
+  it('keys match railCardId for people and businesses', async () => {
+    h.rpc.mockResolvedValue({ data: [
+      { kind: 'person', id: 'u1', cover_url: 'person-cover', source: 'club' },
+      { kind: 'business', id: 'b1', cover_url: 'business-cover', source: 'own' },
+    ], error: null });
+    const { result } = renderHook(() => useSuggestionCovers(['u1'], ['b1']), { wrapper });
+    await waitFor(() => expect(result.current.size).toBe(2));
+    expect(result.current.get(railCardId({ kind: 'person', person: person({}) }))).toBe('person-cover');
+    expect(result.current.get('b:b1')).toBe('business-cover');
+  });
+  it('caps each input at 100 and preserves display order', async () => {
+    const people = Array.from({ length: 105 }, (_, i) => `p-${105-i}`);
+    const businesses = Array.from({ length: 102 }, (_, i) => `b-${102-i}`);
+    h.rpc.mockResolvedValue({ data: [], error: null });
+    renderHook(() => useSuggestionCovers(people, businesses), { wrapper });
+    await waitFor(() => expect(h.rpc).toHaveBeenCalledTimes(1));
+    expect(h.rpc).toHaveBeenCalledWith('get_suggestion_covers', { p_user_ids: people.slice(0,100), p_business_ids: businesses.slice(0,100) });
+  });
+  it('does not read when signed out', async () => {
+    h.user = null;
+    renderHook(() => useSuggestionCovers(['u1'], ['b1']), { wrapper });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    expect(h.rpc).not.toHaveBeenCalled();
+  });
+  it('does not read with no ids', async () => {
+    renderHook(() => useSuggestionCovers([], []), { wrapper });
+    await new Promise(resolve => setTimeout(resolve, 20));
     expect(h.rpc).not.toHaveBeenCalled();
   });
 });

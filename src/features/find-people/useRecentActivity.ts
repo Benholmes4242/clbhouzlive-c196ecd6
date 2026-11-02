@@ -1,6 +1,6 @@
 /**
  * ACTIVE RING — one batched get_recent_activity read per surface (never one
- * per card). Accounts with nothing in the last 24 hours are absent from the
+ * per card). Accounts with nothing in the last 48 hours are absent from the
  * map. The RPC reads at most 100 ids, so callers pass ids in display order.
  */
 import { useQuery } from '@tanstack/react-query';
