@@ -114,7 +114,7 @@ const fireVisible = () => {
 
 function LocationEcho() {
   const loc = useLocation();
-  return <div data-testid="loc" data-path={loc.pathname} />;
+  return <div data-testid="loc" data-path={loc.pathname} data-search={loc.search} />;
 }
 
 function mountFeed(initialFilter?: string) {
@@ -259,6 +259,40 @@ describe('WS1 chips', () => {
     };
     mountFeed();
     expect(screen.getByText('From the community')).toBeTruthy();
+  });
+
+  it("the community rail's See all routes to /media?kind=community", () => {
+    /* The rail injects once, after the third long-form card, so the feed
+       needs four long rows on screen. */
+    f.videos = {
+      data: {
+        pages: [[
+          { post_id: 'v1', duration_seconds: 300, creator_display_name: 'A' },
+          { post_id: 'v2', duration_seconds: 300, creator_display_name: 'B' },
+          { post_id: 'v3', duration_seconds: 300, creator_display_name: 'C' },
+          { post_id: 'v4', duration_seconds: 300, creator_display_name: 'D' },
+        ]],
+      },
+      isFetched: true,
+      isError: false,
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      refetch: vi.fn(),
+      fetchNextPage: vi.fn(),
+    };
+    f.moments = {
+      data: [{ key: 'm1', post: { userId: 'u1', displayName: 'Ann' }, courseName: 'Rosapenna' }],
+      isFetched: true,
+      isError: false,
+      refetch: vi.fn(),
+    };
+    mountFeed();
+    const heading = screen.getByText('From the community');
+    const section = heading.closest('div')!;
+    fireEvent.click(within(section).getByRole('button'));
+    const loc = screen.getByTestId('loc');
+    expect(loc.getAttribute('data-path')).toBe('/media');
+    expect(loc.getAttribute('data-search')).toBe('?kind=community');
   });
 
   it('the search placeholder reads Search videos and creators', () => {

@@ -1,5 +1,10 @@
 # Roadmap
 
+## WS1 — Explore Watch section 1 — DONE
+- [x] Chips For you · Shorts · Long form via mapWatchFilter (community → For you); signed-in Creators row + lead from existing RPCs; community rail kept.
+- [x] WS1.1 community See all → /media?kind=community (+1 test). Focused 67/67; shards 1,433+1,418+1,449+1,487; current 5,788/536 (+49/+2 vs 5,739/534: Active Ring +15/+1, WS1 +34/+1). Report WS1_WATCH_TOP_REPORT.md.
+- [ ] Ruling needed from Ben: keep or remove the six new watch_* analytics events (see report).
+
 ## Tour scorecard tile — course door and right edge — DONE
 - [x] ScorecardSheet passes a course door handler when the tournament is linked (`/courses/{golf_course_id}`, closes first), undefined otherwise; Profile alone stays at the right edge. scorecardParts tour row already carried the member-row flex values (no edit needed); asserted by tests. src/test/tourScorecardCourseDoor.test.tsx (2 new) + tourScorecardProfileDoor.test.tsx 5→7; no existing assertion changed. Full shards 1,409+1,378(5 pre-existing T100 failures)+1,438+1,477 = 5,697/5,702 across 532 (+33/+2 vs 5,669/530; +4/+1 this follow-up, +29/+1 T100). Five failures are the named T100 GB&I slab cases. Report TOUR_SCORECARD_COURSE_DOOR_REPORT.md; build OK.
 - [x] Follow-up — full-width tour player row: moved the `showIdentity && isTour` block out of the head's left column to render after the head flex at full width (`data-scorecard-player-row`, marginTop 10, 22px headshot, name flex 1 1 auto ellipsis, HandicapChip, doors flex none/marginLeft 10/gap 6, Course then Profile), so the doors' right edge lines up with the score's right edge. tourScorecardProfileDoor.test.tsx 7→8: one assertion changed (player-row marker null→not-null, quoted in report) + 1 new sibling-placement test. Focused 36/36; tsgo clean; full shards 1,410+1,378+1,438+1,477 = 5,703/5,703 across 532 (+1/+0 vs 5,702/532), zero failures.
