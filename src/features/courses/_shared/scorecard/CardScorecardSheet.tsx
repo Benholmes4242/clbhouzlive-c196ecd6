@@ -1070,8 +1070,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </>
           )}
 
-          {/* CB61: member doors live in the head; tour exits and Share stay here. */}
-          {(engagement || (isTour && (onViewProfile || onViewCourse)) || onShareRound) && (
+          {/* TOUR SCORECARD TILE — the tour Course/Profile foot actions moved
+              up into the identity row (scorecardParts); with no engagement row
+              and no Share the whole foot block does not render, so the tile
+              ends at the scroll padding below the card. */}
+          {(engagement || onShareRound) && (
             <div
               data-scorecard-interactive="true"
               onClick={(event) => event.stopPropagation()}
