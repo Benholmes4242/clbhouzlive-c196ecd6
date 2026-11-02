@@ -1,5 +1,10 @@
 # Roadmap
 
+## CR2 — Creator profile
+- [x] Add page-owned creator read, cover label, default Videos tab and round-video pills through shared Watch player.
+- [x] Add eight CR2 regressions; focused11/11; four shards executed5,928/545 with5,926 passing, two pre-existing CR1 failures and0 unhandled errors; report CR2_REPORT.md.
+- [ ] Await CR1 failure/type authorisation; four pre-existing type errors keep build unclean. Authenticated screenshots and full-page creator/non-creator navigation checks remain unverified (external_unmanaged).
+
 ## CR1 — Self-serve creator choice
 - [x] Add shared switch, Welcome Continue-only choice and immediate Edit profile save/rollback.
 - [x] Remove business-create Creator tile and apply only authorised test edits.

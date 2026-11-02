@@ -5,6 +5,7 @@
  * is personal-only and never carries HeroShell's square pinned-height logic.
  */
 import React from 'react';
+import '@/features/creator/profile-creator.css';
 import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
@@ -86,6 +87,7 @@ interface Props {
   avatar: React.ReactNode;
   onAvatarTap?: () => void;
   displayName: string;
+  isCreator?: boolean;
   /** Pre-joined home club · region; null when neither resolves. */
   subline: string | null;
   /** Optional member coach line, privacy/read ownership remains with its caller. */
@@ -101,6 +103,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
   avatar,
   onAvatarTap,
   displayName,
+  isCreator = false,
   subline,
   afterSubline,
   onAddHomeClub,
@@ -172,6 +175,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
         </button>
 
         <div style={{ flex: 1, minWidth: 0 }}>
+          <div className={isCreator ? "profile-creator-identity" : undefined}>
           <h1
             style={{
               margin: 0,
@@ -188,6 +192,8 @@ export const ProfileCoverBand: React.FC<Props> = ({
           >
             {displayName}
           </h1>
+          {isCreator && <span className="profile-creator-label">Creator</span>}
+          </div>
           {subline ? (
             <div style={{ marginTop: 3, fontSize: 12.5, fontWeight: 600, color: '#FFFFFF', textShadow: '0 1px 8px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {subline}
