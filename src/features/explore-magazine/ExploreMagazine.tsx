@@ -1491,7 +1491,6 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
           </div>
         ) : null}
       </div>
-      ) : null}
 
       {/* The lead shell exists for the case the brief names — a lead arriving
           after a std has already rendered — and is exported from the shells file
@@ -1583,27 +1582,9 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         />
       )}
 
-      {/* P1 — THE BOARD'S PANEL, mounted against the same state the block reads,
-          so the panel's count and the page's rows can never disagree. Picking a
-          board applies it live (boardApplied), and the footer's "Show N rounds"
-          closes onto a body that has already swapped. */}
-      <BoardFilterPanel
-        open={boardPanelOpen}
-        onClose={() => setBoardPanelOpen(false)}
-        userId={userId}
-        board={boardState.board}
-        onBoardChange={(next) => {
-          boardState.changeBoard(next);
-          setBoardApplied(true);
-        }}
-        resultCount={boardState.total}
-        filters={boardState.filters}
-        onChange={boardState.changeFilters}
-        boardChanged={boardState.board !== boardState.entryBoard}
-        canReset={boardState.canReset}
-        onReset={() => { boardState.resetAll(); setBoardApplied(true); }}
-        facets={boardState.facets}
-      />
+      {/* RS — the board's filter panel left with the Scores view. It was
+          already unopenable here (nothing set boardPanelOpen); /rounds keeps
+          the page's own filter UI. */}
     </div>
     </FeatRarityProvider>
   );
