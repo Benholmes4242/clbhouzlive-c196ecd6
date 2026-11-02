@@ -50,6 +50,11 @@ vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useRegionCourses: () => ({ data: [], isLoading: false, isError: false }),
   useGridVideos: () => ({ data: undefined, isLoading: false, isError: false, hasNextPage: false, fetchNextPage: () => {} }),
 }));
+vi.mock('@/features/explore-magazine/watch/useWatchBottom', () => ({
+  useWatchSpotlight: () => ({ data: null, isError: false }),
+  useCreatorVideos: () => ({ data: [] }),
+  useTop100Videos: () => ({ data: [], isError: false }),
+}));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek', () => ({
   useMomentsOfTheWeek: () => ({ data: [], isFetched: true, isError: false, refetch: vi.fn() }),
 }));
