@@ -46,6 +46,8 @@ import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
 import { useWatchProgress } from './useWatchSignals';
 import { RoundsThisWeekShelf } from './RoundsThisWeekShelf';
+import { CourseVideosShelf, ShelfHeading } from './CourseVideosShelf';
+import { RegionsShelf } from './RegionsShelf';
 import {
   RAIL_EVERY,
   groupByMember,
@@ -404,13 +406,11 @@ export function WatchFeed({
   /* Q.1: the Quick hits heading has ONE home, rendered by both the loading and rows branches,
      so the heading seen while loading can never drift from the one seen once loaded. */
   const quickSection = (
-    <Section
-      title={t('amateur.watch.rail.quick', 'Quick hits')}
-      kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
-      /* BC.0: See all selects the Quick hits chip in place. Both reads are infinite
-         queries, so the chip view already shows everything there is; a separate page
-         could only show the same clips under another name. Once the chip is active
-         there is nothing left to expand, so there is no See all. */
+    /* WS2 §2 — today's Quick hits rail, renamed Shorts, in the Rounds this week heading pattern. */
+    <ShelfHeading
+      title={t('amateur.watch.rail.shorts', 'Shorts')}
+      sub={t('amateur.watch.rail.shortsSub', 'Under three minutes')}
+      /* BC.0: See all selects the Shorts chip in place; none once it is active. */
       seeAll={filter === 'quick' ? undefined : t('amateur.watch.seeAll', 'See all')}
       onSeeAll={filter === 'quick' ? undefined : () => {
         analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
@@ -590,6 +590,15 @@ export function WatchFeed({
               Signed-in members only; the shelf hides itself for guests. */}
           {onAll ? (
             <RoundsThisWeekShelf userId={userId} onOpenRound={onOpenRound} onOpenMember={onOpenMember} />
+          ) : null}
+
+          {/* WS2 — FILMED AT YOUR COURSES and BY REGION: For you only, after Rounds this
+              week and before Watch. Both hide themselves for guests and thin data. */}
+          {onAll ? (
+            <>
+              <CourseVideosShelf userId={userId} onDepart={onDepart} />
+              <RegionsShelf userId={userId} />
+            </>
           ) : null}
 
           {/* K.4 — THE LONG-FORM COLUMN, with the community rail once after the third card. */}
