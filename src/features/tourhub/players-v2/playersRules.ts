@@ -105,6 +105,19 @@ export interface StandingRow {
   events: number | null;
 }
 
+/**
+ * A race is final once it has closed: stored status 'final', or today (YYYY-MM-DD)
+ * past closes_on. Every status read on the page goes through this.
+ */
+export function effectiveStatus(race: { status: string | null; closes_on: string | null } | null, today: string): 'live' | 'final' | null {
+  if (!race) return null;
+  return race.status === 'final' || (race.closes_on != null && today > race.closes_on) ? 'final' : 'live';
+}
+
+export function todayIso(now = new Date()): string {
+  return now.toISOString().slice(0, 10);
+}
+
 export interface Stake {
   after_position: number;
   explainer: string | null;

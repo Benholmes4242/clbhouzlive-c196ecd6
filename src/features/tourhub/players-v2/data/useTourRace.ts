@@ -18,9 +18,7 @@ export type TourRace = Database['public']['Tables']['tour_races']['Row'];
 
 export interface TourRaceResult {
   race: TourRace | null;
-  /** The season the race row belongs to — the newest tour_races year not past
-   *  currentSeasonYear(). Sibling reads use it so a race that is still the
-   *  live one (e.g. a 2026 FedEx Fall in November) is not missed. */
+  /** The standings season this race was read for (resolveStandingsSeason). */
   seasonYear: number;
   stakes: Stake[];
   events: ClockEvent[];
@@ -28,16 +26,21 @@ export interface TourRaceResult {
 
 const FINISHED = new Set(['closed', 'complete', 'completed', 'final', 'finished']);
 
-export function useTourRace(tour: PlayersTourId) {
-  const year = currentSeasonYear();
+/**
+ * @param season the standings season from resolveStandingsSeason: the race row
+ *   and stakes are read for exactly that year. `undefined` = still resolving
+ *   (query waits); `null` = no season has standings (race null).
+ */
+export function useTourRace(tour: PlayersTourId, season: number | null | undefined) {
   return useQuery<TourRaceResult>({
-    queryKey: ['players-v2', 'race', tour, year],
+    queryKey: ['players-v2', 'race', tour, season],
+    enabled: season !== undefined,
     staleTime: 30 * 60_000,
     queryFn: async () => {
-      const raceRes = await supabase.from('tour_races').select('*').eq('tour_code', tour).lte('season_year', year)
-        .order('season_year', { ascending: false }).limit(1).maybeSingle();
+      if (season == null) return { race: null, seasonYear: currentSeasonYear(), stakes: [], events: [] };
+      const raceRes = await supabase.from('tour_races').select('*').eq('tour_code', tour).eq('season_year', season).maybeSingle();
       if (raceRes.error) throw raceRes.error;
-      const seasonYear = raceRes.data?.season_year ?? year;
+      const seasonYear = season;
       const stakesRes = await supabase.from('tour_stakes').select('*').eq('tour_code', tour).eq('season_year', seasonYear).order('after_position', { ascending: true });
       if (stakesRes.error) throw stakesRes.error;
       const race = raceRes.data ?? null;

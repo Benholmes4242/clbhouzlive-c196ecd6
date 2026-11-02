@@ -15,7 +15,7 @@ import type { PlayerView } from '../playersModel';
 import { statList } from '../playersModel';
 import { LinePicksCard } from '../picks/LinePicksCard';
 import {
-  barPct, featuredStakes, fmtInt, fmtWeekdayDate, footerCaption, heroHeadline, heroSub, lineCardLine, lineGap,
+  barPct, effectiveStatus, todayIso, featuredStakes, fmtInt, fmtWeekdayDate, footerCaption, heroHeadline, heroSub, lineCardLine, lineGap,
   ordinal, OTHER_TILE_KEYS, PGA_TILE_KEYS, raceCardLine, situationSentence, STAT_DEFS, type Rich, type Stake,
 } from '../playersRules';
 
@@ -77,7 +77,7 @@ function Hero({ data }: { data: PageData }) {
   const [leader, second] = data.players;
   if (!leader) return null;
   const gap = leader.points != null && second?.points != null ? Math.round(leader.points - second.points) : null;
-  const headline = heroHeadline({ status: data.race?.status ?? null, leaderPts: leader.points, secondPts: second?.points ?? null, leaderName: leader.name });
+  const headline = heroHeadline({ status: effectiveStatus(data.race, todayIso()), leaderPts: leader.points, secondPts: second?.points ?? null, leaderName: leader.name });
   const sub = heroSub({ wins: leader.wins, top10s: leader.top10s, events: leader.events, gap, secondName: second?.name ?? null });
   let scoring: string | null = null;
   if (data.isPga) {
@@ -125,7 +125,7 @@ function HeroImg({ rawName, name, tourCode }: { rawName: string; name: string; t
 
 function Clock({ data }: { data: PageData }) {
   const race = data.race;
-  if (!race || race.status !== 'live' || !race.phase_start || !data.events.length) return null;
+  if (!race || effectiveStatus(race, todayIso()) !== 'live' || !race.phase_start || !data.events.length) return null;
   const left = data.events.filter((e) => !e.finished);
   const next = left[0];
   return (
@@ -257,7 +257,7 @@ function StatLeadersCard({ data, actions }: { data: PageData; actions: PageActio
 export function FrontPage({ data, actions }: { data: PageData; actions: PageActions }) {
   const lines = data.race ? featuredStakes(data.stakes) : [];
   const sentence = situationSentence({
-    status: data.race?.status ?? null,
+    status: effectiveStatus(data.race, todayIso()),
     hasPhase: !!data.race?.phase_start,
     events: data.events,
     lines: lines.map((stake) => ({ stake, gap: lineGap(data.players, stake.after_position) })),

@@ -31,6 +31,7 @@ import { useTourPlayerFollows } from '../leaderboard/useTourPlayerFollows';
 import { usePlayersRanking, type PlayersTourId } from './data/usePlayersRanking';
 import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { useWorldRankLookup } from './data/useWorldRankLookup';
+import { useStandingsSeason } from './data/resolveStandingsSeason';
 import { useTourRace } from './data/useTourRace';
 import { useStandingsMovement } from './data/useStandingsMovement';
 import { useFieldForm } from './data/useFieldForm';
@@ -98,15 +99,17 @@ export function PlayersTab() {
   const query = debouncedSearch.trim().toLowerCase();
 
   // -- Reads
-  const { data: race, isError: raceError } = useTourRace(activeTour);
-  // Standings read the race's season so they never disagree with the line cards.
-  const raceYear = race ? (race.race ? race.race.season_year : null) : raceError ? null : undefined;
-  const { data: ranking, isLoading: rankingFetching, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour, raceYear);
-  const rankingLoading = rankingFetching || raceYear === undefined;
+  // Every read follows the newest season with real standings, so the page
+  // rolls from a finished season to the next one on its own.
+  const { data: standingsSeason, isError: seasonError } = useStandingsSeason(activeTour);
+  const season = standingsSeason !== undefined ? standingsSeason : seasonError ? null : undefined;
+  const { data: race } = useTourRace(activeTour, season);
+  const { data: ranking, isLoading: rankingFetching, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour, season);
+  const rankingLoading = rankingFetching || season === undefined;
   const { data: liveMap } = useLivePlayerIds();
-  const { data: movement } = useStandingsMovement(activeTour, race?.seasonYear);
-  const { data: formMap } = useFieldForm(activeTour, race?.seasonYear);
-  const { data: scorecard } = useScorecardStats(activeTour, race?.seasonYear);
+  const { data: movement } = useStandingsMovement(activeTour, season ?? undefined);
+  const { data: formMap } = useFieldForm(activeTour, season ?? undefined);
+  const { data: scorecard } = useScorecardStats(activeTour, season ?? undefined);
   const { followed } = useTourPlayerFollowsSet();
   const loadedIds = useMemo(() => (ranking?.rows ?? []).map((r) => r.playerId).filter(Boolean), [ranking?.rows]);
   const { data: worldRanks } = useWorldRankLookup(loadedIds);
