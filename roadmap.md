@@ -1,5 +1,9 @@
 # Roadmap
 
+## WS4 Shorts shelf tiles
+- [x] Set shelf to 156×248 and reserve each layout's own two-line title height; grid aspect and all other content frozen.
+- [ ] STOP: new test at ws2WatchMiddle.test.tsx:115 expects cover-fit image but the existing fixture has poster_url null; 21/22 focused pass. Await fixture correction authorisation before four shards; automatic build clean; WS4_SHORTS_TILES_REPORT.md records exact failure and +4 candidate cases.
+
 ## Who to follow cover cards
 - [x] Add one typed batched cover read, signed-off card cover/overlap/dismiss geometry and 48-hour post wording; community rows frozen.
 - [x] Focused 61/61; four full shards 5,946/545 (+10 named activeRing cases), zero failures/unhandled errors; automatic build clean; WHO_TO_FOLLOW_COVERS_REPORT.md reconciles changed height assertions.
