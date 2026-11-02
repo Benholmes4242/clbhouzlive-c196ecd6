@@ -54,3 +54,22 @@ Against the 5,739/534 baseline: **+49 tests / +2 files**
 Failures: none. No pre-existing failures this run. The earlier unidentified shard-1 RS failure has not recurred.
 
 No SQL, migrations or migration files; no RPC or edge-function edits; feed_config untouched; round_pool_cap 30; no native or Median changes.
+
+---
+
+## WS1.2 — the Creators row ring (2026-11-02)
+
+Two faults, both in `src/features/explore-magazine/watch/CreatorsRow.tsx`; nothing else changed.
+
+- **§1 Shape.** The ring wrapper was `display: block` holding an inline-flex avatar, so it picked up the line box and its 34% radius resolved on the wrong box. The wrapper is now exactly the avatar's box: `display: flex`, `width: 64`, `aspectRatio: '1 / 1.05'` (SquircleAvatar's own ratio), `borderRadius: '34%'`, `lineHeight: 0`, `margin: '0 auto'`, with the same `boxShadow` ring. The business-tile path uses the same wrapper, so it is covered. SquircleAvatar untouched.
+- **§2 Cut-off top.** The horizontal scroller clipped the 4px ring vertically. Scroller padding `0 16px` → `6px 16px`; heading-row bottom padding 12px → 6px, keeping the "Creators"-to-avatars gap the same.
+- **§3 Test.** Added one case to `src/test/ws1WatchTop.test.tsx` ("WS1.2: the ring wrapper is the avatar box (flex, 1/1.05, 34%) and the scroller leaves vertical room"): ring wrapper has display flex, aspect-ratio 1 / 1.05, border-radius 34%; scroller vertical padding ≥ 4px. Existing tests unchanged.
+
+### Verification
+
+- Focused: `ws1WatchTop.test.tsx` 35/35 passed.
+- Full suite, `--maxWorkers=2`, sharded 4 ways: shard 1: 1,492; shard 2: 1,456; shard 3: 1,526; shard 4: 1,458 — **5,932 tests / 545 files, 0 failures, 0 unhandled errors**. Baseline 5,931/545; delta +1 = the new WS1.2 case. Logs: /tmp/ws12-shard1..4.log.
+- Build: `build OK` (2026-11-02T20:27:01Z).
+- Pre-existing failures: none.
+
+No SQL, migrations, RPC/edge-function, feed_config, round_pool_cap, or native/Median changes. Guest browsing, review wizard, news and round plots untouched.
