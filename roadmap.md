@@ -1477,3 +1477,5 @@
 
 ## FIX — Who to follow rail + Find people (DONE)
 - Rail cards fixed-height flex column, Follow pinned bottom; follow removes card after 3s (unfollow cancels, session Set, reduced-motion instant); bottom nav hidden on /find-people; title "Explore the community" (6 locales); Suggested = all 8 groups capped at 5 with See all, dedup; Businesses under-3 line. Item 6: report only, no SQL. Suite 5,739/5,739 (534 files): +10/+1 vs 5,729/533 (wfFixRail +6 new file, wf1FindPeople 23→27).
+
+- [x] ACTIVE RING — Who to follow rail and Explore the community rows (ACTIVE_RING_REPORT.md)

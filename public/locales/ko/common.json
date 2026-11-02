@@ -904,6 +904,16 @@
       "seeAllAria": "모두 보기, 커뮤니티 둘러보기"
     },
     "seeAll": "모두 보기 {{count}}",
-    "bizJoining": "더 많은 클럽과 비즈니스가 clbhouz에 참여하고 있습니다."
+    "bizJoining": "더 많은 클럽과 비즈니스가 clbhouz에 참여하고 있습니다.",
+    "active": {
+      "open": "Open {{name}}'s latest post",
+      "played": "Played {{course}}",
+      "playedRound": "Played a round",
+      "reviewed": "Reviewed {{course}}",
+      "postedReview": "Posted a review",
+      "postedJustNow": "Posted just now",
+      "postedMinutes": "Posted {{n}}m ago",
+      "postedHours": "Posted {{n}}h ago"
+    }
   }
 }

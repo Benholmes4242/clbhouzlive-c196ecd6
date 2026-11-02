@@ -23145,6 +23145,16 @@ export type Database = {
         Returns: Json
       }
       get_push_health_summary: { Args: never; Returns: Json }
+      get_recent_activity: {
+        Args: { p_actor_ids: string[] }
+        Returns: {
+          actor_id: string
+          course_name: string
+          created_at: string
+          kind: string
+          post_id: string
+        }[]
+      }
       get_recent_course_records: {
         Args: { p_limit?: number }
         Returns: {

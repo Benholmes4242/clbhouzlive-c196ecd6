@@ -905,6 +905,16 @@
       "seeAllAria": "Ver todo, Explora la comunidad"
     },
     "seeAll": "Ver las {{count}}",
-    "bizJoining": "Más clubes y negocios se están uniendo a clbhouz."
+    "bizJoining": "Más clubes y negocios se están uniendo a clbhouz.",
+    "active": {
+      "open": "Open {{name}}'s latest post",
+      "played": "Played {{course}}",
+      "playedRound": "Played a round",
+      "reviewed": "Reviewed {{course}}",
+      "postedReview": "Posted a review",
+      "postedJustNow": "Posted just now",
+      "postedMinutes": "Posted {{n}}m ago",
+      "postedHours": "Posted {{n}}h ago"
+    }
   }
 }
