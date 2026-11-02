@@ -1362,54 +1362,13 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
        a single call; each card reads its own row out of that response. */
     <FeatRarityProvider ids={roundScoreIds.filter((id): id is string => !!id)}>
     <div data-explore-magazine="" style={{ fontFamily: SANS }}>
-      {/* §3b THE VIEW CHIP ROW starts below the islands because AmateurPage's
-          shell pays CHROME_CLEARANCE. On scroll, the shared islands ride away
-          and this row pins directly beneath the notch. The sentinel drives the
-          one shared safe-area scrim; the scope row remains in normal flow.
-          The active view takes the
-          FILLED ground (applied) and the rest the outline (selectable) —
-          the shared RailChips grammar, not a local look-alike. */}
-      <div ref={chipSentinelRef} style={{ height: 0 }} aria-hidden="true" />
-      <StickySafeAreaScrim visible={chipsStuck} background={A.CANVAS} />
-      <div
-        ref={chipBarRef}
-        data-stuck={chipsStuck ? 'true' : 'false'}
-        style={{
-          position: 'sticky',
-          top: 'var(--sat, env(safe-area-inset-top, 0px))',
-          zIndex: Z.stickyTabs,
-          background: A.CANVAS,
-          padding: '10px 0 12px',
-        }}
-      >
-        <div style={{ paddingInline: CARD_INSET }}>
-          {/* PRIMARY ROW (§1a): the canonical 'md' chip — the same padding and
-              font size as the Courses page sort chips — with the chips sharing
-              the full run between the gutters in equal widths. */}
-          <RailChips
-            options={chips}
-            value={view}
-            onChange={changeView}
-            ariaLabel={t('amateur.stream.views', 'Explore views')}
-            ground="filled-selection"
-            distribute
-          />
-        </div>
-
-      </div>
+      {/* RS — THE VIEW CHIP ROW IS GONE. Explore is always Watch; the Rounds
+          board lives at /rounds. The sticky bar, its sentinel and the shared
+          scrim left with it. */}
 
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
-          (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely; the
-          view chips above stay exactly where they are. */}
-      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} /> : null}
-
-      {/* UNREACHABLE ON SCORES SINCE THE BOARD BECAME THE LANDING VIEW — kept, not
-          dead: see boardApplied. Bringing the stream back is a one-line change. */}
-      {view === 'scores' && !scoresBoardActive ? (
-        <div style={{ marginBottom: BLOCK_GAP }}>
-          <CircleShelf viewerId={userId} pos={0} />
-        </div>
-      ) : null}
+          (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely. */}
+      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} onOpenRound={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)} onOpenMember={(id) => opener.openProfile(id)} /> : null}
       {view === 'all' && featured.isLoading ? (
         <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
           <FeaturedRoundSkeleton />
@@ -1444,30 +1403,12 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         </div>
       ) : null}
 
-      {/* P1 — A PICKED BOARD REPLACES THE RANKED STREAM. The block is the same
-          one the old page rendered (same RPC, same rows, same count line and
-          widening sentence); the way back is STATED above it, because a member
-          who cannot find the stream again will think the app broke. */}
-      {scoresBoardActive ? (
-        <div data-scores-board-container="" style={{ marginBottom: BLOCK_GAP }}>
-          {/* CB46 — instrumentation only; renders nothing. */}
-          <UnknownConnectionFallback userId={userId} />
-          <ScoresLeaderboardsPage
-            userId={userId}
-            sessionKnown={sessionKnown}
-            state={boardState}
-            onRowPress={boardRowPress}
-            onMemberTap={(id) => opener.openProfile(id)}
-            onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
-          />
-        </div>
-      ) : null}
+      {/* RS — the Scores board container left for /rounds, unchanged there. */}
 
       {/* minmax(0,1fr), NOT bare 1fr: a grid item's automatic minimum is its
           min-content, and the kicker/who-line are single-line nowrap — without
           the zero minimum a long course name widens the whole track past the
           viewport at 320px instead of clipping inside the card. */}
-      {!scoresBoardActive ? (
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
         {!source.isFetched && ranked.length === 0 ? (
           <>
