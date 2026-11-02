@@ -10,7 +10,7 @@ import { useFollowedBoardRows } from '../data/useFollowedBoardRows';
 import { useClimberRankHistory } from '../data/useClimberRankHistory';
 import { useTourPlayerFollows } from '../../leaderboard/useTourPlayerFollows';
 import { movementFrom } from '../../_shared/movement';
-import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, TOUR_CANVAS, TREND_UP } from '../../_shared/tokens';
+import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, TREND_UP } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 import {
   fmtPoints,
@@ -65,8 +65,8 @@ function RankingRow({ row, onOpen, third, followed, leaderPoints }: {
     <span style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 11 }}>
       <span style={{ position: 'relative', width: 34, height: 34, flex: 'none' }}>
         <SquircleAvatar size={34} hideRing alt={row.playerName} srcCandidates={resolvePlayerAvatarCandidates({ name: row.playerName, photoUrl: row.photoUrl })} />
-        <span data-flag style={{ position: 'absolute', right: -4, bottom: -3, width: 16, height: 11, borderRadius: 3, border: `1.5px solid ${TOUR_CANVAS}`, overflow: 'hidden', display: 'block', lineHeight: 0 }}>
-          <CountryFlag country={row.country} size="sm" />
+        <span data-flag style={{ position: 'absolute', right: -4, bottom: -3, width: 16, height: 12, borderRadius: 2, overflow: 'hidden', display: 'block', lineHeight: 0 }}>
+          <CountryFlag country={row.country} size="sm" className="border-none" />
         </span>
       </span>
       <span style={{ minWidth: 0, flex: 1 }}>
@@ -135,7 +135,7 @@ function ClimbCard({ rows, basisDays, comparisonDate, latestDate, onOpen }: {
   return (
     <button type="button" data-climb-card onClick={() => onOpen(climber.playerId as string)} style={{ margin: '14px 16px 0', padding: '12px 14px', borderRadius: 14, background: '#141418', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 12, width: 'calc(100% - 32px)', fontFamily: FONT, color: INK, textAlign: 'left', cursor: 'pointer' }}>
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: INK_FAINT, whiteSpace: 'nowrap' }}>
+        <span style={{ display: 'block', fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: INK_FAINT, whiteSpace: 'nowrap', textTransform: 'uppercase' }}>
           <Trans ns="tourhub" i18nKey="overview.rankings.climbLabel" />
         </span>
         <span style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 600 }}>

@@ -46,3 +46,45 @@ World and Race to Dubai presentation are unit-tested: header structure/nonwrappi
 
 ## Protected scope
 No SQL, migrations, backend/RPC changes, native/Median changes, or `feed_config` edits. `round_pool_cap` remains 30. YC2 is not part of this follow-up and remains open.
+---
+
+# FIX — flags cropped with a dark border, and the climber label case
+
+## Cause
+The flag sat in a 16×11 wrapper with `border: 1.5px solid TOUR_CANVAS` and
+`overflow: hidden`, but CountryFlag `sm` renders at 16×12 (`w-4 h-3`). The
+wrapper cropped the flag and the canvas-coloured border read as a black
+outline.
+
+## Diff — `src/features/tourhub/overview/sections/WorldRankings.tsx` (only file)
+1. Flag wrapper: border removed entirely; sized to the flag's own 16×12;
+   radius 3 → 2; `overflow: hidden` kept only to round the corners; position
+   unchanged (right -4, bottom -3). No outline, ring or shadow.
+2. CountryFlag now gets `className="border-none"` for this use only, removing
+   the chip fallback's own `border border-border/10`. Other CountryFlag
+   callers unchanged.
+3. Climber card label span gains `textTransform: 'uppercase'`; the locale
+   string `overview.rankings.climbLabel` stays sentence case.
+4. `TOUR_CANVAS` import removed (now unused).
+
+## Tests — `src/test/worldRankingsRebuild.test.tsx` (36 tests, count unchanged)
+CHANGED assertions in "draws the headshot with the flag on its corner"
+(renamed "…uncropped and without a border"):
+- OLD: `expect(flag.style.height).toBe('11px');`
+- NEW: `expect(flag.style.height).toBe('12px');`
+- NEW: `expect(flag.style.border).toBe('');` `expect(flag.style.boxShadow).toBe('');`
+  `expect(flag.style.overflow).toBe('hidden');`
+- NEW: inner flag carries `w-4`/`h-3` (16×12, the wrapper's own size — nothing
+  cropped) and `border-none`.
+NEW assertion in the biggest-climb card test: the label span's
+`style.textTransform` is `uppercase`.
+
+## Results
+- Focused: 36/36 passed. `npx tsgo --noEmit`: clean.
+- Full suite in shards (4): 1,410 + 1,378 + 1,438 + 1,477 =
+  **5,703 passed / 5,703 across 532 files**, zero failures — no delta vs the
+  5,703/532 baseline (assertions changed/added inside the existing file).
+
+## Unchanged
+No SQL, no migrations, no RPC/edge edits, feed_config untouched,
+round_pool_cap stays at 30, no native/Median changes.
