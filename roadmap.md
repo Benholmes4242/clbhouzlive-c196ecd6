@@ -2,7 +2,6 @@
 
 ## WS4 Shorts shelf tiles
 - [x] Set shelf to 156×248 and reserve each layout's own two-line title height; grid aspect and all other content frozen.
-- [ ] Run focused and four full shards from 5,946/545; confirm build and report counts.
 
 ## Who to follow cover cards
 - [x] Add one typed batched cover read, signed-off card cover/overlap/dismiss geometry and 48-hour post wording; community rows frozen.
