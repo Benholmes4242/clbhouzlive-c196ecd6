@@ -20,7 +20,6 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/hooks/useUserProfile.tsx', () => ({ useUserProfile: () => ({ data: { id: 'owner', username: 'ellie', display_name: 'Ellie', user_type: 'personal', is_public: true, websites: [] }, isLoading: false, isError: false }) }));
 vi.mock('@/components/friend-sheet/FriendSheetProvider', () => ({ useOpenFriendSheet: () => ({ open: vi.fn() }) }));
 vi.mock('@/components/friend-sheet/useMemberTapResolver', () => ({ compareRouteFor: (id: string) => `/compare/${id}`, useMemberTapResolver: () => ({ resolve: vi.fn() }) }));
-vi.mock('@/hooks/useHideHeader', () => ({}));
 vi.mock('@/hooks/useHeaderVisibility', () => ({ useHideHeader: () => {} }));
 vi.mock('@/hooks/usePersonalPostsCount', () => ({ usePersonalPostsCount: () => ({ data: 0 }) }));
 vi.mock('@/hooks/usePersonalReviewsCount', () => ({ usePersonalReviewsCount: () => ({ data: 0, isFetched: true, isError: false }) }));
@@ -111,6 +110,9 @@ it('signed-in whole-page creator default waits in the skeleton then shows Videos
  expect(container.querySelector('.profile-video-grid[aria-busy="true"]')).toBeNull();
 });
 it('signed-in whole-page non-creator defaults to Posts and replaces a Videos deep link with Posts', async () => {
+ const originalScrollIntoView = Element.prototype.scrollIntoView;
+ Element.prototype.scrollIntoView = vi.fn();
+ try {
  h.rpc.mockImplementation(() => Promise.resolve({ data: [{ ...summary, is_creator: false }], error: null }));
  const first = mountPage();
  await screen.findByTestId('profile-posts-content');
@@ -124,4 +126,8 @@ it('signed-in whole-page non-creator defaults to Posts and replaces a Videos dee
  fireEvent.click(screen.getByRole('button', { name: 'Test back' }));
  await screen.findByTestId('before-page');
  expect(screen.getByTestId('page-location')).toHaveTextContent('/before');
+ } finally {
+  cleanup();
+  Element.prototype.scrollIntoView = originalScrollIntoView;
+ }
 });
