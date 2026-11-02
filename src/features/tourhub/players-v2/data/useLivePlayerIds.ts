@@ -13,6 +13,8 @@ export interface LivePlayerInfo {
   position: number | null;
   positionTied: boolean | null;
   score: number | null;
+  /** Holes completed in the current round (additive, Players build 1). */
+  thru?: number | null;
   tournamentId: string;
   tournamentName: string;
 }
@@ -28,7 +30,7 @@ export function useLivePlayerIds() {
       const { data, error } = await supabase
         .from('sr_leaderboards')
         .select(
-          'player_id, position, position_tied, score, tournament:sr_tournaments!inner(id, name, status)',
+          'player_id, position, position_tied, score, thru, tournament:sr_tournaments!inner(id, name, status)',
         )
         .eq('tournament.status', 'inprogress')
         .limit(2000);
@@ -42,6 +44,7 @@ export function useLivePlayerIds() {
         position: number | null;
         position_tied: boolean | null;
         score: number | null;
+        thru?: number | null;
         tournament: { id: string | null; name: string | null; status: string | null } | null;
       };
       const map: LivePlayerMap = {};
@@ -51,6 +54,7 @@ export function useLivePlayerIds() {
           position: row.position ?? null,
           positionTied: row.position_tied ?? null,
           score: row.score ?? null,
+          thru: row.thru ?? null,
           tournamentId: row.tournament?.id ?? '',
           tournamentName: row.tournament?.name ?? '',
         };

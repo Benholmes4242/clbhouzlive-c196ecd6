@@ -41,6 +41,29 @@ export interface RankedRow {
   wins: number | null;
   top10s: number | null;
   eventsPlayed: number | null;
+  /** Movement key: player id (PGA) / player_id ?? manual_player_id ?? lower(name). */
+  playerKey: string;
+  /** Feed name before display normalisation (headshot lookups try it first). */
+  rawName: string;
+  /** Newest row timestamp (PGA updated_at, other tours scraped_at ?? updated_at). */
+  updatedAt: string | null;
+  /** PGA season statistics row (Stats lens, hero, stat leaders). Null on other tours. */
+  pga: PgaSeasonStats | null;
+}
+
+export interface PgaSeasonStats {
+  scoring_average: number | null;
+  strokes_gained_tee_green: number | null;
+  strokes_gained_putting: number | null;
+  driving_distance: number | null;
+  driving_accuracy: number | null;
+  greens_in_reg: number | null;
+  sand_saves: number | null;
+  putting_average: number | null;
+  earnings: number | null;
+  top_25s: number | null;
+  cuts_made: number | null;
+  raw_data: unknown;
 }
 
 
@@ -94,12 +117,13 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 
 // Minimal structural shapes for row casts.
 
-interface PgaStatRow {
+interface PgaStatRow extends PgaSeasonStats {
   player_id: string;
   fedex_points: number | string | null;
   wins: number | null;
   top_10s: number | null;
   events_played: number | null;
+  updated_at: string | null;
 }
 
 interface PlayerRow {
@@ -120,11 +144,13 @@ interface TourSeasonRankingRow {
   tournaments_played: number | null;
   country: string | null;
   tour_code: string | null;
+  scraped_at: string | null;
+  updated_at: string | null;
 }
 
 const PLAYER_SELECT = 'id, full_name, country, country_code, photo_url, tour_codes';
 const SEASON_RANKING_SELECT =
-  'player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code';
+  'player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code, scraped_at, updated_at';
 
 export function usePlayersRanking(tour: PlayersTourId) {
   const { t, i18n } = useTranslation('tourhub');
@@ -146,7 +172,7 @@ export function usePlayersRanking(tour: PlayersTourId) {
             // standing), it ties (T5, T7, T11) and it repeats within a season.
             // Rendering it as the # of a points-ordered list guaranteed
             // disagreement. The # is now the sort position.
-            'player_id, fedex_points, wins, top_10s, events_played',
+            'player_id, fedex_points, wins, top_10s, events_played, scoring_average, strokes_gained_tee_green, strokes_gained_putting, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, earnings, top_25s, cuts_made, raw_data, updated_at',
           )
 
           .eq('season_id', seasonId)
@@ -188,6 +214,16 @@ export function usePlayersRanking(tour: PlayersTourId) {
             wins: s.wins ?? null,
             top10s: s.top_10s ?? null,
             eventsPlayed: s.events_played ?? null,
+            playerKey: s.player_id,
+            rawName: p?.full_name ?? 'Unknown',
+            updatedAt: s.updated_at ?? null,
+            pga: {
+              scoring_average: s.scoring_average, strokes_gained_tee_green: s.strokes_gained_tee_green,
+              strokes_gained_putting: s.strokes_gained_putting, driving_distance: s.driving_distance,
+              driving_accuracy: s.driving_accuracy, greens_in_reg: s.greens_in_reg, sand_saves: s.sand_saves,
+              putting_average: s.putting_average, earnings: s.earnings, top_25s: s.top_25s, cuts_made: s.cuts_made,
+              raw_data: s.raw_data,
+            },
           };
         });
 
@@ -262,6 +298,10 @@ export function usePlayersRanking(tour: PlayersTourId) {
           wins: r.wins ?? null,
           top10s: null,
           eventsPlayed: r.tournaments_played ?? null,
+          playerKey: pid || (r.player_name ?? '').toLowerCase(),
+          rawName: r.player_name ?? p?.full_name ?? 'Unknown',
+          updatedAt: r.scraped_at ?? r.updated_at ?? null,
+          pga: null,
         };
 
       });
