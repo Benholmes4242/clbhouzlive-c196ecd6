@@ -1496,4 +1496,5 @@
 
 ## PROFILE_CLEANUP_V1
 - [x] Verified dependencies; applied dead-file deletions and named cache/comment changes. Business edit simplification applied but not verified.
-- [ ] STOP: focused business suites fail collection; BusinessProfileEditor.tsx:291 "Return statement is not allowed here"; automatic TS1128 at 353. Await correction authorization before reruns/full shards. Authorized test edits applied; 146 collected tests pass. Report PROFILE_CLEANUP_V1_REPORT.md.
+- [x] PROFILE_CLEANUP_V1.1: exact editor corrections, authorised canvas assertion removal, five dead header/college deletions; 284/284 focused tests; automatic build OK; report updated.
+- [ ] STOP V1.1: shard 2 ws1WatchTop.test.tsx:318/332 (expected See all button to be null), :407 (multiple See all elements). Shard 1 repeats two known RS provider failures; provider fix deferred by new-failure stop. Four-shard completion and actual after total await ruling; hosted authenticated readback unavailable (external_unmanaged).

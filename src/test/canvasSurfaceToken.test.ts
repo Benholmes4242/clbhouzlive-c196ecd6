@@ -314,12 +314,6 @@ describe('canonical member surface tokens', () => {
       activeInk: INK_ON_LIGHT,
     });
 
-    const source = readFileSync(resolve(process.cwd(), 'src/components/profile/header/ProfileHeaderCard.tsx'), 'utf8');
-    expect(source).toContain("PROFILE_PILL_SURFACES } from '@/lib/tokens/surfaces'");
-    expect(source).toContain('backgroundColor: PROFILE_PILL_SURFACES.inactive');
-    expect(source).toContain('backgroundColor = PROFILE_PILL_SURFACES.hover');
-    expect(source).not.toContain('profile-pill-inactive');
-    expect(source).not.toContain('--profile-pill-hover');
   });
 
   it('keeps every named arrival screen on the dark ramp', () => {
