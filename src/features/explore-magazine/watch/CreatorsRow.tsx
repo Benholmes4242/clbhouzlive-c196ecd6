@@ -162,7 +162,7 @@ export function CreatorsRow({ userId }: { userId: string | undefined }) {
 
   return (
     <div ref={rootRef} data-watch-creators="row">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '22px 16px 12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '22px 16px 6px' }}>
         <h2 style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, fontFamily: SANS }}>
           {t('amateur.watch.creators.title', 'Creators')}
         </h2>
@@ -184,7 +184,9 @@ export function CreatorsRow({ userId }: { userId: string | undefined }) {
         style={{
           display: 'flex',
           gap: 12,
-          padding: '0 16px',
+          /* WS1.2: 6px vertical room so the 4px ring is never clipped;
+           * the heading loses the matching 6px, keeping the gap the same. */
+          padding: '6px 16px',
           overflowX: 'auto',
           maxWidth: '100%',
           overscrollBehaviorX: 'contain',
@@ -218,10 +220,14 @@ export function CreatorsRow({ userId }: { userId: string | undefined }) {
               <span
                 data-creator-ring={active ? 'true' : undefined}
                 style={{
-                  display: 'block',
+                  /* WS1.2: exactly the avatar's own box, so the ring's 34%
+                   * radius resolves on the avatar's edge, not the line box. */
+                  display: 'flex',
                   width: 64,
-                  margin: '0 auto',
+                  aspectRatio: '1 / 1.05',
                   borderRadius: '34%',
+                  lineHeight: 0,
+                  margin: '0 auto',
                   /* A creator with a video this week wears the white ring. */
                   boxShadow: active ? `0 0 0 2px ${A.CANVAS}, 0 0 0 4px ${A.INK}` : undefined,
                 }}
