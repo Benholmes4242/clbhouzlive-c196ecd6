@@ -841,7 +841,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   const depart = useCallback(() => rememberAmateurScroll(), []);
 
   /* RS — no view switch remains, so the community see-all only picks Watch's
-     community entry; the view is already 'watch'. */
+     community entry; the view is already 'watch'. WS1 — the Community chip is
+     gone, so WatchFeed maps this entry to For you (the rail stays there). */
   const openCommunity = useCallback(() => {
     setWatchEntry('community');
   }, []);
