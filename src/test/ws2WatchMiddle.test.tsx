@@ -107,6 +107,7 @@ afterEach(cleanup);
 
 describe('WS2 order on For you', () => {
   it('WS4 shelf tiles are 156 wide with a 248 cover-fit poster', () => {
+    f.clips.data = { pages: [[{ ...hub('clip1', 60), poster_url: 'https://x/clip1.jpg' }]] };
     const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const tile = container.querySelector<HTMLElement>('[data-watch-card="quick"]');
     expect(tile?.style.width).toBe('156px');

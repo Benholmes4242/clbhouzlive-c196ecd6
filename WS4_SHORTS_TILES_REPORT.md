@@ -1,13 +1,13 @@
-# WS4 Shorts tiles — stopped on new test failure
+# WS4 Shorts tiles — complete
 
 ## Implemented
 Only four presentation values changed in `WatchFeed.tsx`: QH_W 126→156, QH_H 224→248, shelf title minHeight `calc(12px * 1.3 * 2)`, and Shorts grid title minHeight `calc(12.5px * 1.32 * 2)`. Skeleton uses the same size constants. Grid aspect remains `126 / 224`. No other page behaviour or protected backend/configuration changed.
 
-## Verification stop
-Command: `bunx vitest run src/test/ws2WatchMiddle.test.tsx --maxWorkers=2`.
-Result: **21 passing, 1 failing / 22 cases / 1 file**.
-Full output: `/tmp/ws4/focused.log`.
+## Authorised fixture fix (Ben, 21:39 UTC)
+In the new `WS4 shelf tiles are 156 wide with a 248 cover-fit poster` case only, `f.clips.data` now supplies a local spread copy of the shared `hub()` fixture with `poster_url: 'https://x/clip1.jpg'`. The shared `hub()` fixture is untouched, so no other case's data changed. With a poster present, the tile renders its image and the cover-fit assertion passes.
 
+
+## Original stop (before the authorised fixture fix)
 New failure, verbatim:
 ```text
 FAIL src/test/ws2WatchMiddle.test.tsx > WS2 order on For you > WS4 shelf tiles are 156 wide with a 248 cover-fit poster
@@ -17,13 +17,23 @@ Received: undefined
 ❯ src/test/ws2WatchMiddle.test.tsx:115:59
 expect(poster?.querySelector('img')?.style.objectFit).toBe('cover');
 ```
-The existing hub fixture supplies `poster_url: null`, so the tile renders its fallback instead of an image. The width and height assertions passed; the new cover-fit assertion cannot inspect an image in that fixture. No test/component correction was made after the failure, in accordance with the stop rule. No pre-existing failures were observed in this focused run.
+The existing hub fixture supplies `poster_url: null`, so the tile rendered its fallback instead of an image; the width and height assertions passed. No component change was made — the stop was cleared by the authorised fixture fix above.
 
-Automatic build: **build OK**, 2026-11-02T21:35:56Z. Four full shards and live visual checks were not run after the stop.
+Automatic build at the stop: **build OK**, 2026-11-02T21:35:56Z.
+
+## Verification
+Focused: `bunx vitest run src/test/ws2WatchMiddle.test.tsx --maxWorkers=2` — **22/22 passed, 1 file**.
+Full suite, four shards, `--maxWorkers=2`, all exit 0, 0 failures, 0 unhandled errors:
+- shard 1/4: 137 files, 1,492 tests
+- shard 2/4: 137 files, 1,470 tests
+- shard 3/4: 137 files, 1,530 tests
+- shard 4/4: 134 files, 1,458 tests
+Total: **5,950 tests / 545 files passing**. Full logs `/tmp/ws4-shard1.log` … `/tmp/ws4-shard4.log`.
+Automatic build: **build OK**, 2026-11-02T21:40:08Z.
 
 ## Inventory
 Last fully passing baseline: **5,946 tests / 545 files**.
-Candidate inventory: **5,950 / 545**, not a full passing total. `ws2WatchMiddle.test.tsx` grows 18→22, adding four cases:
+Now passing: **5,950 / 545**, +4 cases, all from the four new WS4 cases in `ws2WatchMiddle.test.tsx` (18→22):
 - `WS4 shelf tiles are 156 wide with a 248 cover-fit poster`.
 - `WS4 all titles reserve the same two-line space for short and long titles`.
 - `WS4 quick titles reserve the same two-line space for short and long titles`.
