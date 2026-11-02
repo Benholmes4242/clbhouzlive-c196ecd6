@@ -13704,6 +13704,39 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_races: {
+        Row: {
+          closes_on: string | null
+          phase_label: string | null
+          phase_start: string | null
+          season_year: number
+          status: string
+          title: string
+          tour_code: string
+          updated_at: string
+        }
+        Insert: {
+          closes_on?: string | null
+          phase_label?: string | null
+          phase_start?: string | null
+          season_year: number
+          status?: string
+          title: string
+          tour_code: string
+          updated_at?: string
+        }
+        Update: {
+          closes_on?: string | null
+          phase_label?: string | null
+          phase_start?: string | null
+          season_year?: number
+          status?: string
+          title?: string
+          tour_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tour_season_rankings: {
         Row: {
           country: string | null
@@ -13812,6 +13845,84 @@ export type Database = {
           tour_code?: string
           tournaments_played?: number | null
           wins?: number | null
+        }
+        Relationships: []
+      }
+      tour_stakes: {
+        Row: {
+          after_position: number
+          explainer: string | null
+          featured: boolean
+          foot: string | null
+          id: string
+          kicker: string | null
+          line_label: string
+          pill_label: string | null
+          season_year: number
+          side: string | null
+          sort: number
+          tour_code: string
+          updated_at: string
+        }
+        Insert: {
+          after_position: number
+          explainer?: string | null
+          featured?: boolean
+          foot?: string | null
+          id?: string
+          kicker?: string | null
+          line_label: string
+          pill_label?: string | null
+          season_year: number
+          side?: string | null
+          sort?: number
+          tour_code: string
+          updated_at?: string
+        }
+        Update: {
+          after_position?: number
+          explainer?: string | null
+          featured?: boolean
+          foot?: string | null
+          id?: string
+          kicker?: string | null
+          line_label?: string
+          pill_label?: string | null
+          season_year?: number
+          side?: string | null
+          sort?: number
+          tour_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tour_standings_snapshots: {
+        Row: {
+          player_id: string | null
+          player_key: string
+          points: number | null
+          position: number
+          season_year: number
+          snapshot_date: string
+          tour_code: string
+        }
+        Insert: {
+          player_id?: string | null
+          player_key: string
+          points?: number | null
+          position: number
+          season_year: number
+          snapshot_date: string
+          tour_code: string
+        }
+        Update: {
+          player_id?: string | null
+          player_key?: string
+          points?: number | null
+          position?: number
+          season_year?: number
+          snapshot_date?: string
+          tour_code?: string
         }
         Relationships: []
       }
@@ -20127,6 +20238,7 @@ export type Database = {
         Args: { p_season_id: string }
         Returns: undefined
       }
+      capture_tour_standings_snapshot: { Args: never; Returns: number }
       change_username: { Args: { p_username: string }; Returns: Json }
       check_and_award_badges: {
         Args: { user_id_param: string }
@@ -24125,6 +24237,34 @@ export type Database = {
           target_user_id: string
         }
         Returns: Json
+      }
+      get_tour_field_form: {
+        Args: { p_tour: string; p_year: number }
+        Returns: {
+          player_id: string
+          starts: Json
+        }[]
+      }
+      get_tour_scorecard_stats: {
+        Args: { p_tour: string; p_year: number }
+        Returns: {
+          birdies_per_round: number
+          bogey_rate: number
+          holes: number
+          par3: number
+          par4: number
+          par5: number
+          player_id: string
+          rounds: number
+          scoring_avg: number
+        }[]
+      }
+      get_tour_standings_movement: {
+        Args: { p_tour: string; p_year: number }
+        Returns: {
+          moved: number
+          player_key: string
+        }[]
       }
       get_tournament_hole_analysis: {
         Args: { p_round?: number; p_tournament_id: string }
