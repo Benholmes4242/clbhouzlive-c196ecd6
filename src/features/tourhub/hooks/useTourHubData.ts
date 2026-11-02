@@ -817,7 +817,7 @@ export function useTournamentScoringStats(tournamentId: string) {
 // There is deliberately NO fallback to an earlier season: null is correct and
 // the page already renders the no-stats shape (no headline figure, counting row
 // derived from results, Against the field hidden). currentSeasonYear() from
-// leaders-v2 is the single definition of which season is current.
+// _shared/stats/useLeaderCategories is the single definition of which season is current.
 export function useSinglePlayerStatistics(playerId: string | undefined) {
   const seasonYear = currentSeasonYear();
   return useQuery({
