@@ -64,6 +64,7 @@ export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | 
 
   const openPerson = async (person: ExplorePerson, position: number) => {
     if (!signedIn) return;
+    const token = ++request.current;
     analyticsEvents.track('explore_row_tapped', { tier: person.tier, position, has_new: person.has_new });
     if (person.tier === 'you') {
       analyticsEvents.track('explore_row_you_tapped');
@@ -76,7 +77,6 @@ export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | 
       navigate(getProfilePathById(person.actor_id, undefined, person.handle ?? undefined));
       return;
     }
-    const token = ++request.current;
     setPending(person.actor_id);
     try {
       const posts = await loadPublishedViewerPosts(person.new_post_ids, { userId, actorId: activeActor?.id ?? userId ?? null, actorType: activeActor?.type === 'business' ? 'business' : 'personal' });
@@ -84,7 +84,7 @@ export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | 
       if (!posts.length) { toast.error("This post isn't available"); return; }
       setSheetOpen(false);
       onDepart();
-      openWithOrigin({ posts, index: 0, originEl: null, openedFrom: 'explore-people', forceStartAtZero: true });
+      openWithOrigin({ posts, index: 0, originEl: null, posterUrl: null, openedFrom: 'explore-people', forceStartAtZero: true });
     } catch {
       if (request.current === token) toast.error("Couldn't load this post");
     } finally {
@@ -148,7 +148,7 @@ function CreatorFollowPill({ creator }: { creator: ExplorePerson }) {
       await toggle.mutateAsync({
         targetActorType: 'personal',
         targetActorId: creator.actor_id,
-        targetUserId: 'personal' === 'personal' ? creator.actor_id : undefined,
+        targetUserId: creator.actor_id,
         viewerActorType: activeActor?.type ?? 'personal',
         viewerActorId: activeActor?.id ?? user.id,
         viewerUserId: user.id,
