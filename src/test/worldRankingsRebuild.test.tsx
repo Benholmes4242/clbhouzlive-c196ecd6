@@ -337,6 +337,10 @@ describe('WorldRankings rebuilt section', () => {
     expect(card.textContent).toContain('▲18');
     expect(card.textContent).toContain('to 27th since 27 Jul');
     expect(card.querySelector('[data-climb-line]')).not.toBeNull();
+    // The label renders in capitals (mock: "BIGGEST CLIMB IN THE TOP 50");
+    // the locale string stays sentence case.
+    const label = [...card.querySelectorAll('span')].find((s) => s.textContent === 'Biggest climb in the top 50') as HTMLElement;
+    expect(label.style.textTransform).toBe('uppercase');
   });
 
   it('keeps the climber text but drops the line below three snapshots', () => {
