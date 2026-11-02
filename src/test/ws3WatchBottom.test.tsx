@@ -178,12 +178,14 @@ describe('WS3 Creator to follow', () => {
 
   it('one pick per mount: the visit key is stable across rerenders and chip switches', () => {
     f.spotlight = { data: spot(), isError: false };
-    const view = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
-    view.rerender(
-      <MemoryRouter initialEntries={['/amateur']}><I18nextProvider i18n={i18n}><QueryClientProvider client={new QueryClient()}>
-        <WatchFeed userId="me" onDepart={() => {}} />
-      </QueryClientProvider></I18nextProvider></MemoryRouter>,
+    const client = new QueryClient();
+    const tree = (n: number) => (
+      <MemoryRouter initialEntries={['/amateur']}><I18nextProvider i18n={i18n}><QueryClientProvider client={client}>
+        <WatchFeed key="feed" userId="me" onDepart={() => {}} initialFilter={n ? 'all' : 'all'} />
+      </QueryClientProvider></I18nextProvider></MemoryRouter>
     );
+    const view = render(tree(0));
+    view.rerender(tree(1));
     const firstKeys = new Set(f.spotlightKeys);
     expect(firstKeys.size).toBe(1);
     cleanup();
