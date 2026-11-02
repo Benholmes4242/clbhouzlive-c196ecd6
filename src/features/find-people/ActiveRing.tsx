@@ -49,3 +49,48 @@ export function ActiveRing({
 }
 
 export default ActiveRing;
+
+/**
+ * The ringed avatar is its own button that opens the latest post; taps and
+ * Enter/Space never reach the surrounding card or row (which opens the
+ * profile). Unringed avatars are not buttons.
+ */
+export function ActiveAvatarDoor({
+  postId,
+  label,
+  onOpen,
+  children,
+}: {
+  postId: string | null;
+  label: string;
+  onOpen: (postId: string) => void;
+  children: ReactNode;
+}) {
+  if (!postId) return <>{children}</>;
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpen(postId);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+      }}
+      style={{
+        display: 'flex',
+        flex: 'none',
+        padding: 0,
+        margin: 0,
+        border: 'none',
+        background: 'none',
+        lineHeight: 0,
+        cursor: 'pointer',
+        borderRadius: '34%',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
