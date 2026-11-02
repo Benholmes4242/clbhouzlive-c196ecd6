@@ -1473,6 +1473,7 @@
 
 ## RS — Rounds this week shelf (DONE)
 - /rounds page (no islands, mock wins), Explore opens on Watch, switch removed, shelf after Quick hits, ?view=scores redirect, 6 locales. Suite 5,729/5,729 (533 files): +23/+1 vs 5,706/532 (rsRoundsShelf +22, exploreAllTabTrial +1 retitled).
+- [x] RS.1: shard 4 rerun 1,472/1,472 (132 files, maxWorkers=2; includes later WTF tests). RS_ROUNDS_SHELF_REPORT.md written. Shard-1 one-off failure unidentifiable (log kept only counts); passed on rerun; RS link unconfirmed — recorded, unchanged.
 
 ## FIX — Who to follow rail + Find people (DONE)
 - Rail cards fixed-height flex column, Follow pinned bottom; follow removes card after 3s (unfollow cancels, session Set, reduced-motion instant); bottom nav hidden on /find-people; title "Explore the community" (6 locales); Suggested = all 8 groups capped at 5 with See all, dedup; Businesses under-3 line. Item 6: report only, no SQL. Suite 5,739/5,739 (534 files): +10/+1 vs 5,729/533 (wfFixRail +6 new file, wf1FindPeople 23→27).
