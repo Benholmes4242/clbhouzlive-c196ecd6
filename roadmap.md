@@ -1490,4 +1490,4 @@
 - [ ] Players page Build 3 — awaiting brief.
 - [ ] Players season rollover fix — STOPPED: 11 of 12 tests in playersPage.test.tsx fail ("No QueryClient set") because the page now reads the standings season; needs a ruling to add a stand-in for that read to the test.
 
-- [ ] Players Build 3 (You and the tour): built; STOPPED — 7 existing tests (5 playersPage, 2 seasonRollover) fail "No QueryClient set" from the new card's session/data reads. Awaiting approval to add stand-ins for useSupabaseSession / useYouAndTour in those two files.
+- [x] Players Build 3 (You and the tour): approved stand-ins added; full suite 5,866/5,866 across 540 files.
