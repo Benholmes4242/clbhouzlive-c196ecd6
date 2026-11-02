@@ -21824,6 +21824,36 @@ export type Database = {
         Args: { p_min_rounds?: number }
         Returns: Json
       }
+      get_creator_videos: {
+        Args: {
+          p_actor_id: string
+          p_actor_type: string
+          p_before?: string
+          p_limit?: number
+        }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_cron_job_health: {
         Args: never
         Returns: {
@@ -25229,6 +25259,51 @@ export type Database = {
           review_rating: number
           share_count: number
           source_review_id: string
+          stream_id: string
+          width: number
+        }[]
+      }
+      get_watch_spotlight: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          area: string
+          avatar_url: string
+          courses_filmed: number
+          courses_played: number
+          display_name: string
+          handicap_index: number
+          handle: string
+          is_verified: boolean
+          rounds: number
+          videos: number
+        }[]
+      }
+      get_watch_top100_videos: {
+        Args: { p_before?: string; p_limit?: number }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          list_label: string
+          list_rank: number
+          list_slug: string
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
           stream_id: string
           width: number
         }[]
