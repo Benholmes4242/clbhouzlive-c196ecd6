@@ -324,16 +324,13 @@ export function WatchFeed({
     return () => observer.disconnect();
   }, [driver]);
 
+  /* WS1 — For you / Shorts / Long form, in that order. */
   const chipLabel = (key: (typeof WATCH_CHIPS)[number]) =>
     key === 'all'
-      ? t('amateur.watch.chip.all', 'All')
+      ? t('amateur.watch.chip.all', 'For you')
       : key === 'quick'
-        ? t('amateur.watch.chip.quick', 'Quick hits')
-        : key === 'long'
-          ? t('amateur.watch.chip.long', 'Long form')
-            : key === 'community'
-              ? t('amateur.watch.chip.community', 'Community')
-              : (key satisfies never);
+        ? t('amateur.watch.chip.quick', 'Shorts')
+        : t('amateur.watch.chip.long', 'Long form');
   const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
   const openMoment = (moment: Moment, list: Moment[]) => {
@@ -369,14 +366,10 @@ export function WatchFeed({
     if (members.length === 0) return null;
     return (
       <div style={{ paddingBottom: 8 }}>
-        <Section
-          title={t('amateur.watch.rail.community', 'From the community')}
-          seeAll={filter === 'community' ? undefined : t('amateur.watch.seeAll', 'See all')}
-          onSeeAll={filter === 'community' ? undefined : () => {
-            analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments', surface: 'watch' });
-            setFilter('community');
-          }}
-        />
+        {/* WS1 — the Community chip is gone, so the rail has no See all: the
+            full community view it opened left with the chip. The rail itself
+            stays exactly where it was in For you. */}
+        <Section title={t('amateur.watch.rail.community', 'From the community')} />
         <Rail label="community">
           {members.map(({ lead, count }) => (
             <div key={`member:${lead.key}`} data-watch-card="community" style={{ ...cardButton, width: CT_W, cursor: 'default' }}>
