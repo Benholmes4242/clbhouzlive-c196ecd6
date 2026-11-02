@@ -8,6 +8,9 @@ const h = vi.hoisted(() => ({
   tour: 'pga' as string,
   follows: new Set<string>(),
   race: null as unknown,
+  user: null as { id: string } | null,
+  myScoring: null as unknown,
+  holeAverages: null as unknown,
 }));
 
 function rankedRow(i: number) {
@@ -31,6 +34,8 @@ vi.mock('@/features/tourhub/players-v2/data/useScorecardStats', () => ({
 }));
 vi.mock('@/features/tourhub/players-v2/data/useTourRace', () => ({ useTourRace: () => ({ data: h.race }) }));
 vi.mock('@/features/tourhub/players-v2/data/resolveStandingsSeason', () => ({ useStandingsSeason: () => ({ data: 2027, isError: false }) }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: h.user, session: null, loading: false }) }));
+vi.mock('@/features/tourhub/players-v2/you/useYouAndTour', () => ({ useTourHoleAverages: () => ({ data: h.holeAverages }), useMyHoleScoring: () => ({ data: h.myScoring }) }));
 vi.mock('@/features/tourhub/leaderboard/useTourPlayerFollows', () => ({ useTourPlayerFollows: () => ({ ids: h.follows, busy: false, error: null, toggle: vi.fn() }) }));
 vi.mock('@/features/tourhub/hooks/useTourLensFromPicker', () => ({ useTourLensFromPicker: () => {} }));
 vi.mock('@/features/tourhub/hooks/useTourSelection', () => ({ readStoredTour: () => null }));
@@ -75,6 +80,9 @@ beforeEach(() => {
   cleanup();
   h.tour = 'pga';
   h.follows = new Set();
+  h.user = null;
+  h.myScoring = null;
+  h.holeAverages = null;
   h.race = raceWith([stake(60, 2), stake(100, 1), stake(110, 3, false)], [{ finished: true }, { finished: true }, { finished: false }, { finished: false }, { finished: false }]);
 });
 
@@ -191,5 +199,26 @@ describe('Players routing', () => {
   it('the field rows are in the list', () => {
     const { container } = mount('/tourhub?tab=players&view=all');
     expect(within(container).getAllByRole('button').length).toBeGreaterThan(100);
+  });
+});
+
+describe('You and the tour placement', () => {
+  it('sits after Your players and before In form; with no follows, after the race card', () => {
+    h.user = { id: 'u1' };
+    h.myScoring = { rounds: 20, holes_par3: 80, holes_par4: 200, holes_par5: 80, par3: 0.82, par4: 0.86, par5: 0.71, bogey_rate: 0.62 };
+    h.holeAverages = { players: 70, holes: 10000, par3: -0.004, par4: -0.062, par5: -0.508, bogey_rate: 0.137 };
+    h.follows = new Set(['p11']);
+    const order = (c: HTMLElement) => [...c.querySelectorAll('[data-front-card]')].map((e) => e.getAttribute('data-front-card'));
+    const a = mount();
+    const o1 = order(a.container);
+    const you1 = o1.indexOf('you_and_tour');
+    expect(you1).toBeGreaterThan(-1);
+    expect(o1[you1 - 1]).toBe('your_players');
+    // Everything after the card belongs below In form's slot (In form, then stat leaders).
+    expect(o1.slice(you1 + 1).every((c) => c === 'in_form' || c === 'stat_leaders')).toBe(true);
+    a.unmount();
+    h.follows = new Set();
+    const o2 = order(mount().container);
+    expect(o2[o2.indexOf('you_and_tour') - 1]).toBe('race');
   });
 });
