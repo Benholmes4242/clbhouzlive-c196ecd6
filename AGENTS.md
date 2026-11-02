@@ -31,7 +31,6 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Rankings hand all row taps to TourSection, which alone resolves directory names and sheet navigation, so linked and unlinked entrypoints cannot drift.
 - Review course names link only through `CourseNameLink` (see its header), so the id-or-plain-text rule and tap isolation live once.
 
-- Owner copy uses `profileOwnerVoice` to share grammar.
 - First-sign-in uses the isolated welcome feature with opt-in partial profile saves and canonical connect-controller options; defaults preserve normal profile editing and handicap setup.
 - Club analytics opening copy is computed by courseLead from the selected CourseBlock payload only; no seed fallback or additional reads, so chip switches cannot mix courses.
 - Club weekday conclusions share weekRoom between the lead and tee-sheet card; selected-course conclusions must not drift between surfaces.
@@ -98,7 +97,6 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Search shell ownership: see KeyboardSearchSheet.tsx header.
 - Settings/export/handicap and business Profile/Links ownership: see their module headers.
 - Tour boards: LiveBoard.
-- Active-ring display (gradient slot, ringed avatar post door, when line) lives in features/find-people ActiveRing/activeRingRules with one batched useRecentActivity read per surface, so rail and Find people cannot drift or fetch per card.
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
