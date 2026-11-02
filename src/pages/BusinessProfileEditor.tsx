@@ -1,7 +1,6 @@
 /** BusinessProfileEditor — edit-only /business/:id/edit surface.
  * Immediate field saves, preview and Settings retain their existing behavior;
  * canonical business creation is owned by the separate BusinessCreate flow. */
-/**
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -33,6 +32,7 @@ import { BusinessEditProfileLinks, type ProfileLinkSave, type ProfileLinkSheet }
 import type { BusinessCompletionKey } from '@/components/business/editor/businessCompletion';
 import { BusinessEditSettings } from '@/components/business/editor/BusinessEditSettings';
 import { canEditBusinessProfile, protectBusinessPayload } from '@/components/business/editor/editorPermissions';
+import type { Json } from '@/integrations/supabase/types';
 import {
   DEFAULT_OPENING_HOURS,
   OpeningHours,
@@ -217,7 +217,6 @@ export default function BusinessProfileEditor() {
   const isClubLinked = !!business?.club_id;
   const handleClose = () => { if (id) navigate(`/business/${id}`); else navigate(-1); };
 
-  };
 
   /* ── save: edit uses this hook (needs id) ───── */
   const { uploadLogo, removeLogo, uploadCover, removeCover } = useBusinessImageUpload(
