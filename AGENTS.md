@@ -98,7 +98,7 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Search shell ownership: see KeyboardSearchSheet.tsx header.
 - Settings/export/handicap and business Profile/Links ownership: see their module headers.
 - Tour boards: LiveBoard.
+- Active-ring display (gradient slot, ringed avatar post door, when line) lives in features/find-people ActiveRing/activeRingRules with one batched useRecentActivity read per surface, so rail and Find people cannot drift or fetch per card.
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
-- Active-ring display (gradient slot, ringed avatar post door, when line) lives in features/find-people ActiveRing/activeRingRules with one batched useRecentActivity read per surface, so rail and Find people cannot drift or fetch per card.
