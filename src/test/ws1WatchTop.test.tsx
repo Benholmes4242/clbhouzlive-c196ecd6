@@ -347,6 +347,23 @@ describe('WS1 Creators row', () => {
     expect(container.querySelectorAll('[data-creator-ring="true"]').length).toBe(1);
   });
 
+  it('WS1.2: the ring wrapper is the avatar box (flex, 1/1.05, 34%) and the scroller leaves vertical room', () => {
+    f.creators = {
+      data: [creator('a', { videos_7d: 1 }), creator('b'), creator('c')],
+      isFetched: true,
+      isError: false,
+    };
+    const { container } = mountFeed();
+    const ring = container.querySelector('[data-creator-ring="true"]') as HTMLElement;
+    expect(ring.style.display).toBe('flex');
+    expect(ring.style.aspectRatio).toBe('1 / 1.05');
+    expect(ring.style.borderRadius).toBe('34%');
+    const scroller = container.querySelector('[data-watch-creators="row"] .no-scrollbar') as HTMLElement;
+    const [padTop, , padBottom] = scroller.style.padding.split(' ');
+    expect(parseFloat(padTop)).toBeGreaterThanOrEqual(4);
+    expect(parseFloat(padBottom ?? padTop)).toBeGreaterThanOrEqual(4);
+  });
+
   it('otherwise the second line is the area through shortCourseName, omitted when null', () => {
     f.creators = {
       data: [
