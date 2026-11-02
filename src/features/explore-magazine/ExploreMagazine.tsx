@@ -475,6 +475,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     const fromUrl = searchParams.get('view') as ExploreView | null;
     return fromUrl && EXPLORE_VIEWS.includes(fromUrl) ? fromUrl : readExploreView();
   });
+  /* WS1 — the Community chip is gone; the entry value is passed to WatchFeed,
+     which maps any legacy value through mapWatchFilter (community → For you). */
   const [watchEntry, setWatchEntry] = useState<'all' | 'community'>('all');
   const geography = useViewerScoreScope(userId);
 

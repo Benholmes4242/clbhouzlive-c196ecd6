@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
-import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import { momentViewerPosts } from '../momentViewerPosts';
 import { RailChips } from '@/components/ui/RailChips';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
