@@ -32,13 +32,13 @@ export function Headshot({ rawName, name, tourCode, size = 34, radius = 11 }: { 
   );
 }
 
-export function PlayerCell({ rawName, name, tourCode, country, followed, nameSize = 15, sub, bar, barRow = false }: {
+export function PlayerCell({ rawName, name, tourCode, country, followed, nameSize = 15, sub, bar }: {
   rawName: string; name: string; tourCode: string | null; country: string | null; followed: boolean;
-  nameSize?: number; sub?: ReactNode; bar?: ReactNode; barRow?: boolean;
+  nameSize?: number; sub?: ReactNode; bar?: ReactNode;
 }) {
   return (
     <span data-player-cell style={{ position: 'relative', paddingLeft: 44, minHeight: 34, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <span style={{ position: 'absolute', left: 0, ...(barRow ? { top: 17 - 17 } : { top: '50%', transform: 'translateY(-50%)' }), width: 34, height: 34 }}>
+      <span style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34 }}>
         <Headshot rawName={rawName} name={name} tourCode={tourCode} />
         {country ? (
           <span data-flag style={{ position: 'absolute', right: -5, bottom: -4, width: 16, height: 12, borderRadius: 2, overflow: 'hidden', display: 'block', lineHeight: 0 }}>
