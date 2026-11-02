@@ -216,23 +216,19 @@ export function WatchFeed({
   onOpenMember?: (userId: string) => void;
 }) {
   const { t } = useTranslation('courses');
-  const [filter, setFilter] = useState<WatchFilter>(initialFilter);
+  const [filter, setFilter] = useState<WatchFilter>(() => mapWatchFilter(initialFilter));
   const [query, setQuery] = useState('');
 
   /* THE SEARCH IS SERVER-SIDE: both RPCs take p_search_query. */
   const search = query.trim().length >= 2 ? query.trim() : null;
   const searching = !!search;
-  useEffect(() => {
-    if (searching && filter === 'community') setFilter('all');
-  }, [searching, filter]);
 
   const vParams = videoParams(filter);
   const cParams = clipParams(filter);
-  const videos = useWatchVideos({ userId, mode: vParams?.mode ?? null, search });
-  const clips = useWatchClips({ userId, mode: cParams?.mode ?? null, filter: cParams?.filter, search });
-  const community = isCommunityOnly(filter);
+  const videos = useWatchVideos({ userId, mode: vParams.mode, search });
+  const clips = useWatchClips({ userId, mode: cParams.mode, filter: cParams.filter, search });
   const onAll = allOnly(filter, searching);
-  const moments = useMomentsOfTheWeek(30, { enabled: (onAll || community) && !!userId, candidateLimit: 72 });
+  const moments = useMomentsOfTheWeek(30, { enabled: onAll && !!userId, candidateLimit: 72 });
   const progress = useWatchProgress(userId);
   const { data: myCourses } = useUserAnalyticsCourses({ enabled: !!userId });
   const playedIds = useMemo(
