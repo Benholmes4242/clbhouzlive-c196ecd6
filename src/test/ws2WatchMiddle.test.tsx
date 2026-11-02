@@ -56,12 +56,10 @@ import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { CourseVideosShelf } from '@/features/explore-magazine/watch/CourseVideosShelf';
 import { RegionsShelf } from '@/features/explore-magazine/watch/RegionsShelf';
 import WatchGridPage from '@/pages/WatchGridPage';
-import { fetchGridPage } from '@/features/explore-magazine/watch/useWatchMiddle';
 import { nextCursor, regionPath, shortAge, videosLabel, whoLine } from '@/features/explore-magazine/watch/watchMiddle';
 
-/* fetchGridPage is mocked above with the hook module; pull the real one for the paging test. */
+/* The hook module is mocked above; pull the real fetchGridPage for the paging test. */
 const real = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchMiddle')>('@/features/explore-magazine/watch/useWatchMiddle');
-void fetchGridPage;
 
 const i18n = createInstance();
 void i18n.init({ lng: 'en', initAsync: false, interpolation: { escapeValue: false }, resources: { en: { courses } } });
