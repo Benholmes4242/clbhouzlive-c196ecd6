@@ -281,7 +281,8 @@ describe('WF1 Find people page', () => {
 
   it('renders the header, search field and three chips with ?tab= kept', () => {
     renderPage('/find-people?tab=businesses');
-    expect(screen.getByText('Find people')).toBeTruthy();
+    /* FIX §4 — the page is now "Explore the community". */
+    expect(screen.getByText('Explore the community')).toBeTruthy();
     expect(screen.getByPlaceholderText('Search golfers and businesses')).toBeTruthy();
     const tabs = screen.getAllByRole('tab');
     expect(tabs.map((t) => t.textContent)).toEqual(['Suggested', 'Golfers', 'Businesses']);
@@ -290,15 +291,41 @@ describe('WF1 Find people page', () => {
     expect(screen.getByRole('tab', { name: 'Golfers' }).getAttribute('aria-selected')).toBe('true');
   });
 
-  it('groups the Suggested tab with Follow all on the club group and hides empty groups', () => {
+  it('groups the Suggested tab as the best of everything with Follow all on the club group', () => {
     renderPage();
     const labels = screen.getAllByTestId('group-label').map((el) => el.textContent);
-    expect(labels).toEqual(['From {{club}}', 'Played with you', 'Plays your courses', 'Popular on clbhouz']);
-    expect(labels).not.toContain('Follows you');
+    /* FIX §5 — every group with rows, in the brief's order. */
+    expect(labels).toEqual([
+      'From {{club}}', 'Played with you', 'Follows you', 'Plays your courses',
+      'Followed by people you know', 'Popular on clbhouz', 'Playing lately', 'New to clbhouz',
+    ]);
     expect(screen.getByText('Follow all 2')).toBeTruthy();
     // The your_club business leads the From-club group, before club golfers.
     expect(screen.getByText('Your club · {{category}}')).toBeTruthy();
     expect(screen.getByText('Member at {{club}}')).toBeTruthy();
+  });
+
+  it('See all on a capped Suggested group switches to the Golfers tab', () => {
+    renderPage();
+    const seeAlls = screen.getAllByText(/^See all /);
+    expect(seeAlls.length).toBeGreaterThan(0);
+    fireEvent.click(seeAlls[0]);
+    expect(screen.getByRole('tab', { name: 'Golfers' }).getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('hides the bottom nav while the page is open', () => {
+    renderPage();
+    expect(h.hideNav).toHaveBeenCalled();
+  });
+
+  it('shows the joining line under a thin Businesses tab, never an empty page', () => {
+    h.biz = [biz({})];
+    renderPage('/find-people?tab=businesses');
+    expect(screen.getByText('More clubs and businesses are joining clbhouz.')).toBeTruthy();
+    cleanup();
+    h.biz = FULL_BIZ;
+    renderPage('/find-people?tab=businesses');
+    expect(screen.queryByText('More clubs and businesses are joining clbhouz.')).toBeNull();
   });
 
   it('groups the Golfers tab in the brief order', () => {
