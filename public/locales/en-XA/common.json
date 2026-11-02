@@ -1815,6 +1815,16 @@
       "seeAllAria": "[~~Šéé áļļ, Éxṗļóřé ţĥé çóɱɱúñíţý~~]"
     },
     "seeAll": "[~~Šéé áļļ {{count}}~~]",
-    "bizJoining": "[~~Móřé çļúƀš áñđ ƀúšíñéššéš ářé ĵóíñíñģ çļƀĥóúź.~~]"
+    "bizJoining": "[~~Móřé çļúƀš áñđ ƀúšíñéššéš ářé ĵóíñíñģ çļƀĥóúź.~~]",
+    "active": {
+      "open": "Open {{name}}'s latest post",
+      "played": "Played {{course}}",
+      "playedRound": "Played a round",
+      "reviewed": "Reviewed {{course}}",
+      "postedReview": "Posted a review",
+      "postedJustNow": "Posted just now",
+      "postedMinutes": "Posted {{n}}m ago",
+      "postedHours": "Posted {{n}}h ago"
+    }
   }
 }

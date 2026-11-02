@@ -2008,6 +2008,16 @@
       "seeAllAria": "See all, Explore the community"
     },
     "seeAll": "See all {{count}}",
-    "bizJoining": "More clubs and businesses are joining clbhouz."
+    "bizJoining": "More clubs and businesses are joining clbhouz.",
+    "active": {
+      "open": "Open {{name}}'s latest post",
+      "played": "Played {{course}}",
+      "playedRound": "Played a round",
+      "reviewed": "Reviewed {{course}}",
+      "postedReview": "Posted a review",
+      "postedJustNow": "Posted just now",
+      "postedMinutes": "Posted {{n}}m ago",
+      "postedHours": "Posted {{n}}h ago"
+    }
   }
 }
