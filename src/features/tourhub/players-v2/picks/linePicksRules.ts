@@ -3,22 +3,25 @@
  * state resolution, the six-row pick window, member shares, dates and every
  * sentence. The card renders only what these return; nothing is invented.
  */
-import { ordinal, type Rich, type Stake } from '../playersRules';
+import { effectiveStatus, ordinal, todayIso, type Rich, type Stake } from '../playersRules';
 
 export type PickState = 'open' | 'closed' | 'settled' | 'hidden';
 export const MAX_PICKS = 3;
 
 export function resolvePickState(
-  race: { status: string | null; picks_close_at: string | null } | null,
+  race: { status: string | null; picks_close_at: string | null; closes_on?: string | null } | null,
   stake: Pick<Stake, 'picks' | 'settled_at'>,
   now: Date,
 ): PickState {
   if (!race || !stake.picks) return 'hidden';
   if (stake.settled_at) return 'settled';
   if (!race.picks_close_at) return 'hidden';
+  // Stored 'final' with nothing settled: render nothing (build 2). A race that
+  // is final only because closes_on passed stays Closed until the Monday cron settles it.
   if (race.status === 'final') return 'hidden';
+  const live = effectiveStatus({ status: race.status, closes_on: race.closes_on ?? null }, todayIso(now)) === 'live';
   const closes = new Date(race.picks_close_at).getTime();
-  if (now.getTime() < closes) return race.status === 'live' ? 'open' : 'hidden';
+  if (now.getTime() < closes) return live ? 'open' : 'closed';
   return 'closed';
 }
 

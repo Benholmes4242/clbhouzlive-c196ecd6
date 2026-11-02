@@ -155,9 +155,9 @@ const SEASON_RANKING_SELECT =
   'player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code, scraped_at, updated_at';
 
 /**
- * @param raceYear the race's seasonYear from useTourRace. `undefined` while
- *   the race read is pending (query waits), `null` when the tour has no race
- *   row (currentSeasonYear() with the walk-back fallback), else exact.
+ * @param raceYear the standings season from resolveStandingsSeason. `undefined`
+ *   while it resolves (query waits), `null` when no season has points
+ *   (currentSeasonYear() with the walk-back fallback), else exact.
  */
 export function usePlayersRanking(tour: PlayersTourId, raceYear?: number | null) {
   const { t, i18n } = useTranslation('tourhub');
