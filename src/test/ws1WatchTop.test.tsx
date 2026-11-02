@@ -14,6 +14,7 @@ const f = vi.hoisted(() => ({
   creatorsSheet: { data: [] as unknown[], isFetched: true, isError: false },
   lead: { data: null as unknown, isFetched: true, isError: false },
   moments: { data: [] as unknown[], isFetched: true, isError: false, refetch: vi.fn() },
+  videos: { data: { pages: [[]] as unknown[][] }, isFetched: true, isError: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() },
   track: vi.fn(),
   openWithOrigin: vi.fn(),
   registerRailVideo: vi.fn(() => () => {}),
@@ -23,7 +24,7 @@ const f = vi.hoisted(() => ({
 
 /* WatchFeed's own reads, so the feed renders with no network. */
 vi.mock('@/features/explore-magazine/watch/useWatchVideos', () => ({
-  useWatchVideos: () => ({ data: { pages: [[]] }, isFetched: true, isError: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() }),
+  useWatchVideos: () => f.videos,
 }));
 vi.mock('@/features/explore-magazine/watch/useWatchClips', () => ({
   useWatchClips: () => ({ data: { pages: [[]] }, isFetched: true, isError: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() }),
