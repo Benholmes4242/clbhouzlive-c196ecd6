@@ -42,7 +42,7 @@ import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 import { handicapVisibilityLabel, profileVisibilityLabel, socialsDisplay, websiteDisplay } from '@/features/edit-profile/linkPrivacyRules';
 import { personalWebsiteValid } from '@/lib/profile/websiteValidation';
 
-const form: ProfileFormData = { displayName: 'Ben', username: 'ben', firstName: 'Ben', lastName: '', bio: '', city: '', country: '', gender: '', profilePhotoUrl: null, headerPhotoUrl: null, profilePhotoBlob: null, headerPhotoBlob: null, homeClubName: '', primaryClubId: null, additionalClubs: [], handicapIndex: '', homeClubVisibility: 'public', additionalClubsVisibility: 'public', topTenVisibility: 'public', isPublic: true, websites: [], instagramHandle: '', twitterHandle: '', tiktokHandle: '', youtubeHandle: '' };
+const form: ProfileFormData = { displayName: 'Ben', username: 'ben', firstName: 'Ben', lastName: '', bio: '', city: '', country: '', gender: '', profilePhotoUrl: null, headerPhotoUrl: null, profilePhotoBlob: null, headerPhotoBlob: null, homeClubName: '', primaryClubId: null, additionalClubs: [], handicapIndex: '', homeClubVisibility: 'public', additionalClubsVisibility: 'public', topTenVisibility: 'public', isPublic: true, isCreator: false, websites: [], instagramHandle: '', twitterHandle: '', tiktokHandle: '', youtubeHandle: '' };
 let qc: QueryClient;
 const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={qc}><MemoryRouter>{children}</MemoryRouter></QueryClientProvider>;
 const mount = (patch: Partial<ProfileFormData> = {}) => render(<EditProfileLinksPrivacy userId="me" form={{ ...form, ...patch }} handicapVisibility="public" onSave={h.save} />, { wrapper });

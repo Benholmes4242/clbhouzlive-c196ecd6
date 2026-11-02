@@ -1,5 +1,9 @@
 # Roadmap
 
+## CR1.1 — Authorised stop clearance
+- [x] Apply only optional UserProfile typing, two required form-fixture defaults, target-compatible own-property assertion and three scoped Name-switch queries.
+- [ ] Run focused and four full shards; confirm automatic checks and capture CR1 screenshots where authentication permits.
+
 ## CR2 — Creator profile
 - [x] Add page-owned creator read, cover label, default Videos tab and round-video pills through shared Watch player.
 - [x] Add eight CR2 regressions; focused11/11; four shards executed5,928/545 with5,926 passing, two pre-existing CR1 failures and0 unhandled errors; report CR2_REPORT.md.
