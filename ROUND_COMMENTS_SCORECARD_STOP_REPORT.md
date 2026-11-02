@@ -6,36 +6,44 @@
 - `zIndex.ts`: added stacked backdrop/sheet tokens 12004/12005; default comments remain 12002/12003.
 - Ben explicitly approved guard delegation and the separate comments history entry after the brief's direct state-clear conflicted with its draft-warning requirement.
 - Architecture ownership is documented beside RoundDetailSheet and CommentsSheetV2, not duplicated in AGENTS.md.
+- **Follow-up (authorized test-only mock completion):** `src/test/roundCommentsStacked.test.tsx`'s `useCommentsV2` mock now supplies the full idle mutation shape — `editComment`, `deleteComment`, `toggleLike`, `hideComment`, `reportComment` each `{ isPending: false, mutate: vi.fn(), mutateAsync: vi.fn().mockResolvedValue(undefined) }`, and `addComment` gained `mutate`/`mutateAsync`. No assertion was touched; `CommentsSheetV2.tsx` is unchanged.
 
 ## Test result and stop
-Command:
-`bunx vitest run src/test/roundCommentsStacked.test.tsx src/test/scorecardGlassAccessibility.test.tsx src/test/roundAndReviewComments.test.tsx src/test/roundCommentsOneIdentity.test.tsx src/test/commentsSheetCounts.test.ts src/test/cb61SheetDoors.test.tsx --maxWorkers=2`
+Mock completion applied exactly as authorized; every assertion unchanged (component untouched). File rerun:
 
-**42 passed / 14 failed / 56 executed across six files.** All five existing files passed unchanged (37 tests). New file: 19 tests, five passed and fourteen failed.
+Command: `npx vitest run src/test/roundCommentsStacked.test.tsx`
 
-Every failure has the same incomplete new fixture: its `useCommentsV2` mock provides `addComment` but omits `editComment` and `deleteComment`, whose pending state is read even when their dialogs are closed.
+**15 passed / 4 failed / 19 executed in one file.** The mock fix cleared the original `isPending` crashes: the previously failing fourteen now render and 11 of them pass. The four typed-comment cases progress further and fail on a **new, different error** — deterministic across two runs.
 
-Tool error:
+Failed cases in `src/test/roundCommentsStacked.test.tsx` (all in `round comments close above the scorecard`):
+- backdrop asks before closing typed comments
+- card asks before closing typed comments
+- escape asks before closing typed comments
+- back asks before closing typed comments
+
+Tool error (`src/test/roundCommentsStacked.test.tsx:127`, at `fireEvent.change(screen.getByRole('textbox', { name: 'Draft' }), …)`):
+
 ```text
-TypeError: Cannot read properties of undefined (reading 'isPending')
-❯ CommentsSheetV2Inner src/features/comments-v2/CommentsSheetV2.tsx:563:41
-563| disabled={editComment.isPending || !editText.trim()}
+TestingLibraryElementError: Unable to find an accessible element with the role "textbox" and name "Draft"
 ```
 
-Failed cases in `src/test/roundCommentsStacked.test.tsx`:
-- Activity arrival opens comments, first backdrop closes only comments, second closes the card
-- card / escape / back / swipe dismisses only comments while open (four cases)
-- the own comment button opens the same stacked comments
-- horizontal drag is ignored while comments are open and restored after dismissal
-- backdrop / card / escape / back asks before closing typed comments (four cases)
-- base / stacked uses the specified backdrop and sheet layers (two cases)
-- default callers retain base layers and no history registration
+## Diagnosis — component conflict, not the mock
+The Draft input IS in the DOM (`<input aria-label="Draft" />` inside the stacked comments sheet), but both the stacked comments backdrop (`z-index 12004`) and sheet (`z-index 12005`) carry `data-aria-hidden="true"` while the scorecard card below (`z-index 12003`) is the only accessible dialog. Role queries therefore cannot reach the composer.
 
-No corrections or reruns after failure. No existing assertions changed, deleted, renamed or rewritten: old → new is not applicable. Full shards were not run because of the stop rule. Last reported full-suite baseline: **5,643/5,643 across 528 files**. Candidate inventory is **5,662 across 529 files** (+19/+1 solely `roundCommentsStacked.test.tsx`); this is not a full-suite result.
+Source: `ScorecardGlassOverlay.tsx:87` calls `hideOthers(card)` (`aria-hidden` package) whenever the glass card is open, comment — "Every floating glass card is modal to assistive technology." When the stacked comments sheet mounts above it, the scorecard's aria pass marks the higher, interactive comments layer as background. The layers are visually correct (12004/12005 above 12003); the assistive layering is inverted: the topmost surface is hidden from assistive technology and the covered scorecard remains the only reachable dialog.
+
+This failure was previously masked: before the authorized mock completion those cases crashed in render at `CommentsSheetV2.tsx:563` (`editComment.isPending` on undefined) before reaching the query at line 127.
+
+Fix options need Ben's ruling; none taken without authorization:
+- **Component (recommended):** when comments are stacked above, the comments sheet owns the aria pass — call `hideOthers` from the stacked comments layer (or exempt the stacked comments portals from the scorecard's `hideOthers`), so the top layer is reachable and the scorecard is background. Touches `CommentsSheetV2.tsx` (stacked-only) — currently outside authorized scope.
+- **Test-only:** query the Draft by `document.querySelector('input[aria-label="Draft"]')` instead of role — but this blesses an inverted accessibility layering and contradicts the assertion's intent; not recommended.
+
+## Full suite
+**Not run.** The stop rule forbids shards while a failure stands, and the user's instruction conditioned shards on all fourteen passing. Last reported full-suite baseline: **5,643/5,643 across 528 files**. Candidate inventory is **5,662 across 529 files** (+19/+1 solely `roundCommentsStacked.test.tsx`); not a full-suite result.
 
 No pre-existing failed tests identified. Existing jsdom diagnostic noise in `cb61SheetDoors.test.tsx`: `Error: Could not parse CSS stylesheet`, from the shared review score row's `@container` rules; all nine cases pass. Similar noise was documented in prior WF1 runs.
 
-Automatic preview check: latest `/tmp/observability/build-errors.log` entry **2026-11-02T07:31:01Z — build OK**. No manual build/typecheck was run (the harness owns those checks); standalone TypeScript validation is not claimed.
+Automatic preview check: latest `/tmp/observability/build-errors.log` entry at the previous stop was **2026-11-02T07:31:01Z — build OK**. No manual build/typecheck was run (the harness owns those checks); standalone TypeScript validation is not claimed.
 
 ## Other nested comments callers — unchanged audit
 The background audit incorrectly inferred comments shell layers from `COMMENTS_SHEET_Z = 12100`. Direct source inspection confirms that constant is used for the discard dialog, not the comments backdrop/panel, which were hardcoded 12002/12003 and now remain those values in default mode.
@@ -50,4 +58,4 @@ Signed-in Activity → round → comments end-to-end is unavailable because brow
 
 No SQL, migrations, migration files, deployed RPC/edge-function edits, feed_config edits, round_pool_cap changes, native/Median changes or edits to ScorecardGlassOverlay/CardScorecardSheet.
 
-Next step requires authorization to complete the new `useCommentsV2` fixture's mutation exports without changing any assertion, then rerun focused checks and full shards.
+Next step requires Ben's ruling on the aria layering above (component fix in stacked comments, or a query change) before rerunning the file and full shards.
