@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Who to follow cover cards
-- [ ] Add one batched cover read, signed-off card cover/overlap/dismiss geometry and 48-hour post wording.
-- [ ] Add regressions, run four full shards from 5,936/545, confirm build and report all changed assertions.
+- [x] Add one typed batched cover read, signed-off card cover/overlap/dismiss geometry and 48-hour post wording; community rows frozen.
+- [x] Focused 61/61; four full shards 5,946/545 (+10 named activeRing cases), zero failures/unhandled errors; automatic build clean; WHO_TO_FOLLOW_COVERS_REPORT.md reconciles changed height assertions.
+- [ ] Signed-in visual/readback verification blocked by external_unmanaged authentication; manual tsc prohibited by environment, automatic checks passed.
 
 ## EXPLORE_TOP_1
 - [x] Replace only the top controls and Creators row; share deep-link post loading/mapping without changing behaviour.
