@@ -42,13 +42,19 @@ export function useRegionCourses(userId: string | null | undefined, region: stri
   });
 }
 
-export type GridSource = { kind: 'courses' } | { kind: 'region'; region: string; courseId: string | null };
+export type GridSource = { kind: 'courses' } | { kind: 'top100' } | { kind: 'region'; region: string; courseId: string | null };
 
 export async function fetchGridPage(src: GridSource, before?: string): Promise<WatchVideoRow[]> {
   if (src.kind === 'courses') {
     const { data, error } = await supabase.rpc('get_watch_course_videos', { p_limit: GRID_PAGE, ...(before ? { p_before: before } : {}) });
     if (error) throw error;
     return data ?? [];
+  }
+  if (src.kind === 'top100') {
+    /* WS3 — /watch/top100: same grid and keyset paging, its own read. */
+    const { data, error } = await supabase.rpc('get_watch_top100_videos', { p_limit: GRID_PAGE, ...(before ? { p_before: before } : {}) });
+    if (error) throw error;
+    return (data ?? []) as WatchVideoRow[];
   }
   const { data, error } = await supabase.rpc('get_watch_region_videos', {
     p_region: src.region,
