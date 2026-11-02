@@ -34,7 +34,7 @@ export function Top100RaceSection({ viewerId, list, total, onOpenCourse }: { vie
       <div className="t100-rows">{top.map((r, i) => <HundredRaceRow key={r.user_id} row={r} viewerId={viewerId} total={total} previousViewer={i > 0 && Boolean(top[i - 1].is_viewer || top[i - 1].user_id === viewerId)} onPress={() => setMember({ row: r, list })} />)}
         {pinned ? <><div className="t100-break" aria-hidden>···</div><HundredRaceRow row={pinned} viewerId={viewerId} total={total} onPress={() => setMember({ row: pinned, list })} /></> : null}
       </div>
-      {rows.length > 3 ? <Button variant="ghost" className="t100-see" onClick={() => setAll(true)}>{t('amateur.leaderboards.seeAllMembers')}<ChevronRight size={12} /></Button> : null}
+      {rows.length > 3 ? <button type="button" className="t100-see" onClick={() => setAll(true)}>{t('amateur.leaderboards.seeAllMembers')}<ChevronRight size={12} /></button> : null}
     </section> : null}
     {all ? <Top100RaceSeeAll viewerId={viewerId} initialList={list} initialTotal={total} onClose={() => setAll(false)} onMember={(row, scope) => { setAll(false); setMember({ row, list: scope }); }} /> : null}
     {member ? <Top100ListProgressSheet open onClose={() => setMember(null)} listSlug={member.list} ownerUserId={member.row.user_id} ownerName={member.row.display_name || t('discover.aMember')} ownerPhotoUrl={member.row.photo_url} standing={{ place: member.row.pos, fieldSize: Number(member.row.total_members) }} /> : null}

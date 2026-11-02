@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { Top100CourseProgress } from '@/hooks/gam/useTop100ListProgress';
 import type { CareerRow } from '@/hooks/top100/useTop100Race';
@@ -54,25 +54,25 @@ export function HundredRail({ tiles, onOpenCourse }: { tiles: Top100CourseProgre
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return <div ref={ref} data-hundred-rail className="t100-rail" style={{ gap: RACE_TILE_GAP }}>
-    {tiles.map(c => <Button key={c.course_id} variant="ghost" aria-label={c.course_name} data-played={c.is_viewer_played || undefined} className="t100-tile" style={{ width: RACE_TILE_WIDTH, height: RACE_TILE_HEIGHT }} onClick={() => onOpenCourse(c.course_id)}>
+    {tiles.map(c => <button key={c.course_id} type="button" aria-label={c.course_name} data-played={c.is_viewer_played || undefined} className="t100-tile" style={{ width: RACE_TILE_WIDTH, height: RACE_TILE_HEIGHT }} onClick={() => onOpenCourse(c.course_id)}>
       {c.thumbnail_image ? <img src={c.thumbnail_image} alt="" loading="lazy" decoding="async" /> : null}
       <span className="t100-photo-scrim" aria-hidden />
       {c.rank != null ? <span className="t100-photo-rank tabular-nums">#{c.rank}</span> : null}
       {c.is_viewer_played ? <span data-hundred-played className="t100-played" aria-label={t('amateur.leaderboards.hundredPlayed')}><Check size={11} strokeWidth={4.2} /></span> : null}
-      <span className="t100-photo-name">{c.course_name}</span>
-    </Button>)}
+      <span className="t100-photo-name">{shortCourseName(c.course_name)}</span>
+    </button>)}
   </div>;
 }
 export function HundredRaceRow({ row, viewerId, total, previousViewer = false, onPress }: { row: CareerRow; viewerId: string; total: number; previousViewer?: boolean; onPress: () => void }) {
   const { t } = useTranslation('courses');
   const self = Boolean(row.is_viewer || row.user_id === viewerId);
-  return <Button variant="ghost" className="t100-row" data-race-row={row.user_id} data-viewer={self || undefined} data-after-viewer={previousViewer || undefined} onClick={onPress}>
+  return <button type="button" className="t100-row" data-race-row={row.user_id} data-viewer={self || undefined} data-after-viewer={previousViewer || undefined} onClick={onPress}>
     <span className="t100-position tabular-nums">{row.is_tie ? `T${row.pos}` : row.pos}</span>
     <SquircleAvatar size={34} src={row.photo_url} alt={row.display_name ?? ''} userId={row.user_id} hairlineRing />
     <span className="t100-row-main"><span className="t100-row-name">{row.display_name || t('discover.aMember')}</span>
-      {row.last_course_name ? <span className="t100-row-course">{row.last_course_name}</span> : null}
+      {row.last_course_name ? <span className="t100-row-course">{shortCourseName(row.last_course_name)}</span> : null}
       <span className="t100-row-track" aria-hidden><span data-row-progress style={{ width: `${raceShare(Number(row.value), total) * 100}%` }} /></span>
     </span>
     <span className="t100-value tabular-nums">{row.value}</span>
-  </Button>;
+  </button>;
 }

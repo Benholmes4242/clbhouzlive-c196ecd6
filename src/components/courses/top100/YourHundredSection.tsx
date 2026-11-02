@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { courseRankLabels, RANK_LIST_BY_SLUG, RANK_LIST_LABEL } from '@/features/courses/_shared/courseRankLabels';
 
@@ -231,11 +230,11 @@ export function YourCoursesDropdown(props: Props) {
   const cells = props.courseIds.slice(0, props.total).map(id => cellState(props.enrichment.get(id)));
   const reviewed = cells.filter(state => state === 'reviewed').length;
   return <div className="t100-dropdown" data-your-courses>
-    <Button variant="ghost" className="t100-dropdown-header" aria-expanded={open} onClick={() => setOpen(value => !value)}>
+    <button type="button" className="t100-dropdown-header" aria-expanded={open} onClick={() => setOpen(value => !value)}>
       <span className="t100-mini" aria-hidden>{cells.map((state, i) => <i key={i} data-state={state} />)}</span>
       <span className="t100-dropdown-copy"><b>Your courses</b><span className="tabular-nums">{props.viewerPlayed} played · {reviewed} reviewed</span></span>
       {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-    </Button>
+    </button>
     {open ? <div className="t100-dropdown-body"><YourHundredSection {...props} /></div> : null}
   </div>;
 }
