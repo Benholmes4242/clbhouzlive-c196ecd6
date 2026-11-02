@@ -10,7 +10,7 @@ import { useFollowedBoardRows } from '../data/useFollowedBoardRows';
 import { useClimberRankHistory } from '../data/useClimberRankHistory';
 import { useTourPlayerFollows } from '../../leaderboard/useTourPlayerFollows';
 import { movementFrom } from '../../_shared/movement';
-import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, TOUR_CANVAS, TREND_UP } from '../../_shared/tokens';
+import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, TREND_UP } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 import {
   fmtPoints,
