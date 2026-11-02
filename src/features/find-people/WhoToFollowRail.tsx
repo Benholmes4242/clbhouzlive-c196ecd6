@@ -56,6 +56,9 @@ const EMPTY: ReadonlySet<string> = new Set();
 
 /** Mock: ✕ closes a card over 200ms; the rail closes over the same 200ms. */
 const DISMISS_MS = 200;
+/** FIX §2 — a followed card leaves the rail after three seconds; tapping
+ *  Following again inside the window unfollows and cancels the removal. */
+const FOLLOW_REMOVE_MS = 3000;
 
 /** Test-only: clears the session dismissal and view-event sets. The app never
  *  calls this — session state is meant to last the session. */
@@ -94,6 +97,53 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
   const markStale = () => {
     queryClient.invalidateQueries({ queryKey: ['people-suggestions'], refetchType: 'none' });
     queryClient.invalidateQueries({ queryKey: ['business-suggestions'], refetchType: 'none' });
+  };
+
+  /* FIX §2 — follow-removal timers by card id. After a follow the card stays
+     put for three seconds, then collapses with the dismiss animation (or at
+     once under reduced motion) into the session HIDDEN set, so it cannot
+     return this session. An unfollow inside the window cancels the timer. */
+  const removeTimers = useRef(new Map<string, number>());
+  useEffect(
+    () => () => {
+      for (const timer of removeTimers.current.values()) window.clearTimeout(timer);
+      removeTimers.current.clear();
+    },
+    [],
+  );
+  const cancelRemoval = (id: string) => {
+    const timer = removeTimers.current.get(id);
+    if (timer != null) {
+      window.clearTimeout(timer);
+      removeTimers.current.delete(id);
+    }
+  };
+  const scheduleRemoval = (id: string) => {
+    cancelRemoval(id);
+    removeTimers.current.set(
+      id,
+      window.setTimeout(() => {
+        removeTimers.current.delete(id);
+        const reduced =
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) {
+          HIDDEN.add(id);
+          setHiddenTick((v) => v + 1);
+          return;
+        }
+        setClosing((prev) => new Set(prev).add(id));
+        window.setTimeout(() => {
+          HIDDEN.add(id);
+          setClosing((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+          setHiddenTick((v) => v + 1);
+        }, DISMISS_MS);
+      }, FOLLOW_REMOVE_MS),
+    );
   };
 
   // When every card in the slot is gone the rail closes (height → 0, 200ms),
