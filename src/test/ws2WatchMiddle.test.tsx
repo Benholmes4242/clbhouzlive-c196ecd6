@@ -109,7 +109,7 @@ describe('WS2 order on For you', () => {
   it('lead → Shorts → Rounds this week → Filmed at your courses → By region → Watch', () => {
     const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const lead = container.querySelector('[data-stub="lead"]')!;
-    const shorts = screen.getByText(courses.amateur.watch.rail.shorts);
+    const shorts = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.tagName === 'B')!;
     const rounds = container.querySelector('[data-stub="rounds"]')!;
     const course = container.querySelector('[data-course-shelf]')!;
     const regions = container.querySelector('[data-regions-shelf]')!;
@@ -127,7 +127,7 @@ describe('WS2 order on For you', () => {
 
   it('Shorts heading carries its sub-line', () => {
     wrap(<WatchFeed userId="me" onDepart={() => {}} />);
-    const heading = screen.getByText(courses.amateur.watch.rail.shorts);
+    const heading = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.tagName === 'B')!;
     expect(heading.parentElement!.textContent).toContain(courses.amateur.watch.rail.shortsSub);
   });
 });
