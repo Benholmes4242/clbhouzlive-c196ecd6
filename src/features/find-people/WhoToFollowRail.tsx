@@ -16,12 +16,18 @@
  * up. After any follow, unfollow or dismiss the two suggestion queries are
  * marked stale with refetchType 'none' (WF2 §7): Find people shows the change
  * next time it opens and the rail never reshuffles under the member's thumb.
+ * Covers are one slot-scoped read via useSuggestionCovers; SuggestionCover
+ * owns decorative image failure, never source selection or community rows.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { SuggestionCover } from './SuggestionCover';
+import { useSuggestionCovers } from './useSuggestionCovers';
+import './suggestion-covers.css';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ROW_FONT } from '@/features/social-lists-v2/rowParts';
@@ -100,6 +106,11 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
   /** ACTIVE RING — one batched read for the slot's cards, in display order. */
   const activityIds = useMemo(() => all.map(actorIdOf), [all]);
   const activity = useRecentActivity(activityIds);
+  const coverIds = useMemo(() => ({
+    people: all.flatMap(card => card.kind === 'person' ? [card.person.user_id] : []),
+    businesses: all.flatMap(card => card.kind === 'business' ? [card.business.business_id] : []),
+  }), [all]);
+  const covers = useSuggestionCovers(coverIds.people, coverIds.businesses);
 
   /** WF2 §7 — mark both suggestion queries stale WITHOUT refetching. */
   const markStale = () => {
@@ -235,7 +246,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
     >
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 16px' }}>
-        <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
+        <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: 0, color: A.INK }}>
           {t('findPeople.rail.title', { defaultValue: 'Who to follow' })}
         </div>
         <button
@@ -290,6 +301,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
             scheduleRemoval={scheduleRemoval}
             cancelRemoval={cancelRemoval}
             activity={activity.get(actorIdOf(card))}
+            coverUrl={covers.get(railCardId(card))}
           />
         ))}
       </div>
@@ -308,6 +320,7 @@ function RailCardView({
   scheduleRemoval,
   cancelRemoval,
   activity,
+  coverUrl,
 }: {
   card: RailCard;
   slot: 1 | 2;
@@ -317,6 +330,7 @@ function RailCardView({
   scheduleRemoval: (id: string) => void;
   cancelRemoval: (id: string) => void;
   activity: RecentActivity | undefined;
+  coverUrl: string | undefined;
 }) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
@@ -405,14 +419,14 @@ function RailCardView({
         /* FIX §1 — fixed-height flex column with the Follow button pinned to
            the bottom, so golfer and business cards align whatever the
            reason/figures content above. */
-        height: 252,
+        height: 266,
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        background: '#17171B',
+        background: 'var(--suggestion-card)',
         border: closing ? 'none' : '1px solid rgba(255,255,255,0.08)',
         borderRadius: 18,
-        padding: closing ? '14px 0 12px' : '14px 12px 12px',
+        padding: closing ? '0 0 12px' : '0 12px 12px',
         marginRight: closing ? -10 : 0,
         opacity: closing ? 0 : 1,
         overflow: 'hidden',
@@ -423,35 +437,23 @@ function RailCardView({
         transition: `width ${DISMISS_MS}ms ease, padding ${DISMISS_MS}ms ease, opacity ${DISMISS_MS}ms ease, margin ${DISMISS_MS}ms ease`,
       }}
     >
-      <button
+      <SuggestionCover key={coverUrl ?? 'plain'} url={coverUrl} />
+      <Button
+        variant="ghost"
+        className="suggestion-dismiss"
         type="button"
         aria-label={t('findPeople.rail.hide', { name, defaultValue: `Hide ${name}` })}
         onClick={(e) => {
           e.stopPropagation();
           onDismiss();
         }}
-        style={{
-          position: 'absolute',
-          top: 2,
-          right: 4,
-          width: 32,
-          height: 32,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          color: A.DIM,
-          cursor: 'pointer',
-        }}
       >
-        <X size={14} strokeWidth={2} />
-      </button>
+        <span className="suggestion-dismiss-disc"><X size={12} strokeWidth={2.6} /></span>
+      </Button>
 
       {/* Avatar: golfer squircle; business logo or white initials tile, inside
           the ACTIVE RING slot (ringed avatars open the latest post). */}
-      <div style={{ margin: '4px auto 0', display: 'flex' }}>
+      <div style={{ margin: '31px auto 0', display: 'flex', position: 'relative', zIndex: 1 }}>
         <ActiveAvatarDoor
           postId={activity?.post_id ?? null}
           label={t('findPeople.active.open', { name, defaultValue: `Open ${name}'s latest post` })}

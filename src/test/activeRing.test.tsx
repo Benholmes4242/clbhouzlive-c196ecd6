@@ -162,7 +162,7 @@ describe('WhoToFollowRail', () => {
     fireEvent.click(btn);
     expect(screen.getByTestId('probe').textContent).toBe('/post/post-9');
   });
-  it('an unringed card has an empty when line of the same height and no avatar button; cards are 252 tall', async () => {
+  it('an unringed card has an empty when line of the same height and no avatar button; cards are 266 tall', async () => {
     wrap(<WhoToFollowRail slot={1} />);
     await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
     const card = cardOf('David Lang');
@@ -170,8 +170,8 @@ describe('WhoToFollowRail', () => {
     expect(when.textContent).toBe('');
     expect(when.style.height).toBe('15px');
     expect(screen.queryByRole('button', { name: "Open David Lang's latest post" })).toBeNull();
-    expect(card.style.height).toBe('252px');
-    expect(cardOf('Danny Holmes').style.height).toBe('252px');
+    expect(card.style.height).toBe('266px');
+    expect(cardOf('Danny Holmes').style.height).toBe('266px');
   });
 });
 
