@@ -105,14 +105,16 @@ void i18n.init({ lng: 'en', initAsync: false, interpolation: { escapeValue: fals
 
 function mount(node: React.ReactNode, initial = '/') {
   return render(
-    <MemoryRouter initialEntries={[initial]}>
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <MemoryRouter initialEntries={[initial]}>
       <I18nextProvider i18n={i18n}>
         <Routes>
           <Route path="*" element={node} />
           <Route path="/rounds" element={<div data-testid="rounds-route" />} />
         </Routes>
       </I18nextProvider>
-    </MemoryRouter>,
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
