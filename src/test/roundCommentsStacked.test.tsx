@@ -28,7 +28,13 @@ vi.mock('@/features/stories/useStoryEngagement', () => ({ useStoryEngagement: ()
 vi.mock('@/components/explore-tab-new/courseled/hooks/useContentReactions', () => ({ useContentReactions: () => ({ isSettled: true, viewerId: 'member', stateFor: () => ({ count: 0, mine: false }), toggle: vi.fn() }) }));
 vi.mock('@/features/comments-v2/hooks/useCommentsV2', () => ({ useCommentsV2: () => ({
   threads: [], visibleCount: 0, hiddenCount: 0, threadFetched: true, totalCountFetched: true,
-  isFetched: true, isLoading: false, hasNextPage: false, addComment: { isPending: false },
+  isFetched: true, isLoading: false, hasNextPage: false,
+  addComment: { isPending: false, mutate: vi.fn(), mutateAsync: vi.fn().mockResolvedValue(undefined) },
+  editComment: { isPending: false, mutate: vi.fn(), mutateAsync: vi.fn().mockResolvedValue(undefined) },
+  deleteComment: { isPending: false, mutate: vi.fn(), mutateAsync: vi.fn().mockResolvedValue(undefined) },
+  toggleLike: { isPending: false, mutate: vi.fn(), mutateAsync: vi.fn().mockResolvedValue(undefined) },
+  hideComment: { isPending: false, mutate: vi.fn(), mutateAsync: vi.fn().mockResolvedValue(undefined) },
+  reportComment: { isPending: false, mutate: vi.fn(), mutateAsync: vi.fn().mockResolvedValue(undefined) },
 }) }));
 vi.mock('@/features/comments-v2/hooks/useCommentsRealtimeV2', () => ({ useCommentsRealtimeV2: () => {} }));
 vi.mock('@/features/comments-v2/hooks/useCommentsContext', () => ({ useCommentsSubject: () => ({ data: null }), useThreadStandings: () => ({ data: null }) }));
