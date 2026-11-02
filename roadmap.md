@@ -1461,3 +1461,12 @@
 - [x] Tour identity row gains the shared SheetDoorButton doors (course first, then profile, handlers only); name keeps flex 1 ellipsis. Tour Course/Profile foot actions removed; foot renders only for engagement/Share. Overlay has no minimum height to remove (reported).
 - [x] New tourScorecardProfileDoor.test.tsx (5); cb61 tour assertion updated (old/new quoted in TOUR_SCORECARD_PROFILE_DOOR_REPORT.md). Full shards 5,663/5,667 across 530 files — the 4 failures are the pre-existing roundCommentsStacked typed-draft cases awaiting Ben's ruling; no new failures. tsgo clean; build OK.
 - [x] Live 390x844 tour-scorecard capture impossible (external_unmanaged auth; guest row tap inert); visuals unit-tested, mock captured at /tmp/browser/tour-scorecard/mock_390x844.png. Signed-in device check outstanding.
+
+## RS — Rounds this week shelf + /rounds page — IN PROGRESS
+- [ ] New /rounds page mounting ScoresLeaderboardsPage unchanged (mock B); header in Find people style; back = history back, fallback /amateur.
+- [ ] Register /rounds in chrome-v2 registry (same chrome/tone as /amateur) and Screens analytics route manifest/path normaliser.
+- [ ] Redirect /amateur?view=scores → /rounds (replace, keep other params).
+- [ ] ExploreMagazine: remove Rounds/Watch switch; always Watch; remembered 'scores' falls to Watch; remove Scores-only paths (name every removal); guest gating unchanged — STOP if guest reach changes.
+- [ ] RoundsThisWeekShelf in WatchFeed after Quick hits, All chip only, signed-in only; circle→everyone fallback <2 rows; feats via useFeatsWindow year, 14-day latest_play_date + score id, order ace/albatross/eagle/clean_card, max 2; card order round,round,feat,round,round,feat; hole strips via useRoundHoleShapes; door row always; skeleton; analytics rounds_shelf_viewed/card_tapped/door_tapped/page_viewed.
+- [ ] Tests: new src/test/rsRoundsShelf.test.tsx per brief; list any changed/deleted old→new.
+- [ ] Full shards vs 5,706/532 baseline; report RS report file.
