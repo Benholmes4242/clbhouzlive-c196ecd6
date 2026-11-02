@@ -13,6 +13,7 @@ const h = vi.hoisted(() => ({
   guest: false,
   rpc: vi.fn(),
   eqCalls: [] as Array<[string, unknown]>,
+  guestGate: undefined as undefined | ReturnType<typeof vi.fn>,
 }));
 
 vi.mock('@/integrations/supabase/client', () => {
@@ -29,8 +30,6 @@ vi.mock('@/features/guest/useGuestActionGate', () => ({ useGuestActionGate: () =
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(h as any).guestGate = undefined;
 
 import { LinePicksCard } from '@/features/tourhub/players-v2/picks/LinePicksCard';
 import { openFoot, callersList, orderByFinal, resolvePickState, memberShare, settledLine } from '@/features/tourhub/players-v2/picks/linePicksRules';
@@ -140,8 +139,7 @@ describe('Open state', () => {
     const { container } = mount(<LinePicksCard stake={stake()} data={pageData()} now={NOW} />);
     await waitFor(() => expect(rpcCalls('get_line_picks').length).toBe(1));
     fireEvent.click(container.querySelector('[data-pick-row="100"] [data-pick-button]')!);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((h as any).guestGate).toHaveBeenCalledWith('pick');
+    expect(h.guestGate).toHaveBeenCalledWith('pick');
     await new Promise((r) => setTimeout(r, 20));
     expect(rpcCalls('set_line_pick')).toHaveLength(0);
   });
