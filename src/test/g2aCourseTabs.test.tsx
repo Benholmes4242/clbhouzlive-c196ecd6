@@ -45,7 +45,7 @@ function rowPassed(bottom: number, intersecting = false) {
   const row = node('[data-course-review-tabs]');
   const callback = observers.get(row);
   if (!callback) throw new Error('Course row was not observed');
-  act(() => callback([{ target: row, isIntersecting: intersecting, boundingClientRect: { bottom }, rootBounds: { top: 56 } } as IntersectionObserverEntry], {} as IntersectionObserver));
+  act(() => callback([{ target: row, isIntersecting: intersecting, boundingClientRect: { bottom }, rootBounds: { top: 56 } } as unknown as IntersectionObserverEntry], {} as IntersectionObserver));
 }
 async function move(top: number) {
   scroller.scrollTop = top;
