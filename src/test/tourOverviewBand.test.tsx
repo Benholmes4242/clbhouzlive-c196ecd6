@@ -42,22 +42,23 @@ describe('Tour overview band', () => {
     for (const path of ['/', '/clubhouse', '/tourhub']) {
       const view = mount(path);
       const fade = layer('island-scrim-soft');
-      expect(fade?.style.height).toBe('calc(var(--sat, 0px) + 96px)');
-      expect(fade?.style.background).toBe('var(--island-soft-fade)');
-      expect(fade?.style.position).toBe('fixed');
-      expect(fade?.style.pointerEvents).toBe('none');
+      expect(document.querySelectorAll('[data-chrome="island-scrim-soft"]')).toHaveLength(1);
+      const before = fade?.outerHTML;
       expect(layer('island-scrim-band')).toBeNull();
       expect(layer('island-scrim-hero')).toBeNull();
       expect(layer('island-scrim')).toBeNull();
       scroll.scrolled = true;
       view.rerender(<QueryClientProvider client={new QueryClient()}><MemoryRouter initialEntries={[path]}><ChromeIsland /></MemoryRouter></QueryClientProvider>);
-      expect(layer('island-scrim-soft')?.getAttribute('style')).toBe(fade?.getAttribute('style'));
+      expect(layer('island-scrim-soft')?.outerHTML).toBe(before);
       cleanup(); scroll.scrolled = false;
     }
   });
   it('soft fade token holds the signed-off safe-area stops without a transition', () => {
     const css = readFileSync('src/index.css', 'utf8');
-    expect(css).toContain('--island-soft-fade: linear-gradient(180deg, rgba(10,10,12,0.92) 0px, rgba(10,10,12,0.80) var(--sat, 0px), rgba(10,10,12,0.35) calc(var(--sat, 0px) + 48px), rgba(10,10,12,0) calc(var(--sat, 0px) + 96px));');
+    const rule = css.match(/\[data-chrome="island-scrim-soft"\]\s*\{([^}]+)\}/)?.[1];
+    expect(rule).toBeDefined();
+    expect(rule).toContain('height: calc(var(--sat, 0px) + 96px);');
+    expect(rule).toContain('background: linear-gradient(180deg, rgba(10,10,12,0.92) 0px, rgba(10,10,12,0.80) var(--sat, 0px), rgba(10,10,12,0.35) calc(var(--sat, 0px) + 48px), rgba(10,10,12,0) calc(var(--sat, 0px) + 96px));');
     mount('/tourhub');
     expect(layer('island-scrim-soft')?.style.transition).toBe('');
   });

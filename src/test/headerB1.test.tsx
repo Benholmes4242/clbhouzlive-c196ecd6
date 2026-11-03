@@ -67,7 +67,7 @@ describe('HEADER_B1 shared state and controls', () => {
   });
   it('opted left and right glass move from rest token to canonical material', async () => {
     mount(); const left = screen.getByRole('button', { name: 'Go to home' }); const right = document.querySelector<HTMLElement>('[data-island-right]');
-    expect(left.style.background).toBe('var(--island-rest-glass)'); expect(right?.style.background).toBe('var(--island-rest-glass)');
+    expect(left.style.background).toBe('rgba(14, 14, 16, 0.55)'); expect(right?.style.background).toBe('rgba(14, 14, 16, 0.55)');
     await move(150); expect(left.style.background).toBe('rgba(14, 14, 16, 0.84)'); expect(right?.style.background).toBe('rgba(14, 14, 16, 0.84)');
   });
   it('Tour folds text and chevron but preserves its picker anchor and aria label', async () => {

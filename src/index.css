@@ -24,9 +24,18 @@
   input, textarea, [contenteditable="true"] { caret-color: #F8FAFC; }
 }
 
+/* HEADER_B1.1: keep the safe-area fade geometry and paint in one CSS rule. */
+[data-chrome="island-scrim-soft"] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--sat, 0px) + 96px);
+  background: linear-gradient(180deg, rgba(10,10,12,0.92) 0px, rgba(10,10,12,0.80) var(--sat, 0px), rgba(10,10,12,0.35) calc(var(--sat, 0px) + 48px), rgba(10,10,12,0) calc(var(--sat, 0px) + 96px));
+  pointer-events: none;
+}
+
 :root {
-  --island-rest-glass: rgba(14,14,16,0.55);
-  --island-soft-fade: linear-gradient(180deg, rgba(10,10,12,0.92) 0px, rgba(10,10,12,0.80) var(--sat, 0px), rgba(10,10,12,0.35) calc(var(--sat, 0px) + 48px), rgba(10,10,12,0) calc(var(--sat, 0px) + 96px));
   --island-fold-ease: cubic-bezier(.2,.8,.2,1);
   --island-fold-transition: max-width 300ms var(--island-fold-ease), opacity 200ms var(--island-fold-ease), padding 300ms var(--island-fold-ease), gap 300ms var(--island-fold-ease), margin-right 300ms var(--island-fold-ease);
   --island-glass-transition: background 300ms var(--island-fold-ease);
