@@ -25177,6 +25177,14 @@ export type Database = {
           player_key: string
         }[]
       }
+      get_tournament_circle_rank: {
+        Args: { p_tournament_id: string }
+        Returns: {
+          ahead: number
+          circle_pickers: number
+          level: number
+        }[]
+      }
       get_tournament_course_holes: {
         Args: { p_tournament_id: string }
         Returns: {
