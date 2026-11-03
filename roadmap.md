@@ -1,9 +1,10 @@
 # Roadmap
 
 ## HB6 group1 existing island pages
-- [ ] Opt existing island entries into header B; preserve none routes and existing actions; business history back/fallback '/'.
-- [ ] Wire full heading anchors on eligible non-news pages and static-title open/fold behavior; news page files untouched by user ruling.
-- [ ] Route/anchor inventory, authorized regression updates, browser business/news evidence where available; four shards maxWorkers2 and report from6298/564.
+- [x] Opt existing island entries into header B; preserve none/default routes and existing actions; business history back/fallback '/'. Static Next round and business/media anchors implemented; news page files untouched by ruling.
+- [ ] STOP: focused71/72 headerB1.test.tsx:97:39 expected23px received16px because /discover no longer non-condense; full output/tmp/hb6/focused.log. No correction/rerun/shards/browser after failure. tourOverviewBand's same stale /discover example identified but not run. Automatic build OK17:46:59Z.
+- [ ] Social list source ruling: actual big heading is owner name, not list title; legacy quest/handicap/rivalry/friends routes redirect, themes/query/backstops lack actual pages. No invented headings; report inventory. News story anchors omitted per ruling.
+- [x] HB6_GROUP1_REPORT.md records all files, five authorized hb5 case rewrites, new28 passing cases and candidate6326/565 from6298/564—not full pass total.
 
 ## NAV SQ1 bottom navigation shape
 - [x] Local20px bar and16px tab tile radii in GlobalBottomNavigation only; shared tokens and all other behavior unchanged.
