@@ -36,6 +36,9 @@
 }
 
 :root {
+  --island-dock-glass: rgba(14,14,16,0.84);
+  --island-dock-selected-glass: rgba(40,40,46,0.9);
+  --island-dock-selected-edge: rgba(255,255,255,0.28);
   --island-fold-ease: cubic-bezier(.2,.8,.2,1);
   --island-fold-transition: max-width 300ms var(--island-fold-ease), opacity 200ms var(--island-fold-ease), padding 300ms var(--island-fold-ease), gap 300ms var(--island-fold-ease), margin-right 300ms var(--island-fold-ease);
   --island-glass-transition: background 300ms var(--island-fold-ease);

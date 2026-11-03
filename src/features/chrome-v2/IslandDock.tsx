@@ -48,6 +48,6 @@ export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLE
       if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
       releaseRef.current?.(); releaseRef.current = null; setFocused(false);
     }}>
-    {children(shown)}
+    {shown ? children(shown) : null}
   </div>;
 }
