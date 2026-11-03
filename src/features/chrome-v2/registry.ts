@@ -107,9 +107,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/achievements' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/golferstofollow' },         spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/find-people' },             spec: { chrome: 'none', tone: 'dark',  bleed: false } },
-  /* RS — the page owns its Find-people-style back + title header; no islands
-     (the signed-off mock wins over the brief's "same chrome as /amateur"). */
-  { match: { exact: '/rounds' },                  spec: { chrome: 'none', tone: 'dark',  bleed: false } },
+  /* G2C: title/board stay page-owned; global islands carry the history back. */
+  { match: { exact: '/rounds' },                  spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   { match: { exact: '/watch/courses' },           spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/watch/top100' },            spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { prefix: '/watch/region/' },          spec: { chrome: 'none', tone: 'dark',  bleed: false } },

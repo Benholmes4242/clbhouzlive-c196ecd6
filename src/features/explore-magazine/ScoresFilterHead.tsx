@@ -1,4 +1,7 @@
-import type React from 'react';
+import { useContext, useRef, type CSSProperties } from 'react';
+import { UNSAFE_LocationContext } from 'react-router-dom';
+import { IslandDock } from '@/features/chrome-v2/IslandDock';
+import './rounds-scope-dock.css';
 import { useTranslation } from 'react-i18next';
 import { SlidersHorizontal } from 'lucide-react';
 
@@ -46,21 +49,43 @@ export function FiltersPill({ count, onOpen }: { count: number; onOpen: () => vo
 /** THE SCOPE CONTROL — one component, shared by this head and the Leaderboards page. */
 /* ARCHITECTURE RULE (moved from AGENTS.md): Explore Scores renders ScoresLeaderboardsPage; its scope control and Filters pill are the shared ScopeSegments/FiltersPill exported here, so the control exists once. */
 export function ScopeSegments({
-  scope,
-  clubApplies,
-  onScopeChange,
-  style,
+  ...props
 }: {
   scope: ScopeKey;
   clubApplies: boolean;
   onScopeChange: (next: ScopeKey) => void;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
+}) {
+  // G2C: only /rounds mounts a second copy. The board still owns omission,
+  // selection and analytics, so gated/hidden scopes cannot create a dock.
+  const location = useContext(UNSAFE_LocationContext);
+  const anchor = useRef<HTMLDivElement>(null);
+  if (location?.location.pathname !== '/rounds') return <ScopeSegmentsRow {...props} />;
+  return <div style={props.style}>
+    <div ref={anchor} data-rounds-scope-anchor><ScopeSegmentsRow {...props} copy="in-place" /></div>
+    <IslandDock anchorRef={anchor}>{() => <ScopeSegmentsRow {...props} style={undefined} copy="docked" />}</IslandDock>
+  </div>;
+}
+
+function ScopeSegmentsRow({
+  scope,
+  clubApplies,
+  onScopeChange,
+  style,
+  copy,
+}: {
+  scope: ScopeKey;
+  clubApplies: boolean;
+  onScopeChange: (next: ScopeKey) => void;
+  style?: CSSProperties;
+  copy?: 'in-place' | 'docked';
 }) {
   const { t } = useTranslation('courses');
   const options = SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true));
   return (
     <div
       role="radiogroup"
+      data-rounds-scope-copy={copy}
       aria-label={t('amateur.stream.scopes')}
       style={{
         display: 'grid',

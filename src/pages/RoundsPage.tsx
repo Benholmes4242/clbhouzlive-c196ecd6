@@ -1,6 +1,5 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -15,17 +14,17 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { PageTitle } from '@/features/chrome-v2/PageTitle';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 
 /**
  * THE ROUNDS PAGE (RS §1, mock B) — today's ScoresLeaderboardsPage as its own
  * page, mounted exactly as ExploreMagazine mounted it: same board state, same
  * row/member/course handlers, same scorecard opener and sheet, same gate for
- * members without a synced handicap. The header is the Find people / Edit
- * profile pattern; chrome-v2 registers the route with no shared chrome (mock
- * wins over the brief's "same chrome as /amateur" — ruled 2026-11-02).
- *
- * Top clearance is the header's own safe-area padding, NOT CHROME_CLEARANCE:
- * that token includes the island row's height and this page has no islands.
+ * members without a synced handicap. G2C: global islands own back/chrome;
+ * PageTitle is the name anchor and ScopeSegments opts into docking on /rounds
+ * only. Existing gate/session/board ownership is unchanged.
+ * Top clearance is the global island's --island-clearance.
  * Bottom clearance stays NAV_CLEARANCE, as on /amateur.
  */
 
@@ -41,6 +40,9 @@ export default function RoundsPage() {
 
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
+  const title = t('amateur.roundsPage.title', 'Rounds');
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  useIslandBackName(title, titleRef);
   const opener = useScorecardOpener();
   /* Always active: this page IS the board, as the Scores view was. */
   const boardState = useAmateurBoardState(user?.id, true);
@@ -48,11 +50,6 @@ export default function RoundsPage() {
   useEffect(() => {
     analyticsEvents.track('rounds_page_viewed', {});
   }, []);
-
-  const goBack = useCallback(() => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate('/amateur');
-  }, [navigate]);
 
   /* A board row opens its round in the sheet; a member-only row opens the
      member — the same rule ExploreMagazine's boardRowPress used. */
@@ -65,40 +62,8 @@ export default function RoundsPage() {
   );
 
   return (
-    <div data-rounds-page="" style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, color: A.INK, ...FIGS }}>
-      {/* Find people / Edit profile header: 36px round back, centred 17/700. */}
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 16px 0',
-          minHeight: 'calc(env(safe-area-inset-top, 0px) + 50px)',
-        }}
-      >
-        <button
-          type="button"
-          aria-label="Back"
-          onClick={goBack}
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 999,
-            border: '1px solid rgba(255,255,255,0.14)',
-            background: 'none',
-            color: A.INK,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            cursor: 'pointer',
-          }}
-        >
-          <ChevronLeft size={18} strokeWidth={2.2} />
-        </button>
-        <div style={{ flex: 1, textAlign: 'center', marginRight: 36, fontSize: 17, fontWeight: 700 }}>
-          {t('amateur.roundsPage.title', 'Rounds')}
-        </div>
-      </header>
+    <div data-rounds-page="" style={{ background: A.CANVAS, minHeight: '100dvh', paddingTop: 'var(--island-clearance)', fontFamily: SANS, color: A.INK, ...FIGS }}>
+      <PageTitle ref={titleRef} title={title} />
 
       <main style={{ padding: `0 0 ${NAV_CLEARANCE}` }}>
         {/* CB46 — instrumentation only; renders nothing. */}
