@@ -143,9 +143,9 @@ function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRo
             <SquircleAvatar size={56} src={row.avatar_url} alt={row.display_name ?? ''} userId={business ? null : row.actor_id} />
           )}
           <div style={{ minWidth: 0, flex: 1 }}>
-            <b data-spotlight-name style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 17, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.display_name}</span>
-              {row.is_verified ? <VerifiedBadge size="sm" /> : null}
+            <b data-spotlight-name style={{ display: 'block', fontSize: 17, fontWeight: 700, overflowWrap: 'anywhere' }}>
+              {row.display_name}
+              {row.is_verified ? <> <VerifiedBadge size="sm" className="inline align-middle" /></> : null}
             </b>
             <span data-spotlight-line className="spotlight-line">{spotlightLine(row, vids.isError ? null : videos[0]?.created_at)}</span>
           </div>
