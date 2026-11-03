@@ -33,6 +33,8 @@ export default function AuthCallback() {
   useEffect(() => {
     if (!isInMedianApp) return;
 
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
     const run = async () => {
       try {
         await new Promise(r => setTimeout(r, 150));

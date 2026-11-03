@@ -65,8 +65,8 @@ describe('CB57 hero board removals', () => {
       const expected = document.createElement('span');
       expected.style.background = OVERVIEW.bracket;
       expect(bar.style.background).toBe(expected.style.background);
-      expect(bar.style.top).toBe([0, 3].includes(i) ? '50%' : '-6px');
-      expect(bar.style.bottom).toBe([2, 4].includes(i) ? '50%' : '-6px');
+      expect(bar.style.top).toBe([0, 3].includes(i) ? '50%' : '-5px');
+      expect(bar.style.bottom).toBe([2, 4].includes(i) ? '50%' : '-5px');
       expect(bar.parentElement?.style.position).toBe('relative');
       expect(bar.parentElement?.style.alignSelf).toBe('stretch');
     });
