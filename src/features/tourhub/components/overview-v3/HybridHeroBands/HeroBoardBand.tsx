@@ -716,12 +716,12 @@ function PicksBlock({
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
         <span ref={picksRef} style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
-        {phase!=='upcoming' ? <span className="pick-panel-dim" style={{marginLeft:'auto',fontSize:9.5,fontWeight:800,letterSpacing:'.12em'}}>{phase==='completed'?recordCopy('final'):recordCopy('roundLive',{round:currentRound??''})}</span> : teeDay ? (
+        {teeDay && phase !== 'completed' ? (
           <>
             <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
             <span ref={fullRef} data-overview-picks-tee-measure aria-hidden style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: 0, top: 0, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{teeDay}</span>
           </>
-        ) : null}
+        ) : phase !== 'upcoming' ? <span className="pick-panel-dim" style={{marginLeft:'auto',fontSize:9.5,fontWeight:800,letterSpacing:'.12em'}}>{phase==='completed'?recordCopy('final'):recordCopy('roundLive',{round:currentRound??''})}</span> : null}
       </div>
       {phase==='completed' && <div className="pick-overview-verdict" data-picks-verdict><b>{verdict.bold}</b>{verdict.rest && ` ${verdict.rest}`}</div>}
       {intro ? (

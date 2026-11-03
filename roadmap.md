@@ -1,5 +1,9 @@
 # Roadmap
 
+## Tournament picks heading correction
+- [x] Restore tee-day heading whenever teeDay exists outside completed; retain fit/measure behaviour and live/final fallback; tourOverviewPicksTeeLine.test.tsx unchanged.
+- [ ] Run all four full-suite shards and report each pass count; reconcile inventory and confirm automatic build.
+
 ## Tournament picks build 2 — overview, Why and Our record
 - [x] Stat order: shared course keyStats order for every pick; per-player mock ordering ruled a mistake.
 - [x] Live comparisons: exclude eliminated picks, no 'One of our picks.' prefix, no line when no other active pick; Kim example reads 'Behind Ghim.'.
