@@ -1,8 +1,8 @@
 # Roadmap
 
 ## G2D Video-grid header B
-- [ ] Three route rules and shared title/name anchors; region-only dock with shared chips. Grid reads, tiles and other pages unchanged.
-- [ ] Focused cases, region fixture screenshot and four maxWorkers2 shards until failure; report reconciled totals and inherited blockers.
+- [x] Three route rules and shared title/name anchors; region-only dock with shared chips. Grid reads, tiles and other pages unchanged. Focused35/35 plus ws3 41/41; region Chromium fixture verified; build OK19:13:23Z.
+- [ ] STOP: shard1 1620 passed/4 inherited failed/1624 across143 files; no shards2–4. /tmp/g2d/shard1.log retains full output. Candidate6433/572 =6424/571 +9/+1 g2dVideoGrids. G2D_VIDEO_GRIDS_REPORT.md.
 
 ## G2C Rounds title and scope dock
 - [x] Shared PageTitle/h1 ref, global /rounds islands and route-local scope dock; retain board/gating/other scopes. Fixture title+dock and selection checked; focused38/38; automatic build OK19:01:20Z.
