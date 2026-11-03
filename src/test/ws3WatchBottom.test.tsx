@@ -319,8 +319,8 @@ describe('WS3 Top 100 on film', () => {
   it('/watch/top100: title, no sub, no chips, Top 100 source', () => {
     f.grid = { data: { pages: [[vid('g1'), vid('g2')]] }, isSuccess: true, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() };
     wrap(<WatchGridPage kind="top100" />);
-    expect(q('[data-grid-title]')?.textContent).toBe('Top 100 on film');
-    expect(q('[data-grid-sub]')).toBeNull();
+    expect(q('h1')?.textContent).toBe('Top 100 on film');
+    expect(q('.chrome-page-title-subtitle')).toBeNull();
     expect(q('[data-grid-chips]')).toBeNull();
     expect(f.gridCalls.at(-1)).toEqual({ kind: 'top100' });
     expect(f.track).toHaveBeenCalledWith('watch_grid_viewed', { kind: 'top100' });
