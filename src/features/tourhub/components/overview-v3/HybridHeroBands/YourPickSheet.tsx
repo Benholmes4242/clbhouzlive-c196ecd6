@@ -19,26 +19,28 @@ export interface YourPickSheetProps {
   eventName: string;
   ourPicks: { playerId: string; playerName: string }[];
   tourCode: string;
+  /** Player-page entry preselects locally; it never writes before submit. */
+  initialPlayerId?: string;
 }
 
 export function YourPickSheet(props: YourPickSheetProps) {
   return props.open ? <PickSession key={props.tournamentId} {...props} /> : null;
 }
 
-function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode }: YourPickSheetProps) {
+function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, initialPlayerId }: YourPickSheetProps) {
   const { t } = useTranslation('tourhub');
   const titleId = useId();
   const fieldQuery = usePickField(tournamentId);
   const stateQuery = useTournamentPickState(tournamentId);
   const mutation = useSetTournamentPick();
   const [search, setSearch] = useState('');
-  const [chosen, setChosen] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<string | null>(initialPlayerId ?? null);
   const [touched, setTouched] = useState(false);
   const field = fieldQuery.data ?? [];
   const state = stateQuery.data;
   useEffect(() => {
-    if (!touched && state) setChosen(state.my_player_id);
-  }, [state, touched]);
+    if (!touched && state) setChosen(initialPlayerId ?? state.my_player_id);
+  }, [state, touched, initialPlayerId]);
   const choose = (id: string) => { setTouched(true); setChosen(id); };
   const selected = field.find(player => player.player_id === chosen);
   const orderedPicks = ourPicks.slice(0, 3);

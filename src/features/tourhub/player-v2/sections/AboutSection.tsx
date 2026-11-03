@@ -1,105 +1,12 @@
-/**
- * AboutSection - 2-col grid of biographical facts.
- *
- * Per-field null discipline; whole section hides when < 2 fields exist.
- * BORN is deliberately absent: it and AGE are the same fact off the same
- * birth_date field, so only AGE is stated. Cell rules are gone - the grid
- * separates with rowGap, not a ladder of hairlines.
- * The college link renders in INK per the app-wide action ink flip (an
- * underline under a proper noun reads as a spelling error).
- */
-
-import { Link } from 'react-router-dom';
+/** Player facts omit only missing values; place normalization lives in playerRules. */
 import { useTranslation } from 'react-i18next';
 import type { TourPlayer } from '../../hooks/useTourHubData';
-import { analyticsEvents } from '@/utils/analyticsEvents';
-import { INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
-import { FIGS } from '@/lib/tokens/type';
-import { titleCaseCountry } from '../../utils/countryFlags';
-
-interface AboutSectionProps {
-  player: TourPlayer;
-}
-
-function fmtHeight(inches: string | number | null | undefined): string | null {
-  if (!inches) return null;
-  const n = typeof inches === 'string' ? parseInt(inches, 10) : inches;
-  if (isNaN(n)) return null;
-  return `${Math.floor(n / 12)}'${n % 12}"`;
-}
-
-function ageOf(iso: string | null): number | null {
-  if (!iso) return null;
-  const yrs = Math.floor((Date.now() - new Date(iso).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-  return isNaN(yrs) ? null : yrs;
-}
-
-interface Field {
-  label: string;
-  value: React.ReactNode;
-}
-
-export function AboutSection({ player }: AboutSectionProps) {
-  const { t } = useTranslation('tourhub');
-  const fields: Field[] = [];
-
-  const age = ageOf(player.birth_date);
-  if (age !== null) fields.push({ label: t('player.about.field.age'), value: String(age) });
-  if (player.turned_pro) fields.push({ label: t('player.about.field.turnedPro'), value: String(player.turned_pro) });
-  const height = fmtHeight(player.height);
-  if (height) fields.push({ label: t('player.about.field.height'), value: height });
-  if (player.college) {
-    /* TC1 (2026-09-20): the college pages were retired, so this is a plain
-       fact, not a link. The tappable college now lives on the hero stamp. */
-    fields.push({ label: t('player.about.field.college'), value: player.college });
-  }
-  if (player.residence) {
-    const canonicalCountry = player.country ? titleCaseCountry(player.country) : null;
-    const countryTokens = [player.country, player.country_code, canonicalCountry].filter(Boolean).map((value) => String(value).trim().toUpperCase());
-    const residenceParts = player.residence.split(',').map((part) => part.trim()).filter(Boolean);
-    while (residenceParts.length > 0 && countryTokens.includes(residenceParts[residenceParts.length - 1].toUpperCase())) residenceParts.pop();
-    const normalizedResidence = [...residenceParts, canonicalCountry].filter(Boolean).join(', ');
-    if (normalizedResidence) fields.push({ label: t('player.about.field.residence'), value: normalizedResidence });
-  }
-
-  if (fields.length < 2) return null;
-
-  return (
-    <section style={{ background: SURFACE, padding: '16px 16px 18px' }}>
-      <p
-        style={{
-          margin: '0 0 12px',
-          fontSize: 11,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-        }}
-      >
-        {t('player.about.eyebrow')}
-      </p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 20, rowGap: 16 }}>
-        {fields.map((f) => (
-          <div key={f.label} style={{ minWidth: 0 }}>
-            <div
-              style={{
-                // Field labels (AGE, TURNED PRO, HEIGHT, COLLEGE, RESIDENCE) — READ 11.
-                fontSize: 11,
-                fontWeight: 700,
-                color: INK_FAINT,
-                letterSpacing: '0.11em',
-                textTransform: 'uppercase',
-                marginBottom: 4,
-              }}
-            >
-              {f.label}
-            </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em', ...FIGS }}>
-              {f.value}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+import { cleanPlace } from '../playerRules';
+import { PlayerSection } from './PlayerSection';
+export function AboutSection({player}:{player:TourPlayer}) {
+ const {t}=useTranslation('tourhub');const birth=player.birth_date?new Date(player.birth_date):null;const now=new Date();
+ const age=birth&&!Number.isNaN(birth.getTime())?now.getFullYear()-birth.getFullYear()-(now.getMonth()<birth.getMonth()||now.getMonth()===birth.getMonth()&&now.getDate()<birth.getDate()?1:0):null;
+ const inches=player.height?Number.parseFloat(player.height):null;
+ const fields=[{key:'age',value:age},{key:'turnedPro',value:player.turned_pro},{key:'height',value:inches&&Number.isFinite(inches)?`${Math.floor(inches/12)}′${Math.round(inches%12)}″`:null},{key:'college',value:player.college},{key:'born',value:cleanPlace(player.birth_place,player.country),place:true},{key:'lives',value:cleanPlace(player.residence,player.country),place:true}].filter(f=>f.value!=null&&f.value!=='');if(!fields.length)return null;
+ return <PlayerSection id="about" title={t('player.v3.about')}><div className="pv-about">{fields.map(f=><div key={f.key} data-place={f.place}><small>{t(`player.v3.${f.key}`)}</small><b>{f.value}</b></div>)}</div></PlayerSection>;
 }

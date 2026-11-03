@@ -1,10 +1,10 @@
 /** Reads for the "You and the tour" card: tour hole averages (6h) and the member's own hole scoring (30m, keyed by user). */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { PlayersTourId } from '../data/usePlayersRanking';
+import type { TourId } from '../../hooks/useOverviewData';
 import type { MyScoring, TourAverages } from './youAndTourRules';
 
-export function useTourHoleAverages(tour: PlayersTourId, season: number | null | undefined) {
+export function useTourHoleAverages(tour: TourId, season: number | null | undefined) {
   return useQuery<TourAverages | null>({
     queryKey: ['players-v2', 'tour-hole-averages', tour, season],
     enabled: typeof season === 'number',
