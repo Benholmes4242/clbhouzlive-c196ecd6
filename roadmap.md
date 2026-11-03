@@ -1,5 +1,10 @@
 # Roadmap
 
+## ER2 Creators to follow and By region
+- [ ] Match the plural five-row rail, initial following state and canonical batched activity avatar doors; remove only Your patch.
+- [ ] Add scoped tests and quote authorised changes; run four full shards with maxWorkers=2 and confirm automatic build against 6,061/550 baseline.
+- [ ] Verify reachable presentation; report authenticated flow limitations without bypassing guest browsing.
+
 ## ER1 Explore top and Community
 - [x] Remove Golfers to watch, restore Community tile/view, reveal selected tile, and exclude own items outside search locally.
 - [x] Focused131/131; four full shards1504+1504+1554+1499=6,061/550 (+20/+1 ER1); zero failures/unhandled errors. Automatic build clean; ER1_REPORT.md quotes changed cases and final CSS/focused timing. Public phone view verified; signed-in checks blocked by external_unmanaged.
