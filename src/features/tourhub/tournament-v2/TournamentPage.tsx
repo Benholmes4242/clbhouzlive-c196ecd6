@@ -20,7 +20,8 @@
  * Route entry stays as-is (TournamentDetailPage.tsx) — TD2 swaps the
  * component behind the same params.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { TourHubShell } from '../components/TourHubShell';
@@ -80,6 +81,9 @@ export function TournamentPage() {
 
   const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } =
     useTournamentMeta(tournamentId, { live: pulse.state === 'live' });
+  // G2B observes the current rebuilt hero's real h1, not the retired HeroSection.
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  useIslandBackName(!isLoading && !isMetaError ? meta?.name ?? null : null, nameRef);
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
   const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
   const fieldQuery=usePickField(tournamentId??'');
@@ -247,6 +251,7 @@ export function TournamentPage() {
   return (
     <TourHubShell immersive immersiveStatusBar>
       <TourPageShell
+        headerB
         immersive
         background={TOUR_CANVAS}
         title={meta?.name ?? 'Tournament'}
@@ -254,7 +259,7 @@ export function TournamentPage() {
         backFallback="/tourhub?tab=schedule"
       >
       <div className="tournament-v3" style={{fontFamily:FONT}}>
-        <TournamentHero meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl}/>
+        <TournamentHero nameRef={nameRef} meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl}/>
         {pulse.state==='completed' && champion?.player && champion.score!=null && <ChampionStrip presentation="tournament" name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={score(champion.score)} scoreValue={champion.score} scoreLabel={runner?.score!=null?copy('by',{words:words(runner.score-champion.score).toUpperCase()}):undefined} narrativeParts={championNarrative(meta,leaderboardRows)}/>}
         {pulse.state==='completed' && strokeBoard && <RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
         <section id="the-act">

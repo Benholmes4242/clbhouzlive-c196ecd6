@@ -2,7 +2,8 @@
  * never fall back across seasons; only the unchanged live strip is live-owned.
  * Race ranks retain their existing source through the isolated header-year reader.
  * Shared picks/you-and-tour helpers remain authoritative; old sections are retired. */
-import { useEffect,useState } from 'react';
+import { useEffect,useRef,useState } from 'react';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { motion,AnimatePresence } from 'framer-motion';
@@ -38,6 +39,8 @@ export function PlayerPage() {
  const nextQuery=usePlayerNextEvent(header?.next_tournament_id??null);
  const tourQuery=useTourHoleAverages(tour,year),{user}=useSupabaseSession(),guest=useIsGuest(),mineQuery=useMyHoleScoring(!guest&&!user?.is_anonymous?user?.id:null);
  const follows=useTourPlayerFollows(),gate=useGuestActionGate(),state=usePlayerState(playerId),[pickOpen,setPickOpen]=useState(false),[recordOpen,setRecordOpen]=useState(false);
+ const nameRef=useRef<HTMLHeadingElement>(null);
+ useIslandBackName(!playerQuery.isLoading&&!headerQuery.isLoading&&!(year!=null&&resultsQuery.isLoading)&&!playerQuery.isError&&!headerQuery.isError?playerQuery.data?.full_name??null:null,nameRef);
  useEffect(()=>{scrollPageToTop('auto');setPickOpen(false);setRecordOpen(false);},[playerId]);
  if(playerQuery.isLoading||headerQuery.isLoading||year!=null&&resultsQuery.isLoading)return <TourHubShell><PlayerPageSkeleton/></TourHubShell>;
  const player=playerQuery.data;
@@ -45,8 +48,8 @@ export function PlayerPage() {
  const results=resultsQuery.isError?[]:resultsQuery.data??[],stats=statsQuery.isError?[]:statsQuery.data??[],holes=holesQuery.isError?null:holesQuery.data??null,tourHoles=tourQuery.isError?null:tourQuery.data??null,mine=mineQuery.isError?null:mineQuery.data??null;
  const visible=sectionVisibility(results.length,stats,holes,tourHoles,mine,!!user&&!guest&&!user.is_anonymous),liveId=state.state==='live'?state.liveData?.tournamentId??null:null;
  const onPick=()=>{if(gate('other')||!user||user.is_anonymous)return;setPickOpen(true);};
- return <TourHubShell><TourPageShell immersive background="var(--player-canvas)" title={player.full_name} backFallback="/tourhub?tab=players"><div className="player-v3">
- <HeroSection player={player} header={header} results={results} tour={tour} race={raceQuery.isError?null:raceQuery.data??null} following={follows.ids.has(player.id)} busy={follows.busy} onFollow={()=>follows.toggle(player.id)} onPick={onPick} nextStartDate={nextQuery.data?.start_date}/>
+ return <TourHubShell><TourPageShell headerB immersive background="var(--player-canvas)" title={player.full_name} backFallback="/tourhub?tab=players"><div className="player-v3" style={{paddingTop:'var(--island-clearance)'}}>
+ <HeroSection nameRef={nameRef} player={player} header={header} results={results} tour={tour} race={raceQuery.isError?null:raceQuery.data??null} following={follows.ids.has(player.id)} busy={follows.busy} onFollow={()=>follows.toggle(player.id)} onPick={onPick} nextStartDate={nextQuery.data?.start_date}/>
  <AnimatePresence initial={false}>{state.state==='live'&&state.liveData&&<motion.div key="live-now" initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{duration:.25,ease:'easeOut'}} style={{overflow:'hidden'}}><LiveNowStrip liveData={state.liveData} playerName={player.full_name}/></motion.div>}</AnimatePresence>
  {year!=null&&<PlayerForm results={results} year={year} name={player.full_name} tour={tour}/>}
  {visible.game&&<PlayerGame stats={stats} tour={tour} label={playerTourLabel(tour)}/>}

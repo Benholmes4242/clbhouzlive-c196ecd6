@@ -1,5 +1,9 @@
 # Roadmap
 
+## G2B Tour-page header B
+- [ ] Opt only tournament/player detail roots into global islands, preserve legacy TourPageShell users, observe actual full-name h1 elements and clear loading/error ownership; player clearance only.
+- [ ] Add route/shell/name regressions and fixture screenshots; four maxWorkers2 shards until failure, record unchanged prior G2A/HB6/tournament stops and reconciled totals.
+
 ## G2A course-detail tab dock
 - [x] Replaced standalone sticky row/scrim with existing IslandDock and shared tab handler; modal, hero and HB4 back unchanged. Shared dock untouched.
 - [ ] STOP: focused20/21 across3 files; new g2aCourseTabs modal case:104:34 expected env(safe-area-inset-top, 0px), received ''. Explicit preview-error request cleared TS2352 at48 via unknown intermediary only; automatic build OK18:49:17Z, assertions/data/count unchanged. No test reruns/browser/full shards; modal assertion still awaits authorization. G2A_COURSE_TABS_REPORT.md; full focused output/tmp/g2a/focused.log. Candidate6406/569 from6401/568 (+5/+1), not full passing total.
