@@ -1,5 +1,10 @@
 # Roadmap
 
+## TU1 two-up video grids
+- [ ] Waiting on CM1 completion, as TU1 explicitly requires; FIX_GRID_1 is complete. No TU1 product or test edits started.
+- [ ] Once unblocked, extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; preserve chrome/paging/actions.
+- [ ] Update authorised tile assertions, add rank/duration/wrapping/navigation coverage and report reconciled four-shard totals/build, retaining any failing output.
+
 ## Integrated Our picks section
 - [x] Integrate shared four-state amber card/circle rank read/plain record row, preserving sheets/prior fixes; exact guest lock copy blocked by absent guest-accessible locks_at source.
 - [ ] STOP: focused126 passed/1 failed/127 at integratedPicks.test.tsx:36:542; expected “6 of your circle…” received “DG6 of your circle…” from avatar initials in whole-footer selector. No correction or shards after failure; build OK22:25:29Z. Candidate6509/577 (+23/+1 after CM1 candidate6486/576), INTEGRATED_OUR_PICKS_REPORT.md names both authorised rewrites and missing verification. Await authorised test correction; guest time source remains needed.
