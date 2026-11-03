@@ -1,4 +1,24 @@
-# ER3 — Long form woven rails: stopped at focused validation
+# ER3 — Long form woven rails: completed after ER3.1
+
+## ER3.1 completion
+The only test/source change in ER3.1 was in `src/test/er3LongFormRails.test.tsx`'s `rows()` fixture: `caption: \`Title ${i}\`` → `post_content: \`Title ${i}\``. Values, case names and every assertion remain unchanged, including `expect(slot(position)?.parentElement?.querySelector('[data-watch-card="long"]')?.textContent).toContain(\`Title ${position - 1}\`)` in **“40 long videos weave the right headings after 3, 13, 23 and 33”**. No product file was changed in ER3.1. The historical failure below is resolved.
+
+Focused command:
+`bunx vitest run src/test/er3LongFormRails.test.tsx src/test/er1ExploreCommunity.test.tsx src/test/ws1WatchTop.test.tsx src/test/ws2WatchMiddle.test.tsx src/test/ws3WatchBottom.test.tsx src/test/watchPageRules.test.ts --maxWorkers=2`
+
+**158/158 passed / six files**, including all **20/20** cases in `er3LongFormRails.test.tsx` and the exact predecessor-title check at all four rail positions. Full output: `/tmp/er31/focused.log`.
+
+Full-suite commands and results:
+- `bunx vitest run --maxWorkers=2 --shard=1/4` — **1,504 passed / 138 files**
+- `bunx vitest run --maxWorkers=2 --shard=2/4` — **1,504 passed / 138 files**
+- `bunx vitest run --maxWorkers=2 --shard=3/4` — **1,524 passed / 138 files**
+- `bunx vitest run --maxWorkers=2 --shard=4/4` — **1,559 passed / 138 files**
+
+Final total: **6,091/6,091 passed / 552 files**, **zero failures and zero unhandled errors**. Complete output: `/tmp/er31/shard-{1,2,3,4}.log`. No failing shard exists. The only known preceding failure was the ER3 title fixture failure quoted below; it now passes. No other pre-existing failure was observed.
+
+Reconciliation: last full green **6,071 / 551** (ER2) → **6,091 / 552** (+20/+1), entirely the named ER3 cases listed below. ER3.1 itself adds/removes/renames/rewrites **zero cases** and changes **zero assertions**; candidate inventory is unchanged. ER3.1 touched only the fixture file, this report and `roadmap.md`; the complete ER3 file inventory appears below.
+
+Automatic build confirmed **2026-11-03T10:41:40Z — build OK**. No manual build/typecheck was run. Authenticated end-to-end and browser mock comparison remain unverified; no session or access bypass was attempted.
 
 ## Implemented
 - For you outside search caps the top Shorts shelf at `SHORTS_SHELF_COUNT = 10`. Shorts chip and search result shelf remain uncapped.
@@ -6,7 +26,7 @@
 - Page-owned allocation uses separate shown sets for shorts and members. Clips can fetch one extra page per eligible Shorts slot before rendering; in-flight attempts are isolated, and an insufficient refill never loops indefinitely. Community keeps the 72-candidate read.
 - Shorts rail rendering is shared with the original shelf, including its existing Poster/AutoplayLayer, dimensions, title reservation and viewer indexing. Community retains its original MomentTile coordinator group and rail-local viewer order. Shorts See all shares one select-and-scroll callback.
 
-## STOP — exact failure
+## Historical STOP — resolved by ER3.1
 Command:
 `bunx vitest run src/test/er3LongFormRails.test.tsx src/test/er1ExploreCommunity.test.tsx src/test/ws1WatchTop.test.tsx src/test/ws2WatchMiddle.test.tsx src/test/ws3WatchBottom.test.tsx src/test/watchPageRules.test.ts --maxWorkers=2`
 
@@ -28,12 +48,12 @@ Four full shards and browser comparison were **not run** after this new failure,
 
 ## Test counts
 Last reported green baseline: **6,071 tests / 551 files** (ER2).
-Candidate inventory: **6,091 tests / 552 files**, exclusively **+20 cases / +1 new file** `er3LongFormRails.test.tsx`. This is an inventory, not a full-suite result. Existing files lose no tests.
+Final verified inventory: **6,091 tests / 552 files**, exclusively **+20 cases / +1 new file** `er3LongFormRails.test.tsx`. All passed in the ER3.1 full run above. Existing files lose no tests.
 
 New cases (expanded table cases counted separately):
 1. uses ten top shorts, ten-video intervals and three-item minimum
 2. top For you shelf shows ten while the Shorts grid shows everything
-3. 40 long videos weave the right headings after 3, 13, 23 and 33 — failed
+3. 40 long videos weave the right headings after 3, 13, 23 and 33 — historical failure, now passed
 4. no short or grouped member repeats across the page and windows keep their existing order
 5. fewer than three unseen shorts skips those slots without changing later community positions
 6. fewer than three community members skips the slot without changing the next Shorts position
@@ -69,6 +89,6 @@ Tests use real MemoryRouter, QueryClientProvider and English I18nextProvider.
 Persistent requirements recorded in `mem://features/watch/er3-woven-rails` and `mem://index.md`.
 
 ## Build and scope
-Latest automatic preview build observed: **2026-11-03T10:37:46Z — build OK**. No manual build/typecheck run.
+Latest automatic preview build observed at ER3.1 verification: **2026-11-03T10:41:40Z — build OK**. No manual build/typecheck run.
 No SQL, migrations, RPC or edge-function edits/deployments, feed_config changes, pool-cap changes, native/Median changes. Guest browsing, review wizard, news, round plots and shared autoplay/read modules untouched. `round_pool_cap` remains 30.
-Authenticated end-to-end and mock comparison remain unverified; validation stopped before browser work.
+Authenticated end-to-end and mock comparison remain unverified; ER3.1 completed the required focused checks and full four-shard verification without changing product files.
