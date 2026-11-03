@@ -2,7 +2,7 @@
 
 ## FIX_GRID_1
 - [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.
-- [ ] STOP: Activity headerB correction/sole-caller grep complete; focused50 passed but new fixGridClearance.test.ts:89:1 “Expected '}', got '<eof>'”; automatic TS1005 at89,4. Missing sourceFiles closing brace uncorrected under new-failure stop. Intended6472/576 (+10/+1), not collected total; no shards/browser. FIX_GRID_1_REPORT.md retains exact output and scope audit.
+- [x] Explicit preview-error instruction authorised missing-brace correction only; focused58/58, shards1645/1537/1638/1652 =6472/576 (+10/+1), zero failures/unhandled errors; automatic build OK21:51:47Z. Activity sole-caller grep and PlayerPage-only exception confirmed. FIX_GRID_1_REPORT.md retains original failure, full audit and live-hit-testing limitation.
 
 ## Tournament pick follow-up fixes
 - [x] Correct avatar-hugging selection rings, local tap-to-deselect and action fills; lowercase record continuation and display MC on pick cards without changing board tokens.
