@@ -36,7 +36,14 @@ src/test/g2aCourseTabs.test.tsx(48,23): error TS2352: Conversion of type '{ targ
 Type '{ target: HTMLElement; isIntersecting: boolean; boundingClientRect: { bottom: number; }; rootBounds: { top: number; }; }' is missing the following properties from type 'IntersectionObserverEntry': intersectionRatio, intersectionRect, time
 ```
 
-This error is in the new test observer fixture, not product code. It remains uncorrected under the explicit stop rule. **Current work is not clean/completed.** Earlier automatic product edit record at18:47:26Z said `build OK`; it does not supersede the new typecheck error. No manual typecheck/build run.
+This error was in the new test observer fixture, not product code. The subsequent explicit preview-error request authorized its correction only: at line48, `as IntersectionObserverEntry` became `as unknown as IntersectionObserverEntry`, following the compiler's instruction. Fixture data and every assertion stayed identical; no test rewritten/deleted/renamed and no count change (candidate6,406/569 remains unchanged). No tests rerun because the independent modal assertion stop remains.
+
+Latest automatic verification:
+```text
+=== build 2026-11-03T18:49:17Z ===
+build OK
+```
+The preview type error is cleared. **G2A completion remains blocked by the modal test failure**, pending authorized correction; no manual typecheck/build run.
 
 ## Counts and test-change inventory
 - Last full green: **6,298 tests / 564 files**, NAV_SQ1.
@@ -55,7 +62,7 @@ Real QueryClientProvider and MemoryRouter wrap GolfClubView. Only data hooks/tab
 
 **Existing tests changed/deleted/renamed/rewritten: none.** No existing assertion diff to quote. Both product files' precise changes are summarized above; no shared component altered for mock compatibility.
 
-All four full-suite shards were **not run**, due to this new focused failure and surviving type error. No full passing count, zero-failure claim or clean-build claim.
+All four full-suite shards were **not run**, due to the new focused failure. No full passing count or zero-failure claim; automatic build is now clean after the fixture-only type correction.
 
 ## Pre-existing failures, untouched
 - `headerB1.test.tsx:97:39`, “GI1 non-condense guest capsule remains byte-identical through nav changes”: expected23px, received16px for `/discover`, confirmed HB6 failure.

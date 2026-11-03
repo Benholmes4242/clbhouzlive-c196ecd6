@@ -2,7 +2,7 @@
 
 ## G2A course-detail tab dock
 - [x] Replaced standalone sticky row/scrim with existing IslandDock and shared tab handler; modal, hero and HB4 back unchanged. Shared dock untouched.
-- [ ] STOP: focused20/21 across3 files; new g2aCourseTabs modal case:104:34 expected env(safe-area-inset-top, 0px), received ''. Automatic typecheck at48:23 TS2352 partial IntersectionObserverEntry lacks intersectionRatio/intersectionRect/time. No corrections/reruns/browser/full shards after stop. G2A_COURSE_TABS_REPORT.md; full focused output/tmp/g2a/focused.log. Candidate6406/569 from6401/568 (+5/+1), not full passing total.
+- [ ] STOP: focused20/21 across3 files; new g2aCourseTabs modal case:104:34 expected env(safe-area-inset-top, 0px), received ''. Explicit preview-error request cleared TS2352 at48 via unknown intermediary only; automatic build OK18:49:17Z, assertions/data/count unchanged. No test reruns/browser/full shards; modal assertion still awaits authorization. G2A_COURSE_TABS_REPORT.md; full focused output/tmp/g2a/focused.log. Candidate6406/569 from6401/568 (+5/+1), not full passing total.
 
 ## Tournament page three-state rebuild
 - [x] Reviewed three-state brief/mock and existing reads; user ruled chart opening “Novak won it…”, approved plan preserves system font/shared picks and verified round-count provenance.
