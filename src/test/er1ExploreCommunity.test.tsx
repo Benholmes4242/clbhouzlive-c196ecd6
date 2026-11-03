@@ -89,7 +89,7 @@ describe('ER1 Explore', () => {
   it('excludes own community items from the grid', () => { f.moments = [moment('own', 'me', '2026-11-02'), moment('other', 'other', '2026-11-01')]; const { container } = mount('community'); expect(container.querySelectorAll('[data-community-item]')).toHaveLength(1); expect(container.querySelector('[data-community-item="own"]')).toBeNull(); });
   it('excludes own community items before rail member grouping', () => {
     f.rows = [row('a', 500), row('b', 500), row('c', 500), row('d', 500)]; f.moments = [moment('own', 'me', '2026-11-02'), moment('other', 'other', '2026-11-01')];
-    const { container } = mount(); expect(container.querySelectorAll('[data-watch-card="community"]')).toHaveLength(1); expect(container.querySelector('[data-watch-rail="community"]')?.textContent).not.toContain('own');
+    const { container } = mount(); expect(container.querySelectorAll('[data-watch-card="community"]')).toHaveLength(0); expect(container.querySelector('[data-watch-rail="community"]')).toBeNull();
   });
   it('smoothly reveals a clipped selected Community tile', () => {
     const scroll = vi.fn(); const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) { return { left: 0, right: this.classList.contains('explore-top-controls') ? 390 : this.getAttribute('aria-selected') === 'true' ? 440 : 100, top: 0, bottom: 34, width: 390, height: 34, x: 0, y: 0, toJSON() {} }; });

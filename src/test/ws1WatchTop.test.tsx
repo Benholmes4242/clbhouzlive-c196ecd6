@@ -270,7 +270,7 @@ describe('WS1 chips', () => {
       fetchNextPage: vi.fn(),
     };
     f.moments = {
-      data: [{ key: 'm1', post: { userId: 'u1', displayName: 'Ann' }, courseName: 'Rosapenna' }],
+      data: ['1', '2', '3'].map(id => ({ key: `m${id}`, post: { userId: `u${id}`, displayName: 'Ann' }, courseName: 'Rosapenna' })),
       isFetched: true,
       isError: false,
       refetch: vi.fn(),
@@ -299,7 +299,7 @@ describe('WS1 chips', () => {
       fetchNextPage: vi.fn(),
     };
     f.moments = {
-      data: [{ key: 'm1', post: { userId: 'u1', displayName: 'Ann' }, courseName: 'Rosapenna' }],
+      data: ['1', '2', '3'].map(id => ({ key: `m${id}`, post: { userId: `u${id}`, displayName: 'Ann' }, courseName: 'Rosapenna' })),
       isFetched: true,
       isError: false,
       refetch: vi.fn(),

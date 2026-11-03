@@ -380,6 +380,7 @@ export function WatchFeed({
   /* K.6 — ONE ENTRY PER MEMBER, labelled with who, then where. */
   const members = useMemo(() => groupByMember((moments.data ?? []).filter((m) => !userId || searching || m.post?.userId !== userId), (m) => m.post?.userId ?? null), [moments.data, userId, searching]);
   const attemptedClipRails = useRef(new Set<number>());
+  const pendingClipRails = useRef(new Set<number>());
   const [railReadVersion, setRailReadVersion] = useState(0);
   const woven = useMemo(() => {
     const rails = new Map<number, { kind: 'shorts' | 'community'; shorts: HubRpcRow[]; members: typeof members }>();
@@ -395,6 +396,10 @@ export function WatchFeed({
         rails.set(position, { kind: 'community', shorts: [], members: next });
       } else {
         const next = quickRows.filter(row => !shownShorts.has(row.post_id)).slice(0, SHORTS_SHELF_COUNT);
+        if (pendingClipRails.current.has(position)) {
+          next.forEach(row => shownShorts.add(row.post_id));
+          continue;
+        }
         if (next.length < SHORTS_SHELF_COUNT && clips.hasNextPage && !attemptedClipRails.current.has(position)) {
           replenish.push(position);
           // Allocate this window even while waiting, so later slots cannot steal it.
@@ -412,7 +417,11 @@ export function WatchFeed({
     const position = woven.replenish[0];
     if (!onAll || position == null || clips.isFetchingNextPage) return;
     attemptedClipRails.current.add(position);
-    void clips.fetchNextPage().finally(() => setRailReadVersion(version => version + 1));
+    pendingClipRails.current.add(position);
+    void clips.fetchNextPage().catch(() => undefined).finally(() => {
+      pendingClipRails.current.delete(position);
+      setRailReadVersion(version => version + 1);
+    });
   }, [onAll, woven, clips.isFetchingNextPage, clips.fetchNextPage]);
 
   const communityRail = (items: typeof members, position: number) => {
