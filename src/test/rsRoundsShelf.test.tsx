@@ -1,5 +1,5 @@
 import React from 'react';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
@@ -11,18 +11,14 @@ import courses from '../../public/locales/en/courses.json';
 /* ---------------------------------------------------------------- mocks */
 
 const f = vi.hoisted(() => ({
-  circle: { data: [] as unknown[], isFetched: true, isError: false },
-  everyone: { data: [] as unknown[], isFetched: true, isError: false },
-  feats: { data: [] as unknown[], isFetched: true, isError: false },
+  pools: { circle: [] as unknown[], everyone: [] as unknown[] },
+  rpcCalls: [] as Array<Record<string, unknown>>,
+  rpcImpl: null as null | ((name: string, args: Record<string, unknown>) => Promise<unknown>),
   shapes: null as unknown,
   track: vi.fn(),
   warn: vi.fn(),
 }));
 
-vi.mock('@/components/explore-tab-new/courseled/hooks/useStandoutRounds', () => ({
-  useStandoutRounds: (_u: unknown, filters: { scope: string }) => (filters.scope === 'circle' ? f.circle : f.everyone),
-}));
-vi.mock('@/features/explore-magazine/useFeatsWindow', () => ({ useFeatsWindow: () => f.feats }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes', () => ({ useRoundHoleShapes: () => f.shapes }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => null }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: f.track } }));
@@ -82,21 +78,19 @@ vi.mock('@/features/explore-magazine/ExploreMagazine', () => ({ ExploreMagazine:
 vi.mock('@/features/guest/useGuestSurfaceGate', () => ({ useGuestScrollGate: () => {} }));
 vi.mock('@/hooks/useDiscoverLastSeen', () => ({ useDiscoverLastSeen: () => ({ markSeen: vi.fn() }), useMarkDiscoverSeenOnExit: () => {} }));
 
+import { supabase } from '@/integrations/supabase/client';
 import { RoundsThisWeekShelf } from '@/features/explore-magazine/watch/RoundsThisWeekShelf';
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import RoundsPage from '@/pages/RoundsPage';
 import AmateurPage from '@/pages/AmateurPage';
 import {
-  SHELF_FEAT_CAP,
-  buildShelfCards,
-  eligibleFeats,
+  recentSentenceParts,
   roundToPar,
   stripColor,
   toParLabel,
 } from '@/features/explore-magazine/watch/roundsShelfRules';
 import { EXPLORE_VIEWS, readExploreView } from '@/features/explore-magazine/exploreViewMemory';
 import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
-import type { FeatKind, FeatYearRow } from '@/features/explore-magazine/useFeatsWindow';
 
 /* ------------------------------------------------------------- fixtures */
 
@@ -117,8 +111,6 @@ function mount(node: React.ReactNode, initial = '/') {
     </QueryClientProvider>,
   );
 }
-
-const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 
 const round = (id: string, over: Partial<StandoutRound> = {}): StandoutRound => ({
   pos: 1,
@@ -142,29 +134,6 @@ const round = (id: string, over: Partial<StandoutRound> = {}): StandoutRound => 
   ...over,
 });
 
-const feat = (kind: FeatKind, over: Partial<FeatYearRow> = {}): FeatYearRow => ({
-  feat_kind: kind,
-  events: 24,
-  rounds_with: 20,
-  members: 10,
-  denominator: 13368,
-  denominator_unit: 'holes',
-  total_rounds: 743,
-  total_holes: 13368,
-  total_members: 50,
-  rounds_estimated: 0,
-  viewer_events: 0,
-  viewer_rounds_with: 0,
-  latest_user_id: 'u1',
-  latest_display_name: 'mikem84',
-  latest_photo_url: null,
-  latest_score_id: `fs-${kind}`,
-  latest_course_id: null,
-  latest_course_name: 'Trevose Golf Club (Championship)',
-  latest_play_date: daysAgo(2),
-  ...over,
-});
-
 const eighteenHoles = Array.from({ length: 18 }, (_, i) => ({
   holeNo: i + 1,
   par: 4,
@@ -172,45 +141,63 @@ const eighteenHoles = Array.from({ length: 18 }, (_, i) => ({
   sheetStrokes: 4,
 }));
 
+/** The default RPC behaviour: page the scope's pool, newest first. */
+const pagedRpc = async (name: string, args: Record<string, unknown>) => {
+  f.rpcCalls.push({ name, ...args });
+  if (name !== 'get_recent_rounds') return { data: null, error: null };
+  const pool = f.pools[(args.p_scope as 'circle' | 'everyone') ?? 'circle'];
+  const offset = (args.p_offset as number) ?? 0;
+  const limit = (args.p_limit as number) ?? 10;
+  return { data: pool.slice(offset, offset + limit).map((r) => ({ ...r, total_count: pool.length })), error: null };
+};
+
+let rpcSpy: ReturnType<typeof vi.spyOn> | null = null;
+
 beforeEach(() => {
   vi.clearAllMocks();
   sessionStorage.clear();
-  f.circle = { data: [round('a'), round('b'), round('c'), round('d')], isFetched: true, isError: false };
-  f.everyone = { data: [round('w'), round('x')], isFetched: true, isError: false };
-  f.feats = { data: [feat('eagle')], isFetched: true, isError: false };
+  f.pools = { circle: [round('a'), round('b'), round('c'), round('d')], everyone: [round('w'), round('x')] };
+  f.rpcCalls = [];
+  f.rpcImpl = null;
   f.shapes = new Map([['s-a', { coursePar: 71, series: [], beads: [], played: 18, birdies: 2, holes: eighteenHoles }]]);
+  rpcSpy = vi.spyOn(supabase, 'rpc').mockImplementation((name: unknown, args: unknown) =>
+    (f.rpcImpl ?? pagedRpc)(name as string, (args ?? {}) as Record<string, unknown>) as never,
+  );
   vi.spyOn(console, 'warn').mockImplementation(f.warn);
 });
-afterEach(cleanup);
+
+afterEach(() => {
+  cleanup();
+  rpcSpy?.mockRestore();
+  rpcSpy = null;
+});
 
 const shelf = (props: Partial<Parameters<typeof RoundsThisWeekShelf>[0]> = {}) =>
   mount(<RoundsThisWeekShelf userId="me" {...props} />);
 
+const roundCards = () => Array.from(document.querySelectorAll('[data-rounds-shelf-card="round"]'));
+
+/** Installs an IntersectionObserver whose callbacks the test can fire. */
+function captureObservers() {
+  const callbacks: IntersectionObserverCallback[] = [];
+  const original = window.IntersectionObserver;
+  window.IntersectionObserver = class {
+    constructor(cb: IntersectionObserverCallback) { callbacks.push(cb); }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof IntersectionObserver;
+  return {
+    fireAll: () => act(() => {
+      for (const cb of callbacks) cb([{ isIntersecting: true, intersectionRatio: 1 } as IntersectionObserverEntry], {} as IntersectionObserver);
+    }),
+    restore: () => { window.IntersectionObserver = original; },
+  };
+}
+
 /* ---------------------------------------------------------------- rules */
 
-describe('RS shelf rules', () => {
-  it('keeps only feats from the last 14 days with a score id, in rarity order, capped at two', () => {
-    const rows = [
-      feat('clean_card'),
-      feat('ace', { latest_play_date: daysAgo(20) }),
-      feat('albatross', { latest_score_id: null }),
-      feat('eagle'),
-    ];
-    const out = eligibleFeats(rows);
-    expect(out.map((r) => r.feat_kind)).toEqual(['eagle', 'clean_card']);
-    expect(out.length).toBe(SHELF_FEAT_CAP);
-    expect(eligibleFeats([feat('ace'), feat('albatross'), feat('eagle')]).map((r) => r.feat_kind)).toEqual(['ace', 'albatross']);
-  });
-
-  it('orders cards round, round, feat, round, round, feat and closes up missing slots', () => {
-    const rounds = [round('1'), round('2'), round('3'), round('4')];
-    const feats = [feat('ace'), feat('eagle')];
-    expect(buildShelfCards(rounds, feats).map((c) => c.kind)).toEqual(['round', 'round', 'feat', 'round', 'round', 'feat']);
-    expect(buildShelfCards(rounds.slice(0, 3), feats.slice(0, 1)).map((c) => c.kind)).toEqual(['round', 'round', 'feat', 'round']);
-    expect(buildShelfCards(rounds, []).map((c) => c.kind)).toEqual(['round', 'round', 'round', 'round']);
-    expect(buildShelfCards([], feats).map((c) => c.kind)).toEqual(['feat', 'feat']);
-  });
-
+describe('RR shelf rules', () => {
   it('computes net to par and its label', () => {
     expect(roundToPar(round('a'))).toBe(-1);
     expect(roundToPar(round('a', { course_par: null }))).toBeNull();
@@ -230,65 +217,178 @@ describe('RS shelf rules', () => {
   });
 });
 
+describe('RR the line under each card', () => {
+  it('(1) no course, or no comparison figures with an out-of-range par: no line', () => {
+    expect(recentSentenceParts(round('a', { course_name: null }))).toBeNull();
+    expect(
+      recentSentenceParts(round('a', { avg_topar: null, delta: null, prior_n: 0, course_par: null })),
+    ).toBeNull();
+    expect(
+      recentSentenceParts(round('a', { avg_topar: null, delta: null, prior_n: 0, course_par: 27 })),
+    ).toBeNull();
+  });
+
+  it('(2) prior_n 0 reads First round at the course', () => {
+    const s = recentSentenceParts(round('a', { prior_n: 0, avg_topar: null, delta: null }));
+    expect(s?.key).toBe('amateur.standout.firstRound');
+    expect(s?.defaultValue).toBe('First round at {{course}}');
+  });
+
+  it('(3) nothing better on record reads Best ever', () => {
+    const s = recentSentenceParts(round('a', { last_better: null }));
+    expect(s?.key).toBe('amateur.standout.bestEver');
+  });
+
+  it('(4) better after sixty-plus days reads Best since the month', () => {
+    const s = recentSentenceParts(round('a', { last_better: '2024-04-10', delta: -2 }), 'en');
+    expect(s?.key).toBe('amateur.standout.bestSince');
+    expect(s?.month).toBe('April 2024');
+  });
+
+  it('(5) the second and third recorded rounds read as ordinals', () => {
+    const recent = { last_better: '2026-10-25', delta: 0 };
+    const second = recentSentenceParts(round('a', { ...recent, prior_n: 1 }));
+    expect(second?.key).toBe('amateur.standout.ordinalRound');
+    expect(second?.ordinal).toBe('2nd');
+    const third = recentSentenceParts(round('a', { ...recent, prior_n: 2 }));
+    expect(third?.ordinal).toBe('3rd');
+  });
+
+  it('(6) a shot or more under average reads shots better than average', () => {
+    const s = recentSentenceParts(round('a', { last_better: '2026-10-25', delta: -3 }));
+    expect(s?.key).toBe('amateur.standout.betterAverage');
+    expect(s?.n).toBe(3);
+  });
+
+  it('(7) a shot or more over average reads shots above average', () => {
+    const s = recentSentenceParts(round('a', { last_better: '2026-10-25', delta: 2 }));
+    expect(s?.key).toBe('amateur.standout.aboveAverage');
+    expect(s?.n).toBe(2);
+  });
+
+  it('(8) within a shot of average reads Right on average', () => {
+    const s = recentSentenceParts(round('a', { last_better: '2026-10-25', delta: 0 }));
+    expect(s?.key).toBe('amateur.standout.rightOnAverage');
+  });
+});
+
 /* ---------------------------------------------------------------- shelf */
 
-describe('RS Rounds this week shelf', () => {
-  it('renders the heading, circle sub-line and interleaved cards for a signed-in member', () => {
+describe('RR Recent rounds shelf', () => {
+  it('renders newest first from get_recent_rounds, with the new heading and circle sub-line', async () => {
     shelf();
-    expect(screen.getByText('Rounds this week')).toBeInTheDocument();
+    expect(await screen.findByText('Recent rounds')).toBeInTheDocument();
     expect(screen.getByText('Your circle, last 14 days')).toBeInTheDocument();
-    const kinds = Array.from(document.querySelectorAll('[data-rounds-shelf-card]')).map((n) => n.getAttribute('data-rounds-shelf-card'));
-    expect(kinds).toEqual(['round', 'round', 'feat', 'round', 'round']);
-    expect(screen.getAllByText('Royal County Down · Championship · Oct 31')).toHaveLength(4);
+    expect(roundCards()).toHaveLength(4);
+    expect(roundCards()[0].textContent).toContain('Player a');
+    expect(f.rpcCalls).toContainEqual({ name: 'get_recent_rounds', p_scope: 'circle', p_window: '14', p_limit: 10, p_offset: 0 });
   });
 
-  it('falls back to everyone under two circle rows and says so', () => {
-    f.circle = { data: [round('only')], isFetched: true, isError: false };
+  it('loads the next page when the sentinel shows, with a skeleton, and stops at total_count', async () => {
+    f.pools.circle = Array.from({ length: 12 }, (_, i) => round(`p${i}`));
+    const io = captureObservers();
+    let release: (() => void) | null = null;
     shelf();
-    expect(screen.getByText('Everyone, last 14 days')).toBeInTheDocument();
-    expect(screen.getByText('Player w')).toBeInTheDocument();
+    await waitFor(() => expect(roundCards()).toHaveLength(10));
+    expect(document.querySelector('[data-rounds-shelf-end]')).toBeNull();
+    /* Hold page two back so the end skeleton is observable. */
+    f.rpcImpl = async (name, args) => {
+      if (name === 'get_recent_rounds' && (args.p_offset as number) > 0) {
+        await new Promise<void>((resolve) => { release = resolve; });
+      }
+      return pagedRpc(name, args);
+    };
+    io.fireAll();
+    await waitFor(() => expect(document.querySelector('[data-rounds-shelf-skeleton]')).toBeInTheDocument());
+    release!();
+    await waitFor(() => expect(roundCards()).toHaveLength(12));
+    expect(f.rpcCalls.filter((c) => c.name === 'get_recent_rounds').map((c) => c.p_offset)).toEqual([0, 10]);
+    expect(document.querySelector('[data-rounds-shelf-skeleton]')).toBeNull();
+    expect(document.querySelector('[data-rounds-shelf-end]')).toBeInTheDocument();
+    io.restore();
   });
 
-  it('hides the heading when there are no cards but keeps the door', () => {
-    f.circle = { data: [], isFetched: true, isError: false };
-    f.everyone = { data: [], isFetched: true, isError: false };
-    f.feats = { data: [], isFetched: true, isError: false };
+  it('shows the end tile only when everything is loaded, and it goes to /rounds', async () => {
+    f.pools.circle = [round('a'), round('b'), round('c')];
     shelf();
-    expect(screen.queryByText('Rounds this week')).toBeNull();
-    expect(screen.getByText('Leaderboards, feats and every round')).toBeInTheDocument();
+    const end = await waitFor(() => {
+      const el = document.querySelector('[data-rounds-shelf-end]');
+      expect(el).toBeInTheDocument();
+      return el as HTMLElement;
+    });
+    expect(end.textContent).toContain("That's the last 14 days");
+    expect(end.textContent).toContain('Leaderboards, feats and every round');
+    fireEvent.click(end);
+    expect(screen.getByTestId('rounds-route')).toBeInTheDocument();
+    expect(f.track).toHaveBeenCalledWith('rounds_door_tapped', { from: 'end' });
   });
 
-  it('hides the shelf quietly on error, keeps the door and logs', () => {
-    f.circle = { data: [], isFetched: true, isError: true };
+  it('the header pill goes to /rounds and there is no door bar', async () => {
+    f.pools.circle = Array.from({ length: 12 }, (_, i) => round(`p${i}`));
     shelf();
-    expect(screen.queryByText('Rounds this week')).toBeNull();
-    expect(screen.getByText('Leaderboards, feats and every round')).toBeInTheDocument();
-    expect(f.warn).toHaveBeenCalled();
+    expect(await screen.findByText('Leaderboards')).toBeInTheDocument();
+    expect(document.querySelector('[data-rounds-shelf-door]')).toBeNull();
+    expect(screen.queryByText('Leaderboards, feats and every round')).toBeNull();
+    expect(screen.queryByText('All rounds')).toBeNull();
+    fireEvent.click(screen.getByText('Leaderboards'));
+    expect(screen.getByTestId('rounds-route')).toBeInTheDocument();
+    expect(f.track).toHaveBeenCalledWith('rounds_door_tapped', { from: 'header' });
+  });
+
+  it('the rail snaps to the 16px inset, not the screen edge', async () => {
+    shelf();
+    await screen.findByText('Recent rounds');
+    const rail = document.querySelector('[data-rounds-shelf-rail]') as HTMLElement;
+    expect(rail.style.scrollPaddingInline).toBe('16px');
+    expect(rail.style.padding).toBe('0px 16px');
+  });
+
+  it('falls back to everyone under two circle rounds and says so', async () => {
+    f.pools.circle = [round('only')];
+    shelf();
+    expect(await screen.findByText('Everyone, last 14 days')).toBeInTheDocument();
+    expect(await screen.findByText('Player w')).toBeInTheDocument();
+    expect(f.rpcCalls).toContainEqual({ name: 'get_recent_rounds', p_scope: 'everyone', p_window: '14', p_limit: 10, p_offset: 0 });
+  });
+
+  it('hides the heading when there are no rounds', async () => {
+    f.pools = { circle: [], everyone: [] };
+    shelf();
+    await waitFor(() => expect(document.querySelector('[data-rounds-shelf="empty"]')).toBeInTheDocument());
+    expect(screen.queryByText('Recent rounds')).toBeNull();
+  });
+
+  it('hides the shelf quietly on error and logs', async () => {
+    f.rpcImpl = async () => ({ data: null, error: new Error('boom') });
+    shelf();
+    await waitFor(() => expect(f.warn).toHaveBeenCalled());
+    expect(screen.queryByText('Recent rounds')).toBeNull();
   });
 
   it('renders nothing for a signed-out visitor', () => {
     mount(<RoundsThisWeekShelf userId={undefined} />);
     expect(document.querySelector('[data-rounds-shelf]')).toBeNull();
+    expect(f.rpcCalls).toHaveLength(0);
+  });
+
+  it('reserves the heading and two cards while loading, with no door bar', async () => {
+    f.rpcImpl = () => new Promise(() => {});
+    shelf();
+    expect(document.querySelector('[data-rounds-shelf="loading"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-rounds-shelf-door]')).toBeNull();
     expect(screen.queryByText('Leaderboards, feats and every round')).toBeNull();
   });
 
-  it('reserves the heading, two cards and the door while loading', () => {
-    f.circle = { data: [], isFetched: false, isError: false };
+  it('round card: net with red under-par figure, comp kicker, strip and the line underneath', async () => {
+    f.pools.circle = [round('a', { is_competition: true }), round('b')];
     shelf();
-    expect(document.querySelector('[data-rounds-shelf="loading"]')).toBeInTheDocument();
-    expect(screen.getByText('Leaderboards, feats and every round')).toBeInTheDocument();
-  });
-
-  it('round card: net with red under-par figure, comp kicker, strip and standout sentence', () => {
-    f.circle = { data: [round('a', { is_competition: true }), round('b')], isFetched: true, isError: false };
-    f.feats = { data: [], isFetched: true, isError: false };
-    shelf();
+    await screen.findByText('Recent rounds');
     const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
     expect(card.textContent).toContain('70');
     const toPar = card.querySelector('.tabular-nums + span, b + span');
     expect(toPar?.textContent).toBe('−1');
     expect((toPar as HTMLElement).style.color).toBe('rgb(226, 75, 63)');
-    expect(card.textContent).toContain('Net · gross 81 · comp'.replace(' · comp', ''));
+    expect(card.textContent).toContain('Net · gross 81');
     expect(card.textContent?.toLowerCase()).toContain('comp');
     const bars = card.querySelectorAll('i');
     expect(bars).toHaveLength(18);
@@ -299,49 +399,26 @@ describe('RS Rounds this week shelf', () => {
     expect(card.textContent).toContain('Best ever at Royal County Down Golf Club (Championship)');
   });
 
-  it('round card: level par reads E in mute and no strip renders without shapes', () => {
-    f.circle = { data: [round('a', { net_score: 71 }), round('b')], isFetched: true, isError: false };
-    f.feats = { data: [], isFetched: true, isError: false };
+  it('round card: level par reads E in mute and no strip renders without shapes', async () => {
+    f.pools.circle = [round('a', { net_score: 71 }), round('b')];
     f.shapes = null;
     shelf();
+    await screen.findByText('Recent rounds');
     const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
     expect(card.textContent).toContain('E');
     expect(card.querySelectorAll('i')).toHaveLength(0);
   });
 
-  it('feat card: label, rarity wording and the latest-of line, singular included', () => {
-    f.circle = { data: [round('a'), round('b')], isFetched: true, isError: false };
-    f.feats = { data: [feat('eagle')], isFetched: true, isError: false };
-    shelf();
-    const card = document.querySelector('[data-rounds-shelf-card="feat"]') as HTMLElement;
-    expect(card.textContent).toContain('Eagle');
-    expect(card.textContent).toContain('1 in every 557 holes');
-    expect(card.textContent).toContain('The latest of 24 this year');
-    cleanup();
-    f.feats = { data: [feat('eagle', { events: 1 })], isFetched: true, isError: false };
-    shelf();
-    expect(document.querySelector('[data-rounds-shelf-card="feat"]')?.textContent).toContain('The only one this year');
-  });
-
-  it('taps open the right score id; avatar opens the member; both doors go to /rounds', () => {
+  it('taps open the right score id and the avatar opens the member', async () => {
     const onOpenRound = vi.fn();
     const onOpenMember = vi.fn();
     shelf({ onOpenRound, onOpenMember });
+    await screen.findByText('Recent rounds');
     fireEvent.click(document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement);
     expect(onOpenRound).toHaveBeenCalledWith('s-a', 'u-a');
     expect(f.track).toHaveBeenCalledWith('rounds_shelf_card_tapped', { kind: 'round' });
-    fireEvent.click(document.querySelector('[data-rounds-shelf-card="feat"]') as HTMLElement);
-    expect(onOpenRound).toHaveBeenCalledWith('fs-eagle', 'u1');
-    expect(f.track).toHaveBeenCalledWith('rounds_shelf_card_tapped', { kind: 'feat', feat_kind: 'eagle' });
     fireEvent.click(screen.getAllByRole('button', { name: 'Player a' })[0]);
     expect(onOpenMember).toHaveBeenCalledWith('u-a');
-    fireEvent.click(screen.getByText('All rounds'));
-    expect(screen.getByTestId('rounds-route')).toBeInTheDocument();
-    expect(f.track).toHaveBeenCalledWith('rounds_door_tapped', { from: 'header' });
-    cleanup();
-    shelf({ onOpenRound, onOpenMember });
-    fireEvent.click(screen.getByText('Leaderboards, feats and every round'));
-    expect(f.track).toHaveBeenCalledWith('rounds_door_tapped', { from: 'door' });
   });
 });
 
@@ -349,9 +426,9 @@ describe('RS Rounds this week shelf', () => {
 
 describe('RS shelf placement on Watch', () => {
   /* WS1 — chips renamed: All → For you, Quick hits → Shorts. Same shelf rules. */
-  it('shows on the For you chip for a signed-in member, after Quick hits, and not on other chips', () => {
+  it('shows on the For you chip for a signed-in member, after Quick hits, and not on other chips', async () => {
     mount(<WatchFeed userId="me" onDepart={() => {}} />);
-    expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument();
+    await waitFor(() => expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument());
     fireEvent.click(screen.getByRole('tab', { name: 'Shorts' }));
     expect(document.querySelector('[data-rounds-shelf]')).toBeNull();
     fireEvent.click(screen.getByRole('tab', { name: 'For you' }));
@@ -406,7 +483,7 @@ describe('RS /rounds page', () => {
               <Route path="/rounds" element={<RoundsMarker />} />
             </Routes>
           </I18nextProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       </QueryClientProvider>,
     );
 
