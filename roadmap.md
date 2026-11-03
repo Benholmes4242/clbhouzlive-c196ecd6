@@ -1,5 +1,10 @@
 # Roadmap
 
+## RR1 Recent rounds on Explore
+- [x] One paged get_recent_rounds read (circle→everyone fallback), feats out of the shelf, Leaderboards pill, 16px snap inset, sentinel pagination, end tile, eight-rule line under every card.
+- [x] rsRoundsShelf.test.tsx rewritten per brief (22 → 31 cases, removals quoted in the report); focused 31/31; four full shards 5,959/545 (+9), zero failures/unhandled errors; automatic build clean; RR1_RECENT_ROUNDS_REPORT.md.
+- [ ] Signed-in visual check against the mock blocked by external_unmanaged authentication.
+
 ## WS4 Shorts shelf tiles
 - [x] Set shelf to 156×248 and reserve each layout's own two-line title height; grid aspect and all other content frozen.
 - [x] Authorised: local spread fixture with poster_url in the new WS4 case only; focused 22/22; four full shards 5,950/545 (+4 named WS4 cases), zero failures/unhandled errors; automatic build clean; WS4_SHORTS_TILES_REPORT.md reconciles the totals.

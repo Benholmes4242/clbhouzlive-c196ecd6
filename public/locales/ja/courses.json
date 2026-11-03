@@ -405,7 +405,9 @@
       }
     },
     "roundsShelf": {
-      "title": "今週のラウンド",
+      "title": "最近のラウンド",
+      "leaderboards": "リーダーボード",
+      "endTitle": "過去14日分は以上です",
       "subCircle": "あなたのサークル・過去14日",
       "subEveryone": "全員・過去14日",
       "allRounds": "すべてのラウンド",

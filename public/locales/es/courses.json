@@ -405,7 +405,9 @@
       }
     },
     "roundsShelf": {
-      "title": "Rondas de esta semana",
+      "title": "Rondas recientes",
+      "leaderboards": "Clasificaciones",
+      "endTitle": "Esos son los últimos 14 días",
       "subCircle": "Tu círculo, últimos 14 días",
       "subEveryone": "Todos, últimos 14 días",
       "allRounds": "Todas las rondas",

@@ -1,55 +1,96 @@
+import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/discoverWhen';
 import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
-import type { FeatKind, FeatYearRow } from '../useFeatsWindow';
 
 /**
- * ROUNDS THIS WEEK SHELF — the pure rules (RS §3).
+ * RECENT ROUNDS SHELF — the pure rules (RR1).
  *
- * The shelf reads the board's own "circle / last 14 days" standout rows (limit
- * 4 is the RPC argument's own value) and the year's feats, and interleaves
- * them round, round, feat, round, round, feat. Everything here is pure: no
- * hooks, no locale, no DOM.
+ * The shelf reads get_recent_rounds ('circle' / '14', ten a page) and shows
+ * every round newest first; feats no longer appear here (they stay on the
+ * /rounds page). Everything here is pure: no hooks, no locale, no DOM.
  */
 
-/** The shelf's window is the board's own "last 14 days" value. */
-export const SHELF_WINDOW_DAYS = 14;
-
-/** Feat display order, rarest first — the RPC's own display order. */
-export const SHELF_FEAT_ORDER: FeatKind[] = ['ace', 'albatross', 'eagle', 'clean_card'];
-
-/** At most two feat cards. */
-export const SHELF_FEAT_CAP = 2;
-
-/** A feat earns a card only when its latest occurrence is inside the window
- *  and carries a round to open. */
-export function eligibleFeats(rows: FeatYearRow[], now: Date = new Date()): FeatYearRow[] {
-  const cutoff = now.getTime() - SHELF_WINDOW_DAYS * 86_400_000;
-  const byKind = new Map(rows.map((row) => [row.feat_kind, row]));
-  const out: FeatYearRow[] = [];
-  for (const kind of SHELF_FEAT_ORDER) {
-    const row = byKind.get(kind);
-    if (!row || !row.latest_score_id || !row.latest_play_date) continue;
-    const when = new Date(row.latest_play_date).getTime();
-    if (Number.isNaN(when) || when < cutoff) continue;
-    out.push(row);
-  }
-  return out.slice(0, SHELF_FEAT_CAP);
+/** Calendar-day arithmetic, independent of daylight-saving transitions. */
+function calendarDay(iso: string): number {
+  const date = playDateAtLocalNoon(iso);
+  return date ? Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000 : NaN;
 }
 
-export type ShelfCard =
-  | { kind: 'round'; round: StandoutRound }
-  | { kind: 'feat'; feat: FeatYearRow };
+/** English ordinal for the small ordinals this shelf can reach (2nd, 3rd). */
+function ordinal(n: number): string {
+  if (n === 2) return '2nd';
+  if (n === 3) return '3rd';
+  return `${n}th`;
+}
 
-/** round, round, feat, round, round, feat — a missing slot closes up, no gap. */
-export function buildShelfCards(rounds: StandoutRound[], feats: FeatYearRow[]): ShelfCard[] {
-  const pattern: Array<ShelfCard['kind']> = ['round', 'round', 'feat', 'round', 'round', 'feat'];
-  const out: ShelfCard[] = [];
-  let ri = 0;
-  let fi = 0;
-  for (const slot of pattern) {
-    if (slot === 'round' && ri < rounds.length) out.push({ kind: 'round', round: rounds[ri++] });
-    else if (slot === 'feat' && fi < feats.length) out.push({ kind: 'feat', feat: feats[fi++] });
+export type RecentSentence = {
+  key: string;
+  defaultValue: string;
+  course: string;
+  month?: string;
+  n?: number;
+  ordinal?: string;
+};
+
+/**
+ * The line under every card (RR1 §5), evaluated in this order; null = no line.
+ * Keeps the standout keys and wording for the cases they already covered.
+ */
+export function recentSentenceParts(row: StandoutRound, locale = 'en'): RecentSentence | null {
+  const course = row.course_name ?? '';
+  /* (1) no course, or gross/par missing: no line. "Missing" means the round
+     carries no comparison figures at all and the par is not a plausible
+     18-hole par (60–80). */
+  if (!course) return null;
+  const parOutOfRange = row.course_par == null || row.course_par < 60 || row.course_par > 80;
+  if (row.avg_topar == null && row.delta == null && row.prior_n === 0 && parOutOfRange) return null;
+  /* (2) first recorded round at the course. */
+  if (row.prior_n === 0) {
+    return { key: 'amateur.standout.firstRound', defaultValue: 'First round at {{course}}', course };
   }
-  return out;
+  /* (3) nothing better on record. */
+  if (row.last_better == null) {
+    return { key: 'amateur.standout.bestEver', defaultValue: 'Best ever at {{course}}', course };
+  }
+  const delta = row.delta ?? 0;
+  /* (4) better than the last better round, at least 60 days ago. */
+  const play = playDateAtLocalNoon(row.play_date);
+  const better = playDateAtLocalNoon(row.last_better);
+  if (delta < 0 && play && better && calendarDay(row.play_date) - calendarDay(row.last_better) >= 60) {
+    const month = better.toLocaleDateString(locale, {
+      month: 'long',
+      ...(better.getFullYear() !== play.getFullYear() ? { year: 'numeric' as const } : {}),
+    });
+    return { key: 'amateur.standout.bestSince', defaultValue: 'Best at {{course}} since {{month}}', course, month };
+  }
+  /* (5) second or third recorded round. */
+  if (row.prior_n < 3) {
+    return {
+      key: 'amateur.standout.ordinalRound',
+      defaultValue: '{{ordinal}} round at {{course}}',
+      course,
+      ordinal: ordinal(row.prior_n + 1),
+    };
+  }
+  /* (6) clearly better than the member's average. */
+  if (delta <= -1) {
+    return {
+      key: 'amateur.standout.betterAverage',
+      defaultValue: '{{n}} shots better than average at {{course}}',
+      course,
+      n: Math.round(Math.abs(delta)),
+    };
+  }
+  /* (7) clearly worse than the member's average. */
+  if (delta >= 1) {
+    return {
+      key: 'amateur.standout.aboveAverage',
+      defaultValue: '{{n}} shots above average at {{course}}',
+      course,
+      n: Math.round(Math.abs(delta)),
+    };
+  }
+  /* (8) within a shot of the average either way. */
+  return { key: 'amateur.standout.rightOnAverage', defaultValue: 'Right on average at {{course}}', course };
 }
 
 /** Net to par, from the round's own figures; null when either is missing. */
@@ -88,7 +129,7 @@ export function stripColor(strokes: number | null, par: number | null): string {
   return STRIP_COLORS.double;
 }
 
-/** Card geometry and paint, named once (RS §3, mock A/C). */
+/** Card geometry and paint, named once (RS §3, mock A/C; unchanged by RR1). */
 export const SHELF_CARD = {
   width: 232,
   height: 214,
@@ -99,11 +140,16 @@ export const SHELF_CARD = {
   gap: 10,
 } as const;
 
-export const SHELF_DOOR = {
-  height: 50,
-  radius: 14,
+/** The end tile (RR1 §4, mock B). */
+export const SHELF_END = {
+  width: 150,
+  height: 214,
   background: '#17171B',
   border: 'rgba(255,255,255,0.08)',
+  radius: 18,
+  padding: 16,
+  gap: 10,
 } as const;
 
-export const FEAT_TILE = { height: 78, radius: 12, background: '#1E1E23' } as const;
+/** The skeleton card shown while a page loads (RR1 §4). */
+export const SHELF_SKELETON = { width: 232, height: 214, radius: 18, background: '#141417' } as const;
