@@ -1,5 +1,10 @@
 # Roadmap
 
+## Integrated Our picks section
+- [ ] Apply signed-off four-state amber card, circle rank read and shared record row on overview/tournament only; preserve existing sheets and prior fixes.
+- [ ] Cover copy/state/geometry/navigation rules, report every rewritten assertion and reconciled counts; run focused checks and four shards subject to unexpected-failure stop.
+- [ ] CM1 unhandled scrollTo error remains pre-existing and unauthorised; report it if reproduced, do not fix it as part of picks.
+
 ## CM1 Community destination
 - [x] Select Community in place, add watch deep links and retire Media page with legacy redirects; guest rules and shared totals preserved.
 - [x] Apply grid specification and white rating correction; corrected cm1-community-see-all.html received/read; surrounding frozen UI preserved.
