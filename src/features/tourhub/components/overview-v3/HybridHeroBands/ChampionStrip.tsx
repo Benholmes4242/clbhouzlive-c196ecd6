@@ -74,11 +74,11 @@ export function ChampionStrip({
     <div
       style={{
         background: SURFACE,
-        padding: hasNarrative ? '12px 20px 14px' : '10px 20px',
+        padding: hasNarrative ? '10px 20px 12px' : '10px 20px',
         minHeight: hasNarrative ? undefined : STRIP_HEIGHT,
         display: 'flex',
         flexDirection: 'column',
-        gap: hasNarrative ? 8 : 0,
+        gap: hasNarrative ? 6 : 0,
         borderTop: `0.5px solid ${WHITE_ALPHA_06}`,
         position: 'relative',
         overflow: 'hidden',
@@ -119,7 +119,7 @@ export function ChampionStrip({
               fontSize: 17,
               fontWeight: 700,
               color: 'white',
-              letterSpacing: '-0.01em',
+              letterSpacing: 0,
               display: 'block',
               whiteSpace: 'normal',
               lineHeight: 1.1,
@@ -141,7 +141,7 @@ export function ChampionStrip({
               // canonical to-par ramp — red under par, muted even — never gold.
               // Gold stays on the eyebrow, trophy glyph and avatar ring only.
               color: getScoreColor(scoreValue ?? null, 'dark'),
-              letterSpacing: '-0.03em',
+              letterSpacing: 0,
               lineHeight: 1,
               fontFeatureSettings: '"tnum" 1, "kern" 1',
             }}
@@ -175,7 +175,7 @@ export function ChampionStrip({
             fontWeight: 400,
             fontStyle: 'italic',
             lineHeight: 1.4,
-            letterSpacing: '-0.005em',
+            letterSpacing: 0,
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >

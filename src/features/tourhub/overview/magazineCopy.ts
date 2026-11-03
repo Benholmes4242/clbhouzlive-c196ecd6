@@ -210,7 +210,7 @@ export function tournamentHeadlineSegments(args: HeadlineArgs): HeadlineSegment[
 }
 
 /** The same sentence as plain text — derived from the segments, never chosen separately. */
-/* ARCHITECTURE RULE (moved from AGENTS.md): The overview's one tournament sentence comes from tournamentHeadline/tournamentHeadlineSegments: SituationBand prints it on every state but a finished result, and on a finished result it lives only in ChampionStrip's narrative (composed from the leaderboard only — never a stored or generated narrative), so one state never carries two prose blocks. */
+/* ARCHITECTURE RULE: The overview's one tournament sentence comes from tournamentHeadlineSegments and situationSegments, rendered by PhotoBand in every state; ChampionStrip never duplicates it. The tournament-page SituationBand retains its existing ownership. All prose is composed from the selected event's leaderboard only, never stored or generated narrative. */
 export function tournamentHeadline(args: HeadlineArgs): string | null {
   const text = tournamentHeadlineSegments(args).map((segment) => segment.text).join('');
   return text || null;

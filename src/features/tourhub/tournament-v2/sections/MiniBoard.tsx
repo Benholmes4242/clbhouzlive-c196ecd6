@@ -349,8 +349,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   if (theme === 'heroBoard') {
     return (
       <>
-        <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
+        <div style={{ background: T.surface, fontFamily: FONT, paddingTop: 12 }}>
+          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 24, padding: `2px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
             {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {showHeroToday ? <div style={{ textAlign: 'center' }}>{t('board.columns.today')}</div> : null}
@@ -404,7 +404,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     status: r.status ?? null,
                   });
                 } : undefined}
-                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 36 : 34, padding: showHeroShape ? `6px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: showHeroShape ? `5px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
                 {showHeroShape || showOverviewPosition ? (
@@ -422,8 +422,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                           /* Rows are padded, so the rule reaches through the padding
                              to meet its neighbour: start under the marker, end at the
                              last row's centre. */
-                          top: tieRole === 'first' ? '50%' : -6,
-                          bottom: tieRole === 'last' ? '50%' : -6,
+                          top: tieRole === 'first' ? '50%' : -5,
+                          bottom: tieRole === 'last' ? '50%' : -5,
                         }}
                       />
                     ) : null}

@@ -1,12 +1,16 @@
 /** The full-bleed, tappable photograph used only by the Tour Overview carousel. */
 import { useTranslation } from 'react-i18next';
-import { heroCanonBackground } from '../../../_shared/heroGradient';
+import { ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import {
   AMBER,
   CAPS_10,
   FONT,
   INK,
+  OVERVIEW_SITUATION_INK,
+  WHITE_ALPHA_32,
   STATUS_LIVE_ON_DARK,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
@@ -43,6 +47,9 @@ interface PhotoBandProps {
   startDay: string | null;
   heightPx?: number;
   onOpen: () => void;
+  segments?: HeadlineSegment[];
+  note?: string | null;
+  onFullBoard?: () => void;
 }
 
 export function PhotoBand({
@@ -57,6 +64,9 @@ export function PhotoBand({
   startDay,
   heightPx = OVERVIEW_PHOTO_BAND_HEIGHT,
   onOpen,
+  segments = [],
+  note,
+  onFullBoard,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   const venueLine = [venueName, datesString].filter(Boolean).join(' · ');
@@ -77,9 +87,14 @@ export function PhotoBand({
       : t('overview.hero.stateFinal');
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onOpen(); }
+      }}
       aria-label={title}
       data-overview-photo-band
       data-overview-photo-state={state.kind}
@@ -94,33 +109,31 @@ export function PhotoBand({
         overflow: 'hidden',
         border: 'none',
         borderRadius: 0,
-        background: heroCanonBackground(venueImageUrl, COURSE_GRADIENT, '50% 55%'),
+        background: venueImageUrl ? `url("${venueImageUrl}") 50% 55% / cover no-repeat` : COURSE_GRADIENT,
         color: INK,
         fontFamily: FONT,
         textAlign: 'left',
         cursor: 'pointer',
       }}
     >
+      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'var(--th-overview-photo-fade)', pointerEvents: 'none' }} />
       <div
+        data-overview-photo-text
         style={{
           position: 'absolute',
-          left: 24,
-          right: 24,
-          bottom: 16,
-          display: 'flex',
-          alignItems: 'flex-end',
-          gap: 16,
+          left: 20,
+          right: 20,
+          bottom: 14,
           minWidth: 0,
         }}
       >
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div data-overview-photo-pill-row style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: 7,
               minHeight: 28,
-              marginBottom: 8,
               padding: '0 10px',
               borderRadius: 999,
               ...DARK_CHROME_GLASS_MATERIAL,
@@ -131,10 +144,21 @@ export function PhotoBand({
             <span>{stateLabel}</span>
             {inPlay ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
           </div>
+          {onFullBoard ? <Button type="button" variant="ghost" data-overview-full-board aria-label="Full leaderboard"
+            onClick={(event) => { event.stopPropagation(); onFullBoard(); }}
+            onKeyDown={(event) => event.stopPropagation()}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 3, minHeight: 44, height: 44, padding: '0 0 0 12px', margin: '-8px 0', background: 'none', border: 'none', borderRadius: 0, fontFamily: FONT, fontSize: 12, fontWeight: 700, color: INK, cursor: 'pointer' }}>
+            {t('overview.situation.fullBoard', { defaultValue: 'Full board' })}<ChevronRight size={13} strokeWidth={2.6} color={WHITE_ALPHA_32} aria-hidden />
+          </Button> : null}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: 10, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           {tourLabel ? <div style={MASTHEAD_KICKER}>{tourLabel}</div> : null}
           <h1
             style={{
               ...MASTHEAD_NAME,
+              fontSize: 26,
+              letterSpacing: 0,
               marginTop: 4,
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
@@ -144,8 +168,7 @@ export function PhotoBand({
           >
             {title}
           </h1>
-          {venueLine ? <div style={MASTHEAD_PLACE}>{venueLine}</div> : null}
-          {inPlay ? <RoundSpine round={state.round} totalRounds={state.totalRounds} /> : null}
+          {venueLine ? <div style={{ ...MASTHEAD_PLACE, marginTop: 4 }}>{venueLine}</div> : null}
         </div>
 
         {inPlay && leader ? (
@@ -159,13 +182,13 @@ export function PhotoBand({
                 ))}
               </div>
             ) : null}
-            <div style={{ ...NUMERIC_STYLE, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.02em', color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
             {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 5, marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
           </div>
         ) : null}
 
         {isUpcoming && countdown.length > 0 ? (
-          <div style={{ display: 'flex', gap: 6, flex: 'none' }}>
+          <div data-overview-countdown style={{ display: 'flex', gap: 6, flex: 'none' }}>
             {countdown.map((unit) => (
               <div key={unit.label} style={{ minWidth: 50, padding: '8px 10px', borderRadius: 12, textAlign: 'center', ...DARK_CHROME_GLASS_MATERIAL }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 24, lineHeight: 1, fontWeight: 700 }}>{unit.value}</div>
@@ -174,8 +197,14 @@ export function PhotoBand({
             ))}
           </div>
         ) : null}
+        </div>
+        {segments.length > 0 ? <p data-overview-photo-situation style={{ margin: '9px 0 0', fontSize: 13.5, lineHeight: 1.4, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
+          {segments.map((segment, index) => segment.figure ? <strong key={index} style={{ fontWeight: 700, fontStyle: 'normal', color: 'var(--th-text-primary)', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' }}>{segment.text}</strong> : <span key={index}>{segment.text}</span>)}
+        </p> : null}
+        {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
+        {inPlay ? <RoundSpine round={state.round} totalRounds={state.totalRounds} /> : null}
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -188,7 +217,7 @@ function RoundSpine({ round, totalRounds }: { round: number; totalRounds: number
   const { t } = useTranslation('tourhub');
   const nodes = Array.from({ length: Math.max(0, totalRounds) }, (_, i) => i + 1);
   return (
-    <div data-overview-round-spine style={{ display: 'flex', alignItems: 'center', marginTop: 11 }}>
+    <div data-overview-round-spine style={{ display: 'flex', alignItems: 'center', marginTop: 10 }}>
       {nodes.map((n, i) => {
         const live = n === round;
         const done = n < round;
