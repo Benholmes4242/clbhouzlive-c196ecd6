@@ -1,6 +1,6 @@
 /**
- * WS3 §2 — CREATOR TO FOLLOW (signed-off watch-s3 mocks A/B). One creator from
- * get_watch_spotlight(), picked once per Explore visit: WatchFeed mints the
+ * WS6 — CREATOR TO FOLLOW. Up to three creators from get_watch_spotlights,
+ * picked once per Explore visit: WatchFeed mints the
  * visit key, so scroll, chip switches and back-from-viewer keep the same pick.
  * Hidden, heading included, with no row or on error. Follow state is kept per
  * visit, so the card stays (as Following) until the next visit.
@@ -18,9 +18,12 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 import { toast } from '@/lib/toast';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { businessInitials } from '@/features/find-people/findPeopleRules';
-import { ShelfHeading, DurationChip } from './CourseVideosShelf';
-import { useCreatorVideos, useWatchSpotlight } from './useWatchBottom';
-import { spotlightCells, spotlightLine, spotlightPath, type SpotlightCell } from './watchBottom';
+import { ShelfHeading } from './CourseVideosShelf';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { Button } from '@/components/ui/button';
+import './spotlight.css';
+import { useCreatorVideos, useWatchSpotlights } from './useWatchBottom';
+import { spotlightLine, spotlightPath, type SpotlightRow } from './watchBottom';
 import { openVideoList } from './openVideoList';
 
 const viewedVisits = new Set<string>();
@@ -28,46 +31,70 @@ const followedVisits = new Map<string, boolean>();
 /** Test hook. */
 export function __resetSpotlight() { viewedVisits.clear(); followedVisits.clear(); }
 
-const CELL_LABEL: Record<SpotlightCell['key'], [string, string]> = {
-  handicap: ['amateur.watch.spotlight.handicap', 'Handicap'],
-  rounds: ['amateur.watch.spotlight.rounds', 'Rounds'],
-  courses: ['amateur.watch.spotlight.courses', 'Courses'],
-  videos: ['amateur.watch.spotlight.videos', 'Videos'],
-  filmed: ['amateur.watch.spotlight.filmed', 'Courses filmed'],
-};
-
 export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: string | null | undefined; visitKey: string; onDepart?: () => void }) {
+  const { t } = useTranslation('courses');
+  const q = useWatchSpotlights(userId, visitKey);
+  const rows = q.data ?? [];
+  const rail = useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
+  const dotTarget = useRef<number | null>(null);
+  const scroll = () => {
+    const el = rail.current;
+    if (!el) return;
+    const cards = Array.from(el.querySelectorAll<HTMLElement>('[data-spotlight]'));
+    const left = el.getBoundingClientRect().left + 16;
+    const next = cards.reduce((best, card, i) => Math.abs(card.getBoundingClientRect().left - left) < Math.abs((cards[best]?.getBoundingClientRect().left ?? left) - left) ? i : best, 0);
+    if (next !== activeRef.current) {
+      activeRef.current = next; setActive(next);
+      if (dotTarget.current == null) analyticsEvents.track('watch_spotlight_swiped', { to: next + 1 });
+    }
+    if (dotTarget.current === next) dotTarget.current = null;
+  };
+  if (!userId || q.isError || !rows.length) return null;
+  return <div data-spotlight-section>
+    <ShelfHeading title={t('amateur.watch.spotlight.title', 'Creator to follow')} />
+    <div ref={rail} className="spotlight-rail" data-spotlight-rail data-single={rows.length === 1} onScroll={scroll}>
+      {rows.map((row, i) => <SpotlightCard key={`${visitKey}:${row.actor_type}:${row.actor_id}`} row={row} visitKey={visitKey} position={i + 1} onDepart={onDepart} />)}
+    </div>
+    {rows.length > 1 ? <div className="spotlight-dots" data-spotlight-dots>{rows.map((row, i) => <Button key={`${row.actor_type}:${row.actor_id}`} variant="ghost" className="spotlight-dot" aria-label={`Creator ${i + 1}`} aria-pressed={active === i} onClick={() => {
+      const el = rail.current; const card = el?.querySelectorAll<HTMLElement>('[data-spotlight]')[i];
+      if (!el || !card) return;
+      dotTarget.current = i;
+      el.scrollTo({ left: el.scrollLeft + card.getBoundingClientRect().left - el.getBoundingClientRect().left - 16, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }}><span aria-hidden /></Button>)}</div> : null}
+  </div>;
+}
+
+function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRow; visitKey: string; position: number; onDepart?: () => void }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const toggle = useToggleFollow();
-  const q = useWatchSpotlight(userId, visitKey);
-  const row = q.data ?? null;
   const vids = useCreatorVideos(row?.actor_type ?? null, row?.actor_id ?? null);
-  const [following, setFollowing] = useState(() => followedVisits.get(visitKey) ?? false);
+  const actorKey = `${visitKey}:${row.actor_type}:${row.actor_id}`;
+  const [following, setFollowing] = useState(() => followedVisits.get(actorKey) ?? false);
   const [pending, setPending] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
-  const shown = !!userId && !q.isError && !!row;
+
 
   useEffect(() => {
     const el = ref.current;
-    if (!shown || !el || viewedVisits.has(visitKey) || typeof IntersectionObserver === 'undefined') return;
+    if (!el || viewedVisits.has(actorKey) || typeof IntersectionObserver === 'undefined') return;
     const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting) && !viewedVisits.has(visitKey)) {
-        viewedVisits.add(visitKey);
-        analyticsEvents.track('watch_spotlight_viewed', { actor_type: row?.actor_type });
+      if (entries.some((e) => e.isIntersecting) && !viewedVisits.has(actorKey)) {
+        viewedVisits.add(actorKey);
+        analyticsEvents.track('watch_spotlight_viewed', { actor_type: row.actor_type, position });
         io.disconnect();
       }
     }, { threshold: 0.5 });
     io.observe(el);
     return () => io.disconnect();
-  }, [shown, visitKey, row?.actor_type]);
+  }, [actorKey, row.actor_type, position]);
 
-  if (!shown || !row) return null;
 
   const business = row.actor_type === 'business';
-  const cells = spotlightCells(row);
   const videos = (vids.data ?? []).slice(0, 3);
   const openProfile = () => navigate(spotlightPath(row, (id, handle) => getProfilePathById(id, undefined, handle ?? undefined)));
 
@@ -76,7 +103,7 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
     if (!user?.id || pending) return;
     const prev = following;
     setFollowing(!prev);
-    followedVisits.set(visitKey, !prev);
+    followedVisits.set(actorKey, !prev);
     setPending(true);
     try {
       await toggle.mutateAsync({
@@ -88,10 +115,10 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
         viewerUserId: user.id,
         isFollowing: prev,
       } as Parameters<typeof toggle.mutateAsync>[0]);
-      if (!prev) analyticsEvents.track('watch_spotlight_follow', { actor_type: row.actor_type });
+      if (!prev) analyticsEvents.track('watch_spotlight_follow', { actor_type: row.actor_type, position });
     } catch {
       setFollowing(prev);
-      followedVisits.set(visitKey, prev);
+      followedVisits.set(actorKey, prev);
       toast.error(prev ? 'Could not unfollow' : 'Could not follow');
     } finally {
       setPending(false);
@@ -99,9 +126,7 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
   };
 
   return (
-    <div data-spotlight={row.actor_id} ref={ref}>
-      <ShelfHeading title={t('amateur.watch.spotlight.title', 'Creator to follow')} />
-      <div style={{ margin: '0 16px', background: '#17171B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: 16, fontFamily: SANS, color: A.INK }}>
+    <div data-spotlight={row.actor_id} ref={ref} className="spotlight-card" style={{ fontFamily: SANS }}>
         <div
           data-spotlight-head
           role="link"
@@ -122,7 +147,7 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.display_name}</span>
               {row.is_verified ? <VerifiedBadge size="sm" /> : null}
             </b>
-            <span data-spotlight-line style={{ display: 'block', fontSize: 12.5, color: A.MUTE, marginTop: 2 }}>{spotlightLine(row)}</span>
+            <span data-spotlight-line className="spotlight-line">{spotlightLine(row, vids.isError ? null : videos[0]?.created_at)}</span>
           </div>
           <button
             type="button"
@@ -141,17 +166,6 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
           </button>
         </div>
 
-        <div data-spotlight-figs={cells.length} style={{ display: 'grid', gridTemplateColumns: `repeat(${cells.length}, 1fr)`, background: '#1E1E23', borderRadius: 14, marginTop: 14 }}>
-          {cells.map((c, i) => (
-            <div key={c.key} data-spotlight-cell={c.key} style={{ padding: '11px 12px', borderLeft: i === 0 ? 0 : '1px solid rgba(255,255,255,0.06)' }}>
-              <b style={{ display: 'block', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>{c.value}</b>
-              <span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM, marginTop: 3 }}>
-                {t(CELL_LABEL[c.key][0], CELL_LABEL[c.key][1])}
-              </span>
-            </div>
-          ))}
-        </div>
-
         {videos.length > 0 ? (
           <div data-spotlight-videos style={{ display: 'flex', gap: 6, marginTop: 12 }}>
             {[0, 1, 2].map((i) => {
@@ -162,19 +176,18 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
                   key={v.post_id}
                   type="button"
                   data-spotlight-video={v.post_id}
-                  onClick={() => { analyticsEvents.track('watch_spotlight_video_opened'); onDepart?.(); openVideoList(videos, i); }}
-                  style={{ flex: 1, height: 118, borderRadius: 10, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer' }}
+                  onClick={() => { analyticsEvents.track('watch_spotlight_video_opened', { position }); onDepart?.(); openVideoList(videos, i); }}
+                  style={{ flex: 1, height: 150, borderRadius: 10, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer' }}
                 >
                   {v.poster_url ? <img src={v.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
                   <span style={{ position: 'absolute', inset: 0 }}>
-                    <DurationChip seconds={v.duration_seconds} bottom={6} right={6} size={10.5} />
+                    <GlassDurationBadge seconds={v.duration_seconds} placement="top-right" top={6} right={6} />
                   </span>
                 </button>
               );
             })}
           </div>
         ) : null}
-      </div>
     </div>
   );
 }
