@@ -79,6 +79,7 @@ import { ClubProfileHero, clubPlace, clubPlaceLine, clubTeamGates } from '@/comp
 import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 
 
 
@@ -267,6 +268,8 @@ const BusinessProfilePage: React.FC = () => {
   };
 
   // ----- early returns -----
+  const islandNameRef = useRef<HTMLHeadingElement>(null);
+  useIslandBackName(!authLoading && !isLoading && !error && !(business?.club_id && clubCoursesPending) ? business?.name ?? null : null, islandNameRef);
   if (authLoading || isLoading || (business?.club_id && clubCoursesPending)) {
     // Same skeleton as the personal profile, configured: hero + headline
     // figure + four-cell strip, no Top 10 rail; CB119: no tab row.
@@ -460,6 +463,7 @@ const BusinessProfilePage: React.FC = () => {
       {isClub ? (
         <ClubProfileHero
           name={business.name}
+          nameRef={islandNameRef}
           logoUrl={business.logo_url}
           coverUrl={heroUrl || clubCourseImage}
           fallbackKey={avatarFallbackKey}
@@ -493,6 +497,7 @@ const BusinessProfilePage: React.FC = () => {
         /* CB112 — every non-club business renders the shared hero. */
         <ClubProfileHero
           name={business.name}
+          nameRef={islandNameRef}
           logoUrl={business.logo_url}
           coverUrl={heroUrl || clubCourseImage}
           fallbackKey={avatarFallbackKey}

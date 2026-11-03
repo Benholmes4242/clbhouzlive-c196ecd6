@@ -85,6 +85,8 @@ export interface ClubTeamActions {
 
 interface Props {
   name: string;
+  /** HB6 page-owned heading observation; standalone hero consumers stay inert. */
+  nameRef?: React.Ref<HTMLHeadingElement>;
   logoUrl?: string | null;
   coverUrl?: string | null;
   fallbackKey?: string | null;
@@ -208,7 +210,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
           </div>
         </div>
 
-        <h1 style={{ marginTop: 12, fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: INK, overflowWrap: 'anywhere' }}>
+        <h1 ref={p.nameRef} style={{ marginTop: 12, fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: INK, overflowWrap: 'anywhere' }}>
           {p.name}
           {p.verified && (
             <span aria-label="Verified" style={{ display: 'inline-flex', marginLeft: 7, verticalAlign: -1 }}>
