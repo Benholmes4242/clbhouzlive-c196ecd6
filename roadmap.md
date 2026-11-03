@@ -3,7 +3,8 @@
 ## HB2 Explore header and island dock
 - [x] Apply Clubhouse folding chrome to /amateur only and replace sticky controls with a shared-state IslandDock; user-ruled selected glass recorded.
 - [ ] Verify observer/focus/accessibility behavior, browser scroll states and resolved selected-glass paint.
-- [ ] STOP: focused 90/91; hb2ExploreDock.test.tsx:50:167 expected '-56px 0px 0px 0px', received '-0px 0px 0px 0px'. No correction, browser check or shards after failure; automatic build OK 14:57:57Z. Report HB2_EXPLORE_REPORT.md.
+- [x] User-authorized 56px fallback for a nonpositive probe and always-mounted hidden controls; keep observer-boundary expectation unchanged, add exit-mount regression. Ignore mistakenly uploaded Courses mock until HB3.
+- [ ] STOP: authorized boundary/mount correction passes HB2 10/10, focused 91/92; ws1WatchTop.test.tsx:319:19 reports “Found multiple elements with the placeholder text of: Search videos and creators”. Existing test untouched; no browser/shards after new failure. Build OK 15:06:52Z; candidate 6,262/559, baseline 6,252/558. Report HB2_EXPLORE_REPORT.md.
 
 ## ISLAND_SQUIRCLE_1 — squircle islands on header B routes
 - [x] 16px (34%) radius on both islands for '/', '/clubhouse', '/tourhub' via spec.condense; guest right and all other routes unchanged.

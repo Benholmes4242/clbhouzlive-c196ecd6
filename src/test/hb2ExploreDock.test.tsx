@@ -32,7 +32,7 @@ describe('HB2 Explore island dock', () => {
     expect(resolveChrome('/amateur', new URLSearchParams())).toMatchObject({ chrome: 'island', left: { kind: 'logo' }, scrim: 'soft', condense: true });
     expect(resolveChrome('/amateur', new URLSearchParams()).scrollAway).toBeUndefined();
   });
-  it('no docked controls while the in-place row remains visible', () => { mount(); passed(160, true); expect(dock()).toHaveAttribute('data-shown', 'false'); expect(dock().querySelector('[role="tablist"]')).toBeNull(); });
+  it('no docked controls while the in-place row remains visible', () => { mount(); passed(160, true); expect(dock()).toHaveAttribute('data-shown', 'false'); expect(within(dock()).queryByRole('tablist')).toBeNull(); });
   it('only a row above the island boundary qualifies, not a row below the viewport', () => { mount(); passed(1000); expect(dock()).toHaveAttribute('data-shown', 'false'); passed(55); expect(dock()).toHaveAttribute('data-shown', 'true'); });
   it('appears below open islands, hides folded, and returns on up scroll', async () => { mount(); passed(); expect(dock()).toHaveAttribute('data-shown', 'true'); await move(160); expect(dock()).toHaveAttribute('data-shown', 'false'); await move(140); expect(dock()).toHaveAttribute('data-shown', 'true'); });
   it('docked filters update the same in-place selection and vice versa', () => {
@@ -41,7 +41,13 @@ describe('HB2 Explore island dock', () => {
     expect(within(inPlace).getByRole('tab', { name: 'Shorts' })).toHaveAttribute('aria-selected', 'true');
     fireEvent.click(within(inPlace).getByRole('tab', { name: 'Community' })); expect(within(dock()).getByRole('tab', { name: 'Community' })).toHaveAttribute('aria-selected', 'true');
   });
-  it('hidden dock is aria-hidden, inert and contains no focusable controls', () => { mount(); expect(dock()).toHaveAttribute('aria-hidden', 'true'); expect(dock()).toHaveAttribute('inert'); expect(dock().querySelector('button,input,[tabindex]')).toBeNull(); });
+  it('hidden dock is aria-hidden, inert and contains no focusable controls', () => { mount(); expect(dock()).toHaveAttribute('aria-hidden', 'true'); expect(dock()).toHaveAttribute('inert'); expect(within(dock()).queryByRole('button')).toBeNull(); expect(within(dock()).queryByRole('tab')).toBeNull(); });
+  it('docked row stays mounted while hidden, inert and aria-hidden for exit animation', async () => {
+    mount(); const row = dock().querySelector('[data-explore-controls="docked"]'); expect(row).not.toBeNull();
+    passed(); expect(dock().querySelector('[data-explore-controls="docked"]')).toBe(row);
+    await move(160); expect(dock().querySelector('[data-explore-controls="docked"]')).toBe(row);
+    expect(dock()).toHaveAttribute('inert'); expect(dock()).toHaveAttribute('aria-hidden', 'true');
+  });
   it('focused docked search remains shown and shares query with the in-place field', async () => {
     mount(); passed(); fireEvent.click(within(dock()).getByRole('button', { name: 'Search' })); const input = within(dock()).getByRole('searchbox'); expect(document.activeElement).toBe(input);
     fireEvent.change(input, { target: { value: 'links' } }); expect(document.querySelector<HTMLInputElement>('[data-explore-controls="in-place"] input')?.value).toBe('links');

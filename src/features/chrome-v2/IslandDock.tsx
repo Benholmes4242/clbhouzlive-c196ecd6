@@ -27,7 +27,8 @@ export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLE
     probe.style.position = 'absolute';
     probe.style.visibility = 'hidden';
     document.body.appendChild(probe);
-    const boundary = probe.getBoundingClientRect().height;
+    const measuredBoundary = probe.getBoundingClientRect().height;
+    const boundary = measuredBoundary > 0 ? measuredBoundary : 56;
     probe.remove();
     const observer = new IntersectionObserver(([entry]) => {
       if (entry) setPast(!entry.isIntersecting && entry.boundingClientRect.bottom < (entry.rootBounds?.top ?? boundary));
@@ -48,6 +49,6 @@ export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLE
       if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
       releaseRef.current?.(); releaseRef.current = null; setFocused(false);
     }}>
-    {shown ? children(shown) : null}
+    {children(shown)}
   </div>;
 }
