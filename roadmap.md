@@ -1,5 +1,10 @@
 # Roadmap
 
+## HB4 Course detail back-name header
+- [ ] Existing /courses/{id} only: fixed folding header, arrow-only 46×46 at rest and observed short-name expansion; deeper routes/tabs unchanged.
+- [ ] Share the existing IslandDock boundary measurement without behavioral changes; add requested regressions and authorized detail scrollAway assertion update.
+- [ ] Scroll signed-off mock and real sat47 browser states; four maxWorkers2 shards from baseline6268/560, clean automatic build, HB4_COURSE_DETAILS_REPORT.md with inventory and quoted test changes.
+
 ## HB3 Courses header and island dock
 - [x] Apply floating/folding chrome to /courses only and reuse IslandDock for the shared-state Courses / Top 100 switch; course details and shared dock behavior unchanged.
 - [x] Six new regressions; focused44/44. Stable real390×844 down500/up450 at sat47: folded46px, dock top109px, agreed glass and Top100 URL/selection readback; guest right byte-identical, no page errors.
