@@ -25905,6 +25905,23 @@ export type Database = {
           videos: number
         }[]
       }
+      get_watch_spotlights: {
+        Args: { p_limit?: number }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          area: string
+          avatar_url: string
+          courses_filmed: number
+          courses_played: number
+          display_name: string
+          handicap_index: number
+          handle: string
+          is_verified: boolean
+          rounds: number
+          videos: number
+        }[]
+      }
       get_watch_top100_videos: {
         Args: { p_before?: string; p_limit?: number }
         Returns: {
