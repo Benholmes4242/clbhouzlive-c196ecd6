@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(), eq: vi.fn(), from: vi.fn(),
   success: vi.fn(), error: vi.fn(), avatar: vi.fn(),
   scores: vi.fn(), lastRound: vi.fn(),
+  gate: vi.fn(), track: vi.fn(),
 }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' }, loading: false }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: { id: 'member', type: 'personal', name: 'Ben', avatarUrl: '/avatar.jpg' }, isLoading: false }) }));
@@ -24,6 +25,8 @@ vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => 
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
 
 vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => mocks.guest }));
+vi.mock('@/features/guest/guestGateStore', async (importOriginal) => ({ ...await importOriginal<typeof import('@/features/guest/guestGateStore')>(), openGuestCard: mocks.gate }));
+vi.mock('@/features/guest/guestAnalytics', () => ({ trackGuestGateShown: mocks.track }));
 import { TourIsland } from '@/features/tourhub/components/TourIsland';
 import { registerNavScroller, resetToExpanded, pushForceExpand } from '@/hooks/useScrollDirection';
 import { useIslandsCondensed } from '@/features/chrome-v2/useIslandsCondensed';
@@ -63,9 +66,46 @@ describe('HEADER_B1 shared state and controls', () => {
     expect(screen.getByRole('button', { name: 'Open profile menu' })).toBeEnabled();
     await move(130); expect(search.getAttribute('aria-hidden')).toBeNull(); expect(search.style.maxWidth).toBe('19px');
   });
-  it('guest right capsule remains byte-identical through condensation', async () => {
-    mocks.guest = true; mount(); const guest = document.querySelector('[data-guest-island]'); const before = guest?.outerHTML;
+  it('GI1 guest fold hides and disables Log in while Join free keeps its handlers', async () => {
+    mocks.guest = true; mocks.gate.mockClear(); mocks.track.mockClear(); mount();
+    const login = screen.getByRole('button', { name: 'Log in' });
+    const join = screen.getByRole('button', { name: 'Join free' });
+    await move(150);
+    expect(login).toHaveAttribute('aria-hidden', 'true'); expect(login.tabIndex).toBe(-1); expect(login).toBeDisabled();
+    expect(login.style.pointerEvents).toBe('none'); expect(login.style.maxWidth).toBe('0');
+    expect(screen.queryByRole('button', { name: 'Log in' })).toBeNull();
+    expect(join).toBeEnabled(); expect(screen.getByRole('button', { name: 'Join free' })).toBe(join);
+    fireEvent.click(login); expect(mocks.gate).not.toHaveBeenCalled();
+    fireEvent.click(join);
+    expect(mocks.track).toHaveBeenCalledExactlyOnceWith({ surface: 'clubhouse', trigger: 'join_button' });
+    expect(mocks.gate).toHaveBeenCalledExactlyOnceWith({ kind: 'join_button', surface: 'clubhouse' });
+    const guest = document.querySelector<HTMLElement>('[data-guest-island]');
+    expect(guest?.style.background).toBe('rgba(14, 14, 16, 0.84)');
+    expect(guest?.style.padding).toBe('0px 6px'); expect(guest?.style.gap).toBe('0');
+  });
+  it('GI1 guest rest uses member squircle glass and preserves Join free dimensions', () => {
+    mocks.guest = true; mount();
+    const guest = document.querySelector<HTMLElement>('[data-guest-island]');
+    const join = screen.getByRole('button', { name: 'Join free' });
+    expect(guest?.style.borderRadius).toBe('16px'); expect(guest?.style.background).toBe('rgba(14, 14, 16, 0.55)');
+    expect(guest?.style.padding).toBe('0px 6px 0px 16px'); expect(guest?.style.gap).toBe('12px');
+    expect(join.style.borderRadius).toBe('12px'); expect(join.style.height).toBe('34px'); expect(join.style.padding).toBe('0px 16px');
+  });
+  it('GI1 non-condense guest capsule remains byte-identical through nav changes', async () => {
+    mocks.guest = true; mount('/discover');
+    const guest = document.querySelector<HTMLElement>('[data-guest-island]'); const before = guest?.outerHTML;
+    expect(guest?.style.borderRadius).toBe('23px'); expect(guest?.style.background).toBe('rgba(14, 14, 16, 0.84)');
+    expect(guest?.style.transition).toBe(''); expect(screen.getByRole('button', { name: 'Join free' }).style.borderRadius).toBe('17px');
     await move(150); expect(guest?.outerHTML).toBe(before);
+  });
+  it('GI1 Log in restores after upward scroll and retains auth navigation', async () => {
+    const Location = () => <output data-testid="location">{useLocation().pathname}</output>;
+    mocks.guest = true;
+    render(<QueryClientProvider client={client()}><MemoryRouter><ChromeIsland /><Location /></MemoryRouter></QueryClientProvider>);
+    const login = screen.getByRole('button', { name: 'Log in' });
+    await move(150); fireEvent.click(login); expect(screen.getByTestId('location')).toHaveTextContent('/');
+    await move(130); expect(login).toBeEnabled(); expect(login).not.toHaveAttribute('aria-hidden'); expect(login.tabIndex).toBe(0);
+    fireEvent.click(login); expect(screen.getByTestId('location')).toHaveTextContent('/auth');
   });
   it('opted left and right glass move from rest token to canonical material', async () => {
     mount(); const left = screen.getByRole('button', { name: 'Go to home' }); const right = document.querySelector<HTMLElement>('[data-island-right]');

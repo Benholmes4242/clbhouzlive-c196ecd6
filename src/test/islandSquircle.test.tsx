@@ -50,13 +50,13 @@ describe('ISLAND_SQUIRCLE_1', () => {
     expect(right?.style.borderRadius).toBe('16px');
   });
 
-  it('the guest right island keeps its round shape on a condense route', async () => {
+  it('GI1 guest right island uses the squircle shape on a condense route', async () => {
     mocks.guest = true;
     mount('/');
     const guest = document.querySelector<HTMLElement>('[data-guest-island]');
-    expect(guest?.style.borderRadius).toBe('23px');
+    expect(guest?.style.borderRadius).toBe('16px');
     await move(150);
-    expect(guest?.style.borderRadius).toBe('23px');
+    expect(guest?.style.borderRadius).toBe('16px');
   });
 
   it('the folded Clubhouse left island is 30px mark + 7px padding + 1px border each side', async () => {

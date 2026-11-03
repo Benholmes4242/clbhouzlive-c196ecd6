@@ -1,5 +1,9 @@
 # Roadmap
 
+## GI1 signed-out header island
+- [ ] Condense-only guest squircle/glass and accessible Log in fold; preserve Join free actions and non-condense output.
+- [ ] Authorized test rewrites and new regressions; real signed-out rest/fold captures at390×844/sat47, four shards maxWorkers2, clean automatic build and reconciled report.
+
 ## HB5 Profile back-name header
 - [x] Authorized correction: only tourOverviewBand's stale example route /profile/ben→/discover, all assertions unchanged; exact diff quoted in HB5_PROFILE_REPORT.md. Shard4 rerun1619/1619; final1594+1520+1558+1619=6291/562, zero failures/unhandled errors; +13/+1 solely hb5ProfileBackName from6278/561, correction count unchanged. Automatic build OK16:43:35Z.
 - [x] Personal profile roots only: history back, shared HB4 full-name observation; optional ref through ProfileHero to actual ProfileCoverBand heading (HeroShell unused). Content/excluded routes unchanged.

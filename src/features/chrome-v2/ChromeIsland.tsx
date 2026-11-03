@@ -590,11 +590,14 @@ export const AvatarCell: React.FC<{
 // ---------------------------------------------------------------------------
 // Guest right capsule (GUEST BROWSING §2, signed-off mock frame 1): the
 // member content (search, index, avatar) is replaced by "Log in" and a white
-// "Join free" pill. The left logo island is unchanged.
+// "Join free" pill. GI1 opts only condense routes into member glass/folding;
+// legacy routes retain their exact markup/styles and both actions stay owned here.
 // ---------------------------------------------------------------------------
-const GuestRightCapsule: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
+const GuestRightCapsule: React.FC<{ tone: ChromeTone; fold?: boolean }> = ({ tone, fold }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const condensed = useIslandsCondensed();
+  const folded = fold && condensed;
   const surface = surfaceForPath(location.pathname);
   return (
     <div
@@ -605,11 +608,22 @@ const GuestRightCapsule: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
         padding: '0 6px 0 16px',
         gap: 12,
         position: 'relative',
+        ...(fold ? {
+          ...ISLAND_GLASS,
+          borderRadius: 16,
+          background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)',
+          padding: condensed ? '0 6px' : '0 6px 0 16px',
+          gap: condensed ? 0 : 12,
+          transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition), var(--island-fold-transition)',
+        } : {}),
       }}
     >
       <button
         type="button"
         onClick={() => navigate('/auth')}
+        aria-hidden={folded ? true : undefined}
+        tabIndex={folded ? -1 : undefined}
+        disabled={folded ? true : undefined}
         style={{
           background: 'none',
           border: 'none',
@@ -618,6 +632,15 @@ const GuestRightCapsule: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
           fontSize: 14,
           fontWeight: 700,
           color: 'rgba(248,250,252,0.62)',
+          ...(fold ? {
+            maxWidth: condensed ? 0 : 80,
+            opacity: condensed ? 0 : 1,
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            pointerEvents: condensed ? 'none' : 'auto',
+            transition: REDUCED_MOTION ? 'none' : 'var(--island-fold-transition)',
+          } : {}),
         }}
       >
         {GUEST_ISLAND_COPY.login}
@@ -631,7 +654,7 @@ const GuestRightCapsule: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
         style={{
           height: 34,
           padding: '0 16px',
-          borderRadius: 17,
+          borderRadius: fold ? 12 : 17,
           background: '#F3F5F7',
           border: 'none',
           cursor: 'pointer',
@@ -781,7 +804,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         {/* RIGHT capsule — guests get Log in / Join free instead of the
             member content (search, index, avatar). */}
         {isGuest ? (
-          <GuestRightCapsule tone={tone} />
+          <GuestRightCapsule tone={tone} fold={spec.condense === true} />
         ) : (
         <div
           data-island-right
