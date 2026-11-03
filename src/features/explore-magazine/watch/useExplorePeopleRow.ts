@@ -15,6 +15,8 @@ export interface ExplorePerson {
   has_new: boolean;
   new_post_ids: string[];
   latest_at: string | null;
+  /** EXPLORE_ROW_V2: that person's visible video count. */
+  videos: number;
 }
 
 export function useExplorePeopleRow(limit: number, userId: string | undefined) {

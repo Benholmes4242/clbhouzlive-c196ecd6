@@ -60,3 +60,27 @@ export function creatorSecondLine(videos7d: number | null | undefined, area: str
   const short = area ? shortCourseName(area) : '';
   return short ? { kind: 'area', area: short } : null;
 }
+
+/* EXPLORE_TOP_2 — GOLFERS TO WATCH. Up to 20 cards; See all at 21+ others. */
+export const PEOPLE_CARDS_MAX = 20;
+export const PEOPLE_SEE_ALL_MIN = 21;
+export function showsPeopleSeeAll(others: number): boolean {
+  return others >= PEOPLE_SEE_ALL_MIN;
+}
+
+export type PersonWhy = 'following' | 'creator' | 'postedToday';
+export type PersonDetail =
+  | { kind: 'newToday'; count: number }
+  | { kind: 'newTodayBare' }
+  | { kind: 'newCount'; count: number }
+  | { kind: 'videos'; count: number };
+
+/** Lines 2 and 3 by tier (mock notes); n = new_post_ids.length. `isNew`
+ *  inks line 3 when it describes something new. */
+export function personLines(p: { tier: string; has_new: boolean; new_post_ids: string[]; videos?: number | null }): { why: PersonWhy; detail: PersonDetail; isNew: boolean } {
+  const n = p.new_post_ids.length;
+  if (p.tier === 'following') return { why: 'following', detail: { kind: 'newToday', count: n }, isNew: true };
+  if (p.tier === 'creator' && p.has_new) return { why: 'creator', detail: { kind: 'newTodayBare' }, isNew: true };
+  if (p.tier === 'member') return { why: 'postedToday', detail: { kind: 'newCount', count: n }, isNew: true };
+  return { why: 'creator', detail: { kind: 'videos', count: p.videos ?? 0 }, isNew: false };
+}
