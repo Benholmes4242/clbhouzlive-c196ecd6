@@ -25,6 +25,7 @@
 }
 
 :root {
+  --watch-spotlight-dot: rgba(248,250,252,.24);
   --suggestion-card: #17171B;
   --suggestion-ink: #F8FAFC;
   --suggestion-cover-empty: linear-gradient(135deg, #2A2D35 0%, #1E2027 55%, #17171B 100%);

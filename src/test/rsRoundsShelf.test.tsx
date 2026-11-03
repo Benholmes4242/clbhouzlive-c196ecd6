@@ -47,7 +47,7 @@ vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useGridVideos: () => ({ data: undefined, isLoading: false, isError: false, hasNextPage: false, fetchNextPage: () => {} }),
 }));
 vi.mock('@/features/explore-magazine/watch/useWatchBottom', () => ({
-  useWatchSpotlight: () => ({ data: null, isError: false }),
+  useWatchSpotlights: () => ({ data: [], isError: false }),
   useCreatorVideos: () => ({ data: [] }),
   useTop100Videos: () => ({ data: [], isError: false }),
 }));

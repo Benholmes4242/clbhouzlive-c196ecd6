@@ -11,7 +11,8 @@ import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { DurationChip, ShelfHeading, shelfRow } from './CourseVideosShelf';
+import { ShelfHeading, shelfRow } from './CourseVideosShelf';
+import { GlassBadge, GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { useTop100Videos } from './useWatchBottom';
 import { rankPill, showsTop100Shelf } from './watchBottom';
 import { whoLine, type WatchVideoRow } from './watchMiddle';
@@ -43,6 +44,13 @@ export function Top100FilmShelf({ userId, onDepart }: { userId: string | null | 
     return () => io.disconnect();
   }, [shown]);
 
+  if (!userId || q.isError) return null;
+  if (q.isLoading) return (
+    <div data-top100-skeleton aria-hidden>
+      <ShelfHeading title={t('amateur.watch.top100.title', 'Top 100 on film')} sub={t('amateur.watch.top100.sub', 'The lists, filmed by members')} />
+      <div style={shelfRow}>{[0, 1, 2].map(i => <span key={i} style={{ flex: 'none', width: 156, height: 248, borderRadius: 12, background: 'var(--activity-tile)' }} />)}</div>
+    </div>
+  );
   if (!shown) return null;
 
   return (
@@ -64,14 +72,14 @@ export function Top100FilmShelf({ userId, onDepart }: { userId: string | null | 
               onDepart?.();
               openVideoList(rows as unknown as WatchVideoRow[], i);
             }}
-            style={{ flex: 'none', width: 156, height: 220, borderRadius: 14, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer', textAlign: 'left', fontFamily: SANS, color: A.INK }}
+            style={{ flex: 'none', width: 156, height: 248, borderRadius: 12, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer', textAlign: 'left', fontFamily: SANS, color: A.INK }}
           >
             {row.poster_url ? <img src={row.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
             <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.82))' }} />
-            <span data-top100-rank style={{ position: 'absolute', left: 8, top: 8, zIndex: 1, height: 22, padding: '0 8px', borderRadius: 999, background: 'rgba(0,0,0,0.55)', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.06em', display: 'flex', alignItems: 'center', fontVariantNumeric: 'tabular-nums' }}>
-              {rankPill(row)}
+            <span data-top100-rank>
+              <GlassBadge corner="top-left" inset={6} fontSize={11} style={{ fontWeight: 700, letterSpacing: '0.04em', padding: '3px 9px', fontVariantNumeric: 'tabular-nums' }}>{rankPill(row)}</GlassBadge>
             </span>
-            <DurationChip seconds={row.duration_seconds} top={8} right={8} size={11.5} />
+            <GlassDurationBadge seconds={row.duration_seconds} placement="top-right" top={6} right={6} />
             <span style={{ position: 'absolute', left: 10, right: 10, bottom: 10, zIndex: 1 }}>
               <span data-top100-course style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontSize: 12.5, fontWeight: 700, lineHeight: 1.25, textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
                 {shortCourseName(row.course_name ?? '')}

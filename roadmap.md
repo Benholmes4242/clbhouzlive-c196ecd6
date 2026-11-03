@@ -1,5 +1,11 @@
 # Roadmap
 
+## WS6 Creator to follow and Top 100 on film
+- [x] Plural per-visit read, independent creator cards, recency line, snap rail and clickable scroll dots.
+- [x] Top 100 156×248 tiles/skeletons with canonical glass rank and duration; frozen content unchanged; phone geometry verified in isolated browser fixture.
+- [x] Focused140/140; four full shards1501+1469+1501+1552=6,023/548 (+18 ws3WatchBottom); zero failures/unhandled errors; automatic build clean; WS6_REPORT.md quotes rewritten cases.
+- [ ] Signed-in Watch readback/full mock parity unavailable (external_unmanaged); responsive written width applied, mock's fixed340px difference reported.
+
 ## VIDEO_POSTERS_1
 - [x] Added/deployed only pick-video-poster with pure measured-frame rules and secret-authenticated existing RPC calls; live dry run 200, unauthorized 401, invalid limit 400. No write run or schedule created.
 - [x] Explicit thumbnail times and poster-aligned Watch preview starts/repeats; real players unchanged. Real browser black-intro fixture revealed only >=2s moving picture.

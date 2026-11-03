@@ -1,5 +1,5 @@
 /**
- * WS3 reads: the WATCH_S3_V1 RPCs. The spotlight is keyed by a per-visit key
+ * WS6 reads: plural spotlights are keyed by a per-visit key
  * WatchFeed mints on mount, so a fresh pick arrives each visit and stays put
  * while the page is open (no refetch on rerender, chip switch or focus).
  */
@@ -8,9 +8,9 @@ import { supabase } from '@/integrations/supabase/client';
 import type { WatchVideoRow } from './watchMiddle';
 import { SPOTLIGHT_VIDEOS, TOP100_SHELF_LIMIT, type SpotlightRow, type Top100VideoRow } from './watchBottom';
 
-export function useWatchSpotlight(userId: string | null | undefined, visitKey: string) {
-  return useQuery<SpotlightRow | null>({
-    queryKey: ['watch-s3', 'spotlight', userId, visitKey],
+export function useWatchSpotlights(userId: string | null | undefined, visitKey: string) {
+  return useQuery<SpotlightRow[]>({
+    queryKey: ['watch-s3', 'spotlights', userId, visitKey],
     enabled: !!userId,
     staleTime: Infinity,
     gcTime: 30 * 60_000,
@@ -18,9 +18,9 @@ export function useWatchSpotlight(userId: string | null | undefined, visitKey: s
     refetchOnReconnect: false,
     refetchOnMount: false,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_watch_spotlight');
+      const { data, error } = await supabase.rpc('get_watch_spotlights', { p_limit: 3 });
       if (error) throw error;
-      return (data ?? [])[0] ?? null;
+      return data ?? [];
     },
   });
 }
