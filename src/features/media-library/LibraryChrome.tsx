@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect } from 'react';
+import { useCallback, useLayoutEffect, type Ref } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -74,14 +74,14 @@ export function LibraryChrome({ label }: { label: string }) {
 }
 
 /** The media destination's single page title. Kind totals live on the chips. */
-export function LibraryHead({ title }: { title: string }) {
+export function LibraryHead({ title, nameRef }: { title: string; nameRef?: Ref<HTMLHeadingElement> }) {
   return (
     <div
       style={{
         padding: '10px 0 12px',
       }}
     >
-      <h1 style={{ margin: 0, font: `800 20px/1.1 ${SANS}`, color: A.INK }}>{title}</h1>
+      <h1 ref={nameRef} style={{ margin: 0, font: `800 20px/1.1 ${SANS}`, color: A.INK }}>{title}</h1>
     </div>
   );
 }

@@ -385,6 +385,18 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/discover' },               spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: false } },
 ];
 
+// HB6_GROUP1: existing island entries share the signed-off fixed header B.
+// News page files stay untouched under the user's ruling; registry chrome
+// still opts in. The unmatched default is not a registry entry and stays legacy.
+for (const rule of CHROME_REGISTRY) {
+  if (rule.spec.chrome !== 'island' || rule.spec.condense === true) continue;
+  rule.spec = { ...rule.spec, scrim: 'soft', condense: true };
+  delete rule.spec.scrollAway;
+  if (rule.match.test === isBusinessProfilePath) {
+    rule.spec.left = { kind: 'back', title: null, backTarget: 'history', backFallback: '/' };
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Default fallback
 // ---------------------------------------------------------------------------

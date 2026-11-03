@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState, useRef } from 'react';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { useNavigationType, useSearchParams } from 'react-router-dom';
 
 import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
@@ -50,6 +51,8 @@ const KIND_LABELS: Record<MediaKind, string> = {
 };
 
 export default function MediaLibraryPage() {
+  const islandNameRef = useRef<HTMLHeadingElement>(null);
+  useIslandBackName('Media', islandNameRef);
   const [params, setParams] = useSearchParams();
   const raw = params.get('kind');
   const kind: MediaKind = (KINDS as ReadonlyArray<string>).includes(raw ?? '') ? (raw as MediaKind) : 'community';
@@ -177,7 +180,7 @@ export default function MediaLibraryPage() {
       <main style={{ paddingTop: 'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))' }}>
 
         <div style={{ padding: `0 ${GUTTER}px` }}>
-          <LibraryHead title="Media" />
+          <LibraryHead title="Media" nameRef={islandNameRef} />
         </div>
 
         {/* THE KIND RAIL — the canonical chip, each carrying its count. One wall
