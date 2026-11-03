@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tour player page rebuild — player-v2
+- [ ] Rebuild the signed-off player page using header-owned season/tour, recorded wins and existing pick/follow doors; preserve LiveNowStrip.
+- [ ] Add concrete rule/section tests, reconcile all retired or rewritten assertions against 6,168 tests / 554 files, run four shards and check the preview.
+- [ ] Report every touched file and any unavailable read or verification.
+
 ## Tournament picks build 2 — guest availability and reason checks
 - [x] Guest Pick card only for unlocked upcoming events; number words only checked as figures in win/won/wins reasons, digit rules preserved.
 - [x] Focused52/52; four shards1,578+1,507+1,529+1,554=6,168/554, zero failures/unhandled errors. +8 solely tournamentPickInsights.test.tsx (44→52), no existing tests changed. Automatic build11:52:05Z OK; PICK_BUILD2_SMALL_FIXES_REPORT.md records case names and commands.
