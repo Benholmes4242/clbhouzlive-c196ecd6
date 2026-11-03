@@ -1,14 +1,19 @@
 # Roadmap
 
+## Consolidated CM1 then TU1
+- [x] Apply only authorised Merged Airy heading14→16 and grid bottom14→0 expectations; other assertions/product frozen.
+- [x] Run all four CM1 shards with maxWorkers2:1681/1543/1648/1642 =6514 tests/578 files, zero failures/unhandled errors; CM1 complete. Test count +42/+2 reconciled in CM1_REPORT.md; build OK23:02:08Z.
+- [ ] After CM1 green, implement queued TU1 and run four shards again; reconcile every named test delta and preserve all failure output.
+
 ## Authorised Picks continuation
 - [x] Scope integratedPicks circle assertion to its text element, expected copy unchanged; focused23/23 and shard1 passed.
 - [x] Add guest public lock/time reads and null-time copy; preserve member state reads; five new rule tests pass.
-- [ ] STOP: focused115/115; shard1 1681/1681; shard2 1540 passed/3 failed at tourOverviewMergedAiry.test.tsx:78:98 “expected '16px' to be '14px'” for upcoming/live/completed. Shards3–4 and TU1 not started. Full logs/report preserved in PICKS_AUTHORISED_CONTINUATION_REPORT.md and docs/verification/picks-authorised.
+- [x] Historical spacing stop resolved by consolidated authorised two-line correction; focused16/16 and all four CM1 shards6514/6514 clean. Original full failing output remains preserved.
 
 ## TU1 two-up video grids
 - [x] Apply authorised CM1 test-only scrollPageToTop mock; focused 148/148 passed without unhandled errors. Corrected Community mock received/read.
-- [ ] CM1 full green prerequisite still unmet: integratedPicks assertion now passes; current shard2 spacing failures stop remaining shards (see Authorised Picks continuation).
-- [ ] CM1 resumption with only Integrated Picks exempt: shard2 rerun1540 passed/3 non-exempt spacing failures at tourOverviewMergedAiry.test.tsx:78:98 “expected '16px' to be '14px'”; stopped before shards3–4/TU1. No test/source edits; CM1_REPORT.md and docs/verification/cm1-resume/shard-2.log preserve result.
+- [x] CM1 full-green prerequisite satisfied:6514/6514 tests/578 files, four clean shards after both authorised Picks test fixes; no exemptions.
+- [x] Historical shard2 resumption stop preserved in CM1_REPORT.md and docs/verification/cm1-resume/shard-2.log; consolidated run supersedes it.
 - [ ] Once unblocked, extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; preserve chrome/paging/actions.
 - [ ] Update authorised tile assertions, add rank/duration/wrapping/navigation coverage and report reconciled four-shard totals/build, retaining any failing output.
 
@@ -21,7 +26,7 @@
 - [x] Select Community in place, add watch deep links and retire Media page with legacy redirects; guest rules and shared totals preserved.
 - [x] Apply grid specification and white rating correction; corrected cm1-community-see-all.html received/read; surrounding frozen UI preserved.
 - [x] Authorised test-only correction passes focused148/148 with zero unhandled errors; build OK22:36:07Z. Corrected mock received; CM1_REPORT.md preserves historical output and current verification.
-- [ ] Full-suite completion blocked by current shard2 Tour spacing failures; corrected integratedPicks passes shard1. Signed-in live comparison remains unavailable external_unmanaged.
+- [x] Full suite6514/6514 clean; CM1 complete under requested criterion. Signed-in live comparison remains unavailable external_unmanaged and is not claimed.
 
 ## FIX_GRID_1
 - [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.

@@ -75,9 +75,9 @@ describe('Merged Airy lower sections', () => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase={phase} />);
     const picks = v.container.querySelector<HTMLElement>('[data-overview-picks]');
     expect(picks?.style.paddingTop).toBe('8px'); const hairline = picks?.querySelector<HTMLElement>('[data-overview-picks-hairline]'); expect(hairline).not.toBeNull(); expect(hairline?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
-    expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('14px');
+    expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('16px');
     expect(picks?.querySelector<HTMLElement>('[data-overview-pick-card]')?.style.padding).toBe('7px');
-    expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('14px');
+    expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('0px');
   });
   it('tightens upcoming first tee and last-year rows without changing their contents', () => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={[]} currentRound={null} phase="upcoming" />);
