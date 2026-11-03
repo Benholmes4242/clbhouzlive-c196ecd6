@@ -77,7 +77,10 @@ vi.mock('@/hooks/usePrefersReducedMotion', () => ({ usePrefersReducedMotion: () 
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: f.track } }));
 
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
-import { RailChips } from '@/components/ui/RailChips';
+import { APPLIED_FILL, RailChips, SELECTED_EDGE } from '@/components/ui/RailChips';
+import { readFileSync } from 'node:fs';
+import { CHROME_BREATHING } from '@/lib/chromeClearance';
+import { retiredReason } from '@/features/admin/lib/retiredEvents';
 import { ExploreTopControls } from '@/features/explore-magazine/watch/ExploreTopControls';
 import type { ExplorePerson } from '@/features/explore-magazine/watch/useExplorePeopleRow';
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
@@ -90,6 +93,8 @@ import {
   leadCaption,
   leadKickerKey,
   leadShape,
+  personLines,
+  showsPeopleSeeAll,
   showsCreatorsRow,
   showsCreatorsSeeAll,
 } from '@/features/explore-magazine/watch/watchTopRules';
@@ -324,82 +329,120 @@ describe('WS1 chips', () => {
 
 /* ------------------------------------------------------------- creators */
 
-const person = (id: string, over: Partial<ExplorePerson> = {}): ExplorePerson => ({ tier: 'quiet', actor_id: id, display_name: `Name ${id}`, handle: `h-${id}`, avatar_url: null, is_verified: false, is_creator: false, has_new: false, new_post_ids: [], latest_at: null, ...over });
+const person = (id: string, over: Partial<ExplorePerson> = {}): ExplorePerson => ({ tier: 'quiet', actor_id: id, display_name: `Name ${id}`, handle: `h-${id}`, avatar_url: null, is_verified: false, is_creator: false, has_new: false, new_post_ids: [], latest_at: null, videos: 0, ...over });
 const people = (...others: ExplorePerson[]) => { f.creators = { data: [person('me', { tier: 'you' }), ...others], isFetched: true, isError: false }; };
+const topCss = readFileSync('src/features/explore-magazine/watch/explore-top.css', 'utf8');
+const cardsOf = (container: HTMLElement) => Array.from(container.querySelectorAll('[data-watch-creators="row"] [data-explore-card]')) as HTMLElement[];
+/* jsdom normalises colours; compare through the same parser. */
+const norm = (prop: 'background' | 'borderColor', value: string) => { const el = document.createElement('div'); el.style[prop] = value; return el.style[prop]; };
 
-describe('WS1 Creators row', () => {
-  it('You is first with a plus and opens the existing composer', () => {
+describe('EXPLORE_TOP_2 Golfers to watch', () => {
+  it('no you card is rendered and no plus or composer path exists', () => {
+    people(person('a'));
+    const { container } = mountFeed();
+    const cards = cardsOf(container);
+    expect(cards).toHaveLength(1);
+    expect(cards[0].getAttribute('aria-label')).toBe('Name a');
+    expect(screen.queryByText('You')).toBeNull();
+    expect(container.querySelector('[data-explore-plus]')).toBeNull();
+    fireEvent.click(cards[0]);
+    expect(usePostStudioStore.getState().isOpen).toBe(false);
+    expect(f.track).not.toHaveBeenCalledWith('explore_row_you_tapped');
+  });
+  it('explore_row_you_tapped is in the retired events registry', () => {
+    expect(retiredReason('explore_row_you_tapped')).toBeTruthy();
+  });
+  it('shows the Golfers to watch heading through the shelf heading without a sub-line', () => {
     people(person('a'));
     const { container } = mountFeed();
     const row = container.querySelector('[data-watch-creators="row"]') as HTMLElement;
-    const buttons = within(row).getAllByRole('button');
-    expect(buttons[0].getAttribute('aria-label')).toBe('You');
-    expect(buttons[0].querySelector('[data-explore-plus]')).not.toBeNull();
-    fireEvent.click(buttons[0]);
-    expect(usePostStudioStore.getState().isOpen).toBe(true);
-    expect(usePostStudioStore.getState().initialActorId).toBe('me');
-    expect(f.track).toHaveBeenCalledWith('explore_row_you_tapped');
+    expect(within(row).getByText('Golfers to watch')).toBeTruthy();
+    expect(row.querySelectorAll('[data-explore-card]')[0].previousElementSibling).toBeNull();
   });
-  it('only has_new wears a ring and quiet names are muted while You stays ink', () => {
-    people(person('a', { has_new: true }), person('b'));
+  it('each tier prints its own lines 2 and 3, with line 3 inked only when new', () => {
+    people(
+      person('f', { tier: 'following', has_new: true, new_post_ids: ['p1', 'p2'] }),
+      person('c', { tier: 'creator', has_new: true, new_post_ids: ['p3'] }),
+      person('m', { tier: 'member', has_new: true, new_post_ids: ['p4', 'p5', 'p6'] }),
+      person('q', { tier: 'quiet', videos: 38 }),
+      person('one', { tier: 'quiet', videos: 1 }),
+    );
     const { container } = mountFeed();
-    expect(container.querySelectorAll('[data-creator-ring="true"]')).toHaveLength(1);
-    expect(screen.getByText('Name a').getAttribute('data-name-ink')).toBe('ink');
-    expect(screen.getByText('Name b').getAttribute('data-name-ink')).toBe('mute');
-    expect(screen.getByText('You').getAttribute('data-name-ink')).toBe('ink');
+    const lines = cardsOf(container).map((c) => [c.querySelector('[data-explore-why]')!.textContent, c.querySelector('[data-explore-detail]')!.textContent, c.querySelector('[data-explore-detail]')!.getAttribute('data-new')]);
+    expect(lines).toEqual([
+      ['Following', '2 new today', 'true'],
+      ['Creator', 'new today', 'true'],
+      ['Posted today', '3 new', 'true'],
+      ['Creator', '38 videos', 'false'],
+      ['Creator', '1 video', 'false'],
+    ]);
   });
-  it('all names occupy the same sibling slot without a second line', () => {
-    people(person('a', { has_new: true }), person('b'));
+  it('personLines follows the tier rules, n = new_post_ids.length', () => {
+    expect(personLines({ tier: 'following', has_new: true, new_post_ids: ['a', 'b'] })).toEqual({ why: 'following', detail: { kind: 'newToday', count: 2 }, isNew: true });
+    expect(personLines({ tier: 'creator', has_new: true, new_post_ids: ['a'] })).toEqual({ why: 'creator', detail: { kind: 'newTodayBare' }, isNew: true });
+    expect(personLines({ tier: 'member', has_new: true, new_post_ids: ['a', 'b', 'c'] })).toEqual({ why: 'postedToday', detail: { kind: 'newCount', count: 3 }, isNew: true });
+    expect(personLines({ tier: 'quiet', has_new: false, new_post_ids: [], videos: 1 })).toEqual({ why: 'creator', detail: { kind: 'videos', count: 1 }, isNew: false });
+  });
+  it('names reserve two lines so lines 2 and 3 share a top offset across one- and two-line names', () => {
+    people(person('a', { display_name: 'Jay' }), person('b', { display_name: 'golfingwithellie and a much longer second line' }));
     const { container } = mountFeed();
-    const buttons = within(container.querySelector('[data-watch-creators="row"]') as HTMLElement).getAllByRole('button');
-    for (const button of buttons) {
-      expect(button.children).toHaveLength(2);
-      expect(button.children[0].classList.contains('explore-person-ring')).toBe(true);
-      expect(button.children[1].classList.contains('explore-person-name')).toBe(true);
+    for (const card of cardsOf(container)) {
+      const kids = Array.from(card.children).map((k) => k.className);
+      expect(kids).toEqual(['explore-card-ring', 'explore-card-name', 'explore-card-why', 'explore-card-detail']);
     }
+    const nameRule = topCss.match(/\.explore-card-name \{([^}]*)\}/)![1];
+    expect(nameRule).toContain('min-height:calc(13px * 1.25 * 2)');
+    expect(nameRule).toContain('-webkit-line-clamp:2');
+    expect(nameRule).toContain('line-height:1.25');
+    expect(nameRule).not.toContain('nowrap');
   });
   it('has_new opens the permitted posts oldest first at index zero', async () => {
     people(person('a', { tier: 'following', has_new: true, new_post_ids: ['old', 'new'] }));
     mountFeed(); fireEvent.click(screen.getByRole('button', { name: 'Name a' }));
     await vi.waitFor(() => expect(f.openWithOrigin).toHaveBeenCalledWith(expect.objectContaining({ posts: [{ id: 'old' }, { id: 'new' }], index: 0, openedFrom: 'explore-people' })));
     expect(f.loadPosts).toHaveBeenCalledWith(['old', 'new'], expect.objectContaining({ userId: 'me', actorType: 'personal' }));
-    expect(f.track).toHaveBeenCalledWith('explore_row_tapped', { tier: 'following', position: 2, has_new: true });
+    expect(f.track).toHaveBeenCalledWith('explore_row_tapped', { tier: 'following', position: 1, has_new: true });
   });
-  it('a quiet tile goes to the existing profile destination without loading posts', () => {
+  it('a quiet card goes to the existing profile destination without loading posts', () => {
     people(person('a')); mountFeed(); fireEvent.click(screen.getByRole('button', { name: 'Name a' }));
     expect(screen.getByTestId('loc').getAttribute('data-path')).toBe('/profile/h-a');
     expect(f.loadPosts).not.toHaveBeenCalled();
   });
-  it('See all appears only at 21 others and the row caps others at 20', () => {
+  it('See all appears only at 21 or more others, the rail caps at 20 and has no See all tile', () => {
     people(...Array.from({ length: 20 }, (_, i) => person(`c${i}`)));
     const first = mountFeed();
     expect(within(first.container.querySelector('[data-watch-creators="row"]') as HTMLElement).queryByText('See all')).toBeNull();
     first.unmount(); people(...Array.from({ length: 21 }, (_, i) => person(`c${i}`)));
     const second = mountFeed(); const row = second.container.querySelector('[data-watch-creators="row"]') as HTMLElement;
     expect(within(row).getByText('See all')).toBeTruthy();
-    expect(within(row).getAllByRole('button')).toHaveLength(22);
+    expect(cardsOf(second.container)).toHaveLength(20);
+    expect(within(row.querySelector('[data-explore-rail]') as HTMLElement).queryByText('See all')).toBeNull();
     expect(within(row).queryByText('Name c20')).toBeNull();
+    expect(showsPeopleSeeAll(20)).toBe(false);
+    expect(showsPeopleSeeAll(21)).toBe(true);
   });
   it('hides for anonymous guests even when people return', () => {
     f.anonymous = true; people(person('a')); const { container } = mountFeed();
     expect(container.querySelector('[data-watch-creators]')).toBeNull();
   });
-  it('hides when only You returns', () => {
-    people(); const { container } = mountFeed(); expect(container.querySelector('[data-watch-creators="row"]')).toBeNull();
+  it('the whole section, heading included, is hidden when only you comes back', () => {
+    people(); const { container } = mountFeed();
+    expect(container.querySelector('[data-watch-creators]')).toBeNull();
+    expect(screen.queryByText('Golfers to watch')).toBeNull();
   });
-  it('the loading skeleton has five avatar and name pairs and no heading', () => {
+  it('the loading skeleton is a heading place plus three card placeholders', () => {
     f.creators = { data: [], isFetched: false, isError: false }; const { container } = mountFeed();
     const skeleton = container.querySelector('[data-watch-creators="skeleton"]') as HTMLElement;
-    expect(skeleton.querySelectorAll('.explore-person-ring')).toHaveLength(5);
-    expect(skeleton.querySelectorAll('.explore-name-skeleton')).toHaveLength(5);
-    expect(skeleton.querySelector('h2')).toBeNull();
+    expect(skeleton.querySelectorAll('.explore-head-skeleton')).toHaveLength(1);
+    expect(skeleton.querySelectorAll('.explore-card-skeleton')).toHaveLength(3);
   });
-  it('See all opens the same sheet with the larger people list and follow action', async () => {
+  it('See all opens the same sheet with the larger list, without you, and the follow action', async () => {
     people(...Array.from({ length: 21 }, (_, i) => person(`c${i}`)));
-    f.creatorsSheet = { data: [person('extra')], isFetched: true, isError: false };
+    f.creatorsSheet = { data: [person('me', { tier: 'you' }), person('extra')], isFetched: true, isError: false };
     const { container } = mountFeed(); fireEvent.click(within(container.querySelector('[data-watch-creators="row"]') as HTMLElement).getByText('See all'));
     expect(f.track).toHaveBeenCalledWith('explore_row_see_all');
     const sheet = screen.getByTestId('bottom-sheet'); expect(within(sheet).getByText('Name extra')).toBeTruthy();
+    expect(within(sheet).queryByText('You')).toBeNull();
     fireEvent.click(within(sheet).getByText('Follow'));
     await vi.waitFor(() => expect(f.follow.mutateAsync).toHaveBeenCalledWith(expect.objectContaining({ targetActorType: 'personal', targetActorId: 'extra' })));
   });
@@ -407,6 +450,9 @@ describe('WS1 Creators row', () => {
     people(person('a')); mountFeed(); fireVisible(); fireVisible();
     expect(f.track.mock.calls.filter(([name]) => name === 'explore_row_viewed')).toHaveLength(1);
   });
+});
+
+describe('EXPLORE_TOP_2 controls', () => {
   it('search opens with Cancel and Cancel clears the query and restores chips', () => {
     mountFeed(); expect(screen.queryByRole('searchbox')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Search videos and creators' }));
@@ -420,15 +466,38 @@ describe('WS1 Creators row', () => {
     expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('walton');
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeTruthy();
   });
-  it('RailChips lg leaves default and sm caller selection behaviour unchanged', () => {
-    render(<MemoryRouter><QueryClientProvider client={new QueryClient()}>{(['lg', 'md', 'sm'] as const).map((size) => <RailChips key={size} size={size} options={[{ id: 'a', label: size }, { id: 'b', label: `${size} other` }]} value="a" onChange={() => {}} ariaLabel={size} />)}</QueryClientProvider></MemoryRouter>);
-    for (const size of ['lg', 'md', 'sm']) {
-      const tabs = within(screen.getByRole('tablist', { name: size })).getAllByRole('tab');
-      expect(tabs[0].getAttribute('aria-selected')).toBe('true'); expect(tabs[1].getAttribute('aria-selected')).toBe('false');
+  it('the Explore chips use APPLIED_FILL and SELECTED_EDGE when selected, are uppercase and have no counts', () => {
+    render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><ExploreTopControls query="" onQuery={() => {}} options={[{ id: 'a', label: 'For you', value: 12 }, { id: 'b', label: 'Shorts', value: 4 }]} value="a" onChange={() => {}} ariaLabel="Filters" placeholder="Search" sticky={false} /></QueryClientProvider></MemoryRouter>);
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs[0].style.background).toBe(norm('background', APPLIED_FILL));
+    expect(tabs[0].style.border).toContain(norm('borderColor', SELECTED_EDGE));
+    expect(tabs[1].style.background).toBe('transparent');
+    for (const tab of tabs) {
+      expect(tab.style.textTransform).toBe('uppercase');
+      expect(tab.style.height).toBe('34px');
+      expect(tab.style.borderRadius).toBe('13px');
+      expect(tab.children).toHaveLength(0);
     }
-    expect(screen.getByRole('tablist', { name: 'lg' }).classList.contains('explore-lg-chips')).toBe(true);
-    expect(screen.getByRole('tablist', { name: 'md' }).classList.contains('explore-lg-chips')).toBe(false);
-    expect(screen.getByRole('tablist', { name: 'sm' }).classList.contains('explore-lg-chips')).toBe(false);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts']);
+  });
+  it('the control row sits 8 below the islands', () => {
+    const rule = topCss.match(/\.explore-top-controls \{([^}]*)\}/)![1];
+    expect(rule).toContain('padding:0 16px');
+    const margin = Number(rule.match(/margin-top:(-?\d+)px/)![1]);
+    expect(CHROME_BREATHING + margin).toBe(8);
+  });
+  it('other RailChips callers are unchanged', () => {
+    render(<MemoryRouter><QueryClientProvider client={new QueryClient()}>{(['md', 'sm'] as const).map((size) => <RailChips key={size} size={size} options={[{ id: 'a', label: size, value: 3 }, { id: 'b', label: `${size} other` }]} value="a" onChange={() => {}} ariaLabel={size} />)}<RailChips options={[{ id: 'a', label: 'default' }]} value="a" onChange={() => {}} ariaLabel="default" /></QueryClientProvider></MemoryRouter>);
+    for (const size of ['md', 'sm', 'default']) {
+      const list = screen.getByRole('tablist', { name: size });
+      const tabs = within(list).getAllByRole('tab');
+      expect(tabs[0].getAttribute('aria-selected')).toBe('true');
+      expect(tabs[0].style.background).toBe(norm('background', APPLIED_FILL));
+      expect(tabs[0].style.textTransform).toBe('');
+      expect(tabs[0].style.height).toBe('');
+      expect(list.classList.contains('explore-tile-chips')).toBe(false);
+    }
+    expect(within(screen.getByRole('tablist', { name: 'md' })).getAllByRole('tab')[0].textContent).toBe('md3');
   });
 });
 
