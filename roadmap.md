@@ -1,5 +1,9 @@
 # Roadmap
 
+## WS6.1 Creator card width and names
+- [x] Correct multi-card width to min(340px, calc(100% - 18px)); uncut wrapping names with inline verification; preserve all other geometry and actions.
+- [ ] Run focused tests and all four full shards; reconcile inventory and document build/browser evidence in WS6_1_REPORT.md.
+
 ## WS6 Creator to follow and Top 100 on film
 - [x] Plural per-visit read, independent creator cards, recency line, snap rail and clickable scroll dots.
 - [x] Top 100 156×248 tiles/skeletons with canonical glass rank and duration; frozen content unchanged; phone geometry verified in isolated browser fixture.

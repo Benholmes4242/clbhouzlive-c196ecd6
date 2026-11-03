@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createInstance } from 'i18next';
@@ -375,6 +376,31 @@ describe('WS3 Long form', () => {
 });
 
 describe('WS6 swipeable creator cards', () => {
+  it('WS6.1: card width uses min(340px, calc(100% - 18px))', () => {
+    const css = readFileSync('src/features/explore-magazine/watch/spotlight.css', 'utf8');
+    expect(css).toMatch(/\.spotlight-card\s*\{[^}]*width:min\(340px, calc\(100% - 18px\)\)/);
+    expect(css).not.toContain('100% - 50px');
+    expect(css).toContain('.spotlight-rail[data-single="true"] .spotlight-card { width:100%; }');
+  });
+  it('WS6.1: a 30-character name is uncut with inline verification and a nonshrinking Follow pill', () => {
+    const name = 'abcdefghijklmnopqrstuvwxyzabcd';
+    f.spotlight = { data: spot({ display_name: name }), isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    const label = document.querySelector<HTMLElement>('[data-spotlight-name]');
+    expect(label?.textContent?.trim()).toBe(name);
+    expect(label?.style.whiteSpace).toBe('');
+    expect(label?.style.overflow).toBe('');
+    expect(label?.style.textOverflow).toBe('');
+    expect(label?.style.webkitLineClamp).toBe('');
+    expect(label?.style.overflowWrap).toBe('anywhere');
+    expect(label?.style.fontSize).toBe('17px');
+    expect(label?.style.fontWeight).toBe('700');
+    expect(label?.querySelector('[aria-label="Verified"]')).toHaveClass('inline', 'align-middle');
+    const follow = document.querySelector<HTMLElement>('[data-spotlight-follow]');
+    expect(follow).not.toBeNull();
+    expect(follow?.style.flex).toBe('0 0 auto');
+    expect(document.querySelector<HTMLElement>('[data-spotlight-head]')?.style.alignItems).toBe('center');
+  });
   it('three creators render three cards and three dots', () => {
     f.spotlight = { data: [spot(), spot({ actor_id: 'p2' }), spot({ actor_id: 'p3' })], isError: false };
     wrap(<CreatorSpotlight userId="me" visitKey="v" />);
