@@ -1,10 +1,11 @@
 # Roadmap
 
 ## HB5 Profile back-name header
-- [ ] Authorized correction: change only tourOverviewBand's stale example route to /discover, assertions unchanged; rerun shard4 then finish browser fixture proof/report.
+- [x] Authorized correction: only tourOverviewBand's stale example route /profile/ben→/discover, all assertions unchanged; exact diff quoted in HB5_PROFILE_REPORT.md. Shard4 rerun1619/1619; final1594+1520+1558+1619=6291/562, zero failures/unhandled errors; +13/+1 solely hb5ProfileBackName from6278/561, correction count unchanged. Automatic build OK16:43:35Z.
 - [x] Personal profile roots only: history back, shared HB4 full-name observation; optional ref through ProfileHero to actual ProfileCoverBand heading (HeroShell unused). Content/excluded routes unchanged.
-- [ ] STOP: focused54/54; shards1594/1520/1558/1618pass+1fail =6290/6291 executed562 files (+13/+1 solely hb5ProfileBackName from6278/561). tourOverviewBand.test.tsx:67:40 expects profile soft fade null; exact error/full output in HB5_PROFILE_REPORT.md and /tmp/hb5/shard4.log. No correction/rerun; await scoped assertion ruling. Automatic build OK16:34:25Z.
-- [ ] Mock scrolled600/550 and captured; fixture sat47 rest46×46 verified. Folded/named fixture remains expanded/unnamed despite actual scroll, not verified; stop prevents further apparatus work. Hosted member proof unavailable external_unmanaged. Report quotes two authorized existing test rewrites and all13 new cases.
+- [x] Historical tourOverviewBand.test.tsx:67:40 STOP cleared by explicit route-only authorization; original full failing output retained /tmp/hb5/shard4-original-failure.log. Focused54/54; no product/test assertion changes in correction.
+- [x] Mock scrolled600/550; real-component bundled browser fixture sat47 top46×46/top57, down600 folded46×46/glass0.84, up550 named161.453125×46/Back from Chris Leeson/glass0.55 screenshots inspected, zero page errors. Runtime/module and artificial fixed-position traps fixed only in temporary apparatus; shared engine untouched. Report inventories all changes and limits.
+- [ ] Hosted authenticated profile proof unavailable external_unmanaged; fixture does not establish authenticated page readback or full right-capsule/fade parity.
 
 ## HB4 Course detail back-name header
 - [x] Existing /courses/{id} only implementation: fixed folding header and observed short-name expansion; deeper routes/tabs unchanged. Shared boundary extraction; HB2 tests unchanged10/10; authorized HB3 detail assertion quoted in report.
