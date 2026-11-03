@@ -4,7 +4,7 @@
 import { ordinal, rankWord, wordNumber, pronouns, FIT_STATS, type FitKey } from '../components/overview-v3/HybridHeroBands/pickInsightRules';
 import { fullTourLabel, mapTourSlug } from '../_shared/tourOrder';
 import { isAnyMajor } from '../utils/majorScope';
-import { countryToIso2, titleCaseCountry } from '../utils/countryFlags';
+import { countryCodeToFlag } from '../utils/countryFlags';
 import type { PlayerHeader, PlayerResult, PlayerHoles, PlayerStat, PlayerPickHistory } from './data/usePlayerData';
 import type { MyScoring, TourAverages } from '../players-v2/you/youAndTourRules';
 export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -96,11 +96,13 @@ export function pickHistoryLine(history:PlayerPickHistory,tour:string):CopyLine 
   return {bold:count===1?'once':count===2?'twice':`${wordNumber(count)} times`,rest:wins ? `${p.subject} won ${wins===1?'one':wordNumber(wins)} of them.` : best?`${p.possessive} best finish for us: ${best.position} at the ${best.name}.`:''};
 }
 const STATES:Record<string,string>={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',DC:'District of Columbia'};
+const countryIso = (name:string) => {const flag=countryCodeToFlag(name);return flag ? [...flag].map(c=>String.fromCharCode((c.codePointAt(0)??0)-127397)).join('') : '';};
+const countryName = (name:string) => {const iso=countryIso(name);return iso ? new Intl.DisplayNames(['en'],{type:'region'}).of(iso)??name : name;};
 export function cleanPlace(place:string|null,country:string|null):string|null {
   if(!place) return null; const parts=[...new Map(place.split(',').map(s=>s.trim()).filter(Boolean).map(s=>[s.toUpperCase(),s])).values()]; if(!parts.length)return null;
-  const iso=countryToIso2(parts.at(-1)??'')||countryToIso2(country??'');
+  const iso=countryIso(parts.at(-1)??'')||countryIso(country??'');
   if(iso==='US') {const state=parts.slice(1).find(p=>STATES[p.toUpperCase()]||Object.values(STATES).some(s=>s.toUpperCase()===p.toUpperCase()));return [parts[0],state?STATES[state.toUpperCase()]??state:null].filter(Boolean).join(', ');}
-  const last=parts.at(-1)??''; const resolved=countryToIso2(last)?titleCaseCountry(last):country?titleCaseCountry(country):null;
+  const last=parts.at(-1)??''; const resolved=countryIso(last)?countryName(last):country?countryName(country):null;
   return [parts[0],resolved&&resolved.toUpperCase()!==parts[0].toUpperCase()?resolved:parts.length>1?parts[1]:null].filter(Boolean).join(', ');
 }
 export function sectionVisibility(starts:number,stats:PlayerStat[],holes:PlayerHoles|null,tour:TourAverages|null,mine:MyScoring|null,member:boolean) {

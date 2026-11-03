@@ -25,6 +25,15 @@
 }
 
 :root {
+  --player-canvas: #0A0A0C;
+  --player-fallback: #16161A;
+  --player-white: #FFFFFF;
+  --player-other: rgba(248,250,252,.55);
+  --player-out: rgba(248,250,252,.3);
+  --player-round-bar: rgba(248,250,252,.16);
+  --player-win-tile: rgba(251,188,46,.14);
+  --player-win-row: linear-gradient(90deg,rgba(251,188,46,.10),rgba(251,188,46,0) 75%);
+  --player-you-tile: rgba(10,10,12,.5);
   --pick-sheet: #16161A;
   --pick-canvas: #0A0A0C;
   --pick-under: #E24B3F;
