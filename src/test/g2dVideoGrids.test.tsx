@@ -6,19 +6,20 @@ import { I18nextProvider } from 'react-i18next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import locale from '../../public/locales/en/courses.json';
+import { readFileSync } from 'node:fs';
 import WatchGridPage from '@/pages/WatchGridPage';
 import { resolveChrome } from '@/features/chrome-v2/registry';
 import { IslandBackCapsule } from '@/features/chrome-v2/IslandBackCapsule';
 import { registerNavScroller, resetToExpanded } from '@/hooks/useScrollDirection';
 
-const f = vi.hoisted(() => ({ regions: [{ region: 'Scotland', videos: 24, courses: 6 }], sources: [] as unknown[], track: vi.fn(), open: vi.fn() }));
+const f = vi.hoisted(() => ({ rows: [] as Record<string, unknown>[], regions: [{ region: 'Scotland', videos: 24, courses: 6 }], sources: [] as unknown[], track: vi.fn(), open: vi.fn() }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: f.track } }));
 vi.mock('@/features/explore-magazine/watch/openVideoList', () => ({ openVideoList: f.open }));
 vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useWatchRegions: () => ({ data: f.regions }),
   useRegionCourses: () => ({ data: [{ course_id: 'st', course_name: 'St Andrews' }, { course_id: 'kb', course_name: 'Kingsbarns' }] }),
-  useGridVideos: (_id: unknown, source: unknown) => { f.sources.push(source); return { data: { pages: [[]] }, isSuccess: true, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }; },
+  useGridVideos: (_id: unknown, source: unknown) => { f.sources.push(source); return { data: { pages: [f.rows] }, isSuccess: true, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }; },
 }));
 // Real i18n avoids a partial mock affecting shared PageTitle/rail imports.
 const lang = createInstance();
@@ -40,8 +41,62 @@ function mount(kind: 'region' | 'courses' | 'top100', region = 'Scotland') {
 }
 beforeEach(() => {
   resetToExpanded(); callbacks.clear(); f.track.mockClear(); f.sources = []; f.regions = [{ region: 'Scotland', videos: 24, courses: 6 }];
+  f.rows = []; f.open.mockClear();
   scroller = document.createElement('div'); scroller.id = 'root'; document.body.appendChild(scroller); unregister = registerNavScroller(scroller);
   window.IntersectionObserver = class { cb: IntersectionObserverCallback; constructor(cb: IntersectionObserverCallback) { this.cb = cb; } observe(target: Element) { callbacks.set(target, this.cb); } disconnect() {} unobserve() {} } as unknown as typeof IntersectionObserver;
+});
+
+const film = (extra: Record<string, unknown> = {}) => ({ post_id: 'film', poster_url: 'https://example.com/poster.jpg', duration_seconds: 56, course_name: 'Royal County Down · Championship', display_name: 'A creator with a complete long name', handle: 'creator', ...extra });
+describe('TU1 two-up video grid', () => {
+  it('uses two columns, 10px column gaps and 18px row gaps', () => {
+    f.rows = [film()]; mount('top100'); const grid = node('[data-grid]');
+    expect(grid.style.gridTemplateColumns).toBe('repeat(2, 1fr)');
+    expect(grid.style.columnGap).toBe('10px'); expect(grid.style.rowGap).toBe('18px');
+    expect(grid.style.padding).toBe('0px 14px'); expect(grid.style.alignItems).toBe('start');
+  });
+  it('a positive Top 100 rank renders #4 with the existing glass chip', () => {
+    f.rows = [film({ list_rank: 4 })]; mount('top100');
+    expect(node('[data-grid-rank]').textContent).toBe('#4');
+    expect(node('[data-grid-rank]')).toHaveClass('review-tile-chip');
+  });
+  it.each([undefined, 0, -1])('Top 100 rank %s renders no rank chip', rank => {
+    f.rows = [film({ list_rank: rank })]; mount('top100'); expect(document.querySelector('[data-grid-rank]')).toBeNull();
+  });
+  it.each(['courses', 'region'] as const)('%s never renders a rank even when supplied', kind => {
+    f.rows = [film({ list_rank: 4 })]; mount(kind); expect(document.querySelector('[data-grid-rank]')).toBeNull();
+  });
+  it('56 seconds renders the shared bottom-right 0:56 badge', () => {
+    f.rows = [film()]; mount('courses'); const badge = node('[data-watch-badge="duration"]');
+    expect(badge.textContent).toBe('0:56'); expect(badge.style.right).toBe('6px'); expect(badge.style.bottom).toBe('6px');
+    expect(badge.closest('[data-grid-frame]')).toBeTruthy();
+  });
+  it('full course and creator text sit below the frame without truncation', () => {
+    f.rows = [film()]; mount('courses');
+    expect(node('[data-grid-course]').textContent).toBe('Royal County Down · Championship');
+    expect(node('[data-grid-creator]').textContent).toBe('A creator with a complete long name');
+    for (const selector of ['[data-grid-course]', '[data-grid-creator]']) {
+      const text = node(selector); expect(text.style.whiteSpace).not.toBe('nowrap'); expect(text.style.textOverflow).not.toBe('ellipsis');
+      expect(text.style.overflow).not.toBe('hidden'); expect(text.style.overflowWrap).toBe('anywhere');
+      expect(text.parentElement).toBe(node('[data-grid-tile]'));
+    }
+  });
+  it('no display name or handle omits the creator element', () => {
+    f.rows = [film({ display_name: '', handle: '' })]; mount('courses'); expect(document.querySelector('[data-grid-creator]')).toBeNull();
+  });
+  it('a missing display name uses the full handle', () => {
+    f.rows = [film({ display_name: '', handle: 'a-very-long-complete-handle' })]; mount('courses'); expect(node('[data-grid-creator]').textContent).toBe('a-very-long-complete-handle');
+  });
+  it('the entire second tile opens the loaded list at index one', () => {
+    f.rows = [film(), film({ post_id: 'second' })]; mount('top100'); fireEvent.click(node('[data-grid-tile="second"]'));
+    expect(f.open).toHaveBeenCalledOnce(); expect(f.open).toHaveBeenCalledWith(f.rows, 1);
+    expect(f.track).toHaveBeenCalledWith('watch_grid_video_opened', { kind: 'top100' });
+  });
+  it('preserves portrait and semantic colour source values jsdom cannot retain', () => {
+    const source = readFileSync('src/pages/WatchGridPage.tsx', 'utf8');
+    expect(source).toContain("aspectRatio: '4 / 5'"); expect(source).toContain("background: 'var(--watch-grid-poster)'");
+    expect(source).toContain("color: 'var(--watch-grid-rank-ink)'");
+    expect(source).not.toContain('height: 172'); expect(source).not.toContain('DurationChip'); expect(source).not.toContain('linear-gradient');
+  });
 });
 afterEach(() => { cleanup(); unregister(); scroller.remove(); resetToExpanded(); window.IntersectionObserver = original; });
 describe('G2D video-grid islands', () => {
