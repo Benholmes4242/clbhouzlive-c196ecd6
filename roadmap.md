@@ -2,7 +2,7 @@
 
 ## Tournament picks build 2 — guest availability and reason checks
 - [x] Guest Pick card only for unlocked upcoming events; number words only checked as figures in win/won/wins reasons, digit rules preserved.
-- [ ] Run focused regressions and all four full-suite shards; report per-shard counts and reconcile eight new cases against 6,160 / 554.
+- [x] Focused52/52; four shards1,578+1,507+1,529+1,554=6,168/554, zero failures/unhandled errors. +8 solely tournamentPickInsights.test.tsx (44→52), no existing tests changed. Automatic build11:52:05Z OK; PICK_BUILD2_SMALL_FIXES_REPORT.md records case names and commands.
 
 ## Tournament picks heading correction
 - [x] Restore tee-day heading whenever teeDay exists outside completed; retain fit/measure behaviour and live/final fallback; tourOverviewPicksTeeLine.test.tsx unchanged.
