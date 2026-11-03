@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Tour Overview Merged Airy
-- [ ] Merge the situation and Full board into the 340px photo with the resolved20px inset; tighten only the specified overview blocks in all three states.
-- [ ] Update authorized geometry/structure coverage, run focused and four full-suite shards, confirm automatic checks, and reconcile all tests/files in the report.
+- [x] Merge the situation and Full board into the340px photo with resolved20px inset; apply specified lower-section spacing, preserving TournamentPage's SituationBand.
+- [ ] STOP: focused172/174; cb58LeadersGroup:171:44 and tourOverviewMergedAiry:100:225 expect a CSS-variable border shorthand omitted by the test DOM. Full output /tmp/tour-airy-focused.log; await scoped assertion authorization. No full shards/browser comparison after failure; candidate6,041/549 (+16/+1), not a full pass count. Automatic build clean; TOUR_OVERVIEW_MERGED_AIRY_REPORT.md quotes errors and all changed tests.
 
 ## WS6.1 Creator card width and names
 - [x] Correct multi-card width to min(340px, calc(100% - 18px)); uncut wrapping names with inline verification; preserve all other geometry and actions.
