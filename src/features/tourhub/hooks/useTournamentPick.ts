@@ -1,5 +1,6 @@
 /** Tournament pick reads stay RPC-only and viewer-keyed. Mutations refetch active
- * state explicitly; field ordering and lock authority belong to the server. */
+ * state explicitly; field ordering and lock authority belong to the server.
+ * Guest availability uses only the public scalar lock RPCs, never member state. */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -81,5 +82,24 @@ export function useSetTournamentPick() {
     onSuccess: (_data, { tournamentId }) => client.invalidateQueries({
       queryKey: tournamentPickStateKey(tournamentId, user?.id), refetchType: 'active',
     }),
+  });
+}
+
+export function useGuestTournamentPickLock(tournamentId: string, enabled = true) {
+  const { user } = useSupabaseSession();
+  const guest = !user || user.is_anonymous || Boolean(getGuestUser());
+  return useQuery({
+    queryKey: ['tourhub', 'guest-pick-lock', tournamentId, user?.id],
+    enabled: Boolean(tournamentId && guest && enabled),
+    staleTime: 0, refetchOnMount: 'always',
+    queryFn: async (): Promise<{ locks_at: string | null; locked: boolean }> => {
+      const [time, lock] = await Promise.all([
+        supabase.rpc('tournament_pick_locks_at', { p_tournament_id: tournamentId }),
+        supabase.rpc('tournament_pick_is_locked', { p_tournament_id: tournamentId }),
+      ]);
+      if (time.error) throw time.error;
+      if (lock.error) throw lock.error;
+      return { locks_at: typeof time.data === 'string' ? time.data : null, locked: lock.data === true };
+    },
   });
 }

@@ -32,7 +32,7 @@ export function YourPickCard({state,phase,ourResults,tourCode,onPick,teeTime,sta
   else if (phase==='live') sub=compareLivePick(mine,ourResults);
   else sub=state?.my_percentile!=null ? copy('beatField',{value:state.my_percentile}) : '';
   const heading=!hasPick ? copy('winnerQuestion') : phase==='upcoming' ? copy('pickedHeading') : phase==='live' ? liveCircleHeading(circleRank,copy) : finishedOurHeading(mine,ourResults,copy);
-  const line=!hasPick ? (lock ? copy('winnerLine',lock) : copy('winnerLineNoTime')) : phase==='upcoming' ? (lock ? copy('pickedLine',lock) : copy('pickedLineNoTime')) : phase==='live' ? liveOurLine(mine,ourResults,copy) : state ? finishedCircleLine(circleRank,state,copy) : '';
+  const line=!hasPick ? (guest ? lock ? copy('guestWinnerLine',lock) : copy('guestWinnerLineNoTime') : lock ? copy('winnerLine',lock) : copy('winnerLineNoTime')) : phase==='upcoming' ? (lock ? copy('pickedLine',lock) : copy('pickedLineNoTime')) : phase==='live' ? liveOurLine(mine,ourResults,copy) : state ? finishedCircleLine(circleRank,state,copy) : '';
   const best=state?.followed_best;
   const circleLine=phase==='completed' ? '' : phase==='upcoming' && (state?.followed_pickers ?? 0)>0 ? copy('circlePicked',{count:state?.followed_pickers,name:surnameOf(state?.followed_top[0]?.player_name ?? '')}) : phase==='live' && best ? copy('circleBest',{name:surnameOf(best.player_name),position:resultPosition({playerId:best.player_id??'',playerName:best.player_name,position:best.position,tied:best.tied})}) : '';
   return <div className="pick-mine" data-your-pick-card>

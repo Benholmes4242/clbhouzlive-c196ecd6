@@ -178,6 +178,8 @@
       "winnerQuestion": "Who's your winner?",
       "winnerLine": "Beat your circle. One pick before the first tee, {{time}} {{day}}, scored the same way as ours.",
       "winnerLineNoTime": "Beat your circle. One pick before the first tee, scored the same way as ours.",
+      "guestWinnerLine": "One pick before the first tee, {{time}} {{day}}, scored the same way as ours.",
+      "guestWinnerLineNoTime": "One pick before the first tee, scored the same way as ours.",
       "noPickYet": "No pick yet",
       "pickedHeading": "You're in. Now beat your circle.",
       "pickedLine": "Your pick locks at the first tee, {{time}} {{day}}. You can change it until then.",

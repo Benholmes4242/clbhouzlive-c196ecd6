@@ -1,5 +1,10 @@
 # Roadmap
 
+## Authorised Picks continuation
+- [ ] Scope integratedPicks circle assertion to its text element, expected copy unchanged.
+- [ ] Add guest public lock/time reads and null-time copy; preserve member state reads.
+- [ ] Run focused checks, then four shards with per-shard counts; stop/report any unexpected failure before TU1.
+
 ## TU1 two-up video grids
 - [x] Apply authorised CM1 test-only scrollPageToTop mock; focused 148/148 passed without unhandled errors. Corrected Community mock received/read.
 - [ ] STOP: CM1 shard1 has 1680 passed/1 pre-existing integratedPicks failure at src/test/integratedPicks.test.tsx:36:542, Expected “6 of your circle have picked. Most picked: Ghim.” Received “DG6 of your circle have picked. Most picked: Ghim.” Full output docs/verification/cm1-authorised/shard-1.log. Shards2–4 and TU1 not started; CM1 full green prerequisite unmet.
