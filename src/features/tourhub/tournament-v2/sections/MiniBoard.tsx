@@ -36,6 +36,8 @@ interface Props {
   tournamentId: string;
   entries: Row[];
   limit?: number;
+  presentation?: 'tournament';
+  winnerPlayerId?:string|null;
   /** Active round from sr_tournaments.current_round - scopes TODAY and THRU. */
   currentRound?: number | null;
   /**
@@ -227,7 +229,7 @@ export function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null, presentation, winnerPlayerId }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
@@ -346,6 +348,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600, color: ink }}>{overviewName(entity.lines[0])}</span>
   );
 
+  if(presentation==='tournament')return <><div className="tv-board"><div className="tv-board-head"><span>{t('board.columns.pos')}</span><span>{t('board.columns.player')}</span><span>{phase==='completed'?`R${currentRound??heroCols.rounds.length}`:panelScoreLabel}</span><span>{t('board.columns.tot')}</span></div>{rows.map(r=>{const today=todayFromEntry(r,currentRound);return <Button variant="ghost" key={r.id} className="tv-board-row" data-winner={phase==='completed'&&r.player?.id===winnerPlayerId} disabled={!r.player?.id} onClick={()=>{if(!r.player)return;setTarget({playerId:r.player.id,playerName:r.player.full_name,countryCode:r.player.country_code??null,position:r.position,total:r.score,today,thru:r.thru??null,status:r.status??null});}}><span>{r.position!=null?`${r.position_tied?'T':''}${r.position}`:r.status??''}</span><span className="tv-board-who">{r.player&&<SquircleAvatar size={24} srcCandidates={resolvePlayerAvatarCandidates({name:r.player.full_name,photoUrl:r.player.photo_url,tourSlug})} alt={r.player.full_name} userId={r.player.id} hairlineRing/>}<span>{r.player?.full_name??resolveBoardEntity(r,needsInitials,nameTier).prose}</span></span><span className={today!=null&&today<0?'tv-under':''}>{today!=null?fmtScore(today):''}</span><span className={r.score!=null&&r.score<0?'tv-under':''}>{r.score!=null?fmtScore(r.score):''}</span></Button>;})}</div><ScorecardSheet open={!!target} onClose={()=>setTarget(null)} tournamentId={tournamentId} target={target}/></>;
   if (theme === 'heroBoard') {
     return (
       <>

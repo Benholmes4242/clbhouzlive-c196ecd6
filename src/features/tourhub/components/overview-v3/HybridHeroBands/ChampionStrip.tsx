@@ -38,6 +38,8 @@ interface ChampionStripProps {
   playerKey?: string | null;
   /** Pass 5.5: italic editorial narrative beneath the name. */
   narrative?: string | null;
+  presentation?: 'tournament';
+  narrativeParts?: {text:string;bold?:boolean}[];
 }
 
 
@@ -65,11 +67,14 @@ export function ChampionStrip({
   avatarCandidates,
   playerKey,
   narrative,
+  presentation,
+  narrativeParts,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
   const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
   const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
+  if(presentation==='tournament')return <section className="tv-champion" data-tv-section="champion"><div className="tv-champion-top"><PlayerHead size={46} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey}/><div><div className="tv-champion-label">{resolvedEyebrow}</div><div className="tv-champion-name">{name}</div></div><div className="tv-champion-score"><b className={scoreValue!=null&&scoreValue<0?'tv-under':''}>{score}</b>{scoreLabel&&<small>{scoreLabel}</small>}</div></div>{narrativeParts&&narrativeParts.length>0&&<p className="tv-champion-line">{narrativeParts.map((p,i)=>p.bold?<b key={i}>{p.text}</b>:<span key={i}>{p.text}</span>)}</p>}</section>;
   return (
     <div
       style={{
