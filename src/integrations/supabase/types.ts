@@ -25177,6 +25177,16 @@ export type Database = {
           player_key: string
         }[]
       }
+      get_tournament_course_holes: {
+        Args: { p_tournament_id: string }
+        Returns: {
+          course_name: string
+          course_par: number
+          hole_no: number
+          par: number
+          yards: number
+        }[]
+      }
       get_tournament_hole_analysis: {
         Args: { p_round?: number; p_tournament_id: string }
         Returns: Json
