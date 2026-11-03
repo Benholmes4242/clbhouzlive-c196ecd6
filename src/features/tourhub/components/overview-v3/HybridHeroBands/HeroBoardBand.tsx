@@ -74,14 +74,11 @@ import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { LeadersGroup } from './LeadersGroup';
-import { useTournamentPickState } from '../../../hooks/useTournamentPick';
-import { useOurPickRecord } from '../../../hooks/usePickInsights';
+import { PickMemberBands } from './PickMemberBands';
 import { YourPickSheet } from './YourPickSheet';
-import { YourPickCard } from './YourPickCard';
 import { OurRecordSheet } from './OurRecordSheet';
 import { finishedVerdict, resultPosition, type PickResult } from './pickInsightRules';
-import { getGuestUser } from '@/features/guest/guestGateStore';
-import { useGuestActionGate } from '@/features/guest/useGuestActionGate';
+import { Button } from '@/components/ui/button';
 import './pickPanels.css';
 
 
@@ -673,14 +670,7 @@ function PicksBlock({
 }) {
   const { t } = useTranslation('tourhub');
   const cards = picks.slice(0, 3);
-  const stateQuery=useTournamentPickState(tournamentId);
-  const state=stateQuery.isError ? null : stateQuery.data ?? null;
-  const recordQuery=useOurPickRecord(tourCode,seasonYear);
-  const record=recordQuery.isError ? null : recordQuery.data;
-  const gate=useGuestActionGate();
-  const openMine=()=>{if(gate('pick')) return; onOpenYourPick();};
   const verdict=finishedVerdict(pickResults,[...championPlayerIds,...(championPlayerId?[championPlayerId]:[])]);
-  const mineTees=usePickTeeTimes(tournamentId,phase==='upcoming'?1:currentRound??1,state?.my_player_id?[state.my_player_id]:[],{enabled:Boolean(state?.my_player_id && phase!=='completed')});
   const recordCopy=(key:string,options:Record<string,unknown>={})=>t(`overview.pickRecord.${key}`,options);
   /* A card shows a tee time only with no figure line and no start — the same
      rule the card applies below; the heading's day reads exactly these. */
@@ -831,9 +821,7 @@ function PicksBlock({
           );
         })}
       </div>
-      <YourPickCard state={state} phase={phase} ourResults={pickResults} tourCode={tourCode} onPick={openMine} guest={Boolean(getGuestUser())} teeTime={state?.my_player_id ? mineTees.data?.get(state.my_player_id) : null} started={state?.my_player_id ? startedPlayers.has(state.my_player_id):false}/>
-      {phase!=='completed' && state && (phase==='upcoming' ? state.followed_pickers>=1 : Boolean(state.followed_best)) && <div className="pick-follow-line" data-followed-picks><span className="pick-follow-stack">{state.followed_top.slice(0,3).map(top=><span key={top.player_id}><PlayerAvatar playerId={top.player_id} playerName={top.player_name} tourCode={tourCode} size={18}/></span>)}</span><span>{phase==='upcoming'?recordCopy('followed',{count:state.followed_pickers,name:surnameOf(state.followed_top[0]?.player_name ?? '')}):state.followed_best ? recordCopy('bestFollowed',{name:surnameOf(state.followed_best.player_name),position:resultPosition({playerId:state.followed_best.player_id??'',playerName:state.followed_best.player_name,position:state.followed_best.position,tied:state.followed_best.tied})}):''}</span></div>}
-      {record && record.picks>0 && <Button variant="ghost" className="pick-record-door" data-our-record-door onClick={onOpenRecord}><span>{recordCopy('kicker')}</span><span>{recordCopy('wins',{count:record.won})} · {recordCopy('topTens',{count:record.top10})} <small>{recordCopy('from',{count:record.picks})}</small></span></Button>}
+      {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} onPick={onOpenYourPick} onRecord={onOpenRecord}/>}
     </div>
   );
 }
