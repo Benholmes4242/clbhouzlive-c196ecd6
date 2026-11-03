@@ -3,6 +3,9 @@
 ## RR1 Recent rounds on Explore
 - [x] One paged get_recent_rounds read (circle→everyone fallback), feats out of the shelf, Leaderboards pill, 16px snap inset, sentinel pagination, end tile, eight-rule line under every card.
 - [x] rsRoundsShelf.test.tsx rewritten per brief (22 → 31 cases, removals quoted in the report); focused 31/31; four full shards 5,959/545 (+9), zero failures/unhandled errors; automatic build clean; RR1_RECENT_ROUNDS_REPORT.md.
+
+## WHO_TO_FOLLOW thinner dark band on unringed card avatars
+- [x] ActiveRing inactive card branch: 2px transparent outer + 1.5px #17171B inner band (total still 3.5px, slot unchanged); canvas and active branches untouched. Two new activeRing cases (inactive+card structure, inactive+canvas plain) with the same-slot assertion inside the card case; focused 27/27; four full shards 1,501+1,477+1,534+1,459 = 5,971/545 (+2), zero failures/unhandled errors; tsgo clean.
 - [ ] Signed-in visual check against the mock blocked by external_unmanaged authentication.
 
 ## WS4 Shorts shelf tiles
