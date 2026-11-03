@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tournament picks build 1 — Your pick sheet
+- [x] Build isolated member field/state/mutation hooks and signed-off Opened, Chosen, Search and locked sheet; no overview entrypoints.
+- [ ] STOP: focused24/25; yourPickSheet.test.tsx:85:81 expected 'Alejandro FierroNot ranked', received 'AFAlejandro FierroNot ranked' (canonical avatar initials included in whole-row assertion). Await scoped assertion authorization; no fix/rerun/full shards/browser after failure.
+- [x] TOURNAMENT_PICKS_BUILD1_REPORT.md lists every touched file and25 new cases; candidate6,116/553 vs last green6,091/552, not a full-suite result. Automatic build11:02:00Z OK; no pre-existing failure observed. Live entrypoint belongs to build2.
+
 ## ER3 Long form woven rails
 - [x] ER3.1: authorised rows() caption → post_content only; all assertions preserved; focused158/158 (ER3 file20/20) and four full shards passed; report updated.
 - [x] Implement ten top Shorts and unseen alternating rails with minimum three, following-video gate and one-page clip replenishment per rail.
