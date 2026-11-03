@@ -283,6 +283,11 @@ describe('WS3 Creator to follow', () => {
 /* ---------------------------------------------------------------- top 100 */
 
 describe('WS3 Top 100 on film', () => {
+  it('WS5: still renders DurationChip', () => {
+    f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
+    wrap(<Top100FilmShelf userId="me" />);
+    expect(q('[data-top100-tile="t1"] [data-duration]')).not.toBeNull();
+  });
   it('hidden under three rows and on error', () => {
     f.top100 = { data: [vid('t1'), vid('t2')], isError: false };
     wrap(<Top100FilmShelf userId="me" />);
