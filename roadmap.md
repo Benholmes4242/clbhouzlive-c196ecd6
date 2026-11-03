@@ -1,5 +1,9 @@
 # Roadmap
 
+## G2F Activity header B
+- [ ] Activity-only shell opt-in, shared title and chip dock, unchanged back/mark read/navigation.
+- [ ] Focused tests, browser top+docked fixture, sharded verification and reconciled report.
+
 ## G2E Find people header B
 - [x] Shared title/name anchor and global back; tabs dock with unchanged URL setter; search/nav/content preserved. Focused61/61, Chromium dock fixture verified; automatic build OK19:15:13Z.
 - [ ] STOP: shard1 1634 passed/4 inherited failed/1638 across144 files; full output /tmp/g2e/shard1.log; no shards2–4 or failing-test edits. Candidate6440/573 =6433/572 +7/+1 g2eFindPeopleHeader; G2E_FIND_PEOPLE_REPORT.md.

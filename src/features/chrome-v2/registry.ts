@@ -112,7 +112,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/watch/courses' },           spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   { match: { exact: '/watch/top100' },            spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   { match: { prefix: '/watch/region/' },          spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
-  { match: { exact: '/notificationmessages' },    spec: { chrome: 'none', tone: 'light', bleed: false } },
+  { match: { exact: '/notificationmessages' },    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   { match: { exact: '/edit-profile' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
   // ── /handicap family — ISLAND (H3): dark tone, back fallback '/profile',
   // HCP cell hidden. Rivalry sub-routes declared first so they win before the

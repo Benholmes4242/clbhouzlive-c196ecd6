@@ -25,6 +25,8 @@ interface Props {
    * Kept so the existing `theme="dark"` callers still typecheck; ignored.
    */
   theme?: 'light' | 'dark';
+  /** G2F Activity only: global islands replace FixedPageHeader and its spacer. */
+  headerB?: boolean;
 }
 
 /**
@@ -38,7 +40,7 @@ interface Props {
  * on top of that. Do NOT snapshot safe-area here — it would double the
  * inset and open a visible gap under the notch on device.
  */
-export function ManagePageShell({ title, subtitle, children, right, onBack, belowTitle, fill = false }: Props) {
+export function ManagePageShell({ title, subtitle, children, right, onBack, belowTitle, fill = false, headerB = false }: Props) {
   const bg = PAGE_BG;
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
@@ -49,7 +51,8 @@ export function ManagePageShell({ title, subtitle, children, right, onBack, belo
         className="min-h-screen flex flex-col w-full"
         style={{
           background: bg,
-          marginTop: 'calc(-1 * var(--sat, env(safe-area-inset-top, 0px)))',
+          marginTop: headerB ? undefined : 'calc(-1 * var(--sat, env(safe-area-inset-top, 0px)))',
+          paddingTop: headerB ? 'var(--island-clearance)' : undefined,
           maxWidth: '100%',
         }}
       >
@@ -57,12 +60,12 @@ export function ManagePageShell({ title, subtitle, children, right, onBack, belo
             row, 1px A.BORDER edge. FixedPageHeader renders the reservation for
             its own MEASURED height immediately after itself, so nothing can
             render beneath it — on a cold launch or an in-app navigation. */}
-        <FixedPageHeader
+        {!headerB && <FixedPageHeader
           title={title}
           onBack={handleBack}
           right={right}
           below={<>{subtitle && <div className="manage-header-subtitle">{subtitle}</div>}{belowTitle}</>}
-        />
+        />}
 
         <div
           className={fill ? 'flex-1 pb-0 flex flex-col' : 'flex-1 pb-0'}
