@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useGridVideos, useRegionCourses, useWatchRegions, type GridSource } from '@/features/explore-magazine/watch/useWatchMiddle';
@@ -85,7 +86,7 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
   };
 
   return (
-    <div data-watch-grid-page={kind} style={{ background: A.CANVAS, minHeight: '100dvh', paddingTop: 'var(--island-clearance)', fontFamily: SANS, color: A.INK }}>
+    <div data-watch-grid-page={kind} style={{ background: A.CANVAS, minHeight: '100dvh', paddingTop: CHROME_CLEARANCE, fontFamily: SANS, color: A.INK }}>
       <PageTitle ref={titleRef} title={title ?? ''} subtitle={sub ?? undefined} />
 
       {kind === 'region' ? (

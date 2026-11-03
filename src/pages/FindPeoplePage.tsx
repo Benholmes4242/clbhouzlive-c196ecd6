@@ -28,6 +28,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { toast } from '@/lib/toast';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { useGlobalSearchV2 } from '@/features/search-v2/hooks/useGlobalSearchV2';
 import { businessCategoryLabel } from '@/features/find-people/railRules';
@@ -148,7 +149,7 @@ export default function FindPeoplePage() {
         color: A.INK,
         fontFamily: ROW_FONT,
         paddingBottom: 120,
-        paddingTop: 'var(--island-clearance)',
+        paddingTop: CHROME_CLEARANCE,
       }}
     >
       <div style={{ maxWidth: 520, margin: '0 auto' }}>

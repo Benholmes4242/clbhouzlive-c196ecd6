@@ -13,6 +13,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PageTitle } from '@/features/chrome-v2/PageTitle';
 import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
@@ -24,7 +25,7 @@ import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
  * members without a synced handicap. G2C: global islands own back/chrome;
  * PageTitle is the name anchor and ScopeSegments opts into docking on /rounds
  * only. Existing gate/session/board ownership is unchanged.
- * Top clearance is the global island's --island-clearance.
+ * Top clearance is the measured CHROME_CLEARANCE, including bleed routes.
  * Bottom clearance stays NAV_CLEARANCE, as on /amateur.
  */
 
@@ -62,7 +63,7 @@ export default function RoundsPage() {
   );
 
   return (
-    <div data-rounds-page="" style={{ background: A.CANVAS, minHeight: '100dvh', paddingTop: 'var(--island-clearance)', fontFamily: SANS, color: A.INK, ...FIGS }}>
+    <div data-rounds-page="" style={{ background: A.CANVAS, minHeight: '100dvh', paddingTop: CHROME_CLEARANCE, fontFamily: SANS, color: A.INK, ...FIGS }}>
       <PageTitle ref={titleRef} title={title} />
 
       <main style={{ padding: `0 0 ${NAV_CLEARANCE}` }}>
