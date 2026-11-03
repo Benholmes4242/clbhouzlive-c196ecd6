@@ -1,4 +1,23 @@
-# CM1 — authorised test correction passed; stopped on inherited Picks failure
+# CM1 — focused checks passed; shard 2 stops on non-exempt spacing failures
+
+## CM1 resumption — 22:52 UTC
+The Integrated Picks case “no pick combines question, exact lock copy, digit circle count and action” is **pre-existing**, originating in the Integrated Our picks stop at 22:25, not caused by CM1. Its subsequent text-span correction was separately authorised in the Picks continuation; it was not a CM1/TU1 edit. No test or product source was edited in this resumption.
+
+The user's single named exception permits that Picks failure only. Reran `bunx vitest run --maxWorkers=2 --shard=2/4`: **1,540 passed /3 failed /1,543 executed**, **144 passed /1 failed file (145 total)**; zero unhandled errors, exit1. The three non-exempt failures are:
+```text
+FAIL src/test/tourOverviewMergedAiry.test.tsx > Merged Airy lower sections > adds the picks hairline and tighter cards in upcoming
+FAIL src/test/tourOverviewMergedAiry.test.tsx > Merged Airy lower sections > adds the picks hairline and tighter cards in live
+FAIL src/test/tourOverviewMergedAiry.test.tsx > Merged Airy lower sections > adds the picks hairline and tighter cards in completed
+AssertionError: expected '16px' to be '14px' // Object.is equality
+Expected: "14px"
+Received: "16px"
+❯ src/test/tourOverviewMergedAiry.test.tsx:78:98
+```
+Full output retained at `docs/verification/cm1-resume/shard-2.log`. These same failures were recorded in the preceding Picks continuation; they are **not** the one authorised exception. Therefore shards 3–4 were not run and TU1 did not start, per “any other failure is STOP AND REPORT”. Latest shard1 from the separately authorised continuation passed **1,681/1,681**; the earlier CM1 shard1 had **1,680 passed /1 pre-existing Picks failure /1,681 executed**. Do not merge these different runs into a four-shard green claim.
+
+No tests added, removed, renamed or rewritten in this resumption: inventory delta **0**. Latest documented candidate remains **6,514 tests /578 files**, not a verified current full-suite total: FIX_GRID_1 baseline **6,472/576**, CM1 +14/net0 files, Integrated Picks +23/+1, guest lock rule tests +5/+1; authorised selector/mock changes +0. Complete current-suite totals remain unavailable because shards 3–4 did not execute. No fresh build entry was available this resumption; prior clean build evidence is **22:42:13Z build OK** from the Picks continuation.
+
+Files touched this resumption: `CM1_REPORT.md`, `roadmap.md`, `docs/verification/cm1-resume/shard-2.log` only. All preceding sections below are historical records.
 
 ## Authorised continuation — 2026-11-03
 
