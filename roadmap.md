@@ -1,5 +1,10 @@
 # Roadmap
 
+## NAV SQ1 bottom navigation shape
+- [x] Local20px bar and16px tab tile radii in GlobalBottomNavigation only; shared tokens and all other behavior unchanged.
+- [x] Three new navSq1 regressions, no existing test rewrites; focused9/9, full shards1594/1523/1554/1627=6298/564 from6295/563 (+3/+1), zero failures/unhandled errors. Automatic build OK17:18:35Z; NAV_SQ1_REPORT.md lists all files and frozen mock differences.
+- [x] Real /390×844 expanded368×60 and actual registered feed-scroll500 condensed324×60:20px bar/16px active tile both states, unchanged46px items/material/padding/transition; screenshots inspected, no page errors.
+
 ## GI1 signed-out header island
 - [x] Condense-only guest squircle/glass and accessible Log in fold; preserve Join free actions and non-condense output.
 - [x] Authorized two test rewrites quoted in GI1_GUEST_ISLAND_REPORT.md; +3 headerB1/+1 reducedMotion=6295/563 from6291/562. Focused22/22; shards1594/1523/1554/1624, zero failures/unhandled; automatic build OK16:58:14Z. Combined timeout interrupted shard4 only; original retained and individual rerun passed.

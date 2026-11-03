@@ -16,7 +16,6 @@ import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
-import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { Z } from '@/config/zIndex';
 import { GUEST_RAISED_Z, useGuestCardRequest, useGuestCourseSheetOpen } from '@/features/guest/guestGateStore';
@@ -427,7 +426,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 background: tokens.fill,
                 border: tokens.hairline,
                 boxShadow: tokens.shadow,
-                borderRadius: r.xl,
+                // NAV_SQ1: local squircle geometry; shared radius canon is frozen.
+                borderRadius: 20,
                 padding: pillPadding,
                 transition: PILL_TRANSITION,
                 WebkitTapHighlightColor: 'transparent',
@@ -489,7 +489,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                             padding: '0 3px',
                             boxSizing: 'border-box',
                             height: 46,
-                            borderRadius: r.md,
+                            borderRadius: 16,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -523,7 +523,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           color: iconColor,
                           padding: '0 3px',
                           height: 46,
-                          borderRadius: r.md,
+                          borderRadius: 16,
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
