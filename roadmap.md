@@ -1,9 +1,11 @@
 # Roadmap
 
 ## Tournament page three-state rebuild
-- [ ] Review signed-off Before/Live/Finished mock, existing reads and shared picks; resolve genuine brief/mock or data conflicts before implementing affected sections.
-- [ ] Implement scoped tournament page sections, derived rules, English/en-XA copy and existing sheet integration; preserve excluded surfaces.
-- [ ] Add requested regressions, report authorized test changes and reconcile counts; four shards with --maxWorkers=2, stop/report new failures, verify available browser flows and automatic build.
+- [x] Reviewed three-state brief/mock and existing reads; user ruled chart opening “Novak won it…”, approved plan preserves system font/shared picks and verified round-count provenance.
+- [x] Implemented tournament state composition, shared PicksBlock extraction/picks-only path, opt-in board/champion presentation, typed course-holes read, course/time/chart/field/number rules and English/en-XA keys; excluded surfaces untouched.
+- [x] New tests:59 tournamentV3Rules +13 tournamentV3Sections +3 tournamentV3Page; focused166/166 and new-file75/75. Candidate6401/568 = HB6 candidate6326/565 +75/+3, not full green. Automatic build OK18:41:46Z.
+- [ ] STOP: shard1 1593 passed/4 failed/1597 across142 files. tourPlayoffShortenedEvents three page cases lack QueryClientProvider, usePickField:37:10 “No QueryClient set, use QueryClientProvider to set one”. roundNotificationOverlay:11:68 exact chrome object omits HB6 condense/scrim. Full output/tmp/tournament-v3/shard1.log. No corrections/reruns/shards2–4 after failure; report TOURNAMENT_PAGE_V3_REPORT.md.
+- [ ] Visual/live verification incomplete: isolated section fixture lacked app utility CSS (oversized avatar images), no photo/board/picks/full-page proof; external sign-in unavailable. No mock parity claim. Remaining full rule/door/colour coverage and full-suite completion blocked by stop.
 
 ## HB6 group1 existing island pages
 - [x] Opt existing island entries into header B; preserve none/default routes and existing actions; business history back/fallback '/'. Static Next round and business/media anchors implemented; news page files untouched by ruling.

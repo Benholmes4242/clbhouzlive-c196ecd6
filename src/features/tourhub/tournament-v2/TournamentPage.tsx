@@ -33,21 +33,11 @@ import { useBatchCourseImages } from '../hooks/useBatchCourseImages';
 import { useTournamentPulse } from '../components/overview-v3/useTournamentPulse';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
-import { useLiveTournaments } from '../hooks/useLiveTournaments';
 
-import { HeroSection } from './sections/HeroSection';
-import { ContestSection } from './sections/ContestSection';
-import { MoveSection } from './sections/MoveSection';
-import { SectionEyebrow } from './sections/SectionEyebrow';
 import { MiniBoard } from './sections/MiniBoard';
-import { OnTheCourse } from '../_shared/OnTheCourse';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
-import { TeeTimesRail } from './sections/TeeTimesRail';
-import { CourseSection } from './sections/CourseSection';
 import { useDrawnRounds } from './data/useDrawnRounds';
 import { MomentsSection } from './sections/MomentsSection';
-import { EventInfoSection } from './sections/EventInfoSection';
-import { StorySection } from './sections/StorySection';
 import { FullBoardSheet } from './sections/FullBoardSheet';
 import { SituationBand } from '../components/overview-v3/HybridHeroBands/SituationBand';
 import { deriveHeroState, roundsFromSchedule } from '../components/overview-v3/HybridHero.utils';
@@ -56,9 +46,7 @@ import { shortenedApplies, shortenedTo, situationSegments, visibleSituationNote 
 import type { HeroTournament } from '../hooks/useHeroCarouselData';
 
 import { useTeeTimesAll } from './data/useTeeTimesAll';
-import { useTournamentStory } from './data/useTournamentStory';
 import { useTournamentHoleAnalysis } from './data/useTournamentHoleAnalysis';
-import { selectTournamentContest } from './data/tournamentContest';
 import { hasStrokeBoard } from '../_shared/eventFormat';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
@@ -66,6 +54,18 @@ import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSke
 import {
   FONT, INK, INK_MUTE, INK_FAINT, TOUR_CANVAS, HAIRLINE_INK_8, SURFACE,
 } from '../_shared/tokens';
+
+import {usePickField,useTournamentPickState} from '../hooks/useTournamentPick';
+import {useTournamentLastYearTop4} from '../hooks/useTournamentLastYearTop4';
+import {useAIPredictions} from '../hooks/useAIPredictions';
+import {useTourPlayerFollows} from '../leaderboard/useTourPlayerFollows';
+import {useTournamentCourseHoles} from './data/useTournamentCourseHoles';
+import {HeroBoardSection} from '../components/overview-v3/HybridHeroBands/HeroBoardBand';
+import {ChampionStrip} from '../components/overview-v3/HybridHeroBands/ChampionStrip';
+import {resolvePlayerAvatarCandidates} from '../_shared/resolvePlayerAvatar';
+import {winnerRow,championNarrative,score,words,copy,playedRounds} from './data/tournamentRules';
+import {TournamentHero,RaceSection,FieldSection,LastYearSection,CourseV3Section,NumbersSection,TeeV3Section,SectionHead} from './sections/TournamentV3Sections';
+import './tournamentPage.css';
 
 export function TournamentPage() {
   const { t } = useTranslation('tourhub');
@@ -82,7 +82,15 @@ export function TournamentPage() {
     useTournamentMeta(tournamentId, { live: pulse.state === 'live' });
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
   const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
-  const { data: liveList = [] } = useLiveTournaments();
+  const fieldQuery=usePickField(tournamentId??'');
+  const courseHolesQuery=useTournamentCourseHoles(tournamentId);
+  const {data:lastYear}=useTournamentLastYearTop4(pulse.state==='upcoming'?tournamentId:null);
+  const pickState=useTournamentPickState(tournamentId??'');
+  const predictions=useAIPredictions(tournamentId);
+  const playerFollows=useTourPlayerFollows();
+  const ourPickIds=new Set((predictions.data?.topContenders??[]).map(p=>p.playerId));
+  const champion=winnerRow(leaderboard??[],meta?.winner_id??null);
+  const runner=(leaderboard??[]).filter(r=>r.id!==champion?.id&&r.score!=null).sort((a,b)=>(a.score??0)-(b.score??0))[0];
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
   useLeaderboardRealtime(pulse.state === 'live' ? tournamentId : null);
@@ -115,14 +123,15 @@ export function TournamentPage() {
   const highestDrawnRound = drawnRounds.length ? Math.max(...drawnRounds) : null;
   // Lazy fetch: skip the sr_tee_times request on completed events unless
   // the tab=tee-times deep link is present (Brief F-TD-3 §4).
-  const teeTimesRequested = searchParams.get('tab') === 'tee-times';
-  const teeGroupsEnabled = pulse.state !== 'completed' || teeTimesRequested;
-  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
+  const [teeRoundChoice,setTeeRoundChoice]=useState(1);
+  const selectedTeeRound=pulse.state==='upcoming'?teeRoundChoice:Math.min(4,(meta?.current_round??1)+1);
+  const teeGroupsEnabled=pulse.state!=='completed'&&drawnRounds.includes(selectedTeeRound);
+  const {data:teeGroups=[]}=useTeeTimesAll(tournamentId,selectedTeeRound,{enabled:teeGroupsEnabled});
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
   const [fullBoardOpen, setFullBoardOpen] = useState(false);
 
-  const { data: story } = useTournamentStory(tournamentId);
+
 
   const tourCode = (meta?.tour_code ?? 'pga').toLowerCase();
 
@@ -205,27 +214,10 @@ export function TournamentPage() {
     );
   }
 
-  // Stroke and team events carry real positions and lower-is-better to-par
-  // boards. Cup and match retain the facts-only treatment.
   const strokeBoard = hasStrokeBoard(meta.event_type);
   const leaderboardRows = strokeBoard ? (leaderboard ?? []) : [];
-  const hasBoard = leaderboardRows.length > 0;
-  const contest = selectTournamentContest(leaderboardRows, meta, pulse.state);
-  const fieldCount = leaderboardRows.length > 0 ? leaderboardRows.length : (holeAnalysis?.total_players || null);
-
-  // Live: deep-link to the richer Leaderboards tab when this event is in
-  // the live list; otherwise fall back to the house full-board sheet.
-  // Completed: always open the sheet in place.
-  const openFullBoard = () => {
-    if (pulse.state === 'live') {
-      const inLiveList = liveList.some((tRow) => tRow?.id === tournamentId);
-      if (inLiveList) {
-        navigate(`/tourhub?tab=live&event=${tournamentId}`, { state: { from: 'tournament' } });
-        return;
-      }
-    }
-    setFullBoardOpen(true);
-  };
+  const hasBoard = leaderboardRows.some(r=>r.score!=null && r.position!=null);
+  const openFullBoard = () => setFullBoardOpen(true);
 
   /* BRIEF_TOUR_PLAYOFF_AND_SHORTENED_EVENTS §6: the overview's situation copy,
      from the same builder, above the board eyebrow when the event awaits a
@@ -261,68 +253,21 @@ export function TournamentPage() {
         subtitle={meta?.venue_name ?? undefined}
         backFallback="/tourhub?tab=schedule"
       >
-      <div style={{ background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT }}>
-        <HeroSection
-          meta={meta}
-          state={pulse.state}
-          imageUrl={courseImageUrl}
-          tourCode={tourCode}
-          contest={contest}
-          fieldCount={fieldCount}
-        />
-
-        {strokeBoard && (
-          <>
-            <ContestSection contest={contest} state={pulse.state} />
-            <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} currentRound={meta?.current_round ?? null} />
-          </>
-        )}
-
-        {/* THE ACT */}
+      <div className="tournament-v3" style={{fontFamily:FONT}}>
+        <TournamentHero meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl}/>
+        {pulse.state==='completed' && champion?.player && champion.score!=null && <ChampionStrip presentation="tournament" name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={score(champion.score)} scoreValue={champion.score} scoreLabel={runner?.score!=null?copy('by',{words:words(runner.score-champion.score).toUpperCase()}):undefined} narrativeParts={championNarrative(meta,leaderboardRows)}/>}
+        {pulse.state==='completed' && strokeBoard && <RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
         <section id="the-act">
           {situationCopy ? <div data-tournament-situation><SituationBand segments={situationCopy} note={situationNote} /></div> : null}
-          {pulse.state === 'live' && (
-            <>
-              {hasBoard && (
-                <>
-                  <SectionEyebrow kicker={t('tournament.shell.board.eyebrow')} actionLabel={t('tournament.shell.board.action')} onAction={openFullBoard} />
-                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} currentRound={meta?.current_round ?? null} />
-                </>
-              )}
-            </>
-          )}
-
-          {pulse.state === 'completed' && hasBoard && (
-            <>
-              <SectionEyebrow kicker={awaitingPlayoff ? t('tournament.shell.board.eyebrow') : t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
-              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} currentRound={meta?.current_round ?? null} phase="completed" />
-            </>
-          )}
+          {pulse.state!=='upcoming'&&hasBoard&&<section className="tv-section" data-tv-section="board"><SectionHead title={copy(pulse.state==='completed'?'finalBoard':'board')} action={copy('fullBoard')} onAction={openFullBoard}/><MiniBoard tournamentId={tournamentId??meta.id} entries={leaderboardRows} currentRound={meta.current_round??playedRounds(leaderboardRows)} phase={pulse.state==='completed'?'completed':'live'} presentation="tournament" winnerPlayerId={champion?.player?.id??null} tourSlug={tourCode}/></section>}
         </section>
-
-        {/* THE STORY — completed events only, self-hides w/o text */}
-        {pulse.state === 'completed' && <StorySection story={story?.story ?? null} />}
-
-        {pulse.state === 'live' && <OnTheCourse tournamentId={tournamentId!} live tourCode={tourCode} />}
-
-        {/* TEE TIMES BAND — promoted entry point to the round-by-round
-            sheet. Renders for live + upcoming states only. */}
-        {strokeBoard && (pulse.state === 'live' || pulse.state === 'upcoming') && (
-          <TeeTimesRail
-            groups={teeGroups}
-            round={currentRound}
-            onOpenAll={() => setTeeTimesOpen(true)}
-          />
-        )}
-
-        {/* THE COURSE */}
-        <CourseSection tournamentId={tournamentId!} />
-
-        {/* EVENT INFO — always-on. */}
-        <EventInfoSection meta={meta} broadcast={story?.broadcast ?? null} purseShownInHero={meta.purse != null} />
-
-        {/* MOMENTS */}
-        <MomentsSection tournamentId={tournamentId!} tourCode={tourCode} />
+        <div data-tv-section="picks"><HeroBoardSection picksOnly tournamentId={tournamentId??meta.id} entries={leaderboardRows} phase={pulse.state} currentRound={meta.current_round??null} championSrId={meta.winner_id} eventName={meta.name??''} eventTourCode={tourCode} eventSeasonYear={meta.start_date?new Date(meta.start_date).getFullYear():undefined} venuePar={meta.venue_par} totalRounds={scheduledRounds}/></div>
+        {pulse.state==='live'&&strokeBoard&&<RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
+        {strokeBoard&&<TeeV3Section groups={teeGroups} phase={pulse.state} round={selectedTeeRound} rounds={drawnRounds} onRound={setTeeRoundChoice} onAll={()=>setTeeTimesOpen(true)} meta={meta} mine={pickState.data?.my_player_id??null} picks={ourPickIds} follows={playerFollows.ids} field={fieldQuery.data??[]} defender={lastYear?.[0]?.name??meta.defending_champion} rows={leaderboardRows}/>}
+        {pulse.state==='upcoming'&&<><FieldSection field={fieldQuery.isError?[]:fieldQuery.data??[]} tour={tourCode}/><LastYearSection last={lastYear??[]} field={fieldQuery.data??[]} tour={tourCode}/></>}
+        {pulse.state!=='upcoming'&&strokeBoard&&<NumbersSection meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.data?.length??0} picks={ourPickIds}/>}
+        <CourseV3Section id={tournamentId??meta.id} phase={pulse.state} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} analysis={holeAnalysis??null} rows={leaderboardRows} currentRound={meta.current_round??1}/>
+        {pulse.state!=='upcoming'&&<div data-tv-section="moments"><MomentsSection tournamentId={tournamentId??meta.id} tourCode={tourCode}/></div>}
 
         <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
       </div>
@@ -333,9 +278,9 @@ export function TournamentPage() {
         onClose={() => setTeeTimesOpen(false)}
         tournamentId={tournamentId!}
         tournamentName={meta.name}
-        defaultRound={currentRound}
-        maxAvailableRound={pulse.state === 'upcoming' ? 1 : (highestDrawnRound ?? meta?.current_round ?? currentRound)}
-        drawnRounds={pulse.state === 'upcoming' && drawnRounds.length === 0 ? [1] : drawnRounds}
+        defaultRound={selectedTeeRound}
+        maxAvailableRound={highestDrawnRound ?? selectedTeeRound}
+        drawnRounds={drawnRounds}
         entries={leaderboardRows}
 
       />

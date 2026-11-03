@@ -28,37 +28,8 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
   const navigate = useNavigate();
   const { data: moments, isLoading } = useEventMoments(tournamentId);
 
-  // Loading: skeleton — never flash the empty panel before data arrives.
-  if (isLoading) {
-    return (
-      <>
-        <SectionEyebrow kicker={t('tournament.moments.eyebrow')} />
-        <div style={{ padding: '0 16px 8px', display: 'flex', gap: 12, fontFamily: FONT }}>
-          {[0, 1, 2].map((i) => (
-            <div key={i} style={{
-              minWidth: 108, width: 108, height: 148, flexShrink: 0,
-              borderRadius: 12, background: HAIRLINE_INK_8,
-            }} />
-          ))}
-        </div>
-      </>
-    );
-  }
-
   const list = moments ?? [];
-
-  // Empty: one quiet action row, not a card competing with real content.
-  if (list.length === 0) {
-    return (
-      <>
-        <SectionEyebrow kicker={t('tournament.moments.eyebrow')} />
-        <button type="button" onClick={() => navigate('/post-v2')} style={{ width: '100%', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', background: PAGE_CANVAS, border: 'none', borderTop: `0.5px solid ${HAIRLINE_INK_8}`, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, fontFamily: FONT, fontSize: 12.5, textAlign: 'left', cursor: 'pointer' }}>
-          <span style={{ color: INK_FAINT }}>{t('tournament.moments.emptyShort')}</span>
-          <span style={{ color: INK }}>{t('tournament.moments.shareShort')}</span>
-        </button>
-      </>
-    );
-  }
+  if(isLoading || list.length===0)return null;
 
   return (
     <>
