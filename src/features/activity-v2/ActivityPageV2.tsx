@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { startOfDay, startOfWeek, subDays } from 'date-fns';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -34,6 +33,11 @@ import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { activityRoundId, useActivityRoundPages } from './hooks/useActivityRoundSummaries';
 import { foldKey, openOrder, segmentRows, type FoldSegment } from './activityFoldRules';
 import { ActivityFoldedRoundsRow } from './components/ActivityFoldedRoundsRow';
+import { PageTitle } from '@/features/chrome-v2/PageTitle';
+import { IslandDock } from '@/features/chrome-v2/IslandDock';
+import { IslandBackCapsule } from '@/features/chrome-v2/IslandBackCapsule';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
+import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -78,16 +82,19 @@ const EMPTY_COPY: Record<ChipKey, { title: string; sub: string }> = {
 };
 
 interface ChipProps {
+  docked?: boolean;
   active: boolean;
   label: string;
   count?: number;
   onClick: () => void;
 }
-const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
+const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick, docked = false }) => (
   <button
     onClick={onClick}
+    role={docked ? 'tab' : undefined}
+    aria-selected={docked ? active : undefined}
     className="shrink-0 inline-flex items-center transition-all active:scale-[0.96]"
-    style={{ ...railChipStyle(active), gap: 6 }}
+    style={docked ? { height: 34, padding: '0 13px', borderRadius: 13, border: '1px solid var(--island-back-edge)', color: active ? 'var(--island-back-ink)' : INK_60, fontSize: 12.5, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flex: 'none' } : { ...railChipStyle(active), gap: 6 }}
   >
     {label}
     {typeof count === 'number' && count > 0 && (
@@ -173,7 +180,11 @@ function bucketise(rows: ActivityFeedRowV2[], visitUnreadIds: Set<string>) {
 
 export const ActivityPageV2: React.FC = () => {
   useHideBottomNav();
-  useHideHeader();
+  // G2F: Activity opts out of the legacy header; the flush left slot reuses
+  // canonical back chrome while retaining its replace-aware push exit callback.
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const chipsAnchor = useRef<HTMLDivElement>(null);
+  useIslandBackName('Activity', titleRef);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -184,6 +195,8 @@ export const ActivityPageV2: React.FC = () => {
     if (fromPush || location.key === 'default') navigate('/', { replace: true });
     else navigate(-1);
   };
+  const backSlot = useMemo(() => <div data-island-flush><IslandBackCapsule label="Go back" onBack={goBack} /></div>, [location.key, location.state, navigate]);
+  useSetChromeLeftSlot(backSlot);
   const qc = useQueryClient();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -397,11 +410,12 @@ export const ActivityPageV2: React.FC = () => {
     return () => io.disconnect();
   }, [feed.hasNextPage, feed.isFetchingNextPage, feed.fetchNextPage]);
 
-  const chips = (
-    <div className="px-4 flex overflow-x-auto scrollbar-none" style={{ gap: RAIL_CHIP_GAP, paddingTop: 10, paddingBottom: 12 }}>
+  const chips = (docked = false) => (
+    <div data-activity-chips={docked ? 'docked' : 'in-place'} role={docked ? 'tablist' : undefined} className={docked ? 'flex overflow-x-auto scrollbar-none' : 'px-4 flex overflow-x-auto scrollbar-none'} style={{ gap: RAIL_CHIP_GAP, paddingTop: docked ? 0 : 10, paddingBottom: docked ? 0 : 12, willChange: 'transform' }}>
       {CHIPS.map((c) => (
         <ChipButton
           key={c.key}
+          docked={docked}
           active={chip === c.key}
           label={c.label}
           // "New" chip count equals the highlighted rows on screen (same
@@ -428,8 +442,8 @@ export const ActivityPageV2: React.FC = () => {
         padding: '6px 4px',
         background: 'transparent',
         border: 'none',
-        color: INK_60,
-        fontSize: 12.5,
+        color: 'hsl(var(--foreground) / 0.75)',
+        fontSize: 13,
         fontWeight: 700,
         cursor: 'pointer',
         fontFamily: SF_STACK,
@@ -509,11 +523,13 @@ export const ActivityPageV2: React.FC = () => {
   return (
     <ManagePageShell
       title="Activity"
+      headerB
       onBack={goBack}
-      right={markAllRead}
-      belowTitle={chips}
       theme="dark"
     >
+      <PageTitle ref={titleRef} title="Activity" trailingAction={markAllRead} />
+      <div ref={chipsAnchor}>{chips()}</div>
+      <IslandDock anchorRef={chipsAnchor}>{() => chips(true)}</IslandDock>
       <div style={{ background: PAGE, fontFamily: SF_STACK, minHeight: '100%' }}>
         {featured && <FeaturedMomentCard row={featured} />}
         <FriendRequestsRail />
