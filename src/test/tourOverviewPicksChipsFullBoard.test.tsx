@@ -226,9 +226,9 @@ describe('Full board before anyone has teed off', () => {
   });
 });
 
-describe('a pick with a non-scoring status shows the board token', () => {
+describe('a pick with a non-scoring status shows the pick token', () => {
   const withStatus = (statuses: Record<string, string>) => field.map((e) => ({ ...e, status: statuses[String(e.player?.id)] ?? 'active' }));
-  const cases: Array<[string, string]> = [['WD', 'WD'], ['DQ', 'DQ'], ['CUT', 'CUT'], ['MC', 'CUT'], ['MDF', 'MDF'], ['DNS', 'DNS']];
+  const cases: Array<[string, string]> = [['WD', 'WD'], ['DQ', 'DQ'], ['CUT', 'MC'], ['MC', 'MC'], ['MDF', 'MDF'], ['DNS', 'DNS']];
   it.each(['live', 'completed'] as const)('in %s events: token in place of position, no score, no numeral', (phase) => {
     for (const [raw, token] of cases) {
       f.picks = [{ playerId: 'p1', playerName: 'A One' }, { playerId: 'p2', playerName: 'B Two' }];
