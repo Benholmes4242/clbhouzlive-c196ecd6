@@ -1,5 +1,8 @@
 # Tournament picks build 1 — stopped at focused regression
 
+## Authorized follow-up in build 2
+Ben authorized targeting `.your-pick-text` instead of the entire radio row. The exact assertion now reads `expect(screen.getByRole('radio', { name: 'Alejandro Fierro' }).querySelector('.your-pick-text')?.textContent).toBe('Alejandro FierroNot ranked');`. No avatar/product change, no case rename or count delta. `yourPickSheet.test.tsx` passed **25/25** in the build2 focused command recorded in TOURNAMENT_PICKS_BUILD2_REPORT.md. The original stop below is historical and resolved; full-suite verification remains pending because build2 hit three other regressions.
+
 ## Outcome
 Implemented the isolated YourPickSheet, field/state/mutation hooks and English/en-XA copy. No overview button or guest browsing changes. The Opened/Chosen/Search presentation uses the signed-off dimensions and global semantic colour tokens, canonical BottomSheet and real PlayerAvatar. The app's system font remains authoritative instead of the reference's retired Geist.
 
