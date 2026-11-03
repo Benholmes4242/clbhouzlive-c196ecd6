@@ -1,5 +1,11 @@
 # Roadmap
 
+## Tournament picks build 2 — overview, Why and Our record
+- [ ] Resolve brief/mock stat-order conflict: brief requires the same three stats in the same order for every pick; mock changes bar order per player.
+- [ ] Resolve live comparison conflict: brief compares with our picks still in and prefixes 'One of our picks.'; mock Kim compares with missed-cut Clark and omits that prefix.
+- [ ] Obtain scoped authorization for the existing build1 whole-row/AF assertion failure before final verification.
+- [ ] Implement approved overview additions, Why sheet rewrite, record sheet and new RPC hooks; update only retired contract tests; run four full shards and report reconciled counts.
+
 ## Tournament picks build 1 — Your pick sheet
 - [x] Build isolated member field/state/mutation hooks and signed-off Opened, Chosen, Search and locked sheet; no overview entrypoints.
 - [ ] STOP: focused24/25; yourPickSheet.test.tsx:85:81 expected 'Alejandro FierroNot ranked', received 'AFAlejandro FierroNot ranked' (canonical avatar initials included in whole-row assertion). Await scoped assertion authorization; no fix/rerun/full shards/browser after failure.
