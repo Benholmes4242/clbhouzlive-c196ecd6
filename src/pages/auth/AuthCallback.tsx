@@ -33,6 +33,8 @@ export default function AuthCallback() {
   useEffect(() => {
     if (!isInMedianApp) return;
 
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
     const run = async () => {
       try {
         await new Promise(r => setTimeout(r, 150));
@@ -42,7 +44,7 @@ export default function AuthCallback() {
         if (!session) {
           setFailed(true);
           setMessage(t('callback.sessionNotFound'));
-          setTimeout(() => navigate('/auth', { replace: true }), 1500);
+          timer = setTimeout(() => navigate('/auth', { replace: true }), 1500);
           return;
         }
 
@@ -75,11 +77,12 @@ export default function AuthCallback() {
         console.error('[AuthCallback]', err);
         setFailed(true);
         setMessage(t('callback.somethingWentWrong'));
-        setTimeout(() => navigate('/auth', { replace: true }), 1500);
+        timer = setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }
     };
 
     run();
+    return () => { if (timer !== undefined) clearTimeout(timer); };
   }, [navigate, isInMedianApp]);
 
   // In SFVC/Safari: extract session tokens and write to localStorage for WebView pickup
