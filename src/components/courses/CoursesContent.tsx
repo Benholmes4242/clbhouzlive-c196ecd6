@@ -27,6 +27,7 @@ import { Search, X, Star, ChevronRight } from 'lucide-react';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { FIGS } from '@/lib/tokens/type';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
+import { IslandDock } from '@/features/chrome-v2/IslandDock';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -209,6 +210,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [directoryCountry, setDirectoryCountry] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  // HB3: one in-flow anchor for either hub tab; IslandDock alone owns docking.
+  const shellTabsAnchor = useRef<HTMLDivElement>(null);
+  const dockCoursesTabs = location.pathname === '/courses';
 
   
   
@@ -398,6 +402,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         (() => {
           const shellTabsNode = (
             <div
+              ref={shellTabsAnchor}
               style={{
                 /* Opaque canonical page canvas — this row sits in NORMAL FLOW,
                  * so nothing ever scrolls beneath it. Do not use --background
@@ -416,6 +421,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           return (
             <div>
               <CoursesPageHero />
+              {dockCoursesTabs && (
+                <IslandDock anchorRef={shellTabsAnchor}>
+                  {() => <CoursesShellTabs docked activeTab={activeTab as 'explore' | 'top100'} onTabChange={handleTabChange} />}
+                </IslandDock>
+              )}
 
               {activeTab === 'top100' ? (
 

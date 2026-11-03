@@ -11,6 +11,7 @@ const TABS = [
 interface CoursesShellTabsProps {
   activeTab: CoursesTab;
   onTabChange: (tab: CoursesTab) => void;
+  docked?: boolean;
 }
 
 /**
@@ -19,12 +20,15 @@ interface CoursesShellTabsProps {
  * gutters; no bottom divider (the parent owns the seam).
  * The 8px lead-in below the hero is CourseDetailShellTabs' `py-2`, so the
  * pill row clears its photograph by the same distance on both pages.
+ * HB3: docked copies retain RailChips geometry; IslandDock owns their gutter,
+ * solid glass and visibility, while CoursesContent owns the shared tab state.
  */
 export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
   onTabChange,
+  docked = false,
 }) => (
-  <div className="px-4 py-2">
+  <div className={docked ? undefined : 'px-4 py-2'} data-courses-controls={docked ? 'docked' : 'in-place'}>
     <RailChips
       options={TABS}
       value={activeTab}

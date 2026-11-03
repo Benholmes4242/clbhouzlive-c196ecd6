@@ -307,10 +307,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/media' },                    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: false, note: 'media library — shared islands' } },
 
 
-  // Courses landing (editorial geometry; cinematic hero → glass overlay).
-  // bleed + scrollAway stay TRUE deliberately: hero page, same as the tour hero
-  // entries (/tourhub overview, /tourhub/tournament/, /tourhub/player/).
-  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  // HB3: only the Courses hub shares Clubhouse's fixed folding islands.
+  // Course details retain the separate scroll-away rule above.
+  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true, note: EDITORIAL_NOTE } },
 
 
 
