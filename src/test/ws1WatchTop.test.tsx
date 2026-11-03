@@ -316,7 +316,11 @@ describe('WS1 chips', () => {
   it('the search placeholder reads Search videos and creators', () => {
     mountFeed();
     fireEvent.click(screen.getByRole('button', { name: 'Search videos and creators' }));
-    expect(screen.getByPlaceholderText('Search videos and creators')).toBeTruthy();
+    const inPlace = document.querySelector<HTMLElement>('[data-explore-controls="in-place"]');
+    if (!inPlace) throw new Error('Missing in-place Explore controls');
+    expect(within(inPlace).getByPlaceholderText('Search videos and creators')).toBeTruthy();
+    const dockedField = document.querySelector('[data-explore-controls="docked"] input');
+    if (dockedField) expect(dockedField.closest('[aria-hidden="true"][inert]')).not.toBeNull();
   });
 
   it('a chip tap fires watch_chip_changed with from and to, keeping the existing event', () => {
