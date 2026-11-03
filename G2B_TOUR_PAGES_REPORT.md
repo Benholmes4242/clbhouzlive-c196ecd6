@@ -72,3 +72,6 @@ No manual project build/typecheck. Automatic preview clean does not mean the sta
 - New `G2B_TOUR_PAGES_REPORT.md`
 
 No TourHubMainPage/LeaderboardTab edits, shared island engine/IslandDock edits, guest-browsing/review-wizard/news/round-plot changes, SQL/migrations/deployed RPC/edge/feed_config/native/Median changes. round_pool_cap remains30. No publication.
+
+## Final status (STABILISE_1, 3 Nov 2026)
+The test stops that were open in this brief were resolved with test-only changes. The diffs, the authority for each and the named cases are in `STABILISE_1_REPORT.md`. Full suite in four shards with --maxWorkers=2: 1,638 / 1,538 / 1,641 / 1,632 = **6,449 tests, 574 files, 0 failures, 0 unhandled errors**. This confirms the earlier estimate of 6,449. Browser evidence: signed-in checks unavailable (external sign-in); signed-out live checks and fixture coverage are listed in STABILISE_1_REPORT.md.

@@ -39,3 +39,6 @@ Real Chromium fixture at localhost `/g2d-fixture`, 390×844, actual WatchGridPag
 Existing PageTitle tracking remains0 (as G2C; higher-priority design instruction), and original in-flow chips remain frozen styling. No shared changes or full mock parity claim.
 
 Latest automatic build **build OK 2026-11-03T19:13:23Z** in observability. No manual build/typecheck. Full-suite zero-failure acceptance remains blocked by the inherited errors above.
+
+## Final status (STABILISE_1, 3 Nov 2026)
+The test stops that were open in this brief were resolved with test-only changes. The diffs, the authority for each and the named cases are in `STABILISE_1_REPORT.md`. Full suite in four shards with --maxWorkers=2: 1,638 / 1,538 / 1,641 / 1,632 = **6,449 tests, 574 files, 0 failures, 0 unhandled errors**. This confirms the earlier estimate of 6,449. Browser evidence: signed-in checks unavailable (external sign-in); signed-out live checks and fixture coverage are listed in STABILISE_1_REPORT.md.

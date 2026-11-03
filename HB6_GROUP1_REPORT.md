@@ -64,3 +64,6 @@ Latest automatic`=== build 2026-11-03T17:46:59Z ===` / `build OK`. No manual bui
 - Memory:new`mem://features/chrome/hb6-group1.md`, `mem://index.md`.
 
 No news page, guest browsing, review wizard, bottom nav, round plots, SQL/migrations,deployed functions/RPCs,feed_config or native/Median edits. round_pool_cap stays30. Shared geometry/observer/nav behavior retains existing default behavior except opt-in static title.
+
+## Final status (STABILISE_1, 3 Nov 2026)
+The test stops that were open in this brief were resolved with test-only changes. The diffs, the authority for each and the named cases are in `STABILISE_1_REPORT.md`. Full suite in four shards with --maxWorkers=2: 1,638 / 1,538 / 1,641 / 1,632 = **6,449 tests, 574 files, 0 failures, 0 unhandled errors**. This confirms the earlier estimate of 6,449. Browser evidence: signed-in checks unavailable (external sign-in); signed-out live checks and fixture coverage are listed in STABILISE_1_REPORT.md.

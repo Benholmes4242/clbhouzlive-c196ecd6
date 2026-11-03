@@ -49,3 +49,6 @@ Existing AC2 24/24 passed; new G2F8/9 passed. No unhandled-error summary in focu
 - Existing siLadder/SiLadder import-case issue untouched. Suspected tourOverviewBand fixture not a confirmed failure.
 
 Full four-shard zero-failure result and top/docked screenshots remain blocked by the unchanged dock test failure. No mock parity or browser claim. Preview type error cleared; candidate suite count before/after this type-only correction remains **6449/574**.
+
+## Final status (STABILISE_1, 3 Nov 2026)
+The test stops that were open in this brief were resolved with test-only changes. The diffs, the authority for each and the named cases are in `STABILISE_1_REPORT.md`. Full suite in four shards with --maxWorkers=2: 1,638 / 1,538 / 1,641 / 1,632 = **6,449 tests, 574 files, 0 failures, 0 unhandled errors**. This confirms the earlier estimate of 6,449. Browser evidence: signed-in checks unavailable (external sign-in); signed-out live checks and fixture coverage are listed in STABILISE_1_REPORT.md.
