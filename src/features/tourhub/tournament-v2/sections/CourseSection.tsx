@@ -132,7 +132,7 @@ export function CourseSection({ tournamentId }: Props) {
   );
 }
 
-function HolesSheet({
+export function HolesSheet({
   open,
   onClose,
   tournamentId,
