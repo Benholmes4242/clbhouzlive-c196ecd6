@@ -9,6 +9,7 @@ import { getPrimaryScrollElement } from '@/lib/getScrollParent';
 import { pushForceExpand } from '@/hooks/useScrollDirection';
 import { useIslandsCondensed } from './useIslandsCondensed';
 import './island-dock.css';
+import { measureIslandBoundary } from './islandBoundary';
 
 export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLElement>; children: (shown: boolean) => ReactNode }) {
   const condensed = useIslandsCondensed();
@@ -20,16 +21,7 @@ export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLE
   useEffect(() => {
     const anchor = anchorRef.current;
     if (!anchor) return;
-    const sat = getComputedStyle(document.documentElement).getPropertyValue('--sat');
-    // Resolve calc/env safely without guessing a device's notch height.
-    const probe = document.createElement('div');
-    probe.style.height = `calc(${sat.trim() || '0px'} + 56px)`;
-    probe.style.position = 'absolute';
-    probe.style.visibility = 'hidden';
-    document.body.appendChild(probe);
-    const measuredBoundary = probe.getBoundingClientRect().height;
-    const boundary = measuredBoundary > 0 ? measuredBoundary : 56;
-    probe.remove();
+    const boundary = measureIslandBoundary();
     const observer = new IntersectionObserver(([entry]) => {
       if (entry) setPast(!entry.isIntersecting && entry.boundingClientRect.bottom < (entry.rootBounds?.top ?? boundary));
     }, { root: getPrimaryScrollElement() ?? null, rootMargin: `-${boundary}px 0px 0px 0px`, threshold: [0, 1] });

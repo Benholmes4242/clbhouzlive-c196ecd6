@@ -12,6 +12,7 @@ import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTa
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { setGuestCourseContext } from '@/features/guest/guestGateStore';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
@@ -476,6 +477,10 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   recordHolders,
 }) => {
   const { t } = useTranslation('courses');
+  // HB4: observe the actual hero heading; never rename or restyle the photograph.
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const { pathname } = useLocation();
+  useIslandBackName(/^\/courses\/[^/]+\/?$/.test(pathname) ? shortCourseName(course.name) : null, nameRef);
   const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
   const showBand = rounds > 0 || reviewCount > 0;
 
@@ -511,6 +516,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
       <CourseMasthead
         as="h1"
+        nameRef={nameRef}
         kicker={courseMastheadKicker(course, standing)}
         name={course.name}
         place={course.country || null}

@@ -1,0 +1,9 @@
+.island-back.island-back { height:46px; min-width:46px; padding:0 7px; gap:0; border-radius:16px; border:1px solid var(--island-back-edge); background:var(--island-back-rest); color:var(--island-back-ink); box-shadow:var(--island-back-shadow); display:flex; align-items:center; justify-content:center; flex-shrink:1; overflow:hidden; backdrop-filter:blur(22px) saturate(150%); -webkit-backdrop-filter:blur(22px) saturate(150%); transition:var(--island-glass-transition), var(--island-fold-transition); }
+.island-back.island-back:hover { background:var(--island-back-rest); }
+.island-back[data-condensed="true"].island-back { background:var(--island-dock-glass); }
+.island-back[data-named="true"] { padding:0 15px 0 7px; gap:8px; }
+.island-back-arrow { display:block; flex:none; }
+.island-back-fold { display:block; flex:0 1 220px; min-width:0; max-width:0; opacity:0; overflow:hidden; transition:var(--island-fold-transition); }
+.island-back[data-named="true"] .island-back-fold { max-width:220px; opacity:1; }
+.island-back-name { display:block; width:100%; font-size:16px; font-weight:700; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+@media (prefers-reduced-motion:reduce) { .island-back.island-back, .island-back-fold { transition:none; } }

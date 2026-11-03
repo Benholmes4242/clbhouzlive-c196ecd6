@@ -41,6 +41,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { useIslandsCondensed } from './useIslandsCondensed';
+import { IslandBackCapsule } from './IslandBackCapsule';
 import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
@@ -230,6 +231,8 @@ const LeftCapsule: React.FC<{
         navigate(backTarget);
       }
     };
+
+    if (spec.condense) return <IslandBackCapsule onBack={onBack} label={title ? `Back to ${title}` : 'Go back'} />;
 
     return (
       <button
