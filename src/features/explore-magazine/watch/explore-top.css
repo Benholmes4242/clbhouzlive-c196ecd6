@@ -1,5 +1,5 @@
 .explore-top-controls { display:flex; align-items:center; gap:8px; padding:0 16px; margin-top:-8px; /* main clears islands by CHROME_BREATHING (16); row sits 8 below */ overflow-x:auto; scrollbar-width:none; will-change:transform; }
-.explore-top-sticky { position:sticky; top:var(--chrome-total-h,0px); z-index:3; background:var(--explore-top-canvas); box-shadow:0 -16px 0 0 var(--explore-top-canvas); }
+.island-dock .explore-top-controls { padding:0; margin-top:0; }
 .explore-top-controls .explore-tile-chips { overflow:visible !important; flex:none; }
 .explore-top-controls .explore-search-button { flex:none; width:34px; height:34px; padding:0; border-radius:13px; background:transparent; border:1px solid rgba(255,255,255,0.10); color:var(--explore-top-ink); }
 .explore-top-controls .explore-search-button svg { width:15px; height:15px; }

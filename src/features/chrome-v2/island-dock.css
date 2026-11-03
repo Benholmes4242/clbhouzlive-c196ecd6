@@ -1,0 +1,6 @@
+/* HB2: geometry follows the existing island row; no page-scroll listener. */
+.island-dock { position:fixed; top:calc(var(--sat, 0px) + 62px); left:0; right:0; padding:0 16px; transform:translateY(-70px); opacity:0; pointer-events:none; will-change:transform; transition:transform 300ms cubic-bezier(.2,.8,.2,1), opacity 200ms cubic-bezier(.2,.8,.2,1); }
+.island-dock[data-shown="true"] { transform:translateY(0); opacity:1; pointer-events:auto; }
+.island-dock [role="tab"], .island-dock .explore-search-button, .island-dock .explore-search-field { background:var(--island-dock-glass) !important; backdrop-filter:blur(22px) saturate(150%); -webkit-backdrop-filter:blur(22px) saturate(150%); }
+.island-dock [role="tab"][aria-selected="true"] { background:var(--island-dock-selected-glass) !important; border-color:var(--island-dock-selected-edge) !important; }
+@media (prefers-reduced-motion:reduce) { .island-dock { transition:none; } }

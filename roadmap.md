@@ -1,5 +1,10 @@
 # Roadmap
 
+## HB2 Explore header and island dock
+- [ ] Apply Clubhouse folding chrome to /amateur only and replace sticky controls with a shared-state IslandDock.
+- [ ] Verify observer/focus/accessibility behavior, browser scroll states and resolved selected-glass paint.
+- [ ] Run focused tests and four full shards from 6,252/558; confirm automatic build and document files/assertions/counts.
+
 ## ISLAND_SQUIRCLE_1 — squircle islands on header B routes
 - [x] 16px (34%) radius on both islands for '/', '/clubhouse', '/tourhub' via spec.condense; guest right and all other routes unchanged.
 - [x] Folded left islands measure 46×46 in Chromium (Clubhouse 30+7+1; Tour 32+6+1, tile radius 11); fixed slot flush-marker bug (Tour rest width 202→175 restores signed-off padding).

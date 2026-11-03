@@ -532,7 +532,6 @@ export function WatchFeed({
       <ExploreTopControls
           query={query}
           onQuery={setQuery}
-          sticky={quickGrid}
           placeholder={t('amateur.watch.searchPlaceholder', 'Search videos and creators')}
           options={chips}
           value={filter}
