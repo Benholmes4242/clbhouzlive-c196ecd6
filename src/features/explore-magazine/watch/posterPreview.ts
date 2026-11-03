@@ -7,10 +7,12 @@ export function attachPosterPreview(video: HTMLVideoElement, poster: string | nu
   let ready = false;
   let disposed = false;
   let awaitingSeek = false;
+  let hasPlayed = false;
   const play = () => { if (!disposed) video.play()?.catch(() => show(false)); };
   const restart = () => {
     if (!ready || disposed) return;
     show(false);
+    hasPlayed = false;
     awaitingSeek = true;
     video.currentTime = start;
     if (!video.seeking) { awaitingSeek = false; play(); }
@@ -22,12 +24,14 @@ export function attachPosterPreview(video: HTMLVideoElement, poster: string | nu
     restart();
   };
   const seeked = () => { if (awaitingSeek) { awaitingSeek = false; play(); } };
-  const playing = () => show(ready && !awaitingSeek && !video.seeking && video.currentTime >= start);
-  const pause = () => show(false);
+  const update = () => show(hasPlayed && ready && !awaitingSeek && !video.seeking && video.currentTime >= start);
+  const playing = () => { hasPlayed = true; update(); };
+  const pause = () => { hasPlayed = false; show(false); };
   video.addEventListener('loadedmetadata', metadata);
   video.addEventListener('seeked', seeked);
   video.addEventListener('playing', playing);
-  video.addEventListener('timeupdate', () => {});
+  video.addEventListener('timeupdate', update);
+  video.addEventListener('seeking', () => {});
   video.addEventListener('pause', pause);
   video.addEventListener('ended', restart);
   show(false);
@@ -36,6 +40,7 @@ export function attachPosterPreview(video: HTMLVideoElement, poster: string | nu
     video.removeEventListener('loadedmetadata', metadata);
     video.removeEventListener('seeked', seeked);
     video.removeEventListener('playing', playing);
+    video.removeEventListener('timeupdate', update);
     video.removeEventListener('pause', pause);
     video.removeEventListener('ended', restart);
     show(false);
