@@ -14,8 +14,8 @@ export interface YourPickCardProps { state: TournamentPickState | null; phase:'u
 export function YourPickCard({state,phase,ourResults,tourCode,onPick,teeTime,started=true,guest=false}:YourPickCardProps) {
   const { t } = useTranslation('tourhub');
   const copy=(key:string,options:Record<string,unknown>={})=>t(`overview.yourPick.${key}`,options);
-  const hasPick=Boolean(state?.my_player_id && state.my_still_in_field!==false);
-  if (!hasPick && (state?.locked || phase!=='upcoming') && !guest) return null;
+  const hasPick=!guest && Boolean(state?.my_player_id && state.my_still_in_field!==false);
+  if (!hasPick && (state?.locked || phase!=='upcoming')) return null;
   if (!state && !guest) return null;
   const name=state?.my_player_name ?? '';
   const lock=localPickLock(state?.locks_at ?? null);
