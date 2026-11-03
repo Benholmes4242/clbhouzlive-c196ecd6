@@ -27,7 +27,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import CourseReviewsRedirect from '@/pages/CourseReviewsRedirect';
 import BusinessCreateRedirect from '@/features/business-create/BusinessCreateRedirect';
 import { WATCH_SURFACE } from '@/config/featureFlags';
-import { MomentsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkeletons';
+import { MediaRedirect } from '@/features/amateur/MediaRedirect';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { clearAppBadge } from '@/utils/pushBadge';
 import { LIGHT_ROUTE_CANVAS } from '@/lib/tokens/surfaces';
@@ -292,7 +292,6 @@ const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 
 
-const MediaLibraryPage = lazy(() => import("./features/media-library/MediaLibraryPage"));
 
 
 
@@ -397,7 +396,7 @@ const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
 // PR-5: /video/:videoId is a post-id deep link. Preserve old shared links via unified /post viewer.
 const VideoIdToPostRedirect: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
-  return <Navigate to={videoId ? `/post/${videoId}` : '/media'} replace />;
+  return <Navigate to={videoId ? `/post/${videoId}` : '/amateur'} replace />;
 };
 
 /**
@@ -540,7 +539,6 @@ function AppRoutes() {
       p === '/' || p === '/clubhouse' ? 'clubhouse'
       : p.startsWith('/watch') ? 'watch'
       : p === '/amateur' ? 'amateur'
-      : p === '/media' ? 'media'
       : p === '/explore' ? 'discover'
       : p.startsWith('/discover') ? 'discover'
 
@@ -662,13 +660,10 @@ function AppRoutes() {
             land on /amateur, where the live Watch surface lives. */}
         <Route path="/videos" element={<WatchGate><Navigate to="/amateur" replace /></WatchGate>} />
         <Route path="/clips" element={<WatchGate><Navigate to="/amateur" replace /></WatchGate>} />
-        {/* CUTOVER: /media is the one media destination, and it carries the
-            MERGED set the Amateur mosaic summarises — review photographs and
-            course-tagged member moments in one wall, one count. */}
-        <Route path="/media" element={<Suspense fallback={<MomentsLibrarySkeleton />}><MediaLibraryPage /></Suspense>} />
-        {/* SHIM (cutover): the two legacy library URLs now land on /media. */}
-        <Route path="/explore/reviews" element={<Shim to="/media" />} />
-        <Route path="/explore/moments" element={<Shim to="/media" />} />
+        {/* CM1: retired Media addresses select Explore's matching Watch chip. */}
+        <Route path="/media" element={<MediaRedirect />} />
+        <Route path="/explore/reviews" element={<Shim to="/amateur?view=watch&watch=community" />} />
+        <Route path="/explore/moments" element={<Shim to="/amateur?view=watch&watch=community" />} />
         {/* SHIM (cutover): Discover is absorbed by the Amateur destination. */}
         <Route path="/explore" element={<Shim to="/amateur" />} />
 

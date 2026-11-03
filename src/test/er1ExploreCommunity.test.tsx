@@ -52,7 +52,7 @@ describe('ER1 Explore', () => {
     f.moments = [moment('old', 'other', '2026-10-01'), moment('new', 'other', '2026-11-01', true), moment('middle', 'another', '2026-10-15')];
     const { container } = mount('community');
     expect(Array.from(container.querySelectorAll('[data-community-item]')).map((el) => el.getAttribute('data-community-item'))).toEqual(['new', 'middle', 'old']);
-    expect(container.querySelectorAll('[data-community-play]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-community-play]')).toHaveLength(0);
     expect(container.querySelector('video')).toBeNull();
     expect(f.autoplay).not.toHaveBeenCalled();
     expect(container.querySelector('[data-watch-card="quick"]')).toBeNull();

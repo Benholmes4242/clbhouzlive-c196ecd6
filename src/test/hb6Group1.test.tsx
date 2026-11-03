@@ -21,7 +21,6 @@ import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { useIslandBackNameValue } from '@/features/chrome-v2/islandBackNameStore';
 import { registerNavScroller, resetToExpanded } from '@/hooks/useScrollDirection';
 import { ClubProfileHero } from '@/components/business/hero/ClubProfileHero';
-import { LibraryHead } from '@/features/media-library/LibraryChrome';
 
 const routes = ['/business/abc','/business/abc/followers','/business/abc/following','/profile/abc/followers','/profile/abc/following','/profile/quest','/profile/abc/edit','/handicap','/handicap/abc','/handicap/rivalry/abc','/handicap/abc/rivalry/def','/tour/news','/tour/news/story','/tourhub/other','/tour/other','/media','/friends-activity','/discover/news','/discover/news/story','/discover/explore/theme/links','/discover?main=videos&section=clips','/round/abc','/discover/other'];
 let callback: IntersectionObserverCallback;
@@ -32,7 +31,7 @@ function Probe() {const loc=useLocation();const name=useIslandBackNameValue();re
 const mount = (path: string, content?: React.ReactNode) => render(<QueryClientProvider client={client()}><MemoryRouter initialEntries={[path]}><ChromeIsland />{content}<Probe /></MemoryRouter></QueryClientProvider>);
 function Heading({ business=false }: { business?: boolean }) {
  const ref=useRef<HTMLHeadingElement>(null);useIslandBackName(business?'Full business name':'Media',ref);
- return business ? <ClubProfileHero name="Full business name" nameRef={ref} placeLine="" onShare={()=>{}} renderMore={node=>node} team={null} isFollowing={false} onFollowToggle={()=>{}} onBookTeeTime={()=>{}} onMessage={()=>{}} /> : <LibraryHead title="Media" nameRef={ref} />;
+ return <ClubProfileHero name="Full business name" nameRef={ref} placeLine="" onShare={()=>{}} renderMore={node=>node} team={null} isFollowing={false} onFollowToggle={()=>{}} onBookTeeTime={()=>{}} onMessage={()=>{}} />;
 }
 const move=async(top:number)=>{scroller.scrollTop=top;await act(async()=>{fireEvent.scroll(scroller);await new Promise(r=>requestAnimationFrame(()=>r(null)));});};
 beforeEach(()=>{resetToExpanded();scroller=document.createElement('div');scroller.id='root';document.body.append(scroller);off=registerNavScroller(scroller);window.IntersectionObserver=class{constructor(cb:IntersectionObserverCallback){callback=cb;}observe(){}disconnect(){}unobserve(){}} as unknown as typeof IntersectionObserver;});
@@ -47,7 +46,7 @@ describe('HB6 group1',()=>{
   else expect(screen.getByRole('button',{name:'Go to home'})).toBeTruthy();
  });
  it('all registered island entries opt in while none entries stay none',()=>{for(const {spec} of CHROME_REGISTRY){if(spec.chrome==='island'){expect(spec.condense).toBe(true);expect(spec.scrim).toBe('soft');expect(spec.scrollAway).toBeUndefined();}else{expect(spec.condense).toBeUndefined();expect(spec.scrim).toBeUndefined();}}expect(resolveChrome('/auth',new URLSearchParams())).toEqual({chrome:'none',tone:'dark',bleed:false});});
- it.each([true,false])('actual business/media heading observes full name and clears on unmount business=%s',business=>{
+ it.each([true])('actual business/media heading observes full name and clears on unmount business=%s',business=>{
   const view=mount(business?'/business/abc':'/media',<Heading business={business}/>);expect(screen.getByRole('button',{name:'Go back'})).toHaveAttribute('data-named','false');
   act(()=>callback([{isIntersecting:false,boundingClientRect:{bottom:50},rootBounds:{top:56}} as IntersectionObserverEntry],{} as IntersectionObserver));
   expect(screen.getByRole('button',{name:`Back from ${business?'Full business name':'Media'}`})).toHaveAttribute('data-named','true');view.unmount();

@@ -2,7 +2,7 @@
 
 ## CM1 Community destination
 - [ ] Select Community in place, add watch deep links and retire Media page with legacy redirects; preserve guest rules and shared totals.
-- [ ] Apply written grid specification and white rating correction; corrected named HTML is not present in uploads, so exact mock parity is blocked.
+- [ ] Apply grid specification and white rating correction; corrected cm1-community-see-all.html received and read, matching the written correction.
 - [ ] Add/update authorised tests, quote all changed/deleted cases, run focused checks and four shards, report reconciled totals and build.
 
 ## FIX_GRID_1

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { PHOTO_INK } from '@/lib/tokens/surfaces';
 import { useTranslation } from 'react-i18next';
 
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
@@ -266,7 +265,7 @@ export function MomentTile({
               style={{
                 fontSize: 14,
                 fontWeight: 700,
-                color: PHOTO_INK,
+                color: '#FFFFFF',
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
                 fontVariantNumeric: 'tabular-nums',
