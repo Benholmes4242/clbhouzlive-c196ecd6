@@ -1,5 +1,10 @@
 # Roadmap
 
+## ER3 Long form woven rails
+- [ ] Limit For you top Shorts to ten; weave unseen alternating rails with minimum three, following-video gate and one-page clip replenishment per rail.
+- [ ] Add regressions, quote authorised test changes, run four full shards against6,071/551 and confirm automatic build.
+- [ ] Check reachable real presentation and report authenticated limitations.
+
 ## ER2 Creators to follow and By region
 - [x] Match the plural five-row rail, initial following state and canonical batched activity avatar doors; remove only Your patch.
 - [x] Focused104/104; full four shards1504+1504+1509+1554=6,071/551 (+10/+1 er2CreatorsRegion), zero failures/unhandled errors; automatic build clean. ER2_REPORT.md quotes authorised changes and lists files.

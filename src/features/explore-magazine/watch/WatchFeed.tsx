@@ -55,6 +55,9 @@ import { Top100FilmShelf } from './Top100FilmShelf';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
 import {
   RAIL_EVERY,
+  WOVEN_RAIL_INTERVAL,
+  SHORTS_SHELF_COUNT,
+  WOVEN_RAIL_MIN,
   groupByMember,
   isPartWatched,
   isQuickHit,
@@ -69,8 +72,9 @@ import {
  * THE WATCH PAGE (BRIEF_WATCH_PAGE; the signed-off prototype is the spec).
  *
  * ORDER (K.8): chips, then Continue watching (All only, only when populated)
- * -> Quick hits -> the long-form column, with the community rail injected once,
- * after the third long-form card.
+ * -> Quick hits -> long-form, with ER3 community after 3 then alternating
+ * Shorts/community every ten cards. This page owns unseen allocation and
+ * one extra clips-page attempt per Shorts slot; original coordinators stay shared.
  *
  * THE SHAPE IS THE TYPE. A video under QUICK_HIT_MAX is a portrait Quick Hit in
  * a rail; three minutes or more is full-width 16:9 long-form. Both reads are
@@ -275,6 +279,7 @@ export function WatchFeed({
   /* M.1 — one tile, two layouts: grid on the Quick hits chip, rail everywhere else. */
   const quickGrid = filter === 'quick';
   const quickRows = useMemo(() => (showsQuickHits(contentFilter) ? rows.filter((r) => isQuickHit(r.duration_seconds)) : []), [rows, contentFilter]);
+  const topQuickRows = onAll ? quickRows.slice(0, SHORTS_SHELF_COUNT) : quickRows;
   const longRows = useMemo(
     () =>
       showsLongForm(contentFilter)
@@ -373,8 +378,44 @@ export function WatchFeed({
   };
 
   /* K.6 — ONE ENTRY PER MEMBER, labelled with who, then where. */
-  const members = useMemo(() => groupByMember((moments.data ?? []).filter((m) => !userId || searching || m.post?.userId !== userId), (m) => m.post?.userId ?? null).slice(0, 10), [moments.data, userId, searching]);
-  const communityRail = () => {
+  const members = useMemo(() => groupByMember((moments.data ?? []).filter((m) => !userId || searching || m.post?.userId !== userId), (m) => m.post?.userId ?? null), [moments.data, userId, searching]);
+  const attemptedClipRails = useRef(new Set<number>());
+  const [railReadVersion, setRailReadVersion] = useState(0);
+  const woven = useMemo(() => {
+    const rails = new Map<number, { kind: 'shorts' | 'community'; shorts: HubRpcRow[]; members: typeof members }>();
+    const shownShorts = new Set(topQuickRows.map(row => row.post_id));
+    const shownMembers = new Set<string>();
+    const replenish: number[] = [];
+    if (!onAll) return { rails, replenish };
+    for (let position = RAIL_EVERY, slot = 0; position < longRows.length; position += WOVEN_RAIL_INTERVAL, slot++) {
+      if (slot % 2 === 0) {
+        const next = members.filter(item => !shownMembers.has(item.lead.post.userId)).slice(0, SHORTS_SHELF_COUNT);
+        if (next.length < WOVEN_RAIL_MIN) continue;
+        next.forEach(item => shownMembers.add(item.lead.post.userId));
+        rails.set(position, { kind: 'community', shorts: [], members: next });
+      } else {
+        const next = quickRows.filter(row => !shownShorts.has(row.post_id)).slice(0, SHORTS_SHELF_COUNT);
+        if (next.length < SHORTS_SHELF_COUNT && clips.hasNextPage && !attemptedClipRails.current.has(position)) {
+          replenish.push(position);
+          // Allocate this window even while waiting, so later slots cannot steal it.
+          next.forEach(row => shownShorts.add(row.post_id));
+          continue;
+        }
+        if (next.length < WOVEN_RAIL_MIN) continue;
+        next.forEach(row => shownShorts.add(row.post_id));
+        rails.set(position, { kind: 'shorts', shorts: next, members: [] });
+      }
+    }
+    return { rails, replenish };
+  }, [onAll, longRows, quickRows, members, clips.hasNextPage, railReadVersion]);
+  useEffect(() => {
+    const position = woven.replenish[0];
+    if (!onAll || position == null || clips.isFetchingNextPage) return;
+    attemptedClipRails.current.add(position);
+    void clips.fetchNextPage().finally(() => setRailReadVersion(version => version + 1));
+  }, [onAll, woven, clips.isFetchingNextPage, clips.fetchNextPage]);
+
+  const communityRail = (items: typeof members, position: number) => {
     if (moments.isError) {
       return (
         <ShelfRetry
@@ -386,18 +427,18 @@ export function WatchFeed({
       );
     }
     if (!moments.isFetched) return <ShelfShell tileW={CT_W} tileH={CT_W} />;
-    if (members.length === 0) return null;
+    if (items.length < WOVEN_RAIL_MIN) return null;
     return (
-      <div style={{ paddingBottom: 8 }}>
+      <div data-woven-after={position} data-woven-kind="community" style={{ paddingBottom: 8 }}>
         {/* WS1.1 — See all opens the media library's Community tab. */}
         <Section
-          title={t('amateur.watch.rail.community', 'From the community')}
+          title={position === RAIL_EVERY ? t('amateur.watch.rail.community', 'From the community') : 'More from the community'}
           seeAll={t('amateur.watch.seeAll', 'See all')}
           onSeeAll={() => navigate('/media?kind=community')}
         />
         <Rail label="community">
-          {members.map(({ lead, count }) => (
-            <div key={`member:${lead.key}`} data-watch-card="community" style={{ ...cardButton, width: CT_W, cursor: 'default' }}>
+          {items.map(({ lead, count }) => (
+            <div key={`member:${lead.key}`} data-watch-card="community" data-watch-member={lead.post.userId} style={{ ...cardButton, width: CT_W, cursor: 'default' }}>
               <div data-watch-frame style={{ width: CT_W, height: CT_W, flex: 'none', borderRadius: 11, overflow: 'hidden', position: 'relative' }}>
                 <MomentTile
                   moment={lead}
@@ -408,7 +449,7 @@ export function WatchFeed({
                   labelled={false}
                   autoplayGroup="amateur-watch-moments"
                   style={{ width: '100%', height: '100%', display: 'block' }}
-                  onPress={() => openMoment(lead, members.map((x) => x.lead))}
+                  onPress={() => openMoment(lead, items.map((x) => x.lead))}
                 />
               </div>
               <span style={{ ...oneLine, marginTop: 7, fontSize: 12.5, fontWeight: 600 }}>{lead.post?.displayName || lead.post?.username}</span>
@@ -423,6 +464,21 @@ export function WatchFeed({
   const settled = videos.isFetched && clips.isFetched;
   const loading = !settled && rows.length === 0;
   const nothing = settled && quickRows.length === 0 && longRows.length === 0 && !videos.isError && !clips.isError;
+  const selectShorts = () => {
+    analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
+    setFilter('quick');
+    scrollPageToTop();
+  };
+  const shortTiles = (items: HubRpcRow[]) => items.map(row => {
+    const index = quickRows.findIndex(item => item.post_id === row.post_id);
+    const who = creatorName(row);
+    return <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" data-watch-short={row.post_id} onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: QH_W, minWidth: 0 }}>
+      <Poster row={row} height={QH_H} posterH={480} radius={12} autoplay progress={barFor(row)} badgeTopRight />
+      <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3, minHeight: 'calc(12px * 1.3 * 2)' }}>{videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}</span>
+      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
+      {onYourCourse(row) && row.course_name ? <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.AMBER }}>{row.course_name}</span> : null}
+    </button>;
+  });
   /* Q.1: the Quick hits heading has ONE home, rendered by both the loading and rows branches,
      so the heading seen while loading can never drift from the one seen once loaded. */
   const quickSection = (
@@ -432,10 +488,7 @@ export function WatchFeed({
       sub={t('amateur.watch.rail.shortsSub', 'Under three minutes')}
       /* BC.0: See all selects the Shorts chip in place; none once it is active. */
       seeAll={filter === 'quick' ? undefined : t('amateur.watch.seeAll', 'See all')}
-      onSeeAll={filter === 'quick' ? undefined : () => {
-        analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
-        setFilter('quick');
-      }}
+      onSeeAll={filter === 'quick' ? undefined : selectShorts}
     />
   );
 
@@ -552,22 +605,7 @@ export function WatchFeed({
             <>
               {quickSection}
               <QuickLayout grid={false}>
-                {quickRows.map((row, index) => {
-                  const who = creatorName(row);
-                  return (
-                    <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: quickGrid ? '100%' : QH_W, minWidth: 0 }}>
-                      {/* N.2: no autoplay in a 3-across grid — three equally central tiles, one playing, reads as failure. */}
-                      <Poster row={row} height={quickGrid ? null : QH_H} posterH={480} radius={12} autoplay={!quickGrid} progress={barFor(row)} badgeTopRight={!quickGrid} />
-                      <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3, minHeight: 'calc(12px * 1.3 * 2)' }}>
-                        {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
-                      </span>
-                      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
-                      {onYourCourse(row) && row.course_name ? (
-                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.AMBER }}>{row.course_name}</span>
-                      ) : null}
-                    </button>
-                  );
-                })}
+                {shortTiles(topQuickRows)}
               </QuickLayout>
             </>
           ) : loading && showsQuickHits(contentFilter) ? (
@@ -660,7 +698,16 @@ export function WatchFeed({
                         };
                       })()}
                     />
-                    {onAll && index + 1 === RAIL_EVERY && index + 1 < longRows.length ? communityRail() : null}
+                    {(() => {
+                      const position = index + 1;
+                      const rail = woven.rails.get(position);
+                      if (rail?.kind === 'community') return communityRail(rail.members, position);
+                      if (rail?.kind === 'shorts') return <div data-woven-after={position} data-woven-kind="shorts">
+                        <ShelfHeading title="More shorts" sub={t('amateur.watch.rail.shortsSub', 'Under three minutes')} seeAll={t('amateur.watch.seeAll', 'See all')} onSeeAll={selectShorts} />
+                        <QuickLayout grid={false}>{shortTiles(rail.shorts)}</QuickLayout>
+                      </div>;
+                      return null;
+                    })()}
                   </div>
                 );
               })}
