@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 import { useTranslation } from 'react-i18next';
 
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
@@ -244,10 +243,9 @@ export function MomentTile({
           />
         )}
 
-        {/* RATING CHIP — top-left, review photographs only. A moment carries no
-            rating and therefore no chip; the field is absent, not zero. The
-            figure is amber on dark (a rating is the one figure allowed it here)
-            and the scale suffix stays white at 70%. Same dark glass as the
+        {/* RATING CHIP — top-left when a rating is present, absent otherwise.
+            CM1 preserves all-white ratings; the scale suffix stays white at
+            70%. Same dark glass as the
             review tile's chip, never a second treatment. */}
         {typeof m.rating === 'number' && m.rating > 0 && (
           <span
@@ -267,7 +265,7 @@ export function MomentTile({
               style={{
                 fontSize: 14,
                 fontWeight: 700,
-                color: AMBER_ON_MEDIA,
+                color: '#FFFFFF',
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
                 fontVariantNumeric: 'tabular-nums',

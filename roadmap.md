@@ -1,5 +1,10 @@
 # Roadmap
 
+## CM1 Community destination
+- [x] Select Community in place, add watch deep links and retire Media page with legacy redirects; guest rules and shared totals preserved.
+- [x] Apply grid specification and white rating correction; corrected cm1-community-see-all.html received/read; surrounding frozen UI preserved.
+- [ ] STOP: focused148/148 but one unhandled TypeError at getScrollParent.ts:101:13 “scroller?.scrollTo is not a function” via WatchFeed.tsx:449:13 in ws1 community See all case. No correction/shards/browser after new error; build OK22:13:33Z. Candidate6486/576 (+14/+0), CM1_REPORT.md quotes changes/deletions. Await authorised test-environment correction; signed-in check unavailable external_unmanaged.
+
 ## FIX_GRID_1
 - [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.
 - [x] Explicit preview-error instruction authorised missing-brace correction only; focused58/58, shards1645/1537/1638/1652 =6472/576 (+10/+1), zero failures/unhandled errors; automatic build OK21:51:47Z. Activity sole-caller grep and PlayerPage-only exception confirmed. FIX_GRID_1_REPORT.md retains original failure, full audit and live-hit-testing limitation.

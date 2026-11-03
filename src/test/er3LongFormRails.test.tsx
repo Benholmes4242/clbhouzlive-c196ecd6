@@ -76,9 +76,11 @@ describe('ER3 woven rails', () => {
     mount(); const button = Array.from(slot(13)?.querySelectorAll('button') ?? []).find(el => el.textContent === 'See all'); if (!button) throw new Error('Missing Shorts See all'); fireEvent.click(button);
     expect(screen.getByRole('tab', { name: 'Shorts' })).toHaveAttribute('aria-selected','true'); expect(f.scroll).toHaveBeenCalledOnce(); expect(rails()).toHaveLength(0);
   });
-  it('community See all keeps the existing destination', () => {
+  it('community See all selects Community in place and scrolls to the top', () => {
     mount(); const button = Array.from(slot(23)?.querySelectorAll('button') ?? []).find(el => el.textContent === 'See all'); if (!button) throw new Error('Missing community See all'); fireEvent.click(button);
-    expect(screen.getByTestId('loc').textContent).toBe('/media?kind=community');
+    expect(screen.getByTestId('loc').textContent).toBe('/');
+    expect(screen.getByRole('tab', { name: 'Community' })).toHaveAttribute('aria-selected', 'true');
+    expect(f.scroll).toHaveBeenCalledOnce();
   });
   it('takes one extra clips page before a short rail renders, once for that slot', async () => {
     f.long = rows(14); f.short = rows(12,true); f.more = true;

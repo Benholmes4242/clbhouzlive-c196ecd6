@@ -279,7 +279,7 @@ describe('WS1 chips', () => {
     expect(screen.getByText('From the community')).toBeTruthy();
   });
 
-  it("the community rail's See all routes to /media?kind=community", () => {
+  it("the community rail's See all selects Community without changing the path", () => {
     /* The rail injects once, after the third long-form card, so the feed
        needs four long rows on screen. */
     f.videos = {
@@ -309,8 +309,10 @@ describe('WS1 chips', () => {
     const section = heading.closest('div')!;
     fireEvent.click(within(section).getByRole('button'));
     const loc = screen.getByTestId('loc');
-    expect(loc.getAttribute('data-path')).toBe('/media');
-    expect(loc.getAttribute('data-search')).toBe('?kind=community');
+    expect(loc.getAttribute('data-path')).toBe('/amateur');
+    expect(loc.getAttribute('data-search')).toBe('');
+    expect(screen.getByRole('tab', { name: 'Community' }).getAttribute('aria-selected')).toBe('true');
+    expect(f.track).toHaveBeenCalledWith('amateur_shelf_see_all', { kind: 'community', surface: 'watch' });
   });
 
   it('the search placeholder reads Search videos and creators', () => {

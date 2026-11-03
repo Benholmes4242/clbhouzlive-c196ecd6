@@ -4,7 +4,7 @@ import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { GlassDurationBadge, GLASS_CHROME } from '@/components/media/GlassDurationBadge';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { momentViewerPosts } from '../momentViewerPosts';
@@ -439,11 +439,15 @@ export function WatchFeed({
     if (items.length < WOVEN_RAIL_MIN) return null;
     return (
       <div data-woven-after={position} data-woven-kind="community" style={{ paddingBottom: 8 }}>
-        {/* WS1.1 — See all opens the media library's Community tab. */}
+        {/* CM1 — Community shares the other shelves' in-place chip selection. */}
         <Section
           title={position === RAIL_EVERY ? t('amateur.watch.rail.community', 'From the community') : 'More from the community'}
           seeAll={t('amateur.watch.seeAll', 'See all')}
-          onSeeAll={() => navigate('/media?kind=community')}
+          onSeeAll={() => {
+            analyticsEvents.track('amateur_shelf_see_all', { kind: 'community', surface: 'watch' });
+            setFilter('community');
+            scrollPageToTop();
+          }}
         />
         <Rail label="community">
           {items.map(({ lead, count }) => (
@@ -553,8 +557,8 @@ export function WatchFeed({
           : communityItems.length ? <div data-watch-grid="community" className="explore-community-grid">
             {communityItems.map((moment) => <div key={moment.key} data-community-item={moment.key} className="explore-community-item">
               <div className="explore-community-frame">
-                <MomentTile moment={moment} radius={11} initialsSize={14} labelSize={11} labelInset={8} labelled={false} autoplay={false} onPress={() => openMoment(moment, communityItems)} />
-                {moment.mediaType === 'video' ? <span data-community-play aria-hidden style={{ ...GLASS_CHROME, position: 'absolute', left: 8, bottom: 8, width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}><svg width={8} height={8} viewBox="0 0 10 10" fill="currentColor"><path d="M2 1l7 4-7 4z" /></svg></span> : null}
+                <MomentTile moment={moment} radius={12} initialsSize={14} labelSize={11} labelInset={8} labelled={false} autoplay={false} onPress={() => openMoment(moment, communityItems)} />
+                {moment.mediaType === 'video' ? <SolidDurationBadge seconds={moment.durationSeconds} /> : null}
               </div>
               <span className="explore-community-name">{moment.post?.displayName || moment.post?.username}</span>
               <span className="explore-community-course">{moment.courseName}</span>
