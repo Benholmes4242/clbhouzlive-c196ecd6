@@ -1,5 +1,9 @@
 # Roadmap
 
+## G2A course-detail tab dock
+- [ ] Replace standalone sticky row/scrim with existing IslandDock and shared tab handler; modal, hero and HB4 back unchanged.
+- [ ] Add docking/hidden-copy/URL/modal regressions, browser dock at sat47/top109, run four maxWorkers2 shards until any failure; report exact inventory and inherited stops without correcting unrelated tests.
+
 ## Tournament page three-state rebuild
 - [x] Reviewed three-state brief/mock and existing reads; user ruled chart opening “Novak won it…”, approved plan preserves system font/shared picks and verified round-count provenance.
 - [x] Implemented tournament state composition, shared PicksBlock extraction/picks-only path, opt-in board/champion presentation, typed course-holes read, course/time/chart/field/number rules and English/en-XA keys; excluded surfaces untouched.
