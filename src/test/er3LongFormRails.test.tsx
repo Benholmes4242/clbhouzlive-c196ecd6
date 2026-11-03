@@ -31,7 +31,7 @@ import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { SHORTS_SHELF_COUNT, WOVEN_RAIL_INTERVAL, WOVEN_RAIL_MIN } from '@/features/explore-magazine/watch/watchRules';
 const i18n = createInstance();
 void i18n.init({ lng: 'en', initAsync: false, resources: { en: { courses } }, interpolation: { escapeValue: false } });
-const rows = (count: number, short = false) => Array.from({ length: count }, (_, i) => ({ post_id: `${short ? 's' : 'l'}${i}`, duration_seconds: short ? 60 : 500, post_user_id: `creator-${i}`, creator_display_name: `Name ${i}`, caption: `Title ${i}`, poster_url: `https://x/${i}.jpg` }));
+const rows = (count: number, short = false) => Array.from({ length: count }, (_, i) => ({ post_id: `${short ? 's' : 'l'}${i}`, duration_seconds: short ? 60 : 500, post_user_id: `creator-${i}`, creator_display_name: `Name ${i}`, post_content: `Title ${i}`, poster_url: `https://x/${i}.jpg` }));
 const members = (count: number) => Array.from({ length: count }, (_, i) => ({ key: `m${i}`, post: { id: `p${i}`, userId: `u${i}`, displayName: `Member ${i}`, createdAt: '2026-11-03', mediaItems: [] }, courseName: 'Course', thumbnail: null }));
 function Location() { const loc = useLocation(); return <output data-testid="loc">{loc.pathname + loc.search}</output>; }
 const clients: QueryClient[] = [];

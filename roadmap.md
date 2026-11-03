@@ -1,6 +1,7 @@
 # Roadmap
 
 ## ER3 Long form woven rails
+- [ ] ER3.1: authorised rows() caption → post_content only; preserve every assertion, rerun focused158 and four full shards, update the report.
 - [x] Implement ten top Shorts and unseen alternating rails with minimum three, following-video gate and one-page clip replenishment per rail.
 - [ ] STOP: focused157/158; er3LongFormRails.test.tsx:54:136 “AssertionError: expected '8:20NUntitled videoName 2' to contain 'Title 2'”. No correction/rerun after failure; await scoped fixture/assertion ruling. Full output/tmp/er3/focused.log; report ER3_REPORT.md.
 - [ ] Four shards and browser check not run after stop; candidate6,091/552 (+20/+1), not full-suite result. Automatic build clean10:37:46Z.
