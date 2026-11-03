@@ -35,6 +35,7 @@ export interface AITopContender {
   reasons: string[];
   concern: string;
   promoted?: boolean;
+  modelVotes?: { model: string; rank: number }[];
 }
 
 export interface CourseAnalysis {
@@ -60,6 +61,7 @@ export interface AIPredictionData {
     status: string;
   };
   topContenders: AITopContender[];
+  darkHorses?: AITopContender[];
   courseAnalysis: CourseAnalysis;
   confidence: number;
   generatedAt: string;
@@ -741,8 +743,9 @@ function formatPredictions(
       status: tournament.status,
     },
     topContenders,
-    // Stored dark_horses are used ONLY as withdrawal alternates in
-    // validatePicksAgainstField; they are not surfaced as their own list.
+    // Build 2 exposes stored alternates, excluding promoted identities, without
+    // changing top-three selection or the lock-at-first-tee validation.
+    darkHorses: (predictions.darkHorses ?? []).filter((p: AITopContender) => !topContenders.some((top: AITopContender) => top.playerId === p.playerId)),
     // Every field empty on purpose: an absent analysis must read as absent.
     // A plausible default is worse than a missing row — nobody can tell it
     // apart from a real assessment.
