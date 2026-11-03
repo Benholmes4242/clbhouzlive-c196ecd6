@@ -1,9 +1,10 @@
 # Roadmap
 
 ## WS6 Creator to follow and Top 100 on film
-- [ ] Implement plural per-visit read, independent creator cards, recency line, snap rail and clickable scroll dots.
-- [ ] Top 100 156×248 tiles/skeletons with canonical glass rank and duration; frozen content unchanged.
-- [ ] Authorized test rewrites, added coverage, four full shards and clean build; report reconciled against 6,005/548.
+- [x] Plural per-visit read, independent creator cards, recency line, snap rail and clickable scroll dots.
+- [x] Top 100 156×248 tiles/skeletons with canonical glass rank and duration; frozen content unchanged; phone geometry verified in isolated browser fixture.
+- [x] Focused140/140; four full shards1501+1469+1501+1552=6,023/548 (+18 ws3WatchBottom); zero failures/unhandled errors; automatic build clean; WS6_REPORT.md quotes rewritten cases.
+- [ ] Signed-in Watch readback/full mock parity unavailable (external_unmanaged); responsive written width applied, mock's fixed340px difference reported.
 
 ## VIDEO_POSTERS_1
 - [x] Added/deployed only pick-video-poster with pure measured-frame rules and secret-authenticated existing RPC calls; live dry run 200, unauthorized 401, invalid limit 400. No write run or schedule created.
