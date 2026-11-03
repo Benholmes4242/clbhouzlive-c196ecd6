@@ -97,4 +97,19 @@ describe('ER1 Explore', () => {
     try { render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><ExploreTopControls query="" onQuery={() => {}} options={WATCH_CHIPS.map((id) => ({ id, label: id }))} value="community" onChange={() => {}} ariaLabel="Filters" placeholder="Search" sticky={false} /></QueryClientProvider></MemoryRouter>); expect(scroll).toHaveBeenCalledWith({ left: 66, behavior: 'smooth' }); }
     finally { rect.mockRestore(); HTMLElement.prototype.scrollBy = previous; }
   });
+  it('CM1 renders a 9.2 rating in pure white and no chip for an unrated moment', () => {
+    f.moments = [{ ...moment('rated', 'other', '2026-11-02'), rating: 9.2 }, moment('unrated', 'other', '2026-11-01')];
+    const { container } = mount('community');
+    const rated = container.querySelector('[data-community-item="rated"] .review-tile-chip');
+    expect(rated?.children[0].textContent).toBe('9.2');
+    expect((rated?.children[0] as HTMLElement | undefined)?.style.color).toBe('rgb(255, 255, 255)');
+    expect((rated?.children[1] as HTMLElement | undefined)?.style.color).toBe('rgba(255, 255, 255, 0.7)');
+    expect(container.querySelector('[data-community-item="unrated"] .review-tile-chip')).toBeNull();
+  });
+  it('CM1 video length uses the Shorts duration badge and has no play circle', () => {
+    f.moments = [{ ...moment('video', 'other', '2026-11-02', true), durationSeconds: 24 }];
+    const { container } = mount('community');
+    expect(container.querySelector('[data-watch-badge="duration"]')?.textContent).toBe('0:24');
+    expect(container.querySelector('[data-community-play]')).toBeNull();
+  });
 });
