@@ -373,3 +373,98 @@ describe('WS3 Long form', () => {
     expect(f.openWithOrigin).not.toHaveBeenCalled();
   });
 });
+
+describe('WS6 swipeable creator cards', () => {
+  it('three creators render three cards and three dots', () => {
+    f.spotlight = { data: [spot(), spot({ actor_id: 'p2' }), spot({ actor_id: 'p3' })], isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    expect(document.querySelectorAll('[data-spotlight]')).toHaveLength(3);
+    expect(document.querySelectorAll('[data-spotlight-dots] button')).toHaveLength(3);
+    expect(q('[data-spotlight-rail]')?.getAttribute('data-single')).toBe('false');
+  });
+  it('one creator uses full-width mode without dots', () => {
+    f.spotlight = { data: spot(), isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    expect(q('[data-spotlight-rail]')?.getAttribute('data-single')).toBe('true');
+    expect(q('[data-spotlight-dots]')).toBeNull();
+  });
+  it('scroll follows the nearest card and emits its one-based position', () => {
+    f.spotlight = { data: [spot(), spot({ actor_id: 'p2' }), spot({ actor_id: 'p3' })], isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    const rail = q('[data-spotlight-rail]') as HTMLElement;
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-spotlight]'));
+    vi.spyOn(rail, 'getBoundingClientRect').mockReturnValue({ left: 0 } as DOMRect);
+    cards.forEach((card, i) => vi.spyOn(card, 'getBoundingClientRect').mockReturnValue({ left: 16 + (i - 1) * 350 } as DOMRect));
+    fireEvent.scroll(rail);
+    expect(screen.getByRole('button', { name: 'Creator 2' })).toHaveAttribute('aria-pressed', 'true');
+    expect(f.track).toHaveBeenCalledWith('watch_spotlight_swiped', { to: 2 });
+  });
+  it('dot tap scrolls to its card without a swipe event', () => {
+    f.spotlight = { data: [spot(), spot({ actor_id: 'p2' })], isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    const rail = q('[data-spotlight-rail]') as HTMLElement;
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-spotlight]'));
+    vi.spyOn(rail, 'getBoundingClientRect').mockReturnValue({ left: 0 } as DOMRect);
+    cards.forEach((card, i) => vi.spyOn(card, 'getBoundingClientRect').mockReturnValue({ left: 16 + i * 350 } as DOMRect));
+    rail.scrollTo = vi.fn();
+    fireEvent.click(screen.getByRole('button', { name: 'Creator 2' }));
+    expect(rail.scrollTo).toHaveBeenCalledWith({ left: 350, behavior: 'smooth' });
+    expect(f.track).not.toHaveBeenCalledWith('watch_spotlight_swiped', expect.anything());
+  });
+  it('Follow on card two leaves card one unchanged and persists per actor on remount', async () => {
+    f.spotlight = { data: [spot(), spot({ actor_id: 'p2' })], isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    await act(async () => fireEvent.click(q('[data-spotlight="p2"] [data-spotlight-follow]') as Element));
+    expect(q('[data-spotlight="p1"] [data-spotlight-follow]')).toHaveAttribute('data-spotlight-follow', 'off');
+    expect(q('[data-spotlight="p2"] [data-spotlight-follow]')).toHaveAttribute('data-spotlight-follow', 'on');
+    expect(f.track).toHaveBeenCalledWith('watch_spotlight_follow', { actor_type: 'personal', position: 2 });
+    cleanup(); wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    expect(q('[data-spotlight="p1"] [data-spotlight-follow]')).toHaveAttribute('data-spotlight-follow', 'off');
+    expect(q('[data-spotlight="p2"] [data-spotlight-follow]')).toHaveAttribute('data-spotlight-follow', 'on');
+  });
+  it('creator videos are 150 tall with top-right glass duration', () => {
+    f.spotlight = { data: spot(), isError: false }; f.creatorVideos = { data: [vid('v1')] };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    const tile = q('[data-spotlight-video="v1"]') as HTMLElement;
+    expect(tile.style.height).toBe('150px');
+    const badge = Array.from(tile.querySelectorAll('span')).find(el => el.style.top === '6px' && el.style.right === '6px');
+    expect(badge).toBeTruthy(); expect(tile.querySelector('[data-duration]')).toBeNull();
+  });
+  it('line uses the newest loaded video and stays count-only before videos load', () => {
+    f.spotlight = { data: spot({ videos: 1 }), isError: false };
+    const view = wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    expect(q('[data-spotlight-line]')?.textContent).toBe('1 video');
+    f.creatorVideos = { data: [vid('v1', { created_at: new Date().toISOString() })] };
+    view.rerender(<MemoryRouter><I18nextProvider i18n={i18n}><QueryClientProvider client={new QueryClient()}><CreatorSpotlight userId="me" visitKey="v" /></QueryClientProvider></I18nextProvider></MemoryRouter>);
+    expect(q('[data-spotlight-line]')?.textContent).toBe('1 video · today');
+  });
+  it.each([[0, 'today'], [1, 'yesterday'], [2, '2 days ago'], [6, '6 days ago'], [7, '1 week ago'], [14, '2 weeks ago'], [55, '7 weeks ago'], [56, 'in September']])('relative band at %i days is %s', (days, expected) => {
+    const now = new Date('2026-11-03T12:00:00Z');
+    expect(spotlightRelative(new Date(now.getTime() - days * 86400000).toISOString(), now)).toBe(expected);
+  });
+  it('plural read calls limit three and caches picks within one visit', async () => {
+    f.rpc.mockResolvedValue({ data: [spot()], error: null });
+    function Read({ visit }: { visit: string }) { const result = realBottom.useWatchSpotlights('me', visit); return <span data-read>{result.data?.length ?? 0}</span>; }
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const tree = (visit: string) => <MemoryRouter><QueryClientProvider client={client}><Read visit={visit} /></QueryClientProvider></MemoryRouter>;
+    const view = render(tree('first'));
+    await waitFor(() => expect(q('[data-read]')?.textContent).toBe('1'));
+    expect(f.rpc).toHaveBeenCalledWith('get_watch_spotlights', { p_limit: 3 });
+    view.rerender(tree('first')); expect(f.rpc).toHaveBeenCalledTimes(1);
+    view.rerender(tree('second')); await waitFor(() => expect(f.rpc).toHaveBeenCalledTimes(2));
+  });
+  it('Top 100 tile uses 156×248 geometry and glass rank at top-left', () => {
+    f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
+    wrap(<Top100FilmShelf userId="me" />);
+    const tile = q('[data-top100-tile="t1"]') as HTMLElement;
+    expect(tile.style.width).toBe('156px'); expect(tile.style.height).toBe('248px'); expect(tile.style.borderRadius).toBe('12px');
+    const rank = tile.querySelector('[data-top100-rank] > span') as HTMLElement;
+    expect(rank.style.top).toBe('6px'); expect(rank.style.left).toBe('6px'); expect(rank.style.fontSize).toBe('11px'); expect(rank.style.padding).toBe('3px 9px');
+  });
+  it('Top 100 skeleton matches tile geometry', () => {
+    f.top100 = { data: [], isError: false, isLoading: true } as typeof f.top100;
+    wrap(<Top100FilmShelf userId="me" />);
+    const tiles = document.querySelectorAll<HTMLElement>('[data-top100-skeleton] > div:last-child > span');
+    expect(tiles).toHaveLength(3); tiles.forEach(tile => { expect(tile.style.width).toBe('156px'); expect(tile.style.height).toBe('248px'); expect(tile.style.borderRadius).toBe('12px'); });
+  });
+});
