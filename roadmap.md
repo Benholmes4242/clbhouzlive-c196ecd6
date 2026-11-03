@@ -2,9 +2,9 @@
 
 ## HB2 Explore header and island dock
 - [x] Apply Clubhouse folding chrome to /amateur only and replace sticky controls with a shared-state IslandDock; user-ruled selected glass recorded.
-- [ ] Verify observer/focus/accessibility behavior, browser scroll states and resolved selected-glass paint.
+- [x] Focused92/92; real390×844 #root down/up screenshots with sat47 confirm hidden folded dock, shown top109px and resolved glass; shared Shorts readback, guest capsule byte-identical, no page errors.
 - [x] User-authorized 56px fallback for a nonpositive probe and always-mounted hidden controls; keep observer-boundary expectation unchanged, add exit-mount regression. Ignore mistakenly uploaded Courses mock until HB3.
-- [ ] STOP: authorized boundary/mount correction passes HB2 10/10, focused 91/92; ws1WatchTop.test.tsx:319:19 reports “Found multiple elements with the placeholder text of: Search videos and creators”. Existing test untouched; no browser/shards after new failure. Build OK 15:06:52Z; candidate 6,262/559, baseline 6,252/558. Report HB2_EXPLORE_REPORT.md.
+- [ ] STOP: shards1/2 pass1581/1524; shard3 passes1526 but er3LongFormRails.test.tsx fails collection: “No \"getPageScrollTop\" export is defined on the \"@/lib/getScrollParent\" mock” at useScrollDirection.ts:70:12. No correction/shard4; full failing output /tmp/hb2/shard-3.log. Build OK15:09:03Z; candidate6262/559 vs6252/558. HB2_EXPLORE_REPORT.md quotes authorized ws1 assertion and complete verification.
 
 ## ISLAND_SQUIRCLE_1 — squircle islands on header B routes
 - [x] 16px (34%) radius on both islands for '/', '/clubhouse', '/tourhub' via spec.condense; guest right and all other routes unchanged.
