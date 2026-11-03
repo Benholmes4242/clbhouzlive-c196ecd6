@@ -1,7 +1,7 @@
 # Roadmap
 
 ## TU1 two-up video grids
-- [ ] Waiting on CM1 completion, as TU1 explicitly requires; FIX_GRID_1 is complete. No TU1 product or test edits started.
+- [ ] CM1 test-only scrollPageToTop mock correction authorised; run focused checks and four shards before TU1. FIX_GRID_1 is complete.
 - [ ] Once unblocked, extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; preserve chrome/paging/actions.
 - [ ] Update authorised tile assertions, add rank/duration/wrapping/navigation coverage and report reconciled four-shard totals/build, retaining any failing output.
 

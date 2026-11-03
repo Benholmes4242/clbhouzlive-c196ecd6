@@ -16,6 +16,7 @@ const f = vi.hoisted(() => ({
   moments: { data: [] as unknown[], isFetched: true, isError: false, refetch: vi.fn() },
   videos: { data: { pages: [[]] as unknown[][] }, isFetched: true, isError: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() },
   track: vi.fn(),
+  scroll: vi.fn(),
   openWithOrigin: vi.fn(),
   registerRailVideo: vi.fn(() => () => {}),
   attachTileHls: vi.fn(() => ({ detach: vi.fn() })),
@@ -75,6 +76,7 @@ vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachT
 vi.mock('@/components/explore-tab-new/courseled/reviewVideoAutoplay', () => ({ autoplayBlocked: () => false, deliverVerdict: vi.fn() }));
 vi.mock('@/hooks/usePrefersReducedMotion', () => ({ usePrefersReducedMotion: () => false }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: f.track } }));
+vi.mock('@/lib/getScrollParent', async (orig) => ({ ...(await orig<Record<string, unknown>>()), scrollPageToTop: f.scroll }));
 
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { APPLIED_FILL, RailChips, SELECTED_EDGE } from '@/components/ui/RailChips';
@@ -204,6 +206,7 @@ beforeEach(() => {
   f.loadPosts.mockReset().mockResolvedValue([{ id: 'old' }, { id: 'new' }]);
   usePostStudioStore.getState().closePostStudio();
   f.track.mockClear();
+  f.scroll.mockClear();
   f.openWithOrigin.mockClear();
   f.registerRailVideo.mockClear();
   f.attachTileHls.mockClear();
@@ -312,6 +315,7 @@ describe('WS1 chips', () => {
     expect(loc.getAttribute('data-path')).toBe('/amateur');
     expect(loc.getAttribute('data-search')).toBe('');
     expect(screen.getByRole('tab', { name: 'Community' }).getAttribute('aria-selected')).toBe('true');
+    expect(f.scroll).toHaveBeenCalledOnce();
     expect(f.track).toHaveBeenCalledWith('amateur_shelf_see_all', { kind: 'community', surface: 'watch' });
   });
 
