@@ -442,7 +442,7 @@ export const ActivityPageV2: React.FC = () => {
         padding: '6px 4px',
         background: 'transparent',
         border: 'none',
-        color: 'var(--pick-soft)',
+        color: 'hsl(var(--foreground) / 0.75)',
         fontSize: 13,
         fontWeight: 700,
         cursor: 'pointer',
