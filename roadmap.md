@@ -9,12 +9,13 @@
 ## Integrated Our picks section
 - [x] Integrate shared four-state amber card/circle rank read/plain record row, preserving sheets/prior fixes; exact guest lock copy blocked by absent guest-accessible locks_at source.
 - [ ] STOP: focused126 passed/1 failed/127 at integratedPicks.test.tsx:36:542; expected “6 of your circle…” received “DG6 of your circle…” from avatar initials in whole-footer selector. No correction or shards after failure; build OK22:25:29Z. Candidate6509/577 (+23/+1 after CM1 candidate6486/576), INTEGRATED_OUR_PICKS_REPORT.md names both authorised rewrites and missing verification. Await authorised test correction; guest time source remains needed.
-- [ ] CM1 unhandled scrollTo error remains pre-existing and unauthorised; report it if reproduced, do not fix it as part of picks.
+- [x] CM1 scrollTo fixture error resolved by separately authorised ws1 mock; no Picks product/test changes made.
 
 ## CM1 Community destination
 - [x] Select Community in place, add watch deep links and retire Media page with legacy redirects; guest rules and shared totals preserved.
 - [x] Apply grid specification and white rating correction; corrected cm1-community-see-all.html received/read; surrounding frozen UI preserved.
-- [ ] STOP: focused148/148 but one unhandled TypeError at getScrollParent.ts:101:13 “scroller?.scrollTo is not a function” via WatchFeed.tsx:449:13 in ws1 community See all case. No correction/shards/browser after new error; build OK22:13:33Z. Candidate6486/576 (+14/+0), CM1_REPORT.md quotes changes/deletions. Await authorised test-environment correction; signed-in check unavailable external_unmanaged.
+- [x] Authorised test-only correction passes focused148/148 with zero unhandled errors; build OK22:36:07Z. Corrected mock received; CM1_REPORT.md preserves historical output and current verification.
+- [ ] Full-suite completion blocked by inherited integratedPicks assertion in shard1 (1680/1681 pass); see TU1 stop above. Signed-in live comparison remains unavailable external_unmanaged.
 
 ## FIX_GRID_1
 - [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.
