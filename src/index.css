@@ -26,6 +26,18 @@
 
 :root {
   --pick-sheet: #16161A;
+  --pick-canvas: #0A0A0C;
+  --pick-under: #E24B3F;
+  --pick-win: #FBBC2E;
+  --pick-segments: rgba(255,255,255,.05);
+  --pick-tab-selected: #24242A;
+  --pick-stat-fill: rgba(248,250,252,.85);
+  --pick-stat-low: rgba(248,250,252,.35);
+  --pick-case-dot: rgba(255,255,255,.4);
+  --pick-benchmark-tick: rgba(255,255,255,.5);
+  --pick-mine-fill: rgba(247,147,30,.06);
+  --pick-mine-border: rgba(247,147,30,.22);
+  --pick-mine-placeholder: rgba(247,147,30,.6);
   --pick-ink: #F8FAFC;
   --pick-on-amber: #0A0A0C;
   --pick-amber: #F7931E;

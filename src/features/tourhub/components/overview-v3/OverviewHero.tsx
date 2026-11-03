@@ -328,6 +328,9 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         >
           <HeroBoardSection
             tournamentId={bandTournamentId}
+            eventName={activeSlide?.tournament.name}
+            eventTourCode={activeSlide?.tournament.pickTourCode}
+            eventSeasonYear={activeSlide?.tournament.seasonYear}
             entries={boardEntries}
             leaderboardLoading={boardLeaderboardLoading}
             eventType={activeSlide?.tournament.eventType ?? null}

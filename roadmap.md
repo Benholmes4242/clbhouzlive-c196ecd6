@@ -1,14 +1,17 @@
 # Roadmap
 
 ## Tournament picks build 2 — overview, Why and Our record
-- [ ] Resolve brief/mock stat-order conflict: brief requires the same three stats in the same order for every pick; mock changes bar order per player.
-- [ ] Resolve live comparison conflict: brief compares with our picks still in and prefixes 'One of our picks.'; mock Kim compares with missed-cut Clark and omits that prefix.
-- [ ] Obtain scoped authorization for the existing build1 whole-row/AF assertion failure before final verification.
-- [ ] Implement approved overview additions, Why sheet rewrite, record sheet and new RPC hooks; update only retired contract tests; run four full shards and report reconciled counts.
+- [x] Stat order: shared course keyStats order for every pick; per-player mock ordering ruled a mistake.
+- [x] Live comparisons: exclude eliminated picks, no 'One of our picks.' prefix, no line when no other active pick; Kim example reads 'Behind Ghim.'.
+- [x] Authorised build1 assertion targets .your-pick-text, preserving AF initials;25/25 passed.
+- [x] Implement overview additions, tapped-player Why sheet, record sheet, four RPC hooks and44 new regressions; retired5 copy tests updated with unchanged count.
+- [ ] STOP: focused117/120, three tourOverviewPicksTeeLine regressions at119:27,136:27,170:23 because live heading now renders ROUND n · LIVE rather than tee-day. No fix/rerun/full shards/browser after failure. Await scoped ruling; full output /tmp/tournament-picks2/focused.log.
+- [ ] score-predictions casing fix remains untouched: located in existing edge function, which standing restrictions prohibit editing. Requires scoped authorization.
+- [x] TOURNAMENT_PICKS_BUILD2_REPORT.md records all files, named44-test delta, historical build1 clearance and incomplete verification. Candidate6,160/554; latest build11:29:04Z OK.
 
 ## Tournament picks build 1 — Your pick sheet
 - [x] Build isolated member field/state/mutation hooks and signed-off Opened, Chosen, Search and locked sheet; no overview entrypoints.
-- [ ] STOP: focused24/25; yourPickSheet.test.tsx:85:81 expected 'Alejandro FierroNot ranked', received 'AFAlejandro FierroNot ranked' (canonical avatar initials included in whole-row assertion). Await scoped assertion authorization; no fix/rerun/full shards/browser after failure.
+- [x] Historical STOP resolved by authorized .your-pick-text assertion;25/25 passed in build2 focused run. Full suite pending build2 regression ruling.
 - [x] TOURNAMENT_PICKS_BUILD1_REPORT.md lists every touched file and25 new cases; candidate6,116/553 vs last green6,091/552, not a full-suite result. Automatic build11:02:00Z OK; no pre-existing failure observed. Live entrypoint belongs to build2.
 
 ## ER3 Long form woven rails

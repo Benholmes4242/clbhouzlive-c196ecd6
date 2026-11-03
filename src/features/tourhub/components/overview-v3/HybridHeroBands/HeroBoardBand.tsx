@@ -74,6 +74,12 @@ import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { LeadersGroup } from './LeadersGroup';
+import { PickMemberBands } from './PickMemberBands';
+import { YourPickSheet } from './YourPickSheet';
+import { OurRecordSheet } from './OurRecordSheet';
+import { finishedVerdict, resultPosition, type PickResult } from './pickInsightRules';
+import { Button } from '@/components/ui/button';
+import './pickPanels.css';
 
 
 /**
@@ -193,6 +199,9 @@ function StatCell({
 
 interface HeroBoardSectionProps {
   tournamentId: string;
+  eventName?: string;
+  eventTourCode?: string;
+  eventSeasonYear?: number;
   entries: BoardEntry[];
   leaderboardLoading?: boolean;
   eventType?: string | null;
@@ -303,6 +312,9 @@ export function HeroBoardSection({
   onRowTap,
   leaderboardLoading = false,
   eventType = null,
+  eventName,
+  eventTourCode,
+  eventSeasonYear,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   /* Before the first tee the feed gives every row position 1 and a 0 score;
@@ -310,12 +322,15 @@ export function HeroBoardSection({
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
-  const pickTourCode = viewingTourSlug ?? 'pga';
+  const pickTourCode = eventTourCode ?? viewingTourSlug ?? 'pga';
   const picksTid = viewingTournamentId ?? tournamentId;
   const { data: predictions } = useAIPredictions(picksTid);
   const picks = (predictions?.topContenders ?? []) as AITopContender[];
   const hasPicks = picks.length > 0;
   const [picksOpen, setPicksOpen] = useState(false);
+  const [tappedPick, setTappedPick] = useState<string | null>(null);
+  const [yourPickOpen, setYourPickOpen] = useState(false);
+  const [recordOpen, setRecordOpen] = useState(false);
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
     for (const p of picks) if (p?.playerId) ids.add(String(p.playerId));
@@ -357,6 +372,18 @@ export function HeroBoardSection({
     () => resolveChampionPlayerId(entries, championSrId, phase),
     [championSrId, entries, phase],
   );
+  const allPredictionPlayers = [...picks, ...(predictions?.darkHorses ?? [])];
+  const pickResults: PickResult[] = allPredictionPlayers.map(p => {
+    const line = boardByPlayer.get(p.playerId);
+    const entry = entries.find(e=>e.player?.id===p.playerId);
+    return { playerId:p.playerId, playerName:p.playerName, position:line?.position ?? null, tied:line?.tied, score:line?.score, status:line?.status,
+      percentile: phase==='completed' && line?.position!=null && entries.length>1 ? Math.round((entries.length-line.position)/(entries.length-1)*100) : null,
+      thru:entry?.thru };
+  });
+  const championIds = [...championPlayerIds,...(championPlayerId ? [championPlayerId]:[])];
+  const winnerEntry=entries.find(e=>e.player?.id && championIds.includes(e.player.id));
+  const winner=winnerEntry?.player ? {playerId:winnerEntry.player.id,playerName:winnerEntry.player.full_name ?? '',position:winnerEntry.position ?? null,score:winnerEntry.score} : null;
+  const runnerUp=entries.filter(e=>e.player?.id && !championIds.includes(e.player.id) && e.score!=null).sort((a,b)=>Number(a.score)-Number(b.score))[0];
 
   const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
@@ -494,6 +521,12 @@ export function HeroBoardSection({
         <PicksBlock
           picks={picks}
           tourCode={pickTourCode}
+          tournamentId={picksTid}
+          seasonYear={eventSeasonYear ?? null}
+          currentRound={currentRound}
+          pickResults={pickResults.filter(r=>picks.some(p=>p.playerId===r.playerId))}
+          onOpenYourPick={()=>setYourPickOpen(true)}
+          onOpenRecord={()=>setRecordOpen(true)}
           phase={phase}
           boardByPlayer={boardByPlayer}
           teeByPlayer={phase === 'completed' ? null : pickTees ?? null}
@@ -504,7 +537,7 @@ export function HeroBoardSection({
           neededByPlayer={toReachWindow ? neededByPlayer : null}
           leaderTotal={leader?.total ?? null}
           toReachScore={toReachWindow && leader?.total != null ? fmtScore(leader.total) : null}
-          onOpenPick={() => setPicksOpen(true)}
+          onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }}
         />
       ) : null}
       <LeadersGroup tournamentId={tournamentId} entries={entries} currentRound={currentRound} totalRounds={totalRounds}
@@ -515,11 +548,22 @@ export function HeroBoardSection({
           onClose={() => setPicksOpen(false)}
           picks={picks}
           predictions={predictions ?? null}
-          eventName={predictions?.tournament?.name ?? ''}
+          eventName={eventName ?? predictions?.tournament?.name ?? ''}
           venueName={predictions?.tournament?.venueName || null}
           neededByPlayer={neededByPlayer}
+          tournamentId={picksTid}
+          tourCode={pickTourCode}
+          phase={phase}
+          currentRound={currentRound}
+          initialPlayerId={tappedPick}
+          results={pickResults}
+          championIds={championIds}
+          winner={winner}
+          winningMargin={winner?.score!=null && runnerUp?.score!=null ? runnerUp.score-winner.score : null}
         />
       ) : null}
+      <YourPickSheet open={yourPickOpen} onClose={()=>setYourPickOpen(false)} tournamentId={picksTid} eventName={eventName ?? predictions?.tournament?.name ?? ''} ourPicks={picks.map(p=>({playerId:p.playerId,playerName:p.playerName}))} tourCode={pickTourCode}/>
+      {eventSeasonYear != null && <OurRecordSheet open={recordOpen} onClose={()=>setRecordOpen(false)} tour={pickTourCode} year={eventSeasonYear}/>}
 
     </div>
   );
@@ -590,13 +634,25 @@ function PicksBlock({
   toReachScore,
   leaderTotal,
   onOpenPick,
+  tournamentId,
+  seasonYear,
+  currentRound,
+  pickResults,
+  onOpenYourPick,
+  onOpenRecord,
 }: {
   /** Pick tee times by sr_players.id; null/empty renders no tee line. */
   teeByPlayer: Map<string, string> | null;
   startedPlayers: Set<string>;
   /** The leader's to-par; a pick at or ahead of it has nothing to reach. */
   leaderTotal: number | null;
-  onOpenPick: () => void;
+  onOpenPick: (id:string) => void;
+  tournamentId:string;
+  seasonYear:number|null;
+  currentRound:number|null;
+  pickResults:PickResult[];
+  onOpenYourPick:()=>void;
+  onOpenRecord:()=>void;
   /** §E.1 where the picks stand; null renders no line. */
   intro: string | null;
   /** §E.2 the same map PicksSheet reads; null outside the required-round window. */
@@ -614,6 +670,8 @@ function PicksBlock({
 }) {
   const { t } = useTranslation('tourhub');
   const cards = picks.slice(0, 3);
+  const verdict=finishedVerdict(pickResults,[...championPlayerIds,...(championPlayerId?[championPlayerId]:[])]);
+  const recordCopy=(key:string,options:Record<string,unknown>={})=>t(`overview.pickRecord.${key}`,options);
   /* A card shows a tee time only with no figure line and no start — the same
      rule the card applies below; the heading's day reads exactly these. */
   const teeFor = (p: AITopContender): string | null => {
@@ -658,13 +716,14 @@ function PicksBlock({
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
         <span ref={picksRef} style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
-        {teeDay ? (
+        {phase!=='upcoming' ? <span className="pick-panel-dim" style={{marginLeft:'auto',fontSize:9.5,fontWeight:800,letterSpacing:'.12em'}}>{phase==='completed'?recordCopy('final'):recordCopy('roundLive',{round:currentRound??''})}</span> : teeDay ? (
           <>
             <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
             <span ref={fullRef} data-overview-picks-tee-measure aria-hidden style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: 0, top: 0, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{teeDay}</span>
           </>
         ) : null}
       </div>
+      {phase==='completed' && <div className="pick-overview-verdict" data-picks-verdict><b>{verdict.bold}</b>{verdict.rest && ` ${verdict.rest}`}</div>}
       {intro ? (
         <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
       ) : null}
@@ -721,7 +780,7 @@ function PicksBlock({
               type="button"
               key={p.playerId || i}
               data-overview-pick-card
-              onClick={onOpenPick}
+              onClick={()=>onOpenPick(p.playerId)}
               aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
               className="active:opacity-70 transition-opacity"
               /* Signed-off Board B: outlined landscape chip, three across, no fill. */
@@ -762,7 +821,7 @@ function PicksBlock({
           );
         })}
       </div>
-
+      {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} onPick={onOpenYourPick} onRecord={onOpenRecord}/>}
     </div>
   );
 }
