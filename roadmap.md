@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Tour player page rebuild — player-v2
-- [ ] Rebuild the signed-off player page using header-owned season/tour, recorded wins and existing pick/follow doors; preserve LiveNowStrip.
-- [ ] Add concrete rule/section tests, reconcile all retired or rewritten assertions against 6,168 tests / 554 files, run four shards and check the preview.
-- [ ] Report every touched file and any unavailable read or verification.
+- [x] Implement the player page using header-owned season/tour, recorded wins and existing pick/follow doors; preserve LiveNowStrip source.
+- [ ] STOP: focused 102/113; 11 new playerRebuildPage cases fail at src/lib/getScrollParent.ts:101:13, called by PlayerPage.tsx:41:17: TypeError: scroller?.scrollTo is not a function. Await scoped test-environment correction; no edits/reruns/shards/browser comparison after failure.
+- [x] PLAYER_PAGE_REBUILD_REPORT.md quotes four authorized hero replacements (4→4), lists every touched/deleted file and preserves full output. Candidate 6,234/556 = baseline6,168/554 +52 playerRebuildRules +14 playerRebuildPage. Pure52/52, hero4/4, existing25+11+7 passed; automatic build12:50:00Z OK.
+- [ ] Run four full shards and compare the three live player shapes after the stop clears; authenticated member readback unavailable (external_unmanaged).
 
 ## Tournament picks build 2 — guest availability and reason checks
 - [x] Guest Pick card only for unlocked upcoming events; number words only checked as figures in win/won/wins reasons, digit rules preserved.
