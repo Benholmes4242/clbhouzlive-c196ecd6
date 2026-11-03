@@ -1,5 +1,10 @@
 # Roadmap
 
+## Consolidated CM1 then TU1
+- [x] Apply only authorised Merged Airy heading14→16 and grid bottom14→0 expectations; other assertions/product frozen.
+- [ ] Run all four CM1 shards with maxWorkers2; stop on any failure, no exemptions.
+- [ ] After CM1 green, implement queued TU1 and run four shards again; reconcile every named test delta and preserve all failure output.
+
 ## Authorised Picks continuation
 - [x] Scope integratedPicks circle assertion to its text element, expected copy unchanged; focused23/23 and shard1 passed.
 - [x] Add guest public lock/time reads and null-time copy; preserve member state reads; five new rule tests pass.
