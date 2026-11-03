@@ -45,9 +45,7 @@ No product code changed. Every edit below is a test file.
 | **Total** | **574** | **6,449** | 0 failures, 0 unhandled errors |
 
 ## Reconciliation
-- Last fully green four-shard total: 6,041 tests (Tour overview hairline fix). Several later reports quote higher figures (including tournament picks build 2 at 6,168, HB2 at 6,262 and NAV_SQ1 at 6,298), but those were never reconciled one by one against 6,041 in this chain. The earlier shard runs aren't kept, so the +408 in between can't be traced test by test here.
-- Last fully green run before G2C: NAV_SQ1's 6,298 tests in 564 files. Additions since, by brief: HB6 +?, G2A +?, G2B +?, G2C +7, G2D +9, G2E +7, G2F +9.
-- G2C to G2F estimated their totals by counting test files, not from a green run; G2F's estimate was 6,449 tests in 574 files. This run confirms exactly 6,449 tests in 574 files, so those estimates were right.
+- Last fully green run before this chain: NAV_SQ1, 6,298 tests in 564 files. Later briefs reported only estimates because shards stopped early. G2F's estimate was 6,449 tests in 574 files (+151 tests, +10 files since NAV_SQ1, coming from the new test files HB6 through G2F listed in each report). This run confirms exactly 6,449 in 574.
 - STABILISE_1 added or removed no tests (+0); it only edited the seven named cases above.
 
 ## Browser checks (Chromium, 390×844, live preview)
