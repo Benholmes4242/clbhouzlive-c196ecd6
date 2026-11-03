@@ -74,7 +74,7 @@ describe('Merged Airy lower sections', () => {
   it.each(['upcoming', 'live', 'completed'] as const)('adds the picks hairline and tighter cards in %s', phase => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase={phase} />);
     const picks = v.container.querySelector<HTMLElement>('[data-overview-picks]');
-    expect(picks?.style.paddingTop).toBe('8px'); expect(picks?.querySelector('[data-overview-picks-hairline]')).not.toBeNull();
+    expect(picks?.style.paddingTop).toBe('8px'); const hairline = picks?.querySelector<HTMLElement>('[data-overview-picks-hairline]'); expect(hairline).not.toBeNull(); expect(hairline?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
     expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('14px');
     expect(picks?.querySelector<HTMLElement>('[data-overview-pick-card]')?.style.padding).toBe('7px');
     expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('14px');
@@ -97,7 +97,7 @@ describe('Merged Airy lower sections', () => {
   it('tightens leaders with a six-pixel gap and top hairline', () => {
     const group = { teeTime: '2026-11-01T12:00:00Z', startingHole: 1, players: [{ id: 'a', name: 'Player A' }] };
     const v = mount(<LeadersGroupContent tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase="live" round={2} group={group} groups={[group]} />);
-    const section = v.container.querySelector<HTMLElement>('[data-leaders-group]'); expect(section?.style.padding).toBe('14px 20px 12px'); expect(section?.style.marginTop).toBe('6px'); expect(section?.getAttribute('style')).toContain('border-top: 1px solid var(--th-overview-hairline)');
+    const section = v.container.querySelector<HTMLElement>('[data-leaders-group]'); expect(section?.style.padding).toBe('14px 20px 12px'); expect(section?.style.marginTop).toBe('6px'); expect(section?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
     expect(section?.querySelector<HTMLElement>('[data-leaders-group-state]')?.style.marginTop).toBe('6px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-header]')?.style.marginTop).toBe('10px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-row]')?.style.minHeight).toBe('33px');
   });
   it('tightens narrative champion spacing and preserves the no-narrative strip', () => {
