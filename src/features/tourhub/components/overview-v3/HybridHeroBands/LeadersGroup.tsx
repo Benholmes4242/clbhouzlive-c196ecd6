@@ -17,6 +17,7 @@ import { isStrokeEvent } from '../../../_shared/eventFormat';
 import { fmtScore } from '../../../utils/fmtScore';
 import { LEADERS_GROUP as L } from './leadersGroupTokens';
 import { allLeaders, groupState, leadersBaseRound, leadersShownRound, leadersGroupVisible, pickLeadersGroup, otherLeaders, leadersNote, roundEntry, leadersPositionOrder } from './leadersGroupRules';
+import { WHITE_ALPHA_06 } from '../../../_shared/tokens';
 
 interface Props {
   tournamentId: string; entries: BoardEntry[]; currentRound: number | null;
