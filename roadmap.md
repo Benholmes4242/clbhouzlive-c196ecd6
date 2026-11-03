@@ -1,9 +1,10 @@
 # Roadmap
 
 ## ER2 Creators to follow and By region
-- [ ] Match the plural five-row rail, initial following state and canonical batched activity avatar doors; remove only Your patch.
-- [ ] Add scoped tests and quote authorised changes; run four full shards with maxWorkers=2 and confirm automatic build against 6,061/550 baseline.
-- [ ] Verify reachable presentation; report authenticated flow limitations without bypassing guest browsing.
+- [x] Match the plural five-row rail, initial following state and canonical batched activity avatar doors; remove only Your patch.
+- [x] Focused104/104; full four shards1504+1504+1509+1554=6,071/551 (+10/+1 er2CreatorsRegion), zero failures/unhandled errors; automatic build clean. ER2_REPORT.md quotes authorised changes and lists files.
+- [x] Real404×970 public creator rail checked:340px cards, equal65.796875px heads,8 region tiles and no patch, no page errors/overflow.
+- [ ] Authenticated follow write/readback and live ring verification blocked by external_unmanaged; real-component regressions cover those rules without bypassing guest browsing.
 
 ## ER1 Explore top and Community
 - [x] Remove Golfers to watch, restore Community tile/view, reveal selected tile, and exclude own items outside search locally.
