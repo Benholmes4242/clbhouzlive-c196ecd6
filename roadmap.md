@@ -1,5 +1,10 @@
 # Roadmap
 
+## GI1 signed-out header island
+- [x] Condense-only guest squircle/glass and accessible Log in fold; preserve Join free actions and non-condense output.
+- [x] Authorized two test rewrites quoted in GI1_GUEST_ISLAND_REPORT.md; +3 headerB1/+1 reducedMotion=6295/563 from6291/562. Focused22/22; shards1594/1523/1554/1624, zero failures/unhandled; automatic build OK16:58:14Z. Combined timeout interrupted shard4 only; original retained and individual rerun passed.
+- [x] Real signed-out / at390×844/sat47: rest168.359375×46/glass0.55; actual registered Virtuoso feed scroll500 folds104.359375×46/glass0.84, Log in inaccessible, Join free34px/enabled opens existing dialog; screenshots inspected, zero page errors. Initial #root script-only scroller mistake corrected; no fixture/auth/product workaround.
+
 ## HB5 Profile back-name header
 - [x] Authorized correction: only tourOverviewBand's stale example route /profile/ben→/discover, all assertions unchanged; exact diff quoted in HB5_PROFILE_REPORT.md. Shard4 rerun1619/1619; final1594+1520+1558+1619=6291/562, zero failures/unhandled errors; +13/+1 solely hb5ProfileBackName from6278/561, correction count unchanged. Automatic build OK16:43:35Z.
 - [x] Personal profile roots only: history back, shared HB4 full-name observation; optional ref through ProfileHero to actual ProfileCoverBand heading (HeroShell unused). Content/excluded routes unchanged.
