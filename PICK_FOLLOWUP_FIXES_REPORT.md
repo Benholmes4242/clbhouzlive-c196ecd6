@@ -48,4 +48,4 @@ Real YourPickSheet/YourPickCard bundled in temporary fixture with field/state ho
 - `roadmap.md`, `PICK_FOLLOWUP_FIXES_REPORT.md`
 - Project memory `mem://features/tourhub/pick-followup-fixes.md`, `mem://index.md`.
 
-No SQL, migrations, migration files, deployed RPCs/edge functions, feed_config, native/Median, news, guest-browsing or round-plot changes; round_pool_cap remains30. No publication. Automatic build confirmation follows; no manual project build/typecheck run.
+No SQL, migrations, migration files, deployed RPCs/edge functions, feed_config, native/Median, news, guest-browsing or round-plot changes; round_pool_cap remains30. No publication. Latest observed automatic build:2026-11-03T21:30:49Z — build OK; no manual project build/typecheck run.
