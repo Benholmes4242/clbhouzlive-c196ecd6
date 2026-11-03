@@ -9,10 +9,13 @@
  * (useGlobalSearchV2, scopes 'people' and 'clubs'). Follow/unfollow go through
  * the canonical useToggleFollow mutation for both personal and business
  * actors; rows stay in place after following until the next load.
+ * G2E: global islands own history back; PageTitle's actual h1 anchors the
+ * name. IslandDock owns chip visibility only; both copies use onTab so URL
+ * selection cannot drift. Search and useHideBottomNav remain page-owned.
  */
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -45,6 +48,9 @@ import { useBusinessSuggestions, usePeopleSuggestions } from '@/features/find-pe
 import { ActiveAvatarDoor, ActiveRing } from '@/features/find-people/ActiveRing';
 import { activityLine, type RecentActivity } from '@/features/find-people/activeRingRules';
 import { useRecentActivity } from '@/features/find-people/useRecentActivity';
+import { PageTitle } from '@/features/chrome-v2/PageTitle';
+import { IslandDock } from '@/features/chrome-v2/IslandDock';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 
 const HAIRLINE = 'rgba(255,255,255,0.06)';
 const CHIP_BORDER = 'rgba(255,255,255,0.14)';
@@ -56,9 +62,12 @@ export function GolfersToFollowRedirect() {
 }
 
 export default function FindPeoplePage() {
-  const navigate = useNavigate();
   const { t } = useTranslation('common');
-  /* FIX §3 — a full-screen page with its own back button: the floating nav
+  const title = t('findPeople.title', { defaultValue: 'Explore the community' });
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  useIslandBackName(title, titleRef);
+  /* FIX §3 — a full-screen page: the floating nav
      hides while it is open and returns on leave. */
   useHideBottomNav();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -117,16 +126,19 @@ export default function FindPeoplePage() {
     setSearchParams(params, { replace: true });
   };
 
-  const goBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate('/clubhouse');
-  };
-
   const copy = (c: Copy) => t(c.key, { ...c.vars, defaultValue: c.def });
 
   const loading = searching
     ? peopleSearch.isLoading || clubSearch.isLoading
     : peopleQ.isLoading || bizQ.isLoading;
+
+  const tabs = (docked = false) => (['suggested', 'golfers', 'businesses'] as FindPeopleTab[]).map((id) => {
+    const on = tab === id;
+    return <button key={id} type="button" role="tab" aria-selected={on} onClick={() => onTab(id)}
+      style={docked ? { flex: 'none', height: 34, padding: '0 13px', borderRadius: 13, border: '1px solid var(--island-back-edge)', color: on ? 'var(--island-back-ink)' : A.MUTE, fontSize: 12.5, fontWeight: 600, fontFamily: ROW_FONT, cursor: 'pointer' } : { height: 32, padding: '0 13px', borderRadius: 999, border: `1px solid ${on ? A.INK : CHIP_BORDER}`, background: on ? A.INK : 'transparent', color: on ? A.CANVAS : 'rgba(248,250,252,0.62)', fontSize: 13.5, fontWeight: 600, fontFamily: ROW_FONT, cursor: 'pointer' }}>
+      {t(`findPeople.chip.${id}`, { defaultValue: id === 'suggested' ? 'Suggested' : id === 'golfers' ? 'Golfers' : 'Businesses' })}
+    </button>;
+  });
 
   return (
     <div
@@ -136,42 +148,11 @@ export default function FindPeoplePage() {
         color: A.INK,
         fontFamily: ROW_FONT,
         paddingBottom: 120,
+        paddingTop: 'var(--island-clearance)',
       }}
     >
       <div style={{ maxWidth: 520, margin: '0 auto' }}>
-        {/* Edit-profile-style header: back, centred 17px/700 title. */}
-        <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 16px 0',
-            minHeight: 'calc(env(safe-area-inset-top, 0px) + 50px)',
-          }}
-        >
-          <button
-            type="button"
-            aria-label="Back"
-            onClick={goBack}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              border: '1px solid rgba(255,255,255,0.14)',
-              background: 'none',
-              color: A.INK,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              cursor: 'pointer',
-            }}
-          >
-            <ChevronLeft size={18} strokeWidth={2.2} />
-          </button>
-          <div style={{ flex: 1, textAlign: 'center', marginRight: 36, fontSize: 17, fontWeight: 700 }}>
-            {t('findPeople.title', { defaultValue: 'Explore the community' })}
-          </div>
-        </header>
+        <PageTitle ref={titleRef} title={title} />
 
         {/* Search — 14px below the header, 44px, white caret. */}
         <div
@@ -209,36 +190,10 @@ export default function FindPeoplePage() {
         </div>
 
         {/* Chips — 12px below the search field; ?tab= keeps the choice. */}
-        <div role="tablist" style={{ display: 'flex', gap: 8, padding: '12px 16px 4px' }}>
-          {(['suggested', 'golfers', 'businesses'] as FindPeopleTab[]).map((id) => {
-            const on = tab === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={on}
-                onClick={() => onTab(id)}
-                style={{
-                  height: 32,
-                  padding: '0 13px',
-                  borderRadius: 999,
-                  border: `1px solid ${on ? A.INK : CHIP_BORDER}`,
-                  background: on ? A.INK : 'transparent',
-                  color: on ? A.CANVAS : 'rgba(248,250,252,0.62)',
-                  fontSize: 13.5,
-                  fontWeight: 600,
-                  fontFamily: ROW_FONT,
-                  cursor: 'pointer',
-                }}
-              >
-                {t(`findPeople.chip.${id}`, {
-                  defaultValue: id === 'suggested' ? 'Suggested' : id === 'golfers' ? 'Golfers' : 'Businesses',
-                })}
-              </button>
-            );
-          })}
+        <div ref={tabsRef} data-find-tabs role="tablist" style={{ display: 'flex', gap: 8, padding: '12px 16px 4px' }}>
+          {tabs()}
         </div>
+        <IslandDock anchorRef={tabsRef}>{() => <div data-find-dock-tabs role="tablist" style={{ display: 'flex', gap: 8, maxWidth: 488, margin: '0 auto', overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform' }}>{tabs(true)}</div>}</IslandDock>
 
         {loading ? (
           <div style={{ padding: '24px 16px', color: A.DIM, fontSize: 13 }}>
