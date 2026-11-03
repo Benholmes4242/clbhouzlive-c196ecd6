@@ -1,5 +1,9 @@
 # Roadmap
 
+## DEFAULT_B1
+- [x] Set only the unmatched registry default to shared header B; replace the two authorised obsolete cases and add NotFound folding coverage.
+- [ ] Run focused tests and all four full-suite shards with two workers; quote both test diffs, reconcile totals and confirm automatic build in DEFAULT_B1_REPORT.md. Stop on any new failure.
+
 ## CASE_CLASH_1
 - [x] Rename the shared ladder rules without changing contents; update repository path references and add one recursive case-insensitive source-path guard.
 - [x] Both real G2B pages bundle successfully; four shards pass 1638/1532/1638/1642 = 6450 tests in 575 files (+1/+1 filename guard); no failures/unhandled errors. Automatic build clean. CASE_CLASH_1_REPORT.md records every file and historical failures.

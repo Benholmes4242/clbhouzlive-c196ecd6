@@ -389,7 +389,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
 
 // HB6_GROUP1: existing island entries share the signed-off fixed header B.
 // News page files stay untouched under the user's ruling; registry chrome
-// still opts in. The unmatched default is not a registry entry and stays legacy.
+// still opts in. DEFAULT_B1 gives unmatched routes the same shared header B.
 for (const rule of CHROME_REGISTRY) {
   if (rule.spec.chrome !== 'island' || rule.spec.condense === true) continue;
   rule.spec = { ...rule.spec, scrim: 'soft', condense: true };
@@ -407,6 +407,8 @@ const DEFAULT_SPEC: ChromeSpec = {
   left: { kind: 'logo' },
   tone: 'dark',
   bleed: false,
+  scrim: 'soft',
+  condense: true,
 };
 
 // The tour-only light-island exception is GONE: the seven tour island entries
@@ -421,8 +423,7 @@ function withResolvedTone(spec: ChromeSpec): ChromeSpec {
 
 /**
  * Resolve chrome for a route. Walks CHROME_REGISTRY in order; first match wins.
- * Returns DEFAULT_SPEC when no rule matches (today's CompactHeader default:
- * light + logo + non-immersive).
+ * Returns DEFAULT_SPEC when no rule matches: dark, non-bleeding logo header B.
  */
 export function resolveChrome(
   pathname: string,

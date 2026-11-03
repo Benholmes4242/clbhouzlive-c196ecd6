@@ -1,7 +1,7 @@
 import React from 'react';
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-library/react';
-import { MemoryRouter, useLocation } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -32,6 +32,8 @@ import { registerNavScroller, resetToExpanded, pushForceExpand } from '@/hooks/u
 import { useIslandsCondensed } from '@/features/chrome-v2/useIslandsCondensed';
 import { renderHook } from '@testing-library/react';
 import { ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
+import { CHROME_REGISTRY, resolveChrome } from '@/features/chrome-v2/registry';
+import NotFound from '@/pages/NotFound';
 import { readFileSync } from 'node:fs';
 
 
@@ -91,12 +93,44 @@ describe('HEADER_B1 shared state and controls', () => {
     expect(guest?.style.padding).toBe('0px 6px 0px 16px'); expect(guest?.style.gap).toBe('12px');
     expect(join.style.borderRadius).toBe('12px'); expect(join.style.height).toBe('34px'); expect(join.style.padding).toBe('0px 16px');
   });
-  it('GI1 non-condense guest capsule remains byte-identical through nav changes', async () => {
-    mocks.guest = true; mount('/settings');
-    const guest = document.querySelector<HTMLElement>('[data-guest-island]'); const before = guest?.outerHTML;
-    expect(guest?.style.borderRadius).toBe('23px'); expect(guest?.style.background).toBe('rgba(14, 14, 16, 0.84)');
-    expect(guest?.style.transition).toBe(''); expect(screen.getByRole('button', { name: 'Join free' }).style.borderRadius).toBe('17px');
-    await move(150); expect(guest?.outerHTML).toBe(before);
+  it('DEFAULT_B1 unregistered paths resolve to the soft condensing logo default', () => {
+    expect(resolveChrome('/no-such-page', new URLSearchParams())).toEqual({
+      chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: false, scrim: 'soft', condense: true,
+    });
+  });
+  it('DEFAULT_B1 every explicit island rule retains soft condensing chrome', () => {
+    const islands = CHROME_REGISTRY.filter(rule => rule.spec.chrome === 'island');
+    expect(islands.length).toBeGreaterThan(0);
+    for (const rule of islands) expect(rule.spec).toMatchObject({ scrim: 'soft', condense: true });
+  });
+  it('DEFAULT_B1 messages renders neither an island nor a soft fade', () => {
+    expect(resolveChrome('/messages', new URLSearchParams()).chrome).toBe('none');
+    mount('/messages');
+    expect(document.querySelector('[data-chrome="island"]')).toBeNull();
+    expect(document.querySelector('[data-chrome="island-scrim-soft"]')).toBeNull();
+  });
+  it('DEFAULT_B1 NotFound renders a soft-fade logo squircle and folds on scroll', async () => {
+    // NotFound intentionally logs a 404; keep that expected diagnostic local.
+    const diagnostic = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      render(<QueryClientProvider client={client()}><MemoryRouter initialEntries={['/no-such-page']}><ChromeIsland /><Routes><Route path="*" element={<NotFound />} /></Routes></MemoryRouter></QueryClientProvider>);
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+      const left = screen.getByRole('button', { name: 'Go to home' });
+      const right = document.querySelector<HTMLElement>('[data-island-right]');
+      const wordmark = left.querySelector<HTMLImageElement>('img[src*="wordmark"]');
+      const search = screen.getByRole('button', { name: 'Search' });
+      expect(document.querySelectorAll('[data-chrome="island-scrim-soft"]')).toHaveLength(1);
+      expect(left.style.borderRadius).toBe('16px'); expect(right?.style.borderRadius).toBe('16px');
+      expect(left.style.background).toBe('rgba(14, 14, 16, 0.55)'); expect(right?.style.background).toBe('rgba(14, 14, 16, 0.55)');
+      expect(wordmark?.style.maxWidth).toBe('64px');
+      await move(150);
+      expect(wordmark?.style.maxWidth).toBe('0'); expect(search).toHaveAttribute('aria-hidden', 'true');
+      expect(left.style.padding).toBe('0px 7px'); expect(left.style.height).toBe('46px');
+      expect(left.style.borderRadius).toBe('16px'); expect(right?.style.borderRadius).toBe('16px');
+      expect(left.style.background).toBe('rgba(14, 14, 16, 0.84)'); expect(right?.style.background).toBe('rgba(14, 14, 16, 0.84)');
+      expect(document.querySelectorAll('[data-chrome="island-scrim-soft"]')).toHaveLength(1);
+      await move(130); expect(wordmark?.style.maxWidth).toBe('64px'); expect(search).not.toHaveAttribute('aria-hidden');
+    } finally { diagnostic.mockRestore(); }
   });
   it('GI1 Log in restores after upward scroll and retains auth navigation', async () => {
     const Location = () => <output data-testid="location">{useLocation().pathname}</output>;
