@@ -1,4 +1,43 @@
-# CM1 — focused checks passed; shard 2 stops on non-exempt spacing failures
+# CM1 — complete: four clean shards
+
+## Consolidated completion — 2026-11-03
+CM1 is complete under the user's four-clean-shards criterion. All four shards were rerun after the separately authorised Picks test corrections, with **zero failures and zero unhandled errors**, no exemptions. The corrected Community mock was received/read; rating figure stays pure white. Live signed-in visual comparison remains unverified (`external_unmanaged`); completion here is the requested test/build criterion, not a new live-browser claim.
+
+### Step 1 — exact authorised test-only lines
+`src/test/tourOverviewMergedAiry.test.tsx`, retained parameterised case “adds the picks hairline and tighter cards in %s” (upcoming/live/completed):
+```diff
+-expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('14px');
++expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('16px');
+-expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('14px');
++expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('0px');
+```
+Why: match signed-off integrated PicksBlock's existing `16px 20px 10px` heading and `0 20px` grid padding. Preserved unchanged: section top8px, hairline `1px solid rgba(255,255,255,0.06)`, card7px. No product code changed in this step. File remains **16 tests before/after**; no deleted/renamed cases, no inventory delta.
+
+Focused command: `bunx vitest run src/test/tourOverviewMergedAiry.test.tsx --maxWorkers=2` — **16/16 passed**.
+
+### Step 2 — full-suite results
+| Exact command | Passed / executed | Files |
+|---|---:|---:|
+| `bunx vitest run --maxWorkers=2 --shard=1/4` | 1,681 /1,681 | 145 |
+| `bunx vitest run --maxWorkers=2 --shard=2/4` | 1,543 /1,543 | 145 |
+| `bunx vitest run --maxWorkers=2 --shard=3/4` | 1,648 /1,648 | 145 |
+| `bunx vitest run --maxWorkers=2 --shard=4/4` | 1,642 /1,642 | 143 |
+| **Total** | **6,514 /6,514** | **578** |
+
+All commands exit0. Complete logs retained in `docs/verification/cm1-final/` (`picks-spacing.log`, `shard-1.log` through `shard-4.log`). Automatic build log: **2026-11-03T23:02:08Z — build OK**.
+
+### Reconciled counts and prior failures
+Last full verified baseline **6,472 tests /576 files** (FIX_GRID_1); now **6,514 /578**, **+42/+2**:
+- CM1 +14/net0 files: `cm1Community.test.tsx` +17/+1; `er1ExploreCommunity.test.tsx` +2; `hb6Group1.test.tsx` −1; deleted `mediaPageThreeWalls.test.tsx` −4/−1. Exact deleted/changed assertions remain quoted in the original record below.
+- Integrated Our picks: `integratedPicks.test.tsx` +23/+1 (pre-existing intervening work, not CM1). Its separately authorised circle-text narrowing changed no counts.
+- Guest lock continuation: `guestTournamentPickLock.test.tsx` +5/+1, five named cases in `PICKS_AUTHORISED_CONTINUATION_REPORT.md` (not CM1).
+- CM1 scroll mock and this step's two Merged Airy expectation lines: +0 tests/+0 files.
+
+These total **+42/+2**, matching the previously reported candidate **6,514/578**, now verified in full. No unexplained delta.
+
+Previously recorded failures, all absent from this clean run: ws1 Community See all jsdom `scroller?.scrollTo is not a function`; pre-existing Integrated Picks DG6 wrapper-text assertion from 22:25; three Merged Airy phase cases at line78 expecting14px but receiving16px. Fixes were each separately authorised and named; no unexpected assertion rewrites.
+
+Step 3 /TU1 remains **not implemented or tested** in this response. CM1 prerequisite is now satisfied; no TU1 source edits were made. Current completion files touched: `src/test/tourOverviewMergedAiry.test.tsx`, `roadmap.md`, `CM1_REPORT.md`, `docs/verification/cm1-final/{picks-spacing,shard-1,shard-2,shard-3,shard-4}.log`. All prohibited areas remain untouched. Sections below are historical stopped-run evidence, not current status.
 
 ## CM1 resumption — 22:52 UTC
 The Integrated Picks case “no pick combines question, exact lock copy, digit circle count and action” is **pre-existing**, originating in the Integrated Our picks stop at 22:25, not caused by CM1. Its subsequent text-span correction was separately authorised in the Picks continuation; it was not a CM1/TU1 edit. No test or product source was edited in this resumption.
