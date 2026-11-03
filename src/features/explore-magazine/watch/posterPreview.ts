@@ -31,7 +31,6 @@ export function attachPosterPreview(video: HTMLVideoElement, poster: string | nu
   video.addEventListener('seeked', seeked);
   video.addEventListener('playing', playing);
   video.addEventListener('timeupdate', update);
-  video.addEventListener('seeking', () => {});
   video.addEventListener('pause', pause);
   video.addEventListener('ended', restart);
   show(false);
