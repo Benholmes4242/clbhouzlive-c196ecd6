@@ -106,7 +106,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/profile' },                 spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: true, scrim: 'soft', condense: true } },
   { match: { exact: '/achievements' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/golferstofollow' },         spec: { chrome: 'none', tone: 'dark',  bleed: false } },
-  { match: { exact: '/find-people' },             spec: { chrome: 'none', tone: 'dark',  bleed: false } },
+  { match: { exact: '/find-people' },             spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/clubhouse' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   /* G2C: title/board stay page-owned; global islands carry the history back. */
   { match: { exact: '/rounds' },                  spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   { match: { exact: '/watch/courses' },           spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
