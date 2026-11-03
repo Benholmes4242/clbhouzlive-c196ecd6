@@ -48,7 +48,7 @@ vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useGridVideos: (_u: unknown, src: unknown) => { f.gridCalls.push(src); return f.grid; },
 }));
 vi.mock('@/features/explore-magazine/watch/useWatchBottom', () => ({
-  useWatchSpotlight: (_u: unknown, key: string) => { f.spotlightKeys.push(key); return f.spotlight; },
+  useWatchSpotlights: (_u: unknown, key: string) => { f.spotlightKeys.push(key); return { ...f.spotlight, data: Array.isArray(f.spotlight.data) ? f.spotlight.data : f.spotlight.data ? [f.spotlight.data] : [] }; },
   useCreatorVideos: () => f.creatorVideos,
   useTop100Videos: () => f.top100,
 }));
@@ -67,7 +67,7 @@ import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { CreatorSpotlight, __resetSpotlight } from '@/features/explore-magazine/watch/CreatorSpotlight';
 import { Top100FilmShelf } from '@/features/explore-magazine/watch/Top100FilmShelf';
 import WatchGridPage from '@/pages/WatchGridPage';
-import { rankPill, spotlightCells, spotlightLine } from '@/features/explore-magazine/watch/watchBottom';
+import { rankPill, spotlightLine } from '@/features/explore-magazine/watch/watchBottom';
 
 const real = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchMiddle')>('@/features/explore-magazine/watch/useWatchMiddle');
 
@@ -207,30 +207,26 @@ describe('WS3 Creator to follow', () => {
     expect(new Set(f.spotlightKeys).size).toBe(1);
   });
 
-  it('figures with rounds and a handicap: three cells', () => {
-    expect(spotlightCells(spot())).toEqual([
-      { key: 'handicap', value: '6.4' }, { key: 'rounds', value: '142' }, { key: 'courses', value: '31' },
-    ]);
+  it('WS6: figures are absent with rounds and a handicap', () => {
     f.spotlight = { data: spot(), isError: false };
     wrap(<CreatorSpotlight userId="me" visitKey="v" />);
-    expect(q('[data-spotlight-figs]')?.getAttribute('data-spotlight-figs')).toBe('3');
+    expect(q('[data-spotlight-figs]')).toBeNull();
   });
-
-  it('figures with rounds but no visible handicap: two cells', () => {
-    expect(spotlightCells(spot({ handicap_index: null })).map((c) => c.key)).toEqual(['rounds', 'courses']);
+  it('WS6: figures are absent with rounds and no visible handicap', () => {
+    f.spotlight = { data: spot({ handicap_index: null }), isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    expect(q('[data-spotlight-figs]')).toBeNull();
   });
-
-  it('figures without rounds: Videos and Courses filmed, filmed hidden at 0', () => {
-    expect(spotlightCells(spot({ rounds: 0, videos: 24, courses_filmed: 11 }))).toEqual([
-      { key: 'videos', value: '24' }, { key: 'filmed', value: '11' },
-    ]);
-    expect(spotlightCells(spot({ rounds: 0, videos: 24, courses_filmed: 0 })).map((c) => c.key)).toEqual(['videos']);
+  it('WS6: figures are absent without rounds regardless of courses filmed', () => {
+    f.spotlight = { data: [spot({ rounds: 0, courses_filmed: 11 }), spot({ actor_id: 'p2', rounds: 0, courses_filmed: 0 })], isError: false };
+    wrap(<CreatorSpotlight userId="me" visitKey="v" />);
+    expect(document.querySelectorAll('[data-spotlight]')).toHaveLength(2);
+    expect(q('[data-spotlight-figs]')).toBeNull();
   });
-
-  it('area/videos line, area dropped when null, singular video', () => {
-    expect(spotlightLine({ area: 'Surrey', videos: 38 })).toBe('Surrey \u00b7 38 videos');
-    expect(spotlightLine({ area: null as unknown as string, videos: 24 })).toBe('24 videos');
-    expect(spotlightLine({ area: null as unknown as string, videos: 1 })).toBe('1 video');
+  it('WS6: video count alone until newest loaded video is available, singular video', () => {
+    expect(spotlightLine({ videos: 38 })).toBe('38 videos');
+    expect(spotlightLine({ videos: 24 })).toBe('24 videos');
+    expect(spotlightLine({ videos: 1 })).toBe('1 video');
   });
 
   it('follow → Following → unfollow, the card stays', async () => {
@@ -241,7 +237,7 @@ describe('WS3 Creator to follow', () => {
     await act(async () => { fireEvent.click(btn()); });
     expect(btn().getAttribute('data-spotlight-follow')).toBe('on');
     expect(f.toggle).toHaveBeenLastCalledWith(expect.objectContaining({ targetActorId: 'p1', isFollowing: false }));
-    expect(f.track).toHaveBeenCalledWith('watch_spotlight_follow', { actor_type: 'personal' });
+    expect(f.track).toHaveBeenCalledWith('watch_spotlight_follow', { actor_type: 'personal', position: 1 });
     await act(async () => { fireEvent.click(btn()); });
     expect(btn().getAttribute('data-spotlight-follow')).toBe('off');
     expect(f.toggle).toHaveBeenLastCalledWith(expect.objectContaining({ isFollowing: true }));
@@ -262,7 +258,7 @@ describe('WS3 Creator to follow', () => {
     const call = f.openWithOrigin.mock.calls[0][0];
     expect(call.index).toBe(1);
     expect(call.posts.length).toBe(3);
-    expect(f.track).toHaveBeenCalledWith('watch_spotlight_video_opened');
+    expect(f.track).toHaveBeenCalledWith('watch_spotlight_video_opened', { position: 1 });
   });
 
   it('head row routes: a person to their profile, a business to /business/{slug}', () => {
@@ -283,10 +279,12 @@ describe('WS3 Creator to follow', () => {
 /* ---------------------------------------------------------------- top 100 */
 
 describe('WS3 Top 100 on film', () => {
-  it('WS5: still renders DurationChip', () => {
+  it('WS6: renders shared glass duration at top-right', () => {
     f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
     wrap(<Top100FilmShelf userId="me" />);
-    expect(q('[data-top100-tile="t1"] [data-duration]')).not.toBeNull();
+    const badge = q('[data-top100-tile="t1"]')?.querySelectorAll('span')[3] as HTMLElement;
+    expect(q('[data-top100-tile="t1"] [data-duration]')).toBeNull();
+    expect(badge).toBeTruthy();
   });
   it('hidden under three rows and on error', () => {
     f.top100 = { data: [vid('t1'), vid('t2')], isError: false };
