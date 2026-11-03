@@ -43,11 +43,12 @@ Error: No QueryClient set, use QueryClientProvider to set one
 Last full green6,298/564 NAV_SQ1 → HB6 +28/+1 = candidate6,326/565 → tournament +75/+3 = candidate6,401/568 → G2A +5/+1 = last reported candidate**6,406/569** → G2B +11/+1 solely `g2bTourHeaders.test.tsx` = **6,417/570 candidate**, not full passing result. Existing tests deleted/renamed/rewritten: **none**; no old assertion diff to quote. No suite inventory changed by passing existing focused files.
 
 ## Browser limitation
+Historical failure below predates CASE_CLASH_1; the lowercase rules path in this report has been updated to its current name. The original fixture was lost from temporary storage. A replacement browser bundle of both real pages now succeeds; see CASE_CLASH_1_REPORT.md. This is bundle verification, not fresh visual or authenticated verification.
 Temporary fixture prepared under `/tmp/browser/g2b` with real heroes, TourPageShell, back capsule and observer, manual sat47/clearance109 and fabricated identities (signed-out data unavailable; external unmanaged sign-in). It did **not** include full global right-island composition and was not full live-page proof.
 Bundle preparation failed before screenshots:
 ```text
 src/components/courses/course-detail/about/AllHolesSheet.tsx:14:79:
-ERROR: Cannot read file: /dev-server/src/features/courses/_shared/siLadder.tsx
+ERROR: Cannot read file: /dev-server/src/features/courses/_shared/siLadderRules.tsx
 Use "src/features/courses/_shared/SiLadder.tsx" instead ... to avoid issues with case-sensitive file systems
 ```
 The subsequent fixture navigation timed out waiting for load because no bundle was produced. Full browser output `/tmp/g2b/browser.log`; stderr also retained in exec tool log. This is a pre-existing case-sensitive source dependency encountered by standalone bundling, not a failing G2B preview build; no out-of-scope course file altered. No valid screenshots or mock parity claim. Browser fixture recovery was not attempted after shard stop. Required top/named captures remain unverified.

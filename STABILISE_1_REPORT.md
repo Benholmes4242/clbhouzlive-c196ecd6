@@ -54,7 +54,7 @@ Signed-in checks are unavailable: sign-in here is `external_unmanaged`, so no se
 - **G2B, attempted again on the live page instead of a separate test bundle:** `/tourhub/tournament/fa65c3bc-…` (VidantaWorld Mexico Open, opened from the hero) shows a full-width photo and the bold white title. Scrolling down folds the back button to a 46px square and hides Log in.
 - G2B player page `/tourhub/player/d5e38599-…` (Steven Fisk, opened from a leaderboard row through the Profile pill): after scrolling down and then back up, the back button widens to 149px, labelled "Steven Fisk" / aria "Back from Steven Fisk". Its name comes from the page's own h1.
 - `/rounds`, `/watch/region/scotland`, `/find-people` and `/notificationmessages` redirect a signed-out visitor to `/`, so G2C, G2D, G2E and G2F rest on the Chromium fixture checks recorded in their own reports. `/courses/x` (G2A) needs a real course id plus sign-in; not checked live.
-- The old test bundle was blocked by `siLadder.ts` and `SiLadder.tsx` having the same name apart from capitalisation, in `src/features/courses/_shared/`. That is still the case and was left alone as ruled; the live-page check replaces the bundle.
+- The old test bundle was blocked by the rules/chart filename collision in `src/features/courses/_shared/`. CASE_CLASH_1 subsequently renamed the rules to `siLadderRules.ts` without changing their contents; both real G2B pages now bundle successfully (see CASE_CLASH_1_REPORT.md).
 - Screenshots were saved under `/tmp/browser/stab/` (temporary, cleared when the sandbox restarts).
 
 Untouched: guest browsing, review wizard, news, round plots, SQL/migrations, RPCs/edge functions, feed_config, round_pool_cap (30), native/Median.

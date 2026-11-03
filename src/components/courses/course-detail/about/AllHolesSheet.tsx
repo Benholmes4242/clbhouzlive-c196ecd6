@@ -11,7 +11,7 @@ import { fieldHolesExcludingViewer } from '@/lib/courseYou/youDerivations';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { buildSiLadder, type SiLadder as SiLadderData, type SiLadderRow } from '@/features/courses/_shared/siLadder';
+import { buildSiLadder, type SiLadder as SiLadderData, type SiLadderRow } from '@/features/courses/_shared/siLadderRules';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { BUCKETS, courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { buildParTypeRows, type ParTypeRow } from '@/features/courses/components/holes/analytical/parTypeRows';

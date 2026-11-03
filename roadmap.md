@@ -1,5 +1,9 @@
 # Roadmap
 
+## CASE_CLASH_1
+- [x] Rename the shared ladder rules without changing contents; update repository path references and add one recursive case-insensitive source-path guard.
+- [x] Both real G2B pages bundle successfully; four shards pass 1638/1532/1638/1642 = 6450 tests in 575 files (+1/+1 filename guard); no failures/unhandled errors. Automatic build clean. CASE_CLASH_1_REPORT.md records every file and historical failures.
+
 ## G2F Activity header B
 - [x] Activity-only shell opt-in, shared title and chip dock, unchanged back/mark read/navigation callback and hidden nav. Nine tests added; no existing tests changed.
 - [ ] STOP: focused32 passed/1 failed/33, g2fActivityHeader.test.tsx:35:159 and66:94 “Missing observer” unchanged. Explicit preview-error request cleared TS2305 via MemoryRouter prop-derived type only; build OK19:22:55Z. Full output /tmp/g2f/focused.log; no test reruns/browser/shards. Candidate6449/574 unchanged; G2F_ACTIVITY_REPORT.md.
@@ -19,7 +23,7 @@
 ## G2B Tour-page header B
 - [x] Two detail-root registry rules, opt-in TourPageShell headerB (legacy child alone claims suppression), actual TournamentHero/pv-name refs and player clearance. All other content/callers preserved.
 - [ ] STOP: focused31/31; shard1 1620 passed/4 inherited failures/1624 across143 files (roundNotificationOverlay exact HB6 object, three tourPlayoffShortenedEvents missing QueryClientProvider). Full output/tmp/g2b/shard1.log; no corrections/reruns/shards2–4 after failure. Automatic build OK18:52:14Z. Candidate6417/570 from6406/569 (+11/+1 g2bTourHeaders).
-- [ ] Browser fixture could not bundle due pre-existing AllHolesSheet.tsx:14:79 import siLadder (on disk SiLadder.tsx); subsequent missing bundle navigation timed out. No valid screenshots, no parity/live-page claim. G2B_TOUR_PAGES_REPORT.md details limitations and prior failures.
+- [ ] Browser fixture could not bundle due pre-existing AllHolesSheet.tsx:14:79 import siLadderRules (on disk SiLadder.tsx); subsequent missing bundle navigation timed out. No valid screenshots, no parity/live-page claim. G2B_TOUR_PAGES_REPORT.md details limitations and prior failures.
 
 ## G2A course-detail tab dock
 - [x] Replaced standalone sticky row/scrim with existing IslandDock and shared tab handler; modal, hero and HB4 back unchanged. Shared dock untouched.
