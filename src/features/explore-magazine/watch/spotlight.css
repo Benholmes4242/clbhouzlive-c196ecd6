@@ -10,3 +10,6 @@
 .spotlight-dot[aria-pressed="true"] span { width:16px; background:var(--explore-top-ink); }
 .spotlight-dot:focus-visible { outline:2px solid var(--explore-top-focus); }
 .spotlight-line { display:block; font-size:12.5px; color:var(--explore-top-mute); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.spotlight-follow { border:1px solid var(--pf-ring); background:transparent; color:var(--explore-top-ink); }
+.spotlight-follow[data-spotlight-follow="on"] { background:var(--pf-tile); border-color:var(--pf-line); color:var(--explore-top-mute); }
+.spotlight-follow:hover { background:var(--pf-tile); }

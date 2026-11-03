@@ -1,11 +1,13 @@
 /**
- * WS6 — CREATOR TO FOLLOW. Up to three creators from get_watch_spotlights,
+ * ER2 — CREATORS TO FOLLOW. Up to five creators from get_watch_spotlights,
  * picked once per Explore visit: WatchFeed mints the
  * visit key, so scroll, chip switches and back-from-viewer keep the same pick.
  * Hidden, heading included, with no row or on error. Follow state is kept per
  * visit, so the card stays (as Following) until the next visit.
+ * Activity is one display-ordered batched read; canonical Clubhouse rings
+ * and latest-post doors are imported unchanged, never reimplemented here.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -18,6 +20,8 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 import { toast } from '@/lib/toast';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { businessInitials } from '@/features/find-people/findPeopleRules';
+import { ActiveAvatarDoor, ActiveRing } from '@/features/find-people/ActiveRing';
+import { useRecentActivity, type RecentActivity } from '@/features/find-people/useRecentActivity';
 import { ShelfHeading } from './CourseVideosShelf';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { Button } from '@/components/ui/button';
@@ -35,6 +39,8 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
   const { t } = useTranslation('courses');
   const q = useWatchSpotlights(userId, visitKey);
   const rows = q.data ?? [];
+  const activityIds = useMemo(() => rows.map(row => row.actor_id), [q.data]);
+  const activity = useRecentActivity(activityIds);
   const rail = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(0);
   const activeRef = useRef(0);
@@ -53,9 +59,9 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
   };
   if (!userId || q.isError || !rows.length) return null;
   return <div data-spotlight-section>
-    <ShelfHeading title={t('amateur.watch.spotlight.title', 'Creator to follow')} />
+    <ShelfHeading title={t('amateur.watch.spotlight.title', 'Creators to follow')} />
     <div ref={rail} className="spotlight-rail" data-spotlight-rail data-single={rows.length === 1} onScroll={scroll}>
-      {rows.map((row, i) => <SpotlightCard key={`${visitKey}:${row.actor_type}:${row.actor_id}`} row={row} visitKey={visitKey} position={i + 1} onDepart={onDepart} />)}
+      {rows.map((row, i) => <SpotlightCard key={`${visitKey}:${row.actor_type}:${row.actor_id}`} row={row} activity={activity.get(row.actor_id)} visitKey={visitKey} position={i + 1} onDepart={onDepart} />)}
     </div>
     {rows.length > 1 ? <div className="spotlight-dots" data-spotlight-dots>{rows.map((row, i) => <Button key={`${row.actor_type}:${row.actor_id}`} variant="ghost" className="spotlight-dot" aria-label={`Creator ${i + 1}`} aria-pressed={active === i} onClick={() => {
       const el = rail.current; const card = el?.querySelectorAll<HTMLElement>('[data-spotlight]')[i];
@@ -66,7 +72,7 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
   </div>;
 }
 
-function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRow; visitKey: string; position: number; onDepart?: () => void }) {
+function SpotlightCard({ row, activity, visitKey, position, onDepart }: { row: SpotlightRow; activity?: RecentActivity; visitKey: string; position: number; onDepart?: () => void }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -74,7 +80,7 @@ function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRo
   const toggle = useToggleFollow();
   const vids = useCreatorVideos(row?.actor_type ?? null, row?.actor_id ?? null);
   const actorKey = `${visitKey}:${row.actor_type}:${row.actor_id}`;
-  const [following, setFollowing] = useState(() => followedVisits.get(actorKey) ?? false);
+  const [following, setFollowing] = useState(() => followedVisits.get(actorKey) ?? row.following ?? false);
   const [pending, setPending] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -135,6 +141,8 @@ function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRo
           onKeyDown={(e) => { if (e.key === 'Enter') openProfile(); }}
           style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
         >
+          <ActiveAvatarDoor postId={activity?.post_id ?? null} label={`Open ${row.display_name ?? ''}'s latest post`} onOpen={(id) => navigate(`/post/${id}`)}>
+          <ActiveRing active={!!activity} surface="card">
           {business && !row.avatar_url ? (
             <span data-spotlight-tile style={{ width: 56, height: 56, borderRadius: '34%', background: '#000', color: A.INK, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 700 }}>
               {businessInitials(row.display_name ?? '')}
@@ -142,6 +150,8 @@ function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRo
           ) : (
             <SquircleAvatar size={56} src={row.avatar_url} alt={row.display_name ?? ''} userId={business ? null : row.actor_id} />
           )}
+          </ActiveRing>
+          </ActiveAvatarDoor>
           <div style={{ minWidth: 0, flex: 1 }}>
             <b data-spotlight-name style={{ display: 'block', fontSize: 17, fontWeight: 700, overflowWrap: 'anywhere' }}>
               {row.display_name}
@@ -149,7 +159,9 @@ function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRo
             </b>
             <span data-spotlight-line className="spotlight-line">{spotlightLine(row, vids.isError ? null : videos[0]?.created_at)}</span>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            className="spotlight-follow"
             type="button"
             data-spotlight-follow={following ? 'on' : 'off'}
             aria-pressed={following}
@@ -157,13 +169,11 @@ function SpotlightCard({ row, visitKey, position, onDepart }: { row: SpotlightRo
             onClick={onFollow}
             style={{
               marginLeft: 'auto', flex: 'none', height: 32, padding: '0 14px', borderRadius: 999,
-              border: `1px solid ${following ? A.INK : 'rgba(255,255,255,0.22)'}`,
-              background: following ? A.INK : 'transparent', color: following ? A.CANVAS : A.INK,
               fontFamily: SANS, fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
             }}
           >
             {following ? t('amateur.watch.spotlight.following', 'Following') : t('amateur.watch.spotlight.follow', 'Follow')}
-          </button>
+          </Button>
         </div>
 
         {videos.length > 0 ? (
