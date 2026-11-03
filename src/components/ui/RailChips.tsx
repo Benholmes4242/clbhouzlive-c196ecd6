@@ -52,7 +52,8 @@ export const RAIL_CHIP_TRAILING_GAP = 5;
 export const RAIL_CHIP_GEOMETRY = {
   sm: { padding: '4px 9px', fontSize: 11, radius: 9 },
   md: { padding: '6px 11px', fontSize: 12, radius: RAIL_CHIP_RADIUS },
-  lg: { padding: '0 16px', fontSize: 15, radius: 999 },
+  /* EXPLORE_TOP_2: the Leaderboards board tile, label only (opt-in). */
+  tile: { padding: '0 13px', fontSize: 10, radius: 13 },
 } as const;
 
 export interface RailChipOption {
@@ -102,7 +103,7 @@ export interface RailChipsProps {
    * Both rows state their active chip the SAME WAY, so nothing about a filter
    * shouts louder than the thing it filters.
    */
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'tile';
 
   /**
    * ADDITIVE — EQUAL WIDTH, DISTRIBUTED (BRIEF_EXPLORE_SECOND_PASS §2). The scope
@@ -199,10 +200,10 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
       role={filled ? 'group' : 'tablist'}
       aria-label={ariaLabel}
       aria-disabled={locked || undefined}
-      className={`hide-scrollbar${size === 'lg' ? ' explore-lg-chips' : ''}${className ? ` ${className}` : ''}`}
+      className={`hide-scrollbar${size === 'tile' ? ' explore-tile-chips' : ''}${className ? ` ${className}` : ''}`}
       style={{
         display: 'flex',
-        gap: size === 'lg' ? 8 : 6,
+        gap: size === 'tile' ? 8 : 6,
         minWidth: 0,
         overflowX: 'auto',
         scrollbarWidth: 'none',
@@ -235,22 +236,20 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
 
 
               /* Every chip keeps a 1px edge, so switching costs no width shift. */
-              border: size === 'lg' ? `1px solid var(${active ? '--explore-top-ink' : '--explore-top-hair'})` : filled ? 'none' : `1px solid ${active ? SELECTED_EDGE : A.BORDER}`,
-              background: size === 'lg' ? `var(${active ? '--explore-top-ink' : '--explore-top-panel'})` : filled || active ? APPLIED_FILL : 'transparent',
-              color: size === 'lg' ? `var(${active ? '--explore-top-canvas' : '--explore-top-chip-ink'})` : filled || active ? A.INK : A.MUTE,
-              ...(size === 'lg' ? { height: 38 } : null),
-
-
+              border: filled ? 'none' : `1px solid ${active ? SELECTED_EDGE : A.BORDER}`,
+              background: filled || active ? APPLIED_FILL : 'transparent',
+              color: filled || active ? A.INK : A.MUTE,
+              /* 'tile' = the Leaderboards board tile: small capitals, no counts. */
+              ...(size === 'tile' ? { height: 34, display: 'flex', alignItems: 'center', textTransform: 'uppercase' as const, letterSpacing: '0.11em', lineHeight: 1 } : null),
               fontFamily: SANS,
               fontSize: geo.fontSize,
-
-              fontWeight: size === 'lg' ? 600 : RAIL_CHIP_WEIGHT,
+              fontWeight: size === 'tile' ? 800 : RAIL_CHIP_WEIGHT,
               whiteSpace: 'nowrap',
               cursor: 'pointer',
             }}
           >
             {option.label}
-            {option.value != null ? (
+            {option.value != null && size !== 'tile' ? (
               <span
                 style={{
                   marginLeft: RAIL_CHIP_TRAILING_GAP,

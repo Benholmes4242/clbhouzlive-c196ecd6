@@ -1,4 +1,4 @@
-/** EXPLORE_TOP_1: local search chrome only; WatchFeed retains query/results/filter ownership. */
+/** EXPLORE_TOP_1/2 (tile chips): local search chrome only; WatchFeed retains query/results/filter ownership. */
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,15 +14,15 @@ export function ExploreTopControls({ query, onQuery, options, value, onChange, a
     <div className={`explore-top-controls${sticky ? ' explore-top-sticky' : ''}`}>
       {searchOpen ? <>
         <label className="explore-search-field">
-          <Search aria-hidden size={16} strokeWidth={2.4} />
+          <Search aria-hidden size={15} strokeWidth={2.4} />
           <input autoFocus type="search" value={query} onChange={(e) => onQuery(e.target.value)} placeholder={placeholder} aria-label={placeholder} />
         </label>
         <Button variant="ghost" className="explore-search-cancel" onClick={() => { onQuery(''); setOpened(false); }}>Cancel</Button>
       </> : <>
         <Button variant="ghost" size="icon" className="explore-search-button" aria-label={placeholder} onClick={() => setOpened(true)}>
-          <Search aria-hidden size={17} strokeWidth={2.4} />
+          <Search aria-hidden size={15} strokeWidth={2.4} />
         </Button>
-        <RailChips options={options} value={value} onChange={onChange} ariaLabel={ariaLabel} size="lg" />
+        <RailChips options={options} value={value} onChange={onChange} ariaLabel={ariaLabel} size="tile" />
       </>}
     </div>
   );

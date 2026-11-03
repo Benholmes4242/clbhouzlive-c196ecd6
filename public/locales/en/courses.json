@@ -557,6 +557,18 @@
         "title": "Creators",
         "thisWeek": "{{count}} this week"
       },
+      "people": {
+        "title": "Golfers to watch",
+        "seeAll": "See all",
+        "following": "Following",
+        "creator": "Creator",
+        "postedToday": "Posted today",
+        "newToday": "{{count}} new today",
+        "newTodayBare": "new today",
+        "newCount": "{{count}} new",
+        "videos_one": "{{count}} video",
+        "videos_other": "{{count}} videos"
+      },
       "lead": {
         "kickerNew": "New this week",
         "kickerLiked": "Most liked this month",

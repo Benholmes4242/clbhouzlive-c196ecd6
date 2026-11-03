@@ -37,6 +37,8 @@
   --explore-top-focus: rgba(248,250,252,.32);
   --explore-top-chip-ink: rgba(248,250,252,.78);
   --explore-top-mute: rgba(248,250,252,.62);
+  --explore-top-quiet: rgba(248,250,252,.42);
+  --explore-top-skeleton: #141417;
   --explore-top-ring: 0 0 0 2px #0B0B0D, 0 0 0 4px #F8FAFC;
   --t100-panel: #17171B;
   --t100-ink: #F8FAFC;
