@@ -11,7 +11,7 @@ import courses from '../../public/locales/en/courses.json';
 /* ---------------------------------------------------------------- mocks */
 
 const f = vi.hoisted(() => ({
-  pools: { circle: [] as Array<Record<string, unknown>>, everyone: [] as Array<Record<string, unknown>> },
+  pools: { circle: [] as unknown[], everyone: [] as unknown[] },
   rpcCalls: [] as Array<Record<string, unknown>>,
   rpcImpl: null as null | ((name: string, args: Record<string, unknown>) => Promise<unknown>),
   shapes: null as unknown,
@@ -148,7 +148,7 @@ const pagedRpc = async (name: string, args: Record<string, unknown>) => {
   const pool = f.pools[(args.p_scope as 'circle' | 'everyone') ?? 'circle'];
   const offset = (args.p_offset as number) ?? 0;
   const limit = (args.p_limit as number) ?? 10;
-  return { data: pool.slice(offset, offset + limit).map((r) => ({ ...r, total_count: pool.length })), error: null };
+  return { data: pool.slice(offset, offset + limit).map((r) => ({ ...(r as Record<string, unknown>), total_count: pool.length })), error: null };
 };
 
 let rpcSpy: ReturnType<typeof vi.spyOn> | null = null;
