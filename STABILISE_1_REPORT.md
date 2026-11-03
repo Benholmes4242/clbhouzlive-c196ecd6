@@ -65,3 +65,4 @@ Only `src/test/g2fActivityHeader.test.tsx` changed; ActivityPageV2 and IslandDoc
 - "docks only past its chips and shares filters/counters across copies" (line 67): after `mount();` it now runs `await waitFor(() => expect(callbacks.has(node('[data-activity-chips="in-place"]').parentElement as Element)).toBe(true));` before the first `pass(...)`.
 - File run 10 times in a row: 10/10 runs passed 9/9.
 - Four shards (--maxWorkers=2): 1,638 / 1,538 / 1,641 / 1,632 = 6,449 tests, 574 files, 0 failures, 0 unhandled errors (unchanged, +0).
+- Re-check 3 Nov 2026: g2f file again 10/10 runs of 9/9; four shards 1,638 / 1,538 / 1,641 / 1,632 = 6,449 tests, 574 files, 0 failures, 0 unhandled errors. No page code touched.
