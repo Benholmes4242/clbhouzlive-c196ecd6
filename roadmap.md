@@ -2,7 +2,7 @@
 
 ## FIX_GRID_1
 - [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.
-- [ ] STOP: required all-consumer guard conflicts with three-page limit: ManagePageShell.tsx:55 uses old clearance for ActivityPageV2.tsx:524–526 on bleed:true /notificationmessages. Await Activity shell fix permission or explicit second guard exception; no tests run/inventory changes. FIX_GRID_1_REPORT.md includes full audit and unchanged PlayerPage finding.
+- [ ] Approved Activity correction: change only ManagePageShell headerB padding, confirm sole caller, add guards/navigation coverage and run four shards; PlayerPage remains the sole exception.
 
 ## Tournament pick follow-up fixes
 - [x] Correct avatar-hugging selection rings, local tap-to-deselect and action fills; lowercase record continuation and display MC on pick cards without changing board tokens.

@@ -4,6 +4,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { PAGE_BG } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FixedPageHeader } from '@/components/chrome/FixedPageHeader';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 
 
 interface Props {
@@ -52,7 +53,7 @@ export function ManagePageShell({ title, subtitle, children, right, onBack, belo
         style={{
           background: bg,
           marginTop: headerB ? undefined : 'calc(-1 * var(--sat, env(safe-area-inset-top, 0px)))',
-          paddingTop: headerB ? 'var(--island-clearance)' : undefined,
+          paddingTop: headerB ? CHROME_CLEARANCE : undefined,
           maxWidth: '100%',
         }}
       >

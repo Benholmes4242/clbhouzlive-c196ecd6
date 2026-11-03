@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(), eq: vi.fn(), from: vi.fn(),
   success: vi.fn(), error: vi.fn(), avatar: vi.fn(),
   scores: vi.fn(), lastRound: vi.fn(),
-  gate: vi.fn(), track: vi.fn(),
+  gate: vi.fn(), track: vi.fn(), openVideoList: vi.fn(),
 }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' }, loading: false }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: { id: 'member', type: 'personal', name: 'Ben', avatarUrl: '/avatar.jpg' }, isLoading: false }) }));
@@ -23,6 +23,12 @@ vi.mock('@/lib/toast', () => ({ toast: { success: mocks.success, error: mocks.er
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: (props: unknown) => { mocks.avatar(props); return <div data-testid="avatar" />; } }));
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
+vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/features/explore-magazine/watch/openVideoList', () => ({ openVideoList: mocks.openVideoList }));
+vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
+  useWatchRegions: () => ({ data: [] }), useRegionCourses: () => ({ data: [] }),
+  useGridVideos: () => ({ data: { pages: [[{ post_id: 'video', course_name: 'Test course', duration_seconds: 10 }]] }, isSuccess: true, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }),
+}));
 
 vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => mocks.guest }));
 vi.mock('@/features/guest/guestGateStore', async (importOriginal) => ({ ...await importOriginal<typeof import('@/features/guest/guestGateStore')>(), openGuestCard: mocks.gate }));
@@ -34,6 +40,7 @@ import { renderHook } from '@testing-library/react';
 import { ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
 import { CHROME_REGISTRY, resolveChrome } from '@/features/chrome-v2/registry';
 import NotFound from '@/pages/NotFound';
+import WatchGridPage from '@/pages/WatchGridPage';
 import { readFileSync } from 'node:fs';
 
 
@@ -44,6 +51,21 @@ const move = async (top: number) => { el.scrollTop = top; await act(async () => 
 beforeEach(() => { resetToExpanded(); mocks.guest = false; el = document.createElement('div'); document.body.appendChild(el); off = registerNavScroller(el); });
 afterEach(() => { cleanup(); off(); el.remove(); resetToExpanded(); });
 describe('HEADER_B1 shared state and controls', () => {
+  it.each(['history', 'fallback'] as const)('FIX_GRID_1 top100 back uses %s navigation without opening the underlying video', mode => {
+    const length = vi.spyOn(window.history, 'length', 'get').mockReturnValue(mode === 'history' ? 2 : 1);
+    const Location = () => <output data-testid="back-location">{useLocation().pathname}</output>;
+    mocks.openVideoList.mockClear();
+    try {
+      render(<QueryClientProvider client={client()}><MemoryRouter initialEntries={mode === 'history' ? ['/amateur', '/watch/top100'] : ['/watch/top100']} initialIndex={mode === 'history' ? 1 : 0}><ChromeIsland /><Location /><Routes><Route path="/watch/top100" element={<WatchGridPage kind="top100" />} /><Route path="/amateur" element={<div data-testid="returned-amateur" />} /></Routes></MemoryRouter></QueryClientProvider>);
+      expect(document.querySelector('[data-grid-tile="video"]')).toBeInTheDocument();
+      const back = document.querySelector<HTMLElement>('[data-island-back]');
+      expect(back).not.toBeNull(); if (!back) return;
+      fireEvent.click(back);
+      expect(screen.getByTestId('back-location')).toHaveTextContent('/amateur');
+      expect(screen.getByTestId('returned-amateur')).toBeInTheDocument();
+      expect(mocks.openVideoList).not.toHaveBeenCalled();
+    } finally { length.mockRestore(); }
+  });
   it.each(['/', '/clubhouse', '/tourhub'])('only opted %s condenses past the top zone and expands on up scroll', async (path) => {
     const { result } = renderHook(useIslandsCondensed, { wrapper: ({ children }) => <MemoryRouter initialEntries={[path]}>{children}</MemoryRouter> });
     await move(79); expect(result.current).toBe(false);
