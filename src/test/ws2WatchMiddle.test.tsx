@@ -233,8 +233,8 @@ describe('grid pages', () => {
   it('region page shows title and sub from the regions read', () => {
     f.regions = { data: [region('Down', { videos: 10, courses: 3 })], isLoading: false, isError: false };
     const { container } = wrap(<WatchGridPage kind="region" />, '/watch/region/Down', '/watch/region/:region');
-    expect(container.querySelector('[data-grid-title]')!.textContent).toBe('Down');
-    expect(container.querySelector('[data-grid-sub]')!.textContent).toBe('10 videos \u00b7 3 courses');
+    expect(container.querySelector('h1')!.textContent).toBe('Down');
+    expect(container.querySelector('.chrome-page-title-subtitle')!.textContent).toBe('10 videos \u00b7 3 courses');
   });
 
   it('chips come from the region courses and a chip filters by course_id', () => {

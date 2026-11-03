@@ -3,14 +3,15 @@
  *   /watch/region/:region  every video filmed in a region, chips per course
  *   /watch/courses         videos at the viewer's courses, no chips
  *   /watch/top100          WS3 — Top 100 on film, no sub, no chips
- * Chrome 'none', dark; Find people / Rounds header. 3-column grid, 30 per page,
+ * G2D: global islands own history back and PageTitle owns the observed h1.
+ * Only regions mount IslandDock; both chip copies share selection/analytics.
+ * 3-column grid, 30 per page,
  * keyset on the last created_at, one sentinel. Tap opens the canonical viewer on
  * the tile with the loaded list (the viewer has no live append, so swipe stays
  * within what is loaded). Guests meet the app gate like /rounds.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -21,10 +22,12 @@ import { useGridVideos, useRegionCourses, useWatchRegions, type GridSource } fro
 import { coursesLabel, videosLabel } from '@/features/explore-magazine/watch/watchMiddle';
 import { DurationChip } from '@/features/explore-magazine/watch/CourseVideosShelf';
 import { openVideoList } from '@/features/explore-magazine/watch/openVideoList';
+import { PageTitle } from '@/features/chrome-v2/PageTitle';
+import { IslandDock } from '@/features/chrome-v2/IslandDock';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 
 export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | 'top100' }) {
   const { t } = useTranslation('courses');
-  const navigate = useNavigate();
   const params = useParams<{ region: string }>();
   const region = kind === 'region' ? params.region ?? '' : null;
   const { user } = useSupabaseSession();
@@ -41,11 +44,6 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
 
   useEffect(() => { analyticsEvents.track('watch_grid_viewed', { kind }); }, [kind]);
 
-  const goBack = useCallback(() => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate('/amateur');
-  }, [navigate]);
-
   const sentinel = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = sentinel.current;
@@ -59,21 +57,27 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
 
   const title = kind === 'courses' ? t('amateur.watch.grid.yourCourses', 'Your courses') : kind === 'top100' ? t('amateur.watch.top100.title', 'Top 100 on film') : region;
   const sub = kind === 'region' && meta ? `${videosLabel(Number(meta.videos))} \u00b7 ${coursesLabel(Number(meta.courses))}` : null;
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const chipsRef = useRef<HTMLDivElement>(null);
+  useIslandBackName(title ?? '', titleRef);
 
-  const chip = (id: string | null, label: string) => {
+  const chip = (id: string | null, label: string, docked = false) => {
     const on = courseId === id;
     return (
       <button
         key={id ?? 'all'}
         type="button"
-        data-grid-chip={id ?? 'all'}
+        data-grid-chip={docked ? undefined : id ?? 'all'}
+        data-grid-dock-chip={docked ? id ?? 'all' : undefined}
+        role={docked ? 'tab' : undefined}
+        aria-selected={docked ? on : undefined}
         aria-pressed={on}
         onClick={() => {
           if (on) return;
           analyticsEvents.track('watch_grid_chip', { region, course_id: id });
           setCourseId(id);
         }}
-        style={{ flex: 'none', whiteSpace: 'nowrap', height: 32, padding: '0 13px', borderRadius: 999, border: `1px solid ${on ? A.INK : 'rgba(255,255,255,0.14)'}`, background: on ? A.INK : 'transparent', color: on ? '#0B0B0D' : A.MUTE, fontFamily: SANS, fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
+        style={docked ? { flex: 'none', whiteSpace: 'nowrap', height: 34, padding: '0 13px', borderRadius: 13, border: '1px solid var(--island-back-edge)', color: on ? 'var(--island-back-ink)' : A.MUTE, fontFamily: SANS, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' } : { flex: 'none', whiteSpace: 'nowrap', height: 32, padding: '0 13px', borderRadius: 999, border: `1px solid ${on ? A.INK : 'rgba(255,255,255,0.14)'}`, background: on ? A.INK : 'transparent', color: on ? '#0B0B0D' : A.MUTE, fontFamily: SANS, fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
       >
         {label}
       </button>
@@ -81,23 +85,20 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
   };
 
   return (
-    <div data-watch-grid-page={kind} style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, color: A.INK }}>
-      <header style={{ display: 'flex', alignItems: 'center', padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 16px 0', minHeight: 'calc(env(safe-area-inset-top, 0px) + 50px)' }}>
-        <button type="button" aria-label="Back" onClick={goBack}
-          style={{ width: 36, height: 36, borderRadius: 999, border: '1px solid rgba(255,255,255,0.14)', background: 'none', color: A.INK, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}>
-          <ChevronLeft size={18} strokeWidth={2.2} />
-        </button>
-        <div style={{ flex: 1, textAlign: 'center', marginRight: 36 }}>
-          <b data-grid-title style={{ display: 'block', fontSize: 17, fontWeight: 700 }}>{title}</b>
-          {sub ? <span data-grid-sub style={{ display: 'block', fontSize: 12, color: A.DIM, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>{sub}</span> : null}
-        </div>
-      </header>
+    <div data-watch-grid-page={kind} style={{ background: A.CANVAS, minHeight: '100dvh', paddingTop: 'var(--island-clearance)', fontFamily: SANS, color: A.INK }}>
+      <PageTitle ref={titleRef} title={title ?? ''} subtitle={sub ?? undefined} />
 
       {kind === 'region' ? (
-        <div data-grid-chips style={{ display: 'flex', gap: 8, padding: '14px 16px 12px', overflowX: 'auto', scrollbarWidth: 'none', overscrollBehaviorX: 'contain' }}>
+        <>
+        <div ref={chipsRef} data-grid-chips style={{ display: 'flex', gap: 8, padding: '14px 16px 12px', overflowX: 'auto', scrollbarWidth: 'none', overscrollBehaviorX: 'contain' }}>
           {chip(null, t('amateur.watch.grid.all', 'All'))}
           {(courses.data ?? []).map((c) => chip(c.course_id, shortCourseName(c.course_name ?? '')))}
         </div>
+        <IslandDock anchorRef={chipsRef}>{() => <div role="tablist" aria-label={t('amateur.watch.grid.yourCourses', 'Your courses')} data-grid-dock-chips style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', overscrollBehaviorX: 'contain', willChange: 'transform' }}>
+          {chip(null, t('amateur.watch.grid.all', 'All'), true)}
+          {(courses.data ?? []).map((c) => chip(c.course_id, shortCourseName(c.course_name ?? ''), true))}
+        </div>}</IslandDock>
+        </>
       ) : <div style={{ height: 14 }} />}
 
       <main style={{ paddingBottom: NAV_CLEARANCE }}>

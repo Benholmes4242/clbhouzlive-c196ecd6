@@ -1,5 +1,9 @@
 # Roadmap
 
+## G2D Video-grid header B
+- [ ] Three route rules and shared title/name anchors; region-only dock with shared chips. Grid reads, tiles and other pages unchanged.
+- [ ] Focused cases, region fixture screenshot and four maxWorkers2 shards until failure; report reconciled totals and inherited blockers.
+
 ## G2C Rounds title and scope dock
 - [x] Shared PageTitle/h1 ref, global /rounds islands and route-local scope dock; retain board/gating/other scopes. Fixture title+dock and selection checked; focused38/38; automatic build OK19:01:20Z.
 - [ ] STOP: shard1 1620 passed/4 inherited failures/1624 across143 files, unchanged roundNotificationOverlay and three tourPlayoffShortenedEvents errors. Full output /tmp/g2c/shard1.log; no shards2–4. Candidate6424/571 =6417/570 +7/+1 g2cRoundsHeader; inventory collection timed out, not a full passing total. G2C_ROUNDS_REPORT.md.
