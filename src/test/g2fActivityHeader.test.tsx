@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';
-import { MemoryRouter, Routes, Route, useLocation, useNavigate, type InitialEntry } from 'react-router-dom';
+import { MemoryRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActivityPageV2 } from '@/features/activity-v2/ActivityPageV2';
@@ -9,6 +9,7 @@ import { BottomNavigationProvider, useBottomNavigation } from '@/contexts/Bottom
 import { useChromeLeftSlot, useChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { resolveChrome } from '@/features/chrome-v2/registry';
 import { registerNavScroller, resetToExpanded } from '@/hooks/useScrollDirection';
+type InitialEntry = NonNullable<React.ComponentProps<typeof MemoryRouter>['initialEntries']>[number];
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const f = vi.hoisted(() => ({ unread: 3, records: 1, filters: [] as unknown[], from: vi.fn(), success: vi.fn() }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'viewer' } }) }));
