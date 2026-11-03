@@ -66,6 +66,11 @@ export interface TourIslandProps {
   onBackTap?: () => void;
   /** Opens TourGlance; receives the anchor element the tile aligns to. */
   onOpen: (anchor: HTMLElement) => void;
+  /**
+   * Read by ChromeIsland's LeftCapsule from the slot ELEMENT's props (the
+   * inner div's attribute is invisible to it): the capsule adds no padding.
+   */
+  'data-island-flush'?: boolean;
 }
 
 function Chip({ logoSlug, glyph, folded = false }: { logoSlug?: string | null; glyph?: 'globe' | 'trophy' | null; folded?: boolean }) {

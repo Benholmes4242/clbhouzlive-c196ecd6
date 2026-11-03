@@ -87,6 +87,7 @@ function TourHubChromeBridge({
   const slot = useMemo(
     () => (
       <TourIsland
+        data-island-flush={true}
         label={d.label}
         caption={d.caption}
         captionLive={d.captionLive}
