@@ -232,7 +232,7 @@ const LeftCapsule: React.FC<{
       }
     };
 
-    if (spec.condense) return <IslandBackCapsule onBack={onBack} label={title ? `Back to ${title}` : 'Go back'} />;
+    if (spec.condense) return <IslandBackCapsule onBack={onBack} label={title ? `Back to ${title}` : 'Go back'} staticTitle={title} />;
 
     return (
       <button

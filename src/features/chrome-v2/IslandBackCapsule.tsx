@@ -7,12 +7,14 @@ import { useIslandsCondensed } from './useIslandsCondensed';
 import { useIslandBackNameValue } from './islandBackNameStore';
 import './island-back.css';
 
-export function IslandBackCapsule({ onBack, label }: { onBack: () => void; label: string }) {
+export function IslandBackCapsule({ onBack, label, staticTitle }: { onBack: () => void; label: string; staticTitle?: string | null }) {
   const { pathname } = useLocation();
   const condensed = useIslandsCondensed();
   const value = useIslandBackNameValue();
-  const name = value?.pathname === pathname ? value.name : '';
-  const shown = !!name && value?.past === true && !condensed;
+  // HB6 static registry titles have no heading threshold; observed names keep
+  // HB4/HB5's exact ownership and threshold when this opt-in prop is absent.
+  const name = staticTitle ?? (value?.pathname === pathname ? value.name : '');
+  const shown = !!name && (staticTitle != null || value?.past === true) && !condensed;
   const nameRef = useFitOneLine<HTMLSpanElement>(name, 16, 13);
   return <Button variant="ghost" onClick={onBack} className="island-back" data-island-back data-named={shown} data-condensed={condensed}
     aria-label={shown ? `Back from ${name}` : label}>

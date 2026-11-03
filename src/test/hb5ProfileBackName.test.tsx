@@ -82,10 +82,10 @@ describe('HB5 profile back-name header', () => {
     const view = mount(); passed(); expect(screen.getByTestId('name').textContent).toBe('Chris Leeson'); view.unmount();
     render(<MemoryRouter><Probe /></MemoryRouter>); expect(screen.getByTestId('name').textContent).toBe('');
   });
-  it.each(['/profile/abc/followers', '/profile/abc/following', '/profile/quest', '/profile/abc/edit'])('keeps %s out of soft folding chrome', path => {
-    const spec = resolveChrome(path, new URLSearchParams()); expect(spec.condense).toBeUndefined(); expect(spec.scrim).toBeUndefined(); expect(spec.left?.kind).toBe('back');
+  it.each(['/profile/abc/followers', '/profile/abc/following', '/profile/quest', '/profile/abc/edit'])('HB6 opts %s into soft folding chrome', path => {
+    const spec = resolveChrome(path, new URLSearchParams()); expect(spec.condense).toBe(true); expect(spec.scrim).toBe('soft'); expect(spec.left?.kind).toBe('back');
   });
-  it('preserves business profile logo and nonfolding chrome', () => {
-    const spec = resolveChrome('/business/abc', new URLSearchParams()); expect(spec.condense).toBeUndefined(); expect(spec.scrim).toBeUndefined(); expect(spec.left).toBeUndefined();
+  it('HB6 business profile uses soft folding history back with home fallback', () => {
+    const spec = resolveChrome('/business/abc', new URLSearchParams()); expect(spec.condense).toBe(true); expect(spec.scrim).toBe('soft'); expect(spec.left).toEqual({ kind: 'back', title: null, backTarget: 'history', backFallback: '/' });
   });
 });
