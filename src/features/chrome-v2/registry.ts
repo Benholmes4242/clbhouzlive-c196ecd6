@@ -234,6 +234,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
 
   // ── ISLAND routes ────────────────────────────────────────────────────────
   // Tour Hub deep pages (island + back arrow, editorial geometry).
+  // G2B: only the two detail roots opt in; deeper paths retain legacy rules.
+  { match: { test: (p) => /^\/tourhub\/tournament\/[^/]+\/?$/.test(p) }, spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=schedule' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
+  { match: { test: (p) => /^\/tourhub\/player\/[^/]+\/?$/.test(p) }, spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=players' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   {
     match: { prefix: '/tourhub/tournament/' },
     spec: {

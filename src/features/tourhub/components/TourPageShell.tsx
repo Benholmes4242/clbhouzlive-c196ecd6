@@ -21,6 +21,8 @@
  *
  * Sticky rows inside `children` lock to `var(--tour-header-h)`, published by
  * the shared header.
+ * G2B: headerB is opt-in for player/tournament roots only. The global islands
+ * own their chrome; the legacy-only child retains suppression for other users.
  */
 import { ReactNode, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -57,6 +59,12 @@ interface Props {
   /** DEPRECATED: no Tour surface is immersive. Accepted and ignored. */
   immersive?: boolean;
   background?: string;
+  headerB?: boolean;
+}
+
+function LegacyChromeSuppression() {
+  useSetChromeSuppressed(true);
+  return null;
 }
 
 export function tourHeaderInset(pathname: string): 'self' | 'shell' {
@@ -79,13 +87,11 @@ export function TourPageShell({
   showBack = true,
   immersive: _immersiveIgnored = false,
   background = A.CANVAS,
+  headerB = false,
 }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const headerInset = tourHeaderInset(location.pathname);
-
-  // One chrome only: the global island stands down while this shell is mounted.
-  useSetChromeSuppressed(true);
 
   const handleBack = useCallback(() => {
     if (onBack) onBack();
@@ -121,7 +127,7 @@ export function TourPageShell({
 
   return (
     <div style={{ background, fontFamily: SF_STACK, position: 'relative' }}>
-      <AppHeader
+      {!headerB && <><LegacyChromeSuppression /><AppHeader
         left={left}
         tabs={tabs}
         active={activeTab}
@@ -129,7 +135,7 @@ export function TourPageShell({
         tabsAriaLabel="Tour sections"
         inset={headerInset}
         heightVar="--tour-header-h"
-      />
+      /></>}
       {belowTitle}
       {children}
       <ScrollToTopGlass />
