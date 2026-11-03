@@ -1,8 +1,8 @@
-# HEADER_B1 — stopped at focused verification
+# HEADER_B1 / B1.1 — verified tests and Chromium fixture
 
-Implemented the three-route opt-in soft fade, nav-signal folds, accessibility gating and route-only glass with the user-ruled brief padding and 300ms geometry /200ms opacity. Guest right source and bottom navigation remain untouched. Production files were not changed after the failures.
+Implemented the three-route opt-in soft fade, nav-signal folds, accessibility gating and route-only glass with the user-ruled brief padding and 300ms geometry /200ms opacity. Guest right source and bottom navigation remain untouched. The historical CSS-variable stop is resolved by the user-authorized B1.1 code shape.
 
-## Exact stop
+## Historical stop (resolved)
 Command: `bunx vitest run src/test/headerB1.test.tsx src/test/tourOverviewBand.test.tsx src/test/islandsRound2.test.tsx src/test/tourIsland.test.tsx src/test/islandsNav.test.tsx --maxWorkers=2`
 Result: **55 passed /57 executed, 2 failures /5 files**. No separate Vitest unhandled-error result. Full output `/tmp/header-b1/focused.log`.
 - `src/test/headerB1.test.tsx:70:35`: `AssertionError: expected '' to be 'var(--island-rest-glass)' // Object.is equality`
@@ -10,7 +10,7 @@ Result: **55 passed /57 executed, 2 failures /5 files**. No separate Vitest unha
 These new assertions inspect CSS-variable styles that this jsdom environment discards. No assertions were loosened or rerun after the completed-edit failures. All other55 cases pass. No pre-existing test failure observed in the focused scope; full suite unrun.
 
 ## Counts
-Before **6,234 /556 files**. Candidate inventory **6,244 /557**, NOT a passing total. `headerB1.test.tsx` adds10 cases. `tourOverviewBand.test.tsx` stays6 (4 authorized replacements; last2 unchanged). `islandsRound2.test.tsx` stays8 (1 authorized replacement; other7 unchanged). No test deletions or file renames. Four full shards were not run after stop.
+Before **6,234 /556 files**. Candidate inventory **6,244 /557**, NOT a passing total. `headerB1.test.tsx` adds10 cases. `tourOverviewBand.test.tsx` stays6 (4 authorized replacements; last2 unchanged). `islandsRound2.test.tsx` stays8 (1 authorized replacement; other7 unchanged). No test deletions or file renames. B1.1 rerun passes all four shards, recorded below.
 
 ## Files
 - src/features/chrome-v2/registry.ts: three flags, remove unused legacy scrim/scrolledWordmark types; other rules unchanged.
@@ -108,3 +108,28 @@ Replacement names (same total):
 - Live browser comparison, connected-index fold case, reduced-motion dedicated regression case and four full shards remain incomplete. Existing reduced-motion branch switches all folds/glass instantly; not browser-verified.
 - Authenticated readback remains unavailable for external_unmanaged project. No credentials or bypass requested.
 - No SQL, migrations, RPC/edge edits, guest browsing changes, review wizard, news, round plots, feed_config or native/Median changes; round_pool_cap remains30.
+
+
+## HEADER_B1.1 completion
+Changed this correction only: ChromeIsland.tsx (three literal rest backgrounds; fade inline style only zIndex); src/index.css (remove unused rest/fade variables, add one exact fade rule); headerB1.test.tsx; tourOverviewBand.test.tsx; roadmap.md and this report. No guest right, bottom-nav or other product behavior changes.
+
+Focused command above: **57/57, five files**, zero failures. Full suite before6,234/556, after**6,244/557**; +10 exclusively new headerB1 cases from B1, B1.1 itself+0. Commands/results:
+- `bunx vitest run --maxWorkers=2 --shard=1/4`: **1,581 /140 files**
+- `bunx vitest run --maxWorkers=2 --shard=2/4`: **1,524 /140 files**
+- `bunx vitest run --maxWorkers=2 --shard=3/4`: **1,588 /140 files**
+- `bunx vitest run --maxWorkers=2 --shard=4/4`: **1,551 /137 files**
+All exit0, zero failed tests and zero Vitest unhandled errors. No pre-existing test failures observed. Full outputs retained `/tmp/header-b11/focused.log`, `shard-1.log` through `shard-4.log`. Automatic build**13:31:51Z: build OK**; no manual build/typecheck run.
+
+B1.1 authorized assertion changes (no cases renamed/deleted):
+- `opted left and right glass move from rest token to canonical material`: each rest `expect(...style.background).toBe('var(--island-rest-glass)')` becomes `toBe('rgba(14, 14, 16, 0.55)')`; condensed0.84 assertions unchanged. Why: literal inline rest material specified by B1.1.
+- `all three opted routes have one persistent soft fade and no legacy band`: removed inline property expectations `height calc(var(--sat, 0px) + 96px)`, `background var(--island-soft-fade)`, `position fixed`, `pointerEvents none`; now asserts exactly one fade per route and compares captured outerHTML before/after scroll. Legacy absence assertions preserved. Why: geometry/paint move to CSS; identical element assertion is no longer a same-live-reference comparison.
+- `soft fade token holds the signed-off safe-area stops without a transition`: old global `--island-soft-fade` string assertion becomes exact height and exact four-stop gradient assertions within the extracted `[data-chrome="island-scrim-soft"]` rule. Why: named rule owns geometry/paint; no blank-value acceptance.
+
+### Chromium fixture
+Actual ChromeIsland with real QueryClientProvider, MemoryRouter('/') and existing nav scroll store; dependency stubs only intercept fixture requests (no app files, sessions or access bypass). Script `/tmp/browser/header-b11/check_islands.py`; output `output.log`, screenshots `rest.png` /`condensed.png` in same directory. Renderer setup/version issues were apparatus-only and resolved; final page errors**[]**.
+With --sat47px, computed fade height**143px** at rest and condensed. Computed background-image identical in both:
+```text
+linear-gradient(rgba(10, 10, 12, 0.92) 0px, rgba(10, 10, 12, 0.8) 47px, rgba(10, 10, 12, 0.35) 95px, rgba(10, 10, 12, 0) 143px)
+```
+Both islands computed backgrounds: rest**rgba(14, 14, 16, 0.55)**; condensed**rgba(14, 14, 16, 0.84)**. Left width131→46px; right178→138px. Screenshot inspection: rest shows mark+wordmark and search+divider+Connect+avatar; condensed shows mark only and Connect+avatar, no search/divider. Fade is unchanged; capsules have not shifted vertically. This fixture verifies real components with disconnected member data, not an authenticated hosted member journey.
+Earlier mock file-URL scroll check and dedicated reduced-motion/connected-index browser cases remain unverified; no claim of those flows. Existing tour and index regressions passed. Historical stop/limitations paragraphs above are retained as history, superseded by this completion section for shard/build/fixture results.
