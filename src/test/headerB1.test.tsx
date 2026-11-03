@@ -92,7 +92,7 @@ describe('HEADER_B1 shared state and controls', () => {
     expect(join.style.borderRadius).toBe('12px'); expect(join.style.height).toBe('34px'); expect(join.style.padding).toBe('0px 16px');
   });
   it('GI1 non-condense guest capsule remains byte-identical through nav changes', async () => {
-    mocks.guest = true; mount('/discover');
+    mocks.guest = true; mount('/settings');
     const guest = document.querySelector<HTMLElement>('[data-guest-island]'); const before = guest?.outerHTML;
     expect(guest?.style.borderRadius).toBe('23px'); expect(guest?.style.background).toBe('rgba(14, 14, 16, 0.84)');
     expect(guest?.style.transition).toBe(''); expect(screen.getByRole('button', { name: 'Join free' }).style.borderRadius).toBe('17px');

@@ -19,6 +19,8 @@ describe('round notifications open the scorecard over Activity', () => {
       tone: 'dark',
       bleed: false,
       hideHcp: true,
+      condense: true,
+      scrim: 'soft',
     });
   });
 
