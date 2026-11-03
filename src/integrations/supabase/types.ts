@@ -9729,6 +9729,24 @@ export type Database = {
           },
         ]
       }
+      poster_auth_probe: {
+        Row: {
+          request_id: number | null
+          secret_name: string
+          sent_at: string | null
+        }
+        Insert: {
+          request_id?: number | null
+          secret_name: string
+          sent_at?: string | null
+        }
+        Update: {
+          request_id?: number | null
+          secret_name?: string
+          sent_at?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           achievement_badge_id: string | null
