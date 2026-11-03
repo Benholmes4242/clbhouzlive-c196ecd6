@@ -1,5 +1,10 @@
 # Roadmap
 
+## HEADER_B1 — Clubhouse and Tour floating headers
+- [ ] Implement only three-route soft fade and shared-nav-signal folds; preserve guest right, all other routes, clearance and bottom nav.
+- [ ] Update authorized old layer/wordmark tests, add scoped cases, quote every rewritten assertion and reconcile baseline6,234/556.
+- [ ] Scroll both mock phones and verify header states; run focused tests and four full shards with maxWorkers2, check automatic build and report.
+
 ## Tour player page rebuild — player-v2
 - [x] Implement the player page using header-owned season/tour, recorded wins and existing pick/follow doors; preserve LiveNowStrip source.
 - [x] Authorized partial scrollPageToTop mock in playerRebuildPage only; all eleven historical failures were the same jsdom scrollTo error. Focused113/113; production helper/page and assertions unchanged in correction.
