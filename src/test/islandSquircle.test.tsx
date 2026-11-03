@@ -42,12 +42,12 @@ describe('ISLAND_SQUIRCLE_1', () => {
     expect(right?.style.borderRadius).toBe('16px');
   });
 
-  it('a non-condense island route keeps the fully round 23px radius', async () => {
+  it('a profile island route uses the HB5 squircle radius', async () => {
     mount('/profile/ben');
     const right = document.querySelector<HTMLElement>('[data-island-right]');
-    expect(right?.style.borderRadius).toBe('23px');
+    expect(right?.style.borderRadius).toBe('16px');
     await move(150);
-    expect(right?.style.borderRadius).toBe('23px');
+    expect(right?.style.borderRadius).toBe('16px');
   });
 
   it('the guest right island keeps its round shape on a condense route', async () => {
