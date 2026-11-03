@@ -58,3 +58,10 @@ Signed-in checks are unavailable: sign-in here is `external_unmanaged`, so no se
 - Screenshots were saved under `/tmp/browser/stab/` (temporary, cleared when the sandbox restarts).
 
 Untouched: guest browsing, review wizard, news, round plots, SQL/migrations, RPCs/edge functions, feed_config, round_pool_cap (30), native/Median.
+
+## G2F wait for the observer (follow-up)
+Only `src/test/g2fActivityHeader.test.tsx` changed; ActivityPageV2 and IslandDock are untouched, and no assertion changed.
+- "observes the actual Activity title for the expanded back name" (line 65): after `mount();` it now runs `await waitFor(() => expect(callbacks.has(node('h1'))).toBe(true));` before the first `pass('h1', 160, true)`.
+- "docks only past its chips and shares filters/counters across copies" (line 67): after `mount();` it now runs `await waitFor(() => expect(callbacks.has(node('[data-activity-chips="in-place"]').parentElement as Element)).toBe(true));` before the first `pass(...)`.
+- File run 10 times in a row: 10/10 runs passed 9/9.
+- Four shards (--maxWorkers=2): 1,638 / 1,538 / 1,641 / 1,632 = 6,449 tests, 574 files, 0 failures, 0 unhandled errors (unchanged, +0).
