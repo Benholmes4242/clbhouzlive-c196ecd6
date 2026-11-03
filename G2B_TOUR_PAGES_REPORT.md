@@ -47,7 +47,7 @@ Temporary fixture prepared under `/tmp/browser/g2b` with real heroes, TourPageSh
 Bundle preparation failed before screenshots:
 ```text
 src/components/courses/course-detail/about/AllHolesSheet.tsx:14:79:
-ERROR: Cannot read file: /dev-server/src/features/courses/_shared/siLadder.tsx
+ERROR: Cannot read file: /dev-server/src/features/courses/_shared/siLadderRules.tsx
 Use "src/features/courses/_shared/SiLadder.tsx" instead ... to avoid issues with case-sensitive file systems
 ```
 The subsequent fixture navigation timed out waiting for load because no bundle was produced. Full browser output `/tmp/g2b/browser.log`; stderr also retained in exec tool log. This is a pre-existing case-sensitive source dependency encountered by standalone bundling, not a failing G2B preview build; no out-of-scope course file altered. No valid screenshots or mock parity claim. Browser fixture recovery was not attempted after shard stop. Required top/named captures remain unverified.

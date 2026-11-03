@@ -23,7 +23,7 @@
 ## G2B Tour-page header B
 - [x] Two detail-root registry rules, opt-in TourPageShell headerB (legacy child alone claims suppression), actual TournamentHero/pv-name refs and player clearance. All other content/callers preserved.
 - [ ] STOP: focused31/31; shard1 1620 passed/4 inherited failures/1624 across143 files (roundNotificationOverlay exact HB6 object, three tourPlayoffShortenedEvents missing QueryClientProvider). Full output/tmp/g2b/shard1.log; no corrections/reruns/shards2–4 after failure. Automatic build OK18:52:14Z. Candidate6417/570 from6406/569 (+11/+1 g2bTourHeaders).
-- [ ] Browser fixture could not bundle due pre-existing AllHolesSheet.tsx:14:79 import siLadder (on disk SiLadder.tsx); subsequent missing bundle navigation timed out. No valid screenshots, no parity/live-page claim. G2B_TOUR_PAGES_REPORT.md details limitations and prior failures.
+- [ ] Browser fixture could not bundle due pre-existing AllHolesSheet.tsx:14:79 import siLadderRules (on disk SiLadder.tsx); subsequent missing bundle navigation timed out. No valid screenshots, no parity/live-page claim. G2B_TOUR_PAGES_REPORT.md details limitations and prior failures.
 
 ## G2A course-detail tab dock
 - [x] Replaced standalone sticky row/scrim with existing IslandDock and shared tab handler; modal, hero and HB4 back unchanged. Shared dock untouched.

@@ -1,7 +1,7 @@
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, within } from '@testing-library/react';
-import * as rules from '@/features/courses/_shared/siLadder';
+import * as rules from '@/features/courses/_shared/siLadderRules';
 import { IndexDisagreesSection } from '@/features/business/clubAnalytics/sections';
 import type { ClubCourseAnalytics } from '@/features/business/clubAnalytics/types';
 

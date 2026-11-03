@@ -26,7 +26,7 @@
 import React from 'react';
 import RailChips from '@/components/ui/RailChips';
 import { A, SANS, FIGS, LABEL, Panel, bizFigure, BIZ_BODY } from '@/features/courses/components/holes/analytical/tokens';
-import type { SiLadder as SiLadderData, SiLadderRow } from './siLadder';
+import type { SiLadder as SiLadderData, SiLadderRow } from './siLadderRules';
 import { SC_FILL_BIRDIE_DK } from '@/features/courses/components/holes/_constants';
 
 /** §2 — the verdict's two colours. Nothing else on the chart is coloured. */

@@ -46,7 +46,7 @@ Existing AC2 24/24 passed; new G2F8/9 passed. No unhandled-error summary in focu
 - `roundNotificationOverlay.test.ts:11:68`: `AssertionError: expected { chrome: 'island', …(6) } to deeply equal { chrome: 'island', …(4) }`; old expectation lacks condense:true/scrim:soft.
 - Three `tourPlayoffShortenedEvents.test.tsx` page cases: awaiting-playoff pulse live, awaiting-playoff pulse completed and normal finished four-round event: `Error: No QueryClient set, use QueryClientProvider to set one`, useTournamentPick.ts:37:10 → TournamentPage.tsx:89:20. Runner gives no test line.
 - `headerB1.test.tsx:97:39` expected23px/received16px; `g2aCourseTabs.test.tsx:104:34` expected `env(safe-area-inset-top, 0px)`/received empty string.
-- Existing siLadder/SiLadder import-case issue untouched. Suspected tourOverviewBand fixture not a confirmed failure.
+- Existing siLadderRules/SiLadder import-case issue untouched. Suspected tourOverviewBand fixture not a confirmed failure.
 
 Full four-shard zero-failure result and top/docked screenshots remain blocked by the unchanged dock test failure. No mock parity or browser claim. Preview type error cleared; candidate suite count before/after this type-only correction remains **6449/574**.
 

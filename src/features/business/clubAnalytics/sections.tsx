@@ -37,7 +37,7 @@ import {
 } from '@/features/courses/components/holes/_constants';
 import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
 import RailChips from '@/components/ui/RailChips';
-import { buildSiLadder, SI_PLACES_GATE } from '@/features/courses/_shared/siLadder';
+import { buildSiLadder, SI_PLACES_GATE } from '@/features/courses/_shared/siLadderRules';
 import { numberWord, ordinal } from '@/lib/text/numbers';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import type { ClubCourseAnalytics, ClubAnalyticsTee } from './types';
@@ -106,7 +106,7 @@ const roundsLabel = (n: number | null | undefined) => `${fmt(n)} ${n === 1 ? 'ro
 /**
  * BRIEF_SI_LADDER_SHARED §0 — THIS SECTION IS NOW A THIN WRAPPER.
  *
- * The ladder, and the rule behind it, moved to `_shared/siLadder.ts` and
+ * The ladder, and the rule behind it, moved to `_shared/siLadderRules.ts` and
  * `_shared/SiLadder.tsx` so the course detail Course tab renders THE SAME chart
  * from THE SAME verdict. The same course must never show different flags on the
  * two pages, which is exactly what two copies of a threshold produce.
