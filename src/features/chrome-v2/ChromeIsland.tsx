@@ -144,11 +144,13 @@ export function lastIndexMove(
   return NO_MOVE;
 }
 
-function glassStyle(tone: ChromeTone): React.CSSProperties {
+function glassStyle(tone: ChromeTone, squircle = false): React.CSSProperties {
   const isLight = tone === 'light';
   return {
     height: ISLAND_H,
-    borderRadius: 23,
+    // ISLAND_SQUIRCLE_1: condense routes ('/', '/clubhouse', '/tourhub') take the
+    // 34% squircle (16px of 46) at rest AND folded; every other route stays round.
+    borderRadius: squircle ? 16 : 23,
     // Light-tone routes keep their current colours and take only the new
     // geometry (BRIEF_ISLANDS_NAV §SHARED GLASS); dark uses ISLAND_GLASS.
     ...(isLight ? {
