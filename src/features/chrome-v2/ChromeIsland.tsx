@@ -201,7 +201,7 @@ const LeftCapsule: React.FC<{
       <div
         data-island-left
         style={{
-          ...glassStyle(tone),
+          ...glassStyle(tone, spec.condense === true),
           ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
           padding: flush ? 0 : grow ? '0 8px 0 10px' : '0 14px 0 13px',
           ...(grow ? { flex: '1 1 auto', minWidth: 0 } : null),
@@ -237,10 +237,10 @@ const LeftCapsule: React.FC<{
         onClick={onBack}
         aria-label={title ? `Back to ${title}` : 'Go back'}
         style={{
-          ...glassStyle(tone),
+          ...glassStyle(tone, spec.condense === true),
           padding: '0 16px 0 12px',
           gap: 8,
-          border: glassStyle(tone).border,
+          border: glassStyle(tone, spec.condense === true).border,
           cursor: 'pointer',
         }}
       >
@@ -283,7 +283,7 @@ const LeftCapsule: React.FC<{
       onClick={onLogoTap}
       aria-label="Go to home"
       style={{
-        ...glassStyle(tone),
+        ...glassStyle(tone, spec.condense === true),
         ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition), var(--island-fold-transition)' } : {}),
         padding: showWordmarkNow ? '0 15px 0 11px' : '0 7px',
         gap: showWordmarkNow ? 9 : 0,
@@ -783,7 +783,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         <div
           data-island-right
           style={{
-            ...glassStyle(tone),
+            ...glassStyle(tone, spec.condense === true),
             ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
             padding: '0 5px 0 12px',
             gap: 10,
