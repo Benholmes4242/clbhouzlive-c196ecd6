@@ -21550,6 +21550,18 @@ export type Database = {
           username: string
         }[]
       }
+      get_beat_the_model: {
+        Args: { p_tour: string; p_year: number }
+        Returns: {
+          avg_percentile: number
+          display_name: string
+          is_viewer: boolean
+          picks: number
+          profile_photo_url: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_blocked_user_ids: {
         Args: { _user_id: string }
         Returns: {
@@ -22445,6 +22457,14 @@ export type Database = {
       }
       get_echo_engine_health_summary: { Args: never; Returns: Json }
       get_eg_sync_health: { Args: never; Returns: Json }
+      get_event_winning_scores: {
+        Args: { p_tournament_id: string }
+        Returns: {
+          start_date: string
+          tournament_id: string
+          winning_score: number
+        }[]
+      }
       get_exploration_leaderboard: {
         Args: {
           p_club_id?: string
@@ -23708,6 +23728,10 @@ export type Database = {
           total_rounds: number
         }[]
       }
+      get_our_pick_record: {
+        Args: { p_tour: string; p_year: number }
+        Returns: Json
+      }
       get_pending_reviews: {
         Args: never
         Returns: {
@@ -23767,6 +23791,28 @@ export type Database = {
           second_figure: number
           user_id: string
           whs_score_id: string
+        }[]
+      }
+      get_pick_field: {
+        Args: { p_tournament_id: string }
+        Returns: {
+          country: string
+          full_name: string
+          headshot_override: string
+          photo_url: string
+          player_id: string
+          world_rank: number
+        }[]
+      }
+      get_pick_fit: {
+        Args: { p_player_ids: string[]; p_tournament_id: string }
+        Returns: {
+          percentile: number
+          player_id: string
+          players: number
+          stat: string
+          value: number
+          wins: number
         }[]
       }
       get_pickem_leaderboard: {
@@ -25085,6 +25131,27 @@ export type Database = {
           hole_number: number
           par: number
           players: number
+        }[]
+      }
+      get_tournament_pick_state: {
+        Args: { p_tournament_id: string }
+        Returns: {
+          closed: boolean
+          followed_best: Json
+          followed_pickers: number
+          followed_top: Json
+          locked: boolean
+          locks_at: string
+          my_percentile: number
+          my_player_id: string
+          my_player_name: string
+          my_position: number
+          my_score: number
+          my_status: string
+          my_still_in_field: boolean
+          my_thru: number
+          my_tied: boolean
+          picked_at: string
         }[]
       }
       get_tournament_venue_record: {
@@ -26928,6 +26995,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_tournament_pick: {
+        Args: { p_player_id: string; p_tournament_id: string }
+        Returns: string
+      }
       set_typing_indicator: {
         Args: { p_conversation_id: string }
         Returns: undefined
@@ -27672,6 +27743,22 @@ export type Database = {
           tournament_id: string
           user_id: string
         }[]
+      }
+      tournament_field_ids: {
+        Args: { p_tournament_id: string }
+        Returns: string[]
+      }
+      tournament_finish_percentile: {
+        Args: { p_player_id: string; p_tournament_id: string }
+        Returns: number
+      }
+      tournament_pick_is_locked: {
+        Args: { p_tournament_id: string }
+        Returns: boolean
+      }
+      tournament_pick_locks_at: {
+        Args: { p_tournament_id: string }
+        Returns: string
       }
       tournament_scoring_totals:
         | {
