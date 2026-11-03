@@ -1,8 +1,8 @@
 # Roadmap
 
 ## G2C Rounds title and scope dock
-- [ ] Shared PageTitle/h1 ref, global /rounds islands and route-local scope dock; retain board/gating/other scopes.
-- [ ] New tests/browser title+dock fixture, maxWorkers2 full shards until failure, reconcile inventory and prior stops.
+- [x] Shared PageTitle/h1 ref, global /rounds islands and route-local scope dock; retain board/gating/other scopes. Fixture title+dock and selection checked; focused38/38; automatic build OK19:01:20Z.
+- [ ] STOP: shard1 1620 passed/4 inherited failures/1624 across143 files, unchanged roundNotificationOverlay and three tourPlayoffShortenedEvents errors. Full output /tmp/g2c/shard1.log; no shards2–4. Candidate6424/571 =6417/570 +7/+1 g2cRoundsHeader; inventory collection timed out, not a full passing total. G2C_ROUNDS_REPORT.md.
 
 ## G2B Tour-page header B
 - [x] Two detail-root registry rules, opt-in TourPageShell headerB (legacy child alone claims suppression), actual TournamentHero/pv-name refs and player clearance. All other content/callers preserved.
