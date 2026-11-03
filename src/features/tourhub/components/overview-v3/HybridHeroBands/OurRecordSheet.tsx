@@ -24,7 +24,7 @@ function RecordSession({ onClose, tour, year }: OurRecordSheetProps) {
   const copy = (key: string, opts: Record<string,unknown> = {}) => t(`overview.pickRecord.${key}`, opts);
   const rows = record && members.some(row=>row.picks>0) ? sortedBeatRows(members,record) : [];
   const average = record?.avg_percentile;
-  const labels = average == null ? [] : [{ key:'random', value:50, text:copy('random') }, { key:'us', value:average, text:copy('us', { value:average }) }, ...(viewer ? [{ key:'you', value:viewer.avg_percentile, text:copy('you', { value:viewer.avg_percentile }) }] )];
+  const labels = average == null ? [] : [{ key:'random', value:50, text:copy('random') }, { key:'us', value:average, text:copy('us', { value:average }) }, ...(viewer ? [{ key:'you', value:viewer.avg_percentile, text:copy('you', { value:viewer.avg_percentile }) }] : [])];
   const month = record?.first_event_date ? new Intl.DateTimeFormat('en-GB', { month:'long' }).format(new Date(record.first_event_date)) : null;
   return <BottomSheet open onClose={onClose} scrollBody topRadius={22} grabberPadding="8px 0 12px" ariaLabelledBy="pick-record-title">
     <div data-our-record-sheet className="text-[color:var(--pick-ink)] pb-6">
