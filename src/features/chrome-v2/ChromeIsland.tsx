@@ -200,7 +200,7 @@ const LeftCapsule: React.FC<{
         data-island-left
         style={{
           ...glassStyle(tone),
-          ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'var(--island-rest-glass)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
+          ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
           padding: flush ? 0 : grow ? '0 8px 0 10px' : '0 14px 0 13px',
           ...(grow ? { flex: '1 1 auto', minWidth: 0 } : null),
         }}
@@ -282,7 +282,7 @@ const LeftCapsule: React.FC<{
       aria-label="Go to home"
       style={{
         ...glassStyle(tone),
-        ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'var(--island-rest-glass)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition), var(--island-fold-transition)' } : {}),
+        ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition), var(--island-fold-transition)' } : {}),
         padding: showWordmarkNow ? '0 15px 0 11px' : '0 7px',
         gap: showWordmarkNow ? 9 : 0,
         cursor: 'pointer',
@@ -747,10 +747,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     <>
       {spec.scrim === 'soft' && (
         <div aria-hidden data-chrome="island-scrim-soft" style={{
-          position: 'fixed', top: 0, left: 0, right: 0,
-          height: 'calc(var(--sat, 0px) + 96px)',
-          background: 'var(--island-soft-fade)',
-          pointerEvents: 'none', zIndex: Z.header - 1,
+          zIndex: Z.header - 1,
         }} />
       )}
 
@@ -785,7 +782,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
           data-island-right
           style={{
             ...glassStyle(tone),
-            ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'var(--island-rest-glass)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
+            ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
             padding: '0 5px 0 12px',
             gap: 10,
             position: 'relative',
