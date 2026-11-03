@@ -281,7 +281,7 @@ export function AmateurMediaBlock({
           meta={(hubCounts.data?.clip_count ?? 0) > clips.length ? `See all ${hubCounts.data?.clip_count}` : null}
           onMetaPress={() => {
             analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.clip_count ?? 0, section: 'clips' });
-            onSeeAll('/media?kind=clips');
+            onSeeAll('/amateur?view=watch&watch=quick');
           }}
           bleed
         >
@@ -309,7 +309,7 @@ export function AmateurMediaBlock({
           meta={(hubCounts.data?.video_count ?? 0) > videos.length ? `See all ${hubCounts.data?.video_count}` : null}
           onMetaPress={() => {
             analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.video_count ?? 0, section: 'videos' });
-            onSeeAll('/media?kind=longer');
+            onSeeAll('/amateur?view=watch&watch=long');
           }}
         >
           {videos.map((item, index) => (
@@ -323,8 +323,8 @@ export function AmateurMediaBlock({
         meta={total > 0 ? `See all ${total}` : null}
         onMetaPress={() => {
           analyticsEvents.track('amateur_media_see_all_opened', { total, section: 'mosaic' });
-          /* /media carries the MERGED set this mosaic summarises. */
-          onSeeAll('/media?kind=community');
+          /* CM1 — the Community chip is the member-media destination. */
+          onSeeAll('/amateur?view=watch&watch=community');
         }}
         bleed
       >

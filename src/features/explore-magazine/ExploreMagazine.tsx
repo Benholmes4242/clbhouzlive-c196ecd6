@@ -55,6 +55,7 @@ import {
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
 import { WatchFeed } from './watch/WatchFeed';
+import { mapWatchFilter, type WatchFilter } from './watch/watchFilters';
 import { VideoCard } from './watch/videoUnit';
 import { useWatchVideos } from './watch/useWatchVideos';
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
@@ -239,7 +240,7 @@ function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
       onSeeAll={() => {
         analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips' });
         onDepart();
-        navigate('/media?kind=clips');
+        navigate('/amateur?view=watch&watch=quick');
       }}
     >
       {clips.map((clip, index) => (
@@ -475,9 +476,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
     const fromUrl = searchParams.get('view') as ExploreView | null;
     return fromUrl && EXPLORE_VIEWS.includes(fromUrl) ? fromUrl : readExploreView();
   });
-  /* WS1 — the Community chip is gone; the entry value is passed to WatchFeed,
-     which maps any legacy value through mapWatchFilter (community → For you). */
-  const [watchEntry, setWatchEntry] = useState<'all' | 'community'>('all');
+  /* CM1 — entry URL chooses the chip once; openCommunity retains remount ownership. */
+  const [watchEntry, setWatchEntry] = useState<WatchFilter>(() => mapWatchFilter(searchParams.get('watch')));
   const geography = useViewerScoreScope(userId);
 
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);

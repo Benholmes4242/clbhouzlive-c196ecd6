@@ -1,5 +1,10 @@
 # Roadmap
 
+## CM1 Community destination
+- [ ] Select Community in place, add watch deep links and retire Media page with legacy redirects; preserve guest rules and shared totals.
+- [ ] Apply written grid specification and white rating correction; corrected named HTML is not present in uploads, so exact mock parity is blocked.
+- [ ] Add/update authorised tests, quote all changed/deleted cases, run focused checks and four shards, report reconciled totals and build.
+
 ## FIX_GRID_1
 - [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.
 - [x] Explicit preview-error instruction authorised missing-brace correction only; focused58/58, shards1645/1537/1638/1652 =6472/576 (+10/+1), zero failures/unhandled errors; automatic build OK21:51:47Z. Activity sole-caller grep and PlayerPage-only exception confirmed. FIX_GRID_1_REPORT.md retains original failure, full audit and live-hit-testing limitation.
