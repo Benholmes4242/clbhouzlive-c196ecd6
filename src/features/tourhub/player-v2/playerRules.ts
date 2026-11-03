@@ -14,6 +14,7 @@ export const finishWord = (position: string) => displayRank(position) == null ? 
 export const newest = <T extends { end_date: string }>(rows: T[]) => [...rows].sort((a,b) => b.end_date.localeCompare(a.end_date));
 export const bestFinish = (rows: PlayerResult[]) => newest(rows).filter(r => displayRank(r.display_position) != null).sort((a,b) => Number(displayRank(a.display_position))-Number(displayRank(b.display_position)))[0] ?? null;
 export const scoreText = (n: number) => n === 0 ? 'E' : `${n < 0 ? '−' : '+'}${Math.abs(n)}`;
+const eventWithArticle = (name:string) => /^the /i.test(name) ? name : `the ${name}`;
 export const signed = (n: number, decimals = 2) => `${n < 0 ? '−' : n > 0 ? '+' : ''}${Math.abs(n).toFixed(decimals)}`;
 export const tourFor = (header: PlayerHeader | null, codes?: string[] | null) => mapTourSlug(header?.main_tour || codes?.[0]);
 export const playerTourLabel = (tour: string) => tour === 'lpga' ? 'LPGA' : fullTourLabel(tour);
@@ -32,7 +33,7 @@ export function heroLine(rows: PlayerResult[], world: number | null, race: numbe
   const starts = rows.length; const best = bestFinish(rows); if (!starts || !best) return null;
   const wins = rows.filter(r=>r.is_winner).length;
   const top10 = rows.filter(r=>{const n=displayRank(r.display_position);return n != null && n<=10;}).length;
-  const finish = `${finishWord(best.display_position)} at the ${best.name} ${whenEnded(best.end_date,now)}.`;
+  const finish = `${finishWord(best.display_position)} at ${eventWithArticle(best.name)} ${whenEnded(best.end_date,now)}.`;
   if (starts < 3) return { bold: `${cap(wordNumber(starts))} ${starts===1 ? 'start' : 'starts'} this season`, rest: `: ${finish}` };
   if (wins) {
     const beats = rows.flatMap(r=>typeof r.beat_percent==='number' ? [r.beat_percent] : []);
@@ -86,8 +87,8 @@ export function majorsLine(rows: PlayerResult[]): string {
   const majors=rows.filter(r=>isAnyMajor(r.name)),best=bestFinish(majors); if(!majors.length) return '';
   const top5=majors.filter(r=>{const n=displayRank(r.display_position);return n!=null&&n<=5;}); const threshold=top5.length?5:10;
   const top=majors.filter(r=>{const n=displayRank(r.display_position);return n!=null&&n<=threshold;});
-  if(top.length&&best) return `${cap(wordNumber(top.length))} top ${threshold}s from ${wordNumber(majors.length)} majors, and ${finishWord(best.display_position)} at the ${majorShortName(best.name)}.`;
-  return `${cap(wordNumber(majors.length))} ${majors.length===1?'major':'majors'} this season: ${majors.map(r=>`${r.display_position==='MC'?'a missed cut':r.display_position} at the ${majorShortName(r.name)}`).join(' and ')}.`;
+  if(top.length&&best) return `${cap(wordNumber(top.length))} top ${threshold}s from ${wordNumber(majors.length)} majors, and ${finishWord(best.display_position)} at ${eventWithArticle(majorShortName(best.name))}.`;
+  return `${cap(wordNumber(majors.length))} ${majors.length===1?'major':'majors'} this season: ${majors.map(r=>`${r.display_position==='MC'?'a missed cut':r.display_position} at ${eventWithArticle(majorShortName(r.name))}`).join(' and ')}.`;
 }
 export function majorShortName(name:string) { const lower=name.toLowerCase();return lower.includes('masters')?'Masters':lower.includes('pga')?'PGA':lower.includes('u.s.')?'U.S. Open':lower.includes('the open')?'The Open':name; }
 export function pickHistoryLine(history:PlayerPickHistory,tour:string):CopyLine {
@@ -106,6 +107,6 @@ export function cleanPlace(place:string|null,country:string|null):string|null {
   return [parts[0],resolved&&resolved.toUpperCase()!==parts[0].toUpperCase()?resolved:parts.length>1?parts[1]:null].filter(Boolean).join(', ');
 }
 export function sectionVisibility(starts:number,stats:PlayerStat[],holes:PlayerHoles|null,tour:TourAverages|null,mine:MyScoring|null,member:boolean) {
-  const shots=!!(stats.length&&holes&&holes.rounds>=10&&tour&&tour.players>0);
-  return {form:starts>=3,season:starts>=5,game:stats.length>0,shots,you:shots&&member&&!!mine&&mine.rounds>=5,rounds:starts>=3};
+  const shots=!!(holes&&holes.rounds>=10&&tour&&tour.players>0);
+  return {form:starts>=3,season:starts>=5,game:stats.length>0,shots,you:shots&&stats.length>0&&member&&!!mine&&mine.rounds>=5,rounds:starts>=3};
 }
