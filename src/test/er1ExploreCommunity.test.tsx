@@ -9,9 +9,9 @@ import courses from '../../public/locales/en/courses.json';
 
 const f = vi.hoisted(() => ({
   rows: [] as unknown[], moments: [] as unknown[], calls: vi.fn(), open: vi.fn(),
-  fetched: true, error: false, retry: vi.fn(), creators: vi.fn(), autoplay: vi.fn(),
+  fetched: true, error: false, more: false, retry: vi.fn(), creators: vi.fn(), autoplay: vi.fn(),
 }));
-vi.mock('@/features/explore-magazine/watch/useWatchVideos', () => ({ useWatchVideos: () => ({ data: { pages: [f.rows] }, isFetched: true, hasNextPage: false }) }));
+vi.mock('@/features/explore-magazine/watch/useWatchVideos', () => ({ useWatchVideos: () => ({ data: { pages: [f.rows] }, isFetched: true, hasNextPage: f.more }) }));
 vi.mock('@/features/explore-magazine/watch/useWatchClips', () => ({ useWatchClips: () => ({ data: { pages: [] }, isFetched: true, hasNextPage: false }) }));
 vi.mock('@/features/explore-magazine/watch/useWatchSignals', () => ({ useWatchProgress: () => ({ data: new Map() }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek', () => ({ useMomentsOfTheWeek: (window: unknown, options: unknown) => { f.calls(window, options); return { data: f.moments, isFetched: f.fetched, isError: f.error, refetch: f.retry }; } }));
@@ -41,7 +41,7 @@ function mount(filter = 'all') {
 }
 const row = (id: string, duration: number, owner = 'other', extra = {}) => ({ post_id: id, duration_seconds: duration, post_user_id: owner, actor_type: 'personal', caption: id, creator_display_name: id, poster_url: `https://x/${id}.jpg`, ...extra });
 const moment = (key: string, owner: string, date: string, video = false) => ({ key, courseId: 'c', courseName: 'A course', thumbnail: `https://x/${key}.jpg`, mediaType: video ? 'video' : 'image', mediaIndex: 0, post: { id: key, userId: owner, displayName: key, createdAt: date, mediaItems: [{ type: video ? 'video' : 'image', hlsUrl: video ? 'https://x/v.m3u8' : undefined, imageUrl: `https://x/${key}.jpg` }] } });
-beforeEach(() => { f.rows = []; f.moments = []; f.fetched = true; f.error = false; vi.clearAllMocks(); });
+beforeEach(() => { f.rows = []; f.moments = []; f.fetched = true; f.error = false; f.more = false; vi.clearAllMocks(); });
 afterEach(cleanup);
 
 describe('ER1 Explore', () => {
@@ -77,8 +77,8 @@ describe('ER1 Explore', () => {
   });
   it('counts only the displayed Shorts', () => { f.rows = [row('own', 60, 'me'), row('other', 60)]; const { container } = mount('quick'); expect(container.querySelector('[data-watch-count]')?.textContent).toBe('1 clips'); });
   it('Showing n excludes own Shorts while more pages remain', () => {
-    // A concrete count is already covered above; this verifies the search-independent filtering before paging.
-    f.rows = [row('own', 60, 'me'), row('a', 60), row('b', 60)]; const { container } = mount('quick'); expect(container.querySelector('[data-watch-count]')?.textContent).toBe('2 clips');
+    f.more = true;
+    f.rows = [row('own', 60, 'me'), row('a', 60), row('b', 60)]; const { container } = mount('quick'); expect(container.querySelector('[data-watch-count]')?.textContent).toBe('Showing 2');
   });
   it.each(['all', 'quick', 'long', 'community'])('search preserves own videos from %s', (filter) => {
     f.rows = [row('own-short', 60, 'me'), row('own-long', 500, 'me')]; const { container } = mount(filter);
