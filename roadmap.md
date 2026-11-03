@@ -1,5 +1,10 @@
 # Roadmap
 
+## HB5 Profile back-name header
+- [ ] Personal profile roots only: history back, shared HB4 name observation and full-name fitting; preserve all content and excluded routes.
+- [ ] New regressions and authorized no-back/logo assertion updates, quoted inventory; four shards --maxWorkers=2 from6278/561 and clean automatic build.
+- [ ] Scroll signed-off mock; browser sat47 top/folded/named screenshots and rest46×46; report limitations.
+
 ## HB4 Course detail back-name header
 - [x] Existing /courses/{id} only implementation: fixed folding header and observed short-name expansion; deeper routes/tabs unchanged. Shared boundary extraction; HB2 tests unchanged10/10; authorized HB3 detail assertion quoted in report.
 - [x] Authorized shrink-first correction only to GolfClubView and harness: shortCourseName(name, Number.POSITIVE_INFINITY); assertions/helper default unchanged. Focused54/54; historical failure resolved and original output retained.
