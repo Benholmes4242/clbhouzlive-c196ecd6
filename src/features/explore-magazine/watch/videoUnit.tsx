@@ -19,6 +19,7 @@ import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionA
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { reactionKindFor } from '@/lib/reactionKind';
 import { isPortraitSource, type ReasonLine } from './watchRules';
+import { attachPosterPreview } from './posterPreview';
 
 /**
  * THE LONG-FORM VIDEO UNIT — ONE UNIT, TWO SIZES (BRIEF_EXPLORE_ALL_VIDEO).
@@ -127,16 +128,15 @@ export function AutoplayLayer({ hlsUrl, poster }: { hlsUrl: string | null; poste
   useEffect(() => {
     const video = videoRef.current;
     if (!active || !video || !hlsUrl) return;
-    const attachment = attachTileHls(video, hlsUrl, () => setFailed(true));
     video.muted = true;
-    video.currentTime = 0;
-    video.play()?.catch(() => setPlaying(false));
+    const disposePreview = attachPosterPreview(video, poster, setPlaying);
+    const attachment = attachTileHls(video, hlsUrl, () => setFailed(true));
     return () => {
-      setPlaying(false);
+      disposePreview();
       video.pause();
       attachment.detach();
     };
-  }, [active, hlsUrl]);
+  }, [active, hlsUrl, poster]);
 
   if (!mount) return null;
 
@@ -146,13 +146,10 @@ export function AutoplayLayer({ hlsUrl, poster }: { hlsUrl: string | null; poste
         ref={videoRef}
         poster={poster ?? undefined}
         muted
-        loop
         playsInline
         preload="none"
         disableRemotePlayback
         tabIndex={-1}
-        onPlaying={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
         onError={(event) => {
           if (event.currentTarget.getAttribute('src')) setFailed(true);
         }}

@@ -40,6 +40,7 @@ import { getThumbnailUrl } from '@/utils/thumbnail';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useWatchLead, type WatchLeadRow } from './useWatchLead';
 import { leadCaption, leadKickerKey, leadShape } from './watchTopRules';
+import { attachPosterPreview } from './posterPreview';
 
 /** watch_lead_viewed fires once per session per lead post, at 50% visible. */
 const VIEWED = new Set<string>();
@@ -134,19 +135,18 @@ function LeadCard({ row, onDepart }: { row: WatchLeadRow; onDepart: () => void }
   useEffect(() => {
     const video = videoRef.current;
     if (!active || !video || !hls) return;
-    const attachment = attachTileHls(video, hls, () => setFailed(true));
     video.muted = muted;
-    video.currentTime = 0;
-    video.play()?.catch(() => setPlaying(false));
+    const disposePreview = attachPosterPreview(video, poster, setPlaying);
+    const attachment = attachTileHls(video, hls, () => setFailed(true));
     return () => {
-      setPlaying(false);
+      disposePreview();
       video.pause();
       attachment.detach();
     };
     // muted is applied live by the toggle below; re-attaching on every toggle
     // would restart the stream.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, hls]);
+  }, [active, hls, poster]);
 
   const toggleMute = () => {
     setMuted((prev) => {
@@ -358,13 +358,10 @@ function LeadCard({ row, onDepart }: { row: WatchLeadRow; onDepart: () => void }
             ref={videoRef}
             poster={poster ?? undefined}
             muted={muted}
-            loop
             playsInline
             preload="none"
             disableRemotePlayback
             tabIndex={-1}
-            onPlaying={() => setPlaying(true)}
-            onPause={() => setPlaying(false)}
             onError={(event) => {
               if (event.currentTarget.getAttribute('src')) setFailed(true);
             }}
