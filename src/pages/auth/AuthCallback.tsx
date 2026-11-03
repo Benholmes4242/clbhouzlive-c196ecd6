@@ -77,11 +77,12 @@ export default function AuthCallback() {
         console.error('[AuthCallback]', err);
         setFailed(true);
         setMessage(t('callback.somethingWentWrong'));
-        setTimeout(() => navigate('/auth', { replace: true }), 1500);
+        timer = setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }
     };
 
     run();
+    return () => { if (timer !== undefined) clearTimeout(timer); };
   }, [navigate, isInMedianApp]);
 
   // In SFVC/Safari: extract session tokens and write to localStorage for WebView pickup
