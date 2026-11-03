@@ -8,6 +8,7 @@
 ## TU1 two-up video grids
 - [x] Apply authorised CM1 test-only scrollPageToTop mock; focused 148/148 passed without unhandled errors. Corrected Community mock received/read.
 - [ ] CM1 full green prerequisite still unmet: integratedPicks assertion now passes; current shard2 spacing failures stop remaining shards (see Authorised Picks continuation).
+- [ ] CM1 resumption with only Integrated Picks exempt: shard2 rerun1540 passed/3 non-exempt spacing failures at tourOverviewMergedAiry.test.tsx:78:98 “expected '16px' to be '14px'”; stopped before shards3–4/TU1. No test/source edits; CM1_REPORT.md and docs/verification/cm1-resume/shard-2.log preserve result.
 - [ ] Once unblocked, extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; preserve chrome/paging/actions.
 - [ ] Update authorised tile assertions, add rank/duration/wrapping/navigation coverage and report reconciled four-shard totals/build, retaining any failing output.
 
