@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tournament picks build 1 — Your pick sheet
+- [ ] Build isolated member field/state/mutation hooks and signed-off Opened, Chosen, Search and locked sheet; no overview entrypoints.
+- [ ] Add focused regressions without changing unrelated tests; run four full shards against 6,091/552 and confirm automatic build.
+- [ ] Report touched files, named test delta and available verification; live entrypoint belongs to build 2.
+
 ## ER3 Long form woven rails
 - [x] ER3.1: authorised rows() caption → post_content only; all assertions preserved; focused158/158 (ER3 file20/20) and four full shards passed; report updated.
 - [x] Implement ten top Shorts and unseen alternating rails with minimum three, following-video gate and one-page clip replenishment per rail.
