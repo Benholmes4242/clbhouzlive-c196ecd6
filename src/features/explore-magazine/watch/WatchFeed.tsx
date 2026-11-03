@@ -3,7 +3,7 @@ import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { GlassDurationBadge, GLASS_CHROME } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { momentViewerPosts } from '../momentViewerPosts';
@@ -31,7 +31,6 @@ import {
   videoParams,
   type WatchFilter,
 } from './watchFilters';
-import { CreatorsRow } from './CreatorsRow';
 import { WatchLead } from './WatchLead';
 import {
   AutoplayLayer,
@@ -79,6 +78,9 @@ import {
  *
  * K.7: every rail card is a top-aligned flex column with a fixed-height poster
  * (flex: none), because a <button> vertically centres its own contents.
+ * ER1: own-item exclusion belongs here, before grouping/counts, never in shared
+ * read hooks. Search preserves own items. Community owns a separate all-time
+ * pool and opens the existing moment viewer in its displayed order.
  */
 
 const INSET = 14;
@@ -213,9 +215,7 @@ export function WatchFeed({
 }: {
   userId: string | undefined;
   onDepart: () => void;
-  /** Entry selection. WS1 — a legacy value ('community', or anything unknown)
-   *  maps through mapWatchFilter: all → For you, quick → Shorts, community →
-   *  For you. */
+  /** ER1 entry selection maps community to Community; unknown values to For you. */
   initialFilter?: string;
   /** Opens ExploreMagazine's one mounted CommentsSheetV2 — never a second sheet here. */
   onOpenComments?: (postId: string) => void;
@@ -234,6 +234,8 @@ export function WatchFeed({
   /* THE SEARCH IS SERVER-SIDE: both RPCs take p_search_query. */
   const search = query.trim().length >= 2 ? query.trim() : null;
   const searching = !!search;
+  const communityView = filter === 'community' && !searching;
+  const contentFilter = searching && filter === 'community' ? 'all' : filter;
 
   const vParams = videoParams(filter);
   const cParams = clipParams(filter);
@@ -241,6 +243,11 @@ export function WatchFeed({
   const clips = useWatchClips({ userId, mode: cParams.mode, filter: cParams.filter, search });
   const onAll = allOnly(filter, searching);
   const moments = useMomentsOfTheWeek(30, { enabled: onAll && !!userId, candidateLimit: 72 });
+  const community = useMomentsOfTheWeek(null, { enabled: filter === 'community' && !!userId, candidateLimit: 120 });
+  const communityItems = useMemo(() => (community.data ?? [])
+    .filter((m) => !userId || searching || m.post?.userId !== userId)
+    .slice().sort((a, b) => new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime()),
+  [community.data, userId, searching]);
   const progress = useWatchProgress(userId);
   const { data: myCourses } = useUserAnalyticsCourses({ enabled: !!userId });
   const playedIds = useMemo(
@@ -255,25 +262,27 @@ export function WatchFeed({
     const out: HubRpcRow[] = [];
     for (const row of [...(videos.data?.pages ?? []).flat(), ...(clips.data?.pages ?? []).flat()] as HubRpcRow[]) {
       if (!row?.post_id || seen.has(row.post_id)) continue;
+      if (userId && !searching && (row.post_actor_type ?? row.actor_type ?? 'personal') === 'personal'
+        && (row.post_user_id ?? row.actor_id) === userId) continue;
       seen.add(row.post_id);
       out.push(row);
     }
     return out;
-  }, [videos.data, clips.data]);
+  }, [videos.data, clips.data, userId, searching]);
 
   const saved = progress.data;
   /* M.1 — one tile, two layouts: grid on the Quick hits chip, rail everywhere else. */
   const quickGrid = filter === 'quick';
-  const quickRows = useMemo(() => (showsQuickHits(filter) ? rows.filter((r) => isQuickHit(r.duration_seconds)) : []), [rows, filter]);
+  const quickRows = useMemo(() => (showsQuickHits(contentFilter) ? rows.filter((r) => isQuickHit(r.duration_seconds)) : []), [rows, contentFilter]);
   const longRows = useMemo(
     () =>
-      showsLongForm(filter)
+      showsLongForm(contentFilter)
         ? spreadByCreator(
             rows.filter((r) => !isQuickHit(r.duration_seconds)),
             (r) => String(r.post_user_id ?? r.actor_id ?? creatorName(r)),
           )
         : [],
-    [rows, filter],
+    [rows, contentFilter],
   );
   const continueRows = useMemo(
     () => (onAll && saved ? rows.filter((r) => isPartWatched(r, saved.get(r.post_id))) : []),
@@ -325,7 +334,7 @@ export function WatchFeed({
   const driver = filter === 'quick' ? (clips.hasNextPage ? clips : videos) : videos;
   useEffect(() => {
     const el = sentinelRef.current;
-    if (!el || !driver.hasNextPage || driver.isFetchingNextPage) return;
+    if (!el || communityView || !driver.hasNextPage || driver.isFetchingNextPage) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) void driver.fetchNextPage();
@@ -334,15 +343,16 @@ export function WatchFeed({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [driver]);
+  }, [driver, communityView]);
 
-  /* WS1 — For you / Shorts / Long form, in that order. */
+  /* ER1 — For you / Shorts / Long form / Community, in that order. */
   const chipLabel = (key: (typeof WATCH_CHIPS)[number]) =>
     key === 'all'
       ? t('amateur.watch.chip.all', 'For you')
       : key === 'quick'
         ? t('amateur.watch.chip.quick', 'Shorts')
-        : t('amateur.watch.chip.long', 'Long form');
+        : key === 'long' ? t('amateur.watch.chip.long', 'Long form')
+          : t('amateur.watch.chip.community', 'Community');
   const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
   const openMoment = (moment: Moment, list: Moment[]) => {
@@ -362,7 +372,7 @@ export function WatchFeed({
   };
 
   /* K.6 — ONE ENTRY PER MEMBER, labelled with who, then where. */
-  const members = useMemo(() => groupByMember(moments.data ?? [], (m) => m.post?.userId ?? null).slice(0, 10), [moments.data]);
+  const members = useMemo(() => groupByMember((moments.data ?? []).filter((m) => !userId || searching || m.post?.userId !== userId), (m) => m.post?.userId ?? null).slice(0, 10), [moments.data, userId, searching]);
   const communityRail = () => {
     if (moments.isError) {
       return (
@@ -471,16 +481,24 @@ export function WatchFeed({
           ariaLabel={t('amateur.watch.filters', 'Watch filters')}
       />
 
-      {/* WS1 — THE CREATORS ROW AND THE LEAD: For you only, between the chips
-          and Continue watching. Both hide themselves for guests. */}
-      {onAll ? (
-        <>
-          <CreatorsRow userId={userId} onDepart={onDepart} />
-          <WatchLead userId={userId} onDepart={onDepart} />
-        </>
-      ) : null}
+      {/* ER1 removes Golfers to watch only; the lead keeps its existing gates. */}
+      {onAll ? <WatchLead userId={userId} onDepart={onDepart} /> : null}
 
-      <>
+      {communityView ? <>
+        <p className="explore-community-sub">Photos and clips from members</p>
+        {community.isError ? <ShelfRetry heading={chipLabel('community')} label={t('amateur.stream.failed', 'This did not load.')} action={t('amateur.stream.retry', 'Try again')} onRetry={() => void community.refetch()} />
+          : !community.isFetched ? <div data-watch-grid-shell="community" className="explore-community-grid" aria-hidden>{Array.from({ length: 6 }, (_, i) => <div key={i} className="explore-community-square clb-shimmer-dark" />)}</div>
+          : communityItems.length ? <div data-watch-grid="community" className="explore-community-grid">
+            {communityItems.map((moment) => <div key={moment.key} data-community-item={moment.key} className="explore-community-item">
+              <div className="explore-community-frame">
+                <MomentTile moment={moment} radius={11} initialsSize={14} labelSize={11} labelInset={8} labelled={false} autoplay={false} onPress={() => openMoment(moment, communityItems)} />
+                {moment.mediaType === 'video' ? <span data-community-play aria-hidden style={{ ...GLASS_CHROME, position: 'absolute', left: 8, bottom: 8, width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}><svg width={8} height={8} viewBox="0 0 10 10" fill="currentColor"><path d="M2 1l7 4-7 4z" /></svg></span> : null}
+              </div>
+              <span className="explore-community-name">{moment.post?.displayName || moment.post?.username}</span>
+              <span className="explore-community-course">{moment.courseName}</span>
+            </div>)}
+          </div> : <p style={{ padding: '30px 24px', textAlign: 'center', color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p>}
+      </> : <>
           {/* K.2 — CONTINUE WATCHING: All only, only when something is part-watched. */}
           {continueRows.length > 0 ? (
             <>
@@ -500,7 +518,7 @@ export function WatchFeed({
           ) : null}
 
           {/* K.3 — QUICK HITS. The rail carries the GLASS duration badge, as every Poster always has. The grid carries the SOLID badge instead: at 3-column width a translucent badge over a bright poster is unreadable, and solid 62% black is legible whatever is behind it. An earlier version of this comment claimed the rail had no badge; it never matched the code. */}
-          {clips.isError && quickRows.length === 0 && showsQuickHits(filter) ? (
+          {clips.isError && quickRows.length === 0 && showsQuickHits(contentFilter) ? (
             <ShelfRetry
               heading={t('amateur.watch.rail.quick', 'Quick hits')}
               label={t('amateur.stream.failed', 'This did not load.')}
@@ -551,7 +569,7 @@ export function WatchFeed({
                 })}
               </QuickLayout>
             </>
-          ) : loading && showsQuickHits(filter) ? (
+          ) : loading && showsQuickHits(contentFilter) ? (
             /* P.1: the heading is static text, so it renders during loading exactly as it
                will once loaded — the skeleton then holds the tiles' place and nothing shifts.
                A settled chip with no rows renders no heading (falls to null below). */
@@ -582,7 +600,7 @@ export function WatchFeed({
           ) : null}
 
           {/* K.4 — THE LONG-FORM COLUMN, with the community rail once after the third card. */}
-          {videos.isError && showsLongForm(filter) ? (
+          {videos.isError && showsLongForm(contentFilter) ? (
             <div style={{ paddingTop: 18 }}>
               <ShelfRetry
                 heading={t('amateur.watch.rail.videos', 'Videos')}
@@ -653,7 +671,7 @@ export function WatchFeed({
               {t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}
             </p>
           ) : null}
-        </>
+        </>}
 
       <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
     </div>
