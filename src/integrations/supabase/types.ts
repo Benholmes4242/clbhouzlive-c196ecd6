@@ -23860,6 +23860,67 @@ export type Database = {
           thumbnail_image: string
         }[]
       }
+      get_player_header: {
+        Args: { p_player_id: string }
+        Returns: {
+          main_tour: string
+          next_name: string
+          next_tee_time: string
+          next_tournament_id: string
+          season_year: number
+          world_rank: number
+        }[]
+      }
+      get_player_hole_scoring: {
+        Args: { p_player_id: string; p_year: number }
+        Returns: {
+          bogey_rate: number
+          holes_par3: number
+          holes_par4: number
+          holes_par5: number
+          par3: number
+          par4: number
+          par5: number
+          rounds: number
+        }[]
+      }
+      get_player_pick_history: {
+        Args: { p_player_id: string; p_year: number }
+        Returns: Json
+      }
+      get_player_season_results: {
+        Args: { p_player_id: string; p_year: number }
+        Returns: {
+          beat_percent: number
+          display_position: string
+          end_date: string
+          event_status: string
+          field_size: number
+          finish_position: number
+          is_winner: boolean
+          name: string
+          round_1: number
+          round_2: number
+          round_3: number
+          round_4: number
+          score: number
+          start_date: string
+          status: string
+          tied: boolean
+          tour: string
+          tournament_id: string
+        }[]
+      }
+      get_player_stat_percentiles: {
+        Args: { p_player_id: string; p_year: number }
+        Returns: {
+          percentile: number
+          players: number
+          stat: string
+          tour: string
+          value: number
+        }[]
+      }
       get_player_titles_in_reach: {
         Args: { p_limit?: number; p_user_id: string; p_window?: string }
         Returns: {
