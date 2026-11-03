@@ -78,7 +78,7 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: f.track } 
 
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { APPLIED_FILL, RailChips, SELECTED_EDGE } from '@/components/ui/RailChips';
-import topCss from '@/features/explore-magazine/watch/explore-top.css?raw';
+import { readFileSync } from 'node:fs';
 import { CHROME_BREATHING } from '@/lib/chromeClearance';
 import { retiredReason } from '@/features/admin/lib/retiredEvents';
 import { ExploreTopControls } from '@/features/explore-magazine/watch/ExploreTopControls';
@@ -331,6 +331,7 @@ describe('WS1 chips', () => {
 
 const person = (id: string, over: Partial<ExplorePerson> = {}): ExplorePerson => ({ tier: 'quiet', actor_id: id, display_name: `Name ${id}`, handle: `h-${id}`, avatar_url: null, is_verified: false, is_creator: false, has_new: false, new_post_ids: [], latest_at: null, videos: 0, ...over });
 const people = (...others: ExplorePerson[]) => { f.creators = { data: [person('me', { tier: 'you' }), ...others], isFetched: true, isError: false }; };
+const topCss = readFileSync('src/features/explore-magazine/watch/explore-top.css', 'utf8');
 const cardsOf = (container: HTMLElement) => Array.from(container.querySelectorAll('[data-watch-creators="row"] [data-explore-card]')) as HTMLElement[];
 /* jsdom normalises colours; compare through the same parser. */
 const norm = (prop: 'background' | 'borderColor', value: string) => { const el = document.createElement('div'); el.style[prop] = value; return el.style[prop]; };

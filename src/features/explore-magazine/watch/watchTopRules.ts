@@ -77,8 +77,8 @@ export type PersonDetail =
 
 /** Lines 2 and 3 by tier (mock notes); n = new_post_ids.length. `isNew`
  *  inks line 3 when it describes something new. */
-export function personLines(p: { tier: string; has_new: boolean; new_post_ids: string[]; videos?: number | null }): { why: PersonWhy; detail: PersonDetail; isNew: boolean } {
-  const n = p.new_post_ids.length;
+export function personLines(p: { tier: string; has_new: boolean; new_post_ids?: string[] | null; videos?: number | null }): { why: PersonWhy; detail: PersonDetail; isNew: boolean } {
+  const n = p.new_post_ids?.length ?? 0;
   if (p.tier === 'following') return { why: 'following', detail: { kind: 'newToday', count: n }, isNew: true };
   if (p.tier === 'creator' && p.has_new) return { why: 'creator', detail: { kind: 'newTodayBare' }, isNew: true };
   if (p.tier === 'member') return { why: 'postedToday', detail: { kind: 'newCount', count: n }, isNew: true };
