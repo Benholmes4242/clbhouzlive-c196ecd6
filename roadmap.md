@@ -1,5 +1,10 @@
 # Roadmap
 
+## HB6 group1 existing island pages
+- [ ] Opt existing island entries into header B; preserve none routes and existing actions; business history back/fallback '/'.
+- [ ] Wire full heading anchors on eligible non-news pages and static-title open/fold behavior; news page files untouched by user ruling.
+- [ ] Route/anchor inventory, authorized regression updates, browser business/news evidence where available; four shards maxWorkers2 and report from6298/564.
+
 ## NAV SQ1 bottom navigation shape
 - [x] Local20px bar and16px tab tile radii in GlobalBottomNavigation only; shared tokens and all other behavior unchanged.
 - [x] Three new navSq1 regressions, no existing test rewrites; focused9/9, full shards1594/1523/1554/1627=6298/564 from6295/563 (+3/+1), zero failures/unhandled errors. Automatic build OK17:18:35Z; NAV_SQ1_REPORT.md lists all files and frozen mock differences.
