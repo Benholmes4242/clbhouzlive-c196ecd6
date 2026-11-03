@@ -87,24 +87,27 @@
 .pick-record-event-picks > div { display:flex; gap:6px; min-width:0; font-size:12.5px; }
 .pick-record-event-picks span { color:var(--pick-mute); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .pick-record-event-picks b { flex:none; }
-.pick-mine { margin:10px 20px 0; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:var(--pick-mine-fill); border:1px solid var(--pick-mine-border); }
+.pick-mine { margin:12px 20px 0; padding:14px; border-radius:16px; background:var(--pick-mine-fill); border:1px solid var(--pick-mine-border); }
+.pick-mine-heading { font-size:15px; font-weight:800; color:var(--pick-section-white); }
+.pick-mine-how { margin-top:4px; font-size:12.5px; line-height:1.45; color:var(--pick-mute); }
+.pick-mine-row { margin-top:12px; display:flex; align-items:center; gap:10px; }
 .pick-mine-face { flex:none; display:flex; }
 /* Trace the actual shared avatar box, preserving its canonical aspect ratio. */
-.pick-mine-avatar { border-radius:34%; box-shadow:var(--pick-selected-ring); }
-.pick-mine-placeholder { width:34px; height:34px; border-radius:34%; border:1.5px dashed var(--pick-mine-placeholder); display:grid; place-items:center; color:var(--pick-amber); flex:none; }
+.pick-mine-avatar { border-radius:34%; box-shadow:var(--pick-section-ring); }
+.pick-mine-placeholder { width:36px; height:36px; border-radius:34%; border:1.5px dashed var(--pick-mine-placeholder); display:grid; place-items:center; color:var(--pick-amber); flex:none; }
 .pick-mine-text { flex:1; min-width:0; }
 .pick-mine-label { font-size:9.5px; font-weight:800; letter-spacing:.13em; color:var(--pick-amber); }
-.pick-mine-name { margin-top:2px; font-size:13.5px; font-weight:700; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.pick-mine-name { margin-top:2px; font-size:14px; font-weight:700; color:var(--pick-section-white); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .pick-mine-sub { margin-top:2px; font-size:11.5px; color:var(--pick-mute); line-height:1.35; }
-.pick-mine-action { flex:none; height:32px; padding:0 16px; border:0; border-radius:999px; background:var(--pick-amber); color:var(--pick-on-amber); font-size:13px; font-weight:800; }
-.pick-mine-change { padding:0; height:auto; background:transparent; color:var(--pick-mute); font-size:12.5px; font-weight:700; }
+.pick-mine-action { flex:none; height:34px; padding:0 18px; border:0; border-radius:999px; background:var(--pick-amber); color:var(--pick-on-amber); font-size:13.5px; font-weight:800; }
+.pick-mine-change { flex:none; padding:0 12px; height:30px; border:1px solid var(--pick-section-change-border); border-radius:999px; background:transparent; color:var(--pick-ink); font-size:12.5px; font-weight:700; }
 .pick-mine-figure { text-align:right; font-size:14px; font-weight:800; white-space:nowrap; }
 .pick-mine-figure small { display:block; margin-top:2px; font-size:10px; color:var(--pick-dim); }
-.pick-follow-line { margin:8px 20px 0; display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--pick-dim); }
+.pick-follow-line { margin-top:10px; padding-top:10px; border-top:1px solid var(--pick-section-circle-border); display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--pick-mute); }
 .pick-follow-stack { display:flex; flex:none; }
-.pick-follow-stack > span { margin-left:-5px; border:1.5px solid var(--pick-canvas); border-radius:34%; }
+.pick-follow-stack > span { margin-left:-5px; border:1.5px solid var(--pick-section-stack-border); border-radius:34%; }
 .pick-follow-stack > span:first-child { margin-left:0; }
-.pick-record-door { margin-top:12px; width:100%; height:auto; display:flex; justify-content:space-between; gap:8px; padding:11px 20px 13px; border:0; border-top:1px solid var(--pick-hair); border-radius:0; background:transparent; color:var(--pick-ink); }
+.pick-record-door { margin:0; width:100%; height:auto; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:12px 20px 2px; border:0; border-radius:0; background:transparent; color:var(--pick-ink); }
 .pick-record-door > span:first-child { font-size:9.5px; font-weight:800; letter-spacing:.13em; color:var(--pick-mute); }
 .pick-record-door > span:last-child { text-align:right; font-size:12.5px; font-weight:700; }
 .pick-record-door small { font-size:12.5px; font-weight:600; color:var(--pick-dim); }

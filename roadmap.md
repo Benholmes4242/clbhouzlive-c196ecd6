@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Integrated Our picks section
-- [ ] Apply signed-off four-state amber card, circle rank read and shared record row on overview/tournament only; preserve existing sheets and prior fixes.
-- [ ] Cover copy/state/geometry/navigation rules, report every rewritten assertion and reconciled counts; run focused checks and four shards subject to unexpected-failure stop.
+- [x] Integrate shared four-state amber card/circle rank read/plain record row, preserving sheets/prior fixes; exact guest lock copy blocked by absent guest-accessible locks_at source.
+- [ ] STOP: focused126 passed/1 failed/127 at integratedPicks.test.tsx:36:542; expected “6 of your circle…” received “DG6 of your circle…” from avatar initials in whole-footer selector. No correction or shards after failure; build OK22:25:29Z. Candidate6509/577 (+23/+1 after CM1 candidate6486/576), INTEGRATED_OUR_PICKS_REPORT.md names both authorised rewrites and missing verification. Await authorised test correction; guest time source remains needed.
 - [ ] CM1 unhandled scrollTo error remains pre-existing and unauthorised; report it if reproduced, do not fix it as part of picks.
 
 ## CM1 Community destination
