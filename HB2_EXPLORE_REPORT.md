@@ -1,9 +1,32 @@
-# HB2_EXPLORE report — STOPPED
+# HB2_EXPLORE report — COMPLETE
 
 ## Status
-The authorized test-only placeholder correction passes. Real-browser screenshots are verified. Shards 1 and 2 pass; shard 3 stops on a missing export in ER3's existing scroll-helper mock. This is not a hidden duplicate query, so no correction is authorized. Shard 4 was not run.
+HB2 is complete. The authorized one-line ER3 mock correction preserves the real scroll-helper exports and overrides only its existing spy. No product code or other line in ER3 changed in this correction. All four shards pass, browser folded/docked checks are complete, and the latest automatic build is clean.
 
-### Latest full-suite attempt
+## Final verification
+Commands: `bunx vitest run --maxWorkers=2 --shard=1/4`, `--shard=2/4`, `--shard=3/4` (rerun after authorized correction), `--shard=4/4`.
+
+| Shard | Passed tests | Passed files |
+| --- | ---: | ---: |
+| 1 | 1,581 | 140 |
+| 2 | 1,524 | 140 |
+| 3 | 1,546 | 140 |
+| 4 | 1,611 | 139 |
+| Total | **6,262** | **559** |
+
+Zero failed tests, failed suites or Vitest unhandled errors in the final four shard outputs. Shards 1/2 retain their successful results from before the one-file ER3 mock correction, as requested. The corrected ER3 suite passes 20/20. `guestScrollLockShortPage.test.tsx` passes 5/5 and is untouched. No additional missing-export correction was needed. Automatic build entry at 15:23:02Z: `build OK`; no manual build/typecheck command was run.
+
+Final logs: `/tmp/hb2/shard-1.log`, `/tmp/hb2/shard-2.log`, `/tmp/hb2/shard-3-correction.log`, `/tmp/hb2/shard-4.log`. The full original failing shard remains at `/tmp/hb2/shard-3.log`.
+
+Authorized diff in `src/test/er3LongFormRails.test.tsx` (one mock only; every test and assertion unchanged):
+```diff
+-vi.mock('@/lib/getScrollParent', () => ({ scrollPageToTop: f.scroll }));
++vi.mock('@/lib/getScrollParent', async (orig) => ({ ...(await orig<Record<string, unknown>>()), scrollPageToTop: f.scroll }));
+```
+
+Reason: HB2 reaches the real nav-direction store through IslandDock; keeping real exports supplies `getPageScrollTop` without replacing product behavior or changing ER3's `scrollPageToTop` spy.
+
+### Historical interrupted full-suite attempt (resolved)
 Commands: `bunx vitest run --maxWorkers=2 --shard=1/4`, then `--shard=2/4`, then `--shard=3/4`.
 - Shard 1: 1,581 passed / 140 files.
 - Shard 2: 1,524 passed / 140 files.
@@ -75,12 +98,26 @@ Every docked tile uses `rgba(14,14,16,0.84)` with `blur(22px) saturate(150%)`. T
 - `src/index.css`
 - `src/test/hb2ExploreDock.test.tsx` (new, 10 cases)
 - `src/test/ws1WatchTop.test.tsx` (one explicitly authorized assertion scope and hidden-field assertion)
+- `src/test/er3LongFormRails.test.tsx` (one explicitly authorized partial-module mock; quoted above)
 - `AGENTS.md`, `roadmap.md`, project memory
+- `HB2_EXPLORE_REPORT.md`
 
 `ChromeIsland.tsx` was not changed.
 
 ## Tests
-One pre-HB2 case was changed under explicit authorization, quoted above; its count remains unchanged. Read-only discovery found no existing test that asserts `/amateur` scrollAway or `.explore-top-sticky`. The full-suite baseline is 6,252 tests / 558 files; the candidate is 6,262 / 559 (+10 tests / +1 file solely `hb2ExploreDock.test.tsx`). The mount correction added one case, “docked row stays mounted while hidden, inert and aria-hidden for exit animation” (9 → 10). No test was deleted or renamed. The interrupted shard run is not a full-suite result.
+One pre-HB2 case was changed under explicit authorization, quoted above; its count remains unchanged. The ER3 mock change rewrites no case or assertion and has zero count delta. Read-only discovery found no existing test that asserts `/amateur` scrollAway or `.explore-top-sticky`. The full-suite baseline is **6,252 tests / 558 files**; final result is **6,262 / 559**, +10 tests / +1 file solely `hb2ExploreDock.test.tsx`. The mount correction added its tenth case (9 → 10). No test was deleted or renamed. All historical failures are resolved; no pre-existing unresolved failure was encountered.
+
+The ten added cases reconcile the full-suite delta by name:
+1. `/amateur opts into soft fading and squircle condensation without scrollAway`
+2. `no docked controls while the in-place row remains visible`
+3. `only a row above the island boundary qualifies, not a row below the viewport`
+4. `appears below open islands, hides folded, and returns on up scroll`
+5. `docked filters update the same in-place selection and vice versa`
+6. `hidden dock is aria-hidden, inert and contains no focusable controls`
+7. `docked row stays mounted while hidden, inert and aria-hidden for exit animation`
+8. `focused docked search remains shown and shares query with the in-place field`
+9. `observes the page root with the island boundary, adding no scroll listener`
+10. `reduced motion disables dock transitions`
 
 Authorized rewrites within the new HB2 file (no count delta):
 - “no docked controls while the in-place row remains visible”: replaced `expect(dock().querySelector('[role="tablist"]')).toBeNull()` with `expect(within(dock()).queryByRole('tablist')).toBeNull()`; the row now remains mounted but inaccessible as required.
@@ -90,4 +127,4 @@ Authorized rewrites within the new HB2 file (no count delta):
 The Courses mock was mistakenly attached and is ignored until HB3 is separately sent. No Courses implementation was added.
 
 ## Unverified
-Full-suite completion (blocked by ER3 missing mock export), shard 4, signed-in member readback. Browser folded/docked screenshots and 109px/glass measurements are complete.
+Signed-in member readback remains unavailable with external_unmanaged authentication; the live guest browser flow and real shared-state tests were verified. Courses/HB3 is intentionally not implemented. No SQL, migrations, deployed RPC/edge-function edits, guest product changes, review wizard, news, round plots, feed_config or native/Median edits were made; round_pool_cap remains 30.

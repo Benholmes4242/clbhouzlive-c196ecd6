@@ -4,7 +4,7 @@
 - [x] Apply Clubhouse folding chrome to /amateur only and replace sticky controls with a shared-state IslandDock; user-ruled selected glass recorded.
 - [x] Focused92/92; real390×844 #root down/up screenshots with sat47 confirm hidden folded dock, shown top109px and resolved glass; shared Shorts readback, guest capsule byte-identical, no page errors.
 - [x] User-authorized 56px fallback for a nonpositive probe and always-mounted hidden controls; keep observer-boundary expectation unchanged, add exit-mount regression. Ignore mistakenly uploaded Courses mock until HB3.
-- [ ] STOP: shards1/2 pass1581/1524; shard3 passes1526 but er3LongFormRails.test.tsx fails collection: “No \"getPageScrollTop\" export is defined on the \"@/lib/getScrollParent\" mock” at useScrollDirection.ts:70:12. No correction/shard4; full failing output /tmp/hb2/shard-3.log. Build OK15:09:03Z; candidate6262/559 vs6252/558. HB2_EXPLORE_REPORT.md quotes authorized ws1 assertion and complete verification.
+- [x] Authorized ER3 one-line importOriginal mock resolves historical collection stop, assertions unchanged; guestScrollLockShortPage untouched5/5. Final shards1581/1524/1546/1611=6262/559, zero failures/Vitest unhandled errors; +10/+1 solely hb2ExploreDock from6252/558. Build OK15:23:02Z. HB2_EXPLORE_REPORT.md quotes both scoped test corrections; original failing shard retained.
 
 ## ISLAND_SQUIRCLE_1 — squircle islands on header B routes
 - [x] 16px (34%) radius on both islands for '/', '/clubhouse', '/tourhub' via spec.condense; guest right and all other routes unchanged.
