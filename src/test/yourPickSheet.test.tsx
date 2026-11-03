@@ -153,7 +153,7 @@ describe('Your pick sheet build 1', () => {
     mount(); await ready();
     for (const row of screen.getAllByRole('radio')) {
       const face = row.querySelector('[style*="34%"]'); expect(face).not.toBeNull();
-      expect(row.querySelector('.your-pick-avatar')?.querySelector('[style*="50%"]')?.getAttribute('style')).not.toContain('border-radius: 50%');
+      expect(Array.from(row.querySelectorAll<HTMLElement>('.your-pick-avatar [style]')).some(element => element.style.borderRadius === '50%')).toBe(false);
     }
   });
   it('null lock time shows only the live field count', async () => {
