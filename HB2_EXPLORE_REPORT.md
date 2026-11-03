@@ -1,7 +1,42 @@
 # HB2_EXPLORE report — STOPPED
 
 ## Status
-The authorized corrections are applied: the probe retains its real-browser measurement but falls back to 56px when nonpositive; the docked controls stay mounted for the exit animation. The unchanged boundary assertion now passes. A different existing test fails because its placeholder query finds both mounted search fields. Per the stop rule, no further correction, browser check or full shard followed.
+The authorized test-only placeholder correction passes. Real-browser screenshots are verified. Shards 1 and 2 pass; shard 3 stops on a missing export in ER3's existing scroll-helper mock. This is not a hidden duplicate query, so no correction is authorized. Shard 4 was not run.
+
+### Latest full-suite attempt
+Commands: `bunx vitest run --maxWorkers=2 --shard=1/4`, then `--shard=2/4`, then `--shard=3/4`.
+- Shard 1: 1,581 passed / 140 files.
+- Shard 2: 1,524 passed / 140 files.
+- Shard 3: 1,526 passed / 139 passing files; 1 failed suite (140 files total). The ER3 suite failed to collect, so its 20 cases did not execute.
+- Shard 4: not run after the stop.
+- Executed total so far: 4,631 passed. No full-suite success or zero-error claim.
+
+```text
+FAIL  src/test/er3LongFormRails.test.tsx [ src/test/er3LongFormRails.test.tsx ]
+Error: [vitest] No "getPageScrollTop" export is defined on the "@/lib/getScrollParent" mock. Did you forget to return it from "vi.mock"?
+❯ getScrollTop src/hooks/useScrollDirection.ts:70:12
+❯ registerNavScroller src/hooks/useScrollDirection.ts:118:14
+❯ autoRegisterRoots src/hooks/useScrollDirection.ts:186:3
+❯ src/hooks/useScrollDirection.ts:194:5
+```
+
+Complete shard output retained at `/tmp/hb2/shard-1.log`, `/tmp/hb2/shard-2.log`, `/tmp/hb2/shard-3.log`. ER3 was green in the prior baseline; this newly exposed mock failure is not claimed as pre-existing. Latest automatic build at 15:09:03Z: `build OK`; no manual build/typecheck run.
+
+### Browser verification
+Live `/amateur`, fresh signed-out Chromium at 390×844, with `--sat:47px` injected before app mount in the browser response only. Real `#root` is the registered page scroller (844px tall, 4,472px scroll height); no app fixture or product affordance was added.
+- Scroll down to 650: dock hidden, opacity 0; left island 46px wide. Screenshot `/tmp/browser/hb2/folded.png`.
+- Scroll back up to 610: dock shown, opacity 1; top **109px**, left island 131px wide. Screenshot `/tmp/browser/hb2/docked.png`.
+- Search/unselected tiles: computed `rgba(14, 14, 16, 0.84)`; selected tile: `rgba(40, 40, 46, 0.9)` with `rgba(255, 255, 255, 0.28)` border. All compute `blur(22px) saturate(1.5)`.
+- Guest right capsule outerHTML byte-identical before/after folding. Docked Shorts tap reads back as SHORTS selected in the in-place row. No page errors.
+- Reduced-motion runtime transition duration is `1e-05s` (the app-wide reduced-motion override); the dock's own reduced-motion CSS declares `transition:none`. It is effectively instant.
+Screenshots inspected visually; browser output `/tmp/hb2/browser.log`. Signed-in member checks remain unavailable with external_unmanaged authentication.
+
+### Latest focused run
+Same focused command below: **92/92 passed**, 5/5 files; `/tmp/hb2/focused-final.log`.
+
+Authorized existing case change, no count delta: `ws1WatchTop.test.tsx`, “the search placeholder reads Search videos and creators”: replaced `expect(screen.getByPlaceholderText('Search videos and creators')).toBeTruthy()` with `expect(within(inPlace).getByPlaceholderText('Search videos and creators')).toBeTruthy()`, after locating `[data-explore-controls="in-place"]` with a null guard. Added `if (dockedField) expect(dockedField.closest('[aria-hidden="true"][inert]')).not.toBeNull()` beside it. This preserves the placeholder assertion while allowing the mandated hidden mounted copy. No other case in that file or product code changed in this correction.
+
+### Earlier verification history
 
 Command: `bunx vitest run src/test/hb2ExploreDock.test.tsx src/test/headerB1.test.tsx src/test/islandSquircle.test.tsx src/test/ws1WatchTop.test.tsx src/test/er1ExploreCommunity.test.tsx --maxWorkers=2`
 
@@ -39,12 +74,13 @@ Every docked tile uses `rgba(14,14,16,0.84)` with `blur(22px) saturate(150%)`. T
 - `src/features/explore-magazine/watch/WatchFeed.tsx`
 - `src/index.css`
 - `src/test/hb2ExploreDock.test.tsx` (new, 10 cases)
+- `src/test/ws1WatchTop.test.tsx` (one explicitly authorized assertion scope and hidden-field assertion)
 - `AGENTS.md`, `roadmap.md`, project memory
 
 `ChromeIsland.tsx` was not changed.
 
 ## Tests
-No pre-HB2 test was changed. Read-only discovery found no existing test that asserts `/amateur` scrollAway or `.explore-top-sticky`. The full-suite baseline is 6,252 tests / 558 files; the candidate is 6,262 / 559 (+10 tests / +1 file solely `hb2ExploreDock.test.tsx`). This correction adds one case, “docked row stays mounted while hidden, inert and aria-hidden for exit animation” (9 → 10). Full shards were not run because of the new stop.
+One pre-HB2 case was changed under explicit authorization, quoted above; its count remains unchanged. Read-only discovery found no existing test that asserts `/amateur` scrollAway or `.explore-top-sticky`. The full-suite baseline is 6,252 tests / 558 files; the candidate is 6,262 / 559 (+10 tests / +1 file solely `hb2ExploreDock.test.tsx`). The mount correction added one case, “docked row stays mounted while hidden, inert and aria-hidden for exit animation” (9 → 10). No test was deleted or renamed. The interrupted shard run is not a full-suite result.
 
 Authorized rewrites within the new HB2 file (no count delta):
 - “no docked controls while the in-place row remains visible”: replaced `expect(dock().querySelector('[role="tablist"]')).toBeNull()` with `expect(within(dock()).queryByRole('tablist')).toBeNull()`; the row now remains mounted but inaccessible as required.
@@ -54,4 +90,4 @@ Authorized rewrites within the new HB2 file (no count delta):
 The Courses mock was mistakenly attached and is ignored until HB3 is separately sent. No Courses implementation was added.
 
 ## Unverified
-Browser screenshots, the docked row's top and computed background, the four full shards, signed-in readback.
+Full-suite completion (blocked by ER3 missing mock export), shard 4, signed-in member readback. Browser folded/docked screenshots and 109px/glass measurements are complete.
