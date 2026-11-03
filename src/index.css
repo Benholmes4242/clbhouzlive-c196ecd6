@@ -25,6 +25,22 @@
 }
 
 :root {
+  --pick-sheet: #16161A;
+  --pick-ink: #F8FAFC;
+  --pick-on-amber: #0A0A0C;
+  --pick-amber: #F7931E;
+  --pick-mute: rgba(255,255,255,.65);
+  --pick-soft: rgba(248,250,252,.78);
+  --pick-dim: rgba(248,250,252,.42);
+  --pick-hair: rgba(255,255,255,.06);
+  --pick-rule: rgba(255,255,255,.12);
+  --pick-tile: rgba(255,255,255,.04);
+  --pick-radio: rgba(255,255,255,.28);
+  --pick-clear: rgba(255,255,255,.22);
+  --pick-search-icon: rgba(248,250,252,.55);
+  --pick-disabled: rgba(255,255,255,.08);
+  --pick-selected-ring: 0 0 0 1.5px var(--pick-sheet), 0 0 0 3px var(--pick-amber);
+  --pick-bar: linear-gradient(180deg, rgba(22,22,26,0) 0%, rgba(22,22,26,.96) 26%);
   --watch-spotlight-dot: rgba(248,250,252,.24);
   --suggestion-card: #17171B;
   --suggestion-ink: #F8FAFC;
