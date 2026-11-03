@@ -71,6 +71,18 @@ describe('tournament picks pure rules',()=>{
  it('every numeric claim must match tolerance while years are ignored',()=>{
   expect(filterCheckedReasons(['Hits 72.7% of greens','Tee to green +1.10','Driving 314.0 yards','Three wins in 2025'],fits)).toEqual(['Tee to green +1.10','Three wins in 2025']);
  });
+ it('ordinary number words do not invalidate a non-win reason',()=>{
+  expect(filterCheckedReasons(['One of the longest hitters in the field'],fits)).toEqual(['One of the longest hitters in the field']);
+ });
+ it('three wins is kept when the checked wins count is three',()=>{
+  expect(filterCheckedReasons(['Three wins this season'],fits)).toEqual(['Three wins this season']);
+ });
+ it('three wins is dropped when the checked wins count is one',()=>{
+  expect(filterCheckedReasons(['Three wins this season'],fits.map(stat=>({...stat,wins:1})))).toEqual([]);
+ });
+ it('a digit stroke-margin claim is still dropped',()=>{
+  expect(filterCheckedReasons(['Won here by 7 strokes'],fits)).toEqual([]);
+ });
  it('catch selects lowest of all six and uses LPGA pronouns',()=>{const low=lowestFit(fits);expect(low?.stat).toBe('driving_accuracy');if(low)expect(catchSentence(low,'lpga')).toBe('She misses more fairways than most.');});
  it('a sixty-or-better floor gives the no-weakness line',()=>{expect(catchSentence({...fits[0],percentile:60},'pga')).toBe('No real weakness: his lowest number is still above the middle of the tour.');});
  it('putting middle 40–60 uses middle-of-pack copy',()=>{expect(catchSentence(fits[4],'pga')).toBe('Middle of the pack on the greens.');});
@@ -82,6 +94,21 @@ describe('tournament picks pure rules',()=>{
  it('beat rows include clbhouz sorted by average then picks',()=>{expect(sortedBeatRows([...members,{...members[1],user_id:'tie',avg_percentile:73,picks:31}],record).map(r=>r.user_id)).toEqual(['viewer','other','tie','clbhouz']);});
 });
 describe('tournament picks surfaces',()=>{
+ it.each(['live','completed'] as const)('guest %s renders no pick card',(phase)=>{
+  const view=mount(<YourPickCard guest state={null} phase={phase} ourResults={ours} tourCode="pga" onPick={vi.fn()}/>);
+  expect(view.container).toBeEmptyDOMElement();
+ });
+ it('guest locked upcoming renders no pick card',()=>{
+  const view=mount(<YourPickCard guest state={{...state,locked:true}} phase="upcoming" ourResults={ours} tourCode="pga" onPick={vi.fn()}/>);
+  expect(view.container).toBeEmptyDOMElement();
+ });
+ it('guest upcoming renders the card and Pick goes to the guest gate',async()=>{
+  mocks.guest=true;mocks.user=null;mocks.gate.mockReturnValue(true);
+  const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick} onRecord={()=>{}}/>);
+  const pick=await screen.findByRole('button',{name:'Pick'});
+  expect(document.querySelector('[data-your-pick-card]')).not.toBeNull();
+  fireEvent.click(pick);expect(mocks.gate).toHaveBeenCalledWith('pick');expect(onPick).not.toHaveBeenCalled();
+ });
  it('upcoming no-pick card opens Pick and named current pick opens Change',()=>{
   const tap=vi.fn();const v=mount(<YourPickCard state={state} phase="upcoming" ourResults={ours} tourCode="pga" onPick={tap}/>);
   fireEvent.click(screen.getByRole('button',{name:'Pick'}));expect(tap).toHaveBeenCalledOnce();

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Tournament picks build 2 — guest availability and reason checks
+- [x] Guest Pick card only for unlocked upcoming events; number words only checked as figures in win/won/wins reasons, digit rules preserved.
+- [ ] Run focused regressions and all four full-suite shards; report per-shard counts and reconcile eight new cases against 6,160 / 554.
+
 ## Tournament picks heading correction
 - [x] Restore tee-day heading whenever teeDay exists outside completed; retain fit/measure behaviour and live/final fallback; tourOverviewPicksTeeLine.test.tsx unchanged.
 - [x] All four full-suite shards passed: 1,570 + 1,507 + 1,529 + 1,554 = 6,160 / 554 files; zero failures/unhandled errors. Heading tests unchanged, 17/17 passed. Automatic build 11:32:45Z OK. No test inventory change in this correction.

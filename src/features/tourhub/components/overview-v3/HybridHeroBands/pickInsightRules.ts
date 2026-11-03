@@ -61,6 +61,7 @@ export function filterCheckedReasons(reasons: string[], stats: FitStat[]) {
     return numbers.every(match => {
       const token = match[0];
       const words = ['zero','one','two','three','four','five','six','seven','eight','nine','ten'];
+      if (words.includes(token) && !/\b(?:win|won|wins)\b/.test(text)) return true;
       const n = words.includes(token) ? words.indexOf(token) : Number(token.replace('−','-'));
       if (n >= 2000 && n <= 2099 && Number.isInteger(n)) return true;
       const tail = text.slice((match.index ?? 0) + token.length);
