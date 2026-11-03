@@ -26,7 +26,7 @@ vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachT
 vi.mock('@/components/explore-tab-new/courseled/reviewVideoAutoplay', () => ({ autoplayBlocked: () => false, deliverVerdict: vi.fn() }));
 vi.mock('@/hooks/usePrefersReducedMotion', () => ({ usePrefersReducedMotion: () => false }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: f.open }));
-vi.mock('@/lib/getScrollParent', () => ({ scrollPageToTop: f.scroll }));
+vi.mock('@/lib/getScrollParent', async (orig) => ({ ...(await orig<Record<string, unknown>>()), scrollPageToTop: f.scroll }));
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { SHORTS_SHELF_COUNT, WOVEN_RAIL_INTERVAL, WOVEN_RAIL_MIN } from '@/features/explore-magazine/watch/watchRules';
 const i18n = createInstance();
