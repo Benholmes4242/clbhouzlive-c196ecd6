@@ -19,7 +19,7 @@ const original = window.IntersectionObserver;
 const back = vi.fn();
 function Hero({ name }: { name: string }) {
   const anchor = useRef<HTMLHeadingElement>(null);
-  useIslandBackName(shortCourseName(name), anchor);
+  useIslandBackName(shortCourseName(name, Number.POSITIVE_INFINITY), anchor);
   return <h1 ref={anchor} data-testid="hero-name">{name}</h1>;
 }
 function StoreProbe() { const value = useIslandBackNameValue(); return <output data-testid="published-name">{value?.name ?? ''}</output>; }

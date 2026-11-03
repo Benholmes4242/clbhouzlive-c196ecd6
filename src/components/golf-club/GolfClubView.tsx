@@ -480,7 +480,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   // HB4: observe the actual hero heading; never rename or restyle the photograph.
   const nameRef = useRef<HTMLHeadingElement>(null);
   const { pathname } = useLocation();
-  useIslandBackName(/^\/courses\/[^/]+\/?$/.test(pathname) ? shortCourseName(course.name) : null, nameRef);
+  useIslandBackName(/^\/courses\/[^/]+\/?$/.test(pathname) ? shortCourseName(course.name, Number.POSITIVE_INFINITY) : null, nameRef);
   const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
   const showBand = rounds > 0 || reviewCount > 0;
 
