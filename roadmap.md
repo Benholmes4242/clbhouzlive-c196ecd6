@@ -1,5 +1,11 @@
 # Roadmap
 
+## HEADER_B1 — Clubhouse and Tour floating headers
+- [x] Implement three-route soft fade and shared-nav-signal folds with resolved brief padding/300ms geometry/200ms opacity; guest right, clearance and bottom nav unchanged.
+- [x] HEADER_B1_REPORT.md quotes four replaced band cases and one replaced wordmark case; new headerB1 adds10. Candidate6,244/557 from baseline6,234/556, not full pass count.
+- [ ] STOP: focused55/57; headerB1.test.tsx:70:35 expected '' to be 'var(--island-rest-glass)'; tourOverviewBand.test.tsx:45:34 expected '' to be 'calc(var(--sat, 0px) + 96px)'. No test/product correction or full shards after failures; await scoped assertion/environment ruling. Automatic build13:28:49Z OK.
+- [ ] Browser mock screenshot apparatus timed out waiting for#ph-club; mock-scroll/live comparison and dedicated reduced-motion/index cases remain unverified.
+
 ## Tour player page rebuild — player-v2
 - [x] Implement the player page using header-owned season/tour, recorded wins and existing pick/follow doors; preserve LiveNowStrip source.
 - [x] Authorized partial scrollPageToTop mock in playerRebuildPage only; all eleven historical failures were the same jsdom scrollTo error. Focused113/113; production helper/page and assertions unchanged in correction.

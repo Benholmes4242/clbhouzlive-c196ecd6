@@ -38,52 +38,41 @@ const layer = (name: string) => document.querySelector(`[data-chrome="${name}"]`
 afterEach(() => { cleanup(); scroll.scrolled = false; });
 
 describe('Tour overview band', () => {
-  it('at rest: hero fade at 1 with its existing values, band at 0', () => {
-    mount('/tourhub');
-    const hero = layer('island-scrim-hero')!;
-    expect(hero.style.opacity).toBe('1');
-    expect(hero.style.height).toBe('140px');
-    expect(hero.style.pointerEvents).toBe('none');
-    expect(layer('island-scrim-band')!.style.opacity).toBe('0');
-    expect(layer('island-scrim')).toBeNull();
-  });
-  it('scrolled: band at 1 with the Clubhouse values, fade at 0; reverses back', () => {
-    scroll.scrolled = true;
-    const view = mount('/tourhub');
-    const band = layer('island-scrim-band')!;
-    expect(band.style.opacity).toBe('1');
-    expect(band.style.position).toBe('fixed');
-    expect(band.style.background).toBe('rgba(10, 10, 12, 0.88)');
-    expect(band.style.borderBottom.replace(/\s/g, '')).toBe('1pxsolidrgba(255,255,255,0.06)');
-    expect(band.style.pointerEvents).toBe('none');
-    expect(layer('island-scrim-hero')!.style.opacity).toBe('0');
-    scroll.scrolled = false;
-    view.rerender(<QueryClientProvider client={new QueryClient()}><MemoryRouter initialEntries={['/tourhub']}><ChromeIsland /></MemoryRouter></QueryClientProvider>);
-    expect(layer('island-scrim-hero')!.style.opacity).toBe('1');
-    expect(layer('island-scrim-band')!.style.opacity).toBe('0');
-  });
-  it('one shared band element in source, with env()/blur values and the reduced-motion transition', () => {
-    const src = readFileSync('src/features/chrome-v2/ChromeIsland.tsx', 'utf8');
-    expect(src.match(/data-chrome="island-scrim-band"/g)).toHaveLength(1);
-    expect(src).toContain("(spec.scrim === true || spec.scrim === 'hero') && (");
-    expect(src).toContain("height: 'calc(var(--sat, 0px) + 68px)'");
-    expect(src).toContain("background: 'linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.25) 55%, rgba(10,10,12,0) 100%)'");
-    expect(src).toContain("height: 'calc(var(--sat, 0px) + 80px)'");
-    expect(src).toContain("background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)'");
-    expect(src).toContain("backdropFilter: 'blur(20px) saturate(150%)'");
-    expect(src).toContain("WebkitBackdropFilter: 'blur(20px) saturate(150%)'");
-    expect(src).toContain("const scrimTransition = REDUCED_MOTION ? 'none' : 'opacity 180ms linear';");
-    expect(src.match(/transition: scrimTransition/g)?.length).toBe(3);
-  });
-  it('/clubhouse and / keep their rest and band layers', () => {
-    for (const path of ['/clubhouse', '/']) {
-      mount(path);
-      const rest = layer('island-scrim')!;
-      expect(rest.style.opacity).toBe('1');
-      expect(layer('island-scrim-band')!.style.opacity).toBe('0');
+  it('all three opted routes have one persistent soft fade and no legacy band', () => {
+    for (const path of ['/', '/clubhouse', '/tourhub']) {
+      const view = mount(path);
+      const fade = layer('island-scrim-soft');
+      expect(fade?.style.height).toBe('calc(var(--sat, 0px) + 96px)');
+      expect(fade?.style.background).toBe('var(--island-soft-fade)');
+      expect(fade?.style.position).toBe('fixed');
+      expect(fade?.style.pointerEvents).toBe('none');
+      expect(layer('island-scrim-band')).toBeNull();
       expect(layer('island-scrim-hero')).toBeNull();
-      cleanup();
+      expect(layer('island-scrim')).toBeNull();
+      scroll.scrolled = true;
+      view.rerender(<QueryClientProvider client={new QueryClient()}><MemoryRouter initialEntries={[path]}><ChromeIsland /></MemoryRouter></QueryClientProvider>);
+      expect(layer('island-scrim-soft')?.getAttribute('style')).toBe(fade?.getAttribute('style'));
+      cleanup(); scroll.scrolled = false;
     }
+  });
+  it('soft fade token holds the signed-off safe-area stops without a transition', () => {
+    const css = readFileSync('src/index.css', 'utf8');
+    expect(css).toContain('--island-soft-fade: linear-gradient(180deg, rgba(10,10,12,0.92) 0px, rgba(10,10,12,0.80) var(--sat, 0px), rgba(10,10,12,0.35) calc(var(--sat, 0px) + 48px), rgba(10,10,12,0) calc(var(--sat, 0px) + 96px));');
+    mount('/tourhub');
+    expect(layer('island-scrim-soft')?.style.transition).toBe('');
+  });
+  it('other routes have no opt-in fade and retain canonical glass', () => {
+    mount('/profile/ben');
+    expect(layer('island-scrim-soft')).toBeNull();
+    const left = document.querySelector<HTMLElement>('[aria-label="Go to home"]');
+    expect(left?.style.background).toBe('rgba(14, 14, 16, 0.84)');
+    expect(left?.style.transition).toBe('');
+  });
+  it('legacy band and fades have no remaining route consumers or rendered layers', () => {
+    const src = readFileSync('src/features/chrome-v2/ChromeIsland.tsx', 'utf8');
+    expect(src).not.toContain('data-chrome="island-scrim-band"');
+    expect(src).not.toContain('data-chrome="island-scrim-hero"');
+    expect(src).not.toContain('data-chrome="island-scrim"');
   });
   it('no wordmark on /tourhub', () => {
     scroll.scrolled = true;
