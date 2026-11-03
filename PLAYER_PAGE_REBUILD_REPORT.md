@@ -1,9 +1,9 @@
-# Tour player page rebuild — stopped at focused verification
+# Tour player page rebuild — test verification complete
 
 ## Result
-The frontend rebuild is implemented but **not verified complete**. No product or test edits were made after the unexpected focused-test failure. No full-suite shards or browser comparisons were run after the stop.
+The frontend rebuild passes focused verification and all four full-suite shards after the user-authorized test-only scroll mock. `getScrollParent.ts`, `PlayerPage.tsx` and every assertion remain unchanged in this correction. Browser comparison and authenticated readback remain unverified.
 
-## Exact stop
+## Historical stop — resolved by authorized test setup
 Focused command:
 ```text
 bunx vitest run src/test/playerRebuildRules.test.ts src/test/playerRebuildPage.test.tsx src/test/tourPlayerHeroBand.test.tsx src/test/yourPickSheet.test.tsx src/test/youAndTour.test.tsx src/test/seasonRollover.test.tsx --maxWorkers=2
@@ -15,18 +15,31 @@ TypeError: scroller?.scrollTo is not a function
 ❯ Module.scrollPageToTop src/lib/getScrollParent.ts:101:13
 ❯ src/features/tourhub/player-v2/PlayerPage.tsx:41:17
 ```
-The existing root-scroller helper calls an element API absent in jsdom. The new page test setup supplies no element scrollTo stub. The existing helper and all assertions remain unchanged after failure. A scoped test-environment correction is needed before rerunning.
+The existing root-scroller helper calls an element API absent in jsdom. All eleven failures were the same scrollTo error; there were no ten different product failures. The user authorized adding exactly this partial module mock to `src/test/playerRebuildPage.test.tsx`, the only new test file rendering PlayerPage:
+```ts
+vi.mock('@/lib/getScrollParent', async (orig) => ({ ...(await orig<Record<string, unknown>>()), scrollPageToTop: vi.fn() }));
+```
+The rest of the module stays real. No test names, assertions, fixtures or production files were changed in this correction. Focused rerun using the same command above: **113/113, six files passed**.
 
 Full focused output is retained in `PLAYER_PAGE_REBUILD_FOCUSED_OUTPUT.log` and `/tmp/player-rebuild/focused.log`. The runner reported no separate unhandled-error count, but React/jsdom logged caught/uncaught versions of this same error; do not describe this run as error-free.
 
 ## Counts
-Last full-suite green: **6,168 / 554 files**. Candidate inventory after edits: **6,234 / 556 files**, NOT a full-suite passing total.
+Before rebuild: **6,168 / 554 files**. After rebuild: **6,234 passed / 556 files**, zero failed tests and zero Vitest-reported unhandled errors. The scroll-mock correction itself adds/removes zero tests.
 - `playerRebuildRules.test.ts`: +52 new cases.
 - `playerRebuildPage.test.tsx`: +14 new cases.
 - `tourPlayerHeroBand.test.tsx`: 4 before / 4 after; four authorized cinematic cases replaced below, net zero.
 - All other existing tests remain unchanged. `yourPickSheet` 25/25, `youAndTour` 11/11, `seasonRollover` 7/7, new pure rules 52/52 and rewritten hero 4/4 passed in focused verification.
-- No pre-existing test failure was observed in the executed files. The unrun full suite is not independently established as free of pre-existing failures.
-- Requested shard commands (not run after stop): `bunx vitest run --maxWorkers=2 --shard=1/4`, `2/4`, `3/4`, `4/4`.
+- No pre-existing test failure appeared in the focused rerun or any full-suite shard.
+
+| Exact command | Passed tests | Passed files |
+| --- | ---: | ---: |
+| `bunx vitest run --maxWorkers=2 --shard=1/4` | 1,578 | 139 |
+| `bunx vitest run --maxWorkers=2 --shard=2/4` | 1,507 | 139 |
+| `bunx vitest run --maxWorkers=2 --shard=3/4` | 1,538 | 139 |
+| `bunx vitest run --maxWorkers=2 --shard=4/4` | 1,611 | 139 |
+| Total | **6,234** | **556** |
+
+Full output retained under `/tmp/player-rebuild/shard-1.log` through `shard-4.log` and `focused-correction.log`. All four commands exit 0. Passing suites emit jsdom CSS/media-not-implemented diagnostics and deliberate negative-path logs; none is a failed test or a Vitest unhandled-error result. No failing shard exists to preserve for this rerun.
 
 ## Implementation inventory
 Added:
@@ -57,10 +70,10 @@ Deleted (checked no remaining production consumers):
 - `src/features/tourhub/player-v2/sections/SeasonCards.tsx`
 - `src/features/tourhub/player-v2/sections/AgainstTheFieldSection.tsx`
 - `src/features/tourhub/player-v2/sections/FormSection.tsx`
-Legacy `playerSeason.ts` and its five existing tests were retained unchanged; it is no longer consumed by the page. It was not silently deleted or rewritten.
+Legacy `playerSeason.ts` and its existing test file were retained unchanged; it is no longer consumed by the page. It was not silently deleted or rewritten.
 
 ## Authorized hero replacements (4 → 4)
-The brief replaces the cinematic hero geometry and figure selection, authorizing replacement of the four tests protecting the old design. The old names and every assertion follow; no other existing test file was changed.
+The brief replaces the cinematic hero geometry and figure selection, authorizing replacement of the four tests protecting the old design. The old names and every assertion follow; no other pre-existing test file was changed. No tests were deleted or renamed in the scroll-mock correction.
 
 ### `the section is a flex column that still carries the 268px floor`
 ```tsx
@@ -110,16 +123,16 @@ Replacement names:
 - `next-start pick action opens only on an explicit tap`
 
 ## Verification and limitations
-- Latest automatic typecheck/build entry before reporting: **2026-11-03T12:50:00Z — build OK**. Intermediate errors were resolved before testing. No manual build/typecheck was run.
+- Latest automatic typecheck/build entry after the authorized mock: **2026-11-03T12:57:22Z — build OK**. No manual build/typecheck was run.
 - Existing public RPCs inspected without SQL or writes: header, season results, hole scoring, stat percentiles and pick history. Header/result shape is real; pick-history JSON is `{ picks: [{won,name,end_date,position,tournament_id}], member_picks }`.
 - Scheffler’s live RPC hole stats differ from the dated mock sample (currently 62 rounds, par3 −.028/par4 −.138/par5 −.562/bogey .1022). Live data is not replaced with the mock’s snapshot. The concrete mock scoring fixture tests pass independently.
 - System font retained rather than loading the mock’s retired Geist. Compare excluded under explicit brief/approved plan. Mock tabs/notes are reference-only, not member-facing controls.
-- LiveNowStrip source unchanged and still inserted beneath the hero; its new page placement test is blocked by the same scroller error.
+- LiveNowStrip source unchanged and still inserted beneath the hero; its new page placement test now passes.
 - No browser comparison has been completed. Squircle dimensions/colours and long-copy fit remain browser-unverified. Auth status is `external_unmanaged`, so authenticated member action/readback cannot be verified with managed sessions.
-- Four full shards are still required after the scoped test setup correction. No per-shard pass counts can be claimed.
+- Four full shards are complete; results are recorded above.
 - No SQL, migrations, deployed RPC/edge-function edits, guest browsing, review wizard, news, round plots, feed_config or native/Median changes. round_pool_cap remains 30.
 
-## Failed test names
+## Historical failed test names — all now pass
 - `reads header season2026 for all four dependent player RPCs`
 - `one-start LPGA shows three cells and only results`
 - `renders only returned entries with no blank result dash`

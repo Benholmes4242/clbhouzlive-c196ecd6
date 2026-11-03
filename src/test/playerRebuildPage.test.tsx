@@ -7,6 +7,7 @@ import {createInstance} from 'i18next';
 import {I18nextProvider,initReactI18next} from 'react-i18next';
 import en from '../../public/locales/en/tourhub.json';
 const mocks=vi.hoisted(()=>({rpc:vi.fn(),from:vi.fn(),guest:false,user:{id:'member',is_anonymous:false} as {id:string;is_anonymous:boolean}|null,gate:vi.fn(),follow:vi.fn(),following:false,live:false}));
+vi.mock('@/lib/getScrollParent', async (orig) => ({ ...(await orig<Record<string, unknown>>()), scrollPageToTop: vi.fn() }));
 vi.mock('@/integrations/supabase/client',()=>({supabase:{rpc:mocks.rpc,from:mocks.from}}));
 vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:mocks.user})}));
 vi.mock('@/features/guest/useIsGuest',()=>({useIsGuest:()=>mocks.guest}));
