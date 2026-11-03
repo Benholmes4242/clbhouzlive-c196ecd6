@@ -13,6 +13,9 @@
  * opens the tile.
  */
 import React from 'react';
+import { UNSAFE_LocationContext } from 'react-router-dom';
+import { resolveChrome } from '@/features/chrome-v2/registry';
+import { useIslandsCondensed } from '@/features/chrome-v2/useIslandsCondensed';
 import { ChevronLeft } from 'lucide-react';
 import { getTourLogo } from '../utils/tourLogos';
 import { TourIcon, TourLiveDot } from './tourIslandIcons';
@@ -92,6 +95,10 @@ export const TourIsland: React.FC<TourIslandProps> = ({
   onBackTap,
   onOpen,
 }) => {
+  const condensed = useIslandsCondensed();
+  const location = React.useContext(UNSAFE_LocationContext)?.location;
+  const foldRoute = location ? resolveChrome(location.pathname, new URLSearchParams(location.search)).condense === true : false;
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const labelAndCaption = (
     <>
       <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -138,12 +145,13 @@ export const TourIsland: React.FC<TourIslandProps> = ({
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 10, alignSelf: 'stretch',
-          padding: mode === 'back' ? '0 16px 0 0' : '0 16px 0 8px',
+          padding: condensed ? '0 8px' : mode === 'back' ? '0 16px 0 0' : '0 16px 0 8px',
+          ...(foldRoute ? { gap: condensed ? 0 : 10, transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}),
           fontFamily: 'inherit',
         }}
       >
         {mode !== 'back' && <Chip logoSlug={logoSlug} glyph={glyph} />}
-        <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, textAlign: 'left' }}>
+        <span aria-hidden={condensed ? true : undefined} data-tour-island-fold style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, textAlign: 'left', ...(foldRoute ? { maxWidth: condensed ? 0 : 240, opacity: condensed ? 0 : 1, overflow: 'hidden', transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}) }}>
           {labelAndCaption}
         </span>
       </button>

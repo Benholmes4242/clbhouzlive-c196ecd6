@@ -20,6 +20,8 @@
  *     the anchor+trigger for the exact same sheet CompactHeader opens.
  *   - Search cell: SearchOverlayV2, same import + local state pattern.
  *
+ * HEADER_B1: route registry owns opt-in soft fade/glass; both islands consume
+ * useIslandsCondensed; divider stays owned by HcpCell to preserve visibility.
  * Home-nation glass rules: every glass surface publishes BOTH
  * backdropFilter and WebkitBackdropFilter. Squircles use 34% radius.
  */
@@ -38,7 +40,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
-import { useChromeScrolled } from '@/hooks/useScrollDirection';
+import { useIslandsCondensed } from './useIslandsCondensed';
 import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
@@ -176,7 +178,7 @@ const LeftCapsule: React.FC<{
 }> = ({ spec, override, slot }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const scrolled = useChromeScrolled();
+  const condensed = useIslandsCondensed();
   const tone = spec.tone;
 
   // Slot wins over back-override AND the registry rule.
@@ -198,6 +200,7 @@ const LeftCapsule: React.FC<{
         data-island-left
         style={{
           ...glassStyle(tone),
+          ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'var(--island-rest-glass)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
           padding: flush ? 0 : grow ? '0 8px 0 10px' : '0 14px 0 13px',
           ...(grow ? { flex: '1 1 auto', minWidth: 0 } : null),
         }}
@@ -263,8 +266,8 @@ const LeftCapsule: React.FC<{
   // everywhere else it keeps the CompactHeader non-back branch:
   // navigate('/clubhouse'). (Brief said '/watch'; the source of truth is
   // CompactHeader — see report.)
-  const showWordmark = spec.left?.kind === 'logo' ? spec.left.scrolledWordmark === true : false;
-  const showWordmarkNow = scrolled && showWordmark;
+  const showWordmark = spec.condense === true && spec.left?.kind === 'logo';
+  const showWordmarkNow = showWordmark && !condensed;
   const onLogoTap = () => {
     if (location.pathname === '/' || location.pathname === '/clubhouse') {
       window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
@@ -279,6 +282,7 @@ const LeftCapsule: React.FC<{
       aria-label="Go to home"
       style={{
         ...glassStyle(tone),
+        ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'var(--island-rest-glass)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition), var(--island-fold-transition)' } : {}),
         padding: showWordmarkNow ? '0 15px 0 11px' : '0 7px',
         gap: showWordmarkNow ? 9 : 0,
         cursor: 'pointer',
@@ -299,7 +303,7 @@ const LeftCapsule: React.FC<{
             width: 'auto',
             opacity: showWordmarkNow ? 1 : 0,
             // Snap under reduced motion; otherwise the wordmark fades in over 180ms.
-            transition: REDUCED_MOTION ? 'none' : 'opacity 180ms linear',
+            transition: REDUCED_MOTION ? 'none' : 'var(--island-fold-transition)',
             // Keep the island logo-sized until the wordmark appears.
             maxWidth: showWordmarkNow ? 64 : 0,
           }}
@@ -337,11 +341,11 @@ const LeftCapsule: React.FC<{
 // The gain is that it resizes ONCE, when the answer is known.
 // ---------------------------------------------------------------------------
 /** The 1px rule between the search glyph and the index cell. */
-const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
-  <span aria-hidden style={{ width: 1, height: 20, background: color, flexShrink: 0 }} />
+const HcpDivider: React.FC<{ color: string; fold?: boolean; condensed?: boolean }> = ({ color, fold, condensed }) => (
+  <span aria-hidden data-island-divider style={{ width: 1, height: 20, background: color, flexShrink: 0, ...(fold ? { maxWidth: condensed ? 0 : 1, opacity: condensed ? 0 : 1, marginRight: condensed ? -10 : 0, transition: REDUCED_MOTION ? 'none' : 'var(--island-fold-transition)' } : {}) }} />
 );
 
-export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
+export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string; fold?: boolean; condensed?: boolean }> = ({ tone, dividerColor, fold, condensed }) => {
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -479,7 +483,7 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
 
   return (
     <>
-      <HcpDivider color={dividerColor} />
+      <HcpDivider color={dividerColor} fold={fold} condensed={condensed} />
       {body}
     </>
   );
@@ -678,9 +682,8 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     getIslandEdgeScrolled,
     () => false,
   );
-  // Page scrolled past 24px (useScrollDirection store) — drives the scrim
-  // cross-fade; LeftCapsule reads the same flag for its scrolled title.
-  const scrolled = useChromeScrolled();
+  // HEADER_B1 shares the bottom nav's direction signal, without a listener.
+  const condensed = useIslandsCondensed();
 
   const suppressed = hidden || runtimeSuppressed || spec.chrome === 'none';
   // bleed island routes let the page own top padding — publish 0 so content
@@ -740,76 +743,15 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const dividerColor =
     tone === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.14)';
 
-  // Top fade (BRIEF_ISLANDS_NAV §1/§2): scrim routes render one fixed layer
-  // behind the islands; when the page scrolls past 24px it cross-fades in
-  // 180ms to the solid band. Both layers are pointer-events:none.
-  const scrimTransition = REDUCED_MOTION ? 'none' : 'opacity 180ms linear';
-
   return (
     <>
-
-      {/* BRIEF_TOUR_OVERVIEW_BAND: the '/tourhub' 140px photo fade at rest,
-          cross-fading to the shared scrolled band past 24px. */}
-      {spec.scrim === 'hero' && (
-        <div
-          aria-hidden
-          data-chrome="island-scrim-hero"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 140,
-            background: 'linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.25) 55%, rgba(10,10,12,0) 100%)',
-            pointerEvents: 'none',
-            zIndex: Z.header - 1,
-            opacity: scrolled ? 0 : 1,
-            transition: scrimTransition,
-          }}
-        />
-      )}
-
-      {spec.scrim === true && (
-        <div
-          aria-hidden
-          data-chrome="island-scrim"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 'calc(var(--sat, 0px) + 80px)',
-            background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)',
-            pointerEvents: 'none',
-            zIndex: Z.header - 1,
-            opacity: scrolled ? 0 : 1,
-            transition: scrimTransition,
-          }}
-        />
-      )}
-
-      {/* ONE shared scrolled band for scrim === true and 'hero', so the
-          Clubhouse and the Tour overview can never drift. */}
-      {(spec.scrim === true || spec.scrim === 'hero') && (
-        <div
-          aria-hidden
-          data-chrome="island-scrim-band"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 'calc(var(--sat, 0px) + 68px)',
-            background: 'rgba(10,10,12,0.88)',
-            backdropFilter: 'blur(20px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            pointerEvents: 'none',
-            zIndex: Z.header - 1,
-            opacity: scrolled ? 1 : 0,
-            transition: scrimTransition,
-          }}
-        />
+      {spec.scrim === 'soft' && (
+        <div aria-hidden data-chrome="island-scrim-soft" style={{
+          position: 'fixed', top: 0, left: 0, right: 0,
+          height: 'calc(var(--sat, 0px) + 96px)',
+          background: 'var(--island-soft-fade)',
+          pointerEvents: 'none', zIndex: Z.header - 1,
+        }} />
       )}
 
       <div
@@ -843,6 +785,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
           data-island-right
           style={{
             ...glassStyle(tone),
+            ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'var(--island-rest-glass)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
             padding: '0 5px 0 12px',
             gap: 10,
             position: 'relative',
@@ -856,6 +799,8 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
+              aria-hidden={spec.condense && condensed ? true : undefined}
+              tabIndex={spec.condense && condensed ? -1 : undefined}
               style={{
                 background: 'none',
                 border: 'none',
@@ -863,6 +808,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
+                ...(spec.condense ? { width: 19, flexShrink: 0, maxWidth: condensed ? 0 : 19, opacity: condensed ? 0 : 1, overflow: 'hidden', marginRight: condensed ? -10 : 0, pointerEvents: condensed ? 'none' : 'auto', transition: REDUCED_MOTION ? 'none' : 'var(--island-fold-transition)' } : {}),
               }}
             >
               {/* The signed-off magnifier: 19px, stroke 1.9 (mock's exact glyph,
@@ -887,7 +833,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
 
           {/* HcpCell renders its own leading divider so the rule can never be
               stranded when the chip is hidden. */}
-          {!spec.hideHcp && <HcpCell tone={tone} dividerColor={dividerColor} />}
+          {!spec.hideHcp && <HcpCell tone={tone} dividerColor={dividerColor} fold={spec.condense} condensed={condensed} />}
 
 
 

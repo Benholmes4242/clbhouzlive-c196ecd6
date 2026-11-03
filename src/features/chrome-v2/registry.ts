@@ -30,12 +30,7 @@ export type ChromeTone = 'light' | 'dark';
 export type LeftCell =
   | {
       kind: 'logo';
-      /**
-       * When true, the logo island grows to show the white clbhouz wordmark
-       * beside the mark once the page is scrolled (ISLANDS ROUND 2 §2).
-       * Absent = the island stays logo-sized at rest.
-       */
-      scrolledWordmark?: boolean;
+
     }
   | {
       kind: 'back';
@@ -67,14 +62,10 @@ export interface ChromeSpec {
    * the notch and becomes the entire stuck header.
    */
   scrollAway?: boolean;
-  /**
-   * Render the fixed top fade behind the islands (BRIEF_ISLANDS_NAV §1), and
-   * cross-fade it to the solid scrolled band (§2). Set only on '/' and
-   * '/clubhouse' for this build.
-   * 'hero' is the 140px photo fade at rest that cross-fades to the shared
-   * scrolled band past 24px (BRIEF_TOUR_OVERVIEW_BAND, signed off 29 Oct 2026).
-   */
-  scrim?: boolean | 'hero';
+  /** HEADER_B1: one persistent soft fade; no band or position-driven cross-fade. */
+  scrim?: 'soft';
+  /** Direction-driven folding using the existing bottom-nav scroll signal. */
+  condense?: boolean;
   note?: string;
 }
 
@@ -97,8 +88,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // '/' is Clubhouse landing — dark, immersive, page owns chrome.
   // H4b: Clubhouse feed. Island paints; page provides left slot
   // (Suggested/Friends toggle). No logo (slot overrides), no HCP.
-  { match: { exact: '/' },                        spec: { chrome: 'island', left: { kind: 'logo', scrolledWordmark: true }, tone: 'dark',  bleed: true, scrim: true } },
-  { match: { exact: '/clubhouse' },               spec: { chrome: 'island', left: { kind: 'logo', scrolledWordmark: true }, tone: 'dark',  bleed: true, scrim: true } },
+  { match: { exact: '/' },                        spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true, scrim: 'soft', condense: true } },
+  { match: { exact: '/clubhouse' },               spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true, scrim: 'soft', condense: true } },
   { match: { exact: '/auth' },                    spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/welcome' },                 spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/auth/callback' },           spec: { chrome: 'none', tone: 'dark',  bleed: false } },
@@ -267,7 +258,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
 
   // Tour Hub overview: the page-provided left slot carries burger + tour picker;
   // the standard controls remain in the right island over the full-bleed hero.
-  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', tone: 'dark', bleed: true, scrim: 'hero', note: 'Tour overview — shared fixed islands over the full-bleed hero; chrome owns the safe area; \'hero\' is the 140px photo fade at rest that cross-fades to the shared scrolled band past 24px (BRIEF_TOUR_OVERVIEW_BAND, signed off 29 Oct 2026).' } },
+  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', tone: 'dark', bleed: true, scrim: 'soft', condense: true, note: 'Tour overview — shared fixed islands over the full-bleed hero; chrome owns the safe area; \'hero\' is the 140px photo fade at rest that cross-fades to the shared scrolled band past 24px (BRIEF_TOUR_OVERVIEW_BAND, signed off 29 Oct 2026).' } },
   // Wire index + stories are non-bleeding solid-bar pages. Their page-provided
   // slots add the fixed section label and deliberately suppress the tour picker.
   {
