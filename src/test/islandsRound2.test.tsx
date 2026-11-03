@@ -102,7 +102,7 @@ describe('Islands round two disconnected glance', () => {
 });
 
 describe('Islands round two wordmark', () => {
-  it('shows the white wordmark beside the mark only once scrolled', async () => {
+  it('shows the white wordmark at rest and folds it on nav condensation', async () => {
     const { registerNavScroller, resetToExpanded } = await import('@/hooks/useScrollDirection');
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const view = render(
@@ -124,14 +124,14 @@ describe('Islands round two wordmark', () => {
     if (!image) throw new Error('Missing wordmark');
     expect(image.getAttribute('src')).toBe('/brand/clbhouz-wordmark-white@3x.png');
     expect(image.style.height).toBe('20px');
-    expect(image.style.opacity).toBe('0');
-    expect(image.style.maxWidth).toBe('0');
+    expect(image.style.opacity).toBe('1');
+    expect(image.style.maxWidth).toBe('64px');
     // The plain-text "Clubhouse" title is gone in favour of the artwork.
     expect(view.container.textContent).not.toContain('Clubhouse');
 
     const capsule = screen.getByRole('button', { name: 'Go to home' });
-    expect(capsule.style.padding).toBe('0px 7px');
-    expect(capsule.style.gap).toBe('0');
+    expect(capsule.style.padding).toBe('0px 15px 0px 11px');
+    expect(capsule.style.gap).toBe('9px');
     const mark = capsule.querySelector('img');
     expect(mark?.parentElement).toBe(capsule);
     expect(mark?.style.width).toBe('30px');
@@ -147,15 +147,15 @@ describe('Islands round two wordmark', () => {
       await new Promise((r) => requestAnimationFrame(() => r(null)));
     });
 
-    expect(image.style.opacity).toBe('1');
-    expect(image.style.maxWidth).toBe('64px');
-    expect(capsule.style.padding).toBe('0px 15px 0px 11px');
-    expect(capsule.style.gap).toBe('9px');
-
-    act(() => resetToExpanded());
     expect(image.style.opacity).toBe('0');
     expect(image.style.maxWidth).toBe('0');
     expect(capsule.style.padding).toBe('0px 7px');
+    expect(capsule.style.gap).toBe('0');
+
+    act(() => resetToExpanded());
+    expect(image.style.opacity).toBe('1');
+    expect(image.style.maxWidth).toBe('64px');
+    expect(capsule.style.padding).toBe('0px 15px 0px 11px');
 
     unregister();
     scroller.remove();
