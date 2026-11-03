@@ -44,7 +44,7 @@ export default function AuthCallback() {
         if (!session) {
           setFailed(true);
           setMessage(t('callback.sessionNotFound'));
-          setTimeout(() => navigate('/auth', { replace: true }), 1500);
+          timer = setTimeout(() => navigate('/auth', { replace: true }), 1500);
           return;
         }
 
