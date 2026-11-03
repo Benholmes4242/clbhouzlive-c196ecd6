@@ -17,7 +17,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
  * ONE SELECTION GROUND, ONE APPLIED GROUND (BRIEF_ONE_CHIP_APP_WIDE). The
  * default and only choice ground, `filled-selection`, states A CHOICE: the
  * selected chip takes the 6% white ground, ink text and a bright edge; every
- * other chip is transparent with a 1px A.BORDER hairline and A.MUTE text. The
+ * other chip is transparent with a 1px A.BORDER hairline and A.MUTE text.
  * EXPLORE_TOP_2 retired the solid white 'lg' size; the opt-in 'tile' size keeps this ground.
  * Existing sm/md callers keep their unchanged selection treatment. Amber stays
  * out because it belongs to the viewing member.
