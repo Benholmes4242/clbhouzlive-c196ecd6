@@ -1,8 +1,8 @@
 # Roadmap
 
 ## G2E Find people header B
-- [ ] Shared title/name anchor and global back; tabs dock with unchanged URL setter; search/nav/content preserved.
-- [ ] Focused checks, docked browser fixture, full maxWorkers2 shards until failure and reconciled report.
+- [x] Shared title/name anchor and global back; tabs dock with unchanged URL setter; search/nav/content preserved. Focused61/61, Chromium dock fixture verified; automatic build OK19:15:13Z.
+- [ ] STOP: shard1 1634 passed/4 inherited failed/1638 across144 files; full output /tmp/g2e/shard1.log; no shards2–4 or failing-test edits. Candidate6440/573 =6433/572 +7/+1 g2eFindPeopleHeader; G2E_FIND_PEOPLE_REPORT.md.
 
 ## G2D Video-grid header B
 - [x] Three route rules and shared title/name anchors; region-only dock with shared chips. Grid reads, tiles and other pages unchanged. Focused35/35 plus ws3 41/41; region Chromium fixture verified; build OK19:13:23Z.
