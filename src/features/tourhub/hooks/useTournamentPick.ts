@@ -20,6 +20,15 @@ export interface TournamentPickState {
   locked: boolean;
   followed_pickers: number;
   followed_top: FollowedPick[];
+  my_player_name?: string | null;
+  my_position?: number | null;
+  my_tied?: boolean;
+  my_score?: number | null;
+  my_status?: string | null;
+  my_thru?: number | null;
+  my_percentile?: number | null;
+  my_still_in_field?: boolean;
+  followed_best?: { player_id?: string; player_name: string; position: number; tied?: boolean } | null;
 }
 export const pickFieldKey = (id: string) => ['tourhub', 'pick-field', id] as const;
 export const tournamentPickStateKey = (id: string, userId?: string) => ['tourhub', 'tournament-pick-state', id, userId] as const;
@@ -54,7 +63,7 @@ export function useTournamentPickState(tournamentId: string) {
         return typeof player_id === 'string' && typeof player_name === 'string' && typeof picks === 'number'
           ? [{ player_id, player_name, picks }] : [];
       }).slice(0, 3);
-      return { my_player_id: row.my_player_id, locks_at: row.locks_at, locked: row.locked, followed_pickers: row.followed_pickers, followed_top };
+      return { ...row, followed_best: row.followed_best as unknown as TournamentPickState['followed_best'], followed_top };
     },
   });
 }
