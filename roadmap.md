@@ -1,7 +1,8 @@
 # Roadmap
 
 ## TU1 two-up video grids
-- [ ] CM1 test-only scrollPageToTop mock correction authorised; run focused checks and four shards before TU1. FIX_GRID_1 is complete.
+- [x] Apply authorised CM1 test-only scrollPageToTop mock; focused 148/148 passed without unhandled errors. Corrected Community mock received/read.
+- [ ] STOP: CM1 shard1 has 1680 passed/1 pre-existing integratedPicks failure at src/test/integratedPicks.test.tsx:36:542, Expected “6 of your circle have picked. Most picked: Ghim.” Received “DG6 of your circle have picked. Most picked: Ghim.” Full output docs/verification/cm1-authorised/shard-1.log. Shards2–4 and TU1 not started; CM1 full green prerequisite unmet.
 - [ ] Once unblocked, extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; preserve chrome/paging/actions.
 - [ ] Update authorised tile assertions, add rank/duration/wrapping/navigation coverage and report reconciled four-shard totals/build, retaining any failing output.
 

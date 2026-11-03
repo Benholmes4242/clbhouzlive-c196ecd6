@@ -1,4 +1,50 @@
-# CM1 — stopped on new unhandled test error
+# CM1 — authorised test correction passed; stopped on inherited Picks failure
+
+## Authorised continuation — 2026-11-03
+
+Only `src/test/ws1WatchTop.test.tsx` changed in this continuation's tests. No product code or `getScrollParent.ts` edits were made. The existing case “the community rail's See all selects Community without changing the path” retains its name, path/search, selected-chip and analytics assertions. The exact authorised additions are:
+
+```diff
+ const f = vi.hoisted(() => ({
++  scroll: vi.fn(),
+ }));
++vi.mock('@/lib/getScrollParent', async (orig) => ({ ...(await orig<Record<string, unknown>>()), scrollPageToTop: f.scroll }));
+ beforeEach(() => {
++  f.scroll.mockClear();
+ });
+ expect(screen.getByRole('tab', { name: 'Community' }).getAttribute('aria-selected')).toBe('true');
++expect(f.scroll).toHaveBeenCalledOnce();
+```
+
+Why: replace jsdom's unavailable element-scrolling implementation with the same partial module mock as ER3 and assert the actual Community See all scroll command. No cases added, deleted, renamed or otherwise rewritten; **ws1 remains 44 tests before/after**. The focused scope remains **148 before/after**. This continuation has **zero full-suite inventory delta**. Last verified baseline remains **6,472 tests /576 files**; the latest documented candidate before/after is **6,509 /577**, reconciled in `INTEGRATED_OUR_PICKS_REPORT.md` as CM1 +14/net0 files, then Integrated Picks +23/+1 file. A complete current full-suite total is **not verified**: the run stopped after shard 1.
+
+Focused command:
+`bunx vitest run src/test/ws1WatchTop.test.tsx src/test/er3LongFormRails.test.tsx src/test/er1ExploreCommunity.test.tsx src/test/hb6Group1.test.tsx src/test/canvasSurfaceToken.test.ts src/test/cm1Community.test.tsx src/test/ratingsWhite.test.ts --maxWorkers=2`
+
+Result: **7 files /148 tests passed, exit0; zero failures and zero unhandled errors**. Full output: `docs/verification/cm1-authorised/focused.log`. The inherited CM1 `scrollTo` error did not recur. React act warnings remain warnings, not unhandled errors.
+
+Full-suite command started:
+`bunx vitest run --maxWorkers=2 --shard=1/4`
+
+Result: **145 files (144 passed/1 failed), 1,681 tests (1,680 passed/1 failed), exit1; zero unhandled errors**. Full failing output retained in `docs/verification/cm1-authorised/shard-1.log` (not only temporary storage). Required stop observed; shards 2–4 were not run and TU1 has not started.
+
+The reproduced **pre-existing** failure is exactly the earlier Integrated Picks stop, outside this authorisation:
+
+```text
+FAIL src/test/integratedPicks.test.tsx > integrated card states > no pick combines question, exact lock copy, digit circle count and action
+AssertionError: expected 'DG6 of your circle have picked. Most …' to be '6 of your circle have picked. Most pi…' // Object.is equality
+Expected: "6 of your circle have picked. Most picked: Ghim."
+Received: "DG6 of your circle have picked. Most picked: Ghim."
+❯ src/test/integratedPicks.test.tsx:36:542
+```
+
+No correction to that test was attempted. No other test failures were reproduced in the executed scope. Build log is clean: **2026-11-03T22:36:07Z — build OK**.
+
+The corrected Community mock **has arrived** as `/mnt/user-uploads/Community_See_all_pasted.html` and was read. Its rating figure explicitly uses `#FFFFFF`. Source/test comparison supports the five CM1 tile changes: 12px corners, 16px row gap, wrapping course name, visible white rating and Shorts-style duration replacing the play circle. Frozen surrounding chrome/chips were not silently adopted from the mock. Live signed-in visual comparison and null-poster inspection remain unverified: current authentication status is `external_unmanaged`; no credentials requested. This is not a full CM1 green/sign-off claim.
+
+Continuation files touched: `src/test/ws1WatchTop.test.tsx`, `roadmap.md`, `CM1_REPORT.md`, `docs/verification/cm1-authorised/focused.log`, `docs/verification/cm1-authorised/shard-1.log`. All prohibited product, SQL/migration, deployed function, feed_config, round_pool_cap and native/Median areas remain untouched.
+
+## Original CM1 implementation record (historical)
 
 ## Result
 Implemented Community See all in-place selection, Watch URL entry, Media redirects/retirement and the corrected white-rating grid treatment. Corrected `cm1-community-see-all.html` was received and read. Frozen surrounding chrome, chip styling, content ordering and rail geometry remain as shipped; no full mock-parity or live signed-in claim.
