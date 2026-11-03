@@ -2,8 +2,8 @@
 
 ## HB4 Course detail back-name header
 - [x] Existing /courses/{id} only implementation: fixed folding header and observed short-name expansion; deeper routes/tabs unchanged. Shared boundary extraction; HB2 tests unchanged10/10; authorized HB3 detail assertion quoted in report.
-- [ ] STOP focused53/54: hb4CourseBackName.test.tsx:70:74 expected 'A very long championship course name', received 'A very long championship…'; 13px floor passed, canonical shortCourseName shortened fixture. No correction/rerun/shards/browser after failure; awaits authorization.
-- [ ] Mock/real sat47 rest46×46 and down/up screenshots plus full shards unverified. Candidate6278/561 from6268/560 (+10/+1 hb4CourseBackName), not full pass total; automatic build OK15:55:03Z. Full output/tmp/hb4/focused.log; HB4_COURSE_DETAILS_REPORT.md records scope and inventory.
+- [x] Authorized shrink-first correction only to GolfClubView and harness: shortCourseName(name, Number.POSITIVE_INFINITY); assertions/helper default unchanged. Focused54/54; historical failure resolved and original output retained.
+- [x] Real Tralee sat47 top46×46, down700 folded, up650 named Back from Tralee screenshots inspected; signed-off mock scrolled480/430 with browser-only script isolation. Full shards1594/1520/1558/1606=6278/561 from6268/560 (+10/+1 solely hb4CourseBackName), zero failures/unhandled errors; automatic build OK16:10:59Z. HB4_COURSE_DETAILS_REPORT.md quotes all changes and browser apparatus retries. Authenticated member proof unavailable external_unmanaged.
 
 ## HB3 Courses header and island dock
 - [x] Apply floating/folding chrome to /courses only and reuse IslandDock for the shared-state Courses / Top 100 switch; course details and shared dock behavior unchanged.
