@@ -12,8 +12,6 @@ import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 import { COVER_TOP_GUARD, W_55 } from './HeroShell';
 import { PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
 import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
-import { useLocation } from 'react-router-dom';
-import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 
 /** Control skin over the band (EDIT pill and the overflow dots). */
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
@@ -89,6 +87,8 @@ interface Props {
   avatar: React.ReactNode;
   onAvatarTap?: () => void;
   displayName: string;
+  /** HB5: page-owned observation; standalone band rendering remains inert. */
+  nameRef?: React.Ref<HTMLHeadingElement>;
   isCreator?: boolean;
   /** Pre-joined home club · region; null when neither resolves. */
   subline: string | null;
@@ -105,6 +105,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
   avatar,
   onAvatarTap,
   displayName,
+  nameRef,
   isCreator = false,
   subline,
   afterSubline,
@@ -112,12 +113,6 @@ export const ProfileCoverBand: React.FC<Props> = ({
   addHomeClubLabel,
   action,
 }) => {
-  // HB5: this is the actual personal hero name (HeroShell is no longer used).
-  // Publish the full name only on personal roots; HB4 owns observation/fitting.
-  const { pathname } = useLocation();
-  const nameRef = React.useRef<HTMLHeadingElement>(null);
-  const personalRoot = pathname === '/profile' || (pathname !== '/profile/quest' && /^\/profile\/[^/]+$/.test(pathname));
-  useIslandBackName(personalRoot ? displayName : null, nameRef);
   const [broken, setBroken] = React.useState(false);
   React.useEffect(() => setBroken(false), [coverUrl]);
   const showCover = !!coverUrl && !broken;
