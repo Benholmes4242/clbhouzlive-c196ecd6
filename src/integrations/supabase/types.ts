@@ -25936,6 +25936,7 @@ export type Database = {
           courses_filmed: number
           courses_played: number
           display_name: string
+          following: boolean
           handicap_index: number
           handle: string
           is_verified: boolean
@@ -27838,6 +27839,41 @@ export type Database = {
       viewer_shares_host_club: {
         Args: { _host_id: string; _viewer_id: string }
         Returns: boolean
+      }
+      watch_explore_rows: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          region: string
+          stream_id: string
+          width: number
+        }[]
+      }
+      watch_explore_visible: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          created_at: string
+          like_count: number
+          post_id: string
+        }[]
       }
       watch_video_rows: {
         Args: never

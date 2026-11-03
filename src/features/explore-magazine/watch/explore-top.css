@@ -18,3 +18,16 @@
 .explore-card-skeleton { flex:none; width:132px; height:calc(14px + 56px * 1.05 + 10px + 13px * 1.25 * 2 + 4px + 14px + 1px + 14px + 12px + 2px); border-radius:16px; background:var(--explore-top-skeleton); }
 .explore-head-skeleton { padding:28px 16px 10px; }
 .explore-head-skeleton span { display:block; width:150px; height:22px; border-radius:6px; background:var(--explore-top-skeleton); }
+
+/* ER1: grid geometry and poster chrome are opt-in; shared MomentTile stays unchanged. */
+.explore-community-sub { margin:16px 16px 0; font-size:13px; color:var(--explore-top-quiet); }
+.explore-community-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:14px 16px 0; }
+.explore-community-item { min-width:0; color:var(--explore-top-ink); }
+.explore-community-frame { position:relative; aspect-ratio:1 / 1; border-radius:11px; overflow:hidden; }
+.explore-community-frame > button { width:100%; height:100%; display:block; }
+.explore-community-frame > button span[aria-hidden], .explore-community-frame > button .review-tile-chip { display:none !important; }
+.explore-community-frame > button .standout-figure-chip { display:none !important; }
+.explore-community-frame > button [style*="bottom:"] { display:none !important; }
+.explore-community-name { display:block; margin-top:8px; font-size:13px; font-weight:700; overflow-wrap:anywhere; }
+.explore-community-course { display:block; margin-top:2px; font-size:11.5px; color:var(--explore-top-quiet); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.explore-community-square { aspect-ratio:1 / 1; border-radius:11px; background:var(--explore-top-skeleton); }

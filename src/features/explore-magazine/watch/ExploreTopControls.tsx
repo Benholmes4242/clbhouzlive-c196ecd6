@@ -1,5 +1,5 @@
 /** EXPLORE_TOP_1/2 (tile chips): local search chrome only; WatchFeed retains query/results/filter ownership. */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RailChips, type RailChipOption } from '@/components/ui/RailChips';
@@ -10,8 +10,20 @@ export function ExploreTopControls({ query, onQuery, options, value, onChange, a
 }) {
   const [opened, setOpened] = useState(() => !!query);
   const searchOpen = opened || !!query;
+  const rowRef = useRef<HTMLDivElement>(null);
+  // ER1: the outer row owns overflow (including search); reveal only a clipped selection.
+  useEffect(() => {
+    const row = rowRef.current;
+    const selected = row?.querySelector<HTMLElement>('[aria-selected="true"]');
+    if (!row || !selected || searchOpen) return;
+    const bounds = row.getBoundingClientRect();
+    const chip = selected.getBoundingClientRect();
+    const delta = chip.right > bounds.right - 16 ? chip.right - bounds.right + 16
+      : chip.left < bounds.left + 16 ? chip.left - bounds.left - 16 : 0;
+    if (delta && typeof row.scrollBy === 'function') row.scrollBy({ left: delta, behavior: 'smooth' });
+  }, [value, searchOpen]);
   return (
-    <div className={`explore-top-controls${sticky ? ' explore-top-sticky' : ''}`}>
+    <div ref={rowRef} className={`explore-top-controls${sticky ? ' explore-top-sticky' : ''}`}>
       {searchOpen ? <>
         <label className="explore-search-field">
           <Search aria-hidden size={15} strokeWidth={2.4} />

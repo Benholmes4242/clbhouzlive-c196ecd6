@@ -1,5 +1,9 @@
 # Roadmap
 
+## ER1 Explore top and Community
+- [x] Remove Golfers to watch, restore Community tile/view, reveal selected tile, and exclude own items outside search locally.
+- [x] Focused131/131; four full shards1504+1504+1554+1499=6,061/550 (+20/+1 ER1); zero failures/unhandled errors. Automatic build clean; ER1_REPORT.md quotes changed cases and final CSS/focused timing. Public phone view verified; signed-in checks blocked by external_unmanaged.
+
 ## Tour Overview Merged Airy
 - [x] Merge the situation and Full board into the340px photo with resolved20px inset; apply specified lower-section spacing, preserving TournamentPage's SituationBand.
 - [ ] STOP: focused172/174; cb58LeadersGroup:171:44 and tourOverviewMergedAiry:100:225 expect a CSS-variable border shorthand omitted by the test DOM. Full output /tmp/tour-airy-focused.log; await scoped assertion authorization. No full shards/browser comparison after failure; candidate6,041/549 (+16/+1), not a full pass count. Automatic build clean; TOUR_OVERVIEW_MERGED_AIRY_REPORT.md quotes errors and all changed tests.
