@@ -5,7 +5,7 @@
  *   /watch/top100          WS3 — Top 100 on film, no sub, no chips
  * G2D: global islands own history back and PageTitle owns the observed h1.
  * Only regions mount IslandDock; both chip copies share selection/analytics.
- * 3-column grid, 30 per page,
+ * TU1: two-up portrait grid, shared solid badge, Top 100-only rank; 30 per page,
  * keyset on the last created_at, one sentinel. Tap opens the canonical viewer on
  * the tile with the loaded list (the viewer has no live append, so swipe stays
  * within what is loaded). Guests meet the app gate like /rounds.
@@ -21,7 +21,9 @@ import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useGridVideos, useRegionCourses, useWatchRegions, type GridSource } from '@/features/explore-magazine/watch/useWatchMiddle';
 import { coursesLabel, videosLabel } from '@/features/explore-magazine/watch/watchMiddle';
-import { DurationChip } from '@/features/explore-magazine/watch/CourseVideosShelf';
+import { SolidDurationBadge } from '@/features/explore-magazine/watch/SolidDurationBadge';
+import '@/features/explore-magazine/watch/explore-top.css';
+import '@/features/explore-magazine/watch/watch-grid.css';
 import { openVideoList } from '@/features/explore-magazine/watch/openVideoList';
 import { PageTitle } from '@/features/chrome-v2/PageTitle';
 import { IslandDock } from '@/features/chrome-v2/IslandDock';
@@ -108,17 +110,20 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
             {t('amateur.watch.grid.empty', 'No videos here yet.')}
           </p>
         ) : (
-          <div data-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+          <div data-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 10, rowGap: 18, padding: '0 14px', alignItems: 'start' }}>
             {rows.map((row, i) => (
               <button key={`${row.post_id}:${i}`} type="button" data-grid-tile={row.post_id}
                 onClick={() => { analyticsEvents.track('watch_grid_video_opened', { kind }); openVideoList(rows, i); }}
-                style={{ height: 172, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer', color: A.INK, fontFamily: SANS, textAlign: 'left' }}>
-                {row.poster_url ? <img src={row.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
-                <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.6))' }} />
-                <DurationChip seconds={row.duration_seconds} top={6} right={6} size={10.5} />
-                <span data-grid-course style={{ position: 'absolute', left: 6, right: 6, bottom: 6, zIndex: 1, fontSize: 10.5, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                style={{ padding: 0, border: 0, background: 'none', cursor: 'pointer', color: A.INK, fontFamily: SANS, textAlign: 'left', display: 'block', minWidth: 0 }}>
+                <div data-grid-frame style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 12, overflow: 'hidden', background: 'var(--watch-grid-poster)' }}>
+                  {row.poster_url ? <img src={row.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
+                  <SolidDurationBadge seconds={row.duration_seconds} />
+                  {kind === 'top100' && typeof row.list_rank === 'number' && row.list_rank > 0 && <span className="review-tile-chip" data-grid-rank style={{ position: 'absolute', top: 7, left: 7, zIndex: 2, display: 'inline-flex', alignItems: 'baseline', gap: 1, padding: '4px 7px', borderRadius: 10, pointerEvents: 'none' }}><span style={{ fontSize: 9, fontWeight: 700, color: 'var(--watch-grid-rank-prefix)', marginRight: 1 }}>#</span><span className="tabular-nums" style={{ fontSize: 13, fontWeight: 700, color: 'var(--watch-grid-rank-ink)', lineHeight: 1, letterSpacing: '-0.01em' }}>{row.list_rank}</span></span>}
+                </div>
+                <span data-grid-course style={{ display: 'block', marginTop: 8, fontSize: 14, fontWeight: 700, lineHeight: 1.3, overflowWrap: 'anywhere' }}>
                   {shortCourseName(row.course_name ?? '')}
                 </span>
+                {(row.display_name || row.handle) && <span data-grid-creator style={{ display: 'block', marginTop: 2, fontSize: 12, fontWeight: 400, color: 'var(--watch-grid-creator)', lineHeight: 1.35, overflowWrap: 'anywhere' }}>{row.display_name || row.handle}</span>}
               </button>
             ))}
           </div>

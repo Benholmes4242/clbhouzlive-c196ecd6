@@ -1,0 +1,6 @@
+:root {
+  --watch-grid-poster: #1E1E23;
+  --watch-grid-rank-ink: #FFFFFF;
+  --watch-grid-rank-prefix: rgba(255,255,255,0.7);
+  --watch-grid-creator: rgba(248,250,252,0.55);
+}

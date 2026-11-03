@@ -11,7 +11,7 @@ import { momentViewerPosts } from '../momentViewerPosts';
 import { RailChips } from '@/components/ui/RailChips';
 import { ExploreTopControls } from './ExploreTopControls';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { SolidDurationBadge } from './SolidDurationBadge';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
@@ -99,26 +99,6 @@ const CT_W = 124;
 
 /* BRIEF_WATCH_SEE_ALL_IN_PLACE values with no shared token yet. */
 const COUNT_INK = 'rgba(248,250,252,0.46)';
-const BADGE_INK = '#FFFFFF';
-const BADGE_FILL = 'rgba(0,0,0,0.62)';
-
-/** BC.1 — the solid duration badge: grid tiles and the lead only, never the rail. */
-function SolidDurationBadge({ seconds }: { seconds: number | null | undefined }) {
-  const label = seconds ? formatDuration(seconds) : '';
-  if (!label) return null;
-  return (
-    <span
-      data-watch-badge="duration"
-      style={{
-        position: 'absolute', right: 6, bottom: 6, zIndex: 2, pointerEvents: 'none',
-        fontSize: 10, fontWeight: 700, color: BADGE_INK, background: BADGE_FILL,
-        borderRadius: 5, padding: '2px 5px', fontVariantNumeric: 'tabular-nums', lineHeight: 1.2,
-      }}
-    >
-      {label}
-    </span>
-  );
-}
 
 const cardButton: React.CSSProperties = {
   flex: 'none',
