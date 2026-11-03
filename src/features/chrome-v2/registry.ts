@@ -216,12 +216,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/courses' },
       tone: 'dark',
-      // bleed + scrollAway stay TRUE deliberately: this is a hero page, so the
-      // island floats over the course photograph and scrolls away rather than
-      // sitting on it. Precedent: the tour hero entries — /tourhub/tournament/
-      // and /tourhub/player/ (both bleed:true) and the tour overview.
+      // HB4: existing /courses/{id} detail only; deeper routes remain page-owned.
       bleed: true,
-      scrollAway: true,
+      scrim: 'soft',
+      condense: true,
     },
   },
 

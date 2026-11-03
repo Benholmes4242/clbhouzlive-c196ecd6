@@ -99,6 +99,8 @@ export interface CourseMastheadProps {
   nameClamp?: number;
   /** Rendered left of the name block, baseline-aligned (Courses ranked variant). */
   nameLead?: React.ReactNode;
+  /** Optional observation target; callers keep name layout and styling unchanged. */
+  nameRef?: React.RefObject<HTMLHeadingElement>;
   as?: 'h1' | 'div';
   children?: React.ReactNode;
 }
@@ -112,7 +114,7 @@ export function MastheadRule({ children }: { children: React.ReactNode }) {
 }
 
 export const CourseMasthead: React.FC<CourseMastheadProps> = ({
-  kicker, name, place, placeColor = PLACE_INK, nameClamp, nameLead, as = 'div', children,
+  kicker, name, place, placeColor = PLACE_INK, nameClamp, nameLead, nameRef, as = 'div', children,
 }) => {
   const NameTag = as;
   const clamp: React.CSSProperties = nameClamp
@@ -124,7 +126,7 @@ export const CourseMasthead: React.FC<CourseMastheadProps> = ({
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
         {nameLead}
         <div style={{ minWidth: 0, flex: 1 }}>
-          <NameTag style={{ ...MASTHEAD_NAME, ...clamp }}>{name}</NameTag>
+          <NameTag ref={nameRef} style={{ ...MASTHEAD_NAME, ...clamp }}>{name}</NameTag>
           {place && <div style={{ ...MASTHEAD_PLACE, color: placeColor }}>{place}</div>}
         </div>
       </div>

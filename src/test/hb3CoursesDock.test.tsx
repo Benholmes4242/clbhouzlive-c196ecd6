@@ -68,7 +68,7 @@ describe('HB3 Courses island dock', () => {
     expect(within(dock()).getByRole('tab', { name: 'Top 100' })).toHaveAttribute('aria-selected', 'false');
   });
   it('preserves course detail and deeper route chrome', () => {
-    expect(resolveChrome('/courses/course-id', new URLSearchParams())).toEqual({ chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/courses' }, tone: 'dark', bleed: true, scrollAway: true });
+    expect(resolveChrome('/courses/course-id', new URLSearchParams())).toEqual({ chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/courses' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true });
     const deeper = resolveChrome('/courses/course-id/reviews', new URLSearchParams());
     expect(deeper.chrome).toBe('none'); expect(deeper.condense).toBeUndefined(); expect(deeper.scrim).toBeUndefined();
   });

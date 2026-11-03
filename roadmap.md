@@ -1,5 +1,10 @@
 # Roadmap
 
+## HB4 Course detail back-name header
+- [x] Existing /courses/{id} only implementation: fixed folding header and observed short-name expansion; deeper routes/tabs unchanged. Shared boundary extraction; HB2 tests unchanged10/10; authorized HB3 detail assertion quoted in report.
+- [ ] STOP focused53/54: hb4CourseBackName.test.tsx:70:74 expected 'A very long championship course name', received 'A very long championship…'; 13px floor passed, canonical shortCourseName shortened fixture. No correction/rerun/shards/browser after failure; awaits authorization.
+- [ ] Mock/real sat47 rest46×46 and down/up screenshots plus full shards unverified. Candidate6278/561 from6268/560 (+10/+1 hb4CourseBackName), not full pass total; automatic build OK15:55:03Z. Full output/tmp/hb4/focused.log; HB4_COURSE_DETAILS_REPORT.md records scope and inventory.
+
 ## HB3 Courses header and island dock
 - [x] Apply floating/folding chrome to /courses only and reuse IslandDock for the shared-state Courses / Top 100 switch; course details and shared dock behavior unchanged.
 - [x] Six new regressions; focused44/44. Stable real390×844 down500/up450 at sat47: folded46px, dock top109px, agreed glass and Top100 URL/selection readback; guest right byte-identical, no page errors.

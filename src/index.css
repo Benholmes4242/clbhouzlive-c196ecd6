@@ -36,6 +36,10 @@
 }
 
 :root {
+  --island-back-ink: #F8FAFC;
+  --island-back-rest: rgba(14,14,16,0.55);
+  --island-back-edge: rgba(255,255,255,0.10);
+  --island-back-shadow: 0 10px 30px rgba(0,0,0,0.35);
   --island-dock-glass: rgba(14,14,16,0.84);
   --island-dock-selected-glass: rgba(40,40,46,0.9);
   --island-dock-selected-edge: rgba(255,255,255,0.28);
