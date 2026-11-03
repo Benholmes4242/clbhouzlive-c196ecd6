@@ -96,7 +96,7 @@ export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | 
   const detailText = (d: PersonDetail) => d.kind === 'newToday' ? t('amateur.watch.people.newToday', '{{count}} new today', { count: d.count })
     : d.kind === 'newTodayBare' ? t('amateur.watch.people.newTodayBare', 'new today')
     : d.kind === 'newCount' ? t('amateur.watch.people.newCount', '{{count}} new', { count: d.count })
-    : t('amateur.watch.people.videos', { count: d.count, defaultValue_one: '{{count}} video', defaultValue_other: '{{count}} videos', defaultValue: d.count === 1 ? '1 video' : `${d.count} videos` });
+    : t('amateur.watch.people.videos', { count: d.count, defaultValue: d.count === 1 ? '{{count}} video' : '{{count}} videos' });
   return <div ref={rootRef} data-watch-creators="row" className="explore-people">
     <ShelfHeading
       title={t('amateur.watch.people.title', 'Golfers to watch')}
