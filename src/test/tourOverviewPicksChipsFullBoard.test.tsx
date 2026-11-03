@@ -74,7 +74,7 @@ describe('picks chips (Board B)', () => {
     });
   });
 
-  it('puts the 30px avatar left of the name', () => {
+  it('puts the 28px avatar left of the name', () => {
     f.picks = [{ playerId: 'p3', playerName: 'B Three' }];
     const { container } = mountPicks();
     const card = container.querySelector('[data-overview-pick-card]') as HTMLElement;
@@ -83,7 +83,7 @@ describe('picks chips (Board B)', () => {
     expect(card.firstElementChild).toBe(avatar);
     expect(avatar.nextElementSibling).toBe(text);
     expect(avatar.style.flex).toBe('0 0 auto');
-    const sized = avatar.querySelector<HTMLElement>('[style*="30px"]');
+    const sized = avatar.querySelector<HTMLElement>('[style*="28px"]');
     expect(sized).not.toBeNull();
   });
 
@@ -153,13 +153,14 @@ describe('situation row "Full board"', () => {
   it('renders for live and completed (awaiting-playoff) events with a board, never for upcoming', () => {
     f.rows = field;
     mountHero(LIVE);
-    expect(document.querySelector('[data-overview-situation] [data-overview-full-board]')).not.toBeNull();
+    expect(document.querySelector('[data-overview-photo-band] [data-overview-full-board]')).not.toBeNull();
     cleanup();
     mountHero(PLAYOFF);
     expect(document.querySelector('[data-overview-full-board]')).not.toBeNull();
     cleanup();
     mountHero(UPCOMING);
-    expect(document.querySelector('[data-overview-situation]')).not.toBeNull();
+    expect(document.querySelector('[data-overview-photo-situation]')).not.toBeNull();
+    expect(document.querySelector('[data-overview-situation]')).toBeNull();
     expect(document.querySelector('[data-overview-full-board]')).toBeNull();
   });
 
@@ -177,8 +178,9 @@ describe('situation row "Full board"', () => {
     f.rows = field;
     mountHero(LIVE);
     const button = screen.getByRole('button', { name: 'Full leaderboard' });
-    expect(button.style.padding).toBe('12px 0px 12px 12px');
-    expect(button.style.margin).toBe('-12px 0px');
+    expect(button.style.height).toBe('44px');
+    expect(button.style.padding).toBe('0px 0px 0px 12px');
+    expect(button.style.margin).toBe('-8px 0px');
   });
 
   it('live and in the live list navigates to the live leaderboard deep link', () => {

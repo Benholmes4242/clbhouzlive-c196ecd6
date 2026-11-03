@@ -52,9 +52,9 @@ describe('tour player surnames', () => {
 });
 
 describe('Tour Overview Design A hero facts', () => {
-  it('keeps the overview at 386 without changing the shared news hero height', () => {
-    expect(OVERVIEW_PHOTO_BAND_HEIGHT).toBe(386);
-    expect(OVERVIEW_HERO_TOTAL_HEIGHT).toBe('386px');
+  it('keeps the overview at 340 without changing the shared news hero height', () => {
+    expect(OVERVIEW_PHOTO_BAND_HEIGHT).toBe(340);
+    expect(OVERVIEW_HERO_TOTAL_HEIGHT).toBe('340px');
     expect(PHOTO_BAND_HEIGHT).toBe(340);
     expect(OVERVIEW_HERO_HEIGHT).toBe('340px');
   });
