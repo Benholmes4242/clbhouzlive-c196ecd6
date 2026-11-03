@@ -3,7 +3,7 @@
 ## Consolidated CM1 then TU1
 - [x] Apply only authorised Merged Airy heading14→16 and grid bottom14→0 expectations; other assertions/product frozen.
 - [x] Run all four CM1 shards with maxWorkers2:1681/1543/1648/1642 =6514 tests/578 files, zero failures/unhandled errors; CM1 complete. Test count +42/+2 reconciled in CM1_REPORT.md; build OK23:02:08Z.
-- [ ] After CM1 green, implement queued TU1 and run four shards again; reconcile every named test delta and preserve all failure output.
+- [x] TU1 implemented after CM1 green; focused128/128, four shards1681/1556/1648/1642 =6527/578, zero failures/unhandled errors. +13 G2D cases/0 files reconciled in TU1_REPORT.md; build OK23:39:27Z.
 
 ## Authorised Picks continuation
 - [x] Scope integratedPicks circle assertion to its text element, expected copy unchanged; focused23/23 and shard1 passed.
@@ -14,8 +14,8 @@
 - [x] Apply authorised CM1 test-only scrollPageToTop mock; focused 148/148 passed without unhandled errors. Corrected Community mock received/read.
 - [x] CM1 full-green prerequisite satisfied:6514/6514 tests/578 files, four clean shards after both authorised Picks test fixes; no exemptions.
 - [x] Historical shard2 resumption stop preserved in CM1_REPORT.md and docs/verification/cm1-resume/shard-2.log; consolidated run supersedes it.
-- [ ] Once unblocked, extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; preserve chrome/paging/actions.
-- [ ] Update authorised tile assertions, add rank/duration/wrapping/navigation coverage and report reconciled four-shard totals/build, retaining any failing output.
+- [x] Extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; chrome/paging/actions preserved.
+- [x] No old WatchGridPage tile assertions existed to rewrite; +13 G2D cases cover ranks/duration/wrapping/navigation. WS2/WS3 untouched and passing; full suite6527/6527, report/logs retained. Live signed-in browser check unavailable external_unmanaged, not claimed.
 
 ## Integrated Our picks section
 - [x] Integrate shared four-state amber card/circle rank read/plain record row, preserving sheets/prior fixes; exact guest lock copy blocked by absent guest-accessible locks_at source.
