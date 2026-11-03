@@ -100,7 +100,7 @@ export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT, dayOnly = fa
 export function pickStatusToken(raw: string | null | undefined): string | null {
   const s = normalizeStatus(raw);
   if (!s || !['WD', 'DQ', 'DNS', 'CUT', 'MC', 'MDF'].includes(s)) return null;
-  return statusWord(s);
+  return s === 'CUT' || s === 'MC' ? 'MC' : statusWord(s);
 }
 
 export function PicksBlock({

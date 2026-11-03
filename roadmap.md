@@ -1,5 +1,9 @@
 # Roadmap
 
+## Tournament pick follow-up fixes
+- [x] Correct avatar-hugging selection rings, local tap-to-deselect and action fills; lowercase record continuation and display MC on pick cards without changing board tokens.
+- [x] Focused99/99; Chromium rings/fills checked; shards1645/1535/1638/1644 =6462/575 (+7/+0), zero failures/unhandled errors; automatic build OK21:30:49Z. PICK_FOLLOWUP_FIXES_REPORT.md names every test change and authenticated-check limitation.
+
 ## DEFAULT_B1
 - [x] Set only the unmatched registry default to shared header B; replace the two authorised obsolete cases and add NotFound folding coverage.
 - [x] Focused24/24; four shards1638/1535/1638/1644 =6455 tests/575 files (+5/+0); zero failures/unhandled errors. Automatic build OK21:16:24Z. DEFAULT_B1_REPORT.md quotes both authorised diffs and names historical cleared stops.

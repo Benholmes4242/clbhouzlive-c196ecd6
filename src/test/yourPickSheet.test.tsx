@@ -51,6 +51,32 @@ beforeEach(() => {
 afterEach(() => { cleanup(); client.clear(); });
 
 describe('Your pick sheet build 1', () => {
+  it('tapping a chosen row again clears local selection and disables submission', async () => {
+    mount(); await ready();
+    const row = screen.getByRole('radio', { name: 'Tom Kim' });
+    fireEvent.click(row); expect(row).toHaveAttribute('aria-checked', 'true'); expect(submit()).toBeEnabled();
+    fireEvent.click(row); expect(row).toHaveAttribute('aria-checked', 'false'); expect(submit()).toBeDisabled();
+    expect(screen.getAllByRole('radio').filter(item => item.getAttribute('aria-checked') === 'true')).toHaveLength(0);
+    expect(mocks.rpc.mock.calls.some(call => call[0] === 'set_tournament_pick')).toBe(false);
+  });
+  it('tapping a chosen followed tile again clears selection and disables submission', async () => {
+    mount(); await ready();
+    const tile = within(document.querySelector('[data-pick-followed]') as HTMLElement).getByRole('button', { name: 'Steven Fisk' });
+    fireEvent.click(tile); expect(screen.getByRole('radio', { name: 'Steven Fisk' })).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(tile); expect(screen.getByRole('radio', { name: 'Steven Fisk' })).toHaveAttribute('aria-checked', 'false'); expect(submit()).toBeDisabled();
+  });
+  it('closing after clearing a saved pick preserves server and cached choice on reopening', async () => {
+    state.my_player_id = 'p1'; const view = mount(); await ready();
+    const row = screen.getByRole('radio', { name: 'Tom Kim' });
+    await waitFor(() => expect(row).toHaveAttribute('aria-checked', 'true'));
+    fireEvent.click(row); expect(submit()).toBeDisabled();
+    view.rerender(<YourPickSheet {...props()} open={false} />);
+    expect(state.my_player_id).toBe('p1');
+    expect(client.getQueryData(tournamentPickStateKey('event', 'member'))).toMatchObject({ my_player_id: 'p1' });
+    expect(mocks.rpc.mock.calls.some(call => call[0] === 'set_tournament_pick')).toBe(false);
+    view.rerender(<YourPickSheet {...props()} />); await ready();
+    await waitFor(() => expect(screen.getByRole('radio', { name: 'Tom Kim' })).toHaveAttribute('aria-checked', 'true'));
+  });
   it('renders our three in prop rank order with numbered tags and no field duplicates', async () => {
     mount(); await ready();
     const ours = document.querySelector('[data-pick-ours]');

@@ -88,7 +88,9 @@
 .pick-record-event-picks span { color:var(--pick-mute); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .pick-record-event-picks b { flex:none; }
 .pick-mine { margin:10px 20px 0; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:var(--pick-mine-fill); border:1px solid var(--pick-mine-border); }
-.pick-mine-face { flex:none; border-radius:34%; box-shadow:var(--pick-selected-ring); }
+.pick-mine-face { flex:none; display:flex; }
+/* Trace the actual shared avatar box, preserving its canonical aspect ratio. */
+.pick-mine-avatar { border-radius:34%; box-shadow:var(--pick-selected-ring); }
 .pick-mine-placeholder { width:34px; height:34px; border-radius:34%; border:1.5px dashed var(--pick-mine-placeholder); display:grid; place-items:center; color:var(--pick-amber); flex:none; }
 .pick-mine-text { flex:1; min-width:0; }
 .pick-mine-label { font-size:9.5px; font-weight:800; letter-spacing:.13em; color:var(--pick-amber); }
