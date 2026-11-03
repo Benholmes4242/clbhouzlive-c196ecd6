@@ -4,7 +4,6 @@ import React, {useLayoutEffect,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Trophy} from 'lucide-react';
 import {AMBER,FONT,GOLD,WHITE_ALPHA_06,WHITE_ALPHA_65,TOPAR_UNDER_DARK} from '../../../_shared/tokens';
-import {PAGE_CANVAS} from '@/lib/tokens/surfaces';
 import {PlayerAvatar} from '../../PlayerAvatar';
 import type {AITopContender} from '../../../hooks/useAIPredictions';
 import {surnameOf} from '../../../_shared/playerName';
@@ -192,9 +191,9 @@ export function PicksBlock({
   }, [teeDay]);
 
   return (
-    <div data-overview-picks style={{ background: PAGE_CANVAS, paddingTop: 8 }}>
+    <div data-overview-picks style={{ paddingTop: 8 }}>
       <div data-overview-picks-hairline style={{ margin: '0 20px', borderTop: `1px solid ${WHITE_ALPHA_06}` }} />
-      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '14px 20px 8px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
@@ -211,7 +210,7 @@ export function PicksBlock({
         <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
       ) : null}
 
-      <div data-overview-picks-grid style={{ padding: '0 20px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
+      <div data-overview-picks-grid style={{ padding: '0 20px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
         {cards.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
