@@ -1,47 +1,75 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
 
+import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
-import {
-  useStandoutRounds,
-  type StandoutRound,
-} from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
+import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import { standoutSentenceParts } from '@/components/explore-tab-new/courseled/standoutSentence';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { useFeatsWindow, type FeatYearRow } from '../useFeatsWindow';
 import {
-  FEAT_TILE,
   SHELF_CARD,
-  SHELF_DOOR,
+  SHELF_END,
+  SHELF_SKELETON,
   TO_PAR_UNDER,
-  buildShelfCards,
-  eligibleFeats,
+  recentSentenceParts,
   roundToPar,
   stripColor,
   toParLabel,
-  type ShelfCard,
 } from './roundsShelfRules';
 
 /**
- * ROUNDS THIS WEEK (RS §3, mock A/C) — a shelf on Watch's All chip, directly
- * after Quick hits, plus the always-on door to /rounds. Signed-in members only.
+ * RECENT ROUNDS (RR1, mock A/B) — a shelf on Watch's For you chip, directly
+ * after Quick hits. Signed-in members only.
  *
- * Circle first: when the member's circle produced fewer than two standout
- * rounds in the board's own 14-day window, the shelf re-reads with scope
- * 'everyone' and the sub-line says so. No cards hides the heading and the
- * rail; the door still shows. An error hides the shelf quietly and logs the
- * way the page's other shelves log.
+ * One paged read: get_recent_rounds(scope, '14', 10, offset), newest first,
+ * ten at a time as the sentinel shows, until total_count rows are loaded and
+ * the end tile closes the carousel. Circle first: when the circle settles
+ * with fewer than two rounds the shelf re-reads with scope 'everyone' and the
+ * sub-line says so. No rounds hides the heading and the rail. An error hides
+ * the shelf quietly and logs the way the page's other shelves log.
  */
 
 /** One viewed event per scope per app session (the WhoToFollowRail pattern). */
 const VIEWED = new Set<string>();
+
+/** Rows load ten at a time (RR1 §1). */
+const RECENT_PAGE = 10;
+
+/** get_recent_rounds returns the StandoutRound shape plus total_count. */
+export interface RecentRound extends StandoutRound {
+  total_count: number;
+}
+
+export function useRecentRounds(userId: string | undefined, scope: 'circle' | 'everyone', enabled: boolean) {
+  return useInfiniteQuery({
+    queryKey: ['explore', 'recent-rounds', scope, userId],
+    enabled: enabled && !!userId,
+    staleTime: 60_000,
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
+      const { data, error } = await supabase.rpc('get_recent_rounds' as never, {
+        p_scope: scope,
+        p_window: '14',
+        p_limit: RECENT_PAGE,
+        p_offset: pageParam,
+      } as never);
+      if (error) throw error;
+      return (data ?? []) as unknown as RecentRound[];
+    },
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage.length === 0) return undefined;
+      const loaded = pages.reduce((n, page) => n + page.length, 0);
+      const total = lastPage[0]?.total_count ?? loaded;
+      return loaded < total ? loaded : undefined;
+    },
+  });
+}
 
 const oneLine: React.CSSProperties = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 const clamp2: React.CSSProperties = {
@@ -114,7 +142,7 @@ function RoundCard({
   const toPar = roundToPar(round);
   const toParText = toParLabel(toPar);
   const shape = round.whs_score_id ? shapes?.get(round.whs_score_id) ?? null : null;
-  const sentence = standoutSentenceParts(round, locale);
+  const sentence = recentSentenceParts(round, locale);
   return (
     <div
       role="button"
@@ -167,72 +195,11 @@ function RoundCard({
           ))}
         </span>
       ) : null}
-      <span style={{ ...clamp2, fontSize: 12.5, color: A.MUTE, marginTop: 'auto', lineHeight: 1.4 }}>
-        {t(sentence.key, { ...sentence, defaultValue: sentence.defaultValue })}
-      </span>
-    </div>
-  );
-}
-
-function FeatCard({
-  feat,
-  locale,
-  onOpenRound,
-  onOpenMember,
-}: {
-  feat: FeatYearRow;
-  locale: string;
-  onOpenRound?: (scoreId: string, ownerUserId: string | null) => void;
-  onOpenMember?: (userId: string) => void;
-}) {
-  const { t } = useTranslation('courses');
-  const unit = t(`amateur.leaderboards.unit.${feat.denominator_unit}`);
-  const rarity = feat.events > 0
-    ? t('amateur.leaderboards.featRarity', { n: Math.round(feat.denominator / feat.events).toLocaleString(), unit })
-    : null;
-  const open = () => {
-    if (!feat.latest_score_id) return;
-    analyticsEvents.track('rounds_shelf_card_tapped', { kind: 'feat', feat_kind: feat.feat_kind });
-    onOpenRound?.(feat.latest_score_id, feat.latest_user_id);
-  };
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      data-rounds-shelf-card="feat"
-      onClick={open}
-      onKeyDown={(event) => {
-        if (event.key !== 'Enter' && event.key !== ' ') return;
-        event.preventDefault();
-        open();
-      }}
-      style={{
-        flex: 'none', width: SHELF_CARD.width, height: SHELF_CARD.height, boxSizing: 'border-box',
-        scrollSnapAlign: 'start', background: SHELF_CARD.background,
-        border: `1px solid ${SHELF_CARD.border}`, borderRadius: SHELF_CARD.radius,
-        padding: SHELF_CARD.padding, display: 'flex', flexDirection: 'column', cursor: 'pointer',
-      }}
-    >
-      <WhoRow
-        userId={feat.latest_user_id}
-        name={feat.latest_display_name || t('discover.aMember', 'A member')}
-        photoUrl={feat.latest_photo_url}
-        sub={courseAndDate(feat.latest_course_name, feat.latest_play_date, locale)}
-        onOpenMember={onOpenMember}
-      />
-      <span style={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        height: FEAT_TILE.height, borderRadius: FEAT_TILE.radius, background: FEAT_TILE.background,
-        marginTop: 12, padding: '0 14px',
-      }}>
-        <b style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em' }}>
-          {t(`amateur.roundsShelf.feat.${feat.feat_kind === 'clean_card' ? 'cleanCard' : feat.feat_kind}`, feat.feat_kind)}
-        </b>
-        {rarity ? <span style={{ fontSize: 11.5, color: A.MUTE, marginTop: 3 }}>{rarity}</span> : null}
-      </span>
-      <span style={{ ...clamp2, fontSize: 12.5, color: A.MUTE, marginTop: 'auto', lineHeight: 1.4 }}>
-        {t('amateur.roundsShelf.latestOf', { count: feat.events, events: feat.events, defaultValue: feat.events === 1 ? 'The only one this year' : 'The latest of {{events}} this year' })}
-      </span>
+      {sentence ? (
+        <span style={{ ...clamp2, fontSize: 12.5, color: A.MUTE, marginTop: 'auto', lineHeight: 1.4 }}>
+          {t(sentence.key, { ...sentence, defaultValue: sentence.defaultValue })}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -251,37 +218,29 @@ export function RoundsThisWeekShelf({
   const navigate = useNavigate();
   const locale = i18n.language || 'en';
 
-  const circleFilters = useMemo(() => ({ ...DEFAULT_FILTERS, scope: 'circle' as const }), []);
-  const everyoneFilters = useMemo(() => ({ ...DEFAULT_FILTERS, scope: 'everyone' as const }), []);
-  const circle = useStandoutRounds(userId, circleFilters, !!userId);
+  const circle = useRecentRounds(userId, 'circle', !!userId);
   /* Fewer than two circle rows re-reads as everyone; the sub-line says so. */
-  const fellBack = circle.isFetched && (circle.data ?? []).length < 2;
-  const everyone = useStandoutRounds(userId, everyoneFilters, !!userId && fellBack);
+  const circleTotal = circle.data?.pages[0]?.[0]?.total_count ?? circle.data?.pages[0]?.length ?? 0;
+  const fellBack = circle.isFetched && circleTotal < 2;
+  const everyone = useRecentRounds(userId, 'everyone', !!userId && fellBack);
   const scope: 'circle' | 'everyone' = fellBack ? 'everyone' : 'circle';
   const roundsQ = fellBack ? everyone : circle;
 
-  const featsQ = useFeatsWindow(userId, 'year', !!userId);
-
-  const rounds = useMemo(() => (roundsQ.data ?? []).slice(0, 4), [roundsQ.data]);
-  const feats = useMemo(() => eligibleFeats(featsQ.data ?? []), [featsQ.data]);
-  const cards = useMemo(() => buildShelfCards(rounds, feats), [rounds, feats]);
-  const roundIds = useMemo(
-    () => cards.filter((c): c is { kind: 'round'; round: StandoutRound } => c.kind === 'round').map((c) => c.round.whs_score_id),
-    [cards],
-  );
+  const rounds = useMemo(() => roundsQ.data?.pages.flat() ?? [], [roundsQ.data]);
+  const roundIds = useMemo(() => rounds.map((r) => r.whs_score_id), [rounds]);
   const shapes = useRoundHoleShapes(roundIds);
 
-  const loading = !!userId && (!circle.isFetched || (fellBack && !everyone.isFetched) || !featsQ.isFetched);
-  const errored = circle.isError || (fellBack && everyone.isError) || featsQ.isError;
+  const loading = !!userId && (!circle.isFetched || (fellBack && !everyone.isFetched));
+  const errored = circle.isError || (fellBack && everyone.isError);
   useEffect(() => {
-    if (errored) console.warn('[rounds shelf] read failed; shelf hidden', { circle: circle.isError, everyone: everyone.isError, feats: featsQ.isError });
-  }, [errored, circle.isError, everyone.isError, featsQ.isError]);
+    if (errored) console.warn('[rounds shelf] read failed; shelf hidden', { circle: circle.isError, everyone: everyone.isError });
+  }, [errored, circle.isError, everyone.isError]);
 
   /* rounds_shelf_viewed — once per session per scope, at 50% visibility. */
   const viewRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = viewRef.current;
-    if (!el || cards.length === 0 || VIEWED.has(scope)) return;
+    if (!el || rounds.length === 0 || VIEWED.has(scope)) return;
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -296,35 +255,37 @@ export function RoundsThisWeekShelf({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [scope, cards.length]);
+  }, [scope, rounds.length]);
+
+  /* RR1 §4 — the sentinel loads the next page as the end nears. */
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const { hasNextPage, isFetchingNextPage, fetchNextPage } = roundsQ;
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const rail = railRef.current;
+    if (!sentinel || !rail || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !isFetchingNextPage) fetchNextPage();
+        }
+      },
+      { root: rail, rootMargin: '0px 300px 0px 0px' },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, rounds.length]);
 
   if (!userId) return null;
 
-  const goRounds = (from: 'header' | 'door') => {
+  const goRounds = (from: 'header' | 'end') => {
     analyticsEvents.track('rounds_door_tapped', { from });
     navigate('/rounds');
   };
 
-  const door = (
-    <button
-      type="button"
-      data-rounds-shelf-door
-      onClick={() => goRounds('door')}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        margin: '12px 16px 0', height: SHELF_DOOR.height, padding: '0 16px',
-        borderRadius: SHELF_DOOR.radius, background: SHELF_DOOR.background,
-        border: `1px solid ${SHELF_DOOR.border}`, cursor: 'pointer', fontFamily: SANS,
-        color: A.INK, fontSize: 14.5, fontWeight: 600, textAlign: 'left',
-      }}
-    >
-      <span>{t('amateur.roundsShelf.door', 'Leaderboards, feats and every round')}</span>
-      <ChevronRight size={16} color={A.DIM} />
-    </button>
-  );
-
   if (loading) {
-    /* Reserve the heading, one row of two cards and the door; expand outwards only. */
+    /* Reserve the heading and one row of two cards; expand outwards only. */
     return (
       <div data-rounds-shelf="loading" aria-hidden>
         <div style={{ padding: '28px 16px 10px' }}>
@@ -336,19 +297,18 @@ export function RoundsThisWeekShelf({
             <div key={i} style={{ flex: 'none', width: SHELF_CARD.width, height: SHELF_CARD.height, borderRadius: SHELF_CARD.radius, background: A.PANEL }} />
           ))}
         </div>
-        {door}
       </div>
     );
   }
 
   return (
-    <div data-rounds-shelf={cards.length > 0 ? 'ready' : 'empty'}>
-      {cards.length > 0 && !errored ? (
+    <div data-rounds-shelf={rounds.length > 0 ? 'ready' : 'empty'}>
+      {rounds.length > 0 && !errored ? (
         <>
-          <div ref={viewRef} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '28px 16px 10px' }}>
+          <div ref={viewRef} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '28px 16px 12px' }}>
             <div>
               <b style={{ display: 'block', fontSize: 19, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>
-                {t('amateur.roundsShelf.title', 'Rounds this week')}
+                {t('amateur.roundsShelf.title', 'Recent rounds')}
               </b>
               <span style={{ display: 'block', fontSize: 12.5, color: A.DIM, marginTop: 2 }}>
                 {scope === 'circle'
@@ -358,44 +318,78 @@ export function RoundsThisWeekShelf({
             </div>
             <button
               type="button"
+              data-rounds-shelf-leaderboards
               onClick={() => goRounds('header')}
-              style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 14, fontWeight: 600, color: A.MUTE }}
+              style={{
+                flex: 'none', display: 'flex', alignItems: 'center', gap: 5, height: 32,
+                padding: '0 12px 0 13px', borderRadius: 999, background: '#17171B',
+                border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', fontFamily: SANS,
+                fontSize: 13.5, fontWeight: 600, color: A.INK,
+              }}
             >
-              {t('amateur.roundsShelf.allRounds', 'All rounds')}
+              {t('amateur.roundsShelf.leaderboards', 'Leaderboards')}
+              <ChevronRight size={14} color={A.MUTE} />
             </button>
           </div>
           <div
+            ref={railRef}
             data-rounds-shelf-rail
             style={{
               display: 'flex', gap: SHELF_CARD.gap, padding: '0 16px', overflowX: 'auto',
-              scrollbarWidth: 'none', scrollSnapType: 'x proximity', overscrollBehaviorX: 'contain',
-              willChange: 'transform',
+              scrollbarWidth: 'none', scrollSnapType: 'x proximity', scrollPaddingInline: 16,
+              overscrollBehaviorX: 'contain', willChange: 'transform',
             }}
           >
-            {cards.map((card: ShelfCard) =>
-              card.kind === 'round' ? (
-                <RoundCard
-                  key={`round:${card.round.whs_score_id ?? card.round.user_id}:${card.round.play_date}`}
-                  round={card.round}
-                  shapes={shapes}
-                  locale={locale}
-                  onOpenRound={onOpenRound}
-                  onOpenMember={onOpenMember}
-                />
-              ) : (
-                <FeatCard
-                  key={`feat:${card.feat.feat_kind}`}
-                  feat={card.feat}
-                  locale={locale}
-                  onOpenRound={onOpenRound}
-                  onOpenMember={onOpenMember}
-                />
-              ),
-            )}
+            {rounds.map((round) => (
+              <RoundCard
+                key={`round:${round.whs_score_id ?? round.user_id}:${round.play_date}`}
+                round={round}
+                shapes={shapes}
+                locale={locale}
+                onOpenRound={onOpenRound}
+                onOpenMember={onOpenMember}
+              />
+            ))}
+            {hasNextPage ? <div ref={sentinelRef} data-rounds-shelf-sentinel style={{ flex: 'none', width: 1 }} aria-hidden /> : null}
+            {isFetchingNextPage ? (
+              <div
+                data-rounds-shelf-skeleton
+                style={{
+                  flex: 'none', width: SHELF_SKELETON.width, height: SHELF_SKELETON.height,
+                  borderRadius: SHELF_SKELETON.radius, background: SHELF_SKELETON.background,
+                }}
+              />
+            ) : null}
+            {!hasNextPage && !isFetchingNextPage ? (
+              <button
+                type="button"
+                data-rounds-shelf-end
+                onClick={() => goRounds('end')}
+                style={{
+                  flex: 'none', width: SHELF_END.width, height: SHELF_END.height, boxSizing: 'border-box',
+                  scrollSnapAlign: 'start', borderRadius: SHELF_END.radius, background: SHELF_END.background,
+                  border: `1px solid ${SHELF_END.border}`, padding: SHELF_END.padding, cursor: 'pointer',
+                  display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start',
+                  gap: SHELF_END.gap, fontFamily: SANS, textAlign: 'left',
+                }}
+              >
+                <span style={{
+                  width: 38, height: 38, borderRadius: 999, background: '#F8FAFC',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none',
+                }}>
+                  <ChevronRight size={18} color="#0B0B0D" />
+                </span>
+                <b style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3, color: A.INK }}>
+                  {t('amateur.roundsShelf.endTitle', "That's the last 14 days")}
+                </b>
+                <span style={{ fontSize: 12, color: A.DIM, lineHeight: 1.35 }}>
+                  {t('amateur.roundsShelf.door', 'Leaderboards, feats and every round')}
+                </span>
+              </button>
+            ) : null}
           </div>
         </>
       ) : null}
-      {door}
     </div>
   );
 }
