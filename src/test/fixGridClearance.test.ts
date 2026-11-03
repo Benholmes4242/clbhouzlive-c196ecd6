@@ -12,6 +12,7 @@ function sourceFiles(dir: string): string[] {
     const file = path.join(dir, entry.name);
     return entry.isDirectory() ? sourceFiles(file) : /\.(ts|tsx)$/.test(file) && !/\.(test|spec)\./.test(file) ? [file] : [];
   });
+}
 function moduleFile(spec: string, from: string): string | undefined {
   const base = spec.startsWith('@/') ? path.join('src', spec.slice(2)) : spec.startsWith('.') ? path.join(path.dirname(from), spec) : '';
   if (!base) return;
