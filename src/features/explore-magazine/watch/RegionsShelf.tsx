@@ -35,11 +35,6 @@ export function RegionsShelf({ userId }: { userId: string | null | undefined }) 
           >
             {r.poster_url ? <img src={r.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
             <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.75))' }} />
-            {r.is_home ? (
-              <span data-your-patch style={{ position: 'absolute', left: 10, top: 9, zIndex: 1, height: 22, padding: '0 8px', borderRadius: 999, background: 'rgba(0,0,0,0.5)', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', display: 'flex', alignItems: 'center' }}>
-                {t('amateur.watch.regions.yourPatch', 'Your patch')}
-              </span>
-            ) : null}
             <b style={{ position: 'absolute', left: 12, bottom: 25, zIndex: 1, fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>{r.region}</b>
             <span data-region-count style={{ position: 'absolute', left: 12, bottom: 9, zIndex: 1, fontSize: 11.5, color: 'rgba(248,250,252,0.78)', fontVariantNumeric: 'tabular-nums' }}>
               {videosLabel(Number(r.videos))}

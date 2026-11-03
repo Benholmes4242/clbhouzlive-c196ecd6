@@ -210,11 +210,11 @@ describe('By region', () => {
     expect(container.querySelector('[data-regions-shelf]')).toBeNull();
   });
 
-  it('shows Your patch only on the home region, and singular/plural counts', () => {
+  it('shows no Your patch on any region, and retains singular/plural counts', () => {
     const { container } = wrap(<RegionsShelf userId="me" />);
     const patch = container.querySelectorAll('[data-your-patch]');
-    expect(patch).toHaveLength(1);
-    expect(container.querySelector('[data-region-tile="Kent"] [data-your-patch]')).not.toBeNull();
+    expect(patch).toHaveLength(0);
+    expect(container.querySelector('[data-region-tile="Kent"] [data-your-patch]')).toBeNull();
     expect(container.querySelector('[data-region-tile="Down"] [data-region-count]')!.textContent).toBe('8 videos');
     expect(container.querySelector('[data-region-tile="Wicklow"] [data-region-count]')!.textContent).toBe('1 video');
     expect(videosLabel(1)).toBe('1 video');

@@ -54,6 +54,7 @@ vi.mock('@/features/explore-magazine/watch/useWatchBottom', () => ({
   useTop100Videos: () => f.top100,
 }));
 vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutateAsync: f.toggle }) }));
+vi.mock('@/features/find-people/useRecentActivity', () => ({ useRecentActivity: () => new Map() }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span data-stub="avatar" /> }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: f.openWithOrigin }));
@@ -137,7 +138,7 @@ describe('WS3 order on For you', () => {
     f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
   }
 
-  it('By region → Creator to follow → Top 100 on film → Long form → the community rail', () => {
+  it('By region → Creators to follow → Top 100 on film → Long form → the community rail', () => {
     seed();
     wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const regions = q('[data-stub="regions"]');
@@ -171,7 +172,7 @@ describe('WS3 Creator to follow', () => {
   it('hides, heading included, with no row and on error', () => {
     wrap(<CreatorSpotlight userId="me" visitKey="v1" />);
     expect(q('[data-spotlight]')).toBeNull();
-    expect(headingByText('Creator to follow')).toBeNull();
+    expect(headingByText('Creators to follow')).toBeNull();
     cleanup();
     f.spotlight = { data: spot(), isError: true };
     wrap(<CreatorSpotlight userId="me" visitKey="v1" />);
@@ -468,14 +469,14 @@ describe('WS6 swipeable creator cards', () => {
     const now = new Date('2026-11-03T12:00:00Z');
     expect(spotlightRelative(new Date(now.getTime() - days * 86400000).toISOString(), now)).toBe(expected);
   });
-  it('plural read calls limit three and caches picks within one visit', async () => {
+  it('plural read calls limit five and caches picks within one visit', async () => {
     f.rpc.mockResolvedValue({ data: [spot()], error: null });
     function Read({ visit }: { visit: string }) { const result = realBottom.useWatchSpotlights('me', visit); return <span data-read>{result.data?.length ?? 0}</span>; }
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const tree = (visit: string) => <MemoryRouter><QueryClientProvider client={client}><Read visit={visit} /></QueryClientProvider></MemoryRouter>;
     const view = render(tree('first'));
     await waitFor(() => expect(q('[data-read]')?.textContent).toBe('1'));
-    expect(f.rpc).toHaveBeenCalledWith('get_watch_spotlights', { p_limit: 3 });
+    expect(f.rpc).toHaveBeenCalledWith('get_watch_spotlights', { p_limit: 5 });
     view.rerender(tree('first')); expect(f.rpc).toHaveBeenCalledTimes(1);
     view.rerender(tree('second')); await waitFor(() => expect(f.rpc).toHaveBeenCalledTimes(2));
   });

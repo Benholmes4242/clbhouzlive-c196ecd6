@@ -18,7 +18,7 @@ export function useWatchSpotlights(userId: string | null | undefined, visitKey: 
     refetchOnReconnect: false,
     refetchOnMount: false,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_watch_spotlights', { p_limit: 3 });
+      const { data, error } = await supabase.rpc('get_watch_spotlights', { p_limit: 5 });
       if (error) throw error;
       return data ?? [];
     },
