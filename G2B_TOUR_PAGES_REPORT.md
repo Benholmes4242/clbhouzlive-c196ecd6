@@ -43,6 +43,7 @@ Error: No QueryClient set, use QueryClientProvider to set one
 Last full green6,298/564 NAV_SQ1 → HB6 +28/+1 = candidate6,326/565 → tournament +75/+3 = candidate6,401/568 → G2A +5/+1 = last reported candidate**6,406/569** → G2B +11/+1 solely `g2bTourHeaders.test.tsx` = **6,417/570 candidate**, not full passing result. Existing tests deleted/renamed/rewritten: **none**; no old assertion diff to quote. No suite inventory changed by passing existing focused files.
 
 ## Browser limitation
+Historical failure below predates CASE_CLASH_1; the lowercase rules path in this report has been updated to its current name. The original fixture was lost from temporary storage. A replacement browser bundle of both real pages now succeeds; see CASE_CLASH_1_REPORT.md. This is bundle verification, not fresh visual or authenticated verification.
 Temporary fixture prepared under `/tmp/browser/g2b` with real heroes, TourPageShell, back capsule and observer, manual sat47/clearance109 and fabricated identities (signed-out data unavailable; external unmanaged sign-in). It did **not** include full global right-island composition and was not full live-page proof.
 Bundle preparation failed before screenshots:
 ```text

@@ -2,7 +2,7 @@
 
 ## CASE_CLASH_1
 - [x] Rename the shared ladder rules without changing contents; update repository path references and add one recursive case-insensitive source-path guard.
-- [ ] Retry the G2B browser bundle, run four full-suite shards with --maxWorkers=2, confirm automatic build, and record every changed file and reconciled totals in CASE_CLASH_1_REPORT.md.
+- [x] Both real G2B pages bundle successfully; four shards pass 1638/1532/1638/1642 = 6450 tests in 575 files (+1/+1 filename guard); no failures/unhandled errors. Automatic build clean. CASE_CLASH_1_REPORT.md records every file and historical failures.
 
 ## G2F Activity header B
 - [x] Activity-only shell opt-in, shared title and chip dock, unchanged back/mark read/navigation callback and hidden nav. Nine tests added; no existing tests changed.
