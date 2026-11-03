@@ -284,7 +284,7 @@ describe('WS5 one badge, one tile width', () => {
     f.clips.data = { pages: [[hub('clip1', 60)]] };
     const shelf = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const b = badgeIn(shelf.container.querySelector('[data-watch-card="quick"]')!, '1:00');
-    expect([b.style.top, b.style.right, b.style.bottom]).toEqual(['6px', '6px', 'auto']);
+    expect([b.style.top, b.style.right, b.style.bottom]).toEqual(['6px', '6px', '']);
     shelf.unmount();
     const grid = wrap(<WatchFeed userId="me" initialFilter="quick" onDepart={() => {}} />);
     const tile = grid.container.querySelector('[data-watch-card="quick"]')!;
@@ -293,7 +293,7 @@ describe('WS5 one badge, one tile width', () => {
   it('a GlassDurationBadge caller without the new prop still sits bottom-right', () => {
     const { container } = render(<GlassDurationBadge seconds={75} />);
     const b = badgeIn(container, '1:15');
-    expect([b.style.bottom, b.style.right, b.style.top]).toEqual(['6px', '6px', 'auto']);
+    expect([b.style.bottom, b.style.right, b.style.top]).toEqual(['6px', '6px', '']);
   });
   it('the course tile is 156 × 248 with radius 12 and renders the glass badge, not DurationChip', () => {
     const { container } = wrap(<CourseVideosShelf userId="me" />);
@@ -301,7 +301,7 @@ describe('WS5 one badge, one tile width', () => {
     expect([tile.style.width, tile.style.height, tile.style.borderRadius]).toEqual(['156px', '248px', '12px']);
     expect(tile.querySelector('[data-duration]')).toBeNull();
     const b = badgeIn(tile, '0:26');
-    expect([b.style.top, b.style.right, b.style.bottom]).toEqual(['6px', '6px', 'auto']);
+    expect([b.style.top, b.style.right, b.style.bottom]).toEqual(['6px', '6px', '']);
   });
   it('the region tile is 156 wide and 100 tall', () => {
     const { container } = wrap(<RegionsShelf userId="me" />);
