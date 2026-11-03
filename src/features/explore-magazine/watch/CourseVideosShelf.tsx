@@ -15,6 +15,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseVideos } from './useWatchMiddle';
 import { showsCourseShelf, whoLine } from './watchMiddle';
 import { openVideoList } from './openVideoList';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+/* WS5: the Shorts tile size (QH_W × QH_H in WatchFeed.tsx) and its badge props.
+   Literals, not imports: WatchFeed imports this file, so importing back would be circular. */
+const TILE_W = 156; // = QH_W
+const TILE_H = 248; // = QH_H
+const SHELF_BADGE = { placement: 'top-right', top: 6, right: 6 } as const; // = WatchFeed SHELF_BADGE
 
 let viewedThisSession = false;
 /** Test hook: reset the once-per-session flag. */
@@ -81,7 +87,7 @@ export function CourseVideosShelf({ userId, onDepart }: { userId: string | null 
       <div data-course-shelf="loading">
         <ShelfHeading title={title} sub={sub} />
         <div style={shelfRow}>
-          {[0, 1].map((i) => <div key={i} style={{ flex: 'none', width: 156, height: 220, borderRadius: 14, background: A.PANEL }} />)}
+          {[0, 1].map((i) => <div key={i} style={{ flex: 'none', width: TILE_W, height: TILE_H, borderRadius: 12, background: A.PANEL }} />)}
         </div>
       </div>
     );
@@ -98,7 +104,7 @@ export function CourseVideosShelf({ userId, onDepart }: { userId: string | null 
             type="button"
             data-course-tile={row.post_id}
             onClick={() => { onDepart?.(); openVideoList(rows, i); }}
-            style={{ flex: 'none', width: 156, height: 220, borderRadius: 14, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer', textAlign: 'left', fontFamily: SANS, color: A.INK }}
+            style={{ flex: 'none', width: TILE_W, height: TILE_H, borderRadius: 12, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer', textAlign: 'left', fontFamily: SANS, color: A.INK }}
           >
             {row.poster_url || row.media_url ? (
               row.poster_url
@@ -106,7 +112,7 @@ export function CourseVideosShelf({ userId, onDepart }: { userId: string | null 
                 : <video src={`${row.media_url}#t=0.1`} muted playsInline preload="metadata" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : null}
             <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.82))' }} />
-            <DurationChip seconds={row.duration_seconds} top={8} right={8} size={11.5} />
+            <span data-course-badge style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}><GlassDurationBadge seconds={row.duration_seconds ?? null} {...SHELF_BADGE} /></span>
             <span style={{ position: 'absolute', left: 10, right: 10, bottom: 10, zIndex: 1 }}>
               <span data-course-name style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontSize: 12.5, fontWeight: 700, lineHeight: 1.25, textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
                 <MapPin size={11} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 4 }} aria-hidden />

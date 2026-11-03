@@ -84,8 +84,10 @@ import {
 const INSET = 14;
 const CW_W = 184;
 const CW_H = 104;
-const QH_W = 156;
-const QH_H = 248;
+export const QH_W = 156;
+export const QH_H = 248;
+/** WS5: the Shorts shelf glass badge props, shared with Filmed at your courses. */
+export const SHELF_BADGE = { placement: 'top-right', top: 6, right: 6 } as const;
 const CT_W = 124;
 
 /* BRIEF_WATCH_SEE_ALL_IN_PLACE values with no shared token yet. */
@@ -180,7 +182,7 @@ function QuickLayout({ grid, children }: { grid: boolean; children: React.ReactN
   );
 }
 
-function Poster({ row, height, posterH, radius, autoplay, progress, aspect = '9 / 16', badge = 'glass', children }: { row: HubRpcRow; height: number | null; posterH: number; radius: number; autoplay: boolean; progress: number | null; aspect?: string; badge?: 'glass' | 'solid'; children?: React.ReactNode }) {
+function Poster({ row, height, posterH, radius, autoplay, progress, aspect = '9 / 16', badge = 'glass', badgeTopRight = false, children }: { row: HubRpcRow; height: number | null; posterH: number; radius: number; autoplay: boolean; progress: number | null; aspect?: string; badge?: 'glass' | 'solid'; badgeTopRight?: boolean; children?: React.ReactNode }) {
   const poster = posterFor(row, posterH);
   const [failed, setFailed] = useState(false);
   const initial = (creatorName(row) || '?').trim().charAt(0).toUpperCase() || '?';
@@ -193,7 +195,7 @@ function Poster({ row, height, posterH, radius, autoplay, progress, aspect = '9 
       )}
       {autoplay ? <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} /> : null}
       <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
-        {badge === 'solid' ? <SolidDurationBadge seconds={row.duration_seconds} /> : <GlassDurationBadge seconds={row.duration_seconds ?? null} />}
+        {badge === 'solid' ? <SolidDurationBadge seconds={row.duration_seconds} /> : <GlassDurationBadge seconds={row.duration_seconds ?? null} {...(badgeTopRight ? SHELF_BADGE : null)} />}
       </span>
       {children}
       {progress != null ? <WatchProgressBar fraction={progress} /> : null}
@@ -536,7 +538,7 @@ export function WatchFeed({
                   return (
                     <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: quickGrid ? '100%' : QH_W, minWidth: 0 }}>
                       {/* N.2: no autoplay in a 3-across grid — three equally central tiles, one playing, reads as failure. */}
-                      <Poster row={row} height={quickGrid ? null : QH_H} posterH={480} radius={12} autoplay={!quickGrid} progress={barFor(row)} />
+                      <Poster row={row} height={quickGrid ? null : QH_H} posterH={480} radius={12} autoplay={!quickGrid} progress={barFor(row)} badgeTopRight={!quickGrid} />
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3, minHeight: 'calc(12px * 1.3 * 2)' }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>

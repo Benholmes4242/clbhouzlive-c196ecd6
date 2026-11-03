@@ -86,8 +86,13 @@ export function GlassDurationBadge({
   right = 6,
   fontSize = 10,
   inline = false,
+  placement = 'bottom-right',
+  top = 6,
 }: {
   seconds: number | null | undefined;
+  /** WS5: opt-in top-right corner (same pill); default stays bottom-right. */
+  placement?: 'bottom-right' | 'top-right';
+  top?: number;
   bottom?: number;
   right?: number;
   fontSize?: number;
@@ -100,7 +105,7 @@ export function GlassDurationBadge({
     <GlassBadge
       inline={inline}
       fontSize={fontSize}
-      style={inline ? undefined : { position: 'absolute', bottom, right, left: 'auto', top: 'auto' }}
+      style={inline ? undefined : placement === 'top-right' ? { position: 'absolute', top, right, left: 'auto', bottom: 'auto' } : { position: 'absolute', bottom, right, left: 'auto', top: 'auto' }}
     >
       {label}
     </GlassBadge>

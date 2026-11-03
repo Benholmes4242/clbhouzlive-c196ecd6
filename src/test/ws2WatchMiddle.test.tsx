@@ -55,6 +55,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { CourseVideosShelf } from '@/features/explore-magazine/watch/CourseVideosShelf';
 import { RegionsShelf } from '@/features/explore-magazine/watch/RegionsShelf';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import WatchGridPage from '@/pages/WatchGridPage';
 import { nextCursor, regionPath, shortAge, videosLabel, whoLine } from '@/features/explore-magazine/watch/watchMiddle';
 
@@ -184,7 +185,7 @@ describe('Filmed at your courses', () => {
     const tile = container.querySelector('[data-course-tile="v1"]')!;
     expect(tile.querySelector('[data-course-name]')!.textContent).not.toContain('Golf Club');
     expect(tile.querySelector('[data-course-who]')!.textContent).toBe('Benjamin Holmes \u00b7 3d');
-    expect(tile.querySelector('[data-duration]')!.textContent).toBe('0:26');
+    expect(tile.querySelector('[data-course-badge]')!.textContent).toBe('0:26');
   });
 
   it('a tap opens the viewer on that tile with the whole list', () => {
@@ -273,6 +274,39 @@ describe('grid pages', () => {
     expect(arg.index).toBe(2);
     expect(arg.posts).toHaveLength(3);
     expect(f.track).toHaveBeenCalledWith('watch_grid_video_opened', { kind: 'courses' });
+  });
+});
+
+const badgeIn = (el: Element, label: string) => Array.from(el.querySelectorAll('span')).find((n) => n.textContent === label && n.children.length === 0) as HTMLElement;
+
+describe('WS5 one badge, one tile width', () => {
+  it('the Shorts shelf badge sits top-right while the Shorts grid badge is unchanged', () => {
+    f.clips.data = { pages: [[hub('clip1', 60)]] };
+    const shelf = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
+    const b = badgeIn(shelf.container.querySelector('[data-watch-card="quick"]')!, '1:00');
+    expect([b.style.top, b.style.right, b.style.bottom]).toEqual(['6px', '6px', '']);
+    shelf.unmount();
+    const grid = wrap(<WatchFeed userId="me" initialFilter="quick" onDepart={() => {}} />);
+    const tile = grid.container.querySelector('[data-watch-card="quick"]')!;
+    expect(tile.querySelector('[data-watch-badge="duration"]')).not.toBeNull();
+  });
+  it('a GlassDurationBadge caller without the new prop still sits bottom-right', () => {
+    const { container } = render(<GlassDurationBadge seconds={75} />);
+    const b = badgeIn(container, '1:15');
+    expect([b.style.bottom, b.style.right, b.style.top]).toEqual(['6px', '6px', '']);
+  });
+  it('the course tile is 156 × 248 with radius 12 and renders the glass badge, not DurationChip', () => {
+    const { container } = wrap(<CourseVideosShelf userId="me" />);
+    const tile = container.querySelector<HTMLElement>('[data-course-tile="v1"]')!;
+    expect([tile.style.width, tile.style.height, tile.style.borderRadius]).toEqual(['156px', '248px', '12px']);
+    expect(tile.querySelector('[data-duration]')).toBeNull();
+    const b = badgeIn(tile, '0:26');
+    expect([b.style.top, b.style.right, b.style.bottom]).toEqual(['6px', '6px', '']);
+  });
+  it('the region tile is 156 wide and 100 tall', () => {
+    const { container } = wrap(<RegionsShelf userId="me" />);
+    const tile = container.querySelector<HTMLElement>('[data-region-tile]')!;
+    expect([tile.style.width, tile.style.height]).toEqual(['156px', '100px']);
   });
 });
 

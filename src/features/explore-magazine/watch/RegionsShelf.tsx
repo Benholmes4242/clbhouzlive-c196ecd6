@@ -31,7 +31,7 @@ export function RegionsShelf({ userId }: { userId: string | null | undefined }) 
               analyticsEvents.track('watch_region_tapped', { region: r.region, is_home: !!r.is_home });
               navigate(regionPath(r.region));
             }}
-            style={{ flex: 'none', width: 150, height: 100, borderRadius: 14, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer', textAlign: 'left', fontFamily: SANS, color: A.INK }}
+            style={{ flex: 'none', width: 156, height: 100, borderRadius: 14, position: 'relative', overflow: 'hidden', padding: 0, border: 0, background: '#1E1E23', cursor: 'pointer', textAlign: 'left', fontFamily: SANS, color: A.INK }}
           >
             {r.poster_url ? <img src={r.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
             <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.75))' }} />
