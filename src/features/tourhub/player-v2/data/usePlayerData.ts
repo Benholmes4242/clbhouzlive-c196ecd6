@@ -61,7 +61,22 @@ export function usePlayerRaceRank(playerId: string, tour: string, year: number |
       const { data, error } = await supabase.from('sr_player_statistics').select('fedex_rank,sr_seasons!inner(year,tour_name)').eq('player_id', playerId).eq('sr_seasons.year', year).eq('sr_seasons.tour_name', 'pga').limit(1).maybeSingle();
       if (error) throw error; return data?.fedex_rank ?? null;
     }
-    const { data, error } = await supabase.from('tour_season_rankings').select('position').eq('player_id', playerId).eq('tour_code', tour).eq('season_year', year).limit(1).maybeSingle();
+    const { data, error } = await supabase.from('tour_season_rankings').select('position').eq('player_id', playerId).ilike('tour_code', tour).eq('season_year', year).limit(1).maybeSingle();
     if (error) throw error; return data?.position ?? null;
   } });
+}
+export function usePlayerNextEvent(tournamentId: string | null) {
+  return useQuery({queryKey:['player-v3','next-event',tournamentId],enabled:!!tournamentId,staleTime:300_000,queryFn:async()=>{
+    if(!tournamentId)return null;
+    const [event,predictions]=await Promise.all([
+      supabase.from('sr_tournaments').select('start_date').eq('id',tournamentId).maybeSingle(),
+      supabase.from('ai_predictions').select('predictions').eq('tournament_id',tournamentId).order('generated_at',{ascending:false}).limit(1).maybeSingle(),
+    ]);
+    if(event.error)throw event.error;
+    const picks=Array.isArray(predictions.data?.predictions)?predictions.data.predictions.flatMap(row=>{
+      if(!row||typeof row!=='object'||Array.isArray(row))return [];
+      return typeof row.playerId==='string'&&typeof row.playerName==='string'?[{playerId:row.playerId,playerName:row.playerName}]:[];
+    }).slice(0,3):[];
+    return {start_date:event.data?.start_date??null,picks};
+  }});
 }
