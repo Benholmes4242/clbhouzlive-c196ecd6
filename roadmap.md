@@ -1,5 +1,10 @@
 # Roadmap
 
+## VIDEO_POSTERS_1
+- [ ] Add only pick-video-poster with pure measured-frame rules and secret-authenticated existing RPC calls.
+- [ ] Explicit thumbnail times and poster-aligned Watch preview starts/repeats; real players unchanged.
+- [ ] Focused tests, four full shards, clean automatic build, deployment URL and reconciled report (baseline 5,971/545).
+
 ## RR1 Recent rounds on Explore
 - [x] One paged get_recent_rounds read (circle→everyone fallback), feats out of the shelf, Leaderboards pill, 16px snap inset, sentinel pagination, end tile, eight-rule line under every card.
 - [x] rsRoundsShelf.test.tsx rewritten per brief (22 → 31 cases, removals quoted in the report); focused 31/31; four full shards 5,959/545 (+9), zero failures/unhandled errors; automatic build clean; RR1_RECENT_ROUNDS_REPORT.md.
