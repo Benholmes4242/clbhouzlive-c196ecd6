@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
@@ -67,9 +67,10 @@ import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { CreatorSpotlight, __resetSpotlight } from '@/features/explore-magazine/watch/CreatorSpotlight';
 import { Top100FilmShelf } from '@/features/explore-magazine/watch/Top100FilmShelf';
 import WatchGridPage from '@/pages/WatchGridPage';
-import { rankPill, spotlightLine } from '@/features/explore-magazine/watch/watchBottom';
+import { rankPill, spotlightLine, spotlightRelative } from '@/features/explore-magazine/watch/watchBottom';
 
 const real = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchMiddle')>('@/features/explore-magazine/watch/useWatchMiddle');
+const realBottom = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchBottom')>('@/features/explore-magazine/watch/useWatchBottom');
 
 const i18n = createInstance();
 void i18n.init({ lng: 'en', initAsync: false, interpolation: { escapeValue: false }, resources: { en: { courses } } });
@@ -282,7 +283,7 @@ describe('WS3 Top 100 on film', () => {
   it('WS6: renders shared glass duration at top-right', () => {
     f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
     wrap(<Top100FilmShelf userId="me" />);
-    const badge = q('[data-top100-tile="t1"]')?.querySelectorAll('span')[3] as HTMLElement;
+    const badge = Array.from(q('[data-top100-tile="t1"]')?.querySelectorAll('span') ?? []).find(el => el.style.right === '6px' && el.style.top === '6px');
     expect(q('[data-top100-tile="t1"] [data-duration]')).toBeNull();
     expect(badge).toBeTruthy();
   });
