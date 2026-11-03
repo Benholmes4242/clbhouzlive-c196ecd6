@@ -1,6 +1,47 @@
-# HB4_COURSE_DETAILS — STOP
+# HB4_COURSE_DETAILS — COMPLETE
 
-## Failure and status
+## Final verification and authorized correction
+HB4 is complete. User ruled that fitting must happen before ellipsis; only the two authorized calls changed in this correction. shortCourseName itself and its default26 remain unchanged; every test assertion is unchanged.
+```diff
+// GolfClubView.tsx
+-useIslandBackName(/^\/courses\/[^/]+\/?$/.test(pathname) ? shortCourseName(course.name) : null, nameRef);
++useIslandBackName(/^\/courses\/[^/]+\/?$/.test(pathname) ? shortCourseName(course.name, Number.POSITIVE_INFINITY) : null, nameRef);
+// hb4CourseBackName.test.tsx harness
+-useIslandBackName(shortCourseName(name), anchor);
++useIslandBackName(shortCourseName(name, Number.POSITIVE_INFINITY), anchor);
+```
+Suffix stripping and parenthetical handling remain canonical; useFitOneLine now sees the uncut stem and fits16→13px before the existing CSS ellipsis guard. The formerly failing long-name test passes with both original assertions.
+
+Focused command (same six files listed below): **54/54 passed**,6 files, exit0; `/tmp/hb4/focused-correction.log`. Unchanged HB2 IslandDock tests10/10.
+
+| Full-suite command | Passed tests | Passed files |
+| --- | ---: | ---: |
+| `bunx vitest run --maxWorkers=2 --shard=1/4` | 1,594 | 141 |
+| `bunx vitest run --maxWorkers=2 --shard=2/4` | 1,520 | 141 |
+| `bunx vitest run --maxWorkers=2 --shard=3/4` | 1,558 | 141 |
+| `bunx vitest run --maxWorkers=2 --shard=4/4` | 1,606 | 138 |
+| Total | **6,278** | **561** |
+
+All four exited0, zero failed tests/suites and zero Vitest unhandled errors. Baseline6,268/560→6,278/561: +10/+1 solely the ten named hb4CourseBackName cases below; correction adds/removes no tests. Shard boundaries redistribute cases; totals reconcile exactly. No unresolved pre-existing test failure encountered; existing React act warnings remain warnings. Full outputs `/tmp/hb4/shard-{1,2,3,4}.log`; original failure log retained.
+
+## Real-browser screenshots
+Fresh signed-out Chromium390×844, live `/courses/e4d209ba-b83f-423f-95d8-34a2e9878543` (Tralee). `--sat:47px` injected only in the browser HTML response; no app fixture, auth bypass or guest code edit.
+- Top: scroll0, hero heading bottom255px, arrow only, `Go back`, back box **46×46**, top57px. `/tmp/browser/hb4/top.png`.
+- Down700: folded, arrow only, box46×46, heading bottom−445px. `/tmp/browser/hb4/folded.png`.
+- Up650: expanded `Tralee`, label **Back from Tralee**, box107.3125×46, heading bottom−395px. `/tmp/browser/hb4/named.png`.
+- Actual `#root` scrollHeight3438; no page errors. All three screenshots inspected visually; `/tmp/hb4/browser-retry.log` contains measurements. Entry was via the real visible Tralee card; an initial script targeted nonexistent data-course-id and timed out, then was corrected without app edits.
+- The signed-off mock was scrolled down480/up430 and its folded/expanded name screenshots inspected: `/tmp/browser/hb4/mock-folded.png`, `mock-named.png`, `mock-top.png`. Browser-only block-scoping of its inline script was needed because its top-level `const chrome` conflicts with Chromium's built-in chrome binding; the uploaded file is untouched. Earlier file/response attempts failed to render for that apparatus reason; `/tmp/hb4/mock-final.log` confirms `phone ph c named`→`phone ph named`.
+- Preserved hero/tabs/sections and guest right capsule differ from the mock's illustrative content/member account; no frozen element was adopted from the mock. The existing sticky tabs still pass behind fixed islands; course-tab docking remains outside HB4.
+- Authenticated member-right-island proof remains unavailable (external_unmanaged); real signed-out course-name flow was verified. Long-name13px and reduced-motion rule are regression-tested; dedicated browser long-name/reduced-motion measurement was not performed.
+
+Latest automatic build after completed changes:
+```text
+=== build 2026-11-03T16:10:59Z ===
+build OK
+```
+No manual build/typecheck. Additional correction records touched `mem://features/chrome/hb4-shrink-first.md`, `mem://index.md`, this report and roadmap, alongside the two quoted calls. No other product or existing test changes in the correction.
+
+## Historical failure and status (resolved above)
 Implementation is present; focused verification stopped on one new test failure. No correction, rerun, full shards or browser/mock scrolling followed the failure. Automatic preview build is clean. No pre-existing failing test was encountered; the existing islandSquircle act warning remains a warning.
 
 ```text
@@ -71,7 +112,7 @@ EXIT=1
 ```
 No Vitest unhandled error in this output. Full four shards not run after mandated stop.
 
-## Build and outstanding verification
+## Historical build and outstanding verification (superseded above)
 Latest automatic entry:
 ```text
 === build 2026-11-03T15:55:03Z ===
