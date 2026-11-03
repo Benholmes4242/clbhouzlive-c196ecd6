@@ -1,5 +1,10 @@
 # Roadmap
 
+## WS6 Creator to follow and Top 100 on film
+- [ ] Implement plural per-visit read, independent creator cards, recency line, snap rail and clickable scroll dots.
+- [ ] Top 100 156×248 tiles/skeletons with canonical glass rank and duration; frozen content unchanged.
+- [ ] Authorized test rewrites, added coverage, four full shards and clean build; report reconciled against 6,005/548.
+
 ## VIDEO_POSTERS_1
 - [x] Added/deployed only pick-video-poster with pure measured-frame rules and secret-authenticated existing RPC calls; live dry run 200, unauthorized 401, invalid limit 400. No write run or schedule created.
 - [x] Explicit thumbnail times and poster-aligned Watch preview starts/repeats; real players unchanged. Real browser black-intro fixture revealed only >=2s moving picture.
