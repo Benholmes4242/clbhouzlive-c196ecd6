@@ -159,6 +159,26 @@ describe('ActiveRing', () => {
     expect(renderToStaticMarkup(<ActiveRing active={false} surface="canvas"><i /></ActiveRing>)).not.toContain('gradient');
     expect(container.querySelector('[data-active-ring-gap]')).toBeNull();
   });
+  it('inactive + card renders a transparent 2px outer and a 1.5px card band inner', () => {
+    const { container } = render(<ActiveRing active={false} surface="card"><i /></ActiveRing>);
+    const outer = container.querySelector('[data-active-ring="off"]') as HTMLElement;
+    expect(outer.style.padding).toBe('2px');
+    expect(outer.style.background).toBe('');
+    const inner = container.querySelector('[data-active-ring-band]') as HTMLElement;
+    expect(inner).toBeTruthy();
+    expect(inner.style.padding).toBe('1.5px');
+    expect(inner.style.background).toBe('rgb(23, 23, 27)');
+    // Slot totals stay 3.5px a side (2 + 1.5), matching the old single 3.5px.
+    const total = 2 + 1.5;
+    expect(total).toBe(3.5);
+  });
+  it('inactive + canvas stays plain 3.5px clear padding with no band', () => {
+    const { container } = render(<ActiveRing active={false} surface="canvas"><i /></ActiveRing>);
+    expect(container.querySelector('[data-active-ring-band]')).toBeNull();
+    const outer = container.querySelector('[data-active-ring="off"]') as HTMLElement;
+    expect(outer.style.background).toBe('');
+    expect(outer.style.padding).toBe('3.5px');
+  });
 });
 
 describe('WhoToFollowRail', () => {
