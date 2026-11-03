@@ -296,10 +296,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // remains unchanged in globalHeaderRules.ts.
   { match: { exact: '/explore' },                 spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Discover owns fixed header + tabs (now a redirect shim to /amateur)' } },
 
-  // The Amateur destination (bottom-nav tab). Wears the shared floating glass
-  // islands over its 340px hero, exactly as the feed and course detail do:
-  // logo left, standard right capsule, dark tone, hero bleeds beneath.
-  { match: { exact: '/amateur' },                  spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, scrollAway: true, note: 'amateur — islands clear the pinned view row on scroll' } },
+  // HB2: Explore shares Clubhouse's floating/folding header; IslandDock owns
+  // the controls copy below it, leaving the standard right capsule untouched.
+  { match: { exact: '/amateur' },                  spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true, note: 'amateur — floating islands with observer-owned docked controls' } },
 
   // /media — the one media destination. Shared islands, exactly as the course
   // detail page: back on the left (fallback /amateur, the surface its See all
