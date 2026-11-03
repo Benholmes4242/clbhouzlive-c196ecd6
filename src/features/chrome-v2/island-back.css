@@ -2,7 +2,7 @@
 .island-back.island-back:hover { background:var(--island-back-rest); }
 .island-back[data-condensed="true"].island-back { background:var(--island-dock-glass); }
 .island-back[data-named="true"] { padding:0 15px 0 7px; gap:8px; }
-.island-back-arrow { display:block; flex:none; }
+.island-back .island-back-arrow { display:block; flex:none; width:30px; height:30px; }
 .island-back-fold { display:block; flex:0 1 220px; min-width:0; max-width:0; opacity:0; overflow:hidden; transition:var(--island-fold-transition); }
 .island-back[data-named="true"] .island-back-fold { max-width:220px; opacity:1; }
 .island-back-name { display:block; width:100%; font-size:16px; font-weight:700; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
