@@ -16,6 +16,7 @@ import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { setGuestCourseContext } from '@/features/guest/guestGateStore';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
+import { IslandDock } from '@/features/chrome-v2/IslandDock';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { safeGoBack } from '@/utils/navigation';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -32,13 +33,11 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
-import { Z } from '@/config/zIndex';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
 import { useHeroReferenceLine } from '@/components/courses/course-detail/about/useHeroReferenceLine';
 import { useCourseRecordSummary } from '@/components/courses/course-detail/useCourseRecordSummary';
 import { HeroCourseRecord, heroRecordVisible, HERO_RECORD_ROW_EXTRA } from '@/components/courses/course-detail/about/HeroCourseRecord';
 import { SURFACE } from '@/lib/tokens/surface';
-import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
 import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
 
@@ -580,33 +579,21 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
   cinematicHero,
   tabContent,
 }) => {
-  const navigate = useNavigate();
-  const { sentinelRef, stuck: tabsStuck } = useStickySafeAreaState();
+  // G2A: observe the in-place row, not a sticky sentinel. Modal tabs stay above.
+  const tabsRef = useRef<HTMLDivElement>(null);
   return (
     <div className="min-h-screen w-full" data-course-detail>
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       {cinematicHero}
-      <div ref={sentinelRef} style={{ height: 0 }} aria-hidden />
-      <StickySafeAreaScrim visible={tabsStuck} background={A.CANVAS} />
-      {/* The sticky tab band follows the page canvas. It was a light glass
-          (rgba(248,250,252,0.72)) — that band, not FilterChips, is why the
-          course tabs read light. Solid canvas per the mobile-performance rule
-          (no static backdrop-filters). */}
-      <div
-        className="sticky"
-        data-stuck={tabsStuck ? 'true' : 'false'}
-        data-course-review-tabs
-        style={{
-          top: 'var(--sat, 0px)',
-          zIndex: Z.stickyTabs,
-          background: A.CANVAS,
-        }}
-      >
+      <div ref={tabsRef} data-course-review-tabs>
         <CourseDetailShellTabs
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />
       </div>
+      <IslandDock anchorRef={tabsRef}>
+        {() => <CourseDetailShellTabs docked activeTab={activeTab} onTabChange={handleTabChange} />}
+      </IslandDock>
       {tabContent}
     </div>
   );

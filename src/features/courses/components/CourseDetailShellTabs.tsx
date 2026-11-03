@@ -15,6 +15,7 @@ const TABS: { id: CourseDetailTab; labelKey: string }[] = [
 interface CourseDetailShellTabsProps {
   activeTab: CourseDetailTab;
   onTabChange: (tab: CourseDetailTab) => void;
+  docked?: boolean;
 }
 
 /**
@@ -22,15 +23,18 @@ interface CourseDetailShellTabsProps {
  * the Courses / Top 100 shell tabs.
  * The chips share the full run between the gutters rather than
  * sitting centred.
+ * G2A: IslandDock owns the docked copy's gutter, glass and visibility;
+ * GolfClubView supplies the same URL/analytics handler to both copies.
  */
 export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
   activeTab,
   onTabChange,
+  docked = false,
 }) => {
   const { t } = useTranslation('courses');
 
   return (
-    <div className="px-4 py-2">
+    <div className={docked ? undefined : 'px-4 py-2'} data-course-controls={docked ? 'docked' : 'in-place'}>
       <RailChips
         options={TABS.map((tab) => ({ id: tab.id, label: t(tab.labelKey) }))}
         value={activeTab}
