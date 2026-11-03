@@ -1,5 +1,10 @@
 # Roadmap
 
+## HB3 Courses header and island dock
+- [ ] Apply floating/folding chrome to /courses only and reuse IslandDock for the shared-state Courses / Top 100 switch; course details and shared dock behavior stay unchanged.
+- [ ] Add the six requested regressions, capture real folded/docked states at sat47 with top109 and computed paint, then run four maxWorkers2 shards and confirm automatic build.
+- [ ] HB3_COURSES_REPORT.md: reconcile against 6,262 tests / 559 files and quote every authorized existing test change; stop and retain full output for any new failure.
+
 ## HB2 Explore header and island dock
 - [x] Apply Clubhouse folding chrome to /amateur only and replace sticky controls with a shared-state IslandDock; user-ruled selected glass recorded.
 - [x] Focused92/92; real390×844 #root down/up screenshots with sat47 confirm hidden folded dock, shown top109px and resolved glass; shared Shorts readback, guest capsule byte-identical, no page errors.
