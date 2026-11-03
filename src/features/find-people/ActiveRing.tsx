@@ -23,8 +23,20 @@ export function ActiveRing({
   children: ReactNode;
 }) {
   if (!active) {
+    if (surface === 'card') {
+      // Inactive card slot: a 2px transparent cover gap plus a 1.5px card band
+      // (same width as the orange ring), so the unringed side stays 3.5px and
+      // nothing on the card moves.
+      return (
+        <span data-active-ring="off" style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 2, borderRadius: '34%' }}>
+          <span data-active-ring-band="" style={{ display: 'flex', lineHeight: 0, padding: 1.5, borderRadius: '34%', background: CARD_SURFACE }}>
+            {children}
+          </span>
+        </span>
+      );
+    }
     return (
-      <span data-active-ring="off" style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 3.5, borderRadius: '34%', background: surface === 'card' ? CARD_SURFACE : undefined }}>
+      <span data-active-ring="off" style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 3.5, borderRadius: '34%', background: undefined }}>
         {children}
       </span>
     );
