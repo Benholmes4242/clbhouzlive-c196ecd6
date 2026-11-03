@@ -1,5 +1,9 @@
 # Roadmap
 
+## CASE_CLASH_1
+- [x] Rename the shared ladder rules without changing contents; update repository path references and add one recursive case-insensitive source-path guard.
+- [ ] Retry the G2B browser bundle, run four full-suite shards with --maxWorkers=2, confirm automatic build, and record every changed file and reconciled totals in CASE_CLASH_1_REPORT.md.
+
 ## G2F Activity header B
 - [x] Activity-only shell opt-in, shared title and chip dock, unchanged back/mark read/navigation callback and hidden nav. Nine tests added; no existing tests changed.
 - [ ] STOP: focused32 passed/1 failed/33, g2fActivityHeader.test.tsx:35:159 and66:94 “Missing observer” unchanged. Explicit preview-error request cleared TS2305 via MemoryRouter prop-derived type only; build OK19:22:55Z. Full output /tmp/g2f/focused.log; no test reruns/browser/shards. Candidate6449/574 unchanged; G2F_ACTIVITY_REPORT.md.
