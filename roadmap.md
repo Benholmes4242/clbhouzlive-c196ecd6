@@ -3,6 +3,7 @@
 ## HB2 Explore header and island dock
 - [x] Apply Clubhouse folding chrome to /amateur only and replace sticky controls with a shared-state IslandDock; user-ruled selected glass recorded.
 - [ ] Verify observer/focus/accessibility behavior, browser scroll states and resolved selected-glass paint.
+- [x] User-authorized 56px fallback for a nonpositive probe and always-mounted hidden controls; keep observer-boundary expectation unchanged, add exit-mount regression. Ignore mistakenly uploaded Courses mock until HB3.
 - [ ] STOP: focused 90/91; hb2ExploreDock.test.tsx:50:167 expected '-56px 0px 0px 0px', received '-0px 0px 0px 0px'. No correction, browser check or shards after failure; automatic build OK 14:57:57Z. Report HB2_EXPLORE_REPORT.md.
 
 ## ISLAND_SQUIRCLE_1 — squircle islands on header B routes
