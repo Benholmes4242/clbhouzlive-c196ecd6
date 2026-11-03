@@ -87,6 +87,8 @@ interface Props {
   avatar: React.ReactNode;
   onAvatarTap?: () => void;
   displayName: string;
+  /** HB5: page-owned observation; standalone band rendering remains inert. */
+  nameRef?: React.Ref<HTMLHeadingElement>;
   isCreator?: boolean;
   /** Pre-joined home club · region; null when neither resolves. */
   subline: string | null;
@@ -103,6 +105,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
   avatar,
   onAvatarTap,
   displayName,
+  nameRef,
   isCreator = false,
   subline,
   afterSubline,
@@ -177,6 +180,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className={isCreator ? "profile-creator-identity" : undefined}>
           <h1
+            ref={nameRef}
             style={{
               margin: 0,
               fontSize: 21,

@@ -46,6 +46,8 @@ interface Props {
   userId: string;
   viewerUserId?: string | null;
   displayName: string;
+  /** HB5: optional actual cover-name anchor, owned by the profile page. */
+  nameRef?: React.Ref<HTMLHeadingElement>;
   /** Page-owned creator read; hero remains independently renderable. */
   isCreator?: boolean;
   /** First name for the visitor verdict sentence. */
@@ -143,6 +145,7 @@ export const ProfileHero: React.FC<Props> = ({
   userId,
   viewerUserId,
   displayName,
+  nameRef,
   isCreator = false,
   ownerFirstName,
   ownerGender,
@@ -371,6 +374,7 @@ export const ProfileHero: React.FC<Props> = ({
         coverUrl={cover}
         onAvatarTap={onAvatarTap}
         displayName={displayName}
+        nameRef={nameRef}
         isCreator={isCreator}
         subline={subline || null}
         afterSubline={coachLine}

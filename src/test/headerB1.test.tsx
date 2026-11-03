@@ -48,9 +48,11 @@ describe('HEADER_B1 shared state and controls', () => {
     let release = () => {}; act(() => { release = pushForceExpand(); }); expect(result.current).toBe(false); act(release);
     await move(30); expect(result.current).toBe(false);
   });
-  it('non-opted profile remains byte-identical when the nav signal changes', async () => {
-    const { container } = mount('/profile/ben'); const before = container.innerHTML;
-    await move(150); expect(container.innerHTML).toBe(before);
+  it('HB5 profile folds when the nav signal changes', async () => {
+    mount('/profile/ben');
+    const back = screen.getByRole('button', { name: 'Go back' });
+    expect(back).toHaveAttribute('data-condensed', 'false');
+    await move(150); expect(back).toHaveAttribute('data-condensed', 'true');
   });
   it('search and divider fold inaccessible while Connect and avatar stay active', async () => {
     mount(); const search = screen.getByRole('button', { name: 'Search' });

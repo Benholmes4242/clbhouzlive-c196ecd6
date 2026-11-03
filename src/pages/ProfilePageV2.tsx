@@ -46,6 +46,7 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
+import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { CoachProfileLine } from '@/features/coach/BusinessCoachCards';
 import { BandPill, BandDots } from '@/components/profile/hero/ProfileCoverBand';
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
@@ -237,6 +238,13 @@ const ProfilePageV2Content: React.FC = () => {
   
   const { t } = useTranslation('profile');
   const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
+  // HB5: ProfileCoverBand renders the real big name; HeroShell is not mounted.
+  // Keep full-name observation page-owned and reuse HB4 without changing it.
+  const heroNameRef = useRef<HTMLHeadingElement>(null);
+  const displayName = profile?.display_name || 'Golfer';
+  const personalRoot = location.pathname === '/profile' || (location.pathname !== '/profile/quest' && /^\/profile\/[^/]+$/.test(location.pathname));
+  const heroReady = !!user && !!profile?.id && !authLoading && !isResolvingId && !profileLoading && !resolveError && !profileError && !isProfileDeleted && !profileNotFound;
+  useIslandBackName(personalRoot && heroReady ? displayName : null, heroNameRef);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   /* RATED — non-mock `course_ratings` rows for the member. The `= 0` default was
      a confident zero on a failed read; the count is now unknown until fetched,
@@ -829,7 +837,6 @@ const ProfilePageV2Content: React.FC = () => {
 
   if (!user) return null;
 
-  const displayName = profile?.display_name || 'Golfer';
   const avatarInitials = getInitialsFromName(displayName) || '?';
   const avatarFallbackKey = profile?.id || displayName || 'user';
   const username = profile?.username || 'user';
@@ -923,6 +930,7 @@ const ProfilePageV2Content: React.FC = () => {
             isCreator={isCreator}
             coachLine={<CoachProfileLine profileUserId={profile.id} viewerId={user?.id} />}
             displayName={displayName}
+            nameRef={heroNameRef}
             avatarUrl={profile.profile_photo_url}
             coverUrl={profile.header_photo_url ?? null}
             region={profile.location ?? null}

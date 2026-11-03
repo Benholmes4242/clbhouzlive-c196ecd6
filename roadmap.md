@@ -1,5 +1,10 @@
 # Roadmap
 
+## HB5 Profile back-name header
+- [x] Personal profile roots only: history back, shared HB4 full-name observation; optional ref through ProfileHero to actual ProfileCoverBand heading (HeroShell unused). Content/excluded routes unchanged.
+- [ ] STOP: focused54/54; shards1594/1520/1558/1618pass+1fail =6290/6291 executed562 files (+13/+1 solely hb5ProfileBackName from6278/561). tourOverviewBand.test.tsx:67:40 expects profile soft fade null; exact error/full output in HB5_PROFILE_REPORT.md and /tmp/hb5/shard4.log. No correction/rerun; await scoped assertion ruling. Automatic build OK16:34:25Z.
+- [ ] Mock scrolled600/550 and captured; fixture sat47 rest46×46 verified. Folded/named fixture remains expanded/unnamed despite actual scroll, not verified; stop prevents further apparatus work. Hosted member proof unavailable external_unmanaged. Report quotes two authorized existing test rewrites and all13 new cases.
+
 ## HB4 Course detail back-name header
 - [x] Existing /courses/{id} only implementation: fixed folding header and observed short-name expansion; deeper routes/tabs unchanged. Shared boundary extraction; HB2 tests unchanged10/10; authorized HB3 detail assertion quoted in report.
 - [x] Authorized shrink-first correction only to GolfClubView and harness: shortCourseName(name, Number.POSITIVE_INFINITY); assertions/helper default unchanged. Focused54/54; historical failure resolved and original output retained.
