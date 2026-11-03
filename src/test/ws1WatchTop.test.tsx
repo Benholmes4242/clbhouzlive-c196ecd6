@@ -84,7 +84,7 @@ import { retiredReason } from '@/features/admin/lib/retiredEvents';
 import { ExploreTopControls } from '@/features/explore-magazine/watch/ExploreTopControls';
 import type { ExplorePerson } from '@/features/explore-magazine/watch/useExplorePeopleRow';
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
-import { resetCreatorsRowSessionForTests } from '@/features/explore-magazine/watch/CreatorsRow';
+import { CreatorsRow, resetCreatorsRowSessionForTests } from '@/features/explore-magazine/watch/CreatorsRow';
 import { resetWatchLeadSessionForTests } from '@/features/explore-magazine/watch/WatchLead';
 import {
   CREATORS_MIN,
@@ -221,27 +221,27 @@ afterEach(() => cleanup());
 /* ---------------------------------------------------------------- chips */
 
 describe('WS1 chips', () => {
-  it('reads For you · Shorts · Long form, in that order, with no Community chip', () => {
+  it('reads For you · Shorts · Long form · Community, in that order', () => {
     mountFeed();
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form']);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form', 'Community']);
     expect(tabs[0].getAttribute('aria-selected')).toBe('true');
   });
 
-  it('maps the old values: all → For you, quick → Shorts, community → For you', () => {
+  it('maps the old values: all → For you, quick → Shorts, community → Community', () => {
     expect(mapWatchFilter('all')).toBe('all');
     expect(mapWatchFilter('quick')).toBe('quick');
     expect(mapWatchFilter('long')).toBe('long');
-    expect(mapWatchFilter('community')).toBe('all');
+    expect(mapWatchFilter('community')).toBe('community');
     expect(mapWatchFilter(null)).toBe('all');
-    expect(WATCH_CHIPS).toEqual(['all', 'quick', 'long']);
+    expect(WATCH_CHIPS).toEqual(['all', 'quick', 'long', 'community']);
   });
 
-  it('a linked community entry lands on For you', () => {
+  it('a linked community entry lands on Community', () => {
     mountFeed('community');
     const tabs = screen.getAllByRole('tab');
-    expect(tabs[0].getAttribute('aria-selected')).toBe('true');
-    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form']);
+    expect(tabs[3].getAttribute('aria-selected')).toBe('true');
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form', 'Community']);
   });
 
   it('a linked quick entry lands on Shorts', () => {
@@ -329,6 +329,10 @@ describe('WS1 chips', () => {
 
 /* ------------------------------------------------------------- creators */
 
+// ER1: retain all dormant CreatorsRow regressions, but mount the retained component directly.
+function mountCreators() {
+  return render(<MemoryRouter initialEntries={['/amateur']}><I18nextProvider i18n={i18n}><QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><CreatorsRow userId="me" onDepart={() => {}} /><LocationEcho /></QueryClientProvider></I18nextProvider></MemoryRouter>);
+}
 const person = (id: string, over: Partial<ExplorePerson> = {}): ExplorePerson => ({ tier: 'quiet', actor_id: id, display_name: `Name ${id}`, handle: `h-${id}`, avatar_url: null, is_verified: false, is_creator: false, has_new: false, new_post_ids: [], latest_at: null, videos: 0, ...over });
 const people = (...others: ExplorePerson[]) => { f.creators = { data: [person('me', { tier: 'you' }), ...others], isFetched: true, isError: false }; };
 const topCss = readFileSync('src/features/explore-magazine/watch/explore-top.css', 'utf8');
@@ -339,7 +343,7 @@ const norm = (prop: 'background' | 'borderColor', value: string) => { const el =
 describe('EXPLORE_TOP_2 Golfers to watch', () => {
   it('no you card is rendered and no plus or composer path exists', () => {
     people(person('a'));
-    const { container } = mountFeed();
+    const { container } = mountCreators();
     const cards = cardsOf(container);
     expect(cards).toHaveLength(1);
     expect(cards[0].getAttribute('aria-label')).toBe('Name a');
@@ -354,7 +358,7 @@ describe('EXPLORE_TOP_2 Golfers to watch', () => {
   });
   it('shows the Golfers to watch heading through the shelf heading without a sub-line', () => {
     people(person('a'));
-    const { container } = mountFeed();
+    const { container } = mountCreators();
     const row = container.querySelector('[data-watch-creators="row"]') as HTMLElement;
     expect(within(row).getByText('Golfers to watch')).toBeTruthy();
     expect(row.querySelectorAll('[data-explore-card]')[0].previousElementSibling).toBeNull();
@@ -367,7 +371,7 @@ describe('EXPLORE_TOP_2 Golfers to watch', () => {
       person('q', { tier: 'quiet', videos: 38 }),
       person('one', { tier: 'quiet', videos: 1 }),
     );
-    const { container } = mountFeed();
+    const { container } = mountCreators();
     const lines = cardsOf(container).map((c) => [c.querySelector('[data-explore-why]')!.textContent, c.querySelector('[data-explore-detail]')!.textContent, c.querySelector('[data-explore-detail]')!.getAttribute('data-new')]);
     expect(lines).toEqual([
       ['Following', '2 new today', 'true'],
@@ -385,7 +389,7 @@ describe('EXPLORE_TOP_2 Golfers to watch', () => {
   });
   it('names reserve two lines so lines 2 and 3 share a top offset across one- and two-line names', () => {
     people(person('a', { display_name: 'Jay' }), person('b', { display_name: 'golfingwithellie and a much longer second line' }));
-    const { container } = mountFeed();
+    const { container } = mountCreators();
     for (const card of cardsOf(container)) {
       const kids = Array.from(card.children).map((k) => k.className);
       expect(kids).toEqual(['explore-card-ring', 'explore-card-name', 'explore-card-why', 'explore-card-detail']);
@@ -398,22 +402,22 @@ describe('EXPLORE_TOP_2 Golfers to watch', () => {
   });
   it('has_new opens the permitted posts oldest first at index zero', async () => {
     people(person('a', { tier: 'following', has_new: true, new_post_ids: ['old', 'new'] }));
-    mountFeed(); fireEvent.click(screen.getByRole('button', { name: 'Name a' }));
+    mountCreators(); fireEvent.click(screen.getByRole('button', { name: 'Name a' }));
     await vi.waitFor(() => expect(f.openWithOrigin).toHaveBeenCalledWith(expect.objectContaining({ posts: [{ id: 'old' }, { id: 'new' }], index: 0, openedFrom: 'explore-people' })));
     expect(f.loadPosts).toHaveBeenCalledWith(['old', 'new'], expect.objectContaining({ userId: 'me', actorType: 'personal' }));
     expect(f.track).toHaveBeenCalledWith('explore_row_tapped', { tier: 'following', position: 1, has_new: true });
   });
   it('a quiet card goes to the existing profile destination without loading posts', () => {
-    people(person('a')); mountFeed(); fireEvent.click(screen.getByRole('button', { name: 'Name a' }));
+    people(person('a')); mountCreators(); fireEvent.click(screen.getByRole('button', { name: 'Name a' }));
     expect(screen.getByTestId('loc').getAttribute('data-path')).toBe('/profile/h-a');
     expect(f.loadPosts).not.toHaveBeenCalled();
   });
   it('See all appears only at 21 or more others, the rail caps at 20 and has no See all tile', () => {
     people(...Array.from({ length: 20 }, (_, i) => person(`c${i}`)));
-    const first = mountFeed();
+    const first = mountCreators();
     expect(within(first.container.querySelector('[data-watch-creators="row"]') as HTMLElement).queryByText('See all')).toBeNull();
     first.unmount(); people(...Array.from({ length: 21 }, (_, i) => person(`c${i}`)));
-    const second = mountFeed(); const row = second.container.querySelector('[data-watch-creators="row"]') as HTMLElement;
+    const second = mountCreators(); const row = second.container.querySelector('[data-watch-creators="row"]') as HTMLElement;
     expect(within(row).getByText('See all')).toBeTruthy();
     expect(cardsOf(second.container)).toHaveLength(20);
     expect(within(row.querySelector('[data-explore-rail]') as HTMLElement).queryByText('See all')).toBeNull();
@@ -422,16 +426,16 @@ describe('EXPLORE_TOP_2 Golfers to watch', () => {
     expect(showsPeopleSeeAll(21)).toBe(true);
   });
   it('hides for anonymous guests even when people return', () => {
-    f.anonymous = true; people(person('a')); const { container } = mountFeed();
+    f.anonymous = true; people(person('a')); const { container } = mountCreators();
     expect(container.querySelector('[data-watch-creators]')).toBeNull();
   });
   it('the whole section, heading included, is hidden when only you comes back', () => {
-    people(); const { container } = mountFeed();
+    people(); const { container } = mountCreators();
     expect(container.querySelector('[data-watch-creators]')).toBeNull();
     expect(screen.queryByText('Golfers to watch')).toBeNull();
   });
   it('the loading skeleton is a heading place plus three card placeholders', () => {
-    f.creators = { data: [], isFetched: false, isError: false }; const { container } = mountFeed();
+    f.creators = { data: [], isFetched: false, isError: false }; const { container } = mountCreators();
     const skeleton = container.querySelector('[data-watch-creators="skeleton"]') as HTMLElement;
     expect(skeleton.querySelectorAll('.explore-head-skeleton')).toHaveLength(1);
     expect(skeleton.querySelectorAll('.explore-card-skeleton')).toHaveLength(3);
@@ -439,7 +443,7 @@ describe('EXPLORE_TOP_2 Golfers to watch', () => {
   it('See all opens the same sheet with the larger list, without you, and the follow action', async () => {
     people(...Array.from({ length: 21 }, (_, i) => person(`c${i}`)));
     f.creatorsSheet = { data: [person('me', { tier: 'you' }), person('extra')], isFetched: true, isError: false };
-    const { container } = mountFeed(); fireEvent.click(within(container.querySelector('[data-watch-creators="row"]') as HTMLElement).getByText('See all'));
+    const { container } = mountCreators(); fireEvent.click(within(container.querySelector('[data-watch-creators="row"]') as HTMLElement).getByText('See all'));
     expect(f.track).toHaveBeenCalledWith('explore_row_see_all');
     const sheet = screen.getByTestId('bottom-sheet'); expect(within(sheet).getByText('Name extra')).toBeTruthy();
     expect(within(sheet).queryByText('You')).toBeNull();
@@ -447,7 +451,7 @@ describe('EXPLORE_TOP_2 Golfers to watch', () => {
     await vi.waitFor(() => expect(f.follow.mutateAsync).toHaveBeenCalledWith(expect.objectContaining({ targetActorType: 'personal', targetActorId: 'extra' })));
   });
   it('explore_row_viewed fires once per session at 50 percent visibility', () => {
-    people(person('a')); mountFeed(); fireVisible(); fireVisible();
+    people(person('a')); mountCreators(); fireVisible(); fireVisible();
     expect(f.track.mock.calls.filter(([name]) => name === 'explore_row_viewed')).toHaveLength(1);
   });
 });
@@ -459,7 +463,7 @@ describe('EXPLORE_TOP_2 controls', () => {
     const input = screen.getByRole('searchbox'); expect(document.activeElement).toBe(input);
     fireEvent.change(input, { target: { value: 'walton' } }); expect(screen.queryByRole('tablist')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' })); expect(screen.queryByRole('searchbox')).toBeNull();
-    expect(screen.getAllByRole('tab')).toHaveLength(3);
+    expect(screen.getAllByRole('tab')).toHaveLength(4);
   });
   it('a restored query opens directly into the field state', () => {
     render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><ExploreTopControls query="walton" onQuery={() => {}} options={[]} value="all" onChange={() => {}} ariaLabel="Filters" placeholder="Search videos and creators" sticky={false} /></QueryClientProvider></MemoryRouter>);
@@ -627,7 +631,7 @@ describe('WS1 scoping', () => {
     f.creators = { data: [creator('a'), creator('b'), creator('c')], isFetched: true, isError: false };
     f.lead = { data: leadRow(), isFetched: true, isError: false };
     const { container } = mountFeed();
-    expect(container.querySelector('[data-watch-creators="row"]')).toBeTruthy();
+    expect(container.querySelector('[data-watch-creators="row"]')).toBeNull();
     expect(container.querySelector('[data-watch-lead="upright"]')).toBeTruthy();
     fireEvent.click(screen.getByRole('tab', { name: 'Shorts' }));
     expect(container.querySelector('[data-watch-creators="row"]')).toBeNull();
