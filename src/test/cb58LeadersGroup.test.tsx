@@ -166,9 +166,9 @@ describe('CB58 render and tap behavior', () => {
   it('renders after picks and directly after the board without picks', () => {
     fixture.groups = [g]; fixture.picks = true;
     const view = mount(<HeroBoardSection {...props} />);
-    const section = view.container.querySelector('[data-leaders-group]');
+    const section = view.container.querySelector<HTMLElement>('[data-leaders-group]');
     expect(section?.previousElementSibling?.hasAttribute('data-overview-picks')).toBe(true);
-    expect(section?.getAttribute('style')).toContain('border-top: 1px solid var(--th-overview-hairline)');
+    expect(section?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
     cleanup(); fixture.picks = false;
     const without = mount(<HeroBoardSection {...props} />);
     expect(without.container.querySelector('[data-leaders-group]')?.previousElementSibling?.querySelectorAll('[data-hero-tie]').length).toBe(5);

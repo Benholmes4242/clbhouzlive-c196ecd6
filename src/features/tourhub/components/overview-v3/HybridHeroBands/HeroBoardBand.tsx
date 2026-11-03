@@ -50,7 +50,7 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -652,7 +652,7 @@ function PicksBlock({
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS, paddingTop: 8 }}>
-      <div data-overview-picks-hairline style={{ margin: '0 20px', borderTop: '1px solid var(--th-overview-hairline)' }} />
+      <div data-overview-picks-hairline style={{ margin: '0 20px', borderTop: `1px solid ${WHITE_ALPHA_06}` }} />
       <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '14px 20px 8px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
