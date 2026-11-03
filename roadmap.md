@@ -2,7 +2,7 @@
 
 ## DEFAULT_B1
 - [x] Set only the unmatched registry default to shared header B; replace the two authorised obsolete cases and add NotFound folding coverage.
-- [ ] Run focused tests and all four full-suite shards with two workers; quote both test diffs, reconcile totals and confirm automatic build in DEFAULT_B1_REPORT.md. Stop on any new failure.
+- [x] Focused24/24; four shards1638/1535/1638/1644 =6455 tests/575 files (+5/+0); zero failures/unhandled errors. Automatic build OK21:16:24Z. DEFAULT_B1_REPORT.md quotes both authorised diffs and names historical cleared stops.
 
 ## CASE_CLASH_1
 - [x] Rename the shared ladder rules without changing contents; update repository path references and add one recursive case-insensitive source-path guard.
