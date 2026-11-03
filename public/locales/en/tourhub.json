@@ -552,7 +552,7 @@
       "wins_other": "{{count}} wins",
       "topTens_one": "1 top 10",
       "topTens_other": "{{count}} top 10s",
-      "from": "From {{count}} picks ›",
+      "from": "from {{count}} picks ›",
       "followed_one": "1 person you follow has picked. Most picked: {{name}}.",
       "followed_other": "{{count}} people you follow have picked. Most picked: {{name}}.",
       "bestFollowed": "Best pick among people you follow: {{name}}, {{position}}.",

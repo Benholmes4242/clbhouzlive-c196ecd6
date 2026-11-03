@@ -14,6 +14,7 @@ vi.mock('@/features/guest/useGuestActionGate',()=>({useGuestActionGate:()=>mocks
 vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes',()=>({usePickTeeTimes:()=>({data:new Map()})}));
 import { finishedVerdict, compareLivePick, compareFinishedPick, chooseFitStats, ordinal, filterCheckedReasons, lowestFit, catchSentence, modelVoteNote, winningScoreRange, sortedBeatRows, type PickResult } from '@/features/tourhub/components/overview-v3/HybridHeroBands/pickInsightRules';
 import { YourPickCard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickCard';
+import { pickStatusToken } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock';
 import { PicksSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet';
 import { OurRecordSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/OurRecordSheet';
 import { PickMemberBands } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PickMemberBands';
@@ -94,6 +95,12 @@ describe('tournament picks pure rules',()=>{
  it('beat rows include clbhouz sorted by average then picks',()=>{expect(sortedBeatRows([...members,{...members[1],user_id:'tie',avg_percentile:73,picks:31}],record).map(r=>r.user_id)).toEqual(['viewer','other','tie','clbhouz']);});
 });
 describe('tournament picks surfaces',()=>{
+ it.each(['CUT','MC','WD','DQ'])('finished viewer and shared pick cards preserve the canonical %s token',(status)=>{
+  const expected=status==='CUT'?'MC':status;
+  mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:80,my_status:status,my_score:0}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);
+  expect(document.querySelector('.pick-mine-figure')?.textContent).toBe(expected);
+  expect(pickStatusToken(status)).toBe(expected);
+ });
  it.each(['live','completed'] as const)('guest %s renders no pick card',(phase)=>{
   const view=mount(<YourPickCard guest state={null} phase={phase} ourResults={ours} tourCode="pga" onPick={vi.fn()}/>);
   expect(view.container).toBeEmptyDOMElement();

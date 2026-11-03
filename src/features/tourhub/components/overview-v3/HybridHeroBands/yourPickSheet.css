@@ -16,8 +16,10 @@
 .your-pick-heading small { font-size:11px; font-weight:600; letter-spacing:0; color:var(--pick-dim); }
 .your-pick-row { width:100%; height:auto; display:flex; justify-content:flex-start; gap:11px; padding:9px 0; border:0; border-top:1px solid var(--pick-hair); border-radius:0; background:transparent; color:var(--pick-ink); text-align:left; }
 .your-pick-row:first-child { border-top:0; }
-.your-pick-avatar { flex:none; border-radius:34%; }
-.your-pick-row[aria-checked=true] .your-pick-avatar { box-shadow:var(--pick-selected-ring); }
+.your-pick-avatar { flex:none; display:flex; }
+/* Accent belongs to the avatar's measured box, not the inline row wrapper. */
+.your-pick-face { border-radius:34%; }
+.your-pick-row[aria-checked=true] .your-pick-face { box-shadow:var(--pick-selected-ring); }
 .your-pick-text { flex:1; min-width:0; }
 .your-pick-name { display:flex; align-items:center; gap:7px; font-size:14.5px; font-weight:600; }
 .your-pick-name > span:first-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

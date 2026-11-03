@@ -41,7 +41,7 @@ function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, ini
   useEffect(() => {
     if (!touched && state) setChosen(initialPlayerId ?? state.my_player_id);
   }, [state, touched, initialPlayerId]);
-  const choose = (id: string) => { setTouched(true); setChosen(id); };
+  const choose = (id: string) => { setTouched(true); setChosen(current => current === id ? null : id); };
   const selected = field.find(player => player.player_id === chosen);
   const orderedPicks = ourPicks.slice(0, 3);
   const pickIds = new Set(orderedPicks.map(pick => pick.playerId));
@@ -83,7 +83,7 @@ function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, ini
     return <Button key={player.player_id} variant="ghost" className="your-pick-row" role="radio" aria-checked={chosen === player.player_id}
       aria-label={player.full_name} data-pick-player={player.player_id} onClick={() => choose(player.player_id)}>
       <span className="your-pick-avatar"><PlayerAvatar playerId={player.player_id} playerName={player.full_name} tourCode={tourCode}
-        photoUrl={player.photo_url} headshotOverride={player.headshot_override} size={36} /></span>
+        photoUrl={player.photo_url} headshotOverride={player.headshot_override} size={36} className="your-pick-face" /></span>
       <span className="your-pick-text"><span className="your-pick-name"><span>{player.full_name}</span>
         {rankIndex >= 0 && <span className="your-pick-tag" data-our-pick={rankIndex + 1}>{copy('ourPick', { rank: rankIndex + 1 })}</span>}</span>
         <span className="your-pick-meta block tabular-nums">{player.world_rank == null ? copy('notRanked') : copy('worldRank', { rank: player.world_rank })}{country && ` · ${country}`}</span>
@@ -94,6 +94,7 @@ function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, ini
 
   const loading = fieldQuery.isPending || stateQuery.isFetching && !state;
   const failed = fieldQuery.isError || stateQuery.isError || stateQuery.isSuccess && !state;
+  const submitDisabled = !selected || mutation.isPending || loading || failed || !state;
   return <BottomSheet open onClose={onClose} ariaLabelledBy={titleId} className="your-pick-sheet"
     maxHeight="85dvh" topRadius={22} grabberPadding="8px 0 12px" grabberRadius={2}
     style={{ height: '85dvh', paddingBottom: 0 }}>
@@ -126,8 +127,9 @@ function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, ini
           {heading('field', copy('rankingOrder'))}<div role="radiogroup" aria-label={copy('field')} data-pick-field>{remaining.map(playerRow)}</div>
         </>}
       </div>
-      <footer className="your-pick-bar"><Button variant="ghost" className="your-pick-submit" data-pick-submit
-        disabled={!selected || mutation.isPending || loading || failed || !state} onClick={() => void submit()}>
+      <footer className="your-pick-bar"><Button variant={null} size={null} className="your-pick-submit" data-pick-submit
+        style={{ background: submitDisabled ? 'var(--pick-disabled)' : 'var(--pick-amber)', color: submitDisabled ? 'var(--pick-dim)' : 'var(--pick-on-amber)', fontWeight: 800, fontSize: 15, height: 48, borderRadius: 999, opacity: 1 }}
+        disabled={submitDisabled} onClick={() => void submit()}>
         {selected ? copy('pickPlayer', { name: selected.full_name }) : copy('choosePlayer')}
       </Button><div className="your-pick-footnote">{copy('changeUntilTee')}</div></footer>
     </>}
