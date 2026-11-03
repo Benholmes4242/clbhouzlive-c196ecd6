@@ -1,5 +1,9 @@
 # Roadmap
 
+## Tour Overview Merged Airy
+- [ ] Merge the situation and Full board into the 340px photo with the resolved20px inset; tighten only the specified overview blocks in all three states.
+- [ ] Update authorized geometry/structure coverage, run focused and four full-suite shards, confirm automatic checks, and reconcile all tests/files in the report.
+
 ## WS6.1 Creator card width and names
 - [x] Correct multi-card width to min(340px, calc(100% - 18px)); uncut wrapping names with inline verification; preserve all other geometry and actions.
 - [x] Focused41/41; full shards1501+1469+1501+1554=6,025/548 (+2 named ws3WatchBottom cases); zero failures/unhandled errors; automatic build clean. WS6_1_REPORT.md lists files and unchanged existing tests; isolated320/375/390px fit verified.
