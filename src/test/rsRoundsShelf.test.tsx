@@ -82,6 +82,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { RoundsThisWeekShelf } from '@/features/explore-magazine/watch/RoundsThisWeekShelf';
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import RoundsPage from '@/pages/RoundsPage';
+import { resolveChrome } from '@/features/chrome-v2/registry';
 import AmateurPage from '@/pages/AmateurPage';
 import {
   recentSentenceParts,
@@ -452,19 +453,10 @@ describe('RS /rounds page', () => {
     expect(f.track).toHaveBeenCalledWith('rounds_page_viewed', {});
   });
 
-  it('back falls back to /amateur when there is no history', () => {
-    render(
-      <MemoryRouter initialEntries={['/rounds']}>
-        <I18nextProvider i18n={i18n}>
-          <Routes>
-            <Route path="/rounds" element={<RoundsPage />} />
-            <Route path="/amateur" element={<div data-testid="amateur-route" />} />
-          </Routes>
-        </I18nextProvider>
-      </MemoryRouter>,
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(screen.getByTestId('amateur-route')).toBeInTheDocument();
+  it('global back retains the /amateur fallback when there is no history', () => {
+    expect(resolveChrome('/rounds', new URLSearchParams()).left).toEqual({
+      kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur',
+    });
   });
 
   function RoundsMarker() {
