@@ -90,8 +90,8 @@ describe('HB4 course detail back name', () => {
     expect(css).toContain('@media (prefers-reduced-motion:reduce) { .island-back.island-back, .island-back-fold { transition:none; } }');
   });
   it('does not leak a previous detail name into a different route', () => {
-    const { rerender } = mount(); passed();
-    rerender(<MemoryRouter initialEntries={['/courses/course-id']}><Controls hero={false} /></MemoryRouter>);
-    expect(screen.getByTestId('published-name').textContent).toBe('');
+    mount(); passed();
+    render(<MemoryRouter initialEntries={['/handicap']}><IslandBackCapsule onBack={back} label="Other back" /></MemoryRouter>);
+    expect(screen.getByRole('button', { name: 'Other back' })).toHaveAttribute('data-named', 'false');
   });
 });
