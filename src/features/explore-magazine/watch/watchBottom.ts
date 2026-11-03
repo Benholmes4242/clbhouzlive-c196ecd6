@@ -1,15 +1,13 @@
 /**
  * WS3 — the bottom of the Watch page: pure rules for Creator to follow and
- * Top 100 on film. Reads are the WATCH_S3_V1 RPCs only (get_watch_spotlight,
+ * Top 100 on film. Reads use get_watch_spotlights,
  * get_creator_videos, get_watch_top100_videos); all return nothing signed out.
  * Video rows share the WS2 shape, so tiles, age and the viewer reuse watchMiddle.
  */
 import type { Database } from '@/integrations/supabase/types';
-import { formatHcp } from '@/lib/formatHcp';
-import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { videosLabel } from './watchMiddle';
 
-export type SpotlightRow = Database['public']['Functions']['get_watch_spotlight']['Returns'][number];
+export type SpotlightRow = Database['public']['Functions']['get_watch_spotlights']['Returns'][number];
 export type Top100VideoRow = Database['public']['Functions']['get_watch_top100_videos']['Returns'][number];
 
 export const SPOTLIGHT_VIDEOS = 3;
@@ -18,28 +16,24 @@ export const TOP100_MIN = 3;
 
 export const showsTop100Shelf = (rows: number) => rows >= TOP100_MIN;
 
-/** "{area} · {n} videos", the area dropped when null. */
-export function spotlightLine(row: Pick<SpotlightRow, 'area' | 'videos'>): string {
-  const area = row.area ? shortCourseName(row.area) : '';
-  return [area, videosLabel(Number(row.videos ?? 0))].filter(Boolean).join(' \u00b7 ');
+/** WS6 newest loaded video's age; absent/failed reads never invent recency. */
+export function spotlightRelative(createdAt: string | null | undefined, now = new Date()): string | null {
+  if (!createdAt) return null;
+  const date = new Date(createdAt);
+  if (!Number.isFinite(date.getTime())) return null;
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const day = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  const days = Math.max(0, Math.round((today - day) / 86_400_000));
+  if (days === 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return `${days} days ago`;
+  if (days < 56) { const weeks = Math.floor(days / 7); return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`; }
+  return `in ${date.toLocaleDateString('en-GB', { month: 'long' })}`;
 }
 
-export type SpotlightCell = { key: 'handicap' | 'rounds' | 'courses' | 'videos' | 'filmed'; value: string };
-
-/** With rounds: Handicap (only when visible), Rounds, Courses. Without: Videos, Courses filmed (hidden at 0). */
-export function spotlightCells(row: Pick<SpotlightRow, 'rounds' | 'handicap_index' | 'courses_played' | 'videos' | 'courses_filmed'>): SpotlightCell[] {
-  const rounds = Number(row.rounds ?? 0);
-  if (rounds > 0) {
-    const out: SpotlightCell[] = [];
-    if (row.handicap_index !== null && row.handicap_index !== undefined) out.push({ key: 'handicap', value: formatHcp(row.handicap_index) });
-    out.push({ key: 'rounds', value: String(rounds) });
-    out.push({ key: 'courses', value: String(Number(row.courses_played ?? 0)) });
-    return out;
-  }
-  const out: SpotlightCell[] = [{ key: 'videos', value: String(Number(row.videos ?? 0)) }];
-  const filmed = Number(row.courses_filmed ?? 0);
-  if (filmed > 0) out.push({ key: 'filmed', value: String(filmed) });
-  return out;
+export function spotlightLine(row: Pick<SpotlightRow, 'videos'>, createdAt?: string | null, now?: Date): string {
+  const relative = spotlightRelative(createdAt, now);
+  return [videosLabel(Number(row.videos ?? 0)), relative].filter(Boolean).join(' \u00b7 ');
 }
 
 /** "{list_label} #{list_rank}". */
