@@ -15,7 +15,11 @@
       "title": "Standout rounds",
       "bestEver": "Best ever at {{course}}",
       "bestSince": "Best at {{course}} since {{month}}",
-      "betterAverage": "{{n}} shots better than average at {{course}}"
+      "betterAverage": "{{n}} shots better than average at {{course}}",
+      "firstRound": "First round at {{course}}",
+      "ordinalRound": "{{ordinal}} round at {{course}}",
+      "aboveAverage": "{{n}} shots above average at {{course}}",
+      "rightOnAverage": "Right on average at {{course}}"
     },
     "justPlayed": {
       "eyebrow": "The latest",
@@ -591,7 +595,9 @@
       }
     },
     "roundsShelf": {
-      "title": "Rounds this week",
+      "title": "Recent rounds",
+      "leaderboards": "Leaderboards",
+      "endTitle": "That's the last 14 days",
       "subCircle": "Your circle, last 14 days",
       "subEveryone": "Everyone, last 14 days",
       "allRounds": "All rounds",

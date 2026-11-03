@@ -405,7 +405,9 @@
       }
     },
     "roundsShelf": {
-      "title": "Runden diese Woche",
+      "title": "Aktuelle Runden",
+      "leaderboards": "Bestenlisten",
+      "endTitle": "Das waren die letzten 14 Tage",
       "subCircle": "Dein Circle, letzte 14 Tage",
       "subEveryone": "Alle, letzte 14 Tage",
       "allRounds": "Alle Runden",

@@ -405,7 +405,9 @@
       }
     },
     "roundsShelf": {
-      "title": "이번 주 라운드",
+      "title": "최근 라운드",
+      "leaderboards": "리더보드",
+      "endTitle": "지난 14일이 전부예요",
       "subCircle": "내 서클, 지난 14일",
       "subEveryone": "전체, 지난 14일",
       "allRounds": "모든 라운드",
