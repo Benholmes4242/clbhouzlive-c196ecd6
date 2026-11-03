@@ -1,5 +1,11 @@
 # Roadmap
 
+## ISLAND_SQUIRCLE_1 — squircle islands on header B routes
+- [x] 16px (34%) radius on both islands for '/', '/clubhouse', '/tourhub' via spec.condense; guest right and all other routes unchanged.
+- [x] Folded left islands measure 46×46 in Chromium (Clubhouse 30+7+1; Tour 32+6+1, tile radius 11); fixed slot flush-marker bug (Tour rest width 202→175 restores signed-off padding).
+- [x] New islandSquircle.test.tsx (8 tests); focused 72/72; shards 1,581+1,524+1,541+1,606 = 6,252/558, zero failures/unhandled; tsc clean; build OK. Report: ISLAND_SQUIRCLE_1_REPORT.md.
+- [ ] Signed-in member right-island browser check unavailable (external_unmanaged auth); unit tests cover its radius.
+
 ## HEADER_B1 — Clubhouse and Tour floating headers
 - [x] Implement three-route soft fade and shared-nav-signal folds with resolved brief padding/300ms geometry/200ms opacity; guest right, clearance and bottom nav unchanged.
 - [x] B1.1 authorized literal rest glass and CSS-only fade geometry/paint; focused57/57. Report quotes all B1 and B1.1 assertion rewrites; no tests removed or added by B1.1.
