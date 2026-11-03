@@ -58,7 +58,7 @@ describe('HEADER_B1 shared state and controls', () => {
     await move(150); expect(search).toHaveAttribute('aria-hidden', 'true'); expect(search.tabIndex).toBe(-1); expect(search.style.pointerEvents).toBe('none'); expect(search.style.maxWidth).toBe('0');
     expect(document.querySelector<HTMLElement>('[data-island-divider]')?.style.maxWidth).toBe('0');
     expect(screen.getByRole('button', { name: 'Connect your handicap' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /posting as/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Open profile menu' })).toBeEnabled();
     await move(130); expect(search.getAttribute('aria-hidden')).toBeNull(); expect(search.style.maxWidth).toBe('19px');
   });
   it('guest right capsule remains byte-identical through condensation', async () => {
