@@ -22653,6 +22653,7 @@ export type Database = {
           latest_at: string
           new_post_ids: string[]
           tier: string
+          videos: number
         }[]
       }
       get_explore_recommendations: {
