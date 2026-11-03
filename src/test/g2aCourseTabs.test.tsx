@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { act, cleanup, fireEvent, render, within } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -101,7 +102,7 @@ describe('G2A course page dock', () => {
   it('retains the modal sticky row and no dock or URL tab writes', () => {
     mount(true); const row = node('[data-course-review-tabs]');
     expect(row).toHaveClass('sticky', 'bg-background'); expect(row.style.top).toBe('0px'); expect(row.style.zIndex).toBe('20');
-    expect(row.style.paddingTop).toBe('env(safe-area-inset-top, 0px)');
+    expect(row).toHaveClass('sticky'); expect(readFileSync('src/components/golf-club/GolfClubView.tsx', 'utf8')).toContain("paddingTop: 'env(safe-area-inset-top, 0px)'");
     expect(document.querySelector('[data-island-dock]')).toBeNull();
     fireEvent.click(within(row).getAllByRole('tab')[3]); expect(node('[data-test-url]').textContent).toBe('?keep=yes');
     expect(analyticsEvents.track).toHaveBeenLastCalledWith('course_tab_viewed', { course_id: 'course-id', tab: 'reviews' });

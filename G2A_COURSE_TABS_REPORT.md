@@ -85,3 +85,6 @@ Referenced memory files `mem://features/chrome/hb4-course-details.md` and `mem:/
 - New `G2A_COURSE_TABS_REPORT.md`: this report.
 
 No SQL/migrations/migration files/deployed RPC/edge/feed_config/native/Median edits; round_pool_cap remains30. No guest-browsing/review-wizard/news/round-plot logic edited; existing course page presentation change is the authorized scope. No publication.
+
+## Final status (STABILISE_1, 3 Nov 2026)
+The test stops that were open in this brief were resolved with test-only changes. The diffs, the authority for each and the named cases are in `STABILISE_1_REPORT.md`. Full suite in four shards with --maxWorkers=2: 1,638 / 1,538 / 1,641 / 1,632 = **6,449 tests, 574 files, 0 failures, 0 unhandled errors**. This confirms the earlier estimate of 6,449. Browser evidence: signed-in checks unavailable (external sign-in); signed-out live checks and fixture coverage are listed in STABILISE_1_REPORT.md.
