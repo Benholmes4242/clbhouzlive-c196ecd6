@@ -1,26 +1,26 @@
 # Roadmap
 
 ## Authorised Picks continuation
-- [ ] Scope integratedPicks circle assertion to its text element, expected copy unchanged.
-- [ ] Add guest public lock/time reads and null-time copy; preserve member state reads.
-- [ ] Run focused checks, then four shards with per-shard counts; stop/report any unexpected failure before TU1.
+- [x] Scope integratedPicks circle assertion to its text element, expected copy unchanged; focused23/23 and shard1 passed.
+- [x] Add guest public lock/time reads and null-time copy; preserve member state reads; five new rule tests pass.
+- [ ] STOP: focused115/115; shard1 1681/1681; shard2 1540 passed/3 failed at tourOverviewMergedAiry.test.tsx:78:98 “expected '16px' to be '14px'” for upcoming/live/completed. Shards3–4 and TU1 not started. Full logs/report preserved in PICKS_AUTHORISED_CONTINUATION_REPORT.md and docs/verification/picks-authorised.
 
 ## TU1 two-up video grids
 - [x] Apply authorised CM1 test-only scrollPageToTop mock; focused 148/148 passed without unhandled errors. Corrected Community mock received/read.
-- [ ] STOP: CM1 shard1 has 1680 passed/1 pre-existing integratedPicks failure at src/test/integratedPicks.test.tsx:36:542, Expected “6 of your circle have picked. Most picked: Ghim.” Received “DG6 of your circle have picked. Most picked: Ghim.” Full output docs/verification/cm1-authorised/shard-1.log. Shards2–4 and TU1 not started; CM1 full green prerequisite unmet.
+- [ ] CM1 full green prerequisite still unmet: integratedPicks assertion now passes; current shard2 spacing failures stop remaining shards (see Authorised Picks continuation).
 - [ ] Once unblocked, extract unchanged SolidDurationBadge and apply signed-off two-up portrait tiles to the three WatchGridPage destinations only; preserve chrome/paging/actions.
 - [ ] Update authorised tile assertions, add rank/duration/wrapping/navigation coverage and report reconciled four-shard totals/build, retaining any failing output.
 
 ## Integrated Our picks section
 - [x] Integrate shared four-state amber card/circle rank read/plain record row, preserving sheets/prior fixes; exact guest lock copy blocked by absent guest-accessible locks_at source.
-- [ ] STOP: focused126 passed/1 failed/127 at integratedPicks.test.tsx:36:542; expected “6 of your circle…” received “DG6 of your circle…” from avatar initials in whole-footer selector. No correction or shards after failure; build OK22:25:29Z. Candidate6509/577 (+23/+1 after CM1 candidate6486/576), INTEGRATED_OUR_PICKS_REPORT.md names both authorised rewrites and missing verification. Await authorised test correction; guest time source remains needed.
+- [x] Historical DG6 assertion stop resolved by authorised text-span selector; guest public lock functions now wired. Current spacing shard stop documented above.
 - [x] CM1 scrollTo fixture error resolved by separately authorised ws1 mock; no Picks product/test changes made.
 
 ## CM1 Community destination
 - [x] Select Community in place, add watch deep links and retire Media page with legacy redirects; guest rules and shared totals preserved.
 - [x] Apply grid specification and white rating correction; corrected cm1-community-see-all.html received/read; surrounding frozen UI preserved.
 - [x] Authorised test-only correction passes focused148/148 with zero unhandled errors; build OK22:36:07Z. Corrected mock received; CM1_REPORT.md preserves historical output and current verification.
-- [ ] Full-suite completion blocked by inherited integratedPicks assertion in shard1 (1680/1681 pass); see TU1 stop above. Signed-in live comparison remains unavailable external_unmanaged.
+- [ ] Full-suite completion blocked by current shard2 Tour spacing failures; corrected integratedPicks passes shard1. Signed-in live comparison remains unavailable external_unmanaged.
 
 ## FIX_GRID_1
 - [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.
