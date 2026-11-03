@@ -48,6 +48,9 @@ export interface HeroTournament {
   /** 'major' is a synthetic pseudo-tour used for pinned major slides (mens or womens). */
   tourSlug: TourId | 'major';
   tourName: string;
+  /** Real event season, independent of synthetic major/lens identity. */
+  pickTourCode?: string;
+  seasonYear?: number;
   defendingChampion: string | null;
   defendingChampionPhotoUrl: string | null;
   defendingChampionPgaTourId: string | null;
@@ -312,6 +315,8 @@ export function useHeroCarouselData() {
 
         return {
           id: row.id,
+          pickTourCode: tourSlug,
+          seasonYear: row.season.year,
           name: row.name,
           status: row.status,
           startDate: row.start_date,
