@@ -11,7 +11,7 @@ import courses from '../../public/locales/en/courses.json';
 /* ---------------------------------------------------------------- mocks */
 
 const f = vi.hoisted(() => ({
-  pools: { circle: [] as unknown[], everyone: [] as unknown[] },
+  pools: { circle: [] as Array<Record<string, unknown>>, everyone: [] as Array<Record<string, unknown>> },
   rpcCalls: [] as Array<Record<string, unknown>>,
   rpcImpl: null as null | ((name: string, args: Record<string, unknown>) => Promise<unknown>),
   shapes: null as unknown,
@@ -160,9 +160,8 @@ beforeEach(() => {
   f.rpcCalls = [];
   f.rpcImpl = null;
   f.shapes = new Map([['s-a', { coursePar: 71, series: [], beads: [], played: 18, birdies: 2, holes: eighteenHoles }]]);
-  rpcSpy = vi.spyOn(supabase, 'rpc').mockImplementation((name: unknown, args: unknown) =>
-    (f.rpcImpl ?? pagedRpc)(name as string, (args ?? {}) as Record<string, unknown>) as never,
-  );
+  rpcSpy = vi.spyOn(supabase, 'rpc').mockImplementation(((name: unknown, args: unknown) =>
+    (f.rpcImpl ?? pagedRpc)(name as string, (args ?? {}) as Record<string, unknown>)) as never);
   vi.spyOn(console, 'warn').mockImplementation(f.warn);
 });
 
