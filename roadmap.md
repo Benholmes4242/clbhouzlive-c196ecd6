@@ -1,8 +1,8 @@
 # Roadmap
 
 ## ER1 Explore top and Community
-- [ ] Remove Golfers to watch, restore Community tile/view, reveal selected tile, and exclude own items outside search locally.
-- [ ] Add scoped regressions, reconcile against 6,041 tests / 549 files, run four full shards, and report build and verification limits.
+- [x] Remove Golfers to watch, restore Community tile/view, reveal selected tile, and exclude own items outside search locally.
+- [x] Focused131/131; four full shards1504+1504+1554+1499=6,061/550 (+20/+1 ER1); zero failures/unhandled errors. Automatic build clean; ER1_REPORT.md quotes changed cases and final CSS/focused timing. Public phone view verified; signed-in checks blocked by external_unmanaged.
 
 ## Tour Overview Merged Airy
 - [x] Merge the situation and Full board into the340px photo with resolved20px inset; apply specified lower-section spacing, preserving TournamentPage's SituationBand.
