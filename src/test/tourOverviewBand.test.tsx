@@ -26,6 +26,7 @@ vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => 
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
 
 import { ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
+import { CHROME_REGISTRY, resolveChrome } from '@/features/chrome-v2/registry';
 import { readFileSync } from 'node:fs';
 
 /* BRIEF_TOUR_OVERVIEW_BAND — '/tourhub' fade at rest, shared band past 24px. */
@@ -62,12 +63,21 @@ describe('Tour overview band', () => {
     mount('/tourhub');
     expect(layer('island-scrim-soft')?.style.transition).toBe('');
   });
-  it('other routes have no opt-in fade and retain canonical glass', () => {
-    mount('/settings');
+  it('DEFAULT_B1 unregistered paths resolve to the soft condensing logo default', () => {
+    expect(resolveChrome('/no-such-page', new URLSearchParams())).toEqual({
+      chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: false, scrim: 'soft', condense: true,
+    });
+  });
+  it('DEFAULT_B1 every explicit island rule retains soft condensing chrome', () => {
+    const islands = CHROME_REGISTRY.filter(rule => rule.spec.chrome === 'island');
+    expect(islands.length).toBeGreaterThan(0);
+    for (const rule of islands) expect(rule.spec).toMatchObject({ scrim: 'soft', condense: true });
+  });
+  it('DEFAULT_B1 messages renders neither an island nor a soft fade', () => {
+    expect(resolveChrome('/messages', new URLSearchParams()).chrome).toBe('none');
+    mount('/messages');
+    expect(layer('island')).toBeNull();
     expect(layer('island-scrim-soft')).toBeNull();
-    const left = document.querySelector<HTMLElement>('[aria-label="Go to home"]');
-    expect(left?.style.background).toBe('rgba(14, 14, 16, 0.84)');
-    expect(left?.style.transition).toBe('');
   });
   it('legacy band and fades have no remaining route consumers or rendered layers', () => {
     const src = readFileSync('src/features/chrome-v2/ChromeIsland.tsx', 'utf8');
