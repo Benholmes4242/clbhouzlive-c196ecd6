@@ -14,6 +14,10 @@ export const NEARLY_DONE = 0.95;
 export const STARTED_MIN = 0.02;
 /** The community rail is injected after this many long-form cards. */
 export const RAIL_EVERY = 3;
+/** ER3: initial community slot, then alternating rails every ten videos. */
+export const WOVEN_RAIL_INTERVAL = 10;
+export const SHORTS_SHELF_COUNT = 10;
+export const WOVEN_RAIL_MIN = 3;
 
 export interface SavedProgress {
   position: number;

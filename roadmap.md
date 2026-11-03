@@ -1,5 +1,10 @@
 # Roadmap
 
+## ER3 Long form woven rails
+- [x] Implement ten top Shorts and unseen alternating rails with minimum three, following-video gate and one-page clip replenishment per rail.
+- [ ] STOP: focused157/158; er3LongFormRails.test.tsx:54:136 “AssertionError: expected '8:20NUntitled videoName 2' to contain 'Title 2'”. No correction/rerun after failure; await scoped fixture/assertion ruling. Full output/tmp/er3/focused.log; report ER3_REPORT.md.
+- [ ] Four shards and browser check not run after stop; candidate6,091/552 (+20/+1), not full-suite result. Automatic build clean10:37:46Z.
+
 ## ER2 Creators to follow and By region
 - [x] Match the plural five-row rail, initial following state and canonical batched activity avatar doors; remove only Your patch.
 - [x] Focused104/104; full four shards1504+1504+1509+1554=6,071/551 (+10/+1 er2CreatorsRegion), zero failures/unhandled errors; automatic build clean. ER2_REPORT.md quotes authorised changes and lists files.

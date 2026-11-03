@@ -133,7 +133,7 @@ afterEach(cleanup);
 describe('WS3 order on For you', () => {
   function seed() {
     f.videos.data = { pages: [[longHub('l1'), longHub('l2'), longHub('l3'), longHub('l4')]] };
-    f.moments = [moment('a')];
+    f.moments = [moment('a'), moment('b'), moment('c')];
     f.spotlight = { data: spot(), isError: false };
     f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
   }
