@@ -26,7 +26,7 @@ Latest automatic build entry, 2026-11-03T19:21:54Z:
 src/test/g2fActivityHeader.test.tsx(3,70): error TS2305: Module '"react-router-dom"' has no exported member 'InitialEntry'.
 ```
 
-Stopped without changing the failing test or correcting the finished-edit type error, under the explicit unexpected-failure stop rule. Build is **not clean**. No reruns, full-suite shards or browser screenshots. The dock test's observer lookup targets the chip row, whereas the actual dock observes its containing ref wrapper; no correction made or authorized by this report.
+Initially stopped without corrections under the unexpected-failure rule. The subsequent explicit preview-error request authorized a type-only correction: removed the unsupported `InitialEntry` import and derived that type from `React.ComponentProps<typeof MemoryRouter>['initialEntries']`. No assertions, fixtures, runtime code or case names changed. Latest automatic preview result is **build OK 2026-11-03T19:22:55Z**. No test reruns, full-suite shards or browser screenshots. The dock test's observer lookup still targets the chip row, whereas the actual dock observes its containing ref wrapper; that failure is unchanged.
 
 ## Counts
 Before: prior candidate **6440 tests / 573 files**. After: candidate **6449 / 574** (+9/+1 from g2fActivityHeader), not a verified all-green inventory or full passing total.
@@ -48,4 +48,4 @@ Existing AC2 24/24 passed; new G2F8/9 passed. No unhandled-error summary in focu
 - `headerB1.test.tsx:97:39` expected23px/received16px; `g2aCourseTabs.test.tsx:104:34` expected `env(safe-area-inset-top, 0px)`/received empty string.
 - Existing siLadder/SiLadder import-case issue untouched. Suspected tourOverviewBand fixture not a confirmed failure.
 
-Full four-shard zero-failure result and top/docked screenshots remain blocked by this new test failure/type error. No mock parity, browser or clean-build claim.
+Full four-shard zero-failure result and top/docked screenshots remain blocked by the unchanged dock test failure. No mock parity or browser claim. Preview type error cleared; candidate suite count before/after this type-only correction remains **6449/574**.

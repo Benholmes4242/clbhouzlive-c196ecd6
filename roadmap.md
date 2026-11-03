@@ -2,7 +2,7 @@
 
 ## G2F Activity header B
 - [x] Activity-only shell opt-in, shared title and chip dock, unchanged back/mark read/navigation callback and hidden nav. Nine tests added; no existing tests changed.
-- [ ] STOP: focused32 passed/1 failed/33, g2fActivityHeader.test.tsx:35:159 and66:94 “Missing observer”; surviving TS2305 at3:70 react-router-dom has no InitialEntry export. Full output /tmp/g2f/focused.log; no fixes/reruns/browser/shards. Candidate6449/574 =6440/573 +9/+1, not green. G2F_ACTIVITY_REPORT.md.
+- [ ] STOP: focused32 passed/1 failed/33, g2fActivityHeader.test.tsx:35:159 and66:94 “Missing observer” unchanged. Explicit preview-error request cleared TS2305 via MemoryRouter prop-derived type only; build OK19:22:55Z. Full output /tmp/g2f/focused.log; no test reruns/browser/shards. Candidate6449/574 unchanged; G2F_ACTIVITY_REPORT.md.
 
 ## G2E Find people header B
 - [x] Shared title/name anchor and global back; tabs dock with unchanged URL setter; search/nav/content preserved. Focused61/61, Chromium dock fixture verified; automatic build OK19:15:13Z.
