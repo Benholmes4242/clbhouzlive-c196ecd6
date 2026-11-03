@@ -25,9 +25,9 @@
 .explore-community-item { min-width:0; color:var(--explore-top-ink); }
 .explore-community-frame { position:relative; aspect-ratio:1 / 1; border-radius:11px; overflow:hidden; }
 .explore-community-frame > button { width:100%; height:100%; display:block; }
-.explore-community-frame > button span[aria-hidden], .explore-community-frame > button .review-tile-chip { display:none; }
-.explore-community-frame > button .standout-figure-chip { display:none; }
-.explore-community-frame > button [style*="bottom:"] { display:none; }
+.explore-community-frame > button span[aria-hidden], .explore-community-frame > button .review-tile-chip { display:none !important; }
+.explore-community-frame > button .standout-figure-chip { display:none !important; }
+.explore-community-frame > button [style*="bottom:"] { display:none !important; }
 .explore-community-name { display:block; margin-top:8px; font-size:13px; font-weight:700; overflow-wrap:anywhere; }
 .explore-community-course { display:block; margin-top:2px; font-size:11.5px; color:var(--explore-top-quiet); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .explore-community-square { aspect-ratio:1 / 1; border-radius:11px; background:var(--explore-top-skeleton); }
