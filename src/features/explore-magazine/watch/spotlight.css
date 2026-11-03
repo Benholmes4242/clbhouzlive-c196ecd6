@@ -4,7 +4,8 @@
 .spotlight-card { box-sizing:border-box; flex:none; width:min(340px, calc(100% - 50px)); scroll-snap-align:start; background:var(--explore-top-panel); border:1px solid var(--explore-top-hair); border-radius:18px; padding:16px; color:var(--explore-top-ink); }
 .spotlight-rail[data-single="true"] .spotlight-card { width:100%; }
 .spotlight-dots { display:flex; justify-content:center; gap:6px; margin-top:12px; }
-.spotlight-dots .spotlight-dot { display:grid; place-items:center; width:16px; height:24px; padding:0; background:transparent; border:0; border-radius:0; transform:none; }
+.spotlight-dots .spotlight-dot { display:grid; place-items:center; width:6px; height:6px; padding:0; background:transparent; border:0; border-radius:0; transform:none; }
+.spotlight-dots .spotlight-dot[aria-pressed="true"] { width:16px; }
 .spotlight-dot span { display:block; width:6px; height:6px; border-radius:999px; background:var(--watch-spotlight-dot); }
 .spotlight-dot[aria-pressed="true"] span { width:16px; background:var(--explore-top-ink); }
 .spotlight-dot:focus-visible { outline:2px solid var(--explore-top-focus); }
