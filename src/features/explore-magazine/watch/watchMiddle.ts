@@ -7,7 +7,7 @@
 import type { Database } from '@/integrations/supabase/types';
 import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 
-export type WatchVideoRow = Database['public']['Functions']['get_watch_course_videos']['Returns'][number];
+export type WatchVideoRow = Database['public']['Functions']['get_watch_course_videos']['Returns'][number] & { list_rank?: number };
 export type WatchRegionRow = Database['public']['Functions']['get_watch_regions']['Returns'][number];
 export type WatchRegionCourseRow = Database['public']['Functions']['get_watch_region_courses']['Returns'][number];
 
