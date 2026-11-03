@@ -127,7 +127,7 @@ expect(tile).toContain('flex: fill ? undefined : `0 0 ${width}px`');
 ```
 
 ## Null thumbnail and verification limits
-Community's MomentTile uses existing CourseImageFallback: null thumbnail gives a deterministic neutral MEMBER_CELL/MEMBER_PANEL gradient; initials are created, but the existing Community `[style*="bottom:"]` hide also matches `inset:0` in the browser's serialized style, so exact visible fallback text is not claimed without browser verification. Course/member labels below and rating/duration overlays remain. No poster source or fallback change made.
+Community's MomentTile uses existing CourseImageFallback: null thumbnail renders a deterministic neutral MEMBER_CELL/MEMBER_PANEL gradient and course initials (when a usable course name exists), not a blank image tile. Course/member labels below and rating/duration overlays remain. This is source-confirmed; live rendering was not checked. No poster source or fallback change made.
 
 Authenticated browser verification unavailable (`external_unmanaged`); no credentials requested. URL/component tests and source checks do not establish signed-in end-to-end verification. Full shards and live comparison remain unverified following the required stop.
 
