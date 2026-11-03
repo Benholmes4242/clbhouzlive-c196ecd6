@@ -1,11 +1,15 @@
 # Roadmap
 
+## Tournament picks heading correction
+- [x] Restore tee-day heading whenever teeDay exists outside completed; retain fit/measure behaviour and live/final fallback; tourOverviewPicksTeeLine.test.tsx unchanged.
+- [x] All four full-suite shards passed: 1,570 + 1,507 + 1,529 + 1,554 = 6,160 / 554 files; zero failures/unhandled errors. Heading tests unchanged, 17/17 passed. Automatic build 11:32:45Z OK. No test inventory change in this correction.
+
 ## Tournament picks build 2 — overview, Why and Our record
 - [x] Stat order: shared course keyStats order for every pick; per-player mock ordering ruled a mistake.
 - [x] Live comparisons: exclude eliminated picks, no 'One of our picks.' prefix, no line when no other active pick; Kim example reads 'Behind Ghim.'.
 - [x] Authorised build1 assertion targets .your-pick-text, preserving AF initials;25/25 passed.
 - [x] Implement overview additions, tapped-player Why sheet, record sheet, four RPC hooks and44 new regressions; retired5 copy tests updated with unchanged count.
-- [ ] STOP: focused117/120, three tourOverviewPicksTeeLine regressions at119:27,136:27,170:23 because live heading now renders ROUND n · LIVE rather than tee-day. No fix/rerun/full shards/browser after failure. Await scoped ruling; full output /tmp/tournament-picks2/focused.log.
+- [x] Historical focused117/120 stop resolved by user-authorised heading priority correction, without test changes; all three regressions pass in the full four-shard run, 6,160/554 overall.
 - [ ] score-predictions casing fix remains untouched: located in existing edge function, which standing restrictions prohibit editing. Requires scoped authorization.
 - [x] TOURNAMENT_PICKS_BUILD2_REPORT.md records all files, named44-test delta, historical build1 clearance and incomplete verification. Candidate6,160/554; latest build11:29:04Z OK.
 

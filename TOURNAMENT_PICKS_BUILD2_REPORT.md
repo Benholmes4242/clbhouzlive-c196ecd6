@@ -1,4 +1,25 @@
-# Tournament picks build 2 — focused regression stop
+# Tournament picks build 2 — heading regression cleared
+
+## Heading correction — 3 November 2026
+User ruling supersedes the live heading interpretation below: render the existing tee-day label with unchanged fit/measure behaviour whenever `teeDay` exists and phase is not completed; otherwise live renders `ROUND {n} · LIVE`, completed renders `FINAL`, upcoming retains its previous behaviour.
+
+Product change: only `src/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand.tsx`. Documentation: `roadmap.md`, this report; requirement saved in project memory. **No tests added, deleted, renamed or rewritten in this correction; `tourOverviewPicksTeeLine.test.tsx` remains unchanged and passed 17/17.** The three historical heading failures quoted below are resolved; no pre-existing or new failures appeared in the full run.
+
+Commands: `bunx vitest run --maxWorkers=2 --shard=1/4` through `--shard=4/4`.
+
+| Shard | Passed tests | Passed files |
+| --- | ---: | ---: |
+| 1/4 | 1,570 | 139 |
+| 2/4 | 1,507 | 139 |
+| 3/4 | 1,529 | 139 |
+| 4/4 | 1,554 | 137 |
+| Total | **6,160** | **554** |
+
+Zero failures and zero unhandled errors. Full logs retained in `/tmp/picks-heading/shard-{1,2,3,4}.log`. Automatic build: **2026-11-03T11:32:45Z — build OK**. No manual build/typecheck run. No authenticated browser verification claimed.
+
+Inventory before/after correction: **6,160 / 554 → 6,160 / 554**, delta zero. Compared with last full green **6,091 / 552**, the +69 tests / +2 files are the previously documented build1 `yourPickSheet.test.tsx` (+25) and build2 `tournamentPickInsights.test.tsx` (+44); the named authorised rewrites below have zero count delta. Other implementation gaps below remain outside this heading-only correction.
+
+## Historical focused-stop record (superseded by the correction above)
 
 ## Result
 Implemented the overview additions, tapped-player Why we picked them sheet, Our record sheet and four published-RPC hooks. User rulings retained: same three stats in course order for all event picks; compare only active other picks, without “One of our picks.”; Kim T11 versus Ghim T8 and Clark MC reads “Behind Ghim.”. No comparison when no active other pick remains. Existing cards retain their start/status/tee/champion/Needs engine.
