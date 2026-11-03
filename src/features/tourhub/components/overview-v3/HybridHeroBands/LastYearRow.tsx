@@ -57,7 +57,7 @@ export function LastYearRow({
         display: 'grid',
         gridTemplateColumns: '32px 1fr auto 42px',
         gap: 12,
-        padding: isWinner ? '14px 20px' : '12px 20px',
+        padding: isWinner ? '10px 20px' : '8px 20px',
         alignItems: 'center',
         background: isWinner ? 'rgba(251,188,46,0.10)' : 'transparent',
         borderBottom: 'none',
@@ -86,7 +86,7 @@ export function LastYearRow({
               fontSize: isWinner ? 16 : 14,
               fontWeight: isWinner ? 700 : 700,
               color: INK,
-              letterSpacing: '-0.005em',
+              letterSpacing: 0,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -105,7 +105,7 @@ export function LastYearRow({
           // X.4: same rule as the results board — under par red. The champion
           // row stays amber: it marks who won, not what they shot.
           color: isWinner ? GOLD_DARK : /^[-−]/.test(score.trim()) ? TOPAR_UNDER_DARK : INK,
-          letterSpacing: '-0.02em',
+          letterSpacing: 0,
         }}
       >
         {score}

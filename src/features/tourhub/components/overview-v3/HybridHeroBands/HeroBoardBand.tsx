@@ -23,8 +23,8 @@
  * CB57 order, one continuous dark surface with NO seam:
  *   photo → board rows (live/completed) or upcoming facts line (upcoming) →
  *   OUR PICKS block → CB58 leaders' group (live individual events only).
- *   No action row or next-round row; no hairlines between
- *   these blocks. Existing movement and pick-card internal rules are retained
+ *   Merged Airy adds inset picks and leaders hairlines. No action or next-round
+ *   row. Existing movement and pick-card internal rules are retained
  *   and reported under CB57, not silently removed.
  * There is no stat strip and no COURSE SHAPE panel in this file or in
  * OverviewHero.tsx any more — older briefs described both; neither renders.
@@ -163,7 +163,7 @@ function StatCell({
         style={{
           fontSize: 22,
           fontWeight: 600,
-          letterSpacing: '-0.01em',
+          letterSpacing: 0,
           lineHeight: 1.05,
           marginTop: 2,
           color: color ?? '#FFFFFF',
@@ -456,7 +456,7 @@ export function HeroBoardSection({
       ) : null}
 
       {hasUpcomingFacts ? (
-        <div data-overview-facts style={{ display: 'flex', gap: 16, padding: '14px 20px' }}>
+        <div data-overview-facts style={{ display: 'flex', gap: 16, padding: '10px 20px' }}>
           {upcomingFacts.map((fact) => (
             <div key={fact.label} style={{ flex: '1 1 0', minWidth: 0 }}>
               <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{fact.label}</div>
@@ -470,8 +470,8 @@ export function HeroBoardSection({
       ) : null}
 
       {lastYearRows.length > 0 ? (
-        <div data-overview-last-year style={{ paddingBottom: 6 }}>
-          <div style={{ padding: '14px 20px 4px', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
+        <div data-overview-last-year style={{ paddingBottom: 4 }}>
+          <div style={{ padding: '12px 20px 4px', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
             {t('overview.hero.lastYear')}
           </div>
           {lastYearRows.map((row, i) => (
@@ -651,8 +651,9 @@ function PicksBlock({
   }, [teeDay]);
 
   return (
-    <div data-overview-picks style={{ background: PAGE_CANVAS }}>
-      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '22px 20px 8px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+    <div data-overview-picks style={{ background: PAGE_CANVAS, paddingTop: 8 }}>
+      <div data-overview-picks-hairline style={{ margin: '0 20px', borderTop: '1px solid var(--th-overview-hairline)' }} />
+      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '14px 20px 8px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
@@ -668,7 +669,7 @@ function PicksBlock({
         <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
       ) : null}
 
-      <div data-overview-picks-grid style={{ padding: '0 20px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
+      <div data-overview-picks-grid style={{ padding: '0 20px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
         {cards.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
@@ -724,7 +725,7 @@ function PicksBlock({
               aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
               className="active:opacity-70 transition-opacity"
               /* Signed-off Board B: outlined landscape chip, three across, no fill. */
-              style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: 8, textAlign: 'left', minWidth: 0 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: 7, textAlign: 'left', minWidth: 0 }}
             >
               {/* The shared resolver walks the headshot folder chain itself;
                   photoUrl is tried FIRST when present. No second resolver. */}
@@ -735,7 +736,7 @@ function PicksBlock({
                   tourCode={tourCode}
                   photoUrl={p.photoUrl ?? null}
                   headshotOverride={p.headshotOverride ?? null}
-                  size={30}
+                  size={28}
                 />
               </div>
               <div data-overview-pick-text style={{ minWidth: 0 }}>
@@ -774,19 +775,19 @@ function PicksBlock({
 export function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
   const { t } = useTranslation('tourhub');
   return (
-    <div data-overview-movement style={{ padding: '15px 20px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
+    <div data-overview-movement style={{ padding: '12px 20px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
       <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
         {t('overview.biggestMovers', { round })}
       </div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 11 }}>
+      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
         {cards.map((c) => (
-          <div key={c.key} data-overview-movement-card style={{ flex: 1, minWidth: 0, background: OVERVIEW.cardGround, border: `1px solid ${OVERVIEW.hairline}`, borderRadius: 9, padding: '9px 9px 10px' }}>
+          <div key={c.key} data-overview-movement-card style={{ flex: 1, minWidth: 0, background: OVERVIEW.cardGround, border: `1px solid ${OVERVIEW.hairline}`, borderRadius: 9, padding: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
               <SquircleAvatar size={22} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
               <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 700, color: OVERVIEW.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 7 }}>
-              <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: c.delta > 0 ? OVERVIEW.ink : OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 6 }}>
+              <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ fontSize: 16, fontWeight: 800, letterSpacing: 0, color: c.delta > 0 ? OVERVIEW.ink : OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
                 {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta)}
               </span>
               {c.toPar != null ? (

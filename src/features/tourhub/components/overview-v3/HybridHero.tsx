@@ -20,10 +20,9 @@ import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
-import { SituationBand } from './HybridHeroBands/SituationBand';
-import { situationSegments, visibleSituationNote, championNarrative } from '../../overview/situationCopy';
+import { situationSegments, visibleSituationNote } from '../../overview/situationCopy';
 import { roundsFromSchedule } from './HybridHero.utils';
-import { tournamentHeadline, tournamentHeadlineSegments } from '../../overview/magazineCopy';
+import { tournamentHeadlineSegments } from '../../overview/magazineCopy';
 import { earliestTeeTime, fieldHasStarted } from '../../overview/boardStarted';
 import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 
@@ -238,31 +237,16 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
-  // Situation band: every state except a finished result. Awaiting-playoff is
-  // a results variant but not finished, so it takes the band.
-  const showSituation = state.kind !== 'results' || state.variant === 'awaiting-playoff';
-  const situation = showSituation
-    ? situationSegments({
+  // Merged Airy: the photo owns the one sentence in every state. The
+  // champion strip retains its identity/score, never a duplicate narrative.
+  const situation = situationSegments({
         state,
         entries: rows,
         scheduledRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),
-        headline: tournamentHeadlineSegments({ tournament, state, leaderboard: rows, t, firstTeeTime }),
+        headline: tournamentHeadlineSegments({ tournament, state, leaderboard: rows, t, firstTeeTime, closingRound: champion?.closingRound }),
         t,
-      })
-    : null;
+      });
   const situationNote = visibleSituationNote(tournament.situationNote, state, tournament.endDate, now);
-  // Completed: ONE sentence, inside the champion strip, composed from THIS
-  // event's leaderboard only (BRIEF_TOUR_CHAMPION_TRUTH X.1). A sentence that
-  // states a score must be derived from the score, never asked for.
-  const championSentence = champion
-    ? championNarrative({
-        state,
-        entries: rows,
-        scheduledRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),
-        narrative: tournamentHeadline({ tournament, state, leaderboard: rows, t, closingRound: champion.closingRound }),
-        t,
-      })
-    : null;
 
   const startDay = tournament.startDate
     ? new Intl.DateTimeFormat('en', { weekday: 'long' }).format(new Date(tournament.startDate))
@@ -282,8 +266,10 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
         startDay={startDay}
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
+        segments={situation}
+        note={situationNote}
+        onFullBoard={fullBoardAvailable ? openFullBoard : undefined}
       />
-      {situation && situation.length > 0 ? <SituationBand segments={situation} note={situationNote} onFullBoard={fullBoardAvailable ? openFullBoard : undefined} /> : null}
       {fullBoardAvailable ? (
         <FullBoardSheet
           open={fullBoardOpen}
@@ -302,7 +288,6 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
           eyebrow={t('overview.hero.champion')}
           avatarCandidates={championAvatarCandidates}
           playerKey={tournament.winnerKey}
-          narrative={championSentence}
           country={champion.country}
         />
       ) : null}

@@ -25,7 +25,7 @@
 export const PHOTO_BAND_HEIGHT = 340;   // 360 -> 306 -> 260 -> 286 -> 244 -> 340
 
 /**
- * OVERVIEW PHOTO BAND HEIGHT — 386, and it is the OVERVIEW's alone.
+ * OVERVIEW PHOTO BAND HEIGHT — Merged Airy: 340, overview-owned.
  *
  * H9 extends the full-bleed overview photograph to close the measured seam at
  * its foot. PHOTO_BAND_HEIGHT stays 340 because OVERVIEW_HERO_HEIGHT is
@@ -33,7 +33,7 @@ export const PHOTO_BAND_HEIGHT = 340;   // 360 -> 306 -> 260 -> 286 -> 244 -> 34
  * story and StoryPage's hero — which this brief does not touch. Lowering the
  * shared constant would silently shorten both.
  */
-export const OVERVIEW_PHOTO_BAND_HEIGHT = 386;
+export const OVERVIEW_PHOTO_BAND_HEIGHT = 340;
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
