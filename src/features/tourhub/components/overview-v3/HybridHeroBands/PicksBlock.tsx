@@ -15,7 +15,7 @@ import {OVERVIEW} from '../overviewTokens';
 import {fmtScore} from '../../../utils/fmtScore';
 import {finishedVerdict,type PickResult} from './pickInsightRules';
 import {PickMemberBands} from './PickMemberBands';
-import {pickWonTournament} from './HeroBoardBand';
+const pickWonTournament=(id:string,champion:string|null,ids:string[])=>id===champion||ids.includes(id);
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
 const WON_LABEL = 'WON';
 
