@@ -68,12 +68,15 @@ export interface TourIslandProps {
   onOpen: (anchor: HTMLElement) => void;
 }
 
-function Chip({ logoSlug, glyph }: { logoSlug?: string | null; glyph?: 'globe' | 'trophy' | null }) {
+function Chip({ logoSlug, glyph, folded = false }: { logoSlug?: string | null; glyph?: 'globe' | 'trophy' | null; folded?: boolean }) {
+  // ISLAND_SQUIRCLE_1 §2: folded the tile grows to 32px (radius 11) so the left
+  // island measures exactly 46 × 46 — 32 tile + 6 padding + 1 border each side.
+  const size = folded ? 32 : 30;
   return (
     <span
       aria-hidden="true"
       style={{
-        width: 30, height: 30, borderRadius: 9, flexShrink: 0, overflow: 'hidden',
+        width: size, height: size, borderRadius: folded ? 11 : 9, flexShrink: 0, overflow: 'hidden',
         background: logoSlug ? '#FFFFFF' : 'rgba(255,255,255,0.10)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
@@ -98,6 +101,7 @@ export const TourIsland: React.FC<TourIslandProps> = ({
   const condensed = useIslandsCondensed();
   const location = React.useContext(UNSAFE_LocationContext)?.location;
   const foldRoute = location ? resolveChrome(location.pathname, new URLSearchParams(location.search)).condense === true : false;
+  const folded = foldRoute && condensed;
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const labelAndCaption = (
     <>
@@ -145,12 +149,12 @@ export const TourIsland: React.FC<TourIslandProps> = ({
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 10, alignSelf: 'stretch',
-          padding: condensed ? '0 8px' : mode === 'back' ? '0 16px 0 0' : '0 16px 0 8px',
+          padding: folded ? '0 6px' : mode === 'back' ? '0 16px 0 0' : '0 16px 0 8px',
           ...(foldRoute ? { gap: condensed ? 0 : 10, transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}),
           fontFamily: 'inherit',
         }}
       >
-        {mode !== 'back' && <Chip logoSlug={logoSlug} glyph={glyph} />}
+        {mode !== 'back' && <Chip logoSlug={logoSlug} glyph={glyph} folded={folded} />}
         <span aria-hidden={condensed ? true : undefined} data-tour-island-fold style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, textAlign: 'left', ...(foldRoute ? { maxWidth: condensed ? 0 : 240, opacity: condensed ? 0 : 1, overflow: 'hidden', transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}) }}>
           {labelAndCaption}
         </span>
