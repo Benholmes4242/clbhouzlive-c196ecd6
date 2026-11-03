@@ -1,5 +1,9 @@
 # Roadmap
 
+## NAV SQ1 bottom navigation shape
+- [ ] Local20px bar and16px tab tile radii; shared tokens and all other behavior unchanged.
+- [ ] New radius regressions, real / expanded/condensed captures, full four shards maxWorkers2 and clean automatic build; reconcile from6295/563 in report.
+
 ## GI1 signed-out header island
 - [x] Condense-only guest squircle/glass and accessible Log in fold; preserve Join free actions and non-condense output.
 - [x] Authorized two test rewrites quoted in GI1_GUEST_ISLAND_REPORT.md; +3 headerB1/+1 reducedMotion=6295/563 from6291/562. Focused22/22; shards1594/1523/1554/1624, zero failures/unhandled; automatic build OK16:58:14Z. Combined timeout interrupted shard4 only; original retained and individual rerun passed.
