@@ -63,7 +63,7 @@ describe('Tour overview band', () => {
     expect(layer('island-scrim-soft')?.style.transition).toBe('');
   });
   it('other routes have no opt-in fade and retain canonical glass', () => {
-    mount('/discover');
+    mount('/settings');
     expect(layer('island-scrim-soft')).toBeNull();
     const left = document.querySelector<HTMLElement>('[aria-label="Go to home"]');
     expect(left?.style.background).toBe('rgba(14, 14, 16, 0.84)');

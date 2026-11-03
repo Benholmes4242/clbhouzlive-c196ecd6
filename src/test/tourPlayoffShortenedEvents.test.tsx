@@ -164,6 +164,7 @@ vi.mock('@/features/tourhub/tournament-v2/sections/StorySection', () => ({ Story
 vi.mock('@/features/tourhub/tournament-v2/sections/FullBoardSheet', () => ({ FullBoardSheet: () => null }));
 
 import { TournamentPage } from '@/features/tourhub/tournament-v2/TournamentPage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const bermuda = { id: 'bermuda', name: 'Butterfield Bermuda Championship', status: 'playoff', start_date: '2026-10-22', end_date: '2026-10-25', current_round: 4, event_type: 'stroke', situation_note: 'Round 4 was cancelled for high winds.' };
 const field = [
@@ -172,9 +173,9 @@ const field = [
   { id: 'c', position: 3, position_tied: false, score: -14, round_1: -4, round_2: -5, round_3: -5, round_4: null, player: { id: 'c', full_name: 'Other Player' } },
 ];
 const mountPage = () => render(
-  <I18nextProvider i18n={lang}><MemoryRouter initialEntries={['/tourhub/tournament/bermuda']}>
+  <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><I18nextProvider i18n={lang}><MemoryRouter initialEntries={['/tourhub/tournament/bermuda']}>
     <Routes><Route path="/tourhub/tournament/:tournamentId" element={<TournamentPage />} /></Routes>
-  </MemoryRouter></I18nextProvider>,
+  </MemoryRouter></I18nextProvider></QueryClientProvider>,
 );
 afterEach(() => { cleanup(); page.meta = null; page.rows = []; page.pulse = 'live'; });
 
