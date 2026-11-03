@@ -125,7 +125,7 @@ export const TourIsland: React.FC<TourIslandProps> = ({
   );
 
   return (
-    <div data-island-flush="true" style={{ display: 'flex', alignItems: 'center', gap: 10, height: 46 }}>
+    <div data-island-flush={true} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 46 }}>
       {mode === 'back' && (
         <button
           type="button"
