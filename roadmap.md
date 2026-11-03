@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tournament page three-state rebuild
+- [ ] Review signed-off Before/Live/Finished mock, existing reads and shared picks; resolve genuine brief/mock or data conflicts before implementing affected sections.
+- [ ] Implement scoped tournament page sections, derived rules, English/en-XA copy and existing sheet integration; preserve excluded surfaces.
+- [ ] Add requested regressions, report authorized test changes and reconcile counts; four shards with --maxWorkers=2, stop/report new failures, verify available browser flows and automatic build.
+
 ## HB6 group1 existing island pages
 - [x] Opt existing island entries into header B; preserve none/default routes and existing actions; business history back/fallback '/'. Static Next round and business/media anchors implemented; news page files untouched by ruling.
 - [ ] STOP: focused71/72 headerB1.test.tsx:97:39 expected23px received16px because /discover no longer non-condense; full output/tmp/hb6/focused.log. No correction/rerun/shards/browser after failure. tourOverviewBand's same stale /discover example identified but not run. Automatic build OK17:46:59Z.
