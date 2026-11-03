@@ -1,5 +1,9 @@
 # Roadmap
 
+## FIX_GRID_1
+- [x] Restore back-island pointer events and measured top clearance on exactly the three listed pages; player page unchanged.
+- [ ] Complete island-child/legacy-clearance audit, add source/navigation guards, run focused and four full shards, confirm build and reconcile against6462/575 in FIX_GRID_1_REPORT.md.
+
 ## Tournament pick follow-up fixes
 - [x] Correct avatar-hugging selection rings, local tap-to-deselect and action fills; lowercase record continuation and display MC on pick cards without changing board tokens.
 - [x] Focused99/99; Chromium rings/fills checked; shards1645/1535/1638/1644 =6462/575 (+7/+0), zero failures/unhandled errors; automatic build OK21:30:49Z. PICK_FOLLOWUP_FIXES_REPORT.md names every test change and authenticated-check limitation.
