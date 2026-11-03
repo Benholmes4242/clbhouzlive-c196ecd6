@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Tournament picks build 2 — overview, Why and Our record
-- [ ] Resolve brief/mock stat-order conflict: brief requires the same three stats in the same order for every pick; mock changes bar order per player.
-- [ ] Resolve live comparison conflict: brief compares with our picks still in and prefixes 'One of our picks.'; mock Kim compares with missed-cut Clark and omits that prefix.
-- [ ] Obtain scoped authorization for the existing build1 whole-row/AF assertion failure before final verification.
+- [x] Stat order: shared course keyStats order for every pick; per-player mock ordering ruled a mistake.
+- [x] Live comparisons: exclude eliminated picks, no 'One of our picks.' prefix, no line when no other active pick; Kim example reads 'Behind Ghim.'.
+- [x] Authorised build1 assertion now targets .your-pick-text, preserving AF avatar initials; verification pending.
 - [ ] Implement approved overview additions, Why sheet rewrite, record sheet and new RPC hooks; update only retired contract tests; run four full shards and report reconciled counts.
 
 ## Tournament picks build 1 — Your pick sheet

@@ -82,7 +82,7 @@ describe('Your pick sheet build 1', () => {
   });
   it('unranked metadata omits a missing country and keeps RPC order', async () => {
     mount(); await ready();
-    expect(screen.getByRole('radio', { name: 'Alejandro Fierro' }).textContent).toBe('Alejandro FierroNot ranked');
+    expect(screen.getByRole('radio', { name: 'Alejandro Fierro' }).querySelector('.your-pick-text')?.textContent).toBe('Alejandro FierroNot ranked');
     expect(screen.getByRole('radio', { name: 'Mauricio Figueroa' }).textContent).toContain('Not ranked · United States');
   });
   it('fi search matches all five required surname prefixes in field order', async () => {
