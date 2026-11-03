@@ -20,6 +20,7 @@ vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => mocks.guest })
 
 import { ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
 import { TourIsland } from '@/features/tourhub/components/TourIsland';
+import { setChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { registerNavScroller, resetToExpanded } from '@/hooks/useScrollDirection';
 
 let el: HTMLDivElement; let off: () => void;
@@ -81,5 +82,16 @@ describe('ISLAND_SQUIRCLE_1', () => {
     expect(tile?.style.width).toBe('32px');
     expect(tile?.style.height).toBe('32px');
     expect(tile?.style.borderRadius).toBe('11px');
+  });
+
+  it('a flush left slot gets no capsule padding and the squircle radius', async () => {
+    setChromeLeftSlot(<div data-island-flush={true}>slot</div>);
+    mount('/tourhub');
+    const left = document.querySelector<HTMLElement>('[data-island-left]');
+    expect(left?.style.padding).toBe('0px');
+    expect(left?.style.borderRadius).toBe('16px');
+    await move(150);
+    expect(left?.style.padding).toBe('0px');
+    setChromeLeftSlot(null);
   });
 });
