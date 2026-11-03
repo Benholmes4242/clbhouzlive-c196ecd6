@@ -9432,6 +9432,7 @@ export type Database = {
           orientation: string | null
           original_media_url: string | null
           post_id: string
+          poster_checked_at: string | null
           poster_timestamp: number | null
           poster_url: string | null
           processed_at: string | null
@@ -9465,6 +9466,7 @@ export type Database = {
           orientation?: string | null
           original_media_url?: string | null
           post_id: string
+          poster_checked_at?: string | null
           poster_timestamp?: number | null
           poster_url?: string | null
           processed_at?: string | null
@@ -9498,6 +9500,7 @@ export type Database = {
           orientation?: string | null
           original_media_url?: string | null
           post_id?: string
+          poster_checked_at?: string | null
           poster_timestamp?: number | null
           poster_url?: string | null
           processed_at?: string | null
@@ -26479,6 +26482,15 @@ export type Database = {
         Args: { p_actor_ids: string[]; p_post_id: string; p_since: string }
         Returns: boolean
       }
+      posters_to_check: {
+        Args: { p_limit?: number }
+        Returns: {
+          created_at: string
+          duration_seconds: number
+          media_id: string
+          stream_id: string
+        }[]
+      }
       postgis_constraint_dims: {
         Args: { geomcolumn: string; geomschema: string; geomtable: string }
         Returns: number
@@ -26768,6 +26780,10 @@ export type Database = {
         }[]
       }
       run_welcome_dms: { Args: { p_limit?: number }; Returns: Json }
+      save_checked_poster: {
+        Args: { p_media_id: string; p_poster_url?: string }
+        Returns: boolean
+      }
       search_empty_state_v2: { Args: never; Returns: Json }
       search_golf_clubs: {
         Args: { p_limit?: number; p_query: string }

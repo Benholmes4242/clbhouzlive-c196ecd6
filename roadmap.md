@@ -1,5 +1,11 @@
 # Roadmap
 
+## VIDEO_POSTERS_1
+- [x] Added/deployed only pick-video-poster with pure measured-frame rules and secret-authenticated existing RPC calls; live dry run 200, unauthorized 401, invalid limit 400. No write run or schedule created.
+- [x] Explicit thumbnail times and poster-aligned Watch preview starts/repeats; real players unchanged. Real browser black-intro fixture revealed only >=2s moving picture.
+- [x] Focused125/125; full four shards1501+1469+1501+1534=6,005/548, +34/+3 vs5,971/545; zero failures/unhandled errors; automatic build clean; VIDEO_POSTERS_1_REPORT.md lists all additions and deployment URL.
+- [ ] Signed-in Watch readback unavailable with external_unmanaged authentication; deployment dry run and browser helper playback verified, member save/backfill not claimed.
+
 ## RR1 Recent rounds on Explore
 - [x] One paged get_recent_rounds read (circle→everyone fallback), feats out of the shelf, Leaderboards pill, 16px snap inset, sentinel pagination, end tile, eight-rule line under every card.
 - [x] rsRoundsShelf.test.tsx rewritten per brief (22 → 31 cases, removals quoted in the report); focused 31/31; four full shards 5,959/545 (+9), zero failures/unhandled errors; automatic build clean; RR1_RECENT_ROUNDS_REPORT.md.

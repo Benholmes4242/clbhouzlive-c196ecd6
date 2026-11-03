@@ -260,3 +260,6 @@ verify_jwt = false
 
 [functions.onboarding-unsubscribe]
 verify_jwt = false
+
+[functions.pick-video-poster]
+verify_jwt = false

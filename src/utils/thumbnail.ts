@@ -51,9 +51,7 @@ export function getThumbnailUrl(options: ThumbnailOptions): string {
     url = `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg`;
     url += `?height=${sizeValue}`;
     url += `&fit=${fit}`;
-    if (time !== THUMBNAIL_DEFAULT_TIME) {
-      url += `&time=${time}s`;
-    }
+    url += `&time=${time}s`;
   } else if (imageUrl) {
     if (imageUrl.includes('imagedelivery.net')) {
       const sizeValue =

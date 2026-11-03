@@ -19,10 +19,19 @@
  *
  * Shape produced (via getThumbnailUrl, the single URL builder):
  *   https://<stream-subdomain>/<streamId>/thumbnails/thumbnail.jpg?height=<h>&fit=crop
- *   ...&time=<n>s   (only when a non-default frame time is used)
+ *   ...&time=<n>s   (always explicit, including the default frame)
  */
 
 import { getThumbnailUrl } from '@/utils/thumbnail';
+
+/** Explicit Stream poster timestamp; absent or invalid times carry no start intent. */
+export function posterSeconds(url: string | null): number | null {
+  if (!url) return null;
+  const match = url.match(/[?&]time=(\d+(?:\.\d+)?)s(?:&|#|$)/);
+  if (!match) return null;
+  const seconds = Number(match[1]);
+  return Number.isFinite(seconds) ? seconds : null;
+}
 
 /** Height the post composer writes. The legacy pipeline passes 720 to keep its
  *  deployed output byte-identical to what it has always written. */
