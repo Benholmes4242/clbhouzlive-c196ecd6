@@ -37,6 +37,7 @@
 
 
 import React from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import ReactDOM from 'react-dom';
 import { MentionsInput, Mention, type SuggestionDataItem } from 'react-mentions';
 
@@ -356,7 +357,7 @@ function renderSuggestion(
             className="truncate"
             style={{ fontSize: 15, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
           >
-            {s.display}
+            <ProMemberName userId={s.kind === 'user' ? s.id.slice(2) : null}>{s.display}</ProMemberName>
           </span>
           {s.isVerified && (
             <CheckCircle2 size={12} style={{ color: AMBER, flexShrink: 0 }} strokeWidth={2.25} />

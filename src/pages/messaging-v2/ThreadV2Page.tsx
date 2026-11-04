@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, MoreVertical, BadgeCheck } from 'lucide-react';
@@ -427,7 +428,7 @@ const ThreadV2Page: React.FC = () => {
                     className="truncate"
                     style={{ color: INK, fontSize: 17, fontWeight: 600, lineHeight: '20px', letterSpacing: '-0.012em' }}
                   >
-                    {header.name}
+                    <ProMemberName userId={rivalUserId ?? (isDirect && firstIncoming?.sender_actor_type === 'personal' ? firstIncoming.sender_actor_id : null)}>{header.name}</ProMemberName>
                   </span>
                   {header.verified ? (
                     <BadgeCheck size={13} style={{ color: SUB, flexShrink: 0 }} />

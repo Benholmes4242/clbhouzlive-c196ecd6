@@ -10,6 +10,7 @@
  */
 
 import React, { useCallback, useRef, useState } from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -326,7 +327,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
               className="truncate"
               style={{ ...MT.NAME, color: nameColor, minWidth: 0 }}
             >
-              {identity.name}
+              <ProMemberName userId={isGroup || identity.isBusiness ? null : identity.userId}>{identity.name}</ProMemberName>
             </span>
             {identity.verified ? (
               <BadgeCheck size={13} style={{ color: MSG.INK_2, flexShrink: 0 }} />

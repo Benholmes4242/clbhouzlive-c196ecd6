@@ -14,6 +14,7 @@
  * PAGINATION: renders 30 rows, pages on scroll.
  */
 import { useTranslation } from 'react-i18next';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import type { ReactionKind } from '@/lib/reactionKind';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -155,7 +156,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
               textOverflow: 'ellipsis',
             }}
           >
-            {l.displayName || l.username}
+            <ProMemberName userId={isBusiness ? null : actorId}>{l.displayName || l.username}</ProMemberName>
             {isViewer ? ' · You' : null}
           </div>
           {isBusiness ? (

@@ -11,6 +11,7 @@
  * cached for the session.
  */
 import { useNavigate } from 'react-router-dom';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useTranslation } from 'react-i18next';
 import { suggestionReasonLine } from '@/features/social-suggestions/suggestionReasonLine';
 import { Check, Zap } from 'lucide-react';
@@ -406,7 +407,7 @@ function SuggestionRow({
       />
       <div className="flex-1 min-w-0">
         <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
-          {name}
+          <ProMemberName userId={suggestion.id}>{name}</ProMemberName>
         </p>
         <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
           {suggestionReasonLine(suggestion, t)}

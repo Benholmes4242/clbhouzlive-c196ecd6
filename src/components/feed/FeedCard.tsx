@@ -16,6 +16,7 @@
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useTranslation } from 'react-i18next';
 import { FEED_CARD_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -953,7 +954,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               cursor: 'pointer',
             }}
           >
-            {post.displayName}
+            <ProMemberName userId={post.actorType === 'business' ? null : post.actorId ?? post.userId}>{post.displayName}</ProMemberName>
           </button>
           {playedWith && playedWith.length > 0 && <PostWithLine people={playedWith} />}
           </div>

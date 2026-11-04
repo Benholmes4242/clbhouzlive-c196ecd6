@@ -45,6 +45,7 @@
  * figures row under the author line are the only score surfaces.
  */
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
@@ -736,7 +737,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                 minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
               }}
             >
-              {activePost.displayName}
+              <ProMemberName userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId}>{activePost.displayName}</ProMemberName>
             </span>
             {activePost.isVerified && <VerifiedBadge size="sm" />}
           </div>
