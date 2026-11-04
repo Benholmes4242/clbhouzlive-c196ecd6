@@ -14,6 +14,7 @@
  * mark and VerifiedBadge).
  */
 import { useTranslation } from 'react-i18next';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useNavigate } from 'react-router-dom';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -178,7 +179,7 @@ function BlockGolferRow({
                 textOverflow: 'ellipsis',
               }}
             >
-              {golfer.display_name ?? golfer.username ?? ''}
+              <InlineProMemberName userId={golfer.user_id}>{golfer.display_name ?? golfer.username ?? ''}</InlineProMemberName>
             </div>
             {figures ? (
               <div

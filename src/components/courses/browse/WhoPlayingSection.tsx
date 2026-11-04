@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -12,7 +13,7 @@ import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
-import { joinNames, plural, RAIL_BLEED } from './format';
+import { fmtCount, plural, RAIL_BLEED } from './format';
 import { firstName } from '@/lib/whs/share';
 import { useSectionReady } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
@@ -118,7 +119,7 @@ export function WhoPlayingSection() {
                   ))}
                 </span>
                 <span style={{ fontSize: 11.5, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-                  <span style={{ color: A.BODY, fontWeight: 600 }}>{joinNames(g.members.map((m) => firstName(m.display_name)))}</span>
+                  <span style={{ color: A.BODY, fontWeight: 600 }}>{g.members.slice(0, 2).map((member, i) => <span key={member.user_id}>{i > 0 ? g.members.length > 2 ? ', ' : ' and ' : ''}<InlineProMemberName userId={member.user_id}>{firstName(member.display_name)}</InlineProMemberName></span>)}{g.members.length > 2 ? ` and ${fmtCount(g.members.length - 2)} more` : ''}</span>
                   {` \u00B7 ${tail}`}
                 </span>
               </div>
