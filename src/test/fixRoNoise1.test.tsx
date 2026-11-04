@@ -11,14 +11,16 @@ import { installErrorTracking } from '@/lib/errorTracking';
 let observers: Array<() => void> = [];
 let frames = new Map<number, FrameRequestCallback>();
 let nextFrame = 1;
+let origRO: typeof ResizeObserver;
 const flushFrames = () => { const fs = [...frames.values()]; frames.clear(); fs.forEach(f => f(0)); };
 beforeEach(() => {
   observers = []; frames = new Map(); nextFrame = 1;
-  vi.stubGlobal('ResizeObserver', class { cb: () => void; constructor(cb: () => void) { this.cb = cb; observers.push(() => cb([{ contentRect: { height: 0 } }] as any)); } observe() {} disconnect() {} });
+  origRO = window.ResizeObserver;
+  (window as any).ResizeObserver = class { cb: () => void; constructor(cb: () => void) { this.cb = cb; observers.push(() => cb([{ contentRect: { height: 0 } }] as any)); } observe() {} disconnect() {} };
   vi.stubGlobal('requestAnimationFrame', vi.fn((cb: FrameRequestCallback) => { const id = nextFrame++; frames.set(id, cb); return id; }));
   vi.stubGlobal('cancelAnimationFrame', vi.fn((id: number) => { frames.delete(id); }));
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); (window as any).ResizeObserver = origRO; });
 
 function Fit() { const ref = useFitOneLine<HTMLSpanElement>('Course name', 20, 12); return <div><span ref={ref}>Course name</span></div>; }
 
