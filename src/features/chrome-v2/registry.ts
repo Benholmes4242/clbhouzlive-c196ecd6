@@ -233,7 +233,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
 
   // ── ISLAND routes ────────────────────────────────────────────────────────
   // Tour Hub deep pages (island + back arrow, editorial geometry).
-  // G2B: only the two detail roots opt in; deeper paths retain legacy rules.
+  // Tournament root already shares the overview's dark/soft/folding islands,
+  // with history + schedule fallback; only its route-level notch bleed changes.
+  // Player roots also opt in; deeper paths retain page-owned legacy rules.
   { match: { test: (p) => /^\/tourhub\/tournament\/[^/]+\/?$/.test(p) }, spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=schedule' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   { match: { test: (p) => /^\/tourhub\/player\/[^/]+\/?$/.test(p) }, spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=players' }, tone: 'dark', bleed: true, scrim: 'soft', condense: true } },
   {
@@ -242,7 +244,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       chrome: 'none',
       tone: 'dark',
       bleed: true,
-      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
+      note: 'Deeper tournament subroutes only: page-owned header; tournament root uses the dark soft folding back island above.'
     },
   },
   {

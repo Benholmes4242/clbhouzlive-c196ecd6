@@ -11,9 +11,8 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
   '/courses/',        // Course Detail pages
   '/profile',         // Own profile + /profile/:username
   '/profile/',
-  /* Tour pushed pages keep their in-flow header. The two landing heroes are
-     exact immersive routes below, so they can bleed without making every
-     /tourhub/* detail page immersive. */
+  /* Tour overview is exact below; tournament detail roots are matched in
+     isImmersiveRoute. All other /tourhub/* pages remain shell-inset. */
   '/discover/explore/region/', // Region pages
 ] as const;
 
@@ -98,6 +97,7 @@ export function isImmersiveRoute(pathname: string): boolean {
   // Connect flow only — the connected manage surface stays non-immersive.
   if (pathname === WHS_CONNECT_PATH) return whsConnectImmersive;
   if (isBusinessProfilePath(pathname)) return true;
+  if (/^\/tourhub\/tournament\/[^/]+\/?$/.test(pathname)) return true;
   const exactMatch = (IMMERSIVE_EXACT_ROUTES as readonly string[]).some(
     (r) => pathname === r
   );

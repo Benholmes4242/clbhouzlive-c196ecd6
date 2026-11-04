@@ -19,6 +19,7 @@ import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
 import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/courses/CourseMasthead';
 import { OVERVIEW } from '../overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
 
 
 export interface HeroLeaderTrio {
@@ -103,7 +104,7 @@ export function PhotoBand({
         position: 'relative',
         display: 'block',
         width: '100%',
-        height: heightPx,
+        height: photoBandHeight(heightPx),
         margin: 0,
         padding: 0,
         overflow: 'hidden',
@@ -116,7 +117,7 @@ export function PhotoBand({
         cursor: 'pointer',
       }}
     >
-      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'var(--th-overview-photo-fade)', pointerEvents: 'none' }} />
+      <PhotoBandFade />
       <div
         data-overview-photo-text
         style={{
