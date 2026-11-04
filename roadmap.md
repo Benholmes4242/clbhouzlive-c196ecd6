@@ -2,8 +2,8 @@
 
 ## Player page measured clearance
 - [x] Replace player root old island reservation with CHROME_CLEARANCE; preserve hero26px and single safe-area owner; remove guard exception and add player guard case.
-- [ ] Run focused checks and four shards maxWorkers2, preserving full output on any failure; reconcile against6527/578.
-- [ ] Verify Mackenzie Hughes and Brandt Snedeker in the browser; report any authentication limitation without bypassing guest rules.
+- [x] Focused23/23; shards1681/1556/1648/1643 =6528/578, zero failures/unhandled errors; +1 named player guard instance vsTU1. Full logs retained; build OK03:50:29Z.
+- [x] Real Mackenzie/Brandt pages checked390×844 and1280×1800: two-line mobile names, Vanderbilt stamp and loaded photos below islands; public-state proof only, authenticated search/index island unavailable external_unmanaged. PLAYER_CLEARANCE_REPORT.md records exact guard changes and screenshots.
 
 ## Consolidated CM1 then TU1
 - [x] Apply only authorised Merged Airy heading14→16 and grid bottom14→0 expectations; other assertions/product frozen.
