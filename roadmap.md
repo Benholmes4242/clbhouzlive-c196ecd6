@@ -1,10 +1,10 @@
 # Roadmap
 
 ## FIX_OVERFLOW_1
-- [ ] Apply course About grid containment and wrapping map/business names; preserve action sizing.
-- [ ] Apply Tour-only island shrink rules and verify 320px edges.
+- [x] Apply course About grid containment and wrapping map/business names; preserve action sizing.
+- [ ] Tour-only shrink rules applied; guest capsules fit12px edges at320 but All tours is clipped. Guest width168.36px differs from brief138px; await geometry ruling, no label-fit acceptance claimed.
 - [ ] BLOCKED: §2 requires every inline grid to change, including review-wizard files; the same brief forbids touching the review wizard. Await scope ruling before the app-wide edit/guard.
-- [ ] Inventory changed inline grids and unchanged Tailwind grids; source checks, four shards, browser checks and reconciled report. Baseline6625 tests/584 files.
+- [x] Inventory55 inline objects/41 files (2 changed); unchanged Tailwind inventory; focused48/48; shards1708/1588/1676/1661=6633/585 (+8/+1 source cases). No failures/unhandled errors; build OK. FIX_OVERFLOW_1_REPORT.md records both scoped blockers.
 
 ## Overview rhythm
 - [x] Share above-Coming-up event selection; exclude all hero/Also this week ids, order date/purse/tour, fetch12 and retain next+four.
