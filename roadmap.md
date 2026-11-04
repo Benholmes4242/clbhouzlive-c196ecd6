@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_COMMENT_IMG_1
+- [ ] Confirm add_comment_v2 source permits absolute HTTPS media URLs; no server edits or SQL.
+- [ ] Move only composer photo upload to shared R2 helper; keep compression/drafts/send/legacy image reading, expose error toast.
+- [ ] Test attachment/send/failure and absolute/legacy image reading; extend upload guard, run four shards and reconcile6603/583.
+
 ## FIX_UPLOAD_PLAYER_1
 - [x] Admin course photos use the shared R2-only helper; callers unchanged, real failure description exposed.
 - [x] Player root uses direct CHROME_CLEARANCE; zero-exception guard retained and subtraction assertion removed.
