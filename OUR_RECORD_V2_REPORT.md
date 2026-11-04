@@ -114,3 +114,6 @@ PicksSheet additionally removes the literal visible Claude/GPT/Gemini labels and
 
 ## Verification limits
 Managed authentication is external_unmanaged: authenticated circle readback and hosted write flows unavailable, not claimed. Existing tests cover real providers with controlled RPC payloads, not a hosted session. The live public /tourhub check records whether the Our record door was present; screenshot is available only if opened. Hosted JSON contract is not independently queried; missing best does not fall back to all-pick averages. Latest automatic build checked separately.
+
+### Live browser outcome
+At1280×1800 the real record door existed but GuestJoinCard's `data-guest-gate-shade` intercepted its click. Playwright `Locator.click: Timeout 30000ms exceeded` at /tmp/browser/our-record-v2/check_record.py:12. No forced click or gate bypass; no sheet screenshot or live parity claim. Latest automatic build OK08:03:10Z. This is an unavailable guest-gated environmental check, not a test failure; all shards remain clean.
