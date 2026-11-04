@@ -30,7 +30,7 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [x] Write PRO_VERIFICATION_2_REPORT.md with stop, test inventory and verification limits.
 
 ## BRIEF 2B — remaining mounted member names
-- [ ] Confirm production callers; skip and list dormant requested surfaces.
-- [ ] Add small verified-only labels inside original name elements, preserving card geometry and business/player exclusions.
-- [ ] Add mounted-surface, batched-read and unchanged rail-layout tests; list all approved RPC-only fixture repairs.
-- [ ] Run four shards with maxWorkers=2, stop on unexpected failure, and report reconciled counts from 6,730 / 592.
+- [x] Confirm production callers; skip FriendSheet header because no caller invokes its opener; list evidence in PRO_VERIFICATION_2B_REPORT.md.
+- [x] Add small verified-only labels inside original name elements on the remaining mounted surfaces, preserving card geometry and business/player exclusions.
+- [x] Add 12 mounted-surface/batched-read/layout tests; no existing test fixtures changed.
+- [ ] STOP: proVerification2B.test.tsx:81 new picks-member test expects input id order, but the board renders ordinary/pending/pro; 11 passed, 1 failed. No assertion edited; four shards blocked pending direction. Expected inventory 6,742 / 593 (+12 / +1).
