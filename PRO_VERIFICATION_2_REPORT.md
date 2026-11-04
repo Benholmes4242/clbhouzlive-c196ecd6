@@ -165,4 +165,38 @@ Restored CreatorsRow rail/sheet and FindGolfersSheet to their pre-Brief-2 name m
 
 These two surfaces are excluded because they have no production callers (Golfers to watch was removed in ER1). The Brief 2 surface test file already covers only search, comment, reply, and business exclusions: neither excluded surface has an import, fixture, case, or assertion to remove. Therefore **no tests rewritten, renamed, or deleted**, and **no old/new assertions**. Test inventory before and after this rollback: **6,730 tests / 592 files**; delta **0 tests / 0 files**. This reconciles to the last green baseline **6,704 / 588** plus the already named **26 tests / 4 files**.
 
-Four-shard results pending. Commands: `bunx vitest run --maxWorkers=2 --shard=n/4` for n=1,2,3,4. Full outputs retained in `docs/verification/pro-2/unmounted-exclusion/`. Historical failures above were introduced regressions, not pre-existing failures. Known pre-existing failures: none.
+Commands: `bunx vitest run --maxWorkers=2 --shard=n/4`. Full outputs retained in `docs/verification/pro-2/unmounted-exclusion/`.
+
+| Shard | Passed | Failed | Files executed |
+|---|---:|---:|---:|
+| 1/4 | 1,738 | 0 | 148 |
+| 2/4 | 1,591 | 0 | 148 |
+| 3/4 | 1,718 | 1 | 148 |
+| 4/4 | Not run — STOP | — | — |
+
+Executed **5,048 tests / 444 files**, with **5,047 passed / 1 failed**. Full-suite inventory remains **6,730 / 592**, not a full-suite passing claim. `ws1WatchTop.test.tsx` passes unchanged: **44/44** in shard 2. Historical failures above were introduced regressions, not pre-existing failures. Known pre-existing failures: none; this newly observed failure is not classified as pre-existing.
+
+### STOP — unexpected shard 3 failure
+
+```text
+FAIL src/test/likesSheetTiers.test.tsx > LikesSheet H.4 standing segment > one familiarity call and one legends read for the whole sheet; no history shows handicap alone
+AssertionError: expected [ { …(2) }, …(1) ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+❯ src/test/likesSheetTiers.test.tsx:63:25
+61|     const { container } = renderSheet({ authorName: 'Ben', courseId: '…
+62|     await waitFor(() => expect(container.querySelectorAll('[data-liker…
+63|     expect(st.rpcCalls).toHaveLength(1);
+  |                         ^
+64|     expect(st.rpcCalls[0].args).toEqual({ p_user_ids: ['a', 'b', 'c'],…
+65|     expect(st.legendCalls).toBe(1);
+```
+
+Stopped after shard 3; shard 4 was not run. Full failing output: `docs/verification/pro-2/unmounted-exclusion/shard3.log`. No changes to LikesSheet, its tests, or any other surface were made in this pass. No tests rewritten, renamed or deleted; old/new assertions: none.
+
+Latest observed harness build: `=== build 2026-11-04T20:09:46Z ===` / `build OK`. No browser checks run after STOP. Pre-Brief-2 markup was independently confirmed from read-only history for both reverted files. All protected areas remain unchanged.
