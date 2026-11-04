@@ -68,4 +68,19 @@ describe('FIX_UPLOAD_PLAYER_1 admin course photos', () => {
     });
     expect(violations).toEqual([]);
   });
+
+  it('FIX_COMMENT_IMG_1: no comments-v2 source calls supabase.storage upload', () => {
+    const violations = sourceFiles('src/features/comments-v2').filter(file => {
+      const tree = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+      let found = false;
+      function visit(node: ts.Node) {
+        if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === 'upload'
+          && /supabase\.storage\b/.test(node.expression.expression.getText(tree).replace(/\s/g, ''))) found = true;
+        ts.forEachChild(node, visit);
+      }
+      visit(tree);
+      return found;
+    });
+    expect(violations).toEqual([]);
+  });
 });
