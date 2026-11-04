@@ -2,8 +2,8 @@
 
 ## FIX_OVERFLOW_1
 - [x] Apply course About grid containment and wrapping map/business names; preserve action sizing.
-- [ ] Tour-only shrink rules applied; guest capsules fit12px edges at320 but All tours is clipped. Guest width168.36px differs from brief138px; await geometry ruling, no label-fit acceptance claimed.
-- [ ] BLOCKED: §2 requires every inline grid to change, including review-wizard files; the same brief forbids touching the review wizard. Await scope ruling before the app-wide edit/guard.
+- [ ] Ruling: live ≤340px right-only fold on every route, preserving left folding and existing guest/member content/actions; verify320 edges.
+- [ ] Ruling: add single-column containment everywhere except exactly MediaTray, VoiceDictateButton and ComposerStepHeader; named guard exceptions, no Tailwind changes.
 - [x] Inventory55 inline objects/41 files (2 changed); unchanged Tailwind inventory; focused48/48; shards1708/1588/1676/1661=6633/585 (+8/+1 source cases). No failures/unhandled errors; build OK. FIX_OVERFLOW_1_REPORT.md records both scoped blockers.
 
 ## Overview rhythm
