@@ -434,9 +434,15 @@ export function resolveKind(row: {
       bold: 'course_name',
     };
   }
-  if (t === 'golfer_verified') {
-    // System-authored verification confirmation. Amber verified glyph tile,
-    // no actor avatar (actor_id is NULL server-side).
+  // BRIEF 1 §9 — every verification outcome (golfer or pro, approved,
+  // declined or removed) renders the same system-authored amber verified
+  // tile; actor_id is NULL server-side on all of them.
+  if (
+    t === 'golfer_verified' ||
+    t === 'golfer_verification_approved' ||
+    t === 'golfer_verification_rejected' ||
+    t === 'golfer_verification_removed'
+  ) {
     return {
       left: 'tile',
       right: 'none',
