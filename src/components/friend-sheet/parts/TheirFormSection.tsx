@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingDown, TrendingUp, Award, Flame, MapPin } from 'lucide-react';
+import { TrendingDown, TrendingUp, Flame, MapPin } from 'lucide-react';
 import { Eyebrow } from './_shared/Eyebrow';
 import { formatMonthDay2ShortGB } from '@/i18n/format';
 
@@ -102,12 +102,6 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
           color: T60,
         }}
       >
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Award size={12} strokeWidth={2} />
-          {handicap.badges_earned}{' '}
-          {handicap.badges_earned === 1 ? 'badge' : 'badges'}
-        </span>
-        <span style={{ color: T40 }}>·</span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <Flame size={12} strokeWidth={2} />
           {handicap.active_streaks}{' '}
