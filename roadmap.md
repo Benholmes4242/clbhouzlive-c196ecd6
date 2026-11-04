@@ -22,5 +22,6 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [x] Personal hero descriptor and owner-only pending note implemented; exact visual proof pending.
 - [x] Tour tab with canonical player rows, previous-season fallback, eight-row cap and player links; uncovered owner note and Handicap rules.
 - [x] Small labels wired on listed member surfaces; sibling ids coalesced into one call; exhaustive surface proof pending.
-- [ ] STOP: shard 1 fails ms1MessagesHeadToHead.test.tsx:422 (name wrapper moves text into an unstyled descendant). No assertion edited; shards 2–4 and browser checks not run. Full output preserved.
+- [ ] Preserve every original name element inside ProMemberName; ms1MessagesHeadToHead.test.tsx remains untouched.
+- [ ] Add one real ThreadV2Page regression with PRO present and name fontSize 17px; run four shards, stopping on any failure.
 - [x] Write PRO_VERIFICATION_2_REPORT.md with stop, test inventory and verification limits.
