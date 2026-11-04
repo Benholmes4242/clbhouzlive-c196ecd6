@@ -1,5 +1,11 @@
 # Roadmap
 
+## FIX_OVERFLOW_1
+- [ ] Apply course About grid containment and wrapping map/business names; preserve action sizing.
+- [ ] Apply Tour-only island shrink rules and verify 320px edges.
+- [ ] BLOCKED: §2 requires every inline grid to change, including review-wizard files; the same brief forbids touching the review wizard. Await scope ruling before the app-wide edit/guard.
+- [ ] Inventory changed inline grids and unchanged Tailwind grids; source checks, four shards, browser checks and reconciled report. Baseline6625 tests/584 files.
+
 ## Overview rhythm
 - [x] Share above-Coming-up event selection; exclude all hero/Also this week ids, order date/purse/tour, fetch12 and retain next+four.
 - [x] Add reusable story photo slot before World rankings, prefer fresh different-tour story, exclude both bands from News and leave no empty gap.
