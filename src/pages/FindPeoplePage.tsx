@@ -15,6 +15,7 @@
  */
 import { useContext, useMemo, useRef, useState } from 'react';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -415,8 +416,8 @@ function GolferRow({
             textOverflow: 'ellipsis',
           }}
         >
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={golfer.user_id}>{name}</InlineProMemberName></span>
-          {golfer.is_verified ? <VerifiedBadge size="sm" /> : null}
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+          <ProOrVerifiedMark userId={golfer.user_id} verified={golfer.is_verified} />
         </div>
         <ReasonLine
           when={when}

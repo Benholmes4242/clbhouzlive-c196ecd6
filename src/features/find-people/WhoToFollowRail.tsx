@@ -21,6 +21,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -523,8 +524,8 @@ function RailCardView({
           textOverflow: 'ellipsis',
         }}
       >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={card.kind === 'person' ? card.person.user_id : null}>{name}</InlineProMemberName></span>
-        {verified ? <VerifiedBadge size="sm" /> : null}
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+        <ProOrVerifiedMark userId={card.kind === 'person' ? card.person.user_id : null} verified={verified} />
       </div>
 
       {/* Reason: two lines max, fixed height so cards stay aligned. */}
