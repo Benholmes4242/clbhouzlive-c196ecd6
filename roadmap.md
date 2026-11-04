@@ -2,7 +2,7 @@
 
 ## Our record sheet v2 and prediction-engine wording
 - [ ] Implement event-count tiles, best-per-event circle table, ledger rows and anonymous Agreement wording; baseline6575/581.
-- [ ] Resolve signed-off token conflict: brief says withdrawn WD; mock tok maps WD to MC. No ledger token choice before ruling.
+- [x] Ben ruled MC for missed cut, WD for withdrawal, DQ for disqualification, all dim/no score; remaining mock unchanged.
 - [ ] Audit visible model wording, list every copy/test rewrite and run four shards; stop and retain any unexpected failing output.
 
 ## Your pick sheet v2
