@@ -23,6 +23,10 @@ import { WelcomeGolfers } from '@/features/onboarding/WelcomeGolfers';
 import { WelcomeHandicap } from '@/features/onboarding/WelcomeHandicap';
 import { WelcomeFirstLook, type WelcomeDestination } from '@/features/onboarding/WelcomeFirstLook';
 import { canContinueIdentity, readWelcomeProgress, welcomeName, usernameSeed, usernameWithSuffix, USERNAME_RULE_MAX, WELCOME_USERNAME_RE, writeWelcomeProgress, type WelcomeProgress, type WelcomeStep } from '@/features/onboarding/welcomeRules';
+import { ProDetailsSheet } from '@/features/pro-verification/ProDetailsSheet';
+import { useMyProStatus, useInvalidateMyProStatus } from '@/features/pro-verification/useMyProStatus';
+import { proKindLabel, proStatusLine } from '@/features/pro-verification/proRules';
+import { toast } from '@/lib/toast';
 import '@/styles/welcome.css';
 
 /** OB1 owns first-sign-in only. Partial saves reuse useProfileSave; normal
@@ -100,6 +104,36 @@ function WelcomeFlow({ user, profile }: { user: NonNullable<ReturnType<typeof us
     } catch { setMessage(t('welcome.saveFailed', { defaultValue: 'Could not save. Please try again.' })); } finally { setBusy(false); }
   };
   const toggleCreator = () => { const on = !form.isCreator; setField('isCreator', on); analyticsEvents.track('creator_profile_toggled', { on, surface: 'welcome' }); };
+  /* BRIEF 1 §3 — the pro row saves through the pro RPCs straight away, never
+     through the identity save and never into profile columns. On opens the
+     details sheet; closing without sending turns the row back off; pending
+     keeps the row on with an Edit door; off withdraws the request. */
+  const pro = useMyProStatus(user.id);
+  const invalidatePro = useInvalidateMyProStatus();
+  const [proSheetOpen, setProSheetOpen] = useState(false);
+  const [proLocalOn, setProLocalOn] = useState(false);
+  const [proConnectAnyway, setProConnectAnyway] = useState(false);
+  const proOn = proLocalOn || pro.pending || pro.verified;
+  const withdrawPro = async () => {
+    const { error } = await supabase.rpc('withdraw_pro_verification');
+    if (error) { toast.error(error.message); return; }
+    invalidatePro(user.id);
+  };
+  const togglePro = () => {
+    if (pro.verified) return;
+    if (pro.pending) { void withdrawPro(); return; }
+    if (proLocalOn) { setProLocalOn(false); return; }
+    setProLocalOn(true);
+    setProSheetOpen(true);
+  };
+  const onProSheetClose = (outcome: 'sent' | 'withdrawn' | 'closed') => {
+    setProSheetOpen(false);
+    if (outcome !== 'sent') setProLocalOn(false);
+  };
+  /* §4 — a pending or verified pro skips the handicap step; the
+     already_connected auto-complete above still wins because this branch
+     requires no existing connection. */
+  const proBranch = step === 4 && (pro.pending || pro.verified) && !connection.data && !proConnectAnyway;
   const saveIdentity = async () => {
     if (!canContinueIdentity(first, last, candidate, availability.isSuccess && availability.data.available)) return;
     const result = await save({ ...form, firstName: first, lastName: last, displayName: `${first} ${last}`.trim(), username: candidate }, { welcomeFields: 'identity', isOnboarding: true, hasWhsConnection: !!connection.data });
