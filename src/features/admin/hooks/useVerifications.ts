@@ -35,6 +35,17 @@ export interface VerificationRow {
   evidenceUrl?: string | null;
   proofDocumentUrl?: string | null;
   inviteReason?: string | null;
+  /** BRIEF 1 §8 — pro request fields (kinds tour_pro / teaching_pro). */
+  kind?: string | null;
+  proTour?: string | null;
+  proTourCode?: string | null;
+  proBody?: string | null;
+  proClub?: string | null;
+  proMembershipNumber?: string | null;
+  proLink?: string | null;
+  proNoProfile?: boolean | null;
+  proHowToCheck?: string | null;
+  proPlayerId?: string | null;
   displayName?: string | null;
   username?: string | null;
   avatarUrl?: string | null;
@@ -62,13 +73,18 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
       .order('created_at', { ascending: false }),
     supabase
       .from('golfer_verification_requests')
-      .select('id, status, invited_by, created_at, reviewed_at, note, admin_note, evidence_url, invite_reason')
+      .select('id, status, user_id, invited_by, kind, pro_tour, pro_tour_code, pro_body, pro_club, pro_membership_number, pro_link, pro_no_profile, pro_how_to_check, pro_player_id, created_at, reviewed_at, reviewed_by, review_reason, note, admin_note, evidence_url, invite_reason')
       .order('created_at', { ascending: false }),
     supabase
       .from('course_claim_requests')
       .select('id, status, business_id, club_id, source_course_id, proof_note, admin_note, created_at, reviewed_at, requested_by')
       .order('created_at', { ascending: false }),
   ]);
+
+  /* BRIEF 1 §8 — a failed read must surface, never become an empty queue. */
+  if (biz.error) throw biz.error;
+  if (golfer.error) throw golfer.error;
+  if (claims.error) throw claims.error;
 
   // Enrich course-claim rows with business name + course label
   const claimRows = claims.data ?? [];
@@ -113,11 +129,25 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
       contactEmail: r.contact_email ?? null,
       contactRole: r.contact_role ?? null,
     })),
+    /* BRIEF 1 §8 — the subject is user_id, never the inviter: the queue shows
+       the member under review. invited_by stays available for legacy rows. */
     ...(golfer.data ?? []).map(r => ({
       id: r.id, type: 'golfer' as const, status: r.status,
-      requestedBy: r.invited_by, createdAt: r.created_at, reviewedAt: r.reviewed_at,
+      requestedBy: r.user_id ?? r.invited_by, createdAt: r.created_at, reviewedAt: r.reviewed_at,
+      reviewedBy: r.reviewed_by ?? null,
+      reviewReason: r.review_reason ?? null,
       note: r.note, adminNote: r.admin_note,
       evidenceUrl: r.evidence_url, inviteReason: r.invite_reason,
+      kind: r.kind ?? null,
+      proTour: r.pro_tour ?? null,
+      proTourCode: r.pro_tour_code ?? null,
+      proBody: r.pro_body ?? null,
+      proClub: r.pro_club ?? null,
+      proMembershipNumber: r.pro_membership_number ?? null,
+      proLink: r.pro_link ?? null,
+      proNoProfile: r.pro_no_profile ?? null,
+      proHowToCheck: r.pro_how_to_check ?? null,
+      proPlayerId: r.pro_player_id ?? null,
     })),
     ...claimRows.map((r: any) => ({
       id: r.id, type: 'course_claim' as const, status: r.status,
