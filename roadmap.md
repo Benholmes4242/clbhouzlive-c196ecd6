@@ -1,14 +1,15 @@
 # Roadmap
 
 ## Upcoming hero handover
-- [ ] Add UTC start-day helper and two-day handover; preserve finish-day result, off-week3/no-upcoming14 caps, missing start and live priority.
-- [ ] Update existing handover tests; verify All/PGA/LPGA upcoming heroes/picker and finish prior notch browser proof.
-- [ ] Run four final shards, stop/preserve any failure, reconcile both briefs against6528/578 and report exact test edits.
+- [x] UTC two-day handover implemented;15 new hook/date cases preserve finish-day, off-week3/no-upcoming14, missing start/live. No existing direct handover test existed to rewrite.
+- [x] PGA/LPGA real picker and heroes upcoming; final player notch gap26px and finished Mexico photo verified. HERO_HANDOVER_REPORT.md records all evidence/limits.
+- [ ] All tours upcoming-first blocked by conflict with frozen completed-before-upcoming sorting and retained Champions off-week result; upcoming photo proof blocked by missing event image. Await ruling/data, no invented overrides.
+- [x] Final four shards1681/1562/1659/1654 =6556/580, zero failures;6528+13 notch+15 handover reconciled. Full logs retained.
 
 ## Tournament notch bleed and player safe-area audit
-- [ ] Make only tournament detail roots immersive, reuse overview photo geometry/fade, and preserve root island spec/back fallback.
-- [ ] Audit player safe-area ownership and preserve hero26px without a second notch payment.
-- [ ] Update authorised guards/tests, run four shards with failure-stop/full-output retention, reconcile against6528/578, and verify finished Mexico Open/upcoming photos in the browser.
+- [x] Tournament roots immersive; shared overview fade/opt-in340+sat geometry, root island spec already correct and preserved.
+- [x] Player route-hub CSS shell0 verified; token pays notch once and exact kicker26 gap measured. Existing hero26 untouched.
+- [x] Final suite6556/580 clean; exact guard rewrites and finished/photo-less upcoming observations recorded in HERO_HANDOVER_REPORT.md. Upcoming image proof remains blocked above.
 
 ## Player page measured clearance
 - [x] Replace player root old island reservation with CHROME_CLEARANCE; preserve hero26px and single safe-area owner; remove guard exception and add player guard case.
