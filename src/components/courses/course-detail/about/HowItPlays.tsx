@@ -49,7 +49,7 @@ function dominantColour(hole: CourseHole): string {
 }
 
 /** Eighteen independent field comparisons. This intentionally does not reuse ShapeChart. */
-const LocalHoleChart: React.FC<{
+export const LocalHoleChart: React.FC<{
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hasYou: boolean;
