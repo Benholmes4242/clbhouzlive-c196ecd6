@@ -10,6 +10,7 @@ import { mapTourSlug } from '../../_shared/tourOrder';
 import { isMajor } from '../../utils/majorScope';
 import type { TourId } from '../../hooks/useOverviewData';
 import { formatVenueLabel } from '../../lib/venueLabel';
+import { compareComingUpEvents } from '../sections/overviewEventSelection';
 
 const DAY = 86_400_000;
 
@@ -81,7 +82,7 @@ export function useComingUp(tour: TourId | null, limit = 12) {
             if (tour === 'pga' && isMajor(r.name)) return true;
             return false;
           });
-      return scoped.slice(0, effectiveLimit).map(({ r, slug }) => ({
+      return scoped.sort((a, b) => compareComingUpEvents({ ...a.r, tour_slug: a.slug }, { ...b.r, tour_slug: b.slug })).slice(0, effectiveLimit).map(({ r, slug }) => ({
         id: r.id,
         name: r.name,
         start_date: r.start_date,

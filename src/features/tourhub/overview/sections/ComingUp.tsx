@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
-import { fullTourLabel } from '../../_shared/tourOrder';
 import { OverviewSectionHead } from './OverviewSectionHead';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
@@ -11,16 +10,17 @@ import { ComingUpNext, ComingUpListRow } from './ComingUpEvent';
 import { comingMonth } from './comingUpRules';
 import { Fragment } from 'react';
 import './comingUp.css';
+import { compareComingUpEvents } from './overviewEventSelection';
 
 export function displayEventName(name: string): string { return name.replace(/\s+(hosted|presented)\s+by\s+.+$/i, '').trim() || name; }
-export function selectComingUpRail(rows: ComingUpRow[], excludeId?: string | null): ComingUpRow[] {
-  return rows.filter((row) => row.id !== excludeId).slice(0, 6);
+export function selectComingUpRail(rows: ComingUpRow[], excludeIds: readonly string[] = []): ComingUpRow[] {
+  const used = new Set(excludeIds);
+  return rows.filter((row) => !used.has(row.id)).sort(compareComingUpEvents).slice(0, 5);
 }
 
-export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?: string | null }) {
-  const navigate = useNavigate(); const { t } = useTranslation('tourhub'); const { data = [] } = useComingUp(tour, 6);
-  // Signed-off ruling: next panel plus at most four rows. Selector unchanged.
-  const events = selectComingUpRail(data, excludeId).slice(0, 5);
+export function ComingUp({ tour, excludeIds }: { tour: TourId | null; excludeIds?: readonly string[] }) {
+  const navigate = useNavigate(); const { t } = useTranslation('tourhub'); const { data = [] } = useComingUp(tour, 12);
+  const events = selectComingUpRail(data, excludeIds);
   const next = events[0];
   const { data: photos } = useBatchCourseImages(next ? [{ id: next.id, golf_course_id: next.golf_course_id, venue_name: next.venue_name ?? null, venue_course_name: next.venue_course_name, venue_city: next.venue_city, venue_state: next.venue_state, venue_country: next.venue_country }] : []);
   const { data: lastYear } = useTournamentLastYearTop4(next?.id);

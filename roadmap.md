@@ -1,5 +1,11 @@
 # Roadmap
 
+## Overview rhythm
+- [x] Share above-Coming-up event selection; exclude all hero/Also this week ids, order date/purse/tour, fetch12 and retain next+four.
+- [x] Add reusable story photo slot before World rankings, prefer fresh different-tour story, exclude both bands from News and leave no empty gap.
+- [x] Focused253/253; shards1705/1569/1675/1676 =6625/584, +22/+1 from6603/583; no failures. OVERVIEW_RHYTHM_REPORT.md names exact rewrites and all new cases.
+- [x] Live phone/desktop show DP World $10m next and loaded Yamashita slot; mobile guest shade blocks full visual/interaction proof and external_unmanaged prevents authenticated checks. No bypass; frozen mock/data differences reported.
+
 ## FIX_COMMENT_IMG_1
 - [ ] BLOCKED: add_comment_v2 implementation is absent from repository/docs/uploads; generated Args and client forwarding do not establish URL constraints. Await Ben's function source, no SQL run.
 - [ ] After contract confirmation, move only composer photo upload to shared R2 helper; preserve compression/drafts/send/legacy reading, expose error toast.

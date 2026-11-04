@@ -1,6 +1,6 @@
 /** Coming-up owns calendar-day countdowns, tag priority and own-round figures.
- * Five visible events (next + four rows); the frozen six-row selector remains
- * exported by ComingUp for its existing consumers. Never derive member play
+ * Five visible events (next + four rows); above-page exclusions and order
+ * belong to overviewEventSelection. Never derive member play
  * from anyone else's rounds or from a name match. */
 import type { ComingUpRow } from '../data/useComingUp';
 import type { LastYearFinisher } from '../../hooks/useTournamentLastYearTop4';

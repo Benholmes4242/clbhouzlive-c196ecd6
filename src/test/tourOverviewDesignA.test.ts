@@ -247,7 +247,7 @@ describe('Tour Overview H12 material breaks', () => {
 
   it('never repeats the band story in News', () => {
     const stories = [story('band', '2026-09-17T19:00:00Z', 'hero'), story('lead', '2026-09-17T18:00:00Z', null), story('row', '2026-09-17T17:00:00Z', null)];
-    const news = selectOverviewNews(stories, 'band');
+    const news = selectOverviewNews(stories, ['band']);
     expect(news.hero?.id).toBe('lead');
     expect([news.hero, ...news.features, ...news.rows].filter(Boolean).map((item) => item?.id)).not.toContain('band');
   });
@@ -274,9 +274,9 @@ describe('Tour Overview H12 material breaks', () => {
     expect(news.rows.map((item) => item.id)).toEqual(['story-4']);
   });
 
-  it('keeps the first six chronological events and does not stretch a two-event source', () => {
+  it('keeps next plus four chronological events and does not stretch a two-event source', () => {
     const rows = Array.from({ length: 8 }, (_, index) => ({ id: `event-${index}` } as ComingUpRow));
-    expect(selectComingUpRail(rows, 'event-1').map((row) => row.id)).toEqual(['event-0', 'event-2', 'event-3', 'event-4', 'event-5', 'event-6']);
+    expect(selectComingUpRail(rows, ['event-1']).map((row) => row.id)).toEqual(['event-0', 'event-2', 'event-3', 'event-4', 'event-5']);
     expect(selectComingUpRail(rows.slice(0, 2))).toHaveLength(2);
   });
 });
