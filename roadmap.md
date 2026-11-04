@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Our record sheet v2 and prediction-engine wording
-- [ ] Implement event-count tiles, best-per-event circle table, ledger rows and anonymous Agreement wording; baseline6575/581.
-- [ ] Resolve signed-off token conflict: brief says withdrawn WD; mock tok maps WD to MC. No ledger token choice before ruling.
-- [ ] Audit visible model wording, list every copy/test rewrite and run four shards; stop and retain any unexpected failing output.
+- [x] Event-count tiles, weekly-best circle, individual ledger and anonymous Agreement implemented; benchmark preserved.
+- [x] Ben ruled MC for missed cut, WD for withdrawal, DQ for disqualification, all dim/no score; remaining mock unchanged.
+- [x] Copy audit and exact test rewrites in OUR_RECORD_V2_REPORT.md; focused104/104, shards1705/1569/1663/1662 =6599/582, +24/+1 reconciled from6575/581; no failures, full logs retained, build OK.
+- [ ] Live sheet/circle parity blocked by existing guest shade and external_unmanaged authentication; no forced click or gate bypass.
 
 ## Your pick sheet v2
 - [x] Apply five-state sheet and overview doors with public board, stable ActiveRing gaps, white controls and preserved guest Pick gate/server save authority.

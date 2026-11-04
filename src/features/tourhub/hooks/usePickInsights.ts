@@ -4,10 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { getGuestUser } from '@/features/guest/guestGateStore';
-export interface RecordPick { player_id: string; player_name: string; position: number | null; tied: boolean; status: string | null; percentile: number | null }
-export interface PickRecord { tours: string[]; picks: number; event_count?: number; won: number; top10: number; avg_percentile: number | null; first_event_date: string | null; events: { tournament_id: string; name: string; end_date: string; picks: RecordPick[] }[] }
+export interface RecordPick { player_id: string; player_name: string; position: number | null; tied: boolean; status: string | null; percentile: number | null; score?: number | null }
+export interface PickRecord { tours: string[]; picks: number; event_count?: number; best?: { events: number; wins: number; top10: number; avg_percentile: number | null }; won: number; top10: number; avg_percentile: number | null; first_event_date: string | null; events: { tournament_id: string; name: string; end_date: string; picks: RecordPick[] }[] }
 export interface FitStat { player_id: string; stat: string; value: number; percentile: number; players: number; wins: number }
-export interface BeatRow { user_id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; picks: number; avg_percentile: number; is_viewer: boolean }
+export interface BeatRow { user_id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; picks: number; wins: number; top10: number; avg_percentile: number; is_viewer: boolean }
 export function useOurPickRecord(tour: string, year: number | null) {
   return useQuery({ queryKey: ['tourhub', 'our-pick-record', tour, year], enabled: Boolean(tour && year), staleTime: 60_000,
     queryFn: async (): Promise<PickRecord | null> => {

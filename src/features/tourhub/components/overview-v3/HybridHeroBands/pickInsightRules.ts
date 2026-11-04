@@ -1,6 +1,6 @@
 /** One event stat order and active-only comparisons apply on every picker
  * surface. Numeric model claims must be checked here, never inferred in JSX. */
-import type { FitStat, BeatRow, PickRecord } from '../../../hooks/usePickInsights';
+import type { FitStat, BeatRow, PickRecord, RecordPick } from '../../../hooks/usePickInsights';
 import { surnameOf } from '../../../_shared/playerName';
 export const FIT_STATS = ['driving_distance', 'driving_accuracy', 'greens_in_reg', 'strokes_gained_tee_green', 'strokes_gained_putting', 'scoring_average'] as const;
 export type FitKey = typeof FIT_STATS[number];
@@ -85,17 +85,40 @@ export function catchSentence(stat: FitStat, tour: string) {
   const lines: Record<string,string> = { driving_accuracy:`${p.subject} misses more fairways than most.`, driving_distance:'Shorter off the tee than most of the tour.', greens_in_reg:`${p.subject} hits fewer greens than most.`, strokes_gained_tee_green:`${p.possessive} long game is weaker than most of the tour.`, strokes_gained_putting: stat.percentile >= 40 && stat.percentile <= 60 ? 'Middle of the pack on the greens.' : `${p.subject} loses shots on the greens.`, scoring_average:`${p.subject} scores higher than most of the tour.` };
   return lines[stat.stat] ?? '';
 }
-export function modelVoteNote(votes: { model: string; rank: number }[], tour: string) {
-  const order = ['claude','gpt4','gemini'];
-  const labels: Record<string,string> = { claude:'Claude', gpt4:'GPT', gemini:'Gemini' };
-  const known = order.flatMap(model => { const vote = votes.find(v=>v.model===model); return vote ? [{...vote,name:labels[model]}] : []; });
-  if (!known.length) return '';
-  const object = pronouns(tour).object;
-  if (known.length === 3 && known.every(v=>v.rank===known[0].rank)) return `All three models ranked ${object} ${rankWord(known[0].rank)}.`;
-  const ranks = [...new Set(known.map(v=>v.rank))];
-  return ranks.map((rank,i)=>`${joinNames(known.filter(v=>v.rank===rank).map(v=>v.name))}${i===0 ? ` had ${object}` : ''} ${rankWord(rank)}`).join(', ') + '.';
+/** Ordered internal keys never become visible labels. Missing/outside-top-ten
+ * reads stay absent, not invented ranks; all notes count the same three reads. */
+export function agreementRanks(votes: { model: string; rank: number }[]) {
+  return ['claude','gpt4','gemini'].map(key => {
+    const rank=votes.find(v=>v.model===key)?.rank;
+    return rank != null && Number.isInteger(rank) && rank>=1 && rank<=10 ? rank : null;
+  });
+}
+export function agreementNote(votes: { model: string; rank: number }[]) {
+  const reads=agreementRanks(votes);
+  const counts=new Map<number,number>();
+  for(const rank of reads) if(rank!=null) counts.set(rank,(counts.get(rank)??0)+1);
+  const entries=[...counts].sort((a,b)=>b[1]-a[1] || a[0]-b[0]);
+  if(!entries.length) return 'Not in the top 10 in any of our three reads.';
+  const [rank,count]=entries[0];
+  const lead=rankWord(rank)[0].toUpperCase()+rankWord(rank).slice(1);
+  if(count===3) return `${lead} in all three of our reads.`;
+  if(count===2 && entries.length===2) return `${lead} in two of our three reads, ${rankWord(entries[1][0])} in the other.`;
+  if(entries.length===3) return `${lead}, ${rankWord(entries[1][0])} and ${rankWord(entries[2][0])} in our three reads.`;
+  const missing=3-reads.filter(r=>r!=null).length;
+  const parts=entries.map(([r,n],i)=>`${i===0 ? lead : rankWord(r)} in ${n===2?'two':'one'} of our three reads`);
+  return `${parts.join(', ')}, ${missing===1?'one read unavailable':'two reads unavailable'}.`;
 }
 export function winningScoreRange(scores: number[]) { return !scores.length ? null : scores.length === 1 ? { single:true, best:scores[0], worst:scores[0] } : { single:false, best:Math.min(...scores), worst:Math.max(...scores) }; }
 export function sortedBeatRows(rows: BeatRow[], record: PickRecord): (BeatRow & { is_model?: boolean })[] {
-  return [...rows.filter(row=>row.picks>0), { user_id:'clbhouz', display_name:'clbhouz', username:'clbhouz', profile_photo_url:null, picks:record.picks, avg_percentile:record.avg_percentile ?? 0, is_viewer:false, is_model:true }].sort((a,b)=>b.avg_percentile-a.avg_percentile || b.picks-a.picks);
+  const best=record.best;
+  const house: (BeatRow & {is_model?:boolean})[] = best && best.avg_percentile!=null ? [{user_id:'clbhouz',display_name:'clbhouz',username:'clbhouz',profile_photo_url:null,picks:best.events,wins:best.wins,top10:best.top10,avg_percentile:best.avg_percentile,is_viewer:false,is_model:true}] : [];
+  return [...rows.filter(row=>row.picks>0), ...house].sort((a,b)=>b.wins-a.wins || b.top10-a.top10 || b.avg_percentile-a.avg_percentile || b.picks-a.picks);
 }
+export const recordPickWon=(pick:RecordPick)=>!outStatus(pick.status)&&pick.position===1&&!pick.tied;
+export function recordEventSummary(picks:RecordPick[]) {
+  const winner=picks.find(recordPickWon);
+  if(winner)return `${surnameOf(winner.player_name)} won it.`;
+  const top=picks.filter(p=>!outStatus(p.status)&&p.position!=null&&p.position<=10).length;
+  return top===0?'None of our three in the top 10.':`${wordNumber(top)[0].toUpperCase()}${wordNumber(top).slice(1)} of our three in the top 10.`;
+}
+export const orderedRecordPicks=(picks:RecordPick[])=>[...picks].sort((a,b)=>Number(outStatus(a.status))-Number(outStatus(b.status)) || (a.position??Infinity)-(b.position??Infinity));
