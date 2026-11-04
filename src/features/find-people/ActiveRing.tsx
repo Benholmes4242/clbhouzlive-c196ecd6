@@ -16,10 +16,13 @@ const CARD_SURFACE = '#17171B';
 export function ActiveRing({
   active,
   surface,
+  gapColor,
   children,
 }: {
   active: boolean;
   surface: 'card' | 'canvas';
+  /** Opt-in picker material; defaults preserve activity surfaces. */
+  gapColor?: string;
   children: ReactNode;
 }) {
   if (!active) {
@@ -53,7 +56,7 @@ export function ActiveRing({
           lineHeight: 0,
           padding: 2,
           borderRadius: '34%',
-          background: surface === 'card' ? CARD_SURFACE : PAGE_CANVAS,
+          background: gapColor ?? (surface === 'card' ? CARD_SURFACE : PAGE_CANVAS),
         }}
       >
         {children}

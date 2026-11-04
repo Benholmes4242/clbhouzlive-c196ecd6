@@ -33,6 +33,26 @@ export interface TournamentPickState {
 }
 export const pickFieldKey = (id: string) => ['tourhub', 'pick-field', id] as const;
 export const tournamentPickStateKey = (id: string, userId?: string) => ['tourhub', 'tournament-pick-state', id, userId] as const;
+export interface TournamentPicksBoardRow {
+  display_name: string | null; username: string | null; profile_photo_url: string | null;
+  user_id: string; player_id: string; player_name: string; is_followed: boolean; is_viewer: boolean;
+}
+export const tournamentPicksBoardKey = (id: string) => ['tourhub', 'tournament-picks-board', id] as const;
+/** Public board is viewer-keyed for personal flags; no member-state fallback.
+ * Saving invalidates all board identities, while the server owns every row. */
+export function useTournamentPicksBoard(tournamentId: string) {
+  const { user } = useSupabaseSession();
+  const identity = !user || user.is_anonymous || getGuestUser() ? 'guest' : user.id;
+  return useQuery({
+    queryKey: [...tournamentPicksBoardKey(tournamentId), identity], enabled: Boolean(tournamentId),
+    staleTime: 0, refetchOnMount: 'always',
+    queryFn: async (): Promise<TournamentPicksBoardRow[]> => {
+      const { data, error } = await supabase.rpc('get_tournament_picks_board', { p_tournament_id: tournamentId });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
 
 export function usePickField(tournamentId: string) {
   return useQuery({
@@ -79,9 +99,12 @@ export function useSetTournamentPick() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_data, { tournamentId }) => client.invalidateQueries({
-      queryKey: tournamentPickStateKey(tournamentId, user?.id), refetchType: 'active',
-    }),
+    onSuccess: async (_data, { tournamentId }) => {
+      await Promise.all([
+        client.invalidateQueries({ queryKey: tournamentPickStateKey(tournamentId, user?.id), refetchType: 'active' }),
+        client.invalidateQueries({ queryKey: tournamentPicksBoardKey(tournamentId), refetchType: 'active' }),
+      ]);
+    },
   });
 }
 
