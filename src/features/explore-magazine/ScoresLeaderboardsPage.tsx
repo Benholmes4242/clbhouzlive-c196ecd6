@@ -34,6 +34,8 @@ import { standingOrdinal } from './ordinal';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { RoundsGate, roundsGateState } from './RoundsGate';
+import { useMyProStatus } from '@/features/pro-verification/useMyProStatus';
+import { proGateStatus } from '@/features/pro-verification/proRules';
 import { roundsPageHeld } from './roundsPageHold';
 import { useStandoutRounds } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
