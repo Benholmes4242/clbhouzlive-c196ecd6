@@ -301,7 +301,7 @@
   },
   "verifiedAccounts": {
     "title": "Verified accounts",
-    "body": "We verify golfers and professionals ourselves - there's nothing to apply for. If you're seeking verification, contact support and we'll take a look. If you represent a club, brand or business, set up a business page and you can request verification there.",
+    "body": "We verify golfers ourselves. Tour players and PGA professionals can request pro verification in Edit profile. If you represent a club, brand or business, set up a business page and request verification there.",
     "cta": "Contact support →",
     "dismissA11y": "Dismiss",
     "settingsRowTitle": "Verified accounts",

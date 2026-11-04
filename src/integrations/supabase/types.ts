@@ -7628,8 +7628,18 @@ export type Database = {
           evidence_url: string | null
           id: string
           invite_reason: string | null
-          invited_by: string
+          invited_by: string | null
+          kind: string
           note: string | null
+          pro_body: string | null
+          pro_club: string | null
+          pro_how_to_check: string | null
+          pro_link: string | null
+          pro_membership_number: string | null
+          pro_no_profile: boolean
+          pro_player_id: string | null
+          pro_tour: string | null
+          pro_tour_code: string | null
           requested_at: string | null
           required_approvals: number
           review_reason: string | null
@@ -7652,8 +7662,18 @@ export type Database = {
           evidence_url?: string | null
           id?: string
           invite_reason?: string | null
-          invited_by: string
+          invited_by?: string | null
+          kind?: string
           note?: string | null
+          pro_body?: string | null
+          pro_club?: string | null
+          pro_how_to_check?: string | null
+          pro_link?: string | null
+          pro_membership_number?: string | null
+          pro_no_profile?: boolean
+          pro_player_id?: string | null
+          pro_tour?: string | null
+          pro_tour_code?: string | null
           requested_at?: string | null
           required_approvals?: number
           review_reason?: string | null
@@ -7676,8 +7696,18 @@ export type Database = {
           evidence_url?: string | null
           id?: string
           invite_reason?: string | null
-          invited_by?: string
+          invited_by?: string | null
+          kind?: string
           note?: string | null
+          pro_body?: string | null
+          pro_club?: string | null
+          pro_how_to_check?: string | null
+          pro_link?: string | null
+          pro_membership_number?: string | null
+          pro_no_profile?: boolean
+          pro_player_id?: string | null
+          pro_tour?: string | null
+          pro_tour_code?: string | null
           requested_at?: string | null
           required_approvals?: number
           review_reason?: string | null
@@ -7691,7 +7721,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "golfer_verification_requests_pro_player_id_fkey"
+            columns: ["pro_player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       golfer_verification_reviews: {
         Row: {
@@ -16253,6 +16291,13 @@ export type Database = {
           pinned_achievement_ids: string[] | null
           pinned_post_ids: string[] | null
           primary_club_id: string | null
+          pro_body: string | null
+          pro_club: string | null
+          pro_kind: string | null
+          pro_player_id: string | null
+          pro_tour: string | null
+          pro_tour_code: string | null
+          pro_verified_at: string | null
           profile_photo_url: string | null
           profile_type: string | null
           profile_video_thumbnail_url: string | null
@@ -16384,6 +16429,13 @@ export type Database = {
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
           primary_club_id?: string | null
+          pro_body?: string | null
+          pro_club?: string | null
+          pro_kind?: string | null
+          pro_player_id?: string | null
+          pro_tour?: string | null
+          pro_tour_code?: string | null
+          pro_verified_at?: string | null
           profile_photo_url?: string | null
           profile_type?: string | null
           profile_video_thumbnail_url?: string | null
@@ -16515,6 +16567,13 @@ export type Database = {
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
           primary_club_id?: string | null
+          pro_body?: string | null
+          pro_club?: string | null
+          pro_kind?: string | null
+          pro_player_id?: string | null
+          pro_tour?: string | null
+          pro_tour_code?: string | null
+          pro_verified_at?: string | null
           profile_photo_url?: string | null
           profile_type?: string | null
           profile_video_thumbnail_url?: string | null
@@ -16637,6 +16696,13 @@ export type Database = {
             columns: ["primary_club_id"]
             isOneToOne: false
             referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_pro_player_id_fkey"
+            columns: ["pro_player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
             referencedColumns: ["id"]
           },
         ]
@@ -20936,6 +21002,7 @@ export type Database = {
         Args: {
           p_decision: string
           p_note?: string
+          p_player_id?: string
           p_reason?: string
           p_request_id: string
         }
@@ -23997,6 +24064,17 @@ export type Database = {
       }
       get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
       get_pro_hole_data_queue: { Args: never; Returns: Json }
+      get_pro_members: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          pro_club: string
+          pro_kind: string
+          pro_player_id: string
+          pro_tour: string
+          pro_tour_code: string
+          user_id: string
+        }[]
+      }
       get_profile_creator: {
         Args: { p_user_id: string }
         Returns: {
@@ -26886,6 +26964,20 @@ export type Database = {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
+      request_pro_verification: {
+        Args: {
+          p_body?: string
+          p_club?: string
+          p_how_to_check?: string
+          p_kind: string
+          p_link?: string
+          p_membership_number?: string
+          p_no_profile?: boolean
+          p_tour?: string
+          p_tour_code?: string
+        }
+        Returns: string
+      }
       resend_business_invite: { Args: { p_invite_id: string }; Returns: Json }
       reset_watch_personalization: {
         Args: { p_user_id: string }
@@ -27087,6 +27179,10 @@ export type Database = {
           _is_public: boolean
           _member_user_id: string
         }
+        Returns: undefined
+      }
+      set_pro_player_link: {
+        Args: { p_player_id: string; p_user_id: string }
         Returns: undefined
       }
       set_tournament_pick: {
@@ -28116,6 +28212,7 @@ export type Database = {
         Args: { p_score_id: string }
         Returns: boolean
       }
+      withdraw_pro_verification: { Args: never; Returns: undefined }
     }
     Enums: {
       admin_role: "none" | "moderator" | "limited" | "full"

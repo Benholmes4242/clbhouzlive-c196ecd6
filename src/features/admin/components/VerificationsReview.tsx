@@ -20,6 +20,8 @@ import {
 } from '@/components/business/verification/revocationReasons';
 import { confirmedSignals } from '@/components/business/verification/evidenceLine';
 import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
+import { ProRequestFacts } from './ProRequestFacts';
+import { isProKind, proKindLabel, proDeclineReasonLabel, PRO_DECLINE_REASON_OPTIONS } from '@/features/pro-verification/proRules';
 
 /**
  * Extracted from UsersPage during the Members rebuild (D4). Behaviour and
@@ -38,7 +40,7 @@ const PROOF_NOUNS: Record<string, string> = {
   golf_course: 'golf course website',
 };
 
-type EntityFilter = 'business' | 'golfer' | 'course_claim';
+type EntityFilter = 'business' | 'golfer' | 'pro' | 'course_claim';
 
 export function VerificationsTab({
   data, loading, review,
@@ -50,10 +52,13 @@ export function VerificationsTab({
   const [params, setParams] = useSearchParams();
   const entityFromUrl = (params.get('entity') as EntityFilter | null) ?? null;
 
+  /* BRIEF 1 §8 — Users keeps notable requests only; Pros counts pending
+     tour_pro / teaching_pro requests. */
   const pendingByEntity = useMemo(() => ({
     business: data.filter(r => r.type === 'business' && r.status === 'pending').length,
     course_claim: data.filter(r => r.type === 'course_claim' && r.status === 'pending').length,
-    golfer: data.filter(r => r.type === 'golfer' && r.status === 'pending').length,
+    golfer: data.filter(r => r.type === 'golfer' && !isProKind(r.kind) && r.status === 'pending').length,
+    pro: data.filter(r => r.type === 'golfer' && isProKind(r.kind) && r.status === 'pending').length,
   }), [data]);
 
   const defaultEntity: EntityFilter =
@@ -61,6 +66,7 @@ export function VerificationsTab({
     (pendingByEntity.business > 0 ? 'business'
       : pendingByEntity.course_claim > 0 ? 'course_claim'
       : pendingByEntity.golfer > 0 ? 'golfer'
+      : pendingByEntity.pro > 0 ? 'pro'
       : 'business');
 
   const [entityFilter, setEntityFilterState] = useState<EntityFilter>(defaultEntity);
@@ -86,6 +92,9 @@ export function VerificationsTab({
   const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const [confirmApprove, setConfirmApprove] = useState(false);
+  /* BRIEF 1 §8 — the sr_players match the reviewer settled on; "Verify as
+     pro" sends it through to decide_golfer_verification. */
+  const [proPlayerId, setProPlayerId] = useState<string | null>(null);
   // PHASE 5B §1.3 — revocation: a structured reason, then a confirmation that
   // NAMES the business. The bypass is offered for system accounts only.
   const [revokeOpen, setRevokeOpen] = useState(false);
@@ -113,7 +122,12 @@ export function VerificationsTab({
   }, [active?.id, active?.businessId, active?.type]);
 
   const entityFiltered = useMemo(
-    () => data.filter(r => r.type === entityFilter),
+    () => data.filter(r =>
+      entityFilter === 'pro'
+        ? r.type === 'golfer' && isProKind(r.kind)
+        : entityFilter === 'golfer'
+          ? r.type === 'golfer' && !isProKind(r.kind)
+          : r.type === entityFilter),
     [data, entityFilter],
   );
 
@@ -128,6 +142,7 @@ export function VerificationsTab({
   const close = () => {
     setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false);
     setRevokeOpen(false); setRevokeReason(null); setRevokeNote(''); setRevokeBypass(false); setConfirmRevoke(false);
+    setProPlayerId(null);
   };
 
   const canRevoke = active?.type === 'business' && !!active.businessId && bizDetail?.is_verified === true;
@@ -163,7 +178,7 @@ export function VerificationsTab({
     }
     review.mutate(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason },
+      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason, playerId: proPlayerId },
       { onSuccess: close },
     );
   };
@@ -174,6 +189,7 @@ export function VerificationsTab({
         tabs={[
           { id: 'business',     label: 'Businesses', count: pendingByEntity.business || undefined },
           { id: 'golfer',       label: 'Users',      count: pendingByEntity.golfer || undefined },
+          { id: 'pro',          label: 'Pros',       count: pendingByEntity.pro || undefined },
           { id: 'course_claim', label: 'Courses',    count: pendingByEntity.course_claim || undefined },
         ]}
         activeId={entityFilter}
@@ -201,6 +217,9 @@ export function VerificationsTab({
             <VerificationCard key={r.id} row={r} disabled={review.isPending} onOpen={() => setActive(r)} onQuick={(d) => {
               if (review.isPending) return;
               setActive(r);
+              /* BRIEF 1 §8 — a pro approval needs the tour-player choice, so
+                 the quick action opens the card rather than deciding inline. */
+              if (r.type === 'golfer' && isProKind(r.kind)) return;
               if (d === 'approved' && r.type === 'business') {
                 review.mutate({ id: r.id, type: r.type, decision: 'approved', adminNote: '' }, { onSuccess: close });
               } else {
@@ -253,11 +272,11 @@ export function VerificationsTab({
           </div>
         ) : active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
+            <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>{active.type === 'golfer' && isProKind(active.kind) ? 'Decline' : 'Reject'}</DrawerBtn>
             {(active.type === 'business' || active.type === 'course_claim') && (
               <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={review.isPending} onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
             )}
-            <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>Approve</DrawerBtn>
+            <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>{active.type === 'golfer' && isProKind(active.kind) ? 'Verify as pro' : 'Approve'}</DrawerBtn>
           </div>
         ) : undefined}
       >
@@ -269,6 +288,7 @@ export function VerificationsTab({
             decision={decision}
             reviewReason={reviewReason}
             setReviewReason={setReviewReason}
+            onPlayerChange={setProPlayerId}
           />
         )}
       </DetailDrawer>
@@ -318,7 +338,7 @@ export default VerificationsTab;
  * decisions and reviewMutation.
  */
 export function VerificationDetailBody({
-  row, note, setNote, decision, reviewReason, setReviewReason,
+  row, note, setNote, decision, reviewReason, setReviewReason, onPlayerChange,
 }: {
   row: VerificationRow;
   note: string;
@@ -327,6 +347,8 @@ export function VerificationDetailBody({
   /** PHASE 4 §3 — optional so callers that have not adopted reasons still compile. */
   reviewReason?: ReviewReason | null;
   setReviewReason?: (v: ReviewReason | null) => void;
+  /** BRIEF 1 §8 — pro rows report the chosen sr_players match. */
+  onPlayerChange?: (playerId: string | null) => void;
 }) {
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const { data: proofConflict } = useProofConflict(row);
@@ -357,7 +379,8 @@ export function VerificationDetailBody({
           row.type === 'course_claim' ? 'warn' : 'neutral'
         }>
           {row.type === 'business' ? 'Business' :
-           row.type === 'course_claim' ? 'Course claim' : 'Golfer'}
+            row.type === 'course_claim' ? 'Course claim' :
+            isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'}
         </StatusPill>
         <StatusPill tone={
           row.status === 'pending' ? 'warn' :
@@ -454,6 +477,12 @@ export function VerificationDetailBody({
         <Field label="Applicant role" value={row.contactRole} />
       )}
 
+      {/* BRIEF 1 §8 — the pro card: everything they gave, the tour-player
+          suggestion for covered tours, and the per-kind checklist. */}
+      {row.type === 'golfer' && isProKind(row.kind) && (
+        <ProRequestFacts row={row} onPlayerChange={onPlayerChange} />
+      )}
+
       {row.note && <Field label="Request note" value={row.note} />}
       {row.evidenceUrl && (
         <Field label="Evidence">
@@ -478,10 +507,10 @@ export function VerificationDetailBody({
             {row.status} {row.reviewerName ? `by ${row.reviewerName}` : row.reviewedBy ? `by ${row.reviewedBy.slice(0, 8)}` : ''}
             {row.reviewedAt ? ` - ${formatAgo(row.reviewedAt, { suffix: true, empty: '-' })}` : ''}
           </div>
-          {(row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)) && (
+          {(row.type === 'golfer' ? (isProKind(row.kind) ? proDeclineReasonLabel(row.reviewReason) : golferReasonLabel(row.reviewReason)) : reviewReasonLabel(row.reviewReason)) && (
             <div style={{ fontSize: 13, color: t.ink }}>
               <span style={{ color: t.inkMuted }}>Reason:</span>{' '}
-              {row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)}
+              {row.type === 'golfer' ? (isProKind(row.kind) ? proDeclineReasonLabel(row.reviewReason) : golferReasonLabel(row.reviewReason)) : reviewReasonLabel(row.reviewReason)}
             </div>
           )}
           {row.adminNote && (
@@ -498,7 +527,7 @@ export function VerificationDetailBody({
       )}
       {/* PHASE 5B §5.5 — an invited golfer has nothing to supply, so the console
           says so instead of offering a button that throws. */}
-      {row.type === 'golfer' && row.status === 'pending' && (
+      {row.type === 'golfer' && !isProKind(row.kind) && row.status === 'pending' && (
         <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.45 }}>
           Invite-only: a golfer is recognised, not assessed on evidence they submit.
           There is no “needs info” here — approve the invitation or decline it with a reason.
@@ -541,7 +570,7 @@ export function VerificationDetailBody({
             Reason <span style={{ color: t.danger }}>(required)</span>
           </label>
           <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {(row.type === 'golfer' ? GOLFER_REASON_OPTIONS : REVIEW_REASON_OPTIONS).map(opt => {
+            {(row.type === 'golfer' ? (isProKind(row.kind) ? PRO_DECLINE_REASON_OPTIONS : GOLFER_REASON_OPTIONS) : REVIEW_REASON_OPTIONS).map(opt => {
               const on = reviewReason === opt.value;
               return (
                 <button
@@ -633,7 +662,7 @@ function VerificationCard({
                 {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '-'}
               </div>
               <div style={{ fontSize: 12, color: t.inkMuted }}>
-                {row.type === 'business' ? 'Business' : 'Golfer'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
+                {row.type === 'business' ? 'Business' : isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
               </div>
             </>
           )}

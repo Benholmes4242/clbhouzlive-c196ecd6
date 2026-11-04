@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { canContinueIdentity, courseStatsVisible, readWelcomeProgress, usernameSeed, usernameWithSuffix, welcomeName, writeWelcomeProgress, type WelcomeCourse } from '@/features/onboarding/welcomeRules';
 import type { CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 
-const f = vi.hoisted(() => ({ setField: vi.fn(), completed: false, taken: 0, save: vi.fn(), update: vi.fn(), track: vi.fn(), connected: false, connectionPending: false, suggestions: [] as Record<string, unknown>[], suggestionsError: false, stats: null as CourseStatsDetail | null, statsError: false, toggle: vi.fn(), join: vi.fn(), leave: vi.fn(), following: false, courseClubId: 'club' as string | null, circle: [] as Record<string, unknown>[], circleError: false, rating: null as { community_rating: number | null; rating_count: number | null } | null, ratingError: false, friends: [] as Record<string, unknown>[], friendsError: false, catalogueCount: null as number | null, annualDelta: null as number | null, percentile: null as { available: boolean; percentile_top: number } | null, counts: null as { rounds: number; courses: number; friends: number } | null, followingCount: 6 as number | null, catalogueError: false, updateFails: false }));
+const f = vi.hoisted(() => ({ setField: vi.fn(), completed: false, taken: 0, save: vi.fn(), update: vi.fn(), track: vi.fn(), connected: false, connectionPending: false, suggestions: [] as Record<string, unknown>[], suggestionsError: false, stats: null as CourseStatsDetail | null, statsError: false, toggle: vi.fn(), join: vi.fn(), leave: vi.fn(), following: false, courseClubId: 'club' as string | null, circle: [] as Record<string, unknown>[], circleError: false, rating: null as { community_rating: number | null; rating_count: number | null } | null, ratingError: false, friends: [] as Record<string, unknown>[], friendsError: false, catalogueCount: null as number | null, annualDelta: null as number | null, percentile: null as { available: boolean; percentile_top: number } | null, counts: null as { rounds: number; courses: number; friends: number } | null, followingCount: 6 as number | null, catalogueError: false, updateFails: false, pro: { verified: false, pending: false, declined: false, kind: null as string | null, tour: null as string | null, tourCode: null as string | null, club: null as string | null, body: null as string | null, reviewReason: null as string | null, request: null as Record<string, unknown> | null }, proLoading: false, withdraw: vi.fn() }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me', user_metadata: { full_name: 'Auth Name' } }, loading: false }) }));
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: { id: 'me', first_name: 'Ben', last_name: 'Holmes', has_completed_onboarding: false }, loading: false, isError: false }) }));
@@ -33,7 +33,12 @@ vi.mock('@/components/profile/handicap/whs/connect/CountryScreen', async () => {
 vi.mock('react-easy-crop', async () => { const { useEffect } = await vi.importActual<typeof import('react')>('react'); return { default: (p: { showGrid?: boolean; cropShape?: string; aspect?: number; objectFit?: string; onCropComplete: (a: unknown, b: unknown) => void }) => { useEffect(() => { p.onCropComplete({ x: 0, y: 0, width: 100, height: 100 }, { x: 0, y: 0, width: 10, height: 10 }); }, []); return <div data-easy-crop data-grid={String(p.showGrid)} data-shape={p.cropShape} data-aspect={p.aspect} data-fit={p.objectFit} />; } }; });
 vi.mock('@/components/profile/edit-v2/ImageCropperModal', () => ({ ImageCropperModal: () => null, getCroppedImg: async () => new Blob(['x'], { type: 'image/jpeg' }) }));
 vi.mock('@/features/onboarding/WelcomeFirstLook', () => ({ WelcomeFirstLook: (p: { connectionId?: string; busy: boolean; onOpen: (d: string) => void }) => <div data-first-look data-connected={!!p.connectionId}>{['courses', 'top100', 'clubhouse'].map(d => <button key={d} data-row={d} disabled={p.busy} onClick={() => p.onOpen(d)}>row-{d}</button>)}</div> }));
-vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: () => { const chain = { select: () => chain, update: (payload: unknown) => { f.update(payload); return chain; }, eq: () => chain, ilike: () => chain, neq: async () => ({ count: f.taken-- > 0 ? 1 : 0, error: null }), single: async () => (f.updateFails ? { data: null, error: { code: 'X', message: 'fail' } } : { data: { id: 'me' }, error: null }), maybeSingle: async () => ({ data: { id: 'me', has_completed_onboarding: f.completed }, error: null }), then: (resolve: (v: unknown) => void) => resolve(f.catalogueError ? { count: null, error: new Error('count') } : { count: f.catalogueCount, error: null }) }; return chain; }, rpc: async (name: string) => { if (name === 'get_post_course_context') return f.ratingError ? { data: null, error: new Error('rating') } : { data: f.rating ? [f.rating] : [], error: null }; if (name === 'get_my_handicap_friends_on_clbhouz') return f.friendsError ? { data: null, error: new Error('friends') } : { data: f.friends, error: null }; return { data: null, error: null }; } } }));
+/* BRIEF 1 §3/§4 — the pro status hook and the details sheet are mocked whole:
+   Welcome's own branches (switch, pending status, withdraw, screen-4 pro
+   branch) are under test, not the sheet's internals (proVerification1.test). */
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ ...f.pro, isLoading: f.proLoading }), useInvalidateMyProStatus: () => vi.fn() }));
+vi.mock('@/features/pro-verification/ProDetailsSheet', () => ({ ProDetailsSheet: (p: { open: boolean; onClose: (o: string) => void }) => p.open ? <button data-testid="pro-sheet" onClick={() => p.onClose('closed')}>pro-sheet</button> : null }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: () => { const chain = { select: () => chain, update: (payload: unknown) => { f.update(payload); return chain; }, eq: () => chain, ilike: () => chain, neq: async () => ({ count: f.taken-- > 0 ? 1 : 0, error: null }), single: async () => (f.updateFails ? { data: null, error: { code: 'X', message: 'fail' } } : { data: { id: 'me' }, error: null }), maybeSingle: async () => ({ data: { id: 'me', has_completed_onboarding: f.completed }, error: null }), then: (resolve: (v: unknown) => void) => resolve(f.catalogueError ? { count: null, error: new Error('count') } : { count: f.catalogueCount, error: null }) }; return chain; }, rpc: async (name: string) => { if (name === 'get_post_course_context') return f.ratingError ? { data: null, error: new Error('rating') } : { data: f.rating ? [f.rating] : [], error: null }; if (name === 'get_my_handicap_friends_on_clbhouz') return f.friendsError ? { data: null, error: new Error('friends') } : { data: f.friends, error: null }; if (name === 'withdraw_pro_verification') { f.withdraw(); return { data: null, error: null }; } return { data: null, error: null }; } } }));
 import Welcome from '@/pages/Welcome';
 import { WelcomeErrorBoundary } from '@/features/onboarding/WelcomeErrorBoundary';
 import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
@@ -45,7 +50,7 @@ const COURSE: WelcomeCourse = { id: 'course', name: 'Park', region: 'Kent' };
 const statsFixture = (over: Partial<CourseStatsDetail>): CourseStatsDetail => ({ course_id: 'course', rounds_tracked: null, avg_over_par: null, harder_than_pct: null, your_rounds: null, your_best: null, your_best_at: null, circle_played: null, top100_rank: null, top100_list: null, hardest_hole_no: null, hardest_hole_par: null, hardest_hole_plays: null, ...over });
 function mount(step = 1) { writeWelcomeProgress('me', { completed: step - 1, course: null, follows: 0 }); const qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } }); return render(<QueryClientProvider client={qc}><MemoryRouter><Welcome /></MemoryRouter></QueryClientProvider>); }
 function mountFirstLook(props: { course?: WelcomeCourse | null; connectionId?: string }, qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })) { return render(<QueryClientProvider client={qc}><MemoryRouter><RealFirstLook userId="me" first="Ben" fullName="Ben Holmes" username="benholmes" photoUrl={null} course={props.course ?? null} connectionId={props.connectionId} busy={false} onFollow={vi.fn()} onOpen={vi.fn()} /></MemoryRouter></QueryClientProvider>); }
-beforeEach(() => { localStorage.clear(); vi.clearAllMocks(); f.completed = false; f.taken = 0; f.connected = false; f.connectionPending = false; f.suggestions = []; f.suggestionsError = false; f.stats = null; f.statsError = false; f.following = false; f.courseClubId = 'club'; f.circle = []; f.circleError = false; f.rating = null; f.ratingError = false; f.friends = []; f.friendsError = false; f.catalogueCount = null; f.annualDelta = null; f.percentile = null; f.counts = null; f.followingCount = 6; f.catalogueError = false; f.updateFails = false; f.save.mockResolvedValue(true); f.toggle.mockResolvedValue({ next: true }); });
+beforeEach(() => { localStorage.clear(); vi.clearAllMocks(); f.completed = false; f.taken = 0; f.connected = false; f.connectionPending = false; f.suggestions = []; f.suggestionsError = false; f.stats = null; f.statsError = false; f.following = false; f.courseClubId = 'club'; f.circle = []; f.circleError = false; f.rating = null; f.ratingError = false; f.friends = []; f.friendsError = false; f.catalogueCount = null; f.annualDelta = null; f.percentile = null; f.counts = null; f.followingCount = 6; f.catalogueError = false; f.updateFails = false; f.pro = { verified: false, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null }; f.proLoading = false; f.save.mockResolvedValue(true); f.toggle.mockResolvedValue({ next: true }); });
 afterEach(cleanup);
 describe('OB1 welcome', () => {
   it('unfinished post-auth profiles land at welcome', async () => expect(await resolvePostAuthRoute('me')).toBe('/welcome'));
@@ -117,4 +122,73 @@ describe('OB1.2 first sign-in fixes', () => {
   it.each([['courses', '/courses'], ['top100', '/courses?tab=top100'], ['clubhouse', '/']])('row %s completes then navigates with replace to %s', async (dest, path) => { const seen: string[] = []; function Loc() { const l = useLocation(); seen.push(l.pathname + l.search); return null; } writeWelcomeProgress('me', { completed: 4, course: null, follows: 0 }); const qc = new QueryClient(); render(<QueryClientProvider client={qc}><MemoryRouter initialEntries={['/welcome']}><Routes><Route path="/welcome" element={<Welcome />} /><Route path="*" element={<Loc />} /></Routes></MemoryRouter></QueryClientProvider>); fireEvent.click(await screen.findByRole('button', { name: `row-${dest}` })); await waitFor(() => expect(seen.at(-1)).toBe(path)); expect(f.update).toHaveBeenCalledWith(expect.objectContaining({ has_completed_onboarding: true })); expect(f.track).toHaveBeenCalledWith('onboarding_finished', expect.objectContaining({ destination: dest })); });
   it('a row whose completion fails keeps the member on the page with the save-failed message', async () => { f.updateFails = true; mount(5); fireEvent.click(screen.getByRole('button', { name: 'row-courses' })); await screen.findByText('Could not save. Please try again.'); expect(document.querySelector('[data-welcome-step]')).toHaveAttribute('data-welcome-step', '5'); expect(f.track).not.toHaveBeenCalledWith('onboarding_finished', expect.anything()); });
   it('screen 2 search status reads Searching… with role status, 22px below the bar', () => { const css = readFileSync('src/styles/welcome.css', 'utf8'); expect(css).toContain('.welcome-search-status{font-size:13.5px;color:var(--welcome-mute);margin-top:22px}'); const src = readFileSync('src/pages/Welcome.tsx', 'utf8'); expect(src).toContain(`<p role="status" className="welcome-search-status">{t('welcome.searching', { defaultValue: 'Searching…' })}</p>`); });
+});
+
+describe('BRIEF 1 — the welcome pro flow', () => {
+  it('the pro switch opens the details sheet and closing without sending turns it back off', () => {
+    mount(1);
+    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    expect(row).toHaveAttribute('aria-checked', 'false');
+    fireEvent.click(row);
+    expect(screen.getByTestId('pro-sheet')).toBeInTheDocument();
+    expect(row).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(screen.getByTestId('pro-sheet'));
+    expect(screen.queryByTestId('pro-sheet')).toBeNull();
+    expect(row).toHaveAttribute('aria-checked', 'false');
+  });
+  it('a pending pro keeps the row on with an Edit door to the sheet', () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(1);
+    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    expect(row).toHaveAttribute('aria-checked', 'true');
+    expect(row.textContent).toContain('Verification requested · Tour professional');
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(screen.getByTestId('pro-sheet')).toBeInTheDocument();
+    expect(f.withdraw).not.toHaveBeenCalled();
+  });
+  it('turning a pending pro off withdraws the request through the RPC', async () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(1);
+    fireEvent.click(screen.getByRole('switch', { name: "I'm a golf professional" }));
+    await waitFor(() => expect(f.withdraw).toHaveBeenCalledTimes(1));
+  });
+  it('a verified pro row cannot be toggled off', () => {
+    f.pro = { ...f.pro, verified: true, kind: 'teaching_pro', club: 'Sunningdale' };
+    mount(1);
+    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    expect(row).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(row);
+    expect(f.withdraw).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('pro-sheet')).toBeNull();
+  });
+  it('a pending pro gets the No handicap needed branch and Continue completes with the pro choice', async () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('No handicap needed.'));
+    expect(screen.getByText(/Being checked/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'England' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(f.track).toHaveBeenCalledWith('onboarding_step_completed', { step: 4, choice: 'pro' }));
+    expect(document.querySelector('[data-welcome-step]')).toHaveAttribute('data-welcome-step', '5');
+  });
+  it('a verified pro gets the same branch with the verified copy', async () => {
+    f.pro = { ...f.pro, verified: true, kind: 'teaching_pro', club: 'Sunningdale' };
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('No handicap needed.'));
+    expect(screen.getByText(/You're verified as a pro/)).toBeInTheDocument();
+  });
+  it('I have a handicap to connect falls back to the ordinary connect flow', async () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('No handicap needed.'));
+    fireEvent.click(screen.getByRole('button', { name: 'I have a handicap to connect' }));
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Got an official handicap?');
+    expect(screen.getByRole('button', { name: 'England' })).toBeInTheDocument();
+  });
+  it('an unsettled pro read holds screen 4 on the loading state', async () => {
+    f.proLoading = true;
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('status')).toBeInTheDocument());
+    expect(screen.queryByText('No handicap needed.')).toBeNull();
+  });
 });

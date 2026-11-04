@@ -449,8 +449,13 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     if (cid) return `/courses/${cid}?tab=holes`;
   }
   // --- golfer verified (system-authored) -----------------------------
-  if (type === 'golfer_verified') {
+  // BRIEF 1 §9 — approved opens the profile; declined and removed open Edit
+  // profile, where the member reads the reason and can re-request.
+  if (type === 'golfer_verified' || type === 'golfer_verification_approved') {
     return '/profile';
+  }
+  if (type === 'golfer_verification_rejected' || type === 'golfer_verification_removed') {
+    return '/edit-profile';
   }
 
   // --- tour digests (system-authored, NO actor, NO target) ------------

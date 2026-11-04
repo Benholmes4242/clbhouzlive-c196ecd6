@@ -1,0 +1,37 @@
+/* BRIEF 1 §2 — ProDetailsSheet. Values from the signed-off mock
+   (build1-pro-verification-flow-signed-off.html): sheet #16161A, card
+   #17171B, hairline rgba(255,255,255,0.08), ink #F8FAFC. Chips wrap so
+   nothing runs off a small screen. */
+.pds-root{position:fixed;inset:0;z-index:1200;display:flex;flex-direction:column;justify-content:flex-end}
+.pds-dim{position:absolute;inset:0;background:rgba(0,0,0,0.55);border:0;padding:0}
+.pds-sheet{position:relative;background:#16161A;border-radius:22px 22px 0 0;padding:8px 0 0;max-height:85dvh;display:flex;flex-direction:column;overflow:hidden}
+.pds-grab{width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,0.22);margin:0 auto 12px;flex:none}
+.pds-head{padding:4px 20px 0;flex:none}
+.pds-kicker{font-size:10px;font-weight:800;letter-spacing:0.16em;color:rgba(248,250,252,0.62)}
+.pds-head h2{margin:4px 0 0;font-size:22px;font-weight:800;line-height:1.2;color:#F8FAFC}
+.pds-head p{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:rgba(248,250,252,0.62)}
+.pds-body{padding:16px 20px 0;overflow-y:auto;flex:1}
+.pds-kinds{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pds-kind{padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:#17171B;cursor:pointer;text-align:left;font-family:inherit}
+.pds-kind.on{border-color:#F8FAFC}
+.pds-kind b{display:block;font-size:14.5px;font-weight:700;color:#F8FAFC}
+.pds-kind span{display:block;margin-top:3px;font-size:12px;line-height:1.4;color:rgba(248,250,252,0.62)}
+.pds-label{margin:18px 0 8px;font-size:10px;font-weight:800;letter-spacing:0.14em;color:rgba(248,250,252,0.42)}
+.pds-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pds-chip{height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:rgba(248,250,252,0.62);cursor:pointer;background:transparent;font-family:inherit}
+.pds-chip.on{background:#F8FAFC;color:#0B0B0D;border-color:#F8FAFC}
+.pds-inp{width:100%;min-height:46px;border-radius:12px;background:rgba(255,255,255,0.06);border:0;padding:0 12px;display:flex;align-items:center;font-size:15px;color:#F8FAFC;font-family:inherit;outline:none}
+.pds-inp::placeholder{color:rgba(248,250,252,0.42)}
+.pds-inp:disabled{opacity:0.45}
+textarea.pds-inp{min-height:74px;padding:12px;align-items:flex-start;resize:vertical;line-height:1.45}
+.pds-inp + .pds-inp{margin-top:8px}
+.pds-hint{margin-top:6px;font-size:12px;line-height:1.45;color:rgba(248,250,252,0.42)}
+.pds-cb{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#F8FAFC;cursor:pointer;min-height:44px;background:none;border:0;padding:0;font-family:inherit;width:100%;text-align:left}
+.pds-cb .box{width:22px;height:22px;border-radius:7px;border:1.5px solid rgba(255,255,255,0.3);display:grid;place-items:center;flex:none;color:#0A0A0C}
+.pds-cb.on .box{background:#F8FAFC;border-color:#F8FAFC}
+.pds-foot{padding:16px 20px 26px;flex:none}
+.pds-primary{height:52px;border-radius:999px;background:#F8FAFC;color:#0B0B0D;font-family:inherit;font-size:16px;font-weight:600;border:0;width:100%;cursor:pointer}
+.pds-primary:disabled{background:rgba(255,255,255,0.1);color:rgba(248,250,252,0.42);cursor:default}
+.pds-text{height:44px;background:transparent;border:0;color:rgba(248,250,252,0.62);font-family:inherit;font-size:15px;font-weight:600;width:100%;cursor:pointer}
+.pds-fn{margin-top:8px;text-align:center;font-size:12px;line-height:1.45;color:rgba(248,250,252,0.42)}
+.pds-root button:focus-visible,.pds-root input:focus-visible,.pds-root textarea:focus-visible{outline:2px solid #F7931E;outline-offset:2px}

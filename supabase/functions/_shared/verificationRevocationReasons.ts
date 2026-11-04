@@ -19,6 +19,10 @@ export const GOLFER_REASONS = [
   'identity_unconfirmed',
   'invited_in_error',
   'conduct',
+  /* BRIEF 1 §8 — pro decline reasons (tour_pro / teaching_pro requests). */
+  'not_on_tour_site',
+  'not_pga_member',
+  'details_mismatch',
   'other',
 ] as const;
 
@@ -34,5 +38,8 @@ export const GOLFER_REASON_LABEL: Record<string, string> = {
   identity_unconfirmed: 'We could not confirm your identity.',
   invited_in_error: 'The invitation was sent in error.',
   conduct: 'Conduct on the platform.',
+  not_on_tour_site: "We couldn't find you on the tour's site.",
+  not_pga_member: 'We could not confirm a current membership with that PGA.',
+  details_mismatch: "The details didn't match your profile.",
   other: '',
 };

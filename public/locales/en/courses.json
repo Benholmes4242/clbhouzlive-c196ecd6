@@ -46,7 +46,9 @@
       "ghostName": "You",
       "ghostSub": "Your next round",
       "tileTitle": "Get one. It's quicker than you think.",
-      "tileBody": "An official WHS handicap is what unlocks these scores and puts you on the boards. You don't need a club for one."
+      "tileBody": "An official WHS handicap is what unlocks these scores and puts you on the boards. You don't need a club for one.",
+      "proPendingTitle": "Nearly there.",
+      "proPendingBody": "The boards open as soon as your pro verification is checked. Pros don't need a handicap."
     },
     "competitions": {
       "eyebrow": "Home club golf",

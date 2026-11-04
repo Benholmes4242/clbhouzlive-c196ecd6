@@ -20,6 +20,9 @@ import { BOARD_ROW_FLOOR as CIRCLE_ROW_FLOOR } from '@/components/explore-tab-ne
 import type { ScopeKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import { useCircleSize } from './useCircleSize';
+import { roundsGateState } from '@/features/explore-magazine/RoundsGate';
+import { useMyProStatus } from '@/features/pro-verification/useMyProStatus';
+import { proGateStatus } from '@/features/pro-verification/proRules';
 
 /**
  * THE EXPLORE LEADERBOARD'S STATE (BRIEF_EXPLORE_LEADERBOARD_STATES).
@@ -163,8 +166,12 @@ export function useAmateurBoardState(userId: string | undefined, active = true, 
   /* CB40 — the gate state, from the SAME useWhsConnection read above (one
      react-query key, no second request) and the same predicate RoundsGate
      uses: signed in, settled, no connection row. An unsettled or failed read
-     is not gated, so the minimum never applies on a guess. */
-  const gated = !!userId && whs.isSuccess && !whs.data;
+     is not gated, so the minimum never applies on a guess.
+     BRIEF 1 §7 — both owners now call the one shared predicate: a verified
+     pro is never gated and a pending pro is held as 'proPending', neither of
+     which applies the minimums. */
+  const proStatus = useMyProStatus(userId);
+  const gated = roundsGateState(userId, whs, proGateStatus(proStatus)) === 'gated';
   const entryBoard = entryBoardFor();
   /* null = untouched: the member is on their resolved entry board. Once they
      pick, nothing re-applies the default for the rest of the visit. */

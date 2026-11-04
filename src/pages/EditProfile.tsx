@@ -19,6 +19,7 @@ import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 import { EditProfileCard, type PhotoKind, type PhotoActions } from '@/features/edit-profile/EditProfileCard';
 import { EditProfileYou, type YouFields, type YouPatch, type YouActions } from '@/features/edit-profile/EditProfileYou';
 import { EditProfileType } from '@/features/edit-profile/EditProfileType';
+import { EditProfilePro } from '@/features/edit-profile/EditProfilePro';
 import { toast } from '@/lib/toast';
 import { EditProfileGolf, type GolfFields, type GolfPatch, type GolfActions } from '@/features/edit-profile/EditProfileGolf';
 import { EditProfileLinksPrivacy, type LinksPrivacyFields, type LinksPrivacyPatch } from '@/features/edit-profile/EditProfileLinksPrivacy';
@@ -163,6 +164,7 @@ export default function EditProfile() {
             onUsernameChanged={(u, at) => setUsernameNow({ username: u, at })}
           />}
           {profile && <EditProfileType isCreator={creatorNow ?? profile.is_creator ?? false} onSave={saveCreator} />}
+          {profile && <EditProfilePro userId={user?.id ?? ''} />}
           {profile && <EditProfileGolf ref={golfActions} userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
           {profile && <EditProfileLinksPrivacy userId={user?.id ?? ''} form={{ ...form, ...linksPrivacyNow }} handicapVisibility={profile.handicap_visibility === 'friends' || profile.handicap_visibility === 'private' ? profile.handicap_visibility : 'public'} onSave={saveLinksPrivacy} />}
         </main>

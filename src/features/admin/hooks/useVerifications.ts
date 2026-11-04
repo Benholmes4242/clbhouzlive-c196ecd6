@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
+import { isProKind } from '@/features/pro-verification/proRules';
 
 export type BusinessDecision = 'approved' | 'rejected' | 'needs_more_info';
 export type GolferDecision = 'approved' | 'rejected';
@@ -35,6 +36,17 @@ export interface VerificationRow {
   evidenceUrl?: string | null;
   proofDocumentUrl?: string | null;
   inviteReason?: string | null;
+  /** BRIEF 1 §8 — pro request fields (kinds tour_pro / teaching_pro). */
+  kind?: string | null;
+  proTour?: string | null;
+  proTourCode?: string | null;
+  proBody?: string | null;
+  proClub?: string | null;
+  proMembershipNumber?: string | null;
+  proLink?: string | null;
+  proNoProfile?: boolean | null;
+  proHowToCheck?: string | null;
+  proPlayerId?: string | null;
   displayName?: string | null;
   username?: string | null;
   avatarUrl?: string | null;
@@ -62,13 +74,18 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
       .order('created_at', { ascending: false }),
     supabase
       .from('golfer_verification_requests')
-      .select('id, status, invited_by, created_at, reviewed_at, note, admin_note, evidence_url, invite_reason')
+      .select('id, status, user_id, invited_by, kind, pro_tour, pro_tour_code, pro_body, pro_club, pro_membership_number, pro_link, pro_no_profile, pro_how_to_check, pro_player_id, created_at, reviewed_at, reviewed_by, review_reason, note, admin_note, evidence_url, invite_reason')
       .order('created_at', { ascending: false }),
     supabase
       .from('course_claim_requests')
       .select('id, status, business_id, club_id, source_course_id, proof_note, admin_note, created_at, reviewed_at, requested_by')
       .order('created_at', { ascending: false }),
   ]);
+
+  /* BRIEF 1 §8 — a failed read must surface, never become an empty queue. */
+  if (biz.error) throw biz.error;
+  if (golfer.error) throw golfer.error;
+  if (claims.error) throw claims.error;
 
   // Enrich course-claim rows with business name + course label
   const claimRows = claims.data ?? [];
@@ -113,11 +130,25 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
       contactEmail: r.contact_email ?? null,
       contactRole: r.contact_role ?? null,
     })),
+    /* BRIEF 1 §8 — the subject is user_id, never the inviter: the queue shows
+       the member under review. invited_by stays available for legacy rows. */
     ...(golfer.data ?? []).map(r => ({
       id: r.id, type: 'golfer' as const, status: r.status,
-      requestedBy: r.invited_by, createdAt: r.created_at, reviewedAt: r.reviewed_at,
+      requestedBy: r.user_id ?? r.invited_by, createdAt: r.created_at, reviewedAt: r.reviewed_at,
+      reviewedBy: r.reviewed_by ?? null,
+      reviewReason: r.review_reason ?? null,
       note: r.note, adminNote: r.admin_note,
       evidenceUrl: r.evidence_url, inviteReason: r.invite_reason,
+      kind: r.kind ?? null,
+      proTour: r.pro_tour ?? null,
+      proTourCode: r.pro_tour_code ?? null,
+      proBody: r.pro_body ?? null,
+      proClub: r.pro_club ?? null,
+      proMembershipNumber: r.pro_membership_number ?? null,
+      proLink: r.pro_link ?? null,
+      proNoProfile: r.pro_no_profile ?? null,
+      proHowToCheck: r.pro_how_to_check ?? null,
+      proPlayerId: r.pro_player_id ?? null,
     })),
     ...claimRows.map((r: any) => ({
       id: r.id, type: 'course_claim' as const, status: r.status,
@@ -174,7 +205,7 @@ export function useVerifications() {
 
   const reviewMutation = useMutation({
     mutationFn: async ({
-      id, type, decision, adminNote, reviewReason,
+      id, type, decision, adminNote, reviewReason, playerId,
     }: {
       id: string;
       type: 'business' | 'golfer' | 'course_claim';
@@ -185,6 +216,8 @@ export function useVerifications() {
        * alongside admin_notes, never instead of it. Omitted for approvals.
        */
       reviewReason?: string | null;
+      /** BRIEF 1 §8 — the chosen sr_players match on a pro approval. */
+      playerId?: string | null;
     }) => {
       // Shared edge-function error classifier (used by business + course_claim)
       const classifyEdgeError = async (error: any) => {
@@ -264,7 +297,7 @@ export function useVerifications() {
         throw e;
       }
       const { data, error } = await supabase.functions.invoke('verify-golfer-decision', {
-        body: { request_id: id, decision, reason: reviewReason ?? null, admin_note: adminNote || null },
+        body: { request_id: id, decision, reason: reviewReason ?? null, admin_note: adminNote || null, player_id: playerId ?? null },
       });
       if (error) throw await classifyEdgeError(error);
       if (data && data.ok === false) {
@@ -359,15 +392,27 @@ export function useVerifications() {
     onSettled: async () => { await refreshAdminQueues(qc); },
   });
 
+  /** BRIEF 1 §8 — a verified pro's row offers "Change tour player". */
+  const setProPlayerLinkMutation = useMutation({
+    mutationFn: async ({ userId, playerId }: { userId: string; playerId: string }) => {
+      const { error } = await supabase.rpc('set_pro_player_link', { p_user_id: userId, p_player_id: playerId });
+      if (error) throw error;
+    },
+    onSuccess: () => toast.success('Tour player linked.'),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to link the tour player'),
+    onSettled: async () => { await refreshAdminQueues(qc); },
+  });
+
   const counts = {
     all: data.length,
     pending: data.filter(v => v.status === 'pending').length,
     business: data.filter(v => v.type === 'business' && v.status === 'pending').length,
-    golfer: data.filter(v => v.type === 'golfer' && v.status === 'pending').length,
+    golfer: data.filter(v => v.type === 'golfer' && v.status === 'pending' && !isProKind(v.kind)).length,
+    pro: data.filter(v => v.type === 'golfer' && v.status === 'pending' && isProKind(v.kind)).length,
     courseClaim: data.filter(v => v.type === 'course_claim' && v.status === 'pending').length,
   };
 
-  return { data, isLoading, refetch, counts, reviewMutation, revokeMutation, removeGolferMutation };
+  return { data, isLoading, refetch, counts, reviewMutation, revokeMutation, removeGolferMutation, setProPlayerLinkMutation };
 
 }
 

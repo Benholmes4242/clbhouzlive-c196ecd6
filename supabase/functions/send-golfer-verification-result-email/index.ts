@@ -62,21 +62,42 @@ serve(async (req) => {
     const appBase = Deno.env.get("APP_BASE_URL") || "https://www.clbhouz.co.uk";
     const cause = reason ? GOLFER_REASON_LABEL[reason] ?? "" : "";
 
+    /* BRIEF 1 §9 — a pro request gets pro-specific copy. The caller passes
+       only user_id, so the member's latest request supplies the kind. */
+    let proKind: string | null = null;
+    try {
+      const { data: reqRow } = await supabaseAdmin
+        .from("golfer_verification_requests")
+        .select("kind")
+        .eq("user_id", user_id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      proKind = (reqRow?.kind as string | undefined) ?? null;
+    } catch (_) { /* fall through */ }
+    const isPro = proKind === "tour_pro" || proKind === "teaching_pro";
+    const proLabel = proKind === "teaching_pro" ? "teaching professional" : "tour professional";
+
     let subject: string;
     let inner: string;
     let text: string;
 
     if (outcome === "approved") {
-      subject = "You're verified on Clbhouz";
-      text = `Your verified badge is now live across Clbhouz.\n\n${appBase}`;
+      subject = isPro ? "You're verified as a pro on Clbhouz" : "You're verified on Clbhouz";
+      const approvedBody = isPro
+        ? `Your profile now shows you're a verified ${proLabel}.`
+        : "Your verified badge is now live across your profile, posts and reviews.";
+      text = `${approvedBody}\n\n${appBase}`;
       inner = `<h2 style="margin:0 0 8px;color:#0f172a;">You're verified</h2>
-        <p style="margin:0 0 16px;color:#334155;">Your verified badge is now live across your profile, posts and reviews.</p>
+        <p style="margin:0 0 16px;color:#334155;">${approvedBody}</p>
         <a class="cta" href="${appBase}">Open Clbhouz</a>`;
     } else {
-      subject = outcome === "removed" ? "Your Clbhouz verification has been removed" : "About your Clbhouz verification";
+      subject = outcome === "removed"
+        ? (isPro ? "Your Clbhouz pro verification has been removed" : "Your Clbhouz verification has been removed")
+        : (isPro ? "About your Clbhouz pro verification" : "About your Clbhouz verification");
       const body = [cause || (outcome === "removed"
-        ? "Your verified badge has been removed."
-        : "Your verification was not granted."), admin_note].filter(Boolean).join(" ");
+        ? (isPro ? "Your pro verification has been removed." : "Your verified badge has been removed.")
+        : (isPro ? "Your pro verification was declined." : "Your verification was not granted.")), admin_note].filter(Boolean).join(" ");
       text = `${body}\n\n${appBase}`;
       inner = `<h2 style="margin:0 0 8px;color:#0f172a;">Verification update</h2>
         <p style="margin:0 0 12px;color:#334155;">${escapeHtml(body)}</p>`;

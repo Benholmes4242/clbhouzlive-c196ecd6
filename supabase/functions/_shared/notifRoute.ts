@@ -392,7 +392,10 @@ export function routeForNotif(input: NotifRouteInput): string {
   if (type === 'handicap_authority_live') return '/handicap';
 
   // golfer verified (system-authored)
-  if (type === 'golfer_verified') return '/profile';
+  // BRIEF 1 §9 — approved opens the profile; declined and removed open Edit
+  // profile. Mirrors src/features/activity-v2/utils/activityLinks.ts.
+  if (type === 'golfer_verified' || type === 'golfer_verification_approved') return '/profile';
+  if (type === 'golfer_verification_rejected' || type === 'golfer_verification_removed') return '/edit-profile';
 
   // tour digests (system-authored, NO actor, NO target). Each digest summarises
   // several stories, so there is nothing single to deep-link to — they land on
