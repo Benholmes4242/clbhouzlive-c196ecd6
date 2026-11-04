@@ -177,6 +177,12 @@ export const PRO_DECLINE_REASON_OPTIONS = [
   { value: 'other', label: 'Other', hint: 'Free text required' },
 ] as const;
 
+/** §8 — the admin decision record names the pro reason, not its key. */
+export function proDeclineReasonLabel(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return PRO_DECLINE_REASON_OPTIONS.find(r => r.value === value)?.label ?? value;
+}
+
 /** §5 — the Edit profile "Not verified" row: the review reason in plain words. */
 export function proDeclineReasonText(reason: string | null | undefined, tour?: string | null): string {
   switch (reason) {

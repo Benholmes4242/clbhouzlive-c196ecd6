@@ -331,7 +331,9 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
   // PHASE 4 §3.2 — the same gate as the Verifications tab: a refusal carries a reason.
   const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
-  useEffect(() => { if (!row) { setNote(''); setDecision(null); setReviewReason(null); } }, [row]);
+  /* BRIEF 1 §8 — the pro card's chosen sr_players match rides the approval. */
+  const [proPlayerId, setProPlayerId] = useState<string | null>(null);
+  useEffect(() => { if (!row) { setNote(''); setDecision(null); setReviewReason(null); setProPlayerId(null); } }, [row]);
 
   if (!row) return null;
 
@@ -342,7 +344,7 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
     if (row.type === 'golfer' && d === 'needs_more_info') return;
     reviewMutation.mutate(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { id: row.id, type: row.type, decision: d as any, adminNote: note, reviewReason: d === 'approved' ? null : reviewReason },
+      { id: row.id, type: row.type, decision: d as any, adminNote: note, reviewReason: d === 'approved' ? null : reviewReason, playerId: proPlayerId },
       { onSuccess: onClose },
     );
   };
@@ -393,6 +395,7 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
         decision={decision}
         reviewReason={reviewReason}
         setReviewReason={setReviewReason}
+        onPlayerChange={setProPlayerId}
       />
     </AdminSheet>
   );

@@ -21,7 +21,7 @@ import {
 import { confirmedSignals } from '@/components/business/verification/evidenceLine';
 import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
 import { ProRequestFacts } from './ProRequestFacts';
-import { isProKind, proKindLabel, PRO_DECLINE_REASON_OPTIONS } from '@/features/pro-verification/proRules';
+import { isProKind, proKindLabel, proDeclineReasonLabel, PRO_DECLINE_REASON_OPTIONS } from '@/features/pro-verification/proRules';
 
 /**
  * Extracted from UsersPage during the Members rebuild (D4). Behaviour and
@@ -507,10 +507,10 @@ export function VerificationDetailBody({
             {row.status} {row.reviewerName ? `by ${row.reviewerName}` : row.reviewedBy ? `by ${row.reviewedBy.slice(0, 8)}` : ''}
             {row.reviewedAt ? ` - ${formatAgo(row.reviewedAt, { suffix: true, empty: '-' })}` : ''}
           </div>
-          {(row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)) && (
+          {(row.type === 'golfer' ? (isProKind(row.kind) ? proDeclineReasonLabel(row.reviewReason) : golferReasonLabel(row.reviewReason)) : reviewReasonLabel(row.reviewReason)) && (
             <div style={{ fontSize: 13, color: t.ink }}>
               <span style={{ color: t.inkMuted }}>Reason:</span>{' '}
-              {row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)}
+              {row.type === 'golfer' ? (isProKind(row.kind) ? proDeclineReasonLabel(row.reviewReason) : golferReasonLabel(row.reviewReason)) : reviewReasonLabel(row.reviewReason)}
             </div>
           )}
           {row.adminNote && (
