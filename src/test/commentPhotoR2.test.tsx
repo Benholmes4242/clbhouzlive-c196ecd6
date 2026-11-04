@@ -37,7 +37,7 @@ describe('FIX_COMMENT_IMG_1 comment photos', () => {
     const publicUrl = 'https://images.clbhouz.com/comments/user-1/p.jpeg';
     f.upload.mockResolvedValue({ success: true, publicUrl });
     const onSubmit = vi.fn().mockResolvedValue(undefined);
-    const { container } = render(<CommentComposer onSubmit={onSubmit} />);
+    const { container } = render(<CommentComposer replyingTo={null} onClearReply={() => {}} isSubmitting={false} onSubmit={onSubmit} />);
     attach(container);
     await waitFor(() => expect(screen.getByRole('button', { name: 'Send' })).not.toBeDisabled());
     expect(f.compress).toHaveBeenCalledWith(expect.any(File), { preset: 'feed' });
@@ -53,7 +53,7 @@ describe('FIX_COMMENT_IMG_1 comment photos', () => {
     f.upload.mockResolvedValue({ success: false, error: 'x' });
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const onSubmit = vi.fn();
-    const { container } = render(<CommentComposer onSubmit={onSubmit} />);
+    const { container } = render(<CommentComposer replyingTo={null} onClearReply={() => {}} isSubmitting={false} onSubmit={onSubmit} />);
     attach(container);
     await waitFor(() => expect(f.toastError).toHaveBeenCalledWith("Couldn't attach photo", { description: 'x' }));
     const send = screen.getByRole('button', { name: 'Send' });
