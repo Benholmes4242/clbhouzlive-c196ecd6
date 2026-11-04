@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tournament notch bleed and player safe-area audit
+- [ ] Make only tournament detail roots immersive, reuse overview photo geometry/fade, and preserve root island spec/back fallback.
+- [ ] Audit player safe-area ownership and preserve hero26px without a second notch payment.
+- [ ] Update authorised guards/tests, run four shards with failure-stop/full-output retention, reconcile against6528/578, and verify finished Mexico Open/upcoming photos in the browser.
+
 ## Player page measured clearance
 - [x] Replace player root old island reservation with CHROME_CLEARANCE; preserve hero26px and single safe-area owner; remove guard exception and add player guard case.
 - [x] Focused23/23; shards1681/1556/1648/1643 =6528/578, zero failures/unhandled errors; +1 named player guard instance vsTU1. Full logs retained; build OK03:50:29Z.
