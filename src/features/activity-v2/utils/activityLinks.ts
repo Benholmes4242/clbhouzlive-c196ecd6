@@ -454,7 +454,7 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   if (type === 'golfer_verified' || type === 'golfer_verification_approved') {
     return '/profile';
   }
-  if (type === 'golfer_verification_rejected' || type === 'golfer_verification_removed') {
+  if (type === 'golfer_verification_rejected' || type === 'golfer_verification_removed' || type === 'pro_verification_requested') {
     return '/edit-profile';
   }
 
