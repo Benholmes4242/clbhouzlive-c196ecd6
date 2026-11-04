@@ -89,3 +89,75 @@ An intermediate proMember prop was initially placed on ProfileRoundsTab; moved t
 Browser checks not run after the shard STOP. Auth status is `external_unmanaged`; authenticated real-member end-to-end checks are unavailable here. Exact mock visual sign-off and exhaustive per-surface runtime label tests remain unverified. Current coverage directly exercises hero, cache, tab rules, season behavior and search/comments/replies; it does not prove every listed surface. No completion or sign-off claimed.
 
 Structural ownership is documented in new module headers. Root AGENTS.md rule addition was refused by its size budget; existing protected rules were not compressed or modified.
+
+## Name-element preservation continuation — 2026-11-04
+
+User directed a product correction, not a change to `ms1MessagesHeadToHead.test.tsx`. That file remains untouched. ProMemberName now accepts the original name element and adds only an outer flex row plus sibling PRO label. Caller style/className are applied to the text element, not the wrapper; original elements keep their own ellipsis and PRO remains flex none. Removed the extra `.pro-name-text` element and its forced truncation rule.
+
+Audited and moved the existing name elements unchanged (tag, inline styles, classes, handlers and selectors):
+
+| Surface | Original name element retained |
+|---|---|
+| FeedCard header | button, existing inline typography/ellipsis and profile click handler |
+| Fullscreen author | span, existing inline typography/ellipsis and profile click handler |
+| CommentCard | span.truncate, 14.5px/600 and existing color/tracking; You suffix remains inside |
+| ReplyRow | span.truncate, 13.5px/600 and existing color/tracking; You suffix remains inside |
+| Search PersonRow | p with text-[15px], font-medium, truncate and existing S.INK style; Highlight retained |
+| SearchEmptyState people | p with text-[15px], font-medium, truncate and existing S.INK style |
+| SocialListPage pending/ordinary | existing div elements and full inline typography/ellipsis |
+| FindGolfersSheet | existing div with full inline typography and overflowWrap:anywhere; not forced to truncate |
+| CreatorsRow rail | span.explore-card-name with data-explore-name retained on the name, not the wrapper |
+| CreatorsRow sheet | existing span with overflow/textOverflow/whiteSpace styles |
+| Inbox ConversationRow | span.truncate with MT.NAME, nameColor and minWidth |
+| ThreadV2Page header | span.truncate, existing 17px/600, 20px line height and tracking |
+| LikesSheet | existing div with full inline typography/ellipsis and You suffix |
+| Mention suggestions | span.truncate with existing 15px/600 and color/tracking |
+| LedgerRow prefix/quoted | original span with fontWeight 700; composer receives an element-wrapping callback |
+| LedgerRow round | original strong.font-semibold; ActivityRoundContent receives the same wrapping callback |
+
+No original name test ids were added, removed or moved. The existing CreatorsRow `data-explore-name` remains on its original span. Cover identity h1/PRO/Creator ordering was not changed in this continuation.
+
+### Tests and current STOP
+Added exactly one test in new `src/test/proThreadNameElement.test.tsx`: **ThreadV2Page name element still carries fontSize 17px with the PRO label present**. It mounts the real thread page, resolves a verified pro, checks the label is present, and asserts the text-holding span still has `fontSize:17px`, `fontWeight:600`, `className:truncate`, with PRO as its sibling.
+
+No test rewritten, renamed or deleted. Old/new assertions: none. `ms1MessagesHeadToHead.test.tsx` still asserts `expect(name.style.fontSize).toBe('17px')` and now passes unchanged.
+
+Focused command:
+`bunx vitest run src/test/proThreadNameElement.test.tsx src/test/ms1MessagesHeadToHead.test.tsx src/test/proVerification2.test.tsx src/test/proVerification2Surfaces.test.tsx src/test/proVerification2Hero.test.tsx --maxWorkers=2`
+Result: **54/54 tests, 5 files**. Full output (including retained act warnings): `docs/verification/pro-2/name-preservation/focused.log`.
+
+| Command | Passed | Failed | Files |
+|---|---:|---:|---:|
+| bunx vitest run --maxWorkers=2 --shard=1/4 | 1,738 | 0 | 148 |
+| bunx vitest run --maxWorkers=2 --shard=2/4 | 1,590 | 1 | 148 |
+| shard 3/4 | Not run | — | — |
+| shard 4/4 | Not run | — | — |
+
+Stopped immediately after shard 2. Full output preserved in `docs/verification/pro-2/name-preservation/shard2.log`; shard 1 output is alongside it.
+
+```text
+FAIL src/test/ws1WatchTop.test.tsx > EXPLORE_TOP_2 Golfers to watch > names reserve two lines so lines 2 and 3 share a top offset across one- and two-line names
+AssertionError: expected [ 'explore-card-ring', …(3) ] to deeply equal [ 'explore-card-ring', …(3) ]
+
+- Expected
++ Received
+[
+  "explore-card-ring",
+- "explore-card-name",
++ "pro-member-name",
+  "explore-card-why",
+  "explore-card-detail",
+]
+
+❯ src/test/ws1WatchTop.test.tsx:405:20
+403| for (const card of cardsOf(container)) {
+404|   const kids = Array.from(card.children).map((k) => k.className);
+405|   expect(kids).toEqual(['explore-card-ring', 'explore-card-name', …
+   |                ^
+```
+
+This is a newly exposed structural assertion failure, not a pre-existing failure: the user-required wrapper makes the flex row the card's direct child while preserving the original name span inside. No assertion or product workaround applied after STOP. The previous thread-name failure is resolved. Known pre-existing failures: none.
+
+Reconciliation: prior expected inventory **6,729 / 591**, plus this one named test/new file = **6,730 / 592** expected inventory. Relative to last green Brief 1 baseline **6,704 / 588**, total additions are **26 tests / 4 files** (25/3 from Brief 2, 1/1 this pass). Actual executed shards so far: **3,329 tests / 296 files**, **3,328 passed / 1 failed**. No full-suite passing total claimed.
+
+Latest harness build: `=== build 2026-11-04T20:06:19Z ===` / `build OK`. Browser checks not run following STOP. All original constraints remain unchanged.
