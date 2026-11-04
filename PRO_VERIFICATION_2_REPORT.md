@@ -9,7 +9,7 @@ Read the re-sent Brief 2 and `build2-pro-label-and-tour-tab-signed-off.html` (Pr
 - ProfileHero gets page-owned verified membership; professional descriptor replaces connected index content and connect prompt. Existing cover, social controls and counters retained rather than adopting unrelated mock layout.
 - Own pending request read and owner-only note under hero.
 - Personal Tour tab after Posts. Linked player uses canonical PlayerResultRow and existing season-results hook. Current UTC year, previous-year fallback only on successful empty current results, first eight sorted newest, player-page and all-starts links. Unlinked Tour pros get owner-only note; teaching pros have no Tour. Owner Tour removes Handicap only without a connection; visitor Handicap privacy unchanged.
-- Small member labels wired into FeedCard header, fullscreen author, CommentCard, ReplyRow, search PersonRow and suggested people, SocialListPage pending/ordinary rows, FindGolfersSheet, CreatorsRow and sheet, Inbox ConversationRow, ThreadV2Page header, LikesSheet, LedgerRow prefix/quoted/round actors, and mention suggestions. Business identities and group conversation ids are excluded. CreatorsRow and FindGolfersSheet are retained surfaces with no current production callers found; neither was newly mounted.
+- Small member labels wired into FeedCard header, fullscreen author, CommentCard, ReplyRow, search PersonRow and suggested people, SocialListPage pending/ordinary rows, Inbox ConversationRow, ThreadV2Page header, LikesSheet, LedgerRow prefix/quoted/round actors, and mention suggestions. Business identities and group conversation ids are excluded. CreatorsRow (rail and sheet) and FindGolfersSheet are excluded from Brief 2 because nothing mounts them in production; their pre-Brief-2 markup is restored.
 
 ## STOP — unexpected shard failure caused by this change
 Command: `bunx vitest run --maxWorkers=2 --shard=1/4`
@@ -105,9 +105,6 @@ Audited and moved the existing name elements unchanged (tag, inline styles, clas
 | Search PersonRow | p with text-[15px], font-medium, truncate and existing S.INK style; Highlight retained |
 | SearchEmptyState people | p with text-[15px], font-medium, truncate and existing S.INK style |
 | SocialListPage pending/ordinary | existing div elements and full inline typography/ellipsis |
-| FindGolfersSheet | existing div with full inline typography and overflowWrap:anywhere; not forced to truncate |
-| CreatorsRow rail | span.explore-card-name with data-explore-name retained on the name, not the wrapper |
-| CreatorsRow sheet | existing span with overflow/textOverflow/whiteSpace styles |
 | Inbox ConversationRow | span.truncate with MT.NAME, nameColor and minWidth |
 | ThreadV2Page header | span.truncate, existing 17px/600, 20px line height and tracking |
 | LikesSheet | existing div with full inline typography/ellipsis and You suffix |
@@ -115,7 +112,7 @@ Audited and moved the existing name elements unchanged (tag, inline styles, clas
 | LedgerRow prefix/quoted | original span with fontWeight 700; composer receives an element-wrapping callback |
 | LedgerRow round | original strong.font-semibold; ActivityRoundContent receives the same wrapping callback |
 
-No original name test ids were added, removed or moved. The existing CreatorsRow `data-explore-name` remains on its original span. Cover identity h1/PRO/Creator ordering was not changed in this continuation.
+No original name test ids were added, removed or moved. Cover identity h1/PRO/Creator ordering was not changed in this continuation. The unused CreatorsRow and FindGolfersSheet are excluded from this audit's opted-in surface list by the subsequent ruling below.
 
 ### Tests and current STOP
 Added exactly one test in new `src/test/proThreadNameElement.test.tsx`: **ThreadV2Page name element still carries fontSize 17px with the PRO label present**. It mounts the real thread page, resolves a verified pro, checks the label is present, and asserts the text-holding span still has `fontSize:17px`, `fontWeight:600`, `className:truncate`, with PRO as its sibling.
@@ -161,3 +158,45 @@ This is a newly exposed structural assertion failure, not a pre-existing failure
 Reconciliation: prior expected inventory **6,729 / 591**, plus this one named test/new file = **6,730 / 592** expected inventory. Relative to last green Brief 1 baseline **6,704 / 588**, total additions are **26 tests / 4 files** (25/3 from Brief 2, 1/1 this pass). Actual executed shards so far: **3,329 tests / 296 files**, **3,328 passed / 1 failed**. No full-suite passing total claimed.
 
 Latest harness build: `=== build 2026-11-04T20:06:19Z ===` / `build OK`. Browser checks not run following STOP. All original constraints remain unchanged.
+
+## Unmounted-surface exclusion — 2026-11-04
+
+Restored CreatorsRow rail/sheet and FindGolfersSheet to their pre-Brief-2 name markup by removing only the ProMemberName import and wrappers. Existing VerifiedBadge behavior is retained. Every other surface stays as built. `ws1WatchTop.test.tsx` and `ms1MessagesHeadToHead.test.tsx` remain untouched.
+
+These two surfaces are excluded because they have no production callers (Golfers to watch was removed in ER1). The Brief 2 surface test file already covers only search, comment, reply, and business exclusions: neither excluded surface has an import, fixture, case, or assertion to remove. Therefore **no tests rewritten, renamed, or deleted**, and **no old/new assertions**. Test inventory before and after this rollback: **6,730 tests / 592 files**; delta **0 tests / 0 files**. This reconciles to the last green baseline **6,704 / 588** plus the already named **26 tests / 4 files**.
+
+Commands: `bunx vitest run --maxWorkers=2 --shard=n/4`. Full outputs retained in `docs/verification/pro-2/unmounted-exclusion/`.
+
+| Shard | Passed | Failed | Files executed |
+|---|---:|---:|---:|
+| 1/4 | 1,738 | 0 | 148 |
+| 2/4 | 1,591 | 0 | 148 |
+| 3/4 | 1,718 | 1 | 148 |
+| 4/4 | Not run — STOP | — | — |
+
+Executed **5,048 tests / 444 files**, with **5,047 passed / 1 failed**. Full-suite inventory remains **6,730 / 592**, not a full-suite passing claim. `ws1WatchTop.test.tsx` passes unchanged: **44/44** in shard 2. Historical failures above were introduced regressions, not pre-existing failures. Known pre-existing failures: none; this newly observed failure is not classified as pre-existing.
+
+### STOP — unexpected shard 3 failure
+
+```text
+FAIL src/test/likesSheetTiers.test.tsx > LikesSheet H.4 standing segment > one familiarity call and one legends read for the whole sheet; no history shows handicap alone
+AssertionError: expected [ { …(2) }, …(1) ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+❯ src/test/likesSheetTiers.test.tsx:63:25
+61|     const { container } = renderSheet({ authorName: 'Ben', courseId: '…
+62|     await waitFor(() => expect(container.querySelectorAll('[data-liker…
+63|     expect(st.rpcCalls).toHaveLength(1);
+  |                         ^
+64|     expect(st.rpcCalls[0].args).toEqual({ p_user_ids: ['a', 'b', 'c'],…
+65|     expect(st.legendCalls).toBe(1);
+```
+
+Stopped after shard 3; shard 4 was not run. Full failing output: `docs/verification/pro-2/unmounted-exclusion/shard3.log`. No changes to LikesSheet, its tests, or any other surface were made in this pass. No tests rewritten, renamed or deleted; old/new assertions: none.
+
+Latest observed harness build: `=== build 2026-11-04T20:09:46Z ===` / `build OK`. No browser checks run after STOP. Pre-Brief-2 markup was independently confirmed from read-only history for both reverted files. All protected areas remain unchanged.
