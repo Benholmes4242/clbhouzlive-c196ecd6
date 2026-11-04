@@ -1,5 +1,10 @@
 # Roadmap
 
+## Our record sheet v2 and prediction-engine wording
+- [ ] Implement event-count tiles, best-per-event circle table, ledger rows and anonymous Agreement wording; baseline6575/581.
+- [ ] Resolve signed-off token conflict: brief says withdrawn WD; mock tok maps WD to MC. No ledger token choice before ruling.
+- [ ] Audit visible model wording, list every copy/test rewrite and run four shards; stop and retain any unexpected failing output.
+
 ## Your pick sheet v2
 - [x] Apply five-state sheet and overview doors with public board, stable ActiveRing gaps, white controls and preserved guest Pick gate/server save authority.
 - [x] Focused153/153; exact existing assertion diffs and 19 new cases named in YOUR_PICK_SHEET_V2_REPORT.md; 6556/580 →6575/581 reconciled.
