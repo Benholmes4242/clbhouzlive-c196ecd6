@@ -81,3 +81,51 @@ Baseline: **6,730 tests / 592 files** (last four-shard green report). Added **12
 ## Build / verification limits
 
 Latest observed harness signal: `=== build 2026-11-04T20:47:01Z ===` / `build OK`. No browser verification or four-shard run after focused STOP. New tests use real surface rendering with source hooks stubbed and the real shared PRO hook/cache; no authenticated hosted read or visual sign-off claimed. Name-element positioning is covered on PeopleShelf; exhaustive browser geometry remains unverified.
+## Authorised set-comparison fix, then four shards (2026-11-04 20:49–21:02 UTC)
+
+Ben authorised fixing the new `proVerification2B.test.tsx` failure by comparing the
+requested ids as a set (sorted on both sides), keeping the one-call and three-id checks.
+No product code changed; no existing test touched.
+
+Changed lines in `src/test/proVerification2B.test.tsx` (new file):
+
+1. Added helper above the `ids` declaration:
+   `const proReadIds = (): string[] | undefined => { const call = h.rpc.mock.calls.find(c => c[0] === 'get_pro_members'); return call ? call[1]?.p_user_ids as string[] : undefined; };`
+   with the comment that the batched read's id order is not part of the contract.
+2. Per-surface case (was line 81):
+   - Old: `expect(h.rpc).toHaveBeenCalledWith('get_pro_members', { p_user_ids: ids });`
+   - New: `expect(proReadIds()?.sort()).toEqual([...ids].sort());`
+   (`expect(h.rpc).toHaveBeenCalledTimes(1);` retained directly above.)
+3. Mixed follow-rail case:
+   - Old: `expect(h.rpc).toHaveBeenCalledWith('get_pro_members', { p_user_ids: ids });`
+   - New: `expect(h.rpc).toHaveBeenCalledTimes(1);` + `expect(proReadIds()?.sort()).toEqual([...ids].sort());`
+   (The one-call check was added here; the assertion family is unchanged in intent.)
+
+Focused: `src/test/proVerification2B.test.tsx` **12/12 passed**.
+
+| Shard | Result |
+|---|---|
+| 1/4 | **1,750 passed** / 149 files |
+| 2/4 | **1,600 passed** / 149 files |
+| 3/4 | **1 failed / 1,720 passed** (1,721) / 149 files — STOP |
+| 4/4 | Not run |
+
+**STOP — unexpected failure in an existing test, introduced by Brief 2B:**
+
+```text
+FAIL src/test/wf1FindPeople.test.tsx > WF1 Find people page > renders golfer figures with and without a handicap, and verified badges
+AssertionError: expected null to be truthy
+❯ src/test/wf1FindPeople.test.tsx:367:102
+    367|     expect(screen.getByText('Danny Holmes').parentElement!.querySelector('[aria-label="Verified"]')).toBeTruthy();
+```
+
+Cause: Brief 2B wrapped the Find people golfer name (`src/pages/FindPeoplePage.tsx:418`)
+in `InlineProMemberName`, so `getByText('Danny Holmes').parentElement` is now the
+`.pro-inline-name` wrapper, and the row's Verified badge sits outside that parent.
+The test passed in the last green four-shard run (6,730 / 592), so this is a
+Brief 2B-introduced regression, not a pre-existing failure.
+
+Reconciliation against the 6,742 / 593 expectation: shards 1–3 ran 1750+1600+1721 = 5,071
+tests across 447 files; shard 4 (~1,671 tests / ~146 files) not run after the stop.
+Full failing output: `docs/verification/pro-2b/shard3.log`.
+No rewritten existing tests; no existing test files touched.
