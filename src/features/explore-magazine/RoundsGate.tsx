@@ -59,6 +59,8 @@ export function roundsGateState(
   if (pro === 'verified') return 'connected';
   if (!connection.isSuccess) return 'loading';
   if (connection.data) return 'connected';
+  /* An unresolved pro status never gates: hold until it settles. */
+  if (pro === 'unknown') return 'loading';
   return pro === 'pending' ? 'proPending' : 'gated';
 }
 

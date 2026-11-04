@@ -164,9 +164,14 @@ export function proDraftFromRequest(r: ProRequestRow): ProDetailsDraft {
 }
 
 /** §7 — the pro half of the shared Rounds-gate predicate. */
-export type ProGateStatus = 'none' | 'pending' | 'verified';
-export function proGateStatus(s: { verified: boolean; pending: boolean }): ProGateStatus {
-  return s.verified ? 'verified' : s.pending ? 'pending' : 'none';
+/** 'unknown' = the profile or the request read is still unresolved; the gate
+ *  must not decide on it. A failed request read is settled and counts as
+ *  'none' (fail open). */
+export type ProGateStatus = 'none' | 'pending' | 'verified' | 'unknown';
+export function proGateStatus(s: { verified: boolean; pending: boolean; unknown?: boolean }): ProGateStatus {
+  if (s.verified) return 'verified';
+  if (s.unknown) return 'unknown';
+  return s.pending ? 'pending' : 'none';
 }
 
 /** §8 — pro decline reasons. The keys are accepted by the edge boundary

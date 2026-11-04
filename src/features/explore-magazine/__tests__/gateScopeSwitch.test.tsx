@@ -26,6 +26,11 @@ vi.mock('@/features/explore-magazine/useFeatsWindow', () => ({ useFeatsWindow: (
 vi.mock('@/hooks/gam/useTop100ListProgress', () => ({ useTop100ListProgress: () => ({ data: [] }) }));
 const conn: { current: unknown } = { current: null };
 vi.mock('@/lib/whs/hooks', async (orig) => ({ ...(await orig<object>()), useWhsConnection: () => ({ isSuccess: true, isLoading: false, data: conn.current }) }));
+/* Test-only (authorised): a member with no pro status. */
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({
+  useMyProStatus: () => ({ verified: false, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }),
+  useInvalidateMyProStatus: () => () => {},
+}));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 
 import { ScoresLeaderboardsPage } from '@/features/explore-magazine/ScoresLeaderboardsPage';
