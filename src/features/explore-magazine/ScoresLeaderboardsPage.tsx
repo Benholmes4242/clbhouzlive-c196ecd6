@@ -326,7 +326,10 @@ export function ScoresLeaderboardsPage({
      The page's own queries are untouched: gated, they run live behind the
      frost; connected, nothing changes. */
   const connection = useWhsConnection(userId);
-  const gate = roundsGateState(userId, connection);
+  /* BRIEF 1 §7 — the pro status joins the shared predicate: a verified pro is
+     never gated, a pending pro gets the 'proPending' hold. */
+  const proStatus = useMyProStatus(userId);
+  const gate = roundsGateState(userId, connection, proGateStatus(proStatus));
 
   /* 3.3 ONE WINDOW VOCABULARY: WINDOW_OPTIONS (the filter list's own words)
      is the eyebrow too; WINDOW_SHORT survives only as its compact form for the
@@ -590,13 +593,15 @@ export function ScoresLeaderboardsPage({
     </div>
   );
 
-  /* CB13 states 1 and 4 return the page untouched; state 3 frosts it. */
-  if (gate === 'gated') {
+  /* CB13 states 1 and 4 return the page untouched; state 3 frosts it. BRIEF 1
+     §7 adds the proPending hold, which frosts with the waiting copy and no
+     Connect action. */
+  if (gate === 'gated' || gate === 'proPending') {
     /* CB36 — the gate's count is the landing board read's own pool_rounds
        (get_board_page, already issued for the glimpse): no new query. Only a
        settled fortnight read counts; otherwise the gate keeps its sentence. */
     const pool = state.page.isSuccess && state.filters.window === '14' ? state.page.data?.pool.rounds ?? null : null;
-    return <RoundsGate roundCount={pool} scope={state.filters.scope}>{pageBody}</RoundsGate>;
+    return <RoundsGate roundCount={pool} scope={state.filters.scope} proPending={gate === 'proPending'}>{pageBody}</RoundsGate>;
   }
   return pageBody;
 }
