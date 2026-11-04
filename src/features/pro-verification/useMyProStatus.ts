@@ -86,6 +86,7 @@ export function useInvalidateMyProStatus() {
   return (userId: string) => {
     invalidateProMembers();
     void qc.invalidateQueries({ queryKey: ['my-pro-request', userId] });
+    void qc.invalidateQueries({ queryKey: ['profile-pro-pending', userId] });
     void qc.invalidateQueries({ queryKey: ['profile', userId] });
   };
 }

@@ -1,4 +1,5 @@
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 /**
  * FindGolfersSheet (BRIEF_FIND_GOLFERS_SHEET) — the sheet the Discover
  * 'friends' prompt opens.
@@ -274,7 +275,7 @@ function GolferRow({
             overflowWrap: 'anywhere',
           }}
         >
-          {name}
+          <ProMemberName userId={row.id}>{name}</ProMemberName>
         </div>
         {figs.length ? (
           // THE META LINE may clip; the name may not.

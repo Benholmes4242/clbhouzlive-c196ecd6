@@ -17,7 +17,7 @@ export function activityHoleColor(value: number | null): string {
   if (value === 0) return 'var(--activity-hole-par)';
   return value === 1 ? RAMP_DIST.bogey : RAMP_DIST.double;
 }
-export function ActivityRoundContent({ actor, summary, time }: { actor: string; summary?: ActivityRoundSummary; time: string }) {
+export function ActivityRoundContent({ actor, summary, time }: { actor: React.ReactNode; summary?: ActivityRoundSummary; time: string }) {
   const better = summary ? betterThanAverage(summary) : null;
   return <>
     <div className="activity-round-sentence"><strong className="font-semibold">{actor}</strong>{summary ? ` shot ${summary.gross} at ${shortCourseName(summary.course_name)}` : ' shared a round'}</div>

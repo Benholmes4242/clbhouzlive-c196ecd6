@@ -1186,7 +1186,7 @@ const ProfilePageV2Content: React.FC = () => {
         </div>
       )}
 
-
+      {showPendingProNote(isSelf, ownProRequest.data === true, proMember) && <ProfileProNote />}
       {/* Round 3 §3: the "N followers . N friends" canvas line is DELETED -
           both counts (and both destinations) now live in the hero's counter
           strip. */}

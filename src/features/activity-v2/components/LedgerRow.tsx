@@ -434,8 +434,9 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
   }
 
   // ------- Body text rendering with bold accents -------
-  const quoted = composeCommentBody(row);
   const proActorId = row.actor_kind === 'business' || spec.isSystem ? null : row.actor_route_id ?? row.actor_user_id;
+  const actorNode = <ProMemberName userId={proActorId}>{row.actor_display_name ?? row.actor_username ?? 'Someone'}</ProMemberName>;
+  const quoted = composeCommentBody(row, actorNode);
   let bodyNode: React.ReactNode = quoted ?? renderBody(body, row.actor_display_name, proActorId);
   if (spec.bold === 'badge_title' && data.badge_title) {
     bodyNode = (
@@ -501,7 +502,7 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
     >
       {leftVisual}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {isRound ? <ActivityRoundContent actor={row.actor_display_name ?? row.actor_username ?? 'Someone'} summary={roundSummary} time={relativeTime(row.created_at)} /> : <>
+        {isRound ? <ActivityRoundContent actor={actorNode} summary={roundSummary} time={relativeTime(row.created_at)} /> : <>
         <div
           style={{
             // BODY. The action sentence is prose, so it reads at the body tier (14),
