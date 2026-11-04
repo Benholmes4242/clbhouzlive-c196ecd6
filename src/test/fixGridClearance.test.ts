@@ -66,7 +66,7 @@ describe('FIX_GRID_1 source guards', () => {
     expect(source).toMatch(/import\s*\{\s*CHROME_CLEARANCE(?:,\s*CHROME_BREATHING)?\s*\}\s*from\s*['"]@\/lib\/chromeClearance['"]/);
     expect(source).not.toContain(oldClearance);
     if (file.endsWith('/player-v2/PlayerPage.tsx')) {
-      expect(source).toContain('paddingTop:`calc(${CHROME_CLEARANCE} - var(--sat, 0px) - ${CHROME_BREATHING + 10}px)`');
+      expect(source).toContain('paddingTop:`calc(${CHROME_CLEARANCE} - ${CHROME_BREATHING + 10}px)`');
     } else {
       expect(source).toMatch(/paddingTop:\s*(?:headerB\s*\?\s*)?CHROME_CLEARANCE/);
     }
