@@ -32,6 +32,15 @@ export function selectOverviewBandStory(
   return stories.find((story) => isFresh(story, FALLBACK_MAX_AGE_MS, now)) ?? null;
 }
 
+/** Slot selection shares the band's seven-day photographed-story freshness;
+ * unlike the first band it uses the News-lensed list and prefers another tour. */
+export function selectOverviewSlotStory(stories: TourStory[], usedIds: readonly string[], firstBandTour: string | null | undefined, now = new Date()): TourStory | null {
+  const used = new Set(usedIds);
+  const eligible = stories.filter(story => !used.has(story.id) && isFresh(story, FALLBACK_MAX_AGE_MS, now))
+    .sort((a, b) => new Date(b.published_at ?? '').getTime() - new Date(a.published_at ?? '').getTime());
+  return (firstBandTour ? eligible.find(story => story.tour_slug != null && story.tour_slug !== firstBandTour) : null) ?? eligible[0] ?? null;
+}
+
 /**
  * The band IS the News hero, at the overview's 24px gutter. It renders
  * HeroStory rather than restating its shape: two copies of a news card is how
@@ -41,14 +50,14 @@ export function selectOverviewBandStory(
  * The wording is deliberately NOT the hero's: fullTourLabel keeps the line on
  * the tour ("DP WORLD TOUR") where tagFor would prefer the event name.
  */
-export function StoryBand({ story }: { story: TourStory | null }) {
+export function StoryBand({ story, slot = false }: { story: TourStory | null; slot?: boolean }) {
   const navigate = useNavigate();
   const [failedStoryId, setFailedStoryId] = useState<string | null>(null);
   if (!story?.image_url || failedStoryId === story.id) return null;
 
   const tourKicker = story.tour_slug ? fullTourLabel(story.tour_slug) : story.kicker;
   return (
-    <div data-overview-story-band={story.id} style={{ marginTop: 26, fontFamily: FONT, color: INK }}>
+    <div data-overview-story-band={story.id} data-overview-photo-slot={slot ? story.id : undefined} style={{ marginTop: slot ? 0 : 26, fontFamily: FONT, color: INK }}>
       <HeroStory
         story={story}
         onOpen={() => navigate(`/tour/news/${story.slug}`)}

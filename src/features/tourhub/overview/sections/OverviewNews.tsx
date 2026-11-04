@@ -13,17 +13,18 @@ export interface OverviewNewsSelection {
   rows: TourStory[];
 }
 
-export function selectOverviewNews(stories: TourStory[], excludeId?: string | null): OverviewNewsSelection {
-  const visible = stories.filter((story) => story.id !== excludeId).slice(0, 6);
+export function selectOverviewNews(stories: TourStory[], excludeIds: readonly string[] = []): OverviewNewsSelection {
+  const used = new Set(excludeIds);
+  const visible = stories.filter((story) => !used.has(story.id)).slice(0, 6);
   const [hero, ...afterHero] = visible;
   const features = afterHero.length >= 2 ? afterHero.slice(0, 2) : [];
   return { hero: hero ?? null, features, rows: afterHero.slice(features.length, 5) };
 }
 
-export function OverviewNews({ stories, excludeId, presentations }: { stories: TourStory[]; excludeId?: string | null; presentations?: Map<string, NewsPresentation> }) {
+export function OverviewNews({ stories, excludeIds, presentations }: { stories: TourStory[]; excludeIds?: readonly string[]; presentations?: Map<string, NewsPresentation> }) {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
-  const { hero, features, rows } = selectOverviewNews(stories, excludeId);
+  const { hero, features, rows } = selectOverviewNews(stories, excludeIds);
   const { ref, visit } = useNewsVisit(!!hero);
   const shown = hero ? [hero, ...features, ...rows] : [];
   const count = shown.filter(story => isNewStory(story, visit)).length;

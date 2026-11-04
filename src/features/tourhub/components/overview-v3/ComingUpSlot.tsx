@@ -9,16 +9,16 @@
 import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
+import { useOverviewEventsAbove } from '../../overview/sections/useOverviewEventsAbove';
 
 const SCHEDULE_TOURS = new Set<string>(['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv']);
 
 export function ComingUpSlot() {
-  const { selectedTourSlug, viewingTournamentId } = useTourSelection();
+  const { selectedTourSlug } = useTourSelection();
+  const { usedIds } = useOverviewEventsAbove();
   const active = selectedTourSlug ?? 'all';
   const tour = SCHEDULE_TOURS.has(active) ? (active as TourId) : null;
-  // The tournament in the hero is excluded from the list below it — one fact,
-  // one place. Same id the venue/schedule cohesion block is keyed by.
-  return <ComingUp tour={tour} excludeId={viewingTournamentId ?? null} />;
+  return <ComingUp tour={tour} excludeIds={usedIds} />;
 }
 
 export default ComingUpSlot;

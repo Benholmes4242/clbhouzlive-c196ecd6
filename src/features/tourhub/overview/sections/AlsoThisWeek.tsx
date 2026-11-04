@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
 import { useAlsoWeekData } from './useAlsoWeekData';
 import { AlsoWeekEvent } from './AlsoWeekEvent';
 import { useTourPlayerFollows } from '../../leaderboard/useTourPlayerFollows';
 import './alsoWeek.css';
 import { useTranslation } from 'react-i18next';
-import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
-import { useTourSelection } from '../../context/TourSelectionContext';
+import type { HeroSlide } from '../../hooks/useHeroCarouselData';
+import { useOverviewEventsAbove } from './useOverviewEventsAbove';
+export { isAlsoThisWeek } from './overviewEventSelection';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
 export function statusFor(slide: HeroSlide, now = new Date()): string {
@@ -20,34 +20,13 @@ export function statusFor(slide: HeroSlide, now = new Date()): string {
   return `Starts ${format.format(start)}`;
 }
 
-export function isAlsoThisWeek(slide: HeroSlide, now = new Date()): boolean {
-  if (slide.type === 'live') return true;
-  if (slide.type === 'completed') {
-    const end = new Date(slide.tournament.endDate);
-    const age = now.getTime() - end.getTime();
-    return Number.isFinite(age) && age >= 0 && age < 3 * 86_400_000;
-  }
-  if (slide.type !== 'upcoming') return false;
-  const start = new Date(slide.tournament.startDate);
-  if (Number.isNaN(start.getTime()) || start.getTime() < now.getTime()) return false;
-  const sunday = new Date(now);
-  sunday.setDate(now.getDate() + ((7 - now.getDay()) % 7));
-  sunday.setHours(23, 59, 59, 999);
-  return start.getTime() <= sunday.getTime();
-}
-
 export function shouldShowAlsoThisWeekFigures(slide: Pick<HeroSlide, 'type' | 'tournament'>): boolean {
   return slide.type !== 'upcoming' && slide.tournament.leaderScore != null && Boolean(slide.tournament.leaderName?.trim());
 }
 
 export function AlsoThisWeek() {
   const { t } = useTranslation('tourhub');
-  const { data: slides = [] } = useHeroCarouselData();
-  const { viewingTournamentId } = useTourSelection();
-  const others = useMemo(
-    () => slides.filter((slide) => slide.tournament.id !== viewingTournamentId && isAlsoThisWeek(slide)).slice(0, 4),
-    [slides, viewingTournamentId],
-  );
+  const { alsoWeek: others } = useOverviewEventsAbove();
   const data = useAlsoWeekData(others);
   const follows = useTourPlayerFollows(others.length > 0);
   const liveCount = others.filter(s => s.type === 'live').length;

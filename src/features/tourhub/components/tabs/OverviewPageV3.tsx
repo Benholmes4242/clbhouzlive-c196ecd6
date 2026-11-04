@@ -1,7 +1,9 @@
 /**
  * OverviewPageV3 - Tour Hub Overview
  *
- * Hero: the self-contained Hero River carousel. Five independently absent overview sections follow.
+ * Hero: the self-contained Hero River carousel. Sections are independently absent.
+ * Story selection lives here; both bands share StoryBand, the slot uses the
+ * News lens and both story ids are excluded from News's unchanged composition.
  */
 
 import { useEffect } from 'react';
@@ -12,7 +14,8 @@ import { AlsoThisWeek } from '../../overview/sections/AlsoThisWeek';
 import { WorldRankings } from '../../overview/sections/WorldRankings';
 import { OverviewNews, selectOverviewNews } from '../../overview/sections/OverviewNews';
 import { useOverviewNewsData } from '../../overview/sections/useOverviewNewsData';
-import { StoryBand, selectOverviewBandStory } from '../../overview/sections/StoryBand';
+import { StoryBand, selectOverviewBandStory, selectOverviewSlotStory } from '../../overview/sections/StoryBand';
+import { OverviewPhotoSlot } from '../overview-v3/OverviewPhotoSlot';
 import { useTourStories } from '../../news/useTourStories';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
@@ -42,7 +45,9 @@ export function OverviewPageV3() {
     ? stories.filter((story) => story.tour_slug == null || story.tour_slug === selectedTourSlug)
     : stories;
   const bandStory = selectOverviewBandStory(stories, viewingTournamentId);
-  const newsSelection = selectOverviewNews(newsStories, bandStory?.id);
+  const slotStory = selectOverviewSlotStory(newsStories, bandStory ? [bandStory.id] : [], bandStory?.tour_slug);
+  const excludedStoryIds = [bandStory, slotStory].flatMap(story => story ? [story.id] : []);
+  const newsSelection = selectOverviewNews(newsStories, excludedStoryIds);
   const newsPresentation = useOverviewNewsData(newsSelection.hero ? [newsSelection.hero, ...newsSelection.features, ...newsSelection.rows] : []);
 
   // The overview's island label describes the lens used by its sections, not
@@ -106,8 +111,9 @@ export function OverviewPageV3() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32 }}>
               <AlsoThisWeek />
               <ComingUpSlot />
+              <OverviewPhotoSlot content={slotStory ? { kind: 'story', story: slotStory } : null} />
               <WorldRankings />
-              <OverviewNews stories={newsStories} excludeId={bandStory?.id} presentations={newsPresentation} />
+              <OverviewNews stories={newsStories} excludeIds={excludedStoryIds} presentations={newsPresentation} />
 
               {/* The shared page shell reserves the measured bottom-nav clearance. */}
             </div>
