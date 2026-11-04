@@ -34,14 +34,21 @@ export function useFitOneLine<T extends HTMLElement>(text: string, max: number, 
     fit();
 
     const parent = el.parentElement;
-    const ro = parent ? new ResizeObserver(fit) : null;
+    /* Observer writes wait for the next frame so the font change never lands
+     * inside the observer's delivery (FIX_RO_NOISE_1). */
+    let frame = 0;
+    const onResize = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => { frame = 0; fit(); });
+    };
+    const ro = parent ? new ResizeObserver(onResize) : null;
     if (parent && ro) ro.observe(parent);
 
     /* Web fonts land after first paint and change every measurement. */
     let cancelled = false;
     void document.fonts?.ready.then(() => { if (!cancelled) fit(); });
 
-    return () => { cancelled = true; ro?.disconnect(); };
+    return () => { cancelled = true; ro?.disconnect(); if (frame) cancelAnimationFrame(frame); };
   }, [text, max, min]);
 
   return ref;

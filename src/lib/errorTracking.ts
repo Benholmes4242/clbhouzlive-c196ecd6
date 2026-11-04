@@ -97,6 +97,8 @@ export function installErrorTracking(): void {
     (window as unknown as { __errTrackInstalled?: boolean }).__errTrackInstalled = true;
 
     window.addEventListener('error', (e) => {
+      // Benign browser layout notice, never an app error (FIX_RO_NOISE_1).
+      if (isResizeObserverNoise((e as ErrorEvent).message)) return;
       try { // SR1
         trackError({
           kind: 'error',
@@ -121,4 +123,9 @@ export function installErrorTracking(): void {
   } catch {
     // SR1
   }
+}
+
+/** FIX_RO_NOISE_1: both ResizeObserver loop messages are browser noise. */
+export function isResizeObserverNoise(message: unknown): boolean {
+  return typeof message === 'string' && message.startsWith('ResizeObserver loop');
 }
