@@ -338,7 +338,7 @@ export default VerificationsTab;
  * decisions and reviewMutation.
  */
 export function VerificationDetailBody({
-  row, note, setNote, decision, reviewReason, setReviewReason,
+  row, note, setNote, decision, reviewReason, setReviewReason, onPlayerChange,
 }: {
   row: VerificationRow;
   note: string;
@@ -347,6 +347,8 @@ export function VerificationDetailBody({
   /** PHASE 4 §3 — optional so callers that have not adopted reasons still compile. */
   reviewReason?: ReviewReason | null;
   setReviewReason?: (v: ReviewReason | null) => void;
+  /** BRIEF 1 §8 — pro rows report the chosen sr_players match. */
+  onPlayerChange?: (playerId: string | null) => void;
 }) {
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const { data: proofConflict } = useProofConflict(row);
@@ -377,7 +379,8 @@ export function VerificationDetailBody({
           row.type === 'course_claim' ? 'warn' : 'neutral'
         }>
           {row.type === 'business' ? 'Business' :
-           row.type === 'course_claim' ? 'Course claim' : 'Golfer'}
+            row.type === 'course_claim' ? 'Course claim' :
+            isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'}
         </StatusPill>
         <StatusPill tone={
           row.status === 'pending' ? 'warn' :
@@ -474,6 +477,12 @@ export function VerificationDetailBody({
         <Field label="Applicant role" value={row.contactRole} />
       )}
 
+      {/* BRIEF 1 §8 — the pro card: everything they gave, the tour-player
+          suggestion for covered tours, and the per-kind checklist. */}
+      {row.type === 'golfer' && isProKind(row.kind) && (
+        <ProRequestFacts row={row} onPlayerChange={onPlayerChange} />
+      )}
+
       {row.note && <Field label="Request note" value={row.note} />}
       {row.evidenceUrl && (
         <Field label="Evidence">
@@ -518,7 +527,7 @@ export function VerificationDetailBody({
       )}
       {/* PHASE 5B §5.5 — an invited golfer has nothing to supply, so the console
           says so instead of offering a button that throws. */}
-      {row.type === 'golfer' && row.status === 'pending' && (
+      {row.type === 'golfer' && !isProKind(row.kind) && row.status === 'pending' && (
         <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.45 }}>
           Invite-only: a golfer is recognised, not assessed on evidence they submit.
           There is no “needs info” here — approve the invitation or decline it with a reason.
@@ -561,7 +570,7 @@ export function VerificationDetailBody({
             Reason <span style={{ color: t.danger }}>(required)</span>
           </label>
           <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {(row.type === 'golfer' ? GOLFER_REASON_OPTIONS : REVIEW_REASON_OPTIONS).map(opt => {
+            {(row.type === 'golfer' ? (isProKind(row.kind) ? PRO_DECLINE_REASON_OPTIONS : GOLFER_REASON_OPTIONS) : REVIEW_REASON_OPTIONS).map(opt => {
               const on = reviewReason === opt.value;
               return (
                 <button
@@ -653,7 +662,7 @@ function VerificationCard({
                 {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '-'}
               </div>
               <div style={{ fontSize: 12, color: t.inkMuted }}>
-                {row.type === 'business' ? 'Business' : 'Golfer'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
+                {row.type === 'business' ? 'Business' : isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
               </div>
             </>
           )}
