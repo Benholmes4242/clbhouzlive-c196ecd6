@@ -28,3 +28,5 @@ Shard 1: 1,719 · Shard 2: 1,583 · Shard 3: 1,674 · Shard 4: 1,677 = **6,653 t
 ## Files touched
 `src/features/comments-v2/components/CommentComposer.tsx`, `src/test/commentPhotoR2.test.tsx` (new), `src/test/adminCoursePhotoR2.test.ts`, this report, shard logs.
 No SQL/migrations, RPC/edge, native/Median, feed_config, guest browsing, review wizard, news or round plots touched; round_pool_cap 30.
+
+Typecheck note: the first build flagged missing required props in commentPhotoR2.test.tsx (lines 40, 56); fixed test-only by passing replyingTo={null}, onClearReply, isSubmitting={false}. File re-run 4/4.
