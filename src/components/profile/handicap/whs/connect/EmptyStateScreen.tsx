@@ -347,7 +347,7 @@ const CircleSection: React.FC<{ preview: CirclePreview; h: number }> = ({ previe
 
 const PersonRow: React.FC<{ person: CirclePerson }> = ({ person }) => (
   <div style={circleRowStyle()}>
-    {person.avatar_url ? <img src={person.avatar_url} alt="" style={{ width: 36, height: 36, borderRadius: 12, objectFit: 'cover' }} /> : <span style={{ width: 36, height: 36, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 800, background: AVATAR_BG, color: MID }}>{(person.name || '?').charAt(0).toUpperCase()}</span>}
+    {person.avatar_url ? <img src={person.avatar_url} alt="" style={{ width: 36, height: 36, borderRadius: 12, objectFit: 'cover' }} /> : <span style={{ width: 36, height: 36, borderRadius: 12, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 14, fontWeight: 800, background: AVATAR_BG, color: MID }}>{(person.name || '?').charAt(0).toUpperCase()}</span>}
     <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 15, fontWeight: 700 }}>{person.name}</span>{person.club ? <span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>{person.club}</span> : null}</span>
     <span style={{ fontSize: 18, fontWeight: 800 }}>{formatIndex(person.index)}</span>
   </div>
@@ -355,7 +355,7 @@ const PersonRow: React.FC<{ person: CirclePerson }> = ({ person }) => (
 
 const YouCircleRow: React.FC = () => (
   <div style={circleRowStyle(AMBER_ROW)}>
-    <span style={{ width: 36, height: 36, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 800, border: `1.5px dashed ${AMBER_DASH_STRONG}`, color: AMBER }}>?</span>
+    <span style={{ width: 36, height: 36, borderRadius: 12, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 14, fontWeight: 800, border: `1.5px dashed ${AMBER_DASH_STRONG}`, color: AMBER }}>?</span>
     <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 15, fontWeight: 700 }}><IntroText k="circleYou" /></span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}><IntroText k="circleYouLine" /></span></span>
     <span style={{ width: 44, height: 26, borderRadius: 8, border: `1.5px dashed ${AMBER_DASH}` }} />
   </div>
@@ -373,7 +373,7 @@ const TrustSection: React.FC = () => {
       <div style={{ marginTop: 18 }}>
         {TRUST_STEPS.map((x, i) => (
           <div key={x} style={{ display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr)', columnGap: 14, alignItems: 'start', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
-            <span style={{ width: 36, height: 36, borderRadius: 12, background: STEP_BG, display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: 800, color: SOFT_INK }}>{i + 1}</span>
+            <span style={{ width: 36, height: 36, borderRadius: 12, background: STEP_BG, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 13, fontWeight: 800, color: SOFT_INK }}>{i + 1}</span>
             <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{t(`whsConnect.intro.trustStep${x}Title`)}</span><span style={{ display: 'block', marginTop: 3, fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>{t(`whsConnect.intro.trustStep${x}Line`)}</span></span>
           </div>
         ))}

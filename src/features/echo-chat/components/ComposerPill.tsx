@@ -91,7 +91,7 @@ export const ComposerPill: React.FC<{
             height: 32,
             borderRadius: 16,
             border: 'none',
-            display: 'grid',
+            display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)',
             placeItems: 'center',
             // Two solid states, not one colour at two alphas (§1).
             background: canSend ? EC.INK : '#232A33',

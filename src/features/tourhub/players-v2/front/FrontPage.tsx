@@ -26,7 +26,7 @@ export function RichText({ rich, boldColor = P.INK, boldWeight = 700 }: { rich: 
 
 export function SearchButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
-    <button type="button" aria-label={label} onClick={onClick} style={{ width: 36, height: 36, flex: 'none', borderRadius: '50%', border: `1px solid ${P.HAIR2}`, background: 'transparent', display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0 }}>
+    <button type="button" aria-label={label} onClick={onClick} style={{ width: 36, height: 36, flex: 'none', borderRadius: '50%', border: `1px solid ${P.HAIR2}`, background: 'transparent', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', cursor: 'pointer', padding: 0 }}>
       <Search size={16} color={P.INK} />
     </button>
   );

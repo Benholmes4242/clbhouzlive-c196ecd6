@@ -13,7 +13,7 @@ const TONE: Record<string, React.CSSProperties> = {
 
 export function Tile({ tone, label, size = 24 }: { tone: keyof typeof TONE; label?: string; size?: number }) {
   return (
-    <span data-form-tile={tone} style={{ width: size, height: size, borderRadius: size === 24 ? 7 : 5, display: 'grid', placeItems: 'center', fontSize: size === 24 ? 10 : 0, fontWeight: 700, boxSizing: 'border-box', ...TONE[tone] }}>
+    <span data-form-tile={tone} style={{ width: size, height: size, borderRadius: size === 24 ? 7 : 5, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: size === 24 ? 10 : 0, fontWeight: 700, boxSizing: 'border-box', ...TONE[tone] }}>
       {label}
     </span>
   );

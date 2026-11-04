@@ -46,7 +46,7 @@ export function GolfShotStrip({ media, tags, courseName, onTap, onAdd }: {
             </button>
           );
         })}
-        <button type="button" aria-label="Add" onClick={onAdd} style={{ flex: 'none', width: 92, height: 116, borderRadius: 14, border: `1.5px dashed ${GP.line2}`, background: 'transparent', display: 'grid', placeItems: 'center', color: GP.mute, fontSize: 26, cursor: 'pointer' }}>+</button>
+        <button type="button" aria-label="Add" onClick={onAdd} style={{ flex: 'none', width: 92, height: 116, borderRadius: 14, border: `1.5px dashed ${GP.line2}`, background: 'transparent', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', color: GP.mute, fontSize: 26, cursor: 'pointer' }}>+</button>
       </div>
       {line && (
         <div data-testid="hole-line" style={{ padding: '10px 16px 0', fontSize: 12.5, color: GP.mute, lineHeight: 1.45 }}>
@@ -119,7 +119,7 @@ export function WhereSection({ course, reason, changing, recent, onChange, onCan
               {reason ? <>{tick}{reason}</> : 'Tagged'}
             </div>
           </div>
-          <button type="button" aria-label="Remove course" onClick={onUntag} style={{ marginLeft: 'auto', width: 30, height: 30, borderRadius: '50%', border: 0, background: 'rgba(255,255,255,0.07)', cursor: 'pointer', display: 'grid', placeItems: 'center', flex: 'none' }}>
+          <button type="button" aria-label="Remove course" onClick={onUntag} style={{ marginLeft: 'auto', width: 30, height: 30, borderRadius: '50%', border: 0, background: 'rgba(255,255,255,0.07)', cursor: 'pointer', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', flex: 'none' }}>
             <X size={12} color={GP.ink} strokeWidth={2.6} />
           </button>
         </div>

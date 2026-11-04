@@ -82,7 +82,7 @@ export const CourseRecordBook: React.FC<Props> = ({
   if (isLoading) {
     return (
       <Panel kicker={t('courseDetail.records.kicker')}>
-        <div style={{ display: 'grid', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 14 }}>
           {[0, 1, 2].map((i) => (
             <div key={i} style={{ height: 26, borderRadius: 8, background: A.TRACK }} />
           ))}
@@ -155,7 +155,7 @@ export const CourseRecordBook: React.FC<Props> = ({
       onOpen={openBoards}
     >
 
-        <div style={{ display: 'grid', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 14 }}>
           {previewRows.map(({ category, row }) => {
             const isYou = !!user?.id && row.user_id === user.id;
             const tone = isYou ? A.AMBER_DEEP : A.INK;

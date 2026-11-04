@@ -245,7 +245,7 @@ function AdminLog() {
         const clickable = hasDetails(r);
         const inner = (
           <>
-            <span style={{ width: 28, height: 28, borderRadius: 14, display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: ic.bg }}>{ic.letter}</span>
+            <span style={{ width: 28, height: 28, borderRadius: 14, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: ic.bg }}>{ic.letter}</span>
             <span style={{ minWidth: 0 }}>
               <span style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>{logTitle(r)}</span>
               <span style={{ ...META, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{logMeta(r) || '\u00a0'}</span>

@@ -59,7 +59,7 @@ const YourRoundsHere: React.FC<Props> = ({ rounds, total, bestGross, onOpenRound
       heading={t('courseDetail.youTab.sections.yourRounds')}
       meta={formatNumber(total)}
     >
-      <div style={{ display: 'grid' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {shown.map((round) => {
           const isBest = markBest && round.gross != null && round.gross === bestGross;
           const parNode = (v: number | null) => {

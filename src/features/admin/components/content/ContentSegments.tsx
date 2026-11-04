@@ -12,7 +12,7 @@ export default function ContentSegments({ sections, active, onChange }: { sectio
         const on = s === active;
         return (
           <button key={s} type="button" aria-current={on ? 'page' : undefined} onClick={() => onChange(s)} style={{
-            height: 34, borderRadius: 999, border: 0, display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            height: 34, borderRadius: 999, border: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 12, fontWeight: 700, cursor: 'pointer',
             background: on ? t.ink : 'transparent', color: on ? t.canvas : t.inkMuted,
           }}>{SECTION_LABEL[s]}</button>
         );

@@ -43,7 +43,7 @@ export const ThinkingSources: React.FC<{ sources: string[]; thinkingLabel: strin
   }
 
   return (
-    <div style={{ display: 'grid', gap: 9 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 9 }}>
       {sources.map((s, i) => {
         const resolved = i < done;
         return (
@@ -54,7 +54,7 @@ export const ThinkingSources: React.FC<{ sources: string[]; thinkingLabel: strin
                 height: 14,
                 borderRadius: 7,
                 flex: '0 0 auto',
-                display: 'grid',
+                display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)',
                 placeItems: 'center',
                 // §7 ticks are ink, never amber.
                 background: resolved ? EC.INK : 'transparent',

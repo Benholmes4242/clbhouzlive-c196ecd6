@@ -106,7 +106,7 @@ export const AnswerText: React.FC<{ text: string; first?: boolean }> = ({ text, 
         }
         if (b.kind === 'ul') {
           return (
-            <div key={i} style={{ ...T.BODY, marginTop: top, display: 'grid', gap: 6 }}>
+            <div key={i} style={{ ...T.BODY, marginTop: top, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 6 }}>
               {b.items.map((it, j) => (
                 <div key={j} style={{ display: 'flex', gap: 9, alignItems: 'baseline' }}>
                   <span

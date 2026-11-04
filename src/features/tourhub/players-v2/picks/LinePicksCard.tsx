@@ -202,7 +202,7 @@ function VerdictRow({ pick, player, L, first }: { pick: LinePickRow; player: Pla
       <PlayerCell rawName={player?.rawName ?? pick.player_name} name={name} tourCode={player?.tourCode ?? null} country={player?.country ?? null} followed={false} nameSize={14}
         sub={pick.position_at_pick ? `Picked at ${ordinal(pick.position_at_pick)}` : undefined} />
       <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, fontSize: 12.5, fontWeight: 700, whiteSpace: 'nowrap', color: kept ? P.INK : P.DIM }}>
-        <span aria-hidden style={{ width: 18, height: 18, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: 11, flex: 'none',
+        <span aria-hidden style={{ width: 18, height: 18, borderRadius: '50%', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, flex: 'none',
           background: kept ? P.INK : 'transparent', border: kept ? 'none' : '1px solid rgba(255,255,255,0.12)', color: kept ? '#0A0A0C' : P.DIM }}>{kept ? '✓' : '✕'}</span>
         {kept ? 'Kept card' : 'Missed out'}
       </span>

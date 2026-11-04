@@ -176,7 +176,7 @@ const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick, onClaimClick }
      the last thing on the tab and every row names its own destination. */
   return (
     <AboutSection>
-      <div style={{ display: 'grid', borderTop: `1px solid ${A.HAIRLINE}`, paddingTop: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', borderTop: `1px solid ${A.HAIRLINE}`, paddingTop: 4 }}>
         {rows.map((r) => (
           <Row
             key={r.key}

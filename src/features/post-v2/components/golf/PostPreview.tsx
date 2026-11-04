@@ -50,7 +50,7 @@ export function PostPreview({ open, onBack, post, tags, pars, withPeople }: {
       pointerEvents: open ? 'auto' : 'none',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'max(env(safe-area-inset-top), 47px) 16px 6px' }}>
-        <button type="button" aria-label="Back" onClick={onBack} style={{ width: 40, height: 40, borderRadius: '50%', display: 'grid', placeItems: 'center', background: 'transparent', border: 0, cursor: 'pointer' }}>
+        <button type="button" aria-label="Back" onClick={onBack} style={{ width: 40, height: 40, borderRadius: '50%', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', background: 'transparent', border: 0, cursor: 'pointer' }}>
           <ChevronLeft size={22} color={GP.ink} />
         </button>
         <span style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>Preview</span>

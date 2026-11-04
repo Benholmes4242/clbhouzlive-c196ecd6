@@ -91,7 +91,7 @@ function Card({ children, danger }: { children: React.ReactNode; danger?: boolea
 function Row({ children, first }: { children: React.ReactNode; first?: boolean }) {
   return (
     <div style={{
-      padding: '14px 14px 14px 16px', display: 'grid', alignItems: 'center', columnGap: 12,
+      padding: '14px 14px 14px 16px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignItems: 'center', columnGap: 12,
       borderTop: first ? undefined : `1px solid ${t.hairline}`,
     }}>
       {children}

@@ -23,7 +23,7 @@ export const CompareBars: React.FC<{
   const pct = (v: number) => `${Math.max(2, Math.min(100, (v / max) * 100))}%`;
 
   return (
-    <div style={{ display: 'grid', gap: 10 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 10 }}>
       {bars.map((b) => (
         <div key={b.label}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 5 }}>

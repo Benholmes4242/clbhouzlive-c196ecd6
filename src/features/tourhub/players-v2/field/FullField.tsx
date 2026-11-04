@@ -38,7 +38,7 @@ export interface FullFieldProps {
 const LENS_LABEL: Record<Lens, string> = { standings: 'Standings', form: 'Form', stats: 'Stats' };
 const STANDINGS_SENTENCE = 'The lines show what each place is worth. Players within three places of a line show how far they are from it.';
 
-const rowStyle: CSSProperties = { width: '100%', display: 'grid', columnGap: 10, alignItems: 'center', minHeight: 62, padding: '10px 24px', border: 0, borderBottom: `1px solid ${P.HAIR}`, background: 'transparent', color: P.INK, textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' };
+const rowStyle: CSSProperties = { width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', columnGap: 10, alignItems: 'center', minHeight: 62, padding: '10px 24px', border: 0, borderBottom: `1px solid ${P.HAIR}`, background: 'transparent', color: P.INK, textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' };
 const pillStyle = (on: boolean, you = false): CSSProperties => ({ flex: 'none', height: 30, padding: '0 12px', borderRadius: 999, border: `1px solid ${on ? P.INK : P.HAIR2}`, background: on ? P.INK : 'transparent', color: on ? P.CANVAS : you ? AMBER : P.MUTE, fontSize: 12.5, fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' });
 const capStyle: CSSProperties = { margin: '14px 24px 0', fontSize: 11.5, lineHeight: 1.5, color: P.DIM };
 
@@ -185,7 +185,7 @@ export function FullField(props: FullFieldProps) {
   return (
     <div data-players-field>
       <div style={{ margin: '18px 24px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button type="button" aria-label="Back" onClick={onBack} style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${P.HAIR2}`, display: 'grid', placeItems: 'center', flex: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}>
+        <button type="button" aria-label="Back" onClick={onBack} style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${P.HAIR2}`, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', flex: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}>
           <ChevronLeft size={16} color={P.INK} />
         </button>
         {searchOpen ? (

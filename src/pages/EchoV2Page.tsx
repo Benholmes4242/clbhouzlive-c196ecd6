@@ -70,7 +70,7 @@ const TopChrome: React.FC<{ onBack: () => void; onHistory: () => void }> = ({ on
       onClick={onBack}
       aria-label="Back"
       className="ec-glass ec-glass--quiet active:opacity-70"
-      style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', placeItems: 'center' }}
+      style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center' }}
     >
       <ChevronLeft size={19} strokeWidth={2.4} color={EC.INK} />
     </button>
@@ -79,7 +79,7 @@ const TopChrome: React.FC<{ onBack: () => void; onHistory: () => void }> = ({ on
       onClick={onHistory}
       aria-label="History"
       className="ec-glass ec-glass--quiet active:opacity-70"
-      style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', placeItems: 'center' }}
+      style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center' }}
     >
       <Clock size={16} strokeWidth={2.4} color={EC.INK} />
     </button>

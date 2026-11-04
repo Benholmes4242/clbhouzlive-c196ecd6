@@ -152,7 +152,7 @@ function Cohorts({ d }: { d: AnalyticsHealth }) {
               if (v == null) return <span key={i} style={{ height: 24, borderRadius: 4, background: 'rgba(255,255,255,0.03)' }} />;
               return (
                 <span key={i} style={{
-                  height: 24, borderRadius: 4, display: 'grid', placeItems: 'center', fontSize: 10.5, fontWeight: 800,
+                  height: 24, borderRadius: 4, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 10.5, fontWeight: 800,
                   background: `rgba(255,168,58,${Math.max(0.08, Math.min(1, v / 100)).toFixed(2)})`,
                   color: v >= 55 ? t.canvas : t.ink,
                 }}>{v}</span>

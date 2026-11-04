@@ -253,7 +253,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
 
             <section style={{ padding: '34px 20px 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.pars')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.parsMeta')}</div></div>
-              <div style={{ display: 'grid', gap: 12, marginTop: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12, marginTop: 14 }}>
                 {parRows.map((row) => (
                   <div key={row.par} style={{ display: 'grid', gridTemplateColumns: '52px 1fr 34px 34px', gap: 10, alignItems: 'center' }}>
                     <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE }}>Par {row.par}s</span>
