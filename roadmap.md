@@ -18,8 +18,9 @@ Signed-off mock: build1-pro-verification-flow-signed-off.html (six tabs). Ben ra
 Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Median changes; Profile tab of mock (PRO label, Tour tab) is NOT in this brief's six-tab scope.
 
 ## BRIEF 2 — PRO label and profile Tour tab
-- [ ] Shared verified-only batched member cache and two-size PRO label; invalidate after own status changes.
-- [ ] Personal hero descriptor and owner-only pending note.
-- [ ] Tour tab with canonical player rows, previous-season fallback, eight-row cap and player links; uncovered owner note and Handicap rules.
-- [ ] Small labels on exactly the listed member surfaces, with batched visible ids and no business/player labels.
-- [ ] Tests, four shards, browser checks and PRO_VERIFICATION_2_REPORT.md; stop on any unexpected failure.
+- [x] Shared verified-only batched member cache and two-size PRO label; invalidate after own status changes.
+- [x] Personal hero descriptor and owner-only pending note implemented; exact visual proof pending.
+- [x] Tour tab with canonical player rows, previous-season fallback, eight-row cap and player links; uncovered owner note and Handicap rules.
+- [x] Small labels wired on listed member surfaces; sibling ids coalesced into one call; exhaustive surface proof pending.
+- [ ] STOP: shard 1 fails ms1MessagesHeadToHead.test.tsx:422 (name wrapper moves text into an unstyled descendant). No assertion edited; shards 2–4 and browser checks not run. Full output preserved.
+- [x] Write PRO_VERIFICATION_2_REPORT.md with stop, test inventory and verification limits.
