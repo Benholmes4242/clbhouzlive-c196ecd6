@@ -20,6 +20,8 @@ import {
 } from '@/components/business/verification/revocationReasons';
 import { confirmedSignals } from '@/components/business/verification/evidenceLine';
 import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
+import { ProRequestFacts } from './ProRequestFacts';
+import { isProKind, proKindLabel, PRO_DECLINE_REASON_OPTIONS } from '@/features/pro-verification/proRules';
 
 /**
  * Extracted from UsersPage during the Members rebuild (D4). Behaviour and
@@ -38,7 +40,7 @@ const PROOF_NOUNS: Record<string, string> = {
   golf_course: 'golf course website',
 };
 
-type EntityFilter = 'business' | 'golfer' | 'course_claim';
+type EntityFilter = 'business' | 'golfer' | 'pro' | 'course_claim';
 
 export function VerificationsTab({
   data, loading, review,
@@ -50,10 +52,13 @@ export function VerificationsTab({
   const [params, setParams] = useSearchParams();
   const entityFromUrl = (params.get('entity') as EntityFilter | null) ?? null;
 
+  /* BRIEF 1 §8 — Users keeps notable requests only; Pros counts pending
+     tour_pro / teaching_pro requests. */
   const pendingByEntity = useMemo(() => ({
     business: data.filter(r => r.type === 'business' && r.status === 'pending').length,
     course_claim: data.filter(r => r.type === 'course_claim' && r.status === 'pending').length,
-    golfer: data.filter(r => r.type === 'golfer' && r.status === 'pending').length,
+    golfer: data.filter(r => r.type === 'golfer' && !isProKind(r.kind) && r.status === 'pending').length,
+    pro: data.filter(r => r.type === 'golfer' && isProKind(r.kind) && r.status === 'pending').length,
   }), [data]);
 
   const defaultEntity: EntityFilter =
@@ -61,6 +66,7 @@ export function VerificationsTab({
     (pendingByEntity.business > 0 ? 'business'
       : pendingByEntity.course_claim > 0 ? 'course_claim'
       : pendingByEntity.golfer > 0 ? 'golfer'
+      : pendingByEntity.pro > 0 ? 'pro'
       : 'business');
 
   const [entityFilter, setEntityFilterState] = useState<EntityFilter>(defaultEntity);
@@ -113,7 +119,12 @@ export function VerificationsTab({
   }, [active?.id, active?.businessId, active?.type]);
 
   const entityFiltered = useMemo(
-    () => data.filter(r => r.type === entityFilter),
+    () => data.filter(r =>
+      entityFilter === 'pro'
+        ? r.type === 'golfer' && isProKind(r.kind)
+        : entityFilter === 'golfer'
+          ? r.type === 'golfer' && !isProKind(r.kind)
+          : r.type === entityFilter),
     [data, entityFilter],
   );
 
@@ -174,6 +185,7 @@ export function VerificationsTab({
         tabs={[
           { id: 'business',     label: 'Businesses', count: pendingByEntity.business || undefined },
           { id: 'golfer',       label: 'Users',      count: pendingByEntity.golfer || undefined },
+          { id: 'pro',          label: 'Pros',       count: pendingByEntity.pro || undefined },
           { id: 'course_claim', label: 'Courses',    count: pendingByEntity.course_claim || undefined },
         ]}
         activeId={entityFilter}
