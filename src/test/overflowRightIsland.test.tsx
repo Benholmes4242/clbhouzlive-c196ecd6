@@ -40,16 +40,19 @@ const paths = ['/tourhub', '/', '/amateur', '/courses', '/watch/top100'];
 describe('FIX_OVERFLOW_1 right-only narrow fold', () => {
   it.each(paths)('guest folds Log in at rest and retains Join free on %s', path => {
     state.narrow = true; mount(path);
-    const login = screen.getByRole('button', { name: 'Log in', hidden: true });
-    expect(login).toHaveAttribute('aria-hidden', 'true'); expect(login).toBeDisabled(); expect(login.tabIndex).toBe(-1);
+    const login = document.querySelector<HTMLButtonElement>('[data-guest-island] > button:first-of-type');
+    expect(login).toHaveAttribute('aria-hidden', 'true'); expect(login).toBeDisabled(); expect(login?.tabIndex).toBe(-1);
+    expect(login?.style.maxWidth).toBe('0'); expect(login?.style.opacity).toBe('0'); expect(login?.style.pointerEvents).toBe('none');
     expect(screen.getByRole('button', { name: 'Join free' })).toBeEnabled();
   });
   it.each(paths)('member folds search at rest and retains index/avatar on %s', path => {
     state.guest = false; state.narrow = true; mount(path);
-    const search = screen.getByRole('button', { name: 'Search', hidden: true });
-    expect(search).toHaveAttribute('aria-hidden', 'true'); expect(search.tabIndex).toBe(-1);
+    const search = document.querySelector<HTMLButtonElement>('[data-island-right] > button:first-of-type');
+    expect(search).toHaveAttribute('aria-hidden', 'true'); expect(search?.tabIndex).toBe(-1);
+    expect(search?.style.maxWidth).toBe('0'); expect(search?.style.opacity).toBe('0'); expect(search?.style.pointerEvents).toBe('none');
     expect(screen.getByRole('button', { name: 'Handicap index 8.2' })).toBeEnabled();
     expect(screen.getByTestId('avatar')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open profile menu' })).toBeEnabled();
   });
   it.each([true, false])('above340 keeps the existing expanded guest=%s controls', guest => {
     state.guest = guest; mount('/tourhub');
