@@ -325,9 +325,11 @@ describe('BRIEF 1 §8 — the admin Pros tab', () => {
   ];
   const review = { mutate: f.reviewMutate, isPending: false } as unknown as Parameters<typeof VerificationsTab>[0]['review'];
   const mountAdmin = () => render(
-    <MemoryRouter>
-      <VerificationsTab data={rows} loading={false} review={review} />
-    </MemoryRouter>,
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <MemoryRouter>
+        <VerificationsTab data={rows} loading={false} review={review} />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 
   it('the Pros tab counts pending pro requests and Users keeps notable only', () => {
