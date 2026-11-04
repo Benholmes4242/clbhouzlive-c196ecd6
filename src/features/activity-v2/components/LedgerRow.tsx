@@ -51,7 +51,7 @@ function renderBody(text: string, actorName: string | null | undefined, actorId?
   const rest = text.slice(actorName.length);
   return (
     <>
-      <span style={{ fontWeight: 700 }}><ProMemberName userId={actorId}>{actorName}</ProMemberName></span>
+      <ProMemberName userId={actorId}><span style={{ fontWeight: 700 }}>{actorName}</span></ProMemberName>
       {rest}
     </>
   );

@@ -728,7 +728,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         >
           {/* Name row — name ellipses first, follow never pushed off */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <span
+            <ProMemberName userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId}><span
               onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
               style={{
                 fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
@@ -737,8 +737,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                 minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
               }}
             >
-              <ProMemberName userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId}>{activePost.displayName}</ProMemberName>
-            </span>
+              {activePost.displayName}
+            </span></ProMemberName>
             {activePost.isVerified && <VerifiedBadge size="sm" />}
           </div>
 

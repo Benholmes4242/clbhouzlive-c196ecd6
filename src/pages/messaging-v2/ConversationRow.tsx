@@ -323,12 +323,12 @@ export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
 
         <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: 2 }}>
           <div className="flex items-center gap-1.5 min-w-0">
-            <span
+            <ProMemberName userId={isGroup || identity.isBusiness ? null : identity.userId}><span
               className="truncate"
               style={{ ...MT.NAME, color: nameColor, minWidth: 0 }}
             >
-              <ProMemberName userId={isGroup || identity.isBusiness ? null : identity.userId}>{identity.name}</ProMemberName>
-            </span>
+              {identity.name}
+            </span></ProMemberName>
             {identity.verified ? (
               <BadgeCheck size={13} style={{ color: MSG.INK_2, flexShrink: 0 }} />
             ) : null}

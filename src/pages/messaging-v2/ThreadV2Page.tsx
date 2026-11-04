@@ -424,12 +424,12 @@ const ThreadV2Page: React.FC = () => {
               <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
                 <div className="flex items-center gap-1.5 min-w-0">
                   {/* MS1 §2 — the thread name is 17px/600. */}
-                  <span
+                  <ProMemberName userId={rivalUserId ?? (isDirect && firstIncoming?.sender_actor_type === 'personal' ? firstIncoming.sender_actor_id : null)}><span
                     className="truncate"
                     style={{ color: INK, fontSize: 17, fontWeight: 600, lineHeight: '20px', letterSpacing: '-0.012em' }}
                   >
-                    <ProMemberName userId={rivalUserId ?? (isDirect && firstIncoming?.sender_actor_type === 'personal' ? firstIncoming.sender_actor_id : null)}>{header.name}</ProMemberName>
-                  </span>
+                    {header.name}
+                  </span></ProMemberName>
                   {header.verified ? (
                     <BadgeCheck size={13} style={{ color: SUB, flexShrink: 0 }} />
                   ) : null}

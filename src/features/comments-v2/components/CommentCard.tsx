@@ -116,10 +116,10 @@ export function CommentCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="truncate" style={{ fontSize: 14.5, fontWeight: 600, color: isViewer ? A.AMBER : INK, letterSpacing: '-0.01em' }}>
-              <ProMemberName userId={deleted || comment.actor_type === 'business' ? null : comment.actor_id ?? comment.user_id}>{comment.display_name}</ProMemberName>
+            <ProMemberName userId={deleted || comment.actor_type === 'business' ? null : comment.actor_id ?? comment.user_id}><span className="truncate" style={{ fontSize: 14.5, fontWeight: 600, color: isViewer ? A.AMBER : INK, letterSpacing: '-0.01em' }}>
+              {comment.display_name}
               {isViewer ? ' · You' : null}
-            </span>
+            </span></ProMemberName>
             {comment.actor_type === 'business' && (
               <span style={{
                 padding: '1px 5px', borderRadius: 3, fontSize: 11, fontWeight: 700,

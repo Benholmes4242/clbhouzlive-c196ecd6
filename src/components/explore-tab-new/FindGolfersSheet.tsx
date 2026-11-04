@@ -265,7 +265,7 @@ function GolferRow({
       {/* THE NAME NEVER TRUNCATES. It takes a second line instead, and the row
           grows to hold it - acceptance D holds from 320 to 430. */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
+        <ProMemberName userId={row.id}><div
           style={{
             fontSize: 14,
             fontWeight: 700,
@@ -275,8 +275,8 @@ function GolferRow({
             overflowWrap: 'anywhere',
           }}
         >
-          <ProMemberName userId={row.id}>{name}</ProMemberName>
-        </div>
+          {name}
+        </div></ProMemberName>
         {figs.length ? (
           // THE META LINE may clip; the name may not.
           <div
