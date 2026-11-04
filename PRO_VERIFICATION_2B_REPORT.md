@@ -129,3 +129,11 @@ Reconciliation against the 6,742 / 593 expectation: shards 1–3 ran 1750+1600+1
 tests across 447 files; shard 4 (~1,671 tests / ~146 files) not run after the stop.
 Full failing output: `docs/verification/pro-2b/shard3.log`.
 No rewritten existing tests; no existing test files touched.
+
+## Fix: name element keeps its DOM position (2026-11-04)
+- New `ProOrVerifiedMark` renders after the untouched name span, in the parent the Verified badge uses: PRO for verified pros (no tick), the tick for verified non-pros.
+- Applied to FindPeoplePage golfer cards and WhoToFollowRail person cards (the only 2B surfaces that wrapped name text beside a Verified badge). Other 2B surfaces unchanged.
+- wf1FindPeople.test.tsx not edited; now passes 27/27.
+- Rewritten test (new in 2B, own file): `proVerification2B.test.tsx` loop case — for rail/find people, old `container.querySelector('.pro-inline-name:has(.pro-label)')…textContent toBe('pro')` → new `.pro-label` previousElementSibling textContent `'pro'` and no `.pro-inline-name`. "mixed follow rail" old `querySelectorAll('.pro-inline-name')[0]?.querySelector('.pro-label') toBeNull()` → new `getByText('Business').parentElement` has no `.pro-label`. Reason: the wrapper no longer exists on these surfaces.
+- Added 6 tests (3 × rail/find people): verified non-pro tick in name's parent; pro shows PRO, no tick; name element unchanged.
+- Shards: 1,756 / 1,600 / 1,721 / 1,671 = 6,748 across 593 files (previous 6,742 after 2B's +12; +6 new). Logs: docs/verification/pro-2b-fix/.

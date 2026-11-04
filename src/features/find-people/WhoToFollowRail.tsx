@@ -20,7 +20,7 @@
  * owns decorative image failure, never source selection or community rows.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,6 @@ import './suggestion-covers.css';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ROW_FONT } from '@/features/social-lists-v2/rowParts';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
@@ -523,8 +522,8 @@ function RailCardView({
           textOverflow: 'ellipsis',
         }}
       >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={card.kind === 'person' ? card.person.user_id : null}>{name}</InlineProMemberName></span>
-        {verified ? <VerifiedBadge size="sm" /> : null}
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+        <ProOrVerifiedMark userId={card.kind === 'person' ? card.person.user_id : null} verified={verified} />
       </div>
 
       {/* Reason: two lines max, fixed height so cards stay aligned. */}

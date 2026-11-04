@@ -1,6 +1,6 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, waitFor } from '@testing-library/react';
+import { cleanup, render, waitFor, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -47,6 +47,8 @@ const proReadIds = (): string[] | undefined => {
   return call ? call[1]?.p_user_ids as string[] : undefined;
 };
 const ids = ['pro', 'ordinary', 'pending'];
+const SIBLING_SURFACES = ['rail', 'find people'];
+const getByTextIn = (root: HTMLElement, text: string) => within(root).getByText(text, { selector: 'span' });
 const person = (id: string) => ({ user_id: id, display_name: id, username: id, profile_photo_url: null, reason_type: 'club', reason_club_name: 'Club', reason_course_name: null, reason_date: null, mutual_count: null, recent_rounds: null, rounds_total: 3, handicap_index: null, is_verified: false });
 function gridCard(id: string, actorType: 'personal' | 'business' = 'personal') {
   const post = { id, userId: id, actorId: id, actorType, mediaItems: [] } as any;
@@ -84,6 +86,11 @@ describe('Brief 2B mounted member names', () => {
       await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
       expect(h.rpc).toHaveBeenCalledTimes(1);
       expect(proReadIds()?.sort()).toEqual([...ids].sort());
+      if (SIBLING_SURFACES.includes(name)) {
+        expect(container.querySelector('.pro-label')?.previousElementSibling?.textContent).toBe('pro');
+        expect(container.querySelector('.pro-inline-name')).toBeNull();
+        return;
+      }
       const labelled = container.querySelector('.pro-inline-name:has(.pro-label)');
       expect(labelled?.querySelector('.pro-inline-text')?.textContent).toBe('pro');
       expect([...container.querySelectorAll('.pro-inline-name')].filter(node => node.querySelector('.pro-inline-text')?.textContent !== 'pro').every(node => !node.querySelector('.pro-label'))).toBe(true);
@@ -109,6 +116,31 @@ describe('Brief 2B mounted member names', () => {
     await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
     expect(h.rpc).toHaveBeenCalledTimes(1);
     expect(proReadIds()?.sort()).toEqual([...ids].sort());
-    expect(container.querySelectorAll('.pro-inline-name')[0]?.querySelector('.pro-label')).toBeNull();
+    expect(getByTextIn(container, 'Business').parentElement?.querySelector('.pro-label')).toBeNull();
   });
+  for (const name of SIBLING_SURFACES) {
+    it(`${name}: verified non-pro keeps the tick in the name's parent`, async () => {
+      h.people = ids.map(id => ({ ...person(id), is_verified: id === 'ordinary' }));
+      const { container } = mount(surface(name));
+      await waitFor(() => expect(container.querySelector('.pro-label')).not.toBeNull());
+      expect(getByTextIn(container, 'ordinary').parentElement?.querySelector('svg.lucide-badge-check')).not.toBeNull();
+    });
+    it(`${name}: verified pro shows PRO and no tick`, async () => {
+      h.people = ids.map(id => ({ ...person(id), is_verified: id === 'pro' }));
+      const { container } = mount(surface(name));
+      await waitFor(() => expect(container.querySelector('.pro-label')).not.toBeNull());
+      const parent = getByTextIn(container, 'pro').parentElement;
+      expect(parent?.querySelector('.pro-label')).not.toBeNull();
+      expect(parent?.querySelector('svg.lucide-badge-check')).toBeNull();
+    });
+    it(`${name}: name element is unchanged`, async () => {
+      const { container } = mount(surface(name));
+      await waitFor(() => expect(container.querySelector('.pro-label')).not.toBeNull());
+      const el = getByTextIn(container, 'pro');
+      expect(el.tagName).toBe('SPAN');
+      expect(el.children).toHaveLength(0);
+      expect(el.getAttribute('style')).toBe('overflow: hidden; text-overflow: ellipsis;');
+      expect(el.nextElementSibling?.classList.contains('pro-label')).toBe(true);
+    });
+  }
 });
