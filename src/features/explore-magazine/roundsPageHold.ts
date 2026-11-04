@@ -13,7 +13,7 @@
 export function roundsPageHeld(input: {
   sessionKnown: boolean;
   signedIn: boolean;
-  gate: 'signedOut' | 'loading' | 'gated' | 'connected';
+  gate: 'signedOut' | 'loading' | 'gated' | 'proPending' | 'connected';
   boardReady: boolean;
   inFormPending: boolean;
 }): boolean {
