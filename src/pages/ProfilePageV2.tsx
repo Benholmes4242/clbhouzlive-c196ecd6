@@ -910,7 +910,6 @@ const ProfilePageV2Content: React.FC = () => {
             userId={profile.id}
             isOwnProfile={isSelf}
             isCreator={isCreator}
-            proMember={proMember}
             viewerId={user?.id}
             ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
           />
@@ -960,6 +959,7 @@ const ProfilePageV2Content: React.FC = () => {
             userId={profile.id}
             viewerUserId={user?.id}
             isCreator={isCreator}
+            proMember={proMember}
             coachLine={<CoachProfileLine profileUserId={profile.id} viewerId={user?.id} />}
             displayName={displayName}
             nameRef={heroNameRef}
