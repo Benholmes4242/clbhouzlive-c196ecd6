@@ -20,7 +20,6 @@
  * owns decorative image failure, never source selection or community rows.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -34,7 +33,6 @@ import './suggestion-covers.css';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ROW_FONT } from '@/features/social-lists-v2/rowParts';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
