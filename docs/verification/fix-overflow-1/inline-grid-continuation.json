@@ -1,0 +1,262 @@
+[
+  {
+    "path": "src/components/awards/AwardMark.tsx",
+    "line": 28,
+    "snippet": "{\n        width: s.w, height: s.h, borderRadius: s.radius, display: 'grid', placeItems: 'center', flex: 'none',\n        background: medalTierTone(tier), color: INK,\n        ...(ring ? { boxShadow: `0 0 0 1.5px ${ring}` } : null),\n        ...style,\n      }"
+  },
+  {
+    "path": "src/components/business/BusinessEmptyState.tsx",
+    "line": 111,
+    "snippet": "{ display: 'grid', gap: 12, padding: '11px 0' }"
+  },
+  {
+    "path": "src/components/chrome/AppHeader.tsx",
+    "line": 79,
+    "snippet": "{\n        width: 32,\n        height: 32,\n        borderRadius: 999,\n        display: 'grid',\n        placeItems: 'center',\n        padding: 0,\n        border: 0,\n        ...GLASS_CHROME,\n        cursor: 'pointer',\n        flexShrink: 0,\n      }"
+  },
+  {
+    "path": "src/components/chrome/AppHeader.tsx",
+    "line": 216,
+    "snippet": "{ width: 30, height: 34, display: 'grid', placeItems: 'center', padding: 0, border: 0, background: 'transparent', color: A.INK, cursor: 'pointer' }"
+  },
+  {
+    "path": "src/components/chrome/FixedPageHeader.tsx",
+    "line": 101,
+    "snippet": "{\n                width: 32,\n                height: 32,\n                borderRadius: '50%',\n                display: 'grid',\n                placeItems: 'center',\n                padding: 0,\n                border: `1px solid ${A.BORDER}`,\n                background: A.PANEL,\n                color: A.INK,\n                cursor: 'pointer',\n                flexShrink: 0,\n              }"
+  },
+  {
+    "path": "src/components/courses/course-detail/CourseRecordBook.tsx",
+    "line": 85,
+    "snippet": "{ display: 'grid', gap: 14 }"
+  },
+  {
+    "path": "src/components/courses/course-detail/CourseRecordBook.tsx",
+    "line": 158,
+    "snippet": "{ display: 'grid', gap: 14 }"
+  },
+  {
+    "path": "src/components/courses/course-detail/about/AllHolesSheet.tsx",
+    "line": 165,
+    "snippet": "{ display: 'grid', gap: 14 }"
+  },
+  {
+    "path": "src/components/courses/course-detail/about/KeepExploring.tsx",
+    "line": 179,
+    "snippet": "{ display: 'grid', borderTop: `1px solid ${A.HAIRLINE}`, paddingTop: 4 }"
+  },
+  {
+    "path": "src/components/courses/course-detail/about/RecordBook.tsx",
+    "line": 220,
+    "snippet": "{ display: 'grid', gap: 12, marginTop: 14 }"
+  },
+  {
+    "path": "src/components/courses/course-detail/about/RecordBook.tsx",
+    "line": 264,
+    "snippet": "{ display: 'grid', gap: 18 }"
+  },
+  {
+    "path": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
+    "line": 256,
+    "snippet": "{ display: 'grid', gap: 12, marginTop: 14 }"
+  },
+  {
+    "path": "src/components/courses/course-detail/you/YourRoundsHere.tsx",
+    "line": 62,
+    "snippet": "{ display: 'grid' }"
+  },
+  {
+    "path": "src/components/courses/top100/top100Shells.tsx",
+    "line": 52,
+    "snippet": "{ display: 'grid', gap: ARGUMENT_ROW_GAP }"
+  },
+  {
+    "path": "src/components/courses/top100/top100Shells.tsx",
+    "line": 55,
+    "snippet": "{ flex: 1, minWidth: 0, display: 'grid', gap: 6 }"
+  },
+  {
+    "path": "src/components/explore-tab-new/FindGolfersSheet.tsx",
+    "line": 71,
+    "snippet": "{ display: 'grid', flexShrink: 0 }"
+  },
+  {
+    "path": "src/components/profile/handicap/whs/connect/EmptyStateScreen.tsx",
+    "line": 350,
+    "snippet": "{ width: 36, height: 36, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 800, background: AVATAR_BG, color: MID }"
+  },
+  {
+    "path": "src/components/profile/handicap/whs/connect/EmptyStateScreen.tsx",
+    "line": 358,
+    "snippet": "{ width: 36, height: 36, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 800, border: `1.5px dashed ${AMBER_DASH_STRONG}`, color: AMBER }"
+  },
+  {
+    "path": "src/components/profile/handicap/whs/connect/EmptyStateScreen.tsx",
+    "line": 376,
+    "snippet": "{ width: 36, height: 36, borderRadius: 12, background: STEP_BG, display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: 800, color: SOFT_INK }"
+  },
+  {
+    "path": "src/features/admin/components/analytics/AnalyticsLenses.tsx",
+    "line": 20,
+    "snippet": "{\n            height: 34, borderRadius: 999, border: 0, display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700,\n            background: on ? t.ink : 'transparent', color: on ? t.canvas : t.inkMuted, cursor: 'pointer', fontFamily: 'inherit',\n          }"
+  },
+  {
+    "path": "src/features/admin/components/analytics/HealthLens.tsx",
+    "line": 154,
+    "snippet": "{\n                  height: 24, borderRadius: 4, display: 'grid', placeItems: 'center', fontSize: 10.5, fontWeight: 800,\n                  background: `rgba(255,168,58,${Math.max(0.08, Math.min(1, v / 100)).toFixed(2)})`,\n                  color: v >= 55 ? t.canvas : t.ink,\n                }"
+  },
+  {
+    "path": "src/features/admin/components/analytics/LiveLens.tsx",
+    "line": 77,
+    "snippet": "{ width: 34, height: 34, borderRadius: 17, display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: bg }"
+  },
+  {
+    "path": "src/features/admin/components/content/ContentSegments.tsx",
+    "line": 14,
+    "snippet": "{\n            height: 34, borderRadius: 999, border: 0, display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, cursor: 'pointer',\n            background: on ? t.ink : 'transparent', color: on ? t.canvas : t.inkMuted,\n          }"
+  },
+  {
+    "path": "src/features/admin/components/content/StorySection.tsx",
+    "line": 71,
+    "snippet": "{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${t.line}`, background: 'transparent', display: 'grid', placeItems: 'center', padding: 0, cursor: 'pointer' }"
+  },
+  {
+    "path": "src/features/admin/components/content/TourDataSection.tsx",
+    "line": 236,
+    "snippet": "{ width: 34, height: 34, borderRadius: 17, background: t.neutralSoft, display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 700, color: t.inkFaint }"
+  },
+  {
+    "path": "src/features/admin/components/health/GolfDataLens.tsx",
+    "line": 204,
+    "snippet": "{ width: 28, height: 28, borderRadius: 14, background: 'rgba(61,220,145,0.12)', display: 'grid', placeItems: 'center', flexShrink: 0 }"
+  },
+  {
+    "path": "src/features/admin/components/health/JobsLens.tsx",
+    "line": 248,
+    "snippet": "{ width: 28, height: 28, borderRadius: 14, display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: ic.bg }"
+  },
+  {
+    "path": "src/features/admin/pages/SettingsPage.tsx",
+    "line": 93,
+    "snippet": "{\n      padding: '14px 14px 14px 16px', display: 'grid', alignItems: 'center', columnGap: 12,\n      borderTop: first ? undefined : `1px solid ${t.hairline}`,\n    }"
+  },
+  {
+    "path": "src/features/courses/components/holes/analytical/CourseCardPanel.tsx",
+    "line": 656,
+    "snippet": "{ paddingTop: 12, display: 'grid', gap: 11 }"
+  },
+  {
+    "path": "src/features/courses/components/holes/analytical/CourseCardPanel.tsx",
+    "line": 661,
+    "snippet": "{ display: 'grid', gap: 5 }"
+  },
+  {
+    "path": "src/features/courses/components/holes/analytical/CourseCardPanel.tsx",
+    "line": 1021,
+    "snippet": "{ padding: '0 16px 32px', display: 'grid', gap: 12 }"
+  },
+  {
+    "path": "src/features/echo-chat/components/CompareBars.tsx",
+    "line": 26,
+    "snippet": "{ display: 'grid', gap: 10 }"
+  },
+  {
+    "path": "src/features/echo-chat/components/ComposerPill.tsx",
+    "line": 88,
+    "snippet": "{\n            flex: '0 0 auto',\n            width: 32,\n            height: 32,\n            borderRadius: 16,\n            border: 'none',\n            display: 'grid',\n            placeItems: 'center',\n            // Two solid states, not one colour at two alphas (\u00a71).\n            background: canSend ? EC.INK : '#232A33',\n          }"
+  },
+  {
+    "path": "src/features/echo-chat/components/StateCards.tsx",
+    "line": 98,
+    "snippet": "{ display: 'grid', placeItems: 'center' }"
+  },
+  {
+    "path": "src/features/echo-chat/components/StateCards.tsx",
+    "line": 105,
+    "snippet": "{ display: 'grid', gap: 9, marginTop: 30 }"
+  },
+  {
+    "path": "src/features/echo-chat/components/ThinkingSources.tsx",
+    "line": 46,
+    "snippet": "{ display: 'grid', gap: 9 }"
+  },
+  {
+    "path": "src/features/echo-chat/components/ThinkingSources.tsx",
+    "line": 52,
+    "snippet": "{\n                width: 14,\n                height: 14,\n                borderRadius: 7,\n                flex: '0 0 auto',\n                display: 'grid',\n                placeItems: 'center',\n                // \u00a77 ticks are ink, never amber.\n                background: resolved ? EC.INK : 'transparent',\n                border: resolved ? 'none' : `1.5px solid ${EC.LINE}`,\n              }"
+  },
+  {
+    "path": "src/features/echo-chat/components/ThreadPrimitives.tsx",
+    "line": 109,
+    "snippet": "{ ...T.BODY, marginTop: top, display: 'grid', gap: 6 }"
+  },
+  {
+    "path": "src/features/post-v2/components/golf/GolfPostSections.tsx",
+    "line": 49,
+    "snippet": "{ flex: 'none', width: 92, height: 116, borderRadius: 14, border: `1.5px dashed ${GP.line2}`, background: 'transparent', display: 'grid', placeItems: 'center', color: GP.mute, fontSize: 26, cursor: 'pointer' }"
+  },
+  {
+    "path": "src/features/post-v2/components/golf/GolfPostSections.tsx",
+    "line": 122,
+    "snippet": "{ marginLeft: 'auto', width: 30, height: 30, borderRadius: '50%', border: 0, background: 'rgba(255,255,255,0.07)', cursor: 'pointer', display: 'grid', placeItems: 'center', flex: 'none' }"
+  },
+  {
+    "path": "src/features/post-v2/components/golf/PostPreview.tsx",
+    "line": 53,
+    "snippet": "{ width: 40, height: 40, borderRadius: '50%', display: 'grid', placeItems: 'center', background: 'transparent', border: 0, cursor: 'pointer' }"
+  },
+  {
+    "path": "src/features/profile-sheet-v2/components/YourCourseAnalyticsSheet.tsx",
+    "line": 114,
+    "snippet": "{\n  margin: '0 20px',\n  display: 'grid',\n  gap: 10,\n}"
+  },
+  {
+    "path": "src/features/tourhub/players-v2/PlayerCell.tsx",
+    "line": 28,
+    "snippet": "{ width: size, height: size, borderRadius: radius, overflow: 'hidden', background: P.PHOTO, display: 'grid', placeItems: 'center', position: 'relative', flex: 'none', fontSize: size >= 30 ? 11 : 8, fontWeight: 800, color: P.MUTE }"
+  },
+  {
+    "path": "src/features/tourhub/players-v2/field/FormTiles.tsx",
+    "line": 16,
+    "snippet": "{ width: size, height: size, borderRadius: size === 24 ? 7 : 5, display: 'grid', placeItems: 'center', fontSize: size === 24 ? 10 : 0, fontWeight: 700, boxSizing: 'border-box', ...TONE[tone] }"
+  },
+  {
+    "path": "src/features/tourhub/players-v2/field/FullField.tsx",
+    "line": 41,
+    "snippet": "{ width: '100%', display: 'grid', columnGap: 10, alignItems: 'center', minHeight: 62, padding: '10px 24px', border: 0, borderBottom: `1px solid ${P.HAIR}`, background: 'transparent', color: P.INK, textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }"
+  },
+  {
+    "path": "src/features/tourhub/players-v2/field/FullField.tsx",
+    "line": 188,
+    "snippet": "{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${P.HAIR2}`, display: 'grid', placeItems: 'center', flex: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }"
+  },
+  {
+    "path": "src/features/tourhub/players-v2/front/FrontPage.tsx",
+    "line": 29,
+    "snippet": "{ width: 36, height: 36, flex: 'none', borderRadius: '50%', border: `1px solid ${P.HAIR2}`, background: 'transparent', display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0 }"
+  },
+  {
+    "path": "src/features/tourhub/players-v2/picks/LinePicksCard.tsx",
+    "line": 205,
+    "snippet": "{ width: 18, height: 18, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: 11, flex: 'none',\n          background: kept ? P.INK : 'transparent', border: kept ? 'none' : '1px solid rgba(255,255,255,0.12)', color: kept ? '#0A0A0C' : P.DIM }"
+  },
+  {
+    "path": "src/features/tourhub/tournament-v2/sections/TournamentHoleRow.tsx",
+    "line": 231,
+    "snippet": "{ display: 'grid', gap: 8 }"
+  },
+  {
+    "path": "src/features/tourhub/tournament-v2/sections/TournamentHoleRow.tsx",
+    "line": 235,
+    "snippet": "{ display: 'grid', gap: 4 }"
+  },
+  {
+    "path": "src/pages/EchoV2Page.tsx",
+    "line": 73,
+    "snippet": "{ width: 34, height: 34, borderRadius: 17, display: 'grid', placeItems: 'center' }"
+  },
+  {
+    "path": "src/pages/EchoV2Page.tsx",
+    "line": 82,
+    "snippet": "{ width: 34, height: 34, borderRadius: 17, display: 'grid', placeItems: 'center' }"
+  }
+]

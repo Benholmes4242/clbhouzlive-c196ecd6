@@ -18,7 +18,7 @@ export default function AnalyticsLenses<L extends string = Lens>({ lens, onLens,
         const on = l.id === lens;
         return (
           <button key={l.id} type="button" aria-current={on ? 'page' : undefined} onClick={() => onLens(l.id)} style={{
-            height: 34, borderRadius: 999, border: 0, display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700,
+            height: 34, borderRadius: 999, border: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 12, fontWeight: 700,
             background: on ? t.ink : 'transparent', color: on ? t.canvas : t.inkMuted, cursor: 'pointer', fontFamily: 'inherit',
           }}>{l.label}</button>
         );

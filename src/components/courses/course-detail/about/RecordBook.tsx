@@ -217,7 +217,7 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
           </div>
         </div>
 
-        <div style={{ display: 'grid', gap: 12, marginTop: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12, marginTop: 14 }}>
           {previewRows.map(({ category, row }) => (
             <button
               key={category}
@@ -261,7 +261,7 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
       {/* BRIEF_RECORD_BOOK_NO_ROW_RULES: no row rules. The old 11px padding only
           held text off each row's own rule; with no rule it moves into an 18px
           gap, so all separation sits BETWEEN rows and each row reads as one block. */}
-      <div style={{ display: 'grid', gap: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 18 }}>
         {previewRows.map(({ category, row, rows }) => {
           const isYou = rows.some(isViewer);
           const shared = rows.length > 1;

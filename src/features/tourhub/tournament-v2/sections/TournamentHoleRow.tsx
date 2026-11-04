@@ -228,11 +228,11 @@ export const TournamentHoleRow: React.FC<{
 
       {open && (
         <div style={{ padding: `0 0 16px ${DETAIL_INSET}px` }}>
-          <div style={{ display: 'grid', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
             {segs.map((s) => {
               const share = (s.pctValue / total) * 100;
               return (
-                <div key={s.key} style={{ display: 'grid', gap: 4 }}>
+                <div key={s.key} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 4 }}>
                   <div
                     style={{
                       display: 'flex',

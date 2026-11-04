@@ -95,14 +95,14 @@ export const EntryPanel: React.FC<{
       overflowY: 'auto',
     }}
   >
-    <div style={{ display: 'grid', placeItems: 'center' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center' }}>
       {/* Static. A permanently animating logo is a distraction, not a brand. */}
       <EchoWaveform size={56} />
     </div>
 
     <div style={{ ...T.DISPLAY, textAlign: 'center', marginTop: 26 }}>{headline}</div>
 
-    <div style={{ display: 'grid', gap: 9, marginTop: 30 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 9, marginTop: 30 }}>
       {examples.map((ex) => (
         <button
           key={ex.kind}

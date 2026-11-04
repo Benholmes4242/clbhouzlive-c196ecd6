@@ -80,7 +80,7 @@ export function AppHeaderBurger({ onTap, label }: { onTap: () => void; label: st
         width: 32,
         height: 32,
         borderRadius: 999,
-        display: 'grid',
+        display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)',
         placeItems: 'center',
         padding: 0,
         border: 0,
@@ -213,7 +213,7 @@ export function AppHeader({
               type="button"
               aria-label="Search"
               onClick={() => setSearchOpen(true)}
-              style={{ width: 30, height: 34, display: 'grid', placeItems: 'center', padding: 0, border: 0, background: 'transparent', color: A.INK, cursor: 'pointer' }}
+              style={{ width: 30, height: 34, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', padding: 0, border: 0, background: 'transparent', color: A.INK, cursor: 'pointer' }}
             >
               <Search size={16} strokeWidth={2.3} />
             </button>

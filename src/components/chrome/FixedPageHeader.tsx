@@ -102,7 +102,7 @@ export function FixedPageHeader({
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
-                display: 'grid',
+                display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)',
                 placeItems: 'center',
                 padding: 0,
                 border: `1px solid ${A.BORDER}`,

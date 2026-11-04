@@ -49,10 +49,10 @@ export function YourHundredShell() {
 export function ArgumentShell() {
   return (
     <Head>
-      <div style={{ display: 'grid', gap: ARGUMENT_ROW_GAP }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: ARGUMENT_ROW_GAP }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: ARGUMENT_ROW_GAP }}>
           <Bar style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, flexShrink: 0 }} />
-          <div style={{ flex: 1, minWidth: 0, display: 'grid', gap: 6 }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 6 }}>
             <Bar style={{ height: 11, width: '60%' }} />
             <Bar style={{ height: 9, width: '45%' }} />
             <Bar style={{ height: 9, width: '35%' }} />

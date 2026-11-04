@@ -201,7 +201,7 @@ function Stuck({ g }: { g: HealthGolf }) {
       <Head title="Stuck rounds" side={side} />
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
         {clear && (
-          <span style={{ width: 28, height: 28, borderRadius: 14, background: 'rgba(61,220,145,0.12)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+          <span style={{ width: 28, height: 28, borderRadius: 14, background: 'rgba(61,220,145,0.12)', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', flexShrink: 0 }}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke={H.okText} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" /></svg>
           </span>
         )}

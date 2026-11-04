@@ -653,12 +653,12 @@ const OutInCompare: React.FC<{ out: CardHole[]; inn: CardHole[] }> = ({ out, inn
   return (
     <>
       <Hairline style={{ marginTop: 14 }} />
-      <div style={{ paddingTop: 12, display: 'grid', gap: 11 }}>
+      <div style={{ paddingTop: 12, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 11 }}>
         <div style={SH_LABEL}>{t('courses:courseDetail.card.compare.kicker')}</div>
         {measures.map((m) => {
           const domain = Math.max(m.a, m.b) || 1;
           return (
-            <div key={m.label} style={{ display: 'grid', gap: 5 }}>
+            <div key={m.label} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 5 }}>
               <div style={SH_LABEL}>{m.label}</div>
               {(
                 [
@@ -1018,7 +1018,7 @@ const SheetBody: React.FC<{
   };
 
   return (
-    <div style={{ padding: '0 16px 32px', display: 'grid', gap: 12 }}>
+    <div style={{ padding: '0 16px 32px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
       {/* ── a-f: THE SLOPE SECTION, one panel, leading the sheet ───────────── */}
       <div style={{ ...SHEET_PANEL, padding: '16px 16px 15px' }}>
         <div style={SH_KICKER}>

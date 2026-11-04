@@ -74,7 +74,7 @@ function WhoIsIn({ people }: { people: LivePerson[] }) {
             {p.photo ? (
               <img src={p.photo} alt="" style={{ width: 34, height: 34, borderRadius: 17, objectFit: 'cover' }} />
             ) : (
-              <span style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: bg }}>{initials(p)}</span>
+              <span style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: bg }}>{initials(p)}</span>
             )}
             <span style={{ minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700 }}>

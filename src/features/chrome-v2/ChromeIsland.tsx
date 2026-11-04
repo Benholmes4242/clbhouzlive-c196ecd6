@@ -594,10 +594,11 @@ export const AvatarCell: React.FC<{
 // "Join free" pill. GI1 opts only condense routes into member glass/folding;
 // legacy routes retain their exact markup/styles and both actions stay owned here.
 // ---------------------------------------------------------------------------
-const GuestRightCapsule: React.FC<{ tone: ChromeTone; fold?: boolean }> = ({ tone, fold }) => {
+const GuestRightCapsule: React.FC<{ tone: ChromeTone; fold?: boolean; compact?: boolean }> = ({ tone, fold, compact = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const condensed = useIslandsCondensed();
+  const scrollCondensed = useIslandsCondensed();
+  const condensed = compact || scrollCondensed;
   const folded = fold && condensed;
   const surface = surfaceForPath(location.pathname);
   return (
@@ -715,6 +716,19 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   // HEADER_B1 shares the bottom nav's direction signal, without a listener.
   const condensed = useIslandsCondensed();
 
+  // FIX_OVERFLOW_1: only the right island opts into the existing fold at
+  // narrow widths. Its media subscription never changes left/scroll state.
+  const [compactRight, setCompactRight] = useState(() => window.matchMedia('(max-width: 340px)').matches);
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 340px)');
+    const update = () => setCompactRight(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  const rightFold = spec.condense === true || compactRight;
+  const rightCondensed = compactRight || condensed;
+
   const suppressed = hidden || runtimeSuppressed || spec.chrome === 'none';
   // bleed island routes let the page own top padding — publish 0 so content
   // flows under the island rather than being pushed down another 64px.
@@ -806,14 +820,14 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         {/* RIGHT capsule — guests get Log in / Join free instead of the
             member content (search, index, avatar). */}
         {isGuest ? (
-          <GuestRightCapsule tone={tone} fold={spec.condense === true} />
+          <GuestRightCapsule tone={tone} fold={rightFold} compact={compactRight} />
         ) : (
         <div
           data-island-right
           style={{
-            ...glassStyle(tone, spec.condense === true),
+            ...glassStyle(tone, rightFold),
             ...(location.pathname === '/tourhub' ? { flexShrink: 0 } : {}),
-            ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
+            ...(rightFold ? { background: rightCondensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
             padding: '0 5px 0 12px',
             gap: 10,
             position: 'relative',
@@ -827,8 +841,8 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              aria-hidden={spec.condense && condensed ? true : undefined}
-              tabIndex={spec.condense && condensed ? -1 : undefined}
+              aria-hidden={rightFold && rightCondensed ? true : undefined}
+              tabIndex={rightFold && rightCondensed ? -1 : undefined}
               style={{
                 background: 'none',
                 border: 'none',
@@ -836,7 +850,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                ...(spec.condense ? { width: 19, flexShrink: 0, maxWidth: condensed ? 0 : 19, opacity: condensed ? 0 : 1, overflow: 'hidden', marginRight: condensed ? -10 : 0, pointerEvents: condensed ? 'none' : 'auto', transition: REDUCED_MOTION ? 'none' : 'var(--island-fold-transition)' } : {}),
+                ...(rightFold ? { width: 19, flexShrink: 0, maxWidth: rightCondensed ? 0 : 19, opacity: rightCondensed ? 0 : 1, overflow: 'hidden', marginRight: rightCondensed ? -10 : 0, pointerEvents: rightCondensed ? 'none' : 'auto', transition: REDUCED_MOTION ? 'none' : 'var(--island-fold-transition)' } : {}),
               }}
             >
               {/* The signed-off magnifier: 19px, stroke 1.9 (mock's exact glyph,
@@ -861,7 +875,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
 
           {/* HcpCell renders its own leading divider so the rule can never be
               stranded when the chip is hidden. */}
-          {!spec.hideHcp && <HcpCell tone={tone} dividerColor={dividerColor} fold={spec.condense} condensed={condensed} />}
+          {!spec.hideHcp && <HcpCell tone={tone} dividerColor={dividerColor} fold={rightFold} condensed={rightCondensed} />}
 
 
 

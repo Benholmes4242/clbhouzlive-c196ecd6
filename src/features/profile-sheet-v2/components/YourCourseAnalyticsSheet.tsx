@@ -113,7 +113,7 @@ const CARD = (open = false): React.CSSProperties => ({
  *  card carries no trailing space. */
 const CARD_LIST: React.CSSProperties = {
   margin: '0 20px',
-  display: 'grid',
+  display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)',
   gap: 10,
 };
 

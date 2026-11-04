@@ -68,7 +68,7 @@ function ActionSlot({
   settledNode: React.ReactNode;
 }) {
   return (
-    <div style={{ display: 'grid', flexShrink: 0 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', flexShrink: 0 }}>
       <div
         style={{ gridArea: '1 / 1', visibility: settled ? 'hidden' : 'visible' }}
         aria-hidden={settled}

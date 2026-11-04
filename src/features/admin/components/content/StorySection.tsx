@@ -68,7 +68,7 @@ export default function StorySection({ beat, id, onBack, onEdit }: { beat: Beat;
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 4px 4px' }}>
-        <button type="button" onClick={onBack} aria-label="Back to newsroom" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${t.line}`, background: 'transparent', display: 'grid', placeItems: 'center', padding: 0, cursor: 'pointer' }}>
+        <button type="button" onClick={onBack} aria-label="Back to newsroom" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${t.line}`, background: 'transparent', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', padding: 0, cursor: 'pointer' }}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke={t.ink} strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M9 3L5 7l4 4" /></svg>
         </button>
         <span style={{ flex: 1 }}>

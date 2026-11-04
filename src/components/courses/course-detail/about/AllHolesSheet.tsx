@@ -162,7 +162,7 @@ const ParTracks: React.FC<{ rows: ParTypeRow[]; hasYou: boolean }> = ({ rows, ha
   const max = Math.max(0.1, ...values);
   const zero = signedPosition(0, min, max);
   return (
-    <div style={{ display: 'grid', gap: 14 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 14 }}>
       {rows.map((row) => {
         const field = toParParts(row.field);
         const you = hasYou ? toParParts(row.you) : null;

@@ -108,7 +108,7 @@ function Figures({ locale }: { locale: string }) {
       <Card id="figures" style={{ marginBottom: 8 }}>
         <div style={{ ...kicker, marginBottom: 10 }}>On clbhouz today</div>
         {isLoading || !rows ? (
-          <div data-figures-loading="" style={{ display: 'grid', gap: 12, padding: '11px 0' }}>
+          <div data-figures-loading="" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12, padding: '11px 0' }}>
             <Skeleton className="h-4 w-2/3 rounded" />
             <Skeleton className="h-4 w-1/2 rounded" />
           </div>

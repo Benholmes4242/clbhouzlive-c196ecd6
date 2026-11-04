@@ -26,7 +26,7 @@ export function AwardMark({ tier, size, ring, style, glyph = 'medal' }: { tier: 
     <span
       aria-hidden="true"
       style={{
-        width: s.w, height: s.h, borderRadius: s.radius, display: 'grid', placeItems: 'center', flex: 'none',
+        width: s.w, height: s.h, borderRadius: s.radius, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', flex: 'none',
         background: medalTierTone(tier), color: INK,
         ...(ring ? { boxShadow: `0 0 0 1.5px ${ring}` } : null),
         ...style,
