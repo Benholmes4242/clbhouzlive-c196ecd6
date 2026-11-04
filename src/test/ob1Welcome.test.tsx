@@ -123,3 +123,72 @@ describe('OB1.2 first sign-in fixes', () => {
   it('a row whose completion fails keeps the member on the page with the save-failed message', async () => { f.updateFails = true; mount(5); fireEvent.click(screen.getByRole('button', { name: 'row-courses' })); await screen.findByText('Could not save. Please try again.'); expect(document.querySelector('[data-welcome-step]')).toHaveAttribute('data-welcome-step', '5'); expect(f.track).not.toHaveBeenCalledWith('onboarding_finished', expect.anything()); });
   it('screen 2 search status reads Searching… with role status, 22px below the bar', () => { const css = readFileSync('src/styles/welcome.css', 'utf8'); expect(css).toContain('.welcome-search-status{font-size:13.5px;color:var(--welcome-mute);margin-top:22px}'); const src = readFileSync('src/pages/Welcome.tsx', 'utf8'); expect(src).toContain(`<p role="status" className="welcome-search-status">{t('welcome.searching', { defaultValue: 'Searching…' })}</p>`); });
 });
+
+describe('BRIEF 1 — the welcome pro flow', () => {
+  it('the pro switch opens the details sheet and closing without sending turns it back off', () => {
+    mount(1);
+    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    expect(row).toHaveAttribute('aria-checked', 'false');
+    fireEvent.click(row);
+    expect(screen.getByTestId('pro-sheet')).toBeInTheDocument();
+    expect(row).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(screen.getByTestId('pro-sheet'));
+    expect(screen.queryByTestId('pro-sheet')).toBeNull();
+    expect(row).toHaveAttribute('aria-checked', 'false');
+  });
+  it('a pending pro keeps the row on with an Edit door to the sheet', () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(1);
+    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    expect(row).toHaveAttribute('aria-checked', 'true');
+    expect(row.textContent).toContain('Verification requested · Tour professional');
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(screen.getByTestId('pro-sheet')).toBeInTheDocument();
+    expect(f.withdraw).not.toHaveBeenCalled();
+  });
+  it('turning a pending pro off withdraws the request through the RPC', async () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(1);
+    fireEvent.click(screen.getByRole('switch', { name: "I'm a golf professional" }));
+    await waitFor(() => expect(f.withdraw).toHaveBeenCalledTimes(1));
+  });
+  it('a verified pro row cannot be toggled off', () => {
+    f.pro = { ...f.pro, verified: true, kind: 'teaching_pro', club: 'Sunningdale' };
+    mount(1);
+    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    expect(row).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(row);
+    expect(f.withdraw).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('pro-sheet')).toBeNull();
+  });
+  it('a pending pro gets the No handicap needed branch and Continue completes with the pro choice', async () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('No handicap needed.'));
+    expect(screen.getByText(/Being checked/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'England' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(f.track).toHaveBeenCalledWith('onboarding_step_completed', { step: 4, choice: 'pro' }));
+    expect(document.querySelector('[data-welcome-step]')).toHaveAttribute('data-welcome-step', '5');
+  });
+  it('a verified pro gets the same branch with the verified copy', async () => {
+    f.pro = { ...f.pro, verified: true, kind: 'teaching_pro', club: 'Sunningdale' };
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('No handicap needed.'));
+    expect(screen.getByText(/You're verified as a pro/)).toBeInTheDocument();
+  });
+  it('I have a handicap to connect falls back to the ordinary connect flow', async () => {
+    f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('No handicap needed.'));
+    fireEvent.click(screen.getByRole('button', { name: 'I have a handicap to connect' }));
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Got an official handicap?');
+    expect(screen.getByRole('button', { name: 'England' })).toBeInTheDocument();
+  });
+  it('an unsettled pro read holds screen 4 on the loading state', async () => {
+    f.proLoading = true;
+    mount(4);
+    await waitFor(() => expect(screen.getByRole('status')).toBeInTheDocument());
+    expect(screen.queryByText('No handicap needed.')).toBeNull();
+  });
+});
