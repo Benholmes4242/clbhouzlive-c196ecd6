@@ -61,7 +61,7 @@ describe('FIX_GRID_1 source guards', () => {
     expect(rowPassesThrough).toBe(true);
     expect(rowPassesThrough && !/pointer-events\s*:\s*auto\s*;/.test(backRule())).toBe(false);
   });
-  it.each(['src/pages/WatchGridPage.tsx', 'src/pages/RoundsPage.tsx', 'src/pages/FindPeoplePage.tsx', 'src/components/manage/ManagePageShell.tsx'])('%s consumes measured clearance instead of the old reservation', file => {
+  it.each(['src/pages/WatchGridPage.tsx', 'src/pages/RoundsPage.tsx', 'src/pages/FindPeoplePage.tsx', 'src/components/manage/ManagePageShell.tsx', 'src/features/tourhub/player-v2/PlayerPage.tsx'])('%s consumes measured clearance instead of the old reservation', file => {
     const source = read(file);
     expect(source).toMatch(/import\s*\{\s*CHROME_CLEARANCE\s*\}\s*from\s*['"]@\/lib\/chromeClearance['"]/);
     expect(source).not.toContain(oldClearance);
@@ -74,17 +74,13 @@ describe('FIX_GRID_1 source guards', () => {
     expect(read('src/components/manage/ManagePageShell.tsx')).toContain("marginTop: headerB ? undefined : 'calc(-1 * var(--sat, env(safe-area-inset-top, 0px)))'");
     expect(read('src/components/manage/ManagePageShell.tsx')).toContain('{!headerB && <FixedPageHeader');
   });
-  it('no bleeding page or shared shell consumes old clearance except the named PlayerPage', () => {
+  it('no bleeding page or shared shell consumes old clearance', () => {
     const consumers = [...files].filter(file => read(file).includes(oldClearance));
     const pages = routePages();
     expect(pages.some(page => page.route === '/notificationmessages')).toBe(true);
-    // User-frozen exception: PlayerPage begins with identity/name + avatar,
-    // not a full-bleed image; its correction requires a separate brief.
-    const exception = 'src/features/tourhub/player-v2/PlayerPage.tsx';
-    expect(consumers).toContain(exception);
     const unmapped = consumers.filter(file => !pages.some(page => reaches(page.file, file)));
     expect(unmapped, `Unmapped clearance consumers: ${unmapped.join(', ')}`).toEqual([]);
-    const violations = consumers.filter(file => file !== exception).flatMap(file => pages.filter(page => reaches(page.file, file) && resolveChrome(page.route.replace(/:[^/]+/g, 'fixture'), new URLSearchParams()).bleed).map(page => `${file}: ${page.route}`));
+    const violations = consumers.flatMap(file => pages.filter(page => reaches(page.file, file) && resolveChrome(page.route.replace(/:[^/]+/g, 'fixture'), new URLSearchParams()).bleed).map(page => `${file}: ${page.route}`));
     expect(violations, `All old-clearance consumers: ${consumers.join(', ')}; bleeding consumers: ${violations.join(', ')}`).toEqual([]);
   });
 });

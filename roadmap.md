@@ -1,5 +1,10 @@
 # Roadmap
 
+## Player page measured clearance
+- [x] Replace player root old island reservation with CHROME_CLEARANCE; preserve hero26px and single safe-area owner; remove guard exception and add player guard case.
+- [ ] Run focused checks and four shards maxWorkers2, preserving full output on any failure; reconcile against6527/578.
+- [ ] Verify Mackenzie Hughes and Brandt Snedeker in the browser; report any authentication limitation without bypassing guest rules.
+
 ## Consolidated CM1 then TU1
 - [x] Apply only authorised Merged Airy heading14→16 and grid bottom14→0 expectations; other assertions/product frozen.
 - [x] Run all four CM1 shards with maxWorkers2:1681/1543/1648/1642 =6514 tests/578 files, zero failures/unhandled errors; CM1 complete. Test count +42/+2 reconciled in CM1_REPORT.md; build OK23:02:08Z.
