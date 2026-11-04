@@ -290,7 +290,7 @@ export default function CourseMatchingPage() {
           AI matching queue
         </div>
         <div style={{ color: t.inkMuted, fontSize: 13, lineHeight: 1.5, maxWidth: 640 }}>
-          WHS courses the model couldn't confidently match. Link each to a <strong style={{ color: t.ink }}>golf_courses</strong> row —
+          WHS courses our prediction engine couldn't confidently match. Link each to a <strong style={{ color: t.ink }}>golf_courses</strong> row —
           sub-course layouts map to the parent club. Ordered by scored rounds.
         </div>
       </div>
@@ -476,7 +476,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, color: t.inkMuted, fontSize: 12 }}>
         <span>conf <span style={{ color: t.ink, fontWeight: 600, fontFeatureSettings: '"tnum" 1' }}>{conf}</span></span>
         <span>·</span>
-        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{agree} {agree === 1 ? 'model agrees' : 'models agree'}</span>
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{agree} {agree === 1 ? 'read agrees' : 'reads agree'}</span>
         <span>·</span>
         <span>{formatAgo(row.matched_at, { suffix: true, empty: '—' })}</span>
         {row.suggested_course_name && (
@@ -499,7 +499,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
           }}
         >
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          {expanded ? 'Hide model reasoning' : 'Show model reasoning'}
+          {expanded ? 'Hide prediction engine reasoning' : 'Show prediction engine reasoning'}
         </button>
       )}
 
@@ -507,7 +507,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 10px', background: t.neutralSoft, borderRadius: t.radius.md }}>
           {segments.map((seg, i) => (
             <div key={i} style={{ fontSize: 12, color: t.ink, lineHeight: 1.5 }}>
-              <strong style={{ textTransform: 'lowercase' }}>{seg.model}:</strong>{' '}
+              <strong style={{ textTransform: 'lowercase' }}>Read {i + 1}:</strong>{' '}
               <span style={{ color: t.inkMuted }}>{seg.text}</span>
             </div>
           ))}
@@ -800,9 +800,9 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           {suggestion && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                Model suggestion
+                Prediction engine suggestion
               </div>
-              <CourseRow hit={suggestion} label="Model suggestion" />
+              <CourseRow hit={suggestion} label="Prediction engine suggestion" />
             </div>
           )}
 
