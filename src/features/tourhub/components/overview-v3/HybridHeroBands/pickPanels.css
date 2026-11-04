@@ -93,7 +93,7 @@
 .pick-mine-row { margin-top:12px; display:flex; align-items:center; gap:10px; }
 .pick-mine-face { flex:none; display:flex; }
 /* Trace the actual shared avatar box, preserving its canonical aspect ratio. */
-.pick-mine-avatar { border-radius:34%; box-shadow:var(--pick-section-ring); }
+.pick-mine-avatar { border-radius:34%; }
 .pick-mine-placeholder { width:36px; height:36px; border-radius:34%; border:1.5px dashed var(--pick-mine-placeholder); display:grid; place-items:center; color:var(--pick-amber); flex:none; }
 .pick-mine-text { flex:1; min-width:0; }
 .pick-mine-label { font-size:9.5px; font-weight:800; letter-spacing:.13em; color:var(--pick-amber); }
@@ -103,7 +103,8 @@
 .pick-mine-change { flex:none; padding:0 12px; height:30px; border:1px solid var(--pick-section-change-border); border-radius:999px; background:transparent; color:var(--pick-ink); font-size:12.5px; font-weight:700; }
 .pick-mine-figure { text-align:right; font-size:14px; font-weight:800; white-space:nowrap; }
 .pick-mine-figure small { display:block; margin-top:2px; font-size:10px; color:var(--pick-dim); }
-.pick-follow-line { margin-top:10px; padding-top:10px; border-top:1px solid var(--pick-section-circle-border); display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--pick-mute); }
+.pick-follow-line { width:100%; height:auto; margin-top:10px; padding:10px 0 0; border:0; border-top:1px solid var(--pick-section-circle-border); border-radius:0; background:transparent; display:flex; align-items:center; justify-content:flex-start; gap:8px; text-align:left; white-space:normal; font-size:11.5px; font-weight:400; color:var(--pick-mute); }
+.pick-see-picks { margin-left:auto; flex:none; white-space:nowrap; font-weight:700; color:var(--pick-soft); }
 .pick-follow-stack { display:flex; flex:none; }
 .pick-follow-stack > span { margin-left:-5px; border:1.5px solid var(--pick-section-stack-border); border-radius:34%; }
 .pick-follow-stack > span:first-child { margin-left:0; }

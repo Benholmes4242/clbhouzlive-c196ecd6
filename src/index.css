@@ -69,6 +69,8 @@
   --pick-mine-border: rgba(247,147,30,.22);
   --pick-mine-placeholder: rgba(247,147,30,.6);
   --pick-section-white: #FFFFFF;
+  --pick-card-gap: #1A140C;
+  --pick-switch-selected: #2A2A30;
   --pick-section-change-border: rgba(255,255,255,.22);
   --pick-section-circle-border: rgba(247,147,30,.14);
   --pick-section-stack-border: #17120c;

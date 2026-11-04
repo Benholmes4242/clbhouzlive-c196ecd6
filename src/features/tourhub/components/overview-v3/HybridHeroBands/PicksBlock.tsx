@@ -133,7 +133,7 @@ export function PicksBlock({
   seasonYear:number|null;
   currentRound:number|null;
   pickResults:PickResult[];
-  onOpenYourPick:()=>void;
+  onOpenYourPick:(view?:'field'|'board')=>void;
   onOpenRecord:()=>void;
   /** §E.1 where the picks stand; null renders no line. */
   intro: string | null;
