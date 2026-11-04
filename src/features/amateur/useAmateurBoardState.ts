@@ -20,6 +20,9 @@ import { BOARD_ROW_FLOOR as CIRCLE_ROW_FLOOR } from '@/components/explore-tab-ne
 import type { ScopeKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import { useCircleSize } from './useCircleSize';
+import { roundsGateState } from '@/features/explore-magazine/RoundsGate';
+import { useMyProStatus } from '@/features/pro-verification/useMyProStatus';
+import { proGateStatus } from '@/features/pro-verification/proRules';
 
 /**
  * THE EXPLORE LEADERBOARD'S STATE (BRIEF_EXPLORE_LEADERBOARD_STATES).
