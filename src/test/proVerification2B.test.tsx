@@ -41,6 +41,11 @@ import { PeopleShelf } from '@/features/explore-magazine/PeopleShelf';
 import { FeedCard } from '@/components/feed-cards/FeedCard';
 import { invalidateProMembers } from '@/features/pro-verification/proMembersCache';
 
+// The batched read's id order is not part of the contract; compare as a set.
+const proReadIds = (): string[] | undefined => {
+  const call = h.rpc.mock.calls.find(c => c[0] === 'get_pro_members');
+  return call ? call[1]?.p_user_ids as string[] : undefined;
+};
 const ids = ['pro', 'ordinary', 'pending'];
 const person = (id: string) => ({ user_id: id, display_name: id, username: id, profile_photo_url: null, reason_type: 'club', reason_club_name: 'Club', reason_course_name: null, reason_date: null, mutual_count: null, recent_rounds: null, rounds_total: 3, handicap_index: null, is_verified: false });
 function gridCard(id: string, actorType: 'personal' | 'business' = 'personal') {
@@ -78,7 +83,7 @@ describe('Brief 2B mounted member names', () => {
       const { container } = mount(surface(name));
       await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
       expect(h.rpc).toHaveBeenCalledTimes(1);
-      expect(h.rpc).toHaveBeenCalledWith('get_pro_members', { p_user_ids: ids });
+      expect(proReadIds()?.sort()).toEqual([...ids].sort());
       const labelled = container.querySelector('.pro-inline-name:has(.pro-label)');
       expect(labelled?.querySelector('.pro-inline-text')?.textContent).toBe('pro');
       expect([...container.querySelectorAll('.pro-inline-name')].filter(node => node.querySelector('.pro-inline-text')?.textContent !== 'pro').every(node => !node.querySelector('.pro-label'))).toBe(true);
@@ -102,7 +107,8 @@ describe('Brief 2B mounted member names', () => {
     h.businesses = [{ business_id: 'business', name: 'Business', category: 'Golf Club', reason_type: 'your_club', is_verified: true }];
     const { container } = mount(surface('rail'));
     await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
-    expect(h.rpc).toHaveBeenCalledWith('get_pro_members', { p_user_ids: ids });
+    expect(h.rpc).toHaveBeenCalledTimes(1);
+    expect(proReadIds()?.sort()).toEqual([...ids].sort());
     expect(container.querySelectorAll('.pro-inline-name')[0]?.querySelector('.pro-label')).toBeNull();
   });
 });
