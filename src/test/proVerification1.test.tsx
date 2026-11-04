@@ -190,7 +190,7 @@ describe('BRIEF 1 §7 — the shared Rounds gate', () => {
 });
 
 describe('BRIEF 1 §9 — activity kinds and links', () => {
-  it.each(['golfer_verified', 'golfer_verification_approved', 'golfer_verification_rejected', 'golfer_verification_removed'])('%s renders the system verified tile', type => {
+  it.each(['golfer_verified', 'golfer_verification_approved', 'golfer_verification_rejected', 'golfer_verification_removed', 'pro_verification_requested'])('%s renders the system verified tile', type => {
     const spec = resolveKind({ notif_type: type, actor_user_id: null });
     expect(spec.left).toBe('tile');
     expect(spec.isSystem).toBe(true);
@@ -207,6 +207,7 @@ describe('BRIEF 1 §9 — activity kinds and links', () => {
     expect(getActivityLink(row('golfer_verification_approved'))).toBe('/profile');
     expect(getActivityLink(row('golfer_verification_rejected'))).toBe('/edit-profile');
     expect(getActivityLink(row('golfer_verification_removed'))).toBe('/edit-profile');
+    expect(getActivityLink(row('pro_verification_requested'))).toBe('/edit-profile');
   });
 });
 

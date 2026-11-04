@@ -441,7 +441,8 @@ export function resolveKind(row: {
     t === 'golfer_verified' ||
     t === 'golfer_verification_approved' ||
     t === 'golfer_verification_rejected' ||
-    t === 'golfer_verification_removed'
+    t === 'golfer_verification_removed' ||
+    t === 'pro_verification_requested'
   ) {
     return {
       left: 'tile',
