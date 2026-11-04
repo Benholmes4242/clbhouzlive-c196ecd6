@@ -72,7 +72,8 @@ export function proDraftValid(d: ProDetailsDraft): boolean {
 export interface ProRequestArgs {
   p_kind: ProKind;
   p_tour?: string;
-  p_tour_code?: string;
+  /** §2 — tours with no code send p_tour_code null, never an omitted arg. */
+  p_tour_code?: string | null;
   p_body?: string;
   p_club?: string;
   p_membership_number?: string;
@@ -87,7 +88,7 @@ export function proRequestArgs(d: ProDetailsDraft): ProRequestArgs {
     return {
       p_kind: 'tour_pro',
       p_tour: d.tour === OTHER_TOUR ? d.otherTour.trim() : d.tour,
-      p_tour_code: d.tour === OTHER_TOUR ? undefined : chip?.code ?? undefined,
+      p_tour_code: d.tour === OTHER_TOUR ? null : chip?.code ?? null,
       p_link: d.noProfile ? undefined : d.link.trim(),
       p_no_profile: d.noProfile,
       p_how_to_check: d.noProfile ? d.howToCheck.trim() : undefined,
