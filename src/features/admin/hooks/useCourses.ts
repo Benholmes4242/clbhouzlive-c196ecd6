@@ -6,6 +6,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGolfCoursesStats } from '@/hooks/admin/useGolfCoursesStats';
 import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 import { trimOrNull } from '@/features/admin/lib/geography';
+import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 
 export interface AdminCourseRow {
   id: string;
@@ -168,7 +169,7 @@ export function useCourses() {
       toast.success('Photo updated');
       qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
     },
-    onError: () => toast.error('Failed to upload photo'),
+    onError: (err: Error) => toast.error('Failed to upload photo', { description: err?.message }),
   });
 
   const deleteMutation = useMutation({
@@ -214,13 +215,14 @@ export function useCourses() {
   };
 }
 
-/** Uploads a course photo and sets it as the thumbnail. Shared by the course list hook and the Inbox create-and-attach path. */
+/** Shared drawer/Inbox thumbnail upload uses the canonical R2-only helper.
+ * A failed upload never writes a thumbnail; helper/guard ownership stays shared. */
 export async function uploadCoursePhoto(courseId: string, file: File) {
   const ext = file.name.split('.').pop();
   const path = `course-photos/${courseId}-${Date.now()}.${ext}`;
-  const { error: upErr } = await supabase.storage.from('course-images').upload(path, file, { upsert: true });
-  if (upErr) throw upErr;
-  const { data: { publicUrl } } = supabase.storage.from('course-images').getPublicUrl(path);
+  const res = await uploadToR2Only(file, 'clbhouz-course-images', path);
+  if (!res.success || !res.publicUrl) throw new Error(res.error || 'Upload failed');
+  const publicUrl = res.publicUrl;
   const { error: updErr } = await supabase.from('golf_courses').update({ thumbnail_image: publicUrl }).eq('id', courseId);
   if (updErr) throw updErr;
   return publicUrl;

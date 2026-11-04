@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_UPLOAD_PLAYER_1
+- [ ] Route only admin course-photo uploads through uploadToR2Only; preserve both callers and expose the real failure description.
+- [ ] Use direct CHROME_CLEARANCE for player root; existing bleeding guard already has zero exceptions, remove its player-specific subtraction assertion.
+- [ ] Add upload/guard regressions, inventory other storage upload callers without changing them, run four shards and reconcile against6599/582.
+
 ## Our record sheet v2 and prediction-engine wording
 - [x] Event-count tiles, weekly-best circle, individual ledger and anonymous Agreement implemented; benchmark preserved.
 - [x] Ben ruled MC for missed cut, WD for withdrawal, DQ for disqualification, all dim/no score; remaining mock unchanged.

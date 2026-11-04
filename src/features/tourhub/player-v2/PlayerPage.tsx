@@ -3,8 +3,8 @@
  * Race ranks retain their existing source through the isolated header-year reader.
  * Shared picks/you-and-tour helpers remain authoritative; old sections are retired.
  * Player roots remain non-immersive, but route-hub CSS zeroes shell padding.
- * CHROME_CLEARANCE therefore pays the notch once; remove token breathing
- * plus identity inset (10px) so the unchanged hero puts the kicker26px below. */
+ * CHROME_CLEARANCE owns the root reservation with no exceptions; the hero's
+ * own identity padding remains unchanged. */
 import { useEffect,useRef,useState } from 'react';
 import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ import { useTourPlayer } from '../hooks/useTourHubData';
 import { usePlayerState } from '../hooks/usePlayerState';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { scrollPageToTop } from '@/lib/getScrollParent';
-import { CHROME_CLEARANCE, CHROME_BREATHING } from '@/lib/chromeClearance';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsGuest } from '@/features/guest/useIsGuest';
@@ -52,7 +52,7 @@ export function PlayerPage() {
  const results=resultsQuery.isError?[]:resultsQuery.data??[],stats=statsQuery.isError?[]:statsQuery.data??[],holes=holesQuery.isError?null:holesQuery.data??null,tourHoles=tourQuery.isError?null:tourQuery.data??null,mine=mineQuery.isError?null:mineQuery.data??null;
  const visible=sectionVisibility(results.length,stats,holes,tourHoles,mine,!!user&&!guest&&!user.is_anonymous),liveId=state.state==='live'?state.liveData?.tournamentId??null:null;
  const onPick=()=>{if(gate('other')||!user||user.is_anonymous)return;setPickOpen(true);};
- return <TourHubShell><TourPageShell headerB immersive background="var(--player-canvas)" title={player.full_name} backFallback="/tourhub?tab=players"><div className="player-v3" style={{paddingTop:`calc(${CHROME_CLEARANCE} - ${CHROME_BREATHING + 10}px)`}}>
+ return <TourHubShell><TourPageShell headerB immersive background="var(--player-canvas)" title={player.full_name} backFallback="/tourhub?tab=players"><div className="player-v3" style={{paddingTop:CHROME_CLEARANCE}}>
  <HeroSection nameRef={nameRef} player={player} header={header} results={results} tour={tour} race={raceQuery.isError?null:raceQuery.data??null} following={follows.ids.has(player.id)} busy={follows.busy} onFollow={()=>follows.toggle(player.id)} onPick={onPick} nextStartDate={nextQuery.data?.start_date}/>
  <AnimatePresence initial={false}>{state.state==='live'&&state.liveData&&<motion.div key="live-now" initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{duration:.25,ease:'easeOut'}} style={{overflow:'hidden'}}><LiveNowStrip liveData={state.liveData} playerName={player.full_name}/></motion.div>}</AnimatePresence>
  {year!=null&&<PlayerForm results={results} year={year} name={player.full_name} tour={tour}/>}
