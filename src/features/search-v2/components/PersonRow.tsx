@@ -1,4 +1,5 @@
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import type { PersonHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
 import { ROW_BASE, S } from '../lib/tokens';
@@ -23,7 +24,7 @@ export function PersonRow({ person, query, onSelect }: Props) {
       />
       <div className="flex-1 min-w-0">
         <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
-          <Highlight text={name} query={query} />
+          <ProMemberName userId={person.id}><Highlight text={name} query={query} /></ProMemberName>
         </p>
         {person.username && (
           <p className="text-[13px] truncate" style={{ color: S.QUIET }}>

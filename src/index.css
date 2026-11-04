@@ -36,6 +36,12 @@
 }
 
 :root {
+  --pro-label-ground: #F8FAFC;
+  --pro-label-ink: #0A0A0C;
+  --pro-note-ground: #17171B;
+  --pro-note-ink: #F8FAFC;
+  --pro-note-muted: rgba(248,250,252,0.62);
+  --pro-note-hairline: rgba(255,255,255,0.08);
   --island-back-ink: #F8FAFC;
   --island-back-rest: rgba(14,14,16,0.55);
   --island-back-edge: rgba(255,255,255,0.10);

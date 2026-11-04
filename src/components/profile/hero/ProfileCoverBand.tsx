@@ -5,6 +5,7 @@
  * is personal-only and never carries HeroShell's square pinned-height logic.
  */
 import React from 'react';
+import { ProLabel } from '@/features/pro-verification/ProLabel';
 import '@/features/creator/profile-creator.css';
 import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -90,6 +91,7 @@ interface Props {
   /** HB5: page-owned observation; standalone band rendering remains inert. */
   nameRef?: React.Ref<HTMLHeadingElement>;
   isCreator?: boolean;
+  isPro?: boolean;
   /** Pre-joined home club · region; null when neither resolves. */
   subline: string | null;
   /** Optional member coach line, privacy/read ownership remains with its caller. */
@@ -107,6 +109,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
   displayName,
   nameRef,
   isCreator = false,
+  isPro = false,
   subline,
   afterSubline,
   onAddHomeClub,
@@ -178,7 +181,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
         </button>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div className={isCreator ? "profile-creator-identity" : undefined}>
+          <div className={isPro ? 'pro-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
           <h1
             ref={nameRef}
             style={{
@@ -196,6 +199,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
           >
             {displayName}
           </h1>
+          {isPro && <ProLabel size="large" />}
           {isCreator && <span className="profile-creator-label">Creator</span>}
           </div>
           {subline ? (

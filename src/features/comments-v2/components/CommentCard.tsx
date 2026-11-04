@@ -4,6 +4,7 @@
  * border. Replies stay threaded in-row via ReplyRow.
  */
 import { useState } from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThumbsUp, MoreHorizontal } from 'lucide-react';
@@ -116,7 +117,7 @@ export function CommentCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="truncate" style={{ fontSize: 14.5, fontWeight: 600, color: isViewer ? A.AMBER : INK, letterSpacing: '-0.01em' }}>
-              {comment.display_name}
+              <ProMemberName userId={deleted || comment.actor_type === 'business' ? null : comment.actor_id ?? comment.user_id}>{comment.display_name}</ProMemberName>
               {isViewer ? ' · You' : null}
             </span>
             {comment.actor_type === 'business' && (

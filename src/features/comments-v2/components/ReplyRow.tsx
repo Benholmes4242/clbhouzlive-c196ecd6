@@ -3,6 +3,7 @@
  * no background, no radius, no shadow; hairline separated, indented.
  */
 import { useNavigate } from 'react-router-dom';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useTranslation } from 'react-i18next';
 import { ThumbsUp, MoreHorizontal } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -78,7 +79,7 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="truncate" style={{ fontSize: 13.5, fontWeight: 600, color: isViewer ? A.AMBER : INK, letterSpacing: '-0.01em' }}>
-            {comment.display_name}
+            <ProMemberName userId={deleted || comment.actor_type === 'business' ? null : comment.actor_id ?? comment.user_id}>{comment.display_name}</ProMemberName>
             {isViewer ? ' · You' : null}
           </span>
           {comment.actor_type === 'business' && (

@@ -5,7 +5,9 @@
  * tour_pro / teaching_pro), readable through the gvr_select_own policy.
  * Invalidate after request, withdraw and decide.
  */
+import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { invalidateProMembers } from './proMembersCache';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileData } from '@/hooks/useProfileData';
 import { isProKind, type ProKind, type ProRequestRow } from './proRules';
@@ -36,10 +38,11 @@ export function useMyProStatus(userId: string | undefined): MyProStatus {
     enabled: !!userId,
     staleTime: 30_000,
     queryFn: async () => {
+      if (!userId) return null;
       const { data, error } = await supabase
         .from('golfer_verification_requests')
         .select(PRO_REQUEST_SELECT)
-        .eq('user_id', userId!)
+        .eq('user_id', userId)
         .in('kind', ['tour_pro', 'teaching_pro'])
         .order('created_at', { ascending: false })
         .limit(1)
@@ -55,6 +58,11 @@ export function useMyProStatus(userId: string | undefined): MyProStatus {
   const pending = row?.status === 'pending';
   const declined = !verified && !pending && (row?.status === 'rejected' || row?.status === 'declined');
   const rawKind = row?.kind ?? (p?.pro_kind as string | null | undefined) ?? null;
+  const statusKey = JSON.stringify([userId, p?.pro_verified_at, p?.pro_kind, p?.pro_tour, p?.pro_club, p?.pro_player_id, row?.status]);
+  const previousStatus = useRef(statusKey);
+  useEffect(() => {
+    if (previousStatus.current !== statusKey) { previousStatus.current = statusKey; invalidateProMembers(); }
+  }, [statusKey]);
 
   return {
     verified,
@@ -76,7 +84,9 @@ export function useMyProStatus(userId: string | undefined): MyProStatus {
 export function useInvalidateMyProStatus() {
   const qc = useQueryClient();
   return (userId: string) => {
+    invalidateProMembers();
     void qc.invalidateQueries({ queryKey: ['my-pro-request', userId] });
+    void qc.invalidateQueries({ queryKey: ['profile-pro-pending', userId] });
     void qc.invalidateQueries({ queryKey: ['profile', userId] });
   };
 }

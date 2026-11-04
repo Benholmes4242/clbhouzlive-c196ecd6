@@ -14,6 +14,7 @@
  */
 
 import { useMemo, useRef, useEffect, useState } from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useNavigate } from 'react-router-dom';
 import { Search, UserPlus } from 'lucide-react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
@@ -526,7 +527,7 @@ function PendingRow({
             textOverflow: 'ellipsis',
           }}
         >
-          {row.display_name ?? row.username}
+          <ProMemberName userId={row.actor_type === 'business' ? null : row.actor_id}>{row.display_name ?? row.username}</ProMemberName>
         </div>
         <div style={{ fontSize: 11, fontWeight: 500, color: A.BODY, marginTop: 1 }}>
           {cancelled ? 'Request cancelled' : 'Friend request sent'}
@@ -600,7 +601,7 @@ function RichRow({
               textOverflow: 'ellipsis',
             }}
           >
-            {row.display_name ?? row.username}
+            <ProMemberName userId={isBusiness ? null : row.actor_id}>{row.display_name ?? row.username}</ProMemberName>
           </div>
           {!isBusiness && showHcp && (
             <span

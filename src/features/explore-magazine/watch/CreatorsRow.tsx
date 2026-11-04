@@ -4,6 +4,7 @@
  * The WS1 export name and data-watch-creators marker remain for existing consumers.
  */
 import { useEffect, useRef, useState } from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -108,7 +109,7 @@ export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | 
         const lines = personLines(person);
         return <Button key={person.actor_id} variant="ghost" className="explore-card" data-explore-card aria-label={person.display_name} aria-busy={pending === person.actor_id} onClick={() => void openPerson(person, i + 1)}>
           <span className="explore-card-ring" data-creator-ring={person.has_new ? 'true' : undefined}><PersonAvatar person={person} size={56} /></span>
-          <span className="explore-card-name" data-explore-name>{person.display_name}</span>
+          <span className="explore-card-name" data-explore-name><ProMemberName userId={person.actor_id}>{person.display_name}</ProMemberName></span>
           <span className="explore-card-why" data-explore-why>{whyText(lines.why)}</span>
           <span className="explore-card-detail" data-explore-detail data-new={lines.isNew ? 'true' : 'false'}>{detailText(lines.detail)}</span>
         </Button>;
@@ -126,7 +127,7 @@ function CreatorsSheet({ userId, pending, onClose, onOpen }: { userId: string | 
       <h2 id="watch-creators-sheet-title" style={{ margin: 0, padding: '4px 0 12px', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>{t('amateur.watch.creators.title', 'Creators')}</h2>
       {(people.data ?? []).filter((p) => p.tier !== 'you').map((person, i) => <div key={person.actor_id} role="button" tabIndex={0} aria-busy={pending === person.actor_id} onClick={() => void onOpen(person, i + 1)} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); void onOpen(person, i + 1); } }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', cursor: 'pointer', borderTop: i ? `0.5px solid ${A.BORDER}` : undefined, textAlign: 'left' }}>
         <PersonAvatar person={person} size={44} />
-        <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, fontWeight: 600, color: A.INK }}><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{person.display_name}</span>{person.is_verified ? <VerifiedBadge size="sm" /> : null}</div></div>
+        <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, fontWeight: 600, color: A.INK }}><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><ProMemberName userId={person.actor_id}>{person.display_name}</ProMemberName></span>{person.is_verified ? <VerifiedBadge size="sm" /> : null}</div></div>
         <CreatorFollowPill creator={person} />
       </div>)}
     </div>

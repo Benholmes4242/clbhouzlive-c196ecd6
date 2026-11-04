@@ -488,7 +488,7 @@ export function composeCommentBody(row: {
   notif_type: string;
   message?: string | null;
   actor_display_name?: string | null;
-}): React.ReactNode | null {
+}, actorNode?: React.ReactNode): React.ReactNode | null {
   const t = row.notif_type;
   const isReply = t === 'comment_reply' || t === 'top_ten_reply';
   const isComment = t === 'comment' || t === 'comment_post' || t === 'top_ten_comment';
@@ -502,7 +502,7 @@ export function composeCommentBody(row: {
   const verb = isReply ? ' replied: ' : ' commented: ';
   return (
     <>
-      <span style={{ fontWeight: 700 }}>{actor || 'Someone'}</span>
+      <span style={{ fontWeight: 700 }}>{actorNode ?? (actor || 'Someone')}</span>
       {verb}
       <span style={{ color: ACT.INK_45, fontStyle: 'italic' }}>{`\u201C${msg}\u201D`}</span>
     </>

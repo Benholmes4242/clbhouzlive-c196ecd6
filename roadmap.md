@@ -12,7 +12,15 @@ Signed-off mock: build1-pro-verification-flow-signed-off.html (six tabs). Ben ra
 - [x] 7. Rounds gate: shared predicate; verified pro = connected; pending = new 'proPending' state, no Connect action; guests/fail-open unchanged
 - [x] 8. Admin Inbox Verifications: Pros tab + count; subject (not inviter) identity fix; throw initial read errors; pro card facts, tour player match/Change, checklist, Verify as pro / Decline with pro reasons; p_player_id passthrough; set_pro_player_link for verified rows
 - [x] 9. Notifications: ledger renders golfer_verification_approved/rejected/removed with stored title/message + golfer_verified tile; links (approved→own profile, rejected/removed→Edit profile); fix removal push kind in verify-golfer-decision; pro email title/message in send-golfer-verification-result-email; report (not fix) missing caller check
-- [ ] Tests per brief §Tests; run four shards; report per-shard counts; name rewritten tests; stop on unexpected failure
-- [ ] Write PRO_VERIFICATION_1 report
+- [x] Tests per brief §Tests; run four shards; report per-shard counts; name rewritten tests; stop on unexpected failure
+- [x] Write PRO_VERIFICATION_1 report
 
 Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Median changes; Profile tab of mock (PRO label, Tour tab) is NOT in this brief's six-tab scope.
+
+## BRIEF 2 — PRO label and profile Tour tab
+- [x] Shared verified-only batched member cache and two-size PRO label; invalidate after own status changes.
+- [x] Personal hero descriptor and owner-only pending note implemented; exact visual proof pending.
+- [x] Tour tab with canonical player rows, previous-season fallback, eight-row cap and player links; uncovered owner note and Handicap rules.
+- [x] Small labels wired on listed member surfaces; sibling ids coalesced into one call; exhaustive surface proof pending.
+- [ ] STOP: shard 1 fails ms1MessagesHeadToHead.test.tsx:422 (name wrapper moves text into an unstyled descendant). No assertion edited; shards 2–4 and browser checks not run. Full output preserved.
+- [x] Write PRO_VERIFICATION_2_REPORT.md with stop, test inventory and verification limits.

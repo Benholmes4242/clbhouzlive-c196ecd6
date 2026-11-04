@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
+import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { ChevronRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -45,12 +46,12 @@ interface Props {
 
 
 /** Bold the leading actor_display_name in a raw body string (prefix match). */
-function renderBody(text: string, actorName: string | null | undefined): React.ReactNode {
+function renderBody(text: string, actorName: string | null | undefined, actorId?: string | null): React.ReactNode {
   if (!actorName || !text.startsWith(actorName)) return text;
   const rest = text.slice(actorName.length);
   return (
     <>
-      <span style={{ fontWeight: 700 }}>{actorName}</span>
+      <span style={{ fontWeight: 700 }}><ProMemberName userId={actorId}>{actorName}</ProMemberName></span>
       {rest}
     </>
   );
@@ -433,8 +434,10 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
   }
 
   // ------- Body text rendering with bold accents -------
-  const quoted = composeCommentBody(row);
-  let bodyNode: React.ReactNode = quoted ?? renderBody(body, row.actor_display_name);
+  const proActorId = row.actor_kind === 'business' || spec.isSystem ? null : row.actor_route_id ?? row.actor_user_id;
+  const actorNode = <ProMemberName userId={proActorId}>{row.actor_display_name ?? row.actor_username ?? 'Someone'}</ProMemberName>;
+  const quoted = composeCommentBody(row, actorNode);
+  let bodyNode: React.ReactNode = quoted ?? renderBody(body, row.actor_display_name, proActorId);
   if (spec.bold === 'badge_title' && data.badge_title) {
     bodyNode = (
       <>
@@ -458,7 +461,7 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
       const at = body.indexOf(fullName);
       bodyNode = (
         <>
-          {renderBody(body.slice(0, at), row.actor_display_name)}
+          {renderBody(body.slice(0, at), row.actor_display_name, proActorId)}
           <span style={{ fontWeight: 700 }}>{shortCourseName(fullName)}</span>
           {body.slice(at + fullName.length)}
         </>
@@ -499,7 +502,7 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
     >
       {leftVisual}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {isRound ? <ActivityRoundContent actor={row.actor_display_name ?? row.actor_username ?? 'Someone'} summary={roundSummary} time={relativeTime(row.created_at)} /> : <>
+        {isRound ? <ActivityRoundContent actor={actorNode} summary={roundSummary} time={relativeTime(row.created_at)} /> : <>
         <div
           style={{
             // BODY. The action sentence is prose, so it reads at the body tier (14),
