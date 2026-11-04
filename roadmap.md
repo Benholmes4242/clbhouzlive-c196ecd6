@@ -25,5 +25,6 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [x] Preserve every original name element inside ProMemberName; ms1MessagesHeadToHead.test.tsx remains untouched.
 - [x] Add one real ThreadV2Page regression with PRO present and name fontSize 17px; focused 54/54 and shard 1 green.
 - [x] Restore pre-Brief-2 markup on unmounted CreatorsRow rail/sheet and FindGolfersSheet; exclude them from the surface list. Existing surface tests do not include either; no assertion changed.
-- [ ] STOP: unused-surface rollback shards 1/2 pass; shard 3 fails at likesSheetTiers.test.tsx:63 (expected one RPC call, got two). Full output retained; shard 4 blocked by the stop rule pending direction.
+- [x] Approved test-only likesSheetTiers RPC stub returns no pros and excludes get_pro_members from existing RPC counts; all assertions unchanged.
+- [x] All four shards pass: 1,738 / 1,591 / 1,719 / 1,682 = 6,730 tests across 592 files; only likesSheetTiers.test.tsx needed the approved stub, no assertions changed.
 - [x] Write PRO_VERIFICATION_2_REPORT.md with stop, test inventory and verification limits.

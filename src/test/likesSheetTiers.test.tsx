@@ -18,7 +18,7 @@ vi.mock('@/integrations/supabase/client', () => {
   };
   return { supabase: {
     from: () => q,
-    rpc: async (fn: string, args: any) => { st.rpcCalls.push({ fn, args }); return { data: st.famRows, error: null }; },
+    rpc: async (fn: string, args: any) => { if (fn === 'get_pro_members') return { data: [], error: null }; st.rpcCalls.push({ fn, args }); return { data: st.famRows, error: null }; },
   } };
 });
 
