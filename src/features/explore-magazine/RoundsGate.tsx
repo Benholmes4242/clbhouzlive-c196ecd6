@@ -118,29 +118,33 @@ function NoHandicapTile({ onClose, returnRef }: { onClose: () => void; returnRef
   </>, document.body);
 }
 
-function GateCard({ roundCount, scope, onConnect, onNoHandicap, declineRef }: {
+function GateCard({ roundCount, scope, onConnect, onNoHandicap, declineRef, proPending = false }: {
   roundCount: number | null; scope: GateScope | null; onConnect: () => void; onNoHandicap: () => void; declineRef: React.RefObject<HTMLButtonElement>;
+  /** BRIEF 1 §7 — the pending-pro hold: waiting on the check, no Connect action. */
+  proPending?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const cardRef = useRef<HTMLDivElement>(null);
-  const counted = roundCount != null && roundCount > 0 && scope != null;
+  const counted = !proPending && roundCount != null && roundCount > 0 && scope != null;
   const restKey = scope === 'circle' ? 'headRestCircle' : scope === 'club' ? 'headRestClub' : 'headRestEveryone';
   useLayoutEffect(() => { cardRef.current?.focus({ preventScroll: true }); }, []);
   return createPortal(<div ref={cardRef} data-rounds-gate-card="" className="rounds-gate-floating rounds-gate-enter" role="dialog" aria-modal="false" aria-labelledby="rounds-gate-title" tabIndex={-1} style={{ ...GLASS_CARD, zIndex: Z.bottomNav - 1 }}>
     <div className="rounds-gate-kicker">{t('amateur.gate.membersKicker')}</div>
-    <h2 id="rounds-gate-title" className="rounds-gate-head">{counted ? <><span data-rounds-gate-count="" className="rounds-gate-amber">{t('amateur.gate.bodyCount', { count: roundCount })}</span>{' '}{t(`amateur.gate.${restKey}`)}</> : t('amateur.gate.title')}</h2>
-    <p className="rounds-gate-copy">{t('amateur.gate.lockBody')}</p>
+    <h2 id="rounds-gate-title" className="rounds-gate-head">{proPending ? t('amateur.gate.proPendingTitle') : counted ? <><span data-rounds-gate-count="" className="rounds-gate-amber">{t('amateur.gate.bodyCount', { count: roundCount })}</span>{' '}{t(`amateur.gate.${restKey}`)}</> : t('amateur.gate.title')}</h2>
+    <p className="rounds-gate-copy">{proPending ? t('amateur.gate.proPendingBody') : t('amateur.gate.lockBody')}</p>
     <div data-rounds-gate-ghost="" aria-hidden="true" className="rounds-gate-ghost">
       <span className="rounds-gate-you-slot">{t('amateur.gate.ghostName')}</span>
       <span className="rounds-gate-ghost-text"><span className="rounds-gate-ghost-name">{t('amateur.gate.ghostName')}</span><span className="rounds-gate-ghost-sub">{t('amateur.gate.ghostSub')}</span></span>
       <span className="rounds-gate-ghost-col"><span /></span><span className="rounds-gate-ghost-col rounds-gate-ghost-gross"><span /></span>
     </div>
-    <Button style={{ ...primaryCtaStyle, marginTop: 14 }} onClick={onConnect}>{t('amateur.gate.cta')}</Button>
-    <Button ref={declineRef} variant="ghost" style={{ ...declineButtonStyle, marginTop: 10, minHeight: 36, lineHeight: 1.5 }} onClick={onNoHandicap}>{t('amateur.gate.noHandicap')}</Button>
+    {!proPending && <>
+      <Button style={{ ...primaryCtaStyle, marginTop: 14 }} onClick={onConnect}>{t('amateur.gate.cta')}</Button>
+      <Button ref={declineRef} variant="ghost" style={{ ...declineButtonStyle, marginTop: 10, minHeight: 36, lineHeight: 1.5 }} onClick={onNoHandicap}>{t('amateur.gate.noHandicap')}</Button>
+    </>}
   </div>, document.body);
 }
 
-export function RoundsGate({ children, roundCount = null, scope = null }: { children: ReactNode; roundCount?: number | null; scope?: GateScope | null }) {
+export function RoundsGate({ children, roundCount = null, scope = null, proPending = false }: { children: ReactNode; roundCount?: number | null; scope?: GateScope | null; proPending?: boolean }) {
   const navigate = useNavigate();
   // GUEST BROWSING §4: RoundsGate never shows to a guest — the guest join
   // card takes precedence on Explore. The page renders ungated; the guest
@@ -210,7 +214,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     <div ref={bodyRef} data-rounds-gate-body="" aria-hidden={locked ? true : undefined}>{children}</div>
     {locked ? <>
       {createPortal(<div data-rounds-gate-shade="" aria-hidden="true" className="rounds-gate-shade" style={{ zIndex: Z.bottomNav - 2 }} />, document.body)}
-      <GateCard roundCount={roundCount} scope={scope} declineRef={declineRef} onConnect={() => { analyticsEvents.track('rounds_gate_connect_tap', { gate_state: 'gated' }); navigate('/manage/handicap'); }} onNoHandicap={() => { analyticsEvents.track('rounds_gate_no_handicap_tap', { gate_state: 'gated' }); setTileOpen(true); }} />
+      <GateCard roundCount={roundCount} scope={scope} proPending={proPending} declineRef={declineRef} onConnect={() => { analyticsEvents.track('rounds_gate_connect_tap', { gate_state: 'gated' }); navigate('/manage/handicap'); }} onNoHandicap={() => { analyticsEvents.track('rounds_gate_no_handicap_tap', { gate_state: 'gated' }); setTileOpen(true); }} />
       {tileOpen ? <NoHandicapTile onClose={() => setTileOpen(false)} returnRef={declineRef} /> : null}
     </> : null}
   </div>;
