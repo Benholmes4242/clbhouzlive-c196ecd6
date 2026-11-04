@@ -22,13 +22,15 @@ export interface MyProStatus {
   reviewReason: string | null;
   request: ProRequestRow | null;
   isLoading: boolean;
+  /** Profile unresolved or request read pending; a failed read is settled. */
+  unknown: boolean;
 }
 
 const PRO_REQUEST_SELECT =
   'id, kind, status, pro_tour, pro_tour_code, pro_body, pro_club, pro_membership_number, pro_link, pro_no_profile, pro_how_to_check, pro_player_id, review_reason, created_at';
 
 export function useMyProStatus(userId: string | undefined): MyProStatus {
-  const { profile } = useProfileData();
+  const { profile, loading: profileLoading } = useProfileData();
   const request = useQuery({
     queryKey: ['my-pro-request', userId],
     enabled: !!userId,
@@ -66,6 +68,7 @@ export function useMyProStatus(userId: string | undefined): MyProStatus {
     reviewReason: row?.review_reason ?? null,
     request: row,
     isLoading: request.isLoading,
+    unknown: !!userId && (profileLoading || (request.isPending && !request.isError)),
   };
 }
 

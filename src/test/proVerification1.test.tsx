@@ -372,3 +372,23 @@ describe('BRIEF 1 §8 — the admin Pros tab', () => {
     expect(screen.queryByText('Not notable enough')).toBeNull();
   });
 });
+
+describe('pro status unknown never gates', () => {
+  it('unknown with no connection gives loading', () => {
+    expect(proGateStatus({ verified: false, pending: false, unknown: true })).toBe('unknown');
+    expect(roundsGateState('u1', { isSuccess: true, data: null }, 'unknown')).toBe('loading');
+  });
+  it('unknown with a connection gives connected', () => {
+    expect(roundsGateState('u1', { isSuccess: true, data: { id: 'c' } }, 'unknown')).toBe('connected');
+  });
+  it('unknown then verified never passes through gated', () => {
+    const conn = { isSuccess: true, data: null };
+    const seq = [
+      { verified: false, pending: false, unknown: true },
+      { verified: true, pending: false, unknown: true },
+      { verified: true, pending: false, unknown: false },
+    ].map((s) => roundsGateState('u1', conn, proGateStatus(s)));
+    expect(seq).toEqual(['loading', 'connected', 'connected']);
+    expect(seq).not.toContain('gated');
+  });
+});
