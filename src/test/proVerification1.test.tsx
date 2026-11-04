@@ -19,7 +19,7 @@ const f = vi.hoisted(() => ({
     verified: false, pending: false, declined: false,
     kind: null as string | null, tour: null as string | null, tourCode: null as string | null,
     club: null as string | null, body: null as string | null,
-    reviewReason: null as string | null, request: null as Record<string, unknown> | null,
+    reviewReason: null as string | null, request: null as unknown,
     isLoading: false,
   },
   invalidate: vi.fn(),
@@ -321,7 +321,7 @@ describe('BRIEF 1 §8 — the admin Pros tab', () => {
   const rows: VerificationRow[] = [
     { ...base, id: 'g1', requestedBy: 'u1', displayName: 'Notable Golfer', kind: null },
     { ...base, id: 'p1', requestedBy: 'u2', displayName: 'Rory Test', kind: 'tour_pro', proTour: 'PGA TOUR', proTourCode: 'pga', proLink: 'https://pgatour.com/player/1', proNoProfile: false },
-    { ...base, id: 'b1', type: 'business', requestedBy: 'u3', displayName: 'Test Club', businessName: 'Test Club' },
+    { ...base, id: 'b1', type: 'business', requestedBy: 'u3', displayName: 'Test Club' },
   ];
   const review = { mutate: f.reviewMutate, isPending: false } as unknown as Parameters<typeof VerificationsTab>[0]['review'];
   const mountAdmin = () => render(
