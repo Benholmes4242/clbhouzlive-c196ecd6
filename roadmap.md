@@ -28,3 +28,9 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [x] Approved test-only likesSheetTiers RPC stub returns no pros and excludes get_pro_members from existing RPC counts; all assertions unchanged.
 - [x] All four shards pass: 1,738 / 1,591 / 1,719 / 1,682 = 6,730 tests across 592 files; only likesSheetTiers.test.tsx needed the approved stub, no assertions changed.
 - [x] Write PRO_VERIFICATION_2_REPORT.md with stop, test inventory and verification limits.
+
+## BRIEF 2B — remaining mounted member names
+- [ ] Confirm production callers; skip and list dormant requested surfaces.
+- [ ] Add small verified-only labels inside original name elements, preserving card geometry and business/player exclusions.
+- [ ] Add mounted-surface, batched-read and unchanged rail-layout tests; list all approved RPC-only fixture repairs.
+- [ ] Run four shards with maxWorkers=2, stop on unexpected failure, and report reconciled counts from 6,730 / 592.
