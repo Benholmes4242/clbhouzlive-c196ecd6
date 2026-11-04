@@ -1,4 +1,5 @@
 import React from 'react';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -267,7 +268,7 @@ function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; k
           cursor: 'pointer',
         }}
       >
-        {golfer.name}
+        <InlineProMemberName userId={golfer.userId}>{golfer.name}</InlineProMemberName>
       </span>
       {/* §3 THE REASON, RESOLVED AT THE SOURCE, OR NOTHING. Nothing is
           invented: a member no line applies to shows the name alone. */}

@@ -20,6 +20,7 @@
  * owns decorative image failure, never source selection or community rows.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -522,7 +523,7 @@ function RailCardView({
           textOverflow: 'ellipsis',
         }}
       >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={card.kind === 'person' ? card.person.user_id : null}>{name}</InlineProMemberName></span>
         {verified ? <VerifiedBadge size="sm" /> : null}
       </div>
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -25,7 +26,7 @@ export function TournamentPicksBoard({ rows, field, ourPicks, tourCode, pending,
         <div className="your-pick-group-members">{group.members.slice(0,open?undefined:PICKS_VISIBLE_MEMBERS).map(member=>{
           const name=pickMemberName(member);
           return <div key={member.user_id} className="your-pick-member" data-member-id={member.user_id} data-viewer={member.is_viewer}>
-            <SquircleAvatar size={20} src={member.profile_photo_url} userId={member.user_id} alt={name} fallback={name.split(/\s+/).map(w=>w[0]).join('').slice(0,2)} hairlineRing/><span>{member.is_viewer?copy('you'):name}</span>
+            <SquircleAvatar size={20} src={member.profile_photo_url} userId={member.user_id} alt={name} fallback={name.split(/\s+/).map(w=>w[0]).join('').slice(0,2)} hairlineRing/><span><InlineProMemberName userId={member.user_id}>{member.is_viewer?copy('you'):name}</InlineProMemberName></span>
           </div>;
         })}</div>
         {group.members.length>PICKS_VISIBLE_MEMBERS&&<Button variant={null} size={null} className="your-pick-show-all" aria-expanded={open} onClick={()=>setExpanded(current=>{const next=new Set(current);if(open)next.delete(group.playerId);else next.add(group.playerId);return next;})}>{open?copy('showFewer'):copy('showAll',{count:group.members.length})}</Button>}

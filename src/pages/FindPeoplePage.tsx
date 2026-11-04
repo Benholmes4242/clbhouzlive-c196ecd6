@@ -14,6 +14,7 @@
  * selection cannot drift. Search and useHideBottomNav remain page-owned.
  */
 import { useContext, useMemo, useRef, useState } from 'react';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -414,7 +415,7 @@ function GolferRow({
             textOverflow: 'ellipsis',
           }}
         >
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={golfer.user_id}>{name}</InlineProMemberName></span>
           {golfer.is_verified ? <VerifiedBadge size="sm" /> : null}
         </div>
         <ReasonLine
@@ -817,7 +818,7 @@ function SearchResults({
                 textOverflow: 'ellipsis',
               }}
             >
-              {p.display_name ?? p.username ?? ''}
+              <InlineProMemberName userId={p.id}>{p.display_name ?? p.username ?? ''}</InlineProMemberName>
             </div>
             {p.username ? (
               <div style={{ fontSize: 13, color: 'rgba(248,250,252,0.62)', marginTop: 2 }}>@{p.username}</div>

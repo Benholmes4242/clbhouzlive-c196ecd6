@@ -3,8 +3,9 @@
  *
  * Faithful copy of the Tile component inside
  * src/features/watch-v2/components/HubMixedGrid.tsx. The rendering here
- * MUST stay a byte-equivalent behavioural copy of that Tile — do not
- * introduce variants, and do not edit HubMixedGrid.tsx. When the hub
+ * Retains the Tile's media behavior; Brief 2B opts this live tile's personal
+ * creator name into the shared verified-only inline label. Do not edit
+ * HubMixedGrid.tsx. When the hub
  * evolves, port the change here.
  *
  * Contract:
@@ -19,6 +20,7 @@
  *   - `isAutoplayActive` — activeIndices.has(flatIndex).
  */
 import { useRef, useState } from 'react';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ReactionGlyph } from '@/lib/reactionKind';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
@@ -387,7 +389,7 @@ export function FeedCard({
                   minWidth: 0,
                 }}
               >
-                {row.creator_display_name || row.creator_username}
+                <InlineProMemberName userId={feedPost.actorType === 'personal' ? feedPost.userId : null}>{row.creator_display_name || row.creator_username}</InlineProMemberName>
               </span>
             ) : null}
 

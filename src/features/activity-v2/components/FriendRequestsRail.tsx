@@ -1,4 +1,5 @@
 import React from 'react';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFriendRequestsV2, type FriendRequestRowV2 } from '../hooks/useFriendRequestsV2';
@@ -89,7 +90,7 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
           width: '100%',
         }}
       >
-        {name}
+        <InlineProMemberName userId={row.requester_user_id}>{name}</InlineProMemberName>
       </div>
       {mutualLine && (
         <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_60, marginBottom: 12 }}>
