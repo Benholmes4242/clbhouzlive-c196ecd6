@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
+import { isProKind } from '@/features/pro-verification/proRules';
 
 export type BusinessDecision = 'approved' | 'rejected' | 'needs_more_info';
 export type GolferDecision = 'approved' | 'rejected';
@@ -204,7 +205,7 @@ export function useVerifications() {
 
   const reviewMutation = useMutation({
     mutationFn: async ({
-      id, type, decision, adminNote, reviewReason,
+      id, type, decision, adminNote, reviewReason, playerId,
     }: {
       id: string;
       type: 'business' | 'golfer' | 'course_claim';
@@ -215,6 +216,8 @@ export function useVerifications() {
        * alongside admin_notes, never instead of it. Omitted for approvals.
        */
       reviewReason?: string | null;
+      /** BRIEF 1 §8 — the chosen sr_players match on a pro approval. */
+      playerId?: string | null;
     }) => {
       // Shared edge-function error classifier (used by business + course_claim)
       const classifyEdgeError = async (error: any) => {
@@ -294,7 +297,7 @@ export function useVerifications() {
         throw e;
       }
       const { data, error } = await supabase.functions.invoke('verify-golfer-decision', {
-        body: { request_id: id, decision, reason: reviewReason ?? null, admin_note: adminNote || null },
+        body: { request_id: id, decision, reason: reviewReason ?? null, admin_note: adminNote || null, player_id: playerId ?? null },
       });
       if (error) throw await classifyEdgeError(error);
       if (data && data.ok === false) {
@@ -389,15 +392,27 @@ export function useVerifications() {
     onSettled: async () => { await refreshAdminQueues(qc); },
   });
 
+  /** BRIEF 1 §8 — a verified pro's row offers "Change tour player". */
+  const setProPlayerLinkMutation = useMutation({
+    mutationFn: async ({ userId, playerId }: { userId: string; playerId: string }) => {
+      const { error } = await supabase.rpc('set_pro_player_link', { p_user_id: userId, p_player_id: playerId });
+      if (error) throw error;
+    },
+    onSuccess: () => toast.success('Tour player linked.'),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to link the tour player'),
+    onSettled: async () => { await refreshAdminQueues(qc); },
+  });
+
   const counts = {
     all: data.length,
     pending: data.filter(v => v.status === 'pending').length,
     business: data.filter(v => v.type === 'business' && v.status === 'pending').length,
-    golfer: data.filter(v => v.type === 'golfer' && v.status === 'pending').length,
+    golfer: data.filter(v => v.type === 'golfer' && v.status === 'pending' && !isProKind(v.kind)).length,
+    pro: data.filter(v => v.type === 'golfer' && v.status === 'pending' && isProKind(v.kind)).length,
     courseClaim: data.filter(v => v.type === 'course_claim' && v.status === 'pending').length,
   };
 
-  return { data, isLoading, refetch, counts, reviewMutation, revokeMutation, removeGolferMutation };
+  return { data, isLoading, refetch, counts, reviewMutation, revokeMutation, removeGolferMutation, setProPlayerLinkMutation };
 
 }
 
