@@ -62,7 +62,8 @@ async function notifyGolfer(userId: string, decision: string, reason: string | n
         device_id: d.provider_id,
         title: approved ? "You're verified" : "Verification update",
         body,
-        data: { type: approved ? "golfer_verification_approved" : "golfer_verification_rejected" },
+        /* BRIEF 1 §9 — removal must say removal, not rejection. */
+        data: { type: approved ? "golfer_verification_approved" : decision === "removed" ? "golfer_verification_removed" : "golfer_verification_rejected" },
       });
     }
   } catch (e) {
@@ -86,7 +87,7 @@ serve(async (req) => {
     const adminUserId = userData.user.id;
     if (!(await isAdmin(adminUserId))) return json({ ok: false, error: "Forbidden" }, 403);
 
-    const { request_id, user_id, decision, reason, admin_note } = await req.json();
+    const { request_id, user_id, decision, reason, admin_note, player_id } = await req.json();
 
     if (decision === "needs_more_info") {
       // §5.5 — plainly, not an exception.
@@ -133,11 +134,14 @@ serve(async (req) => {
       }
       golferId = reqRow.user_id as string;
 
+      /* BRIEF 1 §8 — the chosen sr_players match passes through to the
+         decision RPC, which links the member's profile to their tour record. */
       const { error } = await supabaseUser.rpc("decide_golfer_verification", {
         p_request_id: request_id,
         p_decision: decision,
         p_reason: reason ?? null,
         p_note: admin_note ?? null,
+        p_player_id: player_id ?? null,
       });
       if (error) return json({ ok: false, error: error.message }, 500);
     }

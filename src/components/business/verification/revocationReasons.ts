@@ -48,6 +48,10 @@ export const GOLFER_REASONS = [
   'identity_unconfirmed',
   'invited_in_error',
   'conduct',
+  /* BRIEF 1 §8 — pro decline reasons, mirrored on the edge boundary. */
+  'not_on_tour_site',
+  'not_pga_member',
+  'details_mismatch',
   'other',
 ] as const;
 
