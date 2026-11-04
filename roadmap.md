@@ -2,9 +2,10 @@
 
 ## FIX_OVERFLOW_1
 - [x] Apply course About grid containment and wrapping map/business names; preserve action sizing.
-- [ ] Live ≤340px right-only fold implemented; STOP:10 new hidden-control lookup failures and existing GI1 broad-matchMedia fixture failure. Full output retained, no fixes/shards/browser after stop; see report.
+- [x] Authorised test-only selectors/fold assertions and query-aware GI1 fixture verified50/50; old/new lines named in report, GI1 assertions untouched. Historical failing output retained.
 - [x] Ruling:52 grid objects/38 files get one containment property; only MediaTray, VoiceDictateButton and ComposerStepHeader exempt. Guard9/9 passes; Tailwind unchanged.
-- [ ] Four shards and320px guest/member verification await authorised fixture/selector repair. Last full6633/585; expected current6648/586 (+15/+1), focused39 passed/11 failed.
+- [x] Four shards1719/1583/1680/1666=6648/586 (+15/+1 prior-continuation cases), no failures/unhandled errors; build OK. Guest320 four-page edges/full Tour label verified,390 restores Log in.
+- [ ] Authenticated member320 browser fit unavailable: external_unmanaged; guest browser and member unit proof complete, no bypass. Course-tab user-supplied proof accepted.
 - [x] Inventory55 inline objects/41 files (2 changed); unchanged Tailwind inventory; focused48/48; shards1708/1588/1676/1661=6633/585 (+8/+1 source cases). No failures/unhandled errors; build OK. FIX_OVERFLOW_1_REPORT.md records both scoped blockers.
 
 ## Overview rhythm
