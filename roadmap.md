@@ -1,5 +1,10 @@
 # Roadmap
 
+## Player page measured clearance
+- [x] Replace player root old island reservation with CHROME_CLEARANCE; preserve hero26px and single safe-area owner; remove guard exception and add player guard case.
+- [x] Focused23/23; shards1681/1556/1648/1643 =6528/578, zero failures/unhandled errors; +1 named player guard instance vsTU1. Full logs retained; build OK03:50:29Z.
+- [x] Real Mackenzie/Brandt pages checked390×844 and1280×1800: two-line mobile names, Vanderbilt stamp and loaded photos below islands; public-state proof only, authenticated search/index island unavailable external_unmanaged. PLAYER_CLEARANCE_REPORT.md records exact guard changes and screenshots.
+
 ## Consolidated CM1 then TU1
 - [x] Apply only authorised Merged Airy heading14→16 and grid bottom14→0 expectations; other assertions/product frozen.
 - [x] Run all four CM1 shards with maxWorkers2:1681/1543/1648/1642 =6514 tests/578 files, zero failures/unhandled errors; CM1 complete. Test count +42/+2 reconciled in CM1_REPORT.md; build OK23:02:08Z.
