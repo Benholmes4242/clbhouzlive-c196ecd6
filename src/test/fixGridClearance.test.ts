@@ -63,9 +63,13 @@ describe('FIX_GRID_1 source guards', () => {
   });
   it.each(['src/pages/WatchGridPage.tsx', 'src/pages/RoundsPage.tsx', 'src/pages/FindPeoplePage.tsx', 'src/components/manage/ManagePageShell.tsx', 'src/features/tourhub/player-v2/PlayerPage.tsx'])('%s consumes measured clearance instead of the old reservation', file => {
     const source = read(file);
-    expect(source).toMatch(/import\s*\{\s*CHROME_CLEARANCE\s*\}\s*from\s*['"]@\/lib\/chromeClearance['"]/);
+    expect(source).toMatch(/import\s*\{\s*CHROME_CLEARANCE(?:,\s*CHROME_BREATHING)?\s*\}\s*from\s*['"]@\/lib\/chromeClearance['"]/);
     expect(source).not.toContain(oldClearance);
-    expect(source).toMatch(/paddingTop:\s*(?:headerB\s*\?\s*)?CHROME_CLEARANCE/);
+    if (file.endsWith('/player-v2/PlayerPage.tsx')) {
+      expect(source).toContain('paddingTop:`calc(${CHROME_CLEARANCE} - var(--sat, 0px) - ${CHROME_BREATHING + 10}px)`');
+    } else {
+      expect(source).toMatch(/paddingTop:\s*(?:headerB\s*\?\s*)?CHROME_CLEARANCE/);
+    }
   });
   it('Activity alone opts into the shell branch with measured root padding', () => {
     const callers = [...files].filter(file => /<ManagePageShell\b[^>]*\bheaderB\b/s.test(read(file)));
