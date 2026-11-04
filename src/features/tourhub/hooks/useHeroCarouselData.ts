@@ -23,7 +23,9 @@ import { isTournamentDecided } from '@/utils/tournamentDecided';
 import {
   RESULTS_CAP_DAYS,
   RESULTS_HANDOVER_DAYS,
+  UPCOMING_HANDOVER_DAYS,
   daysSinceEndDate,
+  daysUntilStartDate,
 } from '../components/overview-v3/HybridHero.utils';
 
 // Tour priority order for sorting live tournaments
@@ -526,16 +528,20 @@ export function useHeroCarouselData() {
           // Age gate (MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW §2). The bucket is
           // fetched wide (COMPLETED_BUCKET_DAYS) so the cap lives HERE, in the
           // selection — never in deriveHeroState.
-          //   tour HAS an upcoming event  -> result stands RESULTS_HANDOVER_DAYS,
-          //                                  then the upcoming card takes the slot
+          //   tour HAS an upcoming event -> result owns its finish day, then
+          //     yields when the next start is <=2 UTC days away or age exceeds3.
+          //     A missing start date keeps the old three-day age gate.
           //   tour has NO upcoming event  -> result stands RESULTS_CAP_DAYS, then
           //                                  the TOUR is omitted from the carousel
           // Both measured in DAYS against end_date, same unit as the bucket.
           const hasUpcoming = upcoming.length > 0;
           const maxAge = hasUpcoming ? RESULTS_HANDOVER_DAYS : RESULTS_CAP_DAYS;
+          const daysToNext = daysUntilStartDate(upcoming[0]?.startDate);
           const inWindow = completed.filter(t => {
             const age = daysSinceEndDate(t.endDate);
-            return age == null || age <= maxAge;
+            if (!hasUpcoming) return age == null || age <= maxAge;
+            return age === 0 || ((age == null || age <= maxAge) &&
+              (daysToNext == null || daysToNext > UPCOMING_HANDOVER_DAYS));
           });
 
           if (inWindow.length > 0) {
