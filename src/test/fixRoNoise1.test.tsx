@@ -28,10 +28,10 @@ describe('FIX_RO_NOISE_1 useFitOneLine', () => {
   it('an observer fire schedules one frame and the font write happens in it', () => {
     const { container } = render(<Fit />);
     const el = container.querySelector('span')!;
-    el.style.fontSize = 'sentinel';
+    el.style.fontSize = '7px';
     act(() => observers[0]());
     expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
-    expect(el.style.fontSize).toBe('');
+    expect(el.style.fontSize).toBe('7px');
     act(() => flushFrames());
     expect(el.style.fontSize).toBe('20px');
   });
@@ -46,7 +46,7 @@ describe('FIX_RO_NOISE_1 useFitOneLine', () => {
 
 describe('FIX_RO_NOISE_1 HowItPlays chart', () => {
   it('an observer fire updates width via the next frame', () => {
-    const holes = [1, 2].map(n => ({ hole_no: n, avg_to_par: 0.5 })) as any;
+    const holes = [1, 2].map(n => ({ hole_no: n, par: 4, yards: 400, stroke_index: n, rounds: 30, avg_to_par: 0.5, avg_gross: 4.5, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 5, par: 15, bogey: 8, double: 2 } })) as any;
     const mine = new Map([[1, { hole_no: 1, avg_to_par: 0.3 }], [2, { hole_no: 2, avg_to_par: 0.4 }]]) as any;
     const { container } = render(<LocalHoleChart holes={holes} myByHole={mine} hasYou />);
     expect(container.querySelector('polyline')).toBeNull();
