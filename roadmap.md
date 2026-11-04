@@ -2,8 +2,9 @@
 
 ## FIX_OVERFLOW_1
 - [x] Apply course About grid containment and wrapping map/business names; preserve action sizing.
-- [ ] Ruling: live ≤340px right-only fold on every route, preserving left folding and existing guest/member content/actions; verify320 edges.
-- [ ] Ruling: add single-column containment everywhere except exactly MediaTray, VoiceDictateButton and ComposerStepHeader; named guard exceptions, no Tailwind changes.
+- [ ] Live ≤340px right-only fold implemented; STOP:10 new hidden-control lookup failures and existing GI1 broad-matchMedia fixture failure. Full output retained, no fixes/shards/browser after stop; see report.
+- [x] Ruling:52 grid objects/38 files get one containment property; only MediaTray, VoiceDictateButton and ComposerStepHeader exempt. Guard9/9 passes; Tailwind unchanged.
+- [ ] Four shards and320px guest/member verification await authorised fixture/selector repair. Last full6633/585; expected current6648/586 (+15/+1), focused39 passed/11 failed.
 - [x] Inventory55 inline objects/41 files (2 changed); unchanged Tailwind inventory; focused48/48; shards1708/1588/1676/1661=6633/585 (+8/+1 source cases). No failures/unhandled errors; build OK. FIX_OVERFLOW_1_REPORT.md records both scoped blockers.
 
 ## Overview rhythm

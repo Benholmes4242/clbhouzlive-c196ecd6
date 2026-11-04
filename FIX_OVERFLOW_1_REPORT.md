@@ -1,5 +1,24 @@
 # FIX_OVERFLOW_1 — partial implementation / scoped stop
 
+## Continuation ruling — STOP at 10:00 UTC
+The approved52 remaining grid objects in38 files now have only `gridTemplateColumns: 'minmax(0, 1fr)'` added. The three ruled wizard files are unchanged. Their named/commented exceptions are in the new app-wide guard, which passed. Full current path/line/object inventory: `docs/verification/fix-overflow-1/inline-grid-continuation.json`. This AST inventory also catches style constants (FullField rowStyle and YourCourseAnalyticsSheet CARD_LIST), which the earlier direct-inline-only audit missed; it still yields52 remaining objects. Tailwind remains unchanged.
+
+ChromeIsland now subscribes live to `matchMedia('(max-width: 340px)')` and reuses existing right-island folded styles on every route. Left scroll-fold state is unchanged. No new design, guest content, actions or gate changes.
+
+**STOP: focused command returned11 failures,39 passes across50 tests (2 failed files/3 passed files). No shards or new browser checks run after this failure. Full output preserved:** `docs/verification/fix-overflow-1/continuation/focused.log`.
+
+- `src/test/overflowRightIsland.test.tsx:43:26`, five guest cases (paths `/tourhub`, `/`, `/amateur`, `/courses`, `/watch/top100`): `TestingLibraryElementError: Unable to find an element with the role "button" and name "Log in"`.
+- `src/test/overflowRightIsland.test.tsx:49:27`, five member cases (same paths): `TestingLibraryElementError: Unable to find an element with the role "button" and name "Search"`.
+- Existing `src/test/gi1GuestIslandReducedMotion.test.tsx:37:28`, `guest glass and Log in fold have no transitions at rest or folded`: `TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Log in"`.
+
+The new tests incorrectly use accessible-name lookup for aria-hidden controls; the failure output shows those controls present with `aria-hidden="true"` and empty accessible names. The existing reduced-motion fixture returns matches=true for EVERY media query, so the new width query also matches and folds Log in before its existing accessible lookup. These are identified fixture/selector issues, not permission to silently repair them. No failure is classified as pre-existing: the existing test's failure is newly exposed by this continuation. No pre-existing failing tests are known.
+
+Exact command: `bunx vitest run src/test/fixOverflowSource.test.ts src/test/overflowRightIsland.test.tsx src/test/headerB1.test.tsx src/test/islandSquircle.test.tsx src/test/gi1GuestIslandReducedMotion.test.tsx --maxWorkers=2`.
+
+**Inventory reconciliation:** last full executed suite6633/585; current expected inventory6648/586 (+15 tests/+1 file), NOT a full-suite passing claim. `fixOverflowSource.test.ts` adds1 case: `all non-test inline grids declare columns except the three wizard-owned files`; existing8 cases/assertions preserved (only imports/comment extended). New `overflowRightIsland.test.tsx` adds14 cases: five guest-at-rest paths, five member-at-rest paths, two above340 guest/member cases, two live-media guest/member cases. No tests deleted/renamed/rewritten; no existing assertions changed. HeaderB1 18/18, islandSquircle8/8 and containment source9/9 passed. Four new above-width/live-media cases passed; ten new hidden-control lookups failed. GI1 existing case failed.
+
+Additional touched files: all38 files named in continuation JSON, ChromeIsland, fixOverflowSource.test.ts, new overflowRightIsland.test.tsx, AGENTS.md (guard ownership rule), roadmap.md, this report, continuation JSON and focused log. No prohibited-area logic edits; three wizard exemptions untouched. Automatic build latest checked `2026-11-04T10:00:32Z: build OK`; no manual build/typecheck. Previous report below is historical, not current completion.
+
 ## Completed
 - CourseAboutTab: both inline grids now use `gridTemplateColumns: 'minmax(0, 1fr)'`; all other grid properties unchanged.
 - LocationMapCard: footer location no longer has `overflow: hidden`, `textOverflow: ellipsis`, or `whiteSpace: nowrap`; now `lineHeight: 1.3`, `overflowWrap: anywhere`. Directions retains `flexShrink: 0`.
