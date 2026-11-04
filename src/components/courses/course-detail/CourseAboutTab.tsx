@@ -141,7 +141,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* ONE OWNER FOR THE SEAMS: AboutSection's own 34px lead-in. The grid
           gap that used to sit here added to it, so every seam measured 58. */}
-      <div style={{ display: 'grid', gap: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 0 }}>
         {/* BRIEF_COURSE_TAB_1A — the verdict is the first thing under the tabs,
             then the place, the tees as a finding, and how it defends par. */}
         <TheVerdict courseId={course.id} courseName={course.name} />
@@ -203,7 +203,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             about the course, useful to every reader, and it sits with the
             course's own information. Under review moved to the footer. */}
         {course.club_id && claimStatus?.state === 'claimed' && claimStatus.business && (
-          <div style={{ display: 'grid', gap: 12, padding: '0 20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12, padding: '0 20px' }}>
             <ClaimedCourseProfileLink business={claimStatus.business} />
           </div>
         )}

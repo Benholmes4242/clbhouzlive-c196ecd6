@@ -89,7 +89,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px' }}>
           <MapPin size={14} strokeWidth={2} color="rgba(255,255,255,0.66)" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#F8FAFC', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#F8FAFC', lineHeight: 1.3, overflowWrap: 'anywhere' }}>
               {locationText}
             </div>
           </div>

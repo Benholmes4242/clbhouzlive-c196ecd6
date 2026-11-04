@@ -114,13 +114,13 @@ export const TourIsland: React.FC<TourIslandProps> = ({
         <span style={{ fontSize: 15, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>{label}</span>
         <TourIcon n="down" s={13} c={DIM} w={2.4} />
       </span>
-      <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, minWidth: 0 }}>
         {captionLive && <TourLiveDot s={5} />}
         <span
           data-testid="tour-island-caption"
           style={{
             fontSize: 8.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-            color: captionLive ? GREEN : DIM, whiteSpace: 'nowrap',
+            color: captionLive ? GREEN : DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}
         >
           {caption}
@@ -130,7 +130,7 @@ export const TourIsland: React.FC<TourIslandProps> = ({
   );
 
   return (
-    <div data-island-flush={true} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 46 }}>
+    <div data-island-flush={true} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 46, minWidth: 0, overflow: 'hidden' }}>
       {mode === 'back' && (
         <button
           type="button"
@@ -154,13 +154,14 @@ export const TourIsland: React.FC<TourIslandProps> = ({
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 10, alignSelf: 'stretch',
+          minWidth: 0, overflow: 'hidden',
           padding: folded ? '0 6px' : mode === 'back' ? '0 16px 0 0' : '0 16px 0 8px',
           ...(foldRoute ? { gap: condensed ? 0 : 10, transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}),
           fontFamily: 'inherit',
         }}
       >
         {mode !== 'back' && <Chip logoSlug={logoSlug} glyph={glyph} folded={folded} />}
-        <span aria-hidden={condensed ? true : undefined} data-tour-island-fold style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, textAlign: 'left', ...(foldRoute ? { maxWidth: condensed ? 0 : 240, opacity: condensed ? 0 : 1, overflow: 'hidden', transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}) }}>
+        <span aria-hidden={condensed ? true : undefined} data-tour-island-fold style={{ display: 'flex', flexDirection: 'column', minWidth: 0, lineHeight: 1, textAlign: 'left', ...(foldRoute ? { maxWidth: condensed ? 0 : 240, opacity: condensed ? 0 : 1, overflow: 'hidden', transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}) }}>
           {labelAndCaption}
         </span>
       </button>
