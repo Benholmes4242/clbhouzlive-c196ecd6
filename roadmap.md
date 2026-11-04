@@ -1,5 +1,10 @@
 # Roadmap
 
+## Upcoming hero handover
+- [ ] Add UTC start-day helper and two-day handover; preserve finish-day result, off-week3/no-upcoming14 caps, missing start and live priority.
+- [ ] Update existing handover tests; verify All/PGA/LPGA upcoming heroes/picker and finish prior notch browser proof.
+- [ ] Run four final shards, stop/preserve any failure, reconcile both briefs against6528/578 and report exact test edits.
+
 ## Tournament notch bleed and player safe-area audit
 - [ ] Make only tournament detail roots immersive, reuse overview photo geometry/fade, and preserve root island spec/back fallback.
 - [ ] Audit player safe-area ownership and preserve hero26px without a second notch payment.

@@ -68,14 +68,16 @@ export const COMPLETED_BUCKET_DAYS = 21;
 export const RESULTS_CAP_DAYS = 14;
 
 /**
- * Handover window for a tour that DOES have an upcoming event: the result
- * stands for this many days, then the upcoming card takes the slot. A SECOND
- * constant on purpose — widening the bucket to COMPLETED_BUCKET_DAYS must not
- * make ordinary weeks show three-week-old results. Preserves the pre-brief
- * behaviour of RESULTS_WINDOW_HOURS = 72 (now expressed in days against
- * end_date).
+ * Maximum result age when a tour has an upcoming event. The finish day always
+ * belongs to the result; afterwards the next event takes over within two days
+ * of its start, or after this cap, whichever comes first. Off weeks retain
+ * the existing three-day result window; the completed fetch stays wider.
  */
 export const RESULTS_HANDOVER_DAYS = 3;
+
+/** The next event takes the slot from the Tuesday before a Thursday start,
+ * which is when picks open. The finish-day result still has priority. */
+export const UPCOMING_HANDOVER_DAYS = 2;
 
 
 
@@ -90,6 +92,15 @@ export function daysSinceEndDate(endDate: string | null | undefined): number | n
   if (Number.isNaN(end)) return null;
   const today = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
   return Math.round((today - end) / 86_400_000);
+}
+
+/** Whole UTC date days from today to start_date, matching daysSinceEndDate. */
+export function daysUntilStartDate(startDate: string | null | undefined): number | null {
+  if (!startDate) return null;
+  const start = Date.parse(`${startDate.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(start)) return null;
+  const today = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+  return Math.round((start - today) / 86_400_000);
 }
 
 /**
