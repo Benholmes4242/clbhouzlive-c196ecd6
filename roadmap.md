@@ -1,5 +1,10 @@
 # Roadmap
 
+## Your pick sheet v2
+- [ ] Apply signed-off five-state sheet and overview doors using the public picks board; preserve guest Pick gate and server lock/save authority.
+- [ ] Cover grouping, state transitions, guest reads and event-count record; name rewritten assertions and reconcile against 6556 tests/580 files.
+- [ ] Run all four shards with maxWorkers2; stop on any unexpected failure and retain full output; verify available browser flow.
+
 ## Upcoming hero handover
 - [x] UTC two-day handover implemented;15 new hook/date cases preserve finish-day, off-week3/no-upcoming14, missing start/live. No existing direct handover test existed to rewrite.
 - [x] PGA/LPGA real picker and heroes upcoming; final player notch gap26px and finished Mexico photo verified. HERO_HANDOVER_REPORT.md records all evidence/limits.
