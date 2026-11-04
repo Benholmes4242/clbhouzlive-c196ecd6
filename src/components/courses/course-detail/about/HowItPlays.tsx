@@ -49,7 +49,7 @@ function dominantColour(hole: CourseHole): string {
 }
 
 /** Eighteen independent field comparisons. This intentionally does not reuse ShapeChart. */
-const LocalHoleChart: React.FC<{
+export const LocalHoleChart: React.FC<{
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hasYou: boolean;
@@ -69,9 +69,14 @@ const LocalHoleChart: React.FC<{
     if (!el) return;
     const measure = () => setW(el.clientWidth);
     measure();
-    const ro = new ResizeObserver(measure);
+    // Observer writes are deferred a frame (FIX_RO_NOISE_1).
+    let frame = 0;
+    const ro = new ResizeObserver(() => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => { frame = 0; measure(); });
+    });
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => { ro.disconnect(); if (frame) cancelAnimationFrame(frame); };
   }, []);
 
   // Runs of CONSECUTIVE played holes. Gaps break the line — never bridged, since

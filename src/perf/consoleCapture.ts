@@ -2,6 +2,7 @@
 // Patches console.* once and forwards to the originals, so desktop devtools is unchanged.
 // Gated by the same flag as the perf instrument: install() no-ops unless DEV || ?perf=1.
 
+import { isResizeObserverNoise } from '@/lib/resizeObserverNoise';
 import { isPerfEnabled, subscribePerfLive } from './navTiming';
 
 export interface LogLine {
@@ -75,7 +76,7 @@ export function installConsoleCapture(): void {
 
   // Capture runtime errors (native has no other way to see these).
   try {
-    window.addEventListener('error', (e) => push('error', [`[window.onerror] ${e.message}`]));
+    window.addEventListener('error', (e) => { if (isResizeObserverNoise(e.message)) return; push('error', [`[window.onerror] ${e.message}`]); });
     window.addEventListener('unhandledrejection', (e: any) =>
       push('error', [`[unhandledrejection] ${e?.reason?.message ?? e?.reason ?? ''}`]));
   } catch {}

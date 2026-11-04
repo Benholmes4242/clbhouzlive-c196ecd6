@@ -14,6 +14,7 @@
 //   SR5  No behaviour change when no error occurs — this module only listens.
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { currentBuildId } from '@/lib/buildFreshness';
+import { isResizeObserverNoise } from '@/lib/resizeObserverNoise';
 
 const MAX_MSG = 200;
 const MAX_STACK = 400;
@@ -97,6 +98,8 @@ export function installErrorTracking(): void {
     (window as unknown as { __errTrackInstalled?: boolean }).__errTrackInstalled = true;
 
     window.addEventListener('error', (e) => {
+      // Benign browser layout notice, never an app error (FIX_RO_NOISE_1).
+      if (isResizeObserverNoise((e as ErrorEvent).message)) return;
       try { // SR1
         trackError({
           kind: 'error',
@@ -122,3 +125,4 @@ export function installErrorTracking(): void {
     // SR1
   }
 }
+

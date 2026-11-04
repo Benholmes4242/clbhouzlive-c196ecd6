@@ -773,11 +773,15 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     const el = islandRowRef.current;
     publish(el?.getBoundingClientRect().height ?? 0);
     if (!el) return;
+    // Observer writes are deferred a frame (FIX_RO_NOISE_1).
+    let frame = 0;
     const ro = new ResizeObserver((entries) => {
-      publish(entries[0]?.contentRect?.height ?? 0);
+      const h = entries[0]?.contentRect?.height ?? 0;
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => { frame = 0; publish(h); });
     });
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => { ro.disconnect(); if (frame) cancelAnimationFrame(frame); };
   }, [suppressed, spec.chrome, spec.left?.kind, leftSlot]);
 
 
