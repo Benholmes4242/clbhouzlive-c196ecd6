@@ -92,6 +92,9 @@ export function VerificationsTab({
   const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const [confirmApprove, setConfirmApprove] = useState(false);
+  /* BRIEF 1 §8 — the sr_players match the reviewer settled on; "Verify as
+     pro" sends it through to decide_golfer_verification. */
+  const [proPlayerId, setProPlayerId] = useState<string | null>(null);
   // PHASE 5B §1.3 — revocation: a structured reason, then a confirmation that
   // NAMES the business. The bypass is offered for system accounts only.
   const [revokeOpen, setRevokeOpen] = useState(false);
@@ -139,6 +142,7 @@ export function VerificationsTab({
   const close = () => {
     setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false);
     setRevokeOpen(false); setRevokeReason(null); setRevokeNote(''); setRevokeBypass(false); setConfirmRevoke(false);
+    setProPlayerId(null);
   };
 
   const canRevoke = active?.type === 'business' && !!active.businessId && bizDetail?.is_verified === true;
@@ -174,7 +178,7 @@ export function VerificationsTab({
     }
     review.mutate(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason },
+      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason, playerId: proPlayerId },
       { onSuccess: close },
     );
   };
@@ -213,6 +217,9 @@ export function VerificationsTab({
             <VerificationCard key={r.id} row={r} disabled={review.isPending} onOpen={() => setActive(r)} onQuick={(d) => {
               if (review.isPending) return;
               setActive(r);
+              /* BRIEF 1 §8 — a pro approval needs the tour-player choice, so
+                 the quick action opens the card rather than deciding inline. */
+              if (r.type === 'golfer' && isProKind(r.kind)) return;
               if (d === 'approved' && r.type === 'business') {
                 review.mutate({ id: r.id, type: r.type, decision: 'approved', adminNote: '' }, { onSuccess: close });
               } else {
@@ -265,11 +272,11 @@ export function VerificationsTab({
           </div>
         ) : active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
+            <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>{active.type === 'golfer' && isProKind(active.kind) ? 'Decline' : 'Reject'}</DrawerBtn>
             {(active.type === 'business' || active.type === 'course_claim') && (
               <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={review.isPending} onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
             )}
-            <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>Approve</DrawerBtn>
+            <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>{active.type === 'golfer' && isProKind(active.kind) ? 'Verify as pro' : 'Approve'}</DrawerBtn>
           </div>
         ) : undefined}
       >
@@ -281,6 +288,7 @@ export function VerificationsTab({
             decision={decision}
             reviewReason={reviewReason}
             setReviewReason={setReviewReason}
+            onPlayerChange={setProPlayerId}
           />
         )}
       </DetailDrawer>
