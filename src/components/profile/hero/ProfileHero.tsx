@@ -24,7 +24,6 @@ import { countsTowardIndex } from '@/lib/whs/counting';
 import { numberWord } from '@/lib/text/numbers';
 import { formBars, formBarLowered, type FormScoreLike } from '@/features/profile-sheet-v2/sheetState';
 import { isFullEighteen, useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
-import { useProfileAchievementFigures } from '@/hooks/gam/useProfileAchievementFigures';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -42,7 +41,7 @@ const GREEN = INDEX_DELTA.dark.improved;
 const RED = INDEX_DELTA.dark.drifted;
 const MS_PER_DAY = 86_400_000;
 /** The event contract — not the layout. Every member stays even where a view omits the cell. */
-export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'badges' | 'friends' | 'followers';
+export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'friends' | 'followers';
 
 interface Props {
   userId: string;
@@ -194,7 +193,6 @@ export const ProfileHero: React.FC<Props> = ({
   const viewerChip = useHandicapChipState(!isSelf && viewerUserId ? viewerUserId : undefined);
   const { data: percentile } = useHandicapPercentile(isSelf ? userId : undefined);
   const roundsQ = useProfileRounds(userId);
-  const figures = useProfileAchievementFigures(userId);
 
   // Fallback chain unchanged: own cover → #1 Top 10 course image → flat canvas.
   const topCourse = React.useMemo(
@@ -354,7 +352,6 @@ export const ProfileHero: React.FC<Props> = ({
   // analytics list (gam_user_courses: mapped, non-penalty) — do not "fix"
   // the two into agreement.
   const coursesCount = rows.length > 0 ? new Set(rows.map((r) => r.course_id).filter((c): c is string => !!c)).size : null;
-  const badgesCount = figures.isFetched && figures.data ? figures.data.badges : null;
 
   const showIndexBlocks = !proMember && chip.settled && chip.connected;
   const showConnectCard = !proMember && chip.settled && !chip.linked && isSelf && !hideConnectPrompt;
@@ -364,7 +361,6 @@ export const ProfileHero: React.FC<Props> = ({
   if (isSelf) counters.push({ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, state: roundsCountState });
   if (coursesCount != null) counters.push({ key: 'courses', label: t('hero.courses', 'Courses'), value: coursesCount });
   counters.push({ key: 'rated', label: t('hero.rated', 'Reviewed'), value: ratedCount, state: ratedCountState });
-  if (badgesCount != null) counters.push({ key: 'badges', label: t('hero.badges', 'Badges'), value: badgesCount });
 
   const socialFig = (n: number | null | undefined) => (socialCountState === 'ok' && n != null ? formatNumber(n) : null);
   const friendsFig = socialFig(friendsCount);

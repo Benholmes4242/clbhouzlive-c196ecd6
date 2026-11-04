@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { withoutRetiredActivity } from './retiredActivityKinds';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCheck } from 'lucide-react';
 import { toast } from '@/lib/toast';
@@ -245,9 +246,9 @@ export const ActivityPageV2: React.FC = () => {
    * resets when the page unmounts. Opening never marks anything read. */
   const [openFolds, setOpenFolds] = useState<Set<string>>(new Set());
 
-  const firstPage = feed.data?.pages?.[0] ?? [];
+  const firstPage = useMemo(() => withoutRetiredActivity(feed.data?.pages?.[0] ?? []), [feed.data]);
   const allRows: ActivityFeedRowV2[] = useMemo(
-    () => (feed.data?.pages ?? []).flat(),
+    () => withoutRetiredActivity((feed.data?.pages ?? []).flat()),
     [feed.data],
   );
 
