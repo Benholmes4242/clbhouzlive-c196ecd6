@@ -27,9 +27,10 @@ import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { Z } from '@/config/zIndex';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useIsGuest } from '@/features/guest/useIsGuest';
+import type { ProGateStatus } from '@/features/pro-verification/proRules';
 import './roundsGate.css';
 
-export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
+export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected' | 'proPending';
 
 /** The four CB13 states. `isSuccess`, never `!isLoading`: a disabled query is
  *  pending-idle, so isLoading is false before the read has ever run (see the
@@ -47,11 +48,18 @@ export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
 export function roundsGateState(
   userId: string | undefined,
   connection: { isSuccess: boolean; isError?: boolean; data: unknown },
+  pro: ProGateStatus = 'none',
 ): RoundsGateState {
   if (!userId) return 'signedOut';
   if (connection.isError) return 'connected';
+  /* BRIEF 1 §7 — a verified pro is connected with no gate, no blur and no
+     minimums, without waiting on the connection read; a pending pro gets the
+     'proPending' hold instead of the connect gate. Guests and the CB45
+     fail-open are unchanged. */
+  if (pro === 'verified') return 'connected';
   if (!connection.isSuccess) return 'loading';
-  return connection.data ? 'connected' : 'gated';
+  if (connection.data) return 'connected';
+  return pro === 'pending' ? 'proPending' : 'gated';
 }
 
 
