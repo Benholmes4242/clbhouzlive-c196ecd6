@@ -1,5 +1,4 @@
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
-import { ProMemberName } from '@/features/pro-verification/ProLabel';
 /**
  * FindGolfersSheet (BRIEF_FIND_GOLFERS_SHEET) — the sheet the Discover
  * 'friends' prompt opens.
@@ -265,7 +264,7 @@ function GolferRow({
       {/* THE NAME NEVER TRUNCATES. It takes a second line instead, and the row
           grows to hold it - acceptance D holds from 320 to 430. */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <ProMemberName userId={row.id}><div
+        <div
           style={{
             fontSize: 14,
             fontWeight: 700,
@@ -276,7 +275,7 @@ function GolferRow({
           }}
         >
           {name}
-        </div></ProMemberName>
+        </div>
         {figs.length ? (
           // THE META LINE may clip; the name may not.
           <div

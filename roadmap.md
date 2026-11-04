@@ -24,5 +24,6 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [x] Small labels wired on listed member surfaces; sibling ids coalesced into one call; exhaustive surface proof pending.
 - [x] Preserve every original name element inside ProMemberName; ms1MessagesHeadToHead.test.tsx remains untouched.
 - [x] Add one real ThreadV2Page regression with PRO present and name fontSize 17px; focused 54/54 and shard 1 green.
-- [ ] STOP: shard 2 ws1WatchTop.test.tsx:405 expects explore-card-name as direct child, but the required outer PRO flex row is now that child. Shards 3–4 not run; full output saved. Await ruling; no assertion changed.
+- [x] Restore pre-Brief-2 markup on unmounted CreatorsRow rail/sheet and FindGolfersSheet; exclude them from the surface list. Existing surface tests do not include either; no assertion changed.
+- [ ] Run all four shards after the unused-surface rollback; stop on any unexpected failure and report per-shard counts and reconciled total.
 - [x] Write PRO_VERIFICATION_2_REPORT.md with stop, test inventory and verification limits.
