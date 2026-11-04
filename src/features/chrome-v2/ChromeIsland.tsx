@@ -206,6 +206,7 @@ const LeftCapsule: React.FC<{
           ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
           padding: flush ? 0 : grow ? '0 8px 0 10px' : '0 14px 0 13px',
           ...(grow ? { flex: '1 1 auto', minWidth: 0 } : null),
+          ...(location.pathname === '/tourhub' ? { minWidth: 0, overflow: 'hidden' } : {}),
         }}
       >
         {slot}
@@ -605,6 +606,7 @@ const GuestRightCapsule: React.FC<{ tone: ChromeTone; fold?: boolean }> = ({ ton
       data-guest-island=""
       style={{
         ...glassStyle(tone),
+        ...(location.pathname === '/tourhub' ? { flexShrink: 0 } : {}),
         padding: '0 6px 0 16px',
         gap: 12,
         position: 'relative',
@@ -810,6 +812,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
           data-island-right
           style={{
             ...glassStyle(tone, spec.condense === true),
+            ...(location.pathname === '/tourhub' ? { flexShrink: 0 } : {}),
             ...(spec.condense ? { background: condensed ? ISLAND_GLASS.background : 'rgba(14,14,16,0.55)', transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)' } : {}),
             padding: '0 5px 0 12px',
             gap: 10,

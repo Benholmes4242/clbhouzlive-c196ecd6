@@ -49,9 +49,9 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
               fontSize: 13,
               fontWeight: 700,
               color: INK,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              lineHeight: 1.3,
+              minWidth: 0,
+              overflowWrap: 'anywhere',
             }}
           >
             {business.name}
@@ -78,6 +78,7 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
           color: AMBER,
           cursor: 'pointer',
           flexShrink: 0,
+          whiteSpace: 'nowrap',
         }}
       >
         {t('courseDetail.claim.profileLink.visit')}
