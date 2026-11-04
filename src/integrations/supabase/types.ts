@@ -21558,8 +21558,10 @@ export type Database = {
           is_viewer: boolean
           picks: number
           profile_photo_url: string
+          top10: number
           user_id: string
           username: string
+          wins: number
         }[]
       }
       get_blocked_user_ids: {
@@ -25231,6 +25233,19 @@ export type Database = {
           my_thru: number
           my_tied: boolean
           picked_at: string
+        }[]
+      }
+      get_tournament_picks_board: {
+        Args: { p_tournament_id: string }
+        Returns: {
+          display_name: string
+          is_followed: boolean
+          is_viewer: boolean
+          player_id: string
+          player_name: string
+          profile_photo_url: string
+          user_id: string
+          username: string
         }[]
       }
       get_tournament_venue_record: {

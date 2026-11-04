@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({ rpc: vi.fn(), user: { id: 'member', is_anonymo
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: mocks.rpc } }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: mocks.user }) }));
 vi.mock('@/features/guest/guestGateStore', () => ({ getGuestUser: () => mocks.guest ? { id: 'guest' } : null }));
+vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes', () => ({ usePickTeeTimes: () => ({ data: new Map(), isError: false }) }));
 vi.mock('@/lib/toast', () => ({ toast: { error: mocks.errorToast } }));
 
 import { YourPickSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickSheet';
@@ -29,7 +30,13 @@ let close: ReturnType<typeof vi.fn>;
 const props = () => ({ open: true, onClose: close, tournamentId: 'event', eventName: 'Mexico Open', ourPicks, tourCode: 'pga' });
 const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={client}><MemoryRouter><I18nextProvider i18n={i18n}>{children}</I18nextProvider></MemoryRouter></QueryClientProvider>;
 function mount() { return render(<YourPickSheet {...props()} />, { wrapper }); }
-async function ready() { await screen.findByRole('radio', { name: 'Wyndham Clark' }); }
+async function ready() {
+  if (state.my_player_id) {
+    await screen.findByRole('button', { name: 'Change pick' });
+    fireEvent.click(screen.getByRole('button', { name: 'Change pick' }));
+  }
+  await screen.findByRole('radio', { name: 'Wyndham Clark' });
+}
 function submit() { return document.querySelector<HTMLButtonElement>('[data-pick-submit]') as HTMLButtonElement; }
 
 beforeEach(() => {
@@ -38,6 +45,7 @@ beforeEach(() => {
   mocks.user = { id: 'member', is_anonymous: false }; mocks.guest = false; mocks.errorToast.mockReset();
   state = { my_player_id: null, locks_at: '2026-11-05T07:40:00Z', locked: false, followed_pickers: 12, followed_top: [{ player_id: 'p0', player_name: names[0], picks: 5 }, { player_id: 'p3', player_name: names[3], picks: 1 }] };
   mocks.rpc.mockReset().mockImplementation(async (name: string, args: { p_player_id?: string }) => {
+    if (name === 'get_tournament_picks_board') return { data: [], error: null };
     if (name === 'get_pick_field') return { data: field, error: null };
     if (name === 'get_tournament_pick_state') return { data: [state], error: null };
     if (name === 'set_tournament_pick') {
@@ -59,11 +67,13 @@ describe('Your pick sheet build 1', () => {
     expect(screen.getAllByRole('radio').filter(item => item.getAttribute('aria-checked') === 'true')).toHaveLength(0);
     expect(mocks.rpc.mock.calls.some(call => call[0] === 'set_tournament_pick')).toBe(false);
   });
-  it('tapping a chosen followed tile again clears selection and disables submission', async () => {
+  it('the board segment opens the list and its footer returns to the field', async () => {
     mount(); await ready();
-    const tile = within(document.querySelector('[data-pick-followed]') as HTMLElement).getByRole('button', { name: 'Steven Fisk' });
-    fireEvent.click(tile); expect(screen.getByRole('radio', { name: 'Steven Fisk' })).toHaveAttribute('aria-checked', 'true');
-    fireEvent.click(tile); expect(screen.getByRole('radio', { name: 'Steven Fisk' })).toHaveAttribute('aria-checked', 'false'); expect(submit()).toBeDisabled();
+    fireEvent.click(screen.getByRole('tab', { name: "Who's picked who 0" }));
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(document.querySelector('[data-picks-board]')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Pick a player' }));
+    expect(screen.getAllByRole('radio')).toHaveLength(10);
   });
   it('closing after clearing a saved pick preserves server and cached choice on reopening', async () => {
     state.my_player_id = 'p1'; const view = mount(); await ready();
@@ -85,26 +95,23 @@ describe('Your pick sheet build 1', () => {
     const rest = document.querySelector('[data-pick-field]');
     expect(Array.from(rest?.querySelectorAll('[data-pick-player]') ?? []).map(row => row.getAttribute('data-pick-player'))).toEqual(['p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9']);
   });
-  it('reads only the field and state RPCs with tournament identity', async () => {
+  it('reads the field state and public board RPCs with tournament identity', async () => {
     mount(); await ready();
     expect(mocks.rpc).toHaveBeenCalledWith('get_pick_field', { p_tournament_id: 'event' });
     expect(mocks.rpc).toHaveBeenCalledWith('get_tournament_pick_state', { p_tournament_id: 'event' });
-    expect(new Set(mocks.rpc.mock.calls.map(call => call[0]))).toEqual(new Set(['get_pick_field', 'get_tournament_pick_state']));
+    expect(new Set(mocks.rpc.mock.calls.map(call => call[0]))).toEqual(new Set(['get_pick_field', 'get_tournament_pick_state', 'get_tournament_picks_board']));
   });
-  it('shows followed tiles and singular/plural counts when at least one followed member picked', async () => {
-    mount(); await ready();
-    const tiles = document.querySelector('[data-pick-followed]') as HTMLElement;
-    expect(within(tiles).getAllByRole('button')).toHaveLength(2);
-    expect(tiles.textContent).toContain('5 picks'); expect(tiles.textContent).toContain('1 pick');
+  it('the former followed tiles are absent even with followed pickers', async () => {
+    mount(); await ready(); expect(document.querySelector('[data-pick-followed]')).toBeNull();
   });
-  it('hides followed tiles when no followed member picked', async () => {
-    state.followed_pickers = 0; mount(); await ready();
-    expect(document.querySelector('[data-pick-followed]')).toBeNull();
+  it('both switch segments are present before a pick', async () => {
+    mount(); await ready(); expect(screen.getAllByRole('tab')).toHaveLength(2);
+    expect(screen.getByRole('tab', { name: 'Pick a player' })).toHaveAttribute('aria-selected','true');
   });
-  it('tapping a followed tile chooses its field player', async () => {
-    mount(); await ready();
-    fireEvent.click(within(document.querySelector('[data-pick-followed]') as HTMLElement).getByRole('button', { name: 'Steven Fisk' }));
-    expect(screen.getByRole('radio', { name: 'Steven Fisk' })).toHaveAttribute('aria-checked', 'true');
+  it('board footer returns without submitting a pick', async () => {
+    mount(); await ready(); fireEvent.click(screen.getAllByRole('tab')[1]);
+    fireEvent.click(screen.getByRole('button',{name:'Pick a player'}));
+    expect(mocks.rpc.mock.calls.some(call=>call[0]==='set_tournament_pick')).toBe(false);
   });
   it('unranked metadata omits a missing country and keeps RPC order', async () => {
     mount(); await ready();
@@ -138,19 +145,26 @@ describe('Your pick sheet build 1', () => {
     fireEvent.click(screen.getByRole('radio', { name: 'Doug Ghim' }));
     expect(screen.getAllByRole('radio').filter(row => row.getAttribute('aria-checked') === 'true')).toHaveLength(1);
   });
-  it('submits tournament and player ids, actively refetches state and closes', async () => {
+  it('submits tournament and player ids, refetches state and board and returns to summary', async () => {
     const invalidate = vi.spyOn(client, 'invalidateQueries'); mount(); await ready();
     fireEvent.click(screen.getByRole('radio', { name: 'Tom Kim' })); fireEvent.click(submit());
-    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    await screen.findByRole('button', {name:'Change pick'}); expect(close).not.toHaveBeenCalled();
     expect(mocks.rpc).toHaveBeenCalledWith('set_tournament_pick', { p_tournament_id: 'event', p_player_id: 'p1' });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: tournamentPickStateKey('event', 'member'), refetchType: 'active' });
     expect(mocks.rpc.mock.calls.filter(call => call[0] === 'get_tournament_pick_state')).toHaveLength(2);
     expect(client.getQueryData(tournamentPickStateKey('event', 'member'))).toMatchObject({ my_player_id: 'p1' });
+    expect(mocks.rpc.mock.calls.filter(call => call[0] === 'get_tournament_picks_board')).toHaveLength(2);
   });
-  it('opens with the current pick chosen and closes without rewriting that pick', async () => {
-    state.my_player_id = 'p1'; mount(); await ready();
-    await waitFor(() => expect(screen.getByRole('radio', { name: 'Tom Kim' })).toHaveAttribute('aria-checked', 'true'));
-    fireEvent.click(submit()); expect(close).toHaveBeenCalledOnce();
+  it('opens on summary and keeping the preselected current pick never rewrites it', async () => {
+    state.my_player_id = 'p1'; mount();
+    await screen.findByRole('button', {name:'Change pick'});
+    expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button',{name:'Change pick'}));
+    expect(screen.getByRole('radio',{name:'Tom Kim'})).toHaveAttribute('aria-checked','true');
+    expect(submit()).toBeDisabled();
+    fireEvent.click(screen.getByRole('button',{name:'Keep Tom Kim'}));
+    expect(screen.getByRole('button',{name:'Change pick'})).toBeInTheDocument();
+    expect(close).not.toHaveBeenCalled();
     expect(mocks.rpc.mock.calls.some(call => call[0] === 'set_tournament_pick')).toBe(false);
   });
   it('reopening clears search and resets to the current pick', async () => {
@@ -161,10 +175,11 @@ describe('Your pick sheet build 1', () => {
     expect(screen.getByRole('textbox')).toHaveValue('');
     await waitFor(() => expect(screen.getByRole('radio', { name: 'Tom Kim' })).toHaveAttribute('aria-checked', 'true'));
   });
-  it('locked state renders header and refusal only, with no list or submit', async () => {
+  it('locked state renders header and read-only board with no field or submit', async () => {
     state.locked = true; mount(); await waitFor(() => expect(document.querySelector('[data-picks-locked]')).not.toBeNull());
     expect(screen.getByRole('heading').textContent).toBe('Who wins the Mexico Open?');
     expect(screen.queryByRole('textbox')).toBeNull(); expect(screen.queryAllByRole('radio')).toHaveLength(0); expect(submit()).toBeNull();
+    await waitFor(()=>expect(document.querySelector('[data-picks-board]')).not.toBeNull());
   });
   it('server lock refusal toasts exact copy and closes', async () => {
     writeError = 'picks are locked'; mount(); await ready(); fireEvent.click(screen.getByRole('radio', { name: 'Tom Kim' })); fireEvent.click(submit());

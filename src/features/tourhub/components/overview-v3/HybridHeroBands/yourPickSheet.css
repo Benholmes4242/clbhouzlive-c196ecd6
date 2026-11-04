@@ -14,12 +14,11 @@
 .your-pick-list { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; will-change:transform; padding:4px 18px 120px; border-top:.5px solid var(--pick-rule); margin-top:12px; }
 .your-pick-heading { margin:14px 0 4px; display:flex; justify-content:space-between; gap:8px; font-size:9.5px; font-weight:800; letter-spacing:.13em; color:var(--pick-mute); }
 .your-pick-heading small { font-size:11px; font-weight:600; letter-spacing:0; color:var(--pick-dim); }
-.your-pick-row { width:100%; height:auto; display:flex; justify-content:flex-start; gap:11px; padding:9px 0; border:0; border-top:1px solid var(--pick-hair); border-radius:0; background:transparent; color:var(--pick-ink); text-align:left; }
+.your-pick-row { width:100%; height:auto; display:flex; justify-content:flex-start; gap:8px; padding:6px 0; border:0; border-top:1px solid var(--pick-hair); border-radius:0; background:transparent; color:var(--pick-ink); text-align:left; }
 .your-pick-row:first-child { border-top:0; }
 .your-pick-avatar { flex:none; display:flex; }
 /* Accent belongs to the avatar's measured box, not the inline row wrapper. */
 .your-pick-face { border-radius:34%; }
-.your-pick-row[aria-checked=true] .your-pick-face { box-shadow:var(--pick-selected-ring); }
 .your-pick-text { flex:1; min-width:0; }
 .your-pick-name { display:flex; align-items:center; gap:7px; font-size:14.5px; font-weight:600; }
 .your-pick-name > span:first-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -27,7 +26,7 @@
 .your-pick-meta { margin-top:2px; font-size:12px; font-weight:400; color:var(--pick-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .your-pick-tag { flex:none; display:inline-flex; align-items:center; height:18px; padding:0 7px; border-radius:999px; border:1px solid var(--pick-rule); font-size:10px; font-weight:700; color:var(--pick-soft); }
 .your-pick-radio { flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--pick-radio); display:grid; place-items:center; }
-.your-pick-row[aria-checked=true] .your-pick-radio { border-color:var(--pick-amber); background:var(--pick-amber); color:var(--pick-on-amber); }
+.your-pick-row[aria-checked=true] .your-pick-radio { border-color:var(--pick-section-white); background:var(--pick-section-white); color:var(--pick-on-amber); }
 .your-pick-radio svg { width:12px; height:12px; }
 .your-pick-followed { display:flex; gap:6px; padding:2px 0 4px; }
 .your-pick-follow-tile { flex:1; min-width:0; height:auto; display:flex; align-items:center; justify-content:flex-start; gap:7px; border:0; border-radius:10px; background:var(--pick-tile); padding:7px 8px; color:var(--pick-ink); text-align:left; }
@@ -36,6 +35,29 @@
 .your-pick-follow-tile small { display:block; font-size:10.5px; color:var(--pick-dim); }
 .your-pick-empty { text-align:center; padding:28px 0; font-size:13px; color:var(--pick-dim); }
 .your-pick-bar { position:absolute; left:0; right:0; bottom:0; padding:12px 18px 22px; background:var(--pick-bar); }
-.your-pick-submit { width:100%; height:48px; border:0; border-radius:999px; background:var(--pick-amber); color:var(--pick-on-amber); font-size:15px; font-weight:800; }
+.your-pick-submit { width:100%; height:48px; border:0; border-radius:999px; background:var(--pick-section-white); color:var(--pick-on-amber); font-size:15px; font-weight:800; }
 .your-pick-submit:disabled { background:var(--pick-disabled); color:var(--pick-dim); opacity:1; }
 .your-pick-footnote { margin-top:8px; text-align:center; font-size:11.5px; line-height:1.45; color:var(--pick-dim); }
+.your-pick-switch { margin:0 18px 10px; padding:3px; border-radius:12px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; background:var(--pick-hair); flex:none; }
+.your-pick-switch button { height:32px; min-width:0; padding:0 2px; gap:6px; border:0; border-radius:9px; background:transparent; color:var(--pick-mute); font-size:13px; font-weight:700; }
+.your-pick-switch button[aria-selected=true] { background:var(--pick-switch-selected); color:var(--pick-ink); }
+.your-pick-switch b { font-size:11.5px; color:var(--pick-dim); }
+.your-pick-outline { width:100%; height:48px; border-radius:999px; background:transparent; border:1px solid var(--pick-section-change-border); color:var(--pick-ink); font-size:15px; font-weight:800; }
+.your-pick-group { padding:12px 0; border-top:1px solid var(--pick-hair); }
+.your-pick-heading + .your-pick-group { border-top:0; }
+.your-pick-group-head { display:flex; align-items:center; gap:9px; }
+.your-pick-group-name { min-width:0; font-size:14.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.your-pick-group-count { margin-left:auto; font-size:14px; font-weight:800; }
+.your-pick-group-members { margin-top:9px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px 10px; }
+.your-pick-member { display:flex; align-items:center; gap:7px; min-width:0; font-size:12.5px; color:var(--pick-soft); }
+.your-pick-member > span:last-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.your-pick-member[data-viewer=true] { color:var(--pick-amber); font-weight:700; }
+.your-pick-show-all { display:block; height:auto; margin-top:9px; padding:0; background:transparent; color:var(--pick-soft); font-size:12px; font-weight:700; }
+.your-pick-mine { margin:0 18px; display:flex; align-items:center; gap:12px; padding:2px 0 16px; flex:none; }
+.your-pick-mine > div { min-width:0; }
+.your-pick-mine-kicker { font-size:9.5px; font-weight:800; letter-spacing:.13em; color:var(--pick-amber); }
+.your-pick-mine-name { margin-top:2px; font-size:18px; font-weight:800; overflow-wrap:anywhere; }
+.your-pick-mine-meta { margin-top:2px; font-size:12px; color:var(--pick-mute); }
+.your-pick-lock-note { margin:0 18px; padding:10px 12px; border-radius:12px; background:var(--pick-tile); color:var(--pick-mute); font-size:12.5px; line-height:1.45; flex:none; }
+.your-pick-tag-yours { border-color:var(--pick-mine-placeholder); color:var(--pick-amber); }
+.your-pick-keep { height:auto; padding:0; background:transparent; font-size:11.5px; font-weight:700; color:var(--pick-soft); }

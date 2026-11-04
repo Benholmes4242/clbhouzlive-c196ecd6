@@ -1,5 +1,11 @@
 # Roadmap
 
+## Your pick sheet v2
+- [x] Apply five-state sheet and overview doors with public board, stable ActiveRing gaps, white controls and preserved guest Pick gate/server save authority.
+- [x] Focused153/153; exact existing assertion diffs and 19 new cases named in YOUR_PICK_SHEET_V2_REPORT.md; 6556/580 →6575/581 reconciled.
+- [x] Four shards1684/1580/1654/1657 all passed; full output retained, latest automatic build OK.
+- [ ] Hosted board/save visual proof unavailable: external_unmanaged sign-in and no public board door in the real /tourhub visit; no bypass or mock-parity claim.
+
 ## Upcoming hero handover
 - [x] UTC two-day handover implemented;15 new hook/date cases preserve finish-day, off-week3/no-upcoming14, missing start/live. No existing direct handover test existed to rewrite.
 - [x] PGA/LPGA real picker and heroes upcoming; final player notch gap26px and finished Mexico photo verified. HERO_HANDOVER_REPORT.md records all evidence/limits.
