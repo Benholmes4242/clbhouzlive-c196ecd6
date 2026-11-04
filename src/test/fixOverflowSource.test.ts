@@ -1,10 +1,10 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 // FIX_OVERFLOW_1 explicitly requests source assertions: jsdom cannot measure
-// min-content sizing. The app-wide guard awaits the protected-area ruling.
+// min-content sizing. The three wizard-owned exceptions are explicitly ruled.
 function objects(path: string) {
   const source = ts.createSourceFile(path, readFileSync(resolve(process.cwd(), path), 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const found: Array<{ text: string; properties: Map<string, string> }> = [];
@@ -33,6 +33,34 @@ function wrapping(properties: Map<string, string>) {
 }
 
 describe('FIX_OVERFLOW_1 scoped source contracts', () => {
+  it('all non-test inline grids declare columns except the three wizard-owned files', () => {
+    // FIX_OVERFLOW_1 continuation: these files are owned by the review wizard
+    // and its shared header, and are the ONLY approved exceptions.
+    const exceptions = new Set([
+      'src/features/review-v2/components/MediaTray.tsx',
+      'src/features/review-v2/components/VoiceDictateButton.tsx',
+      'src/features/composer-flow/components/ComposerStepHeader.tsx',
+    ]);
+    const columns = ['gridTemplateColumns', 'gridTemplate', 'gridTemplateAreas', 'gridAutoFlow', 'gridAutoColumns'];
+    const violations: string[] = [];
+    let scanned = 0;
+    function scan(directory: string) {
+      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        const path = `${directory}/${entry.name}`;
+        if (entry.isDirectory()) {
+          if (!['test', 'tests', '__tests__'].includes(entry.name)) scan(path);
+        } else if (path.endsWith('.tsx') && !/\.(test|spec)\.tsx$/.test(path) && !exceptions.has(path)) {
+          scanned++;
+          for (const object of objects(path)) {
+            if (object.properties.get('display') === "'grid'" && !columns.some(key => object.properties.has(key))) violations.push(`${path}: ${object.text}`);
+          }
+        }
+      }
+    }
+    scan('src');
+    expect(scanned).toBeGreaterThan(1000);
+    expect(violations).toEqual([]);
+  });
   it('About stack and claimed-profile wrapper use shrinkable single columns', () => {
     const grids = objects(course).filter(object => object.properties.get('display') === "'grid'");
     expect(grids).toHaveLength(2);
