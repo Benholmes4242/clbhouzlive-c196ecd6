@@ -12,6 +12,7 @@ import type {TournamentHoleAnalysis} from '../data/useTournamentHoleAnalysis';
 import type {TeeGroup} from '../data/useTeeTimesAll';
 import {HolesSheet} from './CourseSection';
 import {surnameOf} from '../../_shared/playerName';
+import {PhotoBandFade,photoBandHeight} from '../../components/overview-v3/HybridHeroBands/photoBandMaterial';
 import {copy,words,cap,score,ordinal,ordinalWord,day,heroPill,heroSentence,venueLine,glanceFacts,fieldLead,backThisYear,chartLines,labelPositions,playedRounds,roundStanding,raceNarrative,playedCourse,buckets,percentages,completeCount,selectTeeGroups,localTime,teeCaption,numberFacts,type Phase,type Part,type CourseHole} from '../data/tournamentRules';
 export function Parts({parts}:{parts:Part[]}){return <>{parts.map((p,i)=>p.bold?<b key={i}>{p.text}</b>:<span key={i}>{p.text}</span>)}</>;}
 export function SectionHead({title,aside,action,onAction}:{title:string;aside?:string;action?:string;onAction?:()=>void}){return <div className="tv-head"><h2>{title}</h2>{action?<Button variant="ghost" className="tv-link" onClick={onAction}>{action}</Button>:aside?<span>{aside}</span>:null}</div>;}
