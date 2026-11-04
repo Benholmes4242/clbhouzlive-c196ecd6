@@ -1,4 +1,4 @@
-# PRO_VERIFICATION_2 — STOPPED
+# PRO_VERIFICATION_2 — FOUR SHARDS GREEN; VISUAL LIMITS RETAINED
 
 ## Inputs and scope
 Read the re-sent Brief 2 and `build2-pro-label-and-tour-tab-signed-off.html` (Profile tab). No SQL, migrations, migration files, deployed RPC/edge-function edits, feed_config, native/Median configuration changes. round_pool_cap unchanged at 30. Guest browsing, review wizard, news and round plots unchanged. Mention suggestions use the existing shared composer, without changing its host flows.
@@ -200,3 +200,35 @@ AssertionError: expected [ { …(2) }, …(1) ] to have a length of 1 but got 2
 Stopped after shard 3; shard 4 was not run. Full failing output: `docs/verification/pro-2/unmounted-exclusion/shard3.log`. No changes to LikesSheet, its tests, or any other surface were made in this pass. No tests rewritten, renamed or deleted; old/new assertions: none.
 
 Latest observed harness build: `=== build 2026-11-04T20:09:46Z ===` / `build OK`. No browser checks run after STOP. Pre-Brief-2 markup was independently confirmed from read-only history for both reverted files. All protected areas remain unchanged.
+
+## Approved test-only PRO-read isolation — 2026-11-04
+
+**Every test file touched under this approval:** `src/test/likesSheetTiers.test.tsx` only. No other existing test failed or needed the broader approved repair. No product code changed.
+
+The existing RPC mock now returns `{ data: [], error: null }` immediately for `get_pro_members`, before recording calls in `st.rpcCalls`. All other RPC behavior remains unchanged.
+
+Old mock line:
+```ts
+rpc: async (fn: string, args: any) => { st.rpcCalls.push({ fn, args }); return { data: st.famRows, error: null }; },
+```
+New mock line:
+```ts
+rpc: async (fn: string, args: any) => { if (fn === 'get_pro_members') return { data: [], error: null }; st.rpcCalls.push({ fn, args }); return { data: st.famRows, error: null }; },
+```
+
+**Rewritten, renamed or deleted tests: none. Old/new assertions: none.** Only the authorized mock line changed. In particular, `expect(st.rpcCalls).toHaveLength(1)` and `expect(st.rpcCalls[0].args).toEqual({ p_user_ids: ['a', 'b', 'c'], p_course_id: 'c1' })` remain unchanged. Neither `ws1WatchTop.test.tsx` nor `ms1MessagesHeadToHead.test.tsx` was edited.
+
+Focused command: `bunx vitest run src/test/likesSheetTiers.test.tsx --maxWorkers=2` — **6/6**, one file.
+
+| Command | Passed | Failed | Files |
+|---|---:|---:|---:|
+| `bunx vitest run --maxWorkers=2 --shard=1/4` | 1,738 | 0 | 148 |
+| `bunx vitest run --maxWorkers=2 --shard=2/4` | 1,591 | 0 | 148 |
+| `bunx vitest run --maxWorkers=2 --shard=3/4` | 1,719 | 0 | 148 |
+| `bunx vitest run --maxWorkers=2 --shard=4/4` | 1,682 | 0 | 148 |
+
+**Full suite: 6,730 passed / 6,730 executed, 592 passed files; zero failures.** Before/after inventory: **6,730 / 592 → 6,730 / 592**, delta **0 / 0**. Reconciliation against the last full green baseline **6,704 / 588**: the previously named 25 Brief 2 tests in three files plus the one ThreadV2Page regression in one file produce **+26 tests / +4 files**. This pass adds/removes no cases or files.
+
+Complete outputs, including retained warnings: `docs/verification/pro-2/rpc-mock-repair/focused.log` and `shard1.log` through `shard4.log`. No new failures or known pre-existing failures. Previous thread-name, dormant-CreatorsRow and LikesSheet mock failures are resolved; their historical output remains intact above and in the original logs.
+
+Latest observed harness build: `=== build 2026-11-04T20:23:51Z ===` / `build OK`. This test-only pass did not run browser checks or change any previously recorded authenticated/visual verification limits. All protected areas remain unchanged.
