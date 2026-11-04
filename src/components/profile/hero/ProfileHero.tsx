@@ -11,6 +11,8 @@
  * viewer's chip state is warm from the chrome header.
  */
 import React from 'react';
+import type { ProMember } from '@/features/pro-verification/proMembersCache';
+import { proKindLabel } from '@/features/pro-verification/proRules';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -50,6 +52,7 @@ interface Props {
   nameRef?: React.Ref<HTMLHeadingElement>;
   /** Page-owned creator read; hero remains independently renderable. */
   isCreator?: boolean;
+  proMember?: ProMember | null;
   /** First name for the visitor verdict sentence. */
   ownerFirstName?: string | null;
   /** user_profiles.gender — 'male' | 'female'; anything else reads "their". */
@@ -147,6 +150,7 @@ export const ProfileHero: React.FC<Props> = ({
   displayName,
   nameRef,
   isCreator = false,
+  proMember,
   ownerFirstName,
   ownerGender,
   avatarUrl,
@@ -352,9 +356,9 @@ export const ProfileHero: React.FC<Props> = ({
   const coursesCount = rows.length > 0 ? new Set(rows.map((r) => r.course_id).filter((c): c is string => !!c)).size : null;
   const badgesCount = figures.isFetched && figures.data ? figures.data.badges : null;
 
-  const showIndexBlocks = chip.settled && chip.connected;
-  const showConnectCard = chip.settled && !chip.linked && isSelf && !hideConnectPrompt;
-  const showLinkedNotice = chip.settled && chip.linked && !chip.connected && isSelf;
+  const showIndexBlocks = !proMember && chip.settled && chip.connected;
+  const showConnectCard = !proMember && chip.settled && !chip.linked && isSelf && !hideConnectPrompt;
+  const showLinkedNotice = !proMember && chip.settled && chip.linked && !chip.connected && isSelf;
 
   const counters: Array<{ key: HeroStat; label: string; value: number | null; state?: 'ok' | 'loading' | 'error' }> = [];
   if (isSelf) counters.push({ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, state: roundsCountState });
@@ -376,6 +380,7 @@ export const ProfileHero: React.FC<Props> = ({
         displayName={displayName}
         nameRef={nameRef}
         isCreator={isCreator}
+        isPro={!!proMember}
         subline={subline || null}
         afterSubline={coachLine}
         onAddHomeClub={isSelf ? onEdit : undefined}
@@ -434,6 +439,8 @@ export const ProfileHero: React.FC<Props> = ({
         )}
 
         {actionsRow && <ActionsRow>{actionsRow}</ActionsRow>}
+
+        {proMember && <div className="pro-hero-descriptor"><b>{proKindLabel(proMember.pro_kind)}</b><span>{proMember.pro_kind === 'tour_pro' ? proMember.pro_tour : proMember.pro_club}</span></div>}
 
         {(showIndexBlocks || showConnectCard || showLinkedNotice) && <div style={{ height: 1, background: A.SOFT, marginTop: 14 }} />}
 

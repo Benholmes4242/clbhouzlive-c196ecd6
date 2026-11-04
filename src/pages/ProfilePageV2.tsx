@@ -4,6 +4,10 @@
  */
 
 import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
+import { useProMembers } from '@/features/pro-verification/useProMembers';
+import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
+import { ProfileProNote } from '@/features/pro-verification/ProfileProNote';
+import { profileProTabs, showPendingProNote } from '@/features/pro-verification/profileProRules';
 import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -268,6 +272,22 @@ const ProfilePageV2Content: React.FC = () => {
   //                  on the owner's personal profile, isOwnAccount=true but isSelfView=false.
   const isOwnAccount = user?.id === profileUserId;
   const isSelf = isOwnAccount; // legacy alias - preserves personal-identity-owned UI below
+  const profilePros = useProMembers(getProfileType(profile?.user_type).isPersonal ? [profileUserId] : []);
+  const proMember = profileUserId ? profilePros.members.get(profileUserId) : undefined;
+  // Pending requests are private; never read another member's request.
+  const ownProRequest = useQuery({
+    queryKey: ['profile-pro-pending', profileUserId], enabled: isSelf && !!profileUserId,
+    staleTime: 30_000,
+    queryFn: async () => {
+      if (!profileUserId) return false;
+      const { data, error } = await supabase.from('golfer_verification_requests').select('status')
+        .eq('user_id', profileUserId).in('kind', ['tour_pro', 'teaching_pro'])
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (error) throw error;
+      return data?.status === 'pending';
+    },
+  });
+  const { data: viewedWhsConnection } = useWhsConnection(profileUserId ?? undefined);
 
 
 
@@ -318,7 +338,7 @@ const ProfilePageV2Content: React.FC = () => {
   // 'stats' is the legacy id of the handicap tab: accepted, mapped on read,
   // never emitted.
   const tabFromParam = (tabParam: string | null): string => {
-    const validTabs = ['activity', 'courses', 'rounds', 'top100', 'handicap', 'stats', 'videos'];
+    const validTabs = ['activity', 'tour', 'courses', 'rounds', 'top100', 'handicap', 'stats', 'videos'];
     if (!tabParam || !validTabs.includes(tabParam)) return 'activity';
     return tabParam === 'stats' ? 'handicap' : tabParam;
   };
@@ -417,18 +437,28 @@ const ProfilePageV2Content: React.FC = () => {
   // HANDICAP IS SELF-ONLY (Aug 7 ruling: a member's handicap is private to
   // them). Own profile shows four tabs, anyone else's three. It sits LAST so
   // another member's profile loses a tab off the end, not from the middle.
-  const showHandicapTab = isPersonal && isSelf;
+  const proTabs = profileProTabs(proMember, isSelf, !!viewedWhsConnection);
+  const showTourTab = isPersonal && proTabs.tour;
+  const showHandicapTab = isPersonal && proTabs.handicap;
   const tabs = useMemo(() => {
     const base = allTabs.filter(
       t => t.id !== 'top100' && (t.id !== 'handicap' || showHandicapTab),
     );
     if (isCreator) base.unshift({ id: 'videos', label: 'Videos' });
+    if (showTourTab) base.splice(base.findIndex(t => t.id === 'activity') + 1, 0, { id: 'tour', label: 'Tour' });
     if (!showRoundsTab) return base;
     const at = base.findIndex(t => t.id === 'courses');
     const out = [...base];
     out.splice(at >= 0 ? at + 1 : out.length, 0, { id: 'rounds', label: 'Rounds' });
     return out;
-  }, [allTabs, showRoundsTab, showHandicapTab, isCreator]);
+  }, [allTabs, showRoundsTab, showHandicapTab, showTourTab, isCreator]);
+
+  useEffect(() => {
+    if (!profile?.id || profilePros.isLoading) return;
+    if ((activeSection === 'tour' && !showTourTab) || (activeSection === 'handicap' && isSelf && !showHandicapTab)) {
+      setSearchParams({ tab: showTourTab ? 'tour' : 'activity' }, { replace: true });
+    }
+  }, [activeSection, profile?.id, profilePros.isLoading, showTourTab, isSelf, showHandicapTab, setSearchParams]);
 
   useEffect(() => {
     if (searchParams.get('tab') !== 'videos' || creatorPending || !profile?.id || isCreator) return;
@@ -689,7 +719,6 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
 
-  const { data: viewedWhsConnection } = useWhsConnection(profileUserId ?? undefined);
   /* PRIVACY (BRIEF_PROFILE_HANDICAP_GATE §1). Another member's index comes
      ONLY from get_visible_handicaps (gated on can_view_handicap). No row =
      withheld or never had one — both render '–', indistinguishably. The
@@ -856,6 +885,8 @@ const ProfilePageV2Content: React.FC = () => {
             isOwnProfile={isSelf}
           />
         );
+      case 'tour':
+        return showTourTab && proMember ? <ProfileTourTab pro={proMember} displayName={displayName} isOwner={isSelf} /> : null;
       case 'courses':
         return (
           <ProfileCoursesTab 
@@ -879,6 +910,7 @@ const ProfilePageV2Content: React.FC = () => {
             userId={profile.id}
             isOwnProfile={isSelf}
             isCreator={isCreator}
+            proMember={proMember}
             viewerId={user?.id}
             ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
           />
@@ -1358,7 +1390,7 @@ const ProfilePageV2Content: React.FC = () => {
         </section>
 
         {/* Tab Content */}
-        <div className={cn(activeSection === 'activity' || activeSection === 'videos' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
+        <div className={cn(activeSection === 'activity' || activeSection === 'videos' || activeSection === 'tour' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
           {getCurrentContent()}
         </div>
 
