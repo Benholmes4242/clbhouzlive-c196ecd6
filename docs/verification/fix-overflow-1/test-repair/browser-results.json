@@ -1,0 +1,96 @@
+[
+  {
+    "url": "/tourhub",
+    "left": {
+      "left": 12,
+      "right": 187.046875,
+      "width": 175.046875
+    },
+    "right": {
+      "left": 203.640625,
+      "right": 308,
+      "width": 104.359375
+    },
+    "guest": true,
+    "login": {
+      "hidden": "true",
+      "tabIndex": -1,
+      "maxWidth": "0px"
+    },
+    "label": {
+      "text": "All tours",
+      "left": 61,
+      "right": 121.84375,
+      "width": 60.84375,
+      "fits": true
+    },
+    "joinAccessible": true,
+    "edgesPass": true
+  },
+  {
+    "url": "/",
+    "left": {
+      "left": 12,
+      "right": 143,
+      "width": 131
+    },
+    "right": {
+      "left": 203.640625,
+      "right": 308,
+      "width": 104.359375
+    },
+    "guest": true,
+    "login": {
+      "hidden": "true",
+      "tabIndex": -1,
+      "maxWidth": "0px"
+    },
+    "label": null,
+    "joinAccessible": true,
+    "edgesPass": true
+  },
+  {
+    "url": "/amateur",
+    "left": {
+      "left": 12,
+      "right": 143,
+      "width": 131
+    },
+    "right": {
+      "left": 203.640625,
+      "right": 308,
+      "width": 104.359375
+    },
+    "guest": true,
+    "login": {
+      "hidden": "true",
+      "tabIndex": -1,
+      "maxWidth": "0px"
+    },
+    "label": null,
+    "joinAccessible": true,
+    "edgesPass": true
+  },
+  {
+    "url": "/courses",
+    "left": {
+      "left": 12,
+      "right": 143,
+      "width": 131
+    },
+    "right": {
+      "left": 203.640625,
+      "right": 308,
+      "width": 104.359375
+    },
+    "guest": true,
+    "login": {
+      "hidden": "true",
+      "tabIndex": -1,
+      "maxWidth": "0px"
+    },
+    "label": null,
+    "joinAccessible": true,
+    "edgesPass": true
+  }
+]
