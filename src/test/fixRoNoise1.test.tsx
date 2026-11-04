@@ -16,7 +16,7 @@ const flushFrames = () => { const fs = [...frames.values()]; frames.clear(); fs.
 beforeEach(() => {
   observers = []; frames = new Map(); nextFrame = 1;
   origRO = window.ResizeObserver;
-  (window as any).ResizeObserver = class { cb: () => void; constructor(cb: () => void) { this.cb = cb; observers.push(() => cb([{ contentRect: { height: 0 } }] as any)); } observe() {} disconnect() {} };
+  (window as any).ResizeObserver = class { cb: (e: unknown) => void; constructor(cb: (e: unknown) => void) { this.cb = cb; observers.push(() => cb([{ contentRect: { height: 0 } }] as any)); } observe() {} disconnect() {} };
   vi.stubGlobal('requestAnimationFrame', vi.fn((cb: FrameRequestCallback) => { const id = nextFrame++; frames.set(id, cb); return id; }));
   vi.stubGlobal('cancelAnimationFrame', vi.fn((id: number) => { frames.delete(id); }));
 });
