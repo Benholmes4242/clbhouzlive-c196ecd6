@@ -1,0 +1,47 @@
+[
+  {
+    "path": "src/components/ui/alert-dialog.tsx",
+    "line": 40,
+    "className": "fixed left-[50%] top-[50%] z-[201] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-sq-lg"
+  },
+  {
+    "path": "src/components/ui/radio-group.tsx",
+    "line": 14,
+    "className": "grid gap-2"
+  },
+  {
+    "path": "src/components/ui/drawer.tsx",
+    "line": 73,
+    "className": "grid gap-1.5 p-4 text-center sm:text-left"
+  },
+  {
+    "path": "src/components/ui/dialog.tsx",
+    "line": 39,
+    "className": "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border/10 bg-card p-6 text-card-foreground shadow-lg transition-all duration-motion-medium ease-standard"
+  },
+  {
+    "path": "src/components/courses/review/RatingTierDistribution.tsx",
+    "line": 55,
+    "className": "grid items-center gap-x-2 gap-y-2"
+  },
+  {
+    "path": "src/pages/BusinessDirectoryPage.tsx",
+    "line": 158,
+    "className": "grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+  },
+  {
+    "path": "src/pages/BusinessDirectoryPage.tsx",
+    "line": 180,
+    "className": "grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+  },
+  {
+    "path": "src/components/profile/SortViewModal.tsx",
+    "line": 48,
+    "className": "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border-0 bg-transparent p-0 shadow-none duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg"
+  },
+  {
+    "path": "src/components/profile/edit-v2/ImageCropperModal.tsx",
+    "line": 184,
+    "className": "fixed left-[50%] top-[50%] z-[200] grid w-full max-w-lg sm:max-w-xl translate-x-[-50%] translate-y-[-50%] p-0 gap-0 overflow-hidden border border-white/10 shadow-lg rounded-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+  }
+]
