@@ -163,6 +163,7 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   if (
     type === 'level_up' || type === 'level_near' ||
     type === 'status_at_risk' || type === 'status_reclaimed' ||
+    // badge_earned is retired (REMOVE_BADGES_1) and unreachable; kept for old rows.
     type === 'badge_earned'
   ) {
     // The career record sheet lives on /handicap and is opened by the

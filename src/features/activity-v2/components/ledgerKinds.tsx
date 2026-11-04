@@ -117,7 +117,7 @@ export const GAME_NOTIF_TYPES = [
   'status_at_risk',
   'status_reclaimed',
   'rival_played',
-  'badge_earned',
+  'badge_earned', // Retired (REMOVE_BADGES_1): filtered from the feed; kept so old rows never crash.
 ] as const;
 
 export function isGameNotifType(t: string): boolean {
@@ -248,6 +248,7 @@ export function resolveKind(row: {
       isSystem: true,
     };
   }
+  // Retired (REMOVE_BADGES_1): unreachable, rows are filtered before render.
   if (t === 'badge_earned') {
     return {
       left: 'tile',

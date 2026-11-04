@@ -6,7 +6,6 @@ import { formatMonthDay2ShortGB } from '@/i18n/format';
 import {
   T100,
   T60,
-  T40,
   BG_2,
   FONT,
   TAB,
