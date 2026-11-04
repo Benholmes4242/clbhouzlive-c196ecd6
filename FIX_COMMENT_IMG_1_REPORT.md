@@ -30,3 +30,14 @@ Shard 1: 1,719 · Shard 2: 1,583 · Shard 3: 1,674 · Shard 4: 1,677 = **6,653 t
 No SQL/migrations, RPC/edge, native/Median, feed_config, guest browsing, review wizard, news or round plots touched; round_pool_cap 30.
 
 Typecheck note: the first build flagged missing required props in commentPhotoR2.test.tsx (lines 40, 56); fixed test-only by passing replyingTo={null}, onClearReply, isSubmitting={false}. File re-run 4/4.
+
+## Close-out (2026-11-04)
+
+- Build: `/tmp/observability/build-errors.log` is absent after the `commentPhotoR2.test.tsx` type fix; per the observability README the file exists only when a build has errors, so the harness build recorded none. No timestamped entry to quote — absence is the clean signal.
+- Full suite re-run (`--maxWorkers=2`, sharded 4 ways), logs in `docs/verification/fix-comment-img-1/closeout/`:
+  - Shard 1: 1,719 passed (147 files), start 11:37:17
+  - Shard 2: 1,583 passed (147 files), start 11:40:21
+  - Shard 3: 1,674 passed (147 files), start 11:43:30
+  - Shard 4: 1,677 passed (146 files), start 11:46:40
+  - **Total: 6,653 tests / 587 files, 0 failures** — matches the expected 6,653 / 587 exactly. No pre-existing failures.
+- No other changes made.
