@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_COMMENT_IMG_1
+- [ ] BLOCKED: add_comment_v2 implementation is absent from repository/docs/uploads; generated Args and client forwarding do not establish URL constraints. Await Ben's function source, no SQL run.
+- [ ] After contract confirmation, move only composer photo upload to shared R2 helper; preserve compression/drafts/send/legacy reading, expose error toast.
+- [ ] After contract confirmation, test attachment/send/failure and absolute/legacy reading, extend upload guard and run four shards. Baseline unchanged6603/583; no product/test edits. See FIX_COMMENT_IMG_1_REPORT.md.
+
 ## FIX_UPLOAD_PLAYER_1
 - [x] Admin course photos use the shared R2-only helper; callers unchanged, real failure description exposed.
 - [x] Player root uses direct CHROME_CLEARANCE; zero-exception guard retained and subtraction assertion removed.
