@@ -517,7 +517,7 @@ function PendingRow({
         hairlineRing
       />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
+        <ProMemberName userId={row.actor_type === 'business' ? null : row.actor_id}><div
           style={{
             fontSize: 13.5,
             fontWeight: 700,
@@ -527,8 +527,8 @@ function PendingRow({
             textOverflow: 'ellipsis',
           }}
         >
-          <ProMemberName userId={row.actor_type === 'business' ? null : row.actor_id}>{row.display_name ?? row.username}</ProMemberName>
-        </div>
+          {row.display_name ?? row.username}
+        </div></ProMemberName>
         <div style={{ fontSize: 11, fontWeight: 500, color: A.BODY, marginTop: 1 }}>
           {cancelled ? 'Request cancelled' : 'Friend request sent'}
         </div>
@@ -591,7 +591,7 @@ function RichRow({
       <RowAvatar row={row} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div
+          <ProMemberName userId={isBusiness ? null : row.actor_id}><div
             style={{
               fontSize: 14,
               fontWeight: 700,
@@ -601,8 +601,8 @@ function RichRow({
               textOverflow: 'ellipsis',
             }}
           >
-            <ProMemberName userId={isBusiness ? null : row.actor_id}>{row.display_name ?? row.username}</ProMemberName>
-          </div>
+            {row.display_name ?? row.username}
+          </div></ProMemberName>
           {!isBusiness && showHcp && (
             <span
               style={{

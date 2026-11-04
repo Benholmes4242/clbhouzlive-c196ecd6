@@ -17,10 +17,11 @@ export function activityHoleColor(value: number | null): string {
   if (value === 0) return 'var(--activity-hole-par)';
   return value === 1 ? RAMP_DIST.bogey : RAMP_DIST.double;
 }
-export function ActivityRoundContent({ actor, summary, time }: { actor: React.ReactNode; summary?: ActivityRoundSummary; time: string }) {
+export function ActivityRoundContent({ actor, wrapActor, summary, time }: { actor: React.ReactNode; wrapActor?: (name: React.ReactElement) => React.ReactNode; summary?: ActivityRoundSummary; time: string }) {
   const better = summary ? betterThanAverage(summary) : null;
+  const name = <strong className="font-semibold">{actor}</strong>;
   return <>
-    <div className="activity-round-sentence"><strong className="font-semibold">{actor}</strong>{summary ? ` shot ${summary.gross} at ${shortCourseName(summary.course_name)}` : ' shared a round'}</div>
+    <div className="activity-round-sentence">{wrapActor ? wrapActor(name) : name}{summary ? ` shot ${summary.gross} at ${shortCourseName(summary.course_name)}` : ' shared a round'}</div>
     <div className="activity-round-meta">{time}{summary ? <>{summary.at_viewer_club && <> · <span className="text-[color:var(--activity-ink)]">your club</span></>}{better != null && ` · ${better} better than their average there`}</> : ' · scorecard not ready yet'}</div>
     {!!summary?.hole_to_par?.length && <div className="activity-hole-strip" data-testid="activity-hole-strip">{summary.hole_to_par.map((value, i) => <i key={i} data-hole-value={value ?? 'missing'} style={{ background: activityHoleColor(value) }} />)}</div>}
   </>;

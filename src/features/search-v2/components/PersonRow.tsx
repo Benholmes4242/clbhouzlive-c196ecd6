@@ -23,9 +23,9 @@ export function PersonRow({ person, query, onSelect }: Props) {
         ringColor={DARK_HAIRLINE}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
-          <ProMemberName userId={person.id}><Highlight text={name} query={query} /></ProMemberName>
-        </p>
+        <ProMemberName userId={person.id}><p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
+          <Highlight text={name} query={query} />
+        </p></ProMemberName>
         {person.username && (
           <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
             @{person.username}

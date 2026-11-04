@@ -406,9 +406,9 @@ function SuggestionRow({
         ringColor={DARK_HAIRLINE}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
-          <ProMemberName userId={suggestion.id}>{name}</ProMemberName>
-        </p>
+        <ProMemberName userId={suggestion.id}><p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
+          {name}
+        </p></ProMemberName>
         <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
           {suggestionReasonLine(suggestion, t)}
         </p>

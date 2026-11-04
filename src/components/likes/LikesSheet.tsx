@@ -144,7 +144,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
           hairlineRing
         />
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div
+          <ProMemberName userId={isBusiness ? null : actorId}><div
             style={{
               fontSize: 14.5,
               fontWeight: 600,
@@ -156,9 +156,9 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
               textOverflow: 'ellipsis',
             }}
           >
-            <ProMemberName userId={isBusiness ? null : actorId}>{l.displayName || l.username}</ProMemberName>
+            {l.displayName || l.username}
             {isViewer ? ' · You' : null}
-          </div>
+          </div></ProMemberName>
           {isBusiness ? (
             <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, marginTop: 5 }}>
               {businessTypeLabel(l.businessType)}

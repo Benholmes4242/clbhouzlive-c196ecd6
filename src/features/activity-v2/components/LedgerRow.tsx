@@ -51,7 +51,7 @@ function renderBody(text: string, actorName: string | null | undefined, actorId?
   const rest = text.slice(actorName.length);
   return (
     <>
-      <span style={{ fontWeight: 700 }}><ProMemberName userId={actorId}>{actorName}</ProMemberName></span>
+      <ProMemberName userId={actorId}><span style={{ fontWeight: 700 }}>{actorName}</span></ProMemberName>
       {rest}
     </>
   );
@@ -435,8 +435,8 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
 
   // ------- Body text rendering with bold accents -------
   const proActorId = row.actor_kind === 'business' || spec.isSystem ? null : row.actor_route_id ?? row.actor_user_id;
-  const actorNode = <ProMemberName userId={proActorId}>{row.actor_display_name ?? row.actor_username ?? 'Someone'}</ProMemberName>;
-  const quoted = composeCommentBody(row, actorNode);
+  const wrapActor = (name: React.ReactElement) => <ProMemberName userId={proActorId}>{name}</ProMemberName>;
+  const quoted = composeCommentBody(row, wrapActor);
   let bodyNode: React.ReactNode = quoted ?? renderBody(body, row.actor_display_name, proActorId);
   if (spec.bold === 'badge_title' && data.badge_title) {
     bodyNode = (
@@ -502,7 +502,7 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
     >
       {leftVisual}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {isRound ? <ActivityRoundContent actor={actorNode} summary={roundSummary} time={relativeTime(row.created_at)} /> : <>
+        {isRound ? <ActivityRoundContent actor={row.actor_display_name ?? row.actor_username ?? 'Someone'} wrapActor={wrapActor} summary={roundSummary} time={relativeTime(row.created_at)} /> : <>
         <div
           style={{
             // BODY. The action sentence is prose, so it reads at the body tier (14),

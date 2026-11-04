@@ -353,12 +353,12 @@ function renderSuggestion(
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1">
-          <span
+          <ProMemberName userId={s.kind === 'user' ? s.id.slice(2) : null}><span
             className="truncate"
             style={{ fontSize: 15, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
           >
-            <ProMemberName userId={s.kind === 'user' ? s.id.slice(2) : null}>{s.display}</ProMemberName>
-          </span>
+            {s.display}
+          </span></ProMemberName>
           {s.isVerified && (
             <CheckCircle2 size={12} style={{ color: AMBER, flexShrink: 0 }} strokeWidth={2.25} />
           )}

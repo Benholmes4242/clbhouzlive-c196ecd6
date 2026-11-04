@@ -933,7 +933,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', minWidth: 0, gap: 5 }}>
-          <button
+          <ProMemberName userId={post.actorType === 'business' ? null : post.actorId ?? post.userId}><button
             type="button"
             onClick={() => onProfile(post)}
             style={{
@@ -954,8 +954,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               cursor: 'pointer',
             }}
           >
-            <ProMemberName userId={post.actorType === 'business' ? null : post.actorId ?? post.userId}>{post.displayName}</ProMemberName>
-          </button>
+            {post.displayName}
+          </button></ProMemberName>
           {playedWith && playedWith.length > 0 && <PostWithLine people={playedWith} />}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>

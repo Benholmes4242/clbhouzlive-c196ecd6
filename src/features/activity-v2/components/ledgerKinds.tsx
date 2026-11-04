@@ -488,7 +488,7 @@ export function composeCommentBody(row: {
   notif_type: string;
   message?: string | null;
   actor_display_name?: string | null;
-}, actorNode?: React.ReactNode): React.ReactNode | null {
+}, wrapActor?: (name: React.ReactElement) => React.ReactNode): React.ReactNode | null {
   const t = row.notif_type;
   const isReply = t === 'comment_reply' || t === 'top_ten_reply';
   const isComment = t === 'comment' || t === 'comment_post' || t === 'top_ten_comment';
@@ -500,9 +500,10 @@ export function composeCommentBody(row: {
   // rendered by the default bold-prefix path — untouched.
   if (isComment && actor && msg.startsWith(actor)) return null;
   const verb = isReply ? ' replied: ' : ' commented: ';
+  const name = <span style={{ fontWeight: 700 }}>{actor || 'Someone'}</span>;
   return (
     <>
-      <span style={{ fontWeight: 700 }}>{actorNode ?? (actor || 'Someone')}</span>
+      {wrapActor ? wrapActor(name) : name}
       {verb}
       <span style={{ color: ACT.INK_45, fontStyle: 'italic' }}>{`\u201C${msg}\u201D`}</span>
     </>
