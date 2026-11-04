@@ -1,9 +1,10 @@
 # Roadmap
 
 ## FIX_UPLOAD_PLAYER_1
-- [ ] Route only admin course-photo uploads through uploadToR2Only; preserve both callers and expose the real failure description.
-- [ ] Use direct CHROME_CLEARANCE for player root; existing bleeding guard already has zero exceptions, remove its player-specific subtraction assertion.
-- [ ] Add upload/guard regressions, inventory other storage upload callers without changing them, run four shards and reconcile against6599/582.
+- [x] Admin course photos use the shared R2-only helper; callers unchanged, real failure description exposed.
+- [x] Player root uses direct CHROME_CLEARANCE; zero-exception guard retained and subtraction assertion removed.
+- [x] Focused27/27; four shards1705/1569/1663/1666 =6603/583, +4/+1 named in FIX_UPLOAD_PLAYER_1_REPORT.md; no failures/unhandled errors, automatic build OK. Three other storage upload files inventoried unchanged.
+- [ ] Authenticated admin upload/read-back unavailable: external_unmanaged authentication; no bypass or hosted save claim.
 
 ## Our record sheet v2 and prediction-engine wording
 - [x] Event-count tiles, weekly-best circle, individual ledger and anonymous Agreement implemented; benchmark preserved.
