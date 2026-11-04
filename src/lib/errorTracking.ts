@@ -14,6 +14,7 @@
 //   SR5  No behaviour change when no error occurs — this module only listens.
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { currentBuildId } from '@/lib/buildFreshness';
+import { isResizeObserverNoise } from '@/lib/resizeObserverNoise';
 
 const MAX_MSG = 200;
 const MAX_STACK = 400;
@@ -125,7 +126,3 @@ export function installErrorTracking(): void {
   }
 }
 
-/** FIX_RO_NOISE_1: both ResizeObserver loop messages are browser noise. */
-export function isResizeObserverNoise(message: unknown): boolean {
-  return typeof message === 'string' && message.startsWith('ResizeObserver loop');
-}

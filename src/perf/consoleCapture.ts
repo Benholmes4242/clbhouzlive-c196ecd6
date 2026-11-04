@@ -2,7 +2,7 @@
 // Patches console.* once and forwards to the originals, so desktop devtools is unchanged.
 // Gated by the same flag as the perf instrument: install() no-ops unless DEV || ?perf=1.
 
-import { isResizeObserverNoise } from '@/lib/errorTracking';
+import { isResizeObserverNoise } from '@/lib/resizeObserverNoise';
 import { isPerfEnabled, subscribePerfLive } from './navTiming';
 
 export interface LogLine {
