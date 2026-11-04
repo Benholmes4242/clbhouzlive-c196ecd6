@@ -16,3 +16,18 @@
 `TypeError: Cannot read properties of undefined (reading 'onAuthStateChange')` at `src/hooks/useSupabaseSession.tsx:51:54`.
 Cause: §7 makes ScoresLeaderboardsPage call `useMyProStatus`, which reads `useProfileData` → `useSupabaseSession`; that test's supabase mock has no `auth`. Not edited (needs authorisation). Proposed test-only fix: mock `@/features/pro-verification/useMyProStatus` in that file to return a not-pro status.
 Full output: `docs/verification/pro-1/shard3.log`.
+
+## Close-out (2026-11-04)
+
+**Authorised test-only change:** `src/features/explore-magazine/__tests__/gateScopeSwitch.test.tsx` — added a `vi.mock('@/features/pro-verification/useMyProStatus')` returning a member with no pro status (`unknown: false`). No assertion changed. The three earlier shard-3 failures are resolved.
+
+**Product fix — pro status never gates while loading:**
+- `proRules.ts`: `ProGateStatus` gains `'unknown'`; `proGateStatus` returns it when not verified and `unknown` is set (verified still wins).
+- `useMyProStatus.ts`: new `unknown` field = signed in and (profile unresolved, or request query pending). A failed request read is settled → `'none'` (fail open, unchanged).
+- `RoundsGate.tsx` `roundsGateState`: `'unknown'` returns `'loading'` unless the connection already resolves to connected. `useAmateurBoardState` uses the same predicate, so minimums never apply on a guess.
+
+**Tests added** (`src/test/proVerification1.test.tsx`, 3): unknown + no connection → loading; unknown + connection → connected; unknown → verified sequence never contains gated. No test rewritten or deleted.
+
+**Suite** (`--maxWorkers=2`, `--shard=n/4`): 1,719 / 1,583 / 1,724 / 1,678 = **6,704 tests, 588 files**, zero failures. Delta vs last close-out (6,653 / 587): +51 tests, +1 file — the new `proVerification1.test.tsx` file and Brief 1 additions (incl. ledger kind/link cases and these 3). Logs: `docs/verification/pro-1/final/`.
+
+Brief 1 complete. Brief 2 not started (awaiting re-send with mock).
