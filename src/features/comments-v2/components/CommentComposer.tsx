@@ -12,7 +12,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Image as ImageIcon, Send, Check } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { toast } from '@/lib/toast';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
@@ -127,14 +128,16 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     try {
       const result = await compressImage(file, COMPRESSION_PRESETS.feed);
       const ext = (result.file.type.split('/')[1] || 'jpg').split('+')[0];
-      const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from('comment-images').upload(path, result.file, {
-        contentType: result.file.type, upsert: false,
-      });
-      if (error) throw error;
-      setPendingImage(path);
+      const path = `comments/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      /* FIX_COMMENT_IMG_1 — comment photos go to R2 like every other image; the
+         stored media_url is the absolute public URL. CommentImageV2 still signs
+         legacy bare comment-images paths. */
+      const res = await uploadToR2Only(result.file, 'clbhouz-post-images', path);
+      if (!res.success || !res.publicUrl) throw new Error(res.error || 'Upload failed');
+      setPendingImage(res.publicUrl);
     } catch (e) {
       console.warn('[CommentComposer] upload failed', e);
+      toast.error("Couldn't attach photo", { description: e instanceof Error ? e.message : String(e) });
     } finally {
       setUploading(false);
     }
