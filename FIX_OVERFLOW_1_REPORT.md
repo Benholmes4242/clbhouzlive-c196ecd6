@@ -1,4 +1,47 @@
-# FIX_OVERFLOW_1 — partial implementation / scoped stop
+# FIX_OVERFLOW_1 — authorised test repair verified
+
+## Latest verification — 4 November 2026
+Only the two authorised test files changed in this repair; no product code changed. Focused50/50; all four full-suite shards passed with zero failures and zero unhandled errors. Full output: `docs/verification/fix-overflow-1/test-repair/`.
+
+Commands:
+- `bunx vitest run src/test/fixOverflowSource.test.ts src/test/overflowRightIsland.test.tsx src/test/headerB1.test.tsx src/test/islandSquircle.test.tsx src/test/gi1GuestIslandReducedMotion.test.tsx --maxWorkers=2`
+- `bunx vitest run --maxWorkers=2 --shard=n/4`, separately for n=1,2,3,4.
+
+|Shard|Passed tests|Passed files|
+|---|---:|---:|
+|1|1719|147|
+|2|1583|147|
+|3|1680|147|
+|4|1666|145|
+|Total|6648|586|
+
+Reconciliation: last executed full suite6633/585 →6648/586 (+15/+1 from the prior continuation:1 guard case added to fixOverflowSource.test.ts and14 cases in the new overflowRightIsland.test.tsx). This test-only repair adds/deletes/renames no cases: expected6648/586 before and executed6648/586 after. All11 previously reported continuation failures are resolved by the authorised corrections; no pre-existing failing tests remain. Existing React act warnings remain warnings, not unhandled errors.
+
+### Exact authorised test-line changes (old line numbers)
+`src/test/overflowRightIsland.test.tsx` — the five parameterised guest cases and five parameterised member cases retain their names:
+- L43: `screen.getByRole('button', { name: 'Log in', hidden: true })` → `document.querySelector<HTMLButtonElement>('[data-guest-island] > button:first-of-type')`.
+- L44: `expect(login.tabIndex).toBe(-1)` → `expect(login?.tabIndex).toBe(-1)`; aria-hidden and disabled assertions unchanged.
+- Added after L44: `expect(login?.style.maxWidth).toBe('0'); expect(login?.style.opacity).toBe('0'); expect(login?.style.pointerEvents).toBe('none');`.
+- L49: `screen.getByRole('button', { name: 'Search', hidden: true })` → `document.querySelector<HTMLButtonElement>('[data-island-right] > button:first-of-type')`.
+- L50: `expect(search.tabIndex).toBe(-1)` → `expect(search?.tabIndex).toBe(-1)`; aria-hidden assertion unchanged.
+- Added after L50: `expect(search?.style.maxWidth).toBe('0'); expect(search?.style.opacity).toBe('0'); expect(search?.style.pointerEvents).toBe('none');`.
+- Added after L52: `expect(screen.getByRole('button', { name: 'Open profile menu' })).toBeEnabled();` to check the avatar's kept accessible name. Existing Join free and Handicap index8.2 accessible-name assertions retained.
+Reason: aria-hidden controls have no accessible names, so select their existing DOM position and assert the fold directly.
+
+`src/test/gi1GuestIslandReducedMotion.test.tsx` L8 — fixture only:
+- `vi.fn(() => ({ matches: true, media: '(prefers-reduced-motion: reduce)', ... }))` → `vi.fn((query: string) => ({ matches: query === '(prefers-reduced-motion: reduce)', media: query, ... }))`.
+Reason: reduced-motion matches only its own query; width340 query remains false. Every GI1 assertion and every other existing test is unchanged.
+
+### 320px real-browser verification
+Fresh guest browser, viewport320×1056, no gate bypass. All four island screenshots inspected:
+- `/tourhub`: left12→187.046875, right203.640625→308; full All tours, globe and arrow visible, label fits every clipping ancestor.
+- `/`: left12→143, right203.640625→308.
+- `/amateur`: left12→143, right203.640625→308.
+- `/courses`: left12→143, right203.640625→308.
+Every guest Log in has aria-hidden=true, tabIndex−1, maxWidth0px; Join free remains visible/accessibly named. Live resize to390 restores accessible Log in. Screenshots and measurements: `/tmp/browser/fix-overflow-1/test-repair/{tourhub,home,amateur,courses}-320-islands.png` and results.json; durable measurement copy in test-repair/browser-results.json.
+An initial browser measurement script assumed every left island had data-island-left; logo islands use an existing first-child button instead. Corrected only the temporary script, then reran all four checks successfully. This was an apparatus error, not an app/test failure.
+Authenticated member browser checks remain unavailable (`external_unmanaged`); member fold/index/avatar and live-media behavior passed in the14-case test file, but no authenticated browser fit claim is made. User-supplied Portrush/Sundridge five-tab320–390 browser proof accepted as directed, not rerun.
+Automatic build latest observed `2026-11-04T10:08:59Z: build OK`; no manual build/typecheck. Changed this turn: two named test files, report, roadmap and verification output only. Protected product areas, SQL/migrations/deployed RPCs/edge functions/feed_config/pool cap/native/Median untouched. Earlier stop records below are retained as history and superseded by these results.
 
 ## Continuation ruling — STOP at 10:00 UTC
 The approved52 remaining grid objects in38 files now have only `gridTemplateColumns: 'minmax(0, 1fr)'` added. The three ruled wizard files are unchanged. Their named/commented exceptions are in the new app-wide guard, which passed. Full current path/line/object inventory: `docs/verification/fix-overflow-1/inline-grid-continuation.json`. This AST inventory also catches style constants (FullField rowStyle and YourCourseAnalyticsSheet CARD_LIST), which the earlier direct-inline-only audit missed; it still yields52 remaining objects. Tailwind remains unchanged.
