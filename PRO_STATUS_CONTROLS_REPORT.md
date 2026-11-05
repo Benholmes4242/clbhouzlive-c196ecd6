@@ -1,7 +1,7 @@
 # Pro status controls — STOPPED
 
 ## Status
-Implementation is present, but not signed off. Stopped on shard 1 fixture failures and a surviving type error in the new test. No failing existing fixture was changed. Shards 2–4 and browser verification were not run.
+Implementation is present, but not signed off. Stopped on shard 1 fixture failures. The new test's type errors are now fixed; no failing existing fixture was changed. Shards 2–4 and browser verification were not run.
 
 ## Implemented
 - Shared `useOwnHandicapState` combines chip settlement with known pro status; stored WHS connections remain untouched.
@@ -23,8 +23,12 @@ Full output: `docs/verification/pro-status-controls/shard1.log`.
 
 No pre-existing failures observed in this run. The HH3-only flake exception does not apply to this brief.
 
-## Build — NOT clean
-Latest build log: `2026-11-05T11:10:15Z`:
+## Build — clean after test-only type fix
+Latest build log: `2026-11-05T11:16:21Z`: **build OK**.
+The two selectors in `proStatusControls.test.tsx:48–49` changed from `{name:'Stop',exact:true}` to `{name:/^Stop$/}`: exact accessible-name matching is preserved, and the unsupported option is removed. No assertion, case name, or test count changed.
+Focused command: `bunx vitest run src/test/proStatusControls.test.tsx --maxWorkers=2`: **14 passed / one file**. Full output: `docs/verification/pro-status-controls/type-fix-focused.log`. Expected suite inventory before/after this fix remains **6,852 / 604**; full suite not rerun because the existing fixture stop remains.
+
+Historical failing build log: `2026-11-05T11:10:15Z`:
 ```text
 src/test/proStatusControls.test.tsx(48,186): error TS2769: No overload matches this call.
 The last overload gave the following error.
@@ -47,4 +51,4 @@ Object literal may only specify known properties, and 'exact' does not exist in 
 No existing test deleted. The three renamed cases above preserve counts. No fixture/assertion changes in either failing existing file.
 
 ## Remaining
-Fix the two new-test type errors; obtain authorisation for settled amateur pro/own-state fixture mocks without assertion changes in affected existing tests. Complete missing per-surface tests and hosted member flow if possible, then four shards and mock verification. No SQL/migrations, deployed RPC/edge, feed_config, native/Median changes; round_pool_cap unchanged.
+Obtain authorisation for settled amateur pro/own-state fixture mocks without assertion changes in affected existing tests. Complete missing per-surface tests and hosted member flow if possible, then four shards and mock verification. No SQL/migrations, deployed RPC/edge, feed_config, native/Median changes; round_pool_cap unchanged.
