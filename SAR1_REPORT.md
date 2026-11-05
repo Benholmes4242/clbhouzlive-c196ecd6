@@ -22,6 +22,8 @@ Inventory reconciles from **6,936 / 610** to **6,937 / 610**, exactly **+1 case*
 
 Full focused and shard output retained at `docs/verification/sar1-fix-1/focused.log` and `shard1.log` through `shard4.log`. Original failing `docs/verification/sar1/shard4.log` retained. Guest browsing, review wizard, news, round plots, SQL, migrations, migration files, deployed RPCs/edge functions, feed_config and native/Median config remain untouched; round_pool_cap remains 30. Browser/320px checks remain unverified as previously recorded; this follow-up verifies retention through mounted UI tests, not hosted browser evidence.
 
+Latest harness build: **build OK**, `2026-11-05T15:29:17Z`; no surviving build errors.
+
 ---
 
 # Historical SAR1 stop — superseded by the green close-out above
