@@ -1,9 +1,10 @@
 # Roadmap
 
 ## FIX6 — Sign-up and pro fixes
-- [ ] Fix reachable croppers, comments sheet material, account first-open CSS, settled setup guard/error routing and step-one Skip, pro focus/copy.
-- [ ] Add scoped coverage and exact rewritten assertion/string ledger; device-only Safari/native/install/OAuth checks unavailable here.
-- [ ] Run focused checks then ordered shards; preserve CH1's existing new-test stop and report any failure without unauthorised repairs.
+- [x] Implemented reachable cropper containment/zoom, shared comments material, account media-query paint, member-only settled setup guard/error routing/step-one Skip, pro focus/copy. Legacy unmounted personal modal left unchanged.
+- [x] Added 17 tests/3 files; focused 107/107 and surfaces 22/22. Exact old/new assertion/string ledger in FIX6_SIGNUP_PRO_REPORT.md; source inventory expected 6,997/617 including CH1, not full-suite passing total.
+- [ ] STOP: fresh shard1 1,820 passes; shard2 1,663 pass/1 fail at untouched CH1 test line78, `expected null not to be null`. Full logs retained; shards3–4 not run. Await CH1 field-fixture authorisation; no failing test repaired.
+- [ ] Browser natural-aspect harness timed out before ready; no geometry result. Physical Safari/native first-open/install/OAuth checks unavailable. Explicit focus/pro-copy absence coverage remains open at suite stop.
 
 ## CH1 — Champions tidy
 - [x] Prerequisite audited: posted eligibility does not guarantee You reach; independent failed reads and empty reach rows suppress it. Source evidence in CH1_REPORT.md; no product/test edits.

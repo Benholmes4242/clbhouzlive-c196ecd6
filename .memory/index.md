@@ -17,6 +17,7 @@
 - **Chevrons**: `›` means navigation only. Expand/toggle/sheet controls use a different affordance.
 
 ## Memories
+- [Sign-up and pro six fixes](mem://constraints/signup-pro-fix6.md) — Mandatory settled setup, contained crops, sheet material and no pro-board promises.
 - [Champions course-only tidy](mem://features/courses/ch1-champions-tidy) — Successful-read ruling accepts missing You reach after errors/empty results; preserve Defence/other states.
 - [Member-best wording](mem://constraints/member-best-wording.md) — Member scores are Best on clbhouz; genuine Tour and admin catalogue wording are exceptions.
 - [Signed-off post flow](mem://features/post-studio/post-flow-signed-off) — Shared live catalogue count, confirmed completion facts and exact post sheets/screens.
