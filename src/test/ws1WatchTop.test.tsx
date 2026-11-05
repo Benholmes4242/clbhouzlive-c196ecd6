@@ -52,6 +52,7 @@ vi.mock('@/features/explore-magazine/watch/useExplorePeopleRow', () => ({
 }));
 vi.mock('@/lib/publishedPostViewer', () => ({ loadPublishedViewerPosts: f.loadPosts }));
 vi.mock('@/features/explore-magazine/watch/useWatchLead', () => ({ useWatchLead: () => f.lead }));
+vi.mock('@/features/explore-magazine/watch/useWatchFeatured', () => ({ useWatchFeatured: () => ({ data: [], error: null, isFetched: true, isError: false, isPending: false, isLoading: false }) }));
 
 /* Presentation dependencies. */
 vi.mock('@/components/ui/SquircleAvatar', () => ({
