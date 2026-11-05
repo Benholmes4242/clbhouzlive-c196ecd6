@@ -35,7 +35,27 @@ export type RecentSentence = {
  * The line under every card (RR1 §5), evaluated in this order; null = no line.
  * Keeps the standout keys and wording for the cases they already covered.
  */
-export function recentSentenceParts(row: StandoutRound, locale = 'en'): RecentSentence | null {
+/** CS1 §5c: on the course's own page the line drops the course name. Same
+ * rules, order and thresholds; only the keys and English defaults differ. */
+const HERE_COPY = {
+  firstRound: ['amateur.standout.here.firstRound', 'First round here'],
+  bestEver: ['amateur.standout.here.bestEver', 'Best ever here'],
+  bestSince: ['amateur.standout.here.bestSince', 'Best here since {{month}}'],
+  ordinalRound: ['amateur.standout.here.ordinalRound', '{{ordinal}} round here'],
+  betterAverage: ['amateur.standout.here.betterAverage', '{{n}} shots better than average here'],
+  aboveAverage: ['amateur.standout.here.aboveAverage', '{{n}} shots above average here'],
+  rightOnAverage: ['amateur.standout.here.rightOnAverage', 'Right on average here'],
+} as const;
+
+export function recentSentenceParts(row: StandoutRound, locale = 'en', options: { here?: boolean } = {}): RecentSentence | null {
+  const s = recentSentenceCourse(row, locale);
+  if (!s || !options.here) return s;
+  const name = s.key.replace('amateur.standout.', '') as keyof typeof HERE_COPY;
+  const [key, defaultValue] = HERE_COPY[name];
+  return { ...s, key, defaultValue };
+}
+
+function recentSentenceCourse(row: StandoutRound, locale: string): RecentSentence | null {
   const course = row.course_name ?? '';
   /* (1) no course, or gross/par missing: no line. "Missing" means the round
      carries no comparison figures at all and the par is not a plausible

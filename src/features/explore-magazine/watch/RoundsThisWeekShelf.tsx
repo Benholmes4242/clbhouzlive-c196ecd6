@@ -82,12 +82,17 @@ function WhoRow({
   photoUrl,
   sub,
   onOpenMember,
+  wrapName = false,
+  nameColor,
 }: {
   userId: string | null;
   name: string;
   photoUrl: string | null;
-  sub: string;
+  sub: React.ReactNode;
   onOpenMember?: (userId: string) => void;
+  /** CS1: names wrap rather than truncate; own round paints the name amber. */
+  wrapName?: boolean;
+  nameColor?: string;
 }) {
   return (
     <button
@@ -105,7 +110,7 @@ function WhoRow({
     >
       <SquircleAvatar size={32} src={photoUrl} alt="" userId={userId ?? undefined} hairlineRing />
       <span style={{ minWidth: 0 }}>
-        <span style={{ ...oneLine, display: 'block', fontSize: 14, fontWeight: 600 }}>{name}</span>
+        <span data-round-card-name style={{ ...(wrapName ? { lineHeight: 1.25, overflowWrap: 'anywhere' as const } : oneLine), display: 'block', fontSize: 14, fontWeight: 600, ...(nameColor ? { color: nameColor } : {}) }}>{name}</span>
         <span style={{ ...oneLine, display: 'block', fontSize: 11.5, color: A.DIM, marginTop: 1 }}>{sub}</span>
       </span>
     </button>
@@ -122,29 +127,47 @@ function courseAndDate(courseName: string | null, playDate: string | null, local
   return parts.join(' · ');
 }
 
-function RoundCard({
+/** CS1: the course page's own-round amber, name and edge only. */
+export const OWN_ROUND_AMBER = '#F7931E';
+export const OWN_ROUND_BORDER = 'rgba(247,147,30,0.35)';
+
+function shortDate(playDate: string | null, locale: string): string {
+  const when = playDate ? new Date(playDate) : null;
+  return when && !Number.isNaN(when.getTime()) ? when.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
+}
+
+/** Shared by Recent rounds and the course page's Lately here (CS1); never fork. */
+export function RoundCard({
   round,
   shapes,
   locale,
   onOpenRound,
   onOpenMember,
+  here = false,
+  inCircle = false,
+  own = false,
 }: {
   round: StandoutRound;
   shapes: ReturnType<typeof useRoundHoleShapes>;
   locale: string;
   onOpenRound?: (scoreId: string, ownerUserId: string | null) => void;
   onOpenMember?: (userId: string) => void;
+  /** CS1: on the course page — date-only sub line, "here" sentences, wrapping name. */
+  here?: boolean;
+  inCircle?: boolean;
+  own?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const toPar = roundToPar(round);
   const toParText = toParLabel(toPar);
   const shape = round.whs_score_id ? shapes?.get(round.whs_score_id) ?? null : null;
-  const sentence = recentSentenceParts(round, locale);
+  const sentence = recentSentenceParts(round, locale, here ? { here: true } : undefined);
   return (
     <div
       role="button"
       tabIndex={0}
       data-rounds-shelf-card="round"
+      data-own-round={own ? 'true' : undefined}
       onClick={() => {
         if (!round.whs_score_id) return;
         analyticsEvents.track('rounds_shelf_card_tapped', { kind: 'round' });
@@ -160,7 +183,7 @@ function RoundCard({
       style={{
         flex: 'none', width: SHELF_CARD.width, height: SHELF_CARD.height, boxSizing: 'border-box',
         scrollSnapAlign: 'start', background: SHELF_CARD.background,
-        border: `1px solid ${SHELF_CARD.border}`, borderRadius: SHELF_CARD.radius,
+        border: `1px solid ${own ? OWN_ROUND_BORDER : SHELF_CARD.border}`, borderRadius: SHELF_CARD.radius,
         padding: SHELF_CARD.padding, display: 'flex', flexDirection: 'column', cursor: 'pointer',
       }}
     >
@@ -168,8 +191,22 @@ function RoundCard({
         userId={round.user_id}
         name={round.display_name || t('discover.aMember', 'A member')}
         photoUrl={round.profile_photo_url}
-        sub={courseAndDate(round.course_name, round.play_date, locale)}
+        sub={here ? (
+          <>
+            {shortDate(round.play_date, locale)}
+            {inCircle ? (
+              <>
+                {' · '}
+                <span data-round-card-circle style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: A.DIM }}>
+                  {t('courseDetail.lately.circle', 'CIRCLE')}
+                </span>
+              </>
+            ) : null}
+          </>
+        ) : courseAndDate(round.course_name, round.play_date, locale)}
         onOpenMember={onOpenMember}
+        wrapName={here}
+        nameColor={own ? OWN_ROUND_AMBER : undefined}
       />
       <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 12 }}>
         <b className="tabular-nums" style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>
