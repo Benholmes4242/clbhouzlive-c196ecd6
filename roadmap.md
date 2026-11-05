@@ -2,7 +2,8 @@
 
 ## Pro status standing fixture rule
 - [x] Added exactly one authorised settled-amateur line to each of the five shard-2 files; no assertions, expected values or case names changed.
-- [ ] Rerun shard 2 then 3 and 4; apply A/B only to matching failures, stop on any other failure or a repaired file still failing; report against 6,874 / 607.
+- [x] Shard 2 passes 1,663. Shard 3 matching failures repaired with A+B in ep1/ep2 and B in st2; no assertions changed.
+- [ ] STOP: repaired shard 3 has 1,726 pass / 11 fail, all st2SettingsHandicapCard after its authorised line; shard 4 not run. Exact null A templates also trigger TS2873 at ep1:18, ep2:19, ep4:31, st3:30. Await further authorisation; complete evidence and line inventory in retained PRO_STATUS_CONTROLS_REPORT.md.
 - [ ] Delete PRO_STATUS_CONTROLS_REPORT.md only once all four shards pass; preserve historical failing logs and give final counts/fixture inventory in reply.
 
 ## FIX_UNBLOCK_1
