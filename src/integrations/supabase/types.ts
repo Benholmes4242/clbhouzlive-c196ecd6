@@ -10319,6 +10319,109 @@ export type Database = {
           },
         ]
       }
+      pro_score_watchers: {
+        Row: {
+          created_at: string
+          pro_id: string
+          watcher_id: string
+        }
+        Insert: {
+          created_at?: string
+          pro_id: string
+          watcher_id: string
+        }
+        Update: {
+          created_at?: string
+          pro_id?: string
+          watcher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_score_watchers_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_watcher_id_fkey"
+            columns: ["watcher_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_watcher_id_fkey"
+            columns: ["watcher_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_watcher_id_fkey"
+            columns: ["watcher_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_watcher_id_fkey"
+            columns: ["watcher_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_watcher_id_fkey"
+            columns: ["watcher_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_score_watchers_watcher_id_fkey"
+            columns: ["watcher_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       pro_world_rank_history: {
         Row: {
           created_at: string
@@ -24411,6 +24514,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_pro_score_watch: { Args: { p_pro_id: string }; Returns: Json }
       get_pro_world_rank: { Args: { p_user_id: string }; Returns: Json }
       get_profile_creator: {
         Args: { p_user_id: string }
@@ -28316,6 +28420,7 @@ export type Database = {
         }
         Returns: Json
       }
+      toggle_pro_score_watch: { Args: { p_pro_id: string }; Returns: boolean }
       tour_tee_alerts_due: {
         Args: { p_grace?: string }
         Returns: {
