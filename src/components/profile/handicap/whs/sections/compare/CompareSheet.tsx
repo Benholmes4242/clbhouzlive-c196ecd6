@@ -18,9 +18,10 @@
  *            so. NOT an empty state: comparing two members who have never met
  *            is the common case once search is open to everyone.
  *
- * Amber means the leader of a row. Polarity lives in the stat's `format`, so
- * gross and index (low better) and stableford (high better) are handled by
- * CompareStatRow without any call site flipping a colour.
+ * HH3: DETAIL is now "Head to head" (HeadToHeadDetail.tsx): heads, You v,
+ * Together, Course by course. No amber; leader rules in headToHeadRules.ts.
+ * The SHARED/SEASON split above survives only as Together vs its one-line
+ * never-played replacement.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -224,7 +225,27 @@ export const CompareSheet: React.FC<Props> = ({
         fontFamily: CHART_FONT,
       }}
     >
-      {/* Pinned header */}
+      {/* HH3: the DETAIL state carries the Head to head header; LIST is unchanged. */}
+      {target ? (
+        <div data-hh-header style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            {!initialTargetUserId && (
+              <button type="button" onClick={backToList} aria-label={t('handicap.compare.back')} style={{ border: 'none', background: 'transparent', color: 'rgba(248,250,252,0.55)', cursor: 'pointer', padding: 4, marginLeft: -4, lineHeight: 0, flexShrink: 0 }}>
+                <ArrowLeft size={18} strokeWidth={2.2} />
+              </button>
+            )}
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(248,250,252,0.5)' }}>HEAD TO HEAD</div>
+              <div id="handicap-compare-title" style={{ marginTop: 3, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: '#F8FAFC' }}>
+                {target.name ? `You and ${targetFirst}` : <span aria-hidden style={{ display: 'inline-block', width: 148, height: 16, borderRadius: 4, background: 'rgba(255,255,255,0.06)', verticalAlign: 'middle' }} />}
+              </div>
+            </div>
+          </div>
+          <button type="button" onClick={handleClose} aria-label={t('handicap.compare.close')} style={{ width: 34, height: 34, borderRadius: 12, border: '1px solid rgba(255,255,255,0.14)', background: 'transparent', color: 'rgba(248,250,252,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, padding: 0 }}>
+            <X size={15} strokeWidth={2} />
+          </button>
+        </div>
+      ) : (
       <div
         style={{
           flexShrink: 0,
@@ -309,6 +330,7 @@ export const CompareSheet: React.FC<Props> = ({
           <X size={20} strokeWidth={2} />
         </button>
       </div>
+      )}
 
       {/* Scroller */}
       {/* `no-scrollbar` is the app's existing utility (src/index.css) used by the
