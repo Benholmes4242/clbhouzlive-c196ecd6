@@ -1,0 +1,13 @@
+.admin-verified-card{background:var(--admin-verified-card);border-radius:18px;overflow:hidden;color:var(--admin-verified-ink)}
+.admin-verified-card>header{display:flex;justify-content:space-between;padding:14px 16px;font-size:11px;font-weight:800;letter-spacing:0.12em;border-bottom:1px solid var(--admin-verified-hair)}
+.admin-verified-card>header>span:last-child{color:var(--admin-verified-dim);letter-spacing:0;font-weight:600}
+.admin-verified-card h4{margin:0;padding:10px 16px 6px;font-size:9.5px;font-weight:800;letter-spacing:0.14em;color:var(--admin-verified-dim);border-bottom:1px solid var(--admin-verified-hair)}
+.admin-verified-row.admin-verified-row{width:100%;height:auto;display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:0;border-bottom:1px solid var(--admin-verified-hair);text-align:left;color:var(--admin-verified-ink);white-space:normal}
+.admin-verified-row:last-child{border-bottom:0}
+.admin-verified-content{flex:1;min-width:0}
+.admin-verified-name{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700}
+.admin-verified-name>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-verified-sub{display:block;margin-top:3px;font-size:12px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--admin-verified-mute)}
+.admin-verified-right{flex:none;text-align:right;font-size:12px;font-weight:400;color:var(--admin-verified-mute)}
+.admin-verified-pending{flex:none;font-size:8.5px;font-weight:800;letter-spacing:0.08em;color:var(--admin-verified-warn)}
+.admin-verified-card>p{padding:12px 16px;color:var(--admin-verified-mute)}
