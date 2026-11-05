@@ -6,6 +6,8 @@
 import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
 import { useProMembers } from '@/features/pro-verification/useProMembers';
 import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
+import { ProProfileBuildOne } from '@/features/pro-profile/ProProfileBuildOne';
+import { Button } from '@/components/ui/button';
 import { ProfileProNote } from '@/features/pro-verification/ProfileProNote';
 import { profileProTabs, showPendingProNote } from '@/features/pro-verification/profileProRules';
 import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
@@ -990,7 +992,19 @@ const ProfilePageV2Content: React.FC = () => {
           line, the handicap trend panel and the trophies row. */}
       {profile?.id && (
         <div className="relative z-10 pointer-events-auto">
-          <ProfileHero
+          {proMember?.pro_kind === 'tour_pro' ? <ProProfileBuildOne
+            pro={proMember} name={displayName} nameRef={heroNameRef}
+            avatar={profile.profile_photo_url} cover={profile.header_photo_url}
+            owner={isSelfView} viewerId={user?.id} followers={followersCount}
+            followersReady={socialCountState === 'ok'}
+            onFollowers={() => navigate(`/profile/${username}/followers`)}
+            onAvatar={() => isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true)}
+            onEdit={() => navigate(editRoute)}
+            onShare={() => { if (navigator.share) navigator.share({ title: displayName, url: window.location.href }).catch(() => {}); else { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); } }}
+            onFollow={toggleFollow} following={isFollowing} followBusy={followBusy}
+            onMessage={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })} messageBusy={dmStarting}
+            menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>Copy link</DropdownMenuItem>{!isSelfView && <><DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}</DropdownMenuContent></DropdownMenu>}
+          /> : <ProfileHero
             userId={profile.id}
             onOpenRound={(scoreId) => {
               if (scorecard.target?.scoreId === scoreId) scorecard.close();
@@ -1226,7 +1240,7 @@ const ProfilePageV2Content: React.FC = () => {
                 navigate(`/profile/${username}/followers?tab=following&filter=friends`);
               }
             }}
-          />
+          />}
         </div>
       )}
 
