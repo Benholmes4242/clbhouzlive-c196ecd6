@@ -21,7 +21,8 @@ import { ScrollRestoration, scrollPositions } from '@/components/ScrollRestorati
 const h=vi.hoisted(()=>({top:vi.fn(),restore:vi.fn()}));
 vi.mock('@/lib/getScrollParent',()=>({getPageScrollTop:()=>123,getPrimaryScrollElement:()=>({scrollHeight:2000}),scrollPageTo:h.restore,scrollPageToTop:h.top}));
 const row:ActivityFeedRowV2={notif_id:'digest',notif_type:'tour_preview',created_at:new Date().toISOString(),is_read:true,title:null,message:'Weekly tournaments',entity_id:null,entity_type:null,data:{tour_short_name:'DPWT'},actor_user_id:null,actor_username:null,actor_display_name:null,actor_avatar_url:null,actor_kind:'personal',actor_route_id:null,liker_avatar_urls:null,target_course_name:null,target_course_image:null,target_poster_url:null,target_review_rating:null};
-afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks();h.top.mockClear();h.restore.mockClear();scrollPositions.clear();});
+const originalResizeObserver = window.ResizeObserver;
+afterEach(()=>{cleanup();window.ResizeObserver=originalResizeObserver;vi.unstubAllGlobals();vi.restoreAllMocks();h.top.mockClear();h.restore.mockClear();scrollPositions.clear();});
 describe('FIX_TOUR_NOTIF_1',()=>{
   it.each(['tour_preview','tour_roundup'])('%s opens overview',notif_type=>expect(getActivityLink({...row,notif_type})).toBe('/tourhub'));
   it('keeps the trophy after the route change and pushes without nav-origin state, with back to Activity',()=>{
@@ -29,7 +30,7 @@ describe('FIX_TOUR_NOTIF_1',()=>{
     render(<MemoryRouter initialEntries={['/notificationmessages']}><LedgerRow row={row} onMarkRead={vi.fn()} onLongPress={vi.fn()}/><Location/></MemoryRouter>);
     expect(screen.getByTestId('activity-tour-tile').querySelector('svg')).not.toBeNull();
     expect(screen.getByTestId('activity-tour-tile').textContent).toBe('');
-    fireEvent.click(screen.getByRole('button',{name:'Weekly tournaments'}));
+    fireEvent.click(screen.getByRole('button',{name:/^Weekly tournaments/}));
     expect(screen.getByRole('status')).toHaveTextContent('/tourhub|null');
     fireEvent.click(screen.getByRole('button',{name:'Return'}));
     expect(screen.getByRole('status')).toHaveTextContent('/notificationmessages|null');
@@ -50,7 +51,7 @@ describe('FIX_TOUR_NOTIF_1',()=>{
   });
   it('keeps the title in flow and hides rather than clips when measured room is too small',async()=>{
     let resize:()=>void=()=>{};
-    vi.stubGlobal('ResizeObserver',class {constructor(cb:()=>void){resize=cb;}observe(){}disconnect(){}});
+    window.ResizeObserver=class {constructor(cb:()=>void){resize=cb;}observe(){}disconnect(){}} as unknown as typeof window.ResizeObserver;
     const {container}=render(<MemoryRouter><NewsChromeBridge label="Amateur News" mode="menu" backFallback="/amateur"/></MemoryRouter>);
     const slot=container.querySelector<HTMLElement>('[data-news-title-slot]');const text=container.querySelector<HTMLElement>('[data-news-bar-title]');
     if(!slot || !text) throw new Error('Missing title slot');

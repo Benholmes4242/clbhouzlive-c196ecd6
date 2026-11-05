@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_UNBLOCK_1
+- [x] Read authorisation; repair only missing-export failures, fix the two authorised new test fixtures, restore always-burger hub and handler comment without changing handler code.
+- [ ] Run the specified focused set, then four shards; reconcile inventory and list every fixture line; stop on any non-authorised failure (untouched flake requires 3/3 isolated passes).
+- [ ] Verify saved live-dot geometry, narrow News titles and authenticated Activity → Tour → back; name unavailable evidence.
+
 ## FIX_LIVE_DOT_1
 - [x] Confirmed live halo clipping at 1× and recorded baseline geometry; implemented fold-column compensation; TourGlance has no local clipping and stays unchanged.
 - [ ] STOP: 3 new halo tests passed; unchanged headerB1/islandSquircle have 12 missing-isGuestUser fixture failures. Full output kept; no failing tests edited. Four shards and after-edit geometry check await resolution. Report: FIX_LIVE_DOT_1_REPORT.md.

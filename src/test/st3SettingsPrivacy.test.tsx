@@ -26,7 +26,7 @@ vi.mock('@/hooks/useMyRequests', () => ({ useMyRequestsList: () => ({ data: [], 
 vi.mock('@/hooks/useInviteSheet', () => ({ useInviteSheet: () => ({ openInviteSheet: vi.fn() }) }));
 vi.mock('@/hooks/useDeleteAccount', () => ({ useDeleteAccount: () => ({ showDeleteConfirm: false, setShowDeleteConfirm: vi.fn(), showBusinessWarning: false, setShowBusinessWarning: vi.fn(), ownedBusinessNames: [], deleteConfirmText: '', setDeleteConfirmText: vi.fn(), isDeleting: false, initiateDelete: vi.fn(), confirmDelete: vi.fn() }) }));
 vi.mock('@/hooks/useLogout', () => ({ useLogout: () => ({ logout: vi.fn() }) }));
-vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: null }) }));
+vi.mock('@/lib/whs/hooks', () => ({ useHandicapTrend: () => ({ data: undefined, isLoading: false, isPending: true, isFetched: false, isError: false, fetchStatus: 'idle' }), useWhsConnection: () => ({ data: null }) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: (...args: unknown[]) => h.track(...args) } }));
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 

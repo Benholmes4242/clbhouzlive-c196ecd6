@@ -14,7 +14,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: vi.fn() } }
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => null }));
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
-vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => false }));
+vi.mock('@/features/guest/useIsGuest', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/guest/useIsGuest')>()), useIsGuest: () => false }));
 import { ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
 import { resolveChrome, CHROME_REGISTRY } from '@/features/chrome-v2/registry';
 import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
