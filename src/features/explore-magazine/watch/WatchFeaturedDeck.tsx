@@ -21,6 +21,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 import { numberWord } from '@/lib/text/numbers';
 import { WatchLead } from './WatchLead';
 import { shortAge, toHubRow, type WatchVideoRow } from './watchMiddle';
@@ -48,6 +49,8 @@ export function WatchFeaturedSlot(props: SlotProps) {
 }
 
 const posterFor = (row: WatchFeaturedRow) => row.poster_url ?? (row.stream_id ? getThumbnailUrl({ streamId:row.stream_id, height:720 }) : null);
+// Captions share the Watch rows' mention path: stored markup never renders raw.
+const captionFor = (row: WatchFeaturedRow) => (row.caption ? stripMentionMarkup(String(row.caption)).trim() : '') || row.course_name || '';
 
 function FeaturedPlayback({ row }: { row: WatchFeaturedRow }) {
   const reduced = usePrefersReducedMotion();
