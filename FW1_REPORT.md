@@ -104,3 +104,14 @@ The 12 ws1WatchTop failures and ws2WatchMiddle "WS2 order on For you" were FW1-c
 - src/test/ws1WatchTop.test.tsx:55 (new line, after the useWatchLead mock; nothing → `vi.mock('@/features/explore-magazine/watch/useWatchFeatured', () => ({ useWatchFeatured: () => ({ data: [], error: null, isFetched: true, isError: false, isPending: false, isLoading: false }) }));`)
 - src/test/ws2WatchMiddle.test.tsx:39 (new line, after the WatchLead mock; same mock)
 No assertions or product code changed. Focused 108/108. Shards: 1,759 / 1,626 / 1,730 / 1,683 = 6,798 passed, 0 failed, 598 files. Reconciles: previous 6,785 passed + 13 failed = 6,798. Logs: docs/verification/fw1-fixtures/.
+
+## Close-out — 2026-11-05 07:4x
+1. Fixtures (authorised, test-only; no assertions changed): `src/test/ws1WatchTop.test.tsx` (line 55) and `src/test/ws2WatchMiddle.test.tsx` (line 39) mock `useWatchFeatured` as settled with `data: []`.
+2. Product fix: the lead did vanish — `WatchFeaturedSlot` returned only a skeleton while the featured read was pending. Now pending renders Featured's own skeleton (`data-featured-skeleton`) above the still-rendered `WatchLead`. Once settled, either the deck shows (≥ minimum rows) or the lead alone stays.
+   Rewritten test (new in FW1, `fw1FeaturedDeck.test.tsx:34`):
+   - old: 'holds the existing skeleton during loading' — `expect([data-watch-lead="skeleton"]).not.toBeNull(); expect(queryByTestId('legacy-lead')).toBeNull()`
+   - new: 'keeps the lead rendered while the featured read is pending, skeleton in its own slot' — `expect([data-featured-skeleton]).not.toBeNull(); expect(getByTestId('legacy-lead')).toBeTruthy()`
+   Why: the old assertion encoded the vanishing-lead bug.
+3. Shards (`--maxWorkers=2`): 1,759 / 1,626 / 1,730 / 1,683 = 6,798 passed, 0 failed, 598 files (unchanged count; one test rewritten in place). Build OK 07:39:43Z. Logs: docs/verification/fw1-close/.
+Browser (390×844, /amateur, anonymous session; member sign-in unavailable, `external_unmanaged`): Featured deck rendered with real rows — "FEATURED THIS WEEK / The week's best", 1 / 4, card with mention-free caption, like/comment/share bar, dots, hint line, Shorts below. Screenshot: /tmp/browser/fw1/guest.png. Not checked in browser: member like state, swipe motion, end card.
+Status: FW1 complete.
