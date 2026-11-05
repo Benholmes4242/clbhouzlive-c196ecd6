@@ -18,6 +18,8 @@ These are source-confirmed render paths, not claims that a particular live membe
 
 Whole-src production caller search found only `GolfClubView.tsx:332` rendering `CourseLegendsDrilldown`. No additional production entrypoint needs an opt-in Elsewhere preservation prop today. Elsewhere remains rendered at `CourseLegendsDrilldown.tsx:685–688`. Posted What it takes and Defence remain unchanged at `PostedChampions.tsx:115`.
 
+Independent read-only audit confirmed these cases. Actual Posted rendering also requires nonempty legends data (`CourseLegendsDrilldown.tsx:572–590`); the empty-reach case above assumes other visible categories remain, not an entirely empty legends response. The existing `GolfClubView.handleTabChange` at lines 186–203 changes tab/URL/analytics but does not itself scroll; any resumed link work must reconcile the brief's requested top scroll with that existing behaviour without silently altering the frozen You tab.
+
 ## Action needed
 
 Clarify whether the required parity applies only after successful You reads with nonempty reach rows, or authorise a change that provides the missing reach surface. The present brief freezes You; this task does not silently change its gating, invent rows, or weaken the prerequisite.
