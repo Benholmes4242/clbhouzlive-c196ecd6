@@ -17,6 +17,7 @@
 - **Chevrons**: `›` means navigation only. Expand/toggle/sheet controls use a different affordance.
 
 ## Memories
+- [Member-best wording](mem://constraints/member-best-wording.md) — Member scores are Best on clbhouz; genuine Tour and admin catalogue wording are exceptions.
 - [Signed-off post flow](mem://features/post-studio/post-flow-signed-off) — Shared live catalogue count, confirmed completion facts and exact post sheets/screens.
 - [Discover Course-Led](mem://features/discover/course-led-authority) — Two-tab Discover and featured Courses Played one-card rules
 - [Messaging System](mem://architecture/messaging/system-authority) — Styling for headers, bubbles, sheets, and DB rules

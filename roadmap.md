@@ -1,9 +1,9 @@
 # Roadmap
 
 ## RC3_WORDING
-- [ ] Finish the specified member-best defaults and English values without changing keys, behaviour or layout; preserve capitals through label CSS.
-- [ ] Reconcile the whole-src audit: blocked on Tour-event/catalogue-entry wording versus the permitted-match list; details and audit in RC3_WORDING_REPORT.md.
-- [ ] Update authorised old-copy assertions, add uncovered cases, run four fresh ordered shards with full output and report against 6,948 / 611.
+- [x] Member-best defaults and English values updated; keys/variables/logic unchanged. Featured labels retain existing uppercase CSS; unused moment/career keys have no mounted label to style.
+- [x] Audit complete with user-approved Tour/catalogue exceptions; every remaining match and old/new copy line listed in RC3_WORDING_REPORT.md.
+- [x] Focused 102/102; fresh ordered shards 1,819 / 1,670 / 1,762 / 1,722 = 6,973 / 613, zero failures/flakes. Delta +25/+2 from supplied 6,948/611 reconciles as existing RC2 +4/+1 and new RC3 +21/+1. Build OK; browser not claimed.
 
 ## SAR1
 - [x] SAR1_FIX_1: previous-row holding opts in only for StandoutRoundsShelf; heldFrameCB28 unchanged. One regression added; focused 100/100 and fresh ordered shards 1,808 / 1,656 / 1,751 / 1,722 = 6,937 / 610, zero failures or flakes. Close-out at top of SAR1_REPORT.md; full output retained.
