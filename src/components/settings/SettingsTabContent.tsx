@@ -7,7 +7,7 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { SettingsHandicapCard } from './SettingsHandicapCard';
-import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
+import { useMyProStatus } from '@/features/pro-verification/useMyProStatus';
 import { SettingsPrivacyCard } from './SettingsPrivacyCard';
 import { SettingsNotificationsCard } from './SettingsNotificationsCard';
 import { SettingsYourData } from './SettingsYourData';
@@ -53,6 +53,8 @@ const APP_VERSION = '1.0.0';
  * canonical setters; Profile alone edits handicap visibility. Request visibility
  * comes only from a settled, successful useMyRequestsList read, including errors
  * with stale data. Shared settings/ui remains unchanged for other consumers.
+ * Handicap-card mounting waits only for full pro status, never chip/trend
+ * settlement; SettingsHandicapCard owns connectionReady and figure readiness.
  */
 type SettingsProfileRow = {
   id?: string;
@@ -83,7 +85,7 @@ export function SettingsTabContent() {
   const profile = profileRaw as SettingsProfileRow;
   const { count } = useHasBusinesses(user?.id);
   const requests = useMyRequestsList();
-  const ownHandicap = useOwnHandicapState(user?.id);
+  const proStatus = useMyProStatus(user?.id);
   const { openInviteSheet } = useInviteSheet();
 
   useEffect(() => {
@@ -174,7 +176,7 @@ export function SettingsTabContent() {
     <>
       <div className="ep-settings">
         <div className="ep-group">Your handicap</div>
-        {ownHandicap.settled && <SettingsHandicapCard pro={ownHandicap.pro && ownHandicap.proKind ? {kind:ownHandicap.proKind} : null} userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
+        {!proStatus.unknown && <SettingsHandicapCard pro={proStatus.verified && proStatus.kind ? {kind:proStatus.kind} : null} userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
           profileError={!!profileError} egHandicapIndex={profile.eg_handicap_index} manualHandicapIndex={profile.manual_handicap_index}
           checked={!hideHandicapChip} updating={chipUpdating} onToggle={handleToggleHandicapChip} onManage={() => navigate('/manage/handicap')} />}
 

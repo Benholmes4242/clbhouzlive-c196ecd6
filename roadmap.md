@@ -1,9 +1,15 @@
 # Roadmap
 
+## Settings pro-only card readiness
+- [x] Replace Settings shared chip read with full pro status; preserve all card props and existing assertions; add one proStatusControls regression with pending trend.
+- [x] Focused 41/41 (ST2 22/22); shard 3 passes 1,750. Shard 4 stops with 1,702 pass / 21 failures in hb5ProfileBackName, islandsRound2, linkedHandicapProfile, linkedHandicapState. No further fixture additions or assertions changed; full output kept.
+- [ ] STOP: linkedHandicapProfile/linkedHandicapState have “No QueryClient set, use QueryClientProvider to set one”, outside A/B. Await explicit resolution; report retained, not deleted.
+- [x] Retained historical shard 1/2 evidence 1,753 / 1,653; full carried-forward scope 6,879 / 608 = requested 6,875 / 607 plus retained FIX_UNBLOCK_2 four cases/file. Build OK; PRO_STATUS_CONTROLS_REPORT.md contains exact errors.
+
 ## FIX_UNBLOCK_2
 - [x] Resolved island-only readiness scope; fixture field additions authorised without assertion changes. Added profile-owned verifiedKnown, island opt-in and four regression cases; other consumers retain full request waiting.
 - [x] Focused 102/102 passes; shards 1/2 pass 1,753 / 1,653; shard 3 has 1,739 pass / 11 pre-existing ST2 failures. Expected 6,878 / 608 (+4 new fixUnblock2 cases), build OK.
-- [ ] STOP: untouched st2SettingsHandicapCard fails 11/22 in first isolation, so cannot qualify for 3/3 flake exemption. Full logs in docs/verification/fix-unblock-2; no fixture changes to ST2. Shard 4 awaits blocker resolution.
+- [x] ST2 historical stop resolved by Settings pro-only product readiness; unchanged ST2 passes 22/22 and shard 3 passes. Shard 4 now blocked by the separate errors listed above.
 - [ ] Browser checks blocked by ordered suite stop: 1x live-dot geometry/condensation, narrow News labels, signed-in Activity navigation and amateur/Mason cold island. FIX_UNBLOCK_2_REPORT.md records exact errors and limits.
 
 ## Pro status standing fixture rule
