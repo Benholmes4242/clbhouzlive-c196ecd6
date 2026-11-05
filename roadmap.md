@@ -3,8 +3,8 @@
 ## FW1 — Featured this week
 - [x] Ben ruled 260ms advance during the 320ms exit, matching the mock.
 - [x] Implement session-stable featured read, three-row mount threshold and existing lead fallback; build signed-off deck with canonical playback/viewer/likes/comments/share.
-- [ ] Add specified gesture, mount, playback and action tests; run four shards with --maxWorkers=2; stop on any unexpected failure and retain full output.
-- [ ] Confirm clean build and report every touched file, named test changes and reconciled totals.
+- [ ] STOP: 26 new FW1 cases pass; focused integration has 12 failures in untouched ws1WatchTop.test.tsx (new Featured loading slot bypasses its lead-only fixture). Await authorization for fixture-only featured fallback mock; full output retained. Four shards not run.
+- [ ] STOP: src/test/fw1FeaturedRead.test.tsx(14,660) TS2339 staleTime on QueryOptions; latest build 2026-11-05T06:45:50Z is not clean. Report written in FW1_REPORT.md; full inventory expected 6,786 / 597, not executed.
 
 ## BRIEF 1 — Pro verification (request + review flow)
 Signed-off mock: build1-pro-verification-flow-signed-off.html (six tabs). Ben ran the SQL; no migrations, no SQL.
