@@ -55,7 +55,7 @@ vi.mock('@/features/explore-magazine/watch/useWatchBottom', () => ({
 }));
 vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutateAsync: f.toggle }) }));
 vi.mock('@/features/find-people/useRecentActivity', () => ({ useRecentActivity: () => new Map() }));
-vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span data-stub="avatar" /> }));
+vi.mock('@/components/ui/SquircleAvatar', async (orig) => ({ ...(await orig<typeof import('@/components/ui/SquircleAvatar')>()), SquircleAvatar: () => <span data-stub="avatar" /> }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: f.openWithOrigin }));
 vi.mock('@/components/explore-tab-new/courseled/mediaRailAutoplay', () => ({ registerRailVideo: () => () => {}, IN_VIEW_THRESHOLD: 0.6, MAX_PLAYING: 1 }));

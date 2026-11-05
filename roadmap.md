@@ -6,6 +6,9 @@
 - [ ] Ruling needed: synthetic 9:16 top0 conflicts with the explicit 90%-of-usableH formula (693.333 < 717.3 at 390×844/safeTop47/safeBottom0).
 
 ## Pro world ranking sync
+- [x] OWGR_UNBLOCK: Monday parser, undated no-merge, authorized entrypoint and three test repairs implemented. Event11624 has real dates/country and gross71/75/73, no par/venue/to-par.
+- [ ] STOP: focused84 pass/2 expRing1 failures at35:40 (unchanged rgba whitespace assertion). No repairs/deployment/Mason run/shards after failure. Exact output/ledger in OWGR_UNBLOCK_REPORT.md; FS_NOTCH_1 blockers untouched.
+- [ ] BLOCKED: gross rounds cannot populate to_par without par; venue absent. Hosted deployment/check and round-source resolution remain unverified.
 - [x] Add-on source verified: public events API returns Mason's 39 counting events; latest finishes T31/MC/MC. Six pure import-planning tests pass; no persistence claimed.
 - [ ] Add-on BLOCKED: response has week/year but no event start/end dates, ranking date or rounds; no dated event writes, merge execution, parser or deployed sync. See PRO_WORLD_EVENTS_REPORT.md.
 - [ ] BLOCKED: OWGR Mason page yields rank 1436 but no verified ranking-week date or season history; parser/sync not created or deployed rather than inventing dates.

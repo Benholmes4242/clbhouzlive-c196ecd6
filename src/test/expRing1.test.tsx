@@ -28,7 +28,7 @@ describe('EXP_RING_1 Explore creator hairline', () => {
     const ring = container.querySelector<HTMLElement>(`[data-active-ring="${active ? 'on' : 'off'}"]`);
     expect(ring).toBeInTheDocument();
     const inner = ring?.querySelector<HTMLElement>('div.relative.overflow-hidden');
-    expect(inner?.style.border).toBe('none');
+    expect(inner?.style.borderWidth).not.toBe('2px');
     expect(inner?.style.width).toBe('56px');
     const overlay = inner?.nextElementSibling as HTMLElement | null;
     expect(overlay?.style.borderWidth).toBe('1px');

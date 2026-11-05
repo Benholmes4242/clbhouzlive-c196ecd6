@@ -8,6 +8,15 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
+const glanceShellSpy = vi.hoisted(() => vi.fn());
+vi.mock('@/features/chrome-v2/GlanceShell', async importOriginal => {
+  const actual = await importOriginal<typeof import('@/features/chrome-v2/GlanceShell')>();
+  return { ...actual, GlanceShell: (props: React.ComponentProps<typeof actual.GlanceShell>) => {
+    glanceShellSpy(props);
+    return <actual.GlanceShell {...props} />;
+  } };
+});
+
 vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? _k }),
@@ -51,7 +60,7 @@ vi.mock('@/features/tourhub/context/TourSelectionContext', () => ({
 }));
 
 import { TourIsland } from '@/features/tourhub/components/TourIsland';
-import { TourGlance } from '@/features/chrome-v2/TourGlance';
+import { TourGlance, TOUR_GLANCE_CARD_WIDTH } from '@/features/chrome-v2/TourGlance';
 import { islandDescriptor, shortWeekday, singleTourCaption, allToursCaption, TOUR_DISPLAY } from '@/features/tourhub/components/tourIslandRules';
 import type { TourPickerRow } from '@/features/tourhub/hooks/useTourPickerRows';
 
@@ -232,7 +241,8 @@ describe('TourGlance', () => {
     expect(card.style.left).toBe('14px');
     expect(card.style.right).toBe('');
     expect(card.style.top).toBe('70px');
-    expect(card.style.width).toBe('min(346px, calc(100vw - 24px))');
+    expect(TOUR_GLANCE_CARD_WIDTH).toBe('min(346px, calc(100vw - 24px))');
+    expect(glanceShellSpy.mock.lastCall?.[0].cardStyle.width).toBe(TOUR_GLANCE_CARD_WIDTH);
     document.body.removeChild(left);
   });
 });

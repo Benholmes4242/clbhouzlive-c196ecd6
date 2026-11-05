@@ -10205,8 +10205,12 @@ export type Database = {
           id: string
           owgr_event_id: string | null
           owgr_points: number | null
+          owgr_rank_after: number | null
+          owgr_rank_before: number | null
+          owgr_week: number | null
+          owgr_year: number | null
           source: string
-          start_date: string
+          start_date: string | null
           tee_hole: number | null
           tee_time: string | null
           to_par: number | null
@@ -10224,8 +10228,12 @@ export type Database = {
           id?: string
           owgr_event_id?: string | null
           owgr_points?: number | null
+          owgr_rank_after?: number | null
+          owgr_rank_before?: number | null
+          owgr_week?: number | null
+          owgr_year?: number | null
           source?: string
-          start_date: string
+          start_date?: string | null
           tee_hole?: number | null
           tee_time?: string | null
           to_par?: number | null
@@ -10243,8 +10251,12 @@ export type Database = {
           id?: string
           owgr_event_id?: string | null
           owgr_points?: number | null
+          owgr_rank_after?: number | null
+          owgr_rank_before?: number | null
+          owgr_week?: number | null
+          owgr_year?: number | null
           source?: string
-          start_date?: string
+          start_date?: string | null
           tee_hole?: number | null
           tee_time?: string | null
           to_par?: number | null

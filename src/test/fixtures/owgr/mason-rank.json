@@ -1,0 +1,38 @@
+{
+  "props": {
+    "pageProps": {
+      "playerProfileData": {
+        "playerProfileData": {
+          "playerImageURL": "",
+          "currentOWGRRank": 1436,
+          "bestOWGRRank": 1354,
+          "lastOWGRRank": 1436,
+          "pointsAverage": 0.0367,
+          "pointsTotal": 1.4686023561587804,
+          "divisorActual": 39,
+          "divisorApplied": 40,
+          "player": {
+            "id": 31930,
+            "firstName": "Mason",
+            "lastName": "Essam",
+            "fullName": "Mason Essam",
+            "birthDate": "1999-08-09T00:00:00",
+            "gender": "M",
+            "isAmateur": false,
+            "country": {
+              "id": 253,
+              "name": "England",
+              "iocCode": "ENG",
+              "code2": "",
+              "code3": "ENG",
+              "region": null
+            }
+          }
+        },
+        "error": {
+          "isEmpty": true
+        }
+      }
+    }
+  }
+}
