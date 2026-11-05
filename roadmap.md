@@ -6,6 +6,8 @@
 - [ ] Ruling needed: synthetic 9:16 top0 conflicts with the explicit 90%-of-usableH formula (693.333 < 717.3 at 390×844/safeTop47/safeBottom0).
 
 ## Pro world ranking sync
+- [ ] OWGR_UNBLOCK: apply Monday-only rank dates, optional undated imports and event-detail research; implement/deploy authorized sync and real Mason check if access available.
+- [ ] Apply exactly three authorized Tour/Explore test repairs; focused then four shards, stop on any other failure (FS_NOTCH_1 blockers remain untouched).
 - [x] Add-on source verified: public events API returns Mason's 39 counting events; latest finishes T31/MC/MC. Six pure import-planning tests pass; no persistence claimed.
 - [ ] Add-on BLOCKED: response has week/year but no event start/end dates, ranking date or rounds; no dated event writes, merge execution, parser or deployed sync. See PRO_WORLD_EVENTS_REPORT.md.
 - [ ] BLOCKED: OWGR Mason page yields rank 1436 but no verified ranking-week date or season history; parser/sync not created or deployed rather than inventing dates.

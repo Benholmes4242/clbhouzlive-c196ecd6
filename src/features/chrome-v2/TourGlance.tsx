@@ -31,6 +31,7 @@ const MUTE = 'var(--tour-menu-mute)';
 const DIM = 'var(--tour-menu-dim)';
 const GREEN = 'var(--tour-menu-live)';
 const RULE = 'var(--tour-menu-hair)';
+export const TOUR_GLANCE_CARD_WIDTH = 'min(346px, calc(100vw - 24px))';
 
 /** destination id → tile icon; labels resolve from the existing nav.* strings. */
 const SECTIONS: { id: string; labelKey: string; icon: TourIconName }[] = [
@@ -90,7 +91,7 @@ export function TourGlance({ onClose, anchorRef, activeTab, onSelectTab, section
   };
 
   return (
-    <GlanceShell onClose={onClose} anchorRef={anchorRef} label="Tour menu" align="left" cardStyle={{ width: 'min(346px, calc(100vw - 24px))', padding: 14 }}>
+    <GlanceShell onClose={onClose} anchorRef={anchorRef} label="Tour menu" align="left" cardStyle={{ width: TOUR_GLANCE_CARD_WIDTH, padding: 14 }}>
       {/* Sections */}
       <div data-testid="tour-glance-sections" className="tour-menu-sections" style={{ gridTemplateColumns: `repeat(${sections.length}, 1fr)` }}>
         {sections.map(s => {
