@@ -92,11 +92,13 @@ interface Props {
   /** FIX_PROFILE_COMPARE_1: form tiles open the round sheet over the profile. */
   onOpenRound?: (scoreId: string) => void;
   example?: boolean;
+  /** HH3: optional node between the index chart and Form · last five. */
+  afterChart?: React.ReactNode;
 }
 export const HeroHandicapDisplay: React.FC<Props> = ({
   t, shownIndex, deltaLines, slot, verdict, series, chartColor, chartFillTop,
   axisWindow, windowDays, bars, byId, countingKnown, countingN, loweredN,
-  tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false,
+  tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false, afterChart,
 }) => {
   return (
           <div style={{ marginTop: 14 }}>
@@ -154,6 +156,8 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                 }}
               />
             )}
+
+            {afterChart}
 
             {bars.length > 0 && (
               <>

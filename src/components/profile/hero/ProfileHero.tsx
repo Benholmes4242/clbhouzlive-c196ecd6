@@ -36,6 +36,7 @@ import { ProfileCoverBand } from './ProfileCoverBand';
 import { HeroHandicapDisplay } from './HeroHandicapDisplay';
 import { HeroConnectExample } from './HeroConnectExample';
 import { LinkedHandicapNotice } from './LinkedHandicapNotice';
+import { HeadToHeadEntryRow } from '@/components/profile/handicap/whs/sections/compare/HeadToHeadEntryRow';
 
 const GREEN = INDEX_DELTA.dark.improved;
 const RED = INDEX_DELTA.dark.drifted;
@@ -97,6 +98,8 @@ interface Props {
   onEdit?: () => void;
   /** Own profile, not connected: the WHS connect flow. */
   onConnect?: () => void;
+  /** HH3: page-owned eligibility (another member's profile, signed-in non-guest viewer). */
+  showCompareEntry?: boolean;
 }
 
 function formatIndex(v: number): string {
@@ -183,6 +186,7 @@ export const ProfileHero: React.FC<Props> = ({
   onEdit,
   onConnect,
   actionsRow,
+  showCompareEntry = false,
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
@@ -451,6 +455,15 @@ export const ProfileHero: React.FC<Props> = ({
             bars={bars} byId={byId} countingKnown={countingKnown} countingN={countingN}
             loweredN={loweredN} tilesWord={tilesWord} isSelf={isSelf}
             ownerFirstName={ownerFirstName} onStatTap={onStatTap} tap={tap} onOpenRound={onOpenRound}
+            afterChart={showCompareEntry && !isSelf && viewerUserId ? (
+              <HeadToHeadEntryRow
+                viewerUserId={viewerUserId}
+                memberUserId={userId}
+                memberFirstName={ownerFirstName || displayName.split(' ')[0] || displayName}
+                viewerIndex={viewerChip.connected ? viewerChip.trend?.current ?? null : null}
+                memberIndex={shownIndex}
+              />
+            ) : undefined}
           />
         )}
 
