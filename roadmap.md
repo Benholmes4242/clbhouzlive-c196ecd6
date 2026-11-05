@@ -1,5 +1,10 @@
 # Roadmap
 
+## RC3_WORDING
+- [ ] Finish the specified member-best defaults and English values without changing keys, behaviour or layout; preserve capitals through label CSS.
+- [ ] Reconcile the whole-src audit with additional unlisted matches and protected areas; list every remaining match.
+- [ ] Update authorised old-copy assertions, add uncovered cases, run four fresh ordered shards with full output and report against 6,948 / 611.
+
 ## SAR1
 - [x] SAR1_FIX_1: previous-row holding opts in only for StandoutRoundsShelf; heldFrameCB28 unchanged. One regression added; focused 100/100 and fresh ordered shards 1,808 / 1,656 / 1,751 / 1,722 = 6,937 / 610, zero failures or flakes. Close-out at top of SAR1_REPORT.md; full output retained.
 - [x] Added Standout rail, parallel scopes/persistence, typed feats and one hole hook batch; retired Rounds navigation without deleting pages. Authorized four-case assertion ledger in SAR1_REPORT.md.
