@@ -10167,7 +10167,8 @@ export type Database = {
           posted_at: string
           round_no: number
           source: string
-          to_par: number
+          strokes: number | null
+          to_par: number | null
         }
         Insert: {
           event_id: string
@@ -10175,7 +10176,8 @@ export type Database = {
           posted_at?: string
           round_no: number
           source?: string
-          to_par: number
+          strokes?: number | null
+          to_par?: number | null
         }
         Update: {
           event_id?: string
@@ -10183,7 +10185,8 @@ export type Database = {
           posted_at?: string
           round_no?: number
           source?: string
-          to_par?: number
+          strokes?: number | null
+          to_par?: number | null
         }
         Relationships: [
           {
@@ -10209,11 +10212,13 @@ export type Database = {
           owgr_rank_before: number | null
           owgr_week: number | null
           owgr_year: number | null
+          scheduled_rounds: number | null
           source: string
           start_date: string | null
           tee_hole: number | null
           tee_time: string | null
           to_par: number | null
+          total_strokes: number | null
           tour_name: string | null
           updated_at: string
           user_id: string
@@ -10232,11 +10237,13 @@ export type Database = {
           owgr_rank_before?: number | null
           owgr_week?: number | null
           owgr_year?: number | null
+          scheduled_rounds?: number | null
           source?: string
           start_date?: string | null
           tee_hole?: number | null
           tee_time?: string | null
           to_par?: number | null
+          total_strokes?: number | null
           tour_name?: string | null
           updated_at?: string
           user_id: string
@@ -10255,11 +10262,13 @@ export type Database = {
           owgr_rank_before?: number | null
           owgr_week?: number | null
           owgr_year?: number | null
+          scheduled_rounds?: number | null
           source?: string
           start_date?: string | null
           tee_hole?: number | null
           tee_time?: string | null
           to_par?: number | null
+          total_strokes?: number | null
           tour_name?: string | null
           updated_at?: string
           user_id?: string
