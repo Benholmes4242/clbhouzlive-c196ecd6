@@ -3,8 +3,9 @@
 ## FIX_UNBLOCK_4
 - [x] Read uploaded brief; four known files already have the exact settled non-pro fixture including verifiedKnown from the preceding authorised continuation. No new fixture or product edits required initially.
 - [x] Known-four 36/36 and dependencies 67/67; all four fresh shards passed in order: 1,753 / 1,653 / 1,750 / 1,723 = 6,879 / 608, unchanged. Output in docs/verification/fix-unblock-4; no fixture edits or flakes.
-- [ ] STOP: browser startup fails with module MIME application/json error and ERR_INSUFFICIENT_RESOURCES; /tourhub and News show App couldn't start (index.html:169). All four browser checks remain unverified; signed-in checks also lack managed access (external_unmanaged). Exact errors/screenshots recorded in FIX_UNBLOCK_4_REPORT.md.
-- [ ] Combined close-out and superseded STOP-report deletion blocked until all four browser checks pass; reports retained.
+- [x] Ben accepted suite/build evidence; headless startup errors are sandbox environment faults, not product faults. Combined summary recorded at top of FIX_UNBLOCK_4_REPORT.md: suite green; device checks with Ben. Earlier STOP entries below are historical and superseded for these briefs.
+- [x] Deleted exactly the five authorised superseded STOP reports; test logs retained. No code, fixture, test, SQL, migration or edge-function changes.
+- [ ] Ben to perform four device checks: live-dot geometry/condensation, News at 320/430, authenticated Activity/back, and non-pro/Mason cold islands; unavailable in sandbox and not claimed verified.
 
 ## Pro status controls — last four fixtures
 - [x] Add exactly the authorised current rule B line after the last mock in linkedHandicapState, linkedHandicapProfile, islandsRound2 and hb5ProfileBackName; no assertions, names or values changed.
