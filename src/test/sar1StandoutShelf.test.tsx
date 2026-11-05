@@ -72,7 +72,7 @@ function Wrapper({ children }: { children:React.ReactNode }) {
   return <QueryClientProvider client={new QueryClient({ defaultOptions:{ queries:{ retry:false } } })}><I18nextProvider i18n={i18n}>{children}</I18nextProvider></QueryClientProvider>;
 }
 const mount = (props:Partial<React.ComponentProps<typeof StandoutRoundsShelf>> = {}) => render(<Wrapper><StandoutRoundsShelf userId="me" {...props} /></Wrapper>);
-const selected = (label:string) => expect(screen.getByRole('button', { name:label, exact:true })).toHaveAttribute('aria-pressed', 'true');
+const selected = (label:string) => expect(screen.getByRole('button', { name:label })).toHaveAttribute('aria-pressed', 'true');
 beforeEach(() => {
   vi.clearAllMocks(); localStorage.clear(); h.error=false; h.pending=false; h.scopeFetched=true;
   h.geography={ county:'Kent', nation:'England', country:'Scotland' };
@@ -126,7 +126,7 @@ describe('SAR1 rail and scorecard doors', () => {
   it('unknown hole shapes keep the strip block without inventing holes', () => { const { container }=mount(); expect(container.querySelector('[data-standout-strip]')).toBeInTheDocument(); expect(container.querySelectorAll('[data-hole]')).toHaveLength(0); });
   it('a viewer without a handicap opens any round scorecard directly', () => { const open=vi.fn(); const { container }=mount({ onOpenRound:open }); const card=container.querySelector('[data-score-id="k0"]'); if (!card) throw new Error('round missing'); fireEvent.click(card); expect(open).toHaveBeenCalledWith('k0','u-k0'); });
   it('feat tile opens its latest scorecard directly', () => { h.pools.Kent.feats=[feat('f')]; const open=vi.fn(); const { container }=mount({ onOpenRound:open }); const card=container.querySelector('[data-score-id="f"]'); if (!card) throw new Error('feat missing'); fireEvent.click(card); expect(open).toHaveBeenCalledWith('f','u-f'); });
-  it('member name taps open member without opening scorecard', () => { const open=vi.fn(); const member=vi.fn(); mount({ onOpenRound:open,onOpenMember:member }); fireEvent.click(screen.getByRole('button',{ name:'Player k0',exact:true })); expect(member).toHaveBeenCalledWith('u-k0'); expect(open).not.toHaveBeenCalled(); });
+  it('member name taps open member without opening scorecard', () => { const open=vi.fn(); const member=vi.fn(); mount({ onOpenRound:open,onOpenMember:member }); fireEvent.click(screen.getByRole('button',{ name:'Player k0' })); expect(member).toHaveBeenCalledWith('u-k0'); expect(open).not.toHaveBeenCalled(); });
   it('batches round and feat score ids in one hole-shapes hook call', () => { h.pools.Kent.feats=[feat('f')]; mount(); expect(h.holes).toHaveBeenCalledTimes(1); expect(h.holes).toHaveBeenCalledWith(['k0','k1','k2','k3','f']); });
 });
 describe('SAR1 feats and states', () => {
