@@ -36,6 +36,7 @@ vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({
 vi.mock('@/components/explore-tab-new/courseled/MomentTile', () => ({ MomentTile: () => <div /> }));
 vi.mock('@/features/explore-magazine/watch/CreatorsRow', () => ({ CreatorsRow: () => null }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => <div data-stub="lead" /> }));
+vi.mock('@/features/explore-magazine/watch/useWatchFeatured', () => ({ useWatchFeatured: () => ({ data: [], error: null, isFetched: true, isError: false, isPending: false, isLoading: false }) }));
 vi.mock('@/features/explore-magazine/watch/RoundsThisWeekShelf', () => ({ RoundsThisWeekShelf: () => <div data-stub="rounds" /> }));
 vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useCourseVideos: () => f.courseVideos,

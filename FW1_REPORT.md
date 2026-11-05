@@ -99,3 +99,8 @@ Existing tests rewritten, renamed or deleted: **none**. The brief explicitly req
 No SQL, migration, migration file, deployed RPC/edge-function edit, feed_config, round_pool_cap, native/Median configuration, guest-browsing implementation, review wizard, News or round-plot change. The existing `get_watch_featured` contract was already in generated types. Featured's response lacks an actor-specific liked flag, so its current-card action resolves that through the existing `viewer_liked_post` RPC before permitting a toggle; failures do not assume an unliked state. Engagement uses the shared cache patch registry, preserving order.
 
 Authenticated end-to-end checks are unavailable (`external_unmanaged`), and no browser check was attempted after the stop. The exiting top card is currently removed at handover; its remaining 60ms animation continuity has not been visually verified. No sign-off claimed.
+## Fixture fix (authorised, test-setup only) — 2026-11-05
+The 12 ws1WatchTop failures and ws2WatchMiddle "WS2 order on For you" were FW1-caused (fixtures did not answer the featured read), not pre-existing. Now fixed.
+- src/test/ws1WatchTop.test.tsx:55 (new line, after the useWatchLead mock; nothing → `vi.mock('@/features/explore-magazine/watch/useWatchFeatured', () => ({ useWatchFeatured: () => ({ data: [], error: null, isFetched: true, isError: false, isPending: false, isLoading: false }) }));`)
+- src/test/ws2WatchMiddle.test.tsx:39 (new line, after the WatchLead mock; same mock)
+No assertions or product code changed. Focused 108/108. Shards: 1,759 / 1,626 / 1,730 / 1,683 = 6,798 passed, 0 failed, 598 files. Reconciles: previous 6,785 passed + 13 failed = 6,798. Logs: docs/verification/fw1-fixtures/.
