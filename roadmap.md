@@ -3,8 +3,8 @@
 ## CH1 — Champions tidy
 - [x] Prerequisite audited: posted eligibility does not guarantee You reach; independent failed reads and empty reach rows suppress it. Source evidence in CH1_REPORT.md; no product/test edits.
 - [x] Ben chose Successful reads only: proceed and accept absent reach after errors/empty rows; You stays frozen.
-- [ ] If prerequisite passes, remove posted What it takes and course-only Elsewhere; retain Defence and other states; add the posted You-tab link through the existing handler and analytics.
-- [ ] Add requested coverage, name each authorised assertion change, run four fresh ordered shards against 6,973 / 613, and retain full output.
+- [x] Scoped product edit implemented: posted What it takes removed, Defence retained, course-only Elsewhere suppressed, posted link calls existing handler/analytics and resets actual scroll owner; You/Field/Projected untouched.
+- [ ] STOP: new ch1ChampionsTidy.test.tsx:78:66 fails `expected null not to be null` because direct fixture lacks field props; harness TS2739 at (50,92) lacks CourseSelection fields. No failures repaired/rerun. Focused 54 pass/1 fail; full output retained in docs/verification/ch1. Await exact fixture authorisation before four shards/browser; expected inventory 6,980/614 (+7/+1), not executed full.
 
 ## RC3_WORDING
 - [x] Member-best defaults and English values updated; keys/variables/logic unchanged. Featured labels retain existing uppercase CSS; unused moment/career keys have no mounted label to style.
