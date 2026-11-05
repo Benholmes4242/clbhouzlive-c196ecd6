@@ -36,6 +36,15 @@
 }
 
 :root {
+  --connect-seat-ink: #F8FAFC;
+  --connect-seat-mute: rgba(248,250,252,0.62);
+  --connect-seat-dim: rgba(248,250,252,0.42);
+  --connect-seat-line: rgba(255,255,255,0.08);
+  --connect-seat-hair: rgba(255,255,255,0.10);
+  --connect-seat-avatar: #26262c;
+  --connect-seat-amber: #F7931E;
+  --connect-seat-you: rgba(247,147,30,0.07);
+  --connect-seat-you-line: rgba(247,147,30,0.18);
   --standout-card: #17171B;
   --standout-ink: #F8FAFC;
   --standout-mute: rgba(248,250,252,0.62);
