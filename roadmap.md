@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Pro world ranking sync
+- [ ] Add-on: inspect OWGR events/rounds; import counting events, merge unlinked pro rows within 3 days in place preserving own rounds, skip events for Sportradar-linked pros; source evidence/tests/report required.
 - [ ] BLOCKED: OWGR Mason page yields rank 1436 but no verified ranking-week date or season history; parser/sync not created or deployed rather than inventing dates.
 - [x] Shared admin world-ranking row on verified tour pros and approved requests; Save/Check now/error coverage 4/4, related focused set 54/54.
 - [ ] STOP: fresh shard 1 1,843 passed/1 pre-existing tourIsland failure (:235:30); shards 2–4 and authenticated browser not run. Report PRO_WORLD_RANK_REPORT.md; no SQL/schedule creation.
