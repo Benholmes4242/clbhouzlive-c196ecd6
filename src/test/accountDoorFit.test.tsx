@@ -37,8 +37,10 @@ describe('account door small-phone fit', () => {
   });
   it('doors container queries shrink gap and label to 12px at 300px and below', () => {
     const css = readFileSync('src/features/chrome-v2/account-glance.css', 'utf8');
-    expect(css).toContain('.account-doors { display: flex; margin-top: 12px; gap: 8px; container-type: inline-size; }');
-    const block = css.match(/@container \(max-width: 300px\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
+    expect(css).toContain('.account-doors { display: flex; margin-top: 12px; gap: 8px; }');
+    expect(css).not.toContain('container-type');
+    expect(css).not.toContain('@container');
+    const block = css.match(/@media \(max-width: 360px\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(block).toContain('.account-glance button.account-door { gap: 8px; }');
     expect(block).toContain('.account-door-label { font-size: 12px; }');
   });
