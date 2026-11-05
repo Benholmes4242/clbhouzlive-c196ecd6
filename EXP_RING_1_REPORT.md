@@ -1,5 +1,8 @@
 # EXP_RING_1 — STOP
 
+## Type-only follow-up
+Corrected expRing1.test.tsx's DOM query type to HTMLElement and replaced unsupported `replaceAll(',', ', ')` with equivalent `split(',').join(', ')`. Expected values, case names and runtime assertions are unchanged, including the failing border assertion; no mock fix or product edit. Inventory remains expected 7,027 / 621, full suite unverified. Earlier test STOP remains in force.
+
 Explore's sole default-2px caller was changed in CreatorSpotlight.tsx:15 (DARK_HAIRLINE import), :148 (business inset), :152 (hairlineRing + DARK_HAIRLINE); local ownership comment added at :9. Size 56, ActiveRing and ActiveAvatarDoor are unchanged. User resolved the brief's 0.5px/actual component discrepancy in favour of matching Tour's **1px traced personal/photo ring**. Business initials keep the specifically requested 0.5px inset using DARK_HAIRLINE. Shared avatar defaults and all Tour files are untouched.
 
 ## Stop evidence

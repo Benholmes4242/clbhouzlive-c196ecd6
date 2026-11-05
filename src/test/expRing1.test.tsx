@@ -25,14 +25,14 @@ describe('EXP_RING_1 Explore creator hairline', () => {
   it.each([false, true])('uses the Tour-matching traced hairline without a 2px avatar border active=%s', active => {
     st.active = active;
     const { container } = mount();
-    const ring = container.querySelector(`[data-active-ring="${active ? 'on' : 'off'}"]`);
+    const ring = container.querySelector<HTMLElement>(`[data-active-ring="${active ? 'on' : 'off'}"]`);
     expect(ring).toBeInTheDocument();
     const inner = ring?.querySelector<HTMLElement>('div.relative.overflow-hidden');
     expect(inner?.style.border).toBe('none');
     expect(inner?.style.width).toBe('56px');
     const overlay = inner?.nextElementSibling as HTMLElement | null;
     expect(overlay?.style.borderWidth).toBe('1px');
-    expect(overlay?.style.borderColor).toBe(DARK_HAIRLINE.replaceAll(',', ', '));
+    expect(overlay?.style.borderColor).toBe(DARK_HAIRLINE.split(',').join(', '));
     expect(overlay?.style.borderRadius).toBe('34%');
     if (active) {
       expect(ring?.querySelector('[data-active-ring-gap]')).toContainElement(inner ?? null);
