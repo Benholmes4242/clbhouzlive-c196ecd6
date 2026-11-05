@@ -25,7 +25,7 @@ export interface StandoutRound {
   delta: number | null;
 }
 
-export function standoutRpcArgs(viewerId: string | undefined, f: BoardFilters) {
+export function standoutRpcArgs(viewerId: string | undefined, f: BoardFilters, limit = 4) {
   return {
     p_viewer: viewerId ?? null,
     p_scope: f.scope,
@@ -36,20 +36,30 @@ export function standoutRpcArgs(viewerId: string | undefined, f: BoardFilters) {
     p_course_id: f.courseId,
     p_band: f.band,
     p_competition: f.competition,
-    p_limit: 4,
+    p_limit: limit,
   };
 }
 
-export function useStandoutRounds(viewerId: string | undefined, filters: BoardFilters, enabled = true) {
-  const args = standoutRpcArgs(viewerId, filters);
+export function useStandoutRounds(viewerId: string | undefined, filters: BoardFilters, enabled = true, limit = 4) {
+  const args = standoutRpcArgs(viewerId, filters, limit);
   return useQuery<StandoutRound[]>({
     queryKey: ['discover', 'standout-rounds', args],
     enabled,
     staleTime: 60_000,
+    placeholderData: (previous) => previous,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_standout_rounds' as never, args as never);
+      const { data, error } = await (supabase.rpc as any)('get_standout_rounds', args);
       if (error) throw error;
-      return (data ?? []) as unknown as StandoutRound[];
+      return ((data ?? []) as StandoutRound[]).map((row) => ({
+        ...row, pos: Number(row.pos), prior_n: Number(row.prior_n),
+        gross_score: row.gross_score == null ? null : Number(row.gross_score),
+        course_par: row.course_par == null ? null : Number(row.course_par),
+        net_score: row.net_score == null ? null : Number(row.net_score),
+        course_handicap: row.course_handicap == null ? null : Number(row.course_handicap),
+        avg_topar: row.avg_topar == null ? null : Number(row.avg_topar),
+        best_topar: row.best_topar == null ? null : Number(row.best_topar),
+        delta: row.delta == null ? null : Number(row.delta),
+      }));
     },
   });
 }

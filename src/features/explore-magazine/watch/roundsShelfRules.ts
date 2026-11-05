@@ -5,8 +5,8 @@ import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks
  * RECENT ROUNDS SHELF — the pure rules (RR1).
  *
  * The shelf reads get_recent_rounds ('circle' / '14', ten a page) and shows
- * every round newest first; feats no longer appear here (they stay on the
- * /rounds page). Everything here is pure: no hooks, no locale, no DOM.
+ * every round newest first; feats live in Explore's Standout rounds shelf.
+ * Everything here is pure: no hooks, no locale, no DOM.
  */
 
 /** Calendar-day arithmetic, independent of daylight-saving transitions. */
