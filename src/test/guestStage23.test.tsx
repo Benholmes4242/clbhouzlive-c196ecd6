@@ -49,7 +49,7 @@ function makeScroller(scrollHeight: number, clientHeight: number) {
 const scrollTo = (el: HTMLElement, top: number) => act(() => { el.scrollTop = top; el.dispatchEvent(new Event('scroll')); });
 
 beforeEach(() => { resetGuestGateState(); __resetScrollerCache(); h.failed.mockClear(); h.signOut.mockClear(); h.resolve = null; __resetGuestSignIn(); });
-afterEach(() => { cleanup(); document.body.innerHTML = ''; vi.useRealTimers(); });
+afterEach(() => { cleanup(); document.body.innerHTML = ''; vi.useRealTimers(); window.sessionStorage.removeItem('clbhouz_preview_guest'); window.history.replaceState(null, '', '/'); });
 
 describe('Stage 2.3 §1 — the scroller cache', () => {
   it('the first call while #root has overflow-y hidden still returns #root, and so does a call after unlock', () => {
@@ -101,6 +101,7 @@ describe('Stage 2.3 §2 — course sheets share the course look', () => {
 describe('Stage 2.3 §3 — the hold cannot hang', () => {
   const mount = () => render(<MemoryRouter initialEntries={['/courses']}><GuestSessionHold><p>page</p></GuestSessionHold></MemoryRouter>);
   it('stops holding after 8 seconds and tracks guest_session_failed timeout', () => {
+    window.history.replaceState(null, '', '/?guest=1');
     vi.useFakeTimers();
     const { container, queryByText } = mount();
     expect(container.querySelector('[data-guest-session-hold]')).not.toBeNull();
@@ -111,6 +112,7 @@ describe('Stage 2.3 §3 — the hold cannot hang', () => {
     expect(queryByText('page')).not.toBeNull();
   });
   it('a late success after the timeout is signed out again', async () => {
+    window.history.replaceState(null, '', '/?guest=1');
     vi.useFakeTimers();
     mount();
     act(() => { vi.advanceTimersByTime(GUEST_SIGN_IN_TIMEOUT_MS); });

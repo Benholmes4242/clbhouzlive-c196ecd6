@@ -43,9 +43,13 @@ describe('Stage 3 switch and preview', () => {
     expect(actual.GUEST_BROWSING_ENABLED).toBe(false);
   });
   it('bootstraps a preview guest once', async () => {
+    // Preview guest creation now requires an explicit per-tab opt-in.
+    window.history.replaceState(null, '', '/?guest=1');
     renderHook(() => useGuestSessionBootstrap({ envStatus: 'preview', authLoading: false, hasUser: false }));
     await waitFor(() => expect(h.anon).toHaveBeenCalledTimes(1));
     expect(signedOutOutcome({ enabled: true, envStatus: 'preview', guestAttempt: 'pending', stored: false })).toBe('hold');
+    window.sessionStorage.removeItem('clbhouz_preview_guest');
+    window.history.replaceState(null, '', '/');
   });
   it('never allows anonymous welcome or signup', () => {
     expect(isGuestAllowedPath('/welcome')).toBe(false); expect(isGuestAllowedPath('/signup')).toBe(false);

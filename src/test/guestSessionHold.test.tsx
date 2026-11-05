@@ -1,6 +1,6 @@
 /**
  * Stage 2.2 addendum — no request leaves before the guest session exists.
- * The app-level hold renders no route (so nothing fetches) on a preview cold
+ * The app-level hold renders no route (so nothing fetches) on an opted-in preview cold
  * start until signInAnonymously resolves; one sign-in however many holds ask.
  */
 import React from 'react';
@@ -36,8 +36,8 @@ import { guestHoldActive, __resetGuestSignIn } from '@/features/guest/guestSessi
 function Fetcher() { React.useEffect(() => { h.fetchSpy(h.state.user?.is_anonymous ?? 'no-session'); }, []); return <p>page</p>; }
 const mount = (path: string) => render(<MemoryRouter initialEntries={[path]}><GuestSessionHold><Fetcher /></GuestSessionHold></MemoryRouter>);
 
-beforeEach(() => { __resetGuestSignIn(); h.state = { user: null, loading: false }; h.signIn.mockClear(); h.fetchSpy.mockClear(); });
-afterEach(cleanup);
+beforeEach(() => { window.history.replaceState(null, '', '/?guest=1'); __resetGuestSignIn(); h.state = { user: null, loading: false }; h.signIn.mockClear(); h.fetchSpy.mockClear(); });
+afterEach(() => { cleanup(); window.sessionStorage.removeItem('clbhouz_preview_guest'); window.history.replaceState(null, '', '/'); });
 
 describe('GuestSessionHold', () => {
   it('a cold deep link to /courses mounts nothing until the guest session exists', async () => {
