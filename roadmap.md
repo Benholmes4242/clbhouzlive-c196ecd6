@@ -2,7 +2,7 @@
 
 ## RC3_WORDING
 - [ ] Finish the specified member-best defaults and English values without changing keys, behaviour or layout; preserve capitals through label CSS.
-- [ ] Reconcile the whole-src audit with additional unlisted matches and protected areas; list every remaining match.
+- [ ] Reconcile the whole-src audit: blocked on Tour-event/catalogue-entry wording versus the permitted-match list; details and audit in RC3_WORDING_REPORT.md.
 - [ ] Update authorised old-copy assertions, add uncovered cases, run four fresh ordered shards with full output and report against 6,948 / 611.
 
 ## SAR1
