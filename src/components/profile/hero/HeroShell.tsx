@@ -102,6 +102,7 @@ export interface HeroCounter {
   key: string;
   label: string;
   value: number | null;
+  displayValue?: React.ReactNode;
   /**
    * BRIEF_PROFILE_PASS_ONE §A — THREE STATES, NOT TWO.
    *  'ok'      figure renders; 0 is a real zero and renders as 0.
@@ -131,9 +132,10 @@ export interface HeroHeadline {
 export const HeroCell: React.FC<{
   label: string;
   value: number | null;
+  displayValue?: React.ReactNode;
   state?: 'ok' | 'loading' | 'error';
   onTap?: () => void;
-}> = ({ label, value, state = 'ok', onTap }) => {
+}> = ({ label, value, displayValue, state = 'ok', onTap }) => {
   const inert = !onTap || state === 'error';
   return (
     <button
@@ -171,7 +173,7 @@ export const HeroCell: React.FC<{
       >
         {/* §A — the error branch renders an EMPTY figure line: the label still
             reads, the cell keeps its height, and no number is claimed. */}
-        {state === 'error' ? '\u00A0' : value == null ? '\u2014' : formatNumber(value)}
+        {state === 'error' ? '\u00A0' : displayValue ?? (value == null ? '\u2014' : formatNumber(value))}
       </div>
       <div
         style={{
@@ -489,7 +491,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
           }}
         >
           {counters.map((c) => (
-            <HeroCell key={c.key} label={c.label} value={c.value} state={c.state} onTap={c.onTap} />
+            <HeroCell key={c.key} label={c.label} value={c.value} displayValue={c.displayValue} state={c.state} onTap={c.onTap} />
           ))}
         </div>}
         {footer}
