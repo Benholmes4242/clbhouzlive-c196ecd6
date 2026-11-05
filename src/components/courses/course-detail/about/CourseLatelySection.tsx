@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { RoundCard } from '@/features/explore-magazine/watch/RoundsThisWeekShelf';
 import { SHELF_CARD, SHELF_SKELETON } from '@/features/explore-magazine/watch/roundsShelfRules';
+import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import AboutSection, { GUTTER } from './AboutSection';
 import { useCourseLately } from './useCourseLately';
@@ -28,12 +28,10 @@ const TILE: React.CSSProperties = {
 const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefined }> = ({ courseId, userId }) => {
   const { t, i18n } = useTranslation('courses');
   const locale = i18n.language || 'en';
-  const navigate = useNavigate();
+  const opener = useScorecardOpener();
   const q = useCourseLately(courseId, userId);
   const rounds = useMemo(() => q.data?.pages.flat() ?? [], [q.data]);
   const shapes = useRoundHoleShapes(useMemo(() => rounds.map((r) => r.whs_score_id), [rounds]));
-  const [open, setOpen] = useState<{ scoreId: string; owner: string | null } | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
     if (q.isError) console.warn('[course lately] read failed; section hidden');
@@ -136,11 +134,8 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
               here
               inCircle={round.in_circle}
               own={round.user_id === userId}
-              onOpenRound={(scoreId, owner) => {
-                setOpen({ scoreId, owner });
-                setSheetOpen(true);
-              }}
-              onOpenMember={(id) => navigate(`/profile/${id}`)}
+              onOpenRound={(scoreId, owner) => opener.openByScore(scoreId, null, owner)}
+              onOpenMember={(id) => opener.openProfile(id)}
             />
           ))}
           {hasNextPage ? <div ref={sentinelRef} data-course-lately-sentinel style={{ flex: 'none', width: 1 }} aria-hidden /> : null}
@@ -155,10 +150,10 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
         </div>
       </AboutSection>
       <RoundDetailSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        scoreId={open?.scoreId ?? null}
-        profileUserId={open?.owner ?? userId}
+        open={opener.target != null}
+        onClose={opener.close}
+        scoreId={opener.target?.scoreId ?? null}
+        profileUserId={opener.target?.profileUserId ?? null}
       />
     </div>
   );

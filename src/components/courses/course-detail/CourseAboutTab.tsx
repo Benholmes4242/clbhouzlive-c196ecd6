@@ -17,6 +17,7 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import CourseFactsAndTees from './about/CourseFactsAndTees';
 import AboutThisPlace from './about/AboutThisPlace';
 import TheVerdict from './about/TheVerdict';
+import CourseLatelySection from './about/CourseLatelySection';
 import DefendsPar from './about/DefendsPar';
 import RecordBook from './about/RecordBook';
 import WhatPeopleSay from './about/WhatPeopleSay';
@@ -145,6 +146,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {/* BRIEF_COURSE_TAB_1A — the verdict is the first thing under the tabs,
             then the place, the tees as a finding, and how it defends par. */}
         <TheVerdict courseId={course.id} courseName={course.name} />
+        {/* CS1 — Lately here, between the verdict and About this course. */}
+        <CourseLatelySection courseId={course.id} userId={user?.id} />
         <AboutThisPlace courseId={course.id} description={course.description} />
         <CourseFactsAndTees courseId={course.id} />
         <DefendsPar courseId={course.id} courseName={course.name} />
