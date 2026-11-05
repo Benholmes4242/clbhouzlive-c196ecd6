@@ -73,4 +73,12 @@ describe('Also this week signed-off spacing', () => {
     expect(block('also-facts')).toContain('margin-top:10px');
     expect(block('also-yours')).toContain('margin-top:10px');
   });
+  it('faces keep the 34% squircle owned by SquircleAvatar, no pixel-radius overrides', () => {
+    const base = block('also-avatar,.also-avatar>div');
+    expect(base).toContain('aspect-ratio:1!important');
+    expect(base).not.toContain('border-radius');
+    expect(() => block('also-win .also-avatar')).toThrow();
+    expect(() => block('also-stack .also-avatar')).toThrow();
+    expect(block('also-stack>span')).toContain('border-radius:34%');
+  });
 });
