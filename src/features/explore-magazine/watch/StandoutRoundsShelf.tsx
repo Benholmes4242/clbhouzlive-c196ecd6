@@ -18,7 +18,7 @@ import './standout-shelf.css';
  * remembered per-viewer tap, one hole-shapes batch, and ungated scorecard doors.
  * Errors suppress the shelf, never claim emptiness. Recent rounds stays separate. */
 function useScopeReads(userId: string | undefined, kind: RegionKind | null, value: string | null, enabled: boolean) {
-  const rounds = useStandoutRounds(userId, { ...DEFAULT_FILTERS, regionKind: kind, regionValue: value }, enabled, 10);
+  const rounds = useStandoutRounds(userId, { ...DEFAULT_FILTERS, regionKind: kind, regionValue: value }, enabled, 10, { keepPrevious: true });
   const feats = useStandoutFeats(userId, kind, value, enabled);
   return { rounds, feats };
 }
