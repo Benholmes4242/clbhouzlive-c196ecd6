@@ -1,5 +1,9 @@
 # Roadmap
 
+## FIX_GUEST_MINT
+- [ ] Share guestMintAllowed across bootstrap, hold and signed-out outcome; persist preview opt-in safely and block automated browsers.
+- [ ] Add requested regression coverage, preserve native tests, run four fresh ordered shards and report counts/rewrites against 6,879 / 608.
+
 ## FIX_UNBLOCK_4
 - [x] Read uploaded brief; four known files already have the exact settled non-pro fixture including verifiedKnown from the preceding authorised continuation. No new fixture or product edits required initially.
 - [x] Known-four 36/36 and dependencies 67/67; all four fresh shards passed in order: 1,753 / 1,653 / 1,750 / 1,723 = 6,879 / 608, unchanged. Output in docs/verification/fix-unblock-4; no fixture edits or flakes.
