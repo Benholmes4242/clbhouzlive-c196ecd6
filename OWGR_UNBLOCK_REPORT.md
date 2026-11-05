@@ -56,6 +56,7 @@ They are newly exposed after the authorized border assertion fix, not authorized
 Preview compiler flagged `owgrParse.ts(27,70): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.` Replaced it with identical `Object.prototype.hasOwnProperty.call` for target compatibility; no test assertions changed or tests rerun after stop. Updated preview status checked separately.
 
 ## Counts and four shards
+Latest preview log: **build OK at2026-11-05T22:26:07Z**, after the compatibility fix; no manual build/typecheck.
 Inventory before this continuation: expected7,072/626 (includes preceding FS_NOTCH_1 +16/+1); after expected **7,090/627**, solely new owgrParse18/+1. Last full green7,024/620. Intervening deltas: EXP_RING3/+1, Tour15/+1, TopTen4/+1, rank admin4/+1, events6/+1, FS_NOTCH16/+1, current parser18/+1 = +66/+7. Expected inventory, not executed-suite total.
 
 Shard1: not run. Shard2: not run. Shard3: not run. Shard4: not run. Stop prevents pass-count claims.
