@@ -1,5 +1,8 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 
+// Type-only runtime contract also permits importing this gate in Vitest.
+declare const Deno: { env: { get(name: string): string | undefined } };
+
 // Shared fail-closed gate for internal edge functions. Hashing both values
 // to fixed-length digests permits constant-time comparison without length exits.
 //
