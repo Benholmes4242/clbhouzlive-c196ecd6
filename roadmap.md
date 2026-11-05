@@ -6,6 +6,8 @@
 - [ ] Ruling needed: synthetic 9:16 top0 conflicts with the explicit 90%-of-usableH formula (693.333 < 717.3 at 390×844/safeTop47/safeBottom0).
 
 ## Pro world ranking sync
+- [x] OWGR_CRON_AUTH: shared constant-time gate, all-pros-only secret access and preserved JWT paths; redeployed. Focused35/35; shards1,866/1,670/1,802/1,760 passed, only three known FS_NOTCH failures.7,101/628 executed (+7/+1), no existing tests changed. OWGR_CRON_AUTH_REPORT.md and logs retained.
+- [ ] Ben to add the weekly pg_cron schedule; live scheduled run deliberately not triggered here.
 - [x] OWGR_GROSS_FIX: raw strokes71/75/73, total219, scheduled3, null OWGR to_par/venue and source-pro round protection implemented; only expRing1 line35 normalized. Function deployed; focused90/90, shards1,866/1,670/1,806/1,749 passed, plus only three known FS_NOTCH failures. Executed7,094/627 (+4 parser cases); exact ledger/logs in OWGR_UNBLOCK_REPORT.md.
 - [ ] Ben to save Mason's link and press Check now; hosted persistence/readback intentionally not attempted without admin session.
 - [x] OWGR_UNBLOCK: Monday parser, undated no-merge, authorized entrypoint and three test repairs implemented. Event11624 has real dates/country and gross71/75/73, no par/venue/to-par.

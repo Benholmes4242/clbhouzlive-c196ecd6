@@ -10,12 +10,15 @@ import { z } from 'npm:zod@3';
 import { mondayDates, parseRank, parseEvents, parseEventDetails } from './owgrParse.ts';
 import { authorized, syncEach, type Pro, type SyncSource } from './runSync.ts';
 import { eventImportTarget, importedRounds, shouldImportEvents } from './eventImportRules.ts';
+import { authenticateSyncRequest, internalTargetError } from './requestAuth.ts';
 
 const bodySchema = z.object({ user_id: z.string().uuid().optional() }).strict();
 Deno.serve(async req => {
   const reply = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   if (req.method !== 'POST') return reply({ error: 'Method not allowed' }, 405);
+  // Check internal headers before configuration/JWT work, never falling through.
+  const authError = await authenticateSyncRequest(req, corsHeaders, async () => {
   const url = Deno.env.get('SUPABASE_URL');
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE');
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
@@ -29,10 +32,19 @@ Deno.serve(async req => {
     const { data, error } = await scoped.rpc('is_admin');
     return !error && data === true;
   })) return reply({ error: 'Admin access required' }, 403);
+  return null;
+  });
+  if (authError) return authError;
+  const url = Deno.env.get('SUPABASE_URL');
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE');
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+  if (!url || !serviceKey || !anonKey) return reply({ error: 'Sync configuration unavailable' }, 503);
   let input: unknown;
   try { const text = await req.text(); input = text.trim() ? JSON.parse(text) : {}; } catch { return reply({ error: 'Invalid request' }, 400); }
   const body = bodySchema.safeParse(input);
   if (!body.success) return reply({ error: 'Invalid request', details: body.error.flatten() }, 400);
+  const targetError = internalTargetError(req, body.data.user_id, corsHeaders);
+  if (targetError) return targetError;
   const db = createClient(url, serviceKey, { auth: { persistSession: false } });
   const now = new Date();
   const dates = mondayDates(now);
