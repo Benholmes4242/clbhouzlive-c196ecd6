@@ -6,12 +6,13 @@
  * visit, so the card stays (as Following) until the next visit.
  * Activity is one display-ordered batched read; canonical Clubhouse rings
  * and latest-post doors are imported unchanged, never reimplemented here.
+ * EXP_RING_1: inner personal/photo rings match PlayerAvatar; ActiveRing owns its unchanged amber gap.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -144,11 +145,11 @@ function SpotlightCard({ row, activity, visitKey, position, onDepart }: { row: S
           <ActiveAvatarDoor postId={activity?.post_id ?? null} label={`Open ${row.display_name ?? ''}'s latest post`} onOpen={(id) => navigate(`/post/${id}`)}>
           <ActiveRing active={!!activity} surface="card">
           {business && !row.avatar_url ? (
-            <span data-spotlight-tile style={{ width: 56, height: 56, borderRadius: '34%', background: '#000', color: A.INK, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 700 }}>
+            <span data-spotlight-tile style={{ width: 56, height: 56, borderRadius: '34%', background: '#000', color: A.INK, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 700, boxShadow: `inset 0 0 0 0.5px ${DARK_HAIRLINE}` }}>
               {businessInitials(row.display_name ?? '')}
             </span>
           ) : (
-            <SquircleAvatar size={56} src={row.avatar_url} alt={row.display_name ?? ''} userId={business ? null : row.actor_id} />
+            <SquircleAvatar size={56} src={row.avatar_url} alt={row.display_name ?? ''} userId={business ? null : row.actor_id} hairlineRing ringColor={DARK_HAIRLINE} />
           )}
           </ActiveRing>
           </ActiveAvatarDoor>

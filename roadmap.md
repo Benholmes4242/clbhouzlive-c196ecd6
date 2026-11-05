@@ -1,5 +1,9 @@
 # Roadmap
 
+## EXP_RING_1
+- [x] Audit Explore-only avatar callers; resolve brief discrepancy as Tour-matching 1px traced personal ring, business 0.5px inset as requested; amber/shared/Tour unchanged.
+- [ ] Add ring coverage, focused checks and four fresh shards; baseline 7,024 / 620; report changed/preserved caller inventory.
+
 ## Island PRO badge only
 - [x] Remove island caption/helper and scope signed-off 22px badge; keep profile tap/divider and pending/amateur behavior.
 - [x] Focused 26/26; measured 22px/10.5px island badge and unchanged shared sizes. Fresh shards 1,827 / 1,673 / 1,774 / 1,750 = 7,024 / 620, zero failures; baseline 7,036 minus twelve named retired caption cases. Ledger and browser limits in ISLAND_PRO_BADGE_REPORT.md.
