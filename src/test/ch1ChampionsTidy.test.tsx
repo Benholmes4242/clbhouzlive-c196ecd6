@@ -47,7 +47,7 @@ function mount(page = false, modal = false) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   client.setQueryData(['course-detail', 'course'], { id: 'course', name: 'Hayling', country: 'England' });
   return render(<I18nextProvider i18n={i18n}><QueryClientProvider client={client}><MemoryRouter initialEntries={['/courses/course?tab=legends&keep=yes']}>
-    {page ? <GolfClubView courseId="course" isInModal={modal} /> : <CourseLegendsDrilldown selection={selection} hideHeader onOpenYouTab={vi.fn()} />}
+    {page ? <GolfClubView courseId="course" isInModal={modal} /> : <CourseLegendsDrilldown selection={selection} hideHeader fieldAvgOverPar={8} totalCourseRounds={40} onOpenYouTab={vi.fn()} />}
     <Location />
   </MemoryRouter></QueryClientProvider></I18nextProvider>);
 }
