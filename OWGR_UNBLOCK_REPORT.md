@@ -1,4 +1,55 @@
-# OWGR_UNBLOCK — STOP
+# OWGR sync — gross strokes fix deployed
+
+## Latest close-out — 2026-11-05
+Deployed `sync-pro-world-rankings` successfully. Submitted source SHA-256: `bbc4d5e1ae74ee00ae9852997318f4cd58ac12d7ea640f1315e454a09fb2dcd0`.
+
+OWGR event details now supply unchanged round `strokes`, `source='owgr'`, and `to_par=null`. Real event11624 yields rounds71/75/73, `total_strokes=219`, `scheduled_rounds=3`, dates2026-10-15–2026-10-17, countryBelgium; venue and event to_par stay null. No par conversion. Existing source-pro round numbers are excluded; updates remain filtered to source-owgr, and conflicting inserts use ignoreDuplicates, so member rounds are not overwritten. Existing identity merge rules remain unchanged.
+
+### Verification
+Focused command: `bunx vitest run src/test/owgrParse.test.ts src/test/owgrEventImportRules.test.ts src/test/proWorldRankAdmin.test.tsx src/test/tourIsland.test.tsx src/test/expRing1.test.tsx src/test/ws3WatchBottom.test.tsx --maxWorkers=2` — **90/90 passed**, six files.
+
+Fresh full-suite commands: `bunx vitest run --maxWorkers=2 --shard=n/4` for n=1,2,3,4, executed in order:
+
+| Shard | Passed | Known failures | Files |
+| --- | ---: | ---: | ---: |
+| 1 | 1,866 | 0 | 157 |
+| 2 | 1,670 | 0 | 157 |
+| 3 | 1,806 | 3 | 157 |
+| 4 | 1,749 | 0 | 156 |
+| Total | **7,091** | **3** | **627** |
+
+**7,094 executed /627 files**, zero unexpected failures. Before this fix: expected inventory7,090/627; after7,094/627, solely four added cases in `owgrParse.test.ts` (18→22). Last full green7,024/620 plus prior documented66/+7 and this fix4/+0 reconciles to7,094/627. Full logs retained in `docs/verification/owgr-gross-fix/focused.log` and `shard1.log`–`shard4.log`. Preview build OK at22:32:11Z; no manual build/typecheck.
+
+### Known FS_NOTCH_1 failures — untouched, authorized to continue
+- `src/test/fsNotch1.test.tsx:37:45`: `AssertionError: expected '' to be '0px' // Object.is equality`.
+- `src/lib/media/__tests__/fullscreenBand.test.ts:65:18`: `AssertionError: expected { top: +0, …(4) } to match object { top: +0, …(3) }`; width expected251.33333333333334, received251.33333333333331.
+- `src/lib/media/__tests__/fullscreenBand.test.ts:75:22`: `AssertionError: expected 98.83333333333331 to be +0 // Object.is equality`.
+
+### Exact test edit ledger for this fix
+`src/test/expRing1.test.tsx:35` — only this assertion changed:
+```typescript
+// Old
+expect(overlay?.style.borderColor).toBe(DARK_HAIRLINE.split(',').join(', '));
+// New
+expect(overlay?.style.borderColor.replace(/\s/g, '')).toBe(DARK_HAIRLINE.replace(/\s/g, ''));
+```
+Reason: normalize jsdom's rgba whitespace; expected color unchanged. The same line serves both active parameterized cases. No other Explore assertion changed.
+
+`src/test/owgrParse.test.ts`, existing case **reads actual dates/country and gross scores, never invents par or venue**: the `toEqual` assertion previously expected `rounds: []`; now expects three raw-strokes/null-to-par rows, `total_strokes:219` and `scheduled_rounds:3`, with every prior date/country/venue/to_par/grossRounds value retained. Reason: Ben explicitly changed gross-round storage semantics.
+
+Four new cases, each asserting Ben's concrete rule:
+- **stores event 11624 rounds as unchanged strokes with owgr source and null to-par** — exact71/75/73 payloads.
+- **sums event 11624 gross strokes to 219** — `expect(...total_strokes).toBe(219)`.
+- **reads event 11624 scheduledRoundsCount as three rounds** — `expect(...scheduled_rounds).toBe(3)`.
+- **never includes a member source-pro round in gross import writes** — round1 excluded and own to_par-3 row unchanged.
+
+No tests deleted or renamed; no fixture changes. Files changed this fix: parser, eventImportRules type, sync entrypoint, owgrParse.test.ts, expRing1.test.tsx, this report, roadmap, and requirement memory. Existing six import-rule cases untouched. No SQL, migrations, other function deployment, feed_config, cap, native or Median changes.
+
+### Remaining verification with Ben
+Mason link/save/Check now deliberately **not attempted**. Hosted rank/history/event/round readback remains unverified until Ben runs it; deployment success and fixture/unit/full-suite evidence do not claim live persistence. No admin session requested or minted.
+
+---
+# Historical OWGR_UNBLOCK — STOP (superseded above)
 
 ## Result and source evidence
 Ben's Monday-only ranking-date ruling and undated-event permission implemented in the new `sync-pro-world-rankings` entrypoint, parser and run helpers. No SQL, migrations, scheduling, other deployed-function edits, feed_config, cap, native/Median or protected-area changes.

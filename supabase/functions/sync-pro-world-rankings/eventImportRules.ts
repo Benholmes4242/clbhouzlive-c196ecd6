@@ -2,7 +2,7 @@
  * An ambiguous same-week match must fail instead of overwriting an arbitrary member event.
  * Member round rows win any round-number collision; conversion preserves event identity.
  */
-export type OwgrEvent = { owgr_event_id: string; event_name: string; tour_name: string | null; start_date: string | null; end_date: string | null; finish: string; owgr_points: number | null; rounds?: { round_no: number; to_par: number }[] };
+export type OwgrEvent = { owgr_event_id: string; event_name: string; tour_name: string | null; start_date: string | null; end_date: string | null; finish: string; owgr_points: number | null; rounds?: ({ round_no: number; to_par: number } | { round_no: number; strokes: number; to_par: null })[] };
 export type StoredEvent = { id: string; source: string; start_date: string | null; owgr_event_id: string | null };
 export type StoredRound = { round_no: number; source: string };
 export function eventImportTarget(event: OwgrEvent, existing: StoredEvent[]): StoredEvent | null {

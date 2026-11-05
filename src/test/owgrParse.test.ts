@@ -4,7 +4,7 @@ import events from './fixtures/owgr/mason-events.json';
 import details from './fixtures/owgr/event-11624.json';
 import { mondayDates, normalizeFinish, parseRank, parseEvents, parseEventDetails } from '../../supabase/functions/sync-pro-world-rankings/owgrParse';
 import { authorized, syncEach, type Pro } from '../../supabase/functions/sync-pro-world-rankings/runSync';
-import { eventImportTarget } from '../../supabase/functions/sync-pro-world-rankings/eventImportRules';
+import { eventImportTarget, importedRounds } from '../../supabase/functions/sync-pro-world-rankings/eventImportRules';
 
 describe('OWGR real samples and date rulings', () => {
   it('parses Mason current and previous rank with total points', () => {
@@ -34,7 +34,23 @@ describe('OWGR real samples and date rulings', () => {
   });
   it.each(['T4', '12', 'MC', 'WD', 'DQ'])('normalizes finish %s', finish => expect(normalizeFinish(finish.toLowerCase())).toBe(finish));
   it('reads actual dates/country and gross scores, never invents par or venue', () => {
-    expect(parseEventDetails(details, '11624', 31930)).toEqual({ start_date: '2026-10-15', end_date: '2026-10-17', country: 'Belgium', venue: null, to_par: null, rounds: [], grossRounds: [{ round_no: 1, gross: 71 }, { round_no: 2, gross: 75 }, { round_no: 3, gross: 73 }] });
+    expect(parseEventDetails(details, '11624', 31930)).toEqual({ start_date: '2026-10-15', end_date: '2026-10-17', country: 'Belgium', venue: null, to_par: null, total_strokes: 219, scheduled_rounds: 3, rounds: [{ round_no: 1, strokes: 71, to_par: null }, { round_no: 2, strokes: 75, to_par: null }, { round_no: 3, strokes: 73, to_par: null }], grossRounds: [{ round_no: 1, gross: 71 }, { round_no: 2, gross: 75 }, { round_no: 3, gross: 73 }] });
+  });
+  it('stores event 11624 rounds as unchanged strokes with owgr source and null to-par', () => {
+    const parsed = { ...parseEvents(events)[0], ...parseEventDetails(details, '11624', 31930) };
+    expect(importedRounds(parsed, [])).toEqual([{ round_no: 1, strokes: 71, to_par: null, source: 'owgr' }, { round_no: 2, strokes: 75, to_par: null, source: 'owgr' }, { round_no: 3, strokes: 73, to_par: null, source: 'owgr' }]);
+  });
+  it('sums event 11624 gross strokes to 219', () => {
+    expect(parseEventDetails(details, '11624', 31930).total_strokes).toBe(219);
+  });
+  it('reads event 11624 scheduledRoundsCount as three rounds', () => {
+    expect(parseEventDetails(details, '11624', 31930).scheduled_rounds).toBe(3);
+  });
+  it('never includes a member source-pro round in gross import writes', () => {
+    const own = [{ round_no: 1, source: 'pro', to_par: -3 }];
+    const parsed = { ...parseEvents(events)[0], ...parseEventDetails(details, '11624', 31930) };
+    expect(importedRounds(parsed, own)).toEqual([{ round_no: 2, strokes: 75, to_par: null, source: 'owgr' }, { round_no: 3, strokes: 73, to_par: null, source: 'owgr' }]);
+    expect(own).toEqual([{ round_no: 1, source: 'pro', to_par: -3 }]);
   });
   it('never merges undated events into own rows', () => {
     expect(eventImportTarget(parseEvents(events)[0], [{ id: 'own', source: 'pro', start_date: '2026-10-15', owgr_event_id: null }])).toBeNull();

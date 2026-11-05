@@ -32,7 +32,7 @@ describe('EXP_RING_1 Explore creator hairline', () => {
     expect(inner?.style.width).toBe('56px');
     const overlay = inner?.nextElementSibling as HTMLElement | null;
     expect(overlay?.style.borderWidth).toBe('1px');
-    expect(overlay?.style.borderColor).toBe(DARK_HAIRLINE.split(',').join(', '));
+    expect(overlay?.style.borderColor.replace(/\s/g, '')).toBe(DARK_HAIRLINE.replace(/\s/g, ''));
     expect(overlay?.style.borderRadius).toBe('34%');
     if (active) {
       expect(ring?.querySelector('[data-active-ring-gap]')).toContainElement(inner ?? null);
