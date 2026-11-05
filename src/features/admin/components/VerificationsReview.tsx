@@ -21,6 +21,7 @@ import {
 import { confirmedSignals } from '@/components/business/verification/evidenceLine';
 import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
 import { ProRequestFacts } from './ProRequestFacts';
+import { AdminProWorldRanking } from './AdminProWorldRanking';
 import { isProKind, proKindLabel, proDeclineReasonLabel, PRO_DECLINE_REASON_OPTIONS } from '@/features/pro-verification/proRules';
 
 /**
@@ -482,6 +483,7 @@ export function VerificationDetailBody({
       {row.type === 'golfer' && isProKind(row.kind) && (
         <ProRequestFacts row={row} onPlayerChange={onPlayerChange} />
       )}
+      {row.type === 'golfer' && row.kind === 'tour_pro' && (row.status === 'approved' || row.status === 'accepted') && row.requestedBy && <AdminProWorldRanking userId={row.requestedBy} />}
 
       {row.note && <Field label="Request note" value={row.note} />}
       {row.evidenceUrl && (

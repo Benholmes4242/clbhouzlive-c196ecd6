@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro world ranking sync
+- [ ] BLOCKED: OWGR Mason page yields rank 1436 but no verified ranking-week date or season history; parser/sync not created or deployed rather than inventing dates.
+- [x] Shared admin world-ranking row on verified tour pros and approved requests; Save/Check now/error coverage 4/4, related focused set 54/54.
+- [ ] STOP: fresh shard 1 1,843 passed/1 pre-existing tourIsland failure (:235:30); shards 2–4 and authenticated browser not run. Report PRO_WORLD_RANK_REPORT.md; no SQL/schedule creation.
+
 ## TOPTEN_SHEET_1
 - [x] Header action reads A.INK in both modes; shared 24px end gutter inside scroller, BottomSheet unchanged.
 - [x] Focused Top 10 checks 25/25; preview build OK.
