@@ -1,5 +1,11 @@
 # Roadmap
 
+## FIX_UNBLOCK_4
+- [x] Read uploaded brief; four known files already have the exact settled non-pro fixture including verifiedKnown from the preceding authorised continuation. No new fixture or product edits required initially.
+- [ ] Run known-four focused check, then five dependency files, then all four fresh shards in order; keep 6,879 / 608 unchanged and preserve output.
+- [ ] Verify live-dot exact geometry/condensation and 320/430 News; signed-in Activity/back and non-pro/Mason cold islands require authenticated access (current status external_unmanaged).
+- [ ] Create combined close-out report; delete superseded STOP reports only after all shards and four browser checks pass.
+
 ## Pro status controls — last four fixtures
 - [x] Add exactly the authorised current rule B line after the last mock in linkedHandicapState, linkedHandicapProfile, islandsRound2 and hb5ProfileBackName; no assertions, names or values changed.
 - [x] All four shards freshly passed in order: 1,753 / 1,653 / 1,750 / 1,723 = 6,879 tests / 608 files, delta 0. Full output retained in docs/verification/pro-last-four/shard1.log through shard4.log; no additional repairs needed.
