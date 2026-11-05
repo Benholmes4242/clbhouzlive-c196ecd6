@@ -43,8 +43,9 @@ export function WatchFeaturedSlot(props: SlotProps) {
     }
   }, [fallbackReason, props.userId]);
   if (!props.userId) return <WatchLead userId={props.userId} onDepart={props.onDepart} />;
-  // Loading only expands outwards: Featured's skeleton takes its own slot and the lead stays rendered.
-  if (!featured.isFetched && !featured.isError) return <><div data-featured-skeleton aria-hidden style={{ margin:'22px 16px 0', height:440, borderRadius:20, background:'var(--explore-top-panel)' }} /><WatchLead userId={props.userId} onDepart={props.onDepart} /></>;
+  // Featured and the lead share ONE slot: one skeleton while pending, then the
+  // deck or the fallback lead in that same slot, so nothing else moves.
+  if (!featured.isFetched && !featured.isError) return <div data-watch-lead="skeleton" aria-hidden style={{ margin:'22px 16px 0', height:440, borderRadius:20, background:'var(--explore-top-panel)' }} />;
   if (fallbackReason) return <WatchLead userId={props.userId} onDepart={props.onDepart} />;
   return <WatchFeaturedDeck {...props} rows={featured.data ?? []} />;
 }
