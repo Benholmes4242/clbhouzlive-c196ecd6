@@ -10,6 +10,7 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: h.profile, loading: h.loading }) }));
 vi.mock('@/hooks/useProfileSave', () => ({ useProfileSave: () => ({ save: vi.fn(async () => true) }) }));
 vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: h.connection, isLoading: h.whsLoading }) }));
+vi.mock('@/lib/whs/useOwnHandicapState', () => ({ useOwnHandicapState: () => ({ linked: !!h.connection, connected: !!h.connection, settled: true, connection: h.connection, trend: undefined, anyError: false, pro: false, proKind: null, proTour: null, proClub: null }) }));
 vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => ({ state: h.pending ? 'pending' : 'none', pendingName: h.pending ? 'Pending' : null, isLoading: h.homeLoading }) }));
 vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: h.top, isLoading: h.topLoading }) }));
 vi.mock('@/features/coach/hooks', () => ({ useMyCoach: () => ({ data: h.coach, isSuccess: h.coachSuccess, isError: h.coachError }), useInvalidateCoach: () => vi.fn(), useCoachHandicap: () => ({ current: 1, loading: false }), coachRpc: vi.fn() }));

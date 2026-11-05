@@ -12,9 +12,9 @@
 ## Pro status controls
 - [x] Shared settled own-handicap/pro hook; PRO island and Settings card implemented.
 - [x] Listed own-handicap presentation hidden, connections preserved; verified removal sheet implemented.
-- [ ] STOP: shard 1 has 29 new fixture failures (ep5Completion missing useHandicapTrend, overflowRightIsland missing isGuestUser); full log kept. Report: PRO_STATUS_CONTROLS_REPORT.md. No failing existing test edited.
+- [x] Authorised only the settled amateur hook additions in ep5Completion and overflowRightIsland; assertions, names and expected values unchanged; historical failure log retained.
 - [x] Fix new-test Stop selectors without assertion changes: 14/14 pass; build OK 2026-11-05T11:16:21Z.
-- [ ] Complete per-surface tests, mock/member checks and all four shards after stop is resolved.
+- [ ] Add the authorised missing mounted per-surface tests, run four shards and reconcile against 6,835 plus named additions; delete PRO_STATUS_CONTROLS_REPORT.md only if everything passes.
 
 ## Featured tilted pile
 - [ ] Apply signed-off rear-card CSS only, keeping front card and behaviour unchanged.
