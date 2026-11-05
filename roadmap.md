@@ -1,5 +1,9 @@
 # Roadmap
 
+## Featured tilted pile
+- [ ] Apply signed-off rear-card CSS only, keeping front card and behaviour unchanged.
+- [ ] Add/update authorised tests, check 320px/390px corners and overflow, run four shards and report reconciled counts.
+
 ## HH3 and FIX_PROFILE_COMPARE_1 close-out
 - [x] Record guestStage24 and ob1Welcome as Ben-ruled flaky pre-existing failures; preserve both failing logs and leave both tests untouched.
 - [x] Rerun shard 3 once: 1,734 passed; sign off both briefs with final totals 1,754 / 1,649 / 1,734 / 1,696 = 6,833 / 602 (other shards retained from the latest full run).
