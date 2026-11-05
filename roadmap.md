@@ -1,8 +1,9 @@
 # Roadmap
 
 ## FIX_GUEST_MINT
-- [ ] Share guestMintAllowed across bootstrap, hold and signed-out outcome; persist preview opt-in safely and block automated browsers.
-- [ ] Add requested regression coverage, preserve native tests, run four fresh ordered shards and report counts/rewrites against 6,879 / 608.
+- [x] Shared guestMintAllowed across bootstrap, hold and signed-out outcome; safe tab opt-in and automation blocking implemented, native tests unchanged.
+- [x] Focused 61/61; fresh ordered shards 1,769 / 1,667 / 1,747 / 1,712 = 6,895 / 609, baseline 6,879 / 608 +16 cases/one new file. No assertions rewritten; preview setup changes listed in FIX_GUEST_MINT_REPORT.md; build OK.
+- [x] Browser attempt had zero anonymous requests/holds but displayed startup failure; end-to-end verification explicitly unclaimed in report.
 
 ## FIX_UNBLOCK_4
 - [x] Read uploaded brief; four known files already have the exact settled non-pro fixture including verifiedKnown from the preceding authorised continuation. No new fixture or product edits required initially.
