@@ -48,6 +48,7 @@ vi.mock('@/components/posts-tab/PostsTabContent', () => ({ default: () => <div d
 vi.mock('@/components/profile/handicap/whs/sections/compare/CompareMount', () => ({ default: () => { h.compareMounts++; return <div data-testid="compare-mount" />; } }));
 vi.mock('@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet', () => ({ RoundDetailSheet: (p: NonNullable<typeof h.sheet> & { open: boolean }) => { h.sheet = p; return p.open ? <div data-testid="round-sheet" data-score={p.scoreId ?? ''} data-owner={p.profileUserId ?? ''} /> : null; } }));
 import ProfilePageV2 from '@/pages/ProfilePageV2';
+import { Top100DebugProvider } from '@/context/Top100DebugContext';
 import { compareBus } from '@/components/profile/handicap/whs/sections/compare/events';
 import { HeroHandicapDisplay } from '@/components/profile/hero/HeroHandicapDisplay';
 
@@ -59,11 +60,11 @@ function PageLocation() {
 }
 function mountPage(path = '/profile/ellie') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
-  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[path]}><PageLocation /><Routes>
+  return render(<QueryClientProvider client={client}><Top100DebugProvider><MemoryRouter initialEntries={[path]}><PageLocation /><Routes>
     <Route path="/profile" element={<ProfilePageV2 />} />
     <Route path="/profile/:username" element={<ProfilePageV2 />} />
     <Route path="/handicap" element={<div data-testid="own-handicap" />} />
-  </Routes></MemoryRouter></QueryClientProvider>);
+  </Routes></MemoryRouter></Top100DebugProvider></QueryClientProvider>);
 }
 const loc = () => screen.getByTestId('page-location').textContent;
 beforeEach(() => {
