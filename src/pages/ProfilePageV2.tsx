@@ -18,7 +18,7 @@ import { renamedProfilePath, resolvePreviousUsername } from '@/lib/profile/previ
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
-import { compareRouteFor, useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useProfileCreator, creatorTab } from '@/features/creator/profileCreator';
 import { ProfileVideosTab, CreatorContentSkeleton } from '@/features/creator/ProfileVideosTab';
