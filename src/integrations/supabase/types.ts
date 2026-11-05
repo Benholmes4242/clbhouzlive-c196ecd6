@@ -10160,6 +10160,287 @@ export type Database = {
         }
         Relationships: []
       }
+      pro_event_rounds: {
+        Row: {
+          event_id: string
+          holes_played: number
+          posted_at: string
+          round_no: number
+          source: string
+          to_par: number
+        }
+        Insert: {
+          event_id: string
+          holes_played?: number
+          posted_at?: string
+          round_no: number
+          source?: string
+          to_par: number
+        }
+        Update: {
+          event_id?: string
+          holes_played?: number
+          posted_at?: string
+          round_no?: number
+          source?: string
+          to_par?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_event_rounds_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "pro_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pro_events: {
+        Row: {
+          country: string | null
+          created_at: string
+          end_date: string | null
+          event_name: string
+          finish: string | null
+          id: string
+          owgr_event_id: string | null
+          owgr_points: number | null
+          source: string
+          start_date: string
+          tee_hole: number | null
+          tee_time: string | null
+          to_par: number | null
+          tour_name: string | null
+          updated_at: string
+          user_id: string
+          venue: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          end_date?: string | null
+          event_name: string
+          finish?: string | null
+          id?: string
+          owgr_event_id?: string | null
+          owgr_points?: number | null
+          source?: string
+          start_date: string
+          tee_hole?: number | null
+          tee_time?: string | null
+          to_par?: number | null
+          tour_name?: string | null
+          updated_at?: string
+          user_id: string
+          venue?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          end_date?: string | null
+          event_name?: string
+          finish?: string | null
+          id?: string
+          owgr_event_id?: string | null
+          owgr_points?: number | null
+          source?: string
+          start_date?: string
+          tee_hole?: number | null
+          tee_time?: string | null
+          to_par?: number | null
+          tour_name?: string | null
+          updated_at?: string
+          user_id?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      pro_world_rank_history: {
+        Row: {
+          created_at: string
+          points: number | null
+          rank: number
+          ranking_date: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          points?: number | null
+          rank: number
+          ranking_date: string
+          source?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          points?: number | null
+          rank?: number
+          ranking_date?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_world_rank_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      pro_world_rank_sources: {
+        Row: {
+          last_checked_at: string | null
+          last_error: string | null
+          owgr_slug: string
+          owgr_url: string
+          set_at: string
+          set_by: string | null
+          user_id: string
+        }
+        Insert: {
+          last_checked_at?: string | null
+          last_error?: string | null
+          owgr_slug: string
+          owgr_url: string
+          set_at?: string
+          set_by?: string | null
+          user_id: string
+        }
+        Update: {
+          last_checked_at?: string | null
+          last_error?: string | null
+          owgr_slug?: string
+          owgr_url?: string
+          set_at?: string
+          set_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_world_rank_sources_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_sources_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_sources_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_sources_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_sources_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_world_rank_sources_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       profile_analytics_events: {
         Row: {
           action_type: string | null
@@ -20658,6 +20939,10 @@ export type Database = {
         Args: { p_active: boolean; p_jobid: number }
         Returns: Json
       }
+      admin_set_pro_owgr: {
+        Args: { p_owgr_url: string; p_user_id: string }
+        Returns: Json
+      }
       admin_set_staff_account: {
         Args: { p_staff: boolean; p_user_id: string }
         Returns: Json
@@ -24105,6 +24390,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_pro_world_rank: { Args: { p_user_id: string }; Returns: Json }
       get_profile_creator: {
         Args: { p_user_id: string }
         Returns: {
