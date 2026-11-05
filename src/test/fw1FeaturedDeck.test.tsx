@@ -31,7 +31,25 @@ describe('FW1 mount',() => {
   it.each([3,8])('renders the deck for %i rows',count => {f.rows=rows(count); mount(true); expect(document.querySelector('[data-watch-featured]')).not.toBeNull(); expect(screen.queryByTestId('legacy-lead')).toBeNull();});
   it.each([0,1,2])('preserves the lead for %i rows',count => {f.rows=rows(count); mount(true); expect(screen.getByTestId('legacy-lead')).toBeTruthy(); expect(f.track).toHaveBeenCalledWith('watch_featured_fallback',{reason:'too_few'});});
   it('preserves the lead on read error',() => {f.error=true; mount(true); expect(screen.getByTestId('legacy-lead')).toBeTruthy(); expect(f.track).toHaveBeenCalledWith('watch_featured_fallback',{reason:'error'});});
-  it('keeps the lead rendered while the featured read is pending, skeleton in its own slot',() => {f.fetched=false; mount(true); expect(document.querySelector('[data-featured-skeleton]')).not.toBeNull(); expect(screen.getByTestId('legacy-lead')).toBeTruthy();});
+  it('holds the existing skeleton during loading',() => {f.fetched=false; mount(true); expect(document.querySelector('[data-watch-lead="skeleton"]')).not.toBeNull(); expect(screen.queryByTestId('legacy-lead')).toBeNull();});
+  it('pending then settled to the deck replaces the skeleton in place and removes nothing else',() => {
+    f.fetched=false; const client=new QueryClient(); clients.push(client);
+    const tree=() => <QueryClientProvider client={client}><div data-testid="feed"><div data-testid="before" /><WatchFeaturedSlot userId="me" onDepart={() => {}} onOpenComments={comments} selectShorts={shorts} /><div data-testid="after" /></div></QueryClientProvider>;
+    const view=render(tree()); const feed=screen.getByTestId('feed');
+    expect(feed.children).toHaveLength(3); expect(feed.children[1].getAttribute('data-watch-lead')).toBe('skeleton');
+    f.fetched=true; view.rerender(tree());
+    expect(feed.children).toHaveLength(3); expect(feed.children[0]).toBe(screen.getByTestId('before')); expect(feed.children[2]).toBe(screen.getByTestId('after'));
+    expect(feed.children[1].hasAttribute('data-watch-featured')).toBe(true); expect(document.querySelector('[data-watch-lead="skeleton"]')).toBeNull(); expect(screen.queryByTestId('legacy-lead')).toBeNull();
+  });
+  it('pending then settled to the fallback lead replaces the skeleton in place and removes nothing else',() => {
+    f.fetched=false; const saved=f.rows; const client=new QueryClient(); clients.push(client);
+    const tree=() => <QueryClientProvider client={client}><div data-testid="feed"><div data-testid="before" /><WatchFeaturedSlot userId="me" onDepart={() => {}} onOpenComments={comments} selectShorts={shorts} /><div data-testid="after" /></div></QueryClientProvider>;
+    const view=render(tree()); const feed=screen.getByTestId('feed');
+    expect(feed.children[1].getAttribute('data-watch-lead')).toBe('skeleton');
+    f.fetched=true; f.rows=[]; view.rerender(tree()); f.rows=saved;
+    expect(feed.children).toHaveLength(3); expect(feed.children[0]).toBe(screen.getByTestId('before')); expect(feed.children[2]).toBe(screen.getByTestId('after'));
+    expect(feed.children[1]).toBe(screen.getByTestId('legacy-lead')); expect(document.querySelector('[data-watch-lead="skeleton"]')).toBeNull();
+  });
 });
 describe('FW1 gestures and actions',() => {
   it.each([-120,120])('advances either direction (%i) at 260ms during 320ms exit without liking',dx => {mount(); swipe(dx); tick(259); expect(top().getAttribute('data-featured-card')).toBe('p0'); tick(1); expect(top().getAttribute('data-featured-card')).toBe('p1'); expect(f.like).not.toHaveBeenCalled(); expect(FEATURED_ADVANCE_MS).toBe(260); expect(FEATURED_EXIT_MS).toBe(320);});
