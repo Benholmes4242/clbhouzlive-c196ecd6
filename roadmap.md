@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX6 — Sign-up and pro fixes
+- [ ] Fix reachable croppers, comments sheet material, account first-open CSS, settled setup guard/error routing and step-one Skip, pro focus/copy.
+- [ ] Add scoped coverage and exact rewritten assertion/string ledger; device-only Safari/native/install/OAuth checks unavailable here.
+- [ ] Run focused checks then ordered shards; preserve CH1's existing new-test stop and report any failure without unauthorised repairs.
+
 ## CH1 — Champions tidy
 - [x] Prerequisite audited: posted eligibility does not guarantee You reach; independent failed reads and empty reach rows suppress it. Source evidence in CH1_REPORT.md; no product/test edits.
 - [x] Ben chose Successful reads only: proceed and accept absent reach after errors/empty rows; You stays frozen.

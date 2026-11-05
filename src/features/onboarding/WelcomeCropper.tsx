@@ -18,7 +18,7 @@ export function WelcomeCropper({ image, onCancel, onUse, aspect = 1, frameShape 
     try { const blob = await getCroppedImg(image, area); onUse(new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' })); } finally { setBusy(false); }
   };
   return createPortal(<div className="welcome-cropper" role="dialog" aria-modal="true" aria-label={t('welcome.cropTitle', { defaultValue: 'Move and scale' })} data-welcome-cropper data-frame-shape={frameShape} data-appearance={appearance}>
-    <Cropper image={image} crop={crop} zoom={zoom} aspect={aspect} cropShape="rect" showGrid={false} objectFit="cover" onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onComplete} classes={{ cropAreaClassName: 'welcome-crop-area' }} />
+    <Cropper image={image} crop={crop} zoom={zoom} minZoom={1} maxZoom={4} restrictPosition aspect={aspect} cropShape="rect" showGrid={false} objectFit="contain" onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onComplete} classes={{ cropAreaClassName: 'welcome-crop-area' }} />
     <div className="welcome-cropper-head"><b>{t('welcome.cropTitle', { defaultValue: 'Move and scale' })}</b><span>{subtitle ?? t('welcome.cropSub', { defaultValue: 'Pinch to zoom, drag to position' })}</span></div>
     <div className="welcome-cropper-foot"><p>{hint ?? t('welcome.cropHint', { defaultValue: 'This is how golfers will see you.' })}</p><div><button type="button" className="welcome-cropper-cancel" onClick={onCancel}>{t('welcome.cancel', { defaultValue: 'Cancel' })}</button><button type="button" className="welcome-cropper-use" disabled={!area || busy} onClick={() => void use()}>{t('welcome.usePhoto', { defaultValue: 'Use photo' })}</button></div></div>
   </div>, document.body);
