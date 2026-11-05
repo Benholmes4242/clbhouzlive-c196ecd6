@@ -150,11 +150,11 @@ export default function EditProfile() {
             city={you.city}
             coverUrl={profile.header_photo_url ?? null}
             avatarUrl={profile.profile_photo_url ?? null}
-            indexLabel={ownHandicap.settled && !ownHandicap.pro && resolved.value != null ? formatHcp(resolved.value) : null}
+            indexLabel={ownHandicap.settled && !ownHandicap.noHandicap && resolved.value != null ? formatHcp(resolved.value) : null}
             homeClub={(golfNow.homeClubName ?? profile.home_club)?.trim() || null}
             onSavePhoto={savePhoto}
           />}
-          {profile && <EditProfileCompletion userId={user?.id ?? ''} inputs={{ avatar: profile.profile_photo_url, cover: profile.header_photo_url, bio: you.bio, homeClub: !!(golfNow.primaryClubId ?? profile.primary_club_id) || !!(golfNow.homeClubName ?? profile.home_club)?.trim(), pro: ownHandicap.pro, handicap: ownHandicap.pro ? null : resolved.value, linked: !!whs }} loading={loading || !ownHandicap.settled || !!whsLoading || !!whsError} onAction={openCompletion} />}
+          {profile && <EditProfileCompletion userId={user?.id ?? ''} inputs={{ avatar: profile.profile_photo_url, cover: profile.header_photo_url, bio: you.bio, homeClub: !!(golfNow.primaryClubId ?? profile.primary_club_id) || !!(golfNow.homeClubName ?? profile.home_club)?.trim(), pro: ownHandicap.noHandicap, handicap: ownHandicap.noHandicap ? null : resolved.value, linked: !!whs }} loading={loading || !ownHandicap.settled || !!whsLoading || !!whsError} onAction={openCompletion} />}
           {profile && <EditProfileYou
             ref={youActions}
             userId={user?.id ?? ''}
@@ -167,7 +167,7 @@ export default function EditProfile() {
           />}
           {profile && <EditProfileType isCreator={creatorNow ?? profile.is_creator ?? false} onSave={saveCreator} />}
           {profile && <EditProfilePro userId={user?.id ?? ''} />}
-          {profile && ownHandicap.settled && <EditProfileGolf isPro={ownHandicap.pro} ref={golfActions} userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
+          {profile && ownHandicap.settled && <EditProfileGolf isPro={ownHandicap.noHandicap} ref={golfActions} userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
           {profile && <EditProfileLinksPrivacy userId={user?.id ?? ''} form={{ ...form, ...linksPrivacyNow }} handicapVisibility={profile.handicap_visibility === 'friends' || profile.handicap_visibility === 'private' ? profile.handicap_visibility : 'public'} onSave={saveLinksPrivacy} />}
         </main>
       )}

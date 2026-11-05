@@ -62,7 +62,7 @@ type Item = { kind: 'head'; key: string; title: string } | { kind: 'row'; r: Pro
  * retain their existing query ownership and never mount a connection invite. */
 function EmptyRoundsConnection({ userId, children }: { userId: string; children: React.ReactNode }) {
   const chip = useOwnHandicapState(userId);
-  if (!chip.settled || chip.pro) return null;
+  if (!chip.settled || chip.noHandicap) return null;
   if (chip.linked) return <div style={{ padding: '24px 20px 32px', fontFamily: SANS }}>
     <LinkedHandicapNotice provider={chip.connection?.provider} />
   </div>;

@@ -110,7 +110,7 @@ export default function HandicapManagePage() {
   // state - never the connect flow (which would be a claim about data we do not
   // have yet) and never the connected view.
   if (!ownHandicap.settled) return null;
-  if (ownHandicap.pro) return <ProHandicapNote kind={ownHandicap.proKind} />;
+  if (ownHandicap.noHandicap) return <ProHandicapNote kind={ownHandicap.proKind} pending={ownHandicap.proPending && !ownHandicap.pro} />;
   if (!settled) {
     // No header here: the resolved surface may be immersive (connect flow) or
     // shelled (connected). Painting a header now would flash a bar that then

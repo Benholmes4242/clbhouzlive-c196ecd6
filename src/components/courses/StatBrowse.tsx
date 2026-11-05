@@ -850,7 +850,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                 country,
               })}
             </p>
-            {ownHandicap.settled && !ownHandicap.pro && <button
+            {ownHandicap.settled && !ownHandicap.noHandicap && <button
               type="button"
               onClick={() => {
                 analyticsEvents.track('stat_browse_connect_tapped', {

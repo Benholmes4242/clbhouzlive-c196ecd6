@@ -9,6 +9,7 @@ import type { usePrivacySettings, VisibilityLevel } from '@/hooks/usePrivacySett
 import { strangerSummary, visibilityLabel } from './privacySummary';
 import { useSettingsBlockedCount } from './useSettingsBlockedCount';
 import './settingsPrivacy.css';
+import '@/features/pro-verification/pro-status-controls.css';
 
 type Sheet = 'profile' | 'leaderboards' | 'courses';
 const SHEETS = {
