@@ -25788,6 +25788,34 @@ export type Database = {
           width: number
         }[]
       }
+      get_watch_featured: {
+        Args: { p_limit?: number }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          caption: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          created_at: string
+          display_name: string
+          duration_seconds: number
+          handle: string
+          height: number
+          hls_url: string
+          is_verified: boolean
+          like_count: number
+          media_url: string
+          post_id: string
+          poster_url: string
+          rank: number
+          reason: string
+          score: number
+          stream_id: string
+          width: number
+        }[]
+      }
       get_watch_hub_counts: {
         Args: never
         Returns: {
