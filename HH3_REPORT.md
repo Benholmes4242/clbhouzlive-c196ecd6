@@ -35,3 +35,14 @@ No existing test was rewritten, renamed or deleted.
 - If the viewer's index is unknown, the entry line leaves out the gap clause.
 - Strings are English literals, not i18n keys (English-only cutover).
 - Not checked in the browser (member auth is external_unmanaged).
+
+## Rulings applied (2026-11-05)
+- guestStage24: the failing run's log is kept as docs/verification/hh3/shard3-failing-run1.log. On the re-run, guestStage24 passed (5/5, docs/verification/hh3-final/shard3.log:3912). It is recorded as a flaky pre-existing failure.
+- FIX_PROFILE_COMPARE_1 round card close: ProfilePageV2 keeps RoundDetailSheet mounted with open=false and the last score id for ROUND_SHEET_CLOSE_MS (300ms, the BottomSheet close), then clears it. New test file: src/test/fixProfileCompare1Close.test.tsx (1 test). No other change.
+
+## Re-run - STOPPED on a new failure
+`src/test/ob1Welcome.test.tsx:113` "OB1.2 first sign-in fixes > cropper has no slider, grid or reset and Use photo hands the file to the existing upload"
+`AssertionError: expected "spy" to be called with arguments: [ 'profilePhotoBlob', Any<File> ]  Number of calls: 0`
+This is the first sign-in welcome flow; HH3 and the close change don't touch it. Run alone three times, it passed 81/81 each time. Not edited. Log: docs/verification/hh3-final/shard3.log.
+
+Shards: 1: 1,753 | 2: 1,648 | 3: 1,733 passed, 1 failed | 4: 1,693. Total 6,828 / 602 files (6,827 passed). Baseline 6,827 / 601 + 1 new test in 1 new file = 6,828 / 602. Build OK at 09:33:41Z.
