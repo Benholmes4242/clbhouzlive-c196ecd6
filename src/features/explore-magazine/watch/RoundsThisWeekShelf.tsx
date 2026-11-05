@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -14,7 +12,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import {
   SHELF_CARD,
-  SHELF_END,
   SHELF_SKELETON,
   TO_PAR_UNDER,
   recentSentenceParts,
@@ -29,7 +26,7 @@ import {
  *
  * One paged read: get_recent_rounds(scope, '14', 10, offset), newest first,
  * ten at a time as the sentinel shows, until total_count rows are loaded and
- * the end tile closes the carousel. Circle first: when the circle settles
+ * the carousel ends on the final round. Circle first: when the circle settles
  * with fewer than two rounds the shelf re-reads with scope 'everyone' and the
  * sub-line says so. No rounds hides the heading and the rail. An error hides
  * the shelf quietly and logs the way the page's other shelves log.
@@ -215,7 +212,6 @@ export function RoundsThisWeekShelf({
   onOpenMember?: (userId: string) => void;
 }) {
   const { t, i18n } = useTranslation('courses');
-  const navigate = useNavigate();
   const locale = i18n.language || 'en';
 
   const circle = useRecentRounds(userId, 'circle', !!userId);
@@ -279,11 +275,6 @@ export function RoundsThisWeekShelf({
 
   if (!userId) return null;
 
-  const goRounds = (from: 'header' | 'end') => {
-    analyticsEvents.track('rounds_door_tapped', { from });
-    navigate('/rounds');
-  };
-
   if (loading) {
     /* Reserve the heading and one row of two cards; expand outwards only. */
     return (
@@ -316,20 +307,6 @@ export function RoundsThisWeekShelf({
                   : t('amateur.roundsShelf.subEveryone', 'Everyone, last 14 days')}
               </span>
             </div>
-            <button
-              type="button"
-              data-rounds-shelf-leaderboards
-              onClick={() => goRounds('header')}
-              style={{
-                flex: 'none', display: 'flex', alignItems: 'center', gap: 5, height: 32,
-                padding: '0 12px 0 13px', borderRadius: 999, background: '#17171B',
-                border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', fontFamily: SANS,
-                fontSize: 13.5, fontWeight: 600, color: A.INK,
-              }}
-            >
-              {t('amateur.roundsShelf.leaderboards', 'Leaderboards')}
-              <ChevronRight size={14} color={A.MUTE} />
-            </button>
           </div>
           <div
             ref={railRef}
@@ -360,33 +337,7 @@ export function RoundsThisWeekShelf({
                 }}
               />
             ) : null}
-            {!hasNextPage && !isFetchingNextPage ? (
-              <button
-                type="button"
-                data-rounds-shelf-end
-                onClick={() => goRounds('end')}
-                style={{
-                  flex: 'none', width: SHELF_END.width, height: SHELF_END.height, boxSizing: 'border-box',
-                  scrollSnapAlign: 'start', borderRadius: SHELF_END.radius, background: SHELF_END.background,
-                  border: `1px solid ${SHELF_END.border}`, padding: SHELF_END.padding, cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start',
-                  gap: SHELF_END.gap, fontFamily: SANS, textAlign: 'left',
-                }}
-              >
-                <span style={{
-                  width: 38, height: 38, borderRadius: 999, background: '#F8FAFC',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none',
-                }}>
-                  <ChevronRight size={18} color="#0B0B0D" />
-                </span>
-                <b style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3, color: A.INK }}>
-                  {t('amateur.roundsShelf.endTitle', "That's the last 14 days")}
-                </b>
-                <span style={{ fontSize: 12, color: A.DIM, lineHeight: 1.35 }}>
-                  {t('amateur.roundsShelf.door', 'Leaderboards, feats and every round')}
-                </span>
-              </button>
-            ) : null}
+
           </div>
         </>
       ) : null}
