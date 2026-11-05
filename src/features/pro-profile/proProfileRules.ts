@@ -1,5 +1,5 @@
-/** Profile-only calendar-year and score-source rules. OWGR is always gross;
- * member and covered-tour scores are always to-par. No inferred score conversion.
+/** Profile-only calendar-year and score-source rules. OWGR storage stays gross;
+ * display to-par requires explicitly supplied course par. Other sources stay to-par.
  */
 import type { Database } from '@/integrations/supabase/types';
 import type { PlayerResult } from '@/features/tourhub/player-v2/data/usePlayerData';
