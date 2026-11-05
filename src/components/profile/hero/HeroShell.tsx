@@ -475,7 +475,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         ))}
 
         {/* Counter strip */}
-        {counters.length > 0 && <div
+        {(counters.length > 0 || footer === undefined) && <div
           style={{
             marginTop: 14,
             borderTop: `1px solid ${W_10}`,

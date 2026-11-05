@@ -68,7 +68,7 @@
 .pro-profile-track u { position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--pro-profile-dim); }
 .pro-profile-ranks { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
 .pro-profile-ranks span { padding:5px 10px; border-radius:999px; background:var(--pro-profile-wash); color:var(--pro-profile-soft); font-size:11px; }
-.pro-hero-headline { display:flex; gap:12px; align-items:flex-end; margin-top:20px; }
+.pro-hero-headline { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; margin-top:20px; }
 .pro-hero-headline>strong { font-size:44px; font-weight:800; line-height:.9; }
 .pro-hero-headline>div { padding-bottom:4px; min-width:0; }
 .pro-hero-headline b { display:block; font-size:10px; font-weight:800; letter-spacing:.14em; color:var(--pro-profile-mute); }
