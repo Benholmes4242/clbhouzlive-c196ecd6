@@ -21601,6 +21601,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_admin_verified: { Args: never; Returns: Json }
       get_all_users_admin: {
         Args: never
         Returns: {

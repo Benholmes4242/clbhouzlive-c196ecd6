@@ -34,4 +34,4 @@ textarea.pds-inp{min-height:74px;padding:12px;align-items:flex-start;resize:vert
 .pds-primary:disabled{background:rgba(255,255,255,0.1);color:rgba(248,250,252,0.42);cursor:default}
 .pds-text{height:44px;background:transparent;border:0;color:rgba(248,250,252,0.62);font-family:inherit;font-size:15px;font-weight:600;width:100%;cursor:pointer}
 .pds-fn{margin-top:8px;text-align:center;font-size:12px;line-height:1.45;color:rgba(248,250,252,0.42)}
-.pds-root button:focus-visible,.pds-root input:focus-visible,.pds-root textarea:focus-visible{outline:2px solid #F7931E;outline-offset:2px}
+.pds-root button:focus-visible,.pds-root input:focus-visible,.pds-root textarea:focus-visible{outline:2px solid #F8FAFC;outline-offset:2px}

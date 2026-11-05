@@ -3,7 +3,7 @@
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: DARK canvas (A.CANVAS — the page canvas token) — see MICRO_BRIEF_COMMENTS_DARK,
+ * Design: shared SHEET_SURFACE, matching LikesSheet; FIX6 replaces page canvas,
  * comments as hairline
  * separated ROWS (no cards). Height is content-driven, capped at 75dvh.
  * Keyboard-aware via useKeyboardHeight.
@@ -50,6 +50,7 @@ import { useCommentsSubject, useThreadStandings } from './hooks/useCommentsConte
 import { firstAppearanceStandings, standingUserId } from './lib/standing';
 import { useMemo } from 'react';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 import {
   AlertDialog,
@@ -66,7 +67,7 @@ import {
   Dark baseline. Rows carry no fill; separation is the hairline alone, which
   is why BORDER steps up one notch from the light value it replaces.
 */
-const CANVAS = A.CANVAS;
+const CANVAS = SHEET_SURFACE;
 const INK = A.INK;
 const MUTE = A.MUTE;
 const AMBER = '#F7931E';
