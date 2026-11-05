@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro world ranking sync
+- [ ] Verify public OWGR rank/date source and season-history availability; shared parser and authenticated weekly/check-now function.
+- [ ] Admin world-ranking row on verified tour pros and approved requests; Save/Check now/error coverage.
+- [ ] Focused tests, fresh four shards (stop on failures), report source/schedule convention and verification limits. No SQL or schedule creation.
+
 ## TOPTEN_SHEET_1
 - [x] Header action reads A.INK in both modes; shared 24px end gutter inside scroller, BottomSheet unchanged.
 - [x] Focused Top 10 checks 25/25; preview build OK.
