@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_UNBLOCK_3
+- [x] Read brief and dependencies; added only authorised ST2 trend override at line 19, retaining original spread/connection override and all assertions. Settings already uses pro-only readiness from preceding product fix.
+- [ ] Run ST2 then requested focused set and four fresh shards; expected actual 6,879 / 608 includes prior Settings regression (+1 versus brief).
+- [ ] Apply untouched-file 3/3 isolation flake rule; stop on non-flaky failures. Browser checks and combined close-out only after suite green.
+
 ## Settings pro-only card readiness
 - [x] Replace Settings shared chip read with full pro status; preserve all card props and existing assertions; add one proStatusControls regression with pending trend.
 - [x] Focused 41/41 (ST2 22/22); shard 3 passes 1,750. Shard 4 stops with 1,702 pass / 21 failures in hb5ProfileBackName, islandsRound2, linkedHandicapProfile, linkedHandicapState. No further fixture additions or assertions changed; full output kept.
