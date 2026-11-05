@@ -103,11 +103,15 @@ describe('Stage 3 launch', () => {
     expect(screen.queryByTestId('boot')).toBeNull();
   });
   it('preview still opens as a Clubhouse guest', async () => {
+    // Preserve this guest-path proof with the now-required preview opt-in.
+    window.history.replaceState(null, '', '/?guest=1');
     h.preview = true;
     await mountRoot();
     await waitFor(() => expect(screen.getByTestId('clubhouse').getAttribute('data-guest')).toBe('true'));
     expect(h.anon).toHaveBeenCalledTimes(1);
     expect(h.bridge).not.toHaveBeenCalled();
+    window.sessionStorage.removeItem('clbhouz_preview_guest');
+    window.history.replaceState(null, '', '/');
   });
   it('a signed-in native member reaches Clubhouse without anonymous sign-in', async () => {
     h.session = { user: { id: 'member', is_anonymous: false }, loading: false };
