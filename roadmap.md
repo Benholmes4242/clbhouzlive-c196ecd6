@@ -14,7 +14,8 @@
 - [x] Listed own-handicap presentation hidden, connections preserved; verified removal sheet implemented.
 - [x] Authorised only the settled amateur hook additions in ep5Completion and overflowRightIsland; assertions, names and expected values unchanged; historical failure log retained.
 - [x] Fix new-test Stop selectors without assertion changes: 14/14 pass; build OK 2026-11-05T11:16:21Z.
-- [ ] Add the authorised missing mounted per-surface tests, run four shards and reconcile against 6,835 plus named additions; delete PRO_STATUS_CONTROLS_REPORT.md only if everything passes.
+- [x] Added 13 missing per-surface cases; focused authorised set passes 80/80. No existing assertions, names or expected values changed.
+- [ ] STOP: shard 1 passes 1,753; shard 2 has 1,614 pass / 49 fail in untouched ep4LinksPrivacy, st3SettingsPrivacy, hb6Group1, headerB1, islandsNav. Full log retained in docs/verification/pro-status-fixtures/shard2.log; shards 3–4 and report deletion await exact authorisation. Source-based inventory expected 6,874 / 607; historical fixTourNotif1 report counted one excess case, explicitly recorded.
 
 ## Featured tilted pile
 - [ ] Apply signed-off rear-card CSS only, keeping front card and behaviour unchanged.
