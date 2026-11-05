@@ -17,6 +17,7 @@
 - **Chevrons**: `›` means navigation only. Expand/toggle/sheet controls use a different affordance.
 
 ## Memories
+- [Pro polish](mem://features/profile/pro-polish.md) — Pending no-handicap states, small short-caption island and server Verified catalogue.
 - [Sign-up and pro six fixes](mem://constraints/signup-pro-fix6.md) — Mandatory settled setup, contained crops, sheet material and no pro-board promises.
 - [Champions course-only tidy](mem://features/courses/ch1-champions-tidy) — Successful-read ruling accepts missing You reach after errors/empty results; preserve Defence/other states.
 - [Member-best wording](mem://constraints/member-best-wording.md) — Member scores are Best on clbhouz; genuine Tour and admin catalogue wording are exceptions.

@@ -9,6 +9,7 @@ import type { usePrivacySettings, VisibilityLevel } from '@/hooks/usePrivacySett
 import { strangerSummary, visibilityLabel } from './privacySummary';
 import { useSettingsBlockedCount } from './useSettingsBlockedCount';
 import './settingsPrivacy.css';
+import '@/features/pro-verification/pro-status-controls.css';
 
 type Sheet = 'profile' | 'leaderboards' | 'courses';
 const SHEETS = {
@@ -17,8 +18,8 @@ const SHEETS = {
   courses: { title: 'Courses', sub: 'Your Top 100 lists and your Courses tab, wherever they appear. Your counts stay on the boards either way.', lines: ["Any golfer sees the courses you've played.", 'Only your friends see them.', 'Only you see them.'] },
 };
 const LEVELS: VisibilityLevel[] = ['public', 'friends', 'private'];
-interface Props { userId?: string; privacy: ReturnType<typeof usePrivacySettings>; onToggleRounds: (value: boolean) => void; onBlocked: () => void }
-export function SettingsPrivacyCard({ userId, privacy: p, onToggleRounds, onBlocked }: Props) {
+interface Props { noHandicap?: boolean; userId?: string; privacy: ReturnType<typeof usePrivacySettings>; onToggleRounds: (value: boolean) => void; onBlocked: () => void }
+export function SettingsPrivacyCard({ noHandicap = false, userId, privacy: p, onToggleRounds, onBlocked }: Props) {
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const [busy, setBusy] = useState(false);
   const blocked = useSettingsBlockedCount(userId);
@@ -38,13 +39,13 @@ export function SettingsPrivacyCard({ userId, privacy: p, onToggleRounds, onBloc
   return <>
     <div className="ep-rows st3-privacy" data-testid="settings-privacy">
       <div className="st3-seen"><i>What a golfer you don't know sees</i><p data-testid="stranger-summary">{summary.map((s, i) => <span key={i} className={s.tone === 'mute' ? 'st3-mute' : undefined}>{s.text}</span>)}</p></div>
-      {(['profile', 'leaderboards', 'courses'] as const).map(key => <Button key={key} variant="ghost" className="ep-row" disabled={updating[key]} onClick={() => setSheet(key)}>
-        <span className="ep-row-label">{SHEETS[key].title}</span><span className="ep-row-value">{visibilityLabel(values[key])}</span><ChevronRight size={18} className="ep-row-chev" aria-hidden />
+      {(['profile', 'leaderboards', 'courses'] as const).map(key => <Button key={key} variant="ghost" className={`ep-row${noHandicap && key === 'leaderboards' ? ' pro-privacy-inert' : ''}`} disabled={updating[key] || (noHandicap && key === 'leaderboards')} onClick={() => { if (!noHandicap || key !== 'leaderboards') setSheet(key); }}>
+        <span className="ep-row-label">{SHEETS[key].title}</span><span className="ep-row-value">{noHandicap && key === 'leaderboards' ? 'Not for pros' : visibilityLabel(values[key])}</span>{(!noHandicap || key !== 'leaderboards') && <ChevronRight size={18} className="ep-row-chev" aria-hidden />}
       </Button>)}
-      <div className="ep-row st3-rounds"><span className="ep-row-label">New rounds</span><span className="ep-row-value">Tell my followers</span><Button variant="ghost" className="bizc-switch st3-switch" role="switch" aria-label="New rounds" aria-checked={p.autoPostRounds} disabled={p.isUpdatingAutoPostRounds} onClick={() => onToggleRounds(!p.autoPostRounds)}><i aria-hidden /></Button></div>
+      <div className={`ep-row st3-rounds${noHandicap ? ' pro-privacy-inert' : ''}`}><span className="ep-row-label">New rounds</span><span className="ep-row-value">{noHandicap ? 'Not for pros' : 'Tell my followers'}</span><Button variant="ghost" className="bizc-switch st3-switch" role="switch" aria-label="New rounds" aria-checked={noHandicap ? false : p.autoPostRounds} disabled={noHandicap || p.isUpdatingAutoPostRounds} onClick={() => { if (!noHandicap) onToggleRounds(!p.autoPostRounds); }}><i aria-hidden /></Button></div>
       <Button variant="ghost" className="ep-row" onClick={onBlocked}><span className="ep-row-label">Blocked</span><span className={`ep-row-value${blocked === 0 ? ' ph' : ''}`} data-testid="settings-blocked-value">{blocked == null ? null : blocked === 0 ? 'No one' : `${blocked} ${blocked === 1 ? 'golfer' : 'golfers'}`}</span><ChevronRight size={18} className="ep-row-chev" aria-hidden /></Button>
     </div>
-    <p className="st3-note">Your handicap, clubs and Top 10 each have their own setting on the Profile tab.</p>
+    <p className="st3-note">{noHandicap ? "Pros don't post handicap rounds, so they're not on the member boards. Tour results show on your Tour tab." : 'Your handicap, clubs and Top 10 each have their own setting on the Profile tab.'}</p>
     {sheet && <BizcSheet title={SHEETS[sheet].title} sub={SHEETS[sheet].sub} testId="st3-privacy-sheet" onDone={close} actionDisabled={busy || updating[sheet]}>
       <div className="st3-options" role="radiogroup" aria-label={SHEETS[sheet].title}>{LEVELS.slice(0, sheet === 'profile' ? 2 : 3).map((value, index) => <Button key={value} variant="ghost" className="ep-opt" role="radio" aria-checked={values[sheet] === value} disabled={busy || updating[sheet]} onClick={() => void save(sheet, value)}><span><b>{visibilityLabel(value)}</b><small>{SHEETS[sheet].lines[index]}</small></span><i className="ep-radio" aria-hidden /></Button>)}</div>
     </BizcSheet>}

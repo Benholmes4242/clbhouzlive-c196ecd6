@@ -413,7 +413,7 @@ const HandicapPage: React.FC = () => {
   // run. This page currently early-returns while the session is loading, so the
   // old !connLoading read happened to be safe - gating on isFetched removes the
   // dependency on that early return continuing to exist.
-  const isConnectFlow = !isFriendView && ownHandicap.settled && !ownHandicap.pro && connFetched && !connError && !ownConnection;
+  const isConnectFlow = !isFriendView && ownHandicap.settled && !ownHandicap.noHandicap && connFetched && !connError && !ownConnection;
 
   // Apply the dark route theming only when NOT in the connect flow.
   // The connect flow uses Direction A (light) and the dark theming would
@@ -461,7 +461,7 @@ const HandicapPage: React.FC = () => {
   }
 
   if (!ownHandicap.settled) return null;
-  if (ownHandicap.pro) return <ProHandicapNote kind={ownHandicap.proKind} />;
+  if (ownHandicap.noHandicap) return <ProHandicapNote kind={ownHandicap.proKind} pending={ownHandicap.proPending && !ownHandicap.pro} />;
 
   // Own-mode error branch — a failed useWhsConnection must not fall through
   // to the connect flow (would prompt an already-connected user to reconnect).

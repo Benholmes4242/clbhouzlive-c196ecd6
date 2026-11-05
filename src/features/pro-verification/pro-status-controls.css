@@ -1,7 +1,9 @@
 .pro-island-cell.pro-island-cell{height:auto;background:none;border:0;padding:0;border-radius:0;display:flex;flex-direction:column;align-items:flex-start;line-height:1;gap:0}
 .pro-island-detail{margin-top:4px;max-width:92px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;font-size:8.5px;font-weight:700;letter-spacing:0.12em;color:var(--pro-controls-dim)}
 .pro-status-card-head{display:flex;gap:8px;align-items:center}
+.pro-being-checked{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;border:1px solid var(--pro-controls-pending-rule);font-size:9.5px;font-weight:800;letter-spacing:0.12em;color:var(--pro-controls-muted);white-space:nowrap}
 .pro-status-switch{opacity:0.42}
+.pro-privacy-inert.pro-privacy-inert{opacity:0.42}
 .pro-handicap-page{min-height:100dvh;background:var(--pro-controls-canvas);color:var(--pro-controls-ink);padding-top:var(--chrome-clearance)}
 .pro-handicap-note{margin:16px;--ep-card:var(--pro-controls-card);--ep-hair:var(--pro-controls-hair);--ep-ink:var(--pro-controls-ink);--ep-mute:var(--pro-controls-muted)}
 .pro-handicap-note .st2-handicap{padding:16px;border-radius:16px}

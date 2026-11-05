@@ -176,13 +176,13 @@ export function SettingsTabContent() {
     <>
       <div className="ep-settings">
         <div className="ep-group">Your handicap</div>
-        {!proStatus.unknown && <SettingsHandicapCard pro={proStatus.verified && proStatus.kind ? {kind:proStatus.kind} : null} userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
+        {!proStatus.unknown && <SettingsHandicapCard pro={proStatus.verified && proStatus.kind ? {kind:proStatus.kind} : proStatus.pending ? {kind:proStatus.kind ?? 'tour_pro',pending:true} : null} userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
           profileError={!!profileError} egHandicapIndex={profile.eg_handicap_index} manualHandicapIndex={profile.manual_handicap_index}
           checked={!hideHandicapChip} updating={chipUpdating} onToggle={handleToggleHandicapChip} onManage={() => navigate('/manage/handicap')} />}
 
         {/* Privacy */}
         <div className="ep-group">Privacy</div>
-        <SettingsPrivacyCard userId={user?.id} privacy={privacy} onToggleRounds={handleToggleAutoPostRounds} onBlocked={() => navigate('/manage/blocked')} />
+        <SettingsPrivacyCard noHandicap={proStatus.verified || proStatus.pending} userId={user?.id} privacy={privacy} onToggleRounds={handleToggleAutoPostRounds} onBlocked={() => navigate('/manage/blocked')} />
 
         {/* Notifications */}
         <div className="ep-group">Notifications</div>

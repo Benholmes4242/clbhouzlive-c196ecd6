@@ -37,7 +37,7 @@ export function ScoresStandingSlot({
 }) {
   const state = useOwnHandicapState(viewerId);
 
-  if (!state.settled || state.pro) return null;
+  if (!state.settled || state.noHandicap) return null;
   if (state.connected) return <StandingShelf viewerId={viewerId} pos={pos} />;
   if (state.linked) return null;
   return <ConnectStandingInvite pos={pos} />;

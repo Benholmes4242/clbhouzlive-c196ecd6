@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro polish
+- [x] Applied pending no-handicap states, small island captions, Settings pending/inert Privacy and authorised Admin Verified/visible-row reads. Details and limits in PRO_POLISH_REPORT.md.
+- [x] Focused 66/66; assertion ledger and +30/+2 inventory reconciliation saved (expected 7,027/619).
+- [ ] STOP: fresh shard1 1,829 pass; shard2 1,658 pass/1 fail at untouched CH1 line78:66, `expected null not to be null`; full logs retained. Shards3–4/browser and remaining parent/Inbox coverage blocked by stop; CH1 fixture authorisation needed.
+
 ## FIX6 — Sign-up and pro fixes
 - [x] Implemented reachable cropper containment/zoom, shared comments material, account media-query paint, member-only settled setup guard/error routing/step-one Skip, pro focus/copy. Legacy unmounted personal modal left unchanged.
 - [x] Added 17 tests/3 files; focused 107/107 and surfaces 22/22. Exact old/new assertion/string ledger in FIX6_SIGNUP_PRO_REPORT.md; source inventory expected 6,997/617 including CH1, not full-suite passing total.

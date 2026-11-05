@@ -130,6 +130,20 @@ function InboxListPage() {
   const [unmatchedRow, setUnmatchedRow] = useState<UnmatchedCourseRow | null>(null);
   const [holePhotoRow, setHolePhotoRow] = useState<HolePhotoQueueRow | null>(null);
 
+  // Verified catalogue doors select an existing queue payload, never fabricate a request.
+  useEffect(() => {
+    if (!canUsers) return;
+    const requestId = params.get('request');
+    const businessId = params.get('business');
+    if (!requestId && !businessId) return;
+    const item = [...feed.items, ...feed.doneItems].find(i => {
+      if (i.type !== 'verification') return false;
+      const row = i.payload as VerificationRow;
+      return requestId ? row.id === requestId : row.type === 'business' && row.businessId === businessId;
+    });
+    if (item) setVerifRow(item.payload as VerificationRow);
+  }, [canUsers, params, feed.items, feed.doneItems]);
+
   // Deep-link ?ticket= opens support drawer
   useEffect(() => {
     const ticketId = params.get('ticket');
