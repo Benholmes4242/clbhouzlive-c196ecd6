@@ -47,6 +47,7 @@ import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
 import { useWatchProgress } from './useWatchSignals';
 import { RoundsThisWeekShelf } from './RoundsThisWeekShelf';
+import { StandoutRoundsShelf } from './StandoutRoundsShelf';
 import { CourseVideosShelf, ShelfHeading } from './CourseVideosShelf';
 import { RegionsShelf } from './RegionsShelf';
 import { scrollPageToTop } from '@/lib/getScrollParent';
@@ -616,6 +617,8 @@ export function WatchFeed({
           {onAll ? (
             <RoundsThisWeekShelf userId={userId} onOpenRound={onOpenRound} onOpenMember={onOpenMember} />
           ) : null}
+
+          {onAll ? <StandoutRoundsShelf userId={userId} onOpenRound={onOpenRound} onOpenMember={onOpenMember} /> : null}
 
           {/* WS2 — FILMED AT YOUR COURSES and BY REGION: For you only, after Rounds this
               week and before Watch. Both hide themselves for guests and thin data. */}
