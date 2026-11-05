@@ -28,6 +28,7 @@ vi.mock('@/hooks/useDeleteAccount', () => ({ useDeleteAccount: () => ({
 }) }));
 vi.mock('@/hooks/useLogout', () => ({ useLogout: () => ({ logout: vi.fn() }) }));
 vi.mock('@/lib/whs/hooks', () => ({ useHandicapTrend: () => ({ data: undefined, isLoading: false, isPending: true, isFetched: false, isError: false, fetchStatus: 'idle' }), useWhsConnection: () => ({ data: null }), whsKeys: { percentile: (id: string) => ['whs-percentile', id] } }));
+vi.mock('@/lib/whs/useOwnHandicapState', () => ({ useOwnHandicapState: () => ({ linked: !!null, connected: !!null, settled: true, connection: null, trend: undefined, anyError: false, pro: false, proKind: null, proTour: null, proClub: null }) }));
 vi.mock('@/components/settings/ui', () => ({
   SettingsSkeleton: () => <div />,
   SettingsSection: ({ children }: { children: ReactNode }) => <div>{children}</div>,
