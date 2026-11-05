@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { ProLabel } from '@/features/pro-verification/ProLabel';
-import { getBusinessCategoryLabel } from '@/constants/businessCategories';
+import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
 import { adminVerifiedCount, type AdminVerified } from '../hooks/useAdminVerified';
 import { formatAgo } from '../lib/formatAgo';
 import './adminVerified.css';
@@ -24,7 +24,7 @@ export function AdminVerifiedCard({ data, loading, error, onOpenMember }: { data
       {section('PROS', data.pros.map(p => row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, [p.pro_kind === 'tour_pro' ? 'Tour professional' : 'Teaching professional', p.pro_kind === 'tour_pro' ? p.pro_tour : p.pro_club].filter(Boolean).join(' · '), <ProLabel size="small" />, p.verified_at, () => onOpenMember(p.id))))}
       {section('BEING CHECKED', data.pending.map(p => row(p.request_id, p.display_name ?? p.username ?? 'Member', p.avatar_url, `${p.kind === 'tour_pro' ? 'Tour professional' : 'Teaching professional'} · asked ${formatAgo(p.requested_at, { suffix: true })}`, <span className="admin-verified-pending">BEING CHECKED</span>, null, () => navigate(`/admin-v2/inbox?type=verification&request=${encodeURIComponent(p.request_id)}`), true)))}
       {section('GOLFERS', data.golfers.map(p => row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, 'Verified golfer', <VerifiedBadge size="sm" />, p.verified_at, () => onOpenMember(p.id))))}
-      {section('BUSINESSES', data.businesses.map(p => row(p.id, p.name, p.logo_url, getBusinessCategoryLabel(p.category), <VerifiedBadge size="sm" />, p.verified_at, () => navigate(`/admin-v2/inbox?type=verification&view=done&business=${encodeURIComponent(p.id)}`))))}
+      {section('BUSINESSES', data.businesses.map(p => row(p.id, p.name, p.logo_url, BUSINESS_CATEGORIES_WITH_ICONS.find(c => c.value === p.category)?.label ?? p.category ?? '', <VerifiedBadge size="sm" />, p.verified_at, () => navigate(`/admin-v2/inbox?type=verification&view=done&business=${encodeURIComponent(p.id)}`))))}
     </> : null}
   </div>;
 }

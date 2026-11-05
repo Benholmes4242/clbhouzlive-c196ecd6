@@ -16,12 +16,18 @@ import { londonDate } from '../lib/memberRadarDisplay';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { MembersOverview, MembersOverviewMember } from '../hooks/useMembersRadar';
 import { useEgIssueUserIds } from '../hooks/useUsers';
+import { Button } from '@/components/ui/button';
+import { ProLabel } from '@/features/pro-verification/ProLabel';
+import { useProMembers } from '@/features/pro-verification/useProMembers';
+import type { ProMember } from '@/features/pro-verification/proMembersCache';
+import { useAdminVerified, adminVerifiedCount } from '../hooks/useAdminVerified';
+import { AdminVerifiedCard } from './AdminVerifiedCard';
 
 const PAGE = 25;
 const DAY = 86_400_000;
 
-export type ChipFilter = 'all' | 'connected' | 'no_handicap' | 'quiet' | 'new_this_week';
-const CHIP_FILTERS: ChipFilter[] = ['all', 'connected', 'no_handicap', 'quiet', 'new_this_week'];
+export type ChipFilter = 'all' | 'verified' | 'connected' | 'no_handicap' | 'quiet' | 'new_this_week';
+const CHIP_FILTERS: ChipFilter[] = ['all', 'verified', 'connected', 'no_handicap', 'quiet', 'new_this_week'];
 const LEGACY_TO_ALL = new Set(['unverified', 'new_today']);
 
 /** Filters linked from elsewhere: no chip, label shown as the list header. */
@@ -36,13 +42,14 @@ const LINKED_FILTERS: Record<string, { label: string; test: (m: MembersOverviewM
 };
 const CHIP_TEST: Record<ChipFilter, (m: MembersOverviewMember) => boolean> = {
   all: () => true,
+  verified: () => false,
   connected: m => m.connected,
   no_handicap: m => !m.connected,
   quiet: m => m.is_quiet,
   new_this_week: m => m.is_new,
 };
 const CHIP_HEADER: Record<ChipFilter, string> = {
-  all: 'All members', connected: 'Connected', no_handicap: 'No handicap', quiet: 'Quiet', new_this_week: 'New',
+  all: 'All members', verified: 'Verified', connected: 'Connected', no_handicap: 'No handicap', quiet: 'Quiet', new_this_week: 'New',
 };
 
 const PANEL_TITLE: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' };
@@ -59,17 +66,18 @@ export function resolveListFilter(raw: string | null): { chip: ChipFilter | null
   return { chip: 'all', linked: null };
 }
 
-export function memberTags(m: MembersOverviewMember): { label: string; color: string }[] {
+export function memberTags(m: MembersOverviewMember, pro?: ProMember): { label: string; color: string }[] {
   const tags: { label: string; color: string }[] = [];
   if (m.admin_role && ROLE_LABEL[m.admin_role]) tags.push({ label: ROLE_LABEL[m.admin_role], color: t.brandText });
   if (m.is_new) tags.push({ label: 'New', color: t.okText });
   if (m.is_quiet) tags.push({ label: 'Quiet', color: t.warnText });
   if (m.is_suspended) tags.push({ label: 'Suspended', color: t.dangerText });
-  if (!m.connected) tags.push({ label: 'No hcp', color: t.inkFaint });
+  if (!m.connected && !pro) tags.push({ label: 'No hcp', color: t.inkFaint });
   return tags.slice(0, 2);
 }
 
-export function memberSubline(m: MembersOverviewMember): string {
+export function memberSubline(m: MembersOverviewMember, pro?: ProMember): string {
+  if (pro) return [m.home_club, pro.pro_kind === 'tour_pro' ? pro.pro_tour : 'Teaching pro'].filter(Boolean).join(' · ');
   const handle = m.username ? `@${m.username}` : '—';
   if (m.is_quiet) return `was weekly · silent since ${londonDate(m.last_seen_at, { day: 'numeric', month: 'short' })}`;
   if (m.is_new) return `${m.home_club || 'no club'} · joined ${formatAgo(m.created_at, { suffix: true })}`;
@@ -154,9 +162,10 @@ function LastSeenPanel({ o }: { o: MembersOverview | undefined }) {
   );
 }
 
-function Chips({ o, active, onPick }: { o: MembersOverview | undefined; active: ChipFilter | null; onPick: (f: ChipFilter) => void }) {
+function Chips({ o, verifiedCount, active, onPick }: { o: MembersOverview | undefined; verifiedCount: number | undefined; active: ChipFilter | null; onPick: (f: ChipFilter) => void }) {
   const chips: { id: ChipFilter; label: string; n: number | undefined; c?: string }[] = [
     { id: 'all', label: 'All', n: o?.total },
+    { id: 'verified', label: 'Verified', n: verifiedCount },
     { id: 'connected', label: 'Connected', n: o?.connected },
     { id: 'no_handicap', label: 'No handicap', n: o?.no_handicap },
     { id: 'quiet', label: 'Quiet', n: o?.quiet, c: t.warnText },
@@ -167,7 +176,7 @@ function Chips({ o, active, onPick }: { o: MembersOverview | undefined; active: 
       {chips.map(c => {
         const on = active === c.id;
         return (
-          <button
+          <Button variant="ghost"
             key={c.id}
             type="button"
             aria-pressed={on}
@@ -190,14 +199,14 @@ function Chips({ o, active, onPick }: { o: MembersOverview | undefined; active: 
           >
             {c.label}
             <span style={{ fontWeight: 800, color: on ? undefined : c.c }}>{c.n ?? '—'}</span>
-          </button>
+          </Button>
         );
       })}
     </div>
   );
 }
 
-function MemberRow({ m, onOpen }: { m: MembersOverviewMember; onOpen: () => void }) {
+function MemberRow({ m, pro, onOpen }: { m: MembersOverviewMember; pro?: ProMember; onOpen: () => void }) {
   const name = m.display_name ?? m.username ?? 'Member';
   return (
     <button
@@ -224,7 +233,8 @@ function MemberRow({ m, onOpen }: { m: MembersOverviewMember; onOpen: () => void
           <span style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {name}
           </span>
-          {memberTags(m).map(tag => (
+          {pro && <ProLabel size="small" />}
+          {memberTags(m, pro).map(tag => (
             <span key={tag.label} style={{ ...TAG, color: tag.color }}>{tag.label}</span>
           ))}
         </span>
@@ -239,7 +249,7 @@ function MemberRow({ m, onOpen }: { m: MembersOverviewMember; onOpen: () => void
             textOverflow: 'ellipsis',
           }}
         >
-          {memberSubline(m)}
+          {memberSubline(m, pro)}
         </span>
         <span style={{ marginTop: 5, display: 'flex', gap: 3 }}>
           {weekDashColors(m).map((c, i) => (
@@ -248,8 +258,8 @@ function MemberRow({ m, onOpen }: { m: MembersOverviewMember; onOpen: () => void
         </span>
       </span>
       <span style={{ textAlign: 'right' }}>
-        <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: m.connected ? t.ink : t.inkFaint }}>
-          {memberIndexText(m.index, m.connected)}
+        <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: m.connected || pro ? t.ink : t.inkFaint }}>
+          {pro ? 'PRO' : memberIndexText(m.index, m.connected)}
         </span>
         <span style={{ display: 'block', fontSize: 10.5, fontWeight: 700, color: lastSeenColor(m) }}>
           {formatAgo(m.last_seen_at)}
@@ -299,6 +309,7 @@ export default function MembersList({
   const [shown, setShown] = useState(PAGE);
   const { chip, linked } = resolveListFilter(params.get('filter'));
   const eg = useEgIssueUserIds(linked === 'eg_issues');
+  const verified = useAdminVerified();
   const egSet = useMemo(() => new Set(eg.data ?? []), [eg.data]);
 
   const pick = (f: ChipFilter) => {
@@ -321,6 +332,7 @@ export default function MembersList({
   }, [overview, chip, linked, egSet, search]);
 
   const header = linked ? LINKED_FILTERS[linked].label : CHIP_HEADER[chip ?? 'all'];
+  const { members: pros } = useProMembers(chip === 'verified' ? [] : rows.slice(0, shown).map(m => m.user_id));
   const more = rows.length - shown;
 
   return (
@@ -355,10 +367,10 @@ export default function MembersList({
           ))}
         </div>
       ) : (
-        <Chips o={overview} active={chip} onPick={pick} />
+        <Chips o={overview} verifiedCount={adminVerifiedCount(verified.data)} active={chip} onPick={pick} />
       )}
 
-      <div style={{ background: t.surface, borderRadius: 16, padding: '14px 0 4px' }}>
+      {chip === 'verified' ? <AdminVerifiedCard data={verified.data} loading={verified.isPending} error={verified.isError} onOpenMember={onOpenMember} /> : <div style={{ background: t.surface, borderRadius: 16, padding: '14px 0 4px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px 10px' }}>
           <span style={PANEL_TITLE}>{header}</span>
           <span style={CAPTION}>8 wks · index · seen</span>
@@ -372,7 +384,7 @@ export default function MembersList({
         ) : (
           <>
             {rows.slice(0, shown).map(m => (
-              <MemberRow key={m.user_id} m={m} onOpen={() => onOpenMember(m.user_id)} />
+              <MemberRow key={m.user_id} m={m} pro={pros.get(m.user_id)} onOpen={() => onOpenMember(m.user_id)} />
             ))}
             {more > 0 && (
               <button
@@ -400,7 +412,7 @@ export default function MembersList({
             )}
           </>
         )}
-      </div>
+      </div>}
     </>
   );
 }
