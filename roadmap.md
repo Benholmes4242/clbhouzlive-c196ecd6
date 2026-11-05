@@ -2,7 +2,7 @@
 
 ## Tour menu Live board
 - [x] Signed-off menu presentation and slug-owned single selection; shared picker membership/behavior preserved.
-- [ ] Add focused live-board/selection coverage, 320px geometry and four shards; pre-existing EXP_RING_1 failures remain untouched.
+- [ ] STOP: new menu tests 15/15, focused total 28 pass/1 fail at tourIsland.test.tsx:235:30 `expected '' to be 'min(346px, calc(100vw - 24px))'`. No repair; browser/four shards blocked. Prior Explore failures untouched. Expected inventory 7,042 / 622; exact ledger in TOUR_MENU_LIVE_BOARD_REPORT.md.
 
 ## EXP_RING_1
 - [x] Audit Explore-only avatar callers; resolve brief discrepancy as Tour-matching 1px traced personal ring, business 0.5px inset as requested; amber/shared/Tour unchanged.
