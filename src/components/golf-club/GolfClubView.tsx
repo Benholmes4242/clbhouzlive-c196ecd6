@@ -40,6 +40,7 @@ import { HeroCourseRecord, heroRecordVisible, HERO_RECORD_ROW_EXTRA } from '@/co
 import { SURFACE } from '@/lib/tokens/surface';
 import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
 import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
+import { getScrollAncestor } from '@/lib/getScrollParent';
 
 
 interface GolfClubViewProps {
@@ -95,6 +96,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const highlightReviewId = searchParams.get('review');
 
   const [visitedTabs, setVisitedTabs] = useState<Set<CourseTabId>>(new Set([initialTab]));
+  const courseTabsRef = useRef<HTMLDivElement>(null);
 
   // Sync activeTab when URL/state changes (handles deep links when already mounted on this course)
   useEffect(() => {
@@ -202,6 +204,14 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     }
   }, [user?.id, courseId, queryClient, isInModal, searchParams, setSearchParams]);
 
+  // CH1: reuse tab/URL ownership, then reset the actual page/modal scroller.
+  // Ordinary tab changes keep their existing scroll behaviour.
+  const openYouFromChampions = useCallback(() => {
+    handleTabChange('you');
+    requestAnimationFrame(() => {
+      getScrollAncestor(courseTabsRef.current)?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+  }, [handleTabChange]);
 
   if (courseError) {
     return (
@@ -298,7 +308,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   );
 
   const tabContent = (
-    <div className="course-hero-wrapper" style={{ paddingTop: TAB_LEAD_IN }}>
+    <div ref={courseTabsRef} className="course-hero-wrapper" style={{ paddingTop: TAB_LEAD_IN }}>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsContent
           value="course"
@@ -338,6 +348,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
                 courseType: (course as { course_type?: string | null }).course_type ?? null,
               }}
               hideHeader
+              includeElsewhere={false}
+              onOpenYouTab={openYouFromChampions}
               fieldAvgOverPar={courseStats?.avg_over_par ?? null}
               totalCourseRounds={courseStats?.rounds_tracked ?? null}
             />

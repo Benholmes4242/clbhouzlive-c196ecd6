@@ -5,6 +5,7 @@
  * below follows what is drawn. No ghost row: a tracked card ends State 3.
  */
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import type { LegendCategory } from '@/lib/gam/types';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
@@ -19,7 +20,7 @@ import { CHAMPIONS_BOARD_DATA } from '../_shared/championsOrder';
 import type { FlatRow } from './championsFlatBits';
 import { courseHandicap, type CoursePlayInputs } from '@/lib/whs/coursePlay';
 
-export type PostedChampionsProps = Omit<FieldChampionsProps, 'onConnect'> & { onConnect?: () => void; inputs?: CoursePlayInputs | null };
+export type PostedChampionsProps = Omit<FieldChampionsProps, 'onConnect'> & { onConnect?: () => void; inputs?: CoursePlayInputs | null; onOpenYouTab?: () => void };
 
 /** The 90-day counterpart of a board, or null when that window has none. */
 export function ninetyDayCounterpart(category: LegendCategory): LegendCategory | null {
@@ -112,7 +113,13 @@ export function PostedChampions(props: PostedChampionsProps) {
       {openFeats.length > 0 && rounds != null && <div className="champions-empty-said" style={{ color: A.BODY }}>Nobody has made {openNames} here in {rounds.toLocaleString('en-GB')} recorded rounds. {openFeats.length === 1 ? 'That one has been open since the course was added and the first player to do it takes it outright.' : `Those ${numberWord(openFeats.length, false)} have been open since the course was added and the first player to do it takes them outright.`}</div>}
     </section>
     <BoardSection categories={categories} grouped={grouped} activeKey={activeKey} onSelectCategory={props.onSelect} legendWindow={legendWindow} canSwitchWindow onWindowChange={props.onWindowChange} coursePar={props.par} onOpenFull={props.onOpenFull} onRowPress={props.onRowPress} hasTrackedRounds postedScreen />
-    {owned ? <DefencePanel category={activeKey} attainedAt={grouped.get(activeKey)?.rows.find(row => row.isSelf)?.attained_at ?? null} viewerTotal={grouped.get(activeKey)?.rows.find(row => row.isSelf)?.valueDisplay ?? null} {...owned} /> : <WhatItTakes category={activeKey} grouped={grouped} inputs={props.inputs ?? null} />}
+    {owned && <DefencePanel category={activeKey} attainedAt={grouped.get(activeKey)?.rows.find(row => row.isSelf)?.attained_at ?? null} viewerTotal={grouped.get(activeKey)?.rows.find(row => row.isSelf)?.valueDisplay ?? null} {...owned} />}
+    {props.onOpenYouTab && <div data-section="champions-you-link" style={{ margin: '34px 16px 0', paddingTop: 18, borderTop: `1px solid ${A.TRACK}` }}>
+      <Button variant="ghost" onClick={props.onOpenYouTab} className="h-auto w-full justify-between gap-3 rounded-none px-0 py-[6px] text-left whitespace-normal" style={{ color: A.INK, fontSize: 14, fontWeight: 600 }}>
+        <span>What you could take here</span>
+        <span className="shrink-0" style={{ color: A.DIM, fontSize: 13, fontWeight: 500 }}>You tab ›</span>
+      </Button>
+    </div>}
   </div>;
 }
 
@@ -120,7 +127,8 @@ export function PostedChampions(props: PostedChampionsProps) {
  * best here, course handicap); counting boards show two (record, total here).
  * No last-20 and no monument sentence: those need round history, which is a
  * You tab fact and is never fetched into the Champions tree. */
-function WhatItTakes({ category, grouped, inputs }: { category: LegendCategory; grouped: FieldChampionsProps['grouped']; inputs: CoursePlayInputs | null }) {
+// CH1: retained for now, but never rendered by the posted state; You owns reach.
+export function WhatItTakes({ category, grouped, inputs }: { category: LegendCategory; grouped: FieldChampionsProps['grouped']; inputs: CoursePlayInputs | null }) {
   const rows = grouped.get(category)?.rows ?? [];
   const record = rows.find(row => row.rank === 1);
   const self = rows.find(row => row.isSelf);

@@ -111,9 +111,12 @@ interface Props {
   /** Already-mounted GolfClubView read; no additional stats query. */
   fieldAvgOverPar?: number | null;
   totalCourseRounds?: number | null;
+  /** CH1: course-page-only omission; default preserves future non-course callers. */
+  includeElsewhere?: boolean;
+  onOpenYouTab?: () => void;
 }
 
-export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false, theme = 'dark', fieldAvgOverPar = null, totalCourseRounds = null }) => {
+export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false, theme = 'dark', fieldAvgOverPar = null, totalCourseRounds = null, includeElsewhere = true, onOpenYouTab }) => {
   const { t } = useTranslation('courses');
   const ctx = selection;
 
@@ -588,6 +591,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           inputs={projectionInputs}
           viewer={{ name: profile?.display_name ?? 'You', photoUrl: profile?.profile_photo_url ?? null }}
         /> : hasPlayed ? <PostedChampions
+          onOpenYouTab={onOpenYouTab ? () => {
+            analyticsEvents.track('champions_you_link_tapped', { course_id: ctx.courseId });
+            onOpenYouTab();
+          } : undefined}
           inputs={projectionInputs}
           categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
           grouped={grouped}
@@ -683,7 +690,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
 
       {/* CHAMPIONS_ELSEWHERE_R VB1: connected members only, played here or not. */}
-      {!isLoading && !isError && user?.id && showElsewhere(Boolean(whsConnection), user.id, activeActor?.id) && (
+      {includeElsewhere && !isLoading && !isError && user?.id && showElsewhere(Boolean(whsConnection), user.id, activeActor?.id) && (
         <ChampionsElsewhere userId={user.id} />
       )}
 

@@ -1,4 +1,59 @@
-# CH1 — prerequisite stop before product changes
+# CH1 — completed edit, stopped on new check failures
+
+## Preview type-error follow-up
+
+The subsequent request explicitly authorised fixing preview type errors without asking. Added `courseRegion: null, courseCountry: null, courseType: null` to the new test's selection fixture at `src/test/ch1ChampionsTidy.test.tsx:44`; no assertion/case-name change. Preview log now reports **build OK at 2026-11-05T17:50:18Z**. The TS2739 stop below is historical and resolved. The independent Field-panel assertion failure remains unchanged; tests/shards were not rerun in this type-error-only follow-up. Suite inventory remains expected 6,980/614, not a fresh passing total.
+
+## Current stop
+
+Ben chose **Successful reads only**, accepting absent Within reach after failed/empty You reads. The prerequisite stop below is historical and resolved; You remains unchanged.
+
+Implemented the scoped changes:
+- Posted no longer renders What it takes; its function stays exported on disk to avoid an unused-function warning. Defence is retained.
+- Course page passes `includeElsewhere={false}`; drilldown default is true, preserving possible non-course reuse and the on-disk Elsewhere module/helper.
+- Posted course link uses the signed-off geometry, A.INK/A.DIM/A.TRACK, and the shared Button. Callback tracks `champions_you_link_tapped` with course_id and invokes GolfClubView's existing tab handler.
+- The link alone resets the actual page/modal scroll ancestor on the next frame. The existing tab handler has no scroll call; ordinary pill behaviour is intentionally untouched rather than silently changed.
+- FieldChampions, ProjectedChampions, CourseYouTab, existing cabinet/board/sheets and other frozen presentation are unchanged.
+
+### Failure output, preserved without repair
+
+Focused command: `bunx vitest run src/test/ch1ChampionsTidy.test.tsx src/test/championsNetSource.test.tsx src/test/championsElsewhere.test.tsx src/test/championsState1.test.tsx src/test/championsState2.test.tsx src/test/championsState3.test.tsx src/test/g2aCourseTabs.test.tsx --maxWorkers=2`.
+
+Result: **54 passed, 1 failed / 55 tests**, six passed files and one failed file. Full output: `docs/verification/ch1/focused.log`.
+
+```text
+FAIL src/test/ch1ChampionsTidy.test.tsx > CH1 Champions tidy > field keeps What it takes without the You link
+AssertionError: expected null not to be null
+❯ src/test/ch1ChampionsTidy.test.tsx:78:66
+expect(subtree?.querySelector('.champions-field-panel')).not.toBeNull();
+```
+
+The new direct-drilldown fixture omits `fieldAvgOverPar` and `totalCourseRounds`. The unchanged Field comparison requires both (`championsField.ts:12–14`); it correctly omits that panel. No passing production component was altered for this fixture, and no failing assertion was edited.
+
+The finished edit also has this surviving harness type error; full log copied to `docs/verification/ch1/build-stop.log`:
+
+```text
+=== build 2026-11-05T17:48:52Z ===
+--- typecheck ---
+src/test/ch1ChampionsTidy.test.tsx(50,92): error TS2739: Type '{ courseId: string; courseName: string; }' is missing the following properties from type 'CourseSelection': courseRegion, courseCountry, courseType
+```
+
+Per **ANY NEW FAILURE IS STOP AND REPORT**, neither failure was repaired or rerun. No pre-existing failure observed; all six existing focused files passed. Shards 1–4 and browser verification were not started. The flake exception does not apply to a new file.
+
+### Test inventory and assertion ledger
+
+- Last full-suite baseline: **6,973 / 613**. Source inventory after this edit: expected **6,980 / 614**, +7 cases/+1 file solely from `src/test/ch1ChampionsTidy.test.tsx`; full suite not executed, so this is not a passing total.
+- New seven cases cover posted absence/link, Defence, Projected and Field preservation, course-only Elsewhere, and standalone/modal link navigation, analytics and real scroll owner.
+- Only existing rewritten assertion: `src/test/championsNetSource.test.tsx:78`, case **PD2: Your defence replaces What it takes only when the selected board is owned**. Old `expect(document.querySelector('[data-section="what-it-takes"]')).not.toBeNull();` → new `expect(document.querySelector('[data-section="what-it-takes"]')).toBeNull();`. Reason: CH1 expressly removes that posted section on non-owned boards. Case name and all other assertions are unchanged.
+- No tests deleted or renamed; no existing fixture additions. New coverage uses real I18nextProvider, MemoryRouter and QueryClientProvider, with local data fixtures.
+
+### Needed to resume
+
+Course selection fields are now repaired under the type-error follow-up. Authorise passing the existing field average/round-count props to the new direct-drilldown fixture, without changing its assertions or product behaviour; then rerun focused checks and four fresh shards.
+
+`git pull` was not run because stateful repository commands are forbidden. All SQL/migration/server/native/feed_config/cap and protected-surface bans were preserved.
+
+## Historical prerequisite audit (resolved by Ben's ruling)
 
 ## Required verification does not establish parity
 
@@ -20,11 +75,11 @@ Whole-src production caller search found only `GolfClubView.tsx:332` rendering `
 
 Independent read-only audit confirmed these cases. Actual Posted rendering also requires nonempty legends data (`CourseLegendsDrilldown.tsx:572–590`); the empty-reach case above assumes other visible categories remain, not an entirely empty legends response. The existing `GolfClubView.handleTabChange` at lines 186–203 changes tab/URL/analytics but does not itself scroll; any resumed link work must reconcile the brief's requested top scroll with that existing behaviour without silently altering the frozen You tab.
 
-## Action needed
+## Historical action needed (resolved)
 
 Clarify whether the required parity applies only after successful You reads with nonempty reach rows, or authorise a change that provides the missing reach surface. The present brief freezes You; this task does not silently change its gating, invent rows, or weaken the prerequisite.
 
-## Work and verification
+## Historical read-only verification before the ruling
 
 - Read the uploaded brief and signed-off mock; inspected state routing, You eligibility, history/standings reads, reach rendering and production callers.
 - Recorded CH1 in the roadmap and saved the user's course-tab ownership requirement.
