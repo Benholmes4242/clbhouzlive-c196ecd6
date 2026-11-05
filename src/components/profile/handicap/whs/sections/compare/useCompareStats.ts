@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchTrophyAggregates, fetchHandicapHistory } from '@/lib/whs/api';
 import type { HeadToHeadStats, PlayerStats } from './h2hStats';
+import { averages, courseBests } from './headToHeadRules';
 
 interface GamRow {
   user_id: string;
@@ -22,6 +23,7 @@ interface GamRow {
   course_par: number | null;
   hcp_at_time: number | null;
   holes_played?: number | null;
+  course_id?: string | null;
 }
 
 function emptyPlayer(): PlayerStats {
@@ -112,7 +114,7 @@ export function useCompareStats(
       const { data: gamRows } = await supabase
         .from('gam_round_stats' as never)
         .select(
-          'user_id, play_date, gross_score, stableford_points, sub_80, beat_par, course_par, hcp_at_time, holes_played',
+          'user_id, play_date, gross_score, stableford_points, sub_80, beat_par, course_par, hcp_at_time, holes_played, course_id',
         )
         .in('user_id', [viewerId, targetUserId]);
       const gam = (gamRows as unknown as GamRow[]) ?? [];
@@ -168,6 +170,18 @@ export function useCompareStats(
       them.sub80_rounds = themSummary.sub80_rounds;
       them.best_stableford = themSummary.best_stableford;
       them.last5_avg_vs_par = themSummary.last5_avg_vs_par;
+
+      // HH3: averages and per-course bests from the SAME rows (client only).
+      const meRows = gam.filter((r) => r.user_id === viewerId);
+      const themRows = gam.filter((r) => r.user_id === targetUserId);
+      const meAvg = averages(meRows);
+      const themAvg = averages(themRows);
+      me.avg_gross = meAvg.avgGross;
+      me.avg_points = meAvg.avgPoints;
+      them.avg_gross = themAvg.avgGross;
+      them.avg_points = themAvg.avgPoints;
+      me.course_bests = courseBests(meRows);
+      them.course_bests = courseBests(themRows);
 
       me.handicap_index = latestIndex(meHistory);
       them.handicap_index = latestIndex(themHistory);

@@ -41,6 +41,11 @@ export interface PlayerStats {
   delta90: number | null;
   last5_avg_vs_par: number | null;
   is_hot: boolean;
+  /** HH3: 18-hole averages from gam_round_stats, one decimal. */
+  avg_gross?: number | null;
+  avg_points?: number | null;
+  /** HH3: per-course bests (18-hole), keyed by course_id. */
+  course_bests?: Record<string, { gross: number | null; points: number | null }>;
 }
 
 export interface HeadToHeadStats {
