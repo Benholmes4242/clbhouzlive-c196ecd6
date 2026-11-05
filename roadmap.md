@@ -1,5 +1,11 @@
 # Roadmap
 
+## Pro profile build 1
+- [ ] Verified tour-pro hero world ranking, This week, Season and linked-only How he plays; preserve teaching pros, built cover/scrims/insets and everything below.
+- [ ] Ben's corrected ruling: worse ranks muted, never red; BEST for all pros, win 1st in gold. Latest replacement mock governs changed elements.
+- [ ] Owner event/round sheets, score watch/guest gate, result/all-results sheets and existing follow/message/share paths.
+- [ ] Tests and 320px verification; four shards, only three known FS_NOTCH failures permitted. No SQL/migrations.
+
 ## FS_NOTCH_1
 - [x] Shared portrait rule and slide-only scrim implemented; gallery/chrome geometry unchanged, preview build OK.
 - [ ] STOP: focused 38 pass/3 new failures; exact errors and assertion/count ledger in FS_NOTCH_1_REPORT.md, full log retained. No repairs/shards/browser after failure.
