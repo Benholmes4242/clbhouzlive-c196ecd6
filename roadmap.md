@@ -1,5 +1,10 @@
 # Roadmap
 
+## HS2 — Handicap sync seat
+- [x] Replaced intro only with settled full/empty seat; preserved shared exports and later stages, removed unused course reader while retaining done-stage suffix helper.
+- [x] Focused 23/23; shards 1,824 / 1,673 / 1,774 / 1,762 = 7,033 / 620, zero failures. Net +6/+1 from 12 new cases minus six obsolete helper cases. Exact assertion ledger and logs in HS2_REPORT.md.
+- [x] Actual intro fixture geometry/actions verified at 390×844 and 320×844 in both states, long names wrap/no overflow/first-screen CTA; frozen mock differences reported. Hosted authenticated read/next-stage checks unavailable with external unmanaged auth and not claimed.
+
 ## Pro polish
 - [x] Applied pending no-handicap states, small island captions, Settings pending/inert Privacy and authorised Admin Verified/visible-row reads. Details and limits in PRO_POLISH_REPORT.md.
 - [x] Focused 66/66; assertion ledger and +30/+2 inventory reconciliation saved (expected 7,027/619).

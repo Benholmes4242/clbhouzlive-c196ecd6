@@ -5,8 +5,6 @@ import React from 'react';
 import { readFileSync } from 'node:fs';
 import {
   chooseCirclePeople,
-  displayCourseName,
-  nextFooterHidden,
   startingHandicap,
 } from '@/components/profile/handicap/whs/connect/EmptyStateScreen';
 import { EmptyStateScreen } from '@/components/profile/handicap/whs/connect/EmptyStateScreen';
@@ -152,16 +150,6 @@ beforeEach(() => {
 
 describe('connect intro try-it helpers', () => {
   it.each([
-    ['Sundridge Park Golf Club (East Course)', 'Sundridge Park East'],
-    ['Parkstone Golf Club', 'Parkstone'],
-    ["Royal St George's Golf Club", "Royal St George's"],
-    ['The Grove', 'The Grove'],
-    ['AB Golf Club', 'AB Golf Club'],
-  ])('formats course display name %s', (input, expected) => {
-    expect(displayCourseName(input)).toBe(expected);
-  });
-
-  it.each([
     [{ manualHandicapIndex: 12.4 }, 12],
     [{ manualHandicapIndex: -1.2 }, 0],
     [{ manualHandicapIndex: 40 }, 36],
@@ -176,17 +164,14 @@ describe('connect intro try-it helpers', () => {
     expect(chooseCirclePeople(people, 12).map((p) => p.index)).toEqual([9, 11, 13, 18]);
   });
 
-  it('uses hysteresis for footer visibility', () => {
-    expect(nextFooterHidden(false, 0.6)).toBe(true);
-    expect(nextFooterHidden(true, 0.45)).toBe(true);
-    expect(nextFooterHidden(true, 0.25)).toBe(false);
-  });
+
 });
 
 describe('connect intro settled gate', () => {
   it('does not request the fallback course while the session is unresolved', () => {
     renderIntro();
-    expect(introSpy).toHaveBeenCalledWith(null, false);
+    expect(introSpy).not.toHaveBeenCalled();
+    expect(screen.getByTestId('connect-seat-skeleton')).toBeInTheDocument();
     expect(screen.queryByText('Parkstone')).toBeNull();
   });
 });
@@ -199,44 +184,46 @@ describe('connect intro fix 1 behaviour', () => {
     state.stats = { course_id: 'course1', avg_over_par: 11.6, rounds_tracked: 912 };
   });
 
-  it('keeps footer out of fixed positioning and hides it in embedded layout', async () => {
+  it('keeps a single in-content CTA in page and embedded layouts', async () => {
     expect(readFileSync('src/components/profile/handicap/whs/connect/EmptyStateScreen.tsx', 'utf8')).not.toContain('position: \'fixed\'');
     const { container, rerender } = renderIntro('page');
-    await screen.findAllByText('Connect your handicap');
-    expect(container.textContent).toContain('Connect your official handicap and this is built from');
-
+    await screen.findByTestId('connect-seat-list');
+    expect(container.querySelectorAll('.connect-seat-cta')).toHaveLength(1);
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     rerender(<QueryClientProvider client={qc}><EmptyStateScreen layout="embedded" onPickCountry={() => {}} onDecline={() => {}} /></QueryClientProvider>);
-    await screen.findByText('takes 11.6 shots');
-    expect(container.textContent).not.toContain('Connect your official handicap and this is built from');
+    await screen.findByTestId('connect-seat-list');
+    expect(container.querySelectorAll('.connect-seat-cta')).toHaveLength(1);
+    expect(container.querySelector('[aria-hidden="false"]')).toBeNull();
   });
 
-  it('shows the field verdict for the intro course and places the circle by the member\'s index', async () => {
+  it('ignores the course verdict and places the circle by the member index', async () => {
     renderIntro('embedded');
-    await screen.findByText('takes 11.6 shots');
-    expect(screen.getAllByText('+11.6').length).toBeGreaterThan(0);
-    expect(screen.getByText('across 912 rounds, every handicap')).toBeInTheDocument();
-    expect(screen.getByText('The field')).toBeInTheDocument();
-    expect(screen.getAllByText('You').length).toBeGreaterThan(0);
+    await screen.findByTestId('connect-seat-list');
+    expect(introSpy).not.toHaveBeenCalled();
+    expect(screen.queryByText('takes 11.6 shots')).toBeNull();
+    expect(screen.queryByText('The field')).toBeNull();
+    expect(screen.getByText('You')).toBeInTheDocument();
     const aliceRow = screen.getByText('Alice').parentElement?.parentElement;
-    expect(aliceRow?.previousElementSibling?.textContent).toContain('connect to take your place');
+    expect(aliceRow?.previousElementSibling?.getAttribute('data-seat-person')).toBe('you');
   });
 
-  it('renders LegacyFallback when avg_over_par is null', async () => {
+  it('keeps the circle seat when avg_over_par is null', async () => {
     state.stats = { course_id: 'course1', avg_over_par: null, rounds_tracked: 912 };
     renderIntro('embedded');
-    expect(await screen.findByText('Connect once.')).toBeInTheDocument();
+    expect(await screen.findByTestId('connect-seat-list')).toBeInTheDocument();
+    expect(screen.queryByText('Connect once.')).toBeNull();
     expect(screen.queryByText('takes 11.6 shots')).toBeNull();
   });
 
-  it('keeps the circle second sentence at one connected golfer', async () => {
+  it('exposes the live count at one connected golfer', async () => {
     renderIntro('embedded');
-    expect(await screen.findByText('1 golfer you follow has connected. Connect to take your place among them.')).toBeInTheDocument();
+    await screen.findByTestId('connect-seat-list');
+    expect(screen.getByTestId('connect-seat-headline')).toHaveAttribute('data-connected', '1');
   });
 
-  it('fires connect_intro_viewed once after the loaded state renders', async () => {
+  it('fires connect_intro_viewed once after the circle settles', async () => {
     renderIntro('embedded');
-    await waitFor(() => expect(analyticsEvents.track).toHaveBeenCalledWith('connect_intro_viewed', { source: 'home', h0: 13 }));
+    await waitFor(() => expect(analyticsEvents.track).toHaveBeenCalledWith('connect_intro_viewed', { h0: 13 }));
     await waitFor(() => expect((analyticsEvents.track as any).mock.calls.filter((c: unknown[]) => c[0] === 'connect_intro_viewed')).toHaveLength(1));
   });
 });
