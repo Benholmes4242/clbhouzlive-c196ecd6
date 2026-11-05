@@ -1,8 +1,8 @@
 # Roadmap
 
 ## FIX_LIVE_DOT_1
-- [ ] Confirm clipping and baseline geometry in browser, add fold-column-only halo clearance, audit TourGlance ancestors.
-- [ ] New halo/fold regression tests; existing island/chrome/fold tests unchanged; four shards and report, stopping on any failure.
+- [x] Confirmed live halo clipping at 1× and recorded baseline geometry; implemented fold-column compensation; TourGlance has no local clipping and stays unchanged.
+- [ ] STOP: 3 new halo tests passed; unchanged headerB1/islandSquircle have 12 missing-isGuestUser fixture failures. Full output kept; no failing tests edited. Four shards and after-edit geometry check await resolution. Report: FIX_LIVE_DOT_1_REPORT.md.
 
 ## FIX_TOUR_NOTIF_1
 - [x] Activity trophy tile/meta, type-based Tour identity and client overview destination; shared restoration already owns fresh-arrival top scroll.
