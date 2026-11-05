@@ -3,7 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import type { BoardFilters } from '../boardFilters';
 
 /** SR1: the deployed RPC owns ordering and selection. Pass every board axis,
- * but omit tuning arguments so the deployed defaults remain authoritative. */
+ * but omit tuning arguments so the deployed defaults remain authoritative.
+ * Previous-query rows are opt-in for SAR1's shelf only; default consumers retain
+ * their own pending/held-frame lifecycle rather than receiving placeholder rows. */
 export interface StandoutRound {
   pos: number;
   user_id: string;
@@ -40,13 +42,13 @@ export function standoutRpcArgs(viewerId: string | undefined, f: BoardFilters, l
   };
 }
 
-export function useStandoutRounds(viewerId: string | undefined, filters: BoardFilters, enabled = true, limit = 4) {
+export function useStandoutRounds(viewerId: string | undefined, filters: BoardFilters, enabled = true, limit = 4, options: { keepPrevious?: boolean } = {}) {
   const args = standoutRpcArgs(viewerId, filters, limit);
   return useQuery<StandoutRound[]>({
     queryKey: ['discover', 'standout-rounds', args],
     enabled,
     staleTime: 60_000,
-    placeholderData: (previous) => previous,
+    ...(options.keepPrevious ? { placeholderData: (previous: StandoutRound[] | undefined) => previous } : {}),
     queryFn: async () => {
       const { data, error } = await (supabase.rpc as any)('get_standout_rounds', args);
       if (error) throw error;

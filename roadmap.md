@@ -1,9 +1,10 @@
 # Roadmap
 
 ## SAR1
+- [x] SAR1_FIX_1: previous-row holding opts in only for StandoutRoundsShelf; heldFrameCB28 unchanged. One regression added; focused 100/100 and fresh ordered shards 1,808 / 1,656 / 1,751 / 1,722 = 6,937 / 610, zero failures or flakes. Close-out at top of SAR1_REPORT.md; full output retained.
 - [x] Added Standout rail, parallel scopes/persistence, typed feats and one hole hook batch; retired Rounds navigation without deleting pages. Authorized four-case assertion ledger in SAR1_REPORT.md.
 - [x] Focused 93/93; fresh shards 1,807 / 1,656 / 1,751 / 1,721 pass, one new failure in shard 4. Executed 6,936 / 610 = baseline +41 cases/one file; build OK.
-- [ ] STOP: heldFrameCB28.test.tsx:56:71 “AssertionError: expected 0 to be greater than 0”; shared placeholderData changed existing pending behavior. Untouched test preserved, full log retained. Scope placeholder behavior to new shelf on authorization; 320px and browser verification not performed.
+- [x] Historical heldFrameCB28.test.tsx:56:71 regression resolved by SAR1_FIX_1; untouched test passes and original failure log retained. Browser/320px visual checks remain unavailable and unclaimed, not part of this follow-up's requested checks.
 
 ## FIX_GUEST_MINT
 - [x] Shared guestMintAllowed across bootstrap, hold and signed-out outcome; safe tab opt-in and automation blocking implemented, native tests unchanged.

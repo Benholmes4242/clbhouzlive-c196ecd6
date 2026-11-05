@@ -1,4 +1,32 @@
-# SAR1 — stopped on regression
+# SAR1 — SAR1_FIX_1 close-out
+
+## Close-out: green
+- Scoped previous-query data to the new Standout shelf. `useStandoutRounds` now accepts a fifth optional `{ keepPrevious?: boolean }` argument, defaulting to false; `placeholderData: previous => previous` is included only when explicitly enabled. Query key, enabled flag, 60-second stale time, mapping and RPC arguments remain unchanged.
+- Only `StandoutRoundsShelf` passes `{ keepPrevious: true }`. Audited all production callers: `StandoutRounds` and `ScoresLeaderboardsPage` omit the option and retain their previous pending behavior. `RoundsThisWeekShelf` has only a type import, not a hook call. `useStandoutFeats` is used only by the new shelf, so it is unchanged.
+- The prior SAR1 regression in untouched `src/test/heldFrameCB28.test.tsx:56:71`, `AssertionError: expected 0 to be greater than 0`, is resolved. It was a regression, not a pre-existing failure or flake. No failures occurred in this fresh run; no flake reruns were needed.
+- Added exactly one case to `src/test/sar1StandoutShelf.test.tsx`: `holds previous query data only by opt-in and keeps shelf tiles during a chip change`. Real QueryClient observers verify default data becomes undefined/pending on a query-key change while opted-in data remains placeholder data; the mounted shelf verifies all three scope reads opt in and its four tile nodes stay mounted during a chip change. Added option capture to its existing mock without changing any existing assertion or case name. `heldFrameCB28.test.tsx` is unchanged. No tests deleted, renamed or rewritten in SAR1_FIX_1; the original SAR1 rewrite ledger remains below.
+
+Focused command: `bunx vitest run src/test/heldFrameCB28.test.tsx src/test/sar1StandoutShelf.test.tsx src/test/rsRoundsShelf.test.tsx src/test/standoutRounds.test.tsx --maxWorkers=2` — **100/100**, four files (6 / 42 / 31 / 21).
+
+All four full-suite shards were run freshly, in order, using `bunx vitest run --maxWorkers=2 --shard=n/4`:
+
+| Shard | Passed | Failed | Files |
+| --- | ---: | ---: | ---: |
+| 1 | 1,808 | 0 | 153 |
+| 2 | 1,656 | 0 | 153 |
+| 3 | 1,751 | 0 | 153 |
+| 4 | 1,722 | 0 | 151 |
+| Total | **6,937** | **0** | **610** |
+
+Inventory reconciles from **6,936 / 610** to **6,937 / 610**, exactly **+1 case** in `sar1StandoutShelf.test.tsx` (41 → 42), no new files. The earlier 6,895 / 609 baseline plus the original SAR1 41 cases/one file and this fix's one case yields the same total.
+
+Full focused and shard output retained at `docs/verification/sar1-fix-1/focused.log` and `shard1.log` through `shard4.log`. Original failing `docs/verification/sar1/shard4.log` retained. Guest browsing, review wizard, news, round plots, SQL, migrations, migration files, deployed RPCs/edge functions, feed_config and native/Median config remain untouched; round_pool_cap remains 30. Browser/320px checks remain unverified as previously recorded; this follow-up verifies retention through mounted UI tests, not hosted browser evidence.
+
+Latest harness build: **build OK**, `2026-11-05T15:29:17Z`; no surviving build errors.
+
+---
+
+# Historical SAR1 stop — superseded by the green close-out above
 
 ## Implemented, not signed off
 - StandoutRoundsShelf mounted after Recent rounds under the existing All condition, before course videos. Parallel county/nation/Everyone reads, four-round default ladder, empty-chip hiding, per-viewer storage, interleaved RPC order and one hole-shapes hook batch.
