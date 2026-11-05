@@ -167,11 +167,15 @@ export function ImageCropModal({
         </VisuallyHidden>
         
         {/* Crop area */}
-        <div className="relative h-[350px] w-full bg-background">
+        <div className="relative h-[350px] w-full bg-background [&_img]:max-w-none [&_img]:max-h-none">
           <Cropper
             image={imageSrc}
             crop={crop}
             zoom={zoom}
+            objectFit="contain"
+            minZoom={1}
+            maxZoom={4}
+            restrictPosition
             aspect={aspectRatio}
             cropShape="rect"
             showGrid={!isLogo}
@@ -189,7 +193,7 @@ export function ImageCropModal({
             <Slider
               value={[zoom]}
               min={1}
-              max={3}
+              max={4}
               step={0.1}
               onValueChange={(values) => setZoom(values[0])}
               className="flex-1"

@@ -16,6 +16,7 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from '@/lib/toast';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -27,7 +28,7 @@ import { readCommentDraft, writeCommentDraft, clearCommentDraft, COMMENT_DRAFT_D
 
 /*
   DARK BASELINE (MICRO_BRIEF_COMMENTS_DARK §1). The comments sheet is no
-  longer a light-forced surface: the bar sits on the page canvas, the field
+  longer a light-forced surface: the bar shares SHEET_SURFACE, the field
   is a 6% well on it, and AMBER keeps its single meaning (the viewing
   member) — it is not used for chrome here.
 */
@@ -170,7 +171,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     <div
       className="shrink-0"
       style={{
-        background: A.CANVAS,
+        background: SHEET_SURFACE,
         borderTop: `1px solid ${A.BORDER}`,
         padding: '12px',
         paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',

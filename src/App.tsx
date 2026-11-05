@@ -49,6 +49,7 @@ import { signedOutOutcome, useGuestSessionBootstrap } from '@/features/guest/gue
 import { GuestGateHost } from '@/features/guest/GuestGateHost';
 import { GuestRouteGuard } from '@/features/guest/guestRoutes';
 import { GuestSessionHold } from '@/features/guest/GuestSessionHold';
+import { OnboardingGuard } from '@/features/onboarding/OnboardingGuard';
 
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
@@ -597,7 +598,7 @@ function AppRoutes() {
 
 
   return (
-    <GuestSessionHold>
+    <OnboardingGuard><GuestSessionHold>
       {/* Set navigate ref for use in toast actions and other non-component code */}
       <NavigationRefSetter />
 
@@ -866,7 +867,7 @@ function AppRoutes() {
 
       
       {/* VideoPlayerModal removed in PR-5 (queue family strip). */}
-    </GuestSessionHold>
+    </GuestSessionHold></OnboardingGuard>
   );
 }
 

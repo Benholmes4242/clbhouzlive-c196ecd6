@@ -187,11 +187,15 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
           </div>
 
         {/* Cropper area - dark background for contrast */}
-        <div className="relative h-[300px] sm:h-[350px] bg-[#1e293b]">
+        <div className="welcome-cropper-media relative h-[300px] sm:h-[350px] bg-[#1e293b] [&_img]:max-w-none [&_img]:max-h-none">
           <Cropper
             image={image}
             crop={crop}
             zoom={zoom}
+            objectFit="contain"
+            minZoom={1}
+            maxZoom={4}
+            restrictPosition
             rotation={rotation}
             aspect={aspectRatio}
             cropShape={cropShape}
@@ -215,7 +219,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               value={[zoom]}
               onValueChange={([value]) => setZoom(value)}
               min={1}
-              max={3}
+              max={4}
               step={0.1}
               className="flex-1 [&_[role=slider]]:bg-[var(--crop-ink)] [&_[role=slider]]:border-[var(--crop-ink)] [&_.bg-primary]:bg-[var(--crop-ink)]"
               style={{ ['--crop-ink' as string]: A.INK } as React.CSSProperties}
