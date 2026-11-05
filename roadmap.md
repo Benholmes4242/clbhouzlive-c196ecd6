@@ -1,5 +1,11 @@
 # Roadmap
 
+## CH1 — Champions tidy
+- [x] Prerequisite audited: posted eligibility does not guarantee You reach; independent failed reads and empty reach rows suppress it. Source evidence in CH1_REPORT.md; no product/test edits.
+- [ ] STOP pending Ben's ruling: qualify successful/nonempty You reads, or authorise missing reach handling despite the You freeze. Keep posted What it takes until resolved.
+- [ ] If prerequisite passes, remove posted What it takes and course-only Elsewhere; retain Defence and other states; add the posted You-tab link through the existing handler and analytics.
+- [ ] Add requested coverage, name each authorised assertion change, run four fresh ordered shards against 6,973 / 613, and retain full output.
+
 ## RC3_WORDING
 - [x] Member-best defaults and English values updated; keys/variables/logic unchanged. Featured labels retain existing uppercase CSS; unused moment/career keys have no mounted label to style.
 - [x] Audit complete with user-approved Tour/catalogue exceptions; every remaining match and old/new copy line listed in RC3_WORDING_REPORT.md.
