@@ -8,6 +8,7 @@ import type React from 'react';
 const h = vi.hoisted(() => ({
   shared: null as unknown,
   season: null as unknown,
+  recent: [] as unknown[],
   ids: {} as Record<string, { userId: string; name: string; avatarUrl: string | null }>,
 }));
 
@@ -25,7 +26,7 @@ vi.mock('@/components/profile/handicap/whs/sections/compare/useCompareStats', ()
   useCompareStats: () => ({ data: h.season }),
 }));
 vi.mock('@/components/profile/handicap/whs/sections/compare/useCompareRecent', () => ({
-  useCompareRecent: () => [],
+  useCompareRecent: () => h.recent,
 }));
 vi.mock('@/features/search-v2/hooks/useEntityPickerSearch', () => ({
   useEntityPickerSearch: () => ({ people: [] }),
