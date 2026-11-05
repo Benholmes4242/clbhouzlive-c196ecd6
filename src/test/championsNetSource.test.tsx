@@ -75,7 +75,7 @@ describe('CHAMPIONS_STATE_4', () => {
     expect(document.querySelector('[data-section="what-it-takes"]')).toBeNull();
     rerender(<PostedChampions {...base} activeKey="lowest_gross_all_time" />);
     expect(document.querySelector('[data-section="your-defence"]')).toBeNull();
-    expect(document.querySelector('[data-section="what-it-takes"]')).not.toBeNull();
+    expect(document.querySelector('[data-section="what-it-takes"]')).toBeNull();
     expect(document.querySelector('[data-ghost-row]')).toBeNull();
   });
 });
