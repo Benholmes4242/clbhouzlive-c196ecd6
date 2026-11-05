@@ -1,5 +1,11 @@
 # Pro status controls — STOPPED
 
+## Type-error-only repair — 2026-11-05 12:25 UTC
+
+Replaced `linked: !!null, connected: !!null` with the runtime-identical `linked: false, connected: false` in the new A lines only: ep1EditProfile:18, ep2EditProfileYou:19, ep4LinksPrivacy:31, st3SettingsPrivacy:30. No assertion, case name, expected value, existing fixture logic or product code changed. No tests rewritten/deleted/added; inventory remains 6,874 / 607 before and after, delta 0.
+
+`bunx vitest run src/test/ep1EditProfile.test.tsx src/test/ep2EditProfileYou.test.tsx src/test/ep4LinksPrivacy.test.tsx src/test/st3SettingsPrivacy.test.tsx --maxWorkers=2`: **81/81 passed / four files**. Full output: `docs/verification/pro-standing-fixtures/type-fix-focused.log`. Harness `2026-11-05T12:25:33Z`: **build OK**. The historical TS2873 below is resolved; the ST2 shard-3 stop remains unchanged. No shards or ST2 rerun in this type-only repair; report retained.
+
 ## Standing fixture rule — 2026-11-05 12:25 UTC
 
 Applied only authorised A/B additions; no product code, assertion, expected value or case name changed. No tests added/deleted/renamed/rewritten; expected inventory remains **6,874 tests / 607 files**, delta **0**.
