@@ -11,6 +11,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp, parseHcpFormString } from '@/lib/formatHcp';
 import { DANGER } from '@/components/manage/ui';
@@ -34,6 +35,7 @@ type SaveState = 'idle' | 'saving' | 'error';
 export default function EditProfile() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const ownHandicap = useOwnHandicapState(user?.id);
   const { profile: raw, loading } = useProfileData();
   const profile = raw as Record<string, any> | null | undefined;
   const { form } = useProfileForm(profile as any, loading);
@@ -148,7 +150,7 @@ export default function EditProfile() {
             city={you.city}
             coverUrl={profile.header_photo_url ?? null}
             avatarUrl={profile.profile_photo_url ?? null}
-            indexLabel={resolved.value != null ? formatHcp(resolved.value) : null}
+            indexLabel={ownHandicap.settled && !ownHandicap.pro && resolved.value != null ? formatHcp(resolved.value) : null}
             homeClub={(golfNow.homeClubName ?? profile.home_club)?.trim() || null}
             onSavePhoto={savePhoto}
           />}
@@ -165,7 +167,7 @@ export default function EditProfile() {
           />}
           {profile && <EditProfileType isCreator={creatorNow ?? profile.is_creator ?? false} onSave={saveCreator} />}
           {profile && <EditProfilePro userId={user?.id ?? ''} />}
-          {profile && <EditProfileGolf ref={golfActions} userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
+          {profile && ownHandicap.settled && <EditProfileGolf isPro={ownHandicap.pro} ref={golfActions} userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
           {profile && <EditProfileLinksPrivacy userId={user?.id ?? ''} form={{ ...form, ...linksPrivacyNow }} handicapVisibility={profile.handicap_visibility === 'friends' || profile.handicap_visibility === 'private' ? profile.handicap_visibility : 'public'} onSave={saveLinksPrivacy} />}
         </main>
       )}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { StandingShelf } from './StandingShelf';
@@ -16,7 +16,7 @@ import { StandingShelf } from './StandingShelf';
  * NEVER appears on All, and it appears at most once on the page because the
  * standing slot itself appears at most once.
  *
- * LINKED IS DECIDED BY useHandicapChipState — the same predicate the header's
+ * LINKED IS DECIDED BY useOwnHandicapState — the same predicate the header's
  * "Connect HCP" chip uses — so the chip and this invitation can never disagree.
  * While that read is unsettled the slot renders NOTHING: not a shell, because a
  * shell here would be a claim about which of two surfaces is coming.
@@ -35,9 +35,9 @@ export function ScoresStandingSlot({
   viewerId: string | undefined;
   pos: number;
 }) {
-  const state = useHandicapChipState(viewerId);
+  const state = useOwnHandicapState(viewerId);
 
-  if (!state.settled) return null;
+  if (!state.settled || state.pro) return null;
   if (state.connected) return <StandingShelf viewerId={viewerId} pos={pos} />;
   if (state.linked) return null;
   return <ConnectStandingInvite pos={pos} />;
