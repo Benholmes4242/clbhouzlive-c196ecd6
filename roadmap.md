@@ -1,5 +1,10 @@
 # Roadmap
 
+## SAR1
+- [ ] Add signed-off Standout rounds rail, scope selection/persistence, typed feats and one hole batch; preserve all frozen Explore content.
+- [ ] Retire Rounds navigation without deleting pages; update authorized tests and report old/new assertions.
+- [ ] Run focused tests and four fresh shards; verify 320px layout and report totals against 6,895 / 609.
+
 ## FIX_GUEST_MINT
 - [x] Shared guestMintAllowed across bootstrap, hold and signed-out outcome; safe tab opt-in and automation blocking implemented, native tests unchanged.
 - [x] Focused 61/61; fresh ordered shards 1,769 / 1,667 / 1,747 / 1,712 = 6,895 / 609, baseline 6,879 / 608 +16 cases/one new file. No assertions rewritten; preview setup changes listed in FIX_GUEST_MINT_REPORT.md; build OK.
