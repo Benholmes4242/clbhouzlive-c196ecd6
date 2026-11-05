@@ -18,7 +18,7 @@ import { chasePlayers,onCourse,situation,startsValues,weekFacts,weekRows,weekTot
 import '../../leaderboard/leaderboard.css';
 import './alsoWeek.css';
 
-function Avatar({player,tour,size=26}:{player:BoardEntry['player'];tour:string;size?:number}) {
+function Avatar({player,tour,size=22}:{player:BoardEntry['player'];tour:string;size?:number}) {
   return <SquircleAvatar className="also-avatar" size={size} hairlineRing alt={player?.full_name ?? ''} userId={player?.id} srcCandidates={resolvePlayerAvatarCandidates({name:player?.full_name,photoUrl:player?.photo_url,headshotOverride:player?.headshot_override,tourSlug:tour})}/>;
 }
 function WeekBoard({entries,followed,round,complete,tour}:{entries:BoardEntry[];followed:Set<string>;round:number|null;complete:boolean;tour:string}) {
