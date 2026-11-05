@@ -80,6 +80,8 @@ interface Props {
   coachLine?: React.ReactNode;
   onAvatarTap?: () => void;
   onStatTap: (stat: HeroStat) => void;
+  /** Form tile tap: the page opens (or toggles) its RoundDetailSheet; never navigates. */
+  onOpenRound?: (scoreId: string) => void;
   /** Bio (null when absent or gated). Measurement state is owned by the page. */
   bio?: string | null;
   bioRef?: React.Ref<HTMLDivElement>;
@@ -170,6 +172,7 @@ export const ProfileHero: React.FC<Props> = ({
   coachLine,
   onAvatarTap,
   onStatTap,
+  onOpenRound,
   bio,
   bioRef,
   bioExpanded = false,
@@ -447,7 +450,7 @@ export const ProfileHero: React.FC<Props> = ({
             chartFillTop={chartFillTop} axisWindow={axisWindow} windowDays={windowDays}
             bars={bars} byId={byId} countingKnown={countingKnown} countingN={countingN}
             loweredN={loweredN} tilesWord={tilesWord} isSelf={isSelf}
-            ownerFirstName={ownerFirstName} onStatTap={onStatTap} tap={tap} navigate={navigate}
+            ownerFirstName={ownerFirstName} onStatTap={onStatTap} tap={tap} onOpenRound={onOpenRound}
           />
         )}
 
