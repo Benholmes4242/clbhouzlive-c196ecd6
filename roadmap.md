@@ -6,15 +6,14 @@
 - [ ] Ruling needed: synthetic 9:16 top0 conflicts with the explicit 90%-of-usableH formula (693.333 < 717.3 at 390×844/safeTop47/safeBottom0).
 
 ## Pro world ranking sync
-- [ ] OWGR_GROSS_FIX: store raw strokes/total/scheduled rounds, normalize only expRing1 line35, deploy sync-pro-world-rankings and run four shards; carry only the three named FS_NOTCH failures, stop on anything else. Mason Check now belongs to Ben.
+- [x] OWGR_GROSS_FIX: raw strokes71/75/73, total219, scheduled3, null OWGR to_par/venue and source-pro round protection implemented; only expRing1 line35 normalized. Function deployed; focused90/90, shards1,866/1,670/1,806/1,749 passed, plus only three known FS_NOTCH failures. Executed7,094/627 (+4 parser cases); exact ledger/logs in OWGR_UNBLOCK_REPORT.md.
+- [ ] Ben to save Mason's link and press Check now; hosted persistence/readback intentionally not attempted without admin session.
 - [x] OWGR_UNBLOCK: Monday parser, undated no-merge, authorized entrypoint and three test repairs implemented. Event11624 has real dates/country and gross71/75/73, no par/venue/to-par.
-- [ ] STOP: focused84 pass/2 expRing1 failures at35:40 (unchanged rgba whitespace assertion). No repairs/deployment/Mason run/shards after failure. Exact output/ledger in OWGR_UNBLOCK_REPORT.md; FS_NOTCH_1 blockers untouched.
-- [ ] BLOCKED: gross rounds cannot populate to_par without par; venue absent. Hosted deployment/check and round-source resolution remain unverified.
+- [x] Previous expRing1 whitespace blocker and raw-score storage blocker resolved by OWGR_GROSS_FIX; FS_NOTCH tests remain untouched pending separate ruling.
 - [x] Add-on source verified: public events API returns Mason's 39 counting events; latest finishes T31/MC/MC. Six pure import-planning tests pass; no persistence claimed.
-- [ ] Add-on BLOCKED: response has week/year but no event start/end dates, ranking date or rounds; no dated event writes, merge execution, parser or deployed sync. See PRO_WORLD_EVENTS_REPORT.md.
-- [ ] BLOCKED: OWGR Mason page yields rank 1436 but no verified ranking-week date or season history; parser/sync not created or deployed rather than inventing dates.
+- [x] Prior date/round/ranking convention blockers resolved by Ben's Monday ruling and public getEvent details; no inferred par or venue.
 - [x] Shared admin world-ranking row on verified tour pros and approved requests; Save/Check now/error coverage 4/4, related focused set 54/54.
-- [ ] STOP: add-on fresh shard 1 1,845 passed/1 pre-existing tourIsland failure (:235:30); shards 2–4 and authenticated browser not run. Expected 7,056/625; no SQL/schedule creation.
+- [x] Prior Tour width blocker resolved by authorized test repair; fresh full suite completed above with only known FS_NOTCH failures.
 
 ## TOPTEN_SHEET_1
 - [x] Header action reads A.INK in both modes; shared 24px end gutter inside scroller, BottomSheet unchanged.
