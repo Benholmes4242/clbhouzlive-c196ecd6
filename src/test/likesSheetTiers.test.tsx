@@ -64,7 +64,7 @@ describe('LikesSheet H.4 standing segment', () => {
     expect(st.rpcCalls[0].args).toEqual({ p_user_ids: ['a', 'b', 'c'], p_course_id: 'c1' });
     expect(st.legendCalls).toBe(1);
     expect(screen.getByText('Best here 78')).toBeTruthy();
-    expect(screen.getByText('Course record \u00B7 69')).toBeTruthy();
+    expect(screen.getByText('Best on clbhouz \u00B7 69')).toBeTruthy();
     expect(container.querySelector('[data-likes-context]')!.textContent).toContain('\u22121');
   });
 

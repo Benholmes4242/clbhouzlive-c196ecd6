@@ -306,7 +306,7 @@
         "allTimeEagleLeader": "All-time eagle leader",
         "allTimeStablefordLeader": "All-time stableford leader",
         "bestScoreToParHere": "Best score-to-par here",
-        "courseRecordHolder": "Course record holder",
+        "courseRecordHolder": "Best on clbhouz here",
         "mostRoundsHere": "Most rounds here",
         "womensCourseRecordHolder": "Women's course record holder"
       },
@@ -335,7 +335,7 @@
         "birdiesSub_other": "{{count}} birdies in a single round",
         "bogeyFree": "Bogey-free",
         "bogeyFreeSub": "Par or better on every hole",
-        "courseRecord": "Course record",
+        "courseRecord": "Best on clbhouz",
         "eagle": "Eagle",
         "eagleCount_one": "Eagle",
         "eagleCount_other": "Eagle brace",

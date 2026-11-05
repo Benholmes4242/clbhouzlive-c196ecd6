@@ -381,7 +381,7 @@ export function RoundStatStrip({
       case 'record': return {
         icon: <AchievementEmoji glyph="🏆" tier={tier} />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
-        label: t('amateur.stream.callout.courseRecord', 'Course record'),
+        label: t('amateur.stream.callout.courseRecord', 'Best on clbhouz'),
         subline: callout.margin != null && callout.margin > 0
           ? t('amateur.stream.callout.recordMargin', {
               count: callout.margin,
