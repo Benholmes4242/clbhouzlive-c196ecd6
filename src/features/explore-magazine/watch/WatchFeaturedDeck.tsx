@@ -188,6 +188,5 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
       </div>)}
     </div>
     <div className="featured-bar">{!end ? <><Button variant="ghost" className="featured-action" aria-label="Like video" aria-pressed={likes.isLiked} disabled={!likeAvailable} onClick={() => like('button')}><Heart className="featured-like-icon" />{likes.count}</Button><Button variant="ghost" className="featured-action" aria-label="Open comments" onClick={() => { if (!row) return; analyticsEvents.track('watch_featured_comment_opened'); onOpenComments?.(row.post_id); }}><MessageSquare />{row?.comment_count}</Button><Button variant="ghost" className="featured-action" aria-label="Share video" onClick={() => { if (!post) return; analyticsEvents.track('watch_featured_shared'); handleShare(post); }}><Share /></Button></> : null}{!small ? <div className="featured-dots" aria-hidden>{rows.map((item,i) => <i key={item.post_id} data-current={i===Math.min(index,rows.length-1)} />)}</div> : null}</div>
-    <p className="featured-hint">{end ? 'Swipe right to go back' : 'Swipe either way for the next one · double-tap to like'}</p>
   </section>;
 }
