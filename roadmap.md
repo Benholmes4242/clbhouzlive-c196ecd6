@@ -1,5 +1,9 @@
 # Roadmap
 
+## FIX_LIVE_DOT_1
+- [ ] Confirm clipping and baseline geometry in browser, add fold-column-only halo clearance, audit TourGlance ancestors.
+- [ ] New halo/fold regression tests; existing island/chrome/fold tests unchanged; four shards and report, stopping on any failure.
+
 ## FIX_TOUR_NOTIF_1
 - [x] Activity trophy tile/meta, type-based Tour identity and client overview destination; shared restoration already owns fresh-arrival top scroll.
 - [x] NewsChromeBridge label-only fix and report-only sweep recorded in FIX_TOUR_NOTIF_1_REPORT.md.
