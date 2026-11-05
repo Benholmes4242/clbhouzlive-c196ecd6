@@ -30,6 +30,7 @@ const mockHcp = {
 let mockHistory: { observed_at: string; handicap_index: number }[] = [];
 let mockScores: any[] = [];
 let mockLastRound: any = null;
+const mockPro = { verified: false, verifiedKnown: true, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false };
 
 vi.mock('@/hooks/useSupabaseSession', () => ({
   useSupabaseSession: () => ({ user: { id: 'u1' }, loading: false }),
@@ -53,7 +54,7 @@ vi.mock('@/lib/whs/hooks', () => ({
 }));
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
-vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => mockPro }));
 
 import { HcpCell, lastIndexMove } from '@/features/chrome-v2/ChromeIsland';
 import { glanceMoveText, formatVsPar } from '@/features/chrome-v2/IndexGlance';

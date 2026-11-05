@@ -2,7 +2,7 @@ import {renderHook,cleanup} from '@testing-library/react';
 import {afterEach,describe,it,expect,vi} from 'vitest';
 const f=vi.hoisted(()=>({unknown:false,verified:false,linked:false,settled:true}));
 vi.mock('@/lib/whs/useHandicapChipState',()=>({useHandicapChipState:()=>({linked:f.linked,connected:f.linked,settled:f.settled,connection:f.linked?{id:'kept'}:null,trend:null,anyError:false})}));
-vi.mock('@/features/pro-verification/useMyProStatus',()=>({useMyProStatus:()=>({unknown:f.unknown,verified:f.verified,kind:'tour_pro',tour:'Alps Tour',club:null})}));
+vi.mock('@/features/pro-verification/useMyProStatus',()=>({useMyProStatus:()=>({unknown:f.unknown,verifiedKnown:!f.unknown,verified:f.verified,kind:'tour_pro',tour:'Alps Tour',club:null})}));
 import {useOwnHandicapState} from '@/lib/whs/useOwnHandicapState';
 afterEach(cleanup);
 describe('own handicap pro settlement',()=>{

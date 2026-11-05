@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_UNBLOCK_2
+- [x] Resolved island-only readiness scope; fixture field additions authorised without assertion changes. Added profile-owned verifiedKnown, island opt-in and four regression cases; other consumers retain full request waiting.
+- [ ] Run specified focused set and all four shards; reconcile against 6,878 / 608; stop/report new failures, apply untouched-file 3/3 flake rule only.
+- [ ] Check 1x live-dot geometry/condensation, narrow News labels, signed-in Activity navigation and amateur/Mason cold island; report exact limits.
+
 ## Pro status standing fixture rule
 - [x] Added exactly one authorised settled-amateur line to each of the five shard-2 files; no assertions, expected values or case names changed.
 - [x] Shard 2 passes 1,663. Shard 3 matching failures repaired with A+B in ep1/ep2 and B in st2; no assertions changed.
