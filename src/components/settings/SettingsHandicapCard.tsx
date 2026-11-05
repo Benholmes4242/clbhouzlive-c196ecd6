@@ -29,8 +29,8 @@ interface Props {
 }
 
 export function SettingsHandicapCard(p: Props) {
-  const rounds = useMemberRoundTotal(p.connection ? p.userId : undefined);
-  const first = useMemberFirstRoundYear(p.connection ? p.userId : undefined);
+  const rounds = useMemberRoundTotal(!p.pro && p.connection ? p.userId : undefined);
+  const first = useMemberFirstRoundYear(!p.pro && p.connection ? p.userId : undefined);
   const index = resolveDisplayHandicap({ egHandicapIndex: p.egHandicapIndex, manualHandicapIndex: p.manualHandicapIndex, hasWhsConnection: !!p.connection }).value;
   const indexKnown = p.connectionReady && !p.profileError && index != null && Number.isFinite(index);
   const total = p.connectionReady && rounds.state === 'ok' ? rounds.total : null;

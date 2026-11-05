@@ -39,6 +39,6 @@ export function EditProfilePro({ userId }: { userId: string }) {
         <ChevronRight size={18} className="ep-row-chev" />
       </button>
     </div>
-    {pro.verified ? <ProStatusSheet userId={userId} open={sheetOpen} onClose={() => setSheetOpen(false)} /> : <ProDetailsSheet userId={userId} open={sheetOpen} onClose={() => setSheetOpen(false)} />}
+    {sheetOpen && (pro.verified ? <ProStatusSheet userId={userId} open={sheetOpen} onClose={() => setSheetOpen(false)} /> : <ProDetailsSheet userId={userId} open={sheetOpen} onClose={() => setSheetOpen(false)} />)}
   </>;
 }
