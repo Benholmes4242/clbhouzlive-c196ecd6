@@ -20,6 +20,7 @@ vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => 
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
 vi.mock('@/features/explore-magazine/StandingShelf', () => ({ StandingShelf: () => { f.standing(); return <div data-testid="standing" />; } }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, verifiedKnown: true, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { HcpCell } from '@/features/chrome-v2/ChromeIsland';
 import { ScoresStandingSlot } from '@/features/explore-magazine/ConnectStandingInvite';

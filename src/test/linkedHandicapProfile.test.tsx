@@ -16,6 +16,7 @@ vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ 
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
 vi.mock('@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet', () => ({ RoundDetailSheet: () => null }));
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, verifiedKnown: true, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
 import ProfileRoundsTab from '@/components/profile/rounds/ProfileRoundsTab';
 function Path() { const l = useLocation(); return <output data-testid="path">{l.pathname}</output>; }

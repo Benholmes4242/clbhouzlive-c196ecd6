@@ -22,6 +22,7 @@ vi.mock('@/lib/toast', () => ({ toast: { success: mocks.success, error: mocks.er
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: (props: unknown) => { mocks.avatar(props); return <div data-testid="avatar" />; } }));
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, verifiedKnown: true, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
 
 import { HcpCell, AvatarCell, ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
 

@@ -16,6 +16,7 @@ vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => null })
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
 vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => false }));
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, verifiedKnown: true, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
 
 import { ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
 import { ProfileCoverBand } from '@/components/profile/hero/ProfileCoverBand';

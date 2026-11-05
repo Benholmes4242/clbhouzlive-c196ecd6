@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro status controls — last four fixtures
+- [x] Add exactly the authorised current rule B line after the last mock in linkedHandicapState, linkedHandicapProfile, islandsRound2 and hb5ProfileBackName; no assertions, names or values changed.
+- [ ] Run all four shards fresh in order, retaining full output; baseline 6,879 tests / 608 files. Stop on anything outside authorised missing verifiedKnown in earlier rule B lines.
+- [ ] Reconcile complete fixture/rewrite ledger, delete PRO_STATUS_CONTROLS_REPORT.md only after all four pass, and give final report in reply.
+
 ## FIX_UNBLOCK_3
 - [x] Read brief and dependencies; added only authorised ST2 trend override at line 19, retaining original spread/connection override and all assertions. Settings already uses pro-only readiness from preceding product fix.
 - [x] ST2 22/22 and remaining focused 45/45; fresh shards 1,753 / 1,653 / 1,750 / 1,702 pass, shard 4 has 21 same pre-existing failures. Executed 6,879 / 608 includes preceding Settings regression (+1 versus brief); no count change here.
