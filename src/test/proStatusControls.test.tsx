@@ -4,7 +4,7 @@ import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter,useLocation} from 'react-router-dom';
 vi.mock('react-i18next',()=>({initReactI18next:{type:'3rdParty',init:()=>{}},useTranslation:()=>({t:(_k:string,o?:{defaultValue?:string})=>o?.defaultValue??''})}));
 const f=vi.hoisted(()=>({pro:true,settled:true,linked:true,kind:'tour_pro',hidden:false,proUnknown:false,trend:vi.fn(),rpc:vi.fn(),invalidate:vi.fn(),close:vi.fn(),toast:Object.assign(vi.fn(),{error:vi.fn()}),glance:vi.fn()}));
-vi.mock('@/lib/whs/useOwnHandicapState',()=>({useOwnHandicapState:()=>({pro:f.pro,settled:f.settled,proKind:f.kind,proTour:'Alps Tour',proClub:'Sundridge Park',linked:f.linked,connected:f.linked,connection:f.linked?{id:'kept'}:null,trend:{current:4.2},anyError:false})}));
+vi.mock('@/lib/whs/useOwnHandicapState',()=>({useOwnHandicapState:()=>({pro:f.pro,proPending:false,noHandicap:f.pro,settled:f.settled,proKind:f.kind,proTour:'Alps Tour',proClub:'Sundridge Park',linked:f.linked,connected:f.linked,connection:f.linked?{id:'kept'}:null,trend:{current:4.2},anyError:false})}));
 vi.mock('@/features/pro-verification/useMyProStatus',()=>({useMyProStatus:()=>({verified:true,verifiedAt:'2026-11-04T12:00:00Z',kind:f.kind,tour:'Alps Tour',club:'Sundridge Park',unknown:f.proUnknown})}));
 vi.mock('@/features/pro-verification/proMembersCache',()=>({invalidateProMembers:f.invalidate}));
 vi.mock('@/features/pro-verification/useProMembers',()=>({useProMembers:()=>({members:new Map()})}));
@@ -41,8 +41,8 @@ function mount(node:React.ReactNode){return render(<QueryClientProvider client={
 beforeEach(()=>{vi.clearAllMocks();qc=new QueryClient({defaultOptions:{queries:{retry:false}}});f.pro=true;f.settled=true;f.linked=true;f.kind='tour_pro';f.hidden=false;f.proUnknown=false;f.rpc.mockResolvedValue({error:null});});
 afterEach(()=>{cleanup();qc.clear();});
 describe('pro island',()=>{
- it.each([false,true])('shows PRO instead of index linked=%s',linked=>{f.linked=linked;mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(screen.getByRole('button',{name:'Your profile'}).textContent).toContain('Alps Tour');expect(screen.queryByRole('button',{name:/Handicap index/})).toBeNull();});
- it('teaching pro shows club even when chip hidden',()=>{f.kind='teaching_pro';f.hidden=true;mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(screen.getByRole('button',{name:'Your profile'}).textContent).toContain('Sundridge Park');});
+ it.each([false,true])('shows PRO instead of index linked=%s',linked=>{f.linked=linked;mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(screen.getByRole('button',{name:'Your profile'}).textContent).toContain('ALPS TOUR');expect(screen.queryByRole('button',{name:/Handicap index/})).toBeNull();});
+ it('teaching pro shows PGA PRO even when chip hidden',()=>{f.kind='teaching_pro';f.hidden=true;mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(screen.getByRole('button',{name:'Your profile'}).textContent).toContain('PGA PRO');});
  it('profile tap never opens a glance',()=>{mount(<HcpCell tone="dark" dividerColor="transparent"/>);fireEvent.click(screen.getByRole('button',{name:'Your profile'}));expect(screen.getByTestId('location').textContent).toBe('/profile');expect(f.glance).not.toHaveBeenCalled();});
  it('unknown renders no cell',()=>{f.settled=false;const v=mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(v.container.querySelector('button')).toBeNull();});
  it('amateur retains index',()=>{f.pro=false;mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(screen.getByRole('button',{name:'Handicap index 4.2'})).toBeInTheDocument();});
