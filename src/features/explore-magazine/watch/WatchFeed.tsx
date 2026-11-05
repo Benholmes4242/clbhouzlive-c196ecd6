@@ -32,7 +32,7 @@ import {
   videoParams,
   type WatchFilter,
 } from './watchFilters';
-import { WatchLead } from './WatchLead';
+import { WatchFeaturedSlot } from './WatchFeaturedDeck';
 import {
   AutoplayLayer,
   PosterFallback,
@@ -527,8 +527,8 @@ export function WatchFeed({
           ariaLabel={t('amateur.watch.filters', 'Watch filters')}
       />
 
-      {/* ER1 removes Golfers to watch only; the lead keeps its existing gates. */}
-      {onAll ? <WatchLead userId={userId} onDepart={onDepart} /> : null}
+      {/* FW1 changes only the lead slot; thin/error reads retain WatchLead. */}
+      {onAll ? <WatchFeaturedSlot userId={userId} onDepart={onDepart} onOpenComments={onOpenComments} selectShorts={selectShorts} /> : null}
 
       {communityView ? <>
         <p className="explore-community-sub">Photos and clips from members</p>

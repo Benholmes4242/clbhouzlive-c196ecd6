@@ -1,10 +1,10 @@
 # Roadmap
 
 ## FW1 — Featured this week
-- [ ] Resolve signed-off mock/brief conflict: brief §5 advances after a 320ms fly; mock advance() increments the card after 260ms while its transition lasts 320ms.
-- [ ] Implement session-stable featured read, three-row mount threshold and existing lead fallback; build signed-off deck with canonical playback/viewer/likes/comments/share.
-- [ ] Add specified gesture, mount, playback and action tests; run four shards with --maxWorkers=2; stop on any unexpected failure and retain full output.
-- [ ] Confirm clean build and report every touched file, named test changes and reconciled totals.
+- [x] Ben ruled 260ms advance during the 320ms exit, matching the mock.
+- [x] Implement session-stable featured read, three-row mount threshold and existing lead fallback; build signed-off deck with canonical playback/viewer/likes/comments/share.
+- [ ] STOP: 26 new FW1 cases pass; focused integration has 12 failures in untouched ws1WatchTop.test.tsx (new Featured loading slot bypasses its lead-only fixture). Await authorization for fixture-only featured fallback mock; full output retained. Four shards not run.
+- [x] Fix new-test TS2339 with a guarded staleTime property read; focused 6/6, build OK 2026-11-05T06:47:11Z. Report updated; full inventory expected 6,786 / 597, not executed; existing-test stop remains.
 
 ## BRIEF 1 — Pro verification (request + review flow)
 Signed-off mock: build1-pro-verification-flow-signed-off.html (six tabs). Ben ran the SQL; no migrations, no SQL.

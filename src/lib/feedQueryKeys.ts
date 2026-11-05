@@ -52,6 +52,7 @@ export const FEED_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['channels-feed'],
 
   // Watch tab
+  ['watch', 'featured'],
   ['watch-feed'],
   ['watch-feed-posts-by-ids'],
   ['videos-feed'],
