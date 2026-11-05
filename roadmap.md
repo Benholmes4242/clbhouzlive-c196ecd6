@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Pro status controls
-- [ ] Shared settled own-handicap/pro hook; PRO island and Settings card.
-- [ ] Hide listed own-handicap surfaces while preserving stored connections and amateur defaults.
-- [ ] Verified status sheet, confirmation, removal and cache refresh.
-- [ ] Tests, four shards, signed-off mock checks and reconciled report.
+- [x] Shared settled own-handicap/pro hook; PRO island and Settings card implemented.
+- [x] Listed own-handicap presentation hidden, connections preserved; verified removal sheet implemented.
+- [ ] STOP: shard 1 has 29 new fixture failures (ep5Completion missing useHandicapTrend, overflowRightIsland missing isGuestUser); full log kept. New proStatusControls test also has TS2769 at lines 48/49. Report: PRO_STATUS_CONTROLS_REPORT.md. No failing existing test edited.
+- [ ] Complete per-surface tests, mock/member checks and all four shards after stop is resolved.
 
 ## Featured tilted pile
 - [ ] Apply signed-off rear-card CSS only, keeping front card and behaviour unchanged.
