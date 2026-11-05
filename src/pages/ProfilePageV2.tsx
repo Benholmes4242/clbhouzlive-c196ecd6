@@ -1528,8 +1528,10 @@ const ProfilePageV2Content: React.FC = () => {
       )}
       {canCompareInPlace && user?.id && <CompareMount viewerUserId={user.id} />}
       {/* One RoundDetailSheet per page: form tiles (own and other profiles) and
-          the own-profile deep link share it. Closing never navigates. */}
-      {profile?.id && (
+          the own-profile deep link share it. Mounted only while a round is
+          open, so profiles with no open round never read round data. Closing
+          never navigates. */}
+      {profile?.id && (scorecard.target?.scoreId ?? deepLinkScoreId) && (
         <RoundDetailSheet
           open={!!(scorecard.target?.scoreId ?? deepLinkScoreId)}
           onClose={() => { scorecard.close(); setDeepLinkScoreId(null); }}
