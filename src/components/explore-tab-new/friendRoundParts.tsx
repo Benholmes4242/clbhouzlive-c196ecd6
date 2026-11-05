@@ -309,7 +309,7 @@ function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
 
   // 1. A guarded, current course record.
   if (row.is_course_record) {
-    push('record', t('discover.friendsRail.insight.record', { defaultValue: 'A new course record here' }));
+    push('record', t('discover.friendsRail.insight.record', { defaultValue: 'A new best on clbhouz here' }));
   }
 
   // 2. Hole in one — with the hole when the card tells us which.

@@ -1,0 +1,60 @@
+src/hooks/top100/useTop100Enrichment.ts:16: *                                  member count, course record, player ids
+src/lib/courseYou/youDerivations.ts:43: * here" below, "the course record" at or above) is driven by the same count.
+src/components/friend-sheet/parts/UnsyncedPitchCard.tsx:22:  { icon: <Trophy size={16} strokeWidth={2.2} />, title: 'Course records', sub: 'Who holds what, where' },
+src/pages/public/JoinLandingPage.tsx:52:  ['Records to chase', 'Course records, leaderboards and the Top 100, against the golfers you play with.'],
+src/components/feed/featuredRoundTrigger.ts:7: * row), eagle brace (>= 2), CONTESTED course record. The record test is the
+src/features/courses/_shared/scorecard/scorecardFeat.ts:14: * Standings do not belong here. Course record, net record and rank-up depend on
+src/hooks/gam/useCircleLatestRounds.ts:659:      //  ii. COURSE RECORDS. ONE RPC FOR THE WHOLE SURFACED SET — its windowed
+src/features/explore-magazine/useCourseRecordSignal.ts:9: * Who holds a course record is answered by ONE place: gam_course_legends, the
+src/features/explore-magazine/useClubGolfers.ts:88:                 and lets the tile reserve "the course record" exclusively for
+src/lib/gam/fieldGate.ts:11: * CROWN_MIN_OTHERS gates a CONTEST. A course record asks the binary question
+src/lib/gam/fieldGate.ts:33: * round a course record or print the record fact. That is the SAME floor stated
+src/features/comments-v2/components/StandingLine.tsx:3: * 10.5px, tabular. The course record takes the scorecard gold at 700; every
+src/pages/EchoV2Page.tsx:158:    if (data.sources('course')) out.push(t('chat.sources.course', 'Course records'));
+src/components/explore-tab-new/friendRoundParts.tsx:310:  // 1. A guarded, current course record.
+src/features/explore-magazine/exploreCopy.tsx:65:    // adjacent lines never repeat "course record" or sacrifice its name.
+src/features/explore-magazine/exploreCopy.tsx:220:   * achievement (BRIEF_EXPLORE_TWO_SHAPES §6). "took the course record with a
+src/features/explore-magazine/exploreCopy.tsx:221:   * 69" becomes a Course record panel plus "Danny Robinson shot a 69, two
+src/components/explore-tab-new/courseled/roundMoment.ts:18: *   2 COURSE RECORD   strictly beat an earlier clbhouz course mark. #F05AA6
+src/components/explore-tab-new/courseled/roundMoment.ts:217:  /* 1 — ACE / ALBATROSS. They alone outrank a course record. Existing feat
+src/components/explore-tab-new/courseled/roundMoment.ts:239:  /* 2 — COURSE RECORD. A RECORD IS SOMETHING YOU TAKE FROM SOMEONE. A first
+src/components/explore-tab-new/courseled/roundMoment.ts:242:     COURSE RECORD as the catalogue grows. The fact is live, keyed by course_id,
+src/features/explore-magazine/cardTreatment.ts:120:  /* "NEW COURSE RECORD" IS A CLAIM ABOUT NOW, so it may only be drawn from the
+src/components/explore-tab-new/courseled/hooks/useGolfThisWeek.ts:20: * — nines, course records, per-course history, feats, index movement — is shared
+src/features/business/clubAnalytics/sections.tsx:10: *   THE COURSE RECORD,
+src/features/business/clubAnalytics/sections.tsx:464:/* ─────────────────── THE COURSE RECORD ─────────────────── */
+src/features/business/clubAnalytics/sections.tsx:467: * §5 — THE COURSE RECORD, AND WHY IT CARRIES NO NAMES.
+src/features/amateur/AmateurHero.tsx:77: *   4 COURSE RECORD            5 PERSONAL BEST HERE      6 JUST PLAYED
+src/features/explore-magazine/AwardCluster.tsx:10: * than a course record. If that rule is ever loosened, revisit this figure.
+src/components/profile/handicap/whs/sections/trends/RecentRoundsCard.tsx:125: * A course is held by ID: two WHS course records can share a name, and
+src/components/profile/handicap/whs/sections/trends/RecentRoundsCard.tsx:491:// course record, keyed on the id, so two records sharing a name stay two rows.
+src/test/featuredRoundTrigger.test.ts:21:  it('contested course record', () => expect(featuredTriggerFor(post, round(), records(70))?.reason).toBe('course_record'));
+src/test/featuredRoundTrigger.test.ts:26:  it('ace plus course record headlines the ace', () =>
+src/test/exploreRoundTreatment.test.ts:26:    ['a course record draws the line', { is_course_record: true }, shape([0, 0, 0]), 'line'],
+src/features/admin/lib/eventLabels.ts:53:  course_record_book_opened: 'Course record book opened',
+src/test/exploreCardTreatment.test.ts:90:  /* "NEW COURSE RECORD" IS A CLAIM ABOUT NOW. A record that has since been
+src/test/courseRecordSignal.test.ts:5:describe('course record holder reduction', () => {
+src/test/heroCourseRecordNames.test.ts:11:describe('hero course record names (BRIEF_COURSE_HERO_1)', () => {
+src/components/profile/handicap/whs/sections/course-legends/flat/YourCrowns.tsx:9: * ALWAYS ALL TIME. A crown is a claim on a course record; "you hold this over
+src/components/courses/course-detail/you/UpForGrabsSection.tsx:22:  /** The course record gross, when someone holds it. */
+src/components/courses/course-detail/you/UpForGrabsSection.tsx:32:   * here, never "the course record".
+src/components/courses/course-detail/you/UpForGrabsSection.tsx:38:   * open. The held course record row, then every open all-time board. The
+src/components/courses/course-detail/you/UpForGrabsSection.tsx:79:     here; the "course record" noun is reserved for a field that clears the
+src/components/courses/course-detail/you/BoardList.tsx:4: * the course record (the hero already carries it; held boards live behind
+src/components/courses/course-detail/useCourseRecordSummary.ts:52:  /** The course record (lowest gross, all time), or null. */
+src/components/courses/course-detail/useCourseRecordSummary.ts:54:  /** Every holder of the course record (lowest gross, all time). */
+src/test/roundMomentCourseRecord.test.ts:11:describe('COURSE RECORD moment', () => {
+src/features/tourhub/hooks/useEventMoments.ts:61:  record: { icon: '📊', color: 'bg-blue-500/15 text-blue-600', label: 'Course Record' },
+src/components/golf-club/GolfClubView.tsx:491:   * course record are deliberately NOT read here: nothing writes them, and on a
+src/components/courses/course-detail/about/RecordBook.tsx:21: * marks the course record (lowest gross, all time).
+src/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown.tsx:330:   * and the sheet only. A crown is a claim on the course record; "you hold it
+src/components/courses/course-detail/about/HeroCourseRecord.tsx:4: * The course record row under the hero reference line. LOWEST GROSS ONLY —
+src/components/courses/course-detail/CourseRecordBook.tsx:12: *   - the crown marks the course record row (lowest gross, all time) only
+src/components/courses/CoursesPageHero.tsx:104: * app's mark for a course record (gam_course_legends are "crowns"). The other
+src/components/courses/CoursesPageHero.tsx:280:                    contested flag, so COURSE RECORD vs BEST ROUND HERE cannot be
+src/components/courses/course-detail/CourseYouTab.tsx:289:     the best card logged here, never "the course record". */
+src/components/courses/course-detail/CourseYouTab.tsx:434:       same count: "the best card logged here" below, "the course record" at
+src/features/admin/components/AddCourseSheet.tsx:129:      subtitle="Create a new golf course record"
+src/features/admin/components/CourseClubControl.tsx:9: * Admin-only club attachment for a course record. Writes go through
+src/components/courses/BrowseCourseCard.tsx:148:            count, the faces and the course record now arrive in the batched
+src/features/activity-v2/ActivityPageV2.tsx:82:  crowns: { title: 'No records yet', sub: 'Course records, crowns, tiers and streaks land here as you play.' },
