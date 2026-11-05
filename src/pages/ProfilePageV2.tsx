@@ -518,6 +518,19 @@ const ProfilePageV2Content: React.FC = () => {
 
   // ?score=<whs score id> opens the scorecard sheet (round reaction pushes).
   const [deepLinkScoreId, setDeepLinkScoreId] = useState<string | null>(null);
+  // Round card close animation: the sheet stays mounted with open=false and the
+  // last score id through BottomSheet's 300ms close, then the target clears.
+  const openRoundScoreId = scorecard.target?.scoreId ?? deepLinkScoreId;
+  const openRoundOwner = scorecard.target?.profileUserId ?? null;
+  const [roundSheet, setRoundSheet] = useState<{ scoreId: string; profileUserId: string | null } | null>(null);
+  useEffect(() => {
+    if (openRoundScoreId) {
+      setRoundSheet({ scoreId: openRoundScoreId, profileUserId: openRoundOwner });
+      return;
+    }
+    const timer = window.setTimeout(() => setRoundSheet(null), ROUND_SHEET_CLOSE_MS);
+    return () => window.clearTimeout(timer);
+  }, [openRoundScoreId, openRoundOwner]);
   useEffect(() => {
     if (!isSelf) return;
     const scoreId = searchParams.get('score');
@@ -1532,17 +1545,19 @@ const ProfilePageV2Content: React.FC = () => {
           the own-profile deep link share it. Mounted only while a round is
           open, so profiles with no open round never read round data. Closing
           never navigates. */}
-      {profile?.id && (scorecard.target?.scoreId ?? deepLinkScoreId) && (
+      {profile?.id && roundSheet && (
         <RoundDetailSheet
-          open={!!(scorecard.target?.scoreId ?? deepLinkScoreId)}
+          open={!!openRoundScoreId}
           onClose={() => { scorecard.close(); setDeepLinkScoreId(null); }}
-          scoreId={scorecard.target?.scoreId ?? deepLinkScoreId}
-          profileUserId={scorecard.target?.profileUserId ?? profile.id}
+          scoreId={roundSheet.scoreId}
+          profileUserId={roundSheet.profileUserId ?? profile.id}
         />
       )}
     </PageRoot>
   );
 };
+
+export const ROUND_SHEET_CLOSE_MS = 300;
 
 const ProfilePageV2: React.FC = () => {
   const touchDebugEnabled = useMemo(() => {
