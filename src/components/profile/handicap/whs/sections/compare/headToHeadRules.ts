@@ -45,7 +45,7 @@ export function fmtGap(v: number): string {
   return Math.abs(Math.round(v * 10) / 10).toFixed(1);
 }
 
-/** "{n} rounds together · you're {gap} lower|higher|level" / "Never played together · {gap} apart". */
+/** "{n} rounds together · You're {gap} lower|higher|level" / "Never played together · {gap} apart". */
 export function entryLine(
   roundsTogether: number,
   viewerIndex: number | null | undefined,
@@ -58,8 +58,8 @@ export function entryLine(
   }
   const lead = `${roundsTogether} ${roundsTogether === 1 ? 'round' : 'rounds'} together`;
   if (!hasGap) return lead;
-  if (diff === 0) return `${lead} \u00B7 you're level`;
-  return `${lead} \u00B7 you're ${fmtGap(diff)} ${diff < 0 ? 'lower' : 'higher'}`;
+  if (diff === 0) return `${lead} \u00B7 You're level`;
+  return `${lead} \u00B7 You're ${fmtGap(diff)} ${diff < 0 ? 'lower' : 'higher'}`;
 }
 
 export interface Record3 { wins: number; ties: number; losses: number }

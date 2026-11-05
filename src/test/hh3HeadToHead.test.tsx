@@ -78,9 +78,9 @@ const vsRow = (key: string) => document.querySelector(`[data-hh-vs="${key}"]`) a
 const fig = (row: HTMLElement, side: 'me' | 'them') => row.querySelector(`[data-hh-fig="${side}"]`) as HTMLElement;
 
 describe('HH3 entry line', () => {
-  it('n>0 with the viewer lower', () => expect(entryLine(104, 1.9, 5.6)).toBe("104 rounds together \u00B7 you're 3.7 lower"));
-  it('n>0 with the viewer higher', () => expect(entryLine(3, 8.2, 5.6)).toBe("3 rounds together \u00B7 you're 2.6 higher"));
-  it('n>0 with equal indexes reads level', () => expect(entryLine(2, 5.6, 5.6)).toBe("2 rounds together \u00B7 you're level"));
+  it('n>0 with the viewer lower', () => expect(entryLine(104, 1.9, 5.6)).toBe("104 rounds together \u00B7 You're 3.7 lower"));
+  it('n>0 with the viewer higher', () => expect(entryLine(3, 8.2, 5.6)).toBe("3 rounds together \u00B7 You're 2.6 higher"));
+  it('n>0 with equal indexes reads level', () => expect(entryLine(2, 5.6, 5.6)).toBe("2 rounds together \u00B7 You're level"));
   it('n=0 reads never played with the gap apart', () => expect(entryLine(0, 1.9, 5.6)).toBe('Never played together \u00B7 3.7 apart'));
 });
 
