@@ -41,7 +41,6 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
 import { ProLabel } from '@/features/pro-verification/ProLabel';
-import { proIslandCaption } from '@/features/pro-verification/proRules';
 import '@/features/pro-verification/pro-status-controls.css';
 import { useIslandsCondensed } from './useIslandsCondensed';
 import { IslandBackCapsule } from './IslandBackCapsule';
@@ -382,7 +381,7 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string; fold?: 
   if (!user) return null;
   if (isBusinessActor) return null;
   if (!settled) return null;
-  if (hcp.pro) return <><HcpDivider color={dividerColor} fold={fold} condensed={condensed} /><Button variant="ghost" className="pro-island-cell" aria-label="Your profile" onClick={() => navigate('/profile')}><ProLabel size="small" /><span className="pro-island-detail">{proIslandCaption(hcp.proKind, hcp.proTour)}</span></Button></>;
+  if (hcp.pro) return <><HcpDivider color={dividerColor} fold={fold} condensed={condensed} /><Button variant="ghost" className="pro-island-cell" aria-label="Your profile" onClick={() => navigate('/profile')}><ProLabel size="small" /></Button></>;
   if (hcp.proPending) return null;
   if (profile?.hide_handicap_chip) return null;
 

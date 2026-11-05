@@ -1,5 +1,9 @@
 # Roadmap
 
+## Island PRO badge only
+- [x] Remove island caption/helper and scope signed-off 22px badge; keep profile tap/divider and pending/amateur behavior.
+- [ ] Focused tests, measured badge sizes and four fresh shards; baseline 7,036 / 620, expected 7,024 / 620 after twelve caption cases removed.
+
 ## HS2_FOOTER
 - [x] Move intro actions/loading CTA to shared FooterBar; preserve content/data/later stages, update only CTA place to footer.
 - [x] Focused 26/26; fresh shards 1,827 / 1,673 / 1,774 / 1,762 = 7,036 / 620, zero failures. Three added cases; two end→footer payload assertions/case names documented in HS2_FOOTER_REPORT.md. Interrupted shard3 log retained; separately rerun green. Preview build OK; browser/live checks unclaimed.

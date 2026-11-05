@@ -7,18 +7,6 @@
 
 export type ProKind = 'tour_pro' | 'teaching_pro';
 
-/** Island-only short names; profile and editor retain the stored full tour. */
-export function proIslandCaption(kind: ProKind | null | undefined, tour: string | null | undefined): string {
-  if (kind === 'teaching_pro') return 'PGA PRO';
-  const upper = (tour ?? '').trim().toUpperCase();
-  const captions: Record<string, string> = {
-    'PGA TOUR': 'PGA TOUR', 'DP WORLD TOUR': 'DP WORLD', 'LPGA TOUR': 'LPGA',
-    'LIV GOLF': 'LIV GOLF', 'KORN FERRY TOUR': 'KORN FERRY', 'HOTELPLANNER TOUR': 'HOTELPLANNER',
-    'LADIES EUROPEAN TOUR': 'LET', 'PGA TOUR CHAMPIONS': 'CHAMPIONS',
-  };
-  return captions[upper] ?? (upper.length > 11 ? upper.replace(/ TOUR$/, '') : upper);
-}
-
 export interface ProTourChip { label: string; code: string | null }
 
 /** §2 — chip order is signed off. Tours with no code send p_tour_code null. */
