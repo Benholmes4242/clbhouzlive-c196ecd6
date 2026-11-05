@@ -38,7 +38,6 @@
 .featured-dots { margin-left:auto; display:flex; gap:5px; align-items:center; }
 .featured-dots i { width:6px; height:6px; border-radius:3px; background:var(--featured-dot); transition:width 250ms, background 250ms; }
 .featured-dots i[data-current="true"] { width:18px; background:var(--featured-white); }
-.featured-hint { margin:10px 16px 0; font-size:12px; color:var(--featured-hint); }
 .featured-end { border:1px solid var(--featured-end-edge); background:var(--featured-end); padding:30px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
 .featured-end h3 { font-size:20px; font-weight:700; margin:0; }
 .featured-end p { font-size:13.5px; color:var(--featured-body); line-height:1.5; margin:8px 0 0; }
