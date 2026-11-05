@@ -36,6 +36,19 @@
 }
 
 :root {
+  --pro-profile-ink: var(--tour-menu-ink);
+  --pro-profile-on-ink: var(--tour-menu-on-ink);
+  --pro-profile-mute: var(--tour-menu-mute);
+  --pro-profile-dim: var(--tour-menu-dim);
+  --pro-profile-soft: rgba(248,250,252,0.78);
+  --pro-profile-card: #141418;
+  --pro-profile-hair: var(--tour-menu-hair);
+  --pro-profile-rule: rgba(255,255,255,0.2);
+  --pro-profile-wash: rgba(255,255,255,0.04);
+  --pro-profile-green: var(--tour-menu-live);
+  --pro-profile-under: var(--tour-menu-under-par);
+  --pro-profile-gold: #FBBC2E;
+  --pro-profile-over: #6A7BA2;
   --tour-menu-ink: #F8FAFC;
   --tour-menu-on-ink: #0A0A0C;
   --tour-menu-mute: rgba(248,250,252,0.62);
