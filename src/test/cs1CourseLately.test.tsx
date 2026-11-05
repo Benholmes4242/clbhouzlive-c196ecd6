@@ -50,10 +50,11 @@ function row(i: number, extra: Record<string, unknown> = {}) {
   };
 }
 
-function mount(userId: string | undefined = 'me') {
+function mount(userId: string | undefined | 'signed-out' = 'me') {
+  const viewer = userId === 'signed-out' ? undefined : userId;
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <QueryClientProvider client={qc}><MemoryRouter><CourseLatelySection courseId="c1" userId={userId} /></MemoryRouter></QueryClientProvider>,
+    <QueryClientProvider client={qc}><MemoryRouter><CourseLatelySection courseId="c1" userId={viewer} /></MemoryRouter></QueryClientProvider>,
   );
 }
 
@@ -114,7 +115,7 @@ describe('CS1 Lately here', () => {
     await ready();
     const cards = document.querySelectorAll('[data-rounds-shelf-card="round"]');
     expect(cards[0].getAttribute('data-own-round')).toBe('true');
-    expect((cards[0] as HTMLElement).style.border).toContain('rgba(247, 147, 30, 0.35)');
+    expect((cards[0] as HTMLElement).style.border.replace(/\s/g, '')).toContain('rgba(247,147,30,0.35)');
     expect((cards[0].querySelector('[data-round-card-name]') as HTMLElement).style.color).toBe('rgb(247, 147, 30)');
     expect(cards[1].getAttribute('data-own-round')).toBeNull();
     expect(cards[0].querySelector('[data-round-card-circle]')).toBeNull();
@@ -183,13 +184,13 @@ describe('CS1 Lately here', () => {
   });
 
   it('signed-out viewers get nothing and make no read', () => {
-    const { container } = mount(undefined);
+    const { container } = mount('signed-out');
     expect(container.innerHTML).toBe('');
     expect(f.calls.length).toBe(0);
   });
 
   it('(j) hero label reads Best on clbhouz', () => {
-    render(<HeroCourseRecord holders={[{ user_id: 'a', display_name: 'Lennon Hill', value: 65 } as never]} />);
+    render(<HeroCourseRecord holders={[{ user_id: 'a', user_display_name: 'Lennon Hill', value: 65 } as never]} />);
     expect(screen.getByText('Best on clbhouz')).toBeTruthy();
   });
 });
