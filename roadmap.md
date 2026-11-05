@@ -1,5 +1,9 @@
 # Roadmap
 
+## Tour menu Live board
+- [x] Signed-off menu presentation and slug-owned single selection; shared picker membership/behavior preserved.
+- [ ] STOP: new menu tests 15/15, focused total 28 pass/1 fail at tourIsland.test.tsx:235:30 `expected '' to be 'min(346px, calc(100vw - 24px))'`. No repair; browser/four shards blocked. Prior Explore failures untouched. Expected inventory 7,042 / 622; exact ledger in TOUR_MENU_LIVE_BOARD_REPORT.md.
+
 ## EXP_RING_1
 - [x] Audit Explore-only avatar callers; resolve brief discrepancy as Tour-matching 1px traced personal ring, business 0.5px inset as requested; amber/shared/Tour unchanged.
 - [ ] STOP: focused 35 pass/19 fail; new expRing1.test.tsx:31:33 `expected '' to be 'none'`; untouched ws3WatchBottom mock lacks DARK_HAIRLINE (17 failures). No failing assertions repaired; four shards/browser blocked. Baseline 7,024 / 620, expected +3/+1; exact evidence and sweep in EXP_RING_1_REPORT.md.

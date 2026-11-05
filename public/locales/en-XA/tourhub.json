@@ -46,6 +46,7 @@
     },
     "overview": "[~~Őṽéřṽíéŵ~~]",
     "leaderboards": "[~~Ļéáđéřƀőářđš~~]",
+    "leadersShort": "[~~Ļéáđéřš~~]",
     "schedule": "[~~Šĉĥéđúļé~~]",
     "players": "[~~Ƥļáýéřš~~]",
     "leaders": "[~~Ļéáđéřš~~]",
@@ -1393,6 +1394,16 @@
     }
   },
   "tour": {
+    "glance": {
+      "thisWeek": "[~~ŢĤÍŠ ŴÉÉĶ~~]",
+      "liveNow": "[~~{{count}} ļïvë ñöŵ~~]",
+      "tied": "[~~{{count}} ţïëð~~]",
+      "starts": "[~~Šţårţš {{day}}~~]",
+      "offThisWeek": "[~~Öff ţhïš ŵëëk: {{tours}}~~]",
+      "allToursSub": "[~~Ëvërÿ ţöür, šööñëšţ fïršţ~~]",
+      "live": "[~~Ļïvë~~]",
+      "final": "[~~Fïñål~~]"
+    },
     "parValue": "[Par {{par}}]",
     "yardsValue": "[{{yards}} yds]",
     "fieldInline": "[Field {{v}} from {{n}}]"
