@@ -7,7 +7,7 @@ import { resolve } from 'path';
 const css = readFileSync(resolve(__dirname, '../features/tourhub/overview/sections/alsoWeek.css'), 'utf8');
 const tsx = readFileSync(resolve(__dirname, '../features/tourhub/overview/sections/AlsoWeekEvent.tsx'), 'utf8');
 const block = (cls: string) => {
-  const m = new RegExp(`\\.${cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{([^}]*)\\}`).exec(css);
+  const m = new RegExp(`(?:^|\\})\\s*\\.${cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{([^}]*)\\}`).exec(css);
   if (!m) throw new Error(`no .${cls} block`);
   return m[1];
 };
