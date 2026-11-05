@@ -3,15 +3,24 @@ import {render,screen,fireEvent,waitFor,cleanup} from '@testing-library/react';
 import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter,useLocation} from 'react-router-dom';
 vi.mock('react-i18next',()=>({initReactI18next:{type:'3rdParty',init:()=>{}},useTranslation:()=>({t:(_k:string,o?:{defaultValue?:string})=>o?.defaultValue??''})}));
-const f=vi.hoisted(()=>({pro:true,settled:true,linked:true,kind:'tour_pro',hidden:false,rpc:vi.fn(),invalidate:vi.fn(),close:vi.fn(),toast:Object.assign(vi.fn(),{error:vi.fn()}),glance:vi.fn()}));
+const f=vi.hoisted(()=>({pro:true,settled:true,linked:true,kind:'tour_pro',hidden:false,proUnknown:false,trend:vi.fn(),rpc:vi.fn(),invalidate:vi.fn(),close:vi.fn(),toast:Object.assign(vi.fn(),{error:vi.fn()}),glance:vi.fn()}));
 vi.mock('@/lib/whs/useOwnHandicapState',()=>({useOwnHandicapState:()=>({pro:f.pro,settled:f.settled,proKind:f.kind,proTour:'Alps Tour',proClub:'Sundridge Park',linked:f.linked,connected:f.linked,connection:f.linked?{id:'kept'}:null,trend:{current:4.2},anyError:false})}));
-vi.mock('@/features/pro-verification/useMyProStatus',()=>({useMyProStatus:()=>({verified:true,verifiedAt:'2026-11-04T12:00:00Z',kind:f.kind,tour:'Alps Tour',club:'Sundridge Park'})}));
+vi.mock('@/features/pro-verification/useMyProStatus',()=>({useMyProStatus:()=>({verified:true,verifiedAt:'2026-11-04T12:00:00Z',kind:f.kind,tour:'Alps Tour',club:'Sundridge Park',unknown:f.proUnknown})}));
 vi.mock('@/features/pro-verification/proMembersCache',()=>({invalidateProMembers:f.invalidate}));
 vi.mock('@/features/pro-verification/useProMembers',()=>({useProMembers:()=>({members:new Map()})}));
 vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:{id:'me'},loading:false})}));
 vi.mock('@/context/ActiveActorContext',()=>({useActiveActor:()=>({activeActor:{id:'me',type:'personal'}})}));
 vi.mock('@/hooks/useUserProfile',()=>({useUserProfile:()=>({data:{hide_handicap_chip:f.hidden},isFetched:true,isError:false})}));
-vi.mock('@/lib/whs/hooks',()=>({useHandicapHistory:()=>({data:[]})}));
+vi.mock('@/lib/whs/hooks',()=>({useHandicapHistory:()=>({data:[]}),useWhsConnection:()=>({data:null,isFetched:true,isError:false}),useHandicapTrend:f.trend}));
+vi.mock('@/hooks/useProfileData',()=>({useProfileData:()=>({profile:{id:'me',is_public:true},loading:false,error:null})}));
+vi.mock('@/hooks/useMyBusinesses',()=>({useHasBusinesses:()=>({count:0})}));
+vi.mock('@/hooks/useMyRequests',()=>({useMyRequestsList:()=>({data:[],isLoading:false,isError:false})}));
+vi.mock('@/hooks/useInviteSheet',()=>({useInviteSheet:()=>({openInviteSheet:vi.fn()})}));
+vi.mock('@/hooks/useLogout',()=>({useLogout:()=>({logout:vi.fn()})}));
+vi.mock('@/hooks/useDeleteAccount',()=>({useDeleteAccount:()=>({showDeleteConfirm:false,setShowDeleteConfirm:vi.fn(),showBusinessWarning:false,setShowBusinessWarning:vi.fn(),ownedBusinessNames:[],deleteConfirmText:'',setDeleteConfirmText:vi.fn(),isDeleting:false,initiateDelete:vi.fn(),confirmDelete:vi.fn()})}));
+vi.mock('@/components/settings/SettingsPrivacyCard',()=>({SettingsPrivacyCard:()=>null}));
+vi.mock('@/components/settings/SettingsNotificationsCard',()=>({SettingsNotificationsCard:()=>null}));
+vi.mock('@/components/settings/SettingsYourData',()=>({SettingsYourData:()=>null}));
 vi.mock('@/features/chrome-v2/IndexGlance',()=>({IndexGlance:()=>{f.glance();return null;}}));
 vi.mock('@/features/chrome-v2/ConnectGlance',()=>({ConnectGlance:()=>{f.glance();return null;}}));
 vi.mock('@/features/search-v2/SearchOverlayV2',()=>({SearchOverlayV2:()=>null}));
@@ -22,13 +31,14 @@ vi.mock('@/integrations/supabase/client',()=>({supabase:{rpc:f.rpc}}));
 vi.mock('@/lib/toast',()=>({toast:f.toast}));
 import {HcpCell} from '@/features/chrome-v2/ChromeIsland';
 import {SettingsHandicapCard} from '@/components/settings/SettingsHandicapCard';
+import {SettingsTabContent} from '@/components/settings/SettingsTabContent';
 import {ProStatusSheet} from '@/features/pro-verification/ProStatusSheet';
 import {ScoresStandingSlot} from '@/features/explore-magazine/ConnectStandingInvite';
 import {profileProTabs} from '@/features/pro-verification/profileProRules';
 function Location(){return <output data-testid="location">{useLocation().pathname}</output>;}
 let qc:QueryClient;
 function mount(node:React.ReactNode){return render(<QueryClientProvider client={qc}><MemoryRouter>{node}<Location /></MemoryRouter></QueryClientProvider>);}
-beforeEach(()=>{vi.clearAllMocks();qc=new QueryClient({defaultOptions:{queries:{retry:false}}});f.pro=true;f.settled=true;f.linked=true;f.kind='tour_pro';f.hidden=false;f.rpc.mockResolvedValue({error:null});});
+beforeEach(()=>{vi.clearAllMocks();qc=new QueryClient({defaultOptions:{queries:{retry:false}}});f.pro=true;f.settled=true;f.linked=true;f.kind='tour_pro';f.hidden=false;f.proUnknown=false;f.rpc.mockResolvedValue({error:null});});
 afterEach(()=>{cleanup();qc.clear();});
 describe('pro island',()=>{
  it.each([false,true])('shows PRO instead of index linked=%s',linked=>{f.linked=linked;mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(screen.getByRole('button',{name:'Your profile'}).textContent).toContain('Alps Tour');expect(screen.queryByRole('button',{name:/Handicap index/})).toBeNull();});
@@ -38,6 +48,7 @@ describe('pro island',()=>{
  it('amateur retains index',()=>{f.pro=false;mount(<HcpCell tone="dark" dividerColor="transparent"/>);expect(screen.getByRole('button',{name:'Handicap index 4.2'})).toBeInTheDocument();});
 });
 describe('pro handicap surfaces',()=>{
+ it('Settings mounts as soon as pro status is known without waiting for pending handicap trend',()=>{f.settled=false;f.trend.mockReturnValue({data:undefined,isPending:true,isLoading:true,isFetched:false,isError:false});f.proUnknown=true;const v=mount(<SettingsTabContent/>);expect(screen.queryByTestId('st2-handicap-card')).toBeNull();f.proUnknown=false;v.rerender(<QueryClientProvider client={qc}><MemoryRouter><SettingsTabContent/></MemoryRouter></QueryClientProvider>);expect(screen.getByTestId('st2-handicap-card')).toBeInTheDocument();expect(f.trend).not.toHaveBeenCalled();});
  it.each(['tour_pro','teaching_pro'] as const)('Settings preserves %s note and disabled prompts with stored connection',kind=>{const toggle=vi.fn();const connection={id:'kept',passport_id:1,membership_number:'123',last_synced_at:null,last_sync_status:null,last_sync_error:null,consecutive_failures:0,initial_sync_complete:true,created_at:'2026-01-01',provider:'england_golf' as const};mount(<SettingsHandicapCard pro={{kind}} connection={connection} connectionReady checked updating={false} profileError={false} egHandicapIndex={4.2} onToggle={toggle} onManage={()=>{}}/>);expect(screen.getByTestId('st2-handicap-card').querySelector('.st2-line')?.textContent).toBe(`You're verified as ${kind==='tour_pro'?'a tour professional':'a teaching professional'}, so there's no handicap here and no prompts to connect one.`);expect(screen.getByRole('switch',{name:'Connect prompts'})).toBeDisabled();expect(screen.getByRole('switch')).toHaveAttribute('aria-checked','false');expect(screen.getByTestId('st2-handicap-card').querySelector('small')?.textContent).toBe("Off while you're a verified pro");fireEvent.click(screen.getByRole('switch'));expect(toggle).not.toHaveBeenCalled();expect(document.querySelector('.st2-figures,.st2-connect,.st2-manage')).toBeNull();});
  it.each([false,true])('Settings amateur retains connection actions linked=%s',linked=>{const manage=vi.fn(),toggle=vi.fn();const connection=linked?{id:'kept',passport_id:1,membership_number:'123',last_synced_at:null,last_sync_status:null,last_sync_error:null,consecutive_failures:0,initial_sync_complete:true,created_at:'2026-01-01',provider:'england_golf' as const}:null;mount(<SettingsHandicapCard pro={null} connection={connection} connectionReady checked updating={false} profileError={false} egHandicapIndex={4.2} onToggle={toggle} onManage={manage}/>);const card=screen.getByTestId('st2-handicap-card');expect(card.querySelectorAll('.st2-figure')).toHaveLength(linked?3:0);const action=card.querySelector(linked?'.st2-top':'.st2-connect');if(!action)throw new Error('Missing amateur connection action');fireEvent.click(action);expect(manage).toHaveBeenCalledOnce();expect(screen.getByRole('switch')).toBeEnabled();fireEvent.click(screen.getByRole('switch'));expect(toggle).toHaveBeenCalledWith(false);});
  it.each(['tour_pro','teaching_pro'] as const)('Settings has no figures or actions for %s',kind=>{const toggle=vi.fn();mount(<SettingsHandicapCard pro={{kind}} connection={null} connectionReady checked updating={false} profileError={false} onToggle={toggle} onManage={()=>{}}/>);const sw=screen.getByRole('switch');expect(sw).toBeDisabled();expect(sw).toHaveAttribute('aria-checked','false');fireEvent.click(sw);expect(toggle).not.toHaveBeenCalled();expect(document.querySelector('.st2-figures,.st2-connect,.st2-manage')).toBeNull();});

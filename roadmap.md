@@ -1,5 +1,10 @@
 # Roadmap
 
+## Settings pro-only card readiness
+- [x] Replace Settings shared chip read with full pro status; preserve all card props and existing assertions; add one proStatusControls regression with pending trend.
+- [ ] Rerun shard 3 then 4 under A/B standing rule; reconcile expected 6,875 / 607 with retained FIX_UNBLOCK_2 four cases (+4 / +1 = 6,879 / 608).
+- [ ] Retain historical shard 1/2 evidence; delete PRO_STATUS_CONTROLS_REPORT.md only on all-green, report fixture lines and blockers.
+
 ## FIX_UNBLOCK_2
 - [x] Resolved island-only readiness scope; fixture field additions authorised without assertion changes. Added profile-owned verifiedKnown, island opt-in and four regression cases; other consumers retain full request waiting.
 - [x] Focused 102/102 passes; shards 1/2 pass 1,753 / 1,653; shard 3 has 1,739 pass / 11 pre-existing ST2 failures. Expected 6,878 / 608 (+4 new fixUnblock2 cases), build OK.
