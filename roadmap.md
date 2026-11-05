@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_TOUR_NOTIF_1
+- [ ] Activity trophy tile/meta, type-based Tour identity and client overview destination with fresh-arrival top scroll.
+- [ ] NewsChromeBridge label-only fix and report-only sweep of other centred header titles.
+- [ ] Authorised tile/parity tests, new regressions, four shards and report; preserve existing pro-controls fixture stop.
+
 ## Pro status controls
 - [x] Shared settled own-handicap/pro hook; PRO island and Settings card implemented.
 - [x] Listed own-handicap presentation hidden, connections preserved; verified removal sheet implemented.
