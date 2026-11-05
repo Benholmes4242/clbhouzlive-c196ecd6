@@ -115,3 +115,15 @@ No assertions or product code changed. Focused 108/108. Shards: 1,759 / 1,626 / 
 3. Shards (`--maxWorkers=2`): 1,759 / 1,626 / 1,730 / 1,683 = 6,798 passed, 0 failed, 598 files (unchanged count; one test rewritten in place). Build OK 07:39:43Z. Logs: docs/verification/fw1-close/.
 Browser (390×844, /amateur, anonymous session; member sign-in unavailable, `external_unmanaged`): Featured deck rendered with real rows — "FEATURED THIS WEEK / The week's best", 1 / 4, card with mention-free caption, like/comment/share bar, dots, hint line, Shorts below. Screenshot: /tmp/browser/fw1/guest.png. Not checked in browser: member like state, swipe motion, end card.
 Status: FW1 complete.
+
+## Revert of the lead-during-loading change (2026-11-05)
+Ruling: Featured and the lead share one slot. `WatchFeaturedSlot` again renders one skeleton (`data-watch-lead="skeleton"`, margin 22px 16px 0, 440px, radius 20) and no WatchLead while the read is pending; once settled it renders the deck or the fallback WatchLead in that same slot (original FW1 behaviour).
+
+Restored test, `fw1FeaturedDeck.test.tsx:34`:
+- Old: "keeps the lead rendered while the featured read is pending, skeleton in its own slot" — expected `[data-featured-skeleton]` present and `legacy-lead` present.
+- New (restored original): "holds the existing skeleton during loading" — expects `[data-watch-lead="skeleton"]` present and `legacy-lead` absent.
+
+Added: pending→deck and pending→fallback lead; each checks the skeleton is replaced in place and the siblings around it in the feed stay put.
+ws1WatchTop/ws2WatchMiddle settled-empty featured fixtures kept unchanged.
+
+Shards (`--maxWorkers=2`): 1,759 / 1,628 / 1,726 / 1,693 = 6,806 passed, 0 failed, 599 files. 6,804 + 2 added = 6,806. Build OK at 2026-11-05T08:25:47Z. Logs: docs/verification/fw1-revert/.
