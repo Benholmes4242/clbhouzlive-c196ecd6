@@ -22171,6 +22171,35 @@ export type Database = {
         Args: { p_course_id: string; p_exclude_user_id: string }
         Returns: Json
       }
+      get_course_lately: {
+        Args: { p_course_id: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          avg_topar: number
+          best_gross: number
+          best_gross_date: string
+          best_topar: number
+          course_handicap: number
+          course_id: string
+          course_name: string
+          course_par: number
+          delta: number
+          display_name: string
+          golfers: number
+          gross_score: number
+          in_circle: boolean
+          is_competition: boolean
+          last_better: string
+          net_score: number
+          play_date: string
+          pos: number
+          prior_n: number
+          profile_photo_url: string
+          total_count: number
+          user_id: string
+          whs_score_id: string
+          window_avg_topar: number
+        }[]
+      }
       get_course_leaderboard: {
         Args: {
           p_country: string
