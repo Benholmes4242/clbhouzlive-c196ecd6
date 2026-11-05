@@ -1,7 +1,7 @@
-# HH3 Head to head - build report (STOPPED at shard 3)
+# HH3 Head to head - build report (SIGNED OFF)
 
 ## Status
-Built. Full suite: shard 3 had one failure, so per the stop rule HH3 is not signed off. The full output is kept.
+Signed off under Ben's 2026-11-05 ruling after the requested clean shard-3 rerun. Historical failing output remains kept below; neither flaky test was edited. Member browser verification remains unavailable as documented below.
 
 ## Failure (shard 3) - unrelated to HH3, not fixed
 `src/test/guestStage24.test.tsx:85` "Stage 2.4 — guests on /auth > after a guest signs in as a member, Auth redirects once"
@@ -46,3 +46,14 @@ No existing test was rewritten, renamed or deleted.
 This is the first sign-in welcome flow; HH3 and the close change don't touch it. Run alone three times, it passed 81/81 each time. Not edited. Log: docs/verification/hh3-final/shard3.log.
 
 Shards: 1: 1,753 | 2: 1,648 | 3: 1,733 passed, 1 failed | 4: 1,693. Total 6,828 / 602 files (6,827 passed). Baseline 6,827 / 601 + 1 new test in 1 new file = 6,828 / 602. Build OK at 09:33:41Z.
+
+## Final sign-off (2026-11-05)
+- Ben ruled both failures flaky and pre-existing, not caused by HH3 or FIX_PROFILE_COMPARE_1:
+  - `guestStage24.test.tsx:85`, "after a guest signs in as a member, Auth redirects once": failing log retained at `docs/verification/hh3/shard3-failing-run1.log`; previously passed 3/3 standalone runs (5 tests each).
+  - `ob1Welcome.test.tsx:113`, "cropper has no slider, grid or reset and Use photo hands the file to the existing upload": failing log retained at `docs/verification/hh3-final/shard3.log`; previously passed 3/3 standalone runs (81 tests each).
+- For these two briefs only: failures in untouched files passing 3/3 standalone runs are recorded with their failing logs and do not stop work. A touched-file failure or a standalone failure remains STOP AND REPORT.
+- Requested rerun command: `bunx vitest run --maxWorkers=2 --shard=3/4`. **1,734 passed / 151 files**, zero failures and no unhandled errors reported; start 10:30:05 UTC, duration 245.13s. Both named files passed (guestStage24 5/5, ob1Welcome 81/81). Full output: `docs/verification/hh3-signoff/shard3.log`.
+- Final per-shard totals: **1,754 / 1,649 / 1,734 / 1,696 = 6,833 tests across 602 files**, all passed. Shards 1, 2 and 4 are carried forward from the latest full run (Also this week squircle fix), not rerun in this close-out; shard 3 is the fresh run above.
+- Reconciliation: HH3 close-animation inventory 6,828 / 602 + one Featured no-hint test (`fw1FeaturedDeck.test.tsx`) = 6,829 / 602 + four Also this week squircle tests (`alsoWeekSpacing.test.ts`, `alsoWeekRebuild.test.tsx`) = 6,833 / 602. This close-out adds/removes zero tests: before and after **6,833 / 602**.
+- No product or test code changed; no test rewritten, renamed or deleted. Existing build result remains as recorded; no new build was run and no current build log was available to quote.
+- Follow-up recorded in `roadmap.md`: Investigate shard-3 flakes under --maxWorkers=2 (guestStage24, ob1Welcome).

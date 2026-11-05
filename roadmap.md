@@ -1,5 +1,10 @@
 # Roadmap
 
+## HH3 and FIX_PROFILE_COMPARE_1 close-out
+- [x] Record guestStage24 and ob1Welcome as Ben-ruled flaky pre-existing failures; preserve both failing logs and leave both tests untouched.
+- [x] Rerun shard 3 once: 1,734 passed; sign off both briefs with final totals 1,754 / 1,649 / 1,734 / 1,696 = 6,833 / 602 (other shards retained from the latest full run).
+- [ ] Investigate shard-3 flakes under --maxWorkers=2 (guestStage24, ob1Welcome). Deferred follow-up requested by Ben, outside this close-out.
+
 ## FW1 — Featured this week
 - [x] Ben ruled 260ms advance during the 320ms exit, matching the mock.
 - [x] Implement session-stable featured read, three-row mount threshold and existing lead fallback; build signed-off deck with canonical playback/viewer/likes/comments/share.
