@@ -14,15 +14,16 @@ const h = vi.hoisted(() => ({
   geography: { county:'Kent' as string | null, nation:'England' as string | null, country:'Scotland' },
   scopeFetched:true, error:false, pending:false,
   pools: {} as Record<string, { rounds:unknown[]; feats:unknown[] }>,
-  shapes:new Map<string, unknown>(), holes:vi.fn(), rounds:vi.fn(), feats:vi.fn(), rpc:vi.fn(),
+  shapes:new Map<string, unknown>(), holes:vi.fn(), rounds:vi.fn(), roundOptions:vi.fn(), feats:vi.fn(), rpc:vi.fn(),
   profile: { primary_club_id:'club' as string | null, country:'Scotland' },
   clubCourses: [] as unknown[], played: [] as unknown[], mostPlayed: {} as unknown,
 }));
 vi.mock('@/features/explore-magazine/useViewerScoreScope', () => ({ useViewerScoreScope: () => ({ scope:h.geography, isFetched:h.scopeFetched, unresolved:false }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useStandoutRounds', async original => ({
   ...await original<typeof import('@/components/explore-tab-new/courseled/hooks/useStandoutRounds')>(),
-  useStandoutRounds: (viewer: string, filters: { regionValue:string | null }, enabled: boolean, limit:number) => {
+  useStandoutRounds: (viewer: string, filters: { regionValue:string | null }, enabled: boolean, limit:number, options?: { keepPrevious?: boolean }) => {
     h.rounds(viewer, filters, enabled, limit);
+    h.roundOptions(options);
     return { data:h.pools[filters.regionValue ?? 'everyone']?.rounds ?? [], isFetched:!h.pending, isError:h.error };
   },
 }));
@@ -83,6 +84,40 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); localStorage.clear(); });
 
 describe('SAR1 scope ladder and retention', () => {
+  it('holds previous query data only by opt-in and keeps shelf tiles during a chip change', async () => {
+    const actual = await vi.importActual<typeof import('@/components/explore-tab-new/courseled/hooks/useStandoutRounds')>('@/components/explore-tab-new/courseled/hooks/useStandoutRounds');
+    const client = new QueryClient({ defaultOptions:{ queries:{ retry:false } } });
+    const QueryWrapper = ({ children }: { children:React.ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    h.rpc.mockResolvedValue({ data:[round('old')], error:null });
+    const query = renderHook(({ region }) => ({
+      defaultRead:actual.useStandoutRounds('me', { ...DEFAULT_FILTERS, regionKind:'region', regionValue:region }),
+      shelfRead:actual.useStandoutRounds('me', { ...DEFAULT_FILTERS, regionKind:'region', regionValue:region }, true, 10, { keepPrevious:true }),
+    }), { wrapper:QueryWrapper, initialProps:{ region:'Kent' } });
+    await waitFor(() => {
+      expect(query.result.current.defaultRead.isSuccess).toBe(true);
+      expect(query.result.current.shelfRead.isSuccess).toBe(true);
+    });
+    h.rpc.mockImplementation(() => new Promise(() => {}));
+    query.rerender({ region:'Fife' });
+    expect(query.result.current.defaultRead.data).toBeUndefined();
+    expect(query.result.current.defaultRead.isPending).toBe(true);
+    expect(query.result.current.defaultRead.isPlaceholderData).toBe(false);
+    expect(query.result.current.shelfRead.data?.map(row => row.whs_score_id)).toEqual(['old']);
+    expect(query.result.current.shelfRead.isPlaceholderData).toBe(true);
+    query.unmount();
+    client.clear();
+
+    const shelf = mount();
+    expect(h.roundOptions).toHaveBeenCalledTimes(3);
+    expect(h.roundOptions.mock.calls.map(([options]) => options)).toEqual([{ keepPrevious:true }, { keepPrevious:true }, { keepPrevious:true }]);
+    const tiles = [...shelf.container.querySelectorAll('[data-standout-tile]')];
+    expect(tiles).toHaveLength(4);
+    h.pending=true;
+    h.pools.England={ rounds:[], feats:[] };
+    fireEvent.click(screen.getByRole('button', { name:'England' }));
+    expect([...shelf.container.querySelectorAll('[data-standout-tile]')]).toEqual(tiles);
+    expect(shelf.container.querySelector('[data-score-id="k0"]')).toBeInTheDocument();
+  });
   it('defaults to county with at least four rounds', () => { mount(); selected('Kent'); });
   it('county with three rounds falls to nation', () => { h.pools.Kent.rounds=rounds(3,'k'); mount(); selected('England'); });
   it('both narrow scopes under four default to Everyone even with feats', () => {
