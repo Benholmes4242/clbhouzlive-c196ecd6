@@ -18,7 +18,7 @@ Command for each fresh shard: `bunx vitest run --maxWorkers=2 --shard=n/4`.
 
 Shards 3–4 ran independently in parallel. Full logs: `docs/verification/hs2/shard1.log` through `shard4.log`.
 Focused: `bunx vitest run src/test/hs2ConnectSeat.test.tsx src/test/connectIntroTryIt.test.tsx --maxWorkers=2`: **23/23** (12 + 11). Full output in `docs/verification/hs2/focused.log`.
-Latest preview diagnostic: **build OK**, 2026-11-05T19:58:32Z. No manual build/typecheck command was run.
+Latest preview diagnostic: **build OK**, 2026-11-05T20:09:37Z. No manual build/typecheck command was run.
 
 Phone checks mounted the actual intro and unchanged BackRow in an isolated member-fixture harness, with no session/guest creation. Full and empty at 390×844 and 320×844 had no horizontal overflow; 320 used a deliberately long unbroken member name and it wrapped. CTA bottom at 390: full 669.30px, empty 378.53px; both on the first screen. CTA and decline callbacks and end-place analytics passed in each state. Screenshots and measurements: `/tmp/browser/hs2/{390,320}-{full,empty}.png`, `results.json`. These are fixture geometry/action checks, **not hosted authenticated end-to-end verification**. Project auth is external/unmanaged, so live member reads and country-stage readback remain unverified. Initial harness failures were apparatus issues (duplicate QueryClient loading), resolved without product edits.
 
