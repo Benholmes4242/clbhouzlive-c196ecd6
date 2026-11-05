@@ -36,6 +36,28 @@
 }
 
 :root {
+  --featured-white: #FFFFFF;
+  --featured-ink: #F8FAFC;
+  --featured-amber: #F7931E;
+  --featured-muted: rgba(248,250,252,0.55);
+  --featured-meta: rgba(248,250,252,0.7);
+  --featured-hint: rgba(248,250,252,0.45);
+  --featured-body: rgba(248,250,252,0.6);
+  --featured-glass: rgba(14,14,16,0.55);
+  --featured-edge: rgba(255,255,255,0.14);
+  --featured-liked-edge: rgba(255,255,255,0.28);
+  --featured-liked: rgba(255,255,255,0.06);
+  --featured-dot: rgba(255,255,255,0.25);
+  --featured-outline: rgba(255,255,255,0.2);
+  --featured-end: #16161A;
+  --featured-end-edge: rgba(255,255,255,0.1);
+  --featured-on-white: #0B0B0D;
+  --featured-duration: rgba(0,0,0,0.62);
+  --featured-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  --featured-text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+  --featured-caption-shadow: 0 1px 8px rgba(0,0,0,0.6);
+  --featured-heart-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  --featured-shade: linear-gradient(180deg,rgba(0,0,0,0.35) 0,transparent 22%,transparent 48%,rgba(0,0,0,0.82) 100%);
   --pro-label-ground: #F8FAFC;
   --pro-label-ink: #0A0A0C;
   --pro-note-ground: #17171B;
