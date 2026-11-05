@@ -1,5 +1,9 @@
 # CH1 — completed edit, stopped on new check failures
 
+## Preview type-error follow-up
+
+The subsequent request explicitly authorised fixing preview type errors without asking. Added `courseRegion: null, courseCountry: null, courseType: null` to the new test's selection fixture at `src/test/ch1ChampionsTidy.test.tsx:44`; no assertion/case-name change. Preview log now reports **build OK at 2026-11-05T17:50:18Z**. The TS2739 stop below is historical and resolved. The independent Field-panel assertion failure remains unchanged; tests/shards were not rerun in this type-error-only follow-up. Suite inventory remains expected 6,980/614, not a fresh passing total.
+
 ## Current stop
 
 Ben chose **Successful reads only**, accepting absent Within reach after failed/empty You reads. The prerequisite stop below is historical and resolved; You remains unchanged.
@@ -45,7 +49,7 @@ Per **ANY NEW FAILURE IS STOP AND REPORT**, neither failure was repaired or reru
 
 ### Needed to resume
 
-Authorise adding the missing course selection fields and passing the existing field average/round-count props to the new direct-drilldown fixture, without changing its assertions or product behaviour; then rerun focused checks and four fresh shards.
+Course selection fields are now repaired under the type-error follow-up. Authorise passing the existing field average/round-count props to the new direct-drilldown fixture, without changing its assertions or product behaviour; then rerun focused checks and four fresh shards.
 
 `git pull` was not run because stateful repository commands are forbidden. All SQL/migration/server/native/feed_config/cap and protected-surface bans were preserved.
 
