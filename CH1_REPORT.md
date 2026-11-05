@@ -1,3 +1,12 @@
+# CH1 — CLOSED (CH1_FIX_1, 2026-11-05)
+
+- Fixture-only fix in `src/test/ch1ChampionsTidy.test.tsx:50` (direct-drilldown branch of `mount()`): added `fieldAvgOverPar={8} totalCourseRounds={40}`, matching the file's own `useCourseStatsDetail` mock (avg_over_par 8, rounds_tracked 40). Prop names/types confirmed against `GolfClubView.tsx` (`courseStats?.avg_over_par ?? null`, `courseStats?.rounds_tracked ?? null`) and `CourseLegendsDrilldown` Props (`number | null`). No assertion, case name, expected value or product file changed.
+- Focused set (ch1ChampionsTidy, championsNetSource, championsElsewhere, championsState1/2/3, g2aCourseTabs): 7 files, 55/55 passed.
+- Full suite, `--maxWorkers=2`, four shards: 1,829 / 1,659 / 1,782 / 1,757 = **7,027 tests / 619 files, zero failures, no flakes, no pre-existing failures**.
+- Count vs brief's 6,980 / 614: +47 tests / +5 files come entirely from builds landed after CH1's baseline — FIX6 sign-up and pro fixes (expected 6,997 / 617) and pro polish (to 7,027 / 619), both already reported and closed.
+
+---
+
 # CH1 — completed edit, stopped on new check failures
 
 ## Preview type-error follow-up
