@@ -8,6 +8,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
+import { ProHandicapNote } from '@/features/pro-verification/ProHandicapNote';
 
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
 import ManageScreen from '@/components/profile/handicap/whs/connect/ManageScreen';
@@ -23,6 +25,7 @@ import { handicapTabRoute } from '@/lib/handicap/handicapTabRoute';
 export default function HandicapManagePage() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id;
+  const ownHandicap = useOwnHandicapState(userId);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: connection, isFetched: connectionFetched } = useWhsConnection(userId);
@@ -106,6 +109,8 @@ export default function HandicapManagePage() {
   // Session gate + query gate. While EITHER is outstanding we paint the loading
   // state - never the connect flow (which would be a claim about data we do not
   // have yet) and never the connected view.
+  if (!ownHandicap.settled) return null;
+  if (ownHandicap.pro) return <ProHandicapNote kind={ownHandicap.proKind} />;
   if (!settled) {
     // No header here: the resolved surface may be immersive (connect flow) or
     // shelled (connected). Painting a header now would flash a bar that then

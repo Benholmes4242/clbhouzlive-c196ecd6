@@ -29,6 +29,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
+import { ProHandicapNote } from '@/features/pro-verification/ProHandicapNote';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 
@@ -274,6 +276,7 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
 
 const HandicapPage: React.FC = () => {
   const { user, loading } = useSupabaseSession();
+  const ownHandicap = useOwnHandicapState(user?.id);
   const navigate = useNavigate();
   const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -410,7 +413,7 @@ const HandicapPage: React.FC = () => {
   // run. This page currently early-returns while the session is loading, so the
   // old !connLoading read happened to be safe - gating on isFetched removes the
   // dependency on that early return continuing to exist.
-  const isConnectFlow = !isFriendView && connFetched && !connError && !ownConnection;
+  const isConnectFlow = !isFriendView && ownHandicap.settled && !ownHandicap.pro && connFetched && !connError && !ownConnection;
 
   // Apply the dark route theming only when NOT in the connect flow.
   // The connect flow uses Direction A (light) and the dark theming would
@@ -456,6 +459,9 @@ const HandicapPage: React.FC = () => {
   if (!ownerUserId) {
     return <Navigate to="/auth" replace />;
   }
+
+  if (!ownHandicap.settled) return null;
+  if (ownHandicap.pro) return <ProHandicapNote kind={ownHandicap.proKind} />;
 
   // Own-mode error branch — a failed useWhsConnection must not fall through
   // to the connect flow (would prompt an already-connected user to reconnect).

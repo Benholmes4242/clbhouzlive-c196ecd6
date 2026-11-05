@@ -7,6 +7,7 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { SettingsHandicapCard } from './SettingsHandicapCard';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
 import { SettingsPrivacyCard } from './SettingsPrivacyCard';
 import { SettingsNotificationsCard } from './SettingsNotificationsCard';
 import { SettingsYourData } from './SettingsYourData';
@@ -82,6 +83,7 @@ export function SettingsTabContent() {
   const profile = profileRaw as SettingsProfileRow;
   const { count } = useHasBusinesses(user?.id);
   const requests = useMyRequestsList();
+  const ownHandicap = useOwnHandicapState(user?.id);
   const { openInviteSheet } = useInviteSheet();
 
   useEffect(() => {
@@ -172,9 +174,9 @@ export function SettingsTabContent() {
     <>
       <div className="ep-settings">
         <div className="ep-group">Your handicap</div>
-        <SettingsHandicapCard userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
+        {ownHandicap.settled && <SettingsHandicapCard pro={ownHandicap.pro && ownHandicap.proKind ? {kind:ownHandicap.proKind} : null} userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
           profileError={!!profileError} egHandicapIndex={profile.eg_handicap_index} manualHandicapIndex={profile.manual_handicap_index}
-          checked={!hideHandicapChip} updating={chipUpdating} onToggle={handleToggleHandicapChip} onManage={() => navigate('/manage/handicap')} />
+          checked={!hideHandicapChip} updating={chipUpdating} onToggle={handleToggleHandicapChip} onManage={() => navigate('/manage/handicap')} />}
 
         {/* Privacy */}
         <div className="ep-group">Privacy</div>
