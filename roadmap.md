@@ -1,5 +1,10 @@
 # Roadmap
 
+## HS2 — Handicap sync seat
+- [ ] Replace intro only with settled full/empty circle seat states; preserve shared exports and later stages.
+- [ ] Add seat regressions and enumerate authorised old/new intro assertions; run focused tests and four fresh shards against 7,027 / 619.
+- [ ] Verify 390×844 and 320px full/empty geometry; report mock differences, removed/kept code and any unavailable live checks.
+
 ## Pro polish
 - [x] Applied pending no-handicap states, small island captions, Settings pending/inert Privacy and authorised Admin Verified/visible-row reads. Details and limits in PRO_POLISH_REPORT.md.
 - [x] Focused 66/66; assertion ledger and +30/+2 inventory reconciliation saved (expected 7,027/619).
