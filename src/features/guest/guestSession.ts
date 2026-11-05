@@ -1,7 +1,9 @@
 /**
  * GUEST SESSION BOOTSTRAP (brief §1). RootGate's only guest logic lives here
  * so it can be tested without mounting the app:
- *   - useGuestSessionBootstrap mints ONE anonymous session on a native or preview cold
+ *   - guestMintAllowed owns automation blocking and preview opt-in for bootstrap,
+ *     hold and signed-out outcome, so these paths cannot disagree;
+ *   - useGuestSessionBootstrap mints ONE anonymous session on an allowed cold
  *     start with no stored session, tracking started/failed;
  *   - signedOutOutcome says what a signed-out RootGate renders: the canvas
  *     hold while the anonymous call is in flight, otherwise today's /auth.
@@ -18,13 +20,39 @@ export const GUEST_SIGN_IN_TIMEOUT_MS = 8000;
 
 export type GuestAttempt = 'idle' | 'pending' | 'failed';
 
+const PREVIEW_GUEST_KEY = 'clbhouz_preview_guest';
+
+/** URL choices persist for this tab only; unavailable storage never opts in. */
+export function previewGuestOptIn(): boolean {
+  try {
+    const choice = new URLSearchParams(window.location.search).get('guest');
+    if (choice === '1') {
+      window.sessionStorage.setItem(PREVIEW_GUEST_KEY, '1');
+      return true;
+    }
+    if (choice === '0') {
+      window.sessionStorage.removeItem(PREVIEW_GUEST_KEY);
+      return false;
+    }
+    return window.sessionStorage.getItem(PREVIEW_GUEST_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function guestMintAllowed(envStatus: string): boolean {
+  if (typeof navigator !== 'undefined'
+    && (navigator.webdriver || navigator.userAgent.includes('HeadlessChrome'))) return false;
+  return envStatus === 'native' || (envStatus === 'preview' && previewGuestOptIn());
+}
+
 export function signedOutOutcome(args: {
   enabled: boolean;
   envStatus: string;
   guestAttempt: GuestAttempt;
   stored: boolean;
 }): 'hold' | 'auth' {
-  if (args.enabled && (args.envStatus === 'native' || args.envStatus === 'preview') && args.guestAttempt !== 'failed' && !args.stored) {
+  if (args.enabled && guestMintAllowed(args.envStatus) && args.guestAttempt !== 'failed' && !args.stored) {
     return 'hold';
   }
   return 'auth';
@@ -63,7 +91,7 @@ export function guestHoldActive(args: {
   stored: boolean; guestAttempt: GuestAttempt; pathname: string;
 }): boolean {
   if (!args.enabled || isGuestHoldExemptPath(args.pathname)) return false;
-  if (args.envStatus !== 'native' && args.envStatus !== 'preview') return false;
+  if (!guestMintAllowed(args.envStatus)) return false;
   if (args.hasUser) return false;
   if (args.stored) return false; // a stored session resolves itself
   return args.guestAttempt !== 'failed';
@@ -80,7 +108,7 @@ export function useGuestSessionBootstrap(args: {
   const [guestAttempt, setGuestAttempt] = useState<GuestAttempt>('idle');
   useEffect(() => {
     if (!GUEST_BROWSING_ENABLED) return;
-    if (envStatus !== 'native' && envStatus !== 'preview') return;
+    if (!guestMintAllowed(envStatus)) return;
     if (skip || authLoading || hasUser) return;
     if (hasStoredSession()) return;
     if (guestAttempt !== 'idle') return;
