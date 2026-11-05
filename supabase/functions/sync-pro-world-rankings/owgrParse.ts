@@ -24,7 +24,7 @@ export function parseRank(input: unknown, playerId: number) {
   const root = object(data);
   const props = object(object(root?.props)?.pageProps);
   const payload = object(object(props?.playerProfileData)?.playerProfileData) ?? root;
-  if (!payload || object(payload.player)?.id !== playerId || !Object.hasOwn(payload, 'currentOWGRRank')) throw new Error('Page layout changed');
+  if (!payload || object(payload.player)?.id !== playerId || !Object.prototype.hasOwnProperty.call(payload, 'currentOWGRRank')) throw new Error('Page layout changed');
   const rank = positive(payload.currentOWGRRank);
   if (!rank) {
     if (payload.currentOWGRRank === null || payload.currentOWGRRank === 0) throw new Error('Not ranked');
