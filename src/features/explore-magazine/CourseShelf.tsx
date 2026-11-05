@@ -112,7 +112,7 @@ function sublineFor(
   const parts: string[] = [];
   if (event) {
     if (event.kind === 'record') {
-      parts.push(t('amateur.stream.list.eventRecord', 'New course record'));
+      parts.push(t('amateur.stream.list.eventRecord', 'New best on clbhouz'));
     } else if (event.kind === 'low' && event.gross != null) {
       parts.push(t('amateur.stream.list.eventLow', 'New low of {{gross}}', { gross: event.gross }));
     } else if (event.kind === 'rating' && event.rating != null) {

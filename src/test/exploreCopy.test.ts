@@ -44,13 +44,13 @@ describe('Explore round headline ownership', () => {
   it('names the viewer best and the month it stood when both are known', () => {
     const item = round({ consequence: { kind: 'record_lost', delta: 3 } });
     const headline = headlineFor(item, translate, 'en', { viewerBest: 71, viewerBestSince: 'June 2025' });
-    expect(headline).toBe('henryd3737 took your course record with a 68. Your 71 had stood since June 2025.');
+    expect(headline).toBe('henryd3737 took the clbhouz best here from you with a 68. Your 71 had stood since June 2025.');
     expect(headline).not.toContain("Prince's");
   });
 
   it('drops the comparison rather than inventing one', () => {
     expect(headlineFor(round({ consequence: { kind: 'record_lost' } }), translate)).toBe(
-      'henryd3737 took your course record with a 68.',
+      'henryd3737 took the clbhouz best here from you with a 68.',
     );
   });
 

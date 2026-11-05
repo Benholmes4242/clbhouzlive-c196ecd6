@@ -181,7 +181,7 @@ export function pickProBenchmark(args: {
         sub: `Predicted round at ${courseName}`,
         chaseLine:
           recordGross != null && recordGross > g
-            ? `The course record is ${recordGross - g} shy of ${first}'s predicted ${g}`
+            ? `The best on clbhouz is ${recordGross - g} shy of ${first}'s predicted ${g}`
             : undefined,
       };
     }
