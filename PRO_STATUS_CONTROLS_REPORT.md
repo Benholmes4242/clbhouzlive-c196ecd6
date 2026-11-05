@@ -1,5 +1,38 @@
 # Pro status controls — STOPPED
 
+## Settings pro-only readiness — 2026-11-05 12:51 UTC
+
+Product fix: `SettingsTabContent` now reads `useMyProStatus(user?.id)` and renders the card on `!proStatus.unknown`, passing verified kind as specified. Connection, connectionReady, profileError, figures, switch and callbacks are unchanged. It no longer imports or reads useOwnHandicapState. Local header records readiness ownership.
+
+Added one case in `proStatusControls.test.tsx`: “Settings mounts as soon as pro status is known without waiting for pending handicap trend”. It holds the shared chip fixture unsettled, mocks trend pending, asserts absence while pro unknown, then mounts the actual Settings card as soon as pro known and asserts trend was not read. New-test setup additions isolate unrelated Settings dependencies. Existing 18 cases and assertions unchanged. ST2 file and all existing A/B lines unchanged. No tests deleted, renamed or rewritten; no further A/B fixture lines added to existing files.
+
+Focused command `bunx vitest run src/test/proStatusControls.test.tsx src/test/st2SettingsHandicapCard.test.tsx --maxWorkers=2`: **41 passed / 2 files** (19 + 22), complete output `docs/verification/settings-pro-only/focused.log`. All previous ST2 failures are resolved by the product fix, not a fixture adjustment.
+
+Suite command `bunx vitest run --maxWorkers=2 --shard=n/4`:
+
+| Shard | Passed | Failed | Executed | Evidence |
+|---|---:|---:|---:|---|
+| 1, retained FIX_UNBLOCK_2 run | 1,753 | 0 | 1,753 | docs/verification/fix-unblock-2/shard1.log |
+| 2, retained FIX_UNBLOCK_2 run | 1,653 | 0 | 1,653 | docs/verification/fix-unblock-2/shard2.log |
+| 3, fresh | 1,750 | 0 | 1,750 | docs/verification/settings-pro-only/shard3.log |
+| 4, fresh | 1,702 | 21 | 1,723 | docs/verification/settings-pro-only/shard4.log |
+
+Carried-forward full scope **6,858 passed + 21 failed = 6,879 / 608 files**, not all green and not a fresh all-four run. Fresh shards 3/4: **3,452 passed + 21 failed = 3,473 / 304 files**.
+
+Reconciliation: requested **6,875 / 607** excludes the four FIX_UNBLOCK_2 cases/file already retained. Immediately preceding baseline **6,878 / 608** + this one proStatusControls case = **6,879 / 608**. Difference from request **+4 tests / +1 file**, wholly fixUnblock2; no losses or unnamed changes.
+
+### Required STOP
+Shard 4 has failures outside the exact A/B causes: no QueryClient in linkedHandicapState and linkedHandicapProfile. No fixture fixes attempted, including otherwise matching hb5/islandsRound2 fixes, because the same shard contains unauthorised failure categories. No assertions changed.
+
+- `src/test/linkedHandicapProfile.test.tsx`: two failed owner-Rounds cases, tool error `Error: No QueryClient set, use QueryClientProvider to set one`; `src/hooks/useProfileData.ts:8:23` → `useMyProStatus.ts:38:48` → `useOwnHandicapState`.
+- `src/test/linkedHandicapState.test.tsx`: five failed island/standing cases, same `Error: No QueryClient set, use QueryClientProvider to set one`, same source path.
+- `src/test/hb5ProfileBackName.test.tsx`: eight failed cases, `Error: [vitest] No "isGuestUser" export is defined on the "@/features/guest/useIsGuest" mock. Did you forget to return it from "vi.mock"?`.
+- `src/test/islandsRound2.test.tsx:47:28` and siblings 55, 60, 67, 83, 91: six failed disconnected-glance cases (button absent).
+
+Full output, stacks and DOM retained in shard4.log. These are newly observed failures in untouched files, not asserted pre-existing or flaky; no isolation/flake exemption invoked because this brief says A/B only and stop on anything else.
+
+Harness source-edit signal **build OK, 2026-11-05T12:43:11Z**. No browser checks in this suite-only request. Report retained: all-four-green deletion condition unmet. No SQL, migration, deployed RPC/edge, feed_config, native/Median changes; round_pool_cap untouched.
+
 ## Type-error-only repair — 2026-11-05 12:25 UTC
 
 Replaced `linked: !!null, connected: !!null` with the runtime-identical `linked: false, connected: false` in the new A lines only: ep1EditProfile:18, ep2EditProfileYou:19, ep4LinksPrivacy:31, st3SettingsPrivacy:30. No assertion, case name, expected value, existing fixture logic or product code changed. No tests rewritten/deleted/added; inventory remains 6,874 / 607 before and after, delta 0.
