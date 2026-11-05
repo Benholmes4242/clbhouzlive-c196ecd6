@@ -195,7 +195,7 @@ describe('achievement tag and label copy', () => {
     tag: string | null;
     label: string;
   }> = [
-    { consequence: { kind: 'record_taken' }, tag: 'NEW', label: 'Course record' },
+    { consequence: { kind: 'record_taken' }, tag: 'NEW', label: 'Best on clbhouz' },
     { facts: { net_record: true }, tag: 'NEW', label: 'Net course record' },
     { consequence: { kind: 'rank_up', n: 2 }, tag: 'MOVED UP', label: 'Now 2nd' },
     { consequence: { kind: 'rank_up', n: null }, tag: null, label: 'Moved up the board' },
