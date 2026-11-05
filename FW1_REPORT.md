@@ -3,7 +3,7 @@
 ## Result
 Implemented the Featured slot, session-stable eight-row read, stacked deck, deliberate likes, comments/share, delayed fullscreen taps, end card, canonical top-card playback, reduced-motion crossfade and analytics. Ben ruled that normal advance occurs at **260ms during the 320ms exit**, matching the mock.
 
-**Not complete:** stopped on 12 existing-test failures and one surviving new-test type error. No four-shard run or browser verification was performed. No existing tests were edited. No pre-existing failures are established; these failures appeared during FW1 verification.
+**Not complete:** stopped on 12 existing-test failures. The new-test type error was subsequently fixed at the user's request; the build is now clean. No four-shard run or browser verification was performed. No existing tests were edited. No pre-existing failures are established; these failures appeared during FW1 verification.
 
 ## Commands and counts
 - Prior reported baseline: **6,760 tests / 595 files**, from FIX_RO_NOISE_1_REPORT.md; those historical shards preceded its test-only type fix.
@@ -13,13 +13,20 @@ Implemented the Featured slot, session-stable eight-row read, stacked deck, deli
 - Shards 1–4: **not run**, stopped at the focused failure.
 - Full failing output retained: `docs/verification/fw1/focused-integration.log`; first focused output: `docs/verification/fw1/focused.log`.
 
-## Surviving build error
-Latest entry: **2026-11-05T06:45:50Z**, not clean:
+## Build error and type-only close-out
+Historical failure at **2026-11-05T06:45:50Z**:
 ```text
 --- typecheck ---
 src/test/fw1FeaturedRead.test.tsx(14,660): error TS2339: Property 'staleTime' does not exist on type 'QueryOptions<unknown, Error, unknown, QueryKey, never>'.
 ```
-The preceding 2026-11-05T06:45:07Z entry was `build OK`, before the read-test addition. The completed-edit stop rule prevents claiming that earlier result as current.
+Fixed only the new test's option access using an `in` guard, preserving its assertion of Infinity. Latest build log: **2026-11-05T06:47:11Z — `build OK`**.
+
+`bunx vitest run src/test/fw1FeaturedRead.test.tsx --maxWorkers=2`: **6/6 passed** after the fix; full output in `docs/verification/fw1/type-fix-focused.log`. Counts remain 26 new tests in two files, expected full inventory **6,786 / 597**, not executed. Existing test failures remain unresolved; shards were not resumed.
+
+New test changed: **asks for eight and holds order across remounts in the same session**.
+- Old: `expect(query?.options.staleTime).toBe(Infinity)`.
+- New: `expect(query && 'staleTime' in query.options ? query.options.staleTime : undefined).toBe(Infinity)`.
+- Why: QueryOptions' declared type omits observer-level staleTime; an explicit property guard safely reads the actual runtime option without weakening the check.
 
 ## Existing-test failures (untouched)
 All are in `src/test/ws1WatchTop.test.tsx`. Its fixture mocks useWatchLead but not the new featured read; the initial Featured loading skeleton replaces the mocked lead until that read settles. Changing this fixture needs authorization; no assertion was altered.
@@ -85,6 +92,7 @@ Existing tests rewritten, renamed or deleted: **none**. The brief explicitly req
 - `FW1_REPORT.md` (new)
 - `docs/verification/fw1/focused.log` (new)
 - `docs/verification/fw1/focused-integration.log` (new)
+- `docs/verification/fw1/type-fix-focused.log` (new, type-only close-out)
 - Project memory: Featured behavior/timing and index pointer.
 
 ## Scope and limits
