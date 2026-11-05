@@ -1,0 +1,1016 @@
+[
+  {
+    "event": "Hulencourt Alps Tour Grand Final",
+    "id": 11624,
+    "eventWeekId": 2110,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 42,
+    "year": 2026,
+    "finish": "T31",
+    "rankPoints": 0.01752351980698913,
+    "weight": 1,
+    "adjustedPoints": 0.01752351980698913,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1427,
+    "rankAfter": 1426
+  },
+  {
+    "event": "Memorial Giorgio Bordoni",
+    "id": 11609,
+    "eventWeekId": 2109,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 41,
+    "year": 2026,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 1,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1419,
+    "rankAfter": 1427
+  },
+  {
+    "event": "Hauts de France-Pas de Calais Open",
+    "id": 11561,
+    "eventWeekId": 2105,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 37,
+    "year": 2026,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 1,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1383,
+    "rankAfter": 1392
+  },
+  {
+    "event": "Longwy Alps Open",
+    "id": 11547,
+    "eventWeekId": 2104,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 36,
+    "year": 2026,
+    "finish": "T26",
+    "rankPoints": 0.021232269557752603,
+    "weight": 1,
+    "adjustedPoints": 0.021232269557752603,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1393,
+    "rankAfter": 1383
+  },
+  {
+    "event": "Biarritz Cup by ARKEA",
+    "id": 11475,
+    "eventWeekId": 2098,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 30,
+    "year": 2026,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.9782608695652174,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1357,
+    "rankAfter": 1370
+  },
+  {
+    "event": "Alps de Las Castillas",
+    "id": 11458,
+    "eventWeekId": 2096,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 28,
+    "year": 2026,
+    "finish": "T5",
+    "rankPoints": 0.1390639475720068,
+    "weight": 0.9565217391304348,
+    "adjustedPoints": 0.13301768898191954,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1385,
+    "rankAfter": 1354
+  },
+  {
+    "event": "Fred. Olsen Alps de La Gomera",
+    "id": 11449,
+    "eventWeekId": 2095,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 27,
+    "year": 2026,
+    "finish": "T8",
+    "rankPoints": 0.054104740868698306,
+    "weight": 0.9456521739130435,
+    "adjustedPoints": 0.05116426582148644,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1406,
+    "rankAfter": 1385
+  },
+  {
+    "event": "UGolf Aravell Andorra Open",
+    "id": 11433,
+    "eventWeekId": 2094,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 26,
+    "year": 2026,
+    "finish": "T17",
+    "rankPoints": 0.029167666377433718,
+    "weight": 0.9347826086956522,
+    "adjustedPoints": 0.027265427265861956,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1405,
+    "rankAfter": 1406
+  },
+  {
+    "event": "Alps Andalucia-Roquetas de Mar",
+    "id": 11410,
+    "eventWeekId": 2092,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 24,
+    "year": 2026,
+    "finish": "2",
+    "rankPoints": 0.40104052698174497,
+    "weight": 0.9130434782608695,
+    "adjustedPoints": 0.3661674376789845,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1574,
+    "rankAfter": 1407
+  },
+  {
+    "event": "Open de la Mirabelle d'Or",
+    "id": 11405,
+    "eventWeekId": 2091,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 23,
+    "year": 2026,
+    "finish": "T38",
+    "rankPoints": 0.013769601573722288,
+    "weight": 0.9021739130434783,
+    "adjustedPoints": 0.012422575332814673,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1563,
+    "rankAfter": 1574
+  },
+  {
+    "event": "Open de Roissy PGA France",
+    "id": 11373,
+    "eventWeekId": 2090,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 22,
+    "year": 2026,
+    "finish": "2",
+    "rankPoints": 0.4393101672154293,
+    "weight": 0.8913043478260869,
+    "adjustedPoints": 0.3915590620833174,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1838,
+    "rankAfter": 1563
+  },
+  {
+    "event": "Lacanau Alps Open",
+    "id": 11369,
+    "eventWeekId": 2089,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 21,
+    "year": 2026,
+    "finish": "T26",
+    "rankPoints": 0.024821887834543935,
+    "weight": 0.8804347826086957,
+    "adjustedPoints": 0.021854053419544116,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1846,
+    "rankAfter": 1838
+  },
+  {
+    "event": "G\u00f6sser Open",
+    "id": 11357,
+    "eventWeekId": 2088,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 20,
+    "year": 2026,
+    "finish": "T22",
+    "rankPoints": 0.02342577899441743,
+    "weight": 0.8695652173913043,
+    "adjustedPoints": 0.020370242603841245,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1841,
+    "rankAfter": 1846
+  },
+  {
+    "event": "Miglianico Alps Open",
+    "id": 11324,
+    "eventWeekId": 2086,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 18,
+    "year": 2026,
+    "finish": "T12",
+    "rankPoints": 0.04383083873207544,
+    "weight": 0.8478260869565217,
+    "adjustedPoints": 0.037160928490237874,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1849,
+    "rankAfter": 1828
+  },
+  {
+    "event": "Dreamland Open",
+    "id": 11307,
+    "eventWeekId": 2085,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 17,
+    "year": 2026,
+    "finish": "T13",
+    "rankPoints": 0.03167241450841627,
+    "weight": 0.8369565217391305,
+    "adjustedPoints": 0.026508433882044054,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1867,
+    "rankAfter": 1849
+  },
+  {
+    "event": "The Allegria Open",
+    "id": 11308,
+    "eventWeekId": 2085,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 17,
+    "year": 2026,
+    "finish": "T44",
+    "rankPoints": 0.011924029128594384,
+    "weight": 0.8369565217391305,
+    "adjustedPoints": 0.009979893944584432,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1867,
+    "rankAfter": 1849
+  },
+  {
+    "event": "Villa Paradiso Alps Open",
+    "id": 11288,
+    "eventWeekId": 2083,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 15,
+    "year": 2026,
+    "finish": "T10",
+    "rankPoints": 0.06359639315847374,
+    "weight": 0.8152173913043478,
+    "adjustedPoints": 0.05184488572701663,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1895,
+    "rankAfter": 1838
+  },
+  {
+    "event": "Red Sea Little Venice Open",
+    "id": 11248,
+    "eventWeekId": 2077,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 9,
+    "year": 2026,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.75,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1859,
+    "rankAfter": 1867
+  },
+  {
+    "event": "New Giza Open",
+    "id": 11241,
+    "eventWeekId": 2077,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 9,
+    "year": 2026,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.75,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1859,
+    "rankAfter": 1867
+  },
+  {
+    "event": "Ein Bay Open",
+    "id": 11231,
+    "eventWeekId": 2076,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 8,
+    "year": 2026,
+    "finish": "T16",
+    "rankPoints": 0.029402538833912084,
+    "weight": 0.7391304347826086,
+    "adjustedPoints": 0.021732311312021975,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1879,
+    "rankAfter": 1859
+  },
+  {
+    "event": "Alps Tour Grand Final",
+    "id": 11092,
+    "eventWeekId": 2058,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 42,
+    "year": 2025,
+    "finish": "T23",
+    "rankPoints": 0.0254956585189146,
+    "weight": 0.5434782608695652,
+    "adjustedPoints": 0.01385633615158402,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1790,
+    "rankAfter": 1789
+  },
+  {
+    "event": "Parma Alps Open",
+    "id": 11079,
+    "eventWeekId": 2057,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 41,
+    "year": 2025,
+    "finish": "T37",
+    "rankPoints": 0.020772065508850357,
+    "weight": 0.532608695652174,
+    "adjustedPoints": 0.0110633827166703,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1798,
+    "rankAfter": 1790
+  },
+  {
+    "event": "Hauts de France-Pas de Calais Golf Open",
+    "id": 11029,
+    "eventWeekId": 2053,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 37,
+    "year": 2025,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.4891304347826087,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1733,
+    "rankAfter": 1763
+  },
+  {
+    "event": "Longwy Alps Open",
+    "id": 11019,
+    "eventWeekId": 2052,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 36,
+    "year": 2025,
+    "finish": "T23",
+    "rankPoints": 0.03246454550250988,
+    "weight": 0.4782608695652174,
+    "adjustedPoints": 0.015526521762069942,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1754,
+    "rankAfter": 1733
+  },
+  {
+    "event": "Mannings Heath Masters Presented By Tsl, Fortis Vision & Clarke",
+    "id": 10981,
+    "eventWeekId": 2049,
+    "tours": [
+      {
+        "tourId": 39,
+        "currencyId": 0,
+        "name": "Clutch Pro Tour",
+        "fullName": "Clutch Pro Tour",
+        "code": "CPT",
+        "isEligible": true
+      }
+    ],
+    "week": 33,
+    "year": 2025,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.44565217391304346,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1710,
+    "rankAfter": 1726
+  },
+  {
+    "event": "Biarritz Cup by CS Partners",
+    "id": 10945,
+    "eventWeekId": 2046,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 30,
+    "year": 2025,
+    "finish": "42",
+    "rankPoints": 0.021432348338670887,
+    "weight": 0.41304347826086957,
+    "adjustedPoints": 0.008852491705103192,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1687,
+    "rankAfter": 1678
+  },
+  {
+    "event": "Alps de Las Castillas",
+    "id": 10932,
+    "eventWeekId": 2044,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 28,
+    "year": 2025,
+    "finish": "T20",
+    "rankPoints": 0.04935916863825469,
+    "weight": 0.391304347826087,
+    "adjustedPoints": 0.019314457293230097,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1717,
+    "rankAfter": 1684
+  },
+  {
+    "event": "Fred Olsen Alps de La Gomera",
+    "id": 10920,
+    "eventWeekId": 2043,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 27,
+    "year": 2025,
+    "finish": "T9",
+    "rankPoints": 0.08974075517995514,
+    "weight": 0.3804347826086957,
+    "adjustedPoints": 0.034140504688026416,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1740,
+    "rankAfter": 1717
+  },
+  {
+    "event": "Aravell Golf Andorra Open by Creand",
+    "id": 10907,
+    "eventWeekId": 2042,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 26,
+    "year": 2025,
+    "finish": "T5",
+    "rankPoints": 0.19044593866114756,
+    "weight": 0.3695652173913043,
+    "adjustedPoints": 0.070382194722598,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1863,
+    "rankAfter": 1740
+  },
+  {
+    "event": "Open de la Mirabelle d'Or",
+    "id": 10886,
+    "eventWeekId": 2040,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 24,
+    "year": 2025,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.34782608695652173,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1835,
+    "rankAfter": 1847
+  },
+  {
+    "event": "Alps de Andalucia-Roquetas de Mar",
+    "id": 10874,
+    "eventWeekId": 2039,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 23,
+    "year": 2025,
+    "finish": "53",
+    "rankPoints": 0.0185206600191957,
+    "weight": 0.33695652173913043,
+    "adjustedPoints": 0.006240657180381159,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1835,
+    "rankAfter": 1835
+  },
+  {
+    "event": "Lacanau Alps Open",
+    "id": 10848,
+    "eventWeekId": 2037,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 21,
+    "year": 2025,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.31521739130434784,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1799,
+    "rankAfter": 1827
+  },
+  {
+    "event": "Goesser Open",
+    "id": 10835,
+    "eventWeekId": 2036,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 20,
+    "year": 2025,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.30434782608695654,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1791,
+    "rankAfter": 1799
+  },
+  {
+    "event": "Memorial Giorgio Bordoni presented by AON",
+    "id": 10822,
+    "eventWeekId": 2035,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 19,
+    "year": 2025,
+    "finish": "T22",
+    "rankPoints": 0.043739573278791265,
+    "weight": 0.29347826086956524,
+    "adjustedPoints": 0.012836613897036568,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1813,
+    "rankAfter": 1791
+  },
+  {
+    "event": "La Cigale Golf Open by Alps Tour",
+    "id": 10766,
+    "eventWeekId": 2029,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 13,
+    "year": 2025,
+    "finish": "T6",
+    "rankPoints": 0.1830319149159036,
+    "weight": 0.22826086956521738,
+    "adjustedPoints": 0.04177902405689104,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 1948,
+    "rankAfter": 1769
+  },
+  {
+    "event": "Tunisian Golf Open",
+    "id": 10757,
+    "eventWeekId": 2028,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 12,
+    "year": 2025,
+    "finish": "T16",
+    "rankPoints": 0.05781594842007096,
+    "weight": 0.21739130434782608,
+    "adjustedPoints": 0.01256868443914586,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 2005,
+    "rankAfter": 1948
+  },
+  {
+    "event": "New Giza Open",
+    "id": 10744,
+    "eventWeekId": 2026,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 10,
+    "year": 2025,
+    "finish": "39",
+    "rankPoints": 0.018964024494767674,
+    "weight": 0.1956521739130435,
+    "adjustedPoints": 0.0037103526185415015,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 2037,
+    "rankAfter": 2013
+  },
+  {
+    "event": "Red Sea Little Venice Open",
+    "id": 10733,
+    "eventWeekId": 2025,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 9,
+    "year": 2025,
+    "finish": "T14",
+    "rankPoints": 0.04615228175034428,
+    "weight": 0.18478260869565216,
+    "adjustedPoints": 0.008528139019085355,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 2092,
+    "rankAfter": 2037
+  },
+  {
+    "event": "Ein Bay Open",
+    "id": 10723,
+    "eventWeekId": 2024,
+    "tours": [
+      {
+        "tourId": 3,
+        "currencyId": 0,
+        "name": "Alps Tour Golf",
+        "fullName": "Alps Tour Golf",
+        "code": "ALP",
+        "isEligible": true
+      }
+    ],
+    "week": 8,
+    "year": 2025,
+    "finish": "MC",
+    "rankPoints": 0,
+    "weight": 0.17391304347826086,
+    "adjustedPoints": 0,
+    "mbValue": null,
+    "mbPercentage": null,
+    "adjustedBonus": null,
+    "rankBefore": 2082,
+    "rankAfter": 2092
+  }
+]

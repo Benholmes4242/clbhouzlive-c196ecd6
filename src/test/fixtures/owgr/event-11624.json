@@ -1,0 +1,3707 @@
+{
+  "id": 11624,
+  "name": "Hulencourt Alps Tour Grand Final",
+  "weekNumber": 42,
+  "weekDate": "2026-10-18T00:00:00",
+  "week": {
+    "id": 2110,
+    "year": 2026,
+    "weekNumber": 42,
+    "endDate": "2026-10-18T00:00:00",
+    "isActive": true
+  },
+  "worldRatingStrengthOfField": 0,
+  "homeTourStrengthOfFieldPoints": 0,
+  "fieldRating": 3.0732915928162354,
+  "isCurtailed": true,
+  "fieldSize": 48,
+  "scheduledRoundsCount": 3,
+  "isExcludedFromStrokesGainedCalculation": false,
+  "isExcludedFromRanking": false,
+  "cutSize": 48,
+  "isUsingCutSize": true,
+  "firstPlacePoints": 0.8344533241423394,
+  "totalStrengthOfFieldPoints": 0,
+  "endDate": "2026-10-17T00:00:00",
+  "pointsPerPlayer": 0.06403,
+  "startDate": "2026-10-15T00:00:00",
+  "holes": 0,
+  "tours": [
+    {
+      "tourId": 3,
+      "currencyId": 0,
+      "name": "Alps Tour Golf",
+      "fullName": "Alps Tour Golf",
+      "code": "ALP",
+      "isEligible": true
+    }
+  ],
+  "results": [
+    {
+      "id": 1334212,
+      "playerId": 34944,
+      "player": {
+        "id": 34944,
+        "firstName": "Alexandre",
+        "lastName": "Vandermoten",
+        "fullName": "Alexandre Vandermoten",
+        "birthDate": "2000-06-26T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 10000,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.8344533241423394,
+      "mbValue": 0.5841173268996376,
+      "mbPercentage": 70,
+      "finishPosition": 1,
+      "rankFrom": 828,
+      "rankTo": 716,
+      "strokesGainedRating": -1.7638069,
+      "endowment": 0.2435694,
+      "isEndowmentCapped": null,
+      "worldRanking": 828,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 69
+        },
+        {
+          "roundNumber": 2,
+          "score": 66
+        },
+        {
+          "roundNumber": 3,
+          "score": 69
+        }
+      ]
+    },
+    {
+      "id": 1334213,
+      "playerId": 28185,
+      "player": {
+        "id": 28185,
+        "firstName": "Alessandro",
+        "lastName": "Nodari",
+        "fullName": "Alessandro Nodari",
+        "birthDate": "2000-05-19T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 5200,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.3838485291054762,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 2,
+      "rankFrom": 1254,
+      "rankTo": 1191,
+      "strokesGainedRating": -2.4391139,
+      "endowment": 0.124823175,
+      "isEndowmentCapped": null,
+      "worldRanking": 1254,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 66
+        },
+        {
+          "roundNumber": 2,
+          "score": 74
+        },
+        {
+          "roundNumber": 3,
+          "score": 66
+        }
+      ]
+    },
+    {
+      "id": 1334214,
+      "playerId": 19557,
+      "player": {
+        "id": 19557,
+        "firstName": "Mario",
+        "lastName": "Galiano Aguilar",
+        "fullName": "Mario Galiano Aguilar",
+        "birthDate": "1995-04-07T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 2825,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.20986501102179836,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 3,
+      "rankFrom": 1334,
+      "rankTo": 1292,
+      "strokesGainedRating": -2.6081848,
+      "endowment": 0.10558649,
+      "isEndowmentCapped": null,
+      "worldRanking": 1334,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 71
+        },
+        {
+          "roundNumber": 2,
+          "score": 64
+        },
+        {
+          "roundNumber": 3,
+          "score": 73
+        }
+      ]
+    },
+    {
+      "id": 1334215,
+      "playerId": 34945,
+      "player": {
+        "id": 34945,
+        "firstName": "Archie",
+        "lastName": "Smith",
+        "fullName": "Archie Smith",
+        "birthDate": "2002-08-19T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 253,
+          "name": "England",
+          "iocCode": "ENG",
+          "code2": "",
+          "code3": "ENG",
+          "region": null
+        }
+      },
+      "winnings": 2825,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.20986501102179836,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 3,
+      "rankFrom": 2210,
+      "rankTo": 1962,
+      "strokesGainedRating": -3.6363382,
+      "endowment": 0.038157973,
+      "isEndowmentCapped": null,
+      "worldRanking": 2210,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 68
+        },
+        {
+          "roundNumber": 2,
+          "score": 66
+        },
+        {
+          "roundNumber": 3,
+          "score": 74
+        }
+      ]
+    },
+    {
+      "id": 1334216,
+      "playerId": 29293,
+      "player": {
+        "id": 29293,
+        "firstName": "Mattia",
+        "lastName": "Comotti",
+        "fullName": "Mattia Comotti",
+        "birthDate": "2000-04-25T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 2150,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.13685034515934366,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 5,
+      "rankFrom": 1975,
+      "rankTo": 1863,
+      "strokesGainedRating": -4.061738,
+      "endowment": 0.025043659,
+      "isEndowmentCapped": null,
+      "worldRanking": 1975,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 66
+        },
+        {
+          "roundNumber": 3,
+          "score": 71
+        }
+      ]
+    },
+    {
+      "id": 1334217,
+      "playerId": 30712,
+      "player": {
+        "id": 30712,
+        "firstName": "Paul",
+        "lastName": "Franquet",
+        "fullName": "Paul Franquet",
+        "birthDate": "2005-04-25T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 1925,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.10305498553157892,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 6,
+      "rankFrom": 1323,
+      "rankTo": 1304,
+      "strokesGainedRating": -2.988935,
+      "endowment": 0.07242967,
+      "isEndowmentCapped": null,
+      "worldRanking": 1323,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 69
+        },
+        {
+          "roundNumber": 2,
+          "score": 72
+        },
+        {
+          "roundNumber": 3,
+          "score": 69
+        }
+      ]
+    },
+    {
+      "id": 1334218,
+      "playerId": 34942,
+      "player": {
+        "id": 34942,
+        "firstName": "Sam",
+        "lastName": "Murphy",
+        "fullName": "Sam Murphy",
+        "birthDate": "2002-08-07T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 106,
+          "name": "Ireland",
+          "iocCode": "IRL",
+          "code2": "IE",
+          "code3": "IRL",
+          "region": null
+        }
+      },
+      "winnings": 1925,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.10305498553157892,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 6,
+      "rankFrom": 1592,
+      "rankTo": 1550,
+      "strokesGainedRating": -3.3331137,
+      "endowment": 0.05151662,
+      "isEndowmentCapped": null,
+      "worldRanking": 1592,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 67
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 72
+        }
+      ]
+    },
+    {
+      "id": 1334219,
+      "playerId": 26634,
+      "player": {
+        "id": 26634,
+        "firstName": "Nicolas",
+        "lastName": "Calvet",
+        "fullName": "Nicolas Calvet",
+        "birthDate": "1996-12-01T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 1440,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.06475357795344554,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 8,
+      "rankFrom": 1817,
+      "rankTo": 1772,
+      "strokesGainedRating": -2.785435,
+      "endowment": 0.08859415,
+      "isEndowmentCapped": null,
+      "worldRanking": 1817,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 73
+        },
+        {
+          "roundNumber": 2,
+          "score": 70
+        },
+        {
+          "roundNumber": 3,
+          "score": 69
+        }
+      ]
+    },
+    {
+      "id": 1334220,
+      "playerId": 29934,
+      "player": {
+        "id": 29934,
+        "firstName": "Javier",
+        "lastName": "Calles Roman",
+        "fullName": "Javier Calles Roman",
+        "birthDate": "2002-03-04T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 1440,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.06475357795344554,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 8,
+      "rankFrom": 1100,
+      "rankTo": 1114,
+      "strokesGainedRating": -2.3587387,
+      "endowment": 0.13516058,
+      "isEndowmentCapped": null,
+      "worldRanking": 1100,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 70
+        },
+        {
+          "roundNumber": 3,
+          "score": 70
+        }
+      ]
+    },
+    {
+      "id": 1334221,
+      "playerId": 23700,
+      "player": {
+        "id": 23700,
+        "firstName": "Maxime",
+        "lastName": "Legros",
+        "fullName": "Maxime Legros",
+        "birthDate": "2001-08-09T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 1440,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.06475357795344554,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 8,
+      "rankFrom": 894,
+      "rankTo": 893,
+      "strokesGainedRating": -1.4896871,
+      "endowment": 0.31950095,
+      "isEndowmentCapped": null,
+      "worldRanking": 894,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 70
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 71
+        }
+      ]
+    },
+    {
+      "id": 1334222,
+      "playerId": 26732,
+      "player": {
+        "id": 26732,
+        "firstName": "Nathan",
+        "lastName": "Legendre",
+        "fullName": "Nathan Legendre",
+        "birthDate": "2002-04-04T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 1440,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.06475357795344554,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 8,
+      "rankFrom": 1494,
+      "rankTo": 1476,
+      "strokesGainedRating": -2.8061328,
+      "endowment": 0.0867974,
+      "isEndowmentCapped": null,
+      "worldRanking": 1494,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 68
+        },
+        {
+          "roundNumber": 3,
+          "score": 72
+        }
+      ]
+    },
+    {
+      "id": 1334223,
+      "playerId": 12661,
+      "player": {
+        "id": 12661,
+        "firstName": "Damien",
+        "lastName": "Perrier",
+        "fullName": "Damien Perrier",
+        "birthDate": "1989-07-06T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 1440,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.06475357795344554,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 8,
+      "rankFrom": 1531,
+      "rankTo": 1517,
+      "strokesGainedRating": -2.7967007,
+      "endowment": 0.08761161,
+      "isEndowmentCapped": null,
+      "worldRanking": 1531,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 70
+        },
+        {
+          "roundNumber": 2,
+          "score": 69
+        },
+        {
+          "roundNumber": 3,
+          "score": 73
+        }
+      ]
+    },
+    {
+      "id": 1334224,
+      "playerId": 33519,
+      "player": {
+        "id": 33519,
+        "firstName": "Pablo",
+        "lastName": "Alperi L\u00f3pez",
+        "fullName": "Pablo Alperi L\u00f3pez",
+        "birthDate": "2003-07-04T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 1052,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.0405544315533177,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 13,
+      "rankFrom": 1350,
+      "rankTo": 1337,
+      "strokesGainedRating": -2.1344976,
+      "endowment": 0.16875459,
+      "isEndowmentCapped": null,
+      "worldRanking": 1350,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 70
+        }
+      ]
+    },
+    {
+      "id": 1334225,
+      "playerId": 17652,
+      "player": {
+        "id": 17652,
+        "firstName": "Enrico",
+        "lastName": "Di Nitto",
+        "fullName": "Enrico Di Nitto",
+        "birthDate": "1992-12-26T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 1052,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.0405544315533177,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 13,
+      "rankFrom": 1313,
+      "rankTo": 1310,
+      "strokesGainedRating": -2.6016386,
+      "endowment": 0.106272936,
+      "isEndowmentCapped": null,
+      "worldRanking": 1313,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 74
+        },
+        {
+          "roundNumber": 2,
+          "score": 69
+        },
+        {
+          "roundNumber": 3,
+          "score": 70
+        }
+      ]
+    },
+    {
+      "id": 1334226,
+      "playerId": 29876,
+      "player": {
+        "id": 29876,
+        "firstName": "Alberto",
+        "lastName": "Dominguez Avila",
+        "fullName": "Alberto Dominguez Avila",
+        "birthDate": "2000-04-29T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 1052,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.0405544315533177,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 13,
+      "rankFrom": 2008,
+      "rankTo": 1971,
+      "strokesGainedRating": -3.4949079,
+      "endowment": 0.043892357,
+      "isEndowmentCapped": null,
+      "worldRanking": 2008,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 71
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 71
+        }
+      ]
+    },
+    {
+      "id": 1334227,
+      "playerId": 28602,
+      "player": {
+        "id": 28602,
+        "firstName": "Alejandro",
+        "lastName": "Rodriguez Andreu",
+        "fullName": "Alejandro Rodriguez Andreu",
+        "birthDate": "2003-09-27T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 1052,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.0405544315533177,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 13,
+      "rankFrom": 1513,
+      "rankTo": 1502,
+      "strokesGainedRating": -3.4329872,
+      "endowment": 0.046667,
+      "isEndowmentCapped": null,
+      "worldRanking": 1513,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 71
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 71
+        }
+      ]
+    },
+    {
+      "id": 1334228,
+      "playerId": 24911,
+      "player": {
+        "id": 24911,
+        "firstName": "Christoph",
+        "lastName": "Bleier",
+        "fullName": "Christoph Bleier",
+        "birthDate": "2001-03-22T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 14,
+          "name": "Austria",
+          "iocCode": "AUT",
+          "code2": "AT",
+          "code3": "AUT",
+          "region": null
+        }
+      },
+      "winnings": 1052,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.0405544315533177,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 13,
+      "rankFrom": 1388,
+      "rankTo": 1378,
+      "strokesGainedRating": -2.812577,
+      "endowment": 0.086245455,
+      "isEndowmentCapped": null,
+      "worldRanking": 1388,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 71
+        },
+        {
+          "roundNumber": 2,
+          "score": 70
+        },
+        {
+          "roundNumber": 3,
+          "score": 72
+        }
+      ]
+    },
+    {
+      "id": 1334229,
+      "playerId": 28460,
+      "player": {
+        "id": 28460,
+        "firstName": "Hermes",
+        "lastName": "Ferchaud",
+        "fullName": "Hermes Ferchaud",
+        "birthDate": "2000-12-19T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 890,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.032543679641551235,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 18,
+      "rankFrom": 2133,
+      "rankTo": 2092,
+      "strokesGainedRating": -3.7613134,
+      "endowment": 0.03371755,
+      "isEndowmentCapped": null,
+      "worldRanking": 2133,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 70
+        },
+        {
+          "roundNumber": 2,
+          "score": 70
+        },
+        {
+          "roundNumber": 3,
+          "score": 74
+        }
+      ]
+    },
+    {
+      "id": 1334230,
+      "playerId": 18953,
+      "player": {
+        "id": 18953,
+        "firstName": "Lars",
+        "lastName": "Keunen",
+        "fullName": "Lars Keunen",
+        "birthDate": "1996-12-15T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 159,
+          "name": "Netherlands",
+          "iocCode": "NED",
+          "code2": "NL",
+          "code3": "NLD",
+          "region": null
+        }
+      },
+      "winnings": 840,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.030874772993266554,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 19,
+      "rankFrom": 1442,
+      "rankTo": 1454,
+      "strokesGainedRating": -3.0837646,
+      "endowment": 0.06593978,
+      "isEndowmentCapped": null,
+      "worldRanking": 1442,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 69
+        },
+        {
+          "roundNumber": 2,
+          "score": 76
+        },
+        {
+          "roundNumber": 3,
+          "score": 71
+        }
+      ]
+    },
+    {
+      "id": 1334231,
+      "playerId": 15266,
+      "player": {
+        "id": 15266,
+        "firstName": "Filippo",
+        "lastName": "Bergamaschi",
+        "fullName": "Filippo Bergamaschi",
+        "birthDate": "1991-07-16T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 756,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.026911119703590447,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 20,
+      "rankFrom": 1786,
+      "rankTo": 1783,
+      "strokesGainedRating": -2.7013419,
+      "endowment": 0.09628493,
+      "isEndowmentCapped": null,
+      "worldRanking": 1786,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 73
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 73
+        }
+      ]
+    },
+    {
+      "id": 1334232,
+      "playerId": 30415,
+      "player": {
+        "id": 30415,
+        "firstName": "Luca",
+        "lastName": "Cavalli",
+        "fullName": "Luca Cavalli",
+        "birthDate": "2005-09-21T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 756,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.026911119703590447,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 20,
+      "rankFrom": 1710,
+      "rankTo": 1697,
+      "strokesGainedRating": -3.4323456,
+      "endowment": 0.046696644,
+      "isEndowmentCapped": null,
+      "worldRanking": 1710,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 70
+        },
+        {
+          "roundNumber": 2,
+          "score": 74
+        },
+        {
+          "roundNumber": 3,
+          "score": 73
+        }
+      ]
+    },
+    {
+      "id": 1334233,
+      "playerId": 25235,
+      "player": {
+        "id": 25235,
+        "firstName": "Paul",
+        "lastName": "Margolis",
+        "fullName": "Paul Margolis",
+        "birthDate": "1999-05-23T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 756,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.026911119703590447,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 20,
+      "rankFrom": 1701,
+      "rankTo": 1690,
+      "strokesGainedRating": -2.8989668,
+      "endowment": 0.07917637,
+      "isEndowmentCapped": null,
+      "worldRanking": 1701,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 74
+        },
+        {
+          "roundNumber": 3,
+          "score": 71
+        }
+      ]
+    },
+    {
+      "id": 1334234,
+      "playerId": 22789,
+      "player": {
+        "id": 22789,
+        "firstName": "Andrea",
+        "lastName": "Romano(June2000)",
+        "fullName": "Andrea Romano(June2000)",
+        "birthDate": "2000-06-29T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 756,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.026911119703590447,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 20,
+      "rankFrom": 583,
+      "rankTo": 586,
+      "strokesGainedRating": -1.4858633,
+      "endowment": 0.32071263,
+      "isEndowmentCapped": null,
+      "worldRanking": 583,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 66
+        },
+        {
+          "roundNumber": 3,
+          "score": 79
+        }
+      ]
+    },
+    {
+      "id": 1334235,
+      "playerId": 33209,
+      "player": {
+        "id": 33209,
+        "firstName": "Josef",
+        "lastName": "Hacker",
+        "fullName": "Josef Hacker",
+        "birthDate": "1999-11-26T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 112,
+          "name": "Jersey",
+          "iocCode": "JEY",
+          "code2": "JE",
+          "code3": "JEY",
+          "region": null
+        }
+      },
+      "winnings": 685,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.02086133310355849,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 24,
+      "rankFrom": 2246,
+      "rankTo": 2224,
+      "strokesGainedRating": -4.020449,
+      "endowment": 0.026088469,
+      "isEndowmentCapped": null,
+      "worldRanking": 2246,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 75
+        }
+      ]
+    },
+    {
+      "id": 1334236,
+      "playerId": 33685,
+      "player": {
+        "id": 33685,
+        "firstName": "Gonzalo",
+        "lastName": "Leal",
+        "fullName": "Gonzalo Leal",
+        "birthDate": "2000-06-13T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 685,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.02086133310355849,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 24,
+      "rankFrom": 1723,
+      "rankTo": 1712,
+      "strokesGainedRating": -2.5652065,
+      "endowment": 0.11017563,
+      "isEndowmentCapped": null,
+      "worldRanking": 1723,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 71
+        },
+        {
+          "roundNumber": 2,
+          "score": 74
+        },
+        {
+          "roundNumber": 3,
+          "score": 73
+        }
+      ]
+    },
+    {
+      "id": 1334237,
+      "playerId": 25662,
+      "player": {
+        "id": 25662,
+        "firstName": "Theo",
+        "lastName": "Brizard",
+        "fullName": "Theo Brizard",
+        "birthDate": "2000-09-26T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 685,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.02086133310355849,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 24,
+      "rankFrom": 1634,
+      "rankTo": 1631,
+      "strokesGainedRating": -2.9690073,
+      "endowment": 0.07387266,
+      "isEndowmentCapped": null,
+      "worldRanking": 1634,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 70
+        },
+        {
+          "roundNumber": 3,
+          "score": 76
+        }
+      ]
+    },
+    {
+      "id": 1334238,
+      "playerId": 26655,
+      "player": {
+        "id": 26655,
+        "firstName": "Alexis",
+        "lastName": "Leray",
+        "fullName": "Alexis Leray",
+        "birthDate": "1997-07-27T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 685,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.02086133310355849,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 24,
+      "rankFrom": 1805,
+      "rankTo": 1790,
+      "strokesGainedRating": -2.665682,
+      "endowment": 0.09974454,
+      "isEndowmentCapped": null,
+      "worldRanking": 1805,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 69
+        },
+        {
+          "roundNumber": 2,
+          "score": 72
+        },
+        {
+          "roundNumber": 3,
+          "score": 77
+        }
+      ]
+    },
+    {
+      "id": 1334239,
+      "playerId": 29444,
+      "player": {
+        "id": 29444,
+        "firstName": "Luca",
+        "lastName": "Memeo",
+        "fullName": "Luca Memeo",
+        "birthDate": "2005-07-27T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 685,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.02086133310355849,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 24,
+      "rankFrom": 1426,
+      "rankTo": 1438,
+      "strokesGainedRating": -2.6582217,
+      "endowment": 0.10048391,
+      "isEndowmentCapped": null,
+      "worldRanking": 1426,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 69
+        },
+        {
+          "roundNumber": 2,
+          "score": 77
+        },
+        {
+          "roundNumber": 3,
+          "score": 72
+        }
+      ]
+    },
+    {
+      "id": 1334240,
+      "playerId": 23990,
+      "player": {
+        "id": 23990,
+        "firstName": "Manfredi",
+        "lastName": "Manica",
+        "fullName": "Manfredi Manica",
+        "birthDate": "1996-01-29T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 685,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.02086133310355849,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 24,
+      "rankFrom": 1659,
+      "rankTo": 1661,
+      "strokesGainedRating": -3.4585664,
+      "endowment": 0.045500156,
+      "isEndowmentCapped": null,
+      "worldRanking": 1659,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 76
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 71
+        }
+      ]
+    },
+    {
+      "id": 1334241,
+      "playerId": 28881,
+      "player": {
+        "id": 28881,
+        "firstName": "Hugh",
+        "lastName": "Foley",
+        "fullName": "Hugh Foley",
+        "birthDate": "1997-05-09T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 106,
+          "name": "Ireland",
+          "iocCode": "IRL",
+          "code2": "IE",
+          "code3": "IRL",
+          "region": null
+        }
+      },
+      "winnings": 685,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.02086133310355849,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 24,
+      "rankFrom": 1663,
+      "rankTo": 1671,
+      "strokesGainedRating": -3.8385818,
+      "endowment": 0.031234663,
+      "isEndowmentCapped": null,
+      "worldRanking": 1663,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 73
+        },
+        {
+          "roundNumber": 2,
+          "score": 75
+        },
+        {
+          "roundNumber": 3,
+          "score": 70
+        }
+      ]
+    },
+    {
+      "id": 1334242,
+      "playerId": 25656,
+      "player": {
+        "id": 25656,
+        "firstName": "Flavio",
+        "lastName": "Michetti",
+        "fullName": "Flavio Michetti",
+        "birthDate": "2004-02-29T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 620,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01752351980698913,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 31,
+      "rankFrom": 1275,
+      "rankTo": 1274,
+      "strokesGainedRating": -3.372402,
+      "endowment": 0.049551472,
+      "isEndowmentCapped": null,
+      "worldRanking": 1275,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 74
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 74
+        }
+      ]
+    },
+    {
+      "id": 1334243,
+      "playerId": 31930,
+      "player": {
+        "id": 31930,
+        "firstName": "Mason",
+        "lastName": "Essam",
+        "fullName": "Mason Essam",
+        "birthDate": "1999-08-09T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 253,
+          "name": "England",
+          "iocCode": "ENG",
+          "code2": "",
+          "code3": "ENG",
+          "region": null
+        }
+      },
+      "winnings": 620,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01752351980698913,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 31,
+      "rankFrom": 1427,
+      "rankTo": 1426,
+      "strokesGainedRating": -2.9210873,
+      "endowment": 0.07746143,
+      "isEndowmentCapped": null,
+      "worldRanking": 1427,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 71
+        },
+        {
+          "roundNumber": 2,
+          "score": 75
+        },
+        {
+          "roundNumber": 3,
+          "score": 73
+        }
+      ]
+    },
+    {
+      "id": 1334244,
+      "playerId": 27722,
+      "player": {
+        "id": 27722,
+        "firstName": "Eduard",
+        "lastName": "Rousaud",
+        "fullName": "Eduard Rousaud",
+        "birthDate": "2000-05-02T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 605,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01668906648284679,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 33,
+      "rankFrom": 1475,
+      "rankTo": 1494,
+      "strokesGainedRating": -2.691308,
+      "endowment": 0.097246066,
+      "isEndowmentCapped": null,
+      "worldRanking": 1475,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 68
+        },
+        {
+          "roundNumber": 2,
+          "score": 76
+        },
+        {
+          "roundNumber": 3,
+          "score": 76
+        }
+      ]
+    },
+    {
+      "id": 1334245,
+      "playerId": 27840,
+      "player": {
+        "id": 27840,
+        "firstName": "Marco",
+        "lastName": "Florioli",
+        "fullName": "Marco Florioli",
+        "birthDate": "2005-01-03T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 585,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.015576462050657002,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 34,
+      "rankFrom": 1600,
+      "rankTo": 1600,
+      "strokesGainedRating": -2.908779,
+      "endowment": 0.07841102,
+      "isEndowmentCapped": null,
+      "worldRanking": 1600,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 70
+        },
+        {
+          "roundNumber": 2,
+          "score": 74
+        },
+        {
+          "roundNumber": 3,
+          "score": 77
+        }
+      ]
+    },
+    {
+      "id": 1334246,
+      "playerId": 28238,
+      "player": {
+        "id": 28238,
+        "firstName": "Victor",
+        "lastName": "Garcia Broto",
+        "fullName": "Victor Garcia Broto",
+        "birthDate": "1997-04-20T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 585,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.015576462050657002,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 34,
+      "rankFrom": 1508,
+      "rankTo": 1521,
+      "strokesGainedRating": -2.6498907,
+      "endowment": 0.101316035,
+      "isEndowmentCapped": null,
+      "worldRanking": 1508,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 77
+        },
+        {
+          "roundNumber": 2,
+          "score": 69
+        },
+        {
+          "roundNumber": 3,
+          "score": 75
+        }
+      ]
+    },
+    {
+      "id": 1334247,
+      "playerId": 28673,
+      "player": {
+        "id": 28673,
+        "firstName": "Robert",
+        "lastName": "Moran",
+        "fullName": "Robert Moran",
+        "birthDate": "1999-08-10T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 106,
+          "name": "Ireland",
+          "iocCode": "IRL",
+          "code2": "IE",
+          "code3": "IRL",
+          "region": null
+        }
+      },
+      "winnings": 585,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.015576462050657002,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 34,
+      "rankFrom": 1280,
+      "rankTo": 1281,
+      "strokesGainedRating": -2.9645298,
+      "endowment": 0.074200824,
+      "isEndowmentCapped": null,
+      "worldRanking": 1280,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 75
+        },
+        {
+          "roundNumber": 2,
+          "score": 73
+        },
+        {
+          "roundNumber": 3,
+          "score": 73
+        }
+      ]
+    },
+    {
+      "id": 1334248,
+      "playerId": 34090,
+      "player": {
+        "id": 34090,
+        "firstName": "Ewan",
+        "lastName": "Le Tennier",
+        "fullName": "Ewan Le Tennier",
+        "birthDate": "2001-03-04T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 565,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.013907555402372325,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 37,
+      "rankFrom": 2010,
+      "rankTo": 2003,
+      "strokesGainedRating": -3.7839317,
+      "endowment": 0.03297099,
+      "isEndowmentCapped": null,
+      "worldRanking": 2010,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 73
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 78
+        }
+      ]
+    },
+    {
+      "id": 1334249,
+      "playerId": 26360,
+      "player": {
+        "id": 26360,
+        "firstName": "Jose Manuel",
+        "lastName": "Pardo Benitez",
+        "fullName": "Jose Manuel Pardo Benitez",
+        "birthDate": "1999-03-03T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 565,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.013907555402372325,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 37,
+      "rankFrom": 2290,
+      "rankTo": 2277,
+      "strokesGainedRating": -4.2577524,
+      "endowment": 0.020626584,
+      "isEndowmentCapped": null,
+      "worldRanking": 2290,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 74
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 77
+        }
+      ]
+    },
+    {
+      "id": 1334250,
+      "playerId": 27460,
+      "player": {
+        "id": 27460,
+        "firstName": "Augustin",
+        "lastName": "Hole",
+        "fullName": "Augustin Hole",
+        "birthDate": "1997-07-08T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 565,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.013907555402372325,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 37,
+      "rankFrom": 1420,
+      "rankTo": 1417,
+      "strokesGainedRating": -2.8850174,
+      "endowment": 0.08027728,
+      "isEndowmentCapped": null,
+      "worldRanking": 1420,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 70
+        },
+        {
+          "roundNumber": 2,
+          "score": 78
+        },
+        {
+          "roundNumber": 3,
+          "score": 74
+        }
+      ]
+    },
+    {
+      "id": 1334251,
+      "playerId": 23406,
+      "player": {
+        "id": 23406,
+        "firstName": "Tom",
+        "lastName": "Gueant",
+        "fullName": "Tom Gueant",
+        "birthDate": "2001-08-27T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 547,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.012934026524206263,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 40,
+      "rankFrom": 1464,
+      "rankTo": 1474,
+      "strokesGainedRating": -2.9983459,
+      "endowment": 0.07175804,
+      "isEndowmentCapped": null,
+      "worldRanking": 1464,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 71
+        },
+        {
+          "roundNumber": 2,
+          "score": 73
+        },
+        {
+          "roundNumber": 3,
+          "score": 79
+        }
+      ]
+    },
+    {
+      "id": 1334252,
+      "playerId": 26937,
+      "player": {
+        "id": 26937,
+        "firstName": "Ludovico",
+        "lastName": "Addabbo",
+        "fullName": "Ludovico Addabbo",
+        "birthDate": "1998-09-28T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 547,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.012934026524206263,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 40,
+      "rankFrom": 1449,
+      "rankTo": 1455,
+      "strokesGainedRating": -3.0569296,
+      "endowment": 0.06771491,
+      "isEndowmentCapped": null,
+      "worldRanking": 1449,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 76
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 76
+        }
+      ]
+    },
+    {
+      "id": 1334253,
+      "playerId": 31929,
+      "player": {
+        "id": 31929,
+        "firstName": "Filippo",
+        "lastName": "Grossi",
+        "fullName": "Filippo Grossi",
+        "birthDate": "2002-08-22T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 547,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.012934026524206263,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 40,
+      "rankFrom": 1791,
+      "rankTo": 1797,
+      "strokesGainedRating": -3.432027,
+      "endowment": 0.046711367,
+      "isEndowmentCapped": null,
+      "worldRanking": 1791,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 77
+        },
+        {
+          "roundNumber": 2,
+          "score": 71
+        },
+        {
+          "roundNumber": 3,
+          "score": 75
+        }
+      ]
+    },
+    {
+      "id": 1334254,
+      "playerId": 30166,
+      "player": {
+        "id": 30166,
+        "firstName": "Maximilien",
+        "lastName": "Sturdza",
+        "fullName": "Maximilien Sturdza",
+        "birthDate": "2000-03-11T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 217,
+          "name": "Switzerland",
+          "iocCode": "SUI",
+          "code2": "CH",
+          "code3": "CHE",
+          "region": null
+        }
+      },
+      "winnings": 547,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.012934026524206263,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 40,
+      "rankFrom": 1741,
+      "rankTo": 1750,
+      "strokesGainedRating": -3.2234602,
+      "endowment": 0.05742348,
+      "isEndowmentCapped": null,
+      "worldRanking": 1741,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 73
+        },
+        {
+          "roundNumber": 2,
+          "score": 75
+        },
+        {
+          "roundNumber": 3,
+          "score": 75
+        }
+      ]
+    },
+    {
+      "id": 1334255,
+      "playerId": 25184,
+      "player": {
+        "id": 25184,
+        "firstName": "Davide",
+        "lastName": "Buchi",
+        "fullName": "Davide Buchi",
+        "birthDate": "1996-10-04T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 109,
+          "name": "Italy",
+          "iocCode": "ITA",
+          "code2": "IT",
+          "code3": "ITA",
+          "region": null
+        }
+      },
+      "winnings": 532,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01168234653799275,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 44,
+      "rankFrom": 1934,
+      "rankTo": 1927,
+      "strokesGainedRating": -3.697203,
+      "endowment": 0.035926785,
+      "isEndowmentCapped": null,
+      "worldRanking": 1934,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 73
+        },
+        {
+          "roundNumber": 2,
+          "score": 74
+        },
+        {
+          "roundNumber": 3,
+          "score": 81
+        }
+      ]
+    },
+    {
+      "id": 1334256,
+      "playerId": 19956,
+      "player": {
+        "id": 19956,
+        "firstName": "Alvaro ",
+        "lastName": "Hernandez Cabezuela",
+        "fullName": "Alvaro  Hernandez Cabezuela",
+        "birthDate": "1997-02-12T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 532,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01168234653799275,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 44,
+      "rankFrom": 1238,
+      "rankTo": 1247,
+      "strokesGainedRating": -2.9044168,
+      "endowment": 0.07875034,
+      "isEndowmentCapped": null,
+      "worldRanking": 1238,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 77
+        },
+        {
+          "roundNumber": 2,
+          "score": 75
+        },
+        {
+          "roundNumber": 3,
+          "score": 76
+        }
+      ]
+    },
+    {
+      "id": 1334257,
+      "playerId": 26722,
+      "player": {
+        "id": 26722,
+        "firstName": "Theo",
+        "lastName": "Boulet",
+        "fullName": "Theo Boulet",
+        "birthDate": "2003-01-03T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 75,
+          "name": "France",
+          "iocCode": "FRA",
+          "code2": "FR",
+          "code3": "FRA",
+          "region": null
+        }
+      },
+      "winnings": 525,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01168234653799275,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 46,
+      "rankFrom": 1817,
+      "rankTo": 1815,
+      "strokesGainedRating": -3.4008276,
+      "endowment": 0.04817657,
+      "isEndowmentCapped": null,
+      "worldRanking": 1817,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 78
+        },
+        {
+          "roundNumber": 2,
+          "score": 76
+        },
+        {
+          "roundNumber": 3,
+          "score": 75
+        }
+      ]
+    },
+    {
+      "id": 1334258,
+      "playerId": 30086,
+      "player": {
+        "id": 30086,
+        "firstName": "Gregorio",
+        "lastName": "Ferrandez",
+        "fullName": "Gregorio Ferrandez",
+        "birthDate": "2003-08-30T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 10,
+          "name": "Argentina",
+          "iocCode": "ARG",
+          "code2": "AR",
+          "code3": "ARG",
+          "region": null
+        }
+      },
+      "winnings": 520,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01084789321385041,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 47,
+      "rankFrom": 2214,
+      "rankTo": 2204,
+      "strokesGainedRating": -3.3418078,
+      "endowment": 0.051075146,
+      "isEndowmentCapped": null,
+      "worldRanking": 2214,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 70
+        },
+        {
+          "roundNumber": 2,
+          "score": 74
+        },
+        {
+          "roundNumber": 3,
+          "score": 86
+        }
+      ]
+    },
+    {
+      "id": 1334259,
+      "playerId": 25358,
+      "player": {
+        "id": 25358,
+        "firstName": "Jorge",
+        "lastName": "Maicas Redondo",
+        "fullName": "Jorge Maicas Redondo",
+        "birthDate": "1997-10-01T00:00:00",
+        "gender": "M",
+        "isAmateur": false,
+        "country": {
+          "id": 210,
+          "name": "Spain",
+          "iocCode": "ESP",
+          "code2": "ES",
+          "code3": "ESP",
+          "region": null
+        }
+      },
+      "winnings": 515,
+      "nonFinishingState": "",
+      "pointsAwarded": 0.01084789321385041,
+      "mbValue": null,
+      "mbPercentage": null,
+      "finishPosition": 48,
+      "rankFrom": 1192,
+      "rankTo": 1194,
+      "strokesGainedRating": -3.0545917,
+      "endowment": 0.0678718,
+      "isEndowmentCapped": null,
+      "worldRanking": 1192,
+      "resultScores": [
+        {
+          "roundNumber": 1,
+          "score": 72
+        },
+        {
+          "roundNumber": 2,
+          "score": 81
+        },
+        {
+          "roundNumber": 3,
+          "score": 79
+        }
+      ]
+    }
+  ],
+  "pointsBreakdown": [
+    {
+      "id": 422006,
+      "finishPosition": 1,
+      "pointsAvailable": 0.8344533241423394,
+      "percentOfPointsTotal": 27.15
+    },
+    {
+      "id": 422007,
+      "finishPosition": 2,
+      "pointsAvailable": 0.3838485291054762,
+      "percentOfPointsTotal": 12.49
+    },
+    {
+      "id": 422008,
+      "finishPosition": 3,
+      "pointsAvailable": 0.24366037064956308,
+      "percentOfPointsTotal": 7.93
+    },
+    {
+      "id": 422009,
+      "finishPosition": 4,
+      "pointsAvailable": 0.1760696513940336,
+      "percentOfPointsTotal": 5.73
+    },
+    {
+      "id": 422010,
+      "finishPosition": 5,
+      "pointsAvailable": 0.13685034515934366,
+      "percentOfPointsTotal": 4.45
+    },
+    {
+      "id": 422011,
+      "finishPosition": 6,
+      "pointsAvailable": 0.11181674543507347,
+      "percentOfPointsTotal": 3.64
+    },
+    {
+      "id": 422012,
+      "finishPosition": 7,
+      "pointsAvailable": 0.09429322562808437,
+      "percentOfPointsTotal": 3.07
+    },
+    {
+      "id": 422013,
+      "finishPosition": 8,
+      "pointsAvailable": 0.08094197244180693,
+      "percentOfPointsTotal": 2.63
+    },
+    {
+      "id": 422014,
+      "finishPosition": 9,
+      "pointsAvailable": 0.07092853255209886,
+      "percentOfPointsTotal": 2.31
+    },
+    {
+      "id": 422015,
+      "finishPosition": 10,
+      "pointsAvailable": 0.0634184526348178,
+      "percentOfPointsTotal": 2.06
+    },
+    {
+      "id": 422016,
+      "finishPosition": 11,
+      "pointsAvailable": 0.05674282604167908,
+      "percentOfPointsTotal": 1.85
+    },
+    {
+      "id": 422017,
+      "finishPosition": 12,
+      "pointsAvailable": 0.05173610609682505,
+      "percentOfPointsTotal": 1.68
+    },
+    {
+      "id": 422018,
+      "finishPosition": 13,
+      "pointsAvailable": 0.046729386151971,
+      "percentOfPointsTotal": 1.52
+    },
+    {
+      "id": 422019,
+      "finishPosition": 14,
+      "pointsAvailable": 0.04339157285540164,
+      "percentOfPointsTotal": 1.41
+    },
+    {
+      "id": 422020,
+      "finishPosition": 15,
+      "pointsAvailable": 0.040053759558832294,
+      "percentOfPointsTotal": 1.3
+    },
+    {
+      "id": 422021,
+      "finishPosition": 16,
+      "pointsAvailable": 0.03755039958640527,
+      "percentOfPointsTotal": 1.22
+    },
+    {
+      "id": 422022,
+      "finishPosition": 17,
+      "pointsAvailable": 0.03504703961397826,
+      "percentOfPointsTotal": 1.14
+    },
+    {
+      "id": 422023,
+      "finishPosition": 18,
+      "pointsAvailable": 0.032543679641551235,
+      "percentOfPointsTotal": 1.06
+    },
+    {
+      "id": 422024,
+      "finishPosition": 19,
+      "pointsAvailable": 0.030874772993266554,
+      "percentOfPointsTotal": 1
+    },
+    {
+      "id": 422025,
+      "finishPosition": 20,
+      "pointsAvailable": 0.02920586634498188,
+      "percentOfPointsTotal": 0.95
+    },
+    {
+      "id": 422026,
+      "finishPosition": 21,
+      "pointsAvailable": 0.0275369596966972,
+      "percentOfPointsTotal": 0.9
+    },
+    {
+      "id": 422027,
+      "finishPosition": 22,
+      "pointsAvailable": 0.025868053048412526,
+      "percentOfPointsTotal": 0.84
+    },
+    {
+      "id": 422028,
+      "finishPosition": 23,
+      "pointsAvailable": 0.025033599724270182,
+      "percentOfPointsTotal": 0.81
+    },
+    {
+      "id": 422029,
+      "finishPosition": 24,
+      "pointsAvailable": 0.0233646930759855,
+      "percentOfPointsTotal": 0.76
+    },
+    {
+      "id": 422030,
+      "finishPosition": 25,
+      "pointsAvailable": 0.022530239751843165,
+      "percentOfPointsTotal": 0.73
+    },
+    {
+      "id": 422031,
+      "finishPosition": 26,
+      "pointsAvailable": 0.02169578642770082,
+      "percentOfPointsTotal": 0.71
+    },
+    {
+      "id": 422032,
+      "finishPosition": 27,
+      "pointsAvailable": 0.020861333103558487,
+      "percentOfPointsTotal": 0.68
+    },
+    {
+      "id": 422033,
+      "finishPosition": 28,
+      "pointsAvailable": 0.020026879779416147,
+      "percentOfPointsTotal": 0.65
+    },
+    {
+      "id": 422034,
+      "finishPosition": 29,
+      "pointsAvailable": 0.019192426455273807,
+      "percentOfPointsTotal": 0.62
+    },
+    {
+      "id": 422035,
+      "finishPosition": 30,
+      "pointsAvailable": 0.018357973131131466,
+      "percentOfPointsTotal": 0.6
+    },
+    {
+      "id": 422036,
+      "finishPosition": 31,
+      "pointsAvailable": 0.01752351980698913,
+      "percentOfPointsTotal": 0.57
+    },
+    {
+      "id": 422037,
+      "finishPosition": 32,
+      "pointsAvailable": 0.01752351980698913,
+      "percentOfPointsTotal": 0.57
+    },
+    {
+      "id": 422038,
+      "finishPosition": 33,
+      "pointsAvailable": 0.01668906648284679,
+      "percentOfPointsTotal": 0.54
+    },
+    {
+      "id": 422039,
+      "finishPosition": 34,
+      "pointsAvailable": 0.01585461315870445,
+      "percentOfPointsTotal": 0.52
+    },
+    {
+      "id": 422040,
+      "finishPosition": 35,
+      "pointsAvailable": 0.01585461315870445,
+      "percentOfPointsTotal": 0.52
+    },
+    {
+      "id": 422041,
+      "finishPosition": 36,
+      "pointsAvailable": 0.015020159834562109,
+      "percentOfPointsTotal": 0.49
+    },
+    {
+      "id": 422042,
+      "finishPosition": 37,
+      "pointsAvailable": 0.01418570651041977,
+      "percentOfPointsTotal": 0.46
+    },
+    {
+      "id": 422043,
+      "finishPosition": 38,
+      "pointsAvailable": 0.01418570651041977,
+      "percentOfPointsTotal": 0.46
+    },
+    {
+      "id": 422044,
+      "finishPosition": 39,
+      "pointsAvailable": 0.01335125318627743,
+      "percentOfPointsTotal": 0.43
+    },
+    {
+      "id": 422045,
+      "finishPosition": 40,
+      "pointsAvailable": 0.01335125318627743,
+      "percentOfPointsTotal": 0.43
+    },
+    {
+      "id": 422046,
+      "finishPosition": 41,
+      "pointsAvailable": 0.01335125318627743,
+      "percentOfPointsTotal": 0.43
+    },
+    {
+      "id": 422047,
+      "finishPosition": 42,
+      "pointsAvailable": 0.012516799862135091,
+      "percentOfPointsTotal": 0.41
+    },
+    {
+      "id": 422048,
+      "finishPosition": 43,
+      "pointsAvailable": 0.012516799862135091,
+      "percentOfPointsTotal": 0.41
+    },
+    {
+      "id": 422049,
+      "finishPosition": 44,
+      "pointsAvailable": 0.01168234653799275,
+      "percentOfPointsTotal": 0.38
+    },
+    {
+      "id": 422050,
+      "finishPosition": 45,
+      "pointsAvailable": 0.01168234653799275,
+      "percentOfPointsTotal": 0.38
+    },
+    {
+      "id": 422051,
+      "finishPosition": 46,
+      "pointsAvailable": 0.01168234653799275,
+      "percentOfPointsTotal": 0.38
+    },
+    {
+      "id": 422052,
+      "finishPosition": 47,
+      "pointsAvailable": 0.01084789321385041,
+      "percentOfPointsTotal": 0.35
+    },
+    {
+      "id": 422053,
+      "finishPosition": 48,
+      "pointsAvailable": 0.01084789321385041,
+      "percentOfPointsTotal": 0.35
+    }
+  ],
+  "fieldBreakdown": [
+    {
+      "worldRanking": 828,
+      "playerId": 34944,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Alexandre",
+      "lastName": "Vandermoten",
+      "fullName": "Alexandre Vandermoten",
+      "strokesGainedRating": -1.7638069,
+      "performancePoints": 0.2435694
+    },
+    {
+      "worldRanking": 1254,
+      "playerId": 28185,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Alessandro",
+      "lastName": "Nodari",
+      "fullName": "Alessandro Nodari",
+      "strokesGainedRating": -2.4391139,
+      "performancePoints": 0.124823175
+    },
+    {
+      "worldRanking": 1334,
+      "playerId": 19557,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Mario",
+      "lastName": "Galiano Aguilar",
+      "fullName": "Mario Galiano Aguilar",
+      "strokesGainedRating": -2.6081848,
+      "performancePoints": 0.10558649
+    },
+    {
+      "worldRanking": 2210,
+      "playerId": 34945,
+      "country": {
+        "id": 253,
+        "name": "England",
+        "iocCode": "ENG",
+        "code2": "",
+        "code3": "ENG",
+        "region": null
+      },
+      "firstName": "Archie",
+      "lastName": "Smith",
+      "fullName": "Archie Smith",
+      "strokesGainedRating": -3.6363382,
+      "performancePoints": 0.038157973
+    },
+    {
+      "worldRanking": 1975,
+      "playerId": 29293,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Mattia",
+      "lastName": "Comotti",
+      "fullName": "Mattia Comotti",
+      "strokesGainedRating": -4.061738,
+      "performancePoints": 0.025043659
+    },
+    {
+      "worldRanking": 1323,
+      "playerId": 30712,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Paul",
+      "lastName": "Franquet",
+      "fullName": "Paul Franquet",
+      "strokesGainedRating": -2.988935,
+      "performancePoints": 0.07242967
+    },
+    {
+      "worldRanking": 1592,
+      "playerId": 34942,
+      "country": {
+        "id": 106,
+        "name": "Ireland",
+        "iocCode": "IRL",
+        "code2": "IE",
+        "code3": "IRL",
+        "region": null
+      },
+      "firstName": "Sam",
+      "lastName": "Murphy",
+      "fullName": "Sam Murphy",
+      "strokesGainedRating": -3.3331137,
+      "performancePoints": 0.05151662
+    },
+    {
+      "worldRanking": 1817,
+      "playerId": 26634,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Nicolas",
+      "lastName": "Calvet",
+      "fullName": "Nicolas Calvet",
+      "strokesGainedRating": -2.785435,
+      "performancePoints": 0.08859415
+    },
+    {
+      "worldRanking": 1100,
+      "playerId": 29934,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Javier",
+      "lastName": "Calles Roman",
+      "fullName": "Javier Calles Roman",
+      "strokesGainedRating": -2.3587387,
+      "performancePoints": 0.13516058
+    },
+    {
+      "worldRanking": 894,
+      "playerId": 23700,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Maxime",
+      "lastName": "Legros",
+      "fullName": "Maxime Legros",
+      "strokesGainedRating": -1.4896871,
+      "performancePoints": 0.31950095
+    },
+    {
+      "worldRanking": 1494,
+      "playerId": 26732,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Nathan",
+      "lastName": "Legendre",
+      "fullName": "Nathan Legendre",
+      "strokesGainedRating": -2.8061328,
+      "performancePoints": 0.0867974
+    },
+    {
+      "worldRanking": 1531,
+      "playerId": 12661,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Damien",
+      "lastName": "Perrier",
+      "fullName": "Damien Perrier",
+      "strokesGainedRating": -2.7967007,
+      "performancePoints": 0.08761161
+    },
+    {
+      "worldRanking": 1350,
+      "playerId": 33519,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Pablo",
+      "lastName": "Alperi L\u00f3pez",
+      "fullName": "Pablo Alperi L\u00f3pez",
+      "strokesGainedRating": -2.1344976,
+      "performancePoints": 0.16875459
+    },
+    {
+      "worldRanking": 1313,
+      "playerId": 17652,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Enrico",
+      "lastName": "Di Nitto",
+      "fullName": "Enrico Di Nitto",
+      "strokesGainedRating": -2.6016386,
+      "performancePoints": 0.106272936
+    },
+    {
+      "worldRanking": 2008,
+      "playerId": 29876,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Alberto",
+      "lastName": "Dominguez Avila",
+      "fullName": "Alberto Dominguez Avila",
+      "strokesGainedRating": -3.4949079,
+      "performancePoints": 0.043892357
+    },
+    {
+      "worldRanking": 1513,
+      "playerId": 28602,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Alejandro",
+      "lastName": "Rodriguez Andreu",
+      "fullName": "Alejandro Rodriguez Andreu",
+      "strokesGainedRating": -3.4329872,
+      "performancePoints": 0.046667
+    },
+    {
+      "worldRanking": 1388,
+      "playerId": 24911,
+      "country": {
+        "id": 14,
+        "name": "Austria",
+        "iocCode": "AUT",
+        "code2": "AT",
+        "code3": "AUT",
+        "region": null
+      },
+      "firstName": "Christoph",
+      "lastName": "Bleier",
+      "fullName": "Christoph Bleier",
+      "strokesGainedRating": -2.812577,
+      "performancePoints": 0.086245455
+    },
+    {
+      "worldRanking": 2133,
+      "playerId": 28460,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Hermes",
+      "lastName": "Ferchaud",
+      "fullName": "Hermes Ferchaud",
+      "strokesGainedRating": -3.7613134,
+      "performancePoints": 0.03371755
+    },
+    {
+      "worldRanking": 1442,
+      "playerId": 18953,
+      "country": {
+        "id": 159,
+        "name": "Netherlands",
+        "iocCode": "NED",
+        "code2": "NL",
+        "code3": "NLD",
+        "region": null
+      },
+      "firstName": "Lars",
+      "lastName": "Keunen",
+      "fullName": "Lars Keunen",
+      "strokesGainedRating": -3.0837646,
+      "performancePoints": 0.06593978
+    },
+    {
+      "worldRanking": 1786,
+      "playerId": 15266,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Filippo",
+      "lastName": "Bergamaschi",
+      "fullName": "Filippo Bergamaschi",
+      "strokesGainedRating": -2.7013419,
+      "performancePoints": 0.09628493
+    },
+    {
+      "worldRanking": 1710,
+      "playerId": 30415,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Luca",
+      "lastName": "Cavalli",
+      "fullName": "Luca Cavalli",
+      "strokesGainedRating": -3.4323456,
+      "performancePoints": 0.046696644
+    },
+    {
+      "worldRanking": 1701,
+      "playerId": 25235,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Paul",
+      "lastName": "Margolis",
+      "fullName": "Paul Margolis",
+      "strokesGainedRating": -2.8989668,
+      "performancePoints": 0.07917637
+    },
+    {
+      "worldRanking": 583,
+      "playerId": 22789,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Andrea",
+      "lastName": "Romano(June2000)",
+      "fullName": "Andrea Romano(June2000)",
+      "strokesGainedRating": -1.4858633,
+      "performancePoints": 0.32071263
+    },
+    {
+      "worldRanking": 2246,
+      "playerId": 33209,
+      "country": {
+        "id": 112,
+        "name": "Jersey",
+        "iocCode": "JEY",
+        "code2": "JE",
+        "code3": "JEY",
+        "region": null
+      },
+      "firstName": "Josef",
+      "lastName": "Hacker",
+      "fullName": "Josef Hacker",
+      "strokesGainedRating": -4.020449,
+      "performancePoints": 0.026088469
+    },
+    {
+      "worldRanking": 1723,
+      "playerId": 33685,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Gonzalo",
+      "lastName": "Leal",
+      "fullName": "Gonzalo Leal",
+      "strokesGainedRating": -2.5652065,
+      "performancePoints": 0.11017563
+    },
+    {
+      "worldRanking": 1634,
+      "playerId": 25662,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Theo",
+      "lastName": "Brizard",
+      "fullName": "Theo Brizard",
+      "strokesGainedRating": -2.9690073,
+      "performancePoints": 0.07387266
+    },
+    {
+      "worldRanking": 1805,
+      "playerId": 26655,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Alexis",
+      "lastName": "Leray",
+      "fullName": "Alexis Leray",
+      "strokesGainedRating": -2.665682,
+      "performancePoints": 0.09974454
+    },
+    {
+      "worldRanking": 1426,
+      "playerId": 29444,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Luca",
+      "lastName": "Memeo",
+      "fullName": "Luca Memeo",
+      "strokesGainedRating": -2.6582217,
+      "performancePoints": 0.10048391
+    },
+    {
+      "worldRanking": 1659,
+      "playerId": 23990,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Manfredi",
+      "lastName": "Manica",
+      "fullName": "Manfredi Manica",
+      "strokesGainedRating": -3.4585664,
+      "performancePoints": 0.045500156
+    },
+    {
+      "worldRanking": 1663,
+      "playerId": 28881,
+      "country": {
+        "id": 106,
+        "name": "Ireland",
+        "iocCode": "IRL",
+        "code2": "IE",
+        "code3": "IRL",
+        "region": null
+      },
+      "firstName": "Hugh",
+      "lastName": "Foley",
+      "fullName": "Hugh Foley",
+      "strokesGainedRating": -3.8385818,
+      "performancePoints": 0.031234663
+    },
+    {
+      "worldRanking": 1275,
+      "playerId": 25656,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Flavio",
+      "lastName": "Michetti",
+      "fullName": "Flavio Michetti",
+      "strokesGainedRating": -3.372402,
+      "performancePoints": 0.049551472
+    },
+    {
+      "worldRanking": 1427,
+      "playerId": 31930,
+      "country": {
+        "id": 253,
+        "name": "England",
+        "iocCode": "ENG",
+        "code2": "",
+        "code3": "ENG",
+        "region": null
+      },
+      "firstName": "Mason",
+      "lastName": "Essam",
+      "fullName": "Mason Essam",
+      "strokesGainedRating": -2.9210873,
+      "performancePoints": 0.07746143
+    },
+    {
+      "worldRanking": 1475,
+      "playerId": 27722,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Eduard",
+      "lastName": "Rousaud",
+      "fullName": "Eduard Rousaud",
+      "strokesGainedRating": -2.691308,
+      "performancePoints": 0.097246066
+    },
+    {
+      "worldRanking": 1600,
+      "playerId": 27840,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Marco",
+      "lastName": "Florioli",
+      "fullName": "Marco Florioli",
+      "strokesGainedRating": -2.908779,
+      "performancePoints": 0.07841102
+    },
+    {
+      "worldRanking": 1508,
+      "playerId": 28238,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Victor",
+      "lastName": "Garcia Broto",
+      "fullName": "Victor Garcia Broto",
+      "strokesGainedRating": -2.6498907,
+      "performancePoints": 0.101316035
+    },
+    {
+      "worldRanking": 1280,
+      "playerId": 28673,
+      "country": {
+        "id": 106,
+        "name": "Ireland",
+        "iocCode": "IRL",
+        "code2": "IE",
+        "code3": "IRL",
+        "region": null
+      },
+      "firstName": "Robert",
+      "lastName": "Moran",
+      "fullName": "Robert Moran",
+      "strokesGainedRating": -2.9645298,
+      "performancePoints": 0.074200824
+    },
+    {
+      "worldRanking": 2010,
+      "playerId": 34090,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Ewan",
+      "lastName": "Le Tennier",
+      "fullName": "Ewan Le Tennier",
+      "strokesGainedRating": -3.7839317,
+      "performancePoints": 0.03297099
+    },
+    {
+      "worldRanking": 2290,
+      "playerId": 26360,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Jose Manuel",
+      "lastName": "Pardo Benitez",
+      "fullName": "Jose Manuel Pardo Benitez",
+      "strokesGainedRating": -4.2577524,
+      "performancePoints": 0.020626584
+    },
+    {
+      "worldRanking": 1420,
+      "playerId": 27460,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Augustin",
+      "lastName": "Hole",
+      "fullName": "Augustin Hole",
+      "strokesGainedRating": -2.8850174,
+      "performancePoints": 0.08027728
+    },
+    {
+      "worldRanking": 1464,
+      "playerId": 23406,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Tom",
+      "lastName": "Gueant",
+      "fullName": "Tom Gueant",
+      "strokesGainedRating": -2.9983459,
+      "performancePoints": 0.07175804
+    },
+    {
+      "worldRanking": 1449,
+      "playerId": 26937,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Ludovico",
+      "lastName": "Addabbo",
+      "fullName": "Ludovico Addabbo",
+      "strokesGainedRating": -3.0569296,
+      "performancePoints": 0.06771491
+    },
+    {
+      "worldRanking": 1791,
+      "playerId": 31929,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Filippo",
+      "lastName": "Grossi",
+      "fullName": "Filippo Grossi",
+      "strokesGainedRating": -3.432027,
+      "performancePoints": 0.046711367
+    },
+    {
+      "worldRanking": 1741,
+      "playerId": 30166,
+      "country": {
+        "id": 217,
+        "name": "Switzerland",
+        "iocCode": "SUI",
+        "code2": "CH",
+        "code3": "CHE",
+        "region": null
+      },
+      "firstName": "Maximilien",
+      "lastName": "Sturdza",
+      "fullName": "Maximilien Sturdza",
+      "strokesGainedRating": -3.2234602,
+      "performancePoints": 0.05742348
+    },
+    {
+      "worldRanking": 1934,
+      "playerId": 25184,
+      "country": {
+        "id": 109,
+        "name": "Italy",
+        "iocCode": "ITA",
+        "code2": "IT",
+        "code3": "ITA",
+        "region": null
+      },
+      "firstName": "Davide",
+      "lastName": "Buchi",
+      "fullName": "Davide Buchi",
+      "strokesGainedRating": -3.697203,
+      "performancePoints": 0.035926785
+    },
+    {
+      "worldRanking": 1238,
+      "playerId": 19956,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Alvaro ",
+      "lastName": "Hernandez Cabezuela",
+      "fullName": "Alvaro  Hernandez Cabezuela",
+      "strokesGainedRating": -2.9044168,
+      "performancePoints": 0.07875034
+    },
+    {
+      "worldRanking": 1817,
+      "playerId": 26722,
+      "country": {
+        "id": 75,
+        "name": "France",
+        "iocCode": "FRA",
+        "code2": "FR",
+        "code3": "FRA",
+        "region": null
+      },
+      "firstName": "Theo",
+      "lastName": "Boulet",
+      "fullName": "Theo Boulet",
+      "strokesGainedRating": -3.4008276,
+      "performancePoints": 0.04817657
+    },
+    {
+      "worldRanking": 2214,
+      "playerId": 30086,
+      "country": {
+        "id": 10,
+        "name": "Argentina",
+        "iocCode": "ARG",
+        "code2": "AR",
+        "code3": "ARG",
+        "region": null
+      },
+      "firstName": "Gregorio",
+      "lastName": "Ferrandez",
+      "fullName": "Gregorio Ferrandez",
+      "strokesGainedRating": -3.3418078,
+      "performancePoints": 0.051075146
+    },
+    {
+      "worldRanking": 1192,
+      "playerId": 25358,
+      "country": {
+        "id": 210,
+        "name": "Spain",
+        "iocCode": "ESP",
+        "code2": "ES",
+        "code3": "ESP",
+        "region": null
+      },
+      "firstName": "Jorge",
+      "lastName": "Maicas Redondo",
+      "fullName": "Jorge Maicas Redondo",
+      "strokesGainedRating": -3.0545917,
+      "performancePoints": 0.0678718
+    }
+  ],
+  "country": {
+    "id": 21,
+    "name": "Belgium",
+    "iocCode": "BEL",
+    "code2": "BE",
+    "code3": "BEL",
+    "region": null
+  },
+  "originalFieldRating": 4.097722123754981,
+  "curtailedEventType": 1,
+  "originalPointsPerPlayer": 0.08537,
+  "originalFirstPlacePoints": 1.1126044321897859,
+  "originalPointsBreakdown": [
+    {
+      "id": 0,
+      "finishPosition": 1,
+      "pointsAvailable": 1.1126,
+      "percentOfPointsTotal": 27.15
+    },
+    {
+      "id": 0,
+      "finishPosition": 2,
+      "pointsAvailable": 0.5118,
+      "percentOfPointsTotal": 12.49
+    },
+    {
+      "id": 0,
+      "finishPosition": 3,
+      "pointsAvailable": 0.32488,
+      "percentOfPointsTotal": 7.93
+    },
+    {
+      "id": 0,
+      "finishPosition": 4,
+      "pointsAvailable": 0.23476,
+      "percentOfPointsTotal": 5.73
+    },
+    {
+      "id": 0,
+      "finishPosition": 5,
+      "pointsAvailable": 0.18247,
+      "percentOfPointsTotal": 4.45
+    },
+    {
+      "id": 0,
+      "finishPosition": 6,
+      "pointsAvailable": 0.14909,
+      "percentOfPointsTotal": 3.64
+    },
+    {
+      "id": 0,
+      "finishPosition": 7,
+      "pointsAvailable": 0.12572,
+      "percentOfPointsTotal": 3.07
+    },
+    {
+      "id": 0,
+      "finishPosition": 8,
+      "pointsAvailable": 0.10792,
+      "percentOfPointsTotal": 2.63
+    },
+    {
+      "id": 0,
+      "finishPosition": 9,
+      "pointsAvailable": 0.09457,
+      "percentOfPointsTotal": 2.31
+    },
+    {
+      "id": 0,
+      "finishPosition": 10,
+      "pointsAvailable": 0.08456,
+      "percentOfPointsTotal": 2.06
+    },
+    {
+      "id": 0,
+      "finishPosition": 11,
+      "pointsAvailable": 0.07566,
+      "percentOfPointsTotal": 1.85
+    },
+    {
+      "id": 0,
+      "finishPosition": 12,
+      "pointsAvailable": 0.06898,
+      "percentOfPointsTotal": 1.68
+    },
+    {
+      "id": 0,
+      "finishPosition": 13,
+      "pointsAvailable": 0.06231,
+      "percentOfPointsTotal": 1.52
+    },
+    {
+      "id": 0,
+      "finishPosition": 14,
+      "pointsAvailable": 0.05786,
+      "percentOfPointsTotal": 1.41
+    },
+    {
+      "id": 0,
+      "finishPosition": 15,
+      "pointsAvailable": 0.05341,
+      "percentOfPointsTotal": 1.3
+    },
+    {
+      "id": 0,
+      "finishPosition": 16,
+      "pointsAvailable": 0.05007,
+      "percentOfPointsTotal": 1.22
+    },
+    {
+      "id": 0,
+      "finishPosition": 17,
+      "pointsAvailable": 0.04673,
+      "percentOfPointsTotal": 1.14
+    },
+    {
+      "id": 0,
+      "finishPosition": 18,
+      "pointsAvailable": 0.04339,
+      "percentOfPointsTotal": 1.06
+    },
+    {
+      "id": 0,
+      "finishPosition": 19,
+      "pointsAvailable": 0.04117,
+      "percentOfPointsTotal": 1
+    },
+    {
+      "id": 0,
+      "finishPosition": 20,
+      "pointsAvailable": 0.03894,
+      "percentOfPointsTotal": 0.95
+    },
+    {
+      "id": 0,
+      "finishPosition": 21,
+      "pointsAvailable": 0.03672,
+      "percentOfPointsTotal": 0.9
+    },
+    {
+      "id": 0,
+      "finishPosition": 22,
+      "pointsAvailable": 0.03449,
+      "percentOfPointsTotal": 0.84
+    },
+    {
+      "id": 0,
+      "finishPosition": 23,
+      "pointsAvailable": 0.03338,
+      "percentOfPointsTotal": 0.81
+    },
+    {
+      "id": 0,
+      "finishPosition": 24,
+      "pointsAvailable": 0.03115,
+      "percentOfPointsTotal": 0.76
+    },
+    {
+      "id": 0,
+      "finishPosition": 25,
+      "pointsAvailable": 0.03004,
+      "percentOfPointsTotal": 0.73
+    },
+    {
+      "id": 0,
+      "finishPosition": 26,
+      "pointsAvailable": 0.02893,
+      "percentOfPointsTotal": 0.71
+    },
+    {
+      "id": 0,
+      "finishPosition": 27,
+      "pointsAvailable": 0.02782,
+      "percentOfPointsTotal": 0.68
+    },
+    {
+      "id": 0,
+      "finishPosition": 28,
+      "pointsAvailable": 0.0267,
+      "percentOfPointsTotal": 0.65
+    },
+    {
+      "id": 0,
+      "finishPosition": 29,
+      "pointsAvailable": 0.02559,
+      "percentOfPointsTotal": 0.62
+    },
+    {
+      "id": 0,
+      "finishPosition": 30,
+      "pointsAvailable": 0.02448,
+      "percentOfPointsTotal": 0.6
+    },
+    {
+      "id": 0,
+      "finishPosition": 31,
+      "pointsAvailable": 0.02336,
+      "percentOfPointsTotal": 0.57
+    },
+    {
+      "id": 0,
+      "finishPosition": 32,
+      "pointsAvailable": 0.02336,
+      "percentOfPointsTotal": 0.57
+    },
+    {
+      "id": 0,
+      "finishPosition": 33,
+      "pointsAvailable": 0.02225,
+      "percentOfPointsTotal": 0.54
+    },
+    {
+      "id": 0,
+      "finishPosition": 34,
+      "pointsAvailable": 0.02114,
+      "percentOfPointsTotal": 0.52
+    },
+    {
+      "id": 0,
+      "finishPosition": 35,
+      "pointsAvailable": 0.02114,
+      "percentOfPointsTotal": 0.52
+    },
+    {
+      "id": 0,
+      "finishPosition": 36,
+      "pointsAvailable": 0.02003,
+      "percentOfPointsTotal": 0.49
+    },
+    {
+      "id": 0,
+      "finishPosition": 37,
+      "pointsAvailable": 0.01891,
+      "percentOfPointsTotal": 0.46
+    },
+    {
+      "id": 0,
+      "finishPosition": 38,
+      "pointsAvailable": 0.01891,
+      "percentOfPointsTotal": 0.46
+    },
+    {
+      "id": 0,
+      "finishPosition": 39,
+      "pointsAvailable": 0.0178,
+      "percentOfPointsTotal": 0.43
+    },
+    {
+      "id": 0,
+      "finishPosition": 40,
+      "pointsAvailable": 0.0178,
+      "percentOfPointsTotal": 0.43
+    },
+    {
+      "id": 0,
+      "finishPosition": 41,
+      "pointsAvailable": 0.0178,
+      "percentOfPointsTotal": 0.43
+    },
+    {
+      "id": 0,
+      "finishPosition": 42,
+      "pointsAvailable": 0.01669,
+      "percentOfPointsTotal": 0.41
+    },
+    {
+      "id": 0,
+      "finishPosition": 43,
+      "pointsAvailable": 0.01669,
+      "percentOfPointsTotal": 0.41
+    },
+    {
+      "id": 0,
+      "finishPosition": 44,
+      "pointsAvailable": 0.01558,
+      "percentOfPointsTotal": 0.38
+    },
+    {
+      "id": 0,
+      "finishPosition": 45,
+      "pointsAvailable": 0.01558,
+      "percentOfPointsTotal": 0.38
+    },
+    {
+      "id": 0,
+      "finishPosition": 46,
+      "pointsAvailable": 0.01558,
+      "percentOfPointsTotal": 0.38
+    },
+    {
+      "id": 0,
+      "finishPosition": 47,
+      "pointsAvailable": 0.01446,
+      "percentOfPointsTotal": 0.35
+    },
+    {
+      "id": 0,
+      "finishPosition": 48,
+      "pointsAvailable": 0.01446,
+      "percentOfPointsTotal": 0.35
+    }
+  ]
+}
