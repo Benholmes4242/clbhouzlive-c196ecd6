@@ -15,7 +15,7 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: h.profile, loading: false, isError: false, refetch: vi.fn() }) }));
 vi.mock('@/hooks/useProfileSave', () => ({ useProfileSave: () => ({ save: h.save, isSaving: false }) }));
 vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: null }) }));
-vi.mock('@/lib/whs/useOwnHandicapState', () => ({ useOwnHandicapState: () => ({ linked: !!null, connected: !!null, settled: true, connection: null, trend: undefined, anyError: false, pro: false, proKind: null, proTour: null, proClub: null }) }));
+vi.mock('@/lib/whs/useOwnHandicapState', () => ({ useOwnHandicapState: () => ({ linked: false, connected: false, settled: true, connection: null, trend: undefined, anyError: false, pro: false, proKind: null, proTour: null, proClub: null }) }));
 vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
 vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => ({ state: 'none', pendingName: null }) }));
 vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: [] }) }));
