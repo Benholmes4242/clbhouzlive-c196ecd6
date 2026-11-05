@@ -14,11 +14,11 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
   rpc: vi.fn(() => st.pending ? new Promise(() => {}) : Promise.resolve({ data: { connected: st.connected, circle: 30, people: st.indexes.map(index => ({ user_id: String(index), name: `Member ${index}`, avatar_url: null, club: index === 16 ? 'Sundridge Park Golf Club' : null, index })) }, error: st.error ? new Error('circle unavailable') : null })),
 } }));
 
-function mount() {
+function mount(layout: 'page' | 'embedded' = 'page') {
   const pick = vi.fn();
   const decline = vi.fn();
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const result = render(<QueryClientProvider client={qc}><EmptyStateScreen onPickCountry={pick} onDecline={decline} /></QueryClientProvider>);
+  const result = render(<QueryClientProvider client={qc}><EmptyStateScreen layout={layout} onPickCountry={pick} onDecline={decline} /></QueryClientProvider>);
   return { ...result, pick, decline };
 }
 beforeEach(() => {
@@ -80,7 +80,7 @@ describe('HS2 circle seat', () => {
     mount();
     expect(await screen.findByTestId('connect-seat-list')).toBeInTheDocument();
   });
-  it.each([27, 0])('advances and tracks end CTA for circle count %s', async connected => {
+  it.each([27, 0])('advances and tracks footer CTA for circle count %s', async connected => {
     st.connected = connected;
     const { container, pick } = mount();
     await waitFor(() => expect(screen.queryByTestId('connect-seat-skeleton')).toBeNull());
@@ -88,7 +88,37 @@ describe('HS2 circle seat', () => {
     if (!cta) throw new Error('missing CTA');
     fireEvent.click(cta);
     expect(pick).toHaveBeenCalledTimes(1);
-    expect(analyticsEvents.track).toHaveBeenCalledWith('connect_intro_cta', { place: 'end', circle_shown: connected > 0, h: 13 });
+    expect(analyticsEvents.track).toHaveBeenCalledWith('connect_intro_cta', { place: 'footer', circle_shown: connected > 0, h: 13 });
+  });
+  it('keeps CTA and decline in FooterBar outside Stage in both settled states', async () => {
+    for (const connected of [27, 0]) {
+      st.connected = connected;
+      const { container, unmount } = mount();
+      await waitFor(() => expect(screen.queryByTestId('connect-seat-skeleton')).toBeNull());
+      const stage = screen.getByTestId('connect-seat-headline').parentElement?.parentElement;
+      const footer = stage?.nextElementSibling;
+      expect(stage).toHaveStyle({ flex: '1', overflowY: 'auto' });
+      expect(footer).toHaveStyle({ flexShrink: '0' });
+      expect(footer?.querySelectorAll('button')).toHaveLength(2);
+      expect(footer?.querySelector('.connect-seat-cta')).toBeInTheDocument();
+      expect(stage?.querySelectorAll('button')).toHaveLength(0);
+      unmount();
+    }
+  });
+  it('keeps the loading CTA bar in FooterBar outside the scrolling Stage', () => {
+    st.pending = true;
+    mount();
+    const stage = screen.getByTestId('connect-seat-skeleton').parentElement?.parentElement;
+    const footer = stage?.nextElementSibling;
+    expect(footer).toHaveStyle({ flexShrink: '0' });
+    expect(footer).toContainElement(screen.getByTestId('connect-seat-skeleton-cta'));
+    expect(stage).not.toContainElement(screen.getByTestId('connect-seat-skeleton-cta'));
+  });
+  it('reuses setup embedded FooterBar spacing', async () => {
+    mount('embedded');
+    await screen.findByTestId('connect-seat-list');
+    const stage = screen.getByTestId('connect-seat-headline').parentElement?.parentElement;
+    expect(stage?.nextElementSibling).toHaveStyle({ padding: '16px 0 8px', paddingBottom: 'calc(34px + env(safe-area-inset-bottom, 0px))' });
   });
   it('keeps the decline action', async () => {
     const { container, decline } = mount();

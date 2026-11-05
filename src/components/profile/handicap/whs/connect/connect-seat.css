@@ -14,9 +14,9 @@
 .connect-seat-slot { flex: none; width: 54px; height: 30px; border: 1.5px dashed var(--connect-seat-amber); border-radius: 9px; }
 .connect-seat-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; font-size: 12.5px; color: var(--connect-seat-mute); }
 .connect-seat-pills span { padding: 7px 11px; border: 1px solid var(--connect-seat-hair); border-radius: 999px; }
-.connect-seat-cta { margin-top: 26px; }
-.connect-seat-countries { margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--connect-seat-dim); text-align: center; }
+.connect-seat-countries { margin-top: 18px; font-size: 12.5px; line-height: 1.5; color: var(--connect-seat-dim); text-align: center; }
 .connect-seat-skeleton { display: flex; flex-direction: column; gap: 10px; }
 .connect-seat-skeleton span { height: 36px; width: 100%; background: var(--connect-seat-line); border-radius: 4px; }
 .connect-seat-skeleton span:nth-child(2) { width: 75%; }
-.connect-seat-skeleton span:last-child { height: 56px; margin-top: 26px; border-radius: 16px; }
+.connect-seat-skeleton-cta { height: 56px; background: var(--connect-seat-line); border-radius: 16px; }
+.connect-seat-skeleton-decline { height: 36px; margin-top: 12px; }

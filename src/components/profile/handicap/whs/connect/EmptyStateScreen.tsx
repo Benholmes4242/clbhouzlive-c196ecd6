@@ -1,6 +1,8 @@
 /** HS2: circle settlement alone owns intro readiness; profile supplies placement, never a course verdict.
  * Shared CTA/decline exports remain canonical for RoundsGate and ConnectGlance.
  * chooseCirclePeople defaults to four; this intro alone requests three.
+ * HS2_FOOTER: Stage owns scrolling content; shared FooterBar owns actions and the loading CTA.
+ * Embedded footer spacing mirrors EnglandGolfForm so setup hosts retain their gutter ownership.
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -12,7 +14,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { connectReach } from '@/lib/whs/connectReach';
 import { Button } from '@/components/ui/button';
 import { FONT } from './designTokens';
-import { Stage } from './Primitives';
+import { FooterBar, Stage } from './Primitives';
 import './connect-seat.css';
 
 interface Props {
@@ -138,7 +140,7 @@ const CircleList: React.FC<{ preview: CirclePreview; h: number }> = ({ preview, 
   </div>;
 };
 
-export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => {
+export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, layout = 'page' }) => {
   const { t } = useTranslation('handicap');
   const { user, loading: sessionLoading } = useSupabaseSession();
   const profile = useOwnIntroProfile(user?.id, !sessionLoading);
@@ -155,12 +157,13 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   }, [settled, h]);
   const { live, count } = connectReach();
   const cta = () => {
-    analyticsEvents.track('connect_intro_cta', { h, place: 'end', circle_shown: circleShown });
+    analyticsEvents.track('connect_intro_cta', { h, place: 'footer', circle_shown: circleShown });
     onPickCountry();
   };
-  return <Stage style={{ paddingBottom: 40, willChange: 'transform' }}>
+  return <>
+    <Stage style={{ willChange: 'transform' }}>
     <div className="connect-seat">
-      {!settled ? <div data-testid="connect-seat-skeleton" aria-busy="true" className="connect-seat-skeleton"><span /><span /><span /></div> : <>
+      {!settled ? <div data-testid="connect-seat-skeleton" aria-busy="true" className="connect-seat-skeleton"><span /><span /></div> : <>
         <h1 data-testid="connect-seat-headline" data-connected={circleShown ? preview?.connected : 0}>
           {circleShown ? t('whsConnect.intro.seatHeadline', { count: preview?.connected, defaultValue: preview?.connected === 1 ? '1 golfer you follow is already here' : `${preview?.connected} golfers you follow are already here` }) : t('whsConnect.intro.seatEmptyHeadline', { defaultValue: 'Connect your handicap' })}
         </h1>
@@ -169,11 +172,20 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
         <div className="connect-seat-pills">{[
           ['seatTime', 'Thirty seconds'], ['seatReadOnly', 'Read only'], ['seatEncrypted', 'Password encrypted'], ['seatDisconnect', 'Disconnect any time'],
         ].map(([key, text]) => <span key={key}>{t(`whsConnect.intro.${key}`, { defaultValue: text })}</span>)}</div>
-        <Button variant="ghost" className="connect-seat-cta" style={primaryCtaStyle} onClick={cta}>{t('whsConnect.intro.connectCta', { defaultValue: 'Connect your handicap' })}</Button>
         <div className="connect-seat-countries">{t('whsConnect.intro.seatCountries', { live, count, defaultValue: `${live} is live now, with ${count} more countries on the way.` })}</div>
-        {onDecline ? <DeclineButton style={{ marginTop: 22 }} onClick={onDecline} /> : null}
       </>}
     </div>
-  </Stage>;
+    <div style={{ height: 28 }} />
+    </Stage>
+    <FooterBar style={layout === 'embedded' ? { padding: '16px 0 8px', paddingBottom: 'calc(34px + env(safe-area-inset-bottom, 0px))' } : undefined}>
+      {!settled ? <>
+        <div className="connect-seat-skeleton-cta" data-testid="connect-seat-skeleton-cta" aria-hidden="true" />
+        {onDecline ? <div className="connect-seat-skeleton-decline" aria-hidden="true" /> : null}
+      </> : <>
+        <Button variant="ghost" className="connect-seat-cta" style={primaryCtaStyle} onClick={cta}>{t('whsConnect.intro.connectCta', { defaultValue: 'Connect your handicap' })}</Button>
+        {onDecline ? <DeclineButton style={{ marginTop: 12 }} onClick={onDecline} /> : null}
+      </>}
+    </FooterBar>
+  </>;
 };
 export default EmptyStateScreen;

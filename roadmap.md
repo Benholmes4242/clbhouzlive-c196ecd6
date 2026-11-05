@@ -1,5 +1,9 @@
 # Roadmap
 
+## HS2_FOOTER
+- [x] Move intro actions/loading CTA to shared FooterBar; preserve content/data/later stages, update only CTA place to footer.
+- [x] Focused 26/26; fresh shards 1,827 / 1,673 / 1,774 / 1,762 = 7,036 / 620, zero failures. Three added cases; two end→footer payload assertions/case names documented in HS2_FOOTER_REPORT.md. Interrupted shard3 log retained; separately rerun green. Preview build OK; browser/live checks unclaimed.
+
 ## HS2 — Handicap sync seat
 - [x] Replaced intro only with settled full/empty seat; preserved shared exports and later stages, removed unused course reader while retaining done-stage suffix helper.
 - [x] Focused 23/23; shards 1,824 / 1,673 / 1,774 / 1,762 = 7,033 / 620, zero failures. Net +6/+1 from 12 new cases minus six obsolete helper cases. Exact assertion ledger and logs in HS2_REPORT.md.
