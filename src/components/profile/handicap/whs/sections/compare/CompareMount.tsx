@@ -25,6 +25,11 @@ export const CompareMount: React.FC<Props> = ({ viewerUserId }) => {
   const [open, setOpen] = React.useState(false);
   const [target, setTarget] = React.useState<string | null>(null);
   const [from, setFrom] = React.useState<CompareSource>('circle');
+  // The sheet (and its reads) mounts on first open and then stays mounted, so
+  // a page that only might compare (another member's profile) reads nothing
+  // until compare is asked for, and close animations are unchanged after that.
+  const [everOpened, setEverOpened] = React.useState(false);
+  React.useEffect(() => { if (open) setEverOpened(true); }, [open]);
 
   React.useEffect(() => {
     if (!paramTarget) return;
@@ -53,7 +58,7 @@ export const CompareMount: React.FC<Props> = ({ viewerUserId }) => {
     }
   };
 
-  if (!viewerUserId) return null;
+  if (!viewerUserId || (!open && !everOpened)) return null;
 
   return (
     <CompareSheet
