@@ -1,5 +1,48 @@
 # Pro status controls — STOPPED
 
+## Type-error-only repair — 2026-11-05 12:25 UTC
+
+Replaced `linked: !!null, connected: !!null` with the runtime-identical `linked: false, connected: false` in the new A lines only: ep1EditProfile:18, ep2EditProfileYou:19, ep4LinksPrivacy:31, st3SettingsPrivacy:30. No assertion, case name, expected value, existing fixture logic or product code changed. No tests rewritten/deleted/added; inventory remains 6,874 / 607 before and after, delta 0.
+
+`bunx vitest run src/test/ep1EditProfile.test.tsx src/test/ep2EditProfileYou.test.tsx src/test/ep4LinksPrivacy.test.tsx src/test/st3SettingsPrivacy.test.tsx --maxWorkers=2`: **81/81 passed / four files**. Full output: `docs/verification/pro-standing-fixtures/type-fix-focused.log`. Harness `2026-11-05T12:25:33Z`: **build OK**. The historical TS2873 below is resolved; the ST2 shard-3 stop remains unchanged. No shards or ST2 rerun in this type-only repair; report retained.
+
+## Standing fixture rule — 2026-11-05 12:25 UTC
+
+Applied only authorised A/B additions; no product code, assertion, expected value or case name changed. No tests added/deleted/renamed/rewritten; expected inventory remains **6,874 tests / 607 files**, delta **0**.
+
+| File | Rule | Added line(s) |
+|---|---|---|
+| src/test/ep4LinksPrivacy.test.tsx | A, null connection | 31 |
+| src/test/st3SettingsPrivacy.test.tsx | A, null connection | 30 |
+| src/test/hb6Group1.test.tsx | B | 18 |
+| src/test/headerB1.test.tsx | B | 34 |
+| src/test/islandsNav.test.tsx | B | 56 |
+| src/test/ep1EditProfile.test.tsx | A + B (EditProfilePro reads status directly) | 18–19 |
+| src/test/ep2EditProfileYou.test.tsx | A + B (EditProfilePro reads status directly) | 19–20 |
+| src/test/st2SettingsHandicapCard.test.tsx | B | 20 |
+
+Commands: `bunx vitest run --maxWorkers=2 --shard=n/4`.
+
+| Shard | Passed | Failed | Files | Evidence |
+|---|---:|---:|---:|---|
+| 1, retained prior run | 1,753 | 0 | 152 | docs/verification/fix-unblock-1/shard1.log |
+| 2, fresh | 1,663 | 0 | 152 | docs/verification/pro-standing-fixtures/shard2.log |
+| 3, first run | 1,694 | 43 | 152 | docs/verification/pro-standing-fixtures/shard3.log |
+| 3, authorised repaired run | 1,726 | 11 | 152 | docs/verification/pro-standing-fixtures/shard3-repaired.log |
+| 4 | Not run | — | — | Stopped |
+
+Unique latest executed totals including retained shard 1: **5,142 passed + 11 failed = 5,153 / 456 files**. Fresh shards 2–3: **3,389 passed + 11 failed = 3,400 / 304 files**. The remaining expected **1,721 tests / 151 files** belong to unrun shard 4; this is not a test-count delta or a full-suite pass.
+
+The two EP files' missing-useHandicapTrend failures are resolved. ST2 still fails after its one authorised B line: **STOP**, no second fixture edit or shard 4. First surviving error at `src/test/st2SettingsHandicapCard.test.tsx:48:33`:
+`TestingLibraryElementError: Unable to find an accessible element with the role "button" and name /England Golf.*Connected · synced.*Manage/`
+Other surviving cases are at lines 51, 52, 53, 54, 55 (two parameter cases), 56, 59, 61 (connected=true), 62. Full tool output is retained in the repaired shard log. These are newly observed fixture failures, not claimed pre-existing flakes.
+
+The exact A template with null substituted produces a surviving type error. Latest harness entry `2026-11-05T12:20:07Z`:
+`src/test/ep1EditProfile.test.tsx(18,91): error TS2873: This kind of expression is always falsy.`
+Same TS2873 at columns 91/110 in ep1 line 18, ep2 line 19, ep4 line 31, st3 line 30. This comes from `!!null`; no further edit made after the required stop. Build is not clean.
+
+Report retained: all-four-green deletion condition not met. All standing SQL/migration/server/feed_config/native/Median prohibitions preserved; round_pool_cap untouched. No browser check requested or performed in this fixture continuation.
+
 ## Fixture authorisation continuation — 2026-11-05
 
 Only test files and this report/roadmap changed in this continuation; no product code changed.

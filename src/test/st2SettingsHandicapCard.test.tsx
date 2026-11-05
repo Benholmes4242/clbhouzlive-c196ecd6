@@ -17,6 +17,7 @@ const h = vi.hoisted(() => ({
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: { id: 'me', is_public: true, eg_handicap_index: h.eg, manual_handicap_index: h.manual, hide_handicap_chip: h.hidden }, loading: false, error: h.profileError ? new Error('profile failed') : null }) }));
 vi.mock('@/lib/whs/hooks', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/whs/hooks')>(), useWhsConnection: () => ({ data: h.connection, isFetched: h.fetched, isError: h.connectionError }) }));
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
 vi.mock('@/hooks/profile/useMemberRoundTotal', () => ({ useMemberRoundTotal: () => ({ total: h.total, state: h.totalState }) }));
 vi.mock('@/hooks/useMyBusinesses', () => ({ useHasBusinesses: () => ({ count: 0 }) }));
 vi.mock('@/hooks/useMyRequests', () => ({ useMyRequestsList: () => ({ data: [], isLoading: false, isError: false, error: null }) }));

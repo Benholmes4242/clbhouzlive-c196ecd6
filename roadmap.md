@@ -1,5 +1,12 @@
 # Roadmap
 
+## Pro status standing fixture rule
+- [x] Added exactly one authorised settled-amateur line to each of the five shard-2 files; no assertions, expected values or case names changed.
+- [x] Shard 2 passes 1,663. Shard 3 matching failures repaired with A+B in ep1/ep2 and B in st2; no assertions changed.
+- [ ] STOP: repaired shard 3 has 1,726 pass / 11 fail, all st2SettingsHandicapCard after its authorised line; shard 4 not run. Await further authorisation; complete evidence and line inventory in retained PRO_STATUS_CONTROLS_REPORT.md.
+- [x] Type-only repair: replaced !!null with identical false values in four new A fixture lines; assertions unchanged; focused 81/81 pass, harness build OK 2026-11-05T12:25:33Z. ST2 stop preserved.
+- [ ] Delete PRO_STATUS_CONTROLS_REPORT.md only once all four shards pass; preserve historical failing logs and give final counts/fixture inventory in reply.
+
 ## FIX_UNBLOCK_1
 - [x] Read authorisation; repair only missing-export failures, fix the two authorised new test fixtures, restore always-burger hub and handler comment without changing handler code.
 - [x] Specified focused set passes 272/272; repaired headerB1/islandSquircle/hb6Group1 guest mocks and ep4LinksPrivacy/st3SettingsPrivacy trend exports, preserving overrides and assertions; FIX_UNBLOCK_1_REPORT.md lists every line.
