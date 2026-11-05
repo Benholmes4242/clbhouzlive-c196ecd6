@@ -15,7 +15,7 @@ import { ProfileRoundVideos, RoundVideoPill } from '@/features/creator/ProfileRo
 import type { RoundVideo } from '@/features/creator/profileCreator';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
 import { LinkedHandicapNotice } from '../hero/LinkedHandicapNotice';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { CHART } from '@/components/profile/handicap/whs/charts/tokens';
@@ -61,8 +61,8 @@ type Item = { kind: 'head'; key: string; title: string } | { kind: 'row'; r: Pro
 /** Only the empty owner surface needs link state; populated/visitor histories
  * retain their existing query ownership and never mount a connection invite. */
 function EmptyRoundsConnection({ userId, children }: { userId: string; children: React.ReactNode }) {
-  const chip = useHandicapChipState(userId);
-  if (!chip.settled) return null;
+  const chip = useOwnHandicapState(userId);
+  if (!chip.settled || chip.pro) return null;
   if (chip.linked) return <div style={{ padding: '24px 20px 32px', fontFamily: SANS }}>
     <LinkedHandicapNotice provider={chip.connection?.provider} />
   </div>;

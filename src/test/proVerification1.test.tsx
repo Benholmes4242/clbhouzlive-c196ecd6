@@ -222,11 +222,13 @@ describe('BRIEF 1 §5 — Edit profile pills', () => {
     render(<EditProfilePro userId="me" />);
     expect(screen.getByTestId('ep-pro').textContent).toContain(pill);
   });
-  it('a verified row never opens the sheet; every other state does', () => {
+  it('a verified row opens status; every other state opens details', () => {
     Object.assign(f.pro, { verified: true, kind: 'tour_pro', tour: 'PGA TOUR' });
-    render(<EditProfilePro userId="me" />);
+    const qc = new QueryClient();
+    render(<QueryClientProvider client={qc}><EditProfilePro userId="me" /></QueryClientProvider>);
     fireEvent.click(screen.getByRole('button', { name: /Golf professional/ }));
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Stop showing me as a pro' })).toBeInTheDocument();
     cleanup();
     Object.assign(f.pro, { verified: false, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' });
     render(<EditProfilePro userId="me" />);

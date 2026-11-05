@@ -25,6 +25,7 @@ import { syncLabel, validOwnHandicap } from './golfRules';
 export type GolfFields = 'handicap' | 'homeClub' | 'additionalClubs';
 export type GolfPatch = Partial<Pick<ProfileFormData, 'handicapIndex' | 'homeClubName' | 'primaryClubId' | 'additionalClubs'>>;
 interface Props {
+  isPro?: boolean;
   userId: string;
   form: ProfileFormData;
   egHandicapIndex: number | null;
@@ -41,7 +42,7 @@ export const EditProfileGolf = forwardRef<GolfActions, Props>(function EditProfi
   const { topTen } = useUserTopTenCourses(p.userId);
   const [sheet, setSheet] = useState<GolfFields | 'topTen' | null>(null);
   const coachRow = useRef<CoachRowActions>(null);
-  useImperativeHandle(ref, () => ({ open: key => { if (key === 'coach') coachRow.current?.open(); else if (key === 'homeClub') pick(false); else setSheet(key); } }));
+  useImperativeHandle(ref, () => ({ open: key => { if (key === 'handicap' && p.isPro) return; if (key === 'coach') coachRow.current?.open(); else if (key === 'homeClub') pick(false); else setSheet(key); } }));
   const [busy, setBusy] = useState(false);
   const close = () => { if (!busy) setSheet(null); };
   const resolved = resolveDisplayHandicap({ egHandicapIndex: p.egHandicapIndex, manualHandicapIndex: p.manualHandicapIndex, hasWhsConnection: !!p.connection });
@@ -68,13 +69,13 @@ export const EditProfileGolf = forwardRef<GolfActions, Props>(function EditProfi
   return <>
     <div className="ep-group">Your golf</div>
     <div className="ep-rows" data-testid="ep-golf">
-      {row('handicap', 'Handicap', resolved.value != null ? <>{formatHcp(resolved.value)}{resolved.source === 'whs' ? ` · ${body}` : <span className="ep-golf-mute"> Your own</span>}</> : 'Connect your handicap', resolved.value == null, () => setSheet('handicap'), resolved.source === 'whs' && resolved.value != null ? 'Synced' : undefined)}
+      {!p.isPro && row('handicap', 'Handicap', resolved.value != null ? <>{formatHcp(resolved.value)}{resolved.source === 'whs' ? ` · ${body}` : <span className="ep-golf-mute"> Your own</span>}</> : 'Connect your handicap', resolved.value == null, () => setSheet('handicap'), resolved.source === 'whs' && resolved.value != null ? 'Synced' : undefined)}
       {row('homeClub', 'Home club', pending ? <>{pending} · <span className="ep-golf-mute">pending</span></> : p.form.homeClubName || 'Add your home club', !pending && !p.form.homeClubName, () => pick(false))}
       {row('additionalClubs', 'Other clubs', clubs.length ? <>{clubs[0]?.name}{clubs.length > 1 && <span className="ep-golf-mute"> +{clubs.length - 1}</span>}</> : 'Add a club', !clubs.length, () => setSheet('additionalClubs'))}
       <YourCoachRow ref={coachRow} viewerId={p.userId} appearance="editProfile" />
       {row('topTen', 'Top 10', topTen.length ? `${topTen.length} of 10 chosen` : 'Pick your ten courses', !topTen.length, () => setSheet('topTen'))}
     </div>
-    {sheet === 'handicap' && <HandicapSheet connected={!!p.connection} value={resolved.value} own={p.form.handicapIndex || formHcpFromDb(p.manualHandicapIndex)} body={body} syncedAt={p.connection?.last_synced_at ?? null} busy={busy} onClose={close} onNavigate={path => { close(); navigate(path); }} onSave={async handicapIndex => { if (await save('handicap', { handicapIndex })) setSheet(null); }} />}
+    {!p.isPro && sheet === 'handicap' && <HandicapSheet connected={!!p.connection} value={resolved.value} own={p.form.handicapIndex || formHcpFromDb(p.manualHandicapIndex)} body={body} syncedAt={p.connection?.last_synced_at ?? null} busy={busy} onClose={close} onNavigate={path => { close(); navigate(path); }} onSave={async handicapIndex => { if (await save('handicap', { handicapIndex })) setSheet(null); }} />}
     {sheet === 'additionalClubs' && <BizcSheet title="Other clubs" testId="ep-sheet-additionalClubs" onDone={close} actionDisabled={busy}>
       <div className="ep-rows ep-golf-list">{clubs.map(c => <ClubRow key={c.id} id={c.clubId} name={c.name}><Button variant="ghost" size="icon" className="ep-golf-remove" aria-label={`Remove ${c.name}`} disabled={busy} onClick={() => void save('additionalClubs', { additionalClubs: clubs.filter(other => other.id !== c.id) })}><X size={16} /></Button></ClubRow>)}
         <Button variant="ghost" className="ep-golf-add" disabled={busy} onClick={() => pick(true)}><span aria-hidden="true"><Plus size={16} /></span>Add a club</Button>

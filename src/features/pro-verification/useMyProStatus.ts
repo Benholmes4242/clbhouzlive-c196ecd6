@@ -14,6 +14,7 @@ import { isProKind, type ProKind, type ProRequestRow } from './proRules';
 
 export interface MyProStatus {
   verified: boolean;
+  verifiedAt?: string | null;
   pending: boolean;
   declined: boolean;
   kind: ProKind | null;
@@ -66,6 +67,7 @@ export function useMyProStatus(userId: string | undefined): MyProStatus {
 
   return {
     verified,
+    verifiedAt: typeof p?.pro_verified_at === 'string' ? p.pro_verified_at : null,
     pending,
     declined,
     kind: isProKind(rawKind) ? rawKind : null,

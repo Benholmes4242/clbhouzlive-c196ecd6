@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import CountryFlag from '@/components/ui/country-flag';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import {
@@ -140,6 +141,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const ownHandicap = useOwnHandicapState(user?.id);
   const [searchParams, setSearchParams] = useSearchParams();
   const { sentinelRef, stuck: condensed } = useStickySafeAreaState();
   const loadSentinelRef = useRef<HTMLDivElement | null>(null);
@@ -848,7 +850,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                 country,
               })}
             </p>
-            <button
+            {ownHandicap.settled && !ownHandicap.pro && <button
               type="button"
               onClick={() => {
                 analyticsEvents.track('stat_browse_connect_tapped', {
@@ -861,7 +863,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               style={{ background: AMBER }}
             >
               {t('statBrowse.empty.connect')}
-            </button>
+            </button>}
             <button
               type="button"
               onClick={() => openDirectory(country, 'empty_state')}

@@ -39,7 +39,9 @@ import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useHandicapHistory } from '@/lib/whs/hooks';
-import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
+import { ProLabel } from '@/features/pro-verification/ProLabel';
+import '@/features/pro-verification/pro-status-controls.css';
 import { useIslandsCondensed } from './useIslandsCondensed';
 import { IslandBackCapsule } from './IslandBackCapsule';
 import { IndexGlance } from './IndexGlance';
@@ -360,10 +362,10 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string; fold?: 
   const [glanceOpen, setGlanceOpen] = useState(false);
   const indexButtonRef = useRef<HTMLButtonElement>(null);
 
-  // ONE DEFINITION, SHARED: useHandicapChipState owns "is this member connected"
+  // ONE DEFINITION, SHARED: useOwnHandicapState owns "is this member connected"
   // and "has that read settled", so the Explore Scores connect invitation and
   // this chip can never disagree about it.
-  const hcp = useHandicapChipState(user?.id);
+  const hcp = useOwnHandicapState(user?.id);
   const connection = hcp.connection;
   const trendData = hcp.trend;
   const { data: hcpHistory } = useHandicapHistory(connection?.id, 'all');
@@ -373,13 +375,14 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string; fold?: 
   // settled and fall through to the disconnected pill (mirrors WhsHandicapTab).
   const anyError = profileError || hcp.anyError;
   const settled =
-    anyError ||
+    (anyError && hcp.settled) ||
     // eslint-disable-next-line settled/no-not-loading-empty-check -- the expression already requires profileFetched and the shared hook's own settled flag.
     (!sessionLoading && profileFetched && hcp.settled);
 
   if (!user) return null;
   if (isBusinessActor) return null;
   if (!settled) return null;
+  if (hcp.pro) return <><HcpDivider color={dividerColor} fold={fold} condensed={condensed} /><Button variant="ghost" className="pro-island-cell" aria-label="Your profile" onClick={() => navigate('/profile')}><ProLabel size="large" /><span className="pro-island-detail">{hcp.proKind === 'tour_pro' ? hcp.proTour : hcp.proClub}</span></Button></>;
   if (profile?.hide_handicap_chip) return null;
 
 

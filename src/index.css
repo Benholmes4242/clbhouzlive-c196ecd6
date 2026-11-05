@@ -36,6 +36,15 @@
 }
 
 :root {
+  --pro-controls-canvas: #0A0A0C;
+  --pro-controls-card: #17171B;
+  --pro-controls-sheet: #16161A;
+  --pro-controls-confirm: #1E1E23;
+  --pro-controls-ink: #F8FAFC;
+  --pro-controls-muted: rgba(248,250,252,0.62);
+  --pro-controls-dim: rgba(248,250,252,0.42);
+  --pro-controls-hair: rgba(255,255,255,0.08);
+  --pro-controls-rule: rgba(255,255,255,0.14);
   --featured-white: #FFFFFF;
   --featured-ink: #F8FAFC;
   --featured-amber: #F7931E;
