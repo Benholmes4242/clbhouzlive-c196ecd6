@@ -1,5 +1,9 @@
 # Roadmap
 
+## Pro polish
+- [ ] Apply pending no-handicap states, small island label/captions, Settings pending and inert pro privacy; add Admin Verified via authorised RPC and visible-row pro reads.
+- [ ] Add scoped tests and exact assertion ledger; run ordered shards, stopping on failures and preserving CH1 untouched.
+
 ## FIX6 — Sign-up and pro fixes
 - [x] Implemented reachable cropper containment/zoom, shared comments material, account media-query paint, member-only settled setup guard/error routing/step-one Skip, pro focus/copy. Legacy unmounted personal modal left unchanged.
 - [x] Added 17 tests/3 files; focused 107/107 and surfaces 22/22. Exact old/new assertion/string ledger in FIX6_SIGNUP_PRO_REPORT.md; source inventory expected 6,997/617 including CH1, not full-suite passing total.

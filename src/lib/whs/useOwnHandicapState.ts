@@ -6,6 +6,6 @@ import { useMyProStatus } from '@/features/pro-verification/useMyProStatus';
 export function useOwnHandicapState(userId: string | undefined, options?: { island?: boolean }) {
   const chip = useHandicapChipState(userId);
   const status = useMyProStatus(userId);
-  return { ...chip, pro: status.verified, proKind: status.kind, proTour: status.tour,
+  return { ...chip, pro: status.verified, proPending: status.pending, noHandicap: status.verified || status.pending, proKind: status.kind, proTour: status.tour,
     proClub: status.club, settled: chip.settled && (options?.island ? status.verifiedKnown : !status.unknown) };
 }

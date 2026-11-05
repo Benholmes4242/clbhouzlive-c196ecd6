@@ -14,7 +14,7 @@ import { ProLabel } from '@/features/pro-verification/ProLabel';
 import '@/features/pro-verification/pro-status-controls.css';
 
 interface Props {
-  pro?: { kind: 'tour_pro' | 'teaching_pro' } | null;
+  pro?: { kind: 'tour_pro' | 'teaching_pro'; pending?: boolean } | null;
   hideSwitch?: boolean;
   userId?: string;
   connection: WhsConnection | null | undefined;
@@ -43,7 +43,7 @@ export function SettingsHandicapCard(p: Props) {
     </div>
   );
   return <section className="st2-handicap" data-testid="st2-handicap-card">
-    {p.pro ? <><div className="pro-status-card-head"><h3 className="st2-name">Official handicap</h3><ProLabel size="large" /></div><p className="st2-line st2-disconnected-line">You're verified as {p.pro.kind === 'tour_pro' ? 'a tour professional' : 'a teaching professional'}, so there's no handicap here and no prompts to connect one.</p></> : connected ? <>
+    {p.pro ? <><div className="pro-status-card-head"><h3 className="st2-name">Official handicap</h3>{p.pro.pending ? <span className="pro-being-checked">BEING CHECKED</span> : <ProLabel size="large" />}</div><p className="st2-line st2-disconnected-line">{p.pro.pending ? "You've asked to be verified as a pro, so there's nothing to connect while we check. If we can't verify you, this opens up again." : <>You're verified as {p.pro.kind === 'tour_pro' ? 'a tour professional' : 'a teaching professional'}, so there's no handicap here and no prompts to connect one.</>}</p></> : connected ? <>
       <Button variant="ghost" className="st2-top" onClick={p.onManage}>
         <span className="st2-identity"><span className="st2-name">{bodyNameForProvider(p.connection?.provider)}</span>
           <span className="st2-status">{p.connection?.last_synced_at ? `Connected · synced ${formatRelativeAgoLong(p.connection.last_synced_at)}` : 'Connected'}</span>
@@ -58,7 +58,7 @@ export function SettingsHandicapCard(p: Props) {
       <Button variant="ghost" className="st2-connect" onClick={p.onManage}>Connect your handicap</Button>
     </>}
     {!p.hideSwitch && <div className={`st2-switch-row${!p.pro && connected ? '' : ' st2-disconnected-switch'}${p.pro ? ' pro-status-switch' : ''}`}>
-      <span className="st2-switch-copy">{p.pro ? 'Connect prompts' : switchTitle}<small>{p.pro ? "Off while you're a verified pro" : connected ? 'The handicap button beside search' : 'On your profile and in the top bar'}</small></span>
+      <span className="st2-switch-copy">{p.pro ? 'Connect prompts' : switchTitle}<small>{p.pro ? p.pro.pending ? 'Off while we check' : "Off while you're a verified pro" : connected ? 'The handicap button beside search' : 'On your profile and in the top bar'}</small></span>
       <Button variant="ghost" role="switch" aria-label={p.pro ? 'Connect prompts' : switchTitle} aria-checked={p.pro ? false : p.checked} disabled={!!p.pro || p.updating} className="bizc-switch st2-switch" onClick={() => { if (!p.pro) p.onToggle(!p.checked); }}><i aria-hidden="true" /></Button>
     </div>}
   </section>;
