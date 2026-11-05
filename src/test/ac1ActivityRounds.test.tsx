@@ -129,15 +129,18 @@ describe('AC1 round rows', () => {
 });
 describe('AC1 Tour system rows', () => {
   const system = { ...row, notif_type: 'tour_roundup', data: { tour_short_name: 'DPWT' }, actor_user_id: null, actor_display_name: null, message: 'Tour result' };
-  it('uses carried short-name text and Tour-prefixed time', () => {
+  it('uses the trophy tile and carried short-name meta', () => {
     const { container } = mount(undefined, system);
-    expect(screen.getByTestId('activity-tour-tile')).toHaveTextContent('DPWT');
-    expect(container.querySelector('.activity-round-meta')).toHaveTextContent(/^Tour · /);
+    expect(screen.getByTestId('activity-tour-tile').querySelector('svg')).not.toBeNull();
+    expect(screen.getByTestId('activity-tour-tile').textContent).toBe('');
+    expect(container.querySelector('.activity-round-meta')).toHaveTextContent(/^DPWT · /);
     expect(container.querySelector('.lucide-bell')).toBeNull();
   });
   it('falls back to Tour without inventing a short name', () => {
-    mount(undefined, { ...system, data: {} });
-    expect(screen.getByTestId('activity-tour-tile')).toHaveTextContent('Tour');
+    const { container } = mount(undefined, { ...system, data: {} });
+    expect(screen.getByTestId('activity-tour-tile').querySelector('svg')).not.toBeNull();
+    expect(screen.getByTestId('activity-tour-tile').textContent).toBe('');
+    expect(container.querySelector('.activity-round-meta')).toHaveTextContent(/^Tour · /);
   });
   it('keeps the Bell on a non-Tour system row', () => {
     const { container } = mount(undefined, { ...system, notif_type: 'system', data: {} });

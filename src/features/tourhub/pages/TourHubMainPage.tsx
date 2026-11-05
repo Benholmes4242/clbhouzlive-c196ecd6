@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourPageShell } from '../components/TourPageShell';
@@ -118,10 +118,10 @@ function TourHubChromeBridge({
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  /* The left capsule on the hub is ALWAYS the burger. The hub is a bottom-nav
-     destination, so a back chevron there is wrong regardless of how the member
-     arrived. */
-  const backMode = false;
+  const location = useLocation();
+  // Bottom-nav arrivals retain their menu; Activity pushes retain a back door.
+  // Global ScrollRestoration resets fresh non-POP pathname arrivals to zero.
+  const backMode = location.key !== 'default' && location.state?.from !== 'nav';
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(legacyTabRedirect(searchParams) ? 'players' : tabParam || 'overview');
   /* Owned here, not in the bridge: the sub-page shell suppresses the island, so

@@ -7,6 +7,7 @@
 import React, { useEffect, useRef } from 'react';
 import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { ChevronRight } from 'lucide-react';
+import TrophyIcon from '@/components/icons/TrophyIcon';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
@@ -270,8 +271,7 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
   const location = useLocation();
   const spec = resolveKind(row);
   const isRound = !!activityRoundId(row);
-  const destination = getActivityLink(row);
-  const isTour = spec.isSystem && /^\/tour(?:\/|\?|$)/.test(destination);
+  const isTour = spec.isSystem && (row.notif_type === 'tour_preview' || row.notif_type === 'tour_roundup');
   const tourShortName = typeof row.data?.tour_short_name === 'string' && row.data.tour_short_name.trim() ? row.data.tour_short_name : 'Tour';
   // C4 — only the daily-cap winner returns a candidate; RPC does all gating.
   const sharePrompt = useSharePromptFor(row.notif_id);
@@ -363,7 +363,7 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
   // ------- Left visual -------
   let leftVisual: React.ReactNode = null;
   if (isTour) {
-    leftVisual = <div className="activity-tour-tile" data-testid="activity-tour-tile">{tourShortName}</div>;
+    leftVisual = <div data-testid="activity-tour-tile" style={{width:40,height:40,borderRadius:12,background:ACT.GREEN_SOFT,color:ACT.GREEN,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><TrophyIcon width={18} height={18} aria-hidden /></div>;
   } else if (spec.left === 'tile' && spec.tile) {
     leftVisual = <IconTile spec={spec.tile} />;
   } else if (spec.left === 'stacked_likers') {
@@ -517,7 +517,7 @@ export const LedgerRow: React.FC<Props> = ({ row, roundSummary, onMarkRead, onLo
           {bodyNode}
         </div>
         <div className={isTour ? 'activity-round-meta' : undefined} style={isTour ? undefined : { fontSize: 11, fontWeight: 500, color: ACT.INK_45, marginTop: 2 }}>
-          {isTour && 'Tour · '}{relativeTime(row.created_at)}
+          {isTour && `${tourShortName} · `}{relativeTime(row.created_at)}
         </div>
         </>}
         {sharePrompt && <SharePromptAction candidate={sharePrompt} />}

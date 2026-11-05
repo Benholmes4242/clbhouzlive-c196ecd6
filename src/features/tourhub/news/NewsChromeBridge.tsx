@@ -20,13 +20,14 @@ interface NewsChromeBridgeProps {
   label: 'Tour News' | 'Amateur News';
   mode: 'menu' | 'back';
   backFallback: string;
+  titleInPage?: boolean;
 }
 
 /**
  * The solid, notch-safe news header shared by both story pages and the Wire
  * index. It suppresses the global floating island and owns its content offset.
  */
-export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridgeProps) {
+export function NewsChromeBridge({ label, mode, backFallback, titleInPage = false }: NewsChromeBridgeProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
@@ -36,6 +37,21 @@ export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridge
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const avatarRef = useRef<HTMLButtonElement>(null);
+  const titleSlotRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const [titleFits, setTitleFits] = useState(false);
+
+  useLayoutEffect(() => {
+    const slot = titleSlotRef.current;
+    const text = titleRef.current;
+    if (!slot || !text) return;
+    let frame = 0;
+    const measure = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(() => setTitleFits(text.scrollWidth <= slot.clientWidth)); };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(slot);
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); };
+  }, [label, mode, titleInPage]);
 
   useSetChromeSuppressed(true);
 
@@ -61,13 +77,13 @@ export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridge
 
   return (
     <>
-      <header style={{ position: 'fixed', inset: '0 0 auto', zIndex: Z.header, paddingTop: 'env(safe-area-inset-top, 0px)', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS }}>
+      <header aria-label={label} style={{ position: 'fixed', inset: '0 0 auto', zIndex: Z.header, paddingTop: 'env(safe-area-inset-top, 0px)', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS }}>
         <div style={{ position: 'relative', height: 47, display: 'flex', alignItems: 'center', padding: '0 12px' }}>
-          <Button type="button" variant="ghost" size="icon" aria-label={mode === 'back' ? 'Back' : 'Tour menu'} onClick={mode === 'back' ? back : () => setMenuOpen(true)} style={{ width: 36, height: 36, padding: 0, color: A.INK }}>
+          <Button type="button" variant="ghost" size="icon" aria-label={mode === 'back' ? 'Back' : 'Tour menu'} onClick={mode === 'back' ? back : () => setMenuOpen(true)} style={{ width: 36, height: 36, padding: 0, color: A.INK, flexShrink:0 }}>
             {mode === 'back' ? <ArrowLeft size={19} strokeWidth={2.2} aria-hidden /> : <Menu size={19} strokeWidth={2.2} aria-hidden />}
           </Button>
-          {mode === 'menu' && <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', color: A.INK, fontSize: 16, fontWeight: 700, whiteSpace: 'nowrap', pointerEvents: 'none' }}>{label}</div>}
-          <div style={{ marginLeft: 'auto', height: 36, display: 'flex', alignItems: 'center', gap: 9 }}>
+          {mode === 'menu' && !titleInPage && <div ref={titleSlotRef} data-news-title-slot style={{flex:'1 1 auto',minWidth:0,margin:'0 8px',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',pointerEvents:'none'}}><span ref={titleRef} data-news-bar-title aria-hidden={!titleFits} style={{display:'inline-block',visibility:titleFits?'visible':'hidden',color:A.INK,fontSize:16,fontWeight:700}}>{label}</span></div>}
+          <div style={{ marginLeft: 'auto', height: 36, display: 'flex', alignItems: 'center', gap: 9, flexShrink:0 }}>
             <Button type="button" variant="ghost" size="icon" aria-label="Search" onClick={() => setSearchOpen(true)} style={{ width: 30, height: 34, padding: 0, color: A.INK }}><Search size={16} strokeWidth={2.3} aria-hidden /></Button>
             <HcpCell tone="dark" dividerColor={A.BORDER} />
             {isLoading || !activeActor ? <SquircleAvatar size={34} alt="" hideRing /> : <AvatarCell tone="dark" triggerRef={avatarRef} onOpen={() => setProfileOpen((value) => !value)} />}
