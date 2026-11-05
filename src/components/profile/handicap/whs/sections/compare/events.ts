@@ -5,7 +5,7 @@
  * CompareMount mounted by HandicapPage subscribes and owns the sheet state.
  * Same pattern as whs/gam/events.ts.
  */
-export type CompareSource = 'circle' | 'deeplink' | 'friend_cta';
+export type CompareSource = 'circle' | 'deeplink' | 'friend_cta' | 'profile';
 
 type Listener = (payload: { targetUserId?: string; from: CompareSource }) => void;
 

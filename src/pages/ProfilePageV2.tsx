@@ -18,7 +18,7 @@ import { renamedProfilePath, resolvePreviousUsername } from '@/lib/profile/previ
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
-import { compareRouteFor, useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useProfileCreator, creatorTab } from '@/features/creator/profileCreator';
 import { ProfileVideosTab, CreatorContentSkeleton } from '@/features/creator/ProfileVideosTab';
@@ -115,6 +115,8 @@ import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/Str
 import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
+import { compareBus } from '@/components/profile/handicap/whs/sections/compare/events';
+import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { useDeepLinkTabScroll } from '@/hooks/useDeepLinkTabScroll';
 import { useProfileRoundsCount } from '@/components/profile/rounds/useProfileRounds';
 
@@ -335,6 +337,7 @@ const ProfilePageV2Content: React.FC = () => {
     friendshipStatus !== 'friends';
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const scorecard = useScorecardOpener();
   // 'stats' is the legacy id of the handicap tab: accepted, mapped on read,
   // never emitted.
   const tabFromParam = (tabParam: string | null): string => {
@@ -475,12 +478,31 @@ const ProfilePageV2Content: React.FC = () => {
     }
   }, [activeSection, profile?.id, isSelf, visibleRoundCount, setSearchParams]);
 
-  // ?tab=handicap (or legacy ?tab=stats) on SOMEONE ELSE's profile: their
-  // handicap is private, so compare against them, sheet already open.
+  // FIX_PROFILE_COMPARE_1 §1/§2: on SOMEONE ELSE's profile compare opens in
+  // place over their profile (one CompareMount, no navigation, no history).
+  const canCompareInPlace = !isSelf && !!user?.id && user.is_anonymous !== true && !!profileUserId;
+  // ?tab=handicap (or legacy ?tab=stats) there is stripped back to the default
+  // tab with replace, and compare opens in place. Never navigates elsewhere.
   useEffect(() => {
-    if (activeSection !== 'handicap' || authLoading || !profile?.id || isSelf) return;
-    navigate(compareRouteFor(profile.id), { replace: true });
-  }, [activeSection, authLoading, isSelf, profile?.id, navigate]);
+    if (activeSection !== 'handicap' || authLoading || !profile?.id || isSelf || profile.id !== profileUserId) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('tab');
+    setSearchParams(next, { replace: true });
+    setActiveSection(tabFromParam(creatorTab(null, isCreator, creatorPending)));
+    if (canCompareInPlace) compareBus.emit({ targetUserId: profile.id, from: 'profile' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection, authLoading, isSelf, profile?.id, profileUserId]);
+  // The page instance is reused between /profile and /profile/:username, so a
+  // tab chosen on one profile must never carry over to the next.
+  const viewedProfileKey = `${profileUserId ?? ''}|${routeUsername ?? ''}`;
+  const lastViewedProfileKey = useRef(viewedProfileKey);
+  useEffect(() => {
+    if (lastViewedProfileKey.current === viewedProfileKey) return;
+    lastViewedProfileKey.current = viewedProfileKey;
+    setActiveSection(urlTab);
+    scorecard.close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewedProfileKey]);
 
   /* HANDICAP DEEP-LINK PARAMS - moved here with the surface from the retired
      /handicap page. Each effect strips ONLY its own param and never `tab`, so
@@ -957,6 +979,10 @@ const ProfilePageV2Content: React.FC = () => {
         <div className="relative z-10 pointer-events-auto">
           <ProfileHero
             userId={profile.id}
+            onOpenRound={(scoreId) => {
+              if (scorecard.target?.scoreId === scoreId) scorecard.close();
+              else scorecard.openByScore(scoreId, null, profileUserId);
+            }}
             viewerUserId={user?.id}
             isCreator={isCreator}
             proMember={proMember}
@@ -1161,6 +1187,10 @@ const ProfilePageV2Content: React.FC = () => {
               // Addendum B: the index block and the ROUNDS cell share one
               // destination - the profile's handicap surface. The legacy
               // ?tab=stats id redirects here anyway, so we go straight to it.
+              if (stat === 'index' && !isSelf && canCompareInPlace && profileUserId) {
+                compareBus.emit({ targetUserId: profileUserId, from: 'profile' });
+                return;
+              }
               if (stat === 'index' || stat === 'rounds') {
                 if (isSelf) navigate('/handicap');
                 else if (profileUserId) void resolveMemberTap({ targetUserId: profileUserId });
@@ -1493,14 +1523,21 @@ const ProfilePageV2Content: React.FC = () => {
       {showHandicapTab && profile?.id && user?.id && (
         <>
           <StreaksSheetMount />
-          <CompareMount viewerUserId={user.id} />
-          <RoundDetailSheet
-            open={!!deepLinkScoreId}
-            onClose={() => setDeepLinkScoreId(null)}
-            scoreId={deepLinkScoreId}
-            profileUserId={profile.id}
-          />
+          {!canCompareInPlace && <CompareMount viewerUserId={user.id} />}
         </>
+      )}
+      {canCompareInPlace && user?.id && <CompareMount viewerUserId={user.id} />}
+      {/* One RoundDetailSheet per page: form tiles (own and other profiles) and
+          the own-profile deep link share it. Mounted only while a round is
+          open, so profiles with no open round never read round data. Closing
+          never navigates. */}
+      {profile?.id && (scorecard.target?.scoreId ?? deepLinkScoreId) && (
+        <RoundDetailSheet
+          open={!!(scorecard.target?.scoreId ?? deepLinkScoreId)}
+          onClose={() => { scorecard.close(); setDeepLinkScoreId(null); }}
+          scoreId={scorecard.target?.scoreId ?? deepLinkScoreId}
+          profileUserId={scorecard.target?.profileUserId ?? profile.id}
+        />
       )}
     </PageRoot>
   );

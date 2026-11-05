@@ -87,13 +87,16 @@ interface Props {
   ownerFirstName?: string | null;
   onStatTap: (stat: 'index') => void;
   tap: (stat: 'index') => () => void;
-  navigate: NavigateFunction;
+  /** Kept for existing callers; form tiles no longer navigate. */
+  navigate?: NavigateFunction;
+  /** FIX_PROFILE_COMPARE_1: form tiles open the round sheet over the profile. */
+  onOpenRound?: (scoreId: string) => void;
   example?: boolean;
 }
 export const HeroHandicapDisplay: React.FC<Props> = ({
   t, shownIndex, deltaLines, slot, verdict, series, chartColor, chartFillTop,
   axisWindow, windowDays, bars, byId, countingKnown, countingN, loweredN,
-  tilesWord, isSelf, ownerFirstName, onStatTap, tap, navigate, example = false,
+  tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false,
 }) => {
   return (
           <div style={{ marginTop: 14 }}>
@@ -170,7 +173,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                         tabIndex={example ? -1 : undefined}
                         onClick={example ? undefined : () => {
                           analyticsEvents.track('profile_form_tile_tap', { whs_score_id: bar.id, position: i + 1 });
-                          navigate(`/round/${bar.id}`);
+                          onOpenRound?.(bar.id);
                         }}
                         style={{
                           minWidth: 0,
