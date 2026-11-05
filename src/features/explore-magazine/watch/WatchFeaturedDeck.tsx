@@ -43,7 +43,8 @@ export function WatchFeaturedSlot(props: SlotProps) {
     }
   }, [fallbackReason, props.userId]);
   if (!props.userId) return <WatchLead userId={props.userId} onDepart={props.onDepart} />;
-  if (!featured.isFetched && !featured.isError) return <div data-watch-lead="skeleton" aria-hidden style={{ margin:'22px 16px 0', height:440, borderRadius:20, background:'var(--explore-top-panel)' }} />;
+  // Loading only expands outwards: Featured's skeleton takes its own slot and the lead stays rendered.
+  if (!featured.isFetched && !featured.isError) return <><div data-featured-skeleton aria-hidden style={{ margin:'22px 16px 0', height:440, borderRadius:20, background:'var(--explore-top-panel)' }} /><WatchLead userId={props.userId} onDepart={props.onDepart} /></>;
   if (fallbackReason) return <WatchLead userId={props.userId} onDepart={props.onDepart} />;
   return <WatchFeaturedDeck {...props} rows={featured.data ?? []} />;
 }
