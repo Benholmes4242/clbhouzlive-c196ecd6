@@ -36,6 +36,22 @@
 }
 
 :root {
+  --standout-card: #17171B;
+  --standout-ink: #F8FAFC;
+  --standout-mute: rgba(248,250,252,0.62);
+  --standout-dim: rgba(248,250,252,0.42);
+  --standout-faint: rgba(248,250,252,0.30);
+  --standout-hair: rgba(255,255,255,0.08);
+  --standout-chip-edge: rgba(255,255,255,0.10);
+  --standout-selected-edge: rgba(255,255,255,0.18);
+  --standout-selected: #1C1C21;
+  --standout-amber: #F7931E;
+  --standout-eagle: #E8C766;
+  --standout-birdie: #E24B3F;
+  --standout-par: rgba(255,255,255,0.14);
+  --standout-bogey: #A6C2F0;
+  --standout-double: #7AA6EC;
+  --standout-skeleton: #141417;
   --pro-controls-canvas: #0A0A0C;
   --pro-controls-card: #17171B;
   --pro-controls-sheet: #16161A;
