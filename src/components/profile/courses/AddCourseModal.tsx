@@ -14,6 +14,7 @@
  *
  * Ranks come from useCourseListRanks (the membership authority), never the
  * legacy golf_courses rank columns.
+ * TOPTEN_SHEET_1: local end spacer belongs to the scroll body; BottomSheet alone owns safe-area padding.
  */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -336,7 +337,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({ userId, onClose,
         <div id="add-course-title" style={{ marginTop: 4, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>{titleText}</div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <button type="button" onClick={adding ? closeAdd : onClose} style={{ ...btnReset, fontSize: 13, fontWeight: 700, color: A.AMBER }}>
+        <button type="button" onClick={adding ? closeAdd : onClose} style={{ ...btnReset, fontSize: 13, fontWeight: 700, color: A.INK }}>
           {adding ? t('topTen.sheet.cancel', 'Cancel') : t('topTen.sheet.done', 'Done')}
         </button>
         <div style={{ marginTop: 5, fontSize: 10.5, fontWeight: 700, color: A.DIM, ...FIGS }}>
@@ -523,6 +524,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({ userId, onClose,
     >
       {header}
       {adding ? addBody : listBody}
+      <div data-testid="top-ten-sheet-end-gutter" aria-hidden="true" style={{ height: 24, flexShrink: 0 }} />
     </BottomSheet>
   );
 };

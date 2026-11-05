@@ -1,5 +1,9 @@
 # Roadmap
 
+## TOPTEN_SHEET_1
+- [x] Header action reads A.INK in both modes; shared 24px end gutter inside scroller, BottomSheet unchanged.
+- [ ] Focused tests, live/device checks and four shards; prior Explore/Tour test failures remain untouched.
+
 ## Tour menu Live board
 - [x] Signed-off menu presentation and slug-owned single selection; shared picker membership/behavior preserved.
 - [ ] STOP: new menu tests 15/15, focused total 28 pass/1 fail at tourIsland.test.tsx:235:30 `expected '' to be 'min(346px, calc(100vw - 24px))'`. No repair; browser/four shards blocked. Prior Explore failures untouched. Expected inventory 7,042 / 622; exact ledger in TOUR_MENU_LIVE_BOARD_REPORT.md.
