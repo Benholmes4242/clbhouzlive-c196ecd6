@@ -10,8 +10,12 @@ import { formatHcp } from '@/lib/formatHcp';
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import type { WhsConnection } from '@/lib/whs/types';
+import { ProLabel } from '@/features/pro-verification/ProLabel';
+import '@/features/pro-verification/pro-status-controls.css';
 
 interface Props {
+  pro?: { kind: 'tour_pro' | 'teaching_pro' } | null;
+  hideSwitch?: boolean;
   userId?: string;
   connection: WhsConnection | null | undefined;
   connectionReady: boolean;
@@ -39,7 +43,7 @@ export function SettingsHandicapCard(p: Props) {
     </div>
   );
   return <section className="st2-handicap" data-testid="st2-handicap-card">
-    {connected ? <>
+    {p.pro ? <><div className="pro-status-card-head"><h3 className="st2-name">Official handicap</h3><ProLabel size="large" /></div><p className="st2-line st2-disconnected-line">You're verified as {p.pro.kind === 'tour_pro' ? 'a tour professional' : 'a teaching professional'}, so there's no handicap here and no prompts to connect one.</p></> : connected ? <>
       <Button variant="ghost" className="st2-top" onClick={p.onManage}>
         <span className="st2-identity"><span className="st2-name">{bodyNameForProvider(p.connection?.provider)}</span>
           <span className="st2-status">{p.connection?.last_synced_at ? `Connected · synced ${formatRelativeAgoLong(p.connection.last_synced_at)}` : 'Connected'}</span>
@@ -53,9 +57,9 @@ export function SettingsHandicapCard(p: Props) {
       <p className="st2-line st2-disconnected-line">Connect yours and every round arrives on its own, scored hole by hole and measured against the course it was played on.</p>
       <Button variant="ghost" className="st2-connect" onClick={p.onManage}>Connect your handicap</Button>
     </>}
-    <div className={`st2-switch-row${connected ? '' : ' st2-disconnected-switch'}`}>
-      <span className="st2-switch-copy">{switchTitle}<small>{connected ? 'The handicap button beside search' : 'On your profile and in the top bar'}</small></span>
-      <Button variant="ghost" role="switch" aria-label={switchTitle} aria-checked={p.checked} disabled={p.updating} className="bizc-switch st2-switch" onClick={() => p.onToggle(!p.checked)}><i aria-hidden="true" /></Button>
-    </div>
+    {!p.hideSwitch && <div className={`st2-switch-row${!p.pro && connected ? '' : ' st2-disconnected-switch'}${p.pro ? ' pro-status-switch' : ''}`}>
+      <span className="st2-switch-copy">{p.pro ? 'Connect prompts' : switchTitle}<small>{p.pro ? "Off while you're a verified pro" : connected ? 'The handicap button beside search' : 'On your profile and in the top bar'}</small></span>
+      <Button variant="ghost" role="switch" aria-label={p.pro ? 'Connect prompts' : switchTitle} aria-checked={p.pro ? false : p.checked} disabled={!!p.pro || p.updating} className="bizc-switch st2-switch" onClick={() => { if (!p.pro) p.onToggle(!p.checked); }}><i aria-hidden="true" /></Button>
+    </div>}
   </section>;
 }

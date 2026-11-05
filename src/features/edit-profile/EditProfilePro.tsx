@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { ProDetailsSheet } from '@/features/pro-verification/ProDetailsSheet';
+import { ProStatusSheet } from '@/features/pro-verification/ProStatusSheet';
 import { useMyProStatus } from '@/features/pro-verification/useMyProStatus';
 import { proDeclineReasonText, proStatusLine } from '@/features/pro-verification/proRules';
 
@@ -24,7 +25,7 @@ export function EditProfilePro({ userId }: { userId: string }) {
 
   return <>
     <div className="ep-rows" data-testid="ep-pro">
-      <button type="button" className="ep-row" onClick={() => { if (!pro.verified) setSheetOpen(true); }}>
+      <button type="button" className="ep-row" onClick={() => setSheetOpen(true)}>
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ display: 'block', fontSize: 15, fontWeight: 600 }}>Golf professional</span>
           <span style={{ display: 'block', marginTop: 3, fontSize: 12.5, color: 'var(--ep-mute)', lineHeight: 1.4 }}>{sub}</span>
@@ -38,6 +39,6 @@ export function EditProfilePro({ userId }: { userId: string }) {
         <ChevronRight size={18} className="ep-row-chev" />
       </button>
     </div>
-    <ProDetailsSheet userId={userId} open={sheetOpen} onClose={() => setSheetOpen(false)} />
+    {pro.verified ? <ProStatusSheet userId={userId} open={sheetOpen} onClose={() => setSheetOpen(false)} /> : <ProDetailsSheet userId={userId} open={sheetOpen} onClose={() => setSheetOpen(false)} />}
   </>;
 }
