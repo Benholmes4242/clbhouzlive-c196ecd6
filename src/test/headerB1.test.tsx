@@ -30,7 +30,7 @@ vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useGridVideos: () => ({ data: { pages: [[{ post_id: 'video', course_name: 'Test course', duration_seconds: 10 }]] }, isSuccess: true, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }),
 }));
 
-vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => mocks.guest }));
+vi.mock('@/features/guest/useIsGuest', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/guest/useIsGuest')>()), useIsGuest: () => mocks.guest }));
 vi.mock('@/features/guest/guestGateStore', async (importOriginal) => ({ ...await importOriginal<typeof import('@/features/guest/guestGateStore')>(), openGuestCard: mocks.gate }));
 vi.mock('@/features/guest/guestAnalytics', () => ({ trackGuestGateShown: mocks.track }));
 import { TourIsland } from '@/features/tourhub/components/TourIsland';

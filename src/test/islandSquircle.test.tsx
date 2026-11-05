@@ -16,7 +16,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: vi.fn() } }
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <div data-testid="avatar" /> }));
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
-vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => mocks.guest }));
+vi.mock('@/features/guest/useIsGuest', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/guest/useIsGuest')>()), useIsGuest: () => mocks.guest }));
 
 import { ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
 import { TourIsland } from '@/features/tourhub/components/TourIsland';

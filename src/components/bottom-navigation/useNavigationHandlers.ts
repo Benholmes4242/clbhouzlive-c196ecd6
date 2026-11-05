@@ -67,10 +67,8 @@ export const useNavigationHandlers = () => {
         }, 50);
       } else {
         // Tours tab: if already on a sub-route, navigate back to overview
-        // NAV-ARRIVAL TAG: the Tour Hub renders a back chevron when it was
-        // arrived AT (tournament card, share, in-app link) and its burger when it
-        // was navigated TO. A nav tap is the latter, and only the nav knows that,
-        // so it says so in location.state. See TourHubMainPage's backMode.
+        // NAV-ARRIVAL TAG: the Tour Hub always shows the burger, regardless
+        // of arrival. Keep the from:'nav' tag in location.state for other readers.
         if (tab.id === 'tourhub' && location.pathname.startsWith('/tourhub') && location.pathname !== '/tourhub') {
           navigate('/tourhub', { replace: true, state: { from: 'nav' } });
         } else if (tab.id === 'tourhub') {

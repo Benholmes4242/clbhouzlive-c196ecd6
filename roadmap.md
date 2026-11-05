@@ -1,5 +1,11 @@
 # Roadmap
 
+## FIX_UNBLOCK_1
+- [x] Read authorisation; repair only missing-export failures, fix the two authorised new test fixtures, restore always-burger hub and handler comment without changing handler code.
+- [x] Specified focused set passes 272/272; repaired headerB1/islandSquircle/hb6Group1 guest mocks and ep4LinksPrivacy/st3SettingsPrivacy trend exports, preserving overrides and assertions; FIX_UNBLOCK_1_REPORT.md lists every line.
+- [ ] STOP: shard 1 passes 1,753; shard 2 passes 1,654 / 9 fails in untouched islandsNav; isolated run also fails 9/19, so no flake exception. Full logs retained; shards 3–4 need exact authorisation for this different failure. Expected unchanged inventory 6,874 / 607 reconciled in report.
+- [ ] Browser checks stopped with tests; exact live-dot historical comparison also blocked by absent /tmp/browser/live-dot/baseline.json. Narrow News and authenticated Activity → Tour → back remain unverified.
+
 ## FIX_LIVE_DOT_1
 - [x] Confirmed live halo clipping at 1× and recorded baseline geometry; implemented fold-column compensation; TourGlance has no local clipping and stays unchanged.
 - [ ] STOP: 3 new halo tests passed; unchanged headerB1/islandSquircle have 12 missing-isGuestUser fixture failures. Full output kept; no failing tests edited. Four shards and after-edit geometry check await resolution. Report: FIX_LIVE_DOT_1_REPORT.md.
