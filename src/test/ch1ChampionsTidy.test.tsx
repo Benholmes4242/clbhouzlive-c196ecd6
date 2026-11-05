@@ -41,7 +41,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const i18n = createInstance();
 await i18n.init({ lng: 'en', fallbackLng: 'en', resources: {}, interpolation: { escapeValue: false } });
-const selection = { courseId: 'course', courseName: 'Hayling' };
+const selection = { courseId: 'course', courseName: 'Hayling', courseRegion: null, courseCountry: null, courseType: null };
 function Location() { return <output data-location>{useLocation().search}</output>; }
 function mount(page = false, modal = false) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
