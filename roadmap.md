@@ -1,5 +1,10 @@
 # Roadmap
 
+## CH1 — Champions tidy
+- [ ] Verify every posted-state viewer receives Within reach on You; stop before removals if eligibility differs.
+- [ ] If prerequisite passes, remove posted What it takes and course-only Elsewhere; retain Defence and other states; add the posted You-tab link through the existing handler and analytics.
+- [ ] Add requested coverage, name each authorised assertion change, run four fresh ordered shards against 6,973 / 613, and retain full output.
+
 ## RC3_WORDING
 - [x] Member-best defaults and English values updated; keys/variables/logic unchanged. Featured labels retain existing uppercase CSS; unused moment/career keys have no mounted label to style.
 - [x] Audit complete with user-approved Tour/catalogue exceptions; every remaining match and old/new copy line listed in RC3_WORDING_REPORT.md.
