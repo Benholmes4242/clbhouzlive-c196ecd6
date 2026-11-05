@@ -2,7 +2,8 @@
 
 ## TOPTEN_SHEET_1
 - [x] Header action reads A.INK in both modes; shared 24px end gutter inside scroller, BottomSheet unchanged.
-- [ ] Focused tests, live/device checks and four shards; prior Explore/Tour test failures remain untouched.
+- [x] Focused Top 10 checks 25/25; preview build OK.
+- [ ] STOP: shard 1 has 1,843 passed/1 pre-existing tourIsland failure at :235:30 (empty inline width). Shards 2–4 and live/device/interaction checks not run; Explore blockers unchanged. See TOPTEN_SHEET_1_REPORT.md.
 
 ## Tour menu Live board
 - [x] Signed-off menu presentation and slug-owned single selection; shared picker membership/behavior preserved.
