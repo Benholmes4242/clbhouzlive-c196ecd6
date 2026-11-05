@@ -1,7 +1,8 @@
 # Roadmap
 
 ## CH1 — Champions tidy
-- [ ] Verify every posted-state viewer receives Within reach on You; stop before removals if eligibility differs.
+- [x] Prerequisite audited: posted eligibility does not guarantee You reach; independent failed reads and empty reach rows suppress it. Source evidence in CH1_REPORT.md; no product/test edits.
+- [ ] STOP pending Ben's ruling: qualify successful/nonempty You reads, or authorise missing reach handling despite the You freeze. Keep posted What it takes until resolved.
 - [ ] If prerequisite passes, remove posted What it takes and course-only Elsewhere; retain Defence and other states; add the posted You-tab link through the existing handler and analytics.
 - [ ] Add requested coverage, name each authorised assertion change, run four fresh ordered shards against 6,973 / 613, and retain full output.
 
