@@ -161,7 +161,9 @@ export const TourIsland: React.FC<TourIslandProps> = ({
         }}
       >
         {mode !== 'back' && <Chip logoSlug={logoSlug} glyph={glyph} folded={folded} />}
-        <span aria-hidden={condensed ? true : undefined} data-tour-island-fold style={{ display: 'flex', flexDirection: 'column', minWidth: 0, lineHeight: 1, textAlign: 'left', ...(foldRoute ? { maxWidth: condensed ? 0 : 240, opacity: condensed ? 0 : 1, overflow: 'hidden', transition: reducedMotion ? 'none' : 'var(--island-fold-transition)' } : {}) }}>
+        {/* Compensating padding moves only the fold clip edge, never the live
+            dot or text. Folded zero spacing preserves the zero-width column. */}
+        <span aria-hidden={condensed ? true : undefined} data-tour-island-fold style={{ display: 'flex', flexDirection: 'column', minWidth: 0, lineHeight: 1, textAlign: 'left', ...(foldRoute ? { maxWidth: condensed ? 0 : 240, opacity: condensed ? 0 : 1, overflow: 'hidden', padding: condensed ? 0 : 3, margin: condensed ? 0 : -3, transition: reducedMotion ? 'none' : 'var(--island-fold-transition), margin 300ms var(--island-fold-ease)' } : {}) }}>
           {labelAndCaption}
         </span>
       </button>
