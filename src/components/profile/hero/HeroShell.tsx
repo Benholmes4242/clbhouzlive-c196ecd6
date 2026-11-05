@@ -268,6 +268,10 @@ const HeadlineBlock: React.FC<{
 };
 
 interface HeroShellProps {
+  /** Pro-profile opt-ins preserve shell cover/scrim/insets and other callers. */
+  nameRef?: React.Ref<HTMLHeadingElement>;
+  headlineContent?: React.ReactNode;
+  footer?: React.ReactNode;
   /** Resolved cover image; the shell handles the broken-image fallback. */
   coverUrl?: string | null;
   /** 56px avatar node (SquircleAvatar on personal, logo on business). */
@@ -303,6 +307,9 @@ export const HeroShell: React.FC<HeroShellProps> = ({
   headline,
   counters,
   centreCounters = false,
+  nameRef,
+  headlineContent,
+  footer,
 }) => {
   const [coverBroken, setCoverBroken] = React.useState(false);
   React.useEffect(() => setCoverBroken(false), [coverUrl]);
@@ -426,6 +433,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1
+              ref={nameRef}
               style={{
                 margin: 0,
                 fontSize: 20,
@@ -462,12 +470,12 @@ export const HeroShell: React.FC<HeroShellProps> = ({
 
         {/* Headline figure. Omitted entirely when the surface has none - the
             counter strip simply moves up. */}
-        {headline && (
+        {headlineContent ?? (headline && (
           <HeadlineBlock headline={headline} headlineAction={headlineAction} />
-        )}
+        ))}
 
         {/* Counter strip */}
-        <div
+        {counters.length > 0 && <div
           style={{
             marginTop: 14,
             borderTop: `1px solid ${W_10}`,
@@ -480,7 +488,8 @@ export const HeroShell: React.FC<HeroShellProps> = ({
           {counters.map((c) => (
             <HeroCell key={c.key} label={c.label} value={c.value} state={c.state} onTap={c.onTap} />
           ))}
-        </div>
+        </div>}
+        {footer}
       </div>
     </section>
   );
