@@ -8,7 +8,6 @@
 .activity-score-tile { width: 52px; height: 52px; flex: 0 0 52px; border-radius: 14px; background: var(--activity-tile); color: var(--activity-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
 .activity-score-tile b { font-size: 19px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
 .activity-score-tile span { font-size: 11px; color: var(--activity-mute); margin-top: 3px; }
-.activity-tour-tile { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 31%; background: var(--activity-tile); color: var(--activity-tour-ink); font-size: 10px; font-weight: 800; letter-spacing: .06em; display: flex; align-items: center; justify-content: center; overflow-wrap: anywhere; text-align: center; }
 /* AC2 fold row. The hairline border stays inline in the component so it keeps
    reading ACT.HAIR; geometry and type live here. */
 .activity-fold-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; position: relative; cursor: pointer; user-select: none; }

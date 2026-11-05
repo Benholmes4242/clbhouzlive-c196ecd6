@@ -120,8 +120,6 @@ const FIXTURES: Fixture[] = [
   { name: 'video_ready', row: { notif_type: 'video_ready', entity_type: 'post', entity_id: POST, data: { post_id: POST, stream_id: 'st1' } } },
   { name: 'service_announcement (route)', row: { notif_type: 'service_announcement', data: { campaign: 'c', route: '/amateur' } } },
   { name: 'golfer_verified', row: { notif_type: 'golfer_verified', data: {} } },
-  { name: 'tour_preview', row: { notif_type: 'tour_preview', data: {} } },
-  { name: 'tour_roundup', row: { notif_type: 'tour_roundup', data: {} } },
   { name: 'onboarding_nudge (whs)', row: { notif_type: 'onboarding_nudge', data: { gap: 'whs' } } },
   { name: 'onboarding_nudge (club)', row: { notif_type: 'onboarding_nudge', data: { gap: 'club' } } },
   { name: 'onboarding_nudge (username)', row: { notif_type: 'onboarding_nudge', data: { gap: 'username' } } },
@@ -165,7 +163,15 @@ const INERT_EXCEPTIONS: Fixture[] = [
   { name: 'service_announcement routed at /', row: { notif_type: 'service_announcement', data: { campaign: 'c', route: '/' } } },
 ];
 
+// Client overview destination, pending a separate push-router change Ben will approve.
+const TOUR_EXCEPTIONS: Fixture[] = ['tour_preview','tour_roundup'].map(notif_type => ({name:notif_type,row:{notif_type,data:{}}}));
+
 describe('notifRoute parity with activityLinks', () => {
+  it.each(TOUR_EXCEPTIONS)('$name opens overview on client and wire on push pending a separate push-router change Ben will approve', ({row:partial}) => {
+    const r=row(partial);
+    expect(getActivityLink(r)).toBe('/tourhub');
+    expect(routeForNotif({notif_type:r.notif_type,entity_type:r.entity_type,entity_id:r.entity_id,data:r.data as Record<string,unknown> | null,actor_user_id:r.actor_user_id})).toBe('/tour/news');
+  });
   it.each(FIXTURES)('$name resolves identically in both routers', ({ row: partial }) => {
     const r = row(partial);
     expect(

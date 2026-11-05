@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_TOUR_NOTIF_1
+- [x] Activity trophy tile/meta, type-based Tour identity and client overview destination; shared restoration already owns fresh-arrival top scroll.
+- [x] NewsChromeBridge label-only fix and report-only sweep recorded in FIX_TOUR_NOTIF_1_REPORT.md.
+- [ ] STOP: new fixTourNotif1.test.tsx failures at 32:28 (row accessible name includes meta) and 53:8 (Cannot redefine property: ResizeObserver); full focused log kept, 144 pass / 2 fail. No failing tests changed. Four shards/browser await resolution; pre-existing pro-controls fixture stop preserved.
+
 ## Pro status controls
 - [x] Shared settled own-handicap/pro hook; PRO island and Settings card implemented.
 - [x] Listed own-handicap presentation hidden, connections preserved; verified removal sheet implemented.

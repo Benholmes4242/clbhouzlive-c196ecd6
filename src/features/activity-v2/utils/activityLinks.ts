@@ -460,14 +460,11 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   }
 
   // --- tour digests (system-authored, NO actor, NO target) ------------
-  // tour_preview (Thursday) and tour_roundup (Sunday) carry null entity_type,
-  // null entity_id and no ids in data, so there is no single story to deep-link
-  // to — each digest summarises several. They announce STORIES, so they land on
-  // the wire, not on a hub with a leaderboard at the top.
-  // If a digest ever starts carrying a lead story id, deep-link to that story
-  // instead and leave this as the fallback.
+  // These digests announce the week's tournaments; the overview is where
+  // those tournaments live. Push remains on the wire pending Ben's separate
+  // push-router change; the parity test documents this client-only exception.
   if (type === 'tour_preview' || type === 'tour_roundup') {
-    return '/tour/news';
+    return '/tourhub';
   }
 
   // --- entity fallbacks ------------------------------------------------
