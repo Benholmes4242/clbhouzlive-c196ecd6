@@ -26950,6 +26950,7 @@ export type Database = {
         Args: { p_note?: string; p_reason?: string; p_user_id: string }
         Returns: undefined
       }
+      remove_own_pro_status: { Args: never; Returns: undefined }
       reorder_after_removal: {
         Args: { p_course_ids: string[]; p_user_id: string }
         Returns: undefined
