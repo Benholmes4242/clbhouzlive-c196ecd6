@@ -43,8 +43,9 @@ describe('CR1 creator persistence', () => {
     expect(h.track).toHaveBeenCalledWith('creator_profile_toggled', { on: true, surface: 'welcome' });
   });
   it('Skip never writes the toggled creator choice', async () => {
-    render(<Welcome />, { wrapper }); fireEvent.click(await screen.findByRole('switch', { name: 'I make golf videos' })); fireEvent.click(screen.getByRole('button', { name: 'Skip' }));
-    await waitFor(() => expect(h.update).toHaveBeenCalledWith({ has_completed_onboarding: true, updated_at: expect.any(String) }));
+    render(<Welcome />, { wrapper }); fireEvent.click(await screen.findByRole('switch', { name: 'I make golf videos' }));
+    expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull();
+    expect(h.update).not.toHaveBeenCalled();
     expect(h.update.mock.calls.every(([v]) => !Object.prototype.hasOwnProperty.call(v, 'is_creator'))).toBe(true);
   });
   it('Welcome starts on for an existing creator', async () => { h.creator = true; render(<Welcome />, { wrapper }); await waitFor(() => expect(screen.getByRole('switch', { name: 'I make golf videos' })).toHaveAttribute('aria-checked', 'true')); });
