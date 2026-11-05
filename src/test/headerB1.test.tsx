@@ -31,7 +31,7 @@ vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
 }));
 
 vi.mock('@/features/guest/useIsGuest', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/guest/useIsGuest')>()), useIsGuest: () => mocks.guest }));
-vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
+vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => ({ verified: false, verifiedKnown: true, pending: false, declined: false, kind: null, tour: null, tourCode: null, club: null, body: null, reviewReason: null, request: null, isLoading: false, unknown: false }) }));
 vi.mock('@/features/guest/guestGateStore', async (importOriginal) => ({ ...await importOriginal<typeof import('@/features/guest/guestGateStore')>(), openGuestCard: mocks.gate }));
 vi.mock('@/features/guest/guestAnalytics', () => ({ trackGuestGateShown: mocks.track }));
 import { TourIsland } from '@/features/tourhub/components/TourIsland';

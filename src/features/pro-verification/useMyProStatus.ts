@@ -14,6 +14,8 @@ import { isProKind, type ProKind, type ProRequestRow } from './proRules';
 
 export interface MyProStatus {
   verified: boolean;
+  /** Verification is profile-owned; request settlement is independent. */
+  verifiedKnown: boolean;
   verifiedAt?: string | null;
   pending: boolean;
   declined: boolean;
@@ -67,6 +69,7 @@ export function useMyProStatus(userId: string | undefined): MyProStatus {
 
   return {
     verified,
+    verifiedKnown: !userId || !profileLoading,
     verifiedAt: typeof p?.pro_verified_at === 'string' ? p.pro_verified_at : null,
     pending,
     declined,

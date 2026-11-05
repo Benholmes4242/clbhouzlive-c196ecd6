@@ -1,5 +1,11 @@
 # Roadmap
 
+## FIX_UNBLOCK_2
+- [x] Resolved island-only readiness scope; fixture field additions authorised without assertion changes. Added profile-owned verifiedKnown, island opt-in and four regression cases; other consumers retain full request waiting.
+- [x] Focused 102/102 passes; shards 1/2 pass 1,753 / 1,653; shard 3 has 1,739 pass / 11 pre-existing ST2 failures. Expected 6,878 / 608 (+4 new fixUnblock2 cases), build OK.
+- [ ] STOP: untouched st2SettingsHandicapCard fails 11/22 in first isolation, so cannot qualify for 3/3 flake exemption. Full logs in docs/verification/fix-unblock-2; no fixture changes to ST2. Shard 4 awaits blocker resolution.
+- [ ] Browser checks blocked by ordered suite stop: 1x live-dot geometry/condensation, narrow News labels, signed-in Activity navigation and amateur/Mason cold island. FIX_UNBLOCK_2_REPORT.md records exact errors and limits.
+
 ## Pro status standing fixture rule
 - [x] Added exactly one authorised settled-amateur line to each of the five shard-2 files; no assertions, expected values or case names changed.
 - [x] Shard 2 passes 1,663. Shard 3 matching failures repaired with A+B in ep1/ep2 and B in st2; no assertions changed.

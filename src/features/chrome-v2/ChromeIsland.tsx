@@ -362,10 +362,9 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string; fold?: 
   const [glanceOpen, setGlanceOpen] = useState(false);
   const indexButtonRef = useRef<HTMLButtonElement>(null);
 
-  // ONE DEFINITION, SHARED: useOwnHandicapState owns "is this member connected"
-  // and "has that read settled", so the Explore Scores connect invitation and
-  // this chip can never disagree about it.
-  const hcp = useOwnHandicapState(user?.id);
+  // Shared connection authority; only this island opts into profile-owned pro
+  // readiness because it never displays request pending/declined/review details.
+  const hcp = useOwnHandicapState(user?.id, { island: true });
   const connection = hcp.connection;
   const trendData = hcp.trend;
   const { data: hcpHistory } = useHandicapHistory(connection?.id, 'all');
