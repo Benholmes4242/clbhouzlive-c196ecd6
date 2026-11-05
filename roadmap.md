@@ -1,5 +1,11 @@
 # Roadmap
 
+## Pro status controls
+- [ ] Shared settled own-handicap/pro hook; PRO island and Settings card.
+- [ ] Hide listed own-handicap surfaces while preserving stored connections and amateur defaults.
+- [ ] Verified status sheet, confirmation, removal and cache refresh.
+- [ ] Tests, four shards, signed-off mock checks and reconciled report.
+
 ## Featured tilted pile
 - [ ] Apply signed-off rear-card CSS only, keeping front card and behaviour unchanged.
 - [ ] Add/update authorised tests, check 320px/390px corners and overflow, run four shards and report reconciled counts.
