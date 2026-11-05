@@ -1,6 +1,7 @@
 /**
  * BRIEF_MEMBERS_LIST_REBUILD — the Members list, built to Main.html.
- * Every figure comes from get_admin_members_overview (useMembersOverview).
+ * Member figures come from get_admin_members_overview; the Verified catalogue
+ * reads only useAdminVerified and visible pro identities use useProMembers.
  * The one exception is the legacy ?filter=eg_issues deep link, which the
  * overview has no flag for (see useEgIssueUserIds).
  */

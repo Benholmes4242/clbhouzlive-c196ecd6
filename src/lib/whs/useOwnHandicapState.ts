@@ -1,4 +1,5 @@
-/** Shared own-handicap presentation; pro status never mutates WHS connections.
+/** Shared own-handicap presentation; noHandicap hides verified and pending pros
+ * without granting a pending member a PRO label or mutating WHS connections.
  * Only ChromeIsland opts into profile-only verification readiness; all other
  * consumers retain full request settlement, so pending/rejected reads stay authoritative. */
 import { useHandicapChipState } from './useHandicapChipState';
