@@ -6,6 +6,7 @@
 - [ ] Ruling needed: synthetic 9:16 top0 conflicts with the explicit 90%-of-usableH formula (693.333 < 717.3 at 390×844/safeTop47/safeBottom0).
 
 ## Pro world ranking sync
+- [ ] OWGR_GROSS_FIX: store raw strokes/total/scheduled rounds, normalize only expRing1 line35, deploy sync-pro-world-rankings and run four shards; carry only the three named FS_NOTCH failures, stop on anything else. Mason Check now belongs to Ben.
 - [x] OWGR_UNBLOCK: Monday parser, undated no-merge, authorized entrypoint and three test repairs implemented. Event11624 has real dates/country and gross71/75/73, no par/venue/to-par.
 - [ ] STOP: focused84 pass/2 expRing1 failures at35:40 (unchanged rgba whitespace assertion). No repairs/deployment/Mason run/shards after failure. Exact output/ledger in OWGR_UNBLOCK_REPORT.md; FS_NOTCH_1 blockers untouched.
 - [ ] BLOCKED: gross rounds cannot populate to_par without par; venue absent. Hosted deployment/check and round-source resolution remain unverified.

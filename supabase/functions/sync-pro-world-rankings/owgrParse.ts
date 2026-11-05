@@ -1,7 +1,7 @@
 /** OWGR publishes Monday: currentOWGRRank belongs only to this run's UTC
  * Monday, lastOWGRRank only to the preceding Monday if absent. Never use
  * fetch dates, event weekDate or inferred event dates as ranking dates.
- * Gross resultScores are NOT to-par: absent par means no round writes.
+ * Gross resultScores are stored as strokes with null to_par, never converted.
  */
 type RecordValue = Record<string, unknown>;
 const object = (v: unknown): RecordValue | null => v !== null && typeof v === 'object' && !Array.isArray(v) ? v as RecordValue : null;
@@ -44,9 +44,10 @@ export function parseEvents(input: unknown) {
     if (!row || !positive(row.id) || !positive(row.year) || !positive(row.week) || Number(row.week) > 53 || typeof row.event !== 'string' || !row.event.trim()) throw new Error('Page layout changed');
     return { owgr_event_id: String(row.id), event_name: row.event, start_date: null as string | null, end_date: null as string | null,
       venue: null as string | null, country: null as string | null, to_par: null as number | null,
+      total_strokes: null as number | null, scheduled_rounds: null as number | null,
       tour_name: Array.isArray(row.tours) ? row.tours.map(t => object(t)?.name).filter(t => typeof t === 'string').join(' / ') || null : null,
       finish: normalizeFinish(row.finish), owgr_points: finite(row.rankPoints), owgr_year: Number(row.year), owgr_week: Number(row.week),
-      owgr_rank_before: positive(row.rankBefore), owgr_rank_after: positive(row.rankAfter), rounds: [] as { round_no: number; to_par: number }[] };
+      owgr_rank_before: positive(row.rankBefore), owgr_rank_after: positive(row.rankAfter), rounds: [] as { round_no: number; strokes: number; to_par: null }[] };
   });
 }
 function actualDate(value: unknown): string | null {
@@ -58,9 +59,12 @@ export function parseEventDetails(input: unknown, eventId: string, playerId: num
   if (!row || String(row.id) !== eventId || !Array.isArray(row.results)) throw new Error('Event layout changed');
   const result = row.results.map(object).find(r => r?.playerId === playerId);
   const grossRounds = Array.isArray(result?.resultScores) ? result.resultScores.flatMap(v => {
-    const score = object(v); const round = positive(score?.roundNumber); const gross = finite(score?.score);
-    return round && gross !== null ? [{ round_no: round, gross }] : [];
+    const score = object(v); const round = positive(score?.roundNumber); const gross = positive(score?.score);
+    return round && gross !== null && gross <= 32767 ? [{ round_no: round, gross }] : [];
   }) : [];
   return { start_date: actualDate(row.startDate), end_date: actualDate(row.endDate), country: typeof object(row.country)?.name === 'string' ? String(object(row.country)?.name) : null,
-    venue: null, to_par: null, rounds: [] as { round_no: number; to_par: number }[], grossRounds };
+    venue: null, to_par: null,
+    total_strokes: grossRounds.length ? grossRounds.reduce((sum, round) => sum + round.gross, 0) : null,
+    scheduled_rounds: positive(row.scheduledRoundsCount),
+    rounds: grossRounds.map(round => ({ round_no: round.round_no, strokes: round.gross, to_par: null })), grossRounds };
 }

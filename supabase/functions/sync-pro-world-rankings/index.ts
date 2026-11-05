@@ -1,8 +1,8 @@
 /** Monday-only history and independent counting events. No schedule is created.
  * Current rank is filed on this run's UTC Monday; prior on the previous Monday
  * only if absent. Event dates come exclusively from public event details.
- * OWGR supplies gross scores without par: round/to-par writes remain blocked,
- * never fabricated. Dated imports retain member identities and own rounds.
+ * OWGR supplies gross scores without par: store strokes and null to_par.
+ * Dated imports retain member identities; source-pro rounds are never written.
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
@@ -96,8 +96,7 @@ Deno.serve(async req => {
         for (const event of events) {
           try {
             const details = parseEventDetails(await getEvent(event.owgr_event_id), event.owgr_event_id, playerId);
-            Object.assign(event, { start_date: details.start_date, end_date: details.end_date, country: details.country, venue: details.venue, to_par: details.to_par, rounds: details.rounds });
-            if (details.grossRounds.length) warnings.push({ user_id: source.user_id, event_id: event.owgr_event_id, reason: 'Gross round scores supplied without par; no to-par round writes' });
+            Object.assign(event, { start_date: details.start_date, end_date: details.end_date, country: details.country, venue: details.venue, to_par: details.to_par, total_strokes: details.total_strokes, scheduled_rounds: details.scheduled_rounds, rounds: details.rounds });
           } catch (e) {
             warnings.push({ user_id: source.user_id, event_id: event.owgr_event_id, reason: e instanceof Error ? e.message : 'Event details unavailable' });
           }
