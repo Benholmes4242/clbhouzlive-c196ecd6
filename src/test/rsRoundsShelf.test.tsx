@@ -304,35 +304,31 @@ describe('RR Recent rounds shelf', () => {
     await waitFor(() => expect(roundCards()).toHaveLength(12));
     expect(f.rpcCalls.filter((c) => c.name === 'get_recent_rounds').map((c) => c.p_offset)).toEqual([0, 10]);
     expect(document.querySelector('[data-rounds-shelf-skeleton]')).toBeNull();
-    expect(document.querySelector('[data-rounds-shelf-end]')).toBeInTheDocument();
+    expect(document.querySelector('[data-rounds-shelf-end]')).toBeNull();
     io.restore();
   });
 
-  it('shows the end tile only when everything is loaded, and it goes to /rounds', async () => {
+  it('ends on the final round without an end tile or Rounds navigation', async () => {
     f.pools.circle = [round('a'), round('b'), round('c')];
     shelf();
-    const end = await waitFor(() => {
-      const el = document.querySelector('[data-rounds-shelf-end]');
-      expect(el).toBeInTheDocument();
-      return el as HTMLElement;
-    });
-    expect(end.textContent).toContain("That's the last 14 days");
-    expect(end.textContent).toContain('Leaderboards, feats and every round');
-    fireEvent.click(end);
-    expect(screen.getByTestId('rounds-route')).toBeInTheDocument();
-    expect(f.track).toHaveBeenCalledWith('rounds_door_tapped', { from: 'end' });
+    await waitFor(() => expect(roundCards()).toHaveLength(3));
+    expect(document.querySelector('[data-rounds-shelf-end]')).toBeNull();
+    expect(screen.queryByText("That's the last 14 days")).toBeNull();
+    expect(screen.queryByText('Leaderboards, feats and every round')).toBeNull();
+    expect(screen.queryByTestId('rounds-route')).toBeNull();
+    expect(f.track).not.toHaveBeenCalledWith('rounds_door_tapped', { from: 'end' });
   });
 
-  it('the header pill goes to /rounds and there is no door bar', async () => {
+  it('the header has no Leaderboards pill or Rounds door', async () => {
     f.pools.circle = Array.from({ length: 12 }, (_, i) => round(`p${i}`));
     shelf();
-    expect(await screen.findByText('Leaderboards')).toBeInTheDocument();
+    await screen.findByText('Recent rounds');
+    expect(screen.queryByText('Leaderboards')).toBeNull();
     expect(document.querySelector('[data-rounds-shelf-door]')).toBeNull();
     expect(screen.queryByText('Leaderboards, feats and every round')).toBeNull();
     expect(screen.queryByText('All rounds')).toBeNull();
-    fireEvent.click(screen.getByText('Leaderboards'));
-    expect(screen.getByTestId('rounds-route')).toBeInTheDocument();
-    expect(f.track).toHaveBeenCalledWith('rounds_door_tapped', { from: 'header' });
+    expect(screen.queryByTestId('rounds-route')).toBeNull();
+    expect(f.track).not.toHaveBeenCalledWith('rounds_door_tapped', { from: 'header' });
   });
 
   it('the rail snaps to the 16px inset, not the screen edge', async () => {
@@ -470,7 +466,7 @@ describe('RS /rounds page', () => {
         <MemoryRouter initialEntries={[entry]}>
           <I18nextProvider i18n={i18n}>
             <Routes>
-              <Route path="/amateur" element={<AmateurPage />} />
+              <Route path="/amateur" element={<><AmateurPage /><RoundsMarker /></>} />
               <Route path="/rounds" element={<RoundsMarker />} />
             </Routes>
           </I18nextProvider>
@@ -478,9 +474,10 @@ describe('RS /rounds page', () => {
       </QueryClientProvider>,
     );
 
-  it('/amateur?view=scores redirects to /rounds keeping other params', () => {
+  it('/amateur?view=scores stays on Explore and strips only view', () => {
     renderAmateur('/amateur?view=scores&tab=x');
     expect(screen.getByTestId('rounds-marker')).toHaveAttribute('data-search', '?tab=x');
+    expect(screen.getByTestId('explore-magazine')).toBeInTheDocument();
   });
 
   it('/amateur without view=scores still renders Explore', () => {

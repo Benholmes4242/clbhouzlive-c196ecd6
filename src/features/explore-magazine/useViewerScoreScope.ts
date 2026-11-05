@@ -12,6 +12,8 @@ export interface ViewerScoreScope {
   primaryClubId: string | null;
   primaryClubName: string | null;
   county: string | null;
+  /** SAR1: sub_country of the same course that supplied county, not profile country. */
+  nation?: string | null;
   country: string | null;
   countySource: 'primary_club' | 'most_played' | null;
   countrySource: 'profile' | 'primary_club' | null;
@@ -21,6 +23,7 @@ const EMPTY: ViewerScoreScope = {
   primaryClubId: null,
   primaryClubName: null,
   county: null,
+  nation: null,
   country: null,
   countySource: null,
   countrySource: null,
@@ -93,11 +96,13 @@ export function useViewerScoreScope(viewerId: string | undefined) {
       }
 
       const county = clubCourse?.region ?? mostPlayed?.region ?? null;
+      const nation = clubCourse?.region ? clubCourse.sub_country : mostPlayed?.region ? mostPlayed.sub_country : null;
       const country = profile?.country ?? clubCourse?.sub_country ?? null;
       return {
         primaryClubId,
         primaryClubName: clubCourse?.golf_clubs?.name ?? null,
         county,
+        nation,
         country,
         countySource: clubCourse?.region ? 'primary_club' : mostPlayed?.region ? 'most_played' : null,
         countrySource: profile?.country ? 'profile' : clubCourse?.sub_country ? 'primary_club' : null,

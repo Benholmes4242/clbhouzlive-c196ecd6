@@ -24645,6 +24645,31 @@ export type Database = {
           viewer_follows: boolean
         }[]
       }
+      get_standout_feats: {
+        Args: {
+          p_region_kind?: string
+          p_region_value?: string
+          p_viewer?: string
+        }
+        Returns: {
+          denominator_unit: string
+          events_window: number
+          feat_kind: string
+          hole_no: number
+          hole_par: number
+          hole_strokes: number
+          latest_course_id: string
+          latest_course_name: string
+          latest_display_name: string
+          latest_photo_url: string
+          latest_play_date: string
+          latest_score_id: string
+          latest_user_id: string
+          viewer_year_events: number
+          year_denominator: number
+          year_events: number
+        }[]
+      }
       get_standout_rounds: {
         Args: {
           p_band?: string

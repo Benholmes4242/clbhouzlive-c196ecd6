@@ -95,14 +95,13 @@ export default function AmateurPage() {
     return restoreAmateurScroll(y);
   }, []);
 
-  /* RS — the Rounds view is its own page now. /amateur?view=scores (and any
-     remembered link to it) lands on /rounds, keeping every other param. The
+  /* SAR1 — retired scores links stay on Explore, keeping every other param. The
      check sits after every hook so the redirect render is hook-complete. */
   const params = new URLSearchParams(search);
   if (params.get('view') === 'scores') {
     params.delete('view');
     const rest = params.toString();
-    return <Navigate to={`/rounds${rest ? `?${rest}` : ''}`} replace />;
+    return <Navigate to={`/amateur${rest ? `?${rest}` : ''}`} replace />;
   }
 
   return (

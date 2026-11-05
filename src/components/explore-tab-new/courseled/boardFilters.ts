@@ -78,7 +78,8 @@ export type BandKey =
   | 'b15'
   | 'b20'
   | 'b28';
-export type RegionKind = 'country' | 'sub_country';
+/** SAR1 county support is caller-only; BoardFilterPanel still offers country/sub_country. */
+export type RegionKind = 'country' | 'sub_country' | 'region';
 
 export interface BoardFilters {
   scope: ScopeKey;

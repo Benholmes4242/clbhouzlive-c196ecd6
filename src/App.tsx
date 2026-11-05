@@ -344,7 +344,6 @@ const MessagingShell = lazy(() => import("./pages/messaging-v2/MessagingShell"))
 const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"));
 const FindPeoplePage = lazy(() => import("./pages/FindPeoplePage"));
 const GolfersToFollowRedirect = lazy(() => import("./pages/FindPeoplePage").then((m) => ({ default: m.GolfersToFollowRedirect })));
-const RoundsPage = lazy(() => import("./pages/RoundsPage"));
 const WatchRegionPage = lazy(() => import("./pages/WatchGridPage").then((m) => ({ default: m.WatchRegionPage })));
 const WatchCoursesPage = lazy(() => import("./pages/WatchGridPage").then((m) => ({ default: m.WatchCoursesPage })));
 const WatchTop100Page = lazy(() => import("./pages/WatchGridPage").then((m) => ({ default: m.WatchTop100Page })));
@@ -674,8 +673,8 @@ function AppRoutes() {
         {/* BRIEF_AMATEUR_PAGE — the Amateur destination. Shell, header and hero
             first; the four blocks land beneath the hero one at a time. */}
         <Route path="/amateur" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurPage /></Suspense>} />
-        {/* RS — the Rounds board as its own page; /amateur?view=scores redirects here. */}
-        <Route path="/rounds" element={<Suspense fallback={<GenericPageSkeleton />}><RoundsPage /></Suspense>} />
+        {/* SAR1: Rounds pages stay on disk; the former destination is Explore. */}
+        <Route path="/rounds" element={<Navigate to="/amateur" replace />} />
         {/* WS2 — the Watch grid pages. */}
         <Route path="/watch/region/:region" element={<Suspense fallback={<GenericPageSkeleton />}><WatchRegionPage /></Suspense>} />
         <Route path="/watch/courses" element={<Suspense fallback={<GenericPageSkeleton />}><WatchCoursesPage /></Suspense>} />

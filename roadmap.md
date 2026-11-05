@@ -1,5 +1,10 @@
 # Roadmap
 
+## SAR1
+- [x] Added Standout rail, parallel scopes/persistence, typed feats and one hole hook batch; retired Rounds navigation without deleting pages. Authorized four-case assertion ledger in SAR1_REPORT.md.
+- [x] Focused 93/93; fresh shards 1,807 / 1,656 / 1,751 / 1,721 pass, one new failure in shard 4. Executed 6,936 / 610 = baseline +41 cases/one file; build OK.
+- [ ] STOP: heldFrameCB28.test.tsx:56:71 “AssertionError: expected 0 to be greater than 0”; shared placeholderData changed existing pending behavior. Untouched test preserved, full log retained. Scope placeholder behavior to new shelf on authorization; 320px and browser verification not performed.
+
 ## FIX_GUEST_MINT
 - [x] Shared guestMintAllowed across bootstrap, hold and signed-out outcome; safe tab opt-in and automation blocking implemented, native tests unchanged.
 - [x] Focused 61/61; fresh ordered shards 1,769 / 1,667 / 1,747 / 1,712 = 6,895 / 609, baseline 6,879 / 608 +16 cases/one new file. No assertions rewritten; preview setup changes listed in FIX_GUEST_MINT_REPORT.md; build OK.
