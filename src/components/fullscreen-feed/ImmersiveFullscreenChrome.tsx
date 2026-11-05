@@ -4,8 +4,8 @@
  * untouched.
  *
  * Layout:
- *   TOP (no scrim — the back chevron and course block carry their own
- *   shadow over the blurred media backdrop):
+ *   TOP (FeedSlide supplies a slide-local notch scrim only for top-0,
+ *   non-gallery media; the back chevron and course block keep their shadows):
  *     - Back chevron top-LEFT (circular rgba(0,0,0,.32))
  *     - Course header LEFT-aligned after the chevron: row one name 15/700
  *       ellipsis + rating chip at right; location · World #n at 10.5/600;
@@ -551,8 +551,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         bottom={syntheticPosts ? 'env(safe-area-inset-bottom, 0px)' : `calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
         onDraggingChange={setScrubbing}
       />
-      {/* Top scrim removed — chrome sits directly on the blurred media
-          backdrop. Text/icons carry their own drop-shadow for legibility. */}
+      {/* FeedSlide owns the slide-level notch scrim for top-0 non-gallery
+          rects. Chrome positions and text/icon drop-shadows stay unchanged. */}
       <div
         {...inertWhileScrubbing}
         style={{

@@ -1,5 +1,10 @@
 # Roadmap
 
+## FS_NOTCH_1
+- [x] Shared portrait rule and slide-only scrim implemented; gallery/chrome geometry unchanged, preview build OK.
+- [ ] STOP: focused 38 pass/3 new failures; exact errors and assertion/count ledger in FS_NOTCH_1_REPORT.md, full log retained. No repairs/shards/browser after failure.
+- [ ] Ruling needed: synthetic 9:16 top0 conflicts with the explicit 90%-of-usableH formula (693.333 < 717.3 at 390×844/safeTop47/safeBottom0).
+
 ## Pro world ranking sync
 - [x] Add-on source verified: public events API returns Mason's 39 counting events; latest finishes T31/MC/MC. Six pure import-planning tests pass; no persistence claimed.
 - [ ] Add-on BLOCKED: response has week/year but no event start/end dates, ranking date or rounds; no dated event writes, merge execution, parser or deployed sync. See PRO_WORLD_EVENTS_REPORT.md.
