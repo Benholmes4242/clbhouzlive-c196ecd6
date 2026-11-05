@@ -19,7 +19,16 @@
       "firstRound": "First round at {{course}}",
       "ordinalRound": "{{ordinal}} round at {{course}}",
       "aboveAverage": "{{n}} shots above average at {{course}}",
-      "rightOnAverage": "Right on average at {{course}}"
+      "rightOnAverage": "Right on average at {{course}}",
+      "here": {
+        "firstRound": "First round here",
+        "bestEver": "Best ever here",
+        "bestSince": "Best here since {{month}}",
+        "ordinalRound": "{{ordinal}} round here",
+        "betterAverage": "{{n}} shots better than average here",
+        "aboveAverage": "{{n}} shots above average here",
+        "rightOnAverage": "Right on average here"
+      }
     },
     "justPlayed": {
       "eyebrow": "The latest",
@@ -1549,6 +1558,21 @@
     "populations": {
       "everyRound": "Every round played here",
       "everyRoundWithYours": "Every round played here, including yours"
+    },
+    "lately": {
+      "kicker": "LATELY",
+      "title": "Who's been out here",
+      "round": "round",
+      "rounds": "rounds",
+      "golfer": "golfer",
+      "golfers": "golfers",
+      "ledeMid": " in the last 30 days, from ",
+      "tileRounds": "ROUNDS",
+      "tileAvg": "AVG OVER PAR",
+      "tileBest": "BEST GROSS",
+      "circle": "CIRCLE",
+      "foot": "Newest first.",
+      "footCircle": "Newest first. Your circle is marked."
     }
   },
   "courseHero": {
