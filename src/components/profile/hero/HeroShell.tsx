@@ -270,6 +270,8 @@ const HeadlineBlock: React.FC<{
 interface HeroShellProps {
   /** Pro-profile opt-ins preserve shell cover/scrim/insets and other callers. */
   nameRef?: React.Ref<HTMLHeadingElement>;
+  avatarSize?: number;
+  identityContent?: React.ReactNode;
   headlineContent?: React.ReactNode;
   footer?: React.ReactNode;
   /** Resolved cover image; the shell handles the broken-image fallback. */
@@ -297,6 +299,8 @@ interface HeroShellProps {
 export const HeroShell: React.FC<HeroShellProps> = ({
   coverUrl,
   avatar,
+  avatarSize = 56,
+  identityContent,
   onAvatarTap,
   avatarLabel,
   displayName,
@@ -401,7 +405,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
 
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Identity row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, maxWidth: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: identityContent ? 14 : 12, minWidth: 0, maxWidth: '100%' }}>
           <button
             type="button"
             onClick={onAvatarTap}
@@ -419,10 +423,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
           >
             <div
               style={{
-                width: 56,
-                height: 56,
-                borderRadius: 16,
-                overflow: 'hidden',
+                width: avatarSize,
                 // No ring on the hero avatar: it sits on the cover photograph,
                 // where a hairline reads as an outline rather than a surface.
               }}
@@ -432,13 +433,14 @@ export const HeroShell: React.FC<HeroShellProps> = ({
           </button>
 
           <div style={{ flex: 1, minWidth: 0 }}>
+            {identityContent ?? <>
             <h1
               ref={nameRef}
               style={{
                 margin: 0,
                 fontSize: 20,
                 fontWeight: 700,
-                letterSpacing: '-0.03em',
+                letterSpacing: 0,
                 color: '#FFFFFF',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -463,6 +465,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
                 {subline}
               </div>
             )}
+            </>}
           </div>
 
           {action && <div style={{ flexShrink: 0 }}>{action}</div>}

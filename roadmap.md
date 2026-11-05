@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro profile build 1b
+- [ ] Revised hero/avatar/friends and finish/date/scoring labels.
+- [ ] Owner/admin explicit par controls via existing RPC, preserving gross storage.
+- [ ] Focused/four shards/320px verification; baseline7,149/631, only three FS_NOTCH failures allowed.
+
 ## Pro profile build 1
 - [ ] Verified tour-pro hero world ranking, This week, Season and linked-only How he plays; preserve teaching pros, built cover/scrims/insets and everything below.
 - [ ] Ben's corrected ruling: worse ranks muted, never red; BEST for all pros, win 1st in gold. Latest replacement mock governs changed elements.
