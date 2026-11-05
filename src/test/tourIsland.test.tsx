@@ -186,7 +186,7 @@ describe('TourGlance', () => {
     const onClose = vi.fn();
     renderGlance({ onClose });
     const rows = screen.getByTestId('tour-glance-rows').querySelectorAll('button');
-    expect(rows).toHaveLength(7); // All tours + one row per tour slug
+    expect(rows).toHaveLength(2); // All tours + the event; off-week tours are grouped below
     const pgaRow = screen.getByTestId('tour-glance-rows').querySelector('[data-tour-row="pga"]') as HTMLButtonElement;
     expect(pgaRow.textContent).toContain('The Players');
     fireEvent.click(pgaRow);
@@ -194,7 +194,7 @@ describe('TourGlance', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('marks the tour in view with the check and dims unacceptable rows', () => {
+  it('marks the tour in view with the selected row and dims unacceptable rows', () => {
     selection.appliedTourSlug = 'pga';
     heroSlides.data = [slide('t1', 'pga', 'live')];
     const { unmount } = renderGlance();
@@ -206,7 +206,7 @@ describe('TourGlance', () => {
     renderGlance();
     const dimmed = screen.getByTestId('tour-glance-rows').querySelector('[data-tour-row="pga"]') as HTMLButtonElement;
     expect(dimmed.disabled).toBe(true);
-    expect(dimmed.style.opacity).toBe('0.45');
+    expect(dimmed).toHaveClass('tour-menu-row'); // disabled styling is owned by tour-glance.css
   });
 
   it('the leaderboards tab shows sections only, with no tour list', () => {
@@ -232,7 +232,7 @@ describe('TourGlance', () => {
     expect(card.style.left).toBe('14px');
     expect(card.style.right).toBe('');
     expect(card.style.top).toBe('70px');
-    expect(card.style.width).toBe('316px');
+    expect(card.style.width).toBe('min(346px, calc(100vw - 24px))');
     document.body.removeChild(left);
   });
 });

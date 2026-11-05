@@ -128,10 +128,11 @@ export function useTourPickerRows(): { rows: TourPickerRow[] } {
 
       for (const slide of tourSlides) {
         const tournament = slide.tournament;
-        const selected = !isMajorActive
+        const selected = slug === activeTourSlug
+          && !isMajorActive
           && (viewingTournamentId
             ? tournament.id === viewingTournamentId
-            : slug === activeTourSlug && slide === tourSlides[0]);
+            : slide === tourSlides[0]);
         rows.push({
           key: `${slug}:${tournament.id}`, slug, tournamentId: tournament.id, status: slide.type,
           eventName: tournament.name, startDate: tournament.startDate, currentRound: tournament.currentRound ?? null,

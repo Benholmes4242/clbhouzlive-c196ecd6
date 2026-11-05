@@ -36,6 +36,17 @@
 }
 
 :root {
+  --tour-menu-ink: #F8FAFC;
+  --tour-menu-on-ink: #0A0A0C;
+  --tour-menu-mute: rgba(248,250,252,0.62);
+  --tour-menu-dim: rgba(248,250,252,0.42);
+  --tour-menu-live: #34D77F;
+  --tour-menu-under-par: #E24B3F;
+  --tour-menu-hair: rgba(255,255,255,0.08);
+  --tour-menu-tile: rgba(255,255,255,0.06);
+  --tour-menu-selected: rgba(255,255,255,0.07);
+  --tour-menu-logo: #FFFFFF;
+  --tour-menu-icon-chip: rgba(255,255,255,0.10);
   --connect-seat-ink: #F8FAFC;
   --connect-seat-mute: rgba(248,250,252,0.62);
   --connect-seat-dim: rgba(248,250,252,0.42);

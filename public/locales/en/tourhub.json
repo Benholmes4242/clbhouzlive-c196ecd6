@@ -49,6 +49,7 @@
     },
     "overview": "Overview",
     "leaderboards": "Leaderboards",
+    "leadersShort": "Leaders",
     "schedule": "Schedule",
     "players": "Players",
     "leaders": "Leaders",
@@ -1511,6 +1512,10 @@
     "glance": {
       "thisWeek": "THIS WEEK",
       "chooseTour": "Choose the tour you see",
+      "liveNow": "{{count}} live now",
+      "tied": "{{count}} tied",
+      "starts": "Starts {{day}}",
+      "offThisWeek": "Off this week: {{tours}}",
       "allToursSub": "Every tour, soonest first",
       "live": "Live",
       "final": "Final"
