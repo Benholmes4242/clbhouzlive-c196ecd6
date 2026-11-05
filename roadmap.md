@@ -2,7 +2,7 @@
 
 ## EXP_RING_1
 - [x] Audit Explore-only avatar callers; resolve brief discrepancy as Tour-matching 1px traced personal ring, business 0.5px inset as requested; amber/shared/Tour unchanged.
-- [ ] Add ring coverage, focused checks and four fresh shards; baseline 7,024 / 620; report changed/preserved caller inventory.
+- [ ] STOP: focused 35 pass/19 fail; new expRing1.test.tsx:31:33 `expected '' to be 'none'`; untouched ws3WatchBottom mock lacks DARK_HAIRLINE (17 failures). No failing assertions repaired; four shards/browser blocked. Baseline 7,024 / 620, expected +3/+1; exact evidence and sweep in EXP_RING_1_REPORT.md.
 
 ## Island PRO badge only
 - [x] Remove island caption/helper and scope signed-off 22px badge; keep profile tap/divider and pending/amateur behavior.
