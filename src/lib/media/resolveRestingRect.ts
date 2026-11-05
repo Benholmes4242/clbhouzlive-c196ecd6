@@ -12,9 +12,11 @@
  *
  * Ratified product rule: NOTHING IS EVER CROPPED IN THE FULLSCREEN VIEWER.
  *   the bottom of the usable area is the comment band (fullscreenBand.ts), not just the home indicator.
- *   • VIDEO and IMAGES both rest CONTAIN, centred inside the SAFE area so the
- *     letterbox bars clear the notch / home indicator. `mediaType` no longer
- *     affects the outcome (kept in the signature for call-site stability).
+ *   • VIDEO and IMAGES both rest CONTAIN. Tall portrait media whose width-filled
+ *     height reaches 90% of the safe usable height anchors to y=0, bleeding
+ *     under the notch without crossing the comment band. All other known
+ *     aspects stay centred inside the SAFE area. `mediaType` does not affect
+ *     the outcome (kept in the signature for call-site stability).
  *   • The blurred self-backdrop underlay fills the letterbox bars.
  *
  * When dims are unknown (0), the full viewport is returned with `contain`:
@@ -62,10 +64,23 @@ export function resolveRestingRect(
 
   const mediaAspect = mediaW / mediaH;
 
-  // CONTAIN branch — centered inside the SAFE area so letterbox bars clear
-  // the notch and home indicator.
   const usableW = Math.max(0, viewport.w - viewport.safeLeft - viewport.safeRight);
   const usableH = Math.max(0, viewport.h - viewport.safeTop - viewport.safeBottom);
+  const availH = Math.max(0, viewport.h - viewport.safeBottom);
+  const widthFilledH = usableW / mediaAspect;
+  if (mediaAspect < 1 && widthFilledH >= 0.9 * usableH) {
+    const renderH = Math.min(widthFilledH, availH);
+    const renderW = widthFilledH <= availH ? usableW : availH * mediaAspect;
+    return {
+      top: 0,
+      left: viewport.safeLeft + (usableW - renderW) / 2,
+      width: renderW,
+      height: renderH,
+      fit: 'contain',
+    };
+  }
+
+  // Other aspects retain the exact safe-area-centred contain geometry.
   const usableAspect = usableW / Math.max(1, usableH);
 
   let renderW: number;

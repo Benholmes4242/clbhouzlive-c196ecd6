@@ -25,6 +25,7 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoProcessingCard } from './VideoProcessingCard';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { galleryFit } from '@/lib/courseMedia/courseGallery';
+import { FullscreenNotchScrim } from './FullscreenNotchScrim';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
@@ -287,7 +288,7 @@ export const FeedSlide = memo(function FeedSlide({
     if (m?.type === 'image') {
       const imgSrc = m.imageUrl || m.thumbnailUrl || '';
       // Fullscreen: single-authority rect from resolveRestingRect (images
-      // always CONTAIN, safe-area centered). Matches the overlay clone's
+      // always CONTAIN, tall portraits top-anchored). Matches the overlay clone's
       // expand target by construction — no post-paint resize.
       // Feed: legacy heuristic preserved verbatim (out of scope for this fix).
       if (isFullscreen) {
@@ -464,6 +465,7 @@ const FullscreenImageSlot: React.FC<{
           draggable={false}
         />
       </div>
+      <FullscreenNotchScrim rect={fsRect} />
     </div>
   );
 };
@@ -992,7 +994,7 @@ const FullscreenVideoSlot: React.FC<{
           opacity: showVideo ? 1 : 0,
         }}
       />
-
+      <FullscreenNotchScrim rect={settledRect} />
     </div>
   );
 };
@@ -1429,6 +1431,7 @@ const BorrowedFullscreenSlot: React.FC<{
         style={style}
         onTransitionEnd={handleTransitionEnd}
       />
+      {target && <FullscreenNotchScrim rect={target} />}
     </>
   );
 };
@@ -1888,6 +1891,7 @@ const FullscreenPagerPage: React.FC<{
             draggable={false}
           />
         )}
+        <FullscreenNotchScrim rect={videoRect} />
       </div>
     );
   }
@@ -1923,6 +1927,7 @@ const FullscreenPagerPage: React.FC<{
             draggable={false}
           />
         </div>
+        <FullscreenNotchScrim rect={imgRect} />
       </div>
     );
   }

@@ -1,5 +1,9 @@
 # Roadmap
 
+## FS_NOTCH_1
+- [ ] Anchor tall portrait fullscreen media to y=0 through the shared resolver; add slide-only notch scrim, preserving gallery and chrome.
+- [ ] Run focused checks then four fresh shards with --maxWorkers=2; retain failures, reconcile counts and report all six visual checks.
+
 ## Pro world ranking sync
 - [x] Add-on source verified: public events API returns Mason's 39 counting events; latest finishes T31/MC/MC. Six pure import-planning tests pass; no persistence claimed.
 - [ ] Add-on BLOCKED: response has week/year but no event start/end dates, ranking date or rounds; no dated event writes, merge execution, parser or deployed sync. See PRO_WORLD_EVENTS_REPORT.md.

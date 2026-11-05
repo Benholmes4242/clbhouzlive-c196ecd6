@@ -1,0 +1,14 @@
+:root {
+  --fullscreen-notch-scrim: linear-gradient(to bottom, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.fullscreen-notch-scrim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top, 0px) + 72px);
+  background: var(--fullscreen-notch-scrim);
+  pointer-events: none;
+  z-index: 4;
+}
