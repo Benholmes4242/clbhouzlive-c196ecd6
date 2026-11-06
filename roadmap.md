@@ -1,8 +1,9 @@
 # Roadmap
 
 ## PK1_RECORD_1
-- [ ] Move record hook/door under shared picks heading; remove old member-band door/prop; preserve members' door/CSS/cards and old locale keys.
-- [ ] Authorized two test moves and new structural/visibility cases; focused then four fresh shards; report phase/tap/320/390/guest checks and assertion ledger.
+- [x] Move record hook/door under shared picks heading; remove old member-band door/prop; preserve members' door/CSS/cards and old locale keys.
+- [x] Authorized two test moves and10 new cases; focused85/85; fresh shards1,875/1,749/1,849/1,761 =7,234/637, zero test failures. PK1_RECORD_1_REPORT.md records assertion ledger and full output paths.
+- [ ] STOP: preview type error guestTournamentPickLock.test.tsx:25,277 still passes removed onRecord prop; brief authorizes fixture removal in two other files only. Await authorization for that one prop removal, then verify build and390/320 phase/tap/guest checks (auth external unmanaged).
 
 ## Pro profile 1c re-uploaded close-out
 - [x] Confirm exact clock pin and both HeroShell zero-spacing lines already present; no duplicate edits. Focused116/116.
