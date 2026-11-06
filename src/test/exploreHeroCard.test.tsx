@@ -402,7 +402,7 @@ describe('Explore card shapes', () => {
 
     expect(callout).not.toBeNull();
     expect(callout?.querySelector('[data-explore-achievement-tag="true"]')?.textContent).toBe('NEW');
-    expect(callout?.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Best on clbhouz');
+    expect(callout?.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Course record');
     expect(headline).toBeNull();
   });
 
