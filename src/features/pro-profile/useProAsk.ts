@@ -41,11 +41,12 @@ export function useProInbox(status: 'waiting' | 'answered', enabled: boolean) {
   });
 }
 
-/** The asker's own home club and its visibility, for the privacy line. */
-export function useMyAskerLabel(viewerId: string | undefined) {
+/** The asker's own home club and its visibility, for the privacy line. Only
+ * read while the ask sheet is open. */
+export function useMyAskerLabel(viewerId: string | undefined, enabled: boolean) {
   return useQuery({
     queryKey: ['pro-profile', 'asker-label', viewerId],
-    enabled: !!viewerId,
+    enabled: enabled && !!viewerId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_profiles')
