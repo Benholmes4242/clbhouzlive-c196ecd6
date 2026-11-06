@@ -29,7 +29,7 @@ const s = vi.hoisted(() => ({
   guest: false,
   track: vi.fn(async () => {}),
   qr: vi.fn(async (text: string) => `data:image/png;base64,qr(${text})`),
-  canvas: vi.fn(async () => ({ toBlob: (cb: (b: Blob | null) => void) => cb(new Blob(['png'], { type: 'image/png' })) })),
+  canvas: vi.fn(async (_el?: unknown, _opts?: unknown) => ({ toBlob: (cb: (b: Blob | null) => void) => cb(new Blob(['png'], { type: 'image/png' })) })),
 }));
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -77,7 +77,7 @@ const moment = (text: string, year: number, is_win = false): CareerMoment => ({ 
 const owgrEvent = (id: string, name: string, finish: string, over: Partial<ProEvent> = {}): ProEvent => ({
   id, user_id: 'pro', source: 'owgr', event_name: name, tour_name: 'Alps Tour', start_date: '2026-10-01', end_date: '2026-10-04',
   country: 'France', venue: null, finish, to_par: null, total_strokes: 219, scheduled_rounds: 3, tee_time: null, tee_hole: null,
-  owgr_event_id: 1, owgr_points: null, owgr_rank_before: null, owgr_rank_after: null, owgr_year: 2026, owgr_week: 40,
+  owgr_event_id: '1', owgr_points: null, owgr_rank_before: null, owgr_rank_after: null, owgr_year: 2026, owgr_week: 40,
   created_at: '', updated_at: '', rounds: [], ...over,
 });
 
