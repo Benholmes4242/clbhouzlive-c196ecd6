@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Pro profile build2
-- [ ] Bag/partners/career settled sections and owner-only single-sheet editing; live business lookup/linking, scoped writes and invalidation.
-- [ ] Real Mason OWGR derivations, cap/validation tests, visitor/guest/owner proof and320px views; four shards, stop unexpected failure; baseline7,258/639.
+- [x] Add bag/partners/career sections and single-sheet editors with scoped writes/invalidation; exact primitive/copy review remains in close-out.
+- [ ] STOP: focused50 passed/23 failed in untouched proProfileBuildOne and proProfileBuildOneB, useSupabaseSession.tsx:51:54 missing mock auth.onAuthStateChange. Full output/tmp/pro-build2/focused.log; no existing tests edited.14 new rule cases passed, expected inventory7,272/640 vs baseline7,258/639; remaining mounted coverage/shards/browser blocked.
 - [x] Three table types already present in generated types; no manual edits needed, SQL/migrations prohibited.
 
 ## PK2_ODDS_1

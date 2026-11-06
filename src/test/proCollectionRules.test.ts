@@ -2,8 +2,8 @@ import {describe,it,expect} from 'vitest';
 import source from './fixtures/owgr/mason-events.json';
 import {careerEntries,orderedBag,bagPayload,momentPayload,type BagItem,type CareerMoment} from '@/features/pro-profile/proCollectionRules';
 import type {ProEvent} from '@/features/pro-profile/proProfileRules';
-const event=(override:Partial<ProEvent>={}):ProEvent=>({id:'e',user_id:'mason',source:'owgr',event_name:'Event',finish:'T5',owgr_year:2026,owgr_week:1,owgr_rank_after:2000,owgr_rank_before:null,owgr_event_id:1,owgr_points:null,start_date:null,end_date:null,tour_name:null,country:null,venue:null,to_par:null,total_strokes:null,scheduled_rounds:null,tee_time:null,tee_hole:null,created_at:'',updated_at:'',rounds:[],...override});
-const mason=source.map(e=>event({id:String(e.id),owgr_event_id:e.id,event_name:e.event,finish:e.finish,owgr_year:e.year,owgr_week:e.week,owgr_rank_after:e.rankAfter}));
+const event=(override:Partial<ProEvent>={}):ProEvent=>({id:'e',user_id:'mason',source:'owgr',event_name:'Event',finish:'T5',owgr_year:2026,owgr_week:1,owgr_rank_after:2000,owgr_rank_before:null,owgr_event_id:'1',owgr_points:null,start_date:null,end_date:null,tour_name:null,country:null,venue:null,to_par:null,total_strokes:null,scheduled_rounds:null,tee_time:null,tee_hole:null,created_at:'',updated_at:'',rounds:[],...override});
+const mason=source.map(e=>event({id:String(e.id),owgr_event_id:String(e.id),event_name:e.event,finish:e.finish,owgr_year:e.year,owgr_week:e.week,owgr_rank_after:e.rankAfter}));
 const moment=(override:Partial<CareerMoment>={}):CareerMoment=>({id:'mine',user_id:'mason',year:2026,text:'Turned pro',is_win:false,created_at:'2026-01-01',...override});
 describe('Build2 collection rules',()=>{
  it('real Mason high is1354 after Las Castillas in2026',()=>{const high=careerEntries(mason,[]).find(e=>e.kind===0);expect(high?.text).toBe('Career-high world ranking, #1,354, after Alps de Las Castillas');expect(high?.year).toBe(2026);});
