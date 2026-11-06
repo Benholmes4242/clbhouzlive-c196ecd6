@@ -12,6 +12,8 @@ Property 'onRecord' does not exist on type 'IntrinsicAttributes & { tournamentId
 
 The subsequent instruction to fix preview type errors without asking authorized the minimal fixture correction: removed only `onRecord={() => {}}` from guestTournamentPickLock.test.tsx:25. All five cases and every assertion remain unchanged. Old mount ending: `onPick={() => {}} onRecord={() => {}}`; new ending: `onPick={() => {}}`. No production change was made in this close-out. Validation recorded below.
 
+Close-out command: `bunx vitest run src/test/guestTournamentPickLock.test.tsx src/test/pickSheetV2.test.tsx src/test/tournamentPickInsights.test.tsx src/test/pk1RecordHeading.test.tsx --maxWorkers=2` —90/90 passed across4 files; full output /tmp/pk1-record/fixture-closeout.log. Preview signal2026-11-06T07:34:42Z: `build OK`. No assertion changes, no deleted/renamed cases, delta0; full-suite baseline remains7,234/637. Full shards were not repeated for this one-prop fixture-only correction.
+
 ## Tests
 
 Focused command:
@@ -61,10 +63,10 @@ pk1RecordHeading.test.tsx:
 
 ## Requested checks
 
-1. 390px live PGA and LPGA: not verified; build blocker and external unmanaged auth prevent authenticated live checks.
+1. 390px live PGA and LPGA: not verified; external unmanaged auth prevents authenticated live checks (build blocker now cleared).
 2. Upcoming/completed: structural fixtures pass, live phases unverified.
 3. Tap: existing opener called once in focused fixtures; actual sheet opening not verified end-to-end.
-4. 320px normal/long counts: unverified; browser not run after build stop. No claim of measured wrapping/overflow.
+4. 320px normal/long counts: unverified; no browser measurement run in the fixture-only close-out. No claim of measured wrapping/overflow.
 5. Guests: fixture confirms relocated record/opener with no guest-session creation; live guest check unverified.
 
 No SQL, migrations, RPC/edge deployment, guest-browsing edits, review/news/round-plot changes, feed_config or cap/native/Median changes.

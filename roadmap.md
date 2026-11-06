@@ -3,7 +3,8 @@
 ## PK1_RECORD_1
 - [x] Move record hook/door under shared picks heading; remove old member-band door/prop; preserve members' door/CSS/cards and old locale keys.
 - [x] Authorized two test moves and10 new cases; focused85/85; fresh shards1,875/1,749/1,849/1,761 =7,234/637, zero test failures. PK1_RECORD_1_REPORT.md records assertion ledger and full output paths.
-- [ ] Close out preview type error with subsequently authorized removal of only onRecord from guestTournamentPickLock.test.tsx:25; verify targeted test/build. Live390/320 phase/tap/guest checks remain blocked by external unmanaged auth.
+- [x] Close out preview type error: subsequently authorized removal of only onRecord from guestTournamentPickLock.test.tsx:25; focused90/90, preview build OK, assertions/counts unchanged.
+- [ ] Live390/320 phase/tap/guest checks remain unverified — external unmanaged auth prevents authenticated end-to-end access.
 
 ## Pro profile 1c re-uploaded close-out
 - [x] Confirm exact clock pin and both HeroShell zero-spacing lines already present; no duplicate edits. Focused116/116.
