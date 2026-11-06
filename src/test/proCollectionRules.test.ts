@@ -1,0 +1,23 @@
+import {describe,it,expect} from 'vitest';
+import source from './fixtures/owgr/mason-events.json';
+import {careerEntries,orderedBag,bagPayload,momentPayload,type BagItem,type CareerMoment} from '@/features/pro-profile/proCollectionRules';
+import type {ProEvent} from '@/features/pro-profile/proProfileRules';
+const event=(override:Partial<ProEvent>={}):ProEvent=>({id:'e',user_id:'mason',source:'owgr',event_name:'Event',finish:'T5',owgr_year:2026,owgr_week:1,owgr_rank_after:2000,owgr_rank_before:null,owgr_event_id:1,owgr_points:null,start_date:null,end_date:null,tour_name:null,country:null,venue:null,to_par:null,total_strokes:null,scheduled_rounds:null,tee_time:null,tee_hole:null,created_at:'',updated_at:'',rounds:[],...override});
+const mason=source.map(e=>event({id:String(e.id),owgr_event_id:e.id,event_name:e.event,finish:e.finish,owgr_year:e.year,owgr_week:e.week,owgr_rank_after:e.rankAfter}));
+const moment=(override:Partial<CareerMoment>={}):CareerMoment=>({id:'mine',user_id:'mason',year:2026,text:'Turned pro',is_win:false,created_at:'2026-01-01',...override});
+describe('Build2 collection rules',()=>{
+ it('real Mason high is1354 after Las Castillas in2026',()=>{const high=careerEntries(mason,[]).find(e=>e.kind===0);expect(high?.text).toBe('Career-high world ranking, #1,354, after Alps de Las Castillas');expect(high?.year).toBe(2026);});
+ it('real Mason podiums have canonical labels',()=>{expect(careerEntries(mason,[]).filter(e=>e.kind===1).map(e=>e.text)).toEqual(['2nd, Alps Andalucia-Roquetas de Mar','2nd, Open de Roissy PGA France']);});
+ it('real Mason first event is Ein Bay in2025',()=>{const first=careerEntries(mason,[]).find(e=>e.kind===3);expect(first?.text).toBe('First world ranking event, Ein Bay Open');expect(first?.year).toBe(2025);});
+ it('real Mason has no wins',()=>expect(careerEntries(mason,[]).filter(e=>e.is_win)).toEqual([]));
+ it('separate win fixture produces Won and gold marker',()=>{expect(careerEntries([event({finish:'1',event_name:'Title'})],[]).find(e=>e.is_win)).toMatchObject({text:'Won Title',derived:true,is_win:true});});
+ it('caps podiums at latest five including tied third',()=>{const rows=Array.from({length:7},(_,i)=>event({id:String(i),owgr_week:i+1,finish:i===6?'T3':'2'}));expect(careerEntries(rows,[]).filter(e=>e.kind===1).map(e=>e.order)).toEqual(['2026-07','2026-06','2026-05','2026-04','2026-03']);});
+ it('within-year high then podium then own newest then first',()=>{const rows=careerEntries([event({finish:'2'})],[moment(),moment({id:'new',created_at:'2026-02-01'})]);expect(rows.map(e=>e.kind)).toEqual([0,1,2,2,3]);expect(rows.filter(e=>!e.derived).map(e=>e.id)).toEqual(['new','mine']);});
+ it('career high tie uses earliest event',()=>{const rows=careerEntries([event({id:'later',owgr_week:2}),event({id:'earlier',owgr_week:1})],[]);expect(rows.find(e=>e.kind===0)?.id).toBe('0-earlier');});
+ it('own win remains editable gold while derived entries never own',()=>{expect(careerEntries([], [moment({is_win:true})])[0]).toMatchObject({derived:false,is_win:true});});
+ it('bag orders seven slots then sort and creation',()=>{const row=(slot:string,sort:number,created_at:string):BagItem=>({id:`${slot}${sort}${created_at}`,slot,sort,created_at,user_id:'mason',brand:'Brand',model:null,detail:null,business_id:null,updated_at:''});expect(orderedBag([row('ball',0,''),row('driver',2,''),row('driver',1,'b'),row('driver',1,'a')]).map(e=>e.id)).toEqual(['driver1a','driver1b','driver2','ball0']);});
+ it('bag payload uses exact brand model detail and link',()=>expect(bagPayload('mason','driver',' Brand ',' Model ',' Stiff ','biz')).toEqual({user_id:'mason',slot:'driver',brand:'Brand',model:'Model',detail:'Stiff',business_id:'biz'}));
+ it('bag slot is required',()=>expect(()=>bagPayload('mason','','Brand','','',null)).toThrow());
+ it('career year1950 allowed and future rejected',()=>{expect(momentPayload('mason',1950,'Moment',true,2026).year).toBe(1950);expect(()=>momentPayload('mason',2027,'Moment',false,2026)).toThrow();});
+ it('career text120 allowed121 rejected',()=>{expect(momentPayload('mason',2026,'a'.repeat(120),false,2026).text).toHaveLength(120);expect(()=>momentPayload('mason',2026,'a'.repeat(121),false,2026)).toThrow();});
+});
