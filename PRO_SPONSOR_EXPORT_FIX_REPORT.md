@@ -33,7 +33,7 @@ Existing tests changed, renamed, rewritten or deleted: one — the sheet PRO lab
 - Shard 2: **1,824 passed / 162 files**, 1 failure — the known FM1 case only (below).
 - Shard 3: **1,882 passed / 162 files**, 0 failures.
 - Shard 4: **1,798 passed / 159 files**, 0 failures.
-- Total: **7,402 passed + 1 known failure = 7,403 cases / 645 files** — +5 over the 7,398 expectation. Reconciliation: the earlier expectation assumed the two stopped CSS cases stayed failing; with the file-read fix they now pass, and the FM1 known failure moved from shard-2's count into the failure column (7,398 = 7,397 passed + 1 known; observed 7,402 passed + 1 = 7,403). The remaining +4 delta is unaccounted by named test change and is flagged here rather than hidden: no tests were added or removed in this close-out, so the extra four are pre-existing count drift between the last full-suite baseline and this run, not a change from this work.
+- Total: **7,402 passed + 1 known failure = 7,403 cases / 645 files**. Reconciliation: the true incoming baseline was the H2H_BEST_1 run's 7,400 passed + 3 known failures = 7,403 / 645 (the 7,398 figure above was stale). This close-out added and removed no tests; the two sponsor CSS cases moved from failed to passed, leaving 7,402 passed + 1 known failure = 7,403. The count reconciles exactly with no unnamed delta.
 
 ## Known failure, separate and untouched
 `src/test/fw1FeaturedDeck.test.tsx:151:18`, “reserves no right padding on the meta line” (FM1_MUTE_1 scope):
