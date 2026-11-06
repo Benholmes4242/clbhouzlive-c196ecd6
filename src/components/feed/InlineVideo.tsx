@@ -184,7 +184,7 @@ const LocalBlobVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cover', 
           style={{
             position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: 56, height: 56, borderRadius: '50%', border: 0, padding: 0,
-            background: 'rgba(0,0,0,0.45)', display: 'grid', placeItems: 'center',
+            background: 'rgba(0,0,0,0.45)', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center',
             cursor: 'pointer', zIndex: 30,
           }}
         >
