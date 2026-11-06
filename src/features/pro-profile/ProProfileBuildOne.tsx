@@ -16,6 +16,7 @@ import { ProWeekSection } from './ProWeekSection';
 import { ProSeasonSection } from './ProSeasonSection';
 import { HowProPlays, LinkedLiveCard, useLinkedProLive, useLinkedProStats } from './LinkedProSections';
 import {ProCollectionSections} from './ProCollectionSections';
+import {ProAskSection} from './ProAskSection';
 import './pro-profile.css';
 export interface ProProfileProps { pro:ProMember;name:string;nameRef?:Ref<HTMLHeadingElement>;avatar?:string|null;cover?:string|null;owner:boolean;viewerId?:string;friends?:number|null;onFriends?:()=>void;friendLabel?:string;friendBusy?:boolean;onFriend?:()=>void;businessViewer?:boolean;followers:number|null;followersReady:boolean;onFollowers:()=>void;onAvatar:()=>void;onEdit:()=>void;onShare:()=>void;onFollow:()=>void;following:boolean;followBusy:boolean;onMessage:()=>void;messageBusy:boolean;menu:ReactNode }
 export function ProProfileBuildOne(p:ProProfileProps){
