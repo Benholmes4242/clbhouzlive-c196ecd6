@@ -3,9 +3,10 @@
  * actor, course, caption, media, hole chips and "with" names all go through
  * the card's own props. Back unmounts nothing in the composer underneath.
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { FeedCard } from '@/components/feed/FeedCard';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
 import type { StageCourse, StageMediaItem } from '../../hooks/useStageComposer';
@@ -24,7 +25,13 @@ export function buildDraftFeedPost(d: {
     creatorRelation: 'none', caption: d.caption,
     mediaItems: d.media.map((m, i) => ({
       id: m.id, type: m.type, width: m.naturalWidth ?? 1080, height: m.naturalHeight ?? 1350, displayOrder: i,
-      ...(m.type === 'image' ? { imageUrl: m.previewUrl } : { mp4Url: m.previewUrl, thumbnailUrl: m.posterUrl ?? undefined }),
+      ...(m.type === 'image'
+        ? { imageUrl: m.previewUrl }
+        : m.streamId
+          // Edit mode: the real engine plays the stream exactly as in the feed.
+          ? { hlsUrl: generateStreamHlsUrl(m.streamId), thumbnailUrl: m.posterUrl ?? undefined }
+          // New local video: the blob plays through InlineVideo's local branch.
+          : { mp4Url: m.previewUrl, thumbnailUrl: m.posterUrl ?? undefined }),
     })),
     createdAt: new Date().toISOString(), likeCount: 0, commentCount: 0, shareCount: 0, review: null, isReview: false,
     isLikedByMe: false, isFollowedByMe: true, courseName: d.course?.name, courseId: d.course?.id, courseCountry: d.course?.country ?? undefined,
