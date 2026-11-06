@@ -18,6 +18,8 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase:{ rpc:f.rpc } }));
 import { WatchFeaturedDeck, WatchFeaturedSlot } from '@/features/explore-magazine/watch/WatchFeaturedDeck';
 import { featuredSwipe, FEATURED_ADVANCE_MS, FEATURED_EXIT_MS } from '@/features/explore-magazine/watch/featuredRules';
 import type { WatchFeaturedRow } from '@/features/explore-magazine/watch/useWatchFeatured';
+import featuredCss from '@/features/explore-magazine/watch/featured.css?raw';
+import * as autoplayGate from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 const rows = (count=8):WatchFeaturedRow[] => Array.from({length:count},(_,i) => ({ post_id:`p${i}`,reason:'featured',actor_type:'personal',actor_id:`u${i}`,display_name:`Golfer ${i}`,handle:`golfer${i}`,avatar_url:null,is_verified:false,caption:`Video ${i}`,media_url:null,hls_url:`https://example.com/${i}.m3u8`,poster_url:`https://example.com/${i}.jpg`,stream_id:null,duration_seconds:12,width:900,height:1600,like_count:i+10,comment_count:i+2,created_at:'2026-11-04',course_id:null,course_name:null,rank:i+1,score:100-i,is_liked_by_me:false }));
 const comments=vi.fn(), shorts=vi.fn();
 const clients:QueryClient[]=[];
@@ -67,4 +69,86 @@ describe('FW1 gestures and actions',() => {
   it('reduced motion crossfades for 150ms without rotation',() => {f.reduced=true;mount();swipe(120);expect(top().style.transform).toBe('none');expect(top().style.transition).toBe('opacity 150ms linear');tick(149);expect(top().getAttribute('data-featured-card')).toBe('p0');tick(1);expect(top().getAttribute('data-featured-card')).toBe('p1');});
   it('hides dots when the 340px media query matches',() => {f.small=true;mount();expect(document.querySelector('.featured-dots')).toBeNull();});
   it('strips stored mention markup from captions like the Watch rows',() => {const marked=rows();marked[0]={...marked[0],caption:'Great round with @[mikem84](u:123e4567-e89b-42d3-a456-426614174000) today'};f.rows=marked;mount(true);const caption=document.querySelector('.featured-caption');expect(caption?.textContent).toBe('Great round with @mikem84 today');expect(caption?.textContent).not.toContain('@[mikem84]');expect(top().getAttribute('aria-label')).toBe('Great round with @mikem84 today');});
+});
+describe('FM1 sound group', () => {
+  it('puts sound before the single duration in the top-right group only', () => {
+    mount();
+    const group = top().querySelector('.featured-topright');
+    expect(group?.children).toHaveLength(2);
+    expect(group?.children[0].classList.contains('featured-mute')).toBe(true);
+    expect(group?.children[1].classList.contains('featured-duration')).toBe(true);
+    expect(top().querySelectorAll('.featured-duration')).toHaveLength(1);
+    expect(document.querySelector('.featured-mute:not(.featured-topright > .featured-mute)')).toBeNull();
+  });
+  it('toggles sound and icons without opening, liking or advancing', () => {
+    mount();
+    const button = screen.getByRole('button', { name:'Unmute' });
+    const video = top().querySelector('video');
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(button.querySelector('.lucide-volume-x')).not.toBeNull();
+    fireEvent.pointerDown(button, { clientX:150, clientY:150, pointerId:1 });
+    fireEvent.pointerUp(button, { pointerId:1 });
+    fireEvent.click(button);
+    expect(video?.muted).toBe(false);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(button.querySelector('.lucide-volume2')).not.toBeNull();
+    fireEvent.click(button);
+    tick(500);
+    expect(video?.muted).toBe(true);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(f.open).not.toHaveBeenCalled();
+    expect(f.like).not.toHaveBeenCalled();
+    expect(top().getAttribute('data-featured-card')).toBe('p0');
+  });
+  it('stops pointerdown, touchstart and click before deck ancestors see them', () => {
+    mount();
+    const seen = vi.fn();
+    for (const event of ['pointerdown','touchstart','click']) document.addEventListener(event, seen);
+    const button = screen.getByRole('button', { name:'Unmute' });
+    fireEvent.pointerDown(button);
+    fireEvent.touchStart(button);
+    fireEvent.click(button);
+    expect(seen).not.toHaveBeenCalled();
+    for (const event of ['pointerdown','touchstart','click']) document.removeEventListener(event, seen);
+  });
+  it.each(['reduced motion','autoplay blocked'])('shows only duration for %s', reason => {
+    f.reduced = reason === 'reduced motion';
+    const gate = vi.spyOn(autoplayGate, 'autoplayBlocked').mockReturnValue(true);
+    try {
+      mount();
+      expect(top().querySelector('video')).toBeNull();
+      expect(top().querySelector('.featured-mute')).toBeNull();
+      expect(top().querySelector('.featured-topright > .featured-duration')).not.toBeNull();
+    } finally { gate.mockRestore(); }
+  });
+  it('shows duration without sound when the card has no video source', () => {
+    f.rows = rows().map(row => ({ ...row, hls_url:null }));
+    mount(true);
+    expect(top().querySelector('video')).toBeNull();
+    expect(top().querySelector('.featured-topright')?.children).toHaveLength(1);
+    expect(top().querySelector('.featured-topright > .featured-duration')).not.toBeNull();
+    expect(top().querySelector('.featured-mute')).toBeNull();
+  });
+  it('keeps duration alone after a video fails', () => {
+    mount();
+    const video = top().querySelector('video');
+    if (!video) throw new Error('Expected mounted video');
+    video.setAttribute('src','https://example.com/failed.mp4');
+    fireEvent.error(video);
+    expect(top().querySelector('video')).toBeNull();
+    expect(top().querySelector('.featured-mute')).toBeNull();
+    expect(top().querySelector('.featured-topright > .featured-duration')).not.toBeNull();
+  });
+  it('starts the next card muted after sound was enabled', () => {
+    mount();
+    fireEvent.click(screen.getByRole('button', { name:'Unmute' }));
+    swipe(120); tick(260);
+    expect(screen.getByRole('button', { name:'Unmute' }).getAttribute('aria-pressed')).toBe('false');
+    expect(top().querySelector('video')?.muted).toBe(true);
+  });
+  it('reserves no right padding on the meta line', () => {
+    const rule = featuredCss.match(/\.featured-meta\s*\{([^}]+)\}/)?.[1];
+    expect(rule).toBeDefined();
+    expect(rule).not.toMatch(/padding(?:-right)?\s*:/);
+  });
 });

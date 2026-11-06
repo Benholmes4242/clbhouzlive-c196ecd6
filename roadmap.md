@@ -1,5 +1,10 @@
 # Roadmap
 
+## FM1_MUTE_1
+- [x] Move mounted-video sound and duration into playback-owned top-right group; isolate inputs and release meta width; preserve deck behavior.
+- [ ] STOP: focused33 passed/1 failed at fw1FeaturedDeck.test.tsx:151:18, `AssertionError: expected undefined to be defined` in new CSS meta-padding check. No failed-test repair or shards; log /tmp/fm1-mute/focused.log. Baseline7,307/643; nine added cases yield expected7,316/643, not executed total. FM1_MUTE_1_REPORT.md records ledger.
+- [ ] 390/320 geometry, long duration and live deck checks unverified after test stop; mounted toggle/gesture/fallback/next-mute cases pass. External unmanaged auth also blocks legitimate member end-to-end checks.
+
 ## Pro profile build2
 - [x] Add bag/partners/career sections and single-sheet editors with scoped writes/invalidation; exact primitive/copy review remains in close-out.
 - [ ] STOP: focused50 passed/23 failed in untouched proProfileBuildOne and proProfileBuildOneB, useSupabaseSession.tsx:51:54 missing mock auth.onAuthStateChange. Full output/tmp/pro-build2/focused.log; no existing tests edited.14 new rule cases passed, expected inventory7,272/640 vs baseline7,258/639; remaining mounted coverage/shards/browser blocked.

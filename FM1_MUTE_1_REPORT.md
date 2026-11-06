@@ -1,0 +1,42 @@
+# FM1_MUTE_1 — stopped on a new test failure
+
+## Implemented scope
+- FeaturedPlayback renders one top-right flex group containing mounted-video sound first, then formatted duration. Parent duration removed.
+- Group: top/right 14px, gap 8px, z-index 3. Sound: 30×30px, radius 10px, existing semantic glass/edge/ink, blur 16px, opacity 1, 16px icons, invisible inset -7px hit target.
+- Pointerdown/touchstart/click propagation is stopped; old bottom placement and meta right padding removed.
+- Existing playback, stack, engagement and gesture behavior retained. No SQL, migrations, RPC/edge deployment, guest browsing, review wizard, news, round plots, feed_config, cap or native/Median changes.
+
+## Stop: exact runner output
+Command: `bunx vitest run src/test/fw1FeaturedDeck.test.tsx --maxWorkers=2`
+
+```text
+FAIL src/test/fw1FeaturedDeck.test.tsx > FM1 sound group > reserves no right padding on the meta line
+AssertionError: expected undefined to be defined
+❯ src/test/fw1FeaturedDeck.test.tsx:151:18
+149| it('reserves no right padding on the meta line', () => {
+150|   const rule = featuredCss.match(/\.featured-meta\s*\{([^}]+)\}/)?.[1];
+151|   expect(rule).toBeDefined();
+152|   expect(rule).not.toMatch(/padding(?:-right)?\s*:/);
+```
+
+33 passed / 1 failed = 34 executed, one file. Full output: `/tmp/fm1-mute/focused.log`.
+Stopped without repairing the failed test or running shards. The CSS-import-based check did not find the rule; the CSS source removes the padding, but that does not make this test pass.
+
+## Test ledger and counts
+- Last reported full-suite baseline: 7,307 tests / 643 files, from PRO_BAG_PARTNERS_EDIT_REPORT.md.
+- Added nine cases in `src/test/fw1FeaturedDeck.test.tsx`: top-right order/single duration; toggle/icons/no engagement; input propagation; reduced-motion duration-only; autoplay-blocked duration-only; absent-source duration-only; failed-video duration-only; next-card muted; no meta padding.
+- Existing tests: none deleted, renamed or rewritten. No old/new existing assertion to report. Added imports only; original behavior assertions remain unchanged.
+- Expected inventory: 7,316 / 643 (+9 cases in the same file), not an executed full-suite result.
+- Shards 1–4: not run because of the new focused failure. No full-suite pass total available this turn.
+- Known pre-existing TourIsland width failure: not encountered in the focused scope; no other pre-existing failure observed.
+- Preview diagnostic: build OK at 2026-11-06T15:19:56Z, after the production edit. No manual build/typecheck run.
+
+## Requested checks, individually
+1. 390px sound left of 0:24, 8px gap and unobscured: not browser-verified before stop.
+2. Toggle/icon switches without open/like/advance: mounted test passed; live-member/browser check unverified.
+3. Long 12:45 duration clear of badge: unverified.
+4. 320px no overlap/overflow: unverified.
+5. Next card starts muted: mounted test passed; live swipe unverified.
+6. Full-width caption/meta: padding removed in source; new meta test failed as above; browser measurement unverified.
+
+Authenticated end-to-end checks additionally require a legitimate member session; existing environment evidence identifies external unmanaged authentication. No guest mint or authentication bypass attempted.
