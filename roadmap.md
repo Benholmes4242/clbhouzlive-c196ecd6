@@ -1,5 +1,9 @@
 # Roadmap
 
+## VIEW_POST_1
+- [x] Isolate View post navigation in both composer mounts; author-profile close/fallback destination and actor-scoped inactive grid refetch on submit/upload completion.
+- [ ] STOP: focused65 pass/1 new failure at viewPost1Navigation.test.tsx:84:47 `Expected /activity; Received /` because MemoryRouter does not populate window.history. No failing test edited; fixture-only authorization needed. Full log/report retained; four shards not run. Expected7,223/636 (+18 cases/3 files versus7,205/633), not executed full suite. Six live checks unavailable with external unmanaged auth; preview build OK.
+
 ## CLOSE_OUT_1 revised notch threshold
 - [x] Replace portrait threshold with mediaAspect ≤0.6; add stable frame hook and only named test repairs, plus two boundary regressions.
 - [x] Focused53/53; fresh shards1,872/1,741/1,834/1,758 =7,205/633, zero failures. Baseline7,203→7,205 (+2 named cases); FS_NOTCH_1/EXP_RING_1/TOPTEN_SHEET_1 closed. CLOSE_OUT_1_REPORT.md has old/new ledger and retained logs; preview build OK.

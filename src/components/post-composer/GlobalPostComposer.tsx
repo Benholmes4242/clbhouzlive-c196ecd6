@@ -56,6 +56,10 @@ export function GlobalPostComposer() {
   return createPortal(
     <StageComposer
       onClose={handleClose}
+      onViewPost={(postId, closeTo) => {
+        closePostStudio();
+        navigate(`/post/${postId}`, { state: { closeTo } });
+      }}
       editPostId={editPostId}
       draftId={draftId}
       initialMedia={initialMedia}
