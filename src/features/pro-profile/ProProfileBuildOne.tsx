@@ -1,7 +1,7 @@
 /** Verified tour-pro opt-in only. Reads live here, never inside shared hero;
  * each settled section expands independently and failures suppress stale data.
  */
-import type { ReactNode, Ref } from 'react';
+import { useEffect, useRef, type ReactNode, type Ref } from 'react';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { HeroShell } from '@/components/profile/hero/HeroShell';
@@ -17,8 +17,11 @@ import { ProSeasonSection } from './ProSeasonSection';
 import { HowProPlays, LinkedLiveCard, useLinkedProLive, useLinkedProStats } from './LinkedProSections';
 import {ProCollectionSections} from './ProCollectionSections';
 import {ProAskSection} from './ProAskSection';
+import {ProClubhouseSection} from './ProClubhouseSection';
+import {ProOnlyYouSection} from './ProOnlyYouSection';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import './pro-profile.css';
-export interface ProProfileProps { pro:ProMember;name:string;nameRef?:Ref<HTMLHeadingElement>;avatar?:string|null;cover?:string|null;owner:boolean;viewerId?:string;friends?:number|null;onFriends?:()=>void;friendLabel?:string;friendBusy?:boolean;onFriend?:()=>void;businessViewer?:boolean;followers:number|null;followersReady:boolean;onFollowers:()=>void;onAvatar:()=>void;onEdit:()=>void;onShare:()=>void;onFollow:()=>void;following:boolean;followBusy:boolean;onMessage:()=>void;messageBusy:boolean;menu:ReactNode }
+export interface ProProfileProps { pro:ProMember;name:string;nameRef?:Ref<HTMLHeadingElement>;avatar?:string|null;cover?:string|null;owner:boolean;viewerId?:string;username?:string;friends?:number|null;onFriends?:()=>void;friendLabel?:string;friendBusy?:boolean;onFriend?:()=>void;businessViewer?:boolean;followers:number|null;followersReady:boolean;onFollowers:()=>void;onAvatar:()=>void;onEdit:()=>void;onShare:()=>void;onFollow:()=>void;following:boolean;followBusy:boolean;onMessage:()=>void;messageBusy:boolean;menu:ReactNode }
 export function ProProfileBuildOne(p:ProProfileProps){
   const id=p.pro.user_id,playerId=p.pro.pro_player_id??'',year=new Date().getUTCFullYear(),first=p.name.split(' ')[0]||p.name;
   const events=useProEvents(id),rank=useProWorldRank(id),tourResults=usePlayerSeasonResults(playerId,year),live=useLinkedProLive(playerId),stats=useLinkedProStats(playerId,year,p.pro.pro_tour_code??'pga');
