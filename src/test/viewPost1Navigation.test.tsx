@@ -77,11 +77,21 @@ describe('VIEW_POST_1 post deep-link close and processing fallback', () => {
     expect(screen.getByTestId('destination')).toHaveTextContent('/activity');
   });
   it('without closeTo a shared or notification link goes back unchanged', async () => {
+    const len = vi.spyOn(window.history, 'length', 'get').mockReturnValue(2);
     const open = mountLink(undefined, true);
     await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
     expect(open.mock.calls[0]?.[2]?.openCommentsInitially).toBe(true);
     await act(async () => { open.mock.calls[0]?.[2]?.onClose?.({ reason: 'dismissed' } as never); });
     expect(screen.getByTestId('destination')).toHaveTextContent('/activity');
+    len.mockRestore();
+  });
+  it('without closeTo and no browser history a shared link lands on Clubhouse', async () => {
+    const len = vi.spyOn(window.history, 'length', 'get').mockReturnValue(1);
+    const open = mountLink();
+    await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    await act(async () => { open.mock.calls[0]?.[2]?.onClose?.({ reason: 'dismissed' } as never); });
+    expect(screen.getByTestId('destination')).toHaveTextContent('/');
+    len.mockRestore();
   });
   it('a navigating close never overrides the viewer destination even with closeTo', async () => {
     const open = mountLink('/profile');

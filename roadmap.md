@@ -1,6 +1,7 @@
 # Roadmap
 
 ## VIEW_POST_1
+- [ ] Authorized close-out: only history-length setup and one fallback sibling in viewPost1Navigation; rerun focused67 then four fresh shards, retaining all logs and exact old/new code.
 - [x] Isolate View post navigation in both composer mounts; author-profile close/fallback destination and actor-scoped inactive grid refetch on submit/upload completion.
 - [ ] STOP: focused65 pass/1 new failure at viewPost1Navigation.test.tsx:84:47 `Expected /activity; Received /` because MemoryRouter does not populate window.history. No failing test edited; fixture-only authorization needed. Full log/report retained; four shards not run. Expected7,223/636 (+18 cases/3 files versus7,205/633), not executed full suite. Six live checks unavailable with external unmanaged auth; preview build OK.
 
