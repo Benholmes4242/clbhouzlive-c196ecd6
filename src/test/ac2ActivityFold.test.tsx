@@ -1,8 +1,11 @@
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// Pinned to local midday: fixtures are stamped one hour ago and must stay in Today whatever time the suite runs.
+vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 10, 6, 12, 0) });
+afterAll(() => vi.useRealTimers());
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const h = vi.hoisted(() => ({
   user: { id: 'viewer' } as { id: string } | null,

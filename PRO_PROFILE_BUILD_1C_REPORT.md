@@ -1,4 +1,16 @@
-# Pro profile build 1c — implemented; verification stopped
+# Pro profile build 1c — close-out complete
+
+## Close-out (2026-11-06)
+1. **Clock fix (authorized, test-only):** `src/test/ac2ActivityFold.test.tsx` — added `afterAll` to the vitest import and, directly after the imports, the pin `vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 10, 6, 12, 0) });` with the required comment and `afterAll(() => vi.useRealTimers());`. No assertion changes. The two `:216`/`:253` failures were the clock bug; both now pass.
+2. **HeroShell letter-spacing (house rule):** line ~170 `letterSpacing: '-0.01em'` → `0`; line ~227 `letterSpacing: '-0.02em'` → `0`. Nothing else in HeroShell changed. Member hero headline/counter figures change very slightly, as briefed.
+3. **320px/390px spec check against build1c-pro-strokes-signed-off.html: NOT VERIFIED.** `/profile/:username` redirects signed-out visitors to `/auth`, and this project's auth is `external_unmanaged`, so no session can be minted or injected. None of the three states (member view of Mason, covered-tour pro, Mason's own view) could be rendered in the browser. Overflow, surname+PRO badge, four-button row, strokes-only rows and FINISH/STROKES/WORLD RANK tiles are therefore unchecked on a real device viewport.
+4. **Four shards, fresh run:** shard 1 = 1,870 passed (158 files); shard 2 = 1,717 (158); shard 3 = 1,834 passed + 3 failed (158); shard 4 = 1,764 (158). Total 7,185 passed + 3 known failures = 7,188 tests / 632 files — matches the expected 7,188/632 inventory. The only failures are the three known FS_NOTCH ones: `fsNotch1.test.tsx` ("renders the scrim inside a top-0 portrait slide") and `fullscreenBand.test.ts` ("height-limits taller portraits…", "anchors synthetic portrait media…"). Confirmed by isolated rerun. Preview build log 2026-11-06T06:02:51Z: `build OK`.
+
+**Changed tests this close-out:** only `ac2ActivityFold.test.tsx` (clock pin above; no assertions touched). No other test files changed.
+
+---
+
+## Original build 1c report (verification stopped at the time)
 
 ## Delivered
 OWGR result rows display total strokes only at14px/800. Result sheets display FINISH/STROKES/WORLD RANK and round strokes at20px/800, with the plain OWGR footnote followed by the retained points sentence. All course-par controls, maths, attribution, saves and admin lookup are removed. Explicit event projection does not fetch dormant par fields. Pro-added/covered-tour signed to-par stays unchanged. Build1b hero/avatar/social/ordinal/month/SCORING/rank rules retained. No SQL/migrations/types/database/sync/native/feed_config changes.
