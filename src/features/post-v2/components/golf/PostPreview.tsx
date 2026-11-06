@@ -123,10 +123,10 @@ export function PostPreview({ open, onBack, post, tags, pars, withPeople }: {
         <span style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>Preview</span>
         <span style={{ width: 40 }} />
       </div>
-      {open && (
+      {open && videoDims && (
         <div style={{ marginTop: 8, pointerEvents: 'none' }}>
           <FeedCard
-            post={post} liked={false} likeCount={0} commentCount={0}
+            post={shownPost} liked={false} likeCount={0} commentCount={0}
             onLike={noop} onComment={noop} onShare={noop} onOpenMedia={noop} onProfile={noop}
             isActive mountVideo
             playedWith={withPeople.map((p) => ({ userId: p.id, name: p.name, avatarUrl: p.avatarUrl }))}
