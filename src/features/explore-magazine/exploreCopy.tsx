@@ -70,7 +70,7 @@ export function kickerParts(item: StreamItem, t: T): KickerParts {
   }
   /* NO "AT YOUR CLUB" PREFIX. The club's own name follows it and a member knows
      their own club, so the prefix states what the name already says — the same
-     reasoning that removed "Course record". The other ring prefixes STAY: a
+     reasoning that removed "Best on clbhouz". The other ring prefixes STAY: a
      course name alone does not say why the card reached you. */
   if (item.ring === 'club') return withCourse(null);
 
