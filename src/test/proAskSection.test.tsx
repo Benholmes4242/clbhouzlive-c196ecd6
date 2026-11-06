@@ -246,6 +246,7 @@ describe('pro ask — questions sheet', () => {
     mount(true);
     fireEvent.click(await screen.findByText('2 waiting ›'));
     await screen.findByText('Questions for you');
+    await screen.findByText('Do you carry a 2-iron?');
   };
   it('segments show their counts', async () => {
     await openSheet();
