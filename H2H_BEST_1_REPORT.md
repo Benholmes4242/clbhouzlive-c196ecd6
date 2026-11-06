@@ -1,4 +1,20 @@
-# H2H_BEST_1 — compare sheet "Your best here" tiles blank
+# H2H_BEST_1 — compare sheet best tiles blank, relabelled "best ever"
+
+## Revised brief (FIX 2: the labels)
+- `HeadToHeadDetail.tsx` — "YOUR BEST HERE" → "YOUR BEST EVER";
+  "{FIRST}'S BEST HERE" → "{FIRST}'S BEST EVER". One-line string change, same
+  style; the label span is a block with no nowrap, so a long first name wraps to
+  a second line and is never truncated.
+- Test assertion updated (string only): the W-group sheet test now also asserts
+  the labels read `YOUR BEST EVER` / `THOMAS'S BEST EVER`. Old: no label
+  assertion existed; new: `expect(labels).toEqual(['YOUR BEST EVER', "THOMAS'S BEST EVER"])`.
+  No other existing assertion referenced the old wording.
+- Second focused run: 24/24. Four shards re-run: 1,898 / 1,822 / 1,882 / 1,798
+  passed = 7,400 passed + the same 3 known failures (FM1 sound meta-line;
+  two proClubhouseSponsor sheet style stops) = 7,403 tests / 645 files. No new
+  failures; `tourIsland.test.tsx:235` did not appear.
+
+## Original brief (FIX 1: the data)
 
 ## Cause
 Shared-round groups are keyed by a `whs_courses` id (`detect_shared_rounds`), while
