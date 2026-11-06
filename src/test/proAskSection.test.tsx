@@ -264,7 +264,7 @@ describe('pro ask — questions sheet', () => {
     expect(await screen.findByText('Your answer')).toBeTruthy();
     expect(screen.getByText('Sam Carter · Sundridge Park')).toBeTruthy();
     expect(screen.getByText(/Sam gets a notification/)).toBeTruthy();
-    fireEvent.change(screen.getByLabelText('Your answer'), { target: { value: 'A 7-wood, every time.' } }));
+    fireEvent.change(screen.getByLabelText('Your answer'), { target: { value: 'A 7-wood, every time.' } });
     fireEvent.click(screen.getByRole('button', { name: 'Post answer' }));
     await waitFor(() => expect(h.rpcCalls.some((c) => c.fn === 'answer_pro_question' && c.args.p_question_id === 'i1')).toBe(true));
   });
