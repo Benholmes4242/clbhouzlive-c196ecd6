@@ -22,7 +22,7 @@ beforeEach(() => {
   f.rpc.mockReset().mockImplementation(async (name: string) => ({ data: name === 'tournament_pick_locks_at' ? f.time : name === 'tournament_pick_is_locked' ? f.locked : name === 'get_tournament_pick_state' ? [{ my_player_id: null, locks_at: f.time, locked: false, followed_pickers: 0, followed_top: [] }] : null, error: null }));
 });
 afterEach(() => { cleanup(); client.clear(); });
-function mount() { render(<MemoryRouter><QueryClientProvider client={client}><I18nextProvider i18n={i18n}><PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={[]} startedPlayers={new Set()} onPick={() => {}} onRecord={() => {}} /></I18nextProvider></QueryClientProvider></MemoryRouter>); }
+function mount() { render(<MemoryRouter><QueryClientProvider client={client}><I18nextProvider i18n={i18n}><PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={[]} startedPlayers={new Set()} onPick={() => {}} /></I18nextProvider></QueryClientProvider></MemoryRouter>); }
 describe('guest tournament lock authority', () => {
   it('signed-out viewers read both public scalar functions and never member state', async () => {
     mount(); await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('tournament_pick_is_locked', { p_tournament_id: 'event' }));

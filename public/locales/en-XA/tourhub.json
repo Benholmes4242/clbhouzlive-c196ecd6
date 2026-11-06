@@ -594,6 +594,8 @@
       "from": "from {{count}} events ›",
       "from_one": "from 1 event ›",
       "from_other": "from {{count}} events ›",
+      "fromEvents_one": "[~~ƒřőɱ 1 éṽéñţ~~]",
+      "fromEvents_other": "[~~ƒřőɱ {{count}} éṽéñţš~~]",
       "followed_one": "1 person you follow has picked. Most picked: {{name}}.",
       "followed_other": "{{count}} people you follow have picked. Most picked: {{name}}.",
       "bestFollowed": "Best pick among people you follow: {{name}}, {{position}}.",
