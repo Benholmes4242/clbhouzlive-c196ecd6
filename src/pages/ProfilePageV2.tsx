@@ -6,7 +6,6 @@
 import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
 import { useProMembers } from '@/features/pro-verification/useProMembers';
 import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ProProfileBuildOne } from '@/features/pro-profile/ProProfileBuildOne';
 import { Button } from '@/components/ui/button';
 import { ProfileProNote } from '@/features/pro-verification/ProfileProNote';
@@ -278,7 +277,6 @@ const ProfilePageV2Content: React.FC = () => {
   const isOwnAccount = user?.id === profileUserId;
   const isSelf = isOwnAccount; // legacy alias - preserves personal-identity-owned UI below
   const profilePros = useProMembers(getProfileType(profile?.user_type).isPersonal ? [profileUserId] : []);
-  const isAdmin = useIsAdmin();
   const proMember = profileUserId ? profilePros.members.get(profileUserId) : undefined;
   // Pending requests are private; never read another member's request.
   const ownProRequest = useQuery({
@@ -1001,7 +999,6 @@ const ProfilePageV2Content: React.FC = () => {
             friends={friendsCount} onFriends={() => navigate(`/profile/${username}/followers?tab=following&filter=friends`)}
             businessViewer={viewerActorType === 'business'} onFriend={handleFriendAction} friendBusy={friendshipUpdating}
             friendLabel={friendshipUpdating ? friendshipStatus === 'friends' ? 'Unfriending…' : friendshipStatus === 'request_sent' ? 'Cancelling…' : friendshipStatus === 'request_received' ? 'Accepting…' : 'Sending…' : friendshipStatus === 'none' ? 'Add friend' : getFriendButtonLabel()}
-            canEditPar={isOwnAccount || isAdmin}
             followersReady={socialCountState === 'ok'}
             onFollowers={() => navigate(`/profile/${username}/followers`)}
             onAvatar={() => isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true)}

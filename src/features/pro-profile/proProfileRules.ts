@@ -1,10 +1,10 @@
 /** Profile-only calendar-year and score-source rules. OWGR storage stays gross;
- * display to-par requires explicitly supplied course par. Other sources stay to-par.
+ * OWGR display is strokes-only; pro-added and covered-tour scores stay to-par.
  */
 import type { Database } from '@/integrations/supabase/types';
 import type { PlayerResult } from '@/features/tourhub/player-v2/data/usePlayerData';
 export type ProRound = Database['public']['Tables']['pro_event_rounds']['Row'];
-export type ProEvent = Omit<Database['public']['Tables']['pro_events']['Row'], 'course_par' | 'course_par_set_by'> & { course_par?: number | null; course_par_set_by?: string | null; rounds: ProRound[] };
+export type ProEvent = Pick<Database['public']['Tables']['pro_events']['Row'], 'id' | 'user_id' | 'source' | 'event_name' | 'tour_name' | 'start_date' | 'end_date' | 'country' | 'venue' | 'finish' | 'to_par' | 'total_strokes' | 'scheduled_rounds' | 'tee_time' | 'tee_hole' | 'owgr_event_id' | 'owgr_points' | 'owgr_rank_before' | 'owgr_rank_after' | 'owgr_year' | 'owgr_week' | 'created_at' | 'updated_at'> & { rounds: ProRound[] };
 export interface WorldRank { rank: number; ranking_date: string; prior_rank: number | null; season_start_rank: number | null; best_rank: number | null; source: string }
 export function parseWorldRank(value: unknown): WorldRank | null {
   const v = Array.isArray(value) ? value[0] : value;
@@ -33,19 +33,8 @@ export function finishLabel(finish: string | null) {
 export const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 export const monthLabel = (date: string | null) => date ? MONTHS[new Date(`${date.slice(0,10)}T12:00:00Z`).getUTCMonth()] ?? '' : '';
 export const formatWorldRank = (rank: number | null) => rank == null ? '—' : rank.toLocaleString('en-GB');
-export function eventToPar(event: ProEvent): number | null {
-  if (event.source !== 'owgr') return event.to_par;
-  const rounds = event.rounds.filter(r => r.source === 'owgr' && r.strokes != null);
-  return event.course_par != null && event.total_strokes != null && rounds.length > 0 ? event.total_strokes - event.course_par * rounds.length : null;
-}
-export const roundToPar = (event: ProEvent, round: ProRound) => event.source === 'owgr' ? event.course_par != null && round.source === 'owgr' && round.strokes != null ? round.strokes - event.course_par : null : round.to_par;
-export const needsPar = (event: ProEvent) => event.source === 'owgr' && event.total_strokes != null && event.course_par == null;
 export function pointsCopy(points: number | null) {
   return points == null || points <= 0 ? '' : points < .005 ? ' Under 0.01 ranking points earned.' : ` ${points.toFixed(2)} ranking points earned.`;
-}
-export function parFootnote(event: ProEvent, first: string) {
-  const lead = 'Strokes as published by the Official World Golf Ranking';
-  return event.course_par == null ? `${lead}, which doesn't publish par.` : `${lead}. Par ${event.course_par}${event.course_par_set_by === event.user_id ? `, added by ${first}` : ''}.`;
 }
 export const scoreLabel = (score: number | null) => score == null ? '—' : score < 0 ? `−${Math.abs(score)}` : score === 0 ? 'E' : `+${score}`;
 export function eventYear(event: ProEvent): number | null { return event.start_date ? Number(event.start_date.slice(0, 4)) : event.owgr_year; }
