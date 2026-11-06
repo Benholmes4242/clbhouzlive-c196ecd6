@@ -240,3 +240,11 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [x] Add small verified-only labels inside original name elements on the remaining mounted surfaces, preserving card geometry and business/player exclusions.
 - [x] Add 12 mounted-surface/batched-read/layout tests; no existing test fixtures changed.
 - [ ] STOP: proVerification2B.test.tsx:81 new picks-member test expects input id order, but the board renders ordinary/pending/pro; 11 passed, 1 failed. No assertion edited; four shards blocked pending direction. Expected inventory 6,742 / 593 (+12 / +1).
+
+## PREVIEW_FIX_2 + PV1 — post composer Preview swipe, video playback, Share footer
+- [ ] FIX 1: remove pointerEvents none from PostPreview card wrapper; onClickCapture guards a[href] taps; swipe/dots work.
+- [ ] FIX 2: harden LocalBlobVideo (imperative muted/defaultMuted/playsInline before play, load() on src change, retry once on canplay, 2000ms tap-to-play fallback); diagnose WebKit cause in Playwright.
+- [ ] PV1: pinned Share footer on Preview identical to composer footer (shared ShareFooter owner), posts via the composer's own onPrimary.
+- [ ] Tests: new previewFix2.test.tsx; PREVIEW_FIX_1 stays green; no existing test edits.
+- [ ] Run 4 shards (--maxWorkers=2); tourIsland.test.tsx:235 is a known pre-existing failure — name and continue.
+- [ ] Playwright WebKit 390×844 checks (photo+video swipe, single video, no navigation, Back intact); auth is external unmanaged — report if blocked.
