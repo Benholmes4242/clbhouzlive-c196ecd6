@@ -120,6 +120,9 @@ const FIXTURES: Fixture[] = [
   { name: 'video_ready', row: { notif_type: 'video_ready', entity_type: 'post', entity_id: POST, data: { post_id: POST, stream_id: 'st1' } } },
   { name: 'service_announcement (route)', row: { notif_type: 'service_announcement', data: { campaign: 'c', route: '/amateur' } } },
   { name: 'golfer_verified', row: { notif_type: 'golfer_verified', data: {} } },
+  { name: 'pro_question_asked', row: { notif_type: 'pro_question_asked', data: { question_id: 'question-1', pro_id: ACTOR } } },
+  { name: 'pro_question_answered', row: { notif_type: 'pro_question_answered', data: { question_id: 'question-1', pro_id: ACTOR } } },
+  { name: 'pro_round_posted', row: { notif_type: 'pro_round_posted', data: { pro_id: ACTOR, event_id: 'event-1', round_no: 2, to_par: -3, holes_played: 18 } } },
   { name: 'onboarding_nudge (whs)', row: { notif_type: 'onboarding_nudge', data: { gap: 'whs' } } },
   { name: 'onboarding_nudge (club)', row: { notif_type: 'onboarding_nudge', data: { gap: 'club' } } },
   { name: 'onboarding_nudge (username)', row: { notif_type: 'onboarding_nudge', data: { gap: 'username' } } },
@@ -167,6 +170,9 @@ const INERT_EXCEPTIONS: Fixture[] = [
 const TOUR_EXCEPTIONS: Fixture[] = ['tour_preview','tour_roundup'].map(notif_type => ({name:notif_type,row:{notif_type,data:{}}}));
 
 describe('notifRoute parity with activityLinks', () => {
+  it('pro_round_posted opens the pro profile on the client', () => {
+    expect(getActivityLink(row({ notif_type: 'pro_round_posted', data: { pro_id: ACTOR, event_id: 'event-1', round_no: 2, to_par: -3, holes_played: 18 } }))).toBe(`/profile/${ACTOR}`);
+  });
   it.each(TOUR_EXCEPTIONS)('$name opens overview on client and wire on push pending a separate push-router change Ben will approve', ({row:partial}) => {
     const r=row(partial);
     expect(getActivityLink(r)).toBe('/tourhub');

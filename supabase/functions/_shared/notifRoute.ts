@@ -397,6 +397,17 @@ export function routeForNotif(input: NotifRouteInput): string {
   if (type === 'golfer_verified' || type === 'golfer_verification_approved') return '/profile';
   if (type === 'golfer_verification_rejected' || type === 'golfer_verification_removed' || type === 'pro_verification_requested') return '/edit-profile';
 
+  // pro Ask and posted rounds — Mirrors src/features/activity-v2/utils/activityLinks.ts.
+  if (type === 'pro_question_asked') return '/profile?ask=inbox';
+  if (type === 'pro_question_answered') {
+    const proId = data.pro_id;
+    return proId ? `/profile/${proId}?ask=section` : '/profile';
+  }
+  if (type === 'pro_round_posted') {
+    const proId = data.pro_id;
+    return proId ? `/profile/${proId}` : '/profile';
+  }
+
   // tour digests (system-authored, NO actor, NO target). Each digest summarises
   // several stories, so there is nothing single to deep-link to — they land on
   // the wire, not on a hub with a leaderboard at the top.

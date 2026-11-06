@@ -467,6 +467,10 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     const proId = data.pro_id;
     return proId ? `/profile/${proId}?ask=section` : '/profile';
   }
+  if (type === 'pro_round_posted') {
+    const proId = data.pro_id;
+    return proId ? `/profile/${proId}` : '/profile';
+  }
 
   // --- tour digests (system-authored, NO actor, NO target) ------------
   // These digests announce the week's tournaments; the overview is where
