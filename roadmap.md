@@ -2,8 +2,8 @@
 
 ## Pro profile build 3 close-out
 - [x] Hide the visitor header entrypoint only while the enabled, zero-total, no-own-waiting invitation card shows; add two regression cases without changing existing cases.
-- [ ] Run the outstanding shard 4, then a fresh four-shard suite; carry only the known FM1 meta-padding failure and stop on anything else.
-- [ ] Write PRO_PROFILE_BUILD_3_REPORT.md with added files, test ledger and reconciled shard counts.
+- [ ] STOP: outstanding shard4 has1,808 passed/1 unexpected failure at notifRoute.parity.test.ts:312:46 (missing pro_question_asked/pro_question_answered). New test also has TS2769 at80:54/87:75 ('exact' does not exist in ByRoleOptions). No repairs or further test runs; fresh four-shard suite awaits authorization.
+- [x] Write PRO_PROFILE_BUILD_3_REPORT.md with added files, test ledger, expected7,348/644 inventory, carried earlier counts and verbatim stop errors; known FM1 left untouched.
 
 ## FM1_MUTE_1
 - [x] Move mounted-video sound and duration into playback-owned top-right group; isolate inputs and release meta width; preserve deck behavior.
