@@ -77,14 +77,14 @@ describe('pro ask — visitor view', () => {
   it('enabled with nothing has only the invitation Ask entrypoint', async () => {
     h.answers = payload({ total: 0, answers: [] });
     const { container } = mount(false);
-    await screen.findByRole('button', { name: 'Ask', exact: true });
+    await screen.findByRole('button', { name: 'Ask' });
     const header = container.querySelector('.pro-profile-heading');
     const card = container.querySelector('.pro-ask-card');
     expect(header).not.toBeNull();
     expect(card).not.toBeNull();
     if (!header || !card) throw new Error('Missing Ask section header or invitation card');
     expect(within(header as HTMLElement).queryByRole('button')).toBeNull();
-    expect(within(card as HTMLElement).getByRole('button', { name: 'Ask', exact: true })).toBeTruthy();
+    expect(within(card as HTMLElement).getByRole('button', { name: 'Ask' })).toBeTruthy();
   });
   it('enabled with answers retains the header Ask entrypoint', async () => {
     const { container } = mount(false);
