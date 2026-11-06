@@ -22,7 +22,7 @@ describe('RC2_WORDING course record', () => {
   });
   it('English locale values match', () => {
     const a = (en as any).amateur;
-    expect(a.shelf.recordReason.courseRecordHolder).toBe('Course record here');
+    expect(a.shelf.recordReason.courseRecordHolder).toBe('Course record');
     expect(a.stream.callout.courseRecord).toBe('Course record');
   });
 });
