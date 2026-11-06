@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro profile build2
+- [ ] Bag/partners/career settled sections and owner-only single-sheet editing; live business lookup/linking, scoped writes and invalidation.
+- [ ] Real Mason OWGR derivations, cap/validation tests, visitor/guest/owner proof and320px views; four shards, stop unexpected failure; baseline7,258/639.
+- [x] Three table types already present in generated types; no manual edits needed, SQL/migrations prohibited.
+
 ## PK2_ODDS_1
 - [ ] Replace only record benchmark with server-weighted winner odds; viewer-keyed gated hook, pure helper, locales and isolated styles; preserve circle/ledger/header/tiles.
 - [ ] Authorized two assertions, helper/guest/member/cache tests; focused then four separate shards. Report live tour/320 checks and counts against7,234/637.

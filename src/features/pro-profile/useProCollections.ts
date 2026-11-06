@@ -1,0 +1,14 @@
+/** Reads stay profile-keyed and writes invalidate only their collection.
+ * Live-business resolution excludes deleted/system identities for every door. */
+import {useQuery,useQueryClient} from '@tanstack/react-query';
+import {supabase} from '@/integrations/supabase/client';
+import {toast} from 'sonner';
+import type {BagItem,Partner,CareerMoment} from './proCollectionRules';
+export interface ProBusiness {id:string;name:string;logo_url:string|null;category:string|null;city:string|null;region:string|null}
+const projection='id,name,logo_url,category,city,region';
+export function useProBag(userId:string){return useQuery({queryKey:['pro-profile','bag',userId],enabled:!!userId,queryFn:async()=>{const {data,error}=await supabase.from('pro_bag_items').select('*').eq('user_id',userId);if(error)throw error;return data as BagItem[];}});}
+export function useProPartners(userId:string){return useQuery({queryKey:['pro-profile','partners',userId],enabled:!!userId,queryFn:async()=>{const {data,error}=await supabase.from('pro_partners').select('*').eq('user_id',userId);if(error)throw error;return data as Partner[];}});}
+export function useProCareer(userId:string){return useQuery({queryKey:['pro-profile','career',userId],enabled:!!userId,queryFn:async()=>{const {data,error}=await supabase.from('pro_career_moments').select('*').eq('user_id',userId);if(error)throw error;return data as CareerMoment[];}});}
+export function useProBusinesses(ids:string[]){const keys=[...new Set(ids)].sort();return useQuery({queryKey:['pro-profile','businesses',keys],enabled:keys.length>0,queryFn:async()=>{const {data,error}=await supabase.from('business_accounts').select(projection).eq('is_deleted',false).eq('is_system_account',false).in('id',keys);if(error)throw error;return data as ProBusiness[];}});}
+export function useProBusinessSearch(text:string,limit:number){return useQuery({queryKey:['pro-profile','business-search',text,limit],enabled:text.trim().length>=2,queryFn:async()=>{const {data,error}=await supabase.from('business_accounts').select(projection).eq('is_deleted',false).eq('is_system_account',false).ilike('name',`%${text.trim()}%`).limit(limit);if(error)throw error;return data as ProBusiness[];}});}
+export function useCollectionWrite(userId:string){const cache=useQueryClient();return async(kind:'bag'|'partners'|'career',action:()=>PromiseLike<{error:{message:string}|null}>)=>{try{const {error}=await action();if(error)throw error;await cache.invalidateQueries({queryKey:['pro-profile',kind,userId]});return true;}catch(e){toast.error(e&&typeof e==='object'&&'message'in e?String(e.message):'Could not save. Please try again.');return false;}};}
