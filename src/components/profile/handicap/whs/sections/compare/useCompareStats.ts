@@ -24,6 +24,7 @@ interface GamRow {
   hcp_at_time: number | null;
   holes_played?: number | null;
   course_id?: string | null;
+  whs_score_id?: string | null;
 }
 
 function emptyPlayer(): PlayerStats {
@@ -114,7 +115,7 @@ export function useCompareStats(
       const { data: gamRows } = await supabase
         .from('gam_round_stats' as never)
         .select(
-          'user_id, play_date, gross_score, stableford_points, sub_80, beat_par, course_par, hcp_at_time, holes_played, course_id',
+          'user_id, play_date, gross_score, stableford_points, sub_80, beat_par, course_par, hcp_at_time, holes_played, course_id, whs_score_id',
         )
         .in('user_id', [viewerId, targetUserId]);
       const gam = (gamRows as unknown as GamRow[]) ?? [];
@@ -182,6 +183,10 @@ export function useCompareStats(
       them.avg_points = themAvg.avgPoints;
       me.course_bests = courseBests(meRows);
       them.course_bests = courseBests(themRows);
+      // H2H_BEST_1: the raw rows too, so the sheet can resolve a shared-round
+      // group's whs course id to the golf_courses id course_bests is keyed by.
+      me.gam_rows = meRows;
+      them.gam_rows = themRows;
 
       me.handicap_index = latestIndex(meHistory);
       them.handicap_index = latestIndex(themHistory);

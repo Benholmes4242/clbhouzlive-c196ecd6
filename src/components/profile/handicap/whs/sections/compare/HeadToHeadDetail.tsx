@@ -16,7 +16,7 @@ import type { SharedRoundsResult } from '@/lib/whs/api';
 import type { HeadToHeadStats } from './h2hStats';
 import {
   HH_INK, HH_DIM, HH_BAR_OTHER, leaderOf, shareOf, figurePaint, fmtGap,
-  groupByCourse, recordLeadLine, shortDate, type Polarity, type Record3, type CourseGroup,
+  groupByCourse, recordLeadLine, shortDate, resolveGroupCourseId, type Polarity, type Record3, type CourseGroup,
 } from './headToHeadRules';
 
 const KICK: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(248,250,252,0.5)', textTransform: 'uppercase' };
@@ -226,9 +226,16 @@ export const HeadToHeadDetail: React.FC<Props> = ({ me, them, firstName, season,
               <div style={KICK}>COURSE BY COURSE</div>
               <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(248,250,252,0.55)' }}>{groups.length} {groups.length === 1 ? 'course' : 'courses'}</span>
             </div>
-            {groups.map((g, i) => (
-              <CourseCard key={g.courseId} g={g} first={first} defaultOpen={i === 0} meBest={season?.me.course_bests?.[g.courseId]} themBest={season?.them.course_bests?.[g.courseId]} />
-            ))}
+            {groups.map((g, i) => {
+              // H2H_BEST_1: the group is keyed by a whs_courses id; resolve
+              // each side's golf_courses id from its own gam rows so the
+              // best-here tiles read the right course_bests entry.
+              const meId = resolveGroupCourseId(g, season?.me.gam_rows ?? [], 'me');
+              const themId = resolveGroupCourseId(g, season?.them.gam_rows ?? [], 'them');
+              return (
+                <CourseCard key={g.courseId} g={g} first={first} defaultOpen={i === 0} meBest={meId ? season?.me.course_bests?.[meId] : undefined} themBest={themId ? season?.them.course_bests?.[themId] : undefined} />
+              );
+            })}
           </div>
         </section>
       )}
