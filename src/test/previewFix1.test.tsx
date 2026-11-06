@@ -95,7 +95,7 @@ describe('InlineVideo local blob branch', () => {
 describe('buildDraftFeedPost video mapping', () => {
   it('a video with a streamId maps to hlsUrl from generateStreamHlsUrl and no mp4Url', () => {
     const post = buildDraftFeedPost({ caption: '', media: [mediaItem({ streamId: 's'.repeat(32), posterUrl: 'p.jpg' })], course: null, actor, userId: 'u1' });
-    const item = post.mediaItems[0] as Record<string, unknown>;
+    const item = post.mediaItems[0] as unknown as Record<string, unknown>;
     expect(item.hlsUrl).toBe(generateStreamHlsUrl('s'.repeat(32)));
     expect(item.mp4Url).toBeUndefined();
     expect(item.thumbnailUrl).toBe('p.jpg');
@@ -103,14 +103,14 @@ describe('buildDraftFeedPost video mapping', () => {
 
   it('a new local video maps to its blob mp4Url and no hlsUrl', () => {
     const post = buildDraftFeedPost({ caption: '', media: [mediaItem({})], course: null, actor, userId: 'u1' });
-    const item = post.mediaItems[0] as Record<string, unknown>;
+    const item = post.mediaItems[0] as unknown as Record<string, unknown>;
     expect(item.mp4Url).toBe('blob:local-1');
     expect(item.hlsUrl).toBeUndefined();
   });
 
   it('an image is unchanged', () => {
     const post = buildDraftFeedPost({ caption: '', media: [mediaItem({ type: 'image', previewUrl: 'blob:img-1', naturalWidth: 800, naturalHeight: 1000 })], course: null, actor, userId: 'u1' });
-    const item = post.mediaItems[0] as Record<string, unknown>;
+    const item = post.mediaItems[0] as unknown as Record<string, unknown>;
     expect(item.imageUrl).toBe('blob:img-1');
     expect(item.width).toBe(800);
     expect(item.height).toBe(1000);
