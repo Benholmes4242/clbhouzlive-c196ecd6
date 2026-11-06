@@ -1,3 +1,4 @@
+import type React from 'react';
 /** Record is event-tour/season scoped; member odds and board read only the
  * viewer-keyed RPC. House circle figures use weekly best only; the ledger
  * keeps MC/WD/DQ separate and never prints eliminated scores. */
@@ -9,7 +10,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useOurPickRecord, useBeatTheModel, useMyPickOdds } from '../../../hooks/usePickInsights';
-import {barPercent,blindOdds,percentText,recordOdds,winPercent} from './pickOdds';
+import {aboutOneIn,averageBlindTop10,barPercent,multipleOf,rateOf,viewerBlindTop10,winnerOddsText} from './pickOdds';
 import { sortedBeatRows, resultPosition, outStatus, recordPickWon, recordEventSummary, orderedRecordPicks } from './pickInsightRules';
 import { surnameOf } from '../../../_shared/playerName';
 import './pickPanels.css';
@@ -30,11 +31,30 @@ function RecordSession({ onClose, tour, year }: OurRecordSheetProps) {
   const rows = record && members.some(row=>row.picks>0) ? sortedBeatRows(members,record) : [];
   const events=record?.event_count;
   const wins=record?.best?.wins;
-  const blind=blindOdds(record?.random_win_pct);
-  const chanceRow=(key:string,percent:number,odds:string,random=false)=><div className="pick-chance-row" data-chance-row={key}>
-    <div className="pick-chance-head"><span className="pick-chance-who">{copy(`chance.${key}`)}</span><span className="pick-chance-value">{percentText(percent,random)}<em>{copy('chance.odds',{odds})}</em></span></div>
-    <div className="pick-chance-track"><div className="pick-chance-fill" style={{width:`${barPercent(percent)}%`}}/></div>
+  const top10=record?.best?.top10;
+  const viewerRow=members.find(row=>row.is_viewer);
+  const blindTen=record?averageBlindTop10(record.events):null, blindWin=record?.random_win_pct!=null&&record.random_win_pct>0?record.random_win_pct:null;
+  const showMine=!!mine&&mine.events>0;
+  const myBlindWin=showMine&&mine!.random_win_pct!=null&&mine!.random_win_pct>0?mine!.random_win_pct:null, myBlindTen=viewerBlindTop10(myBlindWin);
+  const chanceRow=(key:'ours'|'random'|'you',value:React.ReactNode,rate:number)=><div className="pick-chance-row" data-chance-row={key}>
+    <div className="pick-chance-head"><span className="pick-chance-who">{copy(`chance.${key==='random'?'randomThree':key}`)}</span><span className="pick-chance-value">{value}</span></div>
+    <div className="pick-chance-track"><div className="pick-chance-fill" style={{width:`${barPercent(rate)}%`}}/></div>
   </div>;
+  const counted=(count:number,total:number,trail:string|null)=><>{copy('chance.countOf',{count,events:total})}{trail&&<em>{trail}</em>}</>;
+  const group=(kind:'top10'|'winner',ours:number,blind:number|null,blindText:string|null,you:{count:number;events:number;blind:number|null}|null)=>{
+    const total=events??0, rate=rateOf(ours,total), x=multipleOf(ours,rate,blind);
+    const yourRate=you?rateOf(you.count,you.events):0, yourX=you?multipleOf(you.count,yourRate,you.blind):null;
+    return <div className="pick-chance-group" data-chance-group={kind}>
+      <div className="pick-chance-group-head"><span>{copy(kind==='top10'?'chance.groupTop10':'chance.groupWinner')}</span>{x!=null&&<span className="pick-chance-x">{x}×<em>{copy('chance.blindPicks')}</em></span>}</div>
+      <div className="pick-chance-rows">
+        {chanceRow('ours',counted(ours,total,copy('chance.events',{count:total})),rate)}
+        {blind!=null&&blindText&&chanceRow('random',blindText,blind)}
+        {you&&chanceRow('you',counted(you.count,you.events,yourX!=null?copy('chance.youMultiple',{x:yourX}):null),yourRate)}
+      </div>
+    </div>;
+  };
+  const headX=events!=null&&top10!=null&&wins!=null?{a:multipleOf(top10,rateOf(top10,events),blindTen),b:multipleOf(wins,rateOf(wins,events),blindWin)}:null;
+  const headKey=headX?(headX.a!=null&&headX.b!=null?'headBoth':headX.a!=null?'headTop10':headX.b!=null?'headWinner':null):null;
   const month = record?.first_event_date ? new Intl.DateTimeFormat('en-GB', { month:'long' }).format(new Date(record.first_event_date)) : null;
   return <BottomSheet open onClose={onClose} scrollBody topRadius={22} grabberPadding="8px 0 12px" ariaLabelledBy="pick-record-title">
     <div data-our-record-sheet className="text-[color:var(--pick-ink)] pb-6">
@@ -42,17 +62,11 @@ function RecordSession({ onClose, tour, year }: OurRecordSheetProps) {
       {recordQuery.isError ? <div className="your-pick-empty" role="alert">{copy('error')}<Button variant="ghost" onClick={()=>void recordQuery.refetch()}>{copy('retry')}</Button></div> : !record ? <div className="your-pick-empty" role="status">{copy('loading')}</div> : <>
         <div className="pick-record-tours" aria-label={copy('tours')}>{TOURS.filter(code=>record.tours.includes(code)).map(code=><Button key={code} variant="ghost" className="pick-panel-chip" aria-pressed={selectedTour===code} onClick={()=>setTour(code)}>{TOUR_NAMES[code]}</Button>)}</div>
         <div className="pick-record-three tabular-nums">{(['event_count','won','top10'] as const).map(key=><div key={key}><b>{record[key]}</b><span>{copy(key)}</span></div>)}</div>
-        {events!=null && wins!=null && <div className="pick-record-chance">
-          <p className="pick-chance-sentence"><Trans t={t} i18nKey={`overview.pickRecord.chance.${wins>0?'winner':'noWinner'}`} count={events} values={{wins,events,odds:recordOdds(wins,events)}} components={{b:<b/>}}/>{blind && <> <Trans t={t} i18nKey="overview.pickRecord.chance.blind" values={{odds:blind.odds,n:blind.n}} components={{b:<b/>}}/></>}</p>
-          <div className="pick-chance-bars">
-            {chanceRow('ours',winPercent(wins,events),recordOdds(wins,events))}
-            {record.random_win_pct!=null && chanceRow('randomThree',record.random_win_pct,blind?.odds??'—',true)}
-            {mine && mine.events>0 && <div className="pick-chance-group">
-              {chanceRow('you',winPercent(mine.wins,mine.events),recordOdds(mine.wins,mine.events))}
-              {mine.random_win_pct!=null && chanceRow('randomOne',mine.random_win_pct,blindOdds(mine.random_win_pct)?.odds??'—',true)}
-            </div>}
-          </div>
-          <p className="pick-chance-foot">{copy('chance.footnote')}</p>
+        {events!=null && wins!=null && top10!=null && <div className="pick-record-chance">
+          {headKey&&<p className="pick-chance-sentence"><Trans t={t} i18nKey={`overview.pickRecord.chance.${headKey}`} values={{a:headX!.a,b:headX!.b}} components={{b:<b/>}}/></p>}
+          {group('top10',top10,blindTen,blindTen!=null?copy('chance.aboutOneIn',{n:aboutOneIn(blindTen)}):null,showMine&&viewerRow?{count:viewerRow.top10,events:mine!.events,blind:myBlindTen}:null)}
+          {group('winner',wins,blindWin,blindWin!=null?winnerOddsText(blindWin):null,showMine?{count:mine!.wins,events:mine!.events,blind:myBlindWin}:null)}
+          <p className="pick-chance-foot">{copy('chance.blindFoot')}</p>
         </div>}
         {rows.length>0 && <section className="pick-panel-sec" data-beat-model><div className="pick-panel-label">{copy('beatTitle')}</div>
           <div className="pick-record-board-row pick-record-board-header"><span /><span /><span>{copy('event_count')}</span><span>{copy('winsLabel')}</span><span>{copy('top10Column')}</span><span>{copy('beat')}</span></div>
