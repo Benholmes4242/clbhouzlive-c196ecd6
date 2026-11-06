@@ -15,6 +15,7 @@ import { deleteDraft } from '@/services/drafts/draftService';
 import { uploadManager } from './UploadManager';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { format } from 'date-fns';
+import { refreshAuthorPosts } from '@/features/post-v2/lib/refreshAuthorPosts';
 
 
 const TOAST_DURATION_ERROR_MS = 4000;
@@ -53,6 +54,9 @@ export function UploadToastsBridge() {
 
       // Author-scoped post lists / counts.
       if (evt.actorType && evt.actorId) {
+        if (!evt.isScheduled && evt.uploadType === 'post') {
+          void refreshAuthorPosts(queryClient, evt.actorType, evt.actorId);
+        }
         queryClient.invalidateQueries({
           queryKey: postKeys.actorPosts(evt.actorType, evt.actorId),
         });

@@ -78,6 +78,7 @@ import { isHoleTag, roundReason, shareSubLine, toggleWith, visibilityLabel, type
 import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstCaptureDay, searchMembers } from './lib/golfPostReads';
 import { readPostWith, syncPostWith } from './lib/postWith';
 import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
+import { refreshAuthorPosts } from './lib/refreshAuthorPosts';
 
 interface Props {
   onClose: () => void;
@@ -609,6 +610,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         actor_type: activeActor.type,
         total_ms: Math.round(Date.now() - mountedAtRef.current),
       });
+      void refreshAuthorPosts(queryClient, activeActor.type, activeActor.id);
       setSuccess(res);
       reset();
     } catch (e) {
