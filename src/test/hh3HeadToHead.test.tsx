@@ -36,7 +36,7 @@ import { CompareSheet } from '@/components/profile/handicap/whs/sections/compare
 import { HeadToHeadEntryRow } from '@/components/profile/handicap/whs/sections/compare/HeadToHeadEntryRow';
 import { HeroHandicapDisplay } from '@/components/profile/hero/HeroHandicapDisplay';
 import { compareBus } from '@/components/profile/handicap/whs/sections/compare/events';
-import { entryLine, averages, groupByCourse, recordLeadLine, HH_INK, HH_DIM } from '@/components/profile/handicap/whs/sections/compare/headToHeadRules';
+import { entryLine, averages, groupByCourse, recordLeadLine, resolveGroupCourseId, HH_INK, HH_DIM } from '@/components/profile/handicap/whs/sections/compare/headToHeadRules';
 import type { SharedRoundResult } from '@/lib/whs/api';
 
 const player = (o: Record<string, unknown> = {}) => ({
@@ -218,6 +218,41 @@ describe('HH3 sheet', () => {
     expect(document.querySelector('input')).not.toBeNull();
     expect(document.querySelector('[data-hh-header]')).toBeNull();
     expect(document.querySelector('[data-hh-detail]')).toBeNull();
+  });
+
+  it('H2H_BEST_1: best-here tiles resolve the whs-keyed group to each side\u2019s golf course id', () => {
+    h.shared = sharedWith([round('W', '2026-11-01', 80, 82)]);
+    h.season = {
+      rivalName: 'Thomas Holmes',
+      me: player({
+        course_bests: { G: { gross: 74, points: 38 } },
+        gam_rows: [{ play_date: '2026-11-01', gross_score: 80, course_id: 'G' }],
+      }),
+      them: player({
+        course_bests: { H: { gross: 71, points: 40 } },
+        gam_rows: [{ play_date: '2026-11-01', gross_score: 82, course_id: 'H' }],
+      }),
+    };
+    openSheet();
+    const card = document.querySelector('[data-hh-course="W"]') as HTMLElement;
+    const tiles = Array.from(card.querySelectorAll('[data-hh-course-body] b')).map((b) => b.textContent);
+    expect(tiles).toEqual(['74 \u00B7 38 pts', '71 \u00B7 40 pts']);
+  });
+
+  it('H2H_BEST_1: a side with no matching gam rows keeps the dash on that side only', () => {
+    h.shared = sharedWith([round('W', '2026-11-01', 80, 82)]);
+    h.season = {
+      rivalName: 'Thomas Holmes',
+      me: player({
+        course_bests: { G: { gross: 74, points: 38 } },
+        gam_rows: [{ play_date: '2026-11-01', gross_score: 80, course_id: 'G' }],
+      }),
+      them: player({ course_bests: { H: { gross: 71, points: 40 } }, gam_rows: [] }),
+    };
+    openSheet();
+    const card = document.querySelector('[data-hh-course="W"]') as HTMLElement;
+    const tiles = Array.from(card.querySelectorAll('[data-hh-course-body] b')).map((b) => b.textContent);
+    expect(tiles).toEqual(['74 \u00B7 38 pts', '\u2013 \u00B7 \u2013 pts']);
   });
 
   it('no amber in any HH3 component (source)', () => {
