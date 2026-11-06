@@ -252,7 +252,7 @@ describe('pro ask — questions sheet', () => {
     await openSheet();
     const seg = (name: string) => screen.getByText((_, el) => el?.tagName === 'BUTTON' && el.textContent === name);
     expect(seg('Waiting · 2')).toBeTruthy();
-    fireEvent.click(seg('Answered · 1'));
+    fireEvent.click(seg('Answered · 3'));
     expect(await screen.findByText('Tommy, easily.')).toBeTruthy();
   });
   it('Not for me calls decline', async () => {
@@ -272,7 +272,7 @@ describe('pro ask — questions sheet', () => {
   });
   it('edit mode shortens the note', async () => {
     await openSheet();
-    fireEvent.click(screen.getByText((_, el) => el?.tagName === 'BUTTON' && el.textContent === 'Answered · 1'));
+    fireEvent.click(screen.getByText((_, el) => el?.tagName === 'BUTTON' && el.textContent === 'Answered · 3'));
     fireEvent.click(await screen.findByRole('button', { name: 'Edit answer' }));
     expect(await screen.findByText('Your answer shows on your profile.')).toBeTruthy();
     expect(screen.queryByText(/gets a notification/)).toBeNull();
