@@ -1,5 +1,9 @@
 # Roadmap
 
+## Pro profile 1c re-uploaded close-out
+- [x] Confirm exact clock pin and both HeroShell zero-spacing lines already present; no duplicate edits. Focused116/116.
+- [ ] Recheck supplied spec findings and four fresh shards; report unchanged-test ledger and 320/390 authenticated-view limits.
+
 ## VIEW_POST_1
 - [x] Authorized test-only close-out: only history-length setup and one fallback sibling; focused67/67, fresh shards1,873/1,729/1,849/1,773 =7,224/636, zero failures. Known portrait/TourIsland failures did not recur; old/new code and retained logs in VIEW_POST_1_REPORT.md.
 - [x] Isolate View post navigation in both composer mounts; author-profile close/fallback destination and actor-scoped inactive grid refetch on submit/upload completion.
