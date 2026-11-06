@@ -29,7 +29,7 @@ Shard 4: **1,808 passed / 1 failed = 1,809 executed**, 160 passed files / 1 fail
 
 This is not the authorized known Featured failure. The parity test and routing implementation were not repaired. The fresh four-shard rerun and focused run were not started after this stop.
 
-## Surviving preview type errors
+## Preview type errors — resolved in type-only follow-up
 The preview's automatic check at `2026-11-06T16:58:00Z` also reported:
 
 ```text
@@ -41,7 +41,20 @@ The last overload gave the following error.
 Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
 ```
 
-Both are in the newly added test's role queries. No repair was made after the completed-edit stop; the close-out is not build-clean or complete.
+Both were in the newly added test's role queries. The subsequent explicit type-error repair removed only the unsupported `exact` option; a string `name` already matches exactly by default. Preview build OK at `2026-11-06T17:02:52Z`. The unexpected parity failure remains untouched, so full close-out is still incomplete.
+
+Only the new case `enabled with nothing has only the invitation Ask entrypoint` changed in this follow-up, preserving both assertions and their meaning:
+```tsx
+// Old
+await screen.findByRole('button', { name: 'Ask', exact: true });
+expect(within(card as HTMLElement).getByRole('button', { name: 'Ask', exact: true })).toBeTruthy();
+// New
+await screen.findByRole('button', { name: 'Ask' });
+expect(within(card as HTMLElement).getByRole('button', { name: 'Ask' })).toBeTruthy();
+```
+Reason: `ByRoleOptions` does not support `exact`; removing it preserves exact-name selection. No original Build 3 test was rewritten. Test inventory remains **7,348 / 644**, delta **0** in this follow-up.
+
+Focused follow-up command: `bunx vitest run src/test/proAskSection.test.tsx --maxWorkers=2` — **32/32 passed**, one file. Output: `/tmp/pro-build3-closeout/type-fix-focused.log`. No shards were rerun; the unexpected parity failure still blocks them.
 
 ## Shard accounting
 Earlier Build 3 results below are carried from the preceding conversation, not rerun or independently recovered from original logs this turn.
@@ -104,4 +117,4 @@ This close-out adds:
 File count: **30 → 32 cases**. Existing tests deleted, renamed or rewritten: **none**. Existing test assertions changed: **none**, so there is no old/new existing-test assertion code to list. The import addition is not an assertion rewrite.
 
 ## Unverified and next scope
-The new cases, fresh four-shard suite and live visitor view are unverified. Authentication is externally managed; no member session bypass or guest mint was attempted. Close-out requires authorization to resolve the unexpected parity failure and the new test's type errors before continuing verification. No work continues after this report.
+The new cases now pass in the focused follow-up and the preview build is clean. The fresh four-shard suite and live visitor view remain unverified. Authentication is externally managed; no member session bypass or guest mint was attempted. Close-out requires authorization to resolve the unexpected parity failure before continuing full-suite verification. No work continues after this report.

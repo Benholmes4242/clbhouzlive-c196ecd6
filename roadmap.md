@@ -2,7 +2,8 @@
 
 ## Pro profile build 3 close-out
 - [x] Hide the visitor header entrypoint only while the enabled, zero-total, no-own-waiting invitation card shows; add two regression cases without changing existing cases.
-- [ ] STOP: outstanding shard4 has1,808 passed/1 unexpected failure at notifRoute.parity.test.ts:312:46 (missing pro_question_asked/pro_question_answered). New test also has TS2769 at80:54/87:75 ('exact' does not exist in ByRoleOptions). No repairs or further test runs; fresh four-shard suite awaits authorization.
+- [ ] STOP: outstanding shard4 has1,808 passed/1 unexpected failure at notifRoute.parity.test.ts:312:46 (missing pro_question_asked/pro_question_answered). Parity and known FM1 untouched; fresh four-shard suite awaits authorization.
+- [x] Explicit type-only follow-up removed unsupported exact options from the new test; focused32/32, preview build OK17:02:52Z; inventory unchanged7,348/644 and old/new lines recorded.
 - [x] Write PRO_PROFILE_BUILD_3_REPORT.md with added files, test ledger, expected7,348/644 inventory, carried earlier counts and verbatim stop errors; known FM1 left untouched.
 
 ## FM1_MUTE_1
