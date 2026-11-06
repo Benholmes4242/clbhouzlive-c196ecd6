@@ -45,6 +45,8 @@
   --pro-profile-hair: var(--tour-menu-hair);
   --pro-profile-rule: rgba(255,255,255,0.2);
   --pro-profile-wash: rgba(255,255,255,0.04);
+  --pro-collection-input: rgba(255,255,255,0.05);
+  --pro-career-line: rgba(255,255,255,0.1);
   --pro-profile-green: var(--tour-menu-live);
   --pro-profile-under: var(--tour-menu-under-par);
   --pro-profile-gold: #FBBC2E;

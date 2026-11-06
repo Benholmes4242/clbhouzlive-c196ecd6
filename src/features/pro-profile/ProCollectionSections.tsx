@@ -6,7 +6,8 @@ import {useNavigate} from 'react-router-dom';
 import {Button} from '@/components/ui/button';
 import {getGuestUser} from '@/features/guest/guestGateStore';
 import {useSupabaseSession} from '@/hooks/useSupabaseSession';
-import {careerEntries,orderedBag,orderedPartners,type ProEvent} from './proCollectionRules';
+import {careerEntries,orderedBag,orderedPartners} from './proCollectionRules';
+import type {ProEvent} from './proProfileRules';
 import {useProBag,useProPartners,useProCareer,useProBusinesses} from './useProCollections';
 import {ProCollectionSheet,ProBusinessLogo,type CollectionPanel} from './ProCollectionSheets';
 export function ProCollectionSections({userId,owner,first,events,eventsReady}:{userId:string;owner:boolean;first:string;events:ProEvent[];eventsReady:boolean}){
