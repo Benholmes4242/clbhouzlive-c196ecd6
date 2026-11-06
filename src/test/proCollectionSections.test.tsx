@@ -92,6 +92,30 @@ describe('pro collections — visitor and own views', () => {
     fill(); mount(true);
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' }).length).toBe(3));
   });
+  it('own empty bag has no Edit in its header and shows the add card', async () => {
+    h.tables = { pro_bag_items: [], pro_partners: partners, pro_career_moments: moments, business_accounts: [LIVE] };
+    const { container } = mount(true);
+    await waitFor(() => expect(container.querySelector('[data-pro-bag]')).not.toBeNull());
+    expect(container.querySelector('[data-pro-bag] .pro-collection-edit')).toBeNull();
+    expect(container.querySelector('[data-pro-bag] .pro-profile-add')).not.toBeNull();
+  });
+  it('own bag with one item shows Edit', async () => {
+    h.tables = { pro_bag_items: [bag[0]], pro_partners: [], pro_career_moments: [], business_accounts: [LIVE] };
+    const { container } = mount(true);
+    await waitFor(() => expect(container.querySelector('[data-pro-bag] .pro-collection-edit')).not.toBeNull());
+  });
+  it('own empty partners has no Edit in its header and shows the add card', async () => {
+    h.tables = { pro_bag_items: bag, pro_partners: [], pro_career_moments: moments, business_accounts: [LIVE] };
+    const { container } = mount(true);
+    await waitFor(() => expect(container.querySelector('[data-pro-partners]')).not.toBeNull());
+    expect(container.querySelector('[data-pro-partners] .pro-collection-edit')).toBeNull();
+    expect(container.querySelector('[data-pro-partners] .pro-profile-add')).not.toBeNull();
+  });
+  it('own partners with one item shows Edit', async () => {
+    h.tables = { pro_bag_items: [], pro_partners: [partners[0]], pro_career_moments: [], business_accounts: [LIVE] };
+    const { container } = mount(true);
+    await waitFor(() => expect(container.querySelector('[data-pro-partners] .pro-collection-edit')).not.toBeNull());
+  });
   it('guests see no Edit or add cards even when owner is passed', async () => {
     empty(); h.guest = { id: 'pro1', is_anonymous: true }; const { container } = mount(true);
     await new Promise(r => setTimeout(r, 30));
