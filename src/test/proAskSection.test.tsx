@@ -35,7 +35,7 @@ vi.mock('@/integrations/supabase/client', () => {
   };
   const rpc = (fn: string, args: Record<string, unknown>) => {
     h.rpcCalls.push({ fn, args });
-    if (h.rpcError) return Promise.resolve({ data: null, error: h.rpcError });
+    if (h.rpcError && fn !== 'get_pro_answers' && fn !== 'get_pro_question_inbox') return Promise.resolve({ data: null, error: h.rpcError });
     if (fn === 'get_pro_answers') return Promise.resolve({ data: h.answers, error: null });
     if (fn === 'get_pro_question_inbox') return Promise.resolve({ data: h.inbox[(args.p_status as 'waiting' | 'answered') ?? 'waiting'], error: null });
     if (fn === 'toggle_pro_answer_useful') return Promise.resolve({ data: true, error: null });
@@ -249,8 +249,9 @@ describe('pro ask — questions sheet', () => {
   };
   it('segments show their counts', async () => {
     await openSheet();
-    expect(screen.getByText('Waiting · 2')).toBeTruthy();
-    fireEvent.click(screen.getByText('Answered · 1'));
+    const seg = (name: string) => screen.getByText((_, el) => el?.tagName === 'BUTTON' && el.textContent === name);
+    expect(seg('Waiting · 2')).toBeTruthy();
+    fireEvent.click(seg('Answered · 1'));
     expect(await screen.findByText('Tommy, easily.')).toBeTruthy();
   });
   it('Not for me calls decline', async () => {
@@ -270,7 +271,7 @@ describe('pro ask — questions sheet', () => {
   });
   it('edit mode shortens the note', async () => {
     await openSheet();
-    fireEvent.click(screen.getByText('Answered · 1'));
+    fireEvent.click(screen.getByText((_, el) => el?.tagName === 'BUTTON' && el.textContent === 'Answered · 1'));
     fireEvent.click(await screen.findByRole('button', { name: 'Edit answer' }));
     expect(await screen.findByText('Your answer shows on your profile.')).toBeTruthy();
     expect(screen.queryByText(/gets a notification/)).toBeNull();
