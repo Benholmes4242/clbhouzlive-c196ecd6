@@ -612,7 +612,19 @@
         "you": "[~~ÝŐÚŘ ƤÍĈĶ~~]",
         "randomOne": "[~~1 ÁŢ ŘÁÑĐŐṀ~~]",
         "odds": "[~~őđđš {{odds}}~~]",
-        "footnote": "[~~Áţ řáñđőɱ ɱéáñš ƥíĉķíñĝ ƀļíñđ ƒřőɱ ţĥáţ ŵééķ'š ƒúļļ ƒíéļđ. Éáĉĥ éṽéñţ ĉőúñţš íţš őŵñ ƒíéļđ šížé.~~]"
+        "footnote": "[~~Áţ řáñđőɱ ɱéáñš ƥíĉķíñĝ ƀļíñđ ƒřőɱ ţĥáţ ŵééķ'š ƒúļļ ƒíéļđ. Éáĉĥ éṽéñţ ĉőúñţš íţš őŵñ ƒíéļđ šížé.~~]",
+        "headBoth": "[~~Őúr pícks fíñd á tőp 10 <b>{{a}}×</b> ás őftéñ ás blíñd pícks, áñd thé wíññér <b>{{b}}×</b> ás őftéñ.~~]",
+        "headTop10": "[~~Őúr pícks fíñd á tőp 10 <b>{{a}}×</b> ás őftéñ ás blíñd pícks.~~]",
+        "headWinner": "[~~Őúr pícks fíñd thé wíññér <b>{{b}}×</b> ás őftéñ ás blíñd pícks.~~]",
+        "groupTop10": "[~~Á TŐP 10~~]",
+        "groupWinner": "[~~THÉ WÍÑÑÉR~~]",
+        "blindPicks": "[~~blíñd pícks~~]",
+        "countOf": "[~~{{count}} őf {{events}}~~]",
+        "events_one": "[~~évéñt~~]",
+        "events_other": "[~~évéñts~~]",
+        "aboutOneIn": "[~~ábőút 1 íñ {{n}}~~]",
+        "youMultiple": "[~~{{x}}× á blíñd píck~~]",
+        "blindFoot": "[~~Blíñd pícks méáñs píckíñg át ráñdőm frőm thát wéék's fúll fíéld. Éách évéñt cőúñts íts őwñ fíéld sízé.~~]"
       }
     }
   },
