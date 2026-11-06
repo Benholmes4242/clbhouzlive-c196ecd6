@@ -118,6 +118,7 @@ export function bagLine(items: BagItem[]): string {
 }
 
 export const formatDay = (date: Date) => `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+const formatDayMonth = (date: Date) => `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`;
 const parseDay = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00Z`);
 
 /** The sheet's source line: dated OWGR credit when ranking data exists,
@@ -135,7 +136,7 @@ export function trackingFromLine(tracking_since: string | null, today = new Date
   if (tracking_since) {
     const since = parseDay(tracking_since);
     if (today.getTime() - since.getTime() >= 30 * 24 * 60 * 60 * 1000) return null;
-    return `Views are counted from ${formatDay(since)}.`;
+    return `Views are counted from ${formatDayMonth(since)}.`;
   }
-  return `Views are counted from ${formatDay(today)}.`;
+  return `Views are counted from ${formatDayMonth(today)}.`;
 }
