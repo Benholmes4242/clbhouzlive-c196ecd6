@@ -448,4 +448,4 @@ const InlineVideoEngine: React.FC<Props> = ({
   );
 };
 
-InlineVideo.displayName = 'InlineVideo';
+InlineVideoEngine.displayName = 'InlineVideoEngine';
