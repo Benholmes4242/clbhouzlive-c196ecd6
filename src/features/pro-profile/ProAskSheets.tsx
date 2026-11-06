@@ -186,7 +186,7 @@ export function ProAnswerSheet({ proId, first, row, close }: { proId: string; fi
         </div>
         <textarea
           className="pro-ask-ta"
-          aria-label="Your answer"
+          aria-label="Write your answer"
           maxLength={600}
           placeholder="Write your answer"
           value={text}

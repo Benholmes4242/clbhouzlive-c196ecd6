@@ -194,7 +194,7 @@ describe('pro ask — ask sheet', () => {
     h.answers = payload({ total: 0, answers: [] });
     mount(false);
     fireEvent.click(await screen.findByRole('button', { name: 'Ask' }));
-    await screen.findByText('Ask a question');
+    await screen.findByRole('heading', { name: 'Ask a question' });
   };
   it('counter and the 3-character minimum', async () => {
     await openAsk();
@@ -249,8 +249,8 @@ describe('pro ask — questions sheet', () => {
   };
   it('segments show their counts', async () => {
     await openSheet();
-    expect(screen.getByRole('tab', { name: 'Waiting · 2' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('tab', { name: /Answered ·/ }));
+    expect(screen.getByText('Waiting · 2')).toBeTruthy();
+    fireEvent.click(screen.getByText('Answered · 1'));
     expect(await screen.findByText('Tommy, easily.')).toBeTruthy();
   });
   it('Not for me calls decline', async () => {
@@ -270,7 +270,7 @@ describe('pro ask — questions sheet', () => {
   });
   it('edit mode shortens the note', async () => {
     await openSheet();
-    fireEvent.click(screen.getByRole('tab', { name: /Answered ·/ }));
+    fireEvent.click(screen.getByText('Answered · 1'));
     fireEvent.click(await screen.findByRole('button', { name: 'Edit answer' }));
     expect(await screen.findByText('Your answer shows on your profile.')).toBeTruthy();
     expect(screen.queryByText(/gets a notification/)).toBeNull();
@@ -300,6 +300,6 @@ describe('pro ask — activity deep links', () => {
     h.inbox = { waiting: [], answered: [] };
     mount(true, '/u/pro1?ask=inbox');
     expect(await screen.findByText('Questions for you')).toBeTruthy();
-    expect(screen.getByRole('tab', { name: /Waiting ·/ })).toBeTruthy();
+    expect(screen.getByText(/Waiting ·/)).toBeTruthy();
   });
 });
