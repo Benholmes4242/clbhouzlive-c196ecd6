@@ -108,6 +108,9 @@ beforeEach(() => {
   s.guest = false;
   s.track.mockClear(); s.qr.mockClear(); s.canvas.mockClear();
   localStorage.clear();
+  // jsdom lacks object URLs; the sheet's CORS photo pipeline and download use them.
+  (URL as any).createObjectURL = vi.fn(() => 'blob:mock');
+  (URL as any).revokeObjectURL = vi.fn();
 });
 afterEach(cleanup);
 
@@ -258,15 +261,18 @@ describe('sponsor sheet', () => {
     <ProSponsorSheet open onClose={vi.fn()} proId="pro" identity={identity} season={season} followers={3} {...over} />
   );
   const dialog = () => screen.getByRole('dialog');
+  // The card renders twice: the scaled preview and the off-screen capture
+  // node. Block assertions scope to the preview.
+  const preview = () => within(dialog().querySelector('.pro-ss-fit') as HTMLElement);
 
   it('every chip toggles its block straight away', () => {
     mount(sheet());
     const dlg = dialog();
-    expect(within(dlg).getByText('2026 SEASON')).toBeInTheDocument();
+    expect(preview().getByText('2026 SEASON')).toBeInTheDocument();
     fireEvent.click(within(dlg).getByRole('checkbox', { name: 'Season' }));
-    expect(within(dlg).queryByText('2026 SEASON')).toBeNull();
+    expect(preview().queryByText('2026 SEASON')).toBeNull();
     fireEvent.click(within(dlg).getByRole('checkbox', { name: 'Season' }));
-    expect(within(dlg).getByText('2026 SEASON')).toBeInTheDocument();
+    expect(preview().getByText('2026 SEASON')).toBeInTheDocument();
   });
   it('chips for empty blocks are left out', () => {
     mount(sheet());
@@ -280,7 +286,7 @@ describe('sponsor sheet', () => {
     mount(sheet());
     const dlg = dialog();
     expect(within(dlg).getByRole('checkbox', { name: 'Season' })).toHaveAttribute('aria-checked', 'false');
-    expect(within(dlg).queryByText('2026 SEASON')).toBeNull();
+    expect(preview().queryByText('2026 SEASON')).toBeNull();
     expect(within(dlg).getByRole('checkbox', { name: 'Results' })).toHaveAttribute('aria-checked', 'true');
   });
   it('rank, movement and career best render with the muted-worse rule', () => {
@@ -299,16 +305,16 @@ describe('sponsor sheet', () => {
   });
   it('no rank falls back to best finish; no rank and no events omits the rank row', () => {
     mount(sheet());
-    expect(within(dialog()).getAllByText('BEST FINISH 2026').length).toBeGreaterThan(0);
+    expect(preview().getByText('BEST FINISH 2026')).toBeInTheDocument();
     cleanup();
     mount(sheet({ season: { ...season, best: null, events: 0, results: [] } }));
-    const dlg = dialog();
-    expect(within(dlg).queryByText('WORLD RANKING')).toBeNull();
-    expect(within(dlg).queryByText(/BEST FINISH/)).toBeNull();
+    const dlg = preview();
+    expect(dlg.queryByText('WORLD RANKING')).toBeNull();
+    expect(dlg.queryByText(/BEST FINISH/)).toBeNull();
   });
   it('the season tiles match the Season section figures', () => {
     mount(sheet());
-    const dlg = dialog();
+    const dlg = dialog().querySelector('.pro-ss-fit') as HTMLElement;
     const stats = dlg.querySelectorAll('.pro-ss-stats > div');
     const text = [...stats].map((d) => d.textContent);
     expect(text).toEqual(['20EVENTS', '15CUTS', '5TOP 10S', '2ndBEST', '70.0SCORING']);
@@ -316,7 +322,7 @@ describe('sponsor sheet', () => {
   it('latest results shows four with dimmed MC and the career first four with gold for wins', () => {
     s.career = [moment('Career-high world ranking, #1,354', 2026), moment('2nd, Open de Roissy PGA France', 2026), moment('2nd, Alps Andalucia-Roquetas de Mar', 2026), moment('Kent Amateur champion', 2022, true), moment('Turned professional', 2021)];
     mount(sheet());
-    const dlg = dialog();
+    const dlg = dialog().querySelector('.pro-ss-fit') as HTMLElement;
     const res = dlg.querySelector('.pro-ss-res')!;
     expect(res.querySelectorAll(':scope > div:not(.pro-ss-h)')).toHaveLength(4);
     expect(within(res as HTMLElement).getByText('Hulencourt Alps Tour Grand Final')).toBeInTheDocument();
@@ -358,7 +364,9 @@ describe('sponsor sheet', () => {
     mount(sheet());
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Save image' }));
     await waitFor(() => expect(clicks).toContain('mason-essam-sponsor-sheet.png'));
-    expect(s.canvas).toHaveBeenCalledWith(expect.objectContaining({ style: expect.objectContaining({ width: 360 }) }), { backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false });
+    const [node, opts] = s.canvas.mock.calls[0];
+    expect((node as HTMLElement).querySelector('[data-sponsor-card]')).toHaveStyle({ width: '360px' });
+    expect(opts).toEqual({ backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false });
     vi.restoreAllMocks();
   });
   it('share falls back to save when files cannot be shared', async () => {
