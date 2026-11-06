@@ -12,8 +12,8 @@
  *
  * Ratified product rule: NOTHING IS EVER CROPPED IN THE FULLSCREEN VIEWER.
  *   the bottom of the usable area is the comment band (fullscreenBand.ts), not just the home indicator.
- *   • VIDEO and IMAGES both rest CONTAIN. Tall portrait media whose width-filled
- *     height reaches 90% of the safe usable height anchors to y=0, bleeding
+ *   • VIDEO and IMAGES both rest CONTAIN. Tall portrait media with
+ *     mediaAspect ≤ 0.6 anchors to y=0, bleeding
  *     under the notch without crossing the comment band. All other known
  *     aspects stay centred inside the SAFE area. `mediaType` does not affect
  *     the outcome (kept in the signature for call-site stability).
@@ -68,7 +68,7 @@ export function resolveRestingRect(
   const usableH = Math.max(0, viewport.h - viewport.safeTop - viewport.safeBottom);
   const availH = Math.max(0, viewport.h - viewport.safeBottom);
   const widthFilledH = usableW / mediaAspect;
-  if (mediaAspect < 1 && widthFilledH >= 0.9 * usableH) {
+  if (mediaAspect <= 0.6) {
     const renderH = Math.min(widthFilledH, availH);
     const renderW = widthFilledH <= availH ? usableW : availH * mediaAspect;
     return {

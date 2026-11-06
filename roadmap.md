@@ -1,5 +1,9 @@
 # Roadmap
 
+## CLOSE_OUT_1 revised notch threshold
+- [ ] Replace portrait threshold with mediaAspect ≤0.6; add stable frame hook and only named assertion repairs.
+- [ ] Focused notch/member-shot/video-timing/preview checks, then four fresh shards; report assertion ledger and close FS_NOTCH_1/EXP_RING_1/TOPTEN_SHEET_1 if green.
+
 ## Pro profile 1c result-sheet round row
 - [x] ResultDetail count-based columns capped at four, sheet-only 8px gap; week tiles unchanged.
 - [x] Focused44/44; fresh shards1,872/1,741/1,829/1,758 passed =7,200 plus only3 known FS_NOTCH failures;7,203 executed (+5 named cases),633 unique files. Prior634 file claim internally inconsistent; ledger in PRO_RESULT_ROUND_ROW_REPORT.md. Preview build OK; requested320px style assertion passes (not physical measurement).

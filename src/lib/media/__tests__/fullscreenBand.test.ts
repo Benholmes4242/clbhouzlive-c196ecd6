@@ -62,12 +62,26 @@ describe('fullscreen comment band', () => {
 
   it('height-limits taller portraits and centres between lateral safe insets', () => {
     const rect = resolveRestingRect(1, 3, { ...viewport, safeLeft: 10, safeRight: 20 }, 'image');
-    expect(rect).toMatchObject({ top: 0, width: 754 / 3, height: 754, fit: 'contain' });
+    expect(rect).toMatchObject({ top: 0, height: 754, fit: 'contain' });
+    expect(rect.width).toBeCloseTo(754 / 3);
     expect(rect.left).toBeCloseTo(10 + (360 - 754 / 3) / 2);
   });
 
   it('keeps unknown dimensions at the existing full-viewport fallback', () => {
     expect(resolveRestingRect(0, 0, viewport, 'video')).toEqual({ top: 0, left: 0, width: 390, height: 844, fit: 'contain' });
+  });
+
+  it('anchors the inclusive 3:5 threshold even without a reserved footer', () => {
+    const rect = resolveRestingRect(3, 5, { ...viewport, safeBottom: 0 }, 'image');
+    expect(rect).toEqual({ top: 0, left: 0, width: 390, height: 650, fit: 'contain' });
+  });
+
+  it('centres media just wider than 3:5 regardless of its width-filled height', () => {
+    const rect = resolveRestingRect(601, 1000, viewport, 'image');
+    expect(rect.top).toBeGreaterThan(47);
+    expect(rect.top + rect.height / 2).toBeCloseTo(400.5);
+    expect(rect.width).toBe(390);
+    expect(rect.fit).toBe('contain');
   });
 
   it('anchors synthetic portrait media without reserving a footer', () => {

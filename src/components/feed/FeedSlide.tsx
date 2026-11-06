@@ -446,6 +446,7 @@ const FullscreenImageSlot: React.FC<{
       <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
       <div
         ref={zoomRef}
+        data-fs-media-frame
         style={{
           ...zoomStyle,
           position: 'absolute',
