@@ -18,7 +18,6 @@
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
-import { useNavigate } from 'react-router-dom';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Pencil, X } from 'lucide-react';
@@ -83,6 +82,7 @@ import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExisting
 interface Props {
   onClose: () => void;
   onPosted?: () => void;
+  onViewPost?: (postId: string, closeTo: string) => void;
   /** Files already chosen by the nav picker before the composer opened. */
   initialMedia?: File[];
   /** Edit mode: existing post id (owner-scoped). */
@@ -94,10 +94,9 @@ interface Props {
   initialActorId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId, initialActorType, initialActorId }: Props) {
+export default function StageComposer({ onClose, onPosted, onViewPost, initialMedia = [], editPostId, draftId, initialActorType, initialActorId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
-  const navigate = useNavigate();
   const [scheduleBestHour, setScheduleBestHour] = useState<number | null>(null);
 
   const { activeActor, selectActor, applyDraftActor } = useComposerActor({ initialActorType, initialActorId, ignoreInitial: !!editPostId || !!draftId });
@@ -838,7 +837,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   if (success) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: POST_COMPOSER_Z }}>
-        <PostSuccessV2 result={success} onViewPost={() => { navigate(`/post/${success.postId}`); setSuccess(null); onPosted?.(); onClose(); }}
+        <PostSuccessV2 result={success} onViewPost={() => {
+          const closeTo = activeActor?.type === 'business' ? `/business/${activeActor.id}` : '/profile';
+          onViewPost?.(success.postId, closeTo);
+        }}
           onOpenScheduled={() => setSheet('scheduled')} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
         <ScheduledPostsSheetV2 open={sheet === 'scheduled'} onClose={() => setSheet(null)} userId={profile?.id} onCountChange={setScheduledCount} />
       </div>

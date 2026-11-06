@@ -46,7 +46,8 @@ const PostDeepLinkPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const navState = location.state as { openComments?: boolean; initialCommentId?: string } | null;
+  const navState = location.state as { openComments?: boolean; initialCommentId?: string; closeTo?: string } | null;
+  const closeTo = typeof navState?.closeTo === 'string' ? navState.closeTo : null;
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -82,7 +83,10 @@ const PostDeepLinkPage: React.FC = () => {
 
       const { data, error } = await loadPublishedPost(postId, user?.id);
       if (error) { setLoadError(true); setIsLoading(false); return; }
-      if (!data) { setNotFound(true); setIsLoading(false); return; }
+      if (!data) {
+        if (closeTo && user?.id) { navigate(closeTo, { replace: true }); return; }
+        setNotFound(true); setIsLoading(false); return;
+      }
 
       const row = data as any;
       const profileRow = row.user_profiles ?? {};
@@ -120,6 +124,7 @@ const PostDeepLinkPage: React.FC = () => {
       // Guests are never redirected past this point — they keep the logged-out
       // preview below.
       if (user?.id && mediaCount === 0) {
+        if (closeTo) { navigate(closeTo, { replace: true }); return; }
         // A text-only post has no viewer of its own; the author's profile is
         // the nearest true surface (its feed carries the post).
         const authorRoute = row.actor_type === 'business' && row.actor_id
@@ -173,7 +178,7 @@ const PostDeepLinkPage: React.FC = () => {
     });
 
     if (postId) recordPostViewOnce(postId);
-  }, [postId, user?.id, retryTick, authLoading, activeActorType, activeActorId]);
+  }, [postId, user?.id, retryTick, authLoading, activeActorType, activeActorId, closeTo]);
 
   // Logged-in users: open the global fullscreen viewer with the loaded post
   // and the comments sheet open. Closing the viewer navigates back.
@@ -181,6 +186,11 @@ const PostDeepLinkPage: React.FC = () => {
     if (authLoading || !user || isLoading || !feedPost) return;
     if (hasOpenedFullscreen.current) return;
     hasOpenedFullscreen.current = true;
+
+    if (closeTo && feedPost.mediaItems?.length && feedPost.mediaItems.every(item => item.isProcessing)) {
+      navigate(closeTo, { replace: true });
+      return;
+    }
 
     const shouldOpenComments = navState?.openComments === true || searchParams.get('openComments') === '1';
 
@@ -194,6 +204,7 @@ const PostDeepLinkPage: React.FC = () => {
         // Popping history here would land the member back on Activity and
         // cancel that jump — so do nothing and let this page unmount.
         if (info?.reason === 'navigating') return;
+        if (closeTo) { navigate(closeTo, { replace: true }); return; }
         // Go back if there's history; otherwise land on Clubhouse.
         if (window.history.length > 1) {
           navigate(-1);
@@ -207,13 +218,14 @@ const PostDeepLinkPage: React.FC = () => {
     // scrim below would be the whole screen — show the actionable state
     // instead. Belt-and-braces: the media-less case is already redirected above.
     if (!useFullscreenFeedStore.getState().isOpen) {
+      if (closeTo) { navigate(closeTo, { replace: true }); return; }
       console.error('[PostDeepLink] fullscreen open() refused the post', feedPost.id);
       setNotFound(true);
     }
 
 
 
-  }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
+  }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams, closeTo]);
 
   // --- Loading ---
   if (isLoading || authLoading) {

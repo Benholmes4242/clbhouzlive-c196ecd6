@@ -1,5 +1,9 @@
 # Roadmap
 
+## VIEW_POST_1
+- [ ] Isolate View post navigation in both composer mounts; author-profile close/fallback destination and exact grid refresh.
+- [ ] Add mounted navigation/refetch regressions; focused checks then four fresh shards; report six manual checks and limits.
+
 ## CLOSE_OUT_1 revised notch threshold
 - [x] Replace portrait threshold with mediaAspect ≤0.6; add stable frame hook and only named test repairs, plus two boundary regressions.
 - [x] Focused53/53; fresh shards1,872/1,741/1,834/1,758 =7,205/633, zero failures. Baseline7,203→7,205 (+2 named cases); FS_NOTCH_1/EXP_RING_1/TOPTEN_SHEET_1 closed. CLOSE_OUT_1_REPORT.md has old/new ledger and retained logs; preview build OK.

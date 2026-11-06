@@ -7,5 +7,6 @@ import StageComposer from './StageComposer';
 
 export default function PostV2Page() {
   const navigate = useNavigate();
-  return <StageComposer onClose={() => navigate(-1)} onPosted={() => navigate('/clubhouse')} />;
+  return <StageComposer onClose={() => navigate(-1)} onPosted={() => navigate('/clubhouse')}
+    onViewPost={(postId, closeTo) => navigate(`/post/${postId}`, { replace: true, state: { closeTo } })} />;
 }
