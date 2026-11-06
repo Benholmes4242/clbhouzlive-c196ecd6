@@ -9,6 +9,7 @@ import { ProOnlyYouSection } from '@/features/pro-profile/ProOnlyYouSection';
 import { ProSponsorSheet, type SponsorIdentity, type SponsorSeason } from '@/features/pro-profile/ProSponsorSheet';
 import { ProCollectionSections } from '@/features/pro-profile/ProCollectionSections';
 import { truncateSponsorEvent } from '@/features/pro-profile/proSponsorRules';
+import sponsorCss from '@/features/pro-profile/pro-profile.css?raw';
 import { bagLine, clubhouseCopy, parseProClubhouse, parseProReach, sponsorSourceLine, trackingFromLine } from '@/features/pro-profile/proClubhouseRules';
 import type { ProEvent } from '@/features/pro-profile/proProfileRules';
 import type { BagItem, Partner, CareerMoment } from '@/features/pro-profile/proCollectionRules';
@@ -266,6 +267,29 @@ describe('sponsor sheet', () => {
   // The card renders twice: the scaled preview and the off-screen capture
   // node. Block assertions scope to the preview.
   const preview = () => within(dialog().querySelector('.pro-ss-fit') as HTMLElement);
+
+  it('sheet PRO label uses print-safe inline-block centring only in the sheet', () => {
+    const rule = sponsorCss.match(/\.pro-ss-nm \.pro-label\s*\{([^}]+)\}/)?.[1];
+    expect(rule).toBeDefined();
+    expect(rule).toContain('display:inline-block');
+    expect(rule).toContain('height:18px');
+    expect(rule).toContain('line-height:18px');
+    expect(rule).toContain('padding:0 7px');
+    expect(rule).toContain('text-align:center');
+    expect(rule).toContain('vertical-align:middle');
+    expect(rule).not.toMatch(/top:|inline-flex/);
+  });
+
+  it('sheet rank row uses a bottom-aligned two-column grid and unit figure line-height', () => {
+    const row = sponsorCss.match(/\.pro-ss-rank\s*\{([^}]+)\}/)?.[1];
+    const figure = sponsorCss.match(/\.pro-ss-rank>b\s*\{([^}]+)\}/)?.[1];
+    expect(row).toContain('display:grid');
+    expect(row).toContain('grid-template-columns:auto 1fr');
+    expect(row).toContain('gap:12px');
+    expect(row).toContain('align-items:end');
+    expect(figure).toContain('line-height:1;');
+    expect(figure).not.toMatch(/top:|translate/);
+  });
 
   it('sheet filters the first ranking event before taking four and shortens only its derived career high', () => {
     s.events = [
