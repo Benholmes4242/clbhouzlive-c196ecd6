@@ -7,6 +7,7 @@
 import { Loader2 } from 'lucide-react';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { GP } from './golfPageTokens';
 
 export function ShareFooter({ label, subLine, disabled, busy, onShare }: {
@@ -25,7 +26,7 @@ export function ShareFooter({ label, subLine, disabled, busy, onShare }: {
           width: '100%', height: 54, borderRadius: 999, border: 'none',
           fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em',
           background: disabled ? inkWithAlpha(SURFACE.dark.ink, 0.1) : GP.ink,
-          color: disabled ? GP.dim : GP.onInk,
+          color: disabled ? A.DIM : GP.onInk,
           cursor: disabled ? 'not-allowed' : 'pointer',
         }}
       >
