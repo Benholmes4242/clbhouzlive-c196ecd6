@@ -33,7 +33,7 @@ describe('FS_NOTCH_1 mounted slides', () => {
     const scrim = container.querySelector('[data-fullscreen-notch-scrim]');
     expect(scrim).not.toBeNull();
     expect(scrim?.closest('[data-index="0"]')).not.toBeNull();
-    const image = container.querySelector('img[decoding="async"]');
+    const image = container.querySelector('[data-fs-media-frame] img[decoding="async"]');
     expect(image?.parentElement?.style.top).toBe('0px');
     expect(image?.parentElement?.style.height).toBe('693.3333333333334px');
     expect((image as HTMLImageElement | null)?.style.objectFit).toBe('contain');

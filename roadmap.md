@@ -1,5 +1,9 @@
 # Roadmap
 
+## CLOSE_OUT_1 revised notch threshold
+- [x] Replace portrait threshold with mediaAspect ≤0.6; add stable frame hook and only named test repairs, plus two boundary regressions.
+- [x] Focused53/53; fresh shards1,872/1,741/1,834/1,758 =7,205/633, zero failures. Baseline7,203→7,205 (+2 named cases); FS_NOTCH_1/EXP_RING_1/TOPTEN_SHEET_1 closed. CLOSE_OUT_1_REPORT.md has old/new ledger and retained logs; preview build OK.
+
 ## Pro profile 1c result-sheet round row
 - [x] ResultDetail count-based columns capped at four, sheet-only 8px gap; week tiles unchanged.
 - [x] Focused44/44; fresh shards1,872/1,741/1,829/1,758 passed =7,200 plus only3 known FS_NOTCH failures;7,203 executed (+5 named cases),633 unique files. Prior634 file claim internally inconsistent; ledger in PRO_RESULT_ROUND_ROW_REPORT.md. Preview build OK; requested320px style assertion passes (not physical measurement).
@@ -27,8 +31,8 @@
 
 ## FS_NOTCH_1
 - [x] Shared portrait rule and slide-only scrim implemented; gallery/chrome geometry unchanged, preview build OK.
-- [ ] STOP: focused 38 pass/3 new failures; exact errors and assertion/count ledger in FS_NOTCH_1_REPORT.md, full log retained. No repairs/shards/browser after failure.
-- [ ] Ruling needed: synthetic 9:16 top0 conflicts with the explicit 90%-of-usableH formula (693.333 < 717.3 at 390×844/safeTop47/safeBottom0).
+- [x] CLOSED by CLOSE_OUT_1: named selector/float repairs and synthetic product threshold resolved; focused53/53 and all four fresh shards green. Historical failure logs retained.
+- [x] Revised ruling: mediaAspect≤0.6 replaces 90%-of-usableH; synthetic9:16 also top0. Two boundary regressions added; other aspect geometry preserved.
 
 ## Pro world ranking sync
 - [x] OWGR_CRON_AUTH: shared constant-time gate, all-pros-only secret access and preserved JWT paths; redeployed. Focused35/35; shards1,866/1,670/1,802/1,760 passed, only three known FS_NOTCH failures.7,101/628 executed (+7/+1), no existing tests changed. OWGR_CRON_AUTH_REPORT.md and logs retained.
@@ -45,7 +49,7 @@
 ## TOPTEN_SHEET_1
 - [x] Header action reads A.INK in both modes; shared 24px end gutter inside scroller, BottomSheet unchanged.
 - [x] Focused Top 10 checks 25/25; preview build OK.
-- [ ] STOP: shard 1 has 1,843 passed/1 pre-existing tourIsland failure at :235:30 (empty inline width). Shards 2–4 and live/device/interaction checks not run; Explore blockers unchanged. See TOPTEN_SHEET_1_REPORT.md.
+- [x] CLOSED by CLOSE_OUT_1: four fresh shards green including topTenSheet1 4/4 and tourIsland14/14; previous Tour width failure did not recur. Historical TOPTEN_SHEET_1_REPORT.md/log retained; no hosted/device interaction claim.
 
 ## Tour menu Live board
 - [x] Signed-off menu presentation and slug-owned single selection; shared picker membership/behavior preserved.
@@ -53,7 +57,7 @@
 
 ## EXP_RING_1
 - [x] Audit Explore-only avatar callers; resolve brief discrepancy as Tour-matching 1px traced personal ring, business 0.5px inset as requested; amber/shared/Tour unchanged.
-- [ ] STOP: focused 35 pass/19 fail; new expRing1.test.tsx:31:33 `expected '' to be 'none'`; untouched ws3WatchBottom mock lacks DARK_HAIRLINE (17 failures). No failing assertions repaired; four shards/browser blocked. Baseline 7,024 / 620, expected +3/+1; exact evidence and sweep in EXP_RING_1_REPORT.md.
+- [x] CLOSED by CLOSE_OUT_1: existing authorized expRing whitespace repair and ws3WatchBottom real-export mock confirmed unchanged; fresh shards green with expRing1 3/3 and ws3WatchBottom41/41. Historical report/log retained.
 
 ## Island PRO badge only
 - [x] Remove island caption/helper and scope signed-off 22px badge; keep profile tap/divider and pending/amateur behavior.
