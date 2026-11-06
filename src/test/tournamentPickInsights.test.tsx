@@ -14,7 +14,7 @@ vi.mock('@/features/guest/useGuestActionGate',()=>({useGuestActionGate:()=>mocks
 vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes',()=>({usePickTeeTimes:()=>({data:new Map()})}));
 import { finishedVerdict, compareLivePick, compareFinishedPick, chooseFitStats, ordinal, filterCheckedReasons, lowestFit, catchSentence, agreementNote, winningScoreRange, sortedBeatRows, type PickResult } from '@/features/tourhub/components/overview-v3/HybridHeroBands/pickInsightRules';
 import { YourPickCard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickCard';
-import { pickStatusToken } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock';
+import { PicksBlock, pickStatusToken } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock';
 import { PicksSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet';
 import { OurRecordSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/OurRecordSheet';
 import { PickMemberBands } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PickMemberBands';
@@ -111,7 +111,7 @@ describe('tournament picks surfaces',()=>{
  });
  it('guest upcoming renders the card and Pick goes to the guest gate',async()=>{
   mocks.guest=true;mocks.user=null;mocks.gate.mockReturnValue(true);
-  const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick} onRecord={()=>{}}/>);
+  const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick}/>);
   const pick=await screen.findByRole('button',{name:'Pick'});
   expect(document.querySelector('[data-your-pick-card]')).not.toBeNull();
   fireEvent.click(pick);expect(mocks.gate).toHaveBeenCalledWith('pick');expect(onPick).not.toHaveBeenCalled();
@@ -129,13 +129,18 @@ describe('tournament picks surfaces',()=>{
  it('missed-cut card prints muted MC without score',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:80,my_status:'CUT',my_score:-12}} phase="live" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toBe('Missed the cut.');expect(document.querySelector('.pick-mine-figure')?.textContent).toBe('MC');});
  it('finished card separates real percentile from the best-pick heading',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:8,my_percentile:95}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toBe('Beat 95% of the field.');expect(document.querySelector('[data-pick-question]')?.textContent).toBe('You matched our best pick');});
  it('guest Pick calls the gate and never opens sheet',async()=>{
-  mocks.guest=true;mocks.user=null;mocks.gate.mockReturnValue(true);const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick} onRecord={()=>{}}/>);
+  mocks.guest=true;mocks.user=null;mocks.gate.mockReturnValue(true);const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick}/>);
   fireEvent.click(await screen.findByRole('button',{name:'Pick'}));expect(mocks.gate).toHaveBeenCalledWith('pick');expect(onPick).not.toHaveBeenCalled();
  });
  it('followed singular and record row use server counts; zero hides both',async()=>{
-  record.won=1;record.top10=1;const onRecord=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={()=>{}} onRecord={onRecord}/>);
+  record.won=1;record.top10=1;const onRecord=vi.fn();const bands=mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={()=>{}}/>);
   await waitFor(()=>expect(document.querySelector('[data-followed-picks]')?.textContent).toContain('1 of your circle has picked.'));
+  bands.unmount();
+  const block=mount(<PicksBlock picks={[]} tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onOpenYourPick={()=>{}} onOpenRecord={onRecord} onOpenPick={()=>{}} boardByPlayer={new Map()} teeByPlayer={null} championPlayerId={null} championPlayerIds={[]} intro={null} neededByPlayer={null} toReachScore={null} leaderTotal={null}/>);
+  await waitFor(()=>expect(document.querySelector('[data-our-record-door]')).not.toBeNull());
   const door=document.querySelector('[data-our-record-door]');expect(door?.textContent).toContain('1 win · 1 top 10');if(door)fireEvent.click(door);expect(onRecord).toHaveBeenCalledOnce();
+  record={...record,picks:0};client.setQueryData(['tourhub','our-pick-record','pga',2026],record);
+  await waitFor(()=>expect(block.container.querySelector('[data-our-record-door]')).toBeNull());
  });
  it('Why tabs open on tapped player, switch names and expose anonymous reads without course fit or probability',async()=>{
   mount(<PicksSheet open onClose={()=>{}} picks={picks} predictions={null} eventName="Mexico Open" venueName="Vidanta" tournamentId="event" initialPlayerId="c"/>);
