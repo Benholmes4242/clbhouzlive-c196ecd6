@@ -36,6 +36,7 @@ vi.mock('@/components/feed/FeedCard', () => ({
 }));
 
 import { InlineVideo } from '@/components/feed/InlineVideo';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { buildDraftFeedPost, PostPreview } from '@/features/post-v2/components/golf/PostPreview';
 import type { StageMediaItem } from '@/features/post-v2/hooks/useStageComposer';
 
@@ -95,7 +96,7 @@ describe('buildDraftFeedPost video mapping', () => {
   it('a video with a streamId maps to hlsUrl from generateStreamHlsUrl and no mp4Url', () => {
     const post = buildDraftFeedPost({ caption: '', media: [mediaItem({ streamId: 's'.repeat(32), posterUrl: 'p.jpg' })], course: null, actor, userId: 'u1' });
     const item = post.mediaItems[0] as Record<string, unknown>;
-    expect(item.hlsUrl).toBe(`https://videodelivery.net/${'s'.repeat(32)}/manifest/video.m3u8`);
+    expect(item.hlsUrl).toBe(generateStreamHlsUrl('s'.repeat(32)));
     expect(item.mp4Url).toBeUndefined();
     expect(item.thumbnailUrl).toBe('p.jpg');
   });
