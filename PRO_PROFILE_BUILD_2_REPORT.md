@@ -61,3 +61,10 @@ Type-only correction after stop: new fixture owgr_event_id values changed from n
 - Existing business logo primitive consistency, category wording and exact signed-off sheet copy still require close-out review.
 - All four shards unrun because of unexpected focused failures.
 - Source files added: proCollectionRules.ts, useProCollections.ts, ProCollectionSheets.tsx, ProCollectionSections.tsx; mounted from ProProfileBuildOne. Styles use semantic pro tokens, isolated classes; no unrelated product surface edits.
+## Close-out (auth-mock fix)
+- `ProCollectionSections.tsx`: removed `useSupabaseSession`; `canEdit = owner && !getGuestUser()`.
+- `ProCollectionSheets.tsx`: copy corrected to mock "On clbhouz · links to their page" (was "Links").
+- New `src/test/proCollectionSections.test.tsx`: 12 mounted tests (own supabase mock).
+- Partner logo: SquircleAvatar `hairlineRing` → 1px traced overlay at 34%.
+- Focused 73/73. Shards 1,889 / 1,761 / 1,872 / 1,762 = 7,284 tests / 641 files, zero failures (FS_NOTCH did not recur).
+- Delta vs 7,258/639: +14 proCollectionRules, +12 proCollectionSections, +2 files. No existing test changed.
