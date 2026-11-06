@@ -14,7 +14,7 @@ import '@/features/pro-verification/pro-status-controls.css';
 type Sheet = 'profile' | 'leaderboards' | 'courses';
 const SHEETS = {
   profile: { title: 'Profile', sub: 'Who can open your profile and posts.', lines: ['Any golfer can open your profile.', "Only your friends can. Everyone else sees it's private."] },
-  leaderboards: { title: 'Leaderboards', sub: 'Who sees you ranked on the boards, Course Champions and bests on clbhouz.', lines: ['Any golfer sees where you rank.', 'Only your friends see you on the boards.', "You're left off every board."] },
+  leaderboards: { title: 'Leaderboards', sub: 'Who sees you ranked on the boards, Course Champions and course records.', lines: ['Any golfer sees where you rank.', 'Only your friends see you on the boards.', "You're left off every board."] },
   courses: { title: 'Courses', sub: 'Your Top 100 lists and your Courses tab, wherever they appear. Your counts stay on the boards either way.', lines: ["Any golfer sees the courses you've played.", 'Only your friends see them.', 'Only you see them.'] },
 };
 const LEVELS: VisibilityLevel[] = ['public', 'friends', 'private'];

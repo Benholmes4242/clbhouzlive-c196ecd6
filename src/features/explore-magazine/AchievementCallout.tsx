@@ -154,7 +154,7 @@ export function AchievementCalloutPanel({
       case 'record':
         return {
           icon: <AchievementEmoji glyph="🏆" tier={tier} />,
-          title: t('amateur.stream.callout.record', 'New best on clbhouz'),
+          title: t('amateur.stream.callout.record', 'New course record'),
           subline: callout.margin != null && callout.margin > 0
             ? t('amateur.stream.callout.recordMargin', {
                 count: callout.margin,
@@ -166,7 +166,7 @@ export function AchievementCalloutPanel({
       case 'net_record':
         return {
           icon: <AchievementEmoji glyph="⭐" tier={tier} />,
-          title: t('amateur.stream.callout.netRecord', 'New net best on clbhouz'),
+          title: t('amateur.stream.callout.netRecord', 'New net course record'),
           subline: null,
         };
       case 'rank_up':
@@ -381,19 +381,19 @@ export function RoundStatStrip({
       case 'record': return {
         icon: <AchievementEmoji glyph="🏆" tier={tier} />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
-        label: t('amateur.stream.callout.courseRecord', 'Best on clbhouz'),
+        label: t('amateur.stream.callout.courseRecord', 'Course record'),
         subline: callout.margin != null && callout.margin > 0
           ? t('amateur.stream.callout.recordMargin', {
               count: callout.margin,
-              defaultValue_one: '{{count}} shot better than the previous best on clbhouz',
-              defaultValue_other: '{{count}} shots better than the previous best on clbhouz',
+              defaultValue_one: '{{count}} shot better than the previous course record',
+              defaultValue_other: '{{count}} shots better than the previous course record',
             })
           : null,
       };
       case 'net_record': return {
         icon: <AchievementEmoji glyph="⭐" tier={tier} />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
-        label: t('amateur.stream.callout.netCourseRecord', 'Net best on clbhouz'),
+        label: t('amateur.stream.callout.netCourseRecord', 'Net course record'),
         subline: null,
       };
       case 'rank_up': return {

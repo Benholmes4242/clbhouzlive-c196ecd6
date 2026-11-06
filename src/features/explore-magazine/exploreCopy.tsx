@@ -70,7 +70,7 @@ export function kickerParts(item: StreamItem, t: T): KickerParts {
   }
   /* NO "AT YOUR CLUB" PREFIX. The club's own name follows it and a member knows
      their own club, so the prefix states what the name already says — the same
-     reasoning that removed "Best on clbhouz". The other ring prefixes STAY: a
+     reasoning that removed "Course record". The other ring prefixes STAY: a
      course name alone does not say why the card reached you. */
   if (item.ring === 'club') return withCourse(null);
 
@@ -288,18 +288,18 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
     if (best != null && ctx.viewerBestSince) {
       return t(
         'amateur.stream.headline.recordLostSince',
-        '{{player}} took the clbhouz best here from you with a {{gross}}. Your {{best}} had stood since {{month}}.',
+        '{{player}} took the course record from you with a {{gross}}. Your {{best}} had stood since {{month}}.',
         { player, gross, best, month: ctx.viewerBestSince },
       );
     }
     if (best != null) {
       return t(
         'amateur.stream.headline.recordLostBest',
-        '{{player}} took the clbhouz best here from you with a {{gross}}. Your best here is {{best}}.',
+        '{{player}} took the course record from you with a {{gross}}. Your best here is {{best}}.',
         { player, gross, best },
       );
     }
-    return t('amateur.stream.headline.recordLost', '{{player}} took the clbhouz best here from you with a {{gross}}.', {
+    return t('amateur.stream.headline.recordLost', '{{player}} took the course record from you with a {{gross}}.', {
       player,
       gross,
     });
@@ -365,28 +365,28 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
   if ((item.facts.is_course_record || c?.kind === 'record_taken') && gross != null) {
     if (isOwn || c?.held_by_viewer) {
       return topar
-        ? t('amateur.stream.headline.recordOwnToPar', 'You took the best on clbhouz with a {{gross}}, {{topar}}.', {
+        ? t('amateur.stream.headline.recordOwnToPar', 'You took the course record with a {{gross}}, {{topar}}.', {
             gross,
             topar,
           })
-        : t('amateur.stream.headline.recordOwn', 'You took the best on clbhouz with a {{gross}}.', { gross });
+        : t('amateur.stream.headline.recordOwn', 'You took the course record with a {{gross}}.', { gross });
     }
     const best = ctx.viewerBest ?? null;
     if (topar && best != null) {
       return t(
         'amateur.stream.headline.recordTakenBest',
-        '{{player}} took the best on clbhouz with a {{gross}}, {{topar}}. Your best here is {{best}}.',
+        '{{player}} took the course record with a {{gross}}, {{topar}}. Your best here is {{best}}.',
         { player, gross, topar, best },
       );
     }
     if (topar) {
       return t(
         'amateur.stream.headline.recordTakenToPar',
-        '{{player}} took the best on clbhouz with a {{gross}}, {{topar}}.',
+        '{{player}} took the course record with a {{gross}}, {{topar}}.',
         { player, gross, topar },
       );
     }
-    return t('amateur.stream.headline.recordTaken', '{{player}} took the best on clbhouz with a {{gross}}.', {
+    return t('amateur.stream.headline.recordTaken', '{{player}} took the course record with a {{gross}}.', {
       player,
       gross,
     });

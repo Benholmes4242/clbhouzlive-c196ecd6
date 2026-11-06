@@ -271,7 +271,7 @@
     },
     "about": {
       "headline": "See how you measure up here",
-      "sub": "Connect your handicap to see your scoring average at this course against members, your friends and the best on clbhouz.",
+      "sub": "Connect your handicap to see your scoring average at this course against members, your friends and the course record.",
       "slim": "See how you compare here"
     },
     "profile": {
@@ -1764,7 +1764,7 @@
     "hiddenLine_other": "You've hidden or blocked the people who wrote them.",
     "emptyLineTo": "Be the first to say something to <b>{{name}}</b>.",
     "contextLevel": "Level",
-    "standingRecord": "Best on clbhouz here · {{value}}",
+    "standingRecord": "Course record · {{value}}",
     "standingTopTen": "Top ten here",
     "standingPlayed_one": "Played here {{count}} time",
     "standingPlayed_other": "Played here {{count}} times",

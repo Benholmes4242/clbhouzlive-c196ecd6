@@ -43,11 +43,11 @@ export function courseHeadline(t: TFunction, facts: CourseHeadlineFacts): string
    * joint - co-holders are never named - so the figure prints alone. No date. */
   if (facts.event === 'record' && facts.lowGross != null) {
     return facts.lowBy
-      ? t('amateur.stream.course.eventRecord', 'Best on clbhouz — {{name}} shot {{gross}} here.', {
+      ? t('amateur.stream.course.eventRecord', 'Course record — {{name}} shot {{gross}} here.', {
           name: facts.lowBy,
           gross: facts.lowGross,
         })
-      : t('amateur.stream.course.eventRecordJoint', 'Best on clbhouz — {{gross}}.', { gross: facts.lowGross });
+      : t('amateur.stream.course.eventRecordJoint', 'Course record — {{gross}}.', { gross: facts.lowGross });
   }
   if (facts.event === 'ratings' && (facts.burstCount ?? 0) >= 2 && facts.burstMean != null) {
     return t('amateur.stream.course.eventGolfersRated', '{{n}} golfers rated it this month, averaging {{mean}}.', {
