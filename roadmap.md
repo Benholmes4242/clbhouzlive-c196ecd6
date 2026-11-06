@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro profile build 1b
+- [x] Revised hero/avatar/friends and finish/date/scoring labels.
+- [x] Owner/admin explicit par controls via existing RPC, preserving gross storage.
+- [ ] STOP: focused97/97; shards1=1,870,2=1,727,3=1,832 passed+5 failed. Two unexpected ac2ActivityFold failures at216:19/253:19 alongside three known FS_NOTCH failures. Shard4/320px/live readback not run. Expected7,198/632 (+49/+1); exact errors/full logs in PRO_PROFILE_BUILD_1B_REPORT.md.
+
 ## Pro profile build 1
 - [ ] Verified tour-pro hero world ranking, This week, Season and linked-only How he plays; preserve teaching pros, built cover/scrims/insets and everything below.
 - [ ] Ben's corrected ruling: worse ranks muted, never red; BEST for all pros, win 1st in gold. Latest replacement mock governs changed elements.

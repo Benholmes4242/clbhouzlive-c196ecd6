@@ -10201,6 +10201,8 @@ export type Database = {
       pro_events: {
         Row: {
           country: string | null
+          course_par: number | null
+          course_par_set_by: string | null
           created_at: string
           end_date: string | null
           event_name: string
@@ -10226,6 +10228,8 @@ export type Database = {
         }
         Insert: {
           country?: string | null
+          course_par?: number | null
+          course_par_set_by?: string | null
           created_at?: string
           end_date?: string | null
           event_name: string
@@ -10251,6 +10255,8 @@ export type Database = {
         }
         Update: {
           country?: string | null
+          course_par?: number | null
+          course_par_set_by?: string | null
           created_at?: string
           end_date?: string | null
           event_name?: string
@@ -10275,6 +10281,48 @@ export type Database = {
           venue?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "pro_events_course_par_set_by_fkey"
+            columns: ["course_par_set_by"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_events_course_par_set_by_fkey"
+            columns: ["course_par_set_by"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_events_course_par_set_by_fkey"
+            columns: ["course_par_set_by"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_events_course_par_set_by_fkey"
+            columns: ["course_par_set_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_events_course_par_set_by_fkey"
+            columns: ["course_par_set_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_events_course_par_set_by_fkey"
+            columns: ["course_par_set_by"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "pro_events_user_id_fkey"
             columns: ["user_id"]
@@ -27674,6 +27722,10 @@ export type Database = {
           _is_public: boolean
           _member_user_id: string
         }
+        Returns: undefined
+      }
+      set_pro_event_par: {
+        Args: { p_event_id: string; p_par: number }
         Returns: undefined
       }
       set_pro_player_link: {

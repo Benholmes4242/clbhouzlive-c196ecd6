@@ -48,6 +48,8 @@
   --pro-profile-green: var(--tour-menu-live);
   --pro-profile-under: var(--tour-menu-under-par);
   --pro-profile-gold: #FBBC2E;
+  --pro-profile-amber: #F7931E;
+  --pro-profile-amber-rule: rgba(247,147,30,0.5);
   --pro-profile-over: #6A7BA2;
   --tour-menu-ink: #F8FAFC;
   --tour-menu-on-ink: #0A0A0C;

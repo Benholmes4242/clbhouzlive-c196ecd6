@@ -6,6 +6,7 @@
 import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
 import { useProMembers } from '@/features/pro-verification/useProMembers';
 import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ProProfileBuildOne } from '@/features/pro-profile/ProProfileBuildOne';
 import { Button } from '@/components/ui/button';
 import { ProfileProNote } from '@/features/pro-verification/ProfileProNote';
@@ -277,6 +278,7 @@ const ProfilePageV2Content: React.FC = () => {
   const isOwnAccount = user?.id === profileUserId;
   const isSelf = isOwnAccount; // legacy alias - preserves personal-identity-owned UI below
   const profilePros = useProMembers(getProfileType(profile?.user_type).isPersonal ? [profileUserId] : []);
+  const isAdmin = useIsAdmin();
   const proMember = profileUserId ? profilePros.members.get(profileUserId) : undefined;
   // Pending requests are private; never read another member's request.
   const ownProRequest = useQuery({
@@ -996,6 +998,10 @@ const ProfilePageV2Content: React.FC = () => {
             pro={proMember} name={displayName} nameRef={heroNameRef}
             avatar={profile.profile_photo_url} cover={profile.header_photo_url}
             owner={isSelfView} viewerId={user?.id} followers={followersCount}
+            friends={friendsCount} onFriends={() => navigate(`/profile/${username}/followers?tab=following&filter=friends`)}
+            businessViewer={viewerActorType === 'business'} onFriend={handleFriendAction} friendBusy={friendshipUpdating}
+            friendLabel={friendshipUpdating ? friendshipStatus === 'friends' ? 'Unfriending…' : friendshipStatus === 'request_sent' ? 'Cancelling…' : friendshipStatus === 'request_received' ? 'Accepting…' : 'Sending…' : friendshipStatus === 'none' ? 'Add friend' : getFriendButtonLabel()}
+            canEditPar={isOwnAccount || isAdmin}
             followersReady={socialCountState === 'ok'}
             onFollowers={() => navigate(`/profile/${username}/followers`)}
             onAvatar={() => isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true)}
@@ -1003,7 +1009,7 @@ const ProfilePageV2Content: React.FC = () => {
             onShare={() => { if (navigator.share) navigator.share({ title: displayName, url: window.location.href }).catch(() => {}); else { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); } }}
             onFollow={toggleFollow} following={isFollowing} followBusy={followBusy}
             onMessage={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })} messageBusy={dmStarting}
-            menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>Copy link</DropdownMenuItem>{!isSelfView && <><DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}</DropdownMenuContent></DropdownMenu>}
+            menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>Copy link</DropdownMenuItem>{!isSelfView && <>{viewerActorType !== 'business' && friendshipStatus === 'friends' && <DropdownMenuItem onClick={() => unfriend()}>Remove friend</DropdownMenuItem>}<DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}</DropdownMenuContent></DropdownMenu>}
           /> : <ProfileHero
             userId={profile.id}
             onOpenRound={(scoreId) => {
