@@ -38,6 +38,7 @@ export function ProAskSection({ userId, owner, first, viewerId }: { userId: stri
   if (!query.isSuccess || query.isError) return null;
   const data = query.data;
   const waiting = owner ? data.waiting ?? 0 : 0;
+  const showInvitation = !owner && data.enabled && data.total === 0 && data.my_waiting.length === 0;
 
   const toggleUseful = async (a: ProAnswer) => {
     if (gate('other', { firstName: first })) return;
@@ -70,13 +71,13 @@ export function ProAskSection({ userId, owner, first, viewerId }: { userId: stri
     ? waiting > 0
       ? <Button variant={null} size={null} className="pro-ask-waiting" onClick={() => setSheet('questions')}>{waiting} waiting ›</Button>
       : null
-    : data.enabled
+    : data.enabled && !showInvitation
       ? <Button variant={null} size={null} className="pro-ask-door" onClick={() => { if (!gate('other', { firstName: first })) setSheet('ask'); }}>Ask a question</Button>
       : null;
 
   let body: React.ReactNode = null;
   if (!owner && !data.enabled) return null;
-  if (!owner && data.enabled && data.total === 0 && data.my_waiting.length === 0) {
+  if (showInvitation) {
     body = (
       <div className="pro-ask-card">
         <div><b>Ask {first} anything</b><small>Practice, kit, life on tour. His answers show here.</small></div>

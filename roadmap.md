@@ -1,5 +1,11 @@
 # Roadmap
 
+## Pro profile build 3 close-out
+- [x] Hide the visitor header entrypoint only while the enabled, zero-total, no-own-waiting invitation card shows; add two regression cases without changing existing cases.
+- [ ] STOP: outstanding shard4 has1,808 passed/1 unexpected failure at notifRoute.parity.test.ts:312:46 (missing pro_question_asked/pro_question_answered). Parity and known FM1 untouched; fresh four-shard suite awaits authorization.
+- [x] Explicit type-only follow-up removed unsupported exact options from the new test; focused32/32, preview build OK17:02:52Z; inventory unchanged7,348/644 and old/new lines recorded.
+- [x] Write PRO_PROFILE_BUILD_3_REPORT.md with added files, test ledger, expected7,348/644 inventory, carried earlier counts and verbatim stop errors; known FM1 left untouched.
+
 ## FM1_MUTE_1
 - [x] Move mounted-video sound and duration into playback-owned top-right group; isolate inputs and release meta width; preserve deck behavior.
 - [ ] STOP: focused33 passed/1 failed at fw1FeaturedDeck.test.tsx:151:18, `AssertionError: expected undefined to be defined` in new CSS meta-padding check. No failed-test repair or shards; log /tmp/fm1-mute/focused.log. Baseline7,307/643; nine added cases yield expected7,316/643, not executed total. FM1_MUTE_1_REPORT.md records ledger.

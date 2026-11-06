@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 
@@ -74,6 +74,26 @@ beforeEach(() => {
 });
 
 describe('pro ask — visitor view', () => {
+  it('enabled with nothing has only the invitation Ask entrypoint', async () => {
+    h.answers = payload({ total: 0, answers: [] });
+    const { container } = mount(false);
+    await screen.findByRole('button', { name: 'Ask' });
+    const header = container.querySelector('.pro-profile-heading');
+    const card = container.querySelector('.pro-ask-card');
+    expect(header).not.toBeNull();
+    expect(card).not.toBeNull();
+    if (!header || !card) throw new Error('Missing Ask section header or invitation card');
+    expect(within(header as HTMLElement).queryByRole('button')).toBeNull();
+    expect(within(card as HTMLElement).getByRole('button', { name: 'Ask' })).toBeTruthy();
+  });
+  it('enabled with answers retains the header Ask entrypoint', async () => {
+    const { container } = mount(false);
+    await waitFor(() => expect(container.querySelectorAll('.pro-ask-q').length).toBe(3));
+    const header = container.querySelector('.pro-profile-heading');
+    expect(header).not.toBeNull();
+    if (!header) throw new Error('Missing Ask section header');
+    expect(within(header as HTMLElement).getByRole('button')).toHaveClass('pro-ask-door');
+  });
   it('off renders no section', async () => {
     h.answers = payload({ enabled: false, total: 0, answers: [] });
     const { container } = mount(false);
