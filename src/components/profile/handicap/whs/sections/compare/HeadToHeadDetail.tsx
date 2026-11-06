@@ -130,7 +130,7 @@ const CourseCard: React.FC<{ g: CourseGroup; first: string; defaultOpen: boolean
         {open && (
           <div style={{ padding: '0 14px 12px', borderTop: HAIR }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}>
-              {[{ b: meBest, l: 'YOUR BEST HERE' }, { b: themBest, l: `${first.toUpperCase()}'S BEST HERE` }].map((x) => (
+              {[{ b: meBest, l: 'YOUR BEST EVER' }, { b: themBest, l: `${first.toUpperCase()}'S BEST EVER` }].map((x) => (
                 <div key={x.l} style={{ borderRadius: 12, background: 'rgba(255,255,255,0.04)', padding: '9px 10px' }}>
                   <b style={{ display: 'block', fontSize: 17, fontWeight: 700, color: HH_INK, ...TAB }}>{best(x.b)}</b>
                   <span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(248,250,252,0.5)', marginTop: 2 }}>{x.l}</span>
