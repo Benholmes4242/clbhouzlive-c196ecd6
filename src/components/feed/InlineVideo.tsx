@@ -73,7 +73,68 @@ function useLaneForRole(role: FeedRole | null): LaneId | null {
   return laneId;
 }
 
-export const InlineVideo: React.FC<Props> = ({
+/** LOCAL BLOB BRANCH (PREVIEW_FIX_1) — a draft video in the post composer
+ * Preview has a blob: mp4Url and no hlsUrl/streamId, so the lane engine can
+ * never load it. Render a plain native <video> instead: no lane
+ * registration, no load, no preload, no ownerKey handoff, no spinner. It
+ * plays while isActive and pauses otherwise, so a carousel's off-screen
+ * slides stay paused. feedMapper never produces mp4Url and the server never
+ * produces blob URLs, so feed, profile, Explore and fullscreen playback
+ * cannot reach this branch. */
+const LocalBlobVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cover', onFirstFrameReady }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const firedRef = useRef(false);
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (isActive) {
+      el.play().catch(() => { /* autoplay refusal leaves the poster frame */ });
+    } else {
+      el.pause();
+    }
+  }, [isActive]);
+  const mp4Url = (item as any).mp4Url as string;
+  const poster = ((item as any).thumbnailUrl || (item as any).imageUrl || '') as string;
+  return (
+    <div style={{ position: 'absolute', inset: 0, backgroundColor: PAGE_CANVAS }}>
+      <video
+        ref={videoRef}
+        src={mp4Url}
+        poster={poster || undefined}
+        muted
+        playsInline
+        loop
+        preload="auto"
+        autoPlay
+        onLoadedData={() => {
+          if (firedRef.current) return;
+          firedRef.current = true;
+          onFirstFrameReady?.();
+        }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit,
+          display: 'block',
+        }}
+      />
+    </div>
+  );
+};
+
+export const InlineVideo: React.FC<Props> = (props) => {
+  const item = props.item as any;
+  if (!item.hlsUrl && typeof item.mp4Url === 'string' && item.mp4Url.startsWith('blob:')) {
+    return <LocalBlobVideo {...props} />;
+  }
+  return <InlineVideoEngine {...props} />;
+};
+
+InlineVideo.displayName = 'InlineVideo';
+
+const InlineVideoEngine: React.FC<Props> = ({
   item,
   isActive,
   isNear = false,
