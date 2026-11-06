@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Pro profile build 3 close-out
+- [x] Approved push-router follow-up: mirror all three pro notification destinations and add three parity fixtures plus one client case; existing fixtures/assertions untouched.
+- [ ] Deploy process-push-queue, then run fresh four shards; only known FM1 failure may continue. Update report with deployment and expected7,352/644 inventory (+4 cases).
 - [x] Hide the visitor header entrypoint only while the enabled, zero-total, no-own-waiting invitation card shows; add two regression cases without changing existing cases.
 - [ ] STOP: outstanding shard4 has1,808 passed/1 unexpected failure at notifRoute.parity.test.ts:312:46 (missing pro_question_asked/pro_question_answered). Parity and known FM1 untouched; fresh four-shard suite awaits authorization.
 - [x] Explicit type-only follow-up removed unsupported exact options from the new test; focused32/32, preview build OK17:02:52Z; inventory unchanged7,348/644 and old/new lines recorded.
