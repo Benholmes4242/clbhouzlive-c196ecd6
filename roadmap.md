@@ -2,7 +2,7 @@
 
 ## Pro profile 1c result-sheet round row
 - [x] ResultDetail count-based columns capped at four, sheet-only 8px gap; week tiles unchanged.
-- [ ] Run five added grid regressions and four fresh shards; allow only three known FS_NOTCH failures, report full counts against 7,198/634.
+- [x] Focused44/44; fresh shards1,872/1,741/1,829/1,758 passed =7,200 plus only3 known FS_NOTCH failures;7,203 executed (+5 named cases),633 unique files. Prior634 file claim internally inconsistent; ledger in PRO_RESULT_ROUND_ROW_REPORT.md. Preview build OK; requested320px style assertion passes (not physical measurement).
 
 ## PREVIEW_FIX_1 composer Preview video
 - [x] buildDraftFeedPost streamId→hlsUrl / blob→mp4Url; PostPreview dimension probe with 1500ms fallback; InlineVideo local-blob native branch.
