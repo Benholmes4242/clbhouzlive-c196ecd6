@@ -633,7 +633,19 @@
         "you": "YOUR PICK",
         "randomOne": "1 AT RANDOM",
         "odds": "odds {{odds}}",
-        "footnote": "At random means picking blind from that week's full field. Each event counts its own field size."
+        "footnote": "At random means picking blind from that week's full field. Each event counts its own field size.",
+        "headBoth": "Our picks find a top 10 <b>{{a}}×</b> as often as blind picks, and the winner <b>{{b}}×</b> as often.",
+        "headTop10": "Our picks find a top 10 <b>{{a}}×</b> as often as blind picks.",
+        "headWinner": "Our picks find the winner <b>{{b}}×</b> as often as blind picks.",
+        "groupTop10": "A TOP 10",
+        "groupWinner": "THE WINNER",
+        "blindPicks": "blind picks",
+        "countOf": "{{count}} of {{events}}",
+        "events_one": "event",
+        "events_other": "events",
+        "aboutOneIn": "about 1 in {{n}}",
+        "youMultiple": "{{x}}× a blind pick",
+        "blindFoot": "Blind picks means picking at random from that week's full field. Each event counts its own field size."
       }
     }
   },
