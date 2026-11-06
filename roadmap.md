@@ -3,7 +3,7 @@
 ## Pro profile build 1c
 - [x] Remove course-par code/controls; preserve strokes-only OWGR and signed pro/tour scoring.
 - [x] Retire18 authorized par cases, retain other1b coverage, rewrite1 mixed case and add8 stroke cases:49→39, expected7,188/632.
-- [ ] STOP: focused87/87; shards1=1,870,2=1,717,3=1,832 passed+5 failed. Two ac2ActivityFold failures at216:19/253:19 are not permitted exceptions; three FS_NOTCH failures separately carried. Shard4/320px checks unrun; referenced1c HTML missing. Full ledger/output paths in PRO_PROFILE_BUILD_1C_REPORT.md.
+- [x] Close-out: clock pin fixed ac2ActivityFold; HeroShell negative letter-spacing zeroed; four shards green at 7,185 passed + 3 known FS_NOTCH = 7,188/632. 320/390px browser spec check unverified — external unmanaged auth blocks sign-in. See PRO_PROFILE_BUILD_1C_REPORT.md.
 
 ## Pro profile build 1b
 - [x] Revised hero/avatar/friends and finish/date/scoring labels.
