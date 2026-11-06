@@ -57,7 +57,7 @@ export interface LikesSheetProps {
 /** H.4 — one segment after the handicap; null renders nothing at all. */
 function standingSegment(s: LikerStanding | undefined): { text: string; record: boolean } | null {
   if (!s) return null;
-  if (s.kind === 'record') return { text: `Best on clbhouz \u00B7 ${s.value}`, record: true };
+  if (s.kind === 'record') return { text: `Course record \u00B7 ${s.value}`, record: true };
   if (s.kind === 'best') return { text: `Best here ${s.value}`, record: false };
   return { text: s.n === 1 ? 'Played here once' : `Played here ${s.n} times`, record: false };
 }

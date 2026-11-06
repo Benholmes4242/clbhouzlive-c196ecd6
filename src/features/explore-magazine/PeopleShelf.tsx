@@ -166,8 +166,8 @@ function clubRecordReason(
   t: (key: string, fallback?: string) => string,
 ): string {
   const labels: Record<ClubRecordCategory, [string, string]> = {
-    lowest_gross_all_time: ['courseRecordHolder', 'Best on clbhouz here'],
-    lowest_gross_women_all_time: ['womensCourseRecordHolder', "Women's best on clbhouz here"],
+    lowest_gross_all_time: ['courseRecordHolder', 'Course record'],
+    lowest_gross_women_all_time: ['womensCourseRecordHolder', "Women's course record"],
     most_birdies_all_time: ['allTimeBirdieLeader', 'All-time birdie leader'],
     most_eagles_all_time: ['allTimeEagleLeader', 'All-time eagle leader'],
     most_aces_all_time: ['allTimeAceLeader', 'All-time ace leader'],

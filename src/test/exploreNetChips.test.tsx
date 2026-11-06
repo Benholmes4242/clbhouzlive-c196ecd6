@@ -125,7 +125,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     const sentence = container.querySelector<HTMLElement>('[data-explore-achievement-sentence="true"]');
     expect(sentence).not.toBeNull();
     const subline = container.querySelector<HTMLElement>('[data-explore-achievement-subline="true"]');
-    expect(subline?.textContent).toBe('2 shots better than the previous best on clbhouz');
+    expect(subline?.textContent).toBe('2 shots better than the previous course record');
     expect(subline?.style.color).toBe('rgba(248, 250, 252, 0.62)');
     expect(subline?.style.whiteSpace).toBe('');
     expect(subline?.style.overflow).toBe('');
@@ -158,13 +158,13 @@ describe('amended achievement priority', () => {
       { gross: 66, record_margin: 2 },
       { consequence: { kind: 'record_taken', n: 66 } },
     );
-    expect(record.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('2 shots better than the previous best on clbhouz');
+    expect(record.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('2 shots better than the previous course record');
 
     const singular = renderCard(
       { gross: 67, record_margin: 1 },
       { consequence: { kind: 'record_taken', n: 67 } },
     );
-    expect(singular.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('1 shot better than the previous best on clbhouz');
+    expect(singular.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('1 shot better than the previous course record');
 
     const noRunnerUp = renderCard(
       { gross: 66, record_margin: null },
@@ -183,7 +183,7 @@ describe('amended achievement priority', () => {
 
   it('keeps net record without a subline', () => {
     const container = renderCard({ gross: 66, net_record: true, record_margin: 2 });
-    expect(container.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Net best on clbhouz');
+    expect(container.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Net course record');
     expect(container.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
   });
 });
@@ -195,8 +195,8 @@ describe('achievement tag and label copy', () => {
     tag: string | null;
     label: string;
   }> = [
-    { consequence: { kind: 'record_taken' }, tag: 'NEW', label: 'Best on clbhouz' },
-    { facts: { net_record: true }, tag: 'NEW', label: 'Net best on clbhouz' },
+    { consequence: { kind: 'record_taken' }, tag: 'NEW', label: 'Course record' },
+    { facts: { net_record: true }, tag: 'NEW', label: 'Net course record' },
     { consequence: { kind: 'rank_up', n: 2 }, tag: 'MOVED UP', label: 'Now 2nd' },
     { consequence: { kind: 'rank_up', n: null }, tag: null, label: 'Moved up the board' },
     // BRIEF_FEED_SCORE_PILL §2 — rare feats carry RARE in the NEW tag slot;

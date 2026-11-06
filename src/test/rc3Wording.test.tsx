@@ -32,47 +32,47 @@ async function mount(node: React.ReactNode, translated: boolean) {
 
 describe('RC3 member-best wording', () => {
   it.each(['lowest_gross_women_90d', 'lowest_gross_women_all_time'] as const)('women’s category %s', category => {
-    expect(legendCategoryLabel[category]).toBe("Women's best on clbhouz");
+    expect(legendCategoryLabel[category]).toBe("Women's course record");
   });
   it.each([false, true])('women’s shelf reason, locale loaded: %s', async translated => {
     const { container } = await mount(<PeopleShelf viewerId="viewer" clubId="club" clubName="Club" enabled pos={1} />, translated);
-    expect(container.textContent).toContain("Women's best on clbhouz here");
+    expect(container.textContent).toContain("Women's course record");
   });
   it.each([false, true])('gross achievement, locale loaded: %s', async translated => {
     const { container } = await mount(<AchievementCalloutPanel callout={{ kind: 'record', margin: null }} locale="en" />, translated);
-    expect(container.textContent).toContain('New best on clbhouz');
+    expect(container.textContent).toContain('New course record');
   });
   it.each([false, true])('net achievement, locale loaded: %s', async translated => {
     const { container } = await mount(<AchievementCalloutPanel callout={{ kind: 'net_record' }} locale="en" />, translated);
-    expect(container.textContent).toContain('New net best on clbhouz');
+    expect(container.textContent).toContain('New net course record');
   });
   it('friends insight uses the member-best noun', () => {
-    expect(insightFor({ is_course_record: true } as never, (_key, opts) => String(opts?.defaultValue ?? ''))?.text).toBe('A new best on clbhouz here');
+    expect(insightFor({ is_course_record: true } as never, (_key, opts) => String(opts?.defaultValue ?? ''))?.text).toBe('A new course record here');
   });
   it('benchmark retains its measured gap and pro prediction', () => {
     const result = pickProBenchmark({ pros: [{ slug: 'ann', full_name: 'Ann Golfer', initials: 'AG', tour_code: 'pga', scoring_avg: 70, birdies_per_round: 4, eagles_per_round: 0.1, tour_cr_baseline: 72 }], courseId: 'course', course: { cr: 72, slope: 113, par: 72, yards: 7200 }, viewerRounds: 1, eligibleBases: ['lowest_gross'], recordGross: 73, visitN: 0, courseName: 'Club' });
-    expect(result?.chaseLine).toBe("The best on clbhouz is 3 shy of Ann's predicted 70");
+    expect(result?.chaseLine).toBe("The course record is 3 shy of Ann's predicted 70");
   });
   it.each([
-    ['amateur.stream.kicker.courseRecord', 'Best on clbhouz'],
-    ['amateur.stream.list.eventRecord', 'New best on clbhouz'],
-    ['courseDetail.featured.courseRecord', 'Best on clbhouz'],
-    ['courseDetail.featured.courseRecordJoint', 'Joint best on clbhouz'],
-    ['discover.golfThisWeek.moment.label.courseRecord', 'Best on clbhouz'],
+    ['amateur.stream.kicker.courseRecord', 'Course record'],
+    ['amateur.stream.list.eventRecord', 'New course record'],
+    ['courseDetail.featured.courseRecord', 'Course record'],
+    ['courseDetail.featured.courseRecordJoint', 'Joint course record'],
+    ['discover.golfThisWeek.moment.label.courseRecord', 'Course record'],
   ])('English value %s', (key, expected) => {
     const value = key.split('.').reduce<unknown>((node, part) => node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined, en);
     expect(value).toBe(expected);
   });
   it.each([
-    [false, null, null, 'Ann took the best on clbhouz with a 68.'],
-    [false, -4, null, 'Ann took the best on clbhouz with a 68, four under par.'],
-    [false, -4, 71, 'Ann took the best on clbhouz with a 68, four under par. Your best here is 71.'],
-    [true, null, null, 'You took the best on clbhouz with a 68.'],
-    [true, -4, null, 'You took the best on clbhouz with a 68, four under par.'],
+    [false, null, null, 'Ann took the course record with a 68.'],
+    [false, -4, null, 'Ann took the course record with a 68, four under par.'],
+    [false, -4, 71, 'Ann took the course record with a 68, four under par. Your best here is 71.'],
+    [true, null, null, 'You took the course record with a 68.'],
+    [true, -4, null, 'You took the course record with a 68, four under par.'],
   ] as const)('record-taken headline own=%s par=%s best=%s', (own, par, best, expected) => {
     expect(headlineFor({ kind: 'round', subject: {}, who: { display_name: 'Ann', is_viewer: own }, facts: { gross: 68, to_par: par, is_course_record: true } } as never, t, 'en', { viewerBest: best })).toBe(expected);
   });
   it('record-lost headline retains the viewer best without a date', () => {
-    expect(headlineFor({ kind: 'round', subject: {}, who: { display_name: 'Ann' }, facts: { gross: 68 }, consequence: { kind: 'record_lost' } } as never, t, 'en', { viewerBest: 71 })).toBe('Ann took the clbhouz best here from you with a 68. Your best here is 71.');
+    expect(headlineFor({ kind: 'round', subject: {}, who: { display_name: 'Ann' }, facts: { gross: 68 }, consequence: { kind: 'record_lost' } } as never, t, 'en', { viewerBest: 71 })).toBe('Ann took the course record from you with a 68. Your best here is 71.');
   });
 });

@@ -511,7 +511,7 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
     const d = dayMonthYear(gross.attained_at); if (d) parts.push(`Set ${d}`);
     if (since != null && since > 0) parts.push(`${fmt(since)} ${since === 1 ? 'round' : 'rounds'} since`);
     if (holders != null && holders > 1) parts.push(`${fmt(holders)} golfers have held it`);
-    rows.push({ name: 'Best on clbhouz', meta: parts.length ? parts.join(' · ') : null, value: fmt(gross.value) });
+    rows.push({ name: 'Course record', meta: parts.length ? parts.join(' · ') : null, value: fmt(gross.value) });
   }
   if (stableford?.value != null) {
     const d = dayMonthYear(stableford.attained_at);

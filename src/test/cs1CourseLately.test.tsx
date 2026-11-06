@@ -189,8 +189,8 @@ describe('CS1 Lately here', () => {
     expect(f.calls.length).toBe(0);
   });
 
-  it('(j) hero label reads Best on clbhouz', () => {
+  it('(j) hero label reads Course record', () => {
     render(<HeroCourseRecord holders={[{ user_id: 'a', user_display_name: 'Lennon Hill', value: 65 } as never]} />);
-    expect(screen.getByText('Best on clbhouz')).toBeTruthy();
+    expect(screen.getByText('Course record')).toBeTruthy();
   });
 });

@@ -74,7 +74,7 @@ export function HeroCourseRecord({ holders }: { holders: CourseLegendRow[] }) {
       </span>
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: MEDAL_GOLD, lineHeight: 1.2 }}>
-          Best on clbhouz
+          Course record
         </div>
         <div style={{ fontSize: 12.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>
           {names}
