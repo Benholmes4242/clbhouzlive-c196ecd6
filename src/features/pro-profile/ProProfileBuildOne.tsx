@@ -35,5 +35,6 @@ export function ProProfileBuildOne(p:ProProfileProps){
     {ready&&<ProSeasonSection events={rows} year={year} first={first} owner={p.owner} userId={id} linked={linked} scoring={stats.isSuccess&&!stats.isError?stats.data.player?.scoring_average:null}/>}
     {linked&&stats.isSuccess&&!stats.isError&&<HowProPlays data={stats.data}/>}
     <ProCollectionSections userId={id} owner={p.owner} first={first} events={events.data??[]} eventsReady={events.isSuccess&&!events.isError}/>
+    <ProAskSection userId={id} owner={p.owner} first={first} viewerId={p.viewerId}/>
   </div>;
 }
