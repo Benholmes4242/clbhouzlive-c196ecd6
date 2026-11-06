@@ -1,5 +1,10 @@
 # Roadmap
 
+## Sponsor sheet export fixes
+- [ ] Fix sheet-only measured result truncation, printed PRO/rank alignment and Career filtering; preserve profile Career.
+- [ ] Add regression coverage, run focused tests and four shards; carry only known FM1 failure and report inventory/changed tests.
+- [ ] Check Chromium preview/PNG where available and report verification limits.
+
 ## Pro profile build 3 close-out
 - [x] Approved push-router follow-up: mirror all three pro notification destinations and add three parity fixtures plus one client case; existing fixtures/assertions untouched.
 - [x] Deploy process-push-queue successfully; focused117/117; fresh shards1,889/1,773/1,876/1,813 passed, only1 known FM1 failure.7,351 passed+1 known=7,352 executed/644 files, expected inventory matched (+4 named cases); report updated.

@@ -4,8 +4,10 @@
  * full-size node at html2canvas scale 3 (1080px), the TopTenShareSheet
  * pipeline. Cover/avatar are fetched as CORS blobs so the canvas is never
  * tainted. A block with no data is left out, and its chip with it. Chip
- * choices persist per user in localStorage, wrapped in try/catch. */
-import { useEffect, useMemo, useRef, useState } from 'react';
+ * choices persist per user in localStorage, wrapped in try/catch. Result
+ * names measure their unscaled column in the app font; sponsor-only Career
+ * filtering never changes the profile's canonical entries. */
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -16,7 +18,8 @@ import { toast } from '@/lib/toast';
 import { useProEvents, useProWorldRank } from './useProProfile';
 import { useProBag, useProCareer, useProPartners } from './useProCollections';
 import { useProClubhouse, useProReach } from './useProClubhouse';
-import { careerEntries, orderedBag, orderedPartners } from './proCollectionRules';
+import { careerEntries, orderedBag, orderedPartners, type CareerEntry } from './proCollectionRules';
+import { sponsorCareerEntries, truncateSponsorEvent } from './proSponsorRules';
 import { finishLabel, formatWorldRank, rankMovement, sortedEvents, type ProEvent, type WorldRank } from './proProfileRules';
 import { bagLine, sponsorSourceLine, type ProReach } from './proClubhouseRules';
 
@@ -69,7 +72,7 @@ interface CardProps {
   identity: SponsorIdentity;
   season: SponsorSeason | null;
   rank: WorldRank | null;
-  career: { id: string; year: number; text: string; is_win: boolean }[];
+  career: CareerEntry[];
   partners: string[];
   bagText: string;
   reach: ProReach | null;
@@ -81,10 +84,31 @@ interface CardProps {
   avatarUrl: string | null;
 }
 
+function SponsorEventName({ name }: { name: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [text, setText] = useState(name);
+  useLayoutEffect(() => {
+    const span = ref.current;
+    if (!span) return;
+    let cancelled = false;
+    const measure = () => {
+      if (cancelled || span.clientWidth <= 0) return;
+      const context = document.createElement('canvas').getContext('2d');
+      if (!context) return;
+      context.font = `400 10.5px ${getComputedStyle(span).fontFamily}`;
+      setText(truncateSponsorEvent(name, span.clientWidth, (value) => context.measureText(value)));
+    };
+    measure();
+    void document.fonts?.ready.then(measure);
+    return () => { cancelled = true; };
+  }, [name]);
+  return <span ref={ref}>{text}</span>;
+}
+
 function ProSponsorCard({ identity, season, rank, career, partners, bagText, reach, followers, watchers, blocks, qrUrl, coverUrl, avatarUrl }: CardProps) {
   const movement = rankMovement(rank);
   const results = (season?.results ?? []).slice(0, 4);
-  const moments = career.slice(0, 4);
+  const moments = career;
   const profileUrl = `clbhouz.co.uk/profile/${identity.username}`;
   return (
     <div className="pro-ss" data-sponsor-card style={{ width: CARD_WIDTH }}>
@@ -143,7 +167,7 @@ function ProSponsorCard({ identity, season, rank, career, partners, bagText, rea
                 {results.map((e) => {
                   const label = finishLabel(e.finish);
                   const eliminated = ['MC', 'WD', 'DQ'].includes(e.finish?.toUpperCase() ?? '');
-                  return <div key={e.id}><b className={eliminated ? 'pro-ss-mc' : undefined}>{label}</b><span>{e.event_name}</span></div>;
+                  return <div key={e.id}><b className={eliminated ? 'pro-ss-mc' : undefined}>{label}</b><SponsorEventName name={e.event_name} /></div>;
                 })}
               </div>
             )}
@@ -218,7 +242,7 @@ export function ProSponsorSheet({ open, onClose, proId, identity, season, follow
   const partners = partnersQuery.isSuccess && !partnersQuery.isError ? orderedPartners(partnersQuery.data ?? []) : [];
   const events = eventsQuery.isSuccess && !eventsQuery.isError ? eventsQuery.data ?? [] : [];
   const career = careerQuery.isSuccess && !careerQuery.isError && eventsQuery.isSuccess && !eventsQuery.isError
-    ? careerEntries(events, careerQuery.data ?? [])
+    ? sponsorCareerEntries(careerEntries(events, careerQuery.data ?? []))
     : [];
 
   const available: Record<BlockKey, boolean> = {

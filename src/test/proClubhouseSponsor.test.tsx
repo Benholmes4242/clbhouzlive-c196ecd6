@@ -7,6 +7,8 @@ import { ProProfileBuildOne, type ProProfileProps } from '@/features/pro-profile
 import { ProClubhouseSection } from '@/features/pro-profile/ProClubhouseSection';
 import { ProOnlyYouSection } from '@/features/pro-profile/ProOnlyYouSection';
 import { ProSponsorSheet, type SponsorIdentity, type SponsorSeason } from '@/features/pro-profile/ProSponsorSheet';
+import { ProCollectionSections } from '@/features/pro-profile/ProCollectionSections';
+import { truncateSponsorEvent } from '@/features/pro-profile/proSponsorRules';
 import { bagLine, clubhouseCopy, parseProClubhouse, parseProReach, sponsorSourceLine, trackingFromLine } from '@/features/pro-profile/proClubhouseRules';
 import type { ProEvent } from '@/features/pro-profile/proProfileRules';
 import type { BagItem, Partner, CareerMoment } from '@/features/pro-profile/proCollectionRules';
@@ -265,6 +267,29 @@ describe('sponsor sheet', () => {
   // node. Block assertions scope to the preview.
   const preview = () => within(dialog().querySelector('.pro-ss-fit') as HTMLElement);
 
+  it('sheet filters the first ranking event before taking four and shortens only its derived career high', () => {
+    s.events = [
+      owgrEvent('first', 'First Open', 'T31', { start_date: '2026-01-01', owgr_rank_after: 1354 }),
+      owgrEvent('second', 'Open de Roissy PGA France', '2', { start_date: '2026-04-01' }),
+      owgrEvent('third', 'Alps Andalucia-Roquetas de Mar', '2', { start_date: '2026-05-01' }),
+    ];
+    s.career = [moment('Kent Amateur champion', 2022, true)];
+    mount(sheet());
+    const car = dialog().querySelector('.pro-ss-fit .pro-ss-car');
+    expect(car?.querySelectorAll(':scope > div:not(.pro-ss-h)')).toHaveLength(4);
+    expect(preview().getByText('Career-high world ranking, #1,354')).toBeInTheDocument();
+    expect(preview().queryByText(/, after First Open/)).toBeNull();
+    expect(preview().queryByText(/First world ranking event/)).toBeNull();
+    expect(preview().getByText('Kent Amateur champion').closest('div')).toHaveClass('pro-ss-win');
+  });
+
+  it('profile Career retains the first ranking event and the career-high after clause', () => {
+    const events = [owgrEvent('first', 'First Open', 'T31', { owgr_rank_after: 1354 })];
+    mount(<ProCollectionSections userId="pro" owner={false} first="Mason" events={events} eventsReady />);
+    expect(screen.getByText('Career-high world ranking, #1,354, after First Open')).toBeInTheDocument();
+    expect(screen.getByText('First world ranking event, First Open')).toBeInTheDocument();
+  });
+
   it('every chip toggles its block straight away', () => {
     mount(sheet());
     const dlg = dialog();
@@ -396,6 +421,16 @@ describe('sponsor sheet', () => {
 });
 
 describe('pure helpers', () => {
+  it('cuts a long event with an ellipsis to fit the measured column', () => {
+    const measureText = vi.fn((text: string) => ({ width: Array.from(text).length * 5 }));
+    const result = truncateSponsorEvent('Hulencourt Alps Tour Grand Final', 55, measureText);
+    expect(result).toBe('Hulencourt…');
+    expect(measureText(result).width).toBeLessThanOrEqual(55);
+  });
+  it('keeps a short event unchanged when it fits', () => {
+    const measureText = vi.fn((text: string) => ({ width: text.length * 5 }));
+    expect(truncateSponsorEvent('Open', 55, measureText)).toBe('Open');
+  });
   it('bagLine joins two slots with and, three with a comma list', () => {
     expect(bagLine([bagItem('driver', 'A'), bagItem('fairway', 'A')])).toBe('A driver and fairway');
     expect(bagLine([bagItem('driver', 'A'), bagItem('fairway', 'A'), bagItem('hybrid', 'A')])).toBe('A driver, fairway and hybrid');

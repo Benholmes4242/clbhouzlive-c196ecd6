@@ -225,11 +225,11 @@
 .pro-ss-id { display:flex; align-items:center; gap:12px; }
 .pro-ss-id-text { min-width:0; }
 .pro-ss-nm { font-size:19px; font-weight:800; line-height:1.15; overflow-wrap:anywhere; }
-.pro-ss-nm .pro-label { position:relative; top:-2px; margin-left:8px; }
+.pro-ss-nm .pro-label { display:inline-block; height:18px; line-height:18px; padding:0 7px; text-align:center; vertical-align:middle; margin-left:8px; }
 .pro-ss-sub { margin-top:3px; font-size:11.5px; color:var(--pro-profile-soft); overflow-wrap:anywhere; }
 .pro-ss-sub-mute { margin-top:1px; color:var(--pro-profile-mute); }
-.pro-ss-rank { display:flex; align-items:flex-end; gap:12px; margin-top:14px; }
-.pro-ss-rank>b { font-size:34px; font-weight:800; line-height:.9; }
+.pro-ss-rank { display:grid; grid-template-columns:auto 1fr; align-items:end; gap:12px; margin-top:14px; }
+.pro-ss-rank>b { font-size:34px; font-weight:800; line-height:1; }
 .pro-ss-lab { display:block; font-size:9px; font-weight:800; letter-spacing:.14em; color:var(--pro-profile-mute); }
 .pro-ss-rank em { display:block; margin-top:3px; font-style:normal; font-size:11.5px; font-weight:700; white-space:nowrap; }
 .pro-ss-up { color:var(--pro-profile-green); }
@@ -246,7 +246,7 @@
 .pro-ss-res>.pro-ss-h+div { border-top:0; padding-top:0; }
 .pro-ss-res b { flex:none; width:26px; font-weight:800; }
 .pro-ss-res b.pro-ss-mc { color:var(--pro-profile-dim); font-weight:700; }
-.pro-ss-res span { min-width:0; color:var(--pro-profile-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pro-ss-res span { flex:1; min-width:0; color:var(--pro-profile-soft); white-space:nowrap; }
 .pro-ss-car>div:not(.pro-ss-h) { position:relative; padding:0 0 7px 13px; font-size:10.5px; line-height:1.35; color:var(--pro-profile-soft); overflow-wrap:anywhere; }
 .pro-ss-car>div:not(.pro-ss-h)::before { content:''; position:absolute; left:0; top:4px; width:6px; height:6px; border-radius:50%; border:1.5px solid var(--pro-profile-ink); box-sizing:border-box; }
 .pro-ss-car>div.pro-ss-win::before { background:var(--pro-profile-gold); border-color:var(--pro-profile-gold); }
