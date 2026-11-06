@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro profile build 1c
+- [ ] Remove course-par code/controls; preserve strokes-only OWGR and signed pro/tour scoring.
+- [ ] Retire authorized par tests, retain other 1b coverage and add Mason stroke fixtures.
+- [ ] Focused/four shards/320px checks; prior expected inventory7,198/632, only three known FS_NOTCH failures permitted.
+
 ## Pro profile build 1b
 - [x] Revised hero/avatar/friends and finish/date/scoring labels.
 - [x] Owner/admin explicit par controls via existing RPC, preserving gross storage.
