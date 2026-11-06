@@ -10603,6 +10603,195 @@ export type Database = {
           },
         ]
       }
+      pro_question_useful: {
+        Row: {
+          created_at: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_question_useful_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "pro_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_question_useful_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_question_useful_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_question_useful_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_question_useful_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_question_useful_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_question_useful_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      pro_questions: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          asker_id: string
+          asker_label: string
+          created_at: string
+          id: string
+          pro_id: string
+          question: string
+          status: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          asker_id: string
+          asker_label?: string
+          created_at?: string
+          id?: string
+          pro_id: string
+          question: string
+          status?: string
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          asker_id?: string
+          asker_label?: string
+          created_at?: string
+          id?: string
+          pro_id?: string
+          question?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_questions_asker_id_fkey"
+            columns: ["asker_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_questions_asker_id_fkey"
+            columns: ["asker_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_questions_asker_id_fkey"
+            columns: ["asker_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_questions_asker_id_fkey"
+            columns: ["asker_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_questions_asker_id_fkey"
+            columns: ["asker_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_questions_asker_id_fkey"
+            columns: ["asker_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_questions_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_questions_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_questions_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_questions_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_questions_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_questions_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       pro_score_watchers: {
         Row: {
           created_at: string
@@ -16980,6 +17169,7 @@ export type Database = {
           pinned_achievement_ids: string[] | null
           pinned_post_ids: string[] | null
           primary_club_id: string | null
+          pro_ask_enabled: boolean
           pro_body: string | null
           pro_club: string | null
           pro_kind: string | null
@@ -17118,6 +17308,7 @@ export type Database = {
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
           primary_club_id?: string | null
+          pro_ask_enabled?: boolean
           pro_body?: string | null
           pro_club?: string | null
           pro_kind?: string | null
@@ -17256,6 +17447,7 @@ export type Database = {
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
           primary_club_id?: string | null
+          pro_ask_enabled?: boolean
           pro_body?: string | null
           pro_club?: string | null
           pro_kind?: string | null
@@ -21413,6 +21605,10 @@ export type Database = {
         Args: { target_date?: string }
         Returns: undefined
       }
+      answer_pro_question: {
+        Args: { p_answer: string; p_question_id: string }
+        Returns: undefined
+      }
       approve_business_verification: {
         Args: { _admin_note?: string; _request_id: string }
         Returns: Json
@@ -21429,6 +21625,10 @@ export type Database = {
       are_users_blocked: {
         Args: { user_a: string; user_b: string }
         Returns: boolean
+      }
+      ask_pro_question: {
+        Args: { p_pro_id: string; p_question: string }
+        Returns: string
       }
       auto_flip_season: { Args: never; Returns: undefined }
       backfill_course_top100_memberships: {
@@ -21704,6 +21904,10 @@ export type Database = {
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
         Returns: Json
+      }
+      decline_pro_question: {
+        Args: { p_question_id: string }
+        Returns: undefined
       }
       decrement_slots_if_available: {
         Args: { p_game_id: string }
@@ -24790,6 +24994,10 @@ export type Database = {
         }[]
       }
       get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
+      get_pro_answers: {
+        Args: { p_limit?: number; p_offset?: number; p_pro_id: string }
+        Returns: Json
+      }
       get_pro_hole_data_queue: { Args: never; Returns: Json }
       get_pro_members: {
         Args: { p_user_ids: string[] }
@@ -24802,6 +25010,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_pro_question_inbox: { Args: { p_status?: string }; Returns: Json }
       get_pro_score_watch: { Args: { p_pro_id: string }; Returns: Json }
       get_pro_world_rank: { Args: { p_user_id: string }; Returns: Json }
       get_profile_creator: {
@@ -27964,6 +28173,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_pro_ask_enabled: { Args: { p_on: boolean }; Returns: boolean }
       set_pro_event_par: {
         Args: { p_event_id: string; p_par: number }
         Returns: undefined
@@ -28711,6 +28921,10 @@ export type Database = {
           p_post_id: string
         }
         Returns: Json
+      }
+      toggle_pro_answer_useful: {
+        Args: { p_question_id: string }
+        Returns: boolean
       }
       toggle_pro_score_watch: { Args: { p_pro_id: string }; Returns: boolean }
       tour_tee_alerts_due: {

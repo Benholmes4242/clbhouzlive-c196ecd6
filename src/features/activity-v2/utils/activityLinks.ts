@@ -459,6 +459,15 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     return '/edit-profile';
   }
 
+  // --- pro Ask (build 3) ------------------------------------------------
+  // A new question for the pro opens his OWN profile with the questions
+  // sheet on Waiting; an answer opens that pro's profile scrolled to ASK.
+  if (type === 'pro_question_asked') return '/profile?ask=inbox';
+  if (type === 'pro_question_answered') {
+    const proId = data.pro_id;
+    return proId ? `/profile/${proId}?ask=section` : '/profile';
+  }
+
   // --- tour digests (system-authored, NO actor, NO target) ------------
   // These digests announce the week's tournaments; the overview is where
   // those tournaments live. Push remains on the wire pending Ben's separate
