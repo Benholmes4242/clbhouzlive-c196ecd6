@@ -1,6 +1,73 @@
-# VIEW_POST_1 — implemented, stopped at focused verification
+# VIEW_POST_1 — close-out green
 
-## STOP
+## Authorized test-only close-out
+Completed 2026-11-06. Production code and every other test file were unchanged in this continuation. Only the approved browser-history setup and one sibling case were added to `src/test/viewPost1Navigation.test.tsx`; existing assertions stayed byte-identical. The file already has afterEach cleanup with `vi.restoreAllMocks()`, and both cases explicitly restore their history spy too.
+
+Focused command documented below rerun: **67/67 passed across 7 files**.
+
+Each fresh shard ran as its own command, in order:
+```sh
+bunx vitest run --maxWorkers=2 --shard=1/4
+bunx vitest run --maxWorkers=2 --shard=2/4
+bunx vitest run --maxWorkers=2 --shard=3/4
+bunx vitest run --maxWorkers=2 --shard=4/4
+```
+
+| Shard | Passed | Failed | Files |
+|---|---:|---:|---:|
+| 1 | 1,873 | 0 | 159 |
+| 2 | 1,729 | 0 | 159 |
+| 3 | 1,849 | 0 | 159 |
+| 4 | 1,773 | 0 | 159 |
+| **Total** | **7,224** | **0** | **636** |
+
+Known failures, reported separately: **none appeared**. fsNotch1 passes6/6, fullscreenBand19/19, tourIsland14/14. No unexpected failures or reruns. CLOSE_OUT_1's three portrait fixes remain green; this continuation did not touch those files.
+
+Full-suite baseline was7,205 tests/633 files. VIEW_POST_1 originally added18 tests/3 files, and this close-out adds1 sibling: **7,205+18+1=7,224;633+3=636**. No test/file deleted or renamed. viewPost1Navigation12→13; focused66 executed (65 pass/1 fail)→67 passing, exactly fixed1+added1. Compared with the preceding expected inventory7,223/636, delta is exactly +1 named sibling. Shard membership redistributed; only full totals establish the delta.
+
+### Changed test — old code
+Case: `without closeTo a shared or notification link goes back unchanged`.
+```tsx
+  it('without closeTo a shared or notification link goes back unchanged', async () => {
+    const open = mountLink(undefined, true);
+    await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    expect(open.mock.calls[0]?.[2]?.openCommentsInitially).toBe(true);
+    await act(async () => { open.mock.calls[0]?.[2]?.onClose?.({ reason: 'dismissed' } as never); });
+    expect(screen.getByTestId('destination')).toHaveTextContent('/activity');
+  });
+```
+
+### Changed test — new code
+```tsx
+  it('without closeTo a shared or notification link goes back unchanged', async () => {
+    const len = vi.spyOn(window.history, 'length', 'get').mockReturnValue(2);
+    const open = mountLink(undefined, true);
+    await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    expect(open.mock.calls[0]?.[2]?.openCommentsInitially).toBe(true);
+    await act(async () => { open.mock.calls[0]?.[2]?.onClose?.({ reason: 'dismissed' } as never); });
+    expect(screen.getByTestId('destination')).toHaveTextContent('/activity');
+    len.mockRestore();
+  });
+```
+Why: model actual browser-history length separately from MemoryRouter so the existing back branch is exercised; assertions were not rewritten.
+
+### Added sibling
+```tsx
+  it('without closeTo and no browser history a shared link lands on Clubhouse', async () => {
+    const len = vi.spyOn(window.history, 'length', 'get').mockReturnValue(1);
+    const open = mountLink();
+    await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    await act(async () => { open.mock.calls[0]?.[2]?.onClose?.({ reason: 'dismissed' } as never); });
+    expect(screen.getByTestId('destination')).toHaveTextContent('/');
+    len.mockRestore();
+  });
+```
+
+All five new logs retained under `docs/verification/view-post-1/close-out/`; preceding failing focused log retained unchanged. Preview harness reports `build OK` at2026-11-06T07:04:48Z. No manual build/typecheck, SQL, migrations, production edits, deployed changes or other test changes in this close-out. Six authenticated/device checks remain unverified because auth is external unmanaged; suite-green does not establish those checks. Notification/shared-link history now has passing mounted coverage of both branches.
+
+## Historical implementation and STOP evidence (superseded by green close-out above)
+
+## Historical STOP
 Unexpected failure in a new test; no failing assertion/fixture was edited and no shards were started.
 
 ```text

@@ -1,9 +1,10 @@
 # Roadmap
 
 ## VIEW_POST_1
-- [ ] Authorized close-out: only history-length setup and one fallback sibling in viewPost1Navigation; rerun focused67 then four fresh shards, retaining all logs and exact old/new code.
+- [x] Authorized test-only close-out: only history-length setup and one fallback sibling; focused67/67, fresh shards1,873/1,729/1,849/1,773 =7,224/636, zero failures. Known portrait/TourIsland failures did not recur; old/new code and retained logs in VIEW_POST_1_REPORT.md.
 - [x] Isolate View post navigation in both composer mounts; author-profile close/fallback destination and actor-scoped inactive grid refetch on submit/upload completion.
-- [ ] STOP: focused65 pass/1 new failure at viewPost1Navigation.test.tsx:84:47 `Expected /activity; Received /` because MemoryRouter does not populate window.history. No failing test edited; fixture-only authorization needed. Full log/report retained; four shards not run. Expected7,223/636 (+18 cases/3 files versus7,205/633), not executed full suite. Six live checks unavailable with external unmanaged auth; preview build OK.
+- [x] Previous focused STOP resolved only with authorized browser-history fixture; no assertions rewritten or production changes in close-out. Total delta from7,205/633 is +19 tests/+3 files (18 initial cases plus fallback sibling); preview build OK.
+- [ ] Six authenticated/device checks remain unverified — external unmanaged authentication prevents hosted end-to-end verification; test close-out is complete.
 
 ## CLOSE_OUT_1 revised notch threshold
 - [x] Replace portrait threshold with mediaAspect ≤0.6; add stable frame hook and only named test repairs, plus two boundary regressions.
