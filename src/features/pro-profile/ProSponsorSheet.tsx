@@ -302,7 +302,7 @@ export function ProSponsorSheet({ open, onClose, proId, identity, season, follow
     season,
     rank,
     career,
-    partners: partners.map((p) => (p.business_id ? p.name : p.name)),
+    partners: partners.map((p) => p.name),
     bagText: bagLine(bag),
     reach,
     followers,
