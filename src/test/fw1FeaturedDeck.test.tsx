@@ -19,6 +19,7 @@ import { WatchFeaturedDeck, WatchFeaturedSlot } from '@/features/explore-magazin
 import { featuredSwipe, FEATURED_ADVANCE_MS, FEATURED_EXIT_MS } from '@/features/explore-magazine/watch/featuredRules';
 import type { WatchFeaturedRow } from '@/features/explore-magazine/watch/useWatchFeatured';
 import featuredCss from '@/features/explore-magazine/watch/featured.css?raw';
+import * as autoplayGate from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 const rows = (count=8):WatchFeaturedRow[] => Array.from({length:count},(_,i) => ({ post_id:`p${i}`,reason:'featured',actor_type:'personal',actor_id:`u${i}`,display_name:`Golfer ${i}`,handle:`golfer${i}`,avatar_url:null,is_verified:false,caption:`Video ${i}`,media_url:null,hls_url:`https://example.com/${i}.m3u8`,poster_url:`https://example.com/${i}.jpg`,stream_id:null,duration_seconds:12,width:900,height:1600,like_count:i+10,comment_count:i+2,created_at:'2026-11-04',course_id:null,course_name:null,rank:i+1,score:100-i,is_liked_by_me:false }));
 const comments=vi.fn(), shorts=vi.fn();
 const clients:QueryClient[]=[];
@@ -101,14 +102,24 @@ describe('FM1 sound group', () => {
   });
   it('stops pointerdown, touchstart and click before deck ancestors see them', () => {
     mount();
-    const parent = top();
     const seen = vi.fn();
-    for (const event of ['pointerdown','touchstart','click']) parent.addEventListener(event, seen);
+    for (const event of ['pointerdown','touchstart','click']) document.addEventListener(event, seen);
     const button = screen.getByRole('button', { name:'Unmute' });
     fireEvent.pointerDown(button);
     fireEvent.touchStart(button);
     fireEvent.click(button);
     expect(seen).not.toHaveBeenCalled();
+    for (const event of ['pointerdown','touchstart','click']) document.removeEventListener(event, seen);
+  });
+  it.each(['reduced motion','autoplay blocked'])('shows only duration for %s', reason => {
+    f.reduced = reason === 'reduced motion';
+    const gate = vi.spyOn(autoplayGate, 'autoplayBlocked').mockReturnValue(true);
+    try {
+      mount();
+      expect(top().querySelector('video')).toBeNull();
+      expect(top().querySelector('.featured-mute')).toBeNull();
+      expect(top().querySelector('.featured-topright > .featured-duration')).not.toBeNull();
+    } finally { gate.mockRestore(); }
   });
   it('shows duration without sound when the card has no video source', () => {
     f.rows = rows().map(row => ({ ...row, hls_url:null }));
