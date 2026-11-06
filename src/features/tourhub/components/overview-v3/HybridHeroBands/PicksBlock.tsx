@@ -1,5 +1,7 @@
 /** Shared picks presentation owns both overview and tournament cards. Defaults
- * preserve the signed-off overview; no event reads or automatic mutations here. */
+ * preserve the signed-off overview; no event reads or automatic mutations here.
+ * The season-record hook/door belongs here (never in member bands), so all
+ * phases and viewers share heading placement and the existing record opener. */
 import React, {useLayoutEffect,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Trophy} from 'lucide-react';
