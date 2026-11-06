@@ -621,7 +621,20 @@
       "followed_other": "{{count}} people you follow have picked. Most picked: {{name}}.",
       "bestFollowed": "Best pick among people you follow: {{name}}, {{position}}.",
       "roundLive": "ROUND {{round}} · LIVE",
-      "final": "FINAL"
+      "final": "FINAL",
+      "chance": {
+        "winner_one": "We picked the winner in <b>{{wins}} of {{events}} event</b>, odds of <b>{{odds}}</b>.",
+        "winner_other": "We picked the winner in <b>{{wins}} of {{events}} events</b>, odds of <b>{{odds}}</b>.",
+        "noWinner_one": "We haven't picked a winner yet in <b>{{events}} event</b>.",
+        "noWinner_other": "We haven't picked a winner yet in <b>{{events}} events</b>.",
+        "blind": "Three players picked at random would be <b>{{odds}}</b>: about one week in {{n}}.",
+        "ours": "OUR PICKS",
+        "randomThree": "3 AT RANDOM",
+        "you": "YOUR PICK",
+        "randomOne": "1 AT RANDOM",
+        "odds": "odds {{odds}}",
+        "footnote": "At random means picking blind from that week's full field. Each event counts its own field size."
+      }
     }
   },
   "empty": {

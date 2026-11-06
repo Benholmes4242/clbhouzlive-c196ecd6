@@ -24151,6 +24151,10 @@ export type Database = {
           times_played: number
         }[]
       }
+      get_my_pick_odds: {
+        Args: { p_tour: string; p_year: number }
+        Returns: Json
+      }
       get_my_rival: {
         Args: { p_course_id?: string; p_user_id: string }
         Returns: {

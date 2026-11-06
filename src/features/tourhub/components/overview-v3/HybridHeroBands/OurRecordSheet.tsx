@@ -1,14 +1,15 @@
-/** Record is event-tour/season scoped; member benchmark and board read only the
+/** Record is event-tour/season scoped; member odds and board read only the
  * viewer-keyed RPC. House circle figures use weekly best only; the ledger
  * keeps MC/WD/DQ separate and never prints eliminated scores. */
 import { Trophy } from 'lucide-react';
 import { fmtScore } from '../../../utils/fmtScore';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useOurPickRecord, useBeatTheModel } from '../../../hooks/usePickInsights';
+import { useOurPickRecord, useBeatTheModel, useMyPickOdds } from '../../../hooks/usePickInsights';
+import {barPercent,blindOdds,percentText,recordOdds,winPercent} from './pickOdds';
 import { sortedBeatRows, resultPosition, outStatus, recordPickWon, recordEventSummary, orderedRecordPicks } from './pickInsightRules';
 import { surnameOf } from '../../../_shared/playerName';
 import './pickPanels.css';
@@ -21,13 +22,19 @@ function RecordSession({ onClose, tour, year }: OurRecordSheetProps) {
   const { t } = useTranslation('tourhub');
   const recordQuery = useOurPickRecord(selectedTour, year);
   const boardQuery = useBeatTheModel(selectedTour, year);
+  const myOddsQuery=useMyPickOdds(selectedTour,year);
   const record = recordQuery.isError ? null : recordQuery.data;
   const members = boardQuery.isError ? [] : boardQuery.data ?? [];
-  const viewer = members.find(row=>row.is_viewer && row.picks>0);
+  const mine=myOddsQuery.isError?null:myOddsQuery.data;
   const copy = (key: string, opts: Record<string,unknown> = {}) => t(`overview.pickRecord.${key}`, opts);
   const rows = record && members.some(row=>row.picks>0) ? sortedBeatRows(members,record) : [];
-  const average = record?.avg_percentile;
-  const labels = average == null ? [] : [{ key:'random', value:50, text:copy('random') }, { key:'us', value:average, text:copy('us', { value:average }) }, ...(viewer ? [{ key:'you', value:viewer.avg_percentile, text:copy('you', { value:viewer.avg_percentile }) }] : [])];
+  const events=record?.event_count;
+  const wins=record?.best?.wins;
+  const blind=blindOdds(record?.random_win_pct);
+  const chanceRow=(key:string,percent:number,odds:string,random=false)=><div className="pick-chance-row" data-chance-row={key}>
+    <div className="pick-chance-head"><span className="pick-chance-who">{copy(`chance.${key}`)}</span><span className="pick-chance-value">{percentText(percent,random)}<em>{copy('chance.odds',{odds})}</em></span></div>
+    <div className="pick-chance-track"><div className="pick-chance-fill" style={{width:`${barPercent(percent)}%`}}/></div>
+  </div>;
   const month = record?.first_event_date ? new Intl.DateTimeFormat('en-GB', { month:'long' }).format(new Date(record.first_event_date)) : null;
   return <BottomSheet open onClose={onClose} scrollBody topRadius={22} grabberPadding="8px 0 12px" ariaLabelledBy="pick-record-title">
     <div data-our-record-sheet className="text-[color:var(--pick-ink)] pb-6">
@@ -35,12 +42,17 @@ function RecordSession({ onClose, tour, year }: OurRecordSheetProps) {
       {recordQuery.isError ? <div className="your-pick-empty" role="alert">{copy('error')}<Button variant="ghost" onClick={()=>void recordQuery.refetch()}>{copy('retry')}</Button></div> : !record ? <div className="your-pick-empty" role="status">{copy('loading')}</div> : <>
         <div className="pick-record-tours" aria-label={copy('tours')}>{TOURS.filter(code=>record.tours.includes(code)).map(code=><Button key={code} variant="ghost" className="pick-panel-chip" aria-pressed={selectedTour===code} onClick={()=>setTour(code)}>{TOUR_NAMES[code]}</Button>)}</div>
         <div className="pick-record-three tabular-nums">{(['event_count','won','top10'] as const).map(key=><div key={key}><b>{record[key]}</b><span>{copy(key)}</span></div>)}</div>
-        {average != null && <div className="pick-record-benchmark"><span>{copy('averageBefore')} <b>{copy('averageFigure', { value:average })}</b>. {copy('averageAfter')}</span>
-          <div className="pick-record-track"><div className="pick-panel-fill" style={{ width:`${average}%` }} /><span className="pick-record-tick" />{viewer && <span data-viewer-dot className="pick-record-you" style={{ left:`${viewer.avg_percentile}%` }} />}</div>
-          <div className="pick-record-labels">{labels.map((label,index)=>{
-            const near = labels.slice(0,index).some(previous=>Math.abs(previous.value-label.value)<18);
-            return <span key={label.key} data-viewer={label.key==='you' ? true : undefined} className={label.key==='random' ? 'pick-panel-dim' : ''} style={{ left:`${Math.max(12,Math.min(88,label.value))}%`, top:near ? 26 : 8 }}>{label.text}</span>;
-          })}</div>
+        {events!=null && wins!=null && <div className="pick-record-chance">
+          <p className="pick-chance-sentence"><Trans t={t} i18nKey={`overview.pickRecord.chance.${wins>0?'winner':'noWinner'}`} count={events} values={{wins,events,odds:recordOdds(wins,events)}} components={{b:<b/>}}/>{blind && <> <Trans t={t} i18nKey="overview.pickRecord.chance.blind" values={{odds:blind.odds,n:blind.n}} components={{b:<b/>}}/></>}</p>
+          <div className="pick-chance-bars">
+            {chanceRow('ours',winPercent(wins,events),recordOdds(wins,events))}
+            {record.random_win_pct!=null && chanceRow('randomThree',record.random_win_pct,blind?.odds??'—',true)}
+            {mine && mine.events>0 && <div className="pick-chance-group">
+              {chanceRow('you',winPercent(mine.wins,mine.events),recordOdds(mine.wins,mine.events))}
+              {mine.random_win_pct!=null && chanceRow('randomOne',mine.random_win_pct,blindOdds(mine.random_win_pct)?.odds??'—',true)}
+            </div>}
+          </div>
+          <p className="pick-chance-foot">{copy('chance.footnote')}</p>
         </div>}
         {rows.length>0 && <section className="pick-panel-sec" data-beat-model><div className="pick-panel-label">{copy('beatTitle')}</div>
           <div className="pick-record-board-row pick-record-board-header"><span /><span /><span>{copy('event_count')}</span><span>{copy('winsLabel')}</span><span>{copy('top10Column')}</span><span>{copy('beat')}</span></div>
