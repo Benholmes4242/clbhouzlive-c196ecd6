@@ -167,7 +167,7 @@ export const HeroCell: React.FC<{
           fontWeight: 700,
           color: '#FFFFFF',
           lineHeight: 1.1,
-          letterSpacing: '-0.01em',
+          letterSpacing: 0,
           ...FIGS,
         }}
       >
@@ -224,7 +224,7 @@ const HeadlineBlock: React.FC<{
           style={{
             fontSize: 40,
             fontWeight: 700,
-            letterSpacing: '-0.02em',
+            letterSpacing: 0,
             lineHeight: 1,
             color: headline.color ?? '#FFFFFF',
             ...FIGS,
