@@ -173,6 +173,8 @@
   --pick-on-amber: #0A0A0C;
   --pick-amber: #F7931E;
   --pick-mute: rgba(255,255,255,.65);
+  --pick-chance-mute: rgba(248,250,252,.62);
+  --pick-chance-random-fill: rgba(255,255,255,.32);
   --pick-soft: rgba(248,250,252,.78);
   --pick-dim: rgba(248,250,252,.42);
   --pick-hair: rgba(255,255,255,.06);

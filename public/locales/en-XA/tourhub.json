@@ -600,7 +600,20 @@
       "followed_other": "{{count}} people you follow have picked. Most picked: {{name}}.",
       "bestFollowed": "Best pick among people you follow: {{name}}, {{position}}.",
       "roundLive": "ROUND {{round}} · LIVE",
-      "final": "FINAL"
+      "final": "FINAL",
+      "chance": {
+        "winner_one": "[~~Ŵé ƥíĉķéđ ţĥé ŵíññéř íñ <b>{{wins}} őƒ {{events}} éṽéñţ</b>, őđđš őƒ <b>{{odds}}</b>.~~]",
+        "winner_other": "[~~Ŵé ƥíĉķéđ ţĥé ŵíññéř íñ <b>{{wins}} őƒ {{events}} éṽéñţš</b>, őđđš őƒ <b>{{odds}}</b>.~~]",
+        "noWinner_one": "[~~Ŵé ĥáṽéñ'ţ ƥíĉķéđ á ŵíññéř ýéţ íñ <b>{{events}} éṽéñţ</b>.~~]",
+        "noWinner_other": "[~~Ŵé ĥáṽéñ'ţ ƥíĉķéđ á ŵíññéř ýéţ íñ <b>{{events}} éṽéñţš</b>.~~]",
+        "blind": "[~~Ţĥřéé ƥļáýéřš ƥíĉķéđ áţ řáñđőɱ ŵőúļđ ƀé <b>{{odds}}</b>: áƀőúţ őñé ŵééķ íñ {{n}}.~~]",
+        "ours": "[~~ŐÚŘ ƤÍĈĶŠ~~]",
+        "randomThree": "[~~3 ÁŢ ŘÁÑĐŐṀ~~]",
+        "you": "[~~ÝŐÚŘ ƤÍĈĶ~~]",
+        "randomOne": "[~~1 ÁŢ ŘÁÑĐŐṀ~~]",
+        "odds": "[~~őđđš {{odds}}~~]",
+        "footnote": "[~~Áţ řáñđőɱ ɱéáñš ƥíĉķíñĝ ƀļíñđ ƒřőɱ ţĥáţ ŵééķ'š ƒúļļ ƒíéļđ. Éáĉĥ éṽéñţ ĉőúñţš íţš őŵñ ƒíéļđ šížé.~~]"
+      }
     }
   },
   "empty": {
