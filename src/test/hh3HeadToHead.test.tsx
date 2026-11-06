@@ -36,7 +36,7 @@ import { CompareSheet } from '@/components/profile/handicap/whs/sections/compare
 import { HeadToHeadEntryRow } from '@/components/profile/handicap/whs/sections/compare/HeadToHeadEntryRow';
 import { HeroHandicapDisplay } from '@/components/profile/hero/HeroHandicapDisplay';
 import { compareBus } from '@/components/profile/handicap/whs/sections/compare/events';
-import { entryLine, averages, groupByCourse, recordLeadLine, HH_INK, HH_DIM } from '@/components/profile/handicap/whs/sections/compare/headToHeadRules';
+import { entryLine, averages, groupByCourse, recordLeadLine, resolveGroupCourseId, HH_INK, HH_DIM } from '@/components/profile/handicap/whs/sections/compare/headToHeadRules';
 import type { SharedRoundResult } from '@/lib/whs/api';
 
 const player = (o: Record<string, unknown> = {}) => ({
@@ -111,6 +111,45 @@ describe('HH3 entry row', () => {
     expect(chartAt).toBeGreaterThanOrEqual(0);
     expect(entryAt).toBeGreaterThan(chartAt);
     expect(entryAt).toBeLessThan(all.length - 1); // the form tile button follows it
+  });
+});
+
+describe('H2H_BEST_1 resolveGroupCourseId', () => {
+  const grp = (rows: SharedRoundResult[]) => groupByCourse(rows)[0];
+
+  it('single date match resolves to that course id', () => {
+    const g = grp([round('W', '2026-11-01', 80, 82)]);
+    const rows = [{ play_date: '2026-11-01', gross_score: 80, course_id: 'G' }];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBe('G');
+  });
+
+  it('two gam rows on the same date picks the one with the matching gross', () => {
+    const g = grp([round('W', '2026-11-01', 80, 82)]);
+    const rows = [
+      { play_date: '2026-11-01', gross_score: 91, course_id: 'OTHER' },
+      { play_date: '2026-11-01', gross_score: 80, course_id: 'G' },
+    ];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBe('G');
+  });
+
+  it('no date match resolves to null', () => {
+    const g = grp([round('W', '2026-11-01', 80, 82)]);
+    const rows = [{ play_date: '2026-10-30', gross_score: 80, course_id: 'G' }];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBeNull();
+  });
+
+  it('mixed results resolve to the majority id', () => {
+    const g = grp([
+      round('W', '2026-11-01', 80, 82),
+      round('W', '2026-10-20', 79, 81),
+      round('W', '2026-10-10', 78, 80),
+    ]);
+    const rows = [
+      { play_date: '2026-11-01', gross_score: 80, course_id: 'G' },
+      { play_date: '2026-10-20', gross_score: 79, course_id: 'G' },
+      { play_date: '2026-10-10', gross_score: 78, course_id: 'OLD' },
+    ];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBe('G');
   });
 });
 
@@ -218,6 +257,41 @@ describe('HH3 sheet', () => {
     expect(document.querySelector('input')).not.toBeNull();
     expect(document.querySelector('[data-hh-header]')).toBeNull();
     expect(document.querySelector('[data-hh-detail]')).toBeNull();
+  });
+
+  it('H2H_BEST_1: best-here tiles resolve the whs-keyed group to each side\u2019s golf course id', () => {
+    h.shared = sharedWith([round('W', '2026-11-01', 80, 82)]);
+    h.season = {
+      rivalName: 'Thomas Holmes',
+      me: player({
+        course_bests: { G: { gross: 74, points: 38 } },
+        gam_rows: [{ play_date: '2026-11-01', gross_score: 80, course_id: 'G' }],
+      }),
+      them: player({
+        course_bests: { H: { gross: 71, points: 40 } },
+        gam_rows: [{ play_date: '2026-11-01', gross_score: 82, course_id: 'H' }],
+      }),
+    };
+    openSheet();
+    const card = document.querySelector('[data-hh-course="W"]') as HTMLElement;
+    const tiles = Array.from(card.querySelectorAll('[data-hh-course-body] b')).map((b) => b.textContent);
+    expect(tiles).toEqual(['74 \u00B7 38 pts', '71 \u00B7 40 pts']);
+  });
+
+  it('H2H_BEST_1: a side with no matching gam rows keeps the dash on that side only', () => {
+    h.shared = sharedWith([round('W', '2026-11-01', 80, 82)]);
+    h.season = {
+      rivalName: 'Thomas Holmes',
+      me: player({
+        course_bests: { G: { gross: 74, points: 38 } },
+        gam_rows: [{ play_date: '2026-11-01', gross_score: 80, course_id: 'G' }],
+      }),
+      them: player({ course_bests: { H: { gross: 71, points: 40 } }, gam_rows: [] }),
+    };
+    openSheet();
+    const card = document.querySelector('[data-hh-course="W"]') as HTMLElement;
+    const tiles = Array.from(card.querySelectorAll('[data-hh-course-body] b')).map((b) => b.textContent);
+    expect(tiles).toEqual(['74 \u00B7 38 pts', '\u2013 \u00B7 \u2013 pts']);
   });
 
   it('no amber in any HH3 component (source)', () => {
