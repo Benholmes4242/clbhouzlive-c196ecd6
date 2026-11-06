@@ -993,7 +993,7 @@ const ProfilePageV2Content: React.FC = () => {
       {profile?.id && (
         <div className="relative z-10 pointer-events-auto">
           {proMember?.pro_kind === 'tour_pro' ? <ProProfileBuildOne
-            pro={proMember} name={displayName} nameRef={heroNameRef}
+            pro={proMember} name={displayName} nameRef={heroNameRef} username={username}
             avatar={profile.profile_photo_url} cover={profile.header_photo_url}
             owner={isSelfView} viewerId={user?.id} followers={followersCount}
             friends={friendsCount} onFriends={() => navigate(`/profile/${username}/followers?tab=following&filter=friends`)}

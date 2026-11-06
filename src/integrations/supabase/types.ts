@@ -24998,6 +24998,7 @@ export type Database = {
         Args: { p_limit?: number; p_offset?: number; p_pro_id: string }
         Returns: Json
       }
+      get_pro_clubhouse: { Args: { p_pro_id: string }; Returns: Json }
       get_pro_hole_data_queue: { Args: never; Returns: Json }
       get_pro_members: {
         Args: { p_user_ids: string[] }
@@ -25011,6 +25012,7 @@ export type Database = {
         }[]
       }
       get_pro_question_inbox: { Args: { p_status?: string }; Returns: Json }
+      get_pro_reach: { Args: never; Returns: Json }
       get_pro_score_watch: { Args: { p_pro_id: string }; Returns: Json }
       get_pro_world_rank: { Args: { p_user_id: string }; Returns: Json }
       get_profile_creator: {
