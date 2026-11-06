@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Sponsor sheet export fixes
-- [ ] Fix sheet-only measured result truncation, printed PRO/rank alignment and Career filtering; preserve profile Career.
-- [ ] Add regression coverage, run focused tests and four shards; carry only known FM1 failure and report inventory/changed tests.
-- [ ] Check Chromium preview/PNG where available and report verification limits.
+- [x] Implement sheet-only measured result truncation, printed PRO/rank alignment and Career filtering; preserve profile Career.
+- [ ] STOP: final focused43 pass/2 new raw-CSS rule lookup failures at proClubhouseSponsor.test.tsx:273:18 and286:17; tests left untouched. Shard1=1,892 pass; final shard2=1,822 pass/3 fail (2 unexpected + known FM1). Shards3–4 blocked. Expected7,398/645, +6 named cases; PRO_SPONSOR_EXPORT_FIX_REPORT.md preserves exact errors/counts.
+- [ ] Chromium preview/PNG verification blocked by test stop; authenticated end-to-end also unavailable with external unmanaged auth. Preview build OK18:51:53Z.
 
 ## Pro profile build 3 close-out
 - [x] Approved push-router follow-up: mirror all three pro notification destinations and add three parity fixtures plus one client case; existing fixtures/assertions untouched.
