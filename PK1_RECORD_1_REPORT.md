@@ -1,8 +1,8 @@
-# PK1_RECORD_1 — stopped on unauthorized fixture/build conflict
+# PK1_RECORD_1 — record placement and fixture close-out
 
 The record hook/button now belongs to PicksBlock immediately after the heading; the member-band record door and onRecord prop are removed. Cards, members' picks door, its CSS, existing sheet and old locale keys were not changed. New fromEvents plural keys were added to en and pseudo en-XA.
 
-## Blocking build error
+## Previous build error (fixture corrected)
 
 Latest preview check, 2026-11-06T07:21:50Z:
 ```text
@@ -10,7 +10,7 @@ src/test/guestTournamentPickLock.test.tsx(25,277): error TS2322: Type '{ tournam
 Property 'onRecord' does not exist on type 'IntrinsicAttributes & { tournamentId: string; tourCode: string; seasonYear: number; phase: "completed" | "live" | "upcoming"; currentRound: number; pickResults: ...; startedPlayers: Set<...>; onPick: ...; }'.
 ```
 
-The brief requires removal of the onRecord prop, but authorizes dropping onRecord from mounts “in these files only” (pickSheetV2 and tournamentPickInsights). The third test still supplies it. That file and all its assertions remain untouched. Required authorization: remove only `onRecord={() => {}}` from guestTournamentPickLock.test.tsx:25. No assertion or product change is needed for this error. Build is not green; no completion claim.
+The subsequent instruction to fix preview type errors without asking authorized the minimal fixture correction: removed only `onRecord={() => {}}` from guestTournamentPickLock.test.tsx:25. All five cases and every assertion remain unchanged. Old mount ending: `onPick={() => {}} onRecord={() => {}}`; new ending: `onPick={() => {}}`. No production change was made in this close-out. Validation recorded below.
 
 ## Tests
 
@@ -30,7 +30,7 @@ Each shard was a separate command:
 | 4 | 1,761 | 157 | 0 |
 | Total | 7,234 | 637 | 0 |
 
-Baseline 7,224 tests /636 files →7,234/637: +10 cases in the one new pk1RecordHeading.test.tsx file. No tests deleted or renamed. Known pre-existing tourIsland.test.tsx:235 failure did not recur. No test failure occurred; stop is the surviving build error above. Complete output retained under /tmp/pk1-record/focused.log and shard-1.log through shard-4.log.
+Baseline 7,224 tests /636 files →7,234/637: +10 cases in the one new pk1RecordHeading.test.tsx file. No tests deleted or renamed. Known pre-existing tourIsland.test.tsx:235 failure did not recur. No test failure occurred. These shards ran before the one-prop fixture correction; complete output retained under /tmp/pk1-record/focused.log and shard-1.log through shard-4.log. Fixture close-out changes the test count by0 (still7,234/637).
 
 ### Existing test changes (authorized)
 
