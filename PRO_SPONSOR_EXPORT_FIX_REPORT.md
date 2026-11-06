@@ -45,3 +45,26 @@ Not touched per the brief.
 
 ## Not verified
 Live Chromium preview/PNG identity and rank glyph bottoms are unverified. Auth status is `external_unmanaged`; authenticated profile/export end-to-end verification is unavailable in this project. No saved PNG is claimed verified.
+
+## Paint-the-badge close-out (html2canvas PRO pill capture bug)
+
+html2canvas 1.4.1 drew the sheet's PRO pill ~12px above the name with its text low in the pill despite correct CSS. The clone's badge is now hidden via `onclone` and the pill is painted onto the canvas at the live rect x EXPORT_SCALE (roundRect with an arc fallback, centred PRO text with half letter-spacing correction), before `toBlob`. The capture node carries `data-sponsor-capture`; the preview, shared ProLabel and every other ProLabel use are unchanged.
+
+### Tests
+Added two cases in `src/test/proClubhouseSponsor.test.tsx` (45 -> 47): onclone hides only the clone's sheet badge and the canvas gets roundRect at the badge rect x 3 plus fillText('PRO', centre x, centre y) with textAlign 'center' / textBaseline 'middle'; the preview badge stays visible after a capture.
+
+Existing tests changed: one — the save-capture options assertion.
+- Old: `expect(opts).toEqual({ backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false });`
+- New: `expect(opts).toEqual({ backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false, onclone: expect.any(Function) });`
+No tests renamed, rewritten or deleted.
+
+### Commands and outcomes
+- Focused: `npx vitest run src/test/proClubhouseSponsor.test.tsx` — **47/47 passed**.
+- Shard 1: **1,898 passed / 162 files**, 0 failures.
+- Shard 2: **1,826 passed / 162 files**, 1 failure — the known FM1 case only (above), untouched.
+- Shard 3: **1,882 passed / 162 files**, 0 failures.
+- Shard 4: **1,798 passed / 159 files**, 0 failures.
+- Total: **7,404 passed + 1 known failure = 7,405 cases / 645 files**. Delta vs the 7,403 baseline: +2, exactly the two added cases. Build OK.
+
+### Not verified
+Live Chromium export of the painted badge is unverified; auth is `external_unmanaged`, so an authenticated save/share PNG could not be produced here.
