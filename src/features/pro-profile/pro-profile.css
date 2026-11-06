@@ -41,6 +41,7 @@
 .pro-profile-sheet { padding:16px 16px 32px; }
 .pro-profile-sheet h2 { font-size:19px; font-weight:800; line-height:1.25; margin:6px 0 14px; }
 .pro-profile-sheet .pro-profile-tiles { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.pro-profile-sheet .pro-profile-rounds { gap:8px; }
 .pro-profile-sheet .pro-profile-tile b { font-size:18px; }
 .pro-profile-footnote { font-size:12px; line-height:1.45; color:var(--pro-profile-dim); margin-top:12px; }
 .pro-profile-form { display:grid; gap:12px; }
