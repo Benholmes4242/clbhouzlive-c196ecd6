@@ -38,9 +38,69 @@ export function buildDraftFeedPost(d: {
   };
 }
 
+/** Local blob videos carry no naturalWidth/Height, so the card would frame
+ * them at the 1080×1350 fallback and crop a portrait clip. When Preview
+ * opens, probe each blob video's real dimensions from its metadata and hold
+ * the card until every probe resolves — or 1500ms at most, keeping the
+ * fallback for any still unknown. Dimensions stay local to the preview;
+ * composer state is never written. */
+function useProbedVideoDims(post: FeedPost, open: boolean): Record<string, { w: number; h: number }> | null {
+  const [dims, setDims] = useState<Record<string, { w: number; h: number }> | null>(null);
+  useEffect(() => {
+    if (!open) { setDims(null); return; }
+    const videos = post.mediaItems.filter((m) => m.type === 'video' && typeof (m as { mp4Url?: string }).mp4Url === 'string' && (m as { mp4Url?: string }).mp4Url!.startsWith('blob:'));
+    if (videos.length === 0) { setDims({}); return; }
+    let cancelled = false;
+    const result: Record<string, { w: number; h: number }> = {};
+    const pending = new Set(videos.map((v) => v.id));
+    const finish = (id: string) => {
+      pending.delete(id);
+      if (pending.size === 0 && !cancelled) setDims({ ...result });
+    };
+    const timer = setTimeout(() => { for (const v of videos) finish(v.id); }, 1500);
+    const probes: HTMLVideoElement[] = [];
+    for (const v of videos) {
+      const el = document.createElement('video');
+      el.preload = 'metadata';
+      el.muted = true;
+      el.playsInline = true;
+      el.src = (v as { mp4Url?: string }).mp4Url!;
+      el.onloadedmetadata = () => {
+        if (el.videoWidth > 0 && el.videoHeight > 0) result[v.id] = { w: el.videoWidth, h: el.videoHeight };
+        finish(v.id);
+      };
+      el.onerror = () => finish(v.id);
+      probes.push(el);
+    }
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      for (const el of probes) {
+        el.onloadedmetadata = null;
+        el.onerror = null;
+        el.removeAttribute('src');
+        try { el.load(); } catch { /* ignore */ }
+      }
+    };
+  }, [open, post]);
+  return dims;
+}
+
 export function PostPreview({ open, onBack, post, tags, pars, withPeople }: {
   open: boolean; onBack: () => void; post: FeedPost; tags: Record<string, ShotTag>; pars: ReadonlyMap<number, number>; withPeople: WithCandidate[];
 }) {
+  const videoDims = useProbedVideoDims(post, open);
+  const shownPost = useMemo(() => {
+    if (!videoDims) return post;
+    let changed = false;
+    const mediaItems = post.mediaItems.map((m) => {
+      const d = videoDims[m.id];
+      if (!d) return m;
+      changed = true;
+      return { ...m, width: d.w, height: d.h };
+    });
+    return changed ? { ...post, mediaItems } : post;
+  }, [post, videoDims]);
   const slideTags = useMemo(() => {
     const m = new Map<string, SlideTag>();
     for (const item of post.mediaItems) {
