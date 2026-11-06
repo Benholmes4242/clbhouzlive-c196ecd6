@@ -1,5 +1,9 @@
 # Roadmap
 
+## PK1_RECORD_1
+- [ ] Move record hook/door under shared picks heading; remove old member-band door/prop; preserve members' door/CSS/cards and old locale keys.
+- [ ] Authorized two test moves and new structural/visibility cases; focused then four fresh shards; report phase/tap/320/390/guest checks and assertion ledger.
+
 ## Pro profile 1c re-uploaded close-out
 - [x] Confirm exact clock pin and both HeroShell zero-spacing lines already present; no duplicate edits. Focused116/116.
 - [x] Read-only spec comparison and four fresh shards1,873/1,729/1,849/1,773 =7,224/636, zero failures and delta0. No production/test edits; report includes existing clock old/new and source findings.

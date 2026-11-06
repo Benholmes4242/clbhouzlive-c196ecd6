@@ -14,6 +14,8 @@ import {OVERVIEW} from '../overviewTokens';
 import {fmtScore} from '../../../utils/fmtScore';
 import {finishedVerdict,type PickResult} from './pickInsightRules';
 import {PickMemberBands} from './PickMemberBands';
+import {Button} from '@/components/ui/button';
+import {useOurPickRecord} from '../../../hooks/usePickInsights';
 const pickWonTournament=(id:string,champion:string|null,ids:string[])=>id===champion||ids.includes(id);
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
 const WON_LABEL = 'WON';
@@ -151,6 +153,8 @@ export function PicksBlock({
   championPlayerIds: string[];
 }) {
   const { t } = useTranslation('tourhub');
+  const recordQuery = useOurPickRecord(tourCode, seasonYear);
+  const record = recordQuery.isError ? null : recordQuery.data;
   const cards = picks.slice(0, 3);
   const verdict=finishedVerdict(pickResults,[...championPlayerIds,...(championPlayerId?[championPlayerId]:[])]);
   const recordCopy=(key:string,options:Record<string,unknown>={})=>t(`overview.pickRecord.${key}`,options);
@@ -205,6 +209,12 @@ export function PicksBlock({
           </>
         ) : phase !== 'upcoming' ? <span className="pick-panel-dim" style={{marginLeft:'auto',fontSize:9.5,fontWeight:800,letterSpacing:'.12em'}}>{phase==='completed'?recordCopy('final'):recordCopy('roundLive',{round:currentRound??''})}</span> : null}
       </div>
+      {record && record.picks > 0 && <Button variant={null} size={null} data-our-record-door onClick={onOpenRecord}
+        style={{ display:'flex', alignItems:'baseline', flexWrap:'wrap', columnGap:5, width:'100%', padding:'8px 20px', margin:'-12px 0 2px', border:0, borderRadius:0, background:'transparent', textAlign:'left', lineHeight:1.35, fontFamily:'inherit', fontSize:13, fontWeight:700, color:'var(--pick-ink)', height:'auto', minHeight:32, whiteSpace:'normal', ...FIGS }}>
+        <span data-pick-record-figures style={{ whiteSpace:'nowrap' }}>{recordCopy('wins',{count:record.won})} · {recordCopy('topTens',{count:record.top10})}</span>
+        {record.event_count != null && <span data-pick-record-events style={{ fontWeight:500, color:'var(--text-secondary)', whiteSpace:'nowrap' }}>{recordCopy('fromEvents',{count:record.event_count})}</span>}
+        <span aria-hidden style={{ marginLeft:'auto', paddingLeft:8, fontWeight:600, color:'var(--pick-dim)' }}>›</span>
+      </Button>}
       {phase==='completed' && <div className="pick-overview-verdict" data-picks-verdict><b>{verdict.bold}</b>{verdict.rest && ` ${verdict.rest}`}</div>}
       {intro ? (
         <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
@@ -303,7 +313,7 @@ export function PicksBlock({
           );
         })}
       </div>
-      {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} onPick={onOpenYourPick} onRecord={onOpenRecord}/>}
+      {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} onPick={onOpenYourPick}/>}
     </div>
   );
 }
