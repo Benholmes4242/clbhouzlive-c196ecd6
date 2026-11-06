@@ -1,11 +1,12 @@
-/** Tournament-pick insights use the four published RPCs only. Member rows are
+/** Tournament-pick insights use the published RPCs only. Member rows are
  * viewer-keyed; event-owned tour/year must be supplied, never device defaults. */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { getGuestUser } from '@/features/guest/guestGateStore';
 export interface RecordPick { player_id: string; player_name: string; position: number | null; tied: boolean; status: string | null; percentile: number | null; score?: number | null }
-export interface PickRecord { tours: string[]; picks: number; event_count?: number; best?: { events: number; wins: number; top10: number; avg_percentile: number | null }; won: number; top10: number; avg_percentile: number | null; first_event_date: string | null; events: { tournament_id: string; name: string; end_date: string; picks: RecordPick[] }[] }
+export interface PickRecord { tours: string[]; picks: number; event_count?: number; avg_field_size?:number|null; random_win_pct?:number|null; best?: { events: number; wins: number; top10: number; avg_percentile: number | null }; won: number; top10: number; avg_percentile: number | null; first_event_date: string | null; events: { tournament_id: string; name: string; end_date: string; field_size?:number|null; picks: RecordPick[] }[] }
+export interface MyPickOdds { events:number; wins:number; random_win_pct:number|null }
 export interface FitStat { player_id: string; stat: string; value: number; percentile: number; players: number; wins: number }
 export interface BeatRow { user_id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; picks: number; wins: number; top10: number; avg_percentile: number; is_viewer: boolean }
 export function useOurPickRecord(tour: string, year: number | null) {
@@ -26,6 +27,16 @@ export function useBeatTheModel(tour: string, year: number | null) {
       if (error) throw error;
       return data ?? [];
     } });
+}
+export function useMyPickOdds(tour:string,year:number|null) {
+  const {user}=useSupabaseSession();
+  return useQuery({queryKey:['tourhub','my-pick-odds',tour,year,user?.id],enabled:Boolean(tour && year && user && !user.is_anonymous && !getGuestUser()),staleTime:60_000,
+    queryFn:async():Promise<MyPickOdds|null>=>{
+      if(year==null)return null;
+      const {data,error}=await supabase.rpc('get_my_pick_odds',{p_tour:tour,p_year:year});
+      if(error)throw error;
+      return data as unknown as MyPickOdds|null;
+    }});
 }
 export function usePickFit(tournamentId: string, playerIds: string[]) {
   return useQuery({ queryKey: ['tourhub', 'pick-fit', tournamentId, playerIds], enabled: Boolean(tournamentId && playerIds.length), staleTime: 60_000,

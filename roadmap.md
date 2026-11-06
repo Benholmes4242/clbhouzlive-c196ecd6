@@ -1,5 +1,9 @@
 # Roadmap
 
+## PK2_ODDS_1
+- [ ] Replace only record benchmark with server-weighted winner odds; viewer-keyed gated hook, pure helper, locales and isolated styles; preserve circle/ledger/header/tiles.
+- [ ] Authorized two assertions, helper/guest/member/cache tests; focused then four separate shards. Report live tour/320 checks and counts against7,234/637.
+
 ## PK1_RECORD_1
 - [x] Move record hook/door under shared picks heading; remove old member-band door/prop; preserve members' door/CSS/cards and old locale keys.
 - [x] Authorized two test moves and10 new cases; focused85/85; fresh shards1,875/1,749/1,849/1,761 =7,234/637, zero test failures. PK1_RECORD_1_REPORT.md records assertion ledger and full output paths.
