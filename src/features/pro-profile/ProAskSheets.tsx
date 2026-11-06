@@ -100,6 +100,10 @@ export function ProQuestionsSheet({ proId, first, close }: { proId: string; firs
   const write = useProAskWrite(proId);
   const waiting = useProInbox('waiting', true);
   const answered = useProInbox('answered', tab === 'answered');
+  // The answered count comes from the answers payload's total (already cached
+  // from the section), so both segments read correctly before either tab loads.
+  const answers = useProAnswers(proId);
+  const answeredTotal = answers.isSuccess && !answers.isError ? answers.data.total : 0;
   const rows = tab === 'waiting' ? waiting : answered;
   const list = rows.isSuccess && !rows.isError ? rows.data : [];
 
@@ -124,7 +128,7 @@ export function ProQuestionsSheet({ proId, first, close }: { proId: string; firs
         <h2 id="pro-ask-title">Questions for you</h2>
         <div className="pro-ask-seg" role="tablist">
           <Button variant={null} size={null} role="tab" aria-selected={tab === 'waiting'} className={tab === 'waiting' ? 'on' : ''} onClick={() => setTab('waiting')}>Waiting · {waiting.isSuccess ? waiting.data.length : 0}</Button>
-          <Button variant={null} size={null} role="tab" aria-selected={tab === 'answered'} className={tab === 'answered' ? 'on' : ''} onClick={() => setTab('answered')}>Answered · {answered.isSuccess ? answered.data.length : 0}</Button>
+          <Button variant={null} size={null} role="tab" aria-selected={tab === 'answered'} className={tab === 'answered' ? 'on' : ''} onClick={() => setTab('answered')}>Answered · {answeredTotal}</Button>
         </div>
         <div className="pro-ask-inbox">
           {list.map((row) => (
