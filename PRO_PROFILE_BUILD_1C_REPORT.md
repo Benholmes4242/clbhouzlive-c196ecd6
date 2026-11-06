@@ -1,5 +1,59 @@
 # Pro profile build 1c — close-out complete
 
+## Re-uploaded brief/spec recheck (2026-11-06, 07:05 UTC request)
+The uploaded brief duplicates the already-applied close-out. The exact midday clock pin/comment/afterAll restore and both HeroShell `letterSpacing: 0` lines are present. **No production code or test file changed in this recheck.** Historical old/new edits are below; they were not applied a second time.
+
+Focused command:
+```sh
+bunx vitest run src/test/ac2ActivityFold.test.tsx src/test/proProfileBuildOneB.test.tsx src/test/proProfileBuildOne.test.tsx src/test/proProfileBuildOneRules.test.ts src/test/proProfileSeason.test.tsx --maxWorkers=2
+```
+**116/116 passed,5 files** (Activity24, build1b/1c44, build1 15, rules29, season4). The extra five cases compared with the original111 focused total are the subsequent authorized result-sheet round-row regressions.
+
+Four fresh commands, each run separately in order: `bunx vitest run --maxWorkers=2 --shard=1/4`, then2/4,3/4,4/4.
+
+| Shard | Passed | Failed | Files |
+|---|---:|---:|---:|
+| 1 | 1,873 | 0 | 159 |
+| 2 | 1,729 | 0 | 159 |
+| 3 | 1,849 | 0 | 159 |
+| 4 | 1,773 | 0 | 159 |
+| **Total** | **7,224** | **0** | **636** |
+
+Most recent baseline is VIEW_POST_1 close-out7,224/636; after recheck7,224/636, delta0. No test added/deleted/renamed/rewritten or assertion changed. Known failures separately: **none appeared**; fsNotch1 6/6, fullscreenBand19/19, tourIsland14/14. The three old portrait failures were resolved in CLOSE_OUT_1, not in this recheck. No unexpected failures/flakes/reruns.
+
+Full focused and shard outputs retained in `docs/verification/pro-build1c-recheck/`. Preview harness `build OK` at2026-11-06T07:06:21Z; no manual build/typecheck.
+
+### 320px/390px checks and supplied spec findings
+Browser visits to `/profile/masonessam` at320×844 and390×844 both ended at `/auth`, with zero `.pro-hero-name` elements. Screenshots were reviewed: they show the sign-in screen, not the pro profile. Authentication remains external unmanaged, so neither member-view Mason, covered-tour pro nor Mason-own-view can be verified live. **All six requested profile/state/viewport combinations remain unverified.** No overflow, surname/badge, four-button-fit or result-sheet screenshot claim is made.
+
+Screenshots/script: `/tmp/browser/pro-build1c-recheck/access-320.png`, `access-390.png`, `check_profile_access.py` (temporary sandbox paths).
+
+Read-only source comparison against the new upload (not live geometry evidence):
+- Surname and PRO share `.pro-hero-surname`, inline-flex and nowrap; max359px uses21px names/10px gap, matching the supplied mock's narrow-name arrangement. Actual overflow/splitting still needs the authenticated views.
+- Personal member visitors have Follow/Add friend/Message/menu in the four-column visitor grid. Business viewers omit friendship and use the existing three-column grid; the mock shows only a personal-member visitor. This is an out-of-mock existing behavior, not a redesign target. The background audit's initial claim of an empty fourth business slot was disproved by the conditional `pro-hero-visitor` class in the current source.
+- OWGR rows show strokes only; ResultDetail shows FINISH/STROKES/WORLD RANK, improved ▲ uses green and worse ▼ uses muted. No Add par control is rendered. Legacy `.addpar` CSS in the reference is unused; it is not instruction to restore controls.
+- Covered-tour and pro-added rows retain signed to-par; the uploaded DP state and notes explicitly use tour to-par and Mason-entered to-par. Their ResultDetail second tile is TO PAR and has no OWGR WORLD RANK tile. The mock's explicit three-tile result detail is Mason's OWGR example; no covered-tour result-sheet example is supplied. Reported as source-specific presentation, not silently converted to strokes.
+- Confirmed source difference: `.pro-profile-sheet .pro-profile-tile b` is18px, while the mock's `.nums b` used for the result detail is20px. Round values remain20px/800. No styling was changed, as requested.
+- The subsequent result-round-row ruling remains intact: ResultDetail columns use actual rounds capped at4, gap8px; five or more wrap. This week's auto-fit is unchanged. The re-upload does not revert that later authorized change.
+
+### Historical clock change, exact old/new (already present; no new edit)
+Old import:
+```tsx
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+```
+New import:
+```tsx
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+```
+Old post-import setup: no file-wide Date pin.
+New setup:
+```tsx
+// Pinned to local midday: fixtures are stamped one hour ago and must stay in Today whatever time the suite runs.
+vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 10, 6, 12, 0) });
+afterAll(() => vi.useRealTimers());
+```
+Why: collected one-hour-ago fixtures must stay in local Today; assertions unchanged. HeroShell historical values `'-0.01em'` and `'-0.02em'` remain0. No SQL/migrations/deployed function/RPC/native/Median/feed_config/cap changes.
+
 ## Close-out (2026-11-06)
 1. **Clock fix (authorized, test-only):** `src/test/ac2ActivityFold.test.tsx` — added `afterAll` to the vitest import and, directly after the imports, the pin `vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 10, 6, 12, 0) });` with the required comment and `afterAll(() => vi.useRealTimers());`. No assertion changes. The two `:216`/`:253` failures were the clock bug; both now pass.
 2. **HeroShell letter-spacing (house rule):** line ~170 `letterSpacing: '-0.01em'` → `0`; line ~227 `letterSpacing: '-0.02em'` → `0`. Nothing else in HeroShell changed. Member hero headline/counter figures change very slightly, as briefed.
