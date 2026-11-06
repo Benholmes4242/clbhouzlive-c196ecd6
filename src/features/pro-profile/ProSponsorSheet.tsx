@@ -121,7 +121,7 @@ function ProSponsorCard({ identity, season, rank, career, partners, bagText, rea
         <div className="pro-ss-id">
           <SquircleAvatar size={52} hairlineRing src={avatarUrl} alt={identity.name} userId={identity.username} />
           <div className="pro-ss-id-text">
-            <div className="pro-ss-nm">{identity.name}<ProLabel size="small" /></div>
+            <div className="pro-ss-nm"><span className="pro-ss-nm-text">{identity.name}</span><ProLabel size="small" /></div>
             {identity.tour && <div className="pro-ss-sub">Tour professional · {identity.tour}</div>}
             {identity.homeClub && <div className="pro-ss-sub pro-ss-sub-mute">{identity.homeClub}</div>}
           </div>
