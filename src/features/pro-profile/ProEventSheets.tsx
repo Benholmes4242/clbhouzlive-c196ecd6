@@ -1,5 +1,6 @@
 /** Owner writes always scope source-pro; OWGR rows are read-only. Shared
  * sheet lifecycle supplies history/scroll locking, never a nested modal.
+ * ResultDetail owns count-based round columns; week-card auto-fit stays independent.
  */
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -63,7 +64,7 @@ export function ResultDetail({ event, close }: { event: ProEvent; close: () => v
   return <BottomSheet open onClose={close} scrollBody ariaLabelledBy="pro-result-title"><div className="pro-profile pro-profile-sheet">
     <div className="pro-profile-heading"><span className="pro-profile-kicker">{[event.tour_name,dateLabel,event.country].filter(Boolean).join(' · ').toUpperCase()}</span><Button variant="ghost" size="icon" aria-label="Close result" onClick={close}><X /></Button></div>
     <h2 id="pro-result-title">{event.event_name}</h2><div className="pro-profile-tiles"><div className="pro-profile-tile"><b className={finishLabel(event.finish)==='1st'?'pro-profile-gold':''}>{finishLabel(event.finish)}</b><span>FINISH</span></div><div className="pro-profile-tile"><b className={score!=null&&score<0?'pro-profile-under':''}>{score!=null?scoreLabel(score):owgr?event.total_strokes??'—':'—'}</b><span>{owgr?'STROKES':'TO PAR'}</span></div>{owgr && <div className="pro-profile-tile"><b>{formatWorldRank(after)}</b><span>WORLD RANK</span>{movement&&<small className={`pro-result-rank-movement ${movement.improved?'pro-profile-up':'pro-profile-worse'}`}>{movement.improved?'▲':'▼'} {formatWorldRank(movement.difference)}</small>}</div>}</div>
-    <div className="pro-profile-rounds">{[...event.rounds].sort((a,b)=>a.round_no-b.round_no).map(r=>{const toPar=owgr?null:r.to_par;return <div key={r.round_no} className="pro-profile-round"><span>R{r.round_no}</span><b className={toPar!=null&&toPar<0?'pro-profile-under':''}>{toPar!=null?scoreLabel(toPar):owgr?r.strokes??'—':'—'}</b></div>;})}</div>
+    <div className="pro-profile-rounds" style={{ gridTemplateColumns: `repeat(${Math.max(1, Math.min(event.rounds.length, 4))}, 1fr)` }}>{[...event.rounds].sort((a,b)=>a.round_no-b.round_no).map(r=>{const toPar=owgr?null:r.to_par;return <div key={r.round_no} className="pro-profile-round"><span>R{r.round_no}</span><b className={toPar!=null&&toPar<0?'pro-profile-under':''}>{toPar!=null?scoreLabel(toPar):owgr?r.strokes??'—':'—'}</b></div>;})}</div>
     {owgr && <p className="pro-profile-footnote">Strokes as published by the Official World Golf Ranking.{pointsCopy(event.owgr_points)}</p>}
   </div></BottomSheet>;
 }

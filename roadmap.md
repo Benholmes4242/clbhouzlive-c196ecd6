@@ -1,5 +1,9 @@
 # Roadmap
 
+## Pro profile 1c result-sheet round row
+- [x] ResultDetail count-based columns capped at four, sheet-only 8px gap; week tiles unchanged.
+- [ ] Run five added grid regressions and four fresh shards; allow only three known FS_NOTCH failures, report full counts against 7,198/634.
+
 ## PREVIEW_FIX_1 composer Preview video
 - [x] buildDraftFeedPost streamId→hlsUrl / blob→mp4Url; PostPreview dimension probe with 1500ms fallback; InlineVideo local-blob native branch.
 - [x] 10 new tests; shards 7,195 passed + 3 known FS_NOTCH = 7,198/634; build OK.
