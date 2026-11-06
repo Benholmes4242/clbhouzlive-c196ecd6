@@ -142,6 +142,55 @@ export function averages(rows: GamLike[]): { avgGross: number | null; avgPoints:
 
 export type CourseBests = Record<string, { gross: number | null; points: number | null }>;
 
+/** A player's gam_round_stats row, as needed to resolve a shared-round group's course. */
+export interface ResolveGamRow {
+  play_date: string;
+  gross_score: number | null;
+  course_id?: string | null;
+}
+
+/**
+ * H2H_BEST_1: shared-round groups are keyed by a whs_courses id, but
+ * course_bests is keyed by a golf_courses id. Resolve the group's golf id for
+ * one side by matching that player's gam rows on play_date (several rows on
+ * one date: the one whose gross matches the shared round's gross for that
+ * side; no match: skip the date). The id seen on the most dates wins; ties go
+ * to the most recent date. Null when nothing matches - the tile keeps its dash.
+ */
+export function resolveGroupCourseId(
+  group: CourseGroup,
+  gamRows: ResolveGamRow[],
+  side: 'me' | 'them',
+): string | null {
+  const hits = new Map<string, { count: number; latest: string }>();
+  for (const r of group.rounds) {
+    const sameDay = gamRows.filter((g) => g.play_date === r.play_date && g.course_id);
+    if (sameDay.length === 0) continue;
+    let pick = sameDay[0];
+    if (sameDay.length > 1) {
+      const gross = side === 'me' ? r.user_gross : r.rival_gross;
+      const match = sameDay.find((g) => g.gross_score === gross);
+      if (!match) continue;
+      pick = match;
+    }
+    const id = pick.course_id as string;
+    const cur = hits.get(id) ?? { count: 0, latest: '' };
+    cur.count++;
+    if (r.play_date > cur.latest) cur.latest = r.play_date;
+    hits.set(id, cur);
+  }
+  let best: string | null = null;
+  for (const [id, v] of hits) {
+    if (best == null) {
+      best = id;
+      continue;
+    }
+    const b = hits.get(best)!;
+    if (v.count > b.count || (v.count === b.count && v.latest > b.latest)) best = id;
+  }
+  return best;
+}
+
 /** Lowest gross and best points per course, from that player's 18-hole rounds there. */
 export function courseBests(rows: GamLike[]): CourseBests {
   const out: CourseBests = {};

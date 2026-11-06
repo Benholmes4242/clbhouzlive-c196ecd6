@@ -46,6 +46,8 @@ export interface PlayerStats {
   avg_points?: number | null;
   /** HH3: per-course bests (18-hole), keyed by course_id. */
   course_bests?: Record<string, { gross: number | null; points: number | null }>;
+  /** H2H_BEST_1: the raw gam rows behind course_bests, for group id resolution. */
+  gam_rows?: { play_date: string; gross_score: number | null; course_id?: string | null }[];
 }
 
 export interface HeadToHeadStats {
