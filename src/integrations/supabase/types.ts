@@ -10118,6 +10118,95 @@ export type Database = {
         }
         Relationships: []
       }
+      pro_bag_items: {
+        Row: {
+          brand: string
+          business_id: string | null
+          created_at: string
+          detail: string | null
+          id: string
+          model: string | null
+          slot: string
+          sort: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand: string
+          business_id?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          model?: string | null
+          slot: string
+          sort?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand?: string
+          business_id?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          model?: string | null
+          slot?: string
+          sort?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_bag_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_bag_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_bag_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_bag_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_bag_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_bag_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_bag_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       pro_benchmarks: {
         Row: {
           active: boolean
@@ -10159,6 +10248,76 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      pro_career_moments: {
+        Row: {
+          created_at: string
+          id: string
+          is_win: boolean
+          text: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_win?: boolean
+          text: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_win?: boolean
+          text?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_career_moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_career_moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_career_moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_career_moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_career_moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_career_moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       pro_event_rounds: {
         Row: {
@@ -10360,6 +10519,83 @@ export type Database = {
           },
           {
             foreignKeyName: "pro_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      pro_partners: {
+        Row: {
+          business_id: string | null
+          created_at: string
+          id: string
+          name: string
+          sort: number
+          user_id: string
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          sort?: number
+          user_id: string
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          sort?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_partners_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_partners_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "pro_partners_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_partners_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_partners_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_partners_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_partners_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_top100_progress_view"

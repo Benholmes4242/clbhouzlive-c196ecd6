@@ -15,6 +15,7 @@ import { rankMovement, seasonSummary, tourEvents, finishLabel, finishPosition } 
 import { ProWeekSection } from './ProWeekSection';
 import { ProSeasonSection } from './ProSeasonSection';
 import { HowProPlays, LinkedLiveCard, useLinkedProLive, useLinkedProStats } from './LinkedProSections';
+import {ProCollectionSections} from './ProCollectionSections';
 import './pro-profile.css';
 export interface ProProfileProps { pro:ProMember;name:string;nameRef?:Ref<HTMLHeadingElement>;avatar?:string|null;cover?:string|null;owner:boolean;viewerId?:string;friends?:number|null;onFriends?:()=>void;friendLabel?:string;friendBusy?:boolean;onFriend?:()=>void;businessViewer?:boolean;followers:number|null;followersReady:boolean;onFollowers:()=>void;onAvatar:()=>void;onEdit:()=>void;onShare:()=>void;onFollow:()=>void;following:boolean;followBusy:boolean;onMessage:()=>void;messageBusy:boolean;menu:ReactNode }
 export function ProProfileBuildOne(p:ProProfileProps){
@@ -32,5 +33,6 @@ export function ProProfileBuildOne(p:ProProfileProps){
     {linked?live.isSuccess&&!live.isError&&(live.data?<LinkedLiveCard data={live.data} playerId={playerId} name={p.name} tour={p.pro.pro_tour??'Tour'}/>:events.isSuccess&&!events.isError&&<ProWeekSection events={events.data} userId={id} viewerId={p.viewerId} owner={p.owner} first={first}/>):events.isSuccess&&!events.isError&&<ProWeekSection events={events.data} userId={id} viewerId={p.viewerId} owner={p.owner} first={first}/>}
     {ready&&<ProSeasonSection events={rows} year={year} first={first} owner={p.owner} userId={id} linked={linked} scoring={stats.isSuccess&&!stats.isError?stats.data.player?.scoring_average:null}/>}
     {linked&&stats.isSuccess&&!stats.isError&&<HowProPlays data={stats.data}/>}
+    <ProCollectionSections userId={id} owner={p.owner} first={first} events={events.data??[]} eventsReady={events.isSuccess&&!events.isError}/>
   </div>;
 }

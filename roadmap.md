@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro profile build2
+- [x] Add bag/partners/career sections and single-sheet editors with scoped writes/invalidation; exact primitive/copy review remains in close-out.
+- [ ] STOP: focused50 passed/23 failed in untouched proProfileBuildOne and proProfileBuildOneB, useSupabaseSession.tsx:51:54 missing mock auth.onAuthStateChange. Full output/tmp/pro-build2/focused.log; no existing tests edited.14 new rule cases passed, expected inventory7,272/640 vs baseline7,258/639; remaining mounted coverage/shards/browser blocked.
+- [x] Three table types already present in generated types; no manual edits needed, SQL/migrations prohibited.
+
 ## PK2_ODDS_1
 - [ ] Replace only record benchmark with server-weighted winner odds; viewer-keyed gated hook, pure helper, locales and isolated styles; preserve circle/ledger/header/tiles.
 - [ ] Authorized two assertions, helper/guest/member/cache tests; focused then four separate shards. Report live tour/320 checks and counts against7,234/637.
