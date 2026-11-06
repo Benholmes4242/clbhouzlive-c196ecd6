@@ -5,14 +5,13 @@ import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button} from '@/components/ui/button';
 import {getGuestUser} from '@/features/guest/guestGateStore';
-import {useSupabaseSession} from '@/hooks/useSupabaseSession';
 import {careerEntries,orderedBag,orderedPartners} from './proCollectionRules';
 import type {ProEvent} from './proProfileRules';
 import {useProBag,useProPartners,useProCareer,useProBusinesses} from './useProCollections';
 import {ProCollectionSheet,ProBusinessLogo,type CollectionPanel} from './ProCollectionSheets';
 export function ProCollectionSections({userId,owner,first,events,eventsReady}:{userId:string;owner:boolean;first:string;events:ProEvent[];eventsReady:boolean}){
- const bagQuery=useProBag(userId),partnerQuery=useProPartners(userId),careerQuery=useProCareer(userId),{user}=useSupabaseSession();
- const canEdit=owner&&user?.id===userId&&!user.is_anonymous&&!getGuestUser();
+ const bagQuery=useProBag(userId),partnerQuery=useProPartners(userId),careerQuery=useProCareer(userId);
+ const canEdit=owner&&!getGuestUser();
  const bagReady=bagQuery.isSuccess&&!bagQuery.isError,partnersReady=partnerQuery.isSuccess&&!partnerQuery.isError,careerReady=careerQuery.isSuccess&&!careerQuery.isError&&eventsReady;
  const bag=bagReady?orderedBag(bagQuery.data??[]):[],partners=partnersReady?orderedPartners(partnerQuery.data??[]):[],moments=careerReady?careerQuery.data??[]:[],entries=careerReady?careerEntries(events,moments):[];
  const businesses=useProBusinesses([...bag,...partners].flatMap(i=>i.business_id?[i.business_id]:[]));
