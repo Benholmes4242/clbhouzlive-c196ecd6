@@ -276,6 +276,8 @@ describe('HH3 sheet', () => {
     const card = document.querySelector('[data-hh-course="W"]') as HTMLElement;
     const tiles = Array.from(card.querySelectorAll('[data-hh-course-body] b')).map((b) => b.textContent);
     expect(tiles).toEqual(['74 \u00B7 38 pts', '71 \u00B7 40 pts']);
+    const labels = Array.from(card.querySelectorAll('[data-hh-course-body] b + span')).map((s) => s.textContent);
+    expect(labels).toEqual(['YOUR BEST EVER', "THOMAS'S BEST EVER"]);
   });
 
   it('H2H_BEST_1: a side with no matching gam rows keeps the dash on that side only', () => {
