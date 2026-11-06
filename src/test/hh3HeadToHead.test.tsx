@@ -114,6 +114,45 @@ describe('HH3 entry row', () => {
   });
 });
 
+describe('H2H_BEST_1 resolveGroupCourseId', () => {
+  const grp = (rows: SharedRoundResult[]) => groupByCourse(rows)[0];
+
+  it('single date match resolves to that course id', () => {
+    const g = grp([round('W', '2026-11-01', 80, 82)]);
+    const rows = [{ play_date: '2026-11-01', gross_score: 80, course_id: 'G' }];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBe('G');
+  });
+
+  it('two gam rows on the same date picks the one with the matching gross', () => {
+    const g = grp([round('W', '2026-11-01', 80, 82)]);
+    const rows = [
+      { play_date: '2026-11-01', gross_score: 91, course_id: 'OTHER' },
+      { play_date: '2026-11-01', gross_score: 80, course_id: 'G' },
+    ];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBe('G');
+  });
+
+  it('no date match resolves to null', () => {
+    const g = grp([round('W', '2026-11-01', 80, 82)]);
+    const rows = [{ play_date: '2026-10-30', gross_score: 80, course_id: 'G' }];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBeNull();
+  });
+
+  it('mixed results resolve to the majority id', () => {
+    const g = grp([
+      round('W', '2026-11-01', 80, 82),
+      round('W', '2026-10-20', 79, 81),
+      round('W', '2026-10-10', 78, 80),
+    ]);
+    const rows = [
+      { play_date: '2026-11-01', gross_score: 80, course_id: 'G' },
+      { play_date: '2026-10-20', gross_score: 79, course_id: 'G' },
+      { play_date: '2026-10-10', gross_score: 78, course_id: 'OLD' },
+    ];
+    expect(resolveGroupCourseId(g, rows, 'me')).toBe('G');
+  });
+});
+
 describe('HH3 sheet', () => {
   it('heads show real photos for both sides and the index gap', () => {
     openSheet();
