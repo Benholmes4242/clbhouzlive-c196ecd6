@@ -54,7 +54,9 @@ const posterFor = (row: WatchFeaturedRow) => row.poster_url ?? (row.stream_id ? 
 // Captions share the Watch rows' mention path: stored markup never renders raw.
 const captionFor = (row: WatchFeaturedRow) => (row.caption ? stripMentionMarkup(String(row.caption)).trim() : '') || row.course_name || '';
 
-function FeaturedPlayback({ row }: { row: WatchFeaturedRow }) {
+// Playback owns the sound/duration group so only mounted videos expose sound;
+// the group isolates its input from the card's tap and swipe lifecycle.
+function FeaturedPlayback({ row, duration }: { row: WatchFeaturedRow; duration: string }) {
   const reduced = usePrefersReducedMotion();
   const host = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -81,7 +83,10 @@ function FeaturedPlayback({ row }: { row: WatchFeaturedRow }) {
       {mount ? <video ref={video} className="featured-media featured-video" data-playing={playing} poster={poster ?? undefined} muted={muted} playsInline preload="none" disableRemotePlayback tabIndex={-1} onError={e => { if (e.currentTarget.getAttribute('src')) setFailed(true); }} /> : null}
     </div>
     {playing ? <span className="featured-playing" aria-hidden><i /><i /><i /></span> : null}
-    <Button variant="ghost" className="featured-mute" aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={!muted} onClick={e => { e.stopPropagation(); const next = !muted; if (video.current) video.current.muted = next; setMuted(next); }}>{muted ? <VolumeX /> : <Volume2 />}</Button>
+    <div className="featured-topright">
+      {mount ? <Button variant="ghost" className="featured-mute" aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={!muted} onPointerDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); const next = !muted; if (video.current) video.current.muted = next; setMuted(next); }}>{muted ? <VolumeX /> : <Volume2 />}</Button> : null}
+      <span className="featured-duration">{duration}</span>
+    </div>
   </>;
 }
 
@@ -184,7 +189,7 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
     <div className="featured-deck">
       {end ? <div className="featured-card featured-end" data-featured-end style={topStyle} {...gestures}><h3>That's this week's {numberWord(rows.length,false)}</h3><p>The deck refreshes as new videos come in. Swipe back to see one again.</p><div className="featured-end-actions"><Button variant="ghost" className="featured-end-button featured-restart" onClick={() => { clearTap(); setIndex(0); }}>Start again</Button><Button variant="ghost" className="featured-end-button" onClick={selectShorts}>All shorts</Button></div></div> : rows.slice(index,index+3).map((item,depth) => <div key={item.post_id} className="featured-card" data-featured-card={item.post_id} data-depth={depth} data-top={depth===0} aria-hidden={depth > 0 ? true : undefined} role={depth===0 ? 'button' : undefined} tabIndex={depth===0 ? 0 : -1} aria-label={depth===0 ? captionFor(item) || item.display_name : undefined} style={depth===0 ? topStyle : undefined} {...(depth===0 ? gestures : {})} onKeyDown={depth===0 ? e => { if (e.target!==e.currentTarget) return; if (e.key==='ArrowLeft' || e.key==='ArrowRight') { e.preventDefault(); move(e.key==='ArrowRight' ? 1 : -1); } if (e.key==='Enter' || e.key===' ') { e.preventDefault(); singleTap(); } } : undefined}>
         {posterFor(item) ? <img className="featured-media" src={posterFor(item) ?? undefined} alt="" decoding="async" /> : null}
-        {depth===0 ? <><FeaturedPlayback key={item.post_id} row={item} /><span className="featured-shade" /><span className="featured-badge">FEATURED · {index+1} OF {rows.length}</span><span className="featured-duration">{formatDuration(item.duration_seconds)}</span><div className="featured-foot"><div className="featured-who"><span className="featured-avatar">{item.avatar_url ? <img src={item.avatar_url} alt="" /> : <PlayerSilhouette />}</span><span>{item.display_name}</span></div><p className="featured-caption">{captionFor(item)}</p><div className="featured-meta">{likes.count} likes · {item.comment_count} comments · {shortAge(item.created_at)}</div></div>{heart > 0 ? <span key={heart} className="featured-heart" aria-hidden>♥</span> : null}</> : null}
+        {depth===0 ? <><FeaturedPlayback key={item.post_id} row={item} duration={formatDuration(item.duration_seconds)} /><span className="featured-shade" /><span className="featured-badge">FEATURED · {index+1} OF {rows.length}</span><div className="featured-foot"><div className="featured-who"><span className="featured-avatar">{item.avatar_url ? <img src={item.avatar_url} alt="" /> : <PlayerSilhouette />}</span><span>{item.display_name}</span></div><p className="featured-caption">{captionFor(item)}</p><div className="featured-meta">{likes.count} likes · {item.comment_count} comments · {shortAge(item.created_at)}</div></div>{heart > 0 ? <span key={heart} className="featured-heart" aria-hidden>♥</span> : null}</> : null}
       </div>)}
     </div>
     <div className="featured-bar">{!end ? <><Button variant="ghost" className="featured-action" aria-label="Like video" aria-pressed={likes.isLiked} disabled={!likeAvailable} onClick={() => like('button')}><Heart className="featured-like-icon" />{likes.count}</Button><Button variant="ghost" className="featured-action" aria-label="Open comments" onClick={() => { if (!row) return; analyticsEvents.track('watch_featured_comment_opened'); onOpenComments?.(row.post_id); }}><MessageSquare />{row?.comment_count}</Button><Button variant="ghost" className="featured-action" aria-label="Share video" onClick={() => { if (!post) return; analyticsEvents.track('watch_featured_shared'); handleShare(post); }}><Share /></Button></> : null}{!small ? <div className="featured-dots" aria-hidden>{rows.map((item,i) => <i key={item.post_id} data-current={i===Math.min(index,rows.length-1)} />)}</div> : null}</div>

@@ -1,5 +1,10 @@
 # Roadmap
 
+## FM1_MUTE_1
+- [x] Move mounted-video sound and duration into playback-owned top-right group; isolate inputs and release meta width; preserve deck behavior.
+- [ ] Run focused checks and four separate shards; report counts and existing test changes.
+- [ ] Check 390/320 geometry, long duration, sound toggle and next-card mute; report authenticated access limits honestly.
+
 ## Pro profile build2
 - [x] Add bag/partners/career sections and single-sheet editors with scoped writes/invalidation; exact primitive/copy review remains in close-out.
 - [ ] STOP: focused50 passed/23 failed in untouched proProfileBuildOne and proProfileBuildOneB, useSupabaseSession.tsx:51:54 missing mock auth.onAuthStateChange. Full output/tmp/pro-build2/focused.log; no existing tests edited.14 new rule cases passed, expected inventory7,272/640 vs baseline7,258/639; remaining mounted coverage/shards/browser blocked.
