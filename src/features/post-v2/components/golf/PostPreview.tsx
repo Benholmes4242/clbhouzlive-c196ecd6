@@ -12,6 +12,7 @@ import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
 import type { StageCourse, StageMediaItem } from '../../hooks/useStageComposer';
 import { isHoleTag, type ShotTag, type SlideTag, type WithCandidate } from '../../lib/golfPostRules';
 import { GP } from './golfPageTokens';
+import { ShareFooter } from './ShareFooter';
 
 const noop = () => {};
 
@@ -86,8 +87,15 @@ function useProbedVideoDims(post: FeedPost, open: boolean): Record<string, { w: 
   return dims;
 }
 
-export function PostPreview({ open, onBack, post, tags, pars, withPeople }: {
+/** PV1 — the composer's own Share footer, pinned at the bottom of the
+ * preview. Optional so existing callers/tests without it render unchanged. */
+export interface PreviewShare {
+  label: string; subLine: string; disabled: boolean; busy: boolean; onShare: () => void;
+}
+
+export function PostPreview({ open, onBack, post, tags, pars, withPeople, share }: {
   open: boolean; onBack: () => void; post: FeedPost; tags: Record<string, ShotTag>; pars: ReadonlyMap<number, number>; withPeople: WithCandidate[];
+  share?: PreviewShare;
 }) {
   const videoDims = useProbedVideoDims(post, open);
   const shownPost = useMemo(() => {
@@ -110,29 +118,54 @@ export function PostPreview({ open, onBack, post, tags, pars, withPeople }: {
     }
     return m;
   }, [post.mediaItems, tags, pars]);
+  /* PREVIEW_FIX_2 — the card must be touchable so the carousel's swipe and
+     dots work; the actions stay inert through their no-op handlers. The one
+     remaining escape hatch is real anchors inside the card (course band,
+     names, "with" people, hole chips): capture-phase guard keeps any tap on
+     an a[href] from navigating away from the composer. */
+  const guardLinkClick = (e: React.MouseEvent) => {
+    const t = e.target as HTMLElement | null;
+    if (t && typeof t.closest === 'function' && t.closest('a[href]')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
   return (
     <div data-testid="post-preview" aria-hidden={!open} style={{
-      position: 'fixed', inset: 0, background: GP.canvas, zIndex: 1, overflowY: 'auto',
+      position: 'fixed', inset: 0, background: GP.canvas, zIndex: 1,
+      display: 'flex', flexDirection: 'column', overflow: 'hidden',
       transform: open ? 'none' : 'translateX(100%)', transition: 'transform 280ms cubic-bezier(.2,.8,.2,1)',
       pointerEvents: open ? 'auto' : 'none',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'max(env(safe-area-inset-top), 47px) 16px 6px' }}>
+      <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'max(env(safe-area-inset-top), 47px) 16px 6px' }}>
         <button type="button" aria-label="Back" onClick={onBack} style={{ width: 40, height: 40, borderRadius: '50%', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', background: 'transparent', border: 0, cursor: 'pointer' }}>
           <ChevronLeft size={22} color={GP.ink} />
         </button>
         <span style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>Preview</span>
         <span style={{ width: 40 }} />
       </div>
-      {open && videoDims && (
-        <div style={{ marginTop: 8, pointerEvents: 'none' }}>
-          <FeedCard
-            post={shownPost} liked={false} likeCount={0} commentCount={0}
-            onLike={noop} onComment={noop} onShare={noop} onOpenMedia={noop} onProfile={noop}
-            isActive mountVideo
-            playedWith={withPeople.map((p) => ({ userId: p.id, name: p.name, avatarUrl: p.avatarUrl }))}
-            slideTags={slideTags}
-          />
-        </div>
+      {/* The card scrolls above the pinned footer on small phones (PV1). */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        {open && videoDims && (
+          <div style={{ marginTop: 8 }} onClickCapture={guardLinkClick}>
+            <FeedCard
+              post={shownPost} liked={false} likeCount={0} commentCount={0}
+              onLike={noop} onComment={noop} onShare={noop} onOpenMedia={noop} onProfile={noop}
+              isActive mountVideo
+              playedWith={withPeople.map((p) => ({ userId: p.id, name: p.name, avatarUrl: p.avatarUrl }))}
+              slideTags={slideTags}
+            />
+          </div>
+        )}
+      </div>
+      {share && (
+        <ShareFooter
+          label={share.label}
+          subLine={share.subLine}
+          disabled={share.disabled}
+          busy={share.busy}
+          onShare={share.onShare}
+        />
       )}
     </div>
   );

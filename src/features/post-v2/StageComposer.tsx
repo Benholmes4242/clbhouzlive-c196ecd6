@@ -73,6 +73,7 @@ import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { courseWalkHoles } from '@/lib/courseMedia/holeWalk';
 import { GolfShotStrip, ShotTagSheet, WhereSection, PlayedWithSection, FindSomeoneSheet, VisibilitySheet } from './components/golf/GolfPostSections';
 import { PostPreview, buildDraftFeedPost } from './components/golf/PostPreview';
+import { ShareFooter } from './components/golf/ShareFooter';
 import { GP } from './components/golf/golfPageTokens';
 import { isHoleTag, roundReason, shareSubLine, toggleWith, visibilityLabel, type PostVisibility, type ShotTag, type WithCandidate } from './lib/golfPostRules';
 import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstCaptureDay, searchMembers } from './lib/golfPostReads';
@@ -1282,27 +1283,15 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         </div>
       )}
 
-      {/* SHARE — 54px pill and its sub-line. */}
-      <div style={{ flex: 'none', background: GP.canvas, borderTop: `1px solid ${GP.line}`, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
-        <button
-          onClick={onPrimary}
-          disabled={!canSubmit}
-          style={{
-            width: '100%', height: 54, borderRadius: 999, border: 'none',
-            fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em',
-            background: canSubmit ? GP.ink : inkWithAlpha(SURFACE.dark.ink, 0.1),
-            color: canSubmit ? GP.onInk : PAGE2.dim,
-            cursor: canSubmit ? 'pointer' : 'not-allowed',
-          }}
-        >
-          {(submitting || saving)
-            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
-            : primaryLabel}
-        </button>
-        <div data-testid="share-sub" style={{ textAlign: 'center', fontSize: 11.5, color: GP.dim, marginTop: 8 }}>
-          {shareSubLine(isPersonalActor ? withNames : [], holeShotCount)}
-        </div>
-      </div>
+      {/* SHARE — 54px pill and its sub-line. ONE owner (ShareFooter) shared
+          with the Preview page so the two cannot drift (PV1). */}
+      <ShareFooter
+        label={primaryLabel}
+        subLine={shareSubLine(isPersonalActor ? withNames : [], holeShotCount)}
+        disabled={!canSubmit}
+        busy={submitting || saving}
+        onShare={onPrimary}
+      />
 
       {profile?.id && (
         <PostPreview
@@ -1315,6 +1304,15 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           tags={shotTags}
           pars={tagPars}
           withPeople={isPersonalActor ? withTagged : []}
+          /* PV1 — the preview ends with the composer's own Share footer;
+             tapping it posts through the very same onPrimary path. */
+          share={{
+            label: primaryLabel,
+            subLine: shareSubLine(isPersonalActor ? withNames : [], holeShotCount),
+            disabled: !canSubmit,
+            busy: submitting || saving,
+            onShare: onPrimary,
+          }}
         />
       )}
       {mediaSheet}

@@ -19,7 +19,8 @@
  * of mount / load / play / pause with proper cleanup semantics — a role
  * change whose resolved physical lane is unchanged fires zero engine work.
  */
-import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { Play } from 'lucide-react';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine, type LaneId, type LaneSnapshot } from '@/video/VideoEngine';
@@ -84,17 +85,72 @@ function useLaneForRole(role: FeedRole | null): LaneId | null {
 const LocalBlobVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cover', onFirstFrameReady }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const firedRef = useRef(false);
+  const retriedRef = useRef(false);
+  const [needsTap, setNeedsTap] = useState(false);
+  const mp4Url = (item as any).mp4Url as string;
+  const poster = ((item as any).thumbnailUrl || (item as any).imageUrl || '') as string;
+
+  /* PREVIEW_FIX_2 — iOS WebKit refuses a play() fired before the blob has
+     data, and only honours muted/playsInline reliably when they are set
+     IMPERATIVELY on the element (the React props alone were not enough on
+     Ben's phone). So: prime all three before EVERY play(); retry a rejected
+     play() once on 'canplay'; and if nothing has started 2000ms after the
+     slide became active, offer a centred tap-to-play button whose tap is the
+     user gesture WebKit was waiting for. */
+  const primeAndPlay = useCallback(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = true;
+    el.defaultMuted = true;
+    el.playsInline = true;
+    const attempt = el.play();
+    if (attempt && typeof attempt.catch === 'function') {
+      attempt.catch(() => {
+        if (retriedRef.current) return;
+        retriedRef.current = true;
+        const retry = () => {
+          el.muted = true;
+          el.defaultMuted = true;
+          el.playsInline = true;
+          el.play().catch(() => { /* the 2000ms tap-to-play button is the final fallback */ });
+        };
+        if (el.readyState >= 3) retry();
+        else el.addEventListener('canplay', retry, { once: true });
+      });
+    }
+  }, []);
+
+  /* A new blob src must be load()ed explicitly — the attribute alone does not
+     re-fetch on every WebKit build. Runs before the isActive effect so a
+     mount is load() → play(), never the other way round. */
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
-    if (isActive) {
-      el.play().catch(() => { /* autoplay refusal leaves the poster frame */ });
-    } else {
+    retriedRef.current = false;
+    try { el.load(); } catch { /* jsdom has no media loader */ }
+  }, [mp4Url]);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (!isActive) {
+      setNeedsTap(false);
       el.pause();
+      return;
     }
-  }, [isActive]);
-  const mp4Url = (item as any).mp4Url as string;
-  const poster = ((item as any).thumbnailUrl || (item as any).imageUrl || '') as string;
+    setNeedsTap(false);
+    primeAndPlay();
+    const onPlaying = () => setNeedsTap(false);
+    el.addEventListener('playing', onPlaying);
+    const timer = window.setTimeout(() => {
+      if (el.paused) setNeedsTap(true);
+    }, 2000);
+    return () => {
+      window.clearTimeout(timer);
+      el.removeEventListener('playing', onPlaying);
+    };
+  }, [isActive, primeAndPlay]);
+
   return (
     <div style={{ position: 'absolute', inset: 0, backgroundColor: PAGE_CANVAS }}>
       <video
@@ -120,6 +176,21 @@ const LocalBlobVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cover', 
           display: 'block',
         }}
       />
+      {needsTap && (
+        <button
+          type="button"
+          aria-label="Play video"
+          onClick={(e) => { e.stopPropagation(); primeAndPlay(); }}
+          style={{
+            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: 56, height: 56, borderRadius: '50%', border: 0, padding: 0,
+            background: 'rgba(0,0,0,0.45)', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center',
+            cursor: 'pointer', zIndex: 30,
+          }}
+        >
+          <Play size={24} color="#FFFFFF" fill="#FFFFFF" />
+        </button>
+      )}
     </div>
   );
 };
