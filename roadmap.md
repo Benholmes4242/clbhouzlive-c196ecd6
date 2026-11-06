@@ -1,5 +1,10 @@
 # Roadmap
 
+## PREVIEW_FIX_1 composer Preview video
+- [x] buildDraftFeedPost streamId→hlsUrl / blob→mp4Url; PostPreview dimension probe with 1500ms fallback; InlineVideo local-blob native branch.
+- [x] 10 new tests; shards 7,195 passed + 3 known FS_NOTCH = 7,198/634; build OK.
+- [ ] Manual checks 1–7 unverified — external unmanaged auth blocks signed-in browser session. See PREVIEW_FIX_1_REPORT.md.
+
 ## Pro profile build 1c
 - [x] Remove course-par code/controls; preserve strokes-only OWGR and signed pro/tour scoring.
 - [x] Retire18 authorized par cases, retain other1b coverage, rewrite1 mixed case and add8 stroke cases:49→39, expected7,188/632.
