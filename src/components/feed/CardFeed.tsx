@@ -47,6 +47,8 @@ import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import { golfHoleFor, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
+import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
