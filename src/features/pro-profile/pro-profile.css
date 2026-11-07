@@ -81,12 +81,10 @@
 .pro-hero-actions .pro-hero-secondary { color:var(--pro-profile-ink); background:transparent; border-color:var(--pro-profile-rule); }
 .pro-hero-actions>div { display:flex; justify-content:center; align-items:center; }
 /* Build 1b identity/score geometry is pro-only; shell defaults stay shared. */
-.pro-hero-name { margin:0; font-size:24px; font-weight:800; line-height:1.15; color:var(--pro-profile-ink); }
+.pro-hero-name { margin:0; font-size:26px; font-weight:800; line-height:1.1; letter-spacing:0; color:var(--pro-profile-ink); }
 .pro-hero-surname { display:inline-flex; align-items:center; gap:12px; white-space:nowrap; }
 .pro-hero-surname .pro-label { position:relative; top:1px; }
-.pro-hero-profession,.pro-hero-club { font-size:13px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.pro-hero-profession { margin-top:4px; color:var(--pro-profile-soft); }
-.pro-hero-club { margin-top:1px; color:var(--pro-profile-mute); }
+.pro-hero-profession { font-size:12.5px; font-weight:600; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:4px; color:rgba(255,255,255,.78); }
 .pro-hero-actions { grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; }
 .pro-hero-actions.pro-hero-visitor { grid-template-columns:repeat(3,minmax(0,1fr)) 40px; }
 .pro-hero-actions .pro-profile-command { min-width:0; padding:0 6px; white-space:nowrap; font-weight:700; }
@@ -98,7 +96,7 @@
 .pro-profile-score b.pro-profile-gross { font-size:14px; }
 .pro-result-rank-movement { display:block; margin-top:5px; font-size:11.5px; font-weight:700; }
 .pro-profile-sheet .pro-profile-round b { font-size:20px; }
-@media (max-width:359px) { .pro-hero-name { font-size:21px; } .pro-hero-surname { gap:10px; } }
+@media (max-width:359px) { .pro-hero-surname { gap:10px; } }
 .pro-collection-edit { padding:0; height:auto; color:var(--pro-profile-soft); font-size:12px; font-weight:700; }
 .pro-bag-row { display:flex; align-items:center; gap:12px; width:100%; height:auto; padding:11px 0; border:0; border-radius:0; border-top:1px solid var(--pro-profile-hair); background:transparent; text-align:left; color:var(--pro-profile-ink); white-space:normal; }
 .pro-bag-row:first-child { border-top:0; padding-top:0; }
