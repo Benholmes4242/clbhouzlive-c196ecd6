@@ -153,8 +153,8 @@ describe('pro collections — visitor and own views', () => {
 
   it('partner logo uses the 34% squircle with a 1px traced hairline', async () => {
     fill(); const { container } = mount(false);
-    await waitFor(() => expect(container.querySelector('button.pro-partner-tile')).not.toBeNull());
-    const ring = container.querySelector('button.pro-partner-tile [aria-hidden]') as HTMLElement;
+    await waitFor(() => expect(container.querySelector('button.pro-partner-tile:not(.pro-partner-unlinked)')).not.toBeNull());
+    const ring = container.querySelector('button.pro-partner-tile:not(.pro-partner-unlinked) [aria-hidden]') as HTMLElement;
     expect(ring.style.borderRadius).toBe('34%');
     expect(ring.style.border.startsWith('1px solid')).toBe(true);
   });
