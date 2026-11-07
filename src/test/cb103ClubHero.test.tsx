@@ -177,8 +177,8 @@ describe('CB103 crest row', () => {
   it('Share calls share and More renders through the page menu', () => {
     const renderMore = vi.fn((tr: React.ReactElement) => <div data-menu="">{tr}</div>);
     const { props, container } = hero({ renderMore });
-    const crestRow = container.querySelector('[data-club-crest]')!.parentElement!;
-    const circles = crestRow.querySelectorAll('button:not([data-club-crest])');
+    const cover = container.querySelector('[data-club-cover]')!;
+    const circles = cover.querySelectorAll('button:not([data-club-crest])');
     expect(circles).toHaveLength(2);
     fireEvent.click(circles[0]);
     expect(props.onShare).toHaveBeenCalledTimes(1);
