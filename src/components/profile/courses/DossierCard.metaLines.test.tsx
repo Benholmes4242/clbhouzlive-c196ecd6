@@ -9,6 +9,7 @@ const enCourses = JSON.parse(
 // Real en translations with plural selection, so the "1 ROUNDS" regression
 // cannot hide behind a defaultValue fallback.
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: { count?: number; avg?: string; defaultValue?: string }) => {
       const parts = key.split('.');
@@ -111,5 +112,66 @@ describe('DossierCard meta lines', () => {
       (d) => /2026/.test(d.textContent ?? '') || /avg|round/.test(d.textContent ?? ''),
     );
     expect(metaDivs.some((d) => d.textContent?.trim() === '')).toBe(false);
+  });
+
+  it('renders the archive tour line and tour date for a second-place finish', () => {
+    render(
+      <DossierCard
+        appearance="archive"
+        course={baseCourse}
+        onCourseClick={noop}
+        onFullReview={noop}
+        tourEvent={{ eventName: 'Open de Roissy PGA France', finish: '2', playedOn: '2026-05-31' }}
+      />,
+    );
+    expect(screen.getByTestId('meta-line-1').textContent).toMatch(/^31 May 2026/);
+    expect(screen.getByText('On tour · Open de Roissy PGA France · 2nd')).toBeTruthy();
+  });
+
+  it.each([
+    ['T26', 'On tour · Longwy Alps Open · T26'],
+    ['MC', 'On tour · Biarritz Cup · MC'],
+  ])('renders tour finish %s unchanged', (finish, expected) => {
+    render(
+      <DossierCard
+        appearance="archive"
+        course={baseCourse}
+        onCourseClick={noop}
+        onFullReview={noop}
+        tourEvent={{ eventName: finish === 'MC' ? 'Biarritz Cup' : 'Longwy Alps Open', finish, playedOn: '2026-05-31' }}
+      />,
+    );
+    expect(screen.getByText(expected)).toBeTruthy();
+  });
+
+  it('keeps the rating on a rated tour course and supersedes the review date', () => {
+    render(
+      <DossierCard
+        appearance="archive"
+        course={{ ...baseCourse, review_date: '2026-06-20' }}
+        onCourseClick={noop}
+        onFullReview={noop}
+        scoring={scoring({})}
+        tourEvent={{ eventName: 'Open de Roissy PGA France', finish: '2', playedOn: '2026-05-31' }}
+      />,
+    );
+    expect(screen.getByText('8.4')).toBeTruthy();
+    expect(screen.getByText('On tour · Open de Roissy PGA France · 2nd')).toBeTruthy();
+    expect(screen.getByTestId('meta-line-1').textContent).toMatch(/^31 May 2026/);
+    expect(screen.queryByText(/20 Jun 2026/)).toBeNull();
+  });
+
+  it('renders an archive row without a tour event exactly as before', () => {
+    render(
+      <DossierCard
+        appearance="archive"
+        course={baseCourse}
+        onCourseClick={noop}
+        onFullReview={noop}
+        scoring={scoring({})}
+      />,
+    );
+    expect(screen.getByTestId('meta-line-1').textContent).toBe('3 Sep 2026 · England');
+    expect(screen.getByText('1 round · +1.0 avg')).toBeTruthy();
   });
 });
