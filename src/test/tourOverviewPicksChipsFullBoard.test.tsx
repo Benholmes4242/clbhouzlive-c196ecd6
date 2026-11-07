@@ -95,17 +95,16 @@ describe('picks chips (Board B)', () => {
     expect(figure.previousElementSibling?.hasAttribute('data-overview-pick-name')).toBe(true);
   });
 
-  it('the to-reach line renders as one line only when its condition holds', () => {
+  it('the to-reach line stays absent even in the required-round window', () => {
     f.picks = [{ playerId: 'p0', playerName: 'A Zero' }, { playerId: 'p3', playerName: 'B Three' }];
     const { container } = mountPicks({ currentRound: 3 });
     const cards = container.querySelectorAll('[data-overview-pick-card]');
     expect(cards[0].querySelector('[data-overview-pick-to-reach]')).toBeNull(); // the leader has nothing to reach
-    const line = cards[1].querySelector('[data-overview-pick-to-reach]') as HTMLElement;
-    expect(line).not.toBeNull();
-    expect(line.children).toHaveLength(2);
-    expect(line.style.whiteSpace).toBe('nowrap');
-    expect(line.style.textOverflow).toBe('');
-    expect(line.style.borderTop).toBe('');
+    expect(cards[1].querySelector('[data-overview-pick-to-reach]')).toBeNull();
+    const figure = cards[1].querySelector('[data-overview-pick-figure]') as HTMLElement;
+    expect(figure.style.marginTop).toBe('1px');
+    expect(figure.style.lineHeight).toBe('1.2');
+    expect(figure.style.whiteSpace).toBe('nowrap');
     cleanup();
     const early = mountPicks({ currentRound: 2 });
     expect(early.container.querySelector('[data-overview-pick-to-reach]')).toBeNull();
@@ -119,6 +118,17 @@ describe('picks chips (Board B)', () => {
     expect(name.style.overflow).toBe('hidden');
     expect(name.style.textOverflow).toBe('ellipsis');
     expect((name.parentElement as HTMLElement).style.minWidth).toBe('0');
+  });
+
+  it('uses a 46px border-box chip for a pre-round tee with a 1px gap', () => {
+    f.picks = [{ playerId: 'p3', playerName: 'B Three' }];
+    const { container } = mountPicks({ phase: 'upcoming', entries: [] });
+    const card = container.querySelector<HTMLElement>('[data-overview-pick-card]');
+    expect(card?.style.height).toBe('46px');
+    expect(card?.style.boxSizing).toBe('border-box');
+    const text = card?.querySelector<HTMLElement>('[data-overview-pick-text]');
+    expect(text?.style.flex).toBe('1 1 0%');
+    expect(text?.style.overflow).toBe('hidden');
   });
 });
 

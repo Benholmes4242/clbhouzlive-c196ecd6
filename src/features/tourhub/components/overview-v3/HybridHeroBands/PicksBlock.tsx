@@ -116,9 +116,6 @@ export function PicksBlock({
   championPlayerId,
   championPlayerIds,
   intro,
-  neededByPlayer,
-  toReachScore,
-  leaderTotal,
   onOpenPick,
   tournamentId,
   seasonYear,
@@ -130,8 +127,6 @@ export function PicksBlock({
   /** Pick tee times by sr_players.id; null/empty renders no tee line. */
   teeByPlayer: Map<string, string> | null;
   startedPlayers: Set<string>;
-  /** The leader's to-par; a pick at or ahead of it has nothing to reach. */
-  leaderTotal: number | null;
   onOpenPick: (id:string) => void;
   tournamentId:string;
   seasonYear:number|null;
@@ -141,9 +136,6 @@ export function PicksBlock({
   onOpenRecord:()=>void;
   /** §E.1 where the picks stand; null renders no line. */
   intro: string | null;
-  /** §E.2 the same map PicksSheet reads; null outside the required-round window. */
-  neededByPlayer: Map<string, number> | null;
-  toReachScore: string | null;
   picks: AITopContender[];
   /** The event's tour, for the shared headshot resolver. */
   tourCode: string;
@@ -278,7 +270,7 @@ export function PicksBlock({
               aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
               className="active:opacity-70 transition-opacity"
               /* Signed-off Board B: outlined landscape chip, three across, no fill. */
-              style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: 7, textAlign: 'left', minWidth: 0 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: 7, textAlign: 'left', minWidth: 0 }}
             >
               {/* The shared resolver walks the headshot folder chain itself;
                   photoUrl is tried FIRST when present. No second resolver. */}
@@ -292,23 +284,16 @@ export function PicksBlock({
                   size={28}
                 />
               </div>
-              <div data-overview-pick-text style={{ minWidth: 0 }}>
-                <div data-overview-pick-name style={{ fontSize: 12.5, fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div data-overview-pick-text style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                <div data-overview-pick-name style={{ fontSize: 12.5, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {surnameOf(p.playerName)}
                 </div>
                 {figureLine ? (
-                  <div data-overview-pick-figure style={{ marginTop: 2, fontSize: 11.5, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-start', gap: 4, whiteSpace: 'nowrap', ...FIGS }}>
+                  <div data-overview-pick-figure style={{ marginTop: 1, lineHeight: 1.2, fontSize: 11.5, fontWeight: 700, display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: 4, whiteSpace: 'nowrap', ...FIGS }}>
                     {figureLine}
                   </div>
                 ) : teeText ? (
-                  <div data-overview-pick-tee data-overview-pick-tee-time style={{ marginTop: 3, fontSize: 12.5, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', flex: 'none', ...FIGS }}>{teeText}</div>
-                ) : null}
-                {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
-                    line at all. The dash is only for a target genuinely out of reach. */}
-                {!statusToken && neededByPlayer && toReachScore && (phase !== 'live' || pickStarted) && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
-                  <div data-overview-pick-to-reach style={{ marginTop: 2, display: 'flex', gap: 4, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
-                    <span>{t('overview.picksNeeds', { defaultValue: 'Needs' })}</span><span style={{ color: OVERVIEW.ink }}>{neededByPlayer.get(String(p.playerId)) ?? '\u2014'}</span>
-                  </div>
+                  <div data-overview-pick-tee data-overview-pick-tee-time style={{ marginTop: 1, lineHeight: 1.2, fontSize: 12.5, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', flex: 'none', ...FIGS }}>{teeText}</div>
                 ) : null}
               </div>
             </button>

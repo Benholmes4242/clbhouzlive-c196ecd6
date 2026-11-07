@@ -74,7 +74,17 @@ describe('movement card to-par colour', () => {
     const view = render(<RoundMovementBand round={2} cards={[card(-4, null), card(-6, 64)]} />);
     const scores = view.container.querySelectorAll('[data-movement-score]');
     expect(scores[0].textContent).toBe('\u22124');
-    expect(scores[1].textContent).toBe('64 (\u22126)');
+    expect(scores[1].textContent).toBe('\u22126');
+  });
+
+  it('drops gross 77 and brackets while keeping bare +5 in the tight figure line', () => {
+    const view = render(<RoundMovementBand round={3} cards={[card(5, 77)]} />);
+    const chip = view.container.querySelector<HTMLElement>('[data-overview-movement-card]');
+    expect(chip?.style.height).toBe('46px');
+    expect(chip?.querySelector('[data-movement-score]')?.textContent).toBe('+5');
+    expect(chip?.querySelector('[data-movement-gross]')).toBeNull();
+    expect(chip?.textContent).not.toMatch(/77|[()]/);
+    expect((chip?.children[1].children[1] as HTMLElement)?.style.marginTop).toBe('1px');
   });
 });
 
