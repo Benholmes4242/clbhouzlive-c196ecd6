@@ -49,6 +49,33 @@ import { top100Standing } from '@/lib/gam/top100Standing';
 const base = { avgRating: 8.2, ratedCount: 35, top100Played: 12, isOwnProfile: true };
 
 describe('profile courses record', () => {
+  it('unknown rating and rated-course tiles use dim centred dashes while fetched zero stays a figure', () => {
+    const view = render(<JourneySummaryCard {...base} coursesPlayed={11} countriesPlayed={6} avgRating={null} ratedCount={null} top100Played={0} />);
+    for (const label of ['AVERAGE RATING', 'COURSES RATED']) {
+      const figure = screen.getByTestId(`tile-${label}`);
+      expect(figure.textContent).toBe('—');
+      expect(figure.style.color).toBe('rgba(248, 250, 252, 0.42)');
+      expect(figure.style.textAlign).toBe('center');
+      expect((figure.nextElementSibling as HTMLElement).style.textAlign).toBe('center');
+      expect(figure.style.letterSpacing).toBe('0');
+    }
+    expect(screen.getByTestId('tile-TOP 100 PLAYED').textContent).toBe('0');
+    expect(screen.getByTestId('record-played').style.letterSpacing).toBe('0');
+    view.rerender(<JourneySummaryCard {...base} coursesPlayed={11} countriesPlayed={6} avgRating={0} ratedCount={0} />);
+    expect(screen.getByTestId('tile-AVERAGE RATING').textContent).toBe('0.0');
+    expect(screen.getByTestId('tile-COURSES RATED').textContent).toBe('0');
+  });
+
+  it('unplottable courses keep unmapped text without a map key and country bars use neutral fill', () => {
+    const view = render(<CoursesMapSection tallies={[{ country: 'France', courses: 3 }]} points={[]} unmapped={10} />);
+    expect(screen.queryByTestId('courses-map-plot')).toBeNull();
+    expect(screen.queryByText('Top 100 course')).toBeNull();
+    expect(screen.queryByText('Everything else')).toBeNull();
+    expect(screen.getByTestId('map-unmapped').textContent).toBe('10 not yet mapped');
+    const fill = view.container.querySelector<HTMLElement>('[data-testid="country-row"] > span:nth-child(2) > span');
+    expect(fill?.style.background).toBe('var(--course-country-bar)');
+    expect(fill?.style.opacity).toBe('');
+  });
   it('hero renders the played figure and the country count', () => {
     render(<JourneySummaryCard {...base} coursesPlayed={53} countriesPlayed={9} />);
     expect(screen.getByTestId('record-played').textContent).toBe('53');

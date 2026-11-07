@@ -46,6 +46,19 @@ describe('heroBoard row tap opens the scorecard', () => {
 });
 
 describe('movement card to-par colour', () => {
+  it('pick-style movers have direction-only arrows and independent white place counts', () => {
+    const view = render(<RoundMovementBand round={3} cards={[{ key:'up',name:'Tommy Fleetwood',candidates:[],delta:18,toPar:-8,gross:64 },{ key:'down',name:'Stefano Mazzoli',candidates:[],delta:-31,toPar:5,gross:77 }]} />);
+    const cards = view.container.querySelectorAll<HTMLElement>('[data-overview-movement-card]');
+    for (const card of cards) {
+      expect(card.style.background).toBe('transparent'); expect(card.style.borderRadius).toBe('12px'); expect(card.style.padding).toBe('7px');
+      expect((card.firstElementChild as HTMLElement).style.width).toBe('28px');
+      expect(card.querySelector<HTMLElement>('[data-movement-places]')?.style.color).toBe('rgb(248, 250, 252)');
+    }
+    expect(view.container.querySelector<HTMLElement>('[data-movement-dir="up"]')?.style.color).toBe('rgb(52, 215, 127)');
+    expect(view.container.querySelector<HTMLElement>('[data-movement-dir="down"]')?.style.color).toBe('rgb(194, 74, 74)');
+    expect(view.container.querySelector('[data-movement-dir="up"]')?.textContent?.trim()).toBe('▲');
+    expect(view.container.querySelector('[data-movement-dir="down"]')?.textContent?.trim()).toBe('▼');
+  });
   const card = (toPar: number, gross: number | null) => ({ key: `k${toPar}${gross}`, name: 'Alan Barker', candidates: [], delta: 2, toPar, gross });
 
   it('under par takes the under-par colour; level and over take the colour law', () => {
