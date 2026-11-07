@@ -74,10 +74,10 @@ describe('profile courses archive', () => {
     archiveFixture.realFilters = true;
     mount(false);
     const top = await screen.findByRole('tab', { name: 'Top 100 1' });
-    expect(screen.getByRole('button', { name: 'Global', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Global' })).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(top);
     expect(top).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('button', { name: 'Global', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Global' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('with zero Top 100 courses, Top 100 stays selected and renders the existing empty state', async () => {
@@ -102,13 +102,13 @@ describe('profile courses archive', () => {
     }
     render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><ControlledArchive /></MemoryRouter></QueryClientProvider>);
     await screen.findByRole('tab', { name: 'All 4' });
-    fireEvent.click(screen.getByRole('button', { name: 'GB&I', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'GB&I' }));
     expect(screen.getByRole('tab', { name: 'All 2' })).toHaveAttribute('aria-selected', 'true');
     fireEvent.click(screen.getByRole('tab', { name: 'Top 100 1' }));
     for (const region of ['USA', 'Global', 'Europe']) {
-      fireEvent.click(screen.getByRole('button', { name: region, exact: true }));
+      fireEvent.click(screen.getByRole('button', { name: region }));
       expect(screen.getByRole('tab', { name: /Top 100/ })).toHaveAttribute('aria-selected', 'true');
-      expect(screen.getByRole('button', { name: region, exact: true })).toHaveAttribute('aria-pressed', 'true');
+      expect(screen.getByRole('button', { name: region })).toHaveAttribute('aria-pressed', 'true');
     }
   });
 
