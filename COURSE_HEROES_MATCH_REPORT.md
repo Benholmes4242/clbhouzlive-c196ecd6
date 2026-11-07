@@ -1,5 +1,48 @@
 # Course heroes match the Tour hero
 
+## NEEDS assertion repair and completed verification — 7 November 2026
+
+Production unchanged. Only `src/test/tourHeroRefinements.test.tsx` was edited: **“renders the Needs gross as a separate untruncated white figure and omits leading/level picks”** was renamed **“pick chips carry no Needs line”**. Entries, `f.picks` and mount are unchanged.
+
+Old assertions after the mount:
+```tsx
+const lines = v.container.querySelectorAll<HTMLElement>('[data-overview-pick-to-reach]');
+expect(lines).toHaveLength(1);
+expect(lines[0].children[1].textContent).toBe('66');
+expect(lines[0].style.textOverflow).toBe('');
+expect(lines[0].style.overflow).toBe('');
+expect(lines[0].style.gap).toBe('4px');
+expect(lines[0].style.textTransform).toBe('uppercase');
+```
+New assertions:
+```tsx
+expect(v.container.querySelectorAll('[data-overview-pick-to-reach]')).toHaveLength(0);
+expect(v.container.textContent).not.toMatch(/needs/i);
+```
+Reason: the signed-off tight chips intentionally removed the NEEDS line; its former value/style assertions are obsolete. This is the sole renamed/rewritten case. No cases added, deleted or skipped, no other tests changed; the file remains **12 cases**.
+
+### Completed shared suite
+Commands, each run once in this repair:
+```text
+bunx vitest run --maxWorkers=2 --shard=2/4
+bunx vitest run --maxWorkers=2 --shard=3/4
+bunx vitest run --maxWorkers=2 --shard=4/4
+```
+| Shard | Passed | Failed | Files | Provenance |
+|---|---:|---:|---:|---|
+| 1/4 | 2,000 | 0 | 168 | Previously passed; not rerun, as requested |
+| 2/4 | 1,828 | 0 | 168 | Fresh rerun |
+| 3/4 | 1,954 | 0 | 168 | Fresh run |
+| 4/4 | 1,875 | 0 | 165 | Fresh run |
+
+Fresh shards 2–4: **5,657 passed / 501 files**, zero failures. Combined with the previously reported shard 1: **7,657 passed / 669 files**, zero failures. This is completed shared verification, not four fresh shards in this turn. FW1's allowed-known meta-line failure did not occur; its 34 cases passed in shard 2. The repaired Tour hero refinements file passed all 12 cases.
+
+Counts before/after: **7,657 tests / 669 files → 7,657 tests / 669 files**, delta **0 tests / 0 files**. The previously expected inventory is now verified by combined shard totals. Reconciliation from the last full green **7,607/664**: tight chips **+3/+1**, photo grid **+22/+2**, Tour B **+16/+1**, course heroes **+9/+1** = **7,657/669**. No repeated focused runs are added to these totals.
+
+Logs: `/tmp/needs-closeout/shard2.log`, `shard3.log`, `shard4.log`. Preview build log: `2026-11-07T20:47:02Z build OK`. No browser reruns requested; existing 320px results and live-device limitations remain unchanged. No production, SQL, migration, RPC/edge, guest, review wizard, news, round plot, feed_config, cap or native/Median changes.
+
+**This section supersedes all historical suite stops below; those entries remain as audit history.**
+
 ## Authorised test-only close-out — 7 November 2026
 Production unchanged. Only the three authorised checks were repaired; no additional test changes, deletions, skips or new cases. This section supersedes the historical stop below.
 
