@@ -62,8 +62,10 @@ describe('PF2 ComposerHoleGuide copy and audience states', () => {
     expect(toggle).toHaveProperty('disabled', true);
     fireEvent.click(toggle);
     expect(onToggle).not.toHaveBeenCalled();
-    fireEvent.click(container.querySelector('.composer-golf-att-tap')!);
+    // The locked switch is part of the row: its tap bubbles to the row and opens the sheet.
     expect(onRowTap).toHaveBeenCalledTimes(1);
+    fireEvent.click(container.querySelector('.composer-golf-att-tap')!);
+    expect(onRowTap).toHaveBeenCalledTimes(2);
   });
 });
 
