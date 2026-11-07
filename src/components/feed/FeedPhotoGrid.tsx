@@ -5,6 +5,7 @@ import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { postImageProps } from '@/utils/imageSrc';
 import { SingleMediaTapButton } from './SingleMediaTapButton';
 import { mediaMaxHeight } from './feedMediaSizing';
+import { CARD } from './feedTokens';
 import type { feedPhotoGridLayout } from './feedPhotoGrid';
 import './feedPhotoGrid.css';
 type Layout = NonNullable<ReturnType<typeof feedPhotoGridLayout>>;
@@ -19,5 +20,5 @@ function PhotoTile({ item, index, more, postId, alt, feedIndex, isActive, onOpen
 export function FeedPhotoGrid({ items, layout, postId, alt, feedIndex, isActive, onOpen, onDouble, primaryImgRef, overlays }: { items: MediaItem[]; layout: Layout; postId: string; alt: string; feedIndex?: number; isActive?: boolean; onOpen: (index: number, el: HTMLElement | null, posterUrl: string | null) => void; onDouble: () => void; primaryImgRef?: React.RefObject<HTMLImageElement>; overlays?: React.ReactNode }) {
   const root = useRef<HTMLDivElement>(null), [width, setWidth] = useState(0);
   useLayoutEffect(() => { const el = root.current; if (!el) return; let frame = 0; const measure = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(() => setWidth(el.getBoundingClientRect().width)); }; setWidth(el.getBoundingClientRect().width); if (typeof ResizeObserver === 'undefined') return; const observer = new ResizeObserver(measure); observer.observe(el); return () => { observer.disconnect(); cancelAnimationFrame(frame); }; }, []);
-  return <div ref={root} className="feed-photo-grid" data-feed-photo-grid data-shape={layout.shape} style={{ '--feed-photo-cap': mediaMaxHeight(), '--feed-photo-row': `${width / 3}px`, '--feed-photo-ratio': String(layout.leadRatio) } as React.CSSProperties}>{layout.shown.map(index => { const item = items[index]; return item ? <PhotoTile key={item.id || index} item={item} index={index} more={index === 3 ? layout.more : 0} postId={postId} alt={alt} feedIndex={feedIndex} isActive={isActive} onOpen={onOpen} onDouble={onDouble} primaryImgRef={index === 0 ? primaryImgRef : undefined} overlays={index === 0 ? overlays : undefined} /> : null; })}</div>;
+  return <div ref={root} className="feed-photo-grid" data-feed-photo-grid data-shape={layout.shape} style={{ '--feed-photo-ground': CARD, '--feed-photo-cap': mediaMaxHeight(), '--feed-photo-row': `${width / 3}px`, '--feed-photo-ratio': String(layout.leadRatio) } as React.CSSProperties}>{layout.shown.map(index => { const item = items[index]; return item ? <PhotoTile key={item.id || index} item={item} index={index} more={index === 3 ? layout.more : 0} postId={postId} alt={alt} feedIndex={feedIndex} isActive={isActive} onOpen={onOpen} onDouble={onDouble} primaryImgRef={index === 0 ? primaryImgRef : undefined} overlays={index === 0 ? overlays : undefined} /> : null; })}</div>;
 }

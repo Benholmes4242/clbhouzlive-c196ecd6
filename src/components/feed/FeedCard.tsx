@@ -381,7 +381,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     return map.get(feedIndex) ?? 0;
   });
   const photoGrid = feedPhotoGridLayout(post.mediaItems ?? []);
-  const initialMediaIndex = photoGrid ? 0 : initialMediaIndexProp ?? storedSlide;
+  const initialMediaIndex = photoGrid && !(post.isReview && layout !== 'mediaFirst') ? 0 : initialMediaIndexProp ?? storedSlide;
   /* The hole chip follows the VISIBLE slide. */
   const [visibleSlide, setVisibleSlide] = useState(initialMediaIndex ?? 0);
   
