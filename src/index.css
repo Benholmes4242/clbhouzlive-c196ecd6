@@ -36,6 +36,9 @@
 }
 
 :root {
+  --feed-photo-ground: var(--card);
+  --feed-photo-overlay: rgba(0,0,0,0.45);
+  --feed-photo-ink: #FFFFFF;
   --round-video-under: #E2574C;
   --round-video-chip: rgba(14,14,16,.7);
   --round-video-time: rgba(0,0,0,.6);

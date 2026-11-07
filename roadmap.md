@@ -1,5 +1,10 @@
 # Roadmap
 
+## FEED_PHOTO_GRID
+- [x] Add pure four-photo eligibility and shared grid rendering/taps/loading; preserve video/small sets/words-first frames.
+- [ ] Add helper/mounted regressions; run four separate shards, stopping on unexpected failures.
+- [ ] Check upright5/wide12 at320px for Clubhouse/business feed; report cap/gaps/assertions/counts.
+
 ## OVERVIEW_TIGHT_CHIPS
 - [x] Tighten picks/movers to 46px two-line chips; remove chip NEEDS and gross/brackets only; shorten English intros and preserve PicksSheet.
 - [x] Update authorized obsolete assertions and two direct-mount prop sets; add3cases. Focused115passed/1failed across7files.
