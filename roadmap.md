@@ -1,9 +1,10 @@
 # Roadmap
 
 ## COURSE_HEROES_MATCH
-- [ ] Match course-list/detail photo material and opt-in masthead typography; preserve record gold and all other masthead callers.
-- [ ] Add focused coverage, ledger authorised obsolete assertions, run fresh shards until unexpected failure.
-- [ ] Verify three 320px hero states and write COURSE_HEROES_MATCH_REPORT.md.
+- [x] Match course-list/detail material and opt-in masthead typography; preserve gold/default callers. Preview buildOK.
+- [x] Add9cases/1file and ledger one authorised overlay-case rename/rewrite. Focused42passed/2failed at courseHeroesMatch.test.tsx:59:34 (clamp omitted) and81:86 (nonexistent avatar marker); no repairs.
+- [x] Detail320px with/without record:340height/no overflow, long record name ellipsis; report COURSE_HEROES_MATCH_REPORT.md.
+- [ ] All four shards blocked by two new focused failures; Courses-page320px mount failed (null fade parent); actual islands/avatar loading/adjacent seam remain unverified.
 
 ## OVERVIEW_HERO_B_STRIP
 - [x] Merge tour/state kicker, scale leader B, opt in board spacing after movers and replace locked no-pick members door with the strip; Ben ruled brief10+0/white position over mock.
