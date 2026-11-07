@@ -88,7 +88,9 @@ describe('Courses-only place line', () => {
     const layers = Array.from(hero.children) as HTMLElement[];
     expect(layers[0].hasAttribute('data-photo-band-fade')).toBe(true);
     // jsdom may omit var() backgrounds; the canonical material is source-owned.
-    expect(readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial.tsx', 'utf8')).toContain("background: 'var(--th-overview-photo-fade)'");
+    // ALL_HEROES_MATCH step 0(b): the default path still paints the token; the
+    // optional canvas prop only rebuilds the same five stops in another colour.
+    expect(readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial.tsx', 'utf8')).toContain("canvas ? photoBandFade(canvas) : 'var(--th-overview-photo-fade)'");
     expect(layers[0].style.position).toBe('absolute'); expect(layers[0].style.inset).toBe('0');
     expect(layers[1].style.zIndex).toBe('1'); expect(layers[1].contains(screen.getByText('Essex Links'))).toBe(true);
   });
