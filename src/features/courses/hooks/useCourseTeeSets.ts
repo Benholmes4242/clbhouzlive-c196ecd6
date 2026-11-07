@@ -71,17 +71,23 @@ function coerce(raw: any): TeeSet[] {
   }));
 }
 
+/** ONE fetch definition, shared by the single-course hook and the batched
+ *  PF1B feed read (usePostGolfHoleMeta) so both land on the same cache key. */
+export async function fetchCourseTeeSets(courseId: string): Promise<TeeSet[]> {
+  const { data, error } = await supabase.rpc('get_course_tee_sets', {
+    p_golf_course_id: courseId,
+  });
+  if (error) throw error;
+  return coerce(data);
+}
+
+export const COURSE_TEE_SETS_STALE = TWELVE_HOURS;
+
 export function useCourseTeeSets(courseId: string | undefined) {
   return useQuery<TeeSet[]>({
     queryKey: ['course-tee-sets', courseId],
     enabled: !!courseId,
     staleTime: TWELVE_HOURS,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_course_tee_sets', {
-        p_golf_course_id: courseId,
-      });
-      if (error) throw error;
-      return coerce(data);
-    },
+    queryFn: () => fetchCourseTeeSets(courseId as string),
   });
 }
