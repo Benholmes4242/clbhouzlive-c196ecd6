@@ -410,3 +410,10 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - 4 ClubProfileHero: 39/34 cover, PhotoBandFade, identity on photo, pills below.
 - 5 Pro HeroShell: PhotoBandFade, 20/14 padding, kicker, 26px name, no club line.
 - Tests + 4 shards + 320px checks + report.
+
+## FIX3 pro scale / search order / in-action fallback (in progress)
+- 1 Pro sections to golfer scale (pro-profile.css + inline sizes).
+- 2 Search All order: People, Clubs, Courses, Players, Videos, Posts.
+- 3 IN ACTION rail fallback = ResultTile plate/BORDER/TILE_INITIALS.
+- Tests + 4 shards + 320px checks + report.
+- Carry-over: ALL_HEROES_MATCH shards 2-4 + 320px checks still owed.
