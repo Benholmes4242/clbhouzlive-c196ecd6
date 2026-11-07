@@ -1,5 +1,47 @@
 # Feed photo grid — implemented; suite stopped
 
+## Shared verification close-out — 7 November 2026
+No photo-grid production/test changes. Only the authorised tight-chips test line changed:
+`src/test/tourOverviewPicksChipsFullBoard.test.tsx:130`
+- Old: `expect(text?.style.flex).toBe('1 1 0%');`
+- New: `expect(['1', '1 1 0%']).toContain(text?.style.flex);`
+No added/deleted/renamed tests or other assertion changes in this close-out; count delta **0**.
+
+Focused chips **116/116** across7files; focused photo-grid **50/50** across5files, with the commands already documented in the two reports. Fresh logs: `/tmp/chips-grid-closeout/chips-focused.log`, `grid-focused.log`.
+
+Each shard was run once, `bunx vitest run --maxWorkers=2 --shard=N/4`:
+| Shard | Passed | Failed | Total executed | Files |
+|---|---:|---:|---:|---:|
+| 1/4 | 1,984 | 0 | 1,984 | 167 passed |
+| 2/4 | 1,824 | 1 | 1,825 | 166 passed,1 failed |
+| 3/4 | Not run | — | — | Stopped |
+| 4/4 | Not run | — | — | Stopped |
+Combined **3,808 passed + 1 failed = 3,809 executed / 334 files**. Full-suite total remains unverified. Reconciliation: last green W1 **7,607 tests/664files**, then tight-chips **+3/+1**, then photo-grid **+22/+2**; expected current scope **7,632/667**, not a completed full-suite result.
+
+**Stop on unexpected, unauthorised failure:**
+```text
+FAIL src/test/tourHeroRefinements.test.tsx > Tour hero refinements > renders the Needs gross as a separate untruncated white figure and omits leading/level picks
+AssertionError: expected  to have a length of 1 but got +0
+src/test/tourHeroRefinements.test.tsx:98:19
+expect(lines).toHaveLength(1);
+Expected: 1; Received: 0
+```
+The unchanged test expects the removed NEEDS subtree. No repair, skip, rerun or shards3–4 after this failure. The permitted FW1 meta-line failure did not appear. Shard outputs retained in `/tmp/chips-grid-closeout/`.
+
+### Outstanding 320px checks: real feed-list composition now measured
+Actual **CardFeed** (Clubhouse) and **LightCardFeed** (business author, mediaFirst) rendered their real **FeedCard/FeedPhotoGrid** at320×844 in a temporary unsigned fixture harness, with synthetic photos and real global CSS. Only network/side-effect/secondary modules and virtual-list mounting were isolated; these are no longer bare-grid fixture labels. Complete authenticated Clubhouse/business page chrome/live reads are not claimed.
+| Actual feed fixture | Post | Grid width | Height | Gap | Cap | Feed client/scroll width |
+|---|---|---:|---:|---:|---:|---:|
+| Clubhouse CardFeed | 5 upright |320px|400px|2px|539px|320/320px|
+| Clubhouse CardFeed |12 wide|320px|287.344px|2px|539px|320/320px|
+| Business LightCardFeed |5 upright|320px|400px|2px|539px|320/320px|
+| Business LightCardFeed |12 wide|320px|287.344px|2px|539px|320/320px|
+All four: no horizontal overflow, 2px gaps, height below existing media cap. Screenshots inspected, +1/+8 overlays visible; **zero final page errors**.
+
+Overview checks in the same run: picks and movers each had three **46px** chips within x20–300; long names visibly ellipsised (picks37px vs174px content, movers36px vs174px), no horizontal overflow. Full measurements/screenshots/harness: `/tmp/browser/chips-grid-closeout/`. Temporary bundling/runtime dependencies were resolved in `/tmp` only before the successful final run. No guest access or sign-in altered. Device/fullscreen/live-data checks remain for Ben. Preview log **build OK** at `2026-11-07T19:11:10Z`.
+
+Original stopped results below are historical and superseded by the fresh results above.
+
 ## Result
 Image-only posts with at least four photos now render the signed-off four-tile grid through shared FeedCard. Upright/missing-dimension leads use the 4:5 two-column layout; square/wide leads use the clamped lead above three square tiles. Fourth tile shows the remaining count. Tile taps open the real photo index with its origin/poster; double taps use the existing like path. First-tile hole/tag overlays stay on the lead. Grid rendering ignores restored carousel slides. One–three photos, any video and words-first review fill frames retain the carousel/single-media rendering.
 
