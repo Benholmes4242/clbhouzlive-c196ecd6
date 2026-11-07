@@ -1,0 +1,32 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+const h=vi.hoisted(()=>({calls:[] as {table:string;payload:unknown}[],fail:'',rpc:vi.fn(),update:vi.fn(),upload:vi.fn()}));
+vi.mock('@/integrations/supabase/client',()=>({supabase:{rpc:h.rpc,from:(table:string)=>({upsert:async(payload:unknown)=>{h.calls.push({table,payload});return {error:table===h.fail?{message:'refused'}:null};},insert:async(payload:unknown)=>{h.calls.push({table,payload});if(table===h.fail)throw new Error('refused');return {error:null};},update:(payload:unknown)=>({eq:async()=>{h.update(payload);h.calls.push({table,payload});return {error:null};}})})}}));
+vi.mock('@/context/ActiveActorContext',()=>({useActiveActor:()=>({activeActor:{id:'me',type:'personal'}})}));
+vi.mock('@/hooks/useProfileData',()=>({useProfileData:()=>({profile:{id:'me'}})}));
+vi.mock('@/features/post-v2/lib/postUploadController',()=>({startPostUpload:h.upload}));
+vi.mock('@/features/post-v2/lib/postWith',()=>({writePostWith:async()=>[]}));
+import { writeVideoDetails } from '@/features/post-v2/lib/videoDetailsWrites';
+import { emptyVideoDetails } from '@/features/post-v2/lib/videoDetails';
+import { useStageComposer } from '@/features/post-v2/hooks/useStageComposer';
+import { usePostSubmit } from '@/features/post-v2/hooks/usePostSubmit';
+const media=[{id:'v',type:'video' as const,duration:600,previewUrl:'blob:v',frame:'original' as const}];
+const details=()=>({...emptyVideoDetails(),holeMarks:{1:20,2:40},marksRoundId:'r'});
+beforeEach(()=>{h.calls=[];h.fail='';h.rpc.mockReset().mockResolvedValue({data:{post_id:'p'},error:null});h.update.mockReset();h.upload.mockReset();});
+describe('PF3C publication',()=>{
+  it('writes score_follows and two hole marks after details',async()=>{await writeVideoDetails('p',media,{...details(),scoreFollows:false},{scoreId:'r',holes:9});expect(h.calls.map(c=>c.table)).toEqual(['post_video_details','post_video_chapters']);expect(h.calls[0].payload).toMatchObject({score_follows:false});expect(h.calls[1].payload).toEqual([{post_id:'p',hole_no:1,start_seconds:20},{post_id:'p',hole_no:2,start_seconds:40}]);});
+  it('one mark does not insert chapters',async()=>{await writeVideoDetails('p',media,{...details(),holeMarks:{1:20}},{scoreId:'r',holes:9});expect(h.calls.map(c=>c.table)).toEqual(['post_video_details']);});
+  it('no attached round does not insert chapters',async()=>{await writeVideoDetails('p',media,details(),{scoreId:null,holes:9});expect(h.calls.map(c=>c.table)).not.toContain('post_video_chapters');});
+  it('mismatched round identity does not insert chapters',async()=>{await writeVideoDetails('p',media,details(),{scoreId:'other',holes:9});expect(h.calls.map(c=>c.table)).not.toContain('post_video_chapters');});
+  it('shorts do not insert chapters',async()=>{await writeVideoDetails('p',[{type:'video',duration:60}],details(),{scoreId:'r',holes:9});expect(h.calls.map(c=>c.table)).not.toContain('post_video_chapters');});
+  it('invalid marks do not reach insertion',async()=>{await writeVideoDetails('p',media,{...details(),holeMarks:{1:9,2:598}},{scoreId:'r',holes:18});expect(h.calls.map(c=>c.table)).not.toContain('post_video_chapters');});
+  it('chapter errors warn without rejecting publication',async()=>{const warning=vi.spyOn(console,'warn').mockImplementation(()=>{});h.fail='post_video_chapters';await expect(writeVideoDetails('p',media,details(),{scoreId:'r',holes:9})).resolves.toBeUndefined();expect(warning).toHaveBeenCalledWith('[post-v2] post_video_chapters write failed:',expect.any(Error));warning.mockRestore();});
+  it('real submit writes the attached round patch before details and chapters',async()=>{const hook=renderHook(()=>usePostSubmit());await act(async()=>{await hook.result.current.submit({caption:'',media,course:null,scheduledAt:null,actorType:'personal',actorId:'me',authorName:'Me',authorAvatarUrl:null,authorUsername:null,attachedScoreId:'r',roundHoles:9,videoData:details()});});expect(h.calls.map(c=>c.table)).toEqual(['posts','post_video_details','post_video_chapters']);expect(h.calls[0].payload).toMatchObject({attached_score_id:'r'});expect(h.upload).toHaveBeenCalledOnce();});
+  it('business submission cannot persist attached-round chapters',async()=>{const hook=renderHook(()=>usePostSubmit());await act(async()=>{await hook.result.current.submit({caption:'',media,course:null,scheduledAt:null,actorType:'business',actorId:'club',authorName:'Club',authorAvatarUrl:null,authorUsername:null,attachedScoreId:'r',roundHoles:9,videoData:details()});});expect(h.calls.map(c=>c.table)).not.toContain('post_video_chapters');});
+});
+describe('PF3C composer mark lifecycle',()=>{
+  it('removing or changing attached round clears marks while preserving details',()=>{const hook=renderHook(()=>useStageComposer());act(()=>hook.result.current.hydrate({attachedScoreId:'r',videoData:{...details(),title:'Film',scoreFollows:false}}));act(()=>hook.result.current.setGolf({attachedScoreId:null}));expect(hook.result.current.state.videoData).toMatchObject({holeMarks:{},title:'Film',scoreFollows:false});act(()=>hook.result.current.hydrate({attachedScoreId:'r',videoData:details()}));act(()=>hook.result.current.setGolf({attachedScoreId:'other'}));expect(hook.result.current.state.videoData?.holeMarks).toEqual({});});
+  it('unrelated golf changes keep marks',()=>{const hook=renderHook(()=>useStageComposer());act(()=>hook.result.current.hydrate({attachedScoreId:'r',videoData:details()}));act(()=>hook.result.current.setGolf({holeNo:4}));expect(hook.result.current.state.videoData?.holeMarks).toEqual({1:20,2:40});});
+  it('primary course change clears round-bound marks',()=>{const hook=renderHook(()=>useStageComposer());act(()=>hook.result.current.hydrate({course:{id:'c',name:'Course'},attachedScoreId:'r',videoData:details()}));act(()=>hook.result.current.setCourse({id:'other',name:'Other'}));expect(hook.result.current.state.videoData?.holeMarks).toEqual({});});
+  it('matching draft restores marks and mismatched draft drops them',()=>{const hook=renderHook(()=>useStageComposer());act(()=>hook.result.current.restoreDraft({attachedScoreId:'r',videoData:details()}));expect(hook.result.current.state.videoData?.holeMarks).toEqual({1:20,2:40});act(()=>hook.result.current.restoreDraft({attachedScoreId:'other',videoData:details()}));expect(hook.result.current.state.videoData?.holeMarks).toEqual({});});
+});

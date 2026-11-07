@@ -87,9 +87,11 @@ import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,rou
 import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,effectiveHoleGuide,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
 import {loadComposerDraft} from './lib/composerDrafts';
 import { isLongFormVideo } from '@/constants/videoRules';
-import { emptyVideoDetails, singleVideo, videoDuration } from './lib/videoDetails';
+import { emptyVideoDetails, singleVideo, videoDuration, premarkHoles } from './lib/videoDetails';
 import { VideoTitleDescription, VideoCoverChapters } from './components/video/VideoComposerFields';
 import { VideoDetailsPage } from './components/video/VideoDetailsPage';
+import { MarkHolesPage } from './components/video/MarkHolesPage';
+import type { RoundVideoContext } from './components/video/RoundVideoFields';
 
 interface Props {
   onClose: () => void;
@@ -120,6 +122,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
   const isEditMode = !!editPostId;
   const [videoDetailsOpen, setVideoDetailsOpen] = useState(false);
+  const [markHolesOpen, setMarkHolesOpen] = useState(false);
   const videoComposer = singleVideo(state.media, isEditMode);
   const videoItem = videoComposer ? state.media[0] : null;
   const videoData = state.videoData ?? emptyVideoDetails();
@@ -417,6 +420,18 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const teeSets=useCourseTeeSets(state.course?.id);
   const selectedRound=golfRounds.find(r=>r.whs_score_id===(state.attachedScoreId ?? selectedRoundId)) ?? golfRounds[0] ?? null;
   const shapes=useRoundHoleShapes(state.attachedScoreId ? [state.attachedScoreId] : []);
+  const attachedRound = golfRounds.find(r => r.whs_score_id === state.attachedScoreId);
+  const premarkKeyRef = useRef('');
+  const roundVideo: RoundVideoContext | null = videoComposer && longVideo && activeActor?.type === 'personal' && state.attachedScoreId && (attachedRound?.holes_played === 9 || attachedRound?.holes_played === 18) ? { scoreId: state.attachedScoreId, holes: attachedRound.holes_played, shape: shapes?.get(state.attachedScoreId) ?? null } : null;
+  useEffect(() => {
+    if (!roundVideo || !videoItem) return;
+    const key = JSON.stringify([roundVideo.scoreId, roundVideo.holes, state.caption, videoDuration(videoItem)]);
+    if (premarkKeyRef.current === key) return;
+    premarkKeyRef.current = key;
+    const marks = premarkHoles(state.caption, videoData.holeMarks ?? {}, roundVideo.holes, videoDuration(videoItem) ?? 0);
+    if (JSON.stringify(marks) !== JSON.stringify(videoData.holeMarks ?? {})) setVideoData({ holeMarks: marks, marksRoundId: roundVideo.scoreId });
+  }, [state.caption, roundVideo?.scoreId, roundVideo?.holes, videoItem?.duration, videoItem?.trimStart, videoItem?.trimEnd, videoData.holeMarks, setVideoData]);
+  useEffect(() => { if (!roundVideo) setMarkHolesOpen(false); }, [!!roundVideo]);
   useEffect(()=>{
     if(isEditMode || draftId || prefillCourse || !profile?.id || !activeActor || memberChoseCourseRef.current) return;
     let cancelled=false;
@@ -441,7 +456,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   useEffect(()=>{
     let cancelled=false;
     if(!profile?.id || !state.course || activeActor?.type==='business'){setGolfRounds([]);return;}
-    void readComposerRounds(profile.id,state.course.id).then(rows=>{if(!cancelled){setGolfRounds(rows);setSelectedRoundId(rows[0]?.whs_score_id??null);}});
+    const attached = state.attachedScoreId;
+    void readComposerRounds(profile.id,state.course.id).then(rows=>{if(!cancelled){setGolfRounds(rows);setSelectedRoundId(rows[0]?.whs_score_id??null);if (attached && !rows.some(r => r.whs_score_id === attached)) setVideoData({ holeMarks: {}, marksRoundId: null });}});
     return()=>{cancelled=true;};
   },[profile?.id,state.course?.id,activeActor?.type]);
 
@@ -613,6 +629,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         holeNo:state.holeNo,
         postShotTags:state.postShotTags,
         attachedScoreId:isPersonalActor?state.attachedScoreId:null,
+        roundHoles: roundVideo?.holes ?? null,
         addToGuide:guideEffective,
         videoData: state.videoData,
       });
@@ -1191,7 +1208,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         />
       )}
 
-      {videoItem && <VideoCoverChapters item={videoItem} details={videoData} description={state.caption} long={longVideo} onChange={setVideoData} onFrame={ts => { updateActive({ posterTimestamp: ts }); setVideoData({ coverFrame: ts }); }} onCover={() => { setActiveIndex(0); setSheet('cover'); }} />}
+      {videoItem && <VideoCoverChapters item={videoItem} details={videoData} description={state.caption} long={longVideo} round={roundVideo} onMark={() => setMarkHolesOpen(true)} onChange={setVideoData} onFrame={ts => { updateActive({ posterTimestamp: ts }); setVideoData({ coverFrame: ts }); }} onCover={() => { setActiveIndex(0); setSheet('cover'); }} />}
       <div className="composer-golf-head" style={{margin:'22px 16px 10px'}}><span className="composer-golf-kicker">Sharing</span></div>
       <div data-testid="meta-panel" style={{ background:'var(--composer-golf-card)', border:'1px solid var(--composer-golf-line)', borderRadius:16, margin:'0 16px', overflow: 'hidden' }}>
         {metaRow(t('stage.postingAs'), <>
@@ -1302,6 +1319,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       {mediaSheet}
       {sheets}
       {videoComposer && videoDetailsOpen && <VideoDetailsPage details={videoData} description={state.caption} long={longVideo} userId={profile?.id ?? null} onChange={setVideoData} onDescription={handleSetCaption} onBack={() => setVideoDetailsOpen(false)} />}
+      {roundVideo && videoItem && markHolesOpen && <MarkHolesPage item={videoItem} round={roundVideo} marks={videoData.holeMarks ?? {}} onChange={holeMarks => setVideoData({ holeMarks, marksRoundId: roundVideo.scoreId })} onBack={() => setMarkHolesOpen(false)} />}
     </div>
   );
 }

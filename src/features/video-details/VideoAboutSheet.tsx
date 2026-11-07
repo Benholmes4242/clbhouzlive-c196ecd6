@@ -1,7 +1,7 @@
 /** PF3B: one sheet for feed and fullscreen; callers own seek/open and navigation.
  * The existing composer sheet supplies history/lifecycle; its opt-in material
  * leaves all composer defaults unchanged. This reader never fetches per post. */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -12,7 +12,11 @@ import { formatCountKilo } from '@/i18n/format';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { PostVideoDetails } from './videoDetailsModel';
 import './video-viewer.css';
-export function VideoAboutSheet({ open, post, details, chapters, likes, onClose, onTime, onNavigate }: { open: boolean; post: FeedPost; details?: PostVideoDetails | null; chapters: VideoChapter[]; likes: number; onClose: () => void; onTime: (seconds: number) => void; onNavigate: (path: string) => void }) {
+import { RoundVideoScorecard } from './RoundVideoScore';
+import type { VideoRound } from './roundVideoModel';
+export function VideoAboutSheet({ open, post, details, chapters, likes, onClose, onTime, onNavigate, round, chapter, onScorecard }: { open: boolean; post: FeedPost; details?: PostVideoDetails | null; chapters: VideoChapter[]; likes: number; onClose: () => void; onTime: (seconds: number) => void; onNavigate: (path: string) => void; round?: VideoRound | null; chapter?: VideoChapter | null; onScorecard?: () => void }) {
+  const [showAll, setShowAll] = useState(false);
+  useEffect(() => { setShowAll(false); }, [post.id, open]);
   useEffect(() => { if (!open) return; const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopImmediatePropagation(); onClose(); } }; window.addEventListener('keydown', key, true); return () => window.removeEventListener('keydown', key, true); }, [open, onClose]);
   if (!open || typeof document === 'undefined') return null;
   const go = (path: string) => { onClose(); onNavigate(path); };
@@ -32,7 +36,8 @@ export function VideoAboutSheet({ open, post, details, chapters, likes, onClose,
         if (/^\d+:\d{2}(?::\d{2})?$/.test(part)) { const n = part.split(':').map(Number); if (n.slice(1).every(v => v < 60)) { const seconds = n.reduce((s, v) => s * 60 + v, 0); return <Button key={i} variant="ghost" className="video-inline" onClick={() => seek(seconds)}>{part}</Button>; } }
         return part;
       })}</span>; })}</div>}
-      {chapters.length > 0 && section('Chapters', chapters.map(c => <Button key={c.seconds} variant="ghost" className="video-about-row video-about-chapter" onClick={() => seek(c.seconds)}><span className="video-about-time">{c.time}</span><span className="video-about-grow">{c.label}</span></Button>))}
+      {round && details?.scoreFollows !== false && onScorecard && <RoundVideoScorecard round={round} chapters={chapters} chapter={chapter} onTime={seek} onScorecard={() => { onClose(); onScorecard(); }} />}
+      {chapters.length > 0 && section('Chapters', <>{(round && !showAll ? chapters.slice(0, 4) : chapters).map(c => { const hole = c.holeNo ? round?.shape?.holes.find(h => h.holeNo === c.holeNo) : null; return <Button key={c.seconds} variant="ghost" className="video-about-row video-about-chapter" onClick={() => seek(c.seconds)}><span className="video-about-time">{c.time}</span><span className="video-about-grow">{c.label}{hole?.par != null && <span className="round-video-chapter-par"> · Par {hole.par}</span>}</span>{hole?.strokes != null && <b className="round-video-chapter-score" data-under={hole.par != null && hole.strokes < hole.par}>{hole.strokes}</b>}</Button>; })}{round && chapters.length > 4 && !showAll && <Button variant="ghost" className="round-video-show-all" onClick={() => setShowAll(true)}>Show all {chapters.length}</Button>}</>)}
       {post.courseId && post.courseName && section('Filmed at', <Button variant="ghost" className="video-about-row" onClick={() => go(`/courses/${post.courseId}`)}><SquircleAvatar size={28} src={post.courseThumbnailImage} alt="" fallback={post.courseName.charAt(0)} hairlineRing /><span className="video-about-grow"><b>{post.courseName}</b><small>{post.courseRegion || post.courseSubCountry}{(post.courseRegion || post.courseSubCountry) && ' · '}Course page ›</small></span></Button>)}
       {!!details?.credits.length && section('In this video', <div className="video-about-people">{details.credits.map(c => <Button key={c.profileId} variant="ghost" className="video-about-person" onClick={() => go(`/profile/${c.profileId}`)}><SquircleAvatar size={44} src={c.avatarUrl} alt="" fallback={c.name.charAt(0)} hairlineRing /><b>{c.name}</b><small>{CREDIT_ROLES.find(([r]) => r === c.role)?.[1]}</small></Button>)}</div>)}
       {!!details?.links.length && section('Links', details.links.map((l, i) => { const link = detectVideoLink(l.url); return link ? <a key={i} className="video-about-row video-about-link" href={link.url} target="_blank" rel="noopener noreferrer"><span className="video-about-glyph">{link.glyph}</span><span className="video-about-grow">{l.label || link.label}<small>{link.url}</small></span></a> : null; }))}

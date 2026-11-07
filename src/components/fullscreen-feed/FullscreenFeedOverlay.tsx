@@ -4,6 +4,8 @@ import { usePostGolfContext, usePostGolfHoleMeta, golfHoleFor } from '@/hooks/fe
 import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
 import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { createPortal } from 'react-dom';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -582,6 +584,8 @@ export function FullscreenFeedOverlay() {
     }, [golfContextMap]),
   );
   const activeGolfContext = activePost ? golfContextMap?.get(activePost.id) ?? null : null;
+  const videoRoundShapes = useRoundHoleShapes(useMemo(() => isOpen && !syntheticPosts && !courseGallery ? [...(golfContextMap?.values() ?? [])].map(c => c.roundScoreId) : [], [isOpen, syntheticPosts, courseGallery, golfContextMap]));
+  const videoScorecard = useScorecardOpener();
   const activeGolfHole = golfHoleFor(activeGolfContext, golfHoleMap);
   // The pill opens the SAME scorecard sheet the feed row opens, over the viewer.
   const [golfScorecard, setGolfScorecard] = useState<{ scoreId: string; userId: string | null } | null>(null);
@@ -1077,9 +1081,10 @@ export function FullscreenFeedOverlay() {
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}
                     golfContext={activeGolfContext}
+                    videoRoundShape={videoRoundShapes?.get(activeGolfContext?.roundScoreId ?? '') ?? null}
                     videoDetails={activePost ? videoDetailsMap.get(activePost.id) ?? null : null}
                     golfHole={activeGolfHole}
-                    onOpenScorecard={(scoreId) => activePost && setGolfScorecard({ scoreId, userId: activePost.userId })}
+                    onOpenScorecard={(scoreId) => { if (!activePost) return; if (videoDetailsMap.get(activePost.id)?.holeMarks && Object.keys(videoDetailsMap.get(activePost.id)?.holeMarks ?? {}).length >= 2) videoScorecard.openByScore(scoreId, null, activePost.userId); else setGolfScorecard({ scoreId, userId: activePost.userId }); }}
                   />}
 
                   <FullscreenScrubber
@@ -1259,6 +1264,7 @@ export function FullscreenFeedOverlay() {
       )}
 
       {/* PF1B: the attached round's scorecard, over the viewer. */}
+      {videoScorecard.target && <RoundDetailSheet open onClose={videoScorecard.close} scoreId={videoScorecard.target.scoreId} profileUserId={videoScorecard.target.profileUserId} />}
       {golfScorecard && (
         <RoundDetailSheet
           open
