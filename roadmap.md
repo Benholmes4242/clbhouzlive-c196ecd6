@@ -1,8 +1,14 @@
 # Roadmap
 
+## PF3B_VIEWER
+- [ ] Add page-batched signed-in non-guest details reads and shared detailed-video rules using canonical parseChapters.
+- [ ] Add one About sheet, fullscreen/feed teasers and chapter-aware scrubber; preserve plain videos and protected surfaces.
+- [ ] Add long-form creator-grid title/age and Watch details-title preference.
+- [ ] Add focused tests, run four separate --maxWorkers=2 shards, report every check and any stop.
+
 ## Country-bar test-only second repair and 320px close-out
-- [ ] Replace only the authorized jsdom colour assertion with node:fs source/token checks; preserve all other assertions and production.
-- [ ] Rerun prior focused files and four fresh separate --maxWorkers=2 shards; only FW1 meta-line may be known.
+- [x] Replace only the authorized jsdom colour assertion with node:fs source/token checks; preserve all other assertions and production.
+- [x] Focused124/124; fresh separate shards1965/1766/1918/1859 passed, total7508/657 unchanged, no failures.
 - [ ] Check all five actual-component 320px views and report each outcome plus shard totals.
 
 ## PF3A_FIX_2
