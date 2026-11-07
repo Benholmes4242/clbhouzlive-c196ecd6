@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, renderHook } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, renderHook, within } from '@testing-library/react';
+import { RAIL_CHIP_GEOMETRY } from '@/components/ui/RailChips';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route, useLocation, useNavigationType, useNavigate } from 'react-router-dom';
 import type React from 'react';
@@ -65,7 +66,32 @@ it('creator summary never reads when signed out', () => { renderHook(() => usePr
 it('chips switch the server kind and tiles open the loaded list at the tapped index', async () => {
  h.rpc.mockResolvedValue({ data: [video('a'), video('b')], error: null }); render(<ProfileVideosTab userId="owner" viewerId="viewer" summary={summary} />, { wrapper });
  fireEvent.click(await screen.findByRole('button', { name: 'Play video 2' })); expect(h.open).toHaveBeenCalledWith(expect.objectContaining({ index: 1, posts: expect.arrayContaining([expect.objectContaining({ id: 'b' })]) }));
- fireEvent.click(screen.getByRole('button', { name: 'Shorts 0' })); await waitFor(() => expect(h.rpc).toHaveBeenCalledWith('get_profile_videos', { p_user_id: 'owner', p_kind: 'short', p_limit: 30 }));
+ fireEvent.click(screen.getByRole('tab', { name: 'Shorts 0' })); await waitFor(() => expect(h.rpc).toHaveBeenCalledWith('get_profile_videos', { p_user_id: 'owner', p_kind: 'short', p_limit: 30 }));
+});
+it('creator Videos renders three counted RailChips centred with the shared sm geometry', () => {
+ render(<ProfileVideosTab userId="owner" viewerId="viewer" summary={{ is_creator: true, videos: 26, shorts: 25, long_form: 1 }} />, { wrapper });
+ const row = screen.getByRole('tablist', { name: 'Video type' });
+ const chips = within(row).getAllByRole('tab');
+ expect(chips).toHaveLength(3);
+ expect(within(row).getByRole('tab', { name: 'All 26' })).toHaveAttribute('aria-selected', 'true');
+ expect(within(row).getByRole('tab', { name: 'Shorts 25' })).toHaveAttribute('aria-selected', 'false');
+ expect(within(row).getByRole('tab', { name: 'Long form 1' })).toHaveAttribute('aria-selected', 'false');
+ expect(row.style.justifyContent).toBe('safe center');
+ for (const chip of chips) {
+  expect(chip.style.padding).toBe(RAIL_CHIP_GEOMETRY.sm.padding);
+  expect(chip.style.fontSize).toBe(`${RAIL_CHIP_GEOMETRY.sm.fontSize}px`);
+ }
+});
+it('Long form filters the creator grid and tracks the unchanged chip event', async () => {
+ h.rpc.mockImplementation((_name: string, args: { p_kind?: string }) => Promise.resolve({ data: [video(args.p_kind === 'long' ? 'long-only' : 'all-only')], error: null }));
+ render(<ProfileVideosTab userId="owner" viewerId="viewer" summary={summary} />, { wrapper });
+ await screen.findByRole('button', { name: 'Play video 1' });
+ fireEvent.click(screen.getByRole('tab', { name: 'Long form 2' }));
+ await waitFor(() => expect(h.rpc).toHaveBeenCalledWith('get_profile_videos', { p_user_id: 'owner', p_kind: 'long', p_limit: 30 }));
+ expect(h.track).toHaveBeenCalledWith('profile_videos_chip_changed', { kind: 'long' });
+ await screen.findByRole('button', { name: 'Play video 1' });
+ fireEvent.click(screen.getByRole('button', { name: 'Play video 1' }));
+ expect(h.open).toHaveBeenCalledWith(expect.objectContaining({ posts: [expect.objectContaining({ id: 'long-only' })] }));
 });
 it('round pill uses m:ss or N videos and isolates the scorecard tap', () => {
  const scorecard = vi.fn(); const rows = [{ ...video('a'), score_id: 'score' }] as RoundVideo[];

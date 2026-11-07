@@ -1,5 +1,10 @@
 # Roadmap
 
+## CR_CHIPS_1
+- [x] Replace creator video choices with shared Top 100 sm RailChips; retain wrapper gutters, counts and analytics; remove unused local chip CSS/token.
+- [ ] Run focused creator tests and four separate --maxWorkers=2 shards; stop on new failures, report each count and authorised selector old/new.
+- [ ] Report all four visual/filter checks; authenticated live profile checks unavailable with external unmanaged auth.
+
 ## FM1_FIX_1 — authorised test-only close-out
 - [x] Replace the unused raw stylesheet import with readFileSync inside the meta-padding test; both assertions and product code unchanged.
 - [x] Focused34/34; four separate --maxWorkers=2 shards passed1,898/1,828/1,882/1,798 =7,406/645 with zero failures; known Tour/sponsor failures did not recur. Inventory unchanged from7,405 pass+1 known failure.
