@@ -33,26 +33,26 @@ function MountedDetails({ initial = emptyVideoDetails() }: { initial?: VideoDeta
 }
 
 async function addDetail(kind: typeof detailCases[number]['kind'], addLabel: string) {
-  fireEvent.click(screen.getByRole('button', { name: addLabel, exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: addLabel }));
   if (kind === 'credits') {
     fireEvent.change(screen.getByRole('textbox', { name: 'Search people' }), { target: { value: 'Added' } });
-    fireEvent.click(await screen.findByRole('button', { name: 'Added Person', exact: true }));
-    fireEvent.click(screen.getByRole('button', { name: 'Guest', exact: true }));
-    fireEvent.click(screen.getByRole('button', { name: 'ADD CREDIT', exact: true }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Added Person' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guest' }));
+    fireEvent.click(screen.getByRole('button', { name: 'ADD CREDIT' }));
   } else if (kind === 'thanks') {
     fireEvent.change(screen.getByRole('textbox', { name: 'Search businesses' }), { target: { value: 'Added' } });
-    fireEvent.click(await screen.findByRole('button', { name: 'Added Club', exact: true }));
-    fireEvent.click(screen.getByRole('button', { name: 'ADD', exact: true }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Added Club' }));
+    fireEvent.click(screen.getByRole('button', { name: 'ADD' }));
   } else {
-    fireEvent.change(screen.getByRole('textbox', { name: kind === 'links' ? 'Link address' : 'Gear', exact: true }), { target: { value: kind === 'links' ? 'https://example.com/added' : 'Added Gear' } });
-    fireEvent.click(screen.getByRole('button', { name: kind === 'links' ? 'ADD LINK' : 'ADD GEAR', exact: true }));
+    fireEvent.change(screen.getByRole('textbox', { name: kind === 'links' ? 'Link address' : 'Gear' }), { target: { value: kind === 'links' ? 'https://example.com/added' : 'Added Gear' } });
+    fireEvent.click(screen.getByRole('button', { name: kind === 'links' ? 'ADD LINK' : 'ADD GEAR' }));
   }
 }
 
 describe('PF3A mounted Details transitions', () => {
   it.each(detailCases)('$kind chip becomes filled with a count after adding and outlined after removing', async ({ kind, chip, add, removed }) => {
     render(<MountedDetails />);
-    const chips = screen.getByRole('dialog', { name: 'Video Details', exact: true }).querySelector('.vc-chips');
+    const chips = screen.getByRole('dialog', { name: 'Video Details' }).querySelector('.vc-chips');
     expect(chips).not.toBeNull();
     if (!chips) throw new Error('Details chips missing');
     const chipButton = within(chips as HTMLElement).getByRole('button', { name: new RegExp(`^${chip}`) });
@@ -61,7 +61,7 @@ describe('PF3A mounted Details transitions', () => {
     await addDetail(kind, add);
     expect(chipButton).toHaveAttribute('data-filled', 'true');
     expect(chipButton).toHaveTextContent(`${chip} · 1`);
-    fireEvent.click(screen.getByRole('button', { name: `Remove ${removed}`, exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: `Remove ${removed}` }));
     expect(chipButton).toHaveAttribute('data-filled', 'false');
     expect(chipButton.textContent).toBe(kind === 'credits' || kind === 'links' ? `${chip} · 0` : chip);
   });
@@ -75,12 +75,12 @@ describe('PF3A mounted Details transitions', () => {
       gear: kind === 'gear' ? Array.from({ length: 9 }, (_, i) => `Seed Gear ${i}`) : [],
     };
     render(<MountedDetails initial={initial} />);
-    expect(screen.getByRole('button', { name: add, exact: true })).toBeEnabled();
+    expect(screen.getByRole('button', { name: add })).toBeEnabled();
     await addDetail(kind, add);
-    expect(screen.queryByRole('button', { name: add, exact: true })).toBeNull();
-    expect(screen.getByRole('button', { name: `${chip} · ${limit}`, exact: true })).toHaveAttribute('data-filled', 'true');
-    fireEvent.click(screen.getByRole('button', { name: `Remove ${removed}`, exact: true }));
-    expect(screen.getByRole('button', { name: add, exact: true })).toBeEnabled();
-    expect(screen.getByRole('button', { name: `${chip} · ${limit - 1}`, exact: true })).toHaveAttribute('data-filled', 'true');
+    expect(screen.queryByRole('button', { name: add })).toBeNull();
+    expect(screen.getByRole('button', { name: `${chip} · ${limit}` })).toHaveAttribute('data-filled', 'true');
+    fireEvent.click(screen.getByRole('button', { name: `Remove ${removed}` }));
+    expect(screen.getByRole('button', { name: add })).toBeEnabled();
+    expect(screen.getByRole('button', { name: `${chip} · ${limit - 1}` })).toHaveAttribute('data-filled', 'true');
   });
 });

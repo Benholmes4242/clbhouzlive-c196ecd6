@@ -59,15 +59,15 @@ describe('PF3A mounted composer media transitions', () => {
     expect(primary()).toHaveTextContent('PUBLISH VIDEO');
     fireEvent.change(screen.getByRole('textbox', { name: 'Video title' }), { target: { value: 'Retained film title' } });
     fireEvent.click(screen.getByRole('button', { name: /^Description/ }));
-    fireEvent.click(screen.getByRole('button', { name: '+ Add gear', exact: true }));
-    fireEvent.change(screen.getByRole('textbox', { name: 'Gear', exact: true }), { target: { value: 'Retained driver' } });
-    fireEvent.click(screen.getByRole('button', { name: 'ADD GEAR', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add gear' }));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Gear' }), { target: { value: 'Retained driver' } });
+    fireEvent.click(screen.getByRole('button', { name: 'ADD GEAR' }));
     fireEvent.click(screen.getByRole('button', { name: 'Back to composer' }));
 
     const picker = view.container.querySelector('input[type="file"][hidden]');
     expect(picker).not.toBeNull();
     if (!picker) throw new Error('Composer file picker missing');
-    fireEvent.click(screen.getByRole('button', { name: 'Add', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
     await act(async () => { fireEvent.change(picker, { target: { files: [new File(['photo'], 'added.jpg', { type: 'image/jpeg' })] } }); });
     await screen.findByText('New post', { exact: true });
     expect(screen.queryByRole('textbox', { name: 'Video title' })).toBeNull();
@@ -75,9 +75,9 @@ describe('PF3A mounted composer media transitions', () => {
     expect(primary()).toBeEnabled();
     // Translation mocks intentionally return ''; assert the mode and real
     // button, not invented translations or modified production defaults.
-    fireEvent.click(screen.getByRole('button', { name: 'Photo 2', exact: true }));
-    const mediaSheet = screen.getByRole('dialog', { name: '', exact: true });
-    const removeButtons = within(mediaSheet).getAllByRole('button', { name: 'Remove', exact: true });
+    fireEvent.click(screen.getByRole('button', { name: 'Photo 2' }));
+    const mediaSheet = screen.getByRole('dialog', { name: '' });
+    const removeButtons = within(mediaSheet).getAllByRole('button', { name: 'Remove' });
     const removePhoto = removeButtons[1];
     expect(removePhoto).toBeDefined();
     if (!removePhoto) throw new Error('Added photo removal missing');
@@ -87,9 +87,9 @@ describe('PF3A mounted composer media transitions', () => {
     expect(screen.getByRole('textbox', { name: 'Video title' })).toHaveValue('Retained film title');
     expect(screen.getByRole('button', { name: /^Description/ })).toHaveTextContent('Original description');
     fireEvent.click(screen.getByRole('button', { name: /^Description/ }));
-    const details = screen.getByRole('dialog', { name: 'Video Details', exact: true });
+    const details = screen.getByRole('dialog', { name: 'Video Details' });
     expect(within(details).getByText('Retained driver', { exact: true })).toBeInTheDocument();
-    expect(within(details).getByRole('button', { name: 'Gear in this video · 1', exact: true })).toHaveAttribute('data-filled', 'true');
+    expect(within(details).getByRole('button', { name: 'Gear in this video · 1' })).toHaveAttribute('data-filled', 'true');
     client.clear();
   });
 });
