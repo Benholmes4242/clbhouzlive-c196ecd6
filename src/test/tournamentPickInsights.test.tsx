@@ -138,7 +138,7 @@ describe('tournament picks surfaces',()=>{
   record.won=1;record.top10=1;const onRecord=vi.fn();const bands=mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={()=>{}}/>);
   await waitFor(()=>expect(document.querySelector('[data-followed-picks]')?.textContent).toContain('1 of your circle has picked.'));
   bands.unmount();
-  const block=mount(<PicksBlock picks={[]} tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onOpenYourPick={()=>{}} onOpenRecord={onRecord} onOpenPick={()=>{}} boardByPlayer={new Map()} teeByPlayer={null} championPlayerId={null} championPlayerIds={[]} intro={null} neededByPlayer={null} toReachScore={null} leaderTotal={null}/>);
+  const block=mount(<PicksBlock picks={[]} tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onOpenYourPick={()=>{}} onOpenRecord={onRecord} onOpenPick={()=>{}} boardByPlayer={new Map()} teeByPlayer={null} championPlayerId={null} championPlayerIds={[]} intro={null}/>);
   await waitFor(()=>expect(document.querySelector('[data-our-record-door]')).not.toBeNull());
   const door=document.querySelector('[data-our-record-door]');expect(door?.textContent).toContain('1 win · 1 top 10');if(door)fireEvent.click(door);expect(onRecord).toHaveBeenCalledOnce();
   record={...record,picks:0};client.setQueryData(['tourhub','our-pick-record','pga',2026],record);
