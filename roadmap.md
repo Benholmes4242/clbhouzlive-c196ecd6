@@ -2,7 +2,8 @@
 
 ## Upcoming LAST YEAR condensed board
 - [x] Match upcoming rows/header to the live hero geometry; MiniBoard changes are exports only.
-- [ ] Add coverage, run focused and four separate shards, verify 320px fit and report assertion changes/counts.
+- [x] Add seven cases and update four authorized existing geometry assertions; record files/old-new values in TOUR_UPCOMING_LAST_YEAR_REPORT.md.
+- [ ] STOP: focused 20 passed/3 failed; upcomingLastYearBoard.test.tsx:38/50 DOM casing and :81 GOLD_DARK assertions require test-only authorization. Four shards and 320px browser check not run; expected inventory 7,447/652 from baseline 7,440/651.
 
 ## PF2_GUIDE — posting rebuild stage 2
 - [x] Composer: effectiveHoleGuide rule, mock A copy without "once it's approved", mock B locked-off switch + VisibilitySheet row tap, business actor hides row, golfPostPatch writes effective boolean both ways, state.addToGuide untouched on audience change, drafts unchanged. Edit mode writes no golf fields today — left alone and reported.
