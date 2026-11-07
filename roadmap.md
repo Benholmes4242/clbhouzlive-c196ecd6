@@ -1,5 +1,12 @@
 # Roadmap
 
+## PF1_STAGE1
+- [x] Composer course/hole/shot-tag controls, play-date/claim/GPS prefill, personal attached round and source-linked guide/draft wiring implemented; protected server/feed areas untouched.
+- [x] Focused70/70; four separate shards1918/1816/1884/1819 =7437/648, zero failures; +29 cases/3 files, existing tests unchanged. Latest preview build OK.
+- [x] PF1_STAGE1_REPORT.md records all five checks, remote-media reuse/crop re-upload,320px fixture screenshots and preserved mock differences.
+- [ ] Hosted personal/club post save/readback, app-restart draft, delete cascade and complete320px composer/Preview actor checks: external unmanaged authentication prevents verification.
+- [ ] Durable deferred guide completion after app termination remains outside permitted client-only work; no server changes authorized.
+
 ## Creator video filter centring follow-up
 - [x] Confirm exact shared Top 100 sm treatment; add intrinsic-width/auto-margin centring independent of safe-centre support, preserving counts and filtering.
 - [x] Existing creator13/13 green, no test changes; inventory unchanged7,408/645 (full shards not rerun). Actual-component320/390 fixture centred even with flex-start; build OK. CR_CHIPS_1_REPORT.md records screenshot/source discrepancy and external-auth limitation.

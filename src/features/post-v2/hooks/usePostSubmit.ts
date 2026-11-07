@@ -20,6 +20,8 @@ import type { StageMediaItem, StageCourse } from './useStageComposer';
 import type { ShotTagJob } from '../lib/shotTagWrites';
 import type { PostVisibility } from '../lib/golfPostRules';
 import { writePostWith } from '../lib/postWith';
+import {golfPostPatch,type PostShotTag} from '../lib/composerGolfRules';
+import type {HoleGuideContext} from '../lib/postHoleGuide';
 
 export interface SubmitInput {
   caption: string;
@@ -43,6 +45,10 @@ export interface SubmitInput {
   bestHour?: number | null;
   /** Per-photo course tags, carried with the upload job. */
   shotTags?: ShotTagJob;
+  holeNo?: number | null;
+  postShotTags?: PostShotTag[];
+  attachedScoreId?: string | null;
+  holeGuide?: HoleGuideContext;
 }
 
 export type SubmitResultKind = 'published' | 'scheduled' | 'uploading';
@@ -166,8 +172,7 @@ export function usePostSubmit() {
       const taggedIds = (input.courses && input.courses.length > 0)
         ? input.courses.map((c) => c.id)
         : (input.course ? [input.course.id] : []);
-      const postPatch: Record<string, unknown> = {};
-      if (taggedIds.length > 0) postPatch.tagged_course_ids = taggedIds;
+      const postPatch = golfPostPatch({...input,attachedScoreId:input.actorType==='personal'?input.attachedScoreId:null});
       if (Object.keys(postPatch).length > 0) {
         const { error: tagErr } = await supabase
           .from('posts')
@@ -240,6 +245,7 @@ export function usePostSubmit() {
           isScheduled: !!input.scheduledAt,
           scheduledAt: input.scheduledAt?.toISOString(),
           shotTags: input.shotTags,
+          holeGuide: input.holeGuide,
         },
         input.media,
       );

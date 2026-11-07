@@ -36,6 +36,17 @@
 }
 
 :root {
+  --composer-golf-card: #141418;
+  --composer-golf-line: rgba(255,255,255,.08);
+  --composer-golf-edge: rgba(255,255,255,.14);
+  --composer-golf-selected-edge: rgba(255,255,255,.28);
+  --composer-golf-green: #34D77F;
+  --composer-golf-under: #E2574C;
+  --composer-golf-body: rgba(248,250,252,.78);
+  --composer-golf-toggle: rgba(255,255,255,.16);
+  --composer-golf-par: rgba(255,255,255,.55);
+  --composer-golf-bogey: rgba(255,255,255,.22);
+  --composer-golf-worse: rgba(255,255,255,.12);
   --pro-profile-ink: var(--tour-menu-ink);
   --pro-profile-on-ink: var(--tour-menu-on-ink);
   --pro-profile-mute: var(--tour-menu-mute);

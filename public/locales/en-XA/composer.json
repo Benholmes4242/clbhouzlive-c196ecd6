@@ -24,13 +24,13 @@
   "timeLeftMinutes": "[~~{{m}}ɱ {{s}}š ļéƒţ~~]"
  },
  "drafts": {
-  "footerNote": "[~~Đřáƒţš ǩééƥ ýőúř ŵőřđš, ţáĝš áñđ šéţţíñĝš. Ƥĥőţőš áñđ ṽíđéő ářé ñőţ šáṽéđ.~~]"
+  "footerNote": "Drafts keep your photos, video, words, course, hole, tags and attached round."
  },
  "closeGuard": {
-  "saveDraftKeepsNothingElse": "[~~Šáṽé đřáƒţ · ŵőřđš áñđ ţáĝš őñļý~~]",
-  "saveDraftLosesMedia": "[~~Ƥĥőţőš áñđ ṽíđéő ŵíļļ ñőţ ƀé ǩéƥţ~~]",
-  "saveDraftLosesSchedule": "[~~Ţĥé šĉĥéđúļéđ ţíɱé ŵíļļ ñőţ ƀé ǩéƥţ~~]",
-  "saveDraftLosesBoth": "[~~Ƥĥőţőš, ṽíđéő áñđ ţĥé šĉĥéđúļéđ ţíɱé ŵíļļ ñőţ ƀé ǩéƥţ~~]"
+  "title": "Save as a draft?",
+  "body": "Pick it up later from Drafts, exactly as you left it.",
+  "saveDraft": "Save draft",
+  "saveDraftLosesSchedule": "[~~Ţĥé šĉĥéđúļéđ ţíɱé ŵíļļ ñőţ ƀé ǩéƥţ~~]"
  },
  "stage": {
   "mediaSheet": {

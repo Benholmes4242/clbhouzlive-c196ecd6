@@ -8,6 +8,7 @@
 import { useCallback, useState } from 'react';
 import { toast } from '@/lib/toast';
 import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
+import type { PostShotTag } from '../lib/composerGolfRules';
 
 // Probe a video File's duration (seconds). Resolves 0 if unreadable.
 function probeVideoDuration(file: File): Promise<number> {
@@ -53,6 +54,9 @@ export interface StageMediaItem {
    *  extraction is attempted — a remote video cannot be drawn to a canvas
    *  without tainting it. */
   posterUrl?: string | null;
+  /** PF1 draft source: reuse storage, never pretend it is existing post media. */
+  remoteUrl?: string;
+  filterId?: string | null;
 }
 
 export interface StageCourse {
@@ -80,6 +84,10 @@ export interface StageState {
   course: StageCourse | null;
   scheduledAt: Date | null;
   dirty: boolean;
+  holeNo: number | null;
+  postShotTags: PostShotTag[];
+  attachedScoreId: string | null;
+  addToGuide: boolean;
 
 }
 
@@ -91,6 +99,10 @@ const emptyState: StageState = {
   course: null,
   scheduledAt: null,
   dirty: false,
+  holeNo: null,
+  postShotTags: [],
+  attachedScoreId: null,
+  addToGuide: true,
 
 };
 
@@ -189,6 +201,8 @@ export function useStageComposer() {
       ...s,
       courses,
       course: courses[0] ?? null,
+      holeNo: s.course?.id===c?.id ? s.holeNo : null,
+      attachedScoreId: s.course?.id===c?.id ? s.attachedScoreId : null,
       dirty: true,
     }));
   }, []);
@@ -197,11 +211,14 @@ export function useStageComposer() {
       ...s,
       courses: cs,
       course: cs[0] ?? null,
+      holeNo: s.course?.id===cs[0]?.id ? s.holeNo : null,
+      attachedScoreId: s.course?.id===cs[0]?.id ? s.attachedScoreId : null,
       dirty: true,
     }));
   }, []);
 
   const setScheduledAt = useCallback((d: Date | null) => markDirty({ scheduledAt: d }), []);
+  const setGolf = useCallback((patch:Pick<Partial<StageState>,'holeNo'|'postShotTags'|'attachedScoreId'|'addToGuide'>) => markDirty(patch),[]);
 
   const restoreDraft = useCallback((patch: Partial<StageState>) => {
     setState(s => {
@@ -238,6 +255,7 @@ export function useStageComposer() {
     setCaption,
     setCourse,
     setCourses,
+    setGolf,
 
     setScheduledAt,
     restoreDraft,

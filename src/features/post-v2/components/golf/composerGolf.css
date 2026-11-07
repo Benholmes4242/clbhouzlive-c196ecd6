@@ -1,0 +1,48 @@
+.composer-golf{margin:22px 16px 0;color:var(--pf-ink);min-width:0}
+.composer-golf-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.composer-golf-kicker{font-size:10.5px;font-weight:800;color:var(--pf-dim);text-transform:uppercase;letter-spacing:.18em}
+.composer-golf-source{font-size:11.5px;font-weight:700;color:var(--composer-golf-green)}
+.composer-golf-box{border:1px solid var(--composer-golf-line);background:var(--composer-golf-card);border-radius:16px;overflow:hidden;min-width:0}
+.composer-golf-box[data-on=true]{border-color:var(--composer-golf-selected-edge)}
+.composer-golf-course{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.composer-golf-photo{width:36px;height:36px;border-radius:34%;overflow:hidden;flex:none;background:var(--pf-tile);display:grid;place-items:center;color:var(--pf-dim)}
+.composer-golf-photo img{width:100%;height:100%;object-fit:cover}
+.composer-golf-name{min-width:0;flex:1;font-size:15px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.composer-golf-name small{display:block;font-size:12px;font-weight:400;color:var(--pf-mute);margin-top:3px}
+.composer-golf .composer-golf-action{height:auto;padding:0;background:none;color:var(--pf-mute);font-size:13px;font-weight:700;flex:none;white-space:normal}
+.composer-golf-part{border-top:1px solid var(--composer-golf-line);padding:12px 14px}
+.composer-golf-part:first-child{border-top:0}
+.composer-golf-label{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:700}
+.composer-golf-label small{font-size:12px;font-weight:400;color:var(--pf-dim)}
+.composer-golf-tags,.composer-golf-holes{display:flex;gap:6px;margin-top:8px}
+.composer-golf-tags{flex-wrap:wrap}
+.composer-golf-holes{overflow-x:auto;scrollbar-width:none;will-change:transform}
+.composer-golf .composer-golf-chip{height:30px;min-width:38px;padding:0 11px;border-radius:999px;border:1px solid var(--composer-golf-edge);background:none;color:var(--pf-mute);font-size:12.5px;font-weight:650;flex:none}
+.composer-golf .composer-golf-chip[aria-pressed=true]{background:var(--pf-ink);border-color:var(--pf-ink);color:var(--pf-canvas)}
+.composer-golf-detail{margin-top:10px;font-size:13px;color:var(--composer-golf-body)}
+.composer-golf-detail b{color:var(--pf-ink)}
+.composer-golf-att{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.composer-golf-att>div{min-width:0;flex:1}
+.composer-golf-att b{font-size:14.5px;line-height:1.3;overflow-wrap:anywhere}
+.composer-golf-att p{font-size:12.5px;color:var(--pf-mute);line-height:1.35;margin:2px 0 0;overflow-wrap:anywhere}
+.composer-golf .composer-golf-switch{width:46px;height:28px;border:0;border-radius:999px;padding:3px;background:var(--composer-golf-toggle);flex:none}
+.composer-golf-switch i{display:block;width:22px;height:22px;border-radius:999px;background:var(--pf-ink)}
+.composer-golf .composer-golf-switch[aria-checked=true]{background:var(--composer-golf-green)}
+.composer-golf-switch[aria-checked=true] i{transform:translateX(18px)}
+.composer-golf-round-strip{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:3px;margin:0 14px 12px}
+.composer-golf-round-strip i{display:block;height:6px;border-radius:3px;background:var(--composer-golf-worse)}
+.composer-golf-round-strip [data-tone=under] i{background:var(--composer-golf-under)}
+.composer-golf-round-strip [data-tone=par] i{background:var(--composer-golf-par)}
+.composer-golf-round-strip [data-tone=bogey] i{background:var(--composer-golf-bogey)}
+.composer-golf-round-strip span{display:block;text-align:center;font-size:9px;font-weight:700;color:var(--pf-dim);margin-top:3px}
+.composer-golf-round-strip [data-selected=true] i{outline:1.5px solid var(--pf-ink);outline-offset:1px}
+.composer-golf-round-strip [data-selected=true] span{color:var(--pf-ink)}
+.composer-golf .composer-golf-search{width:100%;height:50px;border-radius:14px;border:1px solid var(--composer-golf-edge);justify-content:flex-start;background:none;color:var(--pf-dim);font-size:15px;gap:10px}
+.composer-golf .composer-golf-suggestion{display:flex;gap:12px;width:100%;height:auto;text-align:left;justify-content:flex-start;white-space:normal;padding:10px 0;background:none;color:var(--pf-ink)}
+.composer-golf-suggestion span{min-width:0;overflow-wrap:anywhere}
+.composer-golf-suggestion small{display:block;font-size:11.5px;color:var(--pf-dim);font-weight:400}
+.composer-draft-keeps{border:1px solid var(--composer-golf-line);border-radius:14px;padding:4px 14px}
+.composer-draft-keeps>div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:13.5px;border-top:1px solid var(--composer-golf-line)}
+.composer-draft-keeps>div:first-child{border-top:0}
+.composer-draft-keeps span{color:var(--pf-mute)}
+.composer-draft-keeps b{text-align:right;overflow-wrap:anywhere;min-width:0}

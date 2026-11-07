@@ -24,13 +24,13 @@
   "timeLeftMinutes": "{{m}}m {{s}}s left"
  },
  "drafts": {
-  "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
+  "footerNote": "Drafts keep your photos, video, words, course, hole, tags and attached round."
  },
  "closeGuard": {
-  "saveDraftKeepsNothingElse": "Save draft · words and tags only",
-  "saveDraftLosesMedia": "Photos and video will not be kept",
-  "saveDraftLosesSchedule": "The scheduled time will not be kept",
-  "saveDraftLosesBoth": "Photos, video and the scheduled time will not be kept"
+  "title": "Save as a draft?",
+  "body": "Pick it up later from Drafts, exactly as you left it.",
+  "saveDraft": "Save draft",
+  "saveDraftLosesSchedule": "The scheduled time will not be kept"
  },
  "stage": {
   "mediaSheet": {
