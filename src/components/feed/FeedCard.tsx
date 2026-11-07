@@ -385,8 +385,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [videoAboutOpen, setVideoAboutOpen] = useState(false);
-  const videoChapters = useMemo(() => chaptersForPost(post), [post]);
-  const detailedVideo = isDetailedVideo(post, videoDetails);
+  const videoChapters = useMemo(() => chaptersForPost(post, videoDetails, golfContext), [post, videoDetails, golfContext]);
+  const detailedVideo = isDetailedVideo(post, videoDetails, golfContext);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
@@ -964,7 +964,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     >
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={post} details={videoDetails} chapters={videoChapters} likes={likeCount} onClose={() => setVideoAboutOpen(false)} onNavigate={path => navigate(path)} onTime={seconds => openWithOrigin({ posts: [post], index: 0, originEl: null, posterUrl: post.mediaItems[0]?.thumbnailUrl ?? null, openedFrom: 'clubhouse', resumeAtSeconds: seconds })} />}
+      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={post} details={videoDetails} chapters={videoChapters} round={golfContext?.roundScoreId && videoChapters.some(c => c.holeNo != null) ? { context: golfContext, shape: golfRoundShape ?? null } : null} onScorecard={onGolfRoundTap && golfContext?.roundScoreId ? () => onGolfRoundTap(post, golfContext.roundScoreId ?? '') : undefined} likes={likeCount} onClose={() => setVideoAboutOpen(false)} onNavigate={path => navigate(path)} onTime={seconds => openWithOrigin({ posts: [post], index: 0, originEl: null, posterUrl: post.mediaItems[0]?.thumbnailUrl ?? null, openedFrom: 'clubhouse', resumeAtSeconds: seconds })} />}
 
 
       {/* Header */}

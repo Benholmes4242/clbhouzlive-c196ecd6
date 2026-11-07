@@ -87,6 +87,9 @@ import { VideoTeaser } from '@/features/video-details/VideoTeaser';
 import { VideoAboutSheet } from '@/features/video-details/VideoAboutSheet';
 import { useVideoChapter } from '@/features/video-details/useVideoChapter';
 import { ownerMatches } from './scrubberMath';
+import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { RoundVideoChip } from '@/features/video-details/RoundVideoScore';
+import { roundChapterLabel } from '@/features/video-details/roundVideoModel';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
@@ -323,6 +326,7 @@ interface Props {
   feedEnded?: boolean;
   /** PF1B: the active post's golf context (batched by the overlay). */
   golfContext?: PostGolfContext | null;
+  videoRoundShape?: HoleShape | null;
   /** PF1B: par/yards for the context's hole. */
   golfHole?: TeeHole | null;
   /** PF1B: opens the attached round's scorecard sheet over the viewer. */
@@ -354,6 +358,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   golfHole = null,
   onOpenScorecard,
   videoDetails,
+  videoRoundShape,
 }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -404,8 +409,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   const activePost = posts[activeIndex] ?? null;
   const [videoAboutOpen, setVideoAboutOpen] = useState(false);
-  const videoChapters = React.useMemo(() => chaptersForPost(activePost), [activePost]);
-  const detailedVideo = !syntheticPosts && isDetailedVideo(activePost, videoDetails);
+  const videoChapters = React.useMemo(() => chaptersForPost(activePost, videoDetails, golfContext), [activePost, videoDetails, golfContext]);
+  const detailedVideo = !syntheticPosts && isDetailedVideo(activePost, videoDetails, golfContext);
+  const videoRound = golfContext?.roundScoreId && videoChapters.some(c => c.holeNo != null) ? { context: golfContext, shape: videoRoundShape ?? null } : null;
   const chapter = useVideoChapter(detailedVideo ? activePost?.id ?? null : null, soundLaneId, videoChapters);
   useEffect(() => { setVideoAboutOpen(false); }, [activePost?.id]);
   // K.1: the member's position is saved on pause, close and a throttled interval.
@@ -579,7 +585,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
+      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} round={videoRound} chapter={chapter} onScorecard={onOpenScorecard && videoRound ? () => onOpenScorecard(videoRound.context.roundScoreId ?? '') : undefined} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
       {!syntheticPosts && <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />}
       <div style={{ ...fadeWhileScrubbing, pointerEvents: 'none' }}>
         <FullscreenTopProgress activePost={activePost} />
@@ -632,6 +638,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             caption block, FIRST slide only. Absolute against this fixed
             container so it tracks the bar's real height. */}
         <FullscreenHoleChipSlot context={golfContext} hole={golfHole} activeSlide={activeSlide} />
+        <RoundVideoChip round={videoRound} chapter={chapter} follows={videoDetails?.scoreFollows !== false} />
 
         {/* Course header — left edge is 70px = chevron left (14) + chevron (44)
             + row gap (12). The header FOLLOWS the chevron: change the chevron's
@@ -842,7 +849,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           {/* Caption — measured 3-line cut + one inline CTA. Non-review posts
               with an empty caption render nothing; reviews always mount so the
               empty-text "Full review" fallback can reach the sheet. */}
-          {detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
+          {detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} chapterLabel={videoRound && chapter ? roundChapterLabel(chapter, videoRound.shape) : undefined} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
             <CaptionBlock
               caption={activePost.caption ?? ''}
               resetKey={activeIndex}
