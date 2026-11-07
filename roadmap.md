@@ -1,5 +1,10 @@
 # Roadmap
 
+## PF3A_FIX_2
+- [ ] Make only people/business result avatars decorative without changing their appearance; replace the two approved result selectors only.
+- [ ] Run PF3A focused scope and four fresh separate --maxWorkers=2 shards; continue only for profileCoursesRecord:76 and tourIsland:235, stop for any other failure.
+- [ ] Update PF3A_VIDEO_REPORT.md with delivery summary, case ledger, final totals and named pre-existing failures.
+
 ## FIX_VERIFY routing and three-build verification
 - [x] Add video_credit only to push post-mention branch; unchanged parity85/85 plus three new route rules3/3 pass. process-push-queue deployed successfully; source SHA in FIX_VERIFY_REPORT.md.
 - [x] Repair exactly authorized country-bar style and28px avatar assertions; presentation35passed/1failed, combined123passed/1failed. Report old/new lines and +3/+1 expected7508/657 inventory.
