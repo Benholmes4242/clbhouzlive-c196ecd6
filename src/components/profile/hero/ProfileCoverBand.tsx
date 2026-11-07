@@ -10,9 +10,10 @@ import '@/features/creator/profile-creator.css';
 import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
-import { COVER_TOP_GUARD, W_55 } from './HeroShell';
+import { W_55 } from './HeroShell';
 import { PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
-import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
+import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
+import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
 /** Control skin over the band (EDIT pill and the overflow dots). */
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
@@ -142,87 +143,90 @@ export const ProfileCoverBand: React.FC<Props> = ({
             onError={() => setBroken(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
           />
-          <div style={{ position: 'absolute', inset: 0, background: HERO_CANON_WASH }} />
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 60, background: COVER_TOP_GUARD }} />
+          <PhotoBandFade />
         </div>
       )}
 
       <div
         style={{
           position: 'absolute',
-          left: 16,
-          right: 16,
+          left: 20,
+          right: 20,
           bottom: 14,
           zIndex: 1,
-          display: 'flex',
-          alignItems: 'flex-end',
-          gap: 12,
         }}
       >
-        <button
-          type="button"
-          onClick={onAvatarTap}
-          disabled={!onAvatarTap}
-          aria-label={displayName}
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 19,
-            flexShrink: 0,
-            overflow: 'hidden',
-            border: `1px solid ${BAND_AVATAR_BORDER}`,
-            padding: 0,
-            background: 'transparent',
-            lineHeight: 0,
-            cursor: onAvatarTap ? 'pointer' : 'default',
-          }}
-        >
-          {avatar}
-        </button>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className={isPro ? 'pro-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
-          <h1
-            ref={nameRef}
-            style={{
-              margin: 0,
-              fontSize: 21,
-              textShadow: '0 1px 10px rgba(0,0,0,0.55)',
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.15,
-              color: '#FFFFFF',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {displayName}
-          </h1>
-          {isPro && <ProLabel size="large" />}
-          {isCreator && <span className="profile-creator-label">Creator</span>}
-          </div>
+        {/* Row 1: the home club as the amber kicker, controls on the right.
+            With no club the controls sit alone on the right. */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
           {subline ? (
-            <div style={{ marginTop: 3, fontSize: 12.5, fontWeight: 600, color: '#FFFFFF', textShadow: '0 1px 8px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {subline}
-            </div>
+            <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{subline}</span>
           ) : onAddHomeClub ? (
             <button
               type="button"
               onClick={onAddHomeClub}
-              style={{ display: 'block', marginTop: 3, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 12.5, fontWeight: 600, color: W_55, textShadow: '0 1px 8px rgba(0,0,0,0.5)', textAlign: 'left' }}
+              style={{ ...MASTHEAD_KICKER, minWidth: 0, color: W_55, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, textAlign: 'left' }}
             >
               {addHomeClubLabel}
             </button>
-          ) : null}
-          {afterSubline}
+          ) : (
+            <span />
+          )}
+          {action && (
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7 }}>
+              {action}
+            </div>
+          )}
         </div>
 
-        {action && (
-          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, paddingBottom: 3 }}>
-            {action}
+        {/* Row 2: the 56px avatar beside the name. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+          <button
+            type="button"
+            onClick={onAvatarTap}
+            disabled={!onAvatarTap}
+            aria-label={displayName}
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 19,
+              flexShrink: 0,
+              overflow: 'hidden',
+              border: `1px solid ${BAND_AVATAR_BORDER}`,
+              padding: 0,
+              background: 'transparent',
+              lineHeight: 0,
+              cursor: onAvatarTap ? 'pointer' : 'default',
+            }}
+          >
+            {avatar}
+          </button>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className={isPro ? 'pro-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
+            <h1
+              ref={nameRef}
+              style={{
+                margin: 0,
+                fontSize: 26,
+                fontWeight: 800,
+                letterSpacing: 0,
+                lineHeight: 1.1,
+                color: '#FFFFFF',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                overflow: 'hidden',
+              }}
+            >
+              {displayName}
+            </h1>
+            {isPro && <ProLabel size="large" />}
+            {isCreator && <span className="profile-creator-label">Creator</span>}
+            </div>
+            {afterSubline}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
