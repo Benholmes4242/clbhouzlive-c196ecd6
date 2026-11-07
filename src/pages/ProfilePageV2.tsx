@@ -438,11 +438,19 @@ const ProfilePageV2Content: React.FC = () => {
     profile?.id,
     isPersonal && !isSelf,
   );
-  const showRoundsTab = isPersonal && (isSelf || (visibleRoundCount ?? 0) > 0);
+  // ROUNDS is handicap rounds; a verified tour pro has no handicap, so the
+  // tab never shows on his profile, own view included.
+  const isTourPro = proMember?.pro_kind === 'tour_pro';
+  const showRoundsTab = isPersonal && !isTourPro && (isSelf || (visibleRoundCount ?? 0) > 0);
+  // An unlinked tour pro's Tour tab exists only when he has recorded results;
+  // this read is gated so ordinary members never pay for it.
+  const unlinkedTourPro = isTourPro && !proMember?.pro_player_id;
+  const proEvents = useProEvents(unlinkedTourPro ? proMember?.user_id ?? '' : '');
+  const proHasResults = unlinkedTourPro && proEvents.isSuccess && !proEvents.isError && (proEvents.data ?? []).some(e => e.finish != null);
   // HANDICAP IS SELF-ONLY (Aug 7 ruling: a member's handicap is private to
   // them). Own profile shows four tabs, anyone else's three. It sits LAST so
   // another member's profile loses a tab off the end, not from the middle.
-  const proTabs = profileProTabs(proMember, isSelf, !!viewedWhsConnection);
+  const proTabs = profileProTabs(proMember, isSelf, !!viewedWhsConnection, proHasResults);
   const showTourTab = isPersonal && proTabs.tour;
   const showHandicapTab = isPersonal && proTabs.handicap;
   const tabs = useMemo(() => {
