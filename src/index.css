@@ -36,6 +36,14 @@
 }
 
 :root {
+  --video-about-sheet: #17171B;
+  --video-about-ink: #F8FAFC;
+  --video-about-body: rgba(248,250,252,.78);
+  --video-about-mute: rgba(248,250,252,.62);
+  --video-about-dim: rgba(248,250,252,.42);
+  --video-about-line: rgba(255,255,255,.08);
+  --video-about-edge: rgba(255,255,255,.14);
+  --video-about-grab: rgba(255,255,255,.25);
   --pro-season-outline: rgba(255,255,255,0.12);
   --tour-mover-name: #FFFFFF;
   --course-country-bar: rgba(248,250,252,0.55);
