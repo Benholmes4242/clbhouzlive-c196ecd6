@@ -49,7 +49,9 @@ import { courseActivityClubName } from '@/features/courses/_shared/courseLabel';
 import { FeedActorPicker } from './FeedActorPicker';
 import Pressable from '@/components/ui/Pressable';
 import { HeartBurst } from './HeartBurst';
-import { createTapHandler } from './mediaTap';
+import { SingleMediaTapButton } from './SingleMediaTapButton';
+import { feedPhotoGridLayout } from './feedPhotoGrid';
+import { FeedPhotoGrid } from './FeedPhotoGrid';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import type { ActiveActor } from '@/types/actor';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -378,7 +380,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       : s.carouselPositions;
     return map.get(feedIndex) ?? 0;
   });
-  const initialMediaIndex = initialMediaIndexProp ?? storedSlide;
+  const photoGrid = feedPhotoGridLayout(post.mediaItems ?? []);
+  const initialMediaIndex = photoGrid && !(post.isReview && layout !== 'mediaFirst') ? 0 : initialMediaIndexProp ?? storedSlide;
   /* The hole chip follows the VISIBLE slide. */
   const [visibleSlide, setVisibleSlide] = useState(initialMediaIndex ?? 0);
   
@@ -453,6 +456,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   );
   const items = post.mediaItems ?? [];
   const isMulti = items.length > 1;
+  const imageGridActive = !!photoGrid && !(post.isReview && layout !== 'mediaFirst');
   const media = items[0];
 
   const ratio = useMemo(() => clampFeedMediaRatio(media), [media]);
@@ -489,16 +493,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // shell is already in the DOM and visually settled by then).
   useEffect(() => {
     if (!isFirstCard) return;
-    if (isMulti || !media) {
+    if ((isMulti && !imageGridActive) || !media) {
       const raf = requestAnimationFrame(() => fireContentReady());
       return () => cancelAnimationFrame(raf);
     }
-  }, [isFirstCard, isMulti, media, fireContentReady]);
+  }, [isFirstCard, isMulti, imageGridActive, media, fireContentReady]);
 
   // Image decode path for first card.
   useEffect(() => {
     if (!isFirstCard) return;
-    if (isMulti || !media) return;
+    if ((isMulti && !imageGridActive) || !media) return;
     if (media.type === 'video') {
       // Video card: if we DON'T mount the player (mountVideo=false), the
       // visible content is the thumbnail <img>, so decode that. If we DO
@@ -533,7 +537,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       img.removeEventListener('load', onLoad);
       img.removeEventListener('error', onError);
     };
-  }, [isFirstCard, isMulti, media, fireContentReady]);
+  }, [isFirstCard, isMulti, imageGridActive, media, fireContentReady]);
   const { t } = useTranslation('common');
   const { t: tCourses } = useTranslation('courses');
 
@@ -564,14 +568,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 {/* Media. A round post never reaches here: it returns the round card
           above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
-        <SlideTagChip tag={slideTags && items[isMulti ? visibleSlide : 0] ? slideTags.get(holeMediaKey(items[isMulti ? visibleSlide : 0])) : null} />
+        {!(photoGrid && !fill) && <SlideTagChip tag={slideTags && items[isMulti ? visibleSlide : 0] ? slideTags.get(holeMediaKey(items[isMulti ? visibleSlide : 0])) : null} />}
         {/* PF1B hole chip: FIRST slide only, top-left 10px inset. The existing
             SlideTagChip sits bottom-left, so there is no top-left overlay to
             collide with. Round posts never reach here (round card above). */}
-        {golfContext?.holeNo != null && (!isMulti || visibleSlide === 0) && (
+        {!(photoGrid && !fill) && golfContext?.holeNo != null && (!isMulti || visibleSlide === 0) && (
           <HoleChip holeNo={golfContext.holeNo} hole={golfHole} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }} />
         )}
-        {isMulti ? (
+        {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} overlays={<><SlideTagChip tag={slideTags && items[0] ? slideTags.get(holeMediaKey(items[0])) : null} />{golfContext?.holeNo != null && <HoleChip holeNo={golfContext.holeNo} hole={golfHole} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }} />}</>} /> : isMulti ? (
           <MediaCarousel
             items={items}
             isCardActive={isActive}
@@ -1167,43 +1171,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
       })();
   }
-};
-
-const SingleMediaTapButton: React.FC<{
-  onSingle: () => void;
-  onDouble: () => void;
-  innerRef: React.RefObject<HTMLButtonElement>;
-  postId: string;
-  /** Review card: fill the frame's height instead of taking the media's ratio. */
-  fill?: boolean;
-  children: React.ReactNode;
-}> = ({ onSingle, onDouble, innerRef, postId, fill = false, children }) => {
-  const handleTap = React.useMemo(
-    () => createTapHandler({
-      onSingle: () => onSingle(),
-      onDouble: () => onDouble(),
-    }),
-    [onSingle, onDouble],
-  );
-  return (
-    <button
-      type="button"
-      ref={innerRef}
-      data-post-id={postId}
-      onClick={handleTap}
-      style={{
-        display: 'block',
-        width: '100%',
-        ...(fill ? { height: '100%' } : {}),
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        cursor: 'pointer',
-      }}
-    >
-      {children}
-    </button>
-  );
 };
 
 export const FooterButton: React.FC<{

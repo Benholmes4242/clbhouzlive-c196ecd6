@@ -1,5 +1,10 @@
 # Roadmap
 
+## FEED_PHOTO_GRID
+- [x] Add pure four-photo eligibility and shared grid rendering/taps/loading; preserve video/small sets/words-first frames.
+- [x] Add22cases (14helper/8mounted); focused50/50. Shard1:1983passed/1failed; stop at tourOverviewPicksChipsFullBoard.test.tsx:130:30 expected '1 1 0%' received '1'. No assertion repair; shards2–4 blocked by authorization.
+- [x] Isolated actual grid320×844: upright5 height400/wide12 height287.344, width320, gap2, cap539, index2taps and no page errors. FEED_PHOTO_GRID_REPORT.md records limits/counts; live Clubhouse/business shells and fullscreen remain unverified.
+
 ## OVERVIEW_TIGHT_CHIPS
 - [x] Tighten picks/movers to 46px two-line chips; remove chip NEEDS and gross/brackets only; shorten English intros and preserve PicksSheet.
 - [x] Update authorized obsolete assertions and two direct-mount prop sets; add3cases. Focused115passed/1failed across7files.
