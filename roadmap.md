@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_VERIFY routing and three-build verification
+- [ ] Add video_credit only to the push post-mention branch; test its destination without changing parity tests; deploy process-push-queue.
+- [ ] Repair only authorized country-bar style and 28px avatar assertions; focused four pro tiles files, then four separate shards. Only FW1 meta-line is allowed-known; stop otherwise.
+- [ ] Verify five requested 320px surfaces without overflow; report deploy, assertion old/new lines, shard totals and check limitations.
+
 ## PF3A_VIDEO mounted-test close-out
 - [x] Add nine mounted cases: real composer/real-hook photo add/remove restoration passes; links/gear chip and limit transitions pass. Existing assertions/cases and production untouched.
 - [x] Focused88 passed/4 failed across8files; PF3A_VIDEO_REPORT.md lists exact errors, +9/+1 expected7505/656 inventory and names three upcomingLastYearBoard cases/tourIsland:235 as pre-existing.

@@ -208,7 +208,7 @@ export function routeForNotif(input: NotifRouteInput): string {
     }
   }
 
-  if (type === 'mention_post' || type === 'tag' || type === 'comment_mention') {
+  if (type === 'mention_post' || type === 'video_credit' || type === 'tag' || type === 'comment_mention') {
     const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     if (pid) return `/post/${pid}`;
   }

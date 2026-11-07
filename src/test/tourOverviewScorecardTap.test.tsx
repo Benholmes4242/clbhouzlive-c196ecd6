@@ -51,7 +51,7 @@ describe('movement card to-par colour', () => {
     const cards = view.container.querySelectorAll<HTMLElement>('[data-overview-movement-card]');
     for (const card of cards) {
       expect(card.style.background).toBe('transparent'); expect(card.style.borderRadius).toBe('12px'); expect(card.style.padding).toBe('7px');
-      expect((card.firstElementChild as HTMLElement).style.width).toBe('28px');
+      expect(card.querySelector('[style*="width: 28px"]')).not.toBeNull();
       expect(card.querySelector<HTMLElement>('[data-movement-places]')?.style.color).toBe('rgb(248, 250, 252)');
     }
     expect(view.container.querySelector<HTMLElement>('[data-movement-dir="up"]')?.style.color).toBe('rgb(52, 215, 127)');
