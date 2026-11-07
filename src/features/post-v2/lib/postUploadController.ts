@@ -46,7 +46,6 @@ import { trackError } from '@/lib/errorTracking';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 import { writeShotTagAfterUpload, type ShotTagJob, type SavedHoleTag } from './shotTagWrites';
-import {publishHoleGuide,watchDeferredHoleGuide,type HoleGuideContext} from './postHoleGuide';
 
 export interface UploadJobContext {
   jobId: string;
@@ -67,7 +66,6 @@ export interface UploadJobContext {
   /** Per-photo course tags, written when each item's upload completes
    *  (see shotTagWrites.ts). Rides the job so it survives the composer. */
   shotTags?: ShotTagJob;
-  holeGuide?: HoleGuideContext;
 }
 
 export type UploadJobPhase = 'running' | 'complete' | 'failed';
@@ -397,7 +395,10 @@ async function runJob(job: InternalJob): Promise<void> {
     }
   }
 
-  if(ctx.holeGuide && !ctx.skipFinalize) {await publishHoleGuide(ctx.holeGuide,ctx.postId);void watchDeferredHoleGuide(ctx.holeGuide,ctx.postId);}
+  /* PF1B: the hole guide is server-side now (posts.add_to_hole_guide). The
+     client never writes hole-guide media rows — the database adds every ready
+     photo, and every video once it has a poster, including after the app
+     closes. */
 
   uploadEventBus.emit('upload:complete', {
     type: 'upload:complete',

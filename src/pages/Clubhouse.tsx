@@ -70,6 +70,7 @@ import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostC
 import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { usePostGolfContext, usePostGolfHoleMeta } from '@/hooks/feed/usePostGolfContext';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
 import { useViewerStanding, type StandingRow } from '@/features/explore-magazine/useViewerStanding';
 import { useViewerCourseBests } from '@/features/explore-magazine/useViewerCourseBests';
@@ -265,6 +266,30 @@ const ClubhouseContent = () => {
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundShapeMap = useRoundHoleShapes(feedScoreIds);
   const roundMedals = useBatchRoundMedals(feedScoreIds);
+  /* PF1B — the page's golf context (hole chip + attached round), ONE batched
+     rpc per page, passed down like the round chain above. Round posts are the
+     round already: once the score-id map settles their ids never reach the
+     RPC. Hole par/yards come from the same tee-set source the composer uses,
+     one read per DISTINCT course; strip shapes are the shared batched read. */
+  const golfPostIds = useMemo(
+    () => (postScoreIdMap.settled ? feedPostIds.filter((id) => !postScoreIdMap.has(id)) : []),
+    [feedPostIds, postScoreIdMap],
+  );
+  const golfContextMap = usePostGolfContext(golfPostIds);
+  const golfCourseIds = useMemo(() => {
+    if (!golfContextMap) return [];
+    const seen = new Set<string>();
+    for (const ctx of golfContextMap.values()) if (ctx.courseId) seen.add(ctx.courseId);
+    return [...seen];
+  }, [golfContextMap]);
+  const golfHoleMap = usePostGolfHoleMeta(golfCourseIds);
+  const golfScoreIds = useMemo(() => {
+    if (!golfContextMap) return [];
+    const seen = new Set<string>();
+    for (const ctx of golfContextMap.values()) if (ctx.roundScoreId) seen.add(ctx.roundScoreId);
+    return [...seen];
+  }, [golfContextMap]);
+  const golfShapeMap = useRoundHoleShapes(golfScoreIds);
   /* PHASE 2 — THE CONSEQUENCE SOURCES, assembled exactly as
      useExploreStreamClient does, ONE read each per page, never per card.
      Standing is the one-argument get_viewer_standing — the same read the
@@ -662,6 +687,10 @@ const ClubhouseContent = () => {
               weekPickScoreId={weekPickScoreId}
               featuredDecisions={featuredDecisions.current}
               onRoundTap={(post, round) => setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })}
+              golfContextMap={golfContextMap}
+              golfHoleMap={golfHoleMap}
+              golfShapeMap={golfShapeMap}
+              onGolfRoundTap={(post, scoreId) => setRoundSheet({ scoreId, userId: post.userId })}
               topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}

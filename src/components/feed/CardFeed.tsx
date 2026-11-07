@@ -47,6 +47,8 @@ import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import { golfHoleFor, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
+import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
@@ -215,6 +217,14 @@ export interface CardFeedProps {
   postRoundsSettled?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
+  /** PF1B: batched golf context keyed by post id (usePostGolfContext). */
+  golfContextMap?: Map<string, PostGolfContext> | null;
+  /** PF1B: tee-set holes keyed by course id (one read per distinct course). */
+  golfHoleMap?: Map<string, TeeHole[]> | null;
+  /** PF1B: hole shapes keyed by the ATTACHED round's score id. */
+  golfShapeMap?: Map<string, HoleShape> | null;
+  /** PF1B: opens the attached round's scorecard sheet. */
+  onGolfRoundTap?: (post: FeedPost, scoreId: string) => void;
   /** Batched hole shapes keyed by whs_score_id; null = not resolved yet. */
   roundShapeMap?: Map<string, HoleShape> | null;
   /** Batched medal counts keyed by whs_score_id (resolved queries only). */
@@ -277,6 +287,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   postScoreIdMap,
   postRoundsSettled = true,
   onRoundTap,
+  golfContextMap,
+  golfHoleMap,
+  golfShapeMap,
+  onGolfRoundTap,
   roundShapeMap,
   roundMedalMap,
   consequenceSources = null,
@@ -989,6 +1003,16 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                   return !!sid && !postRoundMap?.get(sid);
                 })()}
                 onRoundTap={onRoundTap}
+                golfContext={golfContextMap?.get(post.id) ?? null}
+                golfHole={(() => {
+                  const ctx = golfContextMap?.get(post.id);
+                  return ctx ? golfHoleFor(ctx, golfHoleMap) : null;
+                })()}
+                golfRoundShape={(() => {
+                  const sid = golfContextMap?.get(post.id)?.roundScoreId;
+                  return sid ? golfShapeMap?.get(sid) ?? null : null;
+                })()}
+                onGolfRoundTap={onGolfRoundTap}
                 roundShape={(() => {
                   const sid = postScoreIdMap?.get(post.id) ?? null;
                   if (!sid || roundShapeMap == null) return undefined;
@@ -1049,6 +1073,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       postScoreIdMap,
       postRoundsSettled,
       onRoundTap,
+      golfContextMap,
+      golfHoleMap,
+      golfShapeMap,
+      onGolfRoundTap,
       roundShapeMap,
       roundMedalMap,
       consequenceSources,

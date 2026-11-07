@@ -75,6 +75,9 @@ import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 import { PostWithLine, RemoveMeMenu, SlideTagChip } from './PostGolfTags';
 import type { SlideTag } from '@/features/post-v2/lib/golfPostRules';
 import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
+import { HoleChip, FeedRoundRow } from './PostGolfContext';
+import { golfRoundToPar, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
+import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
 
 /** Home's content inset (the header's 12px). The round photo bleeds by it. */
 const ROUND_CARD_INSET = 12;
@@ -193,6 +196,15 @@ export interface FeedCardProps {
   playedWith?: ReadonlyArray<{ userId: string; name: string; avatarUrl?: string | null }>;
   /** Per-slide course tags keyed by holeMediaKey(mediaItem), batched by the host. */
   slideTags?: ReadonlyMap<string, SlideTag>;
+  /** PF1B: batched golf context for this post (usePostGolfContext, page level).
+   *  Absent/null renders the card exactly as before. */
+  golfContext?: PostGolfContext | null;
+  /** Par/yards for the context's hole (page-level tee-set read). */
+  golfHole?: TeeHole | null;
+  /** Hole detail for the attached round's strip; null hides the strip. */
+  golfRoundShape?: HoleShape | null;
+  /** Opens the attached round's scorecard sheet — never the fullscreen viewer. */
+  onGolfRoundTap?: (post: FeedPost, scoreId: string) => void;
 }
 
 interface CaptionBlockProps {
@@ -326,6 +338,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   layout = 'standard',
   playedWith,
   slideTags,
+  golfContext,
+  golfHole,
+  golfRoundShape,
+  onGolfRoundTap,
 }) => {
   // GUEST §5: every like, comment (footer glyph, preview row and the
   // "Add a comment…" row), share and follow door on the card passes through
@@ -540,6 +556,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
         <SlideTagChip tag={slideTags && items[isMulti ? visibleSlide : 0] ? slideTags.get(holeMediaKey(items[isMulti ? visibleSlide : 0])) : null} />
+        {/* PF1B hole chip: FIRST slide only, top-left 10px inset. The existing
+            SlideTagChip sits bottom-left, so there is no top-left overlay to
+            collide with. Round posts never reach here (round card above). */}
+        {golfContext?.holeNo != null && (!isMulti || visibleSlide === 0) && (
+          <HoleChip holeNo={golfContext.holeNo} hole={golfHole} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }} />
+        )}
         {isMulti ? (
           <MediaCarousel
             items={items}
@@ -637,6 +659,19 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </div>
     </>
   );
+  /* PF1B round row (mock A): between the media and the action row. The whole
+     row is the scorecard door — it must not open the fullscreen viewer. */
+  const golfRoundRow = golfContext?.roundScoreId ? (
+    <FeedRoundRow
+      gross={golfContext.roundGross}
+      toPar={golfRoundToPar(golfContext)}
+      shape={golfRoundShape ?? null}
+      roundHoles={golfContext.roundHoles}
+      activeHole={golfContext.holeNo ?? null}
+      onOpen={() => onGolfRoundTap?.(post, golfContext.roundScoreId as string)}
+    />
+  ) : null;
+
   /* THE FOOTER (section A). ONE always-present object, last on every card.
      `compact` is the review card's tightened rows (action row 40, liked-by 26). */
   const renderFooter = (gutter: number, compact: boolean, mediaFirstSlots?: { caption: React.ReactNode; addComment: React.ReactNode; likedByRound?: { subjectId: string; isOwnRound: boolean; subject: SubjectContext | null } }) => (() => {
@@ -1024,6 +1059,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         return (
           <>
             {hasMedia ? <div data-feed-section="media">{renderMedia(false)}</div> : caption}
+            {golfRoundRow}
             {renderCourseBand()}
             <div data-feed-section="footer">{renderFooter(FOOTER_GUTTER, false, { caption: hasMedia ? caption : null, addComment })}</div>
           </>
@@ -1047,6 +1083,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
       {renderMedia(false)}
 
+      {golfRoundRow}
 
       {/* Course band: identity + figures. The actions row is NO LONGER passed
           in — section A moved it into one always-present footer below, so a

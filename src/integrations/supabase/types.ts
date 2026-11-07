@@ -9848,6 +9848,7 @@ export type Database = {
           achievement_id: string | null
           actor_id: string
           actor_type: string
+          add_to_hole_guide: boolean
           attached_score_id: string | null
           audio_mode: string | null
           auto_hidden: boolean
@@ -9888,6 +9889,7 @@ export type Database = {
           achievement_id?: string | null
           actor_id: string
           actor_type?: string
+          add_to_hole_guide?: boolean
           attached_score_id?: string | null
           audio_mode?: string | null
           auto_hidden?: boolean
@@ -9928,6 +9930,7 @@ export type Database = {
           achievement_id?: string | null
           actor_id?: string
           actor_type?: string
+          add_to_hole_guide?: boolean
           attached_score_id?: string | null
           audio_mode?: string | null
           auto_hidden?: boolean
@@ -25073,6 +25076,20 @@ export type Database = {
           your_rounds: number
         }[]
       }
+      get_post_golf_context: {
+        Args: { p_post_ids: string[] }
+        Returns: {
+          course_id: string
+          hole_no: number
+          post_id: string
+          round_gross: number
+          round_holes: number
+          round_par: number
+          round_play_date: string
+          round_score_id: string
+          shot_tags: string[]
+        }[]
+      }
       get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
       get_pro_answers: {
         Args: { p_limit?: number; p_offset?: number; p_pro_id: string }
@@ -28933,6 +28950,10 @@ export type Database = {
         }[]
       }
       sweep_orphaned_processing_posts: { Args: never; Returns: Json }
+      sync_hole_guide_for_post: {
+        Args: { p_post_id: string }
+        Returns: undefined
+      }
       sync_user_email: {
         Args: { current_email: string; user_id_param: string }
         Returns: undefined
