@@ -1,5 +1,10 @@
 # Roadmap
 
+## PF1B_FEED verification-only close-out
+- [x] Run shard 4 as its own `bunx vitest run --maxWorkers=2 --shard=4/4` command: 1,821 tests / 162 files passed, zero failures; no product or test edits.
+- [x] Expand PF1B_FEED_REPORT.md: historical PF1B 1,919/1,831/1,909/1,804=7,463; latest carried Pro-era 1,920/1,783/1,885 plus fresh 1,821=7,409/647; −54 named test delta, historical file-count discrepancy, exact four deleted guide assertions and all six phone checks documented. No failures appeared.
+- [ ] Ben's phone: authenticated feed/fullscreen/no-context checks, video guide completion after app closure, scheduled publication timing, and 320px fit; external unmanaged authentication prevents hosted verification here.
+
 ## PF1_STAGE1
 - [x] Composer course/hole/shot-tag controls, play-date/claim/GPS prefill, personal attached round and source-linked guide/draft wiring implemented; protected server/feed areas untouched.
 - [x] Focused70/70; four separate shards1918/1816/1884/1819 =7437/648, zero failures; +29 cases/3 files, existing tests unchanged. Latest preview build OK.
