@@ -1,5 +1,9 @@
 # Roadmap
 
+## PF3A_VIDEO mounted-test close-out
+- [ ] Add mounted composer video→photo/mixed→video restoration, four Details chip add/remove/count cases and four add-row limit cases; no production edits.
+- [ ] Run fresh focused coverage then four separate --maxWorkers=2 shards; only the three upcomingLastYearBoard cases and tourIsland:235 are pre-existing for this close-out. Stop on every other failure; update PF3A_VIDEO_REPORT.md with exact totals and inventory.
+
 ## Pro tiles, legacy chart and movers
 - [x] Implement season-only outlines/open rows, centred legacy dim null tiles, neutral tally bars/plot-only key and pick-style direction-only movers; buildOK.
 - [x] Add5tests, update only two authorized assertions in MergedAiry; focused34passed/2failed. Report files/counts/errors in PRO_TILES_LEGACY_MOVERS_REPORT.md.
