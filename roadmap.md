@@ -1,5 +1,10 @@
 # Roadmap
 
+## PF2_GUIDE — posting rebuild stage 2
+- [ ] Composer hole-guide row: effective guide = member switch AND media AND personal actor AND visibility anyone; mock A copy without "once it's approved"; mock B off-at-0.4 disabled switch + VisibilitySheet row tap; business actor hides row; golfPostPatch writes effective boolean (true or false) when course+hole set; keep state.addToGuide untouched on audience change; drafts unchanged.
+- [ ] Hole viewer "View post ›" pill: MemberShotRow.source_post_id via holeShotItems for get_hole_media + get_latest_hole_media; glass pill left 72px at caption bottom (24px+safe, 48px+safe video), caption lifts 46px only when present; tap closes viewer and navigates /post/:id with closeTo; never advances slide; no client re-sort of server order.
+- [ ] Tests per brief; four shards --maxWorkers=2; known tourIsland.test.tsx:235 only; report checks 1–5; no SQL/migrations/edge changes.
+
 ## PRO_SELF_RUN verification-only close-out
 - [x] Run shard 4 separately with `--maxWorkers=2`: 1,821 tests / 162 files passed; no failure, including no known Featured meta-line failure.
 - [x] Write PRO_SELF_RUN_REPORT.md: shards 1,920/1,783/1,885/1,821 = 7,409/647 green; only shard 4 rerun here. Seven retired source files and one deleted 48-case sponsor suite named; all eight modified test files have exact old/new diffs, deleted assertions and reasons. Net −54 reconciled; known Featured failure did not occur; direct coverage and phone limits reported.
