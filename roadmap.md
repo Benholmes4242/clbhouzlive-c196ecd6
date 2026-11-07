@@ -1,5 +1,10 @@
 # Roadmap
 
+## FM1_FIX_1 — authorised test-only close-out
+- [x] Replace the unused raw stylesheet import with readFileSync inside the meta-padding test; both assertions and product code unchanged.
+- [ ] Run focused34/34, then four separate full-suite shard commands with --maxWorkers=2; stop on any new failure and report named known failures.
+- [ ] Update FM1_MUTE_1_REPORT.md with reconciled totals and close if green.
+
 ## Sponsor sheet export fixes
 - [x] Implement sheet-only measured result truncation, printed PRO/rank alignment and Career filtering; preserve profile Career.
 - [ ] STOP: final focused43 pass/2 new raw-CSS rule lookup failures at proClubhouseSponsor.test.tsx:273:18 and286:17; tests left untouched. Shard1=1,892 pass; final shard2=1,822 pass/3 fail (2 unexpected + known FM1). Shards3–4 blocked. Expected7,398/645, +6 named cases; PRO_SPONSOR_EXPORT_FIX_REPORT.md preserves exact errors/counts.
