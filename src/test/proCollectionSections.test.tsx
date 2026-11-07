@@ -129,10 +129,45 @@ describe('pro collections — visitor and own views', () => {
     fill(); const { container } = mount(false);
     await waitFor(() => expect(container.querySelectorAll('button.pro-bag-row').length).toBe(1));
     expect(container.querySelectorAll('div.pro-bag-row').length).toBe(1);
-    expect(container.querySelectorAll('button.pro-partner-tile').length).toBe(1);
-    expect(container.querySelectorAll('.pro-partner-unlinked').length).toBe(1);
+    expect(container.querySelectorAll('button.pro-partner-tile').length).toBe(2);
+    expect(container.querySelectorAll('.pro-partner-unlinked').length).toBe(2);
     fireEvent.click(container.querySelector('button.pro-bag-row')!);
     expect(screen.getByTestId('where').textContent).toBe('/business/biz-live');
+  });
+  it('an unlinked partner with a website opens it externally; without one it is not tappable', async () => {
+    fill(); const { container } = mount(false);
+    await waitFor(() => expect(container.querySelector('[data-pro-partners]')).not.toBeNull());
+    const ridgeback = screen.getByText('RIDGEBACK').closest('button');
+    expect(ridgeback).not.toBeNull();
+    fireEvent.click(ridgeback!);
+    expect(h.openExternal).toHaveBeenCalledWith('https://ridgebackgolf.co.uk', 'external');
+    expect(screen.getByText('KENT AUTOS').closest('button')).toBeNull();
+  });
+  it('the edit list shows the website dim under the name', async () => {
+    fill(); const { container } = mount(true);
+    await waitFor(() => expect(container.querySelector('[data-pro-partners] .pro-collection-edit')).not.toBeNull());
+    fireEvent.click(container.querySelector('[data-pro-partners] .pro-collection-edit')!);
+    const site = await screen.findByText('https://ridgebackgolf.co.uk');
+    expect(site.className).toContain('pro-partner-website');
+  });
+  it('Add by name adds the scheme and saves the website with the name', async () => {
+    empty(); mount(true);
+    await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
+    expect((screen.getByLabelText('WEBSITE (OPTIONAL)') as HTMLInputElement).placeholder).toBe('e.g. kentautos.co.uk');
+    fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
+    fireEvent.change(screen.getByLabelText('WEBSITE (OPTIONAL)'), { target: { value: ' kentautos.co.uk ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add by name' }));
+    await waitFor(() => expect(h.writes.length).toBe(1));
+    expect(h.writes[0].payload).toMatchObject({ name: 'Kent Autos', business_id: null, website: 'https://kentautos.co.uk' });
+  });
+  it('an invalid website toasts and does not save', async () => {
+    empty(); mount(true);
+    await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
+    fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
+    fireEvent.change(screen.getByLabelText('WEBSITE (OPTIONAL)'), { target: { value: 'http://' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add by name' }));
+    await waitFor(() => expect(h.toastError).toHaveBeenCalledWith('Check the website.'));
+    expect(h.writes.length).toBe(0);
   });
   it('partner logo uses the 34% squircle with a 1px traced hairline', async () => {
     fill(); const { container } = mount(false);
