@@ -231,11 +231,11 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         </div>
       </div>
 
-      <div style={{ position: 'relative', padding: '0 20px' }}>
+      <div style={{ position: 'relative' }}>
         <div
           data-club-actions={team ? 'team' : 'visitor'}
           className="scrollbar-hide"
-          style={{ display: 'flex', gap: 8, padding: '14px 0 0', margin: '0 -20px', paddingLeft: 20, paddingRight: 20, overflowX: 'auto', flexWrap: 'nowrap', scrollbarWidth: 'none' }}
+          style={{ display: 'flex', gap: 8, padding: '14px 20px 0', overflowX: 'auto', flexWrap: 'nowrap', scrollbarWidth: 'none' }}
         >
           {team ? (
             <>
