@@ -1,5 +1,10 @@
 # Roadmap
 
+## Country-bar test-only second repair and 320px close-out
+- [ ] Replace only the authorized jsdom colour assertion with node:fs source/token checks; preserve all other assertions and production.
+- [ ] Rerun prior focused files and four fresh separate --maxWorkers=2 shards; only FW1 meta-line may be known.
+- [ ] Check all five actual-component 320px views and report each outcome plus shard totals.
+
 ## PF3A_FIX_2
 - [x] Make only people/business result avatars decorative without changing their appearance; replace the two approved result selectors only.
 - [x] Focused92/92; four fresh separate --maxWorkers=2 shards1965/1766/1917/1859 passed, only permitted profileCoursesRecord:76 failed; tourIsland14/14 passed. Full7507passed+1pre-existing=7508/657, no new failure.

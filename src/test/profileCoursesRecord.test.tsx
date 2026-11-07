@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -73,7 +74,11 @@ describe('profile courses record', () => {
     expect(screen.queryByText('Everything else')).toBeNull();
     expect(screen.getByTestId('map-unmapped').textContent).toBe('10 not yet mapped');
     const fill = view.container.querySelector<HTMLElement>('[data-testid="country-row"] > span:nth-child(2) > span');
-    expect(fill?.getAttribute('style')).toContain('var(--course-country-bar)');
+    const src = readFileSync(process.cwd() + '/src/components/profile/courses/CoursesMapSection.tsx', 'utf8');
+    expect(src).toContain("background: 'var(--course-country-bar)'");
+    expect(src).not.toMatch(/background: A\.AMBER, opacity: 0\.75/);
+    const css = readFileSync(process.cwd() + '/src/index.css', 'utf8');
+    expect(css).toMatch(/--course-country-bar:\s*rgba\(248,\s*250,\s*252,\s*0\.55\)/);
     expect(fill?.style.opacity).toBe('');
   });
   it('hero renders the played figure and the country count', () => {
