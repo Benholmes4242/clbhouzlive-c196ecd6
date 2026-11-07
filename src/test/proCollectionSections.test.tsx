@@ -9,11 +9,13 @@ const h = vi.hoisted(() => ({
   writeError: null as null | { message: string },
   guest: null as unknown,
   toastError: vi.fn(),
+  openExternal: vi.fn(),
 }));
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('sonner', () => ({ toast: { error: h.toastError, success: vi.fn() } }));
 vi.mock('@/features/guest/guestGateStore', () => ({ getGuestUser: () => h.guest }));
+vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: h.openExternal }));
 vi.mock('@/hooks/useDebouncedValue', () => ({ useDebouncedValue: (v: unknown) => v }));
 vi.mock('@/integrations/supabase/client', () => {
   const from = (table: string) => {
@@ -49,8 +51,9 @@ const bag = [
   { ...base, id: 'b2', slot: 'putter', brand: 'Gone', model: null, detail: null, business_id: 'biz-dead' },
 ];
 const partners = [
-  { ...base, id: 'p1', name: 'Titleist', business_id: 'biz-live' },
-  { ...base, id: 'p2', name: 'Kent Autos', business_id: null },
+  { ...base, id: 'p1', name: 'Titleist', business_id: 'biz-live', website: null },
+  { ...base, id: 'p2', name: 'Kent Autos', business_id: null, website: null },
+  { ...base, id: 'p3', name: 'Ridgeback', business_id: null, website: 'https://ridgebackgolf.co.uk' },
 ];
 const moments = [{ ...base, id: 'm1', year: 2020, text: 'Turned pro', is_win: false }];
 
@@ -65,7 +68,7 @@ function mount(owner: boolean) {
 const fill = () => { h.tables = { pro_bag_items: bag, pro_partners: partners, pro_career_moments: moments, business_accounts: [LIVE] }; };
 const empty = () => { h.tables = { pro_bag_items: [], pro_partners: [], pro_career_moments: [], business_accounts: [LIVE] }; };
 
-beforeEach(() => { h.writes = []; h.writeError = null; h.guest = null; h.toastError.mockReset(); });
+beforeEach(() => { h.writes = []; h.writeError = null; h.guest = null; h.toastError.mockReset(); h.openExternal.mockReset(); });
 
 describe('pro collections — visitor and own views', () => {
   it('visitor sees bag, partners and career without Edit or add cards', async () => {
@@ -126,15 +129,32 @@ describe('pro collections — visitor and own views', () => {
     fill(); const { container } = mount(false);
     await waitFor(() => expect(container.querySelectorAll('button.pro-bag-row').length).toBe(1));
     expect(container.querySelectorAll('div.pro-bag-row').length).toBe(1);
-    expect(container.querySelectorAll('button.pro-partner-tile').length).toBe(1);
-    expect(container.querySelectorAll('.pro-partner-unlinked').length).toBe(1);
+    expect(container.querySelectorAll('button.pro-partner-tile').length).toBe(2);
+    expect(container.querySelectorAll('.pro-partner-unlinked').length).toBe(2);
     fireEvent.click(container.querySelector('button.pro-bag-row')!);
     expect(screen.getByTestId('where').textContent).toBe('/business/biz-live');
   });
+  it('an unlinked partner with a website opens it externally; without one it is not tappable', async () => {
+    fill(); const { container } = mount(false);
+    await waitFor(() => expect(container.querySelector('[data-pro-partners]')).not.toBeNull());
+    const ridgeback = screen.getByText('RIDGEBACK').closest('button');
+    expect(ridgeback).not.toBeNull();
+    fireEvent.click(ridgeback!);
+    expect(h.openExternal).toHaveBeenCalledWith('https://ridgebackgolf.co.uk', 'external');
+    expect(screen.getByText('KENT AUTOS').closest('button')).toBeNull();
+  });
+  it('the edit list shows the website dim under the name', async () => {
+    fill(); const { container } = mount(true);
+    await waitFor(() => expect(container.querySelector('[data-pro-partners] .pro-collection-edit')).not.toBeNull());
+    fireEvent.click(container.querySelector('[data-pro-partners] .pro-collection-edit')!);
+    const site = await screen.findByText('https://ridgebackgolf.co.uk');
+    expect(site.className).toContain('pro-partner-website');
+  });
+
   it('partner logo uses the 34% squircle with a 1px traced hairline', async () => {
     fill(); const { container } = mount(false);
-    await waitFor(() => expect(container.querySelector('button.pro-partner-tile')).not.toBeNull());
-    const ring = container.querySelector('button.pro-partner-tile [aria-hidden]') as HTMLElement;
+    await waitFor(() => expect(container.querySelector('button.pro-partner-tile:not(.pro-partner-unlinked)')).not.toBeNull());
+    const ring = container.querySelector('button.pro-partner-tile:not(.pro-partner-unlinked) [aria-hidden]') as HTMLElement;
     expect(ring.style.borderRadius).toBe('34%');
     expect(ring.style.border.startsWith('1px solid')).toBe(true);
   });
@@ -142,6 +162,26 @@ describe('pro collections — visitor and own views', () => {
 
 describe('pro collections — sheet flows', () => {
   const openAdd = async (sub: string) => { const card = (await screen.findByText(sub)).closest('.pro-profile-add') as HTMLElement; fireEvent.click(within(card).getByRole('button', { name: 'Add' })); };
+
+  it('Add by name adds the scheme and saves the website with the name', async () => {
+    empty(); mount(true);
+    await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
+    expect((screen.getByLabelText('WEBSITE (OPTIONAL)') as HTMLInputElement).placeholder).toBe('e.g. kentautos.co.uk');
+    fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
+    fireEvent.change(screen.getByLabelText('WEBSITE (OPTIONAL)'), { target: { value: ' kentautos.co.uk ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add by name' }));
+    await waitFor(() => expect(h.writes.length).toBe(1));
+    expect(h.writes[0].payload).toMatchObject({ name: 'Kent Autos', business_id: null, website: 'https://kentautos.co.uk' });
+  });
+  it('an invalid website toasts and does not save', async () => {
+    empty(); mount(true);
+    await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
+    fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
+    fireEvent.change(screen.getByLabelText('WEBSITE (OPTIONAL)'), { target: { value: 'http://' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add by name' }));
+    await waitFor(() => expect(h.toastError).toHaveBeenCalledWith('Check the website.'));
+    expect(h.writes.length).toBe(0);
+  });
 
   it('bag: slot is required, brand search links business_id, editing the brand clears it', async () => {
     empty(); mount(true);

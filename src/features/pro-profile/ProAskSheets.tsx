@@ -3,13 +3,15 @@
  * steps and sample card are fixed text, never live data. */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useProAnswers, useProAskWrite, useProInbox, useMyAskerLabel } from './useProAsk';
+import { askKey, useProAnswers, useProAskWrite, useProInbox, useMyAskerLabel } from './useProAsk';
 import { answerFooter, askerLabel, inboxTime, type ProInboxRow } from './proAskRules';
 
 const Kicker = ({ first }: { first: string }) => <div className="pro-collection-kicker">ASK {first.toUpperCase()}</div>;
@@ -22,13 +24,19 @@ const EXPLAINER_STEPS: [string, string][] = [
   ['Turn it off any time', "Your answers are hidden while it's off, and come back when you turn it on again."],
 ];
 
-export function ProExplainerSheet({ first, close }: { first: string; close: () => void }) {
+export function ProExplainerSheet({ userId, first, close }: { userId: string; first: string; close: () => void }) {
   const [busy, setBusy] = useState(false);
+  const cache = useQueryClient();
   const turnOn = async () => {
     setBusy(true);
     const { error } = await supabase.rpc('set_pro_ask_enabled', { p_on: true });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
+    await Promise.all([
+      cache.invalidateQueries({ queryKey: askKey(userId) }),
+      cache.invalidateQueries({ queryKey: ['pro-profile', 'ask-inbox'] }),
+    ]);
+    toast.success(`Ask ${first} is on.`);
     close();
   };
   return (
@@ -49,7 +57,7 @@ export function ProExplainerSheet({ first, close }: { first: string; close: () =
             <div className="pro-ask-ft"><small>Asked by a member at Sundridge Park · 41 found this useful</small></div>
           </div>
         </div>
-        <Button className="pro-profile-command" disabled={busy} onClick={() => void turnOn()}>Turn on Ask {first}</Button>
+        <Button variant={null} size={null} className="pro-profile-command" disabled={busy} onClick={() => void turnOn()}>Turn on Ask {first}</Button>
         <Button variant={null} size={null} className="pro-ask-later" onClick={close}>Not now</Button>
       </div>
     </BottomSheet>
@@ -76,7 +84,7 @@ export function ProAskSheet({ proId, first, viewerId, close }: { proId: string; 
       <div className="pro-profile pro-profile-sheet pro-ask-sheet">
         <Kicker first={first} />
         <h2 id="pro-ask-title">Ask a question</h2>
-        <textarea
+        <Textarea
           className="pro-ask-ta"
           aria-label="Your question"
           maxLength={200}
@@ -86,7 +94,7 @@ export function ProAskSheet({ proId, first, viewerId, close }: { proId: string; 
         />
         <div className="pro-ask-count">{text.length} / 200</div>
         <p className="pro-ask-priv">{first} sees your name. Everyone else sees "{labelText}".</p>
-        <Button className="pro-profile-command" disabled={busy || text.trim().length < 3} onClick={() => void send()}>Send to {first}</Button>
+        <Button variant={null} size={null} className="pro-profile-command" disabled={busy || text.trim().length < 3} onClick={() => void send()}>Send to {first}</Button>
       </div>
     </BottomSheet>
   );
@@ -188,7 +196,7 @@ export function ProAnswerSheet({ proId, first, row, close }: { proId: string; fi
           <b>{row.question}</b>
           <small>{[row.asker_name, row.asker_club].filter(Boolean).join(' · ')}</small>
         </div>
-        <textarea
+        <Textarea
           className="pro-ask-ta"
           aria-label="Write your answer"
           maxLength={600}
@@ -202,7 +210,7 @@ export function ProAnswerSheet({ proId, first, row, close }: { proId: string; fi
             ? 'Your answer shows on your profile.'
             : `Your answer shows on your profile, and ${askerFirst} gets a notification. Members see the question as from "${askerLabel(row.asker_club, !!row.asker_club)}".`}
         </p>
-        <Button className="pro-profile-command" disabled={busy || !text.trim()} onClick={() => void post()}>Post answer</Button>
+        <Button variant={null} size={null} className="pro-profile-command" disabled={busy || !text.trim()} onClick={() => void post()}>Post answer</Button>
       </div>
     </BottomSheet>
   );

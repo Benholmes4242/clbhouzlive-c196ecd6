@@ -10617,6 +10617,7 @@ export type Database = {
           name: string
           sort: number
           user_id: string
+          website: string | null
         }
         Insert: {
           business_id?: string | null
@@ -10625,6 +10626,7 @@ export type Database = {
           name: string
           sort?: number
           user_id: string
+          website?: string | null
         }
         Update: {
           business_id?: string | null
@@ -10633,6 +10635,7 @@ export type Database = {
           name?: string
           sort?: number
           user_id?: string
+          website?: string | null
         }
         Relationships: [
           {

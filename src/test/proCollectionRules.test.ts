@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import source from './fixtures/owgr/mason-events.json';
-import {careerEntries,orderedBag,bagPayload,momentPayload,type BagItem,type CareerMoment} from '@/features/pro-profile/proCollectionRules';
+import {careerEntries,orderedBag,bagPayload,momentPayload,partnerPayload,type BagItem,type CareerMoment} from '@/features/pro-profile/proCollectionRules';
 import type {ProEvent} from '@/features/pro-profile/proProfileRules';
 const event=(override:Partial<ProEvent>={}):ProEvent=>({id:'e',user_id:'mason',source:'owgr',event_name:'Event',finish:'T5',owgr_year:2026,owgr_week:1,owgr_rank_after:2000,owgr_rank_before:null,owgr_event_id:'1',owgr_points:null,start_date:null,end_date:null,tour_name:null,country:null,venue:null,to_par:null,total_strokes:null,scheduled_rounds:null,tee_time:null,tee_hole:null,created_at:'',updated_at:'',rounds:[],...override});
 const mason=source.map(e=>event({id:String(e.id),owgr_event_id:String(e.id),event_name:e.event,finish:e.finish,owgr_year:e.year,owgr_week:e.week,owgr_rank_after:e.rankAfter}));
@@ -20,4 +20,7 @@ describe('Build2 collection rules',()=>{
  it('bag slot is required',()=>expect(()=>bagPayload('mason','','Brand','','',null)).toThrow());
  it('career year1950 allowed and future rejected',()=>{expect(momentPayload('mason',1950,'Moment',true,2026).year).toBe(1950);expect(()=>momentPayload('mason',2027,'Moment',false,2026)).toThrow();});
  it('career text120 allowed121 rejected',()=>{expect(momentPayload('mason',2026,'a'.repeat(120),false,2026).text).toHaveLength(120);expect(()=>momentPayload('mason',2026,'a'.repeat(121),false,2026)).toThrow();});
+ it('partner website gains https:// when there is no scheme',()=>expect(partnerPayload('mason','Kent Autos',null,' kentautos.co.uk ').website).toBe('https://kentautos.co.uk'));
+ it('partner website keeps an existing scheme and empty stays null',()=>{expect(partnerPayload('mason','Kent Autos',null,'http://kentautos.co.uk').website).toBe('http://kentautos.co.uk');expect(partnerPayload('mason','Kent Autos',null,'').website).toBeNull();expect(partnerPayload('mason','Kent Autos',null).website).toBeNull();});
+ it('partner website refuses invalid or out-of-range values',()=>{expect(()=>partnerPayload('mason','Kent Autos',null,'http://')).toThrow();expect(()=>partnerPayload('mason','Kent Autos',null,'https://x.co/'+ 'a'.repeat(200))).toThrow();expect(()=>partnerPayload('mason','Kent Autos',null,'not a url')).toThrow();});
 });

@@ -119,7 +119,7 @@ export function ProAskSection({ userId, owner, first, viewerId }: { userId: stri
       <div className="pro-profile-heading"><h2>ASK {first.toUpperCase()}</h2>{headerRight}</div>
       {body}
       {sheet === 'ask' && !isGuest && <ProAskSheet proId={userId} first={first} viewerId={viewerId} close={() => setSheet(null)} />}
-      {sheet === 'explainer' && <ProExplainerSheet first={first} close={() => setSheet(null)} />}
+      {sheet === 'explainer' && <ProExplainerSheet userId={userId} first={first} close={() => setSheet(null)} />}
       {sheet === 'questions' && owner && <ProQuestionsSheet proId={userId} first={first} close={() => setSheet(null)} />}
       {sheet === 'all' && <ProAllAnswersSheet proId={userId} first={first} owner={owner} close={() => setSheet(null)} />}
     </section>

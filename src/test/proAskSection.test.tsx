@@ -199,6 +199,26 @@ describe('pro ask — explainer sheet', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Turn on Ask Mason' }));
     await waitFor(() => expect(h.rpcCalls.some((c) => c.fn === 'set_pro_ask_enabled' && c.args.p_on === true)).toBe(true));
   });
+  it('Turn on invalidates both ask keys, toasts, closes and the section shows the empty card', async () => {
+    h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
+    mount(true);
+    fireEvent.click(await screen.findByRole('button', { name: 'See how' }));
+    h.answers = payload({ total: 0, waiting: 0, answers: [] });
+    fireEvent.click(screen.getByRole('button', { name: 'Turn on Ask Mason' }));
+    await waitFor(() => expect(h.toastSuccess).toHaveBeenCalledWith('Ask Mason is on.'));
+    await waitFor(() => expect(screen.queryByText('Members ask you questions')).toBeNull());
+    expect(await screen.findByText('Questions from members show here')).toBeTruthy();
+  });
+  it('a turn-on error toasts the message and the sheet stays open', async () => {
+    h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
+    h.rpcError = { message: 'Only verified tour pros can turn on Ask' };
+    mount(true);
+    fireEvent.click(await screen.findByRole('button', { name: 'See how' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Turn on Ask Mason' }));
+    await waitFor(() => expect(h.toastError).toHaveBeenCalledWith('Only verified tour pros can turn on Ask'));
+    expect(screen.getByText('Members ask you questions')).toBeTruthy();
+    expect(h.toastSuccess).not.toHaveBeenCalled();
+  });
   it('Not now closes without calling the RPC', async () => {
     h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
     mount(true);

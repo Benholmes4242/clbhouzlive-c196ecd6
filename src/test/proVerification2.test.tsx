@@ -1,11 +1,11 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
-const f = vi.hoisted(() => ({ rpc: vi.fn() }));
-vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
+const f = vi.hoisted(() => ({ rpc: vi.fn(), events: [] as unknown[] }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc, from: () => { const b: Record<string, unknown> = {}; ['select', 'eq', 'in', 'order'].forEach((n) => { b[n] = () => b; }); b.range = () => Promise.resolve({ data: f.events, error: null }); return b; } } }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 import { readProMembers, invalidateProMembers, PRO_MEMBERS_STALE_MS, type ProMember } from '@/features/pro-verification/proMembersCache';
 import { ProMemberName } from '@/features/pro-verification/ProLabel';
@@ -19,7 +19,7 @@ const result = (n: number): PlayerResult => ({ tournament_id: `event-${n}`, name
 function mount(node: React.ReactNode) {
   return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>);
 }
-beforeEach(() => { invalidateProMembers(); f.rpc.mockReset().mockResolvedValue({ data: [pro], error: null }); });
+beforeEach(() => { invalidateProMembers(); f.rpc.mockReset().mockResolvedValue({ data: [pro], error: null }); f.events = []; });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('Brief 2 public pro identity', () => {
@@ -65,8 +65,8 @@ describe('Brief 2 public pro identity', () => {
 
 describe('Brief 2 profile visibility rules', () => {
   it('linked tour pro gets a public Tour tab', () => { expect(profileProTabs(pro, false, false).tour).toBe(true); });
-  it('uncovered owner gets Tour instead of unconnected Handicap', () => { expect(profileProTabs({ ...pro, pro_player_id: null }, true, false)).toEqual({ tour: true, handicap: false }); });
-  it('uncovered visitor gets neither Tour nor Handicap', () => { expect(profileProTabs({ ...pro, pro_player_id: null }, false, false)).toEqual({ tour: false, handicap: false }); });
+  it('unlinked pro with results gets the Tour tab, owner and visitor', () => { expect(profileProTabs({ ...pro, pro_player_id: null }, true, false, true)).toEqual({ tour: true, handicap: false }); expect(profileProTabs({ ...pro, pro_player_id: null }, false, false, true).tour).toBe(true); });
+  it('unlinked pro with no results gets no Tour tab, owner included', () => { expect(profileProTabs({ ...pro, pro_player_id: null }, true, false, false)).toEqual({ tour: false, handicap: false }); expect(profileProTabs({ ...pro, pro_player_id: null }, false, false, false)).toEqual({ tour: false, handicap: false }); });
   it('connected pro owner keeps Tour but no Handicap', () => { expect(profileProTabs(pro, true, true)).toEqual({ tour: true, handicap: false }); });
   it('teaching pro gets neither Tour nor Handicap tab', () => { expect(profileProTabs({ ...pro, pro_kind: 'teaching_pro' }, true, false)).toEqual({ tour: false, handicap: false }); });
   it('ordinary owner retains Handicap', () => { expect(profileProTabs(null, true, false)).toEqual({ tour: false, handicap: true }); });
@@ -99,14 +99,27 @@ describe('Brief 2 Tour results', () => {
     await waitFor(() => expect(container.querySelector('[role="status"]')).toBeNull());
     expect(f.rpc).toHaveBeenCalledTimes(1);
   });
-  it('uncovered owner note makes no player read', () => {
-    const { container } = mount(<ProfileTourTab pro={{ ...pro, pro_player_id: null, pro_tour: 'Alps Tour' }} displayName="Member" isOwner />);
-    expect(container.querySelector('.pro-profile-note')).not.toBeNull();
+  it('unlinked pro with results shows year-grouped rows that open the result sheet', async () => {
+    f.events = [
+      { id: 'e1', user_id: 'pro', source: 'owgr', event_name: 'Hulencourt', tour_name: 'Alps Tour', start_date: '2026-10-15', end_date: '2026-10-17', country: 'Belgium', venue: null, finish: 'T31', to_par: null, total_strokes: 219, scheduled_rounds: 3, tee_time: null, tee_hole: null, owgr_event_id: '11624', owgr_points: 0.02, owgr_rank_before: 1440, owgr_rank_after: 1426, owgr_year: 2026, owgr_week: 42, created_at: '', updated_at: '', rounds: [] },
+      { id: 'e2', user_id: 'pro', source: 'owgr', event_name: 'Ein Bay Open', tour_name: 'Alps Tour', start_date: null, end_date: null, country: 'Egypt', venue: null, finish: 'T40', to_par: null, total_strokes: 290, scheduled_rounds: 4, tee_time: null, tee_hole: null, owgr_event_id: '1', owgr_points: null, owgr_rank_before: null, owgr_rank_after: 2000, owgr_year: 2025, owgr_week: 8, created_at: '', updated_at: '', rounds: [] },
+    ];
+    const { container } = mount(<ProfileTourTab pro={{ ...pro, pro_player_id: null, pro_tour: 'Alps Tour' }} displayName="Mason Essam" isOwner={false} />);
+    await waitFor(() => expect(container.querySelectorAll('.pro-profile-row').length).toBe(2));
+    expect(screen.getByRole('button', { name: /T31 Hulencourt/ })).toBeTruthy();
+    expect(screen.getByText('2026')).toBeTruthy();
+    expect(screen.getByText('2025')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /T31 Hulencourt/ }));
+    expect(await screen.findByRole('dialog')).toBeTruthy();
     expect(f.rpc).not.toHaveBeenCalled();
   });
-  it('uncovered visitor renders nothing and makes no player read', () => {
-    const { container } = mount(<ProfileTourTab pro={{ ...pro, pro_player_id: null }} displayName="Member" isOwner={false} />);
-    expect(container.childElementCount).toBe(0);
-    expect(f.rpc).not.toHaveBeenCalled();
+  it('unlinked pro with no results renders nothing, owner included', async () => {
+    f.events = [];
+    const { container, unmount } = mount(<ProfileTourTab pro={{ ...pro, pro_player_id: null }} displayName="Member" isOwner={false} />);
+    await waitFor(() => expect(container.childElementCount).toBe(0));
+    unmount();
+    const own = mount(<ProfileTourTab pro={{ ...pro, pro_player_id: null, pro_tour: 'Alps Tour' }} displayName="Member" isOwner />);
+    await waitFor(() => expect(own.container.childElementCount).toBe(0));
+    expect(own.container.querySelector('.pro-profile-note')).toBeNull();
   });
 });
