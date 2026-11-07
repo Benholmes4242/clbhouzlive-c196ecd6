@@ -12,7 +12,7 @@ import type { PostShotTag } from '../lib/composerGolfRules';
 import { emptyVideoDetails, type VideoDetails } from '../lib/videoDetails';
 
 // Probe a video File's duration (seconds). Resolves 0 if unreadable.
-function probeVideoDuration(file: File): Promise<number> {
+function probeVideoDuration(file: File, onDimensions?: (width: number, height: number) => void): Promise<number> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
     const v = document.createElement('video');
@@ -21,7 +21,7 @@ function probeVideoDuration(file: File): Promise<number> {
       try { URL.revokeObjectURL(url); } catch { /* ignore */ }
       resolve(d);
     };
-    v.onloadedmetadata = () => done(Number.isFinite(v.duration) ? v.duration : 0);
+    v.onloadedmetadata = () => { onDimensions?.(v.videoWidth, v.videoHeight); done(Number.isFinite(v.duration) ? v.duration : 0); };
     v.onerror = () => done(0);
     v.src = url;
   });
@@ -123,9 +123,10 @@ export function useStageComposer() {
   const addFiles = useCallback(async (files: File[]) => {
     const kept: File[] = [];
     const durations = new Map<File, number>();
+    const dimensions = new Map<File, { naturalWidth: number; naturalHeight: number }>();
     for (const file of files) {
       if (file.type.startsWith('video/')) {
-        const dur = await probeVideoDuration(file);
+        const dur = await probeVideoDuration(file, (naturalWidth, naturalHeight) => dimensions.set(file, { naturalWidth, naturalHeight }));
         if (dur === 0) {
           toast.error("Couldn't read that video's length. Try a different file.");
           continue;
@@ -154,7 +155,7 @@ export function useStageComposer() {
           trimStart: null,
           trimEnd: null,
           posterTimestamp: null,
-          ...(isVideo ? { duration: durations.get(file) } : {}),
+          ...(isVideo ? { duration: durations.get(file), ...dimensions.get(file) } : {}),
         };
       });
       return {
