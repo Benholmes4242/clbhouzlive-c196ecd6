@@ -316,6 +316,25 @@ export function SearchOverlayV2({
                       </div>
                     )}
 
+                    {data.clubs.length > 0 && (
+                      <div>
+                        <SearchSectionHeader
+                          label="Clubs"
+                          onSeeAll={
+                            data.clubs.length >= 5 ? () => goScope('clubs') : undefined
+                          }
+                        />
+                        {data.clubs.map((b) => (
+                          <ClubRow
+                            key={b.id}
+                            club={b}
+                            query={q}
+                            onSelect={() => commit(() => navClub(navigate, b))}
+                          />
+                        ))}
+                      </div>
+                    )}
+
                     {data.courses.length > 0 && (
                       <div>
                         <SearchSectionHeader
@@ -349,25 +368,6 @@ export function SearchOverlayV2({
                             player={p}
                             query={q}
                             onSelect={() => commit(() => navPlayer(navigate, p))}
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                    {data.clubs.length > 0 && (
-                      <div>
-                        <SearchSectionHeader
-                          label="Clubs"
-                          onSeeAll={
-                            data.clubs.length >= 5 ? () => goScope('clubs') : undefined
-                          }
-                        />
-                        {data.clubs.map((b) => (
-                          <ClubRow
-                            key={b.id}
-                            club={b}
-                            query={q}
-                            onSelect={() => commit(() => navClub(navigate, b))}
                           />
                         ))}
                       </div>

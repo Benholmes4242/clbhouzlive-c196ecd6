@@ -318,7 +318,8 @@ function PlayerCard({
         srcCandidates={candidates}
         size={64}
         radius="34%"
-        ringColor={DARK_HAIRLINE}
+        color={{ bg: A.TRACK, fg: A.MUTE }}
+        ringColor={A.BORDER}
       />
       <p
         className="truncate w-full text-center"
