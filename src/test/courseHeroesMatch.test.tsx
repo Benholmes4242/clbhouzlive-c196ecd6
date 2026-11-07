@@ -82,11 +82,15 @@ describe('Course headers match the Tour material', () => {
     expect((screen.getByText('Lennon Hill') as HTMLElement).style.fontSize).toBe('13.5px');
     expect((screen.getByText('Gross') as HTMLElement).style.marginTop).toBe('4px');
   });
-  it('both source paths use only shared fade and reviews never opt in', () => {
+  it('both source paths use only shared fade and the review hero opts in on its own canvas', () => {
     for (const path of ['src/components/golf-club/GolfClubView.tsx', 'src/components/courses/CoursesPageHero.tsx']) {
       const source = readFileSync(path,'utf8'); expect(source).not.toContain('HERO_CANON_WASH'); expect(source).not.toContain('SCRIM_HERO_TALL'); expect(source).toContain('<PhotoBandFade />');
     }
-    expect(readFileSync('src/features/review-v2/components/ReviewCourseHero.tsx','utf8')).not.toContain('photoBand');
+    // ALL_HEROES_MATCH §2: the review wizard's photo header joins the shared
+    // band, with the fade ending on the wizard's own canvas colour.
+    const reviewHero = readFileSync('src/features/review-v2/components/ReviewCourseHero.tsx','utf8');
+    expect(reviewHero).toContain('<PhotoBandFade canvas={RV2.canvas} />');
+    expect(reviewHero).toContain('photoBand');
   });
   it('captures actual mounted detail states for the320px browser check', () => {
     if (!process.env.COURSE_HERO_BROWSER) return;

@@ -13,6 +13,7 @@ import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import { BUSINESS_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
+import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
 /* The hero's FALLBACK GROUND, shown only when there is no cover photo.
    Named HERO_INK while the app was light, which hid the fact that it was a
@@ -27,12 +28,6 @@ export const W_35 = 'rgba(255,255,255,0.35)';
 export const W_25 = 'rgba(255,255,255,0.25)';
 export const W_12 = 'rgba(255,255,255,0.12)';
 export const W_10 = 'rgba(255,255,255,0.10)';
-
-/** Flat wash, then vertical ramp. If a figure ever loses contrast on a bright
- *  cover, DEEPEN these - never lighten the text. */
-export const COVER_WASH = 'rgba(14,18,22,0.58)';
-export const COVER_RAMP =
-  'linear-gradient(180deg, rgba(14,18,22,0.42) 0%, rgba(14,18,22,0.80) 100%)';
 
 /** The hero ARTWORK bleeds to the very top of the viewport (behind the status
  *  bar and both floating islands); only the CONTENT is inset by safe-area +
@@ -92,11 +87,6 @@ const HERO_TALLEST_CONTENT = Math.ceil(
  *  (227 now the sparkline is gone). Kept as documentation; the block carries
  *  NO floor (see coverAspect.ts), so the crop frame equals the rendered square. */
 void HERO_TALLEST_CONTENT;
-
-/** Short top gradient so white status-bar text stays legible over a bright
- *  cover; fades out by 60px. */
-export const COVER_TOP_GUARD =
-  'linear-gradient(180deg, rgba(14,18,22,0.45) 0%, rgba(14,18,22,0) 60px)';
 
 export interface HeroCounter {
   key: string;
@@ -272,6 +262,8 @@ const HeadlineBlock: React.FC<{
 interface HeroShellProps {
   /** Pro-profile opt-ins preserve shell cover/scrim/insets and other callers. */
   nameRef?: React.Ref<HTMLHeadingElement>;
+  /** Amber tour-style kicker line above the identity row (pro hero). */
+  kicker?: React.ReactNode;
   avatarSize?: number;
   identityContent?: React.ReactNode;
   headlineContent?: React.ReactNode;
@@ -303,6 +295,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
   avatar,
   avatarSize = 56,
   identityContent,
+  kicker,
   onAvatarTap,
   avatarLabel,
   displayName,
@@ -327,7 +320,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         position: 'relative',
         background: HERO_GROUND,
         marginTop: 0,
-        padding: '0 16px 16px',
+        padding: '0 20px 14px',
         /* The hero pays ONE horizontal inset on both sides and nothing inside
            it may escape that box: an over-wide identity row (long club name +
            badge + FOLLOW + overflow control) used to push its controls past
@@ -390,22 +383,12 @@ export const HeroShell: React.FC<HeroShellProps> = ({
               objectPosition: 'center',
             }}
           />
-          <div style={{ position: 'absolute', inset: 0, background: COVER_WASH }} />
-          <div style={{ position: 'absolute', inset: 0, background: COVER_RAMP }} />
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 60,
-              background: COVER_TOP_GUARD,
-            }}
-          />
+          <PhotoBandFade />
         </div>
       )}
 
       <div style={{ position: 'relative', zIndex: 1 }}>
+        {kicker}
         {/* Identity row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: identityContent ? 14 : 12, minWidth: 0, maxWidth: '100%' }}>
           <button

@@ -18,6 +18,7 @@ import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/cou
 import { OVERVIEW } from '../overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
+import { heroStateLine } from './heroStateLine';
 
 
 export interface HeroLeaderTrio {
@@ -75,15 +76,13 @@ export function PhotoBand({
   const inPlay = isLive || isSuspended;
   const isUpcoming = state.kind === 'upcoming';
   // FINAL is reachable ONLY from `results`; a suspended event can never print it.
-  const stateLabel = isLive
-    ? state.round === state.totalRounds ? t('overview.hero.finalRound') : t('overview.hero.round', { round: state.round })
-    : isSuspended
-      ? `${t('overview.hero.round', { round: state.round })} · ${t('overview.hero.stateSuspended')}`
-    : state.kind === 'results' && state.variant === 'awaiting-playoff'
-      ? t('overview.hero.statePlayoff', { defaultValue: 'PLAYOFF' }) // never RESULTS; no live dot
-    : isUpcoming && startDay
-      ? t('overview.hero.starts', { day: startDay })
-      : t('overview.alsoThisWeek.final');
+  const stateLabel = heroStateLine(t, {
+    kind: state.kind,
+    round: inPlay ? state.round : undefined,
+    totalRounds: inPlay ? state.totalRounds : undefined,
+    playoff: state.kind === 'results' && state.variant === 'awaiting-playoff', // never RESULTS; no live dot
+    startDay: isUpcoming ? startDay : null,
+  });
 
   return (
     <div

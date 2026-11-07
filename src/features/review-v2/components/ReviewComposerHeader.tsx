@@ -41,8 +41,9 @@ interface Props {
   onDelete: () => void;
 }
 
-// Photo hero: the photograph fills one block of safe-area inset + 246px.
-export const PHOTO_HEADER_H_CSS = 'calc(env(safe-area-inset-top, 0px) + 246px)';
+// Photo hero: the photograph fills one block of safe-area inset + 340px, the
+// same band as the course page's cinematic hero (EXPLORE_COURSE_HERO_HEIGHT).
+export const PHOTO_HEADER_H_CSS = 'calc(env(safe-area-inset-top, 0px) + 340px)';
 
 /** The reference line's " · " separator, drawn as CourseTitleOverlay draws it. */
 const RefSep = () => <span style={{ fontWeight: 500, color: SURFACE.dark.dim }}>{' · '}</span>;

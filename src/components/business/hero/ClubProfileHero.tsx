@@ -14,8 +14,9 @@ import { useTranslation } from 'react-i18next';
 import { Share, MoreHorizontal, Plus, MessageCircle, Pencil, ArrowUpRight } from 'lucide-react';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { HERO_CONTENT_INSET } from '@/components/profile/hero/HeroShell';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
+import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
 const CANVAS = '#0B0B0D';
 const INK = '#F8FAFC';
@@ -24,7 +25,6 @@ const DIM = 'rgba(248,250,252,0.42)';
 const HAIR = 'rgba(255,255,255,0.08)';
 const GLASS_BG = 'rgba(255,255,255,0.07)';
 const GLASS_BORDER = '1px solid rgba(255,255,255,0.14)';
-const SCRIM = 'linear-gradient(180deg, rgba(11,11,13,0.15) 0%, rgba(11,11,13,0.35) 45%, #0B0B0D 100%)';
 const ICON = { size: 16, strokeWidth: 1.9 } as const;
 const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 
@@ -170,7 +170,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         data-club-cover=""
         style={{
           position: 'relative',
-          height: `max(300px, calc(${HERO_CONTENT_INSET} + 86px))`,
+          aspectRatio: '39 / 34',
           background: p.coverUrl ? CANVAS : 'linear-gradient(180deg, #17171B 0%, #0B0B0D 100%)',
           overflow: 'hidden',
         }}
@@ -178,57 +178,64 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         {p.coverUrl && (
           <img src={p.coverUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
-        {p.coverUrl && <div aria-hidden style={{ position: 'absolute', inset: 0, background: SCRIM }} />}
-      </div>
+        {p.coverUrl && <PhotoBandFade canvas={CANVAS} />}
 
-      <div style={{ position: 'relative', padding: '0 16px', marginTop: -74 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <button
-            type="button"
-            aria-label={p.name}
-            onClick={p.onAvatarTap}
-            data-club-crest=""
-            style={{ width: 64, height: 64, borderRadius: 16, background: '#F4F4F2', overflow: 'hidden', padding: 0, border: 'none', flex: 'none' }}
-          >
-            {p.logoUrl ? (
-              <img src={p.logoUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <span style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: getAvatarFallbackColor(p.fallbackKey || p.name), color: '#FFFFFF', fontSize: 20, fontWeight: 700 }}>
-                {initials}
-              </span>
-            )}
-          </button>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" aria-label={t('business.clubHero.share', 'Share')} onClick={p.onShare} style={circle(34)}>
-              <Share {...ICON} />
+        {/* Identity on the photo: place kicker + Share/More, then crest + name. */}
+        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+            {p.placeLine ? <span data-club-place="" style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{p.placeLine}</span> : <span />}
+            <div style={{ display: 'flex', gap: 8, flex: 'none' }}>
+              <button type="button" aria-label={t('business.clubHero.share', 'Share')} onClick={p.onShare} style={circle(34)}>
+                <Share {...ICON} />
+              </button>
+              {p.renderMore(
+                <button type="button" aria-label={t('business.clubHero.more', 'More options')} style={circle(34)}>
+                  <MoreHorizontal {...ICON} />
+                </button>,
+              )}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+            <button
+              type="button"
+              aria-label={p.name}
+              onClick={p.onAvatarTap}
+              data-club-crest=""
+              style={{ width: 64, height: 64, borderRadius: 16, background: '#F4F4F2', overflow: 'hidden', padding: 0, border: 'none', flex: 'none' }}
+            >
+              {p.logoUrl ? (
+                <img src={p.logoUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: getAvatarFallbackColor(p.fallbackKey || p.name), color: '#FFFFFF', fontSize: 20, fontWeight: 700 }}>
+                  {initials}
+                </span>
+              )}
             </button>
-            {p.renderMore(
-              <button type="button" aria-label={t('business.clubHero.more', 'More options')} style={circle(34)}>
-                <MoreHorizontal {...ICON} />
-              </button>,
-            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 ref={p.nameRef} style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: 0, lineHeight: 1.1, color: INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
+                {p.name}
+                {p.verified && (
+                  <span aria-label="Verified" style={{ display: 'inline-flex', marginLeft: 7, verticalAlign: -1 }}>
+                    <VerifiedBadge size="lg" />
+                  </span>
+                )}
+              </h1>
+              {showEvidence && (
+                <div style={{ marginTop: 4, fontSize: 12.5, fontWeight: 600, lineHeight: 1.4, color: A.AMBER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {p.evidenceLine}
+                </div>
+              )}
+            </div>
           </div>
         </div>
+      </div>
 
-        <h1 ref={p.nameRef} style={{ marginTop: 12, fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: INK, overflowWrap: 'anywhere' }}>
-          {p.name}
-          {p.verified && (
-            <span aria-label="Verified" style={{ display: 'inline-flex', marginLeft: 7, verticalAlign: -1 }}>
-              <VerifiedBadge size="lg" />
-            </span>
-          )}
-        </h1>
-        {p.placeLine && <div data-club-place="" style={{ marginTop: 4, fontSize: 14, lineHeight: 1.4, color: MUTE }}>{p.placeLine}</div>}
-        {showEvidence && (
-          <div style={{ marginTop: 1, fontSize: 14, lineHeight: 1.4, color: A.AMBER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {p.evidenceLine}
-          </div>
-        )}
-
+      <div style={{ position: 'relative' }}>
         <div
           data-club-actions={team ? 'team' : 'visitor'}
           className="scrollbar-hide"
-          style={{ display: 'flex', gap: 8, marginTop: 16, overflowX: 'auto', flexWrap: 'nowrap', scrollbarWidth: 'none' }}
+          style={{ display: 'flex', gap: 8, padding: '14px 20px 0', overflowX: 'auto', flexWrap: 'nowrap', scrollbarWidth: 'none' }}
         >
           {team ? (
             <>

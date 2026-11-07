@@ -1,8 +1,9 @@
 /**
- * BRIEF_PROFILE_HERO_CLUB_WHITE — in the profile hero, the home club line under
- * the member's name reads the SAME colour as the name. The "Add your home club"
- * prompt that appears on your own profile with no club set is a prompt, not
- * information, so it stays W_55.
+ * BRIEF_PROFILE_HERO_CLUB_WHITE — superseded by ALL_HEROES_MATCH §3: the home
+ * club is no longer a white subline under the name; it is the amber kicker
+ * line on top of the band (MASTHEAD_KICKER), with the controls on its right.
+ * The "Add your home club" prompt that appears on your own profile with no
+ * club set is a prompt, not information, so it stays W_55.
  *
  * The band is a pure presentational block: it takes its photograph, avatar,
  * name, subline and controls as props, so the test renders it directly.
@@ -16,6 +17,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 
 import { ProfileCoverBand } from '@/components/profile/hero/ProfileCoverBand';
 import { W_55 } from '@/components/profile/hero/HeroShell';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /** jsdom serialises colours through cssstyle; compare them the way the DOM does. */
 const toRgb = (c: string) => { const d = document.createElement('div'); d.style.color = c; return d.style.color; };
@@ -23,7 +25,7 @@ const toRgb = (c: string) => { const d = document.createElement('div'); d.style.
 const NAME = 'Kristian Andberg';
 
 describe('BRIEF_PROFILE_HERO_CLUB_WHITE', () => {
-  it('paints the home club subline the same colour as the name', () => {
+  it('paints the home club as the amber kicker above the name', () => {
     render(
       <ProfileCoverBand
         coverUrl={null}
@@ -34,20 +36,27 @@ describe('BRIEF_PROFILE_HERO_CLUB_WHITE', () => {
     );
 
     const name = screen.getByRole('heading', { level: 1 });
-    const subline = screen.getByText('Kristianstad Golf Club');
+    const kicker = screen.getByText('Kristianstad Golf Club');
 
-    expect(subline.style.color).toBe(toRgb('#FFFFFF'));
-    expect(subline.style.color).toBe(name.style.color);
-    expect(subline.style.color).not.toBe(toRgb(W_55));
+    expect(kicker.style.color).toBe(toRgb(A.AMBER));
+    expect(kicker.style.color).not.toBe(toRgb('#FFFFFF'));
+    expect(kicker.style.color).not.toBe(toRgb(W_55));
 
-    // Everything else on that line is frozen by the brief.
-    expect(subline.style.fontSize).toBe('12.5px');
-    expect(subline.style.fontWeight).toBe('600');
-    expect(subline.style.marginTop).toBe('3px');
-    expect(subline.style.textShadow).toBe('0 1px 8px rgba(0,0,0,0.5)');
-    expect(subline.style.overflow).toBe('hidden');
-    expect(subline.style.textOverflow).toBe('ellipsis');
-    expect(subline.style.whiteSpace).toBe('nowrap');
+    // The kicker shares the tour hero's kicker rule.
+    expect(kicker.style.fontSize).toBe('11px');
+    expect(kicker.style.fontWeight).toBe('700');
+    expect(kicker.style.letterSpacing).toBe('0.15em');
+    expect(kicker.style.textTransform).toBe('uppercase');
+    expect(kicker.style.overflow).toBe('hidden');
+    expect(kicker.style.textOverflow).toBe('ellipsis');
+    expect(kicker.style.whiteSpace).toBe('nowrap');
+
+    // The name is the shared 26px hero title with no text shadow.
+    expect(name.style.fontSize).toBe('26px');
+    expect(name.style.fontWeight).toBe('800');
+    expect(name.style.letterSpacing).toBe('0');
+    expect(name.style.lineHeight).toBe('1.1');
+    expect(name.style.textShadow).toBe('');
   });
 
   it('keeps the add-home-club prompt at W_55', () => {
@@ -66,7 +75,6 @@ describe('BRIEF_PROFILE_HERO_CLUB_WHITE', () => {
 
     expect(prompt.style.color).toBe(toRgb(W_55));
     expect(prompt.style.color).not.toBe(toRgb('#FFFFFF'));
-    expect(prompt.style.fontSize).toBe('12.5px');
-    expect(prompt.style.fontWeight).toBe('600');
+    expect(prompt.style.color).not.toBe(toRgb(A.AMBER));
   });
 });

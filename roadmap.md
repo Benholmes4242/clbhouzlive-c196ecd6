@@ -401,3 +401,12 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [x] Build admin Ranking event courses list/sheet, geography guard, link/no-course/add-course actions and inbox Tools row.
 - [x] Add brief-specified geography/rules/Dossier tests, run focused checks and four shards; compare the subsequently supplied signed-off mock and report 320px verification limits.
 - [ ] Ben's device checks: authenticated archive, admin list and sheet at 320px; external unmanaged auth prevents hosted verification here.
+
+## ALL_HEROES_MATCH (in progress)
+- Step 0: fade token already solid-footed; add canvas prop to PhotoBandFade.
+- 1 Tournament hero: drop .tv-pill, shared tour-line state helper, overview type/spacing.
+- 2 Review step 1 hero: 340px, PhotoBandFade canvas=RV2.canvas, CourseMasthead photoBand.
+- 3 ProfileCoverBand: 39/34 aspect, PhotoBandFade, kicker row + 26px name, club line removed.
+- 4 ClubProfileHero: 39/34 cover, PhotoBandFade, identity on photo, pills below.
+- 5 Pro HeroShell: PhotoBandFade, 20/14 padding, kicker, 26px name, no club line.
+- Tests + 4 shards + 320px checks + report.

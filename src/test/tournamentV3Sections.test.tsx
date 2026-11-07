@@ -16,6 +16,10 @@ const meta={id:'e',name:'Tournament',venue_name:'Course',venue_country:'MEX',sta
 const rows:BoardEntry[]=[{id:'a',player:{id:'a',full_name:'Andrew A'},position:1,score:-10,round_1:-2,round_2:-3,round_3:-5,thru:18},{id:'b',player:{id:'b',full_name:'Other B'},position:2,score:-8,round_1:-3,round_2:-2,round_3:-3,thru:18}];
 const groups=[{teeTime:'2026-10-29T08:00Z',startingHole:1,players:[{id:'a',name:'Andrew A'}]},{teeTime:'2026-10-29T09:00Z',startingHole:10,players:[{id:'b',name:'Other B'}]}];
 const teeProps={groups,phase:'upcoming' as const,round:1,rounds:[1,2],onRound:vi.fn(),onAll:vi.fn(),meta,mine:'a',picks:new Set<string>(),follows:new Set<string>(),field:[],defender:'b',rows};
+describe('ALL_HEROES_MATCH tournament hero',()=>{
+ it('joins the state to the tour line through the shared helper, with no pill',()=>{const {container}=mount(<TournamentHero meta={{...meta,tour_full_name:'PGA Tour'} as TournamentMeta} phase="live" rows={rows} field={[]} last={[]} holes={[]} image={null}/>);expect(container.querySelector('.tv-pill')).toBeNull();expect(container.querySelector('.tv-tour')).toHaveTextContent('PGA TOUR · ROUND 3');});
+ it('the hero and the overview photo band read the one state-line helper',async()=>{const {readFileSync}=await import('node:fs');expect(readFileSync('src/features/tourhub/tournament-v2/sections/TournamentV3Sections.tsx','utf8')).toContain("import {heroStateLine} from '../../components/overview-v3/HybridHeroBands/heroStateLine'");expect(readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx','utf8')).toContain("import { heroStateLine } from './heroStateLine'");});
+});
 describe('Tournament-v3 presence and existing doors',()=>{
  it('finished never renders tee section',()=>{const {container}=mount(<TeeV3Section {...teeProps} phase="completed"/>);expect(container.querySelector('[data-tv-section]')).toBeNull();});
  it('no draw omits tee section',()=>{const {container}=mount(<TeeV3Section {...teeProps} rounds={[]}/>);expect(container.querySelector('[data-tv-section]')).toBeNull();});
