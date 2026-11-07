@@ -23,11 +23,3 @@ export function useProWorldRank(userId: string) {
     if (error) throw error; return parseWorldRank(data);
   } });
 }
-export function useProWatch(userId: string, viewerId?: string) {
-  return useQuery({ queryKey: ['pro-profile', 'watch', userId, viewerId], enabled: !!userId, staleTime: 30_000, queryFn: async () => {
-    const { data, error } = await supabase.rpc('get_pro_score_watch', { p_pro_id: userId });
-    if (error) throw error;
-    const row = (Array.isArray(data) ? data[0] : data) as { watching?: boolean; count?: number } | null;
-    return { watching: row?.watching === true, count: typeof row?.count === 'number' ? row.count : 0 };
-  } });
-}
