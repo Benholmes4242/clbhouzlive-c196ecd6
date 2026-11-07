@@ -122,6 +122,7 @@ export function useStageComposer() {
 
   const addFiles = useCallback(async (files: File[]) => {
     const kept: File[] = [];
+    const durations = new Map<File, number>();
     for (const file of files) {
       if (file.type.startsWith('video/')) {
         const dur = await probeVideoDuration(file);
@@ -133,6 +134,7 @@ export function useStageComposer() {
           toast.error(`Video too long (${formatDuration(dur)}). Maximum is ${POST_LIMITS.MAX_VIDEO_DURATION_DISPLAY}.`);
           continue;
         }
+        durations.set(file, dur);
       }
       kept.push(file);
     }
@@ -152,6 +154,7 @@ export function useStageComposer() {
           trimStart: null,
           trimEnd: null,
           posterTimestamp: null,
+          ...(isVideo ? { duration: durations.get(file) } : {}),
         };
       });
       return {
