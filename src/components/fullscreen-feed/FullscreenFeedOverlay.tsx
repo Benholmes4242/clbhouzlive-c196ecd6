@@ -1,5 +1,7 @@
 import React, { useEffect, useLayoutEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { usePostScoreIds } from '@/hooks/feed/usePostRounds';
+import { usePostGolfContext, usePostGolfHoleMeta, golfHoleFor } from '@/hooks/feed/usePostGolfContext';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { createPortal } from 'react-dom';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -557,6 +559,29 @@ export function FullscreenFeedOverlay() {
   );
   const commentScoreId = activePost?.id ? activeScoreIdMap.get(activePost.id) ?? null : null;
   const commentReviewId = activePost?.review?.reviewId ?? null;
+
+  /* PF1B — the viewer's golf context (hole chip + round pill), ONE batched
+     read for whatever posts the viewer shows (feed, profile, deep link).
+     Synthetic member-shot opens and the course gallery never carry it; round
+     posts are the round already and are never queried. Guests/signed-out get
+     nothing (the hook stays disabled). */
+  const golfPostIds = useMemo(
+    () => (syntheticPosts || courseGallery ? [] : posts.filter((p) => p.postType !== 'round').map((p) => p.id)),
+    [posts, syntheticPosts, courseGallery],
+  );
+  const golfContextMap = usePostGolfContext(golfPostIds);
+  const golfHoleMap = usePostGolfHoleMeta(
+    useMemo(() => {
+      if (!golfContextMap) return [];
+      const seen = new Set<string>();
+      for (const ctx of golfContextMap.values()) if (ctx.courseId) seen.add(ctx.courseId);
+      return [...seen];
+    }, [golfContextMap]),
+  );
+  const activeGolfContext = activePost ? golfContextMap?.get(activePost.id) ?? null : null;
+  const activeGolfHole = golfHoleFor(activeGolfContext, golfHoleMap);
+  // The pill opens the SAME scorecard sheet the feed row opens, over the viewer.
+  const [golfScorecard, setGolfScorecard] = useState<{ scoreId: string; userId: string | null } | null>(null);
   const manageableBusinessIds = useManageableBusinessIds(userId);
   const teamBusinessIds = useTeamBusinessIds(userId);
   const isOwnPost = canManagePost(
@@ -1048,6 +1073,9 @@ export function FullscreenFeedOverlay() {
                     syntheticPosts={syntheticPosts}
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}
+                    golfContext={activeGolfContext}
+                    golfHole={activeGolfHole}
+                    onOpenScorecard={(scoreId) => activePost && setGolfScorecard({ scoreId, userId: activePost.userId })}
                   />}
 
                   <FullscreenScrubber
@@ -1223,6 +1251,16 @@ export function FullscreenFeedOverlay() {
           targetId={commentScoreId ?? commentReviewId ?? activePost?.id ?? ""}
           initialCommentId={initialCommentId}
           autoFocusComposer={composeOnOpen}
+        />
+      )}
+
+      {/* PF1B: the attached round's scorecard, over the viewer. */}
+      {golfScorecard && (
+        <RoundDetailSheet
+          open
+          onClose={() => setGolfScorecard(null)}
+          scoreId={golfScorecard.scoreId}
+          profileUserId={golfScorecard.userId}
         />
       )}
 
