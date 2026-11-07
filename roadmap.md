@@ -1,5 +1,11 @@
 # Roadmap
 
+## OVERVIEW_HERO_B_STRIP
+- [x] Merge tour/state kicker, scale leader B, opt in board spacing after movers and replace locked no-pick members door with the strip; Ben ruled brief10+0/white position over mock.
+- [x] Add16cases/1file, authorised padding/door selectors only; focused67/67. Fresh shard1:1986passed/1unexpected failure at tourPlayoffShortenedEvents.test.tsx:89:35 expected RESULTS, received FINALButterfield Bermuda Championship. Existing failing assertion untouched.
+- [x] Actual mounted-component DOM320×844: no overflow; both kicker ellipses, long strip surname ellipsis,10px movers bottom/0px board top; report OVERVIEW_HERO_B_STRIP_REPORT.md, expected7648/668 reconciled from7632/667. Preview buildOK.
+- [ ] Shards2–4 blocked by exact RESULTS failure; live face loading/device/account readback unverified. Static DOM screenshots reserve avatar slots but do not prove loaded faces.
+
 ## FEED_PHOTO_GRID
 - [x] Add pure four-photo eligibility and shared grid rendering/taps/loading; preserve video/small sets/words-first frames.
 - [x] Add22cases (14helper/8mounted); fresh focused50/50 after authorised one-line chips fixture repair. Shared shards1:1984passed;2:1824passed/1unexpected failure;3–4 stopped.

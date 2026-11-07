@@ -74,6 +74,8 @@ interface Props {
   tourSlug?: string | null;
   /** heroBoard only: rounds in the schedule, so SHAPE always draws every slot. */
   totalRounds?: number | null;
+  /** Hero-only opt-in: the movers band owns the preceding seam. */
+  afterMovers?: boolean;
 }
 
 /**
@@ -229,7 +231,7 @@ export function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null, presentation, winnerPlayerId }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null, presentation, winnerPlayerId, afterMovers = false }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
@@ -352,7 +354,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   if (theme === 'heroBoard') {
     return (
       <>
-        <div style={{ background: T.surface, fontFamily: FONT, paddingTop: 12 }}>
+        <div style={{ background: T.surface, fontFamily: FONT, paddingTop: afterMovers ? 0 : 12 }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 24, padding: `2px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
             {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>

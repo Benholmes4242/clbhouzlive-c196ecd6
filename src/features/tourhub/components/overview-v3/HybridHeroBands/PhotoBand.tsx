@@ -5,13 +5,11 @@ import { Button } from '@/components/ui/button';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import {
-  AMBER,
   CAPS_10,
   FONT,
   INK,
   OVERVIEW_SITUATION_INK,
   WHITE_ALPHA_32,
-  STATUS_LIVE_ON_DARK,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
@@ -78,14 +76,14 @@ export function PhotoBand({
   const isUpcoming = state.kind === 'upcoming';
   // FINAL is reachable ONLY from `results`; a suspended event can never print it.
   const stateLabel = isLive
-    ? t('overview.hero.stateLive')
+    ? state.round === state.totalRounds ? t('overview.hero.finalRound') : t('overview.hero.round', { round: state.round })
     : isSuspended
-      ? t('overview.hero.stateSuspended')
+      ? `${t('overview.hero.round', { round: state.round })} · ${t('overview.hero.stateSuspended')}`
     : state.kind === 'results' && state.variant === 'awaiting-playoff'
       ? t('overview.hero.statePlayoff', { defaultValue: 'PLAYOFF' }) // never RESULTS; no live dot
     : isUpcoming && startDay
       ? t('overview.hero.starts', { day: startDay })
-      : t('overview.hero.stateFinal');
+      : t('overview.alsoThisWeek.final');
 
   return (
     <div
@@ -128,39 +126,23 @@ export function PhotoBand({
           minWidth: 0,
         }}
       >
-        <div data-overview-photo-pill-row style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 7,
-              minHeight: 28,
-              padding: '0 10px',
-              borderRadius: 999,
-              ...DARK_CHROME_GLASS_MATERIAL,
-              ...CAPS_10,
-            }}
-          >
-            {isLive ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
-            <span>{stateLabel}</span>
-            {inPlay ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
-          </div>
+        <div data-overview-photo-kicker-row style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
           {onFullBoard ? <Button type="button" variant="ghost" data-overview-full-board aria-label="Full leaderboard"
             onClick={(event) => { event.stopPropagation(); onFullBoard(); }}
             onKeyDown={(event) => event.stopPropagation()}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 3, minHeight: 44, height: 44, padding: '0 0 0 12px', margin: '-8px 0', background: 'none', border: 'none', borderRadius: 0, fontFamily: FONT, fontSize: 12, fontWeight: 700, color: INK, cursor: 'pointer' }}>
+            style={{ display: 'inline-flex', flex: 'none', alignItems: 'center', gap: 3, minHeight: 44, height: 44, padding: '0 0 0 12px', margin: '-8px 0', background: 'none', border: 'none', borderRadius: 0, fontFamily: FONT, fontSize: 12, fontWeight: 700, color: INK, cursor: 'pointer' }}>
             {t('overview.situation.fullBoard', { defaultValue: 'Full board' })}<ChevronRight size={13} strokeWidth={2.6} color={WHITE_ALPHA_32} aria-hidden />
           </Button> : null}
         </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: 10, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: 4, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          {tourLabel ? <div style={MASTHEAD_KICKER}>{tourLabel}</div> : null}
           <h1
             style={{
               ...MASTHEAD_NAME,
               fontSize: 26,
               letterSpacing: 0,
-              marginTop: 4,
+              marginTop: 0,
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
               WebkitLineClamp: 3,
@@ -175,16 +157,16 @@ export function PhotoBand({
         {inPlay && leader ? (
           <div data-overview-leader-trio style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
             {leader.faces.length > 0 ? (
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 5 }}>
                 {leader.faces.map((face, i) => (
-                  <span key={face.key} data-overview-trio-face style={{ display: 'inline-flex', flex: 'none', border: OVERVIEW.trio.faceBorder, borderRadius: '34%', marginLeft: i > 0 ? -9 : 0 }}>
-                    <SquircleAvatar size={28} srcCandidates={face.candidates} alt={face.name} userId={face.key} hideRing />
+                  <span key={face.key} data-overview-trio-face style={{ display: 'inline-flex', flex: 'none', border: OVERVIEW.trio.faceBorder, borderRadius: '34%', marginLeft: i > 0 ? -8 : 0 }}>
+                    <SquircleAvatar size={24} srcCandidates={face.candidates} alt={face.name} userId={face.key} hideRing />
                   </span>
                 ))}
               </div>
             ) : null}
-            <div style={{ ...NUMERIC_STYLE, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
-            {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 5, marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
+            {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 4, marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
           </div>
         ) : null}
 
