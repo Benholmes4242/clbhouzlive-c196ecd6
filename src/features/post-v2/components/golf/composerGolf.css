@@ -29,6 +29,10 @@
 .composer-golf-switch i{display:block;width:22px;height:22px;border-radius:999px;background:var(--pf-ink)}
 .composer-golf .composer-golf-switch[aria-checked=true]{background:var(--composer-golf-green)}
 .composer-golf-switch[aria-checked=true] i{transform:translateX(18px)}
+/* PF2_GUIDE: a non-Everyone audience locks the guide off; the row taps through to Who can see this. */
+.composer-golf .composer-golf-switch[disabled]{opacity:.4;cursor:default}
+.composer-golf-att-tap{cursor:pointer}
+.composer-golf-att p em{font-style:normal;color:var(--pf-ink);font-weight:700}
 .composer-golf-round-strip{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:3px;margin:0 14px 12px}
 .composer-golf-round-strip i{display:block;height:6px;border-radius:3px;background:var(--composer-golf-worse)}
 .composer-golf-round-strip [data-tone=under] i{background:var(--composer-golf-under)}

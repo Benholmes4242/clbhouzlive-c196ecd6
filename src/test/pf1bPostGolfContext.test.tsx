@@ -221,8 +221,9 @@ describe('golfPostPatch add_to_hole_guide', () => {
   it('writes add_to_hole_guide with the hole when the toggle is on', () => {
     expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: true });
   });
-  it('never writes it without the toggle, a hole or a course', () => {
-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15 });
+  it('writes the effective boolean both ways, but never without a hole or a course', () => {
+    // PF2_GUIDE: false is written too, so turning the guide off on an edit turns it off.
+    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: false });
     expect(golfPostPatch({ course, holeNo: null, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'] });
     expect(golfPostPatch({ course: null, holeNo: 15, addToGuide: true })).toEqual({});
   });
