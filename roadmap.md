@@ -1,5 +1,10 @@
 # Roadmap
 
+## PRO_BADGE_W1
+- [x] Apply CSS-only pearl plate, highlight and island-ratio corners; preserve badge copy, sizes, callers and non-pro ticks.
+- [x] Add five source-based badge cases; no existing assertions changed. Remove only unused sponsor badge rule; no ground-token consumers remain.
+- [x] Four fresh shards1975/1810/1941/1881 passed,7607tests/664files; buildOK. PRO_BADGE_W1_REPORT.md records unchanged callers and all five320px checks unverified because external unmanaged auth prevents authenticated access.
+
 ## PF3C_ROUND
 - [ ] Extend canonical chapters with validated 9/18-hole marks and description pre-marks; preserve timestamp fallback.
 - [ ] Add composer chapter preview, following switch and pinned Mark the holes page; clear mismatched round marks and preserve drafts.
