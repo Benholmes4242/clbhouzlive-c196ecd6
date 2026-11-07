@@ -11,11 +11,12 @@
 - [x] Four fresh shards1975/1810/1941/1881 passed,7607tests/664files; buildOK. PRO_BADGE_W1_REPORT.md records unchanged callers and all five320px checks unverified because external unmanaged auth prevents authenticated access.
 
 ## PF3C_ROUND
-- [ ] Extend canonical chapters with validated 9/18-hole marks and description pre-marks; preserve timestamp fallback.
-- [ ] Add composer chapter preview, following switch and pinned Mark the holes page; clear mismatched round marks and preserve drafts.
-- [ ] Save non-blocking details/marks after the attached-round post patch using existing live tables; no server edits.
-- [ ] Add playback-following chip and shared About scorecard/chapter extension from canonical round data.
-- [ ] Add focused tests, run four separate --maxWorkers=2 shards, check 320px and report checks1–5 with device/SQL confirmations left to Ben.
+- [x] Extend canonical chapters with validated9/18-hole marks and description pre-marks; preserve timestamp fallback.
+- [x] Add composer chapter preview, following switch and pinned Mark the holes page; clear mismatched round marks and preserve drafts.
+- [x] Save non-blocking details/marks after attached-round post patch using existing live tables; no server edits.
+- [x] Add playback-following chip and shared About scorecard/chapter extension from canonical round data.
+- [x] Original focused198/198; four shards1973/1810/1942/1877 passed,7602tests/663files. Verification-only close-out rendered actual components320×844 for9/18holes: all four surfaces fit, selected Clear row and expanded About fit, no page errors. PF3C_ROUND_REPORT.md records64newcases and all limits; no code/test edits.
+- [ ] Ben device checks1–4 and native fullscreen/safe-area integration remain; publication row confirmation stays with Ben, no SQL performed.
 
 ## PF3B_VIEWER
 - [ ] Add page-batched signed-in non-guest details reads and shared detailed-video rules using canonical parseChapters.
