@@ -86,6 +86,10 @@ import {useRoundHoleShapes} from '@/components/explore-tab-new/courseled/hooks/u
 import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,roundIsRecent} from './lib/composerGolfReads';
 import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,effectiveHoleGuide,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
 import {loadComposerDraft} from './lib/composerDrafts';
+import { isLongFormVideo } from '@/constants/videoRules';
+import { emptyVideoDetails, singleVideo, videoDuration } from './lib/videoDetails';
+import { VideoTitleDescription, VideoCoverChapters } from './components/video/VideoComposerFields';
+import { VideoDetailsPage } from './components/video/VideoDetailsPage';
 
 interface Props {
   onClose: () => void;
@@ -115,6 +119,12 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const queryClient = useQueryClient();
 
   const isEditMode = !!editPostId;
+  const [videoDetailsOpen, setVideoDetailsOpen] = useState(false);
+  const videoComposer = singleVideo(state.media, isEditMode);
+  const videoItem = videoComposer ? state.media[0] : null;
+  const videoData = state.videoData ?? emptyVideoDetails();
+  const longVideo = videoItem ? isLongFormVideo(videoDuration(videoItem)) : false;
+  const setVideoData = composer.setVideoData;
 
   // ---- Composer funnel instrumentation -----------------------------------
   // mode is derived from the props the openers set; entry from how it opened.
@@ -546,7 +556,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
     ? t('stage.saveChanges')
     : (!state.media.length && !hasWords)
       ? t('stage.emptyGate')
-      : (state.scheduledAt ? t('stage.schedule') : t('stage.share'));
+      : (state.scheduledAt ? t('stage.schedule') : videoComposer && longVideo ? 'PUBLISH VIDEO' : t('stage.share'));
   const primaryStyle: React.CSSProperties = {
     flex: 1,
     minWidth: 0,
@@ -604,6 +614,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         postShotTags:state.postShotTags,
         attachedScoreId:isPersonalActor?state.attachedScoreId:null,
         addToGuide:guideEffective,
+        videoData: state.videoData,
       });
       submittedRef.current = true;
       // A finished job is not a change of mind: the composer-flow step 1 must
@@ -818,6 +829,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         courseCountry: state.course?.country ?? null,
         courses: state.courses,
         media:state.media,holeNo:state.holeNo,postShotTags:state.postShotTags,attachedScoreId:isPersonalActor?state.attachedScoreId:null,visibility,addToGuide:state.addToGuide,
+        videoData: state.videoData ? { ...state.videoData, coverFrame: state.media.length === 1 && state.media[0].type === 'video' ? state.media[0].posterTimestamp ?? state.videoData.coverFrame : state.videoData.coverFrame } : undefined,
       });
       // Analytics callsite: post_draft_saved
       analyticsEvents.track('post_draft_saved', {
@@ -966,7 +978,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           open={sheet === 'cover'}
           onClose={() => setSheet(null)}
           item={active}
-          onApply={(ts) => updateActive({ posterTimestamp: ts })}
+          onApply={(ts) => { updateActive({ posterTimestamp: ts }); if (videoComposer) setVideoData({ coverFrame: ts }); }}
         />
         <AdjustSheet
           open={sheet === 'adjust'}
@@ -1179,6 +1191,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         />
       )}
 
+      {videoItem && <VideoCoverChapters item={videoItem} details={videoData} description={state.caption} long={longVideo} onChange={setVideoData} onFrame={ts => { updateActive({ posterTimestamp: ts }); setVideoData({ coverFrame: ts }); }} onCover={() => { setActiveIndex(0); setSheet('cover'); }} />}
       <div className="composer-golf-head" style={{margin:'22px 16px 10px'}}><span className="composer-golf-kicker">Sharing</span></div>
       <div data-testid="meta-panel" style={{ background:'var(--composer-golf-card)', border:'1px solid var(--composer-golf-line)', borderRadius:16, margin:'0 16px', overflow: 'hidden' }}>
         {metaRow(t('stage.postingAs'), <>
@@ -1204,7 +1217,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 12px)', position: 'relative' }}>
         <ComposerStepHeader step={1} total={1} left={leadingControl} onLeft={handleLeading} />
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>{isEditMode ? 'Edit post' : 'New post'}</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>{isEditMode ? 'Edit post' : videoComposer ? longVideo ? 'New video' : 'New short' : 'New post'}</span>
           <button type="button" onClick={() => setPreviewOpen(true)} disabled={!canSubmit}
             style={{ position: 'absolute', right: 16, pointerEvents: 'auto', height: 32, padding: '0 14px', borderRadius: 999, border: `1px solid ${GP.line2}`, background: 'transparent', fontSize: 13, fontWeight: 700, color: GP.ink, cursor: 'pointer', opacity: canSubmit ? 1 : 0.4 }}>
             Preview
@@ -1245,11 +1258,11 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
         <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
           <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} />
-          <div style={{ padding: '14px 16px 0' }}>
+          {videoComposer ? <VideoTitleDescription details={videoData} description={state.caption} duration={videoItem ? videoDuration(videoItem) : undefined} long={longVideo} onChange={setVideoData} onDetails={() => setVideoDetailsOpen(true)} /> : <div style={{ padding: '14px 16px 0' }}>
             <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
               placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />
             <div style={{ fontSize: 11.5, color: GP.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
-          </div>
+          </div>}
           {tagAndDetails}
         </div>
       )}
@@ -1258,7 +1271,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           with the Preview page so the two cannot drift (PV1). */}
       <ShareFooter
         label={primaryLabel}
-        subLine={composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt)}
+        subLine={composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt) + (videoComposer ? longVideo ? ' · Long form on your profile' : ' · Shorts on your profile' : '')}
         disabled={!canSubmit}
         busy={submitting || saving}
         onShare={onPrimary}
@@ -1279,7 +1292,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
              tapping it posts through the very same onPrimary path. */
           share={{
             label: primaryLabel,
-            subLine: composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt),
+            subLine: composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt) + (videoComposer ? longVideo ? ' · Long form on your profile' : ' · Shorts on your profile' : ''),
             disabled: !canSubmit,
             busy: submitting || saving,
             onShare: onPrimary,
@@ -1288,6 +1301,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       )}
       {mediaSheet}
       {sheets}
+      {videoComposer && videoDetailsOpen && <VideoDetailsPage details={videoData} description={state.caption} long={longVideo} userId={profile?.id ?? null} onChange={setVideoData} onDescription={handleSetCaption} onBack={() => setVideoDetailsOpen(false)} />}
     </div>
   );
 }
