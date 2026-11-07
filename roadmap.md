@@ -1,5 +1,12 @@
 # Roadmap
 
+## PF1_STAGE1
+- [ ] Rebuild composer course/hole/shot-tag controls, play-date/claim/GPS prefill and attached-round selection; preserve manual course choices and round-post identity.
+- [ ] Add non-blocking source-linked pending hole-guide contributions after finalize and media completion; retain draft media/order/edits and golf choices.
+- [ ] Match sharing/leave sheets, real preview actor avatar and photo-only editor title; preserve success and Preview behavior.
+- [ ] Add focused rule/flow coverage, run four separate maxWorkers=2 shards and report counts from7,408/645; stop on any unexpected failure.
+- [ ] Report all five requested live checks and320px geometry, including any external-auth limitations.
+
 ## Creator video filter centring follow-up
 - [x] Confirm exact shared Top 100 sm treatment; add intrinsic-width/auto-margin centring independent of safe-centre support, preserving counts and filtering.
 - [x] Existing creator13/13 green, no test changes; inventory unchanged7,408/645 (full shards not rerun). Actual-component320/390 fixture centred even with flex-start; build OK. CR_CHIPS_1_REPORT.md records screenshot/source discrepancy and external-auth limitation.
