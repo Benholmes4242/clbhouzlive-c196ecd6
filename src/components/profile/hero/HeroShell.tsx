@@ -28,12 +28,6 @@ export const W_25 = 'rgba(255,255,255,0.25)';
 export const W_12 = 'rgba(255,255,255,0.12)';
 export const W_10 = 'rgba(255,255,255,0.10)';
 
-/** Flat wash, then vertical ramp. If a figure ever loses contrast on a bright
- *  cover, DEEPEN these - never lighten the text. */
-export const COVER_WASH = 'rgba(14,18,22,0.58)';
-export const COVER_RAMP =
-  'linear-gradient(180deg, rgba(14,18,22,0.42) 0%, rgba(14,18,22,0.80) 100%)';
-
 /** The hero ARTWORK bleeds to the very top of the viewport (behind the status
  *  bar and both floating islands); only the CONTENT is inset by safe-area +
  *  island row (top offset 10 + ISLAND_H 44) + 8px. */
@@ -92,11 +86,6 @@ const HERO_TALLEST_CONTENT = Math.ceil(
  *  (227 now the sparkline is gone). Kept as documentation; the block carries
  *  NO floor (see coverAspect.ts), so the crop frame equals the rendered square. */
 void HERO_TALLEST_CONTENT;
-
-/** Short top gradient so white status-bar text stays legible over a bright
- *  cover; fades out by 60px. */
-export const COVER_TOP_GUARD =
-  'linear-gradient(180deg, rgba(14,18,22,0.45) 0%, rgba(14,18,22,0) 60px)';
 
 export interface HeroCounter {
   key: string;
