@@ -51,7 +51,7 @@ import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } fr
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
@@ -349,6 +349,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   onOpenScorecard,
 }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation('common');
 
   // Mentions inside the caption must dismiss the fullscreen overlay BEFORE
@@ -363,6 +364,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       requestAnimationFrame(() => navigate(to));
     },
     [onClose, onBeforeNavigate, navigate],
+  );
+  /* PF2_GUIDE: a member shot that came from a live Everyone post offers
+     "View post ›". The viewer closes first (same contract as mention taps)
+     and the post opens with closeTo = where the viewer was opened from, so
+     closing the post returns to the course or Courses page (VIEW_POST_1). */
+  const handleViewSourcePost = useCallback(
+    (postId: string) => {
+      if (onBeforeNavigate) onBeforeNavigate(); else onClose();
+      const closeTo = `${location.pathname}${location.search}`;
+      requestAnimationFrame(() => navigate(`/post/${postId}`, { state: { closeTo } }));
+    },
+    [onClose, onBeforeNavigate, navigate, location.pathname, location.search],
   );
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
@@ -697,7 +710,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       {/* Bottom scrim removed — author strip + action rail sit on the
           blurred backdrop; each element carries its own drop-shadow. */}
 
-      {syntheticPosts && <div style={{ zIndex: Z.echo, position: 'relative', ...fadeWhileScrubbing }} {...inertWhileScrubbing}><MemberShotCredit syntheticPosts={syntheticPosts} item={activePost.mediaItems[activeSlide]} /></div>}
+      {syntheticPosts && <div style={{ zIndex: Z.echo, position: 'relative', ...fadeWhileScrubbing }} {...inertWhileScrubbing}><MemberShotCredit syntheticPosts={syntheticPosts} item={activePost.mediaItems[activeSlide]} onViewPost={handleViewSourcePost} /></div>}
       {/* Bottom-LEFT — author + info stack (real posts only) */}
       {!syntheticPosts && <div
         {...inertWhileScrubbing}
