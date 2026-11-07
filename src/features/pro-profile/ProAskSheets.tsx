@@ -57,7 +57,7 @@ export function ProExplainerSheet({ userId, first, close }: { userId: string; fi
             <div className="pro-ask-ft"><small>Asked by a member at Sundridge Park · 41 found this useful</small></div>
           </div>
         </div>
-        <Button className="pro-profile-command" disabled={busy} onClick={() => void turnOn()}>Turn on Ask {first}</Button>
+        <Button variant={null} size={null} className="pro-profile-command" disabled={busy} onClick={() => void turnOn()}>Turn on Ask {first}</Button>
         <Button variant={null} size={null} className="pro-ask-later" onClick={close}>Not now</Button>
       </div>
     </BottomSheet>
@@ -84,7 +84,7 @@ export function ProAskSheet({ proId, first, viewerId, close }: { proId: string; 
       <div className="pro-profile pro-profile-sheet pro-ask-sheet">
         <Kicker first={first} />
         <h2 id="pro-ask-title">Ask a question</h2>
-        <textarea
+        <Textarea
           className="pro-ask-ta"
           aria-label="Your question"
           maxLength={200}
@@ -94,7 +94,7 @@ export function ProAskSheet({ proId, first, viewerId, close }: { proId: string; 
         />
         <div className="pro-ask-count">{text.length} / 200</div>
         <p className="pro-ask-priv">{first} sees your name. Everyone else sees "{labelText}".</p>
-        <Button className="pro-profile-command" disabled={busy || text.trim().length < 3} onClick={() => void send()}>Send to {first}</Button>
+        <Button variant={null} size={null} className="pro-profile-command" disabled={busy || text.trim().length < 3} onClick={() => void send()}>Send to {first}</Button>
       </div>
     </BottomSheet>
   );
@@ -196,7 +196,7 @@ export function ProAnswerSheet({ proId, first, row, close }: { proId: string; fi
           <b>{row.question}</b>
           <small>{[row.asker_name, row.asker_club].filter(Boolean).join(' · ')}</small>
         </div>
-        <textarea
+        <Textarea
           className="pro-ask-ta"
           aria-label="Write your answer"
           maxLength={600}
@@ -210,7 +210,7 @@ export function ProAnswerSheet({ proId, first, row, close }: { proId: string; fi
             ? 'Your answer shows on your profile.'
             : `Your answer shows on your profile, and ${askerFirst} gets a notification. Members see the question as from "${askerLabel(row.asker_club, !!row.asker_club)}".`}
         </p>
-        <Button className="pro-profile-command" disabled={busy || !text.trim()} onClick={() => void post()}>Post answer</Button>
+        <Button variant={null} size={null} className="pro-profile-command" disabled={busy || !text.trim()} onClick={() => void post()}>Post answer</Button>
       </div>
     </BottomSheet>
   );
