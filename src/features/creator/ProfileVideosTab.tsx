@@ -1,6 +1,8 @@
-/** CR2 videos remain a profile surface; Watch adapter/player own fullscreen playback. */
+/** CR2 videos remain a profile surface; Watch adapter/player own fullscreen playback.
+ * Video filters reuse RailChips' Top 100 sm choice treatment, so chip geometry and counts cannot drift. */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { RailChips } from '@/components/ui/RailChips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { posterFor } from '@/features/explore-magazine/watch/videoUnit';
@@ -24,7 +26,7 @@ export function ProfileVideosTab({ userId, viewerId, summary }: { userId: string
   }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
   const self = userId === viewerId;
   return <div className="profile-videos">
-    <div className="profile-video-chips">{([{ kind: 'all', label: 'All', count: summary.videos }, { kind: 'short', label: 'Shorts', count: summary.shorts }, { kind: 'long', label: 'Long form', count: summary.long_form }] as const).map(c => <Button key={c.kind} variant="ghost" className="profile-video-chip" aria-pressed={kind === c.kind} onClick={() => { setKind(c.kind); analyticsEvents.track('profile_videos_chip_changed', { kind: c.kind }); }}>{c.label}<span>{c.count}</span></Button>)}</div>
+    <div className="px-4 py-3"><RailChips size="sm" align="center-when-fit" ariaLabel="Video type" options={[{ id: 'all', label: 'All', value: summary.videos }, { id: 'short', label: 'Shorts', value: summary.shorts }, { id: 'long', label: 'Long form', value: summary.long_form }]} value={kind} onChange={next => { if (next !== 'all' && next !== 'short' && next !== 'long') return; setKind(next); analyticsEvents.track('profile_videos_chip_changed', { kind: next }); }} /></div>
     {query.isPending ? <CreatorContentSkeleton /> : query.isError ? <Button variant="ghost" onClick={() => void query.refetch()}>Try again</Button> : rows.length === 0 ? <p className="profile-video-empty">{kind === 'short' ? 'No shorts yet.' : kind === 'long' ? 'No long-form videos yet.' : self ? 'Your videos will show here.' : 'No videos yet.'}</p> : <div className="profile-video-grid">{rows.map((r, index) => <Button key={`${r.post_id}:${r.stream_id}`} variant="ghost" className="profile-video-tile" aria-label={`Play video ${index + 1}`} onClick={() => { analyticsEvents.track('profile_video_tapped', { kind, position: index, self }); openWithOrigin({ posts, index, originEl: null, posterUrl: r.poster_url ?? null, openedFrom: 'profile-videos', forceStartAtZero: true }); }}>
       {posterFor(r, 344) && <img src={posterFor(r, 344) ?? undefined} alt="" loading="lazy" />}<span className="profile-video-shade" />{creatorDuration(r.duration_seconds) && <span className="profile-video-duration">{creatorDuration(r.duration_seconds)}</span>}{r.course_name && <span className="profile-video-course">{shortCourseName(r.course_name)}</span>}
     </Button>)}</div>}
