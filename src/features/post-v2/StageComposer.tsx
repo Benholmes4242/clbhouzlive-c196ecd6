@@ -80,6 +80,12 @@ import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstC
 import { readPostWith, syncPostWith } from './lib/postWith';
 import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
 import { refreshAuthorPosts } from './lib/refreshAuthorPosts';
+import {ComposerCourseBlock,ComposerAttachRound,ComposerHoleGuide,ComposerRoundsSheet} from './components/golf/ComposerGolf';
+import {useCourseTeeSets} from '@/features/courses/hooks/useCourseTeeSets';
+import {useRoundHoleShapes} from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,roundIsRecent} from './lib/composerGolfReads';
+import {chooseCourseSource,recentRound,roundDay,guideVisible,composerDestinations,editorTitleKey,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
+import {loadComposerDraft} from './lib/composerDrafts';
 
 interface Props {
   onClose: () => void;
@@ -103,7 +109,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
   const { activeActor, selectActor, applyDraftActor } = useComposerActor({ initialActorType, initialActorId, ignoreInitial: !!editPostId || !!draftId });
   const composer = useStageComposer();
-  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
+  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset, setGolf } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
   const queryClient = useQueryClient();
@@ -269,31 +275,12 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
     if (isEditMode) return;
     if (!draftId || !profile?.id) return;
     let cancelled = false;
-    supabase
-      .from('post_drafts')
-      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, course_data')
-      .eq('id', draftId)
-      .eq('user_id', profile.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled || !data) return;
-        applyDraftActor((data.actor_type as string) ?? null, (data.actor_id as string) ?? null);
-        // Multi-course drafts stash the full ordered list in course_data.courses.
-        const cd = (data.course_data as { courses?: Array<{ id: string; name: string; country: string | null }> } | null) ?? null;
-        const savedCourses = cd?.courses ?? [];
-        const primary = data.course_id && data.course_name
-          ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
-          : null;
-        const courses = savedCourses.length > 0
-          ? savedCourses
-          : (primary ? [primary] : []);
-        restoreDraft({
-          caption: (data.content as string) ?? '',
-          courses,
-          course: courses[0] ?? null,
-        });
-        if (!cancelled) setRestoredDraftId(data.id as string);
-      });
+    void loadComposerDraft(draftId,profile.id).then(saved=>{
+      if(cancelled || !saved) return;
+      applyDraftActor(saved.row.actor_type,saved.row.actor_id);
+      memberChoseCourseRef.current=true;
+      restoreDraft(saved.state);setVisibility(saved.visibility);setRestoredDraftId(saved.row.id);
+    }).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft, applyDraftActor]);
 
@@ -413,25 +400,40 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
     return () => { cancelled = true; };
   }, [profile?.id]);
 
-  // THE COURSE FINDS ITSELF: first arrival, new posts only, never over a choice.
-  const coursesRef = useRef(state.courses);
-  coursesRef.current = state.courses;
-  useEffect(() => {
-    if (isEditMode || draftId || prefillCourse || !profile?.id || roundLookupRef.current) return;
-    if (state.media.length === 0) return;
-    roundLookupRef.current = true;
-    const userId = profile.id;
-    const first = state.media[0];
-    void (async () => {
-      const day = await firstCaptureDay(first);
-      if (!day) return;
-      const course = await findRoundCourse(userId, day);
-      if (!course || memberChoseCourseRef.current || coursesRef.current.length > 0) return;
-      setCourses([course]);
-      setCourseReason(roundReason(day));
-      setRoundFind({ courseId: course.id, day });
+  const [golfRounds,setGolfRounds]=useState<ComposerRound[]>([]);
+  const [golfSuggestions,setGolfSuggestions]=useState<CourseSuggestion[]>([]);
+  const [selectedRoundId,setSelectedRoundId]=useState<string|null>(null);
+  const [roundSheetOpen,setRoundSheetOpen]=useState(false);
+  const teeSets=useCourseTeeSets(state.course?.id);
+  const selectedRound=golfRounds.find(r=>r.whs_score_id===(state.attachedScoreId ?? selectedRoundId)) ?? golfRounds[0] ?? null;
+  const shapes=useRoundHoleShapes(state.attachedScoreId ? [state.attachedScoreId] : []);
+  useEffect(()=>{
+    if(isEditMode || draftId || prefillCourse || !profile?.id || !activeActor || memberChoseCourseRef.current) return;
+    let cancelled=false;
+    void (async()=>{
+      const personal=activeActor.type!=='business';
+      const claimed=personal?null:await readClaimedCourse(activeActor.id);
+      const rows=personal?await readComposerRounds(profile.id):[];
+      const recent=recentRound(rows);
+      const roundCourse=recent?.course_id?await readGolfCourse(recent.course_id):null;
+      const nearby=await readNearbyCourse(state.media.find(m=>m.type==='image'));
+      if(cancelled || memberChoseCourseRef.current) return;
+      const picked=chooseCourseSource({manual:false,claimed,round:recent&&roundCourse?{course:roundCourse,day:recent.play_date}:null,nearby});
+      setCourses(picked?[picked.course]:[]);setCourseReason(picked?.reason??null);
+      setRoundFind(recent&&roundCourse?{courseId:roundCourse.id,day:recent.play_date}:null);
+      const suggestions:CourseSuggestion[]=[];
+      for(const r of rows){if(!r.course_id||suggestions.some(c=>c.id===r.course_id)) continue;const c=await readGolfCourse(r.course_id);if(c)suggestions.push({...c,reason:`Your last round · ${roundDay(r.play_date)}`});if(suggestions.length>=3)break;}
+      if(nearby&&!suggestions.some(c=>c.id===nearby.id))suggestions.splice(2,1,{...nearby,reason:'Near where the first photo was taken'});
+      if(!cancelled)setGolfSuggestions(suggestions);
     })();
-  }, [isEditMode, draftId, prefillCourse, profile?.id, state.media, setCourses]);
+    return()=>{cancelled=true;};
+  },[activeActor?.id,activeActor?.type,profile?.id,isEditMode,draftId,prefillCourse,state.media[0]?.id,setCourses]);
+  useEffect(()=>{
+    let cancelled=false;
+    if(!profile?.id || !state.course || activeActor?.type==='business'){setGolfRounds([]);return;}
+    void readComposerRounds(profile.id,state.course.id).then(rows=>{if(!cancelled){setGolfRounds(rows);setSelectedRoundId(rows[0]?.whs_score_id??null);}});
+    return()=>{cancelled=true;};
+  },[profile?.id,state.course?.id,activeActor?.type]);
 
   // Played with suggestions (re-ranked when a round course/day is found).
   useEffect(() => {
@@ -593,6 +595,10 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         playedWithPeople: isPersonalActor ? withTagged.map(p => ({ id:p.id, name:p.name })) : [],
         bestHour: scheduleBestHour,
         shotTags: newShotTagJob(state.media),
+        holeNo:state.holeNo,
+        postShotTags:state.postShotTags,
+        attachedScoreId:isPersonalActor?state.attachedScoreId:null,
+        holeGuide:state.course && state.holeNo && state.addToGuide && state.media.length ? {courseId:state.course.id,holeNo:state.holeNo,userId:profile?.id??activeActor.id}:undefined,
       });
       submittedRef.current = true;
       // A finished job is not a change of mind: the composer-flow step 1 must
@@ -612,6 +618,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         total_ms: Math.round(Date.now() - mountedAtRef.current),
       });
       void refreshAuthorPosts(queryClient, activeActor.type, activeActor.id);
+      if(restoredDraftId) {try {await drafts.remove(restoredDraftId);setRestoredDraftId(null);} catch(error){console.warn('[PF1] draft removal failed',error);}}
       setSuccess(res);
       reset();
     } catch (e) {
@@ -805,6 +812,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         courseName: state.course?.name ?? null,
         courseCountry: state.course?.country ?? null,
         courses: state.courses,
+        media:state.media,holeNo:state.holeNo,postShotTags:state.postShotTags,attachedScoreId:isPersonalActor?state.attachedScoreId:null,visibility,addToGuide:state.addToGuide,
       });
       // Analytics callsite: post_draft_saved
       analyticsEvents.track('post_draft_saved', {
@@ -819,7 +827,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       setSheet(null);
       reset();
       onClose();
-    } finally {
+    } catch(error) {toast.error(error instanceof Error?error.message:'Could not save draft');} finally {
       setSavingDraft(false);
     }
   };
@@ -938,14 +946,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           onClose={() => setSheet(null)}
           drafts={drafts.drafts}
           onRestore={(d) => {
-            const primary = d.course_id && d.course_name
-              ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null }
-              : null;
-            const cd = (d as unknown as { course_data?: { courses?: Array<{ id: string; name: string; country: string | null }> } }).course_data ?? null;
-            const savedCourses = cd?.courses ?? [];
-            const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
-            restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
-            setRestoredDraftId(d.id);
+            if(!profile?.id)return;
+            void loadComposerDraft(d.id,profile.id).then(saved=>{if(!saved)return;applyDraftActor(saved.row.actor_type,saved.row.actor_id);memberChoseCourseRef.current=true;restoreDraft(saved.state);setVisibility(saved.visibility);setRestoredDraftId(d.id);}).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
           }}
           onDelete={drafts.remove}
         />
@@ -990,47 +992,18 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           </div>
         </BottomSheet>
   
-        {/* Close guard */}
-        <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
-          {/* One short job = content height. Grabber + title come from the sheet. */}
-          <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: PAGE2.mute }}>
-              Keep this post as a draft to finish later?
-            </div>
-            {!isEditMode && (
-              /* SAVE DRAFT TELLS THE TRUTH (BRIEF_SHEET_BACK_BEHAVIOUR_04 §2).
-                 post_drafts has no media or scheduled_at column, so this option
-                 keeps words, course tags and settings and NOTHING ELSE. It used
-                 to say only "Save draft", which reads as safe and threw photos
-                 away in silence. The option now names what it will not keep, in
-                 the option itself. It is NOT disabled: a member who cannot see
-                 why a control is greyed out learns nothing. */
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <button
-                  onClick={saveAsDraft}
-                  disabled={savingDraft}
-                  style={{ height: 48, background: PAGE2.ink, color: PAGE2.canvas, border: 0, borderRadius: 999, fontSize: 12.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
-                >
-                  {savingDraft ? 'Saving' : t('closeGuard.saveDraftKeepsNothingElse')}
-                </button>
-                {(state.media.length > 0 || !!state.scheduledAt) && (
-                  <div style={{ fontSize: 12, fontWeight: 600, color: PAGE2.mute, textAlign: 'center' }}>
-                    {state.media.length > 0 && state.scheduledAt
-                      ? t('closeGuard.saveDraftLosesBoth')
-                      : state.media.length > 0
-                        ? t('closeGuard.saveDraftLosesMedia')
-                        : t('closeGuard.saveDraftLosesSchedule')}
-                  </div>
-                )}
-              </div>
-            )}
-
-            <button
-              onClick={() => { setSheet(null); reset(); onClose(); }}
-              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: 'pointer', color: '#C0392B' }}
-            >
-              Discard
-            </button>
+        <ComposerRoundsSheet open={roundSheetOpen} onClose={()=>setRoundSheetOpen(false)} rounds={golfRounds} onPick={r=>{setSelectedRoundId(r.whs_score_id);if(state.attachedScoreId)setGolf({attachedScoreId:r.whs_score_id});}} />
+        <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title={isEditMode?'Unsaved changes':t('closeGuard.title')}>
+          <div style={{padding:'0 18px 34px',display:'flex',flexDirection:'column',gap:16,color:GP.ink}}>
+            <p style={{fontSize:14,color:GP.mute,lineHeight:1.45,margin:0}}>{t('closeGuard.body')}</p>
+            {!isEditMode&&<><div className="composer-draft-keeps">
+              {state.media.length>0&&<div><span>Photos and video</span><b>{state.media.length}</b></div>}
+              {state.caption&&<div><span>Words</span><b>Kept</b></div>}
+              {(state.course||state.postShotTags?.length>0)&&<div><span>Course, hole and tags</span><b>{[state.course?.name,state.holeNo?ordinal(state.holeNo):null].filter(Boolean).join(' · ') || state.postShotTags.join(', ')}</b></div>}
+              {state.attachedScoreId&&selectedRound&&<div><span>Round</span><b>{selectedRound.gross_score} attached</b></div>}
+            </div><button onClick={saveAsDraft} disabled={savingDraft} style={{height:54,background:GP.ink,color:GP.onInk,border:0,borderRadius:999,fontSize:15,fontWeight:800,textTransform:'uppercase',letterSpacing:'.14em'}}>{savingDraft?'Saving':t('closeGuard.saveDraft')}</button>
+            {state.scheduledAt&&<p style={{fontSize:12,color:GP.mute}}>{t('closeGuard.saveDraftLosesSchedule')}</p>}</>}
+            <button onClick={()=>{setSheet(null);reset();onClose();}} style={{background:'none',border:0,color:'var(--composer-golf-under)',fontSize:13,fontWeight:800,letterSpacing:'.14em'}}>DISCARD</button>
           </div>
         </BottomSheet>
     </>
@@ -1050,7 +1023,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const mediaSheet = !mediaSheetOpen ? null : (
     <div
       role="dialog"
-      aria-label={t('stage.mediaSheet.title')}
+      aria-label={t(editorTitleKey(state.media))}
       style={{
         position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas,
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
@@ -1061,7 +1034,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 10px)' }}>
         <div style={{ width: 36, height: 4, borderRadius: 999, background: PAGE2.dim, margin: '0 auto' }} />
         <div style={{ padding: '12px 16px 10px', fontSize: 16, fontWeight: 700, color: PAGE2.ink, letterSpacing: '-0.015em' }}>
-          {t('stage.mediaSheet.title')}
+          {t(editorTitleKey(state.media))}
         </div>
       </div>
 
@@ -1170,25 +1143,17 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
   const metaRow = (label: string, value: React.ReactNode, onClick: () => void, first: boolean) => (
     <button type="button" onClick={onClick} style={{ ...page2RowStyle(!first), padding: '14px 16px' }}>
-      <span style={{ fontSize: 14.5, fontWeight: 600, color: GP.ink }}>{label}</span>
-      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: GP.mute }}>{value}</span>
+      <span style={{ fontSize: 15, fontWeight: 600, flex:'none', color: GP.ink }}>{label}</span>
+      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, minWidth:0, fontSize: 14, color: GP.mute }}>{value}</span>
       <ChevronRight size={14} color={GP.dim} style={{ marginLeft: 6, flex: 'none' }} />
     </button>
   );
 
   const tagAndDetails = (
     <>
-      <WhereSection
-        course={state.courses[0] ?? null}
-        reason={courseReason}
-        changing={whereChanging}
-        recent={recentCourses.filter((c) => c.id !== state.courses[0]?.id)}
-        onChange={() => setWhereChanging(true)}
-        onCancel={() => setWhereChanging(false)}
-        onUntag={() => chooseCourses(state.courses.slice(1))}
-        onSearch={() => { openDetail('course'); setSheet('course'); }}
-        onPick={(c) => chooseCourses([c, ...state.courses.filter((x) => x.id !== c.id && x.id !== state.courses[0]?.id)])}
-      />
+      <ComposerCourseBlock course={state.course} reason={courseReason} suggestions={golfSuggestions} hole={state.holeNo??null} tags={state.postShotTags??[]} holes={teeSets.data?.[0]?.holes??[]} onChange={()=>{openDetail('course');setSheet('course');}} onPick={c=>chooseCourses([c])} onHole={holeNo=>setGolf({holeNo})} onTags={postShotTags=>setGolf({postShotTags})}/>
+      {isPersonalActor&&selectedRound&&golfRounds.some(roundIsRecent)&&<ComposerAttachRound round={selectedRound} on={!!state.attachedScoreId} hole={state.holeNo??null} shape={shapes?.get(state.attachedScoreId??'')??null} onToggle={()=>setGolf({attachedScoreId:state.attachedScoreId?null:selectedRound.whs_score_id})} onDifferent={()=>setRoundSheetOpen(true)}/>}
+      {state.course&&state.holeNo&&guideVisible(state.holeNo,state.media.length)&&<ComposerHoleGuide course={state.course} hole={state.holeNo} on={state.addToGuide!==false} onToggle={()=>setGolf({addToGuide:!state.addToGuide})}/>}
       {state.courses.length > 1 && (
         <div style={{ display: 'flex', gap: 6, margin: '10px 16px 0', flexWrap: 'wrap' }}>
           {state.courses.slice(1).map((c) => (
@@ -1209,10 +1174,11 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         />
       )}
 
-      <div data-testid="meta-panel" style={{ background: GP.panel, border: `1px solid ${GP.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
+      <div className="composer-golf-head" style={{margin:'22px 16px 10px'}}><span className="composer-golf-kicker">Sharing</span></div>
+      <div data-testid="meta-panel" style={{ background:'var(--composer-golf-card)', border:'1px solid var(--composer-golf-line)', borderRadius:16, margin:'0 16px', overflow: 'hidden' }}>
         {metaRow(t('stage.postingAs'), <>
-          <span style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
-          <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
+          <span style={{minWidth:0,whiteSpace:'normal',overflowWrap:'anywhere',textAlign:'right'}}>{authorName}</span>
+          <SquircleAvatar src={authorAvatar} alt={authorName} size={24} hairlineRing ringColor={DARK_HAIRLINE} />
         </>, () => { openDetail('actor'); setSheet('actor'); }, true)}
         {metaRow('Who can see this', visibilityLabel(visibility), () => setVisibilityOpen(true), false)}
         {showScheduleRow && metaRow(t('stage.scheduleForLater'),
@@ -1272,7 +1238,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         </div>
       ) : (
         /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
-        <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
           <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} />
           <div style={{ padding: '14px 16px 0' }}>
             <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
@@ -1287,7 +1253,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           with the Preview page so the two cannot drift (PV1). */}
       <ShareFooter
         label={primaryLabel}
-        subLine={shareSubLine(isPersonalActor ? withNames : [], holeShotCount)}
+        subLine={composerDestinations(state.holeNo??null,state.addToGuide!==false&&state.media.length>0,state.scheduledAt)}
         disabled={!canSubmit}
         busy={submitting || saving}
         onShare={onPrimary}
@@ -1308,7 +1274,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
              tapping it posts through the very same onPrimary path. */
           share={{
             label: primaryLabel,
-            subLine: shareSubLine(isPersonalActor ? withNames : [], holeShotCount),
+            subLine: composerDestinations(state.holeNo??null,state.addToGuide!==false&&state.media.length>0,state.scheduledAt),
             disabled: !canSubmit,
             busy: submitting || saving,
             onShare: onPrimary,

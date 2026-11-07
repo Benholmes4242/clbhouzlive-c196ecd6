@@ -6,7 +6,7 @@ import {useCoursePhoto} from '../../hooks/useCoursePhoto';
 import type {StageCourse} from '../../hooks/useStageComposer';
 import type {TeeHole} from '@/features/courses/hooks/useCourseTeeSets';
 import type {HoleShape} from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import {POST_SHOT_TAGS,ordinal,roundDay,roundToPar,signedScore,toggleHole,toggleShot,shortCourseName as unused,type PostShotTag,type CourseSuggestion,type ComposerRound} from '../../lib/composerGolfRules';
+import {POST_SHOT_TAGS,ordinal,roundDay,roundToPar,signedScore,toggleHole,toggleShot,type PostShotTag,type CourseSuggestion,type ComposerRound} from '../../lib/composerGolfRules';
 import {shortCourseName} from '../../lib/golfPostRules';
 import BottomSheet from '../BottomSheet';
 import './composerGolf.css';
