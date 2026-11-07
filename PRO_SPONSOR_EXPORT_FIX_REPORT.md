@@ -68,3 +68,28 @@ No tests renamed, rewritten or deleted.
 
 ### Not verified
 Live Chromium export of the painted badge is unverified; auth is `external_unmanaged`, so an authenticated save/share PNG could not be produced here.
+
+## Real fix close-out (text baseline; painted badge removed)
+
+Root cause of every export fault: html2canvas 1.4.1 measures font baselines by placing an `<img>` beside text in the live document, and Tailwind's preflight `img{display:block}` breaks that measurement, drawing every line several pixels low. The painted-badge workaround also misplaced the pill because html2canvas leaves its scale(3) transform on the context, so rect coordinates x 3 landed at 9x.
+
+Fix in `ProSponsorSheet.capture()`: the pill rect/style read, the `onclone` badge-hiding and the canvas painting block are removed completely. The html2canvas call is wrapped in a temporary `<style>img{display:inline-block}</style>` appended to `document.head` and removed in `finally` (including on rejection), with a comment explaining the font-metrics reason. `data-sponsor-capture` stays on the node; the sheet's CSS (flex name row, block ProLabel at 18px line-height, grid rank row, JS-truncated result names) is unchanged.
+
+### Tests
+- Replaced the painted-badge case with two new cases in `src/test/proClubhouseSponsor.test.tsx` (47 -> 48): capture appends a style containing `img{display:inline-block}` to `document.head` before html2canvas runs (checked inside the mock call) and removes it afterwards; capture removes the style even when html2canvas rejects.
+- Existing tests changed: one — the save-capture options assertion.
+  - Old: `expect(opts).toEqual({ backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false, onclone: expect.any(Function) });`
+  - New: `expect(opts).toEqual({ backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false });`
+- The new style-injection case also asserts `opts` has no `onclone` property; capture no longer calls `getContext` for painting (no painting code remains).
+- The "preview badge stays visible after a capture" case is unchanged and still passes.
+
+### Commands and outcomes
+- Focused: `bunx vitest run src/test/proClubhouseSponsor.test.tsx` — **48/48 passed**.
+- Shard 1: **1,898 passed / 162 files**, 0 failures.
+- Shard 2: **1,827 passed / 162 files**, 1 failure — the known FM1 case (`fw1FeaturedDeck.test.tsx > FM1 sound group > reserves no right padding on the meta line`), untouched.
+- Shard 3: **1,882 passed / 162 files**, 0 failures.
+- Shard 4: **1,798 passed / 159 files**, 0 failures.
+- Total: **7,405 passed + 1 known failure = 7,406 cases / 645 files**. Delta vs 7,405: +1, exactly the net test change (-1 painted-badge case, +2 style cases). Build OK.
+
+### Not verified
+A real saved PNG from an authenticated session is unverified; auth is `external_unmanaged`, so no end-to-end export could be produced here.
