@@ -312,6 +312,12 @@ interface Props {
   onBeforeNavigate?: () => void;
   /** When true, only the back chevron renders — the user is on the end-of-feed plate. */
   feedEnded?: boolean;
+  /** PF1B: the active post's golf context (batched by the overlay). */
+  golfContext?: PostGolfContext | null;
+  /** PF1B: par/yards for the context's hole. */
+  golfHole?: TeeHole | null;
+  /** PF1B: opens the attached round's scorecard sheet over the viewer. */
+  onOpenScorecard?: (scoreId: string) => void;
 }
 
 export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome({
@@ -335,6 +341,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   syntheticPosts = false,
   onBeforeNavigate,
   feedEnded = false,
+  golfContext = null,
+  golfHole = null,
+  onOpenScorecard,
 }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
@@ -589,6 +598,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} style={{ display: 'block', marginLeft: -2 }} />
         </button>
 
+        {/* PF1B hole chip (mock B): below the top bar, left aligned with the
+            caption block, FIRST slide only. Absolute against this fixed
+            container so it tracks the bar's real height. */}
+        <FullscreenHoleChipSlot context={golfContext} hole={golfHole} activeSlide={activeSlide} />
 
         {/* Course header — left edge is 70px = chevron left (14) + chevron (44)
             + row gap (12). The header FOLLOWS the chevron: change the chevron's
@@ -768,6 +781,16 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               </>
             )}
           </div>
+
+          {/* PF1B round pill (mock B): one glass pill under the course/time
+              line; opens the same scorecard sheet over the viewer. */}
+          {golfContext?.roundScoreId && onOpenScorecard && (
+            <FullscreenRoundPill
+              gross={golfContext.roundGross}
+              toPar={golfRoundToPar(golfContext)}
+              onOpen={() => onOpenScorecard(golfContext.roundScoreId as string)}
+            />
+          )}
 
           {/* Review figures — shown, not only linked. Null sub-scores omitted. */}
           {review && (
