@@ -1,5 +1,12 @@
 # Roadmap
 
+## PF3C_ROUND
+- [ ] Extend canonical chapters with validated 9/18-hole marks and description pre-marks; preserve timestamp fallback.
+- [ ] Add composer chapter preview, following switch and pinned Mark the holes page; clear mismatched round marks and preserve drafts.
+- [ ] Save non-blocking details/marks after the attached-round post patch using existing live tables; no server edits.
+- [ ] Add playback-following chip and shared About scorecard/chapter extension from canonical round data.
+- [ ] Add focused tests, run four separate --maxWorkers=2 shards, check 320px and report checks1–5 with device/SQL confirmations left to Ben.
+
 ## PF3B_VIEWER
 - [ ] Add page-batched signed-in non-guest details reads and shared detailed-video rules using canonical parseChapters.
 - [ ] Add one About sheet, fullscreen/feed teasers and chapter-aware scrubber; preserve plain videos and protected surfaces.

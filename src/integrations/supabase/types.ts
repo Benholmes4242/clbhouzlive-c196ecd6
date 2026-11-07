@@ -9847,6 +9847,52 @@ export type Database = {
           },
         ]
       }
+      post_video_chapters: {
+        Row: {
+          created_at: string
+          hole_no: number
+          id: string
+          post_id: string
+          start_seconds: number
+        }
+        Insert: {
+          created_at?: string
+          hole_no: number
+          id?: string
+          post_id: string
+          start_seconds: number
+        }
+        Update: {
+          created_at?: string
+          hole_no?: number
+          id?: string
+          post_id?: string
+          start_seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_video_chapters_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_video_chapters_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "review_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_video_chapters_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+        ]
+      }
       post_video_credits: {
         Row: {
           created_at: string
@@ -9947,6 +9993,7 @@ export type Database = {
           gear: Json
           links: Json
           post_id: string
+          score_follows: boolean
           title: string | null
           title_on_cover: boolean
           updated_at: string
@@ -9956,6 +10003,7 @@ export type Database = {
           gear?: Json
           links?: Json
           post_id: string
+          score_follows?: boolean
           title?: string | null
           title_on_cover?: boolean
           updated_at?: string
@@ -9965,6 +10013,7 @@ export type Database = {
           gear?: Json
           links?: Json
           post_id?: string
+          score_follows?: boolean
           title?: string | null
           title_on_cover?: boolean
           updated_at?: string
@@ -25437,8 +25486,10 @@ export type Database = {
         Returns: {
           credits: Json
           gear: Json
+          hole_chapters: Json
           links: Json
           post_id: string
+          score_follows: boolean
           thanks: Json
           title: string
           title_on_cover: boolean
