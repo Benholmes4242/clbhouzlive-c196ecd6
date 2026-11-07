@@ -39,7 +39,17 @@ No tests were deleted or renamed. No SQL, migration file, `feed_config`, native 
 - The permitted known `fw1FeaturedDeck` meta-line failure did not occur.
 - Latest preview build: OK at 2026-11-07T14:23:53Z.
 
-## 320px and mock status
+## Signed-off mock comparison — 7 November 2026
 
-- The referenced `pro-courses-and-event-matching-signed-off.html` was not present in the upload folder, so a direct mock comparison could not be performed.
+- The missing `pro-courses-and-event-matching-signed-off.html` was supplied and compared with all four implemented views and the original BUILD brief. No product or test changes were required.
+- Archive tour-date and finish lines match the changed scope. The live `user_course_activity` view is explicitly the owner of tour-course inclusion and event-date grouping; `useUserCourseActivity` maps `played_at` to `last_played_at`. No client union or regrouping was added. Hosted data remains unverified.
+- The existing summary, year headings, ratings, thumbnails and expansion remain unchanged as required. The mock's sample course totals, ratings and rated-only courses were not copied into production.
+- Admin list states, metadata, filters, sheet copy/search/actions and the Inbox Tools entry match the original brief. The new Tools row has no special highlight, and its zero-count fallback follows the original brief.
+- One shared-pattern difference is retained: the mock displays `Different place (0)` while the existing VenueMapping pattern and new page show the divider only when incompatible candidates exist. The brief requires cloning the existing structure, so shared behavior was not restyled.
+- Reference views were rendered at 320px without horizontal overflow. This checks the supplied mock only, not the authenticated implementation.
+- No tests changed, were deleted or renamed, and no tests were rerun for this comparison. Full-suite inventory remains the previously executed 7,439 tests / 651 files; the four recorded shard counts are unchanged.
+
+## 320px verification status
+
+- The signed-off mock comparison is now complete; it was unavailable during the original build.
 - Authenticated 320px checks are unavailable in this environment because the project uses externally managed authentication. Source checks confirm the archive tour lines use nowrap ellipsis inside a `minWidth: 0` identity column, and the admin sheet footer uses `flexWrap: 'wrap'`; live archive/list/sheet overflow on a device remains for Ben to verify.
