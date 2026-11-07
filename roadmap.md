@@ -1,5 +1,10 @@
 # Roadmap
 
+## PF3A_VIDEO — creator video details
+- [ ] Build single-video title/description, Details and add-item sheets, cover choices and timestamp chapters; preserve mixed/photo/edit and viewer surfaces.
+- [ ] Persist video details/credits/thanks non-blockingly, round-trip video_data drafts, and render video_credit like mentions in Activity.
+- [ ] Add tests, run focused and four separate shards; report cover path and six device checks. Separate upcoming LAST YEAR test stop stays untouched.
+
 ## Upcoming LAST YEAR condensed board
 - [x] Match upcoming rows/header to the live hero geometry; MiniBoard changes are exports only.
 - [x] Add seven cases and update four authorized existing geometry assertions; record files/old-new values in TOUR_UPCOMING_LAST_YEAR_REPORT.md.
