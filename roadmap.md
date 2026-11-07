@@ -1,9 +1,9 @@
 # Roadmap
 
 ## FIX_VERIFY routing and three-build verification
-- [ ] Add video_credit only to the push post-mention branch; test its destination without changing parity tests; deploy process-push-queue.
-- [ ] Repair only authorized country-bar style and 28px avatar assertions; focused four pro tiles files, then four separate shards. Only FW1 meta-line is allowed-known; stop otherwise.
-- [ ] Verify five requested 320px surfaces without overflow; report deploy, assertion old/new lines, shard totals and check limitations.
+- [x] Add video_credit only to push post-mention branch; unchanged parity85/85 plus three new route rules3/3 pass. process-push-queue deployed successfully; source SHA in FIX_VERIFY_REPORT.md.
+- [x] Repair exactly authorized country-bar style and28px avatar assertions; presentation35passed/1failed, combined123passed/1failed. Report old/new lines and +3/+1 expected7508/657 inventory.
+- [ ] STOP: profileCoursesRecord.test.tsx:76:41 approved inline-style assertion still lacks var(--course-country-bar), received display/height/width/radius only. No further repair. Four shards and five320px checks await explicit test-only repair authorization; only FW1 meta-line allowed-known.
 
 ## PF3A_VIDEO mounted-test close-out
 - [x] Add nine mounted cases: real composer/real-hook photo add/remove restoration passes; links/gear chip and limit transitions pass. Existing assertions/cases and production untouched.

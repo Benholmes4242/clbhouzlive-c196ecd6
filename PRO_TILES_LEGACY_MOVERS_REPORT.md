@@ -1,5 +1,8 @@
 # Pro season tiles, legacy chart and movers — stopped
 
+## Authorized FIX_VERIFY follow-up
+Applied exactly the two approved assertions; avatar lookup passes, but country-bar inline style still fails at profileCoursesRecord.test.tsx:76:41: `expected 'display: block; height: 100%; width: …' to contain 'var(--course-country-bar)'`. Actual style is `display: block; height: 100%; width: 100%; border-radius: 3px;`. Four presentation files35passed/1failed; with unchanged routing parity85/85 and three new route cases3/3, combined123passed/1failed across6files. The authorized shared push video_credit branch was deployed in process-push-queue successfully. No further repair/shards/320px checks after the mandatory stop. FIX_VERIFY_REPORT.md records deployment SHA, exact old/new assertion lines, +3/+1 expected7508/657 inventory and all five unverified narrow-screen checks.
+
 ## Delivered scope
 Season-only `pro-season-tiles` outlines/centering and open `pro-season-results`; result sheet tile styles retained. Legacy tile figures/labels centred, null tile values dim em dashes, fetched zero retained; hero/tile figure tracking zero. Country bars use neutral55% ink token; both dot keys render only with plot while unmapped remains independent. Movers are transparent12px outlined flex chips with28px avatar and surname; green up/warning-red down arrow separated from white place count; gross/to-par colour law unchanged. Header/padding/hairline preserved. No mock annotation/switcher/example stand-ins added.
 
