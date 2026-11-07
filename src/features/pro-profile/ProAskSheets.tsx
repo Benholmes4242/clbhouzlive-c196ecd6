@@ -3,13 +3,15 @@
  * steps and sample card are fixed text, never live data. */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useProAnswers, useProAskWrite, useProInbox, useMyAskerLabel } from './useProAsk';
+import { askKey, useProAnswers, useProAskWrite, useProInbox, useMyAskerLabel } from './useProAsk';
 import { answerFooter, askerLabel, inboxTime, type ProInboxRow } from './proAskRules';
 
 const Kicker = ({ first }: { first: string }) => <div className="pro-collection-kicker">ASK {first.toUpperCase()}</div>;
@@ -22,13 +24,19 @@ const EXPLAINER_STEPS: [string, string][] = [
   ['Turn it off any time', "Your answers are hidden while it's off, and come back when you turn it on again."],
 ];
 
-export function ProExplainerSheet({ first, close }: { first: string; close: () => void }) {
+export function ProExplainerSheet({ userId, first, close }: { userId: string; first: string; close: () => void }) {
   const [busy, setBusy] = useState(false);
+  const cache = useQueryClient();
   const turnOn = async () => {
     setBusy(true);
     const { error } = await supabase.rpc('set_pro_ask_enabled', { p_on: true });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
+    await Promise.all([
+      cache.invalidateQueries({ queryKey: askKey(userId) }),
+      cache.invalidateQueries({ queryKey: ['pro-profile', 'ask-inbox'] }),
+    ]);
+    toast.success(`Ask ${first} is on.`);
     close();
   };
   return (
