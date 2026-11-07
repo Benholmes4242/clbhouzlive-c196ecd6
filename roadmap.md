@@ -1,5 +1,9 @@
 # Roadmap
 
+## Creator video filter centring follow-up
+- [x] Confirm exact shared Top 100 sm treatment; add intrinsic-width/auto-margin centring independent of safe-centre support, preserving counts and filtering.
+- [x] Existing creator13/13 green, no test changes; inventory unchanged7,408/645 (full shards not rerun). Actual-component320/390 fixture centred even with flex-start; build OK. CR_CHIPS_1_REPORT.md records screenshot/source discrepancy and external-auth limitation.
+
 ## CR_CHIPS_1
 - [x] Replace creator video choices with shared Top 100 sm RailChips; retain wrapper gutters, counts and analytics; remove unused local chip CSS/token.
 - [x] Focused13/13; separate shards1,900/1,828/1,882/1,798 =7,408/645, zero failures; +2 named cases, existing selector-only change reported.

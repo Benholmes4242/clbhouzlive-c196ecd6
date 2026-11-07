@@ -1,5 +1,12 @@
 # CR_CHIPS_1 — complete
 
+## Screenshot follow-up — 2026-11-07
+- The supplied creator screenshot shows the old larger white-selected pills. Current source already uses the exact same `RailChips size="sm"` as `Top100CoursesHubPanel.tsx:264–270`; no second size or colour treatment was introduced and Courses was not changed. The screenshot's older appearance cannot be reproduced in this sandbox, so its delivery/cache cause is unverified.
+- `ProfileVideosTab.tsx` now also supplies `mx-auto w-max max-w-full`: fitting choices centre using intrinsic width and auto margins, independent of support for `justify-content: safe center`. Oversized rows retain horizontal scrolling. Existing gutters, counts, queries, analytics, grid and duration badges are unchanged.
+- Command `bunx vitest run src/test/cr2CreatorProfile.test.tsx --maxWorkers=2`: **13/13 passed**. No tests added, deleted, renamed, rewritten or assertions changed. Full-suite inventory remains **7,408 tests / 645 files**, delta zero; full shards were not rerun for this follow-up (last full passing run is below).
+- Browser-only actual-component fixture at **320px and 390px**, with alignment deliberately forced to `flex-start` to simulate missing safe-centre support: choice group width221px, scroll width221px, centre offset0.008px; shared11px font,9px radius,26.5px height. Both element screenshots reviewed. This verifies layout fallback, not authenticated profile placement or live readback; external unmanaged auth still prevents that check.
+- Preview diagnostic **build OK 2026-11-07T05:47:50Z**. No shared control, Courses, SQL, migrations, edge functions, guest behavior, review wizard, news, round plots, feed_config, cap or native configuration changed.
+
 ## Changes
 - `ProfileVideosTab.tsx` now uses the shared `RailChips` with default ground, `size="sm"`, `align="center-when-fit"`, `ariaLabel="Video type"`, and live All/Shorts/Long form counts. Wrapper retains 12px vertical and 16px side gutters. No chip-width ceiling or truncation.
 - Existing kind state, `get_profile_videos` reads, analytics event/payload, grid and duration badges remain unchanged.
