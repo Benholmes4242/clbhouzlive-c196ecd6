@@ -9432,6 +9432,7 @@ export type Database = {
           studio_music: Json | null
           updated_at: string | null
           user_id: string
+          video_data: Json | null
           visibility: string | null
         }
         Insert: {
@@ -9453,6 +9454,7 @@ export type Database = {
           studio_music?: Json | null
           updated_at?: string | null
           user_id: string
+          video_data?: Json | null
           visibility?: string | null
         }
         Update: {
@@ -9474,6 +9476,7 @@ export type Database = {
           studio_music?: Json | null
           updated_at?: string | null
           user_id?: string
+          video_data?: Json | null
           visibility?: string | null
         }
         Relationships: [
@@ -9837,6 +9840,202 @@ export type Database = {
           },
           {
             foreignKeyName: "post_shares_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+        ]
+      }
+      post_video_credits: {
+        Row: {
+          created_at: string
+          id: string
+          notified_at: string | null
+          position: number
+          post_id: string
+          profile_id: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          position?: number
+          post_id: string
+          profile_id: string
+          role: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          position?: number
+          post_id?: string
+          profile_id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_video_credits_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "review_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_video_credits_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      post_video_details: {
+        Row: {
+          created_at: string
+          gear: Json
+          links: Json
+          post_id: string
+          title: string | null
+          title_on_cover: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          gear?: Json
+          links?: Json
+          post_id: string
+          title?: string | null
+          title_on_cover?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          gear?: Json
+          links?: Json
+          post_id?: string
+          title?: string | null
+          title_on_cover?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_video_details_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_video_details_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "review_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_video_details_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+        ]
+      }
+      post_video_thanks: {
+        Row: {
+          business_id: string
+          created_at: string
+          position: number
+          post_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          position?: number
+          post_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          position?: number
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_video_thanks_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_video_thanks_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_video_thanks_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "review_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_video_thanks_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "round_post_like_count_drift"
@@ -25233,6 +25432,18 @@ export type Database = {
         }[]
       }
       get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
+      get_post_video_details: {
+        Args: { p_post_ids: string[] }
+        Returns: {
+          credits: Json
+          gear: Json
+          links: Json
+          post_id: string
+          thanks: Json
+          title: string
+          title_on_cover: boolean
+        }[]
+      }
       get_pro_answers: {
         Args: { p_limit?: number; p_offset?: number; p_pro_id: string }
         Returns: Json
@@ -27972,6 +28183,7 @@ export type Database = {
         Args: { _data: Json; _message: string; _title: string }
         Returns: undefined
       }
+      notify_video_credits: { Args: { p_post_id: string }; Returns: undefined }
       owgr_auto_match: { Args: { p_id: string }; Returns: string }
       owgr_country_matches: {
         Args: {
