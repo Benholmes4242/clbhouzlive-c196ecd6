@@ -21,7 +21,6 @@ import type { ShotTagJob } from '../lib/shotTagWrites';
 import type { PostVisibility } from '../lib/golfPostRules';
 import { writePostWith } from '../lib/postWith';
 import {golfPostPatch,type PostShotTag} from '../lib/composerGolfRules';
-import type {HoleGuideContext} from '../lib/postHoleGuide';
 
 export interface SubmitInput {
   caption: string;
@@ -48,7 +47,9 @@ export interface SubmitInput {
   holeNo?: number | null;
   postShotTags?: PostShotTag[];
   attachedScoreId?: string | null;
-  holeGuide?: HoleGuideContext;
+  /** PF1B: the hole-guide toggle. Written to posts.add_to_hole_guide in the
+   *  same posts patch; the server adds the media to the hole guide. */
+  addToGuide?: boolean;
 }
 
 export type SubmitResultKind = 'published' | 'scheduled' | 'uploading';
@@ -217,12 +218,15 @@ export function usePostSubmit() {
 
 
       // Text-only or scheduled-text: single-shot. finalize is implicit on the server.
+      // PF1B: the SERVER decides scheduled — create_post_v2 returns
+      // status 'scheduled' for a text-only post with a scheduled time.
       if (!hasMedia) {
+        const isScheduled = bornObj.status === 'scheduled' || !!input.scheduledAt;
         return {
-          kind: input.scheduledAt ? 'scheduled' : 'published',
+          kind: isScheduled ? 'scheduled' : 'published',
           postId,
-          scheduledAt: bornObj.scheduled_at,
-          isScheduled: !!input.scheduledAt,
+          scheduledAt: bornObj.scheduled_at ?? input.scheduledAt?.toISOString(),
+          isScheduled,
           playedWithNames,
           bestHour: input.bestHour,
           courseName: input.course?.name,
@@ -245,7 +249,6 @@ export function usePostSubmit() {
           isScheduled: !!input.scheduledAt,
           scheduledAt: input.scheduledAt?.toISOString(),
           shotTags: input.shotTags,
-          holeGuide: input.holeGuide,
         },
         input.media,
       );
