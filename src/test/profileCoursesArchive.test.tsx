@@ -17,7 +17,8 @@ const COURSES = [
   { id: 'd', name: 'Delta Dunes', country: 'USA', sub_country: 'Texas', thumbnail_image: null, global_rank: null },
 ];
 
-vi.mock('@/hooks/useUserCourseActivity', () => ({ useUserCourseActivity: () => ({ data: ACTIVITY }) }));
+const archiveFixture = vi.hoisted(() => ({ realFilters: false, zeroTop100: false }));
+vi.mock('@/hooks/useUserCourseActivity', () => ({ useUserCourseActivity: () => ({ data: archiveFixture.zeroTop100 ? ACTIVITY.map(a => ({ ...a, is_top100: false })) : ACTIVITY }) }));
 const tourCourses = vi.hoisted(() => vi.fn(() => ({ data: new Map() })));
 vi.mock('@/hooks/useProTourCourses', () => ({ useProTourCourses: tourCourses }));
 vi.mock('@/hooks/usePlayedUnratedCourses', () => ({ usePlayedUnratedCourses: () => ({ courses: [], count: 0 }) }));
@@ -38,8 +39,9 @@ vi.mock('@/integrations/supabase/client', () => ({
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 // The sort dropdown is a Radix portal; replace the bar with plain buttons that
 // still print the two chip counts it receives.
-vi.mock('@/components/profile/courses/FilterBar', () => ({
-  FilterBar: (p: any) => (
+vi.mock('@/components/profile/courses/FilterBar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/profile/courses/FilterBar')>();
+  return { FilterBar: (p: any) => archiveFixture.realFilters ? <actual.FilterBar {...p} /> : (
     <div>
       <span data-testid="chip-all">{p.allCount}</span>
       <span data-testid="chip-top100">{p.top100Count}</span>
@@ -49,7 +51,8 @@ vi.mock('@/components/profile/courses/FilterBar', () => ({
       ))}
     </div>
   ),
-}));
+  ) };
+});
 
 import { AllCoursesList, DEFAULT_COURSE_SORT } from '@/components/profile/courses/AllCoursesList';
 
