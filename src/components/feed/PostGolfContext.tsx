@@ -194,41 +194,32 @@ export function FullscreenRoundPill({ gross, toPar, onOpen }: { gross: number | 
   );
 }
 
-/** Fullscreen golf block: the hole chip below the top bar (first slide only)
- *  and the round pill for the caption column. Mounted by the immersive chrome;
- *  the overlay owns the scorecard sheet this opens. */
-export function FullscreenGolfContext({
+/** Fullscreen hole chip (mock B): below the viewer's top bar, left aligned
+ *  with the caption block, first slide only. Mounts INSIDE the chrome's fixed
+ *  top container so `top: 100%` tracks the bar's real height (chevron-only vs
+ *  course header) instead of a guessed offset. */
+export function FullscreenHoleChipSlot({
   context,
   hole,
   activeSlide,
-  onOpenScorecard,
 }: {
   context: PostGolfContext | null | undefined;
   hole: TeeHole | null | undefined;
   activeSlide: number;
-  onOpenScorecard?: (scoreId: string) => void;
 }) {
-  if (!context) return null;
-  const toPar = context.roundGross != null && context.roundPar != null ? context.roundGross - context.roundPar : null;
+  if (!context || context.holeNo == null || activeSlide !== 0) return null;
   return (
-    <>
-      {context.holeNo != null && activeSlide === 0 && (
-        <div
-          data-testid="post-hole-chip-fs"
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 'max(14px, env(safe-area-inset-left, 0px))',
-            marginTop: 4,
-            pointerEvents: 'none',
-          }}
-        >
-          <HoleChip holeNo={context.holeNo} hole={hole} />
-        </div>
-      )}
-      {context.roundScoreId && onOpenScorecard && (
-        <FullscreenRoundPill gross={context.roundGross} toPar={toPar} onOpen={() => onOpenScorecard(context.roundScoreId as string)} />
-      )}
-    </>
+    <div
+      data-testid="post-hole-chip-fs"
+      style={{
+        position: 'absolute',
+        top: '100%',
+        left: 'max(14px, env(safe-area-inset-left, 0px))',
+        marginTop: 4,
+        pointerEvents: 'none',
+      }}
+    >
+      <HoleChip holeNo={context.holeNo} hole={hole} />
+    </div>
   );
 }
