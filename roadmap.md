@@ -1,9 +1,10 @@
 # Roadmap
 
 ## PF2_GUIDE — posting rebuild stage 2
-- [ ] Composer hole-guide row: effective guide = member switch AND media AND personal actor AND visibility anyone; mock A copy without "once it's approved"; mock B off-at-0.4 disabled switch + VisibilitySheet row tap; business actor hides row; golfPostPatch writes effective boolean (true or false) when course+hole set; keep state.addToGuide untouched on audience change; drafts unchanged.
-- [ ] Hole viewer "View post ›" pill: MemberShotRow.source_post_id via holeShotItems for get_hole_media + get_latest_hole_media; glass pill left 72px at caption bottom (24px+safe, 48px+safe video), caption lifts 46px only when present; tap closes viewer and navigates /post/:id with closeTo; never advances slide; no client re-sort of server order.
-- [ ] Tests per brief; four shards --maxWorkers=2; known tourIsland.test.tsx:235 only; report checks 1–5; no SQL/migrations/edge changes.
+- [x] Composer: effectiveHoleGuide rule, mock A copy without "once it's approved", mock B locked-off switch + VisibilitySheet row tap, business actor hides row, golfPostPatch writes effective boolean both ways, state.addToGuide untouched on audience change, drafts unchanged. Edit mode writes no golf fields today — left alone and reported.
+- [x] Viewer: source_post_id carried for get_hole_media + get_latest_hole_media (places/course-posts null), glass "View post ›" pill at left 72px with 46px caption lift only when present, tap closes viewer and navigates /post/:id with closeTo, never advances slide, server order preserved.
+- [x] New pf2HoleGuide.test.tsx (14 cases); three brief-authorized existing assertions updated (pf1b false-write, two memberShotPosts payloads) and named in PF2_GUIDE_REPORT.md. Focused 136/136; four shards 1,923/1,788/1,906/1,806 = 7,423/649, zero failures; tourIsland:235 did not appear; build OK.
+- [ ] Ben's device checks 1–3 and 5 (Followers→Everyone switch-back, club-page absence, live post→viewer→post round trip, 320px fit): external unmanaged auth prevents hosted verification here.
 
 ## PRO_SELF_RUN verification-only close-out
 - [x] Run shard 4 separately with `--maxWorkers=2`: 1,821 tests / 162 files passed; no failure, including no known Featured meta-line failure.
