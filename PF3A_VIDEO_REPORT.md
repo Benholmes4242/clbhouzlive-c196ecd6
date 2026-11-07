@@ -1,5 +1,53 @@
 # PF3A_VIDEO — implemented, verification stopped
 
+## PF3A_VIDEO close-out — 7 November 2026
+
+**STOP: four new mounted Details tests failed. No failing selector, expectation, production code or unrelated test was repaired. All four fresh shards remain unrun under the requested stop rule.**
+
+Added nine mounted cases:
+- `src/test/pf3aVideoComposerMounted.test.tsx`: one real StageComposer/real state-hook/file-input/media-tray round trip; long video → added photo/mixed post → photo removed. Checks actual header and publish button, retained title, description and gear read back through Details. **Passed.** The standard translation mock returns `defaultValue` or `''`; the mixed-mode button is checked structurally/enabled, not against an invented translated Share label.
+- `src/test/pf3aVideoUi.test.tsx`: four parameterized chip add/remove cases (credits, links, thanks, gear), checking `data-filled` and count; four parameterized near-limit → add → full-limit → remove cases, with literal 10/5/3/10 limits. Links and gear cases passed; credits and thanks failed in both groups.
+
+Exact failures from `/tmp/pf3a-closeout/focused.log`:
+
+```text
+FAIL src/test/pf3aVideoUi.test.tsx
+'credits' chip becomes filled with a count after adding and outlined after removing
+src/test/pf3aVideoUi.test.tsx:39:34 (caller :61:11)
+TestingLibraryElementError: Unable to find role="button" and name "Added Person"
+
+'thanks' chip becomes filled with a count after adding and outlined after removing
+src/test/pf3aVideoUi.test.tsx:44:34 (caller :61:11)
+TestingLibraryElementError: Unable to find role="button" and name "Added Club"
+
+'credits' add row hides at 10 and returns after removing
+src/test/pf3aVideoUi.test.tsx:39:34 (caller :79:11)
+TestingLibraryElementError: Unable to find role="button" and name "Added Person"
+
+'thanks' add row hides at 3 and returns after removing
+src/test/pf3aVideoUi.test.tsx:44:34 (caller :79:11)
+TestingLibraryElementError: Unable to find role="button" and name "Added Club"
+```
+
+Command: `bunx vitest run src/test/pf3aVideoComposerMounted.test.tsx src/test/pf3aVideoRules.test.ts src/test/pf3aVideoWrites.test.tsx src/test/pf3aVideoUi.test.tsx src/test/pf1ComposerGolf.test.tsx src/test/pf1Drafts.test.ts src/test/viewPost1Composer.test.tsx src/test/pf2HoleGuide.test.tsx --maxWorkers=2`.
+
+Result: **88 passed + 4 failed = 92 tests / 8 files**. Original focused scope was 83; the nine new cases reconcile to 92. No existing case deleted, renamed, rewritten or assertion changed. The existing UI test file gained only a search fixture and appended coverage. After the failed run, unsupported `exact: true` role-query options were removed solely to resolve TS2769 (`Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.`); string role names are already exact by default. No failing selector name or assertion changed, no rerun attempted.
+
+Full inventory before this close-out: **7,496 tests / 655 files**, the last reported Pro tiles/legacy/movers inventory (7,491 archive-era + five Pro tiles cases). After: **7,505 / 656**, expected inventory only, not a passing-suite claim. Delta +9/+1: eight appended Details cases and one new composer file/case. Earlier PF3A-only inventory 7,488/655 is historical; intervening archive and presentation cases account for +8 cases, not this close-out.
+
+| Fresh final-code shard command | Passed | Failed | Status |
+|---|---:|---:|---|
+| `bunx vitest run --maxWorkers=2 --shard=1/4` | — | — | Not run: new focused failure stop |
+| `bunx vitest run --maxWorkers=2 --shard=2/4` | — | — | Not run: new focused failure stop |
+| `bunx vitest run --maxWorkers=2 --shard=3/4` | — | — | Not run: new focused failure stop |
+| `bunx vitest run --maxWorkers=2 --shard=4/4` | — | — | Not run: new focused failure stop |
+
+**User-authorized pre-existing failures:** the three `upcomingLastYearBoard.test.tsx` cases quoted historically below (“puts the shared year in the condensed header, not the rows”; “omits the heading year when the displayed rows have different years”; “keeps the winner the same size with a 14px trophy in the position cell and gold score/band”) belong to the separate upcoming LAST YEAR stream, not PF3A. They are pre-existing for this close-out, and that file was not fixed, skipped or edited. `src/test/tourIsland.test.tsx:235` is also permitted pre-existing if encountered. None was encountered in the focused scope; no new result for those files is claimed. The notification parity and separate presentation failures are not authorized known failures for this close-out; no repair attempted.
+
+Changed in this close-out: the two test files above, `roadmap.md`, and this report. No application, SQL, migrations, migration files, deployed RPC/edge functions, guest browsing, review wizard, news, round plots, feed_config, pool cap or native/Median configuration changes. Hosted publishing/readback and device checks remain unverified; this mounted test does not establish a real authenticated publish.
+
+The earlier sections below are historical and superseded where they call the three Tour failures a PF3A stop.
+
 ## Subsequent authorized Tour test-only rerun
 The three Tour assertions below were repaired under exact user authorization; no PF3A production or tests changed. Focused Tour files passed23/23. Separate shards passed1936,1787,1913,1851 respectively; shard4 also failed one unexpected notification-type parity test. Full inventory7488/655 unchanged: **7487 passed,1 failed**. Failure: `src/features/activity-v2/utils/__tests__/notifRoute.parity.test.ts:318:46`, “handles the same notification types in both files”; `missingFromPort` received `["video_credit"]` instead of `[]`. Stop preserved; no repair attempted. Only allowed known FW1 meta-line did not recur. The 320px check remains unrun due to this stop. Exact output, changed assertions and commands are in TOUR_UPCOMING_LAST_YEAR_REPORT.md.
 
