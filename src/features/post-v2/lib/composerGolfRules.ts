@@ -8,7 +8,7 @@ export const POST_SHOT_TAGS = [
   ['trick_shot', 'Trick shot'], ['gear', 'Gear'], ['hole_in_one', 'Hole-in-one'],
 ] as const;
 export type PostShotTag = typeof POST_SHOT_TAGS[number][0];
-export interface ComposerRound { whs_score_id: string; course_id: string | null; course_name: string | null; play_date: string; gross_score: number | null; course_par: number | null }
+export interface ComposerRound { whs_score_id: string; course_id: string | null; course_name: string | null; play_date: string; gross_score: number | null; course_par: number | null; holes_played?: number | null }
 export type CourseSuggestion = StageCourse & { reason?: string };
 export const calendarDay = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 export function daysBefore(n: number, now = new Date()) { const date = new Date(now); date.setDate(date.getDate()-n); return calendarDay(date); }
