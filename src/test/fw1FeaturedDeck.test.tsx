@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -18,7 +19,6 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase:{ rpc:f.rpc } }));
 import { WatchFeaturedDeck, WatchFeaturedSlot } from '@/features/explore-magazine/watch/WatchFeaturedDeck';
 import { featuredSwipe, FEATURED_ADVANCE_MS, FEATURED_EXIT_MS } from '@/features/explore-magazine/watch/featuredRules';
 import type { WatchFeaturedRow } from '@/features/explore-magazine/watch/useWatchFeatured';
-import featuredCss from '@/features/explore-magazine/watch/featured.css?raw';
 import * as autoplayGate from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 const rows = (count=8):WatchFeaturedRow[] => Array.from({length:count},(_,i) => ({ post_id:`p${i}`,reason:'featured',actor_type:'personal',actor_id:`u${i}`,display_name:`Golfer ${i}`,handle:`golfer${i}`,avatar_url:null,is_verified:false,caption:`Video ${i}`,media_url:null,hls_url:`https://example.com/${i}.m3u8`,poster_url:`https://example.com/${i}.jpg`,stream_id:null,duration_seconds:12,width:900,height:1600,like_count:i+10,comment_count:i+2,created_at:'2026-11-04',course_id:null,course_name:null,rank:i+1,score:100-i,is_liked_by_me:false }));
 const comments=vi.fn(), shorts=vi.fn();
@@ -147,6 +147,7 @@ describe('FM1 sound group', () => {
     expect(top().querySelector('video')?.muted).toBe(true);
   });
   it('reserves no right padding on the meta line', () => {
+    const featuredCss = readFileSync('src/features/explore-magazine/watch/featured.css', 'utf8');
     const rule = featuredCss.match(/\.featured-meta\s*\{([^}]+)\}/)?.[1];
     expect(rule).toBeDefined();
     expect(rule).not.toMatch(/padding(?:-right)?\s*:/);

@@ -1,4 +1,36 @@
-# FM1_MUTE_1 — stopped on a new test failure
+# FM1_MUTE_1 — closed
+
+## FM1_FIX_1 close-out — 2026-11-07
+- Authorised test-only setup fix in `src/test/fw1FeaturedDeck.test.tsx`; no product code changed.
+- Removed `import featuredCss from '@/features/explore-magazine/watch/featured.css?raw';`, added `import { readFileSync } from 'node:fs';`, and read the file inside **reserves no right padding on the meta line**:
+  ```ts
+  const featuredCss = readFileSync('src/features/explore-magazine/watch/featured.css', 'utf8');
+  ```
+- Both existing assertions remain byte-identical:
+  ```ts
+  expect(rule).toBeDefined();
+  expect(rule).not.toMatch(/padding(?:-right)?\s*:/);
+  ```
+  Reason: the raw import yielded no stylesheet text in this test configuration; the direct read follows `accountDoorFit.test.tsx`.
+- Tests added/deleted/renamed: none. Only the setup of the named existing test changed; no assertion rewritten.
+- Focused command: `bunx vitest run src/test/fw1FeaturedDeck.test.tsx --maxWorkers=2` — **34/34 passed**.
+- Full-suite commands, each executed separately:
+
+  | Command | Passing tests | Passing files | Failures |
+  | --- | ---: | ---: | ---: |
+  | `bunx vitest run --maxWorkers=2 --shard=1/4` | 1,898 | 162 | 0 |
+  | `bunx vitest run --maxWorkers=2 --shard=2/4` | 1,828 | 162 | 0 |
+  | `bunx vitest run --maxWorkers=2 --shard=3/4` | 1,882 | 162 | 0 |
+  | `bunx vitest run --maxWorkers=2 --shard=4/4` | 1,798 | 159 | 0 |
+
+- **Total: 7,406 passed / 7,406 executed across 645 files, zero failures.** Last reported baseline was 7,405 passed + 1 known FM1 failure = 7,406 executed / 645 files. Inventory before/after: **7,406 → 7,406**, file delta zero; the sole pass-count increase is the repaired FM1 test.
+- Known pre-existing TourGlance width failure (`tourIsland.test.tsx:235`) did not recur: its file passed 14/14. Neither sponsor-sheet style stop recurred: `proClubhouseSponsor.test.tsx` passed 48/48. No pre-existing or new test failures appeared; those files were untouched.
+- Logs retained at `/tmp/fm1-fix-1/focused.log` and `/tmp/fm1-fix-1/shard1.log` through `shard4.log`.
+- Preview diagnostic: `build OK` at 2026-11-07T05:05:31Z; no manual build or typecheck run.
+- FM1 test/suite stop is closed. Historical implementation details and visual-check limits below remain unchanged; no new browser/device checks were requested or claimed.
+- No SQL, migrations, migration files, deployed RPC/edge changes, guest browsing, review wizard, news, round plots, feed_config, round_pool_cap or native/Median changes.
+
+## Historical stop evidence (superseded by the green close-out above)
 
 ## Implemented scope
 - FeaturedPlayback renders one top-right flex group containing mounted-video sound first, then formatted duration. Parent duration removed.
