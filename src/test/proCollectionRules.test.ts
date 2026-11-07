@@ -20,4 +20,7 @@ describe('Build2 collection rules',()=>{
  it('bag slot is required',()=>expect(()=>bagPayload('mason','','Brand','','',null)).toThrow());
  it('career year1950 allowed and future rejected',()=>{expect(momentPayload('mason',1950,'Moment',true,2026).year).toBe(1950);expect(()=>momentPayload('mason',2027,'Moment',false,2026)).toThrow();});
  it('career text120 allowed121 rejected',()=>{expect(momentPayload('mason',2026,'a'.repeat(120),false,2026).text).toHaveLength(120);expect(()=>momentPayload('mason',2026,'a'.repeat(121),false,2026)).toThrow();});
+ it('partner website gains https:// when there is no scheme',()=>expect(partnerPayload('mason','Kent Autos',null,' kentautos.co.uk ').website).toBe('https://kentautos.co.uk'));
+ it('partner website keeps an existing scheme and empty stays null',()=>{expect(partnerPayload('mason','Kent Autos',null,'http://kentautos.co.uk').website).toBe('http://kentautos.co.uk');expect(partnerPayload('mason','Kent Autos',null,'').website).toBeNull();expect(partnerPayload('mason','Kent Autos',null).website).toBeNull();});
+ it('partner website refuses invalid or out-of-range values',()=>{expect(()=>partnerPayload('mason','Kent Autos',null,'http://')).toThrow();expect(()=>partnerPayload('mason','Kent Autos',null,'https://x.co/'+ 'a'.repeat(200))).toThrow();expect(()=>partnerPayload('mason','Kent Autos',null,'not a url')).toThrow();});
 });
