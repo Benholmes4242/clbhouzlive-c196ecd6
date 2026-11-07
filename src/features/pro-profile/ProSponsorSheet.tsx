@@ -341,66 +341,24 @@ export function ProSponsorSheet({ open, onClose, proId, identity, season, follow
   const capture = async (): Promise<Blob> => {
     const el = captureRef.current;
     if (!el) throw new Error('nothing to capture');
-    // html2canvas 1.4.1 draws the PRO pill ~12px above the name with its text
-    // low in the pill, so the clone's badge is hidden and the pill is painted
-    // onto the canvas at the live rect instead.
-    const badge = el.querySelector('.pro-ss-nm .pro-label') as HTMLElement | null;
-    let pill: { x: number; y: number; w: number; h: number; background: string; colour: string; family: string; fontSize: number; weight: string; letterSpacing: number } | null = null;
-    if (badge) {
-      const r = badge.getBoundingClientRect();
-      const o = el.getBoundingClientRect();
-      const cs = getComputedStyle(badge);
-      pill = {
-        x: r.left - o.left,
-        y: r.top - o.top,
-        w: r.width,
-        h: r.height,
-        background: cs.backgroundColor,
-        colour: cs.color,
-        family: cs.fontFamily,
-        fontSize: parseFloat(cs.fontSize) || 0,
-        weight: cs.fontWeight,
-        letterSpacing: parseFloat(cs.letterSpacing) || 0,
-      };
-    }
-    const canvas = await html2canvas(el, {
-      backgroundColor: '#0A0A0C',
-      scale: EXPORT_SCALE,
-      useCORS: true,
-      logging: false,
-      onclone: (doc) => {
-        const b = doc.querySelector('[data-sponsor-capture] .pro-ss-nm .pro-label');
-        if (b) (b as HTMLElement).style.visibility = 'hidden';
-      },
-    });
-    if (pill) {
-      const ctx = canvas.getContext?.('2d');
-      if (ctx) {
-        const k = EXPORT_SCALE;
-        const x = pill.x * k;
-        const y = pill.y * k;
-        const w = pill.w * k;
-        const h = pill.h * k;
-        ctx.beginPath();
-        if (typeof ctx.roundRect === 'function') {
-          ctx.roundRect(x, y, w, h, (pill.h / 2) * k);
-        } else {
-          const rad = h / 2;
-          ctx.moveTo(x + rad, y);
-          ctx.arc(x + w - rad, y + rad, rad, -Math.PI / 2, Math.PI / 2);
-          ctx.arc(x + rad, y + rad, rad, Math.PI / 2, Math.PI * 1.5);
-          ctx.closePath();
-        }
-        ctx.fillStyle = pill.background;
-        ctx.fill();
-        ctx.fillStyle = pill.colour;
-        ctx.font = `${pill.weight} ${pill.fontSize * k}px ${pill.family}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        const spacing = pill.letterSpacing * k;
-        if ('letterSpacing' in ctx) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${spacing}px`;
-        ctx.fillText('PRO', (pill.x + pill.w / 2) * k + spacing / 2, (pill.y + pill.h / 2) * k);
-      }
+    // html2canvas 1.4.1 measures font baselines by placing an <img> beside
+    // text in the live document; Tailwind's preflight sets img{display:block},
+    // which breaks that measurement and draws every line several pixels low.
+    // Setting img to inline-block for the duration of the capture restores
+    // correct font metrics, so the plain CSS PRO pill renders centred.
+    const fix = document.createElement('style');
+    fix.textContent = 'img{display:inline-block}';
+    document.head.appendChild(fix);
+    let canvas: HTMLCanvasElement;
+    try {
+      canvas = await html2canvas(el, {
+        backgroundColor: '#0A0A0C',
+        scale: EXPORT_SCALE,
+        useCORS: true,
+        logging: false,
+      });
+    } finally {
+      fix.remove();
     }
     const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/png'));
     if (!blob) throw new Error('capture failed');
