@@ -396,7 +396,7 @@ async function runJob(job: InternalJob): Promise<void> {
   }
 
   /* PF1B: the hole guide is server-side now (posts.add_to_hole_guide). The
-     client never writes course_hole_media — the database adds every ready
+     client never writes hole-guide media rows — the database adds every ready
      photo, and every video once it has a poster, including after the app
      closes. */
 

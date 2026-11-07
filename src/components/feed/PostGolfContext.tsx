@@ -168,7 +168,6 @@ export function FullscreenRoundPill({ gross, toPar, onOpen }: { gross: number | 
         marginTop: 10,
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
         height: 34,
         padding: '0 12px',
         borderRadius: 11,
@@ -189,7 +188,7 @@ export function FullscreenRoundPill({ gross, toPar, onOpen }: { gross: number | 
         Round {gross ?? ''}
         {toPar != null && <em style={{ fontStyle: 'normal', color: MUTE, fontWeight: 600 }}> {signedScore(toPar)}</em>}
       </span>
-      <span style={{ color: MUTE, fontWeight: 600 }}>· Scorecard ›</span>
+      <span style={{ color: MUTE, fontWeight: 600 }}>{' · '}Scorecard ›</span>
     </button>
   );
 }

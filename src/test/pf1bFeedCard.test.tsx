@@ -151,7 +151,7 @@ describe('PF1B feed card golf context', () => {
   it('renders the round row between media and actions, opening the scorecard only', () => {
     const onGolfRoundTap = vi.fn();
     const onOpenMedia = vi.fn();
-    renderCard({ golfContext: CONTEXT, golfRoundShape: SHAPE, onGolfRoundTap, onOpenMedia });
+    renderCard({ layout: 'mediaFirst', golfContext: CONTEXT, golfRoundShape: SHAPE, onGolfRoundTap, onOpenMedia });
     const row = screen.getByTestId('post-round-row');
     expect(row.textContent).toContain('73');
     expect(row.textContent).toContain('+2');
