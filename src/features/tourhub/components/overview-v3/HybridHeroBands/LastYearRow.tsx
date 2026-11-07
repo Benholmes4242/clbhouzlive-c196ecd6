@@ -23,7 +23,6 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
-import { OVERVIEW } from '../overviewTokens';
 import { HERO_PAD_X, HERO_POS_W, HERO_TOT_W, HERO_GAP } from '../../../tournament-v2/sections/MiniBoard';
 
 interface LastYearRowProps {
@@ -65,7 +64,7 @@ export function LastYearRow({
           <path d="M7 4h10v3a5 5 0 0 1-10 0V4z M9 13h6l-1 4h-4z M8 19h8v2H8z" />
         </svg>
       ) : (
-        <span style={{ ...NUMERIC_STYLE, fontSize: 12.5, fontWeight: 700, color: OVERVIEW.ink }}>
+        <span style={{ ...NUMERIC_STYLE, fontSize: 12.5, fontWeight: 700, color: '#FFFFFF' }}>
           {rank}
         </span>
       )}
@@ -83,7 +82,7 @@ export function LastYearRow({
               fontSize: 13,
               fontWeight: 600,
               lineHeight: 1.15,
-              color: OVERVIEW.ink,
+              color: '#FFFFFF',
               letterSpacing: 0,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -100,7 +99,7 @@ export function LastYearRow({
           fontWeight: 700,
           // X.4: same rule as the results board — under par red. The champion
           // row stays amber: it marks who won, not what they shot.
-          color: isWinner ? GOLD_DARK : /^[-−]/.test(score.trim()) ? TOPAR_UNDER_DARK : OVERVIEW.ink,
+          color: isWinner ? GOLD_DARK : /^[-−]/.test(score.trim()) ? TOPAR_UNDER_DARK : '#FFFFFF',
           textAlign: 'center',
           letterSpacing: 0,
         }}
