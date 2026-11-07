@@ -13,6 +13,7 @@ import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import { BUSINESS_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
+import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
 /* The hero's FALLBACK GROUND, shown only when there is no cover photo.
    Named HERO_INK while the app was light, which hid the fact that it was a
@@ -261,6 +262,8 @@ const HeadlineBlock: React.FC<{
 interface HeroShellProps {
   /** Pro-profile opt-ins preserve shell cover/scrim/insets and other callers. */
   nameRef?: React.Ref<HTMLHeadingElement>;
+  /** Amber tour-style kicker line above the identity row (pro hero). */
+  kicker?: React.ReactNode;
   avatarSize?: number;
   identityContent?: React.ReactNode;
   headlineContent?: React.ReactNode;
@@ -292,6 +295,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
   avatar,
   avatarSize = 56,
   identityContent,
+  kicker,
   onAvatarTap,
   avatarLabel,
   displayName,
@@ -316,7 +320,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         position: 'relative',
         background: HERO_GROUND,
         marginTop: 0,
-        padding: '0 16px 16px',
+        padding: '0 20px 14px',
         /* The hero pays ONE horizontal inset on both sides and nothing inside
            it may escape that box: an over-wide identity row (long club name +
            badge + FOLLOW + overflow control) used to push its controls past
@@ -379,22 +383,12 @@ export const HeroShell: React.FC<HeroShellProps> = ({
               objectPosition: 'center',
             }}
           />
-          <div style={{ position: 'absolute', inset: 0, background: COVER_WASH }} />
-          <div style={{ position: 'absolute', inset: 0, background: COVER_RAMP }} />
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 60,
-              background: COVER_TOP_GUARD,
-            }}
-          />
+          <PhotoBandFade />
         </div>
       )}
 
       <div style={{ position: 'relative', zIndex: 1 }}>
+        {kicker}
         {/* Identity row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: identityContent ? 14 : 12, minWidth: 0, maxWidth: '100%' }}>
           <button
