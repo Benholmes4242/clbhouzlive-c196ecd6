@@ -6,7 +6,7 @@
  * Every dimension below is measured off the shipped components it stands in
  * for, so the loaded page lands on its own outline:
  *
- *   HeroShell            padding '0 16px 16px', paddingTop = content inset +18
+ *   HeroShell            padding '0 20px 14px', paddingTop = content inset +18
  *                        avatar 56 r16, name 20/800, subline 11.5/600,
  *                        pill minHeight 34, headline label 8.5 caps + 40px
  *                        figure, sparkline 42 (marginTop 10), strip marginTop
@@ -69,7 +69,7 @@ function HeroSkeleton({
       style={{
         position: 'relative',
         background: A.INK,
-        padding: '0 16px 16px',
+        padding: '0 20px 14px',
         paddingTop: `calc(${HERO_CONTENT_INSET} + 18px)`,
         fontFamily: SANS,
       }}

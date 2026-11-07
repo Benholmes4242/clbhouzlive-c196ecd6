@@ -96,21 +96,22 @@ describe('header forms', () => {
     expect(container.querySelector('[data-photo-name-block]')).toBeNull();
     expect(container.querySelector('header')?.getAttribute('data-header-form')).toBe('photo');
   });
-  it('lays the course page wash and the fade into the page over the photo, neither taking taps', () => {
+  it('lays the shared photo-band fade, ending on the wizard canvas, over the photo, never taking taps', () => {
     const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12 }} />);
     const layers = Array.from(container.querySelectorAll('[data-photo-header] [aria-hidden]')) as HTMLElement[];
-    expect(layers).toHaveLength(2);
+    expect(layers).toHaveLength(1);
     for (const layer of layers) {
       expect(layer.style.position).toBe('absolute');
       expect(layer.style.inset).toBe('0');
       expect(layer.style.pointerEvents).toBe('none');
     }
-    // jsdom drops gradient values from the DOM, so the layers themselves are
-    // asserted in the source: the course page's 18% wash first, then the fade.
-    expect(HERO_CANON_WASH).toBe('linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18))');
+    expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
+    // jsdom drops gradient values from the DOM, so the fade itself is asserted
+    // in the source: the shared PhotoBandFade built on the wizard's canvas.
     const src = readFileSync(resolve(__dirname, '../features/review-v2/components/ReviewCourseHero.tsx'), 'utf8');
-    expect(src).toContain('background: HERO_CANON_WASH');
-    expect(src).toContain('linear-gradient(180deg, rgba(22,22,26,0) 40%, rgba(22,22,26,0.72) 72%, ${RV2.canvas} 100%)');
+    expect(src).toContain('<PhotoBandFade canvas={RV2.canvas} />');
+    expect(src).not.toContain('HERO_CANON_WASH');
+    expect(src).not.toContain('rgba(22,22,26');
   });
   it('renders the course page masthead over the photo: shared kicker, place, two-line name clamp', () => {
     mockStanding = { globalRank: 16, regionalRank: 14, usaRank: null };
@@ -177,7 +178,7 @@ describe('header forms', () => {
     expect(container.querySelector('[data-photo-header]')).toHaveClass('rv2-photo');
     expect(header).toHaveClass('rv2-header--photo');
     const cssText = readFileSync(resolve(__dirname, '../features/review-v2/components/reviewComposerHeader.css'), 'utf8');
-    expect(cssText).toContain('.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 246px); }');
+    expect(cssText).toContain('.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 340px); }');
     expect(cssText).toContain('.rv2-header--compact { height: calc(env(safe-area-inset-top, 0px) + 68px); }');
     expect(cssText).toContain('.rv2-photo { height: 100%; }');
     expect(cssText).toContain('transition: height 200ms ease');
