@@ -421,9 +421,13 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const selectedRound=golfRounds.find(r=>r.whs_score_id===(state.attachedScoreId ?? selectedRoundId)) ?? golfRounds[0] ?? null;
   const shapes=useRoundHoleShapes(state.attachedScoreId ? [state.attachedScoreId] : []);
   const attachedRound = golfRounds.find(r => r.whs_score_id === state.attachedScoreId);
+  const premarkKeyRef = useRef('');
   const roundVideo: RoundVideoContext | null = videoComposer && longVideo && activeActor?.type === 'personal' && state.attachedScoreId && (attachedRound?.holes_played === 9 || attachedRound?.holes_played === 18) ? { scoreId: state.attachedScoreId, holes: attachedRound.holes_played, shape: shapes?.get(state.attachedScoreId) ?? null } : null;
   useEffect(() => {
     if (!roundVideo || !videoItem) return;
+    const key = JSON.stringify([roundVideo.scoreId, roundVideo.holes, state.caption, videoDuration(videoItem)]);
+    if (premarkKeyRef.current === key) return;
+    premarkKeyRef.current = key;
     const marks = premarkHoles(state.caption, videoData.holeMarks ?? {}, roundVideo.holes, videoDuration(videoItem) ?? 0);
     if (JSON.stringify(marks) !== JSON.stringify(videoData.holeMarks ?? {})) setVideoData({ holeMarks: marks, marksRoundId: roundVideo.scoreId });
   }, [state.caption, roundVideo?.scoreId, roundVideo?.holes, videoItem?.duration, videoItem?.trimStart, videoItem?.trimEnd, videoData.holeMarks, setVideoData]);
@@ -452,7 +456,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   useEffect(()=>{
     let cancelled=false;
     if(!profile?.id || !state.course || activeActor?.type==='business'){setGolfRounds([]);return;}
-    void readComposerRounds(profile.id,state.course.id).then(rows=>{if(!cancelled){setGolfRounds(rows);setSelectedRoundId(rows[0]?.whs_score_id??null);}});
+    const attached = state.attachedScoreId;
+    void readComposerRounds(profile.id,state.course.id).then(rows=>{if(!cancelled){setGolfRounds(rows);setSelectedRoundId(rows[0]?.whs_score_id??null);if (attached && !rows.some(r => r.whs_score_id === attached)) setVideoData({ holeMarks: {}, marksRoundId: null });}});
     return()=>{cancelled=true;};
   },[profile?.id,state.course?.id,activeActor?.type]);
 
