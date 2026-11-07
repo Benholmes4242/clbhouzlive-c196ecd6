@@ -1,4 +1,4 @@
-import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
+import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
@@ -36,7 +36,7 @@ import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
 import { useHeroReferenceLine } from '@/components/courses/course-detail/about/useHeroReferenceLine';
 import { useCourseRecordSummary } from '@/components/courses/course-detail/useCourseRecordSummary';
-import { HeroCourseRecord, heroRecordVisible, HERO_RECORD_ROW_EXTRA } from '@/components/courses/course-detail/about/HeroCourseRecord';
+import { HeroCourseRecord, heroRecordVisible } from '@/components/courses/course-detail/about/HeroCourseRecord';
 import { SURFACE } from '@/lib/tokens/surface';
 import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
 import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
@@ -140,7 +140,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { data: courseMeta } = useCourseMeta(courseId);
   // Same read as the record boards (useCourseLegends query, deduped by cache).
   const { courseRecordHolders } = useCourseRecordSummary(courseId, user?.id ?? null);
-  const heroHeight = EXPLORE_COURSE_HERO_HEIGHT + (heroRecordVisible(courseRecordHolders) ? HERO_RECORD_ROW_EXTRA : 0);
+  const heroHeight = EXPLORE_COURSE_HERO_HEIGHT;
   // One course, one destination page the member deliberately navigated to —
   // see the hook header: the "never prefetch" rule is about N courses in a feed.
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
@@ -243,8 +243,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
 
-  // Both mounts share Explore's fixed hero height and the canon HERO_CANON_WASH,
-  // which ends opaque on the canvas so the photograph dissolves with no seam.
+  // Both mounts keep the fixed340px height and Tour's near-black photo fade.
   const heroImageBackground = course.thumbnail_image
     ? `url("${course.thumbnail_image}") center 40% / cover no-repeat`
     : A.CANVAS;
@@ -260,10 +259,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         backgroundColor: A.CANVAS,
       }}
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: HERO_CANON_WASH }}
-      />
+      <PhotoBandFade />
       {/* Modal-path back chevron deleted (BRIEF_COURSES_CHROME_DARK): no caller
           passes onClose — the sole caller is CourseDetailPage.tsx:53 with
           isInModal={false} — so it was dead alongside the H3 FloatingPageHeader
@@ -293,10 +289,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: HERO_CANON_WASH }}
-      />
+      <PhotoBandFade />
       <CourseTitleOverlay
         course={course}
         courseStats={courseStats ?? null}
@@ -524,8 +517,9 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   const referenceLine = useHeroReferenceLine(courseId, rounds);
 
   return (
-    <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
+    <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, zIndex: 1 }}>
       <CourseMasthead
+        photoBand
         as="h1"
         nameRef={nameRef}
         kicker={courseMastheadKicker(course, standing)}

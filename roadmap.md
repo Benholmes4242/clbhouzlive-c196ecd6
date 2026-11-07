@@ -1,5 +1,10 @@
 # Roadmap
 
+## COURSE_HEROES_MATCH
+- [ ] Match course-list/detail photo material and opt-in masthead typography; preserve record gold and all other masthead callers.
+- [ ] Add focused coverage, ledger authorised obsolete assertions, run fresh shards until unexpected failure.
+- [ ] Verify three 320px hero states and write COURSE_HEROES_MATCH_REPORT.md.
+
 ## OVERVIEW_HERO_B_STRIP
 - [x] Merge tour/state kicker, scale leader B, opt in board spacing after movers and replace locked no-pick members door with the strip; Ben ruled brief10+0/white position over mock.
 - [x] Add16cases/1file, authorised padding/door selectors only; focused67/67. Fresh shard1:1986passed/1unexpected failure at tourPlayoffShortenedEvents.test.tsx:89:35 expected RESULTS, received FINALButterfield Bermuda Championship. Existing failing assertion untouched.

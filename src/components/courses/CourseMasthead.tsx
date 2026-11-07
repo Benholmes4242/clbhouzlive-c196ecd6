@@ -10,6 +10,8 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
  * never split a joined display string to feed this.
  * Courses opts out of the kicker and supplies its combined amber place;
  * placeColor is opt-in so the course-detail head retains its original ink.
+ * photoBand opts the two course photo headers into Tour typography and an
+ * unruled child seam; defaults preserve review, browse and skeleton consumers.
  */
 
 const HERO_HAIRLINE = 'rgba(255,255,255,0.18)';
@@ -95,6 +97,7 @@ export interface CourseMastheadProps {
   name: string;
   place: string | null;
   placeColor?: string;
+  photoBand?: boolean;
   /** Each hero keeps its own clamp; undefined = no clamp. */
   nameClamp?: number;
   /** Rendered left of the name block, baseline-aligned (Courses ranked variant). */
@@ -114,7 +117,7 @@ export function MastheadRule({ children }: { children: React.ReactNode }) {
 }
 
 export const CourseMasthead: React.FC<CourseMastheadProps> = ({
-  kicker, name, place, placeColor = PLACE_INK, nameClamp, nameLead, nameRef, as = 'div', children,
+  kicker, name, place, placeColor = PLACE_INK, photoBand = false, nameClamp, nameLead, nameRef, as = 'div', children,
 }) => {
   const NameTag = as;
   const clamp: React.CSSProperties = nameClamp
@@ -122,15 +125,15 @@ export const CourseMasthead: React.FC<CourseMastheadProps> = ({
     : {};
   return (
     <div>
-      {kicker && <div style={{ ...MASTHEAD_KICKER, marginBottom: 8 }}>{kicker}</div>}
+      {kicker && <div style={{ ...MASTHEAD_KICKER, marginBottom: photoBand ? 4 : 8 }}>{kicker}</div>}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
         {nameLead}
         <div style={{ minWidth: 0, flex: 1 }}>
-          <NameTag ref={nameRef} style={{ ...MASTHEAD_NAME, ...clamp }}>{name}</NameTag>
-          {place && <div style={{ ...MASTHEAD_PLACE, color: placeColor }}>{place}</div>}
+          <NameTag ref={nameRef} style={{ ...MASTHEAD_NAME, ...(photoBand ? { fontSize: 26, lineHeight: 1.1, letterSpacing: 0 } : {}), ...clamp }}>{name}</NameTag>
+          {place && <div style={{ ...MASTHEAD_PLACE, marginTop: photoBand ? 4 : 6, color: placeColor }}>{place}</div>}
         </div>
       </div>
-      {children != null && children !== false && <MastheadRule>{children}</MastheadRule>}
+      {children != null && children !== false && (photoBand ? <div style={{ marginTop: 9 }}>{children}</div> : <MastheadRule>{children}</MastheadRule>)}
     </div>
   );
 };
