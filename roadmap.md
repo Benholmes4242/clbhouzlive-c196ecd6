@@ -1,8 +1,9 @@
 # Roadmap
 
 ## PF3A_VIDEO mounted-test close-out
-- [ ] Add mounted composer video→photo/mixed→video restoration, four Details chip add/remove/count cases and four add-row limit cases; no production edits.
-- [ ] Run fresh focused coverage then four separate --maxWorkers=2 shards; only the three upcomingLastYearBoard cases and tourIsland:235 are pre-existing for this close-out. Stop on every other failure; update PF3A_VIDEO_REPORT.md with exact totals and inventory.
+- [x] Add nine mounted cases: real composer/real-hook photo add/remove restoration passes; links/gear chip and limit transitions pass. Existing assertions/cases and production untouched.
+- [x] Focused88 passed/4 failed across8files; PF3A_VIDEO_REPORT.md lists exact errors, +9/+1 expected7505/656 inventory and names three upcomingLastYearBoard cases/tourIsland:235 as pre-existing.
+- [ ] STOP: four new credits/thanks cases cannot find Added Person/Added Club at pf3aVideoUi.test.tsx:39:34/:44:34. Failing selectors/assertions untouched; unsupported role-query exact options removed for typing only. Four fresh shards await explicit fixture/selector repair authorization.
 
 ## Pro tiles, legacy chart and movers
 - [x] Implement season-only outlines/open rows, centred legacy dim null tiles, neutral tally bars/plot-only key and pick-style direction-only movers; buildOK.
