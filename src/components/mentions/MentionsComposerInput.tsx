@@ -74,9 +74,10 @@ interface RichSuggestion extends SuggestionDataItem {
 /** The member half of @mention search. Shared with the post page's
  * "Find someone" (members only, no businesses) so both search one way. */
 export function searchMentionMembers(like: string, limit = 6, withHomeClub = false) {
-  return supabase
-    .from('user_profiles')
-    .select(withHomeClub ? 'id, display_name, username, profile_photo_url, is_verified, home_club' : 'id, display_name, username, profile_photo_url, is_verified')
+  const query = withHomeClub
+    ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url, is_verified, home_club')
+    : supabase.from('user_profiles').select('id, display_name, username, profile_photo_url, is_verified');
+  return query
     .or(`display_name.ilike.${like},username.ilike.${like},first_name.ilike.${like}`)
     .eq('is_suspended', false)
     .limit(limit);
@@ -85,8 +86,10 @@ export function searchMentionMembers(like: string, limit = 6, withHomeClub = fal
 /** Business half of mention search; creator thanks uses the same query with
  * opt-in category metadata, keeping every existing mention payload unchanged. */
 export function searchMentionBusinesses(like: string, limit = 4, withCategory = false) {
-  return supabase.from('business_accounts')
-    .select(withCategory ? 'id, name, logo_url, is_verified, city, country, category' : 'id, name, logo_url, is_verified, city, country')
+  const query = withCategory
+    ? supabase.from('business_accounts').select('id, name, logo_url, is_verified, city, country, category')
+    : supabase.from('business_accounts').select('id, name, logo_url, is_verified, city, country');
+  return query
     .ilike('name', like).eq('is_deleted', false).limit(limit);
 }
 
