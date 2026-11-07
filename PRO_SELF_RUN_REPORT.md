@@ -1195,4 +1195,4 @@ No live writes or server jobs were triggered. No authenticated readback or phone
 
 ## Restrictions
 
-No SQL, migrations or migration files; no deployed RPC/edge-function edits; guest browsing, review wizard, news, round plots, feed_config and native/Median configuration untouched. round_pool_cap remains 30. The existing external-URL utility is consumed, not modified. Preview build telemetry was absent; no source edit in this close-out required a new build. This report documents previously implemented changes without expanding scope.
+No SQL, migrations or migration files; no deployed RPC/edge-function edits; guest browsing, review wizard, news, round plots, feed_config and native/Median configuration untouched. round_pool_cap remains 30. The existing external-URL utility is consumed, not modified. Latest preview telemetry at 10:31:09 UTC reports **build OK**; no manual build was run. This report documents previously implemented changes without expanding scope.
