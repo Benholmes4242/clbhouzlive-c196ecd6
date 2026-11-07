@@ -1014,6 +1014,7 @@ const ProfilePageV2Content: React.FC = () => {
             onShare={() => { if (navigator.share) navigator.share({ title: displayName, url: window.location.href }).catch(() => {}); else { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); } }}
             onFollow={toggleFollow} following={isFollowing} followBusy={followBusy}
             onMessage={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })} messageBusy={dmStarting}
+            onSeeAllResults={() => { setSearchParams({ tab: 'tour' }); tabBarRef.current?.scrollIntoView({ block: 'start' }); }}
             menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>Copy link</DropdownMenuItem>{!isSelfView && <>{viewerActorType !== 'business' && friendshipStatus === 'friends' && <DropdownMenuItem onClick={() => unfriend()}>Remove friend</DropdownMenuItem>}<DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}</DropdownMenuContent></DropdownMenu>}
           /> : <ProfileHero
             userId={profile.id}
