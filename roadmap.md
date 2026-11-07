@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Creator video filter centring follow-up
-- [ ] Match the small Top 100 region choices and centre the creator row without relying on Safari support for safe-centre alignment; preserve counts and filtering.
-- [ ] Run existing creator checks and verify mobile filter geometry; report test totals and live-access limits.
+- [x] Confirm exact shared Top 100 sm treatment; add intrinsic-width/auto-margin centring independent of safe-centre support, preserving counts and filtering.
+- [x] Existing creator13/13 green, no test changes; inventory unchanged7,408/645 (full shards not rerun). Actual-component320/390 fixture centred even with flex-start; build OK. CR_CHIPS_1_REPORT.md records screenshot/source discrepancy and external-auth limitation.
 
 ## CR_CHIPS_1
 - [x] Replace creator video choices with shared Top 100 sm RailChips; retain wrapper gutters, counts and analytics; remove unused local chip CSS/token.
