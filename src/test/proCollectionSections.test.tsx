@@ -163,6 +163,26 @@ describe('pro collections — visitor and own views', () => {
 describe('pro collections — sheet flows', () => {
   const openAdd = async (sub: string) => { const card = (await screen.findByText(sub)).closest('.pro-profile-add') as HTMLElement; fireEvent.click(within(card).getByRole('button', { name: 'Add' })); };
 
+  it('Add by name adds the scheme and saves the website with the name', async () => {
+    empty(); mount(true);
+    await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
+    expect((screen.getByLabelText('WEBSITE (OPTIONAL)') as HTMLInputElement).placeholder).toBe('e.g. kentautos.co.uk');
+    fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
+    fireEvent.change(screen.getByLabelText('WEBSITE (OPTIONAL)'), { target: { value: ' kentautos.co.uk ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add by name' }));
+    await waitFor(() => expect(h.writes.length).toBe(1));
+    expect(h.writes[0].payload).toMatchObject({ name: 'Kent Autos', business_id: null, website: 'https://kentautos.co.uk' });
+  });
+  it('an invalid website toasts and does not save', async () => {
+    empty(); mount(true);
+    await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
+    fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
+    fireEvent.change(screen.getByLabelText('WEBSITE (OPTIONAL)'), { target: { value: 'http://' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add by name' }));
+    await waitFor(() => expect(h.toastError).toHaveBeenCalledWith('Check the website.'));
+    expect(h.writes.length).toBe(0);
+  });
+
   it('bag: slot is required, brand search links business_id, editing the brand clears it', async () => {
     empty(); mount(true);
     await openAdd('Driver to ball. Brands on clbhouz link to their page.');
