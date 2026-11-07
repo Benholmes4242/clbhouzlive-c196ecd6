@@ -16,6 +16,8 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
+import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
+import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -243,7 +245,7 @@ export function WatchFeed({
   const onYourCourse = useCallback((row: HubRpcRow) => !!row.course_id && playedIds.has(row.course_id), [playedIds]);
 
   /* ONE POOL, SPLIT ON DURATION. A row is the same video whichever read it came from. */
-  const rows = useMemo(() => {
+  const rawRows = useMemo(() => {
     const seen = new Set<string>();
     const out: HubRpcRow[] = [];
     for (const row of [...(videos.data?.pages ?? []).flat(), ...(clips.data?.pages ?? []).flat()] as HubRpcRow[]) {
@@ -255,6 +257,8 @@ export function WatchFeed({
     }
     return out;
   }, [videos.data, clips.data, userId, searching]);
+  const details = usePostVideoDetails(useMemo(() => singleVideoPostIds(toFeedPosts(rawRows)), [rawRows]));
+  const rows = useMemo(() => rawRows.map(row => ({ ...row, video_details_title: details.get(row.post_id)?.title ?? null })), [rawRows, details]);
 
   const saved = progress.data;
   /* M.1 — one tile, two layouts: grid on the Quick hits chip, rail everywhere else. */

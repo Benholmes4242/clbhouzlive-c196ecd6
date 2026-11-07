@@ -964,7 +964,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     >
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={post} details={videoDetails} chapters={videoChapters} likes={likeCount} onClose={() => setVideoAboutOpen(false)} onNavigate={path => navigate(path)} onTime={seconds => openWithOrigin({ posts: [post], index: 0, originEl: null, openedFrom: 'clubhouse', resumeAtSeconds: seconds })} />}
+      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={post} details={videoDetails} chapters={videoChapters} likes={likeCount} onClose={() => setVideoAboutOpen(false)} onNavigate={path => navigate(path)} onTime={seconds => openWithOrigin({ posts: [post], index: 0, originEl: null, posterUrl: post.mediaItems[0]?.thumbnailUrl ?? null, openedFrom: 'clubhouse', resumeAtSeconds: seconds })} />}
 
 
       {/* Header */}
