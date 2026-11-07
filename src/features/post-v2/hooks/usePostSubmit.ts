@@ -21,6 +21,8 @@ import type { ShotTagJob } from '../lib/shotTagWrites';
 import type { PostVisibility } from '../lib/golfPostRules';
 import { writePostWith } from '../lib/postWith';
 import {golfPostPatch,type PostShotTag} from '../lib/composerGolfRules';
+import type { VideoDetails } from '../lib/videoDetails';
+import { writeVideoDetails } from '../lib/videoDetailsWrites';
 
 export interface SubmitInput {
   caption: string;
@@ -50,6 +52,7 @@ export interface SubmitInput {
   /** PF1B: the hole-guide toggle. Written to posts.add_to_hole_guide in the
    *  same posts patch; the server adds the media to the hole guide. */
   addToGuide?: boolean;
+  videoData?: VideoDetails;
 }
 
 export type SubmitResultKind = 'published' | 'scheduled' | 'uploading';
@@ -185,6 +188,8 @@ export function usePostSubmit() {
 
 
 
+
+      await writeVideoDetails(postId, input.media, input.videoData);
 
       // Mention notifications: insert into the canonical public.mentions
       // pipeline (source_type='post'). The trg_create_mention_notification

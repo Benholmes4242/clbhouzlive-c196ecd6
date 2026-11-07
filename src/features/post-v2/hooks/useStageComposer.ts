@@ -9,6 +9,7 @@ import { useCallback, useState } from 'react';
 import { toast } from '@/lib/toast';
 import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
 import type { PostShotTag } from '../lib/composerGolfRules';
+import { emptyVideoDetails, type VideoDetails } from '../lib/videoDetails';
 
 // Probe a video File's duration (seconds). Resolves 0 if unreadable.
 function probeVideoDuration(file: File): Promise<number> {
@@ -88,6 +89,7 @@ export interface StageState {
   postShotTags: PostShotTag[];
   attachedScoreId: string | null;
   addToGuide: boolean;
+  videoData?: VideoDetails;
 
 }
 
@@ -103,6 +105,7 @@ const emptyState: StageState = {
   postShotTags: [],
   attachedScoreId: null,
   addToGuide: true,
+  videoData: emptyVideoDetails(),
 
 };
 
@@ -194,6 +197,9 @@ export function useStageComposer() {
   }, []);
 
   const setCaption = useCallback((v: string) => markDirty({ caption: v }), []);
+  const setVideoData = useCallback((patch: Partial<VideoDetails>) => {
+    setState(s => ({ ...s, videoData: { ...(s.videoData ?? emptyVideoDetails()), ...patch }, dirty: true }));
+  }, []);
   const setCourse = useCallback((c: StageCourse | null) => {
     // Single-course setter: replaces the whole list with [c] (or clears).
     const courses = c ? [c] : [];
@@ -253,6 +259,7 @@ export function useStageComposer() {
     setActiveIndex,
     updateActive,
     setCaption,
+    setVideoData,
     setCourse,
     setCourses,
     setGolf,

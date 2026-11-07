@@ -159,7 +159,7 @@ export function resolveKind(row: {
   if (
     t === 'comment' || t === 'comment_post' || t === 'comment_reply' ||
     t === 'top_ten_comment' || t === 'top_ten_reply' ||
-    t === 'mention' || t === 'mention_post' || t === 'comment_mention' ||
+    t === 'mention' || t === 'mention_post' || t === 'video_credit' || t === 'comment_mention' ||
     t === 'top_ten_mention' || t === 'tag'
   ) {
     return {

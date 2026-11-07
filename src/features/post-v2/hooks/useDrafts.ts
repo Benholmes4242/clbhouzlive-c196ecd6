@@ -9,6 +9,7 @@ import { saveComposerMedia } from '../lib/composerDrafts';
 import type { StageMediaItem } from './useStageComposer';
 import type { PostShotTag } from '../lib/composerGolfRules';
 import type { PostVisibility } from '../lib/golfPostRules';
+import type { VideoDetails } from '../lib/videoDetails';
 
 export interface DraftRow {
   id: string;
@@ -61,6 +62,7 @@ export function useDrafts(userId: string | null | undefined) {
     attachedScoreId?: string | null;
     visibility?: PostVisibility;
     addToGuide?: boolean;
+    videoData?: VideoDetails;
   }) => {
     if (!userId) throw new Error('Not signed in');
     const {data,error}=await supabase.from('post_drafts').insert({
@@ -76,6 +78,7 @@ export function useDrafts(userId: string | null | undefined) {
       shot_tags:patch.postShotTags??[],
       attached_score_id:patch.actorType==='personal'?patch.attachedScoreId??null:null,
       visibility:patch.visibility??'anyone',
+      ...(patch.videoData ? { video_data: patch.videoData as never } : {}),
     } as never).select('id').single();
     if(error) throw error;
     if(!data?.id) throw new Error('Draft was not saved');
