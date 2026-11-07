@@ -50,7 +50,6 @@ vi.mock('@/components/profile/courses/FilterBar', async (importOriginal) => {
         <button key={s} onClick={() => p.onSortChange(s)}>{`sort:${s}`}</button>
       ))}
     </div>
-  ),
   ) };
 });
 
@@ -69,7 +68,49 @@ const rows = (c: HTMLElement) => c.querySelectorAll('article');
 const SORTS = ['recently-played', 'rating-high-low', 'rating-low-high'] as const;
 
 describe('profile courses archive', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); archiveFixture.realFilters = false; archiveFixture.zeroTop100 = false; });
+
+  it('on Global, tapping Top 100 keeps Global selected and selects Top 100', async () => {
+    archiveFixture.realFilters = true;
+    mount(false);
+    const top = await screen.findByRole('tab', { name: 'Top 100 1' });
+    expect(screen.getByRole('button', { name: 'Global', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(top);
+    expect(top).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('button', { name: 'Global', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('with zero Top 100 courses, Top 100 stays selected and renders the existing empty state', async () => {
+    archiveFixture.realFilters = true;
+    archiveFixture.zeroTop100 = true;
+    render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><AllCoursesList userId="u1" isOwnProfile={false} displayName="Mason Essam" /></MemoryRouter></QueryClientProvider>);
+    await screen.findByRole('tab', { name: 'All 4' });
+    const top = screen.getByRole('tab', { name: 'Top 100 0' });
+    fireEvent.click(top);
+    expect(top).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'All 4' })).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('heading', { name: 'No Top 100 Courses Yet' })).toBeInTheDocument();
+    expect(screen.getByText("Mason hasn't played any Top 100 courses yet.")).toBeInTheDocument();
+    expect(document.querySelectorAll('article')).toHaveLength(0);
+  });
+
+  it('changing region keeps the selected All or Top 100 tab, including controlled region updates', async () => {
+    archiveFixture.realFilters = true;
+    function ControlledArchive() {
+      const [region, setRegion] = React.useState<'global' | 'gb-i' | 'usa' | 'europe' | 'row'>('global');
+      return <AllCoursesList userId="u1" isOwnProfile={false} activeCountry={region} onCountryChange={setRegion} />;
+    }
+    render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><ControlledArchive /></MemoryRouter></QueryClientProvider>);
+    await screen.findByRole('tab', { name: 'All 4' });
+    fireEvent.click(screen.getByRole('button', { name: 'GB&I', exact: true }));
+    expect(screen.getByRole('tab', { name: 'All 2' })).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(screen.getByRole('tab', { name: 'Top 100 1' }));
+    for (const region of ['USA', 'Global', 'Europe']) {
+      fireEvent.click(screen.getByRole('button', { name: region, exact: true }));
+      expect(screen.getByRole('tab', { name: /Top 100/ })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('button', { name: region, exact: true })).toHaveAttribute('aria-pressed', 'true');
+    }
+  });
 
   it('defaults to the recency sort', async () => {
     expect(DEFAULT_COURSE_SORT).toBe('recently-played');

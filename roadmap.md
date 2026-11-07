@@ -1,5 +1,10 @@
 # Roadmap
 
+## Archive independent filters
+- [x] Reproduce before changes: actual zero-count Top100 remains selected with empty state, but region changes Global→GB&I; no All reset reproduced. Trace shared rail/parent/remount ownership without masking.
+- [x] Remove only forced region change; add three existing-file interaction tests with actual controls and controlled-region rerenders.
+- [ ] Run focused and four separate shards; only FW1 meta-line may be known; report exact cause evidence, limits and counts.
+
 ## Authorized upcoming board test-only close-out
 - [x] Repair only the three named upcomingLastYearBoard assertions; add uppercase-style checks, retain winner band and all production code.
 - [x] Focused23/23; four separate shards1936/1787/1913/1851 passed. Full7487 passed+1 failed=7488/655; no inventory delta; report exact assertion repairs and counts.
