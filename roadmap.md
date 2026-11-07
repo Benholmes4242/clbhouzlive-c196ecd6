@@ -4,13 +4,15 @@
 - [x] Match course-list/detail material and opt-in masthead typography; preserve gold/default callers. Preview buildOK.
 - [x] Add9cases/1file and ledger one authorised overlay-case rename/rewrite. Focused42passed/2failed at courseHeroesMatch.test.tsx:59:34 (clamp omitted) and81:86 (nonexistent avatar marker); no repairs.
 - [x] Detail320px with/without record:340height/no overflow, long record name ellipsis; report COURSE_HEROES_MATCH_REPORT.md.
-- [ ] All four shards blocked by two new focused failures; Courses-page320px mount failed (null fade parent); actual islands/avatar loading/adjacent seam remain unverified.
+- [x] Authorised clamp/avatar test-only repairs; course focused44/44 and Tour85/85. Shared shard1:2000passed; shard2:1827passed/1unapproved Needs failure at tourHeroRefinements.test.tsx:98:19; reports updated, no count delta.
+- [ ] Shards3–4 blocked by untouched Needs assertion; Courses-page320px mount failed (null fade parent); actual islands/avatar loading/adjacent seam remain unverified.
 
 ## OVERVIEW_HERO_B_STRIP
 - [x] Merge tour/state kicker, scale leader B, opt in board spacing after movers and replace locked no-pick members door with the strip; Ben ruled brief10+0/white position over mock.
 - [x] Add16cases/1file, authorised padding/door selectors only; focused67/67. Fresh shard1:1986passed/1unexpected failure at tourPlayoffShortenedEvents.test.tsx:89:35 expected RESULTS, received FINALButterfield Bermuda Championship. Existing failing assertion untouched.
 - [x] Actual mounted-component DOM320×844: no overflow; both kicker ellipses, long strip surname ellipsis,10px movers bottom/0px board top; report OVERVIEW_HERO_B_STRIP_REPORT.md, expected7648/668 reconciled from7632/667. Preview buildOK.
-- [ ] Shards2–4 blocked by exact RESULTS failure; live face loading/device/account readback unverified. Static DOM screenshots reserve avatar slots but do not prove loaded faces.
+- [x] Authorised RESULTS→FINAL case rename/assertions; Tour focused85/85. Shared shard1:2000passed; shard2:1827passed/1unapproved Needs failure; OVERVIEW_HERO_B_STRIP_REPORT.md updated with all three repairs and counts.
+- [ ] Shards3–4 blocked by untouched tourHeroRefinements.test.tsx:98:19 Needs assertion; live face loading/device/account readback unverified. Static DOM screenshots reserve avatar slots but do not prove loaded faces.
 
 ## FEED_PHOTO_GRID
 - [x] Add pure four-photo eligibility and shared grid rendering/taps/loading; preserve video/small sets/words-first frames.
