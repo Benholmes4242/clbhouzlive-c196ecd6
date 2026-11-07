@@ -1,5 +1,8 @@
 # PF3A_VIDEO — implemented, verification stopped
 
+## Subsequent authorized Tour test-only rerun
+The three Tour assertions below were repaired under exact user authorization; no PF3A production or tests changed. Focused Tour files passed23/23. Separate shards passed1936,1787,1913,1851 respectively; shard4 also failed one unexpected notification-type parity test. Full inventory7488/655 unchanged: **7487 passed,1 failed**. Failure: `src/features/activity-v2/utils/__tests__/notifRoute.parity.test.ts:318:46`, “handles the same notification types in both files”; `missingFromPort` received `["video_credit"]` instead of `[]`. Stop preserved; no repair attempted. Only allowed known FW1 meta-line did not recur. The 320px check remains unrun due to this stop. Exact output, changed assertions and commands are in TOUR_UPCOMING_LAST_YEAR_REPORT.md.
+
 ## Delivered
 Creator-only single-video title, description door, Details page, credits/links/business thanks/gear sheets, cover choices and timestamp chapters. Personal and business actors use the same one-video gate. Photo/mixed and edit mode keep their normal caption UI; retained metadata survives media additions/removals. Long form uses the existing 240-second rule, “New video”/“PUBLISH VIDEO”; shorts use “New short”/existing Share. Schedule/Save retain their labels; the shared footer carries the profile destination suffix.
 

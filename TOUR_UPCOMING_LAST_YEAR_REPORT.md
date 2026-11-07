@@ -1,5 +1,42 @@
 # Tour upcoming LAST YEAR — stopped on new test failures
 
+## Authorized test-only close-out — 7 November 2026
+
+Production unchanged. Only `src/test/upcomingLastYearBoard.test.tsx` changed; no other test edited, deleted or renamed. The seven cases remain seven cases.
+
+Named assertion repairs:
+- “puts the shared year in the condensed header, not the rows”: `expect(header?.textContent).toBe('LAST YEAR · 2025')` → `expect(header?.textContent).toBe('Last year · 2025')`; added `expect(header?.style.textTransform).toBe('uppercase')`.
+- “omits the heading year when the displayed rows have different years”: inline text assertion expecting `'LAST YEAR'` → typed header lookup and `expect(header?.textContent).toBe('Last year')`; added `expect(header?.style.textTransform).toBe('uppercase')`.
+- “keeps the winner the same size with a 14px trophy in the position cell and gold score/band”: score colour expectation `'rgb(251, 188, 46)'` → `'rgb(212, 160, 23)'`. Trophy GOLD_DARK and band `'rgba(251, 188, 46, 0.1)'` assertions unchanged.
+
+Focused command: `bunx vitest run src/test/upcomingLastYearBoard.test.tsx src/test/tourOverviewMergedAiry.test.tsx --maxWorkers=2` — **23/23 passed, 2 files**.
+
+Each shard ran as a separate command:
+
+| Command | Pass | Fail | Files |
+|---|---:|---:|---:|
+| `bunx vitest run --maxWorkers=2 --shard=1/4` | 1,936 | 0 | 164 |
+| `bunx vitest run --maxWorkers=2 --shard=2/4` | 1,787 | 0 | 164 |
+| `bunx vitest run --maxWorkers=2 --shard=3/4` | 1,913 | 0 | 164 |
+| `bunx vitest run --maxWorkers=2 --shard=4/4` | 1,851 | 1 | 163 |
+
+**Full suite: 7,487 passed + 1 failed = 7,488 tests / 655 files.** Inventory before/after this repair: **7,488/655 → 7,488/655**, no delta. Reconciliation from the last green baseline 7,440/651: upcoming board +7/1, PF3A +41/3. The permitted known FW1 meta-line failure did not recur; no failure was classified as known.
+
+Mandatory stop — unexpected failure, left untouched:
+
+```text
+FAIL src/features/activity-v2/utils/__tests__/notifRoute.parity.test.ts
+notifRoute handled-type coverage > handles the same notification types in both files
+src/features/activity-v2/utils/__tests__/notifRoute.parity.test.ts:318:46
+AssertionError: expected { …(2) } to deeply equal { Object (missingFromPort, extraInPort) }
+Expected: { extraInPort: [], missingFromPort: [] }
+Received: { extraInPort: [], missingFromPort: ["video_credit"] }
+```
+
+320px upcoming-hero/long-name browser check **not run**, because the unexpected shard-four failure required stopping. No production or other test repair attempted. Logs: `/tmp/upcoming-repair-focused.log`, `/tmp/upcoming-repair-shard-{1,2,3,4}.log`. Latest preview telemetry: **build OK**, 2026-11-07T15:19:03Z.
+
+Earlier history follows unchanged.
+
 ## Changes
 - `src/features/tourhub/components/overview-v3/HybridHeroBands/LastYearRow.tsx`: condensed three-column rows, shared tracks/gap/gutter, uniform 33px minimum height and 5px vertical padding; 22px ringless avatars; 13px/600 ellipsised names; 14px trophy; centred 15px scores. Removed flag/year props and cells; retained winner band and GOLD_DARK score rule.
 - `src/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand.tsx`: only LAST YEAR block changed; 12px top padding, no bottom padding, condensed header with shared year or label-only fallback.
