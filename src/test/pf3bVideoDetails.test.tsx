@@ -1,0 +1,47 @@
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { chaptersForPost, chapterFractions, currentChapter, isDetailedVideo, normalizeVideoDetails, singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
+import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
+import { useVideoChapter } from '@/features/video-details/useVideoChapter';
+const state = vi.hoisted(() => ({ user: { id: 'viewer' } as { id: string } | null, guest: false, rpc: vi.fn(), snapshot: vi.fn() }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: state.user }) }));
+vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => state.guest, isGuestUser: () => state.guest }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: state.rpc } }));
+vi.mock('@/video/VideoEngine', () => ({ VideoEngine: { snapshot: state.snapshot } }));
+const video = { id: 'v', type: 'video' as const, width: 1920, height: 1080, duration: 600 };
+const post = { id: 'p', caption: '', mediaItems: [video] };
+const chapters = [{ seconds: 0, time: '0:00', label: 'Intro' }, { seconds: 60, time: '1:00', label: 'Challenge' }, { seconds: 300, time: '5:00', label: 'Finish' }];
+const row = (v: Record<string, unknown> = {}) => normalizeVideoDetails({ post_id: 'p', title: '', links: [], credits: [], thanks: [], gear: [], ...v });
+const client = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
+const wrap = (q: QueryClient) => ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={q}>{children}</QueryClientProvider>;
+beforeEach(() => { state.user = { id: 'viewer' }; state.guest = false; state.rpc.mockReset(); state.rpc.mockResolvedValue({ data: [], error: null }); });
+describe('PF3B shared eligibility', () => {
+  it('title alone qualifies', () => expect(isDetailedVideo(post, row({ title: 'Title' }))).toBe(true));
+  it('credit alone qualifies', () => expect(isDetailedVideo(post, row({ credits: [{ profile_id: 'person', name: 'Person', role: 'host' }] }))).toBe(true));
+  it('chapters alone qualify through the composer parser', () => { const p = { ...post, caption: '0:00 Intro\n1:00 Challenge\n5:00 Finish' }; expect(chaptersForPost(p)).toEqual(chapters); expect(isDetailedVideo(p)).toBe(true); });
+  it('a plain video does not qualify', () => expect(isDetailedVideo(post, row())).toBe(false));
+  it('photo and mixed posts never qualify', () => { expect(isDetailedVideo({ ...post, mediaItems: [{ ...video, type: 'image' }] }, row({ title: 'Title' }))).toBe(false); expect(isDetailedVideo({ ...post, mediaItems: [video, video] }, row({ title: 'Title' }))).toBe(false); });
+  it('collects only single-video ids without duplicates', () => expect(singleVideoPostIds([post, post, { ...post, id: 'mixed', mediaItems: [video, video] }, { ...post, id: 'photo', mediaItems: [{ ...video, type: 'image' }] }])).toEqual(['p']));
+  it('segments are proportional and chapter lookup follows time', () => { expect(chapterFractions(chapters, 600)).toEqual([.1, .4, .5]); expect(currentChapter(chapters, 61)?.seconds).toBe(60); expect(currentChapter([], 90)).toBeNull(); });
+});
+describe('PF3B page details reads', () => {
+  it('batches at 100 and caches missing rows per post', async () => { const q = client(); const ids = Array.from({ length: 205 }, (_, i) => `p${i}`); renderHook(() => usePostVideoDetails(ids), { wrapper: wrap(q) }); await waitFor(() => expect(state.rpc).toHaveBeenCalledTimes(3)); await waitFor(() => expect(q.getQueryData(['post-video-details', 'viewer', 'p204'])).toBeNull()); expect(state.rpc.mock.calls.map(c => c[1].p_post_ids.length)).toEqual([100, 100, 5]); });
+  it('append reads only uncached post ids', async () => { const q = client(); const hook = renderHook(({ ids }) => usePostVideoDetails(ids), { wrapper: wrap(q), initialProps: { ids: ['p'] } }); await waitFor(() => expect(q.getQueryData(['post-video-details', 'viewer', 'p'])).toBeNull()); hook.rerender({ ids: ['p', 'next'] }); await waitFor(() => expect(state.rpc).toHaveBeenCalledTimes(2)); expect(state.rpc.mock.calls[1][1].p_post_ids).toEqual(['next']); });
+  it('guests return empty even with cached data', () => { state.guest = true; const q = client(); q.setQueryData(['post-video-details-page', 'viewer', 'p'], new Map([['p', row({ title: 'Hidden' })]])); const hook = renderHook(() => usePostVideoDetails(['p']), { wrapper: wrap(q) }); expect(hook.result.current.size).toBe(0); expect(state.rpc).not.toHaveBeenCalled(); });
+  it('signed out never reads', () => { state.user = null; const hook = renderHook(() => usePostVideoDetails(['p']), { wrapper: wrap(client()) }); expect(hook.result.current.size).toBe(0); expect(state.rpc).not.toHaveBeenCalled(); });
+  it('RPC errors return empty', async () => { state.rpc.mockResolvedValue({ data: null, error: { message: 'denied' } }); const q = client(); const hook = renderHook(() => usePostVideoDetails(['p']), { wrapper: wrap(q) }); await waitFor(() => expect(q.getQueryState(['post-video-details-page', 'viewer', 'p'])?.status).toBe('success')); expect(hook.result.current.size).toBe(0); });
+  it('normalizes the live credit and business names', async () => { state.rpc.mockResolvedValue({ data: [{ post_id: 'p', title: 'Title', credits: [{ profile_id: 'person', role: 'host', name: 'Person', avatar_url: 'photo' }], thanks: [{ business_id: 'club', name: 'Club', slug: 'club', category: 'Golf club' }] }], error: null }); const hook = renderHook(() => usePostVideoDetails(['p']), { wrapper: wrap(client()) }); await waitFor(() => expect(hook.result.current.get('p')?.title).toBe('Title')); expect(hook.result.current.get('p')?.credits[0].profileId).toBe('person'); expect(hook.result.current.get('p')?.thanks[0].businessId).toBe('club'); });
+});
+it('chapter reads are throttled to once a second and reject a foreign owner', async () => {
+  vi.useFakeTimers(); state.snapshot.mockReturnValue({ postId: 'p:0', currentTime: 0 });
+  const hook = renderHook(() => useVideoChapter('p', 'fullscreen', chapters));
+  expect(state.snapshot).toHaveBeenCalledTimes(1);
+  state.snapshot.mockReturnValue({ postId: 'p:0', currentTime: 70 });
+  await vi.advanceTimersByTimeAsync(999); expect(state.snapshot).toHaveBeenCalledTimes(1);
+  const { act } = await import('@testing-library/react'); await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+  expect(hook.result.current?.seconds).toBe(60);
+  state.snapshot.mockReturnValue({ postId: 'foreign:0', currentTime: 350 }); await act(async () => { await vi.advanceTimersByTimeAsync(1000); }); expect(hook.result.current?.seconds).toBe(60);
+  hook.unmount(); vi.useRealTimers();
+});

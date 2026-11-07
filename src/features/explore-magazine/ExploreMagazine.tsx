@@ -59,6 +59,8 @@ import { mapWatchFilter, type WatchFilter } from './watch/watchFilters';
 import { VideoCard } from './watch/videoUnit';
 import { useWatchVideos } from './watch/useWatchVideos';
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
+import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
+import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { useFeaturedRound } from './useFeaturedRound';
 import { FeaturedRoundCard, FeaturedRoundSkeleton } from './FeaturedRoundCard';
 import { useExploreStream } from './useExploreStream';
