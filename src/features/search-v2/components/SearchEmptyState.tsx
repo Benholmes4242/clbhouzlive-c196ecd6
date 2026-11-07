@@ -34,7 +34,7 @@ import {
   type EmptyStateSuggestion,
 } from '../hooks/useSearchEmptyStateV2';
 import { navCourse } from '../lib/searchNavigation';
-import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { A, ROW_BASE, S } from '../lib/tokens';
 
 
