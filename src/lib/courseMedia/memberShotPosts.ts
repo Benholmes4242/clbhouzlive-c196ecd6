@@ -28,6 +28,9 @@ export interface MemberShotRow {
   hole_no?: number;
   par?: number | null;
   yards?: number | null;
+  /* PF2_GUIDE: the live Everyone post this shot came from, when the server
+     supplies one; only ever non-null when that post is safe to open. */
+  source_post_id?: string | null;
 }
 
 
@@ -84,6 +87,7 @@ function holeShotItems(rows: readonly MemberShotRow[], courseName: string, holeN
         credit: credit(row.member_name, row.added_at),
         avatarUrl: row.member_avatar_url ?? null,
         memberName: row.member_name ?? '',
+        sourcePostId: row.source_post_id ?? null,
         ...(perItemCourse ? { courseId: row.course_id, courseName: row.course_name ?? '' } : {}),
       } }, date: row.added_at,
     }));
@@ -107,6 +111,8 @@ export function placeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName
       kicker: label, title: shortCoursePart(courseName), detail: undefined,
       credit: shot.item.memberShot?.credit ?? '', memberName: shot.item.memberShot?.memberName ?? '',
       avatarUrl: shot.item.memberShot?.avatarUrl ?? null,
+      /* PF2_GUIDE: place shots never link back to a post. */
+      sourcePostId: null,
     } },
   }));
   return syntheticPost(`shots:place:${courseId}:${place}`, courseId, courseName, label, null, shots);
