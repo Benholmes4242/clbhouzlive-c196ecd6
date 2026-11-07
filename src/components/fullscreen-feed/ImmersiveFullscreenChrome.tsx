@@ -82,6 +82,11 @@ import { useFollowState } from '@/hooks/useFollowState';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatCountKilo, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
+import { chaptersForPost, isDetailedVideo, type PostVideoDetails } from '@/features/video-details/videoDetailsModel';
+import { VideoTeaser } from '@/features/video-details/VideoTeaser';
+import { VideoAboutSheet } from '@/features/video-details/VideoAboutSheet';
+import { useVideoChapter } from '@/features/video-details/useVideoChapter';
+import { ownerMatches } from './scrubberMath';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
@@ -292,6 +297,7 @@ const CaptionBlock: React.FC<{
 
 
 interface Props {
+  videoDetails?: PostVideoDetails | null;
   posts: FeedPost[];
   activeIndex: number;
   onClose: () => void;
@@ -347,6 +353,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   golfContext = null,
   golfHole = null,
   onOpenScorecard,
+  videoDetails,
 }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -396,6 +403,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }, [soundBlocked, isAudioMuted]);
 
   const activePost = posts[activeIndex] ?? null;
+  const [videoAboutOpen, setVideoAboutOpen] = useState(false);
+  const videoChapters = React.useMemo(() => chaptersForPost(activePost), [activePost]);
+  const detailedVideo = !syntheticPosts && isDetailedVideo(activePost, videoDetails);
+  const chapter = useVideoChapter(detailedVideo ? activePost?.id ?? null : null, soundLaneId, videoChapters);
+  useEffect(() => { setVideoAboutOpen(false); }, [activePost?.id]);
   // K.1: the member's position is saved on pause, close and a throttled interval.
   // syntheticPosts opens carry synthetic post ids — never write video_progress
   // for them (BRIEF_SYNTHETIC_SHOT_GATES).
@@ -567,12 +579,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
+      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
       {!syntheticPosts && <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />}
       <div style={{ ...fadeWhileScrubbing, pointerEvents: 'none' }}>
         <FullscreenTopProgress activePost={activePost} />
       </div>
       <FullscreenVideoScrubber
         activePost={activePost}
+        chapters={detailedVideo ? videoChapters : undefined}
         bottom={syntheticPosts ? 'env(safe-area-inset-bottom, 0px)' : `calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
         onDraggingChange={setScrubbing}
       />
@@ -828,7 +842,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           {/* Caption — measured 3-line cut + one inline CTA. Non-review posts
               with an empty caption render nothing; reviews always mount so the
               empty-text "Full review" fallback can reach the sheet. */}
-          {activePost.caption?.trim() || activePost.isReview ? (
+          {detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
             <CaptionBlock
               caption={activePost.caption ?? ''}
               resetKey={activeIndex}

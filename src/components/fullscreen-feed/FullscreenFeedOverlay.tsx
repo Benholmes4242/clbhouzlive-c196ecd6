@@ -1,6 +1,8 @@
 import React, { useEffect, useLayoutEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { usePostScoreIds } from '@/hooks/feed/usePostRounds';
 import { usePostGolfContext, usePostGolfHoleMeta, golfHoleFor } from '@/hooks/feed/usePostGolfContext';
+import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
+import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { createPortal } from 'react-dom';
 
@@ -570,6 +572,7 @@ export function FullscreenFeedOverlay() {
     [posts, syntheticPosts, courseGallery],
   );
   const golfContextMap = usePostGolfContext(golfPostIds);
+  const videoDetailsMap = usePostVideoDetails(useMemo(() => isOpen && !syntheticPosts && !courseGallery ? singleVideoPostIds(posts) : [], [isOpen, posts, syntheticPosts, courseGallery]));
   const golfHoleMap = usePostGolfHoleMeta(
     useMemo(() => {
       if (!golfContextMap) return [];
@@ -1074,6 +1077,7 @@ export function FullscreenFeedOverlay() {
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}
                     golfContext={activeGolfContext}
+                    videoDetails={activePost ? videoDetailsMap.get(activePost.id) ?? null : null}
                     golfHole={activeGolfHole}
                     onOpenScorecard={(scoreId) => activePost && setGolfScorecard({ scoreId, userId: activePost.userId })}
                   />}

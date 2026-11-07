@@ -59,6 +59,8 @@ import { mapWatchFilter, type WatchFilter } from './watch/watchFilters';
 import { VideoCard } from './watch/videoUnit';
 import { useWatchVideos } from './watch/useWatchVideos';
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
+import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
+import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { useFeaturedRound } from './useFeaturedRound';
 import { FeaturedRoundCard, FeaturedRoundSkeleton } from './FeaturedRoundCard';
 import { useExploreStream } from './useExploreStream';
@@ -303,6 +305,7 @@ function VideosShelf({
   const { t } = useTranslation('courses');
   const tiles = useMemo(() => rows.slice(0, 12), [rows]);
   const posts = useMemo(() => toFeedPosts(tiles), [tiles]);
+  const videoDetails = usePostVideoDetails(useMemo(() => singleVideoPostIds(posts), [posts]));
 
   if (!isFetched && !isError) return <ShelfShell tileW={VIDEO_TILE.w} tileH={VIDEO_TILE.h} />;
   /* ERRORED IS NOT EMPTY - the same two gates every other shelf carries. */
@@ -326,7 +329,7 @@ function VideosShelf({
       {tiles.map((row, index) => (
         <div key={row.post_id} style={{ flex: `0 0 ${VIDEO_TILE.w}px`, width: VIDEO_TILE.w }}>
           <VideoCard
-            row={row}
+            row={{ ...row, video_details_title: videoDetails.get(row.post_id)?.title ?? null }}
             size="rail"
             context="all"
             onPress={() => {

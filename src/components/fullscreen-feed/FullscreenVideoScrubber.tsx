@@ -14,6 +14,7 @@ import { Z } from '@/config/zIndex';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { LaneId } from '@/video/lanePolicy';
 import { expectedOwnerKey, formatClock, fractionFromX, ownerMatches } from './scrubberMath';
+import type { VideoChapter } from '@/features/post-v2/lib/videoDetails';
 
 const FILLED = 'rgba(255,255,255,0.95)';
 const EMPTY = 'rgba(255,255,255,0.22)';
@@ -31,12 +32,13 @@ export function showsVideoScrubber(activePost: FeedPost | null | undefined, acti
 }
 
 interface Props {
+  chapters?: VideoChapter[];
   activePost: FeedPost | null;
   bottom: string;
   onDraggingChange: (dragging: boolean) => void;
 }
 
-export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, onDraggingChange }) => {
+export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, onDraggingChange, chapters }) => {
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const activeSlide = clampSlide(activePost, activePagerIdx);
@@ -230,6 +232,9 @@ export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, o
               width: total > 0 ? 'calc(var(--fs-progress, 0) * 100%)' : 0,
             }}
           />
+          {total > 0 && chapters && chapters.length > 1 && <div data-video-chapter-segments aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+            {chapters.slice(1).map(c => <span key={c.seconds} data-chapter-boundary={c.seconds} style={{ position: 'absolute', left: `calc(${c.seconds / total * 100}% - 1px)`, top: 0, bottom: 0, width: 2, background: 'var(--video-scrubber-gap)' }} />)}
+          </div>}
           {dragging && (
             <div
               style={{

@@ -20,6 +20,7 @@ import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media
  * optional because each RPC returns a subset - `rowDefaults` fills gaps.
  */
 export interface HubRpcRow {
+  video_details_title?: string | null;
   post_id: string;
   post_content?: string | null;
   post_created_at?: string | null;

@@ -49,6 +49,7 @@ import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRound
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { golfHoleFor, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
 import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
+import type { PostVideoDetails } from '@/features/video-details/videoDetailsModel';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
@@ -175,6 +176,7 @@ const UpToDateDivider: React.FC<{ index: number; loadedCount: number }> = ({ ind
 
 
 export interface CardFeedProps {
+  videoDetailsMap?: Map<string, PostVideoDetails>;
   posts: FeedPost[];
   feedItems?: ClubhouseFeedItem[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
@@ -288,6 +290,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   postRoundsSettled = true,
   onRoundTap,
   golfContextMap,
+  videoDetailsMap,
   golfHoleMap,
   golfShapeMap,
   onGolfRoundTap,
@@ -1004,6 +1007,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 })()}
                 onRoundTap={onRoundTap}
                 golfContext={golfContextMap?.get(post.id) ?? null}
+                videoDetails={videoDetailsMap?.get(post.id) ?? null}
                 golfHole={(() => {
                   const ctx = golfContextMap?.get(post.id);
                   return ctx ? golfHoleFor(ctx, golfHoleMap) : null;
@@ -1074,6 +1078,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       postRoundsSettled,
       onRoundTap,
       golfContextMap,
+      videoDetailsMap,
       golfHoleMap,
       golfShapeMap,
       onGolfRoundTap,

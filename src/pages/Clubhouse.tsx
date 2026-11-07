@@ -71,6 +71,8 @@ import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { usePostGolfContext, usePostGolfHoleMeta } from '@/hooks/feed/usePostGolfContext';
+import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
+import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
 import { useViewerStanding, type StandingRow } from '@/features/explore-magazine/useViewerStanding';
 import { useViewerCourseBests } from '@/features/explore-magazine/useViewerCourseBests';
@@ -223,6 +225,7 @@ const ClubhouseContent = () => {
   const FEED_SCOPE = 'clubhouse:suggested';
 
   const posts = activeFeed.posts;
+  const videoDetailsMap = usePostVideoDetails(useMemo(() => singleVideoPostIds(posts), [posts]));
   // WF2 — Who to follow rail above posts 3 and 15. The callback must stay
   // identity-stable (CardFeed's itemContent depends on it), so the post count
   // reaches it through a ref and the rail fetches its own data.
@@ -688,6 +691,7 @@ const ClubhouseContent = () => {
               featuredDecisions={featuredDecisions.current}
               onRoundTap={(post, round) => setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })}
               golfContextMap={golfContextMap}
+              videoDetailsMap={videoDetailsMap}
               golfHoleMap={golfHoleMap}
               golfShapeMap={golfShapeMap}
               onGolfRoundTap={(post, scoreId) => setRoundSheet({ scoreId, userId: post.userId })}
