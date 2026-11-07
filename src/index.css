@@ -37,6 +37,7 @@
 
 :root {
   --video-about-sheet: #17171B;
+  --video-scrubber-gap: #0A0A0C;
   --video-about-ink: #F8FAFC;
   --video-about-body: rgba(248,250,252,.78);
   --video-about-mute: rgba(248,250,252,.62);

@@ -78,6 +78,10 @@ import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
 import { HoleChip, FeedRoundRow } from './PostGolfContext';
 import { golfRoundToPar, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
 import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
+import { chaptersForPost, isDetailedVideo, type PostVideoDetails } from '@/features/video-details/videoDetailsModel';
+import { VideoTeaser } from '@/features/video-details/VideoTeaser';
+import { VideoAboutSheet } from '@/features/video-details/VideoAboutSheet';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 
 /** Home's content inset (the header's 12px). The round photo bleeds by it. */
 const ROUND_CARD_INSET = 12;
@@ -103,6 +107,7 @@ const FOOTER_ACTION_GAP = 22;
 
 
 export interface FeedCardProps {
+  videoDetails?: PostVideoDetails | null;
   post: FeedPost;
   liked: boolean;
   likeCount: number;
@@ -342,6 +347,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   golfHole,
   golfRoundShape,
   onGolfRoundTap,
+  videoDetails,
 }) => {
   // GUEST §5: every like, comment (footer glyph, preview row and the
   // "Add a comment…" row), share and follow door on the card passes through
@@ -378,6 +384,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
+  const [videoAboutOpen, setVideoAboutOpen] = useState(false);
+  const videoChapters = useMemo(() => chaptersForPost(post), [post]);
+  const detailedVideo = isDetailedVideo(post, videoDetails);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
@@ -955,6 +964,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     >
 
       <div style={{ position: 'relative', zIndex: 1 }}>
+      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={post} details={videoDetails} chapters={videoChapters} likes={likeCount} onClose={() => setVideoAboutOpen(false)} onNavigate={path => navigate(path)} onTime={seconds => openWithOrigin({ posts: [post], index: 0, originEl: null, openedFrom: 'clubhouse', resumeAtSeconds: seconds })} />}
 
 
       {/* Header */}
@@ -1037,7 +1047,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         </div>
       </div>
 
-      {layout === 'mediaFirst' ? (() => {
+      {detailedVideo ? <>
+        <div data-feed-section="media">{renderMedia(false)}</div>
+        <VideoTeaser feed title={videoDetails?.title ?? ''} description={post.caption ?? ''} hasMore={!!(videoChapters.length || post.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} onOpen={() => setVideoAboutOpen(true)} />
+        {golfRoundRow}
+        {renderCourseBand()}
+        <div data-feed-section="footer">{renderFooter(FOOTER_GUTTER, false, { caption: null, addComment })}</div>
+      </> : layout === 'mediaFirst' ? (() => {
         const hasMedia = items.length > 0;
         const lead = post.actorType === 'business'
           ? courseActivityClubName(post.displayName ?? '')

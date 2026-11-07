@@ -36,7 +36,8 @@ import { attachPosterPreview } from './posterPreview';
  */
 const INSET = 16;
 
-export function videoTitle(row: HubRpcRow, fallback: string): string {
+export function videoTitle(row: HubRpcRow, fallback: string, detailsTitle?: string | null): string {
+  if (detailsTitle?.trim() || row.video_details_title?.trim()) return (detailsTitle || row.video_details_title || '').trim();
   const stripped = row.post_content ? stripMentionMarkup(String(row.post_content)).trim() : '';
   return stripped || row.course_name || fallback;
 }
