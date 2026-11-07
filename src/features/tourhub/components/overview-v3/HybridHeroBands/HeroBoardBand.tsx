@@ -50,7 +50,7 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, WHITE_ALPHA_12, TOPAR_UNDER_DARK, LIVE_INK, STATUS_NEGATIVE } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -575,9 +575,10 @@ export function HeroBoardSection({
 
 export {pickTeeText,pickTeeDayLabel,teeHeadingFits,pickStatusToken} from './PicksBlock';
 /**
- * §C — ROUND N MOVEMENT. Three cards at most, never padded. THE ARROW
- * CARRIES THE DIRECTION, NOT THE COLOUR: red is under par on every Tour
- * surface, so a lost place reads muted ink, never red.
+ * §C — ROUND N MOVEMENT. Three cards at most, never padded. Ben's ruling
+ * (7 Nov 2026): only the arrow carries direction colour — live green up,
+ * darker warning red down, never the under-par red. Places remain white;
+ * gross/to-par retain their independent score colour law.
  */
 export function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
   const { t } = useTranslation('tourhub');
@@ -588,20 +589,20 @@ export function RoundMovementBand({ round, cards }: { round: number; cards: Move
       </div>
       <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
         {cards.map((c) => (
-          <div key={c.key} data-overview-movement-card style={{ flex: 1, minWidth: 0, background: OVERVIEW.cardGround, border: `1px solid ${OVERVIEW.hairline}`, borderRadius: 9, padding: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              <SquircleAvatar size={22} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
-              <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 700, color: OVERVIEW.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 6 }}>
-              <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ fontSize: 16, fontWeight: 800, letterSpacing: 0, color: c.delta > 0 ? OVERVIEW.ink : OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
-                {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta)}
+          <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, background: 'transparent', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, padding: 7 }}>
+            <SquircleAvatar size={28} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
+            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: OVERVIEW.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 2, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', minWidth: 0, overflow: 'hidden', ...FIGS }}>
+              <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ flex: 'none', color: c.delta > 0 ? LIVE_INK : STATUS_NEGATIVE }}>
+                {c.delta > 0 ? '\u25B2' : '\u25BC'}
               </span>
+              <span data-movement-places style={{ flex: 'none', color: OVERVIEW.ink }}>{Math.abs(c.delta)}</span>
               {c.toPar != null ? (
                 /* The to-par is a score and takes the colour law; the gross stays
                    muted. With no gross the to-par stands bare — brackets around
                    the only figure on the line say nothing. */
-                <span data-movement-score style={{ fontSize: 10, fontWeight: 600, whiteSpace: 'nowrap', ...FIGS }}>
+                <span data-movement-score style={{ fontSize: 10.5, fontWeight: 600, flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>
                   {c.gross != null ? (
                     <><span data-movement-gross style={{ color: OVERVIEW.mute }}>{c.gross}</span>{' '}
                       <span data-movement-topar style={{ color: getScoreColor(c.toPar, 'dark') }}>({fmtScore(c.toPar)})</span></>
@@ -610,6 +611,7 @@ export function RoundMovementBand({ round, cards }: { round: number; cards: Move
                   )}
                 </span>
               ) : null}
+            </div>
             </div>
           </div>
         ))}

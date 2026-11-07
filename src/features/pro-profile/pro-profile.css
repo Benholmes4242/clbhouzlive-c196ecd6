@@ -11,6 +11,8 @@
 .pro-profile-tile { min-width:0; padding:12px 10px; border-radius:14px; background:var(--pro-profile-card); border:1px solid var(--pro-profile-hair); }
 .pro-profile-tile b { display:block; font-size:20px; font-weight:800; overflow-wrap:anywhere; }
 .pro-profile-tile span { display:block; margin-top:4px; font-size:9.5px; font-weight:800; letter-spacing:.1em; color:var(--pro-profile-dim); }
+.pro-season-tiles .pro-profile-tile { background:transparent; border:1px solid var(--pro-season-outline); border-radius:12px; padding:12px 4px; text-align:center; }
+.pro-season-tiles .pro-profile-tile span { line-height:1.3; }
 .pro-profile-rounds { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px; margin-top:14px; }
 .pro-profile-round { min-width:0; padding:10px 12px; border-radius:12px; background:var(--pro-profile-wash); text-align:left; height:auto; border:0; }
 .pro-profile-round b { display:block; font-size:16px; font-weight:800; }
@@ -19,7 +21,7 @@
 .pro-profile-command { height:42px; width:100%; margin-top:14px; border-radius:999px; font-size:13.5px; font-weight:700; color:var(--pro-profile-on-ink); background:var(--pro-profile-ink); border-color:var(--pro-profile-ink); }
 .pro-profile-command[data-watching=true] { background:transparent; color:var(--pro-profile-ink); border-color:var(--pro-profile-rule); }
 .pro-profile-caption { margin-top:8px; text-align:center; font-size:11.5px; line-height:1.45; color:var(--pro-profile-dim); }
-.pro-profile-results { margin-top:10px; padding:4px 14px; }
+.pro-season-results { margin-top:10px; border-top:1px solid var(--pro-profile-hair); }
 .pro-profile-row { display:flex; align-items:center; gap:12px; padding:12px 2px; width:100%; height:auto; border:0; border-radius:0; border-top:1px solid var(--pro-profile-hair); text-align:left; color:var(--pro-profile-ink); background:transparent; }
 .pro-profile-row:first-child { border-top:0; }
 .pro-profile-finish { width:44px; flex:none; font-size:15px; font-weight:800; }

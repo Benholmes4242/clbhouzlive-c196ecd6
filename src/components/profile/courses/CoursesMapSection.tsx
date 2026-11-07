@@ -113,7 +113,7 @@ export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped =
                 {r.country}
               </span>
               <span style={{ flex: 1, height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
-                <span style={{ display: 'block', height: '100%', width: `${(r.courses / max) * 100}%`, background: A.AMBER, opacity: 0.75, borderRadius: 3 }} />
+                <span style={{ display: 'block', height: '100%', width: `${(r.courses / max) * 100}%`, background: 'var(--course-country-bar)', borderRadius: 3 }} />
               </span>
               <span style={{ fontSize: 10.5, fontWeight: 700, color: A.BODY, fontVariantNumeric: 'tabular-nums', textAlign: 'right', minWidth: 14 }}>
                 {r.courses}
@@ -126,12 +126,12 @@ export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped =
         </div>
       </div>
       <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: 10.5, color: A.DIM }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        {showPlot && fit && <><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: A.AMBER }} />Top 100 course
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: OTHER_DOT }} />Everything else
-        </span>
+        </span></>}
         {unmapped > 0 && (
           <span data-testid="map-unmapped" style={{ fontSize: 10.5, color: A.FAINT }}>{unmapped} not yet mapped</span>
         )}

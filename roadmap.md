@@ -1,5 +1,9 @@
 # Roadmap
 
+## Pro tiles, legacy chart and movers
+- [ ] Match season-only outlined centred tiles/open results; centred legacy tiles with dim null dashes/zero tracking; neutral tally bars and plot-only key; pick-style movers with direction-only arrows.
+- [ ] Add scoped tests/update only authorized old-value assertions; 320px checks and four separate shards; only FW1 meta-line known, existing notification parity stop untouched.
+
 ## Archive independent filters
 - [x] Reproduce before changes: actual zero-count Top100 remains selected with empty state, but region changes Global→GB&I; no All reset reproduced. Trace shared rail/parent/remount ownership without masking.
 - [x] Remove only forced region change; add three existing-file interaction tests with actual controls and controlled-region rerenders.
