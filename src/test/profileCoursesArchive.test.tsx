@@ -18,6 +18,8 @@ const COURSES = [
 ];
 
 vi.mock('@/hooks/useUserCourseActivity', () => ({ useUserCourseActivity: () => ({ data: ACTIVITY }) }));
+const tourCourses = vi.hoisted(() => vi.fn(() => ({ data: new Map() })));
+vi.mock('@/hooks/useProTourCourses', () => ({ useProTourCourses: tourCourses }));
 vi.mock('@/hooks/usePlayedUnratedCourses', () => ({ usePlayedUnratedCourses: () => ({ courses: [], count: 0 }) }));
 const RANKS = [{ course_id: 'a', rank: 37, top100_lists: { slug: 'global', short_label: 'Global', name: 'World', is_active: true, sort_order: 0 } }];
 vi.mock('@/integrations/supabase/client', () => ({
@@ -71,6 +73,35 @@ describe('profile courses archive', () => {
     mount();
     await waitFor(() => expect(document.querySelectorAll('article').length).toBeGreaterThan(0));
     expect(screen.getByTestId('sort').textContent).toBe('recently-played');
+  });
+
+  it('keeps the matching tour event and event date on a rated row sorted rating-high-low', async () => {
+    tourCourses.mockReturnValue({ data: new Map([['a', {
+      eventName: 'Open de Roissy PGA France', finish: '2', playedOn: '2026-05-31', source: 'owgr',
+    }]]) });
+    try {
+      const { container } = render(
+        <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+          <MemoryRouter>
+            <AllCoursesList userId="u1" isOwnProfile ratingRows={[{
+              id: 'rating-a', course_id: 'a', rating: 9.1, review: null,
+              design_score: 9, condition_score: 9, clubhouse_score: 9, facilities_score: 9,
+              review_date: '2026-06-02', created_at: '2026-06-02',
+            }]} />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+      await waitFor(() => expect(rows(container).length).toBe(4));
+      fireEvent.click(screen.getByText('sort:rating-high-low'));
+      const row = Array.from(rows(container)).find((r) => r.textContent?.includes('Alpha Links'));
+      expect(row).toBeTruthy();
+      if (!row) throw new Error('Rated Alpha Links archive row missing');
+      expect(within(row).getByText('On tour · Open de Roissy PGA France · 2nd')).toBeTruthy();
+      expect(within(row).getByTestId('meta-line-1').textContent).toContain('31 May 2026');
+      expect(row.textContent).not.toContain('2 Jun 2026');
+    } finally {
+      tourCourses.mockReturnValue({ data: new Map() });
+    }
   });
 
   it('prints no sort-index number on any row, and keeps the stored #global_rank', async () => {
