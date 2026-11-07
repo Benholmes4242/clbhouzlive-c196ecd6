@@ -3730,6 +3730,8 @@ export type Database = {
           reject_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          source_post_id: string | null
+          source_post_media_id: string | null
           status: string
           stream_id: string | null
           tagged_by: string | null
@@ -3758,6 +3760,8 @@ export type Database = {
           reject_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          source_post_id?: string | null
+          source_post_media_id?: string | null
           status?: string
           stream_id?: string | null
           tagged_by?: string | null
@@ -3786,6 +3790,8 @@ export type Database = {
           reject_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          source_post_id?: string | null
+          source_post_media_id?: string | null
           status?: string
           stream_id?: string | null
           tagged_by?: string | null
@@ -3793,6 +3799,34 @@ export type Database = {
           width?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "chm_source_post_fkey"
+            columns: ["source_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chm_source_post_fkey"
+            columns: ["source_post_id"]
+            isOneToOne: false
+            referencedRelation: "review_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "chm_source_post_fkey"
+            columns: ["source_post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "chm_source_post_media_fkey"
+            columns: ["source_post_media_id"]
+            isOneToOne: false
+            referencedRelation: "post_media"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "course_hole_media_course_id_fkey"
             columns: ["course_id"]
@@ -9279,6 +9313,7 @@ export type Database = {
         Row: {
           actor_id: string
           actor_type: string | null
+          attached_score_id: string | null
           audio_mode: string | null
           badges: string[] | null
           categories: string[] | null
@@ -9288,7 +9323,9 @@ export type Database = {
           course_id: string | null
           course_name: string | null
           created_at: string | null
+          hole_no: number | null
           id: string
+          shot_tags: string[]
           studio_music: Json | null
           updated_at: string | null
           user_id: string
@@ -9297,6 +9334,7 @@ export type Database = {
         Insert: {
           actor_id: string
           actor_type?: string | null
+          attached_score_id?: string | null
           audio_mode?: string | null
           badges?: string[] | null
           categories?: string[] | null
@@ -9306,7 +9344,9 @@ export type Database = {
           course_id?: string | null
           course_name?: string | null
           created_at?: string | null
+          hole_no?: number | null
           id?: string
+          shot_tags?: string[]
           studio_music?: Json | null
           updated_at?: string | null
           user_id: string
@@ -9315,6 +9355,7 @@ export type Database = {
         Update: {
           actor_id?: string
           actor_type?: string | null
+          attached_score_id?: string | null
           audio_mode?: string | null
           badges?: string[] | null
           categories?: string[] | null
@@ -9324,13 +9365,29 @@ export type Database = {
           course_id?: string | null
           course_name?: string | null
           created_at?: string | null
+          hole_no?: number | null
           id?: string
+          shot_tags?: string[]
           studio_music?: Json | null
           updated_at?: string | null
           user_id?: string
           visibility?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "post_drafts_attached_score_id_fkey"
+            columns: ["attached_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "post_drafts_attached_score_id_fkey"
+            columns: ["attached_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "post_drafts_course_id_fkey"
             columns: ["course_id"]
@@ -9791,6 +9848,7 @@ export type Database = {
           achievement_id: string | null
           actor_id: string
           actor_type: string
+          attached_score_id: string | null
           audio_mode: string | null
           auto_hidden: boolean
           badges: string[]
@@ -9799,6 +9857,7 @@ export type Database = {
           content: string | null
           course_id: string | null
           created_at: string
+          hole_no: number | null
           id: string
           is_pinned: boolean | null
           like_count: number
@@ -9814,6 +9873,7 @@ export type Database = {
           pre_moderation_status: string | null
           round_notability: number | null
           scheduled_at: string | null
+          shot_tags: string[]
           source_review_id: string | null
           status: string
           studio_music: Json | null
@@ -9828,6 +9888,7 @@ export type Database = {
           achievement_id?: string | null
           actor_id: string
           actor_type?: string
+          attached_score_id?: string | null
           audio_mode?: string | null
           auto_hidden?: boolean
           badges?: string[]
@@ -9836,6 +9897,7 @@ export type Database = {
           content?: string | null
           course_id?: string | null
           created_at?: string
+          hole_no?: number | null
           id?: string
           is_pinned?: boolean | null
           like_count?: number
@@ -9851,6 +9913,7 @@ export type Database = {
           pre_moderation_status?: string | null
           round_notability?: number | null
           scheduled_at?: string | null
+          shot_tags?: string[]
           source_review_id?: string | null
           status?: string
           studio_music?: Json | null
@@ -9865,6 +9928,7 @@ export type Database = {
           achievement_id?: string | null
           actor_id?: string
           actor_type?: string
+          attached_score_id?: string | null
           audio_mode?: string | null
           auto_hidden?: boolean
           badges?: string[]
@@ -9873,6 +9937,7 @@ export type Database = {
           content?: string | null
           course_id?: string | null
           created_at?: string
+          hole_no?: number | null
           id?: string
           is_pinned?: boolean | null
           like_count?: number
@@ -9888,6 +9953,7 @@ export type Database = {
           pre_moderation_status?: string | null
           round_notability?: number | null
           scheduled_at?: string | null
+          shot_tags?: string[]
           source_review_id?: string | null
           status?: string
           studio_music?: Json | null
@@ -9911,6 +9977,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_achievements_view"
             referencedColumns: ["achievement_id"]
+          },
+          {
+            foreignKeyName: "posts_attached_score_id_fkey"
+            columns: ["attached_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "posts_attached_score_id_fkey"
+            columns: ["attached_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "posts_course_id_fkey"
