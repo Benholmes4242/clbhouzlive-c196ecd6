@@ -2,8 +2,8 @@
 
 ## OVERVIEW_TIGHT_CHIPS
 - [x] Tighten picks/movers to 46px two-line chips; remove chip NEEDS and gross/brackets only; shorten English intros and preserve PicksSheet.
-- [ ] Update only authorized obsolete assertions/props; add requested regression coverage and run four separate shards.
-- [ ] Check actual picks and mover rows at 320px and report files/assertion ledger/counts.
+- [x] Update authorized obsolete assertions and two direct-mount prop sets; add3cases. Focused115passed/1failed across7files.
+- [ ] STOP: tourOverviewPicksChipsFullBoard.test.tsx:130:30 new flex assertion expected '1 1 0%' received '1'. No repair, shards or320px checks after failure; report in OVERVIEW_TIGHT_CHIPS_REPORT.md.
 
 ## PRO_BADGE_W1
 - [x] Apply CSS-only pearl plate, highlight and island-ratio corners; preserve badge copy, sizes, callers and non-pro ticks.
