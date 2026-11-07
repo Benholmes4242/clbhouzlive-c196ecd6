@@ -213,6 +213,8 @@
   --pick-dim: rgba(248,250,252,.42);
   --pick-hair: rgba(255,255,255,.06);
   --pick-rule: rgba(255,255,255,.12);
+  --pick-strip-locked: rgba(255,255,255,.62);
+  --pick-strip-face-ring: 0 0 0 1.5px var(--pick-canvas);
   --pick-tile: rgba(255,255,255,.04);
   --pick-radio: rgba(255,255,255,.28);
   --pick-clear: rgba(255,255,255,.22);

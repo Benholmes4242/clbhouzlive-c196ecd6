@@ -91,7 +91,7 @@ describe('Merged Airy lower sections', () => {
   it('tightens movers and their figure gap', () => {
     const v = mount(<RoundMovementBand round={2} cards={[{ key: 'a', name: 'Player A', candidates: [], delta: 2, toPar: -2, gross: 70 }]} />);
     const movement = v.container.querySelector<HTMLElement>('[data-overview-movement]');
-    expect(movement?.style.padding).toBe('12px 20px'); expect((movement?.children[1] as HTMLElement)?.style.marginTop).toBe('8px');
+    expect(movement?.style.padding).toBe('12px 20px 10px'); expect((movement?.children[1] as HTMLElement)?.style.marginTop).toBe('8px');
     const card = movement?.querySelector<HTMLElement>('[data-overview-movement-card]'); expect(card?.style.padding).toBe('7px'); expect((card?.children[1].children[1] as HTMLElement)?.style.marginTop).toBe('1px');
   });
   it('tightens leaders with a six-pixel gap and top hairline', () => {

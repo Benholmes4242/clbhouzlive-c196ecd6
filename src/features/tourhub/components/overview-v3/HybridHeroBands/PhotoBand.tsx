@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import {
-  AMBER,
   CAPS_10,
   FONT,
   INK,
@@ -84,7 +83,7 @@ export function PhotoBand({
       ? t('overview.hero.statePlayoff', { defaultValue: 'PLAYOFF' }) // never RESULTS; no live dot
     : isUpcoming && startDay
       ? t('overview.hero.starts', { day: startDay })
-      : t('overview.hero.stateFinal');
+      : t('overview.alsoThisWeek.final');
 
   return (
     <div
