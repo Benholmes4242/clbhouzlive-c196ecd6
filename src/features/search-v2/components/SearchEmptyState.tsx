@@ -34,7 +34,7 @@ import {
   type EmptyStateSuggestion,
 } from '../hooks/useSearchEmptyStateV2';
 import { navCourse } from '../lib/searchNavigation';
-import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { A as ANALYTICAL, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { A, ROW_BASE, S } from '../lib/tokens';
 
 
@@ -318,7 +318,8 @@ function PlayerCard({
         srcCandidates={candidates}
         size={64}
         radius="34%"
-        ringColor={DARK_HAIRLINE}
+        color={{ bg: ANALYTICAL.TRACK, fg: ANALYTICAL.MUTE }}
+        ringColor={ANALYTICAL.BORDER}
       />
       <p
         className="truncate w-full text-center"
