@@ -171,7 +171,7 @@ describe('DossierCard meta lines', () => {
         scoring={scoring({})}
       />,
     );
-    expect(screen.getByTestId('meta-line-1').textContent).toBe('3 Sep 2026 · England');
+    expect(screen.getByTestId('meta-line-1').textContent).toBe('3 Sept 2026 · England');
     expect(screen.getByText('1 round · +1.0 avg')).toBeTruthy();
   });
 });
