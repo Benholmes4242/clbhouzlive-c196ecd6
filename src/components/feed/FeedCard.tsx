@@ -659,6 +659,19 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </div>
     </>
   );
+  /* PF1B round row (mock A): between the media and the action row. The whole
+     row is the scorecard door — it must not open the fullscreen viewer. */
+  const golfRoundRow = golfContext?.roundScoreId ? (
+    <FeedRoundRow
+      gross={golfContext.roundGross}
+      toPar={golfRoundToPar(golfContext)}
+      shape={golfRoundShape ?? null}
+      roundHoles={golfContext.roundHoles}
+      activeHole={golfContext.holeNo ?? null}
+      onOpen={() => onGolfRoundTap?.(post, golfContext.roundScoreId as string)}
+    />
+  ) : null;
+
   /* THE FOOTER (section A). ONE always-present object, last on every card.
      `compact` is the review card's tightened rows (action row 40, liked-by 26). */
   const renderFooter = (gutter: number, compact: boolean, mediaFirstSlots?: { caption: React.ReactNode; addComment: React.ReactNode; likedByRound?: { subjectId: string; isOwnRound: boolean; subject: SubjectContext | null } }) => (() => {
@@ -1046,6 +1059,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         return (
           <>
             {hasMedia ? <div data-feed-section="media">{renderMedia(false)}</div> : caption}
+            {golfRoundRow}
             {renderCourseBand()}
             <div data-feed-section="footer">{renderFooter(FOOTER_GUTTER, false, { caption: hasMedia ? caption : null, addComment })}</div>
           </>
@@ -1069,6 +1083,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
       {renderMedia(false)}
 
+      {golfRoundRow}
 
       {/* Course band: identity + figures. The actions row is NO LONGER passed
           in — section A moved it into one always-present footer below, so a
