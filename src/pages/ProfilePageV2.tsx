@@ -7,6 +7,7 @@ import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
 import { useProMembers } from '@/features/pro-verification/useProMembers';
 import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
 import { ProProfileBuildOne } from '@/features/pro-profile/ProProfileBuildOne';
+import { useProEvents } from '@/features/pro-profile/useProProfile';
 import { Button } from '@/components/ui/button';
 import { ProfileProNote } from '@/features/pro-verification/ProfileProNote';
 import { profileProTabs, showPendingProNote } from '@/features/pro-verification/profileProRules';
