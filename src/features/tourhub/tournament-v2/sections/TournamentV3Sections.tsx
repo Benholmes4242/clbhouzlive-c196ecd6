@@ -1,6 +1,7 @@
 /** Selected-event sections consume normalized facts only. Shared picks, avatars
  * and drill-in sheets keep their canonical owners; all empty facts self-hide. */
 import {useState, type RefObject} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Button} from '@/components/ui/button';
 import {BottomSheet} from '@/components/ui/BottomSheet';
 import {PlayerAvatar} from '../../components/PlayerAvatar';
@@ -13,7 +14,8 @@ import type {TeeGroup} from '../data/useTeeTimesAll';
 import {HolesSheet} from './CourseSection';
 import {surnameOf} from '../../_shared/playerName';
 import {PhotoBandFade,photoBandHeight} from '../../components/overview-v3/HybridHeroBands/photoBandMaterial';
-import {copy,words,cap,score,ordinal,ordinalWord,day,heroPill,heroSentence,venueLine,glanceFacts,fieldLead,backThisYear,chartLines,labelPositions,playedRounds,roundStanding,raceNarrative,playedCourse,buckets,percentages,completeCount,selectTeeGroups,localTime,teeCaption,numberFacts,type Phase,type Part,type CourseHole} from '../data/tournamentRules';
+import {heroStateLine} from '../../components/overview-v3/HybridHeroBands/heroStateLine';
+import {copy,words,cap,score,ordinal,ordinalWord,day,heroStartDay,heroSentence,venueLine,glanceFacts,fieldLead,backThisYear,chartLines,labelPositions,playedRounds,roundStanding,raceNarrative,playedCourse,buckets,percentages,completeCount,selectTeeGroups,localTime,teeCaption,numberFacts,type Phase,type Part,type CourseHole} from '../data/tournamentRules';
 export function Parts({parts}:{parts:Part[]}){return <>{parts.map((p,i)=>p.bold?<b key={i}>{p.text}</b>:<span key={i}>{p.text}</span>)}</>;}
 export function SectionHead({title,aside,action,onAction}:{title:string;aside?:string;action?:string;onAction?:()=>void}){return <div className="tv-head"><h2>{title}</h2>{action?<Button variant="ghost" className="tv-link" onClick={onAction}>{action}</Button>:aside?<span>{aside}</span>:null}</div>;}
 export function TournamentHero({meta,phase,rows,field,last,holes,image,nameRef}:{nameRef?:RefObject<HTMLHeadingElement>;meta:TournamentMeta;phase:Phase;rows:BoardEntry[];field:PickFieldPlayer[];last:LastYearFinisher[];holes:CourseHole[];image:string|null}){const facts=glanceFacts(holes),sentence=heroSentence(meta,phase,rows,field,last),pill=heroPill(meta,phase);const figures=[field.length?{label:'FIELD',value:String(field.length)}:null,meta.purse!=null?{label:'PURSE',value:`$${meta.purse>=1000000?`${Number((meta.purse/1000000).toFixed(1))}M`:meta.purse.toLocaleString('en-GB')}`}:null,(facts?.par??meta.venue_par)!=null?{label:'PAR',value:String(facts?.par??meta.venue_par)}:null,(facts?.yards??meta.venue_yardage)!=null?{label:'YARDS',value:(facts?.yards??meta.venue_yardage??0).toLocaleString('en-GB')}:null].filter((f):f is {label:string;value:string}=>f!=null);return <div data-tv-section="hero"><div className="tv-hero" style={{height:photoBandHeight(340,true)}}>{image&&<img src={image} alt=""/>}<PhotoBandFade/><div className="tv-hero-in">{pill&&<span className="tv-pill">{phase==='live'&&<i/>}{pill}</span>}<div className="tv-tour">{meta.tour_full_name?.toUpperCase()??meta.tour_code?.toUpperCase()}</div><h1 ref={nameRef} className="tv-title">{meta.name}</h1><div className="tv-venue">{venueLine(meta)}</div>{sentence.length>0&&<p className="tv-hero-sentence"><Parts parts={sentence}/></p>}</div></div>{figures.length>0&&<div className="tv-figures">{figures.map(f=><div key={f.label}><b>{f.value}</b><span>{f.label}</span></div>)}</div>}</div>;}
