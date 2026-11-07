@@ -612,6 +612,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   onEditReview={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
                   isFirst={(elements[elements.length - 1] as React.ReactElement | undefined)?.type !== DossierCard}
                     scoring={scoringFor(course.id)}
+                    tourEvent={tourByCourse.get(course.id) ?? null}
                     onExpand={handleRowExpand}
                   />,
                 );
