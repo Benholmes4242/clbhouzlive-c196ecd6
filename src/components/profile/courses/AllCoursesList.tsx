@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
+import { useProTourCourses } from '@/hooks/useProTourCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FilterBar, CoursePrimaryTab, CourseSortOption } from './FilterBar';
@@ -190,6 +191,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   );
 
   const { data: userActivity = [] } = useUserCourseActivity(userId);
+  const { data: tourByCourse = new Map() } = useProTourCourses(userId);
 
   // Fetch course details
   const { data: courseRows = [], isLoading, isError, refetch } = useQuery({
@@ -575,6 +577,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   onEditReview={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
                   isFirst={(elements[elements.length - 1] as React.ReactElement | undefined)?.type !== DossierCard}
                       scoring={scoringFor(course.id)}
+                      tourEvent={tourByCourse.get(course.id) ?? null}
                       onExpand={handleRowExpand}
                     />,
                   );
@@ -662,6 +665,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   onEditReview={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
                   isFirst={(elements[elements.length - 1] as React.ReactElement | undefined)?.type !== DossierCard}
                   scoring={scoringFor(course.id)}
+                  tourEvent={tourByCourse.get(course.id) ?? null}
                   onExpand={handleRowExpand}
                 />,
               );
