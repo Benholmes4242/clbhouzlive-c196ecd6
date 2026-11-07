@@ -46,7 +46,7 @@ import { trackError } from '@/lib/errorTracking';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 import { writeShotTagAfterUpload, type ShotTagJob, type SavedHoleTag } from './shotTagWrites';
-import {publishHoleGuide,type HoleGuideContext} from './postHoleGuide';
+import {publishHoleGuide,watchDeferredHoleGuide,type HoleGuideContext} from './postHoleGuide';
 
 export interface UploadJobContext {
   jobId: string;
@@ -397,7 +397,7 @@ async function runJob(job: InternalJob): Promise<void> {
     }
   }
 
-  if(ctx.holeGuide && !ctx.skipFinalize) await publishHoleGuide(ctx.holeGuide,ctx.postId);
+  if(ctx.holeGuide && !ctx.skipFinalize) {await publishHoleGuide(ctx.holeGuide,ctx.postId);void watchDeferredHoleGuide(ctx.holeGuide,ctx.postId);}
 
   uploadEventBus.emit('upload:complete', {
     type: 'upload:complete',

@@ -84,7 +84,7 @@ import {ComposerCourseBlock,ComposerAttachRound,ComposerHoleGuide,ComposerRounds
 import {useCourseTeeSets} from '@/features/courses/hooks/useCourseTeeSets';
 import {useRoundHoleShapes} from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,roundIsRecent} from './lib/composerGolfReads';
-import {chooseCourseSource,recentRound,roundDay,guideVisible,composerDestinations,editorTitleKey,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
+import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
 import {loadComposerDraft} from './lib/composerDrafts';
 
 interface Props {
@@ -422,12 +422,12 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       setCourses(picked?[picked.course]:[]);setCourseReason(picked?.reason??null);
       setRoundFind(recent&&roundCourse?{courseId:roundCourse.id,day:recent.play_date}:null);
       const suggestions:CourseSuggestion[]=[];
-      for(const r of rows){if(!r.course_id||suggestions.some(c=>c.id===r.course_id)) continue;const c=await readGolfCourse(r.course_id);if(c)suggestions.push({...c,reason:`Your last round · ${roundDay(r.play_date)}`});if(suggestions.length>=3)break;}
+      for(const r of rows){if(!r.course_id||suggestions.some(c=>c.id===r.course_id)) continue;const c=await readGolfCourse(r.course_id);if(c)suggestions.push({...c,reason:`Your last round · ${roundSuggestionDay(r.play_date)}`});if(suggestions.length>=3)break;}
       if(nearby&&!suggestions.some(c=>c.id===nearby.id))suggestions.splice(2,1,{...nearby,reason:'Near where the first photo was taken'});
       if(!cancelled)setGolfSuggestions(suggestions);
     })();
     return()=>{cancelled=true;};
-  },[activeActor?.id,activeActor?.type,profile?.id,isEditMode,draftId,prefillCourse,state.media[0]?.id,setCourses]);
+  },[activeActor?.id,activeActor?.type,profile?.id,isEditMode,draftId,prefillCourse,state.media.find(m=>m.type==='image')?.id,setCourses]);
   useEffect(()=>{
     let cancelled=false;
     if(!profile?.id || !state.course || activeActor?.type==='business'){setGolfRounds([]);return;}
@@ -564,7 +564,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
 
   const authorName = useMemo(() => activeActor?.name ?? profile?.display_name ?? 'You', [activeActor, profile]);
-  const authorAvatar = activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
+  const authorAvatar = activeActor?.type==='business' ? activeActor.avatarUrl??null : activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
   const authorUsername = activeActor?.slug ?? profile?.username ?? null;
 
   const isPersonalActor = activeActor?.type !== 'business';

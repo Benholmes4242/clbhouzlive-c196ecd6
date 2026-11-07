@@ -14,6 +14,7 @@ export const calendarDay = (date = new Date()) => `${date.getFullYear()}-${Strin
 export function daysBefore(n: number, now = new Date()) { const date = new Date(now); date.setDate(date.getDate()-n); return calendarDay(date); }
 export function ordinal(n: number) { return `${n}${n%100>=11 && n%100<=13 ? 'th' : ({1:'st',2:'nd',3:'rd'}[n%10] ?? 'th')}`; }
 export function roundDay(day: string, now = new Date()) { if (day===calendarDay(now)) return 'today'; if(day===daysBefore(1,now)) return 'yesterday'; return new Date(`${day}T12:00:00`).toLocaleDateString('en-GB', day>=daysBefore(7,now) ? {weekday:'long'} : {day:'numeric',month:'short'}); }
+export function roundSuggestionDay(day:string,now=new Date()) {const a=new Date(`${calendarDay(now)}T12:00:00`),b=new Date(`${day}T12:00:00`);const days=Math.round((a.getTime()-b.getTime())/86400000);return days>=2 ? `${days} days ago` : roundDay(day,now);}
 export function recentRound(rows: readonly ComposerRound[], now = new Date()) { return [...rows].filter(r=>r.course_id && r.play_date>=daysBefore(1,now) && r.play_date<=calendarDay(now)).sort((a,b)=>b.play_date.localeCompare(a.play_date))[0] ?? null; }
 export const canAttachRound = (personal: boolean, rows: readonly ComposerRound[], now = new Date()) => personal && rows.some(r=>r.play_date>=daysBefore(7,now) && r.play_date<=calendarDay(now));
 export function chooseCourseSource(input: {manual:boolean; claimed?:StageCourse|null; round?:{course:StageCourse;day:string}|null; nearby?:StageCourse|null}, now = new Date()) {
