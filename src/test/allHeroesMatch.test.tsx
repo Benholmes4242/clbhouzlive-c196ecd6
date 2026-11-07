@@ -35,10 +35,13 @@ describe('ALL_HEROES_MATCH step 0 — the shared fade', () => {
     expect(photoBandFade('#16161A')).toBe('linear-gradient(180deg, rgba(22,22,26,0.15) 0%, rgba(22,22,26,0) 20%, rgba(22,22,26,0.62) 48%, rgba(22,22,26,0.97) 88%, rgba(22,22,26,1) 100%)');
   });
   it('no prop uses the token; a non-hex canvas falls back to it', () => {
-    const { container, rerender } = render(<PhotoBandFade />);
-    expect((container.firstElementChild as HTMLElement).style.background).toBe('var(--th-overview-photo-fade)');
-    rerender(<PhotoBandFade canvas="red" />);
-    expect((container.firstElementChild as HTMLElement).style.background).toBe('var(--th-overview-photo-fade)');
+    // jsdom drops var() backgrounds, so the token path is proven in source.
+    const material = src('features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial.tsx');
+    expect(material).toContain("if (!m) return 'var(--th-overview-photo-fade)'");
+    expect(material).toContain("canvas ? photoBandFade(canvas) : 'var(--th-overview-photo-fade)'");
+    expect(photoBandFade('red')).toBe('var(--th-overview-photo-fade)');
+    const { container } = render(<PhotoBandFade />);
+    expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
   });
 });
 
