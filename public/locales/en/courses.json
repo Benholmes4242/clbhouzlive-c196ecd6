@@ -2246,6 +2246,7 @@
       "labelScore": "SCORE",
       "moreHere_one": "+{{count}} more here",
       "moreHere_other": "+{{count}} more here",
+      "onTour": "On tour",
       "rated": "Rated this course",
       "underPar": "Round under par"
     },

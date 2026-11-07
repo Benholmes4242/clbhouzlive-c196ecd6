@@ -6,6 +6,7 @@ import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import { formatListRank, type ListRank } from '@/lib/courses/listRank';
 import { A, SANS, LABEL, NUM, StatRow, TOPAR_RED, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { finishLabel } from '@/features/pro-profile/proProfileRules';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
@@ -40,6 +41,8 @@ export interface DossierCardProps {
   onExpand?: (course: RatedCourseData, hasScoring: boolean) => void;
   /** Every Top 100 placement, folded into the first meta line via formatListRank. */
   listRank?: ListRank | null;
+  /** Archive-only tour event context for a verified pro's course row. */
+  tourEvent?: { eventName: string; finish: string | null; playedOn: string } | null;
   /** Own profile only: opens the existing review editor. Absent = no Edit review. */
   onEditReview?: (courseId: string) => void;
   /** First row in its group draws no top divider. */
@@ -87,6 +90,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
   scoring,
   onExpand,
   listRank = null,
+  tourEvent = null,
   onEditReview,
   isFirst = false,
 }) => {
@@ -94,7 +98,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
   const RowChevron = archive ? ChevronRight : ChevronDown;
   const { t } = useTranslation('courses');
   const [expanded, setExpanded] = useState(false);
-  const dateIso = course.review_date ?? course.last_played_at ?? null;
+  const dateIso = archive && tourEvent ? tourEvent.playedOn : course.review_date ?? course.last_played_at ?? null;
   const dateText = formatRowDate(dateIso);
   const reviewText = (course.review ?? '').trim();
   const hasReview = reviewText.length > 0;
@@ -115,16 +119,24 @@ const DossierCard: React.FC<DossierCardProps> = ({
   // Two fixed lines, never a wrap: line 1 is date · country, line 2 is
   // rounds · average. Line 2 renders only when scoring exists (Ben, Sep 2026).
   const line1 = [dateText || null, where].filter(Boolean).join(' \u00B7 ');
-  const line2 = hasScoring
+  const line2 = archive && tourEvent
     ? [
-        t('yourCourses.roundsCount', { count: rounds as number, defaultValue: '{{count}} rounds' }),
-        avgToPar != null
-          ? t('yourCourses.avgLabel', { avg: fmtSigned(avgToPar), defaultValue: '{{avg}} avg' })
-          : null,
+        t('row.onTour', { defaultValue: 'On tour' }),
+        tourEvent.eventName,
+        tourEvent.finish ? finishLabel(tourEvent.finish) : null,
       ]
         .filter(Boolean)
         .join(' \u00B7 ')
-    : '';
+    : hasScoring
+      ? [
+          t('yourCourses.roundsCount', { count: rounds as number, defaultValue: '{{count}} rounds' }),
+          avgToPar != null
+            ? t('yourCourses.avgLabel', { avg: fmtSigned(avgToPar), defaultValue: '{{avg}} avg' })
+            : null,
+        ]
+          .filter(Boolean)
+          .join(' \u00B7 ')
+      : '';
 
   return (
     <article

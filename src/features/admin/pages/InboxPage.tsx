@@ -1,7 +1,7 @@
 import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidateAdminQueues, subscribeAdminQueueChanges, refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
 import { AlertTriangle } from 'lucide-react';
 import {
@@ -21,6 +21,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
 import VenueMappingPage from './VenueMappingPage';
+import RankingEventCoursesPage from './RankingEventCoursesPage';
 import AddCourseSheet from '../components/AddCourseSheet';
 import InboxQueueRow from '../components/InboxQueueRow';
 import { OpenDoneControl, FigureTiles, QueueChips, RowSkeleton, FlowPanel, ToolRow, useCatalogueTotal } from '../components/InboxPanels';
@@ -81,6 +82,23 @@ function useWorkbenchCount(enabled: boolean) {
   return count;
 }
 
+// ---------- ranking event course count ----------
+
+function useRankingEventsNeedingCourse(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin-owgr-events-needing-course'],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('admin_count_owgr_events_needing_course');
+      if (error) {
+        console.error('admin_count_owgr_events_needing_course failed', error);
+        return 0;
+      }
+      return data ?? 0;
+    },
+  }).data ?? 0;
+}
+
 // ---------- inbox list page ----------
 
 function InboxListPage() {
@@ -97,6 +115,7 @@ function InboxListPage() {
   const feed = useInboxFeed();
   const qc = useQueryClient();
   const workbenchCount = useWorkbenchCount(canUsers);
+  const rankingEventsNeedingCourse = useRankingEventsNeedingCourse(canUsers);
   const flow14 = useInboxFlow(14);
   const flow7 = useInboxFlow(7);
   const catalogueTotal = useCatalogueTotal(canUsers);
@@ -309,15 +328,24 @@ function InboxListPage() {
       {view === 'open' && <FlowPanel flow={flow14.data} loading={flow14.isLoading} />}
 
       {/* 2.6 TOOLS */}
-      {canUsers && workbenchCount > 0 && view === 'open' && (
+      {canUsers && view === 'open' && (
         <section style={{ ...LIST_PANEL, padding: '14px 0 0' }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink, padding: '0 16px 10px' }}>Tools</div>
-          <ToolRow
-            to="/admin-v2/inbox/matching"
-            title="Course matching workbench"
-            sub={`${workbenchCount} scored course${workbenchCount === 1 ? '' : 's'} unmatched`}
-          />
+          {workbenchCount > 0 && (
+            <ToolRow
+              to="/admin-v2/inbox/matching"
+              title="Course matching workbench"
+              sub={`${workbenchCount} scored course${workbenchCount === 1 ? '' : 's'} unmatched`}
+            />
+          )}
           <ToolRow to="/admin-v2/inbox/venues" title="Tour venue mapping" sub="Link tournament venues to courses" />
+          <ToolRow
+            to="/admin-v2/inbox/ranking-events"
+            title="Ranking event courses"
+            sub={rankingEventsNeedingCourse > 0
+              ? `${rankingEventsNeedingCourse} world ranking event${rankingEventsNeedingCourse === 1 ? '' : 's'} need${rankingEventsNeedingCourse === 1 ? 's' : ''} a course`
+              : 'Link world ranking events to courses'}
+          />
         </section>
       )}
 
@@ -1039,6 +1067,7 @@ export default function InboxPage() {
       <Route index element={<InboxListPage />} />
       <Route path="matching" element={<CourseMatchingPage />} />
       <Route path="venues" element={<VenueMappingPage />} />
+      <Route path="ranking-events" element={<RankingEventCoursesPage />} />
     </Routes>
   );
 }
