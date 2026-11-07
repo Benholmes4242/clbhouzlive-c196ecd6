@@ -84,9 +84,10 @@ describe('hero chip', () => {
     expect(band.textContent).not.toContain('RESULTS');
     expect(band.querySelector('span[style*="border-radius: 999px"][style*="width: 7px"]')).toBeNull();
   });
-  it('a standard result still reads RESULTS', () => {
+  it('a standard result reads FINAL in the tour line', () => {
     const { container } = mount(STANDARD);
-    expect(container.textContent).toContain('RESULTS');
+    expect(container.textContent).toContain('FINAL');
+    expect(container.textContent).not.toContain('RESULTS');
   });
 });
 

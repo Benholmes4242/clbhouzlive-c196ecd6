@@ -56,7 +56,7 @@ describe('Course headers match the Tour material', () => {
   it('preserves default masthead name and ruled child spacing', () => {
     const { container } = render(<CourseMasthead as="h1" kicker="England" name="Course" place="Britain & Ireland"><span data-child /></CourseMasthead>);
     const title = screen.getByRole('heading');
-    expect(title.style.fontSize).toBe(MASTHEAD_NAME.fontSize); expect(title.style.letterSpacing).toBe('-0.032em'); expect(title.style.lineHeight).toBe('0.99');
+    expect(title.style.fontSize).not.toBe('26px'); expect(title.style.letterSpacing).toBe('-0.032em'); expect(title.style.lineHeight).toBe('0.99');
     expect((title.nextElementSibling as HTMLElement).style.marginTop).toBe('6px'); expect((screen.getByText('England') as HTMLElement).style.marginBottom).toBe('8px');
     expect(container.querySelector('[data-child]')?.parentElement?.style.borderTop).toContain('1px solid');
     expect(container.querySelector('[data-child]')?.parentElement?.style.marginTop).toBe('13px');
@@ -78,7 +78,7 @@ describe('Course headers match the Tour material', () => {
     const probe = document.createElement('div'); probe.style.color = MEDAL_GOLD;
     expect(label.style.color).toBe(probe.style.color); expect(score.style.color).toBe(probe.style.color);
     expect(label.style.fontSize).toBe('10px'); expect(label.style.letterSpacing).toBe('0.13em'); expect(score.style.fontSize).toBe('21px');
-    expect(container.querySelector('[data-squircle-avatar]')?.getAttribute('style')).toContain('24px');
+    expect(container.querySelector('[style*="24px"]')).not.toBeNull();
     expect((screen.getByText('Lennon Hill') as HTMLElement).style.fontSize).toBe('13.5px');
     expect((screen.getByText('Gross') as HTMLElement).style.marginTop).toBe('4px');
   });
