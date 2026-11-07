@@ -90,13 +90,13 @@ const THEME_TOKENS = {
 
 /* Signed-off hero-only geometry. Full BoardTable owns its independent tracks;
    changing these constants must never resize the full leaderboard. */
-const HERO_PAD_X = 20;
-const HERO_POS_W = 24;
+export const HERO_PAD_X = 20;
+export const HERO_POS_W = 24;
 const HERO_ROUND_W = 32;
 const HERO_TODAY_W = 40;
-const HERO_TOT_W = 40;
+export const HERO_TOT_W = 40;
 const HERO_SHAPE_W = 44;
-const HERO_GAP = 4;
+export const HERO_GAP = 4;
 /** Every numeric cell on the hero board: digits stack down a column. */
 const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'center' as const };
 

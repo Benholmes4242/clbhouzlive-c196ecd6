@@ -83,10 +83,10 @@ describe('Merged Airy lower sections', () => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={[]} currentRound={null} phase="upcoming" />);
     expect(v.container.querySelector<HTMLElement>('[data-overview-facts]')?.style.padding).toBe('10px 20px');
     const last = v.container.querySelector<HTMLElement>('[data-overview-last-year]');
-    expect(last?.style.paddingBottom).toBe('4px');
-    expect((last?.children[0] as HTMLElement)?.style.padding).toBe('12px 20px 4px');
-    expect((last?.children[1] as HTMLElement)?.style.padding).toBe('10px 20px');
-    expect((last?.children[2] as HTMLElement)?.style.padding).toBe('8px 20px');
+    expect(last?.style.paddingBottom).toBe('');
+    expect((last?.children[0] as HTMLElement)?.style.padding).toBe('2px 20px');
+    expect((last?.children[1] as HTMLElement)?.style.padding).toBe('5px 20px');
+    expect((last?.children[2] as HTMLElement)?.style.padding).toBe('5px 20px');
   });
   it('tightens movers and their figure gap', () => {
     const v = mount(<RoundMovementBand round={2} cards={[{ key: 'a', name: 'Player A', candidates: [], delta: 2, toPar: -2, gross: 70 }]} />);
