@@ -479,6 +479,7 @@ export function HeroBoardSection({
           limit={5}
           currentRound={currentRound}
           theme="heroBoard"
+          afterMovers={movementCards.length > 0 && currentRound != null}
           phase={phase === 'completed' ? 'completed' : 'live'}
           pickPlayerIds={pickPlayerIds}
           onRowTap={onRowTap}
@@ -578,7 +579,7 @@ export {pickTeeText,pickTeeDayLabel,teeHeadingFits,pickStatusToken} from './Pick
 export function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
   const { t } = useTranslation('tourhub');
   return (
-    <div data-overview-movement style={{ padding: '12px 20px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
+    <div data-overview-movement style={{ padding: '12px 20px 10px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
       <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
         {t('overview.biggestMovers', { round })}
       </div>

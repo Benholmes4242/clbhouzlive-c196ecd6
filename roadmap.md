@@ -1,5 +1,10 @@
 # Roadmap
 
+## OVERVIEW_HERO_B_STRIP
+- [ ] Merge tour/state kicker, scale leader B, opt in board spacing after movers and replace locked no-pick members door with the strip.
+- [ ] Add scoped coverage and update only brief-authorised obsolete assertions; run focused tests and four separate shards, stopping on unexpected failures.
+- [ ] Check live/upcoming hero, board gap and members strip at320px; report counts, assertion ledger and device limits.
+
 ## FEED_PHOTO_GRID
 - [x] Add pure four-photo eligibility and shared grid rendering/taps/loading; preserve video/small sets/words-first frames.
 - [x] Add22cases (14helper/8mounted); fresh focused50/50 after authorised one-line chips fixture repair. Shared shards1:1984passed;2:1824passed/1unexpected failure;3–4 stopped.

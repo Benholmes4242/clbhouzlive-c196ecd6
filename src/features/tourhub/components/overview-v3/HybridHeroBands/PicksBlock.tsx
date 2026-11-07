@@ -300,7 +300,7 @@ export function PicksBlock({
           );
         })}
       </div>
-      {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} onPick={onOpenYourPick}/>}
+      {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} boardByPlayer={boardByPlayer} onPick={onOpenYourPick}/>}
     </div>
   );
 }
