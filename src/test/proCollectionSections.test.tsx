@@ -9,11 +9,13 @@ const h = vi.hoisted(() => ({
   writeError: null as null | { message: string },
   guest: null as unknown,
   toastError: vi.fn(),
+  openExternal: vi.fn(),
 }));
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('sonner', () => ({ toast: { error: h.toastError, success: vi.fn() } }));
 vi.mock('@/features/guest/guestGateStore', () => ({ getGuestUser: () => h.guest }));
+vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: h.openExternal }));
 vi.mock('@/hooks/useDebouncedValue', () => ({ useDebouncedValue: (v: unknown) => v }));
 vi.mock('@/integrations/supabase/client', () => {
   const from = (table: string) => {
@@ -49,8 +51,9 @@ const bag = [
   { ...base, id: 'b2', slot: 'putter', brand: 'Gone', model: null, detail: null, business_id: 'biz-dead' },
 ];
 const partners = [
-  { ...base, id: 'p1', name: 'Titleist', business_id: 'biz-live' },
-  { ...base, id: 'p2', name: 'Kent Autos', business_id: null },
+  { ...base, id: 'p1', name: 'Titleist', business_id: 'biz-live', website: null },
+  { ...base, id: 'p2', name: 'Kent Autos', business_id: null, website: null },
+  { ...base, id: 'p3', name: 'Ridgeback', business_id: null, website: 'https://ridgebackgolf.co.uk' },
 ];
 const moments = [{ ...base, id: 'm1', year: 2020, text: 'Turned pro', is_win: false }];
 
@@ -65,7 +68,7 @@ function mount(owner: boolean) {
 const fill = () => { h.tables = { pro_bag_items: bag, pro_partners: partners, pro_career_moments: moments, business_accounts: [LIVE] }; };
 const empty = () => { h.tables = { pro_bag_items: [], pro_partners: [], pro_career_moments: [], business_accounts: [LIVE] }; };
 
-beforeEach(() => { h.writes = []; h.writeError = null; h.guest = null; h.toastError.mockReset(); });
+beforeEach(() => { h.writes = []; h.writeError = null; h.guest = null; h.toastError.mockReset(); h.openExternal.mockReset(); });
 
 describe('pro collections — visitor and own views', () => {
   it('visitor sees bag, partners and career without Edit or add cards', async () => {
