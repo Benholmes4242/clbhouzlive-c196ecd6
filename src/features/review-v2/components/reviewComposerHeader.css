@@ -1,4 +1,4 @@
-.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 246px); }
+.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 340px); }
 .rv2-header--compact { height: calc(env(safe-area-inset-top, 0px) + 68px); }
 .rv2-header--photo, .rv2-header--compact { transition: height 200ms ease; }
 /* The photo hero is one block: the photograph fills its whole height. */
