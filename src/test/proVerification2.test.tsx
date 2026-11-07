@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -19,7 +19,7 @@ const result = (n: number): PlayerResult => ({ tournament_id: `event-${n}`, name
 function mount(node: React.ReactNode) {
   return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>);
 }
-beforeEach(() => { invalidateProMembers(); f.rpc.mockReset().mockResolvedValue({ data: [pro], error: null }); });
+beforeEach(() => { invalidateProMembers(); f.rpc.mockReset().mockResolvedValue({ data: [pro], error: null }); f.events = []; });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('Brief 2 public pro identity', () => {
