@@ -1,4 +1,48 @@
-# PF3A_VIDEO — implemented, verification stopped
+# PF3A_VIDEO — close-out complete with one permitted pre-existing failure
+
+## PF3A_FIX_2 final summary — 7 November 2026
+
+PF3A delivered creator-only single-video title/description, Details with credits/links/business thanks/gear, cover choices and timestamp chapters, metadata-preserving mixed-media transitions, best-effort metadata writes, draft restoration and video-credit Activity treatment. Viewer-stage work was not included.
+
+**Final focused scope: 92/92 passed across 8 files. Fresh final-code suite: 7,507 passed + 1 explicitly permitted pre-existing failure = 7,508 tests across 657 files. No other failure occurred.**
+
+PF3A new coverage totals **50 cases / 4 files**: initial rules 27, writes/state/ledger 9 and UI 5; close-out added eight Details transitions in `pf3aVideoUi.test.tsx` plus one composer transition in `pf3aVideoComposerMounted.test.tsx`. PF3A_FIX_2 added/deleted/renamed no cases or files. Current inventory before/after is **7,508 / 657**, unchanged. Reconciliation from the preceding PF3A report's expected 7,505 / 656: separate FIX_VERIFY work added three `videoCreditPushRoute.test.ts` cases and one file, as documented in FIX_VERIFY_REPORT.md; none belongs to this fix.
+
+| Fresh command (each executed separately) | Passed | Failed | Files |
+|---|---:|---:|---:|
+| `bunx vitest run --maxWorkers=2 --shard=1/4` | 1,965 | 0 | 165 |
+| `bunx vitest run --maxWorkers=2 --shard=2/4` | 1,766 | 0 | 165 |
+| `bunx vitest run --maxWorkers=2 --shard=3/4` | 1,917 | 1 pre-existing | 165 |
+| `bunx vitest run --maxWorkers=2 --shard=4/4` | 1,859 | 0 | 162 |
+
+### Exact permitted pre-existing failure
+
+Owned by separate country-bar presentation work; file was not edited:
+
+```text
+FAIL src/test/profileCoursesRecord.test.tsx > profile courses record > unplottable courses keep unmapped text without a map key and country bars use neutral fill
+src/test/profileCoursesRecord.test.tsx:76:41
+AssertionError: expected 'display: block; height: 100%; width: …' to contain 'var(--course-country-bar)'
+Expected: "var(--course-country-bar)"
+Received: "display: block; height: 100%; width: 100%; border-radius: 3px;"
+```
+
+The other permitted pre-existing failure, `src/test/tourIsland.test.tsx:235`, **did not recur** (14/14 passed). All seven upcomingLastYearBoard cases and all 34 fw1FeaturedDeck cases passed; neither file was edited or skipped.
+
+### Approved changes and test ledger
+
+- Production changed only `VideoDetailsSheets.tsx`: the two result-row SquircleAvatar instances now have `alt=""`. SquircleAvatar does not accept/forward `aria-hidden`, so a layout-neutral `display: contents` wrapper hides each decorative avatar from accessibility. Explicit `fallback={getInitialsFromName(name)}` preserves the existing initials, geometry, ring and user-keyed colour; merely emptying alt would have replaced initials with a silhouette. Shared SquircleAvatar was not changed.
+- Test file changed only `src/test/pf3aVideoUi.test.tsx`, its two authorized helper selectors:
+  - Old: `screen.findByRole('button', { name: 'Added Person' })`; new: `screen.findByRole('button', { name: /^Added Person/ })`.
+  - Old: `screen.findByRole('button', { name: 'Added Club' })`; new: `screen.findByRole('button', { name: /^Added Club/ })`.
+  - Reason: match a name-first result while allowing existing supporting text. These helpers serve the four previously failing credit/thanks chip/limit cases. No assertion, test name, test case or other line in that test file changed; none deleted or renamed.
+- Documentation changed: this report and `roadmap.md`.
+
+Focused command: `bunx vitest run src/test/pf3aVideoComposerMounted.test.tsx src/test/pf3aVideoRules.test.ts src/test/pf3aVideoWrites.test.tsx src/test/pf3aVideoUi.test.tsx src/test/pf1ComposerGolf.test.tsx src/test/pf1Drafts.test.ts src/test/viewPost1Composer.test.tsx src/test/pf2HoleGuide.test.tsx --maxWorkers=2`.
+
+Logs: `/tmp/pf3a-fix-2/focused.log` and `shard1.log` through `shard4.log`. Latest available preview build: **build OK**, 2026-11-07T16:49:26Z. Non-failing existing act/jsdom/accessibility warnings remain warnings. Hosted authenticated publish/draft/notification readback and device checks remain unverified; the real mounted composer and Details transitions are verified by the focused tests, not a claim of hosted publishing.
+
+No guest browsing, review wizard, news, round plots, SQL, migrations/migration files, deployed RPCs/edge functions, feed_config, round_pool_cap or native/Median configuration was changed. Earlier STOP sections below are historical; the four failed selectors are resolved and the fresh results above supersede old verification statuses.
 
 ## PF3A_VIDEO close-out — 7 November 2026
 

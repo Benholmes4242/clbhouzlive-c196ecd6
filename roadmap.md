@@ -1,9 +1,9 @@
 # Roadmap
 
 ## PF3A_FIX_2
-- [ ] Make only people/business result avatars decorative without changing their appearance; replace the two approved result selectors only.
-- [ ] Run PF3A focused scope and four fresh separate --maxWorkers=2 shards; continue only for profileCoursesRecord:76 and tourIsland:235, stop for any other failure.
-- [ ] Update PF3A_VIDEO_REPORT.md with delivery summary, case ledger, final totals and named pre-existing failures.
+- [x] Make only people/business result avatars decorative without changing their appearance; replace the two approved result selectors only.
+- [x] Focused92/92; four fresh separate --maxWorkers=2 shards1965/1766/1917/1859 passed, only permitted profileCoursesRecord:76 failed; tourIsland14/14 passed. Full7507passed+1pre-existing=7508/657, no new failure.
+- [x] Update PF3A_VIDEO_REPORT.md with delivery summary, 50 PF3A new cases, unchanged final inventory, old/new selectors and exact pre-existing failure. Hosted/device checks remain with Ben.
 
 ## FIX_VERIFY routing and three-build verification
 - [x] Add video_credit only to push post-mention branch; unchanged parity85/85 plus three new route rules3/3 pass. process-push-queue deployed successfully; source SHA in FIX_VERIFY_REPORT.md.
@@ -13,7 +13,7 @@
 ## PF3A_VIDEO mounted-test close-out
 - [x] Add nine mounted cases: real composer/real-hook photo add/remove restoration passes; links/gear chip and limit transitions pass. Existing assertions/cases and production untouched.
 - [x] Focused88 passed/4 failed across8files; PF3A_VIDEO_REPORT.md lists exact errors, +9/+1 expected7505/656 inventory and names three upcomingLastYearBoard cases/tourIsland:235 as pre-existing.
-- [ ] STOP: four new credits/thanks cases cannot find Added Person/Added Club at pf3aVideoUi.test.tsx:39:34/:44:34. Failing selectors/assertions untouched; unsupported role-query exact options removed for typing only. Four fresh shards await explicit fixture/selector repair authorization.
+- [x] Resolved by PF3A_FIX_2's authorized decorative avatars and two selectors; focused92/92 and all four fresh shards completed above. Historical failure log retained.
 
 ## Pro tiles, legacy chart and movers
 - [x] Implement season-only outlines/open rows, centred legacy dim null tiles, neutral tally bars/plot-only key and pick-style direction-only movers; buildOK.
