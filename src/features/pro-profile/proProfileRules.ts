@@ -50,22 +50,6 @@ export function seasonSummary(events: ProEvent[], year: number) {
   const strokes = rows.flatMap(e => e.source === 'owgr' ? e.rounds.filter(r => r.source === 'owgr' && r.strokes != null).map(r => Number(r.strokes)) : []);
   return { events: rows.length, cuts: rows.filter(e => !['MC', 'WD', 'DQ'].includes(e.finish?.toUpperCase() ?? '')).length, top10s: rows.filter(e => { const p = finishPosition(e.finish); return p != null && p <= 10; }).length, best: best?.finish ?? null, average: strokes.length ? (strokes.reduce((a, b) => a + b, 0) / strokes.length).toFixed(1) : null };
 }
-export function currentEvent(events: ProEvent[], now = new Date()): ProEvent | null {
-  const today = now.toISOString().slice(0, 10);
-  const ahead = new Date(now); ahead.setUTCDate(ahead.getUTCDate() + 7);
-  return [...events].filter(e => {
-    if (!e.start_date || e.start_date > ahead.toISOString().slice(0, 10)) return false;
-    const fallback = new Date(`${e.start_date.slice(0, 10)}T00:00:00Z`); fallback.setUTCDate(fallback.getUTCDate() + 3);
-    return (e.end_date?.slice(0, 10) ?? fallback.toISOString().slice(0, 10)) >= today;
-  }).sort((a, b) => String(a.start_date).localeCompare(String(b.start_date)))[0] ?? null;
-}
 export function tourEvents(results: PlayerResult[], userId: string): ProEvent[] {
   return results.map(r => ({ id: r.tournament_id, user_id: userId, source: 'tour', event_name: r.name, tour_name: r.tour, start_date: r.start_date, end_date: r.end_date, finish: ['MC','WD','DQ'].includes(r.status?.toUpperCase()) ? r.status.toUpperCase() : r.display_position ?? String(r.finish_position), to_par: r.score, total_strokes: null, venue: null, country: null, tee_time: null, tee_hole: null, scheduled_rounds: null, owgr_event_id: null, owgr_points: null, owgr_rank_before: null, owgr_rank_after: null, owgr_week: null, owgr_year: null, created_at: '', updated_at: '', rounds: [r.round_1,r.round_2,r.round_3,r.round_4].flatMap((score, i) => score == null ? [] : [{ event_id: r.tournament_id, round_no: i + 1, to_par: score, strokes: null, holes_played: 18, source: 'tour', posted_at: '' }]) }));
-}
-export function watchCountCopy(count: number) { return count === 0 ? '' : count === 1 ? '1 member does.' : `${count} members do.`; }
-export const ROUND_MIN = -12;
-export const ROUND_MAX = 20;
-export function roundPayload(eventId: string, roundNo: number, toPar: number, holes: number) {
-  if (!Number.isInteger(toPar) || toPar < ROUND_MIN || toPar > ROUND_MAX || !Number.isInteger(holes) || holes < 1 || holes > 18) throw new Error('Invalid round score');
-  return { event_id: eventId, round_no: roundNo, to_par: toPar, holes_played: holes, source: 'pro', strokes: null };
 }
