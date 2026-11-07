@@ -90,17 +90,12 @@ describe('Tour hero refinements', () => {
     expect(f.read.mock.calls.every(([, enabled]) => !enabled)).toBe(true);
     expect(v.container.querySelector('[data-hero-tee]')).toBeNull();
   });
-  it('renders the Needs gross as a separate untruncated white figure and omits leading/level picks', () => {
+  it('pick chips carry no Needs line', () => {
     const entries = [row('a', 1), { ...row('b', 2), score: -8 }, { ...row('c', 2), score: -14 }];
     f.picks = entries.map(e => ({ playerId: e.id, playerName: e.player?.full_name ?? '' }));
     const v = mount(<HeroBoardSection tournamentId="event" entries={entries} phase="live" currentRound={3} totalRounds={4} venuePar={72} />);
-    const lines = v.container.querySelectorAll<HTMLElement>('[data-overview-pick-to-reach]');
-    expect(lines).toHaveLength(1);
-    expect(lines[0].children[1].textContent).toBe('66');
-    expect(lines[0].style.textOverflow).toBe('');
-    expect(lines[0].style.overflow).toBe('');
-    expect(lines[0].style.gap).toBe('4px');
-    expect(lines[0].style.textTransform).toBe('uppercase');
+    expect(v.container.querySelectorAll('[data-overview-pick-to-reach]')).toHaveLength(0);
+    expect(v.container.textContent).not.toMatch(/needs/i);
   });
   it('sorts leaders by position stably with MC/WD last without changing the draw', () => {
     const entries = [row('a', 1), row('b', 2), row('c', 2), { ...row('mc', 70), status: 'MC' }, { ...row('wd', 80), status: 'WD' }];
