@@ -1,5 +1,10 @@
 # Roadmap
 
+## PRO_SELF_RUN verification-only close-out
+- [x] Run shard 4 separately with `--maxWorkers=2`: 1,821 tests / 162 files passed; no failure, including no known Featured meta-line failure.
+- [ ] Write PRO_SELF_RUN_REPORT.md with all shard totals, exact deleted modules/tests, count reconciliation, and old/new code for every changed test.
+- [ ] Live member/device checks remain with Ben: Ask enable/error/readback, partner save/navigation, pro tab/result handoff and sheet focus/white controls; external unmanaged authentication prevents hosted verification here.
+
 ## PF1B_FEED verification-only close-out
 - [x] Run shard 4 as its own `bunx vitest run --maxWorkers=2 --shard=4/4` command: 1,821 tests / 162 files passed, zero failures; no product or test edits.
 - [x] Expand PF1B_FEED_REPORT.md: historical PF1B 1,919/1,831/1,909/1,804=7,463; latest carried Pro-era 1,920/1,783/1,885 plus fresh 1,821=7,409/647; −54 named test delta, historical file-count discrepancy, exact four deleted guide assertions and all six phone checks documented. No failures appeared.
