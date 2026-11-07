@@ -592,7 +592,7 @@ export function RoundMovementBand({ round, cards }: { round: number; cards: Move
           <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, background: 'transparent', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, padding: 7 }}>
             <SquircleAvatar size={28} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
             <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: OVERVIEW.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tour-mover-name)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 2, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', minWidth: 0, overflow: 'hidden', ...FIGS }}>
               <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ flex: 'none', color: c.delta > 0 ? LIVE_INK : STATUS_NEGATIVE }}>
                 {c.delta > 0 ? '\u25B2' : '\u25BC'}
