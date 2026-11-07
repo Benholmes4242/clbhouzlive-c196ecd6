@@ -1,11 +1,11 @@
 # Roadmap
 
 ## PF1_STAGE1
-- [ ] Rebuild composer course/hole/shot-tag controls, play-date/claim/GPS prefill and attached-round selection; preserve manual course choices and round-post identity.
-- [ ] Add non-blocking source-linked pending hole-guide contributions after finalize and media completion; retain draft media/order/edits and golf choices.
-- [ ] Match sharing/leave sheets, real preview actor avatar and photo-only editor title; preserve success and Preview behavior.
-- [ ] Add focused rule/flow coverage, run four separate maxWorkers=2 shards and report counts from7,408/645; stop on any unexpected failure.
-- [ ] Report all five requested live checks and320px geometry, including any external-auth limitations.
+- [x] Composer course/hole/shot-tag controls, play-date/claim/GPS prefill, personal attached round and source-linked guide/draft wiring implemented; protected server/feed areas untouched.
+- [x] Focused70/70; four separate shards1918/1816/1884/1819 =7437/648, zero failures; +29 cases/3 files, existing tests unchanged. Latest preview build OK.
+- [x] PF1_STAGE1_REPORT.md records all five checks, remote-media reuse/crop re-upload,320px fixture screenshots and preserved mock differences.
+- [ ] Hosted personal/club post save/readback, app-restart draft, delete cascade and complete320px composer/Preview actor checks: external unmanaged authentication prevents verification.
+- [ ] Durable deferred guide completion after app termination remains outside permitted client-only work; no server changes authorized.
 
 ## Creator video filter centring follow-up
 - [x] Confirm exact shared Top 100 sm treatment; add intrinsic-width/auto-margin centring independent of safe-centre support, preserving counts and filtering.
