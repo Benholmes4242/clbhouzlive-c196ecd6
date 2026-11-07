@@ -175,6 +175,7 @@
   --island-fold-transition: max-width 300ms var(--island-fold-ease), opacity 200ms var(--island-fold-ease), padding 300ms var(--island-fold-ease), gap 300ms var(--island-fold-ease), margin-right 300ms var(--island-fold-ease);
   --island-glass-transition: background 300ms var(--island-fold-ease);
   --player-canvas: #0A0A0C;
+  --course-record-gross-ink: rgba(255,255,255,0.62);
   --player-fallback: #16161A;
   --player-white: #FFFFFF;
   --player-other: rgba(248,250,252,.55);

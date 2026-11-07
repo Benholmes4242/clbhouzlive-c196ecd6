@@ -82,17 +82,15 @@ describe('Courses-only place line', () => {
     expect((screen.getByText('Country') as HTMLElement).style.color).toBe(probe.style.color);
     expect(readFileSync(resolve('src/components/golf-club/GolfClubView.tsx'), 'utf8')).not.toContain('placeColor=');
   });
-  it('layers the canon wash then the tall scrim beneath the text', () => {
+  it('layers the shared photo-band fade beneath the text', () => {
     showHero();
     const hero = screen.getByRole('link', { name: 'View Essex Links' });
     const layers = Array.from(hero.children) as HTMLElement[];
-    const probe = document.createElement('div');
-    probe.style.background = HERO_CANON_WASH;
-    expect(layers[0].style.background).toBe(probe.style.background);
-    probe.style.background = SCRIM_HERO_TALL;
-    expect(layers[1].style.background).toBe(probe.style.background);
-    expect(layers[1].style.position).toBe('absolute'); expect(layers[1].style.inset).toBe('0');
-    expect(layers[2].style.zIndex).toBe('1'); expect(layers[2].contains(screen.getByText('Essex Links'))).toBe(true);
+    expect(layers[0].hasAttribute('data-photo-band-fade')).toBe(true);
+    // jsdom may omit var() backgrounds; the canonical material is source-owned.
+    expect(readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial.tsx', 'utf8')).toContain("background: 'var(--th-overview-photo-fade)'");
+    expect(layers[0].style.position).toBe('absolute'); expect(layers[0].style.inset).toBe('0');
+    expect(layers[1].style.zIndex).toBe('1'); expect(layers[1].contains(screen.getByText('Essex Links'))).toBe(true);
   });
   it('extends only the new token to 60%, preserving the standout recipe exactly', () => {
     expect(SCRIM_STANDOUT).toBe('linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)');

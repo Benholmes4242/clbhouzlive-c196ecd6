@@ -19,15 +19,9 @@ import { displayName } from '@/lib/whs/utils/initials';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const INK = SURFACE.dark.ink;
-const DIM = SURFACE.dark.dim;
-const AVATAR = 22;
+const AVATAR = 24;
 const OVERLAP = 7;
 const MAX_AVATARS = 3;
-/** Measured rendered row height (34.75px at 393px — the two-line text block,
- *  taller than the 22px avatars) + its 10px margin-top, rounded up. The hero
- *  grows by exactly this; the mock's hero heights were context, not absolutes
- *  (BRIEF_COURSE_HERO_1B K1). */
-export const HERO_RECORD_ROW_EXTRA = 45;
 
 export function heroRecordNames(holders: CourseLegendRow[]): string | null {
   const names = holders.map((h) => displayName(h.user_display_name).trim());
@@ -37,7 +31,7 @@ export function heroRecordNames(holders: CourseLegendRow[]): string | null {
   return `${names[0]} & ${names.length - 1} others`;
 }
 
-/** True when the hero renders the row; the hero height reads this. */
+/** True when the hero renders the row; height remains fixed even with a record. */
 export function heroRecordVisible(holders: CourseLegendRow[]): boolean {
   return heroRecordNames(holders) != null;
 }
@@ -68,23 +62,23 @@ export function HeroCourseRecord({ holders }: { holders: CourseLegendRow[] }) {
   if (!names) return null;
   const score = holders[0].value;
   return (
-    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 9 }}>
+    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
       <span style={{ display: 'inline-flex', flex: '0 0 auto' }}>
         {holders.slice(0, MAX_AVATARS).map((h, i) => <Avatar key={h.user_id} row={h} index={i} />)}
       </span>
       <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: MEDAL_GOLD, lineHeight: 1.2 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: MEDAL_GOLD, lineHeight: 1.2 }}>
           Course record
         </div>
-        <div style={{ fontSize: 12.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>
           {names}
         </div>
       </div>
       <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-        <span className="tabular-nums lining-nums" style={{ fontSize: 19, fontWeight: 800, color: MEDAL_GOLD, lineHeight: 1 }}>
+        <span className="tabular-nums lining-nums" style={{ fontSize: 21, fontWeight: 800, color: MEDAL_GOLD, lineHeight: 1 }}>
           {Math.round(Number(score))}
         </span>
-        <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, marginTop: 3 }}>
+        <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'var(--course-record-gross-ink)', marginTop: 4 }}>
           Gross
         </span>
       </div>

@@ -13,10 +13,9 @@ import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
-import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
+import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 import { CourseMasthead, CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
-import { SCRIM_HERO_TALL } from '@/styles/photoScrim';
 
 /**
  * CoursesPageHero
@@ -26,9 +25,8 @@ import { SCRIM_HERO_TALL } from '@/styles/photoScrim';
  * hero (notch bleed, scrim, cover position) and the SAME data source as
  * the old Discover "Standout courses" card (useExploreHero).
  *
- * Courses-only scrim treatment: HERO_CANON_WASH plus SCRIM_HERO_TALL
- * beneath the bottom-anchored copy. Course-detail and other heroes retain
- * their own treatment; the placeColor opt-in never changes their defaults.
+ * The two course photo headers share Tour's PhotoBandFade material and opt-in
+ * masthead treatment; other masthead consumers retain their defaults.
  *
  * The shared chrome island floats over this hero and is the ONLY safe-area
  * owner. The image itself starts at the physical top, exactly as on Explore.
@@ -225,18 +223,7 @@ function CoursesPageHeroInner() {
         cursor: hero ? 'pointer' : 'default',
       }}
     >
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: HERO_CANON_WASH,
-        }}
-      />
-      <div
-        aria-hidden
-        style={{ position: 'absolute', inset: 0, background: SCRIM_HERO_TALL }}
-      />
+      <PhotoBandFade />
       {/* Bottom-anchored identity + CTA — absolute so copy never expands the
           fixed 340px hero. Matches GolfClubView's CourseTitleOverlay. */}
       <div
@@ -244,8 +231,8 @@ function CoursesPageHeroInner() {
           position: 'absolute',
           left: 0,
           right: 0,
-          bottom: 24,
-          padding: '0 16px',
+          bottom: 14,
+          padding: '0 20px',
           zIndex: 1,
         }}
       >
@@ -253,6 +240,7 @@ function CoursesPageHeroInner() {
           <CourseMastheadSkeleton rowHeight={21} />
         ) : (
           <CourseMasthead
+            photoBand
             kicker={null}
             name={hero.course_name}
             place={placeParts.length > 0 ? placeParts.join(' \u00b7 ') : null}
@@ -265,7 +253,7 @@ function CoursesPageHeroInner() {
                   fontWeight: 700,
                   color: '#fff',
                   lineHeight: 1,
-                  letterSpacing: '-0.03em',
+                  letterSpacing: 0,
                   fontFeatureSettings: '"tnum" 1',
                   fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
