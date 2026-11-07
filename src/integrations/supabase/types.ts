@@ -8635,6 +8635,109 @@ export type Database = {
         }
         Relationships: []
       }
+      owgr_event_course_map: {
+        Row: {
+          candidate_count: number
+          country: string
+          created_at: string
+          event_key: string
+          golf_course_id: string | null
+          id: string
+          matched_at: string | null
+          matched_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          candidate_count?: number
+          country?: string
+          created_at?: string
+          event_key: string
+          golf_course_id?: string | null
+          id?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          candidate_count?: number
+          country?: string
+          created_at?: string
+          event_key?: string
+          golf_course_id?: string | null
+          id?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owgr_event_course_map_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_matched_by_fkey"
+            columns: ["matched_by"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_matched_by_fkey"
+            columns: ["matched_by"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_matched_by_fkey"
+            columns: ["matched_by"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_matched_by_fkey"
+            columns: ["matched_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_matched_by_fkey"
+            columns: ["matched_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owgr_event_course_map_matched_by_fkey"
+            columns: ["matched_by"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       page_path_map: {
         Row: {
           first_seen_at: string
@@ -20659,6 +20762,17 @@ export type Database = {
           },
         ]
       }
+      pro_tour_course_events: {
+        Row: {
+          course_id: string | null
+          event_name: string | null
+          finish: string | null
+          played_on: string | null
+          source: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       public_golfer_blurbs: {
         Row: {
           handicap: number | null
@@ -21555,6 +21669,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_count_owgr_events_needing_course: { Args: never; Returns: number }
       admin_deletion_integrity: {
         Args: never
         Returns: {
@@ -21562,6 +21677,24 @@ export type Database = {
           orphan_profiles: number
           unbanned: number
           worst_seen: string
+        }[]
+      }
+      admin_get_owgr_event_courses: {
+        Args: never
+        Returns: {
+          candidate_count: number
+          country: string
+          course_name: string
+          event_name: string
+          events: number
+          golf_course_id: string
+          id: string
+          last_played: string
+          played: Json
+          pros: number
+          seed: string
+          status: string
+          years: number[]
         }[]
       }
       admin_get_untagged_course_media: {
@@ -21624,6 +21757,10 @@ export type Database = {
       admin_set_cron_job_active: {
         Args: { p_active: boolean; p_jobid: number }
         Returns: Json
+      }
+      admin_set_owgr_event_course: {
+        Args: { p_course_id: string; p_id: string }
+        Returns: undefined
       }
       admin_set_pro_owgr: {
         Args: { p_owgr_url: string; p_user_id: string }
@@ -24275,6 +24412,7 @@ export type Database = {
           member_name: string
           par: number
           poster_url: string
+          source_post_id: string
           stream_id: string
           yards: number
         }[]
@@ -24339,6 +24477,7 @@ export type Database = {
           member_name: string
           par: number
           poster_url: string
+          source_post_id: string
           stream_id: string
           yards: number
         }[]
@@ -25114,6 +25253,16 @@ export type Database = {
       get_pro_question_inbox: { Args: { p_status?: string }; Returns: Json }
       get_pro_reach: { Args: never; Returns: Json }
       get_pro_score_watch: { Args: { p_pro_id: string }; Returns: Json }
+      get_pro_tour_courses: {
+        Args: { p_user_id: string }
+        Returns: {
+          course_id: string
+          event_name: string
+          finish: string
+          played_on: string
+          source: string
+        }[]
+      }
       get_pro_world_rank: { Args: { p_user_id: string }; Returns: Json }
       get_profile_creator: {
         Args: { p_user_id: string }
@@ -27822,6 +27971,27 @@ export type Database = {
       notify_moderators: {
         Args: { _data: Json; _message: string; _title: string }
         Returns: undefined
+      }
+      owgr_auto_match: { Args: { p_id: string }; Returns: string }
+      owgr_country_matches: {
+        Args: {
+          p_event_country: string
+          p_grouping: string
+          p_sub_country: string
+        }
+        Returns: boolean
+      }
+      owgr_event_date: {
+        Args: { p_end: string; p_start: string; p_week: number; p_year: number }
+        Returns: string
+      }
+      owgr_event_key: { Args: { p_name: string }; Returns: string }
+      owgr_event_title: { Args: { p_name: string }; Returns: string }
+      owgr_event_tokens: { Args: { p_key: string }; Returns: string[] }
+      owgr_norm: { Args: { p: string }; Returns: string }
+      owgr_register_event: {
+        Args: { p_country: string; p_name: string }
+        Returns: string
       }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
