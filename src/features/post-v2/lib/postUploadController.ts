@@ -46,7 +46,6 @@ import { trackError } from '@/lib/errorTracking';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 import { writeShotTagAfterUpload, type ShotTagJob, type SavedHoleTag } from './shotTagWrites';
-import {publishHoleGuide,watchDeferredHoleGuide,type HoleGuideContext} from './postHoleGuide';
 
 export interface UploadJobContext {
   jobId: string;

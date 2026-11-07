@@ -598,7 +598,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         holeNo:state.holeNo,
         postShotTags:state.postShotTags,
         attachedScoreId:isPersonalActor?state.attachedScoreId:null,
-        holeGuide:state.course && state.holeNo && state.addToGuide && state.media.length ? {courseId:state.course.id,holeNo:state.holeNo,userId:profile?.id??activeActor.id}:undefined,
+        addToGuide:state.addToGuide!==false&&state.media.length>0,
       });
       submittedRef.current = true;
       // A finished job is not a change of mind: the composer-flow step 1 must
