@@ -502,18 +502,17 @@ export function HeroBoardSection({
       ) : null}
 
       {!picksOnly && lastYearRows.length > 0 ? (
-        <div data-overview-last-year style={{ paddingBottom: 4 }}>
-          <div style={{ padding: '12px 20px 4px', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
+        <div data-overview-last-year style={{ paddingTop: 12 }}>
+          <div data-overview-board-header style={{ display: 'flex', alignItems: 'center', minHeight: 24, padding: '2px 20px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
             {t('overview.hero.lastYear')}
+            {lastYearRows.every(row => row.year === lastYearRows[0].year) ? ` · ${lastYearRows[0].year}` : null}
           </div>
           {lastYearRows.map((row, i) => (
             <LastYearRow
               key={`${row.rank}-${row.name}`}
               rank={row.rank}
               name={row.name}
-              country={row.country || null}
               score={row.score}
-              year={row.year}
               isWinner={row.rank === '1'}
               avatarCandidates={resolvePlayerAvatarCandidates({ name: row.name, photoUrl: row.photoUrl ?? null, tourSlug: pickTourCode })}
               isLast={i === lastYearRows.length - 1}
