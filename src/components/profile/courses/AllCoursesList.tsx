@@ -191,7 +191,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   );
 
   const { data: userActivity = [] } = useUserCourseActivity(userId);
-  const { data: tourByCourse = new Map() } = useProTourCourses(userId);
+  const { data: proTourCourses } = useProTourCourses(userId);
+  const tourByCourse = proTourCourses instanceof Map ? proTourCourses : new Map();
 
   // Fetch course details
   const { data: courseRows = [], isLoading, isError, refetch } = useQuery({
