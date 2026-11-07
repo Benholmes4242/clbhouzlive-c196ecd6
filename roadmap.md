@@ -305,6 +305,7 @@ Constraints: no SQL/migrations; no feed_config; round_pool_cap 30; no native/Med
 - [ ] Playwright WebKit 390×844 checks (photo+video swipe, single video, no navigation, Back intact); auth is external unmanaged — report if blocked.
 
 ## PRO_TOUR_COURSES_ADMIN — ranking event courses
-- [ ] Build profile archive tour-event lines from `get_pro_tour_courses` without changing member-only course behavior.
-- [ ] Build admin Ranking event courses list/sheet, geography guard, link/no-course/add-course actions and inbox Tools row.
-- [ ] Add brief-specified geography/rules/Dossier tests, run focused checks and four shards; report mock absence and 320px verification limits.
+- [x] Build profile archive tour-event lines from `get_pro_tour_courses` without changing member-only course behavior.
+- [x] Build admin Ranking event courses list/sheet, geography guard, link/no-course/add-course actions and inbox Tools row.
+- [x] Add brief-specified geography/rules/Dossier tests, run focused checks and four shards; report mock absence and 320px verification limits.
+- [ ] Ben's device checks: authenticated archive, admin list and sheet at 320px; external unmanaged auth prevents hosted verification here.
