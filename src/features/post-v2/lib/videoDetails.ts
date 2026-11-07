@@ -1,6 +1,6 @@
-/** Creator-only video metadata. Chapters are derived, never persisted; this
- * module is shared with future readers so timestamp qualification has one owner.
- * Exactly-one-video submission is the sole gate for the three metadata writes.
+/** Video metadata and canonical chapter selection shared by creator/viewer.
+ * Timestamp chapters remain derived; PF3C hole marks are round-bound persisted
+ * times, never scores. One validator owns spacing, prefill and publication.
  */
 import { isLongFormVideo } from '@/constants/videoRules';
 export const VIDEO_LIMITS = { title: 80, credits: 10, links: 5, thanks: 3, gear: 10, gearText: 60, url: 300, label: 30 } as const;
@@ -9,15 +9,55 @@ export type CreditRole = typeof CREDIT_ROLES[number][0];
 export interface VideoCredit { id: string; name: string; avatarUrl: string | null; role: CreditRole }
 export interface VideoThanks { id: string; name: string; logoUrl: string | null; category: string | null }
 export interface VideoLink { url: string; label: string }
-export interface VideoDetails { title: string; titleOnCover: boolean; links: VideoLink[]; gear: string[]; credits: VideoCredit[]; thanks: VideoThanks[]; coverFrame: number | null }
-export const emptyVideoDetails = (): VideoDetails => ({ title: '', titleOnCover: true, links: [], gear: [], credits: [], thanks: [], coverFrame: null });
+export type HoleMarks = Record<number, number>;
+export interface VideoDetails { title: string; titleOnCover: boolean; links: VideoLink[]; gear: string[]; credits: VideoCredit[]; thanks: VideoThanks[]; coverFrame: number | null; holeMarks?: HoleMarks; scoreFollows?: boolean; marksRoundId?: string | null }
+export const emptyVideoDetails = (): VideoDetails => ({ title: '', titleOnCover: true, links: [], gear: [], credits: [], thanks: [], coverFrame: null, holeMarks: {}, scoreFollows: true, marksRoundId: null });
 export function restoreVideoDetails(value: unknown): VideoDetails {
   if (!value || typeof value !== 'object') return emptyVideoDetails();
   const v = value as Partial<VideoDetails>;
-  return { title: typeof v.title === 'string' ? v.title : '', titleOnCover: v.titleOnCover !== false, links: Array.isArray(v.links) ? v.links : [], gear: Array.isArray(v.gear) ? v.gear : [], credits: Array.isArray(v.credits) ? v.credits : [], thanks: Array.isArray(v.thanks) ? v.thanks : [], coverFrame: typeof v.coverFrame === 'number' ? v.coverFrame : null };
+  const holeMarks: HoleMarks = {};
+  if (v.holeMarks && typeof v.holeMarks === 'object') for (const [key, seconds] of Object.entries(v.holeMarks)) { const hole = Number(key); if (Number.isInteger(hole) && hole >= 1 && hole <= 18 && typeof seconds === 'number' && Number.isFinite(seconds) && seconds >= 1) holeMarks[hole] = seconds; }
+  return { title: typeof v.title === 'string' ? v.title : '', titleOnCover: v.titleOnCover !== false, links: Array.isArray(v.links) ? v.links : [], gear: Array.isArray(v.gear) ? v.gear : [], credits: Array.isArray(v.credits) ? v.credits : [], thanks: Array.isArray(v.thanks) ? v.thanks : [], coverFrame: typeof v.coverFrame === 'number' ? v.coverFrame : null, holeMarks, scoreFollows: v.scoreFollows !== false, marksRoundId: typeof v.marksRoundId === 'string' ? v.marksRoundId : null };
 }
 export function singleVideo(media: readonly { type: string }[], editing = false): boolean { return !editing && media.length === 1 && media[0].type === 'video'; }
-export interface VideoChapter { seconds: number; time: string; label: string }
+export interface VideoChapter { seconds: number; time: string; label: string; holeNo?: number }
+export const holeOrdinal = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th'}`;
+export const chapterTime = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+export function markRefusal(marks: HoleMarks, hole: number, seconds: number, holes: number, duration: number): string | null {
+  if ((holes !== 9 && holes !== 18) || !Number.isInteger(hole) || hole < 1 || hole > holes) return 'This hole is not in the attached round.';
+  if (!Number.isFinite(seconds) || seconds < 1 || !Number.isFinite(duration)) return 'Choose a time after the Intro.';
+  const entries = Object.entries(marks).map(([h, t]) => [Number(h), t] as const).filter(([h, t]) => h !== hole && h >= 1 && h <= holes && Number.isFinite(t)).sort((a, b) => a[0] - b[0]);
+  const before = entries.filter(([h]) => h < hole).at(-1);
+  const after = entries.find(([h]) => h > hole);
+  if (seconds - (before?.[1] ?? 0) < 10) return `The ${holeOrdinal(hole)} has to start at least 10 seconds after ${before ? `the ${holeOrdinal(before[0])} (${chapterTime(before[1])})` : 'the Intro (0:00)'}.`;
+  if (after && after[1] - seconds < 10) return `The ${holeOrdinal(hole)} has to start at least 10 seconds before the ${holeOrdinal(after[0])} (${chapterTime(after[1])}).`;
+  if (duration - seconds < 10) return `The ${holeOrdinal(hole)} has to start at least 10 seconds before the end.`;
+  return null;
+}
+export function validHoleMarks(marks: HoleMarks, holes: number, duration: number): HoleMarks {
+  const valid: HoleMarks = {};
+  for (const [h, t] of Object.entries(marks).sort((a, b) => Number(a[0]) - Number(b[0]))) if (!markRefusal(valid, Number(h), t, holes, duration)) valid[Number(h)] = t;
+  return valid;
+}
+export function holeChapters(marks: HoleMarks, holes: number, duration: number): VideoChapter[] {
+  const valid = Object.entries(validHoleMarks(marks, holes, duration)).map(([h, seconds]) => ({ seconds, time: chapterTime(seconds), label: holeOrdinal(Number(h)), holeNo: Number(h) })).sort((a, b) => a.seconds - b.seconds);
+  return valid.length >= 2 ? [{ seconds: 0, time: '0:00', label: 'Intro' }, ...valid] : [];
+}
+export function premarkHoles(description: string, marks: HoleMarks, holes: number, duration: number): HoleMarks {
+  const next = { ...marks };
+  for (const line of description.split(/\r?\n/)) {
+    const m = /^(\d+:\d{2}(?::\d{2})?)\s+(?:Hole\s+(\d+)|(\d+)(?:st|nd|rd|th)?(?:\s+hole)?)(?=\s|$)/i.exec(line);
+    if (!m) continue;
+    const parts = m[1].split(':').map(Number), hole = Number(m[2] ?? m[3]);
+    if (parts.slice(1).some(n => n >= 60) || next[hole] != null) continue;
+    const seconds = parts.reduce((s, n) => s * 60 + n, 0);
+    if (!markRefusal(next, hole, seconds, holes, duration)) next[hole] = seconds;
+  }
+  return next;
+}
+export function roundBoundVideoDetails(details: VideoDetails, roundId: string | null): VideoDetails {
+  return details.marksRoundId === roundId && roundId ? details : { ...details, holeMarks: {}, marksRoundId: roundId };
+}
 export function parseChapters(description: string, durationSeconds: number | null | undefined): VideoChapter[] {
   if (!isLongFormVideo(durationSeconds) || durationSeconds == null || !Number.isFinite(durationSeconds)) return [];
   const chapters: VideoChapter[] = [];

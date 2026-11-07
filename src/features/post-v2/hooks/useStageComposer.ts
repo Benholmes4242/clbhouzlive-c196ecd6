@@ -9,7 +9,7 @@ import { useCallback, useState } from 'react';
 import { toast } from '@/lib/toast';
 import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
 import type { PostShotTag } from '../lib/composerGolfRules';
-import { emptyVideoDetails, type VideoDetails } from '../lib/videoDetails';
+import { emptyVideoDetails, roundBoundVideoDetails, type VideoDetails } from '../lib/videoDetails';
 
 // Probe a video File's duration (seconds). Resolves 0 if unreadable.
 function probeVideoDuration(file: File, onDimensions?: (width: number, height: number) => void): Promise<number> {
@@ -213,6 +213,7 @@ export function useStageComposer() {
       course: courses[0] ?? null,
       holeNo: s.course?.id===c?.id ? s.holeNo : null,
       attachedScoreId: s.course?.id===c?.id ? s.attachedScoreId : null,
+      videoData: s.course?.id===c?.id ? s.videoData : roundBoundVideoDetails(s.videoData ?? emptyVideoDetails(), null),
       dirty: true,
     }));
   }, []);
@@ -223,16 +224,18 @@ export function useStageComposer() {
       course: cs[0] ?? null,
       holeNo: s.course?.id===cs[0]?.id ? s.holeNo : null,
       attachedScoreId: s.course?.id===cs[0]?.id ? s.attachedScoreId : null,
+      videoData: s.course?.id===cs[0]?.id ? s.videoData : roundBoundVideoDetails(s.videoData ?? emptyVideoDetails(), null),
       dirty: true,
     }));
   }, []);
 
   const setScheduledAt = useCallback((d: Date | null) => markDirty({ scheduledAt: d }), []);
-  const setGolf = useCallback((patch:Pick<Partial<StageState>,'holeNo'|'postShotTags'|'attachedScoreId'|'addToGuide'>) => markDirty(patch),[]);
+  const setGolf = useCallback((patch:Pick<Partial<StageState>,'holeNo'|'postShotTags'|'attachedScoreId'|'addToGuide'>) => setState(s => ({ ...s, ...patch, videoData: 'attachedScoreId' in patch && patch.attachedScoreId !== s.attachedScoreId ? roundBoundVideoDetails(s.videoData ?? emptyVideoDetails(), patch.attachedScoreId ?? null) : s.videoData, dirty: true })),[]);
 
   const restoreDraft = useCallback((patch: Partial<StageState>) => {
     setState(s => {
       const next = { ...s, ...patch, dirty: false };
+      next.videoData = roundBoundVideoDetails(next.videoData ?? emptyVideoDetails(), next.attachedScoreId);
       // Keep derived alias in sync if only one side was patched.
       if (patch.courses && !patch.course) next.course = patch.courses[0] ?? null;
       else if (patch.course && !patch.courses) next.courses = patch.course ? [patch.course] : [];

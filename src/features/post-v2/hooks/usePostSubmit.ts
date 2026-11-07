@@ -49,6 +49,7 @@ export interface SubmitInput {
   holeNo?: number | null;
   postShotTags?: PostShotTag[];
   attachedScoreId?: string | null;
+  roundHoles?: number | null;
   /** PF1B: the hole-guide toggle. Written to posts.add_to_hole_guide in the
    *  same posts patch; the server adds the media to the hole guide. */
   addToGuide?: boolean;
@@ -189,7 +190,7 @@ export function usePostSubmit() {
 
 
 
-      await writeVideoDetails(postId, input.media, input.videoData);
+      await writeVideoDetails(postId, input.media, input.videoData, { scoreId: input.actorType === 'personal' ? input.attachedScoreId ?? null : null, holes: input.roundHoles ?? null });
 
       // Mention notifications: insert into the canonical public.mentions
       // pipeline (source_type='post'). The trg_create_mention_notification

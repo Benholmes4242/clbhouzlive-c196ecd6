@@ -36,6 +36,11 @@
 }
 
 :root {
+  --round-video-under: #E2574C;
+  --round-video-chip: rgba(14,14,16,.7);
+  --round-video-time: rgba(0,0,0,.6);
+  --round-video-next: rgba(255,255,255,.05);
+  --round-video-selected: rgba(255,255,255,.28);
   --video-about-sheet: #17171B;
   --video-scrubber-gap: #0A0A0C;
   --video-about-ink: #F8FAFC;
