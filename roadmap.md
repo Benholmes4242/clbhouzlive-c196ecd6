@@ -2,7 +2,7 @@
 
 ## PRO_SELF_RUN verification-only close-out
 - [x] Run shard 4 separately with `--maxWorkers=2`: 1,821 tests / 162 files passed; no failure, including no known Featured meta-line failure.
-- [ ] Write PRO_SELF_RUN_REPORT.md with all shard totals, exact deleted modules/tests, count reconciliation, and old/new code for every changed test.
+- [x] Write PRO_SELF_RUN_REPORT.md: shards 1,920/1,783/1,885/1,821 = 7,409/647 green; only shard 4 rerun here. Seven retired source files and one deleted 48-case sponsor suite named; all eight modified test files have exact old/new diffs, deleted assertions and reasons. Net −54 reconciled; known Featured failure did not occur; direct coverage and phone limits reported.
 - [ ] Live member/device checks remain with Ben: Ask enable/error/readback, partner save/navigation, pro tab/result handoff and sheet focus/white controls; external unmanaged authentication prevents hosted verification here.
 
 ## PF1B_FEED verification-only close-out
