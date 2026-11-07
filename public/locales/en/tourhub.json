@@ -575,13 +575,11 @@
       "cutTo": "The event was cut to {{holes}} holes."
     },
     "picksIntro": {
-      "leads": "{{name}} leads for us. Each card shows the round our picks would need to reach {{score}}.",
-      "behind_one": "Our best-placed pick, {{name}}, is {{pos}}, {{count}} shot back. Each card shows the round they would need to reach {{score}}.",
-      "behind_other": "Our best-placed pick, {{name}}, is {{pos}}, {{count}} shots back. Each card shows the round they would need to reach {{score}}.",
-      "level": "Our best-placed pick, {{name}}, is {{pos}}, level with the lead. Each card shows the round they would need to reach {{score}}."
+      "leads": "{{name}} leads for us.",
+      "behind_one": "Our best-placed pick, {{name}}, is {{pos}}, {{count}} shot back.",
+      "behind_other": "Our best-placed pick, {{name}}, is {{pos}}, {{count}} shots back.",
+      "level": "Our best-placed pick, {{name}}, is {{pos}}, level with the lead."
     },
-    "picksToReach": "To reach {{score}}",
-    "picksNeeds": "Needs",
     "biggestMovers": "Round {{round}} biggest movers",
     "pickRecord": {
       "event_count": "EVENTS",

@@ -456,14 +456,12 @@ export function HeroBoardSection({
       if (!best || line.position < best.position) best = { name: surnameOf(p.playerName), position: line.position, tied: line.tied, score: line.score };
     }
     if (!best) return null;
-    const score = fmtScore(leader.total);
     const pos = `${best.tied ? 'T' : ''}${best.position}`;
-    if (best.position === 1 && !best.tied) return t('overview.picksIntro.leads', { name: best.name, score });
+    if (best.position === 1 && !best.tied) return t('overview.picksIntro.leads', { name: best.name });
     const gap = best.score - leader.total;
-    if (gap <= 0) return t('overview.picksIntro.level', { name: best.name, pos, score });
-    return t('overview.picksIntro.behind', { name: best.name, pos, count: gap, score });
+    if (gap <= 0) return t('overview.picksIntro.level', { name: best.name, pos });
+    return t('overview.picksIntro.behind', { name: best.name, pos, count: gap });
   }, [inPlay, leader, picks, boardByPlayer, entries, t]);
-  const toReachWindow = inPlay && leader?.total != null && totalRounds != null && inRequiredRoundWindow(currentRound, totalRounds);
 
 
   return (
@@ -538,9 +536,6 @@ export function HeroBoardSection({
           championPlayerId={championPlayerId}
           championPlayerIds={championPlayerIds}
           intro={picksIntro}
-          neededByPlayer={toReachWindow ? neededByPlayer : null}
-          leaderTotal={leader?.total ?? null}
-          toReachScore={toReachWindow && leader?.total != null ? fmtScore(leader.total) : null}
           onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }}
         />
       ) : null}
@@ -578,7 +573,7 @@ export {pickTeeText,pickTeeDayLabel,teeHeadingFits,pickStatusToken} from './Pick
  * §C — ROUND N MOVEMENT. Three cards at most, never padded. Ben's ruling
  * (7 Nov 2026): only the arrow carries direction colour — live green up,
  * darker warning red down, never the under-par red. Places remain white;
- * gross/to-par retain their independent score colour law.
+ * to-par retains its independent score colour law.
  */
 export function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
   const { t } = useTranslation('tourhub');
@@ -589,26 +584,20 @@ export function RoundMovementBand({ round, cards }: { round: number; cards: Move
       </div>
       <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
         {cards.map((c) => (
-          <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, background: 'transparent', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, padding: 7 }}>
+          <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: 1, minWidth: 0, background: 'transparent', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, padding: 7 }}>
             <SquircleAvatar size={28} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
             <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tour-mover-name)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 2, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', minWidth: 0, overflow: 'hidden', ...FIGS }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2, color: 'var(--tour-mover-name)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 1, lineHeight: 1.2, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', minWidth: 0, overflow: 'hidden', ...FIGS }}>
               <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ flex: 'none', color: c.delta > 0 ? LIVE_INK : STATUS_NEGATIVE }}>
                 {c.delta > 0 ? '\u25B2' : '\u25BC'}
               </span>
               <span data-movement-places style={{ flex: 'none', color: OVERVIEW.ink }}>{Math.abs(c.delta)}</span>
               {c.toPar != null ? (
-                /* The to-par is a score and takes the colour law; the gross stays
-                   muted. With no gross the to-par stands bare — brackets around
-                   the only figure on the line say nothing. */
+                /* Gross was dropped so the figure fits on one line at chip width;
+                   bare to-par keeps its independent score colour law. */
                 <span data-movement-score style={{ fontSize: 10.5, fontWeight: 600, flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>
-                  {c.gross != null ? (
-                    <><span data-movement-gross style={{ color: OVERVIEW.mute }}>{c.gross}</span>{' '}
-                      <span data-movement-topar style={{ color: getScoreColor(c.toPar, 'dark') }}>({fmtScore(c.toPar)})</span></>
-                  ) : (
-                    <span data-movement-topar style={{ color: getScoreColor(c.toPar, 'dark') }}>{fmtScore(c.toPar)}</span>
-                  )}
+                  <span data-movement-topar style={{ color: getScoreColor(c.toPar, 'dark') }}>{fmtScore(c.toPar)}</span>
                 </span>
               ) : null}
             </div>
