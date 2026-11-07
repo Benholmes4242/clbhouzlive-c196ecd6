@@ -42,8 +42,8 @@ vi.mock('@/features/explore-magazine/FeaturedRoundCard', () => ({ FeaturedRoundC
 
 import { FeedCard } from '@/components/feed/FeedCard';
 
-const IMG = { id: 'm1', type: 'image' as const, imageUrl: 'https://x/1.jpg', thumbnailUrl: 'https://x/1.jpg' };
-const IMG2 = { id: 'm2', type: 'image' as const, imageUrl: 'https://x/2.jpg', thumbnailUrl: 'https://x/2.jpg' };
+const IMG = { id: 'm1', type: 'image' as const, imageUrl: 'https://x/1.jpg', thumbnailUrl: 'https://x/1.jpg', width: 1080, height: 1350 };
+const IMG2 = { id: 'm2', type: 'image' as const, imageUrl: 'https://x/2.jpg', thumbnailUrl: 'https://x/2.jpg', width: 1080, height: 1350 };
 
 const POST: FeedPost = {
   id: 'p1',
