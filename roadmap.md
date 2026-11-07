@@ -1,5 +1,10 @@
 # Roadmap
 
+## FIX_VERIFY routing and three-build verification
+- [x] Add video_credit only to push post-mention branch; unchanged parity85/85 plus three new route rules3/3 pass. process-push-queue deployed successfully; source SHA in FIX_VERIFY_REPORT.md.
+- [x] Repair exactly authorized country-bar style and28px avatar assertions; presentation35passed/1failed, combined123passed/1failed. Report old/new lines and +3/+1 expected7508/657 inventory.
+- [ ] STOP: profileCoursesRecord.test.tsx:76:41 approved inline-style assertion still lacks var(--course-country-bar), received display/height/width/radius only. No further repair. Four shards and five320px checks await explicit test-only repair authorization; only FW1 meta-line allowed-known.
+
 ## PF3A_VIDEO mounted-test close-out
 - [x] Add nine mounted cases: real composer/real-hook photo add/remove restoration passes; links/gear chip and limit transitions pass. Existing assertions/cases and production untouched.
 - [x] Focused88 passed/4 failed across8files; PF3A_VIDEO_REPORT.md lists exact errors, +9/+1 expected7505/656 inventory and names three upcomingLastYearBoard cases/tourIsland:235 as pre-existing.

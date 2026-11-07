@@ -73,7 +73,7 @@ describe('profile courses record', () => {
     expect(screen.queryByText('Everything else')).toBeNull();
     expect(screen.getByTestId('map-unmapped').textContent).toBe('10 not yet mapped');
     const fill = view.container.querySelector<HTMLElement>('[data-testid="country-row"] > span:nth-child(2) > span');
-    expect(fill?.style.background).toBe('var(--course-country-bar)');
+    expect(fill?.getAttribute('style')).toContain('var(--course-country-bar)');
     expect(fill?.style.opacity).toBe('');
   });
   it('hero renders the played figure and the country count', () => {
