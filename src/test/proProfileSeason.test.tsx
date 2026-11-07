@@ -15,8 +15,8 @@ describe('Pro profile season results',()=>{
     expect(view.container.querySelector('.pro-profile-tiles')).toHaveClass('pro-season-tiles');
     const css=readFileSync('src/features/pro-profile/pro-profile.css','utf8');
     const rule=css.match(/\.pro-season-tiles \.pro-profile-tile \{([^}]+)\}/)?.[1];
-    expect(rule).toContain('text-align:center'); expect(rule).toContain('background:transparent'); expect(rule).toContain('border-radius:12px'); expect(rule).toContain('padding:12px 4px');
-    expect(css).toContain('.pro-season-tiles .pro-profile-tile span { line-height:1.3; }');
+    expect(rule).toContain('text-align:center'); expect(rule).toContain('background:transparent'); expect(rule).toContain('border-radius:12px'); expect(rule).toContain('padding:8px 5px 7px');
+    expect(css).toContain('.pro-season-tiles .pro-profile-tile span { line-height:1.3; margin-top:4px; font-size:7px; font-weight:700; letter-spacing:.1em; }');
     fireEvent.click(screen.getByRole('button',{name:/Event one/}));
     expect(screen.getByRole('dialog').querySelector('.pro-profile-tiles')).not.toHaveClass('pro-season-tiles');
   });
