@@ -568,6 +568,11 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const authorUsername = activeActor?.slug ?? profile?.username ?? null;
 
   const isPersonalActor = activeActor?.type !== 'business';
+  /* PF2_GUIDE: the guide is written and announced only when the post can
+     actually feed it — personal actor, Everyone audience, with media. The
+     member's own switch (state.addToGuide) is never rewritten by audience
+     changes, so switching back to Everyone restores it. */
+  const guideEffective = effectiveHoleGuide(state.addToGuide, state.media.length, isPersonalActor, visibility);
   /** Tags for photos still to upload, carried by the upload job. */
   const newShotTagJob = useCallback((items: typeof state.media) => {
     const out: Record<string, ShotTagChoice> = {};
@@ -598,7 +603,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         holeNo:state.holeNo,
         postShotTags:state.postShotTags,
         attachedScoreId:isPersonalActor?state.attachedScoreId:null,
-        addToGuide:state.addToGuide!==false&&state.media.length>0,
+        addToGuide:guideEffective,
       });
       submittedRef.current = true;
       // A finished job is not a change of mind: the composer-flow step 1 must
@@ -1153,7 +1158,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
     <>
       <ComposerCourseBlock course={state.course} reason={courseReason} suggestions={golfSuggestions} hole={state.holeNo??null} tags={state.postShotTags??[]} holes={teeSets.data?.[0]?.holes??[]} onChange={()=>{openDetail('course');setSheet('course');}} onPick={c=>chooseCourses([c])} onHole={holeNo=>setGolf({holeNo})} onTags={postShotTags=>setGolf({postShotTags})}/>
       {isPersonalActor&&selectedRound&&golfRounds.some(roundIsRecent)&&<ComposerAttachRound round={selectedRound} on={!!state.attachedScoreId} hole={state.holeNo??null} shape={shapes?.get(state.attachedScoreId??'')??null} onToggle={()=>setGolf({attachedScoreId:state.attachedScoreId?null:selectedRound.whs_score_id})} onDifferent={()=>setRoundSheetOpen(true)}/>}
-      {state.course&&state.holeNo&&guideVisible(state.holeNo,state.media.length)&&<ComposerHoleGuide course={state.course} hole={state.holeNo} on={state.addToGuide!==false} onToggle={()=>setGolf({addToGuide:!state.addToGuide})}/>}
+      {isPersonalActor&&state.course&&state.holeNo&&guideVisible(state.holeNo,state.media.length)&&<ComposerHoleGuide course={state.course} hole={state.holeNo} on={state.addToGuide!==false} audienceOk={visibility==='anyone'} onToggle={()=>setGolf({addToGuide:!state.addToGuide})} onRowTap={()=>setVisibilityOpen(true)}/>}
       {state.courses.length > 1 && (
         <div style={{ display: 'flex', gap: 6, margin: '10px 16px 0', flexWrap: 'wrap' }}>
           {state.courses.slice(1).map((c) => (
@@ -1253,7 +1258,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           with the Preview page so the two cannot drift (PV1). */}
       <ShareFooter
         label={primaryLabel}
-        subLine={composerDestinations(state.holeNo??null,state.addToGuide!==false&&state.media.length>0,state.scheduledAt)}
+        subLine={composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt)}
         disabled={!canSubmit}
         busy={submitting || saving}
         onShare={onPrimary}
@@ -1274,7 +1279,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
              tapping it posts through the very same onPrimary path. */
           share={{
             label: primaryLabel,
-            subLine: composerDestinations(state.holeNo??null,state.addToGuide!==false&&state.media.length>0,state.scheduledAt),
+            subLine: composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt),
             disabled: !canSubmit,
             busy: submitting || saving,
             onShare: onPrimary,
