@@ -1,5 +1,10 @@
 # Roadmap
 
+## PRO_BADGE_W1
+- [x] Apply CSS-only pearl plate, highlight and island-ratio corners; preserve badge copy, sizes, callers and non-pro ticks.
+- [ ] Add source-based badge regression coverage; audit sponsor selector and old assertions.
+- [ ] Run four separate --maxWorkers=2 shards and report all five 320px checks, with unavailable hosted checks explicitly named.
+
 ## PF3C_ROUND
 - [ ] Extend canonical chapters with validated 9/18-hole marks and description pre-marks; preserve timestamp fallback.
 - [ ] Add composer chapter preview, following switch and pinned Mark the holes page; clear mismatched round marks and preserve drafts.

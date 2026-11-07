@@ -154,7 +154,8 @@
   --featured-caption-shadow: 0 1px 8px rgba(0,0,0,0.6);
   --featured-heart-shadow: 0 6px 24px rgba(0,0,0,0.5);
   --featured-shade: linear-gradient(180deg,rgba(0,0,0,0.35) 0,transparent 22%,transparent 48%,rgba(0,0,0,0.82) 100%);
-  --pro-label-ground: #F8FAFC;
+  --pro-label-plate: linear-gradient(135deg, #FFFFFF 0%, #E4E7EC 45%, #FFFFFF 70%, #D9DDE3 100%);
+  --pro-label-edge: inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(255,255,255,0.35);
   --pro-label-ink: #0A0A0C;
   --pro-note-ground: #17171B;
   --pro-note-ink: #F8FAFC;
