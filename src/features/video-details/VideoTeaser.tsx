@@ -4,7 +4,7 @@ import { stripMentionMarkup } from '@/lib/mentions/format';
 import type { VideoChapter } from '@/features/post-v2/lib/videoDetails';
 import './video-viewer.css';
 export function VideoTeaser({ title, description, hasMore, chapter, onOpen, feed = false }: { title: string; description: string; hasMore: boolean; chapter?: VideoChapter | null; onOpen: () => void; feed?: boolean }) {
-  const line = stripMentionMarkup(description).replace(/\s+/g, ' ').trim();
+  const line = stripMentionMarkup(description).split(/\r?\n/)[0].replace(/\s+/g, ' ').trim();
   const ref = useRef<HTMLDivElement>(null);
   const mirror = useRef<HTMLSpanElement>(null);
   const [cut, setCut] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export function VideoTeaser({ title, description, hasMore, chapter, onOpen, feed
     if (ref.current) ro?.observe(ref.current);
     return () => { ro?.disconnect(); cancelAnimationFrame(raf); };
   }, [line, hasMore]);
-  const more = hasMore || cut !== null;
+  const more = hasMore || cut !== null || /\r?\n/.test(description);
   return <div data-video-teaser className={`video-teaser${feed ? ' video-teaser-feed' : ''}`} onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
     {title && <Button variant="ghost" className="video-title" onClick={onOpen}>{title}</Button>}
     <div ref={ref} className="video-teaser-description">{cut ?? line}{cut !== null && '…'}{more && <>{' '}<Button variant="ghost" className="video-more" onClick={onOpen}>more</Button></>}</div>
