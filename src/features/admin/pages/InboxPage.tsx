@@ -1,7 +1,7 @@
 import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidateAdminQueues, subscribeAdminQueueChanges, refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
 import { AlertTriangle } from 'lucide-react';
 import {
