@@ -1,5 +1,41 @@
 # Course heroes match the Tour hero
 
+## Authorised test-only close-out — 7 November 2026
+Production unchanged. Only the three authorised checks were repaired; no additional test changes, deletions, skips or new cases. This section supersedes the historical stop below.
+
+### Exact old/new values
+1. `tourPlayoffShortenedEvents.test.tsx`: **“a standard result still reads RESULTS” → “a standard result reads FINAL in the tour line”**. Old `expect(container.textContent).toContain('RESULTS');` → `expect(container.textContent).toContain('FINAL');` and `expect(container.textContent).not.toContain('RESULTS');`. Reason: removed RESULTS pill; signed-off finished-event FINAL line. PLAYOFF case unchanged;18cases before/after.
+2. `courseHeroesMatch.test.tsx:59`, **“preserves default masthead name and ruled child spacing”**: `expect(title.style.fontSize).toBe(MASTHEAD_NAME.fontSize);` → `expect(title.style.fontSize).not.toBe('26px');`. Reason: jsdom drops clamp(); all remaining tracking/height/gap/hairline assertions retained.
+3. `courseHeroesMatch.test.tsx:81`, **“keeps gold record,24px hairline avatars and21px gross”**: `expect(container.querySelector('[data-squircle-avatar]')?.getAttribute('style')).toContain('24px');` → `expect(container.querySelector('[style*="24px"]')).not.toBeNull();`. Reason: nonexistent marker replaced with authorised size-style selector.9cases before/after.
+
+### Focused results
+```text
+bunx vitest run src/test/overviewHeroBStrip.test.tsx src/test/pickSheetV2.test.tsx src/test/tourOverviewMergedAiry.test.tsx src/test/tourOverviewPicksChipsFullBoard.test.tsx src/test/tourPlayoffShortenedEvents.test.tsx --maxWorkers=2
+85/85 passed,5files
+bunx vitest run src/test/courseHeroesMatch.test.tsx src/test/coursesHeroPlaceScrim.test.tsx src/test/reviewStepOne.test.tsx src/test/heroCourseRecordNames.test.ts --maxWorkers=2
+44/44 passed,4files (course9,place10,review21,names4)
+```
+
+### One shared fresh suite run
+`bunx vitest run --maxWorkers=2 --shard=N/4`:
+- Shard1:2000passed /168files, zero failures.
+- Shard2:1827passed +1failed =1828executed /168files (167passed,1failed).
+- Shards3–4:not run, unapproved failure stop. No reruns/skips/repairs.
+- Combined executed3827passed +1failed =3828tests /336files. Focused129cases are reruns, not extra suite cases.
+
+```text
+FAIL src/test/tourHeroRefinements.test.tsx > Tour hero refinements > renders the Needs gross as a separate untruncated white figure and omits leading/level picks
+AssertionError: expected  to have a length of 1 but got +0
+Expected: 1
+Received: 0
+src/test/tourHeroRefinements.test.tsx:98:19
+```
+Untouched Needs assertion is not the allowed-known FW1 meta-line failure; therefore remaining shards stopped. FW1 did not fail in executed shards. All three authorised repaired cases pass.
+
+No test-count delta from this repair: expected7657/669 before and after, still not a full runner-verified inventory. Last full green7607/664 +tight chips3/1 +photo grid22/2 +Tour B16/1 +courses9/1 =7657/669. No full-suite success claimed. Latest preview entry `2026-11-07T20:26:10Z build OK`; logs `/tmp/heroes-closeout/{tour-focused,course-focused,shard1,shard2}.log`.
+
+No browser reruns in this test-only request. Prior course-detail320px passes and Courses-page/island/avatar/seam limitations remain below. Current suite blocker is the Needs assertion, not the repaired clamp/avatar checks.
+
 ## Delivered
 Both course photo headers now use the canonical PhotoBandFade, fixed340px height,26px/800 zero-tracking names and14px bottom/20px side placement. The opt-in masthead has4px kicker/place seams and unruled9px children. Course records keep MEDAL_GOLD and unchanged holder logic/overlap/ring; avatars24px, names13.5px, score21px. Reviews, skeletons and other masthead callers retain defaults.
 
