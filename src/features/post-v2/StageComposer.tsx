@@ -84,7 +84,7 @@ import {ComposerCourseBlock,ComposerAttachRound,ComposerHoleGuide,ComposerRounds
 import {useCourseTeeSets} from '@/features/courses/hooks/useCourseTeeSets';
 import {useRoundHoleShapes} from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,roundIsRecent} from './lib/composerGolfReads';
-import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
+import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,effectiveHoleGuide,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
 import {loadComposerDraft} from './lib/composerDrafts';
 
 interface Props {
