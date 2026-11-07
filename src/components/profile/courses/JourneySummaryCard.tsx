@@ -98,14 +98,14 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
 
   /*
    * THE RECORD BLOCK (BRIEF_PROFILE_COURSES_REBUILD phase 1). Hero figure,
-   * World Top 100 standing line, three tiles. A null figure renders its label
-   * with an empty value - never a substituted zero.
+   * World Top 100 standing line, three tiles. A null tile figure renders a
+   * dim dash at figure size - never a substituted zero.
    */
   const fig = (n: number | null | undefined) => (n == null ? '' : formatNumber(n));
   const tiles = [
-    { label: 'TOP 100 PLAYED', value: fig(top100Played) },
-    { label: 'AVERAGE RATING', value: avgRating == null ? '' : avgRating.toFixed(1) },
-    { label: 'COURSES RATED', value: fig(ratedCount) },
+    { label: 'TOP 100 PLAYED', value: top100Played == null ? '—' : fig(top100Played), missing: top100Played == null },
+    { label: 'AVERAGE RATING', value: avgRating == null ? '—' : avgRating.toFixed(1), missing: avgRating == null },
+    { label: 'COURSES RATED', value: ratedCount == null ? '—' : fig(ratedCount), missing: ratedCount == null },
   ];
 
   return (
@@ -118,7 +118,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       <Panel kicker={kicker}>
         <div style={{ fontFamily: SANS }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-            <span data-testid="record-played" style={{ fontSize: 76, fontWeight: 800, letterSpacing: '-0.06em', lineHeight: 0.8, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+            <span data-testid="record-played" style={{ fontSize: 76, fontWeight: 800, letterSpacing: 0, lineHeight: 0.8, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
               {fig(coursesPlayed)}
             </span>
             <div>
@@ -135,11 +135,11 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
           )}
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
             {tiles.map((tile) => (
-              <div key={tile.label} style={{ flex: 1, minWidth: 0, background: A.PANEL, borderRadius: 10, padding: '11px 10px' }}>
-                <div data-testid={`tile-${tile.label}`} style={{ fontSize: 21, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, fontVariantNumeric: 'tabular-nums', minHeight: 21 }}>
+              <div key={tile.label} style={{ flex: 1, minWidth: 0, background: A.PANEL, borderRadius: 10, padding: '11px 10px', textAlign: 'center' }}>
+                <div data-testid={`tile-${tile.label}`} style={{ fontSize: 21, fontWeight: 800, letterSpacing: 0, color: tile.missing ? A.DIM : A.INK, fontVariantNumeric: 'tabular-nums', minHeight: 21, textAlign: 'center' }}>
                   {tile.value}
                 </div>
-                <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.DIM }}>
+                <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.DIM, textAlign: 'center' }}>
                   {tile.label}
                 </div>
               </div>

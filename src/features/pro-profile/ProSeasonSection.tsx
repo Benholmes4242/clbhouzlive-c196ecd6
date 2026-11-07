@@ -31,8 +31,8 @@ export function ProSeasonSection({ events, year, first, linked, scoring, onSeeAl
   const source=linked?'From the tour':rows.some(e=>e.source==='owgr')?'Official World Golf Ranking':`Added by ${first}`;
   const tiles=[[summary.events,'EVENTS'],[summary.cuts,'CUTS MADE'],[finishLabel(summary.best),'BEST'],[linked?scoring?.toFixed(1)??'—':summary.average??'—','SCORING']];
   const detail=events.find(e=>e.id===detailId);
-  return <section className="pro-profile-section"><div className="pro-profile-heading"><h2>{year} SEASON</h2><span className="pro-profile-source">{source}</span></div><div className="pro-profile-tiles">{tiles.map(([value,label])=><div className="pro-profile-tile" key={label}><b className={label==='BEST'&&value==='1st'?'pro-profile-gold':''}>{value}</b><span>{label}</span></div>)}</div>
-    {rows.length>0&&<div className="pro-profile-card pro-profile-results">{rows.slice(0,4).map(e=><ProResultRow key={e.id} event={e} first={first} open={()=>setDetailId(e.id)}/>)}{onSeeAll&&<Button variant="ghost" className="pro-profile-all" onClick={onSeeAll}>See all {allRows.length} results ›</Button>}</div>}
+  return <section className="pro-profile-section"><div className="pro-profile-heading"><h2>{year} SEASON</h2><span className="pro-profile-source">{source}</span></div><div className="pro-profile-tiles pro-season-tiles">{tiles.map(([value,label])=><div className="pro-profile-tile" key={label}><b className={label==='BEST'&&value==='1st'?'pro-profile-gold':''}>{value}</b><span>{label}</span></div>)}</div>
+    {rows.length>0&&<div className="pro-season-results">{rows.slice(0,4).map(e=><ProResultRow key={e.id} event={e} first={first} open={()=>setDetailId(e.id)}/>)}{onSeeAll&&<Button variant="ghost" className="pro-profile-all" onClick={onSeeAll}>See all {allRows.length} results ›</Button>}</div>}
     {detail&&<ResultDetail event={detail} close={()=>setDetailId(null)}/>}
   </section>;
 }

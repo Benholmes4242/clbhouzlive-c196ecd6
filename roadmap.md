@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pro tiles, legacy chart and movers
+- [x] Implement season-only outlines/open rows, centred legacy dim null tiles, neutral tally bars/plot-only key and pick-style direction-only movers; buildOK.
+- [x] Add5tests, update only two authorized assertions in MergedAiry; focused34passed/2failed. Report files/counts/errors in PRO_TILES_LEGACY_MOVERS_REPORT.md.
+- [ ] STOP: new profileCoursesRecord.test.tsx:76 expected CSS var got empty; tourOverviewScorecardTap.test.tsx:54 expected28px avatar width got empty. Tests untouched after failure; shards/320px checks not run. Expected7496/655, existing notification parity stop untouched.
+
 ## Archive independent filters
 - [x] Reproduce before changes: actual zero-count Top100 remains selected with empty state, but region changes Global→GB&I; no All reset reproduced. Trace shared rail/parent/remount ownership without masking.
 - [x] Remove only forced region change; add three existing-file interaction tests with actual controls and controlled-region rerenders.

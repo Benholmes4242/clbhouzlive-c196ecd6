@@ -92,7 +92,7 @@ describe('Merged Airy lower sections', () => {
     const v = mount(<RoundMovementBand round={2} cards={[{ key: 'a', name: 'Player A', candidates: [], delta: 2, toPar: -2, gross: 70 }]} />);
     const movement = v.container.querySelector<HTMLElement>('[data-overview-movement]');
     expect(movement?.style.padding).toBe('12px 20px'); expect((movement?.children[1] as HTMLElement)?.style.marginTop).toBe('8px');
-    const card = movement?.querySelector<HTMLElement>('[data-overview-movement-card]'); expect(card?.style.padding).toBe('8px'); expect((card?.children[1] as HTMLElement)?.style.marginTop).toBe('6px');
+    const card = movement?.querySelector<HTMLElement>('[data-overview-movement-card]'); expect(card?.style.padding).toBe('7px'); expect((card?.children[1].children[1] as HTMLElement)?.style.marginTop).toBe('2px');
   });
   it('tightens leaders with a six-pixel gap and top hairline', () => {
     const group = { teeTime: '2026-11-01T12:00:00Z', startingHole: 1, players: [{ id: 'a', name: 'Player A' }] };

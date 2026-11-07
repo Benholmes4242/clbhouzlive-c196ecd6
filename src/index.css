@@ -36,6 +36,9 @@
 }
 
 :root {
+  --pro-season-outline: rgba(255,255,255,0.12);
+  --tour-mover-name: #FFFFFF;
+  --course-country-bar: rgba(248,250,252,0.55);
   --composer-golf-card: #141418;
   --composer-golf-line: rgba(255,255,255,.08);
   --composer-golf-edge: rgba(255,255,255,.14);
