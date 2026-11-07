@@ -2,8 +2,8 @@
 
 ## CR_CHIPS_1
 - [x] Replace creator video choices with shared Top 100 sm RailChips; retain wrapper gutters, counts and analytics; remove unused local chip CSS/token.
-- [ ] Run focused creator tests and four separate --maxWorkers=2 shards; stop on new failures, report each count and authorised selector old/new.
-- [ ] Report all four visual/filter checks; authenticated live profile checks unavailable with external unmanaged auth.
+- [x] Focused13/13; separate shards1,900/1,828/1,882/1,798 =7,408/645, zero failures; +2 named cases, existing selector-only change reported.
+- [x] CR_CHIPS_1_REPORT.md reports all four checks; isolated actual-component320/524 rendering fits centred, live authenticated placement/filtering unavailable with external unmanaged auth.
 
 ## FM1_FIX_1 — authorised test-only close-out
 - [x] Replace the unused raw stylesheet import with readFileSync inside the meta-padding test; both assertions and product code unchanged.
