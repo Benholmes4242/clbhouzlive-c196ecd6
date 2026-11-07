@@ -25,5 +25,11 @@ export function bagPayload(userId:string,slot:string,brand:string,model:string,d
  if(!BAG_SLOTS.includes(slot as typeof BAG_SLOTS[number])||!brand.trim()||brand.trim().length>60||model.length>80||detail.length>80)throw Error('Check the club type and brand.');
  return{user_id:userId,slot,brand:brand.trim(),model:model.trim()||null,detail:detail.trim()||null,business_id:businessId};
 }
-export function partnerPayload(userId:string,name:string,businessId:string|null){if(!name.trim()||name.trim().length>60)throw Error('Enter a partner name.');return{user_id:userId,name:name.trim(),business_id:businessId};}
+export function partnerPayload(userId:string,name:string,businessId:string|null,website?:string){
+ if(!name.trim()||name.trim().length>60)throw Error('Enter a partner name.');
+ let site:string|null=null;
+ const raw=website?.trim()??'';
+ if(raw){site=/^https?:\/\//i.test(raw)?raw:`https://${raw}`;if(!/^https?:\/\/\S+$/i.test(site)||site.length<10||site.length>200)throw Error('Check the website.');}
+ return{user_id:userId,name:name.trim(),business_id:businessId,website:site};
+}
 export function momentPayload(userId:string,year:number,text:string,isWin:boolean,currentYear=new Date().getFullYear()){if(!Number.isInteger(year)||year<1950||year>currentYear||!text.trim()||text.trim().length>120)throw Error('Check the year and career moment.');return{user_id:userId,year,text:text.trim(),is_win:isWin};}
