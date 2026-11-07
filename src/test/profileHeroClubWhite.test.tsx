@@ -54,7 +54,7 @@ describe('BRIEF_PROFILE_HERO_CLUB_WHITE', () => {
     // The name is the shared 26px hero title with no text shadow.
     expect(name.style.fontSize).toBe('26px');
     expect(name.style.fontWeight).toBe('800');
-    expect(name.style.letterSpacing).toBe('0px');
+    expect(name.style.letterSpacing).toBe('0');
     expect(name.style.lineHeight).toBe('1.1');
     expect(name.style.textShadow).toBe('');
   });

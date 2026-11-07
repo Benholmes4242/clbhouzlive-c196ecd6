@@ -112,7 +112,7 @@ describe('ALL_HEROES_MATCH business profile hero', () => {
     expect(cover.querySelector('[data-club-crest]')).not.toBeNull();
     const name = cover.querySelector('h1') as HTMLElement;
     expect(name.style.fontSize).toBe('26px');
-    expect(name.style.letterSpacing).toBe('0px');
+    expect(name.style.letterSpacing).toBe('0');
   });
   it('the pills follow directly below the cover; the -74px overlap is gone', () => {
     const { container } = hero();
