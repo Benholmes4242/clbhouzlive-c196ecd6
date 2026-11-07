@@ -39,7 +39,7 @@ These two columns must not be mixed: intervening Pro work changed the inventory 
 
 ### Inventory reconciliation
 
-PF1B: previous baseline **7,437 / 648** + **30 new cases in two files** − **4 retired cases in one file** = **7,463 / 648** (two new test files minus one deletion, with the baseline's file count already including the Stage 1 inventory; the executed PF1B total is the historical runner report).
+PF1B test count: previous baseline **7,437** + **30 new cases in two files** − **4 retired cases in one file** = **7,463**. The historical reports label both the Stage 1 baseline and PF1B as **648 files**, although two additions minus one deletion implies +1 file. That historical file-count inconsistency cannot be resolved without the original runner logs; **648 is carried as the reported PF1B file total, not independently reverified**. The fresh shard's 162-file count is directly verified.
 
 Later Pro work, not this close-out, changed **7,463 / 648 → 7,409 / 647**:
 
