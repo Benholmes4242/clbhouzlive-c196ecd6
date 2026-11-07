@@ -1,9 +1,9 @@
 # Roadmap
 
 ## PF3A_VIDEO — creator video details
-- [ ] Build single-video title/description, Details and add-item sheets, cover choices and timestamp chapters; preserve mixed/photo/edit and viewer surfaces.
-- [ ] Persist video details/credits/thanks non-blockingly, round-trip video_data drafts, and render video_credit like mentions in Activity.
-- [ ] Add tests, run focused and four separate shards; report cover path and six device checks. Separate upcoming LAST YEAR test stop stays untouched.
+- [x] Build single-video title/description, Details/add sheets, cover and timestamp rules; non-blocking metadata writes, video_data drafts and video_credit ledger routing; photo/mixed/edit/viewer surfaces retained.
+- [x] Add 41 tests in three files, existing tests unchanged; focused83/83. PF3A_VIDEO_REPORT.md records cover path, exact stop and all six check limits; build OK.
+- [ ] STOP: shards1/2 pass1936/1787; shard3 passes1910 with three unresolved upcomingLastYearBoard assertions at38/50/81. Not allowed-known under PF3A; shard4 stopped. Expected inventory7488/655. Test-only authorization needed for separate Tour assertions before fresh four-shard run; 320px/live publish/draft/notification checks unverified.
 
 ## Upcoming LAST YEAR condensed board
 - [x] Match upcoming rows/header to the live hero geometry; MiniBoard changes are exports only.
