@@ -1,5 +1,9 @@
 # Roadmap
 
+## Creator video filter centring follow-up
+- [ ] Match the small Top 100 region choices and centre the creator row without relying on Safari support for safe-centre alignment; preserve counts and filtering.
+- [ ] Run existing creator checks and verify mobile filter geometry; report test totals and live-access limits.
+
 ## CR_CHIPS_1
 - [x] Replace creator video choices with shared Top 100 sm RailChips; retain wrapper gutters, counts and analytics; remove unused local chip CSS/token.
 - [x] Focused13/13; separate shards1,900/1,828/1,882/1,798 =7,408/645, zero failures; +2 named cases, existing selector-only change reported.
