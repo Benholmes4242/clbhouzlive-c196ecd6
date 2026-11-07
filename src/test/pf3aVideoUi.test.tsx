@@ -36,12 +36,12 @@ async function addDetail(kind: typeof detailCases[number]['kind'], addLabel: str
   fireEvent.click(screen.getByRole('button', { name: addLabel }));
   if (kind === 'credits') {
     fireEvent.change(screen.getByRole('textbox', { name: 'Search people' }), { target: { value: 'Added' } });
-    fireEvent.click(await screen.findByRole('button', { name: 'Added Person' }));
+    fireEvent.click(await screen.findByRole('button', { name: /^Added Person/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Guest' }));
     fireEvent.click(screen.getByRole('button', { name: 'ADD CREDIT' }));
   } else if (kind === 'thanks') {
     fireEvent.change(screen.getByRole('textbox', { name: 'Search businesses' }), { target: { value: 'Added' } });
-    fireEvent.click(await screen.findByRole('button', { name: 'Added Club' }));
+    fireEvent.click(await screen.findByRole('button', { name: /^Added Club/ }));
     fireEvent.click(screen.getByRole('button', { name: 'ADD' }));
   } else {
     fireEvent.change(screen.getByRole('textbox', { name: kind === 'links' ? 'Link address' : 'Gear' }), { target: { value: kind === 'links' ? 'https://example.com/added' : 'Added Gear' } });
