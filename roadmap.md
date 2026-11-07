@@ -1,14 +1,20 @@
 # Roadmap
 
+## Authorized upcoming board test-only close-out
+- [x] Repair only the three named upcomingLastYearBoard assertions; add uppercase-style checks, retain winner band and all production code.
+- [x] Focused23/23; four separate shards1936/1787/1913/1851 passed. Full7487 passed+1 failed=7488/655; no inventory delta; report exact assertion repairs and counts.
+- [ ] STOP: unexpected notifRoute.parity.test.ts:318:46 missingFromPort=["video_credit"]. Left untouched; 320px upcoming hero/long-name check blocked by stop. FW1 known failure did not recur.
+
 ## PF3A_VIDEO — creator video details
 - [x] Build single-video title/description, Details/add sheets, cover and timestamp rules; non-blocking metadata writes, video_data drafts and video_credit ledger routing; photo/mixed/edit/viewer surfaces retained.
 - [x] Add 41 tests in three files, existing tests unchanged; focused83/83. PF3A_VIDEO_REPORT.md records cover path, exact stop and all six check limits; build OK.
-- [ ] STOP: shards1/2 pass1936/1787; shard3 passes1910 with three unresolved upcomingLastYearBoard assertions at38/50/81. Not allowed-known under PF3A; shard4 stopped. Expected inventory7488/655. Test-only authorization needed for separate Tour assertions before fresh four-shard run; 320px/live publish/draft/notification checks unverified.
+- [ ] STOP: fresh suite7487 passed+1 failed/655 after authorized Tour assertion repair; unexpected notification parity missing video_credit at notifRoute.parity.test.ts:318:46. Production untouched; live publish/draft/notification and320px checks unverified.
 
 ## Upcoming LAST YEAR condensed board
 - [x] Match upcoming rows/header to the live hero geometry; MiniBoard changes are exports only.
 - [x] Add seven cases and update four authorized existing geometry assertions; record files/old-new values in TOUR_UPCOMING_LAST_YEAR_REPORT.md.
-- [ ] STOP: focused 20 passed/3 failed; upcomingLastYearBoard.test.tsx:38/50 DOM casing and :81 GOLD_DARK assertions require test-only authorization. Four shards and 320px browser check not run; expected inventory 7,447/652 from baseline 7,440/651.
+- [x] Authorized casing/GOLD_DARK test repair; focused23/23, no production or other test change; full-suite counts in report.
+- [ ] 320px long-name browser check blocked by unexpected shard4 notification parity failure above.
 
 ## PF2_GUIDE — posting rebuild stage 2
 - [x] Composer: effectiveHoleGuide rule, mock A copy without "once it's approved", mock B locked-off switch + VisibilitySheet row tap, business actor hides row, golfPostPatch writes effective boolean both ways, state.addToGuide untouched on audience change, drafts unchanged. Edit mode writes no golf fields today — left alone and reported.

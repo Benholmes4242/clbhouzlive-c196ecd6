@@ -35,7 +35,8 @@ describe('upcoming LAST YEAR condensed board', () => {
     const view = mount();
     const block = view.container.querySelector<HTMLElement>('[data-overview-last-year]');
     const header = block?.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.textContent).toBe('LAST YEAR · 2025');
+    expect(header?.textContent).toBe('Last year · 2025');
+    expect(header?.style.textTransform).toBe('uppercase');
     expect(block?.style.paddingTop).toBe('12px');
     expect(block?.style.paddingBottom).toBe('');
     expect(header?.style.minHeight).toBe('24px');
@@ -47,7 +48,9 @@ describe('upcoming LAST YEAR condensed board', () => {
   it('omits the heading year when the displayed rows have different years', () => {
     fixture.rows[1].year = '2024';
     const view = mount();
-    expect(view.container.querySelector('[data-overview-last-year] [data-overview-board-header]')?.textContent).toBe('LAST YEAR');
+    const header = view.container.querySelector<HTMLElement>('[data-overview-last-year] [data-overview-board-header]');
+    expect(header?.textContent).toBe('Last year');
+    expect(header?.style.textTransform).toBe('uppercase');
   });
   it('uses the live row tracks and 22px ringless avatar for a non-winner without a flag', () => {
     const view = render(<LastYearRow rank="2" name="Fredrik Jacobson" score="−19" />);
@@ -78,7 +81,7 @@ describe('upcoming LAST YEAR condensed board', () => {
     expect(row.firstElementChild?.getAttribute('width')).toBe('14');
     expect(row.firstElementChild?.getAttribute('height')).toBe('14');
     expect(row.firstElementChild?.getAttribute('fill')).toBe(GOLD_DARK);
-    expect((row.lastElementChild as HTMLElement).style.color).toBe('rgb(251, 188, 46)');
+    expect((row.lastElementChild as HTMLElement).style.color).toBe('rgb(212, 160, 23)');
     expect(row.style.background).toBe('rgba(251, 188, 46, 0.1)');
     expect((row.lastElementChild as HTMLElement).style.fontSize).toBe('15px');
     expect(row.children).toHaveLength(3);
