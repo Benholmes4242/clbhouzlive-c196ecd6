@@ -1,5 +1,11 @@
 # Roadmap
 
+## Archive independent filters
+- [x] Reproduce before changes: actual zero-count Top100 remains selected with empty state, but region changes Global→GB&I; no All reset reproduced. Trace shared rail/parent/remount ownership without masking.
+- [x] Remove only forced region change; add three existing-file interaction tests with actual controls and controlled-region rerenders.
+- [x] Focused19/19; browser actual-control fixture confirms Top1000 stays selected/Global retained. Four shards1936/1790/1913/1851 passes,7490passed+1failed/655. ARCHIVE_FILTER_FIX_REPORT.md records evidence and +3 tests; production three-line deletion only; build OK.
+- [ ] STOP: notifRoute.parity.test.ts:318:46 missingFromPort=["video_credit"] not allowed-known; untouched. Hosted return-to-All not reproduced, cause unproven; no masking or speculative remount change.
+
 ## Authorized upcoming board test-only close-out
 - [x] Repair only the three named upcomingLastYearBoard assertions; add uppercase-style checks, retain winner band and all production code.
 - [x] Focused23/23; four separate shards1936/1787/1913/1851 passed. Full7487 passed+1 failed=7488/655; no inventory delta; report exact assertion repairs and counts.
