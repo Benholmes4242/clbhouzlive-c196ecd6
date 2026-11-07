@@ -36,7 +36,6 @@ import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
 import { SubmitBar } from '@/features/review-v2/components/SubmitBar';
 import { headerScore } from '@/features/review-v2/hooks/useReviewHeaderFacts';
 import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
-import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 import type { MediaItem } from '@/features/review-v2/types';
 
 afterEach(cleanup);
