@@ -416,47 +416,50 @@ describe('sponsor sheet', () => {
     await waitFor(() => expect(clicks).toContain('mason-essam-sponsor-sheet.png'));
     const [node, opts] = s.canvas.mock.calls[0];
     expect((node as HTMLElement).querySelector('[data-sponsor-card]')).toHaveStyle({ width: '360px' });
-    expect(opts).toEqual({ backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false, onclone: expect.any(Function) });
+    expect(opts).toEqual({ backgroundColor: '#0A0A0C', scale: 3, useCORS: true, logging: false });
     vi.restoreAllMocks();
   });
-  it('capture hides only the clone badge and paints PRO onto the canvas at the live rect', async () => {
-    const ctx = {
-      beginPath: vi.fn(), roundRect: vi.fn(), fill: vi.fn(), fillText: vi.fn(),
-      moveTo: vi.fn(), arc: vi.fn(), closePath: vi.fn(),
-      fillStyle: '', font: '', textAlign: '', textBaseline: '',
-    };
-    s.canvas.mockImplementationOnce(async () => ({
-      getContext: () => ctx,
-      toBlob: (cb: (b: Blob | null) => void) => cb(new Blob(['png'], { type: 'image/png' })),
-    }));
-    const clicks: string[] = [];
+  it('capture wraps html2canvas in a temporary img{display:inline-block} style on the live document', async () => {
+    let during: HTMLStyleElement | undefined;
+    s.canvas.mockImplementationOnce(async () => {
+      during = Array.from(document.head.querySelectorAll('style')).find(
+        (st) => st.textContent === 'img{display:inline-block}',
+      );
+      return { toBlob: (cb: (b: Blob | null) => void) => cb(new Blob(['png'], { type: 'image/png' })) };
+    });
     const realCreate = document.createElement.bind(document);
     vi.spyOn(document, 'createElement').mockImplementation((tag: string, ...rest: any[]) => {
       const el = realCreate(tag, ...rest);
-      if (tag === 'a') el.click = () => clicks.push((el as HTMLAnchorElement).download);
+      if (tag === 'a') el.click = () => {};
       return el;
     });
     mount(sheet());
-    const cap = document.querySelector('[data-sponsor-capture]') as HTMLElement;
-    const badge = cap.querySelector('.pro-ss-nm .pro-label') as HTMLElement;
-    const rect = (left: number, top: number, width: number, height: number) =>
-      ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top, toJSON: () => ({}) }) as DOMRect;
-    vi.spyOn(badge, 'getBoundingClientRect').mockReturnValue(rect(10, 20, 30, 12));
-    vi.spyOn(cap, 'getBoundingClientRect').mockReturnValue(rect(0, 0, 360, 600));
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Save image' }));
-    await waitFor(() => expect(ctx.fillText).toHaveBeenCalled());
-    const opts = s.canvas.mock.calls[0][1] as { onclone: (doc: Document) => void };
-    const cloneDoc = document.implementation.createHTMLDocument();
-    cloneDoc.body.innerHTML = '<div data-sponsor-capture><div class="pro-ss-nm"><span class="pro-label">PRO</span></div></div><div class="pro-ss-nm"><span class="pro-label">PRO</span></div>';
-    opts.onclone(cloneDoc);
-    const cloneBadges = cloneDoc.querySelectorAll('.pro-label');
-    expect((cloneBadges[0] as HTMLElement).style.visibility).toBe('hidden');
-    expect((cloneBadges[1] as HTMLElement).style.visibility).toBe('');
-    expect(ctx.roundRect).toHaveBeenCalledWith(30, 60, 90, 36, 18);
-    expect(ctx.textAlign).toBe('center');
-    expect(ctx.textBaseline).toBe('middle');
-    expect(ctx.fillText).toHaveBeenCalledWith('PRO', 75, 78);
+    await waitFor(() => expect(s.canvas).toHaveBeenCalled());
+    expect(during).toBeDefined();
+    await waitFor(() =>
+      expect(
+        Array.from(document.head.querySelectorAll('style')).some(
+          (st) => st.textContent === 'img{display:inline-block}',
+        ),
+      ).toBe(false),
+    );
+    const opts = s.canvas.mock.calls[0][1] as Record<string, unknown>;
+    expect(opts).not.toHaveProperty('onclone');
     vi.restoreAllMocks();
+  });
+  it('capture removes the inline-block style even when html2canvas rejects', async () => {
+    s.canvas.mockRejectedValueOnce(new Error('capture broke'));
+    mount(sheet());
+    fireEvent.click(within(dialog()).getByRole('button', { name: 'Save image' }));
+    await waitFor(() => expect(s.canvas).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(
+        Array.from(document.head.querySelectorAll('style')).some(
+          (st) => st.textContent === 'img{display:inline-block}',
+        ),
+      ).toBe(false),
+    );
   });
   it('the preview badge stays visible after a capture', async () => {
     const realCreate = document.createElement.bind(document);
