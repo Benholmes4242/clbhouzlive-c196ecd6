@@ -2,8 +2,8 @@
 
 ## FM1_FIX_1 — authorised test-only close-out
 - [x] Replace the unused raw stylesheet import with readFileSync inside the meta-padding test; both assertions and product code unchanged.
-- [ ] Run focused34/34, then four separate full-suite shard commands with --maxWorkers=2; stop on any new failure and report named known failures.
-- [ ] Update FM1_MUTE_1_REPORT.md with reconciled totals and close if green.
+- [x] Focused34/34; four separate --maxWorkers=2 shards passed1,898/1,828/1,882/1,798 =7,406/645 with zero failures; known Tour/sponsor failures did not recur. Inventory unchanged from7,405 pass+1 known failure.
+- [x] FM1_MUTE_1_REPORT.md closed with exact commands, unchanged assertions, setup ledger and totals; no product changes.
 
 ## Sponsor sheet export fixes
 - [x] Implement sheet-only measured result truncation, printed PRO/rank alignment and Career filtering; preserve profile Career.
@@ -20,7 +20,7 @@
 
 ## FM1_MUTE_1
 - [x] Move mounted-video sound and duration into playback-owned top-right group; isolate inputs and release meta width; preserve deck behavior.
-- [ ] STOP: focused33 passed/1 failed at fw1FeaturedDeck.test.tsx:151:18, `AssertionError: expected undefined to be defined` in new CSS meta-padding check. No failed-test repair or shards; log /tmp/fm1-mute/focused.log. Baseline7,307/643; nine added cases yield expected7,316/643, not executed total. FM1_MUTE_1_REPORT.md records ledger.
+- [x] CLOSED by FM1_FIX_1: authorised readFileSync setup repair preserves both assertions; focused34/34 and full suite7,406/645 green. Historical stop/log retained in FM1_MUTE_1_REPORT.md.
 - [ ] 390/320 geometry, long duration and live deck checks unverified after test stop; mounted toggle/gesture/fallback/next-mute cases pass. External unmanaged auth also blocks legitimate member end-to-end checks.
 
 ## Pro profile build2
