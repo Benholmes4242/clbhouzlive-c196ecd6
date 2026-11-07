@@ -5,7 +5,7 @@
 .pro-profile-source { font-size:10px; font-weight:700; color:var(--pro-profile-dim); text-align:right; }
 .pro-profile-card { background:var(--pro-profile-card); border:1px solid var(--pro-profile-hair); border-radius:20px; padding:16px; }
 .pro-profile-kicker { font-size:9px; font-weight:800; letter-spacing:.1em; color:var(--pro-profile-mute); }
-.pro-profile-card h3 { margin:8px 0 0; font-size:18px; font-weight:800; line-height:1.25; overflow-wrap:anywhere; }
+.pro-profile-card h3 { margin:8px 0 0; font-size:15px; font-weight:800; line-height:1.25; overflow-wrap:anywhere; }
 .pro-profile-venue { margin-top:3px; font-size:12.5px; color:var(--pro-profile-mute); }
 .pro-profile-tiles { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
 .pro-profile-tile { min-width:0; padding:12px 10px; border-radius:14px; background:var(--pro-profile-card); border:1px solid var(--pro-profile-hair); }
@@ -47,7 +47,7 @@
 .pro-profile-sheet .pro-profile-tiles { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .pro-profile-sheet .pro-profile-rounds { gap:8px; }
 .pro-profile-sheet .pro-profile-tile b { font-size:18px; }
-.pro-profile-footnote { font-size:12px; line-height:1.45; color:var(--pro-profile-dim); margin-top:12px; }
+.pro-profile-footnote { font-size:11.5px; line-height:1.45; color:var(--pro-profile-dim); margin-top:12px; }
 .pro-profile-form { display:grid; gap:12px; }
 .pro-profile-form label { display:grid; gap:6px; font-size:12px; color:var(--pro-profile-mute); }
 .pro-profile-form input { width:100%; min-width:0; height:40px; padding:8px 10px; border:1px solid var(--pro-profile-rule); border-radius:8px; background:var(--pro-profile-card); color:var(--pro-profile-ink); }
@@ -56,9 +56,9 @@
 .pro-profile-error { color:var(--pro-profile-mute); font-size:12px; }
 .pro-profile-live-position { display:flex; align-items:flex-end; justify-content:space-between; margin-top:16px; }
 .pro-profile-live-position strong { font-size:40px; font-weight:800; line-height:.9; }
-.pro-profile-live-position small { font-size:13px; color:var(--pro-profile-mute); margin-left:6px; }
+.pro-profile-live-position small { font-size:12px; color:var(--pro-profile-mute); margin-left:6px; }
 .pro-profile-live-score { text-align:right; }
-.pro-profile-live-score b { font-size:24px; font-weight:800; }
+.pro-profile-live-score b { font-size:19px; font-weight:800; }
 .pro-profile-live-score span { display:block; font-size:11.5px; color:var(--pro-profile-dim); }
 .pro-profile-holes { display:grid; grid-template-columns:repeat(18,minmax(0,1fr)); gap:3px; margin-top:14px; }
 .pro-profile-holes i { height:6px; border-radius:2px; background:var(--pro-profile-rule); }

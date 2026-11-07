@@ -68,6 +68,19 @@ describe('FIX3 pro profile section scale', () => {
     expect(rule('.pro-partner-tile>span:last-child')).toContain('font-size:11px');
   });
 
+  it('live card figures follow the golfer headline scale', () => {
+    expect(rule('.pro-profile-live-position strong')).toContain('font-size:40px');
+    const score = rule('.pro-profile-live-score b');
+    expect(score).toContain('font-size:19px');
+    expect(score).toContain('font-weight:800');
+    const h3 = rule('.pro-profile-card h3');
+    expect(h3).toContain('font-size:15px');
+    expect(h3).toContain('font-weight:800');
+    expect(h3).toContain('line-height:1.25');
+    expect(rule('.pro-profile-live-position small')).toContain('font-size:12px');
+    expect(rule('.pro-profile-footnote')).toContain('font-size:11.5px');
+  });
+
   it('Ask section titles and body follow the scale mapping', () => {
     expect(rule('.pro-ask-card b')).toContain('font-size:12.5px');
     expect(rule('.pro-ask-card small')).toContain('font-size:11.5px');
