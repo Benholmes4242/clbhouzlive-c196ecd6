@@ -1,5 +1,9 @@
 # Roadmap
 
+## Authorized upcoming board test-only close-out
+- [x] Repair only the three named upcomingLastYearBoard assertions; add uppercase-style checks, retain winner band and all production code.
+- [ ] Run two focused files and four separate two-worker shards; only FW1 meta-line may be known. Check 320px upcoming hero with a long name and report shard totals.
+
 ## PF3A_VIDEO — creator video details
 - [x] Build single-video title/description, Details/add sheets, cover and timestamp rules; non-blocking metadata writes, video_data drafts and video_credit ledger routing; photo/mixed/edit/viewer surfaces retained.
 - [x] Add 41 tests in three files, existing tests unchanged; focused83/83. PF3A_VIDEO_REPORT.md records cover path, exact stop and all six check limits; build OK.
