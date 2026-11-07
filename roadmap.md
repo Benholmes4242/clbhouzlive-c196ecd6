@@ -2,13 +2,15 @@
 
 ## FEED_PHOTO_GRID
 - [x] Add pure four-photo eligibility and shared grid rendering/taps/loading; preserve video/small sets/words-first frames.
-- [x] Add22cases (14helper/8mounted); focused50/50. Shard1:1983passed/1failed; stop at tourOverviewPicksChipsFullBoard.test.tsx:130:30 expected '1 1 0%' received '1'. No assertion repair; shards2–4 blocked by authorization.
-- [x] Isolated actual grid320×844: upright5 height400/wide12 height287.344, width320, gap2, cap539, index2taps and no page errors. FEED_PHOTO_GRID_REPORT.md records limits/counts; live Clubhouse/business shells and fullscreen remain unverified.
+- [x] Add22cases (14helper/8mounted); fresh focused50/50 after authorised one-line chips fixture repair. Shared shards1:1984passed;2:1824passed/1unexpected failure;3–4 stopped.
+- [x] Actual CardFeed/LightCardFeed→FeedCard320×844 fixtures: upright5 height400/wide12 height287.344, width320, gap2, cap539, zero final page errors. Updated FEED_PHOTO_GRID_REPORT.md; live page chrome/data/fullscreen remain unverified.
+- [ ] Shared suite blocked by unauthorised tourHeroRefinements.test.tsx:98:19 Needs assertion expected length1 got0; no repair/rerun.
 
 ## OVERVIEW_TIGHT_CHIPS
 - [x] Tighten picks/movers to 46px two-line chips; remove chip NEEDS and gross/brackets only; shorten English intros and preserve PicksSheet.
 - [x] Update authorized obsolete assertions and two direct-mount prop sets; add3cases. Focused115passed/1failed across7files.
-- [ ] STOP: tourOverviewPicksChipsFullBoard.test.tsx:130:30 new flex assertion expected '1 1 0%' received '1'. No repair, shards or320px checks after failure; report in OVERVIEW_TIGHT_CHIPS_REPORT.md.
+- [x] Authorised only line130 flex assertion accepts1 or1 1 0%; chips focused116/116. Actual overview320px: picks/movers all46px, long names ellipsise, confined x20–300. Updated OVERVIEW_TIGHT_CHIPS_REPORT.md.
+- [ ] Shared shards3–4 blocked by unexpected tourHeroRefinements.test.tsx:98:19 Needs assertion expected length1 got0; existing test untouched.
 
 ## PRO_BADGE_W1
 - [x] Apply CSS-only pearl plate, highlight and island-ratio corners; preserve badge copy, sizes, callers and non-pro ticks.

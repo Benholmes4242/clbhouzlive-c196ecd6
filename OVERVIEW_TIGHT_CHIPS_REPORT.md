@@ -1,5 +1,47 @@
 # Tour overview tight pick and mover chips
 
+## Authorised test-only close-out — 7 November 2026
+Changed **only** `src/test/tourOverviewPicksChipsFullBoard.test.tsx:130`, in “uses a 46px border-box chip for a pre-round tee with a 1px gap”:
+- Old: `expect(text?.style.flex).toBe('1 1 0%');`
+- New: `expect(['1', '1 1 0%']).toContain(text?.style.flex);`
+Reason: accepts jsdom's authored shorthand and the equivalent expanded form. Production unchanged. No tests added, removed, renamed or otherwise rewritten in this close-out; count delta **0**.
+
+### Fresh focused and shared shard results
+The seven-file chips command recorded below now passes **116/116**; the five-file photo-grid focused command passes **50/50**. Logs: `/tmp/chips-grid-closeout/chips-focused.log`, `grid-focused.log`.
+
+Each shard was invoked once using `bunx vitest run --maxWorkers=2 --shard=N/4`:
+| Shard | Passed | Failed | Executed | Files |
+|---|---:|---:|---:|---:|
+| 1/4 | 1,984 | 0 | 1,984 | 167 passed |
+| 2/4 | 1,824 | 1 | 1,825 | 166 passed, 1 failed |
+| 3/4 | Not run | — | — | Stop rule |
+| 4/4 | Not run | — | — | Stop rule |
+
+Executed combined: **3,808 passed + 1 failed = 3,809 tests / 334 files**. Full-suite result remains unavailable. Last green baseline **7,607/664** + tight-chips **3 tests/1 file** + photo-grid **22 tests/2 files** = expected scope **7,632 tests/667 files**; this is a reconciled expectation, not an executed full-suite total. The assertion repair does not change counts.
+
+**Unexpected failure — stopped, not classified as known:**
+```text
+FAIL src/test/tourHeroRefinements.test.tsx > Tour hero refinements > renders the Needs gross as a separate untruncated white figure and omits leading/level picks
+AssertionError: expected  to have a length of 1 but got +0
+src/test/tourHeroRefinements.test.tsx:98:19
+expect(lines).toHaveLength(1);
+Expected: 1; Received: 0
+```
+The test still expects the removed chip NEEDS subtree. It was not changed, skipped or rerun. Repair is outside this one-line authorisation. No FW1 meta-line failure appeared in the executed shards. Logs retained at `/tmp/chips-grid-closeout/shard1.log` and `shard2.log`.
+
+### 320px verification completed independently of the test blocker
+Browser rendered **actual HeroBoardSection, CardFeed and LightCardFeed → FeedCard → FeedPhotoGrid** at **320×844**, using fixture data and real global CSS; network hooks, side-effect modules, secondary panels and virtual-list mounting were isolated in a temporary harness. No production changes, sign-in or guest creation. This verifies the real row/feed-list/card composition, not authenticated page data or complete page chrome.
+- **Overview picks:** three chips, each **46px**, confined to x20–300; long surnames have `text-overflow: ellipsis`, 37px visible width versus 174px content width. No horizontal overflow.
+- **Overview movers:** three chips, each **46px**, confined to x20–300; long surnames ellipsise, 36px visible width versus 174px content width. No horizontal overflow.
+- **Clubhouse, 5 upright photos:** actual CardFeed, grid320×400px, gap2px, cap539px, feed scrollWidth/clientWidth320/320.
+- **Clubhouse, 12 wide photos:** actual CardFeed, grid320×287.344px, gap2px, cap539px, feed scrollWidth/clientWidth320/320.
+- **Business feed, 5 upright photos:** actual LightCardFeed with business author and mediaFirst, grid320×400px, gap2px, cap539px, feed scrollWidth/clientWidth320/320.
+- **Business feed, 12 wide photos:** actual LightCardFeed with business author and mediaFirst, grid320×287.344px, gap2px, cap539px, feed scrollWidth/clientWidth320/320.
+
+Final run: **zero page errors**. Screenshots inspected: chip names visibly ellipsise and +1/+8 photo overlays render. Fixture/results/screenshots: `/tmp/browser/chips-grid-closeout/`. Earlier temporary-harness dependency/identifier/subscription errors were resolved only in `/tmp`; final measurements above come from the successful run. Real-device/live-page reads and fullscreen interaction remain outside this fixture check. Latest preview log: **build OK**, `2026-11-07T19:11:10Z`.
+
+The original stopped build report below is retained as history; the repaired flex blocker and previously unrun 320px checks are superseded by this section.
+
 ## Status: stopped on one new test assertion
 Production presentation changes are applied. Focused verification: **115 passed,1 failed,116 executed/7 files**. No failing test was repaired, skipped or deleted. Full shards and320px checks were not run after this unexpected failure.
 

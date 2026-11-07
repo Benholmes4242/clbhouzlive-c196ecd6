@@ -127,7 +127,7 @@ describe('picks chips (Board B)', () => {
     expect(card?.style.height).toBe('46px');
     expect(card?.style.boxSizing).toBe('border-box');
     const text = card?.querySelector<HTMLElement>('[data-overview-pick-text]');
-    expect(text?.style.flex).toBe('1 1 0%');
+    expect(['1', '1 1 0%']).toContain(text?.style.flex);
     expect(text?.style.overflow).toBe('hidden');
   });
 });
