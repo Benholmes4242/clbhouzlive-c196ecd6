@@ -265,10 +265,10 @@ export function computeBoardColumns(
     rounds,
     cellW: CELL_W,
     gap: GRID_GAP,
-    /* AMBER IS A ROUND IN PROGRESS. `started` only knows that scores
-       exist for the current round, which stays true forever once the
-       event ends — so the final round wore amber permanently. The
-       event's own status is what settles it. */
+    /* GREEN IS A ROUND IN PROGRESS (TOUR_LIVE_GREEN). `started` only knows
+       that scores exist for the current round, which stays true forever
+       once the event ends — so the final round stayed marked permanently.
+       The event's own status is what settles it. */
     liveRound: started && !complete ? currentRound as number : null,
     showThru,
     showPrize,
@@ -301,15 +301,15 @@ export function boardRoundsWidth(c: BoardColumns): number {
 /**
  * ONE grid template shared by the header strip and every body row.
  */
-export function boardGridTemplate(c: BoardColumns): string {
+export function boardGridTemplate(c: BoardColumns, chrome?: { thruW?: number; totW?: number }): string {
   if (c.preTournament) return `minmax(0,1fr) ${PRE_TEE_W}px`;
-  /* The first column is AUTO: the places-moved mark plus the position, plus
-     the 8px the name starts after. Names step in and out with the width of
-     the mark and position — they do NOT line up in a column (signed-off B2). */
+  /* ONE flexible ID cell: the places-moved mark, the position and the name,
+     with the name stepping 8px after its own mark/position pair — names do
+     NOT line up in a column (signed-off B2, kept 8 Nov 2026). */
   return [
-    'auto', 'minmax(0,1fr)',
-    ...c.rounds.map(r => `${c.liveRound === r ? 28 : 26}px`),
-    '32px', '40px', c.showPrize ? `${PRIZE_W}px` : '',
+    'minmax(0,1fr)',
+    ...c.rounds.map(() => `${c.cellW}px`),
+    `${chrome?.thruW ?? THRU_W}px`, `${chrome?.totW ?? TOT_W}px`, c.showPrize ? `${PRIZE_W}px` : '',
   ].filter(Boolean).join(' ');
 }
 
@@ -355,8 +355,8 @@ function resolveLayout(
   /* The name track is the row width minus the figure columns, minus the
      WIDEST position-and-mark cluster on the board, minus the 8px the name
      starts after the position. No face takes any width. */
-  const markFont = `700 9.5px ${F}`;
-  const posFont = `700 13px ${F}`;
+  const markFont = `800 9.5px ${F}`;
+  const posFont = `700 12.5px ${F}`;
   const widestCluster = entries.reduce((maximum, entry) => {
     if (isDemoted(entry.status)) return Math.max(maximum, measureText(statusWord(entry.status), `700 10px ${F}`));
     const pos = entry.position == null ? '' : `${entry.position_tied ? 'T' : ''}${entry.position}`;
