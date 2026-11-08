@@ -17,22 +17,19 @@
 .tour-stat-label { margin-top:4px; font-size:9.5px; font-weight:700; letter-spacing:.14em; color:var(--tour-board-dim); }
 .tour-board-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:20px 18px 6px; font-size:10.5px; font-weight:800; letter-spacing:.16em; color:var(--tour-board-amber); }
 .tour-board-kicker small { font-size:11.5px; font-weight:600; letter-spacing:.02em; color:var(--tour-board-dim); }
-.tour-board-position { display:flex; flex-direction:column; align-items:flex-start; gap:3px; }
-.tour-board-movement { font-size:9px; font-weight:700; line-height:1; }
-.tour-board-player { display:flex; align-items:center; gap:10px; min-width:0; }
+.tour-board-cluster { display:flex; align-items:baseline; gap:3px; padding-right:8px; min-width:0; }
+.tour-board-movement { font-size:9.5px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.tour-board-player { display:flex; align-items:center; min-width:0; }
 .tour-board-who { min-width:0; flex:1; }
 .tour-board-name { display:flex; align-items:center; gap:5px; font-size:14px; font-weight:600; color:var(--tour-board-ink); }
 .tour-board-name-text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
 .tour-board-star { flex:none; font-size:11px; color:var(--tour-board-amber); }
-.tour-board-avatar { flex:none; }
-.tour-board-avatar, .tour-board-avatar > div { aspect-ratio:1!important; border-radius:10px!important; }
-.tour-hole-strip { display:flex; gap:1.5px; margin-top:6px; height:4px; }
-.tour-hole-strip i { flex:1; min-width:0; border-radius:1px; background:var(--tour-board-empty); }
-.tour-hole-strip .tour-nine-gap { flex:0 0 3px; background:transparent; }
-.tour-tie { position:absolute; left:41px; width:1.5px; border-radius:1px; background:var(--tour-board-tie); pointer-events:none; }
-.tour-tie-first { top:50%; bottom:0; }
-.tour-tie-middle { top:0; bottom:0; }
-.tour-tie-last { top:0; bottom:50%; }
+.tour-hole-tiles { display:flex; gap:2px; min-width:0; }
+.tour-hole-tiles i { flex:1; min-width:0; height:16px; border-radius:3px; display:flex; align-items:center; justify-content:center; font-style:normal; font-size:10px; font-weight:700; font-variant-numeric:tabular-nums; }
+.tour-hole-tiles .tour-hole-tiles-gap { flex:0 0 4px; height:auto; background:transparent; }
+.tour-board-key { display:flex; gap:12px; flex-wrap:wrap; padding:10px 16px 0; font-size:10.5px; color:var(--tour-board-mute); }
+.tour-board-key span { display:inline-flex; align-items:center; gap:5px; }
+.tour-board-key i { width:10px; height:10px; border-radius:2px; display:inline-block; }
 .tour-round-expand { overflow:hidden; max-height:0; transition:max-height 260ms ease; }
 .tour-round-expand[data-open=true] { max-height:360px; }
 .tour-round-card { margin:2px 12px 12px; padding:12px; border:1px solid var(--tour-board-line); border-radius:16px; background:var(--tour-board-panel); }
