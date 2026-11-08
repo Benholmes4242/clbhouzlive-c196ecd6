@@ -9,49 +9,46 @@
  * 11. Nothing goes below 10.
  */
 /**
- * ChampionStrip — gold-tinted single-player strip.
- * Reused by Results (champion / playoff winner) and Upcoming (defending champion / fallbacks).
- * §5.2.1 + §5.3 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
+ * ChampionStrip — THE champion block (.tv-champion), shared by the tournament
+ * page and the Tour overview on a completed event: a 46px face inside a GOLD
+ * squircle ring, CHAMPION in gold, the name at 18px/800, the score at
+ * 26px/800 with "BY {words}" beneath, then the narrative line. No trophy
+ * icon, no flag. Styles live in championStrip.css, scoped to .tv-champion so
+ * they resolve off .tournament-v3. The old overview strip presentation was
+ * removed when the overview adopted this block — nothing else used it.
  */
 
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { CHAMPION_STRIP_WASH, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '../../../_shared/tokens';
-import { getScoreColor } from '../../../_shared/scoreColor';
+import { GOLD } from '../HybridHero.constants';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ActiveRing } from '@/features/find-people/ActiveRing';
-import CountryFlag from '@/components/ui/country-flag';
+import './championStrip.css';
 
 interface ChampionStripProps {
   name: string;
-  country?: string;
   score: string;
-  /** Numeric to-par behind `score` — drives the canonical getScoreColor treatment (CORRECTION 1: score is to-par colour, never gold). */
+  /** Numeric to-par behind `score` — drives the canonical under-par treatment (never gold). */
   scoreValue?: number | null;
   scoreLabel?: string;
   eyebrow?: string;
-  eyebrowIcon?: LucideIcon;
   /** Full shared resolver walk; preserve the player's identity on every miss. */
   avatarCandidates?: string[];
   playerKey?: string | null;
-  /** Pass 5.5: italic editorial narrative beneath the name. */
-  narrative?: string | null;
-  presentation?: 'tournament';
-  narrativeParts?: {text:string;bold?:boolean}[];
+  /** championNarrative parts: the how-it-was-won line beneath the block. */
+  narrativeParts?: { text: string; bold?: boolean }[];
 }
 
+/** --tv-panel (#121216): the ring's 2px gap reads the block's own ground. */
+const TV_PANEL = '#121216';
 
 /** The champion's face carries a GOLD squircle ring AROUND it — the same
- *  constant as the CHAMPION label and trophy (the tournament presentation's
- *  --tv-gold resolves to the same #FBBC2E). Built on ActiveRing exactly like
- *  the pick ring: 1.5px ring, 2px gap in the strip's own background, then the
- *  avatar at 34%. The avatar keeps hideRing — no grey hairline inside. */
-function PlayerHead({ size = 42, avatarCandidates, name, playerKey, gapColor }: { size?: number; avatarCandidates?: string[]; name: string; playerKey?: string | null; gapColor: string }) {
+ *  constant as the CHAMPION label (--tv-gold resolves to the same #FBBC2E).
+ *  Built on ActiveRing exactly like the pick ring: 1.5px ring, 2px gap in
+ *  the block's background, then the avatar at 34%. The avatar keeps
+ *  hideRing — no grey hairline inside. */
+function PlayerHead({ size = 46, avatarCandidates, name, playerKey }: { size?: number; avatarCandidates?: string[]; name: string; playerKey?: string | null }) {
   return (
-    <ActiveRing active surface="canvas" gapColor={gapColor} ringColor={GOLD}>
+    <ActiveRing active surface="canvas" gapColor={TV_PANEL} ringColor={GOLD}>
       <SquircleAvatar
         srcCandidates={avatarCandidates}
         alt={name}
@@ -65,135 +62,37 @@ function PlayerHead({ size = 42, avatarCandidates, name, playerKey, gapColor }: 
 
 export function ChampionStrip({
   name,
-  country,
   score,
   scoreValue,
   scoreLabel,
   eyebrow,
-  eyebrowIcon: EyebrowIcon = Trophy,
   avatarCandidates,
   playerKey,
-  narrative,
-  presentation,
   narrativeParts,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
   const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
-  const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
-  if(presentation==='tournament')return <section className="tv-champion" data-tv-section="champion"><div className="tv-champion-top"><PlayerHead size={46} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} gapColor="#121216"/><div><div className="tv-champion-label">{resolvedEyebrow}</div><div className="tv-champion-name">{name}</div></div><div className="tv-champion-score"><b className={scoreValue!=null&&scoreValue<0?'tv-under':''}>{score}</b>{scoreLabel&&<small>{scoreLabel}</small>}</div></div>{narrativeParts&&narrativeParts.length>0&&<p className="tv-champion-line">{narrativeParts.map((p,i)=>p.bold?<b key={i}>{p.text}</b>:<span key={i}>{p.text}</span>)}</p>}</section>;
   return (
-    <div
-      style={{
-        background: SURFACE,
-        padding: hasNarrative ? '10px 20px 12px' : '10px 20px',
-        minHeight: hasNarrative ? undefined : STRIP_HEIGHT,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: hasNarrative ? 6 : 0,
-        borderTop: `0.5px solid ${WHITE_ALPHA_06}`,
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: CHAMPION_STRIP_WASH,
-          pointerEvents: 'none',
-        }}
-      />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
-        <PlayerHead size={42} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} gapColor={SURFACE} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-            <span
-              style={{
-                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-                fontWeight: 700,
-                letterSpacing: '0.18em',
-                color: GOLD,
-                textTransform: 'uppercase',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-              }}
-            >
-              <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
-              {resolvedEyebrow}
-            </span>
-            {country && <CountryFlag country={country} size="sm" />}
-          </div>
-          <div
-            style={{
-              fontSize: 17,
-              fontWeight: 700,
-              color: 'white',
-              letterSpacing: 0,
-              display: 'block',
-              whiteSpace: 'normal',
-              lineHeight: 1.1,
-            }}
-          >
-            {name}
-          </div>
+    <section className="tv-champion" data-tv-section="champion">
+      <div className="tv-champion-top">
+        <PlayerHead size={46} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} />
+        <div>
+          <div className="tv-champion-label">{resolvedEyebrow}</div>
+          <div className="tv-champion-name">{name}</div>
         </div>
-        <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-          <div
-            style={{
-              ...NUMERIC_STYLE,
-              fontSize: 26,
-              // Weight matches the board's TOT figures below (700) — the
-              // champion's score must not read lighter than the same figure
-              // in row 1 of the board.
-              fontWeight: 700,
-              // CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): the score takes the
-              // canonical to-par ramp — red under par, muted even — never gold.
-              // Gold stays on the eyebrow, trophy glyph and avatar ring only.
-              color: getScoreColor(scoreValue ?? null, 'dark'),
-              letterSpacing: 0,
-              lineHeight: 1,
-              fontFeatureSettings: '"tnum" 1, "kern" 1',
-            }}
-          >
-            {score}
-          </div>
-          {scoreLabel && (
-            <div
-              style={{
-                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.50)',
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                marginTop: 2,
-              }}
-            >
-              {scoreLabel}
-            </div>
-          )}
+        <div className="tv-champion-score">
+          <b className={scoreValue != null && scoreValue < 0 ? 'tv-under' : ''}>{score}</b>
+          {scoreLabel && <small>{scoreLabel}</small>}
         </div>
       </div>
-
-      {hasNarrative && (
-        <div
-          aria-label="Tournament narrative"
-          style={{
-            position: 'relative',
-            color: WHITE_ALPHA_65,
-            fontSize: 12,
-            fontWeight: 400,
-            fontStyle: 'italic',
-            lineHeight: 1.4,
-            letterSpacing: 0,
-            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          }}
-        >
-          {narrative}
-        </div>
+      {narrativeParts && narrativeParts.length > 0 && (
+        <p className="tv-champion-line">
+          {narrativeParts.map((p, i) => (p.bold ? <b key={i}>{p.text}</b> : <span key={i}>{p.text}</span>))}
+        </p>
       )}
-    </div>
+    </section>
   );
 }
+
+export default ChampionStrip;
