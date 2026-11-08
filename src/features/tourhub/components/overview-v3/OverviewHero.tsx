@@ -31,6 +31,9 @@ import { resolveChampionEntry } from '../../_shared/boardEntity';
 import { deriveHeroState, isChampionResolvable, isInPlayState } from './HybridHero.utils';
 import { boardPhaseFor } from './HybridHeroBands/HeroBoardBand';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
+import { useHeroFullBoard } from './useHeroFullBoard';
+import { FullBoardSheet } from '../../tournament-v2/sections/FullBoardSheet';
+import { hasStrokeBoard } from '../../_shared/eventFormat';
 
 const NOOP = () => {};
 
@@ -178,7 +181,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // positions); boardRound is null there, so no TODAY. Same query
   // key as HybridHero.tsx, so a completed slide is a cache hit.
   const boardTournamentId = !heroState || heroState.kind === 'upcoming' ? null : viewingTid;
-  const { data: boardLeaderboard, isLoading: boardLeaderboardLoading } = useTourLeaderboard(boardTournamentId ?? '');
+  const { data: boardLeaderboard, isLoading: boardLeaderboardLoading, dataUpdatedAt: boardUpdatedAt } = useTourLeaderboard(boardTournamentId ?? '');
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
   const boardRound = heroState && isInPlayState(heroState) ? heroState.round : null;
 
@@ -193,6 +196,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const bandTournamentId = viewingTid;
   const bandPhase = heroState ? boardPhaseFor(heroState) : 'upcoming';
   const championGate = heroState ? isChampionResolvable(heroState) : false;
+  const fullBoardAvailable = !!boardTournamentId && hasStrokeBoard(activeSlide?.tournament.eventType ?? null) && shouldShowOverviewBoard(boardEntries);
+  const fullBoard = useHeroFullBoard(boardTournamentId, !!heroState && isInPlayState(heroState), fullBoardAvailable);
 
 
   // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
@@ -305,6 +310,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             activeTournamentId={active.tournament.id}
             onSelectTour={NOOP}
             onOpenTournament={openTournament}
+            onFullBoard={fullBoardAvailable ? fullBoard.onOpen : undefined}
           />
         </motion.div>
       </AnimatePresence>
@@ -332,6 +338,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             eventTourCode={activeSlide?.tournament.pickTourCode}
             eventSeasonYear={activeSlide?.tournament.seasonYear}
             entries={boardEntries}
+            onFullBoard={fullBoardAvailable ? fullBoard.onOpen : undefined}
+            boardUpdatedAt={boardUpdatedAt}
             leaderboardLoading={boardLeaderboardLoading}
             eventType={activeSlide?.tournament.eventType ?? null}
             currentRound={boardRound}
@@ -357,6 +365,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         </motion.div>
       )}
     </AnimatePresence>
+    {fullBoardAvailable && boardTournamentId ? <FullBoardSheet open={fullBoard.open} onClose={fullBoard.onClose} tournamentId={boardTournamentId} meta={fullBoard.meta} entries={boardEntries} /> : null}
     </>
   );
 

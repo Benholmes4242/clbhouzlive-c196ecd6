@@ -1,11 +1,11 @@
 /**
  * MiniBoard - TD1 top-5 compressed board.
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
- * Single-line hero rows never read hole data or render marks/key; the shared
- * scorecard sheet owns those reads. Row tap opens ScorecardSheet on every theme; a row with no player id
+ * Hero rows remain single-line; only an open hero panel reads its selected round.
+ * Other themes retain direct ScorecardSheet taps. A row with no player id
  * (a team row) is not tappable.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
@@ -30,6 +30,8 @@ import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { formatTimeHm24 } from '@/i18n/format';
 
 import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
+import { HeroRoundPanel } from './HeroRoundPanel';
+import { heroDefaultRound, heroStartedRounds } from './heroRoundRules';
 
 type Row = BoardEntry;
 
@@ -77,6 +79,8 @@ interface Props {
   totalRounds?: number | null;
   /** Hero-only opt-in: the movers band owns the preceding seam. */
   afterMovers?: boolean;
+  onFullBoard?: () => void;
+  boardUpdatedAt?: number;
 }
 
 /**
@@ -233,9 +237,19 @@ export function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null, presentation, winnerPlayerId, afterMovers = false }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null, presentation, winnerPlayerId, afterMovers = false, onFullBoard, boardUpdatedAt = 0 }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
+  const [expanded, setExpanded] = useState<{ playerId: string; round: number } | null>(null);
+  const [emptyRounds, setEmptyRounds] = useState<Record<string, number[]>>({});
+  useEffect(() => { setExpanded(null); setEmptyRounds({}); setTarget(null); }, [tournamentId]);
+  const confirmEmpty = useCallback((round: number) => {
+    if (!expanded) return;
+    setEmptyRounds(previous => {
+      const known = previous[expanded.playerId] ?? [];
+      return known.includes(round) ? previous : { ...previous, [expanded.playerId]: [...known, round] };
+    });
+  }, [expanded]);
   const rows = entries.slice(0, limit);
   const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
   const nameTrackRef = useRef<HTMLDivElement>(null);
@@ -356,7 +370,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   if (theme === 'heroBoard') {
     return (
       <>
-        <div style={{ background: T.surface, fontFamily: FONT, paddingTop: afterMovers ? 0 : 12 }}>
+        <div className="hero-expand-board" style={{ background: T.surface, fontFamily: FONT, paddingTop: afterMovers ? 0 : 12 }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 24, padding: `2px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
             {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
@@ -383,6 +397,21 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                one player's id; a team row has none, and a member's individual card
                is not the team's round. So a team row is not a control at all. */
             const tappable = !!r.player?.id;
+            const pid = r.player?.id;
+            const isOpen = !!pid && expanded?.playerId === pid;
+            const started = heroStartedRounds(r, currentRound).filter(rd => !(emptyRounds[pid ?? ''] ?? []).includes(rd));
+            const defaultRound = heroDefaultRound(started, currentRound);
+            const openScorecard = () => {
+              if (!pid) return;
+              setTarget({ playerId: pid, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null, position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null });
+            };
+            const toggle = () => {
+              if (!pid) return;
+              onRowTap?.(pid);
+              if (isOpen) { setExpanded(null); return; }
+              if (defaultRound == null) { openScorecard(); return; }
+              setExpanded({ playerId: pid, round: defaultRound });
+            };
             const memberNames = (r.team?.members ?? []).map((m) => m.player?.full_name?.trim()).filter(Boolean).join(', ');
             const teamTitle = r.team?.display_name?.trim() || r.team?.abbr_name?.trim() || '';
             const labelName = entity.kind === 'team'
@@ -391,26 +420,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             const rowLabel = t('overview.board.rowLabel', { name: labelName, position: posText, score: r.score == null ? '' : fmtScore(r.score) });
             const RowTag = tappable ? Button : 'div';
             return (
-              <RowTag
-                key={r.id}
-                {...(tappable ? { type: 'button' as const, variant: 'ghost' as const, 'aria-haspopup': 'dialog' as const } : { role: 'group' })}
+              <Fragment key={r.id}><RowTag
+                data-hero-board-row={r.id}
+                {...(tappable ? { type: 'button' as const, variant: 'ghost' as const, role: 'button', tabIndex: 0, 'aria-expanded': isOpen, 'aria-controls': isOpen ? `hero-round-${pid}` : undefined, 'aria-haspopup': defaultRound == null ? 'dialog' as const : undefined } : { role: 'group' })}
                 aria-label={rowLabel}
-                onClick={tappable ? () => {
-                  const pid = r.player?.id;
-                  if (!pid) return;
-                  onRowTap?.(pid);
-                  setTarget({
-                    playerId: pid,
-                    playerName: entity.lines[0] ?? '',
-                    countryCode: r.player?.country_code ?? r.player?.country ?? null,
-                    position: r.position ?? null,
-                    positionTied: r.position_tied ?? null,
-                    total: r.score ?? null,
-                    today,
-                    thru: r.thru ?? null,
-                    status: r.status ?? null,
-                  });
-                } : undefined}
+                onClick={tappable ? toggle : undefined}
+                onKeyDown={tappable ? event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); } } : undefined}
                 style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gap: heroGap, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: showHeroShape ? `5px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
@@ -430,7 +445,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 {showHeroToday ? (
-                  <div style={{ ...HERO_NUM, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme) }}>{today == null ? BLANK : fmtScore(today)}</div>
+                  <div data-hero-selected-score={isOpen && expanded?.round === currentRound} style={{ ...HERO_NUM, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme) }}>{today == null ? BLANK : fmtScore(today)}</div>
                 ) : null}
                 {showHeroShape ? (
                   <div data-hero-shape style={{ ...HERO_NUM, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', minWidth: 0 }}>
@@ -451,13 +466,14 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   const val = heroRoundScore(r, rd, currentRound);
                   const tee = val == null && rd === teeRound && r.player?.id ? teesByPlayer.get(r.player.id) : null;
                   return (
-                    <div key={rd} data-hero-round={rd} data-hero-tee={tee ? true : undefined} style={{ ...HERO_NUM, fontSize: tee ? 11 : 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: tee ? WHITE_ALPHA_45 : getScoreColor(val, scoreTheme) }}>
+                    <div key={rd} data-hero-round={rd} data-hero-selected-score={isOpen && expanded?.round === rd} data-hero-tee={tee ? true : undefined} style={{ ...HERO_NUM, fontSize: tee ? 11 : 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: tee ? WHITE_ALPHA_45 : getScoreColor(val, scoreTheme) }}>
                       {val == null ? tee ?? BLANK : fmtScore(val)}
                     </div>
                   );
                 })}
                 <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
               </RowTag>
+              {isOpen && expanded && pid ? <HeroRoundPanel key={pid} tournamentId={tournamentId} playerId={pid} round={expanded.round} rounds={totalRounds ?? Math.max(...heroCols.rounds, currentRound ?? 1)} startedRounds={started} boardUpdatedAt={boardUpdatedAt} onRound={round => setExpanded({ playerId: pid, round })} onEmpty={confirmEmpty} onFull={openScorecard} /> : null}</Fragment>
             );
           };
           if (topTieLength === 0) return rows.map((r, i) => renderRow(r, i, false));
@@ -476,6 +492,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             </>
           );
           })()}
+          {onFullBoard ? <Button variant="ghost" className="hero-full-leaderboard" data-hero-full-leaderboard data-field-size={entries.length} onClick={onFullBoard}>
+            {t('overview.board.fullLeaderboard', { defaultValue: 'Full leaderboard' })}
+            <span className="hero-full-leaderboard-count">{t('overview.board.fieldSize', { count: entries.length, defaultValue_one: '{{count}} player', defaultValue_other: '{{count}} players', defaultValue: `${entries.length} ${entries.length === 1 ? 'player' : 'players'}` })}<b aria-hidden="true">›</b></span>
+          </Button> : null}
         </div>
 
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />

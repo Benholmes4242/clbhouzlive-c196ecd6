@@ -84,10 +84,10 @@ import {PicksBlock} from './PicksBlock';
 
 
 /**
- * FIVE rows: the leading positions shown on the hero board. The board sits
+ * TEN rows: the leading positions shown on the hero board. The board sits
  * below the photo band, so no chrome clearance applies here.
  */
-export const HERO_BOARD_ROWS = 5;
+export const HERO_BOARD_ROWS = 10;
 
 export function shouldShowOverviewBoard(entries: Array<{
   position?: number | null; score?: number | null;
@@ -234,6 +234,8 @@ interface HeroBoardSectionProps {
   /** Venue par (to-par → gross conversion for the picks sheet's required round). */
   venuePar?: number | null;
   onRowTap?: (playerId: string) => void;
+  onFullBoard?: () => void;
+  boardUpdatedAt?: number;
 }
 
 /**
@@ -313,6 +315,8 @@ export function HeroBoardSection({
   venuePar = null,
   totalRounds = null,
   onRowTap,
+  onFullBoard,
+  boardUpdatedAt = 0,
   leaderboardLoading = false,
   eventType = null,
   eventName,
@@ -476,7 +480,9 @@ export function HeroBoardSection({
           totalRounds={totalRounds}
           tournamentId={tournamentId}
           entries={entries}
-          limit={5}
+          limit={10}
+          onFullBoard={onFullBoard}
+          boardUpdatedAt={boardUpdatedAt}
           currentRound={currentRound}
           theme="heroBoard"
           afterMovers={movementCards.length > 0 && currentRound != null}
