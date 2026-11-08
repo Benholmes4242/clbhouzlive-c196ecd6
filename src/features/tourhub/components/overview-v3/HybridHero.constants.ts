@@ -34,6 +34,11 @@ export const PHOTO_BAND_HEIGHT = 340;   // 360 -> 306 -> 260 -> 286 -> 244 -> 34
  * story and StoryPage's hero — which this brief does not touch. Lowering the
  * shared constant would silently shorten both.
  */
+/* THE LIVE HEIGHT. EXCEPTION: on the Tour overview only, finished and
+ * upcoming bands are SHORTER by exactly the live-only lines they don't
+ * render (sentence + round spine), derived in PhotoBand from
+ * OVERVIEW_SENTENCE_BLOCK / OVERVIEW_SPINE_BLOCK. Every other photo hero in
+ * the app stays at 350. */
 export const OVERVIEW_PHOTO_BAND_HEIGHT = HERO_PHOTO_HEIGHT;
 
 export const STRIP_HEIGHT = 62;

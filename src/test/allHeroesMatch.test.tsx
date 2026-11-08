@@ -165,7 +165,9 @@ describe('HERO_350 — every photo hero is 350px with the notch counted inside',
     const constants = src('features/tourhub/components/overview-v3/HybridHero.constants.ts');
     expect(constants).toContain('OVERVIEW_PHOTO_BAND_HEIGHT = HERO_PHOTO_HEIGHT');
     const photoBand = src('features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx');
-    expect(photoBand).toContain('height: photoBandHeight(heightPx)');
+    // The overview band derives from the 350 live height minus the live-only
+    // lines a state doesn't render (sentence / round spine blocks).
+    expect(photoBand).toContain('height: photoBandHeight(bandHeight)');
   });
   it('the Courses page, amateur and course-detail heroes all read the 350 constant', () => {
     expect(src('components/courses/CoursesPageHero.tsx')).toContain('height: EXPLORE_COURSE_HERO_HEIGHT');

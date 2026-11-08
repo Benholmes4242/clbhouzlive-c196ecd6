@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -17,7 +18,7 @@ vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes', () => ({ usePic
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet', () => ({ PicksSheet: () => null }));
 vi.mock('@/features/tourhub/leaderboard/ScorecardSheet', () => ({ ScorecardSheet: () => null }));
 
-import { PhotoBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
+import { PhotoBand, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_BLOCK } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
 import { HeroBoardSection, RoundMovementBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { ChampionStrip } from '@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip';
 import { LeadersGroupContent } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup';
@@ -30,10 +31,11 @@ const field: BoardEntry[] = [{ id: 'a', position: 1, score: -6, round_1: -4, rou
 const photo = (state: HeroState, onOpen = vi.fn(), onFullBoard?: () => void) => <PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl="https://example.test/course.jpg" state={state} tourLabel="PGA" leader={{ score: -6, faces: [], caps: 'A' }} countdown={[{ value: 2, label: 'days' }]} startDay={null} segments={[{ text: 'Figure ', figure: false }, { text: '6', figure: true }]} note="Note" onOpen={onOpen} onFullBoard={onFullBoard} />;
 
 describe('Merged Airy photo', () => {
-  it.each(states)('puts the sentence and note on the 350px photo in $kind', state => {
+  it.each(states)('puts the sentence and note on the photo in $kind at the derived height', state => {
     const v = mount(photo(state));
     const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
-    expect(band?.style.height).toBe('350px');
+    // Live keeps 350; states without the round spine drop exactly its block.
+    expect(band?.style.height).toBe(`${state.kind === 'live' ? 350 : 350 - OVERVIEW_SPINE_BLOCK}px`);
     expect(band?.querySelector('[data-overview-photo-situation]')).not.toBeNull();
     expect(band?.querySelector('[data-overview-situation-note]')).not.toBeNull();
     expect(v.container.querySelector('[data-overview-situation]')).toBeNull();
@@ -55,6 +57,13 @@ describe('Merged Airy photo', () => {
     fireEvent.click(band); fireEvent.keyDown(band, { key: 'Enter' }); fireEvent.keyDown(band, { key: ' ' }); expect(open).toHaveBeenCalledTimes(3);
   });
   it('omits Full board when no opener is available', () => { mount(photo(states[0])); expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull(); });
+  it('a finished band with no sentence drops both live-only lines', () => {
+    const v = mount(<PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl={null} state={states[2]} tourLabel="PGA" leader={null} countdown={[]} startDay={null} segments={[]} note={null} onOpen={() => {}} />);
+    const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
+    expect(band?.style.height).toBe(`${350 - OVERVIEW_SENTENCE_BLOCK - OVERVIEW_SPINE_BLOCK}px`);
+    expect(band?.querySelector('[data-overview-photo-situation]')).toBeNull();
+    expect(band?.querySelector('[data-overview-round-spine]')).toBeNull();
+  });
 });
 
 describe('Merged Airy lower sections', () => {
@@ -100,9 +109,21 @@ describe('Merged Airy lower sections', () => {
     const section = v.container.querySelector<HTMLElement>('[data-leaders-group]'); expect(section?.style.padding).toBe('14px 20px 12px'); expect(section?.style.marginTop).toBe('6px'); expect(section?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
     expect(section?.querySelector<HTMLElement>('[data-leaders-group-state]')?.style.marginTop).toBe('6px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-header]')?.style.marginTop).toBe('10px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-row]')?.style.minHeight).toBe('33px');
   });
-  it('tightens narrative champion spacing and preserves the no-narrative strip', () => {
-    const v = mount(<ChampionStrip name="Player A" score="−6" narrative="Narrative" />); const root = v.container.firstElementChild as HTMLElement;
-    expect(root.style.padding).toBe('10px 20px 12px'); expect(root.style.gap).toBe('6px'); v.unmount();
-    const plain = mount(<ChampionStrip name="Player A" score="−6" />); expect((plain.container.firstElementChild as HTMLElement).style.padding).toBe('10px 20px'); expect((plain.container.firstElementChild as HTMLElement).style.minHeight).toBe('62px');
+  it('renders the shared champion block with the narrative line and a gold ring, tighter and faded', () => {
+    const v = mount(<ChampionStrip name="Player A" score="−6" scoreValue={-6} narrativeParts={[{ text: 'Led all week.' }]} />);
+    const block = v.container.querySelector('.tv-champion');
+    expect(block).not.toBeNull();
+    expect(block?.querySelector('.tv-champion-line')?.textContent).toBe('Led all week.');
+    expect(block?.querySelector('[data-active-ring="on"]')).not.toBeNull();
+    v.unmount();
+    const plain = mount(<ChampionStrip name="Player A" score="−6" />);
+    expect(plain.container.querySelector('.tv-champion-line')).toBeNull();
+    // The chrome lives in championStrip.css (jsdom drops imported styles):
+    // 10px vertical padding, no border-bottom, 16px top/bottom fade mask.
+    const css = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/championStrip.css', 'utf8');
+    expect(css).toContain('padding: 10px 20px;');
+    expect(css).not.toContain('border-bottom:');
+    expect(css).toContain('mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);');
+    expect(css).toContain('linear-gradient(90deg, rgba(251,188,46,.12), rgba(251,188,46,0) 70%), var(--tv-panel)');
   });
 });

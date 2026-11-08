@@ -208,7 +208,8 @@ export const TOPAR_EVEN_DARK   = 'rgba(242,244,247,0.42)';
 // ============================================================================
 export const STATUS_LIVE = '#10B981';
 export const STATUS_LIVE_ON_DARK = '#5EE9A6';                 // live green that reads on dark hero gradients (STATUS_LIVE is too dark there)
-export const LIVE_INK = '#34D77F';                           // readable LIVE green text on DARK bg — counterpart to STATUS_LIVE — 7 cross-app files
+export const TOUR_LIVE_GREEN = '#34D77F';                    // THE live green: Tour island LIVE caption, hero round-spine live node, hero board current-round header — amber is reserved for the viewer
+export const LIVE_INK = TOUR_LIVE_GREEN;                     // readable LIVE green text on DARK bg — counterpart to STATUS_LIVE — 7 cross-app files
 export const STATUS_LIVE_TINT_10 = 'rgba(16,185,129,0.10)';  // LIVE pill faint green fill — 3 cross-app sites
 export const STATUS_LIVE_BORDER = 'rgba(16,185,129,0.32)';   // LIVE pill border — 2 cross-app sites
 export const LIVE_DOT = '#22C55E';                            // bright pulse-dot green (green-500) — animated LIVE indicators — 7 cross-app files

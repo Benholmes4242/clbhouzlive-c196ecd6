@@ -18,6 +18,8 @@ import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { championNarrative, copy as tvCopy, words as tvWords } from '../../tournament-v2/data/tournamentRules';
+import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { situationSegments, visibleSituationNote } from '../../overview/situationCopy';
 import { roundsFromSchedule } from './HybridHero.utils';
 import { tournamentHeadlineSegments } from '../../overview/magazineCopy';
@@ -71,23 +73,6 @@ export function formatOverviewDateRange(startDate: string, endDate?: string | nu
     `${day(start)} ${month(start)}`,
     `${day(end)} ${month(end)}`,
   ].join(' – ');
-}
-
-/**
- * CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): score and margin are separate
- * registers. `score` is the bare fmtScore figure (coloured by getScoreColor in
- * ChampionStrip); the wonBy/playoff qualifier travels in `scoreLabel` and
- * renders beneath the score in muted caps. formatOverviewChampionScore's
- * single-string "−17 · by 2" form is withdrawn.
- */
-export function overviewChampionScoreLabel(
-  playoff: boolean,
-  margin: number | null,
-  t: (key: string, options?: { count: number }) => string,
-): string | undefined {
-  if (playoff) return t('overview.hero.playoff');
-  if (margin != null) return t('overview.hero.wonBy', { count: margin });
-  return undefined;
 }
 
 /**
@@ -212,7 +197,6 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
             .filter((r): r is number => typeof r === 'number' && Number.isFinite(r)) // to-par: 0 and negatives are real rounds
         : [],
       closingRound: closingGross(championEntry?.round_4, tournament.venuePar),
-      country: championEntry?.player?.country_code || championEntry?.player?.country || undefined,
     };
   }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName, tournament.venuePar]);
 
@@ -224,6 +208,16 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
         headshotOverride: tournament.winnerHeadshotOverride,
       })
     : [];
+
+  /* The overview's champion block IS the tournament page's: same narrative
+     (championNarrative over the FULL field) and the same "BY {words}" score
+     label rule as TournamentPage. The meta it reads is assembled from the
+     slide's tournament fields. */
+  const championMeta = useMemo(
+    () => ({ winner_id: tournament.winnerId, venue_par: tournament.venuePar, start_date: tournament.startDate }) as TournamentMeta,
+    [tournament.winnerId, tournament.venuePar, tournament.startDate],
+  );
+  const showChampion = isChampionResolvable(state) && champion != null;
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
@@ -256,9 +250,13 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
         startDay={startDay}
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
-        segments={situation}
+        /* A finished event with a champion drops the sentence and the "Full
+           board ›" link — the champion block tells the story and the Full
+           leaderboard button under the board does the navigation. Live and
+           upcoming keep both. */
+        segments={showChampion ? [] : situation}
         note={situationNote}
-        onFullBoard={fullBoardAvailable ? openFullBoard : undefined}
+        onFullBoard={fullBoardAvailable && !showChampion ? openFullBoard : undefined}
       />
       {fullBoardAvailable && !onFullBoard ? (
         <FullBoardSheet
@@ -269,16 +267,16 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
           entries={rows}
         />
       ) : null}
-      {isChampionResolvable(state) && champion ? (
+      {showChampion && champion ? (
         <ChampionStrip
           name={champion.name}
           score={fmtScore(champion.score)}
           scoreValue={champion.score}
-          scoreLabel={overviewChampionScoreLabel(champion.playoff, champion.margin, t)}
+          scoreLabel={!champion.playoff && champion.margin != null ? tvCopy('by', { words: tvWords(champion.margin).toUpperCase() }) : undefined}
           eyebrow={t('overview.hero.champion')}
           avatarCandidates={championAvatarCandidates}
           playerKey={tournament.winnerKey}
-          country={champion.country}
+          narrativeParts={championNarrative(championMeta, rows)}
         />
       ) : null}
     </>

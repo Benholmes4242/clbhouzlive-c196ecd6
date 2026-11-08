@@ -24,10 +24,11 @@ import { useTourPickerRows } from '../hooks/useTourPickerRows';
 import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourSelection } from '../context/TourSelectionContext';
+import { TOUR_LIVE_GREEN } from '../_shared/tokens';
 
 const INK = '#F8FAFC';
 const DIM = 'rgba(248,250,252,0.42)';
-const GREEN = '#34D77F';
+const GREEN = TOUR_LIVE_GREEN;
 
 /**
  * What the island shows for the current tab and tour in view. Shared by the

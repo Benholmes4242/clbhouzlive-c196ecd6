@@ -7,7 +7,8 @@ import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BOARD_GEOMETRY, BoardTable, computeBoardColumns, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
-import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { copy as tvCopy, words as tvWords } from '@/features/tourhub/tournament-v2/data/tournamentRules';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { PhotoBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
@@ -15,6 +16,7 @@ import { buildLeaderTrio } from '@/features/tourhub/components/overview-v3/Hybri
 import { countInWords, pickMovementCards } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import type { HeroState } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { MiniBoard, heroBoardColumns, heroTieRoles, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { TOUR_LIVE_GREEN } from '@/features/tourhub/_shared/tokens';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -98,11 +100,9 @@ describe('Tour Overview Design A hero facts', () => {
     expect(detectTopTie([{ score: -18 }, { score: -18 }, { score: -17 }])).toEqual({ count: 2, score: '−18' });
   });
 
-  it('keeps the wonBy/playoff qualifier in the separate scoreLabel register', () => {
-    const t = (key: string, options?: { count: number }) => key.endsWith('playoff') ? 'playoff' : `by ${options?.count}`;
-    expect(overviewChampionScoreLabel(false, 2, t)).toBe('by 2');
-    expect(overviewChampionScoreLabel(true, null, t)).toBe('playoff');
-    expect(overviewChampionScoreLabel(false, null, t)).toBeUndefined();
+  it('uses the tournament page\'s "BY {words}" rule for the champion score label', () => {
+    expect(tvCopy('by', { words: tvWords(2).toUpperCase() })).toBe('BY TWO');
+    expect(tvCopy('by', { words: tvWords(5).toUpperCase() })).toBe('BY FIVE');
   });
 
   it('does not invent a tie when the rest of the field merely shares the leader score', () => {
@@ -510,6 +510,18 @@ describe('BRIEF_TOUR_OVERVIEW_MOCK_EXACT coverage', () => {
       }
       view.unmount();
     }
+  });
+
+  it('(a2) the live spine node is TOUR_LIVE_GREEN — the island green, never amber', () => {
+    const view = render(createElement(PhotoBand, { title: 'Event', venueName: null, datesString: null, venueImageUrl: null, state: { kind: 'live', round: 2, totalRounds: 4 }, tourLabel: null, leader: null, countdown: [], startDay: null, onOpen: () => {} }));
+    const node = view.container.querySelector('[data-round-node="live"]');
+    const dot = node?.querySelector<HTMLElement>('span[aria-hidden]');
+    const label = node?.querySelectorAll<HTMLElement>('span')[1];
+    expect(dot?.style.background).toBe('rgb(52, 215, 127)'); // TOUR_LIVE_GREEN #34D77F
+    expect(dot?.style.boxShadow).toBe('0 0 0 3px rgba(52,215,127,0.18)');
+    expect(label?.style.color).toBe('rgb(52, 215, 127)');
+    expect(TOUR_LIVE_GREEN).toBe('#34D77F');
+    view.unmount();
   });
 
   it('(b) countInWords is words for 2–10 and a numeral past 10; the trio caps state the TRUE count', () => {

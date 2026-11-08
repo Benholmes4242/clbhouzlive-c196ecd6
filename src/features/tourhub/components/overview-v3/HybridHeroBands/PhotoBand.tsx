@@ -21,6 +21,19 @@ import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
 import { heroStateLine } from './heroStateLine';
 
 
+/** THE LIVE-ONLY LINES, measured from the same constants that style them.
+ *  The overview band shrinks by exactly these amounts on states that don't
+ *  render them (finished loses both, upcoming loses the spine), so the
+ *  kicker and title land exactly where a live hero puts them. */
+export const OVERVIEW_SENTENCE_FONT_SIZE = 13.5;
+export const OVERVIEW_SENTENCE_LINE_HEIGHT = 1.4;
+export const OVERVIEW_SENTENCE_MARGIN_TOP = 9;
+export const OVERVIEW_SENTENCE_BLOCK = OVERVIEW_SENTENCE_FONT_SIZE * OVERVIEW_SENTENCE_LINE_HEIGHT + OVERVIEW_SENTENCE_MARGIN_TOP;
+export const OVERVIEW_SPINE_LABEL_SIZE = 9.5;
+export const OVERVIEW_SPINE_LABEL_LINE_HEIGHT = 1.2;
+export const OVERVIEW_SPINE_MARGIN_TOP = 10;
+export const OVERVIEW_SPINE_BLOCK = OVERVIEW_SPINE_LABEL_SIZE * OVERVIEW_SPINE_LABEL_LINE_HEIGHT + OVERVIEW_SPINE_MARGIN_TOP;
+
 export interface HeroLeaderTrio {
   score: number;
   /** At most three faces; a longer tie still states its true count in `caps`. */
@@ -84,6 +97,13 @@ export function PhotoBand({
     startDay: isUpcoming ? startDay : null,
   });
 
+  /* THE BAND IS SHORTER by exactly each live-only line this state doesn't
+     render — the sentence and the round spine — so finished and upcoming
+     heroes keep the live text geometry with no spacer. Live stays 350. */
+  const bandHeight = heightPx
+    - (segments.length > 0 ? 0 : OVERVIEW_SENTENCE_BLOCK)
+    - (inPlay ? 0 : OVERVIEW_SPINE_BLOCK);
+
   return (
     <div
       role="button"
@@ -101,7 +121,7 @@ export function PhotoBand({
         position: 'relative',
         display: 'block',
         width: '100%',
-        height: photoBandHeight(heightPx),
+        height: photoBandHeight(bandHeight),
         margin: 0,
         padding: 0,
         overflow: 'hidden',
@@ -180,7 +200,7 @@ export function PhotoBand({
           </div>
         ) : null}
         </div>
-        {segments.length > 0 ? <p data-overview-photo-situation style={{ margin: '9px 0 0', fontSize: 13.5, lineHeight: 1.4, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
+        {segments.length > 0 ? <p data-overview-photo-situation style={{ margin: `${OVERVIEW_SENTENCE_MARGIN_TOP}px 0 0`, fontSize: OVERVIEW_SENTENCE_FONT_SIZE, lineHeight: OVERVIEW_SENTENCE_LINE_HEIGHT, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
           {segments.map((segment, index) => segment.figure ? <strong key={index} style={{ fontWeight: 700, fontStyle: 'normal', color: 'var(--th-text-primary)', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' }}>{segment.text}</strong> : <span key={index}>{segment.text}</span>)}
         </p> : null}
         {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
@@ -193,13 +213,14 @@ export function PhotoBand({
 /**
  * A.1 THE ROUND SPINE — one node per round, a connector between consecutive
  * nodes. In-play states only (the caller gates it): never upcoming, never a
- * finished result. Amber here is the round in progress, as on every Tour surface.
+ * finished result. GREEN means live (TOUR_LIVE_GREEN, the island's LIVE
+ * caption green); amber is reserved for the viewer.
  */
 function RoundSpine({ round, totalRounds }: { round: number; totalRounds: number }) {
   const { t } = useTranslation('tourhub');
   const nodes = Array.from({ length: Math.max(0, totalRounds) }, (_, i) => i + 1);
   return (
-    <div data-overview-round-spine style={{ display: 'flex', alignItems: 'center', marginTop: 10 }}>
+    <div data-overview-round-spine style={{ display: 'flex', alignItems: 'center', marginTop: OVERVIEW_SPINE_MARGIN_TOP }}>
       {nodes.map((n, i) => {
         const live = n === round;
         const done = n < round;
@@ -207,8 +228,8 @@ function RoundSpine({ round, totalRounds }: { round: number; totalRounds: number
           <div key={n} style={{ display: 'contents' }}>
             {i > 0 ? <span aria-hidden style={{ flex: 1, height: 1, background: OVERVIEW.spine.connector, margin: '0 7px' }} /> : null}
             <span data-round-node={live ? 'live' : done ? 'done' : 'todo'} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flex: 'none' }}>
-              <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: live ? OVERVIEW.amber : done ? OVERVIEW.spine.done : OVERVIEW.spine.todo, boxShadow: live ? OVERVIEW.spine.liveHalo : undefined }} />
-              <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: live ? OVERVIEW.amber : OVERVIEW.spine.label }}>{t('overview.hero.roundNode', { round: n })}</span>
+              <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: live ? OVERVIEW.spine.live : done ? OVERVIEW.spine.done : OVERVIEW.spine.todo, boxShadow: live ? OVERVIEW.spine.liveHalo : undefined }} />
+              <span style={{ fontSize: OVERVIEW_SPINE_LABEL_SIZE, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: OVERVIEW_SPINE_LABEL_LINE_HEIGHT, color: live ? OVERVIEW.spine.live : OVERVIEW.spine.label }}>{t('overview.hero.roundNode', { round: n })}</span>
             </span>
           </div>
         );

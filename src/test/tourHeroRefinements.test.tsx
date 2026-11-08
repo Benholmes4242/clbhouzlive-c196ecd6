@@ -56,6 +56,8 @@ describe('Tour hero refinements', () => {
     expect(header?.textContent).not.toContain('TODAY');
     expect(header?.textContent).not.toContain('ROUNDS');
     expect(v.container.querySelectorAll('[data-hero-shape]').length).toBe(0);
+    const r3 = Array.from(header?.children ?? []).find(el => el.textContent === 'R3') as HTMLElement | undefined;
+    expect(r3?.style.color).toBe('rgb(52, 215, 127)'); // TOUR_LIVE_GREEN, not amber
   });
   it('shows the on-course today score in the current-round cell at full strength', () => {
     const v = board(field.map(e => ({ ...e, today: -2, today_round: 3, thru: 4 })));

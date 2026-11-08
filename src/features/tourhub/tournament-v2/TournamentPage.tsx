@@ -260,7 +260,7 @@ export function TournamentPage() {
       >
       <div className="tournament-v3" style={{fontFamily:FONT}}>
         <TournamentHero nameRef={nameRef} meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl}/>
-        {pulse.state==='completed' && champion?.player && champion.score!=null && <ChampionStrip presentation="tournament" name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={score(champion.score)} scoreValue={champion.score} scoreLabel={runner?.score!=null?copy('by',{words:words(runner.score-champion.score).toUpperCase()}):undefined} narrativeParts={championNarrative(meta,leaderboardRows)}/>}
+        {pulse.state==='completed' && champion?.player && champion.score!=null && <ChampionStrip name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={score(champion.score)} scoreValue={champion.score} scoreLabel={runner?.score!=null?copy('by',{words:words(runner.score-champion.score).toUpperCase()}):undefined} narrativeParts={championNarrative(meta,leaderboardRows)}/>}
         {pulse.state==='completed' && strokeBoard && <RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
         <section id="the-act">
           {situationCopy ? <div data-tournament-situation><SituationBand segments={situationCopy} note={situationNote} /></div> : null}
