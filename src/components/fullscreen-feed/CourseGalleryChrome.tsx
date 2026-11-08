@@ -92,6 +92,7 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
       <div className="course-gallery-top">
         <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.close', { defaultValue: 'Close' })} onClick={onClose}><X size={16} /></Button>
         <div className="course-gallery-heading"><b>{options.courseName}</b><span data-gallery-count>{grid ? t('media.gallery.gridCount', { count: list.length, filter: label(options.filter), defaultValue: `${list.length} ${shotWord(list.length)} · ${label(options.filter)}` }) : t('media.gallery.count', { i: Math.min(pager + 1, list.length), n: list.length, filter: label(options.filter), defaultValue: `${Math.min(pager + 1, list.length)} of ${list.length} · ${label(options.filter)}` })}</span></div>
+        {!grid && <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.share', { defaultValue: 'Share' })} onClick={() => void share()}><Share size={16} /></Button>}
         <Button variant="ghost" className="course-gallery-circle course-gallery-grid-toggle" aria-label={t(grid ? 'media.gallery.fullscreen' : 'media.gallery.grid', { defaultValue: grid ? 'Full screen' : 'Grid view' })} aria-pressed={grid} onClick={() => { setGrid(on => !on); void analyticsEvents.track('course_gallery_grid_toggle', { on: !grid }); }}>{grid ? <ImageIcon size={16} /> : <Grid2X2 size={16} />}</Button>
       </div>
       <div className="course-gallery-filters">{galleryFilters(data.shots).map(({ filter, count }) => {
