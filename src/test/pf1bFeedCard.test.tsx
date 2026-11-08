@@ -173,9 +173,16 @@ describe('PF1B feed card golf context', () => {
   });
 
   it('renders a post with no context exactly as before', () => {
-    const { container } = renderCard();
-    expect(screen.queryByTestId('post-hole-chip')).toBeNull();
-    expect(screen.queryByTestId('post-round-row')).toBeNull();
-    expect(container.innerHTML).toMatchSnapshot();
+    // Pin the clock so the relative timestamp ("1d" from the 6 Nov fixture) never drifts with the real date.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-07T12:00:00Z'));
+    try {
+      const { container } = renderCard();
+      expect(screen.queryByTestId('post-hole-chip')).toBeNull();
+      expect(screen.queryByTestId('post-round-row')).toBeNull();
+      expect(container.innerHTML).toMatchSnapshot();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
