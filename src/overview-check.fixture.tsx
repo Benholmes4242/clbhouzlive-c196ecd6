@@ -3,6 +3,8 @@ import {createRoot} from 'react-dom/client';
 import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import '/src/index.css';
+import '/src/styles/theme.css';
+import '/src/styles/theme-tokens.css';
 import '/src/i18n';
 import {PhotoBand} from '/src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
 import {ChampionStrip} from '/src/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip';
