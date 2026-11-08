@@ -7,6 +7,11 @@
  * FLOOR: a floor that wins on some device changes the aspect there and makes
  * every crop frame a lie. Do not re-add one; if content stops fitting, report.
  *
+ * THE 350px PHOTO HERO RULE (heroHeights.ts): every photographic hero renders
+ * 350px tall with the notch counted inside. At 350px the hero's shape runs
+ * from about 0.91 (320pt) to 1.23 (430pt), so the crop frames below are a
+ * best-fit shape, not an exact match — the hero's cover fit crops them.
+ *
  * Clearance arithmetic (content must clear safe-area + 62 island row + stack):
  *  - Personal band at 39/34 (340px tall at a 390px width) carries the kicker
  *    row, the 56px identity row and a 14px foot; the aspect wins everywhere.
@@ -16,8 +21,8 @@
  */
 export const PERSONAL_COVER_ASPECT = 39 / 34;
 export const PERSONAL_COVER_ASPECT_CSS = '39 / 34';
-export const BUSINESS_COVER_ASPECT = 1;
-export const BUSINESS_COVER_ASPECT_CSS = '1 / 1';
+export const BUSINESS_COVER_ASPECT = 39 / 34;
+export const BUSINESS_COVER_ASPECT_CSS = '39 / 34';
 
 /** The member avatar is rendered square by SquircleAvatar at every size, so
  *  its crop is square. Deliberately SEPARATE from BUSINESS_COVER_ASPECT even

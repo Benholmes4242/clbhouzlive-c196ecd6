@@ -12,7 +12,7 @@
 import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
-import { BUSINESS_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
+import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
 /* The hero's FALLBACK GROUND, shown only when there is no cover photo.
@@ -355,10 +355,12 @@ export const HeroShell: React.FC<HeroShellProps> = ({
            `coverBroken` is set by onError after first paint, so gating on it
            would collapse the block post-paint - a worse jump than the one the
            floor removes. A URL that 404s keeps the floor and shows ink. */
-        /* The SHAPE, exactly: no floor. Content needs safe-area + 62 + 227; a
-           square gives the viewport width, clearing by +11px at 320pt and +45
-           at 393pt with a 59pt safe area. */
-        aspectRatio: coverUrl ? BUSINESS_COVER_ASPECT_CSS : undefined,
+        /* The 350px photo hero rule, as a FLOOR not a fixed height: content
+           needs safe-area + 62 + 227 (348 with a 59pt notch), so the block
+           must be able to grow past 350 rather than clip. Bottom-anchored
+           content (justify-content: flex-end) keeps the extra as photograph
+           above. Without a cover there is no floor and content height rules. */
+        minHeight: coverUrl ? HERO_PHOTO_HEIGHT : undefined,
 
 
 
