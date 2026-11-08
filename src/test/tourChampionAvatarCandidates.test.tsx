@@ -24,7 +24,7 @@ vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip
   } };
 });
 
-afterEach(() => { cleanup(); fixture.championProps = null; });
+afterEach(() => { cleanup(); fixture.championProps = null; fixture.photoProps = null; });
 
 describe('Tour champion avatar candidates', () => {
   it('walks from a missing first photo to the next candidate', () => {
@@ -94,9 +94,10 @@ describe('Tour champion avatar candidates', () => {
     expect(block?.querySelector('.tv-champion-line')).not.toBeNull();
     expect(block?.querySelector('.tv-champion-score small')?.textContent).toBe('BY TWO');
     expect(block?.querySelector('[data-active-ring="on"]')).not.toBeNull();
-    const band = container.querySelector<HTMLElement>('[data-overview-photo-band]');
-    expect(band?.querySelector('[data-overview-photo-situation]')).toBeNull();
-    expect(band?.querySelector('[data-overview-full-board]')).toBeNull();
-    expect(band?.style.height).toBe('300.7px'); // 350 − sentence (27.9) − spine (21.4)
+    // The photo band (mocked here) is handed no sentence and no Full board
+    // link on a completed event with a champion; the band-height derivation
+    // itself is pinned in tourOverviewMergedAiry against the real PhotoBand.
+    expect(fixture.photoProps?.segments).toEqual([]);
+    expect(fixture.photoProps?.onFullBoard).toBeUndefined();
   });
 });
