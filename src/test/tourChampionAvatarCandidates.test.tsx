@@ -74,7 +74,7 @@ describe('Tour champion avatar candidates', () => {
       winnerName: 'Eugenio Lopez-Chacarra', winnerPhotoUrl: null, winnerHeadshotOverride: 'Eugenio renamed',
       winnerPgaTourId: null, winnerScore: '-17', leaderScore: -17, leaderName: 'Eugenio Lopez-Chacarra', currentRound: 4, currentRoundStatus: null,
     } };
-    render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} /></MemoryRouter></QueryClientProvider>);
+    render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><OverviewChampionBlock slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} /></MemoryRouter></QueryClientProvider>);
     const candidates = fixture.championProps?.avatarCandidates ?? [];
     expect(candidates.length).toBeGreaterThan(1);
     expect(candidates.some(url => url.includes('/DP%20World%20Tour/Eugenio%20renamed.webp'))).toBe(true);
@@ -92,7 +92,7 @@ describe('Tour champion avatar candidates', () => {
       winnerName: 'Eugenio Lopez-Chacarra', winnerPhotoUrl: null, winnerHeadshotOverride: 'Eugenio renamed',
       winnerPgaTourId: null, winnerScore: '-17', leaderScore: -17, leaderName: 'Eugenio Lopez-Chacarra', currentRound: 4, currentRoundStatus: null,
     } };
-    const { container } = render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} /></MemoryRouter></QueryClientProvider>);
+    const { container } = render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} /><OverviewChampionBlock slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} /></MemoryRouter></QueryClientProvider>);
     const block = container.querySelector('.tv-champion');
     expect(block).not.toBeNull();
     expect(block?.querySelector('.tv-champion-line')).not.toBeNull();
