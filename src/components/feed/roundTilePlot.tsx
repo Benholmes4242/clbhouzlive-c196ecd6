@@ -51,7 +51,6 @@ import { scorecardFeatFor, type ScorecardFeatKind } from '@/features/courses/_sh
 const playedRoundPlots = new Set<string>();
 const PLOT_INK = '#F2F4F7';
 const PLOT_HAIR = 'rgba(255,255,255,0.14)';
-const PLOT_MISSING = 'rgba(255,255,255,0.06)';
 const plotToPar = (n: number) => n === 0 ? 'E' : n > 0 ? `+${n}` : `−${Math.abs(n)}`;
 
 // TOPAR_EVEN_DARK rgba(242,244,247,0.42) composited on Home's CARD
