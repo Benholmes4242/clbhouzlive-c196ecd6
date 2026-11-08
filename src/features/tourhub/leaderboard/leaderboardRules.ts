@@ -14,6 +14,28 @@ export function fieldAverageToday(entries: BoardEntry[], round?: number | null) 
   const lowPlayers = finished.filter((_,i) => values[i] === low);
   return { avg: values.reduce((a,b) => a+b,0)/values.length, count: values.length, low, lowPlayers };
 }
+/**
+ * LOW TODAY / LOW ROUND — the lowest score in the given round among players
+ * who have started it. NOT gated: it is one score, not an average, so the
+ * twenty-round FIELD_GATE does not apply. The round value is read inline
+ * (today honoured when it is the asked round) to keep this module free of
+ * the BoardTable import cycle.
+ */
+export function lowRoundScore(entries: BoardEntry[], round?: number | null) {
+  if (round == null || round < 1 || round > 4) return null;
+  const roundValue = (e: BoardEntry): number | null => {
+    const byRound = [e.round_1, e.round_2, e.round_3, e.round_4][round - 1];
+    if (byRound != null) return byRound;
+    if (e.today != null && (e.today_round == null || e.today_round === round)) return e.today;
+    return null;
+  };
+  const started = entries.filter((e) => roundValue(e) != null && !isDemotedStatus(e.status));
+  if (started.length === 0) return null;
+  const values = started.map((e) => roundValue(e) as number);
+  const low = Math.min(...values);
+  return { low, lowPlayers: started.filter((_, i) => values[i] === low) };
+}
+
 export function leaderSummary(entries: BoardEntry[]) {
   const scored = entries.filter(e => e.score != null && !isDemotedStatus(e.status)).sort((a,b) => (a.score ?? 0)-(b.score ?? 0));
   const leader = scored[0];
