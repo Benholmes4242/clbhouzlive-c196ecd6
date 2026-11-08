@@ -9,7 +9,7 @@ import { getScoreColor } from '../_shared/scoreColor';
 import { formatEarnings } from '../_shared/formatEarnings';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
-import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
+import { TREND_UP, TOUR_LIVE_GREEN, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
