@@ -300,8 +300,11 @@ export function boardRoundsWidth(c: BoardColumns): number {
  */
 export function boardGridTemplate(c: BoardColumns): string {
   if (c.preTournament) return `minmax(0,1fr) ${PRE_TEE_W}px`;
+  /* The first column is AUTO: the places-moved mark plus the position, plus
+     the 8px the name starts after. Names step in and out with the width of
+     the mark and position — they do NOT line up in a column (signed-off B2). */
   return [
-    '30px', 'minmax(0,1fr)',
+    'auto', 'minmax(0,1fr)',
     ...c.rounds.map(r => `${c.liveRound === r ? 28 : 26}px`),
     '32px', '40px', c.showPrize ? `${PRIZE_W}px` : '',
   ].filter(Boolean).join(' ');
@@ -345,11 +348,22 @@ function resolveLayout(
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
   const playerFont = `700 ${NAME_SIZE}px ${F}`;
   const teamFont = `600 12.5px ${F}`;
+  /* The name track is the row width minus the figure columns, minus the
+     WIDEST position-and-mark cluster on the board, minus the 8px the name
+     starts after the position. No face takes any width. */
+  const markFont = `700 9.5px ${F}`;
+  const posFont = `700 13px ${F}`;
+  const widestCluster = entries.reduce((maximum, entry) => {
+    if (isDemoted(entry.status)) return Math.max(maximum, measureText(statusWord(entry.status), `700 10px ${F}`));
+    const pos = entry.position == null ? '' : `${entry.position_tied ? 'T' : ''}${entry.position}`;
+    const mov = movementMap?.get(entry.player?.id ?? entry.team?.id ?? entry.id);
+    const mark = mov != null && mov !== 0 ? measureText(`▲${Math.abs(mov)}`, markFont) + 3 : 0;
+    return Math.max(maximum, mark + measureText(pos, posFont));
+  }, 0);
   const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1 + (base.showPrize ? 1 : 0);
   const fixed =
     ROW_PAD_X * 2 +
-    MOV_W +
-    POS_W +
+    Math.ceil(widestCluster) + 8 +
     TOT_W +
     (base.showThru ? THRU_W : 0) +
     (base.showPrize ? PRIZE_W : 0) +
