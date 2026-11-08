@@ -61,17 +61,12 @@
 ## OVERVIEW_CHAMPION_HERO
 - [x] One-column hero board (green R3 header), shared ChampionStrip (gold ring, BY {words}, narrative), finished photo drops sentence/Full board, derived band heights (live 350 / upcoming 328.6 / finished 300.7), green spine #34D77F halo 18%.
 - [x] Focused 208/208; shards 2007/1871/1994/1908 = 7780 (+3 vs 7777).
-- [ ] 320/390/430 screen checks (champion fade/ring clipping) not yet run.
+- [x] Fixture screens at320/390/430; no overflow. Live reference mismatch remains unverified; see closeout report.
 
-## HERO_START_LINE (active)
-- [ ] HERO_CONTENT_TOP=184 derived from live overview stack constants in heroHeights.ts; update 350-rule comment.
-- [ ] Overview kicker row fixed minHeight in every state (live pixel-identical).
-- [ ] Convert heroes to flow text (padding-top 184, padding-bottom 14, auto band): TournamentHero, CoursesPageHero, GolfClubView (both mounts, CourseTitleOverlay into flow, drop cinematic safe-area), ReviewComposerHeader/ReviewCourseHero + ReviewComposerV2 measured header var (delete PHOTO_HEADER_H_CSS if unused), ProfileCoverBand (fix 176px comment), ClubProfileHero, HeroShell (pro, re-based pinned floor), AmateurHero + any other HERO_PHOTO_HEIGHT/EXPLORE_COURSE_HERO_HEIGHT hero.
-- [ ] Skeletons (CourseMastheadSkeleton, CourseDetailSkeleton, ProfileSurfaceSkeleton) + AppHeader overHero callers get real heights.
-- [ ] Tests: update pinned 350/bottom:14/HERO_CONTENT_INSET+18 assertions (list old/new), add new cases; 4 shards (only fw1FeaturedDeck known); 320/390/430 first-line-at-184 checks.
-
-## HERO_START_LINE — STOPPED on a brief/mock conflict (pending Ben's ruling)
-- Brief text: first line at 184px, "the live Tour overview... does not change", "the live position must not change by a pixel".
-- Measured real live hero (one-line title fixture, 320/390/430): kicker ROW top 186.53, kicker TEXT top 193.94. Neither is 184.
-- Mock's own after_overview-live-1line.jpg: amber kicker pixels at image rows 374–389 of a 2x 390 frame = ~187 CSS px (row top), not the 184 guide line drawn over it.
-- 184 matches nothing measured; adopting it moves the live kicker ~3px (row) or ~10px (text), violating the brief's own freeze. Awaiting ruling: 184 vs ~187 (row top) vs ~194 (text top).
+## HERO_START_LINE — paused at verification
+- [x] Ruling saved: derive frozen live kicker TEXT reference; 184 invalid.
+- [x] Shared geometry and named flow hero/skeleton conversions; authorized obsolete fixed-height assertions updated without changing test counts.
+- [ ] Resolve reference discrepancy: fixture text189.9375 vs ruled193.9; derived189.92 is not accepted as a replacement. Before/after freeze unverified.
+- [ ] Focused test STOP: reviewStepOne.test.tsx:119, expected absolute, received relative. Existing assertion unchanged; output docs/verification/hero-start/focused.log.
+- [ ] Four fresh shards blocked by unexpected focused failure; new measurement tests and converted-hero screen checks incomplete.
+- [ ] Report HERO_START_LINE_REPORT.md lists changed files and assertion ledger; no completion claimed.
