@@ -71,10 +71,11 @@ describe('FIX3 IN ACTION rail fallback avatars', () => {
     // The Players rows' fallback is ResultTile with the same tokens.
     const tile = readFileSync('src/features/search-v2/components/ResultTile.tsx', 'utf8');
     expect(tile).toContain('background: white ? \'#FFFFFF\' : A.TRACK');
-    expect(tile).toContain('border: `1px solid ${A.BORDER}`');
+    expect(tile).toContain("border: borderless ? 'none' : `1px solid ${A.BORDER}`");
     expect(tile).toContain('color: A.MUTE');
     const playerRow = readFileSync('src/features/search-v2/components/PlayerRow.tsx', 'utf8');
     expect(playerRow).toContain('ResultTile');
     expect(playerRow).toContain('TILE_INITIALS');
+    expect(playerRow).toContain('<ResultTile borderless>');
   });
 });
