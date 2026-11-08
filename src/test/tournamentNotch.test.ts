@@ -19,7 +19,7 @@ describe('Tournament notch ownership',()=>{
     expect(tournament.left).toEqual({kind:'back',title:null,backTarget:'history',backFallback:'/tourhub?tab=schedule'});
   });
   it('tournament photo is 350px in total with the notch counted inside',()=>{
-    const sections=readFileSync(resolve(__dirname,'../src/features/tourhub/tournament-v2/sections/TournamentV3Sections.tsx'),'utf8');
+    const sections=readFileSync(resolve(__dirname,'../features/tourhub/tournament-v2/sections/TournamentV3Sections.tsx'),'utf8');
     expect(sections).toContain('style={{height:HERO_PHOTO_HEIGHT}}');
     expect(sections).not.toContain('photoBandHeight(340,true)');
   });
