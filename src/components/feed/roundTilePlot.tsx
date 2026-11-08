@@ -318,9 +318,9 @@ export function RoundTilePlot({ shape, received, scoreId }: {
           <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: SC_FILL_GOLD }} />{feat.word}
         </span>
       ) : null}
-      <svg width="100%" height={96} viewBox={`0 0 ${width} 96`} aria-hidden style={{ display: 'block' }}>
+      <svg width="100%" height={80} viewBox={`0 0 ${width} 80`} aria-hidden style={{ display: 'block' }}>
         <defs>
-          <clipPath id={`feed-reveal-${instanceId}`}><rect ref={revealRef} data-plot-reveal x={0} y={-10} width={completed ? width : 0} height={116} /></clipPath>
+          <clipPath id={`feed-reveal-${instanceId}`}><rect ref={revealRef} data-plot-reveal x={0} y={-10} width={completed ? width : 0} height={100} /></clipPath>
           {wentUnder ? <>
             <clipPath id={`feed-under-${instanceId}`} data-under-clip><rect x={0} y={baselineY} width={width} height={Math.max(72 - baselineY, 0)} /></clipPath>
             <linearGradient id={`feed-gradient-${instanceId}`} gradientUnits="userSpaceOnUse" x1={0} y1={baselineY} x2={0} y2={72}>
@@ -334,15 +334,6 @@ export function RoundTilePlot({ shape, received, scoreId }: {
           <path ref={pathRef} data-plot-trace d={path} fill="none" stroke={PLOT_INK} strokeOpacity={0.92} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
           {wentUnder ? <path data-plot-under-stroke d={path} fill="none" stroke={TOPAR_UNDER_DARK} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" clipPath={`url(#feed-under-${instanceId})`} /> : null}
         </g>
-        {shape.holes.map((hole, i) => {
-          const count = values.length - 1;
-          if (i >= count) return null;
-          const left = xFor(i) + (i === 0 ? 0 : count === 18 && i === 9 ? 3.5 : 1.25);
-          const right = xFor(i + 1) - (i === count - 1 ? 0 : count === 18 && i === 8 ? 3.5 : 1.25);
-          const d = hole.par == null || hole.strokes == null ? null : hole.strokes - hole.par;
-          const fill = d == null ? PLOT_MISSING : d <= -2 ? SC_FILL_GOLD : d === -1 ? TOPAR_UNDER_DARK : d === 0 ? PLOT_HAIR : d === 1 ? SC_BOGEY_DARK : SC_DOUBLE_DARK;
-          return <rect key={i} data-plot-hole={i + 1} x={left} y={90} width={Math.max(0, right - left)} height={6} rx={2} fill={fill} fillOpacity={d === 1 ? 0.55 : 1} />;
-        })}
         <circle ref={headRef} data-plot-head cx={16} cy={points[0]?.y} r={3} fill={PLOT_INK} style={{ opacity: 0 }} />
         {last ? <circle ref={endRef} data-plot-end cx={last.x} cy={last.y} r={4} fill={PLOT_INK} stroke={FEED_CARD_SURFACE} strokeWidth={2} style={{ opacity: completed ? 1 : 0, transform: completed ? 'scale(1)' : 'scale(0.4)', transformOrigin: `${last.x}px ${last.y}px` }} /> : null}
       </svg>
