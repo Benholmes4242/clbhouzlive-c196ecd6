@@ -1,7 +1,7 @@
 # Roadmap
 
 ## UPCOMING_OVERVIEW_PLUS
-- [ ] Finish Tour buttons shard 4, responsive fixtures, and close-out report before upcoming edits.
+- [x] Tour buttons shard4 1931/1931; combined reported7816; actual PhotoBand/RailChips320/390/430 no overflow. See TOUR_BUTTONS_REPORT.md for chronology and live-device limitations.
 - [ ] Build countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.
 - [ ] Add rule tests, list authorized assertion changes, run four separate shards, and verify 320/390/430 fixtures.
 
