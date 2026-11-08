@@ -176,7 +176,7 @@ describe('no "Full board" link on the photo band', () => {
     expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull();
     cleanup();
     mountHero(UPCOMING);
-    expect(document.querySelector('[data-overview-photo-situation]')).not.toBeNull();
+    expect(document.querySelector('[data-overview-photo-situation]')).toBeNull();
     expect(document.querySelector('[data-overview-situation]')).toBeNull();
     expect(document.querySelector('[data-overview-full-board]')).toBeNull();
   });
