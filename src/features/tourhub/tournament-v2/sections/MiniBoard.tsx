@@ -378,10 +378,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 aria-label={rowLabel}
                 onClick={tappable ? toggle : undefined}
                 onKeyDown={tappable ? event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); } } : undefined}
-                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gap: heroGap, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: showHeroShape ? `5px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gap: heroGap, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: 31, padding: `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
-                {showHeroShape || showOverviewPosition ? (
+                {showOverviewPosition ? (
                   /* CB57: capped and lower ties use the SAME stretched grid
                      cell and bracket; the cap still owns the visible T1 label. */
                   <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: 0, color: T.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
@@ -390,30 +390,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
                   </div>
                 ) : null}
-                <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: showHeroShape ? 6 : 5 }}>
+                <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: 0, color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
-                {showHeroToday ? (
-                  <div data-hero-selected-score={isOpen && expanded?.round === currentRound} style={{ ...HERO_NUM, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme) }}>{today == null ? BLANK : fmtScore(today)}</div>
-                ) : null}
-                {showHeroShape ? (
-                  <div data-hero-shape style={{ ...HERO_NUM, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', minWidth: 0 }}>
-                    <TrajectorySparkline
-                      variant="bars"
-                      rounds={[]}
-                      ariaHidden
-                      slots={Array.from({ length: shapeSlots }, (_, i) => {
-                        const rd = i + 1;
-                        if (rd === currentRound) return today;
-                        return ([r.round_1, r.round_2, r.round_3, r.round_4][i] ?? null);
-                      })}
-                      liveIndex={currentRound != null && roundInProgress ? currentRound - 1 : null}
-                    />
-                  </div>
-                ) : null}
                 {heroRounds.map((rd) => {
                   const val = heroRoundScore(r, rd, currentRound);
                   const tee = val == null && rd === teeRound && r.player?.id ? teesByPlayer.get(r.player.id) : null;
