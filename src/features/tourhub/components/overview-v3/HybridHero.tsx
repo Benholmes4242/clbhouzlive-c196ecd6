@@ -76,23 +76,6 @@ export function formatOverviewDateRange(startDate: string, endDate?: string | nu
 }
 
 /**
- * CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): score and margin are separate
- * registers. `score` is the bare fmtScore figure (coloured by getScoreColor in
- * ChampionStrip); the wonBy/playoff qualifier travels in `scoreLabel` and
- * renders beneath the score in muted caps. formatOverviewChampionScore's
- * single-string "−17 · by 2" form is withdrawn.
- */
-export function overviewChampionScoreLabel(
-  playoff: boolean,
-  margin: number | null,
-  t: (key: string, options?: { count: number }) => string,
-): string | undefined {
-  if (playoff) return t('overview.hero.playoff');
-  if (margin != null) return t('overview.hero.wonBy', { count: margin });
-  return undefined;
-}
-
-/**
  * The champion's gross closing round. round_N is a TO-PAR figure, so the
  * venue par is added to turn it into strokes. Either absent → null, and the
  * sentence takes its variant without a closing round.
@@ -214,7 +197,6 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
             .filter((r): r is number => typeof r === 'number' && Number.isFinite(r)) // to-par: 0 and negatives are real rounds
         : [],
       closingRound: closingGross(championEntry?.round_4, tournament.venuePar),
-      country: championEntry?.player?.country_code || championEntry?.player?.country || undefined,
     };
   }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName, tournament.venuePar]);
 
