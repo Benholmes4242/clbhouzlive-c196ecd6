@@ -44,7 +44,9 @@ describe('Tour hero refinements', () => {
     for (const el of [header, ...v.container.querySelectorAll<HTMLElement>('[data-hero-tie]')].map(el => el?.hasAttribute('data-hero-tie') ? el.parentElement : el)) {
       Array.from(el?.children ?? []).slice(2).forEach(cell => expect((cell as HTMLElement).style.textAlign).toBe('center'));
     }
-    expect(BOARD_GEOMETRY).toEqual({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 });
+    // LEADERBOARDS PAGE (8 Nov 2026): cell 26→30 and floor 22→25 with the
+    // overview board's sizes; the rest of the geometry is unchanged.
+    expect(BOARD_GEOMETRY).toEqual({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 30, cellFloor: 25, gap: 4 });
   });
   it('centres live round columns and TOT without resizing the full board', () => {
     const v = board(field.map(e => ({ ...e, today: -1, today_round: 3, thru: 4 })));
