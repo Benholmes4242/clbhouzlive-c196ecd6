@@ -9,7 +9,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const fixture = vi.hoisted(() => ({ championProps: null as null | { avatarCandidates?: string[]; playerKey?: string | null } }));
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
-vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: [{ id: 'winner-row', position: 1, score: -17, player: { sr_id: 'winner-key', full_name: 'Eugenio Lopez-Chacarra' } }] }) }));
+vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: [
+  { id: 'winner-row', position: 1, score: -17, round_1: -4, round_2: -5, round_3: -3, round_4: -5, player: { sr_id: 'winner-key', full_name: 'Eugenio Lopez-Chacarra' } },
+  { id: 'runner-row', position: 2, score: -15, round_1: -3, round_2: -4, round_3: -3, round_4: -5, player: { sr_id: 'runner-key', full_name: 'Runner Up' } },
+] }) }));
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
 vi.mock('@/features/tourhub/hooks/useLiveTournaments', async importOriginal => ({ ...(await importOriginal<typeof import('@/features/tourhub/hooks/useLiveTournaments')>()), useLiveTournaments: () => ({ data: [], isLoading: false, isError: false }) }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand', () => ({ PhotoBand: () => null }));
@@ -32,21 +35,19 @@ describe('Tour champion avatar candidates', () => {
     expect(getByRole('img', { name: 'Eugenio Lopez-Chacarra' }).getAttribute('src')).toBe('https://avatar.test/good-b.png');
   });
 
-  it('wraps the champion avatar in a gold squircle ring with no hairline inside (overview and tournament)', () => {
-    for (const presentation of [undefined, 'tournament'] as const) {
-      const { container, unmount } = render(<ChampionStrip name="Eugenio Lopez-Chacarra" score="−17" playerKey="winner-key" presentation={presentation} />);
-      const ring = container.querySelector<HTMLElement>('[data-active-ring="on"]');
-      expect(ring).not.toBeNull();
-      expect(ring?.style.background).toBe('rgb(251, 188, 46)');
-      expect(ring?.style.borderRadius).toBe('34%');
-      const gap = ring?.querySelector<HTMLElement>('[data-active-ring-gap]');
-      expect(gap).not.toBeNull();
-      const squircle = Array.from(ring?.querySelectorAll<HTMLElement>('*') ?? []).find(el => el.style.aspectRatio !== '');
-      expect(squircle).not.toBeNull();
-      expect(squircle?.style.border.includes('solid')).toBe(false); // hideRing: no grey hairline inside the gold ring
-      expect(container.querySelector('[data-avatar-ring-gradient]')).toBeNull();
-      unmount();
-    }
+  it('wraps the champion avatar in a gold squircle ring with no hairline inside (the one block both pages render)', () => {
+    const { container } = render(<ChampionStrip name="Eugenio Lopez-Chacarra" score="−17" playerKey="winner-key" />);
+    const ring = container.querySelector<HTMLElement>('[data-active-ring="on"]');
+    expect(ring).not.toBeNull();
+    expect(ring?.style.background).toBe('rgb(251, 188, 46)');
+    expect(ring?.style.borderRadius).toBe('34%');
+    const gap = ring?.querySelector<HTMLElement>('[data-active-ring-gap]');
+    expect(gap).not.toBeNull();
+    expect(gap?.style.background).toBe('rgb(18, 18, 22)'); // --tv-panel
+    const squircle = Array.from(ring?.querySelectorAll<HTMLElement>('*') ?? []).find(el => el.style.aspectRatio !== '');
+    expect(squircle).not.toBeNull();
+    expect(squircle?.style.border.includes('solid')).toBe(false); // hideRing: no grey hairline inside the gold ring
+    expect(container.querySelector('[data-avatar-ring-gradient]')).toBeNull();
   });
 
   it('uses the player initials rather than the person icon when all photos miss', () => {
