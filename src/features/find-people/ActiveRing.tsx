@@ -17,12 +17,15 @@ export function ActiveRing({
   active,
   surface,
   gapColor,
+  ringColor,
   children,
 }: {
   active: boolean;
   surface: 'card' | 'canvas';
   /** Opt-in picker material; defaults preserve activity surfaces. */
   gapColor?: string;
+  /** Opt-in solid ring colour (e.g. the champion's GOLD); defaults to the activity gradient. */
+  ringColor?: string;
   children: ReactNode;
 }) {
   if (!active) {
@@ -47,7 +50,7 @@ export function ActiveRing({
   return (
     <span
       data-active-ring="on"
-      style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 1.5, borderRadius: '34%', background: ACTIVE_RING_GRADIENT }}
+      style={{ display: 'flex', flex: 'none', lineHeight: 0, padding: 1.5, borderRadius: '34%', background: ringColor ?? ACTIVE_RING_GRADIENT }}
     >
       <span
         data-active-ring-gap=""

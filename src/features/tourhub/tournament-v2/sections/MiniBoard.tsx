@@ -1,6 +1,7 @@
 /**
  * MiniBoard - TD1 top-5 compressed board.
- * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
+ * Panel grammar: POS | PLAYER + flag | THRU | TODAY | TOT.
+ * Hero grammar: POS | PLAYER | R1…Rn | TOT in every phase (see heroBoardColumns).
  * Hero rows remain single-line; only an open hero panel reads its selected round.
  * Other themes retain direct ScorecardSheet taps. A row with no player id
  * (a team row) is not tappable.
@@ -29,7 +30,6 @@ import { Button } from '@/components/ui/button';
 import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { formatTimeHm24 } from '@/i18n/format';
 
-import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
 import { HeroRoundPanel } from './HeroRoundPanel';
 import { heroDefaultRound, heroStartedRounds } from './heroRoundRules';
 
@@ -100,9 +100,7 @@ const THEME_TOKENS = {
 export const HERO_PAD_X = 20;
 export const HERO_POS_W = 24;
 const HERO_ROUND_W = 32;
-const HERO_TODAY_W = 40;
 export const HERO_TOT_W = 40;
-const HERO_SHAPE_W = 44;
 export const HERO_GAP = 4;
 /** Every numeric cell on the hero board: digits stack down a column. */
 const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'center' as const };
@@ -118,47 +116,17 @@ export function heroTeeRound(entries: BoardEntry[], rows: BoardEntry[], rounds: 
   return rounds.find(round => round === currentRound && rows.some(row => !!row.player?.id) && entries.every(row => heroRoundScore(row, round, currentRound) == null)) ?? null;
 }
 
-/** THE HERO BOARD'S COLUMNS, as a broadcast board sets them.
- *
- *  THRU is live state and the hero board has never carried it (the old
- *  `showPanelThru` excluded this theme by name). It is the single most
- *  useful column on a board during play and it is added here.
- *
- *  TODAY ONLY APPEARS WHEN IT CAN DIFFER FROM TOTAL. In round one a
- *  player's total IS today's score, so printing both is the same number
- *  twice on every row. From round two they diverge and TODAY earns its
- *  place.
- *
- *  PER-ROUND COLUMNS NEED AT LEAST TWO ROUNDS for the same reason: a lone
- *  R1 column is the total under another name.
- *
- *  MOV (places gained since the round began) IS A LIVE IDEA. It appears
- *  only while play is in progress (live or suspended mid-round); on a
- *  finished board the round columns already tell how the week went. It
- *  NEEDS A PRIOR ROUND: round one has nothing to rank against, so no
- *  header, no track, no dashes — the width returns to the name. And
- *  FOUR ROUND COLUMNS WIN: beside four round tracks MOV takes the player
- *  track below what a full name needs (~124px at 382px), so MOV is the
- *  column that goes, never the name. `hasMovement` is the data guard:
- *  movementFromRounds over the FULL field returned at least one delta.
- */
-export function heroBoardColumns(opts: { roundCount: number; roundInProgress: boolean; completed: boolean }): {
+/** THE HERO BOARD HAS ONE LAYOUT IN EVERY PHASE — POS | PLAYER | R1…Rn | TOT,
+ *  pre-round, live, suspended or completed, with n running to the current
+ *  round and R1 shown even in round one. This supersedes
+ *  BRIEF_TOUR_OVERVIEW_MOCK_EXACT §D.1 for the hero board: TODAY and SHAPE
+ *  are gone (the current round's cell carries the tee time, the today score
+ *  or the round score), and THRU lives in the open-row panel's "THRU h"
+ *  header, never on the board. */
+export function heroBoardColumns(_opts: { roundCount: number; roundInProgress: boolean; completed: boolean }): {
   today: boolean; rounds: boolean; shape: boolean;
 } {
-  /* BRIEF_TOUR_OVERVIEW_MOCK_EXACT §D.1 supersedes the THRU and MOV notes
-     above: the live grammar is POS | PLAYER | TODAY | SHAPE | TOT. MOV left
-     because movement has its own band (RoundMovementBand) and must not be said
-     twice; THRU left because the mock does not carry it. TODAY keeps its
-     round-one rule (it would equal TOT). */
-  const live = !opts.completed && opts.roundInProgress;
-  const multi = opts.roundCount >= 2;
-  if (live) return { today: multi, rounds: false, shape: true };
-  return { today: false, rounds: multi, shape: false };
-}
-
-/** The live hero grid, exactly as the mock sets it. */
-export function heroLiveGrid(showToday: boolean): string {
-  return [`${HERO_POS_W}px`, 'minmax(0,1fr)', showToday ? `${HERO_TODAY_W}px` : null, `${HERO_SHAPE_W}px`, `${HERO_TOT_W}px`].filter(Boolean).join(' ');
+  return { today: false, rounds: true, shape: false };
 }
 
 /** The TOP group when it is a tie over the visible rows: its length, else 0. */
@@ -287,21 +255,17 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     completed: phase === 'completed',
   });
   const tieRoles = heroTieRoles(rows);
-  const showHeroToday = theme === 'heroBoard' && heroColumnRule.today;
   const showHeroRounds = theme === 'heroBoard' && heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
   const heroRoundTracks = heroRounds.map(() => `${HERO_ROUND_W}px`).join(' ');
-  const showHeroShape = theme === 'heroBoard' && heroColumnRule.shape;
-  const topTieLength = theme === 'heroBoard' && showHeroShape ? heroTopTieLength(rows) : 0;
+  const topTieLength = theme === 'heroBoard' ? heroTopTieLength(rows) : 0;
   const topTieCount = topTieLength > 0 ? entries.filter((e) => e.position === 1).length : 0;
-  const legacyGrid = [
+  const overviewGrid = [
     showOverviewPosition ? `${HERO_POS_W}px` : null,
     'minmax(0, 1fr)',
-    showHeroToday ? `${HERO_TODAY_W}px` : null,
     heroRoundTracks || null,
     `${HERO_TOT_W}px`,
   ].filter(Boolean).join(' ');
-  const overviewGrid = showHeroShape ? heroLiveGrid(showHeroToday) : legacyGrid;
   const heroGap = HERO_GAP;
   const teeRound = theme === 'heroBoard' ? heroTeeRound(entries, rows, heroRounds, currentRound, phase === 'completed') : null;
   const { data: teeGroups } = useTeeTimesAll(tournamentId, teeRound ?? 1, { enabled: teeRound != null });
@@ -314,7 +278,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     }
     return map;
   }, [teeRound, teeGroups]);
-  const shapeSlots = Math.max(totalRounds ?? 0, heroCols.rounds.length, currentRound ?? 0);
 
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
   /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
@@ -364,10 +327,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
       <>
         <div className="hero-expand-board" style={{ background: T.surface, fontFamily: FONT, paddingTop: afterMovers ? 0 : 12 }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 24, padding: `2px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
-            {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
+            {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
-            {showHeroToday ? <div style={{ textAlign: 'center' }}>{t('board.columns.today')}</div> : null}
-            {showHeroShape ? <div style={{ textAlign: 'center' }}>{t('board.columns.rounds')}</div> : null}
             {heroRounds.map((rd) => (
               <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
                 {`R${rd}`}
@@ -418,10 +379,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 aria-label={rowLabel}
                 onClick={tappable ? toggle : undefined}
                 onKeyDown={tappable ? event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); } } : undefined}
-                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gap: heroGap, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: showHeroShape ? `5px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gap: heroGap, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: 31, padding: `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
-                {showHeroShape || showOverviewPosition ? (
+                {showOverviewPosition ? (
                   /* CB57: capped and lower ties use the SAME stretched grid
                      cell and bracket; the cap still owns the visible T1 label. */
                   <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: 0, color: T.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
@@ -430,30 +391,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
                   </div>
                 ) : null}
-                <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: showHeroShape ? 6 : 5 }}>
+                <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: 0, color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
-                {showHeroToday ? (
-                  <div data-hero-selected-score={isOpen && expanded?.round === currentRound} style={{ ...HERO_NUM, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme) }}>{today == null ? BLANK : fmtScore(today)}</div>
-                ) : null}
-                {showHeroShape ? (
-                  <div data-hero-shape style={{ ...HERO_NUM, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', minWidth: 0 }}>
-                    <TrajectorySparkline
-                      variant="bars"
-                      rounds={[]}
-                      ariaHidden
-                      slots={Array.from({ length: shapeSlots }, (_, i) => {
-                        const rd = i + 1;
-                        if (rd === currentRound) return today;
-                        return ([r.round_1, r.round_2, r.round_3, r.round_4][i] ?? null);
-                      })}
-                      liveIndex={currentRound != null && roundInProgress ? currentRound - 1 : null}
-                    />
-                  </div>
-                ) : null}
                 {heroRounds.map((rd) => {
                   const val = heroRoundScore(r, rd, currentRound);
                   const tee = val == null && rd === teeRound && r.player?.id ? teesByPlayer.get(r.player.id) : null;

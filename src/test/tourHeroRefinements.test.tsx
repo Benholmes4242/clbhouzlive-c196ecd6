@@ -46,12 +46,23 @@ describe('Tour hero refinements', () => {
     }
     expect(BOARD_GEOMETRY).toEqual({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 });
   });
-  it('centres live TODAY, shape and TOT without resizing the full board', () => {
+  it('centres live round columns and TOT without resizing the full board', () => {
     const v = board(field.map(e => ({ ...e, today: -1, today_round: 3, thru: 4 })));
     const header = v.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toBe('24px minmax(0,1fr) 40px 44px 40px');
+    expect(header?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 32px 32px 32px 40px');
     Array.from(header?.children ?? []).slice(2).forEach(el => expect((el as HTMLElement).style.textAlign).toBe('center'));
-    v.container.querySelectorAll<HTMLElement>('[data-hero-shape]').forEach(el => { expect(el.style.justifyContent).toBe('center'); expect(el.style.textAlign).toBe('center'); });
+    expect(header?.textContent).toContain('R1');
+    expect(header?.textContent).toContain('R3');
+    expect(header?.textContent).not.toContain('TODAY');
+    expect(header?.textContent).not.toContain('ROUNDS');
+    expect(v.container.querySelectorAll('[data-hero-shape]').length).toBe(0);
+  });
+  it('shows the on-course today score in the current-round cell at full strength', () => {
+    const v = board(field.map(e => ({ ...e, today: -2, today_round: 3, thru: 4 })));
+    const cell = v.container.querySelector<HTMLElement>('[data-hero-round="3"]');
+    expect(cell?.textContent).toBe('−2');
+    expect(cell?.style.color).toBe('rgb(226, 75, 63)'); // getScoreColor(-2, 'dark') under-par red, not the dim tee slot
+    expect(cell?.style.color).not.toBe('rgba(255, 255, 255, 0.45)');
   });
   it('shows a known next-round tee time in its centred dim 11px cell', () => {
     f.draw = [group]; const v = board();

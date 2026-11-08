@@ -63,7 +63,7 @@ describe('Merged Airy lower sections', () => {
     const header = v.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(header?.style.minHeight).toBe('24px'); expect(header?.style.paddingTop).toBe('2px'); expect(header?.parentElement?.style.paddingTop).toBe('12px');
     const row = v.container.querySelector<HTMLElement>('[data-hero-tie]')?.parentElement;
-    expect(row?.style.minHeight).toBe(phase === 'live' ? '33px' : '31px'); expect(row?.style.paddingTop).toBe(phase === 'live' ? '5px' : '4px'); // restore pre-hole-tiles single-line geometry
+    expect(row?.style.minHeight).toBe('31px'); expect(row?.style.paddingTop).toBe('4px'); // one-column board: same single-line geometry in every phase
   });
   it.each(['panel', 'light'] as const)('preserves the %s board spacing', theme => {
     const v = mount(<MiniBoard tournamentId="e" entries={field} currentRound={2} theme={theme} />);
