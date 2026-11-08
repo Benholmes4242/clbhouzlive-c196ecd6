@@ -2,7 +2,7 @@
  * second viewer lives here; filter replacement and jumps use the shared store. */
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Flag, Grid2X2, Image as ImageIcon, Share, Tag, X } from 'lucide-react';
+import { Flag, Grid2X2, Image as ImageIcon, Share, Tag, Volume2, VolumeX, X } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
@@ -10,7 +10,9 @@ import { Button } from '@/components/ui/button';
 import { COURSE_PLACES, type CoursePlace } from '@/lib/courseMedia/places';
 import { filteredGallery, galleryAction, galleryFilters, galleryGroups, galleryPost, galleryRun, shortOrdinal, type GalleryFilter, type GalleryShot } from '@/lib/courseMedia/courseGallery';
 import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
-import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
+import { postedDateLabel } from '@/lib/courseMedia/addedMonth';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useFullscreenMuteControl } from './useFullscreenMuteControl';
 import { PLACE_LABELS } from '@/components/course-media-tab/ShotTagChoices';
 import { placeAge } from '@/components/course-media-tab/CoursePlaceTiles';
 import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
@@ -30,6 +32,9 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
   const pager = useFullscreenFeedStore(s => s.activePagerIdx);
   const [grid, setGrid] = useState(false);
   const [tagShot, setTagShot] = useState<GalleryShot | null>(null);
+  // The shared fullscreen sound control — the same one ImmersiveFullscreenChrome
+  // uses, so course videos are not a second mute.
+  const { shownMuted, handleMuteTap } = useFullscreenMuteControl();
   const panelRef = useRef<HTMLDivElement>(null); const gridRef = useRef<HTMLDivElement>(null);
   const [gridTop, setGridTop] = useState<number | undefined>(undefined);
   // The grid starts 6px below the panel's measured bottom and scrolls under it.
