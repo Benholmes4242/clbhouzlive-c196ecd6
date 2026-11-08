@@ -33,11 +33,17 @@ import { SearchFieldBox } from '@/features/search-v2/components/SearchField';
 import { resolveVenuePlace } from './venuePlace';
 import { Button } from '@/components/ui/button';
 import { LiveBoard } from './LiveBoard';
-import { fieldAverageToday, leaderSummary, eventLeaderLabel } from './leaderboardRules';
+import { fieldAverageToday, leaderSummary, eventLeaderLabel, lowRoundScore } from './leaderboardRules';
 import { surnameOf } from '../_shared/playerName';
 import { getScoreColor } from '../_shared/scoreColor';
 import { fmtScore } from '../utils/fmtScore';
 import { computeBoardColumns } from './BoardTable';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
+import { heroStateLine } from '../components/overview-v3/HybridHeroBands/heroStateLine';
+import { fullTourLabel } from '../_shared/tourOrder';
+import { heroStartDay } from '../tournament-v2/data/tournamentRules';
+import { TOUR_LIVE_GREEN } from '../_shared/tokens';
 import './leaderboard.css';
 
 
@@ -117,7 +123,7 @@ function LiveMarker({
           }}
         />
       )}
-      {/* 12/800 tabular - sits on line one beside the h1. */}
+      {/* 12/800 tabular - the kicker row's right slot while suspended. */}
       <span
         style={{
           fontFamily: F,
@@ -346,8 +352,73 @@ export function LeaderboardTab() {
   const inProgress = computeBoardColumns(boardEntries,currentRound,tournamentIsFinished(metaStatus)).showThru;
   const onCourse = inProgress ? boardEntries.filter(e => e.thru != null && e.thru > 0 && e.thru < 18 && todayFromEntry(e,currentRound) != null).length : 0;
   const lead = leaderSummary(boardEntries);
-  const summarySegments = [venue, par != null ? t('tour.parValue',{par}) : null, yardage != null ? t('tour.yardsValue',{yards:yardage.toLocaleString()}) : null,
-    inProgress ? t('rebuilt.onCourse',{count:onCourse,field:boardEntries.length}) : null].filter(Boolean);
+  const finished = tournamentIsFinished(metaStatus);
+  const suspended = isLive && meta?.current_round_status === 'suspended';
+  // LOW TODAY / LOW ROUND: one score, not an average — never gated.
+  const low = lowRoundScore(boardEntries, fieldRound);
+  const summarySegments = [venue, par != null ? t('tour.parValue',{par}) : null, yardage != null ? t('tour.yardsValue',{yards:yardage.toLocaleString()}) : null].filter(Boolean);
+
+  /* KICKER — full tour label + the shared hero state line, exactly as the
+     overview PhotoBand and tournament hero compose it. */
+  const startDay = !isLive && !finished && meta ? heroStartDay(meta) || null : null;
+  const stateLine = finished
+    ? heroStateLine(t, { kind: 'results' })
+    : isLive
+      ? heroStateLine(t, suspended ? { kind: 'suspended', round: currentRound ?? 1 } : { kind: 'live', round: currentRound ?? 1 })
+      : startDay
+        ? heroStateLine(t, { kind: 'upcoming', startDay })
+        : null;
+  const kicker = [fullTourLabel(selected.tourSlug, (meta?.tour_full_name ?? selected.tour_name)?.toUpperCase()), stateLine].filter(Boolean).join(' · ');
+
+  /* FIGURE ROW — the tournament page's .tv-figures grammar. A cell with no
+     value is omitted; if none qualify, the row doesn't render. */
+  const leaderName = surnameOf(lead?.leader?.player?.full_name ?? lead?.leader?.team?.display_name ?? '').toUpperCase();
+  const lowSmall = low ? (low.lowPlayers.length > 1 ? t('rebuilt.players', { count: low.lowPlayers.length }) : surnameOf(low.lowPlayers[0]?.player?.full_name ?? low.lowPlayers[0]?.team?.display_name ?? '')) : undefined;
+  const figures: Array<{ key: string; value: string; small?: string; label: string; color?: string }> = [];
+  if (isLive) {
+    if (lead) figures.push({ key: 'lead', value: lead.count > 1 ? String(lead.count) : String(lead.lead ?? '—'), small: t(lead.count > 1 ? 'rebuilt.tied' : 'rebuilt.shots'), label: lead.count > 1 ? t('rebuilt.atTop') : t('rebuilt.lead', { name: leaderName }) });
+    if (inProgress) figures.push({ key: 'oncourse', value: String(onCourse), small: t('rebuilt.ofField', { field: boardEntries.length, defaultValue: `of ${boardEntries.length}` }), label: t('rebuilt.onCourseLabel', { defaultValue: 'ON COURSE' }) });
+    if (low) figures.push({ key: 'low', value: fmtScore(low.low), small: lowSmall, label: t('rebuilt.lowToday'), color: getScoreColor(low.low, 'dark') });
+    if (field) figures.push({ key: 'average', value: fmtAvgToPar(field.avg), label: t('rebuilt.fieldAverage'), color: getScoreColor(field.avg, 'dark') });
+  } else if (finished) {
+    if (lead) figures.push(lead.count > 1
+      ? { key: 'wonby', value: t('rebuilt.playoff', { defaultValue: 'PLAYOFF' }), label: t('rebuilt.wonBy', { name: leaderName, defaultValue: `${leaderName} WON BY` }) }
+      : { key: 'wonby', value: String(lead.lead ?? '—'), small: t('rebuilt.shots'), label: t('rebuilt.wonBy', { name: leaderName, defaultValue: `${leaderName} WON BY` }) });
+    if (field) figures.push({ key: 'fieldround', value: fmtAvgToPar(field.avg), label: t('rebuilt.fieldRound', { round: currentRound, defaultValue: `FIELD, ROUND ${currentRound}` }), color: getScoreColor(field.avg, 'dark') });
+    if (low) figures.push({ key: 'lowround', value: fmtScore(low.low), small: lowSmall, label: t('rebuilt.lowRound', { defaultValue: 'LOW ROUND' }), color: getScoreColor(low.low, 'dark') });
+  }
+
+  /* SECTION HEAD — LEADERBOARD in ink, the movement legend and the 32px
+     search button; the search box opens beneath it. Passed INTO LiveBoard
+     so "Your players" stays pinned above it. */
+  const boardHead = (
+    <>
+      <div className="tour-board-section-head">
+        <h2 className="tour-board-section-title">{t('rebuilt.leaderboard')}</h2>
+        <div className="tour-board-section-right">
+          {(currentRound ?? 0) > 1 && <span>{t('rebuilt.placesSince', { round: (currentRound ?? 1) - 1 })}</span>}
+          <button
+            type="button"
+            className="tour-board-search-btn"
+            aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')}
+            onClick={() => { if (searchOpen) setSearchQuery(''); setSearchOpen(!searchOpen); }}
+          >
+            {searchOpen ? <X size={15} /> : <Search size={15} />}
+          </button>
+        </div>
+      </div>
+      {searchOpen && (
+        <div style={{ margin: '10px 20px 0', display: 'flex' }}>
+          <SearchFieldBox
+            ref={searchInputRef}
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={t('board.search.placeholder')}
+          />
+        </div>
+      )}
+    </>
+  );
 
 
   // Column header is owned by BoardTable now (ONE grid definition).
@@ -368,39 +439,33 @@ export function LeaderboardTab() {
   };
 
   return (
-    <div className="tour-board-shell" style={{minHeight:'60vh'}}>
+    <div className="tour-board-shell" style={{minHeight:'60vh', paddingTop: CHROME_CLEARANCE}}>
       {showTabs && <div className="tour-board-events" aria-label={t('leaderboard.a11y.events')}>
         {liveTournaments.map(tt => <Button key={tt.id} variant="outline" className="tour-event-pill" aria-pressed={selected.id===tt.id} onClick={()=>onSelectEvent(tt.id)}>
           {shortEventName(tt.name)}<span className="tour-event-leader">{eventLeaderLabel(tt.leaderName,tt.leaderCount,tt.leaderToPar)}</span>
         </Button>)}
       </div>}
-      <div className="tour-board-event">
-        <div className="tour-event-title-line"><h1>{meta?.name ?? selected.name}</h1>
-          {(metaStatus || currentRound != null) && <LiveMarker status={metaStatus} currentRound={currentRound} />}
-          <Button variant="ghost" size="icon" style={{height:24,width:24,padding:0,color:'var(--tour-board-ink)'}} aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')} onClick={()=>{if(searchOpen)setSearchQuery('');setSearchOpen(!searchOpen);}}>{searchOpen ? <X size={16}/> : <Search size={16}/>}</Button>
+      {/* TOP BLOCK — kicker / wrapping title / place line (leaderboards-page.html). */}
+      <div className="tour-board-top">
+        <div className="tour-board-kicker-row">
+          <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{kicker}</span>
+          {isLive && !suspended ? (
+            <span className="tour-board-live"><i aria-hidden />{t('rebuilt.live', { defaultValue: 'LIVE' })}</span>
+          ) : suspended ? (
+            <LiveMarker status={metaStatus} currentRound={currentRound} />
+          ) : null}
         </div>
-        {summarySegments.length > 0 && <div className="tour-event-sub">{summarySegments.join(' · ')}</div>}
-        {/* SEARCH - the canonical box in its own full-width row. */}
-        {searchOpen && (
-          <div style={{ marginTop: 10, display: 'flex' }}>
-            <SearchFieldBox
-              ref={searchInputRef}
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={t('board.search.placeholder')}
-            />
-          </div>
-        )}
-
+        <h1 className="tour-board-title">{meta?.name ?? selected.name}</h1>
+        {summarySegments.length > 0 && <div className="tour-board-place">{summarySegments.join(' · ')}</div>}
       </div>
-      {(lead || field) && <div className="tour-board-stats">
-        {lead && <div className="tour-board-stat" data-stat="lead"><div className="tour-stat-value">{lead.count > 1 ? lead.count : lead.lead ?? '—'}<small>{t(lead.count>1 ? 'rebuilt.tied' : 'rebuilt.shots')}</small></div><div className="tour-stat-label">{lead.count>1 ? t('rebuilt.atTop') : t('rebuilt.lead',{name:surnameOf(lead.leader.player?.full_name ?? lead.leader.team?.display_name ?? '').toUpperCase()})}</div></div>}
-        {field && <><div className="tour-board-stat" data-stat="average"><div className="tour-stat-value" style={{color:getScoreColor(field.avg,'dark')}}>{fmtAvgToPar(field.avg)}</div><div className="tour-stat-label">{t('rebuilt.fieldAverage')}</div></div>
-        <div className="tour-board-stat" data-stat="low"><div className="tour-stat-value" style={{color:getScoreColor(field.low,'dark')}}>{fmtScore(field.low)}<small>{field.lowPlayers.length>1 ? t('rebuilt.players',{count:field.lowPlayers.length}) : surnameOf(field.lowPlayers[0]?.player?.full_name ?? field.lowPlayers[0]?.team?.display_name ?? '')}</small></div><div className="tour-stat-label">{t('rebuilt.lowToday')}</div></div><FieldAverageTracker count={field.count} tournamentId={selected.id} round={fieldRound}/></>}
+      {figures.length > 0 && <div className="tour-board-figures">
+        {figures.map(f => <div key={f.key} data-stat={f.key}><b style={f.color ? { color: f.color } : undefined}>{f.value}{f.small ? <small>{f.small}</small> : null}</b><span>{f.label}</span></div>)}
+        {field && <FieldAverageTracker count={field.count} tournamentId={selected.id} round={fieldRound} />}
       </div>}
 
       {/* COLUMN HEADER — rendered by BoardTable itself, sticky under the
-          TourPageShell header, so header and rows share ONE grid definition. */}
+          floating islands (CHROME_CLEARANCE), so header and rows share ONE
+          grid definition. */}
 
 
 
@@ -444,7 +509,8 @@ export function LeaderboardTab() {
           cutState={cutState}
           currentRound={currentRound}
           complete={tournamentIsFinished(metaStatus)}
-          headerTop={'var(--tour-header-h, 0px)'}
+          headerTop={CHROME_CLEARANCE}
+          boardHead={boardHead}
           teeTimes={teeTimes}
           onFull={(row) => {
             if (!row.player?.id) return;

@@ -49,11 +49,13 @@ describe('boards without hole marks', () => {
     fireEvent.keyDown(screen.getByRole('button', { name: 'Player A' }), { key: ' ' });
     expect(screen.getByRole('dialog')).toHaveAttribute('data-player-id', 'player-a');
   });
-  it('leaderboard is single-line with 12px padding, no marks/key and no board hole read', () => {
+  it('leaderboard is single-line at the overview board sizes, no marks/key and no board hole read', () => {
     f.entries = [entry]; const v = mount(<LeaderboardTab />);
     const row = v.container.querySelector<HTMLElement>('[data-board-row]');
     expect(row?.style.gridTemplateRows).toBe(''); expect(row?.style.rowGap).toBe('');
-    expect(row?.style.paddingTop).toBe('12px'); expect(row?.style.paddingBottom).toBe('12px');
+    // LEADERBOARDS PAGE (8 Nov 2026): rows take the overview board's sizes —
+    // min-height 31 with 4px vertical padding (was 12px).
+    expect(row?.style.minHeight).toBe('31px'); expect(row?.style.paddingTop).toBe('4px'); expect(row?.style.paddingBottom).toBe('4px');
     expect(v.container.querySelector('[data-hole-marks], [data-hole-marks-key]')).toBeNull();
     expect(f.holes).not.toHaveBeenCalled();
   });

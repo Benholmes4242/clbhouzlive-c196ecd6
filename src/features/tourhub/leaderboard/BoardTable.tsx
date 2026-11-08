@@ -9,7 +9,7 @@ import { getScoreColor } from '../_shared/scoreColor';
 import { formatEarnings } from '../_shared/formatEarnings';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
-import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
+import { TREND_UP, TOUR_LIVE_GREEN, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
@@ -37,7 +37,10 @@ const CANVAS = TOUR_CANVAS;
    32.6px; both are right-aligned, so a track narrower than its label spills
    leftwards into the column beside it. `cell` (26) is a ROUND's figure —
    "R1", "-3" — and TODAY is not a round, so it has its own width here. */
-export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 } as const);
+/* LEADERBOARDS PAGE (8 Nov 2026): the full board takes the Tour overview
+   board's sizes — rounds 30px (25 at ≤340), THRU 34 (32), TOT 40 (36),
+   rows min-height 31 with 4px 0 padding, side padding 20 (16 at ≤340). */
+export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 30, cellFloor: 25, gap: 4 } as const);
 
 /** TIGHTENED GEOMETRY (2.4) — local aliases of BOARD_GEOMETRY, never numbers of their own. */
 const TOT_W = BOARD_GEOMETRY.tot;
@@ -46,11 +49,14 @@ const PRIZE_W = BOARD_GEOMETRY.prize;
 const CELL_W = BOARD_GEOMETRY.cell;
 const CELL_W_FLOOR = BOARD_GEOMETRY.cellFloor;
 const GRID_GAP = BOARD_GEOMETRY.gap;
-/* ROW PADDING IS THE ONE DELIBERATE DIFFERENCE FROM THE HERO BOARD (20 there).
-   This is a full-width scrolling table that needs the content width across
-   seven columns; do not unify it with the hero's 20. */
-const ROW_PAD_X = 16;
-const NAME_SIZE = 14;
+/* NARROW CHROME (≤340px): the signed-off small widths for the figure tracks
+   and the side gutter. */
+const NARROW_TOT_W = 36;
+const NARROW_THRU_W = 32;
+const NARROW_PAD_X = 16;
+/* Row side padding matches the page's 20px gutter (16 at ≤340). */
+const ROW_PAD_X = 20;
+const NAME_SIZE = 13;
 const PRE_NAME_SIZE = 15;
 const PRE_TEE_W = 76;
 /** MOVEMENT only: zero or unavailable movement is a STATEMENT, so it gets a mark. */
@@ -259,10 +265,10 @@ export function computeBoardColumns(
     rounds,
     cellW: CELL_W,
     gap: GRID_GAP,
-    /* AMBER IS A ROUND IN PROGRESS. `started` only knows that scores
-       exist for the current round, which stays true forever once the
-       event ends — so the final round wore amber permanently. The
-       event's own status is what settles it. */
+    /* GREEN IS A ROUND IN PROGRESS (TOUR_LIVE_GREEN). `started` only knows
+       that scores exist for the current round, which stays true forever
+       once the event ends — so the final round stayed marked permanently.
+       The event's own status is what settles it. */
     liveRound: started && !complete ? currentRound as number : null,
     showThru,
     showPrize,
@@ -295,15 +301,15 @@ export function boardRoundsWidth(c: BoardColumns): number {
 /**
  * ONE grid template shared by the header strip and every body row.
  */
-export function boardGridTemplate(c: BoardColumns): string {
+export function boardGridTemplate(c: BoardColumns, chrome?: { thruW?: number; totW?: number }): string {
   if (c.preTournament) return `minmax(0,1fr) ${PRE_TEE_W}px`;
-  /* The first column is AUTO: the places-moved mark plus the position, plus
-     the 8px the name starts after. Names step in and out with the width of
-     the mark and position — they do NOT line up in a column (signed-off B2). */
+  /* ONE flexible ID cell: the places-moved mark, the position and the name,
+     with the name stepping 8px after its own mark/position pair — names do
+     NOT line up in a column (signed-off B2, kept 8 Nov 2026). */
   return [
-    'auto', 'minmax(0,1fr)',
-    ...c.rounds.map(r => `${c.liveRound === r ? 28 : 26}px`),
-    '32px', '40px', c.showPrize ? `${PRIZE_W}px` : '',
+    'minmax(0,1fr)',
+    ...c.rounds.map(() => `${c.cellW}px`),
+    `${chrome?.thruW ?? THRU_W}px`, `${chrome?.totW ?? TOT_W}px`, c.showPrize ? `${PRIZE_W}px` : '',
   ].filter(Boolean).join(' ');
 }
 
@@ -349,8 +355,8 @@ function resolveLayout(
   /* The name track is the row width minus the figure columns, minus the
      WIDEST position-and-mark cluster on the board, minus the 8px the name
      starts after the position. No face takes any width. */
-  const markFont = `700 9.5px ${F}`;
-  const posFont = `700 13px ${F}`;
+  const markFont = `800 9.5px ${F}`;
+  const posFont = `700 12.5px ${F}`;
   const widestCluster = entries.reduce((maximum, entry) => {
     if (isDemoted(entry.status)) return Math.max(maximum, measureText(statusWord(entry.status), `700 10px ${F}`));
     const pos = entry.position == null ? '' : `${entry.position_tied ? 'T' : ''}${entry.position}`;
@@ -478,7 +484,13 @@ export function BoardTable({
     [layoutEntries, resolvedTeamInitials, base, containerW],
   );
 
-  const template = boardGridTemplate(columns);
+  /* ≤340px chrome: the signed-off narrow figure tracks and gutter. */
+  const compact = containerW > 0 && containerW <= 340;
+  const effColumns = compact ? { ...columns, cellW: CELL_W_FLOOR } : columns;
+  const thruW = compact ? NARROW_THRU_W : THRU_W;
+  const totW = compact ? NARROW_TOT_W : TOT_W;
+  const padX = compact ? NARROW_PAD_X : ROW_PAD_X;
+  const template = boardGridTemplate(effColumns, { thruW, totW });
 
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
@@ -555,9 +567,9 @@ export function BoardTable({
   const renderHeader = () => {
     if (!showHeader) return null;
     const labelStyle: React.CSSProperties = {
-      fontSize: 9.5,
+      fontSize: compact ? 9 : 10,
       fontWeight: 700,
-      letterSpacing: '0.08em',
+      letterSpacing: compact ? '0.04em' : '0.08em',
       textTransform: 'uppercase',
       color: SECONDARY,
       whiteSpace: 'nowrap',
@@ -570,19 +582,19 @@ export function BoardTable({
           zIndex: 2,
           display: 'grid',
           gridTemplateColumns: template,
-          gap: columns.gap,
+          gap: effColumns.gap,
           alignItems: 'center',
-          height: 34,
-          padding: `0 ${ROW_PAD_X}px`,
+          minHeight: 26,
+          padding: `0 ${padX}px`,
           background: 'var(--tour-board-head)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
-          borderBottom: `1px solid ${HAIRLINE}`,
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
           fontFamily: F,
           ...labelStyle,
         }}
       >
-        {columns.preTournament ? (
+        {effColumns.preTournament ? (
           <>
             <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
             <div style={{ ...labelStyle, textAlign: 'center' }}>
@@ -591,28 +603,27 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left' }}>{t('board.columns.pos')}</div>
-            <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
-            {columns.rounds.map((r) => (
+            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left', minWidth: 0 }}>{`${t('board.columns.pos')}  ${t('board.columns.player')}`}</div>
+            {effColumns.rounds.map((r) => (
               <div
                 key={r}
                 data-board-round-header
                 style={{
                   ...labelStyle,
                   textAlign: 'center',
-                  // AMBER on this page means THE LIVE ROUND, not the viewing
-                  // member. Bounded, local, deliberate.
-                  color: columns.liveRound === r ? AMBER : SECONDARY,
+                  // GREEN on this page means THE LIVE ROUND (TOUR_LIVE_GREEN);
+                  // amber is reserved for the viewing member (followed rows).
+                  color: effColumns.liveRound === r ? TOUR_LIVE_GREEN : MUTED,
                 }}
               >
                 {`R${r}`}
               </div>
             ))}
             {true && (
-              <div data-board-thru-header style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.thru')}</div>
+              <div data-board-thru-header style={{ ...labelStyle, letterSpacing: 0, textAlign: 'center' }}>{t('board.columns.thru')}</div>
             )}
             <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.tot')}</div>
-            {columns.showPrize && (
+            {effColumns.showPrize && (
               <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.prize', 'Prize')}</div>
             )}
           </>
@@ -670,16 +681,17 @@ export function BoardTable({
           position: 'relative',
           display: 'grid',
           gridTemplateColumns: template,
-          columnGap: columns.gap,
+          columnGap: effColumns.gap,
           alignItems: 'center',
-          padding: `12px ${ROW_PAD_X}px`,
+          minHeight: 31,
+          padding: `4px ${padX}px`,
           background: yourPlayers ? 'var(--tour-board-mine)' : isLeader ? 'var(--tour-board-leader)' : surface,
           opacity: demotedRow ? 0.55 : 1,
           cursor: pid ? 'pointer' : 'default',
           fontFamily: F,
         }}
       >
-        {columns.preTournament ? (
+        {effColumns.preTournament ? (
           <>
             {entity.kind === 'team' ? (
               <div style={{ minWidth: 0 }}>
@@ -711,34 +723,39 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div className="tour-board-cluster">
-              {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : STATUS_NEGATIVE}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
-              {showPosition && <span data-board-position style={{fontSize:demotedRow ? 10 : 13,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{posText}</span>}
+            {/* ONE flexible ID cell: movement, POS, then the name 8px after
+                the row's own mark/position pair (.tour-board-cluster's
+                padding-right), so names step with their position. */}
+            <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+              <div className="tour-board-cluster">
+                {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : MUTED}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
+                {showPosition && <span data-board-position style={{fontSize:demotedRow ? 10 : 12.5,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{posText}</span>}
+              </div>
+
+              {entity.kind === 'team' ? (
+                // A team row names two people, not one. The field's longest pair
+                // needs 254px on one line against a 194px name track at 320, so
+                // the pair stacks. Both lines take full INK: neither player is a
+                // supporting credit.
+                <div style={{ minWidth: 0 }}>
+                  {entity.lines.map((line, index) => (
+                    <span key={`${e.id}-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {line}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="tour-board-player">
+                  <div className="tour-board-who"><span className="tour-board-name"><span className="tour-board-name-text">{nameText}</span>
+                    {pid && pickPlayerIds?.has(pid) && <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />}
+                    {pid && followedIds.has(pid) && <span className="tour-board-star" aria-label={t('rebuilt.following')}>★</span>}
+                  </span></div>
+                </div>
+              )}
             </div>
 
-            {entity.kind === 'team' ? (
-              // A team row names two people, not one. The field's longest pair
-              // needs 254px on one line against a 194px name track at 320, so
-              // the pair stacks. Both lines take full INK: neither player is a
-              // supporting credit.
-              <div style={{ minWidth: 0 }}>
-                {entity.lines.map((line, index) => (
-                  <span key={`${e.id}-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {line}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <div className="tour-board-player">
-                <div className="tour-board-who"><span className="tour-board-name"><span className="tour-board-name-text">{nameText}</span>
-                  {pid && pickPlayerIds?.has(pid) && <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />}
-                  {pid && followedIds.has(pid) && <span className="tour-board-star" aria-label={t('rebuilt.following')}>★</span>}
-                </span></div>
-              </div>
-            )}
-
-            {columns.rounds.map((r) => {
-              const isLive = columns.liveRound === r;
+            {effColumns.rounds.map((r) => {
+              const isLive = effColumns.liveRound === r;
               const val = r === currentRound ? todayVal : roundVals[r - 1] ?? null;
               const settled = !isLive;
               return (
@@ -748,10 +765,10 @@ export function BoardTable({
                   style={{
                     textAlign: 'center',
                     fontSize: 12,
-                    fontWeight: settled ? 600 : 800,
+                    fontWeight: settled ? 600 : 700,
                     // Rounds at full strength: a played round keeps its colour,
                     // size and weight at opacity 1. The current round is marked
-                    // by its 800 weight and amber header. An empty cell is a
+                    // by its 700 weight and green header. An empty cell is a
                     // different thing and keeps A.DIM.
                     opacity: 1,
                     color: val == null ? A.DIM : houseColor(val),
@@ -770,9 +787,8 @@ export function BoardTable({
                 style={{
                   textAlign: 'center',
                   fontSize: 12,
-                  // Still out there = a number, stated. Settled = a quiet 'F'.
                   fontWeight: 600,
-                  color: thruDisplay === 'F' ? A.DIM : A.BODY,
+                  color: MUTED,
                   fontVariantNumeric: 'tabular-nums lining-nums',
                   whiteSpace: 'nowrap',
                 }}
@@ -785,8 +801,8 @@ export function BoardTable({
             <div
               style={{
                 textAlign: 'center',
-                fontSize: 16,
-                fontWeight: 800,
+                fontSize: 15,
+                fontWeight: 700,
                 letterSpacing: 0,
                 color: totColor,
                 fontVariantNumeric: 'tabular-nums lining-nums',
@@ -799,7 +815,7 @@ export function BoardTable({
             {/* PRIZE — earned nothing is stated with an em dash in the faint
                 slot, never a blank and never a zero. MC/WD/DQ/DNS rows earn
                 nothing, so they dash too. */}
-            {columns.showPrize && (
+            {effColumns.showPrize && (
               <div
                 style={{
                   textAlign: 'center',
