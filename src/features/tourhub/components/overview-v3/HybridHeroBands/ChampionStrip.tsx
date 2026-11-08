@@ -81,7 +81,7 @@ export function ChampionStrip({
   const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
   const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
-  if(presentation==='tournament')return <section className="tv-champion" data-tv-section="champion"><div className="tv-champion-top"><PlayerHead size={46} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey}/><div><div className="tv-champion-label">{resolvedEyebrow}</div><div className="tv-champion-name">{name}</div></div><div className="tv-champion-score"><b className={scoreValue!=null&&scoreValue<0?'tv-under':''}>{score}</b>{scoreLabel&&<small>{scoreLabel}</small>}</div></div>{narrativeParts&&narrativeParts.length>0&&<p className="tv-champion-line">{narrativeParts.map((p,i)=>p.bold?<b key={i}>{p.text}</b>:<span key={i}>{p.text}</span>)}</p>}</section>;
+  if(presentation==='tournament')return <section className="tv-champion" data-tv-section="champion"><div className="tv-champion-top"><PlayerHead size={46} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} gapColor="#121216"/><div><div className="tv-champion-label">{resolvedEyebrow}</div><div className="tv-champion-name">{name}</div></div><div className="tv-champion-score"><b className={scoreValue!=null&&scoreValue<0?'tv-under':''}>{score}</b>{scoreLabel&&<small>{scoreLabel}</small>}</div></div>{narrativeParts&&narrativeParts.length>0&&<p className="tv-champion-line">{narrativeParts.map((p,i)=>p.bold?<b key={i}>{p.text}</b>:<span key={i}>{p.text}</span>)}</p>}</section>;
   return (
     <div
       style={{
@@ -106,7 +106,7 @@ export function ChampionStrip({
         }}
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
-        <PlayerHead size={42} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} />
+        <PlayerHead size={42} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} gapColor={SURFACE} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             <span
