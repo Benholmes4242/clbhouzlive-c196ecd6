@@ -27,6 +27,8 @@
  */
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { HoleTiles } from '@/features/tourhub/leaderboard/BoardRound';
+import '@/features/tourhub/leaderboard/leaderboard.css';
 import { smoothPath } from '@/lib/charts/smoothPath';
 import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
 import { T40, T60 } from './feedTokens';

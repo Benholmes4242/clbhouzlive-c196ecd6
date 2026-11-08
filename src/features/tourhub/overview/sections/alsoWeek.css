@@ -46,6 +46,3 @@
 .also-fl {margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--tour-board-dim)}
 .also-yours {margin-top:10px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--tour-board-mute)}
 .also-yours strong {color:var(--tour-board-amber);font-weight:700}
-.also-stack {display:flex;flex:none}
-.also-stack>span {border:2px solid var(--tour-board-canvas);border-radius:34%;margin-left:-6px}
-.also-stack>span:first-child {margin-left:0}
