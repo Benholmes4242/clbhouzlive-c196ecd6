@@ -7,7 +7,8 @@ import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BOARD_GEOMETRY, BoardTable, computeBoardColumns, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
-import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { copy as tvCopy, words as tvWords } from '@/features/tourhub/tournament-v2/data/tournamentRules';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { PhotoBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
@@ -98,11 +99,9 @@ describe('Tour Overview Design A hero facts', () => {
     expect(detectTopTie([{ score: -18 }, { score: -18 }, { score: -17 }])).toEqual({ count: 2, score: '−18' });
   });
 
-  it('keeps the wonBy/playoff qualifier in the separate scoreLabel register', () => {
-    const t = (key: string, options?: { count: number }) => key.endsWith('playoff') ? 'playoff' : `by ${options?.count}`;
-    expect(overviewChampionScoreLabel(false, 2, t)).toBe('by 2');
-    expect(overviewChampionScoreLabel(true, null, t)).toBe('playoff');
-    expect(overviewChampionScoreLabel(false, null, t)).toBeUndefined();
+  it('uses the tournament page\'s "BY {words}" rule for the champion score label', () => {
+    expect(tvCopy('by', { words: tvWords(2).toUpperCase() })).toBe('BY TWO');
+    expect(tvCopy('by', { words: tvWords(5).toUpperCase() })).toBe('BY FIVE');
   });
 
   it('does not invent a tie when the rest of the field merely shares the leader score', () => {
