@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { ChampionStrip } from '@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip';
 import { HybridHero } from '@/features/tourhub/components/overview-v3/HybridHero';
+/* BUILD_TOUR_BUTTONS_UNDER_HERO §1: the champion block moved out of
+   HybridHero into OverviewHero (below the tour chip row); these tests mount
+   the same block directly. */
+import { OverviewChampionBlock } from '@/features/tourhub/components/overview-v3/useOverviewChampion';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -60,7 +64,7 @@ describe('Tour champion avatar candidates', () => {
     expect(fallback?.querySelector('svg')).toBeNull();
   });
 
-  it('passes the full tour-folder walk and upload override from HybridHero', () => {
+  it('passes the full tour-folder walk and upload override from the overview champion block', () => {
     const slide: HeroSlide = { type: 'completed', tournament: {
       id: 'india', name: 'India Championship', status: 'closed', startDate: '2026-10-15', endDate: '2026-10-18',
       venueName: null, venueCourseName: null, venueCity: null, venueState: null, venueCountry: null, venuePar: 72, venueYardage: null,
