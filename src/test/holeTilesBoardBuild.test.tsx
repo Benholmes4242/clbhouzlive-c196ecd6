@@ -95,10 +95,10 @@ describe('no rings on tour player avatars', () => {
 describe('competition mark on round cards', () => {
   const item = { id: 'round:c', kind: 'round', ring: null, lane: 'news', score: 0, consequence: null, subject: { course_id: null, course_name: 'Sample', region: null, sub_country: null, image_url: null, pending: false }, who: { user_id: 'p', display_name: 'Pat', photo_url: null, is_viewer: false }, facts: { score_id: 'c', course_handicap: 18, gross: 90, net: 72, course_par: 72 }, payload: {}, seen: false } as StreamItem;
   it('ExploreCard shows COMP only on explicit true', () => {
-    const on = render(<ExploreCard item={item} size="std" isCompetition />);
+    const on = render(<ExploreCard item={item} size="std" onTap={() => {}} isCompetition />);
     expect(on.container.querySelector('[data-round-author-name]')?.parentElement?.textContent).toMatch(/comp/i);
     cleanup();
-    const off = render(<ExploreCard item={item} size="std" />);
+    const off = render(<ExploreCard item={item} size="std" onTap={() => {}} />);
     expect(off.container.querySelector('[data-round-author-name]')?.parentElement?.textContent).not.toMatch(/comp/i);
   });
   it('FeaturedRoundCard shows COMP only on explicit true', () => {
