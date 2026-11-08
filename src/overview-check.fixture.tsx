@@ -1,0 +1,10 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
+import {MemoryRouter} from 'react-router-dom';
+import '/src/index.css';
+import '/src/i18n';
+import {PhotoBand} from '/src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
+import {ChampionStrip} from '/src/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip';
+const done=new URLSearchParams(location.search).has('done');
+createRoot(document.getElementById('root')).render(<QueryClientProvider client={new QueryClient()}><MemoryRouter><PhotoBand title="Bermuda Championship" venueName="Port Royal Golf Course" datesString="Nov 5–8" venueImageUrl={null} state={done?{kind:'results',variant:'standard',finishDate:'2026-11-08',meta:''}:{kind:'live',round:3,totalRounds:4}} tourLabel="PGA Tour" leader={done?null:{score:-17,faces:[{key:'a',name:'Winner',candidates:[]}],caps:'Winner'}} countdown={[]} startDay={null} onOpen={()=>{}} onFullBoard={done?undefined:()=>{}} segments={done?[]:[{text:'A tight contest at Port Royal.',figure:false}]} />{done&&<ChampionStrip name="Eugenio Lopez-Chacarra" score="−17" scoreValue={-17} scoreLabel="BY TWO" eyebrow="CHAMPION" playerKey="winner" narrativeParts={[{text:'A two-shot win at Port Royal.'}]} />}</MemoryRouter></QueryClientProvider>);
