@@ -1,8 +1,8 @@
 # Roadmap
 
 ## HERO_ROUND_EMPTY_CARD
-- [ ] Keep score-based chips enabled after empty reads; show missing-card note and remove empty-round state.
-- [ ] Authorized assertion update plus one new test; four separate shards and report against7774baseline.
+- [x] Keep score-based chips enabled after empty reads; show missing-card note and remove empty-round state.
+- [x] Focused16/16; separate shards2007/1868/1994/1906 =7775passed (+1 new case); see HERO_ROUND_EMPTY_CARD_REPORT.md.
 
 ## HERO_BOARD_EXPAND
 - [x] Top ten, shared Full leaderboard action and lazy round panels; availability ruling recorded.
