@@ -30,10 +30,10 @@ const field: BoardEntry[] = [{ id: 'a', position: 1, score: -6, round_1: -4, rou
 const photo = (state: HeroState, onOpen = vi.fn(), onFullBoard?: () => void) => <PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl="https://example.test/course.jpg" state={state} tourLabel="PGA" leader={{ score: -6, faces: [], caps: 'A' }} countdown={[{ value: 2, label: 'days' }]} startDay={null} segments={[{ text: 'Figure ', figure: false }, { text: '6', figure: true }]} note="Note" onOpen={onOpen} onFullBoard={onFullBoard} />;
 
 describe('Merged Airy photo', () => {
-  it.each(states)('puts the sentence and note on the 340px photo in $kind', state => {
+  it.each(states)('puts the sentence and note on the 350px photo in $kind', state => {
     const v = mount(photo(state));
     const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
-    expect(band?.style.height).toBe('340px');
+    expect(band?.style.height).toBe('350px');
     expect(band?.querySelector('[data-overview-photo-situation]')).not.toBeNull();
     expect(band?.querySelector('[data-overview-situation-note]')).not.toBeNull();
     expect(v.container.querySelector('[data-overview-situation]')).toBeNull();

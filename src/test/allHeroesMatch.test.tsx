@@ -46,9 +46,9 @@ describe('ALL_HEROES_MATCH step 0 — the shared fade', () => {
 });
 
 describe('ALL_HEROES_MATCH review wizard step 1', () => {
-  it('the photo header is 340px plus the notch, like the course hero', () => {
-    expect(PHOTO_HEADER_H_CSS).toBe('calc(env(safe-area-inset-top, 0px) + 340px)');
-    expect(src('features/review-v2/components/reviewComposerHeader.css')).toContain('.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 340px); }');
+  it('the photo header is 350px in total, notch counted inside', () => {
+    expect(PHOTO_HEADER_H_CSS).toBe('350px');
+    expect(src('features/review-v2/components/reviewComposerHeader.css')).toContain('.rv2-header--photo { height: 350px; }');
   });
   it('the fade ends on the wizard canvas and the masthead is the photo band', () => {
     const hero = src('features/review-v2/components/ReviewCourseHero.tsx');
@@ -61,11 +61,11 @@ describe('ALL_HEROES_MATCH review wizard step 1', () => {
 });
 
 describe('ALL_HEROES_MATCH golfer profile band', () => {
-  it('is a 39/34 band whose crop frame reads the same constant', () => {
+  it('is a 350px band whose crop frame keeps the 39/34 constant', () => {
     expect(PERSONAL_COVER_ASPECT).toBe(39 / 34);
     expect(PERSONAL_COVER_ASPECT_CSS).toBe('39 / 34');
     const { container } = render(<ProfileCoverBand coverUrl="x.jpg" avatar={<span>A</span>} displayName="Benjamin Holmes" subline="Sundridge Park Golf Club" action={<button type="button">Edit</button>} />);
-    expect((container.firstElementChild as HTMLElement).style.aspectRatio).toBe('39 / 34');
+    expect((container.firstElementChild as HTMLElement).style.height).toBe('350px');
     expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
   });
   it('puts the club in the kicker row with the controls, name at 26px with no shadow', () => {
@@ -100,10 +100,10 @@ describe('ALL_HEROES_MATCH business profile hero', () => {
         {...over}
       />,
     );
-  it('lays the fade over a 39/34 cover with the identity on the photo', () => {
+  it('lays the fade over a 350px cover with the identity on the photo', () => {
     const { container } = hero();
     const cover = container.querySelector('[data-club-cover]') as HTMLElement;
-    expect(cover.style.aspectRatio).toBe('39 / 34');
+    expect(cover.style.height).toBe('350px');
     expect(cover.querySelector('[data-photo-band-fade]')).not.toBeNull();
     // Place is the amber kicker with Share/More on its right.
     const place = cover.querySelector('[data-club-place]') as HTMLElement;
