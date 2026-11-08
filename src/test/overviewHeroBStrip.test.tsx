@@ -13,7 +13,7 @@ const f=vi.hoisted(()=>({mine:null as string|null,rows:[] as TournamentPicksBoar
 vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:{id:'me',is_anonymous:false}})}));
 vi.mock('@/features/guest/guestGateStore',()=>({getGuestUser:()=>null}));
 vi.mock('@/features/guest/useGuestActionGate',()=>({useGuestActionGate:()=>()=>false}));
-vi.mock('@/features/tourhub/hooks/useTournamentPick',()=>({useGuestTournamentPickLock:()=>({data:null,isError:false}),useTournamentPickState:()=>({data:{locked:true,my_player_id:f.mine,followed_pickers:0,followed_top:[]},isError:false}),useTournamentPicksBoard:()=>({data:f.rows,isError:false})}));
+vi.mock('@/features/tourhub/hooks/useTournamentPick',()=>({usePickField:()=>({data:[]}),useGuestTournamentPickLock:()=>({data:null,isError:false}),useTournamentPickState:()=>({data:{locked:true,my_player_id:f.mine,followed_pickers:0,followed_top:[]},isError:false}),useTournamentPicksBoard:()=>({data:f.rows,isError:false})}));
 vi.mock('@/features/tourhub/hooks/useTournamentCircleRank',()=>({useTournamentCircleRank:()=>({data:null})}));
 vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes',()=>({usePickTeeTimes:()=>({data:new Map()})}));
 vi.mock('@/features/tourhub/tournament-v2/data/useTeeTimesAll',()=>({useTeeTimesAll:()=>({data:[]})}));
