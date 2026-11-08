@@ -54,10 +54,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoEngine } from '@/video/VideoEngine';
-import { useLaneAudioBlocked } from '@/audio/useLaneAudioBlocked';
-import { triggerHaptic } from '@/lib/ui/haptics';
+import { useFullscreenMuteControl } from './useFullscreenMuteControl';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
 import { FullscreenVideoScrubber } from './FullscreenVideoScrubber';
 import { COMMENT_BAR_H, BAND_H_CSS } from '@/lib/media/fullscreenBand';
@@ -392,20 +390,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
-  const isAudioMuted = useSessionAudio((s) => s.isMuted);
-  // CB48: the engine owns refusals; only the lane actually showing controls this icon.
-  const soundLaneId = useFullscreenFeedStore((s) => s.borrow?.laneId ?? 'fullscreen');
-  const soundBlocked = useLaneAudioBlocked(soundLaneId);
-  const shownMuted = isAudioMuted || soundBlocked;
-
-  const handleMuteTap = useCallback(() => {
-    try { triggerHaptic('light'); } catch {}
-    if (!isAudioMuted && soundBlocked) {
-      VideoEngine.unblockFromGesture();
-    } else {
-      useSessionAudio.getState().toggle();
-    }
-  }, [soundBlocked, isAudioMuted]);
+  // The shared fullscreen sound control (useFullscreenMuteControl); the
+  // course gallery chrome uses the same one.
+  const { soundLaneId, shownMuted, handleMuteTap } = useFullscreenMuteControl();
 
   const activePost = posts[activeIndex] ?? null;
   const [videoAboutOpen, setVideoAboutOpen] = useState(false);

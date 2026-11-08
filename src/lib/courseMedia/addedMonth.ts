@@ -12,3 +12,13 @@ export function addedMonthLabel(value: string | null | undefined): string | null
   if (!Number.isFinite(date.getTime())) return null;
   return `${MONTHS[date.getUTCMonth()]} ${String(date.getUTCFullYear()).padStart(4, '0')}`;
 }
+
+/** GALLERY_CONTROLS §4 — the gallery credit's posted date: the day without a
+ * leading zero, the three-letter month and the four-digit year, UTC. Read from
+ * the post's createdAt, never the tag's added_at. */
+export function postedDateLabel(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  return `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${String(date.getUTCFullYear()).padStart(4, '0')}`;
+}

@@ -2,7 +2,7 @@
  * second viewer lives here; filter replacement and jumps use the shared store. */
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Flag, Grid2X2, Image as ImageIcon, Share, Tag, X } from 'lucide-react';
+import { Flag, Grid2X2, Image as ImageIcon, Share, Tag, Volume2, VolumeX, X } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
@@ -10,7 +10,9 @@ import { Button } from '@/components/ui/button';
 import { COURSE_PLACES, type CoursePlace } from '@/lib/courseMedia/places';
 import { filteredGallery, galleryAction, galleryFilters, galleryGroups, galleryPost, galleryRun, shortOrdinal, type GalleryFilter, type GalleryShot } from '@/lib/courseMedia/courseGallery';
 import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
-import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
+import { postedDateLabel } from '@/lib/courseMedia/addedMonth';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useFullscreenMuteControl } from './useFullscreenMuteControl';
 import { PLACE_LABELS } from '@/components/course-media-tab/ShotTagChoices';
 import { placeAge } from '@/components/course-media-tab/CoursePlaceTiles';
 import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
@@ -30,6 +32,9 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
   const pager = useFullscreenFeedStore(s => s.activePagerIdx);
   const [grid, setGrid] = useState(false);
   const [tagShot, setTagShot] = useState<GalleryShot | null>(null);
+  // The shared fullscreen sound control — the same one ImmersiveFullscreenChrome
+  // uses, so course videos are not a second mute.
+  const { shownMuted, handleMuteTap } = useFullscreenMuteControl();
   const panelRef = useRef<HTMLDivElement>(null); const gridRef = useRef<HTMLDivElement>(null);
   const [gridTop, setGridTop] = useState<number | undefined>(undefined);
   // The grid starts 6px below the panel's measured bottom and scrolls under it.
@@ -87,6 +92,7 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
       <div className="course-gallery-top">
         <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.close', { defaultValue: 'Close' })} onClick={onClose}><X size={16} /></Button>
         <div className="course-gallery-heading"><b>{options.courseName}</b><span data-gallery-count>{grid ? t('media.gallery.gridCount', { count: list.length, filter: label(options.filter), defaultValue: `${list.length} ${shotWord(list.length)} · ${label(options.filter)}` }) : t('media.gallery.count', { i: Math.min(pager + 1, list.length), n: list.length, filter: label(options.filter), defaultValue: `${Math.min(pager + 1, list.length)} of ${list.length} · ${label(options.filter)}` })}</span></div>
+        {!grid && <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.share', { defaultValue: 'Share' })} onClick={() => void share()}><Share size={16} /></Button>}
         <Button variant="ghost" className="course-gallery-circle course-gallery-grid-toggle" aria-label={t(grid ? 'media.gallery.fullscreen' : 'media.gallery.grid', { defaultValue: grid ? 'Full screen' : 'Grid view' })} aria-pressed={grid} onClick={() => { setGrid(on => !on); void analyticsEvents.track('course_gallery_grid_toggle', { on: !grid }); }}>{grid ? <ImageIcon size={16} /> : <Grid2X2 size={16} />}</Button>
       </div>
       <div className="course-gallery-filters">{galleryFilters(data.shots).map(({ filter, count }) => {
@@ -125,9 +131,11 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
         <p>{t('media.gallery.membersShots', { count: placeCount, defaultValue: `${placeCount} ${shotWord(placeCount)} from members` })}{place.id === 'conditions' && age && <> · {t('media.gallery.latest', { age: t(`media.gallery.age.${age.key}`, { count: age.count, defaultValue: age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago` }), defaultValue: `Latest ${age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago`}` })}</>}</p>
       </> : null}
       {(shot.holeTag || shot.placeTag) && <hr />}
-      <div className="course-gallery-credit-row"><div className="course-gallery-credit"><span className="course-gallery-avatar">{shot.avatar ? <img src={shot.avatar} alt="" /> : shot.name.split(/\s+/).map(word => word[0]).slice(0, 2).join('')}</span><span><b>{shot.name}</b>{addedMonthLabel(shot.addedAt) && ` · ${addedMonthLabel(shot.addedAt)}`}</span></div><div className="course-gallery-actions">
+      <div className="course-gallery-credit-row"><div className="course-gallery-credit">{shot.ownerId
+        ? <SquircleAvatar src={shot.avatar || null} alt={shot.name} userId={shot.ownerId} size={32} hairlineRing />
+        : <span className="course-gallery-avatar">{shot.avatar ? <img src={shot.avatar} alt="" /> : shot.name.split(/\s+/).map(word => word[0]).slice(0, 2).join('')}</span>}<span className="course-gallery-credit-who"><b>{shot.name}</b>{postedDateLabel(shot.post.createdAt) && <small>{postedDateLabel(shot.post.createdAt)}</small>}</span></div><div className="course-gallery-actions">
         {action && <Button variant="ghost" className={`course-gallery-tag${action === 'tag' ? ' is-primary' : ''}`} onClick={() => { setTagShot(shot); void analyticsEvents.track('course_gallery_tag_open', { mode: action }); }}><Tag size={15} />{t(action === 'tag' ? 'media.gallery.tag' : 'media.gallery.retag', { defaultValue: action === 'tag' ? 'Tag this shot' : 'Retag' })}</Button>}
-        <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.share', { defaultValue: 'Share' })} onClick={() => void share()}><Share size={16} /></Button>
+        {shot.item.type === 'video' && <Button variant="ghost" className="course-gallery-circle" aria-label={shownMuted ? t('media.gallery.unmute', { defaultValue: 'Unmute' }) : t('media.gallery.mute', { defaultValue: 'Mute' })} onClick={handleMuteTap}>{shownMuted ? <VolumeX size={17} /> : <Volume2 size={17} />}</Button>}
       </div></div>
     </div>}
     {tagShot && <CourseGalleryTagger courseId={options.courseId} shot={tagShot} holes={data.holes.map(hole => hole.hole_no)} onClose={() => setTagShot(null)} onSaved={(holeTag, placeTag) => {
