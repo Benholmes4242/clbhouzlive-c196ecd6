@@ -1,30 +1,29 @@
-/** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once). */
+/** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once).
+ *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: the "Full board ›" kicker link is gone in
+ *  EVERY state — the Full leaderboard button under the board (OverviewHero)
+ *  does the navigation. The champion block no longer renders here either: it
+ *  follows the tour chip row (OverviewChampionBlock, useOverviewChampion.ts).
+ *  This component still needs the champion itself: the closing round feeds
+ *  the photo sentence and showChampion drops it. */
 import { useMemo } from 'react';
-import { useHeroFullBoard } from './useHeroFullBoard';
-import { hasStrokeBoard } from '../../_shared/eventFormat';
-import { FullBoardSheet } from '../../tournament-v2/sections/FullBoardSheet';
-import { boardPhaseFor, shouldShowOverviewBoard } from './HybridHeroBands/HeroBoardBand';
 import { useTranslation } from 'react-i18next';
 import '@/styles/hybrid-hero.css';
 
 import type { HeroSlide } from '../../hooks/useHeroCarouselData';
-import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { PhotoBand, type HeroLeaderTrio, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
 import { countInWords } from './overviewTokens';
-import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, type HeroState } from './HybridHero.utils';
+import { isInPlayState, type HeroState } from './HybridHero.utils';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
-import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
-import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
-import { championNarrative, copy as tvCopy, words as tvWords } from '../../tournament-v2/data/tournamentRules';
-import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
+import { resolveBoardEntity } from '../../_shared/boardEntity';
 import { situationSegments, visibleSituationNote } from '../../overview/situationCopy';
 import { roundsFromSchedule } from './HybridHero.utils';
 import { tournamentHeadlineSegments } from '../../overview/magazineCopy';
 import { earliestTeeTime, fieldHasStarted } from '../../overview/boardStarted';
 import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
+import { useOverviewChampion } from './useOverviewChampion';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -35,7 +34,6 @@ export interface HybridHeroProps {
   activeTournamentId: string | null;
   onSelectTour: (tournamentId: string) => void;
   onOpenTournament: () => void;
-  onFullBoard?: () => void;
 }
 
 export function getOverviewCountdown(startDate: string, now = new Date()): OverviewCountdownUnit[] {
@@ -76,17 +74,6 @@ export function formatOverviewDateRange(startDate: string, endDate?: string | nu
 }
 
 /**
- * The champion's gross closing round. round_N is a TO-PAR figure, so the
- * venue par is added to turn it into strokes. Either absent → null, and the
- * sentence takes its variant without a closing round.
- */
-function closingGross(round4: number | null | undefined, par: number | null | undefined): number | null {
-  if (typeof round4 !== 'number' || !Number.isFinite(round4)) return null;
-  if (typeof par !== 'number' || !Number.isFinite(par) || par <= 0) return null;
-  return par + round4;
-}
-
-/**
  * A.2 THE LEADER TRIO: faces (at most three), the score, one caps line.
  * The caps line states the TRUE count of a tie, however many faces show.
  * Null unless the board has a sole or shared first with a score.
@@ -120,7 +107,7 @@ export function buildLeaderTrio(
   };
 }
 
-export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }: HybridHeroProps) {
+export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
 
@@ -140,84 +127,18 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
   );
   const { data: imageMap } = useBatchCourseImages(venueAdapter);
   const venueImageUrl = tournament.id ? imageMap?.get(tournament.id) ?? null : null;
-  const { data: leaderboard = [] } = useTourLeaderboard(state.kind === 'upcoming' ? '' : tournament.id);
-  const rows = Array.isArray(leaderboard) ? leaderboard : [];
+
+  /* The shared champion derivation (useOverviewChampion.ts) owns the board
+     read; the same rows feed the leader trio and the situation sentence. */
+  const { rows, needsInitials, champion, showChampion } = useOverviewChampion(slide, state);
+
   // Live before anyone tees off: the situation names the first tee time, read
   // from the same tee-time source LeadersGroup uses.
   const notStarted = state.kind === 'live' && !fieldHasStarted(rows);
   const { data: currentTees } = useTeeTimesAll(tournament.id, state.kind === 'live' ? state.round : 1, { enabled: notStarted });
   const firstTeeTime = notStarted ? earliestTeeTime(currentTees) : null;
-  const top = rows[0];
-  const topPosition = top?.position;
-  const tiedCount = topPosition === 1
-    ? rows.filter((entry) => entry.position === 1).length
-    : 0;
-  const tied = tiedCount > 1 ? { count: tiedCount } : null;
-  const needsInitials = useMemo(() => teamNamesNeedInitials(rows), [rows]);
 
   const leader = isInPlayState(state) ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
-
-  /* "Full board ›" (BRIEF_TOUR_OVERVIEW_PICKS_CHIPS_AND_FULL_BOARD §2): the
-     hero board's own gate plus a stroke format; never upcoming. Behaviour
-     mirrors TournamentPage.openFullBoard — live and in the live list
-     deep-links to Leaderboards, anything else opens the house sheet with the
-     FULL field (rows) and the event meta. */
-  const fullBoardAvailable = boardPhaseFor(state) !== 'upcoming'
-    && hasStrokeBoard(tournament.eventType ?? null)
-    && shouldShowOverviewBoard(rows);
-  const fullBoard = useHeroFullBoard(tournament.id, isInPlayState(state), fullBoardAvailable && !onFullBoard);
-  const openFullBoard = onFullBoard ?? fullBoard.onOpen;
-
-  const champion = useMemo(() => {
-    // Champion gate — the SAME rule as the pick trophy in HeroBoardBand: only a
-    // genuinely finished event (isChampionResolvable) with an authoritative
-    // winner. Never by name or position on a live/suspended/playoff board.
-    if (!isChampionResolvable(state) || top?.score == null) return null;
-    // event_type comes from sr_tournaments via the slide — never inferred
-    // from the shape of the top board row. Resolved even when winnerName is
-    // set: its rounds and country feed the strip.
-    const championEntry = resolveChampionEntry(rows, { winner_id: tournament.winnerId, event_type: tournament.eventType });
-    const teamChampion = championEntry && !tournament.winnerName ? resolveBoardEntity(championEntry, needsInitials) : null;
-    const championName = tournament.winnerName ?? teamChampion?.prose ?? null;
-    if (!championName) return null;
-    const championScore = championEntry?.score ?? top.score;
-    const runner = rows
-      .filter((row) => row.id !== championEntry?.id && row.score != null && row.score > championScore)
-      .sort((a, b) => (a.score ?? Number.POSITIVE_INFINITY) - (b.score ?? Number.POSITIVE_INFINITY))[0]
-      ?? rows.find((row) => row.id !== championEntry?.id && row.score != null);
-    const margin = runner?.score != null ? runner.score - championScore : null;
-    const tiedAtTop = detectTopTie(rows);
-    return {
-      name: championName,
-      score: championScore,
-      margin: tiedAtTop ? null : margin != null && margin > 0 ? margin : null,
-      playoff: Boolean(tiedAtTop),
-      rounds: championEntry
-        ? [championEntry.round_1, championEntry.round_2, championEntry.round_3, championEntry.round_4]
-            .filter((r): r is number => typeof r === 'number' && Number.isFinite(r)) // to-par: 0 and negatives are real rounds
-        : [],
-      closingRound: closingGross(championEntry?.round_4, tournament.venuePar),
-    };
-  }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName, tournament.venuePar]);
-
-  const championAvatarCandidates = champion
-    ? resolvePlayerAvatarCandidates({
-        name: champion.name,
-        photoUrl: tournament.winnerPhotoUrl,
-        tourSlug: tournament.tourSlug,
-        headshotOverride: tournament.winnerHeadshotOverride,
-      })
-    : [];
-
-  /* The overview's champion block IS the tournament page's: same narrative
-     (championNarrative over the FULL field) and the same "BY {words}" score
-     label rule as TournamentPage. The meta it reads is assembled from the
-     slide's tournament fields. */
-  const championMeta = useMemo(
-    () => ({ winner_id: tournament.winnerId, venue_par: tournament.venuePar, start_date: tournament.startDate }) as TournamentMeta,
-    [tournament.winnerId, tournament.venuePar, tournament.startDate],
-  );
-  const showChampion = isChampionResolvable(state) && champion != null;
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
@@ -237,49 +158,23 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
     : null;
 
   return (
-    <>
-      <PhotoBand
-        title={tournament.name}
-        venueName={tournament.venueName}
-        datesString={dates}
-        venueImageUrl={venueImageUrl}
-        state={state}
-        tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
-        leader={leader}
-        countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
-        startDay={startDay}
-        heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
-        onOpen={onOpenTournament}
-        /* A finished event with a champion drops the sentence and the "Full
-           board ›" link — the champion block tells the story and the Full
-           leaderboard button under the board does the navigation. Live and
-           upcoming keep both. */
-        segments={showChampion ? [] : situation}
-        note={situationNote}
-        onFullBoard={fullBoardAvailable && !showChampion ? openFullBoard : undefined}
-      />
-      {fullBoardAvailable && !onFullBoard ? (
-        <FullBoardSheet
-          open={fullBoard.open}
-          onClose={fullBoard.onClose}
-          tournamentId={tournament.id}
-          meta={fullBoard.meta}
-          entries={rows}
-        />
-      ) : null}
-      {showChampion && champion ? (
-        <ChampionStrip
-          name={champion.name}
-          score={fmtScore(champion.score)}
-          scoreValue={champion.score}
-          scoreLabel={!champion.playoff && champion.margin != null ? tvCopy('by', { words: tvWords(champion.margin).toUpperCase() }) : undefined}
-          eyebrow={t('overview.hero.champion')}
-          avatarCandidates={championAvatarCandidates}
-          playerKey={tournament.winnerKey}
-          narrativeParts={championNarrative(championMeta, rows)}
-        />
-      ) : null}
-    </>
+    <PhotoBand
+      title={tournament.name}
+      venueName={tournament.venueName}
+      datesString={dates}
+      venueImageUrl={venueImageUrl}
+      state={state}
+      tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
+      leader={leader}
+      countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
+      startDay={startDay}
+      heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
+      onOpen={onOpenTournament}
+      /* A finished event with a champion drops the sentence — the champion
+         block (below the tour chip row) tells the story. */
+      segments={showChampion ? [] : situation}
+      note={situationNote}
+    />
   );
 }
 

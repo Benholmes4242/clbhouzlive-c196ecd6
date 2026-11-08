@@ -1,7 +1,7 @@
-/** The full-bleed, tappable photograph used only by the Tour Overview carousel. */
+/** The full-bleed, tappable photograph used only by the Tour Overview carousel.
+ *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: no "Full board ›" kicker link in ANY
+ *  state — the Full leaderboard button under the board owns that navigation. */
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import {
@@ -9,7 +9,6 @@ import {
   FONT,
   INK,
   OVERVIEW_SITUATION_INK,
-  WHITE_ALPHA_32,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
