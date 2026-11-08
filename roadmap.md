@@ -1,9 +1,9 @@
 # Roadmap
 
 ## REMOVE_BOARD_HOLE_MARKS
-- [ ] Remove leaderboard/hero marks and board-only hole reads; direct leaderboard scorecard taps; preserve other marks.
-- [ ] Update authorised assertions, add tap/keyboard/preservation tests, run focused set and four separate shards.
-- [ ] Verify 320/390px boards and scorecard taps; report original hero padding, assertion ledger and totals.
+- [x] Remove leaderboard/hero marks, key, inline expansion and board-only reads; restore padding and direct sheet taps.
+- [x] Authorized assertion updates plus10 new cases; focused156/156; sequential shards2007/1855/1998/1899 =7759passed (+10).
+- [ ] Device checks: actual leaderboard/hero320/390 row/tap/scorecard. Blocker: external_unmanaged authentication; screen fixture failed React-refresh preamble. See REMOVE_BOARD_HOLE_MARKS_REPORT.md.
 
 ## HOLE_TILES_BOARD_BUILD (active)
 - [x] Read build brief + both signed-off mocks (board-rows B2/8px; hole-tiles).
