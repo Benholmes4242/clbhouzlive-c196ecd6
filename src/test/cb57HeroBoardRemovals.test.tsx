@@ -54,23 +54,9 @@ describe('CB57 hero board removals', () => {
     expect(view.container.querySelector('[data-overview-next-round], [data-overview-action-row], [data-overview-board-cta], [data-overview-course-cta], [data-hero-tie-separator]')).toBeNull();
   });
   it.each(['live', 'completed'] as const)('uses identical position-cell brackets for top and lower ties in %s', (phase) => {
+    // Marks brief: the hero tie bracket is removed (was five [data-hero-tie-bracket] bars).
     const view = mount(phase);
-    const brackets = [...view.container.querySelectorAll<HTMLElement>('[data-hero-tie-bracket]')];
-    expect(brackets).toHaveLength(5);
-    brackets.forEach((bar, i) => {
-      expect(bar.style.left).toBe('');
-      expect(bar.style.right).toBe('2px');
-      expect(bar.style.width).toBe('1.5px');
-      expect(bar.style.borderRadius).toBe('1px');
-      const expected = document.createElement('span');
-      expected.style.background = OVERVIEW.bracket;
-      expect(bar.style.background).toBe(expected.style.background);
-      expect(bar.style.top).toBe([0, 3].includes(i) ? '50%' : '-5px');
-      expect(bar.style.bottom).toBe([2, 4].includes(i) ? '50%' : '-5px');
-      expect(bar.parentElement?.style.position).toBe('relative');
-      expect(bar.parentElement?.style.alignSelf).toBe('stretch');
-    });
-    if (phase === 'live') expect(view.container.querySelectorAll('[data-hero-tie="capped"]')).toHaveLength(3);
+    expect(view.container.querySelectorAll('[data-hero-tie-bracket]')).toHaveLength(0);
   });
   it('renders an empty upcoming band without a placeholder or reserved height', () => {
     fixture.picks = false; fixture.facts = false;
