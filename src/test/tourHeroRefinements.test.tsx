@@ -62,7 +62,7 @@ describe('Tour hero refinements', () => {
     const v = board(field.map(e => ({ ...e, today: -2, today_round: 3, thru: 4 })));
     const cell = v.container.querySelector<HTMLElement>('[data-hero-round="3"]');
     expect(cell?.textContent).toBe('−2');
-    expect(cell?.style.color).toBe(getScoreColor(-2, 'dark'));
+    expect(cell?.style.color).toBe('rgb(226, 75, 63)'); // getScoreColor(-2, 'dark') under-par red, not the dim tee slot
     expect(cell?.style.color).not.toBe('rgba(255, 255, 255, 0.45)');
   });
   it('shows a known next-round tee time in its centred dim 11px cell', () => {

@@ -61,7 +61,7 @@ describe('boards without hole marks', () => {
     const v = mount(<MiniBoard tournamentId="event" entries={[entry]} theme="heroBoard" currentRound={2} phase={phase} />);
     const row = v.container.querySelector<HTMLElement>('[data-hero-tie]')?.parentElement;
     expect(row?.style.gridTemplateRows).toBe(''); expect(row?.style.rowGap).toBe('');
-    expect(row?.style.paddingTop).toBe(phase === 'live' ? '5px' : '4px');
+    expect(row?.style.paddingTop).toBe('4px');
     expect(v.container.querySelector('[data-hole-marks], [data-hole-marks-key], [data-avatar-fallback]')).toBeNull();
     expect(f.holes).not.toHaveBeenCalled();
     if (!row) throw new Error('Missing hero row'); fireEvent.click(row);
