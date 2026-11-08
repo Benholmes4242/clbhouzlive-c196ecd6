@@ -597,7 +597,7 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.pos')}</div>
+            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left' }}>{t('board.columns.pos')}</div>
             <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
             {columns.rounds.map((r) => (
               <div
@@ -675,7 +675,9 @@ export function BoardTable({
           position: 'relative',
           display: 'grid',
           gridTemplateColumns: template,
-          gap: columns.gap,
+          gridTemplateRows: 'auto auto',
+          columnGap: columns.gap,
+          rowGap: 7,
           alignItems: 'center',
           padding: `${entity.kind === 'team' ? 9 : 10}px ${ROW_PAD_X}px`,
           background: yourPlayers ? 'var(--tour-board-mine)' : isLeader ? 'var(--tour-board-leader)' : surface,
