@@ -64,3 +64,23 @@ Complete before/after assertions are preserved in docs/verification/pf4/authoriz
 320px mocksB–D/Edit, caption overflow/more, ring bounds, and authenticated end-to-end remain unverified. Auth status is external_unmanaged, so no managed authenticated browser checks are available. No credentials requested.
 
 Latest preview signal: buildOK at2026-11-08T10:43:54Z. No SQL/migrations/deployed RPC/edge/native/Median/feed_config/cap changes. Protected guest/review/news/round-plot surfaces untouched. Do not treat this as a completed or device-verified release.
+## Close-out (8 Nov 2026)
+
+Harness diff, `src/test/profileFeedInViewGate.test.tsx` only (added after the existing usePostGolfTags mock; no assertions changed):
+
+```diff
+ vi.mock('@/hooks/feed/usePostGolfTags', () => ({ usePostGolfTags: () => ({ withByPost: new Map(), slideTags: new Map() }) }));
++vi.mock('@/hooks/feed/usePostGolfContext', () => ({ usePostGolfContext: () => null, usePostGolfHoleMeta: () => new Map() }));
+```
+The real `usePostGolfContext` returns `Map | null` (not `{ byPostId }`), so the empty result is `null`. LightCardFeed also calls `usePostGolfHoleMeta` (useQueries) from the same module; stubbed as an empty Map.
+
+- profileFeedInViewGate alone: 6/6 passed.
+- PF4 focused set: 124/124 passed (`docs/verification/pf4/focused-closeout.log`).
+- Shard 1/4: 1,982 passed, 12 failed of 1,994 (`docs/verification/pf4/closeout-shard1.log`). STOPPED; shards 2–4 not run.
+
+Unexpected failures (not PF4; they test areas changed by the hole-tiles board build):
+- alsoWeekSection.test.tsx ×4 and homeRailEmpty.test.tsx ×1: `No QueryClient set` (new batched board-hole / competition reads).
+- alsoWeekSpacing.test.ts ×4: old 33px rows, 22px faces, tie bracket, face radius.
+- playerInitialAvatar.test.tsx ×2: expects the removed default ring.
+- searchOrderAndFallback.test.tsx ×1: expects the tile border on the IN ACTION rail.
+No repair made; awaiting a ruling.
