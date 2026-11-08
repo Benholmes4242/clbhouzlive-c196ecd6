@@ -11,13 +11,11 @@ import { getScoreColor } from '../_shared/scoreColor';
 import { formatEarnings } from '../_shared/formatEarnings';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
-import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
+import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
-import { BoardRound, HoleStrip } from './BoardRound';
+import { BoardRound, HoleTiles, orderedHoleCells } from './BoardRound';
 import type { BoardHole } from './useBoardHoles';
 import { boardTieRole } from './leaderboardRules';
 import './leaderboard.css';
@@ -45,8 +43,6 @@ const CANVAS = TOUR_CANVAS;
 export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 } as const);
 
 /** TIGHTENED GEOMETRY (2.4) — local aliases of BOARD_GEOMETRY, never numbers of their own. */
-const MOV_W = BOARD_GEOMETRY.mov;
-const POS_W = BOARD_GEOMETRY.pos;
 const TOT_W = BOARD_GEOMETRY.tot;
 const THRU_W = BOARD_GEOMETRY.thru;
 const PRIZE_W = BOARD_GEOMETRY.prize;
