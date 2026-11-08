@@ -255,21 +255,17 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     completed: phase === 'completed',
   });
   const tieRoles = heroTieRoles(rows);
-  const showHeroToday = theme === 'heroBoard' && heroColumnRule.today;
   const showHeroRounds = theme === 'heroBoard' && heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
   const heroRoundTracks = heroRounds.map(() => `${HERO_ROUND_W}px`).join(' ');
-  const showHeroShape = theme === 'heroBoard' && heroColumnRule.shape;
-  const topTieLength = theme === 'heroBoard' && showHeroShape ? heroTopTieLength(rows) : 0;
+  const topTieLength = theme === 'heroBoard' ? heroTopTieLength(rows) : 0;
   const topTieCount = topTieLength > 0 ? entries.filter((e) => e.position === 1).length : 0;
-  const legacyGrid = [
+  const overviewGrid = [
     showOverviewPosition ? `${HERO_POS_W}px` : null,
     'minmax(0, 1fr)',
-    showHeroToday ? `${HERO_TODAY_W}px` : null,
     heroRoundTracks || null,
     `${HERO_TOT_W}px`,
   ].filter(Boolean).join(' ');
-  const overviewGrid = showHeroShape ? heroLiveGrid(showHeroToday) : legacyGrid;
   const heroGap = HERO_GAP;
   const teeRound = theme === 'heroBoard' ? heroTeeRound(entries, rows, heroRounds, currentRound, phase === 'completed') : null;
   const { data: teeGroups } = useTeeTimesAll(tournamentId, teeRound ?? 1, { enabled: teeRound != null });
