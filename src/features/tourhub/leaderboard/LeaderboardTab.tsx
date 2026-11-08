@@ -439,39 +439,33 @@ export function LeaderboardTab() {
   };
 
   return (
-    <div className="tour-board-shell" style={{minHeight:'60vh'}}>
+    <div className="tour-board-shell" style={{minHeight:'60vh', paddingTop: CHROME_CLEARANCE}}>
       {showTabs && <div className="tour-board-events" aria-label={t('leaderboard.a11y.events')}>
         {liveTournaments.map(tt => <Button key={tt.id} variant="outline" className="tour-event-pill" aria-pressed={selected.id===tt.id} onClick={()=>onSelectEvent(tt.id)}>
           {shortEventName(tt.name)}<span className="tour-event-leader">{eventLeaderLabel(tt.leaderName,tt.leaderCount,tt.leaderToPar)}</span>
         </Button>)}
       </div>}
-      <div className="tour-board-event">
-        <div className="tour-event-title-line"><h1>{meta?.name ?? selected.name}</h1>
-          {(metaStatus || currentRound != null) && <LiveMarker status={metaStatus} currentRound={currentRound} />}
-          <Button variant="ghost" size="icon" style={{height:24,width:24,padding:0,color:'var(--tour-board-ink)'}} aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')} onClick={()=>{if(searchOpen)setSearchQuery('');setSearchOpen(!searchOpen);}}>{searchOpen ? <X size={16}/> : <Search size={16}/>}</Button>
+      {/* TOP BLOCK — kicker / wrapping title / place line (leaderboards-page.html). */}
+      <div className="tour-board-top">
+        <div className="tour-board-kicker-row">
+          <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{kicker}</span>
+          {isLive && !suspended ? (
+            <span className="tour-board-live"><i aria-hidden />{t('rebuilt.live', { defaultValue: 'LIVE' })}</span>
+          ) : suspended ? (
+            <LiveMarker status={metaStatus} currentRound={currentRound} />
+          ) : null}
         </div>
-        {summarySegments.length > 0 && <div className="tour-event-sub">{summarySegments.join(' · ')}</div>}
-        {/* SEARCH - the canonical box in its own full-width row. */}
-        {searchOpen && (
-          <div style={{ marginTop: 10, display: 'flex' }}>
-            <SearchFieldBox
-              ref={searchInputRef}
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={t('board.search.placeholder')}
-            />
-          </div>
-        )}
-
+        <h1 className="tour-board-title">{meta?.name ?? selected.name}</h1>
+        {summarySegments.length > 0 && <div className="tour-board-place">{summarySegments.join(' · ')}</div>}
       </div>
-      {(lead || field) && <div className="tour-board-stats">
-        {lead && <div className="tour-board-stat" data-stat="lead"><div className="tour-stat-value">{lead.count > 1 ? lead.count : lead.lead ?? '—'}<small>{t(lead.count>1 ? 'rebuilt.tied' : 'rebuilt.shots')}</small></div><div className="tour-stat-label">{lead.count>1 ? t('rebuilt.atTop') : t('rebuilt.lead',{name:surnameOf(lead.leader.player?.full_name ?? lead.leader.team?.display_name ?? '').toUpperCase()})}</div></div>}
-        {field && <><div className="tour-board-stat" data-stat="average"><div className="tour-stat-value" style={{color:getScoreColor(field.avg,'dark')}}>{fmtAvgToPar(field.avg)}</div><div className="tour-stat-label">{t('rebuilt.fieldAverage')}</div></div>
-        <div className="tour-board-stat" data-stat="low"><div className="tour-stat-value" style={{color:getScoreColor(field.low,'dark')}}>{fmtScore(field.low)}<small>{field.lowPlayers.length>1 ? t('rebuilt.players',{count:field.lowPlayers.length}) : surnameOf(field.lowPlayers[0]?.player?.full_name ?? field.lowPlayers[0]?.team?.display_name ?? '')}</small></div><div className="tour-stat-label">{t('rebuilt.lowToday')}</div></div><FieldAverageTracker count={field.count} tournamentId={selected.id} round={fieldRound}/></>}
+      {figures.length > 0 && <div className="tour-board-figures">
+        {figures.map(f => <div key={f.key} data-stat={f.key}><b style={f.color ? { color: f.color } : undefined}>{f.value}{f.small ? <small>{f.small}</small> : null}</b><span>{f.label}</span></div>)}
+        {field && <FieldAverageTracker count={field.count} tournamentId={selected.id} round={fieldRound} />}
       </div>}
 
       {/* COLUMN HEADER — rendered by BoardTable itself, sticky under the
-          TourPageShell header, so header and rows share ONE grid definition. */}
+          floating islands (CHROME_CLEARANCE), so header and rows share ONE
+          grid definition. */}
 
 
 
