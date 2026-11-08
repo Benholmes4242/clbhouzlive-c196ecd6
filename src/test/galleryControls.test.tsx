@@ -83,7 +83,7 @@ describe('course gallery controls', () => {
     const squircle = credit.querySelector('[style*="border-radius: 34%"]') as HTMLElement;
     expect(squircle).not.toBeNull();
     expect(squircle.style.width).toBe('32px');
-    const ring = credit.querySelector('[style*="rgba(255, 255, 255, 0.22)"]') as HTMLElement;
+    const ring = credit.querySelector('[style*="rgba(255,255,255,0.22)"]') as HTMLElement;
     expect(ring).not.toBeNull();
     expect(ring.style.border).toContain('1px');
   });
