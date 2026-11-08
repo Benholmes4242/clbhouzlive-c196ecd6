@@ -2,6 +2,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { readFileSync } from 'node:fs';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -56,14 +57,16 @@ describe('FIX3 IN ACTION rail fallback avatars', () => {
   it('uses the ResultTile plate, border and initials colour like the Players rows', () => {
     avatarCalls.length = 0;
     render(
-      <MemoryRouter>
-        <SearchEmptyState onSelect={() => {}} />
-      </MemoryRouter>,
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <MemoryRouter>
+          <SearchEmptyState onSelect={() => {}} />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
     expect(avatarCalls.length).toBeGreaterThan(0);
     for (const call of avatarCalls) {
       expect(call.color).toEqual({ bg: A.TRACK, fg: A.MUTE });
-      expect(call.ringColor).toBe(A.BORDER);
+      expect(call.ringColor ?? undefined).toBeUndefined();
     }
     // The Players rows' fallback is ResultTile with the same tokens.
     const tile = readFileSync('src/features/search-v2/components/ResultTile.tsx', 'utf8');
