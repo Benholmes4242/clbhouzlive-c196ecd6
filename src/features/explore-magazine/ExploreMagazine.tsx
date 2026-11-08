@@ -36,6 +36,7 @@ import type { RoundCardEngagement } from './ExploreCard';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 
 import { useBatchRoundMedals } from './useBatchRoundMedals';
+import { useBatchRoundCompetition } from './useBatchRoundCompetition';
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
@@ -693,6 +694,11 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   /* ONE gam_round_awards read per rendered page; cards receive counts. */
   const roundMedals = useBatchRoundMedals(useMemo(() => [
     // The hero rides in the feed's one batched award read — never a second request.
+    ...(view === 'all' ? [featured.data?.whs_score_id ?? null] : []),
+    ...visible.filter((item) => item.kind === 'round').map((item) => item.facts.score_id ?? null),
+  ], [visible, view, featured.data?.whs_score_id]));
+  /* ONE gam_round_stats read per rendered page; explicit true only shows COMP. */
+  const roundCompetition = useBatchRoundCompetition(useMemo(() => [
     ...(view === 'all' ? [featured.data?.whs_score_id ?? null] : []),
     ...visible.filter((item) => item.kind === 'round').map((item) => item.facts.score_id ?? null),
   ], [visible, view, featured.data?.whs_score_id]));
@@ -1377,6 +1383,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
           <FeaturedRoundCard
             round={featured.data}
             medals={roundMedals.isSuccess ? roundMedals.medals?.get(featured.data.whs_score_id) ?? null : undefined}
+            isCompetition={roundCompetition.isSuccess ? roundCompetition.competition?.get(featured.data.whs_score_id) === true : undefined}
             viewerId={userId}
             shape={featuredShapes?.get(featured.data.whs_score_id) ?? null}
             engagement={engagementForRound(
@@ -1476,6 +1483,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
                 onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
                  engagement={engagementFor(item)}
                 medals={roundMedals.isSuccess && item.facts.score_id ? roundMedals.medals?.get(item.facts.score_id) : undefined}
+                isCompetition={roundCompetition.isSuccess && item.facts.score_id ? roundCompetition.competition?.get(item.facts.score_id) === true : undefined}
               />
              </div>
             </div>
