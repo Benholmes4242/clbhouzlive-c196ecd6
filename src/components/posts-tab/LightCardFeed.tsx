@@ -143,6 +143,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   onRoundTap,
   roundShapeMap,
   roundMedalMap,
+  roundCompetitionMap,
   roundCourseMeta = null,
 }) => {
   /* A round post renders the round card or nothing — see dropUnresolvedRounds.
@@ -693,6 +694,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       onRoundTap,
       roundShapeMap,
       roundMedalMap,
+      roundCompetitionMap,
       roundCourseMeta,
       commentPreview.map,
       golfTags,
