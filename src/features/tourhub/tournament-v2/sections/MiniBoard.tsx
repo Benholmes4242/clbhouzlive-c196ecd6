@@ -15,7 +15,7 @@ import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../lead
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  WHITE_ALPHA_65, WHITE_ALPHA_12,
+  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06,
 } from '../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
@@ -97,7 +97,7 @@ interface Props {
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
   panel: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
-  heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: 'rgba(255,255,255,0.06)', press: 'active:bg-white/[0.06]' },
+  heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_06, press: 'active:bg-white/[0.06]' },
 } as const;
 
 /**
