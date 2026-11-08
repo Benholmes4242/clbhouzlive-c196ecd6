@@ -12,7 +12,7 @@ import { surnameOf } from '../../_shared/playerName';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { fmtScore } from '../../utils/fmtScore';
 import { todayFromEntry, fmtThru, type BoardEntry } from '../../leaderboard/BoardTable';
-import { HoleTiles, orderedHoleCells } from '../../leaderboard/BoardRound';
+import { HoleMarks, orderedHoleCells } from '../../leaderboard/BoardRound';
 import { useBoardHoles } from '../../leaderboard/useBoardHoles';
 import { boardTieRole, leaderSummary } from '../../leaderboard/leaderboardRules';
 import { chasePlayers,onCourse,situation,startsValues,weekFacts,weekRows,weekTotalRounds } from './alsoWeekRules';
@@ -46,7 +46,7 @@ function WeekBoard({entries,followed,round,complete,tournamentId}:{entries:Board
       <span className="also-c also-today" style={{color:getScoreColor(today,'dark')}}>{fmtScore(today,{absent:''})}</span>
       <span className="also-c also-thru">{complete?'F':today==null?'':fmtThru(e.thru)}</span>
       <span className="also-c also-tot" style={{color:getScoreColor(e.score,'dark')}}>{fmtScore(e.score,{absent:''})}</span>
-      <HoleTiles holes={holes?orderedHoleCells(holes):WEEK_EMPTY_TILES} />
+      <HoleMarks holes={holes?orderedHoleCells(holes):WEEK_EMPTY_TILES} surface={mine?'var(--tour-board-mine)':PAGE_CANVAS} />
     </div>;
   };
   return top.length||extra.length?<div className="also-board"><div className="also-bh">{['pos','player','today','thru','tot'].map(k=><span key={k}>{t(`overview.alsoThisWeek.${k}`)}</span>)}</div>{top.map((e,i)=>row(e,i))}{extra.length>0&&<><div className="also-gap"/>{extra.map((e,i)=>row(e,i,true))}</>}</div>:null;
