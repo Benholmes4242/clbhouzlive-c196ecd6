@@ -2,8 +2,9 @@
 
 ## REVIEW_RECEIPT_NEXT_COURSE
 - [x] Scope receipt to its submitted course and clear receipt/submitted state on next-course and route changes.
-- [ ] Add four transition regression cases; run focused tests and four separate shards (baseline 7,784).
-- [ ] Check receipt → new wizard → own receipt at320/390/430; report authenticated/device limitations.
+- [x] Add four transition regression cases; existing assertions/tests unchanged (expected suite7,788 vs7,784).
+- [ ] STOP: focused44passed/4failed; new harness omits headerScore from useReviewHeaderFacts mock. Exact failure/report: REVIEW_RECEIPT_NEXT_COURSE_REPORT.md. Four shards not run under stop rule.
+- [ ] Check receipt → new wizard → own receipt at320/390/430; blocked by stopped verification; hosted authentication external_unmanaged.
 
 ## HERO_ROUND_EMPTY_CARD
 - [x] Keep score-based chips enabled after empty reads; show missing-card note and remove empty-round state.
