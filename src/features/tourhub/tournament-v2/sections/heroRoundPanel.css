@@ -1,5 +1,5 @@
 /* Signed-off hero expansion tokens; scoped so leaderboard/weekly marks cannot drift. */
-.hero-expand-board { --hero-round-surface:#121215; --hero-round-ink:#F8FAFC; --hero-round-canvas:#0A0A0C; --hero-round-mute:rgba(248,250,252,.62); --hero-round-dim:rgba(248,250,252,.42); --hero-round-outline:rgba(255,255,255,.12); --hero-board-side:20px; }
+.hero-expand-board { --hero-board-side:20px; }
 .hero-expand-board [data-hero-board-row][aria-expanded=true] { background:var(--hero-round-surface) !important; }
 .hero-expand-board [data-hero-selected-score=true] { text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:4px; }
 .hero-round-panel { background:var(--hero-round-surface); padding:2px var(--hero-board-side) 12px; }

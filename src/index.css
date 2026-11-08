@@ -36,6 +36,12 @@
 }
 
 :root {
+  --hero-round-surface:#121215;
+  --hero-round-ink:#F8FAFC;
+  --hero-round-canvas:#0A0A0C;
+  --hero-round-mute:rgba(248,250,252,.62);
+  --hero-round-dim:rgba(248,250,252,.42);
+  --hero-round-outline:rgba(255,255,255,.12);
   --feed-photo-ground: var(--card);
   --feed-photo-overlay: rgba(0,0,0,0.45);
   --feed-photo-ink: #FFFFFF;
