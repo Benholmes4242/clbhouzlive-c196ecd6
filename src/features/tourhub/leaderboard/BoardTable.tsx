@@ -15,7 +15,7 @@ import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TO
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
-import { BoardRound, HoleTiles, orderedHoleCells } from './BoardRound';
+import { BoardRound, HoleTiles, HOLE_TILE_TONES, orderedHoleCells } from './BoardRound';
 import type { BoardHole } from './useBoardHoles';
 import { boardTieRole } from './leaderboardRules';
 import './leaderboard.css';
@@ -850,6 +850,19 @@ export function BoardTable({
     <div className="tour-board-shell" ref={rootRef} data-board-name-tier={tier} data-board-show-prize={columns.showPrize ? 'true' : 'false'}>
       {renderHeader()}
       {parts}
+      {!columns.preTournament && entries.length > 0 ? (
+        <div className="tour-board-key" data-board-key>
+          {([
+            ['eagle', HOLE_TILE_TONES.eagle.bg, t('board.holeKey.eagle')],
+            ['birdie', HOLE_TILE_TONES.birdie.bg, t('board.holeKey.birdie')],
+            ['par', 'rgba(255,255,255,.14)', t('board.holeKey.par')],
+            ['bogey', HOLE_TILE_TONES.bogey.bg, t('board.holeKey.bogey')],
+            ['double', HOLE_TILE_TONES.double.bg, t('board.holeKey.double')],
+          ] as const).map(([kind, swatch, label]) => (
+            <span key={kind} data-board-key-item={kind}><i style={{ background: swatch }} />{label}</span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
