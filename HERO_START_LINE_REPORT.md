@@ -1,18 +1,41 @@
-# HERO_START_LINE — incomplete, stopped
+# HERO_START_LINE — rulings applied, screen coverage incomplete
 
-## Stop
-Command: `bunx vitest run src/test/allHeroesMatch.test.tsx src/test/tourOverviewMergedAiry.test.tsx src/test/courseHeroesMatch.test.tsx src/test/reviewStepOne.test.tsx src/test/tournamentNotch.test.ts --maxWorkers=2`
+## Rulings and verification
+Both rulings applied. Only the four authorized expectation lines changed in reviewStepOne this turn. Case “renders the course page masthead over the photo: shared kicker, place, two-line name clamp”: position absolute→relative; left20px→margin0px20px; right20px→left empty; bottom14px→empty. Nothing else in that file changed this turn.
 
-79 passed / 1 failed (80 executed, five files). No tests added or deleted: focused count before/after **80 / 80**. Failure preserved in `docs/verification/hero-start/focused.log`:
+Leader name line-height1.5→1.1; MASTHEAD_PLACE and overview venue1.5→1.2. Geometry comment now names the existing line boxes and accepted no-headshot exception.
 
-`src/test/reviewStepOne.test.tsx:119:37`, `header forms > renders the course page masthead over the photo: shared kicker, place, two-line name clamp`
+Real PhotoBand, one-line title, three faces, sentence and spine at320/390/430: text193.9375px, row186.53125px, height350px at every width. Derived reference193.9px; difference0.0375px. Place line15px at all widths, matching pre-build15px within0.5px. Source proof uses real CourseMasthead, not the whole course-detail page. Original193.9 baseline is restored numerically; old screenshots were not retained across sandbox reset.
 
-`AssertionError: expected 'relative' to be 'absolute' // Object.is equality`
+Derivation: kicker28; title gap4; leader face row27.2+gap5+score21+name gap4+name11=68.2; title/venue block25.74+4+15=44.74 (leader wins); sentence9+18.9=27.9; spine10+11.4=21.4; live stack149.5. Therefore350−14−149.5+(28−13.2)/2=193.9. Each part is exported in photoBandGeometry.ts beside PhotoBand.
 
-Expected `absolute`, received `relative`. That assertion is unchanged. No further test repairs or shard runs after this unexpected failure. Full-suite baseline remains **7,780**; no fresh full-suite total is available.
+Focused command: `bunx vitest run src/test/heroStartLine.test.tsx src/test/allHeroesMatch.test.tsx src/test/tourOverviewMergedAiry.test.tsx src/test/courseHeroesMatch.test.tsx src/test/reviewStepOne.test.tsx src/test/tournamentNotch.test.ts --maxWorkers=2`: **84/84 passed**. Prior focused total80; +4 named cases in new heroStartLine.test.tsx:
+- derives the reference and matches the measured live three-face text top within0.5px
+- preserves the original leader name and place line boxes
+- keeps the review offset measured, with the first-paint fallback
+- shares the reference across every converted hero and named skeleton
+No tests deleted, no existing case count changed. Earlier assertion rename/rewrite ledger retained below.
 
-## Reference blocker
-The current formula yields189.92px. Fixture live kicker text measured189.9375px at320/390/430, while the ruling freezes the earlier193.9px reference. The discrepancy is unresolved, not permission to change the reference. Completed fixture text189.90625px and band276.984375px; live band350px. No claim that the required reference/freeze tests pass. Required new measurement tests and converted-surface screens are incomplete.
+Full command, four independent sequential invocations: `bunx vitest run --maxWorkers=2 --shard=N/4`.
+|Shard|Passed|Files|
+|---|---:|---:|
+|1|2007|170|
+|2|1871|170|
+|3|1983|170|
+|4|1923|170|
+**Before7780 / after7784**, zero failures,680 files. +4 entirely from the named new file; redistribution across shards is not case deletion. Logs docs/verification/hero-start/shard1.log through shard4.log. No known FW1 failure appeared.
+
+## Available390px screen measurements
+|Actual fixture|First-line top|Band height|
+|---|---:|---:|
+|Live overview|193.9375|350|
+|Golfer ProfileCoverBand|193.890625|285.078125|
+|Business visitor|193.890625|307.765625|
+|Business team|193.890625|307.765625|
+|Pro HeroShell (simplified props)|193.890625|488.890625|
+All above also checked320/430 with no horizontal overflow. Profile height286.265625 at320,285.078125 at430; other listed heights unchanged. Screens /tmp/browser/hero-start/{proof,profile,business,business-team,pro}_{320,390,430}.png. Numeric evidence persisted in docs/verification/hero-start/live-proof.json and surface-measurements.json.
+
+These are isolated real-component fixtures, fallback art; Pro fixture does not include real world-rank/actions. **Not completed:** Tournament live/finished; Courses with/without blurb/rank; whole course detail/modal; review Step1/fold; actual ProProfileBuildOne; Amateur; skeleton-to-loaded jump; actual page island/header scroll transitions. Source tests pass but do not replace these browser checks. No completion claim for all-surface screen coverage.
 
 ## Production files touched during alignment
 - `src/lib/heroHeights.ts`
@@ -65,12 +88,12 @@ Each old fixed layout assertion was revised because the brief requires content f
 - Three cases “puts the sentence and note on the photo in$kind at the derived height”: live350 retained; non-live calculated definite height → empty inline height; absolute gutter/bottom checks → conditional absolute/relative position and bottom/paddingBottom14px.
 - “a finished band with no sentence drops both live-only lines”: fixed calculated height → empty inline height plus relative text position; omission assertions unchanged.
 
-No other assertions were changed to bypass the failure. Temporary fixture source/root HTML removed. Latest preview log reports build OK; no manual build run.
+Previous stop assertion repaired only under the new explicit authorization. Temporary fixture source/root HTML removed. Latest preview log reports build OK; no manual build run.
 
 ## Prior overview close-out
 Fresh shard4:1,908. Previous shards1–3:2,007 /1,871 /1,994. Total7,780, +3 against7,777; named additions in `OVERVIEW_CHAMPION_CLOSEOUT_REPORT.md`. Those results precede this alignment work.
 
-## Unverified / device checks
-All converted hero first-line positions, loaded photographs/headshots, actual islands and adjacent sections, long-name/pro tab changes and review fold interaction remain unverified for this alignment. Overview fixture screenshots: `/tmp/browser/overview-closeout/live_{320,390,430}.png` and `done_{320,390,430}.png`; these are current fixtures, not before/after freeze proof. Authenticated live flows unavailable (`external_unmanaged`). No AppHeader overHero callers found. Receipt retains its class-scoped old layout path.
+## Remaining checks
+See incomplete screen coverage above. Authenticated live flows remain unavailable for the external unmanaged project. No AppHeader overHero callers found. Fixed-height consumers remaining: overview HybridHero/constants/OverviewHero; review first-paint measured-height fallback. EXPLORE_COURSE_HERO_HEIGHT has no production consumer outside its export. Receipt retains its class-scoped old layout path.
 
 No SQL, migrations, deployed RPC/edge changes, feed_config or native/Median changes; round_pool_cap unchanged.

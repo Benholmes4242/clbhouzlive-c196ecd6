@@ -63,11 +63,10 @@
 - [x] Focused 208/208; shards 2007/1871/1994/1908 = 7780 (+3 vs 7777).
 - [x] Fixture screens at320/390/430; no overflow. Live reference mismatch remains unverified; see closeout report.
 
-## HERO_START_LINE — paused at verification
-- [ ] Apply TWO_RULINGS: exact four-line review test repair; restore leader1.1/place1.2; prove193.9px and place15px before proceeding.
-- [x] Ruling saved: derive frozen live kicker TEXT reference; 184 invalid.
-- [x] Shared geometry and named flow hero/skeleton conversions; authorized obsolete fixed-height assertions updated without changing test counts.
-- [ ] Resolve reference discrepancy: fixture text189.9375 vs ruled193.9; derived189.92 is not accepted as a replacement. Before/after freeze unverified.
-- [ ] Focused test STOP: reviewStepOne.test.tsx:119, expected absolute, received relative. Existing assertion unchanged; output docs/verification/hero-start/focused.log.
-- [ ] Four fresh shards blocked by unexpected focused failure; new measurement tests and converted-hero screen checks incomplete.
-- [ ] Report HERO_START_LINE_REPORT.md lists changed files and assertion ledger; no completion claimed.
+## HERO_START_LINE — rulings applied; screens incomplete
+- [x] Exact authorized review four-line repair; leader1.1/place1.2 restored.
+- [x] Three-face live fixture193.9375 at320/390/430; derived193.9; place15px. New proof tests4; focused84/84.
+- [x] Four separate shards2007/1871/1983/1923 =7784passed, zero failures; baseline7780,+4 named cases.
+- [x] Real-component fixtures: live overview, ProfileCoverBand, business visitor/team, simplified HeroShell at320/390/430; no overflow.
+- [ ] Remaining screens: Tournament/Courses/course-detail/review/Amateur, actual full Pro, skeleton jump and page header-scroll; not verified in this turn.
+- [x] Updated HERO_START_LINE_REPORT.md with assertion ledger, exact totals, measurements and limitations. No full screen-completion claim.
