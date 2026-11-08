@@ -756,11 +756,11 @@ export function BoardTable({
                     textAlign: 'center',
                     fontSize: 12,
                     fontWeight: settled ? 600 : 800,
-                    // A played round is a played round: no opacity drop. The
-                    // current round is marked by its amber header, which is a
-                    // stronger signal than 40% fade. An empty cell is a
-                    // different thing and keeps A.DIM at full strength.
-                    opacity: settled ? 0.55 : 1,
+                    // Rounds at full strength: a played round keeps its colour,
+                    // size and weight at opacity 1. The current round is marked
+                    // by its 800 weight and amber header. An empty cell is a
+                    // different thing and keeps A.DIM.
+                    opacity: 1,
                     color: val == null ? A.DIM : houseColor(val),
                     fontVariantNumeric: 'tabular-nums lining-nums',
                     whiteSpace: 'nowrap',
@@ -820,6 +820,12 @@ export function BoardTable({
                 {e.money != null ? formatEarnings(e.money) : PRIZE_DASH}
               </div>
             )}
+
+            {/* LINE 2 — the current round's holes as numbered tiles across the
+                FULL row width, from the row's left edge to under TOT. */}
+            {!demotedRow && entity.kind !== 'team' && pid ? (
+              <HoleTiles holes={orderedHoleCells(holes)} />
+            ) : null}
           </>
         )}
       </div>
