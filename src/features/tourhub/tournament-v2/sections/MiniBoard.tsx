@@ -1,6 +1,7 @@
 /**
  * MiniBoard - TD1 top-5 compressed board.
- * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
+ * Panel grammar: POS | PLAYER + flag | THRU | TODAY | TOT.
+ * Hero grammar: POS | PLAYER | R1…Rn | TOT in every phase (see heroBoardColumns).
  * Hero rows remain single-line; only an open hero panel reads its selected round.
  * Other themes retain direct ScorecardSheet taps. A row with no player id
  * (a team row) is not tappable.
