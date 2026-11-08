@@ -19,7 +19,9 @@ import { ProfileCoverBand } from '@/components/profile/hero/ProfileCoverBand';
 import { ClubProfileHero } from '@/components/business/hero/ClubProfileHero';
 import { HeroShell } from '@/components/profile/hero/HeroShell';
 import { PHOTO_HEADER_H_CSS } from '@/features/review-v2/components/ReviewComposerHeader';
-import { PERSONAL_COVER_ASPECT, PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
+import { PERSONAL_COVER_ASPECT, PERSONAL_COVER_ASPECT_CSS, BUSINESS_COVER_ASPECT, BUSINESS_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
+import { HERO_PHOTO_HEIGHT, EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
+import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 const src = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8');
 const toRgb = (c: string) => { const d = document.createElement('div'); d.style.color = c; return d.style.color; };
