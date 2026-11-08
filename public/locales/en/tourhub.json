@@ -313,7 +313,7 @@
       "tot": "TOT",
       "wins": "{{name}} wins by {{margin}}",
       "playoff": "{{name}} wins in a playoff",
-      "closing": "closing {{strokes}}",
+      "closing": "Closing {{strokes}}",
       "field": "FIELD",
       "purse": "PURSE",
       "defending": "DEFENDING",
