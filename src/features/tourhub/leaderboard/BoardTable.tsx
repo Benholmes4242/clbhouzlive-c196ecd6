@@ -738,11 +738,10 @@ export function BoardTable({
               </div>
             ) : (
               <div className="tour-board-player">
-                <SquircleAvatar size={30} hairlineRing className="tour-board-avatar" userId={pid} alt={fullName} srcCandidates={resolvePlayerAvatarCandidates({name:fullName,photoUrl:e.player?.photo_url,tourSlug,headshotOverride:e.player?.headshot_override})} />
                 <div className="tour-board-who"><span className="tour-board-name"><span className="tour-board-name-text">{nameText}</span>
                   {pid && pickPlayerIds?.has(pid) && <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />}
                   {pid && followedIds.has(pid) && <span className="tour-board-star" aria-label={t('rebuilt.following')}>★</span>}
-                </span><HoleStrip holes={holes} /></div>
+                </span></div>
               </div>
             )}
 
