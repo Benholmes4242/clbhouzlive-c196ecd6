@@ -6,7 +6,7 @@ import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const fixture = vi.hoisted(() => ({ championProps: null as null | { avatarCandidates?: string[]; playerKey?: string | null } }));
+const fixture = vi.hoisted(() => ({ championProps: null as null | { avatarCandidates?: string[]; playerKey?: string | null }, photoProps: null as null | { segments?: unknown[]; onFullBoard?: unknown } }));
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: [
@@ -15,7 +15,7 @@ vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: 
 ] }) }));
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
 vi.mock('@/features/tourhub/hooks/useLiveTournaments', async importOriginal => ({ ...(await importOriginal<typeof import('@/features/tourhub/hooks/useLiveTournaments')>()), useLiveTournaments: () => ({ data: [], isLoading: false, isError: false }) }));
-vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand', () => ({ PhotoBand: () => null }));
+vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand', () => ({ PhotoBand: (props: { segments?: unknown[]; onFullBoard?: unknown }) => { fixture.photoProps = props; return null; } }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip', async importOriginal => {
   const actual = await importOriginal<typeof import('@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip')>();
   return { ...actual, ChampionStrip: (props: Parameters<typeof actual.ChampionStrip>[0]) => {
