@@ -50,8 +50,7 @@ function PlayerHead({ size = 42, avatarCandidates, name, playerKey }: { size?: n
       alt={name}
       userId={playerKey ?? name}
       size={size}
-      hairlineRing
-      ringColor={GOLD}
+      hideRing
     />
   );
 }
