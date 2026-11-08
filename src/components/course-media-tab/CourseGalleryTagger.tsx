@@ -10,6 +10,8 @@ import { useHolePhotoTagging } from './hooks/useHolePhotoTagging';
 import { useCoursePlaceMedia, type PlaceMedia } from './hooks/useCoursePlaceMedia';
 import { tagAdminHole } from './AdminHoleTagging';
 import { ShotTagCard } from './ShotTagCard';
+import { PLACE_LABELS } from './ShotTagChoices';
+import { ordinal } from '@/lib/text/numbers';
 import type { GalleryShot } from '@/lib/courseMedia/courseGallery';
 import type { CoursePlace } from '@/lib/courseMedia/places';
 import type { HolePhoto, OwnMediaSource } from '@/lib/courseMedia/holePhotoData';
@@ -28,7 +30,7 @@ export function CourseGalleryTagger({ courseId, shot, holes, onClose, onSaved }:
   const places = useCoursePlaceMedia(courseId, user?.id);
   const [hole, setHole] = useState<number | null>(shot.holeTag?.hole_no ?? null);
   const [place, setPlace] = useState<CoursePlace | null>((shot.placeTag?.place as CoursePlace | undefined) ?? null);
-  const [tag, setTag] = useState<{ hole?: HolePhoto; place?: PlaceMedia }>({ hole: shot.holeTag, place: shot.placeTag });
+  const [tag] = useState<{ hole?: HolePhoto; place?: PlaceMedia }>({ hole: shot.holeTag, place: shot.placeTag });
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const owned = !!user && shot.ownerId === user.id;
@@ -45,57 +47,86 @@ export function CourseGalleryTagger({ courseId, shot, holes, onClose, onSaved }:
       cache.invalidateQueries({ predicate: q => q.queryKey.includes('get_latest_hole_media') }),
     ]);
   };
-  const remove = async () => {
-    if (!owned && !admin) return;
-    setPending(true); setError(null);
-    try {
-      if (tag.hole) {
-        if (admin && !owned) { const result = await supabase.rpc('admin_untag_hole_media', { p_tag_id: tag.hole.id }); if (result.error) throw result.error; }
-        else await member.remove.mutateAsync({ row: tag.hole });
-      }
-      if (tag.place) {
-        if (admin && !owned) { const result = await supabase.rpc('admin_untag_place_media', { p_tag_id: tag.place.id }); if (result.error) throw result.error; }
-        else await places.remove.mutateAsync({ row: tag.place });
-      }
-      setTag({}); setHole(null); setPlace(null); onSaved(); await refresh();
-    } catch (failure) { setError(holePhotoErrorMessage(failure, t('media.gallery.saveError', { defaultValue: 'The tag could not be saved. Nothing was changed.' }))); }
-    finally { setPending(false); }
+  const currentHole = tag.hole?.hole_no ?? null;
+  const currentPlace = (tag.place?.place as CoursePlace | undefined) ?? null;
+  const hasTag = !!(tag.hole || tag.place);
+  const unchanged = hole === currentHole && place === currentPlace;
+  const failMessage = () => t('media.gallery.saveError', { defaultValue: 'The tag could not be saved. Nothing was changed.' });
+  /** Admin add path: the queue resolves the canonical source after removal. */
+  const adminAdd = async (): Promise<{ holeTag?: HolePhoto; placeTag?: PlaceMedia }> => {
+    const { data: queue, error: queueError } = await supabase.rpc('admin_get_untagged_course_media', { p_course_id: courseId });
+    if (queueError) throw queueError;
+    const row = queue?.find(row => holeMediaKey({ url: row.media_url, mediaType: row.media_type, streamId: row.stream_id }) === holeMediaKey(shot.item));
+    if (!row) throw new Error('This shot cannot be tagged.');
+    if (hole != null) return { holeTag: await tagAdminHole(courseId, row.media_id, hole) };
+    if (!place) return {};
+    const { data: id, error } = await supabase.rpc('admin_tag_place_media', { p_course_id: courseId, p_media_id: row.media_id, p_place: place });
+    if (error) throw error;
+    if (!id) throw new Error('The tag was not saved.');
+    const result = await supabase.from('course_place_media').select('*').eq('id', id).single();
+    if (result.error) throw result.error;
+    return { placeTag: result.data };
+  };
+  const ownAdd = async (): Promise<{ holeTag?: HolePhoto; placeTag?: PlaceMedia }> => {
+    if (hole != null) return { holeTag: await member.submit.mutateAsync({ post: { ...shot.post, userId: shot.ownerId, actorType: 'personal', mediaItems: [shot.item] }, hole }) };
+    if (place) return { placeTag: await places.submit.mutateAsync({ source, place }) };
+    return {};
+  };
+  const ownRemove = async () => {
+    if (tag.hole) await member.remove.mutateAsync({ row: tag.hole });
+    if (tag.place) await places.remove.mutateAsync({ row: tag.place });
+  };
+  /** Restores the old tag with the same submit after a failed add. */
+  const ownRestore = async () => {
+    if (currentHole != null) await member.submit.mutateAsync({ post: { ...shot.post, userId: shot.ownerId, actorType: 'personal', mediaItems: [shot.item] }, hole: currentHole });
+    else if (currentPlace) await places.submit.mutateAsync({ source, place: currentPlace });
   };
   const save = async () => {
-    if ((!owned && !admin) || (hole == null && place == null) || tag.hole || tag.place) return;
+    if ((!owned && !admin) || pending) return;
+    if (hasTag ? unchanged : (hole == null && place == null)) return;
     setPending(true); setError(null);
     try {
-      let holeTag: HolePhoto | undefined; let placeTag: PlaceMedia | undefined;
+      let added: { holeTag?: HolePhoto; placeTag?: PlaceMedia } = {};
       if (owned) {
-        if (hole != null) holeTag = await member.submit.mutateAsync({ post: { ...shot.post, userId: shot.ownerId, actorType: 'personal', mediaItems: [shot.item] }, hole });
-        else if (place) placeTag = await places.submit.mutateAsync({ source, place });
-      } else {
-        // Tagged gallery IDs are contribution IDs, not source-media IDs. The
-        // existing admin queue resolves the canonical source after removal.
-        const { data: queue, error: queueError } = await supabase.rpc('admin_get_untagged_course_media', { p_course_id: courseId });
-        if (queueError) throw queueError;
-        const row = queue?.find(row => holeMediaKey({ url: row.media_url, mediaType: row.media_type, streamId: row.stream_id }) === holeMediaKey(shot.item));
-        if (!row) throw new Error('This shot cannot be tagged.');
-        if (hole != null) holeTag = await tagAdminHole(courseId, row.media_id, hole);
-        else if (place) {
-          const { data: id, error } = await supabase.rpc('admin_tag_place_media', { p_course_id: courseId, p_media_id: row.media_id, p_place: place });
+        const postMediaId = tag.hole?.source_post_media_id ?? null;
+        if (!hasTag) added = await ownAdd();
+        else if (postMediaId) {
+          // Post-sourced hole: the post owns the hole; the server moves or removes the row.
+          const { error } = await supabase.from('post_media').update({ hole_no: hole } as never).eq('id', postMediaId);
           if (error) throw error;
-          if (!id) throw new Error('The tag was not saved.');
-          const result = await supabase.from('course_place_media').select('*').eq('id', id).single();
-          if (result.error) throw result.error;
-          placeTag = result.data;
+          if (tag.place) await places.remove.mutateAsync({ row: tag.place });
+          if (place) added = { placeTag: await places.submit.mutateAsync({ source, place }) };
+        } else if (tag.hole && !tag.place && hole != null) {
+          await member.move.mutateAsync({ row: tag.hole, hole });
+        } else {
+          await ownRemove();
+          if (hole != null || place != null) {
+            try { added = await ownAdd(); }
+            catch (failure) { await ownRestore().catch(() => {}); throw failure; }
+          }
         }
+      } else {
+        if (tag.hole) { const result = await supabase.rpc('admin_untag_hole_media', { p_tag_id: tag.hole.id }); if (result.error) throw result.error; }
+        if (tag.place) { const result = await supabase.rpc('admin_untag_place_media', { p_tag_id: tag.place.id }); if (result.error) throw result.error; }
+        if (hole != null || place != null) added = await adminAdd();
       }
-      onSaved(holeTag, placeTag); onClose(); await refresh();
-    } catch (failure) { setError(holePhotoErrorMessage(failure, t('media.gallery.saveError', { defaultValue: 'The tag could not be saved. Nothing was changed.' }))); }
+      onSaved(added.holeTag, added.placeTag); onClose(); await refresh();
+    } catch (failure) { setError(holePhotoErrorMessage(failure, failMessage())); }
     finally { setPending(false); }
   };
+  const primaryLabel = !hasTag ? undefined
+    : unchanged ? (currentHole != null
+      ? t('media.v3.taggedHole', { ordinal: ordinal(currentHole), defaultValue: `Tagged to the ${ordinal(currentHole)}` })
+      : t('media.v3.taggedPlace', { label: PLACE_LABELS[currentPlace!], defaultValue: `Tagged as ${PLACE_LABELS[currentPlace!]}` }))
+    : hole != null ? t('media.v3.moveHole', { ordinal: ordinal(hole), defaultValue: `Move to the ${ordinal(hole)}` })
+    : place ? t('media.v3.movePlace', { label: PLACE_LABELS[place], defaultValue: `Move to ${PLACE_LABELS[place]}` })
+    : t('media.v3.remove', { defaultValue: 'Remove tag' });
+  const canSubmit = hasTag ? !unchanged : (hole != null || place != null);
   return <ShotTagCard gallerySingle shot={{ ...source, ownerName: shot.name }} holes={holes} hole={hole} place={place}
     onHole={next => { setHole(current => current === next ? null : next); setPlace(null); }}
     onPlace={next => { setPlace(current => current === next ? null : next); setHole(null); }}
-    pending={pending} locked={!!(tag.hole || tag.place)} canSubmit={(hole != null || place != null) && !tag.hole && !tag.place}
-    onSubmit={() => void save()} onSkip={onClose} onClose={onClose}
-    remove={tag.hole || tag.place ? { onClick: () => void remove() } : undefined}>
+    pending={pending} canSubmit={canSubmit} primaryLabel={primaryLabel}
+    onSubmit={() => void save()} onSkip={onClose} onClose={onClose}>
     {error && <p role="alert">{error}</p>}
   </ShotTagCard>;
 }
