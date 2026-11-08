@@ -56,6 +56,13 @@ describe('Merged Airy photo', () => {
     fireEvent.click(band); fireEvent.keyDown(band, { key: 'Enter' }); fireEvent.keyDown(band, { key: ' ' }); expect(open).toHaveBeenCalledTimes(3);
   });
   it('omits Full board when no opener is available', () => { mount(photo(states[0])); expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull(); });
+  it('a finished band with no sentence drops both live-only lines', () => {
+    const v = mount(<PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl={null} state={states[2]} tourLabel="PGA" leader={null} countdown={[]} startDay={null} segments={[]} note={null} onOpen={() => {}} />);
+    const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
+    expect(band?.style.height).toBe(`${350 - OVERVIEW_SENTENCE_BLOCK - OVERVIEW_SPINE_BLOCK}px`);
+    expect(band?.querySelector('[data-overview-photo-situation]')).toBeNull();
+    expect(band?.querySelector('[data-overview-round-spine]')).toBeNull();
+  });
 });
 
 describe('Merged Airy lower sections', () => {
