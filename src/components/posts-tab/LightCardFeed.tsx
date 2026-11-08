@@ -1,3 +1,4 @@
+import { usePostGolfContext, usePostGolfHoleMeta } from '@/hooks/feed/usePostGolfContext';
 /**
  * LightCardFeed — the WINDOW-SCROLLED, virtualized profile feed. Dark, like
  * everything else: "Light" in the name is a fossil of the light era and says
@@ -158,6 +159,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const commentPreview = useFeedCommentPreview(feedPostIds, 'posts:cards');
   // ONE batch for Played with + per-slide course tags.
   const golfTags = usePostGolfTags(posts, 'posts:cards');
+  const golfContextMap = usePostGolfContext(feedPostIds, useMemo(() => new Set(posts.filter(p => p.postType === 'round').map(p => p.id)), [posts]));
+  const golfHoleMap = usePostGolfHoleMeta(useMemo(() => [...new Set([...(golfContextMap?.values() ?? [])].flatMap(c => c.courseId ? [c.courseId] : []))], [golfContextMap]));
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
@@ -649,6 +652,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                 commentPreview={commentPreview.map.get(post.id) ?? null}
                 playedWith={golfTags.withByPost.get(post.id)}
                 slideTags={golfTags.slideTags}
+                golfContext={golfContextMap?.get(post.id) ? { ...golfContextMap.get(post.id), roundScoreId: null } as import('@/hooks/feed/usePostGolfContext').PostGolfContext : null}
+                golfHoles={golfHoleMap.get(golfContextMap?.get(post.id)?.courseId ?? '')}
               />
             )}
           </LightItemGate>
@@ -685,6 +690,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       roundCourseMeta,
       commentPreview.map,
       golfTags,
+      golfContextMap,
+      golfHoleMap,
     ],
   );
 

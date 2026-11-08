@@ -49,6 +49,7 @@ export interface StageMediaItem {
   existingId?: string;
   holeNo?: number | null;
   shotTag?: ShotTagChoice | null;
+  studioEdits?: Record<string, unknown>;
   /** Cloudflare Stream uid for an already-uploaded video. The playable
    *  URL is built from this, never parsed back out of previewUrl. */
   streamId?: string | null;

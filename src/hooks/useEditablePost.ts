@@ -42,6 +42,7 @@ export interface EditablePostMedia {
   displayOrder: number;
   holeNo?: number | null;
   shotTag?: ShotTagChoice | null;
+  studioEdits?: Record<string, unknown>;
 }
 
 export interface EditablePostCourse {
@@ -170,6 +171,7 @@ export function useEditablePost(postId: string | null | undefined) {
         mediaUrl: row.media_url,
         holeNo: row.hole_no ?? null,
         shotTag: row.studio_edits?.shotTag ?? null,
+        studioEdits: row.studio_edits ?? {},
         mediaType: (row.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
         posterUrl: row.poster_url ?? null,
         streamId: row.stream_id ?? null,

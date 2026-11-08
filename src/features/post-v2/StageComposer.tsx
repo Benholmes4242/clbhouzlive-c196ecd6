@@ -246,6 +246,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       existingId: m.id,
       holeNo: m.holeNo ?? null,
       shotTag: m.shotTag ?? null,
+      studioEdits: m.studioEdits,
       type: m.mediaType,
       /* A VIDEO'S PLAYABLE URL IS BUILT FROM stream_id, NEVER READ FROM
        * media_url: 37 of 157 video rows store the sentinel 'stream:<uid>' there,
@@ -748,17 +749,18 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         await syncPostWith(editPostId, editable.data.userId, initialWithIdsRef.current, withTagged.map((p) => p.id));
       }
       // Existing photos whose tag changed: remove the old, add the new.
-      if (state.course && profile?.id) {
+      if (profile?.id) {
         for (const m of kept) {
           const before = initialExistingTagsRef.current[m.id] ?? null;
           const after = shotTags[m.id] ?? null;
           if (JSON.stringify(before) === JSON.stringify(after)) continue;
-          await rewriteExistingShotTag(state.course.id, profile.id, tagHoles, m, after, existingTagsRef.current, editable.data.userId, editable.data.actorType !== 'business', visibility);
+          await rewriteExistingShotTag(shotTagMap[m.id]?.courseId ?? state.course?.id ?? editable.data.courses[0]?.courseId ?? '', profile.id, tagHoles, m, after, existingTagsRef.current, editable.data.userId, editable.data.actorType !== 'business', visibility);
         }
       }
 
       // Invalidate common caches.
       queryClient.invalidateQueries({ queryKey: ['post-golf-tags'] });
+      queryClient.invalidateQueries({ queryKey: ['post-golf-context'] });
       queryClient.invalidateQueries({ queryKey: ['editable-post', editPostId] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });

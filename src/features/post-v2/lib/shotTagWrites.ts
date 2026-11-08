@@ -26,13 +26,17 @@ export async function writeShotTagAfterUpload(
   onSavedHole?: (tag: SavedHoleTag) => void,
 ): Promise<void> {
   const choice = tagJob?.items[item.id];
-  if (!choice || !item.file) return;
+  if (!choice) return;
   const { tag } = choice;
   if (!isHoleTag(tag) && (tagJob?.personal === false || (tagJob?.visibility ?? 'anyone') !== 'anyone')) return;
   try {
     if (isHoleTag(tag)) {
       if (tagJob?.personal !== false && (tagJob?.visibility ?? 'anyone') === 'anyone') onSavedHole?.({ itemId: item.id, courseId: choice.courseId, hole: tag.hole });
       return;
+    } else if (!item.file) {
+      const sources = await fetchOwnMediaSources(choice.courseId, memberId);
+      const source = sources.find(s => s.url === uploaded.url || (uploaded.streamId && s.streamId === uploaded.streamId));
+      if (source) await submitCoursePlaceMedia(choice.courseId, memberId, source, tag.place);
     } else if (item.type === 'video') {
       if (uploaded.streamId) await submitLibraryPlaceVideo(item.file, uploaded.streamId, choice.courseId, memberId, tag.place);
     } else if (uploaded.url) await submitLibraryPlacePhoto(item.file, uploaded.url, choice.courseId, memberId, tag.place);
@@ -66,15 +70,15 @@ export function existingTagFor(url: string, tags: ExistingTags, mediaHole?: numb
 /** Edit mode: an existing photo's tag changed. Remove the old, add the new. */
 export async function rewriteExistingShotTag(
   courseId: string, memberId: string, knownHoles: readonly number[],
-  item: { type: 'image' | 'video'; previewUrl: string; streamId?: string | null; existingId?: string },
+  item: { type: 'image' | 'video'; previewUrl: string; streamId?: string | null; existingId?: string; studioEdits?: Record<string, unknown> },
   next: ShotTag | null, tags: ExistingTags, postUserId: string, personal = true, visibility = 'anyone',
 ): Promise<void> {
   const url = existingMediaUrl(item);
   try {
-    for (const row of tags.holes.filter((r) => r.media_url === url)) await removeHoleTag(row, memberId);
+    for (const row of tags.holes.filter((r) => r.media_url === url && !r.source_post_id)) await removeHoleTag(row, memberId);
     for (const row of tags.places.filter((r) => r.media_url === url)) await removeCoursePlaceMedia(row, memberId);
     if (item.existingId) {
-      const { error } = await supabase.from('post_media').update({ hole_no: isHoleTag(next) ? next.hole : null, studio_edits: { shotTag: next ? { tag: next, courseId, knownHoles } : null } } as never).eq('id', item.existingId);
+      const { error } = await supabase.from('post_media').update({ hole_no: isHoleTag(next) ? next.hole : null, studio_edits: { ...item.studioEdits, shotTag: next ? { tag: next, courseId, knownHoles } : null } } as never).eq('id', item.existingId);
       if (error) throw error;
     }
     if (!next || isHoleTag(next) || !personal || visibility !== 'anyone') return;

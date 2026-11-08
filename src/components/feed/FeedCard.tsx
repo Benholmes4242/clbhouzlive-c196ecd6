@@ -569,7 +569,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const shotHoleChip = (index: number) => {
     const item = items[index];
     const local = item ? slideTags?.get(holeMediaKey(item)) : null;
-    const holeNo = local?.hole ?? mediaHoleNo(golfContext, item, index);
+    const holeNo = golfContext ? mediaHoleNo(golfContext, item, index) : local?.hole ?? null;
     if (holeNo == null) return null;
     const detail = golfHoles?.find(h => h.hole_no === holeNo) ?? (golfHole?.hole_no === holeNo ? golfHole : local?.par ? { hole_no: holeNo, par: local.par, yards: null, si: null } : null);
     return <HoleChip holeNo={holeNo} hole={detail} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }}/>;
