@@ -82,6 +82,7 @@ describe('Leaderboards page — top block', () => {
   });
   it('live at the gate adds FIELD AVERAGE TODAY as the fourth cell', () => {
     f.entries = Array.from({ length: 20 }, (_, i) => ({ ...entry(`p${i}`, i + 1), thru: 18 }));
+    f.entries.push({ ...entry('out', 21), thru: 3 });
     const v = mountTab();
     const cells = v.container.querySelectorAll('.tour-board-figures > div[data-stat]');
     expect(v.container.querySelector('[data-stat="average"]')).not.toBeNull();
