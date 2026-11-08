@@ -198,7 +198,7 @@ export function railChipStyle(active: boolean, size: 'sm' | 'md' = 'md'): CSSPro
 /** The canonical chip-row gap. */
 export const RAIL_CHIP_GAP = 6;
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing, maxChipWidth }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing, maxChipWidth, toggleSemantics = false }: RailChipsProps) {
   const filled = ground === 'filled';
   /* ONE geometry pair, stated once. 'md' is the canonical chip. */
   const geo = RAIL_CHIP_GEOMETRY[size];
@@ -206,7 +206,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
 
   return (
     <div
-      role={filled ? 'group' : 'tablist'}
+      role={filled || toggleSemantics ? 'group' : 'tablist'}
       aria-label={ariaLabel}
       aria-disabled={locked || undefined}
       className={`hide-scrollbar${size === 'tile' ? ' explore-tile-chips' : ''}${className ? ` ${className}` : ''}`}
@@ -228,8 +228,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
           <button
             key={option.id}
             type="button"
-            role={filled ? undefined : 'tab'}
-            aria-selected={filled ? undefined : active}
+            role={filled || toggleSemantics ? undefined : 'tab'}
+            aria-selected={filled || toggleSemantics ? undefined : active}
+            aria-pressed={toggleSemantics ? active : undefined}
             aria-disabled={locked || undefined}
             tabIndex={locked ? -1 : undefined}
             onClick={() => { if (!locked) onChange(option.id); }}
