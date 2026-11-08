@@ -30,7 +30,7 @@ export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { 
   return <section data-overview-your-players className="upcoming-block">
     <h2 className="upcoming-kicker">{t('overview.upcomingPlus.yourPlayers')}</h2>
     <p className="upcoming-players-line"><Trans ns="tourhub" i18nKey="overview.alsoThisWeek.yours" count={mine.length} values={{ count: mine.length }} components={{ b: <strong /> }} /></p>
-    {mine.slice(0, 5).map(player => { const tee = drawn ? venueTee(player.teeTime, zone) : null; const target = playerRoute(player.id, { kind: 'tour-hub' }); return <Button variant="ghost" className="upcoming-player-row" key={player.id} onClick={() => navigate(target.to, { state: target.state })}><span className="upcoming-player-name">{player.name}<i data-followed-star>★</i></span>{tee ? <span data-upcoming-tee className="upcoming-player-time">{tee.day} {tee.time}</span> : null}</Button>; })}
+    {mine.slice(0, 5).map(player => { const tee = drawn ? venueTee(player.teeTime, zone) : null; const target = playerRoute(player.id, { kind: 'tour-hub' }); return <Button variant="ghost" className="upcoming-player-row" key={player.id} onClick={() => navigate(target.to, { state: target.state })}><span className="upcoming-player-name"><span>{player.name}</span><i data-followed-star>★</i></span>{tee ? <span data-upcoming-tee className="upcoming-player-time">{tee.day} {tee.time}</span> : null}</Button>; })}
     {mine.length > 5 ? <div data-upcoming-more className="upcoming-more">{t('overview.upcomingPlus.more', { count: mine.length - 5 })}</div> : null}
   </section>;
 }

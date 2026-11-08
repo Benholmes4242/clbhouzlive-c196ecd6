@@ -24,7 +24,7 @@ function marginWords(n: number): string {
   if (n < 100) return `${['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'][Math.floor(n / 10)]}${n % 10 ? `-${ones[n % 10]}` : ''}`;
   return `${marginWords(Math.floor(n / 100))} hundred${n % 100 ? ` and ${marginWords(n % 100)}` : ''}`;
 }
-const numericScore = (value: string) => value.trim() === 'E' ? 0 : Number(value.replace('−', '-'));
+const numericScore = (value: string) => value.trim() === 'E' ? 0 : value.trim() ? Number(value.replace('−', '-')) : NaN;
 export function upcomingSentence(last: LastYearFinisher[], field: UpcomingPlayer[], first: string | null, zone: string | null): HeadlineSegment[] {
   const winner = last.find(row => row.rank === '1') ?? last.find(row => row.rank === 'T1');
   const runner = winner ? last.find(row => row !== winner) : undefined;
@@ -47,6 +47,6 @@ export function followedUpcomingPlayers(member: boolean, followed: Set<string>, 
   if (!member) return [];
   return field.filter(player => followed.has(player.id)).sort((a, b) => {
     if (drawn) { const time = (a.teeTime ? Date.parse(a.teeTime) : Infinity) - (b.teeTime ? Date.parse(b.teeTime) : Infinity); if (time) return time; }
-    return (a.worldRank ?? Infinity) - (b.worldRank ?? Infinity) || a.name.localeCompare(b.name);
+    return (a.worldRank != null && a.worldRank > 0 ? a.worldRank : Infinity) - (b.worldRank != null && b.worldRank > 0 ? b.worldRank : Infinity) || a.name.localeCompare(b.name);
   });
 }
