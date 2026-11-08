@@ -141,6 +141,9 @@ export interface HeroBoardRowsProps {
   totalRounds?: number | null;
   /** Hero-only opt-in: the movers band owns the preceding seam. */
   afterMovers?: boolean;
+  /** Also this week: the card's own 10px board gap owns the seam, so the
+   * board's 12px top padding is dropped. */
+  flushTop?: boolean;
   /** Hero only: the Full leaderboard action. Also this week never passes it. */
   onFullBoard?: () => void;
   boardUpdatedAt?: number;
@@ -158,7 +161,7 @@ export interface HeroBoardRowsProps {
   bleed?: boolean;
 }
 
-export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentRound, phase = 'live', tourSlug = null, totalRounds = null, afterMovers = false, onFullBoard, boardUpdatedAt = 0, onRowTap, pickPlayerIds, bleed = false }: HeroBoardRowsProps) {
+export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentRound, phase = 'live', tourSlug = null, totalRounds = null, afterMovers = false, flushTop = false, onFullBoard, boardUpdatedAt = 0, onRowTap, pickPlayerIds, bleed = false }: HeroBoardRowsProps) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const [expanded, setExpanded] = useState<{ playerId: string; round: number } | null>(null);
@@ -326,13 +329,13 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
         })}
         <div data-hero-tot style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
       </RowTag>
-      {isOpen && expanded && pid ? <div style={bleed ? { margin: `0 -${HERO_PAD_X}px` } : undefined}><HeroRoundPanel key={pid} tournamentId={tournamentId} playerId={pid} round={expanded.round} rounds={totalRounds ?? Math.max(...heroCols.rounds, currentRound ?? 1)} startedRounds={started} boardUpdatedAt={boardUpdatedAt} onRound={round => setExpanded({ playerId: pid, round })} onFull={openScorecard} /></div> : null}</Fragment>
+      {isOpen && expanded && pid ? (() => { const panel = <HeroRoundPanel key={pid} tournamentId={tournamentId} playerId={pid} round={expanded.round} rounds={totalRounds ?? Math.max(...heroCols.rounds, currentRound ?? 1)} startedRounds={started} boardUpdatedAt={boardUpdatedAt} onRound={round => setExpanded({ playerId: pid, round })} onFull={openScorecard} />; return bleed ? <div style={{ margin: `0 -${HERO_PAD_X}px` }}>{panel}</div> : panel; })() : null}</Fragment>
     );
   };
 
   return (
     <>
-      <div className="hero-expand-board" style={{ background: PAGE_CANVAS, fontFamily: FONT, paddingTop: afterMovers ? 0 : 12 }}>
+      <div className="hero-expand-board" style={{ background: PAGE_CANVAS, fontFamily: FONT, paddingTop: afterMovers || flushTop ? 0 : 12 }}>
         <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 24, padding: `2px ${bleed ? 0 : HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
           {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
           <div ref={nameTrackRef}>{t('board.columns.player')}</div>
