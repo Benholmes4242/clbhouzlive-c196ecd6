@@ -11,7 +11,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 import { W_55 } from './HeroShell';
-import { PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
+import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
@@ -125,9 +125,10 @@ export const ProfileCoverBand: React.FC<Props> = ({
     <section
       style={{
         position: 'relative',
-        /* Pure aspect, no floor: the cover crop frame reads the same constant.
-           Clearance arithmetic lives in coverAspect.ts. */
-        aspectRatio: PERSONAL_COVER_ASPECT_CSS,
+        /* The 350px photo hero rule: fixed height, notch counted inside.
+           The crop frame keeps PERSONAL_COVER_ASPECT (39/34); the hero crops
+           to its own shape. Clearance arithmetic lives in coverAspect.ts. */
+        height: HERO_PHOTO_HEIGHT,
         overflow: 'hidden',
         background: A.CANVAS,
         fontFamily: SANS,

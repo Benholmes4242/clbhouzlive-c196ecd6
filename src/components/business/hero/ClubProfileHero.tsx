@@ -170,7 +170,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         data-club-cover=""
         style={{
           position: 'relative',
-          aspectRatio: '39 / 34',
+          height: HERO_PHOTO_HEIGHT,
           background: p.coverUrl ? CANVAS : 'linear-gradient(180deg, #17171B 0%, #0B0B0D 100%)',
           overflow: 'hidden',
         }}
