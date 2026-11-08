@@ -18,11 +18,28 @@ export function holeTone(grade: ReturnType<typeof holeGrade>) {
 export function orderedHoleCells(holes: BoardHole[]) {
   return Array.from({length:18},(_,i) => holes.find(h => h.hole_number === i+1) ?? null);
 }
-export function HoleStrip({ holes }: { holes: BoardHole[] }) {
-  if (!holes.some(h => holeGrade(h.strokes,h.par) !== 'empty')) return null;
-  return <span className="tour-hole-strip" aria-hidden="true" data-hole-strip>{orderedHoleCells(holes).map((h,i) => {
-    const grade = holeGrade(h?.strokes ?? null,h?.par ?? null);
-    return <Fragment key={i}>{i===9 && <i className="tour-nine-gap" />}<i data-hole={i+1} data-grade={grade} style={{background:holeTone(grade),opacity:grade==='bogey' ? .75 : 1}} /></Fragment>;
+
+/** ONE shared numbered tile row (signed-off hole-tiles mock): the leaderboard
+ *  board, the Tour hero board, Also this week and Clubhouse scorecard posts
+ *  all draw THE SAME tile, so tour and member data both feed this component.
+ *  Plain { strokes, par } per hole, in order; 18 holes get the 4px nine gap,
+ *  a nine-hole round renders 9 tiles with no gap. An unplayed hole is an
+ *  empty tile with no number. */
+export interface HoleTileCell { strokes: number | null; par: number | null }
+export const HOLE_TILE_TONES = Object.freeze({
+  eagle: { bg: '#FFD200', fg: '#0A0A0C' },
+  birdie: { bg: '#E24B3F', fg: '#FFFFFF' },
+  par: { bg: 'rgba(255,255,255,.08)', fg: 'rgba(248,250,252,.72)' },
+  bogey: { bg: 'rgba(166,194,240,.85)', fg: '#0A0A0C' },
+  double: { bg: '#7AA6EC', fg: '#0A0A0C' },
+  empty: { bg: 'rgba(255,255,255,.04)', fg: 'transparent' },
+} as const);
+export function HoleTiles({ holes }: { holes: ReadonlyArray<HoleTileCell | null> }) {
+  const nineGap = holes.length === 18;
+  return <span className="tour-hole-tiles" data-hole-tiles style={{ gridColumn: '1 / -1' }}>{holes.map((h, i) => {
+    const grade = holeGrade(h?.strokes ?? null, h?.par ?? null);
+    const tone = HOLE_TILE_TONES[grade];
+    return <Fragment key={i}>{nineGap && i === 9 && <i className="tour-hole-tiles-gap" aria-hidden="true" />}<i data-hole-tile={i + 1} data-grade={grade} style={{ background: tone.bg, color: tone.fg }}>{grade === 'empty' ? '' : h?.strokes}</i></Fragment>;
   })}</span>;
 }
 export function roundNineOrder(holes: BoardHole[], finished: boolean) {
