@@ -484,7 +484,13 @@ export function BoardTable({
     [layoutEntries, resolvedTeamInitials, base, containerW],
   );
 
-  const template = boardGridTemplate(columns);
+  /* ≤340px chrome: the signed-off narrow figure tracks and gutter. */
+  const compact = containerW > 0 && containerW <= 340;
+  const effColumns = compact ? { ...columns, cellW: CELL_W_FLOOR } : columns;
+  const thruW = compact ? NARROW_THRU_W : THRU_W;
+  const totW = compact ? NARROW_TOT_W : TOT_W;
+  const padX = compact ? NARROW_PAD_X : ROW_PAD_X;
+  const template = boardGridTemplate(effColumns, { thruW, totW });
 
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
@@ -561,9 +567,9 @@ export function BoardTable({
   const renderHeader = () => {
     if (!showHeader) return null;
     const labelStyle: React.CSSProperties = {
-      fontSize: 9.5,
+      fontSize: compact ? 9 : 10,
       fontWeight: 700,
-      letterSpacing: '0.08em',
+      letterSpacing: compact ? '0.04em' : '0.08em',
       textTransform: 'uppercase',
       color: SECONDARY,
       whiteSpace: 'nowrap',
@@ -576,19 +582,19 @@ export function BoardTable({
           zIndex: 2,
           display: 'grid',
           gridTemplateColumns: template,
-          gap: columns.gap,
+          gap: effColumns.gap,
           alignItems: 'center',
-          height: 34,
-          padding: `0 ${ROW_PAD_X}px`,
+          minHeight: 26,
+          padding: `0 ${padX}px`,
           background: 'var(--tour-board-head)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
-          borderBottom: `1px solid ${HAIRLINE}`,
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
           fontFamily: F,
           ...labelStyle,
         }}
       >
-        {columns.preTournament ? (
+        {effColumns.preTournament ? (
           <>
             <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
             <div style={{ ...labelStyle, textAlign: 'center' }}>
@@ -597,28 +603,27 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left' }}>{t('board.columns.pos')}</div>
-            <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
-            {columns.rounds.map((r) => (
+            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left', minWidth: 0 }}>{`${t('board.columns.pos')}  ${t('board.columns.player')}`}</div>
+            {effColumns.rounds.map((r) => (
               <div
                 key={r}
                 data-board-round-header
                 style={{
                   ...labelStyle,
                   textAlign: 'center',
-                  // AMBER on this page means THE LIVE ROUND, not the viewing
-                  // member. Bounded, local, deliberate.
-                  color: columns.liveRound === r ? AMBER : SECONDARY,
+                  // GREEN on this page means THE LIVE ROUND (TOUR_LIVE_GREEN);
+                  // amber is reserved for the viewing member (followed rows).
+                  color: effColumns.liveRound === r ? TOUR_LIVE_GREEN : MUTED,
                 }}
               >
                 {`R${r}`}
               </div>
             ))}
             {true && (
-              <div data-board-thru-header style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.thru')}</div>
+              <div data-board-thru-header style={{ ...labelStyle, letterSpacing: 0, textAlign: 'center' }}>{t('board.columns.thru')}</div>
             )}
             <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.tot')}</div>
-            {columns.showPrize && (
+            {effColumns.showPrize && (
               <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.prize', 'Prize')}</div>
             )}
           </>
