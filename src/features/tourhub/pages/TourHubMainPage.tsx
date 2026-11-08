@@ -249,8 +249,14 @@ export function TourHubMainPage() {
         />
         {/* The overview is the immersive exception: the hero starts at the
             physical top and the shared left/right islands float over it. Legacy
-            pushed tabs retain their solid in-flow AppHeader until retirement. */}
-        {isHubRoot ? renderTab() : (
+            pushed tabs retain their solid in-flow AppHeader until retirement.
+            LEADERBOARDS PAGE (8 Nov 2026): the Leaderboards tab joins the
+            overview under the shared islands — the TourIsland (Leaderboards
+            label, live caption, same TourGlance tile) is registered by
+            TourHubChromeBridge above for every tab, and without TourPageShell
+            nothing suppresses the chrome. SubTabTourControl stays for the
+            news/schedule/players tabs. */}
+        {isHubRoot || activeTab === 'live' ? renderTab() : (
           /* Route immersion is path-based, so query-param tabs share the
              overview's y=0 shell. Their own opaque header therefore becomes
              the single safe-area owner while the overview remains full bleed. */
