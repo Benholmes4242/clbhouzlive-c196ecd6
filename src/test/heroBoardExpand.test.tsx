@@ -46,5 +46,13 @@ describe('signed-off hero expansion', () => {
   it('adds concrete complete-nine totals without treating empty holes as zero', () => { const holes = Array.from({ length: 18 }, (_, i) => ({ hole_number: i + 1, strokes: 4 })) as BoardHole[]; expect(heroNineTotal(holes, 0)).toBe(36); expect(heroNineTotal(holes, 9)).toBe(36); expect(heroNineTotal([...holes.slice(0, 8), null], 0)).toBeNull(); });
   it('opens the same player scorecard from the panel footer', () => { const v = mount(); fireEvent.click(row(v.container, 1)); const door = v.container.querySelector('[data-hero-full-scorecard]'); if (!door) throw new Error('Missing door'); fireEvent.click(door); expect(screen.getByRole('dialog')).toHaveAttribute('data-player-id', 'p1'); });
   it('keeps direct scorecard taps for a player with no started rounds', () => { const v = mount([{ ...entry(), round_1: null, round_2: null, thru: null }]); fireEvent.click(row(v.container)); expect(screen.getByRole('dialog')).toHaveAttribute('data-player-id', 'p0'); expect(f.read).not.toHaveBeenCalled(); });
-  it('confirms an empty selected card as disabled and renders eighteen dots', () => { f.empty = true; const v = mount(); fireEvent.click(row(v.container)); expect(v.container.querySelector('[data-round-chip="2"]')).toBeDisabled(); expect(v.container.querySelectorAll('[data-grade="empty"]')).toHaveLength(18); });
+  it('keeps an empty selected card enabled and renders eighteen dots', () => { f.empty = true; const v = mount(); fireEvent.click(row(v.container)); expect(v.container.querySelector('[data-round-chip="2"]')).toBeEnabled(); expect(v.container.querySelectorAll('[data-grade="empty"]')).toHaveLength(18); });
+  it('keeps the empty round selected with a missing-card note instead of nine totals', () => {
+    f.empty = true; const v = mount(); fireEvent.click(row(v.container));
+    const chip = v.container.querySelector('[data-round-chip="2"]');
+    expect(chip).toBeEnabled(); expect(chip).toHaveAttribute('aria-pressed', 'true');
+    expect(v.container.querySelector('[data-hero-missing-card]')).not.toBeNull();
+    expect(v.container.querySelector('[data-hero-out], [data-hero-in]')).toBeNull();
+    expect(f.read.mock.calls.every(args => args[1] === 2)).toBe(true);
+  });
 });

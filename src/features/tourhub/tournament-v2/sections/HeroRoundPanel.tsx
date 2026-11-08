@@ -1,8 +1,8 @@
 /** Only an open hero row mounts this reader. Its single selected-round query
  * reuses useBoardHoles' whole-field cache; closed rows never invoke the hook.
- * Availability starts from board scores and successful empty reads disable chips.
+ * Availability stays score-based; empty cards retain their chip and show a note.
  * Shared marks remain untouched for weekly rows and round posts. */
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { HoleMarks, orderedHoleCells } from '../../leaderboard/BoardRound';
@@ -12,16 +12,14 @@ import { fmtScore } from '../../utils/fmtScore';
 import { heroNineTotal } from './heroRoundRules';
 import './heroRoundPanel.css';
 
-export function HeroRoundPanel({ tournamentId, playerId, round, rounds, startedRounds, boardUpdatedAt, onRound, onEmpty, onFull }: {
+export function HeroRoundPanel({ tournamentId, playerId, round, rounds, startedRounds, boardUpdatedAt, onRound, onFull }: {
   tournamentId: string; playerId: string; round: number; rounds: number; startedRounds: number[]; boardUpdatedAt: number;
-  onRound: (round: number) => void; onEmpty: (round: number) => void; onFull: () => void;
+  onRound: (round: number) => void; onFull: () => void;
 }) {
   const { t } = useTranslation('tourhub');
   const query = useBoardHoles(tournamentId, round, boardUpdatedAt, true);
   const holes = query.byPlayer.get(playerId) ?? [];
-  useEffect(() => {
-    if (query.isSuccess && holes.length === 0) onEmpty(round);
-  }, [query.isSuccess, holes.length, round, onEmpty]);
+  const missingCard = query.isSuccess && holes.length === 0;
   const cells = orderedHoleCells(holes);
   const played = cells.filter(h => h?.strokes != null && h.strokes > 0);
   const front = heroNineTotal(cells, 0);
@@ -39,8 +37,8 @@ export function HeroRoundPanel({ tournamentId, playerId, round, rounds, startedR
     </div>
     <div className="hero-round-numbers" aria-hidden="true">{cells.map((_, i) => <Fragment key={i}>{i === 9 && <i className="hero-round-nine-gap" />}<span>{i + 1}</span></Fragment>)}</div>
     <div className="hero-round-marks"><HoleMarks holes={cells} surface="var(--hero-round-surface)" /></div>
-    <div className="hero-round-footer">
-      <div className="hero-round-nines"><span>{t('overview.board.out', { defaultValue: 'OUT' })} <b data-hero-out>{front}</b></span><span>{t('overview.board.in', { defaultValue: 'IN' })} <b data-hero-in>{back}</b></span></div>
+    <div className="hero-round-footer" data-missing-card={missingCard || undefined}>
+      {missingCard ? <span className="hero-round-missing-note" data-hero-missing-card>{t('overview.board.noHoleCard', { defaultValue: 'No hole-by-hole card for this round' })}</span> : <div className="hero-round-nines"><span>{t('overview.board.out', { defaultValue: 'OUT' })} <b data-hero-out>{front}</b></span><span>{t('overview.board.in', { defaultValue: 'IN' })} <b data-hero-in>{back}</b></span></div>}
       <Button variant="ghost" className="hero-scorecard-button" data-hero-full-scorecard onClick={onFull}>{t('overview.board.fullScorecard', { defaultValue: 'Full scorecard ›' })}</Button>
     </div>
   </div>;
