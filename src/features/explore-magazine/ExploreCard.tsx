@@ -833,11 +833,14 @@ function ReviewStatStrip({ breakdown }: { breakdown: ReviewBreakdown | undefined
    normal posts put it. Follow and owner menu never both show: follow is gated
    on not being the viewer, the menu on being the viewer. No score, kicker or
    headline enters this row (FeedCard). */
-function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow }: {
+function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow, isCompetition }: {
   item: StreamItem;
   onWhoTap?: () => void;
   isFollowed?: boolean;
   onFollow?: () => void;
+  /** Explicit-true gam_round_stats.is_competition only — the COMP mark is a
+   *  statement, never a default. */
+  isCompetition?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const who = item.who && (item.who.user_id || item.who.display_name?.trim()) ? item.who : null;
@@ -869,7 +872,12 @@ function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow }: {
         </span>
       ) : null}
       <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
-        <span data-round-author-name="true" style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, lineHeight: 1.25, color: isViewer ? A.AMBER : '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name}</span>
+        <span style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+          <span data-round-author-name="true" style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, lineHeight: 1.25, color: isViewer ? A.AMBER : '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name}</span>
+          {/* The shared CompetitionMark, 9px after the member's name; the name
+              truncates before the mark does. */}
+          {isCompetition === true ? <CompetitionMark style={{ marginLeft: 9 }} /> : null}
+        </span>
         {date || (onFollow && !isViewer) ? (
           <span style={{ marginTop: 1, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
             {date ? (
@@ -909,6 +917,7 @@ export function ExploreCard({
   onWhoTap,
   engagement,
   medals,
+  isCompetition,
   bleed,
   feedPlot,
   feedLayout,
@@ -927,6 +936,8 @@ export function ExploreCard({
   item: StreamItem;
   /** From useBatchRoundMedals, resolved queries only. undefined = no cluster. */
   medals?: { gold: number; silver: number; bronze: number };
+  /** From useBatchRoundCompetition, resolved queries only. undefined = no mark. */
+  isCompetition?: boolean;
   size: CardSize;
   /** Rounds only. A pair never draws a shape: at 124px it cannot be read. */
   /** undefined = unresolved; null = settled without usable hole detail. */
