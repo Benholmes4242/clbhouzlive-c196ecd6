@@ -41,8 +41,9 @@ describe('Tour champion avatar candidates', () => {
       expect(ring?.style.borderRadius).toBe('34%');
       const gap = ring?.querySelector<HTMLElement>('[data-active-ring-gap]');
       expect(gap).not.toBeNull();
-      const bordered = Array.from(ring?.querySelectorAll<HTMLElement>('*') ?? []).find(el => el.style.border.includes('solid'));
-      expect(bordered?.style.border).toContain('transparent');
+      const squircle = Array.from(ring?.querySelectorAll<HTMLElement>('*') ?? []).find(el => el.style.aspectRatio !== '');
+      expect(squircle).not.toBeNull();
+      expect(squircle?.style.border === 'none' || squircle?.style.border.includes('transparent')).toBe(true);
       expect(container.querySelector('[data-avatar-ring-gradient]')).toBeNull();
       unmount();
     }
