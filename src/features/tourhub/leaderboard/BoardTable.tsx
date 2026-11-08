@@ -718,11 +718,10 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div className="tour-board-position">
-              <span style={{fontSize:demotedRow ? 10 : 12.5,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{showPosition ? posText : '\u00a0'}</span>
-              {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : 'var(--tour-board-dim)'}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
+            <div className="tour-board-cluster">
+              {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : STATUS_NEGATIVE}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
+              {showPosition && <span data-board-position style={{fontSize:demotedRow ? 10 : 13,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{posText}</span>}
             </div>
-            {!yourPlayers && tie && <span aria-hidden="true" data-tie-bracket={tie} className={`tour-tie tour-tie-${tie}`} />}
 
             {entity.kind === 'team' ? (
               // A team row names two people, not one. The field's longest pair
