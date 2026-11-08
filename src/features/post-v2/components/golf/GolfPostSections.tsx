@@ -11,7 +11,7 @@ import BottomSheet from '../BottomSheet';
 import SlideThumb from '../SlideThumb';
 import type { StageCourse, StageMediaItem } from '../../hooks/useStageComposer';
 import {
-  holeLine, isHoleTag, shotTagLabel, VISIBILITY_OPTIONS,
+  holeLine, isHoleTag, shotTagLabel, VISIBILITY_OPTIONS, MAX_PLAYED_WITH,
   type PostVisibility, type ShotTag, type WithCandidate,
 } from '../../lib/golfPostRules';
 import { PostCoursePhoto } from '../PostFlowChrome';
@@ -20,12 +20,12 @@ import '@/styles/post-flow.css';
 import { GP, chipStyle, labelAction, sectionLabel } from './golfPageTokens';
 
 /* ---- MEDIA STRIP + HOLE LINE ------------------------------------------- */
-export function GolfShotStrip({ media, tags, courseName, onTap, onAdd }: {
+export function GolfShotStrip({ media, tags, courseName, onTap, onAdd, visibility = 'anyone', personal = true, onVisibility }: {
   media: StageMediaItem[]; tags: Record<string, ShotTag>; courseName: string | null;
-  onTap: (i: number) => void; onAdd: () => void;
+  onTap: (i: number) => void; onAdd: () => void; visibility?: PostVisibility; personal?: boolean; onVisibility?: () => void;
 }) {
   const holes = media.filter((m) => isHoleTag(tags[m.id])).length;
-  const line = holeLine(courseName, holes);
+  const line = holeLine(courseName, holes, visibility, personal);
   return (
     <>
       <div data-testid="golf-strip" style={{ display: 'flex', gap: 8, padding: '10px 16px 0', overflowX: 'auto', scrollbarWidth: 'none' }}>
@@ -39,8 +39,8 @@ export function GolfShotStrip({ media, tags, courseName, onTap, onAdd }: {
                 <span data-testid="shot-chip" data-tagged={!!tag || undefined} style={{
                   position: 'absolute', left: 6, right: 6, bottom: 6, height: 24, borderRadius: 8, fontSize: 11, fontWeight: 700,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, whiteSpace: 'nowrap',
-                  background: tag ? 'rgba(10,10,12,0.62)' : 'rgba(10,10,12,0.42)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                  border: `1px ${tag ? 'solid' : 'dashed'} rgba(255,255,255,0.18)`, color: tag ? GP.ink : 'rgba(248,250,252,0.78)',
+                  background: 'var(--composer-tag-glass)',
+                  border: `1px ${tag ? 'solid' : 'dashed'} var(--composer-tag-edge)`, color: tag ? GP.ink : GP.mute,
                 }}>{tag ? shotTagLabel(tag) : '+ Tag'}</span>
               )}
             </button>
@@ -50,7 +50,7 @@ export function GolfShotStrip({ media, tags, courseName, onTap, onAdd }: {
       </div>
       {line && (
         <div data-testid="hole-line" style={{ padding: '10px 16px 0', fontSize: 12.5, color: GP.mute, lineHeight: 1.45 }}>
-          {line.count && <b style={{ color: GP.ink, fontWeight: 600 }}>{line.count}</b>}{line.text}
+          {line.visibilityAction ? <Button variant="ghost" className="pf4-hole-audience" onClick={onVisibility}>Hole pages only show posts everyone can see. Change <strong>Who can see this</strong> to Everyone to add your {holes} hole {holes === 1 ? 'shot' : 'shots'}.</Button> : <>{line.count && <b style={{ color: GP.ink, fontWeight: 600 }}>{line.count}</b>}{line.text}</>}
         </div>
       )}
     </>
@@ -142,26 +142,40 @@ export function WhereSection({ course, reason, changing, recent, onChange, onCan
 }
 
 /* ---- PLAYED WITH ------------------------------------------------------- */
-export function PlayedWithSection({ suggestions, tagged, onToggle, onFind }: {
-  suggestions: WithCandidate[]; tagged: WithCandidate[]; onToggle: (p: WithCandidate) => void; onFind: () => void;
+/** PF4: inline search reuses the mention member source; chosen ids never appear in results. */
+export function PlayedWithSection({ suggestions, tagged, onToggle, search, selfId }: {
+  suggestions: WithCandidate[]; tagged: WithCandidate[]; onToggle: (p: WithCandidate) => void;
+  search: (q: string) => Promise<WithCandidate[]>; selfId: string | null;
 }) {
-  // Tagged people always show, even when found by search.
-  const shown = [...tagged, ...suggestions.filter((s) => !tagged.some((t) => t.id === s.id))].slice(0, 8);
-  return (
-    <div data-testid="played-with" style={{ margin: '18px 16px 0' }}>
-      <div style={sectionLabel}><span>Played with</span><button type="button" style={labelAction} onClick={onFind}>Find someone</button></div>
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginRight: -16, paddingRight: 16, scrollbarWidth: 'none' }}>
-        {shown.map((p) => {
-          const on = tagged.some((t) => t.id === p.id);
-          return (
-            <button key={p.id} type="button" aria-pressed={on} data-testid="with-chip" onClick={() => onToggle(p)} style={{ ...chipStyle(on), paddingLeft: 8 }}>
-              <SquircleAvatar src={p.avatarUrl} alt={p.name} userId={p.id} size={22} hairlineRing ringColor={DARK_HAIRLINE} />{p.name.split(/\s+/)[0]}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
+  const [query, setQuery] = useState('');
+  const [focused, setFocused] = useState(false);
+  const [results, setResults] = useState<WithCandidate[]>([]);
+  const [loading, setLoading] = useState(false);
+  const limited = tagged.length >= MAX_PLAYED_WITH;
+  useEffect(() => {
+    if (!focused || !query.trim() || limited) { setResults([]); setLoading(false); return; }
+    let cancelled = false;
+    setLoading(true); setResults([]);
+    const timer = setTimeout(() => {
+      void search(query).then(rows => { if (!cancelled) setResults(rows); }).catch(() => { if (!cancelled) setResults([]); }).finally(() => { if (!cancelled) setLoading(false); });
+    }, 180);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [query, focused, limited, search]);
+  const shown = (query.trim() ? results : suggestions).filter(p => p.id !== selfId && !tagged.some(t => t.id === p.id));
+  return <section data-testid="played-with" className="composer-golf pf4-with" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false); }}>
+    <div className="composer-golf-head"><span className="composer-golf-kicker">Played with</span>{focused && <span className="pf4-with-limit">Up to 8</span>}</div>
+    <label className="pf4-with-input"><Search size={17} aria-hidden="true"/><input aria-label="Who did you play with?" placeholder={limited ? '8 people tagged' : 'Who did you play with?'} disabled={limited} value={query} onFocus={() => setFocused(true)} onChange={e => setQuery(e.target.value)}/></label>
+    {focused && !limited && (shown.length > 0 || loading) && <div className="pf4-with-results" aria-busy={loading}>
+      {shown.map(p => <Button variant="ghost" className="pf4-with-result" key={p.id} onClick={() => { onToggle(p); setQuery(''); }}>
+        <SquircleAvatar src={p.avatarUrl} alt="" userId={p.id} size={34} hairlineRing ringColor={DARK_HAIRLINE}/>
+        <span className="pf4-with-person"><b>{p.name}</b><small>{[p.username ? `@${p.username}` : null, p.homeClub].filter(Boolean).join(' · ')}</small></span><span className="pf4-with-add">Add</span>
+      </Button>)}
+    </div>}
+    {tagged.length > 0 && <div className="pf4-with-chips">{tagged.map(p => <div className="pf4-with-chip" key={p.id}>
+      <SquircleAvatar src={p.avatarUrl} alt="" userId={p.id} size={26} hairlineRing ringColor={DARK_HAIRLINE}/><span>{p.name}</span>
+      <Button variant="ghost" className="pf4-with-remove" aria-label={`Remove ${p.name}`} onClick={() => onToggle(p)}><X size={12}/></Button>
+    </div>)}</div>}
+  </section>;
 }
 
 export function FindSomeoneSheet({ open, onClose, search, onPick }: {
