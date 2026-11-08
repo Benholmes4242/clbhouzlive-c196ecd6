@@ -57,7 +57,7 @@ describe('boards without hole marks', () => {
     expect(v.container.querySelector('[data-hole-marks], [data-hole-marks-key]')).toBeNull();
     expect(f.holes).not.toHaveBeenCalled();
   });
-  it.each(['live', 'completed'] as const)('hero %s has one line, no marks/key or hole reads, and preserves sheet taps', phase => {
+  it.each(['live', 'completed'] as const)('hero %s stays single-line when closed and opens a lazy round panel', phase => {
     const v = mount(<MiniBoard tournamentId="event" entries={[entry]} theme="heroBoard" currentRound={2} phase={phase} />);
     const row = v.container.querySelector<HTMLElement>('[data-hero-tie]')?.parentElement;
     expect(row?.style.gridTemplateRows).toBe(''); expect(row?.style.rowGap).toBe('');
@@ -65,7 +65,9 @@ describe('boards without hole marks', () => {
     expect(v.container.querySelector('[data-hole-marks], [data-hole-marks-key], [data-avatar-fallback]')).toBeNull();
     expect(f.holes).not.toHaveBeenCalled();
     if (!row) throw new Error('Missing hero row'); fireEvent.click(row);
-    expect(screen.getByRole('dialog')).toHaveAttribute('data-player-id', 'player-a');
+    expect(row).toHaveAttribute('aria-expanded', 'true');
+    expect(v.container.querySelector('[data-hero-round-panel]')).toHaveAttribute('data-player-id', 'player-a');
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
   it('pre-tee hero does not fall back to previous-round hole marks or reads', () => {
     const v = mount(<MiniBoard tournamentId="event" entries={[{ ...entry, today: null, round_2: null }]} theme="heroBoard" currentRound={2} />);

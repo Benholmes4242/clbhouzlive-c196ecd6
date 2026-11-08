@@ -29,7 +29,7 @@ import { useTourSelection } from '../../context/TourSelectionContext';
 import { OVERVIEW_HERO_LOADING_BG } from '../../_shared/tokens';
 import { resolveChampionEntry } from '../../_shared/boardEntity';
 import { deriveHeroState, isChampionResolvable, isInPlayState } from './HybridHero.utils';
-import { boardPhaseFor } from './HybridHeroBands/HeroBoardBand';
+import { boardPhaseFor, shouldShowOverviewBoard } from './HybridHeroBands/HeroBoardBand';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { useHeroFullBoard } from './useHeroFullBoard';
 import { FullBoardSheet } from '../../tournament-v2/sections/FullBoardSheet';
