@@ -509,7 +509,8 @@ export function LeaderboardTab() {
           cutState={cutState}
           currentRound={currentRound}
           complete={tournamentIsFinished(metaStatus)}
-          headerTop={'var(--tour-header-h, 0px)'}
+          headerTop={CHROME_CLEARANCE}
+          boardHead={boardHead}
           teeTimes={teeTimes}
           onFull={(row) => {
             if (!row.player?.id) return;
