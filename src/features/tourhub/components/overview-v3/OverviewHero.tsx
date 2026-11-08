@@ -422,7 +422,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         >
           {/* On finished events the champion block follows the chip row
               rather than the photo (BUILD_TOUR_BUTTONS_UNDER_HERO §1). */}
-          <OverviewChampionBlock slide={activeSlide} state={heroState} />
+          <OverviewChampionBlock slide={active} state={heroState} />
           <HeroBoardSection
             tournamentId={bandTournamentId}
             eventName={activeSlide?.tournament.name}
