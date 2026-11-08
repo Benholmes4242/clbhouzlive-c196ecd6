@@ -37,7 +37,10 @@ const CANVAS = TOUR_CANVAS;
    32.6px; both are right-aligned, so a track narrower than its label spills
    leftwards into the column beside it. `cell` (26) is a ROUND's figure —
    "R1", "-3" — and TODAY is not a round, so it has its own width here. */
-export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 } as const);
+/* LEADERBOARDS PAGE (8 Nov 2026): the full board takes the Tour overview
+   board's sizes — rounds 30px (25 at ≤340), THRU 34 (32), TOT 40 (36),
+   rows min-height 31 with 4px 0 padding, side padding 20 (16 at ≤340). */
+export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 30, cellFloor: 25, gap: 4 } as const);
 
 /** TIGHTENED GEOMETRY (2.4) — local aliases of BOARD_GEOMETRY, never numbers of their own. */
 const TOT_W = BOARD_GEOMETRY.tot;
@@ -46,11 +49,14 @@ const PRIZE_W = BOARD_GEOMETRY.prize;
 const CELL_W = BOARD_GEOMETRY.cell;
 const CELL_W_FLOOR = BOARD_GEOMETRY.cellFloor;
 const GRID_GAP = BOARD_GEOMETRY.gap;
-/* ROW PADDING IS THE ONE DELIBERATE DIFFERENCE FROM THE HERO BOARD (20 there).
-   This is a full-width scrolling table that needs the content width across
-   seven columns; do not unify it with the hero's 20. */
-const ROW_PAD_X = 16;
-const NAME_SIZE = 14;
+/* NARROW CHROME (≤340px): the signed-off small widths for the figure tracks
+   and the side gutter. */
+const NARROW_TOT_W = 36;
+const NARROW_THRU_W = 32;
+const NARROW_PAD_X = 16;
+/* Row side padding matches the page's 20px gutter (16 at ≤340). */
+const ROW_PAD_X = 20;
+const NAME_SIZE = 13;
 const PRE_NAME_SIZE = 15;
 const PRE_TEE_W = 76;
 /** MOVEMENT only: zero or unavailable movement is a STATEMENT, so it gets a mark. */
