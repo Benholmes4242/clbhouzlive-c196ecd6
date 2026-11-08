@@ -359,7 +359,7 @@ function PlayerBlock({ playerId }: { playerId: string }) {
           srcCandidates={avatarCandidates}
           alt={name}
           userId={p.id}
-          hairlineRing
+          hideRing
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
@@ -468,7 +468,7 @@ function StatHeader({
   });
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <SquircleAvatar size={40} srcCandidates={candidates} alt={name} userId={player.id} hairlineRing />
+      <SquircleAvatar size={40} srcCandidates={candidates} alt={name} userId={player.id} hideRing />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: INK_FAINT }}>
           {kicker}
