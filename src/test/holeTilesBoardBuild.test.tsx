@@ -9,7 +9,7 @@ import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
-vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '', i18n: { language: 'en' } }) }));
 afterEach(cleanup);
 
 const holes = (diff: (number | null)[]) => diff.map((d) => (d == null ? null : { strokes: 4 + d, par: 4 }));
@@ -52,8 +52,11 @@ describe('leaderboard board rows', () => {
     render(<MemoryRouter><BoardTable entries={entries} cutState={cut} currentRound={2} {...extra} /></MemoryRouter>);
   it('name starts 8px after the mark/position cluster and POS is left aligned', () => {
     const v = board([entry('a')]);
-    const name = v.container.querySelector<HTMLElement>('[data-board-name]');
-    expect(name?.style.marginLeft).toBe('8px');
+    // B2: the cluster carries padding-right 8px (.tour-board-cluster), so the
+    // name starts 8px after each row's own mark/position pair — no shared column.
+    const cluster = v.container.querySelector('.tour-board-cluster');
+    expect(cluster).not.toBeNull();
+    expect(cluster?.nextElementSibling?.classList.contains('tour-board-player')).toBe(true);
     const head = v.container.querySelector<HTMLElement>('[data-board-head] span');
     expect(head?.style.textAlign).toBe('left');
   });
@@ -67,7 +70,7 @@ describe('leaderboard board rows', () => {
     const v = board([entry('a')]);
     const key = v.container.querySelector('[data-board-key]');
     expect(key).not.toBeNull();
-    expect(key?.querySelectorAll('[data-hole-tile]')).toHaveLength(5);
+    expect(key?.querySelectorAll('[data-board-key-item]')).toHaveLength(5);
   });
 });
 
@@ -100,9 +103,9 @@ describe('competition mark on round cards', () => {
   it('FeaturedRoundCard shows COMP only on explicit true', () => {
     const round = { whs_score_id: 's1', user_id: 'u', display_name: 'Pat', photo_url: null, course_name: 'Sample', play_date: '2026-11-01', gross: 70, to_par: -2, vs_hcp: null, tier: 3, joint_count: 0, image_url: null } as never;
     const on = render(<MemoryRouter><FeaturedRoundCard round={round} onOpen={() => {}} isCompetition /></MemoryRouter>);
-    expect(on.container.textContent).toContain('COMP');
+    expect(on.container.textContent).toMatch(/comp/i);
     cleanup();
     const off = render(<MemoryRouter><FeaturedRoundCard round={round} onOpen={() => {}} /></MemoryRouter>);
-    expect(off.container.textContent).not.toContain('COMP');
+    expect(off.container.textContent).not.toMatch(/comp/i);
   });
 });

@@ -823,7 +823,7 @@ export function BoardTable({
 
             {/* LINE 2 — the current round's holes as numbered tiles across the
                 FULL row width, from the row's left edge to under TOT. */}
-            {!demotedRow && entity.kind !== 'team' && pid ? (
+            {!demotedRow && entity.kind !== 'team' && pid && holes.length > 0 ? (
               <HoleTiles holes={orderedHoleCells(holes)} />
             ) : null}
           </>
