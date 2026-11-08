@@ -681,16 +681,17 @@ export function BoardTable({
           position: 'relative',
           display: 'grid',
           gridTemplateColumns: template,
-          columnGap: columns.gap,
+          columnGap: effColumns.gap,
           alignItems: 'center',
-          padding: `12px ${ROW_PAD_X}px`,
+          minHeight: 31,
+          padding: `4px ${padX}px`,
           background: yourPlayers ? 'var(--tour-board-mine)' : isLeader ? 'var(--tour-board-leader)' : surface,
           opacity: demotedRow ? 0.55 : 1,
           cursor: pid ? 'pointer' : 'default',
           fontFamily: F,
         }}
       >
-        {columns.preTournament ? (
+        {effColumns.preTournament ? (
           <>
             {entity.kind === 'team' ? (
               <div style={{ minWidth: 0 }}>
@@ -722,34 +723,39 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div className="tour-board-cluster">
-              {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : STATUS_NEGATIVE}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
-              {showPosition && <span data-board-position style={{fontSize:demotedRow ? 10 : 13,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{posText}</span>}
+            {/* ONE flexible ID cell: movement, POS, then the name 8px after
+                the row's own mark/position pair (.tour-board-cluster's
+                padding-right), so names step with their position. */}
+            <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+              <div className="tour-board-cluster">
+                {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : MUTED}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
+                {showPosition && <span data-board-position style={{fontSize:demotedRow ? 10 : 12.5,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{posText}</span>}
+              </div>
+
+              {entity.kind === 'team' ? (
+                // A team row names two people, not one. The field's longest pair
+                // needs 254px on one line against a 194px name track at 320, so
+                // the pair stacks. Both lines take full INK: neither player is a
+                // supporting credit.
+                <div style={{ minWidth: 0 }}>
+                  {entity.lines.map((line, index) => (
+                    <span key={`${e.id}-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {line}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="tour-board-player">
+                  <div className="tour-board-who"><span className="tour-board-name"><span className="tour-board-name-text">{nameText}</span>
+                    {pid && pickPlayerIds?.has(pid) && <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />}
+                    {pid && followedIds.has(pid) && <span className="tour-board-star" aria-label={t('rebuilt.following')}>★</span>}
+                  </span></div>
+                </div>
+              )}
             </div>
 
-            {entity.kind === 'team' ? (
-              // A team row names two people, not one. The field's longest pair
-              // needs 254px on one line against a 194px name track at 320, so
-              // the pair stacks. Both lines take full INK: neither player is a
-              // supporting credit.
-              <div style={{ minWidth: 0 }}>
-                {entity.lines.map((line, index) => (
-                  <span key={`${e.id}-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {line}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <div className="tour-board-player">
-                <div className="tour-board-who"><span className="tour-board-name"><span className="tour-board-name-text">{nameText}</span>
-                  {pid && pickPlayerIds?.has(pid) && <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />}
-                  {pid && followedIds.has(pid) && <span className="tour-board-star" aria-label={t('rebuilt.following')}>★</span>}
-                </span></div>
-              </div>
-            )}
-
-            {columns.rounds.map((r) => {
-              const isLive = columns.liveRound === r;
+            {effColumns.rounds.map((r) => {
+              const isLive = effColumns.liveRound === r;
               const val = r === currentRound ? todayVal : roundVals[r - 1] ?? null;
               const settled = !isLive;
               return (
@@ -759,10 +765,10 @@ export function BoardTable({
                   style={{
                     textAlign: 'center',
                     fontSize: 12,
-                    fontWeight: settled ? 600 : 800,
+                    fontWeight: settled ? 600 : 700,
                     // Rounds at full strength: a played round keeps its colour,
                     // size and weight at opacity 1. The current round is marked
-                    // by its 800 weight and amber header. An empty cell is a
+                    // by its 700 weight and green header. An empty cell is a
                     // different thing and keeps A.DIM.
                     opacity: 1,
                     color: val == null ? A.DIM : houseColor(val),
@@ -781,9 +787,8 @@ export function BoardTable({
                 style={{
                   textAlign: 'center',
                   fontSize: 12,
-                  // Still out there = a number, stated. Settled = a quiet 'F'.
                   fontWeight: 600,
-                  color: thruDisplay === 'F' ? A.DIM : A.BODY,
+                  color: MUTED,
                   fontVariantNumeric: 'tabular-nums lining-nums',
                   whiteSpace: 'nowrap',
                 }}
@@ -796,8 +801,8 @@ export function BoardTable({
             <div
               style={{
                 textAlign: 'center',
-                fontSize: 16,
-                fontWeight: 800,
+                fontSize: 15,
+                fontWeight: 700,
                 letterSpacing: 0,
                 color: totColor,
                 fontVariantNumeric: 'tabular-nums lining-nums',
@@ -810,7 +815,7 @@ export function BoardTable({
             {/* PRIZE — earned nothing is stated with an em dash in the faint
                 slot, never a blank and never a zero. MC/WD/DQ/DNS rows earn
                 nothing, so they dash too. */}
-            {columns.showPrize && (
+            {effColumns.showPrize && (
               <div
                 style={{
                   textAlign: 'center',
