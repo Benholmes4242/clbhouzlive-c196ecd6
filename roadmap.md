@@ -2,8 +2,9 @@
 
 ## UPCOMING_OVERVIEW_PLUS
 - [x] Tour buttons shard4 1931/1931; combined reported7816; actual PhotoBand/RailChips320/390/430 no overflow. See TOUR_BUTTONS_REPORT.md for chronology and live-device limitations.
-- [ ] Build countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.
-- [ ] Add rule tests, list authorized assertion changes, run four separate shards, and verify 320/390/430 fixtures.
+- [x] Implement countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.
+- [x] Add23 rule cases and assertion ledger; focused214passed/1failed, preview buildOK.
+- [ ] STOP: tourOverviewPicksChipsFullBoard.test.tsx:179:75, expected null not to be null (upcoming sentence with no history/draw). Shards and320/390/430 checks not run. See UPCOMING_OVERVIEW_PLUS_REPORT.md.
 
 ## REVIEW_RECEIPT_NEXT_COURSE
 - [x] Scope receipt to its submitted course and clear receipt/submitted state on next-course and route changes.
