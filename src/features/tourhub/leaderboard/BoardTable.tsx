@@ -344,6 +344,7 @@ function resolveLayout(
   teamInitials: boolean,
   base: BoardColumns,
   containerW: number,
+  movementMap?: Map<string, number>,
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
   const playerFont = `700 ${NAME_SIZE}px ${F}`;
@@ -403,8 +404,7 @@ function resolveLayout(
     const prizeFreeTrackCount = 3 + prizeFree.rounds.length + (prizeFree.showThru ? 1 : 0) + 1;
     const prizeFreeFixed =
       ROW_PAD_X * 2 +
-      MOV_W +
-      POS_W +
+      Math.ceil(widestCluster) + 8 +
       TOT_W +
       (prizeFree.showThru ? THRU_W : 0) +
       (prizeFreeTrackCount - 1) * prizeFree.gap;
