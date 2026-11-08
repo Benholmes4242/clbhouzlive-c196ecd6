@@ -5,7 +5,7 @@
  * Other themes retain direct ScorecardSheet taps. A row with no player id
  * (a team row) is not tappable.
  */
-import { Fragment, useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
@@ -241,15 +241,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const [expanded, setExpanded] = useState<{ playerId: string; round: number } | null>(null);
-  const [emptyRounds, setEmptyRounds] = useState<Record<string, number[]>>({});
-  useEffect(() => { setExpanded(null); setEmptyRounds({}); setTarget(null); }, [tournamentId]);
-  const confirmEmpty = useCallback((round: number) => {
-    if (!expanded) return;
-    setEmptyRounds(previous => {
-      const known = previous[expanded.playerId] ?? [];
-      return known.includes(round) ? previous : { ...previous, [expanded.playerId]: [...known, round] };
-    });
-  }, [expanded]);
+  useEffect(() => { setExpanded(null); setTarget(null); }, [tournamentId]);
   const rows = entries.slice(0, limit);
   const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
   const nameTrackRef = useRef<HTMLDivElement>(null);
@@ -399,7 +391,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             const tappable = !!r.player?.id;
             const pid = r.player?.id;
             const isOpen = !!pid && expanded?.playerId === pid;
-            const started = heroStartedRounds(r, currentRound).filter(rd => !(emptyRounds[pid ?? ''] ?? []).includes(rd));
+            const started = heroStartedRounds(r, currentRound);
             const defaultRound = heroDefaultRound(started, currentRound);
             const openScorecard = () => {
               if (!pid) return;
@@ -473,7 +465,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 })}
                 <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
               </RowTag>
-              {isOpen && expanded && pid ? <HeroRoundPanel key={pid} tournamentId={tournamentId} playerId={pid} round={expanded.round} rounds={totalRounds ?? Math.max(...heroCols.rounds, currentRound ?? 1)} startedRounds={started} boardUpdatedAt={boardUpdatedAt} onRound={round => setExpanded({ playerId: pid, round })} onEmpty={confirmEmpty} onFull={openScorecard} /> : null}</Fragment>
+              {isOpen && expanded && pid ? <HeroRoundPanel key={pid} tournamentId={tournamentId} playerId={pid} round={expanded.round} rounds={totalRounds ?? Math.max(...heroCols.rounds, currentRound ?? 1)} startedRounds={started} boardUpdatedAt={boardUpdatedAt} onRound={round => setExpanded({ playerId: pid, round })} onFull={openScorecard} /> : null}</Fragment>
             );
           };
           if (topTieLength === 0) return rows.map((r, i) => renderRow(r, i, false));

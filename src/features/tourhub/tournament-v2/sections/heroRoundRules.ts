@@ -1,5 +1,5 @@
-/** Hero-only availability: board scores provisionally enable chips; a selected
- * successful empty scorecard read disables that round (Ben's availability ruling).
+/** Hero-only availability stays score-based; an empty selected scorecard keeps
+ * its chip enabled and selected, showing dots and the missing-card footer note.
  * Never read other rounds to infer availability. Number order ignores starting tee. */
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import type { BoardHole } from '../../leaderboard/useBoardHoles';
