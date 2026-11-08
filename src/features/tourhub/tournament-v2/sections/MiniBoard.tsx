@@ -100,9 +100,7 @@ const THEME_TOKENS = {
 export const HERO_PAD_X = 20;
 export const HERO_POS_W = 24;
 const HERO_ROUND_W = 32;
-const HERO_TODAY_W = 40;
 export const HERO_TOT_W = 40;
-const HERO_SHAPE_W = 44;
 export const HERO_GAP = 4;
 /** Every numeric cell on the hero board: digits stack down a column. */
 const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'center' as const };
@@ -118,47 +116,17 @@ export function heroTeeRound(entries: BoardEntry[], rows: BoardEntry[], rounds: 
   return rounds.find(round => round === currentRound && rows.some(row => !!row.player?.id) && entries.every(row => heroRoundScore(row, round, currentRound) == null)) ?? null;
 }
 
-/** THE HERO BOARD'S COLUMNS, as a broadcast board sets them.
- *
- *  THRU is live state and the hero board has never carried it (the old
- *  `showPanelThru` excluded this theme by name). It is the single most
- *  useful column on a board during play and it is added here.
- *
- *  TODAY ONLY APPEARS WHEN IT CAN DIFFER FROM TOTAL. In round one a
- *  player's total IS today's score, so printing both is the same number
- *  twice on every row. From round two they diverge and TODAY earns its
- *  place.
- *
- *  PER-ROUND COLUMNS NEED AT LEAST TWO ROUNDS for the same reason: a lone
- *  R1 column is the total under another name.
- *
- *  MOV (places gained since the round began) IS A LIVE IDEA. It appears
- *  only while play is in progress (live or suspended mid-round); on a
- *  finished board the round columns already tell how the week went. It
- *  NEEDS A PRIOR ROUND: round one has nothing to rank against, so no
- *  header, no track, no dashes — the width returns to the name. And
- *  FOUR ROUND COLUMNS WIN: beside four round tracks MOV takes the player
- *  track below what a full name needs (~124px at 382px), so MOV is the
- *  column that goes, never the name. `hasMovement` is the data guard:
- *  movementFromRounds over the FULL field returned at least one delta.
- */
-export function heroBoardColumns(opts: { roundCount: number; roundInProgress: boolean; completed: boolean }): {
+/** THE HERO BOARD HAS ONE LAYOUT IN EVERY PHASE — POS | PLAYER | R1…Rn | TOT,
+ *  pre-round, live, suspended or completed, with n running to the current
+ *  round and R1 shown even in round one. This supersedes
+ *  BRIEF_TOUR_OVERVIEW_MOCK_EXACT §D.1 for the hero board: TODAY and SHAPE
+ *  are gone (the current round's cell carries the tee time, the today score
+ *  or the round score), and THRU lives in the open-row panel's "THRU h"
+ *  header, never on the board. */
+export function heroBoardColumns(_opts: { roundCount: number; roundInProgress: boolean; completed: boolean }): {
   today: boolean; rounds: boolean; shape: boolean;
 } {
-  /* BRIEF_TOUR_OVERVIEW_MOCK_EXACT §D.1 supersedes the THRU and MOV notes
-     above: the live grammar is POS | PLAYER | TODAY | SHAPE | TOT. MOV left
-     because movement has its own band (RoundMovementBand) and must not be said
-     twice; THRU left because the mock does not carry it. TODAY keeps its
-     round-one rule (it would equal TOT). */
-  const live = !opts.completed && opts.roundInProgress;
-  const multi = opts.roundCount >= 2;
-  if (live) return { today: multi, rounds: false, shape: true };
-  return { today: false, rounds: multi, shape: false };
-}
-
-/** The live hero grid, exactly as the mock sets it. */
-export function heroLiveGrid(showToday: boolean): string {
-  return [`${HERO_POS_W}px`, 'minmax(0,1fr)', showToday ? `${HERO_TODAY_W}px` : null, `${HERO_SHAPE_W}px`, `${HERO_TOT_W}px`].filter(Boolean).join(' ');
+  return { today: false, rounds: true, shape: false };
 }
 
 /** The TOP group when it is a tie over the visible rows: its length, else 0. */
