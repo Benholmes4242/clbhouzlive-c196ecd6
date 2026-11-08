@@ -522,8 +522,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             </>
           );
           })()}
+          <HoleMarksKey surface={PAGE_CANVAS} padX={HERO_PAD_X} />
         </div>
-        <HoleMarksKey surface={PAGE_CANVAS} padX={HERO_PAD_X} />
 
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />
       </>

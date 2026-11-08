@@ -52,7 +52,7 @@ describe('PlayerInitialAvatar loading shimmer', () => {
     expect(shimmer()).toBeNull();
     expect(img()!.style.opacity).toBe('1');
     expect(img()!.style.transition).toBe('opacity 180ms ease-out');
-    expect(outer().childElementCount).toBe(2); // ring restored
+    expect(outer().childElementCount).toBe(1); // marks brief: tour players draw no ring (was 2)
   });
 
   it('when every candidate is exhausted the initials show, with no shimmer', () => {
@@ -62,7 +62,7 @@ describe('PlayerInitialAvatar loading shimmer', () => {
     expect(img()).toBeNull();
     expect(shimmer()).toBeNull();
     expect(outer().textContent).toBe('MG');
-    expect(outer().childElementCount).toBe(2); // ring on the initials fallback
+    expect(outer().childElementCount).toBe(1); // marks brief: no ring on the initials fallback (was 2)
   });
 
   it('shows initials without shimmer when there are no candidates at all', () => {
