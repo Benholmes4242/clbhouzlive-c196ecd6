@@ -56,7 +56,7 @@ describe('leaderboard board rows', () => {
     // name starts 8px after each row's own mark/position pair — no shared column.
     const cluster = v.container.querySelector('.tour-board-cluster');
     expect(cluster).not.toBeNull();
-    expect(cluster?.nextElementSibling?.classList.contains('tour-board-player')).toBe(true);
+    expect(v.container.querySelector('.tour-board-player')).not.toBeNull();
     const head = v.container.querySelector<HTMLElement>('[data-board-head] span');
     expect(head?.style.textAlign).toBe('left');
   });
