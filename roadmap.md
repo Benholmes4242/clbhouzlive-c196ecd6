@@ -1,5 +1,10 @@
 # Roadmap
 
+## REMOVE_BOARD_HOLE_MARKS
+- [ ] Remove leaderboard/hero marks and board-only hole reads; direct leaderboard scorecard taps; preserve other marks.
+- [ ] Update authorised assertions, add tap/keyboard/preservation tests, run focused set and four separate shards.
+- [ ] Verify 320/390px boards and scorecard taps; report original hero padding, assertion ledger and totals.
+
 ## HOLE_TILES_BOARD_BUILD (active)
 - [x] Read build brief + both signed-off mocks (board-rows B2/8px; hole-tiles).
 - [ ] Step 1: BoardTable/BoardRound/leaderboard.css — remove faces, two-line rows, ▲/▼ marks (▼ #C24A4A), opacity 1 rounds, no tie bracket, HoleTiles line 2 full width, key under board, name ladder re-measure.
