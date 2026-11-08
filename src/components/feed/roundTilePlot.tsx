@@ -337,6 +337,12 @@ export function RoundTilePlot({ shape, received, scoreId }: {
         <circle ref={headRef} data-plot-head cx={16} cy={points[0]?.y} r={3} fill={PLOT_INK} style={{ opacity: 0 }} />
         {last ? <circle ref={endRef} data-plot-end cx={last.x} cy={last.y} r={4} fill={PLOT_INK} stroke={FEED_CARD_SURFACE} strokeWidth={2} style={{ opacity: completed ? 1 : 0, transform: completed ? 'scale(1)' : 'scale(0.4)', transformOrigin: `${last.x}px ${last.y}px` }} /> : null}
       </svg>
+      {/* The shared numbered hole tiles replace the 6px coloured bars: the
+          actual gross on every hole, 12px below the round-shape line, at the
+          plot's full width. Nine-hole rounds render nine tiles. */}
+      <div data-plot-tiles style={{ marginTop: 12 }}>
+        <HoleTiles holes={shape.holes.map((h) => ({ strokes: h.strokes, par: h.par }))} />
+      </div>
       {shape.holes.length === 18 && values.length === 19 ? <div data-plot-foot style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 16px 0', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', fontVariantNumeric: 'tabular-nums', color: T40 }}>
         <span>OUT <b style={{ color: T60 }}>{plotToPar(values[9])}</b></span><span>IN <b style={{ color: T60 }}>{plotToPar(values[18] - values[9])}</b></span>
       </div> : null}
