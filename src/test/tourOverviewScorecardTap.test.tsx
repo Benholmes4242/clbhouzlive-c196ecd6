@@ -22,17 +22,22 @@ const mount = (entries: BoardEntry[]) => render(
   </QueryClientProvider>,
 );
 
-describe('heroBoard row tap opens the scorecard', () => {
-  it('opens the sheet for the tapped player and keeps analytics', () => {
+describe('heroBoard row tap opens a round panel', () => {
+  it('opens the tapped player panel and preserves the full-scorecard door', () => {
     const entries = [
       { id: 'a', position: 1, score: -6, thru: 9, round_1: -1, round_2: -5, player: { id: 'pa', full_name: 'Alan Barker' } },
       { id: 'b', position: 2, score: -4, thru: 8, round_1: -4, round_2: 0, player: { id: 'pb', full_name: 'Brian Cole' } },
     ] as unknown as BoardEntry[];
     const view = mount(entries);
-    const rows = view.container.querySelectorAll('button[aria-haspopup="dialog"]');
+    const rows = view.container.querySelectorAll('button[data-hero-board-row]');
     expect(rows.length).toBe(2);
     expect(rows[1].hasAttribute('aria-pressed')).toBe(false);
     fireEvent.click(rows[1]);
+    expect(rows[1]).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    const door = view.container.querySelector('[data-hero-full-scorecard]');
+    if (!door) throw new Error('Missing full-scorecard door');
+    fireEvent.click(door);
     expect(screen.getByRole('dialog').getAttribute('data-target')).toBe('pb');
   });
 

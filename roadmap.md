@@ -1,9 +1,10 @@
 # Roadmap
 
 ## HERO_BOARD_EXPAND
-- [ ] Implement signed-off top ten, shared Full leaderboard action and lazy in-place round cards; preserve leaderboard and sibling surfaces.
-- [ ] Add rules tests and list only authorized old/new assertions; reconcile against last reported 7759 tests.
-- [ ] Run four separate shards and real-stylesheet 320/390/430 screen checks; report missing live/device coverage.
+- [x] Top ten, shared Full leaderboard action and lazy round panels; availability ruling recorded.
+- [x] Focused59/59; four separate shards2007/1867/1994/1906 =7774 (+15 new cases); assertion ledger in HERO_BOARD_EXPAND_REPORT.md.
+- [x] Actual-component fixtures320/390/430: ten rows, button, card/chips/footer, no overflow, chips on one line.
+- [ ] Live authenticated board/scorecard/navigation device checks: external_unmanaged prevents authenticated end-to-end verification.
 
 ## REMOVE_BOARD_HOLE_MARKS
 - [x] Remove leaderboard/hero marks, key, inline expansion and board-only reads; restore padding and direct sheet taps.

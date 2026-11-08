@@ -1,8 +1,6 @@
 /** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once). */
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLiveTournaments } from '../../hooks/useLiveTournaments';
-import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
+import { useMemo } from 'react';
+import { useHeroFullBoard } from './useHeroFullBoard';
 import { hasStrokeBoard } from '../../_shared/eventFormat';
 import { FullBoardSheet } from '../../tournament-v2/sections/FullBoardSheet';
 import { boardPhaseFor, shouldShowOverviewBoard } from './HybridHeroBands/HeroBoardBand';
@@ -35,6 +33,7 @@ export interface HybridHeroProps {
   activeTournamentId: string | null;
   onSelectTour: (tournamentId: string) => void;
   onOpenTournament: () => void;
+  onFullBoard?: () => void;
 }
 
 export function getOverviewCountdown(startDate: string, now = new Date()): OverviewCountdownUnit[] {
@@ -136,7 +135,7 @@ export function buildLeaderTrio(
   };
 }
 
-export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
+export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
 
@@ -178,20 +177,11 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
      mirrors TournamentPage.openFullBoard — live and in the live list
      deep-links to Leaderboards, anything else opens the house sheet with the
      FULL field (rows) and the event meta. */
-  const navigate = useNavigate();
-  const { data: liveList = [] } = useLiveTournaments();
-  const [fullBoardOpen, setFullBoardOpen] = useState(false);
   const fullBoardAvailable = boardPhaseFor(state) !== 'upcoming'
     && hasStrokeBoard(tournament.eventType ?? null)
     && shouldShowOverviewBoard(rows);
-  const { data: fullBoardMeta } = useTournamentMeta(fullBoardAvailable ? tournament.id : null);
-  const openFullBoard = () => {
-    if (isInPlayState(state) && liveList.some((row) => row?.id === tournament.id)) {
-      navigate(`/tourhub?tab=live&event=${tournament.id}`, { state: { from: 'tournament' } });
-      return;
-    }
-    setFullBoardOpen(true);
-  };
+  const fullBoard = useHeroFullBoard(tournament.id, isInPlayState(state), fullBoardAvailable && !onFullBoard);
+  const openFullBoard = onFullBoard ?? fullBoard.onOpen;
 
   const champion = useMemo(() => {
     // Champion gate — the SAME rule as the pick trophy in HeroBoardBand: only a
@@ -270,12 +260,12 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
         note={situationNote}
         onFullBoard={fullBoardAvailable ? openFullBoard : undefined}
       />
-      {fullBoardAvailable ? (
+      {fullBoardAvailable && !onFullBoard ? (
         <FullBoardSheet
-          open={fullBoardOpen}
-          onClose={() => setFullBoardOpen(false)}
+          open={fullBoard.open}
+          onClose={fullBoard.onClose}
           tournamentId={tournament.id}
-          meta={fullBoardMeta ?? null}
+          meta={fullBoard.meta}
           entries={rows}
         />
       ) : null}
