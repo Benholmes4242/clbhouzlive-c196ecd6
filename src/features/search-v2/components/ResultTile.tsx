@@ -12,9 +12,13 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 export function ResultTile({
   children,
   white = false,
+  borderless = false,
 }: {
   children: React.ReactNode;
   white?: boolean;
+  /** Tour player tiles carry no border (no rings on tour player avatars);
+   *  the plate and initials colours stay. */
+  borderless?: boolean;
 }) {
   return (
     <div
@@ -24,7 +28,7 @@ export function ResultTile({
         height: 44,
         borderRadius: 13,
         background: white ? '#FFFFFF' : A.TRACK,
-        border: `1px solid ${A.BORDER}`,
+        border: borderless ? 'none' : `1px solid ${A.BORDER}`,
         color: A.MUTE,
       }}
     >

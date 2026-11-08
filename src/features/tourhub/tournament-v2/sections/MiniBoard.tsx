@@ -6,6 +6,9 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { HoleTiles, orderedHoleCells } from '../../leaderboard/BoardRound';
+import { useBoardHoles } from '../../leaderboard/useBoardHoles';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -105,6 +108,22 @@ const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, text
 export function heroRoundScore(entry: BoardEntry, round: number, currentRound?: number | null): number | null {
   return round === currentRound ? todayFromEntry(entry, currentRound) : [entry.round_1, entry.round_2, entry.round_3, entry.round_4][round - 1] ?? null;
 }
+
+/** WHICH ROUND A ROW'S HOLE TILES SHOW (signed-off hole-tiles mock): the
+ *  current round for every player who has started it; a player still showing
+ *  a tee time shows their PREVIOUS round's 18 holes; in round 1 before a
+ *  player tees off there is no previous round, so the tiles stay empty. A
+ *  finished event shows each player's final round. */
+export function heroTileRound(entry: BoardEntry, currentRound: number | null | undefined, completed: boolean): number | null {
+  if (!completed && currentRound != null && todayFromEntry(entry, currentRound) != null) return currentRound;
+  const rounds = [entry.round_1, entry.round_2, entry.round_3, entry.round_4];
+  const cap = !completed && currentRound != null ? currentRound - 1 : 4;
+  for (let i = Math.min(cap, 4) - 1; i >= 0; i--) if (rounds[i] != null) return i + 1;
+  return null;
+}
+
+/** Eighteen unplayed tiles: the pre-tee-off round-one row. */
+const EMPTY_TILE_CELLS: ReadonlyArray<null> = Array.from({ length: 18 }, () => null);
 /** Only an entirely unscored scheduled column needs a draw. Never fetch a
  * played round for a straggler with missing data, or a completed event. */
 export function heroTeeRound(entries: BoardEntry[], rows: BoardEntry[], rounds: number[], currentRound: number | null | undefined, completed: boolean): number | null {
@@ -308,6 +327,23 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   }, [teeRound, teeGroups]);
   const shapeSlots = Math.max(totalRounds ?? 0, heroCols.rounds.length, currentRound ?? 0);
 
+  /* HERO BOARD HOLE TILES — one cached whole-field read per round, shared
+     with the full leaderboard's cache keys; never a query per row. The
+     previous round is read only when a visible row still needs it. */
+  const isHero = theme === 'heroBoard';
+  const heroCompleted = phase === 'completed';
+  const queryClient = useQueryClient();
+  const boardUpdatedAt = isHero ? queryClient.getQueryState(['tourhub', 'leaderboard', tournamentId])?.dataUpdatedAt ?? 0 : 0;
+  const effectiveRound = currentRound ?? (heroCompleted ? heroCols.rounds.at(-1) ?? null : null);
+  const tileRounds = useMemo(
+    () => (isHero ? rows.map((r) => (r.player?.id ? heroTileRound(r, effectiveRound, heroCompleted) : null)) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isHero, entries, currentRound, phase, limit],
+  );
+  const prevTileRound = !heroCompleted && effectiveRound != null && tileRounds.some((rd) => rd === effectiveRound - 1) ? effectiveRound - 1 : null;
+  const curHoleData = useBoardHoles(isHero ? tournamentId : null, effectiveRound, boardUpdatedAt, isHero && effectiveRound != null);
+  const prevHoleData = useBoardHoles(isHero ? tournamentId : null, prevTileRound, boardUpdatedAt, isHero && prevTileRound != null);
+
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
   /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
      already showing round N's score, so it takes round N's name. */
@@ -350,7 +386,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600, color: ink }}>{overviewName(entity.lines[0])}</span>
   );
 
-  if(presentation==='tournament')return <><div className="tv-board"><div className="tv-board-head"><span>{t('board.columns.pos')}</span><span>{t('board.columns.player')}</span><span>{phase==='completed'?`R${currentRound??heroCols.rounds.length}`:panelScoreLabel}</span><span>{t('board.columns.tot')}</span></div>{rows.map(r=>{const today=todayFromEntry(r,currentRound);return <Button variant="ghost" key={r.id} className="tv-board-row" data-winner={phase==='completed'&&r.player?.id===winnerPlayerId} disabled={!r.player?.id} onClick={()=>{if(!r.player)return;setTarget({playerId:r.player.id,playerName:r.player.full_name,countryCode:r.player.country_code??null,position:r.position,total:r.score,today,thru:r.thru??null,status:r.status??null});}}><span>{r.position!=null?`${r.position_tied?'T':''}${r.position}`:r.status??''}</span><span className="tv-board-who">{r.player&&<SquircleAvatar size={24} srcCandidates={resolvePlayerAvatarCandidates({name:r.player.full_name,photoUrl:r.player.photo_url,tourSlug})} alt={r.player.full_name} userId={r.player.id} hairlineRing/>}<span>{r.player?.full_name??resolveBoardEntity(r,needsInitials,nameTier).prose}</span></span><span className={today!=null&&today<0?'tv-under':''}>{today!=null?fmtScore(today):''}</span><span className={r.score!=null&&r.score<0?'tv-under':''}>{r.score!=null?fmtScore(r.score):''}</span></Button>;})}</div><ScorecardSheet open={!!target} onClose={()=>setTarget(null)} tournamentId={tournamentId} target={target}/></>;
+  if(presentation==='tournament')return <><div className="tv-board"><div className="tv-board-head"><span>{t('board.columns.pos')}</span><span>{t('board.columns.player')}</span><span>{phase==='completed'?`R${currentRound??heroCols.rounds.length}`:panelScoreLabel}</span><span>{t('board.columns.tot')}</span></div>{rows.map(r=>{const today=todayFromEntry(r,currentRound);return <Button variant="ghost" key={r.id} className="tv-board-row" data-winner={phase==='completed'&&r.player?.id===winnerPlayerId} disabled={!r.player?.id} onClick={()=>{if(!r.player)return;setTarget({playerId:r.player.id,playerName:r.player.full_name,countryCode:r.player.country_code??null,position:r.position,total:r.score,today,thru:r.thru??null,status:r.status??null});}}><span>{r.position!=null?`${r.position_tied?'T':''}${r.position}`:r.status??''}</span><span className="tv-board-who">{r.player&&<SquircleAvatar size={24} srcCandidates={resolvePlayerAvatarCandidates({name:r.player.full_name,photoUrl:r.player.photo_url,tourSlug})} alt={r.player.full_name} userId={r.player.id} hideRing/>}<span>{r.player?.full_name??resolveBoardEntity(r,needsInitials,nameTier).prose}</span></span><span className={today!=null&&today<0?'tv-under':''}>{today!=null?fmtScore(today):''}</span><span className={r.score!=null&&r.score<0?'tv-under':''}>{r.score!=null?fmtScore(r.score):''}</span></Button>;})}</div><ScorecardSheet open={!!target} onClose={()=>setTarget(null)} tournamentId={tournamentId} target={target}/></>;
   if (theme === 'heroBoard') {
     return (
       <>
@@ -409,29 +445,16 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     status: r.status ?? null,
                   });
                 } : undefined}
-                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: showHeroShape ? `5px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gridTemplateRows: 'auto auto', columnGap: heroGap, rowGap: 6, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: `${entity.kind === 'team' ? 5 : 8}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
                 {showHeroShape || showOverviewPosition ? (
                   /* CB57: capped and lower ties use the SAME stretched grid
                      cell and bracket; the cap still owns the visible T1 label. */
                   <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: 0, color: T.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {/* ONE MARKER PER TIE: capped/later rows are screen-reader only. */}
+                    {/* ONE MARKER PER TIE: capped/later rows are screen-reader only.
+                        No tie bracket — tied rows show the position once. */}
                     {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
-                    {tieRole !== 'solo' ? (
-                      <span
-                        aria-hidden
-                        data-hero-tie-bracket
-                        style={{
-                          position: 'absolute', right: 2, width: 1.5, borderRadius: 1, background: OVERVIEW.bracket,
-                          /* Rows are padded, so the rule reaches through the padding
-                             to meet its neighbour: start under the marker, end at the
-                             last row's centre. */
-                          top: tieRole === 'first' ? '50%' : -5,
-                          bottom: tieRole === 'last' ? '50%' : -5,
-                        }}
-                      />
-                    ) : null}
                   </div>
                 ) : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: showHeroShape ? 6 : 5 }}>
@@ -472,6 +495,14 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   );
                 })}
                 <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
+                {entity.kind !== 'team' ? (() => {
+                  const tileRound = tileRounds[rowIndex];
+                  const pid = r.player?.id;
+                  const holes = tileRound != null && pid
+                    ? (tileRound === effectiveRound ? curHoleData.byPlayer.get(pid) : prevHoleData.byPlayer.get(pid))
+                    : undefined;
+                  return <HoleTiles holes={holes ? orderedHoleCells(holes) : EMPTY_TILE_CELLS} />;
+                })() : null}
               </RowTag>
             );
           };

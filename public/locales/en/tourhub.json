@@ -715,6 +715,13 @@
     "movement": {
       "up": "Up {{count}}",
       "down": "Down {{count}}"
+    },
+    "holeKey": {
+      "eagle": "Eagle",
+      "birdie": "Birdie",
+      "par": "Par",
+      "bogey": "Bogey",
+      "double": "Double+"
     }
   },
   "tournament": {

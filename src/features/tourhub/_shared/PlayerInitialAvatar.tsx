@@ -38,10 +38,10 @@ export interface PlayerInitialAvatarProps {
    *  (INK_TINT_06) for player headshots; logo callers pass white/near-white so
    *  the badge fills the avatar like before. */
   imageBg?: string;
-  /** Traced 1px hairline colour. Defaults to DARK_HAIRLINE (white @ 22%), the
-   *  one canonical hairline. Override only for an achievement or accent ring —
-   *  the app is dark-only, so this is never a surface choice.
-   *  Set to null to disable. */
+  /** Traced 1px hairline colour. NO RING ON TOUR PLAYERS: the default is
+   *  null, so a tour/pro player avatar draws no ring or hairline at all,
+   *  including on the initials fallback tile. Pass a colour only for a
+   *  deliberate accent ring. */
   ringColor?: string | null;
 }
 
@@ -55,7 +55,7 @@ export function PlayerInitialAvatar({
   color,
   imageScale = 1,
   imageBg = INK_TINT_06,
-  ringColor = 'rgba(255,255,255,0.22)',
+  ringColor = null,
 }: PlayerInitialAvatarProps) {
   const candidates: string[] = (() => {
     if (srcCandidates && srcCandidates.length > 0) {

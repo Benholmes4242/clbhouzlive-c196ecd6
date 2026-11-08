@@ -26,8 +26,9 @@ export function PlayerRow({ player, query, onSelect }: Props) {
     [player.full_name],
   );
   // The photo is drawn straight into the ONE search tile; the initials span is
-  // the tile's own fallback, so a miss keeps the TRACK plate, BORDER and MUTE
-  // initials exactly like every other search row. No avatar background here.
+  // the tile's own fallback, so a miss keeps the TRACK plate and MUTE initials
+  // exactly like every other search row — but with NO border, matching the
+  // IN ACTION rail's ringless tour player tiles. No avatar background here.
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => { setIndex(0); setLoaded(false); }, [candidates]);
@@ -39,7 +40,7 @@ export function PlayerRow({ player, query, onSelect }: Props) {
       onClick={onSelect}
       className={ROW_BASE}
     >
-      <ResultTile>
+      <ResultTile borderless>
         {!loaded ? (
           <span style={{ ...TILE_INITIALS, letterSpacing: '0.02em' }}>
             {initials(player.full_name)}

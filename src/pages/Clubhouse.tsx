@@ -74,6 +74,7 @@ import { usePostGolfContext, usePostGolfHoleMeta } from '@/hooks/feed/usePostGol
 import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
 import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
+import { useBatchRoundCompetition } from '@/features/explore-magazine/useBatchRoundCompetition';
 import { useViewerStanding, type StandingRow } from '@/features/explore-magazine/useViewerStanding';
 import { useViewerCourseBests } from '@/features/explore-magazine/useViewerCourseBests';
 import { useCourseRecordSignal } from '@/features/explore-magazine/useCourseRecordSignal';
@@ -269,6 +270,7 @@ const ClubhouseContent = () => {
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundShapeMap = useRoundHoleShapes(feedScoreIds);
   const roundMedals = useBatchRoundMedals(feedScoreIds);
+  const roundCompetition = useBatchRoundCompetition(feedScoreIds);
   /* PF1B — the page's golf context (hole chip + attached round), ONE batched
      rpc per page, passed down like the round chain above. Round posts are the
      round already: once the score-id map settles their ids never reach the
@@ -685,6 +687,7 @@ const ClubhouseContent = () => {
               postRoundsSettled={roundChainSettled && !roundChainFetching}
               roundShapeMap={roundShapeMap}
               roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
+              roundCompetitionMap={roundCompetition.isSuccess ? roundCompetition.competition : undefined}
               consequenceSources={consequenceSources}
               roundCourseMeta={roundCourseMeta}
               weekPickScoreId={weekPickScoreId}

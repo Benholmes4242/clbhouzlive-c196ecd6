@@ -16,7 +16,7 @@
  */
 
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
-import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface PlayerAvatarProps {
   playerId: string;
@@ -26,9 +26,9 @@ interface PlayerAvatarProps {
   photoUrl?: string | null;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | number;
   className?: string;
-  /** Traced hairline colour. Defaults to DARK_HAIRLINE (white @ 22%), the one
-   *  canonical hairline. Override only for an achievement or accent ring — the
-   *  app is dark-only, so this is never a surface choice. */
+  /** NO RING ON TOUR PLAYERS: a tour/pro player avatar renders with no ring
+   *  or hairline at all, so none is drawn by default. The ONE exception is
+   *  the amber pick ring, which arrives as `ringGradient` below. */
   ringColor?: string;
   /** sr_players.headshot_override — a FILENAME KEY for the folder lookup, not a
    *  URL. Never pass it as photoUrl and never coalesce the two. */
@@ -49,7 +49,7 @@ export function PlayerAvatar({
   photoUrl,
   size = 'md',
   className,
-  ringColor = DARK_HAIRLINE,
+  ringColor,
   headshotOverride = null,
   surface = 'tile',
   imagePosition = '50% 50%',
@@ -67,7 +67,8 @@ export function PlayerAvatar({
       srcCandidates={candidates}
       alt={playerName}
       userId={playerId || playerName}
-      hairlineRing
+      hideRing
+      hairlineRing={ringGradient != null}
       ringColor={ringColor}
       className={className}
       surface={surface}

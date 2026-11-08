@@ -27,6 +27,8 @@
  */
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { HoleTiles } from '@/features/tourhub/leaderboard/BoardRound';
+import '@/features/tourhub/leaderboard/leaderboard.css';
 import { smoothPath } from '@/lib/charts/smoothPath';
 import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
 import { T40, T60 } from './feedTokens';
@@ -49,7 +51,6 @@ import { scorecardFeatFor, type ScorecardFeatKind } from '@/features/courses/_sh
 const playedRoundPlots = new Set<string>();
 const PLOT_INK = '#F2F4F7';
 const PLOT_HAIR = 'rgba(255,255,255,0.14)';
-const PLOT_MISSING = 'rgba(255,255,255,0.06)';
 const plotToPar = (n: number) => n === 0 ? 'E' : n > 0 ? `+${n}` : `−${Math.abs(n)}`;
 
 // TOPAR_EVEN_DARK rgba(242,244,247,0.42) composited on Home's CARD
@@ -316,9 +317,9 @@ export function RoundTilePlot({ shape, received, scoreId }: {
           <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: SC_FILL_GOLD }} />{feat.word}
         </span>
       ) : null}
-      <svg width="100%" height={96} viewBox={`0 0 ${width} 96`} aria-hidden style={{ display: 'block' }}>
+      <svg width="100%" height={80} viewBox={`0 0 ${width} 80`} aria-hidden style={{ display: 'block' }}>
         <defs>
-          <clipPath id={`feed-reveal-${instanceId}`}><rect ref={revealRef} data-plot-reveal x={0} y={-10} width={completed ? width : 0} height={116} /></clipPath>
+          <clipPath id={`feed-reveal-${instanceId}`}><rect ref={revealRef} data-plot-reveal x={0} y={-10} width={completed ? width : 0} height={100} /></clipPath>
           {wentUnder ? <>
             <clipPath id={`feed-under-${instanceId}`} data-under-clip><rect x={0} y={baselineY} width={width} height={Math.max(72 - baselineY, 0)} /></clipPath>
             <linearGradient id={`feed-gradient-${instanceId}`} gradientUnits="userSpaceOnUse" x1={0} y1={baselineY} x2={0} y2={72}>
@@ -332,18 +333,15 @@ export function RoundTilePlot({ shape, received, scoreId }: {
           <path ref={pathRef} data-plot-trace d={path} fill="none" stroke={PLOT_INK} strokeOpacity={0.92} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
           {wentUnder ? <path data-plot-under-stroke d={path} fill="none" stroke={TOPAR_UNDER_DARK} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" clipPath={`url(#feed-under-${instanceId})`} /> : null}
         </g>
-        {shape.holes.map((hole, i) => {
-          const count = values.length - 1;
-          if (i >= count) return null;
-          const left = xFor(i) + (i === 0 ? 0 : count === 18 && i === 9 ? 3.5 : 1.25);
-          const right = xFor(i + 1) - (i === count - 1 ? 0 : count === 18 && i === 8 ? 3.5 : 1.25);
-          const d = hole.par == null || hole.strokes == null ? null : hole.strokes - hole.par;
-          const fill = d == null ? PLOT_MISSING : d <= -2 ? SC_FILL_GOLD : d === -1 ? TOPAR_UNDER_DARK : d === 0 ? PLOT_HAIR : d === 1 ? SC_BOGEY_DARK : SC_DOUBLE_DARK;
-          return <rect key={i} data-plot-hole={i + 1} x={left} y={90} width={Math.max(0, right - left)} height={6} rx={2} fill={fill} fillOpacity={d === 1 ? 0.55 : 1} />;
-        })}
         <circle ref={headRef} data-plot-head cx={16} cy={points[0]?.y} r={3} fill={PLOT_INK} style={{ opacity: 0 }} />
         {last ? <circle ref={endRef} data-plot-end cx={last.x} cy={last.y} r={4} fill={PLOT_INK} stroke={FEED_CARD_SURFACE} strokeWidth={2} style={{ opacity: completed ? 1 : 0, transform: completed ? 'scale(1)' : 'scale(0.4)', transformOrigin: `${last.x}px ${last.y}px` }} /> : null}
       </svg>
+      {/* The shared numbered hole tiles replace the 6px coloured bars: the
+          actual gross on every hole, 12px below the round-shape line, at the
+          plot's full width. Nine-hole rounds render nine tiles. */}
+      <div data-plot-tiles style={{ marginTop: 12 }}>
+        <HoleTiles holes={shape.holes.map((h) => ({ strokes: h.strokes, par: h.par }))} />
+      </div>
       {shape.holes.length === 18 && values.length === 19 ? <div data-plot-foot style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 16px 0', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', fontVariantNumeric: 'tabular-nums', color: T40 }}>
         <span>OUT <b style={{ color: T60 }}>{plotToPar(values[9])}</b></span><span>IN <b style={{ color: T60 }}>{plotToPar(values[18] - values[9])}</b></span>
       </div> : null}

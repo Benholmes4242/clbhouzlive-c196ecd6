@@ -319,7 +319,6 @@ function PlayerCard({
         size={64}
         radius="34%"
         color={{ bg: ANALYTICAL.TRACK, fg: ANALYTICAL.MUTE }}
-        ringColor={ANALYTICAL.BORDER}
       />
       <p
         className="truncate w-full text-center"

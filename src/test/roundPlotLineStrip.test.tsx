@@ -5,8 +5,6 @@ import { RoundTilePlot } from '@/components/feed/roundTilePlot';
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import { SC_FILL_GOLD, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
 
 const shape = (diff: (number | null)[]): HoleShape => {
@@ -54,7 +52,7 @@ describe('Signed-off round line and strip', () => {
   it('draws at observed width without stretching circles', () => {
     const v = plot('width');
     act(() => resize([{ contentRect: { width: 375 } }]));
-    expect(v.container.querySelector('svg')?.getAttribute('viewBox')).toBe('0 0 375 96');
+    expect(v.container.querySelector('svg')?.getAttribute('viewBox')).toBe('0 0 375 80');
     expect(v.container.querySelector('svg')?.hasAttribute('preserveAspectRatio')).toBe(false);
     expect(v.container.querySelector('[data-plot-end]')?.getAttribute('cx')).toBe('359');
   });
@@ -64,23 +62,24 @@ describe('Signed-off round line and strip', () => {
     const end = v.container.querySelector('[data-plot-end]');
     expect(end?.getAttribute('r')).toBe('4'); expect(end?.getAttribute('stroke')).toBe(FEED_CARD_SURFACE);
   });
-  it('grades one strip cell per hole by gross rather than net', () => {
+  it('grades one shared tile per hole by gross rather than net', () => {
     const v = render(<RoundTilePlot shape={shape([-2, -1, 0, 1, 2, null])} received={[1,1,1,1,1,1]} />);
-    const cells = Array.from(v.container.querySelectorAll('[data-plot-hole]'));
-    expect(cells.map(c => c.getAttribute('fill'))).toEqual([SC_FILL_GOLD, TOPAR_UNDER_DARK, 'rgba(255,255,255,0.14)', SC_BOGEY_DARK, SC_DOUBLE_DARK, 'rgba(255,255,255,0.06)']);
-    expect(cells[3].getAttribute('fill-opacity')).toBe('0.55');
-    cells.forEach((c, i) => { const x = Number(c.getAttribute('x')); const right = x + Number(c.getAttribute('width')); expect(x).toBeGreaterThanOrEqual(16 + i / 6 * 358); expect(right).toBeLessThanOrEqual(16 + (i + 1) / 6 * 358); });
+    // The 6px coloured bars are gone; the shared numbered tiles carry the grade.
+    expect(v.container.querySelectorAll('[data-plot-hole]')).toHaveLength(0);
+    const tiles = Array.from(v.container.querySelectorAll('[data-hole-tile]'));
+    expect(tiles.map(t => t.getAttribute('data-grade'))).toEqual(['eagle', 'birdie', 'par', 'bogey', 'double', 'empty']);
+    expect(tiles.map(t => t.textContent)).toEqual(['2', '3', '4', '5', '6', '']);
   });
-  it('keeps outer strip edges flush and widens only the eighteen-hole turn', () => {
+  it('renders the shared tiles 12px below the line with the nine-hole turn gap', () => {
     const v = plot('turn', Array(18).fill(0));
-    const cells = v.container.querySelectorAll('[data-plot-hole]');
-    const right = (i: number) => Number(cells[i].getAttribute('x')) + Number(cells[i].getAttribute('width'));
-    expect(cells[0].getAttribute('x')).toBe('16'); expect(right(17)).toBe(374);
-    expect(Number(cells[9].getAttribute('x')) - right(8)).toBe(7);
-    expect(Number(cells[1].getAttribute('x')) - right(0)).toBeCloseTo(2.5);
+    const wrap = v.container.querySelector<HTMLElement>('[data-plot-tiles]');
+    expect(wrap?.style.marginTop).toBe('12px');
+    expect(v.container.querySelectorAll('[data-hole-tile]')).toHaveLength(18);
+    expect(v.container.querySelectorAll('.tour-hole-tiles-gap')).toHaveLength(1);
     cleanup();
-    const nine = plot('nine-gap', Array(9).fill(0)).container.querySelectorAll('[data-plot-hole]');
-    expect(Number(nine[1].getAttribute('x')) - Number(nine[0].getAttribute('x')) - Number(nine[0].getAttribute('width'))).toBeCloseTo(2.5);
+    const nine = plot('nine-gap', Array(9).fill(0));
+    expect(nine.container.querySelectorAll('[data-hole-tile]')).toHaveLength(9);
+    expect(nine.container.querySelectorAll('.tour-hole-tiles-gap')).toHaveLength(0);
   });
   it('earns red fill, red stroke and rule only by dipping net under par', () => {
     const v = plot('red', [-1,2]);
@@ -100,7 +99,7 @@ describe('Signed-off round line and strip', () => {
   it('keeps the strip, foot and rule outside the animated group', () => {
     const v = plot('static', [-1,...Array(17).fill(0)]);
     const g = v.container.querySelector('[data-plot-animated]');
-    for (const el of v.container.querySelectorAll('[data-plot-hole], [data-plot-foot], [data-plot-level]')) expect(g?.contains(el)).toBe(false);
+    for (const el of v.container.querySelectorAll('[data-plot-tiles], [data-plot-foot], [data-plot-level]')) expect(g?.contains(el)).toBe(false);
   });
   it('never draws before threshold and plays after the 120ms delay', () => {
     geometry(); const v = plot('threshold'); const reveal = v.container.querySelector('[data-plot-reveal]');

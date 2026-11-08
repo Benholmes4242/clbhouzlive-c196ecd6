@@ -11,13 +11,11 @@ import { getScoreColor } from '../_shared/scoreColor';
 import { formatEarnings } from '../_shared/formatEarnings';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
-import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
+import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
-import { BoardRound, HoleStrip } from './BoardRound';
+import { BoardRound, HoleTiles, HOLE_TILE_TONES, orderedHoleCells } from './BoardRound';
 import type { BoardHole } from './useBoardHoles';
 import { boardTieRole } from './leaderboardRules';
 import './leaderboard.css';
@@ -45,8 +43,6 @@ const CANVAS = TOUR_CANVAS;
 export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 } as const);
 
 /** TIGHTENED GEOMETRY (2.4) — local aliases of BOARD_GEOMETRY, never numbers of their own. */
-const MOV_W = BOARD_GEOMETRY.mov;
-const POS_W = BOARD_GEOMETRY.pos;
 const TOT_W = BOARD_GEOMETRY.tot;
 const THRU_W = BOARD_GEOMETRY.thru;
 const PRIZE_W = BOARD_GEOMETRY.prize;
@@ -304,8 +300,11 @@ export function boardRoundsWidth(c: BoardColumns): number {
  */
 export function boardGridTemplate(c: BoardColumns): string {
   if (c.preTournament) return `minmax(0,1fr) ${PRE_TEE_W}px`;
+  /* The first column is AUTO: the places-moved mark plus the position, plus
+     the 8px the name starts after. Names step in and out with the width of
+     the mark and position — they do NOT line up in a column (signed-off B2). */
   return [
-    '30px', 'minmax(0,1fr)',
+    'auto', 'minmax(0,1fr)',
     ...c.rounds.map(r => `${c.liveRound === r ? 28 : 26}px`),
     '32px', '40px', c.showPrize ? `${PRIZE_W}px` : '',
   ].filter(Boolean).join(' ');
@@ -345,15 +344,27 @@ function resolveLayout(
   teamInitials: boolean,
   base: BoardColumns,
   containerW: number,
+  movementMap?: Map<string, number>,
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
   const playerFont = `700 ${NAME_SIZE}px ${F}`;
   const teamFont = `600 12.5px ${F}`;
+  /* The name track is the row width minus the figure columns, minus the
+     WIDEST position-and-mark cluster on the board, minus the 8px the name
+     starts after the position. No face takes any width. */
+  const markFont = `700 9.5px ${F}`;
+  const posFont = `700 13px ${F}`;
+  const widestCluster = entries.reduce((maximum, entry) => {
+    if (isDemoted(entry.status)) return Math.max(maximum, measureText(statusWord(entry.status), `700 10px ${F}`));
+    const pos = entry.position == null ? '' : `${entry.position_tied ? 'T' : ''}${entry.position}`;
+    const mov = movementMap?.get(entry.player?.id ?? entry.team?.id ?? entry.id);
+    const mark = mov != null && mov !== 0 ? measureText(`▲${Math.abs(mov)}`, markFont) + 3 : 0;
+    return Math.max(maximum, mark + measureText(pos, posFont));
+  }, 0);
   const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1 + (base.showPrize ? 1 : 0);
   const fixed =
     ROW_PAD_X * 2 +
-    MOV_W +
-    POS_W +
+    Math.ceil(widestCluster) + 8 +
     TOT_W +
     (base.showThru ? THRU_W : 0) +
     (base.showPrize ? PRIZE_W : 0) +
@@ -393,8 +404,7 @@ function resolveLayout(
     const prizeFreeTrackCount = 3 + prizeFree.rounds.length + (prizeFree.showThru ? 1 : 0) + 1;
     const prizeFreeFixed =
       ROW_PAD_X * 2 +
-      MOV_W +
-      POS_W +
+      Math.ceil(widestCluster) + 8 +
       TOT_W +
       (prizeFree.showThru ? THRU_W : 0) +
       (prizeFreeTrackCount - 1) * prizeFree.gap;
@@ -587,7 +597,7 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.pos')}</div>
+            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left' }}>{t('board.columns.pos')}</div>
             <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
             {columns.rounds.map((r) => (
               <div
@@ -665,7 +675,9 @@ export function BoardTable({
           position: 'relative',
           display: 'grid',
           gridTemplateColumns: template,
-          gap: columns.gap,
+          gridTemplateRows: 'auto auto',
+          columnGap: columns.gap,
+          rowGap: 7,
           alignItems: 'center',
           padding: `${entity.kind === 'team' ? 9 : 10}px ${ROW_PAD_X}px`,
           background: yourPlayers ? 'var(--tour-board-mine)' : isLeader ? 'var(--tour-board-leader)' : surface,
@@ -706,11 +718,10 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div className="tour-board-position">
-              <span style={{fontSize:demotedRow ? 10 : 12.5,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{showPosition ? posText : '\u00a0'}</span>
-              {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : 'var(--tour-board-dim)'}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
+            <div className="tour-board-cluster">
+              {!demotedRow && mov != null && mov !== 0 && <span className="tour-board-movement" style={{color:mov > 0 ? TREND_UP : STATUS_NEGATIVE}}>{mov > 0 ? '▲' : '▼'}{Math.abs(mov)}</span>}
+              {showPosition && <span data-board-position style={{fontSize:demotedRow ? 10 : 13,fontWeight:700,color:isLeader ? 'var(--tour-board-ink)' : 'var(--tour-board-mute)',fontVariantNumeric:'tabular-nums'}}>{posText}</span>}
             </div>
-            {!yourPlayers && tie && <span aria-hidden="true" data-tie-bracket={tie} className={`tour-tie tour-tie-${tie}`} />}
 
             {entity.kind === 'team' ? (
               // A team row names two people, not one. The field's longest pair
@@ -726,11 +737,10 @@ export function BoardTable({
               </div>
             ) : (
               <div className="tour-board-player">
-                <SquircleAvatar size={30} hairlineRing className="tour-board-avatar" userId={pid} alt={fullName} srcCandidates={resolvePlayerAvatarCandidates({name:fullName,photoUrl:e.player?.photo_url,tourSlug,headshotOverride:e.player?.headshot_override})} />
                 <div className="tour-board-who"><span className="tour-board-name"><span className="tour-board-name-text">{nameText}</span>
                   {pid && pickPlayerIds?.has(pid) && <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />}
                   {pid && followedIds.has(pid) && <span className="tour-board-star" aria-label={t('rebuilt.following')}>★</span>}
-                </span><HoleStrip holes={holes} /></div>
+                </span></div>
               </div>
             )}
 
@@ -746,11 +756,11 @@ export function BoardTable({
                     textAlign: 'center',
                     fontSize: 12,
                     fontWeight: settled ? 600 : 800,
-                    // A played round is a played round: no opacity drop. The
-                    // current round is marked by its amber header, which is a
-                    // stronger signal than 40% fade. An empty cell is a
-                    // different thing and keeps A.DIM at full strength.
-                    opacity: settled ? 0.55 : 1,
+                    // Rounds at full strength: a played round keeps its colour,
+                    // size and weight at opacity 1. The current round is marked
+                    // by its 800 weight and amber header. An empty cell is a
+                    // different thing and keeps A.DIM.
+                    opacity: 1,
                     color: val == null ? A.DIM : houseColor(val),
                     fontVariantNumeric: 'tabular-nums lining-nums',
                     whiteSpace: 'nowrap',
@@ -810,6 +820,12 @@ export function BoardTable({
                 {e.money != null ? formatEarnings(e.money) : PRIZE_DASH}
               </div>
             )}
+
+            {/* LINE 2 — the current round's holes as numbered tiles across the
+                FULL row width, from the row's left edge to under TOT. */}
+            {!demotedRow && entity.kind !== 'team' && pid && holes.length > 0 ? (
+              <HoleTiles holes={orderedHoleCells(holes)} />
+            ) : null}
           </>
         )}
       </div>
@@ -834,6 +850,19 @@ export function BoardTable({
     <div className="tour-board-shell" ref={rootRef} data-board-name-tier={tier} data-board-show-prize={columns.showPrize ? 'true' : 'false'}>
       {renderHeader()}
       {parts}
+      {!columns.preTournament && entries.length > 0 ? (
+        <div className="tour-board-key" data-board-key>
+          {([
+            ['eagle', HOLE_TILE_TONES.eagle.bg, t('board.holeKey.eagle')],
+            ['birdie', HOLE_TILE_TONES.birdie.bg, t('board.holeKey.birdie')],
+            ['par', 'rgba(255,255,255,.14)', t('board.holeKey.par')],
+            ['bogey', HOLE_TILE_TONES.bogey.bg, t('board.holeKey.bogey')],
+            ['double', HOLE_TILE_TONES.double.bg, t('board.holeKey.double')],
+          ] as const).map(([kind, swatch, label]) => (
+            <span key={kind} data-board-key-item={kind}><i style={{ background: swatch }} />{label}</span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

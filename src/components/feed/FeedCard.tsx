@@ -172,6 +172,9 @@ export interface FeedCardProps {
   roundShape?: HoleShape | null;
   /** Batched medal counts (useBatchRoundMedals, page level). undefined = none. */
   roundMedals?: RoundMedalCounts;
+  /** Batched competition flag (useBatchRoundCompetition, page level).
+   *  undefined = unresolved; only an explicit true shows the COMP mark. */
+  roundCompetition?: boolean;
   /** Page-level consequence sources; null until every source has fetched. */
   consequenceSources?: ConsequenceSources | null;
   /** Page-level course meta for round cards (image, region). */
@@ -337,6 +340,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onRoundTap,
   roundShape,
   roundMedals,
+  roundCompetition,
   consequenceSources = null,
   roundCourseMeta = null,
   weekPickScoreId,
@@ -850,6 +854,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             viewerId={currentUserId ?? undefined}
             shape={roundShape ?? null}
             medals={roundMedals ?? null}
+            isCompetition={roundCompetition === true}
             engagement={roundEngagement}
             square
             pillLabel={tCourses('courseDetail.featured.featuredPill')}
@@ -888,6 +893,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           feedPlot={homeRoundPlot}
           feedLayout={scoreLed ? 'scoreLed' : undefined}
           medals={roundMedals}
+          isCompetition={roundCompetition === true}
           onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
           onWhoTap={() => onProfile(post)}
           isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
