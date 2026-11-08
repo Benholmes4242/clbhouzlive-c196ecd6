@@ -49,7 +49,7 @@ export function PlayerAvatar({
   photoUrl,
   size = 'md',
   className,
-  ringColor = DARK_HAIRLINE,
+  ringColor,
   headshotOverride = null,
   surface = 'tile',
   imagePosition = '50% 50%',
@@ -67,7 +67,8 @@ export function PlayerAvatar({
       srcCandidates={candidates}
       alt={playerName}
       userId={playerId || playerName}
-      hairlineRing
+      hideRing
+      hairlineRing={ringGradient != null}
       ringColor={ringColor}
       className={className}
       surface={surface}
