@@ -38,10 +38,11 @@ describe('Also this week signed-off spacing', () => {
     expect(bh).toContain('color:var(--tour-board-mute)');
   });
   it('board rows are 33px and your row bleeds 20px', () => {
-    expect(block('also-br')).toContain('min-height:33px');
+    // Marks brief: rows are two lines with 9px top/bottom padding (was min-height 33px / padding 0 20px).
+    expect(block('also-br')).toContain('padding:9px 0');
     const mine = block('also-br[data-mine=true]');
     expect(mine).toContain('margin:0 -20px');
-    expect(mine).toContain('padding:0 20px');
+    expect(mine).toContain('padding:9px 20px');
   });
   it('position is 11px/800 with .04em tracking, leader in ink', () => {
     const pos = block('also-pos');
@@ -51,8 +52,8 @@ describe('Also this week signed-off spacing', () => {
     expect(block('also-pos[data-leader=true]')).toContain('color:var(--tour-board-ink)');
   });
   it('who gap is 8px and row faces are 22px', () => {
-    expect(block('also-who')).toContain('gap:8px');
-    expect(tsx).toContain('size=22');
+    // Marks brief: Also this week rows carry no faces (was gap:8px and size=22).
+    expect(tsx).not.toContain('SquircleAvatar');
   });
   it('name 13.5px/600, today 13px/700, thru 13px/600 mute, tot 15px/700', () => {
     expect(block('also-name')).toContain('font-size:13.5px');
@@ -65,8 +66,8 @@ describe('Also this week signed-off spacing', () => {
     expect(block('also-tot')).toContain('font-weight:700');
   });
   it('tie bracket sits 19px from the edge, 39px on your row', () => {
-    expect(block('also-br .tour-tie')).toContain('left:19px');
-    expect(block('also-br[data-mine=true] .tour-tie')).toContain('left:39px');
+    // Marks brief: the tie bracket is removed (was left:19px / 39px).
+    expect(() => block('also-br .tour-tie')).toThrow();
   });
   it('finished and upcoming gaps are 10px', () => {
     expect(block('also-win')).toContain('margin-top:10px');
@@ -74,11 +75,8 @@ describe('Also this week signed-off spacing', () => {
     expect(block('also-yours')).toContain('margin-top:10px');
   });
   it('faces keep the 34% squircle owned by SquircleAvatar, no pixel-radius overrides', () => {
-    const base = block('also-avatar,.also-avatar>div');
-    expect(base).toContain('aspect-ratio:1!important');
-    expect(base).not.toContain('border-radius');
-    expect(() => block('also-win .also-avatar')).toThrow();
-    expect(() => block('also-stack .also-avatar')).toThrow();
-    expect(block('also-stack>span')).toContain('border-radius:34%');
+    // Marks brief: every Also this week face is removed (was .also-avatar squircle rules).
+    expect(() => block('also-avatar,.also-avatar>div')).toThrow();
+    expect(tsx).not.toContain('also-stack');
   });
 });

@@ -15,7 +15,7 @@ import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TO
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
-import { BoardRound, HoleTiles, HOLE_TILE_TONES, orderedHoleCells } from './BoardRound';
+import { BoardRound, HoleMarks, HoleMarksKey, MARK_SURFACE_LEADER, MARK_SURFACE_MINE, orderedHoleCells } from './BoardRound';
 import type { BoardHole } from './useBoardHoles';
 import { boardTieRole } from './leaderboardRules';
 import './leaderboard.css';
@@ -821,10 +821,10 @@ export function BoardTable({
               </div>
             )}
 
-            {/* LINE 2 — the current round's holes as numbered tiles across the
+            {/* LINE 2 — the current round's holes as scorecard marks across the
                 FULL row width, from the row's left edge to under TOT. */}
             {!demotedRow && entity.kind !== 'team' && pid && holes.length > 0 ? (
-              <HoleTiles holes={orderedHoleCells(holes)} />
+              <HoleMarks holes={orderedHoleCells(holes)} surface={yourPlayers ? MARK_SURFACE_MINE : isLeader ? MARK_SURFACE_LEADER : surface} />
             ) : null}
           </>
         )}
@@ -851,17 +851,7 @@ export function BoardTable({
       {renderHeader()}
       {parts}
       {!columns.preTournament && entries.length > 0 ? (
-        <div className="tour-board-key" data-board-key>
-          {([
-            ['eagle', HOLE_TILE_TONES.eagle.bg, t('board.holeKey.eagle')],
-            ['birdie', HOLE_TILE_TONES.birdie.bg, t('board.holeKey.birdie')],
-            ['par', 'rgba(255,255,255,.14)', t('board.holeKey.par')],
-            ['bogey', HOLE_TILE_TONES.bogey.bg, t('board.holeKey.bogey')],
-            ['double', HOLE_TILE_TONES.double.bg, t('board.holeKey.double')],
-          ] as const).map(([kind, swatch, label]) => (
-            <span key={kind} data-board-key-item={kind}><i style={{ background: swatch }} />{label}</span>
-          ))}
-        </div>
+        <HoleMarksKey surface="var(--tour-board-canvas)" />
       ) : null}
     </div>
   );

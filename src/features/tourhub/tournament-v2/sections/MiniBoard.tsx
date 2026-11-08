@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { HoleTiles, orderedHoleCells } from '../../leaderboard/BoardRound';
+import { HoleMarks, HoleMarksKey, orderedHoleCells } from '../../leaderboard/BoardRound';
 import { useBoardHoles } from '../../leaderboard/useBoardHoles';
 
 import CountryFlag from '@/components/ui/country-flag';
@@ -501,7 +501,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   const holes = tileRound != null && pid
                     ? (tileRound === effectiveRound ? curHoleData.byPlayer.get(pid) : prevHoleData.byPlayer.get(pid))
                     : undefined;
-                  return <HoleTiles holes={holes ? orderedHoleCells(holes) : EMPTY_TILE_CELLS} />;
+                  return <HoleMarks holes={holes ? orderedHoleCells(holes) : EMPTY_TILE_CELLS} surface={PAGE_CANVAS} />;
                 })() : null}
               </RowTag>
             );
@@ -522,6 +522,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             </>
           );
           })()}
+          <HoleMarksKey surface={PAGE_CANVAS} padX={HERO_PAD_X} />
         </div>
 
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />

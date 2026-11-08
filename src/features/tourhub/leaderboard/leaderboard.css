@@ -24,9 +24,6 @@
 .tour-board-name { display:flex; align-items:center; gap:5px; font-size:14px; font-weight:600; color:var(--tour-board-ink); }
 .tour-board-name-text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
 .tour-board-star { flex:none; font-size:11px; color:var(--tour-board-amber); }
-.tour-hole-tiles { display:flex; gap:2px; min-width:0; }
-.tour-hole-tiles i { flex:1; min-width:0; height:16px; border-radius:3px; display:flex; align-items:center; justify-content:center; font-style:normal; font-size:10px; font-weight:700; font-variant-numeric:tabular-nums; }
-.tour-hole-tiles .tour-hole-tiles-gap { flex:0 0 4px; height:auto; background:transparent; }
 .tour-board-key { display:flex; gap:12px; flex-wrap:wrap; padding:10px 16px 0; font-size:10.5px; color:var(--tour-board-mute); }
 .tour-board-key span { display:inline-flex; align-items:center; gap:5px; }
 .tour-board-key i { width:10px; height:10px; border-radius:2px; display:inline-block; }
@@ -49,3 +46,23 @@
 .tour-board-shell .tour-follow-pill { flex:1; height:36px; border-radius:999px; border:1px solid var(--tour-board-pill-line); background:transparent; color:var(--tour-board-ink); font-size:12.5px; font-weight:700; }
 .tour-follow-error { font-size:11.5px; color:var(--tour-board-mute); margin-top:8px; }
 @media(prefers-reduced-motion:reduce) { .tour-round-expand { transition:none; } }
+/* Shared HoleMarks (signed-off hole-marks mock). */
+.tour-hole-marks { display:flex; gap:2px; min-width:0; width:100%; }
+.tour-hole-marks > i { position:relative; flex:1; min-width:0; height:18px; display:flex; align-items:center; justify-content:center; font-style:normal; }
+.tour-hole-marks > .tour-hole-marks-gap { flex:0 0 0; }
+.tour-hole-marks .hm-fig { position:relative; z-index:1; font-size:10.5px; font-weight:700; color:rgba(248,250,252,.92); font-variant-numeric:tabular-nums lining-nums; line-height:1; }
+.tour-hole-marks .hm-shape { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); aspect-ratio:1; box-sizing:border-box; display:none; }
+.tour-hole-marks > i[data-grade=birdie] .hm-shape { display:block; width:min(17px, calc(100% + 1px)); border:1.3px solid #E24B3F; border-radius:50%; }
+.tour-hole-marks > i[data-grade=eagle] .hm-shape { display:block; width:min(14px, calc(100% - 2px)); border:1.3px solid #F5C842; border-radius:50%; box-shadow:0 0 0 1.5px var(--hm-surface), 0 0 0 2.6px #F5C842; }
+.tour-hole-marks > i[data-grade=bogey] .hm-shape { display:block; width:min(15px, calc(100% - 1px)); border:1.3px solid rgba(248,250,252,.55); border-radius:2px; }
+.tour-hole-marks > i[data-grade=double] .hm-shape { display:block; width:min(16px, 100%); border:1.3px solid #5E8FD9; border-radius:2px; box-shadow:inset 0 0 0 1.6px var(--hm-surface), inset 0 0 0 2.8px #5E8FD9; }
+.tour-hole-marks > i[data-grade=triple] .hm-shape { display:block; width:min(16px, 100%); background:#1E4577; border:1.3px solid #5E8FD9; border-radius:2px; }
+.tour-hole-marks > i[data-grade=empty]::after { content:''; width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,.16); }
+.tour-hole-marks-key { display:flex; gap:12px; flex-wrap:wrap; font-size:10.5px; color:var(--tour-board-mute, rgba(248,250,252,.55)); }
+.tour-hole-marks-key span { display:inline-flex; align-items:center; gap:6px; }
+.tour-hole-marks-key i { width:12px; height:12px; display:inline-block; box-sizing:border-box; }
+.tour-hole-marks-key i[data-grade=birdie] { border:1.3px solid #E24B3F; border-radius:50%; }
+.tour-hole-marks-key i[data-grade=eagle] { width:9px; height:9px; margin:1.5px; border:1.3px solid #F5C842; border-radius:50%; box-shadow:0 0 0 1.5px var(--hm-surface), 0 0 0 2.6px #F5C842; }
+.tour-hole-marks-key i[data-grade=bogey] { border:1.3px solid rgba(248,250,252,.55); border-radius:2px; }
+.tour-hole-marks-key i[data-grade=double] { border:1.3px solid #5E8FD9; border-radius:2px; box-shadow:inset 0 0 0 1.6px var(--hm-surface), inset 0 0 0 2.8px #5E8FD9; }
+.tour-hole-marks-key i[data-grade=triple] { background:#1E4577; border:1.3px solid #5E8FD9; border-radius:2px; }

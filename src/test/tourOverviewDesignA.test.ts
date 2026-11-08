@@ -466,7 +466,7 @@ describe('one board geometry', () => {
     expect(roundHeaders.length).toBeGreaterThan(0);
     roundHeaders.forEach((el) => expect(el.style.textAlign).toBe('center'));
     c.querySelectorAll<HTMLElement>('[data-board-round-cell]').forEach((el) => expect(el.style.textAlign).toBe('center'));
-    expect(c.querySelector<HTMLElement>('[data-board-pos-header]')?.style.textAlign).toBe('center');
+    expect(c.querySelector<HTMLElement>('[data-board-pos-header]')?.style.textAlign).toBe('left'); // marks brief: POS sits at the left (was centre)
   });
 
   it('the hero board draws independent 32px round cells without changing BoardTable', () => {

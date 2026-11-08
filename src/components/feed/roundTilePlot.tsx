@@ -27,7 +27,7 @@
  */
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import { HoleTiles } from '@/features/tourhub/leaderboard/BoardRound';
+import { HoleMarks } from '@/features/tourhub/leaderboard/BoardRound';
 import '@/features/tourhub/leaderboard/leaderboard.css';
 import { smoothPath } from '@/lib/charts/smoothPath';
 import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
@@ -339,8 +339,8 @@ export function RoundTilePlot({ shape, received, scoreId }: {
       {/* The shared numbered hole tiles replace the 6px coloured bars: the
           actual gross on every hole, 12px below the round-shape line, at the
           plot's full width. Nine-hole rounds render nine tiles. */}
-      <div data-plot-tiles style={{ marginTop: 12 }}>
-        <HoleTiles holes={shape.holes.map((h) => ({ strokes: h.strokes, par: h.par }))} />
+      <div data-plot-marks style={{ marginTop: 12 }}>
+        <HoleMarks holes={shape.holes.map((h) => ({ strokes: h.strokes, par: h.par }))} surface={FEED_CARD_SURFACE} />
       </div>
       {shape.holes.length === 18 && values.length === 19 ? <div data-plot-foot style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 16px 0', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', fontVariantNumeric: 'tabular-nums', color: T40 }}>
         <span>OUT <b style={{ color: T60 }}>{plotToPar(values[9])}</b></span><span>IN <b style={{ color: T60 }}>{plotToPar(values[18] - values[9])}</b></span>

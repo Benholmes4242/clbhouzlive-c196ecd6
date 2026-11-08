@@ -42,7 +42,7 @@ describe('Tour hero refinements', () => {
     expect(header?.style.gap).toBe('4px');
     expect(header?.style.paddingLeft).toBe('20px');
     for (const el of [header, ...v.container.querySelectorAll<HTMLElement>('[data-hero-tie]')].map(el => el?.hasAttribute('data-hero-tie') ? el.parentElement : el)) {
-      Array.from(el?.children ?? []).slice(2).forEach(cell => expect((cell as HTMLElement).style.textAlign).toBe('center'));
+      Array.from(el?.children ?? []).slice(2).filter(cell => !cell.hasAttribute('data-hole-marks')).forEach(cell => expect((cell as HTMLElement).style.textAlign).toBe('center'));
     }
     expect(BOARD_GEOMETRY).toEqual({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 });
   });

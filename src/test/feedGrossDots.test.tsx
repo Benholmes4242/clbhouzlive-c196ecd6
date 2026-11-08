@@ -31,9 +31,9 @@ describe('FGD1 gross strip beneath the net trace', () => {
     expect(received[0]).toBe(1);
     expect(feedNetSeries(shape, received)[1]).toBe(-2);
     const { container } = render(<RoundTilePlot shape={shape} received={received} />);
-    const firstDot = container.querySelector('[data-plot-hole]');
-    expect(firstDot?.getAttribute('fill')).toBe(TOPAR_UNDER_DARK);
-    expect(firstDot?.getAttribute('fill')).not.toBe(SC_FILL_GOLD);
+    // Marks brief: the plot's hole bars are HoleMarks (was [data-plot-hole] fill TOPAR_UNDER_DARK).
+    const first = container.querySelector('[data-hole-mark]');
+    expect(first?.getAttribute('data-grade')).toBe('birdie');
   });
 
   it('sixteen gross bogeys off twenty finish net four under with sixteen bogey dots', () => {
@@ -50,8 +50,9 @@ describe('FGD1 gross strip beneath the net trace', () => {
     const received = feedStrokesReceived(shape, 3);
     if (!received) throw new Error('Expected eighteen-hole allowance');
     const { container } = render(<RoundTilePlot shape={shape} received={received} />);
-    const tones = Array.from(container.querySelectorAll('[data-plot-hole]')).map((dot) => dot.getAttribute('fill'));
-    expect(tones.filter((tone) => tone === TOPAR_UNDER_DARK)).toHaveLength(5);
-    expect(tones.filter((tone) => tone === SC_FILL_GOLD)).toHaveLength(0);
+    // Marks brief: gross grades now read from HoleMarks (was five TOPAR_UNDER_DARK bar fills, no gold).
+    const grades = Array.from(container.querySelectorAll('[data-hole-mark]')).map((cell) => cell.getAttribute('data-grade'));
+    expect(grades.filter((g) => g === 'birdie')).toHaveLength(5);
+    expect(grades.filter((g) => g === 'eagle')).toHaveLength(0);
   });
 });

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HoleTiles, HOLE_TILE_TONES } from '@/features/tourhub/leaderboard/BoardRound';
+import { HoleMarks, HoleMarksKey } from '@/features/tourhub/leaderboard/BoardRound';
 import { BoardTable, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { PlayerAvatar } from '@/features/tourhub/components/PlayerAvatar';
 import { PlayerInitialAvatar } from '@/features/tourhub/_shared/PlayerInitialAvatar';
@@ -16,34 +16,42 @@ const holes = (diff: (number | null)[]) => diff.map((d) => (d == null ? null : {
 const entry = (id: string, position = 1): BoardEntry => ({ id, position, score: -4, thru: 3, round_1: -2, round_2: -2, player: { id, full_name: `Player ${id}` } });
 const cut = { kind: 'none' as const, cutline: null, extraCount: 0 };
 
-describe('shared numbered hole tiles', () => {
-  it('eighteen holes render eighteen numbered tiles with one nine gap', () => {
-    const v = render(<HoleTiles holes={holes(Array(18).fill(0))} />);
-    const tiles = v.container.querySelectorAll('[data-hole-tile]');
+describe('shared hole marks', () => {
+  it('eighteen holes render eighteen marks with one nine gap', () => {
+    const v = render(<HoleMarks holes={holes(Array(18).fill(0))} />);
+    const tiles = v.container.querySelectorAll('[data-hole-mark]');
     expect(tiles).toHaveLength(18);
     expect(tiles[0].textContent).toBe('4');
-    expect(v.container.querySelectorAll('.tour-hole-tiles-gap')).toHaveLength(1);
+    expect(v.container.querySelectorAll('.tour-hole-marks-gap')).toHaveLength(1);
   });
-  it('nine holes render nine tiles with no gap', () => {
-    const v = render(<HoleTiles holes={holes(Array(9).fill(0))} />);
-    expect(v.container.querySelectorAll('[data-hole-tile]')).toHaveLength(9);
-    expect(v.container.querySelectorAll('.tour-hole-tiles-gap')).toHaveLength(0);
+  it('nine holes render nine cells with no gap', () => {
+    const v = render(<HoleMarks holes={holes(Array(9).fill(0))} />);
+    expect(v.container.querySelectorAll('[data-hole-mark]')).toHaveLength(9);
+    expect(v.container.querySelectorAll('.tour-hole-marks-gap')).toHaveLength(0);
   });
-  it('an unplayed hole is an empty tile with no number', () => {
-    const v = render(<HoleTiles holes={holes([0, null, 0])} />);
-    const tiles = v.container.querySelectorAll('[data-hole-tile]');
-    expect(tiles[1].getAttribute('data-grade')).toBe('empty');
-    expect(tiles[1].textContent).toBe('');
+  it('an unplayed hole is a dot with no figure', () => {
+    const v = render(<HoleMarks holes={holes([0, null, 0])} />);
+    const cells = v.container.querySelectorAll('[data-hole-mark]');
+    expect(cells[1].getAttribute('data-grade')).toBe('empty');
+    expect(cells[1].textContent).toBe('');
+    expect(cells[1].querySelector('.hm-shape')).toBeNull();
   });
-  it('grades carry the signed-off tile colours', () => {
-    const v = render(<HoleTiles holes={holes([-2, -1, 0, 1, 2])} />);
-    const bg = (i: number) => (v.container.querySelectorAll('[data-hole-tile]')[i] as HTMLElement).style.background;
-    expect(bg(0)).toBe('rgb(255, 210, 0)');
-    expect(bg(1)).toBe('rgb(226, 75, 63)');
-    expect(bg(2)).toBe('rgba(255, 255, 255, 0.08)');
-    expect(bg(3)).toBe('rgba(166, 194, 240, 0.85)');
-    expect(bg(4)).toBe('rgb(122, 166, 236)');
-    expect(HOLE_TILE_TONES.eagle.fg).toBe('#0A0A0C');
+  it('each grade renders its own mark and par renders the figure alone', () => {
+    const v = render(<HoleMarks holes={holes([-2, -1, 0, 1, 2, 3])} />);
+    const grades = Array.from(v.container.querySelectorAll('[data-hole-mark]')).map((c) => c.getAttribute('data-grade'));
+    expect(grades).toEqual(['eagle', 'birdie', 'par', 'bogey', 'double', 'triple']);
+    const par = v.container.querySelectorAll('[data-hole-mark]')[2];
+    expect(par.querySelector('.hm-fig')?.textContent).toBe('4');
+  });
+  it('marks span the full row and carry the surface colour', () => {
+    const v = render(<HoleMarks holes={holes([0])} surface="#123456" />);
+    const row = v.container.querySelector<HTMLElement>('[data-hole-marks]')!;
+    expect(row.style.gridColumn).toBe('1 / -1');
+    expect(row.style.getPropertyValue('--hm-surface')).toBe('#123456');
+  });
+  it('the key renders five items', () => {
+    const v = render(<HoleMarksKey />);
+    expect(v.container.querySelectorAll('[data-hole-marks-key-item]')).toHaveLength(5);
   });
 });
 
@@ -69,9 +77,9 @@ describe('leaderboard board rows', () => {
   });
   it('the five-item key renders under the board', () => {
     const v = board([entry('a')]);
-    const key = v.container.querySelector('[data-board-key]');
+    const key = v.container.querySelector('[data-hole-marks-key]');
     expect(key).not.toBeNull();
-    expect(key?.querySelectorAll('[data-board-key-item]')).toHaveLength(5);
+    expect(key?.querySelectorAll('[data-hole-marks-key-item]')).toHaveLength(5);
   });
 });
 
