@@ -329,17 +329,17 @@ describe('our picks trophy', () => {
 });
 
 describe('heroBoardColumns', () => {
-  it('live, one round: SHAPE only — TODAY would equal TOT', () => {
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false })).toEqual({ today: false, rounds: false, shape: true });
+  it('live, one round: round columns only — R1 shows even in round one', () => {
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false })).toEqual({ today: false, rounds: true, shape: false });
   });
-  it('live, two or more rounds: TODAY and SHAPE', () => {
-    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false })).toEqual({ today: true, rounds: false, shape: true });
+  it('live, two or more rounds: round columns only — no TODAY, no SHAPE', () => {
+    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false })).toEqual({ today: false, rounds: true, shape: false });
   });
-  it('not live, two or more rounds: round columns, no SHAPE', () => {
+  it('completed: the same round columns', () => {
     expect(heroBoardColumns({ roundCount: 3, roundInProgress: false, completed: true })).toEqual({ today: false, rounds: true, shape: false });
   });
-  it('not live, one round or fewer: neither, no SHAPE', () => {
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false })).toEqual({ today: false, rounds: false, shape: false });
+  it('pre-round: the same round columns', () => {
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false })).toEqual({ today: false, rounds: true, shape: false });
   });
 });
 
@@ -353,9 +353,16 @@ describe('hero board carries no THRU or MOV key', () => {
       expect(Object.keys(heroBoardColumns(opts)).sort()).toEqual(['rounds', 'shape', 'today']);
     }
   });
-  it('SHAPE is present on a live multi-round board and absent on a single-round one that is not live', () => {
-    expect(heroBoardColumns({ roundCount: 3, roundInProgress: true, completed: false }).shape).toBe(true);
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false }).shape).toBe(false);
+  it('SHAPE and TODAY are absent in every phase', () => {
+    for (const opts of [
+      { roundCount: 3, roundInProgress: true, completed: false },
+      { roundCount: 1, roundInProgress: true, completed: false },
+      { roundCount: 1, roundInProgress: false, completed: false },
+      { roundCount: 4, roundInProgress: false, completed: true },
+    ]) {
+      expect(heroBoardColumns(opts).shape).toBe(false);
+      expect(heroBoardColumns(opts).today).toBe(false);
+    }
   });
 });
 
@@ -381,15 +388,19 @@ describe('MiniBoard heroBoard render', () => {
     createElement(MemoryRouter, null,
       createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound, phase, theme: 'heroBoard', totalRounds: 4 })),
   ));
-  it('live round two takes the mock grammar POS | PLAYER | TODAY | SHAPE | TOT', () => {
+  it('live round two takes the one-column grammar POS | PLAYER | R1 | R2 | TOT', () => {
     const entries = [
       { id: 'a', position: 1, score: -6, thru: 9, round_1: -1, round_2: -5, player: { id: 'pa', full_name: 'Player A' } },
       { id: 'b', position: 2, score: -4, thru: 8, round_1: -4, round_2: 0, player: { id: 'pb', full_name: 'Player B' } },
     ] as unknown as BoardEntry[];
     const view = mountBoard(entries, 2, 'live');
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toBe('24px minmax(0,1fr) 40px 44px 40px');
-    expect(view.container.querySelectorAll('[data-hero-shape]').length).toBe(2);
+    expect(header?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 32px 32px 40px');
+    expect(header?.textContent).toContain('R1');
+    expect(header?.textContent).toContain('R2');
+    expect(view.container.querySelectorAll('[data-hero-shape]').length).toBe(0);
+    expect(view.container.querySelectorAll('[data-hero-round="1"]').length).toBe(2);
+    expect(view.container.querySelectorAll('[data-hero-round="2"]').length).toBe(2);
   });
   it('renders no THRU cell and no MOV track in any phase', () => {
     const entries = [
