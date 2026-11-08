@@ -445,29 +445,16 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     status: r.status ?? null,
                   });
                 } : undefined}
-                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: showHeroShape ? `5px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gridTemplateRows: 'auto auto', columnGap: heroGap, rowGap: 6, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: `${entity.kind === 'team' ? 5 : 8}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
                 {showHeroShape || showOverviewPosition ? (
                   /* CB57: capped and lower ties use the SAME stretched grid
                      cell and bracket; the cap still owns the visible T1 label. */
                   <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: 0, color: T.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {/* ONE MARKER PER TIE: capped/later rows are screen-reader only. */}
+                    {/* ONE MARKER PER TIE: capped/later rows are screen-reader only.
+                        No tie bracket — tied rows show the position once. */}
                     {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
-                    {tieRole !== 'solo' ? (
-                      <span
-                        aria-hidden
-                        data-hero-tie-bracket
-                        style={{
-                          position: 'absolute', right: 2, width: 1.5, borderRadius: 1, background: OVERVIEW.bracket,
-                          /* Rows are padded, so the rule reaches through the padding
-                             to meet its neighbour: start under the marker, end at the
-                             last row's centre. */
-                          top: tieRole === 'first' ? '50%' : -5,
-                          bottom: tieRole === 'last' ? '50%' : -5,
-                        }}
-                      />
-                    ) : null}
                   </div>
                 ) : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: showHeroShape ? 6 : 5 }}>
