@@ -42,6 +42,9 @@ import { formatTimeHm24 } from '@/i18n/format';
 
 import { HeroRoundPanel } from './HeroRoundPanel';
 import { heroDefaultRound, heroStartedRounds } from './heroRoundRules';
+/* HoleMarks' shape styles live in leaderboard.css; the open panel needs them
+   on every surface this shared board renders on. */
+import '../../leaderboard/leaderboard.css';
 
 type Row = BoardEntry;
 
