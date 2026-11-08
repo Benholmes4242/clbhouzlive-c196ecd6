@@ -75,11 +75,11 @@ describe('leaderboard board rows', () => {
     expect(rows[0].style.opacity).toBe('1');
     expect(v.container.querySelector('[data-tie-bracket]')).toBeNull();
   });
-  it('the five-item key renders under the board', () => {
+  it('the board renders no hole marks or key', () => {
     const v = board([entry('a')]);
     const key = v.container.querySelector('[data-hole-marks-key]');
-    expect(key).not.toBeNull();
-    expect(key?.querySelectorAll('[data-hole-marks-key-item]')).toHaveLength(5);
+    expect(key).toBeNull();
+    expect(v.container.querySelector('[data-hole-marks]')).toBeNull();
   });
 });
 

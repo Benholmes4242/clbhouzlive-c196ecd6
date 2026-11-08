@@ -33,16 +33,18 @@ describe('hole rules',()=>{
   it('finished round shows both nines',()=>expect(roundNineOrder([],true)).toEqual([0,9]));
 });
 describe('board interactions',()=>{
-  it('one inline round opens, switches and closes without opening full sheet',()=>{
+  it('row taps open the full scorecard directly without inline expansion',()=>{
     const onFull=vi.fn();const view=board([entry('a'),entry('b',2)],{onRowClick:onFull});
     const rows=view.container.querySelectorAll<HTMLElement>('[data-board-row]');
-    fireEvent.click(rows[0]);expect(rows[0]).toHaveAttribute('aria-expanded','true');expect(onFull).not.toHaveBeenCalled();
-    fireEvent.click(rows[1]);expect(rows[0]).toHaveAttribute('aria-expanded','false');expect(rows[1]).toHaveAttribute('aria-expanded','true');
-    fireEvent.click(rows[1]);expect(rows[1]).toHaveAttribute('aria-expanded','false');
+    fireEvent.click(rows[0]);expect(onFull).toHaveBeenLastCalledWith(entry('a'));
+    fireEvent.click(rows[1]);expect(onFull).toHaveBeenLastCalledWith(entry('b',2));
+    expect(onFull).toHaveBeenCalledTimes(2);
+    expect(view.container.querySelector('.tour-round-expand')).toBeNull();
+    expect(rows[0]).not.toHaveAttribute('aria-expanded');
   });
   it('hole tiles absent without played data',()=>expect(board([entry('a')]).container.querySelector('[data-hole-marks]')).toBeNull());
-  it('absolute hole tiles render and tie brackets are gone',()=>{const view=board([entry('a',2),entry('b',2)],{holesByPlayer:new Map([['a',[hole(10,3)]]])});expect(view.container.querySelector('[data-hole-mark="10"]')).toHaveAttribute('data-grade','birdie');expect(view.container.querySelectorAll('[data-tie-bracket]')).toHaveLength(0);});
+  it('hole marks remain absent with supplied data and tie brackets are gone',()=>{const view=board([entry('a',2),entry('b',2)],{holesByPlayer:new Map([['a',[hole(10,3)]]])});expect(view.container.querySelector('[data-hole-mark]')).toBeNull();expect(view.container.querySelectorAll('[data-tie-bracket]')).toHaveLength(0);});
   it('your player positions are never suppressed by ties',()=>{const view=board([entry('a',2),entry('b',2)],{yourPlayers:true});expect(view.container.querySelectorAll('[data-your-player]')).toHaveLength(2);expect(view.container.querySelector('[data-tie-bracket]')).toBeNull();});
-  it('full scorecard door invokes the existing target callback',()=>{const full=vi.fn();const view=board([entry('a')],{onRowClick:full});fireEvent.click(view.container.querySelector('[data-board-row]') as HTMLElement);fireEvent.click(view.container.querySelector('.tour-scorecard-door') as HTMLElement);expect(full).toHaveBeenCalledWith(entry('a'));});
+  it('row directly invokes the existing full scorecard target callback',()=>{const full=vi.fn();const view=board([entry('a')],{onRowClick:full});fireEvent.click(view.container.querySelector('[data-board-row]') as HTMLElement);expect(view.container.querySelector('.tour-scorecard-door')).toBeNull();expect(full).toHaveBeenCalledWith(entry('a'));});
   it('follow and player-page doors call separate handlers',()=>{const follow=vi.fn(),player=vi.fn();render(<BoardRound holes={[]} round={2} following={false} busy={false} onFollow={follow} onPlayer={player} onFull={vi.fn()}/>);const buttons=screen.getAllByRole('button');fireEvent.click(buttons[1]);fireEvent.click(buttons[2]);expect(follow).toHaveBeenCalledTimes(1);expect(player).toHaveBeenCalledTimes(1);});
 });

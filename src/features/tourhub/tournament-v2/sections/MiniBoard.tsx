@@ -1,14 +1,12 @@
 /**
  * MiniBoard - TD1 top-5 compressed board.
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
- * Row tap opens ScorecardSheet, on every theme; a row with no player id
+ * Single-line hero rows never read hole data or render marks/key; the shared
+ * scorecard sheet owns those reads. Row tap opens ScorecardSheet on every theme; a row with no player id
  * (a team row) is not tappable.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
-import { HoleMarks, HoleMarksKey, orderedHoleCells } from '../../leaderboard/BoardRound';
-import { useBoardHoles } from '../../leaderboard/useBoardHoles';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -109,21 +107,6 @@ export function heroRoundScore(entry: BoardEntry, round: number, currentRound?: 
   return round === currentRound ? todayFromEntry(entry, currentRound) : [entry.round_1, entry.round_2, entry.round_3, entry.round_4][round - 1] ?? null;
 }
 
-/** WHICH ROUND A ROW'S HOLE TILES SHOW (signed-off hole-tiles mock): the
- *  current round for every player who has started it; a player still showing
- *  a tee time shows their PREVIOUS round's 18 holes; in round 1 before a
- *  player tees off there is no previous round, so the tiles stay empty. A
- *  finished event shows each player's final round. */
-export function heroTileRound(entry: BoardEntry, currentRound: number | null | undefined, completed: boolean): number | null {
-  if (!completed && currentRound != null && todayFromEntry(entry, currentRound) != null) return currentRound;
-  const rounds = [entry.round_1, entry.round_2, entry.round_3, entry.round_4];
-  const cap = !completed && currentRound != null ? currentRound - 1 : 4;
-  for (let i = Math.min(cap, 4) - 1; i >= 0; i--) if (rounds[i] != null) return i + 1;
-  return null;
-}
-
-/** Eighteen unplayed tiles: the pre-tee-off round-one row. */
-const EMPTY_TILE_CELLS: ReadonlyArray<null> = Array.from({ length: 18 }, () => null);
 /** Only an entirely unscored scheduled column needs a draw. Never fetch a
  * played round for a straggler with missing data, or a completed event. */
 export function heroTeeRound(entries: BoardEntry[], rows: BoardEntry[], rounds: number[], currentRound: number | null | undefined, completed: boolean): number | null {
@@ -327,23 +310,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   }, [teeRound, teeGroups]);
   const shapeSlots = Math.max(totalRounds ?? 0, heroCols.rounds.length, currentRound ?? 0);
 
-  /* HERO BOARD HOLE TILES — one cached whole-field read per round, shared
-     with the full leaderboard's cache keys; never a query per row. The
-     previous round is read only when a visible row still needs it. */
-  const isHero = theme === 'heroBoard';
-  const heroCompleted = phase === 'completed';
-  const queryClient = useQueryClient();
-  const boardUpdatedAt = isHero ? queryClient.getQueryState(['tourhub', 'leaderboard', tournamentId])?.dataUpdatedAt ?? 0 : 0;
-  const effectiveRound = currentRound ?? (heroCompleted ? heroCols.rounds.at(-1) ?? null : null);
-  const tileRounds = useMemo(
-    () => (isHero ? rows.map((r) => (r.player?.id ? heroTileRound(r, effectiveRound, heroCompleted) : null)) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isHero, entries, currentRound, phase, limit],
-  );
-  const prevTileRound = !heroCompleted && effectiveRound != null && tileRounds.some((rd) => rd === effectiveRound - 1) ? effectiveRound - 1 : null;
-  const curHoleData = useBoardHoles(isHero ? tournamentId : null, effectiveRound, boardUpdatedAt, isHero && effectiveRound != null);
-  const prevHoleData = useBoardHoles(isHero ? tournamentId : null, prevTileRound, boardUpdatedAt, isHero && prevTileRound != null);
-
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
   /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
      already showing round N's score, so it takes round N's name. */
@@ -445,7 +411,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     status: r.status ?? null,
                   });
                 } : undefined}
-                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gridTemplateRows: 'auto auto', columnGap: heroGap, rowGap: 6, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: `${entity.kind === 'team' ? 5 : 8}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, gap: heroGap, alignItems: 'center', width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 33 : 31, padding: showHeroShape ? `5px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 5 : 4}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
                 {showHeroShape || showOverviewPosition ? (
@@ -458,10 +424,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   </div>
                 ) : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: showHeroShape ? 6 : 5 }}>
-                  {/* §D.4 a face leads the name. The heroBoard theme never drew a flag. */}
-                  {showHeroShape ? (
-                    <SquircleAvatar size={22} srcCandidates={r.player ? resolvePlayerAvatarCandidates({ name: r.player.full_name, photoUrl: r.player.photo_url ?? null, tourSlug }) : []} alt={entity.prose || entity.lines[0] || ''} userId={r.player?.id ?? r.id} hideRing />
-                  ) : null}
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: 0, color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
@@ -495,14 +457,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   );
                 })}
                 <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {entity.kind !== 'team' ? (() => {
-                  const tileRound = tileRounds[rowIndex];
-                  const pid = r.player?.id;
-                  const holes = tileRound != null && pid
-                    ? (tileRound === effectiveRound ? curHoleData.byPlayer.get(pid) : prevHoleData.byPlayer.get(pid))
-                    : undefined;
-                  return <HoleMarks holes={holes ? orderedHoleCells(holes) : EMPTY_TILE_CELLS} surface={PAGE_CANVAS} />;
-                })() : null}
               </RowTag>
             );
           };
@@ -522,7 +476,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             </>
           );
           })()}
-          <HoleMarksKey surface={PAGE_CANVAS} padX={HERO_PAD_X} />
         </div>
 
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />

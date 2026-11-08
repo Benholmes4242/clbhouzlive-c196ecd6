@@ -27,8 +27,6 @@
 .tour-board-key { display:flex; gap:12px; flex-wrap:wrap; padding:10px 16px 0; font-size:10.5px; color:var(--tour-board-mute); }
 .tour-board-key span { display:inline-flex; align-items:center; gap:5px; }
 .tour-board-key i { width:10px; height:10px; border-radius:2px; display:inline-block; }
-.tour-round-expand { overflow:hidden; max-height:0; transition:max-height 260ms ease; }
-.tour-round-expand[data-open=true] { max-height:360px; }
 .tour-round-card { margin:2px 12px 12px; padding:12px; border:1px solid var(--tour-board-line); border-radius:16px; background:var(--tour-board-panel); }
 .tour-round-top { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:11px; font-weight:700; letter-spacing:.12em; color:var(--tour-board-dim); }
 .tour-round-top .tour-scorecard-door { height:auto; padding:0; font-size:12.5px; font-weight:500; color:var(--tour-board-ink); white-space:nowrap; }
@@ -45,7 +43,6 @@
 .tour-round-foot { display:flex; gap:8px; margin-top:12px; }
 .tour-board-shell .tour-follow-pill { flex:1; height:36px; border-radius:999px; border:1px solid var(--tour-board-pill-line); background:transparent; color:var(--tour-board-ink); font-size:12.5px; font-weight:700; }
 .tour-follow-error { font-size:11.5px; color:var(--tour-board-mute); margin-top:8px; }
-@media(prefers-reduced-motion:reduce) { .tour-round-expand { transition:none; } }
 /* Shared HoleMarks (signed-off hole-marks mock). */
 .tour-hole-marks { display:flex; gap:2px; min-width:0; width:100%; }
 .tour-hole-marks > i { position:relative; flex:1; min-width:0; height:18px; display:flex; align-items:center; justify-content:center; font-style:normal; }
