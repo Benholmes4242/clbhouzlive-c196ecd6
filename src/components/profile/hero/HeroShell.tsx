@@ -49,44 +49,10 @@ export const HERO_CONTENT_INSET =
  * fontSize x LINE (SF Pro resolves `line-height: normal` to 1.5) except
  * where a lineHeight is stated inline.
  * ------------------------------------------------------------------ */
-const LINE = 1.5;
-const H_PAD_TOP = 0;          // content gap below HERO_CONTENT_INSET
-const H_PAD_BOTTOM = HERO_CONTENT_BOTTOM;       // section padding-bottom
-const H_IDENTITY_ROW = 56;     // 56px avatar floors the row (name + subline are shorter)
-const H_HEADLINE_GAP = 18;     // headline button marginTop
-const H_HEADLINE_LABEL = 8.5 * LINE;
-const H_FIGURE_GAP = 4;
-const H_FIGURE = 40;           // fontSize 40, lineHeight 1
-/* H_SPARKLINE (10 + 42) was personal-only; the personal profile no longer
-   mounts this shell, so it is not part of the sum. */
-const H_STRIP_GAP = 14;        // counter strip marginTop
-const H_STRIP_RULE = 1;        // 1px borderTop
-const H_STRIP_PAD = 13;        // counter strip paddingTop
-const H_CELL_VALUE = 17 * 1.1; // HeroCell figure, lineHeight 1.1
-const H_CELL_LABEL_GAP = 4;
-const H_CELL_LABEL = 7.5 * LINE;
-
-/** Tallest content stack, rounded up to a whole pixel. */
-const HERO_TALLEST_CONTENT = Math.ceil(
-  H_PAD_TOP +
-    H_IDENTITY_ROW +
-    H_HEADLINE_GAP +
-    H_HEADLINE_LABEL +
-    H_FIGURE_GAP +
-    H_FIGURE +
-    H_STRIP_GAP +
-    H_STRIP_RULE +
-    H_STRIP_PAD +
-    H_CELL_VALUE +
-    H_CELL_LABEL_GAP +
-    H_CELL_LABEL +
-    H_PAD_BOTTOM,
-);
-
-/** What the square must clear: HERO_CONTENT_INSET + HERO_TALLEST_CONTENT
- *  (227 now the sparkline is gone). Kept as documentation; the block carries
- *  NO floor (see coverAspect.ts), so the crop frame equals the rendered square. */
-
+/** Pro tallest case: kicker13.2+gap10, avatar72, headline gap20+39.6,
+ * counters gap14+rule1+pad13+value18.7+gap4+label15,
+ * actions gap16+height44. Round up once; bottom belongs to the shell. */
+export const HERO_TALLEST_CONTENT = Math.ceil(11 * 1.2 + 10 + 72 + 20 + 44 * .9 + 14 + 1 + 13 + 17 * 1.1 + 4 + 10 * 1.5 + 16 + 44) + HERO_CONTENT_BOTTOM;
 
 export interface HeroCounter {
   key: string;

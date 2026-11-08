@@ -19,7 +19,7 @@ import { OVERVIEW } from '../overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
 import { heroStateLine } from './heroStateLine';
-import { OVERVIEW_KICKER_ROW_HEIGHT, OVERVIEW_TITLE_SIZE, OVERVIEW_TITLE_LINE_HEIGHT, OVERVIEW_TITLE_GAP, OVERVIEW_VENUE_LINE_HEIGHT, OVERVIEW_VENUE_GAP, OVERVIEW_FACE_SIZE, OVERVIEW_FACE_GAP, OVERVIEW_LEADER_NAME_SIZE, OVERVIEW_LEADER_NAME_LINE_HEIGHT, OVERVIEW_LEADER_NAME_GAP, OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
+import { OVERVIEW_KICKER_ROW_HEIGHT, OVERVIEW_TITLE_SIZE, OVERVIEW_TITLE_LINE_HEIGHT, OVERVIEW_TITLE_GAP, OVERVIEW_VENUE_LINE_HEIGHT, OVERVIEW_VENUE_GAP, OVERVIEW_FACE_SIZE, OVERVIEW_FACE_ROW_HEIGHT, OVERVIEW_FACE_GAP, OVERVIEW_LEADER_NAME_SIZE, OVERVIEW_LEADER_NAME_LINE_HEIGHT, OVERVIEW_LEADER_NAME_GAP, OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 export { OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 
 
@@ -171,7 +171,7 @@ export function PhotoBand({
         {inPlay && leader ? (
           <div data-overview-leader-trio style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
             {leader.faces.length > 0 ? (
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: OVERVIEW_FACE_GAP, lineHeight: 1.5 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: OVERVIEW_FACE_GAP, height: OVERVIEW_FACE_ROW_HEIGHT, alignItems: 'flex-start', lineHeight: 1.5 }}>
                 {leader.faces.map((face, i) => (
                   <span key={face.key} data-overview-trio-face style={{ display: 'inline-flex', flex: 'none', border: OVERVIEW.trio.faceBorder, borderRadius: '34%', marginLeft: i > 0 ? -8 : 0 }}>
                     <SquircleAvatar size={OVERVIEW_FACE_SIZE} srcCandidates={face.candidates} alt={face.name} userId={face.key} hideRing />

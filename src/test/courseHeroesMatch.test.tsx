@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CourseMasthead, MASTHEAD_NAME } from '@/components/courses/CourseMasthead';
+import { HERO_CONTENT_TOP } from '@/lib/heroHeights';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import type { CourseLegendRow } from '@/lib/gam/types';
 
@@ -61,15 +62,16 @@ describe('Course headers match the Tour material', () => {
     expect(container.querySelector('[data-child]')?.parentElement?.style.borderTop).toContain('1px solid');
     expect(container.querySelector('[data-child]')?.parentElement?.style.marginTop).toBe('13px');
   });
-  it.each([[false,false],[true,false],[false,true],[true,true]])('keeps detail350px and one canonical fade (record%s,modal%s)', (record, modal) => {
+  it.each([[false,false],[true,false],[false,true],[true,true]])('keeps detail flow reference and one canonical fade (record%s,modal%s)', (record, modal) => {
     const { container } = mountDetail(record, modal);
     const fade = container.querySelector('[data-photo-band-fade]');
     expect(container.querySelectorAll('[data-photo-band-fade]')).toHaveLength(1);
-    expect(fade?.parentElement?.style.height).toBe('350px');
+    expect(fade?.parentElement?.style.height).toBe('');
+    expect(fade?.parentElement?.style.paddingTop).toBe(`${HERO_CONTENT_TOP}px`);
     const title = screen.getByRole('heading');
     expect(title.style.fontSize).toBe('26px');
     const overlay = title.closest('h1')?.parentElement?.parentElement?.parentElement?.parentElement;
-    expect(overlay?.style.left).toBe('20px'); expect(overlay?.style.right).toBe('20px'); expect(overlay?.style.bottom).toBe('14px');
+    expect(overlay?.style.margin).toBe('0px 20px'); expect(overlay?.style.position).toBe('relative'); expect(overlay?.style.bottom).toBe('');
     expect(Boolean(screen.queryByText('Course record'))).toBe(record);
   });
   it('keeps gold record,24px hairline avatars and21px gross', () => {
