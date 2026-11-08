@@ -37,3 +37,11 @@ The logs are in `docs/verification/marks/shard1b.log`.
 
 ## Not checked
 The browser checks at 320, 390 and 430px were not run, because signed-in checks are not available. How the double square reads at 320px has not been checked visually. By the CSS, a cell at 320px is about 13px wide, so the double square is 13px with a 1.6px gap, and the inner line should still show.
+
+## Close-out (8 Nov 2026) — authorised ResultTile border test repair
+
+- `src/test/searchOrderAndFallback.test.tsx`: line 74 now asserts `"border: borderless ? 'none' : \`1px solid ${A.BORDER}\`"`; added `expect(playerRow).toContain('<ResultTile borderless>');` after the TILE_INITIALS line. No app code changed.
+- Focused: alsoWeekSection 6/6, homeRailEmpty 1/1, searchOrderAndFallback 2/2 (9/9).
+- Shards (`--maxWorkers=2`, one at a time): 2,007 / 1,855 / 1,992 / 1,895 = 7,749 passed, 0 failed. fw1FeaturedDeck known failure did not appear. Logs: `docs/verification/marks/final-shard{1..4}.log`.
+- Screen fixtures (real stylesheets, real HoleMarks/HoleMarksKey/RoundTilePlot, sample scores; fixture page deleted after): 320/390/430 no horizontal overflow. Double square is 14px at 320 (16px at 390/430); inner line visible — `docs/verification/marks/double_320.png`, full page `all_320.png`.
+- Not reached (device check): live leaderboard, Tour hero board and Also this week with real tournament data inside their full row layouts; signed-in Clubhouse feed round posts.
