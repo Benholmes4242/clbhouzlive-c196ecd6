@@ -330,7 +330,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {heroRounds.map((rd) => (
-              <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
+              <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? TOUR_LIVE_GREEN : T.faint }}>
                 {`R${rd}`}
               </div>
             ))}

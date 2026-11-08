@@ -121,7 +121,7 @@ export function PhotoBand({
         position: 'relative',
         display: 'block',
         width: '100%',
-        height: photoBandHeight(heightPx),
+        height: photoBandHeight(bandHeight),
         margin: 0,
         padding: 0,
         overflow: 'hidden',
@@ -200,7 +200,7 @@ export function PhotoBand({
           </div>
         ) : null}
         </div>
-        {segments.length > 0 ? <p data-overview-photo-situation style={{ margin: '9px 0 0', fontSize: 13.5, lineHeight: 1.4, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
+        {segments.length > 0 ? <p data-overview-photo-situation style={{ margin: `${OVERVIEW_SENTENCE_MARGIN_TOP}px 0 0`, fontSize: OVERVIEW_SENTENCE_FONT_SIZE, lineHeight: OVERVIEW_SENTENCE_LINE_HEIGHT, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
           {segments.map((segment, index) => segment.figure ? <strong key={index} style={{ fontWeight: 700, fontStyle: 'normal', color: 'var(--th-text-primary)', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' }}>{segment.text}</strong> : <span key={index}>{segment.text}</span>)}
         </p> : null}
         {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
