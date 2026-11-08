@@ -495,6 +495,14 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   );
                 })}
                 <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
+                {entity.kind !== 'team' ? (() => {
+                  const tileRound = tileRounds[rowIndex];
+                  const pid = r.player?.id;
+                  const holes = tileRound != null && pid
+                    ? (tileRound === effectiveRound ? curHoleData.byPlayer.get(pid) : prevHoleData.byPlayer.get(pid))
+                    : undefined;
+                  return <HoleTiles holes={holes ? orderedHoleCells(holes) : EMPTY_TILE_CELLS} />;
+                })() : null}
               </RowTag>
             );
           };
