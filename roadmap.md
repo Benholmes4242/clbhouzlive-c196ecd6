@@ -5,7 +5,9 @@
 - [x] Implement countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.
 - [x] Add23 rule cases and assertion ledger; focused214passed/1failed, preview buildOK.
 - [x] Authorised single-line repair; focused215/215, shard1 2028/2028; report and logs updated.
-- [ ] Apply authorised cb57 facts-row repair; verify file9/9, focused215/215, restart four sequential shards, then320/390/430 screens and report.
+- [x] Authorised cb57 repair9/9; focused215/215; fresh sequential shards2028/1874/2002/1935=7839passed (+23 vs7816); report/logs updated.
+- [x] Actual lower-block/photo/tournament fixtures320/390/430, zero overflow/errors; hours/minutes and draw/undrawn/empty states checked.
+- [ ] Device checks: populated real picks, full OverviewHero carousel/frame/cross-fade, authenticated navigation; fixture omits picks and external unmanaged auth prevents live member verification.
 
 ## REVIEW_RECEIPT_NEXT_COURSE
 - [x] Scope receipt to its submitted course and clear receipt/submitted state on next-course and route changes.
