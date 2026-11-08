@@ -17,7 +17,7 @@ import { useAmateurHeroCards } from '@/features/amateur/hero/useAmateurHeroCards
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
-import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 
 /**
  * AMATEUR HERO (BRIEF_AMATEUR_PAGE, block 0).
@@ -46,7 +46,6 @@ import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
  * why the band is short and the meta row is off.
  */
 
-export const AMATEUR_HERO_H = EXPLORE_COURSE_HERO_HEIGHT;
 /** The trace band. Short on purpose: it is a shape, not a chart. */
 export const AMATEUR_HERO_SHAPE_H = 34;
 
@@ -271,7 +270,8 @@ export function AmateurHero({
     <section
       style={{
         position: 'relative',
-        height: AMATEUR_HERO_H,
+        paddingTop: HERO_CONTENT_TOP,
+        paddingBottom: HERO_CONTENT_BOTTOM,
         /* FULL BLEED INTO THE NOTCH: the route is immersive, so the hero pays
            the safe area itself and the photograph runs under the status bar. */
         marginTop: 0,
@@ -355,10 +355,8 @@ export function AmateurHero({
             } else if (isAggregateCard) navigate(`/profile/${subject.user_id}`);
           }}
           style={{
-            position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
+            position: 'relative',
+            margin: '0 16px',
             zIndex: 1,
             display: 'block',
             width: 'auto',

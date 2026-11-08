@@ -27,8 +27,8 @@
  */
 import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { HERO_CONTENT_INSET, W_10 } from '@/components/profile/hero/HeroShell';
-import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
+import { W_10 } from '@/components/profile/hero/HeroShell';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 const DARK_FILL = MEMBER_CELL;
@@ -70,11 +70,8 @@ function HeroSkeleton({
       style={{
         position: 'relative',
         background: A.INK,
-        padding: '0 20px 14px',
-        paddingTop: `calc(${HERO_CONTENT_INSET} + 18px)`,
-        /* Matches the 350px photo hero floor (HERO_PHOTO_HEIGHT) so the
-           loaded hero lands on the silhouette without a jump. */
-        minHeight: HERO_PHOTO_HEIGHT,
+        padding: `0 20px ${HERO_CONTENT_BOTTOM}px`,
+        paddingTop: HERO_CONTENT_TOP,
         fontFamily: SANS,
       }}
     >

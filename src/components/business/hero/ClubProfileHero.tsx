@@ -17,7 +17,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
-import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 
 const CANVAS = '#0B0B0D';
 const INK = '#F8FAFC';
@@ -171,7 +171,8 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         data-club-cover=""
         style={{
           position: 'relative',
-          height: HERO_PHOTO_HEIGHT,
+          paddingTop: HERO_CONTENT_TOP,
+          paddingBottom: HERO_CONTENT_BOTTOM,
           background: p.coverUrl ? CANVAS : 'linear-gradient(180deg, #17171B 0%, #0B0B0D 100%)',
           overflow: 'hidden',
         }}
@@ -182,10 +183,10 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         {p.coverUrl && <PhotoBandFade canvas={CANVAS} />}
 
         {/* Identity on the photo: place kicker + Share/More, then crest + name. */}
-        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+        <div style={{ position: 'relative', margin: '0 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>
             {p.placeLine ? <span data-club-place="" style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{p.placeLine}</span> : <span />}
-            <div style={{ display: 'flex', gap: 8, flex: 'none' }}>
+            <div style={{ display: 'flex', gap: 8, flex: 'none', margin: '-11px 0' }}>
               <button type="button" aria-label={t('business.clubHero.share', 'Share')} onClick={p.onShare} style={circle(34)}>
                 <Share {...ICON} />
               </button>

@@ -11,7 +11,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 import { W_55 } from './HeroShell';
-import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
@@ -125,10 +125,8 @@ export const ProfileCoverBand: React.FC<Props> = ({
     <section
       style={{
         position: 'relative',
-        /* The 350px photo hero rule: fixed height, notch counted inside.
-           The crop frame keeps PERSONAL_COVER_ASPECT (39/34); the hero crops
-           to its own shape. Clearance arithmetic lives in coverAspect.ts. */
-        height: HERO_PHOTO_HEIGHT,
+        paddingTop: HERO_CONTENT_TOP,
+        paddingBottom: HERO_CONTENT_BOTTOM,
         overflow: 'hidden',
         background: A.CANVAS,
         fontFamily: SANS,
@@ -150,16 +148,14 @@ export const ProfileCoverBand: React.FC<Props> = ({
 
       <div
         style={{
-          position: 'absolute',
-          left: 20,
-          right: 20,
-          bottom: 14,
+          position: 'relative',
+          margin: '0 20px',
           zIndex: 1,
         }}
       >
         {/* Row 1: the home club as the amber kicker, controls on the right.
             With no club the controls sit alone on the right. */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>
           {subline ? (
             <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{subline}</span>
           ) : onAddHomeClub ? (
@@ -174,7 +170,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
             <span />
           )}
           {action && (
-            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7 }}>
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, margin: '-10px 0' }}>
               {action}
             </div>
           )}

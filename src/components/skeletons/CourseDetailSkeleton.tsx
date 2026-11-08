@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
 
@@ -26,11 +27,11 @@ export const CourseDetailSkeleton = () => {
   return (
     <div className="min-h-screen bg-background pb-20 animate-in fade-in duration-200">
       {/* Hero skeleton */}
-      <div className="relative h-[400px]">
+      <div className="relative" style={{ paddingTop: HERO_CONTENT_TOP, paddingBottom: HERO_CONTENT_BOTTOM }}>
         <Skeleton className="absolute inset-0 rounded-none" />
         {/* Title area */}
         {/* Masthead shape: kicker, name, place, figure row. */}
-        <div className="absolute inset-x-0 bottom-4 px-4">
+        <div className="relative px-5">
           <CourseMastheadSkeleton rowHeight={33} />
         </div>
       </div>

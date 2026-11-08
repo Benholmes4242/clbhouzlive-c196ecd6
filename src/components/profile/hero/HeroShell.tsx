@@ -12,7 +12,7 @@
 import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
-import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 
 /* The hero's FALLBACK GROUND, shown only when there is no cover photo.
@@ -50,8 +50,8 @@ export const HERO_CONTENT_INSET =
  * where a lineHeight is stated inline.
  * ------------------------------------------------------------------ */
 const LINE = 1.5;
-const H_PAD_TOP = 18;          // content gap below HERO_CONTENT_INSET
-const H_PAD_BOTTOM = 16;       // section padding-bottom
+const H_PAD_TOP = 0;          // content gap below HERO_CONTENT_INSET
+const H_PAD_BOTTOM = HERO_CONTENT_BOTTOM;       // section padding-bottom
 const H_IDENTITY_ROW = 56;     // 56px avatar floors the row (name + subline are shorter)
 const H_HEADLINE_GAP = 18;     // headline button marginTop
 const H_HEADLINE_LABEL = 8.5 * LINE;
@@ -86,7 +86,7 @@ const HERO_TALLEST_CONTENT = Math.ceil(
 /** What the square must clear: HERO_CONTENT_INSET + HERO_TALLEST_CONTENT
  *  (227 now the sparkline is gone). Kept as documentation; the block carries
  *  NO floor (see coverAspect.ts), so the crop frame equals the rendered square. */
-void HERO_TALLEST_CONTENT;
+
 
 export interface HeroCounter {
   key: string;
@@ -330,21 +330,10 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         width: '100%',
         maxWidth: '100%',
         overflow: 'hidden',
-        /* MINIMUM top inset - it clears the status bar and ChromeIsland and
-           still does under bottom-anchoring: `justify-content: flex-end`
-           packs content against the padding box's BOTTOM edge and can only
-           ever overflow downwards, never up past padding-top. */
-        paddingTop: `calc(${HERO_CONTENT_INSET} + 18px)`,
-        /* Content bottom-anchors. The floor below is set by the TALLEST
-           content case (personal hero with index, trend and sparkline), which
-           fills it exactly - so this is a no-op there. Heroes with less inside
-           them (business, personal with no handicap connection) used to strand
-           their identity block at the top with the slack collecting beneath
-           it; now the slack collects ABOVE as photograph. Heroes with no cover
-           have no floor, so there is no slack and nothing moves. */
+        paddingTop: HERO_CONTENT_TOP,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
         fontFamily: SANS,
         color: '#FFFFFF',
         isolation: 'isolate',
@@ -355,12 +344,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
            `coverBroken` is set by onError after first paint, so gating on it
            would collapse the block post-paint - a worse jump than the one the
            floor removes. A URL that 404s keeps the floor and shows ink. */
-        /* The 350px photo hero rule, as a FLOOR not a fixed height: content
-           needs safe-area + 62 + 227 (348 with a 59pt notch), so the block
-           must be able to grow past 350 rather than clip. Bottom-anchored
-           content (justify-content: flex-end) keeps the extra as photograph
-           above. Without a cover there is no floor and content height rules. */
-        minHeight: coverUrl ? HERO_PHOTO_HEIGHT : undefined,
+        minHeight: coverUrl ? HERO_CONTENT_TOP + HERO_TALLEST_CONTENT : undefined,
 
 
 

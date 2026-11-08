@@ -1,8 +1,8 @@
-.rv2-header--photo { height: 350px; }
+.rv2-header--photo { height: auto; }
 .rv2-header--compact { height: calc(env(safe-area-inset-top, 0px) + 68px); }
 .rv2-header--photo, .rv2-header--compact { transition: height 200ms ease; }
 /* The photo hero is one block: the photograph fills its whole height. */
-.rv2-photo { height: 100%; }
+.rv2-photo { height: auto; }
 
 @media (prefers-reduced-motion: reduce) {
   .rv2-fold-header, .rv2-fold-header * { transition: none !important; }
