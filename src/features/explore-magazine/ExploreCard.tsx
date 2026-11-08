@@ -11,6 +11,7 @@ import { RoundTilePlot, homePanelCallout, feedStrokesReceived } from '@/componen
 import { formatDisplayedHcp } from '@/lib/whs/format';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
+import { CompetitionMark } from '@/components/explore-tab-new/courseled/CompetitionMark';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MessageCircle } from 'lucide-react';
 import { LikedByRow } from '@/components/likes/LikedByRow';
@@ -1665,7 +1666,7 @@ export function ExploreCard({
         style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: A.INK, fontFamily: SANS, ...FIGS }}
       >
         <span style={{ display: 'block', padding: '12px 14px 0' }}>
-          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} />
         </span>
         <span data-round-score-block="true" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '14px 14px 0' }}>
           {netShown ? (
@@ -1750,7 +1751,7 @@ export function ExploreCard({
         style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: A.INK, fontFamily: SANS, ...FIGS }}
       >
         <span data-feed-round-head="true" style={{ display: 'block', paddingInline: 4, paddingTop: 12 }}>
-          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} />
           {/* CB60 — no name, no line: the span and its 12px margin are absent. */}
           {feedRoundCourse ? (
             <span data-feed-round-course="true" style={{ display: 'block', marginTop: 12, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -1822,7 +1823,7 @@ export function ExploreCard({
     >
       {item.kind === 'round' && size !== 'pair' && !onPhoto ? (
         <span style={{ display: 'block', paddingInline: 4, paddingBottom: 12 }}>
-          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} />
         </span>
       ) : null}
       <span style={{ position: 'relative', display: 'block', marginInline: bleed != null ? -bleed : undefined }}>{photo}</span>
