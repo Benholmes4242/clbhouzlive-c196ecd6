@@ -5,7 +5,7 @@
  * no colour is declared twice. Used only by the Overview hero, its bands and
  * the heroBoard theme of MiniBoard.
  */
-import { AMBER, INK, INK_FAINT, INK_MUTE, WHITE_ALPHA_08, INK_TINT_04, WHITE_ALPHA_18, WHITE_ALPHA_30, HAIRLINE_INK_10 } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, WHITE_ALPHA_08, INK_TINT_04, WHITE_ALPHA_18, WHITE_ALPHA_30, HAIRLINE_INK_10, TOUR_LIVE_GREEN } from '../../_shared/tokens';
 
 export const OVERVIEW = {
   /** Muted caps / secondary figures on the dark band ground. */
@@ -20,7 +20,9 @@ export const OVERVIEW = {
     todo: WHITE_ALPHA_30,
     label: 'rgba(255,255,255,0.50)',
     connector: WHITE_ALPHA_18,
-    liveHalo: '0 0 0 3px rgba(247,147,30,0.25)',
+    /** Green means LIVE (TOUR_LIVE_GREEN at 18%); amber is reserved for the viewer. */
+    live: TOUR_LIVE_GREEN,
+    liveHalo: '0 0 0 3px rgba(52,215,127,0.18)',
   },
   trio: {
     faceBorder: '1.5px solid rgba(8,12,16,0.9)',
