@@ -27,8 +27,8 @@ describe('PF4 shot persistence', () => {
   });
   it('hydration prefers shot hole over old URL tag', () => { expect(existingTagFor('u', { holes: [{ media_url: 'u', hole_no: 7 }] as never, places: [] }, 2)).toEqual({ hole: 2 }); });
   it('hydration falls back to old URL tag', () => { expect(existingTagFor('u', { holes: [{ media_url: 'u', hole_no: 7 }] as never, places: [] }, null)).toEqual({ hole: 7 }); });
-  it('retag removes old URL row before setting shot hole', async () => { await rewriteExistingShotTag('c', 'me', [], { existingId: 'm', type: 'image', previewUrl: 'u' }, { hole: 4 }, { holes: [{ media_url: 'u' }] as never, places: [] }, 'me'); expect(h.events).toEqual(['remove', ['post_media', { hole_no: 4 }]]); });
-  it('untag clears shot hole', async () => { await rewriteExistingShotTag('c', 'me', [], { existingId: 'm', type: 'image', previewUrl: 'u' }, null, { holes: [], places: [] }, 'me'); expect(h.events).toEqual([['post_media', { hole_no: null }]]); });
+  it('retag removes old URL row before setting shot hole', async () => { await rewriteExistingShotTag('c', 'me', [], { existingId: 'm', type: 'image', previewUrl: 'u' }, { hole: 4 }, { holes: [{ media_url: 'u' }] as never, places: [] }, 'me'); expect(h.events[0]).toBe('remove'); expect(h.events[1]).toEqual(['post_media', { hole_no: 4, studio_edits: { shotTag: { tag: { hole: 4 }, courseId: 'c', knownHoles: [] } } }]); });
+  it('untag clears shot hole', async () => { await rewriteExistingShotTag('c', 'me', [], { existingId: 'm', type: 'image', previewUrl: 'u' }, null, { holes: [], places: [] }, 'me'); expect(h.events).toEqual([['post_media', { hole_no: null, studio_edits: { shotTag: null } }]]); });
   it('composer writer has no client hole-library inserts', () => { const source = readFileSync('src/features/post-v2/lib/shotTagWrites.ts', 'utf8'); expect(source).not.toMatch(/submitLibraryHolePhoto|submitLibraryHoleVideo|submitHolePhoto\(/); });
 });
 describe('PF4 audience rules', () => {

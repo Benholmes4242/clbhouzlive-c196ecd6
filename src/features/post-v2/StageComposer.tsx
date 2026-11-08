@@ -82,7 +82,6 @@ import { readPostWith, syncPostWith } from './lib/postWith';
 import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
 import { refreshAuthorPosts } from './lib/refreshAuthorPosts';
 import {ComposerCourseBlock,ComposerAttachRound,ComposerRoundsSheet} from './components/golf/ComposerGolf';
-import {useCourseTeeSets} from '@/features/courses/hooks/useCourseTeeSets';
 import {useRoundHoleShapes} from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,roundIsRecent} from './lib/composerGolfReads';
 import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,effectiveHoleGuide,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
@@ -246,6 +245,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       id: `existing-${m.id}`,
       existingId: m.id,
       holeNo: m.holeNo ?? null,
+      shotTag: m.shotTag ?? null,
       type: m.mediaType,
       /* A VIDEO'S PLAYABLE URL IS BUILT FROM stream_id, NEVER READ FROM
        * media_url: 37 of 157 video rows store the sentinel 'stream:<uid>' there,
@@ -418,7 +418,6 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const [golfSuggestions,setGolfSuggestions]=useState<CourseSuggestion[]>([]);
   const [selectedRoundId,setSelectedRoundId]=useState<string|null>(null);
   const [roundSheetOpen,setRoundSheetOpen]=useState(false);
-  const teeSets=useCourseTeeSets(state.course?.id);
   const selectedRound=golfRounds.find(r=>r.whs_score_id===(state.attachedScoreId ?? selectedRoundId)) ?? golfRounds[0] ?? null;
   const shapes=useRoundHoleShapes(state.attachedScoreId ? [state.attachedScoreId] : []);
   const attachedRound = golfRounds.find(r => r.whs_score_id === state.attachedScoreId);
@@ -489,7 +488,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         const map: Record<string, ShotTagChoice> = {};
         const initial: Record<string, ShotTag> = {};
         for (const m of existing) {
-          const t = existingTagFor(existingMediaUrl(m), tags, m.holeNo);
+          const t = m.holeNo != null ? { hole: m.holeNo } : m.shotTag?.tag ?? existingTagFor(existingMediaUrl(m), tags);
           if (t) { map[m.id] = { tag: t, courseId: course.id, knownHoles: [] }; initial[m.id] = t; }
         }
         initialExistingTagsRef.current = initial;
@@ -600,7 +599,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
      actually feed it — personal actor, Everyone audience, with media. The
      member's own switch (state.addToGuide) is never rewritten by audience
      changes, so switching back to Everyone restores it. */
-  const guideEffective = effectiveHoleGuide(state.addToGuide, state.media.length, isPersonalActor, visibility);
+  
   /** Tags for photos still to upload, carried by the upload job. */
   const newShotTagJob = useCallback((items: typeof state.media) => {
     const out: Record<string, ShotTagChoice> = {};
@@ -1155,7 +1154,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
   const tagAndDetails = (
     <>
-      <ComposerCourseBlock course={state.course} reason={courseReason} suggestions={golfSuggestions} hole={state.holeNo??null} tags={state.postShotTags??[]} holes={teeSets.data?.[0]?.holes??[]} onChange={()=>{openDetail('course');setSheet('course');}} onPick={c=>chooseCourses([c])} onHole={holeNo=>setGolf({holeNo})} onTags={postShotTags=>setGolf({postShotTags})}/>
+      <ComposerCourseBlock course={state.course} reason={courseReason} suggestions={golfSuggestions} hole={state.holeNo??null} tags={state.postShotTags??[]} holes={[]} onChange={()=>{openDetail('course');setSheet('course');}} onPick={c=>chooseCourses([c])} onHole={holeNo=>setGolf({holeNo})} onTags={postShotTags=>setGolf({postShotTags})}/>
       {isPersonalActor&&selectedRound&&golfRounds.some(roundIsRecent)&&<ComposerAttachRound round={selectedRound} on={!!state.attachedScoreId} hole={state.holeNo??null} shape={shapes?.get(state.attachedScoreId??'')??null} onToggle={()=>setGolf({attachedScoreId:state.attachedScoreId?null:selectedRound.whs_score_id})} onDifferent={()=>setRoundSheetOpen(true)}/>}
 
       {state.courses.length > 1 && (

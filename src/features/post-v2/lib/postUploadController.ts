@@ -158,7 +158,7 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
   const hasCropAdjust = !!crop && (crop.scale !== 1 || crop.x !== 50 || crop.y !== 50);
   const shouldBake = (item.frame && item.frame !== 'original') || hasCropAdjust;
   if(item.remoteUrl && !shouldBake) {
-    await insertMediaRow(ctx.postId,displayOrder,{...shotMediaPatch(ctx.shotTags,item.id),media_type:'image',media_url:item.remoteUrl,width:item.naturalWidth??null,height:item.naturalHeight??null,filter_id:item.filterId??null,studio_edits:{frame:item.frame,crop:item.crop??null}});
+    await insertMediaRow(ctx.postId,displayOrder,{...shotMediaPatch(ctx.shotTags,item.id),media_type:'image',media_url:item.remoteUrl,width:item.naturalWidth??null,height:item.naturalHeight??null,filter_id:item.filterId??null,studio_edits:{shotTag:ctx.shotTags?.items[item.id]??null,frame:item.frame,crop:item.crop??null}});
     job.perFile[item.id]=100;emitSnapshot(job);
     uploadEventBus.emit('file:upload-complete',{type:'file:upload-complete',jobId:ctx.jobId,fileId:item.id});return;
   }
@@ -224,7 +224,7 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
     aspect_ratio: compressed.width && compressed.height ? compressed.width / compressed.height : null,
     width: compressed.width ?? null,
     height: compressed.height ?? null,
-    studio_edits: { frame: item.frame, crop: item.crop ?? null },
+    studio_edits: { shotTag: ctx.shotTags?.items[item.id] ?? null, frame: item.frame, crop: item.crop ?? null },
   });
   await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { url: result.publicUrl }, tag => { (job.snapshot.savedHoleTags ??= []).push(tag); });
 
@@ -246,7 +246,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
   });
 
   if(item.remoteUrl && item.streamId) {
-    await insertMediaRow(ctx.postId,displayOrder,{...shotMediaPatch(ctx.shotTags,item.id),media_type:'video',media_url:item.remoteUrl,stream_id:item.streamId,poster_url:item.posterUrl??derivePosterUrl({streamId:item.streamId,posterTimestamp:item.posterTimestamp??null,durationSeconds:item.duration??null}),width:item.naturalWidth??null,height:item.naturalHeight??null,duration_seconds:item.duration??null,trim_start:item.trimStart??null,trim_end:item.trimEnd??null,poster_timestamp:item.posterTimestamp??null,filter_id:item.filterId??null,studio_edits:{frame:item.frame,crop:item.crop??null}});
+    await insertMediaRow(ctx.postId,displayOrder,{...shotMediaPatch(ctx.shotTags,item.id),media_type:'video',media_url:item.remoteUrl,stream_id:item.streamId,poster_url:item.posterUrl??derivePosterUrl({streamId:item.streamId,posterTimestamp:item.posterTimestamp??null,durationSeconds:item.duration??null}),width:item.naturalWidth??null,height:item.naturalHeight??null,duration_seconds:item.duration??null,trim_start:item.trimStart??null,trim_end:item.trimEnd??null,poster_timestamp:item.posterTimestamp??null,filter_id:item.filterId??null,studio_edits:{shotTag:ctx.shotTags?.items[item.id]??null,frame:item.frame,crop:item.crop??null}});
     job.perFile[item.id]=100;emitSnapshot(job);uploadEventBus.emit('file:upload-complete',{type:'file:upload-complete',jobId:ctx.jobId,fileId:item.id});return;
   }
   if (!item.file) throw new Error('Video item missing file');
@@ -311,7 +311,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
     width:item.naturalWidth??null,
     height:item.naturalHeight??null,
     duration_seconds:item.duration??null,
-    studio_edits: { frame: item.frame, crop: item.crop ?? null },
+    studio_edits: { shotTag: ctx.shotTags?.items[item.id] ?? null, frame: item.frame, crop: item.crop ?? null },
   });
   await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { streamId }, tag => { (job.snapshot.savedHoleTags ??= []).push(tag); });
 

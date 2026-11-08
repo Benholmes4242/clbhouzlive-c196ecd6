@@ -74,7 +74,7 @@ export async function rewriteExistingShotTag(
     for (const row of tags.holes.filter((r) => r.media_url === url)) await removeHoleTag(row, memberId);
     for (const row of tags.places.filter((r) => r.media_url === url)) await removeCoursePlaceMedia(row, memberId);
     if (item.existingId) {
-      const { error } = await supabase.from('post_media').update({ hole_no: isHoleTag(next) ? next.hole : null } as never).eq('id', item.existingId);
+      const { error } = await supabase.from('post_media').update({ hole_no: isHoleTag(next) ? next.hole : null, studio_edits: { shotTag: next ? { tag: next, courseId, knownHoles } : null } } as never).eq('id', item.existingId);
       if (error) throw error;
     }
     if (!next || isHoleTag(next) || !personal || visibility !== 'anyone') return;
