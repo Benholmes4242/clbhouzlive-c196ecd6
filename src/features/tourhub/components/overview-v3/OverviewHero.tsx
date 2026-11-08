@@ -382,13 +382,29 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             activeTournamentId={active.tournament.id}
             onSelectTour={NOOP}
             onOpenTournament={openTournament}
-            onFullBoard={fullBoardAvailable ? fullBoard.onOpen : undefined}
           />
         </motion.div>
       </AnimatePresence>
 
 
 
+    </div>
+
+    {/* THE TOUR CHIP ROW — directly under the photo band in EVERY state,
+        above whatever comes first (movers on live, the champion block on
+        finished, the upcoming facts and picks on upcoming). It does NOT
+        cross-fade with the slide: it stays put while the content below
+        changes. The row scrolls horizontally, never wraps, and runs to the
+        screen's right edge so the next chip peeks in. */}
+    <div ref={chipRowRef}>
+      <RailChips
+        options={chipOptions}
+        value={active.tournament.id}
+        onChange={onChipChange}
+        ariaLabel="Tour"
+        toggleSemantics
+        className="overview-tour-chips"
+      />
     </div>
 
     {/* The band EXTENDS the hero downward. It tracks the active slide and
@@ -404,6 +420,9 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
+          {/* On finished events the champion block follows the chip row
+              rather than the photo (BUILD_TOUR_BUTTONS_UNDER_HERO §1). */}
+          <OverviewChampionBlock slide={activeSlide} state={heroState} />
           <HeroBoardSection
             tournamentId={bandTournamentId}
             eventName={activeSlide?.tournament.name}
