@@ -1,11 +1,9 @@
-/** Board-only broadcast layout. Canonical columns/today/cut/team/prize helpers
- * remain authoritative. MiniBoard geometry and hero taps are frozen.
- * BoardRound owns compact inline marks; whole-field reads and member follows
- * are injected by the page/sheet wrapper, never queried by an individual row. */
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+/** Single-line broadcast board. Row clicks and keyboard activation delegate
+ * to the parent-owned scorecard sheet; only that sheet reads hole data.
+ * Canonical columns/today/cut/team/prize and member-follow display stay shared. */
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { fmtScore } from '../utils/fmtScore';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { getScoreColor } from '../_shared/scoreColor';
 import { formatEarnings } from '../_shared/formatEarnings';
@@ -15,7 +13,6 @@ import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TO
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
-import { BoardRound, HoleMarks, HoleMarksKey, MARK_SURFACE_LEADER, MARK_SURFACE_MINE, orderedHoleCells } from './BoardRound';
 import type { BoardHole } from './useBoardHoles';
 import { boardTieRole } from './leaderboardRules';
 import './leaderboard.css';
@@ -448,13 +445,10 @@ export function BoardTable({
   teeTimes,
   movementEntries,
   teamInitials,
-  holesByPlayer = new Map(), followedIds = new Set(), pickPlayerIds,
-  inlineRound, onFollow, followBusy = false, followError = false,
-  yourPlayers = false, tourSlug,
+  followedIds = new Set(), pickPlayerIds,
+  yourPlayers = false,
 }: Props) {
   const { t } = useTranslation('tourhub');
-  const navigate = useNavigate();
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [containerW, setContainerW] = useState(0);
@@ -636,8 +630,6 @@ export function BoardTable({
       : `${e.position_tied ? 'T' : ''}${e.position}`;
     const tie = opts?.tie ?? '';
     const showPosition = yourPlayers || !['middle','last'].includes(tie);
-    const holes = e.player?.id ? holesByPlayer.get(e.player.id) ?? [] : [];
-    const round = inlineRound ?? currentRound ?? columns.rounds.at(-1) ?? 1;
     const isLeader = !demotedRow && e.position === 1;
     const totColor = demotedRow ? SECONDARY : houseColor(e.score);
     const totalDisplay = fmtBoardScore(e.score);
@@ -655,34 +647,35 @@ export function BoardTable({
     const accessibleName = entity.lines.filter(Boolean).join(' / ');
 
     const open = () => {
-      setExpandedId(previous => previous === e.id ? null : e.id);
+      if (!pid) return;
+      onRowClick?.(e);
     };
 
     return (
-      <Fragment key={e.id}><div
-        role="button"
-        tabIndex={0}
+      <div key={e.id}
+        role={pid ? "button" : undefined}
+        tabIndex={pid ? 0 : undefined}
         aria-label={accessibleName || undefined}
-        aria-expanded={expandedId === e.id}
         data-board-row={e.id}
         data-tie-role={tie || undefined}
         data-your-player={yourPlayers || undefined}
         onClick={open}
         onKeyDown={(k) => {
-          if (k.key === 'Enter' || k.key === ' ') open();
+          if (pid && (k.key === 'Enter' || k.key === ' ')) {
+            k.preventDefault();
+            open();
+          }
         }}
         style={{
           position: 'relative',
           display: 'grid',
           gridTemplateColumns: template,
-          gridTemplateRows: 'auto auto',
           columnGap: columns.gap,
-          rowGap: 7,
           alignItems: 'center',
-          padding: `${entity.kind === 'team' ? 9 : 10}px ${ROW_PAD_X}px`,
+          padding: `12px ${ROW_PAD_X}px`,
           background: yourPlayers ? 'var(--tour-board-mine)' : isLeader ? 'var(--tour-board-leader)' : surface,
           opacity: demotedRow ? 0.55 : 1,
-          cursor: 'pointer',
+          cursor: pid ? 'pointer' : 'default',
           fontFamily: F,
         }}
       >
@@ -821,18 +814,9 @@ export function BoardTable({
               </div>
             )}
 
-            {/* LINE 2 — the current round's holes as scorecard marks across the
-                FULL row width, from the row's left edge to under TOT. */}
-            {!demotedRow && entity.kind !== 'team' && pid && holes.length > 0 ? (
-              <HoleMarks holes={orderedHoleCells(holes)} surface={yourPlayers ? MARK_SURFACE_MINE : isLeader ? MARK_SURFACE_LEADER : surface} />
-            ) : null}
           </>
         )}
       </div>
-      <div className="tour-round-expand" data-open={expandedId === e.id}>
-        {expandedId === e.id && <BoardRound holes={holes} round={round} thru={e.thru} following={!!pid && followedIds.has(pid)} busy={followBusy} error={followError}
-          onFull={() => onRowClick?.(e)} onFollow={() => { if (pid) onFollow?.(pid); }} onPlayer={() => { if (pid) navigate(`/tourhub/player/${pid}`); }} />}
-      </div></Fragment>
     );
   };
 
@@ -850,9 +834,6 @@ export function BoardTable({
     <div className="tour-board-shell" ref={rootRef} data-board-name-tier={tier} data-board-show-prize={columns.showPrize ? 'true' : 'false'}>
       {renderHeader()}
       {parts}
-      {!columns.preTournament && entries.length > 0 ? (
-        <HoleMarksKey surface="var(--tour-board-canvas)" />
-      ) : null}
     </div>
   );
 }
