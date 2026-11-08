@@ -1,10 +1,11 @@
 # Roadmap
 
 ## PF4_COMPOSER_FIX
-- [ ] Match media Edit sheet and inline Played with to signed-off A–D screens.
-- [ ] Save per-shot holes, gate place publication, hydrate/retag existing shots, and remove post-wide composer writes/draft values.
-- [ ] Share per-slide hole context across Preview/feed/fullscreen; update draft summary.
-- [ ] Add rule/interaction tests, run four separate two-worker shards, verify 320px and report all five checks.
+- [x] Implement media Edit sheet and inline Played with; simplify On the course.
+- [x] Save per-shot holes, gate place publication, retain shot tags in existing studio metadata/drafts, hydrate/retag existing shots, and stop post-wide writes.
+- [x] Wire per-slide context to Preview/feed/fullscreen and draft summary; focused124/124; preview buildOK.
+- [x] Run four separate two-worker shards:1994/1858/1977/1893passed+6failed;7728executed versus7702baseline (+26cases/onefile).
+- [ ] STOP: profileFeedInViewGate.test.tsx six cases fail: “No QueryClient set, use QueryClientProvider to set one”; usePostGolfContext.ts:83:20 via LightCardFeed.tsx:162:26. No repair authorized;320px/browser and five device checks remain unverified. See PF4_COMPOSER_FIX_REPORT.md.
 
 ## COURSE_HEROES_MATCH
 - [x] Match course-list/detail material and opt-in masthead typography; preserve gold/default callers. Preview buildOK.
