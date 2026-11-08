@@ -2,27 +2,40 @@
 
 ## Result
 Upcoming-only implementation is in place. Verification is incomplete; no completion claim.
-The latest preview signal is `build OK` at 2026-11-08T22:26:26Z.
+The latest preview signal is `build OK` at 2026-11-08T22:31:34Z. No production changes in this repair turn.
 
 ## Stop
 Command:
 `bunx vitest run src/test/upcomingOverviewPlus.test.tsx src/test/upcomingLastYearBoard.test.tsx src/test/tourOverviewMergedAiry.test.tsx src/test/tourOverviewDesignA.test.ts src/test/overviewHeroBStrip.test.tsx src/test/tourOverviewPicksChipsFullBoard.test.tsx src/test/tournamentV3Sections.test.tsx src/test/tournamentV3Rules.test.ts src/test/tournamentV3Page.test.tsx --maxWorkers=2`
 
-**214 passed, 1 failed; 215 executed across 9 files.**
+**Authorised repair applied; fresh focused run: 215/215 passed across 9 files.**
 
-Unexpected surviving assertion:
-- File: `src/test/tourOverviewPicksChipsFullBoard.test.tsx:179:75`
-- Test: `no "Full board" link on the photo band > is absent for live, completed (awaiting-playoff) and upcoming heroes alike`
-- Assertion: `expect(document.querySelector('[data-overview-photo-situation]')).not.toBeNull();`
-- Tool: `AssertionError: expected null not to be null`
+Exactly one line changed in `src/test/tourOverviewPicksChipsFullBoard.test.tsx:179`, case `is absent for live, completed (awaiting-playoff) and upcoming heroes alike`:
+- Old: `expect(document.querySelector('[data-overview-photo-situation]')).not.toBeNull();`
+- New: `expect(document.querySelector('[data-overview-photo-situation]')).toBeNull();`
+- Reason: no history and no draw correctly omit the upcoming sentence.
+No other change in that file; no assertion/case count delta.
+Original stopped output remains in `docs/verification/upcoming-overview-plus/focused.log`; fresh output is `focused-repair.log` beside it.
 
-Its fixture supplies neither history nor draw, so the new no-sentence rule returns null. The failing assertion was left untouched under the stop rule. Output preserved in `docs/verification/upcoming-overview-plus/focused.log`.
+### New unexpected stop — shard 2
+- File: `src/test/cb57HeroBoardRemovals.test.tsx:64:65`
+- Case: `CB57 hero board removals > renders an empty upcoming band without a placeholder or reserved height`
+- Assertion: `expect(view.container.firstElementChild?.childElementCount).toBe(0);`
+- Tool: `AssertionError: expected 1 to be +0 // Object.is equality`
+- Expected: `0`; received: `1`.
+The test was not changed. Its mount passes `venuePar={72}` even when picks/facts are switched off; the new upcoming facts row therefore has a qualifying PAR cell. This source observation is not a repair or authority to alter the fixture.
+Under the requested stop rule, shards 3–4 and the subsequent screen checks were not run.
 
 ## Counts
 Previous Tour buttons reported baseline: **7,816**.
 New `upcomingOverviewPlus.test.tsx`: **23 cases**, all passed.
 No tests deleted. Existing updates preserve case counts. Expected full-suite inventory **7,839** (+23); not verified by a complete suite run.
-Shard 1: not run. Shard 2: not run. Shard 3: not run. Shard 4: not run. Stopped at focused verification.
+Separate commands, strictly sequential:
+- `bunx vitest run --shard=1/4 --maxWorkers=2`: **2,028 passed / 2,028 executed**, 171 files passed.
+- `bunx vitest run --shard=2/4 --maxWorkers=2`: **1,873 passed, 1 failed / 1,874 executed**, 170 files passed / 1 failed.
+- Shards 3 and 4: **not run** after the unexpected stop.
+Partial full-suite execution: **3,902 executed = 3,901 passed + 1 failed**. Not a full-suite total. Neither permitted known failure appeared. No linkedHandicapState isolated rerun was needed.
+Logs: `docs/verification/upcoming-overview-plus/shard1-repair.log` and `shard2-repair.log`.
 
 ## Changed files in this build
 - `src/features/tourhub/components/overview-v3/upcomingOverviewRules.ts`
@@ -63,10 +76,12 @@ No cases deleted. Cases renamed/reworked below retain their count.
 `tourOverviewMergedAiry.test.tsx`:
 - `tightens upcoming first tee and last-year rows without changing their contents` → `omits undrawn unknown facts and uses the upcoming history grammar`: old facts padding `10px 20px` → absent row for unknown/undrawn fixture; heading padding `2px 20px` → upcoming-kicker; row padding `5px 20px` → distinct upcoming-last-header plus zero-padded row. New facts only show qualified values.
 
+`tourOverviewPicksChipsFullBoard.test.tsx`: authorised one-line `.not.toBeNull()` → `.toBeNull()` repair detailed above; case name and count unchanged.
+
 `overviewHeroBStrip.test.tsx`: no assertion/case changes. Added empty `usePickField` export to existing hook mock for new batched read dependency.
 
 ## Screen/device checks
-Upcoming 320/390/430 after-draw, before-draw, no-picks/no-follows, no-history, HOURS, MINUTES and tournament course comparison: **not run following stop**.
+Upcoming 320/390/430 after-draw, before-draw, no-picks/no-follows, no-history, HOURS, MINUTES and tournament course comparison: **not run following the shard-2 stop**.
 Authenticated live readback/navigation is also unverified (external unmanaged authentication).
 
 ## Protected scope
