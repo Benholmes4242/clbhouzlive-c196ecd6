@@ -12,7 +12,6 @@ import {
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
-import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
 import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/courses/CourseMasthead';
 import { OVERVIEW } from '../overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -180,13 +179,9 @@ export function PhotoBand({
         ) : null}
 
         {isUpcoming && countdown.length > 0 ? (
-          <div data-overview-countdown style={{ display: 'flex', gap: 6, flex: 'none' }}>
-            {countdown.map((unit) => (
-              <div key={unit.label} style={{ minWidth: 50, padding: '8px 10px', borderRadius: 12, textAlign: 'center', ...DARK_CHROME_GLASS_MATERIAL }}>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 24, lineHeight: 1, fontWeight: 700 }}>{unit.value}</div>
-                <div style={{ ...CAPS_10, marginTop: 5, fontSize: 9 }}>{t(`overview.hero.${unit.label}`)}</div>
-              </div>
-            ))}
+          <div data-overview-countdown style={{ flex: 'none', alignSelf: 'flex-end', textAlign: 'right' }}>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, color: INK }}>{countdown[0].value}</div>
+            <div style={{ marginTop: 4, fontSize: 10, lineHeight: 1.2, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps }}>{t(`overview.upcomingPlus.${countdown[0].label}`, { count: countdown[0].value })}</div>
           </div>
         ) : null}
         </div>

@@ -359,7 +359,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         position: 'relative',
         width: '100%',
         height: activeHeroHeight,
-        minHeight: height === undefined ? OVERVIEW_HERO_TOTAL_HEIGHT : undefined,
+        minHeight: height === undefined && heroState.kind !== 'upcoming' ? OVERVIEW_HERO_TOTAL_HEIGHT : undefined,
       }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -445,6 +445,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             }
             championPlayerIds={championGate ? activeChampionMemberIds : []}
             venuePar={activeSlide?.tournament.venuePar ?? null}
+            purse={activeSlide?.tournament.purse ?? null}
             onRowTap={(playerId) =>
               analyticsEvents.track('hero_board_row_tap', {
                 tournament_id: bandTournamentId,

@@ -352,6 +352,19 @@
     "page": {
       "offlineBanner": "You're offline. Some data may be outdated."
     },
+    "upcomingPlus": {
+      "defends": "<b>{{name}}</b> defends after winning by <b>{{margin}}</b> at <b>{{score}}</b>.",
+      "won": "<b>{{name}}</b> won here last year, by <b>{{margin}}</b> at <b>{{score}}</b>.",
+      "defendsPlayoff": "<b>{{name}}</b> defends after winning a playoff at <b>{{score}}</b>.",
+      "wonPlayoff": "<b>{{name}}</b> won a playoff here last year at <b>{{score}}</b>.",
+      "firstTeeSentence": "First tee <b>{{day}}</b> at <b>{{time}}</b>.",
+      "days_one": "DAY", "days_other": "DAYS",
+      "hours_one": "HOUR", "hours_other": "HOURS",
+      "minutes_one": "MINUTE", "minutes_other": "MINUTES",
+      "field": "FIELD", "par": "PAR", "yourPlayers": "YOUR PLAYERS",
+      "more": "and {{count}} more", "course": "THE COURSE", "courseGuide": "Course guide ›",
+      "pos": "POS", "player": "PLAYER", "tot": "TOT"
+    },
     "hero": {
       "fieldSoon": "FIELD SOON",
       "round": "ROUND {{round}}",
