@@ -18,6 +18,8 @@ import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { championNarrative, copy as tvCopy, words as tvWords } from '../../tournament-v2/data/tournamentRules';
+import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { situationSegments, visibleSituationNote } from '../../overview/situationCopy';
 import { roundsFromSchedule } from './HybridHero.utils';
 import { tournamentHeadlineSegments } from '../../overview/magazineCopy';
@@ -224,6 +226,16 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
         headshotOverride: tournament.winnerHeadshotOverride,
       })
     : [];
+
+  /* The overview's champion block IS the tournament page's: same narrative
+     (championNarrative over the FULL field) and the same "BY {words}" score
+     label rule as TournamentPage. The meta it reads is assembled from the
+     slide's tournament fields. */
+  const championMeta = useMemo(
+    () => ({ winner_id: tournament.winnerId, venue_par: tournament.venuePar, start_date: tournament.startDate }) as TournamentMeta,
+    [tournament.winnerId, tournament.venuePar, tournament.startDate],
+  );
+  const showChampion = isChampionResolvable(state) && champion != null;
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
