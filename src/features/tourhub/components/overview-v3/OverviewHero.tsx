@@ -20,6 +20,10 @@ import { useNavigate } from 'react-router-dom';
 
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
+import { RailChips } from '@/components/ui/RailChips';
+import { OVERVIEW_TOUR_ORDER, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
+import type { TourId } from '../../hooks/useOverviewData';
+import { OverviewChampionBlock } from './useOverviewChampion';
 import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
 import { tournamentRoute } from '../../routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -66,8 +70,31 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   } = useTourSelection();
 
 
-  // Hero River: trust the hook's editorial order. No per-tour filter, no shuffle.
-  const slides = rawSlides;
+  /**
+   * THE OVERVIEW'S OWN SLIDE ORDER (BUILD_TOUR_BUTTONS_UNDER_HERO §2). The
+   * carousel and the chip row under it run in OVERVIEW_TOUR_ORDER
+   * (PGA → LPGA → DP World → Champions → Korn Ferry), same-tour slides live
+   * first then by start date, so swiping and the buttons always agree.
+   * useHeroCarouselData's own editorial order is untouched — Also this week,
+   * the tournament page and news read it. Tours with no chip (LIV, the
+   * pseudo-'major' slide, anything else) are DROPPED from the carousel here
+   * so a swipe never lands where no chip is selected; they stay reachable
+   * from the top-left island tile exactly as before.
+   */
+  const slides = useMemo(() => {
+    const allowed = rawSlides.filter((s) =>
+      (OVERVIEW_TOUR_ORDER as string[]).includes(s.tournament.tourSlug),
+    );
+    const rank = (s: HeroSlide) => OVERVIEW_TOUR_ORDER.indexOf(s.tournament.tourSlug as TourId);
+    return [...allowed].sort((a, b) => {
+      const d = rank(a) - rank(b);
+      if (d !== 0) return d;
+      const aLive = a.type === 'live' ? 0 : 1;
+      const bLive = b.type === 'live' ? 0 : 1;
+      if (aLive !== bLive) return aLive - bLive;
+      return new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime();
+    });
+  }, [rawSlides]);
   const count = slides.length;
 
   const idSignature = useMemo(
