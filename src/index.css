@@ -57,6 +57,12 @@
   --tour-mover-name: #FFFFFF;
   --course-country-bar: rgba(248,250,252,0.55);
   --composer-golf-card: #141418;
+  --composer-edit-wash: rgba(255,255,255,.07);
+  --composer-edit-edge: rgba(255,255,255,.14);
+  --composer-tag-glass: rgba(14,14,16,.72);
+  --composer-tag-edge: rgba(255,255,255,.22);
+  --composer-search-edge: rgba(255,255,255,.16);
+  --composer-search-focus: rgba(255,255,255,.32);
   --composer-golf-line: rgba(255,255,255,.08);
   --composer-golf-edge: rgba(255,255,255,.14);
   --composer-golf-selected-edge: rgba(255,255,255,.28);

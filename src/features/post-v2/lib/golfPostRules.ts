@@ -10,6 +10,7 @@
  */
 import type { CoursePlace } from '@/lib/courseMedia/places';
 import { PLACE_LABELS } from '@/components/course-media-tab/ShotTagChoices';
+import { ordinal } from './composerGolfRules';
 
 export type ShotTag = { hole: number } | { place: CoursePlace };
 export const MAX_PLAYED_WITH = 8;
@@ -27,7 +28,7 @@ export const visibilityLabel = (v: PostVisibility) => VISIBILITY_OPTIONS.find((o
 export const isHoleTag = (t: ShotTag | null | undefined): t is { hole: number } => !!t && 'hole' in t;
 export function shotTagLabel(t: ShotTag | null | undefined): string | null {
   if (!t) return null;
-  return isHoleTag(t) ? `Hole ${t.hole}` : PLACE_LABELS[t.place];
+  return isHoleTag(t) ? ordinal(t.hole) : PLACE_LABELS[t.place];
 }
 
 /** "Sundridge Park Golf Club (West Course)" -> "Sundridge Park". */
@@ -35,9 +36,11 @@ export function shortCourseName(name: string): string {
   return name.replace(/ \(.*\)/, '').replace(/ Golf Club$/i, '').replace(' Golf Club', '').trim();
 }
 
-export function holeLine(courseName: string | null, holeShots: number): { count: string | null; text: string } | null {
+export function holeLine(courseName: string | null, holeShots: number, visibility: PostVisibility = 'anyone', personal = true): { count: string | null; text: string; visibilityAction?: boolean } | null {
   if (!courseName) return null;
   if (holeShots === 0) return { count: null, text: "Tap a photo to say what's in it. Hole shots also appear on that hole's page." };
+  if (!personal) return { count: null, text: "Hole pages only show members' own posts." };
+  if (visibility !== 'anyone') return { count: null, text: `Hole pages only show posts everyone can see. Change Who can see this to Everyone to add your ${holeShots} hole ${holeShots === 1 ? 'shot' : 'shots'}.`, visibilityAction: true };
   const one = holeShots === 1;
   return {
     count: `${holeShots} ${one ? 'shot' : 'shots'}`,
@@ -67,7 +70,7 @@ export function roundReason(day: string): string {
   return `Your round on ${wd} ${date.getDate()} ${mo}, the day these were taken`;
 }
 
-export interface WithCandidate { id: string; name: string; avatarUrl: string | null; sameRound: boolean; lastInteraction: string }
+export interface WithCandidate { id: string; name: string; avatarUrl: string | null; sameRound: boolean; lastInteraction: string; username?: string | null; homeClub?: string | null }
 /** Same course + same day first, then most recent mutual interaction; never self; cap eight. */
 export function rankPlayedWith(rows: readonly WithCandidate[], selfId: string | null): WithCandidate[] {
   return rows.filter((r) => r.id !== selfId)
