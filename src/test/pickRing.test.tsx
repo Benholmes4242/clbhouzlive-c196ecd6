@@ -101,7 +101,7 @@ describe('pick surfaces use the gradient ring instead of ActiveRing', () => {
     expect(unchosenAvatar.querySelector('[data-active-ring]')).toBeNull();
     expect(chosenAvatar.querySelector('[data-active-ring]')).toBeNull();
     // Same 36px footprint whether chosen or not — selecting a row moves nothing.
-    const sizeOf = (el: HTMLElement) => (el.firstElementChild as HTMLElement).style.width;
+    const sizeOf = (el: HTMLElement) => (el.querySelector('.relative.overflow-hidden') as HTMLElement).style.width;
     expect(sizeOf(chosenAvatar)).toBe('36px');
     expect(sizeOf(unchosenAvatar)).toBe('36px');
   });
