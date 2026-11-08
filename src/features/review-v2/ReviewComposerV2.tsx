@@ -119,6 +119,7 @@ const STEP1_HEADING: React.CSSProperties = {
  */
 
 interface ReceiptState {
+  courseId: string;
   mediaCount: number;
   hasText: boolean;
   ratingId: string | null;
@@ -140,6 +141,13 @@ function InnerComposer() {
   const [success, setSuccess] = useState<ReceiptState | null>(null);
   const submittedRef = useRef(false);
   const [photoHeader, setPhotoHeader] = useState(false);
+
+  // Receipts outlive create-to-edit remounts, never a course change. The
+  // course identity guard below also covers the render before this effect.
+  useEffect(() => {
+    setSuccess(null);
+    submittedRef.current = false;
+  }, [courseId]);
 
   // The claim stack owns the notch in both route and overlay contexts.
   // Only the photo form is transparent; loading, compact and receipt retain canvas.
@@ -284,7 +292,7 @@ function InnerComposer() {
   // The receipt lives HERE, above the keyed <Composer />, so it survives the
   // create-to-edit remount caused by invalidateCourseRatingCaches refetching
   // existingQ (the key flips from ":new" to ":<rating id>").
-  if (success && courseQ.data) {
+  if (success && success.courseId === courseId && courseQ.data) {
     return (
       <ReviewReceipt
         ratingId={success.ratingId}
@@ -303,6 +311,8 @@ function InnerComposer() {
         onClubhouse={() => navigate('/clubhouse')}
         onBack={() => navigate(`/courses/${courseQ.data!.id}`, { replace: true })}
         onNextCourse={(nextId) => {
+          setSuccess(null);
+          submittedRef.current = false;
           navigate(`/courses/${nextId}/rate`, { replace: true });
         }}
       />
@@ -324,7 +334,7 @@ function InnerComposer() {
       submittedRef={submittedRef}
       onSuccess={(payload) => {
         submittedRef.current = true;
-        setSuccess(payload);
+        setSuccess({ ...payload, courseId: courseQ.data.id });
       }}
       author={{
         displayName:
@@ -359,7 +369,7 @@ interface ComposerProps {
   onExit: () => void;
   /** Shared across remounts: true once any instance submitted successfully. */
   submittedRef: React.MutableRefObject<boolean>;
-  onSuccess: (payload: ReceiptState) => void;
+  onSuccess: (payload: Omit<ReceiptState, 'courseId'>) => void;
 }
 
 function Composer({ course, userId, existing, existingMedia, author, onExit, submittedRef, onSuccess, onHeaderFormChange }: ComposerProps) {
