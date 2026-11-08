@@ -518,7 +518,7 @@ describe('BRIEF_TOUR_OVERVIEW_MOCK_EXACT coverage', () => {
     const dot = node?.querySelector<HTMLElement>('span[aria-hidden]');
     const label = node?.querySelectorAll<HTMLElement>('span')[1];
     expect(dot?.style.background).toBe('rgb(52, 215, 127)'); // TOUR_LIVE_GREEN #34D77F
-    expect(dot?.style.boxShadow).toBe('rgba(52, 215, 127, 0.18) 0px 0px 0px 3px');
+    expect(dot?.style.boxShadow).toBe('0 0 0 3px rgba(52,215,127,0.18)');
     expect(label?.style.color).toBe('rgb(52, 215, 127)');
     expect(TOUR_LIVE_GREEN).toBe('#34D77F');
     view.unmount();

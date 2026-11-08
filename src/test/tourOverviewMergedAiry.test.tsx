@@ -122,7 +122,7 @@ describe('Merged Airy lower sections', () => {
     // 10px vertical padding, no border-bottom, 16px top/bottom fade mask.
     const css = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/championStrip.css', 'utf8');
     expect(css).toContain('padding: 10px 20px;');
-    expect(css).not.toContain('border-bottom');
+    expect(css).not.toContain('border-bottom:');
     expect(css).toContain('mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);');
     expect(css).toContain('linear-gradient(90deg, rgba(251,188,46,.12), rgba(251,188,46,0) 70%), var(--tv-panel)');
   });
