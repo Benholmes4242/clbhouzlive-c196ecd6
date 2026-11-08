@@ -1,5 +1,10 @@
 # Roadmap
 
+## Hole tiles — signed-off extension
+- [x] Read the uploaded brief and signed-off HTML; check required prior leaderboard and round-opacity work.
+- [ ] Blocked by prerequisite: BoardRound still exports unnumbered HoleStrip; BoardTable and WeekBoard still render faces; BoardTable still dims settled round cells. Obtain the preceding leaderboard and round-opacity briefs before extending their shared component.
+- [ ] Once prerequisites are complete, implement shared tiles on hero/weekly/round posts and batched explicit-true CompetitionMark; add authorized coverage, run four shards and check320/390/430.
+
 ## PF4_COMPOSER_FIX
 - [x] Implement media Edit sheet and inline Played with; simplify On the course.
 - [x] Save per-shot holes, gate place publication, retain shot tags in existing studio metadata/drafts, hydrate/retag existing shots, and stop post-wide writes.
