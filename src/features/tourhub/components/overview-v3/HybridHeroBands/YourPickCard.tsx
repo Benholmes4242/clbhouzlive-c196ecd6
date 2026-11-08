@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerAvatar } from '../../PlayerAvatar';
-import { ActiveRing } from '@/features/find-people/ActiveRing';
+import { ACTIVE_RING_GRADIENT } from '@/features/find-people/ActiveRing';
 import type { TournamentPicksBoardRow } from '../../../hooks/useTournamentPick';
 import { groupTournamentPicks } from './picksBoardRules';
 import type { TournamentPickState } from '../../../hooks/useTournamentPick';
@@ -43,7 +43,7 @@ export function YourPickCard({state,phase,ourResults,tourCode,onPick,onSeePicks,
     {heading && <div className="pick-mine-heading" data-pick-question>{heading}</div>}
     {line && <div className="pick-mine-how" data-pick-how>{line}</div>}
     <div className="pick-mine-row">
-      {hasPick ? <span className="pick-mine-face"><ActiveRing active surface="canvas" gapColor="var(--pick-card-gap)"><PlayerAvatar playerId={mine.playerId} playerName={name} tourCode={tourCode} size={36} className="pick-mine-avatar"/></ActiveRing></span> : <span className="pick-mine-placeholder"><Plus size={18}/></span>}
+      {hasPick ? <span className="pick-mine-face"><PlayerAvatar playerId={mine.playerId} playerName={name} tourCode={tourCode} size={36} className="pick-mine-avatar" ringGradient={ACTIVE_RING_GRADIENT}/></span> : <span className="pick-mine-placeholder"><Plus size={18}/></span>}
       <div className="pick-mine-text"><div className="pick-mine-label">{copy('kicker')}</div><div className="pick-mine-name">{hasPick ? name : state?.my_player_id ? copy('withdrawnBefore',{name}) : copy('noPickYet')}</div>{sub && <div className="pick-mine-sub">{sub}</div>}</div>
       {!hasPick ? <Button variant={null} size={null} className="pick-mine-action" onClick={onPick}>{copy('pickAction')}</Button> : phase==='upcoming' && !state?.locked ? <Button variant={null} size={null} className="pick-mine-change" onClick={onPick}>{copy('changeAction')}</Button> : (status || started || phase==='completed') && <div className="pick-mine-figure tabular-nums"><span className={status ? 'pick-panel-dim':''}>{resultPosition(mine)}</span>{!status && mine.score!=null && <> <span className={mine.score<0 ? 'pick-panel-under':''}>{fmtScore(mine.score)}</span></>}{phase==='live' && !status && state?.my_thru!=null && <small>{state.my_thru>=18 ? 'F' : copy('thru',{count:state.my_thru})}</small>}</div>}
     </div>

@@ -6,7 +6,7 @@ import { Check, Search, X } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
-import { ActiveRing } from '@/features/find-people/ActiveRing';
+import { ACTIVE_RING_GRADIENT } from '@/features/find-people/ActiveRing';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { getGuestUser } from '@/features/guest/guestGateStore';
 import { usePickTeeTimes } from '../../../tournament-v2/data/usePickTeeTimes';
@@ -103,8 +103,8 @@ function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, ini
     const country = pickCountry(player.country);
     return <Button key={player.player_id} variant="ghost" className="your-pick-row" role="radio" aria-checked={chosen === player.player_id}
       aria-label={player.full_name} data-pick-player={player.player_id} onClick={() => choose(player.player_id)}>
-      <span className="your-pick-avatar"><ActiveRing active={chosen === player.player_id} surface="canvas" gapColor="var(--pick-sheet)"><PlayerAvatar playerId={player.player_id} playerName={player.full_name} tourCode={tourCode}
-        photoUrl={player.photo_url} headshotOverride={player.headshot_override} size={36} className="your-pick-face" /></ActiveRing></span>
+      <span className="your-pick-avatar"><PlayerAvatar playerId={player.player_id} playerName={player.full_name} tourCode={tourCode}
+        photoUrl={player.photo_url} headshotOverride={player.headshot_override} size={36} className="your-pick-face" ringGradient={chosen === player.player_id ? ACTIVE_RING_GRADIENT : undefined} /></span>
       <span className="your-pick-text"><span className="your-pick-name"><span>{player.full_name}</span>
         {rankIndex >= 0 && <span className="your-pick-tag" data-our-pick={rankIndex + 1}>{copy('ourPick', { rank: rankIndex + 1 })}</span>}{changing && state?.my_player_id === player.player_id && <span className="your-pick-tag your-pick-tag-yours">{copy('yourPickTag')}</span>}</span>
         <span className="your-pick-meta block tabular-nums">{player.world_rank == null ? copy('notRanked') : copy('worldRank', { rank: player.world_rank })}{country && ` · ${country}`}</span>
@@ -131,7 +131,7 @@ function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, ini
       <Button variant={null} size={null} role="tab" aria-selected={displayView === 'board'} onClick={() => setView('board')}>{copy('whoTab')}<b className="tabular-nums">{board.isError ? '' : board.data?.length ?? ''}</b></Button>
     </div>}
     {displayView !== 'field' ? <>
-      {hasPick && <div className="your-pick-mine" data-sheet-your-pick><ActiveRing active surface="canvas" gapColor="var(--pick-sheet)"><PlayerAvatar playerId={mineId} playerName={mineName} tourCode={tourCode} photoUrl={mine?.photo_url} headshotOverride={mine?.headshot_override} size={56}/></ActiveRing><div>
+      {hasPick && <div className="your-pick-mine" data-sheet-your-pick><PlayerAvatar playerId={mineId} playerName={mineName} tourCode={tourCode} photoUrl={mine?.photo_url} headshotOverride={mine?.headshot_override} size={56} ringGradient={ACTIVE_RING_GRADIENT}/><div>
         <div className="your-pick-mine-kicker">{copy('kicker')}</div><div className="your-pick-mine-name">{mineName}</div>
         <div className="your-pick-mine-meta">{orderedPicks.some(p => p.playerId === mineId) ? copy('ourPick', {rank:orderedPicks.findIndex(p => p.playerId === mineId)+1}) : ''}{orderedPicks.some(p => p.playerId === mineId) && mine?.world_rank != null ? ' · ' : ''}{mine?.world_rank != null ? copy('worldRank',{rank:mine.world_rank}) : ''}{!orderedPicks.some(p => p.playerId === mineId) && mine?.country ? `${mine.world_rank != null ? ' · ' : ''}${pickCountry(mine.country)}` : ''}</div>
         {tee && <div className="your-pick-mine-meta">{copy('sectionTee',tee)}</div>}
