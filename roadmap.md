@@ -5,7 +5,7 @@
 - [x] Implement countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.
 - [x] Add23 rule cases and assertion ledger; focused214passed/1failed, preview buildOK.
 - [x] Authorised single-line repair; focused215/215, shard1 2028/2028; report and logs updated.
-- [ ] STOP: shard2 1873passed/1failed at cb57HeroBoardRemovals.test.tsx:64:65, expected1 to be+0 (empty upcoming fixture supplies par72). Shards3–4 and320/390/430 checks pending this unexpected failure.
+- [ ] Apply authorised cb57 facts-row repair; verify file9/9, focused215/215, restart four sequential shards, then320/390/430 screens and report.
 
 ## REVIEW_RECEIPT_NEXT_COURSE
 - [x] Scope receipt to its submitted course and clear receipt/submitted state on next-course and route changes.
