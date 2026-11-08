@@ -1,7 +1,7 @@
-/** The full-bleed, tappable photograph used only by the Tour Overview carousel. */
+/** The full-bleed, tappable photograph used only by the Tour Overview carousel.
+ *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: no "Full board ›" kicker link in ANY
+ *  state — the Full leaderboard button under the board owns that navigation. */
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import {
@@ -9,7 +9,6 @@ import {
   FONT,
   INK,
   OVERVIEW_SITUATION_INK,
-  WHITE_ALPHA_32,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
@@ -57,7 +56,6 @@ interface PhotoBandProps {
   onOpen: () => void;
   segments?: HeadlineSegment[];
   note?: string | null;
-  onFullBoard?: () => void;
 }
 
 export function PhotoBand({
@@ -74,7 +72,6 @@ export function PhotoBand({
   onOpen,
   segments = [],
   note,
-  onFullBoard,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   const venueLine = [venueName, datesString].filter(Boolean).join(' · ');
@@ -145,12 +142,6 @@ export function PhotoBand({
       >
         <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
-          {onFullBoard ? <Button type="button" variant="ghost" data-overview-full-board aria-label="Full leaderboard"
-            onClick={(event) => { event.stopPropagation(); onFullBoard(); }}
-            onKeyDown={(event) => event.stopPropagation()}
-            style={{ display: 'inline-flex', flex: 'none', alignItems: 'center', gap: 3, minHeight: 44, height: 44, padding: '0 0 0 12px', margin: '-8px 0', background: 'none', border: 'none', borderRadius: 0, fontFamily: FONT, fontSize: 12, fontWeight: 700, color: INK, cursor: 'pointer' }}>
-            {t('overview.situation.fullBoard', { defaultValue: 'Full board' })}<ChevronRight size={13} strokeWidth={2.6} color={WHITE_ALPHA_32} aria-hidden />
-          </Button> : null}
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: OVERVIEW_TITLE_GAP, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>

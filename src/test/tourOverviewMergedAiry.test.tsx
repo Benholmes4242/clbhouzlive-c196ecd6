@@ -28,7 +28,7 @@ afterEach(cleanup);
 const mount = (node: React.ReactNode) => render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>);
 const states: HeroState[] = [{ kind: 'upcoming', variant: 'far', countdown: '', meta: '' }, { kind: 'live', round: 2, totalRounds: 4 }, { kind: 'results', variant: 'standard', finishDate: '2026-11-01', meta: '' }];
 const field: BoardEntry[] = [{ id: 'a', position: 1, score: -6, round_1: -4, round_2: -2, today: -2, today_round: 2, thru: 9, player: { id: 'a', full_name: 'Player A' } }];
-const photo = (state: HeroState, onOpen = vi.fn(), onFullBoard?: () => void) => <PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl="https://example.test/course.jpg" state={state} tourLabel="PGA" leader={{ score: -6, faces: [], caps: 'A' }} countdown={[{ value: 2, label: 'days' }]} startDay={null} segments={[{ text: 'Figure ', figure: false }, { text: '6', figure: true }]} note="Note" onOpen={onOpen} onFullBoard={onFullBoard} />;
+const photo = (state: HeroState, onOpen = vi.fn()) => <PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl="https://example.test/course.jpg" state={state} tourLabel="PGA" leader={{ score: -6, faces: [], caps: 'A' }} countdown={[{ value: 2, label: 'days' }]} startDay={null} segments={[{ text: 'Figure ', figure: false }, { text: '6', figure: true }]} note="Note" onOpen={onOpen} />;
 
 describe('Merged Airy photo', () => {
   it.each(states)('puts the sentence and note on the photo in $kind at the derived height', state => {
@@ -48,16 +48,17 @@ describe('Merged Airy photo', () => {
     expect(Boolean(band?.querySelector('[data-overview-leader-trio]'))).toBe(state.kind === 'live');
     expect(Boolean(band?.querySelector('[data-overview-countdown]'))).toBe(state.kind === 'upcoming');
   });
-  it('isolates Full board clicks and keyboard events from the tournament door without nested buttons', () => {
-    const open = vi.fn(), full = vi.fn(); const v = mount(photo(states[1], open, full));
+  /* BUILD_TOUR_BUTTONS_UNDER_HERO §3 — the Full board link is gone in every
+     state; this replaced the click/keyboard isolation test that pinned it. */
+  it('opens the tournament door on click and keyboard with no nested buttons and no Full board link', () => {
+    const open = vi.fn(); const v = mount(photo(states[1], open));
     const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
     if (!band) throw new Error('Photo band absent');
-    const button = screen.getByRole('button', { name: 'Full leaderboard' });
     expect(band.tagName).toBe('DIV'); expect(band.querySelector('button button')).toBeNull();
-    fireEvent.click(button); fireEvent.keyDown(button, { key: 'Enter' }); expect(full).toHaveBeenCalledTimes(1); expect(open).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull();
     fireEvent.click(band); fireEvent.keyDown(band, { key: 'Enter' }); fireEvent.keyDown(band, { key: ' ' }); expect(open).toHaveBeenCalledTimes(3);
   });
-  it('omits Full board when no opener is available', () => { mount(photo(states[0])); expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull(); });
+  it('has no Full board link on an upcoming hero either', () => { mount(photo(states[0])); expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull(); });
   it('a finished band with no sentence drops both live-only lines', () => {
     const v = mount(<PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl={null} state={states[2]} tourLabel="PGA" leader={null} countdown={[]} startDay={null} segments={[]} note={null} onOpen={() => {}} />);
     const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');

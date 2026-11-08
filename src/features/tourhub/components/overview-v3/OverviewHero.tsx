@@ -20,6 +20,10 @@ import { useNavigate } from 'react-router-dom';
 
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
+import { RailChips } from '@/components/ui/RailChips';
+import { OVERVIEW_TOUR_ORDER, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
+import type { TourId } from '../../hooks/useOverviewData';
+import { OverviewChampionBlock } from './useOverviewChampion';
 import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
 import { tournamentRoute } from '../../routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -66,8 +70,31 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   } = useTourSelection();
 
 
-  // Hero River: trust the hook's editorial order. No per-tour filter, no shuffle.
-  const slides = rawSlides;
+  /**
+   * THE OVERVIEW'S OWN SLIDE ORDER (BUILD_TOUR_BUTTONS_UNDER_HERO §2). The
+   * carousel and the chip row under it run in OVERVIEW_TOUR_ORDER
+   * (PGA → LPGA → DP World → Champions → Korn Ferry), same-tour slides live
+   * first then by start date, so swiping and the buttons always agree.
+   * useHeroCarouselData's own editorial order is untouched — Also this week,
+   * the tournament page and news read it. Tours with no chip (LIV, the
+   * pseudo-'major' slide, anything else) are DROPPED from the carousel here
+   * so a swipe never lands where no chip is selected; they stay reachable
+   * from the top-left island tile exactly as before.
+   */
+  const slides = useMemo(() => {
+    const allowed = rawSlides.filter((s) =>
+      (OVERVIEW_TOUR_ORDER as string[]).includes(s.tournament.tourSlug),
+    );
+    const rank = (s: HeroSlide) => OVERVIEW_TOUR_ORDER.indexOf(s.tournament.tourSlug as TourId);
+    return [...allowed].sort((a, b) => {
+      const d = rank(a) - rank(b);
+      if (d !== 0) return d;
+      const aLive = a.type === 'live' ? 0 : 1;
+      const bLive = b.type === 'live' ? 0 : 1;
+      if (aLive !== bLive) return aLive - bLive;
+      return new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime();
+    });
+  }, [rawSlides]);
   const count = slides.length;
 
   const idSignature = useMemo(
@@ -240,6 +267,51 @@ export function OverviewHero({ height }: OverviewHeroProps) {
     navigate(target.to, { state: target.state });
   }, [navigate, viewingTid]);
 
+  /**
+   * THE TOUR CHIP ROW (BUILD_TOUR_BUTTONS_UNDER_HERO §1). One canonical
+   * RailChips chip per slide, in slide order. A tour with two slides in a
+   * week labels each "{TOUR} · {shortTournamentToken(name)}" so the pair is
+   * distinguishable. Tapping a chip is EXACTLY a swipe to that slide: the
+   * same setActiveIndex path, and the debounced display reporting below does
+   * the viewing* updates precisely as a swipe does. Tapping the selected chip
+   * does nothing.
+   */
+  const chipOptions = useMemo(() => {
+    const perTour = new Map<string, number>();
+    slides.forEach((s) => perTour.set(s.tournament.tourSlug, (perTour.get(s.tournament.tourSlug) ?? 0) + 1));
+    return slides.map((s) => {
+      const base = TOUR_LABEL[s.tournament.tourSlug as TourId] ?? s.tournament.tourName;
+      const label = (perTour.get(s.tournament.tourSlug) ?? 0) > 1
+        ? `${base} · ${shortTournamentToken(s.tournament.name)}`
+        : base;
+      return { id: s.tournament.id, label };
+    });
+  }, [slides]);
+
+  const chipRowRef = useRef<HTMLDivElement>(null);
+  const onChipChange = useCallback(
+    (id: string) => {
+      const idx = slides.findIndex((s) => s.tournament.id === id);
+      if (idx >= 0 && idx !== activeIndex) setActiveIndex(idx);
+    },
+    [slides, activeIndex],
+  );
+
+  /* The selected chip ALWAYS follows the active slide — swipe, island jump or
+     first load — and scrolls fully into view without moving the page. */
+  useEffect(() => {
+    const row = chipRowRef.current?.firstElementChild as HTMLElement | null;
+    const chip = row?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!row || !chip) return;
+    const left = chip.offsetLeft;
+    const right = left + chip.offsetWidth;
+    if (left < row.scrollLeft) {
+      row.scrollTo({ left: left - 20, behavior: 'smooth' });
+    } else if (right > row.scrollLeft + row.clientWidth) {
+      row.scrollTo({ left: right - row.clientWidth + 20, behavior: 'smooth' });
+    }
+  }, [activeIndex, idSignature]);
+
   if (isLoading || count === 0 || !heroState) {
     return (
       <div
@@ -310,13 +382,29 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             activeTournamentId={active.tournament.id}
             onSelectTour={NOOP}
             onOpenTournament={openTournament}
-            onFullBoard={fullBoardAvailable ? fullBoard.onOpen : undefined}
           />
         </motion.div>
       </AnimatePresence>
 
 
 
+    </div>
+
+    {/* THE TOUR CHIP ROW — directly under the photo band in EVERY state,
+        above whatever comes first (movers on live, the champion block on
+        finished, the upcoming facts and picks on upcoming). It does NOT
+        cross-fade with the slide: it stays put while the content below
+        changes. The row scrolls horizontally, never wraps, and runs to the
+        screen's right edge so the next chip peeks in. */}
+    <div ref={chipRowRef}>
+      <RailChips
+        options={chipOptions}
+        value={active.tournament.id}
+        onChange={onChipChange}
+        ariaLabel="Tour"
+        toggleSemantics
+        className="overview-tour-chips"
+      />
     </div>
 
     {/* The band EXTENDS the hero downward. It tracks the active slide and
@@ -332,6 +420,9 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
+          {/* On finished events the champion block follows the chip row
+              rather than the photo (BUILD_TOUR_BUTTONS_UNDER_HERO §1). */}
+          <OverviewChampionBlock slide={active} state={heroState} />
           <HeroBoardSection
             tournamentId={bandTournamentId}
             eventName={activeSlide?.tournament.name}

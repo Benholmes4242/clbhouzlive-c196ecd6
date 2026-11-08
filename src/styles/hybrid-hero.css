@@ -49,3 +49,10 @@
 /* Pass 5: TourSwitcherOverlay scroll rail. */
 .tour-switcher-rail::-webkit-scrollbar { display: none; }
 
+
+/* BUILD_TOUR_BUTTONS_UNDER_HERO §1 — the tour chip row under the overview
+   hero: 14px top / 2px bottom, left = the page side padding (20px, 16px at
+   ≤340px), NO right padding so the row runs to the screen's right edge and
+   the next chip peeks in. */
+.overview-tour-chips { padding: 14px 0 2px 20px; }
+@media (max-width: 340px) { .overview-tour-chips { padding-left: 16px; } }

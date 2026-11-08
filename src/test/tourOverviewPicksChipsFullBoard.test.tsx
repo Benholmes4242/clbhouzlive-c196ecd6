@@ -159,14 +159,21 @@ function LocationProbe() {
   return <div data-testid="loc">{loc.pathname + loc.search}</div>;
 }
 
-describe('situation row "Full board"', () => {
-  it('renders for live and completed (awaiting-playoff) events with a board, never for upcoming', () => {
+/* BUILD_TOUR_BUTTONS_UNDER_HERO §3 — the "Full board ›" kicker link is gone
+   in EVERY state; the Full leaderboard button under the board (OverviewHero)
+   owns that navigation. These replaced the five tests that pinned the link
+   (rendering, stroke-board gate, 44px target, live deep link, completed
+   sheet) and the two before-first-tee tests. */
+describe('no "Full board" link on the photo band', () => {
+  it('is absent for live, completed (awaiting-playoff) and upcoming heroes alike', () => {
     f.rows = field;
     mountHero(LIVE);
-    expect(document.querySelector('[data-overview-photo-band] [data-overview-full-board]')).not.toBeNull();
+    expect(document.querySelector('[data-overview-full-board]')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull();
     cleanup();
     mountHero(PLAYOFF);
-    expect(document.querySelector('[data-overview-full-board]')).not.toBeNull();
+    expect(document.querySelector('[data-overview-full-board]')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Full leaderboard' })).toBeNull();
     cleanup();
     mountHero(UPCOMING);
     expect(document.querySelector('[data-overview-photo-situation]')).not.toBeNull();
@@ -174,7 +181,7 @@ describe('situation row "Full board"', () => {
     expect(document.querySelector('[data-overview-full-board]')).toBeNull();
   });
 
-  it('is absent without a stroke board', () => {
+  it('stays absent whatever the format or board, and HybridHero mounts no FullBoardSheet', () => {
     f.rows = field;
     mountHero(LIVE, vi.fn(), slide('cup'));
     expect(document.querySelector('[data-overview-full-board]')).toBeNull();
@@ -182,34 +189,11 @@ describe('situation row "Full board"', () => {
     f.rows = [];
     mountHero(LIVE);
     expect(document.querySelector('[data-overview-full-board]')).toBeNull();
-  });
-
-  it('has a 44px target that leaves the row height unchanged', () => {
-    f.rows = field;
-    mountHero(LIVE);
-    const button = screen.getByRole('button', { name: 'Full leaderboard' });
-    expect(button.style.height).toBe('44px');
-    expect(button.style.padding).toBe('0px 0px 0px 12px');
-    expect(button.style.margin).toBe('-8px 0px');
-  });
-
-  it('live and in the live list navigates to the live leaderboard deep link', () => {
-    f.rows = field; f.live = [{ id: 'evt' }];
-    mountHero(LIVE);
-    fireEvent.click(screen.getByRole('button', { name: 'Full leaderboard' }));
-    expect(screen.getByTestId('loc').textContent).toBe('/tourhub?tab=live&event=evt');
-    expect(screen.queryByTestId('full-board-sheet')).toBeNull();
-  });
-
-  it('completed opens FullBoardSheet with the full field and meta', () => {
+    cleanup();
     f.rows = field; f.live = [{ id: 'evt' }];
     mountHero(PLAYOFF);
-    fireEvent.click(screen.getByRole('button', { name: 'Full leaderboard' }));
-    expect(screen.getByTestId('full-board-sheet')).toBeInTheDocument();
-    const last = f.sheet.mock.calls.at(-1)?.[0] as { entries: unknown[]; meta: { id: string } };
-    expect(last.entries).toHaveLength(7);
-    expect(last.meta.id).toBe('evt');
-    expect(screen.getByTestId('loc').textContent).toBe('/tourhub');
+    expect(document.querySelector('[data-overview-full-board]')).toBeNull();
+    expect(f.sheet).not.toHaveBeenCalled();
   });
 
   it('the photo band still opens the tournament page', () => {
@@ -220,19 +204,19 @@ describe('situation row "Full board"', () => {
   });
 });
 
-describe('Full board before anyone has teed off', () => {
+describe('no full-board entry around the first tee', () => {
   const unstarted = Array.from({ length: 6 }, (_, i) => ({ id: `u${i}`, position: 1, position_tied: true, score: 0, today: null, thru: null, player: { id: `p${i}`, full_name: `Player ${i}` } }));
-  it('shows no full-board entry and mounts no FullBoardSheet before the first tee', () => {
+  it('no entry and no FullBoardSheet before the first tee', () => {
     f.rows = unstarted;
     mountHero(LIVE);
     expect(document.querySelector('[data-overview-full-board]')).toBeNull();
     expect(f.sheet).not.toHaveBeenCalled();
   });
-  it('shows both once one row has started', () => {
+  it('still none once one row has started', () => {
     f.rows = [{ ...unstarted[0], thru: 1 }, ...unstarted.slice(1)];
     mountHero(LIVE);
-    expect(document.querySelector('[data-overview-full-board]')).not.toBeNull();
-    expect(f.sheet).toHaveBeenCalled();
+    expect(document.querySelector('[data-overview-full-board]')).toBeNull();
+    expect(f.sheet).not.toHaveBeenCalled();
   });
 });
 
