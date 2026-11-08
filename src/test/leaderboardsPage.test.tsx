@@ -77,7 +77,7 @@ describe('Leaderboards page — top block', () => {
     expect(v.container.querySelector('[data-stat="oncourse"]')).not.toBeNull();
     const low = v.container.querySelector<HTMLElement>('[data-stat="low"]');
     expect(low).not.toBeNull();
-    expect(low?.querySelector('b')?.textContent).toBe('−2');
+    expect(low?.querySelector('b')?.firstChild?.textContent).toBe('−2');
     expect(v.container.querySelector('[data-stat="average"]')).toBeNull();
   });
   it('live at the gate adds FIELD AVERAGE TODAY as the fourth cell', () => {
@@ -98,7 +98,7 @@ describe('Leaderboards page — top block', () => {
     expect(v.container.querySelector('[data-stat="fieldround"]')).not.toBeNull();
     const low = v.container.querySelector<HTMLElement>('[data-stat="lowround"]');
     expect(low).not.toBeNull();
-    expect(low?.querySelector('b')?.textContent).toBe('−6');
+    expect(low?.querySelector('b')?.firstChild?.textContent).toBe('−6');
     expect(v.container.querySelector('[data-stat="lead"]')).toBeNull();
   });
 });
