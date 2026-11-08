@@ -50,9 +50,11 @@
 .course-gallery-info hr { height:1px; border:0; background:var(--course-gallery-divider); margin:16px 0 14px; }
 .course-gallery-credit-row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .course-gallery-credit { display:flex; align-items:center; gap:9px; min-width:0; color:var(--media-v2-mute); font-size:13px; }
-.course-gallery-credit > span:last-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.course-gallery-credit b { color:var(--media-v2-ink); font-weight:600; }
-.course-gallery-avatar { flex:none; width:28px; height:28px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--media-v2-sheet); color:var(--media-v2-ink); font-size:11px; font-weight:700; }
+.course-gallery-credit-who { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.course-gallery-credit-who b { display:block; font-size:13px; font-weight:600; line-height:1.2; color:var(--media-v2-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.course-gallery-credit-who small { display:block; font-size:11.5px; font-weight:500; line-height:1.2; color:var(--media-v2-mute); white-space:nowrap; font-variant-numeric:tabular-nums; }
+/* Squircle fallback for a shot without a member id — same geometry as SquircleAvatar at 32 with the 1px dark hairline. */
+.course-gallery-avatar { flex:none; width:32px; aspect-ratio:1/1.05; border-radius:34%; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--media-v2-sheet); color:var(--media-v2-ink); font-size:11px; font-weight:700; box-shadow:0 0 0 1px rgba(255,255,255,0.22); }
 .course-gallery-avatar img { width:100%; height:100%; object-fit:cover; }
 .course-gallery-actions { display:flex; gap:8px; flex:none; align-items:center; }
 .course-gallery-chrome .course-gallery-actions .course-gallery-circle { width:40px; height:40px; }
