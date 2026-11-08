@@ -21,6 +21,19 @@ import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
 import { heroStateLine } from './heroStateLine';
 
 
+/** THE LIVE-ONLY LINES, measured from the same constants that style them.
+ *  The overview band shrinks by exactly these amounts on states that don't
+ *  render them (finished loses both, upcoming loses the spine), so the
+ *  kicker and title land exactly where a live hero puts them. */
+export const OVERVIEW_SENTENCE_FONT_SIZE = 13.5;
+export const OVERVIEW_SENTENCE_LINE_HEIGHT = 1.4;
+export const OVERVIEW_SENTENCE_MARGIN_TOP = 9;
+export const OVERVIEW_SENTENCE_BLOCK = OVERVIEW_SENTENCE_FONT_SIZE * OVERVIEW_SENTENCE_LINE_HEIGHT + OVERVIEW_SENTENCE_MARGIN_TOP;
+export const OVERVIEW_SPINE_LABEL_SIZE = 9.5;
+export const OVERVIEW_SPINE_LABEL_LINE_HEIGHT = 1.2;
+export const OVERVIEW_SPINE_MARGIN_TOP = 10;
+export const OVERVIEW_SPINE_BLOCK = OVERVIEW_SPINE_LABEL_SIZE * OVERVIEW_SPINE_LABEL_LINE_HEIGHT + OVERVIEW_SPINE_MARGIN_TOP;
+
 export interface HeroLeaderTrio {
   score: number;
   /** At most three faces; a longer tie still states its true count in `caps`. */
@@ -83,6 +96,13 @@ export function PhotoBand({
     playoff: state.kind === 'results' && state.variant === 'awaiting-playoff', // never RESULTS; no live dot
     startDay: isUpcoming ? startDay : null,
   });
+
+  /* THE BAND IS SHORTER by exactly each live-only line this state doesn't
+     render — the sentence and the round spine — so finished and upcoming
+     heroes keep the live text geometry with no spacer. Live stays 350. */
+  const bandHeight = heightPx
+    - (segments.length > 0 ? 0 : OVERVIEW_SENTENCE_BLOCK)
+    - (inPlay ? 0 : OVERVIEW_SPINE_BLOCK);
 
   return (
     <div
