@@ -1,0 +1,35 @@
+/* THE CHAMPION BLOCK — one block shared by the tournament page and the Tour
+ * overview on a completed event. These rules and the --tv-* tokens they use
+ * are scoped to .tv-champion itself so they resolve off .tournament-v3
+ * (moved out of tournamentPage.css; do not fork a second copy).
+ * Tighter and faded: 10px vertical padding, no border-bottom, and the panel
+ * colour + gold wash sit on ::before under a 16px top/bottom fade mask, so
+ * the block has no hard edges. The content is never masked. */
+.tv-champion {
+  --tv-panel: #121216;
+  --tv-gold: #FBBC2E;
+  --tv-mute: rgba(255,255,255,.65);
+  --tv-soft: rgba(248,250,252,.78);
+  --tv-ink: #F8FAFC;
+  --tv-under: #E24B3F;
+  position: relative;
+  padding: 10px 20px;
+}
+.tv-champion:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(251,188,46,.12), rgba(251,188,46,0) 70%), var(--tv-panel);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+}
+.tv-champion-top { position: relative; display: flex; gap: 14px; align-items: center; }
+.tv-champion-name { font-size: 18px; font-weight: 800; margin-top: 2px; color: var(--tv-ink); }
+.tv-champion-label { font-size: 10px; font-weight: 800; letter-spacing: .13em; color: var(--tv-gold); }
+.tv-champion-score { margin-left: auto; text-align: right; }
+.tv-champion-score b { display: block; font-size: 26px; font-weight: 800; line-height: 1; }
+.tv-champion-score small { font-size: 10px; color: var(--tv-mute); }
+.tv-champion .tv-under { color: var(--tv-under); }
+.tv-champion-line { position: relative; margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: var(--tv-soft); }
+.tv-champion-line b { color: var(--tv-ink); }

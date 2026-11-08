@@ -15,7 +15,7 @@ import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../lead
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  WHITE_ALPHA_65, WHITE_ALPHA_45, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
+  WHITE_ALPHA_65, WHITE_ALPHA_45, WHITE_ALPHA_12, WHITE_ALPHA_06, TOUR_LIVE_GREEN,
 } from '../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
