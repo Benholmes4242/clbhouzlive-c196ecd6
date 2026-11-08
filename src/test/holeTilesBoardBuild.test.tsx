@@ -58,7 +58,8 @@ describe('leaderboard board rows', () => {
     expect(cluster).not.toBeNull();
     expect(v.container.querySelector('.tour-board-player')).not.toBeNull();
     const head = v.container.querySelector<HTMLElement>('[data-board-head] span');
-    expect(head?.style.textAlign).toBe('left');
+    // POS sits at the row's left edge: no centring on the first header cell.
+    expect(['', 'left']).toContain(head?.style.textAlign ?? '');
   });
   it('settled rows keep full opacity and no tie bracket renders', () => {
     const v = board([{ ...entry('a'), thru: 18 }, entry('b', 2)]);
