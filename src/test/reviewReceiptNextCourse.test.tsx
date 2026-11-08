@@ -16,7 +16,7 @@ vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ active
 vi.mock('@/features/review-v2/hooks/useReviewMediaPipeline', () => ({ useReviewMediaPipeline: () => ({ items: [], count: 0, pickerError: null, pendingMediaCount: () => 0, writeUploadedHolePhotos: vi.fn(), attachToReview: async () => ({ failed: 0, held: 0 }) }) }));
 vi.mock('@/features/review-v2/hooks/useReviewSubmit', () => ({ useReviewSubmit: () => ({ submitting: false, submit: h.submit }) }));
 vi.mock('@/features/review-v2/hooks/useReviewHoleTags', () => ({ useReviewHoleTags: () => ({ holes: [], assignments: {}, capture: () => null }) }));
-vi.mock('@/features/review-v2/hooks/useReviewHeaderFacts', () => ({ useReviewHeaderFacts: () => ({ avg: null, count: 0, rank: null }) }));
+vi.mock('@/features/review-v2/hooks/useReviewHeaderFacts', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/review-v2/hooks/useReviewHeaderFacts')>()), useReviewHeaderFacts: () => ({ avg: null, count: 0, rank: null }) }));
 vi.mock('@/features/review-v2/hooks/useMyRatedScores', () => ({ useMyRatedScores: () => ({ data: [] }), calibrationRank: () => null, CALIBRATION_MIN_PEERS: 5 }));
 vi.mock('@/hooks/top100/useTop100Config', () => ({ useTop100Config: () => ({ subscoreMinRatings: 10 }) }));
 vi.mock('@/hooks/useCourseTop100Standing', () => ({ useCourseTop100Standing: () => ({ data: null }) }));
@@ -63,7 +63,7 @@ function mount(edit = false) {
 async function receiptA() { fireEvent.click(screen.getByTestId('primary')); await screen.findByTestId('receipt-score-card'); expect(h.submit).toHaveBeenCalledWith(expect.objectContaining({ courseId: 'a' })); }
 function expectNewB() {
   expect(screen.queryByTestId('receipt-status')).toBeNull();
-  expect(document.querySelector('header h1')?.textContent).toBe('Course B');
+  expect(Array.from(document.querySelectorAll('header [data-photo-header] div')).some((d) => d.textContent === 'Course B')).toBe(true);
   expect(document.querySelector('[data-step1-words]')).not.toBeNull();
   expect(h.state.overall).toBeNull(); expect(h.state.scores).toEqual(emptyScores); expect(h.state.reviewText).toBe('');
 }
