@@ -39,7 +39,7 @@ export function PlayerRow({ player, query, onSelect }: Props) {
       onClick={onSelect}
       className={ROW_BASE}
     >
-      <ResultTile>
+      <ResultTile borderless>
         {!loaded ? (
           <span style={{ ...TILE_INITIALS, letterSpacing: '0.02em' }}>
             {initials(player.full_name)}
