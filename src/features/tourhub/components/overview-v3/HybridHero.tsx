@@ -268,9 +268,13 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
         startDay={startDay}
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
-        segments={situation}
+        /* A finished event with a champion drops the sentence and the "Full
+           board ›" link — the champion block tells the story and the Full
+           leaderboard button under the board does the navigation. Live and
+           upcoming keep both. */
+        segments={showChampion ? [] : situation}
         note={situationNote}
-        onFullBoard={fullBoardAvailable ? openFullBoard : undefined}
+        onFullBoard={fullBoardAvailable && !showChampion ? openFullBoard : undefined}
       />
       {fullBoardAvailable && !onFullBoard ? (
         <FullBoardSheet
@@ -281,16 +285,16 @@ export function HybridHero({ slide, state, now, onOpenTournament, onFullBoard }:
           entries={rows}
         />
       ) : null}
-      {isChampionResolvable(state) && champion ? (
+      {showChampion && champion ? (
         <ChampionStrip
           name={champion.name}
           score={fmtScore(champion.score)}
           scoreValue={champion.score}
-          scoreLabel={overviewChampionScoreLabel(champion.playoff, champion.margin, t)}
+          scoreLabel={!champion.playoff && champion.margin != null ? tvCopy('by', { words: tvWords(champion.margin).toUpperCase() }) : undefined}
           eyebrow={t('overview.hero.champion')}
           avatarCandidates={championAvatarCandidates}
           playerKey={tournament.winnerKey}
-          country={champion.country}
+          narrativeParts={championNarrative(championMeta, rows)}
         />
       ) : null}
     </>
