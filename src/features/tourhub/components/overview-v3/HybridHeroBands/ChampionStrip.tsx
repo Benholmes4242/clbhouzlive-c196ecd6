@@ -22,6 +22,7 @@ import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 import { CHAMPION_STRIP_WASH, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ActiveRing } from '@/features/find-people/ActiveRing';
 import CountryFlag from '@/components/ui/country-flag';
 
 interface ChampionStripProps {
@@ -43,15 +44,22 @@ interface ChampionStripProps {
 }
 
 
-function PlayerHead({ size = 42, avatarCandidates, name, playerKey }: { size?: number; avatarCandidates?: string[]; name: string; playerKey?: string | null }) {
+/** The champion's face carries a GOLD squircle ring AROUND it — the same
+ *  constant as the CHAMPION label and trophy (the tournament presentation's
+ *  --tv-gold resolves to the same #FBBC2E). Built on ActiveRing exactly like
+ *  the pick ring: 1.5px ring, 2px gap in the strip's own background, then the
+ *  avatar at 34%. The avatar keeps hideRing — no grey hairline inside. */
+function PlayerHead({ size = 42, avatarCandidates, name, playerKey, gapColor }: { size?: number; avatarCandidates?: string[]; name: string; playerKey?: string | null; gapColor: string }) {
   return (
-    <SquircleAvatar
-      srcCandidates={avatarCandidates}
-      alt={name}
-      userId={playerKey ?? name}
-      size={size}
-      hideRing
-    />
+    <ActiveRing active surface="canvas" gapColor={gapColor} ringColor={GOLD}>
+      <SquircleAvatar
+        srcCandidates={avatarCandidates}
+        alt={name}
+        userId={playerKey ?? name}
+        size={size}
+        hideRing
+      />
+    </ActiveRing>
   );
 }
 
