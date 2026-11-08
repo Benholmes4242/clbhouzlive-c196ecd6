@@ -193,13 +193,14 @@ export function PhotoBand({
 /**
  * A.1 THE ROUND SPINE — one node per round, a connector between consecutive
  * nodes. In-play states only (the caller gates it): never upcoming, never a
- * finished result. Amber here is the round in progress, as on every Tour surface.
+ * finished result. GREEN means live (TOUR_LIVE_GREEN, the island's LIVE
+ * caption green); amber is reserved for the viewer.
  */
 function RoundSpine({ round, totalRounds }: { round: number; totalRounds: number }) {
   const { t } = useTranslation('tourhub');
   const nodes = Array.from({ length: Math.max(0, totalRounds) }, (_, i) => i + 1);
   return (
-    <div data-overview-round-spine style={{ display: 'flex', alignItems: 'center', marginTop: 10 }}>
+    <div data-overview-round-spine style={{ display: 'flex', alignItems: 'center', marginTop: OVERVIEW_SPINE_MARGIN_TOP }}>
       {nodes.map((n, i) => {
         const live = n === round;
         const done = n < round;
@@ -207,8 +208,8 @@ function RoundSpine({ round, totalRounds }: { round: number; totalRounds: number
           <div key={n} style={{ display: 'contents' }}>
             {i > 0 ? <span aria-hidden style={{ flex: 1, height: 1, background: OVERVIEW.spine.connector, margin: '0 7px' }} /> : null}
             <span data-round-node={live ? 'live' : done ? 'done' : 'todo'} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flex: 'none' }}>
-              <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: live ? OVERVIEW.amber : done ? OVERVIEW.spine.done : OVERVIEW.spine.todo, boxShadow: live ? OVERVIEW.spine.liveHalo : undefined }} />
-              <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: live ? OVERVIEW.amber : OVERVIEW.spine.label }}>{t('overview.hero.roundNode', { round: n })}</span>
+              <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: live ? OVERVIEW.spine.live : done ? OVERVIEW.spine.done : OVERVIEW.spine.todo, boxShadow: live ? OVERVIEW.spine.liveHalo : undefined }} />
+              <span style={{ fontSize: OVERVIEW_SPINE_LABEL_SIZE, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: OVERVIEW_SPINE_LABEL_LINE_HEIGHT, color: live ? OVERVIEW.spine.live : OVERVIEW.spine.label }}>{t('overview.hero.roundNode', { round: n })}</span>
             </span>
           </div>
         );
