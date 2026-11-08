@@ -8,6 +8,7 @@
 import { useCallback, useState } from 'react';
 import { toast } from '@/lib/toast';
 import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
+import type { ShotTagChoice } from '../lib/shotTagWrites';
 import type { PostShotTag } from '../lib/composerGolfRules';
 import { emptyVideoDetails, roundBoundVideoDetails, type VideoDetails } from '../lib/videoDetails';
 
@@ -46,6 +47,9 @@ export interface StageMediaItem {
   posterTimestamp?: number | null;
   /** Set for items loaded from an existing post - the post_media.id. */
   existingId?: string;
+  holeNo?: number | null;
+  shotTag?: ShotTagChoice | null;
+  studioEdits?: Record<string, unknown>;
   /** Cloudflare Stream uid for an already-uploaded video. The playable
    *  URL is built from this, never parsed back out of previewUrl. */
   streamId?: string | null;

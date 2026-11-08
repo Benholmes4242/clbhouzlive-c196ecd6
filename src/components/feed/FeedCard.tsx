@@ -1,3 +1,4 @@
+import { mediaHoleNo } from '@/hooks/feed/usePostGolfContext';
 /**
  * FeedCard — Phases 1 & 2
  *
@@ -208,6 +209,7 @@ export interface FeedCardProps {
   golfContext?: PostGolfContext | null;
   /** Par/yards for the context's hole (page-level tee-set read). */
   golfHole?: TeeHole | null;
+  golfHoles?: readonly TeeHole[];
   /** Hole detail for the attached round's strip; null hides the strip. */
   golfRoundShape?: HoleShape | null;
   /** Opens the attached round's scorecard sheet — never the fullscreen viewer. */
@@ -347,6 +349,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   slideTags,
   golfContext,
   golfHole,
+  golfHoles,
   golfRoundShape,
   onGolfRoundTap,
   videoDetails,
@@ -563,19 +566,25 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
      review card, so likes, comments, sharing, the owner menu and the
      fullscreen viewer keep one path. `fill` = the review card's frame owns
      the size and the media fills it with cover. */
+  const shotHoleChip = (index: number) => {
+    const item = items[index];
+    const local = item ? slideTags?.get(holeMediaKey(item)) : null;
+    const holeNo = golfContext ? mediaHoleNo(golfContext, item, index) : local?.hole ?? null;
+    if (holeNo == null) return null;
+    const detail = golfHoles?.find(h => h.hole_no === holeNo) ?? (golfHole?.hole_no === holeNo ? golfHole : local?.par ? { hole_no: holeNo, par: local.par, yards: null, si: null } : null);
+    return <HoleChip holeNo={holeNo} hole={detail} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }}/>;
+  };
+  const shotPlaceChip = (index: number) => {
+    const item = items[index]; const tag = item ? slideTags?.get(holeMediaKey(item)) : null;
+    return tag?.place ? <SlideTagChip tag={tag}/> : null;
+  };
   const renderMedia = (fill: boolean) => (
     <>
 {/* Media. A round post never reaches here: it returns the round card
           above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
-        {!(photoGrid && !fill) && <SlideTagChip tag={slideTags && items[isMulti ? visibleSlide : 0] ? slideTags.get(holeMediaKey(items[isMulti ? visibleSlide : 0])) : null} />}
-        {/* PF1B hole chip: FIRST slide only, top-left 10px inset. The existing
-            SlideTagChip sits bottom-left, so there is no top-left overlay to
-            collide with. Round posts never reach here (round card above). */}
-        {!(photoGrid && !fill) && golfContext?.holeNo != null && (!isMulti || visibleSlide === 0) && (
-          <HoleChip holeNo={golfContext.holeNo} hole={golfHole} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }} />
-        )}
-        {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} overlays={<><SlideTagChip tag={slideTags && items[0] ? slideTags.get(holeMediaKey(items[0])) : null} />{golfContext?.holeNo != null && <HoleChip holeNo={golfContext.holeNo} hole={golfHole} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }} />}</>} /> : isMulti ? (
+        {!(photoGrid && !fill) && <>{shotPlaceChip(isMulti ? visibleSlide : 0)}{shotHoleChip(isMulti ? visibleSlide : 0)}</>}
+        {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} perTileOverlay={index => <>{shotPlaceChip(index)}{shotHoleChip(index)}</>} /> : isMulti ? (
           <MediaCarousel
             items={items}
             isCardActive={isActive}

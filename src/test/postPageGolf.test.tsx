@@ -112,9 +112,10 @@ describe('post_with writes', () => {
 describe('per-photo tags are written after upload', () => {
   const file = new File(['x'], 'a.jpg', { type: 'image/jpeg' });
   const job = { items: { m1: { tag: { hole: 7 }, courseId: 'c1', knownHoles: [7] } } };
-  it('a hole-tagged photo goes through the Media tab library write once its url exists', async () => {
+  it('a hole-tagged photo makes no client library write', async () => {
     await writeShotTagAfterUpload(job, 'me', { id: 'm1', type: 'image', file }, { url: 'https://x/a.jpg' });
-    expect(lib.holePhoto).toHaveBeenCalledWith(file, 'https://x/a.jpg', 'c1', 'me', 7, [7]);
+    expect(lib.holePhoto).not.toHaveBeenCalled();
+    expect(lib.holeVideo).not.toHaveBeenCalled();
   });
   it('an untagged photo writes nothing', async () => {
     await writeShotTagAfterUpload(job, 'me', { id: 'other', type: 'image', file }, { url: 'u' });

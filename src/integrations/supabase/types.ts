@@ -9624,6 +9624,7 @@ export type Database = {
           filter_id: string | null
           height: number | null
           hls_url: string | null
+          hole_no: number | null
           id: string
           image_orientation: string | null
           media_height: number | null
@@ -9658,6 +9659,7 @@ export type Database = {
           filter_id?: string | null
           height?: number | null
           hls_url?: string | null
+          hole_no?: number | null
           id?: string
           image_orientation?: string | null
           media_height?: number | null
@@ -9692,6 +9694,7 @@ export type Database = {
           filter_id?: string | null
           height?: number | null
           hls_url?: string | null
+          hole_no?: number | null
           id?: string
           image_orientation?: string | null
           media_height?: number | null
@@ -25471,6 +25474,7 @@ export type Database = {
         Returns: {
           course_id: string
           hole_no: number
+          media_holes: Json
           post_id: string
           round_gross: number
           round_holes: number

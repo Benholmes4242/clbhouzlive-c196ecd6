@@ -1007,6 +1007,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 })()}
                 onRoundTap={onRoundTap}
                 golfContext={golfContextMap?.get(post.id) ?? null}
+                golfHoles={golfHoleMap?.get(golfContextMap?.get(post.id)?.courseId ?? '')}
                 videoDetails={videoDetailsMap?.get(post.id) ?? null}
                 golfHole={(() => {
                   const ctx = golfContextMap?.get(post.id);

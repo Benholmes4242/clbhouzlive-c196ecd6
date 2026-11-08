@@ -18,7 +18,7 @@ import { startPostUpload } from '../lib/postUploadController';
 import { extractMentions } from '@/lib/mentions/format';
 import type { StageMediaItem, StageCourse } from './useStageComposer';
 import type { ShotTagJob } from '../lib/shotTagWrites';
-import type { PostVisibility } from '../lib/golfPostRules';
+import { isHoleTag, type PostVisibility } from '../lib/golfPostRules';
 import { writePostWith } from '../lib/postWith';
 import {golfPostPatch,type PostShotTag} from '../lib/composerGolfRules';
 import type { VideoDetails } from '../lib/videoDetails';
@@ -215,7 +215,7 @@ export function usePostSubmit() {
       // database trigger on post_with; nothing is sent from here.
       const savedWith = input.playedWith?.length ? await writePostWith(postId, userId, input.playedWith) : [];
       const playedWithNames = savedWith.flatMap(id => { const p = input.playedWithPeople?.find(p => p.id === id); return p ? [p.name] : []; });
-      const holeTags = Object.values(input.shotTags?.items ?? {}).flatMap(choice => {
+      const holeTags = input.actorType !== 'personal' || (input.visibility ?? 'anyone') !== 'anyone' ? [] : Object.values(input.shotTags?.items ?? {}).flatMap(choice => {
         if (!('hole' in choice.tag)) return [];
         const course = (input.courses ?? (input.course ? [input.course] : [])).find(c => c.id === choice.courseId);
         return course ? [{ courseId: course.id, courseName: course.name, hole: choice.tag.hole }] : [];
@@ -254,7 +254,7 @@ export function usePostSubmit() {
           actorId: input.actorId,
           isScheduled: !!input.scheduledAt,
           scheduledAt: input.scheduledAt?.toISOString(),
-          shotTags: input.shotTags,
+          shotTags: input.shotTags ? { ...input.shotTags, personal: input.actorType === 'personal', visibility: input.visibility ?? 'anyone' } : undefined,
         },
         input.media,
       );

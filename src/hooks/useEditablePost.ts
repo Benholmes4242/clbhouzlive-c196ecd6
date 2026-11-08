@@ -4,6 +4,7 @@
 //
 // Brief 2A: read-only shape; mutations live in useUpdatePost.
 
+import type { ShotTagChoice } from '@/features/post-v2/lib/shotTagWrites';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -39,6 +40,9 @@ export interface EditablePostMedia {
   /** When null, recrop must be disabled in the UI ("Original unavailable"). */
   originalMediaUrl: string | null;
   displayOrder: number;
+  holeNo?: number | null;
+  shotTag?: ShotTagChoice | null;
+  studioEdits?: Record<string, unknown>;
 }
 
 export interface EditablePostCourse {
@@ -145,7 +149,7 @@ export function useEditablePost(postId: string | null | undefined) {
           supabase
             .from('post_media')
             .select(
-              'id, media_url, media_type, poster_url, stream_id, media_width, media_height, original_media_url, display_order, created_at',
+              'id, media_url, media_type, poster_url, stream_id, media_width, media_height, original_media_url, display_order, created_at, hole_no, studio_edits',
             )
             .eq('post_id', post.id)
             .order('display_order', { ascending: true })
@@ -165,6 +169,9 @@ export function useEditablePost(postId: string | null | undefined) {
       const media: EditablePostMedia[] = (mediaRows ?? []).map((row: any, idx: number) => ({
         id: row.id,
         mediaUrl: row.media_url,
+        holeNo: row.hole_no ?? null,
+        shotTag: row.studio_edits?.shotTag ?? null,
+        studioEdits: row.studio_edits ?? {},
         mediaType: (row.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
         posterUrl: row.poster_url ?? null,
         streamId: row.stream_id ?? null,

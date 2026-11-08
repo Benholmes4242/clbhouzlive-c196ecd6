@@ -70,10 +70,10 @@ export async function fetchPlayedWithSuggestions(userId: string, round: { course
       .in('user_id', ids).eq('course_id', round.courseId).eq('play_date', round.day);
     same = new Set((rounds ?? []).map((r) => r.user_id));
   }
-  const { data: profiles } = await supabase.from('user_profiles').select('id, display_name, first_name, username, profile_photo_url').in('id', ids);
+  const { data: profiles } = await supabase.from('user_profiles').select('id, display_name, first_name, username, profile_photo_url, home_club').in('id', ids);
   const rows: WithCandidate[] = (profiles ?? []).map((p) => ({
     id: p.id, name: p.display_name || p.first_name || p.username || 'Golfer', avatarUrl: p.profile_photo_url ?? null,
-    sameRound: same.has(p.id), lastInteraction: mutual.get(p.id) ?? '',
+    sameRound: same.has(p.id), lastInteraction: mutual.get(p.id) ?? '', username: p.username, homeClub: p.home_club,
   }));
   return rankPlayedWith(rows, userId);
 }
@@ -83,8 +83,8 @@ export async function searchMembers(q: string, selfId: string | null): Promise<W
   const query = q.trim();
   if (!query) return [];
   const like = `%${query.replace(/[%_]/g, (ch) => '\\' + ch)}%`;
-  const { data } = await searchMentionMembers(like, 8);
+  const { data } = await searchMentionMembers(like, 8, true);
   return (data ?? []).filter((u) => u.id !== selfId).map((u) => ({
-    id: u.id, name: u.display_name || u.username || 'Golfer', avatarUrl: u.profile_photo_url ?? null, sameRound: false, lastInteraction: '',
+    id: u.id, name: u.display_name || u.username || 'Golfer', avatarUrl: u.profile_photo_url ?? null, sameRound: false, lastInteraction: '', username: u.username, homeClub: 'home_club' in u ? u.home_club as string | null : null,
   }));
 }

@@ -1,0 +1,91 @@
+--- /tmp/pf4/before/pf1ComposerGolf.test.tsx	2026-11-08 10:41:47.299949465 +0000
++++ src/test/pf1ComposerGolf.test.tsx	2026-11-08 10:41:47.316323798 +0000
+@@ -21,12 +21,12 @@
+  it('nearest course is within two kilometres',()=>{expect(nearestCourse([{...course,latitude:0,longitude:.01},{id:'far',name:'Far',latitude:0,longitude:.03}],{latitude:0,longitude:0})?.id).toBe('c');expect(nearestCourse([{...course,latitude:0,longitude:.03}],{latitude:0,longitude:0})).toBeNull();});
+  it('business actors cannot attach a round',()=>{expect(canAttachRound(false,[round],now)).toBe(false);});
+  it('a round beyond seven days cannot be attached',()=>{expect(canAttachRound(true,[{...round,play_date:'2026-10-30'}],now)).toBe(false);expect(canAttachRound(true,[{...round,play_date:'2026-10-31'}],now)).toBe(true);});
+- it('attaching writes attached_score_id and never round-post whs_score_id',()=>{expect(golfPostPatch({course,holeNo:15,postShotTags:['view'],attachedScoreId:'score'})).toEqual({tagged_course_ids:['c'],hole_no:15,shot_tags:['view'],attached_score_id:'score'});});
++ it('attaching writes attached_score_id and never round-post whs_score_id',()=>{expect(golfPostPatch({course,holeNo:15,postShotTags:['view'],attachedScoreId:'score'})).toEqual({tagged_course_ids:['c'],attached_score_id:'score'});});
+  it('hole toggles set and clear and never accepts nineteen',()=>{expect(toggleHole(null,15)).toBe(15);expect(toggleHole(15,15)).toBeNull();expect(toggleHole(null,19)).toBeNull();});
+  it('nine shot-tag values exactly match the server catalogue',()=>{expect(POST_SHOT_TAGS.map(([value])=>value)).toEqual(['view','tee_shot','approach','around_green','putt','swing','trick_shot','gear','hole_in_one']);expect(toggleShot(['view'],'putt')).toEqual(['view','putt']);expect(toggleShot(['view'],'view')).toEqual([]);});
+  it('guide requires a hole and media',()=>{expect(guideVisible(null,1)).toBe(false);expect(guideVisible(15,0)).toBe(false);expect(guideVisible(15,1)).toBe(true);});
+  it('editor mode is photo-only for photos and generic for mixed or clips',()=>{expect(editorTitleKey([{type:'image'}])).toBe('stage.mediaSheet.title');expect(editorTitleKey([{type:'image'},{type:'video'}])).toBe('stage.edit');expect(editorTitleKey([{type:'video'}])).toBe('stage.edit');});
+- it('mounted hole controls set then clear the selection',()=>{function Demo(){const [hole,setHole]=useState<number|null>(null);return <ComposerCourseBlock course={course} reason={null} suggestions={[]} hole={hole} tags={[]} holes={[]} onChange={()=>{}} onPick={()=>{}} onHole={setHole} onTags={()=>{}}/>;}render(<Demo/>);const chip=screen.getByRole('button',{name:'Hole 15'});fireEvent.click(chip);expect(chip).toHaveAttribute('aria-pressed','true');fireEvent.click(chip);expect(chip).toHaveAttribute('aria-pressed','false');});
++ it('selected course no longer exposes post-wide hole controls',()=>{render(<ComposerCourseBlock course={course} reason={null} suggestions={[]} hole={15} tags={[]} holes={[]} onChange={()=>{}} onPick={()=>{}} onHole={()=>{}} onTags={()=>{}}/>);expect(screen.queryByRole('button',{name:'Hole 15'})).toBeNull();});
+  it('no course hides hole controls',()=>{render(<ComposerCourseBlock course={null} reason={null} suggestions={[]} hole={null} tags={[]} holes={[]} onChange={()=>{}} onPick={()=>{}} onHole={()=>{}} onTags={()=>{}}/>);expect(screen.queryByRole('button',{name:'Hole 15'})).toBeNull();});
+  it('Different round returns the selected score',()=>{const pick=vi.fn();const close=vi.fn();render(<ComposerRoundsSheet open onClose={close} rounds={[round,{...round,whs_score_id:'other',gross_score:75}]} onPick={pick}/>);fireEvent.click(screen.getByRole('button',{name:/75/}));expect(pick).toHaveBeenCalledWith(expect.objectContaining({whs_score_id:'other'}));expect(close).toHaveBeenCalledTimes(1);});
+  it('changing primary course clears hole and attached round',()=>{const {result}=renderHook(()=>useStageComposer());act(()=>result.current.setCourse(course));act(()=>result.current.setGolf({holeNo:15,attachedScoreId:'score'}));act(()=>result.current.setCourse({id:'other',name:'Other'}));expect(result.current.state.holeNo).toBeNull();expect(result.current.state.attachedScoreId).toBeNull();});
+--- /tmp/pf4/before/pf1Drafts.test.ts	2026-11-08 10:41:47.300170485 +0000
++++ src/test/pf1Drafts.test.ts	2026-11-08 10:41:47.316987408 +0000
+@@ -9,7 +9,7 @@
+ describe('PF1 media-preserving drafts',()=>{
+  it('restores media order, crop, frame and filter',()=>{const restored=restoreComposerMedia([media('second',1),media('first',0)]);expect(restored.map(m=>m.id)).toEqual(['first','second']);expect(restored[0]).toMatchObject({frame:'4:5',crop:{x:25,y:50,scale:2},filterId:'filter',remoteUrl:'https://media.test/first.jpg'});});
+  it('restores clip trim and poster with its Stream source',()=>{const restored=restoreComposerMedia([{...media('clip',0),media_type:'video',stream_id:'stream',studio_edits:{trimStart:2,trimEnd:8,posterTimestamp:3}}]);expect(restored[0]).toMatchObject({streamId:'stream',trimStart:2,trimEnd:8,posterTimestamp:3});});
+- it('reopens course, hole, tags, round, visibility and ordered media',async()=>{h.row={id:'draft',actor_type:'personal',actor_id:'me',content:'Words',course_id:'course',course_name:'Course',course_country:'GB',course_data:null,hole_no:15,shot_tags:['view'],attached_score_id:'score',visibility:'followers'};h.media=[media('two',1),media('one',0)];const restored=await loadComposerDraft('draft','me');expect(restored?.state).toMatchObject({caption:'Words',course:{id:'course'},holeNo:15,postShotTags:['view'],attachedScoreId:'score'});expect(restored?.state.media?.map(m=>m.id)).toEqual(['one','two']);expect(restored?.visibility).toBe('followers');});
++ it('reopens course, round, visibility and ordered media without legacy post-wide tags',async()=>{h.row={id:'draft',actor_type:'personal',actor_id:'me',content:'Words',course_id:'course',course_name:'Course',course_country:'GB',course_data:null,hole_no:15,shot_tags:['view'],attached_score_id:'score',visibility:'followers'};h.media=[media('two',1),media('one',0)];const restored=await loadComposerDraft('draft','me');expect(restored?.state).toMatchObject({caption:'Words',course:{id:'course'},holeNo:null,postShotTags:[],attachedScoreId:'score'});expect(restored?.state.media?.map(m=>m.id)).toEqual(['one','two']);expect(restored?.visibility).toBe('followers');});
+  it('saving retains every local file and its edits in display order',async()=>{const first={id:'one',type:'image' as const,file:new File(['a'],'a.jpg',{type:'image/jpeg'}),previewUrl:'blob:a',frame:'4:5' as const,crop:{x:25,y:50,scale:2}};await saveComposerMedia('draft',[first,{...first,id:'two'}]);expect(h.uploads).toHaveBeenNthCalledWith(1,'draft',first.file,0,expect.objectContaining({studioEdits:expect.objectContaining({frame:'4:5',crop:first.crop})}));expect(h.uploads).toHaveBeenNthCalledWith(2,'draft',first.file,1,expect.anything());});
+  it('already stored media is reused rather than uploaded twice',async()=>{await saveComposerMedia('draft',restoreComposerMedia([media('one',0)]));expect(h.uploads).not.toHaveBeenCalled();expect(h.add).toHaveBeenCalledWith('draft','https://media.test/one.jpg','image',0,expect.anything());});
+  it('failed media save rejects rather than claiming a complete draft',async()=>{h.uploads.mockResolvedValue({success:false,error:'Upload failed'});await expect(saveComposerMedia('draft',[{id:'one',type:'image',file:new File(['a'],'a.jpg'),previewUrl:'blob:a',frame:'original'}])).rejects.toThrow('Upload failed');});
+--- /tmp/pf4/before/pf1bPostGolfContext.test.tsx	2026-11-08 10:41:47.300024922 +0000
++++ src/test/pf1bPostGolfContext.test.tsx	2026-11-08 10:41:47.316690829 +0000
+@@ -218,12 +218,12 @@
+ 
+ describe('golfPostPatch add_to_hole_guide', () => {
+   const course = { id: 'c1', name: 'Machrihanish', country: 'Scotland' };
+-  it('writes add_to_hole_guide with the hole when the toggle is on', () => {
+-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: true });
++  it('ignores the legacy guide-on fields', () => {
++    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'] });
+   });
+-  it('writes the effective boolean both ways, but never without a hole or a course', () => {
++  it('ignores legacy guide-off fields while retaining course association', () => {
+     // PF2_GUIDE: false is written too, so turning the guide off on an edit turns it off.
+-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: false });
++    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'] });
+     expect(golfPostPatch({ course, holeNo: null, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'] });
+     expect(golfPostPatch({ course: null, holeNo: 15, addToGuide: true })).toEqual({});
+   });
+@@ -259,11 +259,11 @@
+     expect(res.isScheduled).toBe(false);
+   });
+ 
+-  it('includes add_to_hole_guide in the posts patch when the guide toggle is on', async () => {
++  it('submission writes course association without legacy hole-guide fields', async () => {
+     rpcMock.mockResolvedValue({ data: { post_id: 'p1', status: 'published' }, error: null });
+     const { result } = renderHook(() => usePostSubmit(), { wrapper });
+     await result.current.submit({ ...base, holeNo: 15, addToGuide: true });
+-    expect(updateCapture.patch).toMatchObject({ hole_no: 15, add_to_hole_guide: true, tagged_course_ids: ['c1'] });
++    expect(updateCapture.patch).toEqual({ tagged_course_ids: ['c1'] });
+   });
+ });
+ 
+--- /tmp/pf4/before/pf2HoleGuide.test.tsx	2026-11-08 10:41:47.300085116 +0000
++++ src/test/pf2HoleGuide.test.tsx	2026-11-08 10:41:47.316888493 +0000
+@@ -31,9 +31,9 @@
+   it('the member switch off stays off', () => {
+     expect(effectiveHoleGuide(false, 1, true, 'anyone')).toBe(false);
+   });
+-  it('golfPostPatch writes the effective boolean false when a hole is set', () => {
+-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: false });
+-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: true });
++  it('golfPostPatch no longer writes either legacy guide boolean', () => {
++    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'] });
++    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'] });
+   });
+   it('footer sub-line carries the guide only when the effective value is on', () => {
+     expect(composerDestinations(15, true, null)).toBe("Shares to your Clubhouse feed · the 15th's hole guide");
+--- /tmp/pf4/before/postPageGolf.test.tsx	2026-11-08 10:41:47.300236816 +0000
++++ src/test/postPageGolf.test.tsx	2026-11-08 10:41:47.317315166 +0000
+@@ -112,9 +112,10 @@
+ describe('per-photo tags are written after upload', () => {
+   const file = new File(['x'], 'a.jpg', { type: 'image/jpeg' });
+   const job = { items: { m1: { tag: { hole: 7 }, courseId: 'c1', knownHoles: [7] } } };
+-  it('a hole-tagged photo goes through the Media tab library write once its url exists', async () => {
++  it('a hole-tagged photo makes no client library write', async () => {
+     await writeShotTagAfterUpload(job, 'me', { id: 'm1', type: 'image', file }, { url: 'https://x/a.jpg' });
+-    expect(lib.holePhoto).toHaveBeenCalledWith(file, 'https://x/a.jpg', 'c1', 'me', 7, [7]);
++    expect(lib.holePhoto).not.toHaveBeenCalled();
++    expect(lib.holeVideo).not.toHaveBeenCalled();
+   });
+   it('an untagged photo writes nothing', async () => {
+     await writeShotTagAfterUpload(job, 'me', { id: 'other', type: 'image', file }, { url: 'u' });

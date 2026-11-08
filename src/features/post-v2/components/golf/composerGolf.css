@@ -50,3 +50,35 @@
 .composer-draft-keeps>div:first-child{border-top:0}
 .composer-draft-keeps span{color:var(--pf-mute)}
 .composer-draft-keeps b{text-align:right;overflow-wrap:anywhere;min-width:0}
+.pf4-with-input{display:flex;align-items:center;gap:10px;height:50px;padding:0 14px;border:1px solid var(--composer-search-edge);border-radius:14px;color:var(--pf-dim)}
+.pf4-with-input:focus-within{border-color:var(--composer-search-focus)}
+.pf4-with-input input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--pf-ink);font-size:15px;padding:0}
+.pf4-with-input input::placeholder{color:var(--pf-dim)}
+.pf4-with-limit{font-size:11.5px;color:var(--pf-dim)}
+.pf4-with-results{margin-top:6px;border:1px solid var(--composer-golf-line);border-radius:14px;background:var(--composer-golf-card);overflow:hidden}
+.pf4-with .pf4-with-result{width:100%;height:auto;display:flex;gap:12px;justify-content:flex-start;padding:10px 14px;border-radius:0;border:0;border-top:1px solid var(--composer-golf-line);background:none;text-align:left;color:var(--pf-ink);white-space:normal}
+.pf4-with .pf4-with-result:first-child{border-top:0}
+.pf4-with-person{flex:1;min-width:0;overflow-wrap:anywhere}
+.pf4-with-person b{display:block;font-size:14.5px;font-weight:700;line-height:1.35}
+.pf4-with-person small{display:block;font-size:12px;color:var(--pf-dim);font-weight:400}
+.pf4-with-add{flex:none;font-size:13px;font-weight:700;color:var(--pf-mute)}
+.pf4-with-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pf4-with-chip{display:flex;align-items:center;gap:7px;min-height:34px;max-width:100%;padding:3px 6px 3px 4px;border-radius:999px;background:var(--composer-golf-card);border:1px solid var(--composer-golf-line);font-size:13.5px;font-weight:650;color:var(--pf-ink)}
+.pf4-with-chip>span{min-width:0;overflow-wrap:anywhere}
+.pf4-with .pf4-with-remove{width:22px;height:22px;padding:0;flex:none;background:none;border:0;border-radius:999px;color:var(--pf-dim)}
+.pf4-hole-audience{display:inline!important;height:auto!important;padding:0!important;border:0!important;background:none!important;text-align:left!important;font-size:inherit!important;font-weight:400!important;color:var(--pf-mute)!important;white-space:normal!important;line-height:1.45!important}
+.pf4-hole-audience strong{color:var(--pf-ink);font-weight:700}
+.pf4-edit-close{width:40px!important;height:40px!important;padding:0!important;border-radius:13px!important;background:var(--composer-edit-wash)!important;border:1px solid var(--composer-edit-edge)!important;color:var(--pf-ink)!important}
+.pf4-edit-close svg{width:20px!important;height:20px!important}
+.pf4-filmstrip{flex:1;min-height:0;display:flex;flex-direction:column;padding-top:12px}
+.pf4-filmstrip-scroll{display:flex;gap:10px;overflow-x:auto;flex:none;padding:5px;margin:0 -5px;scrollbar-width:none;will-change:transform}
+.pf4-filmstrip-tile{position:relative;flex:none;width:112px;height:140px;border-radius:14px;background:var(--composer-golf-card);cursor:pointer}
+.pf4-filmstrip-tile[aria-selected=true]{outline:2.5px solid var(--pf-ink);outline-offset:2px}
+.pf4-filmstrip-image{position:absolute;inset:0;border-radius:14px;overflow:hidden}
+.pf4-filmstrip .pf4-filmstrip-add{width:112px;height:140px;flex:none;padding:0;border-radius:14px;border:1.5px dashed var(--composer-search-edge);background:none;color:var(--pf-mute);font-size:28px}
+.pf4-filmstrip .pf4-filmstrip-remove,.pf4-filmstrip-number{position:absolute;width:24px;height:24px;padding:0;border:0;border-radius:999px;background:var(--composer-tag-glass);color:var(--pf-ink);display:grid;place-items:center;font-size:12px;font-weight:800}
+.pf4-filmstrip .pf4-filmstrip-remove{right:7px;top:7px}
+.pf4-filmstrip-number{left:8px;bottom:8px}
+.pf4-filmstrip-order{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:16px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 26px)}
+.pf4-filmstrip-order p{flex:1;min-width:0;margin:0;font-size:12.5px;color:var(--pf-dim);line-height:1.4}
+.pf4-filmstrip-order .pf4-filmstrip-arrow{width:40px;height:40px;flex:none;padding:0;border:0;border-radius:999px;background:var(--composer-edit-wash);color:var(--pf-ink)}

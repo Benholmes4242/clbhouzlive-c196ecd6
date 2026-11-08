@@ -218,12 +218,12 @@ describe('fullscreen round pill and chip slot', () => {
 
 describe('golfPostPatch add_to_hole_guide', () => {
   const course = { id: 'c1', name: 'Machrihanish', country: 'Scotland' };
-  it('writes add_to_hole_guide with the hole when the toggle is on', () => {
-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: true });
+  it('ignores the legacy guide-on fields', () => {
+    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'] });
   });
-  it('writes the effective boolean both ways, but never without a hole or a course', () => {
+  it('ignores legacy guide-off fields while retaining course association', () => {
     // PF2_GUIDE: false is written too, so turning the guide off on an edit turns it off.
-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: false });
+    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'] });
     expect(golfPostPatch({ course, holeNo: null, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'] });
     expect(golfPostPatch({ course: null, holeNo: 15, addToGuide: true })).toEqual({});
   });
@@ -259,11 +259,11 @@ describe('usePostSubmit', () => {
     expect(res.isScheduled).toBe(false);
   });
 
-  it('includes add_to_hole_guide in the posts patch when the guide toggle is on', async () => {
+  it('submission writes course association without legacy hole-guide fields', async () => {
     rpcMock.mockResolvedValue({ data: { post_id: 'p1', status: 'published' }, error: null });
     const { result } = renderHook(() => usePostSubmit(), { wrapper });
     await result.current.submit({ ...base, holeNo: 15, addToGuide: true });
-    expect(updateCapture.patch).toMatchObject({ hole_no: 15, add_to_hole_guide: true, tagged_course_ids: ['c1'] });
+    expect(updateCapture.patch).toEqual({ tagged_course_ids: ['c1'] });
   });
 });
 

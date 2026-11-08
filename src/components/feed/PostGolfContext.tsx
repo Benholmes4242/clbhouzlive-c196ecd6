@@ -17,7 +17,7 @@ import React from 'react';
 import { ordinal, signedScore } from '@/features/post-v2/lib/composerGolfRules';
 import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import type { PostGolfContext } from '@/hooks/feed/usePostGolfContext';
+import { mediaHoleNo, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
 
 const INK = '#F8FAFC';
 const MUTE = 'rgba(248,250,252,0.62)';
@@ -201,12 +201,18 @@ export function FullscreenHoleChipSlot({
   context,
   hole,
   activeSlide,
+  item,
+  holes,
 }: {
   context: PostGolfContext | null | undefined;
   hole: TeeHole | null | undefined;
   activeSlide: number;
+  item?: { id: string; displayOrder?: number };
+  holes?: readonly TeeHole[];
 }) {
-  if (!context || context.holeNo == null || activeSlide !== 0) return null;
+  const holeNo = mediaHoleNo(context, item, activeSlide);
+  if (holeNo == null) return null;
+  const detail = holes?.find(h => h.hole_no === holeNo) ?? (hole?.hole_no === holeNo ? hole : null);
   return (
     <div
       data-testid="post-hole-chip-fs"
@@ -218,7 +224,7 @@ export function FullscreenHoleChipSlot({
         pointerEvents: 'none',
       }}
     >
-      <HoleChip holeNo={context.holeNo} hole={hole} />
+      <HoleChip holeNo={holeNo} hole={detail} />
     </div>
   );
 }

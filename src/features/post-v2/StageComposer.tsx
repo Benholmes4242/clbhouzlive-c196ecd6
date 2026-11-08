@@ -18,6 +18,7 @@
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
+import { Button } from '@/components/ui/button';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Pencil, X } from 'lucide-react';
@@ -71,7 +72,7 @@ import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { courseWalkHoles } from '@/lib/courseMedia/holeWalk';
-import { GolfShotStrip, ShotTagSheet, WhereSection, PlayedWithSection, FindSomeoneSheet, VisibilitySheet } from './components/golf/GolfPostSections';
+import { GolfShotStrip, ShotTagSheet, WhereSection, PlayedWithSection, VisibilitySheet } from './components/golf/GolfPostSections';
 import { PostPreview, buildDraftFeedPost } from './components/golf/PostPreview';
 import { ShareFooter } from './components/golf/ShareFooter';
 import { GP } from './components/golf/golfPageTokens';
@@ -80,8 +81,7 @@ import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstC
 import { readPostWith, syncPostWith } from './lib/postWith';
 import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
 import { refreshAuthorPosts } from './lib/refreshAuthorPosts';
-import {ComposerCourseBlock,ComposerAttachRound,ComposerHoleGuide,ComposerRoundsSheet} from './components/golf/ComposerGolf';
-import {useCourseTeeSets} from '@/features/courses/hooks/useCourseTeeSets';
+import {ComposerCourseBlock,ComposerAttachRound,ComposerRoundsSheet} from './components/golf/ComposerGolf';
 import {useRoundHoleShapes} from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,roundIsRecent} from './lib/composerGolfReads';
 import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,effectiveHoleGuide,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
@@ -198,7 +198,6 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const [withTagged, setWithTagged] = useState<WithCandidate[]>([]);
   const [visibility, setVisibility] = useState<PostVisibility>('anyone');
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [findOpen, setFindOpen] = useState(false);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const initialVisibilityRef = useRef<PostVisibility>('anyone');
   const initialWithIdsRef = useRef<string[]>([]);
@@ -245,6 +244,9 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
     const media: StageMediaItem[] = data.media.map((m) => ({
       id: `existing-${m.id}`,
       existingId: m.id,
+      holeNo: m.holeNo ?? null,
+      shotTag: m.shotTag ?? null,
+      studioEdits: m.studioEdits,
       type: m.mediaType,
       /* A VIDEO'S PLAYABLE URL IS BUILT FROM stream_id, NEVER READ FROM
        * media_url: 37 of 157 video rows store the sentinel 'stream:<uid>' there,
@@ -292,7 +294,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       if(cancelled || !saved) return;
       applyDraftActor(saved.row.actor_type,saved.row.actor_id);
       memberChoseCourseRef.current=true;
-      restoreDraft(saved.state);setVisibility(saved.visibility);setRestoredDraftId(saved.row.id);
+      restoreDraft(saved.state);setShotTagMap(saved.shotTagMap);setVisibility(saved.visibility);setRestoredDraftId(saved.row.id);
     }).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft, applyDraftActor]);
@@ -417,7 +419,6 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const [golfSuggestions,setGolfSuggestions]=useState<CourseSuggestion[]>([]);
   const [selectedRoundId,setSelectedRoundId]=useState<string|null>(null);
   const [roundSheetOpen,setRoundSheetOpen]=useState(false);
-  const teeSets=useCourseTeeSets(state.course?.id);
   const selectedRound=golfRounds.find(r=>r.whs_score_id===(state.attachedScoreId ?? selectedRoundId)) ?? golfRounds[0] ?? null;
   const shapes=useRoundHoleShapes(state.attachedScoreId ? [state.attachedScoreId] : []);
   const attachedRound = golfRounds.find(r => r.whs_score_id === state.attachedScoreId);
@@ -488,7 +489,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         const map: Record<string, ShotTagChoice> = {};
         const initial: Record<string, ShotTag> = {};
         for (const m of existing) {
-          const t = existingTagFor(existingMediaUrl(m), tags);
+          const t = m.holeNo != null ? { hole: m.holeNo } : m.shotTag?.tag ?? existingTagFor(existingMediaUrl(m), tags);
           if (t) { map[m.id] = { tag: t, courseId: course.id, knownHoles: [] }; initial[m.id] = t; }
         }
         initialExistingTagsRef.current = initial;
@@ -505,6 +506,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       else next[itemId] = { tag, courseId: tagCourse.id, knownHoles: tagHoles };
       return next;
     });
+    setGolf({});
     setTagIndex(null);
   };
 
@@ -598,13 +600,13 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
      actually feed it — personal actor, Everyone audience, with media. The
      member's own switch (state.addToGuide) is never rewritten by audience
      changes, so switching back to Everyone restores it. */
-  const guideEffective = effectiveHoleGuide(state.addToGuide, state.media.length, isPersonalActor, visibility);
+  
   /** Tags for photos still to upload, carried by the upload job. */
   const newShotTagJob = useCallback((items: typeof state.media) => {
     const out: Record<string, ShotTagChoice> = {};
     for (const m of items) if (!m.existingId && shotTagMap[m.id]) out[m.id] = shotTagMap[m.id];
-    return Object.keys(out).length ? { items: out } : undefined;
-  }, [shotTagMap]);
+    return Object.keys(out).length ? { items: out, personal: isPersonalActor, visibility } : undefined;
+  }, [shotTagMap, isPersonalActor, visibility]);
 
   const doCreate = async () => {
     if (!canSubmit || !activeActor) return;
@@ -626,11 +628,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         playedWithPeople: isPersonalActor ? withTagged.map(p => ({ id:p.id, name:p.name })) : [],
         bestHour: scheduleBestHour,
         shotTags: newShotTagJob(state.media),
-        holeNo:state.holeNo,
-        postShotTags:state.postShotTags,
         attachedScoreId:isPersonalActor?state.attachedScoreId:null,
         roundHoles: roundVideo?.holes ?? null,
-        addToGuide:guideEffective,
         videoData: state.videoData,
       });
       submittedRef.current = true;
@@ -750,17 +749,18 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         await syncPostWith(editPostId, editable.data.userId, initialWithIdsRef.current, withTagged.map((p) => p.id));
       }
       // Existing photos whose tag changed: remove the old, add the new.
-      if (state.course && profile?.id) {
+      if (profile?.id) {
         for (const m of kept) {
           const before = initialExistingTagsRef.current[m.id] ?? null;
           const after = shotTags[m.id] ?? null;
           if (JSON.stringify(before) === JSON.stringify(after)) continue;
-          await rewriteExistingShotTag(state.course.id, profile.id, tagHoles, m, after, existingTagsRef.current, editable.data.userId);
+          await rewriteExistingShotTag(shotTagMap[m.id]?.courseId ?? state.course?.id ?? editable.data.courses[0]?.courseId ?? '', profile.id, tagHoles, m, after, existingTagsRef.current, editable.data.userId, editable.data.actorType !== 'business', visibility);
         }
       }
 
       // Invalidate common caches.
       queryClient.invalidateQueries({ queryKey: ['post-golf-tags'] });
+      queryClient.invalidateQueries({ queryKey: ['post-golf-context'] });
       queryClient.invalidateQueries({ queryKey: ['editable-post', editPostId] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });
@@ -845,7 +845,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         courseName: state.course?.name ?? null,
         courseCountry: state.course?.country ?? null,
         courses: state.courses,
-        media:state.media,holeNo:state.holeNo,postShotTags:state.postShotTags,attachedScoreId:isPersonalActor?state.attachedScoreId:null,visibility,addToGuide:state.addToGuide,
+        media:state.media,shotTagMap,attachedScoreId:isPersonalActor?state.attachedScoreId:null,visibility,
         videoData: state.videoData ? { ...state.videoData, coverFrame: state.media.length === 1 && state.media[0].type === 'video' ? state.media[0].posterTimestamp ?? state.videoData.coverFrame : state.videoData.coverFrame } : undefined,
       });
       // Analytics callsite: post_draft_saved
@@ -956,12 +956,6 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           onClose={() => setTagIndex(null)}
           onEditPhoto={() => { if (tagIndex !== null) { setActiveIndex(tagIndex); setOpenMediaIndex(tagIndex); } }}
         />
-        <FindSomeoneSheet
-          open={findOpen}
-          onClose={() => setFindOpen(false)}
-          search={searchPeople}
-          onPick={(p) => setWithTagged((cur) => cur.some((x) => x.id === p.id) ? cur : toggleWith(cur, p, profile?.id ?? null))}
-        />
         <VisibilitySheet open={visibilityOpen} value={visibility} onChange={setVisibility} onClose={() => setVisibilityOpen(false)} />
         <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => selectActor(a)} selectedId={activeActor?.id ?? null} />
   
@@ -981,7 +975,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           drafts={drafts.drafts}
           onRestore={(d) => {
             if(!profile?.id)return;
-            void loadComposerDraft(d.id,profile.id).then(saved=>{if(!saved)return;applyDraftActor(saved.row.actor_type,saved.row.actor_id);memberChoseCourseRef.current=true;restoreDraft(saved.state);setVisibility(saved.visibility);setRestoredDraftId(d.id);}).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
+            void loadComposerDraft(d.id,profile.id).then(saved=>{if(!saved)return;applyDraftActor(saved.row.actor_type,saved.row.actor_id);memberChoseCourseRef.current=true;restoreDraft(saved.state);setShotTagMap(saved.shotTagMap);setVisibility(saved.visibility);setRestoredDraftId(d.id);}).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
           }}
           onDelete={drafts.remove}
         />
@@ -1033,7 +1027,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
             {!isEditMode&&<><div className="composer-draft-keeps">
               {state.media.length>0&&<div><span>Photos and video</span><b>{state.media.length}</b></div>}
               {state.caption&&<div><span>Words</span><b>Kept</b></div>}
-              {(state.course||state.postShotTags?.length>0)&&<div><span>Course, hole and tags</span><b>{[state.course?.name,state.holeNo?ordinal(state.holeNo):null].filter(Boolean).join(' · ') || state.postShotTags.join(', ')}</b></div>}
+              {state.course&&<div><span>Course and tags</span><b>{state.course.name}{state.media.filter(m=>shotTags[m.id]).length>0 ? ` · ${state.media.filter(m=>shotTags[m.id]).length} tagged` : ''}</b></div>}
               {state.attachedScoreId&&selectedRound&&<div><span>Round</span><b>{selectedRound.gross_score} attached</b></div>}
             </div><button onClick={saveAsDraft} disabled={savingDraft} style={{height:54,background:GP.ink,color:GP.onInk,border:0,borderRadius:999,fontSize:15,fontWeight:800,textTransform:'uppercase',letterSpacing:'.14em'}}>{savingDraft?'Saving':t('closeGuard.saveDraft')}</button>
             {state.scheduledAt&&<p style={{fontSize:12,color:GP.mute}}>{t('closeGuard.saveDraftLosesSchedule')}</p>}</>}
@@ -1064,11 +1058,9 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         zIndex: POST_COMPOSER_Z + 1,
       }}
     >
-      {/* Grabber + title */}
-      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 10px)' }}>
-        <div style={{ width: 36, height: 4, borderRadius: 999, background: PAGE2.dim, margin: '0 auto' }} />
-        <div style={{ padding: '12px 16px 10px', fontSize: 16, fontWeight: 700, color: PAGE2.ink, letterSpacing: '-0.015em' }}>
-          {t(editorTitleKey(state.media))}
+      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top, 0px), 10px)' }}>
+        <div style={{ height: 56, padding: '0 12px', display: 'flex', alignItems: 'center' }}>
+          <Button variant="ghost" className="pf4-edit-close" aria-label="Close" onClick={() => setOpenMediaIndex(null)}><X/></Button>
         </div>
       </div>
 
@@ -1128,7 +1120,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
       {/* Filmstrip — only when there is more than one slide, centred in the gap */}
       {state.media.length > 1 ? (
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: PAGE2.canvas }}>
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '0 16px', background: PAGE2.canvas }}>
           <MediaTray
             media={state.media}
             activeIndex={state.activeIndex}
@@ -1142,27 +1134,6 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         <div style={{ flex: 1, minHeight: 0, background: PAGE2.canvas }} />
       )}
 
-      {/* Done — one full-width INK bar, closes the sheet and nothing else. */}
-      <div style={{ flex: 'none', background: PAGE2.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
-        <button
-          onClick={() => setOpenMediaIndex(null)}
-          style={{
-            width: '100%',
-            padding: '15px 20px',
-            borderRadius: 999,
-            border: 'none',
-            /* CAPS ACTION. */
-            fontSize: 13,
-            fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.10em',
-            background: PAGE2.ink,
-            color: PAGE2.canvas,
-            cursor: 'pointer',
-          }}
-        >
-          {t('stage.mediaSheet.done')}
-        </button>
-      </div>
     </div>
   );
 
@@ -1185,9 +1156,9 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
   const tagAndDetails = (
     <>
-      <ComposerCourseBlock course={state.course} reason={courseReason} suggestions={golfSuggestions} hole={state.holeNo??null} tags={state.postShotTags??[]} holes={teeSets.data?.[0]?.holes??[]} onChange={()=>{openDetail('course');setSheet('course');}} onPick={c=>chooseCourses([c])} onHole={holeNo=>setGolf({holeNo})} onTags={postShotTags=>setGolf({postShotTags})}/>
+      <ComposerCourseBlock course={state.course} reason={courseReason} suggestions={golfSuggestions} hole={state.holeNo??null} tags={state.postShotTags??[]} holes={[]} onChange={()=>{openDetail('course');setSheet('course');}} onPick={c=>chooseCourses([c])} onHole={holeNo=>setGolf({holeNo})} onTags={postShotTags=>setGolf({postShotTags})}/>
       {isPersonalActor&&selectedRound&&golfRounds.some(roundIsRecent)&&<ComposerAttachRound round={selectedRound} on={!!state.attachedScoreId} hole={state.holeNo??null} shape={shapes?.get(state.attachedScoreId??'')??null} onToggle={()=>setGolf({attachedScoreId:state.attachedScoreId?null:selectedRound.whs_score_id})} onDifferent={()=>setRoundSheetOpen(true)}/>}
-      {isPersonalActor&&state.course&&state.holeNo&&guideVisible(state.holeNo,state.media.length)&&<ComposerHoleGuide course={state.course} hole={state.holeNo} on={state.addToGuide!==false} audienceOk={visibility==='anyone'} onToggle={()=>setGolf({addToGuide:!state.addToGuide})} onRowTap={()=>setVisibilityOpen(true)}/>}
+
       {state.courses.length > 1 && (
         <div style={{ display: 'flex', gap: 6, margin: '10px 16px 0', flexWrap: 'wrap' }}>
           {state.courses.slice(1).map((c) => (
@@ -1204,7 +1175,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           suggestions={withSuggestions}
           tagged={withTagged}
           onToggle={(p) => setWithTagged((cur) => toggleWith(cur, p, profile?.id ?? null))}
-          onFind={() => setFindOpen(true)}
+          search={searchPeople}
+          selfId={profile?.id ?? null}
         />
       )}
 
@@ -1274,7 +1246,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       ) : (
         /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
         <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
-          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} />
+          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} visibility={visibility} personal={isPersonalActor} onVisibility={() => setVisibilityOpen(true)} />
           {videoComposer ? <VideoTitleDescription details={videoData} description={state.caption} duration={videoItem ? videoDuration(videoItem) : undefined} long={longVideo} onChange={setVideoData} onDetails={() => setVideoDetailsOpen(true)} /> : <div style={{ padding: '14px 16px 0' }}>
             <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
               placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />
@@ -1288,7 +1260,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           with the Preview page so the two cannot drift (PV1). */}
       <ShareFooter
         label={primaryLabel}
-        subLine={composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt) + (videoComposer ? longVideo ? ' · Long form on your profile' : ' · Shorts on your profile' : '')}
+        subLine={(state.scheduledAt ? `Scheduled for ${state.scheduledAt.toLocaleString()}` : shareSubLine(isPersonalActor ? withNames : [], isPersonalActor && visibility === 'anyone' ? holeShotCount : 0)) + (videoComposer ? longVideo ? ' · Long form on your profile' : ' · Shorts on your profile' : '')}
         disabled={!canSubmit}
         busy={submitting || saving}
         onShare={onPrimary}
@@ -1309,7 +1281,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
              tapping it posts through the very same onPrimary path. */
           share={{
             label: primaryLabel,
-            subLine: composerDestinations(state.holeNo??null,guideEffective,state.scheduledAt) + (videoComposer ? longVideo ? ' · Long form on your profile' : ' · Shorts on your profile' : ''),
+            subLine: (state.scheduledAt ? `Scheduled for ${state.scheduledAt.toLocaleString()}` : shareSubLine(isPersonalActor ? withNames : [], isPersonalActor && visibility === 'anyone' ? holeShotCount : 0)) + (videoComposer ? longVideo ? ' · Long form on your profile' : ' · Shorts on your profile' : ''),
             disabled: !canSubmit,
             busy: submitting || saving,
             onShare: onPrimary,
