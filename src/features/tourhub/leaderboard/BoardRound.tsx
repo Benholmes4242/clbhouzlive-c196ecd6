@@ -35,6 +35,10 @@ export function holeMarkGrade(strokes: number | null, par: number | null): HoleM
   return d <= -2 ? 'eagle' : d === -1 ? 'birdie' : d === 0 ? 'par' : d === 1 ? 'bogey' : d === 2 ? 'double' : 'triple';
 }
 export const HOLE_MARK_INK = Object.freeze({ birdie: TOPAR_UNDER_DARK, eagle: SC_EAGLE_DARK, bogey: 'rgba(248,250,252,.55)', double: SC_TRIPLE_DARK, tripleFill: SC_FILL_TRIPLE_DK });
+/** The row tints are translucent; the gap inside a double mark must be the
+ *  OPAQUE colour the row reads as, so tints are flattened onto the canvas. */
+export const MARK_SURFACE_LEADER = 'color-mix(in srgb, rgb(255,255,255) 3.5%, var(--tour-board-canvas))';
+export const MARK_SURFACE_MINE = 'color-mix(in srgb, rgb(247,147,30) 6%, var(--tour-board-canvas))';
 export function HoleMarks({ holes, surface = 'var(--tour-board-canvas)' }: { holes: ReadonlyArray<HoleMarkCell | null>; surface?: string }) {
   const nineGap = holes.length === 18;
   return <span className="tour-hole-marks" data-hole-marks style={{ gridColumn: '1 / -1', '--hm-surface': surface } as CSSProperties}>{holes.map((h, i) => {

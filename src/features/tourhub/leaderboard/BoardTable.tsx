@@ -15,7 +15,7 @@ import { TREND_UP, STATUS_NEGATIVE, AMBER, INK_TINT_04 as LEADER_WASH, INK as TO
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
 import { ClbhouzPickMark } from '../_shared/ClbhouzPickMark';
-import { BoardRound, HoleMarks, HoleMarksKey, orderedHoleCells } from './BoardRound';
+import { BoardRound, HoleMarks, HoleMarksKey, MARK_SURFACE_LEADER, MARK_SURFACE_MINE, orderedHoleCells } from './BoardRound';
 import type { BoardHole } from './useBoardHoles';
 import { boardTieRole } from './leaderboardRules';
 import './leaderboard.css';
@@ -824,7 +824,7 @@ export function BoardTable({
             {/* LINE 2 — the current round's holes as scorecard marks across the
                 FULL row width, from the row's left edge to under TOT. */}
             {!demotedRow && entity.kind !== 'team' && pid && holes.length > 0 ? (
-              <HoleMarks holes={orderedHoleCells(holes)} surface={yourPlayers ? 'var(--tour-board-mine)' : isLeader ? 'var(--tour-board-leader)' : surface} />
+              <HoleMarks holes={orderedHoleCells(holes)} surface={yourPlayers ? MARK_SURFACE_MINE : isLeader ? MARK_SURFACE_LEADER : surface} />
             ) : null}
           </>
         )}
