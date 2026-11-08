@@ -327,6 +327,23 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   }, [teeRound, teeGroups]);
   const shapeSlots = Math.max(totalRounds ?? 0, heroCols.rounds.length, currentRound ?? 0);
 
+  /* HERO BOARD HOLE TILES — one cached whole-field read per round, shared
+     with the full leaderboard's cache keys; never a query per row. The
+     previous round is read only when a visible row still needs it. */
+  const isHero = theme === 'heroBoard';
+  const heroCompleted = phase === 'completed';
+  const queryClient = useQueryClient();
+  const boardUpdatedAt = isHero ? queryClient.getQueryState(['tourhub', 'leaderboard', tournamentId])?.dataUpdatedAt ?? 0 : 0;
+  const effectiveRound = currentRound ?? (heroCompleted ? heroCols.rounds.at(-1) ?? null : null);
+  const tileRounds = useMemo(
+    () => (isHero ? rows.map((r) => (r.player?.id ? heroTileRound(r, effectiveRound, heroCompleted) : null)) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isHero, entries, currentRound, phase, limit],
+  );
+  const prevTileRound = !heroCompleted && effectiveRound != null && tileRounds.some((rd) => rd === effectiveRound - 1) ? effectiveRound - 1 : null;
+  const curHoleData = useBoardHoles(isHero ? tournamentId : null, effectiveRound, boardUpdatedAt, isHero && effectiveRound != null);
+  const prevHoleData = useBoardHoles(isHero ? tournamentId : null, prevTileRound, boardUpdatedAt, isHero && prevTileRound != null);
+
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
   /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
      already showing round N's score, so it takes round N's name. */
