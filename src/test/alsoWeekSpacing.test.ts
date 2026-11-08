@@ -6,6 +6,7 @@ import { resolve } from 'path';
 
 const css = readFileSync(resolve(__dirname, '../features/tourhub/overview/sections/alsoWeek.css'), 'utf8');
 const tsx = readFileSync(resolve(__dirname, '../features/tourhub/overview/sections/AlsoWeekEvent.tsx'), 'utf8');
+const hero = readFileSync(resolve(__dirname, '../features/tourhub/tournament-v2/sections/HeroBoardRows.tsx'), 'utf8');
 const block = (cls: string) => {
   const m = new RegExp(`(?:^|\\})\\s*\\.${cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{([^}]*)\\}`).exec(css);
   if (!m) throw new Error(`no .${cls} block`);
@@ -24,46 +25,43 @@ describe('Also this week signed-off spacing', () => {
     expect(block('also-chase')).toContain('margin-top:12px');
     expect(block('also-track')).toContain('height:34px');
   });
-  it('board grid is 24px minmax(0,1fr) 40px 40px 40px with 4px column gap', () => {
-    expect(block('also-bh,.also-br')).toContain('grid-template-columns:24px minmax(0,1fr) 40px 40px 40px');
-    expect(block('also-bh,.also-br')).toContain('column-gap:4px');
+  it('board grid is the shared hero grammar: 24px POS, 32px rounds, 40px TOT, 4px gap', () => {
+    // Board brief: the weekly board IS the hero board (was 24px minmax(0,1fr) 40px 40px 40px TODAY/THRU/TOT).
+    expect(hero).toContain('HERO_POS_W = 24');
+    expect(hero).toContain('HERO_ROUND_W = 32');
+    expect(hero).toContain('HERO_TOT_W = 40');
+    expect(hero).toContain('HERO_GAP = 4');
   });
-  it('board header is 24px min-height, no bottom padding, 10px/700 mute', () => {
-    const bh = block('also-bh');
-    expect(bh).toContain('min-height:24px');
-    expect(bh).toContain('padding-bottom:0');
-    expect(bh).toContain('font-size:10px');
-    expect(bh).toContain('font-weight:700');
-    expect(bh).toContain('letter-spacing:.08em');
-    expect(bh).toContain('color:var(--tour-board-mute)');
+  it('board header is 24px min-height, 10px/700 with .08em tracking', () => {
+    expect(hero).toContain('minHeight: 24');
+    expect(hero).toContain('fontSize: 10');
+    expect(hero).toContain('fontWeight: 700');
+    expect(hero).toContain("letterSpacing: '0.08em'");
   });
-  it('board rows are 33px and your row bleeds 20px', () => {
-    // Marks brief: rows are two lines with 9px top/bottom padding (was min-height 33px / padding 0 20px).
-    expect(block('also-br')).toContain('padding:9px 0');
-    const mine = block('also-br[data-mine=true]');
-    expect(mine).toContain('margin:0 -20px');
-    expect(mine).toContain('padding:9px 20px');
+  it('board rows are 31px minimum with 4px vertical padding and bleed 20px', () => {
+    // Board brief: single-line hero rows (was two-line 9px rows with always-on marks).
+    expect(hero).toContain('minHeight: 31');
+    expect(hero).toContain('2 * HERO_PAD_X');
+    expect(hero).toContain("background: mine ? 'var(--tour-board-mine)'");
   });
-  it('position is 11px/800 with .04em tracking, leader in ink', () => {
-    const pos = block('also-pos');
-    expect(pos).toContain('font-size:11px');
-    expect(pos).toContain('font-weight:800');
-    expect(pos).toContain('letter-spacing:.04em');
-    expect(block('also-pos[data-leader=true]')).toContain('color:var(--tour-board-ink)');
+  it('position is 12.5px/700 in ink', () => {
+    // Board brief: hero POS grammar (was 11px/800 mute with .04em tracking).
+    expect(hero).toContain('fontSize: 12.5, fontWeight: 700');
   });
   it('who gap is 8px and row faces are 22px', () => {
     // Marks brief: Also this week rows carry no faces (was gap:8px and size=22).
     expect(tsx).not.toContain('SquircleAvatar');
   });
-  it('name 13.5px/600, today 13px/700, thru 13px/600 mute, tot 15px/700', () => {
-    expect(block('also-name')).toContain('font-size:13.5px');
-    expect(block('also-name')).toContain('font-weight:600');
-    expect(block('also-today')).toContain('font-size:13px');
-    expect(block('also-today')).toContain('font-weight:700');
-    expect(block('also-thru')).toContain('font-size:13px');
-    expect(block('also-thru')).toContain('font-weight:600');
-    expect(block('also-tot')).toContain('font-size:15px');
-    expect(block('also-tot')).toContain('font-weight:700');
+  it('name 13px/600, round cells 12px/600, tot 15px/700', () => {
+    // Board brief: hero cell grammar (was name 13.5/600, today 13/700, thru 13/600 mute).
+    expect(hero).toContain('fontSize: 13, fontWeight: 600');
+    expect(hero).toContain('fontSize: tee ? 11 : 12');
+    expect(hero).toContain('fontSize: 15, fontWeight: 700');
+  });
+  it('the win line score is 700 weight and the board reads no holes up front', () => {
+    expect(block('also-win-score')).toContain('font-weight:700');
+    expect(tsx).not.toContain('useBoardHoles');
+    expect(tsx).not.toContain('HoleMarks');
   });
   it('tie bracket sits 19px from the edge, 39px on your row', () => {
     // Marks brief: the tie bracket is removed (was left:19px / 39px).

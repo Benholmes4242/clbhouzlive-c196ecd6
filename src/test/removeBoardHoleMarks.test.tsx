@@ -74,10 +74,13 @@ describe('boards without hole marks', () => {
     expect(v.container.querySelector('[data-hole-marks], [data-hole-marks-key]')).toBeNull();
     expect(f.holes).not.toHaveBeenCalled();
   });
-  it('Also this week rows still render HoleMarks', () => {
+  it('Also this week rows show no marks until a row is tapped, then the open panel reads holes', () => {
     const slide = { type: 'live', tournament: { id: 'event', name: 'Event', currentRound: 2, tourSlug: 'pga', startDate: '2026-11-05', endDate: '2026-11-08' } } as HeroSlide;
     const v = mount(<AlsoWeekEvent slide={slide} entries={[entry]} followed={new Set()} />);
-    expect(v.container.querySelector('.also-br [data-hole-marks]')).not.toBeNull();
+    expect(v.container.querySelector('[data-hole-marks]')).toBeNull();
+    expect(f.holes).not.toHaveBeenCalled();
+    fireEvent.click(v.container.querySelector('[data-hero-board-row="row-a"]') as HTMLElement);
+    expect(v.container.querySelector('[data-hero-round-panel] [data-hole-marks]')).not.toBeNull();
     expect(v.container.querySelectorAll('[data-hole-mark]')).toHaveLength(18);
   });
   it.each([18, 9])('RoundTilePlot keeps HoleMarks for %s holes', count => {
