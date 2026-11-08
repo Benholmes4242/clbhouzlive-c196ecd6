@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -108,9 +109,21 @@ describe('Merged Airy lower sections', () => {
     const section = v.container.querySelector<HTMLElement>('[data-leaders-group]'); expect(section?.style.padding).toBe('14px 20px 12px'); expect(section?.style.marginTop).toBe('6px'); expect(section?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
     expect(section?.querySelector<HTMLElement>('[data-leaders-group-state]')?.style.marginTop).toBe('6px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-header]')?.style.marginTop).toBe('10px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-row]')?.style.minHeight).toBe('33px');
   });
-  it('tightens narrative champion spacing and preserves the no-narrative strip', () => {
-    const v = mount(<ChampionStrip name="Player A" score="−6" narrative="Narrative" />); const root = v.container.firstElementChild as HTMLElement;
-    expect(root.style.padding).toBe('10px 20px 12px'); expect(root.style.gap).toBe('6px'); v.unmount();
-    const plain = mount(<ChampionStrip name="Player A" score="−6" />); expect((plain.container.firstElementChild as HTMLElement).style.padding).toBe('10px 20px'); expect((plain.container.firstElementChild as HTMLElement).style.minHeight).toBe('62px');
+  it('renders the shared champion block with the narrative line and a gold ring, tighter and faded', () => {
+    const v = mount(<ChampionStrip name="Player A" score="−6" scoreValue={-6} narrativeParts={[{ text: 'Led all week.' }]} />);
+    const block = v.container.querySelector('.tv-champion');
+    expect(block).not.toBeNull();
+    expect(block?.querySelector('.tv-champion-line')?.textContent).toBe('Led all week.');
+    expect(block?.querySelector('[data-active-ring="on"]')).not.toBeNull();
+    v.unmount();
+    const plain = mount(<ChampionStrip name="Player A" score="−6" />);
+    expect(plain.container.querySelector('.tv-champion-line')).toBeNull();
+    // The chrome lives in championStrip.css (jsdom drops imported styles):
+    // 10px vertical padding, no border-bottom, 16px top/bottom fade mask.
+    const css = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/championStrip.css', 'utf8');
+    expect(css).toContain('padding: 10px 20px;');
+    expect(css).not.toContain('border-bottom');
+    expect(css).toContain('mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);');
+    expect(css).toContain('linear-gradient(90deg, rgba(251,188,46,.12), rgba(251,188,46,0) 70%), var(--tv-panel)');
   });
 });
