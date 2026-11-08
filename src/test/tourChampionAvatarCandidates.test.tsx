@@ -77,4 +77,26 @@ describe('Tour champion avatar candidates', () => {
     expect(candidates.every(url => decodeURIComponent(url).includes('Eugenio renamed') || decodeURIComponent(url).includes('Eugenio_renamed'))).toBe(true);
     expect(fixture.championProps?.playerKey).toBe('winner-key');
   });
+
+  it('renders the shared .tv-champion block with the narrative and "BY TWO", and drops the photo sentence and Full board link', () => {
+    const slide: HeroSlide = { type: 'completed', tournament: {
+      id: 'india', name: 'India Championship', status: 'closed', startDate: '2026-10-15', endDate: '2026-10-18',
+      venueName: null, venueCourseName: null, venueCity: null, venueState: null, venueCountry: null, venuePar: 72, venueYardage: null,
+      purse: null, winningShare: null, currency: null, tourSlug: 'euro', tourName: 'DP World Tour',
+      defendingChampion: null, defendingChampionPhotoUrl: null, defendingChampionPgaTourId: null,
+      isMajor: false, isSignature: false, eventType: 'stroke', winnerId: 'winner-key', winnerKey: 'winner-key',
+      winnerName: 'Eugenio Lopez-Chacarra', winnerPhotoUrl: null, winnerHeadshotOverride: 'Eugenio renamed',
+      winnerPgaTourId: null, winnerScore: '-17', leaderScore: -17, leaderName: 'Eugenio Lopez-Chacarra', currentRound: 4, currentRoundStatus: null,
+    } };
+    const { container } = render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} /></MemoryRouter></QueryClientProvider>);
+    const block = container.querySelector('.tv-champion');
+    expect(block).not.toBeNull();
+    expect(block?.querySelector('.tv-champion-line')).not.toBeNull();
+    expect(block?.querySelector('.tv-champion-score small')?.textContent).toBe('BY TWO');
+    expect(block?.querySelector('[data-active-ring="on"]')).not.toBeNull();
+    const band = container.querySelector<HTMLElement>('[data-overview-photo-band]');
+    expect(band?.querySelector('[data-overview-photo-situation]')).toBeNull();
+    expect(band?.querySelector('[data-overview-full-board]')).toBeNull();
+    expect(band?.style.height).toBe('300.7px'); // 350 − sentence (27.9) − spine (21.4)
+  });
 });
