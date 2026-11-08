@@ -1,5 +1,10 @@
 # Roadmap
 
+## UPCOMING_OVERVIEW_PLUS
+- [ ] Finish Tour buttons shard 4, responsive fixtures, and close-out report before upcoming edits.
+- [ ] Build countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.
+- [ ] Add rule tests, list authorized assertion changes, run four separate shards, and verify 320/390/430 fixtures.
+
 ## REVIEW_RECEIPT_NEXT_COURSE
 - [x] Scope receipt to its submitted course and clear receipt/submitted state on next-course and route changes.
 - [x] Add four transition regression cases; existing assertions/tests unchanged (expected suite7,788 vs7,784).
