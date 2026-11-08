@@ -267,6 +267,51 @@ export function OverviewHero({ height }: OverviewHeroProps) {
     navigate(target.to, { state: target.state });
   }, [navigate, viewingTid]);
 
+  /**
+   * THE TOUR CHIP ROW (BUILD_TOUR_BUTTONS_UNDER_HERO §1). One canonical
+   * RailChips chip per slide, in slide order. A tour with two slides in a
+   * week labels each "{TOUR} · {shortTournamentToken(name)}" so the pair is
+   * distinguishable. Tapping a chip is EXACTLY a swipe to that slide: the
+   * same setActiveIndex path, and the debounced display reporting below does
+   * the viewing* updates precisely as a swipe does. Tapping the selected chip
+   * does nothing.
+   */
+  const chipOptions = useMemo(() => {
+    const perTour = new Map<string, number>();
+    slides.forEach((s) => perTour.set(s.tournament.tourSlug, (perTour.get(s.tournament.tourSlug) ?? 0) + 1));
+    return slides.map((s) => {
+      const base = TOUR_LABEL[s.tournament.tourSlug as TourId] ?? s.tournament.tourName;
+      const label = (perTour.get(s.tournament.tourSlug) ?? 0) > 1
+        ? `${base} · ${shortTournamentToken(s.tournament.name)}`
+        : base;
+      return { id: s.tournament.id, label };
+    });
+  }, [slides]);
+
+  const chipRowRef = useRef<HTMLDivElement>(null);
+  const onChipChange = useCallback(
+    (id: string) => {
+      const idx = slides.findIndex((s) => s.tournament.id === id);
+      if (idx >= 0 && idx !== activeIndex) setActiveIndex(idx);
+    },
+    [slides, activeIndex],
+  );
+
+  /* The selected chip ALWAYS follows the active slide — swipe, island jump or
+     first load — and scrolls fully into view without moving the page. */
+  useEffect(() => {
+    const row = chipRowRef.current?.firstElementChild as HTMLElement | null;
+    const chip = row?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!row || !chip) return;
+    const left = chip.offsetLeft;
+    const right = left + chip.offsetWidth;
+    if (left < row.scrollLeft) {
+      row.scrollTo({ left: left - 20, behavior: 'smooth' });
+    } else if (right > row.scrollLeft + row.clientWidth) {
+      row.scrollTo({ left: right - row.clientWidth + 20, behavior: 'smooth' });
+    }
+  }, [activeIndex, idSignature]);
+
   if (isLoading || count === 0 || !heroState) {
     return (
       <div
