@@ -32,6 +32,22 @@ describe('Tour champion avatar candidates', () => {
     expect(getByRole('img', { name: 'Eugenio Lopez-Chacarra' }).getAttribute('src')).toBe('https://avatar.test/good-b.png');
   });
 
+  it('wraps the champion avatar in a gold squircle ring with no hairline inside (overview and tournament)', () => {
+    for (const presentation of [undefined, 'tournament'] as const) {
+      const { container, unmount } = render(<ChampionStrip name="Eugenio Lopez-Chacarra" score="−17" playerKey="winner-key" presentation={presentation} />);
+      const ring = container.querySelector<HTMLElement>('[data-active-ring="on"]');
+      expect(ring).not.toBeNull();
+      expect(ring?.style.background).toBe('rgb(251, 188, 46)');
+      expect(ring?.style.borderRadius).toBe('34%');
+      const gap = ring?.querySelector<HTMLElement>('[data-active-ring-gap]');
+      expect(gap).not.toBeNull();
+      const avatar = ring?.querySelector<HTMLElement>('[data-avatar-fallback]')?.parentElement;
+      expect(avatar?.style.border).toContain('transparent');
+      expect(container.querySelector('[data-avatar-ring-gradient]')).toBeNull();
+      unmount();
+    }
+  });
+
   it('uses the player initials rather than the person icon when all photos miss', () => {
     const { getByRole, queryByRole, container } = render(<ChampionStrip name="Eugenio Lopez-Chacarra" score="−17" playerKey="winner-key" avatarCandidates={['https://avatar.test/miss-a.png', 'https://avatar.test/miss-b.png']} />);
     fireEvent.error(getByRole('img', { name: 'Eugenio Lopez-Chacarra' }));
