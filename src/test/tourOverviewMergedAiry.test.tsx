@@ -17,7 +17,7 @@ vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes', () => ({ usePic
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet', () => ({ PicksSheet: () => null }));
 vi.mock('@/features/tourhub/leaderboard/ScorecardSheet', () => ({ ScorecardSheet: () => null }));
 
-import { PhotoBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
+import { PhotoBand, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_BLOCK } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
 import { HeroBoardSection, RoundMovementBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { ChampionStrip } from '@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip';
 import { LeadersGroupContent } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup';
@@ -30,10 +30,11 @@ const field: BoardEntry[] = [{ id: 'a', position: 1, score: -6, round_1: -4, rou
 const photo = (state: HeroState, onOpen = vi.fn(), onFullBoard?: () => void) => <PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl="https://example.test/course.jpg" state={state} tourLabel="PGA" leader={{ score: -6, faces: [], caps: 'A' }} countdown={[{ value: 2, label: 'days' }]} startDay={null} segments={[{ text: 'Figure ', figure: false }, { text: '6', figure: true }]} note="Note" onOpen={onOpen} onFullBoard={onFullBoard} />;
 
 describe('Merged Airy photo', () => {
-  it.each(states)('puts the sentence and note on the 350px photo in $kind', state => {
+  it.each(states)('puts the sentence and note on the photo in $kind at the derived height', state => {
     const v = mount(photo(state));
     const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
-    expect(band?.style.height).toBe('350px');
+    // Live keeps 350; states without the round spine drop exactly its block.
+    expect(band?.style.height).toBe(`${state.kind === 'live' ? 350 : 350 - OVERVIEW_SPINE_BLOCK}px`);
     expect(band?.querySelector('[data-overview-photo-situation]')).not.toBeNull();
     expect(band?.querySelector('[data-overview-situation-note]')).not.toBeNull();
     expect(v.container.querySelector('[data-overview-situation]')).toBeNull();
