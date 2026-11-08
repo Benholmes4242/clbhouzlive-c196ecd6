@@ -33,10 +33,6 @@ export async function writeShotTagAfterUpload(
     if (isHoleTag(tag)) {
       if (tagJob?.personal !== false && (tagJob?.visibility ?? 'anyone') === 'anyone') onSavedHole?.({ itemId: item.id, courseId: choice.courseId, hole: tag.hole });
       return;
-    } else if (item.type !== 'video' && uploaded.url) {
-        saved = !!(await submitLibraryHolePhoto(item.file, uploaded.url, choice.courseId, memberId, tag.hole, choice.knownHoles));
-      }
-      if (saved) onSavedHole?.({ itemId:item.id, courseId:choice.courseId, hole:tag.hole });
     } else if (item.type === 'video') {
       if (uploaded.streamId) await submitLibraryPlaceVideo(item.file, uploaded.streamId, choice.courseId, memberId, tag.place);
     } else if (uploaded.url) await submitLibraryPlacePhoto(item.file, uploaded.url, choice.courseId, memberId, tag.place);

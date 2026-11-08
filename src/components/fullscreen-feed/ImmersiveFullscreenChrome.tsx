@@ -327,6 +327,7 @@ interface Props {
   videoRoundShape?: HoleShape | null;
   /** PF1B: par/yards for the context's hole. */
   golfHole?: TeeHole | null;
+  golfHoles?: readonly TeeHole[];
   /** PF1B: opens the attached round's scorecard sheet over the viewer. */
   onOpenScorecard?: (scoreId: string) => void;
 }
@@ -354,6 +355,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   feedEnded = false,
   golfContext = null,
   golfHole = null,
+  golfHoles,
   onOpenScorecard,
   videoDetails,
   videoRoundShape,
@@ -624,7 +626,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         {/* PF1B hole chip (mock B): below the top bar, left aligned with the
             caption block, FIRST slide only. Absolute against this fixed
             container so it tracks the bar's real height. */}
-        <FullscreenHoleChipSlot context={golfContext} hole={golfHole} activeSlide={activeSlide} />
+        <FullscreenHoleChipSlot context={golfContext} hole={golfHole} holes={golfHoles} item={activePost?.mediaItems[activeSlide]} activeSlide={activeSlide} />
         <RoundVideoChip round={videoRound} chapter={chapter} follows={videoDetails?.scoreFollows !== false} />
 
         {/* Course header — left edge is 70px = chevron left (14) + chevron (44)

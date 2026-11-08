@@ -32,6 +32,7 @@ export interface PostGolfContext {
   roundPar: number | null;
   roundPlayDate: string | null;
   roundHoles: number | null;
+  mediaHoles?: Array<{ mediaId: string | null; displayOrder: number | null; holeNo: number | null }>;
 }
 
 /** null / undefined / non-finite stays null. Absence is not zero. */
@@ -52,6 +53,11 @@ function coerce(row: Record<string, unknown>): PostGolfContext {
     roundPar: nullableNum(row.round_par),
     roundPlayDate: row.round_play_date ? String(row.round_play_date) : null,
     roundHoles: nullableNum(row.round_holes),
+    mediaHoles: Array.isArray(row.media_holes) ? row.media_holes.flatMap(value => {
+      if (!value || typeof value !== 'object') return [];
+      const m = value as Record<string, unknown>;
+      return [{ mediaId: m.media_id ? String(m.media_id) : null, displayOrder: nullableNum(m.display_order), holeNo: nullableNum(m.hole_no) }];
+    }) : [],
   };
 }
 
@@ -138,4 +144,16 @@ export function golfHoleFor(
 ): TeeHole | null {
   if (!ctx?.courseId || ctx.holeNo == null) return null;
   return holeMap?.get(ctx.courseId)?.find((h) => h.hole_no === ctx.holeNo) ?? null;
+}
+
+/** PF4: media identity wins over display order, including an explicitly cleared
+ * hole. Post-wide legacy context applies only when no per-media rows exist. */
+export function mediaHoleNo(ctx: PostGolfContext | null | undefined, item: { id: string; displayOrder?: number } | undefined, slide: number): number | null {
+  if (!ctx) return null;
+  if (ctx.mediaHoles?.length) {
+    if (!item) return null;
+    const row = ctx.mediaHoles.find(m => m.mediaId === item.id) ?? ctx.mediaHoles.find(m => m.displayOrder === (item.displayOrder ?? slide));
+    return row?.holeNo ?? null;
+  }
+  return slide === 0 ? ctx.holeNo : null;
 }
