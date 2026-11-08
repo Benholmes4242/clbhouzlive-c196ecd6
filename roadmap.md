@@ -1,5 +1,11 @@
 # Roadmap
 
+## PF4_COMPOSER_FIX
+- [ ] Match media Edit sheet and inline Played with to signed-off A–D screens.
+- [ ] Save per-shot holes, gate place publication, hydrate/retag existing shots, and remove post-wide composer writes/draft values.
+- [ ] Share per-slide hole context across Preview/feed/fullscreen; update draft summary.
+- [ ] Add rule/interaction tests, run four separate two-worker shards, verify 320px and report all five checks.
+
 ## COURSE_HEROES_MATCH
 - [x] Match course-list/detail material and opt-in masthead typography; preserve gold/default callers. Preview buildOK.
 - [x] Add9cases/1file and ledger one authorised overlay-case rename/rewrite. Focused42passed/2failed at courseHeroesMatch.test.tsx:59:34 (clamp omitted) and81:86 (nonexistent avatar marker); no repairs.
