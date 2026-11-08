@@ -33,11 +33,17 @@ import { SearchFieldBox } from '@/features/search-v2/components/SearchField';
 import { resolveVenuePlace } from './venuePlace';
 import { Button } from '@/components/ui/button';
 import { LiveBoard } from './LiveBoard';
-import { fieldAverageToday, leaderSummary, eventLeaderLabel } from './leaderboardRules';
+import { fieldAverageToday, leaderSummary, eventLeaderLabel, lowRoundScore } from './leaderboardRules';
 import { surnameOf } from '../_shared/playerName';
 import { getScoreColor } from '../_shared/scoreColor';
 import { fmtScore } from '../utils/fmtScore';
 import { computeBoardColumns } from './BoardTable';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
+import { heroStateLine } from '../components/overview-v3/HybridHeroBands/heroStateLine';
+import { fullTourLabel } from '../_shared/tourOrder';
+import { heroStartDay } from '../tournament-v2/data/tournamentRules';
+import { TOUR_LIVE_GREEN } from '../_shared/tokens';
 import './leaderboard.css';
 
 
@@ -117,7 +123,7 @@ function LiveMarker({
           }}
         />
       )}
-      {/* 12/800 tabular - sits on line one beside the h1. */}
+      {/* 12/800 tabular - the kicker row's right slot while suspended. */}
       <span
         style={{
           fontFamily: F,
