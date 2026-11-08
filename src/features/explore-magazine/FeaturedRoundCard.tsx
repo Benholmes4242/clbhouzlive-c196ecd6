@@ -26,6 +26,7 @@ import { FigureCell } from './AchievementCallout';
 import { AwardCluster } from './AwardCluster';
 import type { RoundMedalCounts } from './useBatchRoundMedals';
 import { fmtDateLong } from '@/i18n/format';
+import { CompetitionMark } from '@/components/explore-tab-new/courseled/CompetitionMark';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { r as rad } from '@/lib/radius';
