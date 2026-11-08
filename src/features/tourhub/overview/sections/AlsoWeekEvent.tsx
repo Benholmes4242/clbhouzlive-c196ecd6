@@ -1,38 +1,52 @@
-/** Weekly rows share today/thru/tie rules and bracket CSS with BoardTable.
+/** Weekly rows share today/thru/tie rules with BoardTable. No faces anywhere
+ * (signed-off board-rows mock); player rows carry the shared HoleTiles.
  * Winner identity is the hero's confirmed sr_id, never inferred from a name. */
 import { ChevronRight } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useNavigate } from 'react-router-dom';
 import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { tournamentRoute } from '../../routes';
 import { fullTourLabel } from '../../_shared/tourOrder';
 import { surnameOf } from '../../_shared/playerName';
-import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { fmtScore } from '../../utils/fmtScore';
 import { todayFromEntry, fmtThru, type BoardEntry } from '../../leaderboard/BoardTable';
+import { HoleTiles, orderedHoleCells } from '../../leaderboard/BoardRound';
+import { useBoardHoles } from '../../leaderboard/useBoardHoles';
 import { boardTieRole, leaderSummary } from '../../leaderboard/leaderboardRules';
 import { chasePlayers,onCourse,situation,startsValues,weekFacts,weekRows,weekTotalRounds } from './alsoWeekRules';
 import '../../leaderboard/leaderboard.css';
 import './alsoWeek.css';
 
-function Avatar({player,tour,size=22}:{player:BoardEntry['player'];tour:string;size?:number}) {
-  return <SquircleAvatar className="also-avatar" size={size} hairlineRing alt={player?.full_name ?? ''} userId={player?.id} srcCandidates={resolvePlayerAvatarCandidates({name:player?.full_name,photoUrl:player?.photo_url,headshotOverride:player?.headshot_override,tourSlug:tour})}/>;
+/** The tiles' round, shared with the Tour hero board: the current round once
+ *  the player has started it, otherwise the previous round; a finished event
+ *  shows the final round. Round one before tee-off has no previous round. */
+export function weekTileRound(e: BoardEntry, round: number | null, complete: boolean): number | null {
+  if (round == null) return null;
+  if (complete) return round;
+  if (todayFromEntry(e, round) != null) return round;
+  return round > 1 ? round - 1 : null;
 }
-function WeekBoard({entries,followed,round,complete,tour}:{entries:BoardEntry[];followed:Set<string>;round:number|null;complete:boolean;tour:string}) {
+const WEEK_EMPTY_TILES: ReadonlyArray<null> = Array.from({ length: 18 }, () => null);
+function WeekBoard({entries,followed,round,complete,tournamentId}:{entries:BoardEntry[];followed:Set<string>;round:number|null;complete:boolean;tournamentId:string}) {
   const {t}=useTranslation('tourhub');const {top,extra}=weekRows(entries,followed);
+  const prevRound=!complete&&round!=null&&round>1?round-1:null;
+  const needsPrev=prevRound!=null&&[...top,...extra].some(e=>e.player?.id&&todayFromEntry(e,round)==null);
+  const cur=useBoardHoles(tournamentId,round,0,round!=null);
+  const prev=useBoardHoles(tournamentId,needsPrev?prevRound:null,0,needsPrev);
   const row=(e:BoardEntry,index:number,added=false)=>{
     const tie=added?'':boardTieRole(top,index);const mine=!!e.player?.id&&followed.has(e.player.id);
     const today=todayFromEntry(e,round);
+    const tileRound=weekTileRound(e,round,complete);
+    const holes=tileRound!=null&&e.player?.id?(tileRound===round?cur.byPlayer.get(e.player.id):prev.byPlayer.get(e.player.id)):undefined;
     return <div className="also-br" key={e.id} data-player={e.player?.id} data-mine={mine} data-tie-role={tie||undefined}>
       <span className="also-pos" data-leader={e.position===1}>{added||!['middle','last'].includes(tie)?`${e.position_tied?'T':''}${e.position??''}`:''}</span>
-      {tie&&<i aria-hidden className={`tour-tie tour-tie-${tie}`} data-tie-bracket={tie}/>}
-      <span className="also-who"><Avatar player={e.player} tour={tour}/><span className="also-name">{surnameOf(e.player?.full_name??'')}{mine&&<span className="also-star">★</span>}</span></span>
+      <span className="also-who"><span className="also-name">{surnameOf(e.player?.full_name??'')}{mine&&<span className="also-star">★</span>}</span></span>
       <span className="also-c also-today" style={{color:getScoreColor(today,'dark')}}>{fmtScore(today,{absent:''})}</span>
       <span className="also-c also-thru">{complete?'F':today==null?'':fmtThru(e.thru)}</span>
       <span className="also-c also-tot" style={{color:getScoreColor(e.score,'dark')}}>{fmtScore(e.score,{absent:''})}</span>
+      <HoleTiles holes={holes?orderedHoleCells(holes):WEEK_EMPTY_TILES} />
     </div>;
   };
   return top.length||extra.length?<div className="also-board"><div className="also-bh">{['pos','player','today','thru','tot'].map(k=><span key={k}>{t(`overview.alsoThisWeek.${k}`)}</span>)}</div>{top.map((e,i)=>row(e,i))}{extra.length>0&&<><div className="also-gap"/>{extra.map((e,i)=>row(e,i,true))}</>}</div>:null;
