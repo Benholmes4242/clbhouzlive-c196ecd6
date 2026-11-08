@@ -43,7 +43,7 @@ describe('Tour champion avatar candidates', () => {
       expect(gap).not.toBeNull();
       const squircle = Array.from(ring?.querySelectorAll<HTMLElement>('*') ?? []).find(el => el.style.aspectRatio !== '');
       expect(squircle).not.toBeNull();
-      expect(squircle?.style.border === 'none' || squircle?.style.border.includes('transparent')).toBe(true);
+      expect(squircle?.style.border.includes('solid')).toBe(false); // hideRing: no grey hairline inside the gold ring
       expect(container.querySelector('[data-avatar-ring-gradient]')).toBeNull();
       unmount();
     }
