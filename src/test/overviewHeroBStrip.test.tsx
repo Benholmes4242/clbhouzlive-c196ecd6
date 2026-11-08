@@ -30,7 +30,7 @@ const language=createInstance();
 void language.use(initReactI18next).init({lng:'en',initAsync:false,resources:{en:{tourhub:en}},interpolation:{escapeValue:false}});
 const mount=(node:React.ReactNode)=>render(<QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false}}})}><MemoryRouter><I18nextProvider i18n={language}>{node}</I18nextProvider></MemoryRouter></QueryClientProvider>);
 const member=(id:string,player='griffin'):TournamentPicksBoardRow=>({user_id:id,display_name:id,username:id,profile_photo_url:null,player_id:player,player_name:player==='griffin'?'Ben Griffin':'Peter Malnati',is_viewer:false,is_followed:false});
-const photo=(state:HeroState,tourLabel='PGA TOUR')=><PhotoBand title="World Wide Technology Championship" venueName="El Cardonal at Diamante" datesString="5–8 Nov" venueImageUrl={null} state={state} tourLabel={tourLabel} startDay="THURSDAY" countdown={[{value:4,label:'days'}]} leader={{score:-18,caps:'James',faces:[{key:'j',name:'Benjamin James',candidates:[]},{key:'b',name:'Blair',candidates:[]}]}} onOpen={()=>{}} onFullBoard={()=>{}}/>;
+const photo=(state:HeroState,tourLabel='PGA TOUR')=><PhotoBand title="World Wide Technology Championship" venueName="El Cardonal at Diamante" datesString="5–8 Nov" venueImageUrl={null} state={state} tourLabel={tourLabel} startDay="THURSDAY" countdown={[{value:4,label:'days'}]} leader={{score:-18,caps:'James',faces:[{key:'j',name:'Benjamin James',candidates:[]},{key:'b',name:'Blair',candidates:[]}]}} onOpen={()=>{}}/>;
 const strip=(boardByPlayer=new Map([['griffin',{position:22,tied:true,score:-11}]]))=><PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="live" currentRound={3} pickResults={[]} startedPlayers={new Set()} boardByPlayer={boardByPlayer} onPick={()=>{}}/>;
 beforeEach(()=>{f.mine=null;f.rows=[member('Sam'),member('Alex','malnati')];});
 afterEach(cleanup);
@@ -47,7 +47,7 @@ describe('Overview hero B and members strip',()=>{
     const v=mount(photo(state as HeroState,tour));
     const row=v.container.querySelector('[data-overview-photo-kicker-row]');
     expect(row?.firstElementChild?.textContent).toBe(label);
-    expect(row?.querySelector('[data-overview-full-board]')).not.toBeNull();
+    expect(row?.querySelector('[data-overview-full-board]')).toBeNull(); // BUILD_TOUR_BUTTONS_UNDER_HERO §3: the kicker link is gone in every state
     expect(v.container.querySelector('[data-overview-photo-pill-row]')).toBeNull();
   });
   it('keeps leader B bottom aligned with 24px faces and a 21px score',()=>{
