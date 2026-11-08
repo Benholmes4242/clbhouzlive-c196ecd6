@@ -231,6 +231,8 @@ export interface CardFeedProps {
   roundShapeMap?: Map<string, HoleShape> | null;
   /** Batched medal counts keyed by whs_score_id (resolved queries only). */
   roundMedalMap?: Map<string, RoundMedalCounts>;
+  /** Batched competition flags (useBatchRoundCompetition, page level). */
+  roundCompetitionMap?: Map<string, boolean>;
   /** Page-level consequence sources (Clubhouse); null until all have fetched. */
   consequenceSources?: ConsequenceSources | null;
   roundCourseMeta?: RoundCourseMeta | null;
@@ -1026,6 +1028,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 roundMedals={(() => {
                   const sid = postScoreIdMap?.get(post.id) ?? null;
                   return sid ? roundMedalMap?.get(sid) : undefined;
+                })()}
+                roundCompetition={(() => {
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return sid ? roundCompetitionMap?.get(sid) : undefined;
                 })()}
                 consequenceSources={consequenceSources}
                 roundCourseMeta={roundCourseMeta}
