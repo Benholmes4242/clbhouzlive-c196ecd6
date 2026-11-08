@@ -135,6 +135,15 @@ export interface RailChipsProps {
    * stays the default for every existing consumer.
    */
   maxChipWidth?: number;
+
+  /**
+   * ADDITIVE — TOGGLE SEMANTICS (BUILD_TOUR_BUTTONS_UNDER_HERO §2). The
+   * overview's tour chips are toggle buttons, not tabs: the row takes
+   * role="group" and each chip carries aria-pressed instead of
+   * role="tab"/aria-selected. Opt-in only; every existing consumer keeps the
+   * tablist semantics.
+   */
+  toggleSemantics?: boolean;
 }
 
 
