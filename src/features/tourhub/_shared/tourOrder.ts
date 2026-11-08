@@ -4,6 +4,16 @@ import type { TourId } from '../hooks/useOverviewData';
  *  PGA → LPGA → DP World → Korn Ferry → Champions → LIV. */
 export const TOUR_PRIORITY: TourId[] = ['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
 
+/**
+ * THE OVERVIEW'S OWN TOUR ORDER (BUILD_TOUR_BUTTONS_UNDER_HERO). The chip row
+ * under the overview hero and the overview carousel itself run
+ * PGA → LPGA → DP World → Champions → Korn Ferry. This is NOT TOUR_PRIORITY:
+ * the app-wide importance order puts Korn Ferry ahead of Champions and
+ * includes LIV, while the overview has no LIV chip (LIV stays reachable from
+ * the top-left island tile) and puts Champions ahead of Korn Ferry.
+ */
+export const OVERVIEW_TOUR_ORDER: TourId[] = ['pga', 'lpga', 'euro', 'champ', 'pgad'];
+
 /** Sort key for a tour slug; unknown tours sort last. */
 export function tourPriorityIndex(slug: TourId | string | null | undefined): number {
   const i = TOUR_PRIORITY.indexOf((slug ?? '') as TourId);
