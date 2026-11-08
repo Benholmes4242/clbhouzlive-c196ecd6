@@ -14,7 +14,11 @@ import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { Movement } from '@/features/tourhub/overview/sections/WorldRankings';
 import { tournamentRoute } from '@/features/tourhub/routes';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
-import { DANGER,TREND_UP } from '@/features/tourhub/_shared/tokens';
+import { DANGER,TREND_UP,TOUR_LIVE_GREEN } from '@/features/tourhub/_shared/tokens';
+const holes=vi.hoisted(()=>({read:vi.fn(),tees:[] as {teeTime:string;players:{id:string}[]}[]}));
+vi.mock('@/features/tourhub/tournament-v2/data/useTeeTimesAll',()=>({useTeeTimesAll:(id:string,round:number,opts:{enabled:boolean})=>({data:opts?.enabled?holes.tees:[]})}));
+vi.mock('@/features/tourhub/leaderboard/useBoardHoles',()=>({useBoardHoles:(...args:unknown[])=>{holes.read(...args);const round=args[1] as number;return {isSuccess:true,byPlayer:new Map(['a','b','c','d'].map(id=>[id,Array.from({length:18},(_,i)=>({player_id:id,round_number:round,hole_number:i+1,strokes:4,par:4,starting_hole:1}))]))};}}));
+vi.mock('@/features/tourhub/leaderboard/ScorecardSheet',()=>({ScorecardSheet:({open,target}:{open:boolean;target:{playerId:string}|null})=>open?<div role="dialog" data-player-id={target?.playerId}/>:null}));
 const i18n=createInstance();i18n.use(initReactI18next).init({lng:'en',resources:{en:{tourhub:en}},interpolation:{escapeValue:false},initAsync:false});
 afterEach(cleanup);
 function slide(type:HeroSlide['type']='live'):HeroSlide {return {type,tournament:{id:'event',name:'Weekly Event',status:type==='live'?'inprogress':type==='completed'?'closed':'scheduled',startDate:'2026-10-29',endDate:'2026-11-01',currentRound:3,venueName:'Venue',venueCourseName:'Course',venuePar:71,tourSlug:'pga',tourName:'PGA Tour',purse:2100000,currency:'USD',defendingChampion:'John Defender',winnerId:'sr-a'} as HeroSlide['tournament']};}
