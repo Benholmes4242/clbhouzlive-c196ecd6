@@ -29,7 +29,6 @@ import { Button } from '@/components/ui/button';
 import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { formatTimeHm24 } from '@/i18n/format';
 
-import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
 import { HeroRoundPanel } from './HeroRoundPanel';
 import { heroDefaultRound, heroStartedRounds } from './heroRoundRules';
 
@@ -278,7 +277,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     }
     return map;
   }, [teeRound, teeGroups]);
-  const shapeSlots = Math.max(totalRounds ?? 0, heroCols.rounds.length, currentRound ?? 0);
 
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
   /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
@@ -328,10 +326,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
       <>
         <div className="hero-expand-board" style={{ background: T.surface, fontFamily: FONT, paddingTop: afterMovers ? 0 : 12 }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 24, padding: `2px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
-            {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
+            {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
-            {showHeroToday ? <div style={{ textAlign: 'center' }}>{t('board.columns.today')}</div> : null}
-            {showHeroShape ? <div style={{ textAlign: 'center' }}>{t('board.columns.rounds')}</div> : null}
             {heroRounds.map((rd) => (
               <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
                 {`R${rd}`}
