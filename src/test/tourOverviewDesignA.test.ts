@@ -16,6 +16,7 @@ import { buildLeaderTrio } from '@/features/tourhub/components/overview-v3/Hybri
 import { countInWords, pickMovementCards } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import type { HeroState } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { MiniBoard, heroBoardColumns, heroTieRoles, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { TOUR_LIVE_GREEN } from '@/features/tourhub/_shared/tokens';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -509,6 +510,18 @@ describe('BRIEF_TOUR_OVERVIEW_MOCK_EXACT coverage', () => {
       }
       view.unmount();
     }
+  });
+
+  it('(a2) the live spine node is TOUR_LIVE_GREEN — the island green, never amber', () => {
+    const view = render(createElement(PhotoBand, { title: 'Event', venueName: null, datesString: null, venueImageUrl: null, state: { kind: 'live', round: 2, totalRounds: 4 }, tourLabel: null, leader: null, countdown: [], startDay: null, onOpen: () => {} }));
+    const node = view.container.querySelector('[data-round-node="live"]');
+    const dot = node?.querySelector<HTMLElement>('span[aria-hidden]');
+    const label = node?.querySelectorAll<HTMLElement>('span')[1];
+    expect(dot?.style.background).toBe('rgb(52, 215, 127)'); // TOUR_LIVE_GREEN #34D77F
+    expect(dot?.style.boxShadow).toBe('rgba(52, 215, 127, 0.18) 0px 0px 0px 3px');
+    expect(label?.style.color).toBe('rgb(52, 215, 127)');
+    expect(TOUR_LIVE_GREEN).toBe('#34D77F');
+    view.unmount();
   });
 
   it('(b) countInWords is words for 2–10 and a numeral past 10; the trio caps state the TRUE count', () => {
