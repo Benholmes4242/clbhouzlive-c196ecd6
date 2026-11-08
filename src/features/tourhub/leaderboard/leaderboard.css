@@ -49,7 +49,7 @@
 /* Shared HoleMarks (signed-off hole-marks mock). */
 .tour-hole-marks { display:flex; gap:2px; min-width:0; width:100%; }
 .tour-hole-marks > i { position:relative; flex:1; min-width:0; height:18px; display:flex; align-items:center; justify-content:center; font-style:normal; }
-.tour-hole-marks > .tour-hole-marks-gap { flex:0 0 2px; }
+.tour-hole-marks > .tour-hole-marks-gap { flex:0 0 0; }
 .tour-hole-marks .hm-fig { position:relative; z-index:1; font-size:10.5px; font-weight:700; color:rgba(248,250,252,.92); font-variant-numeric:tabular-nums lining-nums; line-height:1; }
 .tour-hole-marks .hm-shape { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); aspect-ratio:1; box-sizing:border-box; display:none; }
 .tour-hole-marks > i[data-grade=birdie] .hm-shape { display:block; width:min(17px, calc(100% + 1px)); border:1.3px solid #E24B3F; border-radius:50%; }
