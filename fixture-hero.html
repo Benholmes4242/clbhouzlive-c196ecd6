@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;background:#0A0A0C"><div id="root"></div>
+<script type="module">
+import '/src/i18n';
+import { createRoot } from '/node_modules/.vite/deps/react-dom_client.js';
+import { createElement as h } from '/node_modules/.vite/deps/react.js';
+import { PhotoBand } from '/src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx';
+const face = { key: 'p1', name: 'Leader One', candidates: [] };
+createRoot(document.getElementById('root')).render(h(PhotoBand, {
+  title: 'The Open', venueName: 'Royal Portrush', datesString: '16–19 Jul',
+  venueImageUrl: null, state: { kind: 'live', round: 2, totalRounds: 4 },
+  tourLabel: 'PGA TOUR', leader: { score: -12, faces: [face], caps: 'LEADER ONE' },
+  countdown: [], startDay: null, onOpen: () => {}, onFullBoard: () => {},
+  segments: [{ text: 'Three shots cover the top five.' }],
+}));
+</script></body></html>
