@@ -18,6 +18,7 @@ import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/cou
 import { OVERVIEW } from '../overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { heroStateLine } from './heroStateLine';
 import { OVERVIEW_KICKER_ROW_HEIGHT, OVERVIEW_TITLE_SIZE, OVERVIEW_TITLE_LINE_HEIGHT, OVERVIEW_TITLE_GAP, OVERVIEW_VENUE_LINE_HEIGHT, OVERVIEW_VENUE_GAP, OVERVIEW_FACE_SIZE, OVERVIEW_FACE_ROW_HEIGHT, OVERVIEW_FACE_GAP, OVERVIEW_LEADER_NAME_SIZE, OVERVIEW_LEADER_NAME_LINE_HEIGHT, OVERVIEW_LEADER_NAME_GAP, OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 export { OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
@@ -115,7 +116,7 @@ export function PhotoBand({
         position: 'relative',
         display: 'block',
         width: '100%',
-        height: photoBandHeight(bandHeight),
+        height: inPlay ? photoBandHeight(bandHeight) : undefined,
         margin: 0,
         padding: 0,
         overflow: 'hidden',
@@ -132,10 +133,13 @@ export function PhotoBand({
       <div
         data-overview-photo-text
         style={{
-          position: 'absolute',
-          left: 20,
-          right: 20,
-          bottom: 14,
+          position: inPlay ? 'absolute' : 'relative',
+          left: inPlay ? 20 : undefined,
+          right: inPlay ? 20 : undefined,
+          bottom: inPlay ? HERO_CONTENT_BOTTOM : undefined,
+          margin: inPlay ? undefined : '0 20px',
+          paddingTop: inPlay ? undefined : HERO_CONTENT_TOP - (OVERVIEW_KICKER_ROW_HEIGHT - 11 * 1.2) / 2,
+          paddingBottom: inPlay ? undefined : HERO_CONTENT_BOTTOM,
           minWidth: 0,
         }}
       >

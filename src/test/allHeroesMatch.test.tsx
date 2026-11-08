@@ -167,7 +167,7 @@ describe('HERO_350 — every photo hero is 350px with the notch counted inside',
     const photoBand = src('features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx');
     // The overview band derives from the 350 live height minus the live-only
     // lines a state doesn't render (sentence / round spine blocks).
-    expect(photoBand).toContain('height: photoBandHeight(bandHeight)');
+    expect(photoBand).toContain('height: inPlay ? photoBandHeight(bandHeight) : undefined');
   });
   it('the Courses page, amateur and course-detail heroes read the shared reference', () => {
     expect(src('components/courses/CoursesPageHero.tsx')).toContain('paddingTop: HERO_CONTENT_TOP');
@@ -209,7 +209,7 @@ describe('HERO_350 — every photo hero is 350px with the notch counted inside',
     expect(shell).toContain('minHeight: coverUrl ? HERO_CONTENT_TOP + HERO_TALLEST_CONTENT : undefined');
     expect(shell).not.toContain('BUSINESS_COVER_ASPECT_CSS');
     const withCover = render(<HeroShell coverUrl="x.jpg" avatar={<span>A</span>} displayName="Mason Essam" counters={[]} />);
-    expect((withCover.container.querySelector('section') as HTMLElement).style.minHeight).toBe(`${HERO_CONTENT_TOP + 278}px`);
+    expect((withCover.container.querySelector('section') as HTMLElement).style.minHeight).toBe(`${HERO_CONTENT_TOP + 295}px`);
     withCover.unmount();
     const noCover = render(<HeroShell coverUrl={null} avatar={<span>A</span>} displayName="Mason Essam" counters={[]} />);
     expect((noCover.container.querySelector('section') as HTMLElement).style.minHeight).toBe('');
