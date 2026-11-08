@@ -50,3 +50,8 @@ Preview build log: `build OK` at 2026-11-08T18:20:27Z. This does not prove recei
 Authenticated end-to-end checks also unavailable in this environment (`external_unmanaged`); the real account/course review flow remains for device verification. Scroll-to-top and second submission readback are unverified, not claimed complete.
 
 No SQL, migrations, deployed RPC/edge edits, feed_config edits, native/Median changes or round_pool_cap changes.
+## Authorised test repair (close-out)
+- Edit 1 (line 19): `useReviewHeaderFacts` mock now uses the partial-mock pattern (`importOriginal` spread) so the real `headerScore` export survives; only the hook is stubbed.
+- Edit 2 (`expectNewB`): `header h1` lookup replaced with `header [data-photo-header] div` text match (CourseMasthead renders the name as a div, matching reviewStepOne.test.tsx).
+- No production change. File alone: 4/4 pass.
+- Shards (fresh, --maxWorkers=2, one at a time): 1 = 2,011; 2 = 1,876; 3 = 2,001; 4 = 1,907. Total 7,795 (was 7,784; +11 = the 4 repaired Review another tests now passing plus the 7 named Also this week additions). Zero failures; the permitted fw1FeaturedDeck known failure did not appear.

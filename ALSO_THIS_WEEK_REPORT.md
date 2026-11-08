@@ -107,3 +107,7 @@ Unrelated to changed Tour files: fixture `iso(2)` is now 30 October, whereas tod
 - Approved correction of the three assertions and targeted/full-suite shards complete; all pass, as recorded above.
 - Locale keys and additional state/heading/navigation coverage are now added. AGENTS.md pointer skipped by ruling.
 - No SQL, migrations, RPC/edge/provider/native/Median/feed_config changes; round_pool_cap remains 30.
+## Close-out
+- Shard 4's 4 failures were src/test/reviewReceiptNextCourse.test.tsx (Review another build), repaired test-only under authorisation; all 4 now pass.
+- Final shards: 2,011 / 1,876 / 2,001 / 1,907 = 7,795, zero failures.
+- 320/390/430px screen checks (finished/live/upcoming cards, hero board) not completed in this session — remain for device check.
