@@ -132,6 +132,18 @@ export function TournamentPage() {
   const teeGroupsEnabled=pulse.state!=='completed'&&drawnRounds.includes(selectedTeeRound);
   const {data:teeGroups=[]}=useTeeTimesAll(tournamentId,selectedTeeRound,{enabled:teeGroupsEnabled});
 
+  // Course guide entry waits for the real RPC-backed section, then consumes
+  // its landing once. Root scrolling stays owned by getScrollParent.
+  const courseLanding = useRef<string | null>(null);
+  useEffect(() => {
+    if (searchParams.get('section') !== 'course' || isLoading || courseHolesQuery.isLoading || courseLanding.current === tournamentId) return;
+    const frame = requestAnimationFrame(() => {
+      const section = document.querySelector('[data-tv-section="course"]');
+      if (section) { scrollElementIntoView(section as HTMLElement, { behavior: 'smooth' }); courseLanding.current = tournamentId ?? null; }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [searchParams, isLoading, courseHolesQuery.isLoading, courseHolesQuery.data, tournamentId]);
+
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
   const [fullBoardOpen, setFullBoardOpen] = useState(false);
 

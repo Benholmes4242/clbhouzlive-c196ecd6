@@ -56,3 +56,22 @@
    the next chip peeks in. */
 .overview-tour-chips { padding: 14px 0 2px 20px; }
 @media (max-width: 340px) { .overview-tour-chips { padding-left: 16px; } }
+
+/* Upcoming-only grammar. Reuses the existing Tour text/score palette; these
+   local yardage tokens match tournament-v3 without applying its page shell. */
+.upcoming-block,.upcoming-facts{--upcoming-side:20px;--tv-soft:rgba(248,250,252,.78);--tv-dim:rgba(248,250,252,.42);--tv-par3:rgba(248,250,252,.14);--tv-par4:rgba(248,250,252,.22);--tv-par5:rgba(248,250,252,.5);color:var(--th-text-primary)}
+.upcoming-facts{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:14px var(--upcoming-side) 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12)}
+.upcoming-facts>div{padding:12px 0;min-width:0}.upcoming-facts>div+div{padding-left:12px;border-left:1px solid rgba(255,255,255,.08)}
+.upcoming-facts b{display:block;font-size:19px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upcoming-facts span{display:block;margin-top:6px;font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--tv-dim);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upcoming-block{padding:18px var(--upcoming-side) 0}.upcoming-kicker{margin:0;font-size:10px;font-weight:800;letter-spacing:.16em;color:rgba(248,250,252,.62);text-transform:uppercase;line-height:1.4}
+.upcoming-players-line{margin:6px 0 0;font-size:13.5px;line-height:1.4;color:var(--tv-soft)}.upcoming-players-line strong{color:var(--th-text-primary)}
+.upcoming-player-row{display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;min-height:31px;height:auto;gap:8px;padding:0;border-radius:0;background:none;text-align:left;font-size:13px;font-weight:600;color:var(--th-text-primary)}
+.upcoming-player-name{min-width:0;display:flex;align-items:center}.upcoming-player-name>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upcoming-player-name i{flex:none;font-style:normal;font-size:11px;margin-left:4px;color:var(--brand-amber)}
+.upcoming-player-time,.upcoming-more{font-size:12px;font-weight:600;color:rgba(248,250,252,.62);font-variant-numeric:tabular-nums}.upcoming-more{min-height:31px;display:flex;align-items:center}
+.upcoming-last-header{display:grid;grid-template-columns:24px minmax(0,1fr) 40px;gap:4px;align-items:center;margin-top:8px;min-height:24px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(248,250,252,.62)}.upcoming-last-header>span:last-child{text-align:center}
+.upcoming-course-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.upcoming-course-link{padding:0;height:auto;background:none;font-size:12px;font-weight:700;color:var(--th-text-primary)}
+.upcoming-course .tv-lead{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:var(--tv-soft)}.upcoming-course .tv-lead b{color:var(--th-text-primary)}
+.upcoming-course .tv-strip{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:3px;align-items:end;height:70px;margin-top:10px}.upcoming-course .tv-strip>div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.upcoming-course .tv-strip i{display:block;width:100%;border-radius:4px 4px 2px 2px;background:var(--tv-par4)}.upcoming-course .tv-strip i[data-par='3'],.upcoming-course .tv-strip-key i[data-par='3']{background:var(--tv-par3)}.upcoming-course .tv-strip i[data-par='5'],.upcoming-course .tv-strip-key i[data-par='5']{background:var(--tv-par5)}.upcoming-course .tv-strip span{font-size:9px;color:var(--tv-dim);margin-top:4px}
+.upcoming-course .tv-strip-key{display:flex;gap:12px;font-size:10.5px;color:var(--tv-dim);margin-top:8px}.upcoming-course .tv-strip-key i{display:inline-block;width:10px;height:8px;margin-right:5px;background:var(--tv-par4)}.upcoming-course .tv-strip-key>span:last-child{margin-left:auto}
+@media(max-width:340px){.upcoming-block,.upcoming-facts{--upcoming-side:16px}}

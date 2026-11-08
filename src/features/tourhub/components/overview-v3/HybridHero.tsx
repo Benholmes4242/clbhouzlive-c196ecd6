@@ -24,6 +24,8 @@ import { tournamentHeadlineSegments } from '../../overview/magazineCopy';
 import { earliestTeeTime, fieldHasStarted } from '../../overview/boardStarted';
 import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { useOverviewChampion } from './useOverviewChampion';
+import {useUpcomingOverview} from './useUpcomingOverview';
+import {upcomingSentence} from './upcomingOverviewRules';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -41,18 +43,7 @@ export function getOverviewCountdown(startDate: string, now = new Date()): Overv
   if (!Number.isFinite(start)) return [];
   const minutes = Math.max(0, Math.floor((start - now.getTime()) / 60_000));
   if (minutes < 60) return [{ value: minutes, label: 'minutes' }];
-  if (minutes < 1_440) {
-    return [
-      { value: Math.floor(minutes / 60), label: 'hours' },
-      { value: minutes % 60, label: 'minutes' },
-    ];
-  }
-  if (minutes < 2_880) {
-    return [
-      { value: Math.floor(minutes / 1_440), label: 'days' },
-      { value: Math.floor((minutes % 1_440) / 60), label: 'hours' },
-    ];
-  }
+  if (minutes < 1_440) return [{ value: Math.floor(minutes / 60), label: 'hours' }];
   return [{ value: Math.floor(minutes / 1_440), label: 'days' }];
 }
 
@@ -144,7 +135,8 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
 
   // Merged Airy: the photo owns the one sentence in every state. The
   // champion strip retains its identity/score, never a duplicate narrative.
-  const situation = situationSegments({
+  const upcoming = useUpcomingOverview(state.kind === 'upcoming' ? tournament.id : null);
+  const situation = state.kind === 'upcoming' ? upcomingSentence(upcoming.last, upcoming.field, upcoming.first, upcoming.zone) : situationSegments({
         state,
         entries: rows,
         scheduledRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),

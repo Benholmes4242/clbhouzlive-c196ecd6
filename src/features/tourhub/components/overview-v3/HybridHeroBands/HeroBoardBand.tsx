@@ -58,7 +58,9 @@ import { PlayerAvatar } from '../../PlayerAvatar';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
-import { LastYearRow } from './LastYearRow';
+import {useUpcomingOverview} from '../useUpcomingOverview';
+import {UpcomingFacts, YourUpcomingPlayers, UpcomingLastYear, UpcomingCourse} from '../UpcomingOverviewSections';
+import {useTourPlayerFollows} from '../../../leaderboard/useTourPlayerFollows';
 import { inRequiredRoundWindow, leaderOf, neededGross } from './whatsNext';
 import { surnameOf } from '../../../_shared/playerName';
 import { PicksSheet } from './PicksSheet';
@@ -233,6 +235,7 @@ interface HeroBoardSectionProps {
   totalRounds?: number | null;
   /** Venue par (to-par → gross conversion for the picks sheet's required round). */
   venuePar?: number | null;
+  purse?: number | null;
   onRowTap?: (playerId: string) => void;
   onFullBoard?: () => void;
   boardUpdatedAt?: number;
@@ -313,6 +316,7 @@ export function HeroBoardSection({
   championSrId,
   championPlayerIds = [],
   venuePar = null,
+  purse = null,
   totalRounds = null,
   onRowTap,
   onFullBoard,
@@ -394,21 +398,8 @@ export function HeroBoardSection({
   const winner=winnerEntry?.player ? {playerId:winnerEntry.player.id,playerName:winnerEntry.player.full_name ?? '',position:winnerEntry.position ?? null,score:winnerEntry.score} : null;
   const runnerUp=entries.filter(e=>e.player?.id && !championIds.includes(e.player.id) && e.score!=null).sort((a,b)=>Number(a.score)-Number(b.score))[0];
 
-  const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
-  const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
-  const { data: lastYear } = useTournamentLastYearTop4(showUpcomingFacts ? tournamentId : null);
-  const firstTeeCandidate = teeTimes[0] ?? null;
-  const firstTee = firstTeeCandidate?.time && firstTeeCandidate.time !== '\u2014'
-    ? firstTeeCandidate
-    : null;
-  const upcomingFacts = compactUpcomingFacts([
-    // DEFENDING removed (BRIEF_TOUR_CHAMPION_TRUTH X.3): THE SITUATION names the
-    // defender and the LAST YEAR board carries the score in context.
-    firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, trailing: null, trailingColor: INK } : null,
-    // FIELD (world top-20 count) is omitted: no entries data exists to derive it (Phase 4 §4.3).
-  ]);
-  const hasUpcomingFacts = showUpcomingFacts && upcomingFacts.length > 0;
-  const lastYearRows = showUpcomingFacts ? (lastYear ?? []).slice(0, 4) : [];
+  const upcoming = useUpcomingOverview(!picksOnly && phase === 'upcoming' ? tournamentId : null);
+  const follows = useTourPlayerFollows(!picksOnly && phase === 'upcoming');
 
   // §4.1 / §4.2 — live and suspended only (both map to phase 'live').
   const inPlay = phase === 'live';
@@ -492,39 +483,7 @@ export function HeroBoardSection({
         />
       ) : null}
 
-      {!picksOnly && hasUpcomingFacts ? (
-        <div data-overview-facts style={{ display: 'flex', gap: 16, padding: '10px 20px' }}>
-          {upcomingFacts.map((fact) => (
-            <div key={fact.label} style={{ flex: '1 1 0', minWidth: 0 }}>
-              <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{fact.label}</div>
-              <div style={{ marginTop: 3, display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 17, fontWeight: 800, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{fact.value}</span>
-                {fact.trailing ? <span style={{ color: fact.trailingColor }}>{fact.trailing}</span> : null}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : null}
-
-      {!picksOnly && lastYearRows.length > 0 ? (
-        <div data-overview-last-year style={{ paddingTop: 12 }}>
-          <div data-overview-board-header style={{ display: 'flex', alignItems: 'center', minHeight: 24, padding: '2px 20px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
-            {t('overview.hero.lastYear')}
-            {lastYearRows.every(row => row.year === lastYearRows[0].year) ? ` · ${lastYearRows[0].year}` : null}
-          </div>
-          {lastYearRows.map((row, i) => (
-            <LastYearRow
-              key={`${row.rank}-${row.name}`}
-              rank={row.rank}
-              name={row.name}
-              score={row.score}
-              isWinner={row.rank === '1'}
-              avatarCandidates={resolvePlayerAvatarCandidates({ name: row.name, photoUrl: row.photoUrl ?? null, tourSlug: pickTourCode })}
-              isLast={i === lastYearRows.length - 1}
-            />
-          ))}
-        </div>
-      ) : null}
+      {!picksOnly && phase === 'upcoming' ? <UpcomingFacts first={upcoming.first} zone={upcoming.zone} field={upcoming.field.length} purse={purse} par={venuePar} /> : null}
 
       {hasPicks ? (
         <PicksBlock
@@ -546,6 +505,11 @@ export function HeroBoardSection({
           onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }}
         />
       ) : null}
+      {!picksOnly && phase === 'upcoming' ? <>
+        <YourUpcomingPlayers member={follows.ids.size > 0} followed={follows.ids} field={upcoming.field} drawn={upcoming.drawn} zone={upcoming.zone} />
+        <UpcomingLastYear rows={upcoming.last} />
+        <UpcomingCourse holes={upcoming.holes} tournamentId={tournamentId} />
+      </> : null}
       {!picksOnly && <LeadersGroup tournamentId={tournamentId} entries={entries} currentRound={currentRound} totalRounds={totalRounds}
         phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} onRowTap={onRowTap} />}
       {hasPicks ? (

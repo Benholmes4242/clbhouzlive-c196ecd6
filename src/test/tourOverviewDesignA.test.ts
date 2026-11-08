@@ -60,27 +60,25 @@ describe('Tour Overview Design A hero facts', () => {
     expect(PHOTO_BAND_HEIGHT).toBe(340);
     expect(OVERVIEW_HERO_HEIGHT).toBe('340px');
   });
-  it('uses days and hours under 48 hours out', () => {
+  it('uses only days between 24 and 48 hours out', () => {
     expect(getOverviewCountdown('2026-09-19T11:00:00Z', NOW)).toEqual([
       { value: 1, label: 'days' },
-      { value: 23, label: 'hours' },
     ]);
   });
 
-  it('uses one days box at least 48 hours out', () => {
+  it('uses one days figure at least 48 hours out', () => {
     expect(getOverviewCountdown('2026-09-19T15:00:00Z', NOW)).toEqual([
       { value: 2, label: 'days' },
     ]);
   });
 
-  it('uses hours and minutes below 24 hours', () => {
+  it('uses only hours below 24 hours', () => {
     expect(getOverviewCountdown('2026-09-17T15:42:00Z', NOW)).toEqual([
       { value: 3, label: 'hours' },
-      { value: 42, label: 'minutes' },
     ]);
   });
 
-  it('uses one minutes box below one hour', () => {
+  it('uses one minutes figure below one hour', () => {
     expect(getOverviewCountdown('2026-09-17T12:38:00Z', NOW)).toEqual([
       { value: 38, label: 'minutes' },
     ]);
