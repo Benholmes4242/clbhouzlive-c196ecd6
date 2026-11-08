@@ -127,6 +127,9 @@ export const FeaturedRoundCard: React.FC<{
   engagement?: FeaturedRoundEngagement | null;
   /** From the feed's batched award read. undefined = unresolved (empty cell). */
   medals?: RoundMedalCounts | null;
+  /** From the feed's batched competition read. Explicit true only shows the
+   *  shared COMP mark after the member's name. */
+  isCompetition?: boolean;
   /** Home only: square corners, edge to edge like its feed neighbours. */
   square?: boolean;
   /** Pill text. Absent = the existing "Round of the week" label. */
@@ -140,6 +143,7 @@ export const FeaturedRoundCard: React.FC<{
   onOpen,
   engagement = null,
   medals,
+  isCompetition,
   square = false,
   pillLabel,
 }) => {
@@ -205,8 +209,13 @@ export const FeaturedRoundCard: React.FC<{
             <SquircleAvatar size={20} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hideRing />
           </span>
           <span style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: 1 }}>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14.5, fontWeight: 700, color: mine ? A.AMBER : A.INK }}>
-              {mine ? t('courseDetail.records.you') : r.display_name}
+            <span style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14.5, fontWeight: 700, color: mine ? A.AMBER : A.INK, minWidth: 0 }}>
+                {mine ? t('courseDetail.records.you') : r.display_name}
+              </span>
+              {/* The shared CompetitionMark, 9px after the name; the name
+                  truncates before the mark does. */}
+              {isCompetition === true ? <CompetitionMark style={{ marginLeft: 9 }} /> : null}
             </span>
             {placeLine ? (
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11.5, color: A.MUTE }}>{placeLine}</span>
