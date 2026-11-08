@@ -1,28 +1,12 @@
-/** PER-PHOTO TAG WRITES for the post composer.
- *
- * A picked photo has no media_url until postUploadController finishes it, so
- * the chosen tag rides WITH the upload job (UploadJobContext.shotTags) and is
- * written by the controller the moment that item's upload completes. The
- * controller is module-level, so a tag survives the composer closing exactly
- * as the upload does.
- *
- * REUSED, NOT REBUILT: the writes are the course Media tab's library "add a
- * shot" path — submitLibraryHolePhoto / submitLibraryHoleVideo
- * (lib/courseMedia/holePhotoData.ts) and submitLibraryPlacePhoto /
- * submitLibraryPlaceVideo (lib/courseMedia/libraryPlaceMedia.ts) — with the
- * same trust model (published immediately). Existing post media (edit mode)
- * use the Media tab's own-source paths: submitHolePhoto, submitCoursePlaceMedia,
- * removeHoleTag and removeCoursePlaceMedia.
- *
- * A failed tag loses only the tag: it never fails the upload or the post.
- */
+/** PF4: post_media owns holes and the server owns hole-page publication.
+ * Only personal Everyone place tags use client course-place contributions.
+ * Legacy URL hole rows are removed before updating an existing shot. */
 import { supabase } from '@/integrations/supabase/client';
-import { submitLibraryHolePhoto, submitLibraryHoleVideo, submitHolePhoto, fetchOwnMediaSources, holeMediaKey, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { fetchOwnMediaSources, holeMediaKey, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { submitLibraryPlacePhoto, submitLibraryPlaceVideo } from '@/lib/courseMedia/libraryPlaceMedia';
 import { submitCoursePlaceMedia, removeCoursePlaceMedia, type PlaceMedia } from '@/components/course-media-tab/hooks/useCoursePlaceMedia';
 import { removeHoleTag } from '@/lib/courseMedia/removeHoleTag';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
-import type { FeedPost } from '@/components/media-system/types/media';
 import { isHoleTag, type ShotTag } from './golfPostRules';
 
 /** One photo's choice: its tag and the course it was tagged against. */
@@ -30,6 +14,8 @@ export interface ShotTagChoice { tag: ShotTag; courseId: string; knownHoles: rea
 export interface ShotTagJob {
   /** Keyed by StageMediaItem.id. */
   items: Readonly<Record<string, ShotTagChoice>>;
+  personal?: boolean;
+  visibility?: string;
 }
 
 export interface SavedHoleTag { itemId: string; courseId: string; hole: number }
@@ -42,12 +28,12 @@ export async function writeShotTagAfterUpload(
   const choice = tagJob?.items[item.id];
   if (!choice || !item.file) return;
   const { tag } = choice;
+  if (!isHoleTag(tag) && (tagJob?.personal === false || (tagJob?.visibility ?? 'anyone') !== 'anyone')) return;
   try {
     if (isHoleTag(tag)) {
-      let saved = false;
-      if (item.type === 'video' && uploaded.streamId) {
-        saved = !!(await submitLibraryHoleVideo(item.file, uploaded.streamId, choice.courseId, memberId, tag.hole, choice.knownHoles));
-      } else if (item.type !== 'video' && uploaded.url) {
+      if (tagJob?.personal !== false && (tagJob?.visibility ?? 'anyone') === 'anyone') onSavedHole?.({ itemId: item.id, courseId: choice.courseId, hole: tag.hole });
+      return;
+    } else if (item.type !== 'video' && uploaded.url) {
         saved = !!(await submitLibraryHolePhoto(item.file, uploaded.url, choice.courseId, memberId, tag.hole, choice.knownHoles));
       }
       if (saved) onSavedHole?.({ itemId:item.id, courseId:choice.courseId, hole:tag.hole });
@@ -73,7 +59,8 @@ export async function readExistingShotTags(courseId: string, memberId: string, u
   return { holes: (holes.data ?? []) as HolePhoto[], places: (places.data ?? []) as PlaceMedia[] };
 }
 
-export function existingTagFor(url: string, tags: ExistingTags): ShotTag | null {
+export function existingTagFor(url: string, tags: ExistingTags, mediaHole?: number | null): ShotTag | null {
+  if (mediaHole != null) return { hole: mediaHole };
   const h = tags.holes.find((r) => r.media_url === url);
   if (h) return { hole: h.hole_no };
   const p = tags.places.find((r) => r.media_url === url);
@@ -83,29 +70,31 @@ export function existingTagFor(url: string, tags: ExistingTags): ShotTag | null 
 /** Edit mode: an existing photo's tag changed. Remove the old, add the new. */
 export async function rewriteExistingShotTag(
   courseId: string, memberId: string, knownHoles: readonly number[],
-  item: { type: 'image' | 'video'; previewUrl: string; streamId?: string | null },
-  next: ShotTag | null, tags: ExistingTags, postUserId: string,
+  item: { type: 'image' | 'video'; previewUrl: string; streamId?: string | null; existingId?: string },
+  next: ShotTag | null, tags: ExistingTags, postUserId: string, personal = true, visibility = 'anyone',
 ): Promise<void> {
   const url = existingMediaUrl(item);
   try {
     for (const row of tags.holes.filter((r) => r.media_url === url)) await removeHoleTag(row, memberId);
     for (const row of tags.places.filter((r) => r.media_url === url)) await removeCoursePlaceMedia(row, memberId);
-    if (!next) return;
-    if (isHoleTag(next)) {
-      const post = {
-        userId: postUserId, actorType: 'personal',
-        mediaItems: [item.type === 'video'
-          ? { id: url, type: 'video', hlsUrl: url, streamId: item.streamId ?? undefined, width: 0, height: 0 }
-          : { id: url, type: 'image', imageUrl: url, width: 0, height: 0 }],
-      } as unknown as FeedPost;
-      await submitHolePhoto(post, courseId, memberId, next.hole, knownHoles);
-    } else {
+    if (item.existingId) {
+      const { error } = await supabase.from('post_media').update({ hole_no: isHoleTag(next) ? next.hole : null } as never).eq('id', item.existingId);
+      if (error) throw error;
+    }
+    if (!next || isHoleTag(next) || !personal || visibility !== 'anyone') return;
+    {
       const sources = await fetchOwnMediaSources(courseId, memberId);
       const key = holeMediaKey({ mediaType: item.type, url, streamId: item.streamId ?? null });
       const source = sources.find((s) => s.url === url || holeMediaKey(s) === key);
       if (source) await submitCoursePlaceMedia(courseId, memberId, source, next.place);
     }
   } catch (err) {
-    console.warn('[post-v2] existing shot tag rewrite failed (tag only):', err);
+    throw err;
   }
+}
+
+/** All upload branches, including restored remote media, persist the shot's hole. */
+export function shotMediaPatch(job: ShotTagJob | undefined, itemId: string): { hole_no: number | null } {
+  const tag = job?.items[itemId]?.tag;
+  return { hole_no: isHoleTag(tag) ? tag.hole : null };
 }

@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { saveComposerMedia } from '../lib/composerDrafts';
 import type { StageMediaItem } from './useStageComposer';
 import type { PostShotTag } from '../lib/composerGolfRules';
+import type { ShotTagChoice } from '../lib/shotTagWrites';
 import type { PostVisibility } from '../lib/golfPostRules';
 import type { VideoDetails } from '../lib/videoDetails';
 
@@ -57,6 +58,7 @@ export function useDrafts(userId: string | null | undefined) {
     /** Full ordered multi-course tag list; persisted via course_data.courses. */
     courses?: Array<{ id: string; name: string; country?: string | null }>;
     media?: StageMediaItem[];
+    shotTagMap?: Record<string, ShotTagChoice>;
     holeNo?: number | null;
     postShotTags?: PostShotTag[];
     attachedScoreId?: string | null;
@@ -73,16 +75,14 @@ export function useDrafts(userId: string | null | undefined) {
       course_id: patch.courseId ?? null,
       course_name: patch.courseName ?? null,
       course_country: patch.courseCountry ?? null,
-      course_data: {courses:patch.courses??[],addToGuide:patch.addToGuide??true} as never,
-      hole_no:patch.courseId ? patch.holeNo??null : null,
-      shot_tags:patch.postShotTags??[],
+      course_data: {courses:patch.courses??[]} as never,
       attached_score_id:patch.actorType==='personal'?patch.attachedScoreId??null:null,
       visibility:patch.visibility??'anyone',
       ...(patch.videoData ? { video_data: patch.videoData as never } : {}),
     } as never).select('id').single();
     if(error) throw error;
     if(!data?.id) throw new Error('Draft was not saved');
-    try {await saveComposerMedia(data.id,patch.media??[]);} catch(error) {await supabase.from('post_drafts').delete().eq('id',data.id).eq('user_id',userId);throw error;}
+    try {await saveComposerMedia(data.id,patch.media??[],patch.shotTagMap);} catch(error) {await supabase.from('post_drafts').delete().eq('id',data.id).eq('user_id',userId);throw error;}
     await refresh();
     return data.id;
   }, [userId, refresh]);
