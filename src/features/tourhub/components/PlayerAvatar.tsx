@@ -36,6 +36,8 @@ interface PlayerAvatarProps {
   /** Passed to SquircleAvatar. Defaults change nothing. */
   surface?: 'tile' | 'canvas';
   imagePosition?: string;
+  /** Gradient drawn in the hairline's place (see SquircleAvatar.ringGradient). */
+  ringGradient?: string;
 }
 
 const SIZE_PX = { xs: 26, sm: 32, md: 44, lg: 64, xl: 96, '2xl': 128 } as const;
@@ -51,6 +53,7 @@ export function PlayerAvatar({
   headshotOverride = null,
   surface = 'tile',
   imagePosition = '50% 50%',
+  ringGradient,
 }: PlayerAvatarProps) {
   const candidates = resolvePlayerAvatarCandidates({
     name: playerName,
@@ -69,6 +72,7 @@ export function PlayerAvatar({
       className={className}
       surface={surface}
       imagePosition={imagePosition}
+      ringGradient={ringGradient}
     />
   );
 }

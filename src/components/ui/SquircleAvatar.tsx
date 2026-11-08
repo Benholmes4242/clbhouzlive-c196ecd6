@@ -73,6 +73,11 @@ export interface SquircleAvatarProps {
   thinRing?: boolean;
   /** Use a 0.5px hairline ring (for ultra-minimal contexts like the Clubhouse feed) */
   hairlineRing?: boolean;
+  /** When set WITH hairlineRing, the hairline overlay draws this gradient
+   *  (masked to a 1.5px band) instead of the grey hairline — the ring takes
+   *  the hairline's place inside the avatar's own bounds, so nothing wraps
+   *  or resizes. Without it, everything is unchanged. */
+  ringGradient?: string;
   /** Fallback text (e.g., initials). If omitted, derived from `alt`. */
   fallback?: string;
   /** User UUID — THE fallback key. EVERY MEMBER CALL SITE MUST PASS THIS.
@@ -113,6 +118,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   hideRing = false,
   thinRing = false,
   hairlineRing = false,
+  ringGradient,
   fallback,
   userId,
   className,
@@ -329,14 +335,30 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // the full squircle — inset box-shadow gets clipped by overflow:hidden at
   // the curved corners, leaving the ring cut off at top/bottom/left/right.
   const hairlineRingOverlay = hairlineRing ? (
-    <div
-      aria-hidden
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        borderRadius: '34%',
-        border: `${ringWidth ?? 1}px solid ${effectiveRingColor || DARK_HAIRLINE}`,
-      }}
-    />
+    ringGradient ? (
+      <div
+        aria-hidden
+        data-avatar-ring-gradient=""
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          borderRadius: '34%',
+          padding: 1.5,
+          background: ringGradient,
+          WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+        }}
+      />
+    ) : (
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          borderRadius: '34%',
+          border: `${ringWidth ?? 1}px solid ${effectiveRingColor || DARK_HAIRLINE}`,
+        }}
+      />
+    )
   ) : null;
 
   // Determine the border color
