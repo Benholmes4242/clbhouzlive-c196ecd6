@@ -61,7 +61,8 @@ describe('CB57 hero board removals', () => {
   it('renders an empty upcoming band without a placeholder or reserved height', () => {
     fixture.picks = false; fixture.facts = false;
     const view = mount('upcoming');
-    expect(view.container.firstElementChild?.childElementCount).toBe(0);
+    expect(view.container.firstElementChild?.childElementCount).toBe(1);
+    expect(view.container.querySelector('[data-overview-facts]')?.querySelectorAll('[data-upcoming-fact]')).toHaveLength(2);
     expect((view.container.firstElementChild as HTMLElement).style.height).toBe('');
     expect((view.container.firstElementChild as HTMLElement).style.minHeight).toBe('');
   });
