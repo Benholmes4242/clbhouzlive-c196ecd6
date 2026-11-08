@@ -91,14 +91,14 @@ describe('Merged Airy lower sections', () => {
     expect(picks?.querySelector<HTMLElement>('[data-overview-pick-card]')?.style.padding).toBe('7px');
     expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('0px');
   });
-  it('tightens upcoming first tee and last-year rows without changing their contents', () => {
+  it('omits undrawn unknown facts and uses the upcoming history grammar', () => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={[]} currentRound={null} phase="upcoming" />);
-    expect(v.container.querySelector<HTMLElement>('[data-overview-facts]')?.style.padding).toBe('10px 20px');
+    expect(v.container.querySelector('[data-overview-facts]')).toBeNull();
     const last = v.container.querySelector<HTMLElement>('[data-overview-last-year]');
     expect(last?.style.paddingBottom).toBe('');
-    expect((last?.children[0] as HTMLElement)?.style.padding).toBe('2px 20px');
-    expect((last?.children[1] as HTMLElement)?.style.padding).toBe('5px 20px');
-    expect((last?.children[2] as HTMLElement)?.style.padding).toBe('5px 20px');
+    expect(last?.children[0].classList.contains('upcoming-kicker')).toBe(true);
+    expect(last?.children[1].classList.contains('upcoming-last-header')).toBe(true);
+    expect((last?.children[2] as HTMLElement)?.style.padding).toBe('0px');
   });
   it('tightens movers and their figure gap', () => {
     const v = mount(<RoundMovementBand round={2} cards={[{ key: 'a', name: 'Player A', candidates: [], delta: 2, toPar: -2, gross: 70 }]} />);
