@@ -78,9 +78,23 @@ The real `usePostGolfContext` returns `Map | null` (not `{ byPostId }`), so the 
 - PF4 focused set: 124/124 passed (`docs/verification/pf4/focused-closeout.log`).
 - Shard 1/4: 1,982 passed, 12 failed of 1,994 (`docs/verification/pf4/closeout-shard1.log`). STOPPED; shards 2–4 not run.
 
-Unexpected failures (not PF4; they test areas changed by the hole-tiles board build):
-- alsoWeekSection.test.tsx ×4 and homeRailEmpty.test.tsx ×1: `No QueryClient set` (new batched board-hole / competition reads).
-- alsoWeekSpacing.test.ts ×4: old 33px rows, 22px faces, tie bracket, face radius.
-- playerInitialAvatar.test.tsx ×2: expects the removed default ring.
-- searchOrderAndFallback.test.tsx ×1: expects the tile border on the IN ACTION rail.
-No repair made; awaiting a ruling.
+Unexpected failures (not PF4; they test areas changed by the hole-tiles board build). Ruling (Ben, 8 Nov 2026): do NOT repair any of them in this stream — they are pre-existing, owned by the Tour leaderboard / hole-tiles stream, which is mid-build; one touches round plots, off-limits here. Recorded by file and test name:
+
+- src/test/alsoWeekSection.test.tsx
+  - weekly section membership and heading > carousel order and four-event cap remain unchanged
+  - weekly section membership and heading > no live events hide the count
+  - weekly section membership and heading > two live events count as two live in the section head
+  - weekly section membership and heading > viewed event is excluded from rows and live count
+- src/test/homeRailEmpty.test.tsx
+  - Home rail bands render nothing when empty > round of the week with no featured round mounts nothing
+- src/test/alsoWeekSpacing.test.ts
+  - Also this week signed-off spacing > board rows are 33px and your row bleeds 20px
+  - Also this week signed-off spacing > who gap is 8px and row faces are 22px
+  - Also this week signed-off spacing > faces keep the 34% squircle owned by SquircleAvatar, no pixel-radius overrides
+  - Also this week signed-off spacing > tie bracket sits 19px from the edge, 39px on your row
+- src/test/playerInitialAvatar.test.tsx
+  - PlayerInitialAvatar loading shimmer > load fades the image in and removes the shimmer, with the ring back
+  - PlayerInitialAvatar loading shimmer > when every candidate is exhausted the initials show, with no shimmer
+- src/test/searchOrderAndFallback.test.tsx
+  - FIX3 IN ACTION rail fallback avatars > uses the ResultTile plate, border and initials colour like the Players rows
+No repair made, per the ruling.
