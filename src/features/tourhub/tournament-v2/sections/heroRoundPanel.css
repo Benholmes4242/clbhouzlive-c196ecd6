@@ -1,0 +1,25 @@
+/* Signed-off hero expansion tokens; scoped so leaderboard/weekly marks cannot drift. */
+.hero-expand-board { --hero-round-surface:#121215; --hero-round-ink:#F8FAFC; --hero-round-canvas:#0A0A0C; --hero-round-mute:rgba(248,250,252,.62); --hero-round-dim:rgba(248,250,252,.42); --hero-round-outline:rgba(255,255,255,.12); --hero-board-side:20px; }
+.hero-expand-board [data-hero-board-row][aria-expanded=true] { background:var(--hero-round-surface) !important; }
+.hero-expand-board [data-hero-selected-score=true] { text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:4px; }
+.hero-round-panel { background:var(--hero-round-surface); padding:2px var(--hero-board-side) 12px; }
+.hero-round-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.hero-round-label { font-size:9.5px; font-weight:800; letter-spacing:.14em; color:var(--hero-round-dim); white-space:nowrap; }
+.hero-round-label b { margin-left:6px; color:var(--hero-round-ink); font-size:12px; letter-spacing:0; }
+.hero-round-label i { margin-left:4px; font-size:12px; font-weight:800; font-style:normal; letter-spacing:0; }
+.hero-round-chips { display:flex; gap:4px; flex:none; }
+.hero-round-chips button { height:26px; min-width:34px; padding:0 8px; border-radius:13px; border:1px solid var(--hero-round-outline); background:transparent; color:var(--hero-round-mute); font-size:11px; font-weight:700; }
+.hero-round-chips button[aria-pressed=true] { background:var(--hero-round-ink); color:var(--hero-round-canvas); border-color:var(--hero-round-ink); }
+.hero-round-chips button:disabled { opacity:.35; }
+.hero-round-numbers { display:flex; gap:2px; margin-top:10px; }
+.hero-round-numbers span { flex:1; min-width:0; text-align:center; font-size:8.5px; font-weight:700; color:var(--hero-round-dim); }
+.hero-round-nine-gap { flex:0 0 0; }
+.hero-round-marks { margin-top:4px; }
+.hero-round-footer { display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+.hero-round-nines { display:flex; gap:12px; font-size:9.5px; font-weight:700; letter-spacing:.14em; color:var(--hero-round-dim); }
+.hero-round-nines b { color:var(--hero-round-ink); }
+.hero-round-footer .hero-scorecard-button { height:30px; border-radius:15px; border:1px solid var(--hero-round-outline); background:transparent; color:var(--hero-round-ink); font-size:12px; font-weight:700; padding:0 12px; }
+.hero-expand-board .hero-full-leaderboard { display:flex; justify-content:space-between; width:calc(100% - 2 * var(--hero-board-side)); margin:14px var(--hero-board-side) 0; height:46px; border-radius:14px; border:1px solid var(--hero-round-outline); background:transparent; padding:0 16px; color:var(--hero-round-ink); font-size:14px; font-weight:700; }
+.hero-full-leaderboard-count { display:flex; align-items:center; gap:8px; color:var(--hero-round-mute); font-size:12.5px; font-weight:600; }
+.hero-full-leaderboard-count b { color:var(--hero-round-ink); font-size:15px; }
+@media(max-width:340px) { .hero-expand-board { --hero-board-side:16px; } }
