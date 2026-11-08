@@ -6,6 +6,9 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { HoleTiles, orderedHoleCells } from '../../leaderboard/BoardRound';
+import { useBoardHoles } from '../../leaderboard/useBoardHoles';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -105,6 +108,22 @@ const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, text
 export function heroRoundScore(entry: BoardEntry, round: number, currentRound?: number | null): number | null {
   return round === currentRound ? todayFromEntry(entry, currentRound) : [entry.round_1, entry.round_2, entry.round_3, entry.round_4][round - 1] ?? null;
 }
+
+/** WHICH ROUND A ROW'S HOLE TILES SHOW (signed-off hole-tiles mock): the
+ *  current round for every player who has started it; a player still showing
+ *  a tee time shows their PREVIOUS round's 18 holes; in round 1 before a
+ *  player tees off there is no previous round, so the tiles stay empty. A
+ *  finished event shows each player's final round. */
+export function heroTileRound(entry: BoardEntry, currentRound: number | null | undefined, completed: boolean): number | null {
+  if (!completed && currentRound != null && todayFromEntry(entry, currentRound) != null) return currentRound;
+  const rounds = [entry.round_1, entry.round_2, entry.round_3, entry.round_4];
+  const cap = !completed && currentRound != null ? currentRound - 1 : 4;
+  for (let i = Math.min(cap, 4) - 1; i >= 0; i--) if (rounds[i] != null) return i + 1;
+  return null;
+}
+
+/** Eighteen unplayed tiles: the pre-tee-off round-one row. */
+const EMPTY_TILE_CELLS: ReadonlyArray<null> = Array.from({ length: 18 }, () => null);
 /** Only an entirely unscored scheduled column needs a draw. Never fetch a
  * played round for a straggler with missing data, or a completed event. */
 export function heroTeeRound(entries: BoardEntry[], rows: BoardEntry[], rounds: number[], currentRound: number | null | undefined, completed: boolean): number | null {
