@@ -10,3 +10,6 @@ Actual PhotoBand and ChampionStrip, real app CSS and tourhub translations, at 32
 
 ## Measurement correction / unresolved reference
 The fixture measures 189.9375px, not the user-ratified 193.9px. Its cause has **not** been proven; the earlier attribution to avatar geometry was speculative and is withdrawn. These fixture checks do not establish a pixel-identical before/after live reference. The ruling remains 193.9px and the freeze requirement is not verified. Screens above were subsequently overwritten by alignment checks; they are current-state evidence, not retained before/after pairs. Current completed fixture height is 276.984375px (the prior overview-only fixture was 300.6875px).
+
+## TWO_RULINGS resolution
+The4px move was caused by pinning leader names to1.5 rather than1.1. Venue/place restored1.2. Fresh live fixture now193.9375px at320/390/430, derived193.9; height350px. Earlier unresolved-reference section is historical and superseded. Fresh alignment suite7784passed (+4 named cases; see HERO_START_LINE_REPORT.md).
