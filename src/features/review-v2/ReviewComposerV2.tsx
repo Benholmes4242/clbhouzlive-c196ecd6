@@ -1,3 +1,4 @@
+import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
 import { mediaCountKey } from './lib/mediaUploadSummary';
 /**
  * ReviewComposerV2 - steps 2 and 3 of the unified composer's review path.
@@ -55,7 +56,7 @@ import { OverallScrubber } from './components/OverallScrubber';
 import { CategoryGrid, type CategoryCopy } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
 import { ReviewHoleTags } from './components/ReviewHoleTags';
-import { ReviewComposerHeader, PHOTO_HEADER_H_CSS } from './components/ReviewComposerHeader';
+import { ReviewComposerHeader } from './components/ReviewComposerHeader';
 import { useReviewHeaderFacts } from './hooks/useReviewHeaderFacts';
 import { usePhotoHeaderForm } from './lib/stepOneFold';
 import { useReviewHoleTags } from './hooks/useReviewHoleTags';
@@ -869,6 +870,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   // independent of its height) and reserves exactly the difference. That is
   // one derivation, correct in BOTH render contexts — it never has to know
   // whether .app-shell or the fixed header paid env(safe-area-inset-top).
+  const composerRootRef = useRef<HTMLDivElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
   const spacerRef = useRef<HTMLDivElement | null>(null);
   const [spacerH, setSpacerH] = useState<number | null>(null);
@@ -878,6 +880,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     const spacer = spacerRef.current;
     if (!header || !spacer) return;
     const read = () => {
+      composerRootRef.current?.style.setProperty('--review-header-height', `${header.getBoundingClientRect().height}px`);
       const overlap = header.getBoundingClientRect().bottom - spacer.getBoundingClientRect().top;
       setSpacerH(Math.max(0, Math.round(overlap)) + (photoForm ? 6 : RV2_HEADER_GAP));
     };
@@ -898,6 +901,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   return (
 
     <div
+      ref={composerRootRef}
       style={{
         minHeight: '100vh',
         background: RV2.canvas,
@@ -953,7 +957,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           height:
             spacerH != null
               ? `${spacerH}px`
-              : `calc(${photoForm ? PHOTO_HEADER_H_CSS : RV2_HEADER_H_CSS} + ${photoForm ? 6 : RV2_HEADER_GAP}px)`,
+              : `calc(${photoForm ? `var(--review-header-height, ${HERO_PHOTO_HEIGHT}px)` : RV2_HEADER_H_CSS} + ${photoForm ? 6 : RV2_HEADER_GAP}px)`,
           flexShrink: 0,
         }}
       />

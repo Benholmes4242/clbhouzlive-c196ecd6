@@ -18,21 +18,16 @@ import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/cou
 import { OVERVIEW } from '../overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { heroStateLine } from './heroStateLine';
+import { OVERVIEW_KICKER_ROW_HEIGHT, OVERVIEW_TITLE_SIZE, OVERVIEW_TITLE_LINE_HEIGHT, OVERVIEW_TITLE_GAP, OVERVIEW_VENUE_LINE_HEIGHT, OVERVIEW_VENUE_GAP, OVERVIEW_FACE_SIZE, OVERVIEW_FACE_ROW_HEIGHT, OVERVIEW_FACE_GAP, OVERVIEW_LEADER_NAME_SIZE, OVERVIEW_LEADER_NAME_LINE_HEIGHT, OVERVIEW_LEADER_NAME_GAP, OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
+export { OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 
 
 /** THE LIVE-ONLY LINES, measured from the same constants that style them.
  *  The overview band shrinks by exactly these amounts on states that don't
  *  render them (finished loses both, upcoming loses the spine), so the
  *  kicker and title land exactly where a live hero puts them. */
-export const OVERVIEW_SENTENCE_FONT_SIZE = 13.5;
-export const OVERVIEW_SENTENCE_LINE_HEIGHT = 1.4;
-export const OVERVIEW_SENTENCE_MARGIN_TOP = 9;
-export const OVERVIEW_SENTENCE_BLOCK = OVERVIEW_SENTENCE_FONT_SIZE * OVERVIEW_SENTENCE_LINE_HEIGHT + OVERVIEW_SENTENCE_MARGIN_TOP;
-export const OVERVIEW_SPINE_LABEL_SIZE = 9.5;
-export const OVERVIEW_SPINE_LABEL_LINE_HEIGHT = 1.2;
-export const OVERVIEW_SPINE_MARGIN_TOP = 10;
-export const OVERVIEW_SPINE_BLOCK = OVERVIEW_SPINE_LABEL_SIZE * OVERVIEW_SPINE_LABEL_LINE_HEIGHT + OVERVIEW_SPINE_MARGIN_TOP;
 
 export interface HeroLeaderTrio {
   score: number;
@@ -121,7 +116,7 @@ export function PhotoBand({
         position: 'relative',
         display: 'block',
         width: '100%',
-        height: photoBandHeight(bandHeight),
+        height: inPlay ? photoBandHeight(bandHeight) : undefined,
         margin: 0,
         padding: 0,
         overflow: 'hidden',
@@ -138,14 +133,17 @@ export function PhotoBand({
       <div
         data-overview-photo-text
         style={{
-          position: 'absolute',
-          left: 20,
-          right: 20,
-          bottom: 14,
+          position: inPlay ? 'absolute' : 'relative',
+          left: inPlay ? 20 : undefined,
+          right: inPlay ? 20 : undefined,
+          bottom: inPlay ? HERO_CONTENT_BOTTOM : undefined,
+          margin: inPlay ? undefined : '0 20px',
+          paddingTop: inPlay ? undefined : HERO_CONTENT_TOP - (OVERVIEW_KICKER_ROW_HEIGHT - 11 * 1.2) / 2,
+          paddingBottom: inPlay ? undefined : HERO_CONTENT_BOTTOM,
           minWidth: 0,
         }}
       >
-        <div data-overview-photo-kicker-row style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
           {onFullBoard ? <Button type="button" variant="ghost" data-overview-full-board aria-label="Full leaderboard"
             onClick={(event) => { event.stopPropagation(); onFullBoard(); }}
@@ -154,12 +152,13 @@ export function PhotoBand({
             {t('overview.situation.fullBoard', { defaultValue: 'Full board' })}<ChevronRight size={13} strokeWidth={2.6} color={WHITE_ALPHA_32} aria-hidden />
           </Button> : null}
         </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: 4, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: OVERVIEW_TITLE_GAP, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1
             style={{
               ...MASTHEAD_NAME,
-              fontSize: 26,
+              fontSize: OVERVIEW_TITLE_SIZE,
+              lineHeight: OVERVIEW_TITLE_LINE_HEIGHT,
               letterSpacing: 0,
               marginTop: 0,
               display: '-webkit-box',
@@ -170,22 +169,22 @@ export function PhotoBand({
           >
             {title}
           </h1>
-          {venueLine ? <div style={{ ...MASTHEAD_PLACE, marginTop: 4 }}>{venueLine}</div> : null}
+          {venueLine ? <div style={{ ...MASTHEAD_PLACE, marginTop: OVERVIEW_VENUE_GAP, lineHeight: OVERVIEW_VENUE_LINE_HEIGHT }}>{venueLine}</div> : null}
         </div>
 
         {inPlay && leader ? (
           <div data-overview-leader-trio style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
             {leader.faces.length > 0 ? (
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 5 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: OVERVIEW_FACE_GAP, height: OVERVIEW_FACE_ROW_HEIGHT, alignItems: 'flex-start', lineHeight: 1.5 }}>
                 {leader.faces.map((face, i) => (
                   <span key={face.key} data-overview-trio-face style={{ display: 'inline-flex', flex: 'none', border: OVERVIEW.trio.faceBorder, borderRadius: '34%', marginLeft: i > 0 ? -8 : 0 }}>
-                    <SquircleAvatar size={24} srcCandidates={face.candidates} alt={face.name} userId={face.key} hideRing />
+                    <SquircleAvatar size={OVERVIEW_FACE_SIZE} srcCandidates={face.candidates} alt={face.name} userId={face.key} hideRing />
                   </span>
                 ))}
               </div>
             ) : null}
             <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
-            {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 4, marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
+            {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: OVERVIEW_LEADER_NAME_GAP, marginLeft: 'auto', fontSize: OVERVIEW_LEADER_NAME_SIZE, lineHeight: OVERVIEW_LEADER_NAME_LINE_HEIGHT, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
           </div>
         ) : null}
 

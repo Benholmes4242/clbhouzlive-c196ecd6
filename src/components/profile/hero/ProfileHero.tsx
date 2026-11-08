@@ -1,7 +1,7 @@
 /**
  * ProfileHero — BRIEF_PROFILE_TOP_REBUILD.
  *
- * The personal profile top: the 176px ProfileCoverBand, then ON CANVAS the
+ * The personal profile top: the content-sized ProfileCoverBand, then ON CANVAS the
  * bio + meta row, the index block, the index chart, the form strip and the
  * counter strip. HeroShell is NOT used here any more — it stays as the
  * business profile's hero, untouched.

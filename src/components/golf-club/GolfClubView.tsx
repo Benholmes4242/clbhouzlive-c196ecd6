@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
-import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
 import { useHeroReferenceLine } from '@/components/courses/course-detail/about/useHeroReferenceLine';
 import { useCourseRecordSummary } from '@/components/courses/course-detail/useCourseRecordSummary';
@@ -140,7 +140,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { data: courseMeta } = useCourseMeta(courseId);
   // Same read as the record boards (useCourseLegends query, deduped by cache).
   const { courseRecordHolders } = useCourseRecordSummary(courseId, user?.id ?? null);
-  const heroHeight = EXPLORE_COURSE_HERO_HEIGHT;
   // One course, one destination page the member deliberately navigated to —
   // see the hook header: the "never prefetch" rule is about N courses in a feed.
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
@@ -253,7 +252,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     <div
       className="relative overflow-hidden"
       style={{
-        height: heroHeight,
+        paddingTop: HERO_CONTENT_TOP,
+        paddingBottom: HERO_CONTENT_BOTTOM,
         marginTop: 0,
         background: heroImageBackground,
         backgroundColor: A.CANVAS,
@@ -281,12 +281,12 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        height: heroHeight,
+        paddingTop: HERO_CONTENT_TOP,
+        paddingBottom: HERO_CONTENT_BOTTOM,
         background: heroImageBackground,
         backgroundColor: A.CANVAS,
         display: 'flex',
         flexDirection: 'column',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
       <PhotoBandFade />
@@ -517,7 +517,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   const referenceLine = useHeroReferenceLine(courseId, rounds);
 
   return (
-    <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, zIndex: 1 }}>
+    <div style={{ position: 'relative', margin: '0 20px', zIndex: 1 }}>
       <CourseMasthead
         photoBand
         as="h1"

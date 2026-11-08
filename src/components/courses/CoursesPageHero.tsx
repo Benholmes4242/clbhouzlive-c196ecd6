@@ -15,7 +15,7 @@ import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/Hybri
 
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 import { CourseMasthead, CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
-import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
+import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 
 /**
  * CoursesPageHero
@@ -215,7 +215,8 @@ function CoursesPageHeroInner() {
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        height: EXPLORE_COURSE_HERO_HEIGHT,
+        paddingTop: HERO_CONTENT_TOP,
+        paddingBottom: HERO_CONTENT_BOTTOM,
         background,
         backgroundColor: A.CANVAS,
         display: 'flex',
@@ -224,14 +225,10 @@ function CoursesPageHeroInner() {
       }}
     >
       <PhotoBandFade />
-      {/* Bottom-anchored identity + CTA — absolute so copy never expands the
-          fixed 340px hero. Matches GolfClubView's CourseTitleOverlay. */}
+      {/* Identity flows from the shared live text reference; copy sizes the band. */}
       <div
         style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 14,
+          position: 'relative',
           padding: '0 20px',
           zIndex: 1,
         }}

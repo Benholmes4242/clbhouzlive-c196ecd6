@@ -42,6 +42,7 @@ export const MASTHEAD_NAME: React.CSSProperties = {
 export const MASTHEAD_PLACE: React.CSSProperties = {
   fontSize: 12.5,
   fontWeight: 600,
+  lineHeight: 1.5,
   color: PLACE_INK,
   marginTop: 6,
   whiteSpace: 'nowrap',

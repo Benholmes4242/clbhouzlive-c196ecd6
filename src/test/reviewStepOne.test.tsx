@@ -169,7 +169,7 @@ describe('header forms', () => {
     const divs = Array.from(bare.container.querySelectorAll('div')) as HTMLElement[];
     expect(divs.some((d) => d.style.borderTop.includes('rgba(255, 255, 255, 0.18)'))).toBe(false);
   });
-  it('preserves the safe-area photo height and compact height through the measured fold', () => {
+  it('uses content-sized photo height and preserves compact height through the measured fold', () => {
     const ref = React.createRef<HTMLElement>();
     const facts = { avg: null, count: 0 };
     const { container, rerender } = render(<ReviewComposerHeader ref={ref} {...props} form="photo" facts={facts} />);
@@ -177,9 +177,9 @@ describe('header forms', () => {
     expect(container.querySelector('[data-photo-header]')).toHaveClass('rv2-photo');
     expect(header).toHaveClass('rv2-header--photo');
     const cssText = readFileSync(resolve(__dirname, '../features/review-v2/components/reviewComposerHeader.css'), 'utf8');
-    expect(cssText).toContain('.rv2-header--photo { height: 350px; }');
+    expect(cssText).toContain('.rv2-header--photo { height: auto; }');
     expect(cssText).toContain('.rv2-header--compact { height: calc(env(safe-area-inset-top, 0px) + 68px); }');
-    expect(cssText).toContain('.rv2-photo { height: 100%; }');
+    expect(cssText).toContain('.rv2-photo { height: auto; }');
     expect(cssText).toContain('transition: height 200ms ease');
     rerender(<ReviewComposerHeader ref={ref} {...props} form="compact" facts={facts} />);
     expect(ref.current).toBe(header);

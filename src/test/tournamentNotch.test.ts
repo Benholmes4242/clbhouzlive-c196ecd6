@@ -18,9 +18,9 @@ describe('Tournament notch ownership',()=>{
     for(const key of ['chrome','tone','bleed','scrim','condense'] as const)expect(tournament[key]).toEqual(overview[key]);
     expect(tournament.left).toEqual({kind:'back',title:null,backTarget:'history',backFallback:'/tourhub?tab=schedule'});
   });
-  it('tournament photo is 350px in total with the notch counted inside',()=>{
+  it('tournament photo flows from the notch-inclusive reference',()=>{
     const sections=readFileSync(resolve(__dirname,'../features/tourhub/tournament-v2/sections/TournamentV3Sections.tsx'),'utf8');
-    expect(sections).toContain('style={{height:HERO_PHOTO_HEIGHT}}');
+    expect(sections).toContain('style={{paddingTop:HERO_CONTENT_TOP,paddingBottom:HERO_CONTENT_BOTTOM}}');
     expect(sections).not.toContain('photoBandHeight(340,true)');
   });
   it('overview keeps its existing definite carousel height',()=>{

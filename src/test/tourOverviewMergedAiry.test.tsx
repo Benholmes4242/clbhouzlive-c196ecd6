@@ -35,12 +35,13 @@ describe('Merged Airy photo', () => {
     const v = mount(photo(state));
     const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
     // Live keeps 350; states without the round spine drop exactly its block.
-    expect(band?.style.height).toBe(`${state.kind === 'live' ? 350 : 350 - OVERVIEW_SPINE_BLOCK}px`);
+    expect(band?.style.height).toBe(state.kind === 'live' ? '350px' : '');
     expect(band?.querySelector('[data-overview-photo-situation]')).not.toBeNull();
     expect(band?.querySelector('[data-overview-situation-note]')).not.toBeNull();
     expect(v.container.querySelector('[data-overview-situation]')).toBeNull();
     const text = band?.querySelector<HTMLElement>('[data-overview-photo-text]');
-    expect(text?.style.left).toBe('20px'); expect(text?.style.right).toBe('20px'); expect(text?.style.bottom).toBe('14px');
+    expect(text?.style.position).toBe(state.kind === 'live' ? 'absolute' : 'relative');
+    expect(state.kind === 'live' ? text?.style.bottom : text?.style.paddingBottom).toBe('14px');
     expect(band?.querySelector('h1')?.style.fontSize).toBe('26px');
     expect(band?.querySelector<HTMLElement>('[data-overview-photo-situation]')?.style.lineHeight).toBe('1.4');
     expect(band?.querySelector<HTMLElement>('[data-overview-situation-note]')?.style.marginTop).toBe('4px');
@@ -60,7 +61,8 @@ describe('Merged Airy photo', () => {
   it('a finished band with no sentence drops both live-only lines', () => {
     const v = mount(<PhotoBand title="Event" venueName="Venue" datesString="Dates" venueImageUrl={null} state={states[2]} tourLabel="PGA" leader={null} countdown={[]} startDay={null} segments={[]} note={null} onOpen={() => {}} />);
     const band = v.container.querySelector<HTMLElement>('[data-overview-photo-band]');
-    expect(band?.style.height).toBe(`${350 - OVERVIEW_SENTENCE_BLOCK - OVERVIEW_SPINE_BLOCK}px`);
+    expect(band?.style.height).toBe('');
+    expect(band?.querySelector<HTMLElement>('[data-overview-photo-text]')?.style.position).toBe('relative');
     expect(band?.querySelector('[data-overview-photo-situation]')).toBeNull();
     expect(band?.querySelector('[data-overview-round-spine]')).toBeNull();
   });

@@ -18,9 +18,8 @@ import { PhotoBandFade, photoBandFade } from '@/features/tourhub/components/over
 import { ProfileCoverBand } from '@/components/profile/hero/ProfileCoverBand';
 import { ClubProfileHero } from '@/components/business/hero/ClubProfileHero';
 import { HeroShell } from '@/components/profile/hero/HeroShell';
-import { PHOTO_HEADER_H_CSS } from '@/features/review-v2/components/ReviewComposerHeader';
 import { PERSONAL_COVER_ASPECT, PERSONAL_COVER_ASPECT_CSS, BUSINESS_COVER_ASPECT, BUSINESS_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
-import { HERO_PHOTO_HEIGHT, EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
+import { HERO_PHOTO_HEIGHT, HERO_CONTENT_TOP, EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 const src = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8');
@@ -48,9 +47,9 @@ describe('ALL_HEROES_MATCH step 0 — the shared fade', () => {
 });
 
 describe('ALL_HEROES_MATCH review wizard step 1', () => {
-  it('the photo header is 350px in total, notch counted inside', () => {
-    expect(PHOTO_HEADER_H_CSS).toBe('350px');
-    expect(src('features/review-v2/components/reviewComposerHeader.css')).toContain('.rv2-header--photo { height: 350px; }');
+  it('the photo header flows from the shared reference', () => {
+    expect(src('features/review-v2/components/ReviewCourseHero.tsx')).toContain('paddingTop: HERO_CONTENT_TOP');
+    expect(src('features/review-v2/components/reviewComposerHeader.css')).toContain('.rv2-header--photo { height: auto; }');
   });
   it('the fade ends on the wizard canvas and the masthead is the photo band', () => {
     const hero = src('features/review-v2/components/ReviewCourseHero.tsx');
@@ -63,11 +62,11 @@ describe('ALL_HEROES_MATCH review wizard step 1', () => {
 });
 
 describe('ALL_HEROES_MATCH golfer profile band', () => {
-  it('is a 350px band whose crop frame keeps the 39/34 constant', () => {
+  it('is a content-sized band whose crop frame keeps the 39/34 constant', () => {
     expect(PERSONAL_COVER_ASPECT).toBe(39 / 34);
     expect(PERSONAL_COVER_ASPECT_CSS).toBe('39 / 34');
     const { container } = render(<ProfileCoverBand coverUrl="x.jpg" avatar={<span>A</span>} displayName="Benjamin Holmes" subline="Sundridge Park Golf Club" action={<button type="button">Edit</button>} />);
-    expect((container.firstElementChild as HTMLElement).style.height).toBe('350px');
+    expect((container.firstElementChild as HTMLElement).style.height).toBe('');
     expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
   });
   it('puts the club in the kicker row with the controls, name at 26px with no shadow', () => {
@@ -102,10 +101,10 @@ describe('ALL_HEROES_MATCH business profile hero', () => {
         {...over}
       />,
     );
-  it('lays the fade over a 350px cover with the identity on the photo', () => {
+  it('lays the fade over a content-sized cover with identity on the photo', () => {
     const { container } = hero();
     const cover = container.querySelector('[data-club-cover]') as HTMLElement;
-    expect(cover.style.height).toBe('350px');
+    expect(cover.style.height).toBe('');
     expect(cover.querySelector('[data-photo-band-fade]')).not.toBeNull();
     // Place is the amber kicker with Share/More on its right.
     const place = cover.querySelector('[data-club-place]') as HTMLElement;
@@ -138,7 +137,8 @@ describe('ALL_HEROES_MATCH pro profile shell', () => {
     expect(shell).not.toContain('COVER_TOP_GUARD');
     const { container } = render(<HeroShell coverUrl="x.jpg" avatar={<span>A</span>} displayName="Mason Essam" counters={[]} kicker={<div className="pro-hero-kicker">Alps Tour · Dartford Golf Club</div>} />);
     const section = container.querySelector('section') as HTMLElement;
-    expect(section.style.padding).toBe('0px 20px 14px');
+    expect(section.style.paddingTop).toBe(`${HERO_CONTENT_TOP}px`);
+    expect(section.style.paddingBottom).toBe('14px');
     expect(section.querySelector('[data-photo-band-fade]')).not.toBeNull();
     expect(section.textContent).toContain('Alps Tour · Dartford Golf Club');
   });
@@ -167,54 +167,54 @@ describe('HERO_350 — every photo hero is 350px with the notch counted inside',
     const photoBand = src('features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx');
     // The overview band derives from the 350 live height minus the live-only
     // lines a state doesn't render (sentence / round spine blocks).
-    expect(photoBand).toContain('height: photoBandHeight(bandHeight)');
+    expect(photoBand).toContain('height: inPlay ? photoBandHeight(bandHeight) : undefined');
   });
-  it('the Courses page, amateur and course-detail heroes all read the 350 constant', () => {
-    expect(src('components/courses/CoursesPageHero.tsx')).toContain('height: EXPLORE_COURSE_HERO_HEIGHT');
-    expect(src('features/amateur/AmateurHero.tsx')).toContain('AMATEUR_HERO_H = EXPLORE_COURSE_HERO_HEIGHT');
+  it('the Courses page, amateur and course-detail heroes read the shared reference', () => {
+    expect(src('components/courses/CoursesPageHero.tsx')).toContain('paddingTop: HERO_CONTENT_TOP');
+    expect(src('features/amateur/AmateurHero.tsx')).toContain('paddingTop: HERO_CONTENT_TOP');
     const detail = src('components/golf-club/GolfClubView.tsx');
-    expect(detail).toContain('const heroHeight = EXPLORE_COURSE_HERO_HEIGHT;');
-    expect(detail).toContain('height: heroHeight');
+    expect(detail).toContain('paddingTop: HERO_CONTENT_TOP');
+    expect(detail).toContain('paddingBottom: HERO_CONTENT_BOTTOM');
   });
-  it('the tournament hero is 350 with no safe-area term', () => {
+  it('the tournament hero flows without a safe-area term', () => {
     const sections = src('features/tourhub/tournament-v2/sections/TournamentV3Sections.tsx');
-    expect(sections).toContain('style={{height:HERO_PHOTO_HEIGHT}}');
+    expect(sections).toContain('style={{paddingTop:HERO_CONTENT_TOP,paddingBottom:HERO_CONTENT_BOTTOM}}');
     expect(sections).not.toContain('photoBandHeight(340,true)');
     expect(sections).not.toContain('photoBandHeight(HERO_PHOTO_HEIGHT,true)');
   });
-  it('the review photo header is 350 with no safe-area term', () => {
-    expect(PHOTO_HEADER_H_CSS).toBe('350px');
-    expect(src('features/review-v2/components/reviewComposerHeader.css')).toContain('.rv2-header--photo { height: 350px; }');
+  it('the review photo header flows with no safe-area term', () => {
+    expect(src('features/review-v2/components/ReviewCourseHero.tsx')).toContain('paddingTop: HERO_CONTENT_TOP');
+    expect(src('features/review-v2/components/reviewComposerHeader.css')).toContain('.rv2-header--photo { height: auto; }');
   });
-  it('the golfer cover band is 350 with no safe-area term', () => {
+  it('the golfer cover band flows with no safe-area term', () => {
     const band = src('components/profile/hero/ProfileCoverBand.tsx');
-    expect(band).toContain('height: HERO_PHOTO_HEIGHT');
+    expect(band).toContain('paddingTop: HERO_CONTENT_TOP');
     expect(band).not.toContain('aspectRatio');
     const { container } = render(<ProfileCoverBand coverUrl="x.jpg" avatar={<span>A</span>} displayName="Benjamin Holmes" subline={null} />);
-    expect((container.firstElementChild as HTMLElement).style.height).toBe('350px');
+    expect((container.firstElementChild as HTMLElement).style.height).toBe('');
   });
-  it('the business cover is 350 with or without a photo', () => {
+  it('the business cover flows with or without a photo', () => {
     const heroSrc = src('components/business/hero/ClubProfileHero.tsx');
-    expect(heroSrc).toContain('height: HERO_PHOTO_HEIGHT');
+    expect(heroSrc).toContain('paddingTop: HERO_CONTENT_TOP');
     for (const coverUrl of ['cover.jpg', null]) {
       const { container, unmount } = render(
         <ClubProfileHero name="Sundridge Park Golf Club" placeLine={null} coverUrl={coverUrl} onShare={() => {}} renderMore={(t) => t} team={null} isFollowing={false} onFollowToggle={() => {}} onBookTeeTime={() => {}} onMessage={() => {}} />,
       );
-      expect((container.querySelector('[data-club-cover]') as HTMLElement).style.height).toBe('350px');
+      expect((container.querySelector('[data-club-cover]') as HTMLElement).style.height).toBe('');
       unmount();
     }
   });
-  it('the pro hero carries a 350 minHeight floor with a cover, none without', () => {
+  it('the pro hero carries a derived minHeight floor with a cover, none without', () => {
     const shell = src('components/profile/hero/HeroShell.tsx');
-    expect(shell).toContain('minHeight: coverUrl ? HERO_PHOTO_HEIGHT : undefined');
+    expect(shell).toContain('minHeight: coverUrl ? HERO_CONTENT_TOP + HERO_TALLEST_CONTENT : undefined');
     expect(shell).not.toContain('BUSINESS_COVER_ASPECT_CSS');
     const withCover = render(<HeroShell coverUrl="x.jpg" avatar={<span>A</span>} displayName="Mason Essam" counters={[]} />);
-    expect((withCover.container.querySelector('section') as HTMLElement).style.minHeight).toBe('350px');
+    expect((withCover.container.querySelector('section') as HTMLElement).style.minHeight).toBe(`${HERO_CONTENT_TOP + 295}px`);
     withCover.unmount();
     const noCover = render(<HeroShell coverUrl={null} avatar={<span>A</span>} displayName="Mason Essam" counters={[]} />);
     expect((noCover.container.querySelector('section') as HTMLElement).style.minHeight).toBe('');
   });
-  it('the HeroShell skeleton matches the 350 floor', () => {
-    expect(src('components/skeletons/ProfileSurfaceSkeleton.tsx')).toContain('minHeight: HERO_PHOTO_HEIGHT');
+  it('the profile skeleton starts at the shared reference', () => {
+    expect(src('components/skeletons/ProfileSurfaceSkeleton.tsx')).toContain('paddingTop: HERO_CONTENT_TOP');
   });
 });
