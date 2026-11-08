@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const scope = { current: { primaryClubId: null as string | null, primaryClubName: null as string | null } };
 
@@ -33,7 +34,7 @@ describe('Home rail bands render nothing when empty', () => {
   beforeEach(() => { scope.current = { primaryClubId: null, primaryClubName: null }; });
 
   it('round of the week with no featured round mounts nothing', () => {
-    const { container } = render(<HomeRail kind="featuredRound" viewerId="u1" pos={0} />);
+    const { container } = render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><HomeRail kind="featuredRound" viewerId="u1" pos={0} /></QueryClientProvider>);
     expectCollapsed(container);
     expect(container.childNodes.length).toBe(0);
   });

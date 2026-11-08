@@ -3,6 +3,7 @@ import { render,cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider,initReactI18next } from 'react-i18next';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import en from '../../public/locales/en/tourhub.json';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 const fixtures=vi.hoisted(()=>({slides:[] as HeroSlide[],viewing:'viewed',guest:true,follows:new Set<string>()}));
@@ -14,7 +15,7 @@ import { AlsoThisWeek } from '@/features/tourhub/overview/sections/AlsoThisWeek'
 const i18n=createInstance();i18n.use(initReactI18next).init({lng:'en',resources:{en:{tourhub:en}},initAsync:false});
 afterEach(()=>{cleanup();vi.useRealTimers();fixtures.slides=[];fixtures.guest=true;fixtures.follows.clear();});
 function slide(id:string,type:HeroSlide['type']='live'):HeroSlide {return {type,tournament:{id,name:id,status:type==='live'?'inprogress':'closed',startDate:'2026-10-29',endDate:'2026-11-01',currentRound:3,tourSlug:'pga',tourName:'PGA Tour'} as HeroSlide['tournament']};}
-function open(){vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));return render(<MemoryRouter><I18nextProvider i18n={i18n}><AlsoThisWeek/></I18nextProvider></MemoryRouter>);}
+function open(){vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));const qc=new QueryClient({defaultOptions:{queries:{retry:false}}});return render(<QueryClientProvider client={qc}><MemoryRouter><I18nextProvider i18n={i18n}><AlsoThisWeek/></I18nextProvider></MemoryRouter></QueryClientProvider>);}
 describe('weekly section membership and heading',()=>{
   it('two live events count as two live in the section head',()=>{fixtures.slides=[slide('a'),slide('b'),slide('c','completed')];const v=open();expect(v.container.querySelector('.also-week-meta')?.textContent).toBe('2 live');expect(v.container.querySelectorAll('.also-event')).toHaveLength(3);});
   it('no live events hide the count',()=>{fixtures.slides=[slide('c','completed')];const v=open();expect(v.container.querySelector('.also-week-meta')).toBeNull();expect(v.container.querySelectorAll('.also-event')).toHaveLength(1);});
