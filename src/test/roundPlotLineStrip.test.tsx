@@ -66,20 +66,20 @@ describe('Signed-off round line and strip', () => {
     const v = render(<RoundTilePlot shape={shape([-2, -1, 0, 1, 2, null])} received={[1,1,1,1,1,1]} />);
     // The 6px coloured bars are gone; the shared numbered tiles carry the grade.
     expect(v.container.querySelectorAll('[data-plot-hole]')).toHaveLength(0);
-    const tiles = Array.from(v.container.querySelectorAll('[data-hole-tile]'));
+    const tiles = Array.from(v.container.querySelectorAll('[data-hole-mark]'));
     expect(tiles.map(t => t.getAttribute('data-grade'))).toEqual(['eagle', 'birdie', 'par', 'bogey', 'double', 'empty']);
     expect(tiles.map(t => t.textContent)).toEqual(['2', '3', '4', '5', '6', '']);
   });
   it('renders the shared tiles 12px below the line with the nine-hole turn gap', () => {
     const v = plot('turn', Array(18).fill(0));
-    const wrap = v.container.querySelector<HTMLElement>('[data-plot-tiles]');
+    const wrap = v.container.querySelector<HTMLElement>('[data-plot-marks]');
     expect(wrap?.style.marginTop).toBe('12px');
-    expect(v.container.querySelectorAll('[data-hole-tile]')).toHaveLength(18);
-    expect(v.container.querySelectorAll('.tour-hole-tiles-gap')).toHaveLength(1);
+    expect(v.container.querySelectorAll('[data-hole-mark]')).toHaveLength(18);
+    expect(v.container.querySelectorAll('.tour-hole-marks-gap')).toHaveLength(1);
     cleanup();
     const nine = plot('nine-gap', Array(9).fill(0));
-    expect(nine.container.querySelectorAll('[data-hole-tile]')).toHaveLength(9);
-    expect(nine.container.querySelectorAll('.tour-hole-tiles-gap')).toHaveLength(0);
+    expect(nine.container.querySelectorAll('[data-hole-mark]')).toHaveLength(9);
+    expect(nine.container.querySelectorAll('.tour-hole-marks-gap')).toHaveLength(0);
   });
   it('earns red fill, red stroke and rule only by dipping net under par', () => {
     const v = plot('red', [-1,2]);
@@ -99,7 +99,7 @@ describe('Signed-off round line and strip', () => {
   it('keeps the strip, foot and rule outside the animated group', () => {
     const v = plot('static', [-1,...Array(17).fill(0)]);
     const g = v.container.querySelector('[data-plot-animated]');
-    for (const el of v.container.querySelectorAll('[data-plot-tiles], [data-plot-foot], [data-plot-level]')) expect(g?.contains(el)).toBe(false);
+    for (const el of v.container.querySelectorAll('[data-plot-marks], [data-plot-foot], [data-plot-level]')) expect(g?.contains(el)).toBe(false);
   });
   it('never draws before threshold and plays after the 120ms delay', () => {
     geometry(); const v = plot('threshold'); const reveal = v.container.querySelector('[data-plot-reveal]');
