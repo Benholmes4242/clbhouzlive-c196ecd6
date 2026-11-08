@@ -57,3 +57,21 @@
 - [x] Update authorized obsolete assertions and two direct-mount prop sets; add3cases. Focused115passed/1failed across7files.
 - [x] Authorised only line130 flex assertion accepts1 or1 1 0%; chips focused116/116. Actual overview320px: picks/movers all46px, long names ellipsise, confined x20–300. Updated OVERVIEW_TIGHT_CHIPS_REPORT.md.
 - [ ] Shared shards3–4 blocked by unexpected tourHeroRefinements.test.tsx:98:19 Needs assertion expected length1 got0; existing test untouched.
+
+## OVERVIEW_CHAMPION_HERO
+- [x] One-column hero board (green R3 header), shared ChampionStrip (gold ring, BY {words}, narrative), finished photo drops sentence/Full board, derived band heights (live 350 / upcoming 328.6 / finished 300.7), green spine #34D77F halo 18%.
+- [x] Focused 208/208; shards 2007/1871/1994/1908 = 7780 (+3 vs 7777).
+- [ ] 320/390/430 screen checks (champion fade/ring clipping) not yet run.
+
+## HERO_START_LINE (active)
+- [ ] HERO_CONTENT_TOP=184 derived from live overview stack constants in heroHeights.ts; update 350-rule comment.
+- [ ] Overview kicker row fixed minHeight in every state (live pixel-identical).
+- [ ] Convert heroes to flow text (padding-top 184, padding-bottom 14, auto band): TournamentHero, CoursesPageHero, GolfClubView (both mounts, CourseTitleOverlay into flow, drop cinematic safe-area), ReviewComposerHeader/ReviewCourseHero + ReviewComposerV2 measured header var (delete PHOTO_HEADER_H_CSS if unused), ProfileCoverBand (fix 176px comment), ClubProfileHero, HeroShell (pro, re-based pinned floor), AmateurHero + any other HERO_PHOTO_HEIGHT/EXPLORE_COURSE_HERO_HEIGHT hero.
+- [ ] Skeletons (CourseMastheadSkeleton, CourseDetailSkeleton, ProfileSurfaceSkeleton) + AppHeader overHero callers get real heights.
+- [ ] Tests: update pinned 350/bottom:14/HERO_CONTENT_INSET+18 assertions (list old/new), add new cases; 4 shards (only fw1FeaturedDeck known); 320/390/430 first-line-at-184 checks.
+
+## HERO_START_LINE — STOPPED on a brief/mock conflict (pending Ben's ruling)
+- Brief text: first line at 184px, "the live Tour overview... does not change", "the live position must not change by a pixel".
+- Measured real live hero (one-line title fixture, 320/390/430): kicker ROW top 186.53, kicker TEXT top 193.94. Neither is 184.
+- Mock's own after_overview-live-1line.jpg: amber kicker pixels at image rows 374–389 of a 2x 390 frame = ~187 CSS px (row top), not the 184 guide line drawn over it.
+- 184 matches nothing measured; adopting it moves the live kicker ~3px (row) or ~10px (text), violating the brief's own freeze. Awaiting ruling: 184 vs ~187 (row top) vs ~194 (text top).
