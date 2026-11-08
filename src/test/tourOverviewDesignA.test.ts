@@ -447,7 +447,7 @@ describe('MiniBoard hero rows', () => {
     ] as unknown as BoardEntry[];
     const view = mount(entries, 2);
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns.startsWith('24px minmax(0,1fr)')).toBe(true);
+    expect(header?.style.gridTemplateColumns.startsWith('24px minmax(0, 1fr)')).toBe(true);
     expect(view.container.textContent).not.toContain('\u25B2');
   });
 });
