@@ -17,6 +17,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
+import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
 
 const CANVAS = '#0B0B0D';
 const INK = '#F8FAFC';
@@ -170,7 +171,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         data-club-cover=""
         style={{
           position: 'relative',
-          aspectRatio: '39 / 34',
+          height: HERO_PHOTO_HEIGHT,
           background: p.coverUrl ? CANVAS : 'linear-gradient(180deg, #17171B 0%, #0B0B0D 100%)',
           overflow: 'hidden',
         }}

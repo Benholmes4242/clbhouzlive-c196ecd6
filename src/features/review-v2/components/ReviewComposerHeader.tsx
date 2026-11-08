@@ -41,9 +41,9 @@ interface Props {
   onDelete: () => void;
 }
 
-// Photo hero: the photograph fills one block of safe-area inset + 340px, the
-// same band as the course page's cinematic hero (EXPLORE_COURSE_HERO_HEIGHT).
-export const PHOTO_HEADER_H_CSS = 'calc(env(safe-area-inset-top, 0px) + 340px)';
+// Photo hero: 350px in total with the notch counted inside (HERO_PHOTO_HEIGHT),
+// the same band as the course page's cinematic hero. No safe-area term on top.
+export const PHOTO_HEADER_H_CSS = '350px';
 
 /** The reference line's " · " separator, drawn as CourseTitleOverlay draws it. */
 const RefSep = () => <span style={{ fontWeight: 500, color: SURFACE.dark.dim }}>{' · '}</span>;

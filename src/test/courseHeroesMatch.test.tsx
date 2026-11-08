@@ -61,11 +61,11 @@ describe('Course headers match the Tour material', () => {
     expect(container.querySelector('[data-child]')?.parentElement?.style.borderTop).toContain('1px solid');
     expect(container.querySelector('[data-child]')?.parentElement?.style.marginTop).toBe('13px');
   });
-  it.each([[false,false],[true,false],[false,true],[true,true]])('keeps detail340px and one canonical fade (record%s,modal%s)', (record, modal) => {
+  it.each([[false,false],[true,false],[false,true],[true,true]])('keeps detail350px and one canonical fade (record%s,modal%s)', (record, modal) => {
     const { container } = mountDetail(record, modal);
     const fade = container.querySelector('[data-photo-band-fade]');
     expect(container.querySelectorAll('[data-photo-band-fade]')).toHaveLength(1);
-    expect(fade?.parentElement?.style.height).toBe('340px');
+    expect(fade?.parentElement?.style.height).toBe('350px');
     const title = screen.getByRole('heading');
     expect(title.style.fontSize).toBe('26px');
     const overlay = title.closest('h1')?.parentElement?.parentElement?.parentElement?.parentElement;

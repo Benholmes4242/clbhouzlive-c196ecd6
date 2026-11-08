@@ -177,7 +177,7 @@ describe('header forms', () => {
     expect(container.querySelector('[data-photo-header]')).toHaveClass('rv2-photo');
     expect(header).toHaveClass('rv2-header--photo');
     const cssText = readFileSync(resolve(__dirname, '../features/review-v2/components/reviewComposerHeader.css'), 'utf8');
-    expect(cssText).toContain('.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 340px); }');
+    expect(cssText).toContain('.rv2-header--photo { height: 350px; }');
     expect(cssText).toContain('.rv2-header--compact { height: calc(env(safe-area-inset-top, 0px) + 68px); }');
     expect(cssText).toContain('.rv2-photo { height: 100%; }');
     expect(cssText).toContain('transition: height 200ms ease');

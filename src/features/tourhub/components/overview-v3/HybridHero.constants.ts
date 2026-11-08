@@ -5,6 +5,7 @@
  * per §8 of HYBRID_HERO_IMPLEMENTATION_BRIEF — do not introduce new layout
  * tokens without updating the brief.
  */
+import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
 
 // Layout
 /**
@@ -33,7 +34,7 @@ export const PHOTO_BAND_HEIGHT = 340;   // 360 -> 306 -> 260 -> 286 -> 244 -> 34
  * story and StoryPage's hero — which this brief does not touch. Lowering the
  * shared constant would silently shorten both.
  */
-export const OVERVIEW_PHOTO_BAND_HEIGHT = 340;
+export const OVERVIEW_PHOTO_BAND_HEIGHT = HERO_PHOTO_HEIGHT;
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
