@@ -31,9 +31,9 @@ describe('PF2 effective hole guide rule', () => {
   it('the member switch off stays off', () => {
     expect(effectiveHoleGuide(false, 1, true, 'anyone')).toBe(false);
   });
-  it('golfPostPatch writes the effective boolean false when a hole is set', () => {
-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: false });
-    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'], hole_no: 15, add_to_hole_guide: true });
+  it('golfPostPatch no longer writes either legacy guide boolean', () => {
+    expect(golfPostPatch({ course, holeNo: 15, addToGuide: false })).toEqual({ tagged_course_ids: ['c1'] });
+    expect(golfPostPatch({ course, holeNo: 15, addToGuide: true })).toEqual({ tagged_course_ids: ['c1'] });
   });
   it('footer sub-line carries the guide only when the effective value is on', () => {
     expect(composerDestinations(15, true, null)).toBe("Shares to your Clubhouse feed · the 15th's hole guide");
