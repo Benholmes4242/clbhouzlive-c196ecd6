@@ -1,13 +1,15 @@
 /** Render-owned live geometry. The leader column floors the one-line title
  * row; include it in the reference rather than assuming the title is taller.
- * Normal inherited line boxes are pinned to their existing 1.5 rendering.
+ * Line boxes are pinned to their existing rendering: leader name 1.1,
+ * place line 1.2. The reference is live with headshots; without headshots
+ * the shorter leader column places the kicker lower, intentionally.
  * Shared consumers import this dependency-only module to avoid a component cycle. */
 export const OVERVIEW_KICKER_ROW_HEIGHT = 28;
 export const OVERVIEW_KICKER_LINE_HEIGHT = 11 * 1.2;
 export const OVERVIEW_TITLE_SIZE = 26;
 export const OVERVIEW_TITLE_LINE_HEIGHT = 0.99;
 export const OVERVIEW_TITLE_GAP = 4;
-export const OVERVIEW_VENUE_LINE_HEIGHT = 1.5;
+export const OVERVIEW_VENUE_LINE_HEIGHT = 1.2;
 export const OVERVIEW_VENUE_GAP = 4;
 export const OVERVIEW_FACE_SIZE = 24;
 export const OVERVIEW_FACE_HEIGHT = OVERVIEW_FACE_SIZE * 1.05 + 2;
@@ -15,7 +17,7 @@ export const OVERVIEW_FACE_ROW_HEIGHT = OVERVIEW_FACE_HEIGHT;
 export const OVERVIEW_FACE_GAP = 5;
 export const OVERVIEW_LEADER_SCORE_HEIGHT = 21;
 export const OVERVIEW_LEADER_NAME_SIZE = 10;
-export const OVERVIEW_LEADER_NAME_LINE_HEIGHT = 1.5;
+export const OVERVIEW_LEADER_NAME_LINE_HEIGHT = 1.1;
 export const OVERVIEW_LEADER_NAME_GAP = 4;
 export const OVERVIEW_LEADER_BLOCK = OVERVIEW_FACE_ROW_HEIGHT + OVERVIEW_FACE_GAP + OVERVIEW_LEADER_SCORE_HEIGHT + OVERVIEW_LEADER_NAME_GAP + OVERVIEW_LEADER_NAME_SIZE * OVERVIEW_LEADER_NAME_LINE_HEIGHT;
 export const OVERVIEW_TITLE_BLOCK = OVERVIEW_TITLE_SIZE * OVERVIEW_TITLE_LINE_HEIGHT + OVERVIEW_VENUE_GAP + 12.5 * OVERVIEW_VENUE_LINE_HEIGHT;

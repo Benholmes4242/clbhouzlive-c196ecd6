@@ -64,6 +64,7 @@
 - [x] Fixture screens at320/390/430; no overflow. Live reference mismatch remains unverified; see closeout report.
 
 ## HERO_START_LINE — paused at verification
+- [ ] Apply TWO_RULINGS: exact four-line review test repair; restore leader1.1/place1.2; prove193.9px and place15px before proceeding.
 - [x] Ruling saved: derive frozen live kicker TEXT reference; 184 invalid.
 - [x] Shared geometry and named flow hero/skeleton conversions; authorized obsolete fixed-height assertions updated without changing test counts.
 - [ ] Resolve reference discrepancy: fixture text189.9375 vs ruled193.9; derived189.92 is not accepted as a replacement. Before/after freeze unverified.

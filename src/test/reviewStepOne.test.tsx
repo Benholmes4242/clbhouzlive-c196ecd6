@@ -116,10 +116,10 @@ describe('header forms', () => {
     mockStanding = { globalRank: 16, regionalRank: 14, usaRank: null };
     const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12 }} />);
     const masthead = container.querySelector('[data-photo-header] > div:last-child') as HTMLElement;
-    expect(masthead.style.position).toBe('absolute');
-    expect(masthead.style.left).toBe('20px');
-    expect(masthead.style.right).toBe('20px');
-    expect(masthead.style.bottom).toBe('14px');
+    expect(masthead.style.position).toBe('relative');
+    expect(masthead.style.margin).toBe('0px 20px');
+    expect(masthead.style.left).toBe('');
+    expect(masthead.style.bottom).toBe('');
     const kickerEl = Array.from(masthead.querySelectorAll('div')).find((d) => d.textContent === 'Fife · #16 World · #14 GB&I') as HTMLElement;
     expect(kickerEl).toBeTruthy();
     expect(kickerEl.style.textTransform).toBe('uppercase');
