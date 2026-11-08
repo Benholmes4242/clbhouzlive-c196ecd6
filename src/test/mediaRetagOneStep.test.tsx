@@ -30,7 +30,7 @@ import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 const holeRow = (extra: Partial<HolePhoto> = {}) => ({ id: 'tag', hole_no: 6, status: 'approved', media_url: '/a.jpg', media_type: 'image', source_post_media_id: null, ...extra }) as HolePhoto;
 const shot = (over: Partial<GalleryShot> = {}): GalleryShot => ({
   id: 's', ownerId: 'me', name: 'Ann', avatar: '', addedAt: '2026-01-01',
-  item: { id: 'i', url: '/a.jpg', type: 'image' } as GalleryShot['item'], post: { id: 'p' } as GalleryShot['post'], holeTag: holeRow(), ...over,
+  item: { id: 'i', url: '/a.jpg', type: 'image', width: 1, height: 1 } as GalleryShot['item'], post: { id: 'p' } as GalleryShot['post'], holeTag: holeRow(), ...over,
 });
 const mount = (s: GalleryShot) => {
   const onSaved = vi.fn(); const onClose = vi.fn();
