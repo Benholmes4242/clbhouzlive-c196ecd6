@@ -8,7 +8,6 @@ import { I18nextProvider } from 'react-i18next';
 import en from '../../public/locales/en/tourhub.json';
 import { MiniBoard, heroTeeRound } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { BOARD_GEOMETRY, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
-import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { HeroBoardSection } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { LeadersGroupContent } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup';
 import { leadersPositionOrder } from '@/features/tourhub/components/overview-v3/HybridHeroBands/leadersGroupRules';
