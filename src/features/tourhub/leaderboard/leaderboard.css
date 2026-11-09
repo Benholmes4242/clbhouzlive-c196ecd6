@@ -15,8 +15,8 @@
 .tour-board-title { margin:4px 0 0; font-size:26px; font-weight:800; line-height:1.1; letter-spacing:0; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
 .tour-board-place { margin-top:4px; font-size:12.5px; font-weight:600; line-height:1.2; color:rgba(255,255,255,.78); }
 .tour-board-figures { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); margin:14px 20px 0; border-top:1px solid rgba(255,255,255,.12); border-bottom:1px solid rgba(255,255,255,.12); }
-.tour-board-figures > div { padding:12px 0; min-width:0; }
-.tour-board-figures > div + div { padding-left:12px; border-left:1px solid rgba(255,255,255,.08); }
+.tour-board-figures > div { padding:12px 0; min-width:0; text-align:center; }
+.tour-board-figures > div + div { padding-left:0; border-left:1px solid rgba(255,255,255,.08); }
 .tour-board-figures b { display:block; font-size:19px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .tour-board-figures b small { font-size:12px; font-weight:700; color:var(--tour-board-mute); margin-left:3px; }
 .tour-board-figures span { display:block; margin-top:6px; font-size:9.5px; font-weight:800; letter-spacing:.12em; color:var(--tour-board-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
