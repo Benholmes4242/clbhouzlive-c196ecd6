@@ -17,7 +17,7 @@ import {surnameOf} from '../../_shared/playerName';
 import {PhotoBandFade} from '../../components/overview-v3/HybridHeroBands/photoBandMaterial';
 import {HERO_CONTENT_TOP,HERO_CONTENT_BOTTOM} from '@/lib/heroHeights';
 import {heroStateLine} from '../../components/overview-v3/HybridHeroBands/heroStateLine';
-import {copy,words,cap,score,ordinal,ordinalWord,day,heroStartDay,heroSentence,venueLine,glanceFacts,fieldLead,backThisYear,chartLines,labelPositions,playedRounds,roundStanding,raceNarrative,playedCourse,buckets,percentages,completeCount,selectTeeGroups,localTime,teeCaption,numberFacts,type Phase,type Part,type CourseHole} from '../data/tournamentRules';
+import {copy,words,cap,score,ordinal,ordinalWord,day,heroStartDay,heroStartDayForm,eventZone,heroSentence,venueLine,glanceFacts,fieldLead,backThisYear,chartLines,labelPositions,playedRounds,roundStanding,raceNarrative,playedCourse,buckets,percentages,completeCount,selectTeeGroups,localTime,teeCaption,numberFacts,type Phase,type Part,type CourseHole} from '../data/tournamentRules';
 import {PhotoBand} from '../../components/overview-v3/HybridHeroBands/PhotoBand';
 import {formatOverviewDateRange,getOverviewCountdown} from '../../components/overview-v3/HybridHero';
 import {upcomingSentence} from '../../components/overview-v3/upcomingOverviewRules';
