@@ -153,7 +153,7 @@ function InnerComposer() {
   // The photo form AND the confirmation receipt are transparent (the receipt
   // hero is Step 1's hero — the photo runs behind the notch); loading and
   // compact retain canvas.
-  const receiptShowing = !!(success && success.courseId === courseId && courseQ.data);
+  const receiptShowing = !!(success && success.courseId === courseId);
   const immersiveNotch = photoHeader || receiptShowing;
   useLayoutEffect(() => {
     claimOverlayChrome({
