@@ -97,7 +97,6 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Search shell ownership: see KeyboardSearchSheet.tsx header.
 - Settings/export/handicap and business Profile/Links ownership: see their module headers.
 - Tour boards: LiveBoard.
-- Overview season recap: between-seasons and fresh-standings rules live only in seasonRecapRules.ts (see header), so stale lists can never render as FINAL.
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
