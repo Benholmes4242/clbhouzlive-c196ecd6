@@ -284,6 +284,25 @@ export function ScheduleTab() {
   }, [allEvents, followedIds, fieldMap, ownRounds]);
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
+  /* EMPTY-WEEK FIX: the first landing fired before the winner/leader
+     enrichment settled; the rows above the anchor then grew and the page
+     landed short, leaving a pinned week header covering its own row (the
+     "12 – 18 OCT" / SAS Championship report). Re-land whenever the timeline
+     identity changes (enrichment settle points) until the user scrolls. */
+  const userScrolledRef = useRef(false);
+  useEffect(() => {
+    userScrolledRef.current = false;
+    const mark = () => { userScrolledRef.current = true; };
+    window.addEventListener('wheel', mark, { passive: true });
+    window.addEventListener('touchmove', mark, { passive: true });
+    window.addEventListener('keydown', mark);
+    return () => {
+      window.removeEventListener('wheel', mark);
+      window.removeEventListener('touchmove', mark);
+      window.removeEventListener('keydown', mark);
+    };
+  }, [activeTour]);
+
   const anchorId = timeline?.anchorEventId ?? null;
   const computeOffset = () => {
     const rootStyles = getComputedStyle(document.documentElement);
@@ -304,7 +323,7 @@ export function ScheduleTab() {
     const start = performance.now();
     const DEADLINE = 1500;
     const tryScroll = () => {
-      if (cancelled) return;
+      if (cancelled || userScrolledRef.current) return;
       const el = document.getElementById(`sv2-row-${anchorId}`);
       if (!el) {
         if (performance.now() - start < DEADLINE) {
@@ -313,6 +332,7 @@ export function ScheduleTab() {
         return;
       }
       const doScroll = () => {
+        if (userScrolledRef.current) return;
         scrollElementIntoView(el, { offset: computeOffset(), behavior: 'auto' });
       };
       doScroll();
@@ -326,7 +346,7 @@ export function ScheduleTab() {
       cancelled = true;
       cancelAnimationFrame(rafId);
     };
-  }, [anchorId, activeTour]);
+  }, [anchorId, activeTour, timeline]);
 
   const thisWeekKey = useMemo(() => currentWeekKey(), [timeline?.totalEvents]);
   const hasThisWeek = !!timeline?.weeks.some((w) => w.key === thisWeekKey);
