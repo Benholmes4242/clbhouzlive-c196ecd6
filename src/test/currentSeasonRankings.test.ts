@@ -15,7 +15,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: (table: str
     limit: (v: number) => { cap = v; return b; },
     then: (resolve: any) => {
       state.calls.push({ table, filters: { ...filters } });
-      let data = table === 'sr_seasons' ? [{ id: 'season' }] : table === 'sr_tournaments' ? state.events : table === 'tour_season_rankings' ? state.rankings : [];
+      let data = table === 'sr_seasons' ? [{ id: 'season', year: filters.year, tour_name: filters.tour_name }] : table === 'sr_tournaments' ? state.events : table === 'tour_season_rankings' ? state.rankings : [];
       data = data.filter((row: any) => Object.entries(filters).every(([k, v]) => k === 'followed' ? v.includes(`"${row.player_id}"`) : Array.isArray(v) ? v.includes(row[k]) : row[k] === v));
       return resolve({ data: data.slice(0, cap), count: head ? data.length : null, error: null });
     },
