@@ -48,8 +48,17 @@ const TOUR_NAME_TO_API: Record<string, string> = {
   'champ': 'champ',
 };
 
-// Years to sync
-const YEARS_TO_SYNC = [2025, 2026];
+// Years to sync — ROLLING, computed per run: [current UTC year, next UTC year].
+// A hard-coded list (it was [2025, 2026]) silently stopped next season loading:
+// tours publish next year's calendar before New Year (DP World's season starts
+// in late November), so the next year must always be requested. From 1 Jan the
+// window becomes [2027, 2028]. Two years only; do not add a third.
+// A 404 for the NEXT year is expected (not published yet) and is not a failure.
+export function yearsToSync(now: Date = new Date()): number[] {
+  const y = now.getUTCFullYear();
+  return [y, y + 1];
+}
+const YEARS_TO_SYNC = yearsToSync();
 
 // SportRadar API configuration
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
@@ -151,6 +160,11 @@ Deno.serve(async (req) => {
             console.log(`[Daily Schedule Sync] ${tour} ${year}: ${data.records_synced} tournaments synced`);
           } else {
             const errorText = await response.text();
+            if (year > new Date().getUTCFullYear() && /\b404\b/.test(errorText)) {
+              results.push({ tour, year, status: 'not_published' });
+              console.log(`[Daily Schedule Sync] ${tour} ${year}: not published yet (404)`);
+              continue;
+            }
             results.push({
               tour,
               year,
@@ -208,7 +222,7 @@ Deno.serve(async (req) => {
             try {
               const season = tournament.season as any;
               const tour = TOUR_NAME_TO_API[season?.tour_name] || 'pga';
-              const year = season?.year || 2026;
+              const year = season?.year || new Date(tournament.end_date).getUTCFullYear();
               
               const records = await syncFinalLeaderboard(
                 supabase,
@@ -291,7 +305,7 @@ Deno.serve(async (req) => {
     }
 
     // Log the sync status to sr_cron_status
-    const successCount = results.filter(r => r.status === 'success').length;
+    const successCount = results.filter(r => r.status === 'success' || r.status === 'not_published').length;
     const totalRecords = results.reduce((sum, r) => sum + (r.records || 0), 0);
     const leaderboardRecords = leaderboardResults.reduce((sum, r) => sum + (r.records || 0), 0);
 
