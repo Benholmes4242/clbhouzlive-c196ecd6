@@ -144,6 +144,13 @@ describe('recap body', () => {
     expect(container.querySelector('[data-recap-cards] h2')!.textContent).toBe('TOP 20 · PGA TOUR CARD FOR 2027');
     expect(container.querySelector('[data-recap-youngest]')!.textContent).toBe('Blades Brown earned his card at 19, the youngest of the 20.');
   });
+  it('ruling 1: CARDS shows above 20 with MOST WINS as the 4th cell', () => {
+    expect(recapFactCells({ events: 32, winners: 24, maxWins: 4, mostWinsSurname: 'Korda', tiedLeaders: 1, cards: 80, youngest: 19, tiedLabel: (n) => `${n} players` }))
+      .toEqual([{ key: 'events', value: '32' }, { key: 'winners', value: '24' }, { key: 'cards', value: '80' }, { key: 'mostWins', value: '4', small: 'Korda' }]);
+    const { container } = wrap(<SeasonRecapBody tour="lpga" year={2026} data={kf({ cardLine: { label: 'TOP 80', n: 80 } })} />);
+    expect([...container.querySelectorAll('[data-recap-fact]')].map((c) => [c.getAttribute('data-recap-fact'), c.querySelector('b')!.firstChild!.textContent]))
+      .toEqual([['events', '25'], ['winners', '20'], ['cards', '80'], ['mostWins', '2']]);
+  });
   it('card list over 20 shows See all, and the LPGA youngest line says her', () => {
     const big = kf({ cardLine: { label: 'TOP 80 · FULL STATUS FOR 2027', n: 80 } });
     const { container, unmount } = wrap(<SeasonRecapBody tour="lpga" year={2026} data={big} />);

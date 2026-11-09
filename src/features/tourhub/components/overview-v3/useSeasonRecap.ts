@@ -114,7 +114,7 @@ export async function freshPgaStandings(seasonId: string | null, finalEnd: strin
   };
 }
 
-async function freshStandings(tour: TourId, year: number, finalEnd: string, seasonId: string | null = null): Promise<{ rows: StandingRow[]; source: SeasonRecapData['standingsSource'] } | null> {
+export async function freshStandings(tour: TourId, year: number, finalEnd: string, seasonId: string | null = null): Promise<{ rows: StandingRow[]; source: SeasonRecapData['standingsSource'] } | null> {
   if (tour === 'pga') return freshPgaStandings(seasonId, finalEnd);
   const r = await supabase
     .from('tour_season_rankings')
