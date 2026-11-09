@@ -134,10 +134,17 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >
       <div
+        className="full-board-sheet"
         style={{
           fontFamily: FONT,
           height: 'auto', maxHeight: '85dvh',
           display: 'flex', flexDirection: 'column',
+          /* ONE surface for the whole sheet: rows, the sticky column head
+             and the hole-mark rings all read these variables. */
+          ['--tour-board-canvas' as string]: SHEET_SURFACE,
+          ['--tour-board-head' as string]: 'rgba(22,22,26,.94)',
+          ['--hero-round-surface' as string]: SHEET_SURFACE,
+          ['--hero-board-side' as string]: '20px',
         }}
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
@@ -158,7 +165,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
 
         {/* Column header moved INTO BoardTable in lockstep with the
             single-line row: one grid definition, no duplicate strip here. */}
-        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, willChange:'transform', background:'var(--tour-board-canvas)' }}>
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, willChange:'transform', background: SHEET_SURFACE }}>
           <LiveBoard
             tournamentId={tournamentId}
             enabled={open}
@@ -169,6 +176,8 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             complete={tournamentIsFinished(meta?.status)}
             onFull={handleRow}
             headerTop={0}
+            expandedId={expanded?.playerId ?? null}
+            renderExpanded={renderExpandedRow}
           />
         </div>
       </div>
