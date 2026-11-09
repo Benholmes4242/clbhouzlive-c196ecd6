@@ -22,7 +22,9 @@ import { corsFor } from '../_shared/cors.ts';
  * Season year is the one the source publishes (falls back to the UTC year).
  * The old script's "November and later = next year" rule is deliberately
  * dropped: these four seasons are calendar years and that rule would have
- * written the finished 2026 lists under 2027.
+ * written the finished 2026 lists under 2027. RULED by Ben (Season recap
+ * rulings, 9 Nov 2026): keep the source's published year; do NOT restore the
+ * Nov/Dec-as-next-year rule.
  *
  * A tour whose mapped rows fall below its floor writes nothing.
  */
