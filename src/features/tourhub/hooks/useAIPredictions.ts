@@ -1,3 +1,4 @@
+import { currentSeasonFor } from '../_shared/currentSeason';
 /**
  * useAIPredictions - Fetches Claude-powered tournament predictions
  * 
@@ -437,15 +438,9 @@ async function fetchNextTournamentPreview(): Promise<NextTournamentResult> {
 // SHARED HELPERS
 // =============================================
 
-async function getPgaSeasonId(): Promise<string | null> {
-  const { data: seasons } = await supabase
-    .from('sr_seasons')
-    .select('id')
-    .ilike('tour_name', 'pga')
-    .order('year', { ascending: false })
-    .limit(1);
-
-  return seasons?.[0]?.id ?? null;
+// Current PGA season by date (see _shared/currentSeason), never the newest year.
+export async function getPgaSeasonId(): Promise<string | null> {
+  return (await currentSeasonFor('pga'))?.id ?? null;
 }
 
 // Exported for tests (CB54 lock-at-first-tee guard coverage).

@@ -1,3 +1,4 @@
+import { currentSeasonFor } from '../_shared/currentSeason';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { BoardEntry } from '../leaderboard/BoardTable';
@@ -226,12 +227,13 @@ export function useTourSeason() {
         }
       }
       
-      // Final fallback: any recent season
+      // Final fallback: the current PGA season by date (never the newest year).
+      const current = await currentSeasonFor('pga');
+      if (!current) return null;
       const { data, error } = await supabase
         .from('sr_seasons')
         .select('*')
-        .order('year', { ascending: false })
-        .limit(1)
+        .eq('id', current.id)
         .single();
       
       if (error) {
