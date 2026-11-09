@@ -31,8 +31,16 @@ import { FullscreenNotchScrim } from './FullscreenNotchScrim';
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 import { MentionText } from '@/components/mentions/MentionText';
 
-function resolveViewerRect(width: number, height: number, viewport: ReturnType<typeof getCurrentViewport>, type: 'image' | 'video'): RestingRect {
-  if (!useFullscreenFeedStore.getState().courseGallery) return resolveRestingRect(width, height, viewport, type);
+/**
+ * Fullscreen rect decision. The course gallery AND the Course tab's
+ * about-strip open (openedFrom 'about-strip', readOnly) share the gallery
+ * rule: full-viewport rect, portrait media cover edge to edge, landscape
+ * letterboxed contain over the blurred self-backdrop. Every other surface
+ * (Clubhouse feed included) keeps resolveRestingRect's safe-area contain.
+ */
+export function resolveViewerRect(width: number, height: number, viewport: ReturnType<typeof getCurrentViewport>, type: 'image' | 'video'): RestingRect {
+  const s = useFullscreenFeedStore.getState();
+  if (!s.courseGallery && s.openedFrom !== 'about-strip') return resolveRestingRect(width, height, viewport, type);
   return { top: 0, left: 0, width: viewport.w, height: viewport.h, fit: galleryFit(width, height) };
 }
 
