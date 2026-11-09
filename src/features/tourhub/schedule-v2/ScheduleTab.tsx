@@ -44,6 +44,7 @@ import {
 } from './scheduleRules';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import {
+  AMBER,
   FONT,
   HAIRLINE_INK_10,
   INK,
@@ -424,21 +425,37 @@ export function ScheduleTab() {
   );
 
   // ── Header figures + next major ────────────────────────────────────────
-  const yearLabel = timeline?.seasonYear ?? new Date().getFullYear();
-  const played = useMemo(
-    () => allEvents.filter((e) => e.state === 'completed').length,
+  /* The list runs across seasons, but the header figures keep describing
+     the CURRENT season only (inCurrentSeason is undefined — treated as
+     current — on the merged all-tours view, which is unchanged). */
+  const currentSeasonEvents = useMemo(
+    () => allEvents.filter((e) => e.inCurrentSeason !== false),
     [allEvents],
   );
+  const yearLabel = timeline?.seasonYear ?? new Date().getFullYear();
+  const played = useMemo(
+    () => currentSeasonEvents.filter((e) => e.state === 'completed').length,
+    [currentSeasonEvents],
+  );
   const remaining = useMemo(
-    () => allEvents.filter((e) => e.state === 'upcoming').length,
-    [allEvents],
+    () => currentSeasonEvents.filter((e) => e.state === 'upcoming').length,
+    [currentSeasonEvents],
   );
   const nextMajor = useMemo(
     () =>
-      allEvents.find(
+      currentSeasonEvents.find(
         (e) => e.state === 'upcoming' && e.isMajor && e.daysAway !== null,
       ) ?? null,
-    [allEvents],
+    [currentSeasonEvents],
+  );
+
+  // Season breaks: event id → the boundary that renders before it.
+  const seasonBreaks = useMemo(
+    () =>
+      timeline?.seasons && timeline.seasons.length > 1
+        ? seasonBreakBoundaries(allEvents, timeline.seasons)
+        : new Map<string, SeasonBreakModel>(),
+    [allEvents, timeline?.seasons],
   );
 
   const progressPct = useMemo(() => {
