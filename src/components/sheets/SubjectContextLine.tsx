@@ -34,7 +34,7 @@ export function SubjectContextLine({ subject, dataAttr = 'subject-context' }: { 
     const tpText = tp == null ? null : tp === 0 ? t('comments.contextLevel') : tp < 0 ? `\u2212${Math.abs(tp)}` : `+${tp}`;
     tail = (
       <>
-        {' \u00B7 '}<span style={strong}>{subject.gross}</span>
+        {' \u00B7 '}<span style={strong}>{subject.net}</span>
         {tpText && <span style={{ color: tp != null && tp < 0 ? TOPAR_UNDER_DARK : A.MUTE, fontWeight: 700 }}>{' '}{tpText}</span>}
       </>
     );
