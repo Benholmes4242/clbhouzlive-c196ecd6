@@ -39,11 +39,11 @@ export const HOLE_MARK_INK = Object.freeze({ birdie: TOPAR_UNDER_DARK, eagle: SC
  *  OPAQUE colour the row reads as, so tints are flattened onto the canvas. */
 export const MARK_SURFACE_LEADER = 'color-mix(in srgb, rgb(255,255,255) 3.5%, var(--tour-board-canvas))';
 export const MARK_SURFACE_MINE = 'color-mix(in srgb, rgb(247,147,30) 6%, var(--tour-board-canvas))';
-export function HoleMarks({ holes, surface = 'var(--tour-board-canvas)' }: { holes: ReadonlyArray<HoleMarkCell | null>; surface?: string }) {
+export function HoleMarks({ holes, surface = 'var(--tour-board-canvas)', raised = null }: { holes: ReadonlyArray<HoleMarkCell | null>; surface?: string; raised?: number | null }) {
   const nineGap = holes.length === 18;
   return <span className="tour-hole-marks" data-hole-marks style={{ gridColumn: '1 / -1', '--hm-surface': surface } as CSSProperties}>{holes.map((h, i) => {
     const grade = holeMarkGrade(h?.strokes ?? null, h?.par ?? null);
-    return <Fragment key={i}>{nineGap && i === 9 && <i className="tour-hole-marks-gap" aria-hidden="true" />}<i data-hole-mark={i + 1} data-grade={grade}>{grade === 'empty' ? null : <><b className="hm-shape" aria-hidden="true" /><span className="hm-fig">{h?.strokes}</span></>}</i></Fragment>;
+    return <Fragment key={i}>{nineGap && i === 9 && <i className="tour-hole-marks-gap" aria-hidden="true" />}<i data-hole-mark={i + 1} data-grade={grade} data-raised={raised === i + 1 ? 'true' : undefined}>{grade === 'empty' ? null : <><b className="hm-shape" aria-hidden="true" /><span className="hm-fig">{h?.strokes}</span></>}</i></Fragment>;
   })}</span>;
 }
 /** Shared key under a marks board: Birdie, Eagle+, Bogey, Double, Triple+;
