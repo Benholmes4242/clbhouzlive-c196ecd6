@@ -24,13 +24,13 @@ describe('formatTimeHm24', () => {
     const md = new Intl.DateTimeFormat('en-GB-u-hc-h12', { month: 'short', day: 'numeric' }).format(d);
     expect(formatMonthDayHm24(d)).toBe(`${md}, 14:05`);
   });
-  it('the situation line still uses the 12-hour formatTimeHm', () => {
+  it('the situation line uses the 24-hour formatTimeHm24 like every tour tee time', () => {
     const tee = local(14, 5).toISOString();
     const field = Array.from({ length: 3 }, (_, i) => ({ score: 0, position: 1, player: { full_name: `P${i}` } }));
     const segs = tournamentHeadlineSegments({ tournament: { id: '1', name: 'E', defendingChampion: null } as any, state: { kind: 'live', round: 1, totalRounds: 4 } as any, leaderboard: field as any, t, firstTeeTime: tee });
     const fig = segs.find((s) => s.figure)?.text;
-    expect(fig).toBe(formatTimeHm(tee));
-    expect(fig).not.toBe('14:05');
+    expect(fig).toBe(formatTimeHm24(tee));
+    expect(fig).toBe('14:05');
   });
 });
 
