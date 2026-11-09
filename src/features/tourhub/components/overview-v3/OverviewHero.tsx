@@ -39,6 +39,9 @@ import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { useHeroFullBoard } from './useHeroFullBoard';
 import { FullBoardSheet } from '../../tournament-v2/sections/FullBoardSheet';
 import { hasStrokeBoard } from '../../_shared/eventFormat';
+import { useOverviewRecaps, useSeasonRecap, type OverviewRecapCandidate } from './useSeasonRecap';
+import { isBetweenSeasons } from './seasonRecapRules';
+import { RecapPhotoBand, SeasonRecapBody } from './SeasonRecapSections';
 
 const NOOP = () => {};
 
@@ -62,7 +65,31 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   /* URGENT_FIX §3: every overview tour always has a slide. The fallback only
      fills tours the carousel lacks; useHeroCarouselData itself is unchanged. */
   const { data: fallbackSlides = [], isLoading: fallbackLoading } = useOverviewFallbackSlides(carouselSlides, !carouselLoading);
-  const rawSlides = useMemo(() => [...carouselSlides, ...fallbackSlides], [carouselSlides, fallbackSlides]);
+  const mergedSlides = useMemo(() => [...carouselSlides, ...fallbackSlides], [carouselSlides, fallbackSlides]);
+  /* SEASON RECAP (seasonRecapRules.ts): a tour between seasons shows ONE
+     recap slide built from its last completed event, replacing its stale
+     finished slide or a far-off upcoming slide. A live slide always wins. */
+  const { data: recapCandidates } = useOverviewRecaps(!carouselLoading);
+  const recaps = useMemo(() => {
+    const out = new Map<string, OverviewRecapCandidate>();
+    if (!recapCandidates) return out;
+    const now = new Date();
+    for (const [tour, candidate] of recapCandidates) {
+      const own = mergedSlides.filter((s) => s.tournament.tourSlug === tour);
+      if (own.some((s) => s.type === 'live')) continue;
+      const nextStart = own
+        .filter((s) => s.type === 'upcoming' && s.tournament.startDate && new Date(s.tournament.startDate).getTime() >= now.getTime() - 86_400_000)
+        .map((s) => s.tournament.startDate)
+        .sort()[0] ?? null;
+      if (isBetweenSeasons({ lastEnd: candidate.last.endDate ?? null, seasonYear: candidate.last.seasonYear ?? null, nextStart, raceFinal: candidate.raceFinal, now })) out.set(tour, candidate);
+    }
+    return out;
+  }, [recapCandidates, mergedSlides]);
+  const rawSlides = useMemo(() => {
+    if (recaps.size === 0) return mergedSlides;
+    const kept = mergedSlides.filter((s) => !recaps.has(s.tournament.tourSlug));
+    return [...kept, ...[...recaps.values()].map((c): HeroSlide => ({ tournament: c.last, type: 'completed' }))];
+  }, [mergedSlides, recaps]);
   const isLoading = carouselLoading || (fallbackLoading && carouselSlides.length === 0);
 
 
@@ -168,6 +195,15 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const activeSlide = count > 0 ? slides[Math.min(activeIndex, count - 1)] : undefined;
   const viewingSlug = activeSlide?.tournament.tourSlug;
   const viewingTid = activeSlide?.tournament.id ?? null;
+  const activeRecap = activeSlide && recaps.get(activeSlide.tournament.tourSlug)?.last.id === activeSlide.tournament.id
+    ? recaps.get(activeSlide.tournament.tourSlug)!
+    : null;
+  const { data: recapData } = useSeasonRecap(
+    activeRecap ? (activeRecap.last.tourSlug as TourId) : null,
+    activeRecap?.seasonId ?? null,
+    activeRecap?.last.seasonYear ?? null,
+    activeRecap?.last.endDate ?? null,
+  );
 
   /**
    * ONE SOURCE OF TRUTH FOR THE SLIDE'S STATE. deriveHeroState is the only
@@ -213,7 +249,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // positions from them. The board also renders on completed slides (final
   // positions); boardRound is null there, so no TODAY. Same query
   // key as HybridHero.tsx, so a completed slide is a cache hit.
-  const boardTournamentId = !heroState || heroState.kind === 'upcoming' ? null : viewingTid;
+  const boardTournamentId = !heroState || heroState.kind === 'upcoming' || activeRecap ? null : viewingTid;
   const { data: boardLeaderboard, isLoading: boardLeaderboardLoading, dataUpdatedAt: boardUpdatedAt } = useTourLeaderboard(boardTournamentId ?? '');
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
   const boardRound = heroState && isInPlayState(heroState) ? heroState.round : null;
@@ -380,14 +416,16 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           transition={{ duration: 0.25 }}
           style={{ height: activeHeroHeight === 'auto' ? 'auto' : '100%' }}
         >
-          <HybridHero
+          {activeRecap ? (
+            <RecapPhotoBand slide={active} state={heroState} data={recapData} onOpen={openTournament} />
+          ) : <HybridHero
             slide={active}
             state={heroState}
             now={now}
             activeTournamentId={active.tournament.id}
             onSelectTour={NOOP}
             onOpenTournament={openTournament}
-          />
+          />}
         </motion.div>
       </AnimatePresence>
 
@@ -403,7 +441,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         screen's right edge so the next chip peeks in. */}
     {/* URGENT_FIX §2: on finished events the champion block sits straight
         off the photo, ABOVE the tour buttons. Renders nothing otherwise. */}
-    <OverviewChampionBlock slide={active} state={heroState} />
+    {activeRecap ? null : <OverviewChampionBlock slide={active} state={heroState} />}
 
     <div ref={chipRowRef} data-overview-chip-row>
       <RailChips
@@ -422,7 +460,11 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         the board; on an upcoming slide the upcoming facts and picks.
         CB57 removes the action and next-round rows without reserving space. */}
     <AnimatePresence mode="wait" initial={false}>
-      {bandTournamentId && (
+      {bandTournamentId && activeRecap ? (
+        <motion.div key={`recap-${bandTournamentId}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+          <SeasonRecapBody tour={activeRecap.last.tourSlug as TourId} year={activeRecap.last.seasonYear ?? new Date().getUTCFullYear()} data={recapData} />
+        </motion.div>
+      ) : bandTournamentId && (
         <motion.div
           key={bandTournamentId}
           initial={{ opacity: 0 }}
