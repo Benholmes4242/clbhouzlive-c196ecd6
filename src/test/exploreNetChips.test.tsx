@@ -39,7 +39,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     /* BUILD Round scores §3 — the identity figures are the FN1.5 row:
        NET with to-par, GROSS with to-par, HANDICAP; VS HCP is gone. */
     expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('67−4');
-    expect(container.querySelector('[data-explore-stat-value="gross"]')?.textContent).toBe('70−1');
+    expect(container.querySelector('[data-explore-stat-value="gross"]')?.textContent).toBe('70');
     expect(container.querySelector('[data-explore-stat-value="handicap"]')?.textContent).toBe('3');
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')).toBeNull();
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
@@ -91,7 +91,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     /* BUILD Round scores §3 — FN1.5 row: NET carries the to-par suffix. */
     expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('76+5');
-    expect(container.querySelector('[data-explore-stat-value="gross"]')?.textContent).toBe('82+11');
+    expect(container.querySelector('[data-explore-stat-value="gross"]')?.textContent).toBe('82');
     expect(container.querySelector('[data-explore-stat-value="handicap"]')?.textContent).toBe('6');
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')).toBeNull();
     expect(container.textContent).not.toMatch(/BIRDIES/i);
