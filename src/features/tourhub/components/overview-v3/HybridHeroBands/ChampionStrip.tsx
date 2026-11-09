@@ -19,12 +19,13 @@
  */
 
 import { copy as tvCopyPlayoff } from '../../../tournament-v2/data/tournamentRules';
-const PLAYOFF_LABEL = tvCopyPlayoff('playoff');
 import { useTranslation } from 'react-i18next';
 import { GOLD } from '../HybridHero.constants';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ActiveRing } from '@/features/find-people/ActiveRing';
 import './championStrip.css';
+
+const PLAYOFF_LABEL = tvCopyPlayoff('playoff');
 
 interface ChampionStripProps {
   name: string;
