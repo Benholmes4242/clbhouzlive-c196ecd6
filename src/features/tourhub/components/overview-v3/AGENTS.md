@@ -1,0 +1,1 @@
+- Season recap: between-seasons and fresh-standings rules live only in seasonRecapRules.ts (see header), so stale lists can never render as FINAL.

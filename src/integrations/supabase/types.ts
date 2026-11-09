@@ -21922,7 +21922,7 @@ export type Database = {
       }
       admin_count_owgr_events_needing_course: { Args: never; Returns: number }
       admin_create_club_for_course: {
-        Args: { p_course_id: string }
+        Args: { p_club_name?: string; p_course_id: string }
         Returns: string
       }
       admin_deletion_integrity: {
@@ -22303,6 +22303,7 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
+      club_base_name: { Args: { p: string }; Returns: string }
       club_key_v2: { Args: { p_name: string }; Returns: string }
       coach_index_at: {
         Args: { p_at: string; p_user: string }
