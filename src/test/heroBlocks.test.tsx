@@ -35,11 +35,15 @@ describe('one upcoming block on both pages', () => {
   const page = readFileSync('src/features/tourhub/tournament-v2/TournamentPage.tsx', 'utf8');
   it('the tournament hero upcoming branch uses the overview builders', () => {
     expect(sections).toContain('<PhotoBand');
-    expect(sections).toContain('upcomingSentence(upcoming.last,upcoming.field,upcoming.first,upcoming.zone)');
+    expect(sections).toContain('upcomingSentence(last,upcomingField,firstTee,zone)');
     expect(sections).toContain('getOverviewCountdown(meta.start_date)');
     expect(sections).toContain('formatOverviewDateRange(meta.start_date,meta.end_date)');
     expect(sections).toContain('<UpcomingFacts');
-    expect(sections).toContain('useUpcomingOverview');
+  });
+  it('the tournament page feeds the hero round-1 tees and the draw field count', () => {
+    expect(page).toContain('useTeeTimesAll(tournamentId,1,');
+    expect(page).toContain('firstTee={earliestTeeTime(heroTeeGroups)}');
+    expect(page).toContain('drawnField={heroTeeGroups.length?');
   });
   it('the tournament page upcoming phase uses the overview LAST YEAR block', () => {
     expect(page).toContain('<UpcomingLastYear rows={lastYear??[]}/>');
