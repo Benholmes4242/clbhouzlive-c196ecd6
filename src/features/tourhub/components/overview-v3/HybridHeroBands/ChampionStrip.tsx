@@ -18,11 +18,14 @@
  * removed when the overview adopted this block — nothing else used it.
  */
 
+import { copy as tvCopyPlayoff } from '../../../tournament-v2/data/tournamentRules';
 import { useTranslation } from 'react-i18next';
 import { GOLD } from '../HybridHero.constants';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ActiveRing } from '@/features/find-people/ActiveRing';
 import './championStrip.css';
+
+const PLAYOFF_LABEL = tvCopyPlayoff('playoff');
 
 interface ChampionStripProps {
   name: string;
@@ -83,7 +86,7 @@ export function ChampionStrip({
         </div>
         <div className="tv-champion-score">
           <b className={scoreValue != null && scoreValue < 0 ? 'tv-under' : ''}>{score}</b>
-          {scoreLabel && <small>{scoreLabel}</small>}
+          {scoreLabel && <small data-playoff={scoreLabel === PLAYOFF_LABEL || undefined}>{scoreLabel}</small>}
         </div>
       </div>
       {narrativeParts && narrativeParts.length > 0 && (

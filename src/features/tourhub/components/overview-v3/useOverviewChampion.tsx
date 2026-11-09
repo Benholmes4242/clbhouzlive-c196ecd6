@@ -20,7 +20,8 @@ import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from 
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { detectTopTie, fmtScore, isChampionResolvable, type HeroState } from './HybridHero.utils';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
-import { championNarrative, copy as tvCopy, words as tvWords } from '../../tournament-v2/data/tournamentRules';
+import { championNarrative } from '../../tournament-v2/data/tournamentRules';
+import { championScoreLabel } from '../../tournament-v2/data/weekFactsRules';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 
 export interface OverviewChampion {
@@ -119,7 +120,7 @@ export function OverviewChampionBlock({ slide, state }: { slide: HeroSlide; stat
       name={champion.name}
       score={fmtScore(champion.score)}
       scoreValue={champion.score}
-      scoreLabel={!champion.playoff && champion.margin != null ? tvCopy('by', { words: tvWords(champion.margin).toUpperCase() }) : undefined}
+      scoreLabel={championScoreLabel(champion.margin, champion.playoff)}
       eyebrow={t('overview.hero.champion')}
       avatarCandidates={championAvatarCandidates}
       playerKey={slide.tournament.winnerKey}
