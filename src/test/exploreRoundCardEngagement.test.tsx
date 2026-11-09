@@ -40,7 +40,9 @@ describe('Explore round-card who-line engagement', () => {
     expect(view.container.querySelector('[data-round-identity-meta="true"]')).toBeNull();
     expect(view.container.querySelector('[data-round-photo-course="true"]')?.textContent).toBe('Test Course');
     expect(view.container.querySelector('[data-round-identity-date="true"]')?.textContent).toBe(railCaptionDate('2026-09-15'));
-    expect(view.container.querySelector('[data-round-figures="true"]')?.textContent).toContain('NET76VS HCP+4');
+    /* BUILD Round scores §3 — the stat row is now FN1.5 (NET with to-par,
+       GROSS with to-par, HANDICAP, AWARDS), replacing 'NET76VS HCP+4'. */
+    expect(view.container.querySelector('[data-round-figures="true"]')?.textContent).toContain('NET76+4GROSS80+8HANDICAP4');
     expect(view.container.querySelector('[data-round-identity-row="true"] [data-round-reactions="controls"]')).not.toBeNull();
     expect(view.container.querySelector('[data-explore-headline="true"]')).toBeNull();
     expect(view.container.querySelector('[data-explore-kicker="true"]')).toBeNull();
