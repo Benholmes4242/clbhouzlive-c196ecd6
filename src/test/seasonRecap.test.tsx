@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
 import tourhub from '../../public/locales/en/tourhub.json';
+import { readFileSync } from 'node:fs';
 
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
 const record = vi.hoisted(() => ({ value: null as null | { event_count: number; won: number; top10: number } }));
@@ -115,6 +116,31 @@ describe('recap band', () => {
 });
 
 describe('recap body', () => {
+  it('restores both section headings without a Full list action', () => {
+    const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
+    expect(container.querySelector('[data-recap-season] h2')).not.toBeNull();
+    expect(container.querySelector('[data-recap-board] h2')).not.toBeNull();
+    expect(container.querySelector('[data-recap-full-list]')).toBeNull();
+  });
+  it('facts and record reuse the two-line TOT cells', () => {
+    record.value = { event_count: 21, won: 4, top10: 17 };
+    const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
+    for (const cell of container.querySelectorAll('.recap-figs>div')) {
+      expect(cell.children).toHaveLength(2);
+      expect(cell.querySelector('b')).toHaveStyle({ fontSize: '15px', fontWeight: '700' });
+      expect(cell.classList.contains('cw-cell')).toBe(true);
+    }
+    record.value = null;
+  });
+  it('shares completed rhythm and centres intrinsic aligned card columns', () => {
+    const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
+    expect(css).toContain('.recap-block{padding-top:var(--hero-section-gap)}');
+    expect(css).toContain('.recap-figs{margin-top:var(--hero-content-gap)}');
+    expect(css).toContain('.recap-record-figs{margin:var(--hero-content-gap) 0 0}');
+    expect(css).toContain('grid-template-columns:repeat(2,max-content);column-gap:34px;justify-content:center');
+    expect(css).toContain('grid-template-columns:18px minmax(0,1fr);column-gap:10px');
+    expect(css).toContain('.recap-cards span{text-align:right;');
+  });
   it('facts row with a card line: EVENTS, WINNERS, CARDS, YOUNGEST', () => {
     const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
     const cells = [...container.querySelectorAll('[data-recap-fact]')].map((c) => [c.getAttribute('data-recap-fact'), c.querySelector('b')!.textContent]);
@@ -134,14 +160,14 @@ describe('recap body', () => {
     expect(keys).toEqual(['events', 'winners', 'mostWins']);
   });
   it('board: trophy for first, rounded points, no board header row', () => {
-    // HERO BLOCKS §3: the "POINTS LIST · FINAL" kicker and "Full list ›" link
-    // are removed; POS PLAYER PTS sits directly under the fact band divider.
+    // Option B restores THE POINTS LIST only; Full list remains removed.
     const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
     const board = container.querySelector('[data-recap-board]')!;
     expect(board.querySelector('[data-recap-row="1"] [data-recap-trophy]')).not.toBeNull();
     expect(board.querySelector('[data-recap-row="1"]')!.textContent).not.toContain('1Ross');
     expect(board.querySelector('[data-recap-full-list]')).toBeNull();
     expect(board.textContent).not.toContain('POINTS LIST · FINAL');
+    expect(board.querySelector('h2')).not.toBeNull();
     expect(board.querySelector('.recap-grid-head')!.textContent).toBe('POSPLAYERPTS');
   });
   it('Korn Ferry fixture renders exactly the mock names and points', () => {

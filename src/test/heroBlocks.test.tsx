@@ -100,7 +100,7 @@ describe('recap board header removal', () => {
     const src = readFileSync('src/features/tourhub/components/overview-v3/SeasonRecapSections.tsx', 'utf8');
     const stand = src.slice(src.indexOf('export function RecapStandings'), src.indexOf('export function RecapCardList'));
     expect(stand).not.toContain('data-recap-full-list');
-    expect(stand).not.toContain('boardKicker');
+    expect(stand).toContain('overview.recap.pointsHeading');
     expect(stand).not.toContain('recap-head');
   });
 });
