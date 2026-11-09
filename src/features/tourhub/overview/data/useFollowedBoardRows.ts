@@ -7,11 +7,14 @@
  * ranking_date (passed in from the board result); season boards read
  * tour_season_rankings for the board's tour and season year. Guests never
  * reach this hook (the caller passes zero ids and enabled=false).
+ * The shared unfiltered list-year probe prevents a missing followed player
+ * from selecting the previous year while the main board uses the current one.
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { RankingsBoard, RankingsRow } from './useRankingsBoards';
+import { seasonRankingYear } from './useRankingsBoards';
 
 const SEASON_TOUR: Record<Exclude<RankingsBoard, 'owgr'>, 'euro' | 'lpga' | 'liv' | 'pgad'> = {
   r2d: 'euro',
@@ -50,11 +53,11 @@ async function fetchFollowedOwgr(playerIds: string[], latestDate: string): Promi
     }));
 }
 
-async function fetchFollowedSeason(
+export async function fetchFollowedSeason(
   tourCode: 'euro' | 'lpga' | 'liv' | 'pgad',
   playerIds: string[],
 ): Promise<RankingsRow[]> {
-  const year = new Date().getFullYear();
+  const { year } = await seasonRankingYear(tourCode);
   const list = playerIds.map((id) => `"${id}"`).join(',');
   const { data, error } = await supabase
     .from('tour_season_rankings' as any)

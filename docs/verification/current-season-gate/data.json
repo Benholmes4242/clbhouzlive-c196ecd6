@@ -1,0 +1,811 @@
+{
+  "pga": {
+    "2026-11-09": {
+      "name": "Austin Championship presented by Compliance Solutions",
+      "start_date": "2026-11-12",
+      "end_date": "2026-11-15",
+      "status": "created",
+      "event_type": "stroke",
+      "season": {
+        "id": "1882f3dd-cd2e-4210-90d9-fc401e3e0f19",
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    "2026-11-24": {
+      "name": "The Farmers Insurance Skins Game",
+      "start_date": "2026-11-27",
+      "end_date": "2026-11-27",
+      "status": "created",
+      "event_type": "stroke",
+      "season": {
+        "id": "1882f3dd-cd2e-4210-90d9-fc401e3e0f19",
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    "2026-11-30": {
+      "name": "Hero World Challenge",
+      "start_date": "2026-12-03",
+      "end_date": "2026-12-06",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "1882f3dd-cd2e-4210-90d9-fc401e3e0f19",
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    "2026-12-07": {
+      "name": "The American Express",
+      "start_date": "2027-01-21",
+      "end_date": "2027-01-24",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "640bad1d-826b-4fbb-a25e-1db5136228e2",
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    "2026-12-20": {
+      "name": "The American Express",
+      "start_date": "2027-01-21",
+      "end_date": "2027-01-24",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "640bad1d-826b-4fbb-a25e-1db5136228e2",
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    }
+  },
+  "lpga": {
+    "2026-11-09": {
+      "name": "ANNIKA driven by Gainbridge at Pelican",
+      "start_date": "2026-11-12",
+      "end_date": "2026-11-15",
+      "status": "created",
+      "event_type": "stroke",
+      "season": {
+        "id": "92a444aa-4e73-46a6-ac34-d7d2caab6b05",
+        "year": 2026,
+        "tour_name": "LPGA"
+      }
+    },
+    "2026-11-24": {
+      "name": "Grant Thornton Invitational",
+      "start_date": "2026-12-11",
+      "end_date": "2026-12-13",
+      "status": "scheduled",
+      "event_type": "team",
+      "season": {
+        "id": "92a444aa-4e73-46a6-ac34-d7d2caab6b05",
+        "year": 2026,
+        "tour_name": "LPGA"
+      }
+    },
+    "2026-11-30": {
+      "name": "Grant Thornton Invitational",
+      "start_date": "2026-12-11",
+      "end_date": "2026-12-13",
+      "status": "scheduled",
+      "event_type": "team",
+      "season": {
+        "id": "92a444aa-4e73-46a6-ac34-d7d2caab6b05",
+        "year": 2026,
+        "tour_name": "LPGA"
+      }
+    },
+    "2026-12-07": {
+      "name": "Grant Thornton Invitational",
+      "start_date": "2026-12-11",
+      "end_date": "2026-12-13",
+      "status": "scheduled",
+      "event_type": "team",
+      "season": {
+        "id": "92a444aa-4e73-46a6-ac34-d7d2caab6b05",
+        "year": 2026,
+        "tour_name": "LPGA"
+      }
+    },
+    "2026-12-20": {
+      "name": "Grant Thornton Invitational",
+      "start_date": "2026-12-11",
+      "end_date": "2026-12-13",
+      "status": "scheduled",
+      "event_type": "team",
+      "season": {
+        "id": "92a444aa-4e73-46a6-ac34-d7d2caab6b05",
+        "year": 2026,
+        "tour_name": "LPGA"
+      }
+    }
+  },
+  "euro": {
+    "2026-11-09": {
+      "name": "DP World Tour Championship",
+      "start_date": "2026-11-12",
+      "end_date": "2026-11-15",
+      "status": "created",
+      "event_type": "stroke",
+      "season": {
+        "id": "a20eaf0a-1a92-493f-8020-d5582a28c499",
+        "year": 2026,
+        "tour_name": "EURO"
+      }
+    },
+    "2026-11-24": {
+      "name": "BMW Australian PGA Championship",
+      "start_date": "2026-11-26",
+      "end_date": "2026-11-29",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "6ff22401-e764-4727-bef0-7632b679c90a",
+        "year": 2027,
+        "tour_name": "EURO"
+      }
+    },
+    "2026-11-30": {
+      "name": "Capital.com Australian Open",
+      "start_date": "2026-12-03",
+      "end_date": "2026-12-06",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "6ff22401-e764-4727-bef0-7632b679c90a",
+        "year": 2027,
+        "tour_name": "EURO"
+      }
+    },
+    "2026-12-07": {
+      "name": "AfrAsia Bank Mauritius Open",
+      "start_date": "2026-12-10",
+      "end_date": "2026-12-13",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "6ff22401-e764-4727-bef0-7632b679c90a",
+        "year": 2027,
+        "tour_name": "EURO"
+      }
+    },
+    "2026-12-20": {
+      "name": "Hero Dubai Desert Classic",
+      "start_date": "2027-01-21",
+      "end_date": "2027-01-24",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "6ff22401-e764-4727-bef0-7632b679c90a",
+        "year": 2027,
+        "tour_name": "EURO"
+      }
+    }
+  },
+  "champ": {
+    "2026-11-09": {
+      "name": "Charles Schwab Cup Championship",
+      "start_date": "2026-11-12",
+      "end_date": "2026-11-15",
+      "status": "created",
+      "event_type": "stroke",
+      "season": {
+        "id": "92b55ab6-a986-45cc-b466-bde051c12e3f",
+        "year": 2026,
+        "tour_name": "CHAMP"
+      }
+    },
+    "2026-11-24": {
+      "name": "Sony Championship Hawaii",
+      "start_date": "2027-01-14",
+      "end_date": "2027-01-16",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "8b49fce3-f29a-4a8d-b26a-b0f14ff1a62b",
+        "year": 2027,
+        "tour_name": "CHAMP"
+      }
+    },
+    "2026-11-30": {
+      "name": "Sony Championship Hawaii",
+      "start_date": "2027-01-14",
+      "end_date": "2027-01-16",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "8b49fce3-f29a-4a8d-b26a-b0f14ff1a62b",
+        "year": 2027,
+        "tour_name": "CHAMP"
+      }
+    },
+    "2026-12-07": {
+      "name": "Sony Championship Hawaii",
+      "start_date": "2027-01-14",
+      "end_date": "2027-01-16",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "8b49fce3-f29a-4a8d-b26a-b0f14ff1a62b",
+        "year": 2027,
+        "tour_name": "CHAMP"
+      }
+    },
+    "2026-12-20": {
+      "name": "Sony Championship Hawaii",
+      "start_date": "2027-01-14",
+      "end_date": "2027-01-16",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "8b49fce3-f29a-4a8d-b26a-b0f14ff1a62b",
+        "year": 2027,
+        "tour_name": "CHAMP"
+      }
+    }
+  },
+  "liv": {
+    "2026-11-09": {
+      "name": "LIV Golf Indianapolis",
+      "start_date": "2026-08-20",
+      "end_date": "2026-08-23",
+      "status": "closed",
+      "event_type": "stroke",
+      "season": {
+        "id": "849310f8-9339-40ae-88b6-93a7c58c5905",
+        "year": 2026,
+        "tour_name": "LIV"
+      }
+    },
+    "2026-11-24": {
+      "name": "LIV Golf Indianapolis",
+      "start_date": "2026-08-20",
+      "end_date": "2026-08-23",
+      "status": "closed",
+      "event_type": "stroke",
+      "season": {
+        "id": "849310f8-9339-40ae-88b6-93a7c58c5905",
+        "year": 2026,
+        "tour_name": "LIV"
+      }
+    },
+    "2026-11-30": {
+      "name": "LIV Golf Indianapolis",
+      "start_date": "2026-08-20",
+      "end_date": "2026-08-23",
+      "status": "closed",
+      "event_type": "stroke",
+      "season": {
+        "id": "849310f8-9339-40ae-88b6-93a7c58c5905",
+        "year": 2026,
+        "tour_name": "LIV"
+      }
+    },
+    "2026-12-07": {
+      "name": "LIV Golf Indianapolis",
+      "start_date": "2026-08-20",
+      "end_date": "2026-08-23",
+      "status": "closed",
+      "event_type": "stroke",
+      "season": {
+        "id": "849310f8-9339-40ae-88b6-93a7c58c5905",
+        "year": 2026,
+        "tour_name": "LIV"
+      }
+    },
+    "2026-12-20": {
+      "name": "LIV Golf Indianapolis",
+      "start_date": "2026-08-20",
+      "end_date": "2026-08-23",
+      "status": "closed",
+      "event_type": "stroke",
+      "season": {
+        "id": "849310f8-9339-40ae-88b6-93a7c58c5905",
+        "year": 2026,
+        "tour_name": "LIV"
+      }
+    }
+  },
+  "pgad": {
+    "2026-11-09": {
+      "name": "The Bahamas Golf Classic at Atlantis Paradise Island",
+      "start_date": "2027-01-17",
+      "end_date": "2027-01-20",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "93909b5c-b2e4-4584-b9b7-4795b9f1861a",
+        "year": 2027,
+        "tour_name": "PGAD"
+      }
+    },
+    "2026-11-24": {
+      "name": "The Bahamas Golf Classic at Atlantis Paradise Island",
+      "start_date": "2027-01-17",
+      "end_date": "2027-01-20",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "93909b5c-b2e4-4584-b9b7-4795b9f1861a",
+        "year": 2027,
+        "tour_name": "PGAD"
+      }
+    },
+    "2026-11-30": {
+      "name": "The Bahamas Golf Classic at Atlantis Paradise Island",
+      "start_date": "2027-01-17",
+      "end_date": "2027-01-20",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "93909b5c-b2e4-4584-b9b7-4795b9f1861a",
+        "year": 2027,
+        "tour_name": "PGAD"
+      }
+    },
+    "2026-12-07": {
+      "name": "The Bahamas Golf Classic at Atlantis Paradise Island",
+      "start_date": "2027-01-17",
+      "end_date": "2027-01-20",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "93909b5c-b2e4-4584-b9b7-4795b9f1861a",
+        "year": 2027,
+        "tour_name": "PGAD"
+      }
+    },
+    "2026-12-20": {
+      "name": "The Bahamas Golf Classic at Atlantis Paradise Island",
+      "start_date": "2027-01-17",
+      "end_date": "2027-01-20",
+      "status": "scheduled",
+      "event_type": "stroke",
+      "season": {
+        "id": "93909b5c-b2e4-4584-b9b7-4795b9f1861a",
+        "year": 2027,
+        "tour_name": "PGAD"
+      }
+    }
+  },
+  "pga_prechange": [
+    {
+      "name": "VidantaWorld Mexico Open",
+      "event_type": "stroke",
+      "status": "closed",
+      "start_date": "2026-10-29",
+      "end_date": "2026-11-01",
+      "season": {
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "World Wide Technology Championship",
+      "event_type": "stroke",
+      "status": "closed",
+      "start_date": "2026-11-05",
+      "end_date": "2026-11-08",
+      "season": {
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Austin Championship presented by Compliance Solutions",
+      "event_type": "stroke",
+      "status": "created",
+      "start_date": "2026-11-12",
+      "end_date": "2026-11-15",
+      "season": {
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "The RSM Classic",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2026-11-19",
+      "end_date": "2026-11-22",
+      "season": {
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "The Farmers Insurance Skins Game",
+      "event_type": "stroke",
+      "status": "created",
+      "start_date": "2026-11-27",
+      "end_date": "2026-11-27",
+      "season": {
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Hero World Challenge",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2026-12-03",
+      "end_date": "2026-12-06",
+      "season": {
+        "year": 2026,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "The American Express",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-01-21",
+      "end_date": "2027-01-24",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "The Sentry",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-01-27",
+      "end_date": "2027-01-30",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "AT&T Pebble Beach Pro-Am",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-02-04",
+      "end_date": "2027-02-07",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "WM Phoenix Open",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-02-11",
+      "end_date": "2027-02-14",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "The Genesis Invitational",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-02-18",
+      "end_date": "2027-02-21",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Cognizant Classic in The Palm Beaches",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-02-25",
+      "end_date": "2027-02-28",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Cadillac Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-03-04",
+      "end_date": "2027-03-07",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "THE PLAYERS Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-03-11",
+      "end_date": "2027-03-14",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Arnold Palmer Invitational presented by Mastercard",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-03-18",
+      "end_date": "2027-03-21",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Texas Children's Houston Open",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-03-25",
+      "end_date": "2027-03-28",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Valero Texas Open",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-04-01",
+      "end_date": "2027-04-04",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "RBC Heritage",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-04-15",
+      "end_date": "2027-04-18",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Zurich Classic of New Orleans",
+      "event_type": "team",
+      "status": "scheduled",
+      "start_date": "2027-04-22",
+      "end_date": "2027-04-25",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "THE CJ CUP Byron Nelson",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-04-29",
+      "end_date": "2027-05-02",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Valspar Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-05-06",
+      "end_date": "2027-05-09",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Truist Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-05-13",
+      "end_date": "2027-05-16",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "ONEflight Myrtle Beach Classic",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-05-13",
+      "end_date": "2027-05-16",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Charles Schwab Challenge",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-05-27",
+      "end_date": "2027-05-30",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "the Memorial Tournament presented by Workday",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-06-03",
+      "end_date": "2027-06-06",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "RBC Canadian Open",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-06-10",
+      "end_date": "2027-06-13",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Travelers Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-06-24",
+      "end_date": "2027-06-27",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "John Deere Classic",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-07-01",
+      "end_date": "2027-07-04",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "3M Open",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-07-22",
+      "end_date": "2027-07-25",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Sompo Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-07-29",
+      "end_date": "2027-08-01",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "GO by Raymond James",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-08-05",
+      "end_date": "2027-08-08",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "FedEx St. Jude Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-08-12",
+      "end_date": "2027-08-15",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "BMW Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-08-19",
+      "end_date": "2027-08-22",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "TOUR Championship",
+      "event_type": "stroke",
+      "status": "scheduled",
+      "start_date": "2027-08-26",
+      "end_date": "2027-08-29",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    },
+    {
+      "name": "Ryder Cup",
+      "event_type": "cup",
+      "status": "scheduled",
+      "start_date": "2027-09-17",
+      "end_date": "2027-09-19",
+      "season": {
+        "year": 2027,
+        "tour_name": "pga"
+      }
+    }
+  ],
+  "skins": {
+    "id": "c4e87703-43f7-4f48-ab3f-bf6576a45823",
+    "name": "The Farmers Insurance Skins Game",
+    "purse": null,
+    "venue_name": "Atlantic Fields Club",
+    "venue_par": 71,
+    "defending_champion": "Keegan Bradley"
+  },
+  "skinsTeeTimes": [],
+  "skinsBoard": [],
+  "euroRankings": {
+    "2026": [
+      {
+        "position": 1,
+        "player_name": "Eugenio CHACARRA",
+        "points": 4243.79,
+        "season_year": 2026,
+        "scraped_at": "2026-11-09T06:45:03.094+00:00"
+      },
+      {
+        "position": 2,
+        "player_name": "Rory MCILROY",
+        "points": 3709.86,
+        "season_year": 2026,
+        "scraped_at": "2026-11-09T06:45:03.094+00:00"
+      },
+      {
+        "position": 3,
+        "player_name": "Patrick REED",
+        "points": 3528.62,
+        "season_year": 2026,
+        "scraped_at": "2026-11-09T06:45:03.094+00:00"
+      },
+      {
+        "position": 4,
+        "player_name": "Casey JARVIS",
+        "points": 2892.98,
+        "season_year": 2026,
+        "scraped_at": "2026-11-09T06:45:03.094+00:00"
+      },
+      {
+        "position": 5,
+        "player_name": "Aaron RAI",
+        "points": 2560.15,
+        "season_year": 2026,
+        "scraped_at": "2026-11-09T06:45:03.094+00:00"
+      }
+    ],
+    "2027": []
+  }
+}

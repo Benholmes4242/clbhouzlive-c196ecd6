@@ -2,7 +2,10 @@
  * currentSeasonFor(tour) — the ONE rule for "current season".
  *
  * The current season is the season of the tour's earliest event that hasn't
- * finished (end_date ≥ today, any status except cancelled). If there is none,
+ * finished (end_date ≥ today, any status except cancelled), restricted to
+ * event_type stroke/team in both reads and the pure picker. Cup/match events
+ * never hold a season open; no name or additional status exclusions apply.
+ * If there is none,
  * the season of its most recently finished event.
  *
  * Derived from sr_tournaments joined to sr_seasons, never from sr_seasons'
@@ -14,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../hooks/useOverviewData';
 
 export interface SeasonEventRow {
+  event_type: string | null;
   start_date: string | null;
   end_date: string | null;
   status: string | null;
@@ -26,7 +30,7 @@ const CANCELLED = new Set(['cancelled', 'canceled']);
 
 /** Pure picker; `today` is yyyy-MM-dd (UTC). */
 export function pickCurrentSeason(rows: SeasonEventRow[], today: string): CurrentSeason | null {
-  const live = rows.filter((r) => r.season && r.end_date && !CANCELLED.has((r.status ?? '').toLowerCase()));
+  const live = rows.filter((r) => r.season && r.end_date && ['stroke', 'team'].includes(r.event_type ?? '') && !CANCELLED.has((r.status ?? '').toLowerCase()));
   const pending = live
     .filter((r) => (r.end_date as string) >= today)
     .sort((a, b) => (a.start_date ?? '').localeCompare(b.start_date ?? '') || (a.end_date as string).localeCompare(b.end_date as string));
@@ -42,8 +46,9 @@ export async function currentSeasonFor(tour: TourId, now = new Date()): Promise<
   const today = todayUTC(now);
   const base = () => supabase
     .from('sr_tournaments')
-    .select('start_date, end_date, status, season:sr_seasons!inner(id, year, tour_name)')
+    .select('start_date, end_date, status, event_type, season:sr_seasons!inner(id, year, tour_name)')
     .ilike('season.tour_name', tour)
+    .in('event_type', ['stroke', 'team'])
     .or('status.is.null,status.not.in.(cancelled,canceled)');
   const next = await base().gte('end_date', today).order('start_date', { ascending: true }).limit(5);
   if (next.error) throw next.error;
