@@ -228,6 +228,76 @@ export function rightColumn(evt: SeasonEvent): RightColumn {
   return { kind: 'none' };
 }
 
+// ─── Season spans + breaks (Schedule across seasons) ─────────────────────
+
+/** One season's summary inside the merged schedule list. */
+export interface SeasonSpan {
+  year: number;
+  /** The season row's tour full name ("Champions Tour"); null when unknown. */
+  tourName: string | null;
+  /** Events of this season in the LIST (same filter as the rows). */
+  eventCount: number;
+  /** Earliest start date (yyyy-MM-dd) among those events. */
+  firstStart: string | null;
+}
+
+/**
+ * Season summaries over the filtered, sorted event list, in date order.
+ * The event count is the same filter as the list — never a raw table count.
+ */
+export function seasonSpans(
+  events: Array<{ seasonYear?: number | null; startDate: string }>,
+  tourNameByYear: Map<number, string | null>,
+): SeasonSpan[] {
+  const byYear = new Map<number, { count: number; first: string }>();
+  for (const e of events) {
+    if (e.seasonYear == null) continue;
+    const hit = byYear.get(e.seasonYear);
+    if (hit) {
+      hit.count += 1;
+      if (e.startDate < hit.first) hit.first = e.startDate;
+    } else {
+      byYear.set(e.seasonYear, { count: 1, first: e.startDate });
+    }
+  }
+  return Array.from(byYear.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([year, v]) => ({
+      year,
+      tourName: tourNameByYear.get(year) ?? null,
+      eventCount: v.count,
+      firstStart: v.first,
+    }));
+}
+
+export interface SeasonBreak {
+  ending: SeasonSpan;
+  starting: SeasonSpan;
+}
+
+/**
+ * The event id BEFORE WHICH a season break renders, for every boundary in
+ * the sorted list. One break per boundary, never two.
+ */
+export function seasonBreakBoundaries(
+  events: Array<{ id: string; seasonYear?: number | null }>,
+  spans: SeasonSpan[],
+): Map<string, SeasonBreak> {
+  const byYear = new Map(spans.map((s) => [s.year, s]));
+  const out = new Map<string, SeasonBreak>();
+  let prev: number | null = null;
+  for (const e of events) {
+    const y = e.seasonYear ?? null;
+    if (y != null && prev != null && y !== prev) {
+      const ending = byYear.get(prev);
+      const starting = byYear.get(y);
+      if (ending && starting) out.set(e.id, { ending, starting });
+    }
+    if (y != null) prev = y;
+  }
+  return out;
+}
+
 // ─── "In the field" names (§5) ───────────────────────────────────────────
 
 export interface FieldPlayer {
