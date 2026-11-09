@@ -52,6 +52,8 @@ function isDemoted(s?: string | null): boolean {
 export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
+  const [expanded, setExpanded] = useState<{ playerId: string; round: number } | null>(null);
+  useEffect(() => { setExpanded(null); setTarget(null); }, [tournamentId, open]);
   const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
 
 
