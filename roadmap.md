@@ -1,12 +1,16 @@
-# Roadmap — Tour sheets, island and Schedule across seasons
+# Roadmap
 
-Brief: BUILD_Tour_sheets_island_and_Schedule_across_pasted-2.md + schedule-across-seasons-signed-off.html.
+## Open: Tour hero blocks (PAUSED — awaiting ruling)
+Brief: BUILD_Tour_hero_blocks + hero-blocks-signed-off.html. Not started.
+Blocker: baseline shard 2 fails — src/test/tourOverviewNotStarted.test.tsx:41 expects "1:00 pm", gets "13:00" (24h tee-time change from the Tour sheets brief). Need authorisation to update that assertion before building.
 
-- [ ] 1. FullBoardSheet: white LEADERBOARD kicker (sheet only), whole sheet SHEET_SURFACE #16161A (rows, sticky head, --hm-surface, masks), row tap = inline expand via HeroRoundPanel (one open, tap closes), Full scorecard still opens ScorecardSheet.
-- [ ] 2. 24-hour tee times (formatTimeHm24) at: TeeTimesFirstGroups, TeeTimesRail, OnTheCourse, magazineCopy, useTournamentTeeTimes, LeadersGroup. Drop am/pm .toUpperCase().
-- [ ] 3. Island start label: weekday only within next 6 days, else "Starts 17 Jan". Tests at 0/6/7 days. Update stale tourIsland.test.tsx:106 assertion (report old/new).
-- [ ] 4. Schedule across seasons: useSeasonTimeline fetches prev/current/next year seasons; season break per mock; counters/anchor/stats stay current-season; merged view untouched; tests (order, one break per boundary, anchor unchanged, Korn Ferry 17 Jan with 2026 above).
-- [ ] 5. Empty week: CAUSE = anchor scroll fires before winner/leader enrichment settles; rows above grow, landing falls short, sticky "12–18 OCT" header covers the SAS row's name/date (row renders — measured 108px at top 32 vs header 42–89.5). Fix in schedule-v2: re-scroll on timeline settle, cancel on first user scroll. Add no-empty-week test.
-- [ ] 6. Shards before: 1=2052 ✓, 2/3/4 running. After: all four, counts reconciled. Report.
+## Open: Tour sheets, island and Schedule across seasons (shards 2–4 after-runs pending)
+Completed items 1–5; after-shard 1 passed 2,052. Remaining: after-run shards 2–4, reconcile counts. Note: shard 2 now carries the tourOverviewNotStarted failure above (same ruling needed).
+
+## Active: BUILD Round scores (round-tiles-signed-off.html)
+- [ ] 1. Round tiles: replace dot strip with HoleMarks (tourhub/leaderboard/BoardRound.tsx, as roundTilePlot.tsx uses) in RoundsThisWeekShelf RoundCard (~228, also CourseLatelySection) and StandoutRoundsShelf (~34–39). Two rows of nine, 6px gap, full content width, --hm-surface = SHELF_CARD.background; 9-hole = one row; unplayed = empty dot; keep data-raised standout highlight; tile size unchanged; delete stripColor/STRIP_COLORS once unused.
+- [ ] 2. Comments sheet NET: useCommentsContext.ts + header render net score with to-par ("71 E") from FN1 sources (facts.net, course_handicap/feedStrokesReceived); no gross fallback; applies wherever the sheet opens for a round.
+- [ ] 3. Round of the week on net (ExploreCard.tsx photo path ~1861): big figure = NET to par; photo line = net line or none (never gross); stat row FN1.5 via feedNet like line ~1785; figure/line/NET cell agree; test danny.akers1 gross 67 net 68.
+- [ ] 4. Tests: 18 marks in two rows of nine / 9 in one row; no stripColor; comments net/to-par + nothing when unconvertible; ROTW figure/line/NET agree. Shards before/after, one at a time; report counts.
 
 Standing rules: no SQL/migrations, no RPC/edge changes, feed_config untouched, round_pool_cap 30, no native/Median changes, no guest browsing/review wizard/news/round-plot changes.
