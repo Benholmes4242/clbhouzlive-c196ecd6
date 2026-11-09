@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { CompetitionTrophy } from '@/components/explore-tab-new/courseled/CompetitionMark';
 import { DEFAULT_FILTERS, type RegionKind } from '@/components/explore-tab-new/courseled/boardFilters';
 import { useStandoutRounds, type StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
@@ -28,7 +29,7 @@ function readRemembered(userId: string | undefined) {
 }
 function Who({ userId, name, photo, course, onOpenMember }: { userId: string | null; name: string; photo: string | null; course: string | null; onOpenMember?: (id: string) => void }) {
   return <Button variant="ghost" className="standout-who" aria-label={name} onClick={event => { event.stopPropagation(); if (userId) onOpenMember?.(userId); }} onKeyDown={event => event.stopPropagation()}>
-    <SquircleAvatar size={34} src={photo} alt="" userId={userId ?? undefined} hairlineRing />
+    <SquircleAvatar size={34} src={photo} alt="" fallback={getInitialsFromName(name)} userId={userId ?? undefined} hairlineRing />
     <span className="standout-identity"><span className="standout-name">{name}</span><span className="standout-course">{course ? shortCourseName(course) : ''}</span></span>
   </Button>;
 }
