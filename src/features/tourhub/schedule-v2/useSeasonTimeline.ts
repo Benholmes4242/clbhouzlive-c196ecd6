@@ -11,10 +11,16 @@ import { linkedTournamentPlace, TOURNAMENT_COURSE_PLACE_JOIN, type CoursePlaceJo
  *   Never silent — every error path is console.error'd with [schedule-v2].
  *
  * TIMELINE SHAPE: sorted list of events (start_date asc) grouped into
- * months. Each event carries per-state enrichment (leader for live rows,
- * champion for completed rows). Champions/leaders come from
- * useTournamentLeadersWinners — the same source used across ScheduleTab
- * today. Defending champions come from useScheduleDefendingChampionPhotos.
+ * Monday→Sunday weeks. The single-tour list runs across seasons: the
+ * current season (currentSeasonFor) plus its previous and next years when
+ * those season rows exist. Each event carries its seasonYear and an
+ * inCurrentSeason flag; totalEvents / eventNumber / the anchor describe
+ * the CURRENT season only. `seasons` holds the per-season summaries the
+ * season-break headers print. Each event carries per-state enrichment
+ * (leader for live rows, champion for completed rows). Champions/leaders
+ * come from useTournamentLeadersWinners — the same source used across
+ * ScheduleTab today. Defending champions come from
+ * useScheduleDefendingChampionPhotos.
  */
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
