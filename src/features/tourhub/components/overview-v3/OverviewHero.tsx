@@ -24,6 +24,7 @@ import { RailChips } from '@/components/ui/RailChips';
 import { OVERVIEW_TOUR_ORDER, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import type { TourId } from '../../hooks/useOverviewData';
 import { OverviewChampionBlock } from './useOverviewChampion';
+import { useOverviewFallbackSlides } from './useOverviewFallbackSlides';
 import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
 import { tournamentRoute } from '../../routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -57,7 +58,12 @@ export const OVERVIEW_HERO_TOTAL_HEIGHT = `${OVERVIEW_PHOTO_BAND_HEIGHT}px`;
 export function OverviewHero({ height }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const { data: rawSlides = [], isLoading } = useHeroCarouselData();
+  const { data: carouselSlides = [], isLoading: carouselLoading } = useHeroCarouselData();
+  /* URGENT_FIX §3: every overview tour always has a slide. The fallback only
+     fills tours the carousel lacks; useHeroCarouselData itself is unchanged. */
+  const { data: fallbackSlides = [], isLoading: fallbackLoading } = useOverviewFallbackSlides(carouselSlides, !carouselLoading);
+  const rawSlides = useMemo(() => [...carouselSlides, ...fallbackSlides], [carouselSlides, fallbackSlides]);
+  const isLoading = carouselLoading || (fallbackLoading && carouselSlides.length === 0);
 
 
   const {
@@ -338,10 +344,10 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const activeChampionMemberIds = activeChampionEntry?.team?.members
     ?.map((member) => member.player?.id)
     .filter((id: unknown): id is string => typeof id === 'string' && id.length > 0) ?? [];
-  // The frame follows its content in every state (wrapped champion name,
-  // rotation line, whatever comes next). An explicit `height` prop still
-  // sizes a specific slot. The photo band is only a FLOOR, so the
-  // wait-mode crossfade never collapses the frame between slides.
+  // The frame follows its content in every state (URGENT_FIX §1): no floor
+  // above the active band's own height, so no canvas gap under the photo.
+  // The wait-mode crossfade mounts the entering band as the exiting one
+  // leaves, so it needs no floor. An explicit `height` prop still sizes a slot.
   const activeHeroHeight = height ?? 'auto';
 
   // Chevron UI removed per micro-brief; swipe is the sole gesture. goPrev and
@@ -359,7 +365,6 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         position: 'relative',
         width: '100%',
         height: activeHeroHeight,
-        minHeight: height === undefined && heroState.kind !== 'upcoming' ? OVERVIEW_HERO_TOTAL_HEIGHT : undefined,
       }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -396,13 +401,18 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         cross-fade with the slide: it stays put while the content below
         changes. The row scrolls horizontally, never wraps, and runs to the
         screen's right edge so the next chip peeks in. */}
-    <div ref={chipRowRef}>
+    {/* URGENT_FIX §2: on finished events the champion block sits straight
+        off the photo, ABOVE the tour buttons. Renders nothing otherwise. */}
+    <OverviewChampionBlock slide={active} state={heroState} />
+
+    <div ref={chipRowRef} data-overview-chip-row>
       <RailChips
         options={chipOptions}
         value={active.tournament.id}
         onChange={onChipChange}
         ariaLabel="Tour"
         toggleSemantics
+        fill
         className="overview-tour-chips"
       />
     </div>
@@ -420,9 +430,6 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* On finished events the champion block follows the chip row
-              rather than the photo (BUILD_TOUR_BUTTONS_UNDER_HERO §1). */}
-          <OverviewChampionBlock slide={active} state={heroState} />
           <HeroBoardSection
             tournamentId={bandTournamentId}
             eventName={activeSlide?.tournament.name}

@@ -12,6 +12,7 @@ import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 const f = vi.hoisted(() => ({
   slides: [] as HeroSlide[],
   heroSlides: [] as Array<string | undefined>,
+  fallback: [] as HeroSlide[],
   selection: {
     selectedTourSlug: 'all' as string | null,
     selectedTournamentId: null as string | null,
@@ -24,6 +25,7 @@ const f = vi.hoisted(() => ({
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/features/tourhub/hooks/useHeroCarouselData', () => ({ useHeroCarouselData: () => ({ data: f.slides, isLoading: false }) }));
+vi.mock('@/features/tourhub/components/overview-v3/useOverviewFallbackSlides', () => ({ useOverviewFallbackSlides: () => ({ data: f.fallback, isLoading: false }) }));
 vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: [] }) }));
 vi.mock('@/features/tourhub/context/TourSelectionContext', () => ({ useTourSelection: () => f.selection }));
 vi.mock('@/features/tourhub/hooks/useLeaderboardRealtime', () => ({ useLeaderboardRealtime: () => {} }));
@@ -72,6 +74,7 @@ const selectedChip = () => chips().find((c) => c.getAttribute('aria-pressed') ==
 beforeEach(() => {
   f.slides = [];
   f.heroSlides = [];
+  f.fallback = [];
   f.selection.selectedTourSlug = 'all';
   f.selection.selectedTournamentId = null;
   f.selection.selectionNonce = 0;
@@ -172,6 +175,32 @@ describe('overview tour chip row', () => {
     const source = readFileSync('src/features/tourhub/components/overview-v3/OverviewHero.tsx', 'utf8');
     expect(source).toContain("from '@/components/ui/RailChips'");
     expect(source).not.toContain('railChipStyle(');
+  });
+});
+
+describe('URGENT_FIX close-the-gap: five buttons that fill the row', () => {
+  it('a Korn Ferry slide from the fallback renders a Korn Ferry chip, fifth', () => {
+    f.slides = [slide('pga-1', 'pga', 'live'), slide('lpga-1', 'lpga', 'upcoming'), slide('euro-1', 'euro', 'completed'), slide('champ-1', 'champ', 'upcoming')];
+    f.fallback = [slide('pgad-next', 'pgad', 'upcoming')];
+    mountHero();
+    expect(chips().map((c) => c.textContent)).toEqual(['PGA', 'LPGA', 'DP World', 'Champions', 'Korn Ferry']);
+  });
+
+  it('chips are flex 1 1 auto, centred and unwrapped; the row scrolls only on overflow', () => {
+    f.slides = OVERVIEW_TOUR_ORDER.map((t) => slide(`${t}-1`, t, 'upcoming'));
+    mountHero();
+    chips().forEach((chip) => {
+      expect(chip.style.flex).toBe('1 1 auto');
+      expect(chip.style.textAlign).toBe('center');
+      expect(chip.style.whiteSpace).toBe('nowrap');
+      expect(chip.style.minWidth).toBe('max-content');
+    });
+    // overflow-x:auto scrolls only when content exceeds the row; labels never squeeze.
+    expect(chipRow().style.overflowX).toBe('auto');
+    const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
+    expect(css).toContain('.overview-tour-chips { padding: 14px 20px 2px;');
+    expect(css).toMatch(/max-width: 359px\) \{ \.overview-tour-chips \{ --rail-chip-gap: 4px; --rail-chip-font: 11px;/);
+    expect(css).toContain('clamp(3px,');
   });
 });
 

@@ -144,6 +144,16 @@ export interface RailChipsProps {
    * tablist semantics.
    */
   toggleSemantics?: boolean;
+
+  /**
+   * ADDITIVE — FILL THE ROW (URGENT_FIX close-the-gap §4). Each chip takes
+   * flex 1 1 auto with a centred, unwrapped label, so the chips share the
+   * row's spare width edge to edge. The caller may tune gap, label size and
+   * horizontal padding through --rail-chip-gap / --rail-chip-font /
+   * --rail-chip-pad-x (defaults are the canonical 6 / 12 / 11). Labels never
+   * squeeze: when the chips cannot fit the row scrolls as before.
+   */
+  fill?: boolean;
 }
 
 
@@ -198,7 +208,7 @@ export function railChipStyle(active: boolean, size: 'sm' | 'md' = 'md'): CSSPro
 /** The canonical chip-row gap. */
 export const RAIL_CHIP_GAP = 6;
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing, maxChipWidth, toggleSemantics = false }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing, maxChipWidth, toggleSemantics = false, fill = false }: RailChipsProps) {
   const filled = ground === 'filled';
   /* ONE geometry pair, stated once. 'md' is the canonical chip. */
   const geo = RAIL_CHIP_GEOMETRY[size];
@@ -212,7 +222,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
       className={`hide-scrollbar${size === 'tile' ? ' explore-tile-chips' : ''}${className ? ` ${className}` : ''}`}
       style={{
         display: 'flex',
-        gap: size === 'tile' ? 8 : 6,
+        gap: fill ? 'var(--rail-chip-gap, 6px)' : size === 'tile' ? 8 : 6,
         minWidth: 0,
         overflowX: 'auto',
         scrollbarWidth: 'none',
@@ -240,8 +250,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
                  equally, and `min-width: max-content` is what makes the row
                  overflow-and-scroll instead of squeezing a label. */
               ...(distribute ? { flex: '1 1 0%', minWidth: 'max-content', textAlign: 'center' as const } : null),
+              ...(fill ? { flex: '1 1 auto', minWidth: 'max-content', textAlign: 'center' as const } : null),
               ...(maxChipWidth ? { maxWidth: maxChipWidth, overflow: 'hidden', textOverflow: 'ellipsis' } : null),
-              padding: geo.padding,
+              padding: fill ? '6px var(--rail-chip-pad-x, 11px)' : geo.padding,
               borderRadius: geo.radius,
 
 
@@ -252,7 +263,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
               /* 'tile' = the Leaderboards board tile: small capitals, no counts. */
               ...(size === 'tile' ? { height: 34, display: 'flex', alignItems: 'center', textTransform: 'uppercase' as const, letterSpacing: '0.11em', lineHeight: 1 } : null),
               fontFamily: SANS,
-              fontSize: geo.fontSize,
+              fontSize: fill ? 'var(--rail-chip-font, 12px)' : geo.fontSize,
               fontWeight: size === 'tile' ? 800 : RAIL_CHIP_WEIGHT,
               whiteSpace: 'nowrap',
               cursor: 'pointer',

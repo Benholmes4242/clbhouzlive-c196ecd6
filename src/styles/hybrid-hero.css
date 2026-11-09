@@ -54,8 +54,12 @@
    hero: 14px top / 2px bottom, left = the page side padding (20px, 16px at
    ≤340px), NO right padding so the row runs to the screen's right edge and
    the next chip peeks in. */
-.overview-tour-chips { padding: 14px 0 2px 20px; }
-@media (max-width: 340px) { .overview-tour-chips { padding-left: 16px; } }
+/* URGENT_FIX §4: the five tour buttons fill the content width, centred.
+   Padding shrinks with the viewport to a 3px floor; the row scrolls only
+   when a two-event week adds chips that genuinely cannot fit. */
+.overview-tour-chips { padding: 14px 20px 2px; --rail-chip-gap: 6px; --rail-chip-font: 12px; --rail-chip-pad-x: clamp(3px, calc((100vw - 330px) / 6), 11px); }
+@media (max-width: 359px) { .overview-tour-chips { --rail-chip-gap: 4px; --rail-chip-font: 11px; } }
+@media (max-width: 340px) { .overview-tour-chips { padding-left: 16px; padding-right: 16px; --rail-chip-font: 10.5px; } }
 
 /* Upcoming-only grammar. Reuses the existing Tour text/score palette; these
    local yardage tokens match tournament-v3 without applying its page shell. */
