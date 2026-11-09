@@ -114,7 +114,7 @@ export async function freshPgaStandings(seasonId: string | null, finalEnd: strin
   };
 }
 
-async function freshStandings(tour: TourId, year: number, finalEnd: string, seasonId: string | null = null): Promise<{ rows: StandingRow[]; source: SeasonRecapData['standingsSource'] } | null> {
+export async function freshStandings(tour: TourId, year: number, finalEnd: string, seasonId: string | null = null): Promise<{ rows: StandingRow[]; source: SeasonRecapData['standingsSource'] } | null> {
   if (tour === 'pga') return freshPgaStandings(seasonId, finalEnd);
   const r = await supabase
     .from('tour_season_rankings')
@@ -131,22 +131,8 @@ async function freshStandings(tour: TourId, year: number, finalEnd: string, seas
       source: { table: 'tour_season_rankings', date: scraped as string },
     };
   }
-  const s = await supabase
-    .from('tour_standings_snapshots')
-    .select('position, points, player_key, player_id, snapshot_date')
-    .ilike('tour_code', tour)
-    .eq('season_year', year)
-    .gte('snapshot_date', finalEnd.slice(0, 10))
-    .order('snapshot_date', { ascending: false })
-    .order('position', { ascending: true })
-    .limit(400);
-  const snaps = (s.data ?? []) as Array<{ position: number; points: number | null; player_key: string; player_id: string | null; snapshot_date: string }>;
-  const latest = snaps[0]?.snapshot_date;
-  if (!latest || !isFreshStandings(latest, finalEnd)) return null;
-  return {
-    rows: snaps.filter((x) => x.snapshot_date === latest).map((x) => ({ position: x.position, name: displayName(x.player_key), points: x.points, playerId: x.player_id })),
-    source: { table: 'tour_standings_snapshots', date: latest },
-  };
+  // tour_standings_snapshots is deliberately not consulted (see seasonRecapRules header).
+  return null;
 }
 
 export async function fetchSeasonRecap(tour: TourId, seasonId: string | null, year: number, finalEnd: string): Promise<SeasonRecapData> {

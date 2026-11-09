@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+let rankRows: Array<Record<string, unknown>> = [];
 let statRows: Array<{ player_id: string; fedex_points: number | null; updated_at: string | null }> = [];
 const calls: Array<{ table: string; eq: Array<[string, unknown]> }> = [];
 
@@ -12,14 +13,14 @@ vi.mock('@/integrations/supabase/client', () => {
     Object.assign(b, {
       select: chain, order: chain, ilike: chain, in: chain, gte: chain, lte: chain,
       eq: (k: string, v: unknown) => { rec.eq.push([k, v]); return b; },
-      limit: () => Promise.resolve({ data: table === 'sr_player_statistics' ? statRows : [], error: null }),
+      limit: () => Promise.resolve({ data: table === 'sr_player_statistics' ? statRows : table === 'tour_season_rankings' ? rankRows : [{ position: 1, points: 9, player_key: 'X', player_id: 'x', snapshot_date: '2026-12-01' }], error: null }),
     });
     return b;
   };
   return { supabase: { from: (t: string) => builder(t) } };
 });
 
-import { freshPgaStandings } from '@/features/tourhub/components/overview-v3/useSeasonRecap';
+import { freshPgaStandings, freshStandings } from '@/features/tourhub/components/overview-v3/useSeasonRecap';
 
 beforeEach(() => { calls.length = 0; });
 
@@ -46,5 +47,17 @@ describe('PGA recap standings from sr_player_statistics', () => {
   it('reads nothing without a season id', async () => {
     expect(await freshPgaStandings(null, '2026-08-24')).toBeNull();
     expect(calls).toHaveLength(0);
+  });
+});
+
+describe('ruling 2: snapshots are not a recap source', () => {
+  it('a snapshot dated after the final event does not make a stale list fresh', async () => {
+    rankRows = [{ position: 1, points: 2221, player_name: 'Ross Steelman', player_id: 'p', manual_player_id: null, scraped_at: '2026-09-07T06:00:00Z' }];
+    expect(await freshStandings('pgad', 2026, '2026-10-11')).toBeNull();
+    expect(calls.map((c) => c.table)).not.toContain('tour_standings_snapshots');
+  });
+  it('a scraped_at on or after the final event is fresh', async () => {
+    rankRows = [{ position: 1, points: 2221, player_name: 'Ross Steelman', player_id: 'p', manual_player_id: null, scraped_at: '2026-11-09T09:12:09Z' }];
+    expect((await freshStandings('pgad', 2026, '2026-10-11'))?.source).toEqual({ table: 'tour_season_rankings', date: '2026-11-09T09:12:09Z' });
   });
 });

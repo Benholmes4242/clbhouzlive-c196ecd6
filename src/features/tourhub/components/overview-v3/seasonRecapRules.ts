@@ -11,7 +11,9 @@
  *
  * FRESH STANDINGS ONLY: the race winner, the final board, the card list and the
  * CARDS / YOUNGEST cells read a standings source only when that source's own
- * date (scraped_at / snapshot_date) is on or after the final event's end date.
+ * date is on or after the final event's end date: tour_season_rankings.scraped_at
+ * (lpga/pgad/liv/champ/euro) or max sr_player_statistics.updated_at (pga).
+ * tour_standings_snapshots is NOT a source: it re-dates copies, so its date proves nothing.
  * Otherwise the recap falls back to the winners sentence and the EVENTS /
  * WINNERS / MOST WINS facts. A stale list is never shown as FINAL.
  */
@@ -115,8 +117,10 @@ export function recapFactCells(args: {
   const out: RecapFactCell[] = [];
   if (args.events > 0) out.push({ key: 'events', value: String(args.events) });
   if (args.winners > 0) out.push({ key: 'winners', value: String(args.winners) });
+  // CARDS shows for any card line on a fresh list (ruling 1); the 4th cell is
+  // YOUNGEST only when the list is short enough to name (n <= 20).
+  if (args.cards != null) out.push({ key: 'cards', value: String(args.cards) });
   if (args.cards != null && args.cards <= RECAP_CARD_LIST_MAX) {
-    out.push({ key: 'cards', value: String(args.cards) });
     if (args.youngest != null) out.push({ key: 'youngest', value: String(args.youngest) });
   } else if (args.maxWins > 0) {
     out.push(args.tiedLeaders > 1

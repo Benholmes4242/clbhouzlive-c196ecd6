@@ -52,3 +52,12 @@ One job covers lpga, pgad, liv and champ. No GitHub workflow, so no GitHub secre
 ## Not done / notes
 - Unmatched names (e.g. KF "Jay Card III", "S.Y. Noh"; LIV "Do-Yeob Mun") stay with null player_id, as before.
 - No app code or tests changed; no SQL or migrations.
+
+## Rulings 1–5 (9 Nov 2026)
+1. CARDS shows for any card line on a fresh list; 4th cell YOUNGEST when n ≤ 20, else MOST WINS (`recapFactCells`). Names only when n ≤ 20; else "See all {n} ›". New test in seasonRecap.test.tsx ("ruling 1"). No existing assertion changed.
+2. `tour_standings_snapshots` removed as a recap source (`useSeasonRecap.ts`; rule in `seasonRecapRules.ts` header). Two new tests in seasonRecapPgaStandings.test.ts: a post-final snapshot no longer makes a stale list fresh (and the table isn't read); a fresh scraped_at still is.
+3. Year rule ruling recorded in the scrape-season-rankings header. (Deployed copy unchanged — the edit is a comment.)
+4. Board is one grid; PTS track = minmax(64px, max-content), nowrap. Champions top 3 (Cink 3,943,830) at 320/390/430: PTS 66.7px, one line, no clipping, page width = viewport. Hero figure 93px, one line, beside a two-line title at 320 and 390 (16px clear), one line at 430. Screens: docs/verification/season-recap/champ_pts_{320,390,430}.png (fixture, not SF Pro).
+5. Access unchanged. No schedule created.
+
+Shards: 2,045 / 1,895 / 2,017 / 1,926 = 7,883 (+3 from 7,880: the three tests above).
