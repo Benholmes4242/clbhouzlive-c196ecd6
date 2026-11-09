@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Board headers without POS / PLAYER
+Combine heading/score labels where they fit; otherwise retain a score-only label line.
+Preserve row geometry and behaviour; move full-sheet movement legend below board.
+Verify all listed/sibling Tour boards and run sequential before/after shards after recap closes.
+
 ## In progress: Season in review — completed rhythm (option B)
 Restore THE SEASON/THE POINTS LIST headings; shared two-line cells and spacing.
 Centre the column-major card list as a block, with narrow-width equal-column fallback.
