@@ -30,6 +30,28 @@ export function shortWeekday(startDate: string): string {
   return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getUTCDay()];
 }
 
+/** 'YYYY-MM-DD' → '17 Jan' (day number, short month, no year). UTC noon pinned. */
+export function shortDayMonth(startDate: string): string {
+  const d = new Date(startDate.length === 10 ? `${startDate}T12:00:00Z` : startDate);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${d.getUTCDate()} ${months[d.getUTCMonth()]}`
+    .trim();
+}
+
+/**
+ * "Starts …" label for an upcoming event. A weekday is only correct when the
+ * event starts within the next 6 days; further out (or a past date that is
+ * still classed upcoming) the date reads instead: "Starts 17 Jan".
+ */
+export function startsLabel(startDate: string, now: Date = new Date()): string {
+  const start = new Date(startDate.length === 10 ? `${startDate}T12:00:00Z` : startDate).getTime();
+  const todayNoon = new Date(`${now.toISOString().slice(0, 10)}T12:00:00Z`).getTime();
+  const days = Math.round((start - todayNoon) / 86_400_000);
+  return days >= 0 && days <= 6
+    ? `Starts ${shortWeekday(startDate)}`
+    : `Starts ${shortDayMonth(startDate)}`;
+}
+
 export interface TourCaption {
   /** Sentence case; the island uppercases it with textTransform. */
   text: string;
