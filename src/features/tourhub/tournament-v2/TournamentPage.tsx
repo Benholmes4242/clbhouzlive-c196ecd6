@@ -155,6 +155,8 @@ export function TournamentPage() {
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
   const [fullBoardOpen, setFullBoardOpen] = useState(false);
+  const completedStrokeEarly = pulse.state==='completed' && hasStrokeBoard(meta?.event_type);
+  const weekFactsQuery = useTournamentWeekFacts(tournamentId, completedStrokeEarly);
 
 
 
@@ -244,8 +246,7 @@ export function TournamentPage() {
   const hasBoard = leaderboardRows.some(r=>r.score!=null && r.position!=null);
   const openFullBoard = () => setFullBoardOpen(true);
   /* COMPLETED STATE: stroke-play only; null facts keep today's Final board. */
-  const completedStroke = pulse.state==='completed' && strokeBoard;
-  const weekFactsQuery = useTournamentWeekFacts(tournamentId??meta.id, completedStroke);
+  const completedStroke = completedStrokeEarly;
   const weekFacts = weekFactsQuery.data ?? null;
   const weekBlock = completedStroke && weekFacts != null;
 
