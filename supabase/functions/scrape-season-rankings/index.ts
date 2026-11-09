@@ -121,7 +121,7 @@ async function fetchChampions(year: number): Promise<Source> {
   if (!list) throw new Error("No Charles Schwab Cup Points list on page");
   const headers: string[] = (list.columnHeaders ?? []).map((h: any) => String(h?.text ?? h));
   const winsIdx = headers.findIndex((h) => /^wins$/i.test(h));
-  const players = tourCupPlayers(list).map((p, i) => p);
+  const players = tourCupPlayers(list);
   // wins column: re-read from the raw rows so index alignment is exact
   const raw = (list.officialPlayers ?? []).filter((p: any) => p?.displayName && int(p.rankingData?.official));
   players.forEach((p, i) => { if (winsIdx >= 0) p.wins = int(raw[i]?.columnData?.[winsIdx]); });
