@@ -23,7 +23,7 @@ import { useTourPickerRows, type TourPickerRow } from '@/features/tourhub/hooks/
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { useLiveTournaments } from '@/features/tourhub/hooks/useLiveTournaments';
 import { getTourLogo } from '@/features/tourhub/utils/tourLogos';
-import { TOUR_DISPLAY, shortWeekday } from '@/features/tourhub/components/tourIslandRules';
+import { TOUR_DISPLAY, startsLabel } from '@/features/tourhub/components/tourIslandRules';
 import { TourIcon, TourLiveDot, type TourIconName } from '@/features/tourhub/components/tourIslandIcons';
 
 const INK = 'var(--tour-menu-ink)';
@@ -132,7 +132,7 @@ export function TourGlance({ onClose, anchorRef, activeTab, onSelectTab, section
                   {hasLeader ? <b data-testid="tour-menu-leader">{leader} <span data-under-par={score < 0}>{score < 0 ? `−${Math.abs(score)}` : score === 0 ? 'E' : `+${score}`}</span></b> : null}
                   <small><span className="tour-menu-live"><TourLiveDot s={6} />{round != null ? `R${round}` : t('tour.glance.live', { defaultValue: 'Live' })}</span></small>
                 </span> : row.status === 'completed' ? <span className="tour-menu-right tour-menu-status"><b>{t('tour.glance.final', { defaultValue: 'Final' })}</b></span>
-                  : row.status === 'upcoming' && row.startDate ? <span className="tour-menu-right tour-menu-status"><b>{t('tour.glance.starts', { day: shortWeekday(row.startDate), defaultValue: `Starts ${shortWeekday(row.startDate)}` })}</b></span> : null}
+                  : row.status === 'upcoming' && row.startDate ? <span className="tour-menu-right tour-menu-status"><b>{t('tour.glance.starts', { label: startsLabel(row.startDate), defaultValue: startsLabel(row.startDate) })}</b></span> : null}
               </Button>;
             })}
           </div>
