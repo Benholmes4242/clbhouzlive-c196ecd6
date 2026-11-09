@@ -78,3 +78,17 @@ describe('one winner trophy glyph', () => {
     expect(band).toContain("import { Trophy } from 'lucide-react'");
   });
 });
+
+describe('HERO BLOCKS fix: tournament upcoming PhotoBand', () => {
+  it('passes nameRef as titleRef and no onOpen, so the band is inert', async () => {
+    const fs = await import('node:fs');
+    const src = fs.readFileSync('src/features/tourhub/tournament-v2/sections/TournamentV3Sections.tsx', 'utf8');
+    const call = src.slice(src.indexOf('<PhotoBand '), src.indexOf('/><UpcomingFacts'));
+    expect(call).toContain('titleRef={nameRef}');
+    expect(call).not.toContain('onOpen');
+    const band = fs.readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx', 'utf8');
+    expect(band).toContain("role={onOpen ? 'button' : undefined}");
+    expect(band).toContain("cursor: onOpen ? 'pointer' : undefined");
+    expect(band).toMatch(/ref=\{titleRef\}[\s\S]*?\{title\}\s*<\/h1>/);
+  });
+});
