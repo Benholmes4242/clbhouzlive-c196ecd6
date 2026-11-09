@@ -758,6 +758,16 @@
       }
     }
   ],
+  "skins": {
+    "id": "c4e87703-43f7-4f48-ab3f-bf6576a45823",
+    "name": "The Farmers Insurance Skins Game",
+    "purse": null,
+    "venue_name": "Atlantic Fields Club",
+    "venue_par": 71,
+    "defending_champion": "Keegan Bradley"
+  },
+  "skinsTeeTimes": [],
+  "skinsBoard": [],
   "euroRankings": {
     "2026": [
       {
