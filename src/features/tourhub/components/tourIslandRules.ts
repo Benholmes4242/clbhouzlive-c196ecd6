@@ -70,7 +70,7 @@ export function singleTourCaption(
     case 'completed':
       return { text: 'Final', live: false };
     case 'upcoming':
-      return { text: `Starts ${startDate ? shortWeekday(startDate) : ''}`.trim(), live: false };
+      return { text: startDate ? startsLabel(startDate) : 'Starts', live: false };
     case 'season':
       return { text: 'Season complete', live: false };
     default:

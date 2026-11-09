@@ -14,7 +14,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8,
 } from '../../_shared/tokens';
-import { formatTimeHm } from '@/i18n/format';
+import { formatTimeHm24 } from '@/i18n/format';
 
 interface Props {
   groups: TeeGroup[];

@@ -12,7 +12,7 @@
  */
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatTimeHm } from '@/i18n/format';
+import { formatTimeHm24 } from '@/i18n/format';
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import CountryFlag from '@/components/ui/country-flag';
