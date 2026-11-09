@@ -6,6 +6,7 @@ import { linkedTournamentPlace, TOURNAMENT_COURSE_PLACE_JOIN, type CoursePlaceJo
  *   1. Pull sr_seasons rows desc by year (limit 50).
  *   2. Filter to rows whose mapTourSlug(tour_full_name) === requested tour.
  *   3. For pga, prefer exact-name matches over fallback-mapped rows.
+ *   3b. The current season by date (currentSeasonFor) is moved to the front.
  *   4. Probe each candidate .limit(1) against sr_tournaments; first hit wins.
  *   Never silent — every error path is console.error'd with [schedule-v2].
  *
@@ -19,6 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '../_shared/tourOrder';
+import { currentSeasonFor } from '../_shared/currentSeason';
 import { LIVE_STATUSES, COMPLETED_STATUSES, endDateInPast } from '../components/overview-v3/useTournamentPulse';
 import type { TourId } from '../hooks/useOverviewData';
 import { getContextLabel } from '../utils/tournamentClassification';
@@ -107,6 +109,13 @@ async function resolveSeasonCandidates(
   }
 
   return sorted.slice(0, 8);
+}
+
+/** Current season (by date) first; the rest keep their order, so next season stays a probe fallback. */
+export function currentFirst<T extends { id: string }>(cands: T[], currentId: string | null | undefined): T[] {
+  if (!currentId) return cands;
+  const hit = cands.find((c) => c.id === currentId);
+  return hit ? [hit, ...cands.filter((c) => c !== hit)] : cands;
 }
 
 
@@ -270,7 +279,9 @@ export function useSeasonTimeline(
         console.warn('[schedule-v2] no season candidates for tour:', tour);
         return { season: null as SrSeasonRow | null, rows: [] as SrTournamentRow[] };
       }
-      return probeAndFetchTournaments(tour, candidates);
+      // Default to the current season by date, not the newest year (next season loads early).
+      const current = await currentSeasonFor(tour).catch(() => null);
+      return probeAndFetchTournaments(tour, currentFirst(candidates, current?.id));
     },
   });
 
