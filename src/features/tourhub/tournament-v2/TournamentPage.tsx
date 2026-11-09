@@ -67,6 +67,7 @@ import {resolvePlayerAvatarCandidates} from '../_shared/resolvePlayerAvatar';
 import {winnerRow,championNarrative,score,words,copy,playedRounds} from './data/tournamentRules';
 import {TournamentHero,RaceSection,FieldSection,CourseV3Section,NumbersSection,TeeV3Section,SectionHead} from './sections/TournamentV3Sections';
 import {UpcomingLastYear} from '../components/overview-v3/UpcomingOverviewSections';
+import {earliestTeeTime} from '../overview/boardStarted';
 import './tournamentPage.css';
 
 export function TournamentPage() {
