@@ -385,6 +385,8 @@ function likesSubjectOf(item: StreamItem): SubjectContext | null {
     kind: item.kind,
     gross: item.kind === 'round' ? item.facts.gross ?? null : null,
     toPar: item.kind === 'round' ? item.facts.to_par ?? null : null,
+    net: item.kind === 'round' ? item.facts.net ?? null : null,
+    netToPar: item.kind === 'round' && item.facts.net != null && item.facts.course_par != null ? item.facts.net - item.facts.course_par : null,
     rating: item.kind === 'review' ? item.facts.rating ?? null : null,
   };
 }

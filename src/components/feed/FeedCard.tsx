@@ -925,6 +925,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               kind: 'round',
               gross: item.facts.gross ?? null,
               toPar: item.facts.to_par ?? null,
+              net: item.facts.net ?? null,
+              netToPar: item.facts.net != null && item.facts.course_par != null ? item.facts.net - item.facts.course_par : null,
               rating: null,
             },
           } : undefined,
