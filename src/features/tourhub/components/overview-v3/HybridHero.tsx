@@ -26,6 +26,7 @@ import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { useOverviewChampion } from './useOverviewChampion';
 import {useUpcomingOverview} from './useUpcomingOverview';
 import {upcomingSentence} from './upcomingOverviewRules';
+import { startWeekday } from '../../tournament-v2/data/tournamentRules';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
