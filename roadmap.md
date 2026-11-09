@@ -1,10 +1,18 @@
 # Roadmap
 
+## In progress: Board headers without POS / PLAYER
+Combine heading/score labels where they fit; otherwise retain a score-only label line.
+Preserve row geometry and behaviour; move full-sheet movement legend below board.
+Verify all listed/sibling Tour boards and run sequential before/after shards after recap closes.
+
 ## In progress: Season in review — completed rhythm (option B)
 Restore THE SEASON/THE POINTS LIST headings; shared two-line cells and spacing.
 Centre the column-major card list as a block, with narrow-width equal-column fallback.
 Run four before/after shards separately and measure real-stylesheet fixtures at 320/390/430.
 Prior full-suite baseline: 8,002. Board rows, photo, champion and sentence frozen.
+Checkpoint: after 8,005 (+3); last heading alignment rerun shard 1 only (2,087).
+Remaining Our record heading-to-content gap is 13px, required 9px; finish then rerun four shards.
+Report: SEASON_RECAP_RHYTHM_REPORT.md. Board-header implementation has not started.
 
 ## Done: Tour heroes — upcoming rhythm + completed two lines
 Approved figure size: 15px / 700 (brief governs the mock's unused 15px class).
