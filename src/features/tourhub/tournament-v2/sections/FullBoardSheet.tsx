@@ -1,20 +1,31 @@
 /**
  * FullBoardSheet — full-height house sheet that mounts the existing
  * BoardTable with the event's rows + meta. No new renderer; cut state
- * is derived inline from the same fields LeaderboardTab uses. Row
- * taps forward to the ONE ScorecardSheet.
+ * is derived inline from the same fields LeaderboardTab uses.
+ *
+ * Row taps open the SAME inline expand as the tour overview hero board
+ * (HeroRoundPanel: hole marks, round chips, nine totals, "Full scorecard"
+ * button) — one row open at a time, tapping it again closes it. The
+ * panel's "Full scorecard" and rows with no started round still forward
+ * to the ONE ScorecardSheet.
+ *
+ * The whole sheet paints SHEET_SURFACE: the wrapper overrides
+ * --tour-board-canvas / --tour-board-head / --hero-round-surface so row
+ * fills, the sticky column header and the hole-mark rings match the
+ * sheet, and the LEADERBOARD kicker reads white (board ink) here only —
+ * the tournament page and Leaderboards page boards keep theirs.
  *
  * Wiring: completed events' 'Full board >' opens this. Live events
  * keep the Leaderboards-tab deep link (richer live surface) but can
  * fall back to this when the event isn't present in the live tab.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
 import { LiveBoard } from '../../leaderboard/LiveBoard';
-import { todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
+import { computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { resolveCutDisplay, tournamentIsFinished } from '../../_shared/cutDisplay';
@@ -22,6 +33,8 @@ import { FONT, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens'
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+import { HeroRoundPanel } from './HeroRoundPanel';
+import { heroDefaultRound, heroStartedRounds } from './heroRoundRules';
 
 interface Props {
   open: boolean;
