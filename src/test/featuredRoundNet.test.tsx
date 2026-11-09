@@ -10,11 +10,6 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-vi.mock('react-i18next', () => ({
-  initReactI18next: { type: '3rdParty', init: () => {} },
-  useTranslation: () => ({ t: (k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? k }),
-}));
-
 const h = vi.hoisted(() => ({ net: { netScore: 68, courseHandicap: -1 } as { netScore: number | null; courseHandicap: number | null } }));
 vi.mock('@/features/explore-magazine/useFeaturedRound', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/features/explore-magazine/useFeaturedRound')>()),
