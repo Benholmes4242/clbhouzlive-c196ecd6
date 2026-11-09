@@ -136,7 +136,10 @@ export function RoundShape({
   exploreDotCanvas?: string;
   /** Explore-only fill between the trace and level par while cumulative gross
    *  to-par is below zero. Defaults off for every shared consumer. */
-  underParFill?: boolean;
+  underParFill?: boolean;  /** BUILD Round scores §3 — Explore-only NET cumulative series, drawn in
+   *  place of shape.series by the exploreLineOnly branch when the round can
+   *  be netted. Absent for every shared caller, so nothing else moves. */
+  seriesOverride?: number[];
 
 }) {
   const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
