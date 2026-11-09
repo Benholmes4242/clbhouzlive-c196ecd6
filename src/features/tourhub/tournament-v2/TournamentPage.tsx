@@ -132,6 +132,10 @@ export function TournamentPage() {
   const selectedTeeRound=pulse.state==='upcoming'?teeRoundChoice:Math.min(4,(meta?.current_round??1)+1);
   const teeGroupsEnabled=pulse.state!=='completed'&&drawnRounds.includes(selectedTeeRound);
   const {data:teeGroups=[]}=useTeeTimesAll(tournamentId,selectedTeeRound,{enabled:teeGroupsEnabled});
+  /* HERO BLOCKS §1: the upcoming hero's FIRST TEE and field count always read
+     round 1, independent of the tee section's selected day; same query key as
+     the round-1 tee fetch, so no extra request when Thursday is selected. */
+  const {data:heroTeeGroups=[]}=useTeeTimesAll(tournamentId,1,{enabled:pulse.state==='upcoming'&&drawnRounds.includes(1)});
 
   // Course guide entry waits for the real RPC-backed section, then consumes
   // its landing once. Root scrolling stays owned by getScrollParent.
@@ -272,7 +276,7 @@ export function TournamentPage() {
         backFallback="/tourhub?tab=schedule"
       >
       <div className="tournament-v3" style={{fontFamily:FONT}}>
-        <TournamentHero nameRef={nameRef} meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl}/>
+        <TournamentHero nameRef={nameRef} meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl} firstTee={earliestTeeTime(heroTeeGroups)} drawnField={heroTeeGroups.length?new Set(heroTeeGroups.flatMap(g=>g.players.map(p=>p.id).filter(Boolean))).size:null}/>
         {pulse.state==='completed' && champion?.player && champion.score!=null && <ChampionStrip name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={score(champion.score)} scoreValue={champion.score} scoreLabel={runner?.score!=null?copy('by',{words:words(runner.score-champion.score).toUpperCase()}):undefined} narrativeParts={championNarrative(meta,leaderboardRows)}/>}
         {pulse.state==='completed' && strokeBoard && <RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
         <section id="the-act">
