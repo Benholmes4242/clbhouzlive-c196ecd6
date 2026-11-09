@@ -71,12 +71,19 @@ function applyFilter(q: any, filter: CourseFilter) {
   return q;
 }
 
-async function fetchCourses(search: string, country: string, filter: CourseFilter, page: number, pageSize: number) {
-  let q = supabase.from('golf_courses').select(COURSE_COLUMNS, { count: 'exact' });
+// Search is accent-folded server-side by search_course_ids (SEARCH_FOLD_V1);
+// an empty id list short-circuits without querying golf_courses.
+export async function fetchCourses(search: string, country: string, filter: CourseFilter, page: number, pageSize: number) {
+  let matchIds: string[] | null = null;
   if (search.trim()) {
     const s = search.trim();
-    q = q.or(`name.ilike.%${s}%,country.ilike.%${s}%,sub_country.ilike.%${s}%`);
+    const { data: idData, error: idError } = await (supabase.rpc as any)('search_course_ids', { p_query: s, p_limit: 200 });
+    if (idError) throw idError;
+    matchIds = ((idData ?? []) as any[]).map((r) => (typeof r === 'string' ? r : r?.id ?? r?.search_course_ids)).filter(Boolean);
+    if (matchIds.length === 0) return { courses: [] as AdminCourseRow[], total: 0 };
   }
+  let q = supabase.from('golf_courses').select(COURSE_COLUMNS, { count: 'exact' });
+  if (matchIds) q = q.in('id', matchIds);
   if (country && country !== 'all') q = q.eq('country', country);
   q = applyFilter(q, filter);
   q = q.order('name', { ascending: true });
