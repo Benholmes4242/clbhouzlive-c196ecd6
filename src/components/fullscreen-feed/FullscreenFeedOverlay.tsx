@@ -440,7 +440,7 @@ export function FullscreenFeedOverlay() {
       const ar = useMediaDims ? omw / omh : (o!.aspectRatio > 0 ? o!.aspectRatio : 0);
       const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
       const kind: 'video' | 'image' = o!.mediaType ?? 'image';
-      const resting = resolveRestingRect(mw, mh, vp, kind);
+      const resting = resolveViewerRect(mw, mh, vp, kind);
       setReverseClone({
         from: { top: resting.top, left: resting.left, width: resting.width, height: resting.height },
         to:   { top: o!.rect.top, left: o!.rect.left, width: o!.rect.width, height: o!.rect.height },
@@ -829,7 +829,7 @@ export function FullscreenFeedOverlay() {
           const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
           const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
           const kind: 'video' | 'image' = origin.mediaType ?? 'image';
-          const resting = resolveRestingRect(mw, mh, vp, kind);
+          const resting = resolveViewerRect(mw, mh, vp, kind);
           setTargetRect({
             top: resting.top,
             left: resting.left,
