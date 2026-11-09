@@ -58,7 +58,9 @@ describe('LikesSheet H.4 standing segment', () => {
     st.likers = [L('a'), L('b'), L('c')];
     st.famRows = [{ user_id: 'a', rounds: 4, best_gross: 78 }];
     st.legendRows = [{ user_id: 'b', rank: 1, value: 69 }];
-    const { container } = renderSheet({ authorName: 'Ben', courseId: 'c1', courseName: 'Royal X', kind: 'round', gross: 71, toPar: -1, rating: null });
+    /* RULING: the shared subject line shows NET now — the fixture carries
+       net 70 / netToPar −1 so the "−1" assertion proves the net to-par. */
+    const { container } = renderSheet({ authorName: 'Ben', courseId: 'c1', courseName: 'Royal X', kind: 'round', gross: 71, toPar: -1, net: 70, netToPar: -1, rating: null });
     await waitFor(() => expect(container.querySelectorAll('[data-liker-standing]').length).toBe(2));
     expect(st.rpcCalls).toHaveLength(1);
     expect(st.rpcCalls[0].args).toEqual({ p_user_ids: ['a', 'b', 'c'], p_course_id: 'c1' });

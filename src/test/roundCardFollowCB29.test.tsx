@@ -1,6 +1,7 @@
 import React from 'react';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
@@ -41,14 +42,18 @@ describe('CB29 follow control on round cards', () => {
 
   it('FeaturedRoundCard renders follow for another member and never opens the round on tap; absent on own round', () => {
     const onOpen = vi.fn(); const onFollow = vi.fn();
-    const v = render(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={onOpen} isFollowed={false} onFollow={onFollow} />);
+    /* Round scores §3 added the gam_round_net read (useQuery) — the harness
+       supplies a QueryClient; no assertion changes. */
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrap = (node: React.ReactElement) => <QueryClientProvider client={qc}>{node}</QueryClientProvider>;
+    const v = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={onOpen} isFollowed={false} onFollow={onFollow} />));
     const ctl = v.container.querySelector('[data-featured-band="true"] [data-featured-follow="true"] button');
     expect(ctl).not.toBeNull();
     fireEvent.click(ctl!);
     expect(onFollow).toHaveBeenCalledTimes(1);
     expect(onOpen).not.toHaveBeenCalled();
     v.unmount();
-    const own = render(<FeaturedRoundCard round={round} viewerId="author" onOpen={vi.fn()} isFollowed={false} onFollow={vi.fn()} />);
+    const own = render(wrap(<FeaturedRoundCard round={round} viewerId="author" onOpen={vi.fn()} isFollowed={false} onFollow={vi.fn()} />));
     expect(own.container.querySelector('[data-featured-follow]')).toBeNull();
   });
 });

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HoleMarks, HoleMarksKey } from '@/features/tourhub/leaderboard/BoardRound';
 import { BoardTable, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { PlayerAvatar } from '@/features/tourhub/components/PlayerAvatar';
@@ -111,10 +112,13 @@ describe('competition mark on round cards', () => {
   });
   it('FeaturedRoundCard shows COMP only on explicit true', () => {
     const round = { whs_score_id: 's1', user_id: 'u', display_name: 'Pat', photo_url: null, course_name: 'Sample', play_date: '2026-11-01', gross: 70, to_par: -2, vs_hcp: null, tier: 3, joint_count: 0, image_url: null } as never;
-    const on = render(<MemoryRouter><FeaturedRoundCard round={round} onOpen={() => {}} isCompetition /></MemoryRouter>);
+    /* Round scores §3 added the gam_round_net read (useQuery) — the harness
+       supplies a QueryClient; no assertion changes. */
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const on = render(<QueryClientProvider client={qc}><MemoryRouter><FeaturedRoundCard round={round} onOpen={() => {}} isCompetition /></MemoryRouter></QueryClientProvider>);
     expect(on.container.textContent).toMatch(/comp/i);
     cleanup();
-    const off = render(<MemoryRouter><FeaturedRoundCard round={round} onOpen={() => {}} /></MemoryRouter>);
+    const off = render(<QueryClientProvider client={qc}><MemoryRouter><FeaturedRoundCard round={round} onOpen={() => {}} /></MemoryRouter></QueryClientProvider>);
     expect(off.container.textContent).not.toMatch(/comp/i);
   });
 });

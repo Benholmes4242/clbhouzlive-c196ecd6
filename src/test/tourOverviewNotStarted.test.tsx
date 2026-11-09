@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import en from '../../public/locales/en/tourhub.json';
 import { tournamentHeadlineSegments } from '@/features/tourhub/overview/magazineCopy';
 import { earliestTeeTime, fieldHasStarted, rowHasStarted } from '@/features/tourhub/overview/boardStarted';
-import { formatTimeHm } from '@/i18n/format';
+import { formatTimeHm24 } from '@/i18n/format';
 
 const keys: string[] = [];
 const t = ((key: string, values?: Record<string, unknown>) => {
@@ -38,7 +38,8 @@ describe('live situation before anyone tees off', () => {
     const tee = '2026-10-29T13:00:00Z';
     const segs = tournamentHeadlineSegments({ tournament, state: live(1), leaderboard: field, t, firstTeeTime: tee });
     expect(lastKey()).toBe('overview.magazine.liveNotStartedTime');
-    expect(segs.find((s) => s.figure)?.text).toBe(formatTimeHm(tee));
+    /* RULING: every tour tee time is 24-hour — was formatTimeHm ("1:00 pm"). */
+    expect(segs.find((s) => s.figure)?.text).toBe(formatTimeHm24(tee));
   });
   it('without a tee time gives liveNotStarted', () => {
     tournamentHeadlineSegments({ tournament, state: live(1), leaderboard: field, t });

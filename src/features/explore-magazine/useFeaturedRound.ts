@@ -29,6 +29,36 @@ export interface FeaturedRound { whs_score_id: string; user_id: string;
   /** Home feed hero only (reason birdie_run): longest run of birdies. */
   birdie_run?: number | null; }
 
+/**
+ * RULING (Round scores §3) — the featured hero's net facts come from
+ * public.gam_round_net: ONE single-row read keyed on whs_score_id, the same
+ * FN1 source useCommentsContext uses (get_featured_round returns net_score
+ * but no course handicap). No row = the round cannot be netted: the hero
+ * draws no to-par figure, no trace and no NET cell — never a gross
+ * substitute. No RPC or migration change.
+ */
+export function useFeaturedRoundNet(whsScoreId: string | null | undefined) {
+  return useQuery<{ netScore: number | null; courseHandicap: number | null }>({
+    queryKey: ['featured-round-net', whsScoreId ?? null],
+    enabled: !!whsScoreId,
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('gam_round_net' as never)
+        .select('net_score, course_handicap')
+        .eq('whs_score_id', whsScoreId as string)
+        .maybeSingle();
+      const row = data as { net_score?: unknown; course_handicap?: unknown } | null;
+      return {
+        netScore: typeof row?.net_score === 'number' ? row.net_score : null,
+        courseHandicap: typeof row?.course_handicap === 'number' ? row.course_handicap : null,
+      };
+    },
+  });
+}
+
 export function useFeaturedRound(
   viewerId: string | undefined,
   scope: string,

@@ -10,6 +10,15 @@
  * GOLD, NEVER AMBER, ON THE FRAME. Gold means a rare achievement (eagle chips,
  * ace ring). Amber means the viewing member, so on the viewer's own round only
  * the NAME turns amber and reads "You".
+ *
+ * ROUND SCORES §3 (ruling) — the hero is on NET everywhere it renders (Home
+ * round of the week via FeedCard/HomeRail, Explore featured round): the big
+ * to-par figure is NET to par (net_score − course_par, existing under-par
+ * colours), the photo trace is the FN1 net line (feedStrokesReceived →
+ * feedNetSeries) or is not drawn, and the stat row is FN1.5 (NET with to-par,
+ * GROSS with to-par, HANDICAP, AWARDS). Net facts come from one single-row
+ * gam_round_net read (useFeaturedRoundNet); no row = no figure, no line, no
+ * NET cell. Figure, line end and NET cell agree by construction.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +43,9 @@ import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
+import { useFeaturedRoundNet } from './useFeaturedRound';
+import { feedStrokesReceived, feedNetSeries } from '@/components/feed/roundTilePlot';
+import { formatDisplayedHcp } from '@/lib/whs/format';
 import { goodHoleDots, SCORE_TRACE_PLOT_HEIGHT } from './roundTreatment';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
@@ -70,7 +82,7 @@ const UNIT_FIT: React.CSSProperties = { minWidth: 0, overflow: 'hidden', textOve
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
 const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n));
 
-function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
+function Headline({ r, unit, netToPar }: { r: FeaturedRound; unit?: string | null; netToPar: number | null }) {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const feat = (text: string) => <span style={BIG_WORD}>{text}</span>;
@@ -89,8 +101,9 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
       return (
         <span style={{ ...ROW, gap: 8 }}>
           <span style={{ ...BIG, flex: '0 0 auto' }}>{r.gross}</span>
-          {r.to_par != null && r.to_par < 0 ? (
-            <span style={{ flex: '0 0 auto', fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(r.to_par)}</span>
+          {/* Round scores §3 — the to-par figure is NET to par; no net row, no figure. */}
+          {netToPar != null && netToPar < 0 ? (
+            <span style={{ flex: '0 0 auto', fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(netToPar)}</span>
           ) : null}
           {unit ? <span style={{ ...UNIT, ...UNIT_FIT, marginLeft: 2 }}>{unit}</span> : null}
         </span>
@@ -99,7 +112,9 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
       if (r.reason === 'birdie_run') return <span style={BIG}>{k('birdieRun', { count: r.birdie_run })}</span>;
       if (r.reason === 'eagle_brace') return <span style={BIG}>{k('eagleBrace', { count: r.eagles })}</span>;
       if (r.reason === 'stableford_45') return points(r.stableford);
-      return <span style={{ ...BIG, color: TOPAR_UNDER_DARK }}>{toPar(r.to_par)}</span>;
+      /* Round scores §3 — the big to-par figure is NET to par; no net row,
+         no figure (never the gross to-par). */
+      return netToPar != null ? <span style={{ ...BIG, color: TOPAR_UNDER_DARK }}>{toPar(netToPar)}</span> : null;
     case 4:
       if (r.reason === 'stableford_40') return points(r.stableford);
       if (r.reason === 'birdie_haul')
@@ -162,7 +177,19 @@ export const FeaturedRoundCard: React.FC<{
   const grossSuffix = tp
     ? <span style={{ ...FIG, color: (r.to_par ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{tp}</span>
     : null;
-  const vsHcp = r.vs_hcp == null ? '' : r.vs_hcp === 0 ? 'Level' : signed(r.vs_hcp);
+  /* Round scores §3 — FN1 net facts from gam_round_net (one single-row read
+     keyed on whs_score_id). No row = no figure, no trace, no NET cell;
+     GROSS, HANDICAP (if known) and AWARDS still show. Never gross for net. */
+  const netRow = useFeaturedRoundNet(r.whs_score_id).data;
+  const netScore = netRow?.netScore ?? null;
+  const courseHcp = netRow?.courseHandicap ?? null;
+  const nettable = netScore != null && courseHcp != null && r.course_par != null;
+  const netToPar = nettable ? netScore! - r.course_par! : null;
+  const netToParSuffix = netToPar != null
+    ? <span style={{ ...FIG, color: netToPar < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{toPar(netToPar)}</span>
+    : null;
+  const received = feedStrokesReceived(shape, courseHcp);
+  const netSeries = shape && received ? feedNetSeries(shape, received) : null;
   const mGold = medals?.gold ?? 0, mSilver = medals?.silver ?? 0, mBronze = medals?.bronze ?? 0;
   const traceRow = { round_id: r.whs_score_id, front_nine_to_par: null, back_nine_to_par: null } as unknown as CircleRoundRow;
   const dots = goodHoleDots(shape);
@@ -193,15 +220,17 @@ export const FeaturedRoundCard: React.FC<{
           {pillLabel ?? k('label')}
         </span>
         <div style={{ flex: '0 0 44px' }} />
-        <div aria-hidden="true" style={{ position: 'relative', flex: '1 1 auto', minHeight: shape ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
-          {shape ? (
+        <div aria-hidden="true" data-round-trace={shape && netSeries ? 'net' : 'none'} style={{ position: 'relative', flex: '1 1 auto', minHeight: shape && netSeries ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
+          {shape && netSeries ? (
+            /* Round scores §3 — the line on the photo is the NET line (the
+               FN1 helper's per-hole allowance), or it is not drawn. Never gross. */
             <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SCORE_TRACE_PLOT_HEIGHT}
               showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2}
-              exploreLineOnly endLabels exploreGlow exploreDots={dots} underParFill />
+              exploreLineOnly seriesOverride={netSeries} endLabels exploreGlow exploreDots={dots} underParFill />
           ) : null}
         </div>
         <div style={{ position: 'relative', padding: '0 16px 16px', textShadow: TEXT_SHADOW }}>
-          <Headline r={r} unit={unit} />
+          <Headline r={r} unit={unit} netToPar={netToPar} />
         </div>
       </div>
       <div data-featured-band="true" style={{ background: A.PANEL, padding: '13px 16px 14px' }}>
@@ -237,10 +266,11 @@ export const FeaturedRoundCard: React.FC<{
             </span>
           ) : null}
         </div>
+        {/* Round scores §3 — FN1.5: NET (to-par), GROSS (to-par), HANDICAP, AWARDS. */}
         <div style={{ marginTop: 11, paddingTop: 11, borderTop: `1px solid ${A.SOFT}`, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')} value={nettable ? String(netScore) : ''} suffix={nettable ? netToParSuffix : null} />
           <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')} value={r.gross != null ? String(r.gross) : ''} suffix={grossSuffix} />
-          <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')} value={r.net_score != null ? String(r.net_score) : ''} />
-          <FigureCell minHeight={34} label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHcp} under={(r.vs_hcp ?? 0) < 0} />
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.handicap', 'HANDICAP')} value={nettable ? formatDisplayedHcp(Math.round(courseHcp!)) : ''} />
           {mGold + mSilver + mBronze > 0 ? (
             <FigureCell minHeight={34} label={t('amateur.stream.stat.awards', 'AWARDS')}
               value={<AwardCluster gold={mGold} silver={mSilver} bronze={mBronze} scale="row" surfaceColor={A.PANEL} />} />
