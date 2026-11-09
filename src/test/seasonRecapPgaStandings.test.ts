@@ -48,7 +48,6 @@ describe('PGA recap standings from sr_player_statistics', () => {
     expect(await freshPgaStandings(null, '2026-08-24')).toBeNull();
     expect(calls).toHaveLength(0);
   });
-  });
 });
 
 describe('ruling 2: snapshots are not a recap source', () => {
