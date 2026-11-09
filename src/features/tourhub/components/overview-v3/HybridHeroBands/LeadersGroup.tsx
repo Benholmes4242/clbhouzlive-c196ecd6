@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { formatTimeHm, formatWeekdayShort } from '@/i18n/format';
+import { formatTimeHm24, formatWeekdayShort } from '@/i18n/format';
 import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../../leaderboard/ScorecardSheet';
 import { useTeeTimesAll, type TeeGroup } from '../../../tournament-v2/data/useTeeTimesAll';
@@ -51,7 +51,7 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
   const state = groupState(group, entries, round);
   const note = leadersNote(otherLeaders(group, allLeaders(entries), groups));
   const stateKey = state === 'onCourse' ? 'onCourse' : state === 'finished' ? 'finished' : 'teesOff';
-  const stateText = state === 'before' ? t('overview.leadersGroup.teesOff', { day: formatWeekdayShort(group.teeTime), time: formatTimeHm(group.teeTime) }) : t(`overview.leadersGroup.${stateKey}`);
+  const stateText = state === 'before' ? t('overview.leadersGroup.teesOff', { day: formatWeekdayShort(group.teeTime), time: formatTimeHm24(group.teeTime) }) : t(`overview.leadersGroup.${stateKey}`);
   const scoreColor = (v: number | null | undefined) => v != null && v < 0 ? L.under : L.ink;
   const named = note?.names ?? [];
   const namesMarkup = named.map((name, i) => <span key={`${name}-${i}`}><span style={{ color: L.ink, fontWeight: 600 }}>{name}</span>{i < named.length - 2 ? ', ' : i === named.length - 2 ? t('overview.leadersGroup.and') : ''}</span>);

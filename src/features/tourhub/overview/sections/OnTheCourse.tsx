@@ -32,7 +32,7 @@ import { todayFromEntry } from '../../leaderboard/BoardTable';
 
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { SPACE } from '@/lib/spacing';
-import { formatTimeHm } from '@/i18n/format';
+import { formatTimeHm24 } from '@/i18n/format';
 import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 
@@ -159,7 +159,7 @@ function groupThru(g: GroupShape): number | null {
 
 function formatTeeTime(iso: string | undefined): string {
   if (!iso) return '';
-  return formatTimeHm(new Date(iso)).toUpperCase();
+  return formatTimeHm24(new Date(iso));
 }
 
 /** Dedupe key: tee_time + sorted player names joined. */

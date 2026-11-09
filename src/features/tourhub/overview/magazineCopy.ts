@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import type { HeroTournament } from '../hooks/useHeroCarouselData';
 import type { HeroState } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
-import { formatTimeHm } from '@/i18n/format';
+import { formatTimeHm24 } from '@/i18n/format';
 import { rowHasStarted } from './boardStarted';
 
 type BoardEntry = {
@@ -126,7 +126,7 @@ function headlineSpec({ tournament, state, leaderboard, t, closingRound, firstTe
   if (state.kind === 'live') {
     // Nobody has a hole recorded: say when play begins, never a tie at level.
     if (!leaderboard.some(rowHasStarted)) {
-      const time = firstTeeTime ? formatTimeHm(firstTeeTime) : '';
+      const time = firstTeeTime ? formatTimeHm24(firstTeeTime) : '';
       return time
         ? spec('overview.magazine.liveNotStartedTime', { time }, ['time'])
         : spec('overview.magazine.liveNotStarted');
