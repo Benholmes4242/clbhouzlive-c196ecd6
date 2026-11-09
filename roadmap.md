@@ -1,5 +1,10 @@
 # Roadmap
 
+## CURRENT_SEASON_EVENT_GATE
+- [ ] Gate season resolution to stroke/team; align season rankings and followed fallback; mirror EURO year rule in scraper and deploy.
+- [ ] Add regression coverage; run four separate two-worker shards against 7,898 baseline.
+- [ ] Report six tours at five mocked dates, DP World fallback and Skins Game decision paths; no exclusions or scheduling.
+
 ## UPCOMING_OVERVIEW_PLUS
 - [x] Tour buttons shard4 1931/1931; combined reported7816; actual PhotoBand/RailChips320/390/430 no overflow. See TOUR_BUTTONS_REPORT.md for chronology and live-device limitations.
 - [x] Implement countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.

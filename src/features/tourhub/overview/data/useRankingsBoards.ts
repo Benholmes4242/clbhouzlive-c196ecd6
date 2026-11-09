@@ -6,12 +6,15 @@
  *        'livpts' -> tour_season_rankings (tour_code = 'liv')
  *        'kft'    -> tour_season_rankings (tour_code = 'pgad')
  * These chips are independent from the hero tour picker.
+ * Season boards and followed rows share the date-resolved list year. A prior
+ * year's fallback never prints events-left for a different season.
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { currentSeasonYear } from '../../_shared/stats/useLeaderCategories';
 import { supabase } from '@/integrations/supabase/client';
 import { movementFrom } from '../../_shared/movement';
+import { currentSeasonFor } from '../../_shared/currentSeason';
 
 /**
  * Each id names the SOURCE, not a marketing name. 'cme' was called 'rolex' until
@@ -35,8 +38,7 @@ export interface RankingsRow {
   top10s: number | null;
 }
 
-/* Season resolution: currentSeasonYear() in _shared/stats/useLeaderCategories
-   is the ONE definition. This file had an identical local copy; it is gone. */
+/* OWGR stats retain currentSeasonYear(); season lists use currentSeasonFor(). */
 
 /**
  * Wins / top-10s are NOT on sr_world_rankings — that table carries points and
@@ -209,8 +211,8 @@ const SEASON_SR_TOUR: Record<'euro' | 'lpga' | 'liv' | 'pgad', string> = {
  * (the same year the board read uses) whose status is scheduled or created —
  * i.e. not yet played. Any read failure -> null and the clause is omitted.
  */
-async function countEventsLeft(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Promise<number | null> {
-  const year = new Date().getFullYear();
+export async function countEventsLeft(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad', resolvedYear?: number): Promise<number | null> {
+  const year = resolvedYear ?? (await currentSeasonFor(tourCode))?.year ?? new Date().getFullYear();
   const { data: seasons, error: sErr } = await supabase
     .from('sr_seasons')
     .select('id')
@@ -223,15 +225,25 @@ async function countEventsLeft(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Prom
     .from('sr_tournaments')
     .select('id', { count: 'exact', head: true })
     .in('season_id', seasonIds)
+    .in('event_type', ['stroke', 'team'])
     .in('status', ['scheduled', 'created']);
   if (tErr || count == null) return null;
   return count;
 }
 
-async function fetchSeasonBoard(
+/** Shared list-year probe: absence of a followed player is NOT an empty list. */
+export async function seasonRankingYear(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Promise<{ year: number; fallback: boolean }> {
+  const year = (await currentSeasonFor(tourCode))?.year ?? new Date().getFullYear();
+  const { data, error } = await supabase.from('tour_season_rankings' as any)
+    .select('position').eq('tour_code', tourCode).eq('season_year', year).limit(1);
+  if (error) throw error;
+  return { year: data?.length ? year : year - 1, fallback: !data?.length };
+}
+
+export async function fetchSeasonBoard(
   tourCode: 'euro' | 'lpga' | 'liv' | 'pgad',
 ): Promise<RankingsBoardResult> {
-  const year = new Date().getFullYear();
+  const { year, fallback } = await seasonRankingYear(tourCode);
   const { data, error } = await supabase
     .from('tour_season_rankings' as any)
     .select('position, position_change, points, player_name, country, player_id, manual_player_id, wins')
@@ -276,7 +288,7 @@ async function fetchSeasonBoard(
     comparisonDate: null,
     latestDate: null,
     comparisonRanks: null,
-    eventsLeft: await countEventsLeft(tourCode),
+    eventsLeft: fallback ? null : await countEventsLeft(tourCode, year),
     rows: rows.map((r) => {
       const pid = r.player_id ?? r.manual_player_id ?? null;
       const joined = pid ? playerMap.get(pid) : null;
