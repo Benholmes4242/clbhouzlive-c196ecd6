@@ -196,6 +196,10 @@ export interface SeasonEvent {
   endDate: string;
   status: string;
   state: EventState;
+  /** The season year this event belongs to (from its sr_seasons join). */
+  seasonYear?: number | null;
+  /** True when the event sits in the CURRENT season (currentSeasonFor). */
+  inCurrentSeason?: boolean;
   isMajor: boolean;
   isPlayoff: boolean;
   isThisWeek: boolean;
@@ -241,9 +245,12 @@ export interface SeasonTimeline {
   seasonName: string | null;
   seasonYear: number | null;
   weeks: WeekGroup[];
+  /** CURRENT season's event count — never the merged list's length. */
   totalEvents: number;
   currentEventNumber: number | null; // 1-based; null when no anchor
   anchorEventId: string | null; // this-week row, else next upcoming
+  /** Previous/current/next season summaries, oldest first (single-tour only). */
+  seasons?: SeasonSpan[];
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -293,7 +300,19 @@ export function useSeasonTimeline(
       }
       // Default to the current season by date, not the newest year (next season loads early).
       const current = await currentSeasonFor(tour).catch(() => null);
-      return probeAndFetchTournaments(tour, currentFirst(candidates, current?.id));
+      const found = await probeAndFetchTournaments(tour, currentFirst(candidates, current?.id));
+      /* SCHEDULE ACROSS SEASONS: the list runs previous → current → next.
+         The neighbouring years are fetched when their season rows exist;
+         a year with no rows simply doesn't appear. */
+      const year = found.season?.year ?? current?.year ?? null;
+      if (year == null) return found;
+      const [prevRows, nextRows] = await Promise.all([
+        fetchYearRows(candidates, year - 1),
+        fetchYearRows(candidates, year + 1),
+      ]);
+      const seen = new Set(found.rows.map((r) => r.id));
+      const extra = [...prevRows, ...nextRows].filter((r) => !seen.has(r.id));
+      return { season: found.season, rows: [...found.rows, ...extra] };
     },
   });
 
