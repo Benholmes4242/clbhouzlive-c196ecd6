@@ -33,7 +33,7 @@ import {
 } from './tokens';
 
 export type ScoreTheme = 'light' | 'dark';
-export type ScoreEmphasis = 'standard' | 'leader';
+export type ScoreEmphasis = 'standard' | 'leader' | 'ink-neutral';
 
 /**
  * Get the colour for a score-to-par value.
@@ -47,6 +47,10 @@ export function getScoreColor(
   theme: ScoreTheme,
   emphasis: ScoreEmphasis = 'standard',
 ): string {
+  // Opt-in completed figures keep even/over-par ink without changing other boards.
+  if (emphasis === 'ink-neutral' && score != null && score >= 0) {
+    return theme === 'light' ? TOPAR_OVER_LIGHT : INK;
+  }
   if (score == null || score === 0) {
     return theme === 'light' ? TOPAR_EVEN_LIGHT : TOPAR_EVEN_DARK;
   }

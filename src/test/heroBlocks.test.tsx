@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
-import { upcomingFactCells } from '@/features/tourhub/components/overview-v3/UpcomingOverviewSections';
+import { upcomingFactCells, UpcomingFacts } from '@/features/tourhub/components/overview-v3/UpcomingOverviewSections';
 import { heroStartDayForm, startWeekday } from '@/features/tourhub/tournament-v2/data/tournamentRules';
 import { LastYearRow } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LastYearRow';
 
@@ -77,6 +77,21 @@ describe('one upcoming block on both pages', () => {
   it('the tournament page upcoming phase uses the overview LAST YEAR block', () => {
     expect(page).toContain('<UpcomingLastYear rows={lastYear??[]}/>');
     expect(page).not.toContain('<LastYearSection');
+  });
+});
+
+describe('upcoming completed rhythm', () => {
+  it('shared THE EVENT band uses board TOT figures for both page callers', () => {
+    const { container } = render(<UpcomingFacts first={first} zone={zone} field={132} purse={3000000} par={71} yards={6860} startDayNamed />);
+    expect(container.querySelector('[data-overview-event] h2')).not.toBeNull();
+    for (const value of container.querySelectorAll('[data-upcoming-fact] b')) expect(value).toHaveStyle({ fontSize: '15px', fontWeight: '700' });
+  });
+  it('all upcoming seams reference the shared completed tokens', () => {
+    const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
+    expect(css).toContain('.upcoming-event-facts{margin-top:var(--hero-content-gap)}');
+    expect(css).toContain('.upcoming-history{padding-top:var(--hero-section-gap)}');
+    expect(css).toContain('padding-top:calc(var(--hero-section-gap) - 2px)');
+    expect(css).toContain('[data-overview-last-year]+.tv-section[data-tv-section="course"]{padding-top:var(--hero-section-gap)}');
   });
 });
 

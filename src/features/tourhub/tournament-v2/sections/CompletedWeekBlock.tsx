@@ -13,19 +13,18 @@ import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { copy, score } from '../data/tournamentRules';
 import { holeTypeCells, holeTypeHeading, pathCells, topThreeRows, weekCells, type FactCell, type WeekFacts } from '../data/weekFactsRules';
 import { HERO_POS_TYPE, HERO_TOT_TYPE } from './HeroBoardRows';
+import { getScoreColor } from '../../_shared/scoreColor';
 import './heroRoundPanel.css';
 import './completedWeek.css';
 
-const u = (n: number | null | undefined) => (n != null && n < 0 ? 'cw-u' : '');
-
 function Cell({ c }: { c: FactCell }) {
+  const color = getScoreColor(c.toPar ?? 0, 'dark', 'ink-neutral');
   return (
     <div className="cw-cell" data-cw-cell={c.key}>
-      <b style={HERO_TOT_TYPE} className={c.pos ? '' : c.under ? 'cw-u' : ''}>
-        {c.pos ? <><i style={HERO_POS_TYPE}>{c.pos}</i><strong className={c.under ? 'cw-u' : ''} style={{ fontWeight: 'inherit' }}>{c.value}</strong></> : c.value}
+      <b style={{ ...HERO_TOT_TYPE, color }}>
+        {c.pos ? <><i style={HERO_POS_TYPE}>{c.pos}</i><strong style={{ fontWeight: 'inherit', color }}>{c.value}</strong></> : c.value}
       </b>
-      <span>{c.label}</span>
-      {c.sub ? <em>{c.sub}</em> : null}
+      <span data-long-label={c.longLabel || undefined}>{c.label}</span>
     </div>
   );
 }
@@ -53,8 +52,8 @@ export function CompletedWeekBlock({ facts, rows, onFullBoard }: { facts: WeekFa
           <div className="cw-lr" key={r.id} data-cw-top-row>
             <span className="cw-p" style={HERO_POS_TYPE}>{r.winner ? <Trophy size={13} className="recap-trophy" aria-hidden /> : r.pos}</span>
             <span className="cw-n">{r.name}</span>
-            <span className={`cw-r ${u(r.last)}`}>{r.last == null ? '' : score(r.last)}</span>
-            <span className={`cw-v ${u(r.total)}`} style={HERO_TOT_TYPE}>{r.total == null ? '' : score(r.total)}</span>
+            <span className="cw-r" style={{ color: getScoreColor(r.last, 'dark', 'ink-neutral') }}>{r.last == null ? '' : score(r.last)}</span>
+            <span className="cw-v" style={{ ...HERO_TOT_TYPE, color: getScoreColor(r.total, 'dark', 'ink-neutral') }}>{r.total == null ? '' : score(r.total)}</span>
           </div>
         ))}
       </> : null}

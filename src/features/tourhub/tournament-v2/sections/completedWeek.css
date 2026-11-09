@@ -1,20 +1,18 @@
-/* COMPLETED STATE (signed-off completed-state.html). No dividers anywhere;
-   centred cells; figures take the board's TOT/POS styles inline. */
-.cw-block{--cw-side:20px;--cw-ink:#F8FAFC;--cw-mute:rgba(248,250,252,.62);--cw-dim:rgba(248,250,252,.42);--cw-under:#E24B3F;color:var(--cw-ink)}
-.cw-kick{margin:0;padding:16px var(--cw-side) 0;font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--cw-mute);line-height:1.4}
+/* Tour hero rhythm is shared by upcoming/completed; no added seam padding.
+   Figures use board TOT/POS; completed cells have exactly two lines. */
+:root{--hero-section-gap:16px;--hero-content-gap:9px;--hero-table-gap:8px;--hero-label-gap:4px;--hero-label-tracking:.1em;--hero-cell-line:18px;--hero-cell-pad:0 2px;--cw-ink:#F8FAFC;--cw-mute:rgba(248,250,252,.62);--cw-dim:rgba(248,250,252,.42)}
+.cw-block{--cw-side:20px;color:var(--cw-ink)}
+.cw-kick{margin:0;padding:var(--hero-section-gap) var(--cw-side) 0;font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--cw-mute);line-height:1.4}
 .cw-sub{margin:0;padding:13px var(--cw-side) 0;font-size:9.5px;font-weight:800;letter-spacing:.14em;color:var(--cw-dim);line-height:1.4}
-.cw-figs{display:grid;grid-template-columns:repeat(var(--cw-n),minmax(0,1fr));margin:9px var(--cw-side) 0}
-.cw-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));row-gap:11px;margin:9px var(--cw-side) 0}
-.cw-cell{padding:2px;min-width:0;text-align:center}
-.cw-cell b{display:block;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--cw-ink)}
-.cw-figs.cw-path b{line-height:18px}
+.cw-figs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));row-gap:12px;margin:var(--hero-content-gap) var(--cw-side) 0}
+.cw-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));row-gap:12px;margin:var(--hero-content-gap) var(--cw-side) 0}
+.cw-cell{padding:var(--hero-cell-pad);min-width:0;text-align:center}
+.cw-cell b{display:block;line-height:var(--hero-cell-line);white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--cw-ink)}
 .cw-cell b i{font-style:normal;color:var(--cw-ink);margin-right:6px}
-.cw-cell b .cw-u,.cw-cell b.cw-u{color:var(--cw-under)}
-.cw-cell span{display:block;margin-top:4px;font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--cw-dim);white-space:nowrap}
-.cw-cell em{display:block;margin-top:2px;font-style:normal;font-size:11.5px;font-weight:600;color:var(--cw-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cw-grid .cw-cell em{padding:0 4px}
+.cw-cell span{display:block;margin-top:var(--hero-label-gap);font-size:9.5px;font-weight:800;letter-spacing:var(--hero-label-tracking);line-height:13px;color:var(--cw-dim);white-space:nowrap}
+.cw-cell span[data-long-label]{overflow:hidden;text-overflow:ellipsis}
 .cw-lh,.cw-lr{display:grid;grid-template-columns:28px minmax(0,1fr) 40px 48px;column-gap:4px;align-items:center;padding:0 var(--cw-side)}
-.cw-lh{margin-top:8px;min-height:24px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--cw-mute)}
+.cw-lh{margin-top:var(--hero-table-gap);min-height:24px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--cw-mute)}
 .cw-lh span:nth-child(n+3){text-align:right}
 .cw-lr{min-height:31px}
 .cw-lr .cw-p{color:var(--cw-ink)}
@@ -23,6 +21,7 @@
 .cw-lr .cw-v{text-align:right;font-variant-numeric:tabular-nums}
 .cw-block .hero-expand-board{background:transparent!important;padding-top:0!important}
 .cw-block .hero-full-leaderboard{margin-top:12px!important}
-@media(max-width:340px){.cw-block{--cw-side:16px}}
+@media(max-width:340px){:root{--hero-label-tracking:.04em;--hero-cell-pad:0 1px}.cw-block{--cw-side:16px}}
+.tv-section[data-tv-section="completed-week"]{padding:0}
 /* PLAYOFF reads in ink, as the signed-off champion block. */
 .tv-champion-score small[data-playoff]{color:var(--cw-ink,#F8FAFC)}

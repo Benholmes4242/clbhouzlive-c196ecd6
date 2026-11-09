@@ -48,64 +48,64 @@ const ABU: WeekFacts = {
   hardest: { hole: 9, par: 4, avg_to_par: 0.16 }, easiest: { hole: 2, par: 5, avg_to_par: -0.54 },
 };
 
-const flat = (cells: ReturnType<typeof pathCells>) => cells.map((c) => [c.pos ?? '', c.value, c.label, c.sub]);
+const flat = (cells: ReturnType<typeof pathCells>) => cells.map((c) => [c.pos ?? '', c.value, c.label]);
 
 describe('completed state — HOW IT WAS WON', () => {
   it('WWT path', () => {
     expect(flat(pathCells(WWT))).toEqual([
-      ['T9', '−6', 'AFTER R1', '3 back'], ['T6', '−10', 'AFTER R2', '5 back'],
-      ['T9', '−14', 'AFTER R3', '7 back'], ['', '−23', 'FINAL', 'Won · Playoff'],
+      ['T9', '−6', 'R1 · 3 BACK'], ['T6', '−10', 'R2 · 5 BACK'],
+      ['T9', '−14', 'R3 · 7 BACK'], ['', '−23', 'FINAL'],
     ]);
   });
   it('Abu Dhabi path: Level, Led by and Won by two', () => {
     expect(flat(pathCells(ABU))).toEqual([
-      ['T2', '−7', 'AFTER R1', '3 back'], ['T1', '−12', 'AFTER R2', 'Level'],
-      ['1', '−18', 'AFTER R3', 'Led by 1'], ['', '−23', 'FINAL', 'Won by two'],
+      ['T2', '−7', 'R1 · 3 BACK'], ['T1', '−12', 'R2 · LEVEL'],
+      ['1', '−18', 'R3 · LED BY 1'], ['', '−23', 'FINAL'],
     ]);
   });
   it('three-round event gives AFTER R1, AFTER R2, FINAL', () => {
     const f = { ...ABU, rounds: 3, path: ABU.path.slice(0, 3) };
-    expect(pathCells(f).map((c) => c.label)).toEqual(['AFTER R1', 'AFTER R2', 'FINAL']);
+    expect(pathCells(f).map((c) => c.label)).toEqual(['R1 · 3 BACK', 'R2 · LEVEL', 'FINAL']);
   });
 });
 
 describe('completed state — HOLE TYPE', () => {
   it('WWT values and ranks', () => {
     expect(holeTypeHeading(WWT)).toBe('BROWN ON EACH HOLE TYPE');
-    expect(holeTypeCells(WWT)!.map((c) => [c.value, c.label, c.sub])).toEqual([
-      ['E', 'PAR 3s', 'T52 in field'], ['−8', 'PAR 4s', 'T4 in field'], ['−15', 'PAR 5s', 'Best in field'],
+    expect(holeTypeCells(WWT)?.map((c) => [c.value, c.label])).toEqual([
+      ['E', 'PAR 3s · T52'], ['−8', 'PAR 4s · T4'], ['−15', 'PAR 5s · BEST'],
     ]);
   });
   it('Abu Dhabi ranks', () => {
-    expect(holeTypeCells(ABU)!.map((c) => [c.value, c.sub])).toEqual([['−2', 'T5 in field'], ['−9', '4 in field'], ['−12', 'T3 in field']]);
+    expect(holeTypeCells(ABU)?.map((c) => [c.value, c.label])).toEqual([['−2', 'PAR 3s · T5'], ['−9', 'PAR 4s · 4'], ['−12', 'PAR 5s · T3']]);
   });
   it('tied at the top reads T1, and null hole types hide the row', () => {
-    expect(holeTypeCells({ ...WWT, hole_types: [{ par: 5, to_par: -15, rank: 1, tied: true, field: 75 }] })![0]!.sub).toBe('T1 in field');
+    expect(holeTypeCells({ ...WWT, hole_types: [{ par: 5, to_par: -15, rank: 1, tied: true, field: 75 }] })?.[0]?.label).toBe('PAR 5s · T1');
     expect(holeTypeCells({ ...WWT, hole_types: null })).toBeNull();
   });
 });
 
 describe('completed state — THE WEEK', () => {
-  const week = (f: WeekFacts) => weekCells(f).map((c) => [c.value, c.label, c.sub]);
+  const week = (f: WeekFacts) => weekCells(f).map((c) => [c.pos ? `${c.pos} ${c.value}` : c.value, c.label]);
   it('WWT six cells in order', () => {
     expect(week(WWT)).toEqual([
-      ['63', 'LOW ROUND', '5 players'], ['30', 'MOST BIRDIES', 'Kim'], ['69.7', 'FIELD AVG', 'Par 72'],
-      ['−5', 'CUT', '75 made it'], ['4th', 'HARDEST', '+0.22 · Par 4'], ['1st', 'EASIEST', '−0.73 · Par 5'],
+      ['63', 'LOW · 5 PLAYERS'], ['30', 'BIRDIES · KIM'], ['69.7', 'AVG · PAR 72'],
+      ['−5', 'CUT · 75 MADE IT'], ['4th +0.22', 'HARDEST'], ['1st −0.73', 'EASIEST'],
     ]);
-    expect(weekCells(WWT).find((c) => c.key === 'cut')!.under).toBe(true);
+    expect(weekCells(WWT).find((c) => c.key === 'cut')?.under).toBe(true);
   });
   it('Abu Dhabi: no cut becomes FIELD', () => {
     expect(week(ABU)).toEqual([
-      ['62', 'LOW ROUND', 'Laporta'], ['29', 'MOST BIRDIES', 'McIlroy'], ['70.3', 'FIELD AVG', 'Par 72'],
-      ['70', 'FIELD', 'No cut'], ['9th', 'HARDEST', '+0.16 · Par 4'], ['2nd', 'EASIEST', '−0.54 · Par 5'],
+      ['62', 'LOW · LAPORTA'], ['29', 'BIRDIES · MCILROY'], ['70.3', 'AVG · PAR 72'],
+      ['70', 'FIELD · NO CUT'], ['9th +0.16', 'HARDEST'], ['2nd −0.54', 'EASIEST'],
     ]);
   });
   it('missing hole statistics drop HARDEST and EASIEST', () => {
     expect(weekCells({ ...WWT, hardest: null, easiest: null }).map((c) => c.key)).toEqual(['low', 'birdies', 'avg', 'cut']);
   });
   it('sub-lines starting with a word start with a capital', () => {
-    const subs = [WWT, ABU].flatMap((f) => [...pathCells(f), ...holeTypeCells(f)!, ...weekCells(f)].map((c) => c.sub)).filter(Boolean);
-    for (const s of subs) if (/^[a-z]/i.test(s)) expect(s[0]).toBe(s[0]!.toUpperCase());
+    const labels = [WWT, ABU].flatMap((f) => [...pathCells(f), ...(holeTypeCells(f) ?? []), ...weekCells(f)].map((c) => c.label));
+    for (const s of labels) if (/^[a-z]/i.test(s)) expect(s[0]).toBe(s[0]?.toUpperCase());
   });
 });
 
@@ -148,5 +148,22 @@ describe('championNarrative — no repeated final round', () => {
     const meta = { winner_id: 'w', venue_par: 72, start_date: '2026-01-15' } as TournamentMeta;
     const text = championNarrative(meta, [W, O]).map((p) => p.text).join('');
     expect(text).toBe('Took the lead on Saturday with a 66, and went two clear with a 67 on Sunday.');
+  });
+});
+
+describe('two-line completed figures', () => {
+  it('contains no separate sub-line or 11.5px style', () => {
+    const { container } = render(<CompletedWeekBlock facts={WWT} rows={[]} />);
+    expect(container.querySelectorAll('[data-cw-cell] em')).toHaveLength(0);
+    expect(readFileSync('src/features/tourhub/tournament-v2/sections/completedWeek.css', 'utf8')).not.toContain('11.5px');
+    for (const cell of container.querySelectorAll('[data-cw-cell]')) expect(cell.children).toHaveLength(2);
+  });
+  it('uses the shared score helper for negative, even and positive top-three values', async () => {
+    const { getScoreColor } = await import('@/features/tourhub/_shared/scoreColor');
+    const { container } = render(<CompletedWeekBlock facts={WWT} rows={[row('brown', 'Brown', 1, false, -23, -9), row('even', 'Even', 2, false, 0, 0), row('over', 'Over', 3, false, 2, 1)]} />);
+    const rows = container.querySelectorAll('[data-cw-top-row]');
+    for (const [index, score] of [-23, 0, 2].entries()) {
+      expect(rows[index]?.querySelector('.cw-v')).toHaveStyle({ color: getScoreColor(score, 'dark', 'ink-neutral') });
+    }
   });
 });
