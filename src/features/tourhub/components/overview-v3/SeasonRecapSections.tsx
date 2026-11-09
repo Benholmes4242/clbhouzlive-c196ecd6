@@ -35,10 +35,10 @@ export function recapSentence(tour: TourId, data: SeasonRecapData | undefined, s
   if (winner) {
     const segs: HeadlineSegment[] = [
       { text: surname(winner.name), figure: true },
-      { text: ` ${t(`overview.recap.raceVerb.${tour}`)}.` },
+      { text: ` ${t(`overview.recap.raceVerb.${tour}`)}.`, figure: false },
     ];
     if (data.cardLine) {
-      segs.push({ text: t('overview.recap.cardsLead'), figure: false }, { text: String(data.cardLine.n), figure: true }, { text: ` ${t(`overview.recap.cardCopy.${tour}`, { year: seasonYear + 1 })}.` });
+      segs.push({ text: t('overview.recap.cardsLead'), figure: false }, { text: String(data.cardLine.n), figure: true }, { text: ` ${t(`overview.recap.cardCopy.${tour}`, { year: seasonYear + 1 })}.`, figure: false });
     }
     return segs;
   }
