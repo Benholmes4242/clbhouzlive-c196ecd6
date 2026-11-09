@@ -26823,6 +26823,10 @@ export type Database = {
           review_count: number
         }[]
       }
+      get_tournament_week_facts: {
+        Args: { p_tournament_id: string }
+        Returns: Json
+      }
       get_trending_courses: {
         Args: { p_days_back?: number; p_limit?: number; p_region_slug?: string }
         Returns: {
