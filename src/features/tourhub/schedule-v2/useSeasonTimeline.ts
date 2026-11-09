@@ -128,16 +128,18 @@ const TOURNAMENT_SELECT =
 async function fetchYearRows(
   candidates: SrSeasonRow[],
   year: number,
+  fallbackId?: string,
 ): Promise<SrTournamentRow[]> {
   const seasonIds = candidates
     .filter((c) => c.year != null && c.year === year)
     .map((c) => c.id);
-  if (seasonIds.length === 0) return [];
+  const idsToQuery = seasonIds.length > 0 ? seasonIds : fallbackId ? [fallbackId] : [];
+  if (idsToQuery.length === 0) return [];
   const { data, error } = await supabase
     .from('sr_tournaments')
     .select(TOURNAMENT_SELECT)
-    .in('season_id', seasonIds)
-    .order('start_date', { ascending: true });
+      .in('season_id', idsToQuery)
+      .order('start_date', { ascending: true });
   if (error) {
     console.error('[schedule-v2] sr_tournaments fetch failed for year', year, error);
     throw error;
@@ -164,7 +166,7 @@ async function probeAndFetchTournaments(
     // Winning season found. Widen the fetch to every season row with the
     // same year (so cross-tour miscoded majors ride along), matching the
     // existing useTourTournaments behaviour.
-    const rows = await fetchYearRows(candidates, cand.year ?? -1);
+    const rows = await fetchYearRows(candidates, cand.year ?? -1, cand.id);
     return { season: cand, rows };
   }
   return { season: null, rows: [] };
