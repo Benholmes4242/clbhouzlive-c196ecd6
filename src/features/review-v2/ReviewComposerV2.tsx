@@ -150,15 +150,19 @@ function InnerComposer() {
   }, [courseId]);
 
   // The claim stack owns the notch in both route and overlay contexts.
-  // Only the photo form is transparent; loading, compact and receipt retain canvas.
+  // The photo form AND the confirmation receipt are transparent (the receipt
+  // hero is Step 1's hero — the photo runs behind the notch); loading and
+  // compact retain canvas.
+  const receiptShowing = !!(success && success.courseId === courseId);
+  const immersiveNotch = photoHeader || receiptShowing;
   useLayoutEffect(() => {
     claimOverlayChrome({
       id: 'review-composer',
       statusBarStyle: 'light',
-      statusBarColor: photoHeader ? '00000000' : 'FF' + RV2.canvas.replace('#', '').toUpperCase(),
-      shieldColor: photoHeader ? 'transparent' : RV2.canvas,
+      statusBarColor: immersiveNotch ? '00000000' : 'FF' + RV2.canvas.replace('#', '').toUpperCase(),
+      shieldColor: immersiveNotch ? 'transparent' : RV2.canvas,
     });
-  }, [photoHeader]);
+  }, [immersiveNotch]);
   useLayoutEffect(() => () => releaseOverlayChrome('review-composer'), []);
 
 
