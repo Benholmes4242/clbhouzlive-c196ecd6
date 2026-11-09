@@ -104,7 +104,8 @@ Deno.serve(async (req) => {
       rankingType,
     } = await req.json();
 
-    const effectiveYear = year || seasonYear || 2026;
+    // Default is the current UTC year, never a typed season (a hard-coded 2026 would block next season).
+    const effectiveYear = year || seasonYear || new Date().getUTCFullYear();
     const effectiveTour = normaliseTourSlug(tourId || 'pga');
     
     // Validate roundType - use 'rounds' for REST API path (not 'stroke')
@@ -237,6 +238,29 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
   return data;
 }
 
+// Season row fields: payload values first; dates fall back to the tournaments'
+// min start / max end; status falls back to one derived from those dates.
+export function seasonFieldsFor(season: any, meta: any, tournaments: any[], tour: string, year: number, today = new Date().toISOString().slice(0, 10)) {
+  const starts = tournaments.map((t) => t?.start_date).filter(Boolean).sort();
+  const ends = tournaments.map((t) => t?.end_date).filter(Boolean).sort();
+  const start_date = meta.start_date || season.start_date || starts[0] || null;
+  const end_date = meta.end_date || season.end_date || ends[ends.length - 1] || null;
+  let status = meta.status || season.status || null;
+  if (!status && start_date && end_date) {
+    status = today < start_date ? 'scheduled' : today > end_date ? 'closed' : 'inprogress';
+  }
+  return {
+    tour_id: season.tour?.id || tour,
+    tour_name: season.tour?.alias || tour,
+    tour_full_name: season.tour?.name,
+    year: meta.year || season.year || year,
+    name: meta.name || season.name || `${year} Season`,
+    status,
+    start_date,
+    end_date,
+  };
+}
+
 // ============================================================================
 // SCHEDULE - Tour-scoped: /{year}/tournaments/schedule.json
 // Captures all new fields: points, winning_share, event_type, scoring_system, etc.
@@ -248,7 +272,14 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
   let totalRecords = 0;
 
   for (const season of seasons) {
+    // The schedule payload carries season metadata under `season` (the top level
+    // holds tour + tournaments). Reading only the top level is what left every
+    // season row with NULL status/start/end. Identity stays the existing sr_id
+    // (payload id or `${tour}-${year}`) so a re-run updates the same row.
+    const meta = season.season || data.season || {};
     const seasonSrId = season.id || `${tour}-${year}`;
+    const tournaments = season.tournaments || data.tournaments || [];
+    const fields = seasonFieldsFor(season, meta, tournaments, tour, year);
     const { data: existingSeason } = await supabase
       .from('sr_seasons')
       .select('id')
@@ -258,40 +289,22 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
     let seasonDbId: string;
     if (existingSeason) {
       seasonDbId = existingSeason.id;
-      await supabase.from('sr_seasons').update({
-        tour_id: season.tour?.id || tour,
-        tour_name: season.tour?.alias || tour,
-        tour_full_name: season.tour?.name,
-        year: season.year || year,
-        name: season.name || `${year} Season`,
-        status: season.status,
-        start_date: season.start_date,
-        end_date: season.end_date,
-      }).eq('id', seasonDbId);
+      const { error: upErr } = await supabase.from('sr_seasons').update(fields).eq('id', seasonDbId);
+      if (upErr) console.error(`[Schedule] season update failed ${seasonSrId}:`, upErr.message);
     } else {
-      const { data: newSeason, error } = await supabase.from('sr_seasons').insert({
-        sr_id: seasonSrId,
-        tour_id: season.tour?.id || tour,
-        tour_name: season.tour?.alias || tour,
-        tour_full_name: season.tour?.name,
-        year: season.year || year,
-        name: season.name || `${year} Season`,
-        status: season.status,
-        start_date: season.start_date,
-        end_date: season.end_date,
-      }).select().single();
-      if (error) continue;
+      const { data: newSeason, error } = await supabase.from('sr_seasons')
+        .insert({ sr_id: seasonSrId, ...fields }).select().single();
+      if (error) { console.error(`[Schedule] season insert failed ${seasonSrId}:`, error.message); continue; }
       seasonDbId = newSeason.id;
     }
 
-    const tournaments = season.tournaments || data.tournaments || [];
     for (const tournament of tournaments) {
       const venue = tournament.venue;
       const course = venue?.courses?.[0];
       const winner = tournament.winner;
       const defendingChamp = tournament.defending_champ;
       
-      const { error } = await supabase.from('sr_tournaments').upsert({
+      const { data: written, error } = await supabase.from('sr_tournaments').upsert({
         sr_id: tournament.id,
         season_id: seasonDbId,
         name: tournament.name,
@@ -335,8 +348,10 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
         winner_id: winner?.id,
         timezone: tournament.course_timezone || resolveTimezone(venue?.country, venue?.state),
         raw_data: tournament,
-      }, { onConflict: 'sr_id' });
-      if (!error) totalRecords++;
+      }, { onConflict: 'sr_id' }).select('id');
+      // Count only rows actually written; log every failure by name.
+      if (error) console.error(`[Schedule] upsert failed ${tournament.id} ${tournament.name}:`, error.message);
+      else totalRecords += written?.length ?? 0;
 
       // Sync course holes if available
       if (course?.holes) {

@@ -58,7 +58,6 @@ export function yearsToSync(now: Date = new Date()): number[] {
   const y = now.getUTCFullYear();
   return [y, y + 1];
 }
-const YEARS_TO_SYNC = yearsToSync();
 
 // SportRadar API configuration
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
@@ -71,6 +70,7 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const YEARS_TO_SYNC = yearsToSync(); // per run, so a warm instance crosses New Year correctly
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const sportradarApiKey = Deno.env.get('SPORTRADAR_API_KEY');
