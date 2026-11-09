@@ -1,5 +1,13 @@
 # Roadmap
 
+## In progress: Upcoming completed rhythm + top-three score colour
+Approved figure size: 15px / 700 (brief governs the mock's unused 15px class).
+Fresh before-change shards: 2,084 / 1,907 / 2,053 / 1,954 = 7,998, all passing.
+Application changes, after-change shards, and before/after 390px measurements remain pending.
+Screen-check fixture needs its router import aligned with Vite's module identity;
+no application changes were made to accommodate the fixture.
+Report: UPCOMING_COMPLETED_RHYTHM_REPORT.md.
+
 ## Done: Round scores + Media/notch + rulings (baseline clean)
 All four shards green: 2,071 / 1,902 / 2,051 / 1,935 = 7,959, zero failures.
 Report: ROUND_SCORES_AND_VIEWER_FIT_REPORT.md. Device checks left for Ben
