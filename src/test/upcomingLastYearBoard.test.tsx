@@ -22,7 +22,6 @@ vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup'
 
 import { HeroBoardSection } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { LastYearRow } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LastYearRow';
-import { LEADER_GOLD } from '@/features/tourhub/_shared/tokens';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
