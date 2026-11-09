@@ -79,18 +79,25 @@
 .upcoming-course .tv-lead{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:var(--tv-soft)}.upcoming-course .tv-lead b{color:var(--th-text-primary)}
 .upcoming-course .tv-strip{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:3px;align-items:end;height:70px;margin-top:10px}.upcoming-course .tv-strip>div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.upcoming-course .tv-strip i{display:block;width:100%;border-radius:4px 4px 2px 2px;background:var(--tv-par4)}.upcoming-course .tv-strip i[data-par='3'],.upcoming-course .tv-strip-key i[data-par='3']{background:var(--tv-par3)}.upcoming-course .tv-strip i[data-par='5'],.upcoming-course .tv-strip-key i[data-par='5']{background:var(--tv-par5)}.upcoming-course .tv-strip span{font-size:9px;color:var(--tv-dim);margin-top:4px}
 .upcoming-course .tv-strip-key{display:flex;gap:12px;font-size:10.5px;color:var(--tv-dim);margin-top:8px}.upcoming-course .tv-strip-key i{display:inline-block;width:10px;height:8px;margin-right:5px;background:var(--tv-par4)}.upcoming-course .tv-strip-key>span:last-child{margin-left:auto}
-/* Season recap (signed-off season-recap.html). Facts/record figures reuse .upcoming-facts. */
-.recap-fact-small{font-size:12px;font-weight:700;color:rgba(248,250,252,.62);margin-left:3px}
+/* Recap option B: shared completed rhythm; rows/points stay unchanged.
+   Intrinsic card columns centre as a pair; small screens use equal columns. */
+.recap-fact-small{font-size:.63em;font-weight:700;color:var(--cw-mute);margin-left:3px}
+.recap-figs{margin-top:var(--hero-content-gap)}
+.recap-figs>div{padding:var(--hero-cell-pad)}
+.recap-figs b{line-height:var(--hero-cell-line)}
+.recap-figs span{margin-top:var(--hero-label-gap);letter-spacing:var(--hero-label-tracking);line-height:13px;color:var(--cw-dim)}
+.recap-block{padding-top:var(--hero-section-gap)}
+.recap-block .upcoming-kicker{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--cw-mute);line-height:14px}
 .recap-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.recap-link{padding:0;height:auto;background:none;font-size:12px;font-weight:700;letter-spacing:0;color:var(--th-text-primary)}
+.recap-block .recap-head{align-items:baseline}.recap-block .recap-link{line-height:14px}
 /* One grid for head + rows: PTS sizes to the longest value (min 64px, never wraps), every row shares it. */
-/* HERO BLOCKS §3: no board header — POS PLAYER PTS sits 12px under the fact band's bottom edge (HERO BANDS NO DIVIDERS: the band has no rules). */
-[data-recap-board]{padding-top:0}
-.recap-table{display:grid;grid-template-columns:24px minmax(0,1fr) minmax(64px,max-content);column-gap:4px;margin-top:12px}.recap-grid{display:contents}.recap-grid>span{display:flex;align-items:center;min-width:0}.recap-grid>span:last-child{justify-content:flex-end}
+.recap-table{display:grid;grid-template-columns:24px minmax(0,1fr) minmax(64px,max-content);column-gap:4px;margin-top:var(--hero-content-gap)}.recap-grid{display:contents}.recap-grid>span{display:flex;align-items:center;min-width:0}.recap-grid>span:last-child{justify-content:flex-end}
 .recap-grid-head>span{min-height:24px}.recap-grid-head{font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(248,250,252,.62)}.recap-grid-head>span:last-child{text-align:right}
 .recap-row>span{min-height:31px}.recap-pos{font-size:12.5px;font-weight:700}.recap-trophy{display:block;color:#FBBC2E}.recap-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important;line-height:31px}.recap-pts{text-align:right;white-space:nowrap;font-size:15px;font-weight:700;color:var(--th-text-primary);font-variant-numeric:tabular-nums}
-.recap-cards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;padding-top:6px}.recap-cards>div{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;min-height:28px;min-width:0}.recap-cards span{font-size:11.5px;font-weight:700;color:var(--tv-dim);font-variant-numeric:tabular-nums}.recap-cards b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recap-foot{margin:10px 0 0;font-size:12.5px;line-height:1.45;color:rgba(248,250,252,.62)}.recap-foot b{color:var(--th-text-primary)}
-.recap-record-figs{margin:8px 0 0}
+.recap-cards{display:grid;grid-template-columns:repeat(2,max-content);column-gap:34px;justify-content:center;margin-top:var(--hero-content-gap);padding:0}.recap-cards>div{display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:10px;align-items:center;min-height:28px;min-width:0}.recap-cards span{text-align:right;font-size:11.5px;font-weight:700;color:var(--tv-dim);font-variant-numeric:tabular-nums}.recap-cards b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recap-foot{margin:var(--hero-content-gap) 0 0;font-size:12.5px;line-height:1.45;color:var(--cw-mute)}.recap-foot b{color:var(--th-text-primary)}
+.recap-record-figs{margin:var(--hero-content-gap) 0 0}
+@media(max-width:340px){.recap-cards{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:6px}}
 @media(max-width:340px){.upcoming-block,.upcoming-facts{--upcoming-side:16px}}
 /* Upcoming opts into the completed rhythm; recap and member panels keep their
    existing band sizes. No extra container padding may extend these seams. */

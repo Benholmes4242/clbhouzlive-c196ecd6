@@ -5,6 +5,8 @@
  * bottom anchoring as every state, no spine. SeasonRecapBody renders under the
  * tour buttons: facts, final standings, card list and Our record. Every list
  * part renders only from fresh standings (isFreshStandings).
+ * Recap headings/cells reuse completedWeek.css rhythm; card rows retain their
+ * column-major order in an intrinsic centred grid with a narrow fallback.
  */
 import { useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -26,6 +28,8 @@ import {
   RECAP_CARD_LIST_MAX, columnMajor, fmtPoints, recapFactCells, recapPronoun, surname, youngestEarner,
 } from './seasonRecapRules';
 import type { SeasonRecapData } from './useSeasonRecap';
+import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
+import '../../tournament-v2/sections/completedWeek.css';
 
 const playersRace = (tour: TourId) => `/tourhub?tab=players&tour=${encodeURIComponent(tour)}`;
 
@@ -90,16 +94,16 @@ export function RecapFacts({ data }: { data: SeasonRecapData }) {
     cards, youngest, tiedLabel: (count) => t('overview.recap.tiedPlayers', { count }),
   });
   if (!cells.length) return null;
-  return <div data-recap-facts className="upcoming-facts">{cells.map((c) => <div key={c.key} data-recap-fact={c.key}><b>{c.value}{c.small ? <small className="recap-fact-small">{c.small}</small> : null}</b><span>{t(`overview.recap.${c.key}`)}</span></div>)}</div>;
+  return <section data-recap-season className="cw-block"><h2 className="cw-kick">{t('overview.recap.seasonHeading', { defaultValue: 'THE SEASON' })}</h2><div data-recap-facts className="upcoming-facts recap-figs">{cells.map((c) => <div className="cw-cell" key={c.key} data-recap-fact={c.key}><b style={HERO_TOT_TYPE}>{c.value}{c.small ? <small className="recap-fact-small">{c.small}</small> : null}</b><span>{t(`overview.recap.${c.key}`)}</span></div>)}</div></section>;
 }
 
 export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecapData }) {
-  /* HERO BLOCKS §3: no board header row — the POS PLAYER PTS header sits
-     directly under the fact band's bottom divider, 12px below it. */
+  /* Restore only THE POINTS LIST kicker; the Full list link stays retired. */
   const { t } = useTranslation('tourhub');
   const rows = (data.standings ?? []).slice(0, 3);
   if (!rows.length) return null;
   return <section data-recap-board className="upcoming-block recap-block">
+    <h2 className="upcoming-kicker">{t('overview.recap.pointsHeading', { defaultValue: 'THE POINTS LIST' })}</h2>
     <div data-recap-table className="recap-table">
     <div className="recap-grid recap-grid-head"><span>{t('overview.upcomingPlus.pos')}</span><span>{t('overview.upcomingPlus.player')}</span><span>{t('overview.recap.pts')}</span></div>
     {rows.map((r) => <div key={r.position} className="recap-grid recap-row" data-recap-row={r.position}>
@@ -134,10 +138,10 @@ export function RecapOurRecord({ tour, year }: { tour: TourId; year: number }) {
   if (isError || !record || !((record.event_count ?? 0) > 0)) return null;
   return <section data-recap-record className="upcoming-block recap-block">
     <div className="recap-head"><h2 className="upcoming-kicker">{t('overview.recap.ourRecord', { year })}</h2><Button variant="ghost" className="recap-link" onClick={() => setOpen(true)}>{t('overview.recap.howWePick')}</Button></div>
-    <div className="upcoming-facts recap-record-figs">
-      <div><b>{record.event_count}</b><span>{t('overview.recap.events')}</span></div>
-      <div><b>{record.won}</b><span>{t('overview.recap.won')}</span></div>
-      <div><b>{record.top10}</b><span>{t('overview.recap.top10')}</span></div>
+    <div className="upcoming-facts recap-figs recap-record-figs">
+      <div className="cw-cell"><b style={HERO_TOT_TYPE}>{record.event_count}</b><span>{t('overview.recap.events')}</span></div>
+      <div className="cw-cell"><b style={HERO_TOT_TYPE}>{record.won}</b><span>{t('overview.recap.won')}</span></div>
+      <div className="cw-cell"><b style={HERO_TOT_TYPE}>{record.top10}</b><span>{t('overview.recap.top10')}</span></div>
     </div>
     <OurRecordSheet open={open} onClose={() => setOpen(false)} tour={tour} year={year} />
   </section>;
