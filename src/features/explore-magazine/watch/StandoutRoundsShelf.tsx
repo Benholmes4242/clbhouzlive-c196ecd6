@@ -10,7 +10,8 @@ import { standoutSentenceParts } from '@/components/explore-tab-new/courseled/st
 import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { useViewerScoreScope } from '../useViewerScoreScope';
 import { useStandoutFeats, type StandoutFeat } from './useStandoutFeats';
-import { SHELF_CARD, STRIP_COLORS, roundToPar, stripColor, toParLabel } from './roundsShelfRules';
+import { SHELF_CARD, roundToPar, toParLabel } from './roundsShelfRules';
+import { RoundTileMarks } from './RoundTileMarks';
 import { featHeadlineParts, featRarity, interleaveStandouts, scopeHasTiles, selectStandoutScope, shortStandoutDate, type StandoutScopeData, type StandoutScopeKey } from './standoutShelfRules';
 import './standout-shelf.css';
 
@@ -31,14 +32,11 @@ function Who({ userId, name, photo, course, onOpenMember }: { userId: string | n
     <span className="standout-identity"><span className="standout-name">{name}</span><span className="standout-course">{course ? shortCourseName(course) : ''}</span></span>
   </Button>;
 }
-const toneByColor = new Map<string, string>(Object.entries(STRIP_COLORS).map(([tone, color]) => [color, tone]));
+/* The strip is the score post's HoleMarks (RoundTileMarks); the feat hole's
+   highlight rides on the matching mark as data-raised, ringed in gold by
+   standout-shelf.css — the same fact the old raised bar carried. */
 function Strip({ shape, raised }: { shape: HoleShape | null; raised?: number | null }) {
-  return <><div className="standout-strip" data-standout-strip aria-hidden>
-    {shape ? Array.from({ length:18 }, (_, i) => {
-      const hole = shape.holes.find(row => row.holeNo === i + 1);
-      return <i key={i} data-hole={i + 1} data-raised={raised === i + 1} data-tone={toneByColor.get(stripColor(hole?.strokes ?? null, hole?.par ?? null))} />;
-    }) : null}
-  </div><div className="standout-labels" aria-hidden><span>1</span><span>OUT</span><span>IN</span><span>18</span></div></>;
+  return shape ? <RoundTileMarks shape={shape} raised={raised} /> : null;
 }
 function Tile({ tile, shape, locale, onOpenRound, onOpenMember }: {
   tile: ReturnType<typeof interleaveStandouts>[number]; shape: HoleShape | null; locale: string;
