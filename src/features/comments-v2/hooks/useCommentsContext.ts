@@ -25,27 +25,47 @@ export interface CommentsSubject {
   kind: 'round' | 'review' | 'post';
   gross: number | null;
   toPar: number | null;
+  /** BUILD Round scores §2 — the round's NET score and its to-par, from
+   *  gam_round_net (the Home score post's FN1 source). null = the round
+   *  cannot be converted to net, and the header shows NO score — never gross. */
+  net: number | null;
+  netToPar: number | null;
   rating: number | null;
 }
 
 type Row = Record<string, unknown> | null;
 
 async function roundFacts(whsScoreId: string) {
-  const { data } = await supabase
-    .from('gam_round_stats' as never)
-    .select('user_id, course_id, course_name, gross_score, course_par')
-    .eq('whs_score_id', whsScoreId)
-    .maybeSingle();
+  const [{ data }, { data: netRow }] = await Promise.all([
+    supabase
+      .from('gam_round_stats' as never)
+      .select('user_id, course_id, course_name, gross_score, course_par')
+      .eq('whs_score_id', whsScoreId)
+      .maybeSingle(),
+    supabase
+      .from('gam_round_net' as never)
+      .select('net_score, course_handicap')
+      .eq('whs_score_id', whsScoreId)
+      .maybeSingle(),
+  ]);
   const r = data as Row;
   if (!r) return null;
   const gross = typeof r.gross_score === 'number' ? r.gross_score : null;
   const par = typeof r.course_par === 'number' ? r.course_par : null;
+  const n = netRow as Row;
+  const netScore = typeof n?.net_score === 'number' ? n.net_score : null;
+  const courseHandicap = typeof n?.course_handicap === 'number' ? n.course_handicap : null;
+  /* FN1 — a round is netted only when the database's net number, the course
+     handicap and the round par all exist; otherwise NO score is shown. */
+  const nettable = netScore != null && courseHandicap != null && par != null;
   return {
     userId: (r.user_id as string | null) ?? null,
     courseId: (r.course_id as string | null) ?? null,
     courseName: (r.course_name as string | null) ?? null,
     gross,
     toPar: gross != null && par != null ? gross - par : null,
+    net: nettable ? netScore : null,
+    netToPar: nettable ? netScore! - par! : null,
   };
 }
 
@@ -78,6 +98,8 @@ export function useCommentsSubject(targetType: TargetType, targetId: string, ena
       let kind: CommentsSubject['kind'] = 'post';
       let gross: number | null = null;
       let toPar: number | null = null;
+      let net: number | null = null;
+      let netToPar: number | null = null;
       let rating: number | null = null;
 
       let whsScoreId: string | null = targetType === 'round' ? targetId : null;
@@ -107,6 +129,8 @@ export function useCommentsSubject(targetType: TargetType, targetId: string, ena
           courseName = f.courseName;
           gross = f.gross;
           toPar = f.toPar;
+          net = f.net;
+          netToPar = f.netToPar;
         }
       } else if (reviewId) {
         const f = await reviewFacts(reviewId);
@@ -135,7 +159,7 @@ export function useCommentsSubject(targetType: TargetType, targetId: string, ena
       const authorFirstName = business ? authorName : authorName ? authorName.trim().split(/\s+/)[0] : null;
       courseName = courseName ?? (((courseRes.data as Row)?.name as string | null) ?? null);
 
-      return { authorName, authorFirstName, courseId, courseName, kind, gross, toPar, rating };
+      return { authorName, authorFirstName, courseId, courseName, kind, gross, toPar, net, netToPar, rating };
     },
   });
 }
