@@ -393,6 +393,9 @@ export function useSeasonTimeline(
       const isPlayoff = label === 'PLAYOFF EVENT';
 
       const isThisWeek = isInCurrentWeek(r.start_date);
+      const seasonYear = r.season?.year ?? null;
+      const inCurrent = seasonYear != null && currentYear != null && seasonYear === currentYear;
+      if (inCurrent) currentSeq += 1;
 
       const evt: SeasonEvent = {
         id: r.id,
@@ -409,12 +412,14 @@ export function useSeasonTimeline(
         endDate: r.end_date,
         status: r.status,
         state,
+        seasonYear,
+        inCurrentSeason: inCurrent,
         isMajor,
         isPlayoff,
         isThisWeek,
         daysAway: state === 'upcoming' ? daysUntil(r.start_date) : null,
         contextLabel: label,
-        eventNumber: idx + 1,
+        eventNumber: inCurrent ? currentSeq : 0,
       };
 
       if (state === 'completed') {
