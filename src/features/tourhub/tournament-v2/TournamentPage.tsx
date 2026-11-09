@@ -65,7 +65,8 @@ import {HeroBoardSection} from '../components/overview-v3/HybridHeroBands/HeroBo
 import {ChampionStrip} from '../components/overview-v3/HybridHeroBands/ChampionStrip';
 import {resolvePlayerAvatarCandidates} from '../_shared/resolvePlayerAvatar';
 import {winnerRow,championNarrative,score,words,copy,playedRounds} from './data/tournamentRules';
-import {TournamentHero,RaceSection,FieldSection,LastYearSection,CourseV3Section,NumbersSection,TeeV3Section,SectionHead} from './sections/TournamentV3Sections';
+import {TournamentHero,RaceSection,FieldSection,CourseV3Section,NumbersSection,TeeV3Section,SectionHead} from './sections/TournamentV3Sections';
+import {UpcomingLastYear} from '../components/overview-v3/UpcomingOverviewSections';
 import './tournamentPage.css';
 
 export function TournamentPage() {
