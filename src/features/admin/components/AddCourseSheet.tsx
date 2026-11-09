@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
 import { toast } from '@/lib/toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import AddCourseClubSection, { type ClubPick } from './AddCourseClubSection';
+import { clubKey } from '../lib/clubName';
 import { adminTheme as t } from '../theme';
 import AdminSheet from './AdminSheet';
 import { COURSE_TYPES } from '../constants';
@@ -13,12 +17,14 @@ import { Section, Field, TextInput, SelectInput, Toggle, DraftRestoredBar } from
 
 /* ───────── Add course sheet ───────── */
 
-export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting, prefillName, prefillSubCountry }: {
+export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting, prefillName, prefillSubCountry, fixedClub }: {
   open: boolean;
   onClose: () => void;
   /** Receives the created row. Return `false` to keep the sheet open (e.g. a follow-up step failed). */
   onCreated: (created: { id: string; name: string }) => void | boolean | Promise<void | boolean>;
   prefillName?: string;
+  /** ADD_COURSE_CLUB_1 panel C: the club is fixed; no club call, the caller attaches. */
+  fixedClub?: { id: string; name: string };
   prefillSubCountry?: string;
   uploadPhoto: (id: string, file: File) => Promise<any>;
   onOpenExisting: (id: string) => void;
@@ -29,8 +35,17 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
     latitude: '', longitude: '',
     website_url: '', course_type: '',
     has_hosted_major: false, description: '',
+    club_mode: 'new' as 'new' | 'existing', club_mode_touched: false,
+    club_name: '', club_name_touched: false,
+    club_pick: null as ClubPick | null, club_auto: false, club_query: '',
   };
   const [form, setForm] = useState(EMPTY);
+  const qc = useQueryClient();
+  const patchForm = (p: Partial<typeof EMPTY>) => setForm(f => {
+    const next = { ...f, ...p };
+    saveDraft(draftKey, next);
+    return next;
+  });
   const [busy, setBusy] = useState(false);
   /** Set once a course row exists; blocks a second create in this sheet session. */
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -83,12 +98,16 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
     setPhotoPreview(f ? URL.createObjectURL(f) : null);
   };
 
+  const clubReady = !!fixedClub
+    || (form.club_mode === 'new' && clubKey(form.club_name) !== '')
+    || (form.club_mode === 'existing' && !!form.club_pick);
   const valid = !!(
     form.name.trim() &&
     form.continent &&
     form.region_key &&
     isCanonicalCountry(form.country) &&
-    form.sub_country.trim()
+    form.sub_country.trim() &&
+    clubReady
   );
 
   const submit = async () => {
@@ -103,6 +122,18 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
     try {
       const created = await createCourse(form);
       if (created?.id) setCreatedId(created.id);
+      if (created?.id && !fixedClub) {
+        try {
+          const { error } = form.club_mode === 'existing' && form.club_pick
+            ? await (supabase.rpc as any)('admin_set_course_club', { p_course_id: created.id, p_club_id: form.club_pick.id })
+            : await (supabase.rpc as any)('admin_create_club_for_course', { p_course_id: created.id, p_club_name: form.club_name.trim() });
+          if (error) throw error;
+          qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+          qc.invalidateQueries({ queryKey: ['club-course-analytics'] });
+        } catch (e: any) {
+          toast.error(`Course created, but the club step failed: ${e?.message ?? 'unknown error'}. Use "Create a club from this course" on the course.`);
+        }
+      }
       if (photoFile && created?.id) {
         try {
           await uploadPhoto(created.id, photoFile);
@@ -240,6 +271,10 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
               <TextInput value={form.longitude} onChange={v => set('longitude', v)} inputMode="decimal" placeholder="-82.0232" />
             </Field>
           </div>
+        </Section>
+
+        <Section title="Club">
+          <AddCourseClubSection form={form} patch={patchForm} fixedClub={fixedClub} />
         </Section>
 
         <Section title="Details">
