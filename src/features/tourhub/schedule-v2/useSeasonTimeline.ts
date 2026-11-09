@@ -61,7 +61,7 @@ interface SrTournamentRow {
   event_type?: string | null;
   golf_course_id?: string | null;
   course?: CoursePlaceJoin | CoursePlaceJoin[];
-  season?: { tour_name: string | null; tour_full_name: string | null } | null;
+  season?: { tour_name: string | null; tour_full_name: string | null; year?: number | null } | null;
 }
 
 async function resolveSeasonCandidates(
@@ -119,6 +119,32 @@ export function currentFirst<T extends { id: string }>(cands: T[], currentId: st
 }
 
 
+const TOURNAMENT_SELECT =
+  `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, event_type, golf_course_id, season:sr_seasons(tour_name, tour_full_name, year), ${TOURNAMENT_COURSE_PLACE_JOIN}`;
+
+/** Fetch every tournament under every candidate season row of one year
+ *  (the same-year widening that lets cross-tour miscoded majors ride
+ *  along). Returns [] when no candidate of that year exists. */
+async function fetchYearRows(
+  candidates: SrSeasonRow[],
+  year: number,
+): Promise<SrTournamentRow[]> {
+  const seasonIds = candidates
+    .filter((c) => c.year != null && c.year === year)
+    .map((c) => c.id);
+  if (seasonIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from('sr_tournaments')
+    .select(TOURNAMENT_SELECT)
+    .in('season_id', seasonIds)
+    .order('start_date', { ascending: true });
+  if (error) {
+    console.error('[schedule-v2] sr_tournaments fetch failed for year', year, error);
+    throw error;
+  }
+  return (data ?? []) as unknown as SrTournamentRow[];
+}
+
 async function probeAndFetchTournaments(
   tour: TourId,
   candidates: SrSeasonRow[],
@@ -138,24 +164,8 @@ async function probeAndFetchTournaments(
     // Winning season found. Widen the fetch to every season row with the
     // same year (so cross-tour miscoded majors ride along), matching the
     // existing useTourTournaments behaviour.
-    const seasonIds = candidates
-      .filter((c) => c.year != null && c.year === cand.year)
-      .map((c) => c.id);
-    const idsToQuery = seasonIds.length > 0 ? seasonIds : [cand.id];
-
-    const { data, error } = await supabase
-      .from('sr_tournaments')
-      .select(
-        `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, event_type, golf_course_id, season:sr_seasons(tour_name, tour_full_name), ${TOURNAMENT_COURSE_PLACE_JOIN}`,
-      )
-      .in('season_id', idsToQuery)
-      .order('start_date', { ascending: true });
-
-    if (error) {
-      console.error('[schedule-v2] sr_tournaments fetch failed:', error);
-      throw error;
-    }
-    return { season: cand, rows: (data ?? []) as unknown as SrTournamentRow[] };
+    const rows = await fetchYearRows(candidates, cand.year ?? -1);
+    return { season: cand, rows };
   }
   return { season: null, rows: [] };
 }
