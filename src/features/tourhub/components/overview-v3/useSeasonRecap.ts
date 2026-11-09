@@ -109,7 +109,7 @@ export async function freshPgaStandings(seasonId: string | null, finalEnd: strin
   const updated = stats.map((s) => s.updated_at).filter((d): d is string => !!d).sort().pop() ?? null;
   if (stats.length === 0 || !isFreshStandings(updated, finalEnd)) return null;
   return {
-    rows: stats.slice(0, 200).map((s, i) => ({ position: i + 1, name: '', points: Number(s.fedex_points), playerId: s.player_id })),
+    rows: stats.slice(0, 100).map((s, i) => ({ position: i + 1, name: '', points: Number(s.fedex_points), playerId: s.player_id })),
     source: { table: 'sr_player_statistics', date: updated as string },
   };
 }
