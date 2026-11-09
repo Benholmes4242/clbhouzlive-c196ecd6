@@ -7,6 +7,7 @@ import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShotTagChoices } from '@/components/course-media-tab/ShotTagChoices';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import BottomSheet from '../BottomSheet';
 import SlideThumb from '../SlideThumb';
 import type { StageCourse, StageMediaItem } from '../../hooks/useStageComposer';
@@ -167,12 +168,12 @@ export function PlayedWithSection({ suggestions, tagged, onToggle, search, selfI
     <label className="pf4-with-input"><Search size={17} aria-hidden="true"/><input aria-label="Who did you play with?" placeholder={limited ? '8 people tagged' : 'Who did you play with?'} disabled={limited} value={query} onFocus={() => setFocused(true)} onChange={e => setQuery(e.target.value)}/></label>
     {focused && !limited && (shown.length > 0 || loading) && <div className="pf4-with-results" aria-busy={loading}>
       {shown.map(p => <Button variant="ghost" className="pf4-with-result" key={p.id} onClick={() => { onToggle(p); setQuery(''); }}>
-        <SquircleAvatar src={p.avatarUrl} alt="" userId={p.id} size={34} hairlineRing ringColor={DARK_HAIRLINE}/>
+        <SquircleAvatar src={p.avatarUrl} alt="" fallback={getInitialsFromName(p.name)} userId={p.id} size={34} hairlineRing ringColor={DARK_HAIRLINE}/>
         <span className="pf4-with-person"><b>{p.name}</b><small>{[p.username ? `@${p.username}` : null, p.homeClub].filter(Boolean).join(' · ')}</small></span><span className="pf4-with-add">Add</span>
       </Button>)}
     </div>}
     {tagged.length > 0 && <div className="pf4-with-chips">{tagged.map(p => <div className="pf4-with-chip" key={p.id}>
-      <SquircleAvatar src={p.avatarUrl} alt="" userId={p.id} size={26} hairlineRing ringColor={DARK_HAIRLINE}/><span>{p.name}</span>
+      <SquircleAvatar src={p.avatarUrl} alt="" fallback={getInitialsFromName(p.name)} userId={p.id} size={26} hairlineRing ringColor={DARK_HAIRLINE}/><span>{p.name}</span>
       <Button variant="ghost" className="pf4-with-remove" aria-label={`Remove ${p.name}`} onClick={() => onToggle(p)}><X size={12}/></Button>
     </div>)}</div>}
   </section>;

@@ -16,6 +16,7 @@ import { useMaintenanceMode } from '@/hooks/useMaintenanceMode';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { Button } from '@/components/ui/button';
 import { formatAgo } from './lib/formatAgo';
 import { LiveBoard, LiveCard, HealthNavStatus, StatusDot, type DrawerLive } from './AdminDrawerStatus';
@@ -109,7 +110,7 @@ function MemberResults({ query, onClose }: { query: string; onClose: () => void 
   if (!members.length) return <div style={{ padding: '16px 12px', color: t.inkFaint, fontSize: 13 }}>No member matches "{query}"</div>;
   return <>{members.map(m => <Link key={m.user_id} to={`/admin-v2/users?member=${encodeURIComponent(m.user_id)}`} onClick={onClose} style={{ height: 52, padding: '0 12px', display: 'grid', gridTemplateColumns: '32px minmax(0, 1fr)', gap: 12, alignItems: 'center', color: t.ink, textDecoration: 'none' }}>
     <span aria-hidden="true" style={{ display: 'inline-flex' }}>
-      <SquircleAvatar size={32} src={m.photo_url} userId={m.user_id} alt="" hairlineRing />
+      <SquircleAvatar size={32} src={m.photo_url} userId={m.user_id} alt="" fallback={getInitialsFromName(m.display_name || m.username)} hairlineRing />
     </span>
     <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.display_name || m.username || 'Member'}</span>{m.username && <span style={{ display: 'block', fontSize: 12, color: t.inkFaint, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{m.username}</span>}</span>
 

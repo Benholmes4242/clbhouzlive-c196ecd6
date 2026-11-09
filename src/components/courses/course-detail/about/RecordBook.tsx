@@ -30,6 +30,7 @@ import { formatNumber } from '@/i18n/format';
 import { legendCategoryLabel, formatLegendValueCompact } from '@/lib/gam/visuals';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -76,11 +77,11 @@ const HolderStack: React.FC<{ rows: CourseLegendRow[] }> = ({ rows }) => {
   return (
     <div aria-hidden="true" style={{ position: 'relative', width: 52, height: 36 }}>
       <div style={{ ...disc, left: 0, zIndex: 0 }}>
-        <SquircleAvatar src={first.user_photo_url} alt="" userId={first.user_id} size={30} thinRing />
+        <SquircleAvatar src={first.user_photo_url} alt="" fallback={getInitialsFromName(first.user_display_name)} userId={first.user_id} size={30} thinRing />
       </div>
       {rows.length === 2 ? (
         <div style={{ ...disc, left: 20, zIndex: 1 }}>
-          <SquircleAvatar src={second.user_photo_url} alt="" userId={second.user_id} size={30} thinRing />
+          <SquircleAvatar src={second.user_photo_url} alt="" fallback={getInitialsFromName(second.user_display_name)} userId={second.user_id} size={30} thinRing />
         </div>
       ) : (
         <div

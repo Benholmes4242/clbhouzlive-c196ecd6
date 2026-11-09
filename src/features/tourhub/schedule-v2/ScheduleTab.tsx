@@ -78,7 +78,6 @@ const SeasonBreakBlock: React.FC<{ brk: SeasonBreakModel }> = ({ brk }) => {
       <div
         style={{
           padding: '22px 22px 14px',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
         }}
       >
         <span style={{ ...SEASON_KICKER, color: INK_MUTE }}>
@@ -100,7 +99,6 @@ const SeasonBreakBlock: React.FC<{ brk: SeasonBreakModel }> = ({ brk }) => {
       </div>
       <div
         style={{
-          marginTop: 18,
           padding: '16px 22px 14px',
           borderTop: '1px solid rgba(247,147,30,0.45)',
           background: 'linear-gradient(180deg, rgba(247,147,30,0.08), rgba(247,147,30,0))',

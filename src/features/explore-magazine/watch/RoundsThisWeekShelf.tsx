@@ -4,6 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
@@ -108,7 +109,7 @@ function WhoRow({
         textAlign: 'left', minWidth: 0, alignSelf: 'stretch',
       }}
     >
-      <SquircleAvatar size={32} src={photoUrl} alt="" userId={userId ?? undefined} hairlineRing />
+      <SquircleAvatar size={32} src={photoUrl} alt="" fallback={getInitialsFromName(name)} userId={userId ?? undefined} hairlineRing />
       <span style={{ minWidth: 0 }}>
         <span data-round-card-name style={{ ...(wrapName ? { lineHeight: 1.25, overflowWrap: 'anywhere' as const } : oneLine), display: 'block', fontSize: 14, fontWeight: 600, ...(nameColor ? { color: nameColor } : {}) }}>{name}</span>
         <span style={{ ...oneLine, display: 'block', fontSize: 11.5, color: A.DIM, marginTop: 1 }}>{sub}</span>
