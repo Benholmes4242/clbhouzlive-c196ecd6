@@ -17,8 +17,9 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
 import { NUMERIC_STYLE } from '../HybridHero.constants';
-import { INK, LEADER_GOLD } from '../../../_shared/tokens';
+import { INK } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { HERO_PAD_X, HERO_POS_W, HERO_TOT_W, HERO_GAP } from '../../../tournament-v2/sections/MiniBoard';
 
