@@ -64,8 +64,8 @@
 /* Upcoming-only grammar. Reuses the existing Tour text/score palette; these
    local yardage tokens match tournament-v3 without applying its page shell. */
 .upcoming-block,.upcoming-facts{--upcoming-side:20px;--tv-soft:rgba(248,250,252,.78);--tv-dim:rgba(248,250,252,.42);--tv-par3:rgba(248,250,252,.14);--tv-par4:rgba(248,250,252,.22);--tv-par5:rgba(248,250,252,.5);color:var(--th-text-primary)}
-.upcoming-facts{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:14px var(--upcoming-side) 0;}
-/* HERO BLOCKS §2: every hero fact band is centred — number over label — keeping the hairline dividers, with no left-alignment padding. */
+.upcoming-facts{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:14px var(--upcoming-side) 0}
+/* HERO BLOCKS §2: every hero fact band is centred — number over label — with no rules (HERO BANDS NO DIVIDERS: no top, bottom or cell lines) and no left-alignment padding. */
 .upcoming-facts>div{padding:12px 0;min-width:0;text-align:center}.upcoming-facts>div+div{padding-left:0}
 .upcoming-facts b{display:block;font-size:19px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upcoming-facts span{display:block;margin-top:6px;font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--tv-dim);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
