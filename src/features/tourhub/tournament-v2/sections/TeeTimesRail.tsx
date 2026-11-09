@@ -29,7 +29,7 @@ function formatTeeTime(iso: string | undefined): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return String(iso).toUpperCase();
-  return formatTimeHm(d).toUpperCase();
+  return formatTimeHm24(d);
 }
 
 /**

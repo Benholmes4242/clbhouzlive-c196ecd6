@@ -66,7 +66,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
                 fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
-              {formatTimeHm(new Date(g.teeTime))}
+              {formatTimeHm24(new Date(g.teeTime))}
             </div>
             <div
               style={{
