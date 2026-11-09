@@ -70,7 +70,9 @@ describe('upcoming LAST YEAR condensed board', () => {
     expect(row.children).toHaveLength(3);
     expect(row.querySelector('[class*="fi-"]')).toBeNull();
   });
-  it('keeps the winner the same size with a 13px gold trophy and canonical score without wash', () => {
+  it('keeps the winner the same size with the shared 13px outline trophy and canonical score without wash', () => {
+    // HERO BLOCKS §1d: the outline lucide Trophy (13px, #FBBC2E via
+    // .recap-trophy) replaces the old filled cup glyph.
     const view = render(<LastYearRow rank="1" name="Winner" score="−20" isWinner />);
     const row = view.container.firstElementChild as HTMLElement;
     expect(row.style.padding).toBe('0px');
@@ -78,7 +80,8 @@ describe('upcoming LAST YEAR condensed board', () => {
     expect(row.firstElementChild?.tagName).toBe('svg');
     expect(row.firstElementChild?.getAttribute('width')).toBe('13');
     expect(row.firstElementChild?.getAttribute('height')).toBe('13');
-    expect(row.firstElementChild?.getAttribute('fill')).toBe(LEADER_GOLD);
+    expect(row.firstElementChild?.getAttribute('fill')).toBe('none');
+    expect(row.firstElementChild?.classList.contains('recap-trophy')).toBe(true);
     const expected = document.createElement('span'); expected.style.color = getScoreColor(-20, 'dark');
     expect((row.lastElementChild as HTMLElement).style.color).toBe(expected.style.color);
     expect(row.style.background).toBe('transparent');

@@ -133,13 +133,16 @@ describe('recap body', () => {
     const keys = [...container.querySelectorAll('[data-recap-fact]')].map((c) => c.getAttribute('data-recap-fact'));
     expect(keys).toEqual(['events', 'winners', 'mostWins']);
   });
-  it('board: trophy for first, rounded points, Full list link', () => {
+  it('board: trophy for first, rounded points, no board header row', () => {
+    // HERO BLOCKS §3: the "POINTS LIST · FINAL" kicker and "Full list ›" link
+    // are removed; POS PLAYER PTS sits directly under the fact band divider.
     const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
     const board = container.querySelector('[data-recap-board]')!;
     expect(board.querySelector('[data-recap-row="1"] [data-recap-trophy]')).not.toBeNull();
     expect(board.querySelector('[data-recap-row="1"]')!.textContent).not.toContain('1Ross');
-    expect(board.querySelector('[data-recap-full-list]')!.textContent).toBe('Full list ›');
-    expect(board.textContent).toContain('POINTS LIST · FINAL');
+    expect(board.querySelector('[data-recap-full-list]')).toBeNull();
+    expect(board.textContent).not.toContain('POINTS LIST · FINAL');
+    expect(board.querySelector('.recap-grid-head')!.textContent).toBe('POSPLAYERPTS');
   });
   it('Korn Ferry fixture renders exactly the mock names and points', () => {
     const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
