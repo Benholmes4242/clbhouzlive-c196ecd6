@@ -10,6 +10,8 @@
  * when the caller's kicker names the start day by weekday (startDayNamed),
  * passed from the same start-day decision the kicker renders. */
 import '@/styles/hybrid-hero.css';
+import '../../tournament-v2/sections/completedWeek.css';
+import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -34,7 +36,7 @@ export function UpcomingFacts({ first, zone, field, purse, par, yards = null, st
   const { t } = useTranslation('tourhub');
   const cells = upcomingFactCells(first, zone, field, purse, par, yards, startDayNamed);
   if (!cells.length) return null;
-  return <div data-overview-facts className="upcoming-facts">{cells.map(cell => <div key={cell.key} data-upcoming-fact={cell.key}><b>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div>;
+  return <section data-overview-event className="cw-block upcoming-event"><h2 className="cw-kick">{t('overview.upcomingPlus.event', { defaultValue: 'THE EVENT' })}</h2><div data-overview-facts className="upcoming-facts upcoming-event-facts">{cells.map(cell => <div className="cw-cell" key={cell.key} data-upcoming-fact={cell.key}><b style={HERO_TOT_TYPE}>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div></section>;
 }
 export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { member: boolean; followed: Set<string>; field: UpcomingPlayer[]; drawn: boolean; zone: string | null }) {
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
@@ -50,7 +52,7 @@ export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { 
 export function UpcomingLastYear({ rows }: { rows: LastYearFinisher[] }) {
   const { t } = useTranslation('tourhub'); const shown = rows.slice(0, 4);
   if (!shown.length) return null;
-  return <section data-overview-last-year className="upcoming-block">
+  return <section data-overview-last-year className="upcoming-block upcoming-history">
     <h2 data-overview-board-header className="upcoming-kicker" style={{ textTransform: 'uppercase' }}>{t('overview.hero.lastYear')}{shown.every(row => row.year === shown[0].year) ? ` · ${shown[0].year}` : null}</h2>
     <div className="upcoming-last-header">{['pos', 'player', 'tot'].map(key => <span key={key}>{t(`overview.upcomingPlus.${key}`)}</span>)}</div>
     {shown.map((row, i) => <LastYearRow key={`${row.rank}-${row.name}`} rank={i > 0 && row.rank === shown[i - 1].rank ? '' : row.rank} name={row.name} score={row.score} isWinner={i === 0 && (row.rank === '1' || row.rank === 'T1')} />)}

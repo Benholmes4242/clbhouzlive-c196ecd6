@@ -92,10 +92,13 @@
 .recap-foot{margin:10px 0 0;font-size:12.5px;line-height:1.45;color:rgba(248,250,252,.62)}.recap-foot b{color:var(--th-text-primary)}
 .recap-record-figs{margin:8px 0 0}
 @media(max-width:340px){.upcoming-block,.upcoming-facts{--upcoming-side:16px}}
-/* GAP ABOVE THE COURSE: last LAST YEAR row → THE COURSE kicker equals the fact
-   band's bottom divider → LAST YEAR kicker (18px) on both upcoming pages. The
-   course head centres its kicker against the taller guide link (2px), so the
-   block's top padding gives those 2px back; the tournament page's course
-   section follows LAST YEAR directly and takes the same 18px. */
-[data-overview-last-year]+.upcoming-course{padding-top:16px}
-[data-overview-last-year]+.tv-section[data-tv-section="course"]{padding-top:18px}
+/* Upcoming opts into the completed rhythm; recap and member panels keep their
+   existing band sizes. No extra container padding may extend these seams. */
+.upcoming-event-facts{margin-top:var(--hero-content-gap)}
+.upcoming-event-facts>div{padding:var(--hero-cell-pad)}
+.upcoming-event-facts b{line-height:var(--hero-cell-line)}
+.upcoming-event-facts span{margin-top:var(--hero-label-gap);letter-spacing:var(--hero-label-tracking);line-height:13px}
+.upcoming-history{padding-top:var(--hero-section-gap)}
+.upcoming-history .upcoming-last-header{margin-top:var(--hero-table-gap)}
+[data-overview-last-year]+.upcoming-course{padding-top:calc(var(--hero-section-gap) - 2px)}
+[data-overview-last-year]+.tv-section[data-tv-section="course"]{padding-top:var(--hero-section-gap)}

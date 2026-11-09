@@ -1,11 +1,11 @@
 # Roadmap
 
-## In progress: Upcoming completed rhythm + top-three score colour
+## In progress: Tour heroes — upcoming rhythm + completed two lines
 Approved figure size: 15px / 700 (brief governs the mock's unused 15px class).
 Fresh before-change shards: 2,084 / 1,907 / 2,053 / 1,954 = 7,998, all passing.
-Application changes, after-change shards, and before/after 390px measurements remain pending.
-Screen-check fixture needs its router import aligned with Vite's module identity;
-no application changes were made to accommodate the fixture.
+Replacement brief includes two-line completed figures and both live payload fixtures.
+Before fixtures measured facts-label → LAST YEAR 30px and last row → COURSE 18px on both pages.
+Application changes and after-change verification are in progress.
 Report: UPCOMING_COMPLETED_RHYTHM_REPORT.md.
 
 ## Done: Round scores + Media/notch + rulings (baseline clean)

@@ -353,6 +353,7 @@
       "offlineBanner": "You're offline. Some data may be outdated."
     },
     "upcomingPlus": {
+      "event": "THE EVENT",
       "defends": "<b>{{name}}</b> defends after winning by <b>{{margin}}</b> at <b>{{score}}</b>.",
       "won": "<b>{{name}}</b> won here last year, by <b>{{margin}}</b> at <b>{{score}}</b>.",
       "defendsPlayoff": "<b>{{name}}</b> defends after winning a playoff at <b>{{score}}</b>.",
