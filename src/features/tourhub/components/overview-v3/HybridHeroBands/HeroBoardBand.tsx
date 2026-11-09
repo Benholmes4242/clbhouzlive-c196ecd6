@@ -53,6 +53,9 @@ import { Trophy } from 'lucide-react';
 import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, WHITE_ALPHA_12, TOPAR_UNDER_DARK, LIVE_INK, STATUS_NEGATIVE } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
+import { CompletedWeekBlock } from '../../../tournament-v2/sections/CompletedWeekBlock';
+import { useTournamentWeekFacts } from '../../../tournament-v2/data/useTournamentWeekFacts';
+import { hasStrokeBoard } from '../../../_shared/eventFormat';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
@@ -336,6 +339,11 @@ export function HeroBoardSection({
   /* Before the first tee the feed gives every row position 1 and a 0 score;
      a board of T1 E is false, so the board waits for the first started row. */
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
+  /* COMPLETED STATE: finished stroke-play events replace the ten-row board
+     with the shared CompletedWeekBlock. Null facts keep today's board. */
+  const completedStroke = !picksOnly && phase === 'completed' && hasStrokeBoard(eventType);
+  const weekFactsQuery = useTournamentWeekFacts(tournamentId, completedStroke);
+  const weekFacts = completedStroke ? weekFactsQuery.data ?? null : null;
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = eventTourCode ?? viewingTourSlug ?? 'pga';
@@ -469,7 +477,9 @@ export function HeroBoardSection({
         <RoundMovementBand round={currentRound} cards={movementCards} />
       ) : null}
 
-      {!picksOnly && hasBoard ? (
+      {weekFacts ? <CompletedWeekBlock facts={weekFacts} rows={entries} onFullBoard={onFullBoard} /> : null}
+
+      {!picksOnly && hasBoard && !weekFacts && !(completedStroke && weekFactsQuery.isLoading) ? (
         <MiniBoard
           tourSlug={pickTourCode}
           totalRounds={totalRounds}
