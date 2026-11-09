@@ -19,8 +19,8 @@ Minimum-rows guard per tour (writes nothing below): lpga 100, pgad 100, champ 50
 ## 2. Champions added
 `tour_code champ`, Charles Schwab Cup Points from the URL above (events, points, wins mapped). Pass 1 tags tried: CHAMP/champ/SEN/sen/PGAS/pgas, then a unique exact first+last pass across sr_players.
 
-## 3. PGA (FedEx Cup)
-The Players page race board reads `sr_player_statistics.fedex_points` (season via `sr_seasons`, tour_name `pga`), not `tour_season_rankings`. That source exists and is synced, so pga was **not** added. (Not independently checked for freshness — I ran no queries.)
+## 3. PGA — skipped (addendum)
+No scraper. The recap now reads PGA from `sr_player_statistics` for the final event's season (`fedex_points` descending, zero/null excluded, rank = sort position, as usePlayersRanking builds the Players race), dated by the newest `updated_at`; the freshness rule is unchanged. Code: `freshPgaStandings` in `useSeasonRecap.ts`. New test file `src/test/seasonRecapPgaStandings.test.ts` (3 tests). Shards 2,042 / 1,895 / 2,017 / 1,926 = 7,880 (+3 from 7,877, all new).
 
 ## 4. First run — 2026-11-09, season 2026
 | tour | rows | top 3 | scraped_at |
@@ -36,18 +36,18 @@ Champions is "through the Simmons Bank Championship, November 1" — the season 
 Top 3 matches: Steelman 2,221 / Scott 2,191 / Holt 1,618. Top 20 written (same feed the published list renders from): 1 Ross Steelman 2,221; 2 Sandy Scott 2,191; 3 Ian Holt 1,618; 4 Alistair Docherty 1,580; 5 Alvaro Ortiz 1,533; 6 Austin Hitt 1,491; 7 Cole Sherwood 1,483; 8 Doc Redman 1,466; 9 Blades Brown 1,402; 10 Tommy Morrison 1,289; 11 Cooper Dossey 1,200; 12 Hunter Eichhorn 1,190; 13 Dylan Menante 1,183; 14 Michael Johnson 1,120; 15 Jeremy Gandon 1,095; 16 Taylor Dickson 1,058; 17 Ian Gilligan 993; 18 Davis Shore 989; 19 Carson Young 939; 20 Davis Lamb 938. Freshness rule unchanged.
 
 ## Schedule — SQL for Ben to run (I ran none)
-Weekly Monday 06:00 UTC, alongside scrape-tour-rankings:
+Daily at 06:45 UTC, like scrape-tour-rankings-euro-daily:
 ```sql
 select cron.schedule(
-  'scrape-season-rankings-weekly',
-  '0 6 * * 1',
+  'scrape-season-rankings-daily',
+  '45 6 * * *',
   $$ select net.http_post(
        url := 'https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/scrape-season-rankings',
        headers := '{"Content-Type":"application/json","apikey":"<publishable key>"}'::jsonb,
        body := '{"tour":"all"}'::jsonb) $$
 );
 ```
-No GitHub workflow restored, so no GitHub secrets are needed. No table or column change needed.
+One job covers lpga, pgad, liv and champ. No GitHub workflow, so no GitHub secrets; no table or column change.
 
 ## Not done / notes
 - Unmatched names (e.g. KF "Jay Card III", "S.Y. Noh"; LIV "Do-Yeob Mun") stay with null player_id, as before.
