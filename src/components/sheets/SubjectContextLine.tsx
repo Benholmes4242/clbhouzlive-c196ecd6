@@ -16,6 +16,11 @@ export interface SubjectContext {
   kind: 'round' | 'review' | 'post';
   gross: number | null;
   toPar: number | null;
+  /** BUILD Round scores §2 — the NET score and its to-par. A round that
+   *  cannot be converted to net carries null and the line shows NO score;
+   *  gross is never substituted. */
+  net?: number | null;
+  netToPar?: number | null;
   rating: number | null;
 }
 
@@ -24,8 +29,8 @@ export function SubjectContextLine({ subject, dataAttr = 'subject-context' }: { 
   if (!subject || subject.kind === 'post' || !subject.authorName || !subject.courseName) return null;
   const strong = { color: A.INK, fontWeight: 700 } as const;
   let tail: React.ReactNode = null;
-  if (subject.kind === 'round' && subject.gross != null) {
-    const tp = subject.toPar;
+  if (subject.kind === 'round' && subject.net != null) {
+    const tp = subject.netToPar ?? null;
     const tpText = tp == null ? null : tp === 0 ? t('comments.contextLevel') : tp < 0 ? `\u2212${Math.abs(tp)}` : `+${tp}`;
     tail = (
       <>
