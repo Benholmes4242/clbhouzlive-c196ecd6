@@ -34,6 +34,9 @@ import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
+import { useFeaturedRoundNet } from './useFeaturedRound';
+import { feedStrokesReceived, feedNetSeries } from '@/components/feed/roundTilePlot';
+import { formatDisplayedHcp } from '@/lib/whs/format';
 import { goodHoleDots, SCORE_TRACE_PLOT_HEIGHT } from './roundTreatment';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
@@ -70,7 +73,7 @@ const UNIT_FIT: React.CSSProperties = { minWidth: 0, overflow: 'hidden', textOve
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
 const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n));
 
-function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
+function Headline({ r, unit, netToPar }: { r: FeaturedRound; unit?: string | null; netToPar: number | null }) {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const feat = (text: string) => <span style={BIG_WORD}>{text}</span>;
@@ -89,8 +92,9 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
       return (
         <span style={{ ...ROW, gap: 8 }}>
           <span style={{ ...BIG, flex: '0 0 auto' }}>{r.gross}</span>
-          {r.to_par != null && r.to_par < 0 ? (
-            <span style={{ flex: '0 0 auto', fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(r.to_par)}</span>
+          {/* Round scores §3 — the to-par figure is NET to par; no net row, no figure. */}
+          {netToPar != null && netToPar < 0 ? (
+            <span style={{ flex: '0 0 auto', fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(netToPar)}</span>
           ) : null}
           {unit ? <span style={{ ...UNIT, ...UNIT_FIT, marginLeft: 2 }}>{unit}</span> : null}
         </span>
@@ -99,7 +103,9 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
       if (r.reason === 'birdie_run') return <span style={BIG}>{k('birdieRun', { count: r.birdie_run })}</span>;
       if (r.reason === 'eagle_brace') return <span style={BIG}>{k('eagleBrace', { count: r.eagles })}</span>;
       if (r.reason === 'stableford_45') return points(r.stableford);
-      return <span style={{ ...BIG, color: TOPAR_UNDER_DARK }}>{toPar(r.to_par)}</span>;
+      /* Round scores §3 — the big to-par figure is NET to par; no net row,
+         no figure (never the gross to-par). */
+      return netToPar != null ? <span style={{ ...BIG, color: TOPAR_UNDER_DARK }}>{toPar(netToPar)}</span> : null;
     case 4:
       if (r.reason === 'stableford_40') return points(r.stableford);
       if (r.reason === 'birdie_haul')
