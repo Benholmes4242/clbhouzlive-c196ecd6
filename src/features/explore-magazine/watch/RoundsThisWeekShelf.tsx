@@ -16,9 +16,9 @@ import {
   TO_PAR_UNDER,
   recentSentenceParts,
   roundToPar,
-  stripColor,
   toParLabel,
 } from './roundsShelfRules';
+import { RoundTileMarks } from './RoundTileMarks';
 
 /**
  * RECENT ROUNDS (RR1, mock A/B) — a shelf on Watch's For you chip, directly
@@ -222,13 +222,7 @@ export function RoundCard({
         {t('amateur.roundsShelf.kickerNet', 'Net · gross {{gross}}', { gross: round.gross_score ?? '–' })}
         {round.is_competition ? t('amateur.roundsShelf.kickerComp', ' · comp') : ''}
       </span>
-      {shape ? (
-        <span aria-hidden style={{ display: 'flex', gap: 2, marginTop: 11 }}>
-          {shape.holes.map((hole) => (
-            <i key={hole.holeNo} style={{ flex: 1, height: 5, borderRadius: 2, background: stripColor(hole.strokes, hole.par) }} />
-          ))}
-        </span>
-      ) : null}
+      {shape ? <RoundTileMarks shape={shape} /> : null}
       {sentence ? (
         <span style={{ ...clamp2, fontSize: 12.5, color: A.MUTE, marginTop: 'auto', lineHeight: 1.4 }}>
           {t(sentence.key, { ...sentence, defaultValue: sentence.defaultValue })}

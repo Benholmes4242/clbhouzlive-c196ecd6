@@ -129,26 +129,6 @@ export function toParLabel(toPar: number | null): string | null {
 /** Under par is the surface's red; level and over are mute. */
 export const TO_PAR_UNDER = '#E24B3F';
 
-/** The strip's scorecard palette, per the signed-off mock. */
-export const STRIP_COLORS = {
-  eagle: '#E8C766',
-  birdie: '#E24B3F',
-  par: 'rgba(255,255,255,0.14)',
-  bogey: '#A6C2F0',
-  double: '#7AA6EC',
-} as const;
-
-/** One bar's colour from the hole's actual gross against par. */
-export function stripColor(strokes: number | null, par: number | null): string {
-  if (strokes == null || par == null) return STRIP_COLORS.par;
-  const diff = strokes - par;
-  if (diff <= -2) return STRIP_COLORS.eagle;
-  if (diff === -1) return STRIP_COLORS.birdie;
-  if (diff === 0) return STRIP_COLORS.par;
-  if (diff === 1) return STRIP_COLORS.bogey;
-  return STRIP_COLORS.double;
-}
-
 /** Card geometry and paint, named once (RS §3, mock A/C; unchanged by RR1). */
 export const SHELF_CARD = {
   width: 232,

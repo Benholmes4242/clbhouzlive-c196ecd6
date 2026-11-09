@@ -87,9 +87,10 @@ import AmateurPage from '@/pages/AmateurPage';
 import {
   recentSentenceParts,
   roundToPar,
-  stripColor,
   toParLabel,
 } from '@/features/explore-magazine/watch/roundsShelfRules';
+import * as shelfRules from '@/features/explore-magazine/watch/roundsShelfRules';
+import { RoundTileMarks, tileMarkCells, isNineHoleShape } from '@/features/explore-magazine/watch/RoundTileMarks';
 import { EXPLORE_VIEWS, readExploreView } from '@/features/explore-magazine/exploreViewMemory';
 import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 
@@ -207,13 +208,42 @@ describe('RR shelf rules', () => {
     expect(toParLabel(null)).toBeNull();
   });
 
-  it('maps hole scores to the scorecard strip palette', () => {
-    expect(stripColor(2, 4)).toBe('#E8C766');
-    expect(stripColor(3, 4)).toBe('#E24B3F');
-    expect(stripColor(4, 4)).toBe('rgba(255,255,255,0.14)');
-    expect(stripColor(5, 4)).toBe('#A6C2F0');
-    expect(stripColor(6, 4)).toBe('#7AA6EC');
-    expect(stripColor(null, 4)).toBe('rgba(255,255,255,0.14)');
+  it('no longer exports the coloured dot strip (BUILD Round scores §1)', () => {
+    expect('stripColor' in shelfRules).toBe(false);
+    expect('STRIP_COLORS' in shelfRules).toBe(false);
+  });
+
+  it('tile marks: eighteen holes draw two rows of nine, nine holes one row', () => {
+    const shape = { coursePar: 71, series: [], beads: [], played: 18, birdies: 2, holes: eighteenHoles };
+    expect(isNineHoleShape(shape as never)).toBe(false);
+    const cells = tileMarkCells(shape as never);
+    expect(cells).toHaveLength(18);
+    expect(cells[0]).toEqual({ strokes: 3, par: 4 });
+    const { container } = mount(<RoundTileMarks shape={shape as never} />);
+    const rows = container.querySelectorAll('[data-hole-marks]');
+    expect(rows).toHaveLength(2);
+    expect(rows[0].querySelectorAll('[data-hole-mark]')).toHaveLength(9);
+    expect(rows[1].querySelectorAll('[data-hole-mark]')).toHaveLength(9);
+    expect(container.querySelector('[data-round-tile-marks]')).toHaveAttribute('data-round-tile-marks', 'eighteen');
+  });
+
+  it('tile marks: a nine-hole round draws one row of nine', () => {
+    const nine = { coursePar: 36, series: [], beads: [], played: 9, birdies: 1, holes: eighteenHoles.slice(0, 9) };
+    expect(isNineHoleShape(nine as never)).toBe(true);
+    const { container } = mount(<RoundTileMarks shape={nine as never} />);
+    const rows = container.querySelectorAll('[data-hole-marks]');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].querySelectorAll('[data-hole-mark]')).toHaveLength(9);
+    expect(container.querySelector('[data-round-tile-marks]')).toHaveAttribute('data-round-tile-marks', 'nine');
+  });
+
+  it('tile marks: unplayed holes keep the empty dot and the surface is the tile background', () => {
+    const sparse = { coursePar: 71, series: [], beads: [], played: 2, birdies: 0, holes: eighteenHoles.slice(0, 2) };
+    const { container } = mount(<RoundTileMarks shape={sparse as never} />);
+    const marks = container.querySelectorAll('[data-hole-mark]');
+    expect(marks).toHaveLength(9);
+    expect(marks[2]).toHaveAttribute('data-grade', 'empty');
+    expect((container.querySelector('[data-hole-marks]') as HTMLElement).style.getPropertyValue('--hm-surface')).toBe('#17171B');
   });
 });
 
@@ -386,12 +416,14 @@ describe('RR Recent rounds shelf', () => {
     expect((toPar as HTMLElement).style.color).toBe('rgb(226, 75, 63)');
     expect(card.textContent).toContain('Net · gross 81');
     expect(card.textContent?.toLowerCase()).toContain('comp');
-    const bars = card.querySelectorAll('i');
-    expect(bars).toHaveLength(18);
-    expect((bars[0] as HTMLElement).style.background).toBe('rgb(226, 75, 63)');
-    expect((bars[1] as HTMLElement).style.background).toBe('rgb(122, 166, 236)');
-    expect((bars[2] as HTMLElement).style.background).toBe('rgb(232, 199, 102)');
-    expect((bars[3] as HTMLElement).style.background).toBe('rgb(166, 194, 240)');
+    const marks = card.querySelectorAll('[data-hole-mark]');
+    expect(marks).toHaveLength(18);
+    expect(marks[0]).toHaveAttribute('data-grade', 'birdie');
+    expect(marks[1]).toHaveAttribute('data-grade', 'double');
+    expect(marks[2]).toHaveAttribute('data-grade', 'eagle');
+    expect(marks[3]).toHaveAttribute('data-grade', 'bogey');
+    expect(marks[4]).toHaveAttribute('data-grade', 'par');
+    expect(card.querySelectorAll('[data-hole-marks]')).toHaveLength(2);
     expect(card.textContent).toContain('Best ever at Royal County Down Golf Club (Championship)');
   });
 

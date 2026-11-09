@@ -95,6 +95,7 @@ export function RoundShape({
   exploreDots,
   exploreDotCanvas = A.CANVAS,
   underParFill = false,
+  seriesOverride,
 
 }: {
   row: CircleRoundRow;
@@ -137,6 +138,10 @@ export function RoundShape({
   /** Explore-only fill between the trace and level par while cumulative gross
    *  to-par is below zero. Defaults off for every shared consumer. */
   underParFill?: boolean;
+  /** BUILD Round scores §3 — Explore-only NET cumulative series, drawn in
+   *  place of shape.series by the exploreLineOnly branch when the round can
+   *  be netted. Absent for every shared caller, so nothing else moves. */
+  seriesOverride?: number[];
 
 }) {
   const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
@@ -186,7 +191,7 @@ export function RoundShape({
   );
 
   if (shape && exploreLineOnly) {
-    const lineValues = shape.series;
+    const lineValues = seriesOverride ?? shape.series;
     const renderedHeight = height + (endLabels ? EXPLORE_END_LABEL_BAND : 0);
     const lo = Math.min(0, ...lineValues) - 0.7;
     const hi = Math.max(0, ...lineValues) + 0.7;
