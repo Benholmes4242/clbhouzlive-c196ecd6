@@ -10,6 +10,15 @@
  * GOLD, NEVER AMBER, ON THE FRAME. Gold means a rare achievement (eagle chips,
  * ace ring). Amber means the viewing member, so on the viewer's own round only
  * the NAME turns amber and reads "You".
+ *
+ * ROUND SCORES §3 (ruling) — the hero is on NET everywhere it renders (Home
+ * round of the week via FeedCard/HomeRail, Explore featured round): the big
+ * to-par figure is NET to par (net_score − course_par, existing under-par
+ * colours), the photo trace is the FN1 net line (feedStrokesReceived →
+ * feedNetSeries) or is not drawn, and the stat row is FN1.5 (NET with to-par,
+ * GROSS with to-par, HANDICAP, AWARDS). Net facts come from one single-row
+ * gam_round_net read (useFeaturedRoundNet); no row = no figure, no line, no
+ * NET cell. Figure, line end and NET cell agree by construction.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
