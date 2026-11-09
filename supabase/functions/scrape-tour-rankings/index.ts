@@ -1,4 +1,5 @@
 import { corsFor } from '../_shared/cors.ts';
+import { pickSeasonYear, type SeasonYearEvent } from './seasonYear.ts';
 /**
  * scrape-tour-rankings - DP World Tour (Race to Dubai) season rankings ingest.
  *
@@ -18,6 +19,9 @@ import { corsFor } from '../_shared/cors.ts';
  * tours, so the feed's own convention is the stored one and the client does
  * the interpreting: priorRank = position + change, movement = change, both
  * positive-means-up.
+ * Default year mirrors currentSeason.ts using EURO stroke/team events, not
+ * a calendar/November rollover; explicit body.year wins. The 50-row floor
+ * protects the new season until its actual list is ready.
  */
 
 
@@ -91,13 +95,30 @@ Deno.serve(async (req) => {
 
   try {
     const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
     const body = await req.json().catch(() => ({}));
     const tour: string = body.tour || "euro";
-    const season: number = Number(body.year) || new Date().getUTCFullYear();
+    let season: number = Number(body.year) || new Date().getUTCFullYear();
+    if (!Number(body.year)) {
+      const today = new Date().toISOString().slice(0, 10);
+      const base = () => supabase.from('sr_tournaments')
+        .select('start_date, end_date, status, event_type, season:sr_seasons!inner(year, tour_name)')
+        .ilike('season.tour_name', 'euro')
+        .in('event_type', ['stroke', 'team'])
+        .or('status.is.null,status.not.in.(cancelled,canceled)');
+      const next = await base().gte('end_date', today).order('start_date', { ascending: true }).limit(5);
+      if (!next.error) {
+        let picked = pickSeasonYear((next.data ?? []) as unknown as SeasonYearEvent[], today);
+        if (!next.data?.length) {
+          const last = await base().lt('end_date', today).order('end_date', { ascending: false }).limit(5);
+          if (!last.error) picked = pickSeasonYear((last.data ?? []) as unknown as SeasonYearEvent[], today);
+        }
+        season = picked ?? season;
+      }
+    }
     // Test hook: lets the failed-fetch path be exercised without touching data.
     const urlOverride: string | undefined = body.url_override;
 
