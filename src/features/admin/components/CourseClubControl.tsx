@@ -9,15 +9,28 @@ import ConfirmDialog from './ConfirmDialog';
  * Admin-only club attachment for a course record. Writes go through
  * `admin_set_course_club` (is_admin-guarded RPC, applied by hand). The RPC
  * refuses to overwrite a different club, so reattaching is detach-then-attach.
+ * Clubless courses can create their own club via `admin_create_club_for_course`;
+ * club search uses accent-folded `search_golf_clubs`.
  */
 export default function CourseClubControl({ courseId, clubId }: { courseId: string; clubId: string | null }) {
   const qc = useQueryClient();
   const [q, setQ] = useState('');
-  const [hits, setHits] = useState<Array<{ id: string; name: string; sub_country: string | null }>>([]);
+  const [hits, setHits] = useState<Array<{ id: string; name: string; sub_country?: string | null; country?: string | null }>>([]);
   const [searching, setSearching] = useState(false);
   const [picked, setPicked] = useState<{ id: string; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirmDetach, setConfirmDetach] = useState(false);
+  const [confirmCreate, setConfirmCreate] = useState(false);
+
+  const { data: courseName } = useQuery({
+    queryKey: ['admin-v2', 'courses', 'name', courseId],
+    queryFn: async () => {
+      const { data } = await supabase.from('golf_courses').select('name').eq('id', courseId).maybeSingle();
+      return (data as { name: string } | null)?.name ?? null;
+    },
+    enabled: !clubId,
+    staleTime: 30_000,
+  });
 
   const { data: club } = useQuery({
     queryKey: ['admin-v2', 'courses', 'club', clubId],
@@ -36,11 +49,8 @@ export default function CourseClubControl({ courseId, clubId }: { courseId: stri
     let cancelled = false;
     setSearching(true);
     const h = setTimeout(async () => {
-      const { data } = await supabase
-        .from('golf_clubs')
-        .select('id, name, sub_country')
-        .ilike('name', `%${term}%`)
-        .limit(10);
+      // Accent-folded server search (SEARCH_FOLD_V1).
+      const { data } = await (supabase.rpc as any)('search_golf_clubs', { p_query: term, p_limit: 10 });
       if (cancelled) return;
       setHits((data ?? []) as any);
       setSearching(false);
@@ -60,6 +70,23 @@ export default function CourseClubControl({ courseId, clubId }: { courseId: stri
       return true;
     } catch (e: any) {
       toast.error(e?.message || 'Failed to update club');
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const createClub = async () => {
+    setBusy(true);
+    try {
+      const { error } = await (supabase.rpc as any)('admin_create_club_for_course', { p_course_id: courseId });
+      if (error) throw error;
+      toast.success('Club created');
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+      qc.invalidateQueries({ queryKey: ['club-course-analytics'] });
+      return true;
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to create club');
       return false;
     } finally {
       setBusy(false);
@@ -116,13 +143,28 @@ export default function CourseClubControl({ courseId, clubId }: { courseId: stri
                   style={{ textAlign: 'left', background: 'transparent', border: 'none', borderBottom: `1px solid ${t.line}`, padding: '7px 2px', cursor: 'pointer' }}
                 >
                   <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{c.name}</div>
-                  {c.sub_country && <div style={{ fontSize: 11.5, color: t.inkMuted }}>{c.sub_country}</div>}
+                  {(c.sub_country || c.country) && <div style={{ fontSize: 11.5, color: t.inkMuted }}>{c.sub_country || c.country}</div>}
                 </button>
               ))}
             </div>
           )}
+          <div>
+            <button type="button" disabled={busy} onClick={() => setConfirmCreate(true)} style={ghost}>
+              Create a club from this course
+            </button>
+          </div>
         </>
       )}
+
+      <ConfirmDialog
+        open={confirmCreate}
+        onClose={() => setConfirmCreate(false)}
+        onConfirm={async () => { if (await createClub()) setConfirmCreate(false); }}
+        title="Create a club?"
+        description={`Creates "${courseName ?? 'this course'}" as a club so members can pick it as their home club, and attaches this course to it.`}
+        confirmLabel="Create club"
+        busy={busy}
+      />
 
       <ConfirmDialog
         open={confirmDetach}
