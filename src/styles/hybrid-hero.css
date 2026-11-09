@@ -81,9 +81,9 @@
 /* Season recap (signed-off season-recap.html). Facts/record figures reuse .upcoming-facts. */
 .recap-fact-small{font-size:12px;font-weight:700;color:rgba(248,250,252,.62);margin-left:3px}
 .recap-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.recap-link{padding:0;height:auto;background:none;font-size:12px;font-weight:700;letter-spacing:0;color:var(--th-text-primary)}
-.recap-grid{display:grid;grid-template-columns:24px minmax(0,1fr) 64px;column-gap:4px;align-items:center}
+.recap-grid{display:grid;grid-template-columns:24px minmax(0,1fr) minmax(64px,max-content);column-gap:4px;align-items:center}
 .recap-grid-head{margin-top:8px;min-height:24px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(248,250,252,.62)}.recap-grid-head>span:last-child{text-align:right}
-.recap-row{min-height:31px}.recap-pos{font-size:12.5px;font-weight:700}.recap-trophy{display:block;color:#FBBC2E}.recap-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.recap-pts{text-align:right;font-size:15px;font-weight:700;color:var(--th-text-primary);font-variant-numeric:tabular-nums}
+.recap-row{min-height:31px}.recap-pos{font-size:12.5px;font-weight:700}.recap-trophy{display:block;color:#FBBC2E}.recap-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.recap-pts{text-align:right;white-space:nowrap;font-size:15px;font-weight:700;color:var(--th-text-primary);font-variant-numeric:tabular-nums}
 .recap-cards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;padding-top:6px}.recap-cards>div{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;min-height:28px;min-width:0}.recap-cards span{font-size:11.5px;font-weight:700;color:var(--tv-dim);font-variant-numeric:tabular-nums}.recap-cards b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .recap-foot{margin:10px 0 0;font-size:12.5px;line-height:1.45;color:rgba(248,250,252,.62)}.recap-foot b{color:var(--th-text-primary)}
 .recap-record-figs{margin:8px 0 0}
