@@ -75,7 +75,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
     return { kind: 'none', cutline: null, extraCount: 0 };
   }, [meta, entries]);
 
-  const handleRow = (e: BoardEntry) => {
+  const openScorecard = (e: BoardEntry) => {
     if (!e.player?.id) return;
     setTarget({
       playerId: e.player.id,
@@ -88,6 +88,42 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       thru: e.thru ?? null,
       status: e.status ?? null,
     });
+  };
+
+  /* Row tap = the hero board's inline expand. One row open at a time;
+     tapping the open row closes it. A row with no started round goes
+     straight to the ScorecardSheet, exactly as the hero board does. */
+  const handleRow = (e: BoardEntry) => {
+    const pid = e.player?.id;
+    if (!pid) return;
+    if (expanded?.playerId === pid) { setExpanded(null); return; }
+    const started = heroStartedRounds(e, meta?.current_round ?? null);
+    const defaultRound = heroDefaultRound(started, meta?.current_round ?? null);
+    if (defaultRound == null) { openScorecard(e); return; }
+    setExpanded({ playerId: pid, round: defaultRound });
+  };
+
+  const panelRounds = useMemo(() => {
+    const cols = computeBoardColumns(entries, meta?.current_round ?? null, tournamentIsFinished(meta?.status));
+    return Math.max(...cols.rounds, meta?.current_round ?? 1);
+  }, [entries, meta]);
+
+  const renderExpandedRow = (e: BoardEntry) => {
+    const pid = e.player?.id;
+    if (!pid || !expanded || expanded.playerId !== pid) return null;
+    return (
+      <HeroRoundPanel
+        key={pid}
+        tournamentId={tournamentId}
+        playerId={pid}
+        round={expanded.round}
+        rounds={panelRounds}
+        startedRounds={heroStartedRounds(e, meta?.current_round ?? null)}
+        boardUpdatedAt={0}
+        onRound={(round) => setExpanded({ playerId: pid, round })}
+        onFull={() => openScorecard(e)}
+      />
+    );
   };
 
   return (
