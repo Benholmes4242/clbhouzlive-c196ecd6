@@ -1,11 +1,13 @@
 # Roadmap
 
-## In progress: Tour heroes — upcoming rhythm + completed two lines
+## Done: Tour heroes — upcoming rhythm + completed two lines
 Approved figure size: 15px / 700 (brief governs the mock's unused 15px class).
 Fresh before-change shards: 2,084 / 1,907 / 2,053 / 1,954 = 7,998, all passing.
 Replacement brief includes two-line completed figures and both live payload fixtures.
 Before fixtures measured facts-label → LAST YEAR 30px and last row → COURSE 18px on both pages.
-Application changes and after-change verification are in progress.
+Focused 32/32; after shards 2,084 / 1,907 / 2,053 / 1,958 = 8,002 (+4).
+Both page fixtures checked at 320/390/430, draw/no-draw and WWT/Abu Dhabi.
+Only permitted McIlroy label ellipsis at 320. Live authenticated/device checks remain external to these fixtures.
 Report: UPCOMING_COMPLETED_RHYTHM_REPORT.md.
 
 ## Done: Round scores + Media/notch + rulings (baseline clean)
