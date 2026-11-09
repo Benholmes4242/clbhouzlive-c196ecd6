@@ -34,7 +34,7 @@ import {
 } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
 import { weekKey, todayNoonMs, daysUntil, currentRoundFromScores } from './timelineUtils';
-import { rowTourIndex } from './scheduleRules';
+import { rowTourIndex, seasonSpans, type SeasonSpan } from './scheduleRules';
 
 // ─── Season → tournament resolution ───────────────────────────────────────
 
@@ -467,24 +467,27 @@ export function useSeasonTimeline(
       return evt;
     });
 
-    // Anchor priority: live row, then this-week row, then first upcoming.
+    // Anchor priority: live row, then this-week row, then first upcoming —
+    // over the CURRENT season's events only, exactly as before the merge.
+    const currentEvents = decorated.filter((e) => e.inCurrentSeason);
+    const anchorPool = currentEvents.length > 0 ? currentEvents : decorated;
     let anchorId: string | null = null;
     let currentEventNumber: number | null = null;
-    const liveIdx = decorated.findIndex((e) => e.state === 'live');
-    const thisWeekIdx = decorated.findIndex((e) => e.isThisWeek);
+    const liveIdx = anchorPool.findIndex((e) => e.state === 'live');
+    const thisWeekIdx = anchorPool.findIndex((e) => e.isThisWeek);
     if (liveIdx !== -1) {
-      anchorId = decorated[liveIdx].id;
-      currentEventNumber = decorated[liveIdx].eventNumber;
+      anchorId = anchorPool[liveIdx].id;
+      currentEventNumber = anchorPool[liveIdx].eventNumber;
     } else if (thisWeekIdx !== -1) {
-      anchorId = decorated[thisWeekIdx].id;
-      currentEventNumber = decorated[thisWeekIdx].eventNumber;
+      anchorId = anchorPool[thisWeekIdx].id;
+      currentEventNumber = anchorPool[thisWeekIdx].eventNumber;
     } else {
-      const upcomingIdx = decorated.findIndex((e) => e.state === 'upcoming');
+      const upcomingIdx = anchorPool.findIndex((e) => e.state === 'upcoming');
       if (upcomingIdx !== -1) {
-        anchorId = decorated[upcomingIdx].id;
-        currentEventNumber = decorated[upcomingIdx].eventNumber;
-      } else if (decorated.length > 0) {
-        currentEventNumber = decorated[decorated.length - 1].eventNumber;
+        anchorId = anchorPool[upcomingIdx].id;
+        currentEventNumber = anchorPool[upcomingIdx].eventNumber;
+      } else if (anchorPool.length > 0) {
+        currentEventNumber = anchorPool[anchorPool.length - 1].eventNumber;
       }
     }
 
@@ -509,15 +512,26 @@ export function useSeasonTimeline(
         ),
       }));
 
+    // Season summaries for the break headers, named from the rows' own
+    // season joins (same filter as the list).
+    const tourNameByYear = new Map<number, string | null>();
+    for (const r of events) {
+      const y = r.season?.year ?? null;
+      if (y != null && !tourNameByYear.has(y)) {
+        tourNameByYear.set(y, r.season?.tour_full_name ?? r.season?.tour_name ?? null);
+      }
+    }
+
     return {
       seasonName: season?.name ?? null,
       seasonYear: season?.year ?? null,
       weeks,
-      totalEvents: total,
+      totalEvents: currentEvents.length,
       currentEventNumber,
       anchorEventId: anchorId,
+      seasons: seasonSpans(decorated, tourNameByYear),
     };
-  }, [seasonQuery.data, events, leadersWinnersMap, defendingChampionMap]);
+  }, [seasonQuery.data, events, currentYear, leadersWinnersMap, defendingChampionMap]);
 
   return {
     data: timeline,
