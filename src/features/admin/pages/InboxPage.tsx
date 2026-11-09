@@ -857,7 +857,7 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
           <AttachPickedCourse requestId={row.id} courseId={row.forCourseId} clubName={row.clubName ?? 'club'} onDone={onClose} />
         )}
         {isClubCourse && row.status === 'pending' && row.forClubId && !row.forCourseId && (
-          <ClubCoursePicker requestId={row.id} clubId={row.forClubId} initialQuery={row.courseName} requestLocation={row.location ?? undefined} onDone={onClose} />
+          <ClubCoursePicker requestId={row.id} clubId={row.forClubId} clubName={row.clubName ?? 'This club'} initialQuery={row.courseName} requestLocation={row.location ?? undefined} onDone={onClose} />
         )}
 
         {!isHomeClub && !isClubCourse && row.status === 'pending' && (
@@ -939,8 +939,8 @@ function AttachPickedCourse({
  * selectable; the RPC also refuses a course owned by another club.
  */
 function ClubCoursePicker({
-  requestId, clubId, initialQuery, requestLocation, onDone,
-}: { requestId: string; clubId: string; initialQuery: string; requestLocation?: string; onDone: () => void }) {
+  requestId, clubId, clubName, initialQuery, requestLocation, onDone,
+}: { requestId: string; clubId: string; clubName: string; initialQuery: string; requestLocation?: string; onDone: () => void }) {
   const { resolveClubCourseRequest } = useCourseRequests();
   const [createOpen, setCreateOpen] = useState(false);
   const [q, setQ] = useState(initialQuery);
@@ -973,6 +973,7 @@ function ClubCoursePicker({
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         prefillName={initialQuery}
+        fixedClub={{ id: clubId, name: clubName }}
         prefillSubCountry={requestLocation}
         uploadPhoto={uploadCoursePhoto}
         onOpenExisting={() => setCreateOpen(false)}

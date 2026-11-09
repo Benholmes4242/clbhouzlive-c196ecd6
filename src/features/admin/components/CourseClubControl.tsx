@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { clubBaseName } from '../lib/clubName';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { adminTheme as t } from '../theme';
@@ -161,7 +162,7 @@ export default function CourseClubControl({ courseId, clubId }: { courseId: stri
         onClose={() => setConfirmCreate(false)}
         onConfirm={async () => { if (await createClub()) setConfirmCreate(false); }}
         title="Create a club?"
-        description={`Creates "${courseName ?? 'this course'}" as a club so members can pick it as their home club, and attaches this course to it.`}
+        description={`Creates "${clubBaseName(courseName ?? '') || courseName || 'this course'}" as a club so members can pick it as their home club, and attaches this course to it.`}
         confirmLabel="Create club"
         busy={busy}
       />
