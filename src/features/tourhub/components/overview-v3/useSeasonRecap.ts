@@ -12,8 +12,8 @@
  *    sr_players by sr_id;
  *  - standings: tour_season_rankings (dated by scraped_at), else the newest
  *    tour_standings_snapshots date — each used ONLY when its own date is on or
- *    after the final event's end date (isFreshStandings). pga and champ have
- *    no rows today, so they always take the fallback;
+ *    after the final event's end date (isFreshStandings). pga instead reads
+ *    sr_player_statistics (see freshPgaStandings), dated by updated_at;
  *  - card line: tour_stakes by the per-tour after_position mapping;
  *  - card earners' ages: sr_players.birth_date by sr_players.id.
  */
@@ -85,12 +85,37 @@ export interface SeasonRecapData {
   tiedLeaders: number;
   /** Only when a FRESH source exists; else null and every list part hides. */
   standings: StandingRow[] | null;
-  standingsSource: { table: 'tour_season_rankings' | 'tour_standings_snapshots'; date: string } | null;
+  standingsSource: { table: 'tour_season_rankings' | 'tour_standings_snapshots' | 'sr_player_statistics'; date: string } | null;
   cardLine: { label: string; n: number } | null;
   cardEarners: CardEarner[];
 }
 
-async function freshStandings(tour: TourId, year: number, finalEnd: string): Promise<{ rows: StandingRow[]; source: SeasonRecapData['standingsSource'] } | null> {
+/**
+ * PGA standings: the FedEx Cup race exactly as usePlayersRanking builds the
+ * Players page — sr_player_statistics for the season, fedex_points descending,
+ * zero/null excluded, rank = sort position. Dated by the newest updated_at.
+ */
+export async function freshPgaStandings(seasonId: string | null, finalEnd: string): Promise<{ rows: StandingRow[]; source: SeasonRecapData['standingsSource'] } | null> {
+  if (!seasonId) return null;
+  const r = await supabase
+    .from('sr_player_statistics')
+    .select('player_id, fedex_points, updated_at')
+    .eq('season_id', seasonId)
+    .order('fedex_points', { ascending: false, nullsFirst: false })
+    .limit(300);
+  const stats = ((r.data ?? []) as Array<{ player_id: string; fedex_points: number | string | null; updated_at: string | null }>)
+    .filter((s) => s.fedex_points != null && Number(s.fedex_points) > 0)
+    .sort((a, b) => Number(b.fedex_points) - Number(a.fedex_points));
+  const updated = stats.map((s) => s.updated_at).filter((d): d is string => !!d).sort().pop() ?? null;
+  if (stats.length === 0 || !isFreshStandings(updated, finalEnd)) return null;
+  return {
+    rows: stats.slice(0, 100).map((s, i) => ({ position: i + 1, name: '', points: Number(s.fedex_points), playerId: s.player_id })),
+    source: { table: 'sr_player_statistics', date: updated as string },
+  };
+}
+
+async function freshStandings(tour: TourId, year: number, finalEnd: string, seasonId: string | null = null): Promise<{ rows: StandingRow[]; source: SeasonRecapData['standingsSource'] } | null> {
+  if (tour === 'pga') return freshPgaStandings(seasonId, finalEnd);
   const r = await supabase
     .from('tour_season_rankings')
     .select('position, points, player_name, player_id, manual_player_id, scraped_at')
@@ -144,7 +169,7 @@ export async function fetchSeasonRecap(tour: TourId, seasonId: string | null, ye
     mostWinsSurname = p?.last_name || surname(p?.full_name) || null;
   }
 
-  const fresh = await freshStandings(tour, year, finalEnd);
+  const fresh = await freshStandings(tour, year, finalEnd, seasonId);
   let standings = fresh?.rows ?? null;
   let cardLine: SeasonRecapData['cardLine'] = null;
   let cardEarners: CardEarner[] = [];
