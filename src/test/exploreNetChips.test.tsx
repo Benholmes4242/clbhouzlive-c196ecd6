@@ -36,8 +36,12 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     );
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
     expect(statKinds(container)).toEqual(['achievement']);
-    expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('67');
-    expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('−4');
+    /* BUILD Round scores §3 — the identity figures are the FN1.5 row:
+       NET with to-par, GROSS with to-par, HANDICAP; VS HCP is gone. */
+    expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('67−4');
+    expect(container.querySelector('[data-explore-stat-value="gross"]')?.textContent).toBe('70−1');
+    expect(container.querySelector('[data-explore-stat-value="handicap"]')?.textContent).toBe('3');
+    expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')).toBeNull();
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     expect(strip?.style.backgroundColor).toBe('rgb(22, 22, 26)');
     expect(strip?.style.backgroundImage).toBe('');
@@ -79,14 +83,17 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(FEAT_TOP_EMBLEM_GLOW).toContain('drop-shadow(0 0 12px');
   });
 
-  it('renders NET and VS HCP in identity without an achievement and no empty feat block', () => {
+  it('renders NET, GROSS and HANDICAP in identity without an achievement and no empty feat block', () => {
     const container = renderCard({ gross: 82, course_par: 71, net: 76, course_handicap: 6, birdies: 4 });
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
     expect(strip).toBeNull();
     expect(container.querySelector('[data-round-figures="true"]')).not.toBeNull();
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
-    expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('76');
-    expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('+5');
+    /* BUILD Round scores §3 — FN1.5 row: NET carries the to-par suffix. */
+    expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('76+5');
+    expect(container.querySelector('[data-explore-stat-value="gross"]')?.textContent).toBe('82+11');
+    expect(container.querySelector('[data-explore-stat-value="handicap"]')?.textContent).toBe('6');
+    expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')).toBeNull();
     expect(container.textContent).not.toMatch(/BIRDIES/i);
   });
 
@@ -105,10 +112,16 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(vsHandicapLabel(74, 71)).toBe('+3');
     expect(vsHandicapLabel(71, 71)).toBe('Level');
     const under = renderCard({ gross: 76, course_par: 71, net: 70, course_handicap: 6 });
-    expect((under.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
-    expect((under.querySelector('[data-explore-stat-value="vs-hcp"]') as HTMLElement).style.color).not.toBe('rgb(248, 250, 252)');
+    const underNet = under.querySelector('[data-explore-stat-value="net"]') as HTMLElement;
+    /* BUILD Round scores §3 — the net figure stays ink; its to-par suffix
+       carries the under-par red (VS HCP no longer renders). */
+    expect(underNet.style.color).toBe('rgb(248, 250, 252)');
+    expect(underNet.textContent).toBe('70−1');
+    expect(Array.from(underNet.querySelectorAll<HTMLElement>('span')).map((el) => el.style.color)).toContain('rgb(226, 75, 63)');
     const over = renderCard({ gross: 80, course_par: 71, net: 74, course_handicap: 6 });
-    expect((over.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
+    const overNet = over.querySelector('[data-explore-stat-value="net"]') as HTMLElement;
+    expect(overNet.style.color).toBe('rgb(248, 250, 252)');
+    expect(overNet.textContent).toBe('74+3');
   });
 
   it('keeps net and hcp off the photograph', () => {
