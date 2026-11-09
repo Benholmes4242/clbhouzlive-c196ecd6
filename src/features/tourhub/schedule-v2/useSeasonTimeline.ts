@@ -317,6 +317,7 @@ export function useSeasonTimeline(
   });
 
   const rawRows = seasonQuery.data?.rows ?? [];
+  const currentYear = seasonQuery.data?.season?.year ?? null;
 
   // 2. Filter rows to the requested tour (respecting cross-tour miscoded majors).
   const events = useMemo(() => {
@@ -370,9 +371,11 @@ export function useSeasonTimeline(
     const season = seasonQuery.data.season;
     if (!season && events.length === 0) return null;
 
-    const total = events.length;
-
-    const decorated: SeasonEvent[] = events.map((r, idx) => {
+    /* Counters stay CURRENT-SEASON ONLY: eventNumber, totalEvents, the
+       anchor and currentEventNumber all describe the current season even
+       though the list runs previous → current → next. */
+    let currentSeq = 0;
+    const decorated: SeasonEvent[] = events.map((r) => {
       const statusLc = (r.status ?? '').toLowerCase();
       const isDone = COMPLETED_STATUSES.has(statusLc) || endDateInPast(r.end_date);
       const isLive = !isDone && LIVE_STATUSES.has(statusLc);
