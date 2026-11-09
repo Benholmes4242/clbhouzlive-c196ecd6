@@ -38,16 +38,16 @@ export function recapSentence(tour: TourId, data: SeasonRecapData | undefined, s
       { text: ` ${t(`overview.recap.raceVerb.${tour}`)}.` },
     ];
     if (data.cardLine) {
-      segs.push({ text: t('overview.recap.cardsLead') }, { text: String(data.cardLine.n), figure: true }, { text: ` ${t(`overview.recap.cardCopy.${tour}`, { year: seasonYear + 1 })}.` });
+      segs.push({ text: t('overview.recap.cardsLead'), figure: false }, { text: String(data.cardLine.n), figure: true }, { text: ` ${t(`overview.recap.cardCopy.${tour}`, { year: seasonYear + 1 })}.` });
     }
     return segs;
   }
   if (data.winners <= 0 || data.events <= 0) return [];
   return [
     { text: String(data.winners), figure: true },
-    { text: t('overview.recap.winnersA') },
+    { text: t('overview.recap.winnersA'), figure: false },
     { text: String(data.events), figure: true },
-    { text: t('overview.recap.winnersB') },
+    { text: t('overview.recap.winnersB'), figure: false },
   ];
 }
 
