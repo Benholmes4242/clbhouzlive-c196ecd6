@@ -1,92 +1,12 @@
-# Roadmap
+# Roadmap — Tour sheets, island and Schedule across seasons
 
-## CURRENT_SEASON_EVENT_GATE
-- [x] Gate season resolution to stroke/team; align season rankings and followed fallback; mirror EURO year rule in scraper and deploy.
-- [x] Focused20/20; separate shards2052/1900/2030/1929=7911 (+13 against7898), zero failures.
-- [x] Six-tour/five-date public API checks and source-backed Skins report saved in CURRENT_SEASON_REPORT.md; no exclusions or scheduling. Actual future UI and hosted generation not exercised.
+Brief: BUILD_Tour_sheets_island_and_Schedule_across_pasted-2.md + schedule-across-seasons-signed-off.html.
 
-## UPCOMING_OVERVIEW_PLUS
-- [x] Tour buttons shard4 1931/1931; combined reported7816; actual PhotoBand/RailChips320/390/430 no overflow. See TOUR_BUTTONS_REPORT.md for chronology and live-device limitations.
-- [x] Implement countdown, evidence-based sentence, facts, reordered picks, followed players, historical board, shared course glance, and content-sized frame.
-- [x] Add23 rule cases and assertion ledger; focused214passed/1failed, preview buildOK.
-- [x] Authorised single-line repair; focused215/215, shard1 2028/2028; report and logs updated.
-- [x] Authorised cb57 repair9/9; focused215/215; fresh sequential shards2028/1874/2002/1935=7839passed (+23 vs7816); report/logs updated.
-- [x] Actual lower-block/photo/tournament fixtures320/390/430, zero overflow/errors; hours/minutes and draw/undrawn/empty states checked.
-- [ ] Device checks: populated real picks, full OverviewHero carousel/frame/cross-fade, authenticated navigation; fixture omits picks and external unmanaged auth prevents live member verification.
+- [ ] 1. FullBoardSheet: white LEADERBOARD kicker (sheet only), whole sheet SHEET_SURFACE #16161A (rows, sticky head, --hm-surface, masks), row tap = inline expand via HeroRoundPanel (one open, tap closes), Full scorecard still opens ScorecardSheet.
+- [ ] 2. 24-hour tee times (formatTimeHm24) at: TeeTimesFirstGroups, TeeTimesRail, OnTheCourse, magazineCopy, useTournamentTeeTimes, LeadersGroup. Drop am/pm .toUpperCase().
+- [ ] 3. Island start label: weekday only within next 6 days, else "Starts 17 Jan". Tests at 0/6/7 days. Update stale tourIsland.test.tsx:106 assertion (report old/new).
+- [ ] 4. Schedule across seasons: useSeasonTimeline fetches prev/current/next year seasons; season break per mock; counters/anchor/stats stay current-season; merged view untouched; tests (order, one break per boundary, anchor unchanged, Korn Ferry 17 Jan with 2026 above).
+- [ ] 5. Empty week: CAUSE = anchor scroll fires before winner/leader enrichment settles; rows above grow, landing falls short, sticky "12–18 OCT" header covers the SAS row's name/date (row renders — measured 108px at top 32 vs header 42–89.5). Fix in schedule-v2: re-scroll on timeline settle, cancel on first user scroll. Add no-empty-week test.
+- [ ] 6. Shards before: 1=2052 ✓, 2/3/4 running. After: all four, counts reconciled. Report.
 
-## REVIEW_RECEIPT_NEXT_COURSE
-- [x] Scope receipt to its submitted course and clear receipt/submitted state on next-course and route changes.
-- [x] Add four transition regression cases; existing assertions/tests unchanged (expected suite7,788 vs7,784).
-- [ ] STOP: focused44passed/4failed; new harness omits headerScore from useReviewHeaderFacts mock. Exact failure/report: REVIEW_RECEIPT_NEXT_COURSE_REPORT.md. Four shards not run under stop rule.
-- [ ] Check receipt → new wizard → own receipt at320/390/430; blocked by stopped verification; hosted authentication external_unmanaged.
-
-## HERO_ROUND_EMPTY_CARD
-- [x] Keep score-based chips enabled after empty reads; show missing-card note and remove empty-round state.
-- [x] Focused16/16; separate shards2007/1868/1994/1906 =7775passed (+1 new case); see HERO_ROUND_EMPTY_CARD_REPORT.md.
-
-## HERO_BOARD_EXPAND
-- [x] Top ten, shared Full leaderboard action and lazy round panels; availability ruling recorded.
-- [x] Focused59/59; four separate shards2007/1867/1994/1906 =7774 (+15 new cases); assertion ledger in HERO_BOARD_EXPAND_REPORT.md.
-- [x] Actual-component fixtures320/390/430: ten rows, button, card/chips/footer, no overflow, chips on one line.
-- [ ] Live authenticated board/scorecard/navigation device checks: external_unmanaged prevents authenticated end-to-end verification.
-
-## REMOVE_BOARD_HOLE_MARKS
-- [x] Remove leaderboard/hero marks, key, inline expansion and board-only reads; restore padding and direct sheet taps.
-- [x] Authorized assertion updates plus10 new cases; focused156/156; sequential shards2007/1855/1998/1899 =7759passed (+10).
-- [ ] Device checks: actual leaderboard/hero320/390 row/tap/scorecard. Blocker: external_unmanaged authentication; screen fixture failed React-refresh preamble. See REMOVE_BOARD_HOLE_MARKS_REPORT.md.
-
-## HOLE_TILES_BOARD_BUILD (active)
-- [x] Read build brief + both signed-off mocks (board-rows B2/8px; hole-tiles).
-- [ ] Step 1: BoardTable/BoardRound/leaderboard.css — remove faces, two-line rows, ▲/▼ marks (▼ #C24A4A), opacity 1 rounds, no tie bracket, HoleTiles line 2 full width, key under board, name ladder re-measure.
-- [ ] Step 2: Tour hero MiniBoard — HoleTiles line 2, previous-round fallback, no tie bracket.
-- [ ] Step 3: AlsoWeekEvent — remove all faces, WeekBoard HoleTiles, no tie bracket.
-- [ ] Step 4: RoundTilePlot — HoleTiles replace data-plot-hole bars, shrink SVG.
-- [ ] Step 5: No rings on tour player avatars app-wide (PlayerAvatar/PlayerInitialAvatar source + SquircleAvatar sweep; ActiveRing exception stays).
-- [ ] Step 6: CompetitionMark on round cards (ExploreCard/FeaturedRoundCard), explicit-true is_competition, batched hook.
-- [ ] Tests: add new, update only pinned old assertions (list old/new), run 4 shards (only fw1FeaturedDeck known), check 320/390/430.
-
-## PF4_COMPOSER_FIX
-- [x] Implement media Edit sheet and inline Played with; simplify On the course.
-- [x] Save per-shot holes, gate place publication, retain shot tags in existing studio metadata/drafts, hydrate/retag existing shots, and stop post-wide writes.
-- [x] Wire per-slide context to Preview/feed/fullscreen and draft summary; focused124/124; preview buildOK.
-- [x] Run four separate two-worker shards:1994/1858/1977/1893passed+6failed;7728executed versus7702baseline (+26cases/onefile).
-- [ ] STOP: profileFeedInViewGate.test.tsx six cases fail: "No QueryClient set, use QueryClientProvider to set one"; usePostGolfContext.ts:83:20 via LightCardFeed.tsx:162:26. No repair authorized;320px/browser and five device checks remain unverified. See PF4_COMPOSER_FIX_REPORT.md.
-
-## COURSE_HEROES_MATCH
-- [x] Match course-list/detail material and opt-in masthead typography; preserve gold/default callers. Preview buildOK.
-- [x] Add9cases/1file and ledger one authorised overlay-case rename/rewrite. Focused42passed/2failed at courseHeroesMatch.test.tsx:59:34 (clamp omitted) and81:86 (nonexistent avatar marker); no repairs.
-- [x] Detail320px with/without record:340height/no overflow, long record name ellipsis; report COURSE_HEROES_MATCH_REPORT.md.
-- [x] Authorised clamp/avatar test-only repairs; course focused44/44 and Tour85/85. Shared shard1:2000passed; shard2:1827passed/1unapproved Needs failure at tourHeroRefinements.test.tsx:98:19; reports updated, no count delta.
-- [ ] Shards3–4 blocked by untouched Needs assertion; Courses-page320px mount failed (null fade parent); actual islands/avatar loading/adjacent seam remain unverified.
-
-## OVERVIEW_HERO_B_STRIP
-- [x] Merge tour/state kicker, scale leader B, opt in board spacing after movers and replace locked no-pick members door with the strip; Ben ruled brief10+0/white position over mock.
-- [x] Add16cases/1file, authorised padding/door selectors only; focused67/67. Fresh shard1:1986passed/1unexpected failure at tourPlayoffShortenedEvents.test.tsx:89:35 expected RESULTS, received FINALButterfield Bermuda Championship. Existing failing assertion untouched.
-- [x] Actual mounted-component DOM320×844: no overflow; both kicker ellipses, long strip surname ellipsis,10px movers bottom/0px board top; report OVERVIEW_HERO_B_STRIP_REPORT.md, expected7648/668 reconciled from7632/667. Preview buildOK.
-- [x] Authorised RESULTS→FINAL case rename/assertions; Tour focused85/85. Shared shard1:2000passed; shard2:1827passed/1unapproved Needs failure; OVERVIEW_HERO_B_STRIP_REPORT.md updated with all three repairs and counts.
-- [ ] Shards3–4 blocked by untouched tourHeroRefinements.test.tsx:98:19 Needs assertion; live face loading/device/account readback unverified. Static DOM screenshots reserve avatar slots but do not prove loaded faces.
-
-## FEED_PHOTO_GRID
-- [x] Add pure four-photo eligibility and shared grid rendering/taps/loading; preserve video/small sets/words-first frames.
-- [x] Add22cases (14helper/8mounted); fresh focused50/50 after authorised one-line chips fixture repair. Shared shards1:1984passed;2:1824passed/1unexpected failure;3–4 stopped.
-- [x] Actual CardFeed/LightCardFeed→FeedCard320×844 fixtures: upright5 height400/wide12 height287.344, width320, gap2, cap539, zero final page errors. Updated FEED_PHOTO_GRID_REPORT.md; live page chrome/data/fullscreen remain unverified.
-- [ ] Shared suite blocked by unauthorised tourHeroRefinements.test.tsx:98:19 Needs assertion expected length1 got0; no repair/rerun.
-
-## OVERVIEW_TIGHT_CHIPS
-- [x] Tighten picks/movers to 46px two-line chips; remove chip NEEDS and gross/brackets only; shorten English intros and preserve PicksSheet.
-- [x] Update authorized obsolete assertions and two direct-mount prop sets; add3cases. Focused115passed/1failed across7files.
-- [x] Authorised only line130 flex assertion accepts1 or1 1 0%; chips focused116/116. Actual overview320px: picks/movers all46px, long names ellipsise, confined x20–300. Updated OVERVIEW_TIGHT_CHIPS_REPORT.md.
-- [ ] Shared shards3–4 blocked by unexpected tourHeroRefinements.test.tsx:98:19 Needs assertion expected length1 got0; existing test untouched.
-
-## OVERVIEW_CHAMPION_HERO
-- [x] One-column hero board (green R3 header), shared ChampionStrip (gold ring, BY {words}, narrative), finished photo drops sentence/Full board, derived band heights (live 350 / upcoming 328.6 / finished 300.7), green spine #34D77F halo 18%.
-- [x] Focused 208/208; shards 2007/1871/1994/1908 = 7780 (+3 vs 7777).
-- [x] Fixture screens at320/390/430; no overflow. Live reference mismatch remains unverified; see closeout report.
-
-## HERO_START_LINE — rulings applied; screens incomplete
-- [x] Exact authorized review four-line repair; leader1.1/place1.2 restored.
-- [x] Three-face live fixture193.9375 at320/390/430; derived193.9; place15px. New proof tests4; focused84/84.
-- [x] Four separate shards2007/1871/1983/1923 =7784passed, zero failures; baseline7780,+4 named cases.
-- [x] Real-component fixtures: live overview, ProfileCoverBand, business visitor/team, simplified HeroShell at320/390/430; no overflow.
-- [ ] Remaining screens: Tournament/Courses/course-detail/review/Amateur, actual full Pro, skeleton jump and page header-scroll; not verified in this turn.
-- [x] Updated HERO_START_LINE_REPORT.md with assertion ledger, exact totals, measurements and limitations. No full screen-completion claim.
+Standing rules: no SQL/migrations, no RPC/edge changes, feed_config untouched, round_pool_cap 30, no native/Median changes, no guest browsing/review wizard/news/round-plot changes.
