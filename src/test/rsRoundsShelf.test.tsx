@@ -87,9 +87,10 @@ import AmateurPage from '@/pages/AmateurPage';
 import {
   recentSentenceParts,
   roundToPar,
-  stripColor,
   toParLabel,
 } from '@/features/explore-magazine/watch/roundsShelfRules';
+import * as shelfRules from '@/features/explore-magazine/watch/roundsShelfRules';
+import { RoundTileMarks, tileMarkCells, isNineHoleShape } from '@/features/explore-magazine/watch/RoundTileMarks';
 import { EXPLORE_VIEWS, readExploreView } from '@/features/explore-magazine/exploreViewMemory';
 import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 
