@@ -220,7 +220,7 @@ export const FeaturedRoundCard: React.FC<{
           {pillLabel ?? k('label')}
         </span>
         <div style={{ flex: '0 0 44px' }} />
-        <div aria-hidden="true" style={{ position: 'relative', flex: '1 1 auto', minHeight: shape && netSeries ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
+        <div aria-hidden="true" data-round-trace={shape && netSeries ? 'net' : 'none'} style={{ position: 'relative', flex: '1 1 auto', minHeight: shape && netSeries ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
           {shape && netSeries ? (
             /* Round scores §3 — the line on the photo is the NET line (the
                FN1 helper's per-hole allowance), or it is not drawn. Never gross. */
