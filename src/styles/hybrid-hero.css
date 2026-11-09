@@ -89,7 +89,7 @@
 .recap-block{padding-top:var(--hero-section-gap)}
 .recap-block .upcoming-kicker{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--cw-mute);line-height:14px}
 .recap-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.recap-link{padding:0;height:auto;background:none;font-size:12px;font-weight:700;letter-spacing:0;color:var(--th-text-primary)}
-.recap-block .recap-head{align-items:baseline}.recap-block .recap-link{line-height:14px}
+.recap-block .recap-head{align-items:flex-start}.recap-block .recap-link{line-height:14px}
 /* One grid for head + rows: PTS sizes to the longest value (min 64px, never wraps), every row shares it. */
 .recap-table{display:grid;grid-template-columns:24px minmax(0,1fr) minmax(64px,max-content);column-gap:4px;margin-top:var(--hero-content-gap)}.recap-grid{display:contents}.recap-grid>span{display:flex;align-items:center;min-width:0}.recap-grid>span:last-child{justify-content:flex-end}
 .recap-grid-head>span{min-height:24px}.recap-grid-head{font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(248,250,252,.62)}.recap-grid-head>span:last-child{text-align:right}
