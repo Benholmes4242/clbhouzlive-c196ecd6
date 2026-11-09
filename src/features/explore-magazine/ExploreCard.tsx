@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import { collectRoundFeats } from './roundFeatCollection';
-import { RoundTilePlot, homePanelCallout, feedStrokesReceived } from '@/components/feed/roundTilePlot';
+import { RoundTilePlot, homePanelCallout, feedStrokesReceived, feedNetSeries } from '@/components/feed/roundTilePlot';
 import { formatDisplayedHcp } from '@/lib/whs/format';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
@@ -1006,7 +1006,14 @@ export function ExploreCard({
   /* ONE VISUAL: THE TREND LINE, with gold / red dots on the good holes. The
      ticks row and the distribution bar are retired — see roundTreatment.ts. */
   const treatment = item.kind === 'round' && size !== 'pair' ? treatmentFor(item, shape) : 'none';
-  const hasVisual = treatment === 'line' && shape != null && item.payload.round != null;
+  /* FN1 (BUILD Round scores §3) — the photo trace and the figures row follow
+     the Home score post: the line is the NET line or it is not drawn, never
+     gross, and the stat row is FN1.5 via feedNet. */
+  const roundCourseHcp = item.kind === 'round' ? item.facts.course_handicap ?? null : null;
+  const roundReceived = item.kind === 'round' && shape ? feedStrokesReceived(shape, roundCourseHcp) : null;
+  const roundNettable = item.kind === 'round' && roundCourseHcp != null && (shape ? roundReceived != null : true);
+  const roundNetSeries = shape && roundReceived ? feedNetSeries(shape, roundReceived) : null;
+  const hasVisual = treatment === 'line' && shape != null && item.payload.round != null && roundNetSeries != null;
   const dots = hasVisual ? goodHoleDots(shape) : [];
   const band = hasVisual ? SHAPE_BAND[size] + EXPLORE_END_LABEL_BAND : 0;
 
@@ -1598,7 +1605,7 @@ export function ExploreCard({
                 <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
                   height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
                   baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
-                  exploreDots={dots} underParFill />
+                  exploreDots={dots} underParFill seriesOverride={roundNetSeries ?? undefined} />
               ) : null}
             </span>
           </span>
@@ -1622,7 +1629,7 @@ export function ExploreCard({
           <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
             height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
             baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
-            exploreDots={dots} underParFill />
+            exploreDots={dots} underParFill seriesOverride={roundNetSeries ?? undefined} />
         </span>
       ) : null}
     </CourseImageFallback>
@@ -1860,7 +1867,7 @@ export function ExploreCard({
             isFollowed={isFollowed}
             onFollow={onFollow}
             roundIdentity={item.kind === 'round' && size !== 'pair'
-              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null }
+              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null, feedNet: { courseHandicap: roundNettable ? roundCourseHcp : null } }
               : undefined}
           />
         </span>
