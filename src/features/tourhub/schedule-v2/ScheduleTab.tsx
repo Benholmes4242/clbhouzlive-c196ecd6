@@ -684,9 +684,13 @@ export function ScheduleTab() {
                         ? ` · ${t('schedule.week.events', { count: group.events.length })}`
                         : ''
                     }`;
+              const weekBreak = group.events[0]
+                ? seasonBreaks.get(group.events[0].id)
+                : undefined;
               return (
+                <React.Fragment key={group.key}>
+                {weekBreak ? <SeasonBreakBlock brk={weekBreak} /> : null}
                 <section
-                  key={group.key}
                   id={isThis ? 'sv2-week-this' : undefined}
                   style={isThis ? { background: THIS_WEEK_BG } : undefined}
                 >
@@ -727,8 +731,11 @@ export function ScheduleTab() {
                   <div>
                     {group.events.map((evt, eventIndex) => {
                       const isAnchor = evt.id === timeline!.anchorEventId;
+                      const rowBreak =
+                        eventIndex > 0 ? seasonBreaks.get(evt.id) : undefined;
                       return (
                         <div key={evt.id} id={`sv2-row-${evt.id}`}>
+                          {rowBreak ? <SeasonBreakBlock brk={rowBreak} /> : null}
                           <SeasonRow
                             event={evt}
                             you={youByEvent.get(evt.id)}
@@ -741,6 +748,7 @@ export function ScheduleTab() {
                     })}
                   </div>
                 </section>
+                </React.Fragment>
               );
             })}
             <div
