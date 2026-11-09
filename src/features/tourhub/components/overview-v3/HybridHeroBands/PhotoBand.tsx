@@ -55,6 +55,12 @@ interface PhotoBandProps {
   onOpen: () => void;
   segments?: HeadlineSegment[];
   note?: string | null;
+  /** Season recap only: replaces the tour/state kicker verbatim. */
+  kicker?: string | null;
+  /** Season recap only: the race winner's points in the leader-trio slot (INK, no face). */
+  figure?: { value: string; caps: string } | null;
+  /** Overrides data-overview-photo-state (the recap reports 'recap'). */
+  stateKey?: string;
 }
 
 export function PhotoBand({
@@ -71,6 +77,9 @@ export function PhotoBand({
   onOpen,
   segments = [],
   note,
+  kicker,
+  figure,
+  stateKey,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   const venueLine = [venueName, datesString].filter(Boolean).join(' · ');
@@ -106,7 +115,7 @@ export function PhotoBand({
       }}
       aria-label={title}
       data-overview-photo-band
-      data-overview-photo-state={state.kind}
+      data-overview-photo-state={stateKey ?? state.kind}
       data-overview-photo-fallback={venueImageUrl ? undefined : 'true'}
       style={{
         position: 'relative',
@@ -140,7 +149,7 @@ export function PhotoBand({
         }}
       >
         <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
+          <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: OVERVIEW_TITLE_GAP, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -175,6 +184,13 @@ export function PhotoBand({
             ) : null}
             <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
             {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: OVERVIEW_LEADER_NAME_GAP, marginLeft: 'auto', fontSize: OVERVIEW_LEADER_NAME_SIZE, lineHeight: OVERVIEW_LEADER_NAME_LINE_HEIGHT, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
+          </div>
+        ) : null}
+
+        {!inPlay && figure ? (
+          <div data-overview-recap-figure style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: INK }}>{figure.value}</div>
+            <div data-overview-leader-name style={{ maxWidth: 150, marginTop: OVERVIEW_LEADER_NAME_GAP, marginLeft: 'auto', fontSize: OVERVIEW_LEADER_NAME_SIZE, lineHeight: OVERVIEW_LEADER_NAME_LINE_HEIGHT, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{figure.caps}</div>
           </div>
         ) : null}
 
