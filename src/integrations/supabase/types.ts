@@ -21921,6 +21921,10 @@ export type Database = {
         }[]
       }
       admin_count_owgr_events_needing_course: { Args: never; Returns: number }
+      admin_create_club_for_course: {
+        Args: { p_course_id: string }
+        Returns: string
+      }
       admin_deletion_integrity: {
         Args: never
         Returns: {
@@ -28587,7 +28591,13 @@ export type Database = {
         Args: { p_media_id: string; p_poster_url?: string }
         Returns: boolean
       }
+      search_course_ids: {
+        Args: { p_limit?: number; p_query: string }
+        Returns: string[]
+      }
       search_empty_state_v2: { Args: never; Returns: Json }
+      search_fold: { Args: { p: string }; Returns: string }
+      search_fold_all: { Args: { p: string }; Returns: string }
       search_golf_clubs: {
         Args: { p_limit?: number; p_query: string }
         Returns: {
