@@ -1,6 +1,7 @@
 /** The full-bleed, tappable photograph used only by the Tour Overview carousel.
  *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: no "Full board ›" kicker link in ANY
  *  state — the Full leaderboard button under the board owns that navigation. */
+import type { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { getScoreColor } from '../../../_shared/scoreColor';
@@ -52,7 +53,10 @@ interface PhotoBandProps {
   countdown: OverviewCountdownUnit[];
   startDay: string | null;
   heightPx?: number;
-  onOpen: () => void;
+  /** Omitted on the tournament page: the band is then inert (no button role, cursor or key handling). */
+  onOpen?: () => void;
+  /** Tournament page only: the collapsing header observes this full-name h1. */
+  titleRef?: RefObject<HTMLHeadingElement>;
   segments?: HeadlineSegment[];
   note?: string | null;
   /** Season recap only: replaces the tour/state kicker verbatim. */
@@ -75,6 +79,7 @@ export function PhotoBand({
   startDay,
   heightPx = OVERVIEW_PHOTO_BAND_HEIGHT,
   onOpen,
+  titleRef,
   segments = [],
   note,
   kicker,
@@ -106,14 +111,14 @@ export function PhotoBand({
 
   return (
     <div
-      role="button"
-      tabIndex={0}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
       onClick={onOpen}
-      onKeyDown={(event) => {
+      onKeyDown={onOpen ? (event) => {
         if (event.target !== event.currentTarget) return;
         if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onOpen(); }
-      }}
-      aria-label={title}
+      } : undefined}
+      aria-label={onOpen ? title : undefined}
       data-overview-photo-band
       data-overview-photo-state={stateKey ?? state.kind}
       data-overview-photo-fallback={venueImageUrl ? undefined : 'true'}
@@ -131,7 +136,7 @@ export function PhotoBand({
         color: INK,
         fontFamily: FONT,
         textAlign: 'left',
-        cursor: 'pointer',
+        cursor: onOpen ? 'pointer' : undefined,
       }}
     >
       <PhotoBandFade />
@@ -154,6 +159,7 @@ export function PhotoBand({
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: OVERVIEW_TITLE_GAP, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1
+            ref={titleRef}
             style={{
               ...MASTHEAD_NAME,
               fontSize: OVERVIEW_TITLE_SIZE,
