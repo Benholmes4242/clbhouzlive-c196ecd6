@@ -94,11 +94,12 @@ export function RecapFacts({ data }: { data: SeasonRecapData }) {
 }
 
 export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecapData }) {
-  const { t } = useTranslation('tourhub'); const navigate = useNavigate();
+  /* HERO BLOCKS §3: no board header row — the POS PLAYER PTS header sits
+     directly under the fact band's bottom divider, 12px below it. */
+  const { t } = useTranslation('tourhub');
   const rows = (data.standings ?? []).slice(0, 3);
   if (!rows.length) return null;
   return <section data-recap-board className="upcoming-block recap-block">
-    <div className="recap-head"><h2 className="upcoming-kicker">{t(`overview.recap.boardKicker.${tour}`)}</h2><Button variant="ghost" data-recap-full-list className="recap-link" onClick={() => navigate(playersRace(tour))}>{t('overview.recap.fullList')}</Button></div>
     <div data-recap-table className="recap-table">
     <div className="recap-grid recap-grid-head"><span>{t('overview.upcomingPlus.pos')}</span><span>{t('overview.upcomingPlus.player')}</span><span>{t('overview.recap.pts')}</span></div>
     {rows.map((r) => <div key={r.position} className="recap-grid recap-row" data-recap-row={r.position}>

@@ -58,9 +58,10 @@ export function LastYearRow({
       }}
     >
       {isWinner ? (
-        <svg width="13" height="13" viewBox="0 0 24 24" fill={LEADER_GOLD} aria-hidden="true">
-          <path d="M7 4h10v3a5 5 0 0 1-10 0V4z M9 13h6l-1 4h-4z M8 19h8v2H8z" />
-        </svg>
+        /* HERO BLOCKS §1d: the winner's mark is the ONE outline lucide Trophy
+           the completed state and the recap use — 13px, #FBBC2E via
+           .recap-trophy — never the old filled cup glyph. */
+        <Trophy size={13} className="recap-trophy" aria-hidden />
       ) : (
         <span style={{ ...NUMERIC_STYLE, fontSize: 12.5, fontWeight: 700, color: INK }}>
           {rank}
