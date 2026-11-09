@@ -1,5 +1,12 @@
 /** Upcoming-only facts/players/history/course. Each block self-hides; the
- * caller inserts unchanged picks between facts and these lower sections. */
+ * caller inserts unchanged picks between facts and these lower sections.
+ * HERO BLOCKS: the upcoming hero block (PhotoBand + UpcomingFacts +
+ * UpcomingLastYear) is ONE block shared by the overview and the tournament
+ * page, at the overview's sizes — the tournament page imports these same
+ * builders, so the two pages cannot drift. The fact band fills up to four
+ * cells in the order FIRST TEE, FIELD, PURSE, PAR, YARDS from whatever is
+ * available; YARDS is the course glance yards, else venue_yardage. */
+import '@/styles/hybrid-hero.css';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,16 +17,19 @@ import { LastYearRow } from './HybridHeroBands/LastYearRow';
 import { followedUpcomingPlayers, venueTee, type UpcomingPlayer } from './upcomingOverviewRules';
 import type { LastYearFinisher } from '../../hooks/useTournamentLastYearTop4';
 import type { CourseHole } from '../../tournament-v2/data/tournamentRules';
-export function upcomingFactCells(first: string | null, zone: string | null, field: number, purse: number | null, par: number | null) {
+export function upcomingFactCells(first: string | null, zone: string | null, field: number, purse: number | null, par: number | null, yards: number | null = null) {
   const tee = venueTee(first, zone);
   return [tee ? { key: 'firstTee', value: `${tee.day} ${tee.time}` } : null,
     field > 0 ? { key: 'field', value: String(field) } : null,
     purse != null ? { key: 'purse', value: `$${purse >= 1000000 ? `${Number((purse / 1000000).toFixed(1))}M` : purse.toLocaleString('en-GB')}` } : null,
-    par != null ? { key: 'par', value: String(par) } : null].filter((cell): cell is { key: string; value: string } => cell !== null);
+    par != null ? { key: 'par', value: String(par) } : null,
+    yards != null ? { key: 'yards', value: yards.toLocaleString('en-GB') } : null]
+    .filter((cell): cell is { key: string; value: string } => cell !== null)
+    .slice(0, 4);
 }
-export function UpcomingFacts({ first, zone, field, purse, par }: { first: string | null; zone: string | null; field: number; purse: number | null; par: number | null }) {
+export function UpcomingFacts({ first, zone, field, purse, par, yards = null }: { first: string | null; zone: string | null; field: number; purse: number | null; par: number | null; yards?: number | null }) {
   const { t } = useTranslation('tourhub');
-  const cells = upcomingFactCells(first, zone, field, purse, par);
+  const cells = upcomingFactCells(first, zone, field, purse, par, yards);
   if (!cells.length) return null;
   return <div data-overview-facts className="upcoming-facts">{cells.map(cell => <div key={cell.key} data-upcoming-fact={cell.key}><b>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div>;
 }
