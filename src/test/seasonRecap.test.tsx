@@ -68,6 +68,13 @@ describe('between-seasons rule', () => {
     expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: '2027-03-01', raceFinal: false, now: at('2027-01-01') })).toBe(false);
     expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: null, raceFinal: false, now: at('2027-01-01') })).toBe(true);
   });
+  it('a next season starting within 21 days of the finale never shows the recap (DP World 2027)', () => {
+    // Finale ends 15 Nov 2026; the 2027 season opens 26 Nov 2026 (season year 2027).
+    for (const day of ['2026-11-16', '2026-11-20', '2026-11-25']) {
+      expect(isBetweenSeasons({ lastEnd: '2026-11-15', seasonYear: 2026, nextStart: '2026-11-26', raceFinal: true, now: at(day) })).toBe(false);
+      expect(isBetweenSeasons({ lastEnd: '2026-11-15', seasonYear: 2026, nextStart: '2026-11-26', raceFinal: false, now: at(day) })).toBe(false);
+    }
+  });
   it('freshness compares the source date with the final end date', () => {
     expect(isFreshStandings('2026-09-07T05:00:00Z', '2026-10-11')).toBe(false);
     expect(isFreshStandings('2026-10-11', '2026-10-11')).toBe(true);
