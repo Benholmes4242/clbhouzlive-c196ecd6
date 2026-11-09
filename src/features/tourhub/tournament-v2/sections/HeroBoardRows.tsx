@@ -55,6 +55,9 @@ export const HERO_POS_W = 24;
 const HERO_ROUND_W = 32;
 export const HERO_TOT_W = 40;
 export const HERO_GAP = 4;
+/** Board cell type, shared by the completed-state figures (POS and TOT styles). */
+export const HERO_POS_TYPE = { fontSize: 12.5, fontWeight: 700 } as const;
+export const HERO_TOT_TYPE = { fontSize: 15, fontWeight: 700 } as const;
 /** Every numeric cell on the hero board: digits stack down a column. */
 const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'center' as const };
 
@@ -308,7 +311,7 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
         {showOverviewPosition ? (
           /* CB57: capped and lower ties use the SAME stretched grid
              cell and bracket; the cap still owns the visible T1 label. */
-          <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: 0, color: ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+          <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', ...HERO_POS_TYPE, letterSpacing: 0, color: ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
             {/* ONE MARKER PER TIE: capped/later rows are screen-reader only.
                  No tie bracket — tied rows show the position once. */}
             {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
@@ -330,7 +333,7 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
             </div>
           );
         })}
-        <div data-hero-tot style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
+        <div data-hero-tot style={{ ...HERO_NUM, ...HERO_TOT_TYPE, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
       </RowTag>
       {isOpen && expanded && pid ? (() => { const panel = <HeroRoundPanel key={pid} tournamentId={tournamentId} playerId={pid} round={expanded.round} rounds={totalRounds ?? Math.max(...heroCols.rounds, currentRound ?? 1)} startedRounds={started} boardUpdatedAt={boardUpdatedAt} onRound={round => setExpanded({ playerId: pid, round })} onFull={openScorecard} />; return bleed ? <div style={{ margin: `0 -${HERO_PAD_X}px` }}>{panel}</div> : panel; })() : null}</Fragment>
     );
