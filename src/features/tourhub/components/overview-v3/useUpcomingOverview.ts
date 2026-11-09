@@ -28,5 +28,6 @@ export function useUpcomingOverview(id: string | null) {
   return { field: [...players.values()], drawn, first: drawn ? groups[0]?.teeTime ?? null : null,
     last: !id || lastQuery.isError ? [] : lastQuery.data ?? [],
     zone: !id || metaQuery.isError ? null : metaQuery.data?.course_timezone ?? metaQuery.data?.timezone ?? null,
+    startDate: !id || metaQuery.isError ? null : metaQuery.data?.start_date ?? null,
     holes: !id || holesQuery.isError ? [] : holesQuery.data ?? [] };
 }

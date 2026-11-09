@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
 import { upcomingFactCells } from '@/features/tourhub/components/overview-v3/UpcomingOverviewSections';
+import { heroStartDayForm, startWeekday } from '@/features/tourhub/tournament-v2/data/tournamentRules';
 import { LastYearRow } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LastYearRow';
 
 const first = '2026-11-05T15:10:00Z';
@@ -14,7 +15,7 @@ const zone = 'America/Phoenix';
 
 describe('upcomingFactCells ordering and cap', () => {
   it('fills in FIRST TEE, FIELD, PURSE, PAR, YARDS order and caps at four', () => {
-    expect(upcomingFactCells(first, zone, 132, 3500000, 70, 6853).map((c) => c.key))
+    expect(upcomingFactCells(first, zone, 132, 3500000, 70, 6853, true).map((c) => c.key))
       .toEqual(['firstTee', 'field', 'purse', 'par']);
     expect(upcomingFactCells(null, zone, 132, 3500000, 70, 6853).map((c) => c.key))
       .toEqual(['field', 'purse', 'par', 'yards']);
@@ -25,8 +26,36 @@ describe('upcomingFactCells ordering and cap', () => {
   });
   it('yards falls back out when absent and never truncates the first four', () => {
     expect(upcomingFactCells(null, zone, 132, null, 71, null).map((c) => c.key)).toEqual(['field', 'par']);
-    expect(upcomingFactCells(first, zone, 132, 3500000, null, 6853).map((c) => c.key))
+    expect(upcomingFactCells(first, zone, 132, 3500000, null, 6853, true).map((c) => c.key))
       .toEqual(['firstTee', 'field', 'purse', 'yards']);
+  });
+});
+
+describe('FIRST TEE follows the kicker (one zone, time only)', () => {
+  const meta = (start: string, z: string | null) => ({ start_date: start, course_timezone: z, timezone: null }) as never;
+  it('omits FIRST TEE when the kicker is in date form', () => {
+    const form = heroStartDayForm(meta('2026-11-19', zone), new Date('2026-11-09T12:00:00Z'));
+    expect(form.weekday).toBe(false);
+    expect(upcomingFactCells(first, zone, 132, 3500000, 70, 6853, form.weekday).map((c) => c.key))
+      .toEqual(['field', 'purse', 'par', 'yards']);
+  });
+  it('kicker day and first-tee time agree in the event zone (Korea)', () => {
+    const tee = '2026-11-11T22:00:00Z'; // 07:00 KST Thursday 12 Nov
+    const form = heroStartDayForm(meta('2026-11-12', 'Asia/Seoul'), new Date('2026-11-09T12:00:00Z'));
+    expect(form).toEqual({ text: 'THURSDAY', weekday: true });
+    expect(startWeekday('2026-11-12', 'Asia/Seoul')).toBe('Thursday');
+    expect(upcomingFactCells(tee, 'Asia/Seoul', 132, null, null, null, form.weekday)[0]).toEqual({ key: 'firstTee', value: '07:00' });
+  });
+  it('the FIRST TEE value never contains a weekday', () => {
+    const days = /mon|tue|wed|thu|fri|sat|sun/i;
+    for (const z of ['America/Phoenix', 'Asia/Seoul', 'Europe/London', 'Australia/Sydney', null]) {
+      for (let h = 0; h < 24; h += 5) {
+        const cell = upcomingFactCells(`2026-11-12T${String(h).padStart(2, '0')}:45:00Z`, z, 0, null, null, null, true)[0];
+        expect(cell?.key).toBe('firstTee');
+        expect(cell?.value).toMatch(/^\d{2}:\d{2}$/);
+        expect(cell?.value).not.toMatch(days);
+      }
+    }
   });
 });
 

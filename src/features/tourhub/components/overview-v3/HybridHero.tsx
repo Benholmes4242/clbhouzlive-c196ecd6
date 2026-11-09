@@ -26,6 +26,7 @@ import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { useOverviewChampion } from './useOverviewChampion';
 import {useUpcomingOverview} from './useUpcomingOverview';
 import {upcomingSentence} from './upcomingOverviewRules';
+import { startWeekday } from '../../tournament-v2/data/tournamentRules';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -145,9 +146,8 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       });
   const situationNote = visibleSituationNote(tournament.situationNote, state, tournament.endDate, now);
 
-  const startDay = tournament.startDate
-    ? new Intl.DateTimeFormat('en', { weekday: 'long' }).format(new Date(tournament.startDate))
-    : null;
+  // ONE ZONE: the overview's full weekday resolves in the FIRST TEE cell's zone.
+  const startDay = startWeekday(tournament.startDate, upcoming.zone);
 
   return (
     <PhotoBand
