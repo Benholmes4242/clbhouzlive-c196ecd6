@@ -66,7 +66,7 @@ import { surnameOf } from '../../../_shared/playerName';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { fieldHasStarted, rowHasStarted } from '../../../overview/boardStarted';
-import { glanceFacts } from '../../../tournament-v2/data/tournamentRules';
+import { glanceFacts, startWeekday } from '../../../tournament-v2/data/tournamentRules';
 import { usePickTeeTimes } from '../../../tournament-v2/data/usePickTeeTimes';
 import { formatDayMonthShortGB, formatTimeHm24, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
 import { boardMovementMap, statusWord, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
@@ -487,7 +487,7 @@ export function HeroBoardSection({
         />
       ) : null}
 
-      {!picksOnly && phase === 'upcoming' ? <UpcomingFacts first={upcoming.first} zone={upcoming.zone} field={upcoming.field.length} purse={purse} par={venuePar} yards={glanceFacts(upcoming.holes)?.yards ?? venueYardage} /> : null}
+      {!picksOnly && phase === 'upcoming' ? <UpcomingFacts first={upcoming.first} zone={upcoming.zone} field={upcoming.field.length} purse={purse} par={venuePar} yards={glanceFacts(upcoming.holes)?.yards ?? venueYardage} startDayNamed={startWeekday(upcoming.startDate, upcoming.zone) != null} /> : null}
 
       {hasPicks ? (
         <PicksBlock
