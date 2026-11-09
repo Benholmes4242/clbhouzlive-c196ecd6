@@ -103,7 +103,7 @@ describe('tourIslandRules — captions and labels', () => {
     expect(singleTourCaption('live', 3, null)).toEqual({ text: 'Live · Round 3', live: true });
     expect(singleTourCaption('live', null, null)).toEqual({ text: 'Live', live: true });
     expect(singleTourCaption('completed', null, null)).toEqual({ text: 'Final', live: false });
-    expect(singleTourCaption('upcoming', null, '2026-03-05')).toEqual({ text: 'Starts Thu', live: false });
+    expect(singleTourCaption('upcoming', null, '2026-03-05')).toEqual({ text: 'Starts 5 Mar', live: false });
     expect(singleTourCaption('season', null, null)).toEqual({ text: 'Season complete', live: false });
     expect(singleTourCaption('none', null, null)).toEqual({ text: 'No event this week', live: false });
   });

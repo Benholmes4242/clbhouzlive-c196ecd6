@@ -37,10 +37,14 @@ import { currentWeekKey, weekRelation } from './timelineUtils';
 import {
   followedFieldNames,
   nextMajorDateLabel,
+  seasonBreakBoundaries,
   venueLine,
   weekRangeLabel,
+  type SeasonBreak as SeasonBreakModel,
 } from './scheduleRules';
+import { formatDayMonthShortGB } from '@/i18n/format';
 import {
+  AMBER,
   FONT,
   HAIRLINE_INK_10,
   INK,
@@ -53,6 +57,87 @@ import {
 const PANEL = '#141418';
 const THIS_WEEK_BG = 'rgba(255,255,255,0.025)';
 const THIS_WEEK_HEADER_BG = '#0E0E11';
+
+/* Season break (schedule-across-seasons-signed-off.html): the ending
+   season's closing line, then the next season's amber-headed opener. */
+const SEASON_KICKER: React.CSSProperties = {
+  display: 'block',
+  fontSize: 10.5,
+  fontWeight: 800,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+};
+
+const SeasonBreakBlock: React.FC<{ brk: SeasonBreakModel }> = ({ brk }) => {
+  const { t } = useTranslation('tourhub');
+  const startDate = brk.starting.firstStart
+    ? formatDayMonthShortGB(new Date(`${brk.starting.firstStart.slice(0, 10)}T12:00:00Z`))
+    : null;
+  return (
+    <div data-season-break={`${brk.ending.year}-${brk.starting.year}`}>
+      <div
+        style={{
+          padding: '22px 22px 14px',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
+        }}
+      >
+        <span style={{ ...SEASON_KICKER, color: INK_MUTE }}>
+          {t('schedule.seasonBreak.end', {
+            year: brk.ending.year,
+            defaultValue: `END OF THE ${brk.ending.year} SEASON`,
+          })}
+        </span>
+        <span
+          className="num"
+          style={{ display: 'block', marginTop: 3, fontSize: 12.5, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}
+        >
+          {t('schedule.seasonBreak.eventCount', {
+            count: brk.ending.eventCount,
+            defaultValue_one: '{{count}} event',
+            defaultValue_other: '{{count}} events',
+          })}
+        </span>
+      </div>
+      <div
+        style={{
+          marginTop: 18,
+          padding: '16px 22px 14px',
+          borderTop: '1px solid rgba(247,147,30,0.45)',
+          background: 'linear-gradient(180deg, rgba(247,147,30,0.08), rgba(247,147,30,0))',
+        }}
+      >
+        <span style={{ ...SEASON_KICKER, color: AMBER }}>
+          {t('schedule.seasonBreak.season', {
+            year: brk.starting.year,
+            defaultValue: `${brk.starting.year} SEASON`,
+          })}
+        </span>
+        <span
+          className="num"
+          style={{ display: 'block', marginTop: 4, fontSize: 17, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}
+        >
+          {startDate
+            ? t('schedule.seasonBreak.from', {
+                count: brk.starting.eventCount,
+                date: startDate,
+                defaultValue_one: '{{count}} event, from {{date}}',
+                defaultValue_other: '{{count}} events, from {{date}}',
+              })
+            : t('schedule.seasonBreak.eventCount', {
+                count: brk.starting.eventCount,
+                defaultValue_one: '{{count}} event',
+                defaultValue_other: '{{count}} events',
+              })}
+        </span>
+        {brk.starting.tourName ? (
+          <span style={{ display: 'block', marginTop: 3, fontSize: 12.5, color: INK_MUTE }}>
+            {brk.starting.tourName}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 const KICKER: React.CSSProperties = {
   fontSize: 11,
@@ -199,6 +284,25 @@ export function ScheduleTab() {
   }, [allEvents, followedIds, fieldMap, ownRounds]);
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
+  /* EMPTY-WEEK FIX: the first landing fired before the winner/leader
+     enrichment settled; the rows above the anchor then grew and the page
+     landed short, leaving a pinned week header covering its own row (the
+     "12 – 18 OCT" / SAS Championship report). Re-land whenever the timeline
+     identity changes (enrichment settle points) until the user scrolls. */
+  const userScrolledRef = useRef(false);
+  useEffect(() => {
+    userScrolledRef.current = false;
+    const mark = () => { userScrolledRef.current = true; };
+    window.addEventListener('wheel', mark, { passive: true });
+    window.addEventListener('touchmove', mark, { passive: true });
+    window.addEventListener('keydown', mark);
+    return () => {
+      window.removeEventListener('wheel', mark);
+      window.removeEventListener('touchmove', mark);
+      window.removeEventListener('keydown', mark);
+    };
+  }, [activeTour]);
+
   const anchorId = timeline?.anchorEventId ?? null;
   const computeOffset = () => {
     const rootStyles = getComputedStyle(document.documentElement);
@@ -219,7 +323,7 @@ export function ScheduleTab() {
     const start = performance.now();
     const DEADLINE = 1500;
     const tryScroll = () => {
-      if (cancelled) return;
+      if (cancelled || userScrolledRef.current) return;
       const el = document.getElementById(`sv2-row-${anchorId}`);
       if (!el) {
         if (performance.now() - start < DEADLINE) {
@@ -228,6 +332,7 @@ export function ScheduleTab() {
         return;
       }
       const doScroll = () => {
+        if (userScrolledRef.current) return;
         scrollElementIntoView(el, { offset: computeOffset(), behavior: 'auto' });
       };
       doScroll();
@@ -241,7 +346,7 @@ export function ScheduleTab() {
       cancelled = true;
       cancelAnimationFrame(rafId);
     };
-  }, [anchorId, activeTour]);
+  }, [anchorId, activeTour, timeline]);
 
   const thisWeekKey = useMemo(() => currentWeekKey(), [timeline?.totalEvents]);
   const hasThisWeek = !!timeline?.weeks.some((w) => w.key === thisWeekKey);
@@ -340,21 +445,37 @@ export function ScheduleTab() {
   );
 
   // ── Header figures + next major ────────────────────────────────────────
-  const yearLabel = timeline?.seasonYear ?? new Date().getFullYear();
-  const played = useMemo(
-    () => allEvents.filter((e) => e.state === 'completed').length,
+  /* The list runs across seasons, but the header figures keep describing
+     the CURRENT season only (inCurrentSeason is undefined — treated as
+     current — on the merged all-tours view, which is unchanged). */
+  const currentSeasonEvents = useMemo(
+    () => allEvents.filter((e) => e.inCurrentSeason !== false),
     [allEvents],
   );
+  const yearLabel = timeline?.seasonYear ?? new Date().getFullYear();
+  const played = useMemo(
+    () => currentSeasonEvents.filter((e) => e.state === 'completed').length,
+    [currentSeasonEvents],
+  );
   const remaining = useMemo(
-    () => allEvents.filter((e) => e.state === 'upcoming').length,
-    [allEvents],
+    () => currentSeasonEvents.filter((e) => e.state === 'upcoming').length,
+    [currentSeasonEvents],
   );
   const nextMajor = useMemo(
     () =>
-      allEvents.find(
+      currentSeasonEvents.find(
         (e) => e.state === 'upcoming' && e.isMajor && e.daysAway !== null,
       ) ?? null,
-    [allEvents],
+    [currentSeasonEvents],
+  );
+
+  // Season breaks: event id → the boundary that renders before it.
+  const seasonBreaks = useMemo(
+    () =>
+      timeline?.seasons && timeline.seasons.length > 1
+        ? seasonBreakBoundaries(allEvents, timeline.seasons)
+        : new Map<string, SeasonBreakModel>(),
+    [allEvents, timeline?.seasons],
   );
 
   const progressPct = useMemo(() => {
@@ -583,9 +704,13 @@ export function ScheduleTab() {
                         ? ` · ${t('schedule.week.events', { count: group.events.length })}`
                         : ''
                     }`;
+              const weekBreak = group.events[0]
+                ? seasonBreaks.get(group.events[0].id)
+                : undefined;
               return (
+                <React.Fragment key={group.key}>
+                {weekBreak ? <SeasonBreakBlock brk={weekBreak} /> : null}
                 <section
-                  key={group.key}
                   id={isThis ? 'sv2-week-this' : undefined}
                   style={isThis ? { background: THIS_WEEK_BG } : undefined}
                 >
@@ -626,8 +751,11 @@ export function ScheduleTab() {
                   <div>
                     {group.events.map((evt, eventIndex) => {
                       const isAnchor = evt.id === timeline!.anchorEventId;
+                      const rowBreak =
+                        eventIndex > 0 ? seasonBreaks.get(evt.id) : undefined;
                       return (
                         <div key={evt.id} id={`sv2-row-${evt.id}`}>
+                          {rowBreak ? <SeasonBreakBlock brk={rowBreak} /> : null}
                           <SeasonRow
                             event={evt}
                             you={youByEvent.get(evt.id)}
@@ -640,6 +768,7 @@ export function ScheduleTab() {
                     })}
                   </div>
                 </section>
+                </React.Fragment>
               );
             })}
             <div

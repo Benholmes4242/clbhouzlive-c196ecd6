@@ -14,7 +14,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8,
 } from '../../_shared/tokens';
-import { formatTimeHm } from '@/i18n/format';
+import { formatTimeHm24 } from '@/i18n/format';
 
 interface Props {
   groups: TeeGroup[];
@@ -29,7 +29,7 @@ function formatTeeTime(iso: string | undefined): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return String(iso).toUpperCase();
-  return formatTimeHm(d).toUpperCase();
+  return formatTimeHm24(d);
 }
 
 /**

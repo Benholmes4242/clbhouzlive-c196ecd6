@@ -148,6 +148,11 @@ interface Props {
   followedIds?: Set<string>;
   pickPlayerIds?: Set<string>;
   inlineRound?: number | null;
+  /** FullBoardSheet inline expand: the open row's player id, and the panel
+   * renderer (HeroRoundPanel) inserted directly after that row. One row is
+   * open at a time; the parent owns the state and the toggle. */
+  expandedId?: string | null;
+  renderExpanded?: (entry: BoardEntry) => React.ReactNode;
   onFollow?: (playerId: string) => void;
   followBusy?: boolean;
   followError?: boolean;
@@ -453,6 +458,8 @@ export function BoardTable({
   teamInitials,
   followedIds = new Set(), pickPlayerIds,
   yourPlayers = false,
+  expandedId = null,
+  renderExpanded,
 }: Props) {
   const { t } = useTranslation('tourhub');
 
@@ -837,14 +844,24 @@ export function BoardTable({
   };
 
   const parts: React.ReactNode[] = [];
+  const pushRow = (e: BoardEntry, opts?: { demoted?: boolean; tie?: string }) => {
+    parts.push(renderRow(e, opts));
+    if (renderExpanded && expandedId && e.player?.id === expandedId) {
+      parts.push(
+        <div key={`${e.id}__expanded`} data-board-expanded-panel>
+          {renderExpanded(e)}
+        </div>,
+      );
+    }
+  };
   active.forEach((e, i) => {
     if (i === insertionIndex) parts.push(renderCutSentence());
-    parts.push(renderRow(e, {tie:boardTieRole(active,i)}));
+    pushRow(e, {tie:boardTieRole(active,i)});
   });
   if (insertionIndex >= active.length && cutState.kind !== 'none') {
     parts.push(renderCutSentence());
   }
-  demoted.forEach((e) => parts.push(renderRow(e, { demoted: true })));
+  demoted.forEach((e) => pushRow(e, { demoted: true }));
 
   return (
     <div className="tour-board-shell" ref={rootRef} data-board-name-tier={tier} data-board-show-prize={columns.showPrize ? 'true' : 'false'}>

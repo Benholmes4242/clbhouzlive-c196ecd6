@@ -11,10 +11,16 @@ import { linkedTournamentPlace, TOURNAMENT_COURSE_PLACE_JOIN, type CoursePlaceJo
  *   Never silent — every error path is console.error'd with [schedule-v2].
  *
  * TIMELINE SHAPE: sorted list of events (start_date asc) grouped into
- * months. Each event carries per-state enrichment (leader for live rows,
- * champion for completed rows). Champions/leaders come from
- * useTournamentLeadersWinners — the same source used across ScheduleTab
- * today. Defending champions come from useScheduleDefendingChampionPhotos.
+ * Monday→Sunday weeks. The single-tour list runs across seasons: the
+ * current season (currentSeasonFor) plus its previous and next years when
+ * those season rows exist. Each event carries its seasonYear and an
+ * inCurrentSeason flag; totalEvents / eventNumber / the anchor describe
+ * the CURRENT season only. `seasons` holds the per-season summaries the
+ * season-break headers print. Each event carries per-state enrichment
+ * (leader for live rows, champion for completed rows). Champions/leaders
+ * come from useTournamentLeadersWinners — the same source used across
+ * ScheduleTab today. Defending champions come from
+ * useScheduleDefendingChampionPhotos.
  */
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -34,7 +40,7 @@ import {
 } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
 import { weekKey, todayNoonMs, daysUntil, currentRoundFromScores } from './timelineUtils';
-import { rowTourIndex } from './scheduleRules';
+import { rowTourIndex, seasonSpans, type SeasonSpan } from './scheduleRules';
 
 // ─── Season → tournament resolution ───────────────────────────────────────
 
@@ -61,7 +67,7 @@ interface SrTournamentRow {
   event_type?: string | null;
   golf_course_id?: string | null;
   course?: CoursePlaceJoin | CoursePlaceJoin[];
-  season?: { tour_name: string | null; tour_full_name: string | null } | null;
+  season?: { tour_name: string | null; tour_full_name: string | null; year?: number | null } | null;
 }
 
 async function resolveSeasonCandidates(
@@ -119,6 +125,34 @@ export function currentFirst<T extends { id: string }>(cands: T[], currentId: st
 }
 
 
+const TOURNAMENT_SELECT =
+  `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, event_type, golf_course_id, season:sr_seasons(tour_name, tour_full_name, year), ${TOURNAMENT_COURSE_PLACE_JOIN}`;
+
+/** Fetch every tournament under every candidate season row of one year
+ *  (the same-year widening that lets cross-tour miscoded majors ride
+ *  along). Returns [] when no candidate of that year exists. */
+async function fetchYearRows(
+  candidates: SrSeasonRow[],
+  year: number,
+  fallbackId?: string,
+): Promise<SrTournamentRow[]> {
+  const seasonIds = candidates
+    .filter((c) => c.year != null && c.year === year)
+    .map((c) => c.id);
+  const idsToQuery = seasonIds.length > 0 ? seasonIds : fallbackId ? [fallbackId] : [];
+  if (idsToQuery.length === 0) return [];
+  const { data, error } = await supabase
+    .from('sr_tournaments')
+    .select(TOURNAMENT_SELECT)
+      .in('season_id', idsToQuery)
+      .order('start_date', { ascending: true });
+  if (error) {
+    console.error('[schedule-v2] sr_tournaments fetch failed for year', year, error);
+    throw error;
+  }
+  return (data ?? []) as unknown as SrTournamentRow[];
+}
+
 async function probeAndFetchTournaments(
   tour: TourId,
   candidates: SrSeasonRow[],
@@ -138,24 +172,8 @@ async function probeAndFetchTournaments(
     // Winning season found. Widen the fetch to every season row with the
     // same year (so cross-tour miscoded majors ride along), matching the
     // existing useTourTournaments behaviour.
-    const seasonIds = candidates
-      .filter((c) => c.year != null && c.year === cand.year)
-      .map((c) => c.id);
-    const idsToQuery = seasonIds.length > 0 ? seasonIds : [cand.id];
-
-    const { data, error } = await supabase
-      .from('sr_tournaments')
-      .select(
-        `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, event_type, golf_course_id, season:sr_seasons(tour_name, tour_full_name), ${TOURNAMENT_COURSE_PLACE_JOIN}`,
-      )
-      .in('season_id', idsToQuery)
-      .order('start_date', { ascending: true });
-
-    if (error) {
-      console.error('[schedule-v2] sr_tournaments fetch failed:', error);
-      throw error;
-    }
-    return { season: cand, rows: (data ?? []) as unknown as SrTournamentRow[] };
+    const rows = await fetchYearRows(candidates, cand.year ?? -1, cand.id);
+    return { season: cand, rows };
   }
   return { season: null, rows: [] };
 }
@@ -184,6 +202,10 @@ export interface SeasonEvent {
   endDate: string;
   status: string;
   state: EventState;
+  /** The season year this event belongs to (from its sr_seasons join). */
+  seasonYear?: number | null;
+  /** True when the event sits in the CURRENT season (currentSeasonFor). */
+  inCurrentSeason?: boolean;
   isMajor: boolean;
   isPlayoff: boolean;
   isThisWeek: boolean;
@@ -229,9 +251,12 @@ export interface SeasonTimeline {
   seasonName: string | null;
   seasonYear: number | null;
   weeks: WeekGroup[];
+  /** CURRENT season's event count — never the merged list's length. */
   totalEvents: number;
   currentEventNumber: number | null; // 1-based; null when no anchor
   anchorEventId: string | null; // this-week row, else next upcoming
+  /** Previous/current/next season summaries, oldest first (single-tour only). */
+  seasons?: SeasonSpan[];
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -281,11 +306,24 @@ export function useSeasonTimeline(
       }
       // Default to the current season by date, not the newest year (next season loads early).
       const current = await currentSeasonFor(tour).catch(() => null);
-      return probeAndFetchTournaments(tour, currentFirst(candidates, current?.id));
+      const found = await probeAndFetchTournaments(tour, currentFirst(candidates, current?.id));
+      /* SCHEDULE ACROSS SEASONS: the list runs previous → current → next.
+         The neighbouring years are fetched when their season rows exist;
+         a year with no rows simply doesn't appear. */
+      const year = found.season?.year ?? current?.year ?? null;
+      if (year == null) return found;
+      const [prevRows, nextRows] = await Promise.all([
+        fetchYearRows(candidates, year - 1),
+        fetchYearRows(candidates, year + 1),
+      ]);
+      const seen = new Set(found.rows.map((r) => r.id));
+      const extra = [...prevRows, ...nextRows].filter((r) => !seen.has(r.id));
+      return { season: found.season, rows: [...found.rows, ...extra] };
     },
   });
 
   const rawRows = seasonQuery.data?.rows ?? [];
+  const currentYear = seasonQuery.data?.season?.year ?? null;
 
   // 2. Filter rows to the requested tour (respecting cross-tour miscoded majors).
   const events = useMemo(() => {
@@ -339,9 +377,11 @@ export function useSeasonTimeline(
     const season = seasonQuery.data.season;
     if (!season && events.length === 0) return null;
 
-    const total = events.length;
-
-    const decorated: SeasonEvent[] = events.map((r, idx) => {
+    /* Counters stay CURRENT-SEASON ONLY: eventNumber, totalEvents, the
+       anchor and currentEventNumber all describe the current season even
+       though the list runs previous → current → next. */
+    let currentSeq = 0;
+    const decorated: SeasonEvent[] = events.map((r) => {
       const statusLc = (r.status ?? '').toLowerCase();
       const isDone = COMPLETED_STATUSES.has(statusLc) || endDateInPast(r.end_date);
       const isLive = !isDone && LIVE_STATUSES.has(statusLc);
@@ -359,6 +399,9 @@ export function useSeasonTimeline(
       const isPlayoff = label === 'PLAYOFF EVENT';
 
       const isThisWeek = isInCurrentWeek(r.start_date);
+      const seasonYear = r.season?.year ?? null;
+      const inCurrent = seasonYear != null && currentYear != null && seasonYear === currentYear;
+      if (inCurrent) currentSeq += 1;
 
       const evt: SeasonEvent = {
         id: r.id,
@@ -375,12 +418,14 @@ export function useSeasonTimeline(
         endDate: r.end_date,
         status: r.status,
         state,
+        seasonYear,
+        inCurrentSeason: inCurrent,
         isMajor,
         isPlayoff,
         isThisWeek,
         daysAway: state === 'upcoming' ? daysUntil(r.start_date) : null,
         contextLabel: label,
-        eventNumber: idx + 1,
+        eventNumber: inCurrent ? currentSeq : 0,
       };
 
       if (state === 'completed') {
@@ -428,24 +473,27 @@ export function useSeasonTimeline(
       return evt;
     });
 
-    // Anchor priority: live row, then this-week row, then first upcoming.
+    // Anchor priority: live row, then this-week row, then first upcoming —
+    // over the CURRENT season's events only, exactly as before the merge.
+    const currentEvents = decorated.filter((e) => e.inCurrentSeason);
+    const anchorPool = currentEvents.length > 0 ? currentEvents : decorated;
     let anchorId: string | null = null;
     let currentEventNumber: number | null = null;
-    const liveIdx = decorated.findIndex((e) => e.state === 'live');
-    const thisWeekIdx = decorated.findIndex((e) => e.isThisWeek);
+    const liveIdx = anchorPool.findIndex((e) => e.state === 'live');
+    const thisWeekIdx = anchorPool.findIndex((e) => e.isThisWeek);
     if (liveIdx !== -1) {
-      anchorId = decorated[liveIdx].id;
-      currentEventNumber = decorated[liveIdx].eventNumber;
+      anchorId = anchorPool[liveIdx].id;
+      currentEventNumber = anchorPool[liveIdx].eventNumber;
     } else if (thisWeekIdx !== -1) {
-      anchorId = decorated[thisWeekIdx].id;
-      currentEventNumber = decorated[thisWeekIdx].eventNumber;
+      anchorId = anchorPool[thisWeekIdx].id;
+      currentEventNumber = anchorPool[thisWeekIdx].eventNumber;
     } else {
-      const upcomingIdx = decorated.findIndex((e) => e.state === 'upcoming');
+      const upcomingIdx = anchorPool.findIndex((e) => e.state === 'upcoming');
       if (upcomingIdx !== -1) {
-        anchorId = decorated[upcomingIdx].id;
-        currentEventNumber = decorated[upcomingIdx].eventNumber;
-      } else if (decorated.length > 0) {
-        currentEventNumber = decorated[decorated.length - 1].eventNumber;
+        anchorId = anchorPool[upcomingIdx].id;
+        currentEventNumber = anchorPool[upcomingIdx].eventNumber;
+      } else if (anchorPool.length > 0) {
+        currentEventNumber = anchorPool[anchorPool.length - 1].eventNumber;
       }
     }
 
@@ -470,15 +518,26 @@ export function useSeasonTimeline(
         ),
       }));
 
+    // Season summaries for the break headers, named from the rows' own
+    // season joins (same filter as the list).
+    const tourNameByYear = new Map<number, string | null>();
+    for (const r of events) {
+      const y = r.season?.year ?? null;
+      if (y != null && !tourNameByYear.has(y)) {
+        tourNameByYear.set(y, r.season?.tour_full_name ?? r.season?.tour_name ?? null);
+      }
+    }
+
     return {
       seasonName: season?.name ?? null,
       seasonYear: season?.year ?? null,
       weeks,
-      totalEvents: total,
+      totalEvents: currentEvents.length,
       currentEventNumber,
       anchorEventId: anchorId,
+      seasons: seasonSpans(decorated, tourNameByYear),
     };
-  }, [seasonQuery.data, events, leadersWinnersMap, defendingChampionMap]);
+  }, [seasonQuery.data, events, currentYear, leadersWinnersMap, defendingChampionMap]);
 
   return {
     data: timeline,

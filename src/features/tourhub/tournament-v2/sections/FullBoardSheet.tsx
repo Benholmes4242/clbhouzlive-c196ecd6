@@ -1,20 +1,31 @@
 /**
  * FullBoardSheet — full-height house sheet that mounts the existing
  * BoardTable with the event's rows + meta. No new renderer; cut state
- * is derived inline from the same fields LeaderboardTab uses. Row
- * taps forward to the ONE ScorecardSheet.
+ * is derived inline from the same fields LeaderboardTab uses.
+ *
+ * Row taps open the SAME inline expand as the tour overview hero board
+ * (HeroRoundPanel: hole marks, round chips, nine totals, "Full scorecard"
+ * button) — one row open at a time, tapping it again closes it. The
+ * panel's "Full scorecard" and rows with no started round still forward
+ * to the ONE ScorecardSheet.
+ *
+ * The whole sheet paints SHEET_SURFACE: the wrapper overrides
+ * --tour-board-canvas / --tour-board-head / --hero-round-surface so row
+ * fills, the sticky column header and the hole-mark rings match the
+ * sheet, and the LEADERBOARD kicker reads white (board ink) here only —
+ * the tournament page and Leaderboards page boards keep theirs.
  *
  * Wiring: completed events' 'Full board >' opens this. Live events
  * keep the Leaderboards-tab deep link (richer live surface) but can
  * fall back to this when the event isn't present in the live tab.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
 import { LiveBoard } from '../../leaderboard/LiveBoard';
-import { todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
+import { computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { resolveCutDisplay, tournamentIsFinished } from '../../_shared/cutDisplay';
@@ -22,6 +33,8 @@ import { FONT, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens'
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+import { HeroRoundPanel } from './HeroRoundPanel';
+import { heroDefaultRound, heroStartedRounds } from './heroRoundRules';
 
 interface Props {
   open: boolean;
@@ -39,6 +52,8 @@ function isDemoted(s?: string | null): boolean {
 export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
+  const [expanded, setExpanded] = useState<{ playerId: string; round: number } | null>(null);
+  useEffect(() => { setExpanded(null); setTarget(null); }, [tournamentId, open]);
   const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
 
 
@@ -60,7 +75,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
     return { kind: 'none', cutline: null, extraCount: 0 };
   }, [meta, entries]);
 
-  const handleRow = (e: BoardEntry) => {
+  const openScorecard = (e: BoardEntry) => {
     if (!e.player?.id) return;
     setTarget({
       playerId: e.player.id,
@@ -75,6 +90,42 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
     });
   };
 
+  /* Row tap = the hero board's inline expand. One row open at a time;
+     tapping the open row closes it. A row with no started round goes
+     straight to the ScorecardSheet, exactly as the hero board does. */
+  const handleRow = (e: BoardEntry) => {
+    const pid = e.player?.id;
+    if (!pid) return;
+    if (expanded?.playerId === pid) { setExpanded(null); return; }
+    const started = heroStartedRounds(e, meta?.current_round ?? null);
+    const defaultRound = heroDefaultRound(started, meta?.current_round ?? null);
+    if (defaultRound == null) { openScorecard(e); return; }
+    setExpanded({ playerId: pid, round: defaultRound });
+  };
+
+  const panelRounds = useMemo(() => {
+    const cols = computeBoardColumns(entries, meta?.current_round ?? null, tournamentIsFinished(meta?.status));
+    return Math.max(...cols.rounds, meta?.current_round ?? 1);
+  }, [entries, meta]);
+
+  const renderExpandedRow = (e: BoardEntry) => {
+    const pid = e.player?.id;
+    if (!pid || !expanded || expanded.playerId !== pid) return null;
+    return (
+      <HeroRoundPanel
+        key={pid}
+        tournamentId={tournamentId}
+        playerId={pid}
+        round={expanded.round}
+        rounds={panelRounds}
+        startedRounds={heroStartedRounds(e, meta?.current_round ?? null)}
+        boardUpdatedAt={0}
+        onRound={(round) => setExpanded({ playerId: pid, round })}
+        onFull={() => openScorecard(e)}
+      />
+    );
+  };
+
   return (
     <BottomSheet
       open={open}
@@ -83,10 +134,17 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >
       <div
+        className="full-board-sheet"
         style={{
           fontFamily: FONT,
           height: 'auto', maxHeight: '85dvh',
           display: 'flex', flexDirection: 'column',
+          /* ONE surface for the whole sheet: rows, the sticky column head
+             and the hole-mark rings all read these variables. */
+          ['--tour-board-canvas' as string]: SHEET_SURFACE,
+          ['--tour-board-head' as string]: 'rgba(22,22,26,.94)',
+          ['--hero-round-surface' as string]: SHEET_SURFACE,
+          ['--hero-board-side' as string]: '20px',
         }}
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
@@ -107,7 +165,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
 
         {/* Column header moved INTO BoardTable in lockstep with the
             single-line row: one grid definition, no duplicate strip here. */}
-        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, willChange:'transform', background:'var(--tour-board-canvas)' }}>
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, willChange:'transform', background: SHEET_SURFACE }}>
           <LiveBoard
             tournamentId={tournamentId}
             enabled={open}
@@ -118,6 +176,8 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             complete={tournamentIsFinished(meta?.status)}
             onFull={handleRow}
             headerTop={0}
+            expandedId={expanded?.playerId ?? null}
+            renderExpanded={renderExpandedRow}
           />
         </div>
       </div>
