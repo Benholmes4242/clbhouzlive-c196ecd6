@@ -22,7 +22,7 @@ function Cell({ c }: { c: FactCell }) {
   return (
     <div className="cw-cell" data-cw-cell={c.key}>
       <b style={HERO_TOT_TYPE} className={c.pos ? '' : c.under ? 'cw-u' : ''}>
-        {c.pos ? <><i style={HERO_POS_TYPE}>{c.pos}</i><span className={c.under ? 'cw-u' : ''} style={{ display: 'inline', margin: 0, fontSize: 'inherit', fontWeight: 'inherit', letterSpacing: 0 }}>{c.value}</span></> : c.value}
+        {c.pos ? <><i style={HERO_POS_TYPE}>{c.pos}</i><strong className={c.under ? 'cw-u' : ''} style={{ fontWeight: 'inherit' }}>{c.value}</strong></> : c.value}
       </b>
       <span>{c.label}</span>
       {c.sub ? <em>{c.sub}</em> : null}
