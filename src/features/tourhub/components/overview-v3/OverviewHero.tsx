@@ -494,6 +494,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             }
             championPlayerIds={championGate ? activeChampionMemberIds : []}
             venuePar={activeSlide?.tournament.venuePar ?? null}
+            venueYardage={activeSlide?.tournament.venueYardage ?? null}
             purse={activeSlide?.tournament.purse ?? null}
             onRowTap={(playerId) =>
               analyticsEvents.track('hero_board_row_tap', {
