@@ -37,9 +37,12 @@ import { currentWeekKey, weekRelation } from './timelineUtils';
 import {
   followedFieldNames,
   nextMajorDateLabel,
+  seasonBreakBoundaries,
   venueLine,
   weekRangeLabel,
+  type SeasonBreak as SeasonBreakModel,
 } from './scheduleRules';
+import { formatDayMonthShortGB } from '@/i18n/format';
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -53,6 +56,87 @@ import {
 const PANEL = '#141418';
 const THIS_WEEK_BG = 'rgba(255,255,255,0.025)';
 const THIS_WEEK_HEADER_BG = '#0E0E11';
+
+/* Season break (schedule-across-seasons-signed-off.html): the ending
+   season's closing line, then the next season's amber-headed opener. */
+const SEASON_KICKER: React.CSSProperties = {
+  display: 'block',
+  fontSize: 10.5,
+  fontWeight: 800,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+};
+
+const SeasonBreakBlock: React.FC<{ brk: SeasonBreakModel }> = ({ brk }) => {
+  const { t } = useTranslation('tourhub');
+  const startDate = brk.starting.firstStart
+    ? formatDayMonthShortGB(new Date(`${brk.starting.firstStart.slice(0, 10)}T12:00:00Z`))
+    : null;
+  return (
+    <div data-season-break={`${brk.ending.year}-${brk.starting.year}`}>
+      <div
+        style={{
+          padding: '22px 22px 14px',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
+        }}
+      >
+        <span style={{ ...SEASON_KICKER, color: INK_MUTE }}>
+          {t('schedule.seasonBreak.end', {
+            year: brk.ending.year,
+            defaultValue: `END OF THE ${brk.ending.year} SEASON`,
+          })}
+        </span>
+        <span
+          className="num"
+          style={{ display: 'block', marginTop: 3, fontSize: 12.5, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}
+        >
+          {t('schedule.seasonBreak.eventCount', {
+            count: brk.ending.eventCount,
+            defaultValue_one: '{{count}} event',
+            defaultValue_other: '{{count}} events',
+          })}
+        </span>
+      </div>
+      <div
+        style={{
+          marginTop: 18,
+          padding: '16px 22px 14px',
+          borderTop: '1px solid rgba(247,147,30,0.45)',
+          background: 'linear-gradient(180deg, rgba(247,147,30,0.08), rgba(247,147,30,0))',
+        }}
+      >
+        <span style={{ ...SEASON_KICKER, color: AMBER }}>
+          {t('schedule.seasonBreak.season', {
+            year: brk.starting.year,
+            defaultValue: `${brk.starting.year} SEASON`,
+          })}
+        </span>
+        <span
+          className="num"
+          style={{ display: 'block', marginTop: 4, fontSize: 17, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}
+        >
+          {startDate
+            ? t('schedule.seasonBreak.from', {
+                count: brk.starting.eventCount,
+                date: startDate,
+                defaultValue_one: '{{count}} event, from {{date}}',
+                defaultValue_other: '{{count}} events, from {{date}}',
+              })
+            : t('schedule.seasonBreak.eventCount', {
+                count: brk.starting.eventCount,
+                defaultValue_one: '{{count}} event',
+                defaultValue_other: '{{count}} events',
+              })}
+        </span>
+        {brk.starting.tourName ? (
+          <span style={{ display: 'block', marginTop: 3, fontSize: 12.5, color: INK_MUTE }}>
+            {brk.starting.tourName}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 const KICKER: React.CSSProperties = {
   fontSize: 11,
