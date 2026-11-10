@@ -41,8 +41,11 @@ describe('Tour hero refinements', () => {
     expect(header?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 32px 32px 32px 40px');
     expect(header?.style.gap).toBe('4px');
     expect(header?.style.paddingLeft).toBe('20px');
-    for (const el of [header, ...v.container.querySelectorAll<HTMLElement>('[data-hero-tie]')].map(el => el?.hasAttribute('data-hero-tie') ? el.parentElement : el)) {
-      Array.from(el?.children ?? []).slice(2).forEach(cell => expect((cell as HTMLElement).style.textAlign).toBe('center'));
+    // Board headers without POS/PLAYER: the header's centred cells are the
+    // round labels; the kicker and name-track spacer are not score cells.
+    header?.querySelectorAll<HTMLElement>('[data-hero-round-header]').forEach(cell => expect(cell.style.textAlign).toBe('center'));
+    for (const el of v.container.querySelectorAll<HTMLElement>('[data-hero-tie]')) {
+      Array.from(el.parentElement?.children ?? []).slice(2).forEach(cell => expect((cell as HTMLElement).style.textAlign).toBe('center'));
     }
     // LEADERBOARDS PAGE (8 Nov 2026): cell 26→30 and floor 22→25 with the
     // overview board's sizes; the rest of the geometry is unchanged.
