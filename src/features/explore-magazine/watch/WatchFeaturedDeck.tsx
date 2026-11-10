@@ -2,7 +2,7 @@
  * coordinator/HLS/preview lifecycle. Fullscreen uses the complete ordered list.
  * Ben ruled 260ms handover within the 320ms exit. No swipe mutates engagement.
  */
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ReactionGlyph, AMBER } from '@/lib/reactionKind';
 import { HeartBurst } from '@/components/feed/HeartBurst';
