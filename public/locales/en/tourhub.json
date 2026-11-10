@@ -416,6 +416,7 @@
     },
     "hero": {
       "fieldSoon": "FIELD SOON",
+      "starts": "Starts {{day}}",
       "round": "ROUND {{round}}",
       "finalRound": "FINAL ROUND",
       "teesOff": "TEES OFF",
@@ -1649,7 +1650,6 @@
       "chooseTour": "Choose the tour you see",
       "liveNow": "{{count}} live now",
       "tied": "{{count}} tied",
-      "starts": "Starts {{day}}",
       "offThisWeek": "Off this week: {{tours}}",
       "allToursSub": "Every tour, soonest first",
       "live": "Live",
