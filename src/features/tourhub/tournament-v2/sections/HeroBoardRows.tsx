@@ -356,7 +356,8 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
       const available = header.clientWidth - fixed - (bleed ? 0 : 2 * HERO_PAD_X);
       const range = document.createRange();
       range.selectNodeContents(kicker);
-      setLabelsOwnLine(range.getBoundingClientRect().width > available);
+      const textWidth = typeof range.getBoundingClientRect === 'function' ? range.getBoundingClientRect().width : 0;
+      setLabelsOwnLine(textWidth > available);
     };
     measure();
     const observer = new ResizeObserver(measure);
