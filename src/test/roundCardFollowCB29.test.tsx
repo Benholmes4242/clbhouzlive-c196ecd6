@@ -45,7 +45,7 @@ describe('CB29 follow control on round cards', () => {
     const wrap = (node: React.ReactElement) => <QueryClientProvider client={qc}>{node}</QueryClientProvider>;
     const onFollow = vi.fn(); const onOpen = vi.fn();
     const card = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={onOpen} onFollow={onFollow} isFollowed={isFollowed} />));
-    const pill = card.getByRole('button', { name: isFollowed ? 'Unfollow' : 'Follow', exact: true });
+    const pill = card.getByRole('button', { name: isFollowed ? /^Unfollow$/ : /^Follow$/ });
     expect(card.container.querySelector('[data-featured-date-line]')?.contains(pill)).toBe(true);
     fireEvent.click(pill);
     expect(onFollow).toHaveBeenCalledTimes(1);

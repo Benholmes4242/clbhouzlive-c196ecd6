@@ -7,7 +7,7 @@ import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import type { FeaturedRoundEngagement } from '@/features/explore-magazine/FeaturedRoundCard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
+import { ConnectedFeaturedRoundCard } from '@/features/explore-magazine/ConnectedFeaturedRoundCard';
 import { useFeaturedRound } from '@/features/explore-magazine/useFeaturedRound';
 import { useViewerScoreScope } from '@/features/explore-magazine/useViewerScoreScope';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
@@ -96,7 +96,7 @@ function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
     <>
       {/* Full bleed like its neighbours: the photo-led card runs edge to edge. */}
       <div style={{ marginBottom: 8 }}>
-        <FeaturedRoundCard
+        <ConnectedFeaturedRoundCard
           round={r}
           viewerId={viewerId}
           shape={shapes?.get(r.whs_score_id) ?? null}

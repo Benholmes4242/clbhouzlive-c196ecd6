@@ -64,6 +64,7 @@ import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
 import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
 import { useFeaturedRound } from './useFeaturedRound';
 import { FeaturedRoundCard, FeaturedRoundSkeleton } from './FeaturedRoundCard';
+import { ConnectedFeaturedRoundCard } from './ConnectedFeaturedRoundCard';
 import { useExploreStream } from './useExploreStream';
 import { dedupeItems, warnDuplicates } from './dedupeStream';
 import type { StreamItem } from './streamItem';
@@ -1380,7 +1381,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
       ) : null}
       {view === 'all' && featured.data ? (
         <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
-          <FeaturedRoundCard
+          <ConnectedFeaturedRoundCard
             round={featured.data}
             pillLabel={t('courseDetail.featured.featuredPill', 'Featured')}
             medals={roundMedals.isSuccess ? roundMedals.medals?.get(featured.data.whs_score_id) ?? null : undefined}
