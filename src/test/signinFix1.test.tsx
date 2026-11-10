@@ -27,7 +27,7 @@ vi.mock('@/integrations/supabase/client', () => ({
 
 const trackAuthFailed = vi.fn();
 const trackSignupFailed = vi.fn();
-vi.mock('@/lib/analytics/authAnalytics', () => ({
+vi.mock('@/lib/authAnalytics', () => ({
   trackAuthInitiated: vi.fn(),
   trackAuthFailed: (...a: unknown[]) => trackAuthFailed(...a),
   trackAuthSucceeded: vi.fn(),
@@ -180,7 +180,7 @@ describe('SIGNIN_FIX_1', () => {
   it('(e) Google timeout shows the hero error with no toast; cancellation stays silent', async () => {
     let cb: ((r: unknown) => void) | undefined;
     (window as unknown as { median?: unknown }).median = {
-      google: { login: (opts: { callback: (r: unknown) => void }) => { cb = opts.callback; } },
+      socialLogin: { google: { login: (opts: { callback: (r: unknown) => void }) => { cb = opts.callback; } } },
     };
     renderAuth();
     await act(async () => {});
