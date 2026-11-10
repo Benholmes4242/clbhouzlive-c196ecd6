@@ -27,6 +27,7 @@ import React, {
   useRef,
   type ReactNode,
 } from 'react';
+import { isRetiredTour } from '../constants/tourMap';
 import {
   readStoredTour,
   writeStoredTour,
@@ -113,11 +114,13 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const isSlugAcceptable = useCallback((slug: string) => {
+    if (isRetiredTour(slug)) return false;
     const fn = acceptRef.current;
     return fn ? fn(slug) : true;
   }, []);
 
   const selectTour = useCallback((slug: string, opts?: SelectTourOptions) => {
+    if (isRetiredTour(slug)) return;
     // S2.3 — never commit a slug the active page cannot express; the label is
     // derived from selectedTourSlug, so committing one would make it lie.
     // This guard and appliedTourSlug are the two halves of ONE rule: this stops

@@ -1,5 +1,12 @@
 # Roadmap
 
+## In progress: Menu interpolation + LIV retirement
+Baseline sequential shards: 2,087 / 1,916 / 2,066 / 1,971 = 8,040, all passing.
+Fix direct Starts label and guard real-English interpolation across Tour/chrome.
+Registry-owned retired flag drives active lists and deep-link redirects; preserve historical data/helpers.
+Remove retired sync/scrape execution, deploy authorized changed functions, inventory references and cron bodies without SQL.
+Run fresh sequential after-shards and report named test changes.
+
 ## Done: Featured round Follow ruling + close-out
 Canonical inline Follow restored on date line; own rounds hide it.
 Focused 51/51; sequential shards 2,087 / 1,916 / 2,066 / 1,971 = 8,040, zero failures.

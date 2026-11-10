@@ -19,6 +19,7 @@ import { useActiveMensMajor } from './useActiveMensMajor';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import { RESULTS_CAP_DAYS, daysSinceEndDate } from '../components/overview-v3/HybridHero.utils';
 import { useTourSelection } from '../context/TourSelectionContext';
+import { ACTIVE_TOUR_SLUGS } from '../constants/tourMap';
 
 export type TourPickerRowStatus = 'all' | 'live' | 'completed' | 'upcoming' | 'season' | 'none';
 
@@ -43,7 +44,7 @@ export interface TourPickerRow {
  * THE ROW LIST IS NOT THE LABEL MAP. `all` and `major` have their own
  * hand-built rows at the top; only real tours belong in the loop.
  */
-export const TOUR_ROW_SLUGS = ['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'] as const;
+export const TOUR_ROW_SLUGS = ACTIVE_TOUR_SLUGS;
 
 export function useTourPickerRows(): { rows: TourPickerRow[] } {
   const { data: heroSlides } = useHeroCarouselData();

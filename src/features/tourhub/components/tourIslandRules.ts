@@ -7,17 +7,13 @@
  * (uppercase) still serves other surfaces and is unchanged.
  */
 import type { TourPickerRow, TourPickerRowStatus } from '../hooks/useTourPickerRows';
+import { REGISTRY_TOUR_DISPLAY } from '../constants/tourMap';
 
 /** Sentence-case island labels — never uppercase. */
 export const TOUR_DISPLAY: Record<string, string> = {
   all: 'All tours',
   major: 'Majors',
-  pga: 'PGA Tour',
-  lpga: 'LPGA',
-  euro: 'DP World Tour',
-  pgad: 'Korn Ferry',
-  champ: 'Champions',
-  liv: 'LIV Golf',
+  ...REGISTRY_TOUR_DISPLAY,
 };
 
 export function tourDisplayLabel(slug: string): string {
