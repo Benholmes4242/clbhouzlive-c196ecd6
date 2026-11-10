@@ -220,7 +220,7 @@ export function TourHubMainPage() {
             TourPageShell nothing suppresses the chrome. LEADERBOARDS PAGE
             (8 Nov 2026), SCHEDULE TAB and PLAYERS TAB (10 Nov 2026), NEWS TAB
             (10 Nov 2026): with the News conversion the hub no longer renders
-            TourPageShell at all; the --tour-header-h wrapper branch and
+            TourPageShell at all; the old measured-header wrapper branch and
             SubTabTourControl are gone. TourPageShell itself stays for the
             tournament/player sub-pages. */}
         {renderTab()}
