@@ -392,7 +392,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   /* The hole chip follows the VISIBLE slide. */
   const [visibleSlide, setVisibleSlide] = useState(initialMediaIndex ?? 0);
   
-  const { activeActor, setActiveActor } = useActiveActor();
+  const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [videoAboutOpen, setVideoAboutOpen] = useState(false);
   const videoChapters = useMemo(() => chaptersForPost(post, videoDetails, golfContext), [post, videoDetails, golfContext]);
@@ -823,7 +823,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     <div data-feed-section="add-comment" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 16px', width: '100%' }}>
       <FeedActorPicker size={26} value={activeActor} onChange={(a) => setActiveActor(a)} />
       <button type="button" onClick={() => onComment(post, effectiveActor, 'add_comment_row')} style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', padding: 0, textAlign: 'left', cursor: 'pointer' }}>
-        <span style={{ fontSize: 13.5, color: T40 }}>Add a comment…</span>
+        <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
       </button>
     </div>
   ) : (

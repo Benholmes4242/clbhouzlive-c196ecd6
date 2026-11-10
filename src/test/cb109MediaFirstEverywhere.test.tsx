@@ -47,7 +47,7 @@ function card(photo: boolean, over: Partial<React.ComponentProps<typeof FeedCard
       layout="mediaFirst" currentUserId="viewer" commentPreviewEnabled commentPreview={preview} {...over} />
   </MemoryRouter></QueryClientProvider>);
 }
-const markers = ['[data-review-who]', '[data-review-media]', '[data-actor-picker]', '[data-liked-by]', '[data-review-subject]', '[data-review-score-container]', '[data-review-body]', '[data-review-cta]', '[data-comments]', '[data-feed-section="add-comment"]'];
+const markers = ['[data-review-who]', '[data-review-media]', '[data-feed-footer]', '[data-liked-by]', '[data-review-subject]', '[data-review-score-container]', '[data-review-body]', '[data-review-cta]', '[data-comments]', '[data-feed-section="add-comment"]'];
 function order(container: HTMLElement) {
   const present = markers.flatMap((selector) => {
     const el = container.querySelector(selector);
@@ -118,7 +118,8 @@ describe('CB109 media-first everywhere', () => {
   it('ReviewPostCard standard order and media spacing remain unchanged', () => {
     const { container } = render(<MemoryRouter><ReviewPostCard post={POST} articleRef={() => {}} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()}
       media={<img alt="review" />} footer={<div data-actor-picker />} /></MemoryRouter>);
-    expect(order(container)).toEqual([markers[0], markers[4], markers[5], markers[6], markers[7], markers[1], markers[2]]);
+    expect(order(container)).toEqual([markers[0], markers[4], markers[5], markers[6], markers[7], markers[1]]);
+    expect(container.querySelector('[data-actor-picker]')).not.toBeNull();
     expect((container.querySelector('[data-review-media]') as HTMLElement).style.marginTop).toBe('');
     expect(container.querySelector('[data-review-body-lead]')).toBeNull();
   });
