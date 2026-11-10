@@ -857,9 +857,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             isCompetition={roundCompetition === true}
             engagement={roundEngagement}
             square
-            pillLabel={tCourses('courseDetail.featured.featuredPill')}
             isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
-            onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
             onOpen={() => onRoundTap?.(post, postRound)}
           />
         </article>

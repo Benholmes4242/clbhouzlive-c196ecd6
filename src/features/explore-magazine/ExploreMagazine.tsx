@@ -1382,6 +1382,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
           <FeaturedRoundCard
             round={featured.data}
+            pillLabel={t('courseDetail.featured.featuredPill', 'Featured')}
             medals={roundMedals.isSuccess ? roundMedals.medals?.get(featured.data.whs_score_id) ?? null : undefined}
             isCompetition={roundCompetition.isSuccess ? roundCompetition.competition?.get(featured.data.whs_score_id) === true : undefined}
             viewerId={userId}
