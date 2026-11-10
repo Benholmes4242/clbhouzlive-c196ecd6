@@ -348,8 +348,11 @@ describe('CB112 figure placement', () => {
       const s = strip(v.container)!;
       expect(s.getAttribute('data-strip-placement')).toBe(placement);
       for (const el of [s, ...Array.from(s.querySelectorAll<HTMLElement>('*'))]) {
-        for (const b of [el.style.borderTop, el.style.borderBottom, el.style.borderLeft]) {
-          expect(['', 'none'].includes(b)).toBe(true);
+        for (const w of [el.style.borderTopWidth, el.style.borderBottomWidth, el.style.borderLeftWidth]) {
+          expect(['', '0px'].includes(w)).toBe(true);
+        }
+        for (const st of [el.style.borderTopStyle, el.style.borderBottomStyle, el.style.borderLeftStyle]) {
+          expect(['', 'none'].includes(st)).toBe(true);
         }
       }
       v.unmount();
