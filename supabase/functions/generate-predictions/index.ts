@@ -20,6 +20,7 @@ import { calculateCourseFitScores, formatCourseFitForPrompt } from './courseFitC
 import { calculateVenueHistoryScores, formatVenueHistoryForPrompt } from './venueHistory.ts';
 import { runConsensus } from './consensusEngine.ts';
 import { tournamentAcceptsNewPicks } from './picksLock.ts';
+import { isRetiredTourName } from '../_shared/tourRetirement.ts';
 import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
 import type { CourseDNAProfile } from './courseFitCalculator.ts';
 
@@ -209,6 +210,11 @@ serve(async (req) => {
       tournament = data;
     }
 
+    if (tournament.season_id) {
+      const { data: retirementSeason, error: retirementError } = await supabase.from('sr_seasons').select('tour_name').eq('id', tournament.season_id).maybeSingle();
+      if (retirementError) throw retirementError;
+      if (isRetiredTourName(retirementSeason?.tour_name)) return new Response(JSON.stringify({ error: 'Tour retired' }), { status: 410, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     console.log(`[generate-predictions] Processing: ${tournament.name}`);
 
     // =============================================

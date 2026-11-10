@@ -3,6 +3,7 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 import { corsFor } from '../_shared/cors.ts';
+import { activeSyncTours, isRetiredTourName } from '../_shared/tourRetirement.ts';
 
 // Module scope: helpers below the handler spread this, so it must NOT be
 // handler-scoped. Reassigned per request as the first line of the handler.
@@ -79,6 +80,7 @@ serve(async (req) => {
     const startDate = url.searchParams.get("start_date") || "";
     const endDate = url.searchParams.get("end_date") || "";
     const tour = url.searchParams.get("tour") || ""; // e.g., "pga-tour", "liv-golf", "dp-world-tour"
+    if (isRetiredTourName(tour)) return jsonResponse({ error: 'Tour retired' }, 410);
 
     console.log(`[livegolf] Request: action=${action}, eventId=${eventId}, tour=${tour}`);
 
@@ -182,7 +184,7 @@ serve(async (req) => {
       // ==================== ALL DATA (EVENTS BY TOUR) ====================
       case "by-tour":
         // Fetch events for multiple tours in parallel
-        const tours = ["pga-tour", "liv-golf", "dp-world-tour"];
+        const tours = activeSyncTours(["pga-tour", "dp-world-tour"]);
         const tourResults = await Promise.all(
           tours.map(async (t) => {
             const res = await fetchFromLiveGolf("/events", { tour: t });

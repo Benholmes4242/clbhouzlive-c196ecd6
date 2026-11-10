@@ -1,4 +1,5 @@
 import { NEAR_BLACK_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
+import { RETIRED_TOURS } from '../../../../supabase/functions/_shared/tourRetirement';
 
 /**
  * tourMap — central source of truth for tour metadata.
@@ -61,7 +62,7 @@ export const TOUR_MAP: Record<TourCode, TourMeta> = {
     fg: '#FFFFFF',
   },
   LIV: {
-    retired: true,
+    retired: RETIRED_TOURS.liv,
     label: 'LIV Golf',
     short: 'LIV Golf',
     pillCode: 'LIV Golf',

@@ -170,11 +170,6 @@ Deno.serve(async (req) => {
     )
     allArticles.push(...pgaArticles)
 
-    // Fetch LIV Golf news
-    console.log('Fetching LIV Golf news from NewsAPI...')
-    const livArticles = await fetchFromNewsAPI('LIV Golf OR "LIV tournament"')
-    allArticles.push(...livArticles)
-
     // Fetch DP World Tour news
     console.log('Fetching DP World Tour news from NewsAPI...')
     const dpArticles = await fetchFromNewsAPI('"DP World Tour" OR "European Tour"')

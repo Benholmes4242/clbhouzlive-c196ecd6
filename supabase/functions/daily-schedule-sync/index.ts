@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { corsFor } from '../_shared/cors.ts';
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
+import { activeTournamentRows, activeSyncTours } from '../_shared/tourRetirement.ts';
 /**
  * Daily Schedule Sync - Syncs tournament schedules and final leaderboards for ALL major tours
  * Runs at 6 AM UTC daily via pg_cron
@@ -18,14 +19,13 @@ import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
 // Consequence (intended, per MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW): the hero
 // shows the LIV result for 14 days after 23 August, then LIV drops out of the
 // carousel until the 2027 schedule appears. Do not re-investigate.
-const TOURS_TO_SYNC = [
+const TOURS_TO_SYNC = activeSyncTours([
   'pga',    // PGA Tour
   'euro',   // DP World Tour (Sportradar v3 uses 'euro')
   'lpga',   // LPGA Tour
-  'liv',    // LIV Golf — see coverage-gap note above
   'pgad',   // Korn Ferry Tour (Sportradar v3 uses 'pgad')
   'champ',  // Champions Tour (Sportradar v3 uses 'champ')
-];
+]);
 
 
 // Map database tour names to SportRadar API codes
@@ -209,7 +209,7 @@ Deno.serve(async (req) => {
         console.log(`[Daily Schedule Sync] Found ${closedTournaments.length} recently closed tournaments`);
         
         // Check each tournament for missing leaderboard data
-        for (const tournament of closedTournaments) {
+        for (const tournament of await activeTournamentRows(supabase, closedTournaments)) {
           // Check if leaderboard data exists
           const { count } = await supabase
             .from('sr_leaderboards')

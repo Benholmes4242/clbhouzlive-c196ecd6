@@ -1,4 +1,5 @@
 import { corsFor } from '../_shared/cors.ts';
+import { activeTournamentRows, activeSyncTours, isRetiredTourName } from '../_shared/tourRetirement.ts';
 /**
  * tournament-live-sync — Sync ALL in-hours live tournaments per invocation
  *
@@ -104,6 +105,7 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: 'Tournament not found' }),
           { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
+      if (!(await activeTournamentRows(supabase, [t])).length) return new Response(JSON.stringify({ error: 'Tour retired' }), { status: 410, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       const r = await reconcileFinal(supabase, sportradarApiKey, t);
       return new Response(JSON.stringify({ reconciled: t.name, ...r }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -122,7 +124,7 @@ Deno.serve(async (req) => {
       .in('status', STALE_AUTO_CLOSE_STATUSES) // never a playoff/suspended event
       .lt('end_date', today);
     const staleTournaments: Array<{ id: string; name: string }> = [];
-    for (const t of staleCandidates ?? []) {
+    for (const t of await activeTournamentRows(supabase, staleCandidates ?? [])) {
       let final = false;
       let feedStatus: string | undefined;
       try {
@@ -173,7 +175,7 @@ Deno.serve(async (req) => {
     if (upcomingTournaments?.length) {
       if (shouldFetchPreEventTeeTimes(now)) {
         console.log(`[LiveSync] ${upcomingTournaments.length} upcoming tournament(s) within 3 days — syncing tee times`);
-        for (const upcoming of upcomingTournaments) {
+        for (const upcoming of await activeTournamentRows(supabase, upcomingTournaments)) {
           const { data: uSeason } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', upcoming.season_id).maybeSingle();
           const uYear = uSeason?.year || new Date().getFullYear();
           const uTourSlug = getTourSlugForTeeTimes(uSeason?.tour_name || 'pga');
@@ -205,7 +207,7 @@ Deno.serve(async (req) => {
       }
 
       // ── Auto-regeneration: refresh stale predictions for imminent tournaments ──
-      for (const upcoming of upcomingTournaments) {
+      for (const upcoming of await activeTournamentRows(supabase, upcomingTournaments)) {
         try {
           const startDate = new Date(upcoming.start_date);
           const now = new Date();
@@ -287,7 +289,7 @@ Deno.serve(async (req) => {
 
     // ── Sync all tournaments (gated ones get stamped, not skipped) ────
     const syncResults = await Promise.all(
-      liveTournaments.map(tournament => syncTournament(supabase, sportradarApiKey, tournament, now))
+      (await activeTournamentRows(supabase, liveTournaments)).map(tournament => syncTournament(supabase, sportradarApiKey, tournament, now))
     );
 
     const totalRecords = syncResults.reduce((sum, r) => sum + r.records, 0);
@@ -493,7 +495,7 @@ async function syncTournament(
 
   // ── Periodic active-round scorecards (shared quota cadence) ─────
   // PGA, DP World, Champions, LPGA, and Korn Ferry tours get hole-by-hole scorecards
-  const scorecardTours = ['pga', 'euro', 'champ', 'lpga', 'pgad', 'liv'];
+  const scorecardTours = activeSyncTours(['pga', 'euro', 'champ', 'lpga', 'pgad']);
   const shouldSyncScorecards = shouldFetchScorecards(now) && scorecardTours.includes(tour.toLowerCase());
 
   if (shouldSyncScorecards) {
@@ -826,6 +828,7 @@ async function resolveToLiveStatus(
     const season = seasonMap.get(tournament.season_id);
     const year = season?.year || new Date().getFullYear();
     const tour = mapTourName(season?.tour_name || 'pga');
+    if (isRetiredTourName(season?.tour_name)) continue;
 
     try {
       const hasLiveData = await checkForLiveLeaderboard(apiKey, tour, year, tournament.sr_id, tournament.name);
@@ -918,6 +921,7 @@ async function reconcileFinal(supabase: any, apiKey: string, t: any): Promise<{ 
   const { data: season } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', t.season_id).maybeSingle();
   const year = season?.year || new Date().getFullYear();
   const tour = mapTourName(season?.tour_name || 'pga');
+  if (isRetiredTourName(season?.tour_name)) return { records: 0, final: false };
   const r = await syncLeaderboard(supabase, apiKey, tour, year, t.sr_id, t.id, t);
   const final = FINAL_FEED_STATUSES.includes(String(r.sportradarStatus ?? '').toLowerCase());
   console.log(`[LiveSync] Close-out ${t.name}: feed '${r.sportradarStatus}', ${r.records} rows${final ? ' (final, ungated)' : ' (feed not final — gate kept)'}`);
