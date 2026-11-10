@@ -34,6 +34,7 @@ import { corsFor } from '../_shared/cors.ts';
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { isRetiredTourName } from '../_shared/tourRetirement.ts';
 
 type Outcome =
   | 'generated'
@@ -85,7 +86,7 @@ serve(async (req) => {
     const { data: tournaments, error: tErr } = await query;
     if (tErr) throw tErr;
 
-    const list = (tournaments ?? []).filter((t: any) => t.status !== 'closed' && t.status !== 'cancelled');
+    const list = (tournaments ?? []).filter((t: any) => !isRetiredTourName(t.sr_seasons?.tour_name) && t.status !== 'closed' && t.status !== 'cancelled');
 
     console.log(
       `[schedule-predictions] run=${runId} window=${from}..${to} tournaments=${list.length}`,

@@ -18,6 +18,7 @@
  * it can be unit-tested without React and shared across consumers.
  */
 
+import { activeTourList, isRetiredTour } from '../constants/tourMap';
 export const TOUR_STORAGE_KEY = 'tourhub:selectedTour';
 
 /** Canonical tour slugs used by the hero carousel + picker. */
@@ -34,7 +35,7 @@ export const CANONICAL_TOUR_SLUGS = [
 export type CanonicalTourSlug = (typeof CANONICAL_TOUR_SLUGS)[number];
 
 /** Land-time priority for live-first override. */
-const LANDING_PRIORITY: readonly string[] = [
+const LANDING_PRIORITY: readonly string[] = activeTourList([
   'major',
   'pga',
   'lpga',
@@ -42,20 +43,21 @@ const LANDING_PRIORITY: readonly string[] = [
   'champ',
   'liv',
   'pgad',
-];
+]);
 
 export function readStoredTour(): string | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = window.localStorage.getItem(TOUR_STORAGE_KEY);
     if (!raw) return null;
-    return (CANONICAL_TOUR_SLUGS as readonly string[]).includes(raw) ? raw : null;
+    return (CANONICAL_TOUR_SLUGS as readonly string[]).includes(raw) && !isRetiredTour(raw) ? raw : null;
   } catch {
     return null;
   }
 }
 
 export function writeStoredTour(slug: string): void {
+  if (isRetiredTour(slug)) return;
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(TOUR_STORAGE_KEY, slug);
@@ -81,6 +83,6 @@ export function resolveLandingTour(
   for (const p of LANDING_PRIORITY) {
     if (liveSlugs.includes(p)) return p === stored ? null : p;
   }
-  const fallback = liveSlugs[0];
+  const fallback = activeTourList(liveSlugs)[0];
   return fallback && fallback !== stored ? fallback : null;
 }

@@ -10,6 +10,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { parseStoryBlocks, type StoryBlock } from './blocks';
+import { isRetiredTour } from '../constants/tourMap';
 
 export interface TourStory {
   id: string;
@@ -66,7 +67,7 @@ export function useTourStories(tourSlug: string | null, enabled = true) {
     },
   });
 
-  const all = q.data ?? [];
+  const all = (q.data ?? []).filter(story => !isRetiredTour(story.tour_slug));
   const stories =
     !tourSlug || tourSlug === 'all'
       ? all
@@ -111,7 +112,7 @@ export function useMoreFromTheWire(excludeId: string | undefined) {
       if (excludeId) query = query.neq('id', excludeId);
       const { data, error } = await query;
       if (error) throw error;
-      return (data ?? []).map(toStory).slice(0, 3);
+      return (data ?? []).map(toStory).filter(story => !isRetiredTour(story.tour_slug)).slice(0, 3);
     },
   });
 }

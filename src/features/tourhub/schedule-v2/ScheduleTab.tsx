@@ -22,6 +22,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
+import { isActiveTour } from '../constants/tourMap';
 
 import { tournamentRoute } from '../routes';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
@@ -186,11 +187,11 @@ export function ScheduleTab() {
        the member's lens (Coming Up's FULL SCHEDULE row). It must beat the
        stored single tour, otherwise a see-all silently narrows the scope. */
     if (param === 'all') return null;
-    if (param && Object.prototype.hasOwnProperty.call(TOUR_CONFIG, param)) {
+    if (param && isActiveTour(param)) {
       return param as TourId;
     }
     const stored = readStoredTour();
-    if (stored && Object.prototype.hasOwnProperty.call(TOUR_CONFIG, stored)) {
+    if (stored && isActiveTour(stored)) {
       return stored as TourId;
     }
     return null;
@@ -435,7 +436,7 @@ export function ScheduleTab() {
   useTourLensFromPicker<TourId | null>(
     (slug) => {
       if (slug === 'all') return null;
-      if (Object.prototype.hasOwnProperty.call(TOUR_CONFIG, slug)) return slug as TourId;
+      if (isActiveTour(slug)) return slug as TourId;
       return undefined;
     },
     onTourChange,

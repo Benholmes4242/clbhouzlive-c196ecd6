@@ -304,7 +304,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     const body = await req.json().catch(() => ({}));
-    const all: TourCode[] = ["lpga", "pgad", "liv", "champ"];
+    const all: TourCode[] = ["lpga", "pgad", "champ"];
     const requested = body?.tour == null || body.tour === "all" ? all : [body.tour];
     if (!requested.every((t: unknown) => all.includes(t as TourCode))) {
       return new Response(JSON.stringify({ error: `Unknown tour: ${body.tour}` }), {

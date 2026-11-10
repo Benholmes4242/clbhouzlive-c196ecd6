@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '../_shared/tourOrder';
+import { isRetiredTour } from '../constants/tourMap';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../_shared/boardEntity';
 import type { BoardEntry } from '../leaderboard/BoardTable';
 import type { TourId } from './useOverviewData';
@@ -52,7 +53,7 @@ export function useLiveTournaments() {
         .order('purse', { ascending: false, nullsFirst: false });
 
       if (error) throw error;
-      const rows = data ?? [];
+      const rows = (data ?? []).filter((row: any) => !isRetiredTour(row.season?.tour_name));
 
       // Companion query: who leads each of these tournaments. Kept here rather
       // than in components so the menu never depends on a leaderboard page

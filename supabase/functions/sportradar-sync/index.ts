@@ -14,6 +14,7 @@ const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'product
 const getTourBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
 
 // Base for global endpoints (no tour): /golf/{access_level}/v3/{lang}
+import { isRetiredTourName } from '../_shared/tourRetirement.ts';
 const getGlobalBaseUrl = () => `https://api.sportradar.com/golf/${getAccessLevel()}/v3/en`;
 
 // Normalise incoming tourId values to Sportradar URL slugs
@@ -120,6 +121,7 @@ Deno.serve(async (req) => {
     // Default is the current UTC year, never a typed season (a hard-coded 2026 would block next season).
     const effectiveYear = year || seasonYear || new Date().getUTCFullYear();
     const effectiveTour = normaliseTourSlug(tourId || 'pga');
+    if (isRetiredTourName(effectiveTour)) return new Response(JSON.stringify({ error: 'Tour retired' }), { status: 410, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     
     // Validate roundType - use 'rounds' for REST API path (not 'stroke')
     let effectiveRoundType = 'rounds';
@@ -499,6 +501,7 @@ async function syncSeasons(supabase: any, apiKey: string) {
   let totalRecords = 0;
 
   for (const tour of tours) {
+    if (isRetiredTourName(tour.alias) || isRetiredTourName(tour.name)) continue;
     const seasons = tour.seasons || [];
     for (const season of seasons) {
       const { error } = await supabase.from('sr_seasons').upsert({
@@ -1739,6 +1742,7 @@ async function backfillTeeTimes(supabase: any, apiKey: string) {
 
     const year = season?.year || new Date().getFullYear();
     const tourSlug = getTourSlugForTeeTimes(season?.tour_name || 'pga');
+    if (isRetiredTourName(season?.tour_name)) { skipped++; continue; }
     
     if (!tourSlug) {
       skipped++;

@@ -27,6 +27,7 @@ import { Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
+import { ACTIVE_TOUR_SLUGS } from '../constants/tourMap';
 import { useTourStories, type TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
@@ -67,7 +68,7 @@ import {
 } from '../_shared/tokens';
 
 /** Slugs the news list can express. 'major' has no tour_slug counterpart. */
-const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
+const NEWS_SLUGS: string[] = ['all', ...ACTIVE_TOUR_SLUGS];
 
 /** Compact lead band used by the Wire section on the Tour Overview. */
 const COMPACT_LEAD_HEIGHT = 212;

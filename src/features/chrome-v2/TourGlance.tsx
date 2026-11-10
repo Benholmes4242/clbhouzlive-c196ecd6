@@ -24,6 +24,7 @@ import { useTourSelection } from '@/features/tourhub/context/TourSelectionContex
 import { useLiveTournaments } from '@/features/tourhub/hooks/useLiveTournaments';
 import { getTourLogo } from '@/features/tourhub/utils/tourLogos';
 import { TOUR_DISPLAY, startsLabel } from '@/features/tourhub/components/tourIslandRules';
+import { isRetiredTour } from '@/features/tourhub/constants/tourMap';
 import { TourIcon, TourLiveDot, type TourIconName } from '@/features/tourhub/components/tourIslandIcons';
 
 const INK = 'var(--tour-menu-ink)';
@@ -79,8 +80,9 @@ export function TourGlance({ onClose, anchorRef, activeTab, onSelectTab, section
   const showLive = liveFetched && tournamentRows.length > 0;
   const liveById = new Map(tournamentRows.map(tt => [tt.id, tt] as const));
   const liveCount = showLive ? new Set(tournamentRows.map(tt => tt.tourSlug)).size : 0;
-  const visibleRows = rows.filter(row => row.status !== 'none');
-  const offTours = [...new Set(rows.filter(row => row.status === 'none').map(row => TOUR_DISPLAY[row.slug] ?? row.slug))];
+  const activeRows = rows.filter(row => !isRetiredTour(row.slug));
+  const visibleRows = activeRows.filter(row => row.status !== 'none');
+  const offTours = [...new Set(activeRows.filter(row => row.status === 'none').map(row => TOUR_DISPLAY[row.slug] ?? row.slug))];
 
   const sections = SECTIONS.filter(s => s.id !== 'live' || showLive);
 
@@ -132,7 +134,7 @@ export function TourGlance({ onClose, anchorRef, activeTab, onSelectTab, section
                   {hasLeader ? <b data-testid="tour-menu-leader">{leader} <span data-under-par={score < 0}>{score < 0 ? `−${Math.abs(score)}` : score === 0 ? 'E' : `+${score}`}</span></b> : null}
                   <small><span className="tour-menu-live"><TourLiveDot s={6} />{round != null ? `R${round}` : t('tour.glance.live', { defaultValue: 'Live' })}</span></small>
                 </span> : row.status === 'completed' ? <span className="tour-menu-right tour-menu-status"><b>{t('tour.glance.final', { defaultValue: 'Final' })}</b></span>
-                  : row.status === 'upcoming' && row.startDate ? <span className="tour-menu-right tour-menu-status"><b>{t('tour.glance.starts', { label: startsLabel(row.startDate), defaultValue: startsLabel(row.startDate) })}</b></span> : null}
+                  : row.status === 'upcoming' && row.startDate ? <span className="tour-menu-right tour-menu-status"><b>{startsLabel(row.startDate)}</b></span> : null}
               </Button>;
             })}
           </div>

@@ -1,4 +1,5 @@
 import { NEAR_BLACK_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
+import { RETIRED_TOURS } from '../../../../supabase/functions/_shared/tourRetirement';
 
 /**
  * tourMap — central source of truth for tour metadata.
@@ -16,6 +17,7 @@ import { NEAR_BLACK_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 export type TourCode = 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
 export interface TourMeta {
+  retired?: boolean;
   label: string;
   short: string;
   pillCode: string;
@@ -60,6 +62,7 @@ export const TOUR_MAP: Record<TourCode, TourMeta> = {
     fg: '#FFFFFF',
   },
   LIV: {
+    retired: RETIRED_TOURS.liv,
     label: 'LIV Golf',
     short: 'LIV Golf',
     pillCode: 'LIV Golf',
@@ -67,6 +70,25 @@ export const TOUR_MAP: Record<TourCode, TourMeta> = {
     fg: '#000000',
   },
 };
+
+/** Eligibility lives here; historical metadata and readers retain every code. */
+export const TOUR_SLUGS = ['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'] as const;
+export type RegistryTourSlug = typeof TOUR_SLUGS[number];
+const SLUG_CODE: Record<RegistryTourSlug, TourCode> = { pga: 'pga', lpga: 'LPGA', euro: 'EURO', pgad: 'PGAD', champ: 'CHAMP', liv: 'LIV' };
+export function isRetiredTour(value: string | null | undefined): boolean {
+  if (!value) return false;
+  const normalized = value.toLowerCase().trim();
+  const slug = TOUR_SLUGS.find(s => s === normalized || TOUR_MAP[SLUG_CODE[s]].label.toLowerCase() === normalized || TOUR_MAP[SLUG_CODE[s]].short.toLowerCase() === normalized || (s === 'liv' && (normalized === 'liv-golf' || normalized === 'livpts')));
+  return slug ? TOUR_MAP[SLUG_CODE[slug]].retired === true : false;
+}
+export function isActiveTour(value: string): boolean {
+  return (TOUR_SLUGS as readonly string[]).includes(value) && !isRetiredTour(value);
+}
+export const ACTIVE_TOUR_SLUGS = TOUR_SLUGS.filter(isActiveTour);
+export function activeTourList<T extends string>(values: readonly T[]): T[] {
+  return values.filter(value => !isRetiredTour(value));
+}
+export const REGISTRY_TOUR_DISPLAY = Object.fromEntries(TOUR_SLUGS.map(slug => [slug, TOUR_MAP[SLUG_CODE[slug]].short]));
 
 /** Lookup helper — never throws; returns undefined if code is unknown. */
 export function getTourMeta(code: string | null | undefined): TourMeta | undefined {

@@ -7,6 +7,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '../../_shared/tourOrder';
+import { isRetiredTour } from '../../constants/tourMap';
 import { isMajor } from '../../utils/majorScope';
 import type { TourId } from '../../hooks/useOverviewData';
 import { formatVenueLabel } from '../../lib/venueLabel';
@@ -71,7 +72,7 @@ export function useComingUp(tour: TourId | null, limit = 12) {
         .limit(effectiveLimit * 6);
       if (error) throw error;
       const now = Date.now();
-      const rows = ((data as any[]) ?? []).map((r) => {
+      const rows = ((data as any[]) ?? []).filter(r => !isRetiredTour(r.season?.tour_name)).map((r) => {
         const slug = mapTourSlug(r.season?.tour_name);
         return { r, slug };
       });

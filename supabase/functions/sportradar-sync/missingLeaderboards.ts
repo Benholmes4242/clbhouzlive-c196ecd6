@@ -5,6 +5,7 @@ export interface MissingLeaderboardEvent {
   id: string; sr_id: string; name: string;
   season: { tour_name: string; year: number };
 }
+import { isRetiredTourName } from '../_shared/tourRetirement.ts';
 export async function backfillMissingLeaderboards(
   supabase: any,
   sync: (tour: string, year: number, srId: string) => Promise<unknown>,
@@ -18,7 +19,7 @@ export async function backfillMissingLeaderboards(
     .lte('start_date', now.toISOString().slice(0, 10))
     .is('sr_leaderboards', null).order('start_date', { ascending: true }).limit(25);
   if (error) throw error;
-  const events: MissingLeaderboardEvent[] = data ?? [];
+  const events: MissingLeaderboardEvent[] = (data ?? []).filter((event: MissingLeaderboardEvent) => !isRetiredTourName(event.season.tour_name));
   let filled = 0;
   const still_missing: string[] = [];
   for (const [index, event] of events.entries()) {

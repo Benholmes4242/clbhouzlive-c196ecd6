@@ -16,6 +16,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
+import { activeTourList } from '../constants/tourMap';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
 import { getContextLabel } from '../utils/tournamentClassification';
 import { isAnyMajor, getMajorType } from '../utils/majorScope';
@@ -29,7 +30,7 @@ import {
 } from '../components/overview-v3/HybridHero.utils';
 
 // Tour priority order for sorting live tournaments
-const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
+const TOUR_PRIORITY: TourId[] = activeTourList<TourId>(['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ']);
 
 export interface HeroTournament {
   id: string;

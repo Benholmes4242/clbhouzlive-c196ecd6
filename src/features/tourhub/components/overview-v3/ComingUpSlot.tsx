@@ -10,8 +10,9 @@ import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { useOverviewEventsAbove } from '../../overview/sections/useOverviewEventsAbove';
+import { ACTIVE_TOUR_SLUGS } from '../../constants/tourMap';
 
-const SCHEDULE_TOURS = new Set<string>(['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv']);
+const SCHEDULE_TOURS = new Set<string>(ACTIVE_TOUR_SLUGS);
 
 export function ComingUpSlot() {
   const { selectedTourSlug } = useTourSelection();

@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { BoardEntry } from '../leaderboard/BoardTable';
 import { STORY_COLS, toStory, type TourStory } from './useTourStories';
+import { isRetiredTour } from '../constants/tourMap';
 
 /** Real tournament names for the By-event chips. One read for every chip id. */
 export function useNewsEventNames(ids: string[]) {
@@ -78,7 +79,7 @@ export function useNewsSearch(query: string, tourLens: string | null) {
   });
   // The lens stays client-side, exactly as useTourStories applies it.
   const results = (q.data ?? []).filter(
-    (s) => !tourLens || tourLens === 'all' || s.tour_slug == null || s.tour_slug === tourLens,
+    (s) => !isRetiredTour(s.tour_slug) && (!tourLens || tourLens === 'all' || s.tour_slug == null || s.tour_slug === tourLens),
   );
   return { debounced, active, results, isLoading: active && q.isLoading, settled: active && q.isSuccess };
 }

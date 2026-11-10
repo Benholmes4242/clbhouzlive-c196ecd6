@@ -7,6 +7,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { isRetiredTour } from '@/features/tourhub/constants/tourMap';
 
 export type EmptyStateEvent = {
   id: string;
@@ -66,8 +67,8 @@ export function useSearchEmptyStateV2(enabled: boolean) {
       if (error) throw error;
       const j = (data ?? {}) as Partial<EmptyStatePayload>;
       return {
-        event: j.event,
-        players: j.players ?? [],
+        event: isRetiredTour(j.event?.tour_slug) ? undefined : j.event,
+        players: isRetiredTour(j.event?.tour_slug) ? [] : j.players ?? [],
         suggested_people: j.suggested_people ?? [],
         popular_courses: j.popular_courses ?? [],
       };
