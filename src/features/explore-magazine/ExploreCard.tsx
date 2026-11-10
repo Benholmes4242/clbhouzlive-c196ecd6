@@ -488,9 +488,9 @@ function WhoLine({
      for a missing post or zero likes, both excluded here, and its loading state
      still prints the figure — so the thumb's count can safely step aside. */
   const namesLineShows = !pair && !!engagement?.reactionSubjectId && (engagement?.likeCount ?? 0) > 0;
-  /* CB56 — the round foot keeps the line's space at zero so a first like does
-     not grow the tile and move the stream beneath it. */
-  const namesLineReserved = !pair && !!engagement?.reactionSubjectId;
+  /* CB56 — the line collapses at zero on feed cards and opens with an
+     animation when the first like lands; the sheets keep the reserve. */
+  const namesLineReserved = !pair && !!engagement?.reactionSubjectId && (engagement?.likeCount ?? 0) > 0;
 
   const reactions = showActions ? (
     <span
@@ -629,7 +629,6 @@ function WhoLine({
             <LikedByRow
                 postId={engagement!.reactionSubjectId!}
                 count={engagement!.likeCount}
-                reserve
                 source={helpful ? 'review' : 'round'}
                 kind={helpful ? 'helpful' : 'celebrate'}
                 surfaceColor={A.CANVAS}
