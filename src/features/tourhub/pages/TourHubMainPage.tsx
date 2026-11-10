@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubShell } from '../components/TourHubShell';
-import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab } from '../components/tabs';
 import { legacyTabRedirect } from '@/features/tourhub/players-v2/playersRules';
@@ -15,7 +14,6 @@ import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
 import { TourIsland, useTourIslandDescriptor } from '../components/TourIsland';
 import { TourGlance } from '@/features/chrome-v2/TourGlance';
-import { TourIcon } from '../components/tourIslandIcons';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
@@ -200,8 +198,7 @@ export function TourHubMainPage() {
     scrollPageToTop('auto');
   };
 
-  const tabTitle = TAB_TITLES[activeTab] ?? 'Tour';
-  /* Overview IS the hub: no back control there (see TourPageShell.showBack). */
+  /* Overview IS the hub: its status bar stays immersive. */
   const isHubRoot = activeTab === 'overview';
 
   return (
