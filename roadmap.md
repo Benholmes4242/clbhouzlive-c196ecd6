@@ -1,5 +1,11 @@
 # Roadmap
 
+## Done: Featured round Follow ruling + close-out
+Canonical inline Follow restored on date line; own rounds hide it.
+Focused 51/51; sequential shards 2,087 / 1,916 / 2,066 / 1,971 = 8,040, zero failures.
+320/390/430 real-style fixtures passed 18 collision/ellipsis/date-line checks.
+Report: FEATURED_ROUND_REPORT.md. Live-account device checks blocked by external_unmanaged auth; listed in report.
+
 ## In progress: Last year lookup + missing-leaderboard sweep
 Before-change shards executed separately: 2,087 / 1,908 / 2,049 / 1,968 = 8,012 executed (8,011 passed, 1 failed).
 STOP: src/test/heroBlocks.test.tsx:104, “recap board header removal > RecapStandings renders no kicker or Full list link” unexpectedly fails on `recap-head`.

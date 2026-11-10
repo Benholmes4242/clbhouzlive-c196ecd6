@@ -857,6 +857,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             engagement={roundEngagement}
             square
             isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
+            onFollow={mountFollowPill && onFollow ? () => onFollow(post) : undefined}
             onOpen={() => onRoundTap?.(post, postRound)}
           />
         </article>
