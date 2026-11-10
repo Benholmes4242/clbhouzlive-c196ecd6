@@ -30,6 +30,8 @@ import { getGuestUser } from '@/features/guest/guestGateStore';
 import { trackGuestConverted } from '@/features/guest/guestAnalytics';
 import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
 import { refreshGuestConversion } from '@/features/guest/refreshGuestConversion';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 
 type AppleClaims = {
   aud?: string;
@@ -62,7 +64,50 @@ const sanitiseErrorForAnalytics = (message?: string): string => {
 type Step = 'hero' | 'otp';
 type SubmittingMethod = 'email' | 'apple' | 'google' | null;
 
-const RESEND_COOLDOWN_SECONDS = 30;
+// SIGNIN_FIX_1: matches Supabase's one-email-per-60-seconds limit.
+const RESEND_COOLDOWN_SECONDS = 60;
+
+/**
+ * SIGNIN_FIX_1: the code we sent survives iOS reloading the app while the
+ * member is in Mail. One record, overwritten by each send; cleared on
+ * successful verify and on sign-out. Every read/write is guarded — auth
+ * never throws on storage.
+ */
+const PENDING_CODE_KEY = 'auth.pendingCode';
+const PENDING_CODE_MAX_AGE_MS = 10 * 60 * 1000;
+
+interface PendingCode {
+  email: string;
+  sentAt: number;
+  linkMode: boolean;
+}
+
+const readPendingCode = (): PendingCode | null => {
+  try {
+    const raw = safeLocalStorage.get(PENDING_CODE_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as Partial<PendingCode>;
+    if (typeof p?.email !== 'string' || typeof p?.sentAt !== 'number') return null;
+    return { email: p.email, sentAt: p.sentAt, linkMode: p.linkMode === true };
+  } catch {
+    return null;
+  }
+};
+
+const writePendingCode = (rec: PendingCode) => {
+  try {
+    safeLocalStorage.set(PENDING_CODE_KEY, JSON.stringify(rec));
+  } catch { /* never block auth */ }
+};
+
+const clearPendingCode = () => {
+  try {
+    safeLocalStorage.remove(PENDING_CODE_KEY);
+  } catch { /* never block auth */ }
+};
+
+const alreadySentInfo = (email: string) =>
+  `We've already sent a code to ${email}. Use that one; it can take a minute to arrive, so check spam too.`;
 
 interface AuthFormProps {
   /** Stage 2.6: claim navigation for the duration of a sign-in attempt;
@@ -187,6 +232,49 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
     return () => window.clearInterval(id);
   }, [resendCooldown]);
 
+  // SIGNIN_FIX_1: restore the pending code after an app reload (iOS kills the
+  // WebView while the member is in Mail). Only with no session and a record
+  // under 10 minutes old. Never throws — a fault here must not break sign-in.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!alive || data.session) return;
+        const rec = readPendingCode();
+        if (!rec) return;
+        const ageSec = (Date.now() - rec.sentAt) / 1000;
+        if (ageSec >= PENDING_CODE_MAX_AGE_MS / 1000) return;
+        emailLinkModeRef.current = rec.linkMode;
+        setEmailState(rec.email);
+        setOtpInfo(`Enter the code we sent to ${rec.email}.`);
+        setResendCooldown(Math.max(0, Math.ceil(RESEND_COOLDOWN_SECONDS - ageSec)));
+        setStep('otp');
+        void analyticsEvents.track('auth_code_reused', { reason: 'restored' });
+      } catch { /* restore is best-effort */ }
+    })();
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // SIGNIN_FIX_1: the pending record dies with the session.
+  useEffect(() => {
+    try {
+      const sub = supabase.auth.onAuthStateChange?.((evt) => {
+        if (evt === 'SIGNED_OUT') clearPendingCode();
+      });
+      return () => {
+        try {
+          sub?.data?.subscription?.unsubscribe?.();
+        } catch { /* never block */ }
+      };
+    } catch {
+      return undefined;
+    }
+  }, []);
+
   const sendCode = async (rawEmail: string): Promise<boolean> => {
     if (submitting) return false;
     const normalised = rawEmail.trim().toLowerCase();
@@ -207,6 +295,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           trackSignupInitiated('email');
           setEmailState(normalised);
           setResendCooldown(RESEND_COOLDOWN_SECONDS);
+          writePendingCode({ email: normalised, sentAt: Date.now(), linkMode: emailLinkModeRef.current });
           setSubmittingMethod(null);
           return true;
         }
@@ -218,10 +307,38 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
       });
 
       if (error) {
-        const msg =
-          (error as { status?: number }).status === 429
-            ? 'Too many attempts. Please wait a moment and try again.'
-            : error.message || 'Could not send code. Please try again.';
+        // SIGNIN_FIX_1: a 429 with a live pending record for this email means
+        // a code is already on its way — open the sheet instead of failing.
+        if ((error as { status?: number }).status === 429) {
+          const rec = readPendingCode();
+          const ageSec = rec ? (Date.now() - rec.sentAt) / 1000 : Infinity;
+          if (rec && rec.email === normalised && ageSec < PENDING_CODE_MAX_AGE_MS / 1000) {
+            emailLinkModeRef.current = rec.linkMode;
+            setEmailState(normalised);
+            setOtpInfo(alreadySentInfo(normalised));
+            setResendCooldown(Math.max(0, Math.ceil(RESEND_COOLDOWN_SECONDS - ageSec)));
+            setStep('otp');
+            setSubmittingMethod(null);
+            void analyticsEvents.track('auth_code_reused', { reason: 'rate_limited' });
+            return false;
+          }
+          const wait = /after (\d+) seconds?/.exec(error.message || '');
+          const msg = wait
+            ? `Please wait ${wait[1]} seconds, then try again.`
+            : 'Too many attempts. Please wait a moment and try again.';
+          trackAuthFailed(
+            'email',
+            sanitiseErrorForAnalytics(error.message),
+            Date.now() - sendStartRef.current,
+            buildAuthErrorExtras(error),
+          );
+          trackSignupFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - sendStartRef.current, buildAuthErrorExtras(error));
+          setOtpError(msg);
+          setOtpErrorNonce((n) => n + 1);
+          setSubmittingMethod(null);
+          return false;
+        }
+        const msg = error.message || 'Could not send code. Please try again.';
         trackAuthFailed(
           'email',
           sanitiseErrorForAnalytics(error.message),
@@ -239,6 +356,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
       trackSignupInitiated('email');
       setEmailState(normalised);
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
+      writePendingCode({ email: normalised, sentAt: Date.now(), linkMode: emailLinkModeRef.current });
       setSubmittingMethod(null);
       return true;
     } catch (err) {
@@ -252,6 +370,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
   };
 
   const handleSubmitEmail = async (rawEmail: string) => {
+    // SIGNIN_FIX_1: re-submitting the same email inside the 60-second window
+    // must not call Supabase — the code already sent is still valid.
+    const normalised = rawEmail.trim().toLowerCase();
+    const rec = readPendingCode();
+    if (rec && rec.email === normalised) {
+      const ageSec = (Date.now() - rec.sentAt) / 1000;
+      if (ageSec < RESEND_COOLDOWN_SECONDS) {
+        emailLinkModeRef.current = rec.linkMode;
+        setEmailState(normalised);
+        setOtpInfo(alreadySentInfo(normalised));
+        setResendCooldown(Math.max(0, Math.ceil(RESEND_COOLDOWN_SECONDS - ageSec)));
+        setStep('otp');
+        void analyticsEvents.track('auth_code_reused', { reason: 'recent_send' });
+        return;
+      }
+    }
     const ok = await sendCode(rawEmail);
     if (ok) setStep('otp');
   };
@@ -264,10 +398,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
   };
 
   const handleUseDifferentEmail = () => {
+    // SIGNIN_FIX_1: the cooldown is always derived from the pending record,
+    // so closing the sheet no longer zeroes it.
     setStep('hero');
     setOtpError(null);
     setOtpInfo(null);
-    setResendCooldown(0);
   };
 
   const handleVerify = async (token: string) => {
@@ -309,6 +444,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
       }
 
       if (data?.session?.user) {
+        clearPendingCode();
         await refreshGuestConversion(emailLinked);
         trackLoginSuccess('email', Date.now() - start);
         // Linked (updateUser) keeps the guest id; otherwise the session is replaced.
@@ -470,9 +606,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           const msg = String(r.error ?? '');
           const cancelled = /cancel|canceled|cancelled|12501/i.test(msg);
           if (!cancelled && msg) {
+            // SIGNIN_FIX_1: Google failures stay on screen via the hero error
+            // slot instead of a transient toast. Tracking is unchanged.
             console.error('[google-auth] native error:', msg);
             trackAuthFailed('google', msg, undefined, buildAuthErrorExtras({ message: msg }));
-            toast.error('Google Sign-In failed. Please try again.');
+            setOtpError(
+              /timed out/i.test(msg)
+                ? 'Google sign-in timed out. Try again, or use Apple or email.'
+                : /no credentials/i.test(msg)
+                  ? 'No Google account was found on this phone. Use email instead.'
+                  : "Google sign-in didn't work. Try again, or use Apple or email.",
+            );
+            setOtpErrorNonce((n) => n + 1);
           }
           return;
         }
