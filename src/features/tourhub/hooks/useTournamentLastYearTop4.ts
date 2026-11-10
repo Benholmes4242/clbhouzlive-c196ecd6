@@ -4,6 +4,8 @@
  *
  * Used by Upcoming · far variant to populate the 4-row leaderboard band.
  * Returns null when no prior-year instance exists ("first year of this event").
+ * Candidate reads are tour-scoped before the 200-row cap, within the existing
+ * two-year window, so other tours cannot crowd out a prior March edition.
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -60,11 +62,12 @@ export function useTournamentLastYearTop4(tournamentId: string | null | undefine
       // 2. Find prior-year instance on same tour
       const { data: candidates, error: candErr } = await supabase
         .from('sr_tournaments')
-        .select('id, name, end_date, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
+        .select('id, name, end_date, season:sr_seasons!inner(tour_name, year)')
+        .eq('sr_seasons.tour_name', tourName)
         .lt('start_date', `${currentYear}-01-01`)
         .gte('start_date', `${currentYear - 2}-01-01`)
         .order('start_date', { ascending: false })
-        .limit(50);
+        .limit(200);
 
       if (candErr || !candidates) return null;
 

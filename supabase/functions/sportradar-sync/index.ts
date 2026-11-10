@@ -4,6 +4,8 @@ import { roundStarted } from '../_shared/roundState.ts'
 
 import { corsFor } from '../_shared/cors.ts';
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
+import { requireInternalSecret } from '../_shared/internalAuth.ts';
+import { backfillMissingLeaderboards } from './missingLeaderboards.ts';
 // URL Builders - Match Sportradar docs exactly
 // Uses SPORTRADAR_ACCESS_LEVEL env var (trial or production) instead of hardcoding
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
@@ -104,6 +106,16 @@ Deno.serve(async (req) => {
       rankingType,
     } = await req.json();
 
+    // The manual all-tour maintenance action is internal-only; existing
+    // action callers retain their current authentication and response shape.
+    if (action === 'backfill_missing_leaderboards') {
+      const refusal = requireInternalSecret(req, corsHeaders);
+      if (refusal) return refusal;
+      if (Object.keys(await req.clone().json().catch(() => ({}))).some(key => key !== 'action')) {
+        return new Response(JSON.stringify({ error: 'This action accepts only action' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
+
     // Default is the current UTC year, never a typed season (a hard-coded 2026 would block next season).
     const effectiveYear = year || seasonYear || new Date().getUTCFullYear();
     const effectiveTour = normaliseTourSlug(tourId || 'pga');
@@ -132,8 +144,13 @@ Deno.serve(async (req) => {
 
     try {
       let result: { records: number; message: string; debug?: any };
+      let sweep: { checked: number; filled: number; still_missing: string[] } | undefined;
 
       switch (action) {
+        case 'backfill_missing_leaderboards':
+          sweep = await backfillMissingLeaderboards(supabase, (tour, year, srId) => syncLeaderboard(supabase, sportradarApiKey, normaliseTourSlug(tour), year, srId));
+          result = { records: sweep.filled, message: JSON.stringify(sweep), debug: sweep };
+          break;
         case 'schedule':
           result = await syncSchedule(supabase, sportradarApiKey, effectiveTour, effectiveYear);
           break;
@@ -184,13 +201,14 @@ Deno.serve(async (req) => {
           .update({
             status: 'success',
             records_synced: result.records,
+            ...(sweep ? { error_message: JSON.stringify(sweep) } : {}),
             completed_at: new Date().toISOString(),
           })
           .eq('id', syncLogId);
       }
 
       return new Response(
-        JSON.stringify({ success: true, message: result.message, records_synced: result.records, debug: result.debug }),
+        JSON.stringify(sweep ?? { success: true, message: result.message, records_synced: result.records, debug: result.debug }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
 
