@@ -6,6 +6,7 @@
  */
 import type { CSSProperties, ReactNode } from 'react';
 import { Search } from 'lucide-react';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { AMBER } from '../../_shared/tokens';
 import { Headshot, Move, PlayerCell, PointsBar, useHeadshot } from '../PlayerCell';
 import { FormTiles } from '../field/FormTiles';
