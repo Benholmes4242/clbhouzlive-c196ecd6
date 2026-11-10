@@ -56,27 +56,27 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }),
 }));
 
-vi.mock('@/pages/auth/AuthHeroScreen', () => ({
-  AuthHeroScreen: (p: {
+vi.mock('@/pages/auth/components/AuthHeroScreen', () => ({
+  default: (p: {
     errorMessage?: string | null;
     onSubmitEmail: (e: string) => void;
-    onGoogle: () => void;
+    onGoogleSignIn: () => void;
   }) => (
     <div data-testid="hero">
       {p.errorMessage ? <div data-testid="hero-error">{p.errorMessage}</div> : null}
       <button data-testid="email-submit" onClick={() => p.onSubmitEmail('golfer@example.com')} />
-      <button data-testid="google" onClick={p.onGoogle} />
+      <button data-testid="google" onClick={p.onGoogleSignIn} />
     </div>
   ),
 }));
 
-vi.mock('@/pages/auth/AuthBottomSheet', () => ({
-  AuthBottomSheet: (p: { open: boolean; children?: unknown }) =>
-    p.open ? <div data-testid="sheet">{p.children as never}</div> : null,
+vi.mock('@/pages/auth/components/AuthBottomSheet', () => ({
+  default: (p: { isOpen: boolean; children?: unknown }) =>
+    p.isOpen ? <div data-testid="sheet">{p.children as never}</div> : null,
 }));
 
-vi.mock('@/pages/auth/OtpSheetContent', () => ({
-  OtpSheetContent: (p: {
+vi.mock('@/pages/auth/components/OtpSheetContent', () => ({
+  default: (p: {
     infoMessage?: string | null;
     resendCooldown: number;
     onVerify: (code: string) => void;
