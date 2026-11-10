@@ -96,7 +96,9 @@ describe('Players tab on the shared islands', () => {
     const h1 = hero.querySelector('h1')!;
     expect(h1.textContent).toBe('FedEx Cup');
     const row = h1.parentElement as HTMLElement;
-    expect(row.style.top).toContain('--chrome-clearance');
+    // jsdom drops var() from parsed style properties; read the raw attribute.
+    const rowStyle = row.getAttribute('style') ?? '';
+    expect(rowStyle).toContain('top: var(--chrome-clearance');
     expect(row.style.left).toBe('24px');
     expect(row.style.right).toBe('24px');
     expect(row.querySelector('[aria-label="Search players"]')).not.toBeNull();
@@ -108,14 +110,14 @@ describe('Players tab on the shared islands', () => {
   it('the hero wash carries the top shade for the status bar and title', () => {
     const { container } = mount();
     const wash = container.querySelector('[data-players-hero] [aria-hidden="true"]') as HTMLElement;
-    expect(wash.style.background).toContain('rgba(10, 10, 12, 0.35) 0%, rgba(10, 10, 12, 0) 32%');
+    expect(wash.getAttribute('style') ?? '').toContain('rgba(10,10,12,0.35) 0%, rgba(10,10,12,0) 32%');
   });
 
   it('the all-players view starts under the islands', () => {
     const { container } = mount('/tourhub?tab=players&view=all');
     const field = container.querySelector('[data-players-field]')!;
     const wrap = field.parentElement as HTMLElement;
-    expect(wrap.style.paddingTop).toContain('--chrome-clearance');
+    expect(wrap.getAttribute('style') ?? '').toContain('padding-top: var(--chrome-clearance');
   });
 
   it('the error state starts under the islands', () => {
@@ -123,7 +125,7 @@ describe('Players tab on the shared islands', () => {
     const { container } = mount();
     const retry = container.querySelector('button')!;
     const box = retry.closest('div')!.parentElement as HTMLElement;
-    expect(box.style.paddingTop).toContain('--chrome-clearance');
+    expect(box.getAttribute('style') ?? '').toContain('padding-top: calc(var(--chrome-clearance');
   });
 
   it('the empty state starts under the islands', () => {
@@ -131,7 +133,7 @@ describe('Players tab on the shared islands', () => {
     const { container } = mount();
     const page = container.querySelector('[data-players-page]')!;
     const wrap = page.firstElementChild as HTMLElement;
-    expect(wrap.style.paddingTop).toContain('--chrome-clearance');
+    expect(wrap.getAttribute('style') ?? '').toContain('padding-top: var(--chrome-clearance');
   });
 
   it('the skeleton opens with a 420 block at the very top and no title placeholder', () => {
