@@ -153,3 +153,8 @@ describe('FM1 sound group', () => {
     expect(rule).not.toMatch(/padding(?:-right)?\s*:/);
   });
 });
+describe('Featured deck thumbs-up',() => {
+  it('has no lucide heart and renders the outline thumb when not liked',() => {mount(); const b=screen.getByRole('button',{name:'Like video'}); expect(b.querySelector('svg.lucide-heart')).toBeNull(); const svg=b.querySelector('svg')!; expect(svg.getAttribute('fill')).toBe('rgba(255,255,255,0.72)'); expect(b.querySelector<HTMLElement>('[data-featured-like-count]')!.style.color).toBe('');});
+  it('renders the filled amber thumb and amber count when liked',() => {f.liked=true; mount(); const b=screen.getByRole('button',{name:'Like video'}); expect(b.querySelector('svg')!.getAttribute('fill')).toBe('#F7931E'); expect(b.querySelector<HTMLElement>('[data-featured-like-count]')!.style.color).toBe('rgb(247, 147, 30)');});
+  it('double-tap renders the shared HeartBurst',() => {mount();swipe(0);tick(100);swipe(0);tick(10);expect(document.querySelector('.featured-heart')).toBeNull();expect(document.querySelector('[data-top="true"] [aria-hidden="true"]:not(svg)')).not.toBeNull();});
+});
