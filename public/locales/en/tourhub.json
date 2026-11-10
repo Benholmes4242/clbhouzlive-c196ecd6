@@ -313,8 +313,6 @@
       "leader": "LEADER",
       "threeBack": "3 BACK",
       "sixBack": "6 BACK",
-      "pos": "POS",
-      "player": "PLAYER",
       "today": "TODAY",
       "thru": "THRU",
       "tot": "TOT",
@@ -372,8 +370,6 @@
       "more": "and {{count}} more",
       "course": "THE COURSE",
       "courseGuide": "Course guide ›",
-      "pos": "POS",
-      "player": "PLAYER",
       "tot": "TOT"
     },
     "recap": {
@@ -754,8 +750,6 @@
   },
   "board": {
     "columns": {
-      "pos": "POS",
-      "player": "PLAYER",
       "tot": "TOT",
       "thru": "THRU",
       "today": "TODAY",

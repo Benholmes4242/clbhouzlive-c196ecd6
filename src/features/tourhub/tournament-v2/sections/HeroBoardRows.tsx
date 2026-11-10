@@ -339,12 +339,39 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
     );
   };
 
+  /* LEADERBOARD kicker shares the heading line with the score labels when
+     it fits the POS+PLAYER track; otherwise the labels drop to their own
+     line directly under it (fit rule a). No POS/PLAYER titles anywhere. */
+  const headerRef = useRef<HTMLDivElement>(null);
+  const kickerRef = useRef<HTMLSpanElement>(null);
+  const [labelsOwnLine, setLabelsOwnLine] = useState(false);
+  useEffect(() => {
+    const header = headerRef.current;
+    const kicker = kickerRef.current;
+    if (!header || !kicker) return;
+    const measure = () => {
+      const cols = (showOverviewPosition ? 1 : 0) + 1 + heroRounds.length + 1;
+      const fixed = (showOverviewPosition ? HERO_POS_W : 0) + heroRounds.length * HERO_ROUND_W + HERO_TOT_W + heroGap * (cols - 1);
+      const available = header.clientWidth - fixed - (bleed ? 0 : 2 * HERO_PAD_X);
+      setLabelsOwnLine(kicker.scrollWidth > available);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, [showOverviewPosition, heroRounds.length, heroGap, bleed]);
+
+  const boardKicker = (
+    <span ref={kickerRef} data-hero-board-kicker style={{ gridColumn: labelsOwnLine ? '1 / -1' : showOverviewPosition ? '1 / 3' : '1 / 2', gridRow: 1, fontWeight: 800, letterSpacing: '0.16em', textAlign: 'left', minWidth: 0 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
+  );
+
   return (
     <>
       <div className="hero-expand-board" style={{ background: PAGE_CANVAS, fontFamily: FONT, paddingTop: afterMovers || flushTop ? 0 : 12 }}>
-        <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 24, padding: `2px ${bleed ? 0 : HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
-          {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
-          <div ref={nameTrackRef}>{t('board.columns.player')}</div>
+        <div ref={headerRef} data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'end', gap: heroGap, padding: `2px ${bleed ? 0 : HERO_PAD_X}px 6px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
+          {boardKicker}
+          {labelsOwnLine && showOverviewPosition ? <div aria-hidden="true" /> : null}
+          <div ref={nameTrackRef} aria-hidden="true" style={labelsOwnLine ? undefined : { gridColumn: showOverviewPosition ? '2 / 3' : '1 / 2', gridRow: 1, minWidth: 0, height: 0, visibility: 'hidden' }} />
           {heroRounds.map((rd) => (
             <div key={rd} data-hero-round-header={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? TOUR_LIVE_GREEN : faint }}>
               {`R${rd}`}

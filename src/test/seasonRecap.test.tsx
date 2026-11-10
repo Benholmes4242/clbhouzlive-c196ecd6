@@ -168,7 +168,11 @@ describe('recap body', () => {
     expect(board.querySelector('[data-recap-full-list]')).toBeNull();
     expect(board.textContent).not.toContain('POINTS LIST · FINAL');
     expect(board.querySelector('h2')).not.toBeNull();
-    expect(board.querySelector('.recap-grid-head')!.textContent).toBe('POSPLAYERPTS');
+    // Board headers without POS/PLAYER: PTS sits on the heading line.
+    const headRow = board.querySelector('.recap-head-row')!;
+    expect(headRow.textContent).toContain('PTS');
+    expect(headRow.textContent).not.toContain('POS');
+    expect(headRow.textContent).not.toContain('PLAYER');
   });
   it('Korn Ferry fixture renders exactly the mock names and points', () => {
     const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);

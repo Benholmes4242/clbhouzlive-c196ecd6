@@ -73,7 +73,7 @@ describe('Merged Airy lower sections', () => {
   it.each(['live', 'completed'] as const)('compresses only the %s hero board', phase => {
     const v = mount(<MiniBoard tournamentId="e" entries={field} currentRound={2} phase={phase} theme="heroBoard" />);
     const header = v.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.minHeight).toBe('24px'); expect(header?.style.paddingTop).toBe('2px'); expect(header?.parentElement?.style.paddingTop).toBe('12px');
+    expect(header?.style.paddingTop).toBe('2px'); expect(header?.style.paddingBottom).toBe('6px'); expect(header?.parentElement?.style.paddingTop).toBe('12px');
     const row = v.container.querySelector<HTMLElement>('[data-hero-tie]')?.parentElement;
     expect(row?.style.minHeight).toBe('31px'); expect(row?.style.paddingTop).toBe('4px'); // one-column board: same single-line geometry in every phase
   });
@@ -96,9 +96,12 @@ describe('Merged Airy lower sections', () => {
     expect(v.container.querySelector('[data-overview-facts]')).toBeNull();
     const last = v.container.querySelector<HTMLElement>('[data-overview-last-year]');
     expect(last?.style.paddingBottom).toBe('');
-    expect(last?.children[0].classList.contains('upcoming-kicker')).toBe(true);
-    expect(last?.children[1].classList.contains('upcoming-last-header')).toBe(true);
-    expect((last?.children[2] as HTMLElement)?.style.padding).toBe('0px');
+    // Board headers without POS/PLAYER: the heading and TOT label share the
+    // upcoming-last-header line, so it is the section's first child.
+    const lastHead = last?.children[0] as HTMLElement;
+    expect(lastHead.classList.contains('upcoming-last-header')).toBe(true);
+    expect(lastHead.querySelector('h2')?.classList.contains('upcoming-kicker')).toBe(true);
+    expect((last?.children[1] as HTMLElement)?.style.padding).toBe('0px');
   });
   it('tightens movers and their figure gap', () => {
     const v = mount(<RoundMovementBand round={2} cards={[{ key: 'a', name: 'Player A', candidates: [], delta: 2, toPar: -2, gross: 70 }]} />);

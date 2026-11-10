@@ -32,11 +32,13 @@ describe('Also this week signed-off spacing', () => {
     expect(hero).toContain('HERO_TOT_W = 40');
     expect(hero).toContain('HERO_GAP = 4');
   });
-  it('board header is 24px min-height, 10px/700 with .08em tracking', () => {
-    expect(hero).toContain('minHeight: 24');
+  it('board header is 10px/700 with .08em tracking, rows 6px under the label line', () => {
+    // Board headers without POS/PLAYER: the 24px min-height floor went with
+    // the old two-title header; the first row now starts 6px under the line.
     expect(hero).toContain('fontSize: 10');
     expect(hero).toContain('fontWeight: 700');
     expect(hero).toContain("letterSpacing: '0.08em'");
+    expect(hero).toContain('px 6px');
   });
   it('board rows are 31px minimum with 4px vertical padding and bleed 20px', () => {
     // Board brief: single-line hero rows (was two-line 9px rows with always-on marks).

@@ -592,7 +592,7 @@ export function BoardTable({
           gap: effColumns.gap,
           alignItems: 'center',
           minHeight: 26,
-          padding: `0 ${padX}px`,
+          padding: `0 ${padX}px 6px`,
           background: 'var(--tour-board-head)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
@@ -603,14 +603,14 @@ export function BoardTable({
       >
         {effColumns.preTournament ? (
           <>
-            <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
+            <div style={{ ...labelStyle, minWidth: 0 }} aria-hidden="true" />
             <div style={{ ...labelStyle, textAlign: 'center' }}>
               {`R1 ${t('board.columns.thru') === 'THRU' ? 'TEE' : 'TEE'}`}
             </div>
           </>
         ) : (
           <>
-            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left', minWidth: 0 }}>{`${t('board.columns.pos')}  ${t('board.columns.player')}`}</div>
+            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left', minWidth: 0 }} aria-hidden="true" />
             {effColumns.rounds.map((r) => (
               <div
                 key={r}

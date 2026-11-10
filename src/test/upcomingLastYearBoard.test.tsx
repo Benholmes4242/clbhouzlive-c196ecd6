@@ -35,12 +35,14 @@ describe('upcoming LAST YEAR condensed board', () => {
     const view = mount();
     const block = view.container.querySelector<HTMLElement>('[data-overview-last-year]');
     const header = block?.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.textContent).toBe('Last year · 2025');
-    expect(header?.style.textTransform).toBe('uppercase');
+    // Board headers without POS/PLAYER: the heading shares the header line
+    // with the TOT label, so the year text lives on the h2 inside it.
+    expect(header?.querySelector('h2')?.textContent).toBe('Last year · 2025');
+    expect(header?.querySelector('h2')?.style.textTransform).toBe('uppercase');
     expect(block?.classList.contains('upcoming-block')).toBe(true);
     expect(block?.style.paddingBottom).toBe('');
-    expect(block?.querySelector('.upcoming-last-header')?.children).toHaveLength(3);
-    expect(header?.classList.contains('upcoming-kicker')).toBe(true);
+    expect(block?.querySelector('.upcoming-last-header')?.children).toHaveLength(2);
+    expect(header?.querySelector('h2')?.classList.contains('upcoming-kicker')).toBe(true);
     expect(block?.children[1].children).toHaveLength(3);
     expect(block?.children[2].textContent).not.toContain('2025');
   });
@@ -48,8 +50,8 @@ describe('upcoming LAST YEAR condensed board', () => {
     fixture.rows[1].year = '2024';
     const view = mount();
     const header = view.container.querySelector<HTMLElement>('[data-overview-last-year] [data-overview-board-header]');
-    expect(header?.textContent).toBe('Last year');
-    expect(header?.style.textTransform).toBe('uppercase');
+    expect(header?.querySelector('h2')?.textContent).toBe('Last year');
+    expect(header?.querySelector('h2')?.style.textTransform).toBe('uppercase');
   });
   it('uses the live row tracks without avatars or flags', () => {
     const view = render(<LastYearRow rank="2" name="Fredrik Jacobson" score="−19" />);
