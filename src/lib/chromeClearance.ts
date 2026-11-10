@@ -43,11 +43,35 @@ export const CHROME_CLEARANCE =
 
 /**
  * The same clearance as a NUMBER of px, for scroll maths that cannot consume
- * a CSS length. Reads the computed --chrome-clearance; falls back to the
- * unmeasured island height + gap + breathing when unset or NaN.
+ * a CSS length. ChromeIsland publishes --chrome-clearance as a calc() string
+ * (e.g. "calc(var(--sat, 0px) + 72px)"), so parseFloat alone can never resolve
+ * it. Read the raw value; "0px" (chrome-less routes) returns 0; anything else
+ * is measured through a probe div whose height is CHROME_CLEARANCE, letting
+ * the browser resolve the calc. Falls back to the unmeasured island height +
+ * gap + breathing when unset or when the probe measures 0. Cached on the raw
+ * string + viewport so repeated scroll-time calls do not re-measure.
  */
+const CHROME_CLEARANCE_PX_FALLBACK = CHROME_ISLAND_H_FALLBACK + CHROME_TOP_GAP + CHROME_BREATHING;
+
+let clearanceCache: { raw: string; w: number; h: number; px: number } | null = null;
+
 export function chromeClearancePx(): number {
   const raw = getComputedStyle(document.documentElement).getPropertyValue(CHROME_CLEARANCE_VAR);
-  const px = parseFloat(raw);
-  return raw && !Number.isNaN(px) ? px : CHROME_ISLAND_H_FALLBACK + CHROME_TOP_GAP + CHROME_BREATHING;
+  if (raw.trim() === '0px') return 0;
+  if (
+    clearanceCache &&
+    clearanceCache.raw === raw &&
+    clearanceCache.w === window.innerWidth &&
+    clearanceCache.h === window.innerHeight
+  ) {
+    return clearanceCache.px;
+  }
+  const probe = document.createElement('div');
+  probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;top:0;left:0;width:0;height:${CHROME_CLEARANCE}`;
+  document.body.appendChild(probe);
+  const height = probe.getBoundingClientRect().height;
+  probe.remove();
+  const px = height > 0 ? height : CHROME_CLEARANCE_PX_FALLBACK;
+  clearanceCache = { raw, w: window.innerWidth, h: window.innerHeight, px };
+  return px;
 }

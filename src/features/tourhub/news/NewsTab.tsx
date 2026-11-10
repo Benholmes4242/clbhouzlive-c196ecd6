@@ -513,7 +513,7 @@ export function NewsTab({ immersiveHero = true, islands = false }: { immersiveHe
               tabIndex={0}
               className="tour-news-lead"
               onClick={() => open(lead)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(lead); } }}
+              onKeyDown={(e) => { if (e.target !== e.currentTarget) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(lead); } }}
               aria-label={`Read ${lead.headline}`}
               data-testid="tour-news-lead"
             >
