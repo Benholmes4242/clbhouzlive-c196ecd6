@@ -55,33 +55,35 @@ describe('FEATURED_ROUND_OPTION_A', () => {
   });
 
   it('header label is "Round of the week" by default (Home) and "Featured" when passed (Explore)', () => {
+    // i18n is not loaded in this harness: assert the key/default, not words.
+    // 'courseDetail.featured.label' is "Round of the week" (en courses.json).
     const home = mount();
-    expect(home.container.querySelector('[data-featured-champ="true"]')!.textContent).toContain('Round of the week');
+    expect(home.container.querySelector('[data-featured-champ="true"]')!.textContent).toContain('courseDetail.featured.label');
     home.unmount();
     const explore = mount({}, { pillLabel: 'Featured' });
     const champ = explore.container.querySelector('[data-featured-champ="true"]')!;
     expect(champ.textContent).toContain('Featured');
-    expect(champ.textContent).not.toContain('Round of the week');
+    expect(champ.textContent).not.toContain('courseDetail.featured.label');
   });
 
   it('course record renders the gross figure with the COURSE RECORD unit', () => {
     const { container } = mount();
     const feat = container.querySelector('[data-featured-feat-figure="true"]')!;
     expect(feat.textContent).toContain('74');
-    expect(feat.textContent?.toUpperCase()).toContain('COURSE RECORD');
+    expect(feat.textContent?.toUpperCase()).toContain('COURSEDETAIL.FEATURED.COURSERECORD');
   });
 
   it('hole in one renders the words alone, no unit', () => {
     const { container } = mount({ tier: 1, reason: 'hole_in_one', holes_in_one: 1 });
     const words = container.querySelector('[data-featured-feat-words="true"]')!;
-    expect(words.textContent).toBe('Hole in one');
+    expect(words.textContent).toBe('courseDetail.featured.holeInOne');
     expect(container.querySelector('[data-featured-feat-figure="true"]')).toBeNull();
   });
 
   it('birdie run renders the run words alone', () => {
     const { container } = mount({ tier: 3, reason: 'birdie_run', birdie_run: 5 });
     const words = container.querySelector('[data-featured-feat-words="true"]')!;
-    expect(words.textContent).toBe('5 birdies in a row');
+    expect(words.textContent).toBe('courseDetail.featured.birdieRun');
   });
 
   it('the body is the score post: NET/GROSS/HANDICAP cells, the net line and the HoleMarks row', () => {

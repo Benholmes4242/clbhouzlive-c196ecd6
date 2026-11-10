@@ -46,11 +46,12 @@ describe('CB29 follow control on round cards', () => {
   it('FeaturedRoundCard shows "· Following" only when followed', () => {
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const wrap = (node: React.ReactElement) => <QueryClientProvider client={qc}>{node}</QueryClientProvider>;
+    // i18n is not loaded in this harness: assert the key, not the word.
     const followed = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={vi.fn()} isFollowed />));
-    expect(followed.container.querySelector('[data-featured-champ="true"]')!.textContent).toContain('· Following');
+    expect(followed.container.querySelector('[data-featured-champ="true"]')!.textContent).toContain('· courseDetail.featured.following');
     followed.unmount();
     const notFollowed = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={vi.fn()} isFollowed={false} />));
-    expect(notFollowed.container.querySelector('[data-featured-champ="true"]')!.textContent).not.toContain('Following');
+    expect(notFollowed.container.querySelector('[data-featured-champ="true"]')!.textContent).not.toContain('following');
   });
 });
 
