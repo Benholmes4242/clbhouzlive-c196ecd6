@@ -276,6 +276,14 @@ export function useMomentsOfTheWeek(
       }>) {
         profileById.set(p.id, p);
       }
+      const businessById = new Map(
+        ((businesses ?? []) as Array<{
+          id: string;
+          name: string;
+          logo_url: string | null;
+          is_verified: boolean | null;
+        }>).map((b) => [b.id, b]),
+      );
 
       const tiles = picked.map(({ row, courseId, mediaIndex, isCourseLead }): Moment => {
         const media = [...(row.post_media ?? [])].sort(
@@ -307,15 +315,17 @@ export function useMomentsOfTheWeek(
           };
         });
         const profile = profileById.get(row.user_id);
+        const business =
+          row.actor_type === 'business' ? businessById.get(row.actor_id ?? '') : undefined;
         const post: FeedPost = {
           id: row.id,
           userId: row.user_id,
           actorType: (row.actor_type as FeedPost['actorType']) ?? 'personal',
           actorId: row.actor_id ?? row.user_id,
-          username: profile?.username ?? '',
-          displayName: profile?.display_name ?? 'Player',
-          avatarUrl: profile?.profile_photo_url ?? '',
-          isVerified: !!profile?.is_verified,
+          username: business ? '' : (profile?.username ?? ''),
+          displayName: business?.name ?? profile?.display_name ?? 'Player',
+          avatarUrl: business?.logo_url ?? profile?.profile_photo_url ?? '',
+          isVerified: business ? !!business.is_verified : !!profile?.is_verified,
           creatorRelation: 'none',
           caption: row.content ?? '',
           mediaItems,
