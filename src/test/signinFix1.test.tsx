@@ -40,7 +40,7 @@ vi.mock('@/lib/authAnalytics', () => ({
   buildAuthErrorExtras: vi.fn(() => ({})),
 }));
 
-vi.mock('@/lib/postAuthRoute', () => ({ resolvePostAuthRoute: vi.fn(async () => '/') }));
+vi.mock('@/lib/auth/postAuthRoute', () => ({ resolvePostAuthRoute: vi.fn(async () => '/') }));
 
 const track = vi.fn();
 vi.mock('@/utils/analyticsEvents', () => ({
