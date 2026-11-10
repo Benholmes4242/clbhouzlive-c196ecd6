@@ -35,7 +35,7 @@ beforeEach(() => { localStorage.clear(); vi.clearAllMocks(); h.error = false; h.
 afterEach(cleanup);
 describe('CR1 creator persistence', () => {
   it('Welcome toggles locally and Continue writes creator in the identity payload', async () => {
-    render(<Welcome />, { wrapper }); const toggle = await screen.findByRole('switch', { name: 'I make golf videos' });
+    render(<Welcome />, { wrapper }); const toggle = await screen.findByRole('switch', { name: 'Content creator profile' });
     expect(toggle).toHaveAttribute('aria-checked', 'false'); fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-checked', 'true'); expect(h.update).not.toHaveBeenCalled();
     await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()); fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
@@ -43,12 +43,12 @@ describe('CR1 creator persistence', () => {
     expect(h.track).toHaveBeenCalledWith('creator_profile_toggled', { on: true, surface: 'welcome' });
   });
   it('Skip never writes the toggled creator choice', async () => {
-    render(<Welcome />, { wrapper }); fireEvent.click(await screen.findByRole('switch', { name: 'I make golf videos' }));
+    render(<Welcome />, { wrapper }); fireEvent.click(await screen.findByRole('switch', { name: 'Content creator profile' }));
     expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull();
     expect(h.update).not.toHaveBeenCalled();
     expect(h.update.mock.calls.every(([v]) => !Object.prototype.hasOwnProperty.call(v, 'is_creator'))).toBe(true);
   });
-  it('Welcome starts on for an existing creator', async () => { h.creator = true; render(<Welcome />, { wrapper }); await waitFor(() => expect(screen.getByRole('switch', { name: 'I make golf videos' })).toHaveAttribute('aria-checked', 'true')); });
+  it('Welcome starts on for an existing creator', async () => { h.creator = true; render(<Welcome />, { wrapper }); await waitFor(() => expect(screen.getByRole('switch', { name: 'Content creator profile' })).toHaveAttribute('aria-checked', 'true')); });
   it('form hydration maps the creator flag and defaults missing values off', async () => {
     const { result, rerender } = renderHook(({ profile }) => useProfileForm(profile, false), { wrapper, initialProps: { profile: { id: 'me', is_creator: true } as { id: string; is_creator?: boolean } } });
     await waitFor(() => expect(result.current.form.isCreator).toBe(true)); rerender({ profile: { id: 'other' } }); await waitFor(() => expect(result.current.form.isCreator).toBe(false));
