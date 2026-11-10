@@ -12,7 +12,10 @@
  * the cluster the first time.
  *
  * COPY, by count:
- *   0    — nothing renders at all (no empty state, no gap)
+ *   0    — nothing renders at all (no empty state, no gap). Without `reserve`,
+ *          a count that drops to 0 while mounted collapses with the same
+ *          180ms grid-rows/opacity animation a 0→>0 rise opens with; first
+ *          render at count > 0 and prefers-reduced-motion never animate.
  *   1    — "Liked by Thomas"
  *   2    — "Liked by Thomas and Amy"
  *   3+   — "Liked by Thomas, Amy and 10 others"
@@ -35,7 +38,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import type { ReactionKind } from '@/lib/reactionKind';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
 import type { LikeSource } from '@/hooks/usePostLikes';
 import { LikesSheet } from './LikesSheet';
