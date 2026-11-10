@@ -751,7 +751,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 padding: compact ? `9px ${gutter}px ${actionsBottom ? 7 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
               }}
             >
-              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
+              {!mediaFirstSlots && <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />}
               <div style={{ marginLeft: 'auto' }} />
               <FooterButton
                 icon={LikeGlyph}
@@ -817,7 +817,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       })();
 
   // CB109: ordinary and review media-first posts share this one comment door.
-  const addComment = currentUserId ? (
+  // Media-first comment rows own account switching. Standard cards keep their
+  // footer chooser; FeedCommentPreview currently renders no viewer-avatar row.
+  const addComment = currentUserId ? (availableActors?.length > 1 ? (
+    <div data-feed-section="add-comment" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 16px', width: '100%' }}>
+      <FeedActorPicker size={26} value={activeActor} onChange={(a) => setActiveActor(a)} />
+      <button type="button" onClick={() => onComment(post, effectiveActor, 'add_comment_row')} style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', padding: 0, textAlign: 'left', cursor: 'pointer' }}>
+        <span style={{ fontSize: 13.5, color: T40 }}>Add a comment…</span>
+      </button>
+    </div>
+  ) : (
     <button
       type="button"
       data-feed-section="add-comment"
@@ -827,7 +836,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       <SquircleAvatar src={effectiveActor?.avatarUrl ?? null} alt={effectiveActor?.name ?? ''} userId={effectiveActor?.id ?? currentUserId} size={26} hairlineRing />
       <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
     </button>
-  ) : null;
+  )) : null;
 
   if (rendersRoundCard) {
     const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources, roundCourseMeta);

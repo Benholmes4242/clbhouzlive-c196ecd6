@@ -33,6 +33,7 @@ import './suggestion-covers.css';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ROW_FONT } from '@/features/social-lists-v2/rowParts';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
@@ -451,7 +452,7 @@ function RailCardView({
         <span className="suggestion-dismiss-disc"><X size={12} strokeWidth={2.6} /></span>
       </Button>
 
-      {/* Avatar: golfer squircle; business logo or white initials tile, inside
+      {/* Avatar: canonical dark fallback or unchanged business logo, inside
           the ACTIVE RING slot (ringed avatars open the latest post). */}
       <div style={{ margin: '31px auto 0', display: 'flex', position: 'relative', zIndex: 1 }}>
         <ActiveAvatarDoor
@@ -467,7 +468,7 @@ function RailCardView({
                   alt={name}
                   userId={card.person.user_id}
                   size={64}
-                  fallback={name.charAt(0)}
+                  fallback={getInitialsFromName(name)}
                   hairlineRing={!activity}
                   hideRing={!!activity}
                 />
@@ -485,23 +486,7 @@ function RailCardView({
                 <img src={card.business.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ) : (
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: '34%',
-                  background: '#F8FAFC',
-                  color: A.CANVAS,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 18,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                }}
-              >
-                {businessInitials(name)}
-              </div>
+              <SquircleAvatar size={64} src={undefined} alt={name} fallback={businessInitials(name)} hairlineRing={!activity} hideRing={!!activity} />
             )}
           </ActiveRing>
         </ActiveAvatarDoor>

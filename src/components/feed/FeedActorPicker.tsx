@@ -8,9 +8,8 @@ import { KICKER } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /*
- * BRIEF_FEED_ACTOR_PICKER_TIDY (Ben, 20 Oct): 20/12, not 24/14. The picker sits
- * at the left gutter of the Clubhouse footer, directly above the 19px Liked by
- * avatars; at 24px the two rows collided.
+ * Standard cards retain the 20/12 footer trigger. Media-first cards reuse this
+ * same sheet with a 26px comment-row trigger; never duplicate the actor sheet.
  */
 const FEED_ACTOR_PICKER_GEOMETRY = {
   avatar: 20,
@@ -41,9 +40,10 @@ interface FeedActorPickerProps {
   onChange?: (actor: ActiveActor) => void;
   /** Visual theme. Defaults to 'dark' (Clubhouse). The 'light' caller was the light feed card, deleted 10 Sep 2026. */
   theme?: 'light' | 'dark';
+  size?: number;
 }
 
-export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChange, theme = 'dark' }) => {
+export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChange, theme = 'dark', size = FEED_ACTOR_PICKER_GEOMETRY.avatar }) => {
   const c = PALETTE[theme];
   const { activeActor, availableActors } = useActiveActor();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -58,7 +58,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
 
   const avatar = (
     <SquircleAvatar
-      size={FEED_ACTOR_PICKER_GEOMETRY.avatar}
+      size={size}
       src={current.avatarUrl ?? undefined}
       alt={current.name}
       userId={current.type === 'personal' ? current.id : null}
