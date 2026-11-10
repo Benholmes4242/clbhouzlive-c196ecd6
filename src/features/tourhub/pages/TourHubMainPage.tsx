@@ -257,9 +257,11 @@ export function TourHubMainPage() {
             label, live caption, same TourGlance tile) is registered by
             TourHubChromeBridge above for every tab, and without TourPageShell
             nothing suppresses the chrome. SCHEDULE TAB (10 Nov 2026): the
-            Schedule tab joins them under the shared islands, same conversion.
-            SubTabTourControl stays for the news/players tabs. */}
-        {isHubRoot || activeTab === 'live' || activeTab === 'schedule' ? renderTab() : (
+             Schedule tab joins them under the shared islands, same conversion.
+            PLAYERS TAB (10 Nov 2026): the Players tab joins them too — its
+            front hero bleeds into the notch like the overview photo.
+            SubTabTourControl stays for the news tab. */}
+        {isHubRoot || activeTab === 'live' || activeTab === 'schedule' || activeTab === 'players' ? renderTab() : (
           /* Route immersion is path-based, so query-param tabs share the
              overview's y=0 shell. Their own opaque header therefore becomes
              the single safe-area owner while the overview remains full bleed. */

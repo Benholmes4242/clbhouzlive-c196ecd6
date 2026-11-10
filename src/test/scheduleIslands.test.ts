@@ -18,7 +18,7 @@ describe('Schedule tab on the shared islands', () => {
   const schedule = source('src/features/tourhub/schedule-v2/ScheduleTab.tsx');
 
   it('renders directly like live, outside the TourPageShell wrapper', () => {
-    expect(main).toContain("isHubRoot || activeTab === 'live' || activeTab === 'schedule' ? renderTab() : (");
+    expect(main).toContain("isHubRoot || activeTab === 'live' || activeTab === 'schedule' || activeTab === 'players' ? renderTab() : (");
     // The shell branch (AppHeader + SubTabTourControl) is unreachable for schedule.
     const shellBranch = main.slice(main.indexOf('? renderTab() : ('));
     expect(shellBranch).toContain('SubTabTourControl');
