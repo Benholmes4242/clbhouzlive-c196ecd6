@@ -14,11 +14,14 @@ describe('Tour Hub N2 shell ownership', () => {
     expect(tourHeaderInset('/tourhub/college-golf')).toBe('shell');
   });
 
-  it('uses the measured header, not the safe-area inset, to clear hub sub-tabs', () => {
+  it('renders every hub tab directly — the measured-header wrapper is gone', () => {
+    /* NEWS ON THE SHARED ISLANDS (10 Nov 2026): with the News conversion all
+       four sub-tabs render directly, so the --tour-header-h wrapper branch is
+       deleted and NewsTab renders with the islands prop. */
     const main = source('src/features/tourhub/pages/TourHubMainPage.tsx');
-    expect(main).toContain("paddingTop: 'var(--tour-header-h, 0px)'");
+    expect(main).not.toContain("paddingTop: 'var(--tour-header-h, 0px)'");
     expect(main).not.toContain("paddingTop: 'var(--sat, 0px)'");
-    expect(main).toContain('<NewsTab immersiveHero={false} />');
+    expect(main).toContain('<NewsTab immersiveHero={false} islands />');
   });
 
   it('keeps one canonical foot and one shell-owned scroll control', () => {

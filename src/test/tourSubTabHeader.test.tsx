@@ -35,20 +35,12 @@ vi.mock('@/features/tourhub/context/TourSelectionContext', () => ({
   }),
 }));
 
-import { SubTabTourControl } from '@/features/tourhub/pages/TourHubMainPage';
 import { TourIcon, TOUR_ICON_PATHS, type TourIconName } from '@/features/tourhub/components/tourIslandIcons';
 
-describe('SubTabTourControl — every Tour sub-tab header renders without throwing', () => {
-  for (const tab of ['news', 'live', 'schedule', 'players', 'leaderboards']) {
-    it(`renders the ${tab} header`, () => {
-      cleanup();
-      render(<SubTabTourControl activeTab={tab} onOpen={() => {}} />);
-      const button = screen.getByRole('button', { name: 'Change tour' });
-      // The down chevron must actually render an svg (the 'chev' bug left none).
-      expect(button.querySelector('svg')).not.toBeNull();
-    });
-  }
-});
+/* NEWS ON THE SHARED ISLANDS (10 Nov 2026): with all four sub-tabs converted
+   the hub no longer renders TourPageShell, and SubTabTourControl — the
+   component this file's first describe pinned — is deleted with it. The
+   TourIcon defensive tests below are unaffected. */
 
 describe('TourIcon — defensive unknown name', () => {
   it('renders nothing and does not throw for an unknown name', () => {

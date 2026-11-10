@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubShell } from '../components/TourHubShell';
-import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab } from '../components/tabs';
 import { legacyTabRedirect } from '@/features/tourhub/players-v2/playersRules';
@@ -15,45 +14,12 @@ import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
 import { TourIsland, useTourIslandDescriptor } from '../components/TourIsland';
 import { TourGlance } from '@/features/chrome-v2/TourGlance';
-import { TourIcon } from '../components/tourIslandIcons';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
 import { useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import { setGuestTourContext } from '@/features/guest/guestGateStore';
 import { useRetiredTourRedirect } from '../hooks/useRetiredTourRedirect';
-
-/**
- * SubTabTourControl — the sub-tab header's tour control (BRIEF_TOUR_ISLAND):
- * the same sentence-case label as the island, opening the same TourGlance
- * tile. The burger drawer is gone from the Tour hub.
- */
-export function SubTabTourControl({ activeTab, onOpen }: { activeTab: string; onOpen: (anchor: HTMLElement) => void }) {
-  const d = useTourIslandDescriptor(activeTab);
-  return (
-    <button
-      type="button"
-      aria-label="Change tour"
-      onClick={(e) => onOpen(e.currentTarget)}
-      style={{
-        height: 36, display: 'flex', alignItems: 'center', gap: 7, padding: '0 10px',
-        background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-        color: '#F8FAFC', fontSize: 14, fontWeight: 700,
-      }}
-    >
-      <span>{d.label}</span>
-      <TourIcon n="down" s={11.4} c="rgba(248,250,252,0.42)" w={2.2} />
-    </button>
-  );
-}
-
-const TAB_TITLES: Record<string, string> = {
-  news: 'News',
-  /* BRIEF_TOUR_ISLAND §4: the tab reads "Leaderboards", not "Live". */
-  live: 'Leaderboards',
-  schedule: 'Schedule',
-  players: 'Players',
-};
 
 /**
  * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with the
@@ -187,7 +153,7 @@ export function TourHubMainPage() {
       case 'overview':
         return <OverviewTab />;
       case 'news':
-        return <NewsTab immersiveHero={false} />;
+        return <NewsTab immersiveHero={false} islands />;
       case 'live':
         return <LeaderboardTab />;
       case 'schedule':
@@ -232,8 +198,7 @@ export function TourHubMainPage() {
     scrollPageToTop('auto');
   };
 
-  const tabTitle = TAB_TITLES[activeTab] ?? 'Tour';
-  /* Overview IS the hub: no back control there (see TourPageShell.showBack). */
+  /* Overview IS the hub: its status bar stays immersive. */
   const isHubRoot = activeTab === 'overview';
 
   return (
@@ -249,39 +214,16 @@ export function TourHubMainPage() {
           openGlance={openGlance}
           closeGlance={closeGlance}
         />
-        {/* The overview is the immersive exception: the hero starts at the
-            physical top and the shared left/right islands float over it. Legacy
-            pushed tabs retain their solid in-flow AppHeader until retirement.
-            LEADERBOARDS PAGE (8 Nov 2026): the Leaderboards tab joins the
-            overview under the shared islands — the TourIsland (Leaderboards
-            label, live caption, same TourGlance tile) is registered by
-            TourHubChromeBridge above for every tab, and without TourPageShell
-            nothing suppresses the chrome. SCHEDULE TAB (10 Nov 2026): the
-             Schedule tab joins them under the shared islands, same conversion.
-            PLAYERS TAB (10 Nov 2026): the Players tab joins them too — its
-            front hero bleeds into the notch like the overview photo.
-            SubTabTourControl stays for the news tab. */}
-        {isHubRoot || activeTab === 'live' || activeTab === 'schedule' || activeTab === 'players' ? renderTab() : (
-          /* Route immersion is path-based, so query-param tabs share the
-             overview's y=0 shell. Their own opaque header therefore becomes
-             the single safe-area owner while the overview remains full bleed. */
-          <div style={{ paddingTop: 'var(--tour-header-h, 0px)' }}>
-            <TourPageShell
-              title={tabTitle}
-              showBack
-              onBack={() => handleSelectTab('overview')}
-              backFallback="/tourhub"
-              leftSlot={
-                /* BRIEF_TOUR_ISLAND §1: one control everywhere — the sub-tab
-                   header carries the same tour label, opening the same
-                   TourGlance tile. The burger drawer is gone from the hub. */
-                <SubTabTourControl activeTab={activeTab} onOpen={openGlance} />
-              }
-            >
-              {renderTab()}
-            </TourPageShell>
-          </div>
-        )}
+        {/* Every hub tab renders directly under the shared islands — the
+            TourIsland (per-tab label, live caption, same TourGlance tile) is
+            registered by TourHubChromeBridge above for every tab, and without
+            TourPageShell nothing suppresses the chrome. LEADERBOARDS PAGE
+            (8 Nov 2026), SCHEDULE TAB and PLAYERS TAB (10 Nov 2026), NEWS TAB
+            (10 Nov 2026): with the News conversion the hub no longer renders
+            TourPageShell at all; the old measured-header wrapper branch and
+            the sub-tab tour control are gone. TourPageShell itself stays for
+            the tournament/player sub-pages. */}
+        {renderTab()}
       </TourHubShell>
     </TourSelectionProvider>
 

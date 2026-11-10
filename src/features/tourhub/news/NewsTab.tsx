@@ -19,12 +19,21 @@
  *
  * LeadStory / StoryRow below are legacy exports kept for their existing
  * importers (amateur surfaces); the rebuilt page does not use them.
+ *
+ * NEWS ISLANDS (10 Nov 2026): the `islands` prop (default false) converts the
+ * page for the shared-island hub — the lead photo bleeds into the notch at
+ * 500px with the "Tour News" head overlaid at CHROME_CLEARANCE, the fresh
+ * line moves directly below the photo, and search/empty/loading start at
+ * CHROME_CLEARANCE. WireNewsPage (/tour/news) and every other caller keep the
+ * default and are visually unchanged.
  */
 import React, { Fragment, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
 import { ACTIVE_TOUR_SLUGS } from '../constants/tourMap';
@@ -261,7 +270,7 @@ function ArchiveRow({ story, read, query, onOpen }: { story: TourStory; read: bo
  * page, in place). Like and comment buttons are gone from this page — counts
  * live in the details line; the story page keeps the actions.
  */
-export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
+export function NewsTab({ immersiveHero = true, islands = false }: { immersiveHero?: boolean; islands?: boolean }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const [tourLens, setTourLens] = useState<string | null>(() => {
@@ -331,7 +340,9 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
 
   if (isLoading) {
     return (
-      <div style={{ fontFamily: FONT }}>
+      /* NEWS ISLANDS (10 Nov 2026): under the shared islands every non-lead
+         state starts at CHROME_CLEARANCE; only the lead photo bleeds. */
+      <div style={{ fontFamily: FONT, paddingTop: islands ? CHROME_CLEARANCE : 0 }}>
         <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />
         <div style={{ padding: '0 14px' }}>
           <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
@@ -343,8 +354,183 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
 
   if (!lead) {
     return (
-      <div style={{ padding: immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE, fontFamily: FONT }}>
+      <div style={{ padding: islands ? `calc(${CHROME_CLEARANCE} + 18px) 14px 0` : immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE, fontFamily: FONT }}>
         {t('news.empty', 'No stories on the wire yet.')}
+      </div>
+    );
+  }
+
+  const searchBar = (
+    <div className="tour-news-searchbar" data-testid="tour-news-searchbar">
+      <Search size={16} aria-hidden />
+      <input
+        autoFocus
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={t('news.page.searchPlaceholder', 'Search stories')}
+        aria-label={t('news.page.searchPlaceholder', 'Search stories')}
+      />
+      <button type="button" className="tour-news-cancel" onClick={() => { setSearchOpen(false); setQuery(''); }}>
+        Cancel
+      </button>
+    </div>
+  );
+
+  const searchResults = (
+    <div>
+      {search.active && search.settled && (
+        search.results.length > 0 ? (
+          <>
+            <div className="tour-news-grp">{t('news.page.searchResults', { count: search.results.length })}</div>
+            {search.results.map((s) => (
+              <ArchiveRow key={s.id} story={s} read={visit.openedIds.includes(s.id)} query={search.debounced} onOpen={() => open(s)} />
+            ))}
+          </>
+        ) : (
+          <div className="tour-news-search-empty">{t('news.page.searchEmpty', { query: search.debounced })}</div>
+        )
+      )}
+    </div>
+  );
+
+  const freshLine = newCount > 0 ? (
+    <div className="tour-news-fresh">
+      <i className="overview-news-dot" aria-hidden />
+      <span><Trans t={t} i18nKey="overview.news.newSince" count={newCount} components={{ b: <b /> }} /></span>
+    </div>
+  ) : null;
+
+  const leadCopy = (
+    <div className="tour-news-lead-copy">
+      <div className="overview-news-kicker">
+        {presentationFor(lead).isNew && <i className="overview-news-dot" aria-hidden />}
+        <span>{lead.kicker}</span>
+      </div>
+      <h2>{lead.headline}</h2>
+      {lead.standfirst && <p className="tour-news-standfirst">{lead.standfirst}</p>}
+      <NewsDetails story={lead} presentation={presentationFor(lead)} short={false} />
+    </div>
+  );
+
+  const belowLead = (
+    <>
+      {lead.tournament_id && <NewsEventCard tournamentId={lead.tournament_id} follows={follows} />}
+
+      {viewerId && yourPlayers.length > 0 && (
+        <>
+          <div className="tour-news-sec you" data-testid="tour-news-your-players">
+            <span>YOUR PLAYERS</span>
+            <span className="count">{t('news.page.yourPlayersCount', { count: yourPlayers.length })}</span>
+          </div>
+          <div className="tour-news-rows">
+            {yourPlayers.map((s) => (
+              <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="row" />
+            ))}
+          </div>
+        </>
+      )}
+
+      {(pair.length > 0 || rows.length > 0) && (
+        <>
+          <div className="tour-news-sec"><span>TOP STORIES</span><span /></div>
+          {pair.length === 2 && (
+            <div className="tour-news-pair">
+              {pair.map((s) => (
+                <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="pair" />
+              ))}
+            </div>
+          )}
+          {rows.length > 0 && (
+            <div className="tour-news-rows">
+              {rows.map((s) => (
+                <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="row" />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {railChips.length >= EVENT_CHIP_MIN && eventNames && (
+        <>
+          <div className="tour-news-sec"><span>BY EVENT</span><span /></div>
+          <div className="tour-news-events" role="group" aria-label="By event">
+            <button
+              type="button"
+              className={`tour-news-chip${activeEvent === null ? ' on' : ''}`}
+              onClick={() => { setEventFilter(null); setArchiveLimit(NEWS_PAGE_SIZE); }}
+            >
+              All
+            </button>
+            {railChips.map((chip) => (
+              <button
+                key={chip.id}
+                type="button"
+                className={`tour-news-chip${activeEvent === chip.id ? ' on' : ''}`}
+                onClick={() => { setEventFilter(chip.id); setArchiveLimit(NEWS_PAGE_SIZE); }}
+              >
+                {displayEventName(eventNames.get(chip.id) ?? '')} <small className="tabular-nums">{chip.count}</small>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {groups.map((group) => (
+        <section key={group.key} aria-label={group.label}>
+          <div className="tour-news-grp">{group.label}</div>
+          {group.stories.map((s) => (
+            <ArchiveRow key={s.id} story={s} read={visit.openedIds.includes(s.id)} onOpen={() => open(s)} />
+          ))}
+        </section>
+      ))}
+
+      {visibleArchive.length < archiveStories.length && (
+        <button type="button" className="tour-news-more" onClick={() => setArchiveLimit((current) => current + NEWS_PAGE_SIZE)}>
+          {t('news.page.showOlder', 'Show older stories')}
+        </button>
+      )}
+    </>
+  );
+
+  /* NEWS ISLANDS (10 Nov 2026): with `islands` the lead photo bleeds into the
+     notch like the Tour overview hero — 500px at y=0 behind the status bar
+     and the islands, the "Tour News" head overlaid at CHROME_CLEARANCE, and
+     the fresh line directly below the photo. The lead becomes a div with
+     button semantics because the overlaid search button cannot nest inside a
+     <button>. Without `islands` the page renders exactly as before. */
+  if (islands) {
+    return (
+      <div ref={visitRef as React.MutableRefObject<HTMLDivElement | null>} className="tour-news tour-news--islands" style={{ fontFamily: FONT }}>
+        {searchOpen ? (
+          <div style={{ paddingTop: CHROME_CLEARANCE }}>
+            {searchBar}
+            {searchResults}
+          </div>
+        ) : (
+          <>
+            <div
+              role="button"
+              tabIndex={0}
+              className="tour-news-lead"
+              onClick={() => open(lead)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(lead); } }}
+              aria-label={`Read ${lead.headline}`}
+              data-testid="tour-news-lead"
+            >
+              {lead.image_url && <img src={lead.image_url} alt="" loading="eager" decoding="async" />}
+              <header className="tour-news-head" style={{ position: 'absolute', top: CHROME_CLEARANCE, left: 24, right: 24, padding: 0, zIndex: 2 }}>
+                <h1>Tour News</h1>
+                <button type="button" className="tour-news-search-btn" aria-label="Search stories" onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }}>
+                  <Search size={17} aria-hidden />
+                </button>
+              </header>
+              {leadCopy}
+            </div>
+            {freshLine}
+            {belowLead}
+          </>
+        )}
+        <ScrollToTopGlass />
       </div>
     );
   }
@@ -352,19 +538,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   return (
     <div ref={visitRef as React.MutableRefObject<HTMLDivElement | null>} className="tour-news" style={{ fontFamily: FONT }}>
       {searchOpen ? (
-        <div className="tour-news-searchbar" data-testid="tour-news-searchbar">
-          <Search size={16} aria-hidden />
-          <input
-            autoFocus
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t('news.page.searchPlaceholder', 'Search stories')}
-            aria-label={t('news.page.searchPlaceholder', 'Search stories')}
-          />
-          <button type="button" className="tour-news-cancel" onClick={() => { setSearchOpen(false); setQuery(''); }}>
-            Cancel
-          </button>
-        </div>
+        searchBar
       ) : (
         <header className="tour-news-head">
           <h1>Tour News</h1>
@@ -375,117 +549,17 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
       )}
 
       {searchOpen ? (
-        <div>
-          {search.active && search.settled && (
-            search.results.length > 0 ? (
-              <>
-                <div className="tour-news-grp">{t('news.page.searchResults', { count: search.results.length })}</div>
-                {search.results.map((s) => (
-                  <ArchiveRow key={s.id} story={s} read={visit.openedIds.includes(s.id)} query={search.debounced} onOpen={() => open(s)} />
-                ))}
-              </>
-            ) : (
-              <div className="tour-news-search-empty">{t('news.page.searchEmpty', { query: search.debounced })}</div>
-            )
-          )}
-        </div>
+        searchResults
       ) : (
         <>
-          {newCount > 0 && (
-            <div className="tour-news-fresh">
-              <i className="overview-news-dot" aria-hidden />
-              <span><Trans t={t} i18nKey="overview.news.newSince" count={newCount} components={{ b: <b /> }} /></span>
-            </div>
-          )}
+          {freshLine}
 
           <button type="button" className="tour-news-lead" onClick={() => open(lead)} aria-label={`Read ${lead.headline}`} data-testid="tour-news-lead">
             {lead.image_url && <img src={lead.image_url} alt="" loading="eager" decoding="async" />}
-            <div className="tour-news-lead-copy">
-              <div className="overview-news-kicker">
-                {presentationFor(lead).isNew && <i className="overview-news-dot" aria-hidden />}
-                <span>{lead.kicker}</span>
-              </div>
-              <h2>{lead.headline}</h2>
-              {lead.standfirst && <p className="tour-news-standfirst">{lead.standfirst}</p>}
-              <NewsDetails story={lead} presentation={presentationFor(lead)} short={false} />
-            </div>
+            {leadCopy}
           </button>
 
-          {lead.tournament_id && <NewsEventCard tournamentId={lead.tournament_id} follows={follows} />}
-
-          {viewerId && yourPlayers.length > 0 && (
-            <>
-              <div className="tour-news-sec you" data-testid="tour-news-your-players">
-                <span>YOUR PLAYERS</span>
-                <span className="count">{t('news.page.yourPlayersCount', { count: yourPlayers.length })}</span>
-              </div>
-              <div className="tour-news-rows">
-                {yourPlayers.map((s) => (
-                  <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="row" />
-                ))}
-              </div>
-            </>
-          )}
-
-          {(pair.length > 0 || rows.length > 0) && (
-            <>
-              <div className="tour-news-sec"><span>TOP STORIES</span><span /></div>
-              {pair.length === 2 && (
-                <div className="tour-news-pair">
-                  {pair.map((s) => (
-                    <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="pair" />
-                  ))}
-                </div>
-              )}
-              {rows.length > 0 && (
-                <div className="tour-news-rows">
-                  {rows.map((s) => (
-                    <OverviewNewsStory key={s.id} story={s} onOpen={() => open(s)} presentation={presentationFor(s)} shape="row" />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {railChips.length >= EVENT_CHIP_MIN && eventNames && (
-            <>
-              <div className="tour-news-sec"><span>BY EVENT</span><span /></div>
-              <div className="tour-news-events" role="group" aria-label="By event">
-                <button
-                  type="button"
-                  className={`tour-news-chip${activeEvent === null ? ' on' : ''}`}
-                  onClick={() => { setEventFilter(null); setArchiveLimit(NEWS_PAGE_SIZE); }}
-                >
-                  All
-                </button>
-                {railChips.map((chip) => (
-                  <button
-                    key={chip.id}
-                    type="button"
-                    className={`tour-news-chip${activeEvent === chip.id ? ' on' : ''}`}
-                    onClick={() => { setEventFilter(chip.id); setArchiveLimit(NEWS_PAGE_SIZE); }}
-                  >
-                    {displayEventName(eventNames.get(chip.id) ?? '')} <small className="tabular-nums">{chip.count}</small>
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {groups.map((group) => (
-            <section key={group.key} aria-label={group.label}>
-              <div className="tour-news-grp">{group.label}</div>
-              {group.stories.map((s) => (
-                <ArchiveRow key={s.id} story={s} read={visit.openedIds.includes(s.id)} onOpen={() => open(s)} />
-              ))}
-            </section>
-          ))}
-
-          {visibleArchive.length < archiveStories.length && (
-            <button type="button" className="tour-news-more" onClick={() => setArchiveLimit((current) => current + NEWS_PAGE_SIZE)}>
-              {t('news.page.showOlder', 'Show older stories')}
-            </button>
-          )}
+          {belowLead}
         </>
       )}
     </div>

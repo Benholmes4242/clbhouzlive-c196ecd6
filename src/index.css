@@ -5731,6 +5731,12 @@ em-emoji-picker input:focus {
 .tour-news-lead { position:relative; display:block; width:100%; height:440px; border:0; padding:0; color:var(--news-ink); text-align:left; cursor:pointer; background:var(--news-photo-ground); overflow:hidden; font:inherit; }
 .tour-news-lead img { width:100%; height:100%; object-fit:cover; display:block; }
 .tour-news-lead::after { content:""; position:absolute; inset:0; background:var(--news-hero-wash); }
+/* NEWS ISLANDS (10 Nov 2026): the lead bleeds into the notch — 500px at y=0,
+   with a top shade ahead of the shared wash so the status bar and the
+   overlaid "Tour News" head read on the photo. Modifier only; the shared
+   rules above are untouched. */
+.tour-news--islands .tour-news-lead { height:500px; }
+.tour-news--islands .tour-news-lead::after { background:linear-gradient(180deg, rgba(10,10,12,0.40) 0%, rgba(10,10,12,0) 30%), var(--news-hero-wash); }
 .tour-news-lead-copy { position:absolute; left:24px; right:24px; bottom:20px; z-index:1; }
 .tour-news-lead-copy .overview-news-kicker { color:var(--news-photo-ink); }
 .tour-news-lead-copy h2 { margin:10px 0 0; font-size:27px; font-weight:800; line-height:1.12; overflow-wrap:anywhere; }

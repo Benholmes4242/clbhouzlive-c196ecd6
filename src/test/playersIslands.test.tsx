@@ -70,11 +70,10 @@ describe('Players tab on the shared islands', () => {
   const tab = source('src/features/tourhub/players-v2/PlayersTab.tsx');
 
   it('renders directly like live/schedule, outside the TourPageShell wrapper', () => {
-    expect(main).toContain("isHubRoot || activeTab === 'live' || activeTab === 'schedule' || activeTab === 'players' ? renderTab() : (");
-    // The shell branch (AppHeader + SubTabTourControl) is unreachable for players.
-    const shellBranch = main.slice(main.indexOf('? renderTab() : ('));
-    expect(shellBranch).toContain('SubTabTourControl');
-    expect(shellBranch).not.toContain("activeTab === 'players'");
+    /* NEWS ON THE SHARED ISLANDS (10 Nov 2026): with all four sub-tabs
+       converted the shell branch is deleted — every tab renders directly. */
+    expect(main).not.toContain('<TourPageShell');
+    expect(main).toContain('{renderTab()}');
   });
 
   it('keeps the scroll-to-top control TourPageShell used to supply', () => {
