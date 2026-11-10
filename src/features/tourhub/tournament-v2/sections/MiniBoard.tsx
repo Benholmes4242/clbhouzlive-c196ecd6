@@ -243,8 +243,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             color: T.faint, textTransform: 'uppercase',
           }}
         >
-          <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
-          <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
+          <div style={{ width: 34, flexShrink: 0 }} aria-hidden="true" />
+          <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }} aria-hidden="true" />
           {showPanelThru ? <div style={{ width: 40, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.thru')}</div> : null}
           <div style={{ width: 46, textAlign: 'center', flexShrink: 0 }}>{panelScoreLabel}</div>
           <div style={{ width: 46, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.tot')}</div>
