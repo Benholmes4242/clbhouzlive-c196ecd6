@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /** Gate tokens, copied deliberately: the two surfaces are one product. */
 const CANVAS = PAGE_CANVAS;
@@ -183,6 +184,10 @@ const HandoffPage: React.FC = () => {
           <a
             href={FALLBACK_STORE_URL}
             aria-label={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
+            onClick={() => {
+              // FUNNEL_TRACKING_1: fire-and-forget; navigation never waits.
+              void analyticsEvents.track('store_link_tapped', { surface: 'handoff', store: 'app_store' });
+            }}
             style={{ display: 'block', lineHeight: 0 }}
           >
             <img
