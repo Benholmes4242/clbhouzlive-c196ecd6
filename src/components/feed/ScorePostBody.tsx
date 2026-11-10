@@ -31,7 +31,7 @@ import { RoundTilePlot } from './roundTilePlot';
 
 const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 
-export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPar, shape, received, scoreId, medals, course, surfaceColor = FEED_CARD_SURFACE }: {
+export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPar, shape, received, scoreId, medals, course, surfaceColor = FEED_CARD_SURFACE, showPlot = true }: {
   net: number | null;
   gross: number | null;
   coursePar: number | null;
@@ -44,6 +44,9 @@ export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPa
   course: string | null;
   /** AwardCluster surface — the card canvas the marks sit on. */
   surfaceColor?: string;
+  /** ExploreCard's scoreLed branch draws a photo instead when feedPlot is
+   *  off; the featured card always draws the plot. Default true. */
+  showPlot?: boolean;
 }) {
   const { t } = useTranslation();
   const nettable = courseHandicap != null && (shape ? received != null : true);
@@ -105,7 +108,7 @@ export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPa
           {course}
         </span>
       ) : null}
-      {shape && received ? <RoundTilePlot shape={shape} received={received} scoreId={scoreId} /> : null}
+      {showPlot && shape && received ? <RoundTilePlot shape={shape} received={received} scoreId={scoreId} /> : null}
     </>
   );
 }
