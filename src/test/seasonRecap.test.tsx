@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
@@ -17,7 +17,7 @@ vi.mock('@/features/tourhub/hooks/usePickInsights', () => ({
 }));
 
 import {
-  RECAP_AFTER_DAYS, RECAP_NEXT_EVENT_WINDOW_DAYS, isBetweenSeasons, isFreshStandings, columnMajor, recapFactCells, ageAt,
+  RECAP_AFTER_DAYS, RECAP_NEXT_EVENT_WINDOW_DAYS, isBetweenSeasons, isFreshStandings, cardListName, recapFactCells, ageAt,
 } from '@/features/tourhub/components/overview-v3/seasonRecapRules';
 import { RecapPhotoBand, SeasonRecapBody, recapSentence } from '@/features/tourhub/components/overview-v3/SeasonRecapSections';
 import type { SeasonRecapData } from '@/features/tourhub/components/overview-v3/useSeasonRecap';
@@ -36,7 +36,10 @@ function kf(over: Partial<SeasonRecapData> = {}): SeasonRecapData {
     standings: KF_TOP20.map((name, i) => ({ position: i + 1, name, points: KF_POINTS[i] ?? 1000 - i, playerId: `p${i}` })),
     standingsSource: { table: 'tour_season_rankings', date: '2026-10-12T00:00:00Z' },
     cardLine: { label: 'TOP 20 · PGA TOUR CARD FOR 2027', n: 20 },
-    cardEarners: KF_TOP20.map((name) => ({ name, age: name === 'Blades Brown' ? 19 : 27 })),
+    cardEarners: KF_TOP20.map((name, i) => {
+      const [f, ...rest] = name.split(' ');
+      return { name, age: name === 'Blades Brown' ? 19 : 27, playerId: `p${i}`, initialName: `${f[0]}. ${rest.join(' ')}` };
+    }),
     ...over,
   };
 }
@@ -137,8 +140,8 @@ describe('recap body', () => {
     expect(css).toContain('.recap-block{padding-top:var(--hero-section-gap)}');
     expect(css).toContain('.recap-figs{margin-top:var(--hero-content-gap)}');
     expect(css).toContain('.recap-record-figs{margin:var(--hero-content-gap) 0 0}');
-    expect(css).toContain('grid-template-columns:repeat(2,max-content);column-gap:34px;justify-content:center');
-    expect(css).toContain('grid-template-columns:18px minmax(0,1fr);column-gap:10px');
+    expect(css).toContain('grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(var(--recap-rows-3),auto);grid-auto-flow:column;column-gap:12px');
+    expect(css).toContain('grid-template-columns:16px minmax(0,1fr);column-gap:7px');
     expect(css).toContain('.recap-cards span{text-align:right;');
   });
   it('facts row with a card line: EVENTS, WINNERS, CARDS, YOUNGEST', () => {
@@ -179,8 +182,8 @@ describe('recap body', () => {
     const rows = [...container.querySelectorAll('[data-recap-row]')].map((r) => [r.querySelector('.recap-name')!.textContent, r.querySelector('.recap-pts')!.textContent]);
     expect(rows).toEqual([['Ross Steelman', '2,221'], ['Sandy Scott', '2,191'], ['Ian Holt', '1,618']]);
     const cards = [...container.querySelectorAll('[data-recap-card]')].map((c) => c.querySelector('b')!.textContent);
-    expect(cards).toEqual(columnMajor(KF_TOP20));
-    expect(cards[0]).toBe('Ross Steelman'); expect(cards[1]).toBe('Cooper Dossey'); expect(cards[19]).toBe('Davis Lamb');
+    expect(cards).toEqual(KF_TOP20.map((name) => { const [f, ...rest] = name.split(' '); return `${f[0]}. ${rest.join(' ')}`; }));
+    expect(cards[0]).toBe('R. Steelman'); expect(cards[1]).toBe('S. Scott'); expect(cards[19]).toBe('D. Lamb');
     expect(container.querySelector('[data-recap-cards] h2')!.textContent).toBe('TOP 20 · PGA TOUR CARD FOR 2027');
     expect(container.querySelector('[data-recap-youngest]')!.textContent).toBe('Blades Brown earned his card at 19, the youngest of the 20.');
   });
