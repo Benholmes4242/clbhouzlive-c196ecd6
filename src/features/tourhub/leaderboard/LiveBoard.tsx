@@ -25,7 +25,11 @@ export function LiveBoard({entries, fullEntries = entries, tournamentId, current
     onRowClick:onFull, movementEntries:fullEntries, teeTimes, surface:'var(--tour-board-canvas)', expandedId, renderExpanded };
   return <div className="tour-board-shell">
     {mine.length > 0 && <section aria-label={t('rebuilt.yourPlayers')}><div className="tour-board-kicker"><span>{t('rebuilt.yourPlayers')}</span><small>{t('rebuilt.followed',{count:mine.length})}</small></div><BoardTable {...shared} entries={mine} showHeader={false} yourPlayers cutState={{kind:'none',cutline:null,extraCount:0}} /></section>}
-    {boardHead ?? <div className="tour-board-kicker"><span>{t('rebuilt.leaderboard')}</span>{(currentRound ?? 0)>1 && <small>{t('rebuilt.placesSince',{round:(currentRound ?? 1)-1})}</small>}</div>}
+    {boardHead ?? <div className="tour-board-kicker"><span>{t('rebuilt.leaderboard')}</span></div>}
     <BoardTable {...shared} entries={entries} cutState={cutState} headerTop={headerTop} />
+    {/* Full board sheet: the places-since legend leaves the heading line and
+        reads as one caption line under the board. The Leaderboards page keeps
+        its own legend in the section head (rule b). */}
+    {!boardHead && (currentRound ?? 0) > 1 && <div className="tour-board-legend-caption">{t('rebuilt.placesSince', { round: (currentRound ?? 1) - 1 })}</div>}
   </div>;
 }
