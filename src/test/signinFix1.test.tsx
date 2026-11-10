@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act, cleanup, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-const signInWithOtp = vi.fn();
-const verifyOtp = vi.fn();
-const updateUser = vi.fn();
-const getSession = vi.fn();
+const signInWithOtp = vi.fn<(...a: unknown[]) => unknown>();
+const verifyOtp = vi.fn<(...a: unknown[]) => unknown>();
+const updateUser = vi.fn<(...a: unknown[]) => unknown>();
+const getSession = vi.fn<(...a: unknown[]) => unknown>();
 const onAuthStateChange = vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } }));
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -25,8 +25,8 @@ vi.mock('@/integrations/supabase/client', () => ({
   },
 }));
 
-const trackAuthFailed = vi.fn();
-const trackSignupFailed = vi.fn();
+const trackAuthFailed = vi.fn<(...a: unknown[]) => unknown>();
+const trackSignupFailed = vi.fn<(...a: unknown[]) => unknown>();
 vi.mock('@/lib/authAnalytics', () => ({
   trackAuthMethodSelected: vi.fn(),
   trackAuthInitiated: vi.fn(),
@@ -42,12 +42,12 @@ vi.mock('@/lib/authAnalytics', () => ({
 
 vi.mock('@/lib/auth/postAuthRoute', () => ({ resolvePostAuthRoute: vi.fn(async () => '/') }));
 
-const track = vi.fn();
+const track = vi.fn<(...a: unknown[]) => unknown>();
 vi.mock('@/utils/analyticsEvents', () => ({
   analyticsEvents: { track: (...a: unknown[]) => track(...a) },
 }));
 
-const toastError = vi.fn();
+const toastError = vi.fn<(...a: unknown[]) => unknown>();
 vi.mock('sonner', () => ({ toast: { error: (...a: unknown[]) => toastError(...a) } }));
 
 vi.mock('react-i18next', () => ({
