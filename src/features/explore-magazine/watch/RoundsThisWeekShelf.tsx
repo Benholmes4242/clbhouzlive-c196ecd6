@@ -69,7 +69,11 @@ export function useRecentRounds(userId: string | undefined, scope: 'circle' | 'e
 export const OWN_ROUND_AMBER = '#F7931E';
 export const OWN_ROUND_BORDER = 'rgba(247,147,30,0.35)';
 
-/** Shared by Recent rounds and the course page's Lately here (CS1); never fork. */
+/** Shared by Recent rounds and the course page's Lately here (CS1); never fork.
+ * EXPLORE TILES A: the same markup and classes as the Standout round tile —
+ * standout-card / standout-who / standout-story / standout-bottom / standout-foot.
+ * The date lives only in the foot; the sentence is never clamped; the tile
+ * grows (minHeight) so the rail stretches every tile to the tallest. */
 export function RoundCard({
   round,
   shapes,
@@ -85,14 +89,12 @@ export function RoundCard({
   locale: string;
   onOpenRound?: (scoreId: string, ownerUserId: string | null) => void;
   onOpenMember?: (userId: string) => void;
-  /** CS1: on the course page — date-only sub line, "here" sentences, wrapping name. */
+  /** CS1: on the course page — "here" sentences, CIRCLE-only second line. */
   here?: boolean;
   inCircle?: boolean;
   own?: boolean;
 }) {
   const { t } = useTranslation('courses');
-  const toPar = roundToPar(round);
-  const toParText = toParLabel(toPar);
   const shape = round.whs_score_id ? shapes?.get(round.whs_score_id) ?? null : null;
   const sentence = recentSentenceParts(round, locale, here ? { here: true } : undefined);
   return (
@@ -101,6 +103,7 @@ export function RoundCard({
       tabIndex={0}
       data-rounds-shelf-card="round"
       data-own-round={own ? 'true' : undefined}
+      className="standout-card"
       onClick={() => {
         if (!round.whs_score_id) return;
         analyticsEvents.track('rounds_shelf_card_tapped', { kind: 'round' });
@@ -114,53 +117,25 @@ export function RoundCard({
         onOpenRound?.(round.whs_score_id, round.user_id);
       }}
       style={{
-        flex: 'none', width: SHELF_CARD.width, height: SHELF_CARD.height, boxSizing: 'border-box',
-        scrollSnapAlign: 'start', background: SHELF_CARD.background,
-        border: `1px solid ${own ? OWN_ROUND_BORDER : SHELF_CARD.border}`, borderRadius: SHELF_CARD.radius,
-        padding: SHELF_CARD.padding, display: 'flex', flexDirection: 'column', cursor: 'pointer',
+        width: SHELF_CARD.width, minHeight: SHELF_CARD.minHeight,
+        border: `1px solid ${own ? OWN_ROUND_BORDER : SHELF_CARD.border}`,
       }}
     >
-      <WhoRow
+      <RoundTileWho
         userId={round.user_id}
         name={round.display_name || t('discover.aMember', 'A member')}
-        photoUrl={round.profile_photo_url}
-        sub={here ? (
-          <>
-            {shortDate(round.play_date, locale)}
-            {inCircle ? (
-              <>
-                {' · '}
-                <span data-round-card-circle style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: A.DIM }}>
-                  {t('courseDetail.lately.circle', 'CIRCLE')}
-                </span>
-              </>
-            ) : null}
-          </>
-        ) : courseAndDate(round.course_name, round.play_date, locale)}
+        photo={round.profile_photo_url}
+        course={round.course_name}
         onOpenMember={onOpenMember}
-        wrapName={here}
         nameColor={own ? OWN_ROUND_AMBER : undefined}
+        circleOnly={here}
+        inCircle={inCircle}
       />
-      <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 12 }}>
-        <b className="tabular-nums" style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>
-          {round.net_score ?? round.gross_score ?? '–'}
-        </b>
-        {toParText ? (
-          <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, color: toPar != null && toPar < 0 ? TO_PAR_UNDER : A.MUTE }}>
-            {toParText}
-          </span>
-        ) : null}
-      </span>
-      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, marginTop: 5 }}>
-        {t('amateur.roundsShelf.kickerNet', 'Net · gross {{gross}}', { gross: round.gross_score ?? '–' })}
-        {round.is_competition ? t('amateur.roundsShelf.kickerComp', ' · comp') : ''}
-      </span>
-      {shape ? <RoundTileMarks shape={shape} /> : null}
       {sentence ? (
-        <span style={{ ...clamp2, fontSize: 12.5, color: A.MUTE, marginTop: 'auto', lineHeight: 1.4 }}>
-          {t(sentence.key, { ...sentence, defaultValue: sentence.defaultValue })}
-        </span>
+        <div className="standout-story">{t(sentence.key, { ...sentence, defaultValue: sentence.defaultValue })}</div>
       ) : null}
+      <div className="standout-bottom">{shape ? <RoundTileMarks shape={shape} /> : null}</div>
+      <RoundTileFoot round={round} locale={locale} />
     </div>
   );
 }
