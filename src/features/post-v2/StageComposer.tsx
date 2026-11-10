@@ -87,7 +87,7 @@ import {readComposerRounds,readClaimedCourse,readNearbyCourse,readGolfCourse,rou
 import {chooseCourseSource,recentRound,roundDay,roundSuggestionDay,guideVisible,composerDestinations,editorTitleKey,effectiveHoleGuide,ordinal,type ComposerRound,type CourseSuggestion} from './lib/composerGolfRules';
 import {loadComposerDraft} from './lib/composerDrafts';
 import { isLongFormVideo } from '@/constants/videoRules';
-import { emptyVideoDetails, singleVideo, videoDuration, premarkHoles } from './lib/videoDetails';
+import { emptyVideoDetails, singleVideo, videoDuration, premarkHoles, videoCoverSelection } from './lib/videoDetails';
 import { VideoTitleDescription, VideoCoverChapters } from './components/video/VideoComposerFields';
 import { VideoDetailsPage } from './components/video/VideoDetailsPage';
 import { MarkHolesPage } from './components/video/MarkHolesPage';
@@ -989,6 +989,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           open={sheet === 'cover'}
           onClose={() => setSheet(null)}
           item={active}
+          chosenTime={active ? videoCoverSelection(active, videoData.coverFrame).chosen : undefined}
           onApply={(ts) => { updateActive({ posterTimestamp: ts }); if (videoComposer) setVideoData({ coverFrame: ts }); }}
         />
         <AdjustSheet

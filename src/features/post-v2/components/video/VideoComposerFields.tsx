@@ -4,7 +4,7 @@ import { Switch } from '@/components/ui/switch';
 import type { StageMediaItem } from '../../hooks/useStageComposer';
 import { extractPoster } from '../../lib/videoPoster';
 import { stripMentionMarkup } from '@/lib/mentions/format';
-import { parseChapters, videoDescriptionMeta, videoDuration, type VideoDetails } from '../../lib/videoDetails';
+import { parseChapters, videoDescriptionMeta, videoDuration, videoCoverSelection, type VideoDetails } from '../../lib/videoDetails';
 import './videoCreator.css';
 import { RoundVideoFields, type RoundVideoContext } from './RoundVideoFields';
 
@@ -27,13 +27,12 @@ function CoverFrame({ item, time, selected, onPick }: { item: StageMediaItem; ti
 export function VideoCoverChapters({ item, details, description, long, onChange, onFrame, onCover, round, onMark }: { item: StageMediaItem; details: VideoDetails; description: string; long: boolean; onChange: (patch: Partial<VideoDetails>) => void; onFrame: (time: number) => void; onCover: () => void; round?: RoundVideoContext | null; onMark?: () => void }) {
   const duration = videoDuration(item);
   const chapters = parseChapters(description, duration);
-  const times = [0.1, 0.35, 0.6, 0.85].map(part => (duration ?? 0) * part + (item.trimStart ?? 0));
+  const { times, selectedIndex } = videoCoverSelection(item, details.coverFrame);
   const portrait = (item.naturalHeight ?? 0) > (item.naturalWidth ?? 0);
-  const selected = item.posterTimestamp ?? details.coverFrame;
   return <section className="video-creator vc-section" data-video-cover>
     <div className="vc-heading"><span className="vc-kicker">VIDEO</span>{long && <span className="vc-note">For Watch and your profile</span>}</div>
     <div className="vc-box"><div className="vc-part"><div className="vc-part-head">Cover<Button variant="ghost" className="vc-inline" onClick={onCover}>Pick a frame ›</Button></div>
-      <div className="vc-frames" data-portrait={portrait}>{times.map((time, i) => <CoverFrame key={i} item={item} time={time} selected={selected == null ? i === 0 : Math.abs(selected - time) < 0.01} onPick={() => onFrame(time)} />)}</div>
+      <div className="vc-frames" data-portrait={portrait}>{times.map((time, i) => <CoverFrame key={i} item={item} time={time} selected={i === selectedIndex} onPick={() => onFrame(time)} />)}</div>
       <div className="vc-toggle-row"><span>Put the title on the cover</span><Switch className="vc-switch" aria-label="Put the title on the cover" checked={!!details.title.trim() && details.titleOnCover} disabled={!details.title.trim()} onCheckedChange={titleOnCover => onChange({ titleOnCover })} /></div>
     </div>{long && round && onMark ? <RoundVideoFields details={details} duration={duration ?? 0} round={round} onChange={onChange} onMark={onMark} /> : long && <div className="vc-part" data-video-chapters><div className="vc-part-head">Chapters{chapters.length > 0 && <span className="vc-ok">{chapters.length} · from your timestamps</span>}</div>{chapters.length ? chapters.map(chapter => <div className="vc-chapter" key={chapter.seconds}><span className="vc-time">{chapter.time}</span><span className="vc-grow">{chapter.label}</span></div>) : <div className="vc-chapter-hint">Add timestamps starting at 0:00 to make chapters</div>}</div>}</div>
   </section>;
