@@ -455,6 +455,63 @@ describe('RR Recent rounds shelf', () => {
   });
 });
 
+/* ------------------------------------------------ EXPLORE TILES A guards */
+
+describe('EXPLORE TILES A guards', () => {
+  it('the date lives in .standout-when, never in the header', async () => {
+    f.pools.circle = [round('a'), round('b')];
+    shelf();
+    await screen.findByText('Recent rounds');
+    const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
+    expect(card.querySelector('.standout-when')).toHaveTextContent('Oct 31');
+    expect(card.querySelector('.standout-who')).not.toHaveTextContent('Oct 31');
+  });
+
+  it('the sentence carries no line clamp and the tile uses min-height, never height', async () => {
+    f.pools.circle = [round('a'), round('b')];
+    shelf();
+    await screen.findByText('Recent rounds');
+    const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
+    const story = card.querySelector('.standout-story') as HTMLElement;
+    expect(story.style.getPropertyValue('-webkit-line-clamp')).toBe('');
+    expect(card.style.height).toBe('');
+    expect(card.style.minHeight).toBe('214px');
+    const css = readFileSync('src/features/explore-magazine/watch/standout-shelf.css', 'utf8');
+    const storyRule = css.match(/\.standout-story\s*\{[^}]*\}/)?.[0] ?? '';
+    expect(storyRule).not.toContain('-webkit-line-clamp');
+    expect(storyRule).not.toContain('-webkit-box');
+    expect(storyRule).toContain('display:block');
+    const cardRule = css.match(/\.standout-card\s*\{[^}]*\}/)?.[0] ?? '';
+    expect(cardRule).toContain('min-height:214px');
+    expect(cardRule.replace('min-height:214px', '')).not.toContain('height:214px');
+  });
+
+  it('SHELF_CARD, SHELF_END and SHELF_SKELETON expose minHeight, never height', () => {
+    for (const shape of [shelfRules.SHELF_CARD, shelfRules.SHELF_END, shelfRules.SHELF_SKELETON]) {
+      expect(shape.minHeight).toBe(214);
+      expect('height' in shape).toBe(false);
+    }
+  });
+
+  it('a long full course name renders in full with no ellipsis', async () => {
+    f.pools.circle = [
+      round('a', { course_name: 'Sundridge Park Golf Club (East Course)', last_better: '2026-06-10', delta: -2 }),
+      round('b'),
+    ];
+    shelf();
+    await screen.findByText('Recent rounds');
+    const story = document.querySelector('[data-rounds-shelf-card="round"] .standout-story') as HTMLElement;
+    expect(story).toHaveTextContent('Best at Sundridge Park Golf Club (East Course) since June');
+    expect(story.textContent).not.toContain('…');
+  });
+
+  it('Recent rounds still reads the last 14 days', async () => {
+    shelf();
+    await screen.findByText('Recent rounds');
+    expect(f.rpcCalls).toContainEqual({ name: 'get_recent_rounds', p_scope: 'circle', p_window: '14', p_limit: 10, p_offset: 0 });
+  });
+});
+
 /* ------------------------------------------------------- Watch placement */
 
 describe('RS shelf placement on Watch', () => {
