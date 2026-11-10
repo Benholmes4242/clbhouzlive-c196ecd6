@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Feed avatar fallbacks and comment-row account chooser
+Use standard dark two-initial fallbacks in Who to follow; preserve business logos.
+Move media-first footer chooser into the comment row; standard footers stay per ruling.
+Add requested guards, audit white initials tiles, run focused tests and separate shards; baseline 8,091.
+
 ## Done: Tour dock blur and Players portrait correction
 Page-level frost appears while Schedule/Leaderboards headers dock; other board callers retain default paint.
 Players portrait height uses the requested CHROME_CLEARANCE expression. Six new guards; no existing tests changed.
