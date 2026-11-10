@@ -350,10 +350,14 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
     const kicker = kickerRef.current;
     if (!header || !kicker) return;
     const measure = () => {
-      const cols = (showOverviewPosition ? 1 : 0) + 1 + heroRounds.length + 1;
-      const fixed = (showOverviewPosition ? HERO_POS_W : 0) + heroRounds.length * HERO_ROUND_W + HERO_TOT_W + heroGap * (cols - 1);
+      // The heading spans POS + PLAYER. Measure its text, not the stretched
+      // grid item (which becomes full-width when labels use their own line).
+      const fixed = heroRounds.length * HERO_ROUND_W + HERO_TOT_W + heroGap * (heroRounds.length + 1);
       const available = header.clientWidth - fixed - (bleed ? 0 : 2 * HERO_PAD_X);
-      setLabelsOwnLine(kicker.scrollWidth > available);
+      const range = document.createRange();
+      range.selectNodeContents(kicker);
+      const textWidth = typeof range.getBoundingClientRect === 'function' ? range.getBoundingClientRect().width : 0;
+      setLabelsOwnLine(textWidth > available);
     };
     measure();
     const observer = new ResizeObserver(measure);

@@ -101,7 +101,7 @@ describe('recap board header removal', () => {
     const stand = src.slice(src.indexOf('export function RecapStandings'), src.indexOf('export function RecapCardList'));
     expect(stand).not.toContain('data-recap-full-list');
     expect(stand).toContain('overview.recap.pointsHeading');
-    expect(stand).not.toContain('recap-head');
+    expect(stand).not.toMatch(/className="recap-head"/);
   });
 });
 

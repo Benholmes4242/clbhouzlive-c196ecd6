@@ -1,9 +1,9 @@
 # Roadmap
 
-## Blocked: Last year lookup + missing-leaderboard sweep
+## In progress: Last year lookup + missing-leaderboard sweep
 Before-change shards executed separately: 2,087 / 1,908 / 2,049 / 1,968 = 8,012 executed (8,011 passed, 1 failed).
 STOP: src/test/heroBlocks.test.tsx:104, “recap board header removal > RecapStandings renders no kicker or Full list link” unexpectedly fails on `recap-head`.
-No lookup/function/test changes or deployment/invocation performed. Await baseline failure resolution in its owning stream.
+Authorised exact assertion repair applied. Finish board/recap measurements and shard 4, then fix tour-scoped prior-year lookup, add/deploy/invoke the authorised sweep, and run four final shards separately.
 Report: LAST_YEAR_BACKFILL_REPORT.md.
 
 ## In progress: Board headers without POS / PLAYER
