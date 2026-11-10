@@ -54,6 +54,28 @@ export interface FeedCardRow {
   height?: number | null;
 }
 
+/**
+ * ONE RULE (postAuthor): the byline names the business on a business post,
+ * never the uploader. The reduced FeedCardRow carries no business fields, so
+ * the normalized FeedPost (already business-resolved by feedMapper) is the
+ * business source; the raw row only ever supplies the personal name.
+ */
+export function feedCardAuthorName(row: FeedCardRow, feedPost: FeedPost): string {
+  if (feedPost.actorType === 'business') {
+    return postAuthor({
+      actorType: 'business',
+      actorId: feedPost.actorId,
+      displayName: feedPost.displayName,
+    }).name;
+  }
+  return postAuthor({
+    actorType: 'personal',
+    actorId: feedPost.actorId,
+    creator_display_name: row.creator_display_name,
+    creator_username: row.creator_username,
+  }).name;
+}
+
 export function FeedCard({
   row,
   feedPost,
@@ -380,7 +402,7 @@ export function FeedCard({
               minWidth: 0,
             }}
           >
-            {(row.creator_display_name || row.creator_username) ? (
+            {feedCardAuthorName(row, feedPost) ? (
               <span
                 style={{
                   overflow: 'hidden',
@@ -389,7 +411,7 @@ export function FeedCard({
                   minWidth: 0,
                 }}
               >
-                <InlineProMemberName userId={feedPost.actorType === 'personal' ? feedPost.userId : null}>{row.creator_display_name || row.creator_username}</InlineProMemberName>
+                <InlineProMemberName userId={feedPost.actorType === 'personal' ? feedPost.userId : null}>{feedCardAuthorName(row, feedPost)}</InlineProMemberName>
               </span>
             ) : null}
 
