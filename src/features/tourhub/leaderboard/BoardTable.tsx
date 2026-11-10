@@ -2,6 +2,7 @@
  * to the parent-owned scorecard sheet; only that sheet reads hole data.
  * Canonical columns/today/cut/team/prize and member-follow display stay shared. */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useDockedStuck } from '@/lib/useDockedStuck';
 import { fmtScore } from '../utils/fmtScore';
 import { useTranslation } from 'react-i18next';
 import { movementFromRounds } from './movementFromRounds';
@@ -135,6 +136,9 @@ interface Props {
   showHeader?: boolean;
   /** CSS `top` for the sticky header strip (parent supplies its chrome offset). */
   headerTop?: number | string;
+  /** Page frost opt-in only; sheets/embedded boards preserve existing paint. */
+  dockBlur?: boolean;
+  onDockChange?: (stuck: boolean, height: number) => void;
   /** Header/row surface. Defaults to the board canvas. */
   surface?: string;
   /** playerId -> R1 tee time label, used by the pre-tournament board only. */
@@ -452,6 +456,8 @@ export function BoardTable({
   onRowClick,
   showHeader = true,
   headerTop,
+  dockBlur = false,
+  onDockChange,
   surface = CANVAS,
   teeTimes,
   movementEntries,
@@ -464,6 +470,17 @@ export function BoardTable({
   const { t } = useTranslation('tourhub');
 
   const rootRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const headerStuck = useDockedStuck(headerRef, dockBlur && showHeader);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!dockBlur || !el || !onDockChange) return;
+    const report = () => onDockChange(headerStuck, el.getBoundingClientRect().height);
+    report();
+    const observer = new ResizeObserver(report);
+    observer.observe(el);
+    return () => { observer.disconnect(); onDockChange(false, 0); };
+  }, [dockBlur, showHeader, headerStuck, onDockChange]);
   const [containerW, setContainerW] = useState(0);
   useEffect(() => {
     const el = rootRef.current;
@@ -583,9 +600,12 @@ export function BoardTable({
     };
     return (
       <div
+        ref={headerRef}
+        data-board-sticky-header
+        data-dock-blur-enabled={dockBlur}
         style={{
           position: 'sticky',
-          top: headerTop ?? 0,
+          top: dockBlur && headerTop != null ? `calc(${headerTop} - 1px)` : headerTop ?? 0,
           zIndex: 2,
           display: 'grid',
           gridTemplateColumns: template,
@@ -593,9 +613,9 @@ export function BoardTable({
           alignItems: 'center',
           minHeight: 26,
           padding: `0 ${padX}px 6px`,
-          background: 'var(--tour-board-head)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
+          background: dockBlur && headerStuck ? 'transparent' : 'var(--tour-board-head)',
+          backdropFilter: dockBlur ? undefined : 'blur(10px)',
+          WebkitBackdropFilter: dockBlur ? undefined : 'blur(10px)',
           borderBottom: '1px solid rgba(255,255,255,0.08)',
           fontFamily: F,
           ...labelStyle,

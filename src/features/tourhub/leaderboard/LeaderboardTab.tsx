@@ -12,7 +12,7 @@
  */
 
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { formatTournamentDateRange } from '@/i18n/format';
@@ -39,6 +39,7 @@ import { getScoreColor } from '../_shared/scoreColor';
 import { fmtScore } from '../utils/fmtScore';
 import { computeBoardColumns } from './BoardTable';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import { DockBlur } from '../_shared/DockBlur';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { heroStateLine } from '../components/overview-v3/HybridHeroBands/heroStateLine';
 import { fullTourLabel } from '../_shared/tourOrder';
@@ -187,6 +188,10 @@ export function LeaderboardTab() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [sheetTarget, setSheetTarget] = useState<ScorecardSheetTarget | null>(null);
+  const [dock, setDock] = useState({ stuck: false, height: 26 });
+  const onDockChange = useCallback((stuck: boolean, height: number) => {
+    setDock(previous => previous.stuck === stuck && previous.height === height ? previous : { stuck, height });
+  }, []);
 
   const liveTournaments = useMemo(() => {
     return rawLive.filter(row => !isRetiredTour(row.tourSlug)).sort((a, b) => {
@@ -441,6 +446,7 @@ export function LeaderboardTab() {
 
   return (
     <div className="tour-board-shell" style={{minHeight:'60vh', paddingTop: CHROME_CLEARANCE}}>
+      <DockBlur visible={dock.stuck} rowHeight={dock.height} />
       {showTabs && <div className="tour-board-events" aria-label={t('leaderboard.a11y.events')}>
         {liveTournaments.map(tt => <Button key={tt.id} variant="outline" className="tour-event-pill" aria-pressed={selected.id===tt.id} onClick={()=>onSelectEvent(tt.id)}>
           {shortEventName(tt.name)}<span className="tour-event-leader">{eventLeaderLabel(tt.leaderName,tt.leaderCount,tt.leaderToPar)}</span>
@@ -511,6 +517,8 @@ export function LeaderboardTab() {
           currentRound={currentRound}
           complete={tournamentIsFinished(metaStatus)}
           headerTop={CHROME_CLEARANCE}
+          dockBlur
+          onDockChange={onDockChange}
           boardHead={boardHead}
           teeTimes={teeTimes}
           onFull={(row) => {

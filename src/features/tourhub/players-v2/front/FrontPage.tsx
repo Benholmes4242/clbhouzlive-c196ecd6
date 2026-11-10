@@ -127,7 +127,7 @@ function HeroImg({ rawName, name, tourCode }: { rawName: string; name: string; t
   if (!src) return null;
   const mask = 'linear-gradient(90deg, transparent 0%, #000 28%), linear-gradient(180deg, #000 70%, transparent 100%)';
   return (
-    <img src={src} alt="" aria-hidden="true" onError={onError} style={{ position: 'absolute', right: -60, bottom: 0, height: 290, width: 'auto', WebkitMaskImage: mask, maskImage: mask, WebkitMaskComposite: 'source-in', maskComposite: 'intersect' } as CSSProperties} />
+    <img src={src} alt="" aria-hidden="true" onError={onError} style={{ position: 'absolute', right: -60, bottom: 0, height: `min(250px, calc(420px - ${CHROME_CLEARANCE} - 52px))`, width: 'auto', WebkitMaskImage: mask, maskImage: mask, WebkitMaskComposite: 'source-in', maskComposite: 'intersect' } as CSSProperties} />
   );
 }
 
