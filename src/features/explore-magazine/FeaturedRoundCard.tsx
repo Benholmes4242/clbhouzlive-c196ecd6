@@ -176,7 +176,8 @@ export const FeaturedRoundCard: React.FC<{
             </span>
             {dateLine || (onFollow && !mine) ? (
               <span data-featured-date-line style={{ gridColumn: '2 / 4', gridRow: 3, marginTop: 2, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexWrap: 'nowrap' }}>
-                <span style={{ fontSize: 13, color: A.SOFT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dateLine}</span>
+                {/* A.SOFT is a hairline colour, never a text colour. */}
+                <span style={{ fontSize: 13, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dateLine}</span>
                 {onFollow && !mine ? (
                   <span data-round-follow="true" style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box' }} onClickCapture={event => event.preventDefault()} onClick={event => { event.stopPropagation(); event.preventDefault(); }}>
                     <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
