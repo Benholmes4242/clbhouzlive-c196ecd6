@@ -94,6 +94,7 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const body = await req.json();
     const {
       action,
       tourId,
@@ -104,14 +105,14 @@ Deno.serve(async (req) => {
       roundType,
       roundNumber,
       rankingType,
-    } = await req.json();
+    } = body;
 
     // The manual all-tour maintenance action is internal-only; existing
     // action callers retain their current authentication and response shape.
     if (action === 'backfill_missing_leaderboards') {
       const refusal = requireInternalSecret(req, corsHeaders);
       if (refusal) return refusal;
-      if (Object.keys(await req.clone().json().catch(() => ({}))).some(key => key !== 'action')) {
+      if (Object.keys(body).some(key => key !== 'action')) {
         return new Response(JSON.stringify({ error: 'This action accepts only action' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
     }
