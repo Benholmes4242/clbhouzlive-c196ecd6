@@ -78,6 +78,7 @@ afterEach(() => {
   cleanup(); rpc.mockReset();
   vi.mocked(openExternalUrl).mockClear(); vi.mocked(toast).mockClear();
   Object.assign(state, { business: null, courses: [], rows: [], membership: null, followers: 0, posts: 0, nearby: undefined });
+  Object.assign(coachState, { data: null, isSuccess: false, isError: false });
 });
 
 const fixture = (over: Record<string, unknown> = {}) => ({
