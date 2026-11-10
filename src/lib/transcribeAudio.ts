@@ -16,9 +16,9 @@ async function blobToBase64(blob: Blob): Promise<string> {
 export async function transcribeAudio(blob: Blob): Promise<string> {
   const audio = await blobToBase64(blob);
   const { data, error } = await supabase.functions.invoke('voice-to-text', {
-    body: { audio },
+    body: { audio, mimeType: blob.type },
   });
   if (error) throw error;
-  if (!data?.text) throw new Error('No transcription returned');
+  if (typeof data?.text !== 'string') throw new Error('No transcription returned');
   return (data.text as string).trim();
 }

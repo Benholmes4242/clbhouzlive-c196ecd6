@@ -16,6 +16,8 @@ import { Keyboard, Mic, Square } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeAudio } from '@/lib/transcribeAudio';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { toast } from '@/lib/toast';
 import { RV2 } from '../tokens';
 
 interface Props {
@@ -223,16 +225,31 @@ export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseTyp
   const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
+    if (!rec.error) return;
+    analyticsEvents.track('review_voice_failed', { reason: 'recorder_start', mime: null });
+    toast.error("Couldn't catch that. Try again, or type it instead.");
+  }, [rec.error]);
+
+  useEffect(() => {
     if (!rec.audioBlob) return;
     let cancelled = false;
+    const started = performance.now();
+    const mime = rec.audioBlob.type;
     setProcessing(true);
     transcribeAudio(rec.audioBlob)
       .then((text) => {
         if (cancelled) return;
         const trimmed = text.trim();
         if (trimmed) onAppend(trimmed);
+        analyticsEvents.track('review_voice_finished', { chars: trimmed.length, ms: Math.round(performance.now() - started), empty: !trimmed, mime });
+        if (!trimmed) toast.error("Couldn't catch that. Try again, or type it instead.");
       })
-      .catch(() => { /* silent */ })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        const reason = (error instanceof Error ? error.message : 'Transcription failed').slice(0, 120);
+        analyticsEvents.track('review_voice_failed', { reason, ms: Math.round(performance.now() - started), mime });
+        toast.error("Couldn't catch that. Try again, or type it instead.");
+      })
       .finally(() => {
         if (!cancelled) {
           setProcessing(false);

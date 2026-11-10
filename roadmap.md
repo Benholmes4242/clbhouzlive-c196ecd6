@@ -1,5 +1,9 @@
 # Roadmap
 
+## In progress: iPhone voice review
+Negotiate supported recorder MIME; carry actual format to Whisper; record outcomes and show retry toast.
+Add guards, run fresh shards, redeploy only voice-to-text; baseline 8,103. No test repairs authorised.
+
 ## In progress: Four posting/upload corrections
 White in-progress indicators; match VIDEO to ON THE COURSE spacing; retain custom cover frame and seek on reopen.
 Add guards and run focused tests/fresh shards; baseline 8,097. No unrelated changes or unauthorised test repairs.
