@@ -288,6 +288,85 @@ describe('CB112 figure strip', () => {
   });
 });
 
+describe('CB112 figure placement', () => {
+  const hero = (over: Partial<React.ComponentProps<typeof ClubProfileHero>> = {}) => {
+    const props = {
+      name: 'The Fairway Inn', placeLine: 'Hotel · London',
+      onShare: vi.fn(), renderMore: (tr: React.ReactElement) => tr, team: null,
+      isFollowing: false, onFollowToggle: vi.fn(), onBookTeeTime: vi.fn(), onMessage: vi.fn(),
+      ...over,
+    };
+    return render(<ClubProfileHero {...props} />);
+  };
+  const twoCells = [
+    { key: 'followers', value: '48', label: 'Followers', onTap: vi.fn() },
+    { key: 'posts', value: '7', label: 'Posts', onTap: vi.fn() },
+  ];
+  const strip = (c: HTMLElement) => c.querySelector('[data-club-strip]') as HTMLElement | null;
+
+  it('Follow + Message with no second pill puts 1–2 figures beside, inside the action row', async () => {
+    Object.assign(state, { business: fixture({ category: 'Creator' }), followers: 48, posts: 7 });
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
+    const s = strip(container)!;
+    expect(s.getAttribute('data-strip-placement')).toBe('beside');
+    expect(s.closest('[data-club-actions]')).not.toBeNull();
+    expect(s.style.marginLeft).toBe('auto');
+    expect(s.style.gap).toBe('14px');
+  });
+
+  it('a second pill puts the figures underneath', async () => {
+    Object.assign(state, { business: fixture({ booking_url: 'https://stay.example' }), followers: 2, posts: 5 });
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-second-pill]')).not.toBeNull());
+    const s = strip(container)!;
+    expect(s.getAttribute('data-strip-placement')).toBe('below');
+    expect(s.closest('[data-club-actions]')).toBeNull();
+    expect(s.style.gap).toBe('28px');
+    expect(s.style.margin).toBe('16px 20px 0px');
+  });
+
+  it('secondAction undefined (club tee-time pill), a team row, or three cells all go below', () => {
+    const club = hero({ stripCells: twoCells });
+    expect(strip(club.container)!.getAttribute('data-strip-placement')).toBe('below');
+    club.unmount();
+    const team = hero({ stripCells: twoCells, team: { onInsights: vi.fn() } as never });
+    expect(strip(team.container)!.getAttribute('data-strip-placement')).toBe('below');
+    team.unmount();
+    const three = hero({ secondAction: null, stripCells: [...twoCells, { key: 'extra', value: '3', label: 'Extra' }] });
+    expect(strip(three.container)!.getAttribute('data-strip-placement')).toBe('below');
+  });
+
+  it('no element inside the strip carries a divider border, in either placement', () => {
+    for (const placement of ['beside', 'below'] as const) {
+      const v = hero(placement === 'beside' ? { secondAction: null, stripCells: twoCells } : { stripCells: twoCells });
+      const s = strip(v.container)!;
+      expect(s.getAttribute('data-strip-placement')).toBe(placement);
+      for (const el of [s, ...Array.from(s.querySelectorAll<HTMLElement>('*'))]) {
+        for (const b of [el.style.borderTop, el.style.borderBottom, el.style.borderLeft]) {
+          expect(['', 'none'].includes(b)).toBe(true);
+        }
+      }
+      v.unmount();
+    }
+  });
+
+  it('no cells renders no strip, and the bio still renders', () => {
+    const v = hero({ secondAction: null, about: 'Clubs, fitting and everything in between, since 1998.' });
+    expect(strip(v.container)).toBeNull();
+    expect(v.container.querySelector('[data-club-about]')!.textContent).toContain('since 1998');
+  });
+
+  it('the coach strip renders its four keys, below', async () => {
+    Object.assign(coachState, { data: { n: 12, avg_change: -2.4 }, isSuccess: true, isError: false });
+    Object.assign(state, { business: fixture({ category: 'Coach / Instructor' }), followers: 3, posts: 2 });
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
+    expect(cellKeys(container)).toEqual(['coached', 'avgChange', 'followers', 'posts']);
+    expect(strip(container)!.getAttribute('data-strip-placement')).toBe('below');
+  });
+});
+
 describe('CB112 clubs unchanged', () => {
   it('club keeps the tee-time pill, Your courses white and its own cells', async () => {
     rpc.mockResolvedValue({ data: null, error: null });
