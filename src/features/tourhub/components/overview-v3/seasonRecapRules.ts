@@ -105,7 +105,15 @@ export function seasonWinnerFacts(events: SeasonEvent[]) {
 }
 
 export interface StandingRow { position: number; name: string; points: number | null; playerId: string | null }
-export interface CardEarner { name: string; age: number | null }
+export interface CardEarner { name: string; age: number | null; playerId: string | null; initialName: string }
+
+/** CARD LIST A: "A. Docherty" from first/last ("Min Woo" + "Lee" → "M. Lee");
+ * the full name unchanged when either part is missing. */
+export function cardListName(firstName: string | null | undefined, lastName: string | null | undefined, fullName: string): string {
+  const first = (firstName ?? '').trim();
+  const last = (lastName ?? '').trim();
+  return first && last ? `${first[0]}. ${last}` : fullName;
+}
 
 export interface RecapFactCell { key: 'events' | 'winners' | 'cards' | 'youngest' | 'mostWins'; value: string; small?: string }
 
@@ -126,17 +134,6 @@ export function recapFactCells(args: {
     out.push(args.tiedLeaders > 1
       ? { key: 'mostWins', value: String(args.maxWins), small: args.tiedLabel(args.tiedLeaders) }
       : { key: 'mostWins', value: String(args.maxWins), small: args.mostWinsSurname ?? undefined });
-  }
-  return out;
-}
-
-/** Column-major two-column order: 1–10 left, 11–20 right, rendered row by row. */
-export function columnMajor<T>(items: T[]): T[] {
-  const half = Math.ceil(items.length / 2);
-  const out: T[] = [];
-  for (let i = 0; i < half; i++) {
-    out.push(items[i]);
-    if (items[i + half] !== undefined) out.push(items[i + half]);
   }
   return out;
 }

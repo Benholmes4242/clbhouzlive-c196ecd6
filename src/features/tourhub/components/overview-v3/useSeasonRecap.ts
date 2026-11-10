@@ -25,7 +25,7 @@ import type { TourId } from '../../hooks/useOverviewData';
 import { OVERVIEW_TOUR_ORDER } from '../../_shared/tourOrder';
 import { firstPerTour, mapFallbackTournament } from './useOverviewFallbackSlides';
 import {
-  RECAP_CARD_LINE, ageAt, displayName, isFreshStandings, seasonWinnerFacts, surname,
+  RECAP_CARD_LINE, ageAt, cardListName, displayName, isFreshStandings, seasonWinnerFacts, surname,
   type CardEarner, type StandingRow,
 } from './seasonRecapRules';
 
@@ -162,10 +162,10 @@ export async function fetchSeasonRecap(tour: TourId, seasonId: string | null, ye
   const mapping = RECAP_CARD_LINE[tour];
   if (standings) {
     const ids = standings.slice(0, 100).map((x) => x.playerId).filter((x): x is string => !!x);
-    const people = new Map<string, { full_name: string | null; birth_date: string | null }>();
+    const people = new Map<string, { full_name: string | null; first_name: string | null; last_name: string | null; birth_date: string | null }>();
     if (ids.length) {
-      const pr = await supabase.from('sr_players').select('id, full_name, birth_date').in('id', ids);
-      for (const p of (pr.data ?? []) as Array<{ id: string; full_name: string | null; birth_date: string | null }>) people.set(p.id, p);
+      const pr = await supabase.from('sr_players').select('id, full_name, first_name, last_name, birth_date').in('id', ids);
+      for (const p of (pr.data ?? []) as Array<{ id: string; full_name: string | null; first_name: string | null; last_name: string | null; birth_date: string | null }>) people.set(p.id, p);
     }
     standings = standings.map((x) => ({ ...x, name: (x.playerId && people.get(x.playerId)?.full_name) || x.name }));
     if (mapping) {
@@ -180,8 +180,14 @@ export async function fetchSeasonRecap(tour: TourId, seasonId: string | null, ye
       if (line) {
         cardLine = { label: line.line_label, n: line.after_position };
         cardEarners = standings.slice(0, line.after_position).map((x) => {
-          const birth = x.playerId ? people.get(x.playerId)?.birth_date : null;
-          return { name: x.name, age: birth ? ageAt(birth, finalEnd) : null };
+          const person = x.playerId ? people.get(x.playerId) : undefined;
+          const birth = person?.birth_date ?? null;
+          return {
+            name: x.name,
+            age: birth ? ageAt(birth, finalEnd) : null,
+            playerId: x.playerId ?? null,
+            initialName: cardListName(person?.first_name, person?.last_name, x.name),
+          };
         });
       }
     }

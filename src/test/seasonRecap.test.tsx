@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
@@ -17,7 +17,7 @@ vi.mock('@/features/tourhub/hooks/usePickInsights', () => ({
 }));
 
 import {
-  RECAP_AFTER_DAYS, RECAP_NEXT_EVENT_WINDOW_DAYS, isBetweenSeasons, isFreshStandings, columnMajor, recapFactCells, ageAt,
+  RECAP_AFTER_DAYS, RECAP_NEXT_EVENT_WINDOW_DAYS, isBetweenSeasons, isFreshStandings, cardListName, recapFactCells, ageAt,
 } from '@/features/tourhub/components/overview-v3/seasonRecapRules';
 import { RecapPhotoBand, SeasonRecapBody, recapSentence } from '@/features/tourhub/components/overview-v3/SeasonRecapSections';
 import type { SeasonRecapData } from '@/features/tourhub/components/overview-v3/useSeasonRecap';
@@ -36,7 +36,10 @@ function kf(over: Partial<SeasonRecapData> = {}): SeasonRecapData {
     standings: KF_TOP20.map((name, i) => ({ position: i + 1, name, points: KF_POINTS[i] ?? 1000 - i, playerId: `p${i}` })),
     standingsSource: { table: 'tour_season_rankings', date: '2026-10-12T00:00:00Z' },
     cardLine: { label: 'TOP 20 · PGA TOUR CARD FOR 2027', n: 20 },
-    cardEarners: KF_TOP20.map((name) => ({ name, age: name === 'Blades Brown' ? 19 : 27 })),
+    cardEarners: KF_TOP20.map((name, i) => {
+      const [f, ...rest] = name.split(' ');
+      return { name, age: name === 'Blades Brown' ? 19 : 27, playerId: `p${i}`, initialName: `${f[0]}. ${rest.join(' ')}` };
+    }),
     ...over,
   };
 }
@@ -137,8 +140,8 @@ describe('recap body', () => {
     expect(css).toContain('.recap-block{padding-top:var(--hero-section-gap)}');
     expect(css).toContain('.recap-figs{margin-top:var(--hero-content-gap)}');
     expect(css).toContain('.recap-record-figs{margin:var(--hero-content-gap) 0 0}');
-    expect(css).toContain('grid-template-columns:repeat(2,max-content);column-gap:34px;justify-content:center');
-    expect(css).toContain('grid-template-columns:18px minmax(0,1fr);column-gap:10px');
+    expect(css).toContain('grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(var(--recap-rows-3),auto);grid-auto-flow:column;column-gap:12px');
+    expect(css).toContain('grid-template-columns:16px minmax(0,1fr);column-gap:7px');
     expect(css).toContain('.recap-cards span{text-align:right;');
   });
   it('facts row with a card line: EVENTS, WINNERS, CARDS, YOUNGEST', () => {
@@ -179,8 +182,8 @@ describe('recap body', () => {
     const rows = [...container.querySelectorAll('[data-recap-row]')].map((r) => [r.querySelector('.recap-name')!.textContent, r.querySelector('.recap-pts')!.textContent]);
     expect(rows).toEqual([['Ross Steelman', '2,221'], ['Sandy Scott', '2,191'], ['Ian Holt', '1,618']]);
     const cards = [...container.querySelectorAll('[data-recap-card]')].map((c) => c.querySelector('b')!.textContent);
-    expect(cards).toEqual(columnMajor(KF_TOP20));
-    expect(cards[0]).toBe('Ross Steelman'); expect(cards[1]).toBe('Cooper Dossey'); expect(cards[19]).toBe('Davis Lamb');
+    expect(cards).toEqual(KF_TOP20.map((name) => { const [f, ...rest] = name.split(' '); return `${f[0]}. ${rest.join(' ')}`; }));
+    expect(cards[0]).toBe('R. Steelman'); expect(cards[1]).toBe('S. Scott'); expect(cards[19]).toBe('D. Lamb');
     expect(container.querySelector('[data-recap-cards] h2')!.textContent).toBe('TOP 20 · PGA TOUR CARD FOR 2027');
     expect(container.querySelector('[data-recap-youngest]')!.textContent).toBe('Blades Brown earned his card at 19, the youngest of the 20.');
   });
@@ -215,5 +218,54 @@ describe('recap body', () => {
     const { container } = wrap(<SeasonRecapBody tour="champ" year={2026} data={champ} />);
     expect([...container.querySelectorAll('[data-recap-fact]')].map((c) => c.getAttribute('data-recap-fact'))).toEqual(['events', 'winners', 'mostWins']);
     expect(container.querySelector('[data-recap-board]')).toBeNull();
+  });
+});
+
+describe('card list A', () => {
+  const navLog: Array<{ pathname: string; state: unknown }> = [];
+  function LocProbe() {
+    const loc = useLocation();
+    React.useEffect(() => { navLog.push({ pathname: loc.pathname, state: loc.state }); }, [loc]);
+    return null;
+  }
+  it('cardListName: initial + surname, full name when a part is missing', () => {
+    expect(cardListName('Alistair', 'Docherty', 'Alistair Docherty')).toBe('A. Docherty');
+    expect(cardListName('Min Woo', 'Lee', 'Min Woo Lee')).toBe('M. Lee');
+    expect(cardListName(null, 'Lee', 'Min Woo Lee')).toBe('Min Woo Lee');
+    expect(cardListName('  ', 'Lee', 'Min Woo Lee')).toBe('Min Woo Lee');
+    expect(cardListName('Alistair', null, 'Alistair Docherty')).toBe('Alistair Docherty');
+  });
+  it('renders data-recap-card 1 to 20 in DOM order with row vars 7 and 10', () => {
+    const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
+    const grid = container.querySelector('.recap-cards') as HTMLElement;
+    expect(grid.style.getPropertyValue('--recap-rows-3')).toBe('7');
+    expect(grid.style.getPropertyValue('--recap-rows-2')).toBe('10');
+    const cells = [...container.querySelectorAll('[data-recap-card]')];
+    expect(cells.map((c) => c.getAttribute('data-recap-card'))).toEqual(Array.from({ length: 20 }, (_, i) => String(i + 1)));
+    expect(cells[3].querySelector('b')!.textContent).toBe('A. Docherty');
+    expect(cells[3].getAttribute('aria-label')).toBe('Alistair Docherty');
+  });
+  it('tapping card 4 and a points-list name opens the player page with the tour-hub referrer', () => {
+    navLog.length = 0;
+    const { container } = wrap(<><SeasonRecapBody tour="pgad" year={2026} data={kf()} /><LocProbe /></>);
+    fireEvent.click(container.querySelector('[data-recap-card="4"]')!);
+    expect(navLog.at(-1)).toEqual({ pathname: '/tourhub/player/p3', state: { referrer: { kind: 'tour-hub' } } });
+    fireEvent.click(container.querySelector('[data-recap-row="2"] .recap-name')!);
+    expect(navLog.at(-1)).toEqual({ pathname: '/tourhub/player/p1', state: { referrer: { kind: 'tour-hub' } } });
+  });
+  it('a card earner with no playerId renders plain text, not a button', () => {
+    const data = kf();
+    data.cardEarners = data.cardEarners.map((e, i) => (i === 0 ? { ...e, playerId: null } : e));
+    const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={data} />);
+    const first = container.querySelector('[data-recap-card="1"]')!;
+    expect(first.tagName).toBe('DIV');
+    expect(container.querySelector('[data-recap-card="2"]')!.tagName).toBe('BUTTON');
+  });
+  it('hybrid-hero.css has no centred max-content card grid and no 340px card rule', () => {
+    const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
+    const cardRules = css.split('}').filter((r) => r.includes('.recap-cards'));
+    expect(cardRules.join('}')).not.toContain('max-content');
+    expect(cardRules.join('}')).not.toContain('justify-content:center');
+    expect(css).not.toContain('max-width:340px){.recap-cards');
   });
 });

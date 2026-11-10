@@ -5,8 +5,10 @@
  * bottom anchoring as every state, no spine. SeasonRecapBody renders under the
  * tour buttons: facts, final standings, card list and Our record. Every list
  * part renders only from fresh standings (isFreshStandings).
- * Recap headings/cells reuse completedWeek.css rhythm; card rows retain their
- * column-major order in an intrinsic centred grid with a narrow fallback.
+ * Recap headings/cells reuse completedWeek.css rhythm. CARD LIST A: the card
+ * list is a full-width three-column grid (two below 360px) flowing by column
+ * in plain DOM order, names as initial + surname, every cell and every points
+ * list name opening that player's tour player page (plain text without an id).
  */
 import { useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -25,8 +27,9 @@ import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { formatOverviewDateRange } from './HybridHero';
 import type { HeroState } from './HybridHero.utils';
 import {
-  RECAP_CARD_LIST_MAX, columnMajor, fmtPoints, recapFactCells, recapPronoun, surname, youngestEarner,
+  RECAP_CARD_LIST_MAX, fmtPoints, recapFactCells, recapPronoun, surname, youngestEarner,
 } from './seasonRecapRules';
+import { playerRoute } from '../../routes';
 import type { SeasonRecapData } from './useSeasonRecap';
 import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import '../../tournament-v2/sections/completedWeek.css';
@@ -98,8 +101,10 @@ export function RecapFacts({ data }: { data: SeasonRecapData }) {
 }
 
 export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecapData }) {
-  /* Restore only THE POINTS LIST kicker; the Full list link stays retired. */
+  /* Restore only THE POINTS LIST kicker; the Full list link stays retired.
+     CARD LIST A: each name opens that player's tour player page; no id = plain text. */
   const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const rows = (data.standings ?? []).slice(0, 3);
   if (!rows.length) return null;
   return <section data-recap-board className="upcoming-block recap-block">
@@ -110,7 +115,9 @@ export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecap
     <div data-recap-table className="recap-table">
     {rows.map((r) => <div key={r.position} className="recap-grid recap-row" data-recap-row={r.position}>
       <span className="recap-pos">{r.position === 1 ? <Trophy data-recap-trophy size={13} className="recap-trophy" aria-label="1" /> : r.position}</span>
-      <span className="recap-name">{r.name}</span>
+      {r.playerId
+        ? <Button variant="ghost" className="recap-name" aria-label={r.name} onClick={() => { const target = playerRoute(r.playerId as string, { kind: 'tour-hub' }); navigate(target.to, { state: target.state }); }}>{r.name}</Button>
+        : <span className="recap-name">{r.name}</span>}
       <span className="recap-pts">{r.points != null ? fmtPoints(r.points) : ''}</span>
     </div>)}
     </div>
@@ -126,9 +133,18 @@ export function RecapCardList({ tour, data }: { tour: TourId; data: SeasonRecapD
   }
   const list = data.cardEarners.map((e, i) => ({ ...e, pos: i + 1 }));
   const young = youngestEarner(data.cardEarners);
+  const rows3 = Math.ceil(list.length / 3);
+  const rows2 = Math.ceil(list.length / 2);
   return <section data-recap-cards className="upcoming-block recap-block">
     <h2 className="upcoming-kicker recap-kicker-only">{label}</h2>
-    <div className="recap-cards">{columnMajor(list).map((e) => <div key={e.pos} data-recap-card={e.pos}><span>{e.pos}</span><b>{e.name}</b></div>)}</div>
+    <div className="recap-cards" style={{ '--recap-rows-3': rows3, '--recap-rows-2': rows2 } as React.CSSProperties}>
+      {list.map((e) => {
+        const cell = <><span>{e.pos}</span><b>{e.initialName}</b></>;
+        return e.playerId
+          ? <Button key={e.pos} variant="ghost" data-recap-card={e.pos} aria-label={e.name} onClick={() => { const target = playerRoute(e.playerId as string, { kind: 'tour-hub' }); navigate(target.to, { state: target.state }); }}>{cell}</Button>
+          : <div key={e.pos} data-recap-card={e.pos}>{cell}</div>;
+      })}
+    </div>
     {young ? <p data-recap-youngest className="recap-foot"><Trans t={t} i18nKey={`overview.recap.youngestLine_${recapPronoun(tour)}`} values={{ name: young.name, age: young.age, count: n }} components={{ b: <b /> }} /></p> : null}
   </section>;
 }
