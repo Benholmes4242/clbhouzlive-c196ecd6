@@ -1,10 +1,10 @@
 # Roadmap
 
-## In progress: Featured round Follow ruling + close-out
-Restore FeedFollowPill inline after the date with canonical handlers; hide on own rounds.
-Update the qualifier regression for both states and own-round absence.
-Run fresh after-shards separately, check 320/390/430 with production styles, and write FEATURED_ROUND_REPORT.md.
-Baseline 8,031; latest full run 8,038 includes six featured tests and one SIGNIN_FIX_2 test.
+## Done: Featured round Follow ruling + close-out
+Canonical inline Follow restored on date line; own rounds hide it.
+Focused 51/51; sequential shards 2,087 / 1,916 / 2,066 / 1,971 = 8,040, zero failures.
+320/390/430 real-style fixtures passed 18 collision/ellipsis/date-line checks.
+Report: FEATURED_ROUND_REPORT.md. Live-account device checks blocked by external_unmanaged auth; listed in report.
 
 ## In progress: Last year lookup + missing-leaderboard sweep
 Before-change shards executed separately: 2,087 / 1,908 / 2,049 / 1,968 = 8,012 executed (8,011 passed, 1 failed).
