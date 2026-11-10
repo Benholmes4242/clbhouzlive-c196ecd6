@@ -24,7 +24,7 @@ describe('Tour and chrome English interpolation contract', () => {
         if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 't' && node.arguments[0] && ts.isStringLiteral(node.arguments[0])) {
           const options = node.arguments.find((arg, index) => index > 0 && ts.isObjectLiteralExpression(arg));
           if (options && ts.isObjectLiteralExpression(options)) {
-            const supplied = new Set(options.properties.filter(ts.isPropertyAssignment).map(prop => prop.name.getText(tree).replace(/^['"]|['"]$/g, '')));
+            const supplied = new Set(options.properties.filter(prop => ts.isPropertyAssignment(prop) || ts.isShorthandPropertyAssignment(prop)).map(prop => prop.name.getText(tree).replace(/^['"]|['"]$/g, '')));
             const nsProp = options.properties.find(prop => ts.isPropertyAssignment(prop) && prop.name.getText(tree) === 'ns');
             const namespace = nsProp && ts.isPropertyAssignment(nsProp) && ts.isStringLiteral(nsProp.initializer) ? nsProp.initializer.text : defaultNs;
             const key = node.arguments[0].text;
