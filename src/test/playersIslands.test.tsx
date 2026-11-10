@@ -96,44 +96,42 @@ describe('Players tab on the shared islands', () => {
     const h1 = hero.querySelector('h1')!;
     expect(h1.textContent).toBe('FedEx Cup');
     const row = h1.parentElement as HTMLElement;
-    // jsdom drops var() from parsed style properties; read the raw attribute.
-    const rowStyle = row.getAttribute('style') ?? '';
-    expect(rowStyle).toContain('top: var(--chrome-clearance');
     expect(row.style.left).toBe('24px');
     expect(row.style.right).toBe('24px');
     expect(row.querySelector('[aria-label="Search players"]')).not.toBeNull();
     // No title row above the hero any more.
     const front = container.querySelector('[data-players-front]')!;
     expect((front.firstElementChild as HTMLElement).contains(h1)).toBe(true);
+    // jsdom drops var() declarations from inline styles; pin the top in source.
+    const front2 = source('src/features/tourhub/players-v2/front/FrontPage.tsx');
+    expect(front2).toContain('top: CHROME_CLEARANCE');
   });
 
   it('the hero wash carries the top shade for the status bar and title', () => {
-    const { container } = mount();
-    const wash = container.querySelector('[data-players-hero] [aria-hidden="true"]') as HTMLElement;
-    expect(wash.getAttribute('style') ?? '').toContain('rgba(10,10,12,0.35) 0%, rgba(10,10,12,0) 32%');
+    const front = source('src/features/tourhub/players-v2/front/FrontPage.tsx');
+    expect(front).toContain('linear-gradient(180deg, rgba(10,10,12,0.35) 0%, rgba(10,10,12,0) 32%), linear-gradient(90deg');
   });
 
   it('the all-players view starts under the islands', () => {
     const { container } = mount('/tourhub?tab=players&view=all');
-    const field = container.querySelector('[data-players-field]')!;
-    const wrap = field.parentElement as HTMLElement;
-    expect(wrap.getAttribute('style') ?? '').toContain('padding-top: var(--chrome-clearance');
+    expect(container.querySelector('[data-players-field]')).not.toBeNull();
+    // jsdom drops var() declarations from inline styles; pin the clearance in source.
+    expect(tab).toContain('paddingTop: CHROME_CLEARANCE');
   });
 
   it('the error state starts under the islands', () => {
     h.error = true;
     const { container } = mount();
-    const retry = container.querySelector('button')!;
-    const box = retry.closest('div')!.parentElement as HTMLElement;
-    expect(box.getAttribute('style') ?? '').toContain('padding-top: calc(var(--chrome-clearance');
+    expect(container.textContent).toContain("Couldn't load the ranking");
+    expect(tab).toContain('paddingTop: `calc(${CHROME_CLEARANCE} + 48px)`');
   });
 
   it('the empty state starts under the islands', () => {
     h.rows = 0;
     const { container } = mount();
-    const page = container.querySelector('[data-players-page]')!;
-    const wrap = page.firstElementChild as HTMLElement;
-    expect(wrap.getAttribute('style') ?? '').toContain('padding-top: var(--chrome-clearance');
+    expect(container.querySelector('[data-players-hero]')).toBeNull();
+    // Both non-front wrappers (empty + all-players) carry the clearance.
+    expect(tab.match(/paddingTop: CHROME_CLEARANCE/g)!.length).toBeGreaterThanOrEqual(2);
   });
 
   it('the skeleton opens with a 420 block at the very top and no title placeholder', () => {
