@@ -20,6 +20,8 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { reactionKindFor } from '@/lib/reactionKind';
 import { isPortraitSource, type ReasonLine } from './watchRules';
 import { attachPosterPreview } from './posterPreview';
+import { postAuthor } from '@/lib/postAuthor';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 
 /**
  * THE LONG-FORM VIDEO UNIT — ONE UNIT, TWO SIZES (BRIEF_EXPLORE_ALL_VIDEO).
@@ -43,7 +45,9 @@ export function videoTitle(row: HubRpcRow, fallback: string, detailsTitle?: stri
 }
 
 export function creatorName(row: HubRpcRow): string {
-  return (row.creator_display_name || row.creator_username || '').toString();
+  // ONE RULE (postAuthor): a business post is by the business, never the
+  // uploader — name, logo and tick all come from the business fields.
+  return postAuthor(row).name;
 }
 
 /**
@@ -217,11 +221,12 @@ export function VideoCard({
   const rail = size === 'rail';
   const magazine = context === 'all';
   const title = videoTitle(row, t('amateur.watch.untitled', 'Untitled video'));
-  const who = creatorName(row);
+  const author = postAuthor(row);
+  const who = author.name;
   const when = formatRelativeAgo(row.post_created_at ?? null);
   /* K.4 LINE ONE: {creator} · {age}. View counts are not shown on Watch (BRIEF_WATCH_NO_VIEWS). */
   const meta = [who, when].filter(Boolean).join(' \u00B7 ');
-  const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
+  const initial = getInitialsFromName(who) || '?';
   const poster = posterFor(row, rail ? 480 : 720);
   const [posterFailed, setPosterFailed] = useState(false);
 
@@ -318,9 +323,9 @@ export function VideoCard({
         </span>
       ) : (
         <span style={{ display: 'flex', gap: 11, padding: magazine ? '8px 4px 0' : '11px 14px 15px', alignItems: 'flex-start' }}>
-          {row.creator_avatar_url ? (
+          {author.avatarUrl ? (
             <img
-              src={row.creator_avatar_url}
+              src={author.avatarUrl}
               alt=""
               loading="lazy"
               style={{ width: 36, height: 36, borderRadius: 11, objectFit: 'cover', flex: 'none' }}

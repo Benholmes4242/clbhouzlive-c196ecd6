@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { HubRpcRow } from '../utils/toFeedPost';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { postAuthor } from '@/lib/postAuthor';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -122,7 +123,8 @@ function Tile({
       >
         {title}
       </div>
-      {(row.creator_display_name || row.creator_username) ? (
+      {/* ONE RULE (postAuthor): a business post shows the business, never the uploader. */}
+      {postAuthor(row).name ? (
         <div
           style={{
             fontWeight: 500,
@@ -134,7 +136,7 @@ function Tile({
             textOverflow: 'ellipsis',
           }}
         >
-          {row.creator_display_name || row.creator_username}
+          {postAuthor(row).name}
         </div>
       ) : null}
 

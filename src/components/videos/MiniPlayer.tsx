@@ -12,6 +12,7 @@ import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloud
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
 import { VideoEngine } from '@/video/VideoEngine';
 import { MuteButton } from '@/audio/MuteButton';
+import { postAuthor } from '@/lib/postAuthor';
 
 type MiniVideo = {
   id: string;
@@ -80,13 +81,26 @@ export const MiniPlayer: React.FC = () => {
         const hlsUrl = uid ? generateHlsUrl(uid) : media.media_url;
         const posterUrl = media.poster_url || (uid ? generateThumbnailUrl(uid) : undefined);
         const user = Array.isArray(post.user) ? post.user[0] : post.user;
+        const business = Array.isArray(post.business) ? post.business[0] : post.business;
         const title = post.content?.split("\n")[0]?.substring(0, 100) || "Untitled Video";
+
+        // ONE RULE (postAuthor): a business post is by the business, never the uploader.
+        const author = postAuthor({
+          actor_type: post.actor_type,
+          actor_id: post.actor_id,
+          post_user_id: post.user_id,
+          business_name: business?.name ?? null,
+          business_logo_url: business?.logo_url ?? null,
+          creator_display_name: user?.display_name ?? null,
+          creator_username: user?.username ?? null,
+          creator_avatar_url: user?.profile_photo_url ?? null,
+        });
 
         setVideoData({
           id: post.id,
           title,
-          creatorName: user?.display_name || user?.username || "Unknown",
-          creatorAvatarUrl: user?.profile_photo_url,
+          creatorName: author.name || "Unknown",
+          creatorAvatarUrl: author.avatarUrl ?? undefined,
           hlsUrl,
           posterUrl,
         });

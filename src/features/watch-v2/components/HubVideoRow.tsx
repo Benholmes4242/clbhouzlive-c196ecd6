@@ -18,6 +18,8 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { VideoCardMoreButton } from './VideoCardMoreButton';
 import type { HubRpcRow } from '../utils/toFeedPost';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { postAuthor } from '@/lib/postAuthor';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
@@ -42,12 +44,9 @@ function Card({
     ? stripMentionMarkup(String(row.post_content)).trim()
     : '';
   const title = stripped || row.course_name || 'Untitled video';
-  const initial =
-    (row.creator_display_name || row.creator_username || '?')
-      .toString()
-      .trim()
-      .charAt(0)
-      .toUpperCase() || '?';
+  // ONE RULE (postAuthor): a business post shows the business, never the uploader.
+  const author = postAuthor(row);
+  const initial = getInitialsFromName(author.name) || '?';
 
   const hlsUrl = post.mediaItems[0]?.hlsUrl ?? null;
   const isVideo = post.mediaItems[0]?.type === 'video';
@@ -129,9 +128,9 @@ function Card({
       </div>
 
       <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
-        {row.creator_avatar_url ? (
+        {author.avatarUrl ? (
           <img
-            src={row.creator_avatar_url}
+            src={author.avatarUrl}
             alt=""
             style={{
               width: 30,
@@ -175,7 +174,7 @@ function Card({
           >
             {title}
           </div>
-          {((row.creator_display_name || row.creator_username) || Number(row.like_count ?? 0) > 0) ? (
+          {(author.name || Number(row.like_count ?? 0) > 0) ? (
             <div
               style={{
                 display: 'flex',
@@ -188,9 +187,9 @@ function Card({
                 minWidth: 0,
               }}
             >
-              {(row.creator_display_name || row.creator_username) ? (
+              {author.name ? (
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                  {row.creator_display_name || row.creator_username}
+                  {author.name}
                 </span>
               ) : null}
 

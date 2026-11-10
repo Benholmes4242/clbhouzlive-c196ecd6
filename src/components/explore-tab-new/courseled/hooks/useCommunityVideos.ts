@@ -77,7 +77,7 @@ export function useCommunityVideos() {
       const { data, error } = await supabase
         .from('posts')
         .select(
-          `id, user_id, content, created_at, like_count, tagged_course_ids,
+          `id, user_id, actor_id, actor_type, content, created_at, like_count, tagged_course_ids,
            post_media!inner ( id, media_type, media_url, poster_url, hls_url, stream_id, duration_seconds, display_order )`,
         )
         .eq('status', 'published')
@@ -89,6 +89,8 @@ export function useCommunityVideos() {
       type Row = {
         id: string;
         user_id: string;
+        actor_id: string | null;
+        actor_type: string | null;
         content: string | null;
         created_at: string;
         like_count: number | null;
@@ -139,6 +141,15 @@ export function useCommunityVideos() {
 
       // Identities, and course names only for the rare tagged post.
       const userIds = Array.from(new Set(candidates.map((c) => c.row.user_id)));
+      // ONE RULE (postAuthor): business posts are by the business, so the
+      // business identity is fetched alongside the uploader profiles.
+      const businessIds = Array.from(
+        new Set(
+          candidates
+            .filter((c) => c.row.actor_type === 'business' && c.row.actor_id)
+            .map((c) => c.row.actor_id as string),
+        ),
+      );
       const courseIds = Array.from(
         new Set(
           candidates
@@ -146,11 +157,14 @@ export function useCommunityVideos() {
             .filter((id): id is string => !!id),
         ),
       );
-      const [{ data: profiles }, coursesRes] = await Promise.all([
+      const [{ data: profiles }, { data: businesses }, coursesRes] = await Promise.all([
         supabase
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url')
           .in('id', userIds),
+        businessIds.length
+          ? supabase.from('business_accounts').select('id, name, logo_url').in('id', businessIds)
+          : Promise.resolve({ data: [] as Array<{ id: string; name: string; logo_url: string | null }> }),
         courseIds.length
           ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
           : Promise.resolve({ data: [] as Array<{ id: string; name: string }> }),
@@ -163,6 +177,9 @@ export function useCommunityVideos() {
           profile_photo_url: string | null;
         }>).map((p) => [p.id, p]),
       );
+      const businessById = new Map(
+        ((businesses ?? []) as Array<{ id: string; name: string; logo_url: string | null }>).map((b) => [b.id, b]),
+      );
       const courseNameById = new Map(
         ((coursesRes.data ?? []) as Array<{ id: string; name: string }>).map((c) => [
           c.id,
@@ -173,6 +190,8 @@ export function useCommunityVideos() {
       const mapped: CommunityVideo[] = candidates
         .map(({ row, media }) => {
           const profile = profileById.get(row.user_id);
+          const business =
+            row.actor_type === 'business' ? businessById.get(row.actor_id ?? '') : undefined;
           const taggedId = row.tagged_course_ids?.[0] ?? null;
           return {
             key: `${row.id}-${media.id}`,
@@ -188,8 +207,8 @@ export function useCommunityVideos() {
             hlsUrl: media.stream_id
               ? generateStreamHlsUrl(media.stream_id)
               : media.hls_url ?? null,
-            displayName: profile?.display_name ?? profile?.username ?? 'Player',
-            avatarUrl: profile?.profile_photo_url ?? null,
+            displayName: business?.name ?? profile?.display_name ?? profile?.username ?? 'Player',
+            avatarUrl: business?.logo_url ?? profile?.profile_photo_url ?? null,
             // MULTIPLE TAGS: the FIRST resolvable name only, never concatenated.
             courseName: taggedId ? courseNameById.get(taggedId) ?? null : null,
           };
