@@ -24,38 +24,6 @@ import { setGuestTourContext } from '@/features/guest/guestGateStore';
 import { useRetiredTourRedirect } from '../hooks/useRetiredTourRedirect';
 
 /**
- * SubTabTourControl — the sub-tab header's tour control (BRIEF_TOUR_ISLAND):
- * the same sentence-case label as the island, opening the same TourGlance
- * tile. The burger drawer is gone from the Tour hub.
- */
-export function SubTabTourControl({ activeTab, onOpen }: { activeTab: string; onOpen: (anchor: HTMLElement) => void }) {
-  const d = useTourIslandDescriptor(activeTab);
-  return (
-    <button
-      type="button"
-      aria-label="Change tour"
-      onClick={(e) => onOpen(e.currentTarget)}
-      style={{
-        height: 36, display: 'flex', alignItems: 'center', gap: 7, padding: '0 10px',
-        background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-        color: '#F8FAFC', fontSize: 14, fontWeight: 700,
-      }}
-    >
-      <span>{d.label}</span>
-      <TourIcon n="down" s={11.4} c="rgba(248,250,252,0.42)" w={2.2} />
-    </button>
-  );
-}
-
-const TAB_TITLES: Record<string, string> = {
-  news: 'News',
-  /* BRIEF_TOUR_ISLAND §4: the tab reads "Leaderboards", not "Live". */
-  live: 'Leaderboards',
-  schedule: 'Schedule',
-  players: 'Players',
-};
-
-/**
  * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with the
  * ONE tour control (BRIEF_TOUR_ISLAND): the TourIsland showing the tour in
  * view plus one line of context, opening TourGlance. The burger drawer and
@@ -187,7 +155,7 @@ export function TourHubMainPage() {
       case 'overview':
         return <OverviewTab />;
       case 'news':
-        return <NewsTab immersiveHero={false} />;
+        return <NewsTab immersiveHero={false} islands />;
       case 'live':
         return <LeaderboardTab />;
       case 'schedule':
