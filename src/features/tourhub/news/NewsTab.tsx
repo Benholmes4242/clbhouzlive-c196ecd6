@@ -19,6 +19,13 @@
  *
  * LeadStory / StoryRow below are legacy exports kept for their existing
  * importers (amateur surfaces); the rebuilt page does not use them.
+ *
+ * NEWS ISLANDS (10 Nov 2026): the `islands` prop (default false) converts the
+ * page for the shared-island hub — the lead photo bleeds into the notch at
+ * 500px with the "Tour News" head overlaid at CHROME_CLEARANCE, the fresh
+ * line moves directly below the photo, and search/empty/loading start at
+ * CHROME_CLEARANCE. WireNewsPage (/tour/news) and every other caller keep the
+ * default and are visually unchanged.
  */
 import React, { Fragment, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
