@@ -40,3 +40,14 @@ export const CHROME_CLEARANCE_VAR = '--chrome-clearance';
  */
 export const CHROME_CLEARANCE =
   `var(${CHROME_CLEARANCE_VAR}, calc(env(safe-area-inset-top, 0px) + var(${CHROME_ISLAND_H_VAR}, ${CHROME_ISLAND_H_FALLBACK}px) + ${CHROME_TOP_GAP + CHROME_BREATHING}px))`;
+
+/**
+ * The same clearance as a NUMBER of px, for scroll maths that cannot consume
+ * a CSS length. Reads the computed --chrome-clearance; falls back to the
+ * unmeasured island height + gap + breathing when unset or NaN.
+ */
+export function chromeClearancePx(): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(CHROME_CLEARANCE_VAR);
+  const px = parseFloat(raw);
+  return raw && !Number.isNaN(px) ? px : CHROME_ISLAND_H_FALLBACK + CHROME_TOP_GAP + CHROME_BREATHING;
+}
