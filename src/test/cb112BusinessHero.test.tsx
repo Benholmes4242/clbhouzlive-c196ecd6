@@ -246,21 +246,21 @@ describe('CB112 team row', () => {
 });
 
 describe('CB112 figure strip', () => {
-  it('pure order: nearby categories lead, zeros skipped, three max', () => {
-    const h = 'Hotel / Accommodation';
-    expect(businessStripKeys(h, { coursesNear: 6, top100Near: 1, followers: 212, posts: 9 })).toEqual(['coursesNear', 'top100Near', 'followers']);
-    expect(businessStripKeys(h, { coursesNear: 6, top100Near: 0, followers: 212, posts: 9 })).toEqual(['coursesNear', 'followers', 'posts']);
-    expect(businessStripKeys(h, { coursesNear: null, top100Near: null, followers: 3, posts: 2 })).toEqual(['followers', 'posts']);
-    expect(businessStripKeys('Brand / Manufacturer', { coursesNear: 6, top100Near: 1, followers: 3, posts: 2 })).toEqual(['followers', 'posts']);
+  it('pure order: followers then posts for every category, zeros dropped', () => {
+    for (const c of ['Hotel / Accommodation', 'Resort', 'Restaurant / Cafe', 'Bar / Pub', 'Driving Range']) {
+      expect(businessStripKeys(c, { coursesNear: 99, top100Near: 5, followers: 212, posts: 9 } as never)).toEqual(['followers', 'posts']);
+    }
+    expect(businessStripKeys('Hotel / Accommodation', { followers: 0, posts: 9 })).toEqual(['posts']);
     expect(businessStripKeys('Creator', { followers: 0, posts: 4 })).toEqual(['posts']);
     expect(businessStripKeys('Creator', { followers: 0, posts: 0 })).toEqual([]);
   });
-  it('hotel with 6 near and 1 Top 100 shows Courses near · Top 100 near · Followers', async () => {
+  it('hotel with 6 near and 1 Top 100 still shows Followers · Posts only', async () => {
     Object.assign(state, { business: fixture({ lat: 51.4, lng: 0.01 }), nearby: { coursesNear: 6, top100Near: 1 }, followers: 212, posts: 9 });
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
-    expect(cellKeys(container)).toEqual(['coursesNear', 'top100Near', 'followers']);
-    expect(container.querySelector('[data-cell="coursesNear"]')!.tagName).toBe('BUTTON');
+    expect(cellKeys(container)).toEqual(['followers', 'posts']);
+    expect(container.querySelector('[data-cell="coursesNear"]')).toBeNull();
+    expect(container.querySelector('[data-cell="followers"]')!.tagName).toBe('BUTTON');
   });
   it('no pin shows Followers · Posts; zero values give no strip', async () => {
     Object.assign(state, { business: fixture(), nearby: undefined, followers: 3, posts: 2 });
