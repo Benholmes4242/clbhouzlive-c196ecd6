@@ -75,7 +75,7 @@ function Minis({ children }: { children: ReactNode }) {
   return <div data-minis style={{ marginTop: 8, display: 'flex', flexDirection: 'column' }}>{children}</div>;
 }
 
-function Hero({ data }: { data: PageData }) {
+function Hero({ data, actions }: { data: PageData; actions: PageActions }) {
   const [leader, second] = data.players;
   if (!leader) return null;
   const gap = leader.points != null && second?.points != null ? Math.round(leader.points - second.points) : null;
@@ -92,9 +92,15 @@ function Hero({ data }: { data: PageData }) {
   const figs: Array<[string, string]> = [[leader.points != null ? fmtInt(leader.points) : '–', 'PTS'], [String(leader.wins ?? 0), 'WINS']];
   if (scoring) figs.push([scoring, 'SCORING']);
   return (
-    <section data-players-hero style={{ position: 'relative', marginTop: 16, height: 330, overflow: 'hidden', background: 'linear-gradient(180deg, #59606B 0%, #2A2D33 55%, #0A0A0C 100%)' }}>
+    <section data-players-hero style={{ position: 'relative', marginTop: 0, height: 420, overflow: 'hidden', background: 'linear-gradient(180deg, #59606B 0%, #2A2D33 55%, #0A0A0C 100%)' }}>
       <HeroPortrait p={leader} />
-      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.15) 60%, rgba(10,10,12,0) 100%), linear-gradient(180deg, rgba(10,10,12,0) 55%, rgba(10,10,12,0.85) 100%)' }} />
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,10,12,0.35) 0%, rgba(10,10,12,0) 32%), linear-gradient(90deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.15) 60%, rgba(10,10,12,0) 100%), linear-gradient(180deg, rgba(10,10,12,0) 55%, rgba(10,10,12,0.85) 100%)' }} />
+      {/* PLAYERS ISLANDS (10 Nov 2026): the title row lives INSIDE the hero,
+          just under the shared islands, above the wash. */}
+      <div style={{ position: 'absolute', top: CHROME_CLEARANCE, left: 24, right: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, zIndex: 1 }}>
+        <h1 style={{ margin: 0, fontSize: 22, lineHeight: 1.15, fontWeight: 800, color: P.INK }}>{data.title}</h1>
+        <SearchButton label="Search players" onClick={() => actions.openAll({ from: 'search', search: true })} />
+      </div>
       <div style={{ position: 'absolute', left: 24, right: 24, bottom: 22 }}>
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(248,250,252,0.72)' }}>THE SEASON</div>
         <h2 data-hero-headline style={{ margin: '8px 0 0', maxWidth: 240, fontSize: 28, lineHeight: 1.08, fontWeight: 800, color: P.INK }}>{headline}</h2>
@@ -267,11 +273,7 @@ export function FrontPage({ data, actions }: { data: PageData; actions: PageActi
   const n = data.players.length;
   return (
     <div data-players-front>
-      <div style={{ margin: '22px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <h1 style={{ margin: 0, fontSize: 22, lineHeight: 1.15, fontWeight: 800, color: P.INK }}>{data.title}</h1>
-        <SearchButton label="Search players" onClick={() => actions.openAll({ from: 'search', search: true })} />
-      </div>
-      <Hero data={data} />
+      <Hero data={data} actions={actions} />
       {sentence ? <p data-situation style={{ margin: '18px 24px 0', fontSize: 13.5, lineHeight: 1.45, color: P.MUTE }}><RichText rich={sentence} /></p> : null}
       <Clock data={data} />
       {lines.map((stake, i) => (
@@ -299,8 +301,8 @@ export function FrontSkeleton() {
   const block = (h: number, m = '14px 16px 0', r = 18) => <div style={{ margin: m, height: h, borderRadius: r, background: P.CARD }} />;
   return (
     <div data-players-skeleton aria-busy="true">
-      <div style={{ margin: '22px 24px 0', height: 36, display: 'flex', alignItems: 'center' }}><div style={{ width: 140, height: 22, borderRadius: 6, background: P.CARD }} /></div>
-      <div style={{ marginTop: 16, height: 330, background: P.CARD }} />
+      {/* Mirrors the bleeding hero: 420 tall at the very top, no title row. */}
+      <div style={{ marginTop: 0, height: 420, background: P.CARD }} />
       <div style={{ margin: '18px 24px 0', height: 58, borderRadius: 8, background: P.CARD }} />
       {block(330, '20px 16px 0')}
       {block(330)}
