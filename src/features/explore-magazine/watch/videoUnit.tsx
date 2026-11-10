@@ -221,11 +221,12 @@ export function VideoCard({
   const rail = size === 'rail';
   const magazine = context === 'all';
   const title = videoTitle(row, t('amateur.watch.untitled', 'Untitled video'));
-  const who = creatorName(row);
+  const author = postAuthor(row);
+  const who = author.name;
   const when = formatRelativeAgo(row.post_created_at ?? null);
   /* K.4 LINE ONE: {creator} · {age}. View counts are not shown on Watch (BRIEF_WATCH_NO_VIEWS). */
   const meta = [who, when].filter(Boolean).join(' \u00B7 ');
-  const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
+  const initial = getInitialsFromName(who) || '?';
   const poster = posterFor(row, rail ? 480 : 720);
   const [posterFailed, setPosterFailed] = useState(false);
 
