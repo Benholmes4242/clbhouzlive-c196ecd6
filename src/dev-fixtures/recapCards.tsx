@@ -6,13 +6,13 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import tourhub from '../../public/locales/en/tourhub.json';
 import '../index.css';
 import '../styles/hybrid-hero.css';
 import { SeasonRecapBody } from '../features/tourhub/components/overview-v3/SeasonRecapSections';
 import type { SeasonRecapData } from '../features/tourhub/components/overview-v3/useSeasonRecap';
 
 const i18n = i18next.createInstance();
+const tourhub = await (await fetch('/locales/en/tourhub.json')).json();
 i18n.use(initReactI18next).init({ lng: 'en', ns: ['tourhub'], defaultNS: 'tourhub', resources: { en: { tourhub } }, interpolation: { escapeValue: false } });
 
 const KF_TOP20 = ['Ross Steelman', 'Sandy Scott', 'Ian Holt', 'Alistair Docherty', 'Alvaro Ortiz', 'Austin Hitt', 'Cole Sherwood', 'Doc Redman', 'Blades Brown', 'Tommy Morrison', 'Cooper Dossey', 'Hunter Eichhorn', 'Dylan Menante', 'Michael Johnson', 'Jeremy Gandon', 'Taylor Dickson', 'Ian Gilligan', 'Davis Shore', 'Carson Young', 'Davis Lamb'];
