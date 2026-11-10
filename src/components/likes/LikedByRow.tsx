@@ -268,6 +268,7 @@ export function LikedByRow({
   return (
     <>
     <div
+      data-liked-by-row="true"
       style={{
         display: 'grid',
         gridTemplateRows: isOpen ? '1fr' : '0fr',
