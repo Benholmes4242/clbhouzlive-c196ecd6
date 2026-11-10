@@ -34,6 +34,8 @@ import { useTourPlayerFollows } from '../leaderboard/useTourPlayerFollows';
 import { useComingUpOwnRounds } from '../overview/data/useComingUpOwnRounds';
 import { displayEventName } from '../overview/sections/ComingUp';
 import { getScrollAncestor, scrollElementIntoView } from '@/lib/getScrollParent';
+import { CHROME_CLEARANCE, chromeClearancePx } from '@/lib/chromeClearance';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { currentWeekKey, weekRelation } from './timelineUtils';
 import {
   followedFieldNames,
@@ -173,8 +175,11 @@ export function ScheduleTab() {
 
   // The sticky chips row is GONE (BRIEF_TOUR_HEADER_ONE_ROW): the tour control
   // now lives in the island's left capsule. --tour-chips-h is still read by the
-  // week-header offset and the anchor scroll maths, and both readers carry a
-  // 47px fallback — so it must be written as 0, never left unset.
+  // anchor scroll maths, which carry a 47px fallback — so it must be written
+  // as 0, never left unset. SHARED ISLANDS (10 Nov 2026): the page renders
+  // under the islands like Leaderboards — root paddingTop CHROME_CLEARANCE,
+  // sticky week headers dock at calc(CHROME_CLEARANCE - 1px), and every old
+  // header-height read is chromeClearancePx().
   useEffect(() => {
     document.documentElement.style.setProperty('--tour-chips-h', '0px');
   }, []);
@@ -311,9 +316,7 @@ export function ScheduleTab() {
     const chipsH = Number.isNaN(chipsRaw) ? 47 : chipsRaw;
     const weekH =
       parseInt(rootStyles.getPropertyValue('--tour-week-h'), 10) || 41;
-    const headerH =
-      parseInt(rootStyles.getPropertyValue('--tour-header-h'), 10) || 0;
-    return headerH + chipsH + weekH;
+    return chromeClearancePx() + chipsH + weekH;
   };
   useEffect(() => {
     if (!anchorId) return;
@@ -377,11 +380,8 @@ export function ScheduleTab() {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
       if (section) {
-        // Fully off screen: entirely above the sticky header or below the fold.
-        const rootStyles = getComputedStyle(document.documentElement);
-        const headerH =
-          parseInt(rootStyles.getPropertyValue('--tour-header-h'), 10) || 0;
-        setAnchorFar(rect.bottom <= headerH || rect.top >= vh);
+        // Fully off screen: entirely above the docked week header or below the fold.
+        setAnchorFar(rect.bottom <= chromeClearancePx() || rect.top >= vh);
       } else {
         // No THIS WEEK section (off-season): the former anchor-distance rule.
         const center = rect.top + rect.height / 2;
@@ -505,6 +505,7 @@ export function ScheduleTab() {
         minHeight: '100vh',
         fontFamily: FONT,
         position: 'relative',
+        paddingTop: CHROME_CLEARANCE,
       }}
     >
       {/* No tour-pills row: the island's left capsule owns the tour control
@@ -717,7 +718,7 @@ export function ScheduleTab() {
                     ref={attachRef ? weekHeaderRef : undefined}
                     style={{
                       position: 'sticky',
-                      top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 0px) - 1px)',
+                      top: `calc(${CHROME_CLEARANCE} - 1px)`,
                       zIndex: 2,
                       display: 'flex',
                       alignItems: 'baseline',
@@ -826,6 +827,8 @@ export function ScheduleTab() {
         </button>,
         document.body,
       )}
+      {/* The scroll-to-top control TourPageShell used to supply. */}
+      <ScrollToTopGlass />
     </div>
   );
 }
