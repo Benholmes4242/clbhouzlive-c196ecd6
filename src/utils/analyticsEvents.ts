@@ -1,7 +1,7 @@
 // Analytics event tracking utility
 // Rewired to write directly to Supabase analytics_events table
 import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
-import { getSessionId, getUserAgent, onSessionMinted } from './analyticsSession';
+import { getSessionId, getUserAgent, isAnalyticsExcludedHost, onSessionMinted } from './analyticsSession';
 
 // The publishable (anon) key, read from the client config; safe in code.
 const SUPABASE_PUBLISHABLE_KEY: string =

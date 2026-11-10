@@ -95,3 +95,27 @@ export function getUserAgent(): string {
     return '';
   }
 }
+
+/**
+ * FUNNEL_TRACKING_1: editor and preview traffic must never reach
+ * analytics_events. Excluded: Lovable editor hosts (*.lovableproject.com),
+ * the id-preview-- preview hosts, and any framed page (the editor iframe) —
+ * a cross-origin error reading window.top counts as framed. Production
+ * (*.lovable.app other than id-preview--, clbhouz.co.uk) and the native app
+ * keep tracking. Never throws.
+ */
+export function isAnalyticsExcludedHost(): boolean {
+  try {
+    if (typeof window === 'undefined' || !window.location) return false;
+    const host = window.location.hostname || '';
+    if (host.endsWith('.lovableproject.com')) return true;
+    if (host.startsWith('id-preview--')) return true;
+    try {
+      return window.self !== window.top;
+    } catch {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+}
