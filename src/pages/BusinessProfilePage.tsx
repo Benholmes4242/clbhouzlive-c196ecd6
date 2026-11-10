@@ -64,7 +64,7 @@ import { ClubVisiting } from '@/components/business/ClubVisiting';
 import { ClubFromTheClub, scrollToBusinessFeed } from '@/components/business/ClubFromTheClub';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
-import { BusinessNearbyCourses, scrollToNearbyCard } from '@/components/business/BusinessNearbyCourses';
+import { BusinessNearbyCourses } from '@/components/business/BusinessNearbyCourses';
 import { BusinessFollowersCard } from '@/components/business/BusinessFollowersCard';
 import { BusinessMentionsRail } from '@/components/business/BusinessMentionsRail';
 import { BusinessCoachInvite, BusinessCoachResults, coachStrip, scrollToCoachResults } from '@/features/coach/BusinessCoachCards';
@@ -430,10 +430,8 @@ const BusinessProfilePage: React.FC = () => {
     },
   } : null;
 
-  const stripValues = { coursesNear: nearby?.coursesNear, top100Near: nearby?.top100Near, followers: followersCount, posts: postsCount };
+  const stripValues = { followers: followersCount, posts: postsCount };
   const stripLabels = {
-    coursesNear: t('business.hero.coursesNear', { defaultValue: 'Courses near' }),
-    top100Near: t('business.hero.top100Near', { defaultValue: 'Top 100 near' }),
     followers: t('business.hero.followers', { defaultValue: 'Followers' }),
     posts: t('business.hero.posts', { defaultValue: 'Posts' }),
   };
@@ -443,11 +441,7 @@ const BusinessProfilePage: React.FC = () => {
     label: stripLabels[k],
     onTap: k === 'followers'
       ? () => navigate(`/business/${business.slug || business.id}/followers`)
-      : k === 'posts'
-        ? scrollToBusinessFeed
-        : k === 'coursesNear' || k === 'top100Near'
-          ? scrollToNearbyCard
-          : undefined,
+      : scrollToBusinessFeed,
   }));
   const bizStrip = !isClub && isCoachCategory(business.category)
     ? coachStrip(coachResults.isSuccess && !coachResults.isError ? coachResults.data : null, followersCount, postsCount).map(cell => ({
