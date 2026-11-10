@@ -64,7 +64,11 @@ vi.mock('@/hooks/useBusinessNearbyCounts', async (orig) => ({
   useBusinessNearbyCounts: () => ({ data: state.nearby }),
 }));
 const coachState: { data: unknown; isSuccess: boolean; isError: boolean } = { data: null, isSuccess: false, isError: false };
-vi.mock('@/features/coach/hooks', () => ({ useCoachResults: () => coachState, useMyCoach: () => ({ data: null }) }));
+vi.mock('@/features/coach/hooks', async (orig) => ({
+  ...(await orig<typeof import('@/features/coach/hooks')>()),
+  useCoachResults: () => coachState,
+  useMyCoach: () => ({ data: null }),
+}));
 
 import BusinessProfilePage from '@/pages/BusinessProfilePage';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
