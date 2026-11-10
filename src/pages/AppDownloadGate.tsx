@@ -40,6 +40,12 @@ import { GREEN } from '@/components/manage/ui';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { FALLBACK_PLAY_URL, FALLBACK_STORE_URL, fetchStoreLinks } from '@/lib/storeLinks';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
+/** FUNNEL_TRACKING_1: fire-and-forget; navigation never waits on the insert. */
+const trackStoreTap = (store: 'app_store' | 'play_store') => {
+  void analyticsEvents.track('store_link_tapped', { surface: 'download_gate', store });
+};
 
 const CANVAS = PAGE_CANVAS;
 const INK = '#FFFFFF';
@@ -363,6 +369,7 @@ const AppDownloadGate: React.FC = () => {
             <a
               href={appStore}
               aria-label={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
+              onClick={() => trackStoreTap('app_store')}
               style={{ display: 'block', lineHeight: 0 }}
             >
               <img
@@ -375,6 +382,7 @@ const AppDownloadGate: React.FC = () => {
             <a
               href={play}
               aria-label={t('gate.googlePlay', { defaultValue: 'Get clbhouz on Google Play' })}
+              onClick={() => trackStoreTap('play_store')}
               style={{ display: 'block', lineHeight: 0 }}
             >
               <img
