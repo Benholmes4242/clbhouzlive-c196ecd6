@@ -1,9 +1,12 @@
 /**
  * RULING (Round scores §3) — FeaturedRoundCard on FN1 net rules, everywhere
  * it renders (Home round of the week via FeedCard/HomeRail, Explore featured
- * round): the big photo figure is NET to par, the photo line is the net line
- * or nothing, and the stat row is FN1.5 (NET with to-par, GROSS with to-par,
- * HANDICAP, AWARDS). No gam_round_net row = no figure, no line, no NET cell.
+ * round). FEATURED_ROUND_OPTION_A rebuilt the card as the shared ScorePostBody
+ * under a champion-block header: the big body figure is NET with its to-par,
+ * the line is the FN1 net line or nothing, and the cells are FN1.5 (NET with
+ * to-par, GROSS with to-par, HANDICAP, AWARDS). No gam_round_net row = no
+ * NET cell and no line. The header feat figure is the reason headline
+ * (course record, hole in one, …), not the net figure.
  */
 import React from 'react';
 import { afterEach, expect, it, vi } from 'vitest';
@@ -55,48 +58,44 @@ function mount(patch: Partial<FeaturedRound> = {}) {
   );
 }
 
-const cell = (c: HTMLElement, stat: string) =>
-  c.querySelector(`[data-explore-stat-value="${stat}"]`)?.textContent ?? null;
-
-it('danny.akers1: figure −2, NET 68 −2, GROSS 67 −3, HANDICAP +1', () => {
+it('danny.akers1: body NET 68 −2, GROSS 67 −3, HANDICAP +1; header feat is the net to-par −2', () => {
   h.net = { netScore: 68, courseHandicap: -1 };
   const { container } = mount();
-  // The big photo figure is NET to par, never the gross −3.
-  const band = container.querySelector('[data-featured-band="true"]')!;
-  const headline = container.querySelector('[data-round-trace]')!.parentElement!;
-  expect(headline.textContent).toContain('−2');
-  expect(headline.textContent).not.toContain('−3');
-  expect(cell(band as HTMLElement, 'net')).toBe('68−2');
-  expect(cell(band as HTMLElement, 'gross')).toBe('67−3');
-  expect(cell(band as HTMLElement, 'handicap')).toBe('+1');
-  expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')).toBeNull();
+  // The big body figure is NET, never the gross −3.
+  const net = container.querySelector('[data-round-score-net="true"]')!;
+  expect(net.textContent).toContain('68');
+  expect(net.querySelector('[data-round-score-net-topar="true"]')!.textContent).toBe('−2');
+  const gross = container.querySelector('[data-round-score-gross="true"]')!;
+  expect(gross.textContent).toContain('67');
+  expect(gross.querySelector('[data-round-score-gross-topar="true"]')!.textContent).toBe('−3');
+  expect(container.querySelector('[data-round-score-handicap="true"]')!.textContent).toContain('+1');
+  // Tier 3 low_round: the header feat is the NET to-par, never gross.
+  const feat = container.querySelector('[data-featured-feat-figure="true"]')!;
+  expect(feat.textContent).toContain('−2');
+  expect(feat.textContent).not.toContain('−3');
 });
 
-it('the photo line is the net line and its end point agrees with the figure and the NET cell', () => {
+it('the body line is the net line and its end point agrees with the NET cell', () => {
   h.net = { netScore: 68, courseHandicap: -1 };
   const { container } = mount();
-  expect(container.querySelector('[data-round-trace="net"]')).not.toBeNull();
+  expect(container.querySelector('[data-feed-round-plot="true"]')).not.toBeNull();
   const received = feedStrokesReceived(shape, -1);
   expect(received).not.toBeNull();
   const series = feedNetSeries(shape, received!);
-  const lineEnd = series.at(-1);
-  expect(lineEnd).toBe(-2); // net 68 − par 70
-  // Figure, line end and NET cell all say −2.
-  const band = container.querySelector('[data-featured-band="true"]') as HTMLElement;
-  expect(cell(band, 'net')).toContain('−2');
-  const headline = container.querySelector('[data-round-trace]')!.parentElement!;
-  expect(headline.textContent).toContain('−2');
+  expect(series.at(-1)).toBe(-2); // net 68 − par 70
+  const net = container.querySelector('[data-round-score-net="true"]')!;
+  expect(net.textContent).toContain('−2');
 });
 
-it('no gam_round_net row: no figure, no line, no NET cell; GROSS and AWARDS still show', () => {
+it('no gam_round_net row: no NET cell, no line, no header figure; GROSS still shows', () => {
   h.net = { netScore: null, courseHandicap: null };
   const { container } = mount();
-  const headline = container.querySelector('[data-round-trace]')!.parentElement!;
-  expect(headline.textContent).not.toContain('−2');
-  expect(headline.textContent).not.toContain('−3');
-  expect(container.querySelector('[data-round-trace="net"]')).toBeNull();
-  const band = container.querySelector('[data-featured-band="true"]') as HTMLElement;
-  expect(cell(band, 'net')).toBe('');
-  expect(cell(band, 'gross')).toBe('67−3');
-  expect(cell(band, 'handicap')).toBe('');
+  expect(container.querySelector('[data-round-score-net="true"]')).toBeNull();
+  expect(container.querySelector('[data-feed-round-plot="true"]')).toBeNull();
+  expect(container.querySelector('[data-featured-feat-figure="true"]')).toBeNull();
+  // Gross leads the body when net cannot be shown, with its to-par.
+  const gross = container.querySelector('[data-round-score-gross="true"]')!;
+  expect(gross.textContent).toContain('67');
+  expect(gross.textContent).toContain('−3');
+  expect(container.querySelector('[data-round-score-handicap="true"]')).toBeNull();
 });

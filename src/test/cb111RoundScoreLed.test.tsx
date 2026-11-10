@@ -207,7 +207,10 @@ describe('Signed-off score-led round awards', () => {
     for (const mark of Array.from(marks ?? [])) {
       expect((mark as HTMLElement).style.boxShadow).toBe('0 0 0 1.5px #16161A');
     }
-    expect(source('src/features/explore-magazine/ExploreCard.tsx')).toContain('surfaceColor={FEED_CARD_SURFACE} figureSize={17}');
+    // FEATURED_ROUND_OPTION_A — the score-led body (and this AwardCluster
+    // call) moved to the shared ScorePostBody; the surface rule is unchanged.
+    expect(source('src/components/feed/ScorePostBody.tsx')).toContain('surfaceColor = FEED_CARD_SURFACE');
+    expect(source('src/components/feed/ScorePostBody.tsx')).toContain('figureSize={17}');
   });
   it('places all present tiers after handicap and prints the total at 17px', () => {
     const { container } = card({ roundMedals: { gold: 1, silver: 2, bronze: 1 } });

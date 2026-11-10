@@ -546,7 +546,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     };
   }, [isFirstCard, isMulti, imageGridActive, media, fireContentReady]);
   const { t } = useTranslation('common');
-  const { t: tCourses } = useTranslation('courses');
 
   /* A ROUND POST IS THE EXPLORE ROUND CARD (Phase 1, "exactly the same as they
      are now in explore community"). One difference: the photograph runs full
@@ -857,9 +856,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             isCompetition={roundCompetition === true}
             engagement={roundEngagement}
             square
-            pillLabel={tCourses('courseDetail.featured.featuredPill')}
             isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
-            onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
             onOpen={() => onRoundTap?.(post, postRound)}
           />
         </article>

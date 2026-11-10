@@ -1,24 +1,30 @@
 /**
- * BRIEF_SCORES_FEATURED_ROUND — THE ONE ENLARGED ROUND.
+ * FEATURED ROUND / ROUND OF THE WEEK — OPTION A (signed-off mock
+ * featured-round-signed-off.html). The one enlarged round, mounted only in
+ * the slot above the All feed, Home's Round of the week rail and the Home
+ * feed hero. AchievementCallout's "a special round is MARKED, NEVER ENLARGED"
+ * still governs the FEED; this hero is the one agreed exception (Ben).
  *
- * AchievementCallout's "a special round is MARKED, NEVER ENLARGED" still governs
- * the FEED. This hero is the one agreed exception (Ben), mounted only in the
- * slot above the All feed. No feed card changes. BRIEF_FEATURED_ROUND_FIXES:
- * the pane is the feed card's photographic treatment (course image_url, the
- * same RoundShape trace) plus a gold frame, a pill and a headline.
+ * The card is the STANDARD NEW SCORE POST BODY (the shared ScorePostBody,
+ * the same component ExploreCard's scoreLed score post renders) with a
+ * champion-block header on top, in the Tour completed state's grammar: a
+ * gold wash over the top of the card, the member's avatar with a 1.5px gold
+ * ring, the surface label in gold ("Round of the week" on Home, "Featured"
+ * on Explore), the member's name, "<date> · Following" (the qualifier is
+ * omitted when the viewer does not follow the member), and the FEAT on the
+ * right as a gold figure with its unit label. NO photograph, wash, gold
+ * frame, pill or static RoundShape trace — all removed by this build.
  *
- * GOLD, NEVER AMBER, ON THE FRAME. Gold means a rare achievement (eagle chips,
- * ace ring). Amber means the viewing member, so on the viewer's own round only
- * the NAME turns amber and reads "You".
+ * GOLD, NEVER AMBER, ON THE HEADER. Gold means a rare achievement. Amber
+ * means the viewing member, so on the viewer's own round only the NAME turns
+ * amber and reads "You".
  *
- * ROUND SCORES §3 (ruling) — the hero is on NET everywhere it renders (Home
- * round of the week via FeedCard/HomeRail, Explore featured round): the big
- * to-par figure is NET to par (net_score − course_par, existing under-par
- * colours), the photo trace is the FN1 net line (feedStrokesReceived →
- * feedNetSeries) or is not drawn, and the stat row is FN1.5 (NET with to-par,
- * GROSS with to-par, HANDICAP, AWARDS). Net facts come from one single-row
- * gam_round_net read (useFeaturedRoundNet); no row = no figure, no line, no
- * NET cell. Figure, line end and NET cell agree by construction.
+ * ROUND SCORES §3 (ruling) — the body is on NET everywhere it renders: the
+ * big figure is NET with its to-par, the line is the FN1 net line or is not
+ * drawn, and the stat cells are FN1.5 (NET with to-par, GROSS with to-par,
+ * HANDICAP, AWARDS). Net facts come from one single-row gam_round_net read
+ * (useFeaturedRoundNet); no row = no NET cell, no line. Figure, line end and
+ * NET cell agree by construction.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,132 +35,92 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { MINUS } from './exploreCopy';
-import { FigureCell } from './AchievementCallout';
-import { AwardCluster } from './AwardCluster';
-import type { RoundMedalCounts } from './useBatchRoundMedals';
 import { fmtDateLong } from '@/i18n/format';
 import { CompetitionMark } from '@/components/explore-tab-new/courseled/CompetitionMark';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { r as rad } from '@/lib/radius';
-import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
 import { useFeaturedRoundNet } from './useFeaturedRound';
-import { feedStrokesReceived, feedNetSeries } from '@/components/feed/roundTilePlot';
-import { formatDisplayedHcp } from '@/lib/whs/format';
-import { goodHoleDots, SCORE_TRACE_PLOT_HEIGHT } from './roundTreatment';
+import { feedStrokesReceived } from '@/components/feed/roundTilePlot';
+import { ScorePostBody } from '@/components/feed/ScorePostBody';
 import { Skeleton } from '@/components/ui/skeleton';
-import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
-/** Matches the Courses-tab lead course-record tile. 210 left no room for the
- *  trace and the text block to coexist. The pane may grow if copy wraps. */
-const PANE_H = 300;
-/** 52 is the FEED CARD's band (ExploreCard), correct on a 210px card. The
- *  hero's pane is 300, and 52 minus the 13px end-label band leaves height = 39,
- *  so the line had only 19px of vertical range (RoundShape plots between top = 8
- *  and bottom = height − 12). At 72 that becomes 39px, roughly doubling the
- *  swing, and still leaves clear space above the headline. Do not copy this
- *  value back to the feed card — 52 is right there. */
-const SHAPE_BAND = SCORE_TRACE_PLOT_HEIGHT + EXPLORE_END_LABEL_BAND;
-const SHAPE_W = 350;
-/** THE WASH (EXPLORE_FEATURED_ROUND_GETS_A_BAND §2). Only the headline block —
- *  gross, to-par and reason line — still sits on the photograph; the member,
- *  course, date, reactions and figures live in the band below the pane. That
- *  block carries TEXT_SHADOW, so the foot only needs a light ramp to seat it:
- *  transparent to 40%, then up to 0.30 black at the base. A ramp, not a flat
- *  layer, and nothing behind the trace — the picture stays bright. */
-const SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.30) 100%)';
-/** V2 §4 — the unit label beside the figure, on its baseline. */
-const UNIT: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK };
-const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
+
+/** The champion-block gold. */
+const GOLD = '#FBBC2E';
+/** The gold wash over the top of the card — the Tour champion block's
+ *  treatment: 11% gold fading through 3% at 150px to the panel by 260px. */
+const GOLD_WASH = `linear-gradient(180deg, rgba(251,188,46,.11) 0, rgba(251,188,46,.03) 150px, ${A.PANEL} 260px)`;
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
-const BIG: React.CSSProperties = { fontSize: 50, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
-/** HEADLINE_FIT §1 — pure-word headlines (hole in one, albatross, clean card)
- *  at 34 so they hold one line at 375; numeric and count-led stay at BIG. */
-const BIG_WORD: React.CSSProperties = { ...BIG, fontSize: 34 };
-/** §3 — the headline row never wraps; the unit label ellipsises instead. */
-const ROW: React.CSSProperties = { display: 'flex', alignItems: 'baseline', minWidth: 0, flexWrap: 'nowrap', whiteSpace: 'nowrap' };
-const UNIT_FIT: React.CSSProperties = { minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
 const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n));
 
-function Headline({ r, unit, netToPar }: { r: FeaturedRound; unit?: string | null; netToPar: number | null }) {
+/** The feat on the right of the header: a gold figure with its unit label
+ *  beneath, or pure words alone in gold at 20px with no unit. */
+function Feat({ r, netToPar }: { r: FeaturedRound; netToPar: number | null }) {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
-  const feat = (text: string) => <span style={BIG_WORD}>{text}</span>;
-  const points = (n: number) => (
-    <span style={{ ...ROW, gap: 6 }}>
-      <span style={{ ...BIG, flex: '0 0 auto' }}>{n}</span>
-      <span style={{ ...UNIT_FIT, fontSize: 17, fontWeight: 600, color: A.INK }}>{k('stablefordPoints')}</span>
+  const words = (text: string) => (
+    <span data-featured-feat-words="true" style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.1, color: GOLD, textAlign: 'right', ...FIG }}>{text}</span>
+  );
+  const figure = (value: React.ReactNode, unit: string | null) => (
+    <span data-featured-feat-figure="true" style={{ textAlign: 'right' }}>
+      <span style={{ display: 'block', fontSize: 34, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.01em', color: GOLD, ...FIG }}>{value}</span>
+      {unit ? (
+        <span style={{ display: 'block', marginTop: 5, fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}>{unit}</span>
+      ) : null}
     </span>
   );
+  const points = (n: number) => figure(n, k('stablefordPoints'));
   switch (r.tier) {
     case 1:
       // Home feed hero: albatross headlines first even beside an ace.
-      if (r.reason === 'feed_albatross') return feat(k('albatross'));
-      return feat((r.holes_in_one ?? 0) > 0 || r.reason === 'hole_in_one' ? k('holeInOne') : k('albatross'));
+      if (r.reason === 'feed_albatross') return words(k('albatross'));
+      return words((r.holes_in_one ?? 0) > 0 || r.reason === 'hole_in_one' ? k('holeInOne') : k('albatross'));
     case 2:
-      return (
-        <span style={{ ...ROW, gap: 8 }}>
-          <span style={{ ...BIG, flex: '0 0 auto' }}>{r.gross}</span>
-          {/* Round scores §3 — the to-par figure is NET to par; no net row, no figure. */}
-          {netToPar != null && netToPar < 0 ? (
-            <span style={{ flex: '0 0 auto', fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(netToPar)}</span>
-          ) : null}
-          {unit ? <span style={{ ...UNIT, ...UNIT_FIT, marginLeft: 2 }}>{unit}</span> : null}
-        </span>
-      );
+      // JOINT_LABEL §1 — the qualifier lives in the label; the co-holder is never named.
+      return figure(r.gross, (r.joint_count ?? 0) > 0 ? k('courseRecordJoint') : k('courseRecord'));
     case 3:
-      if (r.reason === 'birdie_run') return <span style={BIG}>{k('birdieRun', { count: r.birdie_run })}</span>;
-      if (r.reason === 'eagle_brace') return <span style={BIG}>{k('eagleBrace', { count: r.eagles })}</span>;
+      if (r.reason === 'birdie_run') return words(k('birdieRun', { count: r.birdie_run }));
+      if (r.reason === 'eagle_brace') return words(k('eagleBrace', { count: r.eagles }));
       if (r.reason === 'stableford_45') return points(r.stableford);
-      /* Round scores §3 — the big to-par figure is NET to par; no net row,
-         no figure (never the gross to-par). */
-      return netToPar != null ? <span style={{ ...BIG, color: TOPAR_UNDER_DARK }}>{toPar(netToPar)}</span> : null;
+      /* Round scores §3 — the figure is NET to par; no net row, no figure
+         (never the gross to-par). */
+      return netToPar != null ? figure(toPar(netToPar), null) : null;
     case 4:
       if (r.reason === 'stableford_40') return points(r.stableford);
       if (r.reason === 'birdie_haul')
-        return <span style={BIG}>{k(r.birdies === 1 ? 'birdieHaul_one' : 'birdieHaul_other', { count: r.birdies })}</span>;
-      return <span style={BIG_WORD}>{k('cleanCard')}</span>;
+        return words(k(r.birdies === 1 ? 'birdieHaul_one' : 'birdieHaul_other', { count: r.birdies }));
+      return words(k('cleanCard'));
     default:
-      return (
-        <span style={{ ...ROW, gap: 10 }}>
-          <span style={{ ...BIG, flex: '0 0 auto' }}>{r.vs_hcp == null ? null : signed(r.vs_hcp)}</span>
-          <span style={{ ...UNIT, ...UNIT_FIT }}>{k('vsHandicap')}</span>
-        </span>
-      );
+      return figure(r.vs_hcp == null ? null : signed(r.vs_hcp), k('vsHandicap'));
   }
 }
 
 export const FeaturedRoundCard: React.FC<{
   round: FeaturedRound;
   viewerId?: string;
-  /** CB29. Optional follow control at the end of the band row; absent when not supplied. */
+  /** Drives the header's "· Following" qualifier. */
   isFollowed?: boolean;
-  onFollow?: () => void;
   shape?: HoleShape | null;
   onOpen: () => void;
-  /** Clap + comment in the gold strip (BRIEF_FEATURED_ROUND_ACTIONS). Optional:
-   *  null/absent renders the strapline alone. */
+  /** Clap + comment at the foot of the card. Optional: null/absent renders
+   *  no actions row. */
   engagement?: FeaturedRoundEngagement | null;
   /** From the feed's batched award read. undefined = unresolved (empty cell). */
-  medals?: RoundMedalCounts | null;
+  medals?: import('./useBatchRoundMedals').RoundMedalCounts | null;
   /** From the feed's batched competition read. Explicit true only shows the
    *  shared COMP mark after the member's name. */
   isCompetition?: boolean;
   /** Home only: square corners, edge to edge like its feed neighbours. */
   square?: boolean;
-  /** Pill text. Absent = the existing "Round of the week" label. */
+  /** Header label. Absent = the existing "Round of the week" label. */
   pillLabel?: string;
 }> = ({
   round: r,
   viewerId,
   isFollowed,
-  onFollow,
   shape = null,
   onOpen,
   engagement = null,
@@ -163,36 +129,19 @@ export const FeaturedRoundCard: React.FC<{
   square = false,
   pillLabel,
 }) => {
-  const { t, i18n } = useTranslation('courses');
+  const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const mine = !!viewerId && r.user_id === viewerId;
-  const image = r.image_url;
-  let unit: string | null = null;
-  if (r.tier === 2) {
-    // JOINT_LABEL §1 — the qualifier lives in the label; the co-holder is never named.
-    unit = (r.joint_count ?? 0) > 0 ? k('courseRecordJoint') : k('courseRecord');
-  }
-  const placeLine = [r.course_name, fmtDateLong(r.play_date)].filter(Boolean).join(' · ');
-  const tp = toPar(r.to_par);
-  const grossSuffix = tp
-    ? <span style={{ ...FIG, color: (r.to_par ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{tp}</span>
-    : null;
   /* Round scores §3 — FN1 net facts from gam_round_net (one single-row read
-     keyed on whs_score_id). No row = no figure, no trace, no NET cell;
-     GROSS, HANDICAP (if known) and AWARDS still show. Never gross for net. */
+     keyed on whs_score_id). No row = no NET cell, no line; GROSS, HANDICAP
+     (if known) and AWARDS still show. Never gross for net. */
   const netRow = useFeaturedRoundNet(r.whs_score_id).data;
   const netScore = netRow?.netScore ?? null;
   const courseHcp = netRow?.courseHandicap ?? null;
   const nettable = netScore != null && courseHcp != null && r.course_par != null;
   const netToPar = nettable ? netScore! - r.course_par! : null;
-  const netToParSuffix = netToPar != null
-    ? <span style={{ ...FIG, color: netToPar < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{toPar(netToPar)}</span>
-    : null;
   const received = feedStrokesReceived(shape, courseHcp);
-  const netSeries = shape && received ? feedNetSeries(shape, received) : null;
-  const mGold = medals?.gold ?? 0, mSilver = medals?.silver ?? 0, mBronze = medals?.bronze ?? 0;
-  const traceRow = { round_id: r.whs_score_id, front_nine_to_par: null, back_nine_to_par: null } as unknown as CircleRoundRow;
-  const dots = goodHoleDots(shape);
+  const dateLine = [fmtDateLong(r.play_date), isFollowed ? k('following') : null].filter(Boolean).join(' · ');
 
   return (
     <button
@@ -202,81 +151,54 @@ export const FeaturedRoundCard: React.FC<{
         all: 'unset', display: 'block', width: '100%', boxSizing: 'border-box', cursor: 'pointer', fontFamily: SANS,
       }}
     >
-      <div style={{ borderRadius: square ? 0 : rad.lg, overflow: 'hidden', background: A.PANEL }}>
-      <div style={{ position: 'relative', minHeight: PANE_H, background: A.PANEL, display: 'flex', flexDirection: 'column' }}>
-        {image ? (
-          <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : (
-          <CourseImageFallback />
-        )}
-        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: SCRIM, pointerEvents: 'none' }} />
-        <span
-          className="standout-figure-chip"
-          style={{
-            position: 'absolute', top: 12, left: 12, zIndex: 1, color: A.INK, fontSize: 10, fontWeight: 700,
-            letterSpacing: '0.12em', textTransform: 'uppercase', padding: '5px 10px', borderRadius: rad.pill,
-          }}
-        >
-          {pillLabel ?? k('label')}
-        </span>
-        <div style={{ flex: '0 0 44px' }} />
-        <div aria-hidden="true" data-round-trace={shape && netSeries ? 'net' : 'none'} style={{ position: 'relative', flex: '1 1 auto', minHeight: shape && netSeries ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
-          {shape && netSeries ? (
-            /* Round scores §3 — the line on the photo is the NET line (the
-               FN1 helper's per-hole allowance), or it is not drawn. Never gross. */
-            <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SCORE_TRACE_PLOT_HEIGHT}
-              showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2}
-              exploreLineOnly seriesOverride={netSeries} endLabels exploreGlow exploreDots={dots} underParFill />
-          ) : null}
-        </div>
-        <div style={{ position: 'relative', padding: '0 16px 16px', textShadow: TEXT_SHADOW }}>
-          <Headline r={r} unit={unit} netToPar={netToPar} />
-        </div>
-      </div>
-      <div data-featured-band="true" style={{ background: A.PANEL, padding: '13px 16px 14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
-          <span style={{ width: 20, height: 20, flex: '0 0 20px', display: 'inline-flex' }}>
-            <SquircleAvatar size={20} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hideRing />
+      <div style={{ borderRadius: square ? 0 : rad.lg, overflow: 'hidden', background: A.PANEL, backgroundImage: GOLD_WASH }}>
+        {/* CHAMPION-BLOCK HEADER — gold ring, gold label, name, date ·
+            Following; the feat on the right. The name ellipsises first, so
+            the figure and the name never collide. */}
+        <div data-featured-champ="true" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 16px 0' }}>
+          <span style={{ flex: '0 0 auto', display: 'inline-flex' }}>
+            <SquircleAvatar size={42} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} ringColor={GOLD} ringWidth={1.5} />
           </span>
-          <span style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: 1 }}>
-            <span style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14.5, fontWeight: 700, color: mine ? A.AMBER : A.INK, minWidth: 0 }}>
+          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', color: GOLD }}>
+              {pillLabel ?? k('label')}
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 2 }}>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 17, fontWeight: 800, color: mine ? A.AMBER : A.INK, minWidth: 0 }}>
                 {mine ? t('courseDetail.records.you') : r.display_name}
               </span>
               {/* The shared CompetitionMark, 9px after the name; the name
                   truncates before the mark does. */}
               {isCompetition === true ? <CompetitionMark style={{ marginLeft: 9 }} /> : null}
             </span>
-            {placeLine ? (
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11.5, color: A.MUTE }}>{placeLine}</span>
+            {dateLine ? (
+              <span style={{ marginTop: 2, fontSize: 13, color: A.SOFT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{dateLine}</span>
             ) : null}
           </span>
-          {engagement ? <Actions engagement={engagement} mine={mine} /> : null}
-          {/* CB29 FOLLOW — end of the band row, beside the actions; never on the
-              viewer's own round. Stops the tap the same way Actions' open() does
-              (stopPropagation + preventDefault) so it never opens the round. */}
-          {onFollow && !mine ? (
-            <span
-              data-featured-follow="true"
-              style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box', textShadow: 'none' }}
-              onClickCapture={(ev) => ev.preventDefault()}
-              onClick={(ev) => { ev.stopPropagation(); ev.preventDefault(); }}
-            >
-              <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
-            </span>
-          ) : null}
+          <span style={{ flex: '0 0 auto' }}>
+            <Feat r={r} netToPar={netToPar} />
+          </span>
         </div>
-        {/* Round scores §3 — FN1.5: NET (to-par), GROSS (to-par), HANDICAP, AWARDS. */}
-        <div style={{ marginTop: 11, paddingTop: 11, borderTop: `1px solid ${A.SOFT}`, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
-          <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')} value={nettable ? String(netScore) : ''} suffix={nettable ? netToParSuffix : null} />
-          <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')} value={r.gross != null ? String(r.gross) : ''} suffix={grossSuffix} />
-          <FigureCell minHeight={34} label={t('amateur.stream.stat.handicap', 'HANDICAP')} value={nettable ? formatDisplayedHcp(Math.round(courseHcp!)) : ''} />
-          {mGold + mSilver + mBronze > 0 ? (
-            <FigureCell minHeight={34} label={t('amateur.stream.stat.awards', 'AWARDS')}
-              value={<AwardCluster gold={mGold} silver={mSilver} bronze={mBronze} scale="row" surfaceColor={A.PANEL} />} />
-          ) : <span />}
-        </div>
-      </div>
+        {/* THE STANDARD SCORE POST BODY — the shared component, adapted data:
+            the featured round's own gross/to-par/par plus the FN1 net row. */}
+        <ScorePostBody
+          net={netScore}
+          gross={r.gross ?? null}
+          coursePar={r.course_par ?? null}
+          courseHandicap={courseHcp}
+          grossToPar={r.to_par ?? null}
+          shape={shape}
+          received={received}
+          scoreId={r.whs_score_id}
+          medals={medals}
+          course={r.course_name ?? null}
+          surfaceColor={A.PANEL}
+        />
+        {engagement ? (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '14px 16px 14px' }}>
+            <Actions engagement={engagement} mine={mine} />
+          </div>
+        ) : null}
       </div>
     </button>
   );
@@ -331,24 +253,29 @@ export interface FeaturedRoundEngagement {
   onOpenComments: () => void;
 }
 
-/** Loading silhouette of the Round of the week card: the same rounded 300px
- *  photo pane, chip top-left, then figure, member, course and fact lines. */
+/** Loading silhouette of the Round of the week card: the champion header
+ *  (avatar, label, name, feat figure) over score-post body bars. */
 export const FeaturedRoundSkeleton: React.FC = () => {
   const bar = (w: number | string, h: number, extra?: React.CSSProperties) => (
     <Skeleton style={{ width: w, height: h, borderRadius: 6, ...extra }} />
   );
   return (
-    <div aria-hidden="true" style={{ position: 'relative', height: PANE_H, borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL }}>
-      <div style={{ position: 'absolute', top: 12, left: 12 }}>{bar(112, 22, { borderRadius: rad.pill })}</div>
-      <div style={{ position: 'absolute', left: 16, right: 16, bottom: 14 }}>
-        {bar(96, 44)}
-        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 9 }}>
-          {bar(30, 30, { borderRadius: '34%' })}
-          {bar(140, 18)}
+    <div aria-hidden="true" style={{ borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL, padding: '16px 16px 14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {bar(42, 42, { borderRadius: '34%', flex: '0 0 auto' })}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {bar(96, 11)}
+          <div style={{ marginTop: 6 }}>{bar(140, 17)}</div>
+          <div style={{ marginTop: 6 }}>{bar(110, 13)}</div>
         </div>
-        <div style={{ marginTop: 8 }}>{bar('60%', 13)}</div>
-        <div style={{ marginTop: 6 }}>{bar('40%', 9)}</div>
+        {bar(56, 34, { flex: '0 0 auto' })}
       </div>
+      <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        {bar(72, 46)}
+        {bar(120, 24)}
+      </div>
+      <div style={{ marginTop: 12 }}>{bar('60%', 14)}</div>
+      <div style={{ marginTop: 10 }}>{bar('100%', 80)}</div>
     </div>
   );
 };

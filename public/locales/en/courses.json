@@ -1481,7 +1481,8 @@
       "netFact": "Net {{net}}",
       "featuredPill": "Featured",
       "birdieRun": "{{count}} birdies in a row",
-      "courseRecordJoint": "Joint course record"
+      "courseRecordJoint": "Joint course record",
+      "following": "Following"
     },
     "verdict": {
       "kicker": "The verdict",
