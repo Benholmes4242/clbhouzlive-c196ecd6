@@ -64,7 +64,7 @@ describe('board headers without POS / PLAYER', () => {
     const { container } = mount(<CompletedWeekBlock facts={FACTS} rows={field} onFullBoard={() => {}} />);
     const head = container.querySelector<HTMLElement>('[data-cw-section="top"]');
     noPosPlayer(head);
-    expect(head?.querySelector('h3')?.textContent).toBe('HOW IT WAS WON'.length ? head.querySelector('h3')?.textContent : '');
+    expect(head?.querySelector('h3')).not.toBeNull();
     expect(head?.textContent).toContain('R4');
     expect(head?.textContent).toContain('TOT');
   });
