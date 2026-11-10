@@ -217,39 +217,16 @@ export function TourHubMainPage() {
           openGlance={openGlance}
           closeGlance={closeGlance}
         />
-        {/* The overview is the immersive exception: the hero starts at the
-            physical top and the shared left/right islands float over it. Legacy
-            pushed tabs retain their solid in-flow AppHeader until retirement.
-            LEADERBOARDS PAGE (8 Nov 2026): the Leaderboards tab joins the
-            overview under the shared islands — the TourIsland (Leaderboards
-            label, live caption, same TourGlance tile) is registered by
-            TourHubChromeBridge above for every tab, and without TourPageShell
-            nothing suppresses the chrome. SCHEDULE TAB (10 Nov 2026): the
-             Schedule tab joins them under the shared islands, same conversion.
-            PLAYERS TAB (10 Nov 2026): the Players tab joins them too — its
-            front hero bleeds into the notch like the overview photo.
-            SubTabTourControl stays for the news tab. */}
-        {isHubRoot || activeTab === 'live' || activeTab === 'schedule' || activeTab === 'players' ? renderTab() : (
-          /* Route immersion is path-based, so query-param tabs share the
-             overview's y=0 shell. Their own opaque header therefore becomes
-             the single safe-area owner while the overview remains full bleed. */
-          <div style={{ paddingTop: 'var(--tour-header-h, 0px)' }}>
-            <TourPageShell
-              title={tabTitle}
-              showBack
-              onBack={() => handleSelectTab('overview')}
-              backFallback="/tourhub"
-              leftSlot={
-                /* BRIEF_TOUR_ISLAND §1: one control everywhere — the sub-tab
-                   header carries the same tour label, opening the same
-                   TourGlance tile. The burger drawer is gone from the hub. */
-                <SubTabTourControl activeTab={activeTab} onOpen={openGlance} />
-              }
-            >
-              {renderTab()}
-            </TourPageShell>
-          </div>
-        )}
+        {/* Every hub tab renders directly under the shared islands — the
+            TourIsland (per-tab label, live caption, same TourGlance tile) is
+            registered by TourHubChromeBridge above for every tab, and without
+            TourPageShell nothing suppresses the chrome. LEADERBOARDS PAGE
+            (8 Nov 2026), SCHEDULE TAB and PLAYERS TAB (10 Nov 2026), NEWS TAB
+            (10 Nov 2026): with the News conversion the hub no longer renders
+            TourPageShell at all; the --tour-header-h wrapper branch and
+            SubTabTourControl are gone. TourPageShell itself stays for the
+            tournament/player sub-pages. */}
+        {renderTab()}
       </TourHubShell>
     </TourSelectionProvider>
 
