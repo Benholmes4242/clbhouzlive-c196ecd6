@@ -322,9 +322,9 @@ export function VideoCard({
         </span>
       ) : (
         <span style={{ display: 'flex', gap: 11, padding: magazine ? '8px 4px 0' : '11px 14px 15px', alignItems: 'flex-start' }}>
-          {row.creator_avatar_url ? (
+          {author.avatarUrl ? (
             <img
-              src={row.creator_avatar_url}
+              src={author.avatarUrl}
               alt=""
               loading="lazy"
               style={{ width: 36, height: 36, borderRadius: 11, objectFit: 'cover', flex: 'none' }}
