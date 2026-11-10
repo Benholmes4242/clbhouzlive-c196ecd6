@@ -77,7 +77,7 @@ export function useCommunityVideos() {
       const { data, error } = await supabase
         .from('posts')
         .select(
-          `id, user_id, content, created_at, like_count, tagged_course_ids,
+          `id, user_id, actor_id, actor_type, content, created_at, like_count, tagged_course_ids,
            post_media!inner ( id, media_type, media_url, poster_url, hls_url, stream_id, duration_seconds, display_order )`,
         )
         .eq('status', 'published')
@@ -89,6 +89,8 @@ export function useCommunityVideos() {
       type Row = {
         id: string;
         user_id: string;
+        actor_id: string | null;
+        actor_type: string | null;
         content: string | null;
         created_at: string;
         like_count: number | null;
