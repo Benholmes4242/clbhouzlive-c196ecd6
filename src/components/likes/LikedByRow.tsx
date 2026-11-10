@@ -271,6 +271,7 @@ export function LikedByRow({
       data-liked-by-row="true"
       style={{
         display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr)',
         gridTemplateRows: isOpen ? '1fr' : '0fr',
         opacity: isOpen ? 1 : 0,
         ...(animate ? { transition: 'grid-template-rows 180ms ease-out, opacity 180ms ease-out' } : null),
