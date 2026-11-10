@@ -240,7 +240,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
     (async () => {
       try {
         const { data } = await supabase.auth.getSession();
-        if (!alive || data.session) return;
+        if (!alive) return;
+        // SIGNIN_FIX_2: a guest's anonymous session must not block the
+        // restore — only a real member's session does.
+        if (data.session && !data.session.user.is_anonymous) return;
         const rec = readPendingCode();
         if (!rec) return;
         const ageSec = (Date.now() - rec.sentAt) / 1000;
