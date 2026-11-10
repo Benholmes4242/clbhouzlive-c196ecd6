@@ -29,8 +29,8 @@ vi.mock('@/components/explore-tab-new/courseled/hooks/useStandoutRounds', async 
 }));
 vi.mock('@/features/explore-magazine/watch/useStandoutFeats', async original => ({
   ...await original<typeof import('@/features/explore-magazine/watch/useStandoutFeats')>(),
-  useStandoutFeats: (viewer:string, kind:string | null, value:string | null, enabled:boolean) => {
-    h.feats(viewer, kind, value, enabled);
+  useStandoutFeats: (viewer:string, kind:string | null, value:string | null, enabled:boolean, window?:string) => {
+    h.feats(viewer, kind, value, enabled, window);
     return { data:h.pools[value ?? 'everyone']?.feats ?? [], isFetched:!h.pending, isError:h.error };
   },
 }));
