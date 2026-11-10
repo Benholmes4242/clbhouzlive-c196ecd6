@@ -25,6 +25,8 @@ import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
 import { ACTIVE_TOUR_SLUGS } from '../constants/tourMap';
@@ -261,7 +263,7 @@ function ArchiveRow({ story, read, query, onOpen }: { story: TourStory; read: bo
  * page, in place). Like and comment buttons are gone from this page — counts
  * live in the details line; the story page keeps the actions.
  */
-export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
+export function NewsTab({ immersiveHero = true, islands = false }: { immersiveHero?: boolean; islands?: boolean }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const [tourLens, setTourLens] = useState<string | null>(() => {
@@ -331,7 +333,9 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
 
   if (isLoading) {
     return (
-      <div style={{ fontFamily: FONT }}>
+      /* NEWS ISLANDS (10 Nov 2026): under the shared islands every non-lead
+         state starts at CHROME_CLEARANCE; only the lead photo bleeds. */
+      <div style={{ fontFamily: FONT, paddingTop: islands ? CHROME_CLEARANCE : 0 }}>
         <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />
         <div style={{ padding: '0 14px' }}>
           <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
@@ -343,7 +347,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
 
   if (!lead) {
     return (
-      <div style={{ padding: immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE, fontFamily: FONT }}>
+      <div style={{ padding: islands ? `calc(${CHROME_CLEARANCE} + 18px) 14px 0` : immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE, fontFamily: FONT }}>
         {t('news.empty', 'No stories on the wire yet.')}
       </div>
     );
