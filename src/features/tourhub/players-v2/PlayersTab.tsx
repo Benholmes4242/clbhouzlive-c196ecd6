@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
 import { TOUR_CONFIG } from '../hooks/useOverviewData';
+import { isActiveTour } from '../constants/tourMap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { FONT, TOUR_CANVAS, INK, INK_MUTE } from '../_shared/tokens';
@@ -53,15 +54,15 @@ export function PlayersTab() {
   const inboundTour = searchParams.get('tour');
   const storedTour = readStoredTour();
   const initialTour: PlayersTourId =
-    inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
+    inboundTour && isActiveTour(inboundTour) && inboundTour !== 'champ'
       ? (inboundTour as PlayersTourId)
-      : storedTour && storedTour in TOUR_CONFIG && storedTour !== 'champ'
+      : storedTour && isActiveTour(storedTour) && storedTour !== 'champ'
         ? (storedTour as PlayersTourId)
         : 'pga';
   const [activeTour, setActiveTour] = useState<PlayersTourId>(initialTour);
   const changeTour = useCallback((next: PlayersTourId) => setActiveTour(next), []);
   useTourLensFromPicker<PlayersTourId>(
-    (slug) => (slug !== 'champ' && slug in TOUR_CONFIG ? (slug as PlayersTourId) : undefined),
+    (slug) => (slug !== 'champ' && isActiveTour(slug) ? (slug as PlayersTourId) : undefined),
     changeTour,
     activeTour,
   );

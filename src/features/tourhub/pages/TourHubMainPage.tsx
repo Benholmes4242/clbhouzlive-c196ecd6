@@ -21,6 +21,7 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
 import { useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import { setGuestTourContext } from '@/features/guest/guestGateStore';
+import { useRetiredTourRedirect } from '../hooks/useRetiredTourRedirect';
 
 /**
  * SubTabTourControl — the sub-tab header's tour control (BRIEF_TOUR_ISLAND):
@@ -119,6 +120,7 @@ export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
+  useRetiredTourRedirect(searchParams, searchParams.get('event'));
   /* The left capsule on the hub is ALWAYS the burger. The hub is a bottom-nav destination, so a back chevron there is wrong regardless of how the member arrived. */
   const backMode = false;
   const tabParam = searchParams.get('tab') as TourHubTab | null;

@@ -18,6 +18,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '../_shared/tourOrder';
+import { isRetiredTour } from '../constants/tourMap';
 import {
   LIVE_STATUSES,
   COMPLETED_STATUSES,
@@ -101,7 +102,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
     for (const r of [...rawRows].sort((a, b) =>
       a.start_date.localeCompare(b.start_date),
     )) {
-      if (seen.has(r.id)) continue;
+      if (seen.has(r.id) || isRetiredTour(r.season?.tour_name) || isRetiredTour(r.season?.tour_full_name)) continue;
       seen.add(r.id);
       out.push(r);
     }

@@ -7,6 +7,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import type { SeasonTournament } from './useSeasonTournaments';
+import { isRetiredTour } from '../constants/tourMap';
 
 // Slug → display name for tournament rows (display only, distinct from TOUR_NAME_TO_SLUG which maps the reverse)
 const TOUR_DISPLAY_NAMES: Record<string, string> = {
@@ -26,7 +27,7 @@ export function useUpcomingTournaments(limit = 6) {
     queryFn: async (): Promise<SeasonTournament[]> => {
       if (!cache?.upcoming.length) return [];
 
-      return cache.upcoming.slice(0, limit).map((t) => {
+      return cache.upcoming.filter(t => !isRetiredTour(t.season?.tour_name)).slice(0, limit).map((t) => {
         const tourKey = t.season?.tour_name?.toLowerCase() || '';
 
         return {

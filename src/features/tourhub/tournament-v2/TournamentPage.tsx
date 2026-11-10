@@ -72,12 +72,14 @@ import {TournamentHero,RaceSection,FieldSection,CourseV3Section,NumbersSection,T
 import {UpcomingLastYear} from '../components/overview-v3/UpcomingOverviewSections';
 import {earliestTeeTime} from '../overview/boardStarted';
 import './tournamentPage.css';
+import { useRetiredTourRedirect } from '../hooks/useRetiredTourRedirect';
 
 export function TournamentPage() {
   const { t } = useTranslation('tourhub');
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  useRetiredTourRedirect(searchParams, tournamentId);
   
 
 

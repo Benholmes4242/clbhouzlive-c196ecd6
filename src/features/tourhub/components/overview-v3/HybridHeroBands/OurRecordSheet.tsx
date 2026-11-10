@@ -14,7 +14,8 @@ import {aboutOneIn,averageBlindTop10,barPercent,multipleOf,rateOf,viewerBlindTop
 import { sortedBeatRows, resultPosition, outStatus, recordPickWon, recordEventSummary, orderedRecordPicks } from './pickInsightRules';
 import { surnameOf } from '../../../_shared/playerName';
 import './pickPanels.css';
-const TOURS = ['pga','euro','lpga','champ','pgad','liv'];
+import { activeTourList } from '../../../constants/tourMap';
+const TOURS = activeTourList(['pga','euro','lpga','champ','pgad','liv']);
 const TOUR_NAMES: Record<string,string> = { pga:'PGA TOUR', euro:'DP World', lpga:'LPGA', champ:'Champions', pgad:'Korn Ferry', liv:'LIV Golf' };
 export interface OurRecordSheetProps { open: boolean; onClose: () => void; tour: string; year: number }
 export function OurRecordSheet(props: OurRecordSheetProps) { return props.open ? <RecordSession key={`${props.tour}-${props.year}`} {...props} /> : null; }

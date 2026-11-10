@@ -425,7 +425,6 @@
       "stateFinal": "RESULTS",
       "statePlayoff": "PLAYOFF",
       "factRound": "ROUND",
-      "starts": "Starts {{day}}",
       "days": "Days",
       "hours": "Hrs",
       "minutes": "Mins",

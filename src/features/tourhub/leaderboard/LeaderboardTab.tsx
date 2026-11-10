@@ -45,6 +45,7 @@ import { fullTourLabel } from '../_shared/tourOrder';
 import { heroStartDay } from '../tournament-v2/data/tournamentRules';
 import { TOUR_LIVE_GREEN } from '../_shared/tokens';
 import './leaderboard.css';
+import { isRetiredTour } from '../constants/tourMap';
 
 
 
@@ -188,7 +189,7 @@ export function LeaderboardTab() {
   const [sheetTarget, setSheetTarget] = useState<ScorecardSheetTarget | null>(null);
 
   const liveTournaments = useMemo(() => {
-    return [...rawLive].sort((a, b) => {
+    return rawLive.filter(row => !isRetiredTour(row.tourSlug)).sort((a, b) => {
       const ai = tourPriorityIndex(a.tourSlug);
       const bi = tourPriorityIndex(b.tourSlug);
       if (ai !== bi) return ai - bi;
