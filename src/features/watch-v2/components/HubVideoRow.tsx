@@ -128,9 +128,9 @@ function Card({
       </div>
 
       <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
-        {row.creator_avatar_url ? (
+        {author.avatarUrl ? (
           <img
-            src={row.creator_avatar_url}
+            src={author.avatarUrl}
             alt=""
             style={{
               width: 30,
@@ -174,7 +174,7 @@ function Card({
           >
             {title}
           </div>
-          {((row.creator_display_name || row.creator_username) || Number(row.like_count ?? 0) > 0) ? (
+          {(author.name || Number(row.like_count ?? 0) > 0) ? (
             <div
               style={{
                 display: 'flex',
@@ -187,9 +187,9 @@ function Card({
                 minWidth: 0,
               }}
             >
-              {(row.creator_display_name || row.creator_username) ? (
+              {author.name ? (
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                  {row.creator_display_name || row.creator_username}
+                  {author.name}
                 </span>
               ) : null}
 
