@@ -14,6 +14,11 @@
 .cw-lh,.cw-lr{display:grid;grid-template-columns:28px minmax(0,1fr) 40px 48px;column-gap:4px;align-items:center;padding:0 var(--cw-side)}
 .cw-lh{margin-top:var(--hero-table-gap);min-height:24px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--cw-mute)}
 .cw-lh span:nth-child(n+3){text-align:right}
+/* Heading-line board header: kicker spans POS+PLAYER, score labels keep
+   their row columns; the first row starts 6px under the line. */
+.cw-hrow{display:grid;grid-template-columns:28px minmax(0,1fr) 40px 48px;column-gap:4px;align-items:end;padding:var(--hero-section-gap) var(--cw-side) 6px}
+.cw-hrow .cw-kick{grid-column:1 / 3;padding:0}
+.cw-hrow>span{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--cw-mute);text-align:right}
 .cw-lr{min-height:31px}
 .cw-lr .cw-p{color:var(--cw-ink)}
 .cw-lr .cw-n{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

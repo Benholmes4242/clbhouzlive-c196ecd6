@@ -46,8 +46,10 @@ export function CompletedWeekBlock({ facts, rows, onFullBoard }: { facts: WeekFa
         <div className="cw-figs" data-cw-section="holes" style={{ ['--cw-n' as string]: holes.length }}>{holes.map((c) => <Cell key={c.key} c={c} />)}</div>
       </> : null}
       {top.length > 0 ? <>
-        <h3 className="cw-kick">{copy('wkTopThree')}</h3>
-        <div className="cw-lh" data-cw-section="top"><span>POS</span><span>PLAYER</span><span>{`R${last}`}</span><span>TOT</span></div>
+        <div className="cw-hrow" data-cw-section="top">
+          <h3 className="cw-kick">{copy('wkTopThree')}</h3>
+          <span>{`R${last}`}</span><span>TOT</span>
+        </div>
         {top.map((r) => (
           <div className="cw-lr" key={r.id} data-cw-top-row>
             <span className="cw-p" style={HERO_POS_TYPE}>{r.winner ? <Trophy size={13} className="recap-trophy" aria-hidden /> : r.pos}</span>
