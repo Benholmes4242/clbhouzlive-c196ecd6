@@ -33,6 +33,7 @@ import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { postAuthor } from '@/lib/postAuthor';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
