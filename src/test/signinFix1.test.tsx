@@ -10,7 +10,7 @@ const signInWithOtp = vi.fn<(...a: unknown[]) => unknown>();
 const verifyOtp = vi.fn<(...a: unknown[]) => unknown>();
 const updateUser = vi.fn<(...a: unknown[]) => unknown>();
 const getSession = vi.fn<(...a: unknown[]) => unknown>();
-const onAuthStateChange = vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } }));
+const onAuthStateChange = vi.fn<(...a: unknown[]) => unknown>(() => ({ data: { subscription: { unsubscribe: vi.fn() } } }));
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
