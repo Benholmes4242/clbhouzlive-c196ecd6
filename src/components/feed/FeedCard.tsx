@@ -546,6 +546,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     };
   }, [isFirstCard, isMulti, imageGridActive, media, fireContentReady]);
   const { t } = useTranslation('common');
+  const { t: tCourses } = useTranslation('courses');
 
   /* A ROUND POST IS THE EXPLORE ROUND CARD (Phase 1, "exactly the same as they
      are now in explore community"). One difference: the photograph runs full
@@ -850,6 +851,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         <article ref={articleRef} data-feed-featured-round="true" style={{ background: CARD, position: 'relative', borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}` }}>
           <FeaturedRoundCard
             round={featuredRoundFrom(post, postRound, trigger, item.subject?.image_url ?? null)}
+            pillLabel={tCourses('courseDetail.featured.featuredPill', 'Featured')}
             viewerId={currentUserId ?? undefined}
             shape={roundShape ?? null}
             medals={roundMedals ?? null}
