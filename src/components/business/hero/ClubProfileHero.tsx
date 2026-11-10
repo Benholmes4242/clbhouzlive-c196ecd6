@@ -155,6 +155,50 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
     cells.push({ key: 'members', value: p.membersHere!.toLocaleString(), label: t('business.clubHero.membersHere', 'Members here') });
   }
 
+  /* FIGURE PLACEMENT: beside the buttons only when the visitor row is Follow
+     (or Following) plus Message — a second pill (club tee-time, coach lesson,
+     booking) or the team row puts the figures underneath. No dividers in
+     either placement. */
+  const beside = !team && p.secondAction === null && cells.length > 0 && cells.length <= 2;
+  const renderStrip = (placement: 'beside' | 'below') => (
+    <div
+      data-club-strip=""
+      data-strip-placement={placement}
+      style={placement === 'beside'
+        ? { marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'center', flex: 'none' }
+        : { display: 'flex', gap: 28, justifyContent: 'flex-start', margin: '16px 20px 0', padding: 0 }}
+    >
+      {cells.map((c) => {
+        const body = (
+          <>
+            <span
+              data-cell-value=""
+              style={{
+                display: 'block',
+                fontSize: placement === 'beside' ? 19 : 22,
+                fontWeight: 700,
+                ...(placement === 'beside' ? { lineHeight: 1 } : { letterSpacing: '-0.01em' }),
+                color: c.color ?? INK,
+                ...FIGS,
+              }}
+            >
+              {c.value}
+            </span>
+            <span style={{ display: 'block', marginTop: 4, fontSize: placement === 'beside' ? 9.5 : 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM }}>{c.label}</span>
+          </>
+        );
+        const style: React.CSSProperties = placement === 'beside'
+          ? { textAlign: 'center', background: 'none', border: 0, padding: 0, minHeight: 38, display: 'flex', flexDirection: 'column', justifyContent: 'center', color: INK, fontFamily: SANS }
+          : { textAlign: 'left', background: 'none', border: 0, padding: 0, color: INK, fontFamily: SANS };
+        return c.onTap ? (
+          <button key={c.key} type="button" data-cell={c.key} style={style} onClick={c.onTap}>{body}</button>
+        ) : (
+          <div key={c.key} data-cell={c.key} style={style}>{body}</div>
+        );
+      })}
+    </div>
+  );
+
   const aboutRef = React.useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = React.useState(false);
   const [clamped, setClamped] = React.useState(false);
@@ -289,30 +333,11 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
               </button>
             </>
           )}
+          {beside ? renderStrip('beside') : null}
         </div>
       </div>
 
-      {cells.length > 0 && (
-        <div
-          data-club-strip=""
-          style={{ display: 'grid', gridTemplateColumns: `repeat(${cells.length}, 1fr)`, margin: '20px 16px 0', padding: '14px 0', borderTop: `1px solid ${HAIR}`, borderBottom: `1px solid ${HAIR}` }}
-        >
-          {cells.map((c, i) => {
-            const body = (
-              <>
-                <span style={{ display: 'block', fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', color: c.color ?? INK, ...FIGS }} data-cell-value="">{c.value}</span>
-                <span style={{ display: 'block', marginTop: 4, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM }}>{c.label}</span>
-              </>
-            );
-            const style: React.CSSProperties = { textAlign: 'center', background: 'none', border: 0, borderLeft: i > 0 ? `1px solid ${HAIR}` : 'none', padding: 0, color: INK, fontFamily: SANS };
-            return c.onTap ? (
-              <button key={c.key} type="button" data-cell={c.key} style={style} onClick={c.onTap}>{body}</button>
-            ) : (
-              <div key={c.key} data-cell={c.key} style={style}>{body}</div>
-            );
-          })}
-        </div>
-      )}
+      {!beside && cells.length > 0 ? renderStrip('below') : null}
 
       {p.about && (
         <>
@@ -320,7 +345,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
             ref={aboutRef}
             data-club-about=""
             className={expanded ? 'whitespace-pre-wrap' : 'whitespace-pre-wrap line-clamp-3'}
-            style={{ padding: '16px 18px 0', fontSize: 14.5, lineHeight: 1.5, color: MUTE, overflowWrap: 'anywhere' }}
+            style={{ padding: '14px 18px 0', fontSize: 14.5, lineHeight: 1.5, color: MUTE, overflowWrap: 'anywhere' }}
           >
             {p.about}
           </p>
