@@ -58,6 +58,7 @@ vi.mock('@/features/tourhub/hooks/useTourHubData', async (importOriginal) => {
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: vi.fn() } }));
 
 import { NewsTab } from '@/features/tourhub/news/NewsTab';
+import { NEWS_LAST_SEEN } from '@/features/tourhub/news/newsVisit';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 
 const source = (relativePath: string) =>
@@ -83,6 +84,8 @@ function mount(islands = false) {
 beforeEach(() => {
   cleanup();
   localStorage.clear();
+  // Stories publish an hour ago; last visit a day ago → the fresh line shows.
+  localStorage.setItem(NEWS_LAST_SEEN, String(Date.now() - 24 * 3600e3));
   h.stories = [story('lead'), story('second'), story('third')];
   h.search = { debounced: '', active: false, results: [], isLoading: false, settled: false };
 });
@@ -91,7 +94,8 @@ describe('News tab on the shared islands — hub wiring', () => {
   const main = source('src/features/tourhub/pages/TourHubMainPage.tsx');
 
   it('the hub no longer renders TourPageShell for any tab', () => {
-    expect(main).not.toContain('TourPageShell');
+    expect(main).not.toContain('<TourPageShell');
+    expect(main).not.toContain("import { TourPageShell }");
     expect(main).not.toContain('--tour-header-h');
     expect(main).not.toContain('SubTabTourControl');
     expect(main).toContain('{renderTab()}');

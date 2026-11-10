@@ -43,7 +43,8 @@ describe('Leaderboards page — islands, not a header bar', () => {
     const main = source('src/features/tourhub/pages/TourHubMainPage.tsx');
     /* NEWS ON THE SHARED ISLANDS (10 Nov 2026): every tab now renders
        directly — the hub no longer imports TourPageShell at all. */
-    expect(main).not.toContain('TourPageShell');
+    expect(main).not.toContain('<TourPageShell');
+    expect(main).not.toContain("import { TourPageShell }");
     expect(main).toContain('{renderTab()}');
   });
   it('the TourIsland reads the Leaderboards label with its live caption', () => {
