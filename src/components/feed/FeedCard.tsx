@@ -705,9 +705,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
            a card. The like count in the actions row stays untappable: two
            targets six pixels apart is a mis-tap. Zero likes renders no line and
            no gap. */
-        /* CB56 — the line always occupies its space (LikedByRow reserve), so a
-           first like fills it in place: the review card's photo and the
-           standard card's height never move. */
+        /* CB56 — the line collapses at zero on feed cards (no reserved space)
+           and opens with an animation when the first like lands; the sheets
+           keep the reserve. */
 
         /* SECTION C — comments live INSIDE the footer, under the liked-by line,
            and only when there are comments to show. Rendered from the COMMENT,
@@ -724,7 +724,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         /* ONE OWNER PER SEAM. Whatever is last in the footer carries the 12px
            bottom padding; everything above it carries none, so the gap above
            the first comment is the comment block's own 10px. */
-        const actionsBottom = 0; // the liked-by line is always present (CB56)
+        /* With no likes the liked-by line renders nothing, so the action row
+           carries the bottom gap the line's own padding used to carry (12
+           standard, 10 compact). With likes the line sits under the actions. */
+        const actionsBottom = likeCount > 0 ? 0 : 12;
         const likedByBottom = showComments || mediaFirstSlots ? 0 : 12;
 
         return (
@@ -748,7 +751,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: FOOTER_ACTION_GAP,
-                padding: compact ? `9px ${gutter}px ${actionsBottom ? 7 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
+                padding: compact ? `9px ${gutter}px ${actionsBottom ? 10 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
               }}
             >
               {!mediaFirstSlots && <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />}
@@ -789,7 +792,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   rating: post.review.rating ?? null,
                 } : null}
                 surfaceColor={CARD}
-                reserve
                 style={{
                   padding: compact ? `0 ${gutter}px ${likedByBottom ? 10 : 0}px` : `0 ${gutter}px ${likedByBottom}px`,
                 }}

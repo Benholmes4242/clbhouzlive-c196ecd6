@@ -12,7 +12,10 @@
  * the cluster the first time.
  *
  * COPY, by count:
- *   0    — nothing renders at all (no empty state, no gap)
+ *   0    — nothing renders at all (no empty state, no gap). Without `reserve`,
+ *          a count that drops to 0 while mounted collapses with the same
+ *          180ms grid-rows/opacity animation a 0→>0 rise opens with; first
+ *          render at count > 0 and prefers-reduced-motion never animate.
  *   1    — "Liked by Thomas"
  *   2    — "Liked by Thomas and Amy"
  *   3+   — "Liked by Thomas, Amy and 10 others"
@@ -35,7 +38,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import type { ReactionKind } from '@/lib/reactionKind';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
 import type { LikeSource } from '@/hooks/usePostLikes';
 import { LikesSheet } from './LikesSheet';
@@ -106,6 +109,45 @@ export function LikedByRow({
   // nothing. The line does not wait on it.
   const { likers, isLoading } = usePostLikers(postId, !!postId && count > 0, source);
 
+  /* OPEN/COLLAPSE ANIMATION (no reserve): the row mounts only while `shown`
+     is true. A 0→>0 rise while mounted opens with a 180ms grid-rows/opacity
+     transition; a >0→0 drop collapses the same way and unmounts after the
+     transition. First render at count > 0 has no transition (mountedRef is
+     still false at first paint), and prefers-reduced-motion skips both the
+     transition and the collapse delay. During the collapse the copy keeps the
+     last positive count so the sentence does not blank mid-animation. */
+  const [shown, setShown] = useState(count > 0);
+  const mountedRef = useRef(false);
+  const lastCountRef = useRef(count > 0 ? count : 0);
+  const reducedRef = useRef<boolean | null>(null);
+  const prefersReduced = () => {
+    if (reducedRef.current === null) {
+      reducedRef.current =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    return reducedRef.current;
+  };
+  useEffect(() => {
+    mountedRef.current = true;
+  }, []);
+  useEffect(() => {
+    if (count > 0) {
+      lastCountRef.current = count;
+      setShown(true);
+      return;
+    }
+    if (!shown || reserve) return;
+    if (prefersReduced()) {
+      setShown(false);
+      return;
+    }
+    const id = window.setTimeout(() => setShown(false), 180);
+    return () => window.clearTimeout(id);
+  }, [count, shown, reserve]);
+  const n = count > 0 ? count : lastCountRef.current;
+
   /* ONE style for the row and its reserved box, so the two match in height by
      construction: same element style, same minHeight, same text line. */
   const rowStyle: React.CSSProperties = {
@@ -133,7 +175,7 @@ export function LikedByRow({
     letterSpacing: 0,
   };
 
-  if (!postId || count <= 0) {
+  if (!postId || (count <= 0 && !shown)) {
     if (!reserve) return null;
     return (
       <div aria-hidden="true" data-liked-by-reserve="true" style={{ ...rowStyle, pointerEvents: 'none' }}>
@@ -151,7 +193,7 @@ export function LikedByRow({
 
   let copy: string;
   if (viewerFirst && kind === 'celebrate') {
-    const restAfter = count - 1 - (otherName ? 1 : 0);
+    const restAfter = n - 1 - (otherName ? 1 : 0);
     const youText =
       restAfter <= 0
         ? otherName ? t('reactions.youAndName', { b: otherName }) : t('reactions.youOnly')
@@ -167,7 +209,7 @@ export function LikedByRow({
         ? t('reactions.youCelebratedOwnersRound', { names: youText, owner })
         : t('reactions.youCelebratedThisRound', { names: youText });
   } else if (viewerFirst) {
-    const restAfter = count - 1 - (otherName ? 1 : 0);
+    const restAfter = n - 1 - (otherName ? 1 : 0);
     copy =
       restAfter <= 0
         ? otherName ? t('reactions.likedByYouAndName', { b: otherName }) : t('reactions.likedByYou')
@@ -178,7 +220,7 @@ export function LikedByRow({
             : t('reactions.likedByYouAndMore', { n: restAfter.toLocaleString() });
   } else if (kind === 'celebrate') {
     // "{names} celebrated this round" — the verb, never a plural noun.
-    const rest = count - names.length;
+    const rest = n - names.length;
     const namesText =
       names.length === 0
         ? null
@@ -192,34 +234,49 @@ export function LikedByRow({
     // WHOSE ROUND: own -> "your round"; known owner -> "<Name>'s round"
     // (always 's, even after an s); otherwise the still-true "this round".
     // Never a bare "'s round".
-    const who = namesText ?? count.toLocaleString();
+    const who = namesText ?? n.toLocaleString();
     const owner = ownerName?.trim();
     copy = isOwnRound
       ? t('reactions.celebratedYourRound', { names: who })
       : owner
         ? t('reactions.celebratedOwnersRound', { names: who, owner })
         : t('reactions.celebratedThisRound', { names: who });
-  } else if (names.length >= 2 && count > 2) {
-    const others = Math.max(count - 2, 1);
+  } else if (names.length >= 2 && n > 2) {
+    const others = Math.max(n - 2, 1);
     copy = `Liked by ${names[0]}, ${names[1]} and ${others.toLocaleString()} other${others === 1 ? '' : 's'}`;
   } else if (names.length >= 2) {
     copy = `Liked by ${names[0]} and ${names[1]}`;
   } else if (names.length === 1) {
-    copy = count > 1
-      ? `Liked by ${names[0]} and ${(count - 1).toLocaleString()} other${count - 1 === 1 ? '' : 's'}`
+    copy = n > 1
+      ? `Liked by ${names[0]} and ${(n - 1).toLocaleString()} other${n - 1 === 1 ? '' : 's'}`
       : `Liked by ${names[0]}`;
   } else {
     // Names not resolved yet — the SAME SENTENCE with a figure in place of the
-    // names, never a second rendering of the like count. "12 likes" would
+    // names, never a second rendering of the like n. "12 likes" would
     // repeat the number already beside the heart glyph nine pixels above, and
     // would read as one statement being swapped for a different one rather
     // than names arriving inside a sentence that was already there.
-    copy = `Liked by ${count.toLocaleString()} golfer${count === 1 ? '' : 's'}`;
+    copy = `Liked by ${n.toLocaleString()} golfer${n === 1 ? '' : 's'}`;
   }
 
 
+  /* The grid-rows wrapper is the open/collapse animation: 0fr→1fr (and back)
+     over 180ms with the inner element clipped. No transition on first render
+     (mountedRef) or under prefers-reduced-motion — the row is simply there. */
+  const isOpen = count > 0;
+  const animate = mountedRef.current && !prefersReduced();
   return (
     <>
+    <div
+      data-liked-by-row="true"
+      style={{
+        display: 'grid',
+        gridTemplateRows: isOpen ? '1fr' : '0fr',
+        opacity: isOpen ? 1 : 0,
+        ...(animate ? { transition: 'grid-template-rows 180ms ease-out, opacity 180ms ease-out' } : null),
+      }}
+    >
+    <div style={{ overflow: 'hidden', minHeight: 0 }}>
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); setOpen(true); }}
@@ -239,11 +296,11 @@ export function LikedByRow({
               position: 'relative',
               flex: 'none',
               height: 20,
-              width: 19 + (Math.min(count, 3) - 1) * 12,
+              width: 19 + (Math.min(n, 3) - 1) * 12,
               ...(avatarRing === 'media' ? { filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))' } : null),
             }}
           >
-            {Array.from({ length: isLoading ? Math.min(count, 3) : Math.min(likers.length, Math.min(count, 3)) }, (_, i) => {
+            {Array.from({ length: isLoading ? Math.min(n, 3) : Math.min(likers.length, Math.min(n, 3)) }, (_, i) => {
               const liker = likers[i];
               /* OUTER ring (surfaceColor) separates disc from disc on a 'surface'
                  ground only; the INNER hairline (SquircleAvatar hairlineRing)
@@ -295,6 +352,7 @@ export function LikedByRow({
           {copy}
         </span>
       </button>
+    </div>
 
       {/* Taps inside the sheet bubble through the React tree even though it
           portals; this span keeps them from reaching a parent card. */}
@@ -309,6 +367,7 @@ export function LikedByRow({
         subject={subject}
       />
       </span>
+    </div>
     </>
   );
 }

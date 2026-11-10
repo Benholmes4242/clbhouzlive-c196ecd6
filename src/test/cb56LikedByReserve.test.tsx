@@ -74,11 +74,7 @@ const slot = (root: HTMLElement) => {
   const el = row.nextElementSibling as HTMLElement | null;
   return { row, el };
 };
-/** Everything that decides the footer's height in jsdom (no layout engine). */
-const geometry = (root: HTMLElement) => {
-  const { row, el } = slot(root);
-  return { rowPadding: row.style.padding, slotPresent: !!el, slotPadding: el?.style.padding, slotMargin: el?.style.margin, slotMinHeight: el?.style.minHeight, slotDisplay: el?.style.display };
-};
+
 
 describe('CB56 LikedByRow reserve', () => {
   it('reserve at count 0 renders a box with the populated row style and minHeight', () => {
@@ -108,13 +104,17 @@ describe('CB56 LikedByRow reserve', () => {
     expect(box.querySelector('button, a, [role="button"], [tabindex]')).toBeNull();
   });
 
-  it.each([['standard', BASE], ['review', REVIEW]] as const)('the %s card footer keeps its geometry from 0 to 1 like', (_n, post) => {
-    const v = render(card(post, 0));
-    const before = geometry(v.container);
-    expect(before.slotPresent).toBe(true);
-    v.rerender(card(post, 1));
-    expect(geometry(v.container)).toEqual(before);
-    v.rerender(card(post, 0));
-    expect(geometry(v.container)).toEqual(before);
-  });
+  it.each([['standard', BASE, '10px 20px 12px'], ['review', REVIEW, '9px 14px 10px']] as const)(
+    'the %s card footer collapses the liked-by line at zero likes', (_n, post, actionsPad) => {
+      const v = render(card(post, 0));
+      expect(v.container.querySelector('[data-liked-by-reserve]')).toBeNull();
+      expect(v.container.querySelector('[data-liked-by-row]')).toBeNull();
+      const { row } = slot(v.container);
+      expect(row.style.padding).toBe(actionsPad);
+      v.rerender(card(post, 1));
+      const after = slot(v.container);
+      expect(after.row.style.paddingBottom).toBe('0px');
+      expect(after.el).not.toBeNull();
+      expect(after.el!.getAttribute('data-liked-by-row')).toBe('true');
+    });
 });
