@@ -29,6 +29,8 @@ describe('Tour Hub N2 shell ownership', () => {
     expect(shell).not.toContain("minHeight: '100vh'");
     expect(shell.match(/<ScrollToTopGlass \/>/g)).toHaveLength(1);
     expect(news).not.toContain('paddingBottom: 24');
-    expect(schedule).not.toContain('ScrollToTopGlass');
+    /* SCHEDULE ON THE SHARED ISLANDS (10 Nov 2026): the schedule tab left
+       TourPageShell, so it renders its own scroll-to-top control. */
+    expect(schedule).toContain('ScrollToTopGlass');
   });
 });
