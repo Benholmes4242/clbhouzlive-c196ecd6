@@ -6,6 +6,7 @@ Fix direct Starts label and guard real-English interpolation across Tour/chrome.
 Registry-owned retired flag drives active lists and deep-link redirects; preserve historical data/helpers.
 Remove retired sync/scrape execution, deploy authorized changed functions, inventory references and cron bodies without SQL.
 Run fresh sequential after-shards and report named test changes.
+Authorised pk2WinnerChance test-only repair: replace second tour with Champions, retain figures, add retired-LIV exclusion test; run four fresh shards and update report. User confirms cron job 27 unscheduled and job 54 unrelated.
 
 ## Done: Featured round Follow ruling + close-out
 Canonical inline Follow restored on date line; own rounds hide it.

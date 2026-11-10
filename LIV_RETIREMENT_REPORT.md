@@ -52,9 +52,9 @@ The guard scans literal `t` calls with object options, recognizes shorthand prop
 Successfully deployed: `daily-schedule-sync`, `scrape-season-rankings`, `sportradar-sync`, `tournament-live-sync`, `schedule-predictions`, `generate-predictions`, `tourhub-livegolf`, `fetch-news`.
 Deployment receipt confirms submitted source; no live sync/scrape/prediction execution is claimed here.
 
-## pg_cron inventory limitation
-No SQL was run or written. Hosted pg_cron command/request bodies were not available in this verification, so no installed-job inventory can be certified and “none” is not claimed.
-Source contains `src/features/admin/components/health/jobNames.ts:64` label **sync-player-stats-liv-2026** (“Player stats: LIV”). This is a candidate name for Ben to inspect, not evidence of its current installation or request body. No cron was modified or scheduled.
+## pg_cron status — user-confirmed
+Ben confirmed job **27**, `sync-player-stats-liv-2026`, was unscheduled by SQL. Job **54**, `tournament-live-sync`, is unrelated: “live” means live tournaments, not LIV Golf.
+No SQL was run or written by the agent. These job facts are user-confirmed, not a fresh hosted inventory; no additional cron modification or scheduling was performed.
 
 ## File-grouped implementation inventory
 Entries below describe prior implementation edits, not new close-out changes.
