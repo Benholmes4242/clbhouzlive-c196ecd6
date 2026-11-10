@@ -223,13 +223,30 @@ export function useMomentsOfTheWeek(
       // Course names/regions and author identities, one round-trip each.
       const courseIds = picked.map((p) => p.courseId);
       const userIds = Array.from(new Set(picked.map((p) => p.row.user_id)));
-      const [{ data: courses }, { data: profiles }] = await Promise.all([
+      // ONE RULE (postAuthor): business posts are by the business, so the
+      // business identity is fetched alongside the uploader profiles.
+      const businessIds = Array.from(
+        new Set(
+          picked
+            .filter((p) => p.row.actor_type === 'business' && p.row.actor_id)
+            .map((p) => p.row.actor_id as string),
+        ),
+      );
+      const [{ data: courses }, { data: profiles }, { data: businesses }] = await Promise.all([
         // sub_country rides along on the EXISTING join — no third round trip.
         supabase.from('golf_courses').select('id, name, sub_country').in('id', courseIds),
         supabase
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url, is_verified')
           .in('id', userIds),
+        businessIds.length
+          ? supabase
+              .from('business_accounts')
+              .select('id, name, logo_url, is_verified')
+              .in('id', businessIds)
+          : Promise.resolve({
+              data: [] as Array<{ id: string; name: string; logo_url: string | null; is_verified: boolean | null }>,
+            }),
       ]);
       const courseName = new Map<string, string>();
       const courseRegion = new Map<string, string>();
