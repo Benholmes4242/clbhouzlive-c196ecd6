@@ -158,15 +158,15 @@ export const FeaturedRoundCard: React.FC<{
         {/* CHAMPION-BLOCK HEADER — gold ring, gold label, name, date and
             inline Follow pill; the feat on the right. The name ellipsises first, so
             the figure and the name never collide. */}
-        <div data-featured-champ="true" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 16px 0' }}>
-          <span style={{ flex: '0 0 auto', display: 'inline-flex' }}>
+        <div data-featured-champ="true" style={{ display: 'grid', gridTemplateColumns: '42px minmax(0, 1fr) auto', alignItems: 'center', columnGap: 12, padding: '16px 16px 0' }}>
+          <span style={{ gridColumn: 1, gridRow: '1 / 4', display: 'inline-flex' }}>
             <SquircleAvatar size={42} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} ringColor={GOLD} ringWidth={1.5} />
           </span>
-          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', color: GOLD }}>
+          <span style={{ display: 'contents' }}>
+            <span style={{ gridColumn: 2, gridRow: 1, fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', color: GOLD }}>
               {pillLabel ?? k('label')}
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 2 }}>
+            <span style={{ gridColumn: 2, gridRow: 2, display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 2 }}>
               <span data-featured-name style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 17, fontWeight: 800, color: mine ? A.AMBER : A.INK, minWidth: 0 }}>
                 {mine ? t('courseDetail.records.you') : r.display_name}
               </span>
@@ -175,7 +175,7 @@ export const FeaturedRoundCard: React.FC<{
               {isCompetition === true ? <CompetitionMark style={{ marginLeft: 9 }} /> : null}
             </span>
             {dateLine || (onFollow && !mine) ? (
-              <span data-featured-date-line style={{ marginTop: 2, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexWrap: 'nowrap' }}>
+              <span data-featured-date-line style={{ gridColumn: '2 / 4', gridRow: 3, marginTop: 2, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexWrap: 'nowrap' }}>
                 <span style={{ fontSize: 13, color: A.SOFT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dateLine}</span>
                 {onFollow && !mine ? (
                   <span data-round-follow="true" style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box' }} onClickCapture={event => event.preventDefault()} onClick={event => { event.stopPropagation(); event.preventDefault(); }}>
@@ -185,7 +185,7 @@ export const FeaturedRoundCard: React.FC<{
               </span>
             ) : null}
           </span>
-          <span style={{ flex: '0 0 auto' }}>
+          <span style={{ gridColumn: 3, gridRow: '1 / 3' }}>
             <Feat r={r} netToPar={netToPar} />
           </span>
         </div>
