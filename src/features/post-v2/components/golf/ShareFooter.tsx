@@ -31,7 +31,7 @@ export function ShareFooter({ label, subLine, disabled, busy, onShare }: {
         }}
       >
         {busy
-          ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
+          ? <Loader2 size={16} className="animate-spin text-[var(--pf-ink)]" style={{ display: 'block', margin: '0 auto' }} />
           : label}
       </button>
       <div data-testid="share-sub" style={{ textAlign: 'center', fontSize: 11.5, color: GP.dim, marginTop: 8 }}>

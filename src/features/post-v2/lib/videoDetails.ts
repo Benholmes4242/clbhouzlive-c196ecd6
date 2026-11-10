@@ -96,3 +96,13 @@ export function videoDescriptionMeta(details: VideoDetails, chapters: number): s
 export function videoDuration(item: { duration?: number; trimStart?: number | null; trimEnd?: number | null }): number | undefined {
   return item.trimEnd != null ? Math.max(0, item.trimEnd - (item.trimStart ?? 0)) : item.duration;
 }
+
+/** Cover strip and sheet share absolute source times, including trim offset.
+ * A custom choice replaces only suggestion zero; posterTimestamp wins metadata.
+ */
+export function videoCoverSelection(item: { duration?: number; trimStart?: number | null; trimEnd?: number | null; posterTimestamp?: number | null }, coverFrame: number | null | undefined) {
+  const suggestions = [0.1, 0.35, 0.6, 0.85].map(part => (videoDuration(item) ?? 0) * part + (item.trimStart ?? 0));
+  const chosen = item.posterTimestamp ?? coverFrame ?? suggestions[0];
+  const match = suggestions.findIndex(time => Math.abs(chosen - time) <= 0.01);
+  return { chosen, times: match < 0 ? [chosen, ...suggestions.slice(1)] : suggestions, selectedIndex: match < 0 ? 0 : match };
+}

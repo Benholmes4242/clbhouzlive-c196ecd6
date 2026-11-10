@@ -1,5 +1,9 @@
 # Roadmap
 
+## In progress: Four posting/upload corrections
+White in-progress indicators; match VIDEO to ON THE COURSE spacing; retain custom cover frame and seek on reopen.
+Add guards and run focused tests/fresh shards; baseline 8,097. No unrelated changes or unauthorised test repairs.
+
 ## In progress: Feed avatar fallbacks and comment-row account chooser
 Use standard dark two-initial fallbacks in Who to follow; preserve business logos.
 Move media-first footer chooser into the comment row; standard footers stay per ruling.

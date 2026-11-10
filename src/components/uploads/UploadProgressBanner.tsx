@@ -306,7 +306,7 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
           ) : upload.uploadType === 'review' ? (
             <Star className="h-4 w-4 text-primary animate-pulse" />
           ) : (
-            <Loader2 className="h-4 w-4 text-primary animate-spin" />
+            <Loader2 className="h-4 w-4 text-[var(--pf-ink)] animate-spin" />
           )}
           <span className="text-sm font-medium text-foreground">
             {isComplete
@@ -398,11 +398,11 @@ function UploadProgressItem({ upload, onDismiss, onRetry, onCancel }: UploadProg
           />
         </div>
       ) : (
-        <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className={cn("relative h-1.5 rounded-full overflow-hidden", isUploading ? "bg-[var(--pf-track)]" : "bg-muted")}>
           <motion.div
             className={cn(
               "absolute inset-y-0 left-0 rounded-full",
-              isComplete ? "bg-green-500" : isFailed ? "bg-destructive" : "bg-primary"
+              isComplete ? "bg-green-500" : isFailed ? "bg-destructive" : "bg-[var(--pf-ink)]"
             )}
             initial={{ width: 0 }}
             animate={{ width: `${upload.percentage}%` }}

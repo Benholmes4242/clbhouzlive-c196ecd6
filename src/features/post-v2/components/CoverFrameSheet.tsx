@@ -11,18 +11,21 @@ interface Props {
   open: boolean;
   onClose: () => void;
   item: StageMediaItem | null;
+  chosenTime?: number;
   onApply: (posterTimestamp: number) => void;
 }
 
-export default function CoverFrameSheet({ open, onClose, item, onApply }: Props) {
+export default function CoverFrameSheet({ open, onClose, item, onApply, chosenTime }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [duration, setDuration] = useState<number>(0);
   const [ts, setTs] = useState<number>(0);
+  const initialTime = chosenTime ?? item?.posterTimestamp ?? 0;
 
   useEffect(() => {
     if (!open || !item || item.type !== 'video') return;
-    setTs(item.posterTimestamp ?? 0);
-  }, [open, item]);
+    setTs(initialTime);
+    if (videoRef.current) videoRef.current.currentTime = initialTime;
+  }, [open, item, initialTime]);
 
   if (!item || item.type !== 'video') return null;
 
@@ -33,7 +36,7 @@ export default function CoverFrameSheet({ open, onClose, item, onApply }: Props)
           ref={videoRef}
           src={item.previewUrl}
           playsInline
-          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+          onLoadedMetadata={(e) => { setDuration(e.currentTarget.duration || 0); e.currentTarget.currentTime = initialTime; }}
           style={{ width: '100%', maxHeight: 240, background: '#000', borderRadius: 12 }}
         />
         <label style={{ fontSize: 12, color: CT.ink, display: 'flex', flexDirection: 'column', gap: 6 }}>
