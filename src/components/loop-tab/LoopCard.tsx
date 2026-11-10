@@ -26,6 +26,7 @@ import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/uti
 import { toast } from '@/lib/toast';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { postAuthor, postAuthorRoute } from '@/lib/postAuthor';
 import { LoopCardMenu } from './LoopCardMenu';
 
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
@@ -327,20 +328,20 @@ export const LoopCard = React.memo(function LoopCard({
         {/* 2. CREATOR ROW — compact, sits directly below media */}
         <div className="flex items-center gap-2.5 px-4 pt-3 pb-0">
           <button
-            onClick={() => navigate(`/profile/${post.userId}`)}
+            onClick={() => navigate(postAuthorRoute(postAuthor(post)))}
             className="shrink-0"
             aria-label={`View ${post.displayName}'s profile`}
           >
             <SquircleAvatar
               src={post.avatarUrl}
               alt={post.displayName}
-              userId={post.userId}
+              userId={post.actorId ?? post.userId}
               size="sm"
               hairlineRing
             />
           </button>
           <button
-            onClick={() => navigate(`/profile/${post.userId}`)}
+            onClick={() => navigate(postAuthorRoute(postAuthor(post)))}
             className="flex-1 min-w-0 text-left"
           >
             <div className="flex items-center gap-1 min-w-0">
