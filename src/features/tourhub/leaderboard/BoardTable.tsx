@@ -592,7 +592,7 @@ export function BoardTable({
           gap: effColumns.gap,
           alignItems: 'center',
           minHeight: 26,
-          padding: `0 ${padX}px`,
+          padding: `0 ${padX}px 6px`,
           background: 'var(--tour-board-head)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
