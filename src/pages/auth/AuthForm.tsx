@@ -232,6 +232,49 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
     return () => window.clearInterval(id);
   }, [resendCooldown]);
 
+  // SIGNIN_FIX_1: restore the pending code after an app reload (iOS kills the
+  // WebView while the member is in Mail). Only with no session and a record
+  // under 10 minutes old. Never throws — a fault here must not break sign-in.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!alive || data.session) return;
+        const rec = readPendingCode();
+        if (!rec) return;
+        const ageSec = (Date.now() - rec.sentAt) / 1000;
+        if (ageSec >= PENDING_CODE_MAX_AGE_MS / 1000) return;
+        emailLinkModeRef.current = rec.linkMode;
+        setEmailState(rec.email);
+        setOtpInfo(`Enter the code we sent to ${rec.email}.`);
+        setResendCooldown(Math.max(0, Math.ceil(RESEND_COOLDOWN_SECONDS - ageSec)));
+        setStep('otp');
+        void analyticsEvents.track('auth_code_reused', { reason: 'restored' });
+      } catch { /* restore is best-effort */ }
+    })();
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // SIGNIN_FIX_1: the pending record dies with the session.
+  useEffect(() => {
+    try {
+      const sub = supabase.auth.onAuthStateChange?.((evt) => {
+        if (evt === 'SIGNED_OUT') clearPendingCode();
+      });
+      return () => {
+        try {
+          sub?.data?.subscription?.unsubscribe?.();
+        } catch { /* never block */ }
+      };
+    } catch {
+      return undefined;
+    }
+  }, []);
+
   const sendCode = async (rawEmail: string): Promise<boolean> => {
     if (submitting) return false;
     const normalised = rawEmail.trim().toLowerCase();
@@ -252,6 +295,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           trackSignupInitiated('email');
           setEmailState(normalised);
           setResendCooldown(RESEND_COOLDOWN_SECONDS);
+          writePendingCode({ email: normalised, sentAt: Date.now(), linkMode: emailLinkModeRef.current });
           setSubmittingMethod(null);
           return true;
         }
