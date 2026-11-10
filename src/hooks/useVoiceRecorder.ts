@@ -6,6 +6,7 @@ interface UseVoiceRecorderReturn {
   isPaused: boolean;
   duration: number;
   audioBlob: Blob | null;
+  mimeType: string | null;
   audioUrl: string | null;
   startRecording: () => Promise<void>;
   stopRecording: () => void;
@@ -24,6 +25,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
   const [isPaused, setIsPaused] = useState(false);
   const [duration, setDuration] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [mimeType, setMimeType] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -59,6 +61,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
     try {
       setError(null);
       setAudioBlob(null);
+      setMimeType(null);
       setAudioUrl(null);
       setDuration(0);
       chunksRef.current = [];
@@ -74,11 +77,14 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
       streamRef.current = mediaStream;
       setStream(mediaStream);
 
-      const mediaRecorder = new MediaRecorder(mediaStream, {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-          ? 'audio/webm;codecs=opus'
-          : 'audio/webm'
-      });
+      // Device negotiation owns format; the blob must describe recorded bytes,
+      // not the preferred WebM format (WebKit may choose MP4 instead).
+      const chosenType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac', 'audio/ogg;codecs=opus']
+        .find(type => MediaRecorder.isTypeSupported(type));
+      const mediaRecorder = chosenType
+        ? new MediaRecorder(mediaStream, { mimeType: chosenType })
+        : new MediaRecorder(mediaStream);
+      setMimeType(mediaRecorder.mimeType || chosenType || null);
 
       mediaRecorderRef.current = mediaRecorder;
 
@@ -90,7 +96,9 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
 
       mediaRecorder.onstop = () => {
         if (chunksRef.current.length > 0) {
-          const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+          const recordedType = mediaRecorder.mimeType || chosenType || '';
+          const blob = new Blob(chunksRef.current, { type: recordedType });
+          setMimeType(recordedType || null);
           setAudioBlob(blob);
           setAudioUrl(URL.createObjectURL(blob));
         }
@@ -112,6 +120,11 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
         navigator.vibrate(50);
       }
     } catch (err: unknown) {
+      streamRef.current?.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+      setStream(null);
+      setIsRecording(false);
+      stopTimer();
       AppLog.error('[useVoiceRecorder]', 'Error starting recording:', err);
       setError((err instanceof Error ? err.message : undefined) || 'Could not access microphone');
     }
@@ -154,6 +167,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
 
   const resetRecording = useCallback(() => {
     setAudioBlob(null);
+    setMimeType(null);
     setAudioUrl(null);
     setDuration(0);
     chunksRef.current = [];
@@ -180,6 +194,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
     isPaused,
     duration,
     audioBlob,
+    mimeType,
     audioUrl,
     startRecording,
     stopRecording,

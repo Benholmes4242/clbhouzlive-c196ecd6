@@ -93,6 +93,8 @@ export const EVENT_LABELS: Record<string, string> = {
   post_submitted: 'Post submitted',
   review_score_nudge: 'Review score nudge',
   review_voice_started: 'Review voice started',
+  review_voice_finished: 'Review voice finished',
+  review_voice_failed: 'Review voice failed',
 
   rating_modal_opened: 'Rating opened',
   rating_slider_changed: 'Rating slider changed',
