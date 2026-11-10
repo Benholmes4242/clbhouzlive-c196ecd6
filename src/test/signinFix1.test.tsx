@@ -28,20 +28,19 @@ vi.mock('@/integrations/supabase/client', () => ({
 const trackAuthFailed = vi.fn();
 const trackSignupFailed = vi.fn();
 vi.mock('@/lib/authAnalytics', () => ({
+  trackAuthMethodSelected: vi.fn(),
   trackAuthInitiated: vi.fn(),
   trackAuthFailed: (...a: unknown[]) => trackAuthFailed(...a),
-  trackAuthSucceeded: vi.fn(),
+  trackAuthException: vi.fn(),
   trackSignupInitiated: vi.fn(),
   trackSignupFailed: (...a: unknown[]) => trackSignupFailed(...a),
   trackSignupSuccess: vi.fn(),
-  trackLogin: vi.fn(),
   trackLoginSuccess: vi.fn(),
   trackAuthComplete: vi.fn(),
-  trackGuestConversionIfPending: vi.fn(),
-  isNewSignup: vi.fn(() => false),
   buildAuthErrorExtras: vi.fn(() => ({})),
-  resolvePostAuthRoute: vi.fn(async () => '/'),
 }));
+
+vi.mock('@/lib/postAuthRoute', () => ({ resolvePostAuthRoute: vi.fn(async () => '/') }));
 
 const track = vi.fn();
 vi.mock('@/utils/analyticsEvents', () => ({
