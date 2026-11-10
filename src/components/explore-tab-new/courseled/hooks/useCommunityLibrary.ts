@@ -129,6 +129,15 @@ export function useCommunityLibrary() {
       if (candidates.length === 0) return { all: [], videos: [], clips: [], photos: [] };
 
       const userIds = Array.from(new Set(candidates.map((c) => c.row.user_id)));
+      // ONE RULE (postAuthor): business posts are by the business, so the
+      // business identity is fetched alongside the uploader profiles.
+      const businessIds = Array.from(
+        new Set(
+          candidates
+            .filter((c) => c.row.actor_type === 'business' && c.row.actor_id)
+            .map((c) => c.row.actor_id as string),
+        ),
+      );
       const courseIds = Array.from(
         new Set(
           candidates
@@ -136,11 +145,19 @@ export function useCommunityLibrary() {
             .filter((id): id is string => !!id),
         ),
       );
-      const [{ data: profiles }, coursesRes] = await Promise.all([
+      const [{ data: profiles }, { data: businesses }, coursesRes] = await Promise.all([
         supabase
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url, is_verified')
           .in('id', userIds),
+        businessIds.length
+          ? supabase
+              .from('business_accounts')
+              .select('id, name, logo_url, is_verified')
+              .in('id', businessIds)
+          : Promise.resolve({
+              data: [] as Array<{ id: string; name: string; logo_url: string | null; is_verified: boolean | null }>,
+            }),
         courseIds.length
           ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
           : Promise.resolve({ data: [] as Array<{ id: string; name: string }> }),
@@ -153,6 +170,14 @@ export function useCommunityLibrary() {
           profile_photo_url: string | null;
           is_verified: boolean | null;
         }>).map((p) => [p.id, p]),
+      );
+      const businessById = new Map(
+        ((businesses ?? []) as Array<{
+          id: string;
+          name: string;
+          logo_url: string | null;
+          is_verified: boolean | null;
+        }>).map((b) => [b.id, b]),
       );
       const courseNameById = new Map(
         ((coursesRes.data ?? []) as Array<{ id: string; name: string }>).map((c) => [
@@ -188,6 +213,8 @@ export function useCommunityLibrary() {
             };
           });
           const profile = profileById.get(row.user_id);
+          const business =
+            row.actor_type === 'business' ? businessById.get(row.actor_id ?? '') : undefined;
           const courseId = row.tagged_course_ids?.[0] ?? row.course_id ?? null;
           const courseName = courseId ? courseNameById.get(courseId) ?? null : null;
           const post: FeedPost = {
@@ -195,10 +222,10 @@ export function useCommunityLibrary() {
             userId: row.user_id,
             actorType: (row.actor_type as FeedPost['actorType']) ?? 'personal',
             actorId: row.actor_id ?? row.user_id,
-            username: profile?.username ?? '',
-            displayName: profile?.display_name ?? 'Player',
-            avatarUrl: profile?.profile_photo_url ?? '',
-            isVerified: !!profile?.is_verified,
+            username: business ? '' : (profile?.username ?? ''),
+            displayName: business?.name ?? profile?.display_name ?? 'Player',
+            avatarUrl: business?.logo_url ?? profile?.profile_photo_url ?? '',
+            isVerified: business ? !!business.is_verified : !!profile?.is_verified,
             creatorRelation: 'none',
             caption: row.content ?? '',
             mediaItems,
