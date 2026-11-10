@@ -40,21 +40,17 @@ describe('CB29 follow control on round cards', () => {
     expect(own.container.querySelector('[data-round-follow]')).toBeNull();
   });
 
-  it('FeaturedRoundCard renders follow for another member and never opens the round on tap; absent on own round', () => {
-    const onOpen = vi.fn(); const onFollow = vi.fn();
-    /* Round scores §3 added the gam_round_net read (useQuery) — the harness
-       supplies a QueryClient; no assertion changes. */
+  /* FEATURED_ROUND_OPTION_A — the follow pill left with the old band; the
+     champion header shows "· Following" after the date when the viewer
+     follows the member, and omits it otherwise. */
+  it('FeaturedRoundCard shows "· Following" only when followed', () => {
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const wrap = (node: React.ReactElement) => <QueryClientProvider client={qc}>{node}</QueryClientProvider>;
-    const v = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={onOpen} isFollowed={false} onFollow={onFollow} />));
-    const ctl = v.container.querySelector('[data-featured-band="true"] [data-featured-follow="true"] button');
-    expect(ctl).not.toBeNull();
-    fireEvent.click(ctl!);
-    expect(onFollow).toHaveBeenCalledTimes(1);
-    expect(onOpen).not.toHaveBeenCalled();
-    v.unmount();
-    const own = render(wrap(<FeaturedRoundCard round={round} viewerId="author" onOpen={vi.fn()} isFollowed={false} onFollow={vi.fn()} />));
-    expect(own.container.querySelector('[data-featured-follow]')).toBeNull();
+    const followed = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={vi.fn()} isFollowed />));
+    expect(followed.container.querySelector('[data-featured-champ="true"]')!.textContent).toContain('· Following');
+    followed.unmount();
+    const notFollowed = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={vi.fn()} isFollowed={false} />));
+    expect(notFollowed.container.querySelector('[data-featured-champ="true"]')!.textContent).not.toContain('Following');
   });
 });
 
