@@ -73,6 +73,11 @@ function story(id: string, overrides: Partial<TourStory> = {}): TourStory {
   };
 }
 
+function LocationProbe() {
+  const loc = useLocation();
+  return <div data-testid="loc">{loc.pathname}</div>;
+}
+
 function mount(islands = false) {
   return render(
     <MemoryRouter initialEntries={['/tourhub?tab=news']}>
