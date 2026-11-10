@@ -566,7 +566,7 @@ describe('Who to follow canonical avatar fallbacks', () => {
     h.biz = [biz({ name: 'MasterGolf Travel', logo_url: null })];
     renderRail(1);
     const initials = screen.getByText('MT');
-    expect(initials.closest('[data-squircle-avatar]')).toBeTruthy();
+    expect(initials.matches('[data-avatar-fallback]')).toBeTruthy();
     const card = screen.getByText('MasterGolf Travel').closest('[role="button"]');
     const whiteTiles = Array.from(card?.querySelectorAll('div') ?? []).filter(el => el.style.background === 'rgb(248, 250, 252)');
     expect(whiteTiles).toHaveLength(0);
@@ -576,6 +576,6 @@ describe('Who to follow canonical avatar fallbacks', () => {
     h.people = [person({ display_name: 'Sarah Collins', profile_photo_url: null }), ...people(3).slice(1)];
     h.biz = [];
     renderRail(1);
-    expect(screen.getByText('SC').closest('[data-squircle-avatar]')).toBeTruthy();
+    expect(screen.getByText('SC').matches('[data-avatar-fallback]')).toBeTruthy();
   });
 });
