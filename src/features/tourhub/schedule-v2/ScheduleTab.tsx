@@ -35,6 +35,8 @@ import { useComingUpOwnRounds } from '../overview/data/useComingUpOwnRounds';
 import { displayEventName } from '../overview/sections/ComingUp';
 import { getScrollAncestor, scrollElementIntoView } from '@/lib/getScrollParent';
 import { CHROME_CLEARANCE, chromeClearancePx } from '@/lib/chromeClearance';
+import { useDockedStuck } from '@/lib/useDockedStuck';
+import { DockBlur } from '../_shared/DockBlur';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { currentWeekKey, weekRelation } from './timelineUtils';
 import {
@@ -60,6 +62,26 @@ import {
 const PANEL = '#141418';
 const THIS_WEEK_BG = 'rgba(255,255,255,0.025)';
 const THIS_WEEK_HEADER_BG = '#0E0E11';
+
+/** Each week owns its sticky observation; the page owns ONE frost sibling.
+ * The first row still publishes --tour-week-h through the existing ref. */
+function DockedWeekHeader({ weekKey, publishedRef, onDock, style, children }: {
+  weekKey: string;
+  publishedRef?: React.MutableRefObject<HTMLDivElement | null>;
+  onDock: (key: string, stuck: boolean) => void;
+  style: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const stuck = useDockedStuck(ref);
+  useEffect(() => {
+    onDock(weekKey, stuck);
+    return () => onDock(weekKey, false);
+  }, [weekKey, stuck, onDock]);
+  return <div ref={el => { ref.current = el; if (publishedRef) publishedRef.current = el; }}
+    data-week-header={weekKey} data-docked={stuck}
+    style={{ ...style, background: stuck ? 'transparent' : style.background }}>{children}</div>;
+}
 
 /* Season break (schedule-across-seasons-signed-off.html): the ending
    season's closing line, then the next season's amber-headed opener. */
@@ -170,6 +192,15 @@ export function ScheduleTab() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const weekHeaderRef = useRef<HTMLDivElement | null>(null);
+  const [dockedWeeks, setDockedWeeks] = useState<Set<string>>(() => new Set());
+  const onWeekDock = useCallback((key: string, stuck: boolean) => {
+    setDockedWeeks(previous => {
+      if (previous.has(key) === stuck) return previous;
+      const next = new Set(previous);
+      if (stuck) next.add(key); else next.delete(key);
+      return next;
+    });
+  }, []);
   const [anchorFar, setAnchorFar] = useState(false);
   const viewTrackedRef = useRef(false);
 
@@ -508,6 +539,7 @@ export function ScheduleTab() {
         paddingTop: CHROME_CLEARANCE,
       }}
     >
+      <DockBlur visible={dockedWeeks.size > 0} rowHeight="var(--tour-week-h, 41px)" />
       {/* No tour-pills row: the island's left capsule owns the tour control
           (BRIEF_TOUR_HEADER_ONE_ROW). --tour-chips-h is written as 0 above. */}
 
@@ -714,8 +746,10 @@ export function ScheduleTab() {
                   id={isThis ? 'sv2-week-this' : undefined}
                   style={isThis ? { background: THIS_WEEK_BG } : undefined}
                 >
-                  <div
-                    ref={attachRef ? weekHeaderRef : undefined}
+                  <DockedWeekHeader
+                    weekKey={group.key}
+                    publishedRef={attachRef ? weekHeaderRef : undefined}
+                    onDock={onWeekDock}
                     style={{
                       position: 'sticky',
                       top: `calc(${CHROME_CLEARANCE} - 1px)`,
@@ -747,7 +781,7 @@ export function ScheduleTab() {
                         {rightLabel}
                       </span>
                     ) : null}
-                  </div>
+                  </DockedWeekHeader>
                   <div>
                     {group.events.map((evt, eventIndex) => {
                       const isAnchor = evt.id === timeline!.anchorEventId;
