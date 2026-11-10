@@ -20,6 +20,8 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { reactionKindFor } from '@/lib/reactionKind';
 import { isPortraitSource, type ReasonLine } from './watchRules';
 import { attachPosterPreview } from './posterPreview';
+import { postAuthor } from '@/lib/postAuthor';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 
 /**
  * THE LONG-FORM VIDEO UNIT — ONE UNIT, TWO SIZES (BRIEF_EXPLORE_ALL_VIDEO).
@@ -43,7 +45,9 @@ export function videoTitle(row: HubRpcRow, fallback: string, detailsTitle?: stri
 }
 
 export function creatorName(row: HubRpcRow): string {
-  return (row.creator_display_name || row.creator_username || '').toString();
+  // ONE RULE (postAuthor): a business post is by the business, never the
+  // uploader — name, logo and tick all come from the business fields.
+  return postAuthor(row).name;
 }
 
 /**
