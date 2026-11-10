@@ -45,7 +45,9 @@ try {
    page_view must keep ?tab=). `page` stays location.pathname. session_id,
    page, build and ua remain reserved: callers must NOT send them — Explore's
    numeric `page` was silently replaced for the life of that event (renamed
-   to stream_page, Sep 2026). */
+   to stream_page, Sep 2026). `host` (FUNNEL_TRACKING_1) is reserved the same
+   way: every row carries the hostname so editor/preview leakage can be
+   audited, and callers must NOT send it. */
 function buildRow(eventName: string, params?: EventParams) {
   return {
     name: eventName,
@@ -55,6 +57,7 @@ function buildRow(eventName: string, params?: EventParams) {
       session_id: getSessionId(),
       page: window.location.pathname,
       path: params?.path ?? window.location.pathname,
+      host: window.location.hostname,
       build: __BUILD_ID__,
       ua: getUserAgent(),
     },
@@ -64,7 +67,7 @@ function buildRow(eventName: string, params?: EventParams) {
 /** Survives the page being killed: fetch with keepalive, same row shape. */
 function sendKeepalive(eventName: string, params?: EventParams) {
   try {
-    if (isBot()) return;
+    if (isBot() || isAnalyticsExcludedHost()) return;
     const row = buildRow(eventName, params);
     void fetch(`${SUPABASE_URL}/rest/v1/analytics_events`, {
       method: 'POST',
@@ -83,7 +86,7 @@ function sendKeepalive(eventName: string, params?: EventParams) {
 export const analyticsEvents = {
   track: async (eventName: string, params?: EventParams) => {
     try {
-      if (isBot()) return;
+      if (isBot() || isAnalyticsExcludedHost()) return;
       await supabase.from('analytics_events').insert(buildRow(eventName, params));
     } catch {
       // Never block UI — analytics is non-critical
@@ -378,9 +381,25 @@ export const analyticsEvents = {
 };
 
 // session_start fires exactly when getSessionId() mints a new id.
+// FUNNEL_TRACKING_1: campaign attribution rides the mint — utm_* from the
+// current URL when present, plus referrer_host ('direct' when there is no
+// referrer). WHEN session_start fires is unchanged.
 onSessionMinted((id) => {
+  const campaign: Record<string, string> = {};
+  let referrerHost = 'direct';
+  try {
+    const q = new URLSearchParams(window.location.search);
+    for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'] as const) {
+      const v = q.get(k);
+      if (v) campaign[k] = v;
+    }
+    const ref = typeof document !== 'undefined' ? document.referrer : '';
+    if (ref) referrerHost = new URL(ref).hostname || 'direct';
+  } catch { /* defaults stand */ }
   void analyticsEvents.track('session_start', {
     session_id: id,
     referrer: (typeof document !== 'undefined' && document.referrer) || 'direct',
+    referrer_host: referrerHost,
+    ...campaign,
   });
 });
