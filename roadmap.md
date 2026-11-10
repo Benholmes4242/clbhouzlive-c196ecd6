@@ -1,5 +1,11 @@
 # Roadmap
 
+## Blocked: Last year lookup + missing-leaderboard sweep
+Before-change shards executed separately: 2,087 / 1,908 / 2,049 / 1,968 = 8,012 executed (8,011 passed, 1 failed).
+STOP: src/test/heroBlocks.test.tsx:104, “recap board header removal > RecapStandings renders no kicker or Full list link” unexpectedly fails on `recap-head`.
+No lookup/function/test changes or deployment/invocation performed. Await baseline failure resolution in its owning stream.
+Report: LAST_YEAR_BACKFILL_REPORT.md.
+
 ## In progress: Board headers without POS / PLAYER
 Combine heading/score labels where they fit; otherwise retain a score-only label line.
 Preserve row geometry and behaviour; move full-sheet movement legend below board.
