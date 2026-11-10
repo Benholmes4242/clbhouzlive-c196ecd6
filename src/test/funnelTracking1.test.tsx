@@ -67,6 +67,7 @@ describe('FUNNEL_TRACKING_1 (a) excluded hosts', () => {
     await analyticsEvents.track('funnel_test_event');
     expect(h.insert).not.toHaveBeenCalled();
     vi.unstubAllGlobals();
+    h.insert.mockClear(); // drop the session_start fired by the import-time mint
     await analyticsEvents.track('funnel_test_event');
     expect(h.insert).toHaveBeenCalledTimes(1);
     expect(h.insert.mock.calls[0][0].props.host).toBe('localhost');
