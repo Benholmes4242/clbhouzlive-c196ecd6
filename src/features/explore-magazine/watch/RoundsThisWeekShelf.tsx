@@ -224,7 +224,8 @@ export function RoundsThisWeekShelf({
         </div>
         <div style={{ display: 'flex', gap: SHELF_CARD.gap, padding: '0 16px', overflow: 'hidden' }}>
           {[0, 1].map((i) => (
-            <div key={i} style={{ flex: 'none', width: SHELF_CARD.width, height: SHELF_CARD.height, borderRadius: SHELF_CARD.radius, background: A.PANEL }} />
+            /* The initial loading skeleton stays at the fixed 214. */
+            <div key={i} style={{ flex: 'none', width: SHELF_CARD.width, height: 214, borderRadius: SHELF_CARD.radius, background: A.PANEL }} />
           ))}
         </div>
       </div>
@@ -271,7 +272,7 @@ export function RoundsThisWeekShelf({
               <div
                 data-rounds-shelf-skeleton
                 style={{
-                  flex: 'none', width: SHELF_SKELETON.width, height: SHELF_SKELETON.height,
+                  flex: 'none', width: SHELF_SKELETON.width, minHeight: SHELF_SKELETON.minHeight,
                   borderRadius: SHELF_SKELETON.radius, background: SHELF_SKELETON.background,
                 }}
               />
