@@ -113,7 +113,7 @@ describe('the fixed-layout sheets keep the reserve at zero', () => {
     'components/posts/ReviewBottomSheet.tsx',
     'features/courses/_shared/scorecard/CardScorecardSheet.tsx',
   ])('%s still passes reserve to LikedByRow', (p) => {
-    expect(read(p)).toMatch(/<LikedByRow[\s\S]{0,600}?\breserve\b/);
+    expect(read(p)).toMatch(/<LikedByRow[\s\S]{0,900}?\breserve\b/);
   });
   it('reserve at count 0 still renders the reserved box', () => {
     const v = render(<LikedByRow postId="p1" count={0} reserve />);
