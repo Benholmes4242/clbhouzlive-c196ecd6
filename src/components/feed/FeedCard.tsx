@@ -751,7 +751,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: FOOTER_ACTION_GAP,
-                padding: compact ? `9px ${gutter}px ${actionsBottom ? 7 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
+                padding: compact ? `9px ${gutter}px ${actionsBottom ? 10 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
               }}
             >
               {!mediaFirstSlots && <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />}
@@ -792,7 +792,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   rating: post.review.rating ?? null,
                 } : null}
                 surfaceColor={CARD}
-                reserve
                 style={{
                   padding: compact ? `0 ${gutter}px ${likedByBottom ? 10 : 0}px` : `0 ${gutter}px ${likedByBottom}px`,
                 }}
