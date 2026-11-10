@@ -64,13 +64,13 @@ vi.mock('@/hooks/useBusinessNearbyCounts', async (orig) => ({
   useBusinessNearbyCounts: () => ({ data: state.nearby }),
 }));
 const coachState: { data: unknown; isSuccess: boolean; isError: boolean } = { data: null, isSuccess: false, isError: false };
-vi.mock('@/features/coach/hooks', () => ({ useCoachResults: () => coachState }));
+vi.mock('@/features/coach/hooks', () => ({ useCoachResults: () => coachState, useMyCoach: () => ({ data: null }) }));
 
 import BusinessProfilePage from '@/pages/BusinessProfilePage';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { toast } from '@/lib/toast';
 import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
-import { clubPlace } from '@/components/business/hero/ClubProfileHero';
+import { ClubProfileHero, clubPlace } from '@/components/business/hero/ClubProfileHero';
 
 const t = (_k: string, d: string) => d;
 
