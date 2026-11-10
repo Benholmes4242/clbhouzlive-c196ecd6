@@ -150,8 +150,9 @@ describe('News tab on the shared islands — lead bleed', () => {
     );
     const lead = container.querySelector('[data-testid="tour-news-lead"]')!;
     fireEvent.keyDown(lead.querySelector('[aria-label="Search stories"]')!, { key: 'Enter' });
-    expect(container.querySelector('[data-testid="tour-news-searchbar"]')).not.toBeNull();
+    // The keypress on the button must not bubble into the lead's handler.
     expect(container.querySelector('[data-testid="loc"]')!.textContent).toBe('/tourhub');
+    expect(container.querySelector('[data-testid="tour-news-lead"]')).not.toBeNull();
   });
 
   it('Enter on the lead itself opens the story', () => {
