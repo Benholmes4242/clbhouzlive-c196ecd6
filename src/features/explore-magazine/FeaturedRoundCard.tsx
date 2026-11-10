@@ -10,8 +10,8 @@
  * champion-block header on top, in the Tour completed state's grammar: a
  * gold wash over the top of the card, the member's avatar with a 1.5px gold
  * ring, the surface label in gold ("Round of the week" on Home, "Featured"
- * on Explore), the member's name, "<date> · Following" (the qualifier is
- * omitted when the viewer does not follow the member), and the FEAT on the
+ * on Explore), the member's name, date and canonical inline FeedFollowPill
+ * (hidden on own rounds, with the host's follow handler), and the FEAT on the
  * right as a gold figure with its unit label. NO photograph, wash, gold
  * frame, pill or static RoundShape trace — all removed by this build.
  *
@@ -45,6 +45,7 @@ import type { FeaturedRound } from './useFeaturedRound';
 import { useFeaturedRoundNet } from './useFeaturedRound';
 import { feedStrokesReceived } from '@/components/feed/roundTilePlot';
 import { ScorePostBody } from '@/components/feed/ScorePostBody';
+import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /** The champion-block gold. */
@@ -101,8 +102,9 @@ function Feat({ r, netToPar }: { r: FeaturedRound; netToPar: number | null }) {
 export const FeaturedRoundCard: React.FC<{
   round: FeaturedRound;
   viewerId?: string;
-  /** Drives the header's "· Following" qualifier. */
+  /** Host-owned canonical follow state and score-post handler. */
   isFollowed?: boolean;
+  onFollow?: () => void;
   shape?: HoleShape | null;
   onOpen: () => void;
   /** Clap + comment at the foot of the card. Optional: null/absent renders
@@ -121,6 +123,7 @@ export const FeaturedRoundCard: React.FC<{
   round: r,
   viewerId,
   isFollowed,
+  onFollow,
   shape = null,
   onOpen,
   engagement = null,
@@ -139,9 +142,9 @@ export const FeaturedRoundCard: React.FC<{
   const netScore = netRow?.netScore ?? null;
   const courseHcp = netRow?.courseHandicap ?? null;
   const nettable = netScore != null && courseHcp != null && r.course_par != null;
-  const netToPar = nettable ? netScore! - r.course_par! : null;
+  const netToPar = nettable && netScore != null && r.course_par != null ? netScore - r.course_par : null;
   const received = feedStrokesReceived(shape, courseHcp);
-  const dateLine = [fmtDateLong(r.play_date), isFollowed ? k('following') : null].filter(Boolean).join(' · ');
+  const dateLine = fmtDateLong(r.play_date);
 
   return (
     <button
@@ -152,8 +155,8 @@ export const FeaturedRoundCard: React.FC<{
       }}
     >
       <div style={{ borderRadius: square ? 0 : rad.lg, overflow: 'hidden', background: A.PANEL, backgroundImage: GOLD_WASH }}>
-        {/* CHAMPION-BLOCK HEADER — gold ring, gold label, name, date ·
-            Following; the feat on the right. The name ellipsises first, so
+        {/* CHAMPION-BLOCK HEADER — gold ring, gold label, name, date and
+            inline Follow pill; the feat on the right. The name ellipsises first, so
             the figure and the name never collide. */}
         <div data-featured-champ="true" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 16px 0' }}>
           <span style={{ flex: '0 0 auto', display: 'inline-flex' }}>
@@ -164,15 +167,22 @@ export const FeaturedRoundCard: React.FC<{
               {pillLabel ?? k('label')}
             </span>
             <span style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 2 }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 17, fontWeight: 800, color: mine ? A.AMBER : A.INK, minWidth: 0 }}>
+              <span data-featured-name style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 17, fontWeight: 800, color: mine ? A.AMBER : A.INK, minWidth: 0 }}>
                 {mine ? t('courseDetail.records.you') : r.display_name}
               </span>
               {/* The shared CompetitionMark, 9px after the name; the name
                   truncates before the mark does. */}
               {isCompetition === true ? <CompetitionMark style={{ marginLeft: 9 }} /> : null}
             </span>
-            {dateLine ? (
-              <span style={{ marginTop: 2, fontSize: 13, color: A.SOFT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{dateLine}</span>
+            {dateLine || (onFollow && !mine) ? (
+              <span data-featured-date-line style={{ marginTop: 2, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexWrap: 'nowrap' }}>
+                <span style={{ fontSize: 13, color: A.SOFT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dateLine}</span>
+                {onFollow && !mine ? (
+                  <span data-round-follow="true" style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box' }} onClickCapture={event => event.preventDefault()} onClick={event => { event.stopPropagation(); event.preventDefault(); }}>
+                    <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
+                  </span>
+                ) : null}
+              </span>
             ) : null}
           </span>
           <span style={{ flex: '0 0 auto' }}>

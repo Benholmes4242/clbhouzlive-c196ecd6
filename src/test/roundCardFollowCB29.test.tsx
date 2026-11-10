@@ -40,18 +40,21 @@ describe('CB29 follow control on round cards', () => {
     expect(own.container.querySelector('[data-round-follow]')).toBeNull();
   });
 
-  /* FEATURED_ROUND_OPTION_A — the follow pill left with the old band; the
-     champion header shows "· Following" after the date when the viewer
-     follows the member, and omits it otherwise. */
-  it('FeaturedRoundCard shows "· Following" only when followed', () => {
+  it.each([true, false])('FeaturedRoundCard mounts the inline Follow pill (followed=%s) with the score-post handler', isFollowed => {
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const wrap = (node: React.ReactElement) => <QueryClientProvider client={qc}>{node}</QueryClientProvider>;
-    // i18n is not loaded in this harness: assert the key, not the word.
-    const followed = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={vi.fn()} isFollowed />));
-    expect(followed.container.querySelector('[data-featured-champ="true"]')!.textContent).toContain('· courseDetail.featured.following');
-    followed.unmount();
-    const notFollowed = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={vi.fn()} isFollowed={false} />));
-    expect(notFollowed.container.querySelector('[data-featured-champ="true"]')!.textContent).not.toContain('following');
+    const onFollow = vi.fn(); const onOpen = vi.fn();
+    const card = render(wrap(<FeaturedRoundCard round={round} viewerId="viewer" onOpen={onOpen} onFollow={onFollow} isFollowed={isFollowed} />));
+    const pill = card.getByRole('button', { name: isFollowed ? 'Unfollow' : 'Follow', exact: true });
+    expect(card.container.querySelector('[data-featured-date-line]')?.contains(pill)).toBe(true);
+    fireEvent.click(pill);
+    expect(onFollow).toHaveBeenCalledTimes(1);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+  it('FeaturedRoundCard hides the Follow pill on the member’s own round', () => {
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const card = render(<QueryClientProvider client={qc}><FeaturedRoundCard round={round} viewerId="author" onOpen={vi.fn()} onFollow={vi.fn()} isFollowed /></QueryClientProvider>);
+    expect(card.container.querySelector('[data-round-follow]')).toBeNull();
   });
 });
 
