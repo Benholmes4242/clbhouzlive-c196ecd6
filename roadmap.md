@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Tour dock blur and Players portrait correction
+Add page-level frost only while Schedule/Leaderboards headers dock; preserve other board callers.
+Constrain the Players portrait below the title/search row using CHROME_CLEARANCE.
+Add requested guards, verify scroll/resize and phone widths, run separate shards; stop on any test failure.
+Baseline: 8,085. No existing test repairs authorised.
+
 ## Done: Featured round label and date corrections
 Inline FeedCard heroes use the courses Featured label; HomeRail keeps Round of the week.
 Featured date text uses A.MUTE, with three new guards; no other color: A.SOFT hits found.
