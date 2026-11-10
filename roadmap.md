@@ -1,12 +1,10 @@
 # Roadmap
 
-## In progress: Menu interpolation + LIV retirement
-Baseline sequential shards: 2,087 / 1,916 / 2,066 / 1,971 = 8,040, all passing.
-Fix direct Starts label and guard real-English interpolation across Tour/chrome.
-Registry-owned retired flag drives active lists and deep-link redirects; preserve historical data/helpers.
-Remove retired sync/scrape execution, deploy authorized changed functions, inventory references and cron bodies without SQL.
-Run fresh sequential after-shards and report named test changes.
-Authorised pk2WinnerChance test-only repair: replace second tour with Champions, retain figures, add retired-LIV exclusion test; run four fresh shards and update report. User confirms cron job 27 unscheduled and job 54 unrelated.
+## Done: Menu interpolation + LIV retirement
+Original baseline: 8,040. Retirement tests: 8,047; authorised Champions fixture/switch repair plus one LIV-exclusion test: 8,048.
+Fresh sequential shards: 2,093 / 1,917 / 2,068 / 1,970 = 8,048 passed, zero failures. Focused pk2WinnerChance: 13/13.
+Report: LIV_RETIREMENT_REPORT.md, including every audited reference and exact renamed/assertion changes.
+Ben confirmed job 27 sync-player-stats-liv-2026 unscheduled; job 54 tournament-live-sync is unrelated. No agent SQL or production changes in repair.
 
 ## Done: Featured round Follow ruling + close-out
 Canonical inline Follow restored on date line; own rounds hide it.
