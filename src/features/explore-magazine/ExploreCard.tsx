@@ -1652,7 +1652,6 @@ export function ExploreCard({
   if (feedLayout === 'scoreLed' && item.kind === 'round' && size !== 'pair') {
     const courseHcp = item.facts.course_handicap ?? null;
     const received = shape ? feedStrokesReceived(shape, courseHcp) : null;
-    const nettable = courseHcp != null && (shape ? received != null : true);
     const gross = item.facts.gross ?? null;
     const net = item.facts.net ?? null;
     const par = item.facts.course_par ?? null;
