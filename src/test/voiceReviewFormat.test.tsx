@@ -25,9 +25,14 @@ describe('voice recording format', () => {
     supported = null;
     vi.stubGlobal('MediaRecorder', Recorder);
     Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: vi.fn(async () => ({ getTracks: () => [{ stop: vi.fn() }] })) } });
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:voice');
+    Object.defineProperty(URL, 'createObjectURL', { configurable: true, writable: true, value: vi.fn(() => 'blob:voice') });
+    Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, writable: true, value: vi.fn() });
   });
-  afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+  afterEach(() => {
+    cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals();
+    delete (URL as { createObjectURL?: unknown }).createObjectURL;
+    delete (URL as { revokeObjectURL?: unknown }).revokeObjectURL;
+  });
   it('MP4-only device records and exposes an MP4 blob', async () => {
     supported = 'audio/mp4';
     const { result } = renderHook(useVoiceRecorder);
