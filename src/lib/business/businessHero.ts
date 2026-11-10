@@ -79,16 +79,16 @@ export function businessSecondPill(b: SecondInput, t: T): SecondPill | null {
 /** Categories whose strip leads with nearby courses. */
 export const NEARBY_CATEGORIES = new Set(['Hotel / Accommodation', 'Resort', 'Restaurant / Cafe', 'Bar / Pub', 'Driving Range']);
 
-export type StripKey = 'coursesNear' | 'top100Near' | 'followers' | 'posts';
+export type StripKey = 'followers' | 'posts';
 export interface StripCandidate { key: StripKey; value: number | null | undefined }
 
-/** CB112 §5 — ordered candidates, zero/unavailable skipped, first three kept. */
+/** Figures are followers and posts only, for every non-coach business — the
+    category is ignored and zeros are dropped. coursesNear/top100Near are
+    never returned; the "Courses nearby" card further down the page carries
+    that information. */
 export function businessStripKeys(
-  category: string | null | undefined,
-  v: { coursesNear?: number | null; top100Near?: number | null; followers?: number | null; posts?: number | null },
+  _category: string | null | undefined,
+  v: { followers?: number | null; posts?: number | null },
 ): StripKey[] {
-  const order: StripKey[] = NEARBY_CATEGORIES.has(category ?? '')
-    ? ['coursesNear', 'top100Near', 'followers', 'posts']
-    : ['followers', 'posts'];
-  return order.filter((k) => (v[k] ?? 0) > 0).slice(0, 3);
+  return (['followers', 'posts'] as StripKey[]).filter((k) => (v[k] ?? 0) > 0);
 }

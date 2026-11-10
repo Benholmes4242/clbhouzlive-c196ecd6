@@ -18,7 +18,8 @@ import { MapPin, MessageCircle } from 'lucide-react';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { reactionKindFor } from '@/lib/reactionKind';
-import { isPortraitSource, type ReasonLine } from './watchRules';
+import { type ReasonLine } from './watchRules';
+import { clampFeedMediaRatio, mediaMaxHeight } from '@/components/feed/feedMediaSizing';
 import { attachPosterPreview } from './posterPreview';
 import { postAuthor } from '@/lib/postAuthor';
 import { getInitialsFromName } from '@/lib/avatarFallback';
@@ -257,11 +258,19 @@ export function VideoCard({
         style={{
           position: 'relative',
           flex: 'none',
-          /* L.3 — duration decides the rail, the SOURCE decides the frame. A
-             portrait source never sits in 16:9: centred, capped at 420px tall. */
-          ...(!rail && isPortraitSource(row)
-            ? { alignSelf: 'center', width: 'min(100%, calc(420px * 9 / 16))', aspectRatio: '9 / 16' }
-            : { width: '100%', aspectRatio: '16 / 9' }),
+          /* NO LETTERBOXING (Ben's standing rule): the full-width unit uses the
+             same feed rule as Clubhouse — full width, the source ratio clamped
+             to 4:5…1.91:1, capped at the feed's max height, cover-filled, so a
+             portrait video is cropped top and bottom instead of sitting in a
+             centred 9:16 frame with bars either side. The rail tile keeps its
+             fixed 16:9 frame. */
+          ...(rail
+            ? { width: '100%', aspectRatio: '16 / 9' }
+            : {
+                width: '100%',
+                aspectRatio: String(clampFeedMediaRatio({ width: row.width, height: row.height })),
+                maxHeight: mediaMaxHeight(),
+              }),
           overflow: 'hidden',
           borderRadius: magazine ? r.md : rail ? r.sm : undefined,
           background: A.PANEL,

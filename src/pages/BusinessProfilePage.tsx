@@ -64,7 +64,7 @@ import { ClubVisiting } from '@/components/business/ClubVisiting';
 import { ClubFromTheClub, scrollToBusinessFeed } from '@/components/business/ClubFromTheClub';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
-import { BusinessNearbyCourses, scrollToNearbyCard } from '@/components/business/BusinessNearbyCourses';
+import { BusinessNearbyCourses } from '@/components/business/BusinessNearbyCourses';
 import { BusinessFollowersCard } from '@/components/business/BusinessFollowersCard';
 import { BusinessMentionsRail } from '@/components/business/BusinessMentionsRail';
 import { BusinessCoachInvite, BusinessCoachResults, coachStrip, scrollToCoachResults } from '@/features/coach/BusinessCoachCards';
@@ -72,7 +72,6 @@ import { isCoachCategory } from '@/features/coach/contracts';
 import { useCoachResults } from '@/features/coach/hooks';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
-import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ClubProfileHero, clubPlace, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
@@ -121,7 +120,6 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
   const { data: reviewStats } = useBusinessReviewStats(business?.id);
-  const { data: nearby } = useBusinessNearbyCounts(business?.category, business?.lat, business?.lng);
   /* PHASE 5B §2 — the evidence line, derived from the approved request. */
   const verificationEvidence = useVerificationEvidence(business?.id, business?.is_verified);
 
@@ -430,10 +428,8 @@ const BusinessProfilePage: React.FC = () => {
     },
   } : null;
 
-  const stripValues = { coursesNear: nearby?.coursesNear, top100Near: nearby?.top100Near, followers: followersCount, posts: postsCount };
+  const stripValues = { followers: followersCount, posts: postsCount };
   const stripLabels = {
-    coursesNear: t('business.hero.coursesNear', { defaultValue: 'Courses near' }),
-    top100Near: t('business.hero.top100Near', { defaultValue: 'Top 100 near' }),
     followers: t('business.hero.followers', { defaultValue: 'Followers' }),
     posts: t('business.hero.posts', { defaultValue: 'Posts' }),
   };
@@ -443,11 +439,7 @@ const BusinessProfilePage: React.FC = () => {
     label: stripLabels[k],
     onTap: k === 'followers'
       ? () => navigate(`/business/${business.slug || business.id}/followers`)
-      : k === 'posts'
-        ? scrollToBusinessFeed
-        : k === 'coursesNear' || k === 'top100Near'
-          ? scrollToNearbyCard
-          : undefined,
+      : scrollToBusinessFeed,
   }));
   const bizStrip = !isClub && isCoachCategory(business.category)
     ? coachStrip(coachResults.isSuccess && !coachResults.isError ? coachResults.data : null, followersCount, postsCount).map(cell => ({

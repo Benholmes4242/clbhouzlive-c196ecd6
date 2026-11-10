@@ -63,12 +63,18 @@ vi.mock('@/hooks/useBusinessNearbyCounts', async (orig) => ({
   ...(await orig<typeof import('@/hooks/useBusinessNearbyCounts')>()),
   useBusinessNearbyCounts: () => ({ data: state.nearby }),
 }));
+const coachState: { data: unknown; isSuccess: boolean; isError: boolean } = { data: null, isSuccess: false, isError: false };
+vi.mock('@/features/coach/hooks', async (orig) => ({
+  ...(await orig<typeof import('@/features/coach/hooks')>()),
+  useCoachResults: () => coachState,
+  useMyCoach: () => ({ data: null }),
+}));
 
 import BusinessProfilePage from '@/pages/BusinessProfilePage';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { toast } from '@/lib/toast';
 import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
-import { clubPlace } from '@/components/business/hero/ClubProfileHero';
+import { ClubProfileHero, clubPlace } from '@/components/business/hero/ClubProfileHero';
 
 const t = (_k: string, d: string) => d;
 
@@ -76,6 +82,7 @@ afterEach(() => {
   cleanup(); rpc.mockReset();
   vi.mocked(openExternalUrl).mockClear(); vi.mocked(toast).mockClear();
   Object.assign(state, { business: null, courses: [], rows: [], membership: null, followers: 0, posts: 0, nearby: undefined });
+  Object.assign(coachState, { data: null, isSuccess: false, isError: false });
 });
 
 const fixture = (over: Record<string, unknown> = {}) => ({
@@ -244,21 +251,21 @@ describe('CB112 team row', () => {
 });
 
 describe('CB112 figure strip', () => {
-  it('pure order: nearby categories lead, zeros skipped, three max', () => {
-    const h = 'Hotel / Accommodation';
-    expect(businessStripKeys(h, { coursesNear: 6, top100Near: 1, followers: 212, posts: 9 })).toEqual(['coursesNear', 'top100Near', 'followers']);
-    expect(businessStripKeys(h, { coursesNear: 6, top100Near: 0, followers: 212, posts: 9 })).toEqual(['coursesNear', 'followers', 'posts']);
-    expect(businessStripKeys(h, { coursesNear: null, top100Near: null, followers: 3, posts: 2 })).toEqual(['followers', 'posts']);
-    expect(businessStripKeys('Brand / Manufacturer', { coursesNear: 6, top100Near: 1, followers: 3, posts: 2 })).toEqual(['followers', 'posts']);
+  it('pure order: followers then posts for every category, zeros dropped', () => {
+    for (const c of ['Hotel / Accommodation', 'Resort', 'Restaurant / Cafe', 'Bar / Pub', 'Driving Range']) {
+      expect(businessStripKeys(c, { coursesNear: 99, top100Near: 5, followers: 212, posts: 9 } as never)).toEqual(['followers', 'posts']);
+    }
+    expect(businessStripKeys('Hotel / Accommodation', { followers: 0, posts: 9 })).toEqual(['posts']);
     expect(businessStripKeys('Creator', { followers: 0, posts: 4 })).toEqual(['posts']);
     expect(businessStripKeys('Creator', { followers: 0, posts: 0 })).toEqual([]);
   });
-  it('hotel with 6 near and 1 Top 100 shows Courses near · Top 100 near · Followers', async () => {
+  it('hotel with 6 near and 1 Top 100 still shows Followers · Posts only', async () => {
     Object.assign(state, { business: fixture({ lat: 51.4, lng: 0.01 }), nearby: { coursesNear: 6, top100Near: 1 }, followers: 212, posts: 9 });
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
-    expect(cellKeys(container)).toEqual(['coursesNear', 'top100Near', 'followers']);
-    expect(container.querySelector('[data-cell="coursesNear"]')!.tagName).toBe('BUTTON');
+    expect(cellKeys(container)).toEqual(['followers', 'posts']);
+    expect(container.querySelector('[data-cell="coursesNear"]')).toBeNull();
+    expect(container.querySelector('[data-cell="followers"]')!.tagName).toBe('BUTTON');
   });
   it('no pin shows Followers · Posts; zero values give no strip', async () => {
     Object.assign(state, { business: fixture(), nearby: undefined, followers: 3, posts: 2 });
@@ -283,6 +290,88 @@ describe('CB112 figure strip', () => {
     spy.mockRestore();
     fireEvent.click(r.container.querySelector('[data-cell="followers"]')!);
     await waitFor(() => expect(r.container.querySelector('[data-loc="/business/fairway/followers"]')).not.toBeNull());
+  });
+});
+
+describe('CB112 figure placement', () => {
+  const hero = (over: Partial<React.ComponentProps<typeof ClubProfileHero>> = {}) => {
+    const props = {
+      name: 'The Fairway Inn', placeLine: 'Hotel · London',
+      onShare: vi.fn(), renderMore: (tr: React.ReactElement) => tr, team: null,
+      isFollowing: false, onFollowToggle: vi.fn(), onBookTeeTime: vi.fn(), onMessage: vi.fn(),
+      ...over,
+    };
+    return render(<ClubProfileHero {...props} />);
+  };
+  const twoCells = [
+    { key: 'followers', value: '48', label: 'Followers', onTap: vi.fn() },
+    { key: 'posts', value: '7', label: 'Posts', onTap: vi.fn() },
+  ];
+  const strip = (c: HTMLElement) => c.querySelector('[data-club-strip]') as HTMLElement | null;
+
+  it('Follow + Message with no second pill puts 1–2 figures beside, inside the action row', async () => {
+    Object.assign(state, { business: fixture({ category: 'Creator' }), followers: 48, posts: 7 });
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
+    const s = strip(container)!;
+    expect(s.getAttribute('data-strip-placement')).toBe('beside');
+    expect(s.closest('[data-club-actions]')).not.toBeNull();
+    expect(s.style.marginLeft).toBe('auto');
+    expect(s.style.gap).toBe('14px');
+  });
+
+  it('a second pill puts the figures underneath', async () => {
+    Object.assign(state, { business: fixture({ booking_url: 'https://stay.example' }), followers: 2, posts: 5 });
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-second-pill]')).not.toBeNull());
+    const s = strip(container)!;
+    expect(s.getAttribute('data-strip-placement')).toBe('below');
+    expect(s.closest('[data-club-actions]')).toBeNull();
+    expect(s.style.gap).toBe('28px');
+    expect(s.style.margin).toBe('16px 20px 0px');
+  });
+
+  it('secondAction undefined (club tee-time pill), a team row, or three cells all go below', () => {
+    const club = hero({ stripCells: twoCells });
+    expect(strip(club.container)!.getAttribute('data-strip-placement')).toBe('below');
+    club.unmount();
+    const team = hero({ stripCells: twoCells, team: { onInsights: vi.fn() } as never });
+    expect(strip(team.container)!.getAttribute('data-strip-placement')).toBe('below');
+    team.unmount();
+    const three = hero({ secondAction: null, stripCells: [...twoCells, { key: 'extra', value: '3', label: 'Extra' }] });
+    expect(strip(three.container)!.getAttribute('data-strip-placement')).toBe('below');
+  });
+
+  it('no element inside the strip carries a divider border, in either placement', () => {
+    for (const placement of ['beside', 'below'] as const) {
+      const v = hero(placement === 'beside' ? { secondAction: null, stripCells: twoCells } : { stripCells: twoCells });
+      const s = strip(v.container)!;
+      expect(s.getAttribute('data-strip-placement')).toBe(placement);
+      for (const el of [s, ...Array.from(s.querySelectorAll<HTMLElement>('*'))]) {
+        for (const w of [el.style.borderTopWidth, el.style.borderBottomWidth, el.style.borderLeftWidth]) {
+          expect(['', '0px'].includes(w)).toBe(true);
+        }
+        for (const st of [el.style.borderTopStyle, el.style.borderBottomStyle, el.style.borderLeftStyle]) {
+          expect(['', 'none'].includes(st)).toBe(true);
+        }
+      }
+      v.unmount();
+    }
+  });
+
+  it('no cells renders no strip, and the bio still renders', () => {
+    const v = hero({ secondAction: null, about: 'Clubs, fitting and everything in between, since 1998.' });
+    expect(strip(v.container)).toBeNull();
+    expect(v.container.querySelector('[data-club-about]')!.textContent).toContain('since 1998');
+  });
+
+  it('the coach strip renders its four keys, below', async () => {
+    Object.assign(coachState, { data: { n: 12, avg_change: -2.4 }, isSuccess: true, isError: false });
+    Object.assign(state, { business: fixture({ category: 'Coach / Instructor' }), followers: 3, posts: 2 });
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
+    expect(cellKeys(container)).toEqual(['coached', 'avgChange', 'followers', 'posts']);
+    expect(strip(container)!.getAttribute('data-strip-placement')).toBe('below');
   });
 });
 

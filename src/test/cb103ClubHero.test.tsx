@@ -197,12 +197,14 @@ describe('CB103 stat strip', () => {
     const { container } = hero({ avgRating: null, ratingsCount: 0, roundsTracked: 0, membersHere: null });
     expect(strip(container)).toBeNull();
   });
-  it('columns adapt to the cells present', () => {
+  it('the strip is a divider-free flex row below the buttons and adapts to the cells present', () => {
     const { container, rerender, props } = hero({ avgRating: 8.2, ratingsCount: 5, roundsTracked: 1764, membersHere: 21 });
-    expect(strip(container)!.style.gridTemplateColumns).toBe('repeat(3, 1fr)');
+    expect(strip(container)!.getAttribute('data-strip-placement')).toBe('below');
+    expect(strip(container)!.style.display).toBe('flex');
+    expect(strip(container)!.style.gap).toBe('28px');
+    expect(container.querySelectorAll('[data-cell]')).toHaveLength(3);
     expect(container.querySelector('[data-cell="rounds"] [data-cell-value]')!.textContent).toBe((1764).toLocaleString());
     rerender(<ClubProfileHero {...props} avgRating={8.2} ratingsCount={5} roundsTracked={0} membersHere={null} />);
-    expect(strip(container)!.style.gridTemplateColumns).toBe('repeat(1, 1fr)');
     expect(container.querySelectorAll('[data-cell]')).toHaveLength(1);
   });
   it('rating is white below and at 9.0', () => {
