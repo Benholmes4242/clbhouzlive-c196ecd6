@@ -558,3 +558,24 @@ describe('SuggestedGolfersBlock', () => {
     expect(container.firstChild).toBeNull();
   });
 });
+
+
+describe('Who to follow canonical avatar fallbacks', () => {
+  it('MasterGolf Travel without a logo uses dark SquircleAvatar initials MT, not a white tile', () => {
+    h.people = people(3);
+    h.biz = [biz({ name: 'MasterGolf Travel', logo_url: null })];
+    renderRail(1);
+    const initials = screen.getByText('MT');
+    expect(initials.closest('[data-squircle-avatar]')).toBeTruthy();
+    const card = screen.getByText('MasterGolf Travel').closest('[role="button"]');
+    const whiteTiles = Array.from(card?.querySelectorAll('div') ?? []).filter(el => el.style.background === 'rgb(248, 250, 252)');
+    expect(whiteTiles).toHaveLength(0);
+  });
+
+  it('a person without a photo uses two initials SC', () => {
+    h.people = [person({ display_name: 'Sarah Collins', profile_photo_url: null }), ...people(3).slice(1)];
+    h.biz = [];
+    renderRail(1);
+    expect(screen.getByText('SC').closest('[data-squircle-avatar]')).toBeTruthy();
+  });
+});

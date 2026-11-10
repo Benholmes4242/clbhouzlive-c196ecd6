@@ -85,7 +85,7 @@ const POST: FeedPost = {
   isFollowedByMe: false,
 };
 
-const renderCard = () =>
+const renderCard = (overrides: Partial<React.ComponentProps<typeof FeedCard>> = {}) =>
   render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <FeedCard
@@ -98,6 +98,7 @@ const renderCard = () =>
         onShare={() => {}}
         onOpenMedia={() => {}}
         onProfile={() => {}}
+        {...overrides}
       />
     </QueryClientProvider>,
   );
@@ -158,5 +159,59 @@ describe('feed actor picker tidy (BRIEF_FEED_ACTOR_PICKER_TIDY)', () => {
     expect(buttons).toHaveLength(3);
     for (const el of buttons) expect(el.tagName).toBe('BUTTON');
     expect(buttons[2]).toBe(share);
+  });
+});
+
+
+describe('media-first comment-row account chooser', () => {
+  it('moves the two-actor chooser out of the action row and opens only POST AS on chevron tap', () => {
+    actorState.actors = TWO;
+    const onComment = vi.fn();
+    const { container } = renderCard({ layout: 'mediaFirst', currentUserId: 'u1', onComment });
+    const actionRow = screen.getByRole('button', { name: 'Send' }).parentElement;
+    expect(actionRow?.querySelector('svg.lucide-chevron-down')).toBeNull();
+    expect(actionRow?.querySelector('[aria-label^="Acting as"]')).toBeNull();
+    expect((actionRow?.firstElementChild as HTMLElement).style.marginLeft).toBe('auto');
+    const row = container.querySelector('[data-feed-section="add-comment"]');
+    const trigger = screen.getByRole('button', { name: 'Acting as Ben — tap to switch' });
+    expect(row?.contains(trigger)).toBe(true);
+    expect(avatarBox(trigger, 26)).toHaveLength(1);
+    expect(trigger.querySelector('svg')?.getAttribute('width')).toBe('12');
+    expect(trigger.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.75');
+    expect(row?.querySelector('button button')).toBeNull();
+    const chevron = trigger.querySelector('svg');
+    if (!chevron) throw new Error('missing chooser chevron');
+    fireEvent.click(chevron);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('POST AS')).toBeInTheDocument();
+    expect(onComment).not.toHaveBeenCalled();
+  });
+
+  it('the separate comment text opens comments with the effective actor and source', () => {
+    actorState.actors = TWO;
+    const onComment = vi.fn();
+    renderCard({ layout: 'mediaFirst', currentUserId: 'u1', onComment });
+    fireEvent.click(screen.getByText('Add a comment…'));
+    expect(onComment).toHaveBeenCalledWith(POST, TWO[0], 'add_comment_row');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('one actor keeps a single whole-row comment door without a chevron or nested buttons', () => {
+    actorState.actors = ONE;
+    const onComment = vi.fn();
+    const { container } = renderCard({ layout: 'mediaFirst', currentUserId: 'u1', onComment });
+    const row = container.querySelector('[data-feed-section="add-comment"]');
+    expect(row?.tagName).toBe('BUTTON');
+    expect(row?.querySelector('button, svg.lucide-chevron-down')).toBeNull();
+    if (!row) throw new Error('missing comment row');
+    fireEvent.click(row);
+    expect(onComment).toHaveBeenCalledWith(POST, ONE[0], 'add_comment_row');
+  });
+
+  it('standard cards retain their footer chooser per ruling', () => {
+    actorState.actors = TWO;
+    renderCard();
+    const row = screen.getByRole('button', { name: 'Send' }).parentElement;
+    expect(row?.contains(screen.getByRole('button', { name: 'Acting as Ben — tap to switch' }))).toBe(true);
   });
 });
