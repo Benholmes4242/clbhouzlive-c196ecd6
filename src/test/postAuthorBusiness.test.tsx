@@ -70,7 +70,6 @@ describe('postAuthor', () => {
 
   it('names the business on a shorts_v2-shaped row carrying business_name', () => {
     const author = postAuthor({
-      post_id: 'p2',
       post_actor_type: 'business',
       post_actor_id: 'biz-1',
       business_name: 'Machrihanish Golf Club',
