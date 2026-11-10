@@ -1,10 +1,10 @@
 # Roadmap
 
-## In progress: Tour dock blur and Players portrait correction
-Add page-level frost only while Schedule/Leaderboards headers dock; preserve other board callers.
-Constrain the Players portrait below the title/search row using CHROME_CLEARANCE.
-Add requested guards, verify scroll/resize and phone widths, run separate shards; stop on any test failure.
-Baseline: 8,085. No existing test repairs authorised.
+## Done: Tour dock blur and Players portrait correction
+Page-level frost appears while Schedule/Leaderboards headers dock; other board callers retain default paint.
+Players portrait height uses the requested CHROME_CLEARANCE expression. Six new guards; no existing tests changed.
+Focused 45/45; separate shards 2,113 / 1,929 / 2,068 / 1,981 = 8,091 passed (+6 from 8,085); build OK.
+Live phone checks blocked: all three Tour URLs show “App couldn't start”. Real-page docking/portrait appearance remains unverified.
 
 ## Done: Featured round label and date corrections
 Inline FeedCard heroes use the courses Featured label; HomeRail keeps Round of the week.
