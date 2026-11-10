@@ -6,6 +6,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
+import { isActiveTour } from '../../constants/tourMap';
 import { useFollowedBoardRows } from '../data/useFollowedBoardRows';
 import { useClimberRankHistory } from '../data/useClimberRankHistory';
 import { useTourPlayerFollows } from '../../leaderboard/useTourPlayerFollows';
@@ -22,7 +23,7 @@ import {
   surnameOf,
 } from './worldRankingsRules';
 
-const BOARDS: { id: RankingsBoard; label: string }[] = [{ id: 'owgr', label: 'World' }, { id: 'r2d', label: 'Race to Dubai' }, { id: 'cme', label: 'LPGA' }, { id: 'kft', label: 'Korn Ferry' }];
+const BOARDS: { id: RankingsBoard; label: string }[] = [{ id: 'owgr', label: 'World' }, ...([{ id: 'r2d', label: 'Race to Dubai', tour: 'euro' }, { id: 'cme', label: 'LPGA', tour: 'lpga' }, { id: 'kft', label: 'Korn Ferry', tour: 'pgad' }] as const).filter(board => isActiveTour(board.tour))];
 
 const UNMOVED_INK = 'rgba(248,250,252,0.3)';
 const FOLLOWED_WASH = 'rgba(247,147,30,0.06)';
