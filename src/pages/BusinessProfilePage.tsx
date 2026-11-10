@@ -72,7 +72,6 @@ import { isCoachCategory } from '@/features/coach/contracts';
 import { useCoachResults } from '@/features/coach/hooks';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
-import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ClubProfileHero, clubPlace, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
@@ -121,7 +120,6 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
   const { data: reviewStats } = useBusinessReviewStats(business?.id);
-  const { data: nearby } = useBusinessNearbyCounts(business?.category, business?.lat, business?.lng);
   /* PHASE 5B §2 — the evidence line, derived from the approved request. */
   const verificationEvidence = useVerificationEvidence(business?.id, business?.is_verified);
 
