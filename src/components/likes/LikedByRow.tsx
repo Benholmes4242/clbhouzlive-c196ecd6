@@ -260,8 +260,22 @@ export function LikedByRow({
   }
 
 
+  /* The grid-rows wrapper is the open/collapse animation: 0fr→1fr (and back)
+     over 180ms with the inner element clipped. No transition on first render
+     (mountedRef) or under prefers-reduced-motion — the row is simply there. */
+  const isOpen = count > 0;
+  const animate = mountedRef.current && !prefersReduced();
   return (
     <>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: isOpen ? '1fr' : '0fr',
+        opacity: isOpen ? 1 : 0,
+        ...(animate ? { transition: 'grid-template-rows 180ms ease-out, opacity 180ms ease-out' } : null),
+      }}
+    >
+    <div style={{ overflow: 'hidden', minHeight: 0 }}>
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); setOpen(true); }}
@@ -337,6 +351,7 @@ export function LikedByRow({
           {copy}
         </span>
       </button>
+    </div>
 
       {/* Taps inside the sheet bubble through the React tree even though it
           portals; this span keeps them from reaching a parent card. */}
@@ -351,6 +366,7 @@ export function LikedByRow({
         subject={subject}
       />
       </span>
+    </div>
     </>
   );
 }
