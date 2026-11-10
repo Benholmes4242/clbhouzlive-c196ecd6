@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   CHROME_BREATHING,
@@ -43,18 +43,32 @@ describe('Schedule tab on the shared islands', () => {
 });
 
 describe('chromeClearancePx', () => {
-  it('returns the parsed --chrome-clearance when set', () => {
-    document.documentElement.style.setProperty(CHROME_CLEARANCE_VAR, '72px');
-    expect(chromeClearancePx()).toBe(72);
+  afterEach(() => {
     document.documentElement.style.removeProperty(CHROME_CLEARANCE_VAR);
+    vi.restoreAllMocks();
   });
 
-  it('falls back to island height + gap + breathing when unset or NaN', () => {
+  it('measures the published calc() through a probe instead of parseFloat', () => {
+    document.documentElement.style.setProperty(CHROME_CLEARANCE_VAR, 'calc(var(--sat, 0px) + 72px)');
+    vi.spyOn(HTMLDivElement.prototype, 'getBoundingClientRect').mockReturnValue({ height: 119 } as DOMRect);
+    expect(chromeClearancePx()).toBe(119);
+  });
+
+  it('returns 0 on chrome-less routes publishing 0px', () => {
+    document.documentElement.style.setProperty(CHROME_CLEARANCE_VAR, '0px');
+    expect(chromeClearancePx()).toBe(0);
+  });
+
+  it('falls back to island height + gap + breathing when unset and the probe measures 0', () => {
     document.documentElement.style.removeProperty(CHROME_CLEARANCE_VAR);
-    const fallback = CHROME_ISLAND_H_FALLBACK + CHROME_TOP_GAP + CHROME_BREATHING;
-    expect(chromeClearancePx()).toBe(fallback);
-    document.documentElement.style.setProperty(CHROME_CLEARANCE_VAR, 'auto');
-    expect(chromeClearancePx()).toBe(fallback);
-    document.documentElement.style.removeProperty(CHROME_CLEARANCE_VAR);
+    expect(chromeClearancePx()).toBe(CHROME_ISLAND_H_FALLBACK + CHROME_TOP_GAP + CHROME_BREATHING);
+  });
+
+  it('caches on the raw value and viewport — a second call does not re-probe', () => {
+    document.documentElement.style.setProperty(CHROME_CLEARANCE_VAR, 'calc(var(--sat, 0px) + 88px)');
+    const spy = vi.spyOn(HTMLDivElement.prototype, 'getBoundingClientRect').mockReturnValue({ height: 119 } as DOMRect);
+    expect(chromeClearancePx()).toBe(119);
+    expect(chromeClearancePx()).toBe(119);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });
