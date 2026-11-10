@@ -26,6 +26,8 @@ import { isActiveTour } from '../constants/tourMap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { FONT, TOUR_CANVAS, INK, INK_MUTE } from '../_shared/tokens';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourPlayerFollows } from '../leaderboard/useTourPlayerFollows';
 
@@ -242,7 +244,9 @@ export function PlayersTab() {
       {rankingLoading ? (
         <FrontSkeleton />
       ) : rankingError ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
+        /* PLAYERS ISLANDS (10 Nov 2026): every non-front state starts under
+           the shared islands; only the front hero bleeds into the notch. */
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '0 16px 48px', paddingTop: `calc(${CHROME_CLEARANCE} + 48px)`, textAlign: 'center' }}>
           <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
             {t('players.error.title', { defaultValue: "Couldn't load the ranking" })}
           </div>
@@ -258,8 +262,11 @@ export function PlayersTab() {
           </button>
         </div>
       ) : players.length === 0 ? (
-        <TourHubEmptyState variant="players" />
+        <div style={{ paddingTop: CHROME_CLEARANCE }}>
+          <TourHubEmptyState variant="players" />
+        </div>
       ) : view === 'all' ? (
+        <div style={{ paddingTop: CHROME_CLEARANCE }}>
         <FullField
           data={data}
           actions={actions}
