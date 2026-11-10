@@ -55,7 +55,9 @@ describe('Tour hero refinements', () => {
     const v = board(field.map(e => ({ ...e, today: -1, today_round: 3, thru: 4 })));
     const header = v.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(header?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 32px 32px 32px 40px');
-    Array.from(header?.children ?? []).slice(2).forEach(el => expect((el as HTMLElement).style.textAlign).toBe('center'));
+    // Board headers without POS/PLAYER: round labels and TOT stay centred.
+    header?.querySelectorAll<HTMLElement>('[data-hero-round-header]').forEach(el => expect(el.style.textAlign).toBe('center'));
+    expect((header?.lastElementChild as HTMLElement)?.style.textAlign).toBe('center');
     expect(header?.textContent).toContain('R1');
     expect(header?.textContent).toContain('R3');
     expect(header?.textContent).not.toContain('TODAY');
