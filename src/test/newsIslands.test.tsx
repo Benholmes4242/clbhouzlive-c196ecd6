@@ -1,7 +1,7 @@
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -134,6 +134,30 @@ describe('News tab on the shared islands — lead bleed', () => {
     expect(container.querySelector('[data-testid="tour-news-searchbar"]')).not.toBeNull();
     // The story did not open: still on the hub URL, lead hidden while searching.
     expect(container.querySelector('[data-testid="tour-news-lead"]')).toBeNull();
+  });
+
+  it('Enter on the overlaid search button opens search and never opens the story', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/tourhub?tab=news']}>
+        <NewsTab immersiveHero={false} islands />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+    const lead = container.querySelector('[data-testid="tour-news-lead"]')!;
+    fireEvent.keyDown(lead.querySelector('[aria-label="Search stories"]')!, { key: 'Enter' });
+    expect(container.querySelector('[data-testid="tour-news-searchbar"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="loc"]')!.textContent).toBe('/tourhub');
+  });
+
+  it('Enter on the lead itself opens the story', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/tourhub?tab=news']}>
+        <NewsTab immersiveHero={false} islands />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+    fireEvent.keyDown(container.querySelector('[data-testid="tour-news-lead"]')!, { key: 'Enter' });
+    expect(container.querySelector('[data-testid="loc"]')!.textContent).toBe('/tour/news/lead');
   });
 
   it('the fresh line renders directly below the lead', () => {
