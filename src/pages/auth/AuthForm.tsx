@@ -30,6 +30,8 @@ import { getGuestUser } from '@/features/guest/guestGateStore';
 import { trackGuestConverted } from '@/features/guest/guestAnalytics';
 import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
 import { refreshGuestConversion } from '@/features/guest/refreshGuestConversion';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 
 type AppleClaims = {
   aud?: string;
@@ -62,7 +64,50 @@ const sanitiseErrorForAnalytics = (message?: string): string => {
 type Step = 'hero' | 'otp';
 type SubmittingMethod = 'email' | 'apple' | 'google' | null;
 
-const RESEND_COOLDOWN_SECONDS = 30;
+// SIGNIN_FIX_1: matches Supabase's one-email-per-60-seconds limit.
+const RESEND_COOLDOWN_SECONDS = 60;
+
+/**
+ * SIGNIN_FIX_1: the code we sent survives iOS reloading the app while the
+ * member is in Mail. One record, overwritten by each send; cleared on
+ * successful verify and on sign-out. Every read/write is guarded — auth
+ * never throws on storage.
+ */
+const PENDING_CODE_KEY = 'auth.pendingCode';
+const PENDING_CODE_MAX_AGE_MS = 10 * 60 * 1000;
+
+interface PendingCode {
+  email: string;
+  sentAt: number;
+  linkMode: boolean;
+}
+
+const readPendingCode = (): PendingCode | null => {
+  try {
+    const raw = safeLocalStorage.get(PENDING_CODE_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as Partial<PendingCode>;
+    if (typeof p?.email !== 'string' || typeof p?.sentAt !== 'number') return null;
+    return { email: p.email, sentAt: p.sentAt, linkMode: p.linkMode === true };
+  } catch {
+    return null;
+  }
+};
+
+const writePendingCode = (rec: PendingCode) => {
+  try {
+    safeLocalStorage.set(PENDING_CODE_KEY, JSON.stringify(rec));
+  } catch { /* never block auth */ }
+};
+
+const clearPendingCode = () => {
+  try {
+    safeLocalStorage.remove(PENDING_CODE_KEY);
+  } catch { /* never block auth */ }
+};
+
+const alreadySentInfo = (email: string) =>
+  `We've already sent a code to ${email}. Use that one; it can take a minute to arrive, so check spam too.`;
 
 interface AuthFormProps {
   /** Stage 2.6: claim navigation for the duration of a sign-in attempt;
