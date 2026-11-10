@@ -282,10 +282,12 @@ export function PlayersTab() {
           searchRef={searchRef}
           query={query}
         />
+        </div>
       ) : (
         <FrontPage data={data} actions={actions} />
       )}
       <div style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }} />
+      <ScrollToTopGlass />
     </div>
   );
 }
