@@ -1,23 +1,22 @@
 # Menu label + LIV retirement — close-out report
 
 ## Result and limits
-No app, test, edge-function, configuration or database changes were made during this close-out. Only this report was written.
-After-shards 2, 3 and 4 ran one at a time. Shard 3 has one explained failure: its unchanged test attempts to click the retired LIV Golf button. It was not repaired or rerun. Shard 4 was completed because the failure is directly explained by the requested retirement, not an unexplained regression.
+Authorised test-only repair completed in `src/test/pk2WinnerChance.test.tsx`; no production, edge-function, configuration or database changes. Four fresh shards ran one at a time and all passed. The earlier LIV-button failure is resolved by the explicitly authorised fixture/test repair below.
 
 ## Sequential test counts
 Command for each: `bunx vitest run --maxWorkers=2 --shard=N/4`.
 
-| Shard | Before passed | After passed | After failed | After executed |
+| Shard | Original baseline passed | Before repair executed | After repair passed | Failed |
 |---|---:|---:|---:|---:|
-| 1 (already passed) | 2,087 | 2,093 | 0 | 2,093 |
-| 2 | 1,916 | 1,917 | 0 | 1,917 |
-| 3 | 2,066 | 2,066 | 1 | 2,067 |
-| 4 | 1,971 | 1,970 | 0 | 1,970 |
-| **Total** | **8,040** | **8,046** | **1** | **8,047** |
+| 1 | 2,087 | 2,093 | 2,093 | 0 |
+| 2 | 1,916 | 1,917 | 1,917 | 0 |
+| 3 | 2,066 | 2,067 | 2,068 | 0 |
+| 4 | 1,971 | 1,970 | 1,970 | 0 |
+| **Total** | **8,040** | **8,047** | **8,048** | **0** |
 
-Suite-size reconciliation: **8,040 → 8,047 (+7)**. Six tests were added in `src/test/tourRetirement.test.tsx` and one in `src/test/tourInterpolationGuard.test.ts`. No tests deleted or renamed. Distribution between shards changed; shard 4's -1 is not a test deletion.
+Suite-size reconciliation: **8,040 → 8,047 (+7) → 8,048 (+1)**. The retirement implementation added six tests in `src/test/tourRetirement.test.tsx` and one in `src/test/tourInterpolationGuard.test.ts`. This repair adds one test, “Tour switch omits LIV even when the record lists it”, in `src/test/pk2WinnerChance.test.tsx`. No tests deleted. Exactly one existing test renamed/repaired, as authorised below. Shard redistribution did not delete tests.
 
-New tests:
+Retirement implementation's seven new tests:
 - Retains LIV metadata but omits it from active lists and overview/picker chips.
 - Menu and island with real English JSON have no unresolved interpolation or LIV off-week label.
 - Redirects `/tourhub?tour=liv`.
@@ -26,23 +25,27 @@ New tests:
 - Active function lists exclude all LIV aliases.
 - Supplies every English placeholder in literal `t(key, options)` calls.
 
-Existing assertion changed during implementation (not this close-out):
+Existing retirement assertion changed previously:
 `src/test/tournamentPickInsights.test.tsx`, “record tour chips have canonical order and switching uses event season”.
 Old: `toEqual(['PGA TOUR','DP World','LPGA','Champions','Korn Ferry','LIV Golf'])`.
 New: `toEqual(['PGA TOUR','DP World','LPGA','Champions','Korn Ferry'])`.
 Reason: only the assertion pinning retired LIV's presence was updated; switching assertions retained.
 
-## Remaining failure — exact output
-`src/test/pk2WinnerChance.test.tsx:32:123`
-Test: **PK2 winner chance > LIV switch changes every chance figure and drops the winner multiple**
-```text
-TestingLibraryElementError: Unable to find role="button" and name "LIV Golf"
-```
-The unchanged statement is `fireEvent.click(await screen.findByRole('button',{name:'LIV Golf'}))`.
-The absence is the requested retirement. All subsequent assertions in that test remain untouched. This run is not reported as all green.
+## Authorised repair — exact test changes
+File: `src/test/pk2WinnerChance.test.tsx`.
+- Fixture `record.tours`: `['lpga','liv']` → `['lpga','champ']`.
+- Mock branch: `args.p_tour==='liv'` → `args.p_tour==='champ'`.
+- Renamed **“LIV switch changes every chance figure and drops the winner multiple”** → **“Tour switch changes every chance figure and drops the winner multiple”**.
+- Click: `screen.findByRole('button',{name:'LIV Golf'})` → `screen.findByRole('button',{name:TOUR_MAP.CHAMP.short})`, using registry display metadata, not a hard-coded Champions label.
+- RPC assertion: `expect(h.rpc).toHaveBeenCalledWith('get_my_pick_odds',{p_tour:'liv',p_year:2026})` → same assertion with `p_tour:'champ'`.
+- Unchanged figure assertions: `toBe('OUR PICKS0 of 2events')`, `toBe('3 AT RANDOM24/1')`; winner-multiple and sentence assertions remain `toBeNull()`.
+- New test **“Tour switch omits LIV even when the record lists it”** appends `'liv'` to `record.tours`, switches to registry-named Champions, waits for the switched figures, and asserts `expect(screen.queryByRole('button',{name:TOUR_MAP.LIV.label})).not.toBeInTheDocument()`.
+Reason: preserve the original tour-switch/odds behavior using an active tour, while proving retired LIV never reappears from historical record data.
 
-Logs: `/tmp/retire-liv-after1-final.log`, `/tmp/retire-liv-after2-final.log`, `/tmp/retire-liv-after3-final.log`, `/tmp/retire-liv-after4-final.log`.
-Earlier focused checks: 4 files / 47 tests passed; interpolation guard 1/1 passed. Those focused runs preceded the final implementation edits; final shards are authoritative.
+Focused command: `bunx vitest run src/test/pk2WinnerChance.test.tsx --maxWorkers=2` — **13/13 passed**, previously 12 tests.
+Fresh shard logs: `/tmp/liv-repair-shard1.log`, `/tmp/liv-repair-shard2.log`, `/tmp/liv-repair-shard3.log`, `/tmp/liv-repair-shard4.log`.
+Earlier failure output remains archived at `/tmp/retire-liv-after3-final.log`: `src/test/pk2WinnerChance.test.tsx:32:123`, `TestingLibraryElementError: Unable to find role="button" and name "LIV Golf"`. This is historical evidence, not a remaining failure.
+Latest available build log: `build OK` at 2026-11-10T12:31:19Z.
 
 ## Menu / translation sweep
 TourGlance renders the completed `startsLabel(row.startDate)` directly. Only unused `tour.glance.starts` was removed. A prior implementation edit removed the identically named `overview.hero.starts` accidentally; it was restored before the already-passing final shard 1, without changing its test. The final literal-key guard reported no missing English placeholders.
@@ -52,9 +55,9 @@ The guard scans literal `t` calls with object options, recognizes shorthand prop
 Successfully deployed: `daily-schedule-sync`, `scrape-season-rankings`, `sportradar-sync`, `tournament-live-sync`, `schedule-predictions`, `generate-predictions`, `tourhub-livegolf`, `fetch-news`.
 Deployment receipt confirms submitted source; no live sync/scrape/prediction execution is claimed here.
 
-## pg_cron inventory limitation
-No SQL was run or written. Hosted pg_cron command/request bodies were not available in this verification, so no installed-job inventory can be certified and “none” is not claimed.
-Source contains `src/features/admin/components/health/jobNames.ts:64` label **sync-player-stats-liv-2026** (“Player stats: LIV”). This is a candidate name for Ben to inspect, not evidence of its current installation or request body. No cron was modified or scheduled.
+## pg_cron status — user-confirmed
+Ben confirmed job **27**, `sync-player-stats-liv-2026`, was unscheduled by SQL. Job **54**, `tournament-live-sync`, is unrelated: “live” means live tournaments, not LIV Golf.
+No SQL was run or written by the agent. These job facts are user-confirmed, not a fresh hosted inventory; no additional cron modification or scheduling was performed.
 
 ## File-grouped implementation inventory
 Entries below describe prior implementation edits, not new close-out changes.
@@ -138,7 +141,7 @@ Entries below describe prior implementation edits, not new close-out changes.
 - `supabase/functions/tournament-live-sync/index.ts` — Retired guards on manual reconcile, stale/upcoming/prediction/live candidates, tee-time loop and syncTournament. Scorecard list excludes LIV; historical mappings and team-row logic retained.
 
 ## Deliberately retained references, grouped by file
-Historical rows and generated types were not deleted or rewritten. Existing admin historical controls and the failing historical LIV-switch test are explicitly disclosed, not silently claimed retired.
+Historical rows and generated types were not deleted or rewritten. Existing admin historical controls are explicitly disclosed. The obsolete LIV-switch test was repaired only under the subsequent explicit authorisation.
 
 - `public/locales/de/tourhub.json` — Historical LIV labels/points translation keys retained; disabled/pseudo locale resources unchanged.
 
@@ -212,7 +215,7 @@ Historical rows and generated types were not deleted or rewritten. Existing admi
 
 - `src/test/overviewTourButtons.test.tsx` — Existing LIV fixture, historical metadata or exclusion assertion retained; test unchanged.
 
-- `src/test/pk2WinnerChance.test.tsx` — Unchanged historical LIV fixture and active LIV-switch assertion. The active switch assertion now fails; no repair authorized in this close-out.
+- `src/test/pk2WinnerChance.test.tsx` — Authorised fixture/mock/expected RPC second tour changed to Champions; renamed switch test retains all figures. One new test deliberately supplies historical LIV in record.tours and asserts the LIV button is absent; registry labels supply both selectors.
 
 - `src/test/tourIsland.test.tsx` — Existing LIV fixture, historical metadata or exclusion assertion retained; test unchanged.
 
@@ -239,7 +242,7 @@ Historical rows and generated types were not deleted or rewritten. Existing admi
 - `src/integrations/supabase/types.ts` — Generated database types unchanged. `livegolf_event_id` is a provider identifier, not a LIV active-tour selector.
 
 ## Exact surviving reference appendix
-Scan scope: `src`, `public/locales`, `supabase/functions`, excluding generated `types.ts`; case-insensitive LIV/LIVPTS/LIV-Golf tokens. All 192 matches across 64 files are grouped below. The broad scan also matches “LiveGolf” provider names; those are explicitly unrelated to LIV retirement. Removed references are described in the implementation inventory above. SQL/migration archives, reports and binary logo assets are not execution paths and were not edited.
+Scan scope: `src`, `public/locales`, `supabase/functions`, excluding generated `types.ts`; case-insensitive LIV/LIVPTS/LIV-Golf tokens. The original 192-match / 64-file inventory is preserved below, with the repaired pk2WinnerChance entry refreshed (one surviving line replaces its prior three; 190 entries across the same 64 files). The broad scan also matches “LiveGolf” provider names; those are explicitly unrelated to LIV retirement. Removed references are described in the implementation inventory above. SQL/migration archives, reports and binary logo assets are not execution paths and were not edited.
 
 ### `public/locales/de/tourhub.json`
 ```text
@@ -517,9 +520,7 @@ Scan scope: `src`, `public/locales`, `supabase/functions`, excluding generated `
 
 ### `src/test/pk2WinnerChance.test.tsx`
 ```text
-22:  record={tours:['lpga','liv'],picks:24,event_count:8,won:5,top10:13,avg_percentile:74,best:{events:8,wins:5,top10:8,avg_percentile:90},random_win_pct:2.7,avg_field_size:72,first_event_date:null,events:[]};
-25:   if(name==='get_our_pick_record')return{data:args.p_tour==='liv'?{...record,event_count:2,best:{...record.best,wins:0},random_win_pct:4}:record,error:null};
-32:  it('LIV switch changes every chance figure and drops the winner multiple',async()=>{mount();fireEvent.click(await screen.findByRole('button',{name:'LIV Golf'}));await waitFor(()=>expect(document.querySelector('[data-chance-group="winner"] [data-chance-row="ours"]')?.textContent).toBe('OUR PICKS0 of 2events'));expect(document.querySelector('[data-chance-group="winner"] [data-chance-row="random"]')?.textContent).toBe('3 AT RANDOM24/1');expect(document.querySelector('[data-chance-group="winner"] .pick-chance-x')).toBeNull();expect(document.querySelector('.pick-chance-sentence')).toBeNull();expect(h.rpc).toHaveBeenCalledWith('get_my_pick_odds',{p_tour:'liv',p_year:2026});});
+34:  it('Tour switch omits LIV even when the record lists it',async()=>{record.tours.push('liv');mount();fireEvent.click(await screen.findByRole('button',{name:TOUR_MAP.CHAMP.short}));await waitFor(()=>expect(document.querySelector('[data-chance-group="winner"] [data-chance-row="ours"]')?.textContent).toBe('OUR PICKS0 of 2events'));expect(screen.queryByRole('button',{name:TOUR_MAP.LIV.label})).not.toBeInTheDocument();});
 ```
 
 ### `src/test/tourIsland.test.tsx`
@@ -690,4 +691,4 @@ Scan scope: `src`, `public/locales`, `supabase/functions`, excluding generated `
 ```
 
 ## Preserved constraints
-No SQL, migrations, historical-row deletion, feed_config edits, round_pool_cap changes, native/Median changes or new code/test repairs during close-out. No new browser/device checks were requested or performed. Completion of all-green verification remains blocked only by the named obsolete LIV-button assertion.
+Only the expressly authorised pk2WinnerChance test repair and report/roadmap updates were made. No SQL, migrations, historical-row deletion, production edits, feed_config edits, round_pool_cap changes, native/Median changes or deployments. No new browser/device checks requested or performed. All four fresh shards passed; no verification failure remains.
