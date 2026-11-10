@@ -365,12 +365,21 @@ describe('CB112 figure placement', () => {
     expect(v.container.querySelector('[data-club-about]')!.textContent).toContain('since 1998');
   });
 
-  it('the coach strip renders its four keys, below', async () => {
+  it('the coach strip caps at three keys, below', async () => {
     Object.assign(coachState, { data: { n: 12, avg_change: -2.4 }, isSuccess: true, isError: false });
     Object.assign(state, { business: fixture({ category: 'Coach / Instructor' }), followers: 3, posts: 2 });
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
-    expect(cellKeys(container)).toEqual(['coached', 'avgChange', 'followers', 'posts']);
+    expect(cellKeys(container)).toEqual(['coached', 'avgChange', 'followers']);
+    expect(strip(container)!.getAttribute('data-strip-placement')).toBe('below');
+  });
+
+  it('coach results without avg change show followers and posts, below', async () => {
+    Object.assign(coachState, { data: { n: 4, avg_change: null }, isSuccess: true, isError: false });
+    Object.assign(state, { business: fixture({ category: 'Coach / Instructor' }), followers: 5, posts: 3 });
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
+    expect(cellKeys(container)).toEqual(['followers', 'posts']);
     expect(strip(container)!.getAttribute('data-strip-placement')).toBe('below');
   });
 });
