@@ -1,9 +1,10 @@
 # Roadmap
 
-## In progress: Featured round label and date corrections
-Only inline FeedCard heroes use the courses Featured label; HomeRail keeps Round of the week.
-Change featured date text from A.SOFT to A.MUTE, add three guards, and audit other hairline-text hits without changing them.
-Run focused tests and fresh sequential shards; stop on any failure. Last reported suite baseline: 8,082.
+## Done: Featured round label and date corrections
+Inline FeedCard heroes use the courses Featured label; HomeRail keeps Round of the week.
+Featured date text uses A.MUTE, with three new guards; no other color: A.SOFT hits found.
+Focused 34/34; sequential shards 2,113 / 1,924 / 2,078 / 1,970 = 8,085 passing (+3 against 8,082).
+No existing tests changed, deleted, renamed or repaired. Corrected the new harness's i18next option name without changing assertions.
 
 ## Done: Menu interpolation + LIV retirement
 Original baseline: 8,040. Retirement tests: 8,047; authorised Champions fixture/switch repair plus one LIV-exclusion test: 8,048.

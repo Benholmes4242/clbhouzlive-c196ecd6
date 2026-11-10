@@ -63,7 +63,7 @@ import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard
 import { featuredRoundFrom } from '@/components/feed/featuredRoundTrigger';
 
 const i18n = createInstance();
-void i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { courses } }, initImmediate: false });
+void i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { courses } }, initAsync: false });
 afterEach(cleanup);
 
 const post: FeedPost = {
