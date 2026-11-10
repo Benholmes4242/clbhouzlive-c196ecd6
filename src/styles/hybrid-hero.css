@@ -106,6 +106,6 @@
 .upcoming-event-facts b{line-height:var(--hero-cell-line)}
 .upcoming-event-facts span{margin-top:var(--hero-label-gap);letter-spacing:var(--hero-label-tracking);line-height:13px}
 .upcoming-history{padding-top:var(--hero-section-gap)}
-.upcoming-history .upcoming-last-header{margin-top:var(--hero-table-gap)}
+.upcoming-history .upcoming-last-header{margin-top:0}
 [data-overview-last-year]+.upcoming-course{padding-top:calc(var(--hero-section-gap) - 2px)}
 [data-overview-last-year]+.tv-section[data-tv-section="course"]{padding-top:var(--hero-section-gap)}

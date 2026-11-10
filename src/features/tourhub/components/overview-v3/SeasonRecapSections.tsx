@@ -103,9 +103,11 @@ export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecap
   const rows = (data.standings ?? []).slice(0, 3);
   if (!rows.length) return null;
   return <section data-recap-board className="upcoming-block recap-block">
-    <h2 className="upcoming-kicker">{t('overview.recap.pointsHeading', { defaultValue: 'THE POINTS LIST' })}</h2>
+    <div className="recap-head-row">
+      <h2 className="upcoming-kicker">{t('overview.recap.pointsHeading', { defaultValue: 'THE POINTS LIST' })}</h2>
+      <span className="recap-pts-label">{t('overview.recap.pts')}</span>
+    </div>
     <div data-recap-table className="recap-table">
-    <div className="recap-grid recap-grid-head"><span>{t('overview.upcomingPlus.pos')}</span><span>{t('overview.upcomingPlus.player')}</span><span>{t('overview.recap.pts')}</span></div>
     {rows.map((r) => <div key={r.position} className="recap-grid recap-row" data-recap-row={r.position}>
       <span className="recap-pos">{r.position === 1 ? <Trophy data-recap-trophy size={13} className="recap-trophy" aria-label="1" /> : r.position}</span>
       <span className="recap-name">{r.name}</span>
