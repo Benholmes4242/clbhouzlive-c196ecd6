@@ -8,6 +8,7 @@ import { CourseImageFallback } from '@/components/explore-tab-new/courseled/Cour
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import { collectRoundFeats } from './roundFeatCollection';
 import { RoundTilePlot, homePanelCallout, feedStrokesReceived, feedNetSeries } from '@/components/feed/roundTilePlot';
+import { ScorePostBody } from '@/components/feed/ScorePostBody';
 import { formatDisplayedHcp } from '@/lib/whs/format';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
@@ -1656,16 +1657,7 @@ export function ExploreCard({
     const net = item.facts.net ?? null;
     const par = item.facts.course_par ?? null;
     const grossToPar = item.facts.to_par ?? null;
-    const grossToParText = toParLabel(grossToPar);
-    const netShown = nettable && net != null;
-    const netToPar = netShown && par != null ? net - par : null;
-    const netToParText = toParLabel(netToPar);
-    /* CB111.1 — the card's existing to-par rule: UNDER par is TOPAR_UNDER_DARK
-       red, level or over is A.MUTE. Never red over par. */
-    const toParColor = (v: number | null) => (v ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE;
     const scoreLedCourse = kickerPartsValue.course ?? (item.subject?.course_name?.trim() || null);
-    const hasAwards = !!medals && (medals.gold > 0 || medals.silver > 0 || medals.bronze > 0);
-    const cellLabel: React.CSSProperties = { display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM };
     const sideCallout = feedPlot ? homePanelCallout(callout, shape, collectRoundFeats(item.facts)) : callout;
     return (
       <button
