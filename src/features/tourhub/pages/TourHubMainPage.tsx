@@ -221,8 +221,8 @@ export function TourHubMainPage() {
             (8 Nov 2026), SCHEDULE TAB and PLAYERS TAB (10 Nov 2026), NEWS TAB
             (10 Nov 2026): with the News conversion the hub no longer renders
             TourPageShell at all; the old measured-header wrapper branch and
-            SubTabTourControl are gone. TourPageShell itself stays for the
-            tournament/player sub-pages. */}
+            the sub-tab tour control are gone. TourPageShell itself stays for
+            the tournament/player sub-pages. */}
         {renderTab()}
       </TourHubShell>
     </TourSelectionProvider>
