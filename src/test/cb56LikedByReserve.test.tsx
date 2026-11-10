@@ -74,11 +74,7 @@ const slot = (root: HTMLElement) => {
   const el = row.nextElementSibling as HTMLElement | null;
   return { row, el };
 };
-/** Everything that decides the footer's height in jsdom (no layout engine). */
-const geometry = (root: HTMLElement) => {
-  const { row, el } = slot(root);
-  return { rowPadding: row.style.padding, slotPresent: !!el, slotPadding: el?.style.padding, slotMargin: el?.style.margin, slotMinHeight: el?.style.minHeight, slotDisplay: el?.style.display };
-};
+
 
 describe('CB56 LikedByRow reserve', () => {
   it('reserve at count 0 renders a box with the populated row style and minHeight', () => {
