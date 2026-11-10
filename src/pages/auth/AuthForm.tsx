@@ -355,7 +355,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           const cancelled = /cancel|1001/i.test(msg);
           if (!cancelled && msg) {
             console.error('[apple-auth] native error:', msg);
-            trackAuthFailed('apple', msg);
+            trackAuthFailed('apple', msg, undefined, buildAuthErrorExtras({ message: msg }));
             toast.error('Apple Sign-In failed. Please try again.');
           }
           return;
@@ -391,7 +391,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
 
         if (error) {
           console.error('[apple-auth] supabase rejection:', (error as { status?: number }).status, error.message);
-          trackAuthFailed('apple', sanitiseErrorForAnalytics(error.message));
+          trackAuthFailed('apple', sanitiseErrorForAnalytics(error.message), undefined, buildAuthErrorExtras(error));
           toast.error('Could not complete Apple Sign-In. Please try again or use email.');
           setSubmittingMethod(null);
           return;
@@ -431,7 +431,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
         }
       } catch (err) {
         console.error('[apple-auth] sign-in threw:', err);
-        trackAuthException('apple', (err as Error)?.message ?? String(err));
+        trackAuthException('apple', (err as Error)?.message ?? String(err), buildAuthErrorExtras(err));
         toast.error('Could not complete Apple Sign-In. Please try again or use email.');
       } finally {
         if (!navigated) release?.();
@@ -471,7 +471,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           const cancelled = /cancel|canceled|cancelled|12501/i.test(msg);
           if (!cancelled && msg) {
             console.error('[google-auth] native error:', msg);
-            trackAuthFailed('google', msg);
+            trackAuthFailed('google', msg, undefined, buildAuthErrorExtras({ message: msg }));
             toast.error('Google Sign-In failed. Please try again.');
           }
           return;
@@ -507,7 +507,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
               '[google-auth] NONCE MISMATCH - enable Skip nonce checks in the Supabase Google provider settings',
             );
           }
-          trackAuthFailed('google', sanitiseErrorForAnalytics(error.message));
+          trackAuthFailed('google', sanitiseErrorForAnalytics(error.message), undefined, buildAuthErrorExtras(error));
           toast.error('Could not complete Google Sign-In. Please try again or use email.');
           setSubmittingMethod(null);
           return;
@@ -568,7 +568,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
         }
       } catch (err) {
         console.error('[google-auth] sign-in threw:', err);
-        trackAuthException('google', (err as Error)?.message ?? String(err));
+        trackAuthException('google', (err as Error)?.message ?? String(err), buildAuthErrorExtras(err));
         toast.error('Could not complete Google Sign-In. Please try again or use email.');
       } finally {
         if (!navigated) release?.();
