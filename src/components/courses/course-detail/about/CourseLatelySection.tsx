@@ -66,7 +66,8 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
         </div>
         <div style={{ display: 'flex', gap: SHELF_CARD.gap, padding: `14px ${RAIL_INSET}px 0`, overflow: 'hidden' }}>
           {[0, 1].map((i) => (
-            <div key={i} style={{ flex: 'none', width: SHELF_CARD.width, height: SHELF_CARD.height, borderRadius: SHELF_CARD.radius, background: A.PANEL }} />
+            /* The initial loading skeleton stays at the fixed 214. */
+            <div key={i} style={{ flex: 'none', width: SHELF_CARD.width, height: 214, borderRadius: SHELF_CARD.radius, background: A.PANEL }} />
           ))}
         </div>
       </div>
@@ -140,7 +141,7 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
           ))}
           {hasNextPage ? <div ref={sentinelRef} data-course-lately-sentinel style={{ flex: 'none', width: 1 }} aria-hidden /> : null}
           {isFetchingNextPage ? (
-            <div style={{ flex: 'none', width: SHELF_SKELETON.width, height: SHELF_SKELETON.height, borderRadius: SHELF_SKELETON.radius, background: SHELF_SKELETON.background }} />
+            <div style={{ flex: 'none', width: SHELF_SKELETON.width, minHeight: SHELF_SKELETON.minHeight, borderRadius: SHELF_SKELETON.radius, background: SHELF_SKELETON.background }} />
           ) : null}
         </div>
         <div data-course-lately-foot style={{ padding: `0 ${GUTTER}px`, marginTop: 12, fontSize: 12, color: A.DIM }}>

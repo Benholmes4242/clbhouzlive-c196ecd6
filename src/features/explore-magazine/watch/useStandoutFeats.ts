@@ -36,8 +36,10 @@ export function mapStandoutFeat(row: StandoutFeat): StandoutFeat {
     latest_play_date: row.latest_play_date ?? null,
   };
 }
-export function useStandoutFeats(userId: string | undefined, regionKind: RegionKind | null, regionValue: string | null, enabled = true) {
-  const args = { p_viewer: userId ?? null, p_region_kind: regionKind, p_region_value: regionValue };
+export function useStandoutFeats(userId: string | undefined, regionKind: RegionKind | null, regionValue: string | null, enabled = true, window = '14') {
+  /* EXPLORE TILES A: the window is an explicit argument (the shelf passes '30');
+     it rides the RPC as p_window and keys the query. */
+  const args = { p_viewer: userId ?? null, p_region_kind: regionKind, p_region_value: regionValue, p_window: window };
   return useQuery({
     queryKey: ['explore', 'standout-feats', args], enabled: !!userId && enabled, staleTime: 60_000,
     placeholderData: previous => previous,

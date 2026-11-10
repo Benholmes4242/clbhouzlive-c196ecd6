@@ -29,8 +29,8 @@ vi.mock('@/components/explore-tab-new/courseled/hooks/useStandoutRounds', async 
 }));
 vi.mock('@/features/explore-magazine/watch/useStandoutFeats', async original => ({
   ...await original<typeof import('@/features/explore-magazine/watch/useStandoutFeats')>(),
-  useStandoutFeats: (viewer:string, kind:string | null, value:string | null, enabled:boolean) => {
-    h.feats(viewer, kind, value, enabled);
+  useStandoutFeats: (viewer:string, kind:string | null, value:string | null, enabled:boolean, window?:string) => {
+    h.feats(viewer, kind, value, enabled, window);
     return { data:h.pools[value ?? 'everyone']?.feats ?? [], isFetched:!h.pending, isError:h.error };
   },
 }));
@@ -138,11 +138,16 @@ describe('SAR1 scope ladder and retention', () => {
     const view=mount(); h.pending=true; h.pools.England={ rounds:[], feats:[] }; fireEvent.click(screen.getByRole('button',{ name:'England' }));
     view.rerender(<Wrapper><StandoutRoundsShelf userId="me" /></Wrapper>); expect(screen.getByText('Player k0')).toBeInTheDocument();
   });
-  it('calls county nation and world reads with the specified filters and limit', () => {
-    mount(); expect(h.rounds).toHaveBeenCalledWith('me', { ...DEFAULT_FILTERS,regionKind:'region',regionValue:'Kent' },true,10);
-    expect(h.rounds).toHaveBeenCalledWith('me', { ...DEFAULT_FILTERS,regionKind:'sub_country',regionValue:'England' },true,10);
-    expect(h.rounds).toHaveBeenCalledWith('me',DEFAULT_FILTERS,true,10);
-    expect(h.feats).toHaveBeenCalledWith('me','region','Kent',true);
+  it('calls county nation and world reads with the specified filters and limit, all on the 30-day window', () => {
+    /* EXPLORE TILES A: the shelf reads 30 days; DEFAULT_FILTERS keeps 14 for the boards. */
+    mount(); expect(h.rounds).toHaveBeenCalledWith('me', { ...DEFAULT_FILTERS,window:'30',regionKind:'region',regionValue:'Kent' },true,10);
+    expect(h.rounds).toHaveBeenCalledWith('me', { ...DEFAULT_FILTERS,window:'30',regionKind:'sub_country',regionValue:'England' },true,10);
+    expect(h.rounds).toHaveBeenCalledWith('me',{ ...DEFAULT_FILTERS,window:'30' },true,10);
+    expect(h.feats).toHaveBeenCalledWith('me','region','Kent',true,'30');
+  });
+  it('the heading reads Last 30 days', async () => {
+    mount();
+    expect(await screen.findByText('Last 30 days')).toBeInTheDocument();
   });
 });
 describe('SAR1 rail and scorecard doors', () => {
@@ -181,11 +186,11 @@ describe('SAR1 feats and states', () => {
 describe('SAR1 RPC and geography contracts', () => {
   it('default limit remains four and explicit shelf limit is ten', () => { expect(standoutRpcArgs('me',DEFAULT_FILTERS).p_limit).toBe(4); expect(standoutRpcArgs('me',DEFAULT_FILTERS,10).p_limit).toBe(10); });
   it('feat mapper converts numeric RPC values and preserves server order', () => { const row=mapStandoutFeat({ ...feat('f'),year_events:'10',viewer_year_events:'2',hole_no:'4' } as unknown as StandoutFeat); expect(row.year_events).toBe(10); expect(row.viewer_year_events).toBe(2); expect(row.hole_no).toBe(4); });
-  it('new feat hook sends only viewer and geographic axes', async () => {
+  it('new feat hook sends viewer, geographic axes and the window', async () => {
     const actual=await vi.importActual<typeof import('@/features/explore-magazine/watch/useStandoutFeats')>('@/features/explore-magazine/watch/useStandoutFeats');
     h.rpc.mockResolvedValue({ data:[feat('f2'),feat('f1')],error:null });
-    const { result }=renderHook(() => actual.useStandoutFeats('me','region','Kent'),{ wrapper:Wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true)); expect(h.rpc).toHaveBeenCalledWith('get_standout_feats',{ p_viewer:'me',p_region_kind:'region',p_region_value:'Kent' }); expect(result.current.data?.map(row => row.latest_score_id)).toEqual(['f2','f1']);
+    const { result }=renderHook(() => actual.useStandoutFeats('me','region','Kent',true,'30'),{ wrapper:Wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true)); expect(h.rpc).toHaveBeenCalledWith('get_standout_feats',{ p_viewer:'me',p_region_kind:'region',p_region_value:'Kent',p_window:'30' }); expect(result.current.data?.map(row => row.latest_score_id)).toEqual(['f2','f1']);
   });
   it('nation comes from the primary club course, leaving profile country intact', async () => {
     const actual=await vi.importActual<typeof import('@/features/explore-magazine/useViewerScoreScope')>('@/features/explore-magazine/useViewerScoreScope');

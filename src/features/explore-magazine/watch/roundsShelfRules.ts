@@ -129,10 +129,12 @@ export function toParLabel(toPar: number | null): string | null {
 /** Under par is the surface's red; level and over are mute. */
 export const TO_PAR_UNDER = '#E24B3F';
 
-/** Card geometry and paint, named once (RS §3, mock A/C; unchanged by RR1). */
+/** Card geometry and paint, named once (RS §3, mock A/C; unchanged by RR1).
+ * EXPLORE TILES A: minHeight, never height — tiles grow to fit the full
+ * sentence and every tile in a rail stretches to the tallest one. */
 export const SHELF_CARD = {
   width: 232,
-  height: 214,
+  minHeight: 214,
   background: '#17171B',
   border: 'rgba(255,255,255,0.08)',
   radius: 18,
@@ -143,7 +145,7 @@ export const SHELF_CARD = {
 /** The end tile (RR1 §4, mock B). */
 export const SHELF_END = {
   width: 150,
-  height: 214,
+  minHeight: 214,
   background: '#17171B',
   border: 'rgba(255,255,255,0.08)',
   radius: 18,
@@ -151,5 +153,5 @@ export const SHELF_END = {
   gap: 10,
 } as const;
 
-/** The skeleton card shown while a page loads (RR1 §4). */
-export const SHELF_SKELETON = { width: 232, height: 214, radius: 18, background: '#141417' } as const;
+/** The skeleton card shown while a page loads (RR1 §4); stretches with the rail. */
+export const SHELF_SKELETON = { width: 232, minHeight: 214, radius: 18, background: '#141417' } as const;

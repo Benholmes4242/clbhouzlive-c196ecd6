@@ -109,7 +109,7 @@ describe('CS1 Lately here', () => {
     expect(latelyShortDate('2025-10-29', 'en', new Date('2026-11-05'))).toContain('2025');
   });
 
-  it('(d) date-only sub, CIRCLE only when in_circle, amber own round', async () => {
+  it('(d) no second line without a circle, CIRCLE only when in_circle, amber own round', async () => {
     f.rows = [row(1, { user_id: 'me', total_count: 2 }), row(2, { in_circle: true, total_count: 2 })];
     mount();
     await ready();
@@ -118,10 +118,15 @@ describe('CS1 Lately here', () => {
     expect((cards[0] as HTMLElement).style.border.replace(/\s/g, '')).toContain('rgba(247,147,30,0.35)');
     expect((cards[0].querySelector('[data-round-card-name]') as HTMLElement).style.color).toBe('rgb(247, 147, 30)');
     expect(cards[1].getAttribute('data-own-round')).toBeNull();
+    /* EXPLORE TILES A: a non-circle round has no second header line; a circle
+       round's second line carries only CIRCLE. The date lives in the foot. */
     expect(cards[0].querySelector('[data-round-card-circle]')).toBeNull();
+    expect(cards[0].querySelector('[data-round-card-name]')?.nextElementSibling).toBeNull();
     expect(cards[1].querySelector('[data-round-card-circle]')).not.toBeNull();
-    const sub = cards[0].querySelector('[data-round-card-name]')?.nextElementSibling;
-    expect(sub?.textContent).not.toContain('Sundridge');
+    const circleSub = cards[1].querySelector('[data-round-card-name]')?.nextElementSibling;
+    expect(circleSub?.textContent).toBe('CIRCLE');
+    expect(cards[0].querySelector('.standout-when')).toHaveTextContent('Nov 4');
+    expect(cards[0].querySelector('.standout-who')).not.toHaveTextContent('Nov 4');
     expect(document.querySelector('[data-course-lately-foot]')?.textContent).toBe('Newest first. Your circle is marked.');
     fireEvent.click(cards[1]);
     expect(f.openByScore).toHaveBeenCalledWith('s2', null, 'u2');

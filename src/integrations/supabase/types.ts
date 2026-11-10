@@ -22875,6 +22875,10 @@ export type Database = {
       }
       get_admin_audiences: { Args: never; Returns: Json }
       get_admin_command_centre: { Args: { p_tz?: string }; Returns: Json }
+      get_admin_command_centre_v2: {
+        Args: { p_days?: number; p_tz?: string }
+        Returns: Json
+      }
       get_admin_course_coverage: { Args: { p_limit?: number }; Returns: Json }
       get_admin_dashboard_glance: { Args: { p_tz?: string }; Returns: Json }
       get_admin_event_aggregates: {
@@ -26110,6 +26114,7 @@ export type Database = {
           p_region_kind?: string
           p_region_value?: string
           p_viewer?: string
+          p_window?: string
         }
         Returns: {
           denominator_unit: string
