@@ -258,8 +258,8 @@ export function useCommunityLibrary() {
             kind: isVideo ? 'video' : 'photo',
             thumbnail: leadItem.imageUrl ?? leadItem.thumbnailUrl ?? null,
             hlsUrl: leadItem.hlsUrl ?? null,
-            displayName: profile?.display_name ?? profile?.username ?? 'Player',
-            avatarUrl: profile?.profile_photo_url ?? null,
+            displayName: business?.name ?? profile?.display_name ?? profile?.username ?? 'Player',
+            avatarUrl: business?.logo_url ?? profile?.profile_photo_url ?? null,
             courseName,
             courseId,
             aspect:
