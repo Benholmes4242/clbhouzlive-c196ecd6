@@ -836,11 +836,23 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     isEditMode,
   });
   useLayoutEffect(() => { onHeaderFormChange(photoForm); }, [photoForm, onHeaderFormChange]);
+  /* review_text_cleared: non-empty -> empty on the words step. Length only;
+     never the text. after_voice = a dictation was appended this session. */
+  const dictatedRef = useRef(false);
+  const prevTextLenRef = useRef(composer.state.reviewText.length);
+  useEffect(() => {
+    const len = composer.state.reviewText.length;
+    if (step === FIRST_STEP && prevTextLenRef.current > 0 && len === 0) {
+      analyticsEvents.track('review_text_cleared', { from_len: prevTextLenRef.current, after_voice: dictatedRef.current });
+    }
+    prevTextLenRef.current = len;
+  }, [composer.state.reviewText, step]);
   const appendDictation = (text: string) => {
     const prev = composer.state.reviewText;
     const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
     composer.setReviewText(`${prev}${joiner}${text}`);
     setDictationFlashKey((k) => k + 1);
+    dictatedRef.current = true;
   };
   const hasMedia = media.count > 0;
 
@@ -1146,6 +1158,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 idleVariant="hero"
                 hasText={hasAnyText}
                 onAppend={appendDictation}
+                prompt={`A golf course review of ${course.name}.`}
                 onActiveChange={setVoiceActive}
                 onStart={() => {
                   // Analytics callsite: review_voice_started
