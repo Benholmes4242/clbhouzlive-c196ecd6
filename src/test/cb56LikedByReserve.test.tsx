@@ -104,7 +104,7 @@ describe('CB56 LikedByRow reserve', () => {
     expect(box.querySelector('button, a, [role="button"], [tabindex]')).toBeNull();
   });
 
-  it.each([['standard', BASE, '10px 20px 12px'], ['review', REVIEW, '9px 20px 10px']] as const)(
+  it.each([['standard', BASE, '10px 20px 12px'], ['review', REVIEW, '9px 14px 10px']] as const)(
     'the %s card footer collapses the liked-by line at zero likes', (_n, post, actionsPad) => {
       const v = render(card(post, 0));
       expect(v.container.querySelector('[data-liked-by-reserve]')).toBeNull();

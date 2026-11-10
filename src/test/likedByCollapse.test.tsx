@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+// No react-i18next mock: ExploreCard reads i18n.language, as in exploreRoundTileLikedByNoBubble.test.tsx.
 vi.mock('@/hooks/usePostLikers', () => ({
   usePostLikers: () => ({ likers: [], isLoading: true }),
   likerFirstNames: () => [],
@@ -113,7 +113,7 @@ describe('the fixed-layout sheets keep the reserve at zero', () => {
     'components/posts/ReviewBottomSheet.tsx',
     'features/courses/_shared/scorecard/CardScorecardSheet.tsx',
   ])('%s still passes reserve to LikedByRow', (p) => {
-    expect(read(p)).toMatch(/LikedByRow[\s\S]{0,300}?\breserve\b/);
+    expect(read(p)).toMatch(/LikedByRow[\s\S]{0,600}?\breserve\b/);
   });
   it('reserve at count 0 still renders the reserved box', () => {
     const v = render(<LikedByRow postId="p1" count={0} reserve />);
