@@ -53,7 +53,7 @@ vi.mock('@/integrations/supabase/client', () => ({
 }));
 vi.mock('@/lib/auth/postAuthRoute', () => ({ resolvePostAuthRoute: g.route }));
 vi.mock('@/lib/toast', () => ({ toast: { error: g.toastError } }));
-vi.mock('@/lib/authAnalytics', () => ({ trackAuthMethodSelected: vi.fn(), trackAuthInitiated: vi.fn(), trackAuthFailed: vi.fn(), trackAuthException: vi.fn(), trackLoginSuccess: vi.fn(), trackSignupInitiated: vi.fn(), trackSignupSuccess: vi.fn(), trackSignupFailed: vi.fn(), trackAuthComplete: vi.fn() }));
+vi.mock('@/lib/authAnalytics', () => ({ trackAuthMethodSelected: vi.fn(), trackAuthInitiated: vi.fn(), trackAuthFailed: vi.fn(), trackAuthException: vi.fn(), trackLoginSuccess: vi.fn(), trackSignupInitiated: vi.fn(), trackSignupSuccess: vi.fn(), trackSignupFailed: vi.fn(), trackAuthComplete: vi.fn(), buildAuthErrorExtras: vi.fn(() => ({})) }));
 vi.mock('@/pages/auth/components/AuthHeroScreen', () => ({ default: ({ onAppleSignIn, onGoogleSignIn }: { onAppleSignIn: () => void; onGoogleSignIn: () => void }) => <><button onClick={onAppleSignIn}>Apple</button><button onClick={onGoogleSignIn}>Google</button></> }));
 vi.mock('@/pages/auth/components/AuthBottomSheet', () => ({ default: ({ isOpen, children }: { isOpen: boolean; children: ReactNode }) => isOpen ? <section>{children}</section> : null }));
 vi.mock('@/pages/auth/components/OtpSheetContent', () => ({ default: () => null }));
