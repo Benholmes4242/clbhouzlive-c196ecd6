@@ -220,3 +220,52 @@ describe('recap body', () => {
     expect(container.querySelector('[data-recap-board]')).toBeNull();
   });
 });
+
+describe('card list A', () => {
+  const navLog: Array<{ pathname: string; state: unknown }> = [];
+  function LocProbe() {
+    const loc = useLocation();
+    React.useEffect(() => { navLog.push({ pathname: loc.pathname, state: loc.state }); }, [loc]);
+    return null;
+  }
+  it('cardListName: initial + surname, full name when a part is missing', () => {
+    expect(cardListName('Alistair', 'Docherty', 'Alistair Docherty')).toBe('A. Docherty');
+    expect(cardListName('Min Woo', 'Lee', 'Min Woo Lee')).toBe('M. Lee');
+    expect(cardListName(null, 'Lee', 'Min Woo Lee')).toBe('Min Woo Lee');
+    expect(cardListName('  ', 'Lee', 'Min Woo Lee')).toBe('Min Woo Lee');
+    expect(cardListName('Alistair', null, 'Alistair Docherty')).toBe('Alistair Docherty');
+  });
+  it('renders data-recap-card 1 to 20 in DOM order with row vars 7 and 10', () => {
+    const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
+    const grid = container.querySelector('.recap-cards') as HTMLElement;
+    expect(grid.style.getPropertyValue('--recap-rows-3')).toBe('7');
+    expect(grid.style.getPropertyValue('--recap-rows-2')).toBe('10');
+    const cells = [...container.querySelectorAll('[data-recap-card]')];
+    expect(cells.map((c) => c.getAttribute('data-recap-card'))).toEqual(Array.from({ length: 20 }, (_, i) => String(i + 1)));
+    expect(cells[3].querySelector('b')!.textContent).toBe('A. Docherty');
+    expect(cells[3].getAttribute('aria-label')).toBe('Alistair Docherty');
+  });
+  it('tapping card 4 and a points-list name opens the player page with the tour-hub referrer', () => {
+    navLog.length = 0;
+    const { container } = wrap(<><SeasonRecapBody tour="pgad" year={2026} data={kf()} /><LocProbe /></>);
+    fireEvent.click(container.querySelector('[data-recap-card="4"]')!);
+    expect(navLog.at(-1)).toEqual({ pathname: '/tourhub/player/p3', state: { referrer: { kind: 'tour-hub' } } });
+    fireEvent.click(container.querySelector('[data-recap-row="2"] .recap-name')!);
+    expect(navLog.at(-1)).toEqual({ pathname: '/tourhub/player/p1', state: { referrer: { kind: 'tour-hub' } } });
+  });
+  it('a card earner with no playerId renders plain text, not a button', () => {
+    const data = kf();
+    data.cardEarners = data.cardEarners.map((e, i) => (i === 0 ? { ...e, playerId: null } : e));
+    const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={data} />);
+    const first = container.querySelector('[data-recap-card="1"]')!;
+    expect(first.tagName).toBe('DIV');
+    expect(container.querySelector('[data-recap-card="2"]')!.tagName).toBe('BUTTON');
+  });
+  it('hybrid-hero.css has no centred max-content card grid and no 340px card rule', () => {
+    const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
+    const cardRules = css.split('}').filter((r) => r.includes('.recap-cards'));
+    expect(cardRules.join('}')).not.toContain('max-content');
+    expect(cardRules.join('}')).not.toContain('justify-content:center');
+    expect(css).not.toContain('max-width:340px){.recap-cards');
+  });
+});
