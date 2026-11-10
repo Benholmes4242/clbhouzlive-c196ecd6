@@ -62,6 +62,8 @@ export const FEED_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['videos-following-rail'],
   ['long-form-videos'],
   ['related-long-form-videos'],
+  ['explore-watch-videos'],
+  ['explore-watch-clips'],
 
   // Watch-v2 / Videos-v2 / Clips-v2 (rows carry `post_id`, not `id`;
   // applyEngagementDelta id-check also matches `post_id`).

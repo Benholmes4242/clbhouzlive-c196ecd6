@@ -4,7 +4,9 @@
  */
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Heart, MessageSquare, Share, Volume2, VolumeX } from 'lucide-react';
+import { ReactionGlyph, AMBER } from '@/lib/reactionKind';
+import { HeartBurst } from '@/components/feed/HeartBurst';
+import { MessageSquare, Share, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -100,7 +102,6 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
   const drag = useRef<{ x:number; y:number; dx:number; dy:number } | null>(null);
   const tap = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const heartTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const root = useRef<HTMLElement>(null);
   const viewed = useRef(false);
   const { activeActor } = useActiveActor();
@@ -132,7 +133,7 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
     mq.addEventListener('change', changed);
     return () => mq.removeEventListener('change', changed);
   }, []);
-  useEffect(() => () => { if (tap.current) clearTimeout(tap.current); if (advanceTimer.current) clearTimeout(advanceTimer.current); if (heartTimer.current) clearTimeout(heartTimer.current); }, []);
+  useEffect(() => () => { if (tap.current) clearTimeout(tap.current); if (advanceTimer.current) clearTimeout(advanceTimer.current); }, []);
   useEffect(() => {
     if (!root.current || viewed.current) return;
     const obs = new IntersectionObserver(entries => {
@@ -148,7 +149,7 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
       handleLike({ ...post, isLikedByMe:likes.isLiked, likeCount:likes.count });
       analyticsEvents.track('watch_featured_liked', { via });
     }
-    if (via === 'double_tap' || !likes.isLiked) { setHeart(value => value + 1); if (heartTimer.current) clearTimeout(heartTimer.current); heartTimer.current = setTimeout(() => setHeart(0),700); }
+    if (via === 'double_tap' || !likes.isLiked) { setHeart(value => value + 1); }
   };
   const open = () => { if (!row) return; onDepart(); openWithOrigin({ posts, index, originEl:null, posterUrl:posterFor(row), openedFrom:'amateur-watch', forceStartAtZero:true }); };
   const singleTap = () => {
@@ -189,9 +190,9 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
     <div className="featured-deck">
       {end ? <div className="featured-card featured-end" data-featured-end style={topStyle} {...gestures}><h3>That's this week's {numberWord(rows.length,false)}</h3><p>The deck refreshes as new videos come in. Swipe back to see one again.</p><div className="featured-end-actions"><Button variant="ghost" className="featured-end-button featured-restart" onClick={() => { clearTap(); setIndex(0); }}>Start again</Button><Button variant="ghost" className="featured-end-button" onClick={selectShorts}>All shorts</Button></div></div> : rows.slice(index,index+3).map((item,depth) => <div key={item.post_id} className="featured-card" data-featured-card={item.post_id} data-depth={depth} data-top={depth===0} aria-hidden={depth > 0 ? true : undefined} role={depth===0 ? 'button' : undefined} tabIndex={depth===0 ? 0 : -1} aria-label={depth===0 ? captionFor(item) || item.display_name : undefined} style={depth===0 ? topStyle : undefined} {...(depth===0 ? gestures : {})} onKeyDown={depth===0 ? e => { if (e.target!==e.currentTarget) return; if (e.key==='ArrowLeft' || e.key==='ArrowRight') { e.preventDefault(); move(e.key==='ArrowRight' ? 1 : -1); } if (e.key==='Enter' || e.key===' ') { e.preventDefault(); singleTap(); } } : undefined}>
         {posterFor(item) ? <img className="featured-media" src={posterFor(item) ?? undefined} alt="" decoding="async" /> : null}
-        {depth===0 ? <><FeaturedPlayback key={item.post_id} row={item} duration={formatDuration(item.duration_seconds)} /><span className="featured-shade" /><span className="featured-badge">FEATURED · {index+1} OF {rows.length}</span><div className="featured-foot"><div className="featured-who"><span className="featured-avatar">{item.avatar_url ? <img src={item.avatar_url} alt="" /> : <PlayerSilhouette />}</span><span>{item.display_name}</span></div><p className="featured-caption">{captionFor(item)}</p><div className="featured-meta">{likes.count} likes · {item.comment_count} comments · {shortAge(item.created_at)}</div></div>{heart > 0 ? <span key={heart} className="featured-heart" aria-hidden>♥</span> : null}</> : null}
+        {depth===0 ? <><FeaturedPlayback key={item.post_id} row={item} duration={formatDuration(item.duration_seconds)} /><span className="featured-shade" /><span className="featured-badge">FEATURED · {index+1} OF {rows.length}</span><div className="featured-foot"><div className="featured-who"><span className="featured-avatar">{item.avatar_url ? <img src={item.avatar_url} alt="" /> : <PlayerSilhouette />}</span><span>{item.display_name}</span></div><p className="featured-caption">{captionFor(item)}</p><div className="featured-meta">{likes.count} likes · {item.comment_count} comments · {shortAge(item.created_at)}</div></div>{heart > 0 ? <HeartBurst key={heart} onDone={() => setHeart(0)} /> : null}</> : null}
       </div>)}
     </div>
-    <div className="featured-bar">{!end ? <><Button variant="ghost" className="featured-action" aria-label="Like video" aria-pressed={likes.isLiked} disabled={!likeAvailable} onClick={() => like('button')}><Heart className="featured-like-icon" />{likes.count}</Button><Button variant="ghost" className="featured-action" aria-label="Open comments" onClick={() => { if (!row) return; analyticsEvents.track('watch_featured_comment_opened'); onOpenComments?.(row.post_id); }}><MessageSquare />{row?.comment_count}</Button><Button variant="ghost" className="featured-action" aria-label="Share video" onClick={() => { if (!post) return; analyticsEvents.track('watch_featured_shared'); handleShare(post); }}><Share /></Button></> : null}{!small ? <div className="featured-dots" aria-hidden>{rows.map((item,i) => <i key={item.post_id} data-current={i===Math.min(index,rows.length-1)} />)}</div> : null}</div>
+    <div className="featured-bar">{!end ? <><Button variant="ghost" className="featured-action" aria-label="Like video" aria-pressed={likes.isLiked} disabled={!likeAvailable} onClick={() => like('button')}><ReactionGlyph reacted={likes.isLiked} size={17} tone="panel" /><span data-featured-like-count style={likes.isLiked ? { color: AMBER } : undefined}>{likes.count}</span></Button><Button variant="ghost" className="featured-action" aria-label="Open comments" onClick={() => { if (!row) return; analyticsEvents.track('watch_featured_comment_opened'); onOpenComments?.(row.post_id); }}><MessageSquare />{row?.comment_count}</Button><Button variant="ghost" className="featured-action" aria-label="Share video" onClick={() => { if (!post) return; analyticsEvents.track('watch_featured_shared'); handleShare(post); }}><Share /></Button></> : null}{!small ? <div className="featured-dots" aria-hidden>{rows.map((item,i) => <i key={item.post_id} data-current={i===Math.min(index,rows.length-1)} />)}</div> : null}</div>
   </section>;
 }
