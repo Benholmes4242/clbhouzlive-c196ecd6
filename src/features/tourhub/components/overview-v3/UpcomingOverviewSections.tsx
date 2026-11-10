@@ -53,8 +53,10 @@ export function UpcomingLastYear({ rows }: { rows: LastYearFinisher[] }) {
   const { t } = useTranslation('tourhub'); const shown = rows.slice(0, 4);
   if (!shown.length) return null;
   return <section data-overview-last-year className="upcoming-block upcoming-history">
-    <h2 data-overview-board-header className="upcoming-kicker" style={{ textTransform: 'uppercase' }}>{t('overview.hero.lastYear')}{shown.every(row => row.year === shown[0].year) ? ` · ${shown[0].year}` : null}</h2>
-    <div className="upcoming-last-header">{['pos', 'player', 'tot'].map(key => <span key={key}>{t(`overview.upcomingPlus.${key}`)}</span>)}</div>
+    <div data-overview-board-header className="upcoming-last-header">
+      <h2 className="upcoming-kicker" style={{ textTransform: 'uppercase' }}>{t('overview.hero.lastYear')}{shown.every(row => row.year === shown[0].year) ? ` · ${shown[0].year}` : null}</h2>
+      <span>{t('overview.upcomingPlus.tot')}</span>
+    </div>
     {shown.map((row, i) => <LastYearRow key={`${row.rank}-${row.name}`} rank={i > 0 && row.rank === shown[i - 1].rank ? '' : row.rank} name={row.name} score={row.score} isWinner={i === 0 && (row.rank === '1' || row.rank === 'T1')} />)}
   </section>;
 }
