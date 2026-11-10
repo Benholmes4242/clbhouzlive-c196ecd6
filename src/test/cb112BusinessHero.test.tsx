@@ -63,6 +63,8 @@ vi.mock('@/hooks/useBusinessNearbyCounts', async (orig) => ({
   ...(await orig<typeof import('@/hooks/useBusinessNearbyCounts')>()),
   useBusinessNearbyCounts: () => ({ data: state.nearby }),
 }));
+const coachState: { data: unknown; isSuccess: boolean; isError: boolean } = { data: null, isSuccess: false, isError: false };
+vi.mock('@/features/coach/hooks', () => ({ useCoachResults: () => coachState }));
 
 import BusinessProfilePage from '@/pages/BusinessProfilePage';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
