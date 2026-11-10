@@ -41,16 +41,15 @@ afterEach(() => { cleanup(); f.entries = []; f.meta = { current_round: 2, status
 describe('Leaderboards page — islands, not a header bar', () => {
   it('the live tab renders outside TourPageShell, under the shared islands', () => {
     const main = source('src/features/tourhub/pages/TourHubMainPage.tsx');
-    expect(main).toContain("activeTab === 'live' ? renderTab()");
+    /* NEWS ON THE SHARED ISLANDS (10 Nov 2026): every tab now renders
+       directly — the hub no longer imports TourPageShell at all. */
+    expect(main).not.toContain('TourPageShell');
+    expect(main).toContain('{renderTab()}');
   });
   it('the TourIsland reads the Leaderboards label with its live caption', () => {
     const d = islandDescriptor({ activeTab: 'live', activeTourSlug: 'pga', rows: [], liveCount: 1, major: null, liveRound: () => 4 });
     expect(d.label).toBe('Leaderboards');
     expect(d.captionLive).toBe(true);
-  });
-  it('SubTabTourControl stays: the news/schedule/players tabs still use it', () => {
-    const main = source('src/features/tourhub/pages/TourHubMainPage.tsx');
-    expect(main).toContain('<SubTabTourControl');
   });
 });
 
