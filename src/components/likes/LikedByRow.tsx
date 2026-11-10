@@ -109,6 +109,45 @@ export function LikedByRow({
   // nothing. The line does not wait on it.
   const { likers, isLoading } = usePostLikers(postId, !!postId && count > 0, source);
 
+  /* OPEN/COLLAPSE ANIMATION (no reserve): the row mounts only while `shown`
+     is true. A 0→>0 rise while mounted opens with a 180ms grid-rows/opacity
+     transition; a >0→0 drop collapses the same way and unmounts after the
+     transition. First render at count > 0 has no transition (mountedRef is
+     still false at first paint), and prefers-reduced-motion skips both the
+     transition and the collapse delay. During the collapse the copy keeps the
+     last positive count so the sentence does not blank mid-animation. */
+  const [shown, setShown] = useState(count > 0);
+  const mountedRef = useRef(false);
+  const lastCountRef = useRef(count > 0 ? count : 0);
+  const reducedRef = useRef<boolean | null>(null);
+  const prefersReduced = () => {
+    if (reducedRef.current === null) {
+      reducedRef.current =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    return reducedRef.current;
+  };
+  useEffect(() => {
+    mountedRef.current = true;
+  }, []);
+  useEffect(() => {
+    if (count > 0) {
+      lastCountRef.current = count;
+      setShown(true);
+      return;
+    }
+    if (!shown || reserve) return;
+    if (prefersReduced()) {
+      setShown(false);
+      return;
+    }
+    const id = window.setTimeout(() => setShown(false), 180);
+    return () => window.clearTimeout(id);
+  }, [count, shown, reserve]);
+  const n = count > 0 ? count : lastCountRef.current;
+
   /* ONE style for the row and its reserved box, so the two match in height by
      construction: same element style, same minHeight, same text line. */
   const rowStyle: React.CSSProperties = {
