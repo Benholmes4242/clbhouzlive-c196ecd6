@@ -211,4 +211,20 @@ describe('SIGNIN_FIX_1', () => {
     await act(async () => {});
     expect(localStorage.getItem(PENDING_KEY)).toBeNull();
   });
+
+  it('(g) a guest anonymous session does not block the restore; a member session does', async () => {
+    getSession.mockResolvedValue({ data: { session: { user: { id: 'g1', is_anonymous: true } } } });
+    seedPending('golfer@example.com', 120);
+    renderAuth();
+    await waitFor(() => expect(screen.getByTestId('sheet')).toBeTruthy());
+    expect(screen.getByTestId('otp-info').textContent).toBe('Enter the code we sent to golfer@example.com.');
+    cleanup();
+
+    localStorage.clear();
+    getSession.mockResolvedValue({ data: { session: { user: { id: 'm1', is_anonymous: false } } } });
+    seedPending('golfer@example.com', 120);
+    renderAuth();
+    await act(async () => {});
+    expect(screen.queryByTestId('sheet')).toBeNull();
+  });
 });
