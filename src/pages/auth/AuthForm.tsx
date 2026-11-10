@@ -16,6 +16,7 @@ import {
   trackSignupSuccess,
   trackSignupFailed,
   trackAuthComplete,
+  buildAuthErrorExtras,
 } from '@/lib/authAnalytics';
 
 import AuthHeroScreen from './components/AuthHeroScreen';
@@ -225,8 +226,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           'email',
           sanitiseErrorForAnalytics(error.message),
           Date.now() - sendStartRef.current,
+          buildAuthErrorExtras(error),
         );
-        trackSignupFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - sendStartRef.current);
+        trackSignupFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - sendStartRef.current, buildAuthErrorExtras(error));
         setOtpError(msg);
         setOtpErrorNonce((n) => n + 1);
         setSubmittingMethod(null);
@@ -241,7 +243,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
       return true;
     } catch (err) {
       const e = err as Error;
-      trackAuthException('email', e.message);
+      trackAuthException('email', e.message, buildAuthErrorExtras(e));
       setOtpError('Something went wrong. Please try again.');
       setOtpErrorNonce((n) => n + 1);
       setSubmittingMethod(null);
@@ -298,6 +300,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           'email',
           sanitiseErrorForAnalytics(error.message),
           Date.now() - start,
+          buildAuthErrorExtras(error),
         );
         setOtpError(friendly);
         setOtpErrorNonce((n) => n + 1);
@@ -329,7 +332,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
       }
     } catch (err) {
       const e = err as Error;
-      trackAuthException('email', e.message);
+      trackAuthException('email', e.message, buildAuthErrorExtras(e));
       setOtpError('Something went wrong. Please try again.');
       setOtpErrorNonce((n) => n + 1);
       setSubmittingMethod(null);
