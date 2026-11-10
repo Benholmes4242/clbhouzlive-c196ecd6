@@ -1677,54 +1677,21 @@ export function ExploreCard({
         <span style={{ display: 'block', padding: '12px 14px 0' }}>
           <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} />
         </span>
-        <span data-round-score-block="true" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '14px 14px 0' }}>
-          {netShown ? (
-            <span style={{ minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <span data-round-score-net="true" style={{ ...FIGS, fontSize: 46, fontWeight: 700, letterSpacing: 0, lineHeight: 1, color: A.INK, whiteSpace: 'nowrap' }}>
-                {String(net)}
-                {netToParText ? <span data-round-score-net-topar="true" style={{ ...NUMF, fontSize: 17, fontWeight: 600, color: toParColor(netToPar), marginLeft: 6 }}>{netToParText}</span> : null}
-              </span>
-              <span style={{ ...cellLabel, marginTop: 6 }}>{t('amateur.stream.stat.net', 'Net')}</span>
-            </span>
-          ) : gross != null ? (
-            <span style={{ minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <span data-round-score-gross="true" style={{ ...FIGS, fontSize: 46, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: A.INK, whiteSpace: 'nowrap' }}>
-                {String(gross)}
-                {grossToParText ? <span data-round-score-gross-topar="true" style={{ ...NUMF, fontSize: 17, fontWeight: 600, color: toParColor(grossToPar), marginLeft: 6 }}>{grossToParText}</span> : null}
-              </span>
-              <span style={{ ...cellLabel, marginTop: 6 }}>{t('amateur.stream.stat.gross', 'Gross')}</span>
-            </span>
-          ) : <span />}
-          <span style={{ display: 'flex', gap: hasAwards ? 18 : 22, paddingBottom: 16, flex: '0 0 auto' }}>
-            {netShown && gross != null ? (
-              <span data-round-score-gross="true" style={{ textAlign: 'center' }}>
-                <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap' }}>
-                  {String(gross)}
-                  {grossToParText ? <span data-round-score-gross-topar="true" style={{ ...NUMF, fontSize: 12, fontWeight: 600, color: toParColor(grossToPar), marginLeft: 3 }}>{grossToParText}</span> : null}
-                </span>
-                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.gross', 'Gross')}</span>
-              </span>
-            ) : null}
-            {nettable ? (
-              <span data-round-score-handicap="true" style={{ textAlign: 'center' }}>
-                <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap' }}>{formatDisplayedHcp(Math.round(courseHcp))}</span>
-                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.handicap', 'Handicap')}</span>
-              </span>
-            ) : null}
-            {hasAwards && medals ? (
-              <span data-round-score-awards="true" style={{ textAlign: 'center', flex: 'none' }}>
-                <AwardCluster gold={medals.gold} silver={medals.silver} bronze={medals.bronze} surfaceColor={FEED_CARD_SURFACE} figureSize={17} />
-                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.awards', 'Awards')}</span>
-              </span>
-            ) : null}
-          </span>
-        </span>
-        {scoreLedCourse ? (
-          <span data-feed-round-course="true" style={{ display: 'block', padding: '12px 14px 0', fontSize: 14, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {scoreLedCourse}
-          </span>
-        ) : null}
-        {feedPlot && shape && received ? <RoundTilePlot shape={shape} received={received} scoreId={item.facts.score_id ?? null} /> : null}
+        {/* FEATURED_ROUND_OPTION_A — the body is the shared ScorePostBody, the
+            same component the Featured round / Round of the week card renders. */}
+        <ScorePostBody
+          net={net}
+          gross={gross}
+          coursePar={par}
+          courseHandicap={courseHcp}
+          grossToPar={grossToPar}
+          shape={shape}
+          received={received}
+          scoreId={item.facts.score_id ?? null}
+          medals={medals}
+          course={scoreLedCourse}
+          showPlot={feedPlot}
+        />
         {!feedPlot ? <span style={{ position: 'relative', display: 'block', marginInline: bleed != null ? -bleed : undefined }}>{photo}</span> : null}
         {sideCallout ? (
           <RoundStatStrip
