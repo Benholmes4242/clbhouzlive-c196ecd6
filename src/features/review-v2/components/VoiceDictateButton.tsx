@@ -34,6 +34,8 @@ interface Props {
   onActiveChange?: (active: boolean) => void;
   /** Hero only: fired when a recording starts from the card. */
   onStart?: () => void;
+  /** Optional Whisper hint (the review wizard passes the course name). */
+  prompt?: string;
 }
 
 const BAR_COUNT = 24;
@@ -218,7 +220,7 @@ function ProcessingStrip({ reduced }: { reduced: boolean }) {
   );
 }
 
-export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseType, hasText = false, onActiveChange, onStart }: Props) {
+export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseType, hasText = false, onActiveChange, onStart, prompt }: Props) {
   const { t } = useTranslation('courses');
   const rec = useVoiceRecorder();
   const [processing, setProcessing] = useState(false);
@@ -233,21 +235,22 @@ export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseTyp
   useEffect(() => {
     if (!rec.audioBlob) return;
     let cancelled = false;
-    const started = performance.now();
+    // ms = recording duration (the recorder's whole-second timer), not transcription time.
+    const ms = rec.duration * 1000;
     const mime = rec.audioBlob.type;
     setProcessing(true);
-    transcribeAudio(rec.audioBlob)
+    transcribeAudio(rec.audioBlob, prompt ? { prompt } : undefined)
       .then((text) => {
         if (cancelled) return;
         const trimmed = text.trim();
         if (trimmed) onAppend(trimmed);
-        analyticsEvents.track('review_voice_finished', { chars: trimmed.length, ms: Math.round(performance.now() - started), empty: !trimmed, mime });
+        analyticsEvents.track('review_voice_finished', { chars: trimmed.length, ms, empty: !trimmed, mime });
         if (!trimmed) toast.error("Couldn't catch that. Try again, or type it instead.");
       })
       .catch((error: unknown) => {
         if (cancelled) return;
         const reason = (error instanceof Error ? error.message : 'Transcription failed').slice(0, 120);
-        analyticsEvents.track('review_voice_failed', { reason, ms: Math.round(performance.now() - started), mime });
+        analyticsEvents.track('review_voice_failed', { reason, ms, mime });
         toast.error("Couldn't catch that. Try again, or type it instead.");
       })
       .finally(() => {

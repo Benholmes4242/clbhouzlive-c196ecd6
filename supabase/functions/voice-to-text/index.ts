@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { normalizeError } from '../_shared/normalize-error.ts';
-import { audioFormat } from './audioFormat.ts';
+import { audioFormat, appendPrompt, whisperPrompt } from './audioFormat.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -23,9 +23,10 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const { audio, mimeType } = await req.json();
+    const { audio, mimeType, prompt } = await req.json();
+    const hint = whisperPrompt(prompt);
     
-    if (typeof audio !== 'string' || !audio || !/^[A-Za-z0-9+/]*={0,2}$/.test(audio) || (mimeType != null && (typeof mimeType !== 'string' || mimeType.length > 100)))
+    if (typeof audio !== 'string' || !audio || !/^[A-Za-z0-9+/]*={0,2}$/.test(audio) || (mimeType != null && (typeof mimeType !== 'string' || mimeType.length > 100)) || (prompt != null && typeof prompt !== 'string'))
       return new Response(JSON.stringify({ error: 'Invalid audio or MIME type' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     console.log('Received audio data for transcription');
@@ -70,6 +71,7 @@ serve(async (req) => {
     const blob = new Blob([binaryAudio], { type: format.mimeType });
     formData.append('file', blob, format.filename);
     formData.append('model', 'whisper-1');
+    appendPrompt(formData, hint);
 
     console.log('Sending audio to OpenAI Whisper API');
 

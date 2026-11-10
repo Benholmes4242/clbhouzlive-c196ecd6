@@ -9,3 +9,13 @@ export function audioFormat(mimeType?: string | null) {
     : base.includes('mpeg') ? 'mp3' : base.includes('webm') ? 'webm' : 'bin';
   return { mimeType: type, filename: `audio.${extension}` };
 }
+/** Transcription hint: trimmed, max 200 chars; absent/blank means no hint. */
+export function whisperPrompt(prompt?: unknown): string | null {
+  if (typeof prompt !== 'string') return null;
+  const p = prompt.trim().slice(0, 200);
+  return p || null;
+}
+/** Adds 'prompt' to the Whisper form only when a hint exists. */
+export function appendPrompt(form: FormData, hint: string | null): void {
+  if (hint) form.append('prompt', hint);
+}

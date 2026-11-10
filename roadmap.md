@@ -1,10 +1,10 @@
 # Roadmap
 
-## In progress: iPhone voice review
-Negotiate supported recorder MIME; carry actual format to Whisper; record outcomes and show retry toast.
-Add guards, run fresh shards, redeploy only voice-to-text; baseline 8,103. No test repairs authorised.
-STOP: two new recorder guards fail at voiceReviewFormat.test.tsx:28 with `Error: createObjectURL does not exist`.
-Focused 7 passed / 2 failed. No repair, full shards or deployment performed. Report: VOICE_REVIEW_IPHONE_REPORT.md.
+## In progress: Replacement voice outcome + course hint brief
+Course-name prompt, recording-duration outcomes, session-scoped text-cleared tracking and retry toast implemented; recording format/layout unchanged.
+STOP: focused 35 executed, 33 passed / 2 failed. Both voiceReviewFormat recorder tests fail at line 28:8: `Error: createObjectURL does not exist` before assertions.
+No authorised repairs, full shards or redeployment. Report: VOICE_REVIEW_OUTCOME_HINT_REPORT.md.
+Last verified suite 8,103; prior voice guards +9; this brief voiceReviewHint +5; inferred inventory 8,117, not a verified full-suite result.
 
 ## In progress: Four posting/upload corrections
 White in-progress indicators; match VIDEO to ON THE COURSE spacing; retain custom cover frame and seek on reopen.

@@ -58,6 +58,7 @@ import { MediaTray } from './components/MediaTray';
 import { ReviewHoleTags } from './components/ReviewHoleTags';
 import { ReviewComposerHeader } from './components/ReviewComposerHeader';
 import { useReviewHeaderFacts } from './hooks/useReviewHeaderFacts';
+import { useTextClearedTracking } from './hooks/useTextClearedTracking';
 import { usePhotoHeaderForm } from './lib/stepOneFold';
 import { useReviewHoleTags } from './hooks/useReviewHoleTags';
 import { ShareToggle } from './components/ShareToggle';
@@ -836,11 +837,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     isEditMode,
   });
   useLayoutEffect(() => { onHeaderFormChange(photoForm); }, [photoForm, onHeaderFormChange]);
+  const markDictated = useTextClearedTracking(composer.state.reviewText, step === FIRST_STEP);
   const appendDictation = (text: string) => {
     const prev = composer.state.reviewText;
     const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
     composer.setReviewText(`${prev}${joiner}${text}`);
     setDictationFlashKey((k) => k + 1);
+    markDictated();
   };
   const hasMedia = media.count > 0;
 
@@ -1146,6 +1149,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 idleVariant="hero"
                 hasText={hasAnyText}
                 onAppend={appendDictation}
+                prompt={`A golf course review of ${course.name}.`}
                 onActiveChange={setVoiceActive}
                 onStart={() => {
                   // Analytics callsite: review_voice_started
