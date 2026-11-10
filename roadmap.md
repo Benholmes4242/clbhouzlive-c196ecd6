@@ -3,6 +3,8 @@
 ## In progress: iPhone voice review
 Negotiate supported recorder MIME; carry actual format to Whisper; record outcomes and show retry toast.
 Add guards, run fresh shards, redeploy only voice-to-text; baseline 8,103. No test repairs authorised.
+STOP: two new recorder guards fail at voiceReviewFormat.test.tsx:28 with `Error: createObjectURL does not exist`.
+Focused 7 passed / 2 failed. No repair, full shards or deployment performed. Report: VOICE_REVIEW_IPHONE_REPORT.md.
 
 ## In progress: Four posting/upload corrections
 White in-progress indicators; match VIDEO to ON THE COURSE spacing; retain custom cover frame and seek on reopen.
