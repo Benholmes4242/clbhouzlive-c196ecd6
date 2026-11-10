@@ -444,6 +444,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
       }
 
       if (data?.session?.user) {
+        clearPendingCode();
         await refreshGuestConversion(emailLinked);
         trackLoginSuccess('email', Date.now() - start);
         // Linked (updateUser) keeps the guest id; otherwise the session is replaced.
@@ -605,9 +606,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
           const msg = String(r.error ?? '');
           const cancelled = /cancel|canceled|cancelled|12501/i.test(msg);
           if (!cancelled && msg) {
+            // SIGNIN_FIX_1: Google failures stay on screen via the hero error
+            // slot instead of a transient toast. Tracking is unchanged.
             console.error('[google-auth] native error:', msg);
             trackAuthFailed('google', msg, undefined, buildAuthErrorExtras({ message: msg }));
-            toast.error('Google Sign-In failed. Please try again.');
+            setOtpError(
+              /timed out/i.test(msg)
+                ? 'Google sign-in timed out. Try again, or use Apple or email.'
+                : /no credentials/i.test(msg)
+                  ? 'No Google account was found on this phone. Use email instead.'
+                  : "Google sign-in didn't work. Try again, or use Apple or email.",
+            );
+            setOtpErrorNonce((n) => n + 1);
           }
           return;
         }
