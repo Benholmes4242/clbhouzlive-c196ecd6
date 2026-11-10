@@ -208,9 +208,9 @@ describe('CB114 shared reads', () => {
 });
 
 describe('CB114 hero link', () => {
-  it('hero Courses near / Top 100 near cells scroll to the card', async () => {
+  it('hero strip no longer links to the card; the card scroll helper still works', async () => {
     const src = readFileSync(resolve(process.cwd(), 'src/pages/BusinessProfilePage.tsx'), 'utf8');
-    expect(src).toMatch(/k === 'coursesNear' \|\| k === 'top100Near'\s*\?\s*scrollToNearbyCard/);
+    expect(src).not.toMatch(/coursesNear|top100Near|scrollToNearbyCard/);
     nearbyN(1);
     mount(hotel);
     await waitFor(() => expect(card()).not.toBeNull());
