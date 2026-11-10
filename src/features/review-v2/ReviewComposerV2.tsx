@@ -58,6 +58,7 @@ import { MediaTray } from './components/MediaTray';
 import { ReviewHoleTags } from './components/ReviewHoleTags';
 import { ReviewComposerHeader } from './components/ReviewComposerHeader';
 import { useReviewHeaderFacts } from './hooks/useReviewHeaderFacts';
+import { useTextClearedTracking } from './hooks/useTextClearedTracking';
 import { usePhotoHeaderForm } from './lib/stepOneFold';
 import { useReviewHoleTags } from './hooks/useReviewHoleTags';
 import { ShareToggle } from './components/ShareToggle';
@@ -836,23 +837,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     isEditMode,
   });
   useLayoutEffect(() => { onHeaderFormChange(photoForm); }, [photoForm, onHeaderFormChange]);
-  /* review_text_cleared: non-empty -> empty on the words step. Length only;
-     never the text. after_voice = a dictation was appended this session. */
-  const dictatedRef = useRef(false);
-  const prevTextLenRef = useRef(composer.state.reviewText.length);
-  useEffect(() => {
-    const len = composer.state.reviewText.length;
-    if (step === FIRST_STEP && prevTextLenRef.current > 0 && len === 0) {
-      analyticsEvents.track('review_text_cleared', { from_len: prevTextLenRef.current, after_voice: dictatedRef.current });
-    }
-    prevTextLenRef.current = len;
-  }, [composer.state.reviewText, step]);
+  const markDictated = useTextClearedTracking(composer.state.reviewText, step === FIRST_STEP);
   const appendDictation = (text: string) => {
     const prev = composer.state.reviewText;
     const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
     composer.setReviewText(`${prev}${joiner}${text}`);
     setDictationFlashKey((k) => k + 1);
-    dictatedRef.current = true;
+    markDictated();
   };
   const hasMedia = media.count > 0;
 
