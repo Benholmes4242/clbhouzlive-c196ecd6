@@ -175,7 +175,7 @@ export function LikedByRow({
     letterSpacing: 0,
   };
 
-  if (!postId || count <= 0) {
+  if (!postId || (count <= 0 && !shown)) {
     if (!reserve) return null;
     return (
       <div aria-hidden="true" data-liked-by-reserve="true" style={{ ...rowStyle, pointerEvents: 'none' }}>
