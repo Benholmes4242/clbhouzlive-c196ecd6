@@ -32,7 +32,7 @@ createRoot(document.getElementById('root')!).render(
   <I18nextProvider i18n={i18n}>
     <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter>
-        <div style={{ background: '#0A0A0C', minHeight: '100vh', padding: '16px 20px' }}>
+        <div style={{ background: '#0A0A0C', minHeight: '100vh', padding: '16px 0' }}>
           <SeasonRecapBody tour="pgad" year={2026} data={data} />
         </div>
       </MemoryRouter>
