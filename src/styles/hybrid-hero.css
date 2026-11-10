@@ -87,7 +87,7 @@
 .recap-figs b{line-height:var(--hero-cell-line)}
 .recap-figs span{margin-top:var(--hero-label-gap);letter-spacing:var(--hero-label-tracking);line-height:13px;color:var(--cw-dim)}
 .recap-block{padding-top:var(--hero-section-gap)}
-.recap-block .upcoming-kicker{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--cw-mute);line-height:14px}
+.recap-block .upcoming-kicker{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--cw-mute);line-height:1.4}
 .recap-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.recap-link{padding:0;height:auto;background:none;font-size:12px;font-weight:700;letter-spacing:0;color:var(--th-text-primary)}
 .recap-block .recap-head{align-items:flex-start;line-height:14px}.recap-block .recap-link{line-height:14px;min-height:0}
 /* One grid for head + rows: PTS sizes to the longest value (min 64px, never wraps), every row shares it. */
