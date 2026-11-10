@@ -128,7 +128,7 @@ describe('OB1.2 first sign-in fixes', () => {
 describe('BRIEF 1 — the welcome pro flow', () => {
   it('the pro switch opens the details sheet and closing without sending turns it back off', () => {
     mount(1);
-    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    const row = screen.getByRole('switch', { name: 'Golf professional profile' });
     expect(row).toHaveAttribute('aria-checked', 'false');
     fireEvent.click(row);
     expect(screen.getByTestId('pro-sheet')).toBeInTheDocument();
@@ -140,7 +140,7 @@ describe('BRIEF 1 — the welcome pro flow', () => {
   it('a pending pro keeps the row on with an Edit door to the sheet', () => {
     f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
     mount(1);
-    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    const row = screen.getByRole('switch', { name: 'Golf professional profile' });
     expect(row).toHaveAttribute('aria-checked', 'true');
     expect(row.textContent).toContain('Verification requested · Tour professional');
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
@@ -150,13 +150,13 @@ describe('BRIEF 1 — the welcome pro flow', () => {
   it('turning a pending pro off withdraws the request through the RPC', async () => {
     f.pro = { ...f.pro, pending: true, kind: 'tour_pro', tour: 'PGA TOUR' };
     mount(1);
-    fireEvent.click(screen.getByRole('switch', { name: "I'm a golf professional" }));
+    fireEvent.click(screen.getByRole('switch', { name: 'Golf professional profile' }));
     await waitFor(() => expect(f.withdraw).toHaveBeenCalledTimes(1));
   });
   it('a verified pro row cannot be toggled off', () => {
     f.pro = { ...f.pro, verified: true, kind: 'teaching_pro', club: 'Sunningdale' };
     mount(1);
-    const row = screen.getByRole('switch', { name: "I'm a golf professional" });
+    const row = screen.getByRole('switch', { name: 'Golf professional profile' });
     expect(row).toHaveAttribute('aria-checked', 'true');
     fireEvent.click(row);
     expect(f.withdraw).not.toHaveBeenCalled();
