@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Explore gallery business identity + outstanding screenshots
+Choose preview identity by actor_type, never business lookup success; add the empty-business/uploader-profile regression.
+Run four full-suite shards separately (last reported baseline 8,172; one new test expected).
+Capture 390px MasterGolf header/search and Machrihanish Long form fullscreen/shared-link views; report any access blocker.
+Older entries below retain their historical status; this brief does not authorise their unrelated work.
+
 ## In progress: Replacement voice outcome + course hint brief
 Course-name prompt, recording-duration outcomes, session-scoped text-cleared tracking and retry toast implemented; recording format/layout unchanged.
 STOP: focused 35 executed, 33 passed / 2 failed. Both voiceReviewFormat recorder tests fail at line 28:8: `Error: createObjectURL does not exist` before assertions.

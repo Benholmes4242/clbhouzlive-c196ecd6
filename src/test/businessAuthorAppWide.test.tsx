@@ -99,6 +99,32 @@ describe('mapPublishedPost — shared links open as the business', () => {
 });
 
 describe('useDiscoverMediaPreview — gallery previews name the business', () => {
+  it('keeps business identity empty when the business lookup misses despite an uploader profile', async () => {
+    mockTables({
+      posts: { data: [{
+        id: 'missing-business-post', user_id: 'uploader-1', actor_id: 'b1', actor_type: 'business',
+        content: 'A day on the links', created_at: '2026-11-01T00:00:00Z',
+        course_id: null, tagged_course_ids: null, whs_score_id: null,
+        like_count: 0, comment_count: 0,
+        post_media: [{ id: 'm1', media_type: 'video', media_url: 'https://shot', poster_url: null, hls_url: null, stream_id: null, width: 1080, height: 1080, duration_seconds: null, display_order: 0 }],
+      }] },
+      public_profiles: { data: [{ id: 'uploader-1', username: 'machgolfclub', display_name: 'machgolfclub', profile_photo_url: 'https://uploader-photo' }] },
+      business_accounts: { data: [] },
+      golf_courses: { data: [] },
+    });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    const hook = renderHook(() => useDiscoverMediaPreview(true), { wrapper });
+    await waitFor(() => expect(hook.result.current.isSuccess).toBe(true));
+    const post = hook.result.current.data?.clips[0]?.post;
+    expect(post?.actorType).toBe('business');
+    expect(post?.displayName).toBe('');
+    expect(post?.displayName).not.toBe('machgolfclub');
+    expect(post?.avatarUrl).toBe('');
+    expect(post?.username).toBe('');
+    expect(post?.isVerified).toBe(false);
+  });
+
   it('maps a business row to the business name and logo, not the uploader profile', async () => {
     mockTables({
       posts: {
