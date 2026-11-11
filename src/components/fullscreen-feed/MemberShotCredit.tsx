@@ -17,7 +17,7 @@ export function MemberShotCredit({ syntheticPosts, item, onViewPost }: { synthet
     <div data-member-shot-credit className={`member-shot-caption${video ? ' member-shot-caption-video' : ''}${sourcePostId ? ' member-shot-caption-lifted' : ''}`}>
       <div className="member-shot-avatar">
         <SquircleAvatar key={item?.id} size={40} src={shot.avatarUrl} alt={shot.memberName}
-          fallback={shot.memberName.trim().charAt(0).toUpperCase() || '?'} hairlineRing />
+          hairlineRing />
       </div>
       <div className="member-shot-text">
         <div style={VERDICT_KICKER}>{shot.kicker}</div>
