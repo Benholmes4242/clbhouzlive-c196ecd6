@@ -202,16 +202,14 @@ describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
     // Global: four qualify; c4 rises (members 2nd, list 4th), c2 falls.
     expect(document.querySelectorAll('[data-golfers-versus]')).toHaveLength(1);
     expect(screen.getAllByText('Course 4').length).toBeGreaterThan(0);
-    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 4 rated')).toBeInTheDocument();
-    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 4th')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 4th, but golfers rank it 2nd')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     // GB&I: c4 is not on the list, so three qualify and the groups recompute.
     const sections = document.querySelectorAll('[data-golfers-versus]');
     expect(sections).toHaveLength(1);
     expect(sections[0].querySelector('.t100b-sub')).toBeNull();
     expect(screen.queryByText('Course 4')).toBeNull();
-    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 3 rated')).toBeInTheDocument();
-    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 3rd')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 3rd, but golfers rank it 2nd')).toBeInTheDocument();
   });
 
 });
@@ -249,7 +247,7 @@ describe('BRIEF_TOP100_OFFICIAL_RANK_AND_TAP — panel navigation', () => {
     Object.defineProperty(root, 'scrollTop', { value: 237, configurable: true });
     try {
       mountWithArgument();
-      expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 4 rated')).toBeInTheDocument();
+      expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 4th, but golfers rank it 2nd')).toBeInTheDocument();
       fireEvent.click(screen.getByRole('button', { name: 'Course 4, open course' }));
       expect(sessionStorage.getItem('top100-scroll')).toBe('237');
       expect(screen.getByTestId('course-location')).toHaveTextContent('/courses/c4');

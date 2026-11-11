@@ -34,23 +34,17 @@ const renderSection = (props: Partial<React.ComponentProps<typeof TheArgumentSec
 afterEach(cleanup);
 
 describe('TheArgumentSection', () => {
-  it('a riser reads "Golfers rank it 2nd of the 19 rated" with an up arrow and 9', () => {
+  it('a riser reads "Officially ranked 1st, but golfers rank it 2nd" with an up arrow and 9', () => {
     const { container } = renderSection({ higher: [row({ memberRank: 2, listRank: 11, divergence: 9 })] });
-    expect(
-      screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 19 rated'),
-    ).toBeInTheDocument();
-    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 1st')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 1st, but golfers rank it 2nd')).toBeInTheDocument();
     expect(container.querySelector('.lucide-arrow-up')).not.toBeNull();
     expect(container.querySelector('.lucide-arrow-down')).toBeNull();
     expect(screen.getByText('9')).toBeInTheDocument();
   });
 
-  it('a faller reads "Golfers rank it 11th of the 19 rated" with a down arrow and 9', () => {
+  it('a faller reads "Officially ranked 1st, but golfers rank it 11th" with a down arrow and 9', () => {
     const { container } = renderSection({ lower: [row({ memberRank: 11, listRank: 2, divergence: -9 })] });
-    expect(
-      screen.getByText((_, el) => el?.textContent === 'Golfers rank it 11th of the 19 rated'),
-    ).toBeInTheDocument();
-    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 1st')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 1st, but golfers rank it 11th')).toBeInTheDocument();
     expect(container.querySelector('.lucide-arrow-down')).not.toBeNull();
     expect(container.querySelector('.lucide-arrow-up')).toBeNull();
     expect(screen.getByText('9')).toBeInTheDocument();
@@ -167,13 +161,24 @@ describe('TheArgumentSection — monthly move', () => {
 describe('TheArgumentSection — official ranks and taps', () => {
   it('prints published rank 71, never listRank as an official rank', () => {
     renderSection({ higher: [row({ publishedRank: 71, listRank: 15, memberRank: 7, divergence: 8 })] });
-    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 71st')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 71st, but golfers rank it 7th')).toBeInTheDocument();
     expect(screen.queryByText(/15th/)).toBeNull();
   });
 
-  it('uses the supplied rated count of 12', () => {
-    renderSection({ higher: [row({ memberRank: 2 })], ratedCount: 12 });
-    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 12 rated')).toBeInTheDocument();
+  it('each row has one wrapping rank line, published rank first, no "rated", why line beneath', () => {
+    const { container } = renderSection({ higher: [row({ id: 'h', name: 'Tralee', publishedRank: 64, memberRank: 1, divergence: 27 })], lower: [row({ id: 'l', name: 'Old', publishedRank: 9, memberRank: 33, divergence: -24 })], ratedCount: 12 });
+    const lines = [...container.querySelectorAll('[data-rank-line]')] as HTMLElement[];
+    expect(lines.map(l => l.textContent)).toEqual(['Officially ranked 64th, but golfers rank it 1st', 'Officially ranked 9th, but golfers rank it 33rd']);
+    for (const l of lines) {
+      expect([...l.querySelectorAll('b')].map(b => b.textContent)).toHaveLength(2);
+      expect(l.textContent).not.toMatch(/rated/);
+      expect(l.style.whiteSpace).toBe('');
+      expect(l.style.textOverflow).toBe('');
+      expect(l.style.overflow).toBe('');
+      expect(l.parentElement?.querySelectorAll('[data-rank-line]')).toHaveLength(1);
+      expect(l.nextElementSibling?.className).toBe('t100b-why');
+    }
+    expect(screen.queryByText(/Golfers rank it .* of the .* rated/)).toBeNull();
   });
 
   it('tapping a row opens its course id', () => {

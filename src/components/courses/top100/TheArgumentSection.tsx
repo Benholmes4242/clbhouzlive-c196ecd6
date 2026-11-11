@@ -58,17 +58,14 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
-                {/* Golfers' position is within the qualifying rated set; the
-                    official position is the active list's real published rank.
-                    listRank is not printed, but stays in the type and maths for
-                    divergence/grouping. rating and ratingCount still order and
-                    qualify the set. The panel owns ratedCount and hands row taps
-                    to the main list's scroll-preserving course opener. */}
-                <div style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.35, color: A.DIM, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  Golfers rank it <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b> of the {ratedCount} rated
-                </div>
-                <div style={{ marginTop: 1, fontSize: 11.5, lineHeight: 1.35, color: A.DIM, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  Officially ranked <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.publishedRank)}</b>
+                {/* One sentence: the official position is the active list's real
+                    published rank; the golfers' position is within the qualifying
+                    rated set. It wraps rather than truncating. listRank is not
+                    printed, but stays in the type and maths for divergence/grouping.
+                    ratedCount still feeds whyLine. The panel hands row taps to the
+                    main list's scroll-preserving course opener. */}
+                <div data-rank-line style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.35, color: A.DIM, fontVariantNumeric: 'tabular-nums' }}>
+                  Officially ranked <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.publishedRank)}</b>, but golfers rank it <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b>
                 </div>
                 <div className="t100b-why">{whyLine(r,ratedCount)}</div>
               </div>
