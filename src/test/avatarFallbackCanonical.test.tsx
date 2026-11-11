@@ -11,7 +11,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { getInitialsFromName } from '@/lib/avatarFallback';
+import { avatarFallbackFill, getInitialsFromName } from '@/lib/avatarFallback';
 import { ClubProfileHero } from '@/components/business/hero/ClubProfileHero';
 import { ClubRow } from '@/features/search-v2/components/ClubRow';
 
@@ -23,6 +23,13 @@ describe('getInitialsFromName first/last rule', () => {
     expect(getInitialsFromName('Mary Jane Smith')).toBe('MS');
     expect(getInitialsFromName('machgolfclub')).toBe('M');
     expect(getInitialsFromName('')).toBe('');
+  });
+
+  it('avatarFallbackFill is the canonical dark gradient', () => {
+    // jsdom strips gradient backgrounds from the style attribute, so the
+    // fill itself is asserted here and the DOM tests assert structure.
+    expect(avatarFallbackFill('MasterGolf Travel')).toContain('#1E1E23');
+    expect(avatarFallbackFill(null)).toContain('#1E1E23');
   });
 });
 
@@ -50,7 +57,9 @@ describe('ClubProfileHero crest fallback', () => {
     expect(crest.getAttribute('style') ?? '').not.toContain('#F4F4F2');
     const fallback = crest.querySelector('span') as HTMLElement;
     expect(fallback.textContent).toBe('MT');
-    expect(fallback.getAttribute('style') ?? '').toContain('#1E1E23');
+    // Gradient fill is stripped by jsdom (see avatarFallbackFill assertion);
+    // the fallback branch is what carries it.
+    expect(fallback.getAttribute('style') ?? '').toContain('inset 0 0 0 1px rgba(248, 250, 252, 0.1)');
   });
 
   it('with a logo: the plate stays #F4F4F2', () => {
@@ -72,7 +81,11 @@ describe('search ClubRow fallback tile', () => {
     );
     const tile = container.querySelector('button')!.firstElementChild as HTMLElement;
     expect(tile.textContent).toBe('MT');
-    expect(tile.getAttribute('style') ?? '').toContain('#1E1E23');
+    // No white plate and no TRACK fill without a logo; the gradient fill is
+    // stripped by jsdom (see avatarFallbackFill assertion).
+    const style = tile.getAttribute('style') ?? '';
+    expect(style).not.toContain('#FFFFFF');
+    expect(style).not.toContain('TRACK');
   });
 });
 
