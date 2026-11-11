@@ -244,9 +244,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const { higher: argumentHigher, lower: argumentLower } = argumentGroups(argumentInputs);
   const comparisonRows = compareRows(argumentInputs);
   const listLabel = LISTS.find(l => l.id === renderedList)?.label ?? renderedList;
-  const race = useTop100Race(memberId, selectedList as RankListSlug);
-  const raceProgress = useTop100ListProgress(selectedList as RankListSlug, memberId, memberId);
-  const raceViewer = !race.isPlaceholderData && !race.isError ? race.data?.find(row => row.is_viewer || row.user_id === memberId) : undefined;
   /* BRIEF_TOP100_MONTHLY_MOVE: the golfers' order four weeks ago, for the
      list the rows on screen belong to. Empty while loading or on error — the
      section never waits on it. */
@@ -321,7 +318,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
       <GateReport id="progress" ready={user?.id ? progressFetchedAfterMount : !progressLoading} />
       <GateReport id="enrichment" ready={!enrichmentLoading} />
-      <GateReport id="race" ready={!memberId || (!race.isPending && !race.isPlaceholderData && !raceProgress.isPending)} />
+      {!memberId ? <GateReport id="race" ready /> : null}
       {comparisonRows.length >= MIN_QUALIFYING ? (
         <TheArgumentSection
           key={renderedList}
@@ -341,10 +338,9 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
         sessionStorage.setItem('top100-scroll', String(getPageScrollTop()));
         navigate(memberId ? `/courses/${id}/rate` : '/auth');
       }} />
-      {memberId && viewerList && viewerPlayed >= 5 && renderedList === selectedList && progressFetchedAfterMount && raceViewer ? <Top100YourHundred key={selectedList} played={viewerPlayed} total={viewerList.total} position={raceViewer.pos} members={Number(raceViewer.total_members)}>{close => <>
-        <Top100RaceSection viewerId={memberId} list={selectedList as RankListSlug} total={viewerList.total} onOpenCourse={id => { close(); openCourse(id); }} />
-        <YourCoursesDropdown listSlug={selectedList} viewerPlayed={viewerPlayed} total={viewerList.total} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={id => { close(); openCourse(id); }} />
-      </>}</Top100YourHundred> : null}
+      {memberId ? <RaceSeat viewerId={memberId} list={selectedList as RankListSlug} total={viewerList?.total ?? 0} played={viewerPlayed} eligible={renderedList === selectedList && progressFetchedAfterMount}>
+        {close => <><Top100RaceSection viewerId={memberId} list={selectedList as RankListSlug} total={viewerList?.total ?? 0} onOpenCourse={id => { close(); openCourse(id); }} /><YourCoursesDropdown listSlug={selectedList} viewerPlayed={viewerPlayed} total={viewerList?.total ?? 0} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={id => { close(); openCourse(id); }} /></>}
+      </RaceSeat> : null}
       <section className="t100b-section">
         <div className="t100b-list-head"><div><div className="t100b-kicker">THE LIST</div><div className="t100b-title">{heading}</div></div><div className="t100b-segments" aria-label="List order">{RANKING_OPTIONS.map(opt => <button type="button" className="t100b-segment" key={opt.value} aria-pressed={ranking===opt.value} onClick={() => chooseRanking(opt.value)}>{opt.label}</button>)}</div></div>
         {ranking === 'community' ? <div className="t100b-note">Ranked by golfers' average rating across the {community.rated.length} courses with three or more ratings. The rest follow in official order.</div> : null}
@@ -413,4 +409,11 @@ const TOP100_GATE_IDS = ['list', 'progress', 'enrichment', 'race'] as const;
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
   useSectionReady(id, ready);
   return null;
+}
+/** Race readiness is loaded once for members; its presentation lives only in the sheet. */
+function RaceSeat({viewerId,list,total,played,eligible,children}: {viewerId:string;list:RankListSlug;total:number;played:number;eligible:boolean;children:(close:()=>void)=>React.ReactNode}) {
+  const race=useTop100Race(viewerId,list);
+  const progress=useTop100ListProgress(list,viewerId,viewerId);
+  const mine=!race.isPlaceholderData && !race.isError ? race.data?.find(r=>r.is_viewer || r.user_id===viewerId) : undefined;
+  return <><GateReport id="race" ready={!race.isPending && !race.isPlaceholderData && !progress.isPending} />{eligible && mine && total>0 && played>=5 ? <Top100YourHundred key={list} played={played} total={total} position={mine.pos} members={Number(mine.total_members)}>{children}</Top100YourHundred> : null}</>;
 }
