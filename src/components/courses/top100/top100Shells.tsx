@@ -9,6 +9,12 @@
  *    plays-to line, no-round line, and CategoryScores returns null with no
  *    scores), so the smallest settled card is its photo alone.
  *  - The Argument holds up to ARGUMENT_ROWS rows and can settle on one.
+ *
+ * Top100PageShell is the tab's PageLoadGate fallback, in page order. Each
+ * section shell draws its SMALLEST settled state, and a section the list was
+ * last seen without is left out, so the reveal only ever grows. Your Hundred
+ * has no shell: it only shows for members with 5 or more played, so its
+ * smallest state is absent.
  */
 import React from 'react';
 import { Bar } from '@/components/skeletons/shellVocabulary';
@@ -72,6 +78,85 @@ export function Top100CardListShell() {
       {[0, 1, 2].map((i) => (
         <Bar key={i} style={{ height: TOP100_PHOTO_H, width: '100%', borderRadius: 0, marginBottom: TOP100_CARD_GAP }} />
       ))}
+    </div>
+  );
+}
+
+/** A bar sitting in a real text line: the line keeps the real class's font, so its height is the real line's. */
+function Line({ className, w, style }: { className?: string; w: number | string; style?: React.CSSProperties }) {
+  return <div className={className} style={style}><Bar style={{ display: 'inline-block', verticalAlign: 'middle', width: w, height: '0.72em' }} />{' '}</div>;
+}
+
+/** Golfers versus the official list at its smallest settled state: three chart rows, no caption, no see-all, one argument row. */
+export function ComparisonShell() {
+  return (
+    <section aria-hidden className="t100b-section" data-comparison-shell>
+      <Line className="t100b-kicker" w={220} />
+      <div className="t100b-title"><Bar style={{ display: 'inline-block', verticalAlign: 'middle', width: '86%', height: '0.72em' }} />{' '}<br /><Bar style={{ display: 'inline-block', verticalAlign: 'middle', width: '52%', height: '0.72em' }} />{' '}</div>
+      <div className="t100b-chart">
+        <div className="t100b-keyrow"><Line className="t100b-key" w={92} /></div>
+        <div className="t100b-axis"><Bar style={{ width: 18, height: 7 }} /><Bar style={{ width: 26, height: 7 }} /></div>
+        {[0, 1, 2].map(i => (
+          <div className="t100b-crow" key={i}>
+            <span className="t100b-name-line"><Line className="t100b-name" w={[110, 84, 128][i]} /><Line className="t100b-badge" w={22} /></span>
+            <span className="t100b-track" />
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 18 }}>
+        <Line style={{ fontSize: 11, lineHeight: 1 }} w={150} />
+        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: ARGUMENT_ROW_GAP }}>
+          <Bar style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Line style={{ fontSize: 13.5 }} w="58%" />
+            <Line style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.35 }} w="82%" />
+            <Line className="t100b-why" w="48%" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** One rating away at its smallest settled state: one card. */
+export function OneRatingAwayShell() {
+  return (
+    <section aria-hidden className="t100b-section" data-near-shell>
+      <Line className="t100b-kicker" w={130} />
+      <Line className="t100b-title" w="72%" />
+      <div className="t100b-sub"><Bar style={{ display: 'inline-block', verticalAlign: 'middle', width: '94%', height: '0.72em' }} />{' '}<br /><Bar style={{ display: 'inline-block', verticalAlign: 'middle', width: '40%', height: '0.72em' }} />{' '}</div>
+      <div className="t100b-near-rail">
+        <div className="t100b-near-card">
+          <Bar style={{ width: 156, height: 96, borderRadius: 12 }} />
+          <Line className="t100b-near-name" w={96} />
+          <Line className="t100b-near-line" w={120} />
+          <Bar style={{ width: 72, height: 30, borderRadius: 999 }} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** The list head: kicker, title and the order toggle. */
+export function ListHeadShell() {
+  return (
+    <section aria-hidden className="t100b-section" data-list-head-shell>
+      <div className="t100b-list-head">
+        <div><Line className="t100b-kicker" w={64} /><Line className="t100b-title" w={150} /></div>
+        <Bar style={{ width: 168, height: 38, borderRadius: 999, flex: 'none' }} />
+      </div>
+    </section>
+  );
+}
+
+/** The Top 100 tab's gate fallback, in page order. A section the list was last seen without is left out, so the reveal only ever grows. */
+export function Top100PageShell({ comparison = true, near = true }: { comparison?: boolean; near?: boolean }) {
+  return (
+    <div className="t100b" aria-hidden data-top100-fallback>
+      {comparison ? <ComparisonShell /> : null}
+      {near ? <OneRatingAwayShell /> : null}
+      <ListHeadShell />
+      <div style={{ paddingTop: 24 }}><Top100CardListShell /></div>
     </div>
   );
 }

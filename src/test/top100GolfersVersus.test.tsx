@@ -11,15 +11,16 @@ import { Top100OneRatingAway, oneRatingAway } from '@/components/courses/top100/
 import { Top100YourHundred } from '@/components/courses/top100/Top100YourHundred';
 import { TheArgumentSection } from '@/components/courses/top100/TheArgumentSection';
 import { communityOrder } from '@/components/courses/top100/communityOrder';
+import { ordinal } from '@/lib/text/numbers';
 import { gbi19 } from './top100GolfersVersus.fixture';
 import { gbiLive100 } from './top100GbiLive.fixture';
 
-const f=vi.hoisted(()=>({ placeholder:false, user:{id:'me'} as {id:string}|null }));
+const f=vi.hoisted(()=>({ placeholder:false, gateRevealed:true, user:{id:'me'} as {id:string}|null }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/components/explore-tab-new/courseled/CourseImageFallback',()=>({CourseImageFallback:()=>null}));
 vi.mock('@/components/ui/BottomSheet',()=>({BottomSheet:({children}: {children:React.ReactNode})=><div role="dialog">{children}</div>}));
-vi.mock('@/components/courses/browse/PageLoadGate',()=>({PageLoadGate:({children}:{children:React.ReactNode})=><>{children}</>,usePageRevealed:()=>true,useSectionReady:()=>{}}));
-vi.mock('@/components/courses/BrowseCourseCard',()=>({default:()=>null}));
+vi.mock('@/components/courses/browse/PageLoadGate',()=>({PageLoadGate:({children,fallback}:{children:React.ReactNode;fallback?:React.ReactNode})=><>{f.gateRevealed?children:fallback}</>,usePageRevealed:()=>f.gateRevealed,useSectionReady:()=>{}}));
+vi.mock('@/components/courses/BrowseCourseCard',()=>({default:()=>null,TOP100_PHOTO_H:178}));
 vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:f.user})}));
 vi.mock('@/hooks/useGolfCoursesInfinite',()=>({useGolfCoursesInfinite:()=>({data:{pages:[gbi19.map(c=>({...c,country:'England',thumbnail_image:null,list_memberships:[{list_slug:'gb-i',rank:c.publishedRank},{list_slug:'global',rank:c.publishedRank}]}))]},isLoading:false,isError:false,isPlaceholderData:f.placeholder})}));
 vi.mock('@/hooks/top100/useTop100Enrichment',()=>({useTop100Enrichment:()=>({data:new Map(gbi19.map(c=>[c.id,{rating:c.rating,ratingCount:c.ratingCount,subScores:c.subScores}])),isLoading:false})}));
@@ -41,7 +42,7 @@ const mixed=compareRows([input('a',1,7),input('b',2,9),input('c',3,8),input('d',
 const reversed=(count:number)=>compareRows(Array.from({length:count},(_,i)=>input(`r${i+1}`,i+1,8+(i+1)*0.1)));
 function wrapper({children}:{children:React.ReactNode}) { return <MemoryRouter><QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false}}})}>{children}</QueryClientProvider></MemoryRouter>; }
 afterEach(cleanup);
-beforeEach(()=>{sessionStorage.clear();f.placeholder=false;f.user={id:'me'};});
+beforeEach(()=>{sessionStorage.clear();localStorage.clear();f.placeholder=false;f.gateRevealed=true;f.user={id:'me'};});
 
 describe('signed-off course-name rule',()=>{
  it.each([
@@ -97,4 +98,47 @@ describe('option C: full names, the agree mark and the aligned rail',()=>{
  it('an agreeing row renders one agree mark and no separate dots',()=>{const {container}=render(<Top100CompareChart rows={mixed} onOpenCourse={vi.fn()} />);const agree=container.querySelector('button[aria-label="d"]') as Element;expect(agree.querySelectorAll('.t100b-agree')).toHaveLength(1);expect(agree.querySelectorAll('.t100b-dot')).toHaveLength(0);const moving=container.querySelector('button[aria-label="a"]') as Element;expect(moving.querySelectorAll('.t100b-agree')).toHaveLength(0);expect(moving.querySelectorAll('.t100b-dot.t100b-official')).toHaveLength(1);expect(moving.querySelectorAll('.t100b-dot.t100b-member')).toHaveLength(1);});
  it('"Golfers agree" joins the key only where an agreeing row is on screen',()=>{const {container}=render(<Top100CompareChart rows={reversed(13)} onOpenCourse={vi.fn()} />);expect(container.querySelectorAll('.t100b-key-item')).toHaveLength(1);fireEvent.click(screen.getByRole('button',{name:'SEE ALL 13'}));const dialog=screen.getByRole('dialog');const items=dialog.querySelectorAll('.t100b-key-item');expect(items).toHaveLength(2);expect(items[1].textContent).toBe('Golfers agree');expect(items[1].querySelector('.t100b-agree')).not.toBeNull();});
  it('Rate it is pinned to the card bottom so every button lines up',()=>{const rail=[{...gbi19[0],id:'q0',name:"Rosapenna Golf Resort - St Patrick's Links",publishedRank:5,ratingCount:1},{...gbi19[0],id:'q1',name:'Parkstone',publishedRank:4,ratingCount:1},{...gbi19[0],id:'q2',name:'Tralee',publishedRank:3,ratingCount:1}];const {container}=render(<Top100OneRatingAway courses={rail} listLabel="GB&I" onOpenCourse={vi.fn()} onRate={vi.fn()} />);expect(container.querySelectorAll('.t100b-near-card')).toHaveLength(3);expect(container.querySelectorAll('.t100b-rate')).toHaveLength(3);expect(container.textContent).toContain('Officially 5th · 1 of 2 ratings');expect(container.querySelector('.t100b-sub')?.textContent).toBe('3 GB&I courses have one golfer rating. A second puts each into the comparison.');expect(cssRule('t100b-near-rail')).toContain('align-items:stretch');expect(cssRule('t100b-near-card')).toContain('flex-direction:column');expect(cssRule('t100b-near-line')).toContain('margin-bottom:9px');expect(cssRule('t100b-rate')).toContain('margin-top:auto');});
+});
+describe('page loading skeleton',()=>{
+ it('the unrevealed gate shows comparison, one-rating-away and list-head shells in page order, none after reveal',()=>{
+  f.gateRevealed=false;const {container,rerender}=render(<Top100CoursesHubPanel />,{wrapper});
+  const fallback=container.querySelector('[data-top100-fallback]');expect(fallback).not.toBeNull();
+  const shells=[...fallback!.querySelectorAll('[data-comparison-shell],[data-near-shell],[data-list-head-shell]')].map(el=>Object.keys(el.dataset)[0]);
+  expect(shells).toEqual(['comparisonShell','nearShell','listHeadShell']);
+  expect(container.querySelector('[data-golfers-versus]')).toBeNull();
+  f.gateRevealed=true;rerender(<Top100CoursesHubPanel />);
+  expect(container.querySelector('[data-top100-fallback]')).toBeNull();expect(container.querySelector('[data-golfers-versus]')).not.toBeNull();
+ });
+ it('a list remembered without a comparison leaves that shell out',()=>{
+  sessionStorage.setItem('top100-last-filters',JSON.stringify({list:'usa'}));localStorage.setItem('top100-shape:usa',JSON.stringify({cmp:false,near:true}));
+  f.gateRevealed=false;const {container}=render(<Top100CoursesHubPanel />,{wrapper});
+  const fallback=container.querySelector('[data-top100-fallback]');expect(fallback).not.toBeNull();
+  expect(fallback!.querySelector('[data-comparison-shell]')).toBeNull();expect(fallback!.querySelector('[data-near-shell]')).not.toBeNull();expect(fallback!.querySelector('[data-list-head-shell]')).not.toBeNull();
+ });
+ it('storage that throws still renders the full fallback',()=>{
+  const spy=vi.spyOn(window.localStorage,'getItem').mockImplementation(()=>{throw new Error('denied');});
+  try {
+   f.gateRevealed=false;const {container}=render(<Top100CoursesHubPanel />,{wrapper});
+   const fallback=container.querySelector('[data-top100-fallback]');expect(fallback).not.toBeNull();
+   expect(fallback!.querySelector('[data-comparison-shell]')).not.toBeNull();expect(fallback!.querySelector('[data-near-shell]')).not.toBeNull();expect(fallback!.querySelector('[data-list-head-shell]')).not.toBeNull();
+  } finally { spy.mockRestore(); }
+ });
+ it('a settled list writes its remembered shape once revealed',()=>{
+  render(<Top100CoursesHubPanel />,{wrapper});
+  expect(JSON.parse(localStorage.getItem('top100-shape:gb-i')!)).toEqual({cmp:true,near:false});
+ });
+});
+describe('tapped-row panel copy',()=>{
+ it('a gap row reads "Officially ranked …, but golfers rank it …" with no "the list" or "of the"',()=>{
+  const {container}=render(<Top100CompareChart rows={rows} onOpenCourse={vi.fn()} />);
+  const target=chartRows(rows)[0];fireEvent.click(screen.getByRole('button',{name:target.name}));
+  const line=container.querySelector('.t100b-detail-line')!;
+  expect(line.textContent).toBe(`Officially ranked ${target.publishedRank}${ordinal(target.publishedRank).replace(/\d+/,'')}, but golfers rank it ${ordinal(target.memberRank)}`);
+  expect(line.textContent).not.toContain('the list');expect(line.textContent).not.toContain('of the');
+ });
+ it('an agreeing row uses "and"',()=>{
+  const {container}=render(<Top100CompareChart rows={mixed} onOpenCourse={vi.fn()} />);
+  fireEvent.click(screen.getByRole('button',{name:'d'}));
+  expect(container.querySelector('.t100b-detail-line')!.textContent).toBe('Officially ranked 4th, and golfers rank it 4th');
+ });
 });

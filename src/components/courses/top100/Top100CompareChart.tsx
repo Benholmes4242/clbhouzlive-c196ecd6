@@ -13,7 +13,7 @@ export function chartRows(rows: ArgumentRow[]): ArgumentRow[] {
 function Detail({ row, n, onOpen }: { row: ArgumentRow; n:number; onOpen:(id:string)=>void }) {
   return <div className="t100b-detail" data-compare-detail>
     <span className="t100b-thumb"><CourseImageFallback courseId={row.id} courseName={row.name} imageUrl={row.imageUrl} style={{ height: '100%' }} /></span>
-    <span className="t100b-detail-copy"><span className="t100b-detail-line">Golfers <span className="t100b-number">{ordinal(row.memberRank)}</span> · the list <span className="t100b-number">{ordinal(row.listRank)}</span> of the {n} (officially <span className="t100b-number">{ordinal(row.publishedRank)}</span>)</span><span className="t100b-why">{whyLine(row,n)}</span><button type="button" className="t100b-view" onClick={e => { e.stopPropagation(); onOpen(row.id); }}>View course ›</button></span>
+    <span className="t100b-detail-copy"><span className="t100b-detail-line">Officially ranked <span className="t100b-number">{ordinal(row.publishedRank)}</span>, {row.divergence === 0 ? 'and' : 'but'} golfers rank it <span className="t100b-number">{ordinal(row.memberRank)}</span></span><span className="t100b-why">{whyLine(row,n)}</span><button type="button" className="t100b-view" onClick={e => { e.stopPropagation(); onOpen(row.id); }}>View course ›</button></span>
   </div>;
 }
 /** A position's centre on the track, inset by the 6px half-width of the widest mark. */

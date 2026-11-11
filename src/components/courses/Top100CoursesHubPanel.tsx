@@ -21,7 +21,7 @@ import { isGuestUser } from '@/features/guest/useIsGuest';
 import type { RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
 import './top100/t100Race.css';
 import { TheArgumentSection } from './top100/TheArgumentSection';
-import { ArgumentShell, Top100CardListShell } from './top100/top100Shells';
+import { ArgumentShell, Top100CardListShell, Top100PageShell } from './top100/top100Shells';
 
 /** Gap between cards in the Top 100 list; its shell reads this (BRIEF_COURSES_SKELETONS_3A). */
 export const TOP100_CARD_GAP = 24;
@@ -31,7 +31,7 @@ import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline'
 import { useTop100Race } from '@/hooks/top100/useTop100Race';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { Top100YourHundred } from './top100/Top100YourHundred';
-import { Top100OneRatingAway } from './top100/Top100OneRatingAway';
+import { Top100OneRatingAway, oneRatingAway } from './top100/Top100OneRatingAway';
 import './top100/top100Compare.css';
 
 const LISTS = [
@@ -60,6 +60,18 @@ function savedRanking(): Top100Ranking {
   } catch {
     return 'official';
   }
+}
+
+/** The remembered section shape per list, so a list without a section never
+ * draws its shell. Missing or unreadable storage means the full fallback. */
+function readTop100Shape(list: string): { cmp: boolean; near: boolean } {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(`top100-shape:${list}`) ?? 'null');
+    if (typeof parsed?.cmp === 'boolean' && typeof parsed?.near === 'boolean') return parsed;
+  } catch {
+    /* storage failing leaves the defaults */
+  }
+  return { cmp: true, near: true };
 }
 
 function savedList(): string {
@@ -134,6 +146,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const memberId = user && !isGuestUser(user) ? user.id : undefined;
   const [selectedList, setSelectedList] = useState(savedList);
   const [ranking, setRanking] = useState<Top100Ranking>(savedRanking);
+  const shape = useMemo(() => readTop100Shape(selectedList), [selectedList]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [nameQuery, setNameQuery] = useState('');
   const restored = useRef(false);
@@ -250,6 +263,25 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const argumentBaseline = useTop100GolferBaseline(renderedList);
 
   const revealed = usePageRevealed();
+  /* Remember each list's section shape once, after the gate has revealed and
+     the list's data is settled (not placeholder data; list, enrichment and
+     progress all ready). USA has no comparison section today, so after its
+     first visit its skeleton leaves that shell out and the reveal never shrinks. */
+  const shapeWritten = useRef(new Set<string>());
+  useEffect(() => {
+    if (!revealed || isPlaceholderData || isLoading || enrichmentLoading) return;
+    if (user?.id ? !progressFetchedAfterMount : progressLoading) return;
+    if (shapeWritten.current.has(renderedList)) return;
+    shapeWritten.current.add(renderedList);
+    try {
+      localStorage.setItem(`top100-shape:${renderedList}`, JSON.stringify({
+        cmp: comparisonRows.length >= MIN_QUALIFYING,
+        near: oneRatingAway(argumentInputs).length > 0,
+      }));
+    } catch {
+      /* storage failing leaves the defaults */
+    }
+  });
   useEffect(() => {
     if (!revealed || restored.current || courses.length === 0) return;
     const value = sessionStorage.getItem('top100-scroll');
@@ -312,7 +344,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           </div>
         ) : null}
       </div>
-      <PageLoadGate expect={TOP100_GATE_IDS}>
+      <PageLoadGate expect={TOP100_GATE_IDS} fallback={<Top100PageShell comparison={shape.cmp} near={shape.near} />}>
       <div className="t100b">
       <GateReport id="list" ready={!isLoading} />
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
