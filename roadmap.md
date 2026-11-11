@@ -1,5 +1,8 @@
 # Roadmap
 
+## In progress: Top 100 Golfers versus (Option B)
+Implement signed-off comparison, why lines, two-rating rail, race sheet and three-rating list order. Preserve canonical course/rating navigation. Add specified regressions; run four shards sequentially from 8,206 baseline and check 390/320 where preview access permits.
+
 ## Done: Store-link suite rerun
 Requested assertions and HTTPS/insecure business-link case already present; no duplicate case or source change.
 Sequential shards passed: 2,133 / 1,958 / 2,111 / 2,004 = 8,206, zero failures (730 files). Picker screenshot skipped by request.
