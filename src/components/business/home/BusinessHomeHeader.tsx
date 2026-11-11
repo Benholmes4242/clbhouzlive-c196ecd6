@@ -61,7 +61,7 @@ export function businessColour(id: string): string {
   return GRADIENTS[h % GRADIENTS.length];
 }
 export function businessInitials(name: string): string {
-  return name.trim().split(/\s+/).slice(0, 2).map((w) => w.charAt(0)).join('').toUpperCase();
+  return getInitialsFromName(name);
 }
 /**
  * CB66.1: drop trailing words (and trailing punctuation-only words like "&")
