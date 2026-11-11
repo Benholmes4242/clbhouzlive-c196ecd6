@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Golf Travel category
+Add the canonical category, create tile, hero labels, seven facilities and booking membership; preserve all venue/hospitality exclusions.
+Audit category-keyed readers, add golfTravelCategory guards, run four shards sequentially and capture the picker at 320px.
+Previous full verified baseline: 8,173; homepage added 23 cases (inventory 8,196), with a known storeLinks assertion blocker left untouched.
+
 ## In progress: WEB_HOMEPAGE_1
 Homepage implemented; focused 39/39 (23 new guards), shard 1: 2,138 passed; shard 2: 1,950 passed / 1 failed.
 STOP: src/lib/storeLinks.test.ts:45:37, `AssertionError: expected { …(3) } to deeply equal { …(2) }`; new business:null field breaks the existing exact-shape assertion. No repair attempted.
