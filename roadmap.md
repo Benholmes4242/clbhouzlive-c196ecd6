@@ -1,5 +1,12 @@
 # Roadmap
 
+## Verified: Explore gallery business identity; two screenshots blocked
+Preview identity uses actor_type; missing-business regression passes. No existing tests rewritten.
+Separate shards 2,125 / 1,956 / 2,077 / 2,015 = 8,173 passing (+1 from 8,172).
+390px MasterGolf header/search captured and visually verified. Machrihanish fullscreen/shared link remain blocked: Long form has no posts in the available external_unmanaged browser, and actual post id is unavailable.
+Report: EXPLORE_GALLERY_IDENTITY_REPORT.md.
+Older entries below retain their historical status; this brief does not authorise their unrelated work.
+
 ## In progress: Replacement voice outcome + course hint brief
 Course-name prompt, recording-duration outcomes, session-scoped text-cleared tracking and retry toast implemented; recording format/layout unchanged.
 STOP: focused 35 executed, 33 passed / 2 failed. Both voiceReviewFormat recorder tests fail at line 28:8: `Error: createObjectURL does not exist` before assertions.
