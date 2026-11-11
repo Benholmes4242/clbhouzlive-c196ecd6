@@ -17,7 +17,7 @@ export function shortenCourseName(name: string): string {
   return name.replace(/ (Golf and Country Club|Golf & Country Club|Golf Club|Golf Links|Golf Resort|Golf Course)(?=$| \()/, '');
 }
 
-export const MIN_RATINGS = 3;
+export const MIN_RATINGS = 2;
 export const MIN_QUALIFYING = 3;
 /** Cap PER GROUP — up to three risers and up to three fallers. */
 export const ARGUMENT_ROWS = 3;

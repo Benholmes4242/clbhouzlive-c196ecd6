@@ -43,8 +43,8 @@ describe('The argument — argumentGroups', () => {
     expect(higher).toEqual([]);
     expect(lower).toEqual([]);
   });
-  it('a course with fewer than three ratings never appears', () => {
-    const { higher, lower } = argumentGroups([c('a', 1, 6), c('b', 2, 7), c('c', 3, 8), c('d', 4, 9.9, 2)]);
+  it('a course with fewer than two ratings never appears', () => {
+    const { higher, lower } = argumentGroups([c('a', 1, 6), c('b', 2, 7), c('c', 3, 8), c('d', 4, 9.9, 1)]);
     expect([...higher, ...lower].map((r) => r.id)).not.toContain('d');
   });
   it('returns two empty groups when fewer than three courses qualify', () => {

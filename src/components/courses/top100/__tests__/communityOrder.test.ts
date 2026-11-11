@@ -8,8 +8,8 @@ const run = (xs: C[]) =>
 const ratedIds = (xs: C[]) => run(xs).rated.map((r) => r.course.id);
 
 describe('communityOrder', () => {
-  it('one or two ratings do not qualify', () => {
-    expect(ratedIds([c('a', 7.0, 1, 5), c('b', 9.9, 2, 6)])).toEqual([]);
+  it('one rating does not qualify, two does', () => {
+    expect(ratedIds([c('a', 7.0, 1, 5), c('b', 9.9, 2, 6)])).toEqual(['b']);
   });
   it('null rating or zero count goes to unrated', () => {
     const out = run([c('a', null, 3, 1), c('b', 8, 0, 2)]);

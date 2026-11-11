@@ -106,12 +106,13 @@ export function TheArgumentSection({ rows, renderedList, listLabel = 'Global', h
   const all = rows ?? [...higher, ...lower];
   const leader = all.find(r => r.memberRank === 1) ?? [...all].sort((a,b) => a.memberRank-b.memberRank)[0];
   if (!leader) return null;
-  const shared = all.filter(r => r.listRank <= 10 && r.memberRank <= 10).length;
+  /* Option C: the head is kicker, headline and caption only. The qualifying
+     count lives in the chart's caption ("The 10 biggest gaps of the {n}"), so
+     there is no sub-line under the headline. */
   return (
     <section className="t100b-section" data-golfers-versus={renderedList}>
       <div className="t100b-kicker amber">GOLFERS VERSUS THE OFFICIAL LIST</div>
       <div className="t100b-title">Golfers put {shortenCourseName(leader.name)} 1st. The list has it {ordinal(leader.publishedRank)}.</div>
-      <div className="t100b-sub">{ratedCount} {listLabel} courses have three or more golfer ratings.{ratedCount >= 10 ? ` Golfers and the list share ${shared} of their top 10.` : ''}</div>
       {rows ? <Top100CompareChart rows={rows} onOpenCourse={onOpenCourse} /> : null}
       <ArgumentGroup label="Golfers rate higher" rows={higher} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
       <ArgumentGroup label="Golfers rate lower" rows={lower} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />

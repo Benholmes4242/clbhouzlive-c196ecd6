@@ -343,7 +343,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       </RaceSeat> : null}
       <section className="t100b-section">
         <div className="t100b-list-head"><div><div className="t100b-kicker">THE LIST</div><div className="t100b-title">{heading}</div></div><div className="t100b-segments" aria-label="List order">{RANKING_OPTIONS.map(opt => <button type="button" className="t100b-segment" key={opt.value} aria-pressed={ranking===opt.value} onClick={() => chooseRanking(opt.value)}>{opt.label}</button>)}</div></div>
-        {ranking === 'community' ? <div className="t100b-note">Ranked by golfers' average rating across the {community.rated.length} courses with three or more ratings. The rest follow in official order.</div> : null}
+        {ranking === 'community' ? <div className="t100b-note">Ranked by golfers' average rating across the {community.rated.length} courses with two or more ratings. The rest follow in official order.</div> : null}
       </section>
 
       <div style={{ paddingTop: 24 }}>
@@ -369,7 +369,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
                   padding: '20px 16px 0',
                 }}
               >
-                <div className="t100b-kicker">FEWER THAN THREE RATINGS</div>
+                <div className="t100b-kicker">FEWER THAN TWO RATINGS</div>
                 <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
                   {`${communityUnrated.length} courses, in official order.`}
                 </div>

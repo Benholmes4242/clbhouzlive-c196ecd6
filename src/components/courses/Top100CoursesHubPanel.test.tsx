@@ -208,7 +208,7 @@ describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
     // GB&I: c4 is not on the list, so three qualify and the groups recompute.
     const sections = document.querySelectorAll('[data-golfers-versus]');
     expect(sections).toHaveLength(1);
-    expect(sections[0].querySelector('.t100b-sub')?.textContent).toContain('GB&I courses have three or more golfer ratings');
+    expect(sections[0].querySelector('.t100b-sub')).toBeNull();
     expect(screen.queryByText('Course 4')).toBeNull();
     expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 3 rated')).toBeInTheDocument();
     expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 3rd')).toBeInTheDocument();

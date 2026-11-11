@@ -1,7 +1,9 @@
 /**
  * Top 100 Community rating order (BRIEF_TOP100_COMMUNITY_RANKING §5).
- * Three-rating published set only; remaining courses stay in official order.
+ * The published set is the page's own floor (MIN_RATINGS, now two ratings);
+ * remaining courses stay in official order.
  */
+import { MIN_RATINGS } from './theArgument';
 export function communityOrder<T>(
   courses: T[],
   ratingOf: (c: T) => { rating: number | null; ratingCount: number },
@@ -12,8 +14,8 @@ export function communityOrder<T>(
   const unrated: T[] = [];
   for (const course of courses) {
     const { rating, ratingCount } = ratingOf(course);
-    // The comparison and golfers' list share the signed-off three-rating floor.
-    if (rating != null && ratingCount >= 3 && officialRankOf(course) != null) rated.push({ course, rating, count: ratingCount });
+    // The comparison and golfers' list share one signed-off floor.
+    if (rating != null && ratingCount >= MIN_RATINGS && officialRankOf(course) != null) rated.push({ course, rating, count: ratingCount });
     else unrated.push(course);
   }
   const rank = (c: T) => officialRankOf(c) ?? 999;

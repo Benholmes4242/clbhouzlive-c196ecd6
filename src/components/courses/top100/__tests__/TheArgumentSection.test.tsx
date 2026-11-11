@@ -56,9 +56,9 @@ describe('TheArgumentSection', () => {
     expect(screen.getByText('9')).toBeInTheDocument();
   });
 
-  it('the head prints the qualifying count and selected list', () => {
+  it('the head prints no sub-line under the headline', () => {
     const { container } = renderSection({ higher: [row({})], listLabel:'GB&I' });
-    expect(container.querySelector('.t100b-sub')?.textContent).toContain('19 GB&I courses have three or more golfer ratings.');
+    expect(container.querySelector('.t100b-sub')).toBeNull();
   });
 
   it('group labels are eyebrows with no coloured dot', () => {

@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within, act } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { compareRows, shortenCourseName, whyLine } from '@/components/courses/top100/theArgument';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import { compareRows, shortenCourseName, whyLine, type ArgumentInput } from '@/components/courses/top100/theArgument';
 import { Top100CompareChart, chartRows } from '@/components/courses/top100/Top100CompareChart';
 import { Top100OneRatingAway, oneRatingAway } from '@/components/courses/top100/Top100OneRatingAway';
 import { Top100YourHundred } from '@/components/courses/top100/Top100YourHundred';
@@ -28,6 +30,14 @@ vi.mock('@/components/courses/top100/Top100RaceSection',()=>({Top100RaceSection:
 vi.mock('@/components/courses/top100/YourHundredSection',()=>({YourCoursesDropdown:()=> <div data-your-courses /> }));
 import Top100CoursesHubPanel from '@/components/courses/Top100CoursesHubPanel';
 const rows=compareRows(gbi19);
+/* jsdom never applies this stylesheet, so the geometry checks read the file. */
+const compareCss = readFileSync(resolve(__dirname, '../components/courses/top100/top100Compare.css'), 'utf8');
+const cssRule=(sel:string)=>new RegExp(`\\.${sel}\\{[^}]*\\}`).exec(compareCss)?.[0] ?? '';
+const input=(id:string,publishedRank:number,rating:number,ratingCount=5):ArgumentInput=>({id,name:id,imageUrl:null,publishedRank,rating,ratingCount});
+/** list a,b,c,d against members b,c,a,d: only d agrees. */
+const mixed=compareRows([input('a',1,7),input('b',2,9),input('c',3,8),input('d',4,6)]);
+/** 13 courses whose member order is the exact reverse: r7 agrees, and the ten-row cap hides it. */
+const reversed=(count:number)=>compareRows(Array.from({length:count},(_,i)=>input(`r${i+1}`,i+1,8+(i+1)*0.1)));
 function wrapper({children}:{children:React.ReactNode}) { return <MemoryRouter><QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false}}})}>{children}</QueryClientProvider></MemoryRouter>; }
 afterEach(cleanup);
 beforeEach(()=>{sessionStorage.clear();f.placeholder=false;f.user={id:'me'};});
@@ -58,8 +68,8 @@ describe('comparison chart',()=>{
  it('chart controls have only their scoped class',()=>{const {container}=render(<Top100CompareChart rows={rows} onOpenCourse={vi.fn()} />);for(const button of container.querySelectorAll('button'))expect(['t100b-crow','t100b-see-all']).toContain(button.className);});
 });
 describe('one rating away',()=>{
- const near=Array.from({length:12},(_,i)=>({...gbi19[0],id:`near${i}`,publishedRank:12-i,ratingCount:2,ratedByYou:i===0}));
- it('exactly two only, viewer exclusions and published order',()=>{expect(oneRatingAway([...near,{...near[0],id:'one',ratingCount:1},{...near[0],id:'three',ratingCount:3}]).map(c=>c.id)).toEqual([...near].reverse().filter(c=>!c.ratedByYou).map(c=>c.id));});
+ const near=Array.from({length:12},(_,i)=>({...gbi19[0],id:`near${i}`,publishedRank:12-i,ratingCount:1,ratedByYou:i===0}));
+ it('exactly one only, viewer exclusions and published order',()=>{expect(oneRatingAway([...near,{...near[0],id:'zero',ratingCount:0},{...near[0],id:'two',ratingCount:2}]).map(c=>c.id)).toEqual([...near].reverse().filter(c=>!c.ratedByYou).map(c=>c.id));});
  it('caps the rail at eight',()=>{const {container}=render(<Top100OneRatingAway courses={near} listLabel="GB&I" onOpenCourse={vi.fn()} onRate={vi.fn()} />);expect(container.querySelectorAll('.t100b-near-card')).toHaveLength(8);});
  it('empty eligible set is hidden',()=>{const {container}=render(<Top100OneRatingAway courses={[]} listLabel="GB&I" onOpenCourse={vi.fn()} onRate={vi.fn()} />);expect(container.firstChild).toBeNull();});
  it('rate action carries course id',()=>{const rate=vi.fn();render(<Top100OneRatingAway courses={[near[1]]} listLabel="GB&I" onOpenCourse={vi.fn()} onRate={rate} />);fireEvent.click(screen.getByRole('button',{name:'Rate it'}));expect(rate).toHaveBeenCalledWith('near1');});
@@ -69,9 +79,18 @@ describe('Your hundred and active-list identity',()=>{
  it('23 of 100, 3rd of 35 and only the sheet mounts race and courses',()=>{const {container}=render(<Top100YourHundred played={23} total={100} position={3} members={35}>{()=> <><div data-top100-race /><div data-your-courses /></>}</Top100YourHundred>);expect(container.textContent).toContain('23 of 100 · 3rd of 35');expect(container.querySelector('[data-top100-race]')).toBeNull();fireEvent.click(screen.getByRole('button'));expect(screen.getByRole('dialog').querySelector('[data-top100-race]')).not.toBeNull();expect(screen.getByRole('dialog').querySelector('[data-your-courses]')).not.toBeNull();});
  it('saved GB&I member has one section across placeholder Global and GB&I switches',async()=>{
  sessionStorage.setItem('top100-last-filters',JSON.stringify({list:'gb-i'}));const {container,rerender}=render(<Top100CoursesHubPanel />, {wrapper});
- const check=(list:string,label:string)=>{const sections=container.querySelectorAll('[data-golfers-versus]');expect(sections).toHaveLength(1);expect(sections[0].getAttribute('data-golfers-versus')).toBe(list);expect(sections[0].querySelector('.t100b-sub')?.textContent).toContain(`19 ${label} courses`);};check('gb-i','GB&I');
+ const check=(list:string,label:string)=>{const sections=container.querySelectorAll('[data-golfers-versus]');expect(sections).toHaveLength(1);expect(sections[0].getAttribute('data-golfers-versus')).toBe(list);expect(sections[0].querySelector('.t100b-sub')).toBeNull();expect(sections[0].querySelector('.t100b-caption')?.textContent).toBe('The 10 biggest gaps of the 19, in official order');};check('gb-i','GB&I');
  for(const [label,slug] of [['Global','global'],['GB&I','gb-i']]) {f.placeholder=true;fireEvent.click(screen.getByRole('tab',{name:label}));expect(container.querySelectorAll('[data-golfers-versus]')).toHaveLength(1);f.placeholder=false;await act(async()=>rerender(<Top100CoursesHubPanel />));check(slug,label);}
  expect(container.querySelector('[data-top100-race]')).toBeNull();expect(container.querySelector('[data-your-courses]')).toBeNull();fireEvent.click(screen.getByRole('button',{name:/YOUR HUNDRED/}));expect(screen.getByRole('dialog').querySelector('[data-top100-race]')).not.toBeNull();
  });
- it('two ratings at 9.9 remains below the qualifying list',()=>{const result=communityOrder([{id:'two',rating:9.9,ratingCount:2,publishedRank:1},{id:'three',rating:8,ratingCount:3,publishedRank:2}],c=>c,c=>c.publishedRank,c=>c.id);expect(result.rated.map(r=>r.course.id)).toEqual(['three']);expect(result.unrated.map(c=>c.id)).toEqual(['two']);});
+ it('two ratings at 9.9 now leads the qualifying list',()=>{const result=communityOrder([{id:'two',rating:9.9,ratingCount:2,publishedRank:1},{id:'three',rating:8,ratingCount:3,publishedRank:2}],c=>c,c=>c.publishedRank,c=>c.id);expect(result.rated.map(r=>r.course.id)).toEqual(['two','three']);expect(result.unrated).toEqual([]);});
+});
+describe('option C: full names, the agree mark and the aligned rail',()=>{
+ it('the head has no sub-line under the headline',()=>{const {container}=render(<TheArgumentSection rows={mixed} higher={[]} lower={[]} ratedCount={4} listLabel="GB&I" renderedList="gb-i" onOpenCourse={vi.fn()} />);expect(container.querySelector('.t100b-sub')).toBeNull();expect(container.querySelector('.t100b-title')?.textContent).toBe('Golfers put b 1st. The list has it 2nd.');});
+ it('a row prints the full shortened name and its style never truncates',()=>{const long=compareRows([input('Royal County Down Golf Club (Championship)',1,9),input('Parkstone',2,8),input('Tralee',3,7)]);const {container}=render(<Top100CompareChart rows={long} onOpenCourse={vi.fn()} />);expect([...container.querySelectorAll('.t100b-name')].map(n=>n.textContent)).toContain('Royal County Down (Championship)');const rule=cssRule('t100b-name');expect(rule).not.toBe('');expect(rule).not.toContain('text-overflow');expect(rule).not.toContain('white-space:nowrap');});
+ it('the gap label reads down n, up n or = in the matching tone',()=>{const {container}=render(<Top100CompareChart rows={mixed} onOpenCourse={vi.fn()} />);const badge=(id:string)=>container.querySelector(`button[aria-label="${id}"] .t100b-badge`);expect(badge('a')?.textContent).toBe('↓2');expect(badge('a')?.className).toContain('t100b-down');expect(badge('b')?.textContent).toBe('↑1');expect(badge('b')?.className).toContain('t100b-up');expect(badge('d')?.textContent).toBe('=');expect(badge('d')?.className).toBe('t100b-badge');});
+ it('a moving row prints two position numbers, an agreeing row one dim number',()=>{const {container}=render(<Top100CompareChart rows={mixed} onOpenCourse={vi.fn()} />);expect(container.querySelectorAll('button[aria-label="a"] .t100b-num')).toHaveLength(2);expect(container.querySelectorAll('button[aria-label="d"] .t100b-num')).toHaveLength(1);expect(container.querySelector('button[aria-label="d"] .t100b-num')?.textContent).toBe('4');});
+ it('an agreeing row renders one agree mark and no separate dots',()=>{const {container}=render(<Top100CompareChart rows={mixed} onOpenCourse={vi.fn()} />);const agree=container.querySelector('button[aria-label="d"]') as Element;expect(agree.querySelectorAll('.t100b-agree')).toHaveLength(1);expect(agree.querySelectorAll('.t100b-dot')).toHaveLength(0);const moving=container.querySelector('button[aria-label="a"]') as Element;expect(moving.querySelectorAll('.t100b-agree')).toHaveLength(0);expect(moving.querySelectorAll('.t100b-dot.t100b-official')).toHaveLength(1);expect(moving.querySelectorAll('.t100b-dot.t100b-member')).toHaveLength(1);});
+ it('"Golfers agree" joins the key only where an agreeing row is on screen',()=>{const {container}=render(<Top100CompareChart rows={reversed(13)} onOpenCourse={vi.fn()} />);expect(container.querySelectorAll('.t100b-key-item')).toHaveLength(1);fireEvent.click(screen.getByRole('button',{name:'SEE ALL 13 COMPARED'}));const dialog=screen.getByRole('dialog');const items=dialog.querySelectorAll('.t100b-key-item');expect(items).toHaveLength(2);expect(items[1].textContent).toBe('Golfers agree');expect(items[1].querySelector('.t100b-agree')).not.toBeNull();});
+ it('Rate it is pinned to the card bottom so every button lines up',()=>{const rail=[{...gbi19[0],id:'q0',name:"Rosapenna Golf Resort - St Patrick's Links",publishedRank:5,ratingCount:1},{...gbi19[0],id:'q1',name:'Parkstone',publishedRank:4,ratingCount:1},{...gbi19[0],id:'q2',name:'Tralee',publishedRank:3,ratingCount:1}];const {container}=render(<Top100OneRatingAway courses={rail} listLabel="GB&I" onOpenCourse={vi.fn()} onRate={vi.fn()} />);expect(container.querySelectorAll('.t100b-near-card')).toHaveLength(3);expect(container.querySelectorAll('.t100b-rate')).toHaveLength(3);expect(container.textContent).toContain('Officially 5th · 1 of 2 ratings');expect(container.querySelector('.t100b-sub')?.textContent).toBe('3 GB&I courses have one golfer rating. A second puts each into the comparison.');expect(cssRule('t100b-near-rail')).toContain('align-items:stretch');expect(cssRule('t100b-near-card')).toContain('flex-direction:column');expect(cssRule('t100b-near-line')).toContain('margin-bottom:9px');expect(cssRule('t100b-rate')).toContain('margin-top:auto');});
 });

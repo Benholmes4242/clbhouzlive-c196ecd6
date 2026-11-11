@@ -16,9 +16,35 @@ function Detail({ row, n, onOpen }: { row?: ArgumentRow; n:number; onOpen:(id:st
     <span className="t100b-detail-copy"><span className="t100b-detail-name">{shortenCourseName(row.name)}</span><div className="t100b-detail-line">Golfers <span className="t100b-number">{ordinal(row.memberRank)}</span> · the list <span className="t100b-number">{ordinal(row.listRank)}</span> of the {n} (officially <span className="t100b-number">{ordinal(row.publishedRank)}</span>)</div><div className="t100b-why">{whyLine(row,n)}</div></span><ChevronRight size={14} className="t100b-chevron" aria-hidden />
   </button></div>;
 }
+/** A position's centre on the track, inset by the 6px half-width of the widest mark. */
+function position(p: number, n: number) {
+  return `calc((100% - 12px) * ${(p - 1) / Math.max(1, n - 1)} + 6px)`;
+}
+/** Option C: the full name and the gap above, the two positions and their numbers on the track. */
+function CompareRow({ row, n, selected, onSelect }: { row: ArgumentRow; n: number; selected: string | null; onSelect: (id: string) => void }) {
+  const agree = row.divergence === 0;
+  const up = row.divergence > 0;
+  const fill = agree ? '' : up ? 't100b-green' : 't100b-red';
+  const tone = agree ? '' : up ? 't100b-up' : 't100b-down';
+  const gap = agree ? '=' : `${up ? '↑' : '↓'}${Math.abs(row.divergence)}`;
+  return <button type="button" className="t100b-crow" aria-label={row.name} aria-pressed={selected===row.id} data-dim={selected!==null && selected!==row.id} onClick={() => onSelect(row.id)}>
+    <span className="t100b-name-line"><span className="t100b-name">{shortenCourseName(row.name)}</span><b className={tone ? `t100b-badge ${tone}` : 't100b-badge'}>{gap}</b></span>
+    <span className="t100b-track">
+      {agree ? <i className="t100b-agree" style={{ left: position(row.listRank, n) }} /> : <>
+        <i className={fill ? `t100b-connector ${fill}` : 't100b-connector'} style={{ left: position(Math.min(row.listRank, row.memberRank), n), width: `calc((100% - 12px) * ${Math.abs(row.divergence) / Math.max(1, n - 1)})` }} />
+        <i className="t100b-dot t100b-official" style={{ left: position(row.listRank, n) }} />
+        <i className={fill ? `t100b-dot t100b-member ${fill}` : 't100b-dot t100b-member'} style={{ left: position(row.memberRank, n) }} />
+      </>}
+      <em className="t100b-num" style={{ left: position(row.listRank, n) }}>{row.listRank}</em>
+      {agree ? null : <em className={tone ? `t100b-num ${tone}` : 't100b-num'} style={{ left: position(row.memberRank, n) }}>{row.memberRank}</em>}
+    </span>
+  </button>;
+}
 function Chart({ rows,n,selected,onSelect }: { rows:ArgumentRow[];n:number;selected:string|null;onSelect:(id:string)=>void }) {
-  const position=(p:number) => `calc((100% - 10px) * ${(p-1)/Math.max(1,n-1)} + 5px)`;
-  return <><div className="t100b-key"><span className="t100b-key-item"><i className="t100b-dot t100b-official t100b-key-dot" />Official rank</span></div><div className="t100b-axis"><span /><span className="t100b-axis-labels"><span>1st</span><span>{ordinal(n)}</span></span></div>{rows.map(row => { const tone=row.divergence>0 ? 't100b-green' : row.divergence<0 ? 't100b-red' : ''; return <button type="button" className="t100b-crow" key={row.id} aria-label={row.name} aria-pressed={selected===row.id} data-dim={selected!==null && selected!==row.id} onClick={() => onSelect(row.id)}><span className="t100b-cname">{shortenCourseName(row.name)}</span><span className="t100b-track">{row.divergence!==0 ? <i className={`t100b-connector ${tone}`} style={{left:position(Math.min(row.listRank,row.memberRank)),width:`calc((100% - 10px) * ${Math.abs(row.divergence)/Math.max(1,n-1)})`}} /> : null}<i className="t100b-dot t100b-official" style={{left:position(row.listRank)}} /><i className={`t100b-dot t100b-member ${tone}`} style={{left:position(row.memberRank)}} /></span></button>; })}</>;
+  /* "Golfers agree" joins the key only when a row actually on screen agrees,
+     so the page's capped ten and the see-all sheet are checked separately. */
+  const agrees = rows.some(r => r.divergence === 0);
+  return <><div className="t100b-key"><span className="t100b-key-item"><i className="t100b-dot t100b-official t100b-key-dot" />Official rank</span>{agrees ? <span className="t100b-key-item"><i className="t100b-agree t100b-key-dot" />Golfers agree</span> : null}</div><div className="t100b-axis"><span>1st</span><span>{ordinal(n)}</span></div>{rows.map(row => <CompareRow key={row.id} row={row} n={n} selected={selected} onSelect={onSelect} />)}</>;
 }
 /** Selection is local to each list-keyed chart; sheet course taps close before navigation. */
 export function Top100CompareChart({ rows,onOpenCourse }: { rows:ArgumentRow[];onOpenCourse:(id:string)=>void }) {
