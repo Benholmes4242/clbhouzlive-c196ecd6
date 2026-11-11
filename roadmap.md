@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: WEB_HOMEPAGE_1B completion
+Both fixes implemented; focused 30 passed. Sequential shards: 1=2,133 passed; 2=1,958 passed; 3=2,110 passed /1 failed. Shard 4 not run under the stop rule.
+STOP: src/test/guestStage24.test.tsx:85:18, `AssertionError: expected [ '/auth' ] to deeply equal [ '/auth', '/' ]`. Guest code/test unchanged; no repair or rerun.
+Ben verified production-style none/invite layouts at 1280/390/320; no visual rerun required. Inventory before 8,204; two new cases give expected 8,206, not full-suite verified. Report: WEB_HOMEPAGE_1B_REPORT.md.
+
 ## In progress: Golf Travel category
 Implemented canonical category, create tile, hero labels, seven facilities and booking membership; venue/hospitality exclusions unchanged.
 Focused 57 passed; sequential shard 1: 2,133 passed; shard 2: 1,956 passed / 1 failed. STOP at src/lib/storeLinks.test.ts:45:37: `AssertionError: expected { …(3) } to deeply equal { …(2) }` (existing homepage business:null regression). No repair or test changes.

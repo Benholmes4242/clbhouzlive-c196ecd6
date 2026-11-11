@@ -42,7 +42,7 @@ describe('fetchStoreLinks', () => {
         }),
       }),
     });
-    expect(await fetchStoreLinks()).toEqual(links);
+    expect(await fetchStoreLinks()).toEqual({ ...links, business: null });
 
     from.mockReturnValue({
       select: () => ({
@@ -55,6 +55,17 @@ describe('fetchStoreLinks', () => {
         }),
       }),
     });
-    expect(await fetchStoreLinks()).toEqual({ appStore: null, play: 'https://play.google.com/x' });
+    expect(await fetchStoreLinks()).toEqual({ appStore: null, play: 'https://play.google.com/x', business: null });
+  });
+  it('accepts an HTTPS web_business_url and drops an insecure business URL', async () => {
+    for (const [value, business] of [
+      ['https://clbhouz.co.uk/business', 'https://clbhouz.co.uk/business'],
+      ['http://insecure.example', null],
+    ]) {
+      from.mockReturnValue({
+        select: () => ({ in: async () => ({ data: [{ key: 'web_business_url', value }], error: null }) }),
+      });
+      expect(await fetchStoreLinks()).toEqual({ appStore: null, play: null, business });
+    }
   });
 });

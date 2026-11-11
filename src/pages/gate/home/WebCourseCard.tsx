@@ -4,7 +4,10 @@ export function WebCourseCard({ course, phone = false }: { course: WebCourse; ph
   const { t } = useTranslation('common');
   const say = (key: string, text: string) => t(`webHome.course.${key}`, { defaultValue: text });
   const ratings = course.ratings_count ?? 0;
-  const rate = course.rating_avg != null ? say('rated', `Rated ${course.rating_avg} by golfers · ${ratings} ratings`) : ratings === 1 ? say('oneRating', '1 rating so far') : ratings > 1 ? say('ratings', `${ratings} ratings so far`) : say('unrated', 'Not rated yet');
+  const ratingFigure = course.rating_avg != null ? Number(course.rating_avg).toFixed(1) : null;
+  const ratingLine = ratingFigure != null ? say('rated', `Rated ${ratingFigure} by golfers · ${ratings} ratings`) : '';
+  const ratingParts = ratingFigure != null ? ratingLine.split(ratingFigure) : [];
+  const rate = ratingFigure != null ? <>{ratingParts[0]}<b className="web-rating-figure fig">{ratingFigure}</b>{ratingParts.slice(1).join(ratingFigure)}</> : ratings === 1 ? say('oneRating', '1 rating so far') : ratings > 1 ? say('ratings', `${ratings} ratings so far`) : say('unrated', 'Not rated yet');
   const hard = course.hardest_hole;
   const cardHole = course.card_hardest_hole;
   const sub = cardHole != null ? say('cardOrdinal', `card says ${ordinal(cardHole)}`) : hard?.stroke_index != null ? say('cardIndex', `card says SI ${hard.stroke_index}`) : '';
