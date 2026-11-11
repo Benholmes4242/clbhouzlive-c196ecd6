@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import common from '../../public/locales/en/courses.json';
 
 const f = vi.hoisted(() => ({ board: vi.fn(), tiles: vi.fn(), user: { id: 'me', is_anonymous: false } as { id: string; is_anonymous: boolean } | null, courses: vi.fn(), enrichment: vi.fn(), progress: vi.fn() }));
-vi.mock('@/hooks/top100/useTop100Race', () => ({ useTop100Race: f.board }));
+vi.mock('@/hooks/top100/useTop100Race', () => ({ useTop100Race: f.board, useCareerBoard: f.board, TOP100_METRIC: { 'gb-i': 'top_100_gbni_distinct', global: 'top_100_worldwide_distinct', europe: 'top_100_europe_distinct', usa: 'top_100_usa_distinct' } }));
 vi.mock('@/hooks/gam/useTop100ListProgress', () => ({ useTop100ListProgress: f.tiles }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: f.user }) }));
 vi.mock('@/hooks/useGolfCoursesInfinite', () => ({ useGolfCoursesInfinite: f.courses }));
@@ -20,7 +20,7 @@ vi.mock('@/components/top100/sheets/Top100ListProgressSheet', () => ({ Top100Lis
 vi.mock('@/components/explore-tab-new/courseled/ExploreSheetShell', () => ({ ExploreSheetShell: ({ children, above }: { children: React.ReactNode; above: React.ReactNode }) => <div data-testid="see-all">{above}{children}</div> }));
 vi.mock('@/components/explore-tab-new/courseled/CourseImageFallback', () => ({ CourseImageFallback: () => null }));
 vi.mock('@/components/courses/BrowseCourseCard', () => ({ default: () => null }));
-vi.mock('@/components/courses/browse/PageLoadGate', () => ({ PageLoadGate: ({ children }: { children: React.ReactNode }) => <>{children}</>, usePageRevealed: () => true, useSectionReady: () => {} }));
+vi.mock('@/components/courses/browse/PageLoadGate', () => ({ PageLoadGate: ({ children }: { children: React.ReactNode }) => <>{children}</>, usePageRevealed: () => true, useSectionReady: () => {}, settled: (q: { isFetched?: boolean; isError?: boolean; status?: string }) => q.isFetched === true || q.isError === true || q.status === 'success' || q.status === 'error' }));
 
 import { HundredRail, HundredYou } from '@/components/courses/top100/HundredRaceParts';
 import { Top100RaceSection } from '@/components/courses/top100/Top100RaceSection';
@@ -136,7 +136,8 @@ describe('T100 folded Your courses', () => {
   it('reviewed and played cells use ink not amber, member and nobody unchanged', () => {expect(cellStyle('reviewed').background).toBe('#F8FAFC');expect(cellStyle('played').boxShadow).toContain('#F8FAFC');expect(cellStyle('member').background).toBe('var(--t100-member)');expect(cellStyle('nobody').background).toBe('var(--t100-nobody)');expect(cellState(undefined)).toBe('nobody');});
 });
 describe('T100 visibility and Rounds removal', () => {
-  it.each(['signed-out','guest'])('%s has no race or reservation', kind=>{f.user=kind==='guest'?{id:'guest',is_anonymous:true}:null;mount(<Top100CoursesHubPanel />);expect(document.querySelector('[data-top100-race]')).toBeNull();expect(document.querySelector('[data-race-shell]')).toBeNull();expect(f.board).not.toHaveBeenCalled();});
+  /* Top 100 leaderboard Option B: guests and signed-out visitors now read the PUBLIC board (p_viewer null); the retired rule was "no board read at all". The race and its reservation stay unmounted. */
+  it.each(['signed-out','guest'])('%s has no race or reservation', kind=>{f.user=kind==='guest'?{id:'guest',is_anonymous:true}:null;mount(<Top100CoursesHubPanel />);expect(document.querySelector('[data-top100-race]')).toBeNull();expect(document.querySelector('[data-race-shell]')).toBeNull();expect(f.board).toHaveBeenCalledWith(undefined,'top_100_worldwide_distinct',100);});
   it('no board rows hides race',()=>{f.board.mockReturnValue({data:[],isPending:false,isError:false});race();expect(screen.queryByText('The race')).toBeNull();expect(document.querySelector('[data-hundred-rail]')).toBeNull();});
   it('failed read shows a retry instead of stale rows',()=>{const retry=vi.fn();f.board.mockReturnValue({data:[row('a',5,1)],isPending:false,isError:true,refetch:retry});race();fireEvent.click(screen.getByRole('button',{name:'Retry'}));expect(retry).toHaveBeenCalledOnce();expect(document.querySelector('[data-race-row]')).toBeNull();});
   it('loading reserves slab rail and three rows, no pinned row or dropdown',()=>{f.board.mockReturnValue({isPending:true});race();expect(element('[data-race-shell]')).toBeInTheDocument();expect(document.querySelectorAll('.t100-shell-row')).toHaveLength(3);expect(document.querySelector('[data-your-courses]')).toBeNull();});

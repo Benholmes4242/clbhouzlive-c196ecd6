@@ -19,14 +19,14 @@ const f=vi.hoisted(()=>({ placeholder:false, gateRevealed:true, user:{id:'me'} a
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/components/explore-tab-new/courseled/CourseImageFallback',()=>({CourseImageFallback:()=>null}));
 vi.mock('@/components/ui/BottomSheet',()=>({BottomSheet:({children}: {children:React.ReactNode})=><div role="dialog">{children}</div>}));
-vi.mock('@/components/courses/browse/PageLoadGate',()=>({PageLoadGate:({children,fallback}:{children:React.ReactNode;fallback?:React.ReactNode})=><>{f.gateRevealed?children:fallback}</>,usePageRevealed:()=>f.gateRevealed,useSectionReady:()=>{}}));
+vi.mock('@/components/courses/browse/PageLoadGate',()=>({PageLoadGate:({children,fallback}:{children:React.ReactNode;fallback?:React.ReactNode})=><>{f.gateRevealed?children:fallback}</>,usePageRevealed:()=>f.gateRevealed,useSectionReady:()=>{},settled:(q:{isFetched?:boolean;isError?:boolean;status?:string})=>q.isFetched===true||q.isError===true||q.status==='success'||q.status==='error'}));
 vi.mock('@/components/courses/BrowseCourseCard',()=>({default:()=>null,TOP100_PHOTO_H:178}));
 vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:f.user})}));
 vi.mock('@/hooks/useGolfCoursesInfinite',()=>({useGolfCoursesInfinite:()=>({data:{pages:[gbi19.map(c=>({...c,country:'England',thumbnail_image:null,list_memberships:[{list_slug:'gb-i',rank:c.publishedRank},{list_slug:'global',rank:c.publishedRank}]}))]},isLoading:false,isError:false,isPlaceholderData:f.placeholder})}));
 vi.mock('@/hooks/top100/useTop100Enrichment',()=>({useTop100Enrichment:()=>({data:new Map(gbi19.map(c=>[c.id,{rating:c.rating,ratingCount:c.ratingCount,subScores:c.subScores}])),isLoading:false})}));
 vi.mock('@/hooks/useTop100ProgressForUser',()=>({useTop100ProgressForUser:()=>({data:{lists:[{listSlug:'gb-i',played:23,total:100},{listSlug:'global',played:8,total:100}]},isLoading:false,isFetchedAfterMount:true})}));
 vi.mock('@/hooks/top100/useTop100GolferBaseline',()=>({useTop100GolferBaseline:()=>new Map()}));
-vi.mock('@/hooks/top100/useTop100Race',()=>({useTop100Race:()=>({data:[{user_id:'me',is_viewer:true,pos:3,total_members:35}],isPending:false,isError:false,isPlaceholderData:false})}));
+vi.mock('@/hooks/top100/useTop100Race',()=>({useTop100Race:()=>({data:[{user_id:'me',is_viewer:true,pos:3,total_members:35}],isPending:false,isError:false,isPlaceholderData:false}),useCareerBoard:()=>({data:[],isPending:false,isError:false,isPlaceholderData:false,isFetched:true,status:'success'}),TOP100_METRIC:{'gb-i':'top_100_gbni_distinct',global:'top_100_worldwide_distinct',europe:'top_100_europe_distinct',usa:'top_100_usa_distinct'}}));
 vi.mock('@/hooks/gam/useTop100ListProgress',()=>({useTop100ListProgress:()=>({data:[],isPending:false})}));
 vi.mock('@/components/courses/top100/Top100RaceSection',()=>({Top100RaceSection:()=> <div data-top100-race /> }));
 vi.mock('@/components/courses/top100/YourHundredSection',()=>({YourCoursesDropdown:()=> <div data-your-courses /> }));
@@ -82,11 +82,12 @@ describe('one rating away',()=>{
 describe('Your hundred and active-list identity',()=>{
  it('hidden below five',()=>{const {container}=render(<Top100YourHundred played={4} total={100} position={3} members={35}>{()=>null}</Top100YourHundred>);expect(container.firstChild).toBeNull();});
  it('23 of 100, 3rd of 35 and only the sheet mounts race and courses',()=>{const {container}=render(<Top100YourHundred played={23} total={100} position={3} members={35}>{()=> <><div data-top100-race /><div data-your-courses /></>}</Top100YourHundred>);expect(container.textContent).toContain('23 of 100 · 3rd of 35');expect(container.querySelector('[data-top100-race]')).toBeNull();fireEvent.click(screen.getByRole('button'));expect(screen.getByRole('dialog').querySelector('[data-top100-race]')).not.toBeNull();expect(screen.getByRole('dialog').querySelector('[data-your-courses]')).not.toBeNull();});
- it('saved GB&I member has one section across placeholder Global and GB&I switches',async()=>{
+ it('saved GB&I member has one argument section across placeholder Global and GB&I switches',async()=>{
  sessionStorage.setItem('top100-last-filters',JSON.stringify({list:'gb-i'}));const {container,rerender}=render(<Top100CoursesHubPanel />, {wrapper});
  const check=(list:string,label:string)=>{const sections=container.querySelectorAll('[data-golfers-versus]');expect(sections).toHaveLength(1);expect(sections[0].getAttribute('data-golfers-versus')).toBe(list);expect(sections[0].querySelector('.t100b-sub')).toBeNull();expect(sections[0].querySelector('.t100b-caption')?.textContent).toBe('The 10 biggest gaps of the 19, in official order');};check('gb-i','GB&I');
  for(const [label,slug] of [['Global','global'],['GB&I','gb-i']]) {f.placeholder=true;fireEvent.click(screen.getByRole('tab',{name:label}));expect(container.querySelectorAll('[data-golfers-versus]')).toHaveLength(1);f.placeholder=false;await act(async()=>rerender(<Top100CoursesHubPanel />));check(slug,label);}
- expect(container.querySelector('[data-top100-race]')).toBeNull();expect(container.querySelector('[data-your-courses]')).toBeNull();fireEvent.click(screen.getByRole('button',{name:/YOUR HUNDRED/}));expect(screen.getByRole('dialog').querySelector('[data-top100-race]')).not.toBeNull();
+ /* The YOUR HUNDRED row, race shell and dropdown no longer mount on this page (Top 100 leaderboard Option B); with an empty board the leaderboard card is absent too. */
+ expect(container.querySelector('[data-top100-race]')).toBeNull();expect(container.querySelector('[data-your-courses]')).toBeNull();expect(screen.queryByRole('button',{name:/YOUR HUNDRED/})).toBeNull();expect(container.querySelector('.t100b-lb-card')).toBeNull();
  });
  it('two ratings at 9.9 now leads the qualifying list',()=>{const result=communityOrder([{id:'two',rating:9.9,ratingCount:2,publishedRank:1},{id:'three',rating:8,ratingCount:3,publishedRank:2}],c=>c,c=>c.publishedRank,c=>c.id);expect(result.rated.map(r=>r.course.id)).toEqual(['two','three']);expect(result.unrated).toEqual([]);});
 });

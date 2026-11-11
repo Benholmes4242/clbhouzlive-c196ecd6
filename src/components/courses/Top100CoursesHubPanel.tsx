@@ -15,8 +15,7 @@ import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
-import { YourCoursesDropdown } from './top100/YourHundredSection';
-import { Top100RaceSection } from './top100/Top100RaceSection';
+import { Top100Leaderboard } from './top100/Top100Leaderboard';
 import { isGuestUser } from '@/features/guest/useIsGuest';
 import type { RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
 import './top100/t100Race.css';
@@ -28,9 +27,6 @@ export const TOP100_CARD_GAP = 24;
 import { argumentGroups, compareRows, MIN_QUALIFYING } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline';
-import { useTop100Race } from '@/hooks/top100/useTop100Race';
-import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
-import { Top100YourHundred } from './top100/Top100YourHundred';
 import { Top100OneRatingAway, oneRatingAway } from './top100/Top100OneRatingAway';
 import './top100/top100Compare.css';
 
@@ -232,7 +228,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
     isFetchedAfterMount: progressFetchedAfterMount,
   } = useTop100ProgressForUser(user?.id);
   const viewerList = progress?.lists.find((list) => list.listSlug === renderedList);
-  const viewerPlayed = viewerList?.played ?? 0;
 
   /* The tab opens where the member's golf is. This runs ONCE, only when nothing has been chosen — a saved list or a tap in this mount both win over it, because a default that overrides a member's own choice is not a default, it is a bug. A tie for the most played, or none played at all, falls back to Global. It is safe to change the list here because PageLoadGate is already waiting on 'progress', so the page has not painted yet. */
   useEffect(() => {
@@ -242,14 +237,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
     defaultApplied.current = true;
     setSelectedList(mostPlayedList(progress.lists));
   }, [user?.id, progress, progressLoading]);
-  const subjects = useMemo(
-    () => new Map(courses.map((c) => [c.id, {
-      name: c.name ?? '',
-      imageUrl: c.thumbnail_image ?? null,
-      memberships: ((c.list_memberships ?? []) as CourseListMembership[]).map((m) => ({ list_slug: m.list_slug, rank: Number(m.rank) })),
-    }])),
-    [courses],
-  );
   const argumentInputs = courses.map((c) => {
     const e = enrichment.get(c.id);
     return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, renderedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0, subScores:e?.subScores, ratedByYou:e?.ratedByYou ?? false };
@@ -350,7 +337,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
       <GateReport id="progress" ready={user?.id ? progressFetchedAfterMount : !progressLoading} />
       <GateReport id="enrichment" ready={!enrichmentLoading} />
-      {!memberId ? <GateReport id="race" ready /> : null}
       {comparisonRows.length >= MIN_QUALIFYING ? (
         <TheArgumentSection
           key={renderedList}
@@ -370,9 +356,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
         sessionStorage.setItem('top100-scroll', String(getPageScrollTop()));
         navigate(memberId ? `/courses/${id}/rate` : '/auth');
       }} />
-      {memberId ? <RaceSeat viewerId={memberId} list={selectedList as RankListSlug} total={viewerList?.total ?? 0} played={viewerPlayed} eligible={renderedList === selectedList && progressFetchedAfterMount}>
-        {close => <><Top100RaceSection viewerId={memberId} list={selectedList as RankListSlug} total={viewerList?.total ?? 0} onOpenCourse={id => { close(); openCourse(id); }} /><YourCoursesDropdown listSlug={selectedList} viewerPlayed={viewerPlayed} total={viewerList?.total ?? 0} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={id => { close(); openCourse(id); }} /></>}
-      </RaceSeat> : null}
+      <Top100Leaderboard viewerId={memberId} list={renderedList as RankListSlug} listSize={viewerList?.total} />
       <section className="t100b-section">
         <div className="t100b-list-head"><div><div className="t100b-kicker">THE LIST</div><div className="t100b-title">{heading}</div></div><div className="t100b-segments" aria-label="List order">{RANKING_OPTIONS.map(opt => <button type="button" className="t100b-segment" key={opt.value} aria-pressed={ranking===opt.value} onClick={() => chooseRanking(opt.value)}>{opt.label}</button>)}</div></div>
         {ranking === 'community' ? <div className="t100b-note">Ranked by golfers' average rating across the {community.rated.length} courses with two or more ratings. The rest follow in official order.</div> : null}
@@ -442,10 +426,4 @@ function GateReport({ id, ready }: { id: string; ready: boolean }) {
   useSectionReady(id, ready);
   return null;
 }
-/** Race readiness is loaded once for members; its presentation lives only in the sheet. */
-function RaceSeat({viewerId,list,total,played,eligible,children}: {viewerId:string;list:RankListSlug;total:number;played:number;eligible:boolean;children:(close:()=>void)=>React.ReactNode}) {
-  const race=useTop100Race(viewerId,list);
-  const progress=useTop100ListProgress(list,viewerId,viewerId);
-  const mine=!race.isPlaceholderData && !race.isError ? race.data?.find(r=>r.is_viewer || r.user_id===viewerId) : undefined;
-  return <><GateReport id="race" ready={!race.isPending && !race.isPlaceholderData && !progress.isPending} />{eligible && mine && total>0 && played>=5 ? <Top100YourHundred key={list} played={played} total={total} position={mine.pos} members={Number(mine.total_members)}>{children}</Top100YourHundred> : null}</>;
-}
+
