@@ -59,13 +59,14 @@ describe('ClubProfileHero crest fallback', () => {
     expect(fallback.textContent).toBe('MT');
     // Gradient fill is stripped by jsdom (see avatarFallbackFill assertion);
     // the fallback branch is what carries it.
-    expect(fallback.getAttribute('style') ?? '').toContain('inset 0 0 0 1px rgba(248, 250, 252, 0.1)');
+    expect(fallback.getAttribute('style') ?? '').toContain('box-shadow: inset 0 0 0 1px rgba(248,250,252,0.10)');
   });
 
   it('with a logo: the plate stays #F4F4F2', () => {
     const { container } = hero({ logoUrl: 'https://example.com/logo.png' });
     const crest = container.querySelector('[data-club-crest]') as HTMLElement;
-    expect(crest.getAttribute('style') ?? '').toContain('#F4F4F2');
+    // jsdom serializes #F4F4F2 as rgb(244, 244, 242).
+    expect(crest.getAttribute('style') ?? '').toContain('rgb(244, 244, 242)');
     expect(crest.querySelector('img')).not.toBeNull();
   });
 });
