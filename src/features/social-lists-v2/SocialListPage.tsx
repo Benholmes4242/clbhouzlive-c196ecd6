@@ -513,7 +513,6 @@ function PendingRow({
         alt={row.display_name ?? row.username ?? ''}
         userId={row.actor_id}
         size={38}
-        fallback={(row.display_name ?? row.username ?? '?').charAt(0)}
         hairlineRing
       />
       <div style={{ flex: 1, minWidth: 0 }}>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
+import { getAvatarFallbackGradient, getInitialsFromName } from '@/lib/avatarFallback';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { Loader2, MapPin } from 'lucide-react';
@@ -370,7 +370,7 @@ const PostDeepLinkPage: React.FC = () => {
                   color: 'rgba(248,250,252,0.82)',
                 }}
               >
-                {displayName.charAt(0).toUpperCase()}
+                {getInitialsFromName(displayName) || '?'}
               </div>
             )}
             <div className="flex flex-col">

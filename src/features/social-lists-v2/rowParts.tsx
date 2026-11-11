@@ -13,7 +13,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SF_STACK } from '@/components/manage/ui';
-import { getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { avatarFallbackFill, getInitialsFromName } from '@/lib/avatarFallback';
 
 /* ── type stack ──────────────────────────────────────────────────────
    Colour lives in A (analytical dark ramp) — this surface declares NO
@@ -44,7 +44,7 @@ export function RowAvatar({
   row: RowActorLike;
   size?: number;
 }) {
-  const initial = (row.display_name ?? row.username ?? '?').charAt(0);
+  const initial = getInitialsFromName(row.display_name ?? row.username) || '?';
   if (row.actor_type === 'business') {
     if (row.avatar_url) {
       return (
@@ -76,9 +76,9 @@ export function RowAvatar({
           width: size,
           height: size,
           borderRadius: '34%',
-          /* Shared fallback hash — see lib/avatarFallback.ts. Keyed on actor_id
-             so a business gets the same colour everywhere it appears. */
-          background: getAvatarFallbackColor(row.actor_id),
+          /* Canonical dark fallback fill — see lib/avatarFallback.ts. Keyed on
+             actor_id so a business gets the same fill everywhere it appears. */
+          background: avatarFallbackFill(row.actor_id),
           border: `0.5px solid ${DARK_HAIRLINE}`,
           display: 'flex',
           alignItems: 'center',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,9 +17,7 @@ const AMBER_DEEP = ACT.AMBER_DEEP;
 const HAIR = ACT.HAIR;
 
 function initialsOf(name?: string | null): string {
-  if (!name) return '?';
-  const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || '?';
+  return getInitialsFromName(name) || '?';
 }
 
 interface CardProps {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import { useBusinessDirectory, BusinessDirectoryItem } from '@/hooks/useBusinessDirectory';
 import { Button } from '@/components/ui/button';
@@ -58,7 +59,7 @@ const BusinessDirectoryPage = () => {
   };
 
   const getInitials = (name: string) => {
-    return name.charAt(0).toUpperCase();
+    return getInitialsFromName(name) || '?';
   };
 
   return (

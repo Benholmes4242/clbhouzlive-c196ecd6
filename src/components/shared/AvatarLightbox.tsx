@@ -8,7 +8,7 @@ import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
-import { getAvatarFallbackColor, getAvatarFallbackGradient } from '@/lib/avatarFallback';
+import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 
 export interface AvatarLightboxProps {
@@ -20,8 +20,8 @@ export interface AvatarLightboxProps {
   fallbackInitial?: string;
   /** Subject's id. THE fallback key; altText is a last resort. */
   subjectId?: string | null;
-  /** HUE IS A PERSON, THE SLATE PALETTE IS AN ENTITY. This lightbox is shared
-   *  by a member's photo and a business logo, so the caller says which. */
+  /** MEMBER OR ENTITY — both now share the one canonical dark fallback fill.
+   *  The prop stays so callers need not change. */
   subject?: 'member' | 'entity';
 }
 
@@ -36,10 +36,7 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
   subject = 'member',
 }) => {
   const fallbackKey = subjectId || altText;
-  const fallbackFill =
-    subject === 'entity'
-      ? getAvatarFallbackColor(fallbackKey)
-      : getAvatarFallbackGradient(fallbackKey);
+  const fallbackFill = getAvatarFallbackGradient(fallbackKey);
   const [imgFailed, setImgFailed] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();

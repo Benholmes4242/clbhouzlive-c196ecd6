@@ -18,6 +18,7 @@
  * derived from it rather than relying on CSS invert surviving capture.
  */
 import React from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
@@ -82,13 +83,7 @@ const tersePlace = (c: TopTenShareCourse, variant: string | null) =>
 const heroPlace = (c: TopTenShareCourse, variant: string | null) =>
   [variant, [c.region, c.sub_country].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
 
-const initialsOf = (name: string) =>
-  name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w.charAt(0).toUpperCase())
-    .join('');
+const initialsOf = (name: string) => getInitialsFromName(name);
 
 export const TopTenShareCard: React.FC<Props> = ({
   format,

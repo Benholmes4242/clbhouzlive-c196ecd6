@@ -30,6 +30,9 @@ export const AVATAR_FALLBACK_PALETTE = [
 /**
  * Stable 32-bit hash of a string, folded into a palette slot.
  * Same input → same slot, every time, on every device.
+ *
+ * Tour player tiles only. Never for a personal or business profile; those
+ * use avatarFallbackFill.
  */
 export function getAvatarFallbackColor(
   key: string | null | undefined
@@ -48,7 +51,8 @@ export function getAvatarFallbackColor(
  * Derive 1–2 character initials from a user's display name.
  *
  * Rules:
- * - Two tokens or more → first letter of first two tokens ("Danny Holmes" → "DH")
+ * - Two tokens or more → first letter of the FIRST and LAST tokens
+ *   ("Danny Holmes" → "DH", "Mary Jane Smith" → "MS")
  * - One token → first letter only ("neilbryan" → "N")
  * - Single character → that character ("n" → "N")
  * - Empty/nullish → returns empty string (caller should fall back to "?")
@@ -64,9 +68,21 @@ export function getInitialsFromName(
 
   const tokens = cleaned.split(/\s+/).filter(Boolean);
   if (tokens.length >= 2) {
-    return (tokens[0][0] + tokens[1][0]).toUpperCase();
+    return (tokens[0][0] + tokens[tokens.length - 1][0]).toUpperCase();
   }
   return tokens[0].charAt(0).toUpperCase();
+}
+
+/** Initials ink on the canonical dark fallback fill. */
+export const AVATAR_FALLBACK_INK = '#F8FAFC';
+
+/**
+ * The one fallback fill for every personal or business profile with no
+ * photo or logo — the same dark gradient SquircleAvatar and the search
+ * overlay already use. Tiles that don't render SquircleAvatar import this.
+ */
+export function avatarFallbackFill(key: string | null | undefined): string {
+  return getAvatarFallbackGradient(key);
 }
 
 /**

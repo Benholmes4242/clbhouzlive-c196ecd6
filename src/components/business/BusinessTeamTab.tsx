@@ -91,7 +91,6 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
               src={m.user_profile?.profile_photo_url || undefined}
               alt={name}
               userId={m.user_profile?.id ?? m.user_profile_id}
-              fallback={name.charAt(0).toUpperCase()}
               hairlineRing
             />
             <div className="min-w-0 flex-1">

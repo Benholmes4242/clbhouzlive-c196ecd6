@@ -210,7 +210,6 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                 src={author.avatarUrl}
                 alt={author.displayName}
                 userId={author.id}
-                fallback={author.displayName?.[0] ?? '?'}
                 hairlineRing
               />
             </div>

@@ -13,6 +13,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, Search, Send, Check } from 'lucide-react';
@@ -156,13 +157,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
   const { openInviteSheet } = useInviteSheet();
   const openSearch = () => window.dispatchEvent(new Event('clbhouz:open-search'));
 
-  const userInitials = (profile?.display_name || profile?.username || '?')
-    .split(' ')
-    .map((w) => w[0])
-    .filter(Boolean)
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const userInitials = getInitialsFromName(profile?.display_name || profile?.username) || '?';
 
   return (
     <div
@@ -256,13 +251,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
           }
           const seed = spineSeeds[i - 1];
           if (seed) {
-            const initials = (seed.displayName || '?')
-              .split(' ')
-              .map((w) => w[0])
-              .filter(Boolean)
-              .join('')
-              .slice(0, 2)
-              .toUpperCase();
+            const initials = getInitialsFromName(seed.displayName) || '?';
             return (
               <div key={seed.userId} className="fb-slot-pop" style={{ width: 52 }}>
                 <SquircleAvatar
@@ -433,13 +422,7 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
   onFollow,
   onOpenProfile,
 }) => {
-  const initials = (creator.displayName || '?')
-    .split(' ')
-    .map((w) => w[0])
-    .filter(Boolean)
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = getInitialsFromName(creator.displayName) || '?';
 
   return (
     <div

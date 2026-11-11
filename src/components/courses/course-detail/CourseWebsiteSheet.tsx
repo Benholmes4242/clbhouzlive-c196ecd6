@@ -14,6 +14,7 @@
  * NO NEGATIVE LETTER-SPACING anywhere in this sheet.
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowUpRight, Bookmark, Calendar, Check, ChevronRight, Link as LinkIcon,
@@ -644,7 +645,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                       ) : (
-                        (player.display_name ?? '?').trim().charAt(0).toUpperCase()
+                        getInitialsFromName(player.display_name) || '?'
                       )}
                     </div>
                   ))}

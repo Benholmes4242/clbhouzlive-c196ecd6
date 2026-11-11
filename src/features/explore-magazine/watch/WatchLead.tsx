@@ -323,7 +323,6 @@ function LeadCard({ row, onDepart }: { row: WatchLeadRow; onDepart: () => void }
       alt={row.display_name}
       userId={row.actor_type === 'personal' ? row.actor_id : null}
       size={size}
-      fallback={row.display_name.charAt(0)}
       hairlineRing
     />
   );

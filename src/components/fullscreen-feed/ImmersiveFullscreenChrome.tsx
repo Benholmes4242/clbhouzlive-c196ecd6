@@ -755,7 +755,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             src={activePost.avatarUrl}
             alt={activePost.displayName}
             userId={activePost.actorId ?? activePost.userId}
-            fallback={activePost.displayName?.[0] ?? '?'}
             hairlineRing
           />
         </button>
@@ -960,8 +959,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           <SquircleAvatar
             size={30}
             src={activeActor!.avatarUrl ?? undefined}
-            alt=""
-            fallback={(activeActor!.name ?? '').trim().charAt(0).toUpperCase() || '?'}
+            alt={activeActor!.name ?? ''}
             hairlineRing
           />
           <span style={{ flex: 1, minWidth: 0, fontSize: 13, color: META, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

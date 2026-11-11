@@ -22,7 +22,7 @@ import {
   ManageCard,
 } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { getAvatarFallbackColor, getInitialsFromName } from '@/lib/avatarFallback';
+import { avatarFallbackFill, AVATAR_FALLBACK_INK, getInitialsFromName } from '@/lib/avatarFallback';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 /** The one amber on this surface: waiting. Brand amber, resolved through the analytical ramp. */
@@ -338,7 +338,7 @@ export function PlainButton({
 /**
  * §4.2 THE BUSINESS ROW — their own logo, resolved exactly as
  * ClubProfileHero's crest does: logoUrl, falling back to initials on
- * getAvatarFallbackColor(fallbackKey || name). No placeholder, no stock image.
+ * avatarFallbackFill(fallbackKey || name). No placeholder, no stock image.
  */
 export function BusinessRow({
   name,
@@ -364,7 +364,7 @@ export function BusinessRow({
           overflow: 'hidden',
           flexShrink: 0,
           border: `1px solid ${HAIR}`,
-          background: logoUrl ? '#E9ECF2' : getAvatarFallbackColor(fallbackKey || name),
+          background: logoUrl ? '#E9ECF2' : avatarFallbackFill(fallbackKey || name),
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -379,7 +379,7 @@ export function BusinessRow({
               fontFamily: SF_STACK,
               fontSize: 16,
               fontWeight: 600,
-              color: '#FFFFFF',
+              color: AVATAR_FALLBACK_INK,
               letterSpacing: '0.01em',
             }}
           >

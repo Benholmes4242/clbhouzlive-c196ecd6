@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import './explore-top.css';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -175,7 +176,7 @@ function QuickLayout({ grid, children }: { grid: boolean; children: React.ReactN
 function Poster({ row, height, posterH, radius, autoplay, progress, aspect = '9 / 16', badge = 'glass', badgeTopRight = false, children }: { row: HubRpcRow; height: number | null; posterH: number; radius: number; autoplay: boolean; progress: number | null; aspect?: string; badge?: 'glass' | 'solid'; badgeTopRight?: boolean; children?: React.ReactNode }) {
   const poster = posterFor(row, posterH);
   const [failed, setFailed] = useState(false);
-  const initial = (creatorName(row) || '?').trim().charAt(0).toUpperCase() || '?';
+  const initial = getInitialsFromName(creatorName(row)) || '?';
   return (
     <span data-watch-frame style={{ display: 'block', position: 'relative', ...(height == null ? { aspectRatio: aspect } : { height }), flex: 'none', borderRadius: radius, overflow: 'hidden', background: A.PANEL }}>
       {poster && !failed ? (

@@ -396,7 +396,6 @@ function GolferRow({
             alt={name}
             userId={golfer.user_id}
             size={44}
-            fallback={name.charAt(0)}
             hairlineRing={!activity}
             hideRing={!!activity}
           />
@@ -805,7 +804,6 @@ function SearchResults({
             alt={p.display_name ?? p.username ?? ''}
             userId={p.id}
             size={44}
-            fallback={(p.display_name ?? p.username ?? '?').charAt(0)}
             hairlineRing
           />
           <div style={{ flex: 1, minWidth: 0 }}>

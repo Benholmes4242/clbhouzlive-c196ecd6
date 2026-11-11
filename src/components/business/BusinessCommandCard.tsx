@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -351,7 +352,7 @@ export function BusinessCommandCard({
               <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
             ) : (
               <span className="text-[18px] font-semibold" style={{ color: BIZ.inkMute }}>
-                {business.name.charAt(0).toUpperCase()}
+                {getInitialsFromName(business.name) || '?'}
               </span>
             )}
             {/* Canonical 1px traced hairline ring — A.BORDER white-alpha */}

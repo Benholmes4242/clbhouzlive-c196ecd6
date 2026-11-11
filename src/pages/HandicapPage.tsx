@@ -1,4 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 /**
  * HandicapPage — Top-level Handicap route.
  *
@@ -99,7 +100,7 @@ const FriendTitleRow: React.FC<{
 }> = ({ displayName, avatarUrl, username, friendId, viewerUserId }) => {
   const navigate = useNavigate();
   const profileTarget = username ? `/profile/${username}` : `/profile/${friendId}`;
-  const initial = (displayName?.charAt(0) ?? '?').toUpperCase();
+  const initial = getInitialsFromName(displayName) || '?';
 
   const handleTap = () => {
     analyticsEvents.track('friend_handicap_profile_tap', {

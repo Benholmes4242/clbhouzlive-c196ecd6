@@ -41,7 +41,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
     if (!isLoading && activeActor && useBareTheme) {
-      const initials = activeActor.name.charAt(0).toUpperCase();
       return (
         <button
           ref={ref}
@@ -71,7 +70,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               size={30}
               src={activeActor.avatarUrl}
               alt={activeActor.name}
-              fallback={initials}
               hairlineRing
             />
 

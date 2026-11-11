@@ -13,6 +13,7 @@
  *   deterministic gradient picked from the business id.
  */
 import { useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal, Plus, Eye, Share, Trash2, ShieldCheck, Globe, Clock, AlertCircle, Flag } from 'lucide-react';
@@ -60,7 +61,7 @@ export function businessColour(id: string): string {
   return GRADIENTS[h % GRADIENTS.length];
 }
 export function businessInitials(name: string): string {
-  return name.trim().split(/\s+/).slice(0, 2).map((w) => w.charAt(0)).join('').toUpperCase();
+  return getInitialsFromName(name);
 }
 /**
  * CB66.1: drop trailing words (and trailing punctuation-only words like "&")
