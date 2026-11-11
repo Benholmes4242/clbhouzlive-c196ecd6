@@ -47,16 +47,23 @@ export function useDiscoverMediaPreview(enabled: boolean) {
       const rows = (data ?? []) as unknown as Row[];
       const userIds = [...new Set(rows.map((row) => row.user_id))];
       const courseIds = [...new Set(rows.flatMap((row) => [row.tagged_course_ids?.[0], row.course_id]).filter((id): id is string => !!id))];
-      const [{ data: profiles }, { data: courses }] = await Promise.all([
+      // BUSINESS AUTHORSHIP: business rows are named by business_accounts,
+      // never by the uploader's public_profiles row.
+      const businessIds = [...new Set(rows.filter((row) => row.actor_type === 'business' && row.actor_id).map((row) => row.actor_id as string))];
+      const [{ data: profiles }, { data: courses }, { data: businesses }] = await Promise.all([
         userIds.length
           ? supabase.from('public_profiles').select('id, username, display_name, profile_photo_url').in('id', userIds)
           : Promise.resolve({ data: [] }),
         courseIds.length
           ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
           : Promise.resolve({ data: [] }),
+        businessIds.length
+          ? supabase.from('business_accounts').select('id, name, logo_url, is_verified').in('id', businessIds)
+          : Promise.resolve({ data: [] }),
       ]);
       const profileById = new Map((profiles ?? []).map((profile: any) => [profile.id as string, profile]));
       const courseById = new Map((courses ?? []).map((course: any) => [course.id as string, course.name as string]));
+      const businessById = new Map((businesses ?? []).map((business: any) => [business.id as string, business]));
 
       const mapped = rows.flatMap((row): CommunityLibraryItem[] => {
         const media = [...(row.post_media ?? [])].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
