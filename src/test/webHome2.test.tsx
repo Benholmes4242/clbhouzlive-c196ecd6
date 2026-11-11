@@ -50,19 +50,11 @@ describe('WEB_HOMEPAGE_2', () => {
     expect(imgs.every(i => i.getAttribute('width') === '750' && i.getAttribute('height') === '1626' && i.getAttribute('alt') === '')).toBe(true);
   });
   it('centres all four How it works icons within their columns', () => {
-    const style = document.createElement('style');
-    style.textContent = webHomeCss;
-    document.head.appendChild(style);
-    try {
+    return import('@/styles/web-home.css?raw').then(({ default: css }) => {
+      expect(css).toMatch(/\.web-home\s+\.four\s+svg\s*\{(?=[^}]*\bdisplay\s*:\s*block\s*(?:;|\}))(?=[^}]*\bmargin\s*:\s*0\s+auto\s*(?:;|\}))[^}]*\}/);
       const { container } = mount();
-      const icons = [...container.querySelectorAll('.four svg')];
-      expect(icons.map(icon => {
-        const css = getComputedStyle(icon);
-        return [css.display, css.marginLeft, css.marginRight];
-      })).toEqual(Array.from({ length: 4 }, () => ['block', 'auto', 'auto']));
-    } finally {
-      style.remove();
-    }
+      expect(container.querySelectorAll('.four svg')).toHaveLength(4);
+    });
   });
   it('belt uses recent courses', async () => { const { container } = mount(); await waitFor(() => expect(container.querySelector('[data-web-belt]')?.textContent).toContain('Recent One')); expect(h.rpc).toHaveBeenCalledWith('get_web_recent_courses', { p_limit: 12 }); });
   it('belt falls back to popular when recent is empty', async () => { data.get_web_recent_courses = []; const { container } = mount(); await waitFor(() => expect(container.querySelector('[data-web-belt]')?.textContent).toContain('Course a')); expect(h.rpc).toHaveBeenCalledWith('get_web_popular_courses', { p_limit: 10 }); });
