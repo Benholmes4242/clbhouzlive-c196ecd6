@@ -199,6 +199,8 @@
   },
   "business": {
     "hero": {
+      "word": { "travel": "Golf travel" },
+      "planTrip": "Plan a trip",
       "communityRating": "コミュニティ評価",
       "ratings": "{{count}} 件の評価",
       "edit": "編集",

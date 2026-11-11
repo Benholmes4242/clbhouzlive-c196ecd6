@@ -199,6 +199,8 @@
   },
   "business": {
     "hero": {
+      "word": { "travel": "Golf travel" },
+      "planTrip": "Plan a trip",
       "communityRating": "커뮤니티 평점",
       "ratings": "평가 {{count}}건",
       "edit": "편집",

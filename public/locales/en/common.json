@@ -744,6 +744,8 @@
       }
     },
     "hero": {
+      "word": { "travel": "Golf travel" },
+      "planTrip": "Plan a trip",
       "communityRating": "Community rating",
       "ratings": "{{count}} ratings",
       "ratings_one": "{{count}} rating",
