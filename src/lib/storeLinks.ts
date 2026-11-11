@@ -11,6 +11,7 @@ export const FALLBACK_PLAY_URL = 'https://play.google.com/store/apps/details?id=
 export interface StoreLinks {
   appStore: string | null;
   play: string | null;
+  business?: string | null;
 }
 
 /** Accepts a string value or { url }, exactly as useStoreUrl did. */
@@ -25,13 +26,14 @@ function httpsOnly(value: unknown): string | null {
 }
 
 export async function fetchStoreLinks(): Promise<StoreLinks> {
-  const { data, error } = await supabase
+  const response = await supabase
     .from('app_config' as never)
     .select('key, value')
-    .in('key', ['app_download_url', 'play_store_url']);
-  if (error) throw error;
+    .in('key', ['app_download_url', 'play_store_url', 'web_business_url']);
+  if (!response || response.error) throw response?.error ?? new Error('Store links unavailable');
+  const { data } = response;
   const map = new Map(((data ?? []) as { key: string; value: unknown }[]).map((r) => [r.key, r.value]));
-  return { appStore: httpsOnly(map.get('app_download_url')), play: httpsOnly(map.get('play_store_url')) };
+  return { appStore: httpsOnly(map.get('app_download_url')), play: httpsOnly(map.get('play_store_url')), business: httpsOnly(map.get('web_business_url')) };
 }
 
 /**

@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: WEB_HOMEPAGE_1
+Homepage implemented; focused 39/39 (23 new guards), shard 1: 2,138 passed; shard 2: 1,950 passed / 1 failed.
+STOP: src/lib/storeLinks.test.ts:45:37, `AssertionError: expected { …(3) } to deeply equal { …(2) }`; new business:null field breaks the existing exact-shape assertion. No repair attempted.
+Shards 3/4 and visual verification unfinished. Localhost bypasses the public gate; live homepage locator timed out. Production BootHold unverified.
+Last verified full-suite baseline: 8,173; new inventory expected 8,196 (+23 webHome1 cases), not verified as a full run. Report: WEB_HOMEPAGE_1_REPORT.md.
+
 ## Verified: Explore gallery business identity; two screenshots blocked
 Preview identity uses actor_type; missing-business regression passes. No existing tests rewritten.
 Separate shards 2,125 / 1,956 / 2,077 / 2,015 = 8,173 passing (+1 from 8,172).
