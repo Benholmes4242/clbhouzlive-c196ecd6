@@ -341,7 +341,6 @@ export function LikedByRow({
                     src={liker.avatarUrl}
                     alt={liker.displayName ?? ''}
                     userId={liker.actorId ?? liker.userId}
-                    fallback={getInitialsFromName(liker.displayName ?? '').charAt(0)}
                     hairlineRing
                   />
                 </span>

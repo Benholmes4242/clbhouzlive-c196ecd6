@@ -29,7 +29,7 @@ export function resetCreatorsRowSessionForTests() { viewedThisSession = false; }
 const MUTE = 'var(--explore-top-mute)';
 
 function PersonAvatar({ person, size }: { person: ExplorePerson; size: number }) {
-  return <SquircleAvatar src={person.avatar_url ?? undefined} alt={person.display_name} userId={person.actor_id} size={size} fallback={person.display_name.charAt(0)} hairlineRing />;
+  return <SquircleAvatar src={person.avatar_url ?? undefined} alt={person.display_name} userId={person.actor_id} size={size} hairlineRing />;
 }
 
 export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | undefined; onDepart?: () => void }) {

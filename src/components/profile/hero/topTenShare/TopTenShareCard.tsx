@@ -82,13 +82,7 @@ const tersePlace = (c: TopTenShareCourse, variant: string | null) =>
 const heroPlace = (c: TopTenShareCourse, variant: string | null) =>
   [variant, [c.region, c.sub_country].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
 
-const initialsOf = (name: string) =>
-  name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w.charAt(0).toUpperCase())
-    .join('');
+const initialsOf = (name: string) => getInitialsFromName(name);
 
 export const TopTenShareCard: React.FC<Props> = ({
   format,

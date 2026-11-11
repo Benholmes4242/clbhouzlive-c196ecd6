@@ -226,7 +226,6 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
             src={selfActor?.avatarUrl}
             alt={selfActor?.name || 'You'}
             userId={selfActor?.id ?? null}
-            fallback={selfActor?.name?.charAt(0) || '?'}
             hairlineRing ringColor={DARK_HAIRLINE}
           />
         </button>
@@ -252,7 +251,6 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
                   src={a.avatarUrl}
                   alt={a.name}
                   userId={a.id}
-                  fallback={a.name?.charAt(0) || '?'}
                   hairlineRing ringColor={DARK_HAIRLINE}
                 />
                 <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>{a.name}</span>
