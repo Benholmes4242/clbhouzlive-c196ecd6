@@ -1,5 +1,10 @@
 # Roadmap
 
+## Done: Store-link suite rerun
+Requested assertions and HTTPS/insecure business-link case already present; no duplicate case or source change.
+Sequential shards passed: 2,133 / 1,958 / 2,111 / 2,004 = 8,206, zero failures (730 files). Picker screenshot skipped by request.
+No test changes this turn. StoreLinks 6/6 passed; prior guestStage24 and historical tourIsland failures did not recur. Report: STORE_LINKS_SUITE_REPORT.md.
+
 ## In progress: WEB_HOMEPAGE_1B completion
 Both fixes implemented; focused 30 passed. Sequential shards: 1=2,133 passed; 2=1,958 passed; 3=2,110 passed /1 failed. Shard 4 not run under the stop rule.
 STOP: src/test/guestStage24.test.tsx:85:18, `AssertionError: expected [ '/auth' ] to deeply equal [ '/auth', '/' ]`. Guest code/test unchanged; no repair or rerun.
