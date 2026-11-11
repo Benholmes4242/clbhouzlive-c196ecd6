@@ -164,7 +164,8 @@ export function Step2Other({ draft, setDraft, userId, onContinue }: Props) {
         {undismissed && match && (
           <div className="bizc-note" data-testid="bizc-name-match" style={{ marginTop: 10 }}>
             <div className="bizc-idrow">
-              <span className="bizc-crest" aria-hidden="true">
+              <span className="bizc-crest" aria-hidden="true"
+                style={match.logo_url ? undefined : { background: avatarFallbackFill(match.id), color: AVATAR_FALLBACK_INK }}>
                 {match.logo_url ? <img src={match.logo_url} alt="" /> : nameInitial(match.name)}
               </span>
               <span className="bizc-res-text">

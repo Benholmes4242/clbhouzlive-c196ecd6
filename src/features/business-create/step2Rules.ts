@@ -5,6 +5,7 @@
  * a render. Nothing here touches the database.
  */
 import { ordinal } from '@/lib/text/numbers';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { courseStatsVisible } from '@/features/onboarding/welcomeRules';
 
 /** Mirrors public.normalize_club_key(): lower(trim(name)) with non [a-z0-9] removed.
