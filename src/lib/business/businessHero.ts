@@ -13,6 +13,7 @@ const WORDS: Record<string, [string, string]> = {
   'Retailer / Pro Shop': ['business.hero.word.shop', 'Golf shop'],
   Resort: ['business.hero.word.resort', 'Golf resort'],
   'Hotel / Accommodation': ['business.hero.word.hotel', 'Hotel'],
+  'Golf Travel': ['business.hero.word.travel', 'Golf travel'],
   'Restaurant / Cafe': ['business.hero.word.restaurant', 'Restaurant'],
   'Bar / Pub': ['business.hero.word.bar', 'Bar'],
   'Brand / Manufacturer': ['business.hero.word.brand', 'Brand'],
@@ -53,6 +54,7 @@ export function businessActionLabel(kind: Exclude<SecondKind, 'soon'>, category:
   if (kind !== 'book') return t(`business.hero.${kind}`, { website: 'Website', call: 'Call', email: 'Email', directions: 'Directions' }[kind]);
   const c = category ?? '';
   return c === 'Hotel / Accommodation' || c === 'Resort' ? t('business.hero.bookStay', 'Book a stay')
+    : c === 'Golf Travel' ? t('business.hero.planTrip', 'Plan a trip')
     : c === 'Restaurant / Cafe' || c === 'Bar / Pub' ? t('business.hero.bookTable', 'Book a table')
     : LESSON.has(c) ? t('business.hero.bookLesson', 'Book a lesson')
     : c === 'Driving Range' ? t('business.hero.bookBay', 'Book a bay')

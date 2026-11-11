@@ -4,7 +4,7 @@
  * canonical BUSINESS_CATEGORIES value, never the display label.
  */
 import type { LucideIcon } from 'lucide-react';
-import { Flag, GraduationCap, Target, Wrench, Building2, Bed, Coffee, Beer, ShoppingBag, Briefcase, MoreHorizontal } from 'lucide-react';
+import { Flag, GraduationCap, Target, Wrench, Building2, Bed, Plane, Coffee, Beer, ShoppingBag, Briefcase, MoreHorizontal } from 'lucide-react';
 import type { BusinessCategoryValue } from '@/constants/businessCategories';
 import type { SelectedClub } from '@/components/business/ClubSearchDropdown';
 import type { SelectedCollege } from '@/components/business/CollegeSearchDropdown';
@@ -26,6 +26,7 @@ export const CREATE_CATEGORY_GROUPS: { key: 'golf' | 'around'; label: string; ti
   { key: 'around', label: 'Around golf', tiles: [
     { label: 'Resort', value: 'Resort', icon: Building2 },
     { label: 'Hotel / Stay', value: 'Hotel / Accommodation', icon: Bed },
+    { label: 'Golf travel', value: 'Golf Travel', icon: Plane },
     { label: 'Restaurant / Café', value: 'Restaurant / Cafe', icon: Coffee },
     { label: 'Bar / Pub', value: 'Bar / Pub', icon: Beer },
     { label: 'Retailer / Pro Shop', value: 'Retailer / Pro Shop', icon: ShoppingBag },

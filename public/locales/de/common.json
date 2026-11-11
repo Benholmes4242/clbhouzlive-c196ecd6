@@ -199,6 +199,8 @@
   },
   "business": {
     "hero": {
+      "word": { "travel": "Golf travel" },
+      "planTrip": "Plan a trip",
       "communityRating": "Community-Bewertung",
       "ratings": "{{count}} Bewertungen",
       "ratings_one": "{{count}} Bewertung",

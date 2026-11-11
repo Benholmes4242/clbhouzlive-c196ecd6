@@ -27742,6 +27742,24 @@ export type Database = {
           width: number
         }[]
       }
+      get_web_course_card: { Args: { p_course_id?: string }; Returns: Json }
+      get_web_home_figures: {
+        Args: never
+        Returns: {
+          courses_total: number
+          holes_total: number
+          rounds_total: number
+        }[]
+      }
+      get_web_popular_courses: {
+        Args: { p_limit?: number }
+        Returns: {
+          area: string
+          id: string
+          name: string
+          rounds: number
+        }[]
+      }
       get_week_in_golf: {
         Args: { p_limit?: number; p_user_id?: string }
         Returns: {
