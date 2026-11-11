@@ -12,6 +12,7 @@ import { Top100YourHundred } from '@/components/courses/top100/Top100YourHundred
 import { TheArgumentSection } from '@/components/courses/top100/TheArgumentSection';
 import { communityOrder } from '@/components/courses/top100/communityOrder';
 import { gbi19 } from './top100GolfersVersus.fixture';
+import { gbiLive100 } from './top100GbiLive.fixture';
 
 const f=vi.hoisted(()=>({ placeholder:false, user:{id:'me'} as {id:string}|null }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -48,14 +49,17 @@ describe('signed-off course-name rule',()=>{
  ])('%s preserves only the documented name parts',(name,result)=>expect(shortenCourseName(name)).toBe(result));
 });
 describe('live GB&I qualifying set',()=>{
- it('Kingsbarns leads at list position 5',()=>{expect(rows.find(c=>c.name==='Kingsbarns Golf Links')).toMatchObject({memberRank:1,listRank:5});});
- it('Kings has +9',()=>{expect(rows.find(c=>c.name==='Gleneagles (King’s)')?.divergence).toBe(9);});
- it('Ailsa has -9',()=>{expect(rows.find(c=>c.name==='Trump Turnberry Resort - Ailsa')?.divergence).toBe(-9);});
- it('seven of the top ten agree',()=>{expect(rows.filter(c=>c.listRank<=10 && c.memberRank<=10)).toHaveLength(7);});
+ const live=compareRows(gbiLive100);
+ const row=(name:string)=>live.find(c=>c.name===name);
+ it('36 qualify at two ratings and 17 are one rating away',()=>{expect(live).toHaveLength(36);expect(oneRatingAway(gbiLive100)).toHaveLength(17);});
  it.each([
- ['Gleneagles (King’s)','Best design and clubhouse of the 19'],['Queenwood Golf Club','Best facilities of the 19'],['Trump Turnberry Resort - Ailsa','Weakest on condition: 8.9, 13th of the 19'],['European Club','Lowest facilities and clubhouse of the 19'],
- ])('explains %s from category positions',(name,expected)=>{const row=rows.find(c=>c.name===name);expect(row).toBeDefined();if(row) expect(whyLine(row,19)).toBe(expected);});
- it('headline uses published rank 12',()=>{render(<TheArgumentSection rows={rows} higher={[]} lower={[]} ratedCount={19} listLabel="GB&I" renderedList="gb-i" onOpenCourse={vi.fn()} />);expect(screen.getByText('Golfers put Kingsbarns 1st. The list has it 12th.')).toBeInTheDocument();});
+ ['Tralee Golf Club',28,1,27,'Best design of the 36'],['St Andrews Links (Old)',2,26,-24,'Weakest on design: 8.0, 35th of the 36'],['The Addington Golf Club',35,35,0,'Golfers and the list agree: 35th of the 36'],
+ ])('%s compares and explains from live data',(name,listRank,memberRank,divergence,why)=>{const r=row(name as string);expect(r).toMatchObject({listRank,memberRank,divergence});if(r) expect(whyLine(r,36)).toBe(why);});
+ it.each([
+ ['Gleneagles (King’s)',18,'Best clubhouse of the 36'],['Trump Turnberry Resort - Ailsa',-15,'Weakest on condition: 8.9, 19th of the 36'],
+ ])('%s gap and why line',(name,divergence,why)=>{const r=row(name as string);expect(r?.divergence).toBe(divergence);if(r) expect(whyLine(r,36)).toBe(why);});
+ it('headline uses published rank 64',()=>{render(<TheArgumentSection rows={live} higher={[]} lower={[]} ratedCount={36} listLabel="GB&I" renderedList="gb-i" onOpenCourse={vi.fn()} />);expect(screen.getByText('Golfers put Tralee 1st. The list has it 64th.')).toBeInTheDocument();});
+ it('detail second line wraps with no ellipsis styling',()=>{const rule=cssRule('t100b-detail-line');expect(rule).not.toBe('');expect(rule).not.toMatch(/nowrap|text-overflow|overflow/);expect(rule).toMatch(/line-height:1\.35/);});
 });
 describe('comparison chart',()=>{
  it('19 caps at 10 in official order and opens all 19',()=>{const {container}=render(<Top100CompareChart rows={rows} onOpenCourse={vi.fn()} />);expect(container.querySelectorAll('.t100b-crow')).toHaveLength(10);expect(chartRows(rows).map(c=>c.listRank)).toEqual(chartRows(rows).map(c=>c.listRank).sort((a,b)=>a-b));expect(screen.getByText('The 10 biggest gaps of the 19, in official order')).toBeInTheDocument();fireEvent.click(screen.getByRole('button',{name:'SEE ALL 19 COMPARED'}));expect(screen.getByRole('dialog').querySelectorAll('.t100b-crow')).toHaveLength(19);});
