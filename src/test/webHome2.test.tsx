@@ -3,7 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import webHomeCss from '@/styles/web-home.css?inline';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 const h = vi.hoisted(() => ({ rpc: vi.fn(), context: null as unknown, track: vi.fn(), links: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: h.rpc } }));
 vi.mock('@/pages/gate/useGateContext', () => ({ useGateContext: () => ({ data: h.context }) }));
@@ -11,6 +12,8 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: h.track } 
 vi.mock('@/lib/storeLinks', () => ({ FALLBACK_STORE_URL: 'https://apps.apple.com/fallback', FALLBACK_PLAY_URL: 'https://play.google.com/fallback', fetchStoreLinks: h.links }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '', i18n: { language: 'en' } }) }));
 import AppDownloadGate from '@/pages/AppDownloadGate';
+
+const webHomeCss = readFileSync(resolve(__dirname, '../styles/web-home.css'), 'utf8');
 
 const card = (id: string, extra: Record<string, unknown> = {}) => ({ id, name: `Course ${id}`, area: 'Kent, England', rating_avg: null, ratings_count: 0, quote: null, rounds: 0, hole_rounds: 0, plays_vs_par: null, read_available: false, hardest_hole: null, card_hardest_hole: null, top_holes: [], ...extra });
 let data: Record<string, unknown>;
@@ -50,11 +53,9 @@ describe('WEB_HOMEPAGE_2', () => {
     expect(imgs.every(i => i.getAttribute('width') === '750' && i.getAttribute('height') === '1626' && i.getAttribute('alt') === '')).toBe(true);
   });
   it('centres all four How it works icons within their columns', () => {
-    return import('@/styles/web-home.css?raw').then(({ default: css }) => {
-      expect(css).toMatch(/\.web-home\s+\.four\s+svg\s*\{(?=[^}]*\bdisplay\s*:\s*block\s*(?:;|\}))(?=[^}]*\bmargin\s*:\s*0\s+auto\s*(?:;|\}))[^}]*\}/);
-      const { container } = mount();
-      expect(container.querySelectorAll('.four svg')).toHaveLength(4);
-    });
+    expect(webHomeCss).toMatch(/\.web-home\s+\.four\s+svg\s*\{(?=[^}]*\bdisplay\s*:\s*block\s*(?:;|\}))(?=[^}]*\bmargin\s*:\s*0\s+auto\s*(?:;|\}))[^}]*\}/);
+    const { container } = mount();
+    expect(container.querySelectorAll('.four svg')).toHaveLength(4);
   });
   it('belt uses recent courses', async () => { const { container } = mount(); await waitFor(() => expect(container.querySelector('[data-web-belt]')?.textContent).toContain('Recent One')); expect(h.rpc).toHaveBeenCalledWith('get_web_recent_courses', { p_limit: 12 }); });
   it('belt falls back to popular when recent is empty', async () => { data.get_web_recent_courses = []; const { container } = mount(); await waitFor(() => expect(container.querySelector('[data-web-belt]')?.textContent).toContain('Course a')); expect(h.rpc).toHaveBeenCalledWith('get_web_popular_courses', { p_limit: 10 }); });
