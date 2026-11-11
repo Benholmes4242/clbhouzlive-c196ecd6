@@ -27746,8 +27746,11 @@ export type Database = {
       get_web_home_figures: {
         Args: never
         Returns: {
+          courses_30d: number
           courses_total: number
+          holes_30d: number
           holes_total: number
+          rounds_30d: number
           rounds_total: number
         }[]
       }
@@ -27758,6 +27761,15 @@ export type Database = {
           id: string
           name: string
           rounds: number
+        }[]
+      }
+      get_web_recent_courses: {
+        Args: { p_limit?: number }
+        Returns: {
+          area: string
+          id: string
+          name: string
+          rounds_30d: number
         }[]
       }
       get_week_in_golf: {
