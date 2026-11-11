@@ -103,7 +103,7 @@ describe('page loading skeleton',()=>{
  it('the unrevealed gate shows comparison, one-rating-away and list-head shells in page order, none after reveal',()=>{
   f.gateRevealed=false;const {container,rerender}=render(<Top100CoursesHubPanel />,{wrapper});
   const fallback=container.querySelector('[data-top100-fallback]');expect(fallback).not.toBeNull();
-  const shells=[...fallback!.querySelectorAll('[data-comparison-shell],[data-near-shell],[data-list-head-shell]')].map(el=>Object.keys(el.dataset)[0]);
+  const shells=[...fallback!.querySelectorAll('[data-comparison-shell],[data-near-shell],[data-list-head-shell]')].map(el=>Object.keys((el as HTMLElement).dataset)[0]);
   expect(shells).toEqual(['comparisonShell','nearShell','listHeadShell']);
   expect(container.querySelector('[data-golfers-versus]')).toBeNull();
   f.gateRevealed=true;rerender(<Top100CoursesHubPanel />);
