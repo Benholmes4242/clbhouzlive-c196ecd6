@@ -12,7 +12,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Share, MoreHorizontal, Plus, MessageCircle, Pencil, ArrowUpRight } from 'lucide-react';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, avatarFallbackFill, AVATAR_FALLBACK_INK } from '@/lib/avatarFallback';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
@@ -248,12 +248,12 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
               aria-label={p.name}
               onClick={p.onAvatarTap}
               data-club-crest=""
-              style={{ width: 64, height: 64, borderRadius: 16, background: '#F4F4F2', overflow: 'hidden', padding: 0, border: 'none', flex: 'none' }}
+              style={{ width: 64, height: 64, borderRadius: 16, background: p.logoUrl ? '#F4F4F2' : undefined, overflow: 'hidden', padding: 0, border: 'none', flex: 'none' }}
             >
               {p.logoUrl ? (
                 <img src={p.logoUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: getAvatarFallbackColor(p.fallbackKey || p.name), color: '#FFFFFF', fontSize: 20, fontWeight: 700 }}>
+                <span style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: avatarFallbackFill(p.fallbackKey || p.name), color: AVATAR_FALLBACK_INK, fontSize: 20, fontWeight: 600, boxShadow: 'inset 0 0 0 1px rgba(248,250,252,0.10)' }}>
                   {initials}
                 </span>
               )}
