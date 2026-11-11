@@ -1,9 +1,9 @@
 # Roadmap
 
 ## In progress: WEB_HOMEPAGE_1B completion
-Authorised storeLinks exact-shape expectations and one HTTPS business-link case; one-decimal ink rating figure shared by card/phone and one new guard.
-Run four sequential shards. Ben verified production-style none/invite layouts at 1280/390/320; no visual rerun required.
-Inventory before: 8,204 (8,173 verified baseline +23 homepage +8 Golf Travel); two new cases give expected 8,206.
+Both fixes implemented; focused 30 passed. Sequential shards: 1=2,133 passed; 2=1,958 passed; 3=2,110 passed /1 failed. Shard 4 not run under the stop rule.
+STOP: src/test/guestStage24.test.tsx:85:18, `AssertionError: expected [ '/auth' ] to deeply equal [ '/auth', '/' ]`. Guest code/test unchanged; no repair or rerun.
+Ben verified production-style none/invite layouts at 1280/390/320; no visual rerun required. Inventory before 8,204; two new cases give expected 8,206, not full-suite verified. Report: WEB_HOMEPAGE_1B_REPORT.md.
 
 ## In progress: Golf Travel category
 Implemented canonical category, create tile, hero labels, seven facilities and booking membership; venue/hospitality exclusions unchanged.
