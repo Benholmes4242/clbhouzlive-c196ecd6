@@ -29,6 +29,11 @@ vi.mock('./browse/PageLoadGate', () => ({
 }));
 vi.mock('./BrowseCourseCard', () => ({ default: () => null }));
 vi.mock('./top100/Top100RaceSection', () => ({ Top100RaceSection: () => null }));
+// The Your hundred row reads the canonical race and list-progress hooks (signed-off Option B).
+vi.mock('@/hooks/top100/useTop100Race', () => ({
+  useTop100Race: () => ({ data: [{ pos: 3, value: 5, total: 100, total_members: 35, is_viewer: true, user_id: 'u1' }], isPending: false, isPlaceholderData: false, isError: false }),
+}));
+vi.mock('@/hooks/gam/useTop100ListProgress', () => ({ useTop100ListProgress: () => ({ data: undefined, isPending: false }) }));
 
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
@@ -73,7 +78,9 @@ function LocationProbe() {
   return <output data-testid="course-location">{location.pathname}</output>;
 }
 
+const yourHundredRow = () => screen.queryByRole('button', { name: /YOUR HUNDRED/ });
 const sectionAbsent = () => {
+  expect(yourHundredRow()).toBeNull();
   expect(screen.queryByText('Your hundred')).toBeNull();
   expect(screen.queryByText('A life in golf, one list')).toBeNull();
   expect(screen.queryByRole('button', { name: /^#1 / })).toBeNull();
@@ -106,6 +113,8 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
   it('five played renders the closed Your courses dropdown which opens the grid and legend', () => {
     f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
     mount();
+    expect(screen.queryByText('Your courses')).toBeNull();
+    fireEvent.click(yourHundredRow()!);
     expect(screen.getByText('Your courses')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '#1 Course 1' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
@@ -120,6 +129,7 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
     unmount();
     f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
     mount();
+    fireEvent.click(yourHundredRow()!);
     expect(screen.getByText('Your courses')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
     expect(screen.getByRole('button', { name: '#1 Course 1' })).toBeInTheDocument();
@@ -128,7 +138,7 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
   it('switching the active scope from nine played to three removes the section without remounting the page', () => {
     f.progress.mockReturnValue({ data: progressData(9, 3), isLoading: false, isFetchedAfterMount: true });
     mount();
-    expect(screen.getByText('Your courses')).toBeInTheDocument();
+    expect(yourHundredRow()).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     sectionAbsent();
     // The page itself never remounted: the list head for the new scope is on screen.
@@ -177,22 +187,28 @@ function mountWithArgument() {
 describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
   it('the section renders no golfers-list link and the ranking trigger still reads Official rating', () => {
     mountWithArgument();
-    expect(screen.getByText('Official rating')).toBeInTheDocument();
+    const official = screen.getByRole('button', { name: 'Official' });
+    const golfers = screen.getByRole('button', { name: "Golfers'" });
+    expect(official).toHaveAttribute('aria-pressed', 'true');
+    expect(golfers).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(golfers);
+    expect(golfers).toHaveAttribute('aria-pressed', 'true');
+    expect(JSON.parse(sessionStorage.getItem('top100-last-filters') ?? '{}').ranking).toBe('community');
     expect(screen.queryByText(/See the golfers' list/)).toBeNull();
   });
 
   it('switching the active list from Global to GB&I recomputes both groups', () => {
     mountWithArgument();
     // Global: four qualify; c4 rises (members 2nd, list 4th), c2 falls.
-    expect(
-      screen.getByText("The courses that vary the most between the golfers' ratings and the official rankings."),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Course 4')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-golfers-versus]')).toHaveLength(1);
+    expect(screen.getAllByText('Course 4').length).toBeGreaterThan(0);
     expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 4 rated')).toBeInTheDocument();
     expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 4th')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     // GB&I: c4 is not on the list, so three qualify and the groups recompute.
-    expect(screen.queryByText(/courses on this list/)).toBeNull();
+    const sections = document.querySelectorAll('[data-golfers-versus]');
+    expect(sections).toHaveLength(1);
+    expect(sections[0].querySelector('.t100b-sub')?.textContent).toContain('GB&I courses have three or more golfer ratings');
     expect(screen.queryByText('Course 4')).toBeNull();
     expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 3 rated')).toBeInTheDocument();
     expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 3rd')).toBeInTheDocument();
