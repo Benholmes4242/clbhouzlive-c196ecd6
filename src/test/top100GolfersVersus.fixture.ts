@@ -1,0 +1,270 @@
+import type { ArgumentInput } from '@/components/courses/top100/theArgument';
+// Signed-off mock's real GB&I 19, preserving category precision.
+export const gbi19: ArgumentInput[] = [
+  {
+    "id": "8df6dde5-49e2-4b1d-bbec-bd5f6e3c2b66",
+    "name": "Royal County Down Golf Club (Championship)",
+    "imageUrl": null,
+    "publishedRank": 1,
+    "rating": 9.3556,
+    "ratingCount": 9,
+    "subScores": {
+      "design": 9.4889,
+      "condition": 9.1111,
+      "facilities": 8.9556,
+      "clubhouse": 9.2778
+    }
+  },
+  {
+    "id": "7424f1ed-e256-4cef-98c9-85c4d8cf2596",
+    "name": "Trump Turnberry Resort - Ailsa",
+    "imageUrl": null,
+    "publishedRank": 3,
+    "rating": 8.94,
+    "ratingCount": 5,
+    "subScores": {
+      "design": 9.16,
+      "condition": 8.88,
+      "facilities": 8.88,
+      "clubhouse": 8.5
+    }
+  },
+  {
+    "id": "1a1ced55-ad63-48c3-8c15-f38bf61c3f25",
+    "name": "Royal Portrush Golf Club (Dunluce)",
+    "imageUrl": null,
+    "publishedRank": 5,
+    "rating": 9.275,
+    "ratingCount": 4,
+    "subScores": {
+      "design": 9.2333,
+      "condition": 9.1667,
+      "facilities": 8.8667,
+      "clubhouse": 9.3333
+    }
+  },
+  {
+    "id": "f667e22a-40d6-4c1c-a737-bc0e5fc0547f",
+    "name": "Sunningdale Golf Club (Old)",
+    "imageUrl": null,
+    "publishedRank": 8,
+    "rating": 9.4,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 9.4667,
+      "condition": 9.3,
+      "facilities": 8.4,
+      "clubhouse": 9.1667
+    }
+  },
+  {
+    "id": "5cdf162c-c3f3-44fa-b1ef-7b30d5d66b96",
+    "name": "Kingsbarns Golf Links",
+    "imageUrl": null,
+    "publishedRank": 12,
+    "rating": 9.7,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 9.6,
+      "condition": 9.6,
+      "facilities": 9.1667,
+      "clubhouse": 9.4667
+    }
+  },
+  {
+    "id": "3674f9c2-3322-4580-bddb-c1123c92ec42",
+    "name": "Ballybunion Golf Club (Old)",
+    "imageUrl": null,
+    "publishedRank": 14,
+    "rating": 9.275,
+    "ratingCount": 4,
+    "subScores": {
+      "design": 9.275,
+      "condition": 9.075,
+      "facilities": 8.675,
+      "clubhouse": 8.775
+    }
+  },
+  {
+    "id": "36c501d1-fb20-4083-9edb-168eac631dc5",
+    "name": "Woodhall Spa Golf Club (Hotchkin)",
+    "imageUrl": null,
+    "publishedRank": 18,
+    "rating": 9,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 8.8667,
+      "condition": 8.9667,
+      "facilities": 7.2667,
+      "clubhouse": 8.3
+    }
+  },
+  {
+    "id": "e145c682-9044-4ad4-8afd-7b208c9e9d16",
+    "name": "Swinley Forest Golf Club",
+    "imageUrl": null,
+    "publishedRank": 21,
+    "rating": 8.6667,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 9.35,
+      "condition": 8.9,
+      "facilities": 7.45,
+      "clubhouse": 9.15
+    }
+  },
+  {
+    "id": "808c483a-0318-4130-a270-95e36bcb8f59",
+    "name": "Royal Porthcawl Golf Club",
+    "imageUrl": null,
+    "publishedRank": 27,
+    "rating": 9.0333,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 8.9333,
+      "condition": 8.9333,
+      "facilities": 8.8333,
+      "clubhouse": 8.5333
+    }
+  },
+  {
+    "id": "c0ec892a-e632-44a9-adab-7b9e746daa7c",
+    "name": "Royal Cinque Ports Golf Club",
+    "imageUrl": null,
+    "publishedRank": 30,
+    "rating": 8.525,
+    "ratingCount": 4,
+    "subScores": {
+      "design": 8.575,
+      "condition": 8.55,
+      "facilities": 7.9,
+      "clubhouse": 8.1
+    }
+  },
+  {
+    "id": "174b8e8e-056e-44fa-8e7e-136ba4be9be1",
+    "name": "Gleneagles (King’s)",
+    "imageUrl": null,
+    "publishedRank": 36,
+    "rating": 9.6,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 9.6333,
+      "condition": 9.4667,
+      "facilities": 9.1,
+      "clubhouse": 9.7667
+    }
+  },
+  {
+    "id": "31742397-f8c0-426a-8330-81c84f7ace90",
+    "name": "European Club",
+    "imageUrl": null,
+    "publishedRank": 42,
+    "rating": 8.2667,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 8.7667,
+      "condition": 8,
+      "facilities": 6.5,
+      "clubhouse": 6.7333
+    }
+  },
+  {
+    "id": "b66b9793-7896-4208-bce8-c2dcd2b1f2e3",
+    "name": "Hankley Common Golf Club",
+    "imageUrl": null,
+    "publishedRank": 47,
+    "rating": 8.4667,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 8.5333,
+      "condition": 8.7667,
+      "facilities": 7.8333,
+      "clubhouse": 8.2667
+    }
+  },
+  {
+    "id": "5c0b2c25-afb3-4f89-bc61-7abcb0b8db2a",
+    "name": "West Sussex Golf Club",
+    "imageUrl": null,
+    "publishedRank": 58,
+    "rating": 8.9333,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 8.8333,
+      "condition": 8.9333,
+      "facilities": 8.7333,
+      "clubhouse": 8.6667
+    }
+  },
+  {
+    "id": "46e08d90-d9a3-4e65-b169-0f009d566c2b",
+    "name": "Queenwood Golf Club",
+    "imageUrl": null,
+    "publishedRank": 71,
+    "rating": 9.2667,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 8.6333,
+      "condition": 9.5667,
+      "facilities": 10,
+      "clubhouse": 9.5
+    }
+  },
+  {
+    "id": "e061d8f5-606a-4050-83db-ea8dc614f1de",
+    "name": "Prince's Golf Club (Shore, Dunes & Himalayas)",
+    "imageUrl": null,
+    "publishedRank": 77,
+    "rating": 8.075,
+    "ratingCount": 4,
+    "subScores": {
+      "design": 8.175,
+      "condition": 8.875,
+      "facilities": 7.7,
+      "clubhouse": 7.15
+    }
+  },
+  {
+    "id": "27cbd5a0-9b27-44f6-9ea0-d1130a0e3ebe",
+    "name": "Parkstone Golf Club",
+    "imageUrl": null,
+    "publishedRank": 82,
+    "rating": 9.04,
+    "ratingCount": 5,
+    "subScores": {
+      "design": 9.22,
+      "condition": 9.02,
+      "facilities": 8.2,
+      "clubhouse": 8.58
+    }
+  },
+  {
+    "id": "0954c30f-08a4-4711-a66e-6a075d2235d6",
+    "name": "The Addington Golf Club",
+    "imageUrl": null,
+    "publishedRank": 92,
+    "rating": 7.9333,
+    "ratingCount": 3,
+    "subScores": {
+      "design": 8.0667,
+      "condition": 8,
+      "facilities": 7.4333,
+      "clubhouse": 7.5333
+    }
+  },
+  {
+    "id": "18bf6092-05b1-4110-a854-6bfbd1e24da6",
+    "name": "Broadstone Golf Club",
+    "imageUrl": null,
+    "publishedRank": 95,
+    "rating": 8.5,
+    "ratingCount": 5,
+    "subScores": {
+      "design": 8.46,
+      "condition": 8.3,
+      "facilities": 7.72,
+      "clubhouse": 7.94
+    }
+  }
+];
