@@ -8,7 +8,9 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 const h = vi.hoisted(() => ({ from: vi.fn(), rpc: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: h.from, rpc: h.rpc } }));
 
+import { readFileSync } from 'fs';
 import { postAuthor } from '@/lib/postAuthor';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { mapPublishedPost } from '@/lib/publishedPostViewer';
 import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/hooks/useDiscoverMediaPreview';
 import { memberShotToHubRow, type MemberShotRow } from '@/lib/courseMedia/memberShotPosts';
@@ -121,6 +123,23 @@ describe('useDiscoverMediaPreview — gallery previews name the business', () =>
     expect(item.avatarUrl).toBe('https://logo');
     expect(item.post.actorType).toBe('business');
     expect(item.post.username).toBe('');
+  });
+});
+
+describe('fullscreen author avatar — business with no logo', () => {
+  it('derives first-and-last initials from the business name (ruled: MC, not MG or M)', () => {
+    // ImmersiveFullscreenChrome renders SquircleAvatar with alt=displayName and
+    // no fallback prop, so the initials come from the app-wide rule.
+    render(<SquircleAvatar size={40} src={null} alt="Machrihanish Golf Club" hairlineRing />);
+    expect(screen.getByText('MC')).toBeTruthy();
+    expect(screen.queryByText('M')).toBeNull();
+  });
+
+  it('neither fullscreen surface passes a one-letter fallback prop', () => {
+    const chrome = readFileSync('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx', 'utf8');
+    const credit = readFileSync('src/components/fullscreen-feed/MemberShotCredit.tsx', 'utf8');
+    expect(chrome).not.toMatch(/fallback=/);
+    expect(credit).not.toMatch(/fallback=/);
   });
 });
 

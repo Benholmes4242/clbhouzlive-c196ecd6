@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { avatarFallbackFill, AVATAR_FALLBACK_INK } from '@/lib/avatarFallback';
 import { AddressAutocomplete, type AddressValue } from '@/components/business/AddressAutocomplete';
 import { CountrySelector, getCountryCode, getCountryDisplayName } from '@/components/business/CountrySelector';
 import { PinDropModal } from '@/components/business/PinDropModal';
@@ -164,7 +165,8 @@ export function Step2Other({ draft, setDraft, userId, onContinue }: Props) {
         {undismissed && match && (
           <div className="bizc-note" data-testid="bizc-name-match" style={{ marginTop: 10 }}>
             <div className="bizc-idrow">
-              <span className="bizc-crest" aria-hidden="true">
+              <span className="bizc-crest" aria-hidden="true"
+                style={match.logo_url ? undefined : { background: avatarFallbackFill(match.id), color: AVATAR_FALLBACK_INK }}>
                 {match.logo_url ? <img src={match.logo_url} alt="" /> : nameInitial(match.name)}
               </span>
               <span className="bizc-res-text">
