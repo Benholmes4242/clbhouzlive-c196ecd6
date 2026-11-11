@@ -1,12 +1,5 @@
 # Roadmap
 
-## Done: Top 100 detail-line capitalisation
-Changed only `The list` to `the list` in the comparison Detail line. No test asserted that capital; no tests changed, added, removed or renamed.
-Command: `npx vitest run --maxWorkers=2 --shard=N/4`, separately and sequentially for N=1,2,3,4. Passed: 2,133 / 1,958 / 2,122 / 2,015 = 8,228 (731 files), zero failures. Before and after: 8,228, delta zero.
-
-## In progress: Top 100 Golfers versus (Option B)
-Implement signed-off comparison, why lines, two-rating rail, race sheet and three-rating list order. Preserve canonical course/rating navigation. Add specified regressions; run four shards sequentially from 8,206 baseline and check 390/320 where preview access permits.
-
 ## Done: Store-link suite rerun
 Requested assertions and HTTPS/insecure business-link case already present; no duplicate case or source change.
 Sequential shards passed: 2,133 / 1,958 / 2,111 / 2,004 = 8,206, zero failures (730 files). Picker screenshot skipped by request.

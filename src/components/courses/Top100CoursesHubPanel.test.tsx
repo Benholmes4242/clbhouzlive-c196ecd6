@@ -15,7 +15,6 @@ const f = vi.hoisted(() => ({
   enrichment: vi.fn(),
   progress: vi.fn(),
   baseline: vi.fn(),
-  race: vi.fn(),
 }));
 
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'u1' } }) }));
@@ -23,7 +22,6 @@ vi.mock('@/hooks/useGolfCoursesInfinite', () => ({ useGolfCoursesInfinite: f.cou
 vi.mock('@/hooks/top100/useTop100Enrichment', () => ({ useTop100Enrichment: f.enrichment }));
 vi.mock('@/hooks/useTop100ProgressForUser', () => ({ useTop100ProgressForUser: f.progress }));
 vi.mock('@/hooks/top100/useTop100GolferBaseline', () => ({ useTop100GolferBaseline: f.baseline }));
-vi.mock('@/hooks/top100/useTop100Race', () => ({ useTop100Race: f.race }));
 vi.mock('./browse/PageLoadGate', () => ({
   PageLoadGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   usePageRevealed: () => true,
@@ -94,7 +92,6 @@ beforeEach(() => {
   });
   f.enrichment.mockReturnValue({ data: new Map(), isLoading: false });
   f.baseline.mockReturnValue(new Map());
-  f.race.mockReturnValue({ data: [{ user_id: 'u1', pos: 3, total_members: 35 }], isPending: false, isError: false });
 });
 
 afterEach(cleanup);
@@ -106,11 +103,9 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
     sectionAbsent();
   });
 
-  it('five played opens Your hundred before the closed Your courses grid', () => {
+  it('five played renders the closed Your courses dropdown which opens the grid and legend', () => {
     f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
     mount();
-    expect(screen.queryByText('Your courses')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Open Your hundred' }));
     expect(screen.getByText('Your courses')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '#1 Course 1' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
@@ -125,7 +120,6 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
     unmount();
     f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
     mount();
-    fireEvent.click(screen.getByRole('button', { name: 'Open Your hundred' }));
     expect(screen.getByText('Your courses')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
     expect(screen.getByRole('button', { name: '#1 Course 1' })).toBeInTheDocument();
@@ -134,7 +128,7 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
   it('switching the active scope from nine played to three removes the section without remounting the page', () => {
     f.progress.mockReturnValue({ data: progressData(9, 3), isLoading: false, isFetchedAfterMount: true });
     mount();
-    expect(screen.getByRole('button', { name: 'Open Your hundred' })).toBeInTheDocument();
+    expect(screen.getByText('Your courses')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     sectionAbsent();
     // The page itself never remounted: the list head for the new scope is on screen.
@@ -181,17 +175,19 @@ function mountWithArgument() {
 }
 
 describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
-  it('the section renders no golfers-list link and the segmented order starts Official', () => {
+  it('the section renders no golfers-list link and the ranking trigger still reads Official rating', () => {
     mountWithArgument();
-    expect(screen.getByRole('button', { name: 'Official' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Official rating')).toBeInTheDocument();
     expect(screen.queryByText(/See the golfers' list/)).toBeNull();
   });
 
   it('switching the active list from Global to GB&I recomputes both groups', () => {
     mountWithArgument();
     // Global: four qualify; c4 rises (members 2nd, list 4th), c2 falls.
-    expect(screen.getAllByRole('button', { name: /^Compare / })).toHaveLength(4);
-    expect(screen.getByRole('button', { name: 'Course 4, open course' })).toBeInTheDocument();
+    expect(
+      screen.getByText("The courses that vary the most between the golfers' ratings and the official rankings."),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Course 4')).toBeInTheDocument();
     expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 4 rated')).toBeInTheDocument();
     expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 4th')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
