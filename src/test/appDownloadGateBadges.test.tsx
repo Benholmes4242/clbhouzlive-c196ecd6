@@ -55,13 +55,13 @@ describe('download gate badges', () => {
     expect(links.map((a) => a.getAttribute('href'))).toEqual([FALLBACK_STORE_URL, FALLBACK_PLAY_URL]);
   });
 
-  it('both badges are 46px tall in a wrapping centred row, with no Play "coming soon"', async () => {
+  it('both badges are 52px tall in a wrapping left-aligned row, with no Play "coming soon"', async () => {
     fetchStoreLinks.mockResolvedValue({ appStore: null, play: null });
     const { container } = renderGate();
     const { row, imgs } = badges(container);
-    expect(imgs.map((i) => i.style.height)).toEqual(['46px', '46px']);
+    expect(imgs.map((i) => i.style.height)).toEqual(['52px', '52px']);
     const s = (row as HTMLElement).style;
-    expect([s.display, s.flexWrap, s.justifyContent, s.gap]).toEqual(['flex', 'wrap', 'center', '10px']);
+    expect([s.display, s.flexWrap, s.justifyContent, s.gap]).toEqual(['flex', 'wrap', 'flex-start', '10px']);
     expect(container.querySelector('[aria-disabled]')).toBeNull();
     expect(container.textContent).not.toContain('Coming soon to Google Play');
   });
