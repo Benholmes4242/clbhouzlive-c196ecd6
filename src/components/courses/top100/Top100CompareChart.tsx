@@ -11,7 +11,7 @@ export function chartRows(rows: ArgumentRow[]): ArgumentRow[] {
 }
 function Detail({ row, n, onOpen }: { row?: ArgumentRow; n:number; onOpen:(id:string)=>void }) {
   return <div className="t100b-detail">{row ? <button type="button" className="t100b-detail-button" onClick={() => onOpen(row.id)} aria-label={`${row.name}, open course`}>
-    <span className="t100b-thumb"><CourseImageFallback courseId={row.id} courseName={row.name} imageUrl={row.imageUrl} className="t100b-image" /></span>
+    <span className="t100b-thumb"><CourseImageFallback courseId={row.id} courseName={row.name} imageUrl={row.imageUrl} style={{ height: '100%' }} /></span>
     <span className="t100b-detail-copy"><span className="t100b-detail-name">{shortenCourseName(row.name)}</span><div className="t100b-detail-line">Golfers <span className="t100b-number">{ordinal(row.memberRank)}</span> · the list <span className="t100b-number">{ordinal(row.listRank)}</span> of the {n} (officially <span className="t100b-number">{ordinal(row.publishedRank)}</span>)</div><div className="t100b-why">{whyLine(row,n)}</div></span><ChevronRight size={14} className="t100b-chevron" aria-hidden />
   </button> : <span className="t100b-hint">Tap a course to see why</span>}</div>;
 }
