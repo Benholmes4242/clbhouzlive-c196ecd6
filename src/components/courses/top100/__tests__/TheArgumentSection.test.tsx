@@ -56,13 +56,9 @@ describe('TheArgumentSection', () => {
     expect(screen.getByText('9')).toBeInTheDocument();
   });
 
-  it('the lede is one sentence and prints no qualifying count', () => {
-    const { container } = renderSection({ higher: [row({})] });
-    expect(
-      screen.getByText("The courses that vary the most between the golfers' ratings and the official rankings."),
-    ).toBeInTheDocument();
-    expect(container.textContent).not.toContain('19 courses');
-    expect(container.textContent).not.toContain('courses on this list');
+  it('the head prints the qualifying count and selected list', () => {
+    const { container } = renderSection({ higher: [row({})], listLabel:'GB&I' });
+    expect(container.querySelector('.t100b-sub')?.textContent).toContain('19 GB&I courses have three or more golfer ratings.');
   });
 
   it('group labels are eyebrows with no coloured dot', () => {

@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Award, Check, Search, X } from 'lucide-react';
+import { Award, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
 import type { StatBrowseRow } from './useStatBrowse';
-import { RailChips, railChipStyle, RailChipTrigger, APPLIED_FILL, RAIL_CHIP_WEIGHT } from '@/components/ui/RailChips';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { RailChips, railChipStyle } from '@/components/ui/RailChips';
 import { communityOrder } from './top100/communityOrder';
 import { PageLoadGate, usePageRevealed, useSectionReady } from './browse/PageLoadGate';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -26,9 +25,14 @@ import { ArgumentShell, Top100CardListShell } from './top100/top100Shells';
 
 /** Gap between cards in the Top 100 list; its shell reads this (BRIEF_COURSES_SKELETONS_3A). */
 export const TOP100_CARD_GAP = 24;
-import { argumentGroups, qualifyingCount } from './top100/theArgument';
+import { argumentGroups, compareRows, MIN_QUALIFYING } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline';
+import { useTop100Race } from '@/hooks/top100/useTop100Race';
+import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
+import { Top100YourHundred } from './top100/Top100YourHundred';
+import { Top100OneRatingAway } from './top100/Top100OneRatingAway';
+import './top100/top100Compare.css';
 
 const LISTS = [
   { id: 'global', label: 'Global' },
@@ -46,8 +50,8 @@ const LIST_NAMES: Record<string, string> = {
 
 type Top100Ranking = 'official' | 'community';
 const RANKING_OPTIONS: Array<{ value: Top100Ranking; label: string }> = [
-  { value: 'official', label: 'Official rating' },
-  { value: 'community', label: 'Community rating' },
+  { value: 'official', label: 'Official' },
+  { value: 'community', label: "Golfers'" },
 ];
 
 function savedRanking(): Top100Ranking {
@@ -138,8 +142,9 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
      the previous list stays on screen (keepPreviousData), so rows must be read
      against the list they came from, not the chip just tapped. */
   const settledList = useRef(selectedList);
-  if (!isPlaceholderData) settledList.current = selectedList;
-  const renderedList = settledList.current;
+  // Commit the settled slug after render, never mutate it in speculative renders.
+  useEffect(() => { if (!isPlaceholderData) settledList.current = selectedList; }, [selectedList, isPlaceholderData]);
+  const renderedList = isPlaceholderData ? settledList.current : selectedList;
 
   const chosenThisMount = useRef(false);
   const defaultApplied = useRef(false);
@@ -234,9 +239,11 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   );
   const argumentInputs = courses.map((c) => {
     const e = enrichment.get(c.id);
-    return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, renderedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0 };
+    return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, renderedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0, subScores:e?.subScores, ratedByYou:e?.ratedByYou ?? false };
   });
   const { higher: argumentHigher, lower: argumentLower } = argumentGroups(argumentInputs);
+  const comparisonRows = compareRows(argumentInputs);
+  const listLabel = LISTS.find(l => l.id === renderedList)?.label ?? renderedList;
   /* BRIEF_TOP100_MONTHLY_MOVE: the golfers' order four weeks ago, for the
      list the rows on screen belong to. Empty while loading or on error — the
      section never waits on it. */
@@ -306,57 +313,37 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
         ) : null}
       </div>
       <PageLoadGate expect={TOP100_GATE_IDS}>
+      <div className="t100b">
       <GateReport id="list" ready={!isLoading} />
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
       <GateReport id="progress" ready={user?.id ? progressFetchedAfterMount : !progressLoading} />
       <GateReport id="enrichment" ready={!enrichmentLoading} />
       {!memberId ? <GateReport id="race" ready /> : null}
-      {memberId ? <Top100RaceSection viewerId={memberId} list={selectedList as RankListSlug} total={progress?.lists.find(row => row.listSlug === selectedList)?.total ?? 0} onOpenCourse={openCourse} /> : null}
-      {memberId && viewerList && viewerList.total > 0 && courses.length > 0 && viewerPlayed >= 5 && renderedList === selectedList && progressFetchedAfterMount ? (
-        <YourCoursesDropdown key={selectedList} listSlug={selectedList} viewerPlayed={viewerPlayed} total={viewerList.total} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={openCourse} />
-      ) : null}
-      {argumentHigher.length + argumentLower.length > 0 ? (
+      {comparisonRows.length >= MIN_QUALIFYING ? (
         <TheArgumentSection
+          key={renderedList}
+          rows={comparisonRows}
+          renderedList={renderedList}
+          listLabel={listLabel}
           higher={argumentHigher}
           lower={argumentLower}
           baseline={argumentBaseline}
-          ratedCount={qualifyingCount(argumentInputs)}
+          ratedCount={comparisonRows.length}
           onOpenCourse={openCourse}
         />
       ) : isLoading || enrichmentLoading ? (
         <ArgumentShell />
       ) : null}
-      <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
-          <SectionHead kicker="The list" tone="quiet" title={heading} />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <RailChipTrigger label={ranking === 'community' ? 'Community rating' : 'Official rating'} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[180px]">
-              {RANKING_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onSelect={() => chooseRanking(opt.value)}
-                  className="text-sm"
-                  style={
-                    ranking === opt.value
-                      ? { background: APPLIED_FILL, color: A.INK, fontWeight: RAIL_CHIP_WEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }
-                      : undefined
-                  }
-                >
-                  {opt.label}
-                  {ranking === opt.value ? <Check size={14} color={A.INK} aria-hidden /> : null}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        {ranking === 'community' ? (
-          <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
-            Ranked by clbhouz members' average rating.
-          </div>
-        ) : null}
+      <Top100OneRatingAway courses={argumentInputs} listLabel={listLabel} onOpenCourse={openCourse} onRate={id => {
+        sessionStorage.setItem('top100-scroll', String(getPageScrollTop()));
+        navigate(memberId ? `/courses/${id}/rate` : '/auth');
+      }} />
+      {memberId ? <RaceSeat viewerId={memberId} list={selectedList as RankListSlug} total={viewerList?.total ?? 0} played={viewerPlayed} eligible={renderedList === selectedList && progressFetchedAfterMount}>
+        {close => <><Top100RaceSection viewerId={memberId} list={selectedList as RankListSlug} total={viewerList?.total ?? 0} onOpenCourse={id => { close(); openCourse(id); }} /><YourCoursesDropdown listSlug={selectedList} viewerPlayed={viewerPlayed} total={viewerList?.total ?? 0} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={id => { close(); openCourse(id); }} /></>}
+      </RaceSeat> : null}
+      <section className="t100b-section">
+        <div className="t100b-list-head"><div><div className="t100b-kicker">THE LIST</div><div className="t100b-title">{heading}</div></div><div className="t100b-segments" aria-label="List order">{RANKING_OPTIONS.map(opt => <button type="button" className="t100b-segment" key={opt.value} aria-pressed={ranking===opt.value} onClick={() => chooseRanking(opt.value)}>{opt.label}</button>)}</div></div>
+        {ranking === 'community' ? <div className="t100b-note">Ranked by golfers' average rating across the {community.rated.length} courses with three or more ratings. The rest follow in official order.</div> : null}
       </section>
 
       <div style={{ paddingTop: 24 }}>
@@ -382,9 +369,9 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
                   padding: '20px 16px 0',
                 }}
               >
-                <SectionHead kicker="Not yet rated" tone="quiet" />
+                <div className="t100b-kicker">FEWER THAN THREE RATINGS</div>
                 <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
-                  {`${communityUnrated.length} ${communityUnrated.length === 1 ? 'course' : 'courses'} no member has rated, in official order.`}
+                  {`${communityUnrated.length} courses, in official order.`}
                 </div>
               </section>
             ) : null}
@@ -407,6 +394,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           </div>
         )}
       </div>
+      </div>
       </PageLoadGate>
       <div aria-hidden style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }} />
     </div>
@@ -421,4 +409,11 @@ const TOP100_GATE_IDS = ['list', 'progress', 'enrichment', 'race'] as const;
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
   useSectionReady(id, ready);
   return null;
+}
+/** Race readiness is loaded once for members; its presentation lives only in the sheet. */
+function RaceSeat({viewerId,list,total,played,eligible,children}: {viewerId:string;list:RankListSlug;total:number;played:number;eligible:boolean;children:(close:()=>void)=>React.ReactNode}) {
+  const race=useTop100Race(viewerId,list);
+  const progress=useTop100ListProgress(list,viewerId,viewerId);
+  const mine=!race.isPlaceholderData && !race.isError ? race.data?.find(r=>r.is_viewer || r.user_id===viewerId) : undefined;
+  return <><GateReport id="race" ready={!race.isPending && !race.isPlaceholderData && !progress.isPending} />{eligible && mine && total>0 && played>=5 ? <Top100YourHundred key={list} played={played} total={total} position={mine.pos} members={Number(mine.total_members)}>{children}</Top100YourHundred> : null}</>;
 }
