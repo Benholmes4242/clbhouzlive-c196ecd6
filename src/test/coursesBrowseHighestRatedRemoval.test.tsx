@@ -25,12 +25,12 @@ vi.mock('@/stores/reviewSheetStore', () => ({
 }));
 vi.mock('@/components/courses/CourseMasthead', () => ({ HERO_FIGURE_LABEL: {}, HERO_FIGURE_VALUE: {} }));
 vi.mock('@/components/courses/StatBrowse', async () => ({ default: await readySection('list') }));
-vi.mock('@/components/courses/browse/WhoPlayingSection', async () => ({ WhoPlayingSection: await readySection('whoPlaying') }));
-vi.mock('@/components/courses/browse/ByRegionSection', async () => ({ ByRegionSection: await readySection('byRegion'), ALL_COURSES_ANCHOR: 'all-courses' }));
-vi.mock('@/components/courses/browse/LatestCoursesSection', async () => ({ LatestCoursesSection: await readySection('latestCourses') }));
+vi.mock('@/components/courses/browse/WhoPlayingSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/WhoPlayingSection')>()), WhoPlayingSection: await readySection('whoPlaying') }));
+vi.mock('@/components/courses/browse/ByRegionSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/ByRegionSection')>()), ByRegionSection: await readySection('byRegion') }));
+vi.mock('@/components/courses/browse/LatestCoursesSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/LatestCoursesSection')>()), LatestCoursesSection: await readySection('latestCourses') }));
 vi.mock('@/components/courses/browse/MostPlayedSection', async () => ({ MostPlayedSection: await readySection('mostPlayed') }));
-vi.mock('@/components/courses/browse/HardestSection', async () => ({ HardestSection: await readySection('hardest') }));
-vi.mock('@/components/courses/browse/LatestHolesSection', async () => ({ LatestHolesSection: await readySection('latestHoles') }));
+vi.mock('@/components/courses/browse/HardestSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/HardestSection')>()), HardestSection: await readySection('hardest') }));
+vi.mock('@/components/courses/browse/LatestHolesSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/LatestHolesSection')>()), LatestHolesSection: await readySection('latestHoles') }));
 vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestReviewsSection: () => null }));
 
 import CoursesBrowsePage from '@/components/courses/CoursesBrowsePage';
