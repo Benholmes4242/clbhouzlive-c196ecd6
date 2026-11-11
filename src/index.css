@@ -1,4 +1,22 @@
 @import './styles/web-home.css';
+@import './styles/top100-compare.css';
+
+:root {
+  --t100-b-canvas: #0A0A0C;
+  --t100-b-panel: #16161A;
+  --t100-b-ink: #F8FAFC;
+  --t100-b-body: rgba(248,250,252,.72);
+  --t100-b-mute: rgba(248,250,252,.62);
+  --t100-b-dim: rgba(248,250,252,.42);
+  --t100-b-track: rgba(255,255,255,.08);
+  --t100-b-dot-border: rgba(248,250,252,.7);
+  --t100-b-pill-border: rgba(255,255,255,.18);
+  --t100-b-seg-border: rgba(255,255,255,.06);
+  --t100-b-active: rgba(255,255,255,.1);
+  --t100-b-green: #2FA35A;
+  --t100-b-red: #E24B3F;
+  --t100-b-amber: #F7931E;
+}
 
 
 @import './styles/hub-warm.css';
