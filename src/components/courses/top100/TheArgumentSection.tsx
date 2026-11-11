@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { SectionHead, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import type { ArgumentRow } from './theArgument';
+import { whyLine, type ArgumentRow } from './theArgument';
+import { Top100CompareChart, shortenCourseName } from './Top100CompareChart';
 import { ordinal } from '@/lib/text/numbers';
 
 /* Row geometry, read by the rows AND their shell (BRIEF_COURSES_SKELETONS 3.4). */
@@ -13,6 +14,8 @@ export const ARGUMENT_THUMB = { size: 52, radius: 8 } as const;
 export const ARGUMENT_ROW_GAP = 12;
 
 interface Props {
+  rows?: ArgumentRow[];
+  listLabel?: string;
   higher: ArgumentRow[];
   lower: ArgumentRow[];
   ratedCount: number;
@@ -69,6 +72,7 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
                 <div style={{ marginTop: 1, fontSize: 11.5, lineHeight: 1.35, color: A.DIM, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   Officially ranked <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.publishedRank)}</b>
                 </div>
+                <div className="t100-why">{whyLine(r, ratedCount)}</div>
               </div>
               <div style={{ flexShrink: 0, textAlign: 'right' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 800, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
@@ -100,17 +104,20 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
 }
 
 /** BRIEF_TOP100_GOLFERS_VS_OFFICIAL. The caller renders nothing when both groups are empty. */
-export function TheArgumentSection({ higher, lower, baseline, ratedCount, onOpenCourse }: Props) {
-  if (higher.length === 0 && lower.length === 0) return null;
+export function TheArgumentSection({ rows, listLabel = 'Global', higher, lower, baseline, ratedCount, onOpenCourse }: Props) {
+  if (rows ? rows.length < 3 : higher.length === 0 && lower.length === 0) return null;
+  const leader = rows?.find(row => row.memberRank === 1);
+  const overlap = rows?.filter(row => row.listRank <= 10 && row.memberRank <= 10).length ?? 0;
   return (
-    <section style={SECTION_WRAP}>
-      <SectionHead kicker="Golfers versus the official list" title="Where the ratings and the rankings differ" />
+    <section className={rows ? 't100-b-section' : undefined} style={rows ? undefined : SECTION_WRAP}>
+      {leader ? <><div className="t100-b-kicker amber">GOLFERS VERSUS THE OFFICIAL LIST</div><h2 className="t100-b-title">Golfers put {shortenCourseName(leader.name)} 1st. The list has it {ordinal(leader.publishedRank)}.</h2><p className="t100-b-sub">{ratedCount} {listLabel} courses have three or more golfer ratings.{ratedCount >= 10 ? ` Golfers and the list share ${overlap} of their top 10.` : ''}</p><Top100CompareChart rows={rows ?? []} onOpenCourse={onOpenCourse} /></> : <><SectionHead kicker="Golfers versus the official list" title="Where the ratings and the rankings differ" />
       {/* Sub-line geometry matches "The list" ("Ranked by clbhouz members'
           average rating."): 8 / 12 / 1.4 / A.DIM. The qualifying count is no
           longer printed. */}
       <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
         The courses that vary the most between the golfers' ratings and the official rankings.
       </div>
+      </>}
       <ArgumentGroup label="Golfers rate higher" rows={higher} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
       <ArgumentGroup label="Golfers rate lower" rows={lower} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
     </section>
