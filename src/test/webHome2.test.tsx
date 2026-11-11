@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import webHomeCss from '@/styles/web-home.css?inline';
 const h = vi.hoisted(() => ({ rpc: vi.fn(), context: null as unknown, track: vi.fn(), links: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: h.rpc } }));
 vi.mock('@/pages/gate/useGateContext', () => ({ useGateContext: () => ({ data: h.context }) }));
@@ -47,6 +48,21 @@ describe('WEB_HOMEPAGE_2', () => {
     expect(imgs.map(i => i.getAttribute('src'))).toEqual(['/web-home/club.webp', '/web-home/scorecard.webp', '/web-home/feed.webp', '/web-home/course.webp', '/web-home/explore.webp']);
     expect(imgs.map(i => i.getAttribute('loading'))).toEqual(['lazy', 'lazy', 'eager', 'lazy', 'lazy']);
     expect(imgs.every(i => i.getAttribute('width') === '750' && i.getAttribute('height') === '1626' && i.getAttribute('alt') === '')).toBe(true);
+  });
+  it('centres all four How it works icons within their columns', () => {
+    const style = document.createElement('style');
+    style.textContent = webHomeCss;
+    document.head.appendChild(style);
+    try {
+      const { container } = mount();
+      const icons = [...container.querySelectorAll('.four svg')];
+      expect(icons.map(icon => {
+        const css = getComputedStyle(icon);
+        return [css.display, css.marginLeft, css.marginRight];
+      })).toEqual(Array.from({ length: 4 }, () => ['block', 'auto', 'auto']));
+    } finally {
+      style.remove();
+    }
   });
   it('belt uses recent courses', async () => { const { container } = mount(); await waitFor(() => expect(container.querySelector('[data-web-belt]')?.textContent).toContain('Recent One')); expect(h.rpc).toHaveBeenCalledWith('get_web_recent_courses', { p_limit: 12 }); });
   it('belt falls back to popular when recent is empty', async () => { data.get_web_recent_courses = []; const { container } = mount(); await waitFor(() => expect(container.querySelector('[data-web-belt]')?.textContent).toContain('Course a')); expect(h.rpc).toHaveBeenCalledWith('get_web_popular_courses', { p_limit: 10 }); });
