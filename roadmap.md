@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Top 100 leaderboard finish
+Restore complete panel hook mocks; replace four retired dropdown tests with two.
+Use numeric sheet positions, ring-free avatars and retained page-card rows during list switching.
+Run four fresh sequential shards against 8,265; report every test delta and commit.
+Older roadmap entries are historical and do not authorise unrelated work in this brief.
+
 ## Done: Store-link suite rerun
 Requested assertions and HTTPS/insecure business-link case already present; no duplicate case or source change.
 Sequential shards passed: 2,133 / 1,958 / 2,111 / 2,004 = 8,206, zero failures (730 files). Picker screenshot skipped by request.

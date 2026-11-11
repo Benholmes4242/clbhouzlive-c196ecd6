@@ -10,6 +10,8 @@
  * Tab switching keeps the last settled tab's summary and rows on screen at
  * opacity .4 while the new tab's board is placeholder data, so there is no
  * height jump and no wrong list label; the swap is one paint.
+ * The list-neutral page card also retains its last settled board during page
+ * chip switches; errors and settled empty boards still suppress it.
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
@@ -106,8 +108,8 @@ function Sheet({ viewerId, pageList, pageListSize, onClose }: { viewerId: string
           <div className="t100b-lb-rows">{rows.map(r => {
             const you = Boolean(r.is_viewer || (viewerId != null && r.user_id === viewerId));
             return <button type="button" key={r.user_id} className={you ? 't100b-lb-row you' : 't100b-lb-row'} onClick={() => setMember({ row: r, list: shown.tab })}>
-              <span className="t100b-lb-pos">{posText(r)}</span>
-              <SquircleAvatar src={r.photo_url} alt={r.display_name ?? ''} size={40} />
+              <span className="t100b-lb-pos">{r.is_tie ? '=' : ''}{r.pos}</span>
+              <SquircleAvatar src={r.photo_url} alt={r.display_name ?? ''} size={40} hideRing />
               <span className="t100b-lb-rt">
                 <span className="t100b-lb-rn">{you ? 'You' : r.display_name}</span>
                 {r.last_course_name ? <span className="t100b-lb-rs">{shortCourseName(r.last_course_name)}</span> : null}
@@ -129,8 +131,14 @@ export function Top100Leaderboard({ viewerId, list, listSize }: { viewerId: stri
   const board = useCareerBoard(viewerId, TOP100_METRIC[list], 100);
   useSectionReady('race', settled(board));
   const [open, setOpen] = useState(false);
+  const settledRows = useRef<CareerRow[]>([]);
+  useEffect(() => {
+    if (!board.isPlaceholderData && !board.isError && settled(board)) {
+      settledRows.current = board.data ?? [];
+    }
+  }, [board.data, board.isPlaceholderData, board.isError, board.isFetched, board.status]);
   if (board.isError) return null;
-  const rows = board.isPlaceholderData ? [] : board.data ?? [];
+  const rows = board.isPlaceholderData ? settledRows.current : board.data ?? [];
   if (rows.length === 0) return null;
   return (
     <section className="t100b-section">

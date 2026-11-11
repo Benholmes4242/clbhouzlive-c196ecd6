@@ -25,7 +25,10 @@ vi.mock('@/hooks/top100/useTop100Race', () => ({
 }));
 vi.mock('@/hooks/gam/useTop100ListProgress', () => ({ useTop100ListProgress: () => ({ data: new Array(f.progressLen).fill(0), isPending: false }) }));
 vi.mock('@/components/ui/BottomSheet', () => ({ BottomSheet: ({ children }: { children: React.ReactNode }) => <div role="dialog">{children}</div> }));
-vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => null }));
+vi.mock('@/components/ui/SquircleAvatar', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/components/ui/SquircleAvatar')>()),
+  SquircleAvatar: ({ hideRing, size }: { hideRing?: boolean; size: number }) => <span data-avatar-size={size} data-hide-ring={String(hideRing === true)} />,
+}));
 vi.mock('@/components/top100/sheets/Top100ListProgressSheet', () => ({ Top100ListProgressSheet: (props: object) => { f.progressSheet = props as typeof f.progressSheet; return <div data-progress-sheet />; } }));
 import { Top100Leaderboard } from '@/components/courses/top100/Top100Leaderboard';
 
@@ -64,6 +67,17 @@ afterEach(cleanup);
 beforeEach(() => { f.placeholder = false; f.progressLen = 100; f.lastMetric = ''; f.progressSheet = null; useLiveBoards(); });
 
 describe('page card', () => {
+  it('placeholder data after a settled board keeps the card mounted', () => {
+    const { rerender } = renderCard(undefined);
+    const card = screen.getByRole('button', { name: /Who's played the most/ });
+    f.placeholder = true;
+    rerender(<Top100Leaderboard viewerId={undefined} list="global" listSize={100} />);
+    expect(screen.getByRole('button', { name: /Who's played the most/ })).toBe(card);
+    expect(card.textContent).toContain('Andrew Yetzes leads on 39.');
+    f.placeholder = false;
+    rerender(<Top100Leaderboard viewerId={undefined} list="global" listSize={100} />);
+    expect(screen.queryByRole('button', { name: /Who's played the most/ })).toBeNull();
+  });
   it('a guest sees the leader and the member count', () => {
     const { container } = renderCard(undefined);
     const card = container.querySelector('.t100b-lb-card')!;
@@ -110,6 +124,18 @@ describe('page card', () => {
 });
 
 describe('leaderboard sheet', () => {
+  it('sheet row positions are 1, 2, =3 without ordinal suffixes', () => {
+    renderCard(undefined, 'europe');
+    const dialog = openSheet();
+    expect(Array.from(dialog.querySelectorAll('.t100b-lb-pos'), el => el.textContent)).toEqual(['1', '2', '=3', '=3', '=3', '6']);
+  });
+  it('sheet avatars receive hideRing', () => {
+    renderCard(undefined, 'europe');
+    const dialog = openSheet();
+    const avatars = dialog.querySelectorAll('[data-avatar-size="40"]');
+    expect(avatars).toHaveLength(6);
+    for (const avatar of avatars) expect(avatar).toHaveAttribute('data-hide-ring', 'true');
+  });
   it('opens on the page list, and switching tabs changes the metric but not the page list', () => {
     const { container } = renderCard('me', 'gb-i');
     const dialog = openSheet();
@@ -180,8 +206,8 @@ describe('leaderboard sheet', () => {
     const dialog = openSheet();
     const you = dialog.querySelector('.t100b-lb-row.you')!;
     expect(you.querySelector('.t100b-lb-rn')!.textContent).toBe('You');
-    expect(you.querySelector('.t100b-lb-pos')!.textContent).toBe('=3rd');
-    expect(dialog.querySelector('.t100b-lb-rows')!.textContent).toContain('=3rd');
+    expect(you.querySelector('.t100b-lb-pos')!.textContent).toBe('=3');
+    expect(dialog.querySelector('.t100b-lb-rows')!.textContent).toContain('=3');
   });
   it('a row tap opens the member progress sheet with that member and standing', () => {
     renderCard('me');

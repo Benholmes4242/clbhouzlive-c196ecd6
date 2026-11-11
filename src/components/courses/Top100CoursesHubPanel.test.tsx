@@ -1,8 +1,6 @@
 /**
- * HUNDRED_FIT_1_R AYA3/4: the under-five gate lives in the panel, so the rule
- * is tested here against the panel — never in yourHundredPeek.test.tsx, which
- * mounts the section directly and is untouched. Absence is asserted by query
- * (heading, grid cells, legend returning null), never by computed style.
+ * The leaderboard replaces the page's Your courses dropdown without a
+ * five-played gate. Standalone Your hundred consumers remain untouched.
  */
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,6 +13,7 @@ const f = vi.hoisted(() => ({
   enrichment: vi.fn(),
   progress: vi.fn(),
   baseline: vi.fn(),
+  career: vi.fn(),
 }));
 
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'u1' } }) }));
@@ -22,16 +21,19 @@ vi.mock('@/hooks/useGolfCoursesInfinite', () => ({ useGolfCoursesInfinite: f.cou
 vi.mock('@/hooks/top100/useTop100Enrichment', () => ({ useTop100Enrichment: f.enrichment }));
 vi.mock('@/hooks/useTop100ProgressForUser', () => ({ useTop100ProgressForUser: f.progress }));
 vi.mock('@/hooks/top100/useTop100GolferBaseline', () => ({ useTop100GolferBaseline: f.baseline }));
-vi.mock('./browse/PageLoadGate', () => ({
+vi.mock('./browse/PageLoadGate', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./browse/PageLoadGate')>()),
   PageLoadGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   usePageRevealed: () => true,
   useSectionReady: () => {},
 }));
 vi.mock('./BrowseCourseCard', () => ({ default: () => null }));
 vi.mock('./top100/Top100RaceSection', () => ({ Top100RaceSection: () => null }));
-// The Your hundred row reads the canonical race and list-progress hooks (signed-off Option B).
-vi.mock('@/hooks/top100/useTop100Race', () => ({
+// Preserve all module exports while stubbing the canonical board reads.
+vi.mock('@/hooks/top100/useTop100Race', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/top100/useTop100Race')>()),
   useTop100Race: () => ({ data: [{ pos: 3, value: 5, total: 100, total_members: 35, is_viewer: true, user_id: 'u1' }], isPending: false, isPlaceholderData: false, isError: false }),
+  useCareerBoard: f.career,
 }));
 vi.mock('@/hooks/gam/useTop100ListProgress', () => ({ useTop100ListProgress: () => ({ data: undefined, isPending: false }) }));
 
@@ -78,17 +80,9 @@ function LocationProbe() {
   return <output data-testid="course-location">{location.pathname}</output>;
 }
 
-const yourHundredRow = () => screen.queryByRole('button', { name: /YOUR HUNDRED/ });
-const sectionAbsent = () => {
-  expect(yourHundredRow()).toBeNull();
-  expect(screen.queryByText('Your hundred')).toBeNull();
-  expect(screen.queryByText('A life in golf, one list')).toBeNull();
-  expect(screen.queryByRole('button', { name: /^#1 / })).toBeNull();
-  expect(screen.queryByTestId('hundred-legend')).toBeNull();
-};
-
 beforeEach(() => {
   sessionStorage.clear();
+  f.career.mockReturnValue({ data: [], isPending: false, isFetched: true, isPlaceholderData: false, isError: false });
   Element.prototype.scrollIntoView = vi.fn();
   f.courses.mockReturnValue({
     data: { pages: [COURSES] },
@@ -103,46 +97,22 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-describe('HUNDRED_FIT_1_R — the under-five gate', () => {
-  it('four played on the active list renders no heading, figure, grid or legend', () => {
+describe('leaderboard replaces the page dropdown', () => {
+  it('the panel never mounts the Your courses dropdown, at four or nine played', () => {
+    for (const played of [4, 9]) {
+      f.progress.mockReturnValue({ data: progressData(played, 0), isLoading: false, isFetchedAfterMount: true });
+      const { container, unmount } = mount();
+      expect(screen.queryByRole('button', { name: /Your courses/ })).toBeNull();
+      expect(container.querySelector('[data-your-courses]')).toBeNull();
+      unmount();
+    }
+  });
+
+  it('the leaderboard card shows with four played', () => {
     f.progress.mockReturnValue({ data: progressData(4, 0), isLoading: false, isFetchedAfterMount: true });
+    f.career.mockReturnValue({ data: [{ pos: 1, is_tie: false, user_id: 'u1', display_name: 'Member', photo_url: null, value: 4, total_members: 1, is_viewer: true }], isPending: false, isFetched: true, isPlaceholderData: false, isError: false });
     mount();
-    sectionAbsent();
-  });
-
-  it('five played renders the closed Your courses dropdown which opens the grid and legend', () => {
-    f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
-    mount();
-    expect(screen.queryByText('Your courses')).toBeNull();
-    fireEvent.click(yourHundredRow()!);
-    expect(screen.getByText('Your courses')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '#1 Course 1' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
-    expect(screen.getByRole('button', { name: '#1 Course 1' })).toBeInTheDocument();
-    expect(screen.getByTestId('hundred-legend')).toBeInTheDocument();
-  });
-
-  it('the boundary sits at five, not four', () => {
-    f.progress.mockReturnValue({ data: progressData(4, 0), isLoading: false, isFetchedAfterMount: true });
-    const { unmount } = mount();
-    sectionAbsent();
-    unmount();
-    f.progress.mockReturnValue({ data: progressData(5, 0), isLoading: false, isFetchedAfterMount: true });
-    mount();
-    fireEvent.click(yourHundredRow()!);
-    expect(screen.getByText('Your courses')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Your courses/ }));
-    expect(screen.getByRole('button', { name: '#1 Course 1' })).toBeInTheDocument();
-  });
-
-  it('switching the active scope from nine played to three removes the section without remounting the page', () => {
-    f.progress.mockReturnValue({ data: progressData(9, 3), isLoading: false, isFetchedAfterMount: true });
-    mount();
-    expect(yourHundredRow()).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
-    sectionAbsent();
-    // The page itself never remounted: the list head for the new scope is on screen.
-    expect(screen.getByText('GB&I Top 100')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Who's played the most/ })).toBeInTheDocument();
   });
 });
 
