@@ -19,8 +19,8 @@ describe('communityOrder', () => {
   it('higher rating first', () => {
     expect(ratedIds([c('a', 7, 3, 1), c('b', 9, 3, 2)])).toEqual(['b', 'a']);
   });
-  it('equal rating uses published rank, not rating count', () => {
-    expect(ratedIds([c('a', 8, 1, 1), c('b', 8, 4, 2)])).toEqual(['b', 'a']);
+  it('equal rating: official rank breaks the tie, not rating count', () => {
+    expect(ratedIds([c('a', 9.0, 5, 2), c('b', 9.0, 3, 1)])).toEqual(['b', 'a']);
   });
   it('equal rating and count, better official rank first', () => {
     expect(ratedIds([c('a', 8, 3, 9), c('b', 8, 3, 3)])).toEqual(['b', 'a']);
