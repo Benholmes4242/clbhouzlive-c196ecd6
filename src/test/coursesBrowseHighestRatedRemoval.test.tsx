@@ -34,6 +34,7 @@ vi.mock('@/components/courses/browse/LatestHolesSection', async (importOriginal)
 vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestReviewsSection: () => null }));
 
 import CoursesBrowsePage from '@/components/courses/CoursesBrowsePage';
+import { ALL_COURSES_ANCHOR } from '@/components/courses/browse/ByRegionSection';
 
 const mount = () => render(<CoursesBrowsePage onOpenDirectory={() => {}} />);
 
@@ -42,7 +43,7 @@ afterEach(cleanup);
 describe('BRIEF_REMOVE_HIGHEST_RATED_SECTION', () => {
   it('the Courses page never renders "What members rate highest"', () => {
     const view = mount();
-    expect(view.container.querySelector('#all-courses')).not.toBeNull();
+    expect(view.container.querySelector(`#${ALL_COURSES_ANCHOR}`)).not.toBeNull();
     expect(screen.queryByText('What members rate highest')).toBeNull();
   });
 
@@ -54,9 +55,17 @@ describe('BRIEF_REMOVE_HIGHEST_RATED_SECTION', () => {
 
   it('the page gate opens once the remaining sections report ready', async () => {
     const view = mount();
-    const gateDiv = view.container.querySelector('#all-courses')?.parentElement?.parentElement;
-    // RTL flushes effects before render returns, so the gate is expected to
-    // already be revealed — every remaining section reported ready at mount.
-    await waitFor(() => expect(gateDiv?.style.display).toBe(''));
+    // The gate is revealed when nothing between the list anchor and the
+    // container is hidden, and the page's skeleton fallback has gone.
+    await waitFor(() => {
+      const anchor = view.container.querySelector<HTMLElement>(`#${ALL_COURSES_ANCHOR}`);
+      expect(anchor).not.toBeNull();
+      const hidden: HTMLElement[] = [];
+      for (let el = anchor!.parentElement; el && el !== view.container; el = el.parentElement) {
+        if (el.style.display === 'none') hidden.push(el);
+      }
+      expect(hidden).toHaveLength(0);
+      expect(view.container.querySelector('[data-courses-fallback]')).toBeNull();
+    });
   });
 });

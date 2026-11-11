@@ -83,7 +83,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
     <div>
       <style>{GLASS_CHIP_CSS}</style>
       <PageLoadGate expect={GATE_IDS} fallback={
-        <div style={BLEED}>
+        <div data-courses-fallback="" style={BLEED}>
           {user && <WhoPlayingShell />}
           <ByRegionShell />
           <LatestCoursesShell />
