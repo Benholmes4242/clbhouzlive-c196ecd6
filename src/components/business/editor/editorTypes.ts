@@ -100,6 +100,7 @@ const FACILITIES_BY_CATEGORY: Record<BusinessCategoryValue, string[]> = {
     'Restaurant', 'Spa', 'Buggy hire', 'Lessons',
   ],
   'Hotel / Accommodation': ['Parking', 'Restaurant', 'Bar', 'Spa', 'Gym', 'Golf packages', 'Club storage', 'EV charging'],
+  'Golf Travel': ['Tailor-made trips', 'Group trips', 'Tee time booking', 'Accommodation', 'Airport transfers', 'Club hire', 'Flights'],
   'Restaurant / Cafe': ['Parking', 'Outdoor seating', 'Takeaway', 'Reservations', 'Vegetarian options', 'Family friendly'],
   'Bar / Pub': ['Parking', 'Outdoor seating', 'Live sport on TV', 'Food served', 'Dog friendly', 'Beer garden'],
   'Brand / Manufacturer': [],

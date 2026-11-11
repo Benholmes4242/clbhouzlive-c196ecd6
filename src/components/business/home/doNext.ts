@@ -72,7 +72,7 @@ export const VENUE_CATEGORIES = [
 ] as const;
 export const BOOKABLE_CATEGORIES = [
   'Golf Club', 'Golf Academy', 'Coach / Instructor', 'Club Fitter', 'Resort',
-  'Hotel / Accommodation', 'Restaurant / Cafe',
+  'Hotel / Accommodation', 'Golf Travel', 'Restaurant / Cafe',
 ] as const;
 
 const filled = (v: string | null | undefined) => !!v && v.trim().length > 0;
