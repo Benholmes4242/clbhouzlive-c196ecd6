@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: WEB_HOMEPAGE_1B completion
+Authorised storeLinks exact-shape expectations and one HTTPS business-link case; one-decimal ink rating figure shared by card/phone and one new guard.
+Run four sequential shards. Ben verified production-style none/invite layouts at 1280/390/320; no visual rerun required.
+Inventory before: 8,204 (8,173 verified baseline +23 homepage +8 Golf Travel); two new cases give expected 8,206.
+
 ## In progress: Golf Travel category
 Implemented canonical category, create tile, hero labels, seven facilities and booking membership; venue/hospitality exclusions unchanged.
 Focused 57 passed; sequential shard 1: 2,133 passed; shard 2: 1,956 passed / 1 failed. STOP at src/lib/storeLinks.test.ts:45:37: `AssertionError: expected { …(3) } to deeply equal { …(2) }` (existing homepage business:null regression). No repair or test changes.
