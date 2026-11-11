@@ -1,424 +1,49 @@
 /**
- * clbhouz — web download gate. BRIEF_WEB_GATE_REDESIGN.
- *
- * The web never mounts the app shell. Every gated path lands here on the
- * same dark canvas the app holds on cold start (#15171F), so a member who
- * taps a link and then installs sees one continuous frame.
- *
- * THREE BANDS DISTRIBUTED OVER THE FULL HEIGHT:
- *   band 1  identity   mark, wordmark            (top, fixed)
- *   band 2  statement  headline, support, figures (centred, flexes)
- *   band 3  action     badges, signature, legal   (bottom, fixed)
- *
- * COPY LAW:
- *   - The signature is "stay in play." with an AMBER full stop, at the foot.
- *     "the home of golf" was an earlier draft and appears nowhere.
- *   - No state opens with "Get the app to…". Support lines state, never
- *     instruct.
- *
- * FIGURE LAW:
- *   - The only figures allowed are the three from get_platform_reach() via
- *     usePlatformReach(). Nothing is ever hardcoded, nothing counted here.
- *   - THE ZERO TRAP: the hook coerces a null row to zeros, so a failed or
- *     empty RPC would tell a stranger clbhouz has 0 courses. If the query
- *     errored, or coursesTotal is 0, the WHOLE block is suppressed.
- *   - Pending is not absent: the block holds its own height in flight so the
- *     headline does not jump when the figures land.
- *
- * BootHold mirrors band 1 and this canvas exactly; both must move together or
- * the app flashes on every launch.
+ * WEB_HOMEPAGE_1: the public web homepage, shared by all three gate states.
+ * Gate routing/context and invite attribution stay canonical. Fictional phones
+ * stay static; live figures/search/cards use only the authorised public RPCs.
+ * ZERO TRAP: errors or zero courses hide proof and use unnumbered fallback copy;
+ * pending figures reserve the proof height. Never fall back to platform reach.
+ * The homepage no longer mirrors BootHold's identity band.
  */
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { resolveGateState } from './gate/gateRoutes';
 import { useGateContext } from './gate/useGateContext';
-import { usePlatformReach } from '@/hooks/usePlatformReach';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
-import { GREEN } from '@/components/manage/ui';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { FALLBACK_PLAY_URL, FALLBACK_STORE_URL, fetchStoreLinks } from '@/lib/storeLinks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-
-/** FUNNEL_TRACKING_1: fire-and-forget; navigation never waits on the insert. */
-const trackStoreTap = (store: 'app_store' | 'play_store') => {
-  void analyticsEvents.track('store_link_tapped', { surface: 'download_gate', store });
-};
-
-const CANVAS = PAGE_CANVAS;
-const INK = '#FFFFFF';
-const BODY = 'rgba(255,255,255,0.66)';
-const MUTE = 'rgba(255,255,255,0.42)';
-const HAIR = 'rgba(255,255,255,0.10)';
-const AMBER = '#F7931E';
-
-const SANS =
-  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif';
-const LABEL: React.CSSProperties = {
-  fontSize: 8.5,
-  fontWeight: 700,
-  letterSpacing: '0.17em',
-  textTransform: 'uppercase',
-};
-
+import { fmt, useWebHomeFigures, useWebCourseCard } from './gate/home/useWebHomeData';
+import { HeroFeedPhone, HomePillars, ShareRoundSection, CreatorsSection, NetworkSection, CourseFeatureCopy, BusinessBand } from './gate/home/HomeIllustrations';
+import { WebCourseCard } from './gate/home/WebCourseCard';
+import { WebCourseSearch } from './gate/home/WebCourseSearch';
+import '@/styles/web-home.css';
 const MARK = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
-
-/**
- * Both store links, no device detection: the App Store badge always opens
- * the App Store and the Google Play badge always opens Google Play. Starts
- * on the fallbacks; a failed fetch keeps them.
- */
-function useStoreLinks(): { appStore: string; play: string } {
-  const [links, setLinks] = React.useState({ appStore: FALLBACK_STORE_URL, play: FALLBACK_PLAY_URL });
-  React.useEffect(() => {
-    let alive = true;
-    fetchStoreLinks()
-      .then((l) => {
-        if (alive) setLinks({ appStore: l.appStore ?? FALLBACK_STORE_URL, play: l.play ?? FALLBACK_PLAY_URL });
-      })
-      .catch(() => {
-        // fallbacks stand
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
+/** Both fallbacks stand on failed/mocked responses; no device detection. */
+function useStoreLinks() {
+  const [links,setLinks] = React.useState({ appStore:FALLBACK_STORE_URL, play:FALLBACK_PLAY_URL, business:null as string | null });
+  React.useEffect(() => { let alive = true; fetchStoreLinks().then(l => { if (alive && l) setLinks({appStore:l.appStore ?? FALLBACK_STORE_URL,play:l.play ?? FALLBACK_PLAY_URL,business:l.business ?? null}); }).catch(() => {}); return () => { alive=false; }; },[]);
   return links;
 }
-
-function fmt(n: number, locale: string): string {
-  try {
-    return n.toLocaleString(locale);
-  } catch {
-    return n.toLocaleString('en');
-  }
+const trackStoreTap = (store: 'app_store' | 'play_store', placement: 'hero' | 'final') => { void analyticsEvents.track('store_link_tapped',{surface:'download_gate',store,placement}); };
+function StoreBadges({ appStore,play,placement }: { appStore:string; play:string; placement:'hero'|'final' }) {
+  const { t } = useTranslation('common');
+  return <div className="badges" data-store-badges="" id={placement === 'hero' ? 'get' : undefined} style={{display:'flex',flexWrap:'wrap',justifyContent:placement === 'hero' ? 'flex-start' : 'center',gap:10}}>{(['app_store','play_store'] as const).map(store => { const apple=store === 'app_store'; const label=t(apple ? 'gate.appStore' : 'gate.googlePlay',{defaultValue:apple ? 'Download clbhouz on the App Store' : 'Get clbhouz on Google Play'}); return <a key={store} href={apple ? appStore : play} aria-label={label} onClick={() => trackStoreTap(store,placement)}><img src={apple ? '/brand/apple-app-store-badge.svg' : '/brand/google-play-badge.svg'} alt={label} style={{display:'block',height:52,width:'auto'}} draggable={false}/></a>; })}</div>;
 }
-
-/** One figure. A ZERO DELTA RENDERS NOTHING — no "+0", no grey dash. */
-function Figure({
-  total,
-  delta,
-  label,
-  locale,
-}: {
-  total: number;
-  delta: number;
-  label: string;
-  locale: string;
-}) {
-  return (
-    <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-      <div
-        style={{
-          fontSize: 27,
-          fontWeight: 700,
-          letterSpacing: '-0.03em',
-          lineHeight: 1,
-          color: INK,
-          fontVariantNumeric: 'tabular-nums lining-nums',
-        }}
-      >
-        {fmt(total, locale)}
-      </div>
-      <div
-        style={{
-          marginTop: 5,
-          height: 12,
-          fontSize: 10.5,
-          fontWeight: 700,
-          lineHeight: '12px',
-          color: GREEN,
-          fontVariantNumeric: 'tabular-nums lining-nums',
-        }}
-      >
-        {delta > 0 ? `\u25B2 +${fmt(delta, locale)}` : ''}
-      </div>
-      <div style={{ ...LABEL, marginTop: 7, color: MUTE }}>{label}</div>
-    </div>
-  );
-}
-
 const AppDownloadGate: React.FC = () => {
-  const identityRef = React.useRef<HTMLDivElement>(null);
-  const headlineRef = React.useRef<HTMLHeadingElement>(null);
-  const [identityShift, setIdentityShift] = React.useState(0);
-  const location = useLocation();
-  const { t, i18n } = useTranslation('common');
-  const locale = i18n.language || 'en';
-  const state = React.useMemo(() => resolveGateState(location.pathname), [location.pathname]);
-  const { data: ctx } = useGateContext(state);
-  const { appStore, play } = useStoreLinks();
-  const { data: reach, isPending: reachPending, isError: reachError } = usePlatformReach();
-
-  // Invite attribution: stash the code so a later signup can credit the
-  // inviter. NOTE: nothing consumes `clbhouz_invite_ref` yet.
-  React.useEffect(() => {
-    if (state.kind === 'invite' && state.code) {
-      safeLocalStorage.set('clbhouz_invite_ref', state.code);
-    }
-  }, [state]);
-
-  const inviterFirst = ctx?.found ? (ctx.first_name || ctx.display_name || null) : null;
-  const profileName = ctx?.found ? (ctx.display_name || ctx.username || null) : null;
-
-  let headLines: string[] = [
-    t('gate.head.line1', { defaultValue: 'Every round you play.' }),
-    t('gate.head.line2', { defaultValue: 'Every course you visit.' }),
-  ];
-  let sub = t('gate.sub.default', {
-    defaultValue:
-      'Courses measured from the rounds actually played on them, and your golf read hole by hole against them.',
-  });
-
-  if (state.kind === 'invite') {
-    headLines = [
-      inviterFirst
-        ? t('gate.head.invite', { name: inviterFirst, defaultValue: '{{name}} invited you' })
-        : t('gate.head.inviteAnon', { defaultValue: 'You have been invited' }),
-    ];
-    sub = t('gate.sub.invite', {
-      defaultValue: 'Every round you both play, measured on the same courses.',
-    });
-  } else if (state.kind === 'profile') {
-    headLines = [
-      profileName
-        ? t('gate.head.profile', { name: profileName, defaultValue: '{{name}} on clbhouz' })
-        : t('gate.head.line1', { defaultValue: 'Every round you play.' }),
-    ];
-    sub = t('gate.sub.profile', {
-      defaultValue: 'Their index, their form, and every course they have played.',
-    });
-  }
-
-  // THE ZERO TRAP. An errored or empty RPC yields zeros — suppress the block.
-  const figuresUsable = !reachError && !!reach && reach.coursesTotal > 0;
-
-  // Keep the complete identity lockup centred in the open space between the
-  // physical top of the viewport and the first line of the statement.
-  React.useLayoutEffect(() => {
-    const positionIdentity = () => {
-      const identity = identityRef.current;
-      const headline = headlineRef.current;
-      if (!identity || !headline) return;
-
-      const targetCenter = headline.getBoundingClientRect().top / 2;
-      setIdentityShift((currentShift) => {
-        const renderedCenter = identity.getBoundingClientRect().top + identity.offsetHeight / 2;
-        const unshiftedCenter = renderedCenter - currentShift;
-        return Math.round(targetCenter - unshiftedCenter);
-      });
-    };
-
-    positionIdentity();
-    const observer = new ResizeObserver(positionIdentity);
-    if (identityRef.current) observer.observe(identityRef.current);
-    if (headlineRef.current) observer.observe(headlineRef.current);
-    window.addEventListener('resize', positionIdentity);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', positionIdentity);
-    };
-  }, [headLines.join('|'), reachPending, figuresUsable]);
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 2147483000,
-        overflowY: 'auto',
-        background: CANVAS,
-        fontFamily: SANS,
-        WebkitFontSmoothing: 'antialiased',
-      }}
-    >
-      <div
-        style={{
-          minHeight: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          maxWidth: 420,
-          margin: '0 auto',
-          padding: '48px 24px calc(env(safe-area-inset-bottom, 0px) + 40px)',
-          textAlign: 'center',
-        }}
-      >
-        {/* ───────────────── band 1 — identity ───────────────── */}
-        <div
-          ref={identityRef}
-          style={{
-            flex: '0 0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            transform: `translateY(${identityShift}px)`,
-          }}
-        >
-          <img
-            src={MARK}
-            alt=""
-            width={72}
-            height={72}
-            style={{ display: 'block', width: 72, height: 72 }}
-            draggable={false}
-          />
-          <img
-            src={wordmark.url}
-            alt="clbhouz"
-            style={{
-              display: 'block',
-              marginTop: 18,
-              height: 26,
-              width: 'auto',
-              filter: 'invert(1)',
-            }}
-            draggable={false}
-          />
-        </div>
-
-        {/* ───────────────── band 2 — statement ───────────────── */}
-        <div
-          style={{
-            flex: 1,
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '40px 0',
-          }}
-        >
-          <h1
-            ref={headlineRef}
-            style={{
-              margin: 0,
-              fontSize: 28,
-              fontWeight: 700,
-              letterSpacing: '-0.042em',
-              lineHeight: 1.14,
-              color: INK,
-            }}
-          >
-            {headLines.map((line, i) => (
-              <span key={i} style={{ display: 'block' }}>
-                {line}
-              </span>
-            ))}
-          </h1>
-          <p style={{ margin: '14px 0 0', fontSize: 15, lineHeight: 1.52, color: BODY }}>{sub}</p>
-
-          {/* figures — pending holds height, settled-and-empty renders nothing */}
-          {reachPending ? (
-            <div aria-hidden style={{ height: 96, width: '100%' }} />
-          ) : figuresUsable ? (
-            <div style={{ width: '100%', marginTop: 34 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 10,
-                  paddingTop: 18,
-                  borderTop: `0.5px solid ${HAIR}`,
-                }}
-              >
-                <Figure
-                  total={reach.coursesTotal}
-                  delta={reach.coursesDelta}
-                  locale={locale}
-                  label={t('gate.figures.courses', { defaultValue: 'Courses' })}
-                />
-                <Figure
-                  total={reach.roundsTotal}
-                  delta={reach.roundsDelta}
-                  locale={locale}
-                  label={t('gate.figures.rounds', { defaultValue: 'Rounds tracked' })}
-                />
-                <Figure
-                  total={reach.reviewsTotal}
-                  delta={reach.reviewsDelta}
-                  locale={locale}
-                  label={t('gate.figures.reviews', { defaultValue: 'Course reviews' })}
-                />
-              </div>
-              <p style={{ margin: '14px 0 0', fontSize: 11.5, lineHeight: 1.45, color: MUTE }}>
-                {t('gate.figures.note', {
-                  defaultValue: 'Live from the platform. Green is the last 30 days.',
-                })}
-              </p>
-            </div>
-          ) : null}
-        </div>
-
-        {/* ───────────────── band 3 — action ───────────────── */}
-        <div
-          style={{
-            flex: '0 0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-          }}
-        >
-          <div
-            data-store-badges=""
-            style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 10 }}
-          >
-            <a
-              href={appStore}
-              aria-label={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
-              onClick={() => trackStoreTap('app_store')}
-              style={{ display: 'block', lineHeight: 0 }}
-            >
-              <img
-                src="/brand/apple-app-store-badge.svg"
-                alt={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
-                style={{ display: 'block', height: 46, width: 'auto' }}
-                draggable={false}
-              />
-            </a>
-            <a
-              href={play}
-              aria-label={t('gate.googlePlay', { defaultValue: 'Get clbhouz on Google Play' })}
-              onClick={() => trackStoreTap('play_store')}
-              style={{ display: 'block', lineHeight: 0 }}
-            >
-              <img
-                src="/brand/google-play-badge.svg"
-                alt={t('gate.googlePlay', { defaultValue: 'Get clbhouz on Google Play' })}
-                style={{ display: 'block', height: 46, width: 'auto' }}
-                draggable={false}
-              />
-            </a>
-          </div>
-
-          {/* the signature — amber full stop */}
-          <div
-            style={{
-              marginTop: 26,
-              fontSize: 15,
-              fontWeight: 700,
-              letterSpacing: '-0.03em',
-              color: INK,
-            }}
-          >
-            stay in play<span style={{ color: AMBER }}>.</span>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 18, marginTop: 20 }}>
-            <Link to="/terms" style={{ ...LABEL, color: MUTE, textDecoration: 'none' }}>
-              {t('gate.terms', { defaultValue: 'Terms' })}
-            </Link>
-            <Link to="/privacy" style={{ ...LABEL, color: MUTE, textDecoration: 'none' }}>
-              {t('gate.privacy', { defaultValue: 'Privacy' })}
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const location=useLocation(); const { t,i18n }=useTranslation('common'); const locale=i18n?.language || 'en';
+  const state=React.useMemo(() => resolveGateState(location.pathname),[location.pathname]); const {data:ctx}=useGateContext(state);
+  const links=useStoreLinks(); const figures=useWebHomeFigures(); const featured=useWebCourseCard(null);
+  React.useEffect(() => { if (state.kind === 'invite' && state.code) safeLocalStorage.set('clbhouz_invite_ref',state.code); },[state]);
+  const say=(key:string,text:string) => t(`webHome.${key}`,{defaultValue:text});
+  const first=ctx?.found ? (ctx.first_name || ctx.display_name?.trim().split(/\s+/)[0]) : null;
+  const name=ctx?.found ? (ctx.display_name || ctx.username) : null;
+  let kicker=say('kicker','The home of golf, online'); let head=say('head',"Golf's clubhouse."); let lede=say('lede','Share your rounds, follow golfers and creators, connect with clubs and coaches, and see how every course really plays. All in one app, free on iPhone and Android.');
+  if (state.kind === 'invite') { kicker=say('inviteKicker',"You've been invited"); head=first ? say('inviteHead',`${first} invited you to clbhouz.`) : say('inviteAnonHead',"You're invited to clbhouz."); lede=first ? say('inviteLede',`Join free and land straight in ${first}'s circle: see each other's rounds, compare on the same courses, and find who else plays where you play.`) : say('inviteAnonLede',"Join free and see each other's rounds, compare on the same courses, and find who else plays where you play."); }
+  else if (state.kind === 'profile' && name) { kicker=say('profileKicker','On clbhouz'); head=say('profileHead',`${name} is on clbhouz.`); lede=say('profileLede','Follow their rounds, see where they play, and compare on the courses you share. Free on iPhone and Android.'); }
+  const usable=!figures.isError && !!figures.data && figures.data.courses_total > 0; const count=usable && figures.data ? fmt(figures.data.courses_total,locale) : null;
+  return <div className="web-home"><nav><div className="wrap"><a className="brand" href="#get"><img src={MARK} alt=""/><img src={wordmark.url} alt="clbhouz"/></a><a className="navlink" href="#business">{say('businessLink','For business')}</a><a className="pill" href="#get">{say('getApp','Get the app')}</a></div></nav><header className="hero"><div className="wrap"><div><div className="kicker">{kicker}</div><h1>{head.endsWith('.') ? head.slice(0,-1) : head}<span className="dot">.</span></h1><p className="lede">{lede}</p><StoreBadges {...links} placement="hero"/><p className="reassure"><b>{say('reassureBold','For every golfer, club and golf business.')}</b>{' '}{say('reassure','No handicap needed to join. Connect one whenever you like and your rounds post themselves.')}</p></div><div><HeroFeedPhone/></div></div></header><HomePillars/><section className="feat"><div className="wrap"><ShareRoundSection/><CreatorsSection/><NetworkSection/><div className="row flip"><div className="txt"><CourseFeatureCopy/><ul><li>{count ? say('courseCount',`${count} courses with reviews, photos and ratings`) : say('courseFallback','Every course, with reviews, photos and ratings')}</li><li>{say('hardestBullet',"The real hardest hole, not the scorecard's stroke index")}</li><li>{say('ownRead','Your own golf read hole by hole against the course')}</li></ul></div><div>{featured.data && !featured.isError && <WebCourseCard course={featured.data} phone/>}</div></div></div></section><WebCourseSearch placeholder={count ? say('searchCount',`Search ${count} courses`) : say('searchFallback','Search courses')}/><BusinessBand businessUrl={links.business}/>{figures.isPending ? <div className="proof proof-pending" aria-hidden/> : usable && figures.data ? <div className="proof" data-web-proof><div className="wrap">{([[figures.data.courses_total,'Courses'],[figures.data.rounds_total,'Rounds shared'],[figures.data.holes_total,'Holes played']] as const).map(([n,label]) => <div key={label}><div className="n fig">{fmt(n,locale)}</div><div className="l">{say(`figure.${label}`,label)}</div></div>)}<div className="live">{say('live','Live from the platform')}</div></div></div> : null}<section className="final"><div className="wrap"><div className="kicker">{say('free','Free on iPhone and Android')}</div><h2>{say('final','Pull up a chair in the clubhouse')}<span className="dot">.</span></h2><StoreBadges {...links} placement="final"/></div></section><footer><div className="wrap"><div className="sig">stay in play<span className="dot">.</span></div><a href="#business">{say('businessLink','For business')}</a><Link to="/terms">{t('gate.terms',{defaultValue:'Terms'})}</Link><Link to="/privacy">{t('gate.privacy',{defaultValue:'Privacy'})}</Link></div></footer></div>;
 };
-
 export default AppDownloadGate;
