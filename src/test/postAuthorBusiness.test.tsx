@@ -108,7 +108,7 @@ describe('videoUnit VideoCard', () => {
         autoplay={false}
       />,
     );
-    expect(screen.getByText('MG')).toBeTruthy();
+    expect(screen.getByText('MC')).toBeTruthy();
     expect(screen.queryByText('M')).toBeNull();
   });
 });

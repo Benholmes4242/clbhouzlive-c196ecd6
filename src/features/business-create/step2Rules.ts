@@ -82,9 +82,11 @@ export function nameInitials(name: string): string {
   return `${words[0][0]!.toUpperCase()}${words[words.length - 1][0]!.toUpperCase()}`;
 }
 
-/** Business name-match tile: a single initial ("Kestrel Golf Academy" → "K"). */
+/** Business name-match tile: the app-wide avatar rule — first and last
+ *  token ("Kestrel Golf Academy" → "KA"), one letter for a single word.
+ *  Ben's ruling supersedes the earlier business-create freeze for this line. */
 export function nameInitial(name: string): string {
-  return name.trim()[0]?.toUpperCase() ?? '';
+  return getInitialsFromName(name) || '?';
 }
 
 export const CLAIM_PROOF_NOTE_MAX = 500;

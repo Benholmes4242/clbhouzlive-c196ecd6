@@ -72,7 +72,7 @@ describe('ER1 Explore', () => {
     if (filter !== 'long') expect(container.querySelectorAll('[data-watch-card="quick"]')).toHaveLength(1);
   });
   it('uses actor id fallback while preserving business actor videos', () => {
-    f.rows = [row('fallback-own', 60, 'me', { post_user_id: null, actor_id: 'me' }), row('business', 60, 'me', { actor_type: 'business' })];
+    f.rows = [row('fallback-own', 60, 'me', { post_user_id: null, actor_id: 'me' }), row('business', 60, 'me', { actor_type: 'business', business_name: 'business' })];
     const { container } = mount('quick'); expect(container.textContent).not.toContain('fallback-own'); expect(container.textContent).toContain('business');
   });
   it('counts only the displayed Shorts', () => { f.rows = [row('own', 60, 'me'), row('other', 60)]; const { container } = mount('quick'); expect(container.querySelector('[data-watch-count]')?.textContent).toBe('1 clips'); });
