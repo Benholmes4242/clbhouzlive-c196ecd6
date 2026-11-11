@@ -18,6 +18,7 @@
  * derived from it rather than relying on CSS invert surviving capture.
  */
 import React from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';

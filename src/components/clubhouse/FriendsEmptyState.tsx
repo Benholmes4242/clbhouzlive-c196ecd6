@@ -13,6 +13,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, Search, Send, Check } from 'lucide-react';

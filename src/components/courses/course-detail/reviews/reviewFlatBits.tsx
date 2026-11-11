@@ -19,6 +19,7 @@
  * mutation is called only with 'helpful' | 'clear'.
  */
 import { useTranslation } from 'react-i18next';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import React, { useState } from 'react';
 import { ThumbsUp, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { X } from 'lucide-react';
