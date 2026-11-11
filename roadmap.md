@@ -1,9 +1,10 @@
 # Roadmap
 
 ## In progress: Golf Travel category
-Add the canonical category, create tile, hero labels, seven facilities and booking membership; preserve all venue/hospitality exclusions.
-Audit category-keyed readers, add golfTravelCategory guards, run four shards sequentially and capture the picker at 320px.
-Previous full verified baseline: 8,173; homepage added 23 cases (inventory 8,196), with a known storeLinks assertion blocker left untouched.
+Implemented canonical category, create tile, hero labels, seven facilities and booking membership; venue/hospitality exclusions unchanged.
+Focused 57 passed; sequential shard 1: 2,133 passed; shard 2: 1,956 passed / 1 failed. STOP at src/lib/storeLinks.test.ts:45:37: `AssertionError: expected { …(3) } to deeply equal { …(2) }` (existing homepage business:null regression). No repair or test changes.
+Shards 3/4 not run under the stop rule. Actual 320px picker check redirected to /auth; external_unmanaged prevents authenticated verification and the requested picker screenshot.
+Previous full verified baseline: 8,173; homepage +23 and golfTravelCategory +8 yield expected inventory 8,204, not full-suite verified. Report: GOLF_TRAVEL_CATEGORY_REPORT.md.
 
 ## In progress: WEB_HOMEPAGE_1
 Homepage implemented; focused 39/39 (23 new guards), shard 1: 2,138 passed; shard 2: 1,950 passed / 1 failed.
