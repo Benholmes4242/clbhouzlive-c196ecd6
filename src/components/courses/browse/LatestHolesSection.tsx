@@ -9,7 +9,7 @@ import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import { latestHolesToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SCRIM_STANDOUT, SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
-import { useSectionReady } from './PageLoadGate';
+import { settled, useSectionReady } from './PageLoadGate';
 import { useIsGuest } from '@/features/guest/useIsGuest';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
@@ -93,8 +93,8 @@ export function LatestHolesSection() {
   const viewerOpen = useFullscreenFeedStore(state => state.isOpen);
   // Guests read this exactly as members do; the guest flag stays in the key.
   const isGuest = useIsGuest();
-  const { user } = useSupabaseSession();
-  const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+  const { user, loading: sessionLoading } = useSupabaseSession();
+  const { data, isLoading, isFetched, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
     queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite', user?.id, isGuest],
     initialPageParam: undefined as { at: string; id: string } | undefined,
     queryFn: async ({ pageParam }) => {
@@ -111,9 +111,10 @@ export function LatestHolesSection() {
     staleTime: 60_000,
     enabled: !viewerOpen,
   });
-  useSectionReady('latestHoles', !isLoading);
+  const ready = !sessionLoading && settled({ isFetched, isError });
+  useSectionReady('latestHoles', ready);
   const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.id), [data]);
-  const visible = !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
+  const visible = ready && !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
   const { railRef, sentinelRef } = useRailPagination({ hasNextPage, isFetching, fetchNextPage, cardWidth: LATEST_HOLE_W, pageCount: data?.pages.length ?? 0, visible, blocked: viewerOpen, isBlocked: holesViewerOpen });
   const posts = useMemo(() => latestHolesToFeedPosts(rows), [rows]);
   const onOpen = (tapped: LatestHoleMedia) => {
@@ -128,7 +129,7 @@ export function LatestHolesSection() {
     });
   };
 
-  if (isLoading) return <LatestHolesShell />;
+  if (!ready || isLoading) return <LatestHolesShell />;
   if (!visible) return null;
   return <section style={SECTION_WRAP}>
     <SectionHead tone="amber" kicker="Through members' eyes" title="Latest holes" />

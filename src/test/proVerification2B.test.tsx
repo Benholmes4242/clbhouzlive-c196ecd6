@@ -20,9 +20,9 @@ vi.mock('@/features/social-suggestions/useSuggestedGolfers', () => ({ useSuggest
 vi.mock('@/features/social-lists-v2/rowParts', () => ({ RowAvatar: () => <span data-avatar />, FollowButton: () => <span data-follow />, ROW_FONT: 'inherit' }));
 vi.mock('@/features/search-v2/hooks/useGlobalSearchV2', () => ({ useGlobalSearchV2: () => ({ data: { people: [], clubs: [] }, isLoading: false }) }));
 vi.mock('@/features/activity-v2/hooks/useFriendRequestsV2', () => ({ useFriendRequestsV2: () => ({ data: h.requests, isLoading: false, acceptRequest: { isPending: false }, declineRequest: { isPending: false } }) }));
-vi.mock('@/hooks/gam/useCircleLatestRounds', () => ({ useCircleLatestRounds: () => ({ data: h.rounds, isLoading: false }) }));
-vi.mock('@/components/explore-tab-new/courseled/hooks/useCourseCardMeta', () => ({ useCourseCardMeta: () => ({ data: new Map(), isLoading: false }) }));
-vi.mock('@/components/courses/browse/PageLoadGate', () => ({ useSectionReady: () => {} }));
+vi.mock('@/hooks/gam/useCircleLatestRounds', () => ({ useCircleLatestRounds: () => ({ data: h.rounds, isLoading: false, isFetched: true }) }));
+vi.mock('@/components/explore-tab-new/courseled/hooks/useCourseCardMeta', () => ({ useCourseCardMeta: () => ({ data: new Map(), isLoading: false, isFetched: true }) }));
+vi.mock('@/components/courses/browse/PageLoadGate', async original => ({ ...await original<typeof import('@/components/courses/browse/PageLoadGate')>(), useSectionReady: () => {} }));
 vi.mock('@/components/explore-tab-new/courseled/CourseImageFallback', () => ({ CourseImageFallback: ({ children }: any) => <div>{children}</div> }));
 vi.mock('@/features/explore-magazine/useClubGolfers', () => ({ useClubGolfers: () => ({ golfers: h.club, isFetched: true }) }));
 vi.mock('@/features/explore-magazine/ExploreShelf', () => ({ ExploreShelf: ({ children }: any) => <section>{children}</section> }));

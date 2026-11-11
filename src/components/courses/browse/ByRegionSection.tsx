@@ -12,7 +12,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseBrowseTruth, type BrowseRegion } from '../useStatBrowse';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtToPar, playsToPar, plural } from './format';
-import { useSectionReady } from './PageLoadGate';
+import { settled, useSectionReady } from './PageLoadGate';
 import { ByRegionShell } from './sectionShells';
 import { pickRotating, readRotationIds, writeRotationIds } from './rotation';
 
@@ -61,15 +61,18 @@ const FACT_SHADOW = '0 1px 4px rgba(0,0,0,0.6)';
 export function ByRegionSection() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: truth, isLoading: truthLoading } = useCourseBrowseTruth();
+  const truthQuery = useCourseBrowseTruth();
+  const { data: truth } = truthQuery;
   const home = useHomeClubStatus(user?.id);
   const homeRegionQuery = useHomeRegion(home.clubId);
   const homeRegion = homeRegionQuery.data ?? null;
-  useSectionReady('byRegion', !homeRegionQuery.isLoading && !truthLoading && !home.isLoading);
+  const ready = !sessionLoading && settled(truthQuery) && (!user || (settled(home) && (!home.clubId || settled(homeRegionQuery))));
+  useSectionReady('byRegion', ready);
 
   const rotated = useRef<{ lead: string | null; names: string[] } | null>(null);
   const regions = truth?.regions ?? [];
-  const loading = sessionLoading || truthLoading || home.isLoading || homeRegionQuery.isLoading;
+  const loading = !ready;
+  if (loading) return <ByRegionShell />;
   if (regions.length === 0) return loading ? <ByRegionShell /> : null;
 
   const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;

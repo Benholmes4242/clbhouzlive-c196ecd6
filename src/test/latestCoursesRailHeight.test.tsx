@@ -12,7 +12,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: vi.fn() } })
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: vi.fn() }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', () => ({ useGalleryCourseMedia: () => ({ data: null, isError: false }) }));
-vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: false, isError: false, hasNextPage: false, isFetching: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
+vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: false, isFetched: true, isError: false, hasNextPage: false, isFetching: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
 
 import { LATEST_COURSE_W, LATEST_COURSE_H, LATEST_COURSE_SMALL_H, LATEST_COURSE_BIG_W, LATEST_COURSE_SMALL_W, LatestCoursesSection } from '@/components/courses/browse/LatestCoursesSection';
 import { LATEST_HOLE_W, LATEST_HOLE_H } from '@/components/courses/browse/LatestHolesSection';

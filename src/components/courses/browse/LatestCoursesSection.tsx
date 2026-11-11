@@ -25,7 +25,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
-import { useSectionReady } from './PageLoadGate';
+import { settled, useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
@@ -190,10 +190,10 @@ function LatestCourseCard({ row, pending, onOpen }: {
 }
 
 export function LatestCoursesSection() {
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   // Guests read this exactly as members do; the guest flag stays in the key.
   const isGuest = useIsGuest();
-  const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+  const { data, isLoading, isFetched, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
     queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite', user?.id, isGuest],
     initialPageParam: undefined as { at: string; id: string } | undefined,
     queryFn: async ({ pageParam }) => {
@@ -208,9 +208,10 @@ export function LatestCoursesSection() {
     },
     staleTime: 60_000,
   });
-  useSectionReady('latestCourses', !isLoading);
+  const ready = !sessionLoading && settled({ isFetched, isError });
+  useSectionReady('latestCourses', ready);
   const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.course_id), [data]);
-  const visible = !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
+  const visible = ready && !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
   const { railRef, sentinelRef } = useRailPagination({ hasNextPage, isFetching, fetchNextPage, cardWidth: LATEST_COURSE_W, pageCount: data?.pages.length ?? 0, visible });
   const [pending, setPending] = useState<PendingOpen | null>(null);
   const gallery = useGalleryCourseMedia(pending?.courseId ?? null, user?.id);
@@ -240,7 +241,7 @@ export function LatestCoursesSection() {
     setPending(null);
   }, [gallery.data, gallery.isError, pending]);
 
-  if (isLoading) return <LatestCoursesShell />;
+  if (!ready || isLoading) return <LatestCoursesShell />;
   if (!visible) return null;
   return (
     <section style={SECTION_WRAP}>

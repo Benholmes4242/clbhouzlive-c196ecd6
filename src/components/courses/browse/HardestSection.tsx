@@ -1,3 +1,4 @@
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
@@ -29,6 +30,7 @@ const writeLast = (ids: string[]) => writeRotationIds(TOUGH_LAST_KEY, ids);
 
 /** SECTION 04 — THE HARDEST TESTS (BRIEF_COURSES_PAGE_REBUILD §6). */
 export function HardestSection() {
+  const { loading: sessionLoading } = useSupabaseSession();
   const navigate = useNavigate();
   const { rows, isLoading } = useStatBrowseList({ lens: 'toughest', country: null, region: null, limit: TOUGH_POOL });
   const poolKey = rows.map((r) => r.course_id).join('|');
@@ -43,8 +45,9 @@ export function HardestSection() {
     return next;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolKey]);
-  useSectionReady('hardest', !isLoading);
-  if (isLoading) return <HardestShell />;
+  // Manual list loading starts true; no disabled-query ambiguity.
+  useSectionReady('hardest', !sessionLoading && !isLoading);
+  if (sessionLoading || isLoading) return <HardestShell />;
   if (rows.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>

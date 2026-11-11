@@ -6,8 +6,8 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
  * Children stay MOUNTED behind display:none so their queries fire exactly as
  * before; the gate reveals in one paint (no fade, no height tween) once every
  * expected section has reported ready. One-shot: never hides again.
- * BRIEF_COURSES_SKELETONS 1.4: the gate DRAWS NOTHING. Its old single 180px
- * bar stood for the whole page; each section now owns its own shell.
+ * Courses supplies its existing section shells as a fallback; other tabs default
+ * to no fallback. A failsafe leaves unsettled sections on their own shells.
  */
 interface GateCtx {
   report: (id: string, ready: boolean) => void;
@@ -16,7 +16,12 @@ interface GateCtx {
 
 const Ctx = createContext<GateCtx | null>(null);
 
-/** Call at the TOP of a section, before any early return. Ready = !isLoading. */
+/** Disabled/dependent queries are not settled merely because isLoading is false. */
+export function settled(query: { isFetched?: boolean; isError?: boolean; status?: string }): boolean {
+  return query.isFetched === true || query.isError === true || query.status === 'success' || query.status === 'error';
+}
+
+/** Call at the TOP of a section, before any early return. */
 export function useSectionReady(id: string, ready: boolean): void {
   const ctx = useContext(Ctx);
   const report = ctx?.report;
@@ -30,9 +35,9 @@ export function usePageRevealed(): boolean {
 }
 
 /** FAILSAFE, not a timing mechanism: a hung query degrades to ungated rendering. */
-const FAILSAFE_MS = 4000;
+const FAILSAFE_MS = 8000;
 
-export function PageLoadGate({ expect, children }: { expect: readonly string[]; children: React.ReactNode }) {
+export function PageLoadGate({ expect, children, fallback = null }: { expect: readonly string[]; children: React.ReactNode; fallback?: React.ReactNode }) {
   const [readyIds, setReadyIds] = useState<Record<string, boolean>>({});
   const [revealed, setRevealed] = useState(false);
 
@@ -54,6 +59,7 @@ export function PageLoadGate({ expect, children }: { expect: readonly string[]; 
 
   return (
     <Ctx.Provider value={value}>
+      {!revealed && fallback}
       <div style={revealed ? undefined : { display: 'none' }}>{children}</div>
     </Ctx.Provider>
   );

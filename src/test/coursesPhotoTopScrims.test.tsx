@@ -17,7 +17,7 @@ vi.mock('@/components/courses/useStatBrowse', () => ({ useStatBrowseList: () => 
 vi.mock('@/components/explore-tab-new/courseled/CourseImageFallback', () => ({ CourseImageFallback: ({ children }: { children: React.ReactNode }) => <div data-photo="">{children}</div> }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', () => ({ useGalleryCourseMedia: () => ({ data: undefined, isError: false }) }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: vi.fn() }));
-vi.mock('@tanstack/react-query', async original => ({ ...await original<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: { queryKey: string[] }) => ({ data: { pages: [options.queryKey[1] === 'get_latest_hole_media' ? f.holes : f.courses] }, isLoading: false, isError: false, hasNextPage: false, isFetching: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }) }));
+vi.mock('@tanstack/react-query', async original => ({ ...await original<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: { queryKey: string[] }) => ({ data: { pages: [options.queryKey[1] === 'get_latest_hole_media' ? f.holes : f.courses] }, isLoading: false, isFetched: true, isError: false, hasNextPage: false, isFetching: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }) }));
 
 import { PhotoFigureCard } from '@/components/courses/browse/PhotoFigureCard';
 import { HardestSection } from '@/components/courses/browse/HardestSection';

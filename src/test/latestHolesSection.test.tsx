@@ -26,7 +26,7 @@ vi.mock('@/components/course-media-tab/hooks/useCoursePlaceMedia', () => ({ useC
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 
 vi.mock('@/components/course-media-tab/hooks/useCourseGallery', () => ({ useCourseGallery: () => f.open }));
-vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
+vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: f.loading, isFetched: !f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
 
 import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';

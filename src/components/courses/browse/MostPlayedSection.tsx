@@ -1,3 +1,4 @@
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { useStatBrowseList } from '../useStatBrowse';
 import { useSectionReady } from './PageLoadGate';
@@ -12,9 +13,11 @@ import { PhotoRailShell } from './sectionShells';
  * a per-course, per-index-band cell holds one member or none.
  */
 export function MostPlayedSection() {
+  const { loading: sessionLoading } = useSupabaseSession();
   const { rows, isLoading } = useStatBrowseList({ lens: 'played', country: null, region: null, limit: MOST_PLAYED_COUNT });
-  useSectionReady('mostPlayed', !isLoading);
-  if (isLoading) return <PhotoRailShell count={MOST_PLAYED_COUNT} />;
+  // Manual list loading starts true; no disabled-query ambiguity.
+  useSectionReady('mostPlayed', !sessionLoading && !isLoading);
+  if (sessionLoading || isLoading) return <PhotoRailShell count={MOST_PLAYED_COUNT} />;
   if (rows.length === 0) return null;
 
   return (

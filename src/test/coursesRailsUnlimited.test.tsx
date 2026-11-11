@@ -14,7 +14,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc, from:
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: f.open }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'admin' } }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', () => ({ useGalleryCourseMedia: () => ({ data: undefined, isError: false }) }));
-vi.mock('@/components/courses/browse/PageLoadGate', () => ({ useSectionReady: f.ready }));
+vi.mock('@/components/courses/browse/PageLoadGate', async original => ({ ...await original<typeof import('@/components/courses/browse/PageLoadGate')>(), useSectionReady: f.ready }));
 
 type Row = LatestHoleMedia | LatestCourseMedia;
 const kinds = [

@@ -15,7 +15,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtCount, plural, RAIL_BLEED } from './format';
 import { firstName } from '@/lib/whs/share';
-import { useSectionReady } from './PageLoadGate';
+import { settled, useSectionReady } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
 
 /**
@@ -49,7 +49,7 @@ interface CourseGroup {
 export function WhoPlayingSection() {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const roundsQuery = useCircleLatestRounds(user?.id, { limit: ROUND_LIMIT, allowMultiplePerFriend: true });
   const groups = useMemo(() => {
     const rows = [...(roundsQuery.data ?? [])].sort((a, b) => b.play_date.localeCompare(a.play_date));
@@ -70,9 +70,11 @@ export function WhoPlayingSection() {
   const courseIds = useMemo(() => groups.map((g) => g.courseId).filter((v): v is string => !!v), [groups]);
   const metaQuery = useCourseCardMeta(courseIds);
   const meta = metaQuery.data;
-  useSectionReady('whoPlaying', !roundsQuery.isLoading && !metaQuery.isLoading);
+  const ready = !sessionLoading && (!user || (settled(roundsQuery) && (courseIds.length === 0 || settled(metaQuery))));
+  useSectionReady('whoPlaying', ready);
 
-  const loading = roundsQuery.isLoading || metaQuery.isLoading;
+  const loading = !ready;
+  if (loading) return <WhoPlayingShell />;
   if (groups.length === 0) return loading ? <WhoPlayingShell /> : null;
 
   return (

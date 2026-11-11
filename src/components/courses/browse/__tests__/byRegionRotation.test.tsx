@@ -5,10 +5,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { BrowseRegion } from '../../useStatBrowse';
 
 const s = vi.hoisted(() => ({ regions: [] as BrowseRegion[], clubId: null as string | null, homeRegion: null as string | null, session: { user: { id: 'u' } as { id: string } | null, loading: false } }));
-vi.mock('../../useStatBrowse', () => ({ useCourseBrowseTruth: () => ({ data: { regions: s.regions }, isLoading: false }) }));
-vi.mock('../PageLoadGate', () => ({ useSectionReady: () => {} }));
+vi.mock('../../useStatBrowse', () => ({ useCourseBrowseTruth: () => ({ data: { regions: s.regions }, isLoading: false, isFetched: true }) }));
+vi.mock('../PageLoadGate', async original => ({ ...await original<typeof import('../PageLoadGate')>(), useSectionReady: () => {} }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => s.session }));
-vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => ({ clubId: s.clubId, isLoading: false }) }));
+vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => ({ clubId: s.clubId, isLoading: false, isFetched: true }) }));
 vi.mock('@/features/home-club/homeClubPickerStore', () => ({ openHomeClubPicker: () => {} }));
 vi.mock('@/integrations/supabase/client', () => {
   const chain: Record<string, unknown> = {};

@@ -48,6 +48,7 @@ import {
 import { RailChips } from '@/components/ui/RailChips';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
+import { useSectionReady } from './browse/PageLoadGate';
 import { BrowseCourseCard, PHOTO_H as BROWSE_PHOTO_H } from './BrowseCourseCard';
 
 /** Gap between browse cards; the list and its shell both read it. */
@@ -214,6 +215,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     country,
     region,
   });
+
+  // The list hook's manual loading flag starts true and covers its dependent reads.
+  useSectionReady('list', !isLoading);
 
   /* INLINE NAME SEARCH (Ben, 14 Sep). Narrows what the country/region/lens
      controls have already selected: a plain case-insensitive contains-match

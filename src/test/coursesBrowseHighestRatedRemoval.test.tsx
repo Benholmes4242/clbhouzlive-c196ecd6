@@ -14,16 +14,17 @@ const readySection = vi.hoisted(() => async (id: string) => {
   };
 });
 
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: null, loading: false }) }));
 vi.mock('@/components/courses/useStatBrowse', () => ({
-  useCourseBrowseTruth: () => ({ data: null, isLoading: false }),
+  useCourseBrowseTruth: () => ({ data: null, isLoading: false, isFetched: true }),
   useStatBrowseList: () => ({ rows: [], isLoading: false }),
 }));
-vi.mock('@/components/courses/useBrowseReviews', () => ({ useBrowseReviews: () => ({ pool: [], isLoading: false }) }));
+vi.mock('@/components/courses/useBrowseReviews', () => ({ useBrowseReviews: () => ({ pool: [], isLoading: false, isPending: false }) }));
 vi.mock('@/stores/reviewSheetStore', () => ({
   useReviewSheetStore: (sel?: (s: { open: () => void }) => unknown) => sel?.({ open: () => {} }),
 }));
 vi.mock('@/components/courses/CourseMasthead', () => ({ HERO_FIGURE_LABEL: {}, HERO_FIGURE_VALUE: {} }));
-vi.mock('@/components/courses/StatBrowse', () => ({ default: () => null }));
+vi.mock('@/components/courses/StatBrowse', async () => ({ default: await readySection('list') }));
 vi.mock('@/components/courses/browse/WhoPlayingSection', async () => ({ WhoPlayingSection: await readySection('whoPlaying') }));
 vi.mock('@/components/courses/browse/ByRegionSection', async () => ({ ByRegionSection: await readySection('byRegion'), ALL_COURSES_ANCHOR: 'all-courses' }));
 vi.mock('@/components/courses/browse/LatestCoursesSection', async () => ({ LatestCoursesSection: await readySection('latestCourses') }));
@@ -53,9 +54,9 @@ describe('BRIEF_REMOVE_HIGHEST_RATED_SECTION', () => {
 
   it('the page gate opens once the remaining sections report ready', async () => {
     const view = mount();
-    const gateDiv = (view.container.firstElementChild as HTMLElement).children[1].firstElementChild as HTMLElement;
+    const gateDiv = view.container.querySelector('#all-courses')?.parentElement?.parentElement;
     // RTL flushes effects before render returns, so the gate is expected to
     // already be revealed — every remaining section reported ready at mount.
-    await waitFor(() => expect(gateDiv.style.display).toBe(''));
+    await waitFor(() => expect(gateDiv?.style.display).toBe(''));
   });
 });

@@ -8,6 +8,7 @@ const mockRows: { current: Partial<StatBrowseRow>[] } = { current: [] };
 vi.mock('../../useStatBrowse', () => ({
   useStatBrowseList: () => ({ rows: mockRows.current, isLoading: false }),
 }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: null, loading: false }) }));
 vi.mock('../PageLoadGate', () => ({ useSectionReady: () => {} }));
 
 import { pickToughFour, HardestSection } from '../HardestSection';
