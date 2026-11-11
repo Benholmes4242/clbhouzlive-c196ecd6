@@ -14,7 +14,7 @@ export function chartRows(rows: ArgumentRow[], all = false) {
 function Detail({ row, n, onOpenCourse }: { row?: ArgumentRow; n: number; onOpenCourse: (id: string) => void }) {
   return <div className="t100-compare-detail">{row ? <Button variant="ghost" className="t100-detail-button" onClick={() => onOpenCourse(row.id)} aria-label={`${row.name}, view course`}>
     <div className="t100-detail-thumb"><CourseImageFallback courseId={row.id} courseName={row.name} imageUrl={row.imageUrl} style={{ height: '100%' }} /></div>
-    <span className="t100-detail-copy"><b>{shortenCourseName(row.name)}</b><span className="t100-detail-order">Golfers <em>{ordinal(row.memberRank)}</em> · The list <em>{ordinal(row.listRank)}</em> of the {n} (officially {ordinal(row.publishedRank)})</span><span className="t100-why">{whyLine(row, n)}</span></span><ChevronRight size={14} />
+    <span className="t100-detail-copy"><b>{shortenCourseName(row.name)}</b><span className="t100-detail-order">Golfers <em>{ordinal(row.memberRank)}</em> · the list <em>{ordinal(row.listRank)}</em> of the {n} (officially {ordinal(row.publishedRank)})</span><span className="t100-why">{whyLine(row, n)}</span></span><ChevronRight size={14} />
   </Button> : <span className="t100-compare-hint">Tap a course to see why</span>}</div>;
 }
 function Chart({ rows, n, selected, onSelect }: { rows: ArgumentRow[]; n: number; selected: string | null; onSelect: (id: string) => void }) {
