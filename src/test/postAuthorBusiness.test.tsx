@@ -35,20 +35,22 @@ describe('postAuthor', () => {
     expect(postAuthorRoute(author)).toBe('/business/biz-1');
   });
 
-  it('returns the business identity for an actor_type business row that only has creator_* (long-form shape)', () => {
-    // get_long_form_videos_v2 carries the business in creator_* with a null username.
+  it('never falls back to creator_* for a business row, even when business_* is absent (long-form shape)', () => {
+    // get_long_form_videos_v2 now returns business_*; a raw row's creator_* can
+    // be the UPLOADER's personal profile, so a business with no logo must not
+    // show the uploader's photo (BUSINESS_AUTHORSHIP_APP_WIDE §1).
     const author = postAuthor({
       actor_type: 'business',
       actor_id: 'biz-1',
-      creator_display_name: 'Machrihanish Golf Club',
-      creator_avatar_url: 'https://cdn.example.com/logo.png',
+      creator_display_name: 'Mac Heed',
+      creator_avatar_url: 'https://cdn.example.com/uploader.png',
       creator_is_verified: true,
       creator_username: null,
     });
     expect(author.kind).toBe('business');
-    expect(author.name).toBe('Machrihanish Golf Club');
-    expect(author.avatarUrl).toBe('https://cdn.example.com/logo.png');
-    expect(author.isVerified).toBe(true);
+    expect(author.name).toBe('');
+    expect(author.avatarUrl).toBeNull();
+    expect(author.isVerified).toBe(false);
     expect(author.handle).toBeNull();
   });
 
