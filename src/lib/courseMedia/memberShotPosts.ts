@@ -70,14 +70,12 @@ const shortCoursePart = (name: string) => {
 const holeDetail = (row: MemberShotRow) => row.par != null
   ? `Par ${row.par}${row.yards != null ? ` · ${row.yards} yards` : ''}` : undefined;
 
-/** One mapping owns ready-video filtering, item ids and hole caption facts. */
-function holeShotItems(rows: readonly MemberShotRow[], courseName: string, holeNo: number,
-  perItemCourse = false) {
-  const readyRows = rows.filter(row => row.media_type !== 'video' || row.duration_seconds != null);
-  const hubRows: HubRpcRow[] = readyRows.map(row => {
-    const creditActorType = row.credit_actor_type ?? 'personal';
-    const businessShot = creditActorType === 'business';
-    return {
+/** One hole row → one hub row. Exported so the business-credit mapping is
+ *  testable without rendering the synthetic carousel. */
+export function memberShotToHubRow(row: MemberShotRow, courseName: string, perItemCourse = false): HubRpcRow {
+  const creditActorType = row.credit_actor_type ?? 'personal';
+  const businessShot = creditActorType === 'business';
+  return {
     post_id: row.id, media_id: row.id, post_created_at: row.added_at ?? null,
     post_user_id: row.member_id ?? null,
     post_actor_type: creditActorType,
@@ -95,7 +93,14 @@ function holeShotItems(rows: readonly MemberShotRow[], courseName: string, holeN
     } : {}),
     review_course_id: row.course_id, review_course_name: perItemCourse ? row.course_name ?? '' : courseName,
     like_count: 0, comment_count: 0, share_count: 0,
-  };});
+  };
+}
+
+/** One mapping owns ready-video filtering, item ids and hole caption facts. */
+function holeShotItems(rows: readonly MemberShotRow[], courseName: string, holeNo: number,
+  perItemCourse = false) {
+  const readyRows = rows.filter(row => row.media_type !== 'video' || row.duration_seconds != null);
+  const hubRows: HubRpcRow[] = readyRows.map(row => memberShotToHubRow(row, courseName, perItemCourse));
   return toFeedPosts(hubRows).flatMap((post, index) => {
     const row = readyRows[index];
     if (!row) return [];
