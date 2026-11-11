@@ -1,9 +1,11 @@
 # Roadmap
 
-## In progress: Top 100 leaderboard finish
-Restore complete panel hook mocks; replace four retired dropdown tests with two.
-Use numeric sheet positions, ring-free avatars and retained page-card rows during list switching.
-Run four fresh sequential shards against 8,265; report every test delta and commit.
+## Done: Top 100 leaderboard finish
+Complete panel hook mocks restored; four retired dropdown tests replaced with two.
+Numeric sheet positions, ring-free avatars and retained page-card rows verified by focused tests.
+Four fresh sequential shards: 2,136 / 1,982 / 2,128 / 2,043 = 8,289 passed, zero failures.
+Against 8,265: prior leaderboard build +23, this finish +3 new / -2 replacements = +24 net.
+Report: /mnt/documents/TOP100_LEADERBOARD_FINISH_REPORT.md. No new screen verification.
 Older roadmap entries are historical and do not authorise unrelated work in this brief.
 
 ## Done: Store-link suite rerun
