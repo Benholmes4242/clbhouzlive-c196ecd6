@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { avatarFallbackFill, AVATAR_FALLBACK_INK } from '@/lib/avatarFallback';
 import { AddressAutocomplete, type AddressValue } from '@/components/business/AddressAutocomplete';
 import { CountrySelector, getCountryCode, getCountryDisplayName } from '@/components/business/CountrySelector';
 import { PinDropModal } from '@/components/business/PinDropModal';
