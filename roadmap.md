@@ -1,5 +1,9 @@
 # Roadmap
 
+## In progress: Store-link suite rerun
+Requested assertions and HTTPS/insecure business-link case already present; no duplicate case or source change.
+Rerun shards 1/4 through 4/4 sequentially; picker screenshot skipped by request. Expected inventory unchanged at 8,206.
+
 ## In progress: WEB_HOMEPAGE_1B completion
 Both fixes implemented; focused 30 passed. Sequential shards: 1=2,133 passed; 2=1,958 passed; 3=2,110 passed /1 failed. Shard 4 not run under the stop rule.
 STOP: src/test/guestStage24.test.tsx:85:18, `AssertionError: expected [ '/auth' ] to deeply equal [ '/auth', '/' ]`. Guest code/test unchanged; no repair or rerun.
