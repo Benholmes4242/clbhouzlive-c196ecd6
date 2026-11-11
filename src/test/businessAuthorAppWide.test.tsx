@@ -105,7 +105,7 @@ describe('useDiscoverMediaPreview — gallery previews name the business', () =>
           content: 'A day on the links', created_at: '2026-11-01T00:00:00Z',
           course_id: null, tagged_course_ids: null, whs_score_id: null,
           like_count: 0, comment_count: 0,
-          post_media: [{ id: 'm1', media_type: 'image', media_url: 'https://shot', poster_url: null, hls_url: null, stream_id: null, width: 1080, height: 1080, duration_seconds: null, display_order: 0 }],
+          post_media: [{ id: 'm1', media_type: 'video', media_url: 'https://shot', poster_url: null, hls_url: null, stream_id: null, width: 1080, height: 1080, duration_seconds: null, display_order: 0 }],
         }],
       },
       public_profiles: { data: [{ id: 'uploader-1', username: 'machgolfclub', display_name: 'Mac Heed', profile_photo_url: 'https://me' }] },
