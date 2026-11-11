@@ -30,11 +30,7 @@ import { ReviewMediaStrip } from '@/components/courses/review/ReviewMediaStrip';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import type { CourseReview } from '@/hooks/useCourseReviews';
 
-const getInitials = (name: string) => {
-  const parts = name.split(' ').filter(Boolean);
-  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  return name.slice(0, 2).toUpperCase();
-};
+const getInitials = (name: string) => getInitialsFromName(name);
 
 export const formatReviewDate = (dateString?: string | null) => {
   if (!dateString) return '';

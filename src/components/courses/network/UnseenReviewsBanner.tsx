@@ -47,7 +47,7 @@ export function UnseenReviewsBanner() {
           src={latest.reviewer_avatar}
           alt={latest.reviewer_name}
           userId={latest.reviewer_id}
-          fallback={latest.reviewer_name.slice(0, 2).toUpperCase()}
+          fallback={getInitialsFromName(latest.reviewer_name) || '?'}
           hairlineRing
         />
       </div>
