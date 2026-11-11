@@ -18,6 +18,7 @@ import {
 import { TOP100_PHOTO_H } from '../BrowseCourseCard';
 import { TOP100_CARD_GAP } from '../Top100CoursesHubPanel';
 import { ARGUMENT_ROW_GAP, ARGUMENT_THUMB } from './TheArgumentSection';
+import './top100Compare.css';
 
 
 function Head({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,7 @@ export function YourHundredShell() {
 export function ArgumentShell() {
   return (
     <Head>
+      <div className="t100b-chart-shell">{Array.from({length:10},(_,i) => <div className="t100b-shell-row" key={i}><Bar className="t100b-shell-name" /><Bar className="t100b-shell-track" /></div>)}</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: ARGUMENT_ROW_GAP }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: ARGUMENT_ROW_GAP }}>
           <Bar style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, flexShrink: 0 }} />

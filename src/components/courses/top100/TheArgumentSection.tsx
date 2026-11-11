@@ -1,11 +1,11 @@
 import React from 'react';
 import { ArrowDown, ArrowUp, ChevronRight } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { SectionHead, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import type { ArgumentRow } from './theArgument';
+import { shortenCourseName, whyLine, type ArgumentRow } from './theArgument';
+import { Top100CompareChart } from './Top100CompareChart';
+import './top100Compare.css';
 import { ordinal } from '@/lib/text/numbers';
 
 /* Row geometry, read by the rows AND their shell (BRIEF_COURSES_SKELETONS 3.4). */
@@ -13,6 +13,9 @@ export const ARGUMENT_THUMB = { size: 52, radius: 8 } as const;
 export const ARGUMENT_ROW_GAP = 12;
 
 interface Props {
+  rows?: ArgumentRow[];
+  renderedList?: string;
+  listLabel?: string;
   higher: ArgumentRow[];
   lower: ArgumentRow[];
   ratedCount: number;
@@ -43,14 +46,12 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
           /* Positive = golfers moved it UP over the last four weeks. */
           const move = baseline?.has(r.id) ? (baseline.get(r.id) as number) - r.memberRank : null;
           return (
-            <Button
+            <button
               key={r.id}
               type="button"
-              variant="ghost"
               aria-label={`${r.name}, open course`}
               onClick={() => onOpenCourse(r.id)}
-              className="h-auto rounded-none justify-start active:scale-100 active:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-auto"
-              style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: 0, color: 'inherit', font: 'inherit', cursor: 'pointer', minHeight: 52, WebkitTapHighlightColor: 'transparent' }}
+              className="t100b-argument-button"
             >
               <div style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, overflow: 'hidden', flexShrink: 0 }}>
                 <CourseImageFallback courseId={r.id} courseName={r.name} imageUrl={r.imageUrl} style={{ height: '100%' }} />
@@ -69,6 +70,7 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
                 <div style={{ marginTop: 1, fontSize: 11.5, lineHeight: 1.35, color: A.DIM, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   Officially ranked <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.publishedRank)}</b>
                 </div>
+                <div className="t100b-why">{whyLine(r,ratedCount)}</div>
               </div>
               <div style={{ flexShrink: 0, textAlign: 'right' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 800, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
@@ -91,7 +93,7 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
                 ) : null}
               </div>
               <ChevronRight size={14} strokeWidth={2.5} style={{ color: A.DIM, flexShrink: 0, marginLeft: -4 }} aria-hidden />
-            </Button>
+            </button>
           );
         })}
       </div>
@@ -99,18 +101,18 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
   );
 }
 
-/** BRIEF_TOP100_GOLFERS_VS_OFFICIAL. The caller renders nothing when both groups are empty. */
-export function TheArgumentSection({ higher, lower, baseline, ratedCount, onOpenCourse }: Props) {
-  if (higher.length === 0 && lower.length === 0) return null;
+/** Exactly one active-list section; empty small qualifying sets are omitted by the panel. */
+export function TheArgumentSection({ rows, renderedList, listLabel = 'Global', higher, lower, baseline, ratedCount, onOpenCourse }: Props) {
+  const all = rows ?? [...higher, ...lower];
+  const leader = all.find(r => r.memberRank === 1) ?? [...all].sort((a,b) => a.memberRank-b.memberRank)[0];
+  if (!leader) return null;
+  const shared = all.filter(r => r.listRank <= 10 && r.memberRank <= 10).length;
   return (
-    <section style={SECTION_WRAP}>
-      <SectionHead kicker="Golfers versus the official list" title="Where the ratings and the rankings differ" />
-      {/* Sub-line geometry matches "The list" ("Ranked by clbhouz members'
-          average rating."): 8 / 12 / 1.4 / A.DIM. The qualifying count is no
-          longer printed. */}
-      <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
-        The courses that vary the most between the golfers' ratings and the official rankings.
-      </div>
+    <section className="t100b-section" data-golfers-versus={renderedList}>
+      <div className="t100b-kicker amber">GOLFERS VERSUS THE OFFICIAL LIST</div>
+      <div className="t100b-title">Golfers put {shortenCourseName(leader.name)} 1st. The list has it {ordinal(leader.publishedRank)}.</div>
+      <div className="t100b-sub">{ratedCount} {listLabel} courses have three or more golfer ratings.{ratedCount >= 10 ? ` Golfers and the list share ${shared} of their top 10.` : ''}</div>
+      {rows ? <Top100CompareChart rows={rows} onOpenCourse={onOpenCourse} /> : null}
       <ArgumentGroup label="Golfers rate higher" rows={higher} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
       <ArgumentGroup label="Golfers rate lower" rows={lower} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
     </section>
