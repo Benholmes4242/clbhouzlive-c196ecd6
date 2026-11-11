@@ -108,7 +108,8 @@ describe('videoUnit VideoCard', () => {
         autoplay={false}
       />,
     );
-    expect(screen.getByText('MC')).toBeTruthy();
+    // The poster tile and the author avatar both derive the same initials.
+    expect(screen.getAllByText('MC').length).toBeGreaterThan(0);
     expect(screen.queryByText('M')).toBeNull();
   });
 });
