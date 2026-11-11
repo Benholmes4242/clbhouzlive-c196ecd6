@@ -13,6 +13,7 @@
  *   deterministic gradient picked from the business id.
  */
 import { useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal, Plus, Eye, Share, Trash2, ShieldCheck, Globe, Clock, AlertCircle, Flag } from 'lucide-react';

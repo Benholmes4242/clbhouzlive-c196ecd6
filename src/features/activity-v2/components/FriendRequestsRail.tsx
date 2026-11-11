@@ -1,4 +1,5 @@
 import React from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import { useBusinessDirectory, BusinessDirectoryItem } from '@/hooks/useBusinessDirectory';
 import { Button } from '@/components/ui/button';

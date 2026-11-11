@@ -5,6 +5,7 @@
  * Embedded footer spacing mirrors EnglandGolfForm so setup hosts retain their gutter ownership.
  */
 import React from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';

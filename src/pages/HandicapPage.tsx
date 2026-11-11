@@ -1,4 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 /**
  * HandicapPage — Top-level Handicap route.
  *

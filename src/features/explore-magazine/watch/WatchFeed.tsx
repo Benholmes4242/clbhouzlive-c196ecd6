@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import './explore-top.css';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';

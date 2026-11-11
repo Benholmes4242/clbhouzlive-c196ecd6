@@ -14,6 +14,7 @@
  * NO NEGATIVE LETTER-SPACING anywhere in this sheet.
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowUpRight, Bookmark, Calendar, Check, ChevronRight, Link as LinkIcon,

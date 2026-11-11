@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { INK_ON_LIGHT, MEMBER_CELL, PAGE_CANVAS, inkWithAlpha } from '@/lib/tokens/surfaces';
