@@ -70,6 +70,7 @@ export function useDiscoverMediaPreview(enabled: boolean) {
         const lead = media[0];
         if (!lead) return [];
         const profile = profileById.get(row.user_id) as any;
+        const business = row.actor_type === 'business' && row.actor_id ? businessById.get(row.actor_id) as any : null;
         const courseId = row.tagged_course_ids?.[0] ?? row.course_id ?? null;
         const isVideo = lead.media_type === 'video';
         const ready = isVideo && lead.duration_seconds != null;
@@ -94,10 +95,10 @@ export function useDiscoverMediaPreview(enabled: boolean) {
           userId: row.user_id,
           actorType: (row.actor_type as FeedPost['actorType']) ?? 'personal',
           actorId: row.actor_id ?? row.user_id,
-          username: profile?.username ?? '',
-          displayName: profile?.display_name ?? profile?.username ?? 'Player',
-          avatarUrl: profile?.profile_photo_url ?? '',
-          isVerified: false,
+          username: business ? '' : profile?.username ?? '',
+          displayName: business ? business.name ?? '' : profile?.display_name ?? profile?.username ?? 'Player',
+          avatarUrl: business ? business.logo_url ?? '' : profile?.profile_photo_url ?? '',
+          isVerified: business ? !!business.is_verified : false,
           creatorRelation: 'none',
           caption: row.content ?? '',
           mediaItems: [leadItem],
