@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: WEB_HOMEPAGE_1
+Replace AppDownloadGate with the signed-off web homepage; preserve routing, invite attribution, badges and legal links.
+Use only the authorised public homepage RPCs and existing course search; add guards and run four shards separately.
+Verify none/invite widths at 1280/390/320 and report production BootHold without changing it.
+Current verified baseline is 8,173 (the brief's 8,038 is historical).
+
 ## Verified: Explore gallery business identity; two screenshots blocked
 Preview identity uses actor_type; missing-business regression passes. No existing tests rewritten.
 Separate shards 2,125 / 1,956 / 2,077 / 2,015 = 8,173 passing (+1 from 8,172).
