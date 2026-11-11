@@ -133,7 +133,7 @@ const CircleList: React.FC<{ preview: CirclePreview; h: number }> = ({ preview, 
         <span className="connect-seat-slot" aria-hidden="true" />
       </div> :
       <div className="connect-seat-row" key={row.user_id} data-seat-person={row.user_id}>
-        {row.avatar_url ? <img className="connect-seat-avatar" src={row.avatar_url} alt="" /> : <span className="connect-seat-avatar">{(row.name || '?').charAt(0).toUpperCase()}</span>}
+        {row.avatar_url ? <img className="connect-seat-avatar" src={row.avatar_url} alt="" /> : <span className="connect-seat-avatar">{getInitialsFromName(row.name) || '?'}</span>}
         <div className="connect-seat-name"><b>{row.name}</b>{row.club ? <span>{row.club}</span> : null}</div>
         <span className="connect-seat-index">{formatIndex(row.index)}</span>
       </div>)}

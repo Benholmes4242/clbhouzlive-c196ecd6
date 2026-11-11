@@ -139,7 +139,7 @@ export function PublicLanding({
                   color: inkWithAlpha(INK, 0.72),
                 }}
               >
-                {name.charAt(0).toUpperCase()}
+                {getInitialsFromName(name) || '?'}
               </span>
             )}
             {name ? (

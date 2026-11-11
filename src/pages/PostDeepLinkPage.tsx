@@ -370,7 +370,7 @@ const PostDeepLinkPage: React.FC = () => {
                   color: 'rgba(248,250,252,0.82)',
                 }}
               >
-                {displayName.charAt(0).toUpperCase()}
+                {getInitialsFromName(displayName) || '?'}
               </div>
             )}
             <div className="flex flex-col">

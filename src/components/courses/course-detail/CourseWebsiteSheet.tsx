@@ -644,7 +644,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                       ) : (
-                        (player.display_name ?? '?').trim().charAt(0).toUpperCase()
+                        getInitialsFromName(player.display_name) || '?'
                       )}
                     </div>
                   ))}

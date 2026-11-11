@@ -70,7 +70,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               size={30}
               src={activeActor.avatarUrl}
               alt={activeActor.name}
-              fallback={initials}
               hairlineRing
             />
 

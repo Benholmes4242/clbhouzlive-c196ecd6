@@ -351,7 +351,7 @@ export function BusinessCommandCard({
               <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
             ) : (
               <span className="text-[18px] font-semibold" style={{ color: BIZ.inkMute }}>
-                {business.name.charAt(0).toUpperCase()}
+                {getInitialsFromName(business.name) || '?'}
               </span>
             )}
             {/* Canonical 1px traced hairline ring — A.BORDER white-alpha */}
