@@ -24662,6 +24662,9 @@ export type Database = {
           added_at: string
           course_id: string
           course_name: string
+          credit_actor_id: string
+          credit_actor_type: string
+          credit_is_verified: boolean
           duration_seconds: number
           hole_no: number
           id: string
@@ -24726,6 +24729,9 @@ export type Database = {
           course_id: string
           course_name: string
           created_at: string
+          credit_actor_id: string
+          credit_actor_type: string
+          credit_is_verified: boolean
           duration_seconds: number
           exif_captured_at: string
           hole_no: number
@@ -24896,6 +24902,9 @@ export type Database = {
         Returns: {
           actor_id: string
           actor_type: string
+          business_is_verified: boolean
+          business_logo_url: string
+          business_name: string
           comment_count: number
           course_id: string
           course_name: string
