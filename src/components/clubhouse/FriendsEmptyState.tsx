@@ -423,8 +423,6 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
   onOpenProfile,
 }) => {
   const initials = getInitialsFromName(creator.displayName) || '?';
-    .slice(0, 2)
-    .toUpperCase();
 
   return (
     <div
