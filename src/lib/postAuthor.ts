@@ -13,6 +13,12 @@
  *                creator_is_verified (or the normalized displayName/avatarUrl/
  *                username/isVerified on a FeedPost)
  *
+ * creator_* is NEVER read for a business post: on a raw RPC row those columns
+ * can be the uploader's personal profile, so a business with no logo would
+ * show the uploader's photo. A business with no business_* fields renders
+ * with an empty name and a null avatar (the dark initials fallback), never
+ * the uploader.
+ *
  * feedMapper already applies this rule to normalized FeedPosts; this helper
  * exists for every renderer that reads a RAW row (Watch tiles, hub rows,
  * community rails) so the selection can never drift between surfaces.
@@ -72,12 +78,11 @@ export function postAuthor(row: PostAuthorRow): PostAuthor {
       name:
         row.business_name ??
         row.businessName ??
-        row.creator_display_name ??
         row.displayName ??
         '',
       avatarUrl:
-        row.business_logo_url ?? row.businessLogoUrl ?? row.creator_avatar_url ?? row.avatarUrl ?? null,
-      isVerified: !!(row.business_is_verified ?? row.creator_is_verified ?? row.isVerified),
+        row.business_logo_url ?? row.businessLogoUrl ?? row.avatarUrl ?? null,
+      isVerified: !!(row.business_is_verified ?? row.isVerified),
       handle: null,
     };
   }

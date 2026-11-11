@@ -47,22 +47,30 @@ export function useDiscoverMediaPreview(enabled: boolean) {
       const rows = (data ?? []) as unknown as Row[];
       const userIds = [...new Set(rows.map((row) => row.user_id))];
       const courseIds = [...new Set(rows.flatMap((row) => [row.tagged_course_ids?.[0], row.course_id]).filter((id): id is string => !!id))];
-      const [{ data: profiles }, { data: courses }] = await Promise.all([
+      // BUSINESS AUTHORSHIP: business rows are named by business_accounts,
+      // never by the uploader's public_profiles row.
+      const businessIds = [...new Set(rows.filter((row) => row.actor_type === 'business' && row.actor_id).map((row) => row.actor_id as string))];
+      const [{ data: profiles }, { data: courses }, { data: businesses }] = await Promise.all([
         userIds.length
           ? supabase.from('public_profiles').select('id, username, display_name, profile_photo_url').in('id', userIds)
           : Promise.resolve({ data: [] }),
         courseIds.length
           ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
           : Promise.resolve({ data: [] }),
+        businessIds.length
+          ? supabase.from('business_accounts').select('id, name, logo_url, is_verified').in('id', businessIds)
+          : Promise.resolve({ data: [] }),
       ]);
       const profileById = new Map((profiles ?? []).map((profile: any) => [profile.id as string, profile]));
       const courseById = new Map((courses ?? []).map((course: any) => [course.id as string, course.name as string]));
+      const businessById = new Map((businesses ?? []).map((business: any) => [business.id as string, business]));
 
       const mapped = rows.flatMap((row): CommunityLibraryItem[] => {
         const media = [...(row.post_media ?? [])].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
         const lead = media[0];
         if (!lead) return [];
         const profile = profileById.get(row.user_id) as any;
+        const business = row.actor_type === 'business' && row.actor_id ? businessById.get(row.actor_id) as any : null;
         const courseId = row.tagged_course_ids?.[0] ?? row.course_id ?? null;
         const isVideo = lead.media_type === 'video';
         const ready = isVideo && lead.duration_seconds != null;
@@ -87,10 +95,10 @@ export function useDiscoverMediaPreview(enabled: boolean) {
           userId: row.user_id,
           actorType: (row.actor_type as FeedPost['actorType']) ?? 'personal',
           actorId: row.actor_id ?? row.user_id,
-          username: profile?.username ?? '',
-          displayName: profile?.display_name ?? profile?.username ?? 'Player',
-          avatarUrl: profile?.profile_photo_url ?? '',
-          isVerified: false,
+          username: business ? '' : profile?.username ?? '',
+          displayName: business ? business.name ?? '' : profile?.display_name ?? profile?.username ?? 'Player',
+          avatarUrl: business ? business.logo_url ?? '' : profile?.profile_photo_url ?? '',
+          isVerified: business ? !!business.is_verified : false,
           creatorRelation: 'none',
           caption: row.content ?? '',
           mediaItems: [leadItem],

@@ -25,6 +25,13 @@ export interface MemberShotRow {
   member_id?: string | null;
   member_name?: string | null;
   member_avatar_url?: string | null;
+  /* BUSINESS AUTHORSHIP: get_hole_media / get_latest_hole_media return the
+     business as member_name / member_avatar_url when the shot came from a
+     business post, plus these credit columns naming the real actor. The
+     credit line keeps reading member_*; the ACTOR fields route taps. */
+  credit_actor_type?: 'business' | 'personal' | null;
+  credit_actor_id?: string | null;
+  credit_is_verified?: boolean | null;
   hole_no?: number;
   par?: number | null;
   yards?: number | null;
@@ -63,19 +70,37 @@ const shortCoursePart = (name: string) => {
 const holeDetail = (row: MemberShotRow) => row.par != null
   ? `Par ${row.par}${row.yards != null ? ` · ${row.yards} yards` : ''}` : undefined;
 
+/** One hole row → one hub row. Exported so the business-credit mapping is
+ *  testable without rendering the synthetic carousel. */
+export function memberShotToHubRow(row: MemberShotRow, courseName: string, perItemCourse = false): HubRpcRow {
+  const creditActorType = row.credit_actor_type ?? 'personal';
+  const businessShot = creditActorType === 'business';
+  return {
+    post_id: row.id, media_id: row.id, post_created_at: row.added_at ?? null,
+    post_user_id: row.member_id ?? null,
+    post_actor_type: creditActorType,
+    post_actor_id: row.credit_actor_id ?? row.member_id ?? null,
+    post_status: 'published',
+    media_type: row.media_type, media_url: row.media_url, poster_url: row.poster_url ?? null,
+    stream_id: row.stream_id ?? null, duration_seconds: row.duration_seconds ?? null,
+    width: row.width ?? null, height: row.height ?? null, creator_display_name: row.member_name ?? null,
+    /* Business shots carry the business in member_*; mirror it into the
+       business_* fields so postAuthor never reads the uploader's creator_*. */
+    ...(businessShot ? {
+      business_name: row.member_name ?? null,
+      business_logo_url: row.member_avatar_url ?? null,
+      business_is_verified: row.credit_is_verified ?? null,
+    } : {}),
+    review_course_id: row.course_id, review_course_name: perItemCourse ? row.course_name ?? '' : courseName,
+    like_count: 0, comment_count: 0, share_count: 0,
+  };
+}
+
 /** One mapping owns ready-video filtering, item ids and hole caption facts. */
 function holeShotItems(rows: readonly MemberShotRow[], courseName: string, holeNo: number,
   perItemCourse = false) {
   const readyRows = rows.filter(row => row.media_type !== 'video' || row.duration_seconds != null);
-  const hubRows: HubRpcRow[] = readyRows.map(row => ({
-    post_id: row.id, media_id: row.id, post_created_at: row.added_at ?? null,
-    post_user_id: row.member_id ?? null, post_actor_type: 'personal', post_status: 'published',
-    media_type: row.media_type, media_url: row.media_url, poster_url: row.poster_url ?? null,
-    stream_id: row.stream_id ?? null, duration_seconds: row.duration_seconds ?? null,
-    width: row.width ?? null, height: row.height ?? null, creator_display_name: row.member_name ?? null,
-    review_course_id: row.course_id, review_course_name: perItemCourse ? row.course_name ?? '' : courseName,
-    like_count: 0, comment_count: 0, share_count: 0,
-  }));
+  const hubRows: HubRpcRow[] = readyRows.map(row => memberShotToHubRow(row, courseName, perItemCourse));
   return toFeedPosts(hubRows).flatMap((post, index) => {
     const row = readyRows[index];
     if (!row) return [];

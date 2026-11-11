@@ -129,7 +129,32 @@ export async function mapPublishedPost(row: any, viewer: PostViewerIdentity) {
         likedByMe = liked === true;
       }
 
-      return mapActivityPostToFeedPost(activityPost, { isLikedByMe: likedByMe });
+      const feedPost = mapActivityPostToFeedPost(activityPost, { isLikedByMe: likedByMe });
+
+      // BUSINESS AUTHORSHIP: mapActivityPostToFeedPost hard-codes the uploader's
+      // personal profile, so a shared link to a business post would open as the
+      // uploader. Resolve the business once and override the mapped identity.
+      // userId stays the uploader — the block check and ownership need it.
+      if (row.actor_type === 'business' && row.actor_id) {
+        const { data: business } = await supabase
+          .from('business_accounts')
+          .select('id, name, logo_url, is_verified, slug')
+          .eq('id', row.actor_id)
+          .maybeSingle();
+        // A failed or empty fetch keeps actorType 'business' with an empty
+        // name/avatar — NEVER the uploader's profile.
+        return {
+          ...feedPost,
+          actorType: 'business' as const,
+          actorId: row.actor_id,
+          displayName: business?.name ?? '',
+          username: '',
+          avatarUrl: business?.logo_url ?? '',
+          isVerified: !!business?.is_verified,
+        };
+      }
+
+      return feedPost;
 }
 
 export async function loadPublishedViewerPosts(ids: string[], viewer: PostViewerIdentity) {
