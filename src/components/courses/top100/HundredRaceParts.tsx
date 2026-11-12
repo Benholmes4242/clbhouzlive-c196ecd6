@@ -11,7 +11,7 @@ import { standingOrdinal } from '@/features/explore-magazine/ordinal';
 
 /** T100 owns only race presentation; foreground/neutral paint comes from the
  * global t100 tokens. Career figures and activity-grid figures are independent. */
-export function HundredYou({ slab, list, listLength, leaderValue }: { slab: HundredSlab; list: string; listLength: number; leaderValue: number }) {
+export function HundredYou({ slab, list, listLength, leaderValue, rows = [] }: { rows?: CareerRow[]; slab: HundredSlab; list: string; listLength: number; leaderValue: number }) {
   const { t, i18n } = useTranslation('courses');
   const track = useRef<HTMLDivElement>(null), caption = useRef<HTMLSpanElement>(null), leftLabel = useRef<HTMLSpanElement>(null), rightLabel = useRef<HTMLSpanElement>(null);
   const [captionLeft, setCaptionLeft] = useState(0);
@@ -34,7 +34,7 @@ export function HundredYou({ slab, list, listLength, leaderValue }: { slab: Hund
       total: slab.kind === 'played' ? slab.total : undefined, gap: clause?.gap,
       leader: clause?.kind === 'behind' ? clause.leader || t('discover.aMember') : undefined,
       second: clause?.kind === 'clear' ? clause.second || t('discover.aMember') : undefined,
-    }} components={{ b: <b className="tabular-nums" /> }} /></p>
+    }} components={{ b: <b className="tabular-nums" />, leader: <InlineProMemberName userId={rows[0]?.user_id}>{null}</InlineProMemberName>, second: <InlineProMemberName userId={rows[1]?.user_id}>{null}</InlineProMemberName> }} /></p>
     <div ref={track} className="t100-track" aria-hidden>
       <div data-hundred-fill className="t100-track-fill" style={{ width: `${share * 100}%` }} />
       {leaderValue > 0 ? <span data-leader-mark className="t100-leader-mark" style={{ left: `${mark * 100}%` }} /> : null}

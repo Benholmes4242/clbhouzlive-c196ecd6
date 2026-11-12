@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * ReviewOverlayCore — Frost Panel review overlay (PR 2 visual redesign).
  *
@@ -28,6 +29,7 @@ import {
 export type ReviewOverlayVariant = 'fullscreen' | 'tile';
 
 export interface ReviewOverlayCoreProps {
+  actorType?: string;
   courseName: string;
   courseLocation?: string;
   rating: number;
@@ -60,7 +62,7 @@ export interface ReviewOverlayCoreProps {
 // Tier pill removed (PR 5) — the score speaks for itself.
 
 const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
-  courseName,
+  courseName, actorType,
   courseLocation,
   rating,
   variant,
@@ -390,7 +392,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                     textOverflow: 'ellipsis',
                   }}
                 >
-                  {user.name}
+                  <InlineProMemberName userId={actorType === 'personal' ? user.id : undefined}>{user.name}</InlineProMemberName>
                 </span>
               </button>
               {coursesRated != null && (

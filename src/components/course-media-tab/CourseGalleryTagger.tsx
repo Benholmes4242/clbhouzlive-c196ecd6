@@ -34,7 +34,7 @@ export function CourseGalleryTagger({ courseId, shot, holes, onClose, onSaved }:
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const owned = !!user && shot.ownerId === user.id;
-  const source: OwnMediaSource = { url: holeSourceUrl(shot.item), mediaType: shot.item.type, streamId: shot.item.streamId ?? null,
+  const source: OwnMediaSource = { ownerUserId: shot.post.actorType === 'personal' ? shot.ownerId : null, actorType: shot.post.actorType, url: holeSourceUrl(shot.item), mediaType: shot.item.type, streamId: shot.item.streamId ?? null,
     posterUrl: shot.item.thumbnailUrl ?? null, createdAt: shot.addedAt, width: shot.item.width, height: shot.item.height, durationSeconds: shot.item.duration ?? null };
   const refresh = async () => {
     await Promise.all([

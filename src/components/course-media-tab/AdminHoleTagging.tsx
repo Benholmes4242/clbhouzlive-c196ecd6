@@ -19,6 +19,7 @@ import { HolePhotoBatchPath } from './HolePhotoFastPaths';
 
 export function adminBatchPhotos(rows: readonly AdminUntaggedMedia[]) {
   return orderedBatch(rows.map(row => ({
+    ownerUserId: row.owner_id, actorType: row.source === 'review' ? 'personal' : undefined,
     mediaId: row.media_id, ownerName: row.owner_name, url: row.media_url, createdAt: row.created_at,
     exif: { capturedAt: null, captureDay: null, latitude: null, longitude: null },
     mediaType: row.media_type === 'video' ? 'video' as const : 'image' as const,

@@ -258,8 +258,8 @@
       },
       "hundredSlab": {
         "played": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members.",
-        "playedBehind": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> behind {{leader}}.",
-        "playedClear": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> clear of {{second}}.",
+        "playedBehind": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> behind <leader>{{leader}}</leader>.",
+        "playedClear": "You've played <b>{{n}}</b> of the {{list}} Hundred, <b>{{pos}}</b> of <b>{{total}}</b> members and <b>{{gap}}</b> clear of <second>{{second}}</second>.",
         "playedJoint": "You've played <b>{{n}}</b> of the {{list}} Hundred, joint <b>{{pos}}</b> of <b>{{total}}</b> members.",
         "absent": "You haven't played one of the {{list}} Hundred yet.",
         "nobodyPast": "Nobody past {{n}}"

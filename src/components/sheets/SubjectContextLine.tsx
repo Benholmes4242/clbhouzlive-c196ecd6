@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * THE ONE CONTEXT LINE for the comments and likes sheets (BRIEF_COMMENTS_SHEET
  * G.3, lifted for BRIEF_LIKES_SHEET H.3 so the two sheets cannot drift).
@@ -10,6 +11,8 @@ import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 
 export interface SubjectContext {
+  authorUserId?: string | null;
+  actorType?: string;
   authorName: string | null;
   courseId: string | null;
   courseName: string | null;
@@ -47,7 +50,7 @@ export function SubjectContextLine({ subject, dataAttr = 'subject-context' }: { 
       className="truncate"
       style={{ ...FIGS, fontSize: 11, color: A.MUTE, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}
     >
-      <span style={strong}>{subject.authorName}</span>
+      <span style={strong}><InlineProMemberName userId={subject.actorType === 'personal' ? subject.authorUserId : undefined}>{subject.authorName}</InlineProMemberName></span>
       {' \u00B7 '}{shortCourseName(subject.courseName)}
       {tail}
     </div>

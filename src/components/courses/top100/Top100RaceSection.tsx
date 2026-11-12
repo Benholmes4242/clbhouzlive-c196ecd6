@@ -29,7 +29,7 @@ export function Top100RaceSection({ viewerId, list, total, onOpenCourse }: { vie
   return <>
     {loading ? <YourHundredShell /> : board.isError ? <section className="t100-race"><div className="t100-head"><SectionHead tone="quiet" kicker="Your hundred" title="The race" /></div><div className="t100-retry">Could not load the race. <Button variant="ghost" onClick={() => board.refetch()}>Retry</Button></div></section> : rows.length > 0 ? <section className="t100-race" data-top100-race>
       <div className="t100-head"><SectionHead tone="quiet" kicker="Your hundred" title="The race" /></div>
-      <HundredYou slab={hundredSlab(rows, viewerId)} list={RANK_SCOPE_LABEL[list]} listLength={total} leaderValue={Number(rows[0]?.value ?? 0)} />
+      <HundredYou rows={rows} slab={hundredSlab(rows, viewerId)} list={RANK_SCOPE_LABEL[list]} listLength={total} leaderValue={Number(rows[0]?.value ?? 0)} />
       {progress.isPending ? <div className="t100-rail-pending" aria-hidden /> : tiles.length > 0 ? <HundredRail key={list} tiles={tiles} onOpenCourse={onOpenCourse} /> : null}
       <div className="t100-rows">{top.map((r, i) => <HundredRaceRow key={r.user_id} row={r} viewerId={viewerId} total={total} previousViewer={i > 0 && Boolean(top[i - 1].is_viewer || top[i - 1].user_id === viewerId)} onPress={() => setMember({ row: r, list })} />)}
         {pinned ? <><div className="t100-break" aria-hidden>···</div><HundredRaceRow row={pinned} viewerId={viewerId} total={total} onPress={() => setMember({ row: pinned, list })} /></> : null}

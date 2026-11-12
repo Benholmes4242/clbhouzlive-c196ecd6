@@ -382,6 +382,8 @@ function likesSubjectOf(item: StreamItem): SubjectContext | null {
   if (item.kind !== 'round' && item.kind !== 'review') return null;
   return {
     authorName: item.who?.display_name?.trim() || null,
+    authorUserId: item.who?.user_id ?? null,
+    actorType: 'personal',
     courseId: item.subject?.course_id ?? null,
     courseName: item.subject?.course_name ?? null,
     kind: item.kind,

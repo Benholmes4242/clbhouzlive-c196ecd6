@@ -786,6 +786,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 isOwnRound={mediaFirstSlots?.likedByRound?.isOwnRound ?? false}
                 subject={mediaFirstSlots?.likedByRound ? mediaFirstSlots.likedByRound.subject : post.review ? {
                   authorName: post.displayName ?? null,
+                  authorUserId: post.actorType === 'personal' ? post.userId : null,
+                  actorType: post.actorType,
                   courseId: post.review.courseId ?? null,
                   courseName: post.review.courseName ?? null,
                   kind: 'review', gross: null, toPar: null,
@@ -931,6 +933,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             isOwnRound: item.who?.is_viewer === true,
             subject: {
               authorName: post.displayName ?? null,
+              authorUserId: post.actorType === 'personal' ? post.userId : null,
+              actorType: post.actorType,
               courseId: item.subject?.course_id ?? null,
               courseName: item.subject?.course_name ?? null,
               kind: 'round',

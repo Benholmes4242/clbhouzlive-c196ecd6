@@ -453,7 +453,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const ownFigure = rating != null && reviewerAvg != null ? formatDeviation(rating - reviewerAvg) : null;
   const courseFigure = showReference && communityAvg != null ? formatDeviation(rating - communityAvg) : null;
   const ownSub = reviewerAvg != null
-    ? `${firstName} rates ${reviewerAvg.toFixed(1)}`
+    ? <><InlineProMemberName userId={user.id}>{firstName}</InlineProMemberName>{` rates ${reviewerAvg.toFixed(1)}`}</>
     : 'Too few reviews to average';
   const courseSub = courseFigure != null
     ? `${ratingCount} ratings, ${communityAvg!.toFixed(1)} average`

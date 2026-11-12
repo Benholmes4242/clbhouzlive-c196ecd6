@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { MapPin, Flame } from 'lucide-react';
@@ -49,6 +50,8 @@ export interface OverlayCornersProps {
   
   // Bottom-left: Creator + Likes (stacked)
   creatorName?: string;
+  userId?: string | null;
+  actorType?: string;
   likes?: number;
   showCreator?: boolean;
   showLikes?: boolean;
@@ -92,7 +95,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   hotState = false,
   trendingLabel,
   onClubClick,
-  creatorName,
+  creatorName, userId, actorType,
   likes,
   showCreator = true,
   showLikes = false, // Default to false - likes removed from tile overlays
@@ -211,7 +214,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
               style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
               onClick={onCreatorClick}
             >
-              {creatorName}
+              <InlineProMemberName userId={actorType === 'personal' ? userId : undefined}>{creatorName}</InlineProMemberName>
             </button>
           )}
         </div>

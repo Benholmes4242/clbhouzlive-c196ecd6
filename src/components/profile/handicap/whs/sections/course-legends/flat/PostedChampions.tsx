@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /** CHAMPIONS_STATE_4: connected member with tracked rounds at this course.
  * Reach uses the explicit 'posted' basis; the member's posted value is their
  * own row on each board (CHAMPIONS_NET_SOURCE_1 RA1), never a recomputation.
@@ -161,16 +162,16 @@ function DefencePanel({ category, rival, defence, own90, rival90, attainedAt, vi
   const title = !rival ? 'Nobody else is on this board' : closing ? `${rival.name} is closing` : 'Nobody is closing on you';
   return <section className="champions-empty-section" data-section="your-defence" data-trend={defence?.trend ?? 'no-rival'}>
     <div className="champions-empty-kicker" style={VERDICT_KICKER}>Your defence</div>
-    <h2 style={TAB_TITLE}>{title}</h2>
+    <h2 style={TAB_TITLE}>{rival && closing ? <><InlineProMemberName userId={rival.userId}>{rival.name}</InlineProMemberName> is closing</> : title}</h2>
     {rival && <div className="champions-field-panel" style={{ background: A.PANEL }}>
       <div className="champions-field-record"><strong style={{ color: MEDAL_GOLD, fontSize: 32 }}>{defence?.margin}</strong><span style={{ color: A.MUTE }}>{unit ? <>{unit}<br /></> : null}clear</span></div>
-      <div className="champions-field-stats">{([[String(viewerTotal ?? '\u2014'), 'You'], [rival.valueDisplay, rival.name], ...(closing ? [[`+${defence?.gain90}`, `${rival.name} gains a quarter`], [defence?.date ? monthName(defence.date) : 'Beyond a year', `${rival.name} passes you`]] : [])] as string[][]).map(([value, label]) => <div key={label}><strong>{value}</strong><span style={{ color: A.DIM }}>{label}</span></div>)}</div>
+      <div className="champions-field-stats">{([[String(viewerTotal ?? '\u2014'), 'You'], [rival.valueDisplay, rival.name], ...(closing ? [[`+${defence?.gain90}`, `${rival.name} gains a quarter`], [defence?.date ? monthName(defence.date) : 'Beyond a year', `${rival.name} passes you`]] : [])] as string[][]).map(([value, label]) => <div key={label}><strong>{value}</strong><span style={{ color: A.DIM }}>{label.startsWith(rival.name) ? <><InlineProMemberName userId={rival.userId}>{rival.name}</InlineProMemberName>{label.slice(rival.name.length)}</> : label}</span></div>)}</div>
       {CHAMPIONS_BOARD_DATA[category].kind === 'cumulative' && own90 != null && rival90 != null && <div className="champions-defence-bars" aria-label="Last 90 days">
         <div className="champions-bar-group-label" style={{ color: A.DIM }}>LAST 90 DAYS</div>
-        {[[`You +${own90}`, own90, MEDAL_GOLD], [`${rival.name} +${rival90}`, rival90, A.DIM]].map(([caption, value, tone]) => <div className="champions-defence-track" key={String(caption)}><div className="champions-defence-bar" style={{ width: `${Number(value) / max * 100}%`, background: String(tone) }} /><span style={{ color: A.MUTE }}>{caption}</span></div>)}
+        {[[`You +${own90}`, own90, MEDAL_GOLD], [`${rival.name} +${rival90}`, rival90, A.DIM]].map(([caption, value, tone]) => <div className="champions-defence-track" key={String(caption)}><div className="champions-defence-bar" style={{ width: `${Number(value) / max * 100}%`, background: String(tone) }} /><span style={{ color: A.MUTE }}>{String(caption).startsWith(rival.name) ? <><InlineProMemberName userId={rival.userId}>{rival.name}</InlineProMemberName>{String(caption).slice(rival.name.length)}</> : caption}</span></div>)}
       </div>}
     </div>}
-    {closing && rival && rival90 != null && own90 != null && defence?.date && <div className="champions-empty-said" style={{ borderColor: MEDAL_GOLD, color: A.BODY }}>{rival.name} has added {rival90}{unit ? ` ${unit}` : ''} here since {monthName(since)} to your {own90}. At that rate {rival.name} takes this board in {monthName(defence.date)}.{held ? ` You have held it for ${held}.` : ''}</div>}
+    {closing && rival && rival90 != null && own90 != null && defence?.date && <div className="champions-empty-said" style={{ borderColor: MEDAL_GOLD, color: A.BODY }}><InlineProMemberName userId={rival.userId}>{rival.name}</InlineProMemberName> has added {rival90}{unit ? ` ${unit}` : ''} here since {monthName(since)} to your {own90}. At that rate <InlineProMemberName userId={rival.userId}>{rival.name}</InlineProMemberName> takes this board in {monthName(defence.date)}.{held ? ` You have held it for ${held}.` : ''}</div>}
     <div className="champions-empty-said" style={{ color: A.MUTE }}>{closing ? 'A rate is not a promise \u2014 it is the last ninety days carried forward, and ninety days of anybody\u2019s golf can turn. It is here because a board you cannot lose is not worth holding.' : defence?.trend === 'unknown' ? 'There is no honest pace for this board, so no date is given.' : rival ? 'Over the last 90 days nobody is closing on you.' : 'The first card from anyone else starts the chase.'}</div>
   </section>;
 }

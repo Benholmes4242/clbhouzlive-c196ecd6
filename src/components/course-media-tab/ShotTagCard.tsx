@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /** Media v3 has one presentation for single, member batch and admin batch.
  * Adapters own selection, writes, pending locks and undo; this shell owns the
  * simultaneous grids and read-only canonical thumbnail viewer. */
@@ -20,7 +21,7 @@ export function openTagShot(shot: TagShot, originEl: HTMLElement) {
   const posts = placeShotsToFeedPosts([{ id: shot.url, course_id: '', media_url: shot.url,
     media_type: shot.mediaType ?? 'image', poster_url: shot.posterUrl, stream_id: shot.streamId,
     duration_seconds: shot.durationSeconds, width: shot.width, height: shot.height,
-    added_at: shot.createdAt, member_name: shot.ownerName }], '', '', 'preview', '');
+    added_at: shot.createdAt, member_name: shot.ownerName, member_id: shot.actorType === 'personal' ? shot.ownerUserId : null }], '', '', 'preview', '');
   if (!posts.length) return;
   openWithOrigin({ posts, index: 0, originEl, posterUrl: shot.posterUrl ?? shot.url,
     mediaId: shot.url, openedFrom: 'course-media', options: { readOnly: true, syntheticPosts: true } });
@@ -56,7 +57,7 @@ export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole
         </div>
         <Button variant="ghost" className="media-v3-tag-close" aria-label={t('media.v3.close', { defaultValue: 'Close' })} disabled={pending} onClick={close}><X size={15} /></Button>
       </div>
-      {credit && <p className="media-v3-tag-credit">{credit}</p>}
+      {credit && <p className="media-v3-tag-credit">{shot.ownerName && credit.startsWith(shot.ownerName) ? <><InlineProMemberName userId={shot.actorType === 'personal' ? shot.ownerUserId : undefined}>{shot.ownerName}</InlineProMemberName>{credit.slice(shot.ownerName.length)}</> : credit}</p>}
       {strip}
       {children}
       <ShotTagChoices holes={holes} hole={hole} onHole={onHole} place={place} onPlace={onPlace} disabled={pending || locked} lockedHole={locked} />

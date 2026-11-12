@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * CommentsSheetV2 - the ONE comments sheet for posts, top-ten cards,
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
@@ -462,7 +463,7 @@ function CommentsSheetV2Inner({
                 <SkeletonRows />
               ) : threads.length === 0 ? (
                 /* G.2 / G.5 — two different situations, never one block of copy. */
-                <EmptyState hiddenCount={hiddenCount} name={subject?.authorFirstName ?? null} />
+                <EmptyState hiddenCount={hiddenCount} name={subject?.authorFirstName ?? null} userId={subject?.actorType === 'personal' ? subject.authorUserId : null} />
               ) : (
                 <div>
                   {threads.map((c, i) => (
@@ -663,7 +664,7 @@ export const CommentsSheetV2 = memo(CommentsSheetV2Inner);
 export default CommentsSheetV2;
 
 /** G.5 genuine empty (132px) and G.2 all-hidden, sharing one shell. */
-function EmptyState({ hiddenCount, name }: { hiddenCount: number; name: string | null }) {
+function EmptyState({ hiddenCount, name, userId }: { hiddenCount: number; name: string | null; userId?: string | null }) {
   const { t } = useTranslation('common');
   const hidden = hiddenCount > 0;
   return (
@@ -685,7 +686,7 @@ function EmptyState({ hiddenCount, name }: { hiddenCount: number; name: string |
         {hidden
           ? t('comments.hiddenLine', { count: hiddenCount })
           : name
-            ? <Trans t={t} i18nKey="comments.emptyLineTo" values={{ name }} components={{ b: <strong style={{ color: A.INK, fontWeight: 700 }} /> }} />
+            ? <Trans t={t} i18nKey="comments.emptyLineTo" values={{ name }} components={{ b: <InlineProMemberName userId={userId}><strong style={{ color: A.INK, fontWeight: 700 }} /></InlineProMemberName> }} />
             : t('comments.emptyLine')}
       </div>
     </div>

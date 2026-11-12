@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { ReviewOverlayCore } from './ReviewOverlayCore';
 
 interface ReviewTileOverlayProps {
+  actorType?: string;
   courseName: string;
   courseLocation?: string;
   rating: number;
@@ -28,7 +29,7 @@ interface ReviewTileOverlayProps {
  * Wrapped in React.memo to prevent unnecessary re-renders
  */
 const ReviewTileOverlayInner: React.FC<ReviewTileOverlayProps> = ({
-  courseName,
+  courseName, actorType,
   courseLocation,
   rating,
   user,
@@ -38,6 +39,7 @@ const ReviewTileOverlayInner: React.FC<ReviewTileOverlayProps> = ({
 }) => {
   return (
     <ReviewOverlayCore
+      actorType={actorType}
       courseName={courseName}
       courseLocation={courseLocation}
       rating={rating}

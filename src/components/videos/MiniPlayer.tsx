@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 // Poster-only chassis (Stage B5, BRIEF_VIDEO_TEARDOWN.md).
 // All hls / <video> / MediaRuntime / seek / progress playback logic severed.
 // The mini bar renders the poster thumbnail; controls remain as inert UI shells
@@ -15,6 +16,8 @@ import { MuteButton } from '@/audio/MuteButton';
 import { postAuthor } from '@/lib/postAuthor';
 
 type MiniVideo = {
+  actorId?: string | null;
+  actorType?: string;
   id: string;
   title: string;
   creatorName: string;
@@ -53,6 +56,7 @@ export const MiniPlayer: React.FC = () => {
         id: activeVideoId,
         title: context.miniMeta.title,
         creatorName: context.miniMeta.creatorName,
+        actorId: context.miniMeta.actorId, actorType: context.miniMeta.actorType,
         hlsUrl: context.miniMeta.hlsUrl,
         posterUrl: context.miniMeta.posterUrl,
       });
@@ -100,6 +104,7 @@ export const MiniPlayer: React.FC = () => {
           id: post.id,
           title,
           creatorName: author.name || "Unknown",
+          actorId: author.id, actorType: author.kind,
           creatorAvatarUrl: author.avatarUrl ?? undefined,
           hlsUrl,
           posterUrl,
@@ -234,7 +239,7 @@ export const MiniPlayer: React.FC = () => {
               {videoData?.title || "Loading..."}
             </div>
             <div className="text-muted-foreground text-xs truncate">
-              {videoData?.creatorName || ""}
+              <InlineProMemberName userId={videoData?.actorType === 'personal' ? videoData.actorId : undefined}>{videoData?.creatorName || ''}</InlineProMemberName>
             </div>
             {/* Queue/Next buttons removed in PR-5 with the drawer. */}
           </div>

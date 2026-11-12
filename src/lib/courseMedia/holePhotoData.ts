@@ -25,6 +25,8 @@ export function libraryHoleVideoError(file: File): string | null {
 }
 
 export interface OwnMediaSource {
+  ownerUserId?: string | null;
+  actorType?: string | null;
   url: string; createdAt: string; mediaType: 'image' | 'video';
   streamId: string | null; posterUrl: string | null; durationSeconds: number | null;
   width: number | null; height: number | null;
@@ -97,6 +99,7 @@ export async function fetchOwnMediaSources(courseId: string, memberId: string): 
   const readyReviews = reviews.filter(row => row.media_type !== 'video' || (row.duration_seconds != null && row.status !== 'failed'));
   const readyPosts = posts.filter(row => row.media_type !== 'video' || (row.duration_seconds != null && !['processing', 'pending', 'error'].includes(row.processing_status ?? '') && row.processing_error == null));
   return [...new Map([...readyReviews, ...readyPosts].filter(row => !row.media_type || ['image', 'video'].includes(row.media_type)).map(row => [row.media_url, {
+    ownerUserId: 'course_ratings' in row ? row.course_ratings?.user_id : 'posts' in row ? row.posts?.user_id : null, actorType: 'personal',
     url: row.media_url, createdAt: row.created_at ?? '', mediaType: row.media_type === 'video' ? 'video' as const : 'image' as const,
     streamId: row.stream_id ?? null, posterUrl: row.media_type === 'video' ? holeMediaPoster(row) : row.poster_url ?? null,
     durationSeconds: row.duration_seconds ?? null, width: row.width ?? null, height: row.height ?? null,

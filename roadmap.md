@@ -1,8 +1,8 @@
 # Roadmap
 
-## Blocked: PRO member-name coverage
+## In progress: PRO member-name coverage
 Member rows wired; source sweep and stop evidence in PRO_LABEL_COVERAGE_REPORT.md.
-Blocked by new test missing MemoryRouter: MentionText.tsx:36:20, "useNavigate() may be used only in the context of a <Router> component." Await exact test-fix authorisation.
+Finish brief authorises the MemoryRouter repair; finish identity propagation, guard and regressions, then sequential shards.
 Outstanding: guard, missing-ID contracts/prose, actor regressions, four separate shards against 8,295, and live 320px checks.
 
 ## Done: Verification messages

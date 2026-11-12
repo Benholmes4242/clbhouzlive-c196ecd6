@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 const STORAGE_KEY = 'mini_player_state';
 
 export interface MiniPlayerMeta {
+  actorId?: string | null;
+  actorType?: string;
   title: string;
   creatorName: string;
   thumbnailUrl: string;

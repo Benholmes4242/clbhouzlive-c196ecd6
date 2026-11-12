@@ -17,6 +17,8 @@ import type { TargetType } from './useCommentsV2';
 import { standingFor, likerStandingFor, chunkIds, familiarityMap, familiarityDetailMap, type LegendHit, type Standing, type LikerStanding } from '../lib/standing';
 
 export interface CommentsSubject {
+  authorUserId?: string | null;
+  actorType?: 'personal' | 'business';
   authorName: string | null;
   /** Personal authors only; a business is named in full. */
   authorFirstName: string | null;
@@ -159,7 +161,7 @@ export function useCommentsSubject(targetType: TargetType, targetId: string, ena
       const authorFirstName = business ? authorName : authorName ? authorName.trim().split(/\s+/)[0] : null;
       courseName = courseName ?? (((courseRes.data as Row)?.name as string | null) ?? null);
 
-      return { authorName, authorFirstName, courseId, courseName, kind, gross, toPar, net, netToPar, rating };
+      return { authorUserId: business ? null : userId, actorType: business ? 'business' as const : 'personal' as const, authorName, authorFirstName, courseId, courseName, kind, gross, toPar, net, netToPar, rating };
     },
   });
 }

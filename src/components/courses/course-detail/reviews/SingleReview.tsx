@@ -67,7 +67,7 @@ export function SingleReview({ totalRatings, review, isHighlighted, playedMonth,
         <div style={{ fontSize: 11.5, color: A.DIM, lineHeight: 1.45, marginTop: 2, ...FIGS }}>{communityCount} {communityCount === 1 ? 'rating' : 'ratings'}</div>
       </div>
     </div>}
-    <p style={{ color: SURFACE.dark.mute, fontSize: 12.5, lineHeight: 1.5, margin: '8px 0 0' }}>{lede}</p>
+    <p style={{ color: SURFACE.dark.mute, fontSize: 12.5, lineHeight: 1.5, margin: '8px 0 0' }}>{firstName && !isViewerOwn ? <><InlineProMemberName userId={review?.user_id}>{firstName}</InlineProMemberName>{lede.slice(firstName.length)}</> : isViewerOwn ? <><InlineProMemberName userId={review?.user_id}>You</InlineProMemberName>{lede.slice(3)}</> : lede}</p>
     {review && <RaterReviewRow review={review} isHighlighted={isHighlighted} context={facts} playedMonth={playedMonth} onMediaClick={onMediaClick} />}
     {calibration && <p data-review-calibration style={{ borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11, color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '14px 0 0' }}>
       {calibration.everyCategory && <>{subject} gave it <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{review?.rating?.toFixed(1)}</b> on every category. </>}
