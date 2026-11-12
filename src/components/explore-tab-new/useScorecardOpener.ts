@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { prefetchRoundDetail } from '@/lib/whs/hooks';
 import { prefetchRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 
@@ -14,9 +14,15 @@ export interface ScorecardTarget {
  * Shared opener for Discover rails. Score-backed rows (feats + friends)
  * open the full RoundDetailSheet with identity. Aggregate rows
  * (leaderboards with no score_id) navigate to the holder's profile.
+ *
+ * MEMBER TAPS OUTSIDE THE HANDICAP AREA OPEN THAT GOLFER'S PROFILE. The
+ * compare/nudge/invite rule belongs to useMemberTapResolver and the
+ * handicap area's own callers only; it was never meant for Explore,
+ * course or feed taps. Self taps open the viewer's own profile too,
+ * never /handicap.
  */
 export function useScorecardOpener() {
-  const { resolve } = useMemberTapResolver();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [target, setTarget] = useState<ScorecardTarget | null>(null);
 
@@ -38,12 +44,12 @@ export function useScorecardOpener() {
 
   const openProfile = useCallback(
     (userId: string | null | undefined) => {
-      // Discover rows are almost never the viewer's own. The resolver keeps
-      // self on their own page and sends everyone else to compare/nudge/invite
-      // rather than to a stranger's handicap page.
-      if (userId) void resolve({ targetUserId: userId });
+      // Any member id — including the viewer's own — opens that member's
+      // profile. The handicap area's compare/nudge/invite rule lives in
+      // useMemberTapResolver and does not apply outside that area.
+      if (userId) navigate(`/profile/${userId}`);
     },
-    [resolve],
+    [navigate],
   );
 
   const close = useCallback(() => setTarget(null), []);
