@@ -1,8 +1,9 @@
 # Roadmap
 
-## In progress: Admin Command centre v2B verification
+## Done: Admin Command centre v2B verification
 Authorised repair adds explicit single columns to the squircle and cohort grids only; hook and tests unchanged.
-Run focused grid/Dashboard checks, then four separate sequential shards; rerun only the two named intermittent failures once.
+Focused checks: 20 passed. Four separate sequential shards: 2,142 / 1,993 / 2,133 / 2,110 passed, each zero failures; total 8,378 across 739 files.
+Inventory before/after: 8,378 / 8,378, no test changes. Prior verified 8,373 + eleven v2 cases - six retired loop cases = 8,378. No named intermittent or existing failures appeared; no reruns needed.
 
 ## Previous stop: Admin Command centre v2
 Dashboard/live v2 hook implemented; mock caption weights and auto-fit creator grid confirmed.
