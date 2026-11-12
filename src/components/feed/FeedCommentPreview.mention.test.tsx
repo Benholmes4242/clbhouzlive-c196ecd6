@@ -86,7 +86,7 @@ describe('FeedCommentPreview mention integration', () => {
     const { container } = wrap(
       <FeedCommentPreview preview={{ ...preview, content: long }} commentCount={1} onOpenComments={() => {}} />,
     );
-    const clamp = screen.getByText('Bob').parentElement;
+    const clamp = screen.getByText('Bob').closest('.pro-inline-name')?.parentElement?.parentElement;
 
     expect(clamp).toHaveStyle({
       display: '-webkit-box',
@@ -115,7 +115,7 @@ describe('FeedCommentPreview mention integration', () => {
       <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="light" />,
     );
     const row = within(container.querySelector('[role="button"]') as HTMLElement);
-    expect(row.getByText('Bob')).toHaveStyle({ color: '#0F172A' });
+    expect(row.getByText('Bob').closest('.pro-inline-name')?.parentElement).toHaveStyle({ color: '#0F172A' });
     // The MID tone wrapper carries the color; the <MentionText> span inherits it.
     const mention = container.querySelector('[data-mention-type="user"]');
     expect(mention?.parentElement?.parentElement).toHaveStyle({ color: '#6C727E' });
@@ -137,7 +137,7 @@ describe('FeedCommentPreview mention integration', () => {
       <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="dark" />,
     );
     const row = within(container.querySelector('[role="button"]') as HTMLElement);
-    expect(row.getByText('Bob')).toHaveStyle({ color: '#F8FAFC' });
+    expect(row.getByText('Bob').closest('.pro-inline-name')?.parentElement).toHaveStyle({ color: '#F8FAFC' });
     const mention = container.querySelector('[data-mention-type="user"]');
     expect(mention?.parentElement?.parentElement).toHaveStyle({ color: '#A7AAAE' });
   });

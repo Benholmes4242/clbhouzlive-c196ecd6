@@ -570,7 +570,7 @@ describe('WS1 lead', () => {
     const lead = container.querySelector('[data-watch-lead="landscape"]');
     expect(lead).toBeTruthy();
     expect(screen.getByText('24:50')).toBeTruthy();
-    expect(within(lead as HTMLElement).getByText(/Jay Kelly ✓ · 48 likes · 2d/)).toBeTruthy();
+    expect(within(lead as HTMLElement).getByText((_text, element) => /Jay Kelly ✓ · 48 likes · 2d/.test(element?.textContent ?? '') && element?.querySelector('.pro-inline-text') !== null && !element?.querySelector('[data-watch-lead="caption"]'))).toBeTruthy();
   });
 
   it('the kicker reads Most liked this month when the reason is most_liked', () => {

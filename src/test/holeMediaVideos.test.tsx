@@ -31,7 +31,7 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); audioDuck.reset(); });
 
 describe('Stage1 encoded hole-video sources', () => {
-  it('includes encoded post video and its metadata', async () => { f.posts = [source]; expect(await fetchOwnMediaSources('course', 'member')).toEqual([{ url, createdAt: '2026-10-24', mediaType: 'video', streamId: source.stream_id, posterUrl: '/poster.jpg', durationSeconds: 42, width: 640, height: 480 }]); });
+  it('includes encoded post video and its metadata', async () => { f.posts = [source]; expect(await fetchOwnMediaSources('course', 'member')).toEqual([{ url, createdAt: '2026-10-24', mediaType: 'video', streamId: source.stream_id, posterUrl: '/poster.jpg', durationSeconds: 42, width: 640, height: 480, ownerUserId: null, actorType: 'personal' }]); });
   it.each(['processing', 'pending', 'error'])('excludes post encode status %s', async processing_status => { f.posts = [{ ...source, processing_status }]; expect(await fetchOwnMediaSources('course', 'member')).toEqual([]); });
   it('excludes missing duration', async () => { f.posts = [{ ...source, duration_seconds: null }]; expect(await fetchOwnMediaSources('course', 'member')).toEqual([]); });
   it('excludes processing error', async () => { f.posts = [{ ...source, processing_error: 'Encode failed' }]; expect(await fetchOwnMediaSources('course', 'member')).toEqual([]); });

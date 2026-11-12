@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Blocked: PRO member-name coverage finish
-Current ask: six authorised wrapper/payload assertions updated; no components changed and no test-count change.
+Current ask: six shard-2 assertions updated for split text, styled ancestors and added owner/actor fields. No components changed and zero test-count delta.
 Router repair, remaining contracts/prose, guard and actor regressions implemented; focused 78 passed.
-Fresh separate shards: 1 = 2,142 passed; 2 = 1,981 passed / 6 failed (1,987 executed). Stopped on FeedCommentPreview.mention (three cases), holeMediaVideos, reviewSheetCalibration and ws1WatchTop; these tests are unchanged.
-Shards 3–4 not run under the stop rule; live 320px checks remain unverified. Baseline 8,295; expected inventory 8,373 (+78 prior PRO tests), full total unverified; this turn adds zero tests.
+Fresh separate shards: 1 = 2,142 passed; 2 = 1,987 passed; 3 = 2,130 passed / 2 failed (2,132 executed). STOP: exploreSheetShell.test.tsx:86:22 expects one RPC call but receives two (outside authorised kinds A/B/C). adminHoleTagging.test.tsx:85:109 also has an authorised-kind split-credit failure, left unchanged when the stop occurred.
+Shard 4 not run under the stop rule; live 320px checks remain unverified. Baseline 8,295; expected inventory 8,373 (+78 prior PRO tests), full total unverified; this turn adds zero tests.
 Checkpoint report retained until done; sweep and errors delivered in PRO-label-finish-report.md.
 
 ## Done: Verification messages

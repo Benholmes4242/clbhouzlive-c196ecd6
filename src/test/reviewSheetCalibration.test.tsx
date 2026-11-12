@@ -63,7 +63,7 @@ describe('calibration strip', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
     const figs = Array.from(q('[data-review-calibration-figure]')).map((n) => n.textContent);
     expect(figs).toEqual(['+0.7', '\u22120.4']);
-    expect(screen.getByText('mikem84 rates 7.6')).toBeTruthy();
+    expect(screen.getByText((_text, element) => element?.textContent === 'mikem84 rates 7.6' && element?.querySelector('.pro-inline-text') !== null)).toBeTruthy();
     expect(screen.getByText('3 ratings, 8.7 average')).toBeTruthy();
   });
 
