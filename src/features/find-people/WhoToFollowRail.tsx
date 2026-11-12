@@ -18,6 +18,10 @@
  * next time it opens and the rail never reshuffles under the member's thumb.
  * Covers are one slot-scoped read via useSuggestionCovers; SuggestionCover
  * owns decorative image failure, never source selection or community rows.
+ *
+ * KindRail (Pros to follow above post 9, Creators to follow above post 21)
+ * shares RailBody/RailCardView and the HIDDEN set; a qualifying kind rail's
+ * people leave the general rail so no one appears twice.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
@@ -52,16 +56,23 @@ import {
   railBusinessReason,
   railGolferReason,
   railSlotCards,
+  kindFigures,
+  kindRailVisible,
+  kindReason,
+  kindRowToPerson,
+  type FollowKind,
+  type KindPerson,
   type RailCard,
 } from './railRules';
+import { usePeopleToFollowByKind } from './usePeopleToFollowByKind';
 import { ActiveAvatarDoor, ActiveRing } from './ActiveRing';
 import { activityLine, type RecentActivity } from './activeRingRules';
 import { useRecentActivity } from './useRecentActivity';
 
 /** Cards hidden this session — shared by both slots and across feed remounts. */
 const HIDDEN = new Set<string>();
-/** Slots whose 50%-visible view event already fired this session. */
-const VIEWED = new Set<number>();
+/** Rails (slot number or kind) whose 50%-visible view event already fired this session. */
+const VIEWED = new Set<string | number>();
 const EMPTY: ReadonlySet<string> = new Set();
 
 const actorIdOf = (card: RailCard) => (card.kind === 'person' ? card.person.user_id : card.business.business_id);
@@ -81,29 +92,116 @@ export function resetWhoToFollowRailSessionForTests() {
 
 const MUTE = 'rgba(248,250,252,0.62)';
 
+type RailTrack = Record<string, unknown>;
+
+interface RailHeadSpec {
+  testId: string;
+  viewKey: string | number;
+  track: RailTrack;
+  title: string;
+  sub: string;
+  seeAllAria: string;
+  seeAllPath: string;
+}
+
 export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
+  const { t } = useTranslation('common');
+  const peopleQ = usePeopleSuggestions();
+  const bizQ = useBusinessSuggestions();
+  /* No one twice: people shown in a QUALIFYING kind rail leave this rail;
+     a kind rail under 3 cards keeps its people eligible here. Same cache
+     keys as the kind rails, so this adds no reads of its own. */
+  const proQ = usePeopleToFollowByKind('pro');
+  const creatorQ = usePeopleToFollowByKind('creator');
+  const excluded = useMemo(() => {
+    const ids = new Set<string>();
+    for (const r of kindRailVisible(proQ.data ?? [], HIDDEN)) ids.add(r.user_id);
+    for (const r of kindRailVisible(creatorQ.data ?? [], HIDDEN)) ids.add(r.user_id);
+    return ids;
+  }, [proQ.data, creatorQ.data]);
+
+  const ordered = useMemo(
+    () => railCards((peopleQ.data ?? []).filter((p) => !excluded.has(p.user_id)), bizQ.data ?? []),
+    [peopleQ.data, bizQ.data, excluded],
+  );
+  /** The slot's cards before session hides — tells a never-render from an
+   *  everything-dismissed collapse. */
+  const all = useMemo(() => railSlotCards(ordered, slot, EMPTY), [ordered, slot]);
+  const select = useMemo(() => (hidden: ReadonlySet<string>) => railSlotCards(ordered, slot, hidden), [ordered, slot]);
+  const head = useMemo<RailHeadSpec>(() => ({
+    testId: `who-to-follow-rail-${slot}`,
+    viewKey: slot,
+    track: { slot },
+    title: t('findPeople.rail.title', { defaultValue: 'Who to follow' }),
+    sub: t('findPeople.rail.sub', { defaultValue: 'Golfers and clubs you might know' }),
+    seeAllAria: t('findPeople.rail.seeAllAria', { defaultValue: 'See all, Explore the community' }),
+    seeAllPath: '/find-people',
+  }), [slot, t]);
+  return <RailBody all={all} select={select} head={head} />;
+}
+
+/** Pros to follow / Creators to follow — the same rail frame and card. */
+export function KindRail({ kind }: { kind: FollowKind }) {
+  const { t } = useTranslation('common');
+  const q = usePeopleToFollowByKind(kind);
+  /** Qualifies once per data load against this session's hides (3+ cards);
+   *  later hides collapse cards in place and close the rail at zero. */
+  const rows = useMemo(() => kindRailVisible(q.data ?? [], HIDDEN), [q.data]);
+  const all = useMemo<RailCard[]>(
+    () => rows.map((r) => ({ kind: 'person', person: kindRowToPerson(kind, r) })),
+    [rows, kind],
+  );
+  const kindRows = useMemo(() => new Map(rows.map((r) => [r.user_id, r])), [rows]);
+  const select = useMemo(
+    () => (hidden: ReadonlySet<string>) => all.filter((c) => !hidden.has(railCardId(c))),
+    [all],
+  );
+  const head = useMemo<RailHeadSpec>(() => kind === 'pro'
+    ? {
+        testId: 'pros-to-follow-rail',
+        viewKey: 'rail_pros',
+        track: { surface: 'rail_pros' },
+        title: t('findPeople.kind.pro.title', { defaultValue: 'Pros to follow' }),
+        sub: t('findPeople.kind.pro.sub', { defaultValue: 'Verified tour and teaching professionals' }),
+        seeAllAria: t('findPeople.kind.pro.seeAllAria', { defaultValue: 'See all, Pros to follow' }),
+        seeAllPath: '/find-people?kind=pro',
+      }
+    : {
+        testId: 'creators-to-follow-rail',
+        viewKey: 'rail_creators',
+        track: { surface: 'rail_creators' },
+        title: t('findPeople.kind.creator.title', { defaultValue: 'Creators to follow' }),
+        sub: t('findPeople.kind.creator.sub', { defaultValue: 'Golfers making videos on clbhouz' }),
+        seeAllAria: t('findPeople.kind.creator.seeAllAria', { defaultValue: 'See all, Creators to follow' }),
+        seeAllPath: '/find-people?kind=creator',
+      }, [kind, t]);
+  return <RailBody all={all} select={select} head={head} kind={kind} kindRows={kindRows} />;
+}
+
+function RailBody({
+  all,
+  select,
+  head,
+  kind,
+  kindRows,
+}: {
+  all: RailCard[];
+  select: (hidden: ReadonlySet<string>) => RailCard[];
+  head: RailHeadSpec;
+  kind?: FollowKind;
+  kindRows?: ReadonlyMap<string, KindPerson>;
+}) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const peopleQ = usePeopleSuggestions();
-  const bizQ = useBusinessSuggestions();
+  const { track } = head;
 
   const [closing, setClosing] = useState<ReadonlySet<string>>(new Set());
   const [hiddenTick, setHiddenTick] = useState(0);
   const [gone, setGone] = useState(false);
 
-  const ordered = useMemo(
-    () => railCards(peopleQ.data ?? [], bizQ.data ?? []),
-    [peopleQ.data, bizQ.data],
-  );
-  /** The slot's cards before session hides — tells a never-render from an
-   *  everything-dismissed collapse. */
-  const all = useMemo(() => railSlotCards(ordered, slot, EMPTY), [ordered, slot]);
   // hiddenTick re-reads the module-level HIDDEN set.
-  const cards = useMemo(
-    () => railSlotCards(ordered, slot, HIDDEN),
-    [ordered, slot, hiddenTick],
-  );
+  const cards = useMemo(() => select(HIDDEN), [select, hiddenTick]);
   /** ACTIVE RING — one batched read for the slot's cards, in display order. */
   const activityIds = useMemo(() => all.map(actorIdOf), [all]);
   const activity = useRecentActivity(activityIds);
@@ -117,6 +215,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
   const markStale = () => {
     queryClient.invalidateQueries({ queryKey: ['people-suggestions'], refetchType: 'none' });
     queryClient.invalidateQueries({ queryKey: ['business-suggestions'], refetchType: 'none' });
+    queryClient.invalidateQueries({ queryKey: ['people-to-follow'], refetchType: 'none' });
   };
 
   /* FIX §2 — follow-removal timers by card id. After a follow the card stays
@@ -179,19 +278,20 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = rootRef.current;
-    if (!el || VIEWED.has(slot) || cards.length === 0) return;
+    const key = head.viewKey;
+    if (!el || VIEWED.has(key) || cards.length === 0) return;
     const obs = new IntersectionObserver((entries) => {
       for (const e of entries) {
-        if (e.isIntersecting && !VIEWED.has(slot)) {
-          VIEWED.add(slot);
-          analyticsEvents.track('who_to_follow_viewed', { slot });
+        if (e.isIntersecting && !VIEWED.has(key)) {
+          VIEWED.add(key);
+          analyticsEvents.track('who_to_follow_viewed', track);
           obs.disconnect();
         }
       }
     }, { threshold: 0.5 });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [slot, cards.length]);
+  }, [head.viewKey, track, cards.length]);
 
   if (gone || all.length === 0) return null;
   const collapsing = cards.length === 0;
@@ -200,7 +300,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
     const id = railCardId(card);
     const actor = railCardActor(card);
     analyticsEvents.track('who_to_follow_dismiss', {
-      slot,
+      ...track,
       actor_type: actor.actor_type,
       reason_type: railCardReasonType(card),
     });
@@ -233,7 +333,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
   return (
     <div
       ref={rootRef}
-      data-testid={`who-to-follow-rail-${slot}`}
+      data-testid={head.testId}
       style={{
         background: A.CANVAS,
         padding: collapsing ? '0' : '16px 0 18px',
@@ -248,14 +348,14 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 16px' }}>
         <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: 0, color: A.INK }}>
-          {t('findPeople.rail.title', { defaultValue: 'Who to follow' })}
+          {head.title}
         </div>
         <button
           type="button"
-          aria-label={t('findPeople.rail.seeAllAria', { defaultValue: 'See all, Explore the community' })}
+          aria-label={head.seeAllAria}
           onClick={() => {
-            analyticsEvents.track('who_to_follow_see_all', { slot });
-            navigate('/find-people');
+            analyticsEvents.track('who_to_follow_see_all', track);
+            navigate(head.seeAllPath);
           }}
           style={{
             background: 'none',
@@ -272,7 +372,7 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
         </button>
       </div>
       <div style={{ fontSize: 12.5, color: A.DIM, padding: '2px 16px 0' }}>
-        {t('findPeople.rail.sub', { defaultValue: 'Golfers and clubs you might know' })}
+        {head.sub}
       </div>
 
       {/* Cards row — sideways drags scroll the cards, vertical drags pass
@@ -295,7 +395,9 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
           <RailCardView
             key={railCardId(card)}
             card={card}
-            slot={slot}
+            track={track}
+            kind={kind}
+            kindRow={card.kind === 'person' ? kindRows?.get(card.person.user_id) : undefined}
             closing={closing.has(railCardId(card))}
             onDismiss={() => dismiss(card)}
             markStale={markStale}
@@ -314,7 +416,9 @@ export function WhoToFollowRail({ slot }: { slot: 1 | 2 }) {
 
 function RailCardView({
   card,
-  slot,
+  track,
+  kind,
+  kindRow,
   closing,
   onDismiss,
   markStale,
@@ -324,7 +428,9 @@ function RailCardView({
   coverUrl,
 }: {
   card: RailCard;
-  slot: 1 | 2;
+  track: RailTrack;
+  kind?: FollowKind;
+  kindRow?: KindPerson;
   closing: boolean;
   onDismiss: () => void;
   markStale: () => void;
@@ -346,13 +452,18 @@ function RailCardView({
     ? card.person.display_name ?? card.person.username ?? ''
     : card.business.name;
   const verified = isPerson ? !!card.person.is_verified : !!card.business.is_verified;
-  const reason: Copy | null = isPerson
+  const reason: Copy | null = kind && kindRow
+    ? kindReason(kind, kindRow)
+    : isPerson
     ? railGolferReason(card.person)
     : railBusinessReason(card.business, businessCategoryLabel(card.business));
   const line = activity ? activityLine(activity, new Date()) : null;
   const when = line ? t(line.key, { ...line.vars, defaultValue: line.def }) : '';
   const followers = !isPerson ? card.business.followers ?? 0 : 0;
-  const figures = isPerson
+  const kindFig = kind && kindRow ? kindFigures(kindRow) : null;
+  const figures = kind && kindRow
+    ? (kindFig ? t(kindFig.key, { ...kindFig.vars, defaultValue: kindFig.def }) : '')
+    : isPerson
     ? golferFigures(card.person)
     : t('findPeople.followers', {
         count: followers,
@@ -388,7 +499,7 @@ function RailCardView({
         isFollowing: prev,
       });
       analyticsEvents.track('who_to_follow_follow', {
-        slot,
+        ...track,
         actor_type: actor.actor_type,
         reason_type: railCardReasonType(card),
       });

@@ -135,3 +135,93 @@ export function businessCategoryLabel(b: BusinessSuggestion): string {
     ? 'Golf club'
     : businessCategoryWord(b.category, (_key, fallback) => fallback);
 }
+
+/* ── Pros to follow / Creators to follow (wtf-pros-creators-rails, Option A) ── */
+
+export type FollowKind = 'pro' | 'creator';
+
+/** One get_people_to_follow_by_kind row (run by Ben; audience is server-owned). */
+export interface KindPerson {
+  user_id: string;
+  display_name: string | null;
+  username: string | null;
+  profile_photo_url: string | null;
+  pro_kind: string | null;
+  pro_tour: string | null;
+  pro_club: string | null;
+  videos: number | null;
+  mutual_count: number | null;
+  followers: number | null;
+}
+
+/**
+ * Feed placement for the kind rails: Pros above postIndex 9, Creators above
+ * postIndex 21. Sibling of railSlotForPostIndex, which keeps slots 1 and 2.
+ * CardFeed only asks for posts that exist, so a feed that never reaches the
+ * post never renders the rail.
+ */
+export function kindRailForPostIndex(postIndex: number, postCount: number): FollowKind | null {
+  if (postIndex === 9 && postCount > 9) return 'pro';
+  if (postIndex === 21 && postCount > 21) return 'creator';
+  return null;
+}
+
+/** A kind rail qualifies with 3+ cards left after this session's hides. */
+export function kindRailVisible(rows: KindPerson[], hidden: ReadonlySet<string>): KindPerson[] {
+  const visible = rows.filter((r) => !hidden.has(`p:${r.user_id}`));
+  return visible.length >= RAIL_MIN_CARDS ? visible : [];
+}
+
+/** Reason line: pro role plus club/tour (dropped when null), or video count. */
+export function kindReason(kind: FollowKind, r: KindPerson): Copy {
+  if (kind === 'creator') {
+    const n = r.videos ?? 0;
+    return {
+      key: n === 1 ? 'findPeople.kind.reason.creatorOne' : 'findPeople.kind.reason.creator',
+      def: n === 1 ? 'Creator · 1 video' : 'Creator · {{count}} videos',
+      vars: { count: n },
+    };
+  }
+  if (r.pro_kind === 'tour_pro') {
+    return r.pro_tour
+      ? { key: 'findPeople.kind.reason.tour', def: 'Tour professional · {{tour}}', vars: { tour: r.pro_tour } }
+      : { key: 'findPeople.kind.reason.tourBare', def: 'Tour professional' };
+  }
+  return r.pro_club
+    ? { key: 'findPeople.kind.reason.teaching', def: 'Teaching professional · {{club}}', vars: { club: r.pro_club } }
+    : { key: 'findPeople.kind.reason.teachingBare', def: 'Teaching professional' };
+}
+
+/** Slot line when there is no amber activity: mutuals, then followers, else none. */
+export function kindFigures(r: KindPerson): Copy | null {
+  const m = r.mutual_count ?? 0;
+  if (m > 0) return { key: 'findPeople.kind.mutual', def: 'Followed by {{count}} you follow', vars: { count: m } };
+  const f = r.followers ?? 0;
+  if (f > 0) {
+    return {
+      key: f === 1 ? 'findPeople.kind.followerOne' : 'findPeople.kind.followers',
+      def: f === 1 ? '1 follower' : '{{count}} followers',
+      vars: { count: f.toLocaleString('en-GB') },
+    };
+  }
+  return null;
+}
+
+/** Adapt a kind row to the shared rail card's person shape. */
+export function kindRowToPerson(kind: FollowKind, r: KindPerson): PersonSuggestion {
+  return {
+    user_id: r.user_id,
+    display_name: r.display_name,
+    username: r.username,
+    profile_photo_url: r.profile_photo_url,
+    reason_type: kind,
+    reason_club_name: null,
+    reason_course_name: null,
+    reason_date: null,
+    mutual_count: r.mutual_count,
+    recent_rounds: null,
+    rounds_total: null,
+    handicap_index: null,
+    is_verified: null,
+  };
+}

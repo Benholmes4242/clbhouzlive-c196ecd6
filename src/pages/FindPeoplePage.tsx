@@ -33,7 +33,8 @@ import { toast } from '@/lib/toast';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { useGlobalSearchV2 } from '@/features/search-v2/hooks/useGlobalSearchV2';
-import { businessCategoryLabel } from '@/features/find-people/railRules';
+import { businessCategoryLabel, kindFigures, kindReason, kindRowToPerson, type FollowKind } from '@/features/find-people/railRules';
+import { usePeopleToFollowByKind } from '@/features/find-people/usePeopleToFollowByKind';
 import { navClub, navPerson } from '@/features/search-v2/lib/searchNavigation';
 import {
   businessInitials,
@@ -66,14 +67,22 @@ export function GolfersToFollowRedirect() {
 
 export default function FindPeoplePage() {
   const { t } = useTranslation('common');
-  const title = t('findPeople.title', { defaultValue: 'Explore the community' });
+  const [searchParams, setSearchParams] = useSearchParams();
+  /* ?kind=pro|creator — See all from the Pros / Creators rails lists the same
+     server read (50 rows) with the existing golfer row. No kind: unchanged. */
+  const kindParam = searchParams.get('kind');
+  const kind: FollowKind | null = kindParam === 'pro' || kindParam === 'creator' ? kindParam : null;
+  const title = kind === 'pro'
+    ? t('findPeople.kind.pro.title', { defaultValue: 'Pros to follow' })
+    : kind === 'creator'
+    ? t('findPeople.kind.creator.title', { defaultValue: 'Creators to follow' })
+    : t('findPeople.title', { defaultValue: 'Explore the community' });
   const titleRef = useRef<HTMLHeadingElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   useIslandBackName(title, titleRef);
   /* FIX §3 — a full-screen page: the floating nav
      hides while it is open and returns on leave. */
   useHideBottomNav();
-  const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const tab: FindPeopleTab =
     tabParam === 'golfers' || tabParam === 'businesses' ? tabParam : 'suggested';
@@ -81,8 +90,10 @@ export default function FindPeoplePage() {
   const [query, setQuery] = useState('');
   const searching = query.trim().length > 0;
 
-  const peopleQ = usePeopleSuggestions(60, !searching);
-  const bizQ = useBusinessSuggestions(30, !searching);
+  const peopleQ = usePeopleSuggestions(60, !searching && !kind);
+  const bizQ = useBusinessSuggestions(30, !searching && !kind);
+  const kindQ = usePeopleToFollowByKind(kind ?? 'pro', 50, !!kind && !searching);
+  const kindRows = useMemo(() => (kind ? kindQ.data ?? [] : []), [kind, kindQ.data]);
   const peopleSearch = useGlobalSearchV2({ query, scope: 'people', enabled: searching });
   const clubSearch = useGlobalSearchV2({ query, scope: 'clubs', enabled: searching });
 
@@ -104,6 +115,7 @@ export default function FindPeoplePage() {
    *  search results are out of scope. */
   const activityIds = useMemo(() => {
     if (searching) return [];
+    if (kind) return kindRows.map((r) => r.user_id);
     const ids: string[] = [];
     const seen = new Set<string>();
     for (const g of groups) {
@@ -115,7 +127,7 @@ export default function FindPeoplePage() {
       }
     }
     return ids;
-  }, [groups, searching]);
+  }, [groups, searching, kind, kindRows]);
   const activity = useRecentActivity(activityIds);
 
   // WF2: the label rule moved to railRules.businessCategoryLabel so the page
@@ -133,6 +145,8 @@ export default function FindPeoplePage() {
 
   const loading = searching
     ? peopleSearch.isLoading || clubSearch.isLoading
+    : kind
+    ? kindQ.isLoading
     : peopleQ.isLoading || bizQ.isLoading;
 
   const tabs = (docked = false) => (['suggested', 'golfers', 'businesses'] as FindPeopleTab[]).map((id) => {
@@ -193,10 +207,12 @@ export default function FindPeoplePage() {
         </div>
 
         {/* Chips — 12px below the search field; ?tab= keeps the choice. */}
+        {kind ? null : <>
         <div ref={tabsRef} data-find-tabs role="tablist" style={{ display: 'flex', gap: 8, padding: '12px 16px 4px' }}>
           {tabs()}
         </div>
         <IslandDock anchorRef={tabsRef}>{() => <div data-find-dock-tabs role="tablist" style={{ display: 'flex', gap: 8, maxWidth: 488, margin: '0 auto', overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform' }}>{tabs(true)}</div>}</IslandDock>
+        </>}
 
         {loading ? (
           <div style={{ padding: '24px 16px', color: A.DIM, fontSize: 13 }}>
@@ -209,6 +225,31 @@ export default function FindPeoplePage() {
             followed={followed}
             markFollowed={markFollowed}
           />
+        ) : kind ? (
+          kindRows.length === 0 ? (
+            <div style={{ padding: '28px 16px', color: 'rgba(248,250,252,0.62)', fontSize: 14 }}>
+              {t('findPeople.empty', { defaultValue: 'No suggestions yet. Search above, or invite friends.' })}
+            </div>
+          ) : (
+            <div data-testid="find-people-kind-list" style={{ paddingTop: 12 }}>
+              {kindRows.map((r, i) => {
+                const fig = kindFigures(r);
+                return (
+                  <GolferRow
+                    key={r.user_id}
+                    golfer={kindRowToPerson(kind, r)}
+                    reasonOverride={kindReason(kind, r)}
+                    figuresOverride={fig ? copy(fig) : null}
+                    showDivider={i > 0}
+                    followed={followed.has(`p:${r.user_id}`)}
+                    markFollowed={markFollowed}
+                    t={t}
+                    activity={activity.get(r.user_id)}
+                  />
+                );
+              })}
+            </div>
+          )
         ) : groups.length === 0 ? (
           <div style={{ padding: '28px 16px', color: 'rgba(248,250,252,0.62)', fontSize: 14 }}>
             {t('findPeople.empty', { defaultValue: 'No suggestions yet. Search above, or invite friends.' })}
@@ -367,8 +408,12 @@ function GolferRow({
   markFollowed,
   t,
   activity,
+  reasonOverride,
+  figuresOverride,
 }: {
   golfer: PersonSuggestion;
+  reasonOverride?: Copy;
+  figuresOverride?: string | null;
   showDivider: boolean;
   followed: boolean;
   markFollowed: (id: string, on: boolean) => void;
@@ -376,8 +421,8 @@ function GolferRow({
   activity: RecentActivity | undefined;
 }) {
   const navigate = useNavigate();
-  const reason = golferReason(golfer);
-  const figures = golferFigures(golfer);
+  const reason = reasonOverride ?? golferReason(golfer);
+  const figures = figuresOverride !== undefined ? figuresOverride : golferFigures(golfer);
   const name = golfer.display_name ?? golfer.username ?? '';
   const when = whenText(activity, t);
   return (

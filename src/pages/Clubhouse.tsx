@@ -31,8 +31,8 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 // ── New feed components ──
 import { CardFeed } from '@/components/feed/CardFeed';
-import { WhoToFollowRail } from '@/features/find-people/WhoToFollowRail';
-import { railSlotForPostIndex } from '@/features/find-people/railRules';
+import { KindRail, WhoToFollowRail } from '@/features/find-people/WhoToFollowRail';
+import { kindRailForPostIndex, railSlotForPostIndex } from '@/features/find-people/railRules';
 import { FeedErrorBoundary } from '@/components/feed/FeedErrorBoundary';
 import { safeInitialState } from '@/components/feed/feedSnapshot';
 import type { StateSnapshot } from 'react-virtuoso';
@@ -234,7 +234,10 @@ const ClubhouseContent = () => {
   postsLenRef.current = posts.length;
   const renderBeforePost = useCallback((postIndex: number) => {
     const slot = railSlotForPostIndex(postIndex, postsLenRef.current);
-    return slot ? <WhoToFollowRail slot={slot} /> : null;
+    if (slot) return <WhoToFollowRail slot={slot} />;
+    // Pros to follow above post 9, Creators to follow above post 21.
+    const kind = kindRailForPostIndex(postIndex, postsLenRef.current);
+    return kind ? <KindRail kind={kind} /> : null;
   }, []);
   // Reversible editorial injection: remove this one call and pass `posts`
   // directly to CardFeed to restore a social-only Clubhouse feed.
