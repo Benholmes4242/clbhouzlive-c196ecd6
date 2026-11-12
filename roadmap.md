@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Blocked: PRO member-name coverage finish
+Current ask: six authorised wrapper/payload assertions updated; no components changed and no test-count change.
 Router repair, remaining contracts/prose, guard and actor regressions implemented; focused 78 passed.
-Shard 1: 2,136 passed / 6 failed in existing exploreRoundCardEngagement, memberShotCredit, memberShotPosts and scoresLeadBoard tests; stopped without modifying them.
-Shards 2–4 and live 320px checks outstanding; external unmanaged authentication prevents member checks. Baseline 8,295; expected inventory 8,373, full total unverified.
+Fresh separate shards: 1 = 2,142 passed; 2 = 1,981 passed / 6 failed (1,987 executed). Stopped on FeedCommentPreview.mention (three cases), holeMediaVideos, reviewSheetCalibration and ws1WatchTop; these tests are unchanged.
+Shards 3–4 not run under the stop rule; live 320px checks remain unverified. Baseline 8,295; expected inventory 8,373 (+78 prior PRO tests), full total unverified; this turn adds zero tests.
 Checkpoint report retained until done; sweep and errors delivered in PRO-label-finish-report.md.
 
 ## Done: Verification messages

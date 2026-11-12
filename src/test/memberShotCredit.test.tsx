@@ -53,13 +53,13 @@ afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: n
 describe('member-shot caption in the real fullscreen chrome', () => {
   it('shows only the active item caption and follows horizontal carousel position', () => {
     mount(true);
-    expect(screen.getByText('Thomas Holmes · Mar 2026')).toBeInTheDocument();
-    expect(screen.queryByText('Benjamin Holmes · Jun 2026')).toBeNull();
+    expect(screen.getByText((_text, element) => element?.textContent === 'Thomas Holmes · Mar 2026' && element?.querySelector('.pro-inline-text') !== null)).toBeInTheDocument();
+    expect(screen.queryByText((_text, element) => element?.textContent === 'Benjamin Holmes · Jun 2026' && element?.querySelector('.pro-inline-text') !== null)).toBeNull();
     expect(screen.getByText("Through members' eyes")).toBeInTheDocument();
     expect(screen.getByAltText('Thomas Holmes')).toHaveAttribute('src', expect.stringContaining('thomas.jpg'));
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
-    expect(screen.queryByText('Thomas Holmes · Mar 2026')).toBeNull();
-    expect(screen.getByText('Benjamin Holmes · Jun 2026')).toBeInTheDocument();
+    expect(screen.queryByText((_text, element) => element?.textContent === 'Thomas Holmes · Mar 2026' && element?.querySelector('.pro-inline-text') !== null)).toBeNull();
+    expect(screen.getByText((_text, element) => element?.textContent === 'Benjamin Holmes · Jun 2026' && element?.querySelector('.pro-inline-text') !== null)).toBeInTheDocument();
     expect(screen.getByText('The fifteenth')).toBeInTheDocument();
     expect(screen.getByText('Druids Glen · Par 4 · 412 yards')).toBeInTheDocument();
     expect(screen.getByAltText('Benjamin Holmes')).toHaveAttribute('src', expect.stringContaining('ben.jpg'));
@@ -80,7 +80,7 @@ describe('member-shot caption in the real fullscreen chrome', () => {
     const view = mount(true);
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(2));
     expect(view.container.querySelector('[data-avatar-fallback]')).toHaveTextContent('E');
-    expect(screen.getByText('Ed · Jul 2026')).toBeInTheDocument();
+    expect(screen.getByText((_text, element) => element?.textContent === 'Ed · Jul 2026' && element?.querySelector('.pro-inline-text') !== null)).toBeInTheDocument();
   });
 
   it('real-post opens retain their footer, author row and relative time without the synthetic caption', () => {

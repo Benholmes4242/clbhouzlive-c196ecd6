@@ -149,7 +149,7 @@ describe('See-all sheet rows (retargeted from the page lead board, EX1b)', () =>
     expect(toPar.textContent).toBe('\u22122');
     expect(toPar.style.color).toBe(toCss(A.RED));
     expect(pos.style.color).toBe(toCss(A.AMBER));
-    expect(within(self).getByText('Viewer').style.color).toBe(toCss(A.AMBER));
+    expect(within(self).getByText('Viewer').closest<HTMLElement>('[data-board-name-row] > span')?.style.color).toBe(toCss(A.AMBER));
     expect(value.style.color).not.toBe(toCss(A.AMBER));
   });
 });

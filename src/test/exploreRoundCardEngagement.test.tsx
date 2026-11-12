@@ -143,6 +143,8 @@ describe('Explore round-card who-line engagement', () => {
     const group = view.container.querySelector<HTMLElement>('[data-round-reactions="controls"]');
     expect(group?.style.flex).toBe('0 0 auto');
     expect(group?.style.whiteSpace).toBe('nowrap');
-    expect(view.getByText(item.who?.display_name ?? '').style.textOverflow).toBe('ellipsis');
+    const nameText = view.getByText(item.who?.display_name ?? '');
+    expect(nameText.closest<HTMLElement>('[data-round-author-name="true"]')?.style.textOverflow).toBe('ellipsis');
+    expect(nameText.closest('.pro-inline-text')).not.toBeNull();
   });
 });
