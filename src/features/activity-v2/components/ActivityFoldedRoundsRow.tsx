@@ -1,3 +1,5 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { activityRoundId } from '../hooks/useActivityRoundSummaries';
 /** AC2 folded round row: up to three actor avatars (newest first), the
  * "{n} golfers posted rounds" sentence, an optional Best line and the
  * See-all opener. No score tile. Opening is the page's concern — this row
@@ -5,7 +7,7 @@
 import React from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ACT } from './ledgerKinds';
-import { bestRoundLine } from '../activityFoldRules';
+import { bestRoundLine, openOrder } from '../activityFoldRules';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 import type { ActivityRoundSummary } from '../hooks/useActivityRoundSummaries';
 
@@ -17,6 +19,7 @@ interface Props {
 
 export const ActivityFoldedRoundsRow: React.FC<Props> = ({ rows, summaries, onOpen }) => {
   const best = bestRoundLine(rows, summaries);
+  const bestActor = openOrder(rows, summaries).find(row => { const id = activityRoundId(row); return id && summaries.get(id)?.holes_played === 18; });
   return (
     <div
       className="activity-fold-row"
@@ -53,7 +56,7 @@ export const ActivityFoldedRoundsRow: React.FC<Props> = ({ rows, summaries, onOp
         </div>
         {best && (
           <div className="activity-fold-best" data-testid="activity-fold-best">
-            Best: {best.name}, {best.gross} at {best.course}
+            Best: <InlineProMemberName userId={bestActor?.actor_kind === 'business' ? undefined : bestActor?.actor_user_id}>{best.name}</InlineProMemberName>, {best.gross} at {best.course}
           </div>
         )}
         <div className="activity-fold-more">See all {rows.length} ›</div>

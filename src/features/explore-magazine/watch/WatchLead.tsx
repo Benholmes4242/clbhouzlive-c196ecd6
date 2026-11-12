@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * WS1 §3 — THE LEAD (watch-s1.html, signed off — the mock is the spec).
  *
@@ -414,7 +415,7 @@ function LeadCard({ row, onDepart }: { row: WatchLeadRow; onDepart: () => void }
             >
               {whoAvatar(30)}
               <span style={{ fontSize: 14, fontWeight: 600, textShadow: TEXT_SHADOW, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                {row.display_name}
+                <InlineProMemberName userId={row.actor_type === 'personal' ? row.actor_id : undefined}>{row.display_name}</InlineProMemberName>
                 {row.is_verified ? <VerifiedBadge size="sm" /> : null}
               </span>
             </button>
@@ -478,7 +479,7 @@ function LeadCard({ row, onDepart }: { row: WatchLeadRow; onDepart: () => void }
               </p>
             ) : null}
             <div data-watch-lead="meta" style={{ marginTop: 3, fontSize: 12.5, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {row.display_name}
+              <InlineProMemberName userId={row.actor_type === 'personal' ? row.actor_id : undefined}>{row.display_name}</InlineProMemberName>
               {row.is_verified ? ' ✓' : ''}
               {` · ${likes}`}
               {age ? ` · ${age}` : ''}

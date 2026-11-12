@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * FeedCommentPreview — the newest comment on a feed card, above an
  * add-a-comment prompt.
@@ -106,6 +107,8 @@ export const FeedCommentPreview: React.FC<Props> = ({
           content: preview.content,
           created_at: preview.created_at,
           display_name: preview.display_name,
+          actor_type: preview.actor_type,
+          actor_id: preview.actor_id,
         }]
       : []
   )
@@ -167,7 +170,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
               overflow: 'hidden',
             }}
           >
-            <span style={{ color: INK, fontWeight: 700 }}>{l.display_name}</span>
+            <span style={{ color: INK, fontWeight: 700 }}><InlineProMemberName userId={l.actor_type === 'personal' ? l.actor_id : undefined}>{l.display_name}</InlineProMemberName></span>
             <span style={{ color: MID, fontWeight: 500, marginLeft: 5 }}>
               <MentionText text={(l.content ?? '').trim()} />
             </span>

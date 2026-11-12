@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * GOLFERS YOU MIGHT KNOW (BRIEF_EXPLORE_LEADERBOARD_STATES §4).
  *
@@ -105,7 +106,7 @@ export function SuggestedGolfersRail({ surface }: { surface: string }) {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {g.display_name ?? g.username ?? ''}
+                  <InlineProMemberName userId={g.user_id}>{g.display_name ?? g.username ?? ''}</InlineProMemberName>
                 </span>
                 {/* THE REASON IS THE POINT: why we suggest them, and why
                     following them would fill the board. */}

@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VERDICT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
@@ -23,7 +24,7 @@ export function MemberShotCredit({ syntheticPosts, item, onViewPost }: { synthet
         <div style={VERDICT_KICKER}>{shot.kicker}</div>
         <div className="member-shot-title">{shot.title}</div>
         {shot.detail && <div className="member-shot-detail">{shot.detail}</div>}
-        <div className="member-shot-credit">{shot.credit}</div>
+        <div className="member-shot-credit"><InlineProMemberName userId={shot.memberUserId}>{shot.memberName}</InlineProMemberName>{shot.credit.startsWith(shot.memberName) ? shot.credit.slice(shot.memberName.length) : ''}</div>
       </div>
     </div>
     {sourcePostId && onViewPost && (

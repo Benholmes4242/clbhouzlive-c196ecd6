@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -398,7 +399,7 @@ export default function BusinessInvitePage() {
             />
             <span style={{ flex: 1, minWidth: 0 }}>
               <span className="block truncate" style={{ fontSize: 15, fontWeight: 700, color: INK }}>
-                {pickedUser.display_name || pickedUser.username}
+                <InlineProMemberName userId={pickedUser.id}>{pickedUser.display_name || pickedUser.username}</InlineProMemberName>
               </span>
               <span className="block truncate" style={{ fontSize: 12, color: DIM, marginTop: 2 }}>@{pickedUser.username}</span>
             </span>

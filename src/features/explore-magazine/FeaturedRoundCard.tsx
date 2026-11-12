@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * FEATURED ROUND / ROUND OF THE WEEK — OPTION A (signed-off mock
  * featured-round-signed-off.html). The one enlarged round, mounted only in
@@ -168,7 +169,7 @@ export const FeaturedRoundCard: React.FC<{
             </span>
             <span style={{ gridColumn: 2, gridRow: 2, display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 2 }}>
               <span data-featured-name style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 17, fontWeight: 800, color: mine ? A.AMBER : A.INK, minWidth: 0 }}>
-                {mine ? t('courseDetail.records.you') : r.display_name}
+                <InlineProMemberName userId={r.user_id}>{mine ? t('courseDetail.records.you') : r.display_name}</InlineProMemberName>
               </span>
               {/* The shared CompetitionMark, 9px after the name; the name
                   truncates before the mark does. */}

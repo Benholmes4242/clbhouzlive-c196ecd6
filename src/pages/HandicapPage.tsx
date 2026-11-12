@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 /**
@@ -183,7 +184,7 @@ const FriendTitleRow: React.FC<{
               minWidth: 0,
             }}
           >
-            {displayName ?? 'Player'}
+            <InlineProMemberName userId={friendId}>{displayName ?? 'Player'}</InlineProMemberName>
           </span>
           <ChevronRight size={18} strokeWidth={2.2} color="var(--hcp-t-60)" style={{ flexShrink: 0 }} />
         </div>

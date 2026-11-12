@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * WS2 §5 — THE WATCH GRID PAGES (signed-off watch-s2 mock B).
  *   /watch/region/:region  every video filmed in a region, chips per course
@@ -123,7 +124,7 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
                 <span data-grid-course style={{ display: 'block', marginTop: 8, fontSize: 14, fontWeight: 700, lineHeight: 1.3, overflowWrap: 'anywhere' }}>
                   {shortCourseName(row.course_name ?? '')}
                 </span>
-                {(row.display_name || row.handle) && <span data-grid-creator style={{ display: 'block', marginTop: 2, fontSize: 12, fontWeight: 400, color: 'var(--watch-grid-creator)', lineHeight: 1.35, overflowWrap: 'anywhere' }}>{row.display_name || row.handle}</span>}
+                {(row.display_name || row.handle) && <span data-grid-creator style={{ display: 'block', marginTop: 2, fontSize: 12, fontWeight: 400, color: 'var(--watch-grid-creator)', lineHeight: 1.35, overflowWrap: 'anywhere' }}><InlineProMemberName userId={row.actor_type === 'personal' ? row.actor_id : undefined}>{row.display_name || row.handle}</InlineProMemberName></span>}
               </button>
             ))}
           </div>

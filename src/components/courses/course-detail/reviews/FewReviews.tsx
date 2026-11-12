@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /** REVIEWS_STATE_3/4: total selects this shared screen; complete excluding community
  * owns every aggregate figure. The existing course circle means
  * outgoing follows; it marks only already-visible, blocked-filtered prose rows.
@@ -53,9 +54,10 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
   const ratedViewer = community.viewerScore != null;
   const renderPerson = (review: CourseReview, flat: boolean) => <React.Fragment key={review.id}><RaterReviewRow review={review} flat={flat} isHighlighted={review.id === highlightedReviewId} onMediaClick={(index, el) => onMediaClick(review, index, el)} />{afterReview?.(review)}</React.Fragment>;
   const identities = community.communityRows.map(row => {
-    const profile = visible.find(review => review.id === row.id)?.user_profiles;
+    const review = visible.find(review => review.id === row.id);
+    const profile = review?.user_profiles;
     const fullName = profile?.display_name?.trim() || profile?.username?.trim();
-    return { name: fullName?.split(/\s+/)[0], rating: row.rating };
+    return { name: fullName?.split(/\s+/)[0], userId: review?.user_id, rating: row.rating };
   });
   return <div data-reviews-state={stateFour ? 'five-to-nine' : 'few'} data-community-count={facts?.count} data-community-spread={facts?.spread}>
     <section style={{ ...section, paddingTop: 0 }}>
@@ -73,7 +75,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
           {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 14, ...FIGS }}>{community.viewerScore?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}
         </div>
         {!stateFour && <div style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 11, overflowWrap: 'anywhere', ...FIGS }}>
-          {identities.every(person => person.name) && <>{new Intl.ListFormat('en-GB').format(identities.map(person => person.name ?? ''))} · </>}
+          {identities.every(person => person.name) && <>{new Intl.ListFormat('en-GB').formatToParts(identities.map(person => person.name ?? '')).map((part, index, parts) => part.type === 'element' ? <InlineProMemberName key={index} userId={identities[parts.slice(0, index).filter(previous => previous.type === 'element').length]?.userId}>{part.value}</InlineProMemberName> : part.value)} · </>}
           <span data-individual-scores>{new Intl.ListFormat('en-GB').format(identities.map(person => person.rating?.toFixed(1) ?? ''))}</span>
         </div>}
         {showDistribution ? <div style={{ marginTop: 15 }}>

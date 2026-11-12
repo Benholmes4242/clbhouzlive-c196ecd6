@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /** REVIEWS_STATE_2 signed-off person-led exception to the flat multi-review row.
  * A review owns its overall score; calibration refers to that same source.
  * REVIEWS_FIRST_RATING_1: shows the Course tab aggregate with its count beside it
@@ -97,7 +98,7 @@ export function RaterReviewRow({ review, context, playedMonth, onMediaClick, fla
       <div data-rater-row style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <SquircleAvatar src={review.user_profiles?.profile_photo_url} alt={name} userId={review.user_id} size={34} hairlineRing />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ color: SURFACE.dark.ink, fontSize: 14, fontWeight: 700, overflowWrap: 'anywhere', lineHeight: 1.2 }}>{name}</div>
+          <div style={{ color: SURFACE.dark.ink, fontSize: 14, fontWeight: 700, overflowWrap: 'anywhere', lineHeight: 1.2 }}><InlineProMemberName userId={review.user_id}>{name}</InlineProMemberName></div>
           {contextItems.length > 0 && <div data-rater-context style={{ color: SURFACE.dark.dim, fontSize: 11, lineHeight: 1.45, marginTop: 3, ...FIGS }}>
             {contextItems.map((item, index) => <React.Fragment key={index}>{index > 0 && ' · '}{item}</React.Fragment>)}
           </div>}

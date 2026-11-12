@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * BreathingRoomBottomBar — bottom-left content slot for regular posts.
  *
@@ -46,6 +47,7 @@ interface BreathingRoomBottomBarProps {
   /** Author identity rendered above the caption. Null on editorial cards. */
   author?: {
     id: string;
+    actorType?: string;
     displayName: string;
     avatarUrl: string;
     handicapIndex: number | null;
@@ -227,7 +229,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                     minWidth: 0,
                   }}
                 >
-                  {author.displayName}
+                  <InlineProMemberName userId={author.actorType === 'personal' ? author.id : undefined}>{author.displayName}</InlineProMemberName>
                 </span>
                 {author.handicapIndex !== null && Number.isFinite(author.handicapIndex) && (
                   <span

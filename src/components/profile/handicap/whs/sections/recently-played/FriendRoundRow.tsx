@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
@@ -90,7 +91,7 @@ export const FriendRoundRow: React.FC<Props> = ({
     <>
       <div style={{ minWidth: 0, flex: '1 1 auto' }}>
         <p style={{ margin: 0, fontFamily: CHART_FONT, fontSize: 13, lineHeight: '16px', fontWeight: 700, color: CHART.INK, overflowWrap: 'anywhere' }}>
-          {displayName(activity.friend_name)}
+          <InlineProMemberName userId={activity.friend_user_id}>{displayName(activity.friend_name)}</InlineProMemberName>
         </p>
         <p style={{ ...KICKER, marginTop: GAP_NAME_TO_DATE }}>{dateMeta}</p>
       </div>

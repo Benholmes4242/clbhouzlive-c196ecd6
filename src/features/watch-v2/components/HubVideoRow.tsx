@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactionGlyph } from '@/lib/reactionKind';
@@ -189,7 +190,7 @@ function Card({
             >
               {author.name ? (
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                  {author.name}
+                  <InlineProMemberName userId={author.kind === 'personal' ? author.id : undefined}>{author.name}</InlineProMemberName>
                 </span>
               ) : null}
 

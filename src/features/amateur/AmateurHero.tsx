@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -430,7 +431,7 @@ export function AmateurHero({
                   textShadow: '0 1px 2px rgba(0,0,0,0.72)',
                 }}
               >
-                {subject.display_name}
+                <InlineProMemberName userId={subject.user_id}>{subject.display_name}</InlineProMemberName>
               </span>
               {/* §1 THE KICKER, BENEATH THE NAME. It NAMES THE FEAT, which is what
                   explains the gold dot on the shape below — the label keys the

@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 /**
@@ -581,7 +582,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               <div data-review-player-row="true" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                 <SquircleAvatar size={28} src={user.avatar} alt={user.name} userId={user.id} fallback={initials} hairlineRing ringColor={DARK_HAIRLINE} />
                 <div data-sheet-player-name="true" style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={user.id}>{user.name}</InlineProMemberName></div>
                   {metaSeg && <div style={{ marginTop: 2, fontSize: 12, color: BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{metaSeg}</div>}
                 </div>
                 {(courseId || user.id) && <div data-sheet-doors="true" style={{ display: 'flex', gap: 6, flex: 'none' }}>

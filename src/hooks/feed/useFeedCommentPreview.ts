@@ -23,6 +23,8 @@ import { batchDigest, feedKeys, viewerId } from '@/lib/queryKeys';
 import { useMergedBatch } from '@/lib/batchQuery';
 
 export interface FeedCommentLine {
+  actor_type?: 'personal' | 'business';
+  actor_id?: string;
   comment_id: string;
   content: string | null;
   created_at: string;
@@ -175,6 +177,8 @@ export function useFeedCommentPreview(
                 content: row.content,
                 created_at: row.created_at,
                 display_name: actor.displayName,
+                actor_type: actor.actorType,
+                actor_id: actor.actorId,
               },
             };
           })

@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -154,7 +155,7 @@ function ReplySheet({
                 ringColor={DARK_HAIRLINE}
               />
               <div className="text-[13px] font-semibold" style={{ color: INK }}>
-                {review.reviewer.display_name || review.reviewer.username || 'Golfer'}
+                <InlineProMemberName userId={review.reviewer.id}>{review.reviewer.display_name || review.reviewer.username || 'Golfer'}</InlineProMemberName>
               </div>
               <RatingChip rating={review.rating} />
             </div>
@@ -349,7 +350,7 @@ export function ReviewCard({
           ringColor={DARK_HAIRLINE}
         />
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-[14.5px] truncate" style={{ color: INK }}>{name}</div>
+          <div className="font-semibold text-[14.5px] truncate" style={{ color: INK }}><InlineProMemberName userId={r.reviewer.id}>{name}</InlineProMemberName></div>
           <div className="mt-0.5 text-[11.5px] truncate tabular-nums" style={{ color: A.DIM }}>{meta}</div>
         </div>
         <div

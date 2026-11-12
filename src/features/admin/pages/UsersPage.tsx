@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -1115,7 +1116,7 @@ function CreateInviteDrawer({
             }}>
               <SquircleAvatar size={32} src={selected.avatar_url} alt={selected.display_name ?? ''} userId={selected.id} hairlineRing />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{selected.display_name}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}><InlineProMemberName userId={selected.id}>{selected.display_name}</InlineProMemberName></div>
                 <div style={{ fontSize: 11, color: t.inkMuted }}>@{selected.username}</div>
               </div>
               <button
@@ -1158,7 +1159,7 @@ function CreateInviteDrawer({
                     >
                       <SquircleAvatar size={28} src={u.avatar_url} alt={u.display_name ?? ''} userId={u.id} hairlineRing />
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: 13, color: t.ink }}>{u.display_name}</div>
+                        <div style={{ fontSize: 13, color: t.ink }}><InlineProMemberName userId={u.id}>{u.display_name}</InlineProMemberName></div>
                         <div style={{ fontSize: 11, color: t.inkMuted }}>@{u.username}</div>
                       </div>
                     </button>

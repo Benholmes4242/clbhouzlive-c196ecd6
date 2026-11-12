@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * BRIEF_ADMIN_SETTINGS — the admin Settings page at /admin-v2/settings,
  * replacing the old Health-tab SettingsTab. Exact match of the three signed-off
@@ -558,7 +559,7 @@ function StaffSection({ settings, setStaff }: {
                 display: 'block', textAlign: 'left', cursor: 'pointer', color: t.ink, fontFamily: 'inherit',
               }}
             >
-              <span style={{ display: 'block', fontSize: 14, fontWeight: 600 }}>{m.display_name || m.username || 'Member'}</span>
+              <span style={{ display: 'block', fontSize: 14, fontWeight: 600 }}><InlineProMemberName userId={m.user_id}>{m.display_name || m.username || 'Member'}</InlineProMemberName></span>
               <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: t.inkFaint }}>{m.email ?? (m.username ? `@${m.username}` : '')}</span>
             </button>
           ))}
@@ -602,7 +603,7 @@ function AdminAccessSection({ viewerId }: { viewerId: string | undefined }) {
           <Row key={m.user_id} first={i === 0}>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 12, alignItems: 'center' }}>
               <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: 14, fontWeight: 600 }}>{m.display_name || 'Member'}</span>
+                <span style={{ display: 'block', fontSize: 14, fontWeight: 600 }}><InlineProMemberName userId={m.user_id}>{m.display_name || 'Member'}</InlineProMemberName></span>
                 <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: t.inkFaint }}>
                   {m.user_id === viewerId
                     ? 'You · active now'

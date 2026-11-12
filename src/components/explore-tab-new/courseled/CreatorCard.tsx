@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
@@ -137,7 +138,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
                 whiteSpace: 'nowrap',
               }}
             >
-              {creator.displayName}
+              <InlineProMemberName userId={creator.userId}>{creator.displayName}</InlineProMemberName>
             </span>
             {counts && (
               <span

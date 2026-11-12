@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { CELEBRATE_GLYPH_SIZE_COMPACT } from '@/lib/reactionKind';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -479,7 +480,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {r.display_name}
+                      <InlineProMemberName userId={r.user_id}>{r.display_name}</InlineProMemberName>
                     </span>
                   </span>
                   {/* THE FIXED-WIDTH TRAILING SLOT renders on every row whether

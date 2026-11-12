@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
@@ -346,7 +347,7 @@ export const LoopCard = React.memo(function LoopCard({
           >
             <div className="flex items-center gap-1 min-w-0">
               <span className="text-[14px] font-semibold text-foreground truncate">
-                {post.displayName}
+                <InlineProMemberName userId={post.actorType === 'business' || post.actorType === 'system' ? undefined : post.userId}>{post.displayName}</InlineProMemberName>
               </span>
               {post.isVerified && (
                 <svg className="h-3.5 w-3.5 text-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">

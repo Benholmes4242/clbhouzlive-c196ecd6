@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * Top100ListProgressSheet — one member's Top 100 list: played, then still to
  * play, in list order. Opened from the Explore Top 100 board and from the
@@ -145,7 +146,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
         />
       ) : null}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ ...ELLIPSIS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>{ownerName}</div>
+        <div style={{ ...ELLIPSIS, fontSize: 14.5, fontWeight: 700, color: A.INK }}><InlineProMemberName userId={ownerUserId}>{ownerName}</InlineProMemberName></div>
         <div style={{ ...CAPS, color: A.DIM }}>{`Top 100 ${RANK_SCOPE_LABEL[slug]}`}</div>
       </div>
       {isOwn ? (

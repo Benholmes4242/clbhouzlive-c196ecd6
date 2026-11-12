@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { MediaRailTile } from '@/components/explore-tab-new/courseled/MediaRailTile';
@@ -115,7 +116,7 @@ export function VideoRow({ item, first, onPress }: { item: CommunityLibraryItem;
         </div>
         {/* §7 ROW SUB-LINE — 11 DIM. */}
         <div style={{ marginTop: 4, fontSize: 11, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {item.displayName}
+          <InlineProMemberName userId={item.post.actorType === 'personal' ? item.post.userId : undefined}>{item.displayName}</InlineProMemberName>
         </div>
       </div>
     </button>

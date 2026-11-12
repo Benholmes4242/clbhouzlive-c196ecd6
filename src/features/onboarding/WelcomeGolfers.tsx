@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,7 +15,7 @@ function Golfer({ row, viewerId, onFollow }: { row: WelcomeFriend & { meta?: str
   const state = useFollowState({ viewerActorType: 'personal', viewerActorId: viewerId, targetActorType: 'personal', targetActorId: row.user_id });
   const toggle = useToggleFollow();
   const following = state.isFollowing ?? row.is_following;
-  return <div className="welcome-person"><span className="welcome-person-avatar">{row.profile_photo_url ? <img src={row.profile_photo_url} alt="" /> : <PlayerSilhouette />}</span><div className="welcome-person-copy"><b>{row.display_name || row.username}</b><span>{row.meta}</span></div><Button className={`welcome-follow${following ? ' is-following' : ''}`} disabled={following === undefined || toggle.isPending} onClick={async () => { const result = await toggle.mutateAsync({ viewerActorType: 'personal', viewerActorId: viewerId, viewerUserId: viewerId, targetActorType: 'personal', targetActorId: row.user_id, targetUserId: row.user_id, isFollowing: !!following }); onFollow(result.next ? 1 : -1); }}>{t(following ? 'welcome.following' : 'welcome.follow', { defaultValue: following ? 'Following' : 'Follow' })}</Button></div>;
+  return <div className="welcome-person"><span className="welcome-person-avatar">{row.profile_photo_url ? <img src={row.profile_photo_url} alt="" /> : <PlayerSilhouette />}</span><div className="welcome-person-copy"><b><InlineProMemberName userId={row.user_id}>{row.display_name || row.username}</InlineProMemberName></b><span>{row.meta}</span></div><Button className={`welcome-follow${following ? ' is-following' : ''}`} disabled={following === undefined || toggle.isPending} onClick={async () => { const result = await toggle.mutateAsync({ viewerActorType: 'personal', viewerActorId: viewerId, viewerUserId: viewerId, targetActorType: 'personal', targetActorId: row.user_id, targetUserId: row.user_id, isFollowing: !!following }); onFollow(result.next ? 1 : -1); }}>{t(following ? 'welcome.following' : 'welcome.follow', { defaultValue: following ? 'Following' : 'Follow' })}</Button></div>;
 }
 /** Follow-all over the existing toggle path; shared by screen 3 and the final page. */
 export function useFollowAll(rows: WelcomeFriend[], viewerId: string, onFollow: (n: number) => void) {

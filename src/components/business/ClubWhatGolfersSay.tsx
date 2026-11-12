@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * CB106 — golf club profile, section 4: "What golfers say". Club profiles
  * only, placed directly after "How it plays". Ratings are ALL WHITE (the
@@ -60,7 +61,7 @@ function LatestReview({ review, courses, onOpen }: {
       <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
         <SquircleAvatar size={28} src={review.user_profiles?.profile_photo_url ?? null}
           alt={review.user_profiles?.display_name ?? ''} userId={review.user_id} hairlineRing />
-        <b style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}>{review.user_profiles?.display_name ?? ''}</b>
+        <b style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}><InlineProMemberName userId={review.user_id}>{review.user_profiles?.display_name ?? ''}</InlineProMemberName></b>
         {review.rating != null && (
           <span data-club-say-chip style={{ fontSize: 11.5, fontWeight: 700, padding: '2px 7px', borderRadius: 999,
             background: T.chip, color: T.ink, ...TAB }}>{review.rating.toFixed(1)}</span>

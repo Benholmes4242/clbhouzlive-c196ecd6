@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * InlineReviewCard — caption-style overlay for the immersive feed.
  *
@@ -192,7 +193,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             textOverflow: 'ellipsis',
           }}
         >
-          {reviewer.name || 'Golfer'}
+          <InlineProMemberName userId={reviewer.id}>{reviewer.name || 'Golfer'}</InlineProMemberName>
         </span>
         {coursesRated != null && (
           <span

@@ -1,3 +1,5 @@
+import { postAuthor } from '@/lib/postAuthor';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import './explore-top.css';
@@ -451,7 +453,7 @@ export function WatchFeed({
                   onPress={() => openMoment(lead, items.map((x) => x.lead))}
                 />
               </div>
-              <span style={{ ...oneLine, marginTop: 7, fontSize: 12.5, fontWeight: 600 }}>{lead.post?.displayName || lead.post?.username}</span>
+              <span style={{ ...oneLine, marginTop: 7, fontSize: 12.5, fontWeight: 600 }}><InlineProMemberName userId={lead.post?.actorType === 'personal' ? lead.post.userId : undefined}>{lead.post?.displayName || lead.post?.username}</InlineProMemberName></span>
               <span style={{ ...oneLine, marginTop: 2, fontSize: 11.5, color: A.DIM }}>{photosCaption(lead.courseName, count)}</span>
             </div>
           ))}
@@ -474,7 +476,7 @@ export function WatchFeed({
     return <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" data-watch-short={row.post_id} onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: QH_W, minWidth: 0 }}>
       <Poster row={row} height={QH_H} posterH={480} radius={12} autoplay progress={barFor(row)} badgeTopRight />
       <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3, minHeight: 'calc(12px * 1.3 * 2)' }}>{videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}</span>
-      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
+      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}><InlineProMemberName userId={postAuthor(row).kind === 'personal' ? postAuthor(row).id : undefined}>{who}</InlineProMemberName></span> : null}
       {onYourCourse(row) && row.course_name ? <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.AMBER }}>{row.course_name}</span> : null}
     </button>;
   });
@@ -546,7 +548,7 @@ export function WatchFeed({
                 <MomentTile moment={moment} radius={12} initialsSize={14} labelSize={11} labelInset={8} labelled={false} autoplay={false} onPress={() => openMoment(moment, communityItems)} />
                 {moment.mediaType === 'video' ? <SolidDurationBadge seconds={moment.durationSeconds} /> : null}
               </div>
-              <span className="explore-community-name">{moment.post?.displayName || moment.post?.username}</span>
+              <span className="explore-community-name"><InlineProMemberName userId={moment.post?.actorType === 'personal' ? moment.post.userId : undefined}>{moment.post?.displayName || moment.post?.username}</InlineProMemberName></span>
               <span className="explore-community-course">{moment.courseName}</span>
             </div>)}
           </div> : <p style={{ padding: '30px 24px', textAlign: 'center', color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p>}
@@ -590,7 +592,7 @@ export function WatchFeed({
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32, minHeight: 'calc(12.5px * 1.32 * 2)' }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
-                      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{who}</span> : null}
+                      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}><InlineProMemberName userId={postAuthor(row).kind === 'personal' ? postAuthor(row).id : undefined}>{who}</InlineProMemberName></span> : null}
                       {onYourCourse(row) && row.course_name ? (
                         <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.AMBER }}>{row.course_name}</span>
                       ) : null}

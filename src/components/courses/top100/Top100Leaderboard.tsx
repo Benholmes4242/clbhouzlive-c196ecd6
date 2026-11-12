@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * TOP 100 LEADERBOARD — "Who's played the most" card and sheet (Option B,
  * signed off). Replaces the Your Hundred row on this page only: the old
@@ -37,31 +38,31 @@ const posText = (r: CareerRow) => `${r.is_tie ? '=' : ''}${ordinal(r.pos)}`;
 /** Card sub line. n = rows.length; numbers and ordinals are <em>. */
 function cardSub(rows: CareerRow[], viewerId: string | undefined) {
   const n = rows.length, leader = rows[0], me = viewerRow(rows, viewerId);
-  if (!viewerId) return <>{leader.display_name} leads on <em>{leader.value}</em>. {n} {n === 1 ? 'member has' : 'members have'} played one.</>;
+  if (!viewerId) return <><InlineProMemberName userId={leader.user_id}>{leader.display_name}</InlineProMemberName> leads on <em>{leader.value}</em>. {n} {n === 1 ? 'member has' : 'members have'} played one.</>;
   if (me) {
     if (me.pos === 1 && !me.is_tie) {
       const second = rows[1];
       return second
-        ? <>You lead on <em>{me.value}</em>, <em>{me.value - second.value}</em> ahead of {second.display_name}.</>
+        ? <>You lead on <em>{me.value}</em>, <em>{me.value - second.value}</em> ahead of <InlineProMemberName userId={second.user_id}>{second.display_name}</InlineProMemberName>.</>
         : <>You lead on <em>{me.value}</em>.</>;
     }
     if (me.pos === 1) return <>You share the lead on <em>{me.value}</em>.</>;
-    return <>{leader.display_name} leads on <em>{leader.value}</em>. You're <em>{posText(me)}</em> of {n}.</>;
+    return <><InlineProMemberName userId={leader.user_id}>{leader.display_name}</InlineProMemberName> leads on <em>{leader.value}</em>. You're <em>{posText(me)}</em> of {n}.</>;
   }
-  return <>{leader.display_name} leads on <em>{leader.value}</em>. You haven't played one yet.</>;
+  return <><InlineProMemberName userId={leader.user_id}>{leader.display_name}</InlineProMemberName> leads on <em>{leader.value}</em>. You haven't played one yet.</>;
 }
 
 /** Sheet summary sentence. Figures and the leader's name are <b>. */
 function summary(rows: CareerRow[], viewerId: string | undefined, lab: string) {
   const n = rows.length, leader = rows[0], me = viewerRow(rows, viewerId);
-  if (!viewerId) return <><b>{leader.display_name}</b> leads the {lab} Top 100 on <b>{leader.value}</b>. {n} {n === 1 ? 'member has' : 'members have'} played at least one.</>;
-  if (!me) return <>You haven't played any of the {lab} Top 100 yet. <b>{leader.display_name}</b> leads on <b>{leader.value}</b>.</>;
+  if (!viewerId) return <><b><InlineProMemberName userId={leader.user_id}>{leader.display_name}</InlineProMemberName></b> leads the {lab} Top 100 on <b>{leader.value}</b>. {n} {n === 1 ? 'member has' : 'members have'} played at least one.</>;
+  if (!me) return <>You haven't played any of the {lab} Top 100 yet. <b><InlineProMemberName userId={leader.user_id}>{leader.display_name}</InlineProMemberName></b> leads on <b>{leader.value}</b>.</>;
   if (me.pos === 1 && me.is_tie) return <>You share the lead on the {lab} Top 100 on <b>{me.value}</b>.</>;
   if (me.pos === 1) {
     const second = rows[1];
-    return <>You lead the {lab} Top 100 on <b>{me.value}</b>{second ? <>, <b>{me.value - second.value}</b> ahead of {second.display_name}</> : null}.</>;
+    return <>You lead the {lab} Top 100 on <b>{me.value}</b>{second ? <>, <b>{me.value - second.value}</b> ahead of <InlineProMemberName userId={second.user_id}>{second.display_name}</InlineProMemberName></> : null}.</>;
   }
-  return <>You've played <b>{me.value}</b> of the {lab} Top 100. <b>{posText(me)}</b> of {n}, <b>{leader.value - me.value}</b> behind {leader.display_name}.</>;
+  return <>You've played <b>{me.value}</b> of the {lab} Top 100. <b>{posText(me)}</b> of {n}, <b>{leader.value - me.value}</b> behind <InlineProMemberName userId={leader.user_id}>{leader.display_name}</InlineProMemberName>.</>;
 }
 
 function Sheet({ viewerId, pageList, pageListSize, onClose }: { viewerId: string | undefined; pageList: RankListSlug; pageListSize: number | undefined; onClose: () => void }) {
@@ -111,7 +112,7 @@ function Sheet({ viewerId, pageList, pageListSize, onClose }: { viewerId: string
               <span className="t100b-lb-pos">{r.is_tie ? '=' : ''}{r.pos}</span>
               <SquircleAvatar src={r.photo_url} alt={r.display_name ?? ''} size={40} hideRing />
               <span className="t100b-lb-rt">
-                <span className="t100b-lb-rn">{you ? 'You' : r.display_name}</span>
+                <span className="t100b-lb-rn"><InlineProMemberName userId={r.user_id}>{you ? 'You' : r.display_name}</InlineProMemberName></span>
                 {r.last_course_name ? <span className="t100b-lb-rs">{shortCourseName(r.last_course_name)}</span> : null}
               </span>
               <span className="t100b-lb-rv">{r.value}</span>

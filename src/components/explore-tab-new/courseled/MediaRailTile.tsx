@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useEffect, useRef, useState } from 'react';
 
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
@@ -112,7 +113,7 @@ export function MediaRailTile({
         )}
         <GlassDurationBadge seconds={item.duration} />
       </div>
-      {showCaption && <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.displayName}</div>}
+      {showCaption && <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={item.post.actorType === 'personal' ? item.post.userId : undefined}>{item.displayName}</InlineProMemberName></div>}
     </button>
   );
 }

@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * ER2 — CREATORS TO FOLLOW. Up to five creators from get_watch_spotlights,
  * picked once per Explore visit: WatchFeed mints the
@@ -155,7 +156,7 @@ function SpotlightCard({ row, activity, visitKey, position, onDepart }: { row: S
           </ActiveAvatarDoor>
           <div style={{ minWidth: 0, flex: 1 }}>
             <b data-spotlight-name style={{ display: 'block', fontSize: 17, fontWeight: 700, overflowWrap: 'anywhere' }}>
-              {row.display_name}
+              <InlineProMemberName userId={business ? undefined : row.actor_id}>{row.display_name}</InlineProMemberName>
               {row.is_verified ? <> <VerifiedBadge size="sm" className="inline align-middle" /></> : null}
             </b>
             <span data-spotlight-line className="spotlight-line">{spotlightLine(row, vids.isError ? null : videos[0]?.created_at)}</span>

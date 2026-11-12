@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -53,7 +54,7 @@ export function RoundTileWho({
     >
       <SquircleAvatar size={34} src={photo} alt="" fallback={getInitialsFromName(name)} userId={userId ?? undefined} hairlineRing />
       <span className="standout-identity">
-        <span data-round-card-name className="standout-name" style={nameColor ? { color: nameColor } : undefined}>{name}</span>
+        <span data-round-card-name className="standout-name" style={nameColor ? { color: nameColor } : undefined}><InlineProMemberName userId={userId}>{name}</InlineProMemberName></span>
         {secondLine}
       </span>
     </Button>

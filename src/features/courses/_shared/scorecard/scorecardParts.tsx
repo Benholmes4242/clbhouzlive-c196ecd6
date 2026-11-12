@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { formatHcp } from '@/lib/formatHcp';
 import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 /**
@@ -488,7 +489,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
             }}
             title={playerName as string}
           >
-            {playerName}
+            <InlineProMemberName userId={isTour ? undefined : playerUserId}>{playerName}</InlineProMemberName>
           </span>
           {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
           {(onViewCourse || onViewProfile) && (
@@ -507,7 +508,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
           </span>
           <span data-sheet-player-name="true" style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {playerName}
+              <InlineProMemberName userId={isTour ? undefined : playerUserId}>{playerName}</InlineProMemberName>
             </span>
             {!isTour && playedOffIndex != null ? (
               <span data-scorecard-played-off="true" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.DIM, marginTop: 2, whiteSpace: 'nowrap' }}>

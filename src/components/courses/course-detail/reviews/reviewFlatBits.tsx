@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * BRIEF_REVIEWS_TAB_REBUILD §4 — THE REVIEW ROW.
  *
@@ -163,7 +164,7 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
               textOverflow: 'ellipsis',
             }}
           >
-            {name}
+            <InlineProMemberName userId={review.user_id}>{name}</InlineProMemberName>
           </div>
           <div style={{ fontSize: 11, color: A.DIM, marginTop: 2 }}>
             {formatReviewDate(review.review_date)}

@@ -125,6 +125,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   };
 
   const author = {
+    actorType: activePost.actorType ?? 'personal',
     id: activePost.userId,
     displayName: activePost.displayName,
     avatarUrl: activePost.avatarUrl,

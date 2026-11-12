@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * DEAD LIST — UNREFERENCED since 10 Sep 2026. Nothing imports this file.
  *
@@ -253,7 +254,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
               overflowWrap: 'anywhere',
             }}
           >
-            {displayName}
+            <InlineProMemberName userId={entry.friend_user_id}>{displayName}</InlineProMemberName>
           </p>
           {showFlame && <FlameIcon />}
         </div>

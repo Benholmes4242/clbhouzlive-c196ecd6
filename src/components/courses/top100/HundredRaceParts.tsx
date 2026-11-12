@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
@@ -69,7 +70,7 @@ export function HundredRaceRow({ row, viewerId, total, previousViewer = false, o
   return <button type="button" className="t100-row" data-race-row={row.user_id} data-viewer={self || undefined} data-after-viewer={previousViewer || undefined} onClick={onPress}>
     <span className="t100-position tabular-nums">{row.is_tie ? `T${row.pos}` : row.pos}</span>
     <SquircleAvatar size={34} src={row.photo_url} alt={row.display_name ?? ''} userId={row.user_id} hairlineRing />
-    <span className="t100-row-main"><span className="t100-row-name">{row.display_name || t('discover.aMember')}</span>
+    <span className="t100-row-main"><span className="t100-row-name"><InlineProMemberName userId={row.user_id}>{row.display_name || t('discover.aMember')}</InlineProMemberName></span>
       {row.last_course_name ? <span className="t100-row-course">{shortCourseName(row.last_course_name)}</span> : null}
       <span className="t100-row-track" aria-hidden><span data-row-progress style={{ width: `${raceShare(Number(row.value), total) * 100}%` }} /></span>
     </span>

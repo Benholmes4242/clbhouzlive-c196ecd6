@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React from 'react';
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
@@ -661,7 +662,7 @@ function WhoLine({
             fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, textShadow: HERO_TEXT_SHADOW,
           }}
         >
-          {name}
+          <InlineProMemberName userId={item.kind === 'round' || item.kind === 'review' ? who?.user_id : undefined}>{name}</InlineProMemberName>
         </span>
         {who && reviewIdentity.course ? <span aria-hidden style={{ flex: '0 0 auto', color: subColor }}>·</span> : null}
         {reviewIdentity.course ? (
@@ -729,7 +730,7 @@ function WhoLine({
                textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
             }}
           >
-            {name}
+            <InlineProMemberName userId={item.kind === 'round' || item.kind === 'review' ? who?.user_id : undefined}>{name}</InlineProMemberName>
           </span>
         ) : null}
         {sub ? (
@@ -876,7 +877,7 @@ function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow, isCompetition }:
       ) : null}
       <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
         <span style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-          <span data-round-author-name="true" style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, lineHeight: 1.25, color: isViewer ? A.AMBER : '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name}</span>
+          <span data-round-author-name="true" style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, lineHeight: 1.25, color: isViewer ? A.AMBER : '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}><InlineProMemberName userId={item.kind === 'round' || item.kind === 'review' ? who?.user_id : undefined}>{name}</InlineProMemberName></span>
           {/* The shared CompetitionMark, 9px after the member's name; the name
               truncates before the mark does. */}
           {isCompetition === true ? <CompetitionMark style={{ marginLeft: 9 }} /> : null}
@@ -1312,7 +1313,7 @@ export function ExploreCard({
           color: item.who?.is_viewer ? A.AMBER : '#FFFFFF', textShadow: HERO_TEXT_SHADOW,
         }}
       >
-        {reviewName}
+        <InlineProMemberName userId={item.who?.user_id}>{reviewName}</InlineProMemberName>
       </span>
       {kickerDate ? (
         <span

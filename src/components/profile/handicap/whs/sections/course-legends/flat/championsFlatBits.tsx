@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * BRIEF_CHAMPIONS_TAB_REBUILD — the shared parts of the flat Champions tab.
  *
@@ -180,7 +181,7 @@ export const ChampionLine: React.FC<{
             whiteSpace: 'nowrap',
           }}
         >
-          {champion.isSelf ? 'You' : champion.name}
+          <InlineProMemberName userId={champion.userId}>{champion.isSelf ? 'You' : champion.name}</InlineProMemberName>
         </span>
         {!onlyRound && tenure && !champion.isSelf ? (
           <span
@@ -279,7 +280,7 @@ export const FlatBoardRow: React.FC<{
             whiteSpace: 'nowrap',
           }}
         >
-          {ghost ? 'You would sit here' : row.isSelf ? 'You' : row.name}
+          <InlineProMemberName userId={row.userId}>{ghost ? 'You would sit here' : row.isSelf ? 'You' : row.name}</InlineProMemberName>
         </span>
         <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 500, color: ghost ? A.FAINT : A.DIM }}>
           {ghost ? 'Projected, not played' : `${formatChampionsWhen(row.attained_at)}${pinned ? ' · your best here' : ''}`}

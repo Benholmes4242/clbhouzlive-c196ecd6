@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -374,7 +375,7 @@ const PostDeepLinkPage: React.FC = () => {
               </div>
             )}
             <div className="flex flex-col">
-              <span className="text-white text-[14px] font-semibold leading-tight">{displayName}</span>
+              <span className="text-white text-[14px] font-semibold leading-tight"><InlineProMemberName userId={feedPost?.actorType === 'personal' ? feedPost.userId : undefined}>{displayName}</InlineProMemberName></span>
               {username && (
                 <span className="text-white/40 text-[12px] leading-tight">@{username}</span>
               )}

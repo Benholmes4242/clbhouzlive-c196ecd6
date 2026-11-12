@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * ReviewPostCard — the Clubhouse feed's review post (BRIEF_REVIEW_POST_V2,
  * spec reviewpost-v2.html). A REVIEW POST IS NOT A CARD: the article takes
@@ -109,7 +110,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       {body ? (
         <div data-review-body-wrap style={{ flex: 'none', display: 'flex', padding: `0 ${GUTTER}px 6px` }}>
           <div data-review-body style={{ fontSize: 15, lineHeight: 1.4, color: A.INK, ...REVIEW_BODY_CLAMP }}>
-            {mediaLeads ? <><span data-review-body-lead style={{ fontWeight: 600, color: A.INK }}>{post.displayName}</span>{' '}</> : null}
+            {mediaLeads ? <><span data-review-body-lead style={{ fontWeight: 600, color: A.INK }}><InlineProMemberName userId={post.actorType === 'business' || post.actorType === 'system' ? undefined : post.userId}>{post.displayName}</InlineProMemberName></span>{' '}</> : null}
             <MentionText text={body} />
           </div>
         </div>
@@ -160,7 +161,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
-            {post.displayName}
+            <InlineProMemberName userId={post.actorType === 'business' || post.actorType === 'system' ? undefined : post.userId}>{post.displayName}</InlineProMemberName>
           </button>
           {/* A.1 — the meta line reads exactly like a normal post: the owner
               menu, then the date, then the follow pill, all inline. The earlier

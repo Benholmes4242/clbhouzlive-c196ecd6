@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -238,7 +239,7 @@ function CompactRow({
             textOverflow: 'ellipsis',
           }}
         >
-          {name}
+          <InlineProMemberName userId={id}>{name}</InlineProMemberName>
         </span>
         {secondary ? (
           <span

@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { BOARD_ROW_METRICS } from './rowMetrics';
 import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
@@ -467,7 +468,7 @@ export function BoardRowView({
             whiteSpace: 'nowrap',
           }}
         >
-          {row.display_name ?? t('discover.aMember')}
+          <InlineProMemberName userId={row.user_id}>{row.display_name ?? t('discover.aMember')}</InlineProMemberName>
         </span>
           {feat ? (
             <span

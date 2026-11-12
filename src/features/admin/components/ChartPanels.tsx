@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React from 'react';
 import { Radio, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -157,7 +158,7 @@ export function RightNowPanel({
               <SquircleAvatar src={u.avatarUrl} alt={u.displayName} userId={u.userId} size={20} hairlineRing />
 
               <span style={{ color: t.ink, fontSize: 13, fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {u.displayName}
+                <InlineProMemberName userId={u.userId}>{u.displayName}</InlineProMemberName>
               </span>
               <span style={{ ...FIG, color: t.ink, fontSize: 13, fontWeight: 700 }}>{num(u.eventCount)}</span>
               <ChevronRight size={14} color={t.inkFaint} aria-hidden />

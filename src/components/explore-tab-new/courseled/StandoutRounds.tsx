@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useTranslation } from 'react-i18next';
 import { Section } from '@/features/explore-magazine/Section';
 import { Button } from '@/components/ui/button';
@@ -67,7 +68,7 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
             <span style={{ display: 'flex', flex: 'none' }}><MemberAvatar userId={row.user_id} name={row.display_name} photoUrl={row.profile_photo_url} size={36} /></span>
             <span style={{ flex: 1, minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', lineHeight: '16px', minWidth: 0 }}>
-                <span style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{row.display_name ?? t('discover.aMember')}</span>
+                <span style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}><InlineProMemberName userId={row.user_id}>{row.display_name ?? t('discover.aMember')}</InlineProMemberName></span>
                 {/* CB6.1 — a category, not a rare achievement, so a bare coloured word, never a pill (rule recorded in BoardRows.tsx). */}
                 {row.is_competition === true ? <CompetitionMark data-standout-competition style={{ marginLeft: 9 }} /> : null}
               </span>

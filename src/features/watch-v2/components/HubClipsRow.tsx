@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubQuickClips } from '../hooks/useHubQuickClips';
@@ -136,7 +137,7 @@ function Tile({
             textOverflow: 'ellipsis',
           }}
         >
-          {postAuthor(row).name}
+          <InlineProMemberName userId={postAuthor(row).kind === 'personal' ? postAuthor(row).id : undefined}>{postAuthor(row).name}</InlineProMemberName>
         </div>
       ) : null}
 

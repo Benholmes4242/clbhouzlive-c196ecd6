@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { UserX } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
@@ -156,7 +157,7 @@ export default function BlockedPage() {
                     hairlineRing
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-medium text-foreground" style={{ lineHeight: 1.3 }}>{p?.full_name ?? 'Unknown'}</p>
+                    <p className="text-[15px] font-medium text-foreground" style={{ lineHeight: 1.3 }}><InlineProMemberName userId={item.blocked_id}>{p?.full_name ?? 'Unknown'}</InlineProMemberName></p>
                     {p?.username && (
                       <p className="text-[13px]" style={{ color: A.MUTE, lineHeight: 1.35 }}>@{p.username}</p>
                     )}

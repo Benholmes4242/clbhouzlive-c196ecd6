@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { CELEBRATE_GLYPH_SIZE_COMPACT } from '@/lib/reactionKind';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -156,7 +157,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = 
               minWidth: 0,
             }}
           >
-            {display_name}
+            <InlineProMemberName userId={user_id}>{display_name}</InlineProMemberName>
           </div>
 
           <div

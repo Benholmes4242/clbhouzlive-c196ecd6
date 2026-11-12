@@ -30,6 +30,7 @@ export interface MediaItem {
     credit: string;
     avatarUrl: string | null;
     memberName: string;
+    memberUserId?: string | null;
     /** PF2_GUIDE: the live public post this shot came from; null for every
      *  other tag path (Media tab, places, course posts). */
     sourcePostId?: string | null;

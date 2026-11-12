@@ -112,6 +112,7 @@ function holeShotItems(rows: readonly MemberShotRow[], courseName: string, holeN
         credit: credit(row.member_name, row.added_at),
         avatarUrl: row.member_avatar_url ?? null,
         memberName: row.member_name ?? '',
+        memberUserId: row.credit_actor_type === 'business' ? null : row.credit_actor_id ?? row.member_id ?? null,
         sourcePostId: row.source_post_id ?? null,
         ...(perItemCourse ? { courseId: row.course_id, courseName: row.course_name ?? '' } : {}),
       } }, date: row.added_at,
@@ -158,6 +159,7 @@ export function coursePostsToShotPosts(posts: readonly FeedPost[],
       kicker: "Through members' eyes", title: courseName,
       credit: credit(post.displayName, post.createdAt),
       avatarUrl: post.avatarUrl || null, memberName: post.displayName,
+      memberUserId: post.actorType === 'business' || post.actorType === 'system' ? null : post.userId,
     } }, date: post.createdAt,
   })));
   return syntheticPost(`shots:course:${courseId}`, courseId, courseName, courseName, thumbnail, shots);

@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 // A share card is the one surface a member puts in front of other people, so every figure on it must already be true somewhere else on this page. It recomputes nothing. A figure we do not have is a row that is not drawn, never a zero.
 import React from 'react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -18,6 +19,7 @@ export interface CourseLegacyCardProps {
   /** The member's own ratings, from the tab's one course_ratings read. */
   ratings: { course_id: string; rating: number | null }[];
   displayName?: string;
+  userId?: string;
   year?: number;
 }
 
@@ -66,7 +68,7 @@ const ROW: React.CSSProperties = {
 };
 
 export const CourseLegacyCard: React.FC<CourseLegacyCardProps> = ({
-  isOwnProfile, coursesPlayed, countriesPlayed, top100Played, points, names, ratings, displayName,
+  isOwnProfile, coursesPlayed, countriesPlayed, top100Played, points, names, ratings, displayName, userId,
   year = new Date().getFullYear(),
 }) => {
   if (!isOwnProfile || coursesPlayed == null) return null;
@@ -125,7 +127,7 @@ export const CourseLegacyCard: React.FC<CourseLegacyCardProps> = ({
         )}
         {displayName && (
           <div style={{ marginTop: 14, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.FAINT }}>
-            {displayName}
+            <InlineProMemberName userId={userId}>{displayName}</InlineProMemberName>
           </div>
         )}
       </div>

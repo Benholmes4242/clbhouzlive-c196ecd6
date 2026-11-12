@@ -204,6 +204,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       {isOwnProfile && (
         <div className="mt-6">
           <CourseLegacyCard
+            userId={userId}
             isOwnProfile={isOwnProfile}
             coursesPlayed={totalCoursesPlayed}
             countriesPlayed={countriesPlayed}

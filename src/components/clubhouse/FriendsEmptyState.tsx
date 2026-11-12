@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * FriendsEmptyState — "Build your fourball" empty state for the Friends tab.
  *
@@ -473,7 +474,7 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
             textOverflow: 'ellipsis',
           }}
         >
-          {creator.displayName}
+          <InlineProMemberName userId={creator.userId}>{creator.displayName}</InlineProMemberName>
         </div>
         <div
           style={{

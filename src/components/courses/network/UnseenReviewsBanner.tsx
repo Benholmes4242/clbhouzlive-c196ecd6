@@ -1,3 +1,4 @@
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import React, { useState } from 'react';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
@@ -68,7 +69,7 @@ export function UnseenReviewsBanner() {
               rating: Number(latest.rating).toFixed(1),
             }}
             components={{
-              name: <span className="font-bold" />,
+              name: <InlineProMemberName userId={latest.reviewer_id}><span className="font-bold" /></InlineProMemberName>,
               course: <span className="font-semibold" />,
               rating: <span style={{ color: AMBER, fontWeight: 700 }} />,
             }}
