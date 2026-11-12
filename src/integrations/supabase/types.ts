@@ -25266,6 +25266,21 @@ export type Database = {
           username: string
         }[]
       }
+      get_people_to_follow_by_kind: {
+        Args: { p_kind: string; p_limit?: number }
+        Returns: {
+          display_name: string
+          followers: number
+          mutual_count: number
+          pro_club: string
+          pro_kind: string
+          pro_tour: string
+          profile_photo_url: string
+          user_id: string
+          username: string
+          videos: number
+        }[]
+      }
       get_personal_bests: {
         Args: { p_days?: number; p_limit?: number; p_per_member?: number }
         Returns: {
