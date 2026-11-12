@@ -1,6 +1,10 @@
 # Roadmap
 
-## Blocked: Admin Command centre v2
+## In progress: Admin Command centre v2B verification
+Authorised repair adds explicit single columns to the squircle and cohort grids only; hook and tests unchanged.
+Run focused grid/Dashboard checks, then four separate sequential shards; rerun only the two named intermittent failures once.
+
+## Previous stop: Admin Command centre v2
 Dashboard/live v2 hook implemented; mock caption weights and auto-fit creator grid confirmed.
 Focused 16 passed; separate shards 1=2,142 passed, 2=1,993 passed, 3=2,132 passed/1 failed. Shard 4 not run.
 STOP src/test/fixOverflowSource.test.ts:62:24: `AssertionError: expected [ …(2) ] to deeply equal []`; Dashboard squircle/cohort grids omit explicit columns. Test untouched; no repair after failure.

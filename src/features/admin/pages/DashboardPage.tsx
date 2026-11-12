@@ -82,7 +82,7 @@ function Btn({ children, primary, to }: { children: React.ReactNode; primary?: b
 function Squircle({ name, size = 30 }: { name: string; size?: number }) {
   const initials = name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
   return (
-    <div style={{ width: size, height: size, borderRadius: size * 0.34, background: INSET, border: `1px solid ${t.hairline}`, display: 'grid', placeItems: 'center', fontSize: size * 0.36, fontWeight: 700, color: t.inkMuted, flex: 'none' }}>{initials}</div>
+    <div style={{ width: size, height: size, borderRadius: size * 0.34, background: INSET, border: `1px solid ${t.hairline}`, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: size * 0.36, fontWeight: 700, color: t.inkMuted, flex: 'none' }}>{initials}</div>
   );
 }
 
@@ -461,7 +461,7 @@ function Retention({ data }: { data: CommandCentreV2['retention'] }) {
             {[0, 1, 2, 3, 4].map(i => {
               const v = cells[i];
               return (
-                <div key={i} style={{ height: 30, borderRadius: 7, display: 'grid', placeItems: 'center', background: v == null ? 'transparent' : `rgba(233,237,243,${0.05 + (v / 100) * 0.55})`, border: v == null ? `1px dashed ${t.hairline}` : 'none' }}>
+                <div key={i} style={{ height: 30, borderRadius: 7, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', background: v == null ? 'transparent' : `rgba(233,237,243,${0.05 + (v / 100) * 0.55})`, border: v == null ? `1px dashed ${t.hairline}` : 'none' }}>
                   {v != null && <span style={{ ...FIG, fontSize: 11.5, letterSpacing: 0, color: v > 60 ? t.canvas : t.ink }}>{v}</span>}
                 </div>
               );
