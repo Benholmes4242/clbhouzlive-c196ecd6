@@ -32,12 +32,21 @@ async function isAdmin(userId: string): Promise<boolean> {
   return !!data && (data.role === "full" || data.role === "limited");
 }
 
-async function notifyGolfer(userId: string, decision: string, reason: string | null, note: string | null) {
+// Copy stays pure so tests exercise the same payload queued for devices.
+export function buildGolferPush(decision: string, isPro: boolean, reason: string | null, note: string | null) {
   const approved = decision === "approved";
   const cause = reason ? GOLFER_REASON_LABEL[reason] ?? "" : "";
-  const body = approved
-    ? "Your verified badge is now live across Clbhouz."
-    : [cause || "Your verification was not granted.", note].filter(Boolean).join(" ");
+  return {
+    title: approved ? (isPro ? "You're verified as a pro" : "You're verified") : "Verification update",
+    body: approved
+      ? (isPro ? "Your PRO label is live. No handicap needed." : "Your verified badge is now live across clbhouz.")
+      : [cause || "Your verification was not granted.", note].filter(Boolean).join(" "),
+  };
+}
+
+async function notifyGolfer(userId: string, decision: string, isPro: boolean, reason: string | null, note: string | null) {
+  const approved = decision === "approved";
+  const { title, body } = buildGolferPush(decision, isPro, reason, note);
 
   // Email, if we can resolve one. A missing address must not fail the decision.
   try {
@@ -60,7 +69,7 @@ async function notifyGolfer(userId: string, decision: string, reason: string | n
         recipient_actor_type: "personal",
         recipient_actor_id: userId,
         device_id: d.provider_id,
-        title: approved ? "You're verified" : "Verification update",
+        title,
         body,
         /* BRIEF 1 §9 — removal must say removal, not rejection. */
         data: { type: approved ? "golfer_verification_approved" : decision === "removed" ? "golfer_verification_removed" : "golfer_verification_rejected" },
@@ -112,6 +121,7 @@ serve(async (req) => {
     );
 
     let golferId: string | null = user_id ?? null;
+    let isPro = false;
 
     if (decision === "removed") {
       if (!golferId) return json({ ok: false, error: "Missing user_id" }, 400);
@@ -125,7 +135,7 @@ serve(async (req) => {
       if (!request_id) return json({ ok: false, error: "Missing request_id" }, 400);
       const { data: reqRow } = await supabaseAdmin
         .from("golfer_verification_requests")
-        .select("id, user_id, status")
+        .select("id, user_id, status, kind")
         .eq("id", request_id)
         .maybeSingle();
       if (!reqRow) return json({ ok: false, error: "Request not found" }, 404);
@@ -133,6 +143,7 @@ serve(async (req) => {
         return json({ ok: false, error: "Request is not pending" }, 409);
       }
       golferId = reqRow.user_id as string;
+      isPro = reqRow.kind === "tour_pro" || reqRow.kind === "teaching_pro";
 
       /* BRIEF 1 §8 — the chosen sr_players match passes through to the
          decision RPC, which links the member's profile to their tour record. */
@@ -149,7 +160,7 @@ serve(async (req) => {
     console.log(`[golfer-decision] ${decision} for ${golferId} by ${adminUserId} (${reason ?? '-'})`);
 
     if (golferId) {
-      notifyGolfer(golferId, decision, reason ?? null, admin_note ?? null)
+      notifyGolfer(golferId, decision, isPro, reason ?? null, admin_note ?? null)
         .catch((e) => console.error("[golfer-decision] notify failed", e));
     }
 

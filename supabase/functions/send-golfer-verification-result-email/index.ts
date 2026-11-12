@@ -10,6 +10,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { corsFor } from '../_shared/cors.ts';
 import { GOLFER_REASON_LABEL } from '../_shared/verificationRevocationReasons.ts';
 
+export const GOLFER_EMAIL_FROM = "clbhouz <support@clbhouz.co.uk>";
+export const GOLFER_EMAIL_REPLY_TO = "support@clbhouz.co.uk";
+
 const supabaseAdmin = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -19,20 +22,54 @@ const supabaseAdmin = createClient(
 type Outcome = "approved" | "rejected" | "removed";
 
 function escapeHtml(s: string) {
-  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] ?? c));
 }
 
 function shell(inner: string) {
   return `<!DOCTYPE html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#0f172a;background:#f8fafc;margin:0;padding:24px;">
     <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
-      <div style="background:#0f172a;color:#fff;padding:18px 22px;font-weight:700;">Clbhouz</div>
+      <div style="background:#0f172a;color:#fff;padding:18px 22px;font-weight:700;">clbhouz</div>
       <div style="padding:22px;">
         ${inner}
-        <p style="margin-top:24px;color:#64748b;font-size:12px;">This is an automated message from Clbhouz.</p>
+        <p style="margin-top:24px;color:#64748b;font-size:12px;">This is an automated message from clbhouz.</p>
       </div>
     </div>
     <style>.cta{display:inline-block;background:#0f172a;color:#fff!important;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;}</style>
   </body></html>`;
+}
+
+// The sender and all result copy are built once for the actual Resend payload.
+export function buildGolferEmail(recipient: string, outcome: Outcome, proKind: string | null, reason: string | null, admin_note: string | null, appBase: string) {
+  const cause = reason ? GOLFER_REASON_LABEL[reason] ?? "" : "";
+  const isPro = proKind === "tour_pro" || proKind === "teaching_pro";
+  const proLabel = proKind === "teaching_pro" ? "teaching professional" : "tour professional";
+
+  let subject: string;
+  let inner: string;
+  let text: string;
+
+  if (outcome === "approved") {
+    subject = isPro ? "You're verified as a pro on clbhouz" : "You're verified on clbhouz";
+    const approvedBody = isPro
+    ? `Your profile now shows you're a verified ${proLabel}. Your PRO label is live and no handicap is needed.`
+    : "Your verified badge is now live across your profile, posts and reviews.";
+    text = `${approvedBody}\n\n${appBase}`;
+    inner = `<h2 style="margin:0 0 8px;color:#0f172a;">You're verified</h2>
+    <p style="margin:0 0 16px;color:#334155;">${approvedBody}</p>
+    <a class="cta" href="${appBase}">Open clbhouz</a>`;
+  } else {
+    subject = outcome === "removed"
+    ? (isPro ? "Your clbhouz pro verification has been removed" : "Your clbhouz verification has been removed")
+    : (isPro ? "About your clbhouz pro verification" : "About your clbhouz verification");
+    const body = [cause || (outcome === "removed"
+    ? (isPro ? "Your pro verification has been removed." : "Your verified badge has been removed.")
+    : (isPro ? "Your pro verification was declined." : "Your verification was not granted.")), admin_note].filter(Boolean).join(" ");
+    text = `${body}\n\n${appBase}`;
+    inner = `<h2 style="margin:0 0 8px;color:#0f172a;">Verification update</h2>
+    <p style="margin:0 0 12px;color:#334155;">${escapeHtml(body)}</p>`;
+  }
+
+  return { from: GOLFER_EMAIL_FROM, reply_to: GOLFER_EMAIL_REPLY_TO, to: recipient, subject, text, html: shell(inner) };
 }
 
 serve(async (req) => {
@@ -60,7 +97,6 @@ serve(async (req) => {
     if (!recipient) return json({ ok: true, skipped: "no_recipient" });
 
     const appBase = Deno.env.get("APP_BASE_URL") || "https://www.clbhouz.co.uk";
-    const cause = reason ? GOLFER_REASON_LABEL[reason] ?? "" : "";
 
     /* BRIEF 1 §9 — a pro request gets pro-specific copy. The caller passes
        only user_id, so the member's latest request supplies the kind. */
@@ -75,44 +111,18 @@ serve(async (req) => {
         .maybeSingle();
       proKind = (reqRow?.kind as string | undefined) ?? null;
     } catch (_) { /* fall through */ }
-    const isPro = proKind === "tour_pro" || proKind === "teaching_pro";
-    const proLabel = proKind === "teaching_pro" ? "teaching professional" : "tour professional";
-
-    let subject: string;
-    let inner: string;
-    let text: string;
-
-    if (outcome === "approved") {
-      subject = isPro ? "You're verified as a pro on Clbhouz" : "You're verified on Clbhouz";
-      const approvedBody = isPro
-        ? `Your profile now shows you're a verified ${proLabel}.`
-        : "Your verified badge is now live across your profile, posts and reviews.";
-      text = `${approvedBody}\n\n${appBase}`;
-      inner = `<h2 style="margin:0 0 8px;color:#0f172a;">You're verified</h2>
-        <p style="margin:0 0 16px;color:#334155;">${approvedBody}</p>
-        <a class="cta" href="${appBase}">Open Clbhouz</a>`;
-    } else {
-      subject = outcome === "removed"
-        ? (isPro ? "Your Clbhouz pro verification has been removed" : "Your Clbhouz verification has been removed")
-        : (isPro ? "About your Clbhouz pro verification" : "About your Clbhouz verification");
-      const body = [cause || (outcome === "removed"
-        ? (isPro ? "Your pro verification has been removed." : "Your verified badge has been removed.")
-        : (isPro ? "Your pro verification was declined." : "Your verification was not granted.")), admin_note].filter(Boolean).join(" ");
-      text = `${body}\n\n${appBase}`;
-      inner = `<h2 style="margin:0 0 8px;color:#0f172a;">Verification update</h2>
-        <p style="margin:0 0 12px;color:#334155;">${escapeHtml(body)}</p>`;
-    }
+    const payload = buildGolferEmail(recipient, outcome, proKind, reason ?? null, admin_note ?? null, appBase);
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
-      console.log("[golfer-result-email] RESEND_API_KEY not set; would send", subject, "to", recipient);
+      console.log("[golfer-result-email] RESEND_API_KEY not set; would send", payload.subject, "to", recipient);
       return json({ ok: true, skipped: "no_resend_key" });
     }
 
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: "Clbhouz <noreply@clbhouz.co.uk>", to: recipient, subject, text, html: shell(inner) }),
+      body: JSON.stringify(payload),
     });
     if (!r.ok) {
       const errText = await r.text();

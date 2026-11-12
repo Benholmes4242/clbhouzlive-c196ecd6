@@ -1,5 +1,12 @@
 # Roadmap
 
+## Done: Verification messages
+Lowercase verification copy, pro-specific push and support sender/reply address; both authorised functions deployed.
+Six new pure payload tests; no existing tests changed. Four separate sequential shards:
+2,142 / 1,987 / 2,138 / 2,028 = 8,295 passed, zero failures (+6 against 8,289).
+Deployed smoke checks returned expected 401/400; no real approval or member delivery was triggered.
+Report: /mnt/documents/VERIFICATION_MESSAGES_REPORT.md. No SQL, migrations or database decision changes.
+
 ## Done: Top 100 leaderboard finish
 Complete panel hook mocks restored; four retired dropdown tests replaced with two.
 Numeric sheet positions, ring-free avatars and retained page-card rows verified by focused tests.
