@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Admin Command centre v2
+Port signed-off panels to live v2 RPC; keep AdminShell and unrelated surfaces unchanged.
+User resolved captions to mock weights and creators to mock auto-fit grid.
+Replace six retired loop tests with the authorised v2 regressions; run focused and four separate shards.
+Verify 320/390 screen fit where authenticated access permits; latest verified baseline 8,373, not the brief's historical 7,890.
+
 ## Done: PRO member-name coverage suite
 Kinds A/B/C/D authorised assertion updates complete; no production components or shared test files changed this turn.
 Separate shards: retained 1 = 2,142 passed and 2 = 1,987 passed from the preceding run; fresh 3 = 2,132 passed and 4 = 2,112 passed. Total 8,373 passed, zero failures (+78 named prior PRO tests against 8,295). This turn adds/removes zero tests.
