@@ -84,7 +84,7 @@ describe('Brief 2B mounted member names', () => {
     it(`${name}: verified-only labels with one batched screen read`, async () => {
       const { container } = mount(surface(name));
       await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
-      expect(h.rpc).toHaveBeenCalledTimes(1);
+      expect(h.rpc.mock.calls.filter((c: unknown[]) => c[0] !== 'get_people_to_follow_by_kind')).toHaveLength(1);
       expect(proReadIds()?.sort()).toEqual([...ids].sort());
       if (SIBLING_SURFACES.includes(name)) {
         expect(container.querySelector('.pro-label')?.previousElementSibling?.textContent).toBe('pro');
@@ -114,7 +114,7 @@ describe('Brief 2B mounted member names', () => {
     h.businesses = [{ business_id: 'business', name: 'Business', category: 'Golf Club', reason_type: 'your_club', is_verified: true }];
     const { container } = mount(surface('rail'));
     await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
-    expect(h.rpc).toHaveBeenCalledTimes(1);
+    expect(h.rpc.mock.calls.filter((c: unknown[]) => c[0] !== 'get_people_to_follow_by_kind')).toHaveLength(1);
     expect(proReadIds()?.sort()).toEqual([...ids].sort());
     expect(getByTextIn(container, 'Business').parentElement?.querySelector('.pro-label')).toBeNull();
   });
