@@ -1,9 +1,10 @@
 # Roadmap
 
-## In progress: PRO member-name coverage
-Member rows wired; source sweep and stop evidence in PRO_LABEL_COVERAGE_REPORT.md.
-Finish brief authorises the MemoryRouter repair; finish identity propagation, guard and regressions, then sequential shards.
-Outstanding: guard, missing-ID contracts/prose, actor regressions, four separate shards against 8,295, and live 320px checks.
+## Blocked: PRO member-name coverage finish
+Router repair, remaining contracts/prose, guard and actor regressions implemented; focused 78 passed.
+Shard 1: 2,136 passed / 6 failed in existing exploreRoundCardEngagement, memberShotCredit, memberShotPosts and scoresLeadBoard tests; stopped without modifying them.
+Shards 2–4 and live 320px checks outstanding; external unmanaged authentication prevents member checks. Baseline 8,295; expected inventory 8,373, full total unverified.
+Checkpoint report retained until done; sweep and errors delivered in PRO-label-finish-report.md.
 
 ## Done: Verification messages
 Lowercase verification copy, pro-specific push and support sender/reply address; both authorised functions deployed.
