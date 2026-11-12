@@ -11,7 +11,7 @@ Any unexpected test failure: STOP AND REPORT. Never edit a test to make it pass 
 ## Tests
 Every test deleted, renamed or rewritten is named in the build report, with its assertion quoted and one line on why. A brief that changes a documented rule implicitly authorises updating the test encoding it; it never authorises doing so silently. State the test count before and after; every difference must reconcile by name.
 
-Copy every react-i18next mock in full from src/test/profileCoursesRecord.test.tsx:33: initReactI18next is required at module load; t returns defaultValue or ''. Assert structure, not translated words; never change components for mocks.
+Copy every react-i18next mock in full from src/test/profileCoursesRecord.test.tsx:34: initReactI18next is required at module load; t returns defaultValue or ''. Assert structure, not translated words; never change components for mocks.
 
 When AGENTS.md approaches its limit, always move an architecture note into a file header, never compress a rule. A fact about how one module behaves belongs next to that module. AGENTS.md holds only what cannot live in a header: cross-cutting process rules.
 
