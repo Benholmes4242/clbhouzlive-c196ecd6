@@ -1,11 +1,11 @@
 # Roadmap
 
-## Blocked: PRO member-name coverage finish
-Current ask: six shard-2 assertions updated for split text, styled ancestors and added owner/actor fields. No components changed and zero test-count delta.
-Router repair, remaining contracts/prose, guard and actor regressions implemented; focused 78 passed.
-Fresh separate shards: 1 = 2,142 passed; 2 = 1,987 passed; 3 = 2,130 passed / 2 failed (2,132 executed). STOP: exploreSheetShell.test.tsx:86:22 expects one RPC call but receives two (outside authorised kinds A/B/C). adminHoleTagging.test.tsx:85:109 also has an authorised-kind split-credit failure, left unchanged when the stop occurred.
-Shard 4 not run under the stop rule; live 320px checks remain unverified. Baseline 8,295; expected inventory 8,373 (+78 prior PRO tests), full total unverified; this turn adds zero tests.
-Checkpoint report retained until done; sweep and errors delivered in PRO-label-finish-report.md.
+## Done: PRO member-name coverage suite
+Kinds A/B/C/D authorised assertion updates complete; no production components or shared test files changed this turn.
+Separate shards: retained 1 = 2,142 passed and 2 = 1,987 passed from the preceding run; fresh 3 = 2,132 passed and 4 = 2,112 passed. Total 8,373 passed, zero failures (+78 named prior PRO tests against 8,295). This turn adds/removes zero tests.
+Shard 4 first exposed another kind-D count (competitionBoards); excluding only get_pro_members preserved the expected one call, and its separate full rerun passed.
+Root checkpoint report removed; final sweep, every new/updated test and diff delivered in PRO-label-shards-complete-report.md.
+Live 320px/authenticated screen checks remain unverified; LearnVideoCard has no member ID and admin post-source actor type is absent, so no identity is guessed.
 
 ## Done: Verification messages
 Lowercase verification copy, pro-specific push and support sender/reply address; both authorised functions deployed.

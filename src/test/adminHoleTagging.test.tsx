@@ -82,8 +82,8 @@ describe('admin block and batch', () => {
   it('single item says shot', async () => { rows = [rows[0] as AdminUntaggedMedia]; mount(); expect(await screen.findByRole('heading', { name: 'One untagged shot here' })).toBeInTheDocument(); });
   it('opens oldest-first batch and active owner month', async () => {
     mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' }));
-    expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg'); expect(screen.getByText('Thomas Holmes · Sep 2026')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' })); expect(screen.getByText('Thomas Holmes · Oct 2026')).toBeInTheDocument();
+    expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg'); expect(screen.getByText((_text, element) => element?.matches('.media-v3-tag-credit') === true && element.textContent === 'Thomas Holmes · Sep 2026')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' })); expect(screen.getByText((_text, element) => element?.matches('.media-v3-tag-credit') === true && element.textContent === 'Thomas Holmes · Oct 2026')).toBeInTheDocument();
   });
   it('empty owner name hides owner line', async () => {
     rows = [row('only', '2026-10-01', '')]; mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); expect(screen.queryByText(/Oct 2026/)).toBeNull();

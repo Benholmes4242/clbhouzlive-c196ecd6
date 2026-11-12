@@ -83,7 +83,7 @@ describe('Explore sheet canonical shell', () => {
     if (!(row instanceof HTMLElement)) throw new Error('Missing field row');
     fireEvent.click(row);
     expect(press).toHaveBeenCalledWith(expect.objectContaining({ whs_score_id: 's' }));
-    expect(data.rpc).toHaveBeenCalledTimes(1);
+    expect(data.rpc.mock.calls.filter(([name]) => name !== 'get_pro_members')).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: i18n.t('common.done') }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
