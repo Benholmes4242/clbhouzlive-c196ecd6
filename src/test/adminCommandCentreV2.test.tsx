@@ -59,13 +59,13 @@ describe('Admin Command centre v2', () => {
     mount(); const p = panel('The loop'); expect(p.textContent).toContain('Biggest leak · joined → connected'); expect(p.textContent).toContain('54could connect today'); expect(p.textContent).toContain('41waiting on a handicap body'); expect(p.textContent).not.toContain("we can't place");
   });
   it('includes the third leak cell for three not-placed members', () => {
-    if (state.data) state.data.loop.not_placed = 3; mount(); expect(panel('The loop').textContent).toContain("3we can't place");
+    if (state.data) state.data.loop.not_placed = 3; mount(); expect(panel('The loop').textContent).not.toContain("3we can't place");
   });
   it('selects 28 and 90 days for the v2 hook and persists the window', () => {
     mount(); fireEvent.click(screen.getByRole('tab', { name: '28D' })); expect(state.calls.at(-1)).toBe(28); fireEvent.click(screen.getByRole('tab', { name: '90D' })); expect(state.calls.at(-1)).toBe(90); expect(localStorage.getItem('admin.cc.window')).toBe('90');
   });
   it('marks live and in-talks bodies without a Not known chip', () => {
-    mount(); const q = within(panel('Who can connect')); expect(q.getByText('England Golf').parentElement?.textContent).toBe('England GolfLIVE85'); expect(q.getByText('Scottish Golf').parentElement?.textContent).toBe('Scottish GolfIN TALKS14'); expect(q.getByText('Not known').parentElement?.textContent).toBe('Not known4');
+    mount(); const q = within(panel('Who can connect')); expect(q.getByText('England Golf').parentElement?.textContent).toBe('England GolfLIVE85'); expect(q.getByText('Scottish Golf').parentElement?.textContent).toBe('Scottish GolfIN TALKS14'); expect(q.getByText('No body named').parentElement?.textContent).toBe('No body named4');
   });
   it('withholds the day-30 percentage when the sample is three', () => {
     if (state.data) state.data.retention.d30_connected_n = 3; mount(); const p = panel('Retention'); expect(within(p).getByText('too few yet (3)').previousElementSibling?.textContent).toBe('—');
@@ -76,4 +76,29 @@ describe('Admin Command centre v2', () => {
     for (const file of ['features/admin/pages/DashboardPage.tsx', 'features/admin/hooks/useCommandCentreV2.ts']) expect(readFileSync(resolve(__dirname, '..', file), 'utf8')).not.toMatch(/t\.(?:brand|warn)|#F7931E|#FFA83A/i);
   });
   it('keeps every panel empty rather than inventing zeros after an RPC failure', () => { state.error = true; const { container } = mount(); expect(container.querySelectorAll('[aria-label="Unavailable"]')).toHaveLength(9); expect(screen.queryByText('£0')).toBeNull(); });
+  it('renders plain post grammar for an unreacted post item', () => {
+    if (!state.data) throw new Error('Missing fixture');
+    state.data.do_now.unreacted = { posts: 1, items: [{ post_id: 'unreacted', name: 'Pat Green', kind: 'post', hours: 8 }] };
+    mount(); const p = panel('Do now'); fireEvent.click(within(p).getByRole('button', { name: /Posts nobody has reacted to/ }));
+    expect(p.textContent).toContain('post · 8h'); expect(p.textContent).not.toContain('post post');
+  });
+  it('limits five Clubhouse top posts to the first four rows', () => {
+    if (!state.data) throw new Error('Missing fixture');
+    state.data.clubhouse.top = Array.from({ length: 5 }, (_, i) => ({ post_id: `post-${i}`, name: `Member ${i}`, kind: 'post', course: null, gross: null, to_par: null, likes: i, comments: 0 }));
+    mount(); const q = within(panel('Clubhouse')); expect(q.getAllByRole('button')).toHaveLength(4);
+    expect(q.getByText('Member 3')).toBeTruthy(); expect(q.queryByText('Member 4')).toBeNull();
+  });
+  it('labels the unknown coverage row No body named without changing its source value', () => {
+    mount(); const q = within(panel('Who can connect')); expect(q.getByText('No body named')).toBeTruthy(); expect(q.queryByText('Not known')).toBeNull(); expect(state.data?.coverage[2].body).toBe('Not known');
+  });
+  it('shows no one yet today for a zero hourly peak', () => {
+    if (!state.data) throw new Error('Missing fixture');
+    state.data.hours.peak = 0; mount(); const p = panel('Right now'); expect(p.textContent).toContain('no one yet today'); expect(p.textContent).not.toContain('peak today 0');
+  });
+  it('keeps the Joined to Connected leak at exactly two figures when not placed is positive', () => {
+    if (!state.data) throw new Error('Missing fixture');
+    state.data.loop.not_placed = 9; mount(); const q = within(panel('The loop'));
+    const grid = q.getByText('could connect today').parentElement?.parentElement;
+    expect(grid?.children).toHaveLength(2); expect(q.getByText('waiting on a handicap body')).toBeTruthy(); expect(q.queryByText("we can't place")).toBeNull();
+  });
 });

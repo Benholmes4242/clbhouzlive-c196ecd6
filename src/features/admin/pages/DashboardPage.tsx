@@ -169,7 +169,7 @@ function DoNow({ data: d }: { data: CommandCentreV2['do_now'] }) {
     { n: d.gone_quiet.members, title: 'Regulars gone quiet', short: 'Regulars gone quiet', sub: 'played weekly · silent 10+ days', cta: 'DM', to: member(d.gone_quiet.items[0]?.user_id), items: d.gone_quiet.items.map(x => ({ name: x.name, detail: `last seen ${x.days} days ago`, to: member(x.user_id) })) },
     { n: d.clubs_to_pitch.clubs, title: 'Clubs ready to pitch', short: 'Clubs to pitch', sub: '3+ members each · no club profile', cta: 'PITCH', to: pitch(d.clubs_to_pitch.items[0]?.name), items: d.clubs_to_pitch.items.map(x => ({ name: x.name, detail: `${x.members} members · ${x.connected} connected`, to: pitch(x.name) })) },
     { n: d.first_rounds.members, title: 'First rounds just landed', short: 'First rounds', sub: 'new members · last 24 hours', cta: 'WELCOME', to: member(d.first_rounds.items[0]?.user_id), items: d.first_rounds.items.map(x => ({ name: x.name, detail: x.gross == null ? x.course : `${x.gross} at ${x.course ?? ''}`, to: member(x.user_id) })) },
-    { n: d.unreacted.posts, title: 'Posts nobody has reacted to', short: 'Unreacted posts', sub: 'live for 6+ hours', cta: 'REACT', to: d.unreacted.items[0] ? `/post/${d.unreacted.items[0].post_id}` : '/admin-v2/content', items: d.unreacted.items.map(x => ({ name: x.name, detail: `${x.kind} post · ${x.hours}h`, to: `/post/${x.post_id}` })) },
+    { n: d.unreacted.posts, title: 'Posts nobody has reacted to', short: 'Unreacted posts', sub: 'live for 6+ hours', cta: 'REACT', to: d.unreacted.items[0] ? `/post/${d.unreacted.items[0].post_id}` : '/admin-v2/content', items: d.unreacted.items.map(x => ({ name: x.name, detail: `${x.kind === 'post' ? 'post' : `${x.kind} post`} · ${x.hours}h`, to: `/post/${x.post_id}` })) },
     { n: d.played_not_connected, title: 'Played, not connected', short: 'Played, not connected', sub: 'this week', cta: 'NUDGE', to: '/admin-v2/users?filter=not_connected', items: [] },
     { n: d.inbox, title: 'Inbox', short: 'Inbox', sub: 'claims, requests and tickets', cta: 'OPEN', to: '/admin-v2/inbox', items: [] },
   ];
@@ -203,7 +203,7 @@ function RightNow({ hours, days }: { hours: CommandCentreV2['hours']; days: Comm
     { k: 'Sticky', v: a.stickiness == null ? '—' : `${Math.round(a.stickiness)}%`, d: undefined, sub: 'WAU / MAU', s: a.daily.slice(-13).map(x => x.mau ? x.wau / x.mau * 100 : 0) },
   ] : [];
   return (
-    <Panel title={<span style={{ display: 'flex', alignItems: 'center', gap: 9 }}><span style={{ width: 8, height: 8, borderRadius: 99, background: t.ok }} />Right now</span>} meta={<>peak today <b style={{ color: t.ink }}>{hours.peak}</b> at {String(hours.peak_hour).padStart(2, '0')}:00</>}>
+    <Panel title={<span style={{ display: 'flex', alignItems: 'center', gap: 9 }}><span style={{ width: 8, height: 8, borderRadius: 99, background: t.ok }} />Right now</span>} meta={hours.peak === 0 ? 'no one yet today' : <>peak today <b style={{ color: t.ink }}>{hours.peak}</b> at {String(hours.peak_hour).padStart(2, '0')}:00</>}>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14 }}>
         <div style={{ flex: 'none' }}>
           <Body height={58} loading={live.isLoading} failed={live.isError || !live.data}>{() => <span style={{ ...FIG, fontSize: 64, lineHeight: 0.9 }}>{live.data?.count}</span>}</Body>
@@ -250,8 +250,8 @@ function Loop({ data }: { data: CommandCentreV2['loop'] }) {
       ))}
       <div style={{ marginTop: 14, padding: '14px 14px', background: t.dangerSoft, borderRadius: 14 }}>
         <div style={{ ...LABEL, color: t.danger }}>Biggest leak · {steps[Math.max(0, leak - 1)][0].toLowerCase()} → {steps[leak][0].toLowerCase()}</div>
-        <div style={{ display: 'grid', gridTemplateColumns: leak === 1 && data.not_placed > 0 ? '1fr 1fr 1fr' : leak === 1 ? '1fr 1fr' : '1fr', gap: 10, marginTop: 10 }}>
-          {(leak === 1 ? [[data.could_connect, 'could connect today'], [data.waiting_on_body, 'waiting on a handicap body'], ...(data.not_placed > 0 ? [[data.not_placed, "we can't place"]] : [])] : [[drops[leak], 'lost at this step']]).map(([n, label]) => <div key={label}><div style={{ ...FIG, fontSize: 26 }}>{n}</div><div style={{ fontSize: 12.5, color: t.inkMuted, marginTop: 2 }}>{label}</div></div>)}
+        <div style={{ display: 'grid', gridTemplateColumns: leak === 1 ? '1fr 1fr' : '1fr', gap: 10, marginTop: 10 }}>
+          {(leak === 1 ? [[data.could_connect, 'could connect today'], [data.waiting_on_body, 'waiting on a handicap body']] : [[drops[leak], 'lost at this step']]).map(([n, label]) => <div key={label}><div style={{ ...FIG, fontSize: 26 }}>{n}</div><div style={{ fontSize: 12.5, color: t.inkMuted, marginTop: 2 }}>{label}</div></div>)}
         </div>
       </div>
     </Panel>
@@ -260,7 +260,7 @@ function Loop({ data }: { data: CommandCentreV2['loop'] }) {
 
 /* ---------- 5. coverage ---------- */
 function Coverage({ data, waiting }: { data: CommandCentreV2['coverage']; waiting: number }) {
-  const bodies: [string, string, number, number][] = data.map(x => [x.body, x.live ? 'LIVE' : ['Scottish Golf', 'Golf Ireland', 'Wales Golf'].includes(x.body) ? 'IN TALKS' : ['USGA', 'FFGolf'].includes(x.body) ? 'IN PLAY' : '', x.members, x.connected]);
+  const bodies: [string, string, number, number][] = data.map(x => [x.body === 'Not known' ? 'No body named' : x.body, x.live ? 'LIVE' : ['Scottish Golf', 'Golf Ireland', 'Wales Golf'].includes(x.body) ? 'IN TALKS' : ['USGA', 'FFGolf'].includes(x.body) ? 'IN PLAY' : '', x.members, x.connected]);
   const max = Math.max(1, ...data.map(x => x.members));
   return (
     <Panel title="Who can connect" meta={<><b style={{ color: t.ink }}>{waiting}</b> members waiting</>}>
@@ -376,7 +376,7 @@ function Moat({ data, win, days }: { data: CommandCentreV2['moat']; win: string;
 /* ---------- 8. clubhouse ---------- */
 function Clubhouse({ data: w, win }: { data: CommandCentreV2['clubhouse']; win: string }) {
   const [openPost, setOpenPost] = useState<string | null>(null);
-  const posts: [string, string, number, number, [string, string, boolean] | null, string][] = w.top.map(x => [x.name, `${x.kind}${x.course ? ` · ${x.course}` : ''}`, x.likes, x.comments, x.kind === 'round' && x.gross != null ? [String(x.gross), x.to_par != null ? toParText(x.to_par) : '', x.to_par != null && x.to_par < 0] : null, x.post_id]);
+  const posts: [string, string, number, number, [string, string, boolean] | null, string][] = w.top.slice(0, 4).map(x => [x.name, `${x.kind}${x.course ? ` · ${x.course}` : ''}`, x.likes, x.comments, x.kind === 'round' && x.gross != null ? [String(x.gross), x.to_par != null ? toParText(x.to_par) : '', x.to_par != null && x.to_par < 0] : null, x.post_id]);
   const creators: [string, number, number][] = w.creators.map(x => [x.name, x.posts, x.reactions]);
   const stats: [string, number, number | null, string?][] = [['Posts', w.posts, w.posts_prev], ['Reactions', w.reactions, null, `${(w.posts ? w.reactions / w.posts : 0).toFixed(1)} a post`], ['Reviews', w.reviews, w.reviews_prev], ['Video', w.video_posts, null, `${Math.round(w.posts ? w.video_posts / w.posts * 100 : 0)}% of posts`]];
   return (

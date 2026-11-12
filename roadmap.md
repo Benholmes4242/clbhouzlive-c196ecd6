@@ -1,5 +1,9 @@
 # Roadmap
 
+## Done: Admin Command centre v2C
+Five Dashboard-only mock-match fixes complete; focused 25 passed. Four separate sequential shards: 2,142 / 1,998 / 2,133 / 2,110 passed, each zero failures. Total 8,383, up five from 8,378; no known failures appeared and no reruns were needed.
+Five added cases in adminCommandCentreV2.test.tsx: plain-post grammar; first four top posts; unknown-body label; zero-peak message; exactly two Connected leak figures. Two authorised assertions updated: third-leak case toContain("3we can't place") becomes not.toContain because the third figure is removed; coverage case 'Not known4' becomes 'No body named4' because only the display label changes. Existing case names retained; no tests deleted or renamed. Live authenticated rendering remains unverified (external_unmanaged).
+
 ## Done: Admin Command centre v2B verification
 Authorised repair adds explicit single columns to the squircle and cohort grids only; hook and tests unchanged.
 Focused checks: 20 passed. Four separate sequential shards: 2,142 / 1,993 / 2,133 / 2,110 passed, each zero failures; total 8,378 across 739 files.
