@@ -528,36 +528,50 @@ function RailCardView({
         {reason ? t(reason.key, { ...reason.vars, defaultValue: reason.def }) : ''}
       </div>
 
-      {/* Figures: blank when empty (fixed height) so the pills line up. */}
+      {/* One 35px slot: the amber ACTIVE RING line (two lines max) when the
+          golfer has one, otherwise the figures; empty but height-holding when
+          neither. Business cards never carry a when line, so always figures. */}
       <div
+        data-testid="rail-slot"
         style={{
-          fontSize: 12,
-          color: A.DIM,
           marginTop: 6,
-          height: 16,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {figures}
-      </div>
-
-      {/* ACTIVE RING — when line; empty but height-holding when unringed. */}
-      <div
-        data-testid="rail-when"
-        style={{
-          marginTop: 4,
-          height: 15,
-          lineHeight: '15px',
-          fontSize: 11,
-          fontWeight: 600,
-          color: '#F7931E',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          height: 35,
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
           maxWidth: '100%',
         }}
       >
-        {when}
+        {isPerson && when ? (
+          <div
+            data-testid="rail-when"
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: '#F7931E',
+              lineHeight: '15px',
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+              maxWidth: '100%',
+            }}
+          >
+            {when}
+          </div>
+        ) : figures ? (
+          <div
+            data-testid="rail-figures"
+            style={{
+              fontSize: 12,
+              color: A.DIM,
+              lineHeight: '16px',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {figures}
+          </div>
+        ) : null}
       </div>
 
       <button

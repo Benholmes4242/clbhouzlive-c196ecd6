@@ -296,11 +296,11 @@ describe('WhoToFollowRail', () => {
     expect(screen.getByText('New to clbhouz')).toBeTruthy();
     expect(screen.getByText('4.1 hcp · 63 rounds')).toBeTruthy();
     expect(screen.getByText('12.8 hcp · 41 rounds')).toBeTruthy();
-    // Rob has no figures: the line stays blank but keeps its 16px height.
+    // Rob has no figures and no when line: the slot stays blank but keeps its 35px height.
     const robCard = screen.getByText('Rob Bennett').closest('[role="button"]') as HTMLElement;
-    const figures = Array.from(robCard.querySelectorAll('div')).find((d) => d.style.height === '16px');
-    expect(figures).toBeTruthy();
-    expect(figures!.textContent).toBe('');
+    const slot = robCard.querySelector('[data-testid="rail-slot"]') as HTMLElement;
+    expect(slot.style.height).toBe('35px');
+    expect(slot.textContent).toBe('');
   });
 
   it('shows the verified badge and the business initials tile', () => {

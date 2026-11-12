@@ -127,11 +127,12 @@ describe('FIX §1 — one vertical rhythm, button pinned to the bottom', () => {
     const bob = cardOf('Golfer Bob');
     const blocks = Array.from(bob.querySelectorAll('div')).map((d) => (d as HTMLElement).style);
     expect(blocks.some((s) => s.height === '34px')).toBe(true);
-    expect(blocks.some((s) => s.height === '16px')).toBe(true);
+    expect(blocks.some((s) => s.height === '35px')).toBe(true);
     const bizCard = cardOf('Sundridge Park GC');
     const bizBlocks = Array.from(bizCard.querySelectorAll('div')).map((d) => (d as HTMLElement).style);
     expect(bizBlocks.some((s) => s.height === '34px')).toBe(true);
-    expect(bizBlocks.some((s) => s.height === '16px')).toBe(true);
+    expect(bizBlocks.some((s) => s.height === '35px')).toBe(true);
+    expect(bizCard.querySelector('[data-testid="rail-figures"]')).not.toBeNull();
   });
 });
 

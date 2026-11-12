@@ -205,16 +205,32 @@ describe('WhoToFollowRail', () => {
     fireEvent.click(btn);
     expect(screen.getByTestId('probe').textContent).toBe('/post/post-9');
   });
-  it('an unringed card has an empty when line of the same height and no avatar button; cards are 266 tall', async () => {
+  it('an unringed card has no when line, shows its figures in a 35px slot and no avatar button; cards are 266 tall', async () => {
     wrap(<WhoToFollowRail slot={1} />);
     await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
     const card = cardOf('David Lang');
-    const when = card.querySelector('[data-testid="rail-when"]') as HTMLElement;
-    expect(when.textContent).toBe('');
-    expect(when.style.height).toBe('15px');
+    expect(card.querySelector('[data-testid="rail-when"]')).toBeNull();
+    expect(card.querySelector('[data-testid="rail-figures"]')).not.toBeNull();
+    expect((card.querySelector('[data-testid="rail-slot"]') as HTMLElement).style.height).toBe('35px');
     expect(screen.queryByRole('button', { name: "Open David Lang's latest post" })).toBeNull();
     expect(card.style.height).toBe('266px');
     expect(cardOf('Danny Holmes').style.height).toBe('266px');
+  });
+  it('a ringed card renders a two-line clamped when line, no figures, in a 35px slot; card stays 266', async () => {
+    wrap(<WhoToFollowRail slot={1} />);
+    await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
+    const card = cardOf('Danny Holmes');
+    const when = card.querySelector('[data-testid="rail-when"]') as HTMLElement;
+    // jsdom drops -webkit-line-clamp, so the clamp is read from the source.
+    expect(when.style.overflow).toBe('hidden');
+    expect(when.style.lineHeight).toBe('15px');
+    const src = (await import('node:fs')).readFileSync(
+      (await import('node:path')).resolve(__dirname, '../features/find-people/WhoToFollowRail.tsx'), 'utf8');
+    expect(src).toMatch(/data-testid="rail-when"[\s\S]{0,400}WebkitLineClamp: 2/);
+    expect(when.style.whiteSpace).toBe('');
+    expect(card.querySelector('[data-testid="rail-figures"]')).toBeNull();
+    expect((card.querySelector('[data-testid="rail-slot"]') as HTMLElement).style.height).toBe('35px');
+    expect(card.style.height).toBe('266px');
   });
 });
 
