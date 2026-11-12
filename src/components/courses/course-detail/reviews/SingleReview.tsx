@@ -1,3 +1,4 @@
+// Architecture note (moved from AGENTS.md): Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /** REVIEWS_STATE_2 signed-off person-led exception to the flat multi-review row.
  * A review owns its overall score; calibration refers to that same source.
