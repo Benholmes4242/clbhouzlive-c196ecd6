@@ -1,10 +1,11 @@
 # Roadmap
 
-## In progress: Admin Command centre v2
-Port signed-off panels to live v2 RPC; keep AdminShell and unrelated surfaces unchanged.
-User resolved captions to mock weights and creators to mock auto-fit grid.
-Replace six retired loop tests with the authorised v2 regressions; run focused and four separate shards.
-Verify 320/390 screen fit where authenticated access permits; latest verified baseline 8,373, not the brief's historical 7,890.
+## Blocked: Admin Command centre v2
+Dashboard/live v2 hook implemented; mock caption weights and auto-fit creator grid confirmed.
+Focused 16 passed; separate shards 1=2,142 passed, 2=1,993 passed, 3=2,132 passed/1 failed. Shard 4 not run.
+STOP src/test/fixOverflowSource.test.ts:62:24: `AssertionError: expected [ …(2) ] to deeply equal []`; Dashboard squircle/cohort grids omit explicit columns. Test untouched; no repair after failure.
+Baseline 8,373; six retired loop cases replaced by eleven v2 cases => expected 8,378, full-suite unverified.
+Authenticated 320/390 screenshots/live flow unavailable (external_unmanaged); exact assertions and diff in delivered ADMIN_COMMAND_CENTRE_V2_REPORT.md.
 
 ## Done: PRO member-name coverage suite
 Kinds A/B/C/D authorised assertion updates complete; no production components or shared test files changed this turn.
