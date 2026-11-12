@@ -750,6 +750,8 @@
   },
   "board": {
     "columns": {
+      "pos": "POS",
+      "player": "PLAYER",
       "tot": "TOT",
       "thru": "THRU",
       "today": "TODAY",

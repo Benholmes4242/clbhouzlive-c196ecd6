@@ -13,6 +13,8 @@ Every test deleted, renamed or rewritten is named in the build report, with its 
 
 Copy every react-i18next mock in full from src/test/profileCoursesRecord.test.tsx:34: initReactI18next is required at module load; t returns defaultValue or ''. Assert structure, not translated words; never change components for mocks.
 
+A locale key is in use if any template string can build it (e.g. t(`board.columns.${key}`)); never delete a key as unused without searching for its parent path in template strings.
+
 When AGENTS.md approaches its limit, always move an architecture note into a file header, never compress a rule. A fact about how one module behaves belongs next to that module. AGENTS.md holds only what cannot live in a header: cross-cutting process rules.
 
 - Shared standings/Top 100 helpers live in `src/lib/gam`; achievement levels live beside celebrations, preserving active consumers after Trophy Room removal.
