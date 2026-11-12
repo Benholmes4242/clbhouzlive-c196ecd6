@@ -1,3 +1,4 @@
+// Architecture note (moved from AGENTS.md): Club weekday conclusions share weekRoom between the lead and tee-sheet card; selected-course conclusions must not drift between surfaces.
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import type { ClubCourseAnalytics } from './types';
 
