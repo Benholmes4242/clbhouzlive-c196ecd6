@@ -26,6 +26,22 @@ import { registerNavScroller, resetToExpanded } from '@/hooks/useScrollDirection
 afterEach(() => { cleanup(); resetToExpanded(); });
 afterAll(() => vi.unstubAllGlobals());
 describe('GI1 reduced motion', () => {
+  it('full-bleed soft fade follows condensation without a transition', async () => {
+    resetToExpanded();
+    const el = document.createElement('div'); document.body.appendChild(el);
+    const off = registerNavScroller(el);
+    try {
+      const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+      const view = render(<QueryClientProvider client={client}><MemoryRouter initialEntries={['/tourhub']}><ChromeIsland /></MemoryRouter></QueryClientProvider>);
+      const fade = view.container.querySelector<HTMLElement>('[data-chrome="island-scrim-soft"]');
+      expect(fade?.style.opacity).toBe('0');
+      expect(fade?.style.transition).toBe('none');
+      el.scrollTop = 150;
+      await act(async () => { fireEvent.scroll(el); await new Promise(r => requestAnimationFrame(() => r(null))); });
+      expect(fade?.style.opacity).toBe('1');
+      expect(fade?.style.transition).toBe('none');
+    } finally { off(); el.remove(); }
+  });
   it('guest glass and Log in fold have no transitions at rest or folded', async () => {
     resetToExpanded();
     const el = document.createElement('div'); document.body.appendChild(el);

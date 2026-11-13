@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Full-bleed top fade Option E
+- Hide the shared soft fade at rest by resolved bleed; follow existing condensation and glass timing on scroll.
+- Preserve gradient, height, z-index, registry, safe-area strip and page heroes.
+- Add route-table, scroll, reduced-motion and unchanged-gradient cases; run each full shard separately and report results.
+- Prior notch observer test stop remains unauthorised and untouched.
+
 ## Blocked: Gate-reveal notch strip and top tie rows
 - Re-measure hidden/revealed sentinels in the shared hook; preserve gates and scrim registry.
 - Remove shared board top tie cap and skeleton tie field; use v5 storage, preserving photo caption.

@@ -22,6 +22,8 @@
  *
  * HEADER_B1: route registry owns opt-in soft fade/glass; both islands consume
  * useIslandsCondensed; divider stays owned by HcpCell to preserve visibility.
+ * Full-bleed soft fades follow the same condensed signal and glass timing;
+ * padded routes stay visible. Registry bleed owns this, never route lists.
  * Home-nation glass rules: every glass surface publishes BOTH
  * backdropFilter and WebkitBackdropFilter. Squircles use 34% radius.
  */
@@ -799,6 +801,11 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
       {spec.scrim === 'soft' && (
         <div aria-hidden data-chrome="island-scrim-soft" style={{
           zIndex: Z.header - 1,
+          opacity: spec.bleed ? (condensed ? 1 : 0) : 1,
+          ...(spec.bleed ? {
+            transition: REDUCED_MOTION ? 'none' : 'var(--island-glass-transition)',
+            transitionProperty: REDUCED_MOTION ? undefined : 'opacity',
+          } : {}),
         }} />
       )}
 
