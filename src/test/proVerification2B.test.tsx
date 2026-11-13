@@ -140,7 +140,12 @@ describe('Brief 2B mounted member names', () => {
       const el = getByTextIn(container, 'pro');
       expect(el.tagName).toBe('SPAN');
       expect(el.children).toHaveLength(0);
-      expect(el.getAttribute('style')).toBe('overflow: hidden; text-overflow: ellipsis;');
+      if (name === 'rail') {
+        expect(el.parentElement?.classList.contains('follow-tile-name')).toBe(true);
+        expect(el.parentElement?.firstElementChild).toBe(el);
+      } else {
+        expect(el.getAttribute('style')).toBe('overflow: hidden; text-overflow: ellipsis;');
+      }
       expect(el.nextElementSibling?.classList.contains('pro-label')).toBe(true);
     });
   }
