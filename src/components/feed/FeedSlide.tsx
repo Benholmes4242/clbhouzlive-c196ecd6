@@ -25,6 +25,7 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoProcessingCard } from './VideoProcessingCard';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { galleryFit } from '@/lib/courseMedia/courseGallery';
+import { usesGalleryLayout } from '@/lib/media/galleryLayout';
 import { FullscreenNotchScrim } from './FullscreenNotchScrim';
 
 
@@ -32,7 +33,7 @@ import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 import { MentionText } from '@/components/mentions/MentionText';
 
 /**
- * Fullscreen rect decision. The course gallery AND the Course tab's
+ * Fullscreen rect decision. Every member-shot open AND the Course tab's
  * about-strip open (openedFrom 'about-strip', readOnly) share the gallery
  * rule: full-viewport rect, portrait media cover edge to edge, landscape
  * letterboxed contain over the blurred self-backdrop. Every other surface
@@ -40,7 +41,7 @@ import { MentionText } from '@/components/mentions/MentionText';
  */
 export function resolveViewerRect(width: number, height: number, viewport: ReturnType<typeof getCurrentViewport>, type: 'image' | 'video'): RestingRect {
   const s = useFullscreenFeedStore.getState();
-  if (!s.courseGallery && s.openedFrom !== 'about-strip') return resolveRestingRect(width, height, viewport, type);
+  if (!usesGalleryLayout(s) && s.openedFrom !== 'about-strip') return resolveRestingRect(width, height, viewport, type);
   return { top: 0, left: 0, width: viewport.w, height: viewport.h, fit: galleryFit(width, height) };
 }
 
@@ -101,6 +102,7 @@ export const FeedSlide = memo(function FeedSlide({
   // Synthetic member-shot fullscreen opens must never insert post_views.
   const syntheticPosts = useFullscreenFeedStore(s => s.syntheticPosts);
   const gallery = useFullscreenFeedStore(s => s.courseGallery);
+  const galleryLayout = usesGalleryLayout({ courseGallery: gallery, syntheticPosts });
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const isActive = activeIndex === index;
@@ -350,7 +352,7 @@ export const FeedSlide = memo(function FeedSlide({
     <div
       ref={setRef}
       data-index={index}
-      className={`relative w-full overflow-hidden flex-shrink-0${gallery && isFullscreen ? ' course-gallery-slide' : ''}`}
+      className={`relative w-full overflow-hidden flex-shrink-0${galleryLayout && isFullscreen ? ' course-gallery-slide' : ''}`}
       aria-hidden={!isActive}
       {...(!isActive ? { inert: '' } : {})}
       style={{
@@ -371,7 +373,7 @@ export const FeedSlide = memo(function FeedSlide({
 
       {singleBackdropSrc != null && <FullscreenBackdrop src={singleBackdropSrc} />}
       {renderContent()}
-      {gallery && isFullscreen && <div className="course-gallery-media-gradient" />}
+      {galleryLayout && isFullscreen && <div className="course-gallery-media-gradient" />}
 
       {/* Inline carousel dots — top-right, always visible, multi-media non-editorial only */}
       {showInlineDots && (
@@ -1950,6 +1952,7 @@ const FullscreenPagerPage: React.FC<{
  * Crossfades over 180ms when the source changes.
  */
 const FullscreenBackdrop: React.FC<{ src: string }> = ({ src }) => {
+  const galleryLayout = usesGalleryLayout(useFullscreenFeedStore.getState());
   const [layers, setLayers] = useState<Array<{ src: string; key: number }>>(
     () => (src ? [{ src, key: 0 }] : []),
   );
@@ -1983,9 +1986,9 @@ const FullscreenBackdrop: React.FC<{ src: string }> = ({ src }) => {
           decoding="async"
           draggable={false}
           style={{
-            position: 'absolute', inset: useFullscreenFeedStore.getState().courseGallery ? -40 : 0, width: useFullscreenFeedStore.getState().courseGallery ? 'calc(100% + 80px)' : '100%', height: useFullscreenFeedStore.getState().courseGallery ? 'calc(100% + 80px)' : '100%',
+            position: 'absolute', inset: galleryLayout ? -40 : 0, width: galleryLayout ? 'calc(100% + 80px)' : '100%', height: galleryLayout ? 'calc(100% + 80px)' : '100%',
             objectFit: 'cover',
-            filter: useFullscreenFeedStore.getState().courseGallery ? 'blur(36px) brightness(0.45) saturate(1.2)' : 'blur(40px) brightness(0.5) saturate(1.2)',
+            filter: galleryLayout ? 'blur(36px) brightness(0.45) saturate(1.2)' : 'blur(40px) brightness(0.5) saturate(1.2)',
             transform: 'scale(1.2)',
             opacity: l.key === shown || layers.length === 1 ? 1 : 0,
             transition: 'opacity 180ms linear',

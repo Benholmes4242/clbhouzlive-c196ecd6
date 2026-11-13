@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Member-shot gallery layout
+- Share one gallery-layout predicate for rect, backdrop, gradient and notch protection; leave chrome and open calls unchanged.
+- Add synthetic/non-synthetic regression tests and run four separate shards from baseline 8,573.
+- Report changed lines, CSS loading, assertion changes and totals.
+
 ## Complete: Follow tile posted-age lines
 - New pure tilePostedLine (days/weeks/months/over-a-year) replaces activityLine on the tile only; active ring unchanged.
 - findPeople.tile.* keys added to all six locale files; +16 tests.
