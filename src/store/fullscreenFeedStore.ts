@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { FeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 import type { LaneId } from '@/video/lanePolicy';
@@ -216,6 +216,7 @@ interface FullscreenFeedState {
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: (info?: CloseInfo) => void;
   appendPosts: (newPosts: FeedPost[]) => void;
+  appendPostMedia: (postId: string, items: MediaItem[]) => void;
   setActiveIndex: (idx: number) => void;
   consumeOpenCommentsInitially: () => void;
   consumeInitialCommentId: () => void;
@@ -631,6 +632,24 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     });
   },
 
+
+  /** Course neighbours hydrate append-only, including the active post: no
+   * replacements, reordering or pager-index writes are allowed here. */
+  appendPostMedia: (postId, items) => {
+    set(s => {
+      if (!s.isOpen) return s;
+      const post = s.posts.find(p => p.id === postId);
+      if (!post) return s;
+      const ids = new Set(post.mediaItems.map(item => item.id));
+      const additions = items.filter(item => {
+        if (ids.has(item.id)) return false;
+        ids.add(item.id);
+        return true;
+      });
+      if (!additions.length) return s;
+      return { posts: s.posts.map(p => p === post ? { ...p, mediaItems: [...p.mediaItems, ...additions] } : p) };
+    });
+  },
 
   setActiveIndex: (idx) => {
     const prev = get().activeIndex;

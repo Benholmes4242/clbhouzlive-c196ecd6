@@ -124,12 +124,12 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     expect(f.holeRpc).not.toHaveBeenCalled();
     expect(f.open).toHaveBeenCalledTimes(1);
     const args = f.open.mock.calls[0][0] as { posts: Array<{ id: string; displayName: string; courseName?: string; mediaItems: Array<{ id: string }> }>; index: number; mediaId: string | null; openedFrom: string; options?: { readOnly?: boolean } };
-    expect(args.posts).toHaveLength(1);
-    expect(args.posts[0].id).toBe('shots:latest-holes');
-    expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['first', 'second', 'third']);
-    expect(args.index).toBe(0);
+    expect(args.posts).toHaveLength(3);
+    expect(args.posts[0].id).toBe('shots:latest-hole:first');
+    expect(args.posts.map(post => post.mediaItems.map(item => item.id))).toEqual([['first'], ['second'], ['third']]);
+    expect(args.index).toBe(1);
     expect(args.mediaId).toBe('second');
-    expect(args.openedFrom).toBe('course-media');
+    expect(args.openedFrom).toBe('courses-latest-holes');
     expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
     expect(args.posts[0].displayName).toBe('Latest holes');
     expect(args.posts[0].courseName).toBe('');

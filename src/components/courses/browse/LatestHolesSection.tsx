@@ -6,7 +6,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
-import { latestHolesToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
+import { latestHoleRowsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SCRIM_STANDOUT, SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
 import { settled, useSectionReady } from './PageLoadGate';
@@ -30,7 +30,7 @@ import './latestHoles.css';
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §2: a tap opens the CANONICAL
  * full-screen viewer (FullscreenFeedOverlay via openWithOrigin, readOnly)
  * over EVERY ready card on the rail in RPC order, without another network read,
- * one sideways carousel with each shot credited to its contributor, landing on the
+ * one full-screen page per shot, vertical like the Clubhouse feed, landing on the
  * tapped shot. The ?tab=media&hole=&shot= deep link in CourseMediaTabNew is
  * unchanged.
  */
@@ -116,15 +116,15 @@ export function LatestHolesSection() {
   const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.id), [data]);
   const visible = ready && !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
   const { railRef, sentinelRef } = useRailPagination({ hasNextPage, isFetching, fetchNextPage, cardWidth: LATEST_HOLE_W, pageCount: data?.pages.length ?? 0, visible, blocked: viewerOpen, isBlocked: holesViewerOpen });
-  const posts = useMemo(() => latestHolesToFeedPosts(rows), [rows]);
+  const posts = useMemo(() => latestHoleRowsToFeedPosts(rows), [rows]);
   const onOpen = (tapped: LatestHoleMedia) => {
     openWithOrigin({
       posts,
-      index: 0,
+      index: Math.max(0, posts.findIndex(post => post.mediaItems[0]?.id === tapped.id)),
       originEl: null,
       posterUrl: tapped.media_type === 'video' ? holeMediaPoster(tapped) : tapped.media_url,
       mediaId: tapped.id,
-      openedFrom: 'course-media',
+      openedFrom: 'courses-latest-holes',
       options: { readOnly: true, syntheticPosts: true },
     });
   };

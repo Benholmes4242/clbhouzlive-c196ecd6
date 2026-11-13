@@ -5,7 +5,9 @@
  * raw row; first-page minimum/readiness and the existing tap ladder stay unchanged.
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §3 — tapping a tile opens the
  * CANONICAL full-screen viewer (FullscreenFeedOverlay via openWithOrigin,
- * readOnly) over ONE run through every photo and video of that course,
+ * readOnly) with one page per course, vertical between courses and sideways
+ * within each course. Neighbours fill in the background without moving the visible slide.
+ * The tapped course contains every photo and video of that course,
  * starting on the tapped shot. The set is still the course's media from
  * get_course_media_v2 via useGalleryCourseMedia, in the Media tab's order,
  * flattened post-then-media into one sideways carousel, each credited to the
@@ -14,13 +16,15 @@
  * "courses-member-shots" group (one video at a time); small slots draw their poster. */
 import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
 import { SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
-import { useEffect, useMemo, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsGuest } from '@/features/guest/useIsGuest';
-import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
-import { coursePostsToShotPosts } from '@/lib/courseMedia/memberShotPosts';
+import { galleryCourseMediaQuery, useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
+import { coursePostsToShotPosts, courseTilesToShotPost } from '@/lib/courseMedia/memberShotPosts';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -67,6 +71,7 @@ export interface LatestCourseMedia {
 }
 
 interface PendingOpen {
+  rows: LatestCourseMedia[];
   courseId: string;
   courseName: string;
   postId: string;
@@ -191,6 +196,13 @@ function LatestCourseCard({ row, pending, onOpen }: {
 
 export function LatestCoursesSection() {
   const { user, loading: sessionLoading } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const queryClient = useQueryClient();
+  const viewerOwned = useIsViewerOwnedBy('courses-latest-courses');
+  const activeIndex = useFullscreenFeedStore(state => state.activeIndex);
+  const viewerPosts = useFullscreenFeedStore(state => state.posts);
+  const fillSession = useRef<{ filled: Set<string>; inFlight: number } | null>(null);
+  const [fillTick, setFillTick] = useState(0);
   // Guests read this exactly as members do; the guest flag stays in the key.
   const isGuest = useIsGuest();
   const { data, isLoading, isFetched, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
@@ -224,22 +236,49 @@ export function LatestCoursesSection() {
     if (gallery.isError) { setPending(null); return; }
     const data = gallery.data;
     if (!data) return;
-    const posts = coursePostsToShotPosts(data, pending.courseId, pending.courseName);
-    if (posts.length === 0) { setPending(null); return; }
-    const post = posts[0];
+    const post = coursePostsToShotPosts(data, pending.courseId, pending.courseName)[0];
     if (!post) { setPending(null); return; }
+    const posts = pending.rows.flatMap(row => row.course_id === pending.courseId
+      ? [post] : [courseTilesToShotPost(row)]);
     const mediaId = shotStartId(data, post, pending);
+    fillSession.current = { filled: new Set([pending.courseId]), inFlight: 0 };
     openWithOrigin({
       posts,
-      index: 0,
+      index: posts.indexOf(post),
       originEl: null,
       posterUrl: pending.posterUrl,
       mediaId,
-      openedFrom: 'course-media',
+      openedFrom: 'courses-latest-courses',
       options: { readOnly: true, syntheticPosts: true },
     });
     setPending(null);
   }, [gallery.data, gallery.isError, pending]);
+
+  // Only the current three-page window may start reads; outstanding work is
+  // capped at three even across rapid swipes. A per-open token rejects stale
+  // completions after close/reopen. Failed reads retain their original tiles.
+  useEffect(() => {
+    if (!viewerOwned) { fillSession.current = null; return; }
+    const session = fillSession.current;
+    if (!session || !user?.id) return;
+    for (const index of [activeIndex - 1, activeIndex, activeIndex + 1]) {
+      const post = viewerPosts[index];
+      const courseId = post?.courseId;
+      if (!post || !courseId || session.filled.has(courseId) || session.inFlight >= 3) continue;
+      session.filled.add(courseId);
+      session.inFlight += 1;
+      queryClient.fetchQuery(galleryCourseMediaQuery(courseId, user.id, activeActor?.type, activeActor?.id))
+        .then(result => {
+          const state = useFullscreenFeedStore.getState();
+          if (fillSession.current !== session || !state.isOpen || state.openedFrom !== 'courses-latest-courses') return;
+          const items = coursePostsToShotPosts(result, courseId, post.courseName ?? '')[0]?.mediaItems;
+          if (items) state.appendPostMedia(post.id, items);
+        }).catch(() => {}).finally(() => {
+          session.inFlight -= 1;
+          if (fillSession.current === session) setFillTick(tick => tick + 1);
+        });
+    }
+  }, [viewerOwned, activeIndex, viewerPosts, user?.id, activeActor?.type, activeActor?.id, queryClient, fillTick]);
 
   if (!ready || isLoading) return <LatestCoursesShell />;
   if (!visible) return null;
@@ -255,6 +294,7 @@ export function LatestCoursesSection() {
             onOpen={tile => {
               if (pending) return;
               setPending({
+                rows: [...rows],
                 courseId: row.course_id,
                 courseName: row.course_name,
                 postId: tile.post_id,

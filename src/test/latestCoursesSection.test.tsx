@@ -18,7 +18,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.rows] }, isLoading: f.loading, isFetched: !f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: vi.fn().mockResolvedValue({ data: [], error: null }) } }));
-vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', () => ({ useGalleryCourseMedia: () => f.gallery }));
+vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', async original => ({ ...await original<typeof import('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia')>(), useGalleryCourseMedia: () => f.gallery }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 
 import { LatestCoursesSection, type LatestCourseMedia, type LatestCourseMediaTile } from '@/components/courses/browse/LatestCoursesSection';
@@ -180,12 +180,12 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 2 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = lastOpen();
-    expect(args.posts).toHaveLength(1);
+    expect(args.posts).toHaveLength(3);
     expect(args.posts[0].id).toBe('shots:course:course-alpha');
     expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['m1', 'm2', 'm3', 'm4', 'm5']);
     expect(args.index).toBe(0);
     expect(args.mediaId).toBe('m5');
-    expect(args.openedFrom).toBe('course-media');
+    expect(args.openedFrom).toBe('courses-latest-courses');
     expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
     expect(args.posts[0].displayName).toBe('Course alpha');
   });
@@ -239,7 +239,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 1 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = lastOpen();
-    expect(args.posts).toHaveLength(1);
+    expect(args.posts).toHaveLength(3);
     expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['m1', 'v2', 'm2']);
     expect(args.index).toBe(0);
     expect(args.mediaId).toBe('m2');

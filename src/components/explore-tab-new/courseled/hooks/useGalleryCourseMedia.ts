@@ -21,11 +21,11 @@ import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 const PAGE_SIZE = 30;
 const MAX_PAGES = 4;
 
-export function useGalleryCourseMedia(courseId: string | null, userId: string | undefined) {
-  const { activeActor } = useActiveActor();
-
-  return useQuery({
-    queryKey: ['gallery-course-media', courseId, userId, activeActor?.type, activeActor?.id],
+/** One cache contract for the hook and course-rail neighbour fills. */
+export function galleryCourseMediaQuery(courseId: string | null, userId: string | undefined,
+  actorType: 'personal' | 'business' | undefined, actorId: string | undefined) {
+  return {
+    queryKey: ['gallery-course-media', courseId, userId, actorType, actorId],
     enabled: !!courseId && !!userId,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -41,8 +41,8 @@ export function useGalleryCourseMedia(courseId: string | null, userId: string | 
           p_filter: 'all',
           p_page_size: PAGE_SIZE,
           p_seen_post_ids: seen,
-          p_viewer_actor_type: activeActor?.type ?? 'personal',
-          p_viewer_actor_id: activeActor?.id ?? userId,
+          p_viewer_actor_type: actorType ?? 'personal',
+          p_viewer_actor_id: actorId ?? userId,
         };
         if (cursor) params.p_cursor = cursor;
 
@@ -65,5 +65,10 @@ export function useGalleryCourseMedia(courseId: string | null, userId: string | 
 
       return groupMultiMedia(flat);
     },
-  });
+  };
+}
+
+export function useGalleryCourseMedia(courseId: string | null, userId: string | undefined) {
+  const { activeActor } = useActiveActor();
+  return useQuery(galleryCourseMediaQuery(courseId, userId, activeActor?.type, activeActor?.id));
 }

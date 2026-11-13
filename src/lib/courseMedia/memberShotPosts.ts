@@ -1,5 +1,6 @@
-/** BRIEF_MEMBER_SHOTS_SWIPE_ACROSS — one synthetic post owns the canonical
- * horizontal carousel for a course or hole; memberShot captions belong to media items.
+/** BRIEF_MEMBER_SHOTS_VERTICAL_PAGING — Latest holes owns one page per shot;
+ * course rail owns one page per course. HoleWalk/place runs remain horizontal.
+ * memberShot captions belong to media items.
  * Latest holes maps the rail snapshot; HoleWalk keeps get_hole_media. Shared
  * hole captions split course title from scored detail, avoiding entrypoint drift.
  * Every caller must set readOnly and syntheticPosts. Synthetic ids never
@@ -9,6 +10,8 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 import { addedMonthLabel } from './addedMonth';
 import { holeOrdinal } from './holeWalk';
 import { shareCourseName } from '@/lib/courses/shareCourseName';
+import { mapRowToFeedPost } from '@/components/media-system/utils/feedMapper';
+import type { LatestCourseMedia } from '@/components/courses/browse/LatestCoursesSection';
 
 export interface MemberShotRow {
   id: string;
@@ -148,6 +151,45 @@ export function placeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName
 export function latestHolesToFeedPosts(rows: readonly MemberShotRow[]): FeedPost[] {
   return syntheticPost('shots:latest-holes', '', '', 'Latest holes', null,
     holeShotItems(rows, '', 0, true));
+}
+
+/** One full-screen page per ready shot in the loaded rail snapshot, RPC order. */
+export function latestHoleRowsToFeedPosts(rows: readonly MemberShotRow[]): FeedPost[] {
+  return rows.flatMap(row => syntheticPost(`shots:latest-hole:${row.id}`, '', '', 'Latest holes', null,
+    holeShotItems([row], '', 0, true)));
+}
+
+/** Rail placeholders use the gallery mapper and ready filter; full reads only
+ * append missing ids, so tile order and the visible slide cannot move. */
+export function courseTilesToShotPost(row: Pick<LatestCourseMedia, 'course_id' | 'course_name' | 'tiles'>): FeedPost {
+  const shots = row.tiles.flatMap(tile => mapRowToFeedPost({
+    post_content: null, post_user_id: '', post_actor_type: 'personal', post_actor_id: '',
+    post_status: 'published', source_review_id: null, width: null, height: null, display_order: null,
+    creator_username: null, creator_display_name: null, creator_avatar_url: null, creator_is_verified: false,
+    business_name: null, business_logo_url: null, business_is_verified: false,
+    like_count: 0, comment_count: 0, share_count: 0, review_rating: null,
+    review_course_id: row.course_id, review_course_name: row.course_name, review_course_image: null,
+    creator_relation: 'none', is_liked_by_me: false, is_followed_by_me: false, engagement_score: 0,
+    post_id: tile.post_id, media_id: tile.media_id, media_type: tile.media_type,
+    media_url: tile.media_url, poster_url: tile.poster_url, stream_id: tile.stream_id,
+    duration_seconds: tile.duration_seconds, post_created_at: tile.created_at,
+  }).mediaItems.filter(ready).map(item => ({
+    item: { ...item, memberShot: {
+      kicker: "Through members' eyes", title: row.course_name,
+      courseId: row.course_id, courseName: row.course_name,
+      credit: '', memberName: '', avatarUrl: null,
+    } }, date: tile.created_at,
+  })));
+  // Keep a typed placeholder even if every tile is processing; open() owns
+  // media-less page exclusion and preserves the intended tapped post.
+  return syntheticPost(`shots:course:${row.course_id}`, row.course_id, row.course_name,
+    row.course_name, null, shots)[0] ?? {
+    id: `shots:course:${row.course_id}`, userId: '', actorId: '', actorType: 'personal',
+    username: '', displayName: row.course_name, avatarUrl: '', isVerified: false,
+    creatorRelation: 'none', caption: '', createdAt: '', mediaItems: [],
+    likeCount: 0, commentCount: 0, shareCount: 0, review: null, isReview: false,
+    isLikedByMe: false, isFollowedByMe: false, courseId: row.course_id, courseName: row.course_name,
+  };
 }
 
 /** Preserve Media-tab post-then-media order and the existing ready-source filter. */
