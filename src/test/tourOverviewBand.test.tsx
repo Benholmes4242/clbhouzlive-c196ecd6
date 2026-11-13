@@ -54,13 +54,16 @@ describe('Tour overview band', () => {
       cleanup(); scroll.scrolled = false;
     }
   });
-  it('soft fade token holds the signed-off safe-area stops without a transition', () => {
+  it('soft fade token keeps the signed-off stops; transition only on full-bleed routes', () => {
     const css = readFileSync('src/index.css', 'utf8');
     const rule = css.match(/\[data-chrome="island-scrim-soft"\]\s*\{([^}]+)\}/)?.[1];
     expect(rule).toBeDefined();
     expect(rule).toContain('height: calc(var(--sat, 0px) + 96px);');
     expect(rule).toContain('background: linear-gradient(180deg, rgba(10,10,12,0.92) 0px, rgba(10,10,12,0.80) var(--sat, 0px), rgba(10,10,12,0.35) calc(var(--sat, 0px) + 48px), rgba(10,10,12,0) calc(var(--sat, 0px) + 96px));');
     mount('/tourhub');
+    expect(layer('island-scrim-soft')?.style.transition).toBe('var(--island-glass-transition)');
+    cleanup();
+    mount('/no-such-page');
     expect(layer('island-scrim-soft')?.style.transition).toBe('');
   });
   it('DEFAULT_B1 unregistered paths resolve to the soft condensing logo default', () => {

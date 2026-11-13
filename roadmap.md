@@ -1,27 +1,10 @@
 # Roadmap
 
-## Blocked verification: Authorised observer-test setup repair and combined builds
-- Only stickySafeAreaGate.test.tsx: assign writable observer globals and restore originals; assertions, setup and application unchanged.
-- Observer cases: 3 passed. Separate shards: 2,155 passed / 2,026 passed / 2,159 passed / 2,185 passed, 2 failed; combined 8,527 executed, 8,525 passed.
-- STOP tourOverviewBand.test.tsx:64:58 — expected 'var(--island-glass-transition)' to be ''; tourSlot.test.tsx:87:657 — expected undefined to be 'post-123'. Neither repaired; full report: .lovable/reports/combined-tour-observer-repair.md.
-
-## Blocked verification: Signed-off Clubhouse Tour slot
-- Add one Preview/Live/Result post-style slot before post index 12, preserving all rails and the Round of the week.
-- Reuse the hero's tournamentHeadline sentence (confirmed), venue images, post engagement and analytics; no SQL, migrations or ranking changes.
-- STOP src/test/tourSlot.test.tsx:87:657 — AssertionError: expected undefined to be 'post-123'. Focused: 39 passed, 1 failed. Four shards unrun; failed test unchanged; prior notch-test stop untouched.
-
-## Blocked verification: Full-bleed top fade Option E
-- Hide the shared soft fade at rest by resolved bleed; follow existing condensation and glass timing on scroll.
-- Preserve gradient, height, z-index, registry, safe-area strip and page heroes.
-- Fade checks: 35 passed. Separate shards: 1/4 = 2,155 passed; 2/4 = 2,023 passed, 3 failed; 3/4 and 4/4 unrun under stop rule.
-- STOP src/test/stickySafeAreaGate.test.tsx:18:6 — TypeError: Cannot redefine property: ResizeObserver. Preview build OK; full report: .lovable/reports/top-fade-option-e.md.
-- Observer setup repaired under subsequent explicit authorisation; all three cases now pass. Combined verification remains blocked by the two failures listed above.
-
-## Blocked: Gate-reveal notch strip and top tie rows
-- Re-measure hidden/revealed sentinels in the shared hook; preserve gates and scrim registry.
-- Remove shared board top tie cap and skeleton tie field; use v5 storage, preserving photo caption.
-- Run three new notch cases and authorised tie assertions, then four separate shards; report counts and named changes.
-- Original observer setup stop resolved by authorised assignment/restoration repair; all three cases pass in shard 2. Combined verification remains blocked by the two failures listed above.
+## Complete: Four-build test verification and authorised repairs
+- Both final test-only repairs applied exactly; CSS assertions and Tour slot binding assertions preserved.
+- Four separate shards: 2,155 / 2,026 / 2,159 / 2,187 passed; full suite 8,527 passed, 748 files, zero failures.
+- Notch/tie, observer repair, Option E and saved Tour slot are suite-verified; all new/changed cases, old assertions and count reconciliation: .lovable/reports/combined-tour-final-tests.md.
+- Ben's 390/320 comparison and real-member like/comment verification remain pending; no application code changed in these final repairs.
 
 ## Complete: Tour skeleton text-only measurement and wrapper
 - Measure rendered text without container padding/min-height; preserve all other geometry.
