@@ -1,5 +1,9 @@
 # Roadmap
 
+## In progress: Authorised composer tagging and Tour gate stop fixes
+- Add titleMarkup only to the round-trip expectation; refine whole-word search priority; rewrite only four new title-suggestion cases with the complete mention-module mock.
+- Run shards 1/4–4/4 as separate commands; stop on any other failure. Report all names, reconciled totals and fix diff.
+
 ## Stopped: Tour overview one-load gate verification
 - One-shot gate and remembered twelve-hour shells added; focused 137 passed, including eleven new gate tests.
 - Separate shards: 1=2,148 passed; 2=2,004 passed; 3=2,148 passed/1 failed. Shard 4 not run under stop rule.

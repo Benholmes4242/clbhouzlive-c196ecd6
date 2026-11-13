@@ -90,9 +90,11 @@ export async function searchMembers(q: string, selfId: string | null): Promise<W
     const username = (u.username ?? '').toLowerCase();
     if (name === needle || username === needle) return 0;
     if (name.startsWith(needle)) return 1;
-    if (name.split(/\s+/).some(word => word.startsWith(needle))) return 2;
-    if (username.startsWith(needle)) return 3;
-    return 4;
+    const words = name.split(/\s+/);
+    if (words.includes(needle)) return 2;
+    if (words.some(word => word.startsWith(needle))) return 3;
+    if (username.startsWith(needle)) return 4;
+    return 5;
   };
   return (data ?? []).filter((u) => u.id !== selfId).sort((a, b) => rank(a) - rank(b)).slice(0, 8).map((u) => ({
     id: u.id, name: u.display_name || u.username || 'Golfer', avatarUrl: u.profile_photo_url ?? null, sameRound: false, lastInteraction: '', username: u.username, homeClub: 'home_club' in u ? u.home_club as string | null : null,

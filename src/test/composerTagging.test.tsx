@@ -4,7 +4,16 @@ import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@t
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const h = vi.hoisted(() => ({ members: [] as Record<string, unknown>[], businesses: [] as Record<string, unknown>[], calls: [] as { table: string; payload: unknown }[], limits: [] as { table: string; limit: number }[], upload: vi.fn() }));
+type MentionProps = React.ComponentProps<typeof import('@/components/mentions/MentionsComposerInput').MentionsComposerInput>;
+const h = vi.hoisted(() => ({ mentionProps: [] as MentionProps[], members: [] as Record<string, unknown>[], businesses: [] as Record<string, unknown>[], calls: [] as { table: string; payload: unknown }[], limits: [] as { table: string; limit: number }[], upload: vi.fn() }));
+// Preserve every export, including the real search helpers used by Played with.
+vi.mock('@/components/mentions/MentionsComposerInput', async importOriginal => {
+  const actual = await importOriginal<typeof import('@/components/mentions/MentionsComposerInput')>();
+  return { ...actual, MentionsComposerInput: (props: MentionProps) => {
+    h.mentionProps.push(props);
+    return <textarea ref={props.inputRef} value={stripMentionMarkup(props.value)} placeholder={props.placeholder} maxLength={props.maxLength} onChange={e => props.onChange(e.target.value)} />;
+  } };
+});
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: {
   rpc: async (name: string) => ({ data: name === 'create_post_v2' ? { post_id: 'post' } : [], error: null }),
@@ -27,16 +36,17 @@ vi.mock('@/features/post-v2/lib/postWith', () => ({ writePostWith: async () => [
 import { PlayedWithSection } from '@/features/post-v2/components/golf/GolfPostSections';
 import { searchMembers } from '@/features/post-v2/lib/golfPostReads';
 import { VideoTitleDescription } from '@/features/post-v2/components/video/VideoComposerFields';
+import { VideoDetailsPage } from '@/features/post-v2/components/video/VideoDetailsPage';
 import { emptyVideoDetails, restoreVideoDetails } from '@/features/post-v2/lib/videoDetails';
 import { useStageComposer } from '@/features/post-v2/hooks/useStageComposer';
 import { usePostSubmit } from '@/features/post-v2/hooks/usePostSubmit';
-import { serializeMention } from '@/lib/mentions/format';
+import { serializeMention, stripMentionMarkup } from '@/lib/mentions/format';
 
 const id = '11111111-1111-4111-8111-111111111111';
 const businessId = '22222222-2222-4222-8222-222222222222';
 const mention = serializeMention({ display: 'Thomas Holmes', entityType: 'user', entityId: id });
 const person = { id, name: 'Thomas Holmes', avatarUrl: null, sameRound: false, lastInteraction: '' };
-beforeEach(() => { h.members = [{ id, display_name: person.name, username: 'thomas', profile_photo_url: null }]; h.businesses = []; h.calls = []; h.limits = []; h.upload.mockClear(); });
+beforeEach(() => { h.mentionProps = []; h.members = [{ id, display_name: person.name, username: 'thomas', profile_photo_url: null }]; h.businesses = []; h.calls = []; h.limits = []; h.upload.mockClear(); });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 function mount(node: React.ReactNode) {
@@ -52,6 +62,11 @@ function typeTitle(value: string) {
   fireEvent.focus(input);
   fireEvent.change(input, { target: { value, selectionStart: value.length, selectionEnd: value.length } });
   return input;
+}
+function titleProps() {
+  const props = h.mentionProps.findLast(p => p.placeholder === "What's this video?");
+  if (!props) throw new Error('Title did not render the canonical mention input');
+  return props;
 }
 
 describe('composer tagging', () => {
@@ -92,31 +107,39 @@ describe('composer tagging', () => {
     expect(rows).toHaveLength(8);
     expect(rows.map(p => p.name)).toEqual(['THOMAS', 'Exact username', 'Thomas Holmes', 'Al Thomas', 'Username prefix', 'Other', 'Tail one', 'Tail two']);
   });
-  it('typing @th and picking a member retains markup, plain title and plain counter', async () => {
+  it('typing @th and picking a member retains markup, plain title and plain counter', () => {
     mount(<Title />);
     typeTitle('@th');
-    const option = await screen.findByRole('option', { name: /Thomas Holmes/ });
-    fireEvent.mouseDown(option); fireEvent.click(option);
-    expect(screen.getByTestId('markup').textContent).toBe(`${mention} `);
-    expect(screen.getByTestId('plain').textContent).toBe('@Thomas Holmes ');
-    expect(screen.getByRole('textbox', { name: 'Video title' })).toHaveValue('@Thomas Holmes ');
-    expect(screen.getByText('15/80')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Video title' })).toBeInTheDocument();
+    expect(titleProps()).toMatchObject({ currentUserId: 'me', maxLength: 80 });
+    act(() => titleProps().onChange(`So close ${mention}`));
+    expect(screen.getByTestId('markup').textContent).toBe(`So close ${mention}`);
+    expect(screen.getByTestId('plain').textContent).toBe('So close @Thomas Holmes');
+    expect(screen.getByRole('textbox', { name: 'Video title' })).toHaveValue('So close @Thomas Holmes');
+    expect(screen.getByText('23/80')).toBeInTheDocument();
   });
-  it('title suggestions include businesses and exclude the current member', async () => {
-    h.members = [{ id: 'me', display_name: 'Thomas Self', username: 'thself' }];
-    h.businesses = [{ id: businessId, name: 'Thomas Golf', logo_url: null }];
-    mount(<Title />); typeTitle('@th');
-    const option = await screen.findByRole('option', { name: /Thomas Golf/ });
-    expect(screen.queryByRole('option', { name: /Thomas Self/ })).toBeNull();
-    fireEvent.click(option);
-    expect(screen.getByTestId('markup').textContent).toContain(`(b:${businessId})`);
+  it('title suggestions include businesses and exclude the current member', () => {
+    mount(<><Title /><VideoDetailsPage details={emptyVideoDetails()} description="" long={false} userId="me" onChange={() => {}} onDescription={() => {}} onBack={() => {}} /></>);
+    const title = titleProps();
+    const description = h.mentionProps.findLast(p => p.placeholder === 'Description');
+    expect(description).toBeDefined();
+    for (const props of [title, description]) {
+      expect(props).toMatchObject({ value: '', currentUserId: 'me', onChange: expect.any(Function), textStyle: expect.any(Object) });
+      expect(props).not.toHaveProperty('searchMembers');
+      expect(props).not.toHaveProperty('searchBusinesses');
+    }
+    const business = serializeMention({ display: 'Thomas Golf', entityType: 'business', entityId: businessId });
+    act(() => title.onChange(business));
+    expect(screen.getByTestId('markup').textContent).toBe(business);
+    expect(screen.getByTestId('plain').textContent).toBe('@Thomas Golf');
   });
-  it('title blocks a mention pick exceeding eighty plain characters', async () => {
+  it('title blocks a mention pick exceeding eighty plain characters', () => {
     mount(<Title initial={'a'.repeat(70)} />);
     typeTitle(`${'a'.repeat(70)} @th`);
-    fireEvent.click(await screen.findByRole('option', { name: /Thomas Holmes/ }));
+    const previous = screen.getByTestId('markup').textContent;
+    act(() => titleProps().onChange(`${'a'.repeat(70)} ${mention}`));
     expect(screen.getByTestId('plain').textContent).toBe(`${'a'.repeat(70)} @th`);
-    expect(screen.getByTestId('markup').textContent).not.toContain('(u:');
+    expect(screen.getByTestId('markup').textContent).toBe(previous);
   });
   it('title truncates ordinary text to eighty plain characters', () => {
     mount(<Title />); typeTitle('a'.repeat(90));
@@ -128,14 +151,16 @@ describe('composer tagging', () => {
     expect(fireEvent.keyDown(input, { key: 'Enter', shiftKey: true })).toBe(false);
     expect(screen.getByTestId('plain').textContent).toBe('Film');
   });
-  it('title paste strips newlines while retaining existing mention markup', async () => {
-    mount(<Title />); typeTitle('@th');
-    fireEvent.click(await screen.findByRole('option', { name: /Thomas Holmes/ }));
-    const input = screen.getByRole('textbox', { name: 'Video title' }) as HTMLTextAreaElement;
-    input.setSelectionRange(input.value.length, input.value.length);
-    expect(fireEvent.paste(input, { clipboardData: { getData: () => 'So\nclose\r\nyet' } })).toBe(false);
+  it('title paste strips newlines while retaining existing mention markup', () => {
+    mount(<Title />);
+    act(() => titleProps().onChange(`${mention} So\nclose\r\nyet`));
     expect(screen.getByTestId('markup').textContent).toBe(`${mention} Socloseyet`);
     expect(screen.getByTestId('plain').textContent).toBe('@Thomas Holmes Socloseyet');
+    const input = screen.getByRole('textbox', { name: 'Video title' }) as HTMLTextAreaElement;
+    input.setSelectionRange(input.value.length, input.value.length);
+    expect(fireEvent.paste(input, { clipboardData: { getData: () => '\nagain' } })).toBe(false);
+    expect(screen.getByTestId('markup').textContent).toBe(`${mention} Socloseyetagain`);
+    expect(screen.getByTestId('plain').textContent).toBe('@Thomas Holmes Socloseyetagain');
   });
   it('draft restore retains titleMarkup and accepts a legacy plain title', () => {
     expect(restoreVideoDetails({ title: 'old', titleMarkup: mention })).toMatchObject({ titleMarkup: mention, title: '@Thomas Holmes' });
