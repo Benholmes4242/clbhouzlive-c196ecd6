@@ -41,6 +41,8 @@ import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { useTourSlotData, type TourSlotVisit } from './useTourSlotData';
 import { TOUR_DISPLAY, slotPosition, pickScore, recordLine, bestOfThree, chaserSentence, type SlotSelection, type SlotPick } from './tourSlotRules';
 
+// The slot photo sits 10px under the shared hero height so the card reads between the top islands and the floating nav.
+const TOUR_SLOT_PHOTO_HEIGHT = HERO_PHOTO_HEIGHT - 10;
 const ellipsis: React.CSSProperties = { minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 const numeric: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 const caps: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '.16em', textTransform: 'uppercase' };
@@ -74,7 +76,7 @@ export function TourSlotView({ selection, picks, board, image, record, sentence,
           <div style={{ ...ellipsis, fontSize: 14, color: INK_MUTE, marginTop: 3 }}>{state === 'live' ? <><span style={{ color: TOUR_LIVE_GREEN, fontSize: 11, fontWeight: 800, letterSpacing: '.14em' }}>● LIVE</span>{'  '}Round {round}</> : state === 'preview' ? `Starts ${dateLabel(event.start_date)}` : `Final · ${dateLabel(event.end_date)}`}</div>
         </div>
       </header>
-      <div data-tour-slot-photo style={{ position: 'relative', height: HERO_PHOTO_HEIGHT, width: '100%', background: COURSE_GRADIENT }}>
+      <div data-tour-slot-photo style={{ position: 'relative', height: TOUR_SLOT_PHOTO_HEIGHT, width: '100%', background: COURSE_GRADIENT }}>
         {image && <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />}
         <PhotoBandFade canvas={FEED_CARD_SURFACE} />
         <div style={{ position: 'absolute', left: 16, right: 16, bottom: 6, display: 'flex', alignItems: 'flex-end', gap: 12 }}>

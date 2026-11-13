@@ -87,6 +87,17 @@ describe('Option B source priority', () => {
     render(<WhoToFollowRail slot={1}/>,{wrapper});
     await waitFor(()=>expect(tile('person').getAttribute('data-follow-tile-source')).toBe('cover'));
   });
+  it('Follow and dismiss carry no Button variant or size classes', async () => {
+    render(<WhoToFollowRail slot={1}/>,{wrapper});
+    await waitFor(()=>expect(tile('person').getAttribute('data-follow-tile-source')).toBe('none'));
+    const follow=tile('person').querySelector('.follow-tile-follow'); if (!follow) throw Error('follow missing');
+    const dismiss=tile('person').querySelector('.follow-tile-dismiss'); if (!dismiss) throw Error('dismiss missing');
+    for (const button of [follow,dismiss]) {
+      for (const cls of ['h-11','h-10','rounded-[10px]','bg-transparent']) expect(button.className).not.toContain(cls);
+    }
+    expect(follow.className).toContain('follow-tile-follow');
+    expect(dismiss.className).toContain('follow-tile-dismiss');
+  });
   it('makes one media call per mounted rail surface', async () => {
     render(<><WhoToFollowRail slot={1}/><KindRail kind="pro"/></>,{wrapper});
     await waitFor(()=>expect(h.rpc.mock.calls.filter(c=>c[0]==='get_follow_tile_media')).toHaveLength(2));

@@ -546,7 +546,7 @@ function RailCardView({
         cursor: 'pointer', scrollSnapAlign: 'start',
         transition: `width ${DISMISS_MS}ms ease, opacity ${DISMISS_MS}ms ease, margin ${DISMISS_MS}ms ease` }}>
       {source && <><img className="follow-tile-image" src={source.url} alt="" loading="lazy" decoding="async" onError={fail} /><PhotoBandFade canvas={PAGE_CANVAS} /></>}
-      <Button variant="ghost" className="follow-tile-dismiss" type="button"
+      <Button variant={null} size={null} className="follow-tile-dismiss" type="button"
         aria-label={t('findPeople.rail.hide', { name, defaultValue: `Hide ${name}` })}
         onClick={(e) => { e.stopPropagation(); onDismiss(); }}><X size={14} strokeWidth={2.6} /></Button>
       {source?.media?.media_type === 'video' && <span data-follow-tile-play className="follow-tile-play" aria-hidden><Play size={13} fill="currentColor" strokeWidth={0} /></span>}
@@ -556,7 +556,7 @@ function RailCardView({
         <div className="follow-tile-name"><span>{name}</span><ProOrVerifiedMark userId={isPerson ? card.person.user_id : null} verified={verified} /></div>
         <div className="follow-tile-reason">{reason ? t(reason.key, { ...reason.vars, defaultValue: reason.def }) : ''}</div>
         <div data-testid="rail-slot" className="follow-tile-stat">{when ? <span data-testid="rail-when">{when}</span> : figures ? <span data-testid="rail-figures">{figures}</span> : null}</div>
-        <Button type="button" onClick={onFollow} disabled={pending} className="follow-tile-follow"
+        <Button type="button" variant={null} size={null} onClick={onFollow} disabled={pending} className="follow-tile-follow"
           style={{ opacity: pending ? 0.7 : 1, ...(followed ? { background: A.INK, color: A.CANVAS, border: `1px solid ${A.INK}` } : {}) }}>
           {followed ? t('findPeople.following', { defaultValue: 'Following' }) : t('findPeople.follow', { defaultValue: 'Follow' })}
         </Button>
