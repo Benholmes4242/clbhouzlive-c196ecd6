@@ -30,6 +30,6 @@ export function ComingUp({ tour, excludeIds }: { tour: TourId | null; excludeIds
   if (events.length === 0) return null;
   return <section className="coming-up" data-overview-band="comingUp"><OverviewSectionHead title={t('overview.comingUp.title')} action={t('overview.comingUp.linkLabel')} onAction={() => navigate(`/tourhub?tab=schedule&tour=${tour ?? 'all'}`)} />
     {next ? <ComingUpNext row={next} photo={photos?.get(next.id)} lastYear={lastYear} own={next.golf_course_id ? own?.get(next.golf_course_id) : undefined} onOpen={() => navigate(`/tourhub/tournament/${next.id}`)}/> : null}
-    {events.slice(1).map((row, index, rows) => { const month = comingMonth(row.start_date); const showMonth = index === 0 || month !== comingMonth(rows[index - 1].start_date); return <Fragment key={row.id}>{showMonth ? <div className="coming-month">{month}</div> : null}<ComingUpListRow row={row} played={!!row.golf_course_id && !!own?.has(row.golf_course_id)} onOpen={() => navigate(`/tourhub/tournament/${row.id}`)}/></Fragment>; })}
+    {events.slice(1).map((row, index, rows) => { const month = comingMonth(row.start_date); const showMonth = index === 0 || month !== comingMonth(rows[index - 1].start_date); return <Fragment key={row.id}>{showMonth ? <div className="coming-month" data-coming-month>{month}</div> : null}<ComingUpListRow row={row} played={!!row.golf_course_id && !!own?.has(row.golf_course_id)} onOpen={() => navigate(`/tourhub/tournament/${row.id}`)}/></Fragment>; })}
   </section>;
 }

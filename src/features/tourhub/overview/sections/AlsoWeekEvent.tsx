@@ -35,7 +35,7 @@ export function AlsoWeekEvent({slide,entries,draw,followed}:{slide:HeroSlide;ent
   const target=tournamentRoute(event.id,{kind:'overview'});
   const {top,extra}=weekRows(entries,followed);
   const winnerClosing=complete&&winner&&event.venuePar!=null&&round!=null?todayFromEntry(winner,round):null;
-  return <div className="also-event">
+  return <div className="also-event" data-also-event>
     <Button variant="ghost" className="also-head" onClick={()=>navigate(target.to,{state:target.state})}>
       <div className="also-kick"><span>{fullTourLabel(event.tourSlug,event.tourName)}</span><span className="also-state" data-state={slide.type}>{slide.type==='live'&&<i className="also-live-dot"/>}{state}</span></div>
       <div className="also-title"><span>{event.name}</span><ChevronRight size={16} aria-hidden/></div><div className="also-sub">{sub}</div>

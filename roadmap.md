@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Signed-off Tour skeleton rebuild
+- Rebuild only overviewShells and its tests; other band edits are data markers only. Preserve queries and gate readiness.
+- Use corrected 390/320 mocks: three hero headline bars; respect every line limit and ellipsis cell edge, without overlapping bars.
+- Record v2 counted shapes; verify focused tests and four separate shards, then report names, totals and diff.
+
 ## In progress: Tour overview loading — three fixes
 - Marker-based shape recording (data-overview-band on all five band roots), island caption readiness with shimmer placeholder, hero photo preload gating the reveal.
 - New tests: five-band shape, photo gate load/error/none, island ready/zero/live rules. Run focused, then shards 1/4–4/4 separately; stop on any other failure.
