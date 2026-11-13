@@ -1,9 +1,12 @@
 # Roadmap
 
-## In progress: Tour overview one-load gate
-- Add one-shot readiness across all five sections and the first hero slide only.
-- Share remembered twelve-hour skeleton shapes between route and gate; verify 320px and four separate shards.
-- Preserve the prior composer stop; five known composerTagging failures remain outside this request.
+## Stopped: Tour overview one-load gate verification
+- One-shot gate and remembered twelve-hour shells added; focused 137 passed, including eleven new gate tests.
+- Separate shards: 1=2,148 passed; 2=2,004 passed; 3=2,148 passed/1 failed. Shard 4 not run under stop rule.
+- STOP src/test/pf3cRoundRules.test.ts:29:224: `AssertionError: expected { title: '', titleMarkup: '', …(9) } to deeply equal { title: '', titleOnCover: true, …(8) }`. Prior composer titleMarkup restoration caused the extra field; test untouched.
+- Inventory 8,419 before / expected 8,430 after (+11 tourOverviewGate); latest fully passing baseline remains 8,407. Five prior composerTagging failures remain unresolved.
+- 320px Tour page returned “App couldn't start”; no page/skeleton overflow or smallest-shell measurement verified. Authenticated browser checks unavailable (external_unmanaged).
+- First-slide-only behavior verified at readiness helper level, not a real carousel selection flow. No further changes after test stop.
 
 ## Stopped: Composer tagging
 - Fix Played with pointer/focus and pending/empty results; rank up to twenty search rows into eight.
