@@ -84,12 +84,14 @@ export function chaserSentence(rows: BoardEntry[], t: (key: string, opts?: Recor
   const subject = chasers.length === 1 ? `${names[0]} is` : chasers.length === 2 ? `${names[0]} and ${names[1]} are` : `${chasers.length} players are`;
   return `${subject} ${gap === 1 ? 'a shot' : `${countInWords(gap, t).toLowerCase()} shots`} back.`;
 }
+/** ONE FIGURE OWNER: the slot's record line reads the same three fields the
+ * Tour page's picks block reads (record.won, record.top10, record.event_count),
+ * never record.best — that is the single best event, not the season. With no
+ * event count the clause is omitted rather than invented. */
 export function recordLine(tour: SlotTour, record: PickRecord | null | undefined): string | null {
   if (!record) return null;
-  const wins = record.best?.wins ?? record.won;
-  const top10 = record.best?.top10 ?? record.top10;
-  const events = record.best?.events ?? record.event_count ?? record.events.length;
-  return `Our record on the ${TOUR_DISPLAY[tour]}: ${wins} ${wins === 1 ? 'win' : 'wins'}, ${top10} top 10s from ${events} events.`;
+  const base = `Our record on the ${TOUR_DISPLAY[tour]}: ${record.won} ${record.won === 1 ? 'win' : 'wins'}, ${record.top10} top 10s`;
+  return record.event_count == null ? `${base}.` : `${base} from ${record.event_count} events.`;
 }
 export function bestOfThree(picks: readonly SlotPick[], board: BoardEntry[]): string | null {
   const ranked = picks.map(pick => ({ pick, row: board.find(row => row.player?.id === pick.playerId) }))

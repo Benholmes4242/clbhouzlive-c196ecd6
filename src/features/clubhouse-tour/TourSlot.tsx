@@ -175,5 +175,5 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
       onOpen: () => { selectTour(selection.tour, { tournamentId: event.id }); writeStoredTour(selection.tour); analyticsEvents.track('tour_slot_tapped', { state: selection.state, tour: selection.tour, tournament_id: event.id }); navigate('/tourhub'); },
     };
   }
-  return lastView.current ? <div ref={root}><TourSlotView {...lastView.current} /></div> : null;
+  return lastView.current ? <div ref={node => { root.current = node; visit.el = node; }}><TourSlotView {...lastView.current} /></div> : null;
 }

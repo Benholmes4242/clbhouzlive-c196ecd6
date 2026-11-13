@@ -733,6 +733,9 @@ const ClubhouseContent = () => {
                 // the refetch resolves.
                 virtuosoSnapshots.current[FEED_TAB] = undefined;
                 featuredDecisions.current.clear();
+                // PTR also rotates the Tour slot, but only while it is still
+                // below the fold (the hook owns that guard).
+                tourSlotVisit.refresh?.();
                 return handleRefresh();
               }}
               isRefreshing={activeFeed.isRefetching}

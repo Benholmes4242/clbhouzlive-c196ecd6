@@ -1,28 +1,68 @@
 /** Slot reads existing published tournament/prediction data only. Pagination
  * prevents row-cap truncation; no generation, sync, ranking or feed writes.
  * Visit identity outlives virtualized card mounts; a shown card retains its
- * last settled payload on errors or expiry rather than collapsing. */
+ * last settled payload on errors or expiry rather than collapsing.
+ * ROTATION: this hook owns the cursor. It advances on first mount, on each
+ * return to an active Clubhouse (KeepAlive keeps the route mounted, so a tab
+ * switch is a reactivation, not a remount) and on pull-to-refresh — but only
+ * while the slot is still below the fold, so a taller or shorter card can
+ * never move what the member is reading. */
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useKeepAlive } from '@/components/keep-alive/KeepAliveOutlet';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { CachedTournament } from '@/hooks/useTournamentsCache';
 import { readStoredTour } from '@/features/tourhub/hooks/useTourSelection';
 import { advanceTourSlotCursor, orderTourSlots, resolveTourSlot, type SlotTournament, type SlotPick, type SlotSelection } from './tourSlotRules';
 
 export interface SlotPayload { tournaments: SlotTournament[]; predictions: Map<string, SlotPick[]>; boards: Map<string, BoardEntry[]> }
-export interface TourSlotVisit { cursor: number; ready: boolean; selected: SlotSelection | null; snapshot: SlotPayload | null; shown: Set<string> }
+export interface TourSlotVisit { cursor: number; ready: boolean; selected: SlotSelection | null; snapshot: SlotPayload | null; shown: Set<string>; el?: HTMLElement | null; refresh?: () => void }
+
+/** A slot that has not rendered yet, or is hidden inside an inactive keep-alive
+ * portal, has nothing scrolled past it. Otherwise only a top edge below the
+ * viewport bottom is safe to re-pick against. */
+function slotBelowViewport(el: HTMLElement | null | undefined) {
+  if (!el) return true;
+  const rects = typeof el.getClientRects === 'function' ? el.getClientRects() : [];
+  if (!rects.length) return true;
+  return el.getBoundingClientRect().top > window.innerHeight;
+}
+
 export function useTourSlotVisit() {
-  const visit = useRef<TourSlotVisit>({ cursor: 0, ready: false, selected: null, snapshot: null, shown: new Set() });
+  const visit = useRef<TourSlotVisit>({ cursor: 0, ready: false, selected: null, snapshot: null, shown: new Set(), el: null });
   const [, setReady] = useState(false);
+  const [, setTick] = useState(0);
   const advanced = useRef(false);
+  const { isActive } = useKeepAlive();
+  const wasActive = useRef(isActive);
+
+  const advance = () => {
+    try { visit.current.cursor = advanceTourSlotCursor(window.localStorage); } catch { visit.current.cursor = 0; }
+    // The new cursor picks the next eligible tournament on the next read; the
+    // rendered card keeps its last settled payload until that settles. The
+    // bump is what makes that read happen — a ref write alone re-renders nothing.
+    visit.current.selected = null;
+    setTick(n => n + 1);
+  };
+  visit.current.refresh = () => { if (slotBelowViewport(visit.current.el)) advance(); };
+
   useEffect(() => {
     if (advanced.current) return;
     advanced.current = true;
-    try { visit.current.cursor = advanceTourSlotCursor(window.localStorage); } catch { visit.current.cursor = 0; }
+    advance();
     visit.current.ready = true;
     setReady(true);
   }, []);
+
+  useEffect(() => {
+    const becameActive = isActive && !wasActive.current;
+    wasActive.current = isActive;
+    if (!becameActive || !advanced.current) return;
+    if (!slotBelowViewport(visit.current.el)) return;
+    advance();
+  }, [isActive]);
+
   return visit.current;
 }
 export async function fetchTourSlotData(): Promise<SlotPayload> {
