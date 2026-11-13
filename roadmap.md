@@ -1,9 +1,10 @@
 # Roadmap
 
-## In progress: Full-bleed top fade Option E
+## Blocked verification: Full-bleed top fade Option E
 - Hide the shared soft fade at rest by resolved bleed; follow existing condensation and glass timing on scroll.
 - Preserve gradient, height, z-index, registry, safe-area strip and page heroes.
-- Add route-table, scroll, reduced-motion and unchanged-gradient cases; run each full shard separately and report results.
+- Fade checks: 35 passed. Separate shards: 1/4 = 2,155 passed; 2/4 = 2,023 passed, 3 failed; 3/4 and 4/4 unrun under stop rule.
+- STOP src/test/stickySafeAreaGate.test.tsx:18:6 — TypeError: Cannot redefine property: ResizeObserver. Preview build OK; full report: .lovable/reports/top-fade-option-e.md.
 - Prior notch observer test stop remains unauthorised and untouched.
 
 ## Blocked: Gate-reveal notch strip and top tie rows
