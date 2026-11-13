@@ -15,7 +15,8 @@ vi.mock('@/features/chrome-v2/useIslandBackName', () => ({ useIslandBackName: ()
 vi.mock('@/features/chrome-v2/IslandDock', () => ({ IslandDock: () => null }));
 vi.mock('@/features/find-people/usePeopleSuggestions', () => ({ usePeopleSuggestions: () => ({ data: h.people, isLoading: false }), useBusinessSuggestions: () => ({ data: h.businesses, isLoading: false }) }));
 vi.mock('@/features/find-people/useRecentActivity', () => ({ useRecentActivity: () => new Map() }));
-vi.mock('@/features/find-people/useSuggestionCovers', () => ({ useSuggestionCovers: () => new Map() }));
+vi.mock('@/features/find-people/useSuggestionCovers', () => ({ useSuggestionCovers: () => new Map(), useSuggestionCoversQuery: () => ({ covers: new Map(), settled: true }) }));
+vi.mock('@/features/find-people/useFollowTileMedia', () => ({ useFollowTileMedia: () => ({ media: new Map(), settled: true }) }));
 vi.mock('@/features/social-suggestions/useSuggestedGolfers', () => ({ useSuggestionGate: () => ({ eligible: true }), useSuggestedGolfers: () => ({ data: [], isFetched: true }) }));
 vi.mock('@/features/social-lists-v2/rowParts', () => ({ RowAvatar: () => <span data-avatar />, FollowButton: () => <span data-follow />, ROW_FONT: 'inherit' }));
 vi.mock('@/features/search-v2/hooks/useGlobalSearchV2', () => ({ useGlobalSearchV2: () => ({ data: { people: [], clubs: [] }, isLoading: false }) }));

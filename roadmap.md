@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Stopped: Signed-off Option B follow tiles
+- Authorised settled covers/media mocks saved in proVerification2B only; assertions and activeRing unchanged. Fresh shard 1 stopped: 2,167 passed / 1 failed, src/test/proVerification2B.test.tsx:143:40, `rail: name element is unchanged`: expected inline style but received null. Shards 2–4 unrun; report: .lovable/reports/follow-tiles-option-b-mock-fix.md.
 - Authorised Follow selector repair saved; shard 1 stopped: 2,163 passed / 5 failed (2,168 executed). src/test/proVerification2B.test.tsx:18 mock lacks useSuggestionCoversQuery; runtime at WhoToFollowRail.tsx:217:23. Shards 2/3/4 unrun; no further repair authorised. Full continuation report: .lovable/reports/follow-tiles-option-b-authorised-fix.md.
 - Replace shared rail tiles with settled media → cover → no-image selection and poster-only video glyphs.
 - Preserve follow/dismiss/session/order/header/analytics; generated RPC type is already present.
