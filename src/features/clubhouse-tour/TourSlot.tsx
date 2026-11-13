@@ -26,6 +26,7 @@ import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { INK, INK_SOFT, INK_MUTE, INK_FAINT, AMBER, TOUR_LIVE_GREEN } from '@/features/tourhub/_shared/tokens';
 import { FEED_CARD_SURFACE, MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
 import { countInWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import { formatOverviewDateRange } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { FeedPostActions, FeedAddComment } from '@/components/feed/FeedPostControls';
@@ -73,7 +74,7 @@ export function TourSlotView({ selection, picks, board, image, record, sentence,
           <div style={{ ...ellipsis, fontSize: 14, color: INK_MUTE, marginTop: 3 }}>{state === 'live' ? <><span style={{ color: TOUR_LIVE_GREEN, fontSize: 11, fontWeight: 800, letterSpacing: '.14em' }}>● LIVE</span>{'  '}Round {round}</> : state === 'preview' ? `Starts ${dateLabel(event.start_date)}` : `Final · ${dateLabel(event.end_date)}`}</div>
         </div>
       </header>
-      <div data-tour-slot-photo style={{ position: 'relative', height: 340, width: '100%', background: COURSE_GRADIENT }}>
+      <div data-tour-slot-photo style={{ position: 'relative', height: HERO_PHOTO_HEIGHT, width: '100%', background: COURSE_GRADIENT }}>
         {image && <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />}
         <PhotoBandFade canvas={FEED_CARD_SURFACE} />
         <div style={{ position: 'absolute', left: 16, right: 16, bottom: 6, display: 'flex', alignItems: 'flex-end', gap: 12 }}>

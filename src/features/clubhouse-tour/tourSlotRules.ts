@@ -18,7 +18,7 @@ export type SlotBoards = ReadonlyMap<string, BoardEntry[]>;
 const TOUR_ORDER: SlotTour[] = ['pga', 'lpga', 'euro', 'champ', 'pgad'];
 const STATE_ORDER: SlotState[] = ['live', 'result', 'preview'];
 export const CURSOR_KEY = 'clubhouse-tour-slot:cursor';
-export function tourSlotPlacement(index: number, count: number) { return index === 12 && count > 12; }
+export function tourSlotPlacement(index: number, count: number) { return index === 8 && count > 8; }
 
 /** Compare calendar days in London: midnight Wednesday is excluded, including BST. */
 export function resultHeld(endDate: string, now: Date): boolean {

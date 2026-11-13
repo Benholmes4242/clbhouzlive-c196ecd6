@@ -76,7 +76,7 @@ describe('Tour slot formatting', () => {
   it('formats the best-of-three result line', () => { expect(bestOfThree([picks[1],picks[2]],board)).toBe('Best of our three: Ventura, T2.'); });
   it('formats the picked-winner result line', () => { expect(bestOfThree(picks,board)).toBe('We picked the winner: Crowe.'); });
   it('strips sponsorship clauses but preserves Championship', () => { expect(['presented','driven','sponsored'].map(clause=>stripEventSponsorClause(`Austin Championship ${clause} by Company`))).toEqual(['Austin Championship','Austin Championship','Austin Championship']); });
-  it('places the slot only before index twelve with more than twelve posts', () => { expect([tourSlotPlacement(12,13),tourSlotPlacement(12,12),tourSlotPlacement(11,20),tourSlotPlacement(13,20)]).toEqual([true,false,false,false]); });
+  it('places the slot only before index eight with more than eight posts', () => { expect([tourSlotPlacement(8,9),tourSlotPlacement(8,8),tourSlotPlacement(8,7),tourSlotPlacement(7,20),tourSlotPlacement(9,20),tourSlotPlacement(12,20)]).toEqual([true,false,false,false,false,false]); });
 });
 function Location() { return <output data-testid="location">{useLocation().pathname}</output>; }
 function mount() {

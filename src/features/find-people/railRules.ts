@@ -155,13 +155,13 @@ export interface KindPerson {
 }
 
 /**
- * Feed placement for the kind rails: Pros above postIndex 9, Creators above
+ * Feed placement for the kind rails: Pros above postIndex 10, Creators above
  * postIndex 21. Sibling of railSlotForPostIndex, which keeps slots 1 and 2.
  * CardFeed only asks for posts that exist, so a feed that never reaches the
  * post never renders the rail.
  */
 export function kindRailForPostIndex(postIndex: number, postCount: number): FollowKind | null {
-  if (postIndex === 9 && postCount > 9) return 'pro';
+  if (postIndex === 10 && postCount > 10) return 'pro';
   if (postIndex === 21 && postCount > 21) return 'creator';
   return null;
 }

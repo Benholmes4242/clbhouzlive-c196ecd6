@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Tour slot placement and shared photo height
+- Move the slot after post 8 and Pros after post 10; all sibling placements stay unchanged.
+- Import the shared hero photo height without moving the overlay or changing other styles.
+- Update the two placement cases; run four separate shards and report totals, named assertions and diff.
+
 ## Complete: Four-build test verification and authorised repairs
 - Both final test-only repairs applied exactly; CSS assertions and Tour slot binding assertions preserved.
 - Four separate shards: 2,155 / 2,026 / 2,159 / 2,187 passed; full suite 8,527 passed, 748 files, zero failures.

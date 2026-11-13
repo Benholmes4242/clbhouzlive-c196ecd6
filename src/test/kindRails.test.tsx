@@ -102,8 +102,12 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('kind rail placement', () => {
-  it('pros sit above post 9 and creators above post 21; slots 1 and 2 unchanged', () => {
-    expect(kindRailForPostIndex(9, 30)).toBe('pro');
+  it('pros sit above post 10 and creators above post 21; slots 1 and 2 unchanged', () => {
+    expect(kindRailForPostIndex(10, 11)).toBe('pro');
+    expect(kindRailForPostIndex(10, 10)).toBeNull();
+    expect(kindRailForPostIndex(10, 9)).toBeNull();
+    expect(kindRailForPostIndex(9, 30)).toBeNull();
+    expect(kindRailForPostIndex(11, 30)).toBeNull();
     expect(kindRailForPostIndex(21, 30)).toBe('creator');
     expect(kindRailForPostIndex(3, 30)).toBeNull();
     expect(kindRailForPostIndex(15, 30)).toBeNull();
