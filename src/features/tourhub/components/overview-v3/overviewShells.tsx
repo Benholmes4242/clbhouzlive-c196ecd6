@@ -13,25 +13,27 @@ import '../../overview/sections/comingUp.css';
 
 export const TOUR_OVERVIEW_GATE_IDS = ['hero', 'stories', 'alsoThisWeek', 'comingUp', 'rankings'] as const;
 export const OVERVIEW_SHAPE_MAX_AGE = 12 * 60 * 60 * 1000;
-/** V3 item lines are measured only from revealed DOM; v1/v2 entries remain untouched.
+/** V4 item lines are measured only from revealed DOM; v1/v2/v3 entries remain untouched.
  * Shells use the live band's containers and inline geometry. Visible bars respect
  * each cell's clipping/line limit; no hidden lines, icons or coloured telemetry. */
 export type NewsItemShape = { headline: 1 | 2 | 3; details: 1 | 2 };
 export type AlsoEventShape = { tie: boolean; rows: number; sitLines: 1 | 2 };
+export type PicksShape = { sentenceLines: 1 | 2 | 3; recordLines: 1 | 2 };
+export type ComingNextShape = { lastLines: 1 | 2 | 3; nameLines: 1 | 2 | 3 };
 export type OverviewShape = {
   chips: boolean; movers: boolean; boardRows: number; fullLeaderboard: boolean;
-  picks: boolean; leadersRows: number; storyBand: boolean; alsoEvents: AlsoEventShape[];
-  comingNext: boolean; comingMonths: Array<Array<1 | 2>>; rankingsRows: number; climb: boolean;
+  picks: PicksShape | null; leadersRows: number; storyBand: boolean; alsoEvents: AlsoEventShape[];
+  comingNext: ComingNextShape | null; comingMonths: Array<Array<1 | 2>>; rankingsRows: number; climb: boolean;
   newsLead: boolean; newsPair: [NewsItemShape, NewsItemShape] | null; newsList: NewsItemShape[]; at?: number;
 };
 export const EMPTY_OVERVIEW_SHAPE: OverviewShape = {
-  chips: false, movers: false, boardRows: 0, fullLeaderboard: false, picks: false,
-  leadersRows: 0, storyBand: false, alsoEvents: [], comingNext: false, comingMonths: [],
+  chips: false, movers: false, boardRows: 0, fullLeaderboard: false, picks: null,
+  leadersRows: 0, storyBand: false, alsoEvents: [], comingNext: null, comingMonths: [],
   rankingsRows: 0, climb: false, newsLead: false, newsPair: null, newsList: [],
 };
-const shapeKey = (lens: string | null) => `tour-overview-shape:v3:${lens ?? 'all'}`;
+const shapeKey = (lens: string | null) => `tour-overview-shape:v4:${lens ?? 'all'}`;
 const countBounds = { boardRows: 10, leadersRows: 3, rankingsRows: 5 } as const;
-const flags = ['chips', 'movers', 'fullLeaderboard', 'picks', 'storyBand', 'comingNext', 'climb', 'newsLead'] as const;
+const flags = ['chips', 'movers', 'fullLeaderboard', 'storyBand', 'climb', 'newsLead'] as const;
 const emptyShape = (): OverviewShape => ({ ...EMPTY_OVERVIEW_SHAPE, alsoEvents: [], comingMonths: [], newsList: [] });
 const validCount = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && Number.isInteger(value);
 const clamp = (value: number, max: number) => Math.max(0, Math.min(max, value));
@@ -49,6 +51,10 @@ export function readOverviewShape(lens: string | null = 'all', now = Date.now())
       shape[key] = clamp(value[key], countBounds[key]);
     }
     const inRange = (n: unknown, min: number, max: number) => validCount(n) && n >= min && n <= max;
+    if (value.picks !== null && (!value.picks || typeof value.picks !== 'object' || Array.isArray(value.picks) || !inRange(value.picks.sentenceLines, 1, 3) || !inRange(value.picks.recordLines, 1, 2))) return emptyShape();
+    if (value.comingNext !== null && (!value.comingNext || typeof value.comingNext !== 'object' || Array.isArray(value.comingNext) || !inRange(value.comingNext.lastLines, 1, 3) || !inRange(value.comingNext.nameLines, 1, 3))) return emptyShape();
+    shape.picks = value.picks;
+    shape.comingNext = value.comingNext;
     const newsItem = (item: unknown): item is NewsItemShape => !!item && typeof item === 'object' && inRange((item as NewsItemShape).headline, 1, 3) && inRange((item as NewsItemShape).details, 1, 2);
     if (!Array.isArray(value.alsoEvents) || value.alsoEvents.length > 3 || !value.alsoEvents.every((item: AlsoEventShape) => item && typeof item === 'object' && typeof item.tie === 'boolean' && inRange(item.rows, 0, 4) && inRange(item.sitLines, 1, 2))) return emptyShape();
     if (!Array.isArray(value.comingMonths) || value.comingMonths.length > 3 || !value.comingMonths.every((month: unknown) => Array.isArray(month) && month.length <= 6 && month.every(n => inRange(n, 1, 2)))) return emptyShape();
@@ -86,13 +92,15 @@ export function ShapeAfterReveal({ lens, root }: { lens: string | null; root: Re
       if (node.hasAttribute('data-coming-month')) comingMonths.push([]);
       else if (comingMonths.length > 0 && comingMonths[comingMonths.length - 1].length < 6) comingMonths[comingMonths.length - 1].push(lines(node.querySelector('.coming-row-name'), 2) as 1 | 2);
     });
+    const picks = content.querySelector('[data-overview-picks]');
+    const next = content.querySelector('[data-coming-next]');
     const boardRows = [...content.querySelectorAll('[data-hero-board-row]')].filter(node => !node.closest('[data-overview-band="alsoThisWeek"]')).length;
     writeOverviewShape(lens, {
       chips: has('[data-overview-chip-row]'), movers: has('[data-overview-movement]'),
       boardRows: clamp(boardRows, 10), fullLeaderboard: has('[data-hero-full-leaderboard]'),
-      picks: has('[data-overview-picks]'), leadersRows: count('[data-leaders-group-row]', 3),
+      picks: picks ? { sentenceLines: lines(picks.querySelector('[data-overview-picks-intro]'), 3) as 1 | 2 | 3, recordLines: lines(picks.querySelector('[data-our-record-door]'), 2) as 1 | 2 } : null, leadersRows: count('[data-leaders-group-row]', 3),
       storyBand: has('[data-overview-story-band]'), alsoEvents: [...content.querySelectorAll('[data-also-event]')].slice(0, 3).map(node => ({ tie: !!node.querySelector('[data-hero-tie-cap]'), rows: Math.min(4, node.querySelectorAll('[data-hero-board-row]').length), sitLines: lines(node.querySelector('.also-sit'), 2) as 1 | 2 })),
-      comingNext: has('[data-coming-next]'), comingMonths: comingMonths.slice(0, 3),
+      comingNext: next ? { lastLines: lines(next.querySelector('.coming-last-text'), 3) as 1 | 2 | 3, nameLines: lines(next.querySelector('.coming-name'), 3) as 1 | 2 | 3 } : null, comingMonths: comingMonths.slice(0, 3),
       rankingsRows: count('[data-rank-row]', 5), climb: has('[data-climb-card]'),
       newsLead: has('[data-news-shape="hero"]'), newsPair: pair.length === 2 ? [pair[0], pair[1]] : null,
       newsList: [...content.querySelectorAll('[data-news-shape="row"]')].slice(0, 3).map(newsItem),
@@ -169,8 +177,8 @@ function BoardRow({ index, bleed = false }: { index: number; bleed?: boolean }) 
 export function BoardShell({ rows = 0, full = false }: { rows?: number; full?: boolean }) {
   return <div data-tour-shell="board" className="hero-expand-board" style={{ background: PAGE_CANVAS, paddingTop: 0 }}><BoardHeader />{Array.from({ length: rows }, (_, i) => <BoardRow key={i} index={i} />)}{full && <div className="hero-full-leaderboard" style={{ border: SHELL_OUTLINE }}><Line width={109} font={14} /><Line width={64} font={13} /></div>}</div>;
 }
-function PicksShell() {
-  return <div data-tour-shell="picks" data-overview-picks style={{ paddingTop: 8 }}><div style={{ margin: '0 20px', borderTop: SHELL_SEPARATOR }} /><div style={{ padding: '16px 20px 10px', display: 'flex', justifyContent: 'space-between', gap: 8 }}><Line width={176} font={11} /><Line width={85} font={9.5} /></div><div style={{ padding: '8px 20px', margin: '-12px 0 2px', minHeight: 32 }}><Line width={219} font={13.5} line={1.35} /></div><div style={{ margin: '0 20px 12px' }}><Line width="94%" font={13.5} line={1.45} /></div><SmallCards picks /></div>;
+function PicksShell({ shape }: { shape: PicksShape }) {
+  return <div data-tour-shell="picks" data-overview-picks style={{ paddingTop: 8 }}><div style={{ margin: '0 20px', borderTop: SHELL_SEPARATOR }} /><div style={{ padding: '16px 20px 10px', display: 'flex', justifyContent: 'space-between', gap: 8 }}><Line width={176} font={11} /><Line width={85} font={9.5} /></div><div data-shell-picks-record style={{ padding: '8px 20px', margin: '-12px 0 2px', minHeight: 32 }}><Lines widths={[219, 132].slice(0, shape.recordLines)} font={13} line={1.35} /></div><div data-shell-picks-sentence style={{ margin: '0 20px 12px' }}><Lines widths={['94%', '65%', '40%'].slice(0, shape.sentenceLines)} font={14} line={1.45} /></div><SmallCards picks /></div>;
 }
 function LeadersShell({ rows }: { rows: number }) {
   const grid = '24px minmax(0,1fr) 40px 40px 40px';
@@ -178,10 +186,10 @@ function LeadersShell({ rows }: { rows: number }) {
 }
 function StoryShell() { return <div data-tour-shell="story" style={{ position: 'relative', height: 340, marginTop: 26, overflow: 'hidden', background: MEMBER_PANEL }}><div style={{ position: 'absolute', top: 13, left: 24, right: 24 }}><Line width={183} font={9} line={1.2} panel /></div><div style={{ position: 'absolute', left: 24, right: 24, bottom: 14 }}><Lines widths={['99%', '66%']} font={25} line={1.13} panel /><div style={{ marginTop: 9 }}><Lines widths={['92%', '94%', '38%']} font={13.5} line={1.48} panel /></div></div></div>; }
 export function AlsoThisWeekShell({ events = [] }: { events?: AlsoEventShape[] }) {
-  return <section data-tour-shell="alsoThisWeek" className="also-week"><Head />{events.map((event, i) => <div key={i} data-shell-also-event className="also-event" style={{ borderBottom: i === events.length - 1 ? 0 : SHELL_SEPARATOR }}><div className="also-head"><div className="also-kick"><Line width={90} font={9.5} line={1.2} /><Line width={47} font={9.5} line={1.2} /></div><div className="also-title"><span><Line width={244} font={17} line={1.25} /></span></div><div className="also-sub"><Line width={170} font={12} line={1.35} /></div><div className="also-sit"><Lines widths={[255, 160].slice(0, event.sitLines)} font={13.5} line={1.4} /></div><div className="also-chase"><div className="also-track" /><div className="also-axis">{[37, 36, 36].map((width, j) => <Line key={j} width={width} font={9} line={1.5} />)}</div></div></div><div className="also-board"><div className="hero-expand-board" style={{ paddingTop: 0 }}><BoardHeader bleed />{event.tie && <div data-shell-tie-row style={{ height: 29, padding: '9px 0 3px', display: 'flex', alignItems: 'baseline', gap: 8 }}><Line width={13} font={11} /><Line width={55} font={9.5} /></div>}{Array.from({ length: event.rows }, (_, j) => <BoardRow key={j} index={j} bleed />)}</div></div></div>)}</section>;
+  return <section data-tour-shell="alsoThisWeek" className="also-week"><Head />{events.map((event, i) => <div key={i} data-shell-also-event className="also-event" style={{ borderBottom: undefined }}><div className="also-head"><div className="also-kick"><Line width={90} font={9.5} line={1.2} /><Line width={47} font={9.5} line={1.2} /></div><div className="also-title"><span><Line width={244} font={17} line={1.25} /></span></div><div className="also-sub"><Line width={170} font={12} line={1.35} /></div><div className="also-sit"><Lines widths={[255, 160].slice(0, event.sitLines)} font={13.5} line={1.4} /></div><div className="also-chase"><div className="also-track" /><div className="also-axis">{[37, 36, 36].map((width, j) => <Line key={j} width={width} font={9} line={1.5} />)}</div></div></div><div className="also-board"><div className="hero-expand-board" style={{ paddingTop: 0 }}><BoardHeader bleed />{event.tie && <div data-shell-tie-row style={{ height: 29, padding: '9px 0 3px', display: 'flex', alignItems: 'baseline', gap: 8 }}><Line width={13} font={11} /><Line width={55} font={9.5} /></div>}{Array.from({ length: event.rows }, (_, j) => <BoardRow key={j} index={j} bleed />)}</div></div></div>)}</section>;
 }
-export function ComingUpShell({ next = false, months = [] }: { next?: boolean; months?: Array<Array<1 | 2>> }) {
-  return <section data-tour-shell="comingUp" className="coming-up"><Head width={105} />{next && <article data-shell-coming-next className="coming-next" style={{ border: SHELL_OUTLINE, background: MEMBER_PANEL }}><div className="coming-photo" style={{ background: MEMBER_PANEL }}><div className="coming-over"><div className="coming-kick"><Line width={102} font={9.5} line={1.2} panel /><span className="coming-tag" style={{ border: SHELL_OUTLINE }}><Line width={82} font={9} line={1.2} panel /></span></div><div className="coming-name"><Lines widths={[167, 149]} font={21} line={1.18} panel /></div><div className="coming-venue"><Line width={260} font={12.5} panel /></div></div></div><div className="coming-when"><div className="coming-dates"><Line width={156} font={15} /></div><div className="coming-away"><Line width={52} font={12.5} /></div></div><div className="coming-facts" style={{ borderColor: WHITE_ALPHA_08 }}>{[0, 1].map(i => <div key={i} className="coming-fact" style={{ borderColor: WHITE_ALPHA_08 }}><div className="coming-fv" style={{ display: 'flex', justifyContent: 'center' }}><Line width={49} font={16} /></div><div className="coming-fl" style={{ display: 'flex', justifyContent: 'center' }}><Line width={55} font={9} /></div></div>)}</div><div className="coming-last"><Avatar size={30} height={32} /><span className="coming-last-text"><Line width={230} font={13} line={1.4} /></span></div><div className="coming-actions">{[0, 1].map(i => <div key={i} className="coming-pill" style={{ border: SHELL_OUTLINE, background: i === 1 ? MEMBER_CELL : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Line width={i ? 88 : 98} font={13} line={1.15} /></div>)}</div></article>}{months.map((rows, month) => <React.Fragment key={month}><div className="coming-month"><Line width={72} font={10.5} /></div>{rows.map((nameLines, i) => <div key={i} data-shell-coming-row className="coming-row" style={{ borderBottom: SHELL_SEPARATOR }}><div className="coming-date" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><div className="coming-day"><Line width={26} font={22} line={1} /></div><div className="coming-week"><Line width={21} font={9} /><Line width={22} font={9} /></div></div><div className="coming-mid"><div className="coming-kick"><Line width={55} font={9.5} /></div><div className="coming-row-name"><Lines widths={['95%', '60%'].slice(0, nameLines)} font={15} line={1.25} /></div><div className="coming-row-venue"><Line width="95%" font={12} /></div></div><div className="coming-right"><div className="coming-row-away"><Line width={58} font={12.5} /></div><div className="coming-purse"><Line width={34} font={11.5} /></div></div></div>)}</React.Fragment>)}</section>;
+export function ComingUpShell({ next = null, months = [] }: { next?: ComingNextShape | null; months?: Array<Array<1 | 2>> }) {
+  return <section data-tour-shell="comingUp" className="coming-up"><Head width={105} />{next && <article data-shell-coming-next className="coming-next" style={{ border: SHELL_OUTLINE, background: MEMBER_PANEL }}><div className="coming-photo" style={{ background: MEMBER_PANEL }}><div className="coming-over"><div className="coming-kick"><Line width={102} font={9.5} line={1.2} panel /><span className="coming-tag" style={{ border: SHELL_OUTLINE }}><Line width={82} font={9} line={1.2} panel /></span></div><div className="coming-name"><Lines widths={[167, 149, 100].slice(0, next.nameLines)} font={21} line={1.18} panel /></div><div className="coming-venue"><Line width={260} font={12.5} panel /></div></div></div><div className="coming-when"><div className="coming-dates"><Line width={156} font={15} /></div><div className="coming-away"><Line width={52} font={12.5} /></div></div><div className="coming-facts" style={{ borderColor: WHITE_ALPHA_08 }}>{[0, 1].map(i => <div key={i} className="coming-fact" style={{ borderColor: WHITE_ALPHA_08 }}><div className="coming-fv" style={{ display: 'flex', justifyContent: 'center' }}><Line width={49} font={16} /></div><div className="coming-fl" style={{ display: 'flex', justifyContent: 'center' }}><Line width={55} font={9} /></div></div>)}</div><div className="coming-last"><Avatar size={30} height={32} /><span className="coming-last-text"><Lines widths={[230, 170, 100].slice(0, next.lastLines)} font={13} line={1.4} /></span></div><div className="coming-actions">{[0, 1].map(i => <div key={i} className="coming-pill" style={{ border: SHELL_OUTLINE, background: i === 1 ? MEMBER_CELL : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Line width={i ? 88 : 98} font={13} line={1.15} /></div>)}</div></article>}{months.map((rows, month) => <React.Fragment key={month}><div className="coming-month"><Line width={72} font={10.5} /></div>{rows.map((nameLines, i) => <div key={i} data-shell-coming-row className="coming-row"><div className="coming-date" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><div className="coming-day"><Line width={26} font={22} line={1} /></div><div className="coming-week"><Line width={21} font={9} /><Line width={22} font={9} /></div></div><div className="coming-mid"><div className="coming-kick"><Line width={55} font={9.5} /></div><div className="coming-row-name"><Lines widths={['95%', '60%'].slice(0, nameLines)} font={15} line={1.25} /></div><div className="coming-row-venue"><Line width="95%" font={12} /></div></div><div className="coming-right"><div className="coming-row-away"><Line width={58} font={12.5} /></div><div className="coming-purse"><Line width={34} font={11.5} /></div></div></div>)}</React.Fragment>)}</section>;
 }
 const RANK_GRID = '26px minmax(0,1fr) 58px 48px';
 export function RankingsShell({ rows = 0, climb = false }: { rows?: number; climb?: boolean }) {
@@ -197,11 +205,15 @@ export function NewsShell({ lead = false, pair = null, list = [] }: { lead?: boo
 export function TourOverviewShell({ shape }: { shape: OverviewShape }) {
   const below = shape.alsoEvents.length > 0 || shape.comingNext || shape.comingMonths.length > 0 || shape.rankingsRows > 0 || shape.climb || shape.newsLead || shape.newsPair || shape.newsList.length > 0;
   return <div data-tour-overview-fallback aria-hidden style={{ minHeight: '100vh', background: PAGE_CANVAS }}><style>{`
+[data-tour-overview-fallback] .coming-row,
+[data-tour-overview-fallback] .also-event { border-bottom: ${SHELL_SEPARATOR}; }
+[data-tour-overview-fallback] .coming-row:last-child,
+[data-tour-overview-fallback] .also-event:last-child { border-bottom: 0; }
 [data-tour-overview-fallback] .coming-photo::after,
 [data-tour-overview-fallback] .overview-news-photo::after { content: none; }
 [data-tour-overview-fallback] .overview-news-hero .overview-news-copy { bottom: 22px; }
 @media (max-width:340px) {
  [data-tour-overview-fallback] { --shell-head-1:83px; --shell-head-2:185px; --shell-head-3:167px; --shell-venue:218px; }
 }
-`}</style><HeroShell />{shape.chips && <ChipsShell />}{shape.movers && <MoversShell />}{(shape.boardRows > 0 || shape.fullLeaderboard) && <BoardShell rows={shape.boardRows} full={shape.fullLeaderboard} />}{shape.picks && <PicksShell />}{shape.leadersRows > 0 && <LeadersShell rows={shape.leadersRows} />}{shape.storyBand && <StoryShell />}<div data-shell-below-column style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: below ? 32 : 0 }}>{shape.alsoEvents.length > 0 && <AlsoThisWeekShell events={shape.alsoEvents} />}{(shape.comingNext || shape.comingMonths.length > 0) && <ComingUpShell next={shape.comingNext} months={shape.comingMonths} />}{(shape.rankingsRows > 0 || shape.climb) && <RankingsShell rows={shape.rankingsRows} climb={shape.climb} />}{(shape.newsLead || shape.newsPair || shape.newsList.length > 0) && <NewsShell lead={shape.newsLead} pair={shape.newsPair} list={shape.newsList} />}</div></div>;
+`}</style><HeroShell />{shape.chips && <ChipsShell />}{shape.movers && <MoversShell />}{(shape.boardRows > 0 || shape.fullLeaderboard) && <BoardShell rows={shape.boardRows} full={shape.fullLeaderboard} />}{shape.picks && <PicksShell shape={shape.picks} />}{shape.leadersRows > 0 && <LeadersShell rows={shape.leadersRows} />}{shape.storyBand && <StoryShell />}<div data-shell-below-column style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: below ? 32 : 0 }}>{shape.alsoEvents.length > 0 && <AlsoThisWeekShell events={shape.alsoEvents} />}{(shape.comingNext || shape.comingMonths.length > 0) && <ComingUpShell next={shape.comingNext} months={shape.comingMonths} />}{(shape.rankingsRows > 0 || shape.climb) && <RankingsShell rows={shape.rankingsRows} climb={shape.climb} />}{(shape.newsLead || shape.newsPair || shape.newsList.length > 0) && <NewsShell lead={shape.newsLead} pair={shape.newsPair} list={shape.newsList} />}</div></div>;
 }

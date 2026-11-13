@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Tour skeleton final three mismatches
+- Measure picks sentence/record and Coming next name/last-year lines; v4 storage.
+- Reuse actual last-item border selectors; all other presentation stays frozen.
+- Four separate shards, combined named-test report, diff and commit.
+
 ## In progress: Tour skeleton item-height follow-up
 - Finish prior shard 4 and combine both briefs in the report.
 - Change only story placement/leaders height and rendered per-item also-week, coming-month and news shapes; v3 storage.

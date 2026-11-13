@@ -7,17 +7,17 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 afterEach(() => { cleanup(); localStorage.clear(); vi.restoreAllMocks(); });
 const item = { headline: 2 as const, details: 1 as const };
 const also = { tie: true, rows: 4, sitLines: 1 as const };
-const full = { ...EMPTY_OVERVIEW_SHAPE, chips: true, movers: true, boardRows: 10, fullLeaderboard: true, picks: true, leadersRows: 3, storyBand: true, alsoEvents: [also, { ...also, rows: 3 }, { ...also, tie: false, rows: 3 }], comingNext: true, comingMonths: [[1, 2, 1], [2]] as Array<Array<1 | 2>>, rankingsRows: 5, climb: true, newsLead: true, newsPair: [item, item] as [typeof item, typeof item], newsList: [item, { headline: 3 as const, details: 2 as const }, item] };
-const store = (changes: Record<string, unknown> = {}) => localStorage.setItem('tour-overview-shape:v3:all', JSON.stringify({ ...full, at: 1000, ...changes }));
-describe('Tour counted skeleton shape v3', () => {
- it('round-trips every v3 shape field', () => { writeOverviewShape('pga', full); expect(readOverviewShape('pga')).toEqual({ ...full, at: expect.any(Number) }); });
+const full = { ...EMPTY_OVERVIEW_SHAPE, chips: true, movers: true, boardRows: 10, fullLeaderboard: true, picks: { sentenceLines: 1 as const, recordLines: 1 as const }, leadersRows: 3, storyBand: true, alsoEvents: [also, { ...also, rows: 3 }, { ...also, tie: false, rows: 3 }], comingNext: { lastLines: 1 as const, nameLines: 1 as const }, comingMonths: [[1, 2, 1], [2]] as Array<Array<1 | 2>>, rankingsRows: 5, climb: true, newsLead: true, newsPair: [item, item] as [typeof item, typeof item], newsList: [item, { headline: 3 as const, details: 2 as const }, item] };
+const store = (changes: Record<string, unknown> = {}) => localStorage.setItem('tour-overview-shape:v4:all', JSON.stringify({ ...full, at: 1000, ...changes }));
+describe('Tour counted skeleton shape v4', () => {
+ it('round-trips every v4 shape field', () => { writeOverviewShape('pga', full); expect(readOverviewShape('pga')).toEqual({ ...full, at: expect.any(Number) }); });
  it('clamps scalar counts at their lower bound', () => { store({ boardRows: -1, leadersRows: -1, rankingsRows: -1 }); expect(readOverviewShape('all', 1000)).toMatchObject({ boardRows: 0, leadersRows: 0, rankingsRows: 0 }); });
  it('clamps bounded scalar counts', () => { store({ boardRows: 11, leadersRows: 4, rankingsRows: 6 }); expect(readOverviewShape('all', 1000)).toMatchObject({ boardRows: 10, leadersRows: 3, rankingsRows: 5 }); });
  it('expires only after twelve hours', () => { store(); expect(readOverviewShape('all', 1000 + OVERVIEW_SHAPE_MAX_AGE)).toEqual({ ...full, at: 1000 }); expect(readOverviewShape('all', 1001 + OVERVIEW_SHAPE_MAX_AGE)).toEqual(EMPTY_OVERVIEW_SHAPE); });
- it('rejects malformed storage', () => { localStorage.setItem('tour-overview-shape:v3:all', '{'); expect(readOverviewShape()).toEqual(EMPTY_OVERVIEW_SHAPE); });
+ it('rejects malformed storage', () => { localStorage.setItem('tour-overview-shape:v4:all', '{'); expect(readOverviewShape()).toEqual(EMPTY_OVERVIEW_SHAPE); });
  it('rejects wrong types in every field', () => { for (const key of Object.keys(full)) { store({ [key]: 'wrong' }); expect(readOverviewShape('all', 1000)).toEqual(EMPTY_OVERVIEW_SHAPE); } store({ at: '1000' }); expect(readOverviewShape('all', 1000)).toEqual(EMPTY_OVERVIEW_SHAPE); store({ comingMonths: [[1, '2']] }); expect(readOverviewShape('all', 1000)).toEqual(EMPTY_OVERVIEW_SHAPE); });
  it('rejects future timestamps', () => { store({ at: 1001 }); expect(readOverviewShape('all', 1000)).toEqual(EMPTY_OVERVIEW_SHAPE); });
- it('ignores v1 and v2 and preserves their keys', () => { const old = JSON.stringify({ board: true, at: Date.now() }); localStorage.setItem('tour-overview-shape:all', old); expect(readOverviewShape()).toEqual(EMPTY_OVERVIEW_SHAPE); localStorage.setItem('tour-overview-shape:v2:all', old); expect(readOverviewShape()).toEqual(EMPTY_OVERVIEW_SHAPE); writeOverviewShape('all', full); expect(localStorage.getItem('tour-overview-shape:all')).toBe(old); expect(localStorage.getItem('tour-overview-shape:v2:all')).toBe(old); });
+ it('ignores v1, v2 and v3 and preserves their keys', () => { const old = JSON.stringify({ board: true, at: Date.now() }); localStorage.setItem('tour-overview-shape:all', old); expect(readOverviewShape()).toEqual(EMPTY_OVERVIEW_SHAPE); localStorage.setItem('tour-overview-shape:v2:all', old); expect(readOverviewShape()).toEqual(EMPTY_OVERVIEW_SHAPE); localStorage.setItem('tour-overview-shape:v3:all', old); expect(readOverviewShape()).toEqual(EMPTY_OVERVIEW_SHAPE); writeOverviewShape('all', full); expect(localStorage.getItem('tour-overview-shape:v3:all')).toBe(old); expect(localStorage.getItem('tour-overview-shape:all')).toBe(old); expect(localStorage.getItem('tour-overview-shape:v2:all')).toBe(old); });
  it('keeps lenses separate', () => { writeOverviewShape('pga', full); writeOverviewShape('euro', EMPTY_OVERVIEW_SHAPE); expect(readOverviewShape('pga').boardRows).toBe(10); expect(readOverviewShape('euro').boardRows).toBe(0); expect(readOverviewShape('all')).toEqual(EMPTY_OVERVIEW_SHAPE); });
  it('records mounted marker counts and measured per-item arrays', () => {
    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) { const lines = Number(this.getAttribute('data-lines') ?? 1); return { height: lines * 20 } as DOMRect; });
@@ -54,6 +54,24 @@ describe('Tour counted skeleton shape v3', () => {
  it('places the story outside the column with a 26px top margin', () => {
    const { container } = render(<TourOverviewShell shape={full} />); const story = container.querySelector('[data-tour-shell="story"]'); const column = container.querySelector('[data-shell-below-column]');
    expect(story?.parentElement).toBe(column?.parentElement); expect(story?.nextElementSibling).toBe(column); expect(story).toHaveStyle({ marginTop: '26px' }); expect(column).toHaveStyle({ paddingTop: '32px', gap: '32px' });
+ });
+
+ it('rejects malformed v4 picks and Coming next objects', () => {
+   for (const picks of [true, [], {}, { sentenceLines: 0, recordLines: 1 }, { sentenceLines: 4, recordLines: 1 }, { sentenceLines: 1, recordLines: 0 }, { sentenceLines: 1, recordLines: 3 }, { sentenceLines: '1', recordLines: 1 }, { sentenceLines: 1.5, recordLines: 1 }]) { store({ picks }); expect(readOverviewShape('all', 1000)).toEqual(EMPTY_OVERVIEW_SHAPE); }
+   for (const comingNext of [true, [], {}, { lastLines: 0, nameLines: 1 }, { lastLines: 4, nameLines: 1 }, { lastLines: 1, nameLines: 0 }, { lastLines: 1, nameLines: 4 }, { lastLines: '1', nameLines: 1 }, { lastLines: 1, nameLines: 1.5 }]) { store({ comingNext }); expect(readOverviewShape('all', 1000)).toEqual(EMPTY_OVERVIEW_SHAPE); }
+ });
+ it('measures picks sentence, record and Coming next text at reveal', () => {
+   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) { return { height: Number(this.getAttribute('data-lines') ?? 1) * 20 } as DOMRect; });
+   function Content() { const ref = useRef<HTMLDivElement>(null); useSectionReady('hero', true); return <div ref={ref}><ShapeAfterReveal lens="all" root={ref} /><div data-overview-picks><p data-overview-picks-intro data-lines="3" style={{ lineHeight: '20px' }} /><div data-our-record-door data-lines="2" style={{ lineHeight: '20px' }} /></div><div data-coming-next><div className="coming-name" data-lines="2" style={{ lineHeight: '20px' }} /><div className="coming-last-text" data-lines="3" style={{ lineHeight: '20px' }} /></div></div>; }
+   render(<PageLoadGate expect={['hero']}><Content /></PageLoadGate>);
+   expect(readOverviewShape()).toMatchObject({ picks: { sentenceLines: 3, recordLines: 2 }, comingNext: { lastLines: 3, nameLines: 2 } });
+ });
+ it('draws exactly the supplied picks and Coming next lines', () => {
+   const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, picks: { sentenceLines: 3, recordLines: 2 }, comingNext: { lastLines: 3, nameLines: 2 } }} />);
+   expect(container.querySelectorAll('[data-shell-picks-sentence] [data-shell-bar]')).toHaveLength(3);
+   expect(container.querySelectorAll('[data-shell-picks-record] [data-shell-bar]')).toHaveLength(2);
+   expect(container.querySelectorAll('.coming-name [data-shell-bar]')).toHaveLength(2);
+   expect(container.querySelectorAll('.coming-last-text [data-shell-bar]')).toHaveLength(3);
  });
 
 });
