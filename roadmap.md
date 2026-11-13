@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Stopped: Signed-off Option B follow tiles
+- Authorised Follow selector repair saved; shard 1 stopped: 2,163 passed / 5 failed (2,168 executed). src/test/proVerification2B.test.tsx:18 mock lacks useSuggestionCoversQuery; runtime at WhoToFollowRail.tsx:217:23. Shards 2/3/4 unrun; no further repair authorised. Full continuation report: .lovable/reports/follow-tiles-option-b-authorised-fix.md.
 - Replace shared rail tiles with settled media → cover → no-image selection and poster-only video glyphs.
 - Preserve follow/dismiss/session/order/header/analytics; generated RPC type is already present.
 - Focused checks: 100 passed, 1 failed at src/test/kindRails.test.tsx:212:42, `follow goes through useToggleFollow`: expected spy call, Number of calls: 0. Test untouched after failure; shards unrun. Baseline 8,534, expected +20 = 8,554 unverified. Report: .lovable/reports/follow-tiles-option-b-stop.md.

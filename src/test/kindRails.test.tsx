@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -208,7 +208,7 @@ describe('kind card actions', () => {
     wrap(<KindRail kind="creator" />);
     await screen.findByText('Cara One');
     const card = screen.getByText('Cara One').closest('[role="button"]') as HTMLElement;
-    fireEvent.click(card.querySelector('button:last-of-type') as HTMLElement);
+    fireEvent.click(within(card).getByRole('button', { name: 'Follow' }));
     await waitFor(() => expect(h.toggle).toHaveBeenCalledWith(expect.objectContaining({ targetActorType: 'personal', targetActorId: 'cr0', isFollowing: false })));
   });
 });
