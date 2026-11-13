@@ -33,5 +33,5 @@ export function AlsoThisWeek() {
   const follows = useTourPlayerFollows(others.length > 0);
   const liveCount = others.filter(s => s.type === 'live').length;
   if (others.length === 0) return null;
-  return <section className="also-week"><OverviewSectionHead title={t('overview.alsoThisWeek.title')} meta={liveCount > 0 ? <span className="also-week-meta">{t('overview.alsoThisWeek.live', {count:liveCount})}</span> : undefined}/><div>{others.map(slide => <AlsoWeekEvent key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} draw={data.isError ? undefined : data.data?.draws.get(slide.tournament.id)} followed={follows.ids}/>)}</div></section>;
+  return <section className="also-week" data-overview-band="alsoThisWeek"><OverviewSectionHead title={t('overview.alsoThisWeek.title')} meta={liveCount > 0 ? <span className="also-week-meta">{t('overview.alsoThisWeek.live', {count:liveCount})}</span> : undefined}/><div>{others.map(slide => <AlsoWeekEvent key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} draw={data.isError ? undefined : data.data?.draws.get(slide.tournament.id)} followed={follows.ids}/>)}</div></section>;
 }

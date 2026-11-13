@@ -82,6 +82,8 @@ export function allToursCaption(rows: TourPickerRow[]): TourCaption {
   const liveCount = rows.filter(r => r.status === 'live').length;
   if (liveCount > 0) return { text: `${liveCount} live`, live: true };
   const events = rows.filter(r => r.status === 'completed' || r.status === 'upcoming').length;
+  // Settled with nothing on: never print a bare "0 events this week".
+  if (events === 0) return { text: 'No events this week', live: false };
   return { text: `${events} events this week`, live: false };
 }
 
@@ -109,22 +111,32 @@ export function islandDescriptor(args: {
   major: { id: string; name: string; startDate: string; status: 'live' | 'upcoming' } | null;
   /** Live round by tournament id (useLiveTournaments); null when unknown. */
   liveRound: (tournamentId: string | null) => number | null;
+  /** useTourPickerRows settled; while false the caption stays empty (no false count). */
+  rowsReady?: boolean;
+  /** useLiveTournaments settled; gates only the Leaderboards caption. */
+  liveReady?: boolean;
 }): IslandDescriptor {
   const { activeTab, activeTourSlug, rows, liveCount, major, liveRound } = args;
+  const rowsReady = args.rowsReady ?? true;
+  const liveReady = args.liveReady ?? true;
 
   if (activeTab === 'live') {
+    if (!liveReady) return { label: 'Leaderboards', caption: '', captionLive: false, logoSlug: null, glyph: 'trophy' };
     return { label: 'Leaderboards', caption: `${liveCount} live`, captionLive: liveCount > 0, logoSlug: null, glyph: 'trophy' };
   }
   if (activeTourSlug === 'all') {
+    if (!rowsReady) return { label: TOUR_DISPLAY.all, caption: '', captionLive: false, logoSlug: null, glyph: 'globe' };
     const c = allToursCaption(rows);
     return { label: TOUR_DISPLAY.all, caption: c.text, captionLive: c.live, logoSlug: null, glyph: 'globe' };
   }
   if (activeTourSlug === 'major') {
+    if (!rowsReady) return { label: TOUR_DISPLAY.major, caption: '', captionLive: false, logoSlug: null, glyph: 'trophy' };
     const c = major
       ? singleTourCaption(major.status, major.status === 'live' ? liveRound(major.id) : null, major.startDate)
       : singleTourCaption('none', null, null);
     return { label: TOUR_DISPLAY.major, caption: c.text, captionLive: c.live, logoSlug: null, glyph: 'trophy' };
   }
+  if (!rowsReady) return { label: tourDisplayLabel(activeTourSlug), caption: '', captionLive: false, logoSlug: activeTourSlug, glyph: null };
   const row = rows.find(r => r.slug === activeTourSlug);
   const status = row && row.status !== 'all' ? row.status : 'none';
   const c = singleTourCaption(

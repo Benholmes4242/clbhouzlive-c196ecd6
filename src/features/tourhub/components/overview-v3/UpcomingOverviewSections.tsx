@@ -53,7 +53,7 @@ export function UpcomingLastYear({ rows }: { rows: LastYearFinisher[] }) {
   const { t } = useTranslation('tourhub'); const shown = rows.slice(0, 4);
   if (!shown.length) return null;
   return <section data-overview-last-year className="upcoming-block upcoming-history">
-    <div data-overview-board-header className="upcoming-last-header">
+    <div data-overview-board-header data-overview-band="board" className="upcoming-last-header">
       <h2 className="upcoming-kicker" style={{ textTransform: 'uppercase' }}>{t('overview.hero.lastYear')}{shown.every(row => row.year === shown[0].year) ? ` · ${shown[0].year}` : null}</h2>
       <span>{t('overview.upcomingPlus.tot')}</span>
     </div>

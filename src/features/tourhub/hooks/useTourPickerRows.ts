@@ -14,6 +14,7 @@
  * TOUR_DISPLAY map from tourIslandRules.
  */
 import { useMemo } from 'react';
+import { settled } from '@/components/courses/browse/PageLoadGate';
 import { useHeroCarouselData, mapTourSlug as mapTourSlugForPicker, type HeroSlide } from './useHeroCarouselData';
 import { useActiveMensMajor } from './useActiveMensMajor';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
@@ -46,9 +47,14 @@ export interface TourPickerRow {
  */
 export const TOUR_ROW_SLUGS = ACTIVE_TOUR_SLUGS;
 
-export function useTourPickerRows(): { rows: TourPickerRow[] } {
-  const { data: heroSlides } = useHeroCarouselData();
-  const { data: cache } = useTournamentsCache();
+export function useTourPickerRows(): { rows: TourPickerRow[]; ready: boolean } {
+  const carouselQuery = useHeroCarouselData();
+  const cacheQuery = useTournamentsCache();
+  const { data: heroSlides } = carouselQuery;
+  const { data: cache } = cacheQuery;
+  // The island reads an empty rows array as "0 events" while these load, so
+  // captions wait for BOTH queries the rows are built from to settle.
+  const ready = settled(carouselQuery) && settled(cacheQuery);
   const activeMajor = useActiveMensMajor();
   const { selectedTourSlug, viewingTourSlug, viewingTournamentId, appliedTourSlug, isSlugAcceptable } = useTourSelection();
 
@@ -142,6 +148,6 @@ export function useTourPickerRows(): { rows: TourPickerRow[] } {
       }
     }
 
-    return { rows };
-  }, [slidesByTour, seasonCompleteByTour, activeMajor, activeTourSlug, isMajorActive, viewingTournamentId, isSlugAcceptable]);
+    return { rows, ready };
+  }, [slidesByTour, seasonCompleteByTour, activeMajor, activeTourSlug, isMajorActive, viewingTournamentId, isSlugAcceptable, ready]);
 }

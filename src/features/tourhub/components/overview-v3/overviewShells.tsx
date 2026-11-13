@@ -36,12 +36,13 @@ export function ShapeAfterReveal({ lens, root }: { lens: string | null; root: Re
     if (!revealed || written.current || !root.current) return;
     written.current = true;
     const content = root.current;
-    const sections = content.querySelector('#content-below-hero > div > div');
+    // Explicit markers only: structural selectors silently miss real bands.
     writeOverviewShape(lens, {
-      board: !!content.querySelector('[data-overview-board-header]'),
-      alsoThisWeek: !!content.querySelector('.also-week'), comingUp: !!content.querySelector('.coming-up'),
-      rankings: !!sections?.querySelector(':scope > section:not(.also-week):not(.overview-news)'),
-      news: !!content.querySelector('.overview-news'),
+      board: !!content.querySelector('[data-overview-band="board"]'),
+      alsoThisWeek: !!content.querySelector('[data-overview-band="alsoThisWeek"]'),
+      comingUp: !!content.querySelector('[data-overview-band="comingUp"]'),
+      rankings: !!content.querySelector('[data-overview-band="rankings"]'),
+      news: !!content.querySelector('[data-overview-band="news"]'),
     });
   }, [revealed, lens, root]);
   return null;

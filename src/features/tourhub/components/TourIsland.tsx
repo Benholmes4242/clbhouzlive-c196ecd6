@@ -25,6 +25,8 @@ import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourSelection } from '../context/TourSelectionContext';
 import { TOUR_LIVE_GREEN } from '../_shared/tokens';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { settled } from '@/components/courses/browse/PageLoadGate';
 
 const INK = '#F8FAFC';
 const DIM = 'rgba(248,250,252,0.42)';
@@ -36,10 +38,11 @@ const GREEN = TOUR_LIVE_GREEN;
  * both surfaces of the same page never disagree.
  */
 export function useTourIslandDescriptor(activeTab: string): IslandDescriptor {
-  const { rows } = useTourPickerRows();
+  const { rows, ready: rowsReady } = useTourPickerRows();
   const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
   const activeMajor = useActiveMensMajor();
-  const { data: liveTournaments } = useLiveTournaments();
+  const liveQuery = useLiveTournaments();
+  const { data: liveTournaments } = liveQuery;
   const liveRows = Array.isArray(liveTournaments)
     ? liveTournaments.filter((tt) => (tt.status || '').toLowerCase() === 'inprogress')
     : [];
@@ -52,6 +55,8 @@ export function useTourIslandDescriptor(activeTab: string): IslandDescriptor {
     liveCount: liveRows.length,
     major: activeMajor,
     liveRound: (id) => (id ? liveRoundById.get(id) ?? null : null),
+    rowsReady,
+    liveReady: settled(liveQuery),
   });
 }
 
@@ -116,16 +121,24 @@ export const TourIsland: React.FC<TourIslandProps> = ({
         <TourIcon n="down" s={13} c={DIM} w={2.4} />
       </span>
       <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, minWidth: 0 }}>
-        {captionLive && <TourLiveDot s={5} />}
-        <span
-          data-testid="tour-island-caption"
-          style={{
-            fontSize: 8.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-            color: captionLive ? GREEN : DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}
-        >
-          {caption}
-        </span>
+        {caption === '' ? (
+          /* Not settled yet: a fixed shimmer bar, so nothing moves when the
+             real caption arrives. 8.5px matches the caption's line height. */
+          <span data-testid="tour-island-caption-loading" className="clb-shimmer-dark" style={{ display: 'inline-block', width: 64, height: 8.5, borderRadius: 6, background: MEMBER_CELL }} />
+        ) : (
+          <>
+            {captionLive && <TourLiveDot s={5} />}
+            <span
+              data-testid="tour-island-caption"
+              style={{
+                fontSize: 8.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+                color: captionLive ? GREEN : DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}
+            >
+              {caption}
+            </span>
+          </>
+        )}
       </span>
     </>
   );

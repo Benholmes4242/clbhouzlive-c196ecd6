@@ -1,8 +1,9 @@
 /** The full-bleed, tappable photograph used only by the Tour Overview carousel.
  *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: no "Full board ›" kicker link in ANY
  *  state — the Full leaderboard button under the board owns that navigation. */
-import type { RefObject } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useOverviewBandReady } from '../overviewShells';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import {
@@ -87,6 +88,21 @@ export function PhotoBand({
   stateKey,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
+  /* The band paints venueImageUrl as a CSS background, which nothing waits
+     on — preload it so the one-load gate holds the reveal until the photo
+     can actually paint. Done on load, on error, or when there is no photo. */
+  const [photoReady, setPhotoReady] = useState(!venueImageUrl);
+  useEffect(() => {
+    if (!venueImageUrl) { setPhotoReady(true); return; }
+    setPhotoReady(false);
+    const img = new Image();
+    const done = () => setPhotoReady(true);
+    img.onload = done;
+    img.onerror = done;
+    img.src = venueImageUrl;
+    return () => { img.onload = null; img.onerror = null; };
+  }, [venueImageUrl]);
+  useOverviewBandReady('photoImage', photoReady);
   const venueLine = [venueName, datesString].filter(Boolean).join(' · ');
   const isLive = state.kind === 'live';
   const isSuspended = state.kind === 'suspended';

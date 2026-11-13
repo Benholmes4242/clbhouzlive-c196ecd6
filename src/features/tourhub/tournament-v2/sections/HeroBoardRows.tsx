@@ -372,7 +372,7 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
   return (
     <>
       <div className="hero-expand-board" style={{ background: PAGE_CANVAS, fontFamily: FONT, paddingTop: afterMovers || flushTop ? 0 : 12 }}>
-        <div ref={headerRef} data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'end', gap: heroGap, padding: `2px ${bleed ? 0 : HERO_PAD_X}px 6px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
+        <div ref={headerRef} data-overview-board-header data-overview-band="board" style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'end', gap: heroGap, padding: `2px ${bleed ? 0 : HERO_PAD_X}px 6px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
           {boardKicker}
           {labelsOwnLine && showOverviewPosition ? <div aria-hidden="true" /> : null}
           <div ref={nameTrackRef} aria-hidden="true" style={labelsOwnLine ? undefined : { gridColumn: showOverviewPosition ? '2 / 3' : '1 / 2', gridRow: 1, minWidth: 0, height: 0, visibility: 'hidden' }} />

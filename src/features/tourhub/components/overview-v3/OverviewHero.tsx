@@ -401,7 +401,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
 
 
   return (
-<OverviewReadinessBand key={active.tournament.id} id="hero" hero base={firstPaintReady} expect={activeRecap ? ['recapRecord'] : ['photo', 'champion', 'band', ...(heroState.kind === 'upcoming' ? ['upcoming'] : [])]}>
+<OverviewReadinessBand key={active.tournament.id} id="hero" hero base={firstPaintReady} expect={activeRecap ? ['recapRecord'] : ['photo', 'photoImage', 'champion', 'band', ...(heroState.kind === 'upcoming' ? ['upcoming'] : [])]}>
     <div
       data-overview-hero-frame
       style={{

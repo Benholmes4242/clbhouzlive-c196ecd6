@@ -137,6 +137,31 @@ describe('tourIslandRules — captions and labels', () => {
     expect(d.caption).toBe('Live · Round 3');
     expect(d.logoSlug).toBe('pga');
   });
+
+  it('all-tours caption is empty with no number while the rows are not ready', () => {
+    const d = islandDescriptor({ activeTab: 'overview', activeTourSlug: 'all', rows: [], liveCount: 0, major: null, liveRound: () => null, rowsReady: false });
+    expect(d.caption).toBe('');
+    expect(d.caption).not.toMatch(/\d/);
+    expect(d.captionLive).toBe(false);
+  });
+
+  it('settled with zero events reads No events this week, never a zero count', () => {
+    expect(allToursCaption([])).toEqual({ text: 'No events this week', live: false });
+    const d = islandDescriptor({ activeTab: 'overview', activeTourSlug: 'all', rows: [], liveCount: 0, major: null, liveRound: () => null, rowsReady: true });
+    expect(d.caption).toBe('No events this week');
+  });
+
+  it('settled with live rows reads the live count', () => {
+    const d = islandDescriptor({ activeTab: 'overview', activeTourSlug: 'all', rows: [baseRow({ status: 'live' })], liveCount: 1, major: null, liveRound: () => null, rowsReady: true });
+    expect(d.caption).toBe('1 live');
+    expect(d.captionLive).toBe(true);
+  });
+
+  it('leaderboards caption is empty while live tournaments are not ready', () => {
+    const d = islandDescriptor({ activeTab: 'live', activeTourSlug: 'pga', rows: [], liveCount: 0, major: null, liveRound: () => null, liveReady: false });
+    expect(d.caption).toBe('');
+    expect(d.captionLive).toBe(false);
+  });
 });
 
 describe('TourIsland', () => {

@@ -33,7 +33,7 @@ export function OverviewNews({ stories, excludeIds, presentations }: { stories: 
   const open = (story: TourStory) => { markNewsOpened(story.id); navigate(`/tour/news/${story.slug}`); };
 
   return (
-    <section ref={ref} className="overview-news" data-overview-news-lead={hero.id}>
+    <section ref={ref} className="overview-news" data-overview-band="news" data-overview-news-lead={hero.id}>
       <OverviewSectionHead title={t('overview.news.title')} action={t('overview.news.all')} onAction={() => navigate('/tourhub?tab=news')} />
       {count > 0 && <div className="overview-news-fresh"><i className="overview-news-dot" aria-hidden /><span><Trans t={t} i18nKey="overview.news.newSince" count={count} components={{ b: <b /> }} /></span></div>}
       <article style={{ fontFamily: FONT }}>

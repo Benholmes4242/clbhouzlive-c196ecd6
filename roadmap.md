@@ -1,5 +1,9 @@
 # Roadmap
 
+## In progress: Tour overview loading — three fixes
+- Marker-based shape recording (data-overview-band on all five band roots), island caption readiness with shimmer placeholder, hero photo preload gating the reveal.
+- New tests: five-band shape, photo gate load/error/none, island ready/zero/live rules. Run focused, then shards 1/4–4/4 separately; stop on any other failure.
+
 ## In progress: Authorised composer tagging and Tour gate stop fixes
 - Final authorised fixes: add titleMarkup: 'Film' to the PF3A round-trip data only; replace both findLast calls with reversed-copy find, without changing tsconfig.
 - Confirm preview build, then run shards 1/4–4/4 as separate commands; stop on any other failure. Report all names across both builds, reconciled totals and fix diff.

@@ -212,7 +212,7 @@ export function WorldRankings() {
 
   return (
 <OverviewReadinessBand id="rankings" hero base={overviewQueryReady(rankingsQuery)} expect={board === 'owgr' ? ['climber'] : []}>
-    <section>
+    <section data-overview-band="rankings">
       <OverviewSectionHead title={t('overview.rankings.sectionEyebrow')} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=players&view=all&lens=stats&stat=world_rank')} />
       <RailChips options={BOARDS} value={board} onChange={(next) => setBoard(next as RankingsBoard)} ariaLabel={t('overview.rankings.sectionEyebrow')} distribute style={{ margin: 0, padding: '0 24px' }} />
       <LeadSentence rows={rows} eventsLeft={board === 'owgr' ? null : data?.eventsLeft ?? null} />
