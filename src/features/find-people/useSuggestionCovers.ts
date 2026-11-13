@@ -6,7 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const EMPTY = new Map<string, string>();
 
-export function useSuggestionCovers(personIds: string[], businessIds: string[]): Map<string, string> {
+export function useSuggestionCoversQuery(personIds: string[], businessIds: string[]) {
   const { user } = useSupabaseSession();
   const viewerId = user?.id ?? null;
   const people = personIds.slice(0, 100);
@@ -31,5 +31,10 @@ export function useSuggestionCovers(personIds: string[], businessIds: string[]):
       return covers;
     },
   });
-  return query.data ?? EMPTY;
+  return { covers: query.data ?? EMPTY, settled: !(!!viewerId && user?.is_anonymous !== true && ids.length > 0) || query.isFetched || query.isError };
+}
+
+/** Compatibility reader: existing surfaces retain the map-only contract. */
+export function useSuggestionCovers(personIds: string[], businessIds: string[]): Map<string, string> {
+  return useSuggestionCoversQuery(personIds, businessIds).covers;
 }

@@ -281,7 +281,7 @@ describe('WhoToFollowRail', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('shows the rail reason lines and figures, with blank figures keeping their height', () => {
+  it('shows the rail reason lines and figures, with blank figures keeping the stat line', () => {
     h.people = [
       person({ user_id: 'u-club', display_name: 'Niall Devins' }),
       person({ user_id: 'u-played', display_name: 'Chris Leeson', reason_type: 'played_with', reason_course_name: 'Sundridge Park Golf Club (West)', handicap_index: 12.8, rounds_total: 41 }),
@@ -299,7 +299,7 @@ describe('WhoToFollowRail', () => {
     // Rob has no figures and no when line: the slot stays blank but keeps its 35px height.
     const robCard = screen.getByText('Rob Bennett').closest('[role="button"]') as HTMLElement;
     const slot = robCard.querySelector('[data-testid="rail-slot"]') as HTMLElement;
-    expect(slot.style.height).toBe('35px');
+    expect(slot.classList.contains('follow-tile-stat')).toBe(true);
     expect(slot.textContent).toBe('');
   });
 

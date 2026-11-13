@@ -188,49 +188,43 @@ describe('WhoToFollowRail', () => {
       ? [{ kind: 'person', id: 'u-plain', cover_url: 'https://media.clbhouz.co.uk/cover.jpg', source: 'own' }]
       : h.rows }));
     wrap(<WhoToFollowRail slot={1} />);
-    await waitFor(() => expect(cardOf('David Lang').querySelector('[data-suggestion-cover="image"]')).toBeTruthy());
+    await waitFor(() => expect(cardOf('David Lang').querySelector('[data-follow-tile-source="cover"], .follow-tile-image')).toBeTruthy());
     expect(h.rpc.mock.calls.filter(([name]) => name === 'get_suggestion_covers')).toHaveLength(1);
     expect(h.rpc).toHaveBeenCalledWith('get_suggestion_covers', { p_user_ids: ['u-ring', 'u-plain', 'u-third'], p_business_ids: [] });
-    expect(cardOf('Danny Holmes').querySelector('[data-suggestion-cover="plain"]')).toBeTruthy();
+    expect(cardOf('Danny Holmes').getAttribute('data-follow-tile-source')).toBe('none');
     fireEvent.click(screen.getByRole('button', { name: 'Hide David Lang' }));
     await waitFor(() => expect(screen.queryByText('David Lang')).toBeNull());
     expect(screen.queryByTestId('probe')).toBeNull();
   });
 
-  it('a ringed card shows the when line and its avatar opens the post, not the profile', async () => {
+  it('a card without media keeps its figures and its avatar opens the post, not the profile', async () => {
     wrap(<WhoToFollowRail slot={1} />);
     const btn = await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
-    const when = cardOf('Danny Holmes').querySelector('[data-testid="rail-when"]') as HTMLElement;
-    expect(when.textContent).toMatch(/^Played /);
+    expect(cardOf('Danny Holmes').querySelector('[data-testid="rail-when"]')).toBeNull();
+    expect(cardOf('Danny Holmes').querySelector('[data-testid="rail-figures"]')).not.toBeNull();
     fireEvent.click(btn);
     expect(screen.getByTestId('probe').textContent).toBe('/post/post-9');
   });
-  it('an unringed card has no when line, shows its figures in a 35px slot and no avatar button; cards are 266 tall', async () => {
+  it('a card without activity shows figures and a large avatar without an avatar button', async () => {
     wrap(<WhoToFollowRail slot={1} />);
     await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
     const card = cardOf('David Lang');
     expect(card.querySelector('[data-testid="rail-when"]')).toBeNull();
     expect(card.querySelector('[data-testid="rail-figures"]')).not.toBeNull();
-    expect((card.querySelector('[data-testid="rail-slot"]') as HTMLElement).style.height).toBe('35px');
+    expect(card.querySelector('[data-follow-tile-avatar="large"]')).not.toBeNull();
+    expect(card.querySelector('[data-follow-tile-avatar="small"]')).toBeNull();
     expect(screen.queryByRole('button', { name: "Open David Lang's latest post" })).toBeNull();
-    expect(card.style.height).toBe('266px');
-    expect(cardOf('Danny Holmes').style.height).toBe('266px');
   });
-  it('a ringed card renders a two-line clamped when line, no figures, in a 35px slot; card stays 266', async () => {
+  it('a card with media shows Posted in the stat line instead of activity or figures', async () => {
+    h.rpc.mockImplementation((name: string) => Promise.resolve({ error: null, data: name === 'get_follow_tile_media'
+      ? [{ kind:'person', id:'u-ring', media_type:'image', image_url:'https://media.clbhouz.co.uk/post.jpg', aspect_ratio:1, posted_at:new Date().toISOString() }]
+      : name === 'get_recent_activity' ? h.rows : [] }));
     wrap(<WhoToFollowRail slot={1} />);
-    await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
+    await waitFor(() => expect(cardOf('Danny Holmes').getAttribute('data-follow-tile-source')).toBe('media'));
     const card = cardOf('Danny Holmes');
-    const when = card.querySelector('[data-testid="rail-when"]') as HTMLElement;
-    // jsdom drops -webkit-line-clamp, so the clamp is read from the source.
-    expect(when.style.overflow).toBe('hidden');
-    expect(when.style.lineHeight).toBe('15px');
-    const src = (await import('node:fs')).readFileSync(
-      (await import('node:path')).resolve(__dirname, '../features/find-people/WhoToFollowRail.tsx'), 'utf8');
-    expect(src).toMatch(/data-testid="rail-when"[\s\S]{0,400}WebkitLineClamp: 2/);
-    expect(when.style.whiteSpace).toBe('');
+    expect(card.querySelector('[data-testid="rail-when"]')?.textContent).toBe('Posted just now');
     expect(card.querySelector('[data-testid="rail-figures"]')).toBeNull();
-    expect((card.querySelector('[data-testid="rail-slot"]') as HTMLElement).style.height).toBe('35px');
-    expect(card.style.height).toBe('266px');
+    expect(card.querySelector('[data-follow-tile-avatar="small"]')).not.toBeNull();
   });
 });
 

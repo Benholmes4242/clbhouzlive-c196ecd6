@@ -16,10 +16,11 @@
  * up. After any follow, unfollow or dismiss the two suggestion queries are
  * marked stale with refetchType 'none' (WF2 §7): Find people shows the change
  * next time it opens and the rail never reshuffles under the member's thumb.
- * Covers are one slot-scoped read via useSuggestionCovers; SuggestionCover
- * owns decorative image failure, never source selection or community rows.
+ * Option B reads media and covers once per surface and waits for both before
+ * choosing media → cover → none. FollowTileImage owns URL failure fallback;
+ * shared photo fade and squircle avatars retain their canonical owners.
  *
- * KindRail (Pros to follow above post 9, Creators to follow above post 21)
+ * KindRail (Pros to follow above post 10, Creators to follow above post 21)
  * shares RailBody/RailCardView and the HIDDEN set; a qualifying kind rail's
  * people leave the general rail so no one appears twice.
  */
@@ -28,10 +29,14 @@ import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
+import { X, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SuggestionCover } from './SuggestionCover';
-import { useSuggestionCovers } from './useSuggestionCovers';
+import { useSuggestionCoversQuery } from './useSuggestionCovers';
+import { useFollowTileMedia, type FollowTileMedia } from './useFollowTileMedia';
+import { useFollowTileSource } from './FollowTileImage';
+import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import './follow-tiles.css';
 import './suggestion-covers.css';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -65,7 +70,7 @@ import {
   type RailCard,
 } from './railRules';
 import { usePeopleToFollowByKind } from './usePeopleToFollowByKind';
-import { ActiveAvatarDoor, ActiveRing } from './ActiveRing';
+import { ActiveAvatarDoor } from './ActiveRing';
 import { activityLine, type RecentActivity } from './activeRingRules';
 import { useRecentActivity } from './useRecentActivity';
 
@@ -209,7 +214,8 @@ function RailBody({
     people: all.flatMap(card => card.kind === 'person' ? [card.person.user_id] : []),
     businesses: all.flatMap(card => card.kind === 'business' ? [card.business.business_id] : []),
   }), [all]);
-  const covers = useSuggestionCovers(coverIds.people, coverIds.businesses);
+  const coversQuery = useSuggestionCoversQuery(coverIds.people, coverIds.businesses);
+  const mediaQuery = useFollowTileMedia(coverIds.people, coverIds.businesses);
 
   /** WF2 §7 — mark both suggestion queries stale WITHOUT refetching. */
   const markStale = () => {
@@ -404,7 +410,9 @@ function RailBody({
             scheduleRemoval={scheduleRemoval}
             cancelRemoval={cancelRemoval}
             activity={activity.get(actorIdOf(card))}
-            coverUrl={covers.get(railCardId(card))}
+            coverUrl={coversQuery.covers.get(railCardId(card))}
+            media={mediaQuery.media.get(railCardId(card))}
+            sourcesSettled={coversQuery.settled && mediaQuery.settled}
           />
         ))}
       </div>
@@ -426,6 +434,8 @@ function RailCardView({
   cancelRemoval,
   activity,
   coverUrl,
+  media,
+  sourcesSettled,
 }: {
   card: RailCard;
   track: RailTrack;
@@ -438,6 +448,8 @@ function RailCardView({
   cancelRemoval: (id: string) => void;
   activity: RecentActivity | undefined;
   coverUrl: string | undefined;
+  media: FollowTileMedia | undefined;
+  sourcesSettled: boolean;
 }) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
@@ -457,7 +469,8 @@ function RailCardView({
     : isPerson
     ? railGolferReason(card.person)
     : railBusinessReason(card.business, businessCategoryLabel(card.business));
-  const line = activity ? activityLine(activity, new Date()) : null;
+  const { source, fail } = useFollowTileSource(media, coverUrl, sourcesSettled);
+  const line = source?.media ? activityLine({ actor_id: actorIdOf(card), kind: 'post', post_id: '', created_at: source.media.posted_at, course_name: null }, new Date()) : null;
   const when = line ? t(line.key, { ...line.vars, defaultValue: line.def }) : '';
   const followers = !isPerson ? card.business.followers ?? 0 : 0;
   const kindFig = kind && kindRow ? kindFigures(kindRow) : null;
@@ -517,198 +530,37 @@ function RailCardView({
     markStale();
   };
 
+  const avatar = (size: number) => <ActiveAvatarDoor
+    postId={activity?.post_id ?? null}
+    label={t('findPeople.active.open', { name, defaultValue: `Open ${name}'s latest post` })}
+    onOpen={(id) => navigate(`/post/${id}`)}
+  ><SquircleAvatar src={isPerson ? card.person.profile_photo_url : card.business.logo_url}
+    alt={name} userId={actorIdOf(card)} size={size}
+    fallback={isPerson ? getInitialsFromName(name) : businessInitials(name)} hairlineRing />
+  </ActiveAvatarDoor>;
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') open();
-      }}
-      style={{
-        flex: 'none',
-        width: closing ? 0 : 172,
-        /* FIX §1 — fixed-height flex column with the Follow button pinned to
-           the bottom, so golfer and business cards align whatever the
-           reason/figures content above. */
-        height: 266,
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'var(--suggestion-card)',
-        border: closing ? 'none' : '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 18,
-        padding: closing ? '0 0 12px' : '0 12px 12px',
-        marginRight: closing ? -10 : 0,
-        opacity: closing ? 0 : 1,
-        overflow: 'hidden',
-        textAlign: 'center',
-        position: 'relative',
-        cursor: 'pointer',
-        scrollSnapAlign: 'start',
-        transition: `width ${DISMISS_MS}ms ease, padding ${DISMISS_MS}ms ease, opacity ${DISMISS_MS}ms ease, margin ${DISMISS_MS}ms ease`,
-      }}
-    >
-      <SuggestionCover key={coverUrl ?? 'plain'} url={coverUrl} />
-      <Button
-        variant="ghost"
-        className="suggestion-dismiss"
-        type="button"
+    <div role="button" tabIndex={0} className="follow-tile" data-follow-tile-source={!sourcesSettled ? 'pending' : source?.media ? 'media' : source ? 'cover' : 'none'}
+      onClick={open} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') open(); }}
+      style={{ flex: 'none', width: closing ? 0 : 186, height: 300, boxSizing: 'border-box', borderRadius: 18,
+        marginRight: closing ? -10 : 0, opacity: closing ? 0 : 1, overflow: 'hidden', position: 'relative',
+        cursor: 'pointer', scrollSnapAlign: 'start',
+        transition: `width ${DISMISS_MS}ms ease, opacity ${DISMISS_MS}ms ease, margin ${DISMISS_MS}ms ease` }}>
+      {source && <><img className="follow-tile-image" src={source.url} alt="" loading="lazy" decoding="async" onError={fail} /><PhotoBandFade canvas={PAGE_CANVAS} /></>}
+      <Button variant="ghost" className="follow-tile-dismiss" type="button"
         aria-label={t('findPeople.rail.hide', { name, defaultValue: `Hide ${name}` })}
-        onClick={(e) => {
-          e.stopPropagation();
-          onDismiss();
-        }}
-      >
-        <span className="suggestion-dismiss-disc"><X size={12} strokeWidth={2.6} /></span>
-      </Button>
-
-      {/* Avatar: canonical dark fallback or unchanged business logo, inside
-          the ACTIVE RING slot (ringed avatars open the latest post). */}
-      <div style={{ margin: '31px auto 0', display: 'flex', position: 'relative', zIndex: 1 }}>
-        <ActiveAvatarDoor
-          postId={activity?.post_id ?? null}
-          label={t('findPeople.active.open', { name, defaultValue: `Open ${name}'s latest post` })}
-          onOpen={(id) => navigate(`/post/${id}`)}
-        >
-          <ActiveRing active={!!activity} surface="card">
-            {isPerson ? (
-              <div style={{ width: 64 }}>
-                <SquircleAvatar
-                  src={card.person.profile_photo_url ?? undefined}
-                  alt={name}
-                  userId={card.person.user_id}
-                  size={64}
-                  fallback={getInitialsFromName(name)}
-                  hairlineRing={!activity}
-                  hideRing={!!activity}
-                />
-              </div>
-            ) : card.business.logo_url ? (
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: '34%',
-                  overflow: 'hidden',
-                  background: '#F8FAFC',
-                }}
-              >
-                <img src={card.business.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-            ) : (
-              <SquircleAvatar size={64} src={undefined} alt={name} fallback={businessInitials(name)} hairlineRing={!activity} hideRing={!!activity} />
-            )}
-          </ActiveRing>
-        </ActiveAvatarDoor>
+        onClick={(e) => { e.stopPropagation(); onDismiss(); }}><X size={14} strokeWidth={2.6} /></Button>
+      {source?.media?.media_type === 'video' && <span data-follow-tile-play className="follow-tile-play" aria-hidden><Play size={13} fill="currentColor" strokeWidth={0} /></span>}
+      {!source && <div data-follow-tile-avatar="large" className="follow-tile-avatar follow-tile-avatar-large">{avatar(84)}</div>}
+      <div className="follow-tile-bottom">
+        {source && <div data-follow-tile-avatar="small" className="follow-tile-avatar follow-tile-avatar-small">{avatar(34)}</div>}
+        <div className="follow-tile-name"><span>{name}</span><ProOrVerifiedMark userId={isPerson ? card.person.user_id : null} verified={verified} /></div>
+        <div className="follow-tile-reason">{reason ? t(reason.key, { ...reason.vars, defaultValue: reason.def }) : ''}</div>
+        <div data-testid="rail-slot" className="follow-tile-stat">{when ? <span data-testid="rail-when">{when}</span> : figures ? <span data-testid="rail-figures">{figures}</span> : null}</div>
+        <Button type="button" onClick={onFollow} disabled={pending} className="follow-tile-follow"
+          style={{ opacity: pending ? 0.7 : 1, ...(followed ? { background: A.INK, color: A.CANVAS, border: `1px solid ${A.INK}` } : {}) }}>
+          {followed ? t('findPeople.following', { defaultValue: 'Following' }) : t('findPeople.follow', { defaultValue: 'Follow' })}
+        </Button>
       </div>
-
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 4,
-          fontSize: 15,
-          fontWeight: 600,
-          color: A.INK,
-          marginTop: 10,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-        <ProOrVerifiedMark userId={card.kind === 'person' ? card.person.user_id : null} verified={verified} />
-      </div>
-
-      {/* Reason: two lines max, fixed height so cards stay aligned. */}
-      <div
-        style={{
-          fontSize: 12.5,
-          color: MUTE,
-          marginTop: 3,
-          lineHeight: 1.35,
-          height: 34,
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitBoxOrient: 'vertical',
-          WebkitLineClamp: 2,
-        }}
-      >
-        {reason ? t(reason.key, { ...reason.vars, defaultValue: reason.def }) : ''}
-      </div>
-
-      {/* One 35px slot: the amber ACTIVE RING line (two lines max) when the
-          golfer has one, otherwise the figures; empty but height-holding when
-          neither. Business cards never carry a when line, so always figures. */}
-      <div
-        data-testid="rail-slot"
-        style={{
-          marginTop: 6,
-          height: 35,
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          maxWidth: '100%',
-        }}
-      >
-        {isPerson && when ? (
-          <div
-            data-testid="rail-when"
-            style={{
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: '#F7931E',
-              lineHeight: '15px',
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 2,
-              overflow: 'hidden',
-              maxWidth: '100%',
-            }}
-          >
-            {when}
-          </div>
-        ) : figures ? (
-          <div
-            data-testid="rail-figures"
-            style={{
-              fontSize: 12,
-              color: A.DIM,
-              lineHeight: '16px',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {figures}
-          </div>
-        ) : null}
-      </div>
-
-      <button
-        type="button"
-        onClick={onFollow}
-        disabled={pending}
-        style={{
-          width: '100%',
-          height: 34,
-          borderRadius: 999,
-          border: followed ? `1px solid ${A.INK}` : '1px solid rgba(255,255,255,0.22)',
-          background: followed ? A.INK : 'transparent',
-          color: followed ? A.CANVAS : A.INK,
-          fontSize: 14,
-          fontWeight: 600,
-          fontFamily: ROW_FONT,
-          /* FIX §1 — pinned to the card's bottom, not spaced from content. */
-          marginTop: 'auto',
-          cursor: pending ? 'default' : 'pointer',
-          opacity: pending ? 0.7 : 1,
-        }}
-      >
-        {followed
-          ? t('findPeople.following', { defaultValue: 'Following' })
-          : t('findPeople.follow', { defaultValue: 'Follow' })}
-      </button>
     </div>
   );
 }

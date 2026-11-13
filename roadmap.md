@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Signed-off Option B follow tiles
+- Replace shared rail tiles with settled media → cover → no-image selection and poster-only video glyphs.
+- Preserve follow/dismiss/session/order/header/analytics; generated RPC type is already present.
+- Focused checks: 100 passed, 1 failed at src/test/kindRails.test.tsx:212:42, `follow goes through useToggleFollow`: expected spy call, Number of calls: 0. Test untouched after failure; shards unrun. Baseline 8,534, expected +20 = 8,554 unverified. Report: .lovable/reports/follow-tiles-option-b-stop.md.
+
 ## Complete: Tour slot placement and shared photo height
 - Move the slot after post 8 and Pros after post 10; all sibling placements stay unchanged.
 - Import the shared hero photo height without moving the overlay or changing other styles.

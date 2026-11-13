@@ -150,7 +150,7 @@ describe('kind card copy', () => {
     expect(kindFigures(row({ followers: 1 }))?.def).toBe('1 follower');
     expect(kindFigures(row({}))).toBeNull();
   });
-  it('the slot shows amber activity first, else figures, else stays empty', async () => {
+  it('the slot shows figures without media, even with recent activity, else stays empty', async () => {
     h.kind.pro = [
       row({ user_id: 'a', display_name: 'Active Al', mutual_count: 3 }),
       row({ user_id: 'b', display_name: 'Mutual Mo', mutual_count: 3 }),
@@ -160,12 +160,13 @@ describe('kind card copy', () => {
     wrap(<KindRail kind="pro" />);
     const cardOf = (n: string) => screen.getByText(n).closest('[role="button"]') as HTMLElement;
     await screen.findByText('Active Al');
-    await waitFor(() => expect(cardOf('Active Al').querySelector('[data-testid="rail-when"]')).not.toBeNull());
-    expect(cardOf('Active Al').querySelector('[data-testid="rail-figures"]')).toBeNull();
+    await waitFor(() => expect(h.rpc.mock.calls.some(c => c[0] === 'get_follow_tile_media')).toBe(true));
+    expect(cardOf('Active Al').querySelector('[data-testid="rail-when"]')).toBeNull();
+    expect(cardOf('Active Al').querySelector('[data-testid="rail-figures"]')).not.toBeNull();
     expect(cardOf('Mutual Mo').querySelector('[data-testid="rail-figures"]')?.textContent).toBe('Followed by {{count}} you follow');
     const empty = cardOf('Empty Ed').querySelector('[data-testid="rail-slot"]') as HTMLElement;
     expect(empty.textContent).toBe('');
-    expect(empty.style.height).toBe('35px');
+    expect(empty.classList.contains('follow-tile-stat')).toBe(true);
   });
   it('pro cards carry the PRO label and no card has a Creator chip', async () => {
     const { container, unmount } = wrap(<KindRail kind="pro" />);

@@ -109,30 +109,20 @@ afterEach(() => {
 });
 
 describe('FIX §1 — one vertical rhythm, button pinned to the bottom', () => {
-  it('golfer and business cards share the fixed height and a bottom-pinned Follow button', () => {
+  it('golfer and business cards share the fixed tile and bottom block Follow button', () => {
     renderRail();
     for (const name of ['Sundridge Park GC', 'Golfer Ann', 'Golfer Bob', 'Golfer Cat']) {
       const card = cardOf(name);
-      expect(card.style.height).toBe('266px');
-      expect(card.style.display).toBe('flex');
-      expect(card.style.flexDirection).toBe('column');
-      expect(followButtonOf(name).style.marginTop).toBe('auto');
+      expect(card.querySelector('.follow-tile-bottom')?.contains(followButtonOf(name))).toBe(true);
+      expect(card.querySelector('[data-follow-tile-avatar="large"]')).not.toBeNull();
     }
   });
 
-  it('a missing reason or figures leaves its fixed space empty', () => {
+  it('a missing reason or figures keeps the bottom block and leaves the stat line empty', () => {
     renderRail();
-    /* Golfer Bob: no handicap, no rounds → empty figures; popular Cat: no
-       club reason content difference — both blocks keep their fixed heights. */
-    const bob = cardOf('Golfer Bob');
-    const blocks = Array.from(bob.querySelectorAll('div')).map((d) => (d as HTMLElement).style);
-    expect(blocks.some((s) => s.height === '34px')).toBe(true);
-    expect(blocks.some((s) => s.height === '35px')).toBe(true);
-    const bizCard = cardOf('Sundridge Park GC');
-    const bizBlocks = Array.from(bizCard.querySelectorAll('div')).map((d) => (d as HTMLElement).style);
-    expect(bizBlocks.some((s) => s.height === '34px')).toBe(true);
-    expect(bizBlocks.some((s) => s.height === '35px')).toBe(true);
-    expect(bizCard.querySelector('[data-testid="rail-figures"]')).not.toBeNull();
+    expect(cardOf('Golfer Bob').querySelector('[data-testid="rail-slot"]')?.textContent).toBe('');
+    expect(cardOf('Golfer Bob').querySelector('.follow-tile-bottom')).not.toBeNull();
+    expect(cardOf('Sundridge Park GC').querySelector('[data-testid="rail-figures"]')).not.toBeNull();
   });
 });
 

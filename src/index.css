@@ -244,6 +244,12 @@
   --suggestion-cover-empty: linear-gradient(135deg, #2A2D35 0%, #1E2027 55%, #17171B 100%);
   --suggestion-cover-scrim: linear-gradient(180deg, rgba(10,10,12,.10) 0%, rgba(10,10,12,.30) 100%);
   --suggestion-dismiss: rgba(10,10,12,.55);
+  --follow-tile-panel: #16161A;
+  --follow-tile-cell: #1E1E23;
+  --follow-tile-canvas: #0A0A0C;
+  --follow-tile-ink: #F8FAFC;
+  --follow-tile-mute: rgba(248,250,252,.62);
+  --follow-tile-glass: rgba(10,10,12,.45);
   --explore-top-panel: #17171B;
   --explore-top-ink: #F8FAFC;
   --explore-top-canvas: #0B0B0D;
