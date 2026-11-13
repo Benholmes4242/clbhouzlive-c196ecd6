@@ -47,7 +47,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedFollowPill } from './FeedFollowPill';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { courseActivityClubName } from '@/features/courses/_shared/courseLabel';
-import { FeedActorPicker } from './FeedActorPicker';
+import { FeedPostActions, FeedAddComment } from './FeedPostControls';
 import Pressable from '@/components/ui/Pressable';
 import { HeartBurst } from './HeartBurst';
 import { SingleMediaTapButton } from './SingleMediaTapButton';
@@ -746,32 +746,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 group pushed to the right edge by the auto-margin spacer, so
                 the buttons stay right even when the picker renders nothing.
                 Same footer object on a normal post and a review post. */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: FOOTER_ACTION_GAP,
-                padding: compact ? `9px ${gutter}px ${actionsBottom ? 10 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
-              }}
-            >
-              {!mediaFirstSlots && <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />}
-              <div style={{ marginLeft: 'auto' }} />
-              <FooterButton
-                icon={LikeGlyph}
-                label={likeCount > 0 ? formatCount(likeCount) : undefined}
-                active={liked}
-                onClick={() => onLike(post, effectiveActor)}
-                activeColor={AMBER}
-                glyph={<ReactionGlyph reacted={liked} size={21} />}
-                haptic={!liked ? 'selection' : 'none'}
-              />
-              <FooterButton
-                icon={MessageCircle}
-                label={commentCount > 0 ? formatCount(commentCount) : undefined}
-                onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
-              />
-              <FooterButton icon={Share} onClick={() => onShare(post)} ariaLabel="Send" />
-            </div>
+            <FeedPostActions
+              actor={activeActor} onActorChange={setActiveActor} showActor={!mediaFirstSlots}
+              liked={liked} likeCount={likeCount} commentCount={commentCount}
+              onLike={() => onLike(post, effectiveActor)}
+              onComment={() => onComment(post, effectiveActor, 'footer_glyph')}
+              onShare={() => onShare(post)} gap={FOOTER_ACTION_GAP}
+              padding={compact ? `9px ${gutter}px ${actionsBottom ? 10 : 0}px` : `10px ${gutter}px ${actionsBottom}px`}
+            />
 
 
             {(
@@ -823,24 +805,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // CB109: ordinary and review media-first posts share this one comment door.
   // Media-first comment rows own account switching. Standard cards keep their
   // footer chooser; FeedCommentPreview currently renders no viewer-avatar row.
-  const addComment = currentUserId ? (availableActors?.length > 1 ? (
-    <div data-feed-section="add-comment" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 16px', width: '100%' }}>
-      <FeedActorPicker size={26} value={activeActor} onChange={(a) => setActiveActor(a)} />
-      <button type="button" onClick={() => onComment(post, effectiveActor, 'add_comment_row')} style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', padding: 0, textAlign: 'left', cursor: 'pointer' }}>
-        <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
-      </button>
-    </div>
-  ) : (
-    <button
-      type="button"
-      data-feed-section="add-comment"
-      onClick={() => onComment(post, effectiveActor, 'add_comment_row')}
-      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 16px', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
-    >
-      <SquircleAvatar src={effectiveActor?.avatarUrl ?? null} alt={effectiveActor?.name ?? ''} userId={effectiveActor?.id ?? currentUserId} size={26} hairlineRing />
-      <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
-    </button>
-  )) : null;
+  const addComment = <FeedAddComment currentUserId={currentUserId} actor={activeActor}
+    multipleActors={(availableActors?.length ?? 0) > 1} onActorChange={setActiveActor}
+    onComment={() => onComment(post, effectiveActor, 'add_comment_row')} />;
 
   if (rendersRoundCard) {
     const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources, roundCourseMeta);
@@ -1205,51 +1172,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   }
 };
 
-export const FooterButton: React.FC<{
-  icon: React.ComponentType<any>;
-  label?: string;
-  onClick: () => void;
-  active?: boolean;
-  activeColor?: string;
-  /** Overrides Icon — the like button passes ReactionGlyph. */
-  glyph?: React.ReactNode;
-  haptic?: 'none' | 'selection' | 'success' | 'warning';
-  ariaLabel?: string;
-}> = ({ icon: Icon, label, onClick, active, activeColor, glyph, haptic = 'none', ariaLabel }) => (
-  <Pressable
-    as="button"
-    variant="icon"
-    aria-label={ariaLabel}
-    haptic={haptic}
-    onPress={(e) => {
-      (e as React.MouseEvent).stopPropagation?.();
-      onClick();
-    }}
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 6,
-      background: 'transparent',
-      border: 'none',
-      padding: 0,
-      color: active ? activeColor ?? T100 : T60,
-      fontSize: 13,
-      fontVariantNumeric: 'tabular-nums',
-    }}
-    innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-  >
-    {glyph ?? <Icon
-      /* §6 condense. The engagement row is SHARED by every feed card, so it
-         steps 24 -> 21 rather than to the mock's 19: a round-post-only figure
-         would restyle photo and review posts too. */
-      size={21}
-      strokeWidth={1.75}
-      color={active ? activeColor ?? T100 : T60}
-      fill={active ? activeColor ?? 'none' : 'none'}
-    />}
-    {label && <span>{label}</span>}
-  </Pressable>
-);
+export { FooterButton } from './FeedPostControls';
 
 
 export const FeedCard = React.memo(FeedCardImpl);

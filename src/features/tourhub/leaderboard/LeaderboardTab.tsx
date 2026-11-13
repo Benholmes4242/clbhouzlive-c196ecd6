@@ -47,6 +47,7 @@ import { heroStartDay } from '../tournament-v2/data/tournamentRules';
 import { TOUR_LIVE_GREEN } from '../_shared/tokens';
 import './leaderboard.css';
 import { isRetiredTour } from '../constants/tourMap';
+import { stripEventSponsorClause } from '../_shared/eventName';
 
 
 
@@ -74,7 +75,7 @@ function shortEventName(name: string): string {
   const original = (name || '').trim();
   // The "presented/driven/sponsored by" clause never produces a stub, so it is
   // stripped unconditionally.
-  const base = original.replace(/\s+(presented|driven|sponsored)\s+by\s+.*$/i, '').trim();
+  const base = stripEventSponsorClause(original);
   const stripped = base.replace(/\s+Championship$/i, '').trim();
   if (!stripped) return base || original;
   // S3.1 — THE FLOOR. Dropping " Championship" from "FM Championship" leaves

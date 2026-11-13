@@ -1,5 +1,10 @@
 # Roadmap
 
+## Blocked verification: Signed-off Clubhouse Tour slot
+- Add one Preview/Live/Result post-style slot before post index 12, preserving all rails and the Round of the week.
+- Reuse the hero's tournamentHeadline sentence (confirmed), venue images, post engagement and analytics; no SQL, migrations or ranking changes.
+- STOP src/test/tourSlot.test.tsx:87:657 — AssertionError: expected undefined to be 'post-123'. Focused: 39 passed, 1 failed. Four shards unrun; failed test unchanged; prior notch-test stop untouched.
+
 ## Blocked verification: Full-bleed top fade Option E
 - Hide the shared soft fade at rest by resolved bleed; follow existing condensation and glass timing on scroll.
 - Preserve gradient, height, z-index, registry, safe-area strip and page heroes.

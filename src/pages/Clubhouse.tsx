@@ -101,6 +101,9 @@ import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFe
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
 import { ClubhouseEmptyState } from '@/components/clubhouse/ClubhouseEmptyState';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { TourSlot } from '@/features/clubhouse-tour/TourSlot';
+import { useTourSlotVisit } from '@/features/clubhouse-tour/useTourSlotData';
+import { tourSlotPlacement } from '@/features/clubhouse-tour/tourSlotRules';
 
 
 
@@ -226,6 +229,8 @@ const ClubhouseContent = () => {
   const FEED_SCOPE = 'clubhouse:suggested';
 
   const posts = activeFeed.posts;
+  const tourSlotVisit = useTourSlotVisit();
+  const tourSlotComment = useRef<(post: FeedPost, source: import('@/types/commentOpenSource').CommentOpenSource) => void>(() => {});
   const videoDetailsMap = usePostVideoDetails(useMemo(() => singleVideoPostIds(posts), [posts]));
   // WF2 — Who to follow rail above posts 3 and 15. The callback must stay
   // identity-stable (CardFeed's itemContent depends on it), so the post count
@@ -233,6 +238,7 @@ const ClubhouseContent = () => {
   const postsLenRef = useRef(0);
   postsLenRef.current = posts.length;
   const renderBeforePost = useCallback((postIndex: number) => {
+    if (tourSlotPlacement(postIndex, postsLenRef.current)) return <TourSlot visit={tourSlotVisit} onComment={(post, source) => tourSlotComment.current(post, source)} />;
     const slot = railSlotForPostIndex(postIndex, postsLenRef.current);
     if (slot) return <WhoToFollowRail slot={slot} />;
     // Pros to follow above post 9, Creators to follow above post 21.
@@ -462,6 +468,7 @@ const ClubhouseContent = () => {
 
   // ── Comments state ──
   const { commentsOpen, commentsPost, openComments, closeComments, getCommentCount, resetComments, clearCommentsPost } = useClubhouseComments(activeActor);
+  tourSlotComment.current = openComments;
 
   // Conditionally mount CommentsSheet so its hooks/subtrees don't exist while closed.
   // Keep it mounted through the exit animation (~500ms spring) so close still animates.
