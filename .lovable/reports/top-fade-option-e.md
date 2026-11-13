@@ -83,10 +83,10 @@ The route cases assert actual inline opacity plus real resolved route classifica
 Platform maintenance saved the implementation in checkpoint `30e88717d5`; it is preserved, not reverted or squashed. Whole-request command: `git diff 6e4668405c HEAD --stat` after the completion commit:
 
 ```text
- .lovable/reports/top-fade-option-e.md          | 93 +++++++++++++++++++++++++++
+ .lovable/reports/top-fade-option-e.md          | 92 ++++++++++++++++++++++++++
  roadmap.md                                    |  7 ++
  src/features/chrome-v2/ChromeIsland.tsx       |  7 ++
  src/test/gi1GuestIslandReducedMotion.test.tsx | 16 +++++
  src/test/islandSoftFade.test.tsx              | 93 +++++++++++++++++++++++++++
- 5 files changed, 216 insertions(+)
+ 5 files changed, 215 insertions(+)
 ```
