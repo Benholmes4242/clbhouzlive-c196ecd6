@@ -1,5 +1,11 @@
 # Roadmap
 
+## Blocked: Read-only WAGR feasibility probe
+- Add and deploy only probe-wagr-profile with existing service-role/admin authentication, sequential public reads and complete response evidence.
+- Invoke once for lewy-hayward-41967; save the full response and invocation auth in .lovable/reports/wagr-probe.md, or report unavailable access and stop.
+- No SQL, migrations, persistence, scheduling or client changes.
+- Validation stopped: index.ts:7:29 TS2307 Cannot find module 'npm:@supabase/supabase-js@2/cors'. Not deployed or invoked; full error and auth status in the report.
+
 ## Complete: Member-shot vertical paging follow-up
 - Latest holes opens one synthetic page per ready shot; course rail opens one page per loaded course with sideways media.
 - Preserve the tap snapshot and append neighbour media without moving existing slides; add scoped tests and run four separate shards.
