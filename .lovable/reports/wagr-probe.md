@@ -1,17 +1,31 @@
-# WAGR feasibility probe — validation stop
+# WAGR feasibility probe — deployed; invocation unauthorized
 
 ## File
 `supabase/functions/probe-wagr-profile/index.ts`
 
-Read-only implementation with the existing rankings service-role/signed-in-admin auth branch; `is_admin` is the only RPC and is used exclusively for the required auth check. No application data reads or writes, SQL, migrations, scheduling, client changes or new secrets. The internal scheduling-secret branch is intentionally not supported, matching the brief's service-role/admin-only caller requirement. Module-level response helpers use module-level SDK `corsHeaders`.
+Read-only implementation with the existing rankings service-role/signed-in-admin auth branch; `is_admin` is the only RPC and is used exclusively for the required auth check. No application data reads or writes, SQL, migrations, scheduling, client changes or new secrets. The internal scheduling-secret branch is intentionally not supported, matching the brief's service-role/admin-only caller requirement. Module-level response helpers now use module-level `corsHeaders` initialized with the house `corsFor(null)` helper; the Deno.serve callback assigns the request-origin headers before calling the unchanged handler. No other function code changed; the five protected functions were untouched.
 
 ## Deploy result
-Not deployed. Validation encountered a type-check error; work stopped under the project's stop rule. No other functions were deployed.
+Tool result: `Successfully deployed edge functions: probe-wagr-profile`
+
+Submitted source SHA-256: `995e8409d3ae374012c261ce0d7d0ae82e0846a24fe053ed98a571dbd417406e`.
+
+Only `probe-wagr-profile` was deployed. The invocation below reached its authorization check.
 
 ## Invocation and full response
-Not invoked. No invocation auth was used, and no WAGR JSON response exists to paste. The environment reports `external_unmanaged`; no managed browser session is available. Ben will need to invoke after the validation issue is resolved and the function is deployed.
+Exactly one invocation was attempted with `POST /probe-wagr-profile`, `Content-Type: application/json`, and body `{"slug":"lewy-hayward-41967"}` through `supabase.curl_edge_functions`.
 
-## Exact validation failure
+Auth used: no explicit Authorization header or service-role credential was supplied. The tool's automatic preview-auth mechanism did not provide usable authentication: the function returned HTTP 401 `Unauthorized` (the handler's missing-Bearer-token response).
+
+Complete, unedited JSON response:
+
+```json
+{"error":"Unauthorized"}
+```
+
+Stopped after this single attempt. No WAGR requests ran, so no profile/events/graph response exists. Ben must invoke the deployed function with service-role or signed-in-admin authorization; no retry was made.
+
+## Previous validation failure (resolved)
 Command: `deno test --allow-env --allow-net supabase/functions/probe-wagr-profile/index_test.ts`
 
 ```text
@@ -25,12 +39,14 @@ error: Type checking failed.
   hint: Re-run with --no-check to skip type-checking.
 ```
 
-No type-check bypass was used. No tests executed; this is a validation/import failure, not a failed assertion.
+The house CORS import resolved this error. No type-check bypass was used.
 
 ## Tests and counts
-Previous application-suite baseline: 8,593 passed. Application test files unchanged; full application suite not rerun for this isolated probe. Three new Deno tests were added, but none ran because module checking failed:
+Command rerun: `deno test --allow-env --allow-net supabase/functions/probe-wagr-profile/index_test.ts`.
+
+Result: **3 passed, 0 failed**. Previous application-suite baseline: 8,593 passed; application test files unchanged and full application suite not rerun for this isolated import correction. Separate Deno test inventory before/after: 3/3, unchanged:
 - `WAGR slug accepts lewy-hayward-41967 and rejects unsafe paths`
 - `WAGR requests preserve order, 1000ms spacing, honest headers and full JSON`
 - `WAGR block pages and network failures never stop later requests`
 
-No tests deleted, renamed or rewritten. Application-suite count remains 8,593; three separate, unverified edge-function cases added.
+No tests deleted, renamed or rewritten. Application-suite inventory remains 8,593; the three separate edge-function cases are now verified.

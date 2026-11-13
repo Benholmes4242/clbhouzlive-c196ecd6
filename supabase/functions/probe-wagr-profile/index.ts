@@ -4,8 +4,10 @@
  * honest identification and raw block-page evidence preserve probe fidelity.
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { corsFor } from '../_shared/cors.ts';
 import { z } from 'npm:zod@3';
+
+let corsHeaders: Record<string, string> = corsFor(null);
 
 export const bodySchema = z.object({ slug: z.string().regex(/^[a-z0-9-]+-(\d+)$/) }).strict();
 
@@ -112,4 +114,7 @@ export async function handler(req: Request): Promise<Response> {
   return reply(await probeProfile(body.data.slug));
 }
 
-if (import.meta.main) Deno.serve(handler);
+if (import.meta.main) Deno.serve((req) => {
+  corsHeaders = corsFor(req.headers.get('Origin'));
+  return handler(req);
+});
