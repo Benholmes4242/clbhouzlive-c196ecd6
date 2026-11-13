@@ -59,13 +59,21 @@ describe('member-shot vertical paging', () => {
   it('appendPostMedia preserves active items and pager index while appending unique ids in order', () => {
     const post = courseTilesToShotPost(row(1));
     useFullscreenFeedStore.setState({ isOpen: true, posts: [post], activeIndex: 0, activePagerIdx: 1 });
-    useFullscreenFeedStore.getState().appendPostMedia(post.id, [post.mediaItems[0], item('X'), item('Y'), item('X')]);
+    const memberShot = { kicker: "Through members' eyes", title: 'Course 1',
+      memberName: 'Thomas Holmes', credit: 'Thomas Holmes · Mar 2026', avatarUrl: '/t.jpg' };
+    const incoming = [{ ...post.mediaItems[0], imageUrl: '/must-not-replace.jpg', width: 1, memberShot }, item('X'), item('Y'), item('X')];
+    useFullscreenFeedStore.getState().appendPostMedia(post.id, incoming);
     const state = useFullscreenFeedStore.getState();
-    expect(state.posts[0].mediaItems.slice(0, 3)).toEqual(post.mediaItems);
+    expect(state.posts[0].mediaItems[0]).toEqual({ ...post.mediaItems[0], memberShot });
+    expect(state.posts[0].mediaItems.slice(1, 3)).toEqual(post.mediaItems.slice(1, 3));
     expect(state.posts[0].mediaItems[1]).toBe(post.mediaItems[1]);
     expect(state.posts[0].mediaItems.map(m => m.id)).toEqual(['m1-0', 'm1-1', 'm1-2', 'X', 'Y']);
     expect(state.activePagerIdx).toBe(1);
     expect(state.activeIndex).toBe(0);
+    state.appendPostMedia(post.id, incoming);
+    expect(useFullscreenFeedStore.getState().posts).toBe(state.posts);
+    state.appendPostMedia(post.id, [{ ...incoming[0], memberShot: { ...memberShot } }]);
+    expect(useFullscreenFeedStore.getState().posts).toBe(state.posts);
   });
   it('missing post ids, closed viewers and duplicate-only appends are no-ops', () => {
     const post = courseTilesToShotPost(row(1));

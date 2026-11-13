@@ -1,11 +1,12 @@
 # Roadmap
 
-## Stopped: Member-shot vertical paging verification
+## Complete: Member-shot vertical paging follow-up
 - Latest holes opens one synthetic page per ready shot; course rail opens one page per loaded course with sideways media.
 - Preserve the tap snapshot and append neighbour media without moving existing slides; add scoped tests and run four separate shards.
 - Focused 92/92 passed; shard 1 executed 2,183 (2,181 passed, 2 failed). Shards 2–4 unrun under the stop rule.
-- Blocker: coursesPhotoTopScrims.test.tsx:56 and :97 render LatestCoursesSection without QueryClientProvider; error: No QueryClient set, use QueryClientProvider to set one. Failing tests unchanged.
-- Report: .lovable/reports/member-shots-vertical-paging.md; authenticated browser checks unavailable for the externally managed service.
+- Applied the authorised coursesPhotoTopScrims mock exports only; existing memberShot fields refresh in place with repeat-call identity stability.
+- Separate shards 2,183 / 2,039 / 2,185 / 2,186 = 8,593 passed, zero failures; +11 from the 8,582 baseline, no delta in this follow-up.
+- Reports: .lovable/reports/member-shots-vertical-paging.md and member-shots-vertical-paging-followup.md; authenticated browser checks remain unavailable for the externally managed service.
 
 ## Complete: Member-shot gallery layout
 - Share one gallery-layout predicate for rect, backdrop, gradient and notch protection; leave chrome and open calls unchanged.

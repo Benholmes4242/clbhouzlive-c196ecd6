@@ -633,21 +633,39 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   },
 
 
-  /** Course neighbours hydrate append-only, including the active post: no
-   * replacements, reordering or pager-index writes are allowed here. */
+  /** Course neighbours append new ids and refresh existing memberShot fields
+   * in place, including the active post, never moving the visible slide or
+   * changing media fields/order or writing the pager index. */
   appendPostMedia: (postId, items) => {
     set(s => {
       if (!s.isOpen) return s;
       const post = s.posts.find(p => p.id === postId);
       if (!post) return s;
+      const incoming = new Map<string, MediaItem>();
+      for (const item of items) {
+        if (!incoming.has(item.id)) incoming.set(item.id, item);
+      }
+      let refreshed = false;
+      const mediaItems = post.mediaItems.map(existing => {
+        const item = incoming.get(existing.id);
+        if (!item) return existing;
+        const before = existing.memberShot;
+        const after = item.memberShot;
+        const same = before === after || (before != null && after != null &&
+          [...new Set([...Object.keys(before), ...Object.keys(after)])].every(key =>
+            before[key as keyof typeof before] === after[key as keyof typeof after]));
+        if (same) return existing;
+        refreshed = true;
+        return { ...existing, memberShot: after };
+      });
       const ids = new Set(post.mediaItems.map(item => item.id));
       const additions = items.filter(item => {
         if (ids.has(item.id)) return false;
         ids.add(item.id);
         return true;
       });
-      if (!additions.length) return s;
-      return { posts: s.posts.map(p => p === post ? { ...p, mediaItems: [...p.mediaItems, ...additions] } : p) };
+      if (!additions.length && !refreshed) return s;
+      return { posts: s.posts.map(p => p === post ? { ...p, mediaItems: [...mediaItems, ...additions] } : p) };
     });
   },
 
