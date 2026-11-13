@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Tour skeleton text-only measurement and wrapper
+- Measure rendered text without container padding/min-height; preserve all other geometry.
+- Wrap Also this week events exactly as the loaded section.
+- Two new cases, four separate shards, report and commit.
+
 ## Complete: Tour skeleton final three mismatches
 - Measure picks sentence/record and Coming next name/last-year lines; v4 storage.
 - Reuse actual last-item border selectors; all other presentation stays frozen.

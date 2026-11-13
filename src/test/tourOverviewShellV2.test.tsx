@@ -74,4 +74,22 @@ describe('Tour counted skeleton shape v4', () => {
    expect(container.querySelectorAll('.coming-last-text [data-shell-bar]')).toHaveLength(3);
  });
 
+ it('counts one text line inside a padded min-height record row', () => {
+   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ height: 34 } as DOMRect);
+   Object.defineProperty(Range.prototype, 'getBoundingClientRect', { configurable: true, value: () => ({ height: 17.55 }) });
+   function Content() { const ref = useRef<HTMLDivElement>(null); useSectionReady('hero', true); return <div ref={ref}><ShapeAfterReveal lens="all" root={ref} /><div data-overview-picks><div data-our-record-door style={{ padding: '8px 20px', minHeight: 32, lineHeight: '17.55px' }}><span data-pick-record-figures style={{ lineHeight: '17.55px' }}>3 wins · 15 top 10s</span><span> from 11 events</span></div></div></div>; }
+   render(<PageLoadGate expect={['hero']}><Content /></PageLoadGate>);
+   expect(readOverviewShape().picks?.recordLines).toBe(1);
+   Reflect.deleteProperty(Range.prototype, 'getBoundingClientRect');
+ });
+ it('wraps all also-week events in one sibling after the head', () => {
+   const { container } = render(<TourOverviewShell shape={full} />);
+   const section = container.querySelector('[data-tour-shell="alsoThisWeek"]');
+   const wrapper = section?.querySelector('[data-shell-also-events]');
+   expect(section?.children).toHaveLength(2);
+   expect(wrapper?.previousElementSibling).toBe(section?.firstElementChild);
+   expect(wrapper?.children).toHaveLength(3);
+   expect([...container.querySelectorAll('[data-shell-also-event]')].every(node => node.parentElement === wrapper)).toBe(true);
+ });
+
 });
