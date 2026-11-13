@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Tour skeleton item-height follow-up
+- Finish prior shard 4 and combine both briefs in the report.
+- Change only story placement/leaders height and rendered per-item also-week, coming-month and news shapes; v3 storage.
+- Run focused checks, phone-width measurements and four separate full shards; report named test changes and diff.
+
 ## In progress: Signed-off Tour skeleton rebuild
 - Rebuild only overviewShells and its tests; other band edits are data markers only. Preserve queries and gate readiness.
 - Use corrected 390/320 mocks: three hero headline bars; respect every line limit and ellipsis cell edge, without overlapping bars.
