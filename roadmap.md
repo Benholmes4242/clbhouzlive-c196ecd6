@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Counting eight A2 tile grid + NET
+- NET via one useRoundNetScores call; detail block lines swapped (counts right of course, date after DIFF).
+- Two-column tile grid replaces the chip box; dimming only when the selected round counts.
+- Authorised test edits (a)–(d) only; shards 2,168 / 2,020 / 2,183 / 2,186 = 8,557 passed. Report: .lovable/reports/counting-eight-a2.md.
+
 ## Complete: Follow tile buttons + Tour slot photo height
 - Follow/dismiss Buttons drop variant/size classes; in-tile CSS raised to two-class specificity, values unchanged.
 - Tour slot photo is TOUR_SLOT_PHOTO_HEIGHT = HERO_PHOTO_HEIGHT - 10 (340); overlay bottom-anchored.
