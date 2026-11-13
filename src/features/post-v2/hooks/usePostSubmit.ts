@@ -15,7 +15,7 @@ import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsSt
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useProfileData } from '@/hooks/useProfileData';
 import { startPostUpload } from '../lib/postUploadController';
-import { extractMentions } from '@/lib/mentions/format';
+import { extractMentions, stripMentionMarkup } from '@/lib/mentions/format';
 import type { StageMediaItem, StageCourse } from './useStageComposer';
 import type { ShotTagJob } from '../lib/shotTagWrites';
 import { isHoleTag, type PostVisibility } from '../lib/golfPostRules';
@@ -190,13 +190,14 @@ export function usePostSubmit() {
 
 
 
-      await writeVideoDetails(postId, input.media, input.videoData, { scoreId: input.actorType === 'personal' ? input.attachedScoreId ?? null : null, holes: input.roundHoles ?? null });
+      const videoData = input.videoData;
+      await writeVideoDetails(postId, input.media, videoData ? { ...videoData, title: stripMentionMarkup(videoData.titleMarkup ?? videoData.title) } : undefined, { scoreId: input.actorType === 'personal' ? input.attachedScoreId ?? null : null, holes: input.roundHoles ?? null });
 
       // Mention notifications: insert into the canonical public.mentions
       // pipeline (source_type='post'). The trg_create_mention_notification
       // trigger fans out notifications with self-mention and block guards.
       // Non-blocking: a mention-write failure must never fail the post.
-      const mentions = extractMentions(input.caption);
+      const mentions = [...new Map([...extractMentions(input.caption), ...extractMentions(videoData?.titleMarkup ?? '')].map(m => [`${m.entityType}:${m.entityId}`, m])).values()];
       if (mentions.length > 0) {
         const rows = mentions.map((m) => ({
           source_type: 'post' as const,

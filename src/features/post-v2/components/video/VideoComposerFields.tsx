@@ -3,18 +3,52 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { StageMediaItem } from '../../hooks/useStageComposer';
 import { extractPoster } from '../../lib/videoPoster';
-import { stripMentionMarkup } from '@/lib/mentions/format';
+import { extractMentions, MENTION_REGEX, stripMentionMarkup } from '@/lib/mentions/format';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import { parseChapters, videoDescriptionMeta, videoDuration, videoCoverSelection, type VideoDetails } from '../../lib/videoDetails';
 import './videoCreator.css';
 import { RoundVideoFields, type RoundVideoContext } from './RoundVideoFields';
 
-export function VideoTitleDescription({ details, description, duration, long, onChange, onDetails }: { details: VideoDetails; description: string; duration?: number; long: boolean; onChange: (patch: Partial<VideoDetails>) => void; onDetails: () => void }) {
+// Map visible selection to storage offsets without cutting through a mention token.
+function titleOffset(markup: string, position: number, end = false): number {
+  let delta = 0;
+  for (const m of markup.matchAll(new RegExp(MENTION_REGEX.source, 'g'))) {
+    const start = m.index - delta;
+    const length = m[1].length + 1;
+    if (position <= start) break;
+    if (position < start + length) return end ? m.index + m[0].length : m.index;
+    delta += m[0].length - length;
+  }
+  return position + delta;
+}
+
+export function VideoTitleDescription({ details, description, duration, long, currentUserId, onChange, onDetails }: { details: VideoDetails; description: string; duration?: number; long: boolean; currentUserId?: string | null; onChange: (patch: Partial<VideoDetails>) => void; onDetails: () => void }) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => { const el = titleRef.current; if (el) { el.style.height = 'auto'; el.style.height = `${el.scrollHeight}px`; } }, [details.title]);
+  const markup = details.titleMarkup ?? details.title;
+  const updateTitle = (value: string) => {
+    let next = value.replace(/[\r\n]+/g, '');
+    const plain = stripMentionMarkup(next);
+    if (plain.length > 80) {
+      const previous = new Set(extractMentions(markup).map(m => `${m.entityType}:${m.entityId}`));
+      if (extractMentions(next).some(m => !previous.has(`${m.entityType}:${m.entityId}`))) return;
+      next = next.slice(0, titleOffset(next, 80));
+    }
+    onChange({ titleMarkup: next, title: stripMentionMarkup(next) });
+  };
   const meta = videoDescriptionMeta(details, parseChapters(description, duration).length);
   return <div className="video-creator" data-video-composer>
     <div className="vc-title-head"><span className="vc-kicker">TITLE</span><span className="vc-kicker vc-title-type">{long ? 'LONG FORM' : 'SHORT'}</span></div>
-    <textarea ref={titleRef} aria-label="Video title" className="vc-title" placeholder="What's this video?" maxLength={80} rows={1} value={details.title} onChange={e => onChange({ title: e.target.value.slice(0, 80) })} />
+    <div className="vc-title-input" onKeyDownCapture={e => { if (e.key === 'Enter') e.preventDefault(); }} onPasteCapture={e => {
+      const text = e.clipboardData.getData('text/plain');
+      if (!/[\r\n]/.test(text)) return;
+      e.preventDefault();
+      const input = titleRef.current;
+      if (!input) return;
+      updateTitle(markup.slice(0, titleOffset(markup, input.selectionStart)) + text.replace(/[\r\n]+/g, '') + markup.slice(titleOffset(markup, input.selectionEnd, true)));
+    }}>
+      <style>{`.vc-title-input{padding:6px 16px 0;min-width:0}.vc-title-input .mentions-composer textarea,.vc-title-input .mentions-composer__highlighter{font-weight:700!important}`}</style>
+      <MentionsComposerInput value={markup} onChange={updateTitle} placeholder="What's this video?" maxLength={80} currentUserId={currentUserId} inputRef={el => { titleRef.current = el; el?.setAttribute('aria-label', 'Video title'); }} textStyle={{ fontSize: 21, lineHeight: 1.25, padding: '0', minHeight: 27, color: 'var(--video-ink)', caretColor: 'var(--video-ink)', placeholderColor: 'var(--video-dim)' }} />
+    </div>
     <div className="vc-rule" /><div className="vc-count">{details.title.length}/80</div>
     <div className="vc-description-wrap"><Button variant="ghost" className="vc-description" onClick={onDetails}><span className="vc-grow"><b>Description</b><span className="vc-preview">{stripMentionMarkup(description) || 'Add the story, credits and links'}</span>{meta && <span className="vc-meta">{meta}</span>}</span><span className="vc-chevron">›</span></Button></div>
   </div>;

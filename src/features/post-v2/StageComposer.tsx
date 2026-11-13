@@ -1248,7 +1248,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
         <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
           <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} visibility={visibility} personal={isPersonalActor} onVisibility={() => setVisibilityOpen(true)} />
-          {videoComposer ? <VideoTitleDescription details={videoData} description={state.caption} duration={videoItem ? videoDuration(videoItem) : undefined} long={longVideo} onChange={setVideoData} onDetails={() => setVideoDetailsOpen(true)} /> : <div style={{ padding: '14px 16px 0' }}>
+          {videoComposer ? <VideoTitleDescription details={videoData} description={state.caption} duration={videoItem ? videoDuration(videoItem) : undefined} long={longVideo} currentUserId={profile?.id ?? null} onChange={setVideoData} onDetails={() => setVideoDetailsOpen(true)} /> : <div style={{ padding: '14px 16px 0' }}>
             <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
               placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />
             <div style={{ fontSize: 11.5, color: GP.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>

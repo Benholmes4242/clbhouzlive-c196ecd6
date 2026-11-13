@@ -2,7 +2,7 @@
  * post-page-signed-off.html). Presentation only: StageComposer owns state and
  * every write; rules live in lib/golfPostRules.ts.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShotTagChoices } from '@/components/course-media-tab/ShotTagChoices';
@@ -149,6 +149,7 @@ export function PlayedWithSection({ suggestions, tagged, onToggle, search, selfI
   search: (q: string) => Promise<WithCandidate[]>; selfId: string | null;
 }) {
   const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const [results, setResults] = useState<WithCandidate[]>([]);
   const [loading, setLoading] = useState(false);
@@ -165,9 +166,9 @@ export function PlayedWithSection({ suggestions, tagged, onToggle, search, selfI
   const shown = (query.trim() ? results : suggestions).filter(p => p.id !== selfId && !tagged.some(t => t.id === p.id));
   return <section data-testid="played-with" className="composer-golf pf4-with" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false); }}>
     <div className="composer-golf-head"><span className="composer-golf-kicker">Played with</span>{focused && <span className="pf4-with-limit">Up to 8</span>}</div>
-    <label className="pf4-with-input"><Search size={17} aria-hidden="true"/><input aria-label="Who did you play with?" placeholder={limited ? '8 people tagged' : 'Who did you play with?'} disabled={limited} value={query} onFocus={() => setFocused(true)} onChange={e => setQuery(e.target.value)}/></label>
-    {focused && !limited && (shown.length > 0 || loading) && <div className="pf4-with-results" aria-busy={loading}>
-      {shown.map(p => <Button variant="ghost" className="pf4-with-result" key={p.id} onClick={() => { onToggle(p); setQuery(''); }}>
+    <label className="pf4-with-input"><Search size={17} aria-hidden="true"/><input ref={inputRef} aria-label="Who did you play with?" placeholder={limited ? '8 people tagged' : 'Who did you play with?'} disabled={limited} value={query} onFocus={() => setFocused(true)} onChange={e => setQuery(e.target.value)}/></label>
+    {focused && !limited && (shown.length > 0 || loading || !!query.trim()) && <div className="pf4-with-results" aria-busy={loading}>
+      {loading ? <div role="status" style={{ fontSize: 13, color: GP.mute, padding: 12 }}>Searching…</div> : !shown.length ? <div role="status" style={{ fontSize: 13, color: GP.mute, padding: 12, overflowWrap: 'anywhere' }}>No golfers match "{query}"</div> : shown.map(p => <Button variant="ghost" className="pf4-with-result" key={p.id} onPointerDown={e => e.preventDefault()} onClick={() => { onToggle(p); setQuery(''); inputRef.current?.focus(); }}>
         <SquircleAvatar src={p.avatarUrl} alt="" fallback={getInitialsFromName(p.name)} userId={p.id} size={34} hairlineRing ringColor={DARK_HAIRLINE}/>
         <span className="pf4-with-person"><b>{p.name}</b><small>{[p.username ? `@${p.username}` : null, p.homeClub].filter(Boolean).join(' · ')}</small></span><span className="pf4-with-add">Add</span>
       </Button>)}

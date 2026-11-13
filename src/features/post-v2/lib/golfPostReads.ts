@@ -83,8 +83,18 @@ export async function searchMembers(q: string, selfId: string | null): Promise<W
   const query = q.trim();
   if (!query) return [];
   const like = `%${query.replace(/[%_]/g, (ch) => '\\' + ch)}%`;
-  const { data } = await searchMentionMembers(like, 8, true);
-  return (data ?? []).filter((u) => u.id !== selfId).map((u) => ({
+  const { data } = await searchMentionMembers(like, 20, true);
+  const needle = query.toLowerCase();
+  const rank = (u: { display_name: string | null; username: string | null }) => {
+    const name = (u.display_name ?? '').toLowerCase();
+    const username = (u.username ?? '').toLowerCase();
+    if (name === needle || username === needle) return 0;
+    if (name.startsWith(needle)) return 1;
+    if (name.split(/\s+/).some(word => word.startsWith(needle))) return 2;
+    if (username.startsWith(needle)) return 3;
+    return 4;
+  };
+  return (data ?? []).filter((u) => u.id !== selfId).sort((a, b) => rank(a) - rank(b)).slice(0, 8).map((u) => ({
     id: u.id, name: u.display_name || u.username || 'Golfer', avatarUrl: u.profile_photo_url ?? null, sameRound: false, lastInteraction: '', username: u.username, homeClub: 'home_club' in u ? u.home_club as string | null : null,
   }));
 }

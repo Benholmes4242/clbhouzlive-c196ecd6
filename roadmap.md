@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: Composer tagging
+- Fix Played with pointer/focus and pending/empty results; rank up to twenty search rows into eight.
+- Add canonical title mentions with plain eighty-character limit, draft restoration and deduplicated submission.
+- Focused run: 43 passed / 5 failed (48). New composerTagging ordering assertion at 86:68 and four missing suggestion options at 98:33, 109:33, 117:34, 133:34 block continuation under the stop rule; tests untouched after failure. Four shards not run; baseline 8,407 plus twelve new cases = expected 8,419, unverified.
+- Authenticated 320px checks depend on available sign-in (external_unmanaged).
+
 ## Done: Admin Command centre v2C
 Five Dashboard-only mock-match fixes complete; focused 25 passed. Four separate sequential shards: 2,142 / 1,998 / 2,133 / 2,110 passed, each zero failures. Total 8,383, up five from 8,378; no known failures appeared and no reruns were needed.
 Five added cases in adminCommandCentreV2.test.tsx: plain-post grammar; first four top posts; unknown-body label; zero-peak message; exactly two Connected leak figures. Two authorised assertions updated: third-leak case toContain("3we can't place") becomes not.toContain because the third figure is removed; coverage case 'Not known4' becomes 'No body named4' because only the display label changes. Existing case names retained; no tests deleted or renamed. Live authenticated rendering remains unverified (external_unmanaged).

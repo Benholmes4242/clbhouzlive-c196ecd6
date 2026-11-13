@@ -3,6 +3,7 @@
  * times, never scores. One validator owns spacing, prefill and publication.
  */
 import { isLongFormVideo } from '@/constants/videoRules';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 export const VIDEO_LIMITS = { title: 80, credits: 10, links: 5, thanks: 3, gear: 10, gearText: 60, url: 300, label: 30 } as const;
 export const CREDIT_ROLES = [['host', 'Host'], ['guest', 'Guest'], ['filmed', 'Filmed'], ['edited', 'Edited'], ['filmed_edited', 'Filmed & edited']] as const;
 export type CreditRole = typeof CREDIT_ROLES[number][0];
@@ -10,14 +11,16 @@ export interface VideoCredit { id: string; name: string; avatarUrl: string | nul
 export interface VideoThanks { id: string; name: string; logoUrl: string | null; category: string | null }
 export interface VideoLink { url: string; label: string }
 export type HoleMarks = Record<number, number>;
-export interface VideoDetails { title: string; titleOnCover: boolean; links: VideoLink[]; gear: string[]; credits: VideoCredit[]; thanks: VideoThanks[]; coverFrame: number | null; holeMarks?: HoleMarks; scoreFollows?: boolean; marksRoundId?: string | null }
+// Composer/drafts retain titleMarkup; readers and persisted video titles use plain title.
+export interface VideoDetails { title: string; titleMarkup?: string; titleOnCover: boolean; links: VideoLink[]; gear: string[]; credits: VideoCredit[]; thanks: VideoThanks[]; coverFrame: number | null; holeMarks?: HoleMarks; scoreFollows?: boolean; marksRoundId?: string | null }
 export const emptyVideoDetails = (): VideoDetails => ({ title: '', titleOnCover: true, links: [], gear: [], credits: [], thanks: [], coverFrame: null, holeMarks: {}, scoreFollows: true, marksRoundId: null });
 export function restoreVideoDetails(value: unknown): VideoDetails {
   if (!value || typeof value !== 'object') return emptyVideoDetails();
   const v = value as Partial<VideoDetails>;
+  const titleMarkup = typeof v.titleMarkup === 'string' ? v.titleMarkup : typeof v.title === 'string' ? v.title : '';
   const holeMarks: HoleMarks = {};
   if (v.holeMarks && typeof v.holeMarks === 'object') for (const [key, seconds] of Object.entries(v.holeMarks)) { const hole = Number(key); if (Number.isInteger(hole) && hole >= 1 && hole <= 18 && typeof seconds === 'number' && Number.isFinite(seconds) && seconds >= 1) holeMarks[hole] = seconds; }
-  return { title: typeof v.title === 'string' ? v.title : '', titleOnCover: v.titleOnCover !== false, links: Array.isArray(v.links) ? v.links : [], gear: Array.isArray(v.gear) ? v.gear : [], credits: Array.isArray(v.credits) ? v.credits : [], thanks: Array.isArray(v.thanks) ? v.thanks : [], coverFrame: typeof v.coverFrame === 'number' ? v.coverFrame : null, holeMarks, scoreFollows: v.scoreFollows !== false, marksRoundId: typeof v.marksRoundId === 'string' ? v.marksRoundId : null };
+  return { title: stripMentionMarkup(titleMarkup), titleMarkup, titleOnCover: v.titleOnCover !== false, links: Array.isArray(v.links) ? v.links : [], gear: Array.isArray(v.gear) ? v.gear : [], credits: Array.isArray(v.credits) ? v.credits : [], thanks: Array.isArray(v.thanks) ? v.thanks : [], coverFrame: typeof v.coverFrame === 'number' ? v.coverFrame : null, holeMarks, scoreFollows: v.scoreFollows !== false, marksRoundId: typeof v.marksRoundId === 'string' ? v.marksRoundId : null };
 }
 export function singleVideo(media: readonly { type: string }[], editing = false): boolean { return !editing && media.length === 1 && media[0].type === 'video'; }
 export interface VideoChapter { seconds: number; time: string; label: string; holeNo?: number }
