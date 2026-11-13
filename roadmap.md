@@ -1,16 +1,16 @@
 # Roadmap
 
-## In progress: Tour skeleton final three mismatches
+## Complete: Tour skeleton final three mismatches
 - Measure picks sentence/record and Coming next name/last-year lines; v4 storage.
 - Reuse actual last-item border selectors; all other presentation stays frozen.
-- Four separate shards, combined named-test report, diff and commit.
+- Four separate shards passed 8,456 tests; combined report: .lovable/reports/tour-overview-skeleton-combined.md. Ben’s loaded-page acceptance comparison remains pending.
 
-## In progress: Tour skeleton item-height follow-up
+## Complete: Tour skeleton item-height follow-up
 - Finish prior shard 4 and combine both briefs in the report.
 - Change only story placement/leaders height and rendered per-item also-week, coming-month and news shapes; v3 storage.
 - Run focused checks, phone-width measurements and four separate full shards; report named test changes and diff.
 
-## In progress: Signed-off Tour skeleton rebuild
+## Complete: Signed-off Tour skeleton rebuild
 - Rebuild only overviewShells and its tests; other band edits are data markers only. Preserve queries and gate readiness.
 - Use corrected 390/320 mocks: three hero headline bars; respect every line limit and ellipsis cell edge, without overlapping bars.
 - Record v2 counted shapes; verify focused tests and four separate shards, then report names, totals and diff.
