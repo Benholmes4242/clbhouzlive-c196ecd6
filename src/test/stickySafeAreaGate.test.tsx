@@ -3,6 +3,8 @@ import { act, cleanup, render } from '@testing-library/react';
 import { PageLoadGate, useSectionReady } from '@/components/courses/browse/PageLoadGate';
 import { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 
+const origRO = window.ResizeObserver;
+const origIO = window.IntersectionObserver;
 let resize: ResizeObserverCallback;
 let intersect: IntersectionObserverCallback;
 let top = 350;
@@ -15,8 +17,8 @@ const gate = (ready: boolean) => <PageLoadGate expect={['hero']}><Sentinel ready
 beforeEach(() => {
   top = 350;
   document.documentElement.style.setProperty('--sat', '47px');
-  vi.stubGlobal('ResizeObserver', class { constructor(cb: ResizeObserverCallback) { resize = cb; } observe() {} disconnect() {} });
-  vi.stubGlobal('IntersectionObserver', class { constructor(cb: IntersectionObserverCallback) { intersect = cb; } observe() {} disconnect() {} });
+  (window as any).ResizeObserver = class { constructor(cb: ResizeObserverCallback) { resize = cb; } observe() {} disconnect() {} };
+  (window as any).IntersectionObserver = class { constructor(cb: IntersectionObserverCallback) { intersect = cb; } observe() {} disconnect() {} };
   vi.spyOn(Element.prototype, 'getClientRects').mockImplementation(function (this: Element) {
     return (this.closest('[style*="display: none"]') ? [] : [{ top }]) as unknown as DOMRectList;
   });
@@ -24,7 +26,7 @@ beforeEach(() => {
     return { top: this.closest('[style*="display: none"]') ? 0 : top } as DOMRect;
   });
 });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); document.documentElement.style.removeProperty('--sat'); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); window.ResizeObserver = origRO; window.IntersectionObserver = origIO; document.documentElement.style.removeProperty('--sat'); });
 describe('Sticky notch state across a load gate', () => {
   it('is not stuck for a sentinel inside an unrevealed PageLoadGate', () => {
     const { getByTestId } = render(gate(false));
