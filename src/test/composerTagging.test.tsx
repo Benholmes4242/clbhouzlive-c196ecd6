@@ -64,7 +64,7 @@ function typeTitle(value: string) {
   return input;
 }
 function titleProps() {
-  const props = h.mentionProps.findLast(p => p.placeholder === "What's this video?");
+  const props = [...h.mentionProps].reverse().find(p => p.placeholder === "What's this video?");
   if (!props) throw new Error('Title did not render the canonical mention input');
   return props;
 }
@@ -121,7 +121,7 @@ describe('composer tagging', () => {
   it('title suggestions include businesses and exclude the current member', () => {
     mount(<><Title /><VideoDetailsPage details={emptyVideoDetails()} description="" long={false} userId="me" onChange={() => {}} onDescription={() => {}} onBack={() => {}} /></>);
     const title = titleProps();
-    const description = h.mentionProps.findLast(p => p.placeholder === 'Description');
+    const description = [...h.mentionProps].reverse().find(p => p.placeholder === 'Description');
     expect(description).toBeDefined();
     for (const props of [title, description]) {
       expect(props).toMatchObject({ value: '', currentUserId: 'me', onChange: expect.any(Function), textStyle: expect.any(Object) });

@@ -1,8 +1,8 @@
 # Roadmap
 
 ## In progress: Authorised composer tagging and Tour gate stop fixes
-- Add titleMarkup only to the round-trip expectation; refine whole-word search priority; rewrite only four new title-suggestion cases with the complete mention-module mock.
-- Run shards 1/4–4/4 as separate commands; stop on any other failure. Report all names, reconciled totals and fix diff.
+- Final authorised fixes: add titleMarkup: 'Film' to the PF3A round-trip data only; replace both findLast calls with reversed-copy find, without changing tsconfig.
+- Confirm preview build, then run shards 1/4–4/4 as separate commands; stop on any other failure. Report all names across both builds, reconciled totals and fix diff.
 
 ## Stopped: Tour overview one-load gate verification
 - One-shot gate and remembered twelve-hour shells added; focused 137 passed, including eleven new gate tests.
