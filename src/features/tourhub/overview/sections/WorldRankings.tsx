@@ -1,3 +1,4 @@
+import { OverviewReadinessBand, overviewQueryReady, useOverviewBandReady } from '../../components/overview-v3/overviewShells';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
@@ -131,6 +132,7 @@ function ClimbCard({ rows, basisDays, comparisonDate, latestDate, onOpen }: {
 }) {
   const climber = basisDays != null ? pickBiggestClimb(rows) : null;
   const history = useClimberRankHistory(climber?.playerId ?? null, latestDate);
+  useOverviewBandReady('climber', overviewQueryReady(history, !!climber?.playerId && !!latestDate));
   if (!climber || climber.movement == null || !climber.playerId) return null;
   const line = sparkline(history.data ?? []);
   return (
@@ -170,13 +172,15 @@ export function WorldRankings() {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
   const [board, setBoard] = useState<RankingsBoard>('owgr');
-  const { data, isLoading } = useRankingsBoards(board);
+  const rankingsQuery = useRankingsBoards(board);
+  const { data, isLoading } = rankingsQuery;
   const follows = useTourPlayerFollows();
   const followedIds = [...follows.ids];
   const followed = useFollowedBoardRows(board, followedIds, data?.latestDate ?? null, followedIds.length > 0);
 
   const allRows = data?.rows ?? [];
-  if (!isLoading && allRows.length === 0) return null;
+  useOverviewBandReady('unused-rankings', overviewQueryReady(rankingsQuery));
+  if (!isLoading && allRows.length === 0) return <OverviewReadinessBand id="rankings" hero base={overviewQueryReady(rankingsQuery)} expect={[]} />;
   const rows = allRows.slice(0, 5);
   const basisDays = data?.basisDays ?? null;
   const leaderPoints = rows[0]?.points ?? null;
@@ -207,6 +211,7 @@ export function WorldRankings() {
   const openPlayer = (playerId: string) => navigate(`/tourhub/player/${playerId}`);
 
   return (
+<OverviewReadinessBand id="rankings" hero base={overviewQueryReady(rankingsQuery)} expect={board === 'owgr' ? ['climber'] : []}>
     <section>
       <OverviewSectionHead title={t('overview.rankings.sectionEyebrow')} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=players&view=all&lens=stats&stat=world_rank')} />
       <RailChips options={BOARDS} value={board} onChange={(next) => setBoard(next as RankingsBoard)} ariaLabel={t('overview.rankings.sectionEyebrow')} distribute style={{ margin: 0, padding: '0 24px' }} />
@@ -248,5 +253,6 @@ export function WorldRankings() {
         <ClimbCard rows={allRows} basisDays={basisDays} comparisonDate={data?.comparisonDate ?? null} latestDate={data?.latestDate ?? null} onOpen={openPlayer} />
       ) : null}
     </section>
+    </OverviewReadinessBand>
   );
 }

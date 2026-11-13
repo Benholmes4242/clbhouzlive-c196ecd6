@@ -72,6 +72,8 @@ export interface AIPredictionData {
 }
 
 export interface UseAIPredictionsResult {
+  /** Existing selected query settlement, for the overview reveal only. */
+  ready: boolean;
   data: AIPredictionData | null | undefined;
   isLoading: boolean;
   error: Error | null;
@@ -153,6 +155,7 @@ export function useAIPredictions(tournamentIdArg?: string | null): UseAIPredicti
   });
 
   return {
+    ready: !(scoped ? !!scopedTid : true) || (scoped ? scopedQuery.isFetched || scopedQuery.isError : mainQuery.isFetched || mainQuery.isError),
     data: result?.predictions ?? undefined,
     isLoading: scoped ? scopedQuery.isLoading : mainQuery.isLoading,
     error: (scoped ? scopedQuery.error : mainQuery.error) as Error | null,

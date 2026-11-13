@@ -1,3 +1,4 @@
+import { overviewQueryReady } from '../../components/overview-v3/overviewShells';
 /** Overview News observes the hero's existing tournaments-cache without a
  * query function or tournament read. A single filtered board request covers
  * every shown live story; names for non-live followed players are batched.
@@ -51,5 +52,5 @@ export function useOverviewNewsData(stories: TourStory[]) {
     const board: BoardEntry[] = (boards.isError ? [] : boards.data ?? []).filter(entry => entry.tournament_id === story.tournament_id);
     result.set(story.id, { isNew: false, liveRound: round, players: newsPlayers(story, follows, namesById, board, round), followedPlayer: newsPlayers(story, follows, namesById, board, null)[0] });
   }
-  return result;
+  return Object.assign(result, { ready: overviewQueryReady(boards, tournamentIds.length > 0 && playerIds.length > 0) && overviewQueryReady(names, followed.length > 0) });
 }

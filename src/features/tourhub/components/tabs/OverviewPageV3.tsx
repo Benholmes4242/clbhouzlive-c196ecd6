@@ -6,7 +6,9 @@
  * News lens and both story ids are excluded from News's unchanged composition.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { PageLoadGate, settled, useSectionReady } from '@/components/courses/browse/PageLoadGate';
+import { TOUR_OVERVIEW_GATE_IDS, TourOverviewShell, readOverviewShape, ShapeAfterReveal } from '../overview-v3/overviewShells';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
@@ -40,7 +42,10 @@ export function OverviewPageV3() {
   // The hero river crosses tours, so its tournament match and the explicit
   // "any story" 48-hour fallback must read the unfiltered feed. News retains
   // the overview's selected-tour lens from its previous implementation.
-  const { stories } = useTourStories(null);
+  const storiesQuery = useTourStories(null);
+  const { stories } = storiesQuery;
+  const [shape] = useState(() => readOverviewShape(selectedTourSlug));
+  const contentRef = useRef<HTMLDivElement>(null);
   const newsStories = selectedTourSlug && selectedTourSlug !== 'all'
     ? stories.filter((story) => story.tour_slug == null || story.tour_slug === selectedTourSlug)
     : stories;
@@ -49,6 +54,8 @@ export function OverviewPageV3() {
   const excludedStoryIds = [bandStory, slotStory].flatMap(story => story ? [story.id] : []);
   const newsSelection = selectOverviewNews(newsStories, excludedStoryIds);
   const newsPresentation = useOverviewNewsData(newsSelection.hero ? [newsSelection.hero, ...newsSelection.features, ...newsSelection.rows] : []);
+
+  // Stories remain inside the shared gate context via the readiness child below.
 
   // The overview's island label describes the lens used by its sections, not
   // the tour of whichever tournament happens to be visible in the hero.
@@ -94,6 +101,10 @@ export function OverviewPageV3() {
       >
         {/* Tour Hub Hero River — self-contained carousel crossing all tours.
             See OverviewHero.tsx. */}
+        <PageLoadGate expect={TOUR_OVERVIEW_GATE_IDS} fallback={<TourOverviewShell shape={shape} />}>
+        <div ref={contentRef}>
+        <StoriesReady ready={settled(storiesQuery) && (newsSelection.hero == null || newsPresentation.ready)} />
+        <ShapeAfterReveal lens={selectedTourSlug} root={contentRef} />
         <OverviewHero />
 
         {/* T1 sentinel — first ordinary content, immediately below the hero.
@@ -119,8 +130,12 @@ export function OverviewPageV3() {
             </div>
           </div>
         </div>
+        </div>
+        </PageLoadGate>
         <ScrollToTopGlass />
       </motion.div>
     </>
   );
 }
+
+function StoriesReady({ ready }: { ready: boolean }) { useSectionReady('stories', ready); return null; }

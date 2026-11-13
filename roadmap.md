@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Tour overview one-load gate
+- Add one-shot readiness across all five sections and the first hero slide only.
+- Share remembered twelve-hour skeleton shapes between route and gate; verify 320px and four separate shards.
+- Preserve the prior composer stop; five known composerTagging failures remain outside this request.
+
 ## Stopped: Composer tagging
 - Fix Played with pointer/focus and pending/empty results; rank up to twenty search rows into eight.
 - Add canonical title mentions with plain eighty-character limit, draft restoration and deduplicated submission.

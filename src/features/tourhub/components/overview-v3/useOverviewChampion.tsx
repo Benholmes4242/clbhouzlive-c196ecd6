@@ -1,3 +1,4 @@
+import { overviewQueryReady, useOverviewBandReady } from './overviewShells';
 /**
  * THE OVERVIEW CHAMPION — ONE derivation, two readers (extracted from
  * HybridHero for BUILD_TOUR_BUTTONS_UNDER_HERO §1). HybridHero needs the
@@ -46,7 +47,9 @@ function closingGross(round4: number | null | undefined, par: number | null | un
 
 export function useOverviewChampion(slide: HeroSlide, state: HeroState) {
   const { tournament } = slide;
-  const { data: leaderboard = [] } = useTourLeaderboard(state.kind === 'upcoming' ? '' : tournament.id);
+  const championQuery = useTourLeaderboard(state.kind === 'upcoming' ? '' : tournament.id);
+  const leaderboard = championQuery.data ?? [];
+  useOverviewBandReady('champion', overviewQueryReady(championQuery, state.kind !== 'upcoming'));
   const rows = Array.isArray(leaderboard) ? leaderboard : [];
   const top = rows[0];
   const needsInitials = useMemo(() => teamNamesNeedInitials(rows), [rows]);

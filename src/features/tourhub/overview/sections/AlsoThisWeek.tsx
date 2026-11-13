@@ -1,3 +1,4 @@
+import { settled, useSectionReady } from '@/components/courses/browse/PageLoadGate';
 import { useAlsoWeekData } from './useAlsoWeekData';
 import { AlsoWeekEvent } from './AlsoWeekEvent';
 import { useTourPlayerFollows } from '../../leaderboard/useTourPlayerFollows';
@@ -28,6 +29,7 @@ export function AlsoThisWeek() {
   const { t } = useTranslation('tourhub');
   const { alsoWeek: others } = useOverviewEventsAbove();
   const data = useAlsoWeekData(others);
+  useSectionReady('alsoThisWeek', others.length === 0 || settled(data));
   const follows = useTourPlayerFollows(others.length > 0);
   const liveCount = others.filter(s => s.type === 'live').length;
   if (others.length === 0) return null;

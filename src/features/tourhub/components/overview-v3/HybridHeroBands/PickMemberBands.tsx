@@ -1,3 +1,4 @@
+import { overviewQueryReady, useOverviewBandReady } from '../overviewShells';
 /** Opt-in event-scoped additions keep the existing three card engine separate
  * from member/session reads; the real overview supplies the event season.
  * The members strip reads only public picks plus the caller's board snapshot;
@@ -41,6 +42,7 @@ export function PickMemberBands({ tournamentId, tourCode, seasonYear, phase, cur
   const gate=useGuestActionGate();
   const openMine=()=>{if(gate('pick')) return; onPick();};
   const mineTees=usePickTeeTimes(tournamentId,phase==='upcoming'?1:currentRound??1,state?.my_player_id?[state.my_player_id]:[],{enabled:Boolean(state?.my_player_id && phase!=='completed')});
+  useOverviewBandReady('members', overviewQueryReady(boardQuery, !!tournamentId) && overviewQueryReady(guest ? guestLock : stateQuery, !!tournamentId) && overviewQueryReady(mineTees, !!state?.my_player_id && phase !== 'completed'));
   return <>
     {!guestLock.isError && <YourPickCard state={state} circleRank={circleRank} phase={phase} ourResults={pickResults} tourCode={tourCode} onPick={openMine} onSeePicks={view=>onPick(view)} boardRows={boardRows} guest={guest} teeTime={state?.my_player_id ? mineTees.data?.get(state.my_player_id) : null} started={state?.my_player_id ? startedPlayers.has(state.my_player_id):false}/>}
     {state?.locked && !state.my_player_id && mostPicked && <div data-members-picks-strip style={{margin:'14px 20px 0',paddingTop:14,borderTop:'1px solid var(--pick-hair)',minWidth:0}}>

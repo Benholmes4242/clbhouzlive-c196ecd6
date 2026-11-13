@@ -1,3 +1,4 @@
+import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
 /** Shared picks presentation owns both overview and tournament cards. Defaults
  * preserve the signed-off overview; no event reads or automatic mutations here.
  * The season-record hook/door belongs here (never in member bands), so all
@@ -189,6 +190,7 @@ export function PicksBlock({
   }, [teeDay]);
 
   return (
+<OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={seasonYear != null ? ['members'] : []}>
     <div data-overview-picks style={{ paddingTop: 8 }}>
       <div data-overview-picks-hairline style={{ margin: '0 20px', borderTop: `1px solid ${WHITE_ALPHA_06}` }} />
       <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
@@ -302,6 +304,7 @@ export function PicksBlock({
       </div>
       {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} boardByPlayer={boardByPlayer} onPick={onOpenYourPick}/>}
     </div>
+    </OverviewReadinessBand>
   );
 }
 

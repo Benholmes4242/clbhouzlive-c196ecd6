@@ -1,3 +1,4 @@
+import { overviewQueryReady, useOverviewBandReady } from './overviewShells';
 /** Shared selected-upcoming snapshot. Draw rows use AlsoThisWeek's exact
  * sr_tee_times → sr_tee_time_players → sr_players source via useTeeTimesAll.
  * Before publication the canonical get_pick_field supplies membership/rank;
@@ -25,6 +26,7 @@ export function useUpcomingOverview(id: string | null) {
   } else {
     for (const player of ranked) players.set(player.player_id, { id: player.player_id, name: player.full_name, worldRank: player.world_rank });
   }
+  useOverviewBandReady('upcoming', !id || [fieldQuery, drawQuery, lastQuery, metaQuery, holesQuery].every(query => overviewQueryReady(query)));
   return { field: [...players.values()], drawn, first: drawn ? groups[0]?.teeTime ?? null : null,
     last: !id || lastQuery.isError ? [] : lastQuery.data ?? [],
     zone: !id || metaQuery.isError ? null : metaQuery.data?.course_timezone ?? metaQuery.data?.timezone ?? null,

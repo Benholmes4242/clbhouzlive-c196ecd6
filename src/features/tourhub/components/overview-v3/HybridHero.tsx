@@ -1,3 +1,4 @@
+import { overviewQueryReady, useOverviewBandReady, OverviewReadinessBand } from './overviewShells';
 /** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once).
  *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: the "Full board ›" kicker link is gone in
  *  EVERY state — the Full leaderboard button under the board (OverviewHero)
@@ -127,7 +128,9 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   // Live before anyone tees off: the situation names the first tee time, read
   // from the same tee-time source LeadersGroup uses.
   const notStarted = state.kind === 'live' && !fieldHasStarted(rows);
-  const { data: currentTees } = useTeeTimesAll(tournament.id, state.kind === 'live' ? state.round : 1, { enabled: notStarted });
+  const currentTeesQuery = useTeeTimesAll(tournament.id, state.kind === 'live' ? state.round : 1, { enabled: notStarted });
+  const currentTees = currentTeesQuery.data;
+  useOverviewBandReady('photo', overviewQueryReady(currentTeesQuery, notStarted));
   const firstTeeTime = notStarted ? earliestTeeTime(currentTees) : null;
 
   const leader = isInPlayState(state) ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;

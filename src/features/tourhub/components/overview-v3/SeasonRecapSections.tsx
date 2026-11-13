@@ -1,3 +1,4 @@
+import { overviewQueryReady, useOverviewBandReady } from './overviewShells';
 /**
  * SEASON RECAP SURFACES (rules: seasonRecapRules.ts; data: useSeasonRecap.ts).
  * RecapPhotoBand renders the shared PhotoBand with the recap kicker, title,
@@ -152,7 +153,9 @@ export function RecapCardList({ tour, data }: { tour: TourId; data: SeasonRecapD
 export function RecapOurRecord({ tour, year }: { tour: TourId; year: number }) {
   const { t } = useTranslation('tourhub');
   const [open, setOpen] = useState(false);
-  const { data: record, isError } = useOurPickRecord(tour, year);
+  const recordQuery = useOurPickRecord(tour, year);
+  const { data: record, isError } = recordQuery;
+  useOverviewBandReady('recapRecord', overviewQueryReady(recordQuery, !!tour && !!year));
   if (isError || !record || !((record.event_count ?? 0) > 0)) return null;
   return <section data-recap-record className="upcoming-block recap-block">
     <div className="recap-head"><h2 className="upcoming-kicker">{t('overview.recap.ourRecord', { year })}</h2><Button variant="ghost" className="recap-link" onClick={() => setOpen(true)}>{t('overview.recap.howWePick')}</Button></div>

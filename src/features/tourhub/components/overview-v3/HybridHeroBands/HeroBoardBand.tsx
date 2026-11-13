@@ -1,3 +1,4 @@
+import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
 /**
  * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
  * The hero is a broadcast surface. Tracked-out caps over photography read
@@ -348,7 +349,8 @@ export function HeroBoardSection({
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = eventTourCode ?? viewingTourSlug ?? 'pga';
   const picksTid = picksOnly ? tournamentId : (viewingTournamentId ?? tournamentId);
-  const { data: predictions } = useAIPredictions(picksTid);
+  const predictionsQuery = useAIPredictions(picksTid);
+  const predictions = predictionsQuery.data;
   const picks = (predictions?.topContenders ?? []) as AITopContender[];
   const hasPicks = picks.length > 0;
   const [picksOpen, setPicksOpen] = useState(false);
@@ -365,7 +367,8 @@ export function HeroBoardSection({
   /* Picks tee line: the stored tee sheet for the current round (round 1 when
      upcoming), and which picks have started under the one has-started rule. */
   const teeRound = phase === 'upcoming' ? 1 : (currentRound ?? 1);
-  const { data: pickTees } = usePickTeeTimes(picksTid, teeRound, picks.map((p) => String(p?.playerId ?? '')), { enabled: phase !== 'completed' });
+  const pickTeesQuery = usePickTeeTimes(picksTid, teeRound, picks.map((p) => String(p?.playerId ?? '')), { enabled: phase !== 'completed' });
+  const pickTees = pickTeesQuery.data;
   const startedPlayers = useMemo(() => {
     const set = new Set<string>();
     for (const entry of entries) {
@@ -472,6 +475,7 @@ export function HeroBoardSection({
 
 
   return (
+    <OverviewReadinessBand id="band" base={overviewQueryReady({ isFetched: predictionsQuery.ready }, !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
     <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
       {!picksOnly && movementCards.length > 0 && currentRound != null ? (
         <RoundMovementBand round={currentRound} cards={movementCards} />
@@ -550,6 +554,7 @@ export function HeroBoardSection({
       {eventSeasonYear != null && <OurRecordSheet open={recordOpen} onClose={()=>setRecordOpen(false)} tour={pickTourCode} year={eventSeasonYear}/>}
 
     </div>
+    </OverviewReadinessBand>
   );
 }
 

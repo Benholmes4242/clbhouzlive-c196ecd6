@@ -1,3 +1,4 @@
+import { OverviewReadinessBand, overviewQueryReady } from './overviewShells';
 /**
  * OverviewHero — Hero River. The carousel crosses ALL tours in the
  * editorial order returned by useHeroCarouselData (LIVE→majors→rest).
@@ -61,15 +62,18 @@ export const OVERVIEW_HERO_TOTAL_HEIGHT = `${OVERVIEW_PHOTO_BAND_HEIGHT}px`;
 export function OverviewHero({ height }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const { data: carouselSlides = [], isLoading: carouselLoading } = useHeroCarouselData();
+  const carouselQuery = useHeroCarouselData();
+  const { data: carouselSlides = [], isLoading: carouselLoading } = carouselQuery;
   /* URGENT_FIX §3: every overview tour always has a slide. The fallback only
      fills tours the carousel lacks; useHeroCarouselData itself is unchanged. */
-  const { data: fallbackSlides = [], isLoading: fallbackLoading } = useOverviewFallbackSlides(carouselSlides, !carouselLoading);
+  const fallbackQuery = useOverviewFallbackSlides(carouselSlides, !carouselLoading);
+  const { data: fallbackSlides = [], isLoading: fallbackLoading } = fallbackQuery;
   const mergedSlides = useMemo(() => [...carouselSlides, ...fallbackSlides], [carouselSlides, fallbackSlides]);
   /* SEASON RECAP (seasonRecapRules.ts): a tour between seasons shows ONE
      recap slide built from its last completed event, replacing its stale
      finished slide or a far-off upcoming slide. A live slide always wins. */
-  const { data: recapCandidates } = useOverviewRecaps(!carouselLoading);
+  const recapsQuery = useOverviewRecaps(!carouselLoading);
+  const { data: recapCandidates } = recapsQuery;
   const recaps = useMemo(() => {
     const out = new Map<string, OverviewRecapCandidate>();
     if (!recapCandidates) return out;
@@ -198,7 +202,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const activeRecap = activeSlide && recaps.get(activeSlide.tournament.tourSlug)?.last.id === activeSlide.tournament.id
     ? recaps.get(activeSlide.tournament.tourSlug)!
     : null;
-  const { data: recapData } = useSeasonRecap(
+  const recapQuery = useSeasonRecap(
     activeRecap ? (activeRecap.last.tourSlug as TourId) : null,
     activeRecap?.seasonId ?? null,
     activeRecap?.last.seasonYear ?? null,
@@ -212,6 +216,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
    * `slide.type` is never consulted for this — see the bucketing note in
    * useHeroCarouselData.
    */
+  const recapData = recapQuery.data;
   const [now, setNow] = useState(() => new Date());
   const heroState = useMemo(
     () => (activeSlide ? deriveHeroState(activeSlide.tournament, now) : null),
@@ -250,7 +255,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // positions); boardRound is null there, so no TODAY. Same query
   // key as HybridHero.tsx, so a completed slide is a cache hit.
   const boardTournamentId = !heroState || heroState.kind === 'upcoming' || activeRecap ? null : viewingTid;
-  const { data: boardLeaderboard, isLoading: boardLeaderboardLoading, dataUpdatedAt: boardUpdatedAt } = useTourLeaderboard(boardTournamentId ?? '');
+  const boardQuery = useTourLeaderboard(boardTournamentId ?? '');
+  const { data: boardLeaderboard, isLoading: boardLeaderboardLoading, dataUpdatedAt: boardUpdatedAt } = boardQuery;
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
   const boardRound = heroState && isInPlayState(heroState) ? heroState.round : null;
 
@@ -354,16 +360,17 @@ export function OverviewHero({ height }: OverviewHeroProps) {
     }
   }, [activeIndex, idSignature]);
 
+  const firstPaintReady = overviewQueryReady(carouselQuery) && overviewQueryReady(fallbackQuery, !carouselLoading && OVERVIEW_TOUR_ORDER.some(tour => !carouselSlides.some(slide => slide.tournament.tourSlug === tour))) && overviewQueryReady(recapsQuery, !carouselLoading) && overviewQueryReady(boardQuery, !!boardTournamentId) && overviewQueryReady(recapQuery, !!activeRecap && activeRecap.last.seasonYear != null && !!activeRecap.last.endDate);
   if (isLoading || count === 0 || !heroState) {
     return (
-      <div
+<OverviewReadinessBand id="hero" hero base={firstPaintReady} expect={[]}><div
         style={{
           height,
           borderRadius: 20,
           background: OVERVIEW_HERO_LOADING_BG,
         }}
         aria-busy={isLoading}
-      />
+      /></OverviewReadinessBand>
     );
   }
 
@@ -394,7 +401,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
 
 
   return (
-    <>
+<OverviewReadinessBand key={active.tournament.id} id="hero" hero base={firstPaintReady} expect={activeRecap ? ['recapRecord'] : ['photo', 'champion', 'band', ...(heroState.kind === 'upcoming' ? ['upcoming'] : [])]}>
     <div
       data-overview-hero-frame
       style={{
@@ -508,7 +515,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
       )}
     </AnimatePresence>
     {fullBoardAvailable && boardTournamentId ? <FullBoardSheet open={fullBoard.open} onClose={fullBoard.onClose} tournamentId={boardTournamentId} meta={fullBoard.meta} entries={boardEntries} /> : null}
-    </>
+    </OverviewReadinessBand>
   );
 
 }
