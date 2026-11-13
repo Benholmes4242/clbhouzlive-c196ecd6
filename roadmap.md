@@ -1,9 +1,9 @@
 # Roadmap
 
-## In progress: Member-shot gallery layout
+## Complete: Member-shot gallery layout
 - Share one gallery-layout predicate for rect, backdrop, gradient and notch protection; leave chrome and open calls unchanged.
-- Add synthetic/non-synthetic regression tests and run four separate shards from baseline 8,573.
-- Report changed lines, CSS loading, assertion changes and totals.
+- Nine new synthetic/non-synthetic regression cases; separate shards 2,170 / 2,036 / 2,179 / 2,197 = 8,582 passed (+9 from 8,573).
+- Changed lines, CSS loading and assertion accounting: .lovable/reports/member-shot-gallery-layout.md. Real-member browser checks remain unverified.
 
 ## Complete: Follow tile posted-age lines
 - New pure tilePostedLine (days/weeks/months/over-a-year) replaces activityLine on the tile only; active ring unchanged.
