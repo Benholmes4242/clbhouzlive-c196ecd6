@@ -24309,6 +24309,17 @@ export type Database = {
           whs_score_id: string
         }[]
       }
+      get_follow_tile_media: {
+        Args: { p_business_ids: string[]; p_user_ids: string[] }
+        Returns: {
+          aspect_ratio: number
+          id: string
+          image_url: string
+          kind: string
+          media_type: string
+          posted_at: string
+        }[]
+      }
       get_friend_course_activity: {
         Args: { p_course_ids: string[]; p_user_id: string }
         Returns: {
