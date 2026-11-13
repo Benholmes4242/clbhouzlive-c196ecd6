@@ -18,8 +18,7 @@
  * BRIEF_MECHANISM_PAIRING_2: the selection defaults to the newest round in the
  * twenty, and a tap only selects — this section never opens RoundDetailSheet.
  * The two-line detail block always renders, so the section never moves.
- * NET IS ABSENT, NOT APPROXIMATED: whs_scores carries no net figure, so the
- * net slot stays empty rather than being derived.
+ * NET comes from gam_round_net via useRoundNetScores, blank when absent.
  *
  * NINE HOLES CARRY NO MARK HERE: WHS states every differential on an
  * eighteen-hole basis, so every point is already on one scale.
@@ -38,6 +37,8 @@ import { HcpSection } from './HcpSection';
 import { CHART } from '../charts';
 import LastTwentyBars from '../charts/LastTwentyBars';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { MEMBER_PANEL, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { useRoundNetScores } from '@/components/explore-tab-new/courseled/hooks/useRoundNetScores';
 
 /** A full rolling window. Below this the section states the sample instead. */
 const MIN_ROUNDS = 20;
@@ -74,7 +75,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
    * arrives on useAllScores (whs_scores), the same read the posted-history
    * sheet uses.
    */
-  const window20 = useMemo(() => {
+  const windowBase = useMemo(() => {
     if (!allScores || allScores.length === 0) return [];
     return counterWindow(allScores)
       .sort((a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime())
@@ -86,10 +87,15 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         course_name: r.course?.name ?? null,
         gross: r.adjusted_gross ?? null,
         par: r.course_par ?? null,
-        /* Not carried by whs_scores — absent, never derived (AA3). */
-        net: null as number | null,
       }));
   }, [allScores]);
+
+  /* ONE batched net read for the whole window, keyed on whs_scores ids. */
+  const nets = useRoundNetScores(windowBase.map((r) => r.id));
+  const window20 = useMemo(
+    () => windowBase.map((r) => ({ ...r, net: nets.get(r.id)?.net ?? null as number | null })),
+    [windowBase, nets],
+  );
 
   const withheld = !isLoading && total > 0 && total < MIN_ROUNDS;
   const withheldFired = useRef(false);
@@ -179,8 +185,13 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                 >
                   {selected.course_name ?? ''}
                 </span>
-                <span data-testid="detail-date" style={{ fontSize: 11, fontWeight: 600, color: CHART.DIM, flexShrink: 0, ...FIG }}>
-                  {formatDayMonthShortGB(selected.play_date)}
+                <span
+                  data-testid="detail-counts"
+                  style={{ fontSize: 12.5, fontWeight: 700, flexShrink: 0, color: selected.is_counter ? A.IMPROVED : CHART.MUTE }}
+                >
+                  {selected.is_counter
+                    ? t('common:handicap.roundsThatCount.counts')
+                    : t('common:handicap.roundsThatCount.doesNotCount')}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4, whiteSpace: 'nowrap' }}>
@@ -198,13 +209,8 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                     <span data-testid={`detail-${k}`} style={{ fontSize: 12.5, fontWeight: 700, color: CHART.INK, ...FIG }}>{v}</span>
                   </span>
                 ))}
-                <span
-                  data-testid="detail-counts"
-                  style={{ fontSize: 12.5, fontWeight: 700, color: selected.is_counter ? A.IMPROVED : CHART.MUTE }}
-                >
-                  {selected.is_counter
-                    ? t('common:handicap.roundsThatCount.counts')
-                    : t('common:handicap.roundsThatCount.doesNotCount')}
+                <span data-testid="detail-date" style={{ fontSize: 11, fontWeight: 600, color: CHART.DIM, marginLeft: 'auto', ...FIG }}>
+                  {formatDayMonthShortGB(selected.play_date)}
                 </span>
               </div>
             </>
@@ -221,25 +227,18 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           labels={window20.map(roundLabel)}
         />
 
-        {/* §4.6 THE COUNTING EIGHT — chips best first, each with a course tag. */}
+        {/* §4.6 THE COUNTING EIGHT — two-column tiles, best first, full course names. */}
         {countingEight.length > 0 && (
-          <div
-            style={{
-              marginTop: 14,
-              border: `1px solid ${A.IMPROVED}`,
-              borderRadius: 12,
-              padding: 11,
-            }}
-          >
+          <>
             <div
               style={{
-                fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
+                marginTop: 22, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em',
                 textTransform: 'uppercase', color: A.IMPROVED,
               }}
             >
               {t('common:handicap.mechanism.countingEight')}
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 9 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginTop: 10 }}>
               {countingEight.map((r) => (
                 <button
                   key={r.id}
@@ -249,29 +248,39 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                   aria-pressed={activeId === r.id}
                   onClick={() => onSelect(window20.findIndex((w) => w.id === r.id))}
                   style={{
-                    display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
-                    gap: 2, padding: '6px 8px', margin: 0, background: 'transparent',
+                    display: 'flex', flexDirection: 'column', gap: 10,
+                    padding: '11px 12px 10px', borderRadius: 12, background: MEMBER_PANEL,
+                    border: 0, margin: 0, textAlign: 'left', minWidth: 0,
                     font: 'inherit', cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-                    border: `1px solid ${CHART.BORDER}`, borderRadius: 8,
-                    opacity: activeId != null && activeId !== r.id ? 0.55 : 1,
+                    /* Dim the other seven only when the selected round is one of the eight. */
+                    opacity: activeId != null && activeId !== r.id && countingEight.some((c) => c.id === activeId) ? 0.55 : 1,
                   }}
                 >
-                  <span style={{ fontSize: 11.5, fontWeight: 800, color: CHART.INK, ...FIG }}>
-                    {fmtDiff(r.diff as number)}
-                  </span>
                   <span
                     style={{
-                      fontSize: 8.5, fontWeight: 700, letterSpacing: '0.09em',
-                      textTransform: 'uppercase', color: CHART.DIM,
-                      maxWidth: 72, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontSize: 12.5, fontWeight: 600, lineHeight: 1.3,
+                      color: inkWithAlpha(CHART.INK, 0.86), overflowWrap: 'anywhere',
                     }}
                   >
                     {r.course_name ?? ''}
                   </span>
+                  <span style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 600, color: CHART.DIM, whiteSpace: 'nowrap' }}>
+                      {formatDayMonthShortGB(r.play_date)}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 22, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1,
+                        fontVariantNumeric: 'tabular-nums lining-nums', color: A.IMPROVED,
+                      }}
+                    >
+                      {fmtDiff(r.diff as number)}
+                    </span>
+                  </span>
                 </button>
               ))}
             </div>
-          </div>
+          </>
         )}
       </HcpSection>
 

@@ -19,6 +19,7 @@ const scores = diffs.map((d, i) => ({
   course_par: 72,
 }));
 vi.mock('@/lib/whs/hooks', () => ({ useAllScores: () => ({ data: scores, isLoading: false }) }));
+vi.mock('@/components/explore-tab-new/courseled/hooks/useRoundNetScores', () => ({ useRoundNetScores: () => new Map([['s3', { net: 69 }]]) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 vi.mock('../round-detail/RoundDetailSheet', () => ({
   default: (props: { open: boolean; scoreId: string; onClose: () => void }) => {
@@ -53,6 +54,7 @@ it('a chip tap updates the detail block and lights the matching bar, opening not
   fireEvent.click(chipFor('s3'));
   expect(detail('course')).toBe('Course 3');
   expect(detail('gross')).toBe('73 (+1)');
+  expect(detail('net')).toBe('69');
   expect(detail('diff')).toBe('3.0');
   expect(barFor('Course 3').getAttribute('aria-pressed')).toBe('true');
   expect((barFor('Course 4').firstChild as HTMLElement).style.opacity).toBe('0.55');
@@ -83,6 +85,18 @@ it('a second tap keeps the selection', () => {
   fireEvent.click(chipFor('s6'));
   expect(chipFor('s6').getAttribute('aria-pressed')).toBe('true');
   expect(detail('course')).toBe('Course 6');
+});
+
+it('dims the other seven tiles only when the selected round counts', () => {
+  mount();
+  // Default selection is the newest round (s0), which counts.
+  document.querySelectorAll('[data-round-id]').forEach((c) => {
+    expect((c as HTMLElement).style.opacity).toBe(c.getAttribute('data-round-id') === 's0' ? '1' : '0.55');
+  });
+  fireEvent.click(barFor('Course 10'));
+  document.querySelectorAll('[data-round-id]').forEach((c) => {
+    expect((c as HTMLElement).style.opacity).toBe('1');
+  });
 });
 
 it('a non-counting bar selects itself, lights no chip, and a null net renders empty', () => {
