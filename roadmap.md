@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Follow tile posted-age lines
+- New pure tilePostedLine (days/weeks/months/over-a-year) replaces activityLine on the tile only; active ring unchanged.
+- findPeople.tile.* keys added to all six locale files; +16 tests.
+- Shards 2,170 / 2,032 / 2,181 / 2,190 = 8,573 passed. Report: .lovable/reports/follow-tile-posted-age.md.
+
 ## Complete: Counting eight A2 tile grid + NET
 - NET via one useRoundNetScores call; detail block lines swapped (counts right of course, date after DIFF).
 - Two-column tile grid replaces the chip box; dimming only when the selected round counts.

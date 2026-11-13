@@ -98,6 +98,11 @@ describe('Option B source priority', () => {
     expect(follow.className).toContain('follow-tile-follow');
     expect(dismiss.className).toContain('follow-tile-dismiss');
   });
+  it('a post three days old reads Posted 3 days ago', async () => {
+    h.media=[{ ...mediaRow('person'), posted_at:new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() }];
+    render(<WhoToFollowRail slot={1}/>,{wrapper});
+    await waitFor(()=>expect(tile('person').querySelector('[data-testid="rail-when"]')?.textContent).toBe('Posted 3 days ago'));
+  });
   it('makes one media call per mounted rail surface', async () => {
     render(<><WhoToFollowRail slot={1}/><KindRail kind="pro"/></>,{wrapper});
     await waitFor(()=>expect(h.rpc.mock.calls.filter(c=>c[0]==='get_follow_tile_media')).toHaveLength(2));

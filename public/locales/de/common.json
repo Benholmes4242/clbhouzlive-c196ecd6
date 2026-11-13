@@ -918,6 +918,15 @@
       "postedMinutes": "Posted {{n}}m ago",
       "postedHours": "Posted {{n}}h ago",
       "postedYesterday": "Posted yesterday"
+    },
+    "tile": {
+      "postedDays_one": "Posted {{count}} day ago",
+      "postedDays_other": "Posted {{count}} days ago",
+      "postedWeeks_one": "Posted {{count}} week ago",
+      "postedWeeks_other": "Posted {{count}} weeks ago",
+      "postedMonths_one": "Posted {{count}} month ago",
+      "postedMonths_other": "Posted {{count}} months ago",
+      "postedOverYear": "Posted over a year ago"
     }
   }
 }

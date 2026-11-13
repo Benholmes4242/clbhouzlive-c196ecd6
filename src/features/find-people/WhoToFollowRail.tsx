@@ -71,7 +71,8 @@ import {
 } from './railRules';
 import { usePeopleToFollowByKind } from './usePeopleToFollowByKind';
 import { ActiveAvatarDoor } from './ActiveRing';
-import { activityLine, type RecentActivity } from './activeRingRules';
+import { type RecentActivity } from './activeRingRules';
+import { tilePostedLine } from './followTileRules';
 import { useRecentActivity } from './useRecentActivity';
 
 /** Cards hidden this session — shared by both slots and across feed remounts. */
@@ -470,7 +471,7 @@ function RailCardView({
     ? railGolferReason(card.person)
     : railBusinessReason(card.business, businessCategoryLabel(card.business));
   const { source, fail } = useFollowTileSource(media, coverUrl, sourcesSettled);
-  const line = source?.media ? activityLine({ actor_id: actorIdOf(card), kind: 'post', post_id: '', created_at: source.media.posted_at, course_name: null }, new Date()) : null;
+  const line = source?.media ? tilePostedLine(source.media.posted_at, new Date()) : null;
   const when = line ? t(line.key, { ...line.vars, defaultValue: line.def }) : '';
   const followers = !isPerson ? card.business.followers ?? 0 : 0;
   const kindFig = kind && kindRow ? kindFigures(kindRow) : null;
