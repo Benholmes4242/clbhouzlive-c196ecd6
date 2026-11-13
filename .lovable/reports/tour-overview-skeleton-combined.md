@@ -73,3 +73,18 @@
  5 files changed, 255 insertions(+), 37 deletions(-)
 ```
 - SQL, migrations, feed_config, queries and readiness unchanged by skeleton follow-ups.
+
+## Text-only measurement and wrapper follow-up
+- Four separate commands: `bunx vitest run --shard=1/4 --maxWorkers=2`, `bunx vitest run --shard=2/4 --maxWorkers=2`, `bunx vitest run --shard=3/4 --maxWorkers=2`, `bunx vitest run --shard=4/4 --maxWorkers=2`.
+- Totals: **2,155 / 2,024 / 2,161 / 2,118 = 8,458 passed**, zero failures. Baseline 8,456 + two new cases = 8,458.
+- `src/test/tourOverviewShellV2.test.tsx`: 20 → 22 cases. Gate remains 13. No existing tests renamed, rewritten or deleted.
+- New: **counts one text line inside a padded min-height record row** — `expect(readOverviewShape().picks?.recordLines).toBe(1)` with 34px container and 17.55px text.
+- New: **wraps all also-week events in one sibling after the head** — asserts two section children, one wrapper containing all three events, and wrapper directly after the head.
+- Focused 35/35 passed. Latest preview build OK.
+- Browser: real text Range records `{ sentenceLines: 1, recordLines: 1 }`; picks height 153.34px; head height 28px; head-to-wrapper gap exactly 10px. Controlled rendering, not authenticated loaded-page comparison.
+- Every measured field uses the shared text Range helper: picks sentence/record, also situation, coming event names, coming last-year text, news headline/details. Record line-height is read from its text span; Range excludes row padding and minimum height.
+
+### Follow-up git diff --stat
+```text
+
+```
