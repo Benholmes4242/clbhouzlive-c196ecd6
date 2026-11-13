@@ -534,7 +534,7 @@ describe('BRIEF_TOUR_OVERVIEW_MOCK_EXACT coverage', () => {
     expect(sole?.caps).toBe('A');
   });
 
-  it('(c) the tie cap renders once over a tied top group whose rows carry no position; absent when the top is not tied', () => {
+  it('(c) top ties show T1 on the first player and screen-reader positions on later players without a cap', () => {
     const mountLive = (entries: BoardEntry[]) => render(createElement(
       QueryClientProvider,
       { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
@@ -548,15 +548,16 @@ describe('BRIEF_TOUR_OVERVIEW_MOCK_EXACT coverage', () => {
       { id: 'd', position: 4, score: -4, thru: 9, round_1: -4, round_2: 0, player: { id: 'pd', full_name: 'Player D' } },
     ] as unknown as BoardEntry[];
     const view = mountLive(tied);
-    const caps = view.container.querySelectorAll('[data-hero-tie-cap]');
-    expect(caps.length).toBe(1);
-    expect(caps[0].textContent).toBe('T1Three tied');
-    const group = view.container.querySelector('[data-hero-tie-group]')!;
-    expect(group.querySelectorAll('[data-hero-tie="capped"]').length).toBe(3);
-    group.querySelectorAll('[data-hero-tie="capped"]').forEach((cell) => {
-      // CB57 adds an aria-hidden bracket, not a visible position label.
-      expect(cell.querySelector(':not(.sr-only):not([data-hero-tie-bracket])')).toBeNull();
-    });
+    expect(view.container.querySelector('[data-hero-tie-cap]')).toBeNull();
+    expect(view.container.querySelector('[data-hero-tie-group]')).toBeNull();
+    const cells = [...view.container.querySelectorAll('[data-hero-tie]')];
+    expect(cells.map(cell => cell.getAttribute('data-hero-tie'))).toEqual(['first', 'middle', 'last', 'solo']);
+    expect(cells[0].textContent).toBe('T1');
+    expect(cells[0].querySelector('.sr-only')).toBeNull();
+    for (const cell of cells.slice(1, 3)) {
+      expect(cell.querySelector('.sr-only')?.textContent).toBe('T1');
+      expect(cell.children).toHaveLength(1);
+    }
     view.unmount();
     const solo = mountLive([{ ...tied[0], position_tied: false }, { ...tied[3], position: 2 }] as BoardEntry[]);
     expect(solo.container.querySelector('[data-hero-tie-cap]')).toBeNull();

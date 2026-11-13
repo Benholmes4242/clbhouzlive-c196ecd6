@@ -35,7 +35,7 @@ import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
-import { OVERVIEW, countInWords } from '../../components/overview-v3/overviewTokens';
+import { OVERVIEW } from '../../components/overview-v3/overviewTokens';
 import { Button } from '@/components/ui/button';
 import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { formatTimeHm24 } from '@/i18n/format';
@@ -206,8 +206,6 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
   const showHeroRounds = heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
   const heroRoundTracks = heroRounds.map(() => `${HERO_ROUND_W}px`).join(' ');
-  const topTieLength = heroTopTieLength(rows);
-  const topTieCount = topTieLength > 0 ? entries.filter((e) => e.position === 1).length : 0;
   const overviewGrid = [
     showOverviewPosition ? `${HERO_POS_W}px` : null,
     'minmax(0, 1fr)',
@@ -263,7 +261,7 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
     <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600, color: ink }}>{overviewName(entity.lines[0])}</span>
   );
 
-  const renderRow = (r: Row, rowIndex: number, inTopTie: boolean, mine = false) => {
+  const renderRow = (r: Row, rowIndex: number, mine = false) => {
     const entity = resolveBoardEntity(r, needsInitials, nameTier);
     const tieRole = mine ? 'solo' : tieRoles[rowIndex];
     const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
@@ -309,12 +307,11 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
         className={tappable ? `${press} transition-colors` : undefined}
       >
         {showOverviewPosition ? (
-          /* CB57: capped and lower ties use the SAME stretched grid
-             cell and bracket; the cap still owns the visible T1 label. */
-          <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', ...HERO_POS_TYPE, letterSpacing: 0, color: ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-            {/* ONE MARKER PER TIE: capped/later rows are screen-reader only.
+          /* Top and lower ties share the same first/middle/last path. */
+          <div data-hero-tie={tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', ...HERO_POS_TYPE, letterSpacing: 0, color: ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+            {/* ONE MARKER PER TIE: later rows are screen-reader only.
                  No tie bracket — tied rows show the position once. */}
-            {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
+            {tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
           </div>
         ) : null}
         <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -383,24 +380,11 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
           ))}
           <div style={{ textAlign: 'center' }}>{t('board.columns.tot')}</div>
         </div>
-        {topTieLength === 0 ? rows.map((r, i) => renderRow(r, i, false)) : (
-          <>
-            <div data-hero-tie-cap style={{ padding: `9px ${bleed ? 0 : HERO_PAD_X}px 3px`, display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: OVERVIEW.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>T1</span>
-              <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
-                {t('overview.hero.tiedCaps', { words: countInWords(topTieCount, t) })}
-              </span>
-            </div>
-            <div data-hero-tie-group style={{ position: 'relative' }}>
-              {rows.slice(0, topTieLength).map((r, i) => renderRow(r, i, true))}
-            </div>
-            {rows.slice(topTieLength).map((r, i) => renderRow(r, i + topTieLength, false))}
-          </>
-        )}
+        {rows.map((r, i) => renderRow(r, i))}
         {extraRows && extraRows.length > 0 ? (
           <>
             <div data-hero-extra-rule style={{ height: 1, margin: '4px 0', background: 'var(--tour-board-empty)' }} />
-            {extraRows.map((r, i) => renderRow(r, rows.length + i, false, true))}
+            {extraRows.map((r, i) => renderRow(r, rows.length + i, true))}
           </>
         ) : null}
         {onFullBoard ? <Button variant="ghost" className="hero-full-leaderboard" data-hero-full-leaderboard data-field-size={entries.length} onClick={onFullBoard}>

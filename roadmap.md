@@ -1,5 +1,11 @@
 # Roadmap
 
+## Blocked: Gate-reveal notch strip and top tie rows
+- Re-measure hidden/revealed sentinels in the shared hook; preserve gates and scrim registry.
+- Remove shared board top tie cap and skeleton tie field; use v5 storage, preserving photo caption.
+- Run three new notch cases and authorised tie assertions, then four separate shards; report counts and named changes.
+- STOP: src/test/stickySafeAreaGate.test.tsx:18 — TypeError: Cannot redefine property: ResizeObserver. Focused run: 97 passed, 3 failed; shards not started. Preview build OK. Await authorisation to repair the new test observer setup.
+
 ## Complete: Tour skeleton text-only measurement and wrapper
 - Measure rendered text without container padding/min-height; preserve all other geometry.
 - Wrap Also this week events exactly as the loaded section.
