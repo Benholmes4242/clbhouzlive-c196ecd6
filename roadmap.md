@@ -1,9 +1,9 @@
 # Roadmap
 
-## In progress: Tour slot placement and shared photo height
+## Complete: Tour slot placement and shared photo height
 - Move the slot after post 8 and Pros after post 10; all sibling placements stay unchanged.
 - Import the shared hero photo height without moving the overlay or changing other styles.
-- Update the two placement cases; run four separate shards and report totals, named assertions and diff.
+- Two placement cases updated; separate shards passed 2,168 / 2,020 / 2,173 / 2,173 (8,534, unchanged). Report: .lovable/reports/tour-slot-placement-height.md.
 
 ## Complete: Four-build test verification and authorised repairs
 - Both final test-only repairs applied exactly; CSS assertions and Tour slot binding assertions preserved.
