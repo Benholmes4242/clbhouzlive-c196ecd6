@@ -11,7 +11,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { writeStoredTour } from '@/features/tourhub/hooks/useTourSelection';
-import { useOurPickRecord } from '@/features/tourhub/hooks/usePickInsights';
 import { useBatchCourseImages } from '@/features/tourhub/hooks/useBatchCourseImages';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
@@ -26,7 +25,6 @@ import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { INK, INK_SOFT, INK_MUTE, INK_FAINT, AMBER, TOUR_LIVE_GREEN } from '@/features/tourhub/_shared/tokens';
 import { FEED_CARD_SURFACE, MEMBER_CELL } from '@/lib/tokens/surfaces';
-import { HERO_PHOTO_HEIGHT } from '@/lib/heroHeights';
 import { countInWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import { formatOverviewDateRange } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { FeedPostActions, FeedAddComment } from '@/components/feed/FeedPostControls';
@@ -39,18 +37,18 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { useTourSlotData, type TourSlotVisit } from './useTourSlotData';
-import { TOUR_DISPLAY, slotPosition, pickScore, recordLine, bestOfThree, chaserSentence, type SlotSelection, type SlotPick } from './tourSlotRules';
+import { TOUR_DISPLAY, chaserSentence, type SlotSelection } from './tourSlotRules';
 
-// The slot photo sits 10px under the shared hero height so the card reads between the top islands and the floating nav.
-const TOUR_SLOT_PHOTO_HEIGHT = HERO_PHOTO_HEIGHT - 10;
+// The slot photo is a fixed 162px (signed off with the simpler slot).
+const TOUR_SLOT_PHOTO_HEIGHT = 162;
 const ellipsis: React.CSSProperties = { minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 const numeric: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 const caps: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '.16em', textTransform: 'uppercase' };
 const dateLabel = (date: string) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(`${date.slice(0,10)}T12:00:00Z`)).replace(',', '');
 const weekday = (date: string) => new Intl.DateTimeFormat('en-GB', { weekday: 'short', timeZone: 'Europe/London' }).format(new Date(`${date.slice(0,10)}T12:00:00Z`));
-export interface TourSlotViewProps { selection: SlotSelection; picks: readonly SlotPick[]; board: BoardEntry[]; image: string | null; record: string | null; sentence: string | null; chase: string | null; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
+export interface TourSlotViewProps { selection: SlotSelection; board: BoardEntry[]; image: string | null; sentence: string | null; chase: string | null; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
 
-export function TourSlotView({ selection, picks, board, image, record, sentence, chase, actions, comment, onOpen }: TourSlotViewProps) {
+export function TourSlotView({ selection, board, image, sentence, chase, actions, comment, onOpen }: TourSlotViewProps) {
   const { t } = useTranslation('tourhub');
   const { tournament: event, tour, state } = selection;
   const rows = board.filter(row => row.position != null).sort((a,b) => (a.position ?? Infinity) - (b.position ?? Infinity));
@@ -70,10 +68,10 @@ export function TourSlotView({ selection, picks, board, image, record, sentence,
   const scoreStyle = (score: number | null): React.CSSProperties => ({ ...numeric, color: score != null && score > 0 ? INK : getScoreColor(score, 'dark'), fontSize: 15, fontWeight: 800, textAlign: 'right' });
   return <>
     <article data-tour-slot={state} data-tour-slot-id={event.id} onClick={onOpen} style={{ background: FEED_CARD_SURFACE, color: INK, width: '100%', minWidth: 0, cursor: 'pointer' }}>
-      <header style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '14px 16px 12px' }}>
-        <div style={{ width: 46, height: 46, flexShrink: 0, borderRadius: '34%', background: MEMBER_CELL, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trophy size={22} strokeWidth={1.8} /></div>
-        <div style={{ minWidth: 0 }}><div style={{ ...ellipsis, fontSize: 17, fontWeight: 700, lineHeight: 1.2 }}>{TOUR_DISPLAY[tour]}</div>
-          <div style={{ ...ellipsis, fontSize: 14, color: INK_MUTE, marginTop: 3 }}>{state === 'live' ? <><span style={{ color: TOUR_LIVE_GREEN, fontSize: 11, fontWeight: 800, letterSpacing: '.14em' }}>● LIVE</span>{'  '}Round {round}</> : state === 'preview' ? `Starts ${dateLabel(event.start_date)}` : `Final · ${dateLabel(event.end_date)}`}</div>
+      <header style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 16px 8px' }}>
+        <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: '34%', background: MEMBER_CELL, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trophy size={19} strokeWidth={1.8} /></div>
+        <div style={{ minWidth: 0 }}><div style={{ ...ellipsis, fontSize: 16, fontWeight: 700, lineHeight: 1.2 }}>{TOUR_DISPLAY[tour]}</div>
+          <div style={{ ...ellipsis, fontSize: 13, color: INK_MUTE, marginTop: 2 }}>{state === 'live' ? <><span style={{ color: TOUR_LIVE_GREEN, fontSize: 11, fontWeight: 800, letterSpacing: '.14em' }}>● LIVE</span>{'  '}Round {round}</> : state === 'preview' ? `Starts ${dateLabel(event.start_date)}` : `Final · ${dateLabel(event.end_date)}`}</div>
         </div>
       </header>
       <div data-tour-slot-photo style={{ position: 'relative', height: TOUR_SLOT_PHOTO_HEIGHT, width: '100%', background: COURSE_GRADIENT }}>
@@ -91,20 +89,13 @@ export function TourSlotView({ selection, picks, board, image, record, sentence,
       </div>
       {actions && <div data-tour-slot-actions onClick={e => e.stopPropagation()}>{actions}</div>}
       {state === 'preview' && <div style={{ display: 'flex', gap: 26, padding: '10px 16px 0', minWidth: 0 }}>{facts.map(f => <div key={f.label} style={{ minWidth: 0, flex: '0 1 auto' }}><div style={{ ...ellipsis, fontSize: 16, fontWeight: 800 }}>{f.value}</div><div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '.14em', color: INK_FAINT, textTransform: 'uppercase', marginTop: 3 }}>{f.label}</div></div>)}</div>}
-      {state === 'live' && sentence && <p style={{ fontSize: 15, lineHeight: 1.45, color: INK_SOFT, padding: '8px 16px 0', margin: 0 }}><strong style={{ color: INK, fontWeight: 700 }}>{sentence}</strong>{chase ? ` ${chase}` : ''}</p>}
-      {state !== 'preview' && <div data-tour-slot-board style={{ padding: '8px 16px 0' }}>{rows.slice(0,3).map((row,i) => <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '32px minmax(0,1fr) auto', alignItems: 'center', gap: 8, height: 30 }}>
+      {state === 'live' && sentence && <p style={{ fontSize: 14.5, lineHeight: 1.4, color: INK_SOFT, padding: '6px 16px 0', margin: 0 }}><strong style={{ color: INK, fontWeight: 700 }}>{sentence}</strong>{chase ? ` ${chase}` : ''}</p>}
+      {state !== 'preview' && <div data-tour-slot-board style={{ padding: '6px 16px 0' }}>{rows.slice(0,3).map((row,i) => <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '32px minmax(0,1fr) auto', alignItems: 'center', gap: 8, height: 26 }}>
         <span style={{ ...numeric, color: INK, fontSize: 13, fontWeight: 700 }}>{i > 0 && rows[i-1].position === row.position ? '' : `${row.position_tied || rows.filter(r => r.position === row.position).length > 1 ? 'T' : ''}${row.position}`}</span>
         <span style={{ ...ellipsis, fontSize: 14.5, fontWeight: 600 }}>{row.player?.full_name ?? row.team?.display_name ?? ''}</span><span style={scoreStyle(row.score)}>{row.score == null ? '' : fmtScore(row.score)}</span>
       </div>)}</div>}
-      <div style={{ ...caps, color: INK_FAINT, padding: '16px 16px 0' }}>Our picks</div>
-      <div data-tour-slot-picks style={{ padding: '8px 16px 0' }}>{picks.map(pick => {
-        const row = board.find(row => row.player?.id === pick.playerId);
-        const score = state === 'preview' ? null : pickScore(row);
-        return <div key={pick.playerId} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto 44px', gap: 8, alignItems: 'center', height: 30 }}><span style={{ ...ellipsis, fontSize: 14.5, fontWeight: 600 }}>{pick.playerName}</span><span data-tour-slot-position style={{ ...numeric, fontSize: 13, fontWeight: 700, color: INK, textAlign: 'right' }}>{state === 'preview' ? '' : slotPosition(row)}</span><span style={scoreStyle(score)}>{score == null ? '' : fmtScore(score)}</span></div>;
-      })}</div>
-      {record && <div style={{ fontSize: 12.5, color: INK_FAINT, padding: '8px 16px 0' }}>{record}</div>}
       {comment && <div data-tour-slot-comment onClick={e => e.stopPropagation()}>{comment}</div>}
-      {!comment && <div style={{ height: 16 }} />}
+      {!comment && <div style={{ height: 12 }} />}
     </article><div aria-hidden style={{ height: 8 }} />
   </>;
 }
@@ -129,7 +120,6 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const imagesInput = useMemo(() => event ? [{ id: event.id, venue_name: event.venue_name, venue_course_name: event.venue_course_name, venue_city: event.venue_city, venue_state: event.venue_state, venue_country: event.venue_country }] : [], [event]);
   const images = useBatchCourseImages(imagesInput);
-  const record = useOurPickRecord(selection?.tour ?? '', event?.season.year ?? null);
   const postIdQuery = useTournamentSlotPost(event?.id ?? null, event?.name ?? null);
   const postId = postIdQuery.data ?? null;
   const engagement = useQuery({ queryKey: ['post-engagement', postId, 'tour-slot', activeActor?.type, activeActor?.id], enabled: !!postId,
@@ -148,7 +138,7 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId: user?.id, activeActor });
   const { handleShare } = useClubhouseShare(user?.id);
   const lastView = useRef<TourSlotViewProps | null>(null);
-  const settled = !!event && (images.isFetched || images.isError) && (record.isFetched || record.isError) && (postIdQuery.isFetched || postIdQuery.isError) && (!postId || engagement.isFetched || engagement.isError);
+  const settled = !!event && (images.isFetched || images.isError) && (postIdQuery.isFetched || postIdQuery.isError) && (!postId || engagement.isFetched || engagement.isError);
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!settled || !event || !selection || !root.current || visit.shown.has(event.id)) return;
@@ -162,19 +152,17 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
   }, [settled, event, selection, visit]);
   if (settled && selection && event && payload) {
     const board = payload.boards.get(event.id) ?? [];
-    const picks = payload.predictions.get(event.id) ?? [];
     const data = engagement.data;
     const post: FeedPost | null = postId && data ? { id: postId, userId: data.userId, actorId: data.userId, actorType: 'system', username: 'clbhouz', displayName: TOUR_DISPLAY[selection.tour], avatarUrl: '', isVerified: false, creatorRelation: 'system', caption: event.name, mediaItems: [], createdAt: data.createdAt, likeCount: data.likeCount, commentCount: data.commentCount, shareCount: 0, review: null, isReview: false, isLikedByMe: data.isLikedByMe, isFollowedByMe: false, postType: 'tournament_live' } : null;
     const likes = getActiveLikeState(post);
     const guest = (action: 'like' | 'comment' | 'share', fn: () => void) => { if (!gateGuestActionNow(action, { postKind: 'post' })) fn(); };
     const open = (source: CommentOpenSource) => { if (post) guest('comment', () => onComment(post, source)); };
     const heroTournament = { ...event, name: event.name, startDate: event.start_date, endDate: event.end_date } as unknown as HeroTournament;
-    lastView.current = { selection, picks, board, image: images.data?.get(event.id) ?? null,
-      record: selection.state === 'result' ? bestOfThree(picks, board) : recordLine(selection.tour, record.isError ? null : record.data),
+    lastView.current = { selection, board, image: images.data?.get(event.id) ?? null,
       sentence: selection.state === 'live' ? tournamentHeadline({ tournament: heroTournament, state: { kind: 'live', round: event.current_round ?? 1, totalRounds: roundsFromSchedule(event.start_date, event.end_date) }, leaderboard: board, t }) : null,
       chase: chaserSentence(board, t),
-      actions: post ? <><FeedPostActions actor={activeActor} onActorChange={setActiveActor} liked={likes.isLiked} likeCount={likes.count} commentCount={post.commentCount} padding="14px 16px 4px" gap={26} onLike={() => guest('like', () => handleLike(post))} onComment={() => open('footer_glyph')} onShare={() => guest('share', () => handleShare(post))} /><LikedByRow postId={post.id} count={likes.count} source="post" kind="like" surfaceColor={FEED_CARD_SURFACE} style={{ padding: '0 16px' }} /></> : null,
-      comment: post ? <FeedAddComment currentUserId={user?.id} actor={activeActor} multipleActors={availableActors.length > 1} onActorChange={setActiveActor} onComment={() => open('add_comment_row')} padding="14px 16px 16px" /> : null,
+      actions: post ? <><FeedPostActions actor={activeActor} onActorChange={setActiveActor} liked={likes.isLiked} likeCount={likes.count} commentCount={post.commentCount} padding="10px 16px 2px" gap={26} onLike={() => guest('like', () => handleLike(post))} onComment={() => open('footer_glyph')} onShare={() => guest('share', () => handleShare(post))} /><LikedByRow postId={post.id} count={likes.count} source="post" kind="like" surfaceColor={FEED_CARD_SURFACE} style={{ padding: '0 16px' }} /></> : null,
+      comment: post ? <FeedAddComment currentUserId={user?.id} actor={activeActor} multipleActors={availableActors.length > 1} onActorChange={setActiveActor} onComment={() => open('add_comment_row')} padding="10px 16px 12px" /> : null,
       onOpen: () => { selectTour(selection.tour, { tournamentId: event.id }); writeStoredTour(selection.tour); analyticsEvents.track('tour_slot_tapped', { state: selection.state, tour: selection.tour, tournament_id: event.id }); navigate('/tourhub'); },
     };
   }

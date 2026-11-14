@@ -7,7 +7,6 @@ import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { SlotTournament, SlotSelection } from '@/features/clubhouse-tour/tourSlotRules';
 import { advanceTourSlotCursor, bestOfThree, chaserSentence, CURSOR_KEY, orderTourSlots, pickScore, recordLine, resolveTourSlot, resultHeld, slotPosition, tourSlotPlacement } from '@/features/clubhouse-tour/tourSlotRules';
 import { stripEventSponsorClause } from '@/features/tourhub/_shared/eventName';
-import { INK } from '@/features/tourhub/_shared/tokens';
 
 const h = vi.hoisted(() => ({ selection: null as SlotSelection | null, postId: 'post-123' as string | null, select: vi.fn(), invoke: vi.fn(), track: vi.fn(), onLike: vi.fn(), comments: vi.fn() }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -84,11 +83,25 @@ function mount() {
   return render(<QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false}}})}><MemoryRouter initialEntries={['/clubhouse']}><TourSlot visit={visit} onComment={h.comments} /><Location /></MemoryRouter></QueryClientProvider>);
 }
 describe('Tour slot rendering and post binding', () => {
+  it.each(['preview', 'live', 'result'] as const)('omits Our picks and the picks block in %s', state => {
+    const { container } = render(<TourSlotView selection={{ tournament: event(), tour: 'pga', state }} board={board} image={null} sentence={null} chase={null} onOpen={() => {}} />);
+    expect(screen.queryByText('Our picks')).toBeNull();
+    expect(container.querySelector('[data-tour-slot-picks]')).toBeNull();
+  });
+  it('renders board rows 26px high in live and result', () => {
+    for (const state of ['live', 'result'] as const) {
+      const { container, unmount } = render(<TourSlotView selection={{ tournament: event(), tour: 'pga', state }} board={board} image={null} sentence={null} chase={null} onOpen={() => {}} />);
+      const rows = container.querySelectorAll<HTMLElement>('[data-tour-slot-board] > div');
+      expect(rows).toHaveLength(3);
+      for (const row of rows) expect(row.style.height).toBe('26px');
+      unmount();
+    }
+  });
   it('renders nothing without an eligible tournament', () => { const {container}=mount(); expect(container.querySelector('[data-tour-slot]')).toBeNull(); expect(h.invoke).not.toHaveBeenCalled(); });
   it('binds actions and liked-by to the returned persistent post id', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot-actions]')).not.toBeNull()); expect(h.invoke).toHaveBeenCalledWith('upsert-live-tournament-post',{body:{tournamentId:'event',tournamentName:'Austin Championship'}}); expect(container.querySelector('[data-likers-post]')?.getAttribute('data-likers-post')).toBe('post-123'); const buttons=container.querySelectorAll('[data-tour-slot-actions] button'); fireEvent.pointerDown(buttons[0], { pointerId: 1 }); fireEvent.pointerUp(buttons[0], { pointerId: 1 }); expect(h.onLike.mock.calls[0]?.[0]?.id).toBe('post-123'); });
   it('hides actions and comment doors when no post id is returned', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; h.postId=null; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot]')).not.toBeNull()); expect(container.querySelector('[data-tour-slot-actions]')).toBeNull(); expect(container.querySelector('[data-tour-slot-comment]')).toBeNull(); });
   it('selects the tournament tour and navigates when the body is tapped', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot]')).not.toBeNull()); const article=container.querySelector('[data-tour-slot]'); if (!article) throw Error('slot missing'); fireEvent.click(article); expect(h.select).toHaveBeenCalledWith('pga',{tournamentId:'event'}); expect(screen.getByTestId('location').textContent).toBe('/tourhub'); expect(localStorage.getItem('tourhub:selectedTour')).toBe('pga'); });
   it('does not navigate when the action or comment row is tapped', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot-actions]')).not.toBeNull()); const action=container.querySelector('[data-tour-slot-actions]'); const comment=container.querySelector('[data-tour-slot-comment] button'); if (!action || !comment) throw Error('doors missing'); fireEvent.click(action); fireEvent.click(comment); expect(h.select).not.toHaveBeenCalled(); expect(screen.getByTestId('location').textContent).toBe('/clubhouse'); expect(h.comments.mock.calls[0]?.[0]?.id).toBe('post-123'); });
-  it('renders the photo ten pixels under the shared hero height', () => { const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'preview'}} picks={picks} board={board} image={null} record={null} sentence={null} chase={null} onOpen={()=>{}} />); expect((container.querySelector('[data-tour-slot-photo]') as HTMLElement).style.height).toBe('340px'); });
-  it('shows the first top tie marker only and keeps pick positions in ink', () => { const tied=[row(1,'A Player',-10,true),row(1,'B Player',-10,true),row(3,'C Player',2)]; const ps=tied.map((r,i)=>({rank:i+1,playerId:r.player?.id??'',playerName:r.player?.full_name??''})); const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'live'}} picks={ps} board={tied} image={null} record={null} sentence={null} chase={null} onOpen={()=>{}} />); const positions=container.querySelectorAll('[data-tour-slot-board] > div > span:first-child'); expect([...positions].map(p=>p.textContent)).toEqual(['T1','','3']); for (const p of container.querySelectorAll('[data-tour-slot-position]')) expect((p as HTMLElement).style.color).toBe('rgb(248, 250, 252)'); expect(INK).toBe('#F8FAFC'); });
+  it('renders the photo at 162px', () => { const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'preview'}} board={board} image={null} sentence={null} chase={null} onOpen={()=>{}} />); expect((container.querySelector('[data-tour-slot-photo]') as HTMLElement).style.height).toBe('162px'); });
+  it('shows the first top tie marker only', () => { const tied=[row(1,'A Player',-10,true),row(1,'B Player',-10,true),row(3,'C Player',2)]; const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'live'}} board={tied} image={null} sentence={null} chase={null} onOpen={()=>{}} />); const positions=container.querySelectorAll('[data-tour-slot-board] > div > span:first-child'); expect([...positions].map(p=>p.textContent)).toEqual(['T1','','3']); });
 });

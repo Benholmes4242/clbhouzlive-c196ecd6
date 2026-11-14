@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Simpler Clubhouse Tour post
+- Remove picks/record display and record read only from TourSlot; preserve prediction resolver and shared rules.
+- Apply signed-off 162px photo, compact header/actions/sentence/board/comment; update only authorised Tour slot tests.
+- Run focused tests and four app shards; reconcile from 8,727 and report the exact diff.
+
 ## WAGR profile ranking line — tests complete; visual checks outstanding
 - Add the shared server-gated ranking line below the index, or independently when the index is absent; preserve the rest of the profile and examples.
 - Focused 54 executed / 53 passed / 1 failed: new example-mode case lacks QueryClientProvider (useDeclineHandicapChip.ts:15:23). Stop rule prevents shards; report .lovable/reports/wagr-profile-line-stop.md. Expected inventory 8,727 (+13 from 8,714). Visual checks remain unverified.
