@@ -1,11 +1,12 @@
 # Roadmap
 
-## Blocked: WAGR AM name badges — existing PRO test assertion
+## Complete: WAGR AM name badges — authorised test narrowing verified
 - Authorised WAGR AM badge test fix: narrow only the two PRO read counts (and identical aggregate-count failures if encountered), then run all four app shards; no source changes.
 - Add batched verified-amateur cache, shared name marks, profile cover and visible admin-row badges with PRO priority.
 - Invalidate after WAGR review/request/removal; preserve fonts, badge design, island handicap and existing PRO tests.
 - Run focused coverage and all four app shards; report files and reconcile against 8,667.
 - Focused 104 executed / 103 passed / 1 failed; all 26 new tests passed. Existing proVerification2.test.tsx:43:39 counts all RPCs and now sees both PRO and amateur reads. Four shards stopped; test-side authorisation needed. Inventory 8,693 (+26); preview build OK.
+- Finish brief: no source or test changes; four separate commands passed 2,224 / 2,083 / 2,189 / 2,197 = 8,693, zero failures. Eight narrowed assertion sites in six files documented with exact diff in .lovable/reports/wagr-am-badge.md; inventory unchanged from the test-fix request.
 
 ## WAGR Settings: tests complete; screenshots outstanding
 - Add amateur link/pending/verified cards and link/unlink sheets; tour-pro-only results card with shared optimistic privacy switch.
