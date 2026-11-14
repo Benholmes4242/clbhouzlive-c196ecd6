@@ -47,7 +47,8 @@ describe('Members badge source contract', () => {
     expect(badge?.getAttribute('data-size')).toBe('large');
     expect(badge?.querySelector('.pro-label-text')?.textContent).toBe('Creator');
     expect(badge?.previousElementSibling?.className).toBe('pro-label');
-    expect(badge?.previousElementSibling?.previousElementSibling?.tagName).toBe('H1');
+    expect(badge?.parentElement?.className).toBe('identity-badges');
+    expect(badge?.parentElement?.previousElementSibling?.tagName).toBe('H1');
     unmount();
     client.clear();
   });
