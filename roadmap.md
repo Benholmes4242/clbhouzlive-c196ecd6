@@ -1,9 +1,9 @@
 # Roadmap
 
-## In progress: Simpler Clubhouse Tour post
+## Complete: Simpler Clubhouse Tour post
 - Remove picks/record display and record read only from TourSlot; preserve prediction resolver and shared rules.
 - Apply signed-off 162px photo, compact header/actions/sentence/board/comment; update only authorised Tour slot tests.
-- Run focused tests and four app shards; reconcile from 8,727 and report the exact diff.
+- Focused 44/44; shards 2,203 / 2,110 / 2,196 / 2,222 = 8,731 passed (+4 from 8,727); report .lovable/reports/tour-slot-simpler.md. Real-member 430/320 visual comparison remains unverified.
 
 ## WAGR profile ranking line — tests complete; visual checks outstanding
 - Add the shared server-gated ranking line below the index, or independently when the index is absent; preserve the rest of the profile and examples.
