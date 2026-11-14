@@ -1,10 +1,10 @@
 # Roadmap
 
-## In progress: WAGR server and admin review
+## Complete: WAGR server and admin review
 - Remove and undeploy the disposable probe; add shared WAGR reads, member linking and sequential verified-member sync without SQL or schedules.
 - Reuse admin verification rows/details and add verified amateurs; preserve existing golfer/pro decisions.
 - Add mocked Deno and admin tests, run four independent app shards, deploy only the two new functions; never invoke the real sync.
-- Report version, deployments and test accounting; existing cron name/schedule may be unavailable without SQL (which remains prohibited).
+- Both functions deployed; probe undeployed. App shards 2,206 / 2,023 / 2,186 / 2,190 = 8,605 (+5); Deno 28 passed. Report .lovable/reports/wagr-server.md. Cron name/schedule unverified without prohibited SQL; emails unsupported; authenticated checks unavailable. No real sync invoked.
 
 ## Complete: Personal identity badge wrapping — authorised test fix
 - Group personal-profile badges and wrap them below the unchanged heading when needed; preserve every badge style and pro-profile surface.
@@ -23,7 +23,7 @@
 - Replace the five authorised pearl tests with seven member-badge cases; run each of the four shards separately and report exact source, assertions and totals.
 - Four separate shards passed 2,206 / 2,018 / 2,185 / 2,186 = 8,595 (+2 from 8,593); preview build OK. Full source, deleted assertions and test names: .lovable/reports/member-badge-amber.md. Authenticated visual checks remain unavailable.
 
-## Blocked on invocation authorization: Read-only WAGR feasibility probe
+## Retired by WAGR server brief: Read-only WAGR feasibility probe
 - Add and deploy only probe-wagr-profile with existing service-role/admin authentication, sequential public reads and complete response evidence.
 - Invoke once for lewy-hayward-41967; save the full response and invocation auth in .lovable/reports/wagr-probe.md, or report unavailable access and stop.
 - No SQL, migrations, persistence, scheduling or client changes.
