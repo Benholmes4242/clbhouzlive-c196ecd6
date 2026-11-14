@@ -24,7 +24,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { functions: { invo
     delete: () => chain,
     single: () => Promise.resolve({ data: { show_tour_results: true }, error: null }),
     maybeSingle: () => Promise.resolve({ data: table === 'amateur_rank_links' ? h.link : h.summary, error: null }),
-    then: (resolve: any) => Promise.resolve({
+    then: (resolve: any) => Promise.resolve(table === 'amateur_career_moments' ? { data: [], error: null } : {
       data: table === 'amateur_rank_history' ? (h.historyError ? null : h.history) : h.eventsError ? null : h.events,
       error: (table === 'amateur_rank_history' ? h.historyError : h.eventsError) ? new Error('read failed') : null,
     }).then(resolve),
