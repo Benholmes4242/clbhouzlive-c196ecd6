@@ -219,7 +219,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
               {displayName}
             </h1>
             {isPro && <ProLabel size="large" />}
-            {isCreator && <span className="profile-creator-label">Creator</span>}
+            {isCreator && <span className="profile-creator-label" data-size="large"><span className="pro-label-text">Creator</span></span>}
             </div>
             {afterSubline}
           </div>

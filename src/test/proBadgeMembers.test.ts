@@ -3,20 +3,50 @@ import { createElement } from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { ProLabel } from '@/features/pro-verification/ProLabel';
+import { ProfileCoverBand } from '@/components/profile/hero/ProfileCoverBand';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 
 const label = readFileSync(process.cwd() + '/src/features/pro-verification/pro-label.css', 'utf8');
 const controls = readFileSync(process.cwd() + '/src/features/pro-verification/pro-status-controls.css', 'utf8');
 const tokens = readFileSync(process.cwd() + '/src/index.css', 'utf8');
 const profile = readFileSync(process.cwd() + '/src/features/pro-profile/pro-profile.css', 'utf8');
+const creator = readFileSync(process.cwd() + '/src/features/creator/profile-creator.css', 'utf8');
 
 function rule(source: string, selector: string) {
-  const body = source.split(selector + ' ')[1]?.match(/^\{([^}]+)\}/)?.[1]
-    ?? source.split(selector + '{')[1]?.split('}')[0];
+  const body = [...source.matchAll(/([^{}]+)\{([^}]+)\}/g)]
+    .find((match) => match[1].trim() === selector || match[1].split(',').some((part) => part.trim() === selector))?.[2];
   expect(body, selector).toBeDefined();
   return body ?? '';
 }
 
 describe('Members badge source contract', () => {
+  it('shares the plate and rim rule between PRO and Creator', () => {
+    expect(rule(label, '.pro-label, .profile-creator-label')).toContain('var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box');
+  });
+
+  it('uppercases the shared foil letters', () => {
+    expect(rule(label, '.pro-label-text')).toContain('text-transform:uppercase');
+  });
+
+  it('removes the independent Creator badge rule', () => {
+    expect(creator).not.toMatch(/\.profile-creator-label\s*\{/);
+  });
+
+  it('renders the large Creator foil badge directly after PRO on a creator profile', () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const band = createElement(ProfileCoverBand, { coverUrl: null, avatar: null, displayName: 'Charlie Okonkwo-Bramwell', subline: null, isPro: true, isCreator: true });
+    const { container, unmount } = render(createElement(QueryClientProvider, { client }, createElement(MemoryRouter, null, band)));
+    const badge = container.querySelector('.profile-creator-label');
+    expect(badge?.className).toBe('profile-creator-label');
+    expect(badge?.getAttribute('data-size')).toBe('large');
+    expect(badge?.querySelector('.pro-label-text')?.textContent).toBe('Creator');
+    expect(badge?.previousElementSibling?.className).toBe('pro-label');
+    expect(badge?.previousElementSibling?.previousElementSibling?.tagName).toBe('H1');
+    unmount();
+    client.clear();
+  });
+
   it('defines the exact plate, amber rim and foil tokens and retires the pearl plate', () => {
     expect(tokens).toContain('--member-badge-plate: linear-gradient(180deg, #26272B 0%, #0E0E10 55%, #050506 100%);');
     expect(tokens).toContain('--member-badge-rim: linear-gradient(135deg, #FFD9A6 0%, #F7931E 35%, #FFC37A 60%, #C46A0E 100%);');

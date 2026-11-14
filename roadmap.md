@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Creator amber members badge
+- Share the existing amber badge rule and foil lettering with Creator; preserve name/PRO/Creator order and the existing heading clamp.
+- Remove the unused Creator ground token and independent pill rule; add four badge cases, preserve existing assertions and run four separate shards.
+- Four separate shards passed 2,206 / 2,022 / 2,185 / 2,186 = 8,599 (+4 from 8,595); preview build OK. Changed lines, grep and all test names: .lovable/reports/creator-badge-amber.md. Authenticated 320px visual checks remain unverified.
+
 ## Complete: Signed-off amber members badge
 - Replace only shared badge tokens, ProLabel markup and badge/island styles; keep PRO eligibility and callers unchanged, with AM supported but unused.
 - Replace the five authorised pearl tests with seven member-badge cases; run each of the four shards separately and report exact source, assertions and totals.

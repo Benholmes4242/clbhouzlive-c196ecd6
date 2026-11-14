@@ -1,5 +1,4 @@
 .profile-creator-identity{display:flex;align-items:center;gap:7px;min-width:0}.profile-creator-identity h1{flex:1;min-width:0}
-.profile-creator-label{display:inline-flex;align-items:center;flex:none;height:20px;padding:0 8px;border-radius:999px;background:var(--profile-creator-label-ground);color:var(--profile-creator-photo-ink);font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
 .profile-video-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;width:100%}
 .profile-video-tile.profile-video-tile,.profile-video-loading{position:relative;height:172px;min-width:0;padding:0;border:0;border-radius:0;overflow:hidden;background:var(--welcome-card);box-shadow:none;transform:none}
 .profile-video-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.profile-video-shade{position:absolute;inset:0;background:var(--profile-video-shade)}
