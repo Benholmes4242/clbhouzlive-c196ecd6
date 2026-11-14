@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Blocked: WAGR AM name badges — existing PRO test assertion
+- Authorised WAGR AM badge test fix: narrow only the two PRO read counts (and identical aggregate-count failures if encountered), then run all four app shards; no source changes.
 - Add batched verified-amateur cache, shared name marks, profile cover and visible admin-row badges with PRO priority.
 - Invalidate after WAGR review/request/removal; preserve fonts, badge design, island handicap and existing PRO tests.
 - Run focused coverage and all four app shards; report files and reconcile against 8,667.

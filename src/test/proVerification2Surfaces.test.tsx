@@ -21,7 +21,7 @@ describe('Brief 2 opted-in member rows', () => {
       const row = (id: string) => surface === 'search' ? <PersonRow person={{ id, display_name: 'Name' } as PersonHit} query="" onSelect={() => {}} /> : surface === 'comment' ? <CommentCard comment={comment(id)} currentUserId={null} onReply={() => {}} onLike={() => {}} onMore={() => {}} /> : <ReplyRow comment={comment(id)} currentUserId={null} onLike={() => {}} onMore={() => {}} />;
       const { container } = render(<MemoryRouter>{row('pro')}{row('ordinary')}{row('pending')}</MemoryRouter>);
       await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
-      expect(f.rpc).toHaveBeenCalledTimes(1);
+      expect(f.rpc.mock.calls.filter(c => c[0] === 'get_pro_members')).toHaveLength(1);
       expect(f.rpc).toHaveBeenCalledWith('get_pro_members', { p_user_ids: ['pro', 'ordinary', 'pending'] });
     });
   }

@@ -70,7 +70,7 @@ describe('CB1 competition boards', () => {
     expect(q('[data-competition-field-row]').length).toBe(5);
     expect([...q('[data-competition-field-row]')].map((r) => r.firstElementChild!.textContent)).toEqual(['1', 'T2', 'T2', '4', '5']);
     expect(q('[data-competition-field-row][data-self]').length).toBe(1);
-    expect(f.rpc.mock.calls.filter(([name]) => name !== 'get_pro_members')).toHaveLength(1);
+    expect(f.rpc.mock.calls.filter(([name]) => name !== 'get_pro_members' && name !== 'get_verified_amateurs')).toHaveLength(1);
   });
   it('a card of three members carries the same CTA and still opens the sheet', async () => {
     f.rpc.mockResolvedValue({ data: [row({ members: 3 })], error: null });

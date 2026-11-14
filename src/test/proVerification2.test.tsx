@@ -40,9 +40,9 @@ describe('Brief 2 public pro identity', () => {
   });
   it('invalidating own status refetches visible identities', async () => {
     mount(<ProMemberName userId="pro">Name</ProMemberName>);
-    await waitFor(() => expect(f.rpc).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(f.rpc.mock.calls.filter(c => c[0] === 'get_pro_members')).toHaveLength(1));
     invalidateProMembers();
-    await waitFor(() => expect(f.rpc).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(f.rpc.mock.calls.filter(c => c[0] === 'get_pro_members')).toHaveLength(2));
   });
   it('pending and unverified ids have no pro identity', async () => {
     const members = await readProMembers(['pro', 'pending', 'unverified']);

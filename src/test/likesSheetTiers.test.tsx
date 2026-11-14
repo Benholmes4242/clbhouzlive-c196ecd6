@@ -62,7 +62,7 @@ describe('LikesSheet H.4 standing segment', () => {
        net 70 / netToPar −1 so the "−1" assertion proves the net to-par. */
     const { container } = renderSheet({ authorName: 'Ben', courseId: 'c1', courseName: 'Royal X', kind: 'round', gross: 71, toPar: -1, net: 70, netToPar: -1, rating: null });
     await waitFor(() => expect(container.querySelectorAll('[data-liker-standing]').length).toBe(2));
-    expect(st.rpcCalls).toHaveLength(1);
+    expect(st.rpcCalls.filter(c => c.fn !== 'get_verified_amateurs')).toHaveLength(1);
     expect(st.rpcCalls[0].args).toEqual({ p_user_ids: ['a', 'b', 'c'], p_course_id: 'c1' });
     expect(st.legendCalls).toBe(1);
     expect(screen.getByText('Best here 78')).toBeTruthy();
