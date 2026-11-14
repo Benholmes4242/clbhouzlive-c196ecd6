@@ -21,6 +21,11 @@ function rule(source: string, selector: string) {
 }
 
 describe('Members badge source contract', () => {
+  it('wraps the personal identity row while keeping its badge group unsplit', () => {
+    expect(rule(label, '.pro-identity-row, .profile-creator-identity')).toContain('flex-wrap:wrap');
+    expect(rule(label, '.identity-badges')).toContain('flex:none');
+  });
+
   it('shares the plate and rim rule between PRO and Creator', () => {
     expect(rule(label, '.pro-label, .profile-creator-label')).toContain('var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box');
   });

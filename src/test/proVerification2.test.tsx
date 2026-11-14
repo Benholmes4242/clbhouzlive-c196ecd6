@@ -58,8 +58,14 @@ describe('Brief 2 public pro identity', () => {
     const { container } = mount(<ProfileCoverBand coverUrl={null} avatar={null} displayName="Long Name" subline={null} isPro isCreator />);
     const row = container.querySelector('.pro-identity-row');
     expect(row?.children[0].tagName).toBe('H1');
-    expect(row?.children[1].getAttribute('data-size')).toBe('large');
-    expect(row?.children[2].className).toBe('profile-creator-label');
+    expect(row?.children).toHaveLength(2);
+    const badges = row?.children[1];
+    expect(badges?.className).toBe('identity-badges');
+    expect(badges?.children).toHaveLength(2);
+    expect(badges?.children[0].className).toBe('pro-label');
+    expect(badges?.children[0].getAttribute('data-size')).toBe('large');
+    expect(badges?.children[1].className).toBe('profile-creator-label');
+    expect(badges?.children[1].previousElementSibling).toBe(badges?.children[0]);
   });
 });
 

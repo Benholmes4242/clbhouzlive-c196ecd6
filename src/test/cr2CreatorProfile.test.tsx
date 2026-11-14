@@ -57,7 +57,10 @@ it('creator label is present only when enabled and is a sibling of the name', ()
  const { rerender } = render(<ProfileCoverBand coverUrl={null} avatar={null} displayName="Ellie" subline={null} />, { wrapper });
  expect(document.querySelector('.profile-creator-label')).toBeNull();
  rerender(<ProfileCoverBand coverUrl={null} avatar={null} displayName="Ellie" subline={null} isCreator />);
- expect(document.querySelector('.profile-creator-label')?.previousElementSibling).toBe(screen.getByRole('heading', { name: 'Ellie' }));
+ const badges = document.querySelector('.identity-badges');
+ expect(badges?.previousElementSibling).toBe(screen.getByRole('heading', { name: 'Ellie' }));
+ expect(badges?.children).toHaveLength(1);
+ expect(badges?.children[0].className).toBe('profile-creator-label');
 });
 it('creator defaults to Videos while a non-creator defaults to Posts', () => { expect(creatorTab(null, true, false)).toBe('videos'); expect(creatorTab(null, false, false)).toBe('activity'); });
 it('non-creator video links resolve to Posts', () => { expect(creatorTab('videos', false, false)).toBe('activity'); });
