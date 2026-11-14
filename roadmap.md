@@ -1,10 +1,11 @@
 # Roadmap
 
-## In progress: Personal identity badge wrapping — authorised test fix
+## Complete: Personal identity badge wrapping — authorised test fix
 - Group personal-profile badges and wrap them below the unchanged heading when needed; preserve every badge style and pro-profile surface.
 - Apply the two authorised structure updates, add one source case and run tests; stop on any other failure without changing its assertion.
 - Focused 44 executed / 43 passed / 1 failed: proBadgeMembers.test.ts:50:76 expects a direct-sibling H1, now undefined. Four shards unrun; inventory 8,600 (+1), last passing baseline 8,599. Authorisation required to inspect the badge group's previous sibling instead; report .lovable/reports/identity-badges-wrap-stop.md.
 - Authorised follow-up replaces only that assertion with the identity-badges parent and its preceding H1 checks; run all four shards separately with no source changes.
+- All four separate shards passed 2,206 / 2,023 / 2,185 / 2,186 = 8,600, zero failures; follow-up inventory unchanged, +1 from last passing baseline 8,599 due to the wrap source case. Before/after and full names: .lovable/reports/identity-badges-wrap-testfix.md. Visual checks remain unverified.
 
 ## Complete: Creator amber members badge
 - Share the existing amber badge rule and foil lettering with Creator; preserve name/PRO/Creator order and the existing heading clamp.
