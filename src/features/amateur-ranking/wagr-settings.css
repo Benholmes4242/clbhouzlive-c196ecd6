@@ -1,5 +1,5 @@
 /* Opt-in WAGR surfaces reuse ST2; only signed-off differences live here. */
-.wagr-settings{--ep-card:var(--pro-controls-card);--ep-inset:var(--pro-controls-confirm);--ep-ink:var(--pro-controls-ink);--ep-mute:var(--pro-controls-muted);--ep-dim:var(--pro-controls-dim);--ep-hair:var(--pro-controls-hair);--ep-canvas:var(--background);color:var(--ep-ink)}
+.wagr-settings{--ep-card:var(--pro-controls-card);--ep-inset:var(--pro-controls-confirm);--ep-ink:var(--pro-controls-ink);--ep-mute:var(--pro-controls-muted);--ep-dim:var(--pro-controls-dim);--ep-hair:var(--pro-controls-hair);--ep-canvas:#0B0B0D;color:var(--ep-ink)}
 .wagr-settings.st2-handicap{padding:16px;margin-top:14px}
 .wagr-settings .pro-status-card-head{flex-wrap:wrap}
 .wagr-settings .st2-line{margin-top:8px}
@@ -7,8 +7,8 @@
 .wagr-settings .st2-figure{border:0}
 .wagr-settings .st2-switch-row{border:0;padding:0;margin-top:16px;min-height:0}
 .wagr-settings .st2-switch-copy small{margin-top:3px;line-height:1.4}
-.wagr-settings .wagr-text.wagr-text{background:none;border:0;padding:0;margin-top:14px;height:auto;min-height:0;border-radius:0;font-size:14px;font-weight:600;color:var(--ep-mute);box-shadow:none}
-.wagr-settings .st2-connect.st2-connect{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:999px;background:var(--ep-ink);color:var(--pro-controls-canvas);font-size:14.5px;font-weight:600;margin-top:14px;border:0;box-shadow:none}
+.wagr-settings .wagr-text.wagr-text{background:none;border:0;padding:0;margin-top:14px;height:auto;min-height:0;border-radius:0;font-size:13.3333px;font-weight:400;color:var(--ep-mute);box-shadow:none}
+.wagr-settings .st2-connect.st2-connect{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:999px;background:var(--ep-ink);color:#0B0B0D;font-size:13.3333px;font-weight:400;margin-top:14px;border:0;box-shadow:none}
 .wagr-sheet.wagr-sheet{background:var(--pro-controls-card);border:0;border-radius:22px 22px 0 0;padding:10px 16px max(env(safe-area-inset-bottom,0px),22px);gap:0;overflow-y:auto;max-height:85dvh}
 .wagr-grab{width:36px;height:5px;border-radius:3px;background:var(--pro-controls-pending-rule);margin:0 auto 16px;flex:none}
 .wagr-kicker{font-size:9.5px;font-weight:800;letter-spacing:0.16em;color:var(--pro-profile-amber)}
@@ -21,7 +21,7 @@
 .wagr-found b{display:block;font-size:14.5px}
 .wagr-found small{display:block;font-size:12px;color:var(--ep-mute);margin-top:2px}
 .wagr-settings .wagr-small{font-size:12px;color:var(--ep-dim)}
-.wagr-settings .wagr-send.wagr-send{width:100%;height:46px;margin-top:16px}
+.wagr-settings .wagr-send.wagr-send{width:100%;height:46px;margin-top:16px;font-size:13.3333px;font-weight:400;color:#0B0B0D}
 .wagr-confirm.wagr-confirm{border-radius:20px 20px 0 0;padding:8px 16px max(env(safe-area-inset-bottom,0px),16px)}
 .wagr-confirm .wagr-heading{margin:4px 0 12px}
 .wagr-confirm .st2-line{font-size:15px;line-height:1.5;margin:4px 0 16px}
