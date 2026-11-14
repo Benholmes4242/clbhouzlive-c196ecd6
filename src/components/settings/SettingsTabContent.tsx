@@ -7,6 +7,9 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { SettingsHandicapCard } from './SettingsHandicapCard';
+import { SettingsWagrCard } from '@/features/amateur-ranking/SettingsWagrCard';
+import { SettingsTourResultsCard } from '@/features/pro-verification/SettingsTourResultsCard';
+import { wagrCardVisible, tourResultsVisible } from '@/features/amateur-ranking/wagrSettingsRules';
 import { useMyProStatus } from '@/features/pro-verification/useMyProStatus';
 import { SettingsPrivacyCard } from './SettingsPrivacyCard';
 import { SettingsNotificationsCard } from './SettingsNotificationsCard';
@@ -179,6 +182,8 @@ export function SettingsTabContent() {
         {!proStatus.unknown && <SettingsHandicapCard pro={proStatus.verified && proStatus.kind ? {kind:proStatus.kind} : proStatus.pending ? {kind:proStatus.kind ?? 'tour_pro',pending:true} : null} userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
           profileError={!!profileError} egHandicapIndex={profile.eg_handicap_index} manualHandicapIndex={profile.manual_handicap_index}
           checked={!hideHandicapChip} updating={chipUpdating} onToggle={handleToggleHandicapChip} onManage={() => navigate('/manage/handicap')} />}
+        {user?.id && wagrCardVisible(proStatus) && <SettingsWagrCard userId={user.id} />}
+        {user?.id && tourResultsVisible(proStatus) && <SettingsTourResultsCard userId={user.id} />}
 
         {/* Privacy */}
         <div className="ep-group">Privacy</div>

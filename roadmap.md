@@ -1,5 +1,10 @@
 # Roadmap
 
+## Blocked: WAGR Settings test-side typecheck
+- Add amateur link/pending/verified cards and link/unlink sheets; tour-pro-only results card with shared optimistic privacy switch.
+- Add nonfatal review notifications before approval sync; test all states and four independent shards.
+- Focused 40/40 passed; new test TypeScript errors at wagrSettings.test.tsx:35 and :65 stopped full shards and screenshots. Inventory 8,640 (+35), last passing 8,605. Exact diagnostics and changed assertions: .lovable/reports/wagr-settings-stop.md.
+
 ## Complete: WAGR server and admin review
 - Remove and undeploy the disposable probe; add shared WAGR reads, member linking and sequential verified-member sync without SQL or schedules.
 - Reuse admin verification rows/details and add verified amateurs; preserve existing golfer/pro decisions.
