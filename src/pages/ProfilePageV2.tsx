@@ -5,6 +5,7 @@
 
 import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
 import { useProMembers } from '@/features/pro-verification/useProMembers';
+import { useProResultsVisible } from '@/features/pro-verification/useProResultsVisible';
 import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
 import { useAmateurSummary } from '@/features/amateur-ranking/useAmateurRanking';
 import { insertRankingTab, rankingTabVisible } from '@/features/amateur-ranking/rankingTabRules';
@@ -455,7 +456,10 @@ const ProfilePageV2Content: React.FC = () => {
   // them). Own profile shows four tabs, anyone else's three. It sits LAST so
   // another member's profile loses a tab off the end, not from the middle.
   const proTabs = profileProTabs(proMember, isSelf, !!viewedWhsConnection, proHasResults);
-  const showTourTab = isPersonal && proTabs.tour;
+  // A tour pro who switched his results off shows no Tour tab to anyone but
+  // himself; the read fails closed and the redirect below waits for it.
+  const proResultsGate = useProResultsVisible(isTourPro ? profileUserId ?? '' : '', isSelf);
+  const showTourTab = isPersonal && proTabs.tour && (isSelf || proResultsGate.visible);
   const showHandicapTab = isPersonal && proTabs.handicap;
   // The summary read is the Ranking-tab gate: the server returns rows only for
   // the member, an admin, or a verified member with show_tour_results on.
@@ -480,10 +484,11 @@ const ProfilePageV2Content: React.FC = () => {
     // A disabled summary read (pros, businesses) stays pending forever; only
     // wait for it when the gate actually runs.
     if (isPersonal && proMember == null && amateurSummary.isPending) return;
+    if (isTourPro && !isSelf && !proResultsGate.settled) return;
     if ((activeSection === 'tour' && !showTourTab) || (activeSection === 'ranking' && !showRankingTab) || (activeSection === 'handicap' && isSelf && !showHandicapTab)) {
       setSearchParams({ tab: showTourTab ? 'tour' : 'activity' }, { replace: true });
     }
-  }, [activeSection, profile?.id, profilePros.isLoading, isPersonal, proMember, amateurSummary.isPending, showTourTab, showRankingTab, isSelf, showHandicapTab, setSearchParams]);
+  }, [activeSection, profile?.id, profilePros.isLoading, isPersonal, proMember, amateurSummary.isPending, isTourPro, proResultsGate.settled, showTourTab, showRankingTab, isSelf, showHandicapTab, setSearchParams]);
 
   useEffect(() => {
     if (searchParams.get('tab') !== 'videos' || creatorPending || !profile?.id || isCreator) return;
@@ -1028,7 +1033,7 @@ const ProfilePageV2Content: React.FC = () => {
             onShare={() => { if (navigator.share) navigator.share({ title: displayName, url: window.location.href }).catch(() => {}); else { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); } }}
             onFollow={toggleFollow} following={isFollowing} followBusy={followBusy}
             onMessage={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })} messageBusy={dmStarting}
-            onSeeAllResults={() => { setSearchParams({ tab: 'tour' }); tabBarRef.current?.scrollIntoView({ block: 'start' }); }}
+            onSeeAllResults={isSelf || proResultsGate.visible ? () => { setSearchParams({ tab: 'tour' }); tabBarRef.current?.scrollIntoView({ block: 'start' }); } : undefined}
             menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>Copy link</DropdownMenuItem>{!isSelfView && <>{viewerActorType !== 'business' && friendshipStatus === 'friends' && <DropdownMenuItem onClick={() => unfriend()}>Remove friend</DropdownMenuItem>}<DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}</DropdownMenuContent></DropdownMenu>}
           /> : <ProfileHero
             userId={profile.id}

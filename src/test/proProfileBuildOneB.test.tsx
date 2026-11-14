@@ -11,6 +11,7 @@ const s=vi.hoisted(()=>({events:[] as ProEvent[],club:'Dartford Golf Club',rpc:v
 vi.mock('react-i18next',()=>({initReactI18next:{type:'3rdParty',init:()=>{}},useTranslation:()=>({t:(_k:string,o?:{defaultValue?:string})=>o?.defaultValue??''})}));
 vi.mock('@/integrations/supabase/client',()=>({supabase:{rpc:s.rpc}}));
 vi.mock('@/features/pro-profile/useProProfile',()=>({useProEvents:()=>({data:s.events,isSuccess:true,isError:false}),useProWorldRank:()=>({data:null,isSuccess:true,isError:false})}));
+vi.mock('@/features/pro-verification/useProResultsVisible',()=>({useProResultsVisible:()=>({visible:true,settled:true})}));
 vi.mock('@/components/profile/hooks/useProfileClubs',()=>({useProfileClubs:()=>({homeClub:s.club?{name:s.club}:null})}));
 vi.mock('@/hooks/useUserTopTenCourses',()=>({useUserTopTenCourses:()=>({topTen:[]})}));
 vi.mock('@/features/tourhub/player-v2/data/usePlayerData',()=>({usePlayerSeasonResults:()=>({data:s.events,isSuccess:true,isError:false})}));

@@ -8,6 +8,7 @@ import type { ProEvent } from '@/features/pro-profile/proProfileRules';
 const s=vi.hoisted(()=>({events:[] as any[],rank:null as any,ready:true,linked:false,live:null as any}));
 vi.mock('react-i18next',()=>({initReactI18next:{type:'3rdParty',init:()=>{}},useTranslation:()=>({t:(_k:string,o?:{defaultValue?:string})=>o?.defaultValue??''})}));
 vi.mock('@/features/pro-profile/useProProfile',()=>({useProEvents:()=>({data:s.events,isSuccess:s.ready,isError:false}),useProWorldRank:()=>({data:s.rank,isSuccess:s.ready,isError:false})}));
+vi.mock('@/features/pro-verification/useProResultsVisible',()=>({useProResultsVisible:()=>({visible:true,settled:true})}));
 vi.mock('@/components/profile/hooks/useProfileClubs',()=>({useProfileClubs:()=>({homeClub:{name:'Dartford Golf Club'}})}));
 vi.mock('@/hooks/useUserTopTenCourses',()=>({useUserTopTenCourses:()=>({topTen:[]})}));
 vi.mock('@/features/tourhub/player-v2/data/usePlayerData',()=>({usePlayerSeasonResults:()=>({data:[],isSuccess:s.ready,isError:false})}));
