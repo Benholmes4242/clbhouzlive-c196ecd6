@@ -2,6 +2,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, useSearchParams, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const h = vi.hoisted(() => ({ summary: { rank: 318 } as { rank: number | null } | null, history: [] as Array<{ id: number; week: number; rank: number; finish: string | null }>, failed: false, connected: true }));
 vi.mock('@/features/amateur-ranking/useAmateurRanking', () => ({ useAmateurSummary: () => ({ data: h.summary, isSuccess: true }), useAmateurHistory: () => ({ data: h.history, isSuccess: !h.failed }), useAmateurEvents: () => ({ data: [], isSuccess: true }), useAmateurCareer: () => ({ data: [], isSuccess: true }) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -46,5 +47,5 @@ describe('WAGR profile ranking line', () => {
   it('opens the Ranking tab on tap', () => { mount(); const button = line(); if (!button) throw new Error('Ranking line missing'); fireEvent.click(button); expect(screen.getByTestId('search').textContent).toBe('?tab=ranking'); });
   it('retains ranking independently when handicap is hidden', () => { h.connected = false; mount(); expect(line()).not.toBeNull(); expect(screen.queryByText('+2.1')).toBeNull(); });
   it('retains ranking independently when no index exists', () => { mount({ index: null }); expect(line()).not.toBeNull(); expect(screen.queryByText('+2.1')).toBeNull(); });
-  it('does not add ranking to the example mode', () => { render(<MemoryRouter><HeroConnectExample t={t} /></MemoryRouter>); expect(line()).toBeNull(); expect(document.querySelectorAll('[data-example-form-tile]')).toHaveLength(5); });
+  it('does not add ranking to the example mode', () => { render(<MemoryRouter><QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><HeroConnectExample t={t} /></QueryClientProvider></MemoryRouter>); expect(line()).toBeNull(); expect(document.querySelectorAll('[data-example-form-tile]')).toHaveLength(5); });
 });
