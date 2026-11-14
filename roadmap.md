@@ -1,10 +1,10 @@
 # Roadmap
 
-## Blocked: WAGR Career — existing Ranking tests
-- Authorised test-fix: return empty amateur career moments in the Ranking mock only; preserve all assertions and source, then run focused coverage and four app shards.
+## WAGR Career — tests complete; visual checks outstanding
+- Authorised test-fix returns empty amateur career moments in the Ranking mock only; all assertions and source unchanged. Focused 80/80 and four separate shards 2,224 / 2,083 / 2,187 / 2,213 = 8,707 passed; diff and totals in .lovable/reports/wagr-career-testfix.md.
 - Add career reads/timeline and reuse parameterised pro career sheets; preserve pro behaviour and existing five-row fixture.
 - Save uploaded 124-row Lewy history in src/test/fixtures/lewy-amateur-rank-history.json; verify 5 wins / 21 top 10s / 46 events and exact ten-entry order.
-- Focused 80 executed / 76 passed / 4 failed in unchanged wagrRankingTab.test.tsx:161,172,188,198; all 16 new and 37 pro cases passed. Four shards and visual checks stopped; inventory 8,707 (+16 from 8,691). Exact errors/files in .lovable/reports/wagr-career-stop.md; no SQL or migrations.
+- Prior focused stop (76/80) is resolved by the authorised mock-only fix; inventory remains 8,707 (+16 Career cases from last passing 8,691). Requested 390/320 comparison and authenticated flows remain unverified; no SQL or migrations.
 
 ## Complete: WAGR server-owned decision notifications
 - Remove client notification insertion; preserve review RPC → amateur invalidation → approve-only sync.
