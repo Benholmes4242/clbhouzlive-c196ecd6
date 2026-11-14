@@ -1,5 +1,9 @@
 # Roadmap
 
+## Blocked: WAGR profile ranking line — new example test provider
+- Add the shared server-gated ranking line below the index, or independently when the index is absent; preserve the rest of the profile and examples.
+- Focused 54 executed / 53 passed / 1 failed: new example-mode case lacks QueryClientProvider (useDeclineHandicapChip.ts:15:23). Stop rule prevents shards; report .lovable/reports/wagr-profile-line-stop.md. Expected inventory 8,727 (+13 from 8,714). Visual checks remain unverified.
+
 ## WAGR Career — tests complete; visual checks outstanding
 - Authorised test-fix returns empty amateur career moments in the Ranking mock only; all assertions and source unchanged. Focused 80/80 and four separate shards 2,224 / 2,083 / 2,187 / 2,213 = 8,707 passed; diff and totals in .lovable/reports/wagr-career-testfix.md.
 - Add career reads/timeline and reuse parameterised pro career sheets; preserve pro behaviour and existing five-row fixture.

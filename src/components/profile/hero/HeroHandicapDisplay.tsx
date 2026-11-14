@@ -94,11 +94,13 @@ interface Props {
   example?: boolean;
   /** HH3: optional node between the index chart and Form · last five. */
   afterChart?: React.ReactNode;
+  /** Profile-owned ranking line; illustrative examples never supply it. */
+  afterIndex?: React.ReactNode;
 }
 export const HeroHandicapDisplay: React.FC<Props> = ({
   t, shownIndex, deltaLines, slot, verdict, series, chartColor, chartFillTop,
   axisWindow, windowDays, bars, byId, countingKnown, countingN, loweredN,
-  tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false, afterChart,
+  tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false, afterChart, afterIndex,
 }) => {
   return (
           <div style={{ marginTop: 14 }}>
@@ -134,6 +136,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                     </span>
                   )}
                 </div>
+                {!example && afterIndex}
                 {verdict && (
                   <div style={{ marginTop: 9, fontSize: 12.5, fontWeight: 600, lineHeight: 1.4, color: A.BODY }}>{verdict}</div>
                 )}

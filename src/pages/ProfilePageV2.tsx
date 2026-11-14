@@ -1037,6 +1037,7 @@ const ProfilePageV2Content: React.FC = () => {
             menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>Copy link</DropdownMenuItem>{!isSelfView && <>{viewerActorType !== 'business' && friendshipStatus === 'friends' && <DropdownMenuItem onClick={() => unfriend()}>Remove friend</DropdownMenuItem>}<DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}</DropdownMenuContent></DropdownMenu>}
           /> : <ProfileHero
             userId={profile.id}
+            onOpenRanking={() => { setSearchParams({ tab: 'ranking' }); tabBarRef.current?.scrollIntoView({ block: 'start' }); }}
             onOpenRound={(scoreId) => {
               if (scorecard.target?.scoreId === scoreId) scorecard.close();
               else scorecard.openByScore(scoreId, null, profileUserId);

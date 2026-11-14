@@ -9,10 +9,14 @@
  * Every figure reuses a hook the page (or another tab) already mounts:
  * useProfileRounds is shared with the Rounds tab via React Query; the
  * viewer's chip state is warm from the chrome header.
+ * WAGR profile lines share the Ranking tab's server-gated summary/history;
+ * handicap visibility never gates ranking visibility, and examples stay inert.
  */
 import React from 'react';
 import type { ProMember } from '@/features/pro-verification/proMembersCache';
 import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers';
+import { useAmateurSummary, useAmateurHistory } from '@/features/amateur-ranking/useAmateurRanking';
+import { rankingMovement } from '@/features/amateur-ranking/rankingTabRules';
 import { proKindLabel } from '@/features/pro-verification/proRules';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -101,6 +105,7 @@ interface Props {
   onConnect?: () => void;
   /** HH3: page-owned eligibility (another member's profile, signed-in non-guest viewer). */
   showCompareEntry?: boolean;
+  onOpenRanking?: () => void;
 }
 
 function formatIndex(v: number): string {
@@ -188,6 +193,7 @@ export const ProfileHero: React.FC<Props> = ({
   onConnect,
   actionsRow,
   showCompareEntry = false,
+  onOpenRanking,
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
@@ -202,6 +208,23 @@ export const ProfileHero: React.FC<Props> = ({
   const { data: percentile } = useHandicapPercentile(isSelf ? userId : undefined);
   const roundsQ = useProfileRounds(userId);
   const { members: amateurs } = useAmateurMembers([userId]);
+  const amateurSummary = useAmateurSummary(userId, !proMember);
+  const amateurHistory = useAmateurHistory(userId, !proMember && amateurSummary.isSuccess && !!amateurSummary.data);
+  const amateurRank = !proMember && amateurSummary.isSuccess ? amateurSummary.data?.rank : null;
+  const amateurMovement = amateurHistory.isSuccess ? rankingMovement(amateurHistory.data ?? [])?.thisWeek : null;
+  const rankingLine = amateurRank == null ? null : (
+    <button type="button" aria-label={`World amateur ranking ${amateurRank}. Open the Ranking tab`} onClick={onOpenRanking}
+      style={{ background: 'transparent', border: 0, padding: 0, textAlign: 'left', width: '100%', display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap', marginTop: 10, fontSize: 12.5, fontWeight: 700, color: A.INK, cursor: 'pointer' }}>
+      <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.01em', color: A.INK }}>#{amateurRank}</span>
+      <span style={{ ...MICRO, color: A.DIM }}>World amateur ranking</span>
+      {amateurMovement && <span>
+        <span style={{ color: amateurMovement.direction === 'up' ? GREEN : amateurMovement.direction === 'down' ? RED : A.MUTE }}>
+          {amateurMovement.direction === 'same' ? 'no change' : `${amateurMovement.direction === 'up' ? '▲' : '▼'} ${amateurMovement.amount}`}
+        </span>{' '}<span style={{ color: A.MUTE, fontWeight: 600 }}>this week</span>
+      </span>}
+      <span aria-hidden="true" style={{ marginLeft: 'auto', color: A.DIM, fontSize: 15 }}>›</span>
+    </button>
+  );
 
   // Fallback chain unchanged: own cover → #1 Top 10 course image → flat canvas.
   const topCourse = React.useMemo(
@@ -458,6 +481,7 @@ export const ProfileHero: React.FC<Props> = ({
             bars={bars} byId={byId} countingKnown={countingKnown} countingN={countingN}
             loweredN={loweredN} tilesWord={tilesWord} isSelf={isSelf}
             ownerFirstName={ownerFirstName} onStatTap={onStatTap} tap={tap} onOpenRound={onOpenRound}
+            afterIndex={rankingLine}
             afterChart={showCompareEntry && !isSelf && viewerUserId ? (
               <HeadToHeadEntryRow
                 viewerUserId={viewerUserId}
@@ -469,6 +493,8 @@ export const ProfileHero: React.FC<Props> = ({
             ) : undefined}
           />
         )}
+
+        {(!showIndexBlocks || shownIndex == null) && rankingLine && <div style={{ marginTop: 14 }}>{React.cloneElement(rankingLine, { style: { ...rankingLine.props.style, marginTop: 0 } })}</div>}
 
         {showConnectCard && <HeroConnectExample t={t} onConnect={onConnect} />}
         {showLinkedNotice && <LinkedHandicapNotice provider={chip.connection?.provider} />}
