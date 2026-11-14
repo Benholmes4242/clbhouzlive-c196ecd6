@@ -624,6 +624,41 @@ export type Database = {
           },
         ]
       }
+      amateur_career_moments: {
+        Row: {
+          created_at: string
+          id: string
+          is_win: boolean
+          text: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_win?: boolean
+          text: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_win?: boolean
+          text?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amateur_career_moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "amateur_rank_links"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       amateur_events: {
         Row: {
           counting: boolean
