@@ -42,3 +42,13 @@ export function useAmateurEvents(userId: string | undefined, enabled = true) {
     },
   });
 }
+
+
+export function useAmateurCareer(userId: string, enabled: boolean) {
+  return useQuery({ queryKey: ['amateur-career', userId], enabled: enabled && !!userId, queryFn: async () => {
+    const result = await supabase.from('amateur_career_moments').select('*').eq('user_id', userId)
+      .order('year', { ascending: false }).order('created_at', { ascending: false });
+    if (result.error) throw result.error;
+    return result.data ?? [];
+  } });
+}

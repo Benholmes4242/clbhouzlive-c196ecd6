@@ -3,7 +3,7 @@
  * so a positive (other − current) difference is an improvement. */
 import { wagrOrdinal } from './wagrSettingsRules';
 
-export type AmateurHistoryRow = { id: number; week: number; rank: number; finish: string | null };
+export type AmateurHistoryRow = { id: number; week: number; rank: number; finish: string | null; event_id?: number | null; event_name?: string | null };
 export type AmateurEventRow = { wagr_event_id: number; event_name: string; event_week: string | null; week_year: string | null; country: string | null; finish: string | null; points: number | null };
 
 /** The tab exists only on personal profiles of non-pros whose summary read
@@ -110,4 +110,31 @@ export function finishLabel(finish: string | null): { text: string; dim: boolean
   if (/^\d+$/.test(trimmed)) return { text: wagrOrdinal(Number(trimmed)), dim: false };
   if (trimmed === 'Participant') return { text: 'Team', dim: true };
   return { text: trimmed, dim: true };
+}
+
+
+export type AmateurCareerMoment = { id: string; year: number; text: string; is_win: boolean; created_at: string };
+export type AmateurCareerEntry = AmateurCareerMoment & { derived: boolean; kind: number; order: string };
+/** Whole-career figures never use the rolling summary; repeated event ids count once. */
+export function amateurCareerTotals(history: AmateurHistoryRow[]) {
+  const ids = (accept: (row: AmateurHistoryRow) => boolean) => new Set(history.filter(row => row.event_id != null && accept(row)).map(row => row.event_id)).size;
+  return { wins: ids(row => row.finish === '1'), top10s: ids(row => /^(?:[1-9]|10)$/.test(row.finish ?? '')), events: ids(() => true) };
+}
+/** Shared ordering mirrors pro careerEntries: year, kind, descending date, id. */
+export function amateurCareerEntries(history: AmateurHistoryRow[], moments: AmateurCareerMoment[]): AmateurCareerEntry[] {
+  const rows = [...history].sort((a,b) => a.week-b.week || a.id-b.id);
+  const events = rows.filter(row => row.event_id != null && row.event_name);
+  const unique = events.filter((row,index) => events.findIndex(other => other.event_id === row.event_id) === index);
+  const entries: AmateurCareerEntry[] = moments.map(moment => ({ ...moment, derived: false, kind: 2, order: moment.created_at }));
+  const add = (row: AmateurHistoryRow, kind: number, text: string, is_win = false) => {
+    const date = isoWeekThursday(row.week);
+    entries.push({ id: `${kind}-${row.id}`, year: date.getUTCFullYear(), text, is_win, created_at: date.toISOString(), derived: true, kind, order: date.toISOString() });
+  };
+  const high = [...rows].sort((a,b) => a.rank-b.rank || a.week-b.week || a.id-b.id)[0];
+  if (high) add(high,0,`Career-high world amateur ranking, #${high.rank}`);
+  unique.filter(row => row.finish === '1').forEach(row => add(row,1,`Won ${row.event_name}`,true));
+  unique.filter(row => row.finish === '2' || row.finish === '3').reverse().slice(0,5).forEach(row => add(row,1,`${row.finish === '2' ? '2nd' : '3rd'}, ${row.event_name}`));
+  const first = unique[0];
+  if (first) add(first,3,`First world amateur ranking event, ${first.event_name}`);
+  return entries.sort((a,b) => b.year-a.year || a.kind-b.kind || b.order.localeCompare(a.order) || a.id.localeCompare(b.id));
 }

@@ -4,9 +4,12 @@
  * colours come from INDEX_DELTA.dark; wins use the gam gold #FBBC2E. */
 import { useId, useState } from 'react';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
-import { useAmateurEvents, useAmateurHistory, useAmateurSummary } from './useAmateurRanking';
-import { axisLabel, eventMonthLabel, finishLabel, rankingChartPoints, rankingLabelY, rankingMovement, type RankingMovementPart } from './rankingTabRules';
+import { useAmateurCareer, useAmateurEvents, useAmateurHistory, useAmateurSummary } from './useAmateurRanking';
+import { amateurCareerEntries, amateurCareerTotals, axisLabel, eventMonthLabel, finishLabel, rankingChartPoints, rankingLabelY, rankingMovement, type RankingMovementPart } from './rankingTabRules';
 import { wagrOrdinal } from './wagrSettingsRules';
+import { Button } from '@/components/ui/button';
+import { ProCollectionSheet, type CollectionPanel } from '@/features/pro-profile/ProCollectionSheets';
+import '@/features/pro-profile/pro-profile.css';
 import './ranking-tab.css';
 
 const UP = INDEX_DELTA.dark.improved;
@@ -18,16 +21,21 @@ function MovementPart({ part }: { part: RankingMovementPart }) {
   return <span className={part.direction === 'up' ? 'amr-up' : 'amr-down'}>{part.direction === 'up' ? '▲' : '▼'} {part.amount}</span>;
 }
 
-export function ProfileRankingTab({ userId }: { userId: string }) {
+export function ProfileRankingTab({ userId, isOwner = false }: { userId: string; isOwner?: boolean }) {
   const gradientId = useId();
   const summary = useAmateurSummary(userId);
   const ready = summary.isSuccess && summary.data != null;
   const history = useAmateurHistory(userId, ready);
   const events = useAmateurEvents(userId, ready);
+  const career = useAmateurCareer(userId, ready);
+  const [panel, setPanel] = useState<CollectionPanel | null>(null);
   const [expanded, setExpanded] = useState(false);
   const data = summary.data;
   if (!data) return null;
   const rows = history.isSuccess ? history.data ?? [] : [];
+  const moments = career.isSuccess ? career.data ?? [] : [];
+  const entries = amateurCareerEntries(rows, moments);
+  const totals = history.isSuccess ? amateurCareerTotals(rows) : null;
   const movement = rankingMovement(rows);
   const points = rows.length >= 2 ? rankingChartPoints(rows) : [];
   const eventRows = events.isSuccess ? events.data ?? [] : [];
@@ -62,9 +70,9 @@ export function ProfileRankingTab({ userId }: { userId: string }) {
       </svg>}
       <div className="amr-tiles">
         {tile('BEST RANK', data.best_rank != null ? wagrOrdinal(data.best_rank) : null)}
-        {tile('WINS', data.wins, true)}
-        {tile('TOP 10S', data.top10s)}
-        {tile('EVENTS', data.counting_events)}
+        {tile('WINS', totals?.wins ?? null, true)}
+        {tile('TOP 10S', totals?.top10s ?? null)}
+        {tile('EVENTS', totals?.events ?? null)}
       </div>
     </section>
     {events.isSuccess && <section className="amr-section">
@@ -80,6 +88,15 @@ export function ProfileRankingTab({ userId }: { userId: string }) {
       })}
       {!expanded && eventRows.length > 5 && <button type="button" className="amr-all" onClick={() => setExpanded(true)}>See all {eventRows.length} counting events ›</button>}
     </section>}
+    {(entries.length > 0 || isOwner) && <section className="amr-section" data-amateur-career>
+      <div className="amr-hd"><h2>CAREER</h2>{isOwner && moments.length > 0 && <Button variant={null} size={null} className="amr-edit" onClick={() => setPanel({kind:'career',mode:'list'})}>Edit</Button>}</div>
+      <div className="amr-career">{entries.map((entry,index) => <div key={entry.id} data-career-entry data-win={entry.is_win ? '' : undefined}>
+        {entries[index-1]?.year !== entry.year && <b>{entry.year}</b>}
+        <span>{entry.text}{entry.derived && <small>From WAGR</small>}</span>
+      </div>)}</div>
+      {isOwner && <div className="amr-add"><div><b>Add a career moment</b><small>County caps, club titles, team selections. Wins show in gold.</small></div><Button variant={null} size={null} className="amr-cmd" onClick={() => setPanel({kind:'career',mode:'edit'})}>Add</Button></div>}
+    </section>}
+    {isOwner && panel && <ProCollectionSheet panel={panel} setPanel={setPanel} userId={userId} bag={[]} partners={[]} moments={moments} amateur careerTable="amateur_career_moments" careerKey={['amateur-career',userId]}/>}
     <div className="amr-foot">Points average {data.points_average != null ? data.points_average.toFixed(2) : '–'} · last 104 weeks · updated weekly from WAGR®</div>
   </div>;
 }

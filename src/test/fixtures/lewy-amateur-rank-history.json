@@ -1,0 +1,1242 @@
+[
+ {
+  "id": 1,
+  "user_id": "lewy",
+  "week": 202427,
+  "rank": 4440,
+  "event_id": 234178,
+  "event_name": "Midland Youths Open Amateur Championship (Kymin)",
+  "finish": "1",
+  "points": 7.8383
+ },
+ {
+  "id": 2,
+  "user_id": "lewy",
+  "week": 202428,
+  "rank": 4471,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 3,
+  "user_id": "lewy",
+  "week": 202429,
+  "rank": 4191,
+  "event_id": 234602,
+  "event_name": "English Under 25 Championship",
+  "finish": "10",
+  "points": 4.1375
+ },
+ {
+  "id": 4,
+  "user_id": "lewy",
+  "week": 202430,
+  "rank": 3843,
+  "event_id": 234763,
+  "event_name": "English Boys' Open Amateur Stroke Play Championship (Carris Trophy)",
+  "finish": "5",
+  "points": 5.5697
+ },
+ {
+  "id": 5,
+  "user_id": "lewy",
+  "week": 202431,
+  "rank": 3855,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 6,
+  "user_id": "lewy",
+  "week": 202432,
+  "rank": 3838,
+  "event_id": 235161,
+  "event_name": "Girls' & Boys' Home Internationals",
+  "finish": "Participant",
+  "points": 0.4369
+ },
+ {
+  "id": 7,
+  "user_id": "lewy",
+  "week": 202433,
+  "rank": 3699,
+  "event_id": 235319,
+  "event_name": "R&A Boys Amateur Championship",
+  "finish": "82",
+  "points": 2.3692
+ },
+ {
+  "id": 8,
+  "user_id": "lewy",
+  "week": 202434,
+  "rank": 3711,
+  "event_id": 235480,
+  "event_name": "West Of England Under 18 Open Amateur Strokeplay",
+  "finish": "1",
+  "points": 7.6702
+ },
+ {
+  "id": 9,
+  "user_id": "lewy",
+  "week": 202435,
+  "rank": 1810,
+  "event_id": 235600,
+  "event_name": "The South East of England Links Championship",
+  "finish": "12",
+  "points": 3.7315
+ },
+ {
+  "id": 10,
+  "user_id": "lewy",
+  "week": 202436,
+  "rank": 1206,
+  "event_id": 235605,
+  "event_name": "West of England Open Amateur Match Play",
+  "finish": "9",
+  "points": 3.093
+ },
+ {
+  "id": 11,
+  "user_id": "lewy",
+  "week": 202437,
+  "rank": 1214,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 12,
+  "user_id": "lewy",
+  "week": 202438,
+  "rank": 1222,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 13,
+  "user_id": "lewy",
+  "week": 202439,
+  "rank": 1232,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 14,
+  "user_id": "lewy",
+  "week": 202440,
+  "rank": 852,
+  "event_id": 236245,
+  "event_name": "North of England Open Amateur Championship",
+  "finish": "18",
+  "points": 3.1681
+ },
+ {
+  "id": 15,
+  "user_id": "lewy",
+  "week": 202441,
+  "rank": 849,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 16,
+  "user_id": "lewy",
+  "week": 202442,
+  "rank": 857,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 17,
+  "user_id": "lewy",
+  "week": 202443,
+  "rank": 872,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 18,
+  "user_id": "lewy",
+  "week": 202444,
+  "rank": 804,
+  "event_id": 254596,
+  "event_name": "FJT - England Championship (South III)",
+  "finish": "3",
+  "points": 5.5629
+ },
+ {
+  "id": 19,
+  "user_id": "lewy",
+  "week": 202445,
+  "rank": 802,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 20,
+  "user_id": "lewy",
+  "week": 202446,
+  "rank": 794,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 21,
+  "user_id": "lewy",
+  "week": 202447,
+  "rank": 786,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 22,
+  "user_id": "lewy",
+  "week": 202448,
+  "rank": 784,
+  "event_id": 230855,
+  "event_name": "32nd Junior European Open with Sky Sports",
+  "finish": "1",
+  "points": 7.2254
+ },
+ {
+  "id": 23,
+  "user_id": "lewy",
+  "week": 202449,
+  "rank": 589,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 24,
+  "user_id": "lewy",
+  "week": 202450,
+  "rank": 584,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 25,
+  "user_id": "lewy",
+  "week": 202451,
+  "rank": 586,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 26,
+  "user_id": "lewy",
+  "week": 202452,
+  "rank": 592,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 27,
+  "user_id": "lewy",
+  "week": 202501,
+  "rank": 587,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 28,
+  "user_id": "lewy",
+  "week": 202502,
+  "rank": 584,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 29,
+  "user_id": "lewy",
+  "week": 202503,
+  "rank": 585,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 30,
+  "user_id": "lewy",
+  "week": 202504,
+  "rank": 583,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 31,
+  "user_id": "lewy",
+  "week": 202505,
+  "rank": 584,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 32,
+  "user_id": "lewy",
+  "week": 202506,
+  "rank": 583,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 33,
+  "user_id": "lewy",
+  "week": 202507,
+  "rank": 585,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 34,
+  "user_id": "lewy",
+  "week": 202508,
+  "rank": 587,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 35,
+  "user_id": "lewy",
+  "week": 202509,
+  "rank": 591,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 36,
+  "user_id": "lewy",
+  "week": 202510,
+  "rank": 594,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 37,
+  "user_id": "lewy",
+  "week": 202511,
+  "rank": 597,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 38,
+  "user_id": "lewy",
+  "week": 202512,
+  "rank": 666,
+  "event_id": 256256,
+  "event_name": "Bernard Darwin Salver",
+  "finish": "8",
+  "points": 3.5503
+ },
+ {
+  "id": 39,
+  "user_id": "lewy",
+  "week": 202513,
+  "rank": 663,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 40,
+  "user_id": "lewy",
+  "week": 202514,
+  "rank": 819,
+  "event_id": 256546,
+  "event_name": "Berkhamsted Trophy",
+  "finish": "37",
+  "points": 2.7483
+ },
+ {
+  "id": 41,
+  "user_id": "lewy",
+  "week": 202515,
+  "rank": 815,
+  "event_id": 256701,
+  "event_name": "Hampshire Salver",
+  "finish": "7",
+  "points": 4.2729
+ },
+ {
+  "id": 42,
+  "user_id": "lewy",
+  "week": 202516,
+  "rank": 864,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 43,
+  "user_id": "lewy",
+  "week": 202517,
+  "rank": 868,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 44,
+  "user_id": "lewy",
+  "week": 202518,
+  "rank": 863,
+  "event_id": 257177,
+  "event_name": "Lytham Trophy",
+  "finish": "29",
+  "points": 4.9323
+ },
+ {
+  "id": 45,
+  "user_id": "lewy",
+  "week": 202519,
+  "rank": 690,
+  "event_id": 257317,
+  "event_name": "Irish Men’s Amateur Open Championship",
+  "finish": "2",
+  "points": 8.3641
+ },
+ {
+  "id": 46,
+  "user_id": "lewy",
+  "week": 202520,
+  "rank": 688,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 47,
+  "user_id": "lewy",
+  "week": 202521,
+  "rank": 800,
+  "event_id": 257554,
+  "event_name": "English Men's Open Amateur Stroke Play Championship (Brabazon Trophy)",
+  "finish": "107",
+  "points": 2.4251
+ },
+ {
+  "id": 48,
+  "user_id": "lewy",
+  "week": 202522,
+  "rank": 802,
+  "event_id": 257692,
+  "event_name": "Scottish Men's Open Championship",
+  "finish": "18",
+  "points": 4.8423
+ },
+ {
+  "id": 49,
+  "user_id": "lewy",
+  "week": 202523,
+  "rank": 766,
+  "event_id": 257849,
+  "event_name": "St Andrews Links Trophy",
+  "finish": "49",
+  "points": 5.8067
+ },
+ {
+  "id": 50,
+  "user_id": "lewy",
+  "week": 202524,
+  "rank": 761,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 51,
+  "user_id": "lewy",
+  "week": 202525,
+  "rank": 754,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 52,
+  "user_id": "lewy",
+  "week": 202526,
+  "rank": 736,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 53,
+  "user_id": "lewy",
+  "week": 202527,
+  "rank": 751,
+  "event_id": 258616,
+  "event_name": "Midland Youths Open Amateur Championship (Kymin)",
+  "finish": "6",
+  "points": 4.3741
+ },
+ {
+  "id": 54,
+  "user_id": "lewy",
+  "week": 202528,
+  "rank": 764,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 55,
+  "user_id": "lewy",
+  "week": 202529,
+  "rank": 863,
+  "event_id": 259035,
+  "event_name": "Tillman Trophy",
+  "finish": "62",
+  "points": 2.5649
+ },
+ {
+  "id": 56,
+  "user_id": "lewy",
+  "week": 202530,
+  "rank": 705,
+  "event_id": 259148,
+  "event_name": "Walton Heath Trophy (Michael Lunt Salver)",
+  "finish": "1",
+  "points": 8.8372
+ },
+ {
+  "id": 57,
+  "user_id": "lewy",
+  "week": 202531,
+  "rank": 738,
+  "event_id": 259419,
+  "event_name": "English Men's Amateur Championship",
+  "finish": "17",
+  "points": 4.1093
+ },
+ {
+  "id": 58,
+  "user_id": "lewy",
+  "week": 202532,
+  "rank": 689,
+  "event_id": 259641,
+  "event_name": "Women's & Men's Home Internationals",
+  "finish": "Participant",
+  "points": 1.6082
+ },
+ {
+  "id": 59,
+  "user_id": "lewy",
+  "week": 202533,
+  "rank": 647,
+  "event_id": 260240,
+  "event_name": "West of England Open Amateur Match Play",
+  "finish": "1",
+  "points": 7.0206
+ },
+ {
+  "id": 60,
+  "user_id": "lewy",
+  "week": 202534,
+  "rank": 643,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 61,
+  "user_id": "lewy",
+  "week": 202535,
+  "rank": 642,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 62,
+  "user_id": "lewy",
+  "week": 202536,
+  "rank": 645,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 63,
+  "user_id": "lewy",
+  "week": 202537,
+  "rank": 644,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 64,
+  "user_id": "lewy",
+  "week": 202538,
+  "rank": 654,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 65,
+  "user_id": "lewy",
+  "week": 202539,
+  "rank": 662,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 66,
+  "user_id": "lewy",
+  "week": 202540,
+  "rank": 663,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 67,
+  "user_id": "lewy",
+  "week": 202541,
+  "rank": 653,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 68,
+  "user_id": "lewy",
+  "week": 202542,
+  "rank": 651,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 69,
+  "user_id": "lewy",
+  "week": 202543,
+  "rank": 652,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 70,
+  "user_id": "lewy",
+  "week": 202544,
+  "rank": 646,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 71,
+  "user_id": "lewy",
+  "week": 202545,
+  "rank": 643,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 72,
+  "user_id": "lewy",
+  "week": 202546,
+  "rank": 632,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 73,
+  "user_id": "lewy",
+  "week": 202547,
+  "rank": 636,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 74,
+  "user_id": "lewy",
+  "week": 202548,
+  "rank": 637,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 75,
+  "user_id": "lewy",
+  "week": 202549,
+  "rank": 641,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 76,
+  "user_id": "lewy",
+  "week": 202550,
+  "rank": 642,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 77,
+  "user_id": "lewy",
+  "week": 202551,
+  "rank": 647,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 78,
+  "user_id": "lewy",
+  "week": 202552,
+  "rank": 650,
+  "event_id": 265472,
+  "event_name": "The International Amateur ",
+  "finish": "38",
+  "points": 4.561
+ },
+ {
+  "id": 79,
+  "user_id": "lewy",
+  "week": 202601,
+  "rank": 641,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 80,
+  "user_id": "lewy",
+  "week": 202602,
+  "rank": 592,
+  "event_id": 268286,
+  "event_name": "Abierto Sudamericano Amateur",
+  "finish": "9",
+  "points": 7.3879
+ },
+ {
+  "id": 81,
+  "user_id": "lewy",
+  "week": 202603,
+  "rank": 590,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 82,
+  "user_id": "lewy",
+  "week": 202604,
+  "rank": 572,
+  "event_id": 268371,
+  "event_name": "Octagonal Match - E. Fdez-Gamboa Memorial",
+  "finish": "Participant",
+  "points": 0.8971
+ },
+ {
+  "id": 83,
+  "user_id": "lewy",
+  "week": 202605,
+  "rank": 564,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 84,
+  "user_id": "lewy",
+  "week": 202606,
+  "rank": 556,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 85,
+  "user_id": "lewy",
+  "week": 202607,
+  "rank": 583,
+  "event_id": 268447,
+  "event_name": "Portuguese Internacional Amateur Championship",
+  "finish": "45",
+  "points": 4.4938
+ },
+ {
+  "id": 86,
+  "user_id": "lewy",
+  "week": 202607,
+  "rank": 583,
+  "event_id": 268172,
+  "event_name": "Nau Alamos Open",
+  "finish": "45",
+  "points": 2.7499
+ },
+ {
+  "id": 87,
+  "user_id": "lewy",
+  "week": 202608,
+  "rank": 654,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 88,
+  "user_id": "lewy",
+  "week": 202609,
+  "rank": 648,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 89,
+  "user_id": "lewy",
+  "week": 202610,
+  "rank": 655,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 90,
+  "user_id": "lewy",
+  "week": 202611,
+  "rank": 667,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 91,
+  "user_id": "lewy",
+  "week": 202612,
+  "rank": 682,
+  "event_id": 268603,
+  "event_name": "Spanish Amateur Copa S M El Rey",
+  "finish": "33",
+  "points": 4.4685
+ },
+ {
+  "id": 92,
+  "user_id": "lewy",
+  "week": 202613,
+  "rank": 689,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 93,
+  "user_id": "lewy",
+  "week": 202614,
+  "rank": 694,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 94,
+  "user_id": "lewy",
+  "week": 202615,
+  "rank": 725,
+  "event_id": 268985,
+  "event_name": "Berkhamsted Trophy",
+  "finish": "8",
+  "points": 4.1401
+ },
+ {
+  "id": 95,
+  "user_id": "lewy",
+  "week": 202616,
+  "rank": 730,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 96,
+  "user_id": "lewy",
+  "week": 202617,
+  "rank": 689,
+  "event_id": 269363,
+  "event_name": "Italian International Amateur Championship",
+  "finish": "7",
+  "points": 6.3825
+ },
+ {
+  "id": 97,
+  "user_id": "lewy",
+  "week": 202618,
+  "rank": 627,
+  "event_id": 269415,
+  "event_name": "Lytham Trophy",
+  "finish": "10",
+  "points": 7.6568
+ },
+ {
+  "id": 98,
+  "user_id": "lewy",
+  "week": 202619,
+  "rank": 580,
+  "event_id": 269962,
+  "event_name": "Austrian International Amateur",
+  "finish": "4",
+  "points": 7.252
+ },
+ {
+  "id": 99,
+  "user_id": "lewy",
+  "week": 202620,
+  "rank": 571,
+  "event_id": 267256,
+  "event_name": "France v England International Match",
+  "finish": "Participant",
+  "points": 0.9608
+ },
+ {
+  "id": 100,
+  "user_id": "lewy",
+  "week": 202621,
+  "rank": 529,
+  "event_id": 269687,
+  "event_name": "English Men's Open Amateur Stroke Play Championship (Brabazon Trophy)",
+  "finish": "9",
+  "points": 7.0415
+ },
+ {
+  "id": 101,
+  "user_id": "lewy",
+  "week": 202622,
+  "rank": 565,
+  "event_id": 269780,
+  "event_name": "Scottish Men's Open Championship",
+  "finish": "33",
+  "points": 3.4836
+ },
+ {
+  "id": 102,
+  "user_id": "lewy",
+  "week": 202623,
+  "rank": 545,
+  "event_id": 269912,
+  "event_name": "St Andrews Links Trophy",
+  "finish": "47",
+  "points": 6.0457
+ },
+ {
+  "id": 103,
+  "user_id": "lewy",
+  "week": 202624,
+  "rank": 528,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 104,
+  "user_id": "lewy",
+  "week": 202625,
+  "rank": 420,
+  "event_id": 270163,
+  "event_name": "The Amateur Championship",
+  "finish": "9",
+  "points": 11.144
+ },
+ {
+  "id": 105,
+  "user_id": "lewy",
+  "week": 202626,
+  "rank": 412,
+  "event_id": 270339,
+  "event_name": "European Amateur Championship",
+  "finish": "71",
+  "points": 5.5412
+ },
+ {
+  "id": 106,
+  "user_id": "lewy",
+  "week": 202627,
+  "rank": 407,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 107,
+  "user_id": "lewy",
+  "week": 202628,
+  "rank": 370,
+  "event_id": 270657,
+  "event_name": "European Amateur Team Championship",
+  "finish": "Participant",
+  "points": 2.4034
+ },
+ {
+  "id": 108,
+  "user_id": "lewy",
+  "week": 202629,
+  "rank": 365,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 109,
+  "user_id": "lewy",
+  "week": 202630,
+  "rank": 369,
+  "event_id": 271006,
+  "event_name": "South of Ireland Men's Amateur Open Championship",
+  "finish": "33",
+  "points": 4.9444
+ },
+ {
+  "id": 110,
+  "user_id": "lewy",
+  "week": 202631,
+  "rank": 358,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 111,
+  "user_id": "lewy",
+  "week": 202632,
+  "rank": 336,
+  "event_id": 273189,
+  "event_name": "Men's and Women's Home International Matches",
+  "finish": "Participant",
+  "points": 1.6164
+ },
+ {
+  "id": 112,
+  "user_id": "lewy",
+  "week": 202633,
+  "rank": 336,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 113,
+  "user_id": "lewy",
+  "week": 202634,
+  "rank": 332,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 114,
+  "user_id": "lewy",
+  "week": 202635,
+  "rank": 337,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 115,
+  "user_id": "lewy",
+  "week": 202636,
+  "rank": 330,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 116,
+  "user_id": "lewy",
+  "week": 202637,
+  "rank": 349,
+  "event_id": 272573,
+  "event_name": "Bernhard Langer German International Amateur",
+  "finish": "21",
+  "points": 3.6418
+ },
+ {
+  "id": 117,
+  "user_id": "lewy",
+  "week": 202638,
+  "rank": 341,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 118,
+  "user_id": "lewy",
+  "week": 202639,
+  "rank": 316,
+  "event_id": 276763,
+  "event_name": "Swedish International Men's Amateur Championship",
+  "finish": "2",
+  "points": 8.4619
+ },
+ {
+  "id": 119,
+  "user_id": "lewy",
+  "week": 202640,
+  "rank": 317,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 120,
+  "user_id": "lewy",
+  "week": 202641,
+  "rank": 312,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 121,
+  "user_id": "lewy",
+  "week": 202642,
+  "rank": 315,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 122,
+  "user_id": "lewy",
+  "week": 202643,
+  "rank": 319,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 123,
+  "user_id": "lewy",
+  "week": 202644,
+  "rank": 321,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ },
+ {
+  "id": 124,
+  "user_id": "lewy",
+  "week": 202645,
+  "rank": 318,
+  "event_id": null,
+  "event_name": null,
+  "finish": null,
+  "points": null
+ }
+]

@@ -945,7 +945,7 @@ const ProfilePageV2Content: React.FC = () => {
       case 'tour':
         return showTourTab && proMember ? <ProfileTourTab pro={proMember} displayName={displayName} isOwner={isSelf} /> : null;
       case 'ranking':
-        return showRankingTab && profile?.id ? <ProfileRankingTab userId={profile.id} /> : null;
+        return showRankingTab && profile?.id ? <ProfileRankingTab userId={profile.id} isOwner={isSelf} /> : null;
       case 'courses':
         return (
           <ProfileCoursesTab 

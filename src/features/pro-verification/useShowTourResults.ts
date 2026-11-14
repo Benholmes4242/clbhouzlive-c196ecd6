@@ -27,7 +27,7 @@ export function useShowTourResults(userId: string) {
   }, onSuccess: async () => {
     await Promise.all([
       cache.invalidateQueries({ queryKey: ['pro-profile'] }),
-      ...['profile', 'user-profile', 'wagr-link', 'amateur-summary', 'amateur-history', 'amateur-events', 'pro-world-rank'].map(prefix => cache.invalidateQueries({ queryKey: [prefix, userId] })),
+      ...['profile', 'user-profile', 'wagr-link', 'amateur-summary', 'amateur-history', 'amateur-events', 'amateur-career', 'pro-world-rank'].map(prefix => cache.invalidateQueries({ queryKey: [prefix, userId] })),
     ]);
   } });
   return { checked: query.data ?? true, disabled: query.isPending || query.isError || mutation.isPending, saving: mutation.isPending, toggle: (next: boolean) => mutation.mutate(next) };
