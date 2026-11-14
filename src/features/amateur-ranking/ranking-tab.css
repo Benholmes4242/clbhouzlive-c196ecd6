@@ -1,6 +1,7 @@
 /* Signed-off amateur-ranking-A mock, renamed under .amr- and scoped to the tab.
    Only colour changes: up/line/fill INDEX_DELTA.dark.improved #4ADE80, down
    INDEX_DELTA.dark.drifted #F87171, wins gold #FBBC2E. */
+.amateur-ranking-tab{line-height:normal}
 .amateur-ranking-tab .amr-section{padding:18px 16px 0}
 .amateur-ranking-tab .amr-hd{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px}
 .amateur-ranking-tab .amr-hd h2{margin:0;font-size:9px;font-weight:700;letter-spacing:.16em;color:rgba(248,250,252,.42)}
@@ -29,5 +30,5 @@
 .amateur-ranking-tab .amr-nm small{display:block;font-size:11px;margin-top:2px;color:rgba(248,250,252,.42)}
 .amateur-ranking-tab .amr-pts{flex:none;text-align:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
 .amateur-ranking-tab .amr-pts i{display:block;font-style:normal;font-size:7.5px;letter-spacing:.12em;color:rgba(248,250,252,.42);margin-top:1px}
-.amateur-ranking-tab .amr-all{padding:10px 2px 0;font-size:12px;font-weight:700;color:rgba(248,250,252,.78);background:none;border:0;width:100%;text-align:left}
+.amateur-ranking-tab .amr-all{font:inherit;padding:10px 2px 0;font-size:12px;font-weight:700;color:rgba(248,250,252,.78);background:none;border:0;width:100%;text-align:left}
 .amateur-ranking-tab .amr-foot{padding:16px 16px 0;font-size:10.5px;color:rgba(248,250,252,.42);line-height:1.4}

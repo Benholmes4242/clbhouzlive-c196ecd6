@@ -45,13 +45,15 @@ const LEWY_HISTORY = [
   { id: 4, user_id: 'member', week: 202644, rank: 321, finish: null, event_name: null, points: null, event_id: null },
   { id: 5, user_id: 'member', week: 202645, rank: 318, finish: '2', event_name: 'Swedish International', points: 8.46, event_id: 6 },
 ];
+// Real database shape: event_week is the DATE of the ISO week's Thursday;
+// the WAGR "WW/YYYY" text lives in week_year.
 const LEWY_EVENTS = [
-  { wagr_event_id: 6, user_id: 'member', event_name: "Swedish International Men's Amateur Championship", event_week: '39/2026', country: 'Sweden', finish: '2', points: 8.46, counting: true, week_year: '2026', event_type: null, format: null, updated_at: '' },
-  { wagr_event_id: 5, user_id: 'member', event_name: 'Bernhard Langer German International Amateur', event_week: '38/2026', country: 'Germany', finish: '21', points: 3.64, counting: true, week_year: '2026', event_type: null, format: null, updated_at: '' },
-  { wagr_event_id: 4, user_id: 'member', event_name: "Men's and Women's Home International Matches", event_week: '35/2026', country: 'Ireland', finish: 'Participant', points: 1.62, counting: true, week_year: '2026', event_type: null, format: null, updated_at: '' },
-  { wagr_event_id: 3, user_id: 'member', event_name: "South of Ireland Men's Amateur Open Championship", event_week: '30/2026', country: 'Ireland', finish: '33', points: 4.94, counting: true, week_year: '2026', event_type: null, format: null, updated_at: '' },
-  { wagr_event_id: 2, user_id: 'member', event_name: 'European Amateur Team Championship', event_week: '29/2026', country: 'Estonia', finish: 'Participant', points: 2.4, counting: true, week_year: '2026', event_type: null, format: null, updated_at: '' },
-  { wagr_event_id: 1, user_id: 'member', event_name: 'English Men\'s Open Amateur Stroke Play', event_week: '25/2026', country: null, finish: '5', points: null, counting: true, week_year: '2026', event_type: null, format: null, updated_at: '' },
+  { wagr_event_id: 6, user_id: 'member', event_name: "Swedish International Men's Amateur Championship", event_week: '2026-09-24', country: 'Sweden', finish: '2', points: 8.46, counting: true, week_year: '39/2026', event_type: null, format: null, updated_at: '' },
+  { wagr_event_id: 5, user_id: 'member', event_name: 'Bernhard Langer German International Amateur', event_week: '2026-09-17', country: 'Germany', finish: '21', points: 3.64, counting: true, week_year: '38/2026', event_type: null, format: null, updated_at: '' },
+  { wagr_event_id: 4, user_id: 'member', event_name: "Men's and Women's Home International Matches", event_week: '2026-08-27', country: 'Ireland', finish: 'Participant', points: 1.62, counting: true, week_year: '35/2026', event_type: null, format: null, updated_at: '' },
+  { wagr_event_id: 3, user_id: 'member', event_name: "South of Ireland Men's Amateur Open Championship", event_week: '2026-07-23', country: 'Ireland', finish: '33', points: 4.94, counting: true, week_year: '30/2026', event_type: null, format: null, updated_at: '' },
+  { wagr_event_id: 2, user_id: 'member', event_name: 'European Amateur Team Championship', event_week: '2026-07-16', country: 'Estonia', finish: 'Participant', points: 2.4, counting: true, week_year: '29/2026', event_type: null, format: null, updated_at: '' },
+  { wagr_event_id: 1, user_id: 'member', event_name: 'English Men\'s Open Amateur Stroke Play', event_week: '2026-06-18', country: null, finish: '5', points: null, counting: true, week_year: '25/2026', event_type: null, format: null, updated_at: '' },
 ];
 
 const clients: QueryClient[] = [];
@@ -120,10 +122,14 @@ it('Win dots come only from rows finishing 1', () => {
   expect(wins).toHaveLength(1);
   expect(wins[0]).toMatchObject({ x: 4, y: 100 });
 });
-it('Rank labels flip under their point when above would clip', () => {
+it('Rank labels flip under their point only below y 4', () => {
   expect(rankingLabelY(100, -16, 14)).toBe(84);
-  expect(rankingLabelY(14, -8, 14)).toBe(28);
+  expect(rankingLabelY(14, -8, 14)).toBe(6);
   expect(rankingLabelY(50, -8, 14)).toBe(42);
+  expect(rankingLabelY(11, -8, 14)).toBe(25);
+});
+it('Lewy last label stays at y 6.6, unflipped', () => {
+  expect(rankingLabelY(14.6, -8, 14)).toBe(6.6);
 });
 it('Equal ranks sit on the middle line', () => {
   const points = rankingChartPoints([LEWY_HISTORY[3], { ...LEWY_HISTORY[4], rank: 321 }]);
@@ -132,7 +138,11 @@ it('Equal ranks sit on the middle line', () => {
 it('Axis and event labels come from the ISO week Thursday', () => {
   expect(axisLabel(202428)).toBe('JUL 2024');
   expect(axisLabel(202645)).toBe('NOV 2026');
-  expect(eventMonthLabel('39/2026')).toBe('Sep 2026');
+  expect(eventMonthLabel({ event_week: '2026-09-24', week_year: '39/2026' })).toBe('Sep 2026');
+});
+it('Event label falls back to week_year, then blank', () => {
+  expect(eventMonthLabel({ event_week: null, week_year: '39/2026' })).toBe('Sep 2026');
+  expect(eventMonthLabel({ event_week: null, week_year: null })).toBe('');
 });
 
 // --- Ordinals and finishes ---

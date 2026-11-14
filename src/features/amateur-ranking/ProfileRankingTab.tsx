@@ -71,7 +71,7 @@ export function ProfileRankingTab({ userId }: { userId: string }) {
       <div className="amr-hd"><h2>RECENT EVENTS</h2><span className="amr-src">World Amateur Golf Ranking®</span></div>
       {shown.map(event => {
         const fin = finishLabel(event.finish);
-        const when = eventMonthLabel(event.event_week);
+        const when = eventMonthLabel(event);
         return <div className="amr-ev" key={event.wagr_event_id}>
           <span className={`amr-fin${fin.dim ? ' amr-dim' : ''}`}>{fin.text}</span>
           <span className="amr-nm"><b>{event.event_name}</b><small>{when}{event.country ? `${when ? ' · ' : ''}${event.country}` : ''}</small></span>

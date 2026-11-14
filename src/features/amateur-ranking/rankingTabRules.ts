@@ -4,7 +4,7 @@
 import { wagrOrdinal } from './wagrSettingsRules';
 
 export type AmateurHistoryRow = { id: number; week: number; rank: number; finish: string | null };
-export type AmateurEventRow = { wagr_event_id: number; event_name: string; event_week: string | null; country: string | null; finish: string | null; points: number | null };
+export type AmateurEventRow = { wagr_event_id: number; event_name: string; event_week: string | null; week_year: string | null; country: string | null; finish: string | null; points: number | null };
 
 /** The tab exists only on personal profiles of non-pros whose summary read
  * returned a row (the server gates the rows; no rows means no tab). */
@@ -38,12 +38,18 @@ export function axisLabel(week: number): string {
   return `${MONTHS[thursday.getUTCMonth()]} ${thursday.getUTCFullYear()}`.toUpperCase();
 }
 
-/** "Sep 2026" from an event_week stored as "WW/YYYY". */
-export function eventMonthLabel(eventWeek: string | null): string {
-  const match = /^(\d{1,2})\/(\d{4})$/.exec(eventWeek ?? '');
-  if (!match) return '';
-  const thursday = isoWeekThursday(Number(match[2]) * 100 + Number(match[1]));
-  return `${MONTHS[thursday.getUTCMonth()]} ${thursday.getUTCFullYear()}`;
+/** "Sep 2026" for an event. event_week is a DATE (the Thursday of the ISO
+ * week, e.g. '2026-09-24') and wins when present; the WAGR "WW/YYYY" text in
+ * week_year is the fallback. Parsed as UTC so the month never drifts. */
+export function eventMonthLabel(event: { event_week: string | null; week_year: string | null }): string {
+  const date = /^(\d{4})-(\d{2})-(\d{2})$/.exec(event.event_week ?? '');
+  if (date) return `${MONTHS[Number(date[2]) - 1]} ${date[1]}`;
+  const week = /^(\d{1,2})\/(\d{4})$/.exec(event.week_year ?? '');
+  if (week) {
+    const thursday = isoWeekThursday(Number(week[2]) * 100 + Number(week[1]));
+    return `${MONTHS[thursday.getUTCMonth()]} ${thursday.getUTCFullYear()}`;
+  }
+  return '';
 }
 
 export type RankingMovementPart = { direction: 'up' | 'down' | 'same'; amount: number };
@@ -91,10 +97,11 @@ export function rankingChartPoints(rows: AmateurHistoryRow[]): RankingChartPoint
   }));
 }
 
-/** Rank labels sit above their point; below y 8 they flip under it instead. */
+/** Rank labels sit above their point; below y 4 they flip under it instead
+ * (the signed-off mock keeps the last label at y 6.6). */
 export function rankingLabelY(y: number, offset: number, flipped: number): number {
   const value = round1(y + offset);
-  return value < 8 ? round1(y + flipped) : value;
+  return value < 4 ? round1(y + flipped) : value;
 }
 
 export function finishLabel(finish: string | null): { text: string; dim: boolean } {
