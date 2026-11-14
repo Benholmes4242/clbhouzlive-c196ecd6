@@ -37,7 +37,7 @@ for (const [name, pro, wagr, tour] of [
   ['verified tour pro', { unknown: false, verified: true, pending: false, kind: 'tour_pro' }, false, true],
   ['verified teaching pro', { unknown: false, verified: true, pending: false, kind: 'teaching_pro' }, false, false],
   ['unresolved pro', { unknown: true, verified: false, pending: false, kind: null }, false, false],
-] as const) it(`WAGR card visibility for ${name}`, () => { expect(wagrCardVisible(pro)).toBe(wagr); expect(tourResultsVisible(pro)).toBe(tour); });
+] as const) it(`WAGR card visibility for ${name}`, () => { const status = pro; expect(wagrCardVisible(status)).toBe(wagr); expect(tourResultsVisible(status)).toBe(tour); });
 for (const status of [null, 'rejected']) it(`WAGR ${status ?? 'absent'} link offers linking`, async () => {
   h.link = status ? { status } : null; mount(<SettingsWagrCard userId="member" />);
   expect(await screen.findByRole('button', { name: 'Link your WAGR profile' })).toBeEnabled(); expect(h.invoke).not.toHaveBeenCalled();
@@ -62,7 +62,7 @@ it('WAGR unknown figures display dashes rather than invented values', async () =
 });
 it('WAGR unlink requires confirmation and deletes only member row', async () => {
   h.link = { status: 'verified' }; mount(<SettingsWagrCard userId="member" />); fireEvent.click(await screen.findByRole('button', { name: 'Unlink WAGR' }));
-  expect(h.deleted).not.toHaveBeenCalled(); fireEvent.click(screen.getByRole('button', { name: 'Unlink', exact: true })); await waitFor(() => expect(h.deleted).toHaveBeenCalledExactlyOnceWith('amateur_rank_links', 'user_id', 'member'));
+  expect(h.deleted).not.toHaveBeenCalled(); fireEvent.click(screen.getByRole('button', { name: /^Unlink$/ })); await waitFor(() => expect(h.deleted).toHaveBeenCalledExactlyOnceWith('amateur_rank_links', 'user_id', 'member'));
 });
 for (const [iso, expected] of [[null, 'first update on its way'], ['2026-11-14T12:00:00Z', 'updated today'], ['2026-11-09T12:00:00Z', 'updated Monday'], ['2026-11-01T12:00:00Z', 'updated 1 Nov']] as const) it(`WAGR updated branch ${expected}`, () => { expect(rankingUpdated(iso, new Date('2026-11-14T15:00:00Z'))).toBe(expected); });
 it('WAGR Best ordinals handle 11th, 12th, 13th and 21st', () => { expect([11, 12, 13, 21, 22, 23].map(wagrOrdinal)).toEqual(['11th', '12th', '13th', '21st', '22nd', '23rd']); });

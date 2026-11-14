@@ -1,9 +1,9 @@
 # Roadmap
 
-## Blocked: WAGR Settings test-side typecheck
+## WAGR Settings: tests complete; screenshots outstanding
 - Add amateur link/pending/verified cards and link/unlink sheets; tour-pro-only results card with shared optimistic privacy switch.
 - Add nonfatal review notifications before approval sync; test all states and four independent shards.
-- Focused 40/40 passed; new test TypeScript errors at wagrSettings.test.tsx:35 and :65 stopped full shards and screenshots. Inventory 8,640 (+35), last passing 8,605. Exact diagnostics and changed assertions: .lovable/reports/wagr-settings-stop.md.
+- Type errors corrected without changing assertions; preview build OK. Four separate shards 2,211 / 2,046 / 2,186 / 2,197 = 8,640 passed (+35 from 8,605); report .lovable/reports/wagr-settings-typefix.md. Requested screenshots still outstanding; real authenticated checks unavailable on external Supabase.
 
 ## Complete: WAGR server and admin review
 - Remove and undeploy the disposable probe; add shared WAGR reads, member linking and sequential verified-member sync without SQL or schedules.
