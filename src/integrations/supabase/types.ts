@@ -624,6 +624,192 @@ export type Database = {
           },
         ]
       }
+      amateur_events: {
+        Row: {
+          counting: boolean
+          country: string | null
+          event_name: string
+          event_type: string | null
+          event_week: string | null
+          finish: string | null
+          format: string | null
+          points: number | null
+          updated_at: string
+          user_id: string
+          wagr_event_id: number
+          week_year: string
+        }
+        Insert: {
+          counting?: boolean
+          country?: string | null
+          event_name: string
+          event_type?: string | null
+          event_week?: string | null
+          finish?: string | null
+          format?: string | null
+          points?: number | null
+          updated_at?: string
+          user_id: string
+          wagr_event_id: number
+          week_year: string
+        }
+        Update: {
+          counting?: boolean
+          country?: string | null
+          event_name?: string
+          event_type?: string | null
+          event_week?: string | null
+          finish?: string | null
+          format?: string | null
+          points?: number | null
+          updated_at?: string
+          user_id?: string
+          wagr_event_id?: number
+          week_year?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amateur_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "amateur_rank_links"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      amateur_rank_history: {
+        Row: {
+          event_id: number | null
+          event_name: string | null
+          finish: string | null
+          id: number
+          points: number | null
+          rank: number
+          user_id: string
+          week: number
+        }
+        Insert: {
+          event_id?: number | null
+          event_name?: string | null
+          finish?: string | null
+          id?: never
+          points?: number | null
+          rank: number
+          user_id: string
+          week: number
+        }
+        Update: {
+          event_id?: number | null
+          event_name?: string | null
+          finish?: string | null
+          id?: never
+          points?: number | null
+          rank?: number
+          user_id?: string
+          week?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amateur_rank_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "amateur_rank_links"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      amateur_rank_links: {
+        Row: {
+          last_error: string | null
+          last_synced_at: string | null
+          requested_at: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+          wagr_country: string | null
+          wagr_name: string | null
+          wagr_player_id: number
+          wagr_slug: string
+        }
+        Insert: {
+          last_error?: string | null
+          last_synced_at?: string | null
+          requested_at?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+          wagr_country?: string | null
+          wagr_name?: string | null
+          wagr_player_id: number
+          wagr_slug: string
+        }
+        Update: {
+          last_error?: string | null
+          last_synced_at?: string | null
+          requested_at?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+          wagr_country?: string | null
+          wagr_name?: string | null
+          wagr_player_id?: number
+          wagr_slug?: string
+        }
+        Relationships: []
+      }
+      amateur_rank_summary: {
+        Row: {
+          best_rank: number | null
+          counting_events: number | null
+          divisor: number | null
+          fetched_at: string
+          points_average: number | null
+          rank: number | null
+          rank_week: number | null
+          top10s: number | null
+          user_id: string
+          wins: number | null
+        }
+        Insert: {
+          best_rank?: number | null
+          counting_events?: number | null
+          divisor?: number | null
+          fetched_at?: string
+          points_average?: number | null
+          rank?: number | null
+          rank_week?: number | null
+          top10s?: number | null
+          user_id: string
+          wins?: number | null
+        }
+        Update: {
+          best_rank?: number | null
+          counting_events?: number | null
+          divisor?: number | null
+          fetched_at?: string
+          points_average?: number | null
+          rank?: number | null
+          rank_week?: number | null
+          top10s?: number | null
+          user_id?: string
+          wins?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amateur_rank_summary_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "amateur_rank_links"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       amateur_stories: {
         Row: {
           body_blocks: Json
@@ -17628,6 +17814,7 @@ export type Database = {
           show_handicap: boolean
           show_in_exploration_leaderboards: boolean
           show_in_handicap_leaderboards: boolean
+          show_tour_results: boolean
           social_links: Json | null
           suspended_at: string | null
           suspended_by: string | null
@@ -17767,6 +17954,7 @@ export type Database = {
           show_handicap?: boolean
           show_in_exploration_leaderboards?: boolean
           show_in_handicap_leaderboards?: boolean
+          show_tour_results?: boolean
           social_links?: Json | null
           suspended_at?: string | null
           suspended_by?: string | null
@@ -17906,6 +18094,7 @@ export type Database = {
           show_handicap?: boolean
           show_in_exploration_leaderboards?: boolean
           show_in_handicap_leaderboards?: boolean
+          show_tour_results?: boolean
           social_links?: Json | null
           suspended_at?: string | null
           suspended_by?: string | null
@@ -21999,6 +22188,29 @@ export type Database = {
           total_users: number
         }[]
       }
+      admin_review_wagr_link: {
+        Args: { p_approve: boolean; p_note?: string; p_user: string }
+        Returns: {
+          last_error: string | null
+          last_synced_at: string | null
+          requested_at: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+          wagr_country: string | null
+          wagr_name: string | null
+          wagr_player_id: number
+          wagr_slug: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "amateur_rank_links"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_route_for_path: { Args: { p_path: string }; Returns: string }
       admin_run_cron_job: { Args: { p_jobid: number }; Returns: Json }
       admin_set_app_config: {
@@ -22083,6 +22295,7 @@ export type Database = {
         Args: { target_date?: string }
         Returns: undefined
       }
+      amateur_results_visible: { Args: { p_user: string }; Returns: boolean }
       answer_pro_question: {
         Args: { p_answer: string; p_question_id: string }
         Returns: undefined
@@ -27199,6 +27412,12 @@ export type Database = {
           username: string
         }[]
       }
+      get_verified_amateurs: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          user_id: string
+        }[]
+      }
       get_video_of_the_week: {
         Args: never
         Returns: {
@@ -28395,6 +28614,7 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      pro_results_visible: { Args: { p_user: string }; Returns: boolean }
       prune_featured_rounds_history: { Args: never; Returns: number }
       prune_leaderboard_snapshots: { Args: never; Returns: undefined }
       publish_pending_review: {
