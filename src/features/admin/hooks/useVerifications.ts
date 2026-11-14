@@ -205,22 +205,11 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
   );
 }
 
+// WAGR decision notifications belong to wagr_link_decision_notify; the client only reviews, invalidates and syncs approvals.
 export async function reviewWagrClaim(userId: string, approve: boolean, note: string) {
   const reviewed = await supabase.rpc('admin_review_wagr_link', { p_user: userId, p_approve: approve, p_note: note });
   if (reviewed.error) throw reviewed.error;
   invalidateAmateurMembers();
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const result = await supabase.from('notifications').insert({
-        user_id: userId, recipient_actor_type: 'user', recipient_actor_id: userId,
-        actor_id: user.id, type: 'moderation',
-        title: approve ? 'WAGR profile linked' : 'WAGR link not confirmed',
-        message: approve ? 'Your World Amateur Golf Ranking is now on your profile, with the AM badge.' : "We couldn't confirm that WAGR profile is yours. You can try again from Settings.",
-      });
-      if (result.error) throw result.error;
-    }
-  } catch (error) { console.warn('[wagr] notify failed', error); }
   if (approve) {
     const synced = await supabase.functions.invoke('sync-amateur-rankings', { body: { user_id: userId } });
     if (synced.error || synced.data?.errored > 0) throw new Error(synced.error?.message ?? 'Approved, but the WAGR sync failed.');

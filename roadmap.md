@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete: WAGR server-owned decision notifications
+- Remove client notification insertion; preserve review RPC → amateur invalidation → approve-only sync.
+- Authorised cases replaced; four separate shards passed 2,224 / 2,083 / 2,187 / 2,197 = 8,691. Delta −2 from 8,693 names the two obsolete notification cases in .lovable/reports/wagr-notify-server.md; no unexpected failures.
+
 ## Complete: WAGR AM name badges — authorised test narrowing verified
 - Authorised WAGR AM badge test fix: narrow only the two PRO read counts (and identical aggregate-count failures if encountered), then run all four app shards; no source changes.
 - Add batched verified-amateur cache, shared name marks, profile cover and visible admin-row badges with PRO priority.

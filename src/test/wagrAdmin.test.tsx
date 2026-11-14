@@ -26,33 +26,25 @@ it('WAGR pending claims have their own count and do not inflate pro/golfer count
   expect(hook.result.current.data.find(row => row.id === 'am')).toMatchObject({ type: 'wagr', wagrName: 'Lewy', displayName: 'Member' });
   hook.unmount(); client.clear();
 });
-it('WAGR approval calls review RPC before invoking targeted sync', async () => {
+it('WAGR approval calls review RPC then targeted sync without a notifications insert', async () => {
   await reviewWagrClaim('am', true, 'Confirmed');
-  expect(h.calls).toEqual(['rpc', 'notification', 'sync']);
-  expect(h.notification).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'am', recipient_actor_type: 'user', recipient_actor_id: 'am', actor_id: 'admin', type: 'moderation', title: 'WAGR profile linked', message: 'Your World Amateur Golf Ranking is now on your profile, with the AM badge.' }));
+  expect(h.calls).toEqual(['rpc', 'sync']);
+  expect(h.notification).not.toHaveBeenCalled();
   expect(h.rpc).toHaveBeenCalledWith('admin_review_wagr_link', { p_user: 'am', p_approve: true, p_note: 'Confirmed' });
   expect(h.invoke).toHaveBeenCalledWith('sync-amateur-rankings', { body: { user_id: 'am' } });
 });
-it('WAGR rejection records the note and never invokes sync', async () => {
+it('WAGR rejection calls review RPC without a notifications insert or sync', async () => {
   await reviewWagrClaim('am', false, 'Different person'); expect(h.invoke).not.toHaveBeenCalled();
   expect(h.rpc).toHaveBeenCalledWith('admin_review_wagr_link', { p_user: 'am', p_approve: false, p_note: 'Different person' });
-  expect(h.notification).toHaveBeenCalledWith(expect.objectContaining({ title: 'WAGR link not confirmed', message: "We couldn't confirm that WAGR profile is yours. You can try again from Settings." }));
+  expect(h.calls).toEqual(['rpc']);
+  expect(h.notification).not.toHaveBeenCalled();
 });
 it('WAGR failed approval RPC never invokes sync', async () => {
   h.rpc.mockResolvedValue({ data: null, error: new Error('denied') });
   await expect(reviewWagrClaim('am', true, '')).rejects.toThrow('denied'); expect(h.invoke).not.toHaveBeenCalled();
+  expect(h.rpc).toHaveBeenCalledWith('admin_review_wagr_link', { p_user: 'am', p_approve: true, p_note: '' });
+  expect(h.notification).not.toHaveBeenCalled();
 });
 it('WAGR failed queue read is not treated as no claims', async () => {
   h.failed = true; await expect(fetchVerifications()).rejects.toThrow('denied');
-});
-it('WAGR notification failure warns without failing the review or skipping sync', async () => {
-  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-  h.notification.mockResolvedValue({ error: new Error('notification denied') });
-  await reviewWagrClaim('am', true, '');
-  expect(warn).toHaveBeenCalled(); expect(h.invoke).toHaveBeenCalled(); warn.mockRestore();
-});
-it('WAGR approval notifies even when the following sync fails', async () => {
-  h.invoke.mockResolvedValue({ error: new Error('sync blocked') });
-  await expect(reviewWagrClaim('am', true, '')).rejects.toThrow('sync blocked');
-  expect(h.calls).toEqual(['rpc', 'notification']); expect(h.notification).toHaveBeenCalled();
 });
