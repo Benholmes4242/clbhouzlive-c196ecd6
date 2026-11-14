@@ -10,7 +10,7 @@ export type CourseClaimDecision = 'approved' | 'rejected' | 'needs_more_info';
 
 export interface VerificationRow {
   id: string;
-  type: 'business' | 'golfer' | 'course_claim';
+  type: 'business' | 'golfer' | 'course_claim' | 'wagr';
   status: string;
   requestedBy: string | null;
   createdAt: string;
@@ -47,6 +47,9 @@ export interface VerificationRow {
   proNoProfile?: boolean | null;
   proHowToCheck?: string | null;
   proPlayerId?: string | null;
+  wagrName?: string | null;
+  wagrCountry?: string | null;
+  wagrSlug?: string | null;
   displayName?: string | null;
   username?: string | null;
   avatarUrl?: string | null;
@@ -66,7 +69,7 @@ export interface VerificationRow {
 }
 
 export async function fetchVerifications(): Promise<VerificationRow[]> {
-  const [biz, golfer, claims] = await Promise.all([
+  const [biz, golfer, claims, wagr] = await Promise.all([
     supabase
       .from('business_verification_requests')
       .select('id, status, requested_by, created_at, reviewed_at, reviewed_by, review_reason, approval_count, required_approvals, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata, proof_document_url, contact_email, contact_role')
@@ -80,12 +83,14 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
       .from('course_claim_requests')
       .select('id, status, business_id, club_id, source_course_id, proof_note, admin_note, created_at, reviewed_at, requested_by')
       .order('created_at', { ascending: false }),
+    supabase.from('amateur_rank_links').select('*').order('requested_at', { ascending: false }),
   ]);
 
   /* BRIEF 1 §8 — a failed read must surface, never become an empty queue. */
   if (biz.error) throw biz.error;
   if (golfer.error) throw golfer.error;
   if (claims.error) throw claims.error;
+  if (wagr.error) throw wagr.error;
 
   // Enrich course-claim rows with business name + course label
   const claimRows = claims.data ?? [];
@@ -114,6 +119,11 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
   }
 
   const rows: VerificationRow[] = [
+    ...(wagr.data ?? []).map(r => ({
+      id: r.user_id, type: 'wagr' as const, status: r.status, requestedBy: r.user_id,
+      createdAt: r.requested_at, reviewedAt: r.reviewed_at, reviewedBy: r.reviewed_by,
+      note: null, adminNote: r.review_note, wagrName: r.wagr_name, wagrCountry: r.wagr_country, wagrSlug: r.wagr_slug,
+    })),
     ...(biz.data ?? []).map((r: any) => ({
       id: r.id, type: 'business' as const, status: r.status,
       requestedBy: r.requested_by, createdAt: r.created_at, reviewedAt: r.reviewed_at,
@@ -194,6 +204,15 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
   );
 }
 
+export async function reviewWagrClaim(userId: string, approve: boolean, note: string) {
+  const reviewed = await supabase.rpc('admin_review_wagr_link', { p_user: userId, p_approve: approve, p_note: note });
+  if (reviewed.error) throw reviewed.error;
+  if (approve) {
+    const synced = await supabase.functions.invoke('sync-amateur-rankings', { body: { user_id: userId } });
+    if (synced.error || synced.data?.errored > 0) throw new Error(synced.error?.message ?? 'Approved, but the WAGR sync failed.');
+  }
+}
+
 export function useVerifications() {
   const qc = useQueryClient();
   const { data = [], isLoading, refetch } = useQuery({
@@ -208,7 +227,7 @@ export function useVerifications() {
       id, type, decision, adminNote, reviewReason, playerId,
     }: {
       id: string;
-      type: 'business' | 'golfer' | 'course_claim';
+      type: 'business' | 'golfer' | 'course_claim' | 'wagr';
       decision: BusinessDecision | GolferDecision | CourseClaimDecision;
       adminNote: string;
       /**
@@ -233,6 +252,12 @@ export function useVerifications() {
         }
         return new Error(error?.message || 'Edge function error');
       };
+
+      if (type === 'wagr') {
+        if (decision === 'needs_more_info') throw new Error('WAGR claims support approve or reject only.');
+        await reviewWagrClaim(id, decision === 'approved', adminNote);
+        return;
+      }
 
       if (type === 'business') {
         // Route through edge functions so is_verified flips + emails fire.
@@ -409,6 +434,7 @@ export function useVerifications() {
     business: data.filter(v => v.type === 'business' && v.status === 'pending').length,
     golfer: data.filter(v => v.type === 'golfer' && v.status === 'pending' && !isProKind(v.kind)).length,
     pro: data.filter(v => v.type === 'golfer' && v.status === 'pending' && isProKind(v.kind)).length,
+    wagr: data.filter(v => v.type === 'wagr' && v.status === 'pending').length,
     courseClaim: data.filter(v => v.type === 'course_claim' && v.status === 'pending').length,
   };
 

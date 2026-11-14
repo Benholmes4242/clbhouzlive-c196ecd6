@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -41,7 +43,7 @@ const PROOF_NOUNS: Record<string, string> = {
   golf_course: 'golf course website',
 };
 
-type EntityFilter = 'business' | 'golfer' | 'pro' | 'course_claim';
+type EntityFilter = 'business' | 'golfer' | 'pro' | 'course_claim' | 'wagr';
 
 export function VerificationsTab({
   data, loading, review,
@@ -59,6 +61,7 @@ export function VerificationsTab({
     business: data.filter(r => r.type === 'business' && r.status === 'pending').length,
     course_claim: data.filter(r => r.type === 'course_claim' && r.status === 'pending').length,
     golfer: data.filter(r => r.type === 'golfer' && !isProKind(r.kind) && r.status === 'pending').length,
+    wagr: data.filter(r => r.type === 'wagr' && r.status === 'pending').length,
     pro: data.filter(r => r.type === 'golfer' && isProKind(r.kind) && r.status === 'pending').length,
   }), [data]);
 
@@ -68,6 +71,7 @@ export function VerificationsTab({
       : pendingByEntity.course_claim > 0 ? 'course_claim'
       : pendingByEntity.golfer > 0 ? 'golfer'
       : pendingByEntity.pro > 0 ? 'pro'
+      : pendingByEntity.wagr > 0 ? 'wagr'
       : 'business');
 
   const [entityFilter, setEntityFilterState] = useState<EntityFilter>(defaultEntity);
@@ -135,7 +139,7 @@ export function VerificationsTab({
   const rows = useMemo(() => {
     if (statusFilter === 'all') return entityFiltered;
     if (statusFilter === 'needs_info') return entityFiltered.filter(r => r.status === 'needs_more_info');
-    if (statusFilter === 'approved') return entityFiltered.filter(r => r.status === 'approved' || r.status === 'accepted');
+    if (statusFilter === 'approved') return entityFiltered.filter(r => r.status === 'approved' || r.status === 'accepted' || r.status === 'verified');
     if (statusFilter === 'rejected') return entityFiltered.filter(r => r.status === 'rejected' || r.status === 'declined');
     return entityFiltered.filter(r => r.status === 'pending');
   }, [entityFiltered, statusFilter]);
@@ -166,7 +170,7 @@ export function VerificationsTab({
 
   const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
     if (!active) return;
-    if (d === 'rejected' || d === 'needs_more_info') {
+    if (active.type !== 'wagr' && (d === 'rejected' || d === 'needs_more_info')) {
       // §3.2 — a refusal now needs a REASON. Free text is required only when the
       // list cannot carry it ('other'); otherwise the reason names the cause.
       if (!reviewReason) { setDecision(d); return; }
@@ -191,6 +195,7 @@ export function VerificationsTab({
           { id: 'business',     label: 'Businesses', count: pendingByEntity.business || undefined },
           { id: 'golfer',       label: 'Users',      count: pendingByEntity.golfer || undefined },
           { id: 'pro',          label: 'Pros',       count: pendingByEntity.pro || undefined },
+          { id: 'wagr',         label: 'WAGR',       count: pendingByEntity.wagr || undefined },
           { id: 'course_claim', label: 'Courses',    count: pendingByEntity.course_claim || undefined },
         ]}
         activeId={entityFilter}
@@ -242,7 +247,7 @@ export function VerificationsTab({
         subtitle={active ? (
           active.type === 'course_claim'
             ? `Course claim - requested by ${active.displayName ?? active.username ?? '-'} - ${formatAgo(active.createdAt, { suffix: true, empty: '-' })}`
-            : `${active.type === 'business' ? 'Business' : 'Golfer'} - ${formatAgo(active.createdAt, { suffix: true, empty: '-' })}`
+            : `${active.type === 'business' ? 'Business' : active.type === 'wagr' ? 'WAGR' : 'Golfer'} - ${formatAgo(active.createdAt, { suffix: true, empty: '-' })}`
         ) : undefined}
         footer={active && canRevoke ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
@@ -370,6 +375,16 @@ export function VerificationDetailBody({
     return () => { cancelled = true; };
   }, [row.id, row.businessId, row.type]);
 
+  const wagrLookup = useQuery({
+    queryKey: ['admin-wagr-lookup', row.id, row.wagrSlug],
+    enabled: row.type === 'wagr' && !!row.wagrSlug,
+    staleTime: 0,
+    queryFn: async () => {
+      const result = await supabase.functions.invoke('wagr-link', { body: { action: 'lookup', input: row.wagrSlug } });
+      if (result.error) throw result.error;
+      return result.data as { rank: number | null; isPro: boolean };
+    },
+  });
   const resolved = useMemo(() => resolveSignals(row), [row]);
 
   return (
@@ -381,7 +396,7 @@ export function VerificationDetailBody({
         }>
           {row.type === 'business' ? 'Business' :
             row.type === 'course_claim' ? 'Course claim' :
-            isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'}
+            row.type === 'wagr' ? 'WAGR' : isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'}
         </StatusPill>
         <StatusPill tone={
           row.status === 'pending' ? 'warn' :
@@ -392,6 +407,18 @@ export function VerificationDetailBody({
           {row.status}
         </StatusPill>
       </div>
+
+      {row.type === 'wagr' && (
+        <div>
+          <Field label="WAGR name" value={row.wagrName ?? '—'} />
+          <Field label="Country" value={row.wagrCountry ?? '—'} />
+          {wagrLookup.isLoading ? <p role="status">Checking WAGR…</p> : wagrLookup.isError ? <p role="alert">Could not check the current WAGR profile.</p> : wagrLookup.data ? <>
+            <Field label="Current rank" value={String(wagrLookup.data.rank ?? '—')} />
+            <Field label="Professional" value={wagrLookup.data.isPro ? 'Yes' : 'No'} />
+          </> : null}
+          <a href={`https://www.wagr.com/playerprofile/${row.wagrSlug}`} target="_blank" rel="noreferrer">Open on WAGR</a>
+        </div>
+      )}
 
       {row.type === 'course_claim' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -566,7 +593,7 @@ export function VerificationDetailBody({
 
       {/* PHASE 4 §3.2 — the reason is chosen from the published criteria, so the
           applicant gets a cause and a remedy rather than a mood. */}
-      {row.status === 'pending' && setReviewReason && (decision === 'rejected' || decision === 'needs_more_info') && (
+      {row.type !== 'wagr' && row.status === 'pending' && setReviewReason && (decision === 'rejected' || decision === 'needs_more_info') && (
         <div>
           <label style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
             Reason <span style={{ color: t.danger }}>(required)</span>
@@ -664,13 +691,14 @@ function VerificationCard({
                 {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '-'}
               </div>
               <div style={{ fontSize: 12, color: t.inkMuted }}>
-                {row.type === 'business' ? 'Business' : isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
+                {row.type === 'business' ? 'Business' : row.type === 'wagr' ? [row.wagrName, row.wagrCountry].filter(Boolean).join(' · ') : isProKind(row.kind) ? proKindLabel(row.kind) : 'Golfer'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
               </div>
             </>
           )}
         </div>
         <StatusPill tone={tone}>{row.status}</StatusPill>
       </button>
+      {row.type === 'wagr' && <a href={`https://www.wagr.com/playerprofile/${row.wagrSlug}`} target="_blank" rel="noreferrer">Open on WAGR</a>}
       {row.status === 'pending' && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <DrawerBtn icon={<X size={14} />} tone="danger" disabled={disabled} onClick={() => onQuick('rejected')}>Reject</DrawerBtn>

@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: WAGR server and admin review
+- Remove and undeploy the disposable probe; add shared WAGR reads, member linking and sequential verified-member sync without SQL or schedules.
+- Reuse admin verification rows/details and add verified amateurs; preserve existing golfer/pro decisions.
+- Add mocked Deno and admin tests, run four independent app shards, deploy only the two new functions; never invoke the real sync.
+- Report version, deployments and test accounting; existing cron name/schedule may be unavailable without SQL (which remains prohibited).
+
 ## Complete: Personal identity badge wrapping — authorised test fix
 - Group personal-profile badges and wrap them below the unchanged heading when needed; preserve every badge style and pro-profile surface.
 - Apply the two authorised structure updates, add one source case and run tests; stop on any other failure without changing its assertion.
