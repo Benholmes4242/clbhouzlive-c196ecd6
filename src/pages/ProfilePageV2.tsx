@@ -6,6 +6,9 @@
 import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
 import { useProMembers } from '@/features/pro-verification/useProMembers';
 import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
+import { useAmateurSummary } from '@/features/amateur-ranking/useAmateurRanking';
+import { insertRankingTab, rankingTabVisible } from '@/features/amateur-ranking/rankingTabRules';
+import { ProfileRankingTab } from '@/features/amateur-ranking/ProfileRankingTab';
 import { ProProfileBuildOne } from '@/features/pro-profile/ProProfileBuildOne';
 import { useProEvents } from '@/features/pro-profile/useProProfile';
 import { Button } from '@/components/ui/button';
@@ -344,7 +347,7 @@ const ProfilePageV2Content: React.FC = () => {
   // 'stats' is the legacy id of the handicap tab: accepted, mapped on read,
   // never emitted.
   const tabFromParam = (tabParam: string | null): string => {
-    const validTabs = ['activity', 'tour', 'courses', 'rounds', 'top100', 'handicap', 'stats', 'videos'];
+    const validTabs = ['activity', 'tour', 'ranking', 'courses', 'rounds', 'top100', 'handicap', 'stats', 'videos'];
     if (!tabParam || !validTabs.includes(tabParam)) return 'activity';
     return tabParam === 'stats' ? 'handicap' : tabParam;
   };
@@ -454,25 +457,33 @@ const ProfilePageV2Content: React.FC = () => {
   const proTabs = profileProTabs(proMember, isSelf, !!viewedWhsConnection, proHasResults);
   const showTourTab = isPersonal && proTabs.tour;
   const showHandicapTab = isPersonal && proTabs.handicap;
+  // The summary read is the Ranking-tab gate: the server returns rows only for
+  // the member, an admin, or a verified member with show_tour_results on.
+  const amateurSummary = useAmateurSummary(profileUserId, isPersonal && proMember == null);
+  const showRankingTab = rankingTabVisible(isPersonal, proMember, amateurSummary.data);
   const tabs = useMemo(() => {
-    const base = allTabs.filter(
+    let base = allTabs.filter(
       t => t.id !== 'top100' && (t.id !== 'handicap' || showHandicapTab),
     );
     if (isCreator) base.unshift({ id: 'videos', label: 'Videos' });
     if (showTourTab) base.splice(base.findIndex(t => t.id === 'activity') + 1, 0, { id: 'tour', label: 'Tour' });
+    if (showRankingTab) base = insertRankingTab(base);
     if (!showRoundsTab) return base;
     const at = base.findIndex(t => t.id === 'courses');
     const out = [...base];
     out.splice(at >= 0 ? at + 1 : out.length, 0, { id: 'rounds', label: 'Rounds' });
     return out;
-  }, [allTabs, showRoundsTab, showHandicapTab, showTourTab, isCreator]);
+  }, [allTabs, showRoundsTab, showHandicapTab, showTourTab, showRankingTab, isCreator]);
 
   useEffect(() => {
     if (!profile?.id || profilePros.isLoading) return;
-    if ((activeSection === 'tour' && !showTourTab) || (activeSection === 'handicap' && isSelf && !showHandicapTab)) {
+    // A disabled summary read (pros, businesses) stays pending forever; only
+    // wait for it when the gate actually runs.
+    if (isPersonal && proMember == null && amateurSummary.isPending) return;
+    if ((activeSection === 'tour' && !showTourTab) || (activeSection === 'ranking' && !showRankingTab) || (activeSection === 'handicap' && isSelf && !showHandicapTab)) {
       setSearchParams({ tab: showTourTab ? 'tour' : 'activity' }, { replace: true });
     }
-  }, [activeSection, profile?.id, profilePros.isLoading, showTourTab, isSelf, showHandicapTab, setSearchParams]);
+  }, [activeSection, profile?.id, profilePros.isLoading, isPersonal, proMember, amateurSummary.isPending, showTourTab, showRankingTab, isSelf, showHandicapTab, setSearchParams]);
 
   useEffect(() => {
     if (searchParams.get('tab') !== 'videos' || creatorPending || !profile?.id || isCreator) return;
@@ -933,6 +944,8 @@ const ProfilePageV2Content: React.FC = () => {
         );
       case 'tour':
         return showTourTab && proMember ? <ProfileTourTab pro={proMember} displayName={displayName} isOwner={isSelf} /> : null;
+      case 'ranking':
+        return showRankingTab && profile?.id ? <ProfileRankingTab userId={profile.id} /> : null;
       case 'courses':
         return (
           <ProfileCoursesTab 
@@ -1461,7 +1474,7 @@ const ProfilePageV2Content: React.FC = () => {
         </section>
 
         {/* Tab Content */}
-        <div className={cn(activeSection === 'activity' || activeSection === 'videos' || activeSection === 'tour' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
+        <div className={cn(activeSection === 'activity' || activeSection === 'videos' || activeSection === 'tour' || activeSection === 'ranking' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
           {getCurrentContent()}
         </div>
 

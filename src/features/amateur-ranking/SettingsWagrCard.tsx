@@ -9,6 +9,7 @@ import { useShowTourResults } from '@/features/pro-verification/useShowTourResul
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { WagrLinkSheet } from './WagrLinkSheet';
+import { useAmateurSummary } from './useAmateurRanking';
 import { rankingUpdated, wagrOrdinal, type WagrLookup } from './wagrSettingsRules';
 import '@/features/pro-verification/pro-status-controls.css';
 import './wagr-settings.css';
@@ -21,7 +22,7 @@ export function SettingsWagrCard({ userId }: { userId: string }) {
   const verified = link.data?.status === 'verified';
   const slug = link.data?.wagr_slug;
   const lookup = useQuery({ queryKey: ['wagr-lookup', slug], enabled: pending && !!slug, staleTime: 3600000, retry: false, queryFn: async () => { const result = await supabase.functions.invoke('wagr-link', { body: { action: 'lookup', input: slug } }); if (result.error || result.data?.error) throw result.error ?? new Error(result.data.error); return result.data as WagrLookup; } });
-  const summary = useQuery({ queryKey: ['amateur-summary', userId], enabled: verified, queryFn: async () => { const result = await supabase.from('amateur_rank_summary').select('rank,best_rank,counting_events').eq('user_id', userId).maybeSingle(); if (result.error) throw result.error; return result.data; } });
+  const summary = useAmateurSummary(userId, verified);
   const remove = useMutation({ mutationFn: async () => { const result = await supabase.from('amateur_rank_links').delete().eq('user_id', userId); if (result.error) throw result.error; }, onSuccess: async () => { setUnlinkOpen(false); await Promise.all(['wagr-link', 'amateur-summary', 'amateur-history', 'amateur-events', 'profile'].map(prefix => cache.invalidateQueries({ queryKey: [prefix, userId] }))); }, onError: () => toast.error('Could not update. Please try again.') });
   const figure = (label: string, value: number | string | null | undefined) => <div className="st2-figure" data-figure={label}><b className="tabular-nums" data-unknown={value == null}>{value ?? '–'}</b><span>{label}</span></div>;
   return <><section className="st2-handicap wagr-settings" data-testid="settings-wagr-card">
