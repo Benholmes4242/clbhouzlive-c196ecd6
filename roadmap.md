@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Signed-off amber members badge
+- Replace only shared badge tokens, ProLabel markup and badge/island styles; keep PRO eligibility and callers unchanged, with AM supported but unused.
+- Replace the five authorised pearl tests with seven member-badge cases; run each of the four shards separately and report exact source, assertions and totals.
+- Four separate shards passed 2,206 / 2,018 / 2,185 / 2,186 = 8,595 (+2 from 8,593); preview build OK. Full source, deleted assertions and test names: .lovable/reports/member-badge-amber.md. Authenticated visual checks remain unavailable.
+
 ## Blocked on invocation authorization: Read-only WAGR feasibility probe
 - Add and deploy only probe-wagr-profile with existing service-role/admin authentication, sequential public reads and complete response evidence.
 - Invoke once for lewy-hayward-41967; save the full response and invocation auth in .lovable/reports/wagr-probe.md, or report unavailable access and stop.

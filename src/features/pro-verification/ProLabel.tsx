@@ -2,8 +2,8 @@ import { cloneElement, isValidElement, type ReactNode, type CSSProperties, type 
 import { useProMembers } from './useProMembers';
 import './pro-label.css';
 
-export function ProLabel({ size = 'small' }: { size?: 'large' | 'small' }) {
-  return <span className="pro-label" data-size={size}>PRO</span>;
+export function ProLabel({ size = 'small', kind = 'pro' }: { size?: 'large' | 'small'; kind?: 'pro' | 'am' }) {
+  return <span className="pro-label" data-size={size} data-kind={kind}><span className="pro-label-text">{kind === 'am' ? 'AM' : 'PRO'}</span></span>;
 }
 
 /** The caller supplies its ORIGINAL name element, unchanged: tag, style,
