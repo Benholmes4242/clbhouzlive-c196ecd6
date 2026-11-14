@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
 import { isProKind } from '@/features/pro-verification/proRules';
+import { invalidateAmateurMembers } from '@/features/amateur-ranking/amateurMembersCache';
 
 export type BusinessDecision = 'approved' | 'rejected' | 'needs_more_info';
 export type GolferDecision = 'approved' | 'rejected';
@@ -207,6 +208,7 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
 export async function reviewWagrClaim(userId: string, approve: boolean, note: string) {
   const reviewed = await supabase.rpc('admin_review_wagr_link', { p_user: userId, p_approve: approve, p_note: note });
   if (reviewed.error) throw reviewed.error;
+  invalidateAmateurMembers();
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {

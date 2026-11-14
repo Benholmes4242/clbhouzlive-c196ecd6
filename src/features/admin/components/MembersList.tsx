@@ -20,6 +20,7 @@ import { useEgIssueUserIds } from '../hooks/useUsers';
 import { Button } from '@/components/ui/button';
 import { ProLabel } from '@/features/pro-verification/ProLabel';
 import { useProMembers } from '@/features/pro-verification/useProMembers';
+import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers';
 import type { ProMember } from '@/features/pro-verification/proMembersCache';
 import { useAdminVerified, adminVerifiedCount } from '../hooks/useAdminVerified';
 import { AdminVerifiedCard } from './AdminVerifiedCard';
@@ -207,7 +208,7 @@ function Chips({ o, verifiedCount, active, onPick }: { o: MembersOverview | unde
   );
 }
 
-function MemberRow({ m, pro, onOpen }: { m: MembersOverviewMember; pro?: ProMember; onOpen: () => void }) {
+function MemberRow({ m, pro, amateur, onOpen }: { m: MembersOverviewMember; pro?: ProMember; amateur?: boolean; onOpen: () => void }) {
   const name = m.display_name ?? m.username ?? 'Member';
   return (
     <button
@@ -235,6 +236,7 @@ function MemberRow({ m, pro, onOpen }: { m: MembersOverviewMember; pro?: ProMemb
             {name}
           </span>
           {pro && <ProLabel size="small" />}
+          {!pro && amateur && <ProLabel size="small" kind="am" />}
           {memberTags(m, pro).map(tag => (
             <span key={tag.label} style={{ ...TAG, color: tag.color }}>{tag.label}</span>
           ))}
@@ -334,6 +336,7 @@ export default function MembersList({
 
   const header = linked ? LINKED_FILTERS[linked].label : CHIP_HEADER[chip ?? 'all'];
   const { members: pros } = useProMembers(chip === 'verified' ? [] : rows.slice(0, shown).map(m => m.user_id));
+  const { members: amateurs } = useAmateurMembers(chip === 'verified' ? [] : rows.slice(0, shown).map(m => m.user_id));
   const more = rows.length - shown;
 
   return (
@@ -385,7 +388,7 @@ export default function MembersList({
         ) : (
           <>
             {rows.slice(0, shown).map(m => (
-              <MemberRow key={m.user_id} m={m} pro={pros.get(m.user_id)} onOpen={() => onOpenMember(m.user_id)} />
+              <MemberRow key={m.user_id} m={m} pro={pros.get(m.user_id)} amateur={amateurs.has(m.user_id)} onOpen={() => onOpenMember(m.user_id)} />
             ))}
             {more > 0 && (
               <button

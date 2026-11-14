@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ProLabel } from '@/features/pro-verification/ProLabel';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeWagrError, wagrError, type WagrLookup } from './wagrSettingsRules';
+import { invalidateAmateurMembers } from './amateurMembersCache';
 import './wagr-settings.css';
 export function WagrLinkSheet({ userId, open, onClose }: { userId: string; open: boolean; onClose: () => void }) {
   const cache = useQueryClient();
@@ -39,6 +40,7 @@ export function WagrLinkSheet({ userId, open, onClose }: { userId: string; open:
     try {
       const result = await supabase.functions.invoke('wagr-link', { body: { action: 'request', input: input.trim() } });
       if (result.error || result.data?.error) { setError(await invokeWagrError(result.error, result.data)); return; }
+      invalidateAmateurMembers();
       await cache.invalidateQueries({ queryKey: ['wagr-link', userId] });
       onClose();
     } catch { setError(wagrError()); } finally { setSaving(false); }

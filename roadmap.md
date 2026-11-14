@@ -1,5 +1,11 @@
 # Roadmap
 
+## Blocked: WAGR AM name badges — existing PRO test assertion
+- Add batched verified-amateur cache, shared name marks, profile cover and visible admin-row badges with PRO priority.
+- Invalidate after WAGR review/request/removal; preserve fonts, badge design, island handicap and existing PRO tests.
+- Run focused coverage and all four app shards; report files and reconcile against 8,667.
+- Focused 104 executed / 103 passed / 1 failed; all 26 new tests passed. Existing proVerification2.test.tsx:43:39 counts all RPCs and now sees both PRO and amateur reads. Four shards stopped; test-side authorisation needed. Inventory 8,693 (+26); preview build OK.
+
 ## WAGR Settings: tests complete; screenshots outstanding
 - Add amateur link/pending/verified cards and link/unlink sheets; tour-pro-only results card with shared optimistic privacy switch.
 - Add nonfatal review notifications before approval sync; test all states and four independent shards.

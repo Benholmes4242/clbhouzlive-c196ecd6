@@ -1,5 +1,6 @@
 import { cloneElement, isValidElement, type ReactNode, type CSSProperties, type ReactElement } from 'react';
 import { useProMembers } from './useProMembers';
+import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers';
 import './pro-label.css';
 
 export function ProLabel({ size = 'small', kind = 'pro' }: { size?: 'large' | 'small'; kind?: 'pro' | 'am' }) {
@@ -12,11 +13,12 @@ export function ProLabel({ size = 'small', kind = 'pro' }: { size?: 'large' | 's
  * Plain text callers may supply style/className for the fallback name span. */
 export function ProMemberName({ userId, children, style, className }: { userId?: string | null; children: ReactNode; style?: CSSProperties; className?: string }) {
   const { members } = useProMembers([userId]);
+  const { members: amateurs } = useAmateurMembers([userId]);
   const name = isValidElement(children)
     ? style || className ? cloneElement(children as ReactElement<{ style?: CSSProperties; className?: string }>, {
       ...(style ? { style } : {}), ...(className ? { className } : {}),
     }) : children
     : <span style={style} className={className}>{children}</span>;
   const Row = isValidElement(children) && (children.type === 'div' || children.type === 'p') ? 'div' : 'span';
-  return <Row className="pro-member-name">{name}{userId && members.has(userId) ? <ProLabel /> : null}</Row>;
+  return <Row className="pro-member-name">{name}{userId && members.has(userId) ? <ProLabel /> : userId && amateurs.has(userId) ? <ProLabel kind="am" /> : null}</Row>;
 }

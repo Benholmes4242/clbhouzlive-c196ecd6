@@ -12,6 +12,7 @@
  */
 import React from 'react';
 import type { ProMember } from '@/features/pro-verification/proMembersCache';
+import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers';
 import { proKindLabel } from '@/features/pro-verification/proRules';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -200,6 +201,7 @@ export const ProfileHero: React.FC<Props> = ({
   const viewerChip = useHandicapChipState(!isSelf && viewerUserId ? viewerUserId : undefined);
   const { data: percentile } = useHandicapPercentile(isSelf ? userId : undefined);
   const roundsQ = useProfileRounds(userId);
+  const { members: amateurs } = useAmateurMembers([userId]);
 
   // Fallback chain unchanged: own cover → #1 Top 10 course image → flat canvas.
   const topCourse = React.useMemo(
@@ -384,6 +386,7 @@ export const ProfileHero: React.FC<Props> = ({
         nameRef={nameRef}
         isCreator={isCreator}
         isPro={!!proMember}
+        isAmateur={amateurs.has(userId)}
         subline={subline || null}
         afterSubline={coachLine}
         onAddHomeClub={isSelf ? onEdit : undefined}

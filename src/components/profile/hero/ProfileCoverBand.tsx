@@ -93,6 +93,7 @@ interface Props {
   nameRef?: React.Ref<HTMLHeadingElement>;
   isCreator?: boolean;
   isPro?: boolean;
+  isAmateur?: boolean;
   /** Pre-joined home club · region; null when neither resolves. */
   subline: string | null;
   /** Optional member coach line, privacy/read ownership remains with its caller. */
@@ -111,6 +112,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
   nameRef,
   isCreator = false,
   isPro = false,
+  isAmateur = false,
   subline,
   afterSubline,
   onAddHomeClub,
@@ -200,7 +202,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
           </button>
 
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className={isPro ? 'pro-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
+            <div className={isPro || isAmateur ? 'pro-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
             <h1
               ref={nameRef}
               style={{
@@ -218,8 +220,9 @@ export const ProfileCoverBand: React.FC<Props> = ({
             >
               {displayName}
             </h1>
-            {(isPro || isCreator) && <span className="identity-badges">
+            {(isPro || isAmateur || isCreator) && <span className="identity-badges">
               {isPro && <ProLabel size="large" />}
+              {isAmateur && !isPro && <ProLabel size="large" kind="am" />}
               {isCreator && <span className="profile-creator-label" data-size="large"><span className="pro-label-text">Creator</span></span>}
             </span>}
             </div>
