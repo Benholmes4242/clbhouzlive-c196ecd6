@@ -83,7 +83,7 @@ it('Business profiles never get a Ranking tab', () => {
   expect(rankingTabVisible(false, null, LEWY_SUMMARY)).toBe(false);
 });
 it('Ranking is inserted directly after Posts', () => {
-  const tabs = insertRankingTab([{ id: 'activity' }, { id: 'courses' }, { id: 'handicap' }]);
+  const tabs = insertRankingTab([{ id: 'activity', label: 'Posts' }, { id: 'courses', label: 'Courses' }, { id: 'handicap', label: 'Handicap' }]);
   expect(tabs.map(t => t.id)).toEqual(['activity', 'ranking', 'courses', 'handicap']);
 });
 

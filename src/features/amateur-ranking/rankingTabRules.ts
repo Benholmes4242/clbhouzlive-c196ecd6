@@ -12,10 +12,10 @@ export const rankingTabVisible = (isPersonal: boolean, proMember: unknown, summa
   isPersonal && proMember == null && summary != null;
 
 /** Ranking sits directly after Posts, the same way the Tour tab is inserted. */
-export function insertRankingTab<T extends { id: string }>(tabs: T[]): T[] {
+export function insertRankingTab(tabs: { id: string; label: string }[]): { id: string; label: string }[] {
   const out = [...tabs];
   const at = out.findIndex(t => t.id === 'activity');
-  out.splice(at >= 0 ? at + 1 : 0, 0, { id: 'ranking', label: 'Ranking' } as T);
+  out.splice(at >= 0 ? at + 1 : 0, 0, { id: 'ranking', label: 'Ranking' });
   return out;
 }
 
