@@ -1,11 +1,11 @@
 # Roadmap
 
-## Blocked: Signed-off sign-in redesign — caret sweep and new-test type error
+## Blocked: Signed-off sign-in redesign — caret sweep
 - Replace choose/email presentation only; preserve social/code/session behavior and exported logos.
 - Apply clarified bottom padding max(34px, calc(14px + env(safe-area-inset-bottom, 0px))); small-phone band uses max(18px, calc(14px + env(safe-area-inset-bottom, 0px))).
 - Test step focus/back/email/guest navigation; run four separate shards and report against 8,731, stopping on unexpected failures.
 - Focused 64/64; shards 2,203/2,203, 2,116/2,116, 2,196/2,195 (one failure at ep51SearchAndCarets.test.tsx:32:23); shard 4 unrun. Expected inventory 8,744 (+13 from 8,731), not fully executed.
-- Preview type error: signInRedesign.test.tsx:18:123 TS2769, initImmediate unsupported. Stop prevents repairs; report .lovable/reports/sign-in-redesign-stop.md. 390/320 visual and real sign-in checks unverified.
+- Correct preview type error only: replace unsupported initImmediate with initAsync in the new test provider; assertions/source unchanged. Existing caret sweep stop remains; report .lovable/reports/sign-in-redesign-stop.md. 390/320 visual and real sign-in checks unverified.
 
 ## Complete: Simpler Clubhouse Tour post
 - Remove picks/record display and record read only from TourSlot; preserve prediction resolver and shared rules.

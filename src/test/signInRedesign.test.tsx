@@ -15,7 +15,7 @@ vi.mock('@/lib/toast', () => ({ toast: { info: vi.fn() } }));
 import AuthHeroScreen from '@/pages/auth/components/AuthHeroScreen';
 
 const i18n = createInstance();
-void i18n.init({ lng: 'en', resources: { en: { auth, common: { back: 'Back' } } }, interpolation: { escapeValue: false }, initImmediate: false });
+void i18n.init({ lng: 'en', resources: { en: { auth, common: { back: 'Back' } } }, interpolation: { escapeValue: false }, initAsync: false });
 const submit = vi.fn();
 const apple = vi.fn();
 const google = vi.fn();
