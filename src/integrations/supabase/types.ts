@@ -23804,6 +23804,17 @@ export type Database = {
         Args: { p_course_id: string; p_exclude_user_id: string }
         Returns: Json
       }
+      get_course_hole_ranks: {
+        Args: { p_course_ids: string[] }
+        Returns: {
+          avg_to_par: number
+          course_id: string
+          difficulty_rank: number
+          hole_no: number
+          holes_ranked: number
+          rounds: number
+        }[]
+      }
       get_course_lately: {
         Args: { p_course_id: string; p_limit?: number; p_offset?: number }
         Returns: {
@@ -26070,6 +26081,15 @@ export type Database = {
           is_followed_by: boolean
           is_following: boolean
           target_user_id: string
+        }[]
+      }
+      get_review_author_rounds: {
+        Args: { p_review_ids: string[] }
+        Returns: {
+          best_gross: number
+          best_to_par: number
+          review_id: string
+          rounds_here: number
         }[]
       }
       get_review_post: {
