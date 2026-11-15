@@ -88,12 +88,12 @@ describe('Tour slot rendering and post binding', () => {
     expect(screen.queryByText('Our picks')).toBeNull();
     expect(container.querySelector('[data-tour-slot-picks]')).toBeNull();
   });
-  it('renders board rows 26px high in live and result', () => {
+  it('renders board rows with the shared 31px minimum in live and result', () => {
     for (const state of ['live', 'result'] as const) {
       const { container, unmount } = render(<TourSlotView selection={{ tournament: event(), tour: 'pga', state }} board={board} image={null} sentence={null} chase={null} onOpen={() => {}} />);
-      const rows = container.querySelectorAll<HTMLElement>('[data-tour-slot-board] > div');
+      const rows = container.querySelectorAll<HTMLElement>('[data-slot-board-row]');
       expect(rows).toHaveLength(3);
-      for (const row of rows) expect(row.style.height).toBe('26px');
+      for (const row of rows) expect(row.style.minHeight).toBe('31px');
       unmount();
     }
   });
@@ -103,5 +103,5 @@ describe('Tour slot rendering and post binding', () => {
   it('selects the tournament tour and navigates when the body is tapped', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot]')).not.toBeNull()); const article=container.querySelector('[data-tour-slot]'); if (!article) throw Error('slot missing'); fireEvent.click(article); expect(h.select).toHaveBeenCalledWith('pga',{tournamentId:'event'}); expect(screen.getByTestId('location').textContent).toBe('/tourhub'); expect(localStorage.getItem('tourhub:selectedTour')).toBe('pga'); });
   it('does not navigate when the action or comment row is tapped', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot-actions]')).not.toBeNull()); const action=container.querySelector('[data-tour-slot-actions]'); const comment=container.querySelector('[data-tour-slot-comment] button'); if (!action || !comment) throw Error('doors missing'); fireEvent.click(action); fireEvent.click(comment); expect(h.select).not.toHaveBeenCalled(); expect(screen.getByTestId('location').textContent).toBe('/clubhouse'); expect(h.comments.mock.calls[0]?.[0]?.id).toBe('post-123'); });
   it('renders the photo at 162px', () => { const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'preview'}} board={board} image={null} sentence={null} chase={null} onOpen={()=>{}} />); expect((container.querySelector('[data-tour-slot-photo]') as HTMLElement).style.height).toBe('162px'); });
-  it('shows the first top tie marker only', () => { const tied=[row(1,'A Player',-10,true),row(1,'B Player',-10,true),row(3,'C Player',2)]; const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'live'}} board={tied} image={null} sentence={null} chase={null} onOpen={()=>{}} />); const positions=container.querySelectorAll('[data-tour-slot-board] > div > span:first-child'); expect([...positions].map(p=>p.textContent)).toEqual(['T1','','3']); });
+  it('shows the first top tie marker only', () => { const tied=[row(1,'A Player',-10,true),row(1,'B Player',-10,true),row(3,'C Player',2)]; const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'live'}} board={tied} image={null} sentence={null} chase={null} onOpen={()=>{}} />); const positions=container.querySelectorAll('[data-slot-position]'); expect([...positions].map(p=>p.textContent)).toEqual(['T1','','3']); });
 });

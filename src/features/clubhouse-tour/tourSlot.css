@@ -1,0 +1,4 @@
+/* Signed-off photo-only geometry exception; shared avatars elsewhere remain
+ * 34% and retain their existing rings and aspect. */
+[data-tour-slot-leader-face] { margin-bottom: 5px; }
+[data-tour-slot-leader-face] > div { border-radius: 30% !important; aspect-ratio: 1 !important; }

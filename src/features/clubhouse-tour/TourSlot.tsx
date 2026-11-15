@@ -16,6 +16,10 @@ import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridH
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { tournamentHeadline } from '@/features/tourhub/overview/magazineCopy';
 import { roundsFromSchedule } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
+import { RoundSpine } from '@/features/tourhub/components/overview-v3/HybridHeroBands/RoundSpine';
+import { RoundMovementBand, roundMovementCards } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import type { HeroTournament } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { scheduleTag, formatPurseShort } from '@/features/tourhub/schedule-v2/scheduleRules';
 import { getContextLabel } from '@/features/tourhub/utils/tournamentClassification';
@@ -23,7 +27,7 @@ import { stripEventSponsorClause } from '@/features/tourhub/_shared/eventName';
 import { surnameOf } from '@/features/tourhub/_shared/playerName';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
-import { INK, INK_SOFT, INK_MUTE, INK_FAINT, AMBER, TOUR_LIVE_GREEN } from '@/features/tourhub/_shared/tokens';
+import { INK, INK_SOFT, INK_MUTE, INK_FAINT, AMBER, TOUR_LIVE_GREEN, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
 import { FEED_CARD_SURFACE, MEMBER_CELL } from '@/lib/tokens/surfaces';
 import { countInWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import { formatOverviewDateRange } from '@/features/tourhub/components/overview-v3/HybridHero';
@@ -37,7 +41,9 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { useTourSlotData, type TourSlotVisit } from './useTourSlotData';
-import { TOUR_DISPLAY, chaserSentence, type SlotSelection } from './tourSlotRules';
+import { TOUR_DISPLAY, chaserSentence, resultSentence, type SlotSelection } from './tourSlotRules';
+import { SlotBoard, SlotLastYearBoard, slotBoardRows } from './SlotBoard';
+import './tourSlot.css';
 
 // The slot photo is a fixed 162px (signed off with the simpler slot).
 const TOUR_SLOT_PHOTO_HEIGHT = 162;
@@ -46,9 +52,9 @@ const numeric: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontF
 const caps: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '.16em', textTransform: 'uppercase' };
 const dateLabel = (date: string) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(`${date.slice(0,10)}T12:00:00Z`)).replace(',', '');
 const weekday = (date: string) => new Intl.DateTimeFormat('en-GB', { weekday: 'short', timeZone: 'Europe/London' }).format(new Date(`${date.slice(0,10)}T12:00:00Z`));
-export interface TourSlotViewProps { selection: SlotSelection; board: BoardEntry[]; image: string | null; sentence: string | null; chase: string | null; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
+export interface TourSlotViewProps { selection: SlotSelection; board: BoardEntry[]; image: string | null; sentence: string | null; chase: string | null; lastYear?: React.ReactNode; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
 
-export function TourSlotView({ selection, board, image, sentence, chase, actions, comment, onOpen }: TourSlotViewProps) {
+export function TourSlotView({ selection, board, image, sentence, chase, lastYear, actions, comment, onOpen }: TourSlotViewProps) {
   const { t } = useTranslation('tourhub');
   const { tournament: event, tour, state } = selection;
   const rows = board.filter(row => row.position != null).sort((a,b) => (a.position ?? Infinity) - (b.position ?? Infinity));
@@ -65,7 +71,10 @@ export function TourSlotView({ selection, board, image, sentence, chase, actions
   const facts = [{ value: event.purse == null ? null : formatPurseShort(event.purse), label: 'Purse' },
     { value: event.venue_par == null ? null : `Par ${event.venue_par}`, label: event.venue_yardage == null ? '' : `${event.venue_yardage.toLocaleString('en-GB')} yds` },
     { value: event.defending_champion ? surnameOf(event.defending_champion) : null, label: 'Defending' }].filter(f => f.value != null);
-  const scoreStyle = (score: number | null): React.CSSProperties => ({ ...numeric, color: score != null && score > 0 ? INK : getScoreColor(score, 'dark'), fontSize: 15, fontWeight: 800, textAlign: 'right' });
+  const result = state === 'result' ? resultSentence(board, t) : null;
+  const totalRounds = roundsFromSchedule(event.start_date, event.end_date);
+  const movementRound = state === 'result' ? Math.max(round, ...board.map(r => r.round_4 != null ? 4 : r.round_3 != null ? 3 : r.round_2 != null ? 2 : 1)) : round;
+  const movers = state === 'preview' ? [] : roundMovementCards(board, movementRound, event.venue_par, tour);
   return <>
     <article data-tour-slot={state} data-tour-slot-id={event.id} onClick={onOpen} style={{ background: FEED_CARD_SURFACE, color: INK, width: '100%', minWidth: 0, cursor: 'pointer' }}>
       <header style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 16px 8px' }}>
@@ -82,18 +91,20 @@ export function TourSlotView({ selection, board, image, sentence, chase, actions
             <div style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.08, letterSpacing: '-.01em', marginTop: 5, overflowWrap: 'anywhere' }}>{title}</div>
             <div style={{ fontSize: 12.5, color: INK_SOFT, marginTop: 5, overflowWrap: 'anywhere' }}>{venue.filter(Boolean).join(' · ')}</div>
           </div>
-          <div style={{ textAlign: 'right', flexShrink: 0, maxWidth: 104 }}><div style={{ ...numeric, fontSize: state === 'preview' ? 22 : 28, fontWeight: 800, lineHeight: 1, color: state === 'preview' ? INK : leader?.score != null && leader.score > 0 ? INK : getScoreColor(leader?.score, 'dark') }}>{state === 'preview' ? weekday(event.start_date) : leader?.score == null ? '' : fmtScore(leader.score)}</div>
+          <div data-tour-slot-leader style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', flexShrink: 0, maxWidth: 104 }}>
+            {state !== 'preview' && leaders.length === 1 && leader?.player ? <div data-tour-slot-leader-face><SquircleAvatar size={34} srcCandidates={resolvePlayerAvatarCandidates({ name: leader.player.full_name, photoUrl: leader.player.photo_url, tourSlug: tour })} alt={leader.player.full_name} userId={leader.player.id} surface="canvas" ringWidth={1.5} ringColor={WHITE_ALPHA_18} /></div> : null}
+            <div style={{ ...numeric, fontSize: state === 'preview' ? 22 : 28, fontWeight: 800, lineHeight: 1, color: state === 'preview' ? INK : getScoreColor(leader?.score, 'dark') }}>{state === 'preview' ? weekday(event.start_date) : leader?.score == null ? '' : fmtScore(leader.score)}</div>
             <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.14em', color: INK_MUTE, marginTop: 5, textTransform: 'uppercase', overflowWrap: 'anywhere' }}>{state === 'preview' ? 'First tee' : rightLabel}</div>
           </div>
         </div>
       </div>
       {actions && <div data-tour-slot-actions onClick={e => e.stopPropagation()}>{actions}</div>}
-      {state === 'preview' && <div style={{ display: 'flex', gap: 26, padding: '10px 16px 0', minWidth: 0 }}>{facts.map(f => <div key={f.label} style={{ minWidth: 0, flex: '0 1 auto' }}><div style={{ ...ellipsis, fontSize: 16, fontWeight: 800 }}>{f.value}</div><div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '.14em', color: INK_FAINT, textTransform: 'uppercase', marginTop: 3 }}>{f.label}</div></div>)}</div>}
+      {state === 'preview' && <><div data-tour-slot-facts style={{ display: 'flex', gap: 26, padding: '10px 16px 0', minWidth: 0 }}>{facts.map(f => <div key={f.label} style={{ minWidth: 0, flex: '0 1 auto' }}><div style={{ ...ellipsis, fontSize: 16, fontWeight: 800 }}>{f.value}</div><div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '.14em', color: INK_FAINT, textTransform: 'uppercase', marginTop: 3 }}>{f.label}</div></div>)}</div>{lastYear}</>}
       {state === 'live' && sentence && <p style={{ fontSize: 14.5, lineHeight: 1.4, color: INK_SOFT, padding: '6px 16px 0', margin: 0 }}><strong style={{ color: INK, fontWeight: 700 }}>{sentence}</strong>{chase ? ` ${chase}` : ''}</p>}
-      {state !== 'preview' && <div data-tour-slot-board style={{ padding: '6px 16px 0' }}>{rows.slice(0,3).map((row,i) => <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '32px minmax(0,1fr) auto', alignItems: 'center', gap: 8, height: 26 }}>
-        <span style={{ ...numeric, color: INK, fontSize: 13, fontWeight: 700 }}>{i > 0 && rows[i-1].position === row.position ? '' : `${row.position_tied || rows.filter(r => r.position === row.position).length > 1 ? 'T' : ''}${row.position}`}</span>
-        <span style={{ ...ellipsis, fontSize: 14.5, fontWeight: 600 }}>{row.player?.full_name ?? row.team?.display_name ?? ''}</span><span style={scoreStyle(row.score)}>{row.score == null ? '' : fmtScore(row.score)}</span>
-      </div>)}</div>}
+      {result ? <p data-tour-slot-result-sentence style={{ fontSize: 14.5, lineHeight: 1.4, color: INK_SOFT, padding: '6px 16px 0', margin: 0 }}><strong style={{ color: INK, fontWeight: 700 }}>{result.headline}</strong>{result.chase ? ` ${result.chase}` : ''}</p> : null}
+      {state === 'live' ? <div style={{ padding: '12px 16px 0' }}><RoundSpine round={round} totalRounds={totalRounds} marginTop={0} /></div> : null}
+      {movers.length > 0 ? <RoundMovementBand round={movementRound} cards={movers} gutter={16} padding="16px 16px 4px" /> : null}
+      {state !== 'preview' ? <SlotBoard kind={state} board={board} rows={slotBoardRows(board)} round={round} /> : null}
       {comment && <div data-tour-slot-comment onClick={e => e.stopPropagation()}>{comment}</div>}
       {!comment && <div style={{ height: 12 }} />}
     </article><div aria-hidden style={{ height: 8 }} />
@@ -159,6 +170,7 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
     const open = (source: CommentOpenSource) => { if (post) guest('comment', () => onComment(post, source)); };
     const heroTournament = { ...event, name: event.name, startDate: event.start_date, endDate: event.end_date } as unknown as HeroTournament;
     lastView.current = { selection, board, image: images.data?.get(event.id) ?? null,
+      lastYear: selection.state === 'preview' ? <SlotLastYearBoard event={event} /> : null,
       sentence: selection.state === 'live' ? tournamentHeadline({ tournament: heroTournament, state: { kind: 'live', round: event.current_round ?? 1, totalRounds: roundsFromSchedule(event.start_date, event.end_date) }, leaderboard: board, t }) : null,
       chase: chaserSentence(board, t),
       actions: post ? <><FeedPostActions actor={activeActor} onActorChange={setActiveActor} liked={likes.isLiked} likeCount={likes.count} commentCount={post.commentCount} padding="10px 16px 2px" gap={26} onLike={() => guest('like', () => handleLike(post))} onComment={() => open('footer_glyph')} onShare={() => guest('share', () => handleShare(post))} /><LikedByRow postId={post.id} count={likes.count} source="post" kind="like" surfaceColor={FEED_CARD_SURFACE} style={{ padding: '0 16px' }} /></> : null,

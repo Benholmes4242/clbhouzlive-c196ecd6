@@ -107,7 +107,7 @@ export async function fetchTourSlotData(): Promise<SlotPayload> {
     const readBoards = async () => {
       for (let offset = 0; ; offset += 500) {
         const result = await supabase.from('sr_leaderboards')
-          .select('*, player:sr_players!sr_leaderboards_player_id_fkey(id, sr_id, full_name, first_name, last_name), team:sr_teams!sr_leaderboards_team_id_fkey(id, display_name)')
+          .select('*, player:sr_players!sr_leaderboards_player_id_fkey(id, sr_id, full_name, first_name, last_name, photo_url), team:sr_teams!sr_leaderboards_team_id_fkey(id, display_name)')
           .in('tournament_id', ids).order('position', { ascending: true, nullsFirst: false }).order('id').range(offset, offset + 499);
         if (result.error) throw result.error;
         for (const raw of result.data ?? []) {

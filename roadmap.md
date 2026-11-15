@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Clubhouse Tour slot all states
+- Share round spine and movement computation without changing Tour overview output.
+- Add single-leader portrait, result sentence, live five-row board and collapsed top-three result/prior-year boards.
+- Added 13 state cases; four separate shards passed 2,243 / 2,118 / 2,211 / 2,224 = 8,796 (baseline 8,783 + 13). Build OK; report .lovable/reports/tour-slot-all-states.md. Real-member and 390/320 visual comparison remain unverified.
+
 ## Complete: OWGR approval — authorised finish
 - Retained the authorised no-player confirmation click in proVerification1; added the explicit chosen-player first-click regression case.
 - Four separate shards passed: 2,236 / 2,106 / 2,203 / 2,215 = 8,760 (8,748 + 11 + 1), zero failures or skips.

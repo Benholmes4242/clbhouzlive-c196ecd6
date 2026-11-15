@@ -1,4 +1,19 @@
 {
+  "slot": {
+    "finalTopThree": "FINAL TOP THREE",
+    "lastYear": "LAST YEAR · {{year}}",
+    "others": " & {{count}} others",
+    "resultMargin": "{{winner}} wins by {{margin}} {{score}}.",
+    "resultPlayoff": "{{winner}} wins a play-off {{score}}.",
+    "atUnder": "at {{count}} under par",
+    "atLevel": "at level par",
+    "atOver": "at {{count}} over par",
+    "second": "{{runner}} is second {{score}}.",
+    "sharedSecond": "{{count}} players share second {{score}}.",
+    "onUnder": "on {{count}} under",
+    "onLevel": "at level par",
+    "onOver": "on {{count}} over"
+  },
   "rebuilt": {
     "yourPlayers": "YOUR PLAYERS",
     "followed": "{{count}} followed",

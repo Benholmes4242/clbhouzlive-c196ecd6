@@ -52,7 +52,7 @@ type Row = BoardEntry;
    changing these constants must never resize the full leaderboard. */
 export const HERO_PAD_X = 20;
 export const HERO_POS_W = 24;
-const HERO_ROUND_W = 32;
+export const HERO_ROUND_W = 32;
 export const HERO_TOT_W = 40;
 export const HERO_GAP = 4;
 /** Board cell type, shared by the completed-state figures (POS and TOT styles). */

@@ -6,6 +6,7 @@ import type { CachedTournament } from '@/hooks/useTournamentsCache';
 import type { PickRecord } from '@/features/tourhub/hooks/usePickInsights';
 import { surnameOf } from '@/features/tourhub/_shared/playerName';
 import { countInWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
+import en from '../../../public/locales/en/tourhub.json';
 
 export const TOUR_DISPLAY = { pga: 'PGA Tour', lpga: 'LPGA Tour', euro: 'DP World Tour', champ: 'Champions Tour', pgad: 'Korn Ferry Tour' } as const;
 export type SlotTour = keyof typeof TOUR_DISPLAY;
@@ -101,4 +102,44 @@ export function bestOfThree(picks: readonly SlotPick[], board: BoardEntry[]): st
   if (!best) return null;
   const name = surnameOf(best.pick.playerName);
   return best.row.position === 1 ? `We picked the winner: ${name}.` : `Best of our three: ${name}, ${slotPosition(best.row)}.`;
+}
+
+/** Slot-only top-three reduction: preserve up to four people, otherwise fold
+ * only the final tied group, never drop a winner or invent a fourth place. */
+export function slotTopThree<T extends { position: number | null }>(entries: T[]): Array<{ entry: T; others: number }> {
+  const rows = entries.filter(e => e.position != null && e.position <= 3).sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  if (rows.length <= 4) return rows.map(entry => ({ entry, others: 0 }));
+  const lastPosition = rows[rows.length - 1]?.position;
+  const first = rows.findIndex(e => e.position === lastPosition);
+  return rows.slice(0, first + 1).map((entry, index) => ({ entry, others: index === first ? rows.length - first - 1 : 0 }));
+}
+
+type SlotTranslate = (key: string, opts?: Record<string, unknown>) => string;
+const englishSlot: SlotTranslate = (key, opts = {}) => {
+  const template = en.slot[key.replace('slot.', '') as keyof typeof en.slot] ?? '';
+  return template.replace(/\{\{(\w+)\}\}/g, (_, name: string) => String(opts[name] ?? ''));
+};
+
+/** Pure regulation-score result copy. An untied winner at the runner's score
+ * is a play-off, rather than a fictitious zero-shot margin. No standings or
+ * event reads, and missing winner/runner scores suppress unsupported copy. */
+export function resultSentence(board: BoardEntry[], t: SlotTranslate = englishSlot): { headline: string; chase: string | null } | null {
+  const rows = board.filter(r => r.position != null).sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  const winner = rows[0];
+  if (!winner || winner.position !== 1 || winner.score == null || rows.filter(r => r.position === 1).length !== 1) return null;
+  const second = rows.find(r => r.position !== 1);
+  if (!second || second.score == null) return null;
+  const margin = second.score - winner.score;
+  if (margin < 0) return null;
+  const scoreText = (score: number, prefix: 'at' | 'on') => t(`slot.${prefix}${score < 0 ? 'Under' : score > 0 ? 'Over' : 'Level'}`, { count: Math.abs(score) });
+  const gap = margin === 1 ? 'one' : countInWords(margin, key => englishWords(key)).toLowerCase();
+  const headline = t(margin === 0 ? 'slot.resultPlayoff' : 'slot.resultMargin', { winner: surnameOf(winner.player?.full_name ?? winner.team?.display_name ?? ''), margin: gap, score: scoreText(winner.score, 'at') });
+  const runners = rows.filter(r => r.position === second.position);
+  const chase = t(runners.length === 1 ? 'slot.second' : 'slot.sharedSecond', { runner: surnameOf(second.player?.full_name ?? second.team?.display_name ?? ''), count: runners.length, score: scoreText(second.score, 'on') });
+  return { headline, chase };
+}
+
+function englishWords(key: string): string {
+  const words = en.overview.countWords as Record<string, string>;
+  return words[key.replace('overview.countWords.', '')] ?? '';
 }

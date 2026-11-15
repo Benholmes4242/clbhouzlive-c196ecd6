@@ -434,25 +434,7 @@ export function HeroBoardSection({
      used, so the guard is identical to the old hasMovement: in play, a prior
      round to rank against, at least one non-zero delta. */
   const movementCards = useMemo<MovementCard[]>(() => {
-    if (!inPlay || currentRound == null || currentRound < 2 || !fieldHasStarted(entries)) return [];
-    const map = boardMovementMap(entries, currentRound);
-    const cards: MovementCard[] = [];
-    for (const e of entries) {
-      const delta = map.get(e.player?.id ?? e.team?.id ?? e.id);
-      if (delta == null || delta === 0) continue;
-      const name = e.player?.full_name?.trim() || e.team?.display_name?.trim() || '';
-      const toPar = todayFromEntry(e, currentRound);
-      const complete = e.thru != null && e.thru >= 18;
-      cards.push({
-        key: e.id,
-        name,
-        candidates: e.player ? resolvePlayerAvatarCandidates({ name, photoUrl: e.player.photo_url ?? null, tourSlug: pickTourCode }) : [],
-        delta,
-        toPar,
-        gross: complete && toPar != null && typeof venuePar === 'number' && venuePar > 0 ? venuePar + toPar : null,
-      });
-    }
-    return pickMovementCards(cards);
+    return inPlay ? roundMovementCards(entries, currentRound, venuePar, pickTourCode) : [];
   }, [inPlay, currentRound, entries, venuePar, pickTourCode]);
 
   /* §E.1 — where the picks stand. A fixed sentence from the board: the
@@ -565,10 +547,34 @@ export {pickTeeText,pickTeeDayLabel,teeHeadingFits,pickStatusToken} from './Pick
  * darker warning red down, never the under-par red. Places remain white;
  * to-par retains its independent score colour law.
  */
-export function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
+/** Movement has one full-field source across the overview and feed slot;
+ * lifecycle gating belongs to each caller, including finished-round reuse. */
+export function roundMovementCards(entries: BoardEntry[], round: number | null | undefined, venuePar: number | null | undefined, tourCode: string | null | undefined): MovementCard[] {
+    if (round == null || round < 2 || !fieldHasStarted(entries)) return [];
+    const map = boardMovementMap(entries, round);
+    const cards: MovementCard[] = [];
+    for (const e of entries) {
+      const delta = map.get(e.player?.id ?? e.team?.id ?? e.id);
+      if (delta == null || delta === 0) continue;
+      const name = e.player?.full_name?.trim() || e.team?.display_name?.trim() || '';
+      const toPar = todayFromEntry(e, round);
+      const complete = e.thru != null && e.thru >= 18;
+      cards.push({
+        key: e.id,
+        name,
+        candidates: e.player ? resolvePlayerAvatarCandidates({ name, photoUrl: e.player.photo_url ?? null, tourSlug: tourCode }) : [],
+        delta,
+        toPar,
+        gross: complete && toPar != null && typeof venuePar === 'number' && venuePar > 0 ? venuePar + toPar : null,
+      });
+    }
+    return pickMovementCards(cards);
+}
+
+export function RoundMovementBand({ round, cards, gutter = 20, padding = '12px 20px 10px' }: { round: number; cards: MovementCard[]; gutter?: number; padding?: string }) {
   const { t } = useTranslation('tourhub');
   return (
-    <div data-overview-movement style={{ padding: '12px 20px 10px' }}>
+    <div data-overview-movement style={{ padding }}>
       <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
         {t('overview.biggestMovers', { round })}
       </div>
@@ -576,7 +582,7 @@ export function RoundMovementBand({ round, cards }: { round: number; cards: Move
         ? { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', columnGap: 32, marginTop: 8 }
         : cards.length === 1
           ? { display: 'flex', justifyContent: 'center', marginTop: 8 }
-          : { display: 'grid', gridTemplateColumns: EVEN_ROW_GRID, margin: '8px -20px 0' }}>
+          : { display: 'grid', gridTemplateColumns: EVEN_ROW_GRID, margin: `8px -${gutter}px 0` }}>
         {cards.map((c, i) => (
           <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: '0 1 auto', minWidth: 0, padding: 0, ...(cards.length === 2 ? { justifySelf: i === 0 ? 'end' : 'start' } : {}), ...(cards.length === 3 ? { gridColumn: EVEN_ROW_COLUMNS[i] } : {}) }}>
             <SquircleAvatar size={28} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
