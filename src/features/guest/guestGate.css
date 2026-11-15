@@ -23,6 +23,9 @@
   outline: none;
   border-radius: 24px;
   padding: 22px 20px 16px;
+  /* The app inherits line-height 1.5; the signed-off mock renders at normal.
+     Head (1.12) and body (1.45) keep their own explicit line-heights. */
+  line-height: normal;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
 }
 
