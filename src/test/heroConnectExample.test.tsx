@@ -31,6 +31,7 @@ vi.mock('@/lib/whs/usePercentile', () => ({ useHandicapPercentile: () => ({ data
 vi.mock('@/components/profile/rounds/useProfileRounds', () => ({ useProfileRounds: () => ({ isSuccess: true, data: [] }), isFullEighteen: () => false }));
 vi.mock('@/hooks/gam/useProfileAchievementFigures', () => ({ useProfileAchievementFigures: () => ({ isFetched: true, data: null }) }));
 vi.mock('@/components/profile/hooks/useProfileClubs', () => ({ useProfileClubs: () => ({ homeClub: null, secondaryClubs: [], isPrivate: false, isLoading: false }) }));
+vi.mock('@/components/profile/hooks/useClubCoverPhoto', () => ({ useClubCoverPhoto: () => ({ coverPhoto: null, isLoading: false }), default: () => ({ coverPhoto: null, isLoading: false }) }));
 vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: [], isLoading: false }) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
