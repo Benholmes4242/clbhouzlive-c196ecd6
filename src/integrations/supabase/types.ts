@@ -24054,6 +24054,15 @@ export type Database = {
           standing: number
         }[]
       }
+      get_course_record_holders: {
+        Args: { p_course_ids: string[] }
+        Returns: {
+          course_id: string
+          holder_id: string
+          holder_name: string
+          record_gross: number
+        }[]
+      }
       get_course_regions: {
         Args: never
         Returns: {
