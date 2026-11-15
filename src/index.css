@@ -1707,6 +1707,20 @@ html, body, #root {
   
   /* Core surfaces - Global Background: Cool blue-grey slate */
   --bg-page: #0A0A0C; /* PAGE_CANVAS in src/lib/tokens/surfaces.ts */
+  --auth-ink: #F8FAFC;
+  --auth-muted: rgba(248,250,252,.62);
+  --auth-dim: rgba(248,250,252,.42);
+  --auth-control: #16171B;
+  --auth-control-border: rgba(255,255,255,.12);
+  --auth-input-ground: rgba(255,255,255,.06);
+  --auth-input-border: rgba(255,255,255,.14);
+  --auth-input-focus: rgba(255,255,255,.32);
+  --auth-disabled-ink: rgba(255,255,255,.38);
+  --auth-disabled-border: rgba(255,255,255,.10);
+  --auth-band: #121216;
+  --auth-amber: #F7931E;
+  --auth-error: #F87171;
+  --auth-glow: radial-gradient(closest-side, rgba(247,147,30,.13), rgba(247,147,30,0));
   --app-shell-surface: #0A0A0C;
   --desktop-gutter-surface: #0A0A0C;
   --near-black-control-surface: #1E1E23;
