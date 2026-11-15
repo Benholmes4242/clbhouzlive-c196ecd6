@@ -112,12 +112,12 @@ function SubLine({ item, isFullAdmin }: { item: InboxItem; isFullAdmin: boolean 
     case 'support': {
       const r = item.payload as SupportTicketRow;
       const who = r.profile?.display_name ?? r.profile?.username ?? 'Member';
-      return <div style={muted}>{who} \u00b7 {r.last_sender === 'user' ? 'last message from the member' : 'waiting on the member'}</div>;
+      return <div style={muted}>{who}{' \u00b7 '}{r.last_sender === 'user' ? 'last message from the member' : 'waiting on the member'}</div>;
     }
     case 'courseRequest': {
       const r = item.payload as CourseRequestRow;
       const who = r.displayName ?? (r.username ? `@${r.username}` : 'Member');
-      return <div style={muted}>{who} \u00b7 {r.note?.trim() || 'no note'}</div>;
+      return <div style={muted}>{who}{' \u00b7 '}{r.note?.trim() || 'no note'}</div>;
     }
     default:
       return <div style={muted}>{item.meta.replace(/^[^-]+-\s*/, '')}</div>;

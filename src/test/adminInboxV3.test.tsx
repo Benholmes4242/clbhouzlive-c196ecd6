@@ -148,6 +148,36 @@ describe('ADMIN_INBOX_V3', () => {
     expect(screen.getAllByRole('link').map(a => a.getAttribute('href'))).toEqual(['/admin-v2/inbox/venues', '/admin-v2/inbox/ranking-events']);
   });
 
+  it('a support row prints a real middle dot between the name and the rest of the fact line', () => {
+    const { container } = row(item({
+      id: 's1', type: 'support', title: 'Billing question',
+      payload: {
+        id: 's1', user_id: 'u1', category: 'billing', subject: 'Billing question', status: 'open',
+        last_sender: 'user', last_message_at: ago(0), created_at: ago(1), resolved_at: null,
+        profile: { display_name: 'Jane Rimmer', username: 'jane', profile_photo_url: null }, snippet: null,
+      },
+    }));
+    const fact = document.querySelector('[data-fact-line]') as HTMLElement;
+    expect(fact.textContent).toContain('Jane Rimmer \u00b7 last message from the member');
+    expect(fact.textContent).not.toContain('\\u00b7');
+    expect(container.textContent).not.toContain('\\u00b7');
+  });
+
+  it('a course request row prints a real middle dot between the name and the note', () => {
+    const { container } = row(item({
+      id: 'c1', type: 'courseRequest', title: 'Wensum Valley',
+      payload: {
+        id: 'c1', requestedBy: 'u1', courseName: 'Wensum Valley', location: 'Norwich', country: 'England',
+        note: 'Please add it', status: 'pending', adminNotes: null, resolvedBy: null, resolvedAt: null,
+        createdAt: ago(1), displayName: 'Jane Rimmer', username: 'jane',
+      },
+    }));
+    const fact = document.querySelector('[data-fact-line]') as HTMLElement;
+    expect(fact.textContent).toContain('Jane Rimmer \u00b7 Please add it');
+    expect(fact.textContent).not.toContain('\\u00b7');
+    expect(container.textContent).not.toContain('\\u00b7');
+  });
+
   it('every row control is 30px high and nothing uses amber or text under 10px', () => {
     const { container } = row(unmatched());
     const controls = container.querySelectorAll('[data-inbox-row] > div:last-child button, [data-inbox-row] > div:last-child label');
