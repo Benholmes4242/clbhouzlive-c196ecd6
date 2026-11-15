@@ -8,13 +8,11 @@ import { useReviewAuthorRounds } from './useReviewAuthorRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import StatBrowse from './StatBrowse';
-import { SectionHead, SECTION_WRAP, HEAD_GAP } from './browse/SectionHead';
 import { useCourseBrowseTruth } from './useStatBrowse';
-import { HERO_FIGURE_LABEL, HERO_FIGURE_VALUE } from './CourseMasthead';
-import { WhoPlayingShell, ByRegionShell, LatestCoursesShell, FiguresRowShell } from './browse/sectionShells';
+import { WhoPlayingShell, ByRegionShell, LatestCoursesShell } from './browse/sectionShells';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
-import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
+import { ByRegionSection } from './browse/ByRegionSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageLoadGate, settled, useSectionReady } from './browse/PageLoadGate';
@@ -45,20 +43,11 @@ const BLEED: React.CSSProperties = { marginLeft: -16, marginRight: -16 };
 
 
 export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
-  // Live head figures (BRIEF_COURSES_LIST_HEAD_STATS). HOLES is dropped, never
-  // zeroed, when its count is unavailable to this viewer.
+  // The head's figures now live in the list itself (ListScopeHeader,
+  // BRIEF_COURSES_LIST_PHOTO_CARDS §2). The page keeps only the readiness
+  // report that gates them.
   const { user, loading: sessionLoading } = useSupabaseSession();
   const truthQuery = useCourseBrowseTruth();
-  const { data: truth, isLoading: truthLoading } = truthQuery;
-  const fmt = (n: number) => n.toLocaleString('en-GB');
-  const cells: Array<[string, number]> = truth
-    ? ([
-        ['Courses', truth.directoryTotal],
-        ['Played', truth.playedCount],
-        ['Rounds', truth.roundsTotal],
-        ['Holes', truth.holesPlayed],
-      ].filter((c): c is [string, number] => c[1] != null))
-    : [];
   // The reviews rail is app-wide: no country, no region.
   const { pool: reviewPool, isLoading: reviewsLoading, isPending: reviewsPending } = useBrowseReviews(null, null);
   // The reviewer's own rounds behind each review (BRIEF_COURSES_MEMBERS_SECTIONS §2).
@@ -103,21 +92,6 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <HardestSection />
         <LatestHolesSection />
         <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} authorRounds={authorRounds.map} viewerId={user?.id ?? null} />
-        <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
-          <SectionHead tone="quiet" kicker="Every course we hold" />
-          {cells.length > 0 ? (
-            <div style={{ display: 'flex', marginTop: HEAD_GAP }}>
-              {cells.map(([label, value]) => (
-                <div key={label} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                  <span style={HERO_FIGURE_LABEL}>{label}</span>
-                  <span style={HERO_FIGURE_VALUE}>{fmt(value)}</span>
-                </div>
-              ))}
-            </div>
-          ) : truthLoading ? (
-            <FiguresRowShell />
-          ) : null}
-        </section>
       </div>
       <StatBrowse onOpenDirectory={onOpenDirectory} />
       </PageLoadGate>

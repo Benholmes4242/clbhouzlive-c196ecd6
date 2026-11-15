@@ -35,7 +35,6 @@ vi.mock('@/components/courses/browse/LatestHolesSection', async (importOriginal)
 vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestReviewsSection: () => null }));
 
 import CoursesBrowsePage from '@/components/courses/CoursesBrowsePage';
-import { ALL_COURSES_ANCHOR } from '@/components/courses/browse/ByRegionSection';
 
 // The page's own reads (the reviews pool's author rounds) need a query client.
 const mount = () => {
@@ -48,7 +47,9 @@ afterEach(cleanup);
 describe('BRIEF_REMOVE_HIGHEST_RATED_SECTION', () => {
   it('the Courses page never renders "What members rate highest"', () => {
     const view = mount();
-    expect(view.container.querySelector(`#${ALL_COURSES_ANCHOR}`)).not.toBeNull();
+    // The list head's anchor now lives inside StatBrowse (BRIEF_COURSES_LIST_
+    // PHOTO_CARDS §2) and this test stubs that component, so the anchor is
+    // checked where it is built — src/test/coursesListPhotoCards.test.tsx.
     expect(screen.queryByText('What members rate highest')).toBeNull();
   });
 
@@ -60,15 +61,13 @@ describe('BRIEF_REMOVE_HIGHEST_RATED_SECTION', () => {
 
   it('the page gate opens once the remaining sections report ready', async () => {
     const view = mount();
-    // The gate is revealed when nothing between the list anchor and the
-    // container is hidden, and the page's skeleton fallback has gone.
+    // The gate is revealed when nothing in the page is hidden any more and the
+    // page's skeleton fallback has gone. The walk starts at the container
+    // because the list-head anchor moved inside the stubbed StatBrowse
+    // (BRIEF_COURSES_LIST_PHOTO_CARDS §2).
     await waitFor(() => {
-      const anchor = view.container.querySelector<HTMLElement>(`#${ALL_COURSES_ANCHOR}`);
-      expect(anchor).not.toBeNull();
-      const hidden: HTMLElement[] = [];
-      for (let el = anchor!.parentElement; el && el !== view.container; el = el.parentElement) {
-        if (el.style.display === 'none') hidden.push(el);
-      }
+      const hidden = Array.from(view.container.querySelectorAll<HTMLElement>('div'))
+        .filter((el) => el.style.display === 'none');
       expect(hidden).toHaveLength(0);
       expect(view.container.querySelector('[data-courses-fallback]')).toBeNull();
     });

@@ -3366,6 +3366,11 @@
         "label": "Longest",
         "title": "Longest"
       },
+      "lowest": {
+        "description": "Courses by their record round, lowest first.",
+        "label": "Lowest rounds",
+        "title": "Lowest rounds"
+      },
       "played": {
         "description": "Where this community spends its golf.",
         "kicker": "Most played courses",

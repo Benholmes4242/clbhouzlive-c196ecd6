@@ -4,17 +4,24 @@ import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImage
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import type { StatBrowseRow } from './useStatBrowse';
+import type { CourseRecordHolderEntry } from './useCourseRecordHolders';
 import { courseRankLabels, RANK_LIST_BY_SLUG as SLUG } from '@/features/courses/_shared/courseRankLabels';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 /** The browse variant's photo height; read by StatBrowse's shell (BRIEF_COURSES_SKELETONS 4.4). */
-export const PHOTO_H = 196;
+export const PHOTO_H = 190;
 /** The top100 variant's photo height; read by its shell (BRIEF_COURSES_SKELETONS 3.3). */
 export const TOP100_PHOTO_H = 178;
 const PHOTO_MUTE = 'rgba(255,255,255,0.66)';
 const PHOTO_DIM = 'rgba(255,255,255,0.55)';
 const RANK_GLASS = 'rgba(15,23,42,0.42)';
+/** The record row's gold — the one loud element a list card is allowed (BRIEF_COURSES_LIST_PHOTO_CARDS §3b). */
+export const RECORD_GOLD = '#E2B04A';
+/** The Courses hero's own five-stop fade, ending in the page colour so the cards
+ *  run into each other instead of stopping at an edge. */
+const BROWSE_FADE =
+  'linear-gradient(180deg, rgba(10,10,12,0.15) 0%, rgba(10,10,12,0) 20%, rgba(10,10,12,0.62) 48%, rgba(10,10,12,0.97) 88%, #0A0A0C 100%)';
 const GLASS_CHIP: React.CSSProperties = {
   position: 'absolute', top: 14, padding: '5px 10px', borderRadius: 999,
   background: RANK_GLASS, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
@@ -22,7 +29,7 @@ const GLASS_CHIP: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
 };
 
-function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] }) {
+function RankBadge({ memberships, left = 20 }: { memberships: StatBrowseRow['memberships']; left?: number }) {
   const labels = courseRankLabels(
     memberships
       .filter((entry) => entry.list_slug in SLUG && entry.rank != null)
@@ -32,7 +39,7 @@ function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] 
   return (
     <div
       style={{
-        position: 'absolute', top: 14, left: 20, padding: '5px 10px', borderRadius: 999,
+        position: 'absolute', top: 14, left, padding: '5px 10px', borderRadius: 999,
         background: RANK_GLASS, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
         color: A.INK, fontFamily: SANS, fontSize: 11, fontWeight: 700,
         fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
@@ -60,6 +67,10 @@ interface BrowseCourseCardProps {
   recordHolder?: string | null;
   /** Top 100 only: up to three members, most rounds first. */
   players?: Array<{ id: string; name: string | null; photoUrl: string | null }>;
+  /** Browse only: the record's holder — name, face, and the gross the RPC read
+      with it. The row renders only when that gross equals row.course_record
+      (the Top 100 card's rule), which is why no username can reach this card. */
+  holder?: CourseRecordHolderEntry | null;
 }
 
 const NO_PLAYERS: NonNullable<BrowseCourseCardProps['players']> = [];
@@ -75,6 +86,7 @@ export function BrowseCourseCard({
   viewerBest = null,
   recordHolder = null,
   players = NO_PLAYERS,
+  holder = null,
 }: BrowseCourseCardProps) {
   const top100 = variant === 'top100';
   const hasRoundFacts = row.rounds > 0 && row.avg_to_par != null;
@@ -110,6 +122,120 @@ export function BrowseCourseCard({
       </div>
     </>
   ) : null;
+
+  /* The browse card's own headline: bigger, lighter weight, and its count label
+     one tier fainter. The Top 100 lead above is unchanged. */
+  const browseLead = row.community_rating != null ? (
+    <>
+      <div style={{ ...FIGS, fontSize: 28, fontWeight: 700, lineHeight: 1, color: A.INK }}>
+        {row.community_rating.toFixed(1)}
+      </div>
+      <div style={{ marginTop: 5, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: A.DIM, whiteSpace: 'nowrap' }}>
+        {row.review_count} {row.review_count === 1 ? 'rating' : 'ratings'}
+      </div>
+    </>
+  ) : null;
+
+  /* ── BROWSE VARIANT (BRIEF_COURSES_LIST_PHOTO_CARDS §3) ───────────────────
+     Text ON the photograph. The photo is absolutely positioned at the top, the
+     hero's five-stop fade runs over it, and the content flows from 63px down:
+     the name starts a third of the way into the picture and everything else
+     runs on over and below it, the fade ending in the page colour so the cards
+     meet without a seam. The Top 100 card below is a different card and is
+     untouched — this branch returns before it. */
+  if (!top100) {
+    // The course hero's rule, stated once: a record needs a holder whose gross
+    // IS this record. No holder row, no name, or a different gross → no row.
+    const record =
+      holder && row.course_record != null && holder.holderName.trim() !== '' && holder.recordGross === row.course_record
+        ? holder
+        : null;
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={`View ${row.name}`}
+        style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', fontFamily: SANS }}
+      >
+        <div style={{ position: 'relative', overflow: 'hidden', background: A.CANVAS, minHeight: PHOTO_H }}>
+          <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: PHOTO_H, overflow: 'hidden', background: A.PANEL }}>
+            {row.image_url ? (
+              <img
+                src={getOptimizedImageUrl(row.image_url, { width: 640 })}
+                srcSet={generateImageSrcSet(row.image_url, [{ width: 400 }, { width: 640 }, { width: 800 }])}
+                sizes="100vw"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+              />
+            ) : null}
+          </div>
+          <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, top: 0, height: PHOTO_H, background: BROWSE_FADE }} />
+          <RankBadge memberships={row.memberships} left={16} />
+          <div style={{ position: 'relative', zIndex: 1, padding: '63px 0 14px' }}>
+            <div style={{ padding: '0 16px' }}>
+              <div
+                style={{
+                  color: A.INK, fontSize: 22, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.15,
+                  textShadow: '0 1px 8px rgba(0,0,0,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}
+              >
+                {row.name}
+              </div>
+              <div style={{ marginTop: 3, fontSize: 12.5, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {location}
+              </div>
+            </div>
+            {record ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 0' }}>
+                <SquircleAvatar src={record.photoUrl} userId={record.holderId} size={26} alt={record.holderName} hairlineRing />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: RECORD_GOLD }}>
+                    COURSE RECORD
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: 13.5, fontWeight: 600, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {record.holderName}
+                  </div>
+                </div>
+                {/* The score is the one figure that may never wrap: it holds its
+                    own column open with flex none + nowrap. */}
+                <div style={{ marginLeft: 'auto', flex: 'none', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <div style={{ ...FIGS, fontSize: 22, fontWeight: 700, lineHeight: 1, color: RECORD_GOLD }}>{record.recordGross}</div>
+                  <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: A.DIM }}>
+                    GROSS
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            {/* The plays sentence keeps its wording and its 80/20 comparison
+                rule; it may now wrap rather than overflow a narrow screen. */}
+            {hasRoundFacts ? (
+              <div style={{ padding: '10px 16px 0', fontSize: 13, color: A.MUTE }}>
+                Plays to{' '}
+                {avg == null ? 'level par' : <span style={fig}>{avg}</span>}
+                {' '}on average{comparison ? (
+                  <>, {comparison.word} than <span style={fig}>{comparison.value}%</span> of courses.</>
+                ) : '.'}
+              </div>
+            ) : null}
+            <div style={{ padding: '10px 16px 6px' }}>
+              <CategoryScores
+                scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }}
+                layout="split"
+                lead={browseLead}
+                marginTop={0}
+              />
+            </div>
+          </div>
+        </div>
+      </button>
+    );
+  }
+
+  /* ── TOP 100 VARIANT — frozen (BRIEF_COURSES_LIST_PHOTO_CARDS) ───────────
+     Everything below renders for the Top 100 card only; its `!top100`
+     conditionals are unreachable now that browse returns above. */
   return (
     <button
       type="button"

@@ -23,10 +23,11 @@ export const STAT_LENSES = [
   'longest',
   'rated',
   'chase',
+  'lowest',
 ] as const;
 
-/** The four boards exposed by the rebuilt Courses browse rail. */
-export const COURSE_BROWSE_LENSES = ['rated', 'played', 'toughest', 'scoreable'] as const;
+/** The five boards exposed by the rebuilt Courses browse rail. */
+export const COURSE_BROWSE_LENSES = ['rated', 'played', 'toughest', 'scoreable', 'lowest'] as const;
 
 export type StatLens = (typeof STAT_LENSES)[number];
 
@@ -137,6 +138,52 @@ export interface BrowseRegion {
   imageCourseName: string | null;
 }
 
+/** One `stat_browse_base` row exactly as the Courses truth read fetches it. */
+export interface StatBrowseBaseRow {
+  course_id: string;
+  avg_to_par: number | string | null;
+  region: string | null;
+  sub_country: string | null;
+  rounds: number | string | null;
+  image_url: string | null;
+  name: string | null;
+}
+
+/**
+ * The list head's three figures for one scope, from the SAME rows
+ * `groupBrowseRegions` groups into the By region tiles, with the SAME
+ * arithmetic: course count, summed rounds, rounds-weighted `avg_to_par`.
+ * So a region's header equals that region's tile to the last decimal.
+ * Scope precedence matches the header's caption: a region wins over an area,
+ * an area wins over everything.
+ */
+export function browseFiguresForScope(
+  rows: readonly StatBrowseBaseRow[],
+  scope: { country?: string | null; region?: string | null },
+): { courses: number; rounds: number; avgToPar: number | null } {
+  const matches = (row: StatBrowseBaseRow) =>
+    scope.region
+      ? row.region === scope.region
+      : scope.country
+        ? row.sub_country === scope.country
+        : true;
+  let courses = 0;
+  let rounds = 0;
+  let parSum = 0;
+  let parN = 0;
+  for (const row of rows) {
+    if (!matches(row)) continue;
+    const r = Number(row.rounds ?? 0) || 0;
+    courses += 1;
+    rounds += r;
+    if (row.avg_to_par != null && Number.isFinite(Number(row.avg_to_par))) {
+      parSum += Number(row.avg_to_par) * r;
+      parN += r;
+    }
+  }
+  return { courses, rounds, avgToPar: parN > 0 ? parSum / parN : null };
+}
+
 /** Group stat_browse_base rows by region, null regions dropped, courses descending. */
 export function groupBrowseRegions(
   rows: Array<{
@@ -219,15 +266,7 @@ export function useCourseBrowseTruth() {
       const facetData = (facetsResult.data ?? {}) as Record<string, unknown>;
       const allPlayedTotal = Number(facetData.all_played_total ?? 0);
       const ratedTotal = Number(facetData.rated_total ?? 0);
-      const baseRows = (difficultyResult.data ?? []) as unknown as Array<{
-        course_id: string;
-        avg_to_par: number | string | null;
-        region: string | null;
-        sub_country: string | null;
-        rounds: number | string | null;
-        image_url: string | null;
-        name: string | null;
-      }>;
+      const baseRows = (difficultyResult.data ?? []) as unknown as StatBrowseBaseRow[];
       // The read used to filter avg_to_par NOT NULL server-side; it now reads every
       // row for the region grouping, so the percentile map filters nulls itself
       // (Number(null) is 0, which would silently rank a course as level par).
@@ -250,7 +289,7 @@ export function useCourseBrowseTruth() {
       const roundsTotal = baseRows.reduce((sum, r) => sum + (Number(r.rounds) || 0), 0);
       const holesPlayed =
         holesResult && !holesResult.error && typeof holesResult.count === 'number' ? holesResult.count : null;
-      return { allPlayedTotal, ratedTotal, difficultyPercentiles, regions, directoryTotal, playedCount, roundsTotal, holesPlayed };
+      return { allPlayedTotal, ratedTotal, difficultyPercentiles, regions, directoryTotal, playedCount, roundsTotal, holesPlayed, baseRows };
     },
   });
 }

@@ -43,16 +43,20 @@ import {
   type StatBrowseRow,
   type StatLens,
   type LensCounts,
-
+  browseFiguresForScope,
 } from './useStatBrowse';
+import { useCourseRecordHolders } from './useCourseRecordHolders';
+import { ListScopeHeader } from './browse/ListScopeHeader';
 import { RailChips } from '@/components/ui/RailChips';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
 import { useSectionReady } from './browse/PageLoadGate';
 import { BrowseCourseCard, PHOTO_H as BROWSE_PHOTO_H } from './BrowseCourseCard';
 
-/** Gap between browse cards; the list and its shell both read it. */
-const STAT_BROWSE_CARD_GAP = 24;
+/** Gap between browse cards; the list and its shell both read it. Zero because
+ *  the card's fade now ends in the page colour — cards run into each other
+ *  instead of stopping at an edge (BRIEF_COURSES_LIST_PHOTO_CARDS §3). */
+const STAT_BROWSE_CARD_GAP = 0;
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
@@ -218,6 +222,19 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   // The list hook's manual loading flag starts true and covers its dependent reads.
   useSectionReady('list', !isLoading);
+
+  /* The record holder behind every loaded row (BRIEF_COURSES_LIST_PHOTO_CARDS
+     §3b): one read keyed on the sorted, de-duplicated id set, so a page append
+     adds ids and an inline name search never refetches. */
+  const holderIds = useMemo(() => rows.map((row) => row.course_id), [rows]);
+  const holders = useCourseRecordHolders(holderIds);
+
+  /* The head's three figures, from the same stat_browse_base rows the By region
+     tiles are grouped from, so a region's header equals that region's tile. */
+  const scopeFigures = useMemo(
+    () => browseFiguresForScope(browseTruth?.baseRows ?? [], { country, region }),
+    [browseTruth, country, region],
+  );
 
   /* INLINE NAME SEARCH (Ben, 14 Sep). Narrows what the country/region/lens
      controls have already selected: a plain case-insensitive contains-match
@@ -399,7 +416,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         text = row.tee_label ? t('statBrowse.sample.tees', { tee: row.tee_label }) : null;
       } else if (lens === 'rated') {
         text = t('statBrowse.sample.reviews', { count: row.review_count });
-      } else if (lens === 'chase') {
+      } else if (lens === 'chase' || lens === 'lowest') {
+        // The record sentence, unchanged: 'lowest' ranks by that same record.
         text = row.course_record != null
           ? t('statBrowse.sample.record', { score: row.course_record })
           : null;
@@ -501,7 +519,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         ? 'Most played'
         : value === 'toughest'
           ? 'Hardest'
-          : 'Easiest',
+          : value === 'lowest'
+            ? 'Lowest rounds'
+            : 'Easiest',
   }));
 
   /**
@@ -691,6 +711,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   return (
     <div className="w-full">
+      {/* The list's own head (BRIEF_COURSES_LIST_PHOTO_CARDS §2): caption and
+          three figures for the scope the dropdowns have selected. Above the
+          sticky bar, and not sticky itself. */}
+      <ListScopeHeader region={region} country={country} figures={scopeFigures} />
       {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
       <div ref={sentinelRef} style={{ height: 0 }} aria-hidden="true" />
       <StickySafeAreaScrim visible={condensed} background={A.CANVAS} />
@@ -744,7 +768,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               onChange={setNameQuery}
               padding="0"
               autoFocus
-              placeholder={t('statBrowse.search.placeholder', { defaultValue: 'Search these courses' })}
+              placeholder={
+                region || country
+                  ? t('statBrowse.search.placeholderScope', {
+                      defaultValue: 'Search {{scope}} courses',
+                      scope: region ?? country,
+                    })
+                  : t('statBrowse.search.placeholderAll', { defaultValue: 'Search courses' })
+              }
             />
           </div>
         ) : null}
@@ -905,6 +936,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                 <BrowseCourseCard
                   row={row}
                   difficultyPercentile={browseTruth?.difficultyPercentiles.get(row.course_id)}
+                  holder={holders.map.get(row.course_id) ?? null}
                   onClick={() => {
                     analyticsEvents.track('stat_browse_course_opened', {
                       course_id: row.course_id,
