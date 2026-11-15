@@ -27,16 +27,15 @@ export function AdminVerifiedCard({ data, loading, error, onOpenMember }: { data
     let alive = true;
     setOwgrSources(null);
     if (!unlinkedKey) return;
-    try {
-      supabase
-        .from('pro_world_rank_sources')
-        .select('user_id')
-        .in('user_id', unlinkedKey.split(','))
-        .then(({ data: rows, error: readError }) => {
-          if (alive && !readError) setOwgrSources(new Set((rows ?? []).map(r => r.user_id as string)));
-        })
-        .catch(() => { /* failed read: no warning */ });
-    } catch { /* failed read: no warning */ }
+    (async () => {
+      try {
+        const { data: rows, error: readError } = await supabase
+          .from('pro_world_rank_sources')
+          .select('user_id')
+          .in('user_id', unlinkedKey.split(','));
+        if (alive && !readError) setOwgrSources(new Set((rows ?? []).map(r => r.user_id as string)));
+      } catch { /* failed read: no warning */ }
+    })();
     return () => { alive = false; };
   }, [unlinkedKey]);
   const row = (id: string, name: string, photo: string | null, sub: React.ReactNode, badge: React.ReactNode, date: string | null, open: () => void, pending = false) => <Button key={id} variant="ghost" className="admin-verified-row" onClick={open}>
@@ -51,7 +50,7 @@ export function AdminVerifiedCard({ data, loading, error, onOpenMember }: { data
         const noSource = p.pro_kind === 'tour_pro' && !p.pro_player_id && owgrSources !== null && !owgrSources.has(p.id);
         const meta = [p.pro_kind === 'tour_pro' ? 'Tour professional' : 'Teaching professional', p.pro_kind === 'tour_pro' ? p.pro_tour : p.pro_club].filter(Boolean).join(' · ');
         return <div key={p.id}>{row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, <>{meta}{noSource && <span style={{ color: t.warn, fontSize: 12 }}> · No results source</span>}</>, <ProLabel size="small" />, p.verified_at, () => onOpenMember(p.id))}{p.pro_kind === 'tour_pro' && <AdminProWorldRanking userId={p.id} />}</div>;
-      })}
+      }))}
       {section('AMATEURS', (data.amateurs ?? []).map(p => row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, [`WAGR ${p.rank ?? '—'}`, p.last_synced_at ? `Synced ${formatAgo(p.last_synced_at, { suffix: true })}` : 'Not synced', p.last_error].filter(Boolean).join(' · '), <ProLabel size="small" kind="am" />, null, () => onOpenMember(p.id))))}
       {section('BEING CHECKED', data.pending.map(p => row(p.request_id, p.display_name ?? p.username ?? 'Member', p.avatar_url, `${p.kind === 'tour_pro' ? 'Tour professional' : 'Teaching professional'} · asked ${formatAgo(p.requested_at, { suffix: true })}`, <span className="admin-verified-pending">BEING CHECKED</span>, null, () => navigate(`/admin-v2/inbox?type=verification&request=${encodeURIComponent(p.request_id)}`), true)))}
       {section('GOLFERS', data.golfers.map(p => row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, 'Verified golfer', <VerifiedBadge size="sm" />, p.verified_at, () => onOpenMember(p.id))))}
