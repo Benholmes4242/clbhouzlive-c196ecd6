@@ -51,7 +51,7 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, WHITE_ALPHA_12, TOPAR_UNDER_DARK, LIVE_INK, STATUS_NEGATIVE } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, TOPAR_UNDER_DARK, LIVE_INK, STATUS_NEGATIVE } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { CompletedWeekBlock } from '../../../tournament-v2/sections/CompletedWeekBlock';
@@ -568,13 +568,17 @@ export {pickTeeText,pickTeeDayLabel,teeHeadingFits,pickStatusToken} from './Pick
 export function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
   const { t } = useTranslation('tourhub');
   return (
-    <div data-overview-movement style={{ padding: '12px 20px 10px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
+    <div data-overview-movement style={{ padding: '12px 20px 10px' }}>
       <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
         {t('overview.biggestMovers', { round })}
       </div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-        {cards.map((c) => (
-          <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: 1, minWidth: 0, background: 'transparent', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, padding: 7 }}>
+      <div data-overview-movement-row style={cards.length === 2
+        ? { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', columnGap: 32, marginTop: 8 }
+        : cards.length === 1
+          ? { display: 'flex', justifyContent: 'center', marginTop: 8 }
+          : { display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 8 }}>
+        {cards.map((c, i) => (
+          <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: '0 1 auto', minWidth: 0, padding: 0, ...(cards.length === 2 ? { justifySelf: i === 0 ? 'end' : 'start' } : {}) }}>
             <SquircleAvatar size={28} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
             <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
               <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2, color: 'var(--tour-mover-name)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</div>
