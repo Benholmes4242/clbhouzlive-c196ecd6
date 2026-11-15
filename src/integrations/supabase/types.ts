@@ -23122,6 +23122,10 @@ export type Database = {
         Returns: Json
       }
       get_admin_audiences: { Args: never; Returns: Json }
+      get_admin_cc_engine: {
+        Args: { p_days?: number; p_tz?: string }
+        Returns: Json
+      }
       get_admin_command_centre: { Args: { p_tz?: string }; Returns: Json }
       get_admin_command_centre_v2: {
         Args: { p_days?: number; p_tz?: string }
