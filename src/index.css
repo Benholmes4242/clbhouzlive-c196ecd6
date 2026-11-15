@@ -1720,7 +1720,6 @@ html, body, #root {
   --auth-band: #121216;
   --auth-amber: #F7931E;
   --auth-error: #F87171;
-  --auth-glow: radial-gradient(closest-side, rgba(247,147,30,.13), rgba(247,147,30,0));
   --app-shell-surface: #0A0A0C;
   --desktop-gutter-surface: #0A0A0C;
   --near-black-control-surface: #1E1E23;

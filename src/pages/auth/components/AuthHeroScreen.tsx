@@ -13,6 +13,8 @@ import { isGuestUser } from '@/features/guest/useIsGuest';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import './auth-hero.css';
 
+// Keyboard mode pins the fixed screen to visualViewport while an input has focus;
+// closing it guardedly resets only the window offset iOS moved (#root untouched).
 // Choose/email state lives here; OTP remains AuthForm-owned. Guest return uses
 // the canonical switch/session definition and never creates a guest session.
 
@@ -88,6 +90,63 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   const [emailError, setEmailError] = useState<string | null>(null);
   const [hasEditedSinceError, setHasEditedSinceError] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const screenRef = useRef<HTMLDivElement>(null);
+  const keyboardWasOpen = useRef(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const [keyboardTight, setKeyboardTight] = useState(false);
+
+  useEffect(() => {
+    const screenEl = screenRef.current;
+    if (!screenEl) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const hasInputFocus = () => {
+      const active = document.activeElement;
+      return active instanceof HTMLInputElement && screenEl.contains(active);
+    };
+    const onFocusIn = (event: FocusEvent) => {
+      if (event.target instanceof HTMLInputElement) { clearTimeout(timer); setKeyboardOpen(true); }
+    };
+    const onFocusOut = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { if (!hasInputFocus()) setKeyboardOpen(false); }, 100);
+    };
+    screenEl.addEventListener('focusin', onFocusIn);
+    screenEl.addEventListener('focusout', onFocusOut);
+    return () => { clearTimeout(timer); screenEl.removeEventListener('focusin', onFocusIn); screenEl.removeEventListener('focusout', onFocusOut); };
+  }, []);
+
+  useEffect(() => {
+    const screenEl = screenRef.current;
+    if (!screenEl) return;
+    const vv = window.visualViewport;
+    if (!keyboardOpen) {
+      screenEl.style.removeProperty('top');
+      screenEl.style.removeProperty('height');
+      screenEl.style.removeProperty('bottom');
+      setKeyboardTight(false);
+      // User-approved exception: iOS moves the window under a fixed screen.
+      // eslint-disable-next-line no-restricted-properties
+      if (keyboardWasOpen.current && (window.scrollY !== 0 || document.documentElement.scrollTop !== 0)) {
+        // eslint-disable-next-line no-restricted-properties
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+      }
+      keyboardWasOpen.current = false;
+      return;
+    }
+    keyboardWasOpen.current = true;
+    if (!vv) return;
+    const pin = () => {
+      screenEl.style.top = `${vv.offsetTop}px`;
+      screenEl.style.height = `${vv.height}px`;
+      screenEl.style.bottom = 'auto';
+      setKeyboardTight(vv.height < 420);
+    };
+    pin();
+    vv.addEventListener('resize', pin);
+    vv.addEventListener('scroll', pin);
+    return () => { vv.removeEventListener('resize', pin); vv.removeEventListener('scroll', pin); };
+  }, [keyboardOpen]);
 
   useEffect(() => {
     if (step === 'email') emailInputRef.current?.focus();
@@ -138,8 +197,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   };
 
   return (
-    <div className="auth-hero-screen">
-      <div className="auth-hero-glow" aria-hidden="true" />
+    <div ref={screenRef} className={`auth-hero-screen${keyboardOpen ? ' is-keyboard-open' : ''}${keyboardTight ? ' is-keyboard-tight' : ''}`}>
       <div className="auth-hero-brand">
         <img src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png" alt="clbhouz" className="auth-logo-animate" />
         <h1 className="auth-tagline-animate">{t('auth:hero.tagline')}<span className="auth-hero-dot" aria-hidden="true" /></h1>
