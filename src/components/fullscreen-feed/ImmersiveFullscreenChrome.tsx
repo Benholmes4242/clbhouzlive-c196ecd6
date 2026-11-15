@@ -572,6 +572,31 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     navigate(`/courses/${cid}`);
   };
 
+  /* BRIEF_LATEST_HOLES_OPTION_A §B: the clbhouz rating chip is one element with two
+     homes — inside the course header on a real post, and alone at the right edge of
+     the member-shot viewer, whose top bar carries nothing but the chevron and it. */
+  const courseChip = showCourseChip ? (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
+      aria-label={`clbhouz rating ${courseRatingLabel}`}
+      style={{
+        flexShrink: 0, display: 'inline-flex', alignItems: 'baseline', gap: 5,
+        background: 'rgba(0,0,0,0.42)', border: '1px solid rgba(255,255,255,0.16)',
+        borderRadius: 999, padding: '4px 10px', cursor: 'pointer',
+        backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+        pointerEvents: 'auto', fontFamily: 'inherit', textShadow: 'none',
+      }}
+    >
+      <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1, ...TABULAR }}>
+        {courseRatingLabel}
+      </span>
+      <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL }}>
+        CLBHOUZ
+      </span>
+    </button>
+  ) : null;
+
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
       {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} round={videoRound} chapter={chapter} onScorecard={onOpenScorecard && videoRound ? () => onOpenScorecard(videoRound.context.roundScoreId ?? '') : undefined} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
@@ -633,7 +658,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             + row gap (12). The header FOLLOWS the chevron: change the chevron's
             size or inset and this edge moves with it. The chip shows the
             course's clbhouz (community) score only — never the author's. */}
-        {courseName && (
+        {courseName && !syntheticPosts && (
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingTop: 2, textShadow: TEXT_SHADOW }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
               <button
@@ -670,27 +695,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                   </span>
                 )}
               </button>
-              {showCourseChip && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-                  aria-label={`clbhouz rating ${courseRatingLabel}`}
-                  style={{
-                    flexShrink: 0, display: 'inline-flex', alignItems: 'baseline', gap: 5,
-                    background: 'rgba(0,0,0,0.42)', border: '1px solid rgba(255,255,255,0.16)',
-                    borderRadius: 999, padding: '4px 10px', cursor: 'pointer',
-                    backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                    pointerEvents: 'auto', fontFamily: 'inherit', textShadow: 'none',
-                  }}
-                >
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1, ...TABULAR }}>
-                    {courseRatingLabel}
-                  </span>
-                  <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL }}>
-                    CLBHOUZ
-                  </span>
-                </button>
-              )}
+              {courseChip}
             </div>
             {showRecord && (
               <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 600, color: META, ...TABULAR }}>
@@ -715,6 +720,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             )}
           </div>
         )}
+        {/* The member-shot viewer: chevron left, rating chip right, nothing between. */}
+        {syntheticPosts && <><div style={{ flex: 1, minWidth: 0 }} />{courseChip}</>}
       </div>
 
       {/* Bottom scrim removed — author strip + action rail sit on the

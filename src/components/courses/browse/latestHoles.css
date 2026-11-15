@@ -1,24 +1,25 @@
-/* Local on-photo semantic tokens; the canonical scrim and panel stay imported. */
+/* Local on-photo semantic tokens; the canonical scrim and panel stay imported.
+ * BRIEF_LATEST_HOLES_OPTION_A: the tile is the viewer's bottom stack — kicker,
+ * course name, par line, credit. The numeral, the PAR/YDS block and the Plays
+ * pill are gone, so their tokens and rules went with them. The kicker's colour
+ * is read from A.AMBER in LatestHolesSection.tsx, the same token the section
+ * head uses, so no amber hex lives here. */
 :root {
   --latest-hole-ink: #FFFFFF;
-  --latest-hole-label: rgba(255,255,255,0.82);
   --latest-hole-credit: rgba(255,255,255,0.78);
-  --latest-hole-number-shadow: 0 2px 10px rgba(0,0,0,0.6);
-  --latest-hole-label-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  --latest-hole-par: rgba(255,255,255,0.72);
 }
 .latest-hole-card { flex: none; position: relative; isolation: isolate; overflow: hidden; border-radius: 0; padding: 0; border: none; text-align: left; cursor: pointer; color: var(--latest-hole-ink); }
 /* The local media stack contains the shared player; its overlays never compete with video descendants. */
 .latest-hole-media > div { z-index: 0; }
 .latest-hole-media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .latest-hole-scrim { position: absolute; inset: 0; z-index: 1; }
-.latest-hole-figure { position: absolute; top: 16px; right: 16px; text-align: right; }
-.latest-hole-number { font-size: 36px; font-weight: 700; letter-spacing: -0.05em; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: var(--latest-hole-number-shadow); }
-.latest-hole-label { margin-top: 5px; font-size: 8px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--latest-hole-label); text-shadow: var(--latest-hole-label-shadow); }
+/* The bottom stack, bottom-anchored: kicker, name, par line, credit. */
 .latest-hole-name { position: absolute; left: 16px; right: 16px; bottom: 15px; }
-/* The "Plays" pill sits inside the bottom-anchored name block, above the course
-   name, so a tile that gains one never moves anything else on the tile. */
-.latest-hole-plays { display: inline-flex; align-items: baseline; gap: 6px; margin-bottom: 8px; padding: 5px 9px; border-radius: 999px; background: rgba(10,10,12,0.55); border: 1px solid rgba(255,255,255,0.18); font-size: 11px; font-weight: 700; color: #FFFFFF; font-variant-numeric: tabular-nums; max-width: 100%; white-space: nowrap; overflow: hidden; }
-.latest-hole-plays em { font-style: normal; font-weight: 600; color: rgba(255,255,255,0.7); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* "THE NINTH" — the viewer's kicker grammar, authored in upper case. */
+.latest-hole-kick { font-size: 8.5px; font-weight: 750; letter-spacing: 1.2px; line-height: 1; margin: 0 0 3px; }
 .latest-hole-course { font-size: 17px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* "Par 3 · 175 yards" — sentence case with the full word, matching the viewer. */
+.latest-hole-par { margin-top: 4px; font-size: 10.5px; line-height: 1.35; color: var(--latest-hole-par); font-variant-numeric: tabular-nums; }
 .latest-hole-credit { margin-top: 5px; font-size: 11.5px; font-weight: 500; color: var(--latest-hole-credit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .latest-hole-video { position: absolute; top: 16px; left: 16px; display: flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border-radius: 999px; color: var(--latest-hole-ink); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }

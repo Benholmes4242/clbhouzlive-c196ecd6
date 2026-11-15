@@ -1,21 +1,10 @@
 import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
 import { useMemo } from 'react';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { A, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { batches } from '@/lib/batches';
-import {
-  RANKS_MAX_IDS,
-  ariaRankPhrase,
-  playsFigure,
-  playsIsUnderPar,
-  rankIsOrdinable,
-  rankKey,
-  rankPhrase,
-  toRanksMap,
-  type CourseHoleRank,
-} from './holePlays';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import { latestHoleRowsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
@@ -70,20 +59,24 @@ export interface LatestHoleMedia {
   yards: number | null;
 }
 
-function LatestHoleCard({ row, rank, onOpen }: {
+/** BRIEF_LATEST_HOLES_OPTION_A: the tile is the viewer's bottom stack — hole word,
+ * course name, par line, credit. No numeral, no PAR/YDS block, no Plays pill; the
+ * photograph carries only the video duration. The hole word comes from the same
+ * ordinal source the fullscreen viewer's kicker uses (holeWalk.holeOrdinal). */
+function LatestHoleCard({ row, onOpen }: {
   row: LatestHoleMedia;
-  /** The course page's rank for this exact hole; absent means no pill. */
-  rank?: CourseHoleRank;
   onOpen: (row: LatestHoleMedia) => void;
 }) {
   const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' · ');
   const seconds = Math.round(row.duration_seconds ?? 0);
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-  // A rank backed by too few plays keeps its Plays figure and states no ordinal.
-  const ordinable = rank ? rankIsOrdinable(rank) : false;
-  const plays = rank ? `, plays ${playsFigure(rank.avg_to_par)}${ordinable ? `, ${ariaRankPhrase(rank.difficulty_rank)}` : ''}` : '';
+  const holeWord = `The ${holeOrdinal(row.hole_no)}`;
+  // An unscored hole has no par to state; the kicker still says which hole it is.
+  const parText = row.par == null ? null
+    : `Par ${row.par}${row.yards != null ? ` \u00B7 ${row.yards} yards` : ''}`;
+  const aria = [holeWord, row.course_name, parText, credit].filter(Boolean).join(', ');
   return (
-    <button type="button" className="latest-hole-card" aria-label={`Hole ${row.hole_no}, ${row.course_name}${plays}`}
+    <button type="button" className="latest-hole-card" aria-label={aria}
       style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: 1, isolation: 'isolate' }}
       onClick={() => onOpen(row)}>
       <div className="latest-hole-media" style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
@@ -93,20 +86,10 @@ function LatestHoleCard({ row, rank, onOpen }: {
       </div>
       <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT, zIndex: 1 }} />
       <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP, zIndex: 1 }} />
-      <div className="latest-hole-figure" style={{ zIndex: 2 }}>
-        <div className="latest-hole-number">{row.hole_no}</div>
-        <div className="latest-hole-label">{row.par != null ? `Par ${row.par}${row.yards != null ? ` · ${row.yards} yds` : ''}` : 'Hole'}</div>
-      </div>
       <div className="latest-hole-name" style={{ zIndex: 2 }}>
-        {rank && (
-          <div className="latest-hole-plays" data-hole-plays>
-            <span data-plays-figure style={playsIsUnderPar(rank.avg_to_par) ? { color: TOPAR_RED } : undefined}>
-              Plays {playsFigure(rank.avg_to_par)}
-            </span>
-            {ordinable && <em>· {rankPhrase(rank.difficulty_rank)}</em>}
-          </div>
-        )}
+        <div className="latest-hole-kick" style={{ color: A.AMBER }}>{holeWord.toUpperCase()}</div>
         <div className="latest-hole-course">{row.course_name}</div>
+        {parText && <div className="latest-hole-par">Par {row.par}{row.yards != null && <>{' \u00B7 '}{row.yards} yards</>}</div>}
         {credit && <div className="latest-hole-credit">{credit}</div>}
       </div>
       {row.media_type === 'video' && <span className="glass-chip latest-hole-video" style={{ zIndex: 2 }}>
@@ -140,32 +123,11 @@ export function LatestHolesSection() {
     enabled: !viewerOpen,
   });
   const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.id), [data]);
-  // One ranks read per loaded set: the distinct courses behind the rail, in a
-  // stable order so a new page extends the key instead of churning it.
-  const courseIds = useMemo(() => Array.from(new Set(rows.map(row => row.course_id))).sort(), [rows]);
-  const ranks = useQuery({
-    queryKey: ['gam_rpc', 'get_course_hole_ranks', courseIds],
-    enabled: courseIds.length > 0,
-    staleTime: 10 * 60_000,
-    queryFn: async (): Promise<CourseHoleRank[]> => {
-      const out: CourseHoleRank[] = [];
-      for (const batch of batches(courseIds, RANKS_MAX_IDS)) {
-        // The RPC is already deployed; generated client types may lag that contract.
-        const { data: rankData, error } = await (supabase.rpc as unknown as (
-          name: string,
-          args: Record<string, unknown>,
-        ) => Promise<{ data: CourseHoleRank[] | null; error: unknown }>)('get_course_hole_ranks', { p_course_ids: batch });
-        if (error) throw error;
-        if (Array.isArray(rankData)) out.push(...rankData);
-      }
-      return out;
-    },
-  });
-  const rankMap = useMemo(() => toRanksMap(ranks.data ?? []), [ranks.data]);
   const ready = !sessionLoading && settled({ isFetched, isError });
-  // The first paint carries the pills: the gate waits for the first page's ranks
-  // to settle, and an error means no pills rather than a broken tile.
-  useSectionReady('latestHoles', ready && (courseIds.length === 0 || settled(ranks)));
+  // BRIEF_LATEST_HOLES_OPTION_A §D: the tile no longer carries a Plays pill, so the
+  // ranks read that fed it is gone. The gate settles on the rail's own read alone —
+  // a clause left waiting on a read that never fires would hold the page open.
+  useSectionReady('latestHoles', ready);
   const visible = ready && !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
   const { railRef, sentinelRef } = useRailPagination({ hasNextPage, isFetching, fetchNextPage, cardWidth: LATEST_HOLE_W, pageCount: data?.pages.length ?? 0, visible, blocked: viewerOpen, isBlocked: holesViewerOpen });
   const posts = useMemo(() => latestHoleRowsToFeedPosts(rows), [rows]);
@@ -186,7 +148,7 @@ export function LatestHolesSection() {
   return <section style={SECTION_WRAP}>
     <SectionHead tone="amber" kicker="Through members' eyes" title="Latest holes" />
     <div ref={railRef} className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP, willChange: 'transform' }}>
-      {rows.map(row => <LatestHoleCard key={row.id} row={row} rank={rankMap.get(rankKey(row.course_id, row.hole_no))} onOpen={onOpen} />)}
+      {rows.map(row => <LatestHoleCard key={row.id} row={row} onOpen={onOpen} />)}
       {isFetchingNextPage && <LatestHoleSkeletonCard />}
       {hasNextPage && <div ref={sentinelRef} aria-hidden style={{ width: 1, flex: 'none', alignSelf: 'stretch' }} />}
     </div>

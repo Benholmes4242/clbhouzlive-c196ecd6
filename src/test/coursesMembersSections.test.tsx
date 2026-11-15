@@ -1,11 +1,11 @@
 /**
- * BRIEF_COURSES_MEMBERS_SECTIONS — the two member-score additions.
+ * BRIEF_COURSES_MEMBERS_SECTIONS — the reviewer's own rounds under a review
+ * (get_review_author_rounds): the copy rules, the show/hide rules (an absent RPC
+ * row means no strip), and the page gate settling on that read.
  *
- * §1 the "Plays" pill on the Latest holes rail (get_course_hole_ranks)
- * §2 the reviewer's own rounds under a review (get_review_author_rounds)
- *
- * Covers the copy rules, the show/hide rules (an absent RPC row means no pill
- * and no strip), and both page-gate reads settling.
+ * BRIEF_LATEST_HOLES_OPTION_A removed the Latest holes "Plays" pill, so the
+ * get_course_hole_ranks read and every test that encoded it are gone; the rail
+ * tile's own tests live in src/test/latestHolesSection.test.tsx.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -17,11 +17,9 @@ import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/
 
 const f = vi.hoisted(() => ({
   holes: [] as unknown[],
-  ranks: [] as unknown[],
   rounds: [] as unknown[],
   pool: [] as unknown[],
   holeState: 'ready' as 'ready' | 'pending' | 'error',
-  rankState: 'ready' as 'ready' | 'pending' | 'error',
   roundState: 'ready' as 'ready' | 'pending' | 'error',
   rpc: vi.fn(),
 }));
@@ -78,10 +76,7 @@ vi.mock('@/components/courses/browse/MostPlayedSection', async () => ({ MostPlay
 vi.mock('@/components/courses/browse/HardestSection', async () => ({ HardestSection: await readySection('hardest') }));
 
 const { default: CoursesBrowsePage } = await import('@/components/courses/CoursesBrowsePage');
-const { LatestHolesSection } = await import('@/components/courses/browse/LatestHolesSection');
 const { ReviewRailSlot } = await import('@/components/courses/ReviewRailSlot');
-const { PageLoadGate } = await import('@/components/courses/browse/PageLoadGate');
-const { playsFigure, rankPhrase, rankKey, toRanksMap } = await import('@/components/courses/browse/holePlays');
 const { toParFigure, roundsLabel, bestLabel, toAuthorRoundsMap } = await import('@/components/courses/reviewAuthorRounds');
 
 /* ── fixtures ─────────────────────────────────────────────────────────── */
@@ -91,10 +86,6 @@ const holeRow = (id: string, courseId: string, holeNo: number): LatestHoleMedia 
   media_url: `/photo-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null,
   exif_captured_at: null, added_at: '2025-06-12T10:00:00Z', created_at: '2026-10-24T12:00:00Z',
   member_id: 'member', member_name: 'Thomas Holmes', member_avatar_url: null, par: 4, yards: 412,
-});
-
-const rankRow = (courseId: string, holeNo: number, avg: number, rank: number, rounds = 30) => ({
-  course_id: courseId, hole_no: holeNo, rounds, avg_to_par: avg, difficulty_rank: rank, holes_ranked: 18,
 });
 
 const review = (id: string, userId: string): LatestReview => ({
@@ -113,13 +104,11 @@ function reply<T>(state: 'ready' | 'pending' | 'error', value: T) {
 beforeEach(() => {
   vi.clearAllMocks();
   f.holes = [holeRow('one', 'course-a', 4), holeRow('two', 'course-b', 7), holeRow('three', 'course-c', 11)];
-  f.ranks = [rankRow('course-a', 4, 0.42, 3)];
   f.rounds = [{ review_id: 'r1', rounds_here: 4, best_gross: 78, best_to_par: 6 }];
   f.pool = [review('r1', 'ada'), review('r2', 'bo')];
-  f.holeState = 'ready'; f.rankState = 'ready'; f.roundState = 'ready';
+  f.holeState = 'ready'; f.roundState = 'ready';
   f.rpc.mockImplementation((name: string) => {
     if (name === 'get_latest_hole_media') return reply(f.holeState, f.holes);
-    if (name === 'get_course_hole_ranks') return reply(f.rankState, f.ranks);
     if (name === 'get_review_author_rounds') return reply(f.roundState, f.rounds);
     return Promise.resolve({ data: [], error: null });
   });
@@ -132,41 +121,12 @@ const mount = (node: React.ReactNode) => {
   return render(<MemoryRouter><QueryClientProvider client={cache}>{node}</QueryClientProvider></MemoryRouter>);
 };
 
-const rail = () => mount(<LatestHolesSection />);
-const gated = () => mount(<PageLoadGate expect={['latestHoles']} fallback={<div data-held />}><LatestHolesSection /></PageLoadGate>);
 const page = () => mount(<CoursesBrowsePage onOpenDirectory={() => {}} />);
 const held = (container: HTMLElement) => container.querySelector('[data-held]') ?? container.querySelector('[data-courses-fallback]');
 
 /* ── the copy rules, in one place ─────────────────────────────────────── */
 
-describe('the pill and strip copy rules', () => {
-  it('rounds the average first, then signs it, at the stat chip\'s one decimal', () => {
-    expect(playsFigure(0)).toBe('level');
-    expect(playsFigure(0.42)).toBe('+0.4');
-    expect(playsFigure(-0.16)).toBe('\u22120.2');
-    expect(playsFigure(2)).toBe('+2.0');
-    /* A value that rounds to par is level: never a signed zero. */
-    expect(playsFigure(0.004)).toBe('level');
-    expect(playsFigure(-0.004)).toBe('level');
-    expect(playsFigure(0.049)).toBe('level');
-    expect(playsFigure(0.06)).toBe('+0.1');
-    expect(playsFigure(-0.06)).toBe('\u22120.1');
-  });
-
-  it('names rank one outright and every other rank by ordinal', () => {
-    expect(rankPhrase(1)).toBe('Hardest hole');
-    expect(rankPhrase(2)).toBe('2nd hardest hole');
-    expect(rankPhrase(3)).toBe('3rd hardest hole');
-    expect(rankPhrase(4)).toBe('4th hardest hole');
-    expect(rankPhrase(11)).toBe('11th hardest hole');
-    expect(rankPhrase(12)).toBe('12th hardest hole');
-    expect(rankPhrase(13)).toBe('13th hardest hole');
-    expect(rankPhrase(18)).toBe('18th hardest hole');
-    expect(rankPhrase(21)).toBe('21st hardest hole');
-    expect(rankPhrase(22)).toBe('22nd hardest hole');
-    expect(rankPhrase(23)).toBe('23rd hardest hole');
-  });
-
+describe('the strip copy rules', () => {
   it('writes the to-par figure, the round label and the best label as specified', () => {
     expect(toParFigure(7)).toBe('+7');
     expect(toParFigure(0)).toBe('E');
@@ -178,19 +138,6 @@ describe('the pill and strip copy rules', () => {
     expect(bestLabel(false)).toBe('THEIR BEST');
   });
 
-  it('keys ranks by course AND hole and drops incomplete rows', () => {
-    const map = toRanksMap([
-      rankRow('course-a', 4, 0.5, 2),
-      { course_id: 'course-a', hole_no: 5, avg_to_par: 0.5 },
-      { course_id: 'course-a', hole_no: 6, difficulty_rank: 1 },
-      'not a row',
-    ]);
-    expect([...map.keys()]).toEqual(['course-a|4']);
-    expect(map.get(rankKey('course-a', 4))?.difficulty_rank).toBe(2);
-    expect(toRanksMap(undefined).size).toBe(0);
-    expect(toRanksMap('nope').size).toBe(0);
-  });
-
   it('keys author rounds by review and keeps a null best as rounds-only', () => {
     const map = toAuthorRoundsMap([
       { review_id: 'r1', rounds_here: 4, best_gross: 78, best_to_par: 6 },
@@ -200,95 +147,6 @@ describe('the pill and strip copy rules', () => {
     expect([...map.keys()]).toEqual(['r1', 'r2']);
     expect(map.get('r2')).toEqual({ review_id: 'r2', rounds_here: 2, best_gross: null, best_to_par: null });
     expect(toAuthorRoundsMap(null).size).toBe(0);
-  });
-});
-
-/* ── §1 the pill on the Latest holes rail ─────────────────────────────── */
-
-describe('the Plays pill', () => {
-  it('marks only the tile whose course and hole the RPC ranked', async () => {
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
-    expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent)
-      .toBe('Plays +0.4· 3rd hardest hole');
-    expect(view.container.querySelectorAll('button')[0].getAttribute('aria-label'))
-      .toBe('Hole 4, Course course-a, plays +0.4, 3rd hardest hole');
-  });
-
-  it('leaves an unranked tile exactly as it was', async () => {
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
-    const cards = view.container.querySelectorAll('button');
-    expect(cards[1].querySelector('[data-hole-plays]')).toBeNull();
-    expect(cards[1].getAttribute('aria-label')).toBe('Hole 7, Course course-b');
-    expect(cards[2].getAttribute('aria-label')).toBe('Hole 11, Course course-c');
-  });
-
-  it('asks for exactly the courses on the rail, once', async () => {
-    rail();
-    await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('get_course_hole_ranks', { p_course_ids: ['course-a', 'course-b', 'course-c'] }));
-    expect(f.rpc.mock.calls.filter(call => call[0] === 'get_course_hole_ranks')).toHaveLength(1);
-  });
-
-  it('never marks a tile from a rank belonging to another hole', async () => {
-    f.ranks = [rankRow('course-a', 9, 0.42, 3)];
-    const view = gated();
-    await waitFor(() => expect(held(view.container)).toBeNull());
-    expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(0);
-  });
-
-  it('paints an under-par average in the red figure and names rank one outright', async () => {
-    f.ranks = [rankRow('course-a', 4, -0.15, 1)];
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
-    const figure = view.container.querySelector('[data-plays-figure]') as HTMLElement;
-    expect(figure.textContent).toBe('Plays \u22120.1');
-    expect(figure.style.color).toBe('rgb(226, 75, 63)');
-    expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent)
-      .toBe('Plays \u22120.1· Hardest hole');
-  });
-
-  it('keeps the Plays figure and states no ordinal below ten plays', async () => {
-    f.ranks = [rankRow('course-a', 4, 0.42, 3, 9)];
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
-    expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent).toBe('Plays +0.4');
-    expect(view.container.querySelector('[data-hole-plays] em')).toBeNull();
-    expect(view.container.querySelectorAll('button')[0].getAttribute('aria-label'))
-      .toBe('Hole 4, Course course-a, plays +0.4');
-    /* The tile itself is never hidden for a thin sample. */
-    expect(view.container.querySelectorAll('button')).toHaveLength(3);
-  });
-
-  it('states the ordinal at exactly ten plays', async () => {
-    f.ranks = [rankRow('course-a', 4, 0.42, 3, 10)];
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
-    expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent)
-      .toBe('Plays +0.4· 3rd hardest hole');
-  });
-
-  it('reads a hole that rounds to par as Plays level, in no colour', async () => {
-    f.ranks = [rankRow('course-a', 4, -0.004, 1)];
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
-    const figure = view.container.querySelector('[data-plays-figure]') as HTMLElement;
-    expect(figure.textContent).toBe('Plays level');
-    expect(figure.style.color).toBe('');
-    expect(view.container.textContent).not.toContain('0.0');
-  });
-
-  it('keeps an over-par figure under CSS control', async () => {
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
-    expect((view.container.querySelector('[data-plays-figure]') as HTMLElement).style.color).toBe('');
-  });
-
-  it('settles the rail with no pills when the ranks read fails', async () => {
-    f.rankState = 'error';
-    const view = rail();
-    await waitFor(() => expect(view.container.querySelectorAll('button')).toHaveLength(3));
-    expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(0);
   });
 });
 
@@ -342,39 +200,6 @@ describe('the played strip', () => {
 /* ── the page gate waits for both reads ───────────────────────────────── */
 
 describe('the page gate', () => {
-  it('holds the rail while the ranks read is unresolved', async () => {
-    f.rankState = 'pending';
-    const view = gated();
-    await waitFor(() => expect(view.container.querySelectorAll('button')).toHaveLength(3));
-    expect(held(view.container)).not.toBeNull();
-    expect((view.container.querySelector('section')?.parentElement as HTMLElement).style.display).toBe('none');
-  });
-
-  it('opens the rail once the ranks read has settled', async () => {
-    let release: (value: unknown) => void = () => {};
-    f.rpc.mockImplementation((name: string) => {
-      if (name === 'get_course_hole_ranks') return new Promise(resolve => { release = resolve; });
-      if (name === 'get_latest_hole_media') return reply('ready', f.holes);
-      return Promise.resolve({ data: [], error: null });
-    });
-    const view = gated();
-    expect(held(view.container)).not.toBeNull();
-    // The read starts once the rail knows which courses it is showing.
-    await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('get_course_hole_ranks', { p_course_ids: ['course-a', 'course-b', 'course-c'] }));
-    await act(async () => { release({ data: f.ranks, error: null }); });
-    await waitFor(() => expect(held(view.container)).toBeNull());
-    expect(view.container.querySelectorAll('button')).toHaveLength(3);
-    expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1);
-  });
-
-  it('opens the rail with no pills when the ranks read fails', async () => {
-    f.rankState = 'error';
-    const view = gated();
-    await waitFor(() => expect(held(view.container)).toBeNull());
-    expect(view.container.querySelectorAll('button')).toHaveLength(3);
-    expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(0);
-  });
-
   it('holds the page while the reviewer-rounds read is unresolved, then opens with the strip', async () => {
     let release: (value: unknown) => void = () => {};
     f.rpc.mockImplementation((name: string) => {

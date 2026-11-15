@@ -78,7 +78,7 @@ describe('Courses photo top scrims', () => {
   it('an eleven-second video retains course and member/date text beside its shared player', () => {
     f.holes[0] = { ...f.holes[0], course_name: 'Tralee Golf Club', media_type: 'video', duration_seconds: 11, poster_url: '/sky.jpg' };
     mount(<LatestHolesSection />);
-    const card = screen.getByRole('button', { name: 'Hole 3, Tralee Golf Club' });
+    const card = screen.getByRole('button', { name: 'The third, Tralee Golf Club, Par 3 · 194 yards, Andrew Yetzes · Apr 2026' });
     expect(within(card).getByText('Tralee Golf Club')).toBeInTheDocument();
     expect(within(card).getByText('Andrew Yetzes · Apr 2026')).toBeInTheDocument();
     expect(within(card).getByText('0:11')).toHaveClass('glass-chip');
@@ -94,7 +94,7 @@ describe('Courses photo top scrims', () => {
     expect(media?.style.position).toBe('absolute');
     const layers = Array.from(card.children).filter(child => (child as HTMLElement).style.background.includes('linear-gradient')) as HTMLElement[];
     expect(layers.map(layer => layer.style.zIndex)).toEqual(['1', '1']);
-    for (const selector of ['.latest-hole-figure', '.latest-hole-name', ...(media_type === 'video' ? ['.latest-hole-video'] : [])]) {
+    for (const selector of ['.latest-hole-name', ...(media_type === 'video' ? ['.latest-hole-video'] : [])]) {
       expect(card.querySelector<HTMLElement>(selector)?.style.zIndex).toBe('2');
     }
     expect(media?.querySelector('img')).not.toBeNull();

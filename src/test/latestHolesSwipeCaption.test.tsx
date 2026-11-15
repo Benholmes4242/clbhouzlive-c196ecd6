@@ -75,42 +75,45 @@ describe('Latest holes active-shot caption and course header', () => {
     expect(view.container.querySelector('.member-shot-title')).toHaveTextContent('Royal Portrush Golf Club (Dunluce)');
     expect(view.container.querySelector('.member-shot-detail')).toBeNull();
   });
-  it('header, record, rating and course navigation follow horizontal active-shot changes', () => {
+  it('rating and course navigation follow horizontal active-shot changes, and the top bar carries no course name', () => {
     const view = mount(true);
-    expect(screen.getByRole('button', { name: 'Open Druids Glen Golf Club' })).toBeInTheDocument();
+    // BRIEF_LATEST_HOLES_OPTION_A §B: the member-shot top bar keeps only the chevron and
+    // the rating chip — the chip is its one course door and it follows the active shot.
+    expect(screen.queryByRole('button', { name: /^Open / })).toBeNull();
     expect(courses.personal).toHaveBeenLastCalledWith('druids');
     expect(courses.stats).toHaveBeenLastCalledWith('druids', true);
     expect(courses.rating).toHaveBeenLastCalledWith('druids');
-    expect(view.container.textContent).toContain('79');
+    expect(view.container.textContent).not.toContain('79');
     expect(screen.getByRole('button', { name: 'clbhouz rating 8.6' })).toBeInTheDocument();
     expect(view.container.textContent).not.toContain('Fallback location');
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
-    expect(screen.queryByRole('button', { name: 'Open Druids Glen Golf Club' })).toBeNull();
-    const header = screen.getByRole('button', { name: 'Open Sundridge Park Golf Club' });
+    expect(screen.queryByRole('button', { name: /^Open / })).toBeNull();
     expect(courses.personal).toHaveBeenLastCalledWith('sundridge');
     expect(courses.stats).toHaveBeenLastCalledWith('sundridge', true);
     expect(courses.rating).toHaveBeenLastCalledWith('sundridge');
-    expect(view.container.textContent).toContain('75');
+    expect(view.container.textContent).not.toContain('75');
     expect(screen.getByRole('button', { name: 'clbhouz rating 9.1' })).toBeInTheDocument();
-    fireEvent.click(header);
+    fireEvent.click(screen.getByRole('button', { name: 'clbhouz rating 9.1' }));
     expect(screen.getByTestId('location')).toHaveTextContent('/courses/sundridge');
   });
   it.each([false, true])('legacy review/golfCourse/post precedence remains when no eligible override (synthetic %s)', synthetic => {
     const shown = synthetic ? { ...post, mediaItems: post.mediaItems.map(item => ({ ...item, memberShot: item.memberShot ? { ...item.memberShot, courseId: undefined } : undefined })) } : post;
     const reviewed = { ...shown, review: { reviewId: 'r', courseId: 'review', courseName: 'Review course', courseImageUrl: null, rating: 8 } };
+    // A real post's header names the course; the member-shot viewer's only door is the chip.
+    const door = (name: string) => screen.getByRole('button', { name: synthetic ? /^clbhouz rating/ : name });
     mount(synthetic, reviewed, { id: 'golf', name: 'Golf course' });
-    expect(screen.getByRole('button', { name: 'Open Review course' })).toBeInTheDocument();
+    expect(door('Open Review course')).toBeInTheDocument();
     expect(courses.personal).toHaveBeenLastCalledWith('review');
     expect(courses.stats).toHaveBeenLastCalledWith('review', true);
-    fireEvent.click(screen.getByRole('button', { name: 'Open Review course' }));
+    fireEvent.click(door('Open Review course'));
     expect(screen.getByTestId('location')).toHaveTextContent('/courses/review');
     cleanup();
     mount(synthetic, shown, { id: 'golf', name: 'Golf course' });
-    expect(screen.getByRole('button', { name: 'Open Golf course' })).toBeInTheDocument();
+    expect(door('Open Golf course')).toBeInTheDocument();
     expect(courses.personal).toHaveBeenLastCalledWith('golf');
     cleanup();
     mount(synthetic, shown);
-    expect(screen.getByRole('button', { name: 'Open Fallback course' })).toBeInTheDocument();
+    expect(door('Open Fallback course')).toBeInTheDocument();
     expect(courses.personal).toHaveBeenLastCalledWith('fallback');
   });
 });
