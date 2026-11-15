@@ -17,6 +17,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
+import { ContourCover } from '@/components/profile/hero/ContourCover';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 
 const CANVAS = '#0B0B0D';
@@ -217,14 +218,16 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
           position: 'relative',
           paddingTop: HERO_CONTENT_TOP,
           paddingBottom: HERO_CONTENT_BOTTOM,
-          background: p.coverUrl ? CANVAS : 'linear-gradient(180deg, #17171B 0%, #0B0B0D 100%)',
+          background: CANVAS,
           overflow: 'hidden',
         }}
       >
-        {p.coverUrl && (
+        {p.coverUrl ? (
           <img src={p.coverUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <ContourCover />
         )}
-        {p.coverUrl && <PhotoBandFade canvas={CANVAS} />}
+        <PhotoBandFade canvas={CANVAS} />
 
         {/* Identity on the photo: place kicker + Share/More, then crest + name. */}
         <div style={{ position: 'relative', margin: '0 20px' }}>

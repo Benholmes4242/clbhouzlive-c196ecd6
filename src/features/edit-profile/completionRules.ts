@@ -14,6 +14,6 @@ export function completionItems(p: CompletionInputs): { key: CompletionAction; l
  { key: 'topTen', label: 'Add your Top 10', done: p.topTen > 0 },
  ];
 }
-export function arrivalAction(src: string | null): 'homeClub' | 'username' | null {
- return src === 'nudge_club' ? 'homeClub' : src === 'nudge_username' ? 'username' : null;
+export function arrivalAction(src: string | null): 'homeClub' | 'username' | 'cover' | null {
+ return src === 'nudge_club' ? 'homeClub' : src === 'nudge_username' ? 'username' : src === 'cover' ? 'cover' : null;
 }

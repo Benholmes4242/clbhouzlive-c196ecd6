@@ -57,6 +57,7 @@ export default function EditProfile() {
     const action = arrivalAction(searchParams.get('src'));
     if (action === 'username') youActions.current?.open(action);
     if (action === 'homeClub') golfActions.current?.open(action);
+    if (action === 'cover') photos.current?.open('cover');
   }, [loading, profile, searchParams, tab]);
   const openCompletion = (action: CompletionAction) => {
     if (action === 'avatar' || action === 'cover') photos.current?.open(action);

@@ -14,6 +14,7 @@ import { W_55 } from './HeroShell';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
+import { ContourCover } from './ContourCover';
 
 /** Control skin over the band (EDIT pill and the overflow dots). */
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
@@ -101,6 +102,9 @@ interface Props {
   /** Own profile with no subline: "Add your home club" → edit route. */
   onAddHomeClub?: () => void;
   addHomeClubLabel?: string;
+  /** Own profile with no cover of its own: the "+ Add a cover" pill. */
+  onAddCover?: () => void;
+  addCoverLabel?: string;
   action?: React.ReactNode;
 }
 
@@ -117,6 +121,8 @@ export const ProfileCoverBand: React.FC<Props> = ({
   afterSubline,
   onAddHomeClub,
   addHomeClubLabel,
+  onAddCover,
+  addCoverLabel,
   action,
 }) => {
   const [broken, setBroken] = React.useState(false);
@@ -135,18 +141,23 @@ export const ProfileCoverBand: React.FC<Props> = ({
         isolation: 'isolate',
       }}
     >
-      {showCover && (
-        <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+      {/* Cover chain: the member's own photograph, else the fairway contours.
+          A photograph that fails to load falls back to the same contours. */}
+      <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        {showCover ? (
           <img
             src={coverUrl as string}
             alt=""
             decoding="async"
+            data-cover-img=""
             onError={() => setBroken(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
           />
-          <PhotoBandFade />
-        </div>
-      )}
+        ) : (
+          <ContourCover />
+        )}
+        <PhotoBandFade />
+      </div>
 
       <div
         style={{
@@ -155,6 +166,36 @@ export const ProfileCoverBand: React.FC<Props> = ({
           zIndex: 1,
         }}
       >
+        {onAddCover && (
+          <button
+            type="button"
+            onClick={onAddCover}
+            data-add-cover=""
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 'calc(100% + 8px)',
+              height: 28,
+              padding: '0 12px',
+              borderRadius: 999,
+              border: `1px solid ${BAND_CONTROL_BORDER}`,
+              background: BAND_CONTROL_GROUND,
+              color: '#FFFFFF',
+              fontFamily: SANS,
+              fontSize: 9.5,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+            }}
+          >
+            {addCoverLabel}
+          </button>
+        )}
         {/* Row 1: the home club as the amber kicker, controls on the right.
             With no club the controls sit alone on the right. */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>

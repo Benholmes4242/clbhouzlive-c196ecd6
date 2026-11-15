@@ -30,6 +30,7 @@ import { numberWord } from '@/lib/text/numbers';
 import { formBars, formBarLowered, type FormScoreLike } from '@/features/profile-sheet-v2/sheetState';
 import { isFullEighteen, useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
+import { useClubCoverPhoto } from '@/components/profile/hooks/useClubCoverPhoto';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -226,12 +227,15 @@ export const ProfileHero: React.FC<Props> = ({
     </button>
   );
 
-  // Fallback chain unchanged: own cover → #1 Top 10 course image → flat canvas.
+  // Fallback chain: own cover → home club course photo → #1 Top 10 course
+  // image → contours. The club photo is read only while no own cover exists,
+  // and a hidden home club never supplies one (useProfileClubs owns that).
   const topCourse = React.useMemo(
     () => [...(topTen ?? [])].sort((a, b) => a.position - b.position)[0] ?? null,
     [topTen],
   );
-  const cover = coverUrl || topCourse?.thumbnail_image || null;
+  const clubCover = useClubCoverPhoto(!coverUrl && homeClub ? homeClub.id : null);
+  const cover = coverUrl || clubCover.coverPhoto || topCourse?.thumbnail_image || null;
 
   // Ninety-day rule: points inside 90 days, else the whole history.
   const { series, oldestMs, windowHeld } = React.useMemo(() => {
@@ -414,6 +418,8 @@ export const ProfileHero: React.FC<Props> = ({
         afterSubline={coachLine}
         onAddHomeClub={isSelf ? onEdit : undefined}
         addHomeClubLabel={t('hero.addHomeClub', 'Add your home club')}
+        onAddCover={isSelf && !coverUrl ? () => navigate('/edit-profile?src=cover') : undefined}
+        addCoverLabel={t('hero.addCover', '+ Add a cover')}
         action={action}
         avatar={<SquircleAvatar size={56} src={avatarUrl ?? undefined} alt={displayName} userId={userId} hideRing className="w-full h-full" />}
       />
