@@ -1,5 +1,10 @@
 # Roadmap
 
+## OWGR approval — authorised finish
+- Keep the authorised no-player confirmation click in proVerification1; add the explicit chosen-player first-click regression case.
+- Run all four shards separately; require 8,760 total (8,748 + 11 + 1), otherwise identify every file losing collected tests and stop.
+- Confirm preview build, write .lovable/reports/pro-owgr-at-approval.md and commit only after all checks pass.
+
 ## Signed-off sign-in redesign — tests complete; visual checks outstanding
 - Authorised caret fix complete: removed only the email caret override; amber dot token retained. Focused 64/64, shard 3 2,196/2,196 and shard 4 2,229/2,229; with previously passed shards 1 (2,203) and 2 (2,116), all 8,744 passed. No test changes; report .lovable/reports/sign-in-caret-fix.md.
 - Replace choose/email presentation only; preserve social/code/session behavior and exported logos.

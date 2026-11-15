@@ -34,6 +34,7 @@ vi.mock('@/integrations/supabase/client', () => ({
         eq: () => chain,
         in: () => chain,
         ilike: () => chain,
+        limit: () => chain,
         maybeSingle: async () => ({ data: null, error: null }),
         then: (res: (v: unknown) => unknown, rej: (e: unknown) => unknown) =>
           Promise.resolve(f.fromData[table] ?? { data: [], error: null }).then(res, rej),
@@ -121,6 +122,25 @@ describe('the OWGR field', () => {
 });
 
 describe('verify as pro', () => {
+  it('a tour_pro with a player picked verifies on the first click without a confirm or OWGR attachment', async () => {
+    mountTab({ ...baseRow, proTour: 'PGA TOUR', proTourCode: 'pga' });
+    expect(await screen.findByLabelText('OWGR profile link')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Change' }));
+    f.fromData['sr_players'] = { data: [{ id: 'sp-picked', full_name: 'Chosen Player', tour_codes: ['pga'] }], error: null };
+    fireEvent.change(screen.getByLabelText('Search tour players'), { target: { value: 'Chosen' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Chosen Player · pga' }));
+    await waitFor(() => expect(screen.queryByLabelText('OWGR profile link')).toBeNull());
+    fireEvent.click(screen.getByRole('button', { name: 'Verify as pro' }));
+    expect(f.reviewMutate).toHaveBeenCalledTimes(1);
+    expect(f.reviewMutate).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'r1', type: 'golfer', decision: 'approved', playerId: 'sp-picked' }),
+      expect.anything(),
+    );
+    expect(screen.queryByRole('dialog', { name: 'No OWGR page?' })).toBeNull();
+    succeedVerify();
+    expect(f.rpc.mock.calls.filter(call => call[0] === 'admin_set_pro_owgr')).toHaveLength(0);
+    expect(f.invoke).not.toHaveBeenCalled();
+  });
   it('an invalid link blocks verify and shows the inline warning', async () => {
     mountTab(baseRow);
     fireEvent.change(await screen.findByLabelText('OWGR profile link'), { target: { value: 'https://example.com/player' } });
