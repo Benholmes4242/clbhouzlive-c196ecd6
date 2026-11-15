@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidateAdminQueues, subscribeAdminQueueChanges, refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
-import { AlertTriangle } from 'lucide-react';
 import {
   CountryMismatchWarning,
   WhsCountryChip,
@@ -24,10 +23,9 @@ import VenueMappingPage from './VenueMappingPage';
 import RankingEventCoursesPage from './RankingEventCoursesPage';
 import AddCourseSheet from '../components/AddCourseSheet';
 import InboxQueueRow from '../components/InboxQueueRow';
-import { OpenDoneControl, FigureTiles, QueueChips, RowSkeleton, FlowPanel, ToolRow, useCatalogueTotal } from '../components/InboxPanels';
+import { OpenDoneControl, FigureTiles, QueueChips, RowSkeleton, FlowPanel, ToolRow, useCatalogueTotal, CC3, NUM, LIST3, PANEL_TITLE, PANEL_META } from '../components/InboxPanels';
 import { useInboxFlow } from '../hooks/useInboxFlow';
 import { orderOpenItems, summariseQueues } from '../lib/inboxQueue';
-import { LIST_PANEL } from '../lib/panels';
 import CourseSearchField, { useCourseSearch } from '../components/CourseSearchField';
 import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
@@ -202,6 +200,15 @@ function InboxListPage() {
   const openCount = openItems.length;
   const loading = feed.isLoading && feed.items.length === 0;
 
+  // "updated HH:MM": the local time the feed last settled.
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  useEffect(() => {
+    if (!feed.isLoading) setUpdatedAt(new Date());
+  }, [feed.isLoading, feed.items, feed.doneItems]);
+  const updatedLabel = updatedAt
+    ? `${String(updatedAt.getHours()).padStart(2, '0')}:${String(updatedAt.getMinutes()).padStart(2, '0')}`
+    : null;
+
   const openRow = (item: InboxItem) => {
     switch (item.type) {
       case 'report': setModRow(item.payload as ModerationQueueRow); break;
@@ -233,10 +240,11 @@ function InboxListPage() {
   if (visibleTypes.length === 0) return <AdminAccessDenied />;
 
   return (
-    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-      {/* 2.1 - the page's first row is the Open/Done control, nothing else. */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+    <div data-inbox-v3 style={{ padding: '10px 12px 28px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 720, margin: '0 auto', lineHeight: 'normal', minWidth: 0 }}>
+      {/* 1. Control row: Open/Done left, last load time right. */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <OpenDoneControl view={view} openCount={openCount} onChange={setView} />
+        {updatedLabel && <span data-updated style={{ ...NUM, fontSize: 11, color: CC3.faint }}>updated {updatedLabel}</span>}
       </div>
 
       {feed.hadErrors && (
@@ -244,12 +252,12 @@ function InboxListPage() {
           role="alert"
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
-            padding: '8px 12px', borderRadius: t.radius.md,
-            background: t.warnSoft, color: t.warnText,
-            fontSize: 12, fontWeight: 600,
+            padding: '9px 12px', borderRadius: 12, background: CC3.surface,
+            color: CC3.ink, fontSize: 12, fontWeight: 600,
           }}
         >
-          <AlertTriangle size={14} /> Some queues could not load
+          <span data-error-dot aria-hidden style={{ width: 7, height: 7, borderRadius: 999, background: CC3.bad, flex: 'none' }} />
+          Some queues could not load
         </div>
       )}
 
@@ -267,54 +275,36 @@ function InboxListPage() {
         <QueueChips loading={loading} total={openCount} queues={queues} selected={typeFilter} onSelect={setType} />
       )}
 
-      {/* 2.4 The list */}
-      <section style={{ ...LIST_PANEL, padding: '14px 0 0' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, padding: '0 16px 10px' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink }}>
-            {view === 'done' ? 'Recently closed' : 'Members affected first'}
-          </span>
-          <span style={{ fontSize: 11, color: t.inkFaint }}>
-            {view === 'done' ? 'newest first' : 'then longest wait'}
-          </span>
+      {/* The list */}
+      <section style={LIST3}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, padding: '0 14px', marginBottom: 12 }}>
+          <span style={PANEL_TITLE}>{view === 'done' ? 'Recently closed' : 'Members affected first'}</span>
+          <span style={{ ...PANEL_META, whiteSpace: 'nowrap' }}>{view === 'done' ? 'newest first' : 'then longest wait'}</span>
         </div>
 
         {loading ? (
-          <div aria-busy>
+          <div aria-busy style={{ borderTop: `1px solid ${CC3.hair}` }}>
             {[0, 1, 2].map(i => <RowSkeleton key={i} first={i === 0} />)}
           </div>
         ) : filtered.length === 0 && view === 'open' ? (
-          <div style={{ padding: '48px 16px', textAlign: 'center', borderTop: `1px solid ${t.hairline}` }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>Nothing waiting</div>
-            <div style={{ fontSize: 11.5, color: t.inkMuted, marginTop: 2 }}>
+          <div data-empty style={{ padding: '28px 14px 30px', textAlign: 'center', borderTop: `1px solid ${CC3.hair}` }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: CC3.ink }}>Nothing waiting</div>
+            <div style={{ fontSize: 11, color: CC3.faint, marginTop: 2 }}>
               {typeFilter === 'all' ? 'every queue is clear' : 'this queue is clear'}
             </div>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ padding: '48px 16px', textAlign: 'center', borderTop: `1px solid ${t.hairline}`, fontSize: 11.5, color: t.inkMuted }}>
-            Nothing closed yet
-          </div>
-        ) : view === 'open' ? (
-          <div style={{ borderTop: `1px solid ${t.hairline}` }}>
-            {filtered.map((item, idx) => (
-              <InboxQueueRow
-                key={item.id}
-                item={item}
-                first={idx === 0}
-                onOpen={() => openRow(item)}
-                onResolved={onResolved}
-                isFullAdmin={role === 'full'}
-                catalogueTotal={catalogueTotal}
-              />
-            ))}
+          <div data-empty style={{ padding: '28px 14px 30px', textAlign: 'center', borderTop: `1px solid ${CC3.hair}` }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: CC3.ink }}>Nothing closed yet</div>
           </div>
         ) : (
-          <div style={{ borderTop: `1px solid ${t.hairline}` }}>
+          <div style={{ borderTop: `1px solid ${CC3.hair}` }}>
             {filtered.map((item, idx) => (
               <InboxQueueRow
                 key={item.id}
                 item={item}
                 first={idx === 0}
-                done
+                done={view === 'done'}
                 onOpen={() => openRow(item)}
                 onResolved={onResolved}
                 isFullAdmin={role === 'full'}
@@ -327,29 +317,29 @@ function InboxListPage() {
 
       {view === 'open' && <FlowPanel flow={flow14.data} loading={flow14.isLoading} />}
 
-      {/* 2.6 TOOLS */}
+      {/* Tools */}
       {canUsers && view === 'open' && (
-        <section style={{ ...LIST_PANEL, padding: '14px 0 0' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink, padding: '0 16px 10px' }}>Tools</div>
+        <section style={LIST3}>
+          <div style={{ ...PANEL_TITLE, padding: '0 14px', marginBottom: 12 }}>Tools</div>
           {workbenchCount > 0 && (
             <ToolRow
               to="/admin-v2/inbox/matching"
               title="Course matching workbench"
-              sub={`${workbenchCount} scored course${workbenchCount === 1 ? '' : 's'} unmatched`}
+              sub={<><b style={{ ...NUM, color: CC3.ink, fontWeight: 700 }}>{workbenchCount}</b> scored course{workbenchCount === 1 ? '' : 's'} unmatched</>}
             />
           )}
-          <ToolRow to="/admin-v2/inbox/venues" title="Tour venue mapping" sub="Link tournament venues to courses" />
+          <ToolRow to="/admin-v2/inbox/venues" title="Tour venue mapping" sub="link tournament venues to courses" />
           <ToolRow
             to="/admin-v2/inbox/ranking-events"
             title="Ranking event courses"
             sub={rankingEventsNeedingCourse > 0
-              ? `${rankingEventsNeedingCourse} world ranking event${rankingEventsNeedingCourse === 1 ? '' : 's'} need${rankingEventsNeedingCourse === 1 ? 's' : ''} a course`
-              : 'Link world ranking events to courses'}
+              ? <><b style={{ ...NUM, color: CC3.ink, fontWeight: 700 }}>{rankingEventsNeedingCourse}</b> world ranking event{rankingEventsNeedingCourse === 1 ? '' : 's'} need{rankingEventsNeedingCourse === 1 ? 's' : ''} a course</>
+              : 'link world ranking events to courses'}
           />
         </section>
       )}
 
-      <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } } .inbox-chips::-webkit-scrollbar { display: none; }`}</style>
+      <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } } .inbox-v3-field::placeholder { color: var(--cc3-faint); opacity: 1; }`}</style>
 
       {/* Drawers */}
       <ModerationDetailDrawer open={modRow !== null} onClose={() => setModRow(null)} row={modRow} />

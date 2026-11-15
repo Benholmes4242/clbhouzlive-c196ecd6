@@ -57,7 +57,7 @@ export function useCourseSearch(
 }
 
 export default function CourseSearchField({
-  placeholder, initialQuery = '', onPick, autoFocus = false, disabled = false, whsCountry = null,
+  placeholder, initialQuery = '', onPick, autoFocus = false, disabled = false, whsCountry = null, compact = false,
 }: {
   placeholder: string;
   initialQuery?: string;
@@ -66,6 +66,8 @@ export default function CourseSearchField({
   disabled?: boolean;
   /** The WHS-published country, so each candidate shows its country flag. */
   whsCountry?: string | null;
+  /** ADMIN_INBOX_V3 opt-in: 30px inset field with no border, 12px text. Default unchanged. */
+  compact?: boolean;
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [open, setOpen] = useState(false);
@@ -80,7 +82,10 @@ export default function CourseSearchField({
   return (
     <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
       <label
-        style={{
+        style={compact ? {
+          display: 'flex', alignItems: 'center', gap: 7, height: 30, padding: '0 10px', boxSizing: 'border-box',
+          borderRadius: 9, background: 'var(--cc3-inset)', border: 'none',
+        } : {
           display: 'flex', alignItems: 'center', gap: 8, height: 36, padding: '0 10px',
           borderRadius: 10, background: RAISED, border: `1px solid ${t.hairline}`,
         }}
@@ -96,9 +101,11 @@ export default function CourseSearchField({
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder={placeholder}
           aria-label={placeholder}
+          className={compact ? 'inbox-v3-field' : undefined}
           style={{
             flex: 1, minWidth: 0, height: '100%', background: 'transparent', border: 'none',
-            outline: 'none', color: t.ink, fontSize: 13,
+            outline: 'none', color: compact ? 'var(--cc3-ink)' : t.ink, fontSize: compact ? 12 : 13,
+            ...(compact ? { textOverflow: 'ellipsis' } : {}),
           }}
         />
       </label>

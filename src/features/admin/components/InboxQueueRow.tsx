@@ -4,8 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { adminTheme as t } from '../theme';
-import { RAISED, ECHO_GROUND, ECHO_EDGE } from '../lib/panels';
+import { CC3, NUM } from './InboxPanels';
 import { QUEUE_TAG, ageLabel, isLongWait } from '../lib/inboxQueue';
 import { refreshAdminQueues } from '../lib/adminQueueRefresh';
 import type { InboxItem } from '../hooks/useInboxFeed';
@@ -40,24 +39,38 @@ const sb = supabase as unknown as {
   };
 };
 
-const TAG: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint };
-const CTRL_H = 36;
+const TAG: React.CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: CC3.faint };
+const QUEUE_CHIP: React.CSSProperties = {
+  display: 'inline-block', verticalAlign: 1, marginRight: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+  textTransform: 'uppercase', padding: '1px 5px', borderRadius: 5, border: `1px solid ${CC3.line}`, color: CC3.mute,
+};
+const CTRL_H = 30;
+const BTN_BASE: React.CSSProperties = {
+  height: CTRL_H, padding: '0 12px', borderRadius: 999, boxSizing: 'border-box', fontSize: 10.5, fontWeight: 700,
+  letterSpacing: '0.06em', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  flexShrink: 0,
+};
 
+/** Primary inline action: ink fill, canvas text (ADMIN_INBOX_V3, no amber). */
 export const btnBrand = (disabled = false): React.CSSProperties => ({
-  height: CTRL_H, padding: '0 14px', borderRadius: 999, border: 'none',
-  background: t.brand, color: t.canvas, fontSize: 12, fontWeight: 700,
-  cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1, flexShrink: 0,
+  ...BTN_BASE, border: `1px solid ${CC3.ink}`, background: CC3.ink, color: CC3.canvas,
+  cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1,
 });
 export const btnOutline = (disabled = false, muted = false): React.CSSProperties => ({
-  height: CTRL_H, padding: '0 14px', borderRadius: 999, border: `1px solid ${t.line}`,
-  background: 'transparent', color: muted ? t.inkMuted : t.ink, fontSize: 12, fontWeight: 700,
-  cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1, flexShrink: 0,
+  ...BTN_BASE, border: `1px solid ${CC3.line}`, background: 'transparent', color: muted ? CC3.mute : CC3.ink,
+  cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1,
 });
 const iconBtn: React.CSSProperties = {
-  width: CTRL_H, height: CTRL_H, borderRadius: 999, border: `1px solid ${t.line}`,
-  background: 'transparent', color: t.ink, display: 'inline-flex', alignItems: 'center',
+  width: CTRL_H, height: CTRL_H, borderRadius: 999, border: `1px solid ${CC3.line}`, boxSizing: 'border-box',
+  background: 'transparent', color: CC3.mute, display: 'inline-flex', alignItems: 'center',
   justifyContent: 'center', cursor: 'pointer', flexShrink: 0, padding: 0,
 };
+const FIELD: React.CSSProperties = {
+  flex: 1, minWidth: 0, height: CTRL_H, borderRadius: 9, background: CC3.inset, border: 'none',
+  color: CC3.ink, fontSize: 12, padding: '0 10px', outline: 'none', boxSizing: 'border-box',
+};
+/** A successful close reads with a good tick; every other outcome stays mute. */
+export const isSuccessOutcome = (o: string | undefined) => !!o && /^(linked|resolved|approved|matched)\b/i.test(o);
 
 const errMsg = (e: unknown, fallback: string) => (e as { message?: string })?.message || fallback;
 
@@ -76,13 +89,13 @@ export interface InboxQueueRowProps {
 
 /** The row's fact line (2.4). */
 function SubLine({ item, isFullAdmin }: { item: InboxItem; isFullAdmin: boolean }) {
-  const muted: React.CSSProperties = { fontSize: 11.5, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 };
+  const muted: React.CSSProperties = { display: 'inline' };
   switch (item.type) {
     case 'unmatchedCourse': {
       const r = item.payload as UnmatchedCourseRow;
       return (
         <div style={muted}>
-          <span style={{ color: t.ink, fontWeight: 700 }}>{r.round_count}</span> round{r.round_count === 1 ? '' : 's'}
+          <span style={{ ...NUM, color: CC3.ink, fontWeight: 700 }}>{r.round_count}</span> round{r.round_count === 1 ? '' : 's'}
           {' \u00b7 '}{r.member_count} member{r.member_count === 1 ? '' : 's'}
           {r.last_tier_tried === 'echo_no_match' ? ' \u00b7 echo found no match' : ''}
           {r.status === 'needs_catalogue' ? ' \u00b7 not in the catalogue' : ''}
@@ -114,32 +127,35 @@ function SubLine({ item, isFullAdmin }: { item: InboxItem; isFullAdmin: boolean 
 export default function InboxQueueRow({ item, first, onOpen, onResolved, isFullAdmin, catalogueTotal, done = false }: InboxQueueRowProps) {
   const long = !done && isLongWait(item.createdAt);
   return (
-    <div style={{ padding: '12px 16px', borderTop: first ? 'none' : `1px solid ${t.hairline}` }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 10, alignItems: 'start' }}>
+    <div data-inbox-row style={{ padding: '11px 14px 12px', borderTop: first ? 'none' : `1px solid ${CC3.hair}` }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', columnGap: 12, alignItems: 'start' }}>
         <button
           type="button"
           onClick={onOpen}
-          style={{ textAlign: 'left', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', minWidth: 0 }}
+          style={{ display: 'block', textAlign: 'left', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', minWidth: 0, color: CC3.ink }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-              {item.title}
-            </span>
-            <span style={{ ...TAG, flexShrink: 0 }}>{QUEUE_TAG[item.type]}</span>
+          <div data-row-title style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.3, color: CC3.ink, overflowWrap: 'anywhere' }}>
+            {item.title}
           </div>
-          <SubLine item={item} isFullAdmin={isFullAdmin} />
+          <div data-fact-line style={{ fontSize: 11, color: CC3.faint, marginTop: 3, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
+            <span data-queue-tag style={QUEUE_CHIP}>{QUEUE_TAG[item.type]}</span>
+            <SubLine item={item} isFullAdmin={isFullAdmin} />
+          </div>
         </button>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: long ? t.dangerText : t.inkMuted, fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right' }}>
+          <span data-row-age style={{ ...NUM, fontSize: 13, fontWeight: 700, color: long ? CC3.bad : CC3.mute }}>
             {ageLabel(item.createdAt)}
           </span>
-          <span style={TAG}>{done ? 'Ago' : 'Waiting'}</span>
+          <span style={{ ...TAG, marginTop: 1 }}>{done ? 'Ago' : 'Waiting'}</span>
         </div>
       </div>
       {done ? (
-        <div style={{ marginTop: 10, fontSize: 12, fontWeight: 700, color: t.inkMuted }}>{item.closedOutcome ?? 'Closed'}</div>
+        <div data-outcome style={{ marginTop: 7, fontSize: 11, fontWeight: 600, color: CC3.mute, overflowWrap: 'anywhere' }}>
+          {isSuccessOutcome(item.closedOutcome) && <span data-outcome-ok data-tone="good" style={{ color: CC3.good }}>{'\u2713 '}</span>}
+          {item.closedOutcome ?? 'Closed'}
+        </div>
       ) : (
-        <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ marginTop: 9, display: 'flex', gap: 6, alignItems: 'center' }}>
           <ActionRow item={item} onOpen={onOpen} onResolved={onResolved} isFullAdmin={isFullAdmin} catalogueTotal={catalogueTotal} />
         </div>
       )}
@@ -222,13 +238,14 @@ function UnmatchedActions({ item, row, onResolved, catalogueTotal }: RowActionPr
       {showEcho ? (
         <>
           <div
+            data-echo
             style={{
-              flex: 1, minWidth: 0, height: CTRL_H, borderRadius: 10, background: ECHO_GROUND,
-              border: `1px solid ${ECHO_EDGE}`, display: 'flex', alignItems: 'center', gap: 8, padding: '0 10px',
+              flex: 1, minWidth: 0, minHeight: CTRL_H, borderRadius: 9, background: CC3.inset, border: 'none',
+              display: 'flex', alignItems: 'center', gap: 7, padding: '6px 10px', boxSizing: 'border-box',
             }}
           >
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', color: t.brandText, flexShrink: 0 }}>ECHO</span>
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', color: CC3.faint, flexShrink: 0 }}>ECHO</span>
+            <span data-echo-name style={{ fontSize: 12, fontWeight: 600, lineHeight: 1.3, color: CC3.ink, overflowWrap: 'anywhere', minWidth: 0 }}>
               {row.echo_suggestion}
             </span>
           </div>
@@ -243,28 +260,29 @@ function UnmatchedActions({ item, row, onResolved, catalogueTotal }: RowActionPr
             disabled={busy}
             whsCountry={row.whs_country_name}
             onPick={(hit) => void link(hit.id)}
+            compact
           />
           <button type="button" disabled={busy} onClick={() => setCreateOpen(true)} style={btnOutline(busy)}>CREATE</button>
         </>
       )}
       <div style={{ position: 'relative' }}>
         <button type="button" aria-label="More" onClick={() => setMenuOpen(v => !v)} style={iconBtn}>
-          <MoreHorizontal size={16} />
+          <MoreHorizontal size={14} />
         </button>
         {menuOpen && (
           <div
             role="menu"
             style={{
-              position: 'absolute', right: 0, top: 40, zIndex: 20, minWidth: 190,
-              background: t.surface, border: `1px solid ${t.line}`, borderRadius: 10, overflow: 'hidden',
-              boxShadow: t.shadowCard,
+              position: 'absolute', right: 0, top: 34, zIndex: 20, minWidth: 190,
+              background: CC3.surface, border: `1px solid ${CC3.line}`, borderRadius: 10, overflow: 'hidden',
+              boxShadow: '0 8px 24px rgba(0,0,0,.4)',
             }}
           >
             {row.status !== 'needs_catalogue' && (
               <button
                 type="button" role="menuitem"
                 onClick={() => { setMenuOpen(false); void done(() => markUnmatchedNeedsCatalogue(row.whs_course_id), 'Update failed'); }}
-                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 12px', background: 'transparent', border: 'none', color: t.ink, fontSize: 13, cursor: 'pointer' }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 12px', background: 'transparent', border: 'none', color: CC3.ink, fontSize: 13, cursor: 'pointer' }}
               >
                 Not in the catalogue
               </button>
@@ -272,7 +290,7 @@ function UnmatchedActions({ item, row, onResolved, catalogueTotal }: RowActionPr
             <button
               type="button" role="menuitem"
               onClick={() => { setMenuOpen(false); setConfirmIgnore(true); }}
-              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 12px', background: 'transparent', border: 'none', borderTop: `1px solid ${t.hairline}`, color: t.dangerText, fontSize: 13, cursor: 'pointer' }}
+              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 12px', background: 'transparent', border: 'none', borderTop: `1px solid ${CC3.hair}`, color: CC3.bad, fontSize: 13, cursor: 'pointer' }}
             >
               Ignore
             </button>
@@ -336,7 +354,8 @@ function ClaimActions({ item, row, onOpen, onResolved, isFullAdmin }: RowActionP
           onChange={(e) => setNote(e.target.value)}
           placeholder="Reason for declining"
           aria-label="Reason for declining"
-          style={{ flex: 1, minWidth: 0, height: CTRL_H, borderRadius: 10, background: RAISED, border: `1px solid ${t.hairline}`, color: t.ink, fontSize: 13, padding: '0 10px', outline: 'none' }}
+          className="inbox-v3-field"
+          style={FIELD}
         />
         <button type="button" onClick={() => { setDeclining(false); setNote(''); }} style={btnOutline(false, true)}>CANCEL</button>
         <button type="button" disabled={busy || note.trim().length < 3} onClick={() => decide('rejected')} style={btnOutline(busy || note.trim().length < 3)}>DECLINE</button>
@@ -348,7 +367,7 @@ function ClaimActions({ item, row, onOpen, onResolved, isFullAdmin }: RowActionP
     <>
       <button type="button" disabled={locked || busy} onClick={() => decide('approved')} style={{ ...btnBrand(locked || busy), flex: 1 }}>APPROVE</button>
       <button type="button" disabled={locked || busy} onClick={() => setDeclining(true)} style={{ ...btnOutline(locked || busy), flex: 1 }}>DECLINE</button>
-      <button type="button" aria-label="Open proof" onClick={onOpen} style={iconBtn}><ChevronRight size={16} /></button>
+      <button type="button" aria-label="Open proof" onClick={onOpen} style={iconBtn}><ChevronRight size={14} /></button>
     </>
   );
 }
@@ -391,13 +410,12 @@ function SupportActions({ item, row, onResolved }: RowActionProps<SupportTicketR
   };
 
   const field: React.CSSProperties = {
-    flex: 1, minWidth: 0, borderRadius: 10, background: RAISED, border: `1px solid ${t.hairline}`,
-    color: t.ink, fontSize: 13, padding: expanded ? '8px 10px' : '0 10px', outline: 'none', resize: 'none',
-    height: expanded ? 72 : CTRL_H, fontFamily: 'inherit',
+    ...FIELD, padding: expanded ? '8px 10px' : '0 10px', resize: 'none',
+    height: expanded ? 72 : CTRL_H, fontFamily: 'inherit', lineHeight: expanded ? 1.4 : `${CTRL_H}px`,
   };
 
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: expanded ? 'flex-end' : 'center', width: '100%' }}>
+    <div style={{ display: 'flex', gap: 6, alignItems: expanded ? 'flex-end' : 'center', width: '100%' }}>
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
@@ -406,6 +424,7 @@ function SupportActions({ item, row, onResolved }: RowActionProps<SupportTicketR
         placeholder={'Reply\u2026'}
         aria-label="Reply"
         rows={expanded ? 3 : 1}
+        className="inbox-v3-field"
         style={field}
       />
       {expanded && (
