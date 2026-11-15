@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete: Tour slot final-round kicker
+- Use the overview FINAL ROUND translation only on the scheduled last live round; preserve the LIVE header and all other rounds.
+- Added one state case (13 → 14); four separate shards passed 2,243 / 2,118 / 2,212 / 2,224 = 8,797 (baseline 8,796 + 1). Build OK; report .lovable/reports/tour-slot-final-round-kicker.md. Live on-screen follow-up remains unverified.
+
 ## Complete: Clubhouse Tour slot all states
 - Share round spine and movement computation without changing Tour overview output.
 - Add single-leader portrait, result sentence, live five-row board and collapsed top-three result/prior-year boards.

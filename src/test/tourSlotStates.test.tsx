@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -24,6 +25,22 @@ function mount(state: SlotState, round = 4, entries = board, format = 'stroke') 
 }
 beforeEach(() => { h.lastYear = null; h.ids.mockClear(); });
 describe('Tour slot all states', () => {
+  it('last-round live selects FINAL ROUND in the photo kicker while round 3 of 4 keeps ROUND 3 and the LIVE header is unchanged', () => {
+    // The canonical translation mock returns ''; assert the selected key and
+    // rendered branch rather than replacing the mock to assert translated copy.
+    const source = readFileSync('src/features/clubhouse-tour/TourSlot.tsx', 'utf8');
+    expect(source).toContain("const totalRounds = roundsFromSchedule(event.start_date, event.end_date);");
+    expect(source).toContain("state === 'live' ? round === totalRounds ? t('overview.hero.finalRound') : `Round ${round}`");
+    const final = mount('live', 4);
+    const finalKicker = final.container.querySelector('[data-tour-slot-photo] [style*="text-transform: uppercase"]');
+    expect(finalKicker?.textContent?.trim()).toBe('DP World Tour ·');
+    expect(final.container.querySelector('header')?.textContent).toContain('● LIVE  Round 4');
+    final.unmount();
+    const third = mount('live', 3);
+    const thirdKicker = third.container.querySelector('[data-tour-slot-photo] [style*="text-transform: uppercase"]');
+    expect(thirdKicker?.textContent).toBe('DP World Tour · Round 3');
+    expect(third.container.querySelector('header')?.textContent).toContain('● LIVE  Round 3');
+  });
   it('(a) upcoming keeps facts and reads prior-year top three, omitting a null board', () => {
     h.lastYear = [1, 2, 3, 3].map((n, i) => ({ rank: n === 3 ? 'T3' : String(n), name: `Player ${i}`, score: '−18', year: '2025', country: '', photoUrl: null }));
     const view = mount('preview');

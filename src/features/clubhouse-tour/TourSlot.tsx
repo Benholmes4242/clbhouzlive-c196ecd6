@@ -87,7 +87,7 @@ export function TourSlotView({ selection, board, image, sentence, chase, lastYea
         {image && <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />}
         <PhotoBandFade canvas={FEED_CARD_SURFACE} />
         <div style={{ position: 'absolute', left: 16, right: 16, bottom: 6, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-          <div style={{ flex: 1, minWidth: 0 }}><div style={{ ...caps, color: AMBER }}>{TOUR_DISPLAY[tour]} · {state === 'live' ? `Round ${round}` : state === 'result' ? 'Final' : tag ? tags[tag] : 'Preview'}</div>
+          <div style={{ flex: 1, minWidth: 0 }}><div style={{ ...caps, color: AMBER }}>{TOUR_DISPLAY[tour]} · {state === 'live' ? round === totalRounds ? t('overview.hero.finalRound') : `Round ${round}` : state === 'result' ? 'Final' : tag ? tags[tag] : 'Preview'}</div>
             <div style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.08, letterSpacing: '-.01em', marginTop: 5, overflowWrap: 'anywhere' }}>{title}</div>
             <div style={{ fontSize: 12.5, color: INK_SOFT, marginTop: 5, overflowWrap: 'anywhere' }}>{venue.filter(Boolean).join(' · ')}</div>
           </div>
