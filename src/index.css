@@ -37,6 +37,25 @@
 }
 
 :root {
+  --cc3-canvas: #0A0D12;
+  --cc3-surface: #12161D;
+  --cc3-inset: #181D25;
+  --cc3-initials: #1E2430;
+  --cc3-ink: #E9EDF3;
+  --cc3-mute: #B3BCC9;
+  --cc3-faint: #8A95A6;
+  --cc3-good: #3DDC91;
+  --cc3-bad: #FF7B72;
+  --cc3-under: #E24B3F;
+  --cc3-hair: rgba(255,255,255,.065);
+  --cc3-line: rgba(255,255,255,.11);
+  --cc3-track: rgba(255,255,255,.07);
+  --cc3-good-ring: rgba(61,220,145,.12);
+  --cc3-good-border: rgba(61,220,145,.35);
+  --cc3-bars: rgba(233,237,243,.28);
+  --cc3-members-bar: rgba(233,237,243,.30);
+  --cc3-empty-border: rgba(255,255,255,.09);
+  --cc3-area: rgba(233,237,243,.06);
   --hero-round-surface:#121215;
   --hero-round-ink:#F8FAFC;
   --hero-round-canvas:#0A0A0C;

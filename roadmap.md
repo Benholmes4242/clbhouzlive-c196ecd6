@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: Admin Command centre v3 — test-side authorisation required
+- Rebuild the existing dashboard to the signed-off dense layout; preserve AdminShell and v2 reader, add the engine reader and October health status.
+- Replace the authorised v2 test file, report every deleted assertion, and run four separate shards against the actual latest baseline 8,797.
+- No SQL, migrations, deployed function changes or admin screenshots.
+- Focused run: 35 executed, 32 passed, 3 failed; two ambiguous Clubs selectors and one empty jsdom colour value. Unchanged AdminShell 5/5 passed; build OK. Full shards unrun under the stop rule. Expected inventory 8,811 = 8,797 − 16 authorised v2 deletions + 30 v3 additions; not a verified suite total. Exact errors and deleted assertions: .lovable/reports/admin-command-centre-v3-stop.md.
+
 ## Complete: Tour slot final-round kicker
 - Use the overview FINAL ROUND translation only on the scheduled last live round; preserve the LIVE header and all other rounds.
 - Added one state case (13 → 14); four separate shards passed 2,243 / 2,118 / 2,212 / 2,224 = 8,797 (baseline 8,796 + 1). Build OK; report .lovable/reports/tour-slot-final-round-kicker.md. Live on-screen follow-up remains unverified.
