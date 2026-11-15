@@ -47,6 +47,9 @@ import { HeadToHeadEntryRow } from '@/components/profile/handicap/whs/sections/c
 const GREEN = INDEX_DELTA.dark.improved;
 const RED = INDEX_DELTA.dark.drifted;
 const MS_PER_DAY = 86_400_000;
+// useProfileClubs returns the sentinel id 'text-fallback' for a typed-in club
+// name with no linked club; only a real UUID may reach the club photo read.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** The event contract — not the layout. Every member stays even where a view omits the cell. */
 export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'friends' | 'followers';
 
@@ -234,8 +237,17 @@ export const ProfileHero: React.FC<Props> = ({
     () => [...(topTen ?? [])].sort((a, b) => a.position - b.position)[0] ?? null,
     [topTen],
   );
-  const clubCover = useClubCoverPhoto(!coverUrl && homeClub ? homeClub.id : null);
-  const cover = coverUrl || clubCover.coverPhoto || topCourse?.thumbnail_image || null;
+  // A typed-in club name with no linked club comes back from useProfileClubs
+  // with the sentinel id 'text-fallback'; passing it to the club photo read
+  // would hit golf_courses.club_id (a uuid column) with a non-uuid and error
+  // on every view. Only a real UUID reaches the hook; legacy clubs fall
+  // through to the Top 10 photo or the contours.
+  const clubId = !coverUrl && homeClub && UUID_RE.test(homeClub.id) ? homeClub.id : null;
+  const clubCover = useClubCoverPhoto(clubId);
+  // While the club read is in flight, do not fall through to the Top 10
+  // photo — show the contours for that moment, then the club photo once it
+  // resolves. A null result continues to the Top 10 photo as before.
+  const cover = coverUrl || clubCover.coverPhoto || (clubId && clubCover.isLoading ? null : topCourse?.thumbnail_image || null);
 
   // Ninety-day rule: points inside 90 days, else the whole history.
   const { series, oldestMs, windowHeld } = React.useMemo(() => {

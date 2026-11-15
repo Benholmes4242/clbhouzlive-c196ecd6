@@ -25,6 +25,7 @@ const db = vi.hoisted(() => ({
   clubRows: [] as { thumbnail_image: string | null }[],
   reads: [] as string[],
   order: null as null | [string, boolean],
+  hang: false,
 }));
 
 vi.mock('@/integrations/supabase/client', () => {
@@ -32,8 +33,9 @@ vi.mock('@/integrations/supabase/client', () => {
     const payload = () => (table === 'golf_courses' ? { data: db.clubRows, error: null } : { data: [], error: null });
     const self: any = new Proxy(function () {} as unknown as object, {
       get: (_t, prop) => {
-        if (prop === 'then') return (fn: (v: unknown) => unknown, rej?: (e: unknown) => unknown) => Promise.resolve(payload()).then(fn, rej);
-        if (prop === 'catch') return (fn: (e: unknown) => unknown) => Promise.resolve(payload()).catch(fn);
+        // db.hang leaves the read in flight forever, so isLoading stays true.
+        if (prop === 'then') return (fn: (v: unknown) => unknown, rej?: (e: unknown) => unknown) => (db.hang ? new Promise(() => {}) : Promise.resolve(payload()).then(fn, rej));
+        if (prop === 'catch') return (fn: (e: unknown) => unknown) => (db.hang ? new Promise(() => {}) : Promise.resolve(payload()).catch(fn));
         if (prop === 'order') {
           return (col: string, cfg?: { ascending?: boolean }) => {
             if (table === 'golf_courses') db.order = [col, cfg?.ascending !== false];
@@ -97,7 +99,9 @@ import { useClubCoverPhoto } from '@/components/profile/hooks/useClubCoverPhoto'
 import { arrivalAction } from '@/features/edit-profile/completionRules';
 
 const src = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8');
-const HOME = { id: 'club-1', name: 'Sundridge Park Golf Club', isPrimary: true };
+// A real UUID: ProfileHero only passes UUID home-club ids to the club photo
+// read, so the club-photo cases below need one to keep exercising that path.
+const HOME = { id: '6f1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d', name: 'Sundridge Park Golf Club', isPrimary: true };
 const clubReads = () => db.reads.filter((t) => t === 'golf_courses');
 
 const renderHero = (over: Record<string, unknown> = {}) => {
@@ -143,6 +147,7 @@ beforeEach(() => {
   db.clubRows = [];
   db.reads = [];
   db.order = null;
+  db.hang = false;
 });
 
 afterEach(cleanup);
@@ -174,7 +179,8 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the cover chain', () => {
     state.topTen = [{ position: 2, thumbnail_image: 'second.jpg' }, { position: 1, thumbnail_image: 'top10.jpg' }];
     const { container } = renderHero({ coverUrl: null });
     await waitFor(() => expect(clubReads().length).toBeGreaterThan(0));
-    expect(container.querySelector('[data-cover-img]')?.getAttribute('src')).toBe('top10.jpg');
+    // The Top 10 photo appears only once the club read has resolved null.
+    await waitFor(() => expect(container.querySelector('[data-cover-img]')?.getAttribute('src')).toBe('top10.jpg'));
   });
 
   it('with nothing to show the contours appear instead of a flat canvas', () => {
@@ -192,6 +198,36 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the cover chain', () => {
     expect(clubReads()).toHaveLength(0);
     expect(container.querySelector('[data-cover-img]')).toBeNull();
     expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+  });
+
+  it("a legacy 'text-fallback' home club never reaches the club photo read and falls through to the Top 10 photo", async () => {
+    state.homeClub = { id: 'text-fallback', name: 'Sundridge Park Golf Club', isPrimary: true };
+    db.clubRows = [{ thumbnail_image: 'club.jpg' }];
+    state.topTen = [{ position: 1, thumbnail_image: 'top10.jpg' }];
+    const { container } = renderHero({ coverUrl: null });
+    await new Promise((r) => setTimeout(r, 20));
+    expect(clubReads()).toHaveLength(0);
+    expect(container.querySelector('[data-cover-img]')?.getAttribute('src')).toBe('top10.jpg');
+  });
+
+  it('while the club photo read is in flight the Top 10 photo is not shown', async () => {
+    state.homeClub = { id: '6f1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d', name: 'Sundridge Park Golf Club', isPrimary: true };
+    db.hang = true;
+    state.topTen = [{ position: 1, thumbnail_image: 'top10.jpg' }];
+    const { container } = renderHero({ coverUrl: null });
+    await new Promise((r) => setTimeout(r, 20));
+    expect(clubReads().length).toBeGreaterThan(0);
+    expect(container.querySelector('[data-cover-img]')).toBeNull();
+    expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+  });
+
+  it('a club photo read returning null still shows the Top 10 photo', async () => {
+    state.homeClub = { id: '6f1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d', name: 'Sundridge Park Golf Club', isPrimary: true };
+    db.clubRows = [];
+    state.topTen = [{ position: 1, thumbnail_image: 'top10.jpg' }];
+    const { container } = renderHero({ coverUrl: null });
+    await waitFor(() => expect(clubReads().length).toBeGreaterThan(0));
+    await waitFor(() => expect(container.querySelector('[data-cover-img]')?.getAttribute('src')).toBe('top10.jpg'));
   });
 });
 
