@@ -66,4 +66,8 @@ describe('sign-in glow and keyboard', () => {
     const { root } = mount();
     expect(root.classList.contains('is-keyboard-tight')).toBe(true);
   });
+  it('hides the empty brand block and lifts the panel in tight mode', () => {
+    expect(css).toContain('.auth-hero-screen.is-keyboard-tight .auth-hero-brand { display: none; }');
+    expect(css).toContain('.auth-hero-screen.is-keyboard-tight .auth-hero-panel { padding-top: calc(env(safe-area-inset-top, 0px) + 16px); }');
+  });
 });

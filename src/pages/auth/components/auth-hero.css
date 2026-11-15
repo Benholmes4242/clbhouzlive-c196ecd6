@@ -42,6 +42,8 @@
 .auth-hero-screen.is-keyboard-open .auth-hero-brand h1 { font-size: 34px; margin-top: 0; }
 .auth-hero-screen.is-keyboard-open .auth-hero-panel-bottom { padding-bottom: 16px; }
 .auth-hero-screen.is-keyboard-tight .auth-hero-brand h1 { display: none; }
+.auth-hero-screen.is-keyboard-tight .auth-hero-brand { display: none; }
+.auth-hero-screen.is-keyboard-tight .auth-hero-panel { padding-top: calc(env(safe-area-inset-top, 0px) + 16px); }
 @media (min-width: 768px) { .auth-hero-screen { max-width: 440px; } }
 @media (max-height: 640px) {
   .auth-hero-brand img { width: 52px; height: 52px; }
