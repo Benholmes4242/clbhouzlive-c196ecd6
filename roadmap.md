@@ -1,11 +1,12 @@
 # Roadmap
 
-## Blocked: Signed-off sign-in redesign — caret sweep
+## Signed-off sign-in redesign — tests complete; visual checks outstanding
+- Authorised caret fix complete: removed only the email caret override; amber dot token retained. Focused 64/64, shard 3 2,196/2,196 and shard 4 2,229/2,229; with previously passed shards 1 (2,203) and 2 (2,116), all 8,744 passed. No test changes; report .lovable/reports/sign-in-caret-fix.md.
 - Replace choose/email presentation only; preserve social/code/session behavior and exported logos.
 - Apply clarified bottom padding max(34px, calc(14px + env(safe-area-inset-bottom, 0px))); small-phone band uses max(18px, calc(14px + env(safe-area-inset-bottom, 0px))).
 - Test step focus/back/email/guest navigation; run four separate shards and report against 8,731, stopping on unexpected failures.
 - Focused 64/64; shards 2,203/2,203, 2,116/2,116, 2,196/2,195 (one failure at ep51SearchAndCarets.test.tsx:32:23); shard 4 unrun. Expected inventory 8,744 (+13 from 8,731), not fully executed.
-- Correct preview type error only: replace unsupported initImmediate with initAsync in the new test provider; assertions/source unchanged. Existing caret sweep stop remains; report .lovable/reports/sign-in-redesign-stop.md. 390/320 visual and real sign-in checks unverified.
+- Correct preview type error only: replace unsupported initImmediate with initAsync in the new test provider; assertions/source unchanged. Prior caret sweep stop resolved by source-only fix; original stop report .lovable/reports/sign-in-redesign-stop.md retained as history. 390/320 visual and real sign-in checks unverified.
 
 ## Complete: Simpler Clubhouse Tour post
 - Remove picks/record display and record read only from TourSlot; preserve prediction resolver and shared rules.
