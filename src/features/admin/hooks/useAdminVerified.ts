@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ProKind } from '@/features/pro-verification/proRules';
 export interface VerifiedPerson { id: string; display_name: string | null; username: string | null; avatar_url: string | null; verified_at: string }
-export interface VerifiedPro extends VerifiedPerson { pro_kind: ProKind; pro_tour: string | null; pro_club: string | null }
+export interface VerifiedPro extends VerifiedPerson { pro_kind: ProKind; pro_tour: string | null; pro_club: string | null; pro_player_id?: string | null }
 export interface PendingPro { request_id: string; user_id: string; display_name: string | null; username: string | null; avatar_url: string | null; kind: ProKind; pro_tour: string | null; pro_club: string | null; requested_at: string }
 export interface VerifiedBusiness { id: string; name: string; slug: string | null; logo_url: string | null; category: string | null; verified_at: string | null }
 export interface VerifiedAmateur extends VerifiedPerson { rank: number | null; last_synced_at: string | null; last_error: string | null }

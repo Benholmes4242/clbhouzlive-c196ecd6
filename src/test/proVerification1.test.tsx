@@ -359,6 +359,9 @@ describe('BRIEF 1 §8 — the admin Pros tab', () => {
     fireEvent.click(screen.getByRole('button', { name: /Pros/ }));
     fireEvent.click(screen.getByText('Rory Test').closest('button')!);
     fireEvent.click(await screen.findByRole('button', { name: 'Verify as pro' }));
+    /* BRIEF_PRO_OWGR_AT_APPROVAL — no tour player and no OWGR link now needs
+       the explicit "he has no OWGR page" confirmation before verifying. */
+    fireEvent.click(await screen.findByRole('button', { name: 'He has no OWGR page — verify' }));
     expect(f.reviewMutate).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'p1', type: 'golfer', decision: 'approved', playerId: null }),
       expect.anything(),

@@ -5,6 +5,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Mail, ShieldOff, X } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Input } from '@/components/ui/input';
+import { toast } from '@/lib/toast';
 import { adminTheme as t } from '../theme';
 import SectionTabs from './SectionTabs';
 import StatusPill from './StatusPill';
@@ -42,6 +44,11 @@ const PROOF_NOUNS: Record<string, string> = {
   creator_business: 'contact',
   golf_course: 'golf course website',
 };
+
+/* BRIEF_PRO_OWGR_AT_APPROVAL — a tour pro who is not linked to a covered
+   tour needs his OWGR page at approval, or his profile shows no results.
+   The pattern matches AdminProWorldRanking's accepted link shape. */
+const OWGR_PROFILE = /^https:\/\/(www\.)?owgr\.com\/playerprofile\/[a-z0-9-]+-\d+\/?$/i;
 
 type EntityFilter = 'business' | 'golfer' | 'pro' | 'course_claim' | 'wagr';
 
@@ -100,6 +107,10 @@ export function VerificationsTab({
   /* BRIEF 1 §8 — the sr_players match the reviewer settled on; "Verify as
      pro" sends it through to decide_golfer_verification. */
   const [proPlayerId, setProPlayerId] = useState<string | null>(null);
+  /* BRIEF_PRO_OWGR_AT_APPROVAL — the OWGR page for an unlinked tour pro, and
+     the one explicit way past an empty link. */
+  const [owgrUrl, setOwgrUrl] = useState('');
+  const [noOwgr, setNoOwgr] = useState(false);
   // PHASE 5B §1.3 — revocation: a structured reason, then a confirmation that
   // NAMES the business. The bypass is offered for system accounts only.
   const [revokeOpen, setRevokeOpen] = useState(false);
@@ -147,7 +158,31 @@ export function VerificationsTab({
   const close = () => {
     setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false);
     setRevokeOpen(false); setRevokeReason(null); setRevokeNote(''); setRevokeBypass(false); setConfirmRevoke(false);
-    setProPlayerId(null);
+    setProPlayerId(null); setOwgrUrl(''); setNoOwgr(false);
+  };
+
+  /* Reset (and pre-fill from an OWGR proLink) whenever the drawer switches rows. */
+  useEffect(() => {
+    setOwgrUrl(active?.proLink && OWGR_PROFILE.test(active.proLink) ? active.proLink : '');
+    setNoOwgr(false);
+  }, [active?.id, active?.proLink]);
+
+  /* After a verify with a valid link: store the OWGR page, then sync. A
+     failure never undoes the verification — the World ranking card remains
+     the way to add it later. */
+  const attachOwgr = async (userId: string, url: string) => {
+    try {
+      const set = await supabase.rpc('admin_set_pro_owgr', { p_user_id: userId, p_owgr_url: url });
+      if (set.error) throw set.error;
+      if (set.data && typeof set.data === 'object' && !Array.isArray(set.data) && (set.data as { error?: unknown }).error) {
+        throw new Error(String((set.data as { error: unknown }).error));
+      }
+      const sync = await supabase.functions.invoke('sync-pro-world-rankings', { body: { user_id: userId } });
+      if (sync.error) throw sync.error;
+      if (sync.data?.error) throw new Error(String(sync.data.error));
+    } catch (e) {
+      toast.error(`Verified, but his OWGR page couldn't be added: ${e instanceof Error ? e.message : String(e)}. Add it from his World ranking card.`);
+    }
   };
 
   const canRevoke = active?.type === 'business' && !!active.businessId && bizDetail?.is_verified === true;
@@ -168,6 +203,27 @@ export function VerificationsTab({
     );
   };
 
+  const runReview = (d: 'approved' | 'rejected' | 'needs_more_info') => {
+    if (!active) return;
+    /* BRIEF_PRO_OWGR_AT_APPROVAL — only an unlinked tour pro approved with a
+       valid link carries the OWGR follow-up. */
+    const owgr =
+      d === 'approved' && active.type === 'golfer' && active.kind === 'tour_pro' && !proPlayerId
+        ? owgrUrl.trim()
+        : '';
+    const requestedBy = active.requestedBy;
+    review.mutate(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason, playerId: proPlayerId },
+      {
+        onSuccess: () => {
+          if (owgr && requestedBy) void attachOwgr(requestedBy, owgr);
+          close();
+        },
+      },
+    );
+  };
+
   const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
     if (!active) return;
     if (active.type !== 'wagr' && (d === 'rejected' || d === 'needs_more_info')) {
@@ -181,11 +237,15 @@ export function VerificationsTab({
       setConfirmApprove(true);
       return;
     }
-    review.mutate(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason, playerId: proPlayerId },
-      { onSuccess: close },
-    );
+    /* BRIEF_PRO_OWGR_AT_APPROVAL — an unlinked tour pro: a valid link verifies,
+       an invalid one only shows its inline warning, and an empty one needs the
+       explicit "he has no OWGR page" confirmation. */
+    if (d === 'approved' && active.type === 'golfer' && active.kind === 'tour_pro' && !proPlayerId) {
+      const url = owgrUrl.trim();
+      if (url && !OWGR_PROFILE.test(url)) return;
+      if (!url) { setNoOwgr(true); return; }
+    }
+    runReview(d);
   };
 
   return (
@@ -295,9 +355,32 @@ export function VerificationsTab({
             reviewReason={reviewReason}
             setReviewReason={setReviewReason}
             onPlayerChange={setProPlayerId}
+            owgrUrl={owgrUrl}
+            setOwgrUrl={setOwgrUrl}
+            proPlayerId={proPlayerId}
           />
         )}
       </DetailDrawer>
+
+      {/* BRIEF_PRO_OWGR_AT_APPROVAL — the one explicit way past an empty OWGR
+          link. It does not verify on its own; cancel returns to the input. */}
+      <ConfirmDialog
+        open={noOwgr}
+        onClose={() => {
+          setNoOwgr(false);
+          document.getElementById('owgr-profile-link')?.focus();
+        }}
+        onConfirm={() => {
+          setNoOwgr(false);
+          runReview('approved');
+        }}
+        title="No OWGR page?"
+        description={`${active?.displayName ?? active?.username ?? 'He'} isn't on a tour we cover. Without an OWGR page his profile will show no results. Only continue if he genuinely has no OWGR page.`}
+        confirmLabel="He has no OWGR page — verify"
+        cancelLabel="Add OWGR page"
+        tone="danger"
+        busy={review.isPending}
+      />
 
       <ConfirmDialog
         open={confirmApprove}
@@ -345,6 +428,7 @@ export default VerificationsTab;
  */
 export function VerificationDetailBody({
   row, note, setNote, decision, reviewReason, setReviewReason, onPlayerChange,
+  owgrUrl, setOwgrUrl, proPlayerId,
 }: {
   row: VerificationRow;
   note: string;
@@ -355,6 +439,11 @@ export function VerificationDetailBody({
   setReviewReason?: (v: ReviewReason | null) => void;
   /** BRIEF 1 §8 — pro rows report the chosen sr_players match. */
   onPlayerChange?: (playerId: string | null) => void;
+  /** BRIEF_PRO_OWGR_AT_APPROVAL — optional so the inbox sheet (which does not
+      gate approvals on OWGR) keeps compiling and rendering unchanged. */
+  owgrUrl?: string;
+  setOwgrUrl?: (v: string) => void;
+  proPlayerId?: string | null;
 }) {
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const { data: proofConflict } = useProofConflict(row);
@@ -509,6 +598,29 @@ export function VerificationDetailBody({
           suggestion for covered tours, and the per-kind checklist. */}
       {row.type === 'golfer' && isProKind(row.kind) && (
         <ProRequestFacts row={row} onPlayerChange={onPlayerChange} />
+      )}
+      {/* BRIEF_PRO_OWGR_AT_APPROVAL — only an actionable tour_pro with no tour
+          player chosen; hidden the moment a player is chosen. */}
+      {row.type === 'golfer' && row.kind === 'tour_pro' && row.status === 'pending' && setOwgrUrl && proPlayerId == null && (
+        <Field label="OWGR profile">
+          <Input
+            id="owgr-profile-link"
+            aria-label="OWGR profile link"
+            type="url"
+            placeholder="https://www.owgr.com/playerprofile/…"
+            value={owgrUrl ?? ''}
+            onChange={e => setOwgrUrl(e.target.value)}
+            style={{ minWidth: 0, flex: '1 1 180px', color: t.ink }}
+          />
+          <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 6, lineHeight: 1.4 }}>
+            Not on a tour we cover. Add his OWGR page so his world ranking and events show on his profile.
+          </div>
+          {(owgrUrl ?? '').trim() && !OWGR_PROFILE.test((owgrUrl ?? '').trim()) && (
+            <div role="alert" style={{ fontSize: 12, color: t.warn, marginTop: 6 }}>
+              That isn't an OWGR player page.
+            </div>
+          )}
+        </Field>
       )}
       {row.type === 'golfer' && row.kind === 'tour_pro' && (row.status === 'approved' || row.status === 'accepted') && row.requestedBy && <AdminProWorldRanking userId={row.requestedBy} />}
 
