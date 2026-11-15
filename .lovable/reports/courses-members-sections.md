@@ -54,3 +54,92 @@ docScroll 1280, 0 overruns. Signed-out viewer reads THEIR BEST on every strip.
 
 ## Not done
 No SQL, no migrations, no RPC/edge edits, feed_config untouched, round_pool_cap 30.
+
+---
+
+## BRIEF_MEMBER_SCORE_SECTIONS_CLOSEOUT — 15 Nov 2026
+
+### Section A — Plays pill sample gates (REPORT-AND-STOP on the permanent fix)
+`get_course_hole_ranks`, read from `pg_get_functiondef`:
+1. Minimum plays behind a hole's rank — **no gate** at hole level. The only floor is
+   course-wide: `where p.total_rounds >= 20`, where `pooled` counts
+   `count(distinct ws.id)` of cards with `wsh.played = true and wsh.actual_gross is not
+   null`. One played hole inside a course holding 20 cards is still ranked.
+2. Distinct players — **no gate**, and none is possible: `whs_scores` has no member
+   column (`connection_id`, `whs_score_uid`, `marker_name` are the only identity-ish
+   columns), so `count(distinct ws.id)` counts score cards, not people.
+3. Floor on the to-par figure — **no gate**: `avg_to_par` is used only for ordering
+   (`order by h.avg_to_par desc`).
+
+Live distribution, read from the whole eligible rail (`course_rank <= 2`, the set
+paging can show), not estimated: **4 pills — 0 at 1-2 plays, 0 at 3-9, 4 at 10+**
+(761, 774, 869, 876 plays). Distinct players behind each: unavailable, no member
+identity exists on the play rows; distinct `connection_id` = 23 for all four.
+STOP: a hole-level floor is a server change and this turn carries none.
+
+Interim behaviour shipped: `src/components/courses/browse/holePlays.ts:45-50`
+(`RANK_ORDINAL_MIN_PLAYS = 10`, `rankIsOrdinable`) and its two uses in
+`src/components/courses/browse/LatestHolesSection.tsx:83-84` (aria-label) and `:106`
+(the visible ordinal clause). No tile is hidden; no server floor is loosened.
+
+### Section B — rounding, sign, the word for zero
+`playsFigure` (`holePlays.ts:56-58`) now delegates to the canonical Courses to-par
+value (`src/components/courses/browse/format.ts:11-15`): `Math.round(v * 10) / 10`
+FIRST, then the sign, ONE decimal, U+2212, and `'level'` when the rounded value is
+zero — so a hole rounding to par reads "Plays level", never "+0.0" or "−0.0".
+`playsIsUnderPar` (`holePlays.ts:72`) follows the printed figure, so a value that
+reads level is never red.
+REPORT only: the stat chip's negatives use an **ASCII hyphen** —
+`src/components/courses/useStatBrowse.ts:474` `-${Math.abs(v).toFixed(1)}` — while the
+pill uses U+2212. They disagree; not changed here.
+
+### Section C — Lowest rounds at an empty scope
+The branch that decides it is `src/components/courses/StatBrowse.tsx:809-811`
+(`showEmpty && areaHasTracked && lens !== 'played'`), which renders the lens-named
+panel (heading `:817`) with the filled INK switch button (`:843-852`) and no Connect
+button. The amber "No rounds logged" invitation (`:865-900`) renders only when the
+area has no tracked courses at all, where the claim is true.
+`lowest` is **not** absent from `lens_counts` — `get_stat_browse_facets` builds
+`'lowest', COUNT(*) FILTER (WHERE b.course_record IS NOT NULL)` in all three count
+objects — so no absence comment was added. Entry bar: `get_stat_browse_courses`'
+`lowest` arm is `s.course_record IS NOT NULL` (a course with no record cannot be
+ranked by record) with `ORDER BY ... course_record ASC NULLS LAST`; nothing rules a
+member out.
+
+### Section D — test integrity
+Both narrowed assertions are STRICT EQUALITY of the call count:
+`src/test/latestHolesSection.test.tsx:126-129` and `:151-155`, each
+`const before = f.holeRpc.mock.calls.length;` … `expect(f.holeRpc.mock.calls.length).toBe(before);`
+Added to each: `expect(before).toBeGreaterThan(0)` at `:126` and `:151`, so removing
+the pill read outright now fails instead of passing on a zero baseline. Both pass —
+the mount read has already fired before the tap.
+The moved anchor: `src/test/coursesListPhotoCards.test.tsx` renders the REAL
+`StatBrowse` (`:68`) with only its data hooks mocked, so `#courses-all` is genuinely
+covered — `head()` at `:91` resolves it and the head tests at `:114`, `:131`, `:143`
+fail if it disappears. No stub, no orphaned coverage.
+
+### Section E — render checks
+320 / 375 / 430 on `/courses`, both boards: page scrollWidth equals the viewport at
+every width (documentElement, `#root` and body all 320 / 375 / 430); no list card
+overruns the viewport at any width; the scope head and the Lowest rounds board render
+10 full-width cards with no empty panel.
+One truncated line at every width: the card's course name
+(`src/components/courses/BrowseCourseCard.tsx:178-182`, `whiteSpace: 'nowrap'` +
+ellipsis at 22px) clips — "Trump International Golf Links" 417>288 at 320,
+"Sundridge Park Golf Club (West Course)" 414>288. Rail items reporting right edges
+past the viewport (618 in a 320 viewport) are horizontal rails, not page overflow.
+Signed-in Latest holes check NOT run: the backend is `external_unmanaged`, so Lovable
+cannot mint a session and no credentials were requested. "YOUR BEST" therefore
+remains covered only by `src/test/coursesMembersSections.test.tsx:319`
+(`expect(stripOf(view.container, 0).textContent).toBe('4ROUNDS HERE78+6YOUR BEST')`).
+
+### Section F — suite and commits
+8,899 tests = shards **2268 / 2174 / 2229 / 2228**. Delta against 8,896: **+3**, all
+three new pill cases in `src/test/coursesMembersSections.test.tsx` (`:251`, `:263`,
+`:271`). One test renamed and rewritten, because this brief changes the precision rule
+it encodes: "signs the average exactly as the mock prints it" → "rounds the average
+first, then signs it, at the stat chip's one decimal" (`:143`), asserting
+`playsFigure(0.42) === '+0.4'`, `playsFigure(-0.16) === '−0.2'`, `playsFigure(2) ===
+'+2.0'` and the round-to-par cases. Two existing pill assertions updated for one
+decimal (`:213-214`, `:245-248`). No test deleted, and no test in another file touched.
+Commits: report 2's work `c24bc64a38`; this closeout `8771d99b96`.
