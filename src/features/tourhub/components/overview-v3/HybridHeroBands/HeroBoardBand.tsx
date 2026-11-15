@@ -576,7 +576,7 @@ export function RoundMovementBand({ round, cards }: { round: number; cards: Move
         ? { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', columnGap: 32, marginTop: 8 }
         : cards.length === 1
           ? { display: 'flex', justifyContent: 'center', marginTop: 8 }
-          : { display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 8 }}>
+          : { display: 'flex', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
         {cards.map((c, i) => (
           <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: '0 1 auto', minWidth: 0, padding: 0, ...(cards.length === 2 ? { justifySelf: i === 0 ? 'end' : 'start' } : {}) }}>
             <SquircleAvatar size={28} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />

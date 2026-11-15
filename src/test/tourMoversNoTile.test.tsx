@@ -39,4 +39,10 @@ describe('Biggest movers without tiles', () => {
     const mover = container.querySelector<HTMLElement>('[data-tour-shell="movers"] [data-shell-small-card]')!;
     expect(mover.style.border).toBe(''); expect((mover.parentElement as HTMLElement).style.justifyContent).toBe('space-between');
   });
+  it('(g) the three-mover row and the movers shell row both use an 8px minimum gap', () => {
+    expect(band(3).row.style.gap).toBe('8px');
+    const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, movers: true }} />);
+    const mover = container.querySelector<HTMLElement>('[data-tour-shell="movers"] [data-shell-small-card]')!;
+    expect((mover.parentElement as HTMLElement).style.gap).toBe('8px');
+  });
 });
