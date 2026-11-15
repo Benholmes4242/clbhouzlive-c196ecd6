@@ -24,6 +24,7 @@ import { computeEchoChip, computePushChip, computeEgChip, computeCronChip, compu
 import { pipelineTone } from '../components/SystemPanels';
 import { ccDelta, ccHours, ccConnectChange, ccShare, ccCoverage, ccBodyChip, ccLeak } from './cc3Rules';
 import './commandCentreV3.css';
+import { doNowTotal } from '../lib/doNowTotal';
 
 const INSET = 'var(--cc3-inset)', INITIALS = 'var(--cc3-initials)', FAINT = 'var(--cc3-faint)', UNDER_PAR = 'var(--cc3-under)';
 const TRACK = 'var(--cc3-track)';
@@ -118,7 +119,7 @@ function DoNow({ data: d }: { data: CommandCentreV2['do_now'] }) {
     { n: d.inbox, title: 'Inbox', short: 'Inbox', sub: 'claims, requests and tickets', cta: 'OPEN', to: '/admin-v2/inbox', items: [] },
   ];
   const visible = rows.filter(r => r.n > 0), [open, setOpen] = useState<string | null>(null);
-  return <Panel title="Do now" meta={<><b>{visible.reduce((n, r) => n + r.n, 0)}</b> things · most urgent first</>} list>{visible.map((r, i) => <React.Fragment key={r.title}><div className={`row${open === r.title ? ' open' : ''}`}><span className="c">{r.n}</span><Button variant="ghost" className="tog" aria-expanded={open === r.title} onClick={() => setOpen(open === r.title ? null : r.title)}><div className="lb">{r.title}<span className="chev" aria-hidden>▾</span></div><div className="sb">{r.sub}</div></Button><Button variant="ghost" asChild className={`btn${i === 0 ? ' fill' : ''}`}><Link to={r.to}>{r.cta}</Link></Button></div>{open === r.title && <div className="sub">{r.items.slice(0, 5).map((x, j) => { const content = <><Squircle name={x.name} /><span className="n">{x.name}</span><span className="r">{x.detail}{x.to ? ' ›' : ''}</span></>; return x.to ? <Link className="mini" key={j} to={x.to}>{content}</Link> : <div className="mini" key={j}>{content}</div>; })}</div>}</React.Fragment>)}<div className="clear"><span className="ck">✓</span>Clear · {rows.filter(r => r.n === 0).map(r => r.short.toLowerCase()).join(' · ')}</div></Panel>;
+  return <Panel title="Do now" meta={<><b>{doNowTotal(d)}</b> things · most urgent first</>} list>{visible.map((r, i) => <React.Fragment key={r.title}><div className={`row${open === r.title ? ' open' : ''}`}><span className="c">{r.n}</span><Button variant="ghost" className="tog" aria-expanded={open === r.title} onClick={() => setOpen(open === r.title ? null : r.title)}><div className="lb">{r.title}<span className="chev" aria-hidden>▾</span></div><div className="sb">{r.sub}</div></Button><Button variant="ghost" asChild className={`btn${i === 0 ? ' fill' : ''}`}><Link to={r.to}>{r.cta}</Link></Button></div>{open === r.title && <div className="sub">{r.items.slice(0, 5).map((x, j) => { const content = <><Squircle name={x.name} /><span className="n">{x.name}</span><span className="r">{x.detail}{x.to ? ' ›' : ''}</span></>; return x.to ? <Link className="mini" key={j} to={x.to}>{content}</Link> : <div className="mini" key={j}>{content}</div>; })}</div>}</React.Fragment>)}<div className="clear"><span className="ck">✓</span>Clear · {rows.filter(r => r.n === 0).map(r => r.short.toLowerCase()).join(' · ')}</div></Panel>;
 }
 function Engine({ data: d, days }: { data: CcEngine; days: CommandCentreDays }) {
   const change = ccConnectChange(d.connect);

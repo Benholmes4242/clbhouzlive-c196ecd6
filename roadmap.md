@@ -1,5 +1,10 @@
 # Roadmap
 
+## Admin side menu v3
+- Match the signed-off drawer, share Do now totals, preserve open-only full-admin reads and search behaviour.
+- Added 12 drawer cases (11 → 23); focused checks stopped at AdminDrawer.test.tsx:205:53: expect(element).toHaveStyle(), overflowWrap: anywhere absent on the nested name span. Dashboard 33/33 unchanged; focused 55/56. Expected inventory 8,846 from 8,834, full shards unrun. Report: .lovable/reports/admin-side-menu-v3-stop.md. Await authorisation to target the enclosing styled name span in the new assertion.
+- Device appearance check is Ben’s; no admin screenshots requested.
+
 ## Complete: Admin Command centre v3 + v3B
 - Rebuilt the dashboard to the signed-off dense layout; preserved AdminShell, the v2 reader and the October health status; added the engine reader.
 - v3B cleared the three stopped checks: panel helper scoped to panel headings, under-par colour asserted through `data-tone` plus source/token checks, and the CSS/status/bar repairs.
