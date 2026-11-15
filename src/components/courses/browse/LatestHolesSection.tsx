@@ -10,6 +10,7 @@ import {
   ariaRankPhrase,
   playsFigure,
   playsIsUnderPar,
+  rankIsOrdinable,
   rankKey,
   rankPhrase,
   toRanksMap,
@@ -78,7 +79,9 @@ function LatestHoleCard({ row, rank, onOpen }: {
   const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' · ');
   const seconds = Math.round(row.duration_seconds ?? 0);
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-  const plays = rank ? `, plays ${playsFigure(rank.avg_to_par)}, ${ariaRankPhrase(rank.difficulty_rank)}` : '';
+  // A rank backed by too few plays keeps its Plays figure and states no ordinal.
+  const ordinable = rank ? rankIsOrdinable(rank) : false;
+  const plays = rank ? `, plays ${playsFigure(rank.avg_to_par)}${ordinable ? `, ${ariaRankPhrase(rank.difficulty_rank)}` : ''}` : '';
   return (
     <button type="button" className="latest-hole-card" aria-label={`Hole ${row.hole_no}, ${row.course_name}${plays}`}
       style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: 1, isolation: 'isolate' }}
@@ -100,7 +103,7 @@ function LatestHoleCard({ row, rank, onOpen }: {
             <span data-plays-figure style={playsIsUnderPar(rank.avg_to_par) ? { color: TOPAR_RED } : undefined}>
               Plays {playsFigure(rank.avg_to_par)}
             </span>
-            <em>· {rankPhrase(rank.difficulty_rank)}</em>
+            {ordinable && <em>· {rankPhrase(rank.difficulty_rank)}</em>}
           </div>
         )}
         <div className="latest-hole-course">{row.course_name}</div>

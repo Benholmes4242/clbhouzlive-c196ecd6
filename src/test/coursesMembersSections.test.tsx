@@ -93,8 +93,8 @@ const holeRow = (id: string, courseId: string, holeNo: number): LatestHoleMedia 
   member_id: 'member', member_name: 'Thomas Holmes', member_avatar_url: null, par: 4, yards: 412,
 });
 
-const rankRow = (courseId: string, holeNo: number, avg: number, rank: number) => ({
-  course_id: courseId, hole_no: holeNo, rounds: 30, avg_to_par: avg, difficulty_rank: rank, holes_ranked: 18,
+const rankRow = (courseId: string, holeNo: number, avg: number, rank: number, rounds = 30) => ({
+  course_id: courseId, hole_no: holeNo, rounds, avg_to_par: avg, difficulty_rank: rank, holes_ranked: 18,
 });
 
 const review = (id: string, userId: string): LatestReview => ({
@@ -140,11 +140,17 @@ const held = (container: HTMLElement) => container.querySelector('[data-held]') 
 /* ── the copy rules, in one place ─────────────────────────────────────── */
 
 describe('the pill and strip copy rules', () => {
-  it('signs the average exactly as the mock prints it', () => {
+  it('rounds the average first, then signs it, at the stat chip\'s one decimal', () => {
     expect(playsFigure(0)).toBe('level');
-    expect(playsFigure(0.42)).toBe('+0.42');
-    expect(playsFigure(-0.15)).toBe('\u22120.15');
-    expect(playsFigure(2)).toBe('+2.00');
+    expect(playsFigure(0.42)).toBe('+0.4');
+    expect(playsFigure(-0.16)).toBe('\u22120.2');
+    expect(playsFigure(2)).toBe('+2.0');
+    /* A value that rounds to par is level: never a signed zero. */
+    expect(playsFigure(0.004)).toBe('level');
+    expect(playsFigure(-0.004)).toBe('level');
+    expect(playsFigure(0.049)).toBe('level');
+    expect(playsFigure(0.06)).toBe('+0.1');
+    expect(playsFigure(-0.06)).toBe('\u22120.1');
   });
 
   it('names rank one outright and every other rank by ordinal', () => {
@@ -204,9 +210,9 @@ describe('the Plays pill', () => {
     const view = rail();
     await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
     expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent)
-      .toBe('Plays +0.42· 3rd hardest hole');
+      .toBe('Plays +0.4· 3rd hardest hole');
     expect(view.container.querySelectorAll('button')[0].getAttribute('aria-label'))
-      .toBe('Hole 4, Course course-a, plays +0.42, 3rd hardest hole');
+      .toBe('Hole 4, Course course-a, plays +0.4, 3rd hardest hole');
   });
 
   it('leaves an unranked tile exactly as it was', async () => {
@@ -236,10 +242,40 @@ describe('the Plays pill', () => {
     const view = rail();
     await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
     const figure = view.container.querySelector('[data-plays-figure]') as HTMLElement;
-    expect(figure.textContent).toBe('Plays \u22120.15');
+    expect(figure.textContent).toBe('Plays \u22120.1');
     expect(figure.style.color).toBe('rgb(226, 75, 63)');
     expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent)
-      .toBe('Plays \u22120.15· Hardest hole');
+      .toBe('Plays \u22120.1· Hardest hole');
+  });
+
+  it('keeps the Plays figure and states no ordinal below ten plays', async () => {
+    f.ranks = [rankRow('course-a', 4, 0.42, 3, 9)];
+    const view = rail();
+    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+    expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent).toBe('Plays +0.4');
+    expect(view.container.querySelector('[data-hole-plays] em')).toBeNull();
+    expect(view.container.querySelectorAll('button')[0].getAttribute('aria-label'))
+      .toBe('Hole 4, Course course-a, plays +0.4');
+    /* The tile itself is never hidden for a thin sample. */
+    expect(view.container.querySelectorAll('button')).toHaveLength(3);
+  });
+
+  it('states the ordinal at exactly ten plays', async () => {
+    f.ranks = [rankRow('course-a', 4, 0.42, 3, 10)];
+    const view = rail();
+    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+    expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent)
+      .toBe('Plays +0.4· 3rd hardest hole');
+  });
+
+  it('reads a hole that rounds to par as Plays level, in no colour', async () => {
+    f.ranks = [rankRow('course-a', 4, -0.004, 1)];
+    const view = rail();
+    await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+    const figure = view.container.querySelector('[data-plays-figure]') as HTMLElement;
+    expect(figure.textContent).toBe('Plays level');
+    expect(figure.style.color).toBe('');
+    expect(view.container.textContent).not.toContain('0.0');
   });
 
   it('keeps an over-par figure under CSS control', async () => {

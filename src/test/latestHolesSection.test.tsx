@@ -123,6 +123,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     mountRail();
     // The ranks read for the pills happens on mount; the tap itself must add none.
     const before = f.holeRpc.mock.calls.length;
+    expect(before).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' }));
     expect(f.holeRpc.mock.calls.length).toBe(before);
     expect(f.open).toHaveBeenCalledTimes(1);
@@ -147,6 +148,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     mountRail(); const card = screen.getByRole('button', { name: 'Hole 4, Course second' });
     // The pill read is already in flight from mount; the tap must start none.
     const before = f.holeRpc.mock.calls.length;
+    expect(before).toBeGreaterThan(0);
     fireEvent.click(card);
     expect(f.open).toHaveBeenCalledTimes(1);
     expect(f.holeRpc.mock.calls.length).toBe(before);
