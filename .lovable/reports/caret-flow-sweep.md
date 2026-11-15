@@ -1,0 +1,170 @@
+# App-wide caret rule sweep
+
+## Rule
+Editable fields use the app's white default caret, never an amber caret. Explicit neutral-white overrides are compliant; do not restyle frozen or inactive light variants.
+
+## Read and resolved caret owners
+- Global input/textarea/contenteditable default: src/index.css, #F8FAFC — compliant; all fields without an override inherit it.
+- Sign-in: auth-hero.css, no override — compliant after the authorised correction.
+- Email code: OtpSheetContent.tsx, #FFFFFF — compliant.
+- First-sign-in setup: welcome.css, #F8FAFC — compliant.
+- People search: FindPeoplePage.tsx, #FFFFFF — compliant.
+- Connected invitations: inviteConnected.css → --invite-ink defined #F8FAFC in index.css — compliant.
+- Business invitation: BusinessInvitePage.tsx INK #F8FAFC — compliant.
+- Course search: CourseSearchSheet.tsx, #F8FAFC — compliant.
+- Add/profile course archive: AddCourseModal.tsx → analytical A.INK #F8FAFC — compliant.
+- Course analytics sheet: YourCourseAnalyticsSheet.tsx, #FFFFFF — compliant.
+- Personal profile editing: edit-profile.css → --ep-ink #F8FAFC — compliant.
+- Business profile editing: business-edit.css and business-where-contact.css → --ep-ink #F8FAFC from editor/creation shells — compliant.
+- Business creation address, contact, links, and phone: business-create.css → --bizc-ink #F8FAFC or #fff — compliant.
+- Review composer: ReviewComposerV2.tsx, #F8FAFC — compliant.
+- Review/course keyboard search: review-course-search.css → --rcs-ink #F8FAFC — compliant.
+- Post captions: CaptionField.tsx → CT_DARK.ink #F8FAFC; both active StageComposer callsites explicitly use variant="dark" — compliant. Unused light variant keeps its documented dark-ink caret for contrast; no active light callsite found, no change to frozen variant.
+- Post golf fields: GolfPostSections.tsx → golfPageTokens GP.ink #F8FAFC — compliant.
+- Video title: VideoComposerFields.tsx → videoCreator.css --video-ink #F8FAFC — compliant.
+- Comments: CommentComposer.tsx INK #F8FAFC — compliant.
+- Shared mentions: MentionsComposerInput.tsx default INK #F8FAFC; consumer overrides above resolved to white on active paths — compliant. Global mentions registration guard intentionally declares no colour.
+- Messaging share/search sheets: ShareSheets.tsx #FFFFFF — compliant.
+- Messaging composer/search: messages-dark.css #F8FAFC / #F4F6F8 neutral whites — compliant.
+- Retired Echo styling: echo-chat.css #F4F6F8 — no amber; not an active member-facing surface and unchanged.
+- Generated src/tailwind.config.lov.json caretColor catalogue is configuration, not an applied field override; no amber/primary caret utility application found.
+- public/ and supabase/ source searches found no caret styling. Background jobs and database functions do not render editable cursors; no changes, SQL, or migration inspection/execution needed.
+
+## All field-bearing source files inspected
+The following files were read during the source sweep; fields without any listed override inherit the global default (including differently built search, admin, settings, forms, and modal flows).
+- `src/components/SuspendedScreen.tsx`
+- `src/components/business/ClaimYourCourseSheet.tsx`
+- `src/components/business/CollegeSearchDropdown.tsx`
+- `src/components/business/CountrySelector.tsx`
+- `src/components/business/PhoneInputWithDialCode.tsx`
+- `src/components/business/RequestAnotherCourseSheet.tsx`
+- `src/components/business/RequestClubModal.tsx`
+- `src/components/business/TeamListSection.tsx`
+- `src/components/business/editor/BusinessEditPreview.tsx`
+- `src/components/business/editor/BusinessEditProfileLinks.tsx`
+- `src/components/business/editor/BusinessEditWhereContact.tsx`
+- `src/components/business/verification/VerificationFlowSheet.tsx`
+- `src/components/course-media-tab/CourseMediaAddShot.tsx`
+- `src/components/course-media-tab/HolePhotoFastPaths.tsx`
+- `src/components/courses/CourseDirectorySheet.tsx`
+- `src/components/courses/CourseSearchSheet.tsx`
+- `src/components/courses/CoursesContent.tsx`
+- `src/components/courses/RequestCourseSheet.tsx`
+- `src/components/courses/review/ReviewResponseBlock.tsx`
+- `src/components/explore-tab-new/FindGolfersSheet.tsx`
+- `src/components/explore-tab-new/courseled/BoardFilterPanel.tsx`
+- `src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx`
+- `src/components/invite/ConnectedInviteState.tsx`
+- `src/components/manage/overlays/DeleteAccountConfirmSheet.tsx`
+- `src/components/mentions/MentionsComposerInput.tsx`
+- `src/components/profile/courses/AddCourseModal.tsx`
+- `src/components/profile/edit-v2/HeaderPhotoCard.tsx`
+- `src/components/profile/edit-v2/LocationSection.tsx`
+- `src/components/profile/edit-v2/ProfilePhotoCard.tsx`
+- `src/components/profile/edit-v2/SocialLinksSection.tsx`
+- `src/components/profile/handicap/whs/connect/CountryScreen.tsx`
+- `src/components/profile/handicap/whs/connect/EnglandGolfForm.tsx`
+- `src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx`
+- `src/components/profile/hero/topTenShare/TopTenShareSheet.tsx`
+- `src/components/settings/sheets/DeleteAllDataConfirmSheet.tsx`
+- `src/components/ui/CatalogueSearchField.tsx`
+- `src/components/ui/input-otp.tsx`
+- `src/components/ui/input.tsx`
+- `src/components/ui/textarea.tsx`
+- `src/features/admin/AdminDrawer.tsx`
+- `src/features/admin/components/AddCourseSheet.tsx`
+- `src/features/admin/components/AppealDetailDrawer.tsx`
+- `src/features/admin/components/ApprovalDetailDrawer.tsx`
+- `src/features/admin/components/ConfirmDialog.tsx`
+- `src/features/admin/components/CourseClubControl.tsx`
+- `src/features/admin/components/CourseFormFields.tsx`
+- `src/features/admin/components/CourseGeographySelectors.tsx`
+- `src/features/admin/components/CourseSearchField.tsx`
+- `src/features/admin/components/HelpArticlesTab.tsx`
+- `src/features/admin/components/HolePhotoReviewSheet.tsx`
+- `src/features/admin/components/InboxQueueRow.tsx`
+- `src/features/admin/components/LegalDocumentsTab.tsx`
+- `src/features/admin/components/MembersList.tsx`
+- `src/features/admin/components/ModerationDetailDrawer.tsx`
+- `src/features/admin/components/ProRequestFacts.tsx`
+- `src/features/admin/components/SupportTicketDrawer.tsx`
+- `src/features/admin/components/VerificationsReview.tsx`
+- `src/features/admin/components/amateur/AmateurStoryEditor.tsx`
+- `src/features/admin/components/content/CoursesSection.tsx`
+- `src/features/admin/components/content/TourDataSection.tsx`
+- `src/features/admin/components/health/GolfDataLens.tsx`
+- `src/features/admin/components/shared/LeadImageUpload.tsx`
+- `src/features/admin/components/wire/WireBlockEditor.tsx`
+- `src/features/admin/components/wire/WireStoryEditor.tsx`
+- `src/features/admin/pages/AnalyticsDiagnostics.tsx`
+- `src/features/admin/pages/ContentPage.tsx`
+- `src/features/admin/pages/CourseMatchingPage.tsx`
+- `src/features/admin/pages/InboxPage.tsx`
+- `src/features/admin/pages/RankingEventCoursesPage.tsx`
+- `src/features/admin/pages/SettingsPage.tsx`
+- `src/features/admin/pages/UsersPage.tsx`
+- `src/features/admin/pages/VenueMappingPage.tsx`
+- `src/features/admin/pages/VideoPerfPage.tsx`
+- `src/features/amateur-ranking/WagrLinkSheet.tsx`
+- `src/features/business-create/BusinessCreateStep3.tsx`
+- `src/features/business-create/BusinessCreateStep4.tsx`
+- `src/features/business-create/Step2Club.tsx`
+- `src/features/business-create/Step2College.tsx`
+- `src/features/business-create/Step2Other.tsx`
+- `src/features/comments-v2/CommentsSheetV2.tsx`
+- `src/features/comments-v2/components/CommentComposer.tsx`
+- `src/features/comments-v2/components/ReportCommentSheetV2.tsx`
+- `src/features/composer-flow/ComposerFlowSheet.tsx`
+- `src/features/composer-flow/KeyboardSearchSheet.tsx`
+- `src/features/echo-chat/components/ComposerPill.tsx`
+- `src/features/edit-profile/EditProfileCard.tsx`
+- `src/features/edit-profile/EditProfileGolf.tsx`
+- `src/features/edit-profile/EditProfileLinksPrivacy.tsx`
+- `src/features/edit-profile/EditProfileYou.tsx`
+- `src/features/explore-magazine/CoursesSearchField.tsx`
+- `src/features/explore-magazine/watch/ExploreTopControls.tsx`
+- `src/features/home-club/HomeClubPickerSheet.tsx`
+- `src/features/post-v2/StageComposer.tsx`
+- `src/features/post-v2/components/AdjustSheet.tsx`
+- `src/features/post-v2/components/CourseTagSheet.tsx`
+- `src/features/post-v2/components/CoverFrameSheet.tsx`
+- `src/features/post-v2/components/MediaTray.tsx`
+- `src/features/post-v2/components/ScheduleSheetV2.tsx`
+- `src/features/post-v2/components/golf/GolfPostSections.tsx`
+- `src/features/post-v2/components/video/MarkHolesPage.tsx`
+- `src/features/post-v2/components/video/VideoDetailsSheets.tsx`
+- `src/features/pro-verification/ProDetailsSheet.tsx`
+- `src/features/profile-sheet-v2/components/YourCourseAnalyticsSheet.tsx`
+- `src/features/review-v2/components/MediaTray.tsx`
+- `src/features/search-v2/components/SearchField.tsx`
+- `src/features/social-lists-v2/SocialListPage.tsx`
+- `src/features/tourhub/components/overview-v3/HybridHeroBands/YourPickSheet.tsx`
+- `src/features/tourhub/news/NewsTab.tsx`
+- `src/features/tourhub/players-v2/field/FullField.tsx`
+- `src/features/tourhub/tournament-v2/sections/AllTeeTimesSheet.tsx`
+- `src/lib/tokens/field.ts`
+- `src/pages/BusinessInvitePage.tsx`
+- `src/pages/BusinessReviewsPage.tsx`
+- `src/pages/EchoHistoryPage.tsx`
+- `src/pages/FindPeoplePage.tsx`
+- `src/pages/ProfilePageV2.tsx`
+- `src/pages/Welcome.tsx`
+- `src/pages/auth/components/AuthHeroScreen.tsx`
+- `src/pages/auth/components/OtpSheetContent.tsx`
+- `src/pages/gate/home/CourseLookup.tsx`
+- `src/pages/manage/ContactPage.tsx`
+- `src/pages/manage/HelpPage.tsx`
+- `src/pages/manage/SupportThreadPage.tsx`
+- `src/pages/messaging-v2/Composer.tsx`
+- `src/pages/messaging-v2/ConversationSettingsSheet.tsx`
+- `src/pages/messaging-v2/InboxV2Page.tsx`
+- `src/pages/messaging-v2/NewConversationSheet.tsx`
+- `src/pages/messaging-v2/ShareSheets.tsx`
+- `src/perf/AudioDebugHud.tsx`
+- `src/utils/media/pickMediaFiles.ts`
+
+## Result and checks
+No further active amber caret violation found; no application source or tests changed in this sweep. Records, settings, permissions and example data untouched. No unrelated font/branding fixes.
+
+Command: `bunx vitest run src/test/ep51SearchAndCarets.test.tsx --maxWorkers=2 --reporter=json --outputFile=/tmp/sign-in-caret-fix/sweep.json`.
+Result: 8 executed / 8 passed / 0 failed, including the global source sweep. Full-suite inventory unchanged at 8,744; previously verified four-shard total 8,744 passed (2,203 / 2,116 / 2,196 / 2,229), not rerun here.
