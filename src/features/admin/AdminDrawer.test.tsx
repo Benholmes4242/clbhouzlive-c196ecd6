@@ -202,7 +202,7 @@ describe('ADMIN_SIDE_MENU_V3', () => {
     draw(); fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'tho' } });
     const link = screen.getByRole('link', { name: /Thomas Holmes/ });
     expect(within(link).getByText('@thomas')).toBeInTheDocument();
-    expect(within(link).getByText('Thomas Holmes')).toHaveStyle({ overflowWrap: 'anywhere' });
+    expect(within(link).getByText('Thomas Holmes').closest('span[style*="overflow-wrap"]')).toHaveStyle({ overflowWrap: 'anywhere' });
     for (const el of link.querySelectorAll<HTMLElement>('[style]')) expect(el.style.textOverflow).not.toBe('ellipsis');
   });
   it('Cancel clears and blurs search and restores the groups', () => {

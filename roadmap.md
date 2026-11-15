@@ -1,8 +1,8 @@
 # Roadmap
 
-## Admin side menu v3
+## Complete: Admin side menu v3
 - Match the signed-off drawer, share Do now totals, preserve open-only full-admin reads and search behaviour.
-- Added 12 drawer cases (11 → 23); focused checks stopped at AdminDrawer.test.tsx:205:53: expect(element).toHaveStyle(), overflowWrap: anywhere absent on the nested name span. Dashboard 33/33 unchanged; focused 55/56. Expected inventory 8,846 from 8,834, full shards unrun. Report: .lovable/reports/admin-side-menu-v3-stop.md. Await authorisation to target the enclosing styled name span in the new assertion.
+- Authorised enclosing-name-span assertion correction complete; AdminDrawer.tsx unchanged. Focused 56/56; four separate shards passed 2,255 / 2,146 / 2,217 / 2,228 = 8,846 (8,834 + 12), zero failures/skips. Build OK; report .lovable/reports/admin-side-menu-v3-testfix.md.
 - Device appearance check is Ben’s; no admin screenshots requested.
 
 ## Complete: Admin Command centre v3 + v3B
