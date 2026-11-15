@@ -48,6 +48,23 @@ export const OVERVIEW = {
   },
 } as const;
 
+/**
+ * THE EVEN ROW (BRIEF_TOUR_OVERVIEW_MOVERS_PICKS_EVEN) — three players across
+ * the full screen width with the SAME gap at the left screen edge, between each
+ * player and at the right screen edge. Seven tracks: the four 1fr spacers share
+ * the free space equally and never drop below 12px, so a long surname ends in
+ * "…" instead of squeezing a gap (every card keeps minWidth 0 and its own
+ * ellipsis). Cards sit in columns 2, 4 and 6. The row spans the full width: it
+ * cancels a 20px-padded parent with a negative side margin, or the parent has
+ * no side padding. Owners: RoundMovementBand (movers), PicksBlock's picks grid
+ * and the overview loading shells, so the skeleton and the real bands cannot
+ * drift apart on reveal.
+ */
+export const EVEN_ROW_GRID =
+  'minmax(12px,1fr) auto minmax(12px,1fr) auto minmax(12px,1fr) auto minmax(12px,1fr)';
+/** Grid columns for the first, second and third card of an even row. */
+export const EVEN_ROW_COLUMNS = [2, 4, 6] as const;
+
 /** "Three", "Two"… from the locale; numerals past ten. Caps come from CSS. */
 export function countInWords(count: number, t: (key: string, opts?: Record<string, unknown>) => string): string {
   if (count >= 2 && count <= 10) return t(`overview.countWords.${count}`);

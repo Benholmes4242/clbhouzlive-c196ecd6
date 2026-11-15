@@ -83,12 +83,12 @@ describe('Merged Airy lower sections', () => {
     expect((root?.firstElementChild as HTMLElement)?.style.padding).toBe('8px 16px');
     expect(root?.querySelector('button')?.style.padding).toBe('10px 16px');
   });
-  it.each(['upcoming', 'live', 'completed'] as const)('adds the picks hairline and tighter cards in %s', phase => {
+  it.each(['upcoming', 'live', 'completed'] as const)('adds no picks hairline and keeps the tighter cards in %s', phase => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase={phase} />);
     const picks = v.container.querySelector<HTMLElement>('[data-overview-picks]');
-    expect(picks?.style.paddingTop).toBe('8px'); const hairline = picks?.querySelector<HTMLElement>('[data-overview-picks-hairline]'); expect(hairline).not.toBeNull(); expect(hairline?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
+    expect(picks?.style.paddingTop).toBe('8px'); expect(picks?.querySelector('[data-overview-picks-hairline]')).toBeNull();
     expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('16px');
-    expect(picks?.querySelector<HTMLElement>('[data-overview-pick-card]')?.style.padding).toBe('7px');
+    expect(picks?.querySelector<HTMLElement>('[data-overview-pick-card]')?.style.padding).toBe('0px');
     expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('0px');
   });
   it('omits undrawn unknown facts and uses the upcoming history grammar', () => {

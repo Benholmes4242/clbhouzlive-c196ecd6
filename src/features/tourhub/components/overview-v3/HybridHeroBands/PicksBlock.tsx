@@ -6,14 +6,14 @@ import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
 import React, {useLayoutEffect,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Trophy} from 'lucide-react';
-import {AMBER,FONT,GOLD,WHITE_ALPHA_06,WHITE_ALPHA_65,TOPAR_UNDER_DARK} from '../../../_shared/tokens';
+import {AMBER,FONT,GOLD,WHITE_ALPHA_65,TOPAR_UNDER_DARK} from '../../../_shared/tokens';
 import {PlayerAvatar} from '../../PlayerAvatar';
 import type {AITopContender} from '../../../hooks/useAIPredictions';
 import {surnameOf} from '../../../_shared/playerName';
 import {formatDayMonthShortGB,formatTimeHm24,formatWeekdayLong,formatWeekdayShortGB} from '@/i18n/format';
 import {statusWord} from '../../../leaderboard/BoardTable';
 import {normalizeStatus} from '../../../_shared/resultStatus';
-import {OVERVIEW} from '../overviewTokens';
+import {EVEN_ROW_COLUMNS, EVEN_ROW_GRID, OVERVIEW} from '../overviewTokens';
 import {fmtScore} from '../../../utils/fmtScore';
 import {finishedVerdict,type PickResult} from './pickInsightRules';
 import {PickMemberBands} from './PickMemberBands';
@@ -97,8 +97,10 @@ export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT, dayOnly = fa
 }
 
 /**
- * §3 — THE PICKS BLOCK. Amber OUR TOURNAMENT PICKS header and a FIXED grid of
- * up to three cards (never padded, never scrolling). Each card opens PicksSheet.
+ * §3 — THE PICKS BLOCK. Amber OUR TOURNAMENT PICKS header and a FIXED group of
+ * up to three cards (never padded, never scrolling, no tiles and no hairline).
+ * Three cards sit in the shared even row (EVEN_ROW_GRID in overviewTokens);
+ * two are a centred pair and one is centred. Each card opens PicksSheet.
  */
 /** The status token a pick card shows instead of a position, as BoardTable labels it. */
 export function pickStatusToken(raw: string | null | undefined): string | null {
@@ -192,7 +194,6 @@ export function PicksBlock({
   return (
 <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={seasonYear != null ? ['members'] : []}>
     <div data-overview-picks style={{ paddingTop: 8 }}>
-      <div data-overview-picks-hairline style={{ margin: '0 20px', borderTop: `1px solid ${WHITE_ALPHA_06}` }} />
       <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
@@ -216,7 +217,11 @@ export function PicksBlock({
         <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
       ) : null}
 
-      <div data-overview-picks-grid style={{ padding: '0 20px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
+      <div data-overview-picks-grid style={cards.length === 2
+        ? { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', columnGap: 32, padding: '0 20px' }
+        : cards.length === 1
+          ? { display: 'flex', justifyContent: 'center', padding: 0 }
+          : { display: 'grid', gridTemplateColumns: EVEN_ROW_GRID, padding: 0 }}>
         {cards.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
@@ -271,8 +276,9 @@ export function PicksBlock({
               onClick={()=>onOpenPick(p.playerId)}
               aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
               className="active:opacity-70 transition-opacity"
-              /* Signed-off Board B: outlined landscape chip, three across, no fill. */
-              style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: 7, textAlign: 'left', minWidth: 0 }}
+              /* Signed-off: no tile at all — the card is a bare tappable row
+                 sitting in the shared even row (or the centred pair/one). */
+              style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: 'transparent', padding: 0, textAlign: 'left', minWidth: 0, ...(cards.length === 2 ? { justifySelf: i === 0 ? 'end' : 'start' } : {}), ...(cards.length === 3 ? { gridColumn: EVEN_ROW_COLUMNS[i] } : {}) }}
             >
               {/* The shared resolver walks the headshot folder chain itself;
                   photoUrl is tried FIRST when present. No second resolver. */}

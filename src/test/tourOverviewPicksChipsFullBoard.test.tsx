@@ -13,6 +13,7 @@ const f = vi.hoisted(() => ({
   rows: [] as unknown[],
   live: [] as Array<{ id: string }>,
   sheet: vi.fn(),
+  picksSheet: vi.fn(),
 }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/features/tourhub/context/TourSelectionContext', () => ({ useTourSelection: () => ({ viewingTournamentId: null, viewingTourSlug: 'pga' }) }));
@@ -22,7 +23,7 @@ vi.mock('@/features/tourhub/hooks/useTournamentLastYearTop4', () => ({ useTourna
 vi.mock('@/features/tourhub/overview/data/useTournamentVenueRecord', () => ({ useTournamentVenueRecord: () => ({ data: null }) }));
 vi.mock('@/features/tourhub/tournament-v2/data/useDrawnRounds', () => ({ useDrawnRounds: () => ({ data: [] }) }));
 vi.mock('@/features/tourhub/tournament-v2/data/useTeeTimesAll', () => ({ useTeeTimesAll: () => ({ data: [] }) }));
-vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet', () => ({ PicksSheet: () => null }));
+vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet', () => ({ PicksSheet: (props: { open: boolean; initialPlayerId: string | null }) => { f.picksSheet(props); return null; } }));
 vi.mock('@/features/tourhub/leaderboard/ScorecardSheet', () => ({ ScorecardSheet: () => null }));
 vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: f.rows }) }));
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
@@ -36,7 +37,9 @@ vi.mock('@/features/tourhub/tournament-v2/sections/FullBoardSheet', () => ({
   FullBoardSheet: (props: { open: boolean; entries: unknown[]; meta: unknown }) => { f.sheet(props); return props.open ? <div data-testid="full-board-sheet" /> : null; },
 }));
 
-import { HeroBoardSection } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { HeroBoardSection, RoundMovementBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { EMPTY_OVERVIEW_SHAPE, TourOverviewShell } from '@/features/tourhub/components/overview-v3/overviewShells';
+import { EVEN_ROW_GRID } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import { HybridHero } from '@/features/tourhub/components/overview-v3/HybridHero';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 
@@ -46,7 +49,7 @@ const field: BoardEntry[] = [1, 2, 3, 4, 5, 6, 7].map((position, i) => ({
   player: { id: `p${i}`, full_name: `Player ${i}` },
 }));
 
-afterEach(() => { cleanup(); f.picks = []; f.rows = []; f.live = []; f.sheet.mockClear(); });
+afterEach(() => { cleanup(); f.picks = []; f.rows = []; f.live = []; f.sheet.mockClear(); f.picksSheet.mockClear(); });
 
 const mountPicks = (props: Partial<React.ComponentProps<typeof HeroBoardSection>> = {}) => render(
   <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
@@ -57,21 +60,80 @@ const mountPicks = (props: Partial<React.ComponentProps<typeof HeroBoardSection>
 );
 
 describe('picks chips (Board B)', () => {
-  it('render three across with no fill, a 1px outline and no chevron', () => {
+  it('render three across the even row with no tile and no chevron', () => {
     f.picks = [{ playerId: 'p0', playerName: 'A Zero' }, { playerId: 'p3', playerName: 'B Three' }, { playerId: 'p5', playerName: 'C Five' }, { playerId: 'p6', playerName: 'D Six' }];
     const { container } = mountPicks();
     const grid = container.querySelector('[data-overview-picks-grid]') as HTMLElement;
-    expect(grid.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
-    expect(grid.style.gap).toBe('6px');
+    expect(grid.style.gridTemplateColumns).toBe(EVEN_ROW_GRID);
+    expect(grid.style.paddingLeft).toBe('0px');
+    expect(grid.style.paddingRight).toBe('0px');
     const cards = container.querySelectorAll<HTMLElement>('[data-overview-pick-card]');
     expect(cards).toHaveLength(3);
+    expect([...cards].map(c => c.style.gridColumn)).toEqual(['2', '4', '6']);
     cards.forEach((card) => {
       expect(card.style.background).toBe('transparent');
-      expect(card.style.border).toBe('1px solid rgba(255,255,255,0.12)');
-      expect(card.style.borderRadius).toBe('12px');
+      expect(card.style.border).toBe('');
+      expect(card.style.borderRadius).toBe('');
+      expect(card.style.padding).toBe('0px');
       expect(card.style.display).toBe('flex');
       expect(card.querySelector('.lucide-chevron-right')).toBeNull();
     });
+  });
+
+  it('(a) the three-mover row and the three-pick grid both use the seven-track even row', () => {
+    const movers = render(<RoundMovementBand round={2} cards={['a', 'b', 'c'].map(k => ({ key: k, name: `Player ${k}`, candidates: [], delta: 2, toPar: -2, gross: 70 }))} />);
+    const mRow = movers.container.querySelector<HTMLElement>('[data-overview-movement-row]')!;
+    expect(mRow.style.gridTemplateColumns).toBe(EVEN_ROW_GRID);
+    expect([...movers.container.querySelectorAll<HTMLElement>('[data-overview-movement-card]')].map(c => c.style.gridColumn)).toEqual(['2', '4', '6']);
+    cleanup();
+    f.picks = [{ playerId: 'p0', playerName: 'A Zero' }, { playerId: 'p3', playerName: 'B Three' }, { playerId: 'p5', playerName: 'C Five' }];
+    const picks = mountPicks();
+    const grid = picks.container.querySelector('[data-overview-picks-grid]') as HTMLElement;
+    expect(grid.style.gridTemplateColumns).toBe(EVEN_ROW_GRID);
+    expect([...picks.container.querySelectorAll<HTMLElement>('[data-overview-pick-card]')].map(c => c.style.gridColumn)).toEqual(['2', '4', '6']);
+  });
+
+  it('(b) two picks use the centred pair and one pick is centred', () => {
+    f.picks = [{ playerId: 'p0', playerName: 'A Zero' }, { playerId: 'p3', playerName: 'B Three' }];
+    const two = mountPicks();
+    const twoGrid = two.container.querySelector('[data-overview-picks-grid]') as HTMLElement;
+    expect(twoGrid.style.display).toBe('grid');
+    expect(twoGrid.style.columnGap).toBe('32px');
+    expect(twoGrid.style.padding).toBe('0px 20px');
+    const twoCards = two.container.querySelectorAll<HTMLElement>('[data-overview-pick-card]');
+    expect(twoCards).toHaveLength(2);
+    expect(twoCards[0].style.justifySelf).toBe('end');
+    expect(twoCards[1].style.justifySelf).toBe('start');
+    cleanup();
+    f.picks = [{ playerId: 'p3', playerName: 'B Three' }];
+    const one = mountPicks();
+    const oneGrid = one.container.querySelector('[data-overview-picks-grid]') as HTMLElement;
+    expect(oneGrid.style.display).toBe('flex');
+    expect(oneGrid.style.justifyContent).toBe('center');
+    expect(oneGrid.style.padding).toBe('0px');
+    expect(one.container.querySelectorAll('[data-overview-pick-card]')).toHaveLength(1);
+  });
+
+  it('(c) there is no picks hairline and no separator in the picks shell', () => {
+    f.picks = [{ playerId: 'p0', playerName: 'A Zero' }];
+    const { container } = mountPicks();
+    expect(container.querySelector('[data-overview-picks-hairline]')).toBeNull();
+    cleanup();
+    const shell = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, picks: { recordLines: 1, sentenceLines: 1 } } as never} />);
+    const picks = shell.container.querySelector<HTMLElement>('[data-tour-shell="picks"]')!;
+    expect(picks.querySelector('[data-overview-picks-hairline]')).toBeNull();
+    expect([...picks.children].every(c => (c as HTMLElement).style.borderTop === '')).toBe(true);
+  });
+
+  it('(d) a pick card is still a button that opens the pick on tap', () => {
+    f.picks = [{ playerId: 'p3', playerName: 'B Three' }, { playerId: 'p5', playerName: 'C Five' }];
+    const { container } = mountPicks();
+    const card = container.querySelector<HTMLElement>('[data-overview-pick-card]')!;
+    expect(card.tagName).toBe('BUTTON');
+    expect(card.getAttribute('type')).toBe('button');
+    f.picksSheet.mockClear();
+    fireEvent.click(card);
+    expect(f.picksSheet.mock.calls.some(c => c[0].open === true && c[0].initialPlayerId === 'p3')).toBe(true);
   });
 
   it('puts the 28px avatar left of the name', () => {

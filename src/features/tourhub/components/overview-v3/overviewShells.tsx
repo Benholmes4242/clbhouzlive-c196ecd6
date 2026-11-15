@@ -6,6 +6,7 @@ import { settled, usePageRevealed, useSectionReady } from '@/components/courses/
 import { MEMBER_CELL, MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { WHITE_ALPHA_06, WHITE_ALPHA_08 } from '../../_shared/tokens';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
+import { EVEN_ROW_COLUMNS, EVEN_ROW_GRID } from './overviewTokens';
 import '../../../../styles/hybrid-hero.css';
 import '../../tournament-v2/sections/heroRoundPanel.css';
 import '../../overview/sections/alsoWeek.css';
@@ -171,7 +172,7 @@ function ChipsShell({ rankings = false }: { rankings?: boolean }) {
   </div>;
 }
 function SmallCards({ picks = false }: { picks?: boolean }) {
-  return <div style={{ display: picks ? 'grid' : 'flex', ...(picks ? { gridTemplateColumns: 'repeat(3,minmax(0,1fr))', padding: '0 20px' } : {}), gap: picks ? 6 : 8, marginTop: picks ? 0 : 8, ...(picks ? {} : { justifyContent: 'space-between' }) }}>{[45, 61, 36].map((width, i) => <div key={i} data-shell-small-card style={picks ? { display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: 1, minWidth: 0, border: SHELL_OUTLINE, borderRadius: 12, padding: 7 } : { display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: '0 1 auto', minWidth: 0, padding: 0 }}><Avatar size={28} height={29} /><div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}><Line width={width} font={12.5} line={1.2} /><div style={{ marginTop: 1 }}><Line width={29} font={11.5} line={1.2} /></div></div></div>)}</div>;
+  return <div style={{ display: 'grid', gridTemplateColumns: EVEN_ROW_GRID, ...(picks ? { padding: 0 } : { margin: '8px -20px 0' }) }}>{[45, 61, 36].map((width, i) => <div key={i} data-shell-small-card style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: '0 1 auto', minWidth: 0, padding: 0, gridColumn: EVEN_ROW_COLUMNS[i] }}><Avatar size={28} height={29} /><div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}><Line width={width} font={12.5} line={1.2} /><div style={{ marginTop: 1 }}><Line width={29} font={11.5} line={1.2} /></div></div></div>)}</div>;
 }
 function MoversShell() { return <div data-tour-shell="movers" data-overview-movement style={{ padding: '12px 20px 10px' }}><Line width={156} font={9.5} /><SmallCards /></div>; }
 const BOARD_GRID = '24px minmax(0,1fr) 32px 32px 40px';
@@ -185,7 +186,7 @@ export function BoardShell({ rows = 0, full = false }: { rows?: number; full?: b
   return <div data-tour-shell="board" className="hero-expand-board" style={{ background: PAGE_CANVAS, paddingTop: 0 }}><BoardHeader />{Array.from({ length: rows }, (_, i) => <BoardRow key={i} index={i} />)}{full && <div className="hero-full-leaderboard" style={{ border: SHELL_OUTLINE }}><Line width={109} font={14} /><Line width={64} font={13} /></div>}</div>;
 }
 function PicksShell({ shape }: { shape: PicksShape }) {
-  return <div data-tour-shell="picks" data-overview-picks style={{ paddingTop: 8 }}><div style={{ margin: '0 20px', borderTop: SHELL_SEPARATOR }} /><div style={{ padding: '16px 20px 10px', display: 'flex', justifyContent: 'space-between', gap: 8 }}><Line width={176} font={11} /><Line width={85} font={9.5} /></div><div data-shell-picks-record style={{ padding: '8px 20px', margin: '-12px 0 2px', minHeight: 32 }}><Lines widths={[219, 132].slice(0, shape.recordLines)} font={13} line={1.35} /></div><div data-shell-picks-sentence style={{ margin: '0 20px 12px' }}><Lines widths={['94%', '65%', '40%'].slice(0, shape.sentenceLines)} font={14} line={1.45} /></div><SmallCards picks /></div>;
+  return <div data-tour-shell="picks" data-overview-picks style={{ paddingTop: 8 }}><div style={{ padding: '16px 20px 10px', display: 'flex', justifyContent: 'space-between', gap: 8 }}><Line width={176} font={11} /><Line width={85} font={9.5} /></div><div data-shell-picks-record style={{ padding: '8px 20px', margin: '-12px 0 2px', minHeight: 32 }}><Lines widths={[219, 132].slice(0, shape.recordLines)} font={13} line={1.35} /></div><div data-shell-picks-sentence style={{ margin: '0 20px 12px' }}><Lines widths={['94%', '65%', '40%'].slice(0, shape.sentenceLines)} font={14} line={1.45} /></div><SmallCards picks /></div>;
 }
 function LeadersShell({ rows }: { rows: number }) {
   const grid = '24px minmax(0,1fr) 40px 40px 40px';

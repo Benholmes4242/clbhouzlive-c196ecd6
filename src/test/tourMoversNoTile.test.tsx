@@ -8,6 +8,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 
 import { RoundMovementBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { EMPTY_OVERVIEW_SHAPE, TourOverviewShell } from '@/features/tourhub/components/overview-v3/overviewShells';
+import { EVEN_ROW_GRID } from '@/features/tourhub/components/overview-v3/overviewTokens';
 
 afterEach(cleanup);
 const mount = (node: React.ReactNode) => render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>);
@@ -21,7 +22,13 @@ describe('Biggest movers without tiles', () => {
     const shell = container.querySelector<HTMLElement>('[data-tour-shell="movers"]')!;
     expect(shell.style.borderTop).toBe(''); expect(shell.style.padding).toBe('12px 20px 10px');
   });
-  it('(b) spaces three movers between the margins', () => { const { row } = band(3); expect(row.style.display).toBe('flex'); expect(row.style.justifyContent).toBe('space-between'); });
+  it('(b) spaces three movers evenly across the full width', () => {
+    const { row, cards } = band(3);
+    expect(row.style.display).toBe('grid');
+    expect(row.style.gridTemplateColumns).toBe(EVEN_ROW_GRID);
+    expect(row.style.margin).toBe('8px -20px 0px');
+    expect(cards.map(c => c.style.gridColumn)).toEqual(['2', '4', '6']);
+  });
   it('(c) centres two movers in a two-column grid', () => {
     const { row, cards } = band(2);
     expect(row.style.display).toBe('grid'); expect(row.style.columnGap).toBe('32px');
@@ -32,17 +39,25 @@ describe('Biggest movers without tiles', () => {
     const c = band(3).cards[0];
     expect(c.style.border).toBe(''); expect(c.style.background).toBe(''); expect(c.style.borderRadius).toBe(''); expect(c.style.flex).toBe('0 1 auto');
   });
-  it('(f) picks cards keep their outline while mover shells lose it', () => {
+  it('(f) picks and mover shells both lose the tile', () => {
     const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, movers: true, picks: { recordLines: 1, sentenceLines: 1 } } as never} />);
-    const pick = container.querySelector<HTMLElement>('[data-tour-shell="picks"] [data-shell-small-card]')!;
-    expect(pick.style.border).not.toBe(''); expect(pick.style.borderRadius).toBe('12px');
-    const mover = container.querySelector<HTMLElement>('[data-tour-shell="movers"] [data-shell-small-card]')!;
-    expect(mover.style.border).toBe(''); expect((mover.parentElement as HTMLElement).style.justifyContent).toBe('space-between');
+    for (const sel of ['[data-tour-shell="picks"]', '[data-tour-shell="movers"]']) {
+      const card = container.querySelector<HTMLElement>(`${sel} [data-shell-small-card]`)!;
+      expect(card.style.border).toBe(''); expect(card.style.borderRadius).toBe(''); expect(card.style.padding).toBe('0px');
+    }
   });
-  it('(g) the three-mover row and the movers shell row both use an 8px minimum gap', () => {
-    expect(band(3).row.style.gap).toBe('8px');
+  it('(g) the three-mover row and the movers shell row both use the even-row grid', () => {
+    expect(band(3).row.style.gridTemplateColumns).toBe(EVEN_ROW_GRID);
     const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, movers: true }} />);
-    const mover = container.querySelector<HTMLElement>('[data-tour-shell="movers"] [data-shell-small-card]')!;
-    expect((mover.parentElement as HTMLElement).style.gap).toBe('8px');
+    const row = container.querySelector<HTMLElement>('[data-tour-shell="movers"] [data-shell-small-card]')!.parentElement as HTMLElement;
+    expect(row.style.gridTemplateColumns).toBe(EVEN_ROW_GRID);
+    expect(row.style.margin).toBe('8px -20px 0px');
+    expect([...row.querySelectorAll<HTMLElement>('[data-shell-small-card]')].map(c => c.style.gridColumn)).toEqual(['2', '4', '6']);
+  });
+  it('(h) the picks shell has no separator line', () => {
+    const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, picks: { recordLines: 1, sentenceLines: 1 } } as never} />);
+    const picks = container.querySelector<HTMLElement>('[data-tour-shell="picks"]')!;
+    expect(picks.querySelector('[data-overview-picks-hairline]')).toBeNull();
+    expect([...picks.children].every(c => (c as HTMLElement).style.borderTop === '')).toBe(true);
   });
 });
