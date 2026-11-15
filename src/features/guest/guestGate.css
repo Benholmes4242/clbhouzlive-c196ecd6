@@ -22,7 +22,7 @@
      programmatic focus for screen readers, never draw its outline. */
   outline: none;
   border-radius: 24px;
-  padding: 20px 18px 16px;
+  padding: 22px 20px 16px;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
 }
 
@@ -70,10 +70,12 @@
 }
 
 .guest-gate-head {
-  margin: 8px 0 0;
-  font-size: 23px;
-  font-weight: 700;
-  line-height: 1.2;
+  margin: 9px 0 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  text-wrap: balance;
   color: #f8fafc;
 }
 
@@ -87,43 +89,63 @@
 
 .guest-gate-body {
   margin: 8px 0 0;
-  font-size: 14px;
+  font-size: 14.5px;
   line-height: 1.45;
   color: rgba(248, 250, 252, 0.62);
 }
 
-.guest-gate-btn {
+/* In-app only: Apple and Google as a centred pair of round buttons. */
+.guest-gate-circles {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.guest-gate-circ {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0f0f12;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* "or" is text only — never a divider. */
+.guest-gate-or {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(248, 250, 252, 0.42);
+  margin: 12px 0;
+}
+
+.guest-gate-pill {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   width: 100%;
   height: 52px;
-  border-radius: 16px;
+  border-radius: 999px;
+  border: none;
+  background: #f8fafc;
+  color: #0a0a0c;
   font-size: 16px;
   font-weight: 700;
+  letter-spacing: -0.01em;
   cursor: pointer;
 }
 
-.guest-gate-btn + .guest-gate-btn {
-  margin-top: 10px;
+.guest-gate-pill:active {
+  opacity: 0.85;
 }
 
-.guest-gate-btn--apple {
-  margin-top: 8px;
-  background: #f3f5f7;
-  color: #0a0a0c;
-  border: none;
-}
-
-.guest-gate-btn--first {
-  margin-top: 8px;
-}
-
-.guest-gate-btn--ghost {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #f8fafc;
+/* On the web there are no round buttons and no "or"; the pill leads. */
+.guest-gate-pill--first {
+  margin-top: 20px;
 }
 
 .guest-gate-login {
@@ -134,10 +156,43 @@
   border: none;
   cursor: pointer;
   text-align: center;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 14px;
+  font-weight: 600;
   color: rgba(248, 250, 252, 0.62);
+}
+
+.guest-gate-login-caret {
+  color: rgba(248, 250, 252, 0.42);
+  margin-left: 5px;
+}
+
+/* 320-wide small phone (signed-off mock column 3): nothing may overflow. */
+@media (max-width: 340px) {
+  .guest-gate-head {
+    font-size: 22px;
+  }
+
+  .guest-gate-body {
+    font-size: 13.5px;
+  }
+
+  .guest-gate-circles {
+    margin-top: 16px;
+  }
+
+  .guest-gate-circ {
+    width: 50px;
+    height: 50px;
+  }
+
+  .guest-gate-or {
+    margin: 9px 0;
+  }
+
+  .guest-gate-pill {
+    height: 48px;
+    font-size: 15px;
+  }
 }
 
 .guest-gate-close {

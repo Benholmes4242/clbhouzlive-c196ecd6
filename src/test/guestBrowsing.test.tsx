@@ -124,6 +124,21 @@ describe('surface locks', () => {
 });
 
 describe('copy table', () => {
+  it('the Clubhouse headline joins to "The global platform for golf." with only the full stop amber', () => {
+    const copy = guestSurfaceCopy('clubhouse');
+    expect(copy.kicker).toBe('Join the community');
+    expect(copy.headline.map((p) => p.text).join('')).toBe('The global platform for golf.');
+    expect(copy.headline.filter((p) => p.amber).map((p) => p.text)).toEqual(['.']);
+    expect(copy.body).toBe('Used by the golfers who play it and the businesses behind it.');
+  });
+  it('other surfaces keep their current copy', () => {
+    expect(guestSurfaceCopy('explore').headline.map((p) => p.text).join('')).toBe(
+      'Real rounds, records and leaderboards from members.',
+    );
+    expect(guestSurfaceCopy('explore').body).toBe('Join free to see the boards and where your own rounds would rank.');
+    expect(guestSurfaceCopy('courses').headline.map((p) => p.text).join('')).toBe('23,000 courses, measured from real rounds.');
+    expect(guestSurfaceCopy('courses').body).toBe('Join free to see how each one plays and review the ones you know.');
+  });
   it('course copy uses the short name as kicker and live rounds in the headline', () => {
     expect(guestSurfaceCopy('clubhouse').kicker).toBe('Join the community');
     setGuestCourseContext({ courseId: 'c1', shortName: 'St Andrews', roundsTracked: 1234 });
@@ -173,9 +188,28 @@ describe('the join card', () => {
   it('shows Apple first, then Google, in the Median app', () => {
     mocks.inMedian = true;
     render(<GuestJoinCard copy={copy} closable onChoice={() => {}} onClose={() => {}} />);
-    const buttons = screen.getAllByRole('button').map((b) => b.textContent);
+    // The round buttons are icon-only; order is read from their aria-labels.
+    const buttons = screen.getAllByRole('button').map((b) => b.getAttribute('aria-label') ?? b.textContent);
     expect(buttons.indexOf('Continue with Apple')).toBeLessThan(buttons.indexOf('Continue with Google'));
     expect(buttons.indexOf('Continue with Google')).toBeLessThan(buttons.indexOf('Continue with email'));
+  });
+  it('in the app shows the round Apple and Google buttons, a text-only "or" and the email pill', () => {
+    mocks.inMedian = true;
+    render(<GuestJoinCard copy={copy} closable onChoice={() => {}} onClose={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Continue with Apple' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeTruthy();
+    expect(screen.getByText('or')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continue with email' })).toBeTruthy();
+  });
+  it('each button hands its choice to onChoice', () => {
+    mocks.inMedian = true;
+    const onChoice = vi.fn();
+    render(<GuestJoinCard copy={copy} closable onChoice={onChoice} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with Apple' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with email' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Already a member? Log in' }));
+    expect(onChoice.mock.calls.map((c) => c[0])).toEqual(['apple', 'google', 'email', 'login']);
   });
   it('keeps its rise/fade behind a reduced-motion guard', () => {
     const css = readFileSync('src/features/guest/guestGate.css', 'utf8');
@@ -236,7 +270,7 @@ describe('the gate host', () => {
   it('the login row goes to the normal /auth', () => {
     render(<Host />);
     act(() => openGuestCard({ kind: 'join_button', surface: 'clubhouse' }));
-    fireEvent.click(screen.getByRole('button', { name: 'ALREADY A MEMBER? LOG IN' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Already a member? Log in' }));
     expect(screen.getByTestId('path').textContent).toBe('/auth');
   });
 

@@ -15,7 +15,7 @@
  */
 import React, { useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { Mail, X } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import { GUEST_RAISED_Z, useGuestCourseSheetOpen } from './guestGateStore';
 import { getPrimaryScrollElement } from '@/lib/getScrollParent';
@@ -99,34 +99,39 @@ export const GuestJoinCard: React.FC<GuestJoinCardProps> = ({ copy, closable, on
         </h2>
         <p className="guest-gate-body">{copy.body}</p>
         {inMedian && (
-          <button
-            type="button"
-            className="guest-gate-btn guest-gate-btn--apple"
-            onClick={() => onChoice('apple')}
-          >
-            <AppleLogo size={17} color="#0A0A0C" />
-            <span>{GUEST_CARD_CHROME_COPY.apple}</span>
-          </button>
+          <div className="guest-gate-circles">
+            <button
+              type="button"
+              className="guest-gate-circ"
+              aria-label={GUEST_CARD_CHROME_COPY.apple}
+              onClick={() => onChoice('apple')}
+            >
+              <AppleLogo size={22} color="#F8FAFC" />
+            </button>
+            <button
+              type="button"
+              className="guest-gate-circ"
+              aria-label={GUEST_CARD_CHROME_COPY.google}
+              onClick={() => onChoice('google')}
+            >
+              <GoogleLogo size={21} />
+            </button>
+          </div>
         )}
-        {inMedian && (
-          <button
-            type="button"
-            className={`guest-gate-btn guest-gate-btn--ghost${inMedian ? '' : ' guest-gate-btn--first'}`}
-            onClick={() => onChoice('google')}
-          >
-            <GoogleLogo size={18} />
-            <span>{GUEST_CARD_CHROME_COPY.google}</span>
-          </button>
-        )}
+        {inMedian && <div className="guest-gate-or">or</div>}
         <button
           type="button"
-          className={`guest-gate-btn guest-gate-btn--ghost${inMedian ? '' : ' guest-gate-btn--first'}`}
+          className={`guest-gate-pill${inMedian ? '' : ' guest-gate-pill--first'}`}
           onClick={() => onChoice('email')}
         >
+          <Mail size={18} strokeWidth={2} aria-hidden="true" />
           <span>{GUEST_CARD_CHROME_COPY.email}</span>
         </button>
         <button type="button" className="guest-gate-login" onClick={() => onChoice('login')}>
           {GUEST_CARD_CHROME_COPY.login}
+          <span className="guest-gate-login-caret" aria-hidden="true">
+            ›
+          </span>
         </button>
       </div>
     </>,

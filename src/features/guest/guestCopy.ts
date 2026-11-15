@@ -27,7 +27,7 @@ export const GUEST_CARD_CHROME_COPY = {
   apple: 'Continue with Apple',
   google: 'Continue with Google',
   email: 'Continue with email',
-  login: 'ALREADY A MEMBER? LOG IN',
+  login: 'Already a member? Log in',
   close: 'Close',
 } as const;
 
@@ -38,11 +38,8 @@ export function guestSurfaceCopy(surface: GuestSurfaceKey): GuestCardCopy {
   if (surface === 'clubhouse') {
     return {
       kicker: 'Join the community',
-      headline: [
-        { text: '23,000 courses', amber: true },
-        { text: ' and the golfers who play them.' },
-      ],
-      body: 'Join free to keep scrolling, review the courses you’ve played and see how your game stacks up.',
+      headline: [{ text: 'The global platform for golf' }, { text: '.', amber: true }],
+      body: 'Used by the golfers who play it and the businesses behind it.',
     };
   }
   if (surface === 'explore') {
