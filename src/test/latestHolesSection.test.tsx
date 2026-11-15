@@ -120,8 +120,11 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     mountRail(); expect(screen.getByText("Through members' eyes")).toBeInTheDocument(); expect(screen.getByText('Latest holes')).toBeInTheDocument();
   });
   it('a tap opens the canonical viewer readOnly on the tapped shot across the whole rail', () => {
-    mountRail(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' }));
-    expect(f.holeRpc).not.toHaveBeenCalled();
+    mountRail();
+    // The ranks read for the pills happens on mount; the tap itself must add none.
+    const before = f.holeRpc.mock.calls.length;
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' }));
+    expect(f.holeRpc.mock.calls.length).toBe(before);
     expect(f.open).toHaveBeenCalledTimes(1);
     const args = f.open.mock.calls[0][0] as { posts: Array<{ id: string; displayName: string; courseName?: string; mediaItems: Array<{ id: string }> }>; index: number; mediaId: string | null; openedFrom: string; options?: { readOnly?: boolean } };
     expect(args.posts).toHaveLength(3);
@@ -142,9 +145,11 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   it('a tap opens immediately with no network wait', () => {
     f.holeRpc.mockReturnValue(new Promise(() => {}));
     mountRail(); const card = screen.getByRole('button', { name: 'Hole 4, Course second' });
+    // The pill read is already in flight from mount; the tap must start none.
+    const before = f.holeRpc.mock.calls.length;
     fireEvent.click(card);
     expect(f.open).toHaveBeenCalledTimes(1);
-    expect(f.holeRpc).not.toHaveBeenCalled();
+    expect(f.holeRpc.mock.calls.length).toBe(before);
     fireEvent.click(card);
     expect(f.open).toHaveBeenCalledTimes(2);
   });

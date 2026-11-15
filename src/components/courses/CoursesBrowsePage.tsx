@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { HardestSection } from './browse/HardestSection';
 import { LatestCoursesSection } from './browse/LatestCoursesSection';
 import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
 import { useBrowseReviews } from './useBrowseReviews';
+import { useReviewAuthorRounds } from './useReviewAuthorRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import StatBrowse from './StatBrowse';
@@ -60,6 +61,9 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
     : [];
   // The reviews rail is app-wide: no country, no region.
   const { pool: reviewPool, isLoading: reviewsLoading, isPending: reviewsPending } = useBrowseReviews(null, null);
+  // The reviewer's own rounds behind each review (BRIEF_COURSES_MEMBERS_SECTIONS §2).
+  const reviewIds = useMemo(() => reviewPool.map(review => review.reviewId), [reviewPool]);
+  const authorRounds = useReviewAuthorRounds(reviewIds, user?.id ?? null);
   const openReviewSheet = useReviewSheetStore((st) => st.open);
   const handleReviewTile = useCallback(
     (r: LatestReview) => {
@@ -90,7 +94,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         </div>
       }>
       <div style={BLEED}>
-        <GateReport id="latestReviews" ready={!sessionLoading && settled({ status: reviewsPending ? 'pending' : 'success' })} />
+        <GateReport id="latestReviews" ready={!sessionLoading && settled({ status: reviewsPending ? 'pending' : 'success' }) && authorRounds.settled} />
         <GateReport id="figures" ready={!sessionLoading && settled(truthQuery)} />
         <WhoPlayingSection />
         <ByRegionSection />
@@ -98,7 +102,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <MostPlayedSection />
         <HardestSection />
         <LatestHolesSection />
-        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} />
+        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} authorRounds={authorRounds.map} viewerId={user?.id ?? null} />
         <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
           <SectionHead tone="quiet" kicker="Every course we hold" />
           {cells.length > 0 ? (

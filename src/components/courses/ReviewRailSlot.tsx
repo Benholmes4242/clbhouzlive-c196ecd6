@@ -17,7 +17,8 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
 
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
-import { A, LABEL, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL, TOPAR_RED, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { bestLabel, roundsLabel, toParFigure, type ReviewAuthorRound } from './reviewAuthorRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -69,9 +70,46 @@ function Reviewer({ r }: { r: LatestReview }) {
 interface Props {
   reviews: LatestReview[];
   onReviewPress: (r: LatestReview) => void;
+  /** BRIEF_COURSES_MEMBERS_SECTIONS §2 — the reviewer's own rounds, keyed by
+   * review id. Only the Courses browse passes it, so every other render of the
+   * rail is unchanged. */
+  authorRounds?: Map<string, ReviewAuthorRound>;
+  /** The viewer: their own review names the best score as theirs. */
+  viewerId?: string | null;
 }
 
-export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
+/* The played strip (mock .played): a value line above a label line, no
+   dividers, tabular figures. */
+const PLAYED: React.CSSProperties = { marginTop: 10, display: 'flex', gap: 16 };
+const PLAYED_VALUE: React.CSSProperties = { ...FIGS, display: 'block', fontSize: 16, fontWeight: 700, lineHeight: 1, color: INK };
+const PLAYED_LABEL: React.CSSProperties = { display: 'block', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: INK_FAINT };
+const PLAYED_TO_PAR: React.CSSProperties = { fontStyle: 'normal', fontSize: 11, marginLeft: 2, color: INK_MUTE };
+
+function PlayedStrip({ author, mine }: { author: ReviewAuthorRound; mine: boolean }) {
+  return (
+    <div data-review-played style={PLAYED}>
+      <div data-played-figure="rounds">
+        <span style={PLAYED_VALUE}>{author.rounds_here}</span>
+        <span style={PLAYED_LABEL}>{roundsLabel(author.rounds_here)}</span>
+      </div>
+      {author.best_gross != null && (
+        <div data-played-figure="best">
+          <span style={PLAYED_VALUE}>
+            {author.best_gross}
+            {author.best_to_par != null && (
+              <em data-played-to-par style={{ ...PLAYED_TO_PAR, color: author.best_to_par < 0 ? TOPAR_RED : INK_MUTE }}>
+                {toParFigure(author.best_to_par)}
+              </em>
+            )}
+          </span>
+          <span style={PLAYED_LABEL}>{bestLabel(mine)}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, authorRounds, viewerId }) => {
   const { t } = useTranslation('courses');
   if (reviews.length === 0) return null;
 
@@ -86,7 +124,10 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
           scrollbarWidth: 'none',
         }}
       >
-        {reviews.map((r) => (
+        {reviews.map((r) => {
+          const author = authorRounds?.get(r.reviewId);
+          const mine = !!viewerId && !!r.userId && r.userId === viewerId;
+          return (
           // CB69 — non-button tile so the course name can be a real button.
           <div
             key={r.reviewId}
@@ -160,8 +201,11 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
             <div style={{ marginTop: REVIEW_FOOT.marginTop }}>
               <Reviewer r={r} />
             </div>
+
+            {author && <PlayedStrip author={author} mine={mine} />}
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

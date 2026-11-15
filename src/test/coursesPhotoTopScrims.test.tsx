@@ -2,6 +2,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { readFileSync } from 'node:fs';
 import { SCRIM_STANDOUT, SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
 import type { StatBrowseRow } from '@/components/courses/useStatBrowse';
@@ -25,7 +26,11 @@ import { LatestCoursesSection } from '@/components/courses/browse/LatestCoursesS
 import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
 
 const source = (name: string) => readFileSync(`src/components/courses/browse/${name}.tsx`, 'utf8');
-const mount = (node: React.ReactNode) => render(<MemoryRouter>{node}</MemoryRouter>);
+// The holes rail reads course ranks, so every mount needs a query client.
+const mount = (node: React.ReactNode) => {
+  const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<MemoryRouter><QueryClientProvider client={cache}>{node}</QueryClientProvider></MemoryRouter>);
+};
 
 // jsdom 20 discards gradients. Preserve assigned background values locally so
 // the authorised inline-gradient selector inspects React's actual assignments.

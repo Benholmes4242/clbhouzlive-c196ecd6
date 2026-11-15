@@ -1,6 +1,7 @@
 import React from 'react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ ready: {} as Record<string, boolean>, user: null as { id: string } | null }));
 const section = vi.hoisted(() => async (id: string) => { const { useSectionReady } = await import('@/components/courses/browse/PageLoadGate'); return () => { useSectionReady(id, f.ready[id] === true); return <div data-testid={id} />; }; });
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: f.user, loading: false }) }));
@@ -18,7 +19,9 @@ vi.mock('@/components/courses/browse/HardestSection', async () => ({ HardestSect
 vi.mock('@/components/courses/browse/LatestHolesSection', async () => ({ LatestHolesSection: await section('latestHoles') }));
 vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestReviewsSection: () => null }));
 import CoursesBrowsePage from '@/components/courses/CoursesBrowsePage';
-const tree = () => <CoursesBrowsePage onOpenDirectory={() => {}} />;
+// The page's own reads (the reviews pool's author rounds) need a query client.
+const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+const tree = () => <QueryClientProvider client={cache}><CoursesBrowsePage onOpenDirectory={() => {}} /></QueryClientProvider>;
 beforeEach(() => { f.ready = {}; f.user = null; });
 afterEach(cleanup);
 it('holds the list and all sections together until the list is ready, preserving the list outside section bleed', () => {

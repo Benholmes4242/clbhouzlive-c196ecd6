@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 /* Every browse section is stubbed to a ready reporter wired to the real
    PageLoadGate context, so the gate reveals exactly when the remaining
@@ -36,7 +37,11 @@ vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestRevie
 import CoursesBrowsePage from '@/components/courses/CoursesBrowsePage';
 import { ALL_COURSES_ANCHOR } from '@/components/courses/browse/ByRegionSection';
 
-const mount = () => render(<CoursesBrowsePage onOpenDirectory={() => {}} />);
+// The page's own reads (the reviews pool's author rounds) need a query client.
+const mount = () => {
+  const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<QueryClientProvider client={cache}><CoursesBrowsePage onOpenDirectory={() => {}} /></QueryClientProvider>);
+};
 
 afterEach(cleanup);
 
