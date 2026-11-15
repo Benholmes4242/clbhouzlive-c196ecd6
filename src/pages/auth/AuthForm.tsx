@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,8 +19,6 @@ import {
 } from '@/lib/authAnalytics';
 
 import AuthHeroScreen from './components/AuthHeroScreen';
-import AuthBottomSheet from './components/AuthBottomSheet';
-import OtpSheetContent from './components/OtpSheetContent';
 import {
   clearGuestConversion,
   peekGuestConversion,
@@ -119,7 +116,6 @@ const NOOP_RELEASE = () => {};
 
 const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
   const claim = useCallback(() => (claimNavigation ? claimNavigation() : NOOP_RELEASE), [claimNavigation]);
-  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -752,45 +748,28 @@ const AuthForm: React.FC<AuthFormProps> = ({ claimNavigation }) => {
     else if (guestStart === 'google') handleGoogleSignIn();
   }, [guestStart, handleAppleSignIn, handleGoogleSignIn]);
 
-  const isSheetOpen = step === 'otp';
-
+  // The code step is a panel state of the hero screen, not a sheet: the hero
+  // stays mounted and interactive throughout, and back/Change return to the
+  // email step with the address still in the box.
   return (
-    <>
-      <div
-        {...(isSheetOpen ? { inert: '' } : {})}
-        style={isSheetOpen ? { pointerEvents: 'none' as const } : undefined}
-      >
-        <AuthHeroScreen
-          submittingMethod={step === 'hero' ? submittingMethod : null}
-          onSubmitEmail={handleSubmitEmail}
-          onAppleSignIn={handleAppleSignIn}
-          onGoogleSignIn={handleGoogleSignIn}
-          errorMessage={step === 'hero' ? otpError : null}
-          errorNonce={otpErrorNonce}
-        />
-
-      </div>
-
-      <AuthBottomSheet
-        isOpen={isSheetOpen}
-        onClose={handleUseDifferentEmail}
-        title={t('otp.checkEmailTitle')}
-        subtitle={undefined}
-      >
-        <OtpSheetContent
-          email={email}
-          submitting={submittingMethod === 'email' && step === 'otp'}
-          errorMessage={otpError}
-          infoMessage={otpInfo}
-          errorNonce={otpErrorNonce}
-          resendCooldown={resendCooldown}
-          onVerify={handleVerify}
-          onResend={handleResend}
-          onUseDifferentEmail={handleUseDifferentEmail}
-          onCodeEdit={() => setOtpInfo(null)}
-        />
-      </AuthBottomSheet>
-    </>
+    <AuthHeroScreen
+      submittingMethod={submittingMethod}
+      onSubmitEmail={handleSubmitEmail}
+      onAppleSignIn={handleAppleSignIn}
+      onGoogleSignIn={handleGoogleSignIn}
+      errorMessage={step === 'hero' ? otpError : null}
+      errorNonce={otpErrorNonce}
+      otpActive={step === 'otp'}
+      otpEmail={email}
+      otpError={otpError}
+      otpInfo={otpInfo}
+      otpErrorNonce={otpErrorNonce}
+      resendCooldown={resendCooldown}
+      onVerifyOtp={handleVerify}
+      onResendOtp={handleResend}
+      onUseDifferentEmail={handleUseDifferentEmail}
+      onCodeEdit={() => setOtpInfo(null)}
+    />
   );
 };
 

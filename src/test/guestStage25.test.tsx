@@ -3,7 +3,6 @@
  * can turn the user into a member, so exactly one redirect fires.
  * Real Auth page, real AuthForm; react-i18next mock copied in full.
  */
-import type { ReactNode } from 'react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -54,9 +53,9 @@ vi.mock('@/integrations/supabase/client', () => ({
 vi.mock('@/lib/auth/postAuthRoute', () => ({ resolvePostAuthRoute: g.route }));
 vi.mock('@/lib/toast', () => ({ toast: { error: g.toastError } }));
 vi.mock('@/lib/authAnalytics', () => ({ trackAuthMethodSelected: vi.fn(), trackAuthInitiated: vi.fn(), trackAuthFailed: vi.fn(), trackAuthException: vi.fn(), trackLoginSuccess: vi.fn(), trackSignupInitiated: vi.fn(), trackSignupSuccess: vi.fn(), trackSignupFailed: vi.fn(), trackAuthComplete: vi.fn(), buildAuthErrorExtras: vi.fn(() => ({})) }));
+// AuthBottomSheet was deleted (the code step is now a hero panel state); this
+// suite only exercises Apple/Google, so no OTP stand-in is needed.
 vi.mock('@/pages/auth/components/AuthHeroScreen', () => ({ default: ({ onAppleSignIn, onGoogleSignIn }: { onAppleSignIn: () => void; onGoogleSignIn: () => void }) => <><button onClick={onAppleSignIn}>Apple</button><button onClick={onGoogleSignIn}>Google</button></> }));
-vi.mock('@/pages/auth/components/AuthBottomSheet', () => ({ default: ({ isOpen, children }: { isOpen: boolean; children: ReactNode }) => isOpen ? <section>{children}</section> : null }));
-vi.mock('@/pages/auth/components/OtpSheetContent', () => ({ default: () => null }));
 
 import Auth from '@/pages/Auth';
 

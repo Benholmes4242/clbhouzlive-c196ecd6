@@ -55,35 +55,31 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }),
 }));
 
+// The code step moved into AuthHeroScreen (AuthBottomSheet deleted), so the
+// hero mock renders the OTP block itself when AuthForm's step is 'otp'.
 vi.mock('@/pages/auth/components/AuthHeroScreen', () => ({
   default: (p: {
     errorMessage?: string | null;
     onSubmitEmail: (e: string) => void;
     onGoogleSignIn: () => void;
+    otpActive?: boolean;
+    otpInfo?: string | null;
+    resendCooldown?: number;
+    onVerifyOtp?: (code: string) => void;
   }) => (
     <div data-testid="hero">
       {p.errorMessage ? <div data-testid="hero-error">{p.errorMessage}</div> : null}
       <button data-testid="email-submit" onClick={() => p.onSubmitEmail('golfer@example.com')} />
       <button data-testid="google" onClick={p.onGoogleSignIn} />
-    </div>
-  ),
-}));
-
-vi.mock('@/pages/auth/components/AuthBottomSheet', () => ({
-  default: (p: { isOpen: boolean; children?: unknown }) =>
-    p.isOpen ? <div data-testid="sheet">{p.children as never}</div> : null,
-}));
-
-vi.mock('@/pages/auth/components/OtpSheetContent', () => ({
-  default: (p: {
-    infoMessage?: string | null;
-    resendCooldown: number;
-    onVerify: (code: string) => void;
-  }) => (
-    <div data-testid="otp">
-      {p.infoMessage ? <div data-testid="otp-info">{p.infoMessage}</div> : null}
-      <div data-testid="cooldown">{p.resendCooldown}</div>
-      <button data-testid="verify" onClick={() => p.onVerify('123456')} />
+      {p.otpActive ? (
+        <div data-testid="sheet">
+          <div data-testid="otp">
+            {p.otpInfo ? <div data-testid="otp-info">{p.otpInfo}</div> : null}
+            <div data-testid="cooldown">{p.resendCooldown}</div>
+            <button data-testid="verify" onClick={() => p.onVerifyOtp?.('123456')} />
+          </div>
+        </div>
+      ) : null}
     </div>
   ),
 }));

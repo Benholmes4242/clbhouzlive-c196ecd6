@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -11,9 +10,9 @@ vi.mock('@/lib/auth/postAuthRoute', () => ({ resolvePostAuthRoute: f.route }));
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn() } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/lib/authAnalytics', () => ({ trackAuthMethodSelected: vi.fn(), trackAuthInitiated: vi.fn(), trackAuthFailed: vi.fn(), trackAuthException: vi.fn(), trackLoginSuccess: f.login, trackSignupInitiated: vi.fn(), trackSignupSuccess: f.signup, trackSignupFailed: vi.fn(), trackAuthComplete: f.complete }));
-vi.mock('@/pages/auth/components/AuthHeroScreen', () => ({ default: ({ onSubmitEmail, onAppleSignIn, onGoogleSignIn }: { onSubmitEmail: (email: string) => void; onAppleSignIn: () => void; onGoogleSignIn: () => void }) => <><button onClick={() => onSubmitEmail('member@example.test')}>Email</button><button onClick={onAppleSignIn}>Apple</button><button onClick={onGoogleSignIn}>Google</button></> }));
-vi.mock('@/pages/auth/components/AuthBottomSheet', () => ({ default: ({ isOpen, children }: { isOpen: boolean; children: ReactNode }) => isOpen ? <section>{children}</section> : null }));
-vi.mock('@/pages/auth/components/OtpSheetContent', () => ({ default: ({ onVerify }: { onVerify: (token: string) => void }) => <button onClick={() => onVerify('123456')}>Verify</button> }));
+// The code step moved into AuthHeroScreen (AuthBottomSheet deleted), so the
+// hero mock renders the Verify control itself when AuthForm's step is 'otp'.
+vi.mock('@/pages/auth/components/AuthHeroScreen', () => ({ default: ({ onSubmitEmail, onAppleSignIn, onGoogleSignIn, otpActive, onVerifyOtp }: { onSubmitEmail: (email: string) => void; onAppleSignIn: () => void; onGoogleSignIn: () => void; otpActive?: boolean; onVerifyOtp?: (token: string) => void }) => <><button onClick={() => onSubmitEmail('member@example.test')}>Email</button><button onClick={onAppleSignIn}>Apple</button><button onClick={onGoogleSignIn}>Google</button>{otpActive ? <button onClick={() => onVerifyOtp?.('123456')}>Verify</button> : null}</> }));
 import AuthForm from '@/pages/auth/AuthForm';
 
 beforeEach(() => {

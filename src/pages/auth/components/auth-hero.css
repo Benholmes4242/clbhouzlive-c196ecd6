@@ -28,6 +28,17 @@
 .auth-hero-input:focus { border-color: var(--auth-input-focus); }
 .auth-hero-input::placeholder { color: var(--auth-disabled-ink); }
 .auth-hero-error { font-size: 14px; color: var(--auth-error); margin: 0 0 12px; }
+/* Code step: boxes shaped like the email box, white sentence-case Verify. */
+.auth-hero-otp-email { color: var(--auth-ink); font-weight: 600; }
+.auth-hero-screen .auth-hero-otp-change { margin-left: 8px; background: none; border: none; padding: 0; color: var(--auth-ink); font-weight: 700; font-size: inherit; line-height: inherit; cursor: pointer; }
+.auth-hero-otp-boxes { display: flex; gap: 8px; margin-bottom: 12px; }
+.auth-hero-otp-box { flex: 1 1 0; min-width: 0; height: 54px; border-radius: 14px; background: var(--auth-input-ground); border: 1px solid var(--auth-input-border); padding: 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--auth-ink); text-align: center; outline: none; caret-color: #FFFFFF; }
+.auth-hero-otp-box:focus { border-color: var(--auth-input-focus); }
+.auth-hero-otp-info { font-size: 14px; color: var(--auth-ink); margin: 0 0 12px; }
+.auth-hero-otp-foot { margin-top: 14px; text-align: center; font-size: 13px; line-height: 1.5; color: var(--auth-dim); }
+.auth-hero-otp-foot > span { display: block; }
+.auth-hero-screen .auth-hero-otp-resend { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.auth-hero-otp-resend b { color: var(--auth-ink); font-weight: 600; }
 @keyframes auth-logo-in { 0% { opacity: 0; transform: scale(.85) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 @keyframes auth-tagline-in { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
 @keyframes auth-button-in { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -56,6 +67,8 @@
   .auth-hero-panel h2 { font-size: 21px; }
   .auth-hero-hint { font-size: 13px; margin-bottom: 12px; }
   .auth-hero-input { height: 50px; font-size: 15px; }
+  .auth-hero-otp-box { height: 50px; font-size: 20px; }
+  .auth-hero-otp-foot { font-size: 12px; margin-top: 12px; }
 }
 @media (max-height: 640px) { .auth-hero-screen.is-keyboard-open .auth-hero-brand h1 { margin-top: 0; } }
 @media (prefers-reduced-motion: reduce) {

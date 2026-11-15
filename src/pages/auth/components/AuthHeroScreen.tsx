@@ -11,12 +11,14 @@ import { Button } from '@/components/ui/button';
 import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
 import { isGuestUser } from '@/features/guest/useIsGuest';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import OtpSheetContent from './OtpSheetContent';
 import './auth-hero.css';
 
 // Keyboard mode pins the fixed screen to visualViewport while an input has focus;
 // closing it guardedly resets only the window offset iOS moved (#root untouched).
-// Choose/email state lives here; OTP remains AuthForm-owned. Guest return uses
-// the canonical switch/session definition and never creates a guest session.
+// Choose/email state lives here; OTP remains AuthForm-owned and renders as the
+// 'code' panel state in place of choose/email. Guest return uses the canonical
+// switch/session definition and never creates a guest session.
 
 interface AuthHeroScreenProps {
   submittingMethod: 'email' | 'apple' | 'google' | null;
@@ -25,6 +27,17 @@ interface AuthHeroScreenProps {
   onGoogleSignIn?: () => void;
   errorMessage?: string | null;
   errorNonce?: number;
+  /** AuthForm's step is 'otp': show the code panel instead of choose/email. */
+  otpActive?: boolean;
+  otpEmail?: string;
+  otpError?: string | null;
+  otpInfo?: string | null;
+  otpErrorNonce?: number;
+  resendCooldown?: number;
+  onVerifyOtp?: (code: string) => Promise<void> | void;
+  onResendOtp?: () => Promise<void> | void;
+  onUseDifferentEmail?: () => void;
+  onCodeEdit?: () => void;
 }
 
 // Exported for the guest join card (brief: the Apple logo AuthHeroScreen uses).
@@ -65,6 +78,16 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   onGoogleSignIn,
   errorMessage,
   errorNonce,
+  otpActive = false,
+  otpEmail = '',
+  otpError = null,
+  otpInfo = null,
+  otpErrorNonce = 0,
+  resendCooldown = 0,
+  onVerifyOtp,
+  onResendOtp,
+  onUseDifferentEmail,
+  onCodeEdit,
 }) => {
   const submitting = submittingMethod !== null;
   const emailSubmitting = submittingMethod === 'email';
@@ -196,6 +219,17 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
     navigate(from || '/');
   };
 
+  // Back/Change from the code step returns to the email step with the address
+  // still in the box; a restored pending code prefills it without resetting
+  // anything the member typed.
+  const handleLeaveCode = () => {
+    if (!loginEmail.trim() && otpEmail) setLoginEmail(otpEmail);
+    setStep('email');
+    onUseDifferentEmail?.();
+  };
+
+  const panelStep = otpActive ? 'code' : step;
+
   return (
     <div ref={screenRef} className={`auth-hero-screen${keyboardOpen ? ' is-keyboard-open' : ''}${keyboardTight ? ' is-keyboard-tight' : ''}`}>
       <div className="auth-hero-brand">
@@ -203,8 +237,27 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <h1 className="auth-tagline-animate">{t('auth:hero.tagline')}<span className="auth-hero-dot" aria-hidden="true" /></h1>
       </div>
       <div className="auth-button-6">
-        <div key={step} className={`auth-hero-panel auth-step-enter ${step === 'email' || !showBrowse ? 'auth-hero-panel-bottom' : ''}`}>
-          {step === 'choose' ? <>
+        <div key={panelStep} className={`auth-hero-panel auth-step-enter ${panelStep !== 'choose' || !showBrowse ? 'auth-hero-panel-bottom' : ''}`}>
+          {panelStep === 'code' ? <>
+            <Button variant="ghost" type="button" className="auth-hero-back" aria-label={t('common:back')} onClick={handleLeaveCode} disabled={submitting}><span aria-hidden="true">‹</span></Button>
+            <h2>{t('auth:otp.checkEmailTitle')}</h2>
+            <p className="auth-hero-hint">
+              {t('auth:otp.sentTo')} <b className="auth-hero-otp-email">{otpEmail}</b>
+              <button type="button" className="auth-hero-otp-change" onClick={handleLeaveCode} disabled={submitting}>{t('auth:otp.changeEmail')}</button>
+            </p>
+            <OtpSheetContent
+              email={otpEmail}
+              submitting={emailSubmitting}
+              errorMessage={otpError}
+              infoMessage={otpInfo}
+              errorNonce={otpErrorNonce}
+              resendCooldown={resendCooldown}
+              onVerify={onVerifyOtp ?? (() => {})}
+              onResend={onResendOtp ?? (() => {})}
+              onUseDifferentEmail={handleLeaveCode}
+              onCodeEdit={onCodeEdit}
+            />
+          </> : panelStep === 'choose' ? <>
             {showSocial && <>
               <div className="auth-hero-social">
                 {showApple && <Button variant="ghost" type="button" onClick={onAppleSignIn} disabled={submitting} aria-label={t('auth:hero.continueWithApple')} className="auth-hero-circle">
@@ -236,7 +289,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             </Button>
           </>}
         </div>
-        {step === 'choose' && showBrowse && <Button variant="ghost" type="button" className="auth-hero-band" onClick={browse} disabled={submitting}>{t('auth:hero.lookAround')}<span aria-hidden="true">›</span></Button>}
+        {panelStep === 'choose' && showBrowse && <Button variant="ghost" type="button" className="auth-hero-band" onClick={browse} disabled={submitting}>{t('auth:hero.lookAround')}<span aria-hidden="true">›</span></Button>}
       </div>
     </div>
   );

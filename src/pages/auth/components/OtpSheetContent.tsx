@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LABEL, BODY, FIGURE } from '@/lib/tokens/type';
 
 interface OtpSheetContentProps {
   email: string;
@@ -21,14 +20,12 @@ interface OtpSheetContentProps {
 const BOX_COUNT = 6;
 
 const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
-  email,
   submitting,
   errorMessage,
   infoMessage,
   resendCooldown,
   onVerify,
   onResend,
-  onUseDifferentEmail,
   errorNonce = 0,
   onCodeEdit,
 }) => {
@@ -149,7 +146,6 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
   const code = digits.join('');
   const canSubmit = code.length === BOX_COUNT && !submitting;
-  const verifyActiveLook = canSubmit || submitting;
 
   const handleManualSubmit = () => {
     if (!canSubmit) return;
@@ -157,27 +153,13 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
     onVerify(code);
   };
 
+  // Markup only: the six-box logic (paste, auto-submit, backspace, arrows,
+  // one-time-code autocomplete, clear/refocus on error) is unchanged. The
+  // sent-to sentence with Change lives in AuthHeroScreen's code panel.
   return (
-    <div className="space-y-4">
-      {/* Sent-to */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <p style={{ ...LABEL, fontSize: 10, color: 'rgba(255,255,255,0.60)', margin: 0 }}>
-          {t('otp.sentTo')}
-        </p>
-        <p style={{ ...BODY, fontSize: 14, margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 600 }}>{email}</span>
-          <button
-            type="button"
-            onClick={onUseDifferentEmail}
-            style={{ ...BODY, fontSize: 14, fontWeight: 600, color: '#FFFFFF', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-          >
-            {t('otp.changeEmail')}
-          </button>
-        </p>
-      </div>
-
+    <>
       {/* Code boxes */}
-      <div className="flex items-center justify-center gap-2.5">
+      <div className="auth-hero-otp-boxes">
         {digits.map((d, i) => (
           <input
             key={i}
@@ -188,90 +170,55 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             onPaste={(e) => handlePaste(i, e)}
             inputMode="numeric"
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
-
             disabled={submitting}
             aria-label={t('otp.digitLabel', { index: i + 1 })}
-            className="text-center focus:outline-none transition-colors"
-            style={{
-              flex: '1 1 0',
-              maxWidth: 52,
-              height: 56,
-              borderRadius: 14,
-              background: 'rgba(255,255,255,0.06)',
-              border: `1px solid ${d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)'}`,
-              transition: 'background 140ms ease, border-color 140ms ease',
-              color: 'rgba(255,255,255,0.96)',
-              ...FIGURE,
-              fontSize: 21,
-              fontWeight: 600,
-              caretColor: '#FFFFFF',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)';
-              e.currentTarget.style.background = 'rgba(255,255,255,0.10)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)';
-              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-            }}
+            className="auth-hero-otp-box"
           />
         ))}
       </div>
 
       {/* Error / Info */}
       {errorMessage && (
-        <p className="text-center" style={{ ...BODY, fontSize: 14, color: '#F87171' }}>
+        <p role="alert" key={errorNonce} className="auth-hero-error auth-error-fade">
           {errorMessage}
         </p>
       )}
       {infoMessage && !errorMessage && (
-        <p className="text-center" style={{ ...BODY, fontSize: 14, color: 'rgba(255,255,255,0.96)' }}>
+        <p className="auth-hero-otp-info">
           {infoMessage}
         </p>
       )}
 
-      {/* Verify CTA */}
+      {/* Verify CTA: the shared white pill, dark until all six digits are in. */}
       <button
         type="button"
         onClick={handleManualSubmit}
         disabled={!canSubmit}
         aria-label={t('otp.verifyAria')}
-        className="w-full h-[54px] flex items-center justify-center gap-2 rounded-sq-sm font-bold uppercase tracking-[0.10em] text-[13px] transition-all duration-150 active:scale-[0.98]"
-        style={{
-          background: verifyActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.06)',
-          boxShadow: verifyActiveLook ? '0 6px 20px rgba(255,255,255,0.18)' : 'none',
-          color: verifyActiveLook ? '#0A0D12' : 'rgba(255,255,255,0.38)',
-          border: verifyActiveLook ? 'none' : '1px solid rgba(255,255,255,0.10)',
-          cursor: canSubmit ? 'pointer' : 'not-allowed',
-        }}
+        className="auth-hero-pill auth-hero-send"
       >
         {submitting ? <Loader2 size={18} className="animate-spin" /> : t('otp.verify')}
       </button>
 
-      {/* Resend */}
-      <div className="text-center">
-        <button
-          type="button"
-          onClick={onResend}
-          disabled={resendCooldown > 0 || submitting}
-          style={{
-            ...BODY,
-            fontSize: 14,
-            color: resendCooldown > 0 ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.55)',
-            cursor: resendCooldown > 0 ? 'default' : 'pointer',
-          }}
-        >
+      {/* Foot: resend line, then where else to look (codes land in Junk). */}
+      <div className="auth-hero-otp-foot">
+        <span>
           {resendCooldown > 0
             ? t('otp.resendCountdown', { seconds: resendCooldown })
-            : <>{t('otp.resendPromptPrefix')}<span style={{ color: '#FFFFFF', fontWeight: 600 }}>{t('otp.resendPromptCta')}</span></>}
-        </button>
+            : (
+              <button
+                type="button"
+                className="auth-hero-otp-resend"
+                onClick={onResend}
+                disabled={submitting}
+              >
+                {t('otp.resendPromptPrefix')}<b>{t('otp.resendPromptCta')}</b>
+              </button>
+            )}
+        </span>
+        <span>{t('otp.junkHint')}</span>
       </div>
-
-      {/* Some members' codes land in Junk (seen on Hotmail) — always say where else to look. */}
-      <p className="text-center" style={{ ...BODY, fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 8 }}>
-        {t('otp.junkHint')}
-      </p>
-    </div>
+    </>
   );
 };
 
