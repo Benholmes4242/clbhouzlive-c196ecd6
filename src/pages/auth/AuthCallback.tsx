@@ -34,12 +34,17 @@ export default function AuthCallback() {
     if (!isInMedianApp) return;
 
     let timer: ReturnType<typeof setTimeout> | undefined;
+    // Set on unmount: every await below returns early so no navigate or state
+    // update reaches an unmounted page.
+    let cancelled = false;
 
     const run = async () => {
       try {
         await new Promise(r => setTimeout(r, 150));
+        if (cancelled) return;
 
         const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled) return;
 
         if (!session) {
           setFailed(true);
@@ -60,12 +65,14 @@ export default function AuthCallback() {
         setMessage(t('callback.settingUpProfile'));
 
         await new Promise(r => setTimeout(r, 700));
+        if (cancelled) return;
 
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('id, has_completed_onboarding')
           .eq('id', session.user.id)
           .maybeSingle();
+        if (cancelled) return;
 
         if (!profile || !profile.has_completed_onboarding) {
           navigate('/welcome', { replace: true });
@@ -74,6 +81,7 @@ export default function AuthCallback() {
         }
 
       } catch (err) {
+        if (cancelled) return;
         console.error('[AuthCallback]', err);
         setFailed(true);
         setMessage(t('callback.somethingWentWrong'));
@@ -82,18 +90,20 @@ export default function AuthCallback() {
     };
 
     run();
-    return () => { if (timer !== undefined) clearTimeout(timer); };
+    return () => { cancelled = true; if (timer !== undefined) clearTimeout(timer); };
   }, [navigate, isInMedianApp]);
 
   // In SFVC/Safari: extract session tokens and write to localStorage for WebView pickup
   useEffect(() => {
     if (isInMedianApp) return;
 
+    let cancelled = false;
     const passSessionToWebView = async () => {
       await new Promise(r => setTimeout(r, 300));
+      if (cancelled) return;
 
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (cancelled || !session) return;
 
       try {
         localStorage.setItem('clbhouz_oauth_session', JSON.stringify({
@@ -106,6 +116,7 @@ export default function AuthCallback() {
     };
 
     passSessionToWebView();
+    return () => { cancelled = true; };
   }, [isInMedianApp]);
 
   if (!isInMedianApp) {
