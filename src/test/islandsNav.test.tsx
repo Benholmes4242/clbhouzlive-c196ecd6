@@ -6,7 +6,8 @@
  *   - the island index cell's move text (▾0.2 / ▴0.3 / none);
  *   - the glance: opens on tap, data appears, closes on Escape and on route
  *     change, focus returns to the index cell;
- *   - "{n} rounds ago" matching the rounds drawn;
+ *   - BRIEF_ONE_INDEX_CHART: the shared 90-day chart, its net headline, the
+ *     five last-round dots and no rule above the stats;
  *   - "vs par" formatting (+1, E, −2);
  *   - the scrolled flag at the 24px threshold;
  */
@@ -52,12 +53,18 @@ vi.mock('@/lib/whs/hooks', () => ({
   useAllScores: () => ({ data: mockScores }),
   useLastRound: () => ({ data: mockLastRound }),
 }));
+let mockRounds: any[] = [];
+vi.mock('@/components/profile/rounds/useProfileRounds', async (orig) => ({
+  ...(await orig<typeof import('@/components/profile/rounds/useProfileRounds')>()),
+  useProfileRounds: () => ({ isSuccess: true, data: mockRounds }),
+}));
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
 vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => mockPro }));
 
 import { HcpCell, lastIndexMove } from '@/features/chrome-v2/ChromeIsland';
-import { glanceMoveText, glanceWindowMove, formatVsPar } from '@/features/chrome-v2/IndexGlance';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { glanceMoveText, glanceNinetyDayText, formatVsPar } from '@/features/chrome-v2/IndexGlance';
 
 const DAY = 86_400_000;
 const iso = (daysAgo: number) => new Date(Date.now() - daysAgo * DAY).toISOString();
@@ -174,7 +181,7 @@ describe('IndexGlance', () => {
     expect(document.activeElement).toBe(dialog);
   });
 
-  it('shows the move, sparkline and stats once data settles', () => {
+  it('shows the 90-day headline, the shared chart, five dots and stats without a rule', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-10-15T12:00:00Z'));
     mockHistory = [
@@ -182,56 +189,46 @@ describe('IndexGlance', () => {
       { observed_at: iso(10), handicap_index: 12.6 },
       { observed_at: iso(2), handicap_index: 12.4 },
     ];
-    mockScores = [
-      { id: 's3', play_date: iso(1), handicap_index_at_time: 12.4 },
-      { id: 's2', play_date: iso(5), handicap_index_at_time: 12.6 },
-      { id: 's1', play_date: iso(9), handicap_index_at_time: 12.2 },
-      { id: 's0', play_date: iso(20), handicap_index_at_time: null },
-    ];
+    mockRounds = [1, 2, 3, 4, 5, 6].map((d) => ({
+      whs_score_id: `r${d}`, play_date: iso(d * 3).slice(0, 10), whs_joined: true, is_nine_hole: false, total_holes: 18,
+      handicap_differential: 12, handicap_index_at_time: 12.4, is_counter: d === 2,
+    }));
     mockLastRound = { adjusted_gross: 73, course_par: 72 };
     openGlance();
     const dialog = screen.getByRole('dialog', { name: 'Your handicap index' });
-    expect(dialog.textContent).toContain('▴ 0.2 over 3 rounds');
-    // 3 rounds carry an index; the current index is appended as "Now".
-    expect(dialog.textContent).toContain('3 rounds ago');
-    expect(dialog.textContent).toContain('Now');
+    expect(dialog.textContent).toContain('▲ 0.2 · 90 days');
+    expect(dialog.textContent).not.toContain('rounds ago');
+    expect(dialog.querySelector('[data-testid="index-glance-chart"] [data-index-window-chart="90"]')).not.toBeNull();
+    expect(dialog.textContent).toContain('90 days ago');
+    const dots = dialog.querySelectorAll('[data-form-round-dot]');
+    expect(dots).toHaveLength(5);
+    expect([...dots].filter((d) => d.getAttribute('data-counts') === 'true').map((d) => d.getAttribute('data-form-round-dot'))).toEqual(['r2']);
+    const stats = dialog.querySelector<HTMLElement>('[data-glance-stats]');
+    expect(stats?.style.borderTop).toBe('');
+    expect(stats?.style.marginTop).toBe('16px');
     expect(dialog.textContent).toContain('12.2'); // Low index
     expect(dialog.textContent).toContain('73'); // Last round
     expect(dialog.textContent).toContain('+1'); // vs par
+    mockRounds = [];
   });
 
-  it('hides the sparkline when fewer than 2 points exist', () => {
-    mockScores = [];
+  it('hides the chart when there is no index history', () => {
+    mockHistory = [];
     openGlance();
-    expect(screen.queryByTestId('index-glance-sparkline')).toBeNull();
+    expect(screen.queryByTestId('index-glance-chart')).toBeNull();
   });
 
   it.each([
-    [13.4, '▾ 1.0 over 7 rounds', '#34D77F'],
-    [11.4, '▴ 1.0 over 7 rounds', '#FF5A4E'],
-    [12.43, 'No change over 7 rounds', '#F8FAFC'],
-  ])('matches its seven-round text and end dot from oldest %s', (oldest, text, dot) => {
-    mockScores = Array.from({ length: 7 }, (_, i) => ({ handicap_index_at_time: i === 6 ? oldest : 12.4 }));
+    [13.4, '▼ 1.0 · 90 days', INDEX_DELTA.dark.improved],
+    [11.4, '▲ 1.0 · 90 days', INDEX_DELTA.dark.drifted],
+    [12.43, 'Level · 90 days', 'rgba(248,250,252,0.62)'],
+  ])('reads the 90-day net from a start of %s', (start, text, color) => {
+    mockHistory = [{ observed_at: iso(120), handicap_index: start }, { observed_at: iso(3), handicap_index: 12.4 }];
     openGlance();
     const dialog = screen.getByRole('dialog', { name: 'Your handicap index' });
     expect(dialog.textContent).toContain(text);
-    expect(dialog.textContent).toContain('7 rounds ago');
-    expect(dialog.querySelector('circle')?.getAttribute('fill')).toBe(dot);
-  });
-
-  it('uses the singular one-round window and caption', () => {
-    mockScores = [{ handicap_index_at_time: 13.4 }];
-    openGlance();
-    const dialog = screen.getByRole('dialog', { name: 'Your handicap index' });
-    expect(dialog.textContent).toContain('▾ 1.0 over 1 round');
-    expect(dialog.textContent).toContain('1 round ago');
-  });
-
-  it('retains the latest-revision wording without a sparkline', () => {
-    mockHistory = [{ observed_at: iso(2), handicap_index: 12.6 }, { observed_at: iso(1), handicap_index: 12.4 }];
-    openGlance();
-    expect(screen.getByRole('dialog', { name: 'Your handicap index' }).textContent).toContain('▾ 0.2 this month');
-    expect(screen.queryByTestId('index-glance-sparkline')).toBeNull();
+    const norm = document.createElement('i'); norm.style.color = color;
+    expect(dialog.querySelector<HTMLElement>('[data-glance-move]')?.style.color).toBe(norm.style.color);
   });
 
   it('closes on Escape and returns focus to the index cell', () => {
@@ -272,9 +269,10 @@ describe('IndexGlance', () => {
 // Glance helpers
 // ---------------------------------------------------------------------------
 describe('glanceMoveText', () => {
-  it('rounds the drawn change to one decimal and uses dim text with an ink level dot', () => {
-    expect(glanceWindowMove(12.4, 12.43, 7)).toEqual({ text: 'No change over 7 rounds', color: 'rgba(248,250,252,0.42)', dotColor: '#F8FAFC' });
-    expect(glanceWindowMove(12.4, 13.66, 7).text).toBe('▾ 1.3 over 7 rounds');
+  it('the 90-day headline treats a 0.1 move as a move and zero as level', () => {
+    expect(glanceNinetyDayText(-0.1).text).toBe('▼ 0.1 · 90 days');
+    expect(glanceNinetyDayText(0.1).text).toBe('▲ 0.1 · 90 days');
+    expect(glanceNinetyDayText(0)).toEqual({ text: 'Level · 90 days', color: 'rgba(248,250,252,0.62)' });
   });
   it('writes "this month" for a move in the current calendar month', () => {
     const now = new Date(2026, 9, 28);

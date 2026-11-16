@@ -5,7 +5,7 @@
  * portalled to body; it no longer navigates. (The disconnected variant uses the same GlanceShell without loading WHS data.)
  *
  * DATA LOADS ONLY WHILE OPEN: HcpCell mounts this component only when the
- * glance is open, so useAllScores / useHandicapHistory / useLastRound run
+ * glance is open, so useHandicapHistory / useLastRound / the last-five rounds run
  * exclusively for the glance's lifetime. No skeletons — each block appears
  * when its data settles.
  *
@@ -23,8 +23,11 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlanceShell } from './GlanceShell';
-import { useAllScores, useHandicapHistory, useLastRound } from '@/lib/whs/hooks';
+import { useHandicapHistory, useLastRound } from '@/lib/whs/hooks';
 import type { HcpMoveDetail } from './ChromeIsland';
+import { IndexWindowChart } from '@/components/handicap/IndexWindowChart';
+import { indexWindow, indexDirection, indexToneOf } from '@/lib/whs/indexWindow';
+import { useLastFiveChartRounds } from '@/lib/whs/lastFive';
 
 const INK = '#F8FAFC';
 const DIM = 'rgba(248,250,252,0.42)';
@@ -32,16 +35,12 @@ const MOVE_IMPROVING = '#34D77F';
 const MOVE_DRIFTING = '#FF5A4E';
 const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
-const SPARK_W = 268;
-const SPARK_H = 62;
-const SPARK_PAD_Y = 4;
-// X range stops at 264 so the r3.5 end dot sits fully inside the 268 box.
-const SPARK_MAX_X = 264;
-
 export interface IndexGlanceProps {
   onClose: () => void;
   anchorRef: React.RefObject<HTMLButtonElement | null>;
   connectionId: string;
+  /** Signed-in member: the shared last five dots on the chart. */
+  userId?: string | null;
   currentIndex: number;
   move: HcpMoveDetail;
 }
@@ -60,14 +59,11 @@ export function glanceMoveText(move: HcpMoveDetail, now: Date = new Date()): str
   return `${triangle} ${size} on ${date}`;
 }
 
-/** The glance alone measures the exact drawn window; the island keeps its latest revision. */
-export function glanceWindowMove(currentIndex: number, oldestIndex: number, roundsDrawn: number) {
-  const delta = Math.round((currentIndex - oldestIndex) * 10) / 10;
-  const rounds = `${roundsDrawn} ${roundsDrawn === 1 ? 'round' : 'rounds'}`;
-  if (delta === 0) return { text: `No change over ${rounds}`, color: DIM, dotColor: INK };
-  const improving = delta < 0;
-  const color = improving ? MOVE_IMPROVING : MOVE_DRIFTING;
-  return { text: `${improving ? '▾' : '▴'} ${Math.abs(delta).toFixed(1)} over ${rounds}`, color, dotColor: color };
+/** BRIEF_ONE_INDEX_CHART: the headline reads the 90-day window's net, the same net that tones the chart. */
+export function glanceNinetyDayText(net: number): { text: string; color: string } {
+  const d = indexDirection(net);
+  if (d === 'flat') return { text: 'Level · 90 days', color: 'rgba(248,250,252,0.62)' };
+  return { text: `${d === 'down' ? '▼' : '▲'} ${Math.abs(net).toFixed(1)} · 90 days`, color: indexToneOf(net) };
 }
 
 /** adjusted_gross − course_par, written +1, E or −2. Null when either side is missing. */
@@ -82,46 +78,19 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
   onClose,
   anchorRef,
   connectionId,
+  userId = null,
   currentIndex,
   move,
 }) => {
   const navigate = useNavigate();
 
-  const { data: scores } = useAllScores(connectionId);
   const { data: history } = useHandicapHistory(connectionId, 'all');
   const { data: lastRound } = useLastRound(connectionId);
 
-  // Sparkline points: last 20 rounds by play_date carrying an index, oldest
-  // first, then the current index appended as the final point.
-  const spark = useMemo(() => {
-    if (!scores) return null;
-    const rounds = scores
-      .filter((s) => s.handicap_index_at_time != null)
-      .slice(0, 20)
-      .map((s) => Number(s.handicap_index_at_time))
-      .filter((v) => Number.isFinite(v))
-      .reverse();
-    const values = [...rounds, currentIndex];
-    if (values.length < 2) return null;
-    return { values, roundsDrawn: rounds.length };
-  }, [scores, currentIndex]);
-
-  const sparkPath = useMemo(() => {
-    if (!spark) return null;
-    const { values } = spark;
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const span = max - min;
-    const step = values.length > 1 ? SPARK_MAX_X / (values.length - 1) : 0;
-    const pts = values.map((v, i) => {
-      const x = i * step;
-      const ratio = span === 0 ? 0.5 : (v - min) / span;
-      // A higher index sits higher on the card.
-      const y = SPARK_PAD_Y + (1 - ratio) * (SPARK_H - SPARK_PAD_Y * 2);
-      return { x, y };
-    });
-    return pts;
-  }, [spark]);
+  // BRIEF_ONE_INDEX_CHART: the shared 90-day window and the shared last five.
+  const win90 = useMemo(() => indexWindow(history, 90), [history]);
+  const chartPoints = useMemo(() => win90.pts.map((p) => ({ value: p.v, observed_at: new Date(p.ts).toISOString() })), [win90]);
+  const rounds = useLastFiveChartRounds(userId);
 
   // Low index: the lowest handicap_index over the last 365 days.
   const lowIndex = useMemo(() => {
@@ -143,7 +112,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
   if (lastRoundGross != null) stats.push({ value: String(lastRoundGross), label: 'Last round' });
   if (vsPar != null) stats.push({ value: vsPar, label: 'vs par' });
 
-  const windowMove = spark ? glanceWindowMove(currentIndex, spark.values[0], spark.roundsDrawn) : null;
+  const windowMove = chartPoints.length >= 2 ? glanceNinetyDayText(win90.net) : null;
   const moveText = windowMove?.text ?? glanceMoveText(move);
   const moveColor = windowMove?.color ?? (move.direction === 'improving' ? MOVE_IMPROVING : MOVE_DRIFTING);
 
@@ -166,52 +135,20 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
           Your handicap index
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}>
           <div style={{ fontSize: 34, fontWeight: 700, color: INK, lineHeight: 1, ...NUM }}>
             {currentIndex.toFixed(1)}
           </div>
           {moveText && (
-            <div style={{ fontSize: 13, fontWeight: 700, color: moveColor, ...NUM }}>
+            <div data-glance-move style={{ fontSize: 12.5, fontWeight: 700, color: moveColor, ...NUM }}>
               {moveText}
             </div>
           )}
         </div>
 
-        {spark && sparkPath && (
-          <div data-testid="index-glance-sparkline">
-            <svg
-              width={SPARK_W}
-              height={SPARK_H}
-              viewBox={`0 0 ${SPARK_W} ${SPARK_H}`}
-              style={{ display: 'block', marginTop: 14 }}
-            >
-              <polyline
-                points={sparkPath.map((p) => `${p.x} ${p.y}`).join(' ')}
-                fill="none"
-                stroke={INK}
-                strokeWidth={2}
-                strokeLinejoin="round"
-              />
-              <circle
-                cx={sparkPath[sparkPath.length - 1].x}
-                cy={sparkPath[sparkPath.length - 1].y}
-                r={3.5}
-                fill={windowMove?.dotColor ?? INK}
-              />
-            </svg>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontSize: 10,
-                color: DIM,
-                marginTop: 4,
-                ...NUM,
-              }}
-            >
-              <span>{spark.roundsDrawn} {spark.roundsDrawn === 1 ? 'round' : 'rounds'} ago</span>
-              <span>Now</span>
-            </div>
+        {chartPoints.length >= 2 && (
+          <div data-testid="index-glance-chart" style={{ marginTop: 14 }}>
+            <IndexWindowChart points={chartPoints} windowDays={90} rounds={rounds} height={60} />
           </div>
         )}
 
@@ -220,10 +157,9 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
             style={{
               display: 'flex',
               gap: 16,
-              marginTop: 14,
-              paddingTop: 12,
-              borderTop: '1px solid rgba(255,255,255,0.08)',
+              marginTop: 16,
             }}
+            data-glance-stats
           >
             {stats.map((s) => (
               <div key={s.label}>

@@ -19,9 +19,10 @@
  * - LANDING MOVEMENT is window end minus window start. Down = improved tone,
  *   up = drifted tone, zero = A.DIM and reads "0.0".
  *
- * - THE CHART IS THE SAME SHARED HcpTrendChart USED BY THE PROFILE SHEET:
- *   SIMPLIFIED branch (one toned line, gradient beneath, three marks, no plot
- *   labels), toned with the dark movement pair. The range sits in a row below.
+ * - THE CHART IS THE SHARED IndexWindowChart (BRIEF_ONE_INDEX_CHART), the same
+ *   one the profile hero and the index glance draw; it tones itself from the
+ *   window's net. Chips start on 90D. The range row (window HIGH / LOW) follows
+ *   the chips. HcpTrendChart stays for the white profile sheet only.
  *
  * - SCRUB: pointer down snaps to the nearest point; drag follows under pointer
  *   capture; release PARKS it. Any range change resets to landing.
@@ -41,16 +42,19 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 import { HcpSection } from './HcpSection';
 import { CHART, DEAD_BAND } from '../charts/tokens';
-import { HcpTrendChart } from '../charts/HcpTrendChart';
+import { IndexWindowChart } from '@/components/handicap/IndexWindowChart';
+import { indexWindow } from '@/lib/whs/indexWindow';
+import type { ChartRound } from '@/lib/whs/lastFive';
 
 interface Props {
   connection: WhsConnection;
   /** Rendered directly under the headline, before the range chips (the lock card). */
   belowHeadline?: React.ReactNode;
+  /** The member's shared last five (src/lib/whs/lastFive.ts), drawn as dots on the chart. */
+  rounds?: ReadonlyArray<ChartRound>;
 }
 
 const MS_PER_DAY = 86_400_000;
-const CHART_H = 96;
 
 type WindowKey = '30d' | '90d' | '12m';
 const DAYS: Record<WindowKey, number> = { '30d': 30, '90d': 90, '12m': 365 };
@@ -74,13 +78,6 @@ const HEAD_LABEL: React.CSSProperties = {
   color: A.DIM,
   lineHeight: '12px',
   whiteSpace: 'nowrap',
-};
-const AXIS: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.12em',
-  textTransform: 'uppercase',
-  color: CHART.DIM,
 };
 
 /** Plus handicaps render with a leading '+'. */
@@ -106,7 +103,7 @@ interface Pt {
   edge?: 'lead' | 'trail';
 }
 
-const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => {
+const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null, rounds = [] }) => {
   const { t } = useTranslation(['common']);
   const { data: history, isLoading } = useHandicapHistory(connection.id, 'all');
 
@@ -119,7 +116,7 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => 
     [history],
   );
 
-  const [win, setWin] = useState<WindowKey>('12m');
+  const [win, setWin] = useState<WindowKey>('90d');
 
   /* THE WINDOW IS THE LAST N DAYS ENDING TODAY (BRIEF_WALK_YOUR_INDEX_WINDOW_ANCHOR).
      The chip, the kicker and the axis state the same span by construction.
@@ -133,35 +130,21 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => 
      member's 30D is therefore a flat line — their index has not moved. */
   const view = useMemo(() => {
     if (all.length === 0) return null;
-    const end = Date.now();
-    const start = end - DAYS[win] * MS_PER_DAY;
-    const before = all.filter((p) => p.ts <= start);
-    const inside = all.filter((p) => p.ts > start && p.ts <= end);
-    const pts: Pt[] = [];
-    if (before.length) pts.push({ ts: start, v: before[before.length - 1].v, edge: 'lead' });
-    pts.push(...inside);
-    const last = pts[pts.length - 1];
-    if (last && last.ts < end) pts.push({ ts: end, v: last.v, edge: 'trail' });
-    return { pts, start, end };
-  }, [all, win]);
+    const w = indexWindow(history, DAYS[win]);
+    return { pts: w.pts as Pt[], start: w.start, end: w.end };
+  }, [all, history, win]);
 
-  /* THE RANGE ROW reads the index in force across the last twelve months,
-     whatever window the chips select: 12M high, 12M low, today. */
+  /* THE RANGE ROW follows the chips (BRIEF_ONE_INDEX_CHART): high and low of
+     the index in force across the SELECTED window. */
   const range = useMemo(() => {
-    if (all.length === 0) return null;
-    const start = Date.now() - DAYS['12m'] * MS_PER_DAY;
-    const before = all.filter((p) => p.ts <= start);
-    const vals = [
-      ...(before.length ? [before[before.length - 1].v] : []),
-      ...all.filter((p) => p.ts > start).map((p) => p.v),
-    ];
+    const vals = (view?.pts ?? []).map((p) => p.v);
     if (vals.length === 0) return null;
     return { high: Math.max(...vals), low: Math.min(...vals), today: vals[vals.length - 1] };
-  }, [all]);
+  }, [view]);
 
   const pts = view?.pts ?? [];
   const chartPoints = useMemo(
-    () => pts.map((p) => ({ t: new Date(p.ts).toISOString(), v: p.v })),
+    () => pts.map((p) => ({ value: p.v, observed_at: new Date(p.ts).toISOString() })),
     [pts],
   );
   // NO CHART only when there is no index history at all at or before today.
@@ -210,9 +193,6 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => 
   /* THE ONE VALUE (§2.2): window end minus window start. The headline figure
      and the line/fill tone both read it; they cannot disagree. */
   const windowNet = pts.length ? pts[pts.length - 1].v - pts[0].v : 0;
-  /* The caller decides direction (the chart never does): dark improved for a
-     fall, dark drifted for a rise, DIM when held. */
-  const chartTone = Math.abs(windowNet) < DEAD_BAND ? CHART.DIM : windowNet < 0 ? CHART.DOWN : CHART.UP;
   if (isLoading) return null;
 
   const idx = sel == null ? null : Math.min(sel, pts.length - 1);
@@ -349,38 +329,25 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => 
             }}
             style={{
               margin: '14px 0 0',
-              height: CHART_H,
               touchAction: 'none',
               position: 'relative',
               cursor: 'pointer',
               userSelect: 'none',
             }}
           >
-            <HcpTrendChart
+            <IndexWindowChart
               points={chartPoints}
-              active={dotIdx}
-              showCrosshair={idx != null}
-              height={CHART_H}
-              /* FULL SECTION WIDTH: padX 0 so the line spans the same left and
-                 right edges as the section rows below (BRIEF user ruling). */
-              padX={0}
-              /* The sheet's simplified branch, toned with the DARK movement
-                 pair: this tab is near-black, the sheet is white. */
-              simplified
-              tone={chartTone}
+              windowDays={DAYS[win]}
+              rounds={rounds}
+              scrub={{ active: idx }}
             />
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...AXIS }}>
-            <span>{view ? format(new Date(view.start), 'MMM yyyy') : ''}</span>
-            <span>{t('common:handicap.walk.today')}</span>
           </div>
 
           {range && !chartLevel && (
             <div data-hcp-range style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
               {([
-                ['high', range.high, CHART.INK, t('common:handicap.walk.rangeHigh')],
-                ['low', range.low, chartTone, t('common:handicap.walk.rangeLow')],
+                ['high', range.high, CHART.INK, t('common:handicap.walk.rangeHighWindow', { window: CHIP_LABEL[win], defaultValue: `${CHIP_LABEL[win]} high` })],
+                ['low', range.low, CHART.DOWN, t('common:handicap.walk.rangeLowWindow', { defaultValue: 'Low' })],
               ] as const).map(([k, v, c, l], i) => (
                 <div key={k} style={{ textAlign: i === 0 ? 'left' : 'right' }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: c, ...FIG }}>{formatIndex(v)}</div>

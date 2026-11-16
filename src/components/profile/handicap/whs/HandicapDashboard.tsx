@@ -24,6 +24,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // resolveHandicapSubtab) were deleted 10 Sep 2026.
 
 import IndexSection from './sections/IndexSection';
+import { useLastFiveChartRounds } from '@/lib/whs/lastFive';
 import LockedCard from './sections/LockedCard';
 import AgeingOutSection from './sections/AgeingOutSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
@@ -52,6 +53,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   // ── Trend (used by hero + passed to sections as currentHandicap) ───────
   const { data: trend } = useHandicapTrend(connection.id);
   const currentHandicap = trend?.current ?? null;
+  const lastFive = useLastFiveChartRounds(userId);
 
   const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
 
@@ -111,7 +113,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       */}
 
       {/* 1 — HANDICAP INDEX */}
-      <IndexSection connection={connection} belowHeadline={<LockedCard connectionId={connection.id} />} />
+      <IndexSection connection={connection} rounds={lastFive} belowHeadline={<LockedCard connectionId={connection.id} />} />
 
       {/* 1b — AGEING OUT (renders only when a counter is about to expire) */}
       <AgeingOutSection connectionId={connection.id} currentHandicap={currentHandicap} />

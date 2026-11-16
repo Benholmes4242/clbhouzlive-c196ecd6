@@ -49,7 +49,7 @@ interface Props {
    * rounds where is_counter is true (derived by the section, never by a
    * client-side comparison here). BRIEF_HANDICAP_TAB_REBUILD_4A keeps
    * the rule without a label or canvas backing.
-   * Drawn as a 1px AMBER rule at the value's true height on the same
+   * Drawn as a 1px WHITE rule (BRIEF_ONE_INDEX_CHART; was amber) at the value's true height on the same
    * min-anchored scale as the bars, so the line and the bar colours cannot
    * disagree.
    */
@@ -104,7 +104,7 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut =
         ))}
       </div>
 
-      {/* PHASE 4 §4.4: the unlabelled 1px AMBER rule at the eighth-best
+      {/* PHASE 4 §4.4: the unlabelled 1px WHITE rule at the eighth-best
           differential's true height. */}
       {cut != null && (
           <div
@@ -112,7 +112,7 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut =
             style={{
               position: 'absolute', left: 0, right: 0,
               bottom: heightOf(cut.value), height: 1,
-              background: CHART.AMBER,
+              background: 'rgba(248,250,252,0.9)',
             }}
           />
       )}

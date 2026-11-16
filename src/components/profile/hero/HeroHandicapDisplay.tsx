@@ -17,15 +17,13 @@ import { numberWord } from '@/lib/text/numbers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Button } from '@/components/ui/button';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
-import { indexLine, type HeroIndexPoint } from './indexLine';
+import type { HeroIndexPoint } from './indexLine';
+import { IndexWindowChart } from '@/components/handicap/IndexWindowChart';
 import './profile-form.css';
 import { W_40 } from './HeroShell';
 const GREEN = INDEX_DELTA.dark.improved;
 const NO_COUNTING: ReadonlySet<string> = new Set();
 const RED = INDEX_DELTA.dark.drifted;
-const AXIS_INK = 'rgba(248,250,252,0.30)';
-const LOW_LINE = 'rgba(255,255,255,0.14)';
-const MARKER_HALO = '0 0 0 3px rgba(10,10,12,0.9)';
 const KICK: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM };
 const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' };
 
@@ -33,41 +31,13 @@ const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpaci
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
-const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; countingIds?: ReadonlySet<string>; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap, tabIndex, example, bars = [], countingIds }) => {
-  const gid = React.useId().replace(/:/g, '');
-  const line = indexLine(points);
-  if (!line) return null;
-  const { lowY, lastY } = line;
-  const d = line.coords.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  return (
-    <button type="button" data-example-chart={example ? '' : undefined} onClick={onTap} tabIndex={tabIndex} style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
-      <div style={{ marginTop: 12, height: 64, position: 'relative' }}>
-        <svg width="100%" height={64} viewBox="0 0 361 64" preserveAspectRatio="none" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
-          <defs>
-            <linearGradient id={`hcpfill-${gid}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor={color} stopOpacity={fillTop} />
-              <stop offset="1" stopColor={color} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <polygon points={`0,64 ${d} 361,64`} fill={`url(#hcpfill-${gid})`} stroke="none" />
-          <line x1={0} y1={lowY} x2={361} y2={lowY} stroke={LOW_LINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
-          <polyline points={d} fill="none" stroke={color} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </svg>
-        {bars.map(bar => {
-          const point = line.at(bar.date);
-          return point ? <span key={bar.id} aria-hidden data-form-round-dot={bar.id} data-counts={countingIds?.has(bar.id) ? 'true' : 'false'} className="profile-index-round-dot" style={{ left: `${point.x / 361 * 100}%`, top: point.y }} /> : null;
-        })}
-        <span style={{ position: 'absolute', left: 0, top: lowY, transform: 'translateY(-50%)', ...MICRO, color: A.DIM, background: A.CANVAS, paddingRight: 6, ...FIGS }}>
-          {lowLabel}
-        </span>
-        <span aria-hidden style={{ position: 'absolute', right: -3, top: lastY, marginTop: -3.5, width: 7, height: 7, borderRadius: 999, background: color, boxShadow: MARKER_HALO }} />
-      </div>
-      {!example && <div style={{ marginTop: 5, display: 'flex', justifyContent: 'space-between', ...MICRO, color: AXIS_INK }}>
-        <span>{axisLeft}</span><span>{axisRight}</span>
-      </div>}
-    </button>
-  );
-};
+const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; countingIds?: ReadonlySet<string>; windowDays: number; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, windowDays, onTap, tabIndex, example, bars = [], countingIds }) => (
+  <button type="button" data-example-chart={example ? '' : undefined} onClick={onTap} tabIndex={tabIndex} style={{ display: 'block', width: '100%', marginTop: 12, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
+    {/* BRIEF_ONE_INDEX_CHART: the shared chart; its tone comes from the window's own net. */}
+    <IndexWindowChart points={points} windowDays={windowDays} hideAxis={example}
+      rounds={bars.map(b => ({ id: b.id, date: b.date, counts: !!countingIds?.has(b.id) }))} />
+  </button>
+);
 
 interface Props {
   t: TFunction<'profile'>;
@@ -76,9 +46,10 @@ interface Props {
   slot: { value: string; label: string; color: string } | null;
   verdict: React.ReactNode;
   series: HeroIndexPoint[];
-  chartColor: string;
-  chartFillTop: number;
-  axisWindow: string;
+  /** Retired by BRIEF_ONE_INDEX_CHART: IndexWindowChart tones itself from the window's net and names its own axis. Accepted and ignored. */
+  chartColor?: string;
+  chartFillTop?: number;
+  axisWindow?: string;
   windowDays: number | null;
   bars: FormBar[];
   byId: Map<string, Pick<ProfileRound, 'gross_score' | 'course_name'>>;
@@ -102,8 +73,8 @@ interface Props {
   afterIndex?: React.ReactNode;
 }
 export const HeroHandicapDisplay: React.FC<Props> = ({
-  t, shownIndex, deltaLines, slot, verdict, series, chartColor, chartFillTop,
-  axisWindow, windowDays, bars, byId, countingKnown, countingN, countingIds = NO_COUNTING,
+  t, shownIndex, deltaLines, slot, verdict, series,
+  windowDays, bars, byId, countingKnown, countingN, countingIds = NO_COUNTING,
   tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false, afterChart, afterIndex,
 }) => {
   return (
@@ -152,11 +123,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                 example={example}
                 points={series}
                 countingIds={countingKnown ? countingIds : undefined} bars={bars}
-                color={chartColor}
-                fillTop={chartFillTop}
-                lowLabel={t('hero.low', { value: formatIndex(Math.min(...series.map(p => p.value))), defaultValue: `Low ${formatIndex(Math.min(...series.map(p => p.value)))}` })}
-                axisLeft={t('hero.windowAgo', { window: axisWindow, defaultValue: `${axisWindow} ago` })}
-                axisRight={t('hero.today', 'Today')}
+                windowDays={90}
                 tabIndex={example ? -1 : undefined}
                 onTap={example ? undefined : () => {
                   analyticsEvents.track('profile_index_chart_tap', { window_days: windowDays });

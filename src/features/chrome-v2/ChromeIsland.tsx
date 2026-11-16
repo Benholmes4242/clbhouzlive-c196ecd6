@@ -484,6 +484,7 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string; fold?: 
             onClose={() => setGlanceOpen(false)}
             anchorRef={indexButtonRef}
             connectionId={connection.id}
+            userId={user?.id ?? null}
             currentIndex={Number(trendData.current)}
             move={lastMove}
           />

@@ -25,10 +25,10 @@ import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/wh
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
-import { countsTowardIndex } from '@/lib/whs/counting';
+import { indexWindow } from '@/lib/whs/indexWindow';
+import { lastFiveRounds } from '@/lib/whs/lastFive';
 import { numberWord } from '@/lib/text/numbers';
-import { formBars, type FormScoreLike } from '@/features/profile-sheet-v2/sheetState';
-import { isFullEighteen, useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
+import { useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useClubCoverPhoto } from '@/components/profile/hooks/useClubCoverPhoto';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
@@ -227,19 +227,12 @@ export const ProfileHero: React.FC<Props> = ({
   // resolves. A null result continues to the Top 10 photo as before.
   const cover = coverUrl || clubCover.coverPhoto || (clubId && clubCover.isLoading ? null : topCourse?.thumbnail_image || null);
 
-  // Ninety-day rule: points inside 90 days, else the whole history.
-  const { series, oldestMs, windowHeld } = React.useMemo(() => {
-    if (!history || history.length < 2) return { series: [] as HeroIndexPoint[], oldestMs: null as number | null, windowHeld: false };
-    const cutoff = Date.now() - 90 * MS_PER_DAY;
-    const recent = history.filter((p) => new Date(p.observed_at).getTime() >= cutoff);
-    const held = recent.length >= 2;
-    const use = (held ? recent : history).filter((p) => Number.isFinite(Number(p.handicap_index)));
-    return {
-      series: use.map((p) => ({ value: Number(p.handicap_index), observed_at: p.observed_at })),
-      oldestMs: use.length ? new Date(use[0].observed_at).getTime() : null,
-      windowHeld: held,
-    };
-  }, [history]);
+  // BRIEF_ONE_INDEX_CHART: the shared 90-day window (lead edge, observations, trail edge).
+  const win90 = React.useMemo(() => indexWindow(history, 90), [history]);
+  const series = React.useMemo<HeroIndexPoint[]>(
+    () => win90.pts.map((p) => ({ value: p.v, observed_at: new Date(p.ts).toISOString() })),
+    [win90],
+  );
 
   // The "lowest index" sentence uses the WHOLE history held, independent of the chart.
   const allHistory = React.useMemo(() => {
@@ -256,34 +249,9 @@ export const ProfileHero: React.FC<Props> = ({
     onStatTap(stat);
   };
 
-  // 90-day window — unchanged thresholds (see BRIEF history in git).
-  const SHORT_FLOOR = 0.2;
-  const SHORT_TARGET_DAYS = 90;
-  const SHORT_MIN_HISTORY_DAYS = 75;
-
-  const shortDelta = React.useMemo<number | null>(() => {
-    const current = indexValue ?? trend?.current ?? null;
-    if (current == null || !history || history.length === 0) return null;
-    const now = Date.now();
-    const earliest = new Date(history[0].observed_at).getTime();
-    if (now - earliest < SHORT_MIN_HISTORY_DAYS * MS_PER_DAY) return null;
-    const target = now - SHORT_TARGET_DAYS * MS_PER_DAY;
-    let closest = history[0];
-    let best = Math.abs(new Date(closest.observed_at).getTime() - target);
-    for (const pt of history) {
-      const diff = Math.abs(new Date(pt.observed_at).getTime() - target);
-      if (diff < best) {
-        closest = pt;
-        best = diff;
-      }
-    }
-    const past = Number(closest.handicap_index);
-    if (!Number.isFinite(past)) return null;
-    return Math.round((current - past) * 10) / 10;
-  }, [history, indexValue, trend]);
-
-  const shortDirection: 'down' | 'up' | 'flat' =
-    shortDelta == null ? 'flat' : shortDelta < -SHORT_FLOOR ? 'down' : shortDelta > SHORT_FLOOR ? 'up' : 'flat';
+  // The 90 DAYS figure reads the SAME net as the chart line (indexWindow), so they cannot disagree.
+  const shortDelta = win90.pts.length >= 2 ? Math.round(win90.net * 10) / 10 : null;
+  const shortDirection = win90.direction;
 
   const delta = trend12.delta;
   const improved = trend12.direction === 'down';
@@ -293,17 +261,8 @@ export const ProfileHero: React.FC<Props> = ({
   if (shortDelta != null) deltaLines.push({ key: 'short', delta: shortDelta, direction: shortDirection, window: t('hero.window90d', '90 days') });
   if (delta != null) deltaLines.push({ key: 'long', delta, direction: improved ? 'down' : drifted ? 'up' : 'flat', window: t('hero.window12mo', '12 months') });
 
-  // ── window naming (axis + verdict share one honest figure) ──
-  const months = oldestMs != null ? Math.min(windowMonths(oldestMs), 12 * 100) : null;
-  const windowDays = oldestMs != null ? Math.round((Date.now() - oldestMs) / MS_PER_DAY) : null;
-  const windowPhrase = months != null ? t('hero.windowMonths', { count: months, defaultValue: months === 1 ? '1 month' : `${months} months` }) : '';
-  const axisWindow = windowHeld ? t('hero.window90d', '90 days') : windowPhrase;
   const allMonths = allHistory ? windowMonths(allHistory.oldestMs) : null;
   const allPhrase = allMonths != null ? t('hero.windowMonths', { count: allMonths, defaultValue: allMonths === 1 ? '1 month' : `${allMonths} months` }) : '';
-  // Chart colour = the 90-day direction (shortDirection), so it never disagrees with the 90 DAYS figure.
-  const chartColor = shortDelta == null || shortDirection === 'flat' ? A.INK : shortDirection === 'down' ? GREEN : RED;
-  const chartFillTop = chartColor === A.INK ? 0.16 : 0.28;
-
   // ── right-hand slot ──
   let slot: { value: string; label: string; color: string } | null = null;
   if (isSelf) {
@@ -350,27 +309,9 @@ export const ProfileHero: React.FC<Props> = ({
     );
   }
 
-  // ── form strip ──
+  // ── form strip ── (one shared last-five helper; the charts mark the same five)
   const rows = roundsQ.isSuccess ? roundsQ.data ?? [] : [];
-  // isFullEighteen FIRST: formBars only tests !is_nine_hole, and a NULL from a
-  // missing whs join would slip through it.
-  const fullRows = rows.filter(isFullEighteen);
-  const byId = new Map(fullRows.map((r) => [r.whs_score_id, r]));
-  const bars = formBars(
-    fullRows.map((r): FormScoreLike => ({
-      id: r.whs_score_id,
-      play_date: r.play_date,
-      handicap_differential: r.handicap_differential,
-      handicap_index_at_time: r.handicap_index_at_time,
-      is_nine_hole: !!r.is_nine_hole,
-    })),
-    shownIndex,
-  ); // oldest first, as the sheet renders them
-  const barRows = bars.map((b) => byId.get(b.id));
-  const countingN = barRows.filter((r) => r && countsTowardIndex(r)).length;
-  // Counting state is unknown when no tile carries is_counter at all.
-  const countingKnown = barRows.some((r) => r?.is_counter != null);
-  const countingIds = new Set(bars.filter((b, i) => { const r = barRows[i]; return r ? countsTowardIndex(r) : false; }).map((b) => b.id));
+  const { bars, byId, countingN, countingKnown, countingIds } = lastFiveRounds(rows, shownIndex);
   const tilesN = bars.length;
   const tilesWord = numberWord(tilesN, false);
   const showIndexBlocks = !proMember && chip.settled && chip.connected;
@@ -462,8 +403,7 @@ export const ProfileHero: React.FC<Props> = ({
         {showIndexBlocks && (
           <HeroHandicapDisplay
             t={t} shownIndex={shownIndex} deltaLines={deltaLines} slot={slot}
-            verdict={verdict} series={series} chartColor={chartColor}
-            chartFillTop={chartFillTop} axisWindow={axisWindow} windowDays={windowDays}
+            verdict={verdict} series={series} windowDays={90}
             bars={bars} byId={byId} countingKnown={countingKnown} countingN={countingN}
             countingIds={countingIds} tilesWord={tilesWord} isSelf={isSelf}
             ownerFirstName={ownerFirstName} onStatTap={onStatTap} tap={tap} onOpenRound={onOpenRound}
