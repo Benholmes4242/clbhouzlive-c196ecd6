@@ -3,12 +3,25 @@ import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
-import { deriveHoleWalk, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
+import { deriveHoleWalk, holePhotoMonths, holeOrdinal } from '@/lib/courseMedia/holeWalk';
 import { HoleWalk } from '@/components/course-media-tab/HoleWalk';
 import { HolePhotoTagDialog } from '@/components/course-media-tab/HolePhotoTagDialog';
 const hole = (n: number, avg = n): CourseHole => ({ hole_no: n, par: 4, yards: 475, stroke_index: 3, avg_to_par: avg, avg_gross: 5.9, rounds: 10, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 5, bogey: 5, double: 0 } });
 const photo = (id: string, n: number, status = 'approved', month = '2026-05'): HolePhoto => ({ id, hole_no: n, status, user_id: 'member', media_url: `/photo-${id}.jpg`, exif_captured_at: `${month}-12T12:00:00Z` }) as HolePhoto;
 describe('MEDIA_WALK_1_R', () => {
+  it.each([
+    [19, '19th'], [21, '21st'], [22, '22nd'], [23, '23rd'], [27, '27th'], [111, '111th'],
+  ] as const)('uses the correct English ordinal for hole %i', (number, expected) => {
+    expect(holeOrdinal(number)).toBe(expected);
+  });
+  it('preserves all eighteen hole words and the teen suffix exceptions', () => {
+    expect(Array.from({ length: 18 }, (_, index) => holeOrdinal(index + 1))).toEqual([
+      'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth',
+      'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth',
+      'seventeenth', 'eighteenth',
+    ]);
+    expect([112, 113].map(holeOrdinal)).toEqual(['112th', '113th']);
+  });
   it('only the ten-or-more headline owns a total', () => {
     expect(deriveHoleWalk(Array.from({ length: 9 }, (_, i) => hole(i + 1)), []).headlineTotal).toBeNull();
     expect(deriveHoleWalk(Array.from({ length: 10 }, (_, i) => hole(i + 1)), []).headlineTotal).toBe(10);

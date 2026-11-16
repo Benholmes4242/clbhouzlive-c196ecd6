@@ -1,5 +1,10 @@
 # Roadmap
 
+## Latest holes Option A closeout
+- Append the committed Option A changes, exact −16/+4 test reconciliation and unchanged course-name audit.
+- Correct shared ordinal suffixes while retaining holes 1–18; run focused tests and four separate full-suite shards.
+- Check the longest live rail course name at 430px without page overflow; leave chipForLens unchanged.
+
 ## Complete: Admin side menu v3
 - Match the signed-off drawer, share Do now totals, preserve open-only full-admin reads and search behaviour.
 - Authorised enclosing-name-span assertion correction complete; AdminDrawer.tsx unchanged. Focused 56/56; four separate shards passed 2,255 / 2,146 / 2,217 / 2,228 = 8,846 (8,834 + 12), zero failures/skips. Build OK; report .lovable/reports/admin-side-menu-v3-testfix.md.

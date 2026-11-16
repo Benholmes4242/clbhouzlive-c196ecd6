@@ -20,7 +20,16 @@ export function courseWalkHoles(data: CourseHoleAnalysis | null | undefined): { 
 }
 
 const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth'];
-export const holeOrdinal = (hole: number) => ORDINALS[hole - 1] ?? `${hole}th`;
+// Rail and viewer kickers share these words; numeric fallbacks obey English
+// suffixes, including the 11–13 exception in every hundred.
+export function holeOrdinal(hole: number): string {
+  const word = ORDINALS[hole - 1];
+  if (word) return word;
+  const lastHundred = hole % 100;
+  const suffix = lastHundred >= 11 && lastHundred <= 13 ? 'th'
+    : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[hole % 10] ?? 'th';
+  return `${hole}${suffix}`;
+}
 
 export function deriveHoleWalk(holes: readonly CourseHole[], rows: readonly HolePhoto[]) {
   const tiles = [...holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => ({
