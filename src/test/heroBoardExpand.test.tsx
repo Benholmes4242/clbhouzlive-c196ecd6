@@ -24,6 +24,21 @@ describe('signed-off hero expansion', () => {
     const button = v.container.querySelector('[data-hero-full-leaderboard]'); expect(button).toHaveAttribute('data-field-size', '70');
     if (!button) throw new Error('Missing action'); fireEvent.click(button); expect(handler).toHaveBeenCalledTimes(1);
   });
+  it('live more-players row: count, no border, keeps attributes and opens the board', () => {
+    const handler = vi.fn(); const v = mount(Array.from({ length: 70 }, (_, i) => entry(i)), { onFullBoard: handler });
+    const button = v.container.querySelector<HTMLElement>('[data-hero-full-leaderboard]');
+    if (!button) throw new Error('Missing action');
+    expect(button.querySelector('[data-hero-more-name]')?.textContent).toBe('60 more players');
+    expect(button).toHaveAttribute('aria-label', 'Full leaderboard, 70 players');
+    expect(button.style.borderStyle).toBe('none');
+    expect(button.style.gridTemplateColumns).not.toBe('');
+    expect(button.className).not.toContain('hero-full-leaderboard');
+    fireEvent.click(button); expect(handler).toHaveBeenCalledTimes(1);
+  });
+  it('live: no more-players row when every entry is displayed', () => {
+    const v = mount([entry(), entry(1)], { onFullBoard: vi.fn() });
+    expect(v.container.querySelector('[data-hero-full-leaderboard]')).toBeNull();
+  });
   it('never invokes the holes hook with all rows closed', () => { mount(); expect(f.read).not.toHaveBeenCalled(); });
   it('toggles the panel and allows only one open row', () => {
     const v = mount(); fireEvent.click(row(v.container)); expect(row(v.container)).toHaveAttribute('aria-expanded', 'true');

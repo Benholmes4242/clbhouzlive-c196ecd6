@@ -81,7 +81,7 @@ export function weekCells(f: WeekFacts): FactCell[] {
 
 /** Finished chart uses the champion plus the next two by final position,
  * stable on ties. Select first, then drop incomplete players (no replacement).
- * Geometry stays here so both callers use the same 150px date-independent plot. */
+ * Geometry stays here so both callers use the same 126px full-width, date-independent plot. */
 export function wonChart(f: WeekFacts, rows: BoardEntry[], width: number) {
   if (f.rounds < 2 || !f.path.length || !f.champion_player_id) return null;
   const eligible = rows.filter(r => r.player && r.position != null && !['MC', 'CUT', 'WD', 'DQ'].includes((r.status ?? '').toUpperCase()));
@@ -96,14 +96,9 @@ export function wonChart(f: WeekFacts, rows: BoardEntry[], width: number) {
   if (!players.some(p => p.champion)) return null;
   const values = players.flatMap(p => p.values);
   const min = Math.min(...values) - 1, max = Math.max(0, ...values);
-  const x = (i: number) => 14 + i * (width - 118) / (f.rounds - 1);
-  const y = (v: number) => 22 + (v - min) / (max - min) * 106;
-  const lines = players.map(p => ({ ...p, points: p.values.map((value, i) => ({ x: x(i), y: y(value), value, position: p.champion ? f.path.find(entry => entry.round === i + 1) : undefined })), labelY: y(p.values[p.values.length - 1] ?? 0) + 4 }));
-  const labels = [...lines].sort((a, b) => a.labelY - b.labelY);
-  for (let i = 1; i < labels.length; i++) {
-    const previous = labels[i - 1], current = labels[i];
-    if (previous && current) current.labelY = Math.max(current.labelY, previous.labelY + 13);
-  }
+  const x = (i: number) => 10 + i * (width - 20) / (f.rounds - 1);
+  const y = (v: number) => 18 + (v - min) / (max - min) * 88;
+  const lines = players.map(p => ({ ...p, points: p.values.map((value, i) => ({ x: x(i), y: y(value), value, position: p.champion ? f.path.find(entry => entry.round === i + 1) : undefined })) }));
   return { lines, rounds: Array.from({ length: f.rounds }, (_, i) => ({ x: x(i), label: `R${i + 1}` })) };
 }
 

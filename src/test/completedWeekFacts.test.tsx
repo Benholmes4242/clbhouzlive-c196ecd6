@@ -5,6 +5,7 @@ import { fireEvent, render } from '@testing-library/react';
 import { holeTypeCells, holeTypeHeading, pathCells, wonChart, weekCells, topThreeRows, championScoreLabel, type WeekFacts } from '@/features/tourhub/tournament-v2/data/weekFactsRules';
 import { championNarrative } from '@/features/tourhub/tournament-v2/data/tournamentRules';
 import { CompletedWeekBlock } from '@/features/tourhub/tournament-v2/sections/CompletedWeekBlock';
+import { WonChart } from '@/features/tourhub/tournament-v2/sections/WonChart';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { TournamentMeta } from '@/features/tourhub/leaderboard/useTournamentMeta';
 
@@ -168,14 +169,42 @@ describe('finished week chart', () => {
     const chart = wonChart(WWT, field(), 335);
     expect(chart?.lines.map(p => p.id)).toEqual(['brown', 'a', 'b']);
     expect(chart?.lines[0]?.values).toEqual([0, 0, 0, -9]);
-    expect(chart?.lines[0]?.points.map(p => p.x)).toEqual([14, 86.33333333333333, 158.66666666666666, 231]);
+    expect(chart?.lines[0]?.points.map(p => p.x)).toEqual([10, 115, 220, 325]);
     expect(chart?.lines[0]?.points[3]?.y).toBeLessThan(chart?.lines[0]?.points[0]?.y ?? 0);
   });
-  it('labels with equal finish scores are at least 13px apart', () => {
-    const labels = wonChart(WWT, field(), 335)?.lines.map(p => p.labelY).sort((a,b)=>a-b) ?? [];
-    expect(labels).toHaveLength(3);
-    expect(labels[1] - labels[0]).toBeGreaterThanOrEqual(13);
-    expect(labels[2] - labels[1]).toBeGreaterThanOrEqual(13);
+  it('runs edge to edge: first point x=10, last x=325 at 335', () => {
+    const xs = wonChart(WWT, field(), 335)?.lines[0]?.points.map(p => p.x) ?? [];
+    expect(xs[0]).toBe(10); expect(xs[xs.length - 1]).toBe(325);
+  });
+  it('at 320 no SVG text sits beyond the width', () => {
+    const { container } = render(<WonChart facts={WWT} rows={field()} tourCode="pga" />);
+    const chart = wonChart(WWT, field(), 320);
+    expect(Math.max(...(chart?.rounds.map(r => r.x) ?? [Infinity]))).toBeLessThanOrEqual(320);
+    const svgXs = [...container.querySelectorAll('svg text')].map(t => Number(t.getAttribute('x')));
+    expect(svgXs.every(x => x <= 335)).toBe(true);
+  });
+  it('key: champion then the next two in board order, surname and score, under colour vs ink', () => {
+    const rows = field(); rows[2] = { ...rows[2], round_4: 3 } as BoardEntry;
+    const { container } = render(<WonChart facts={WWT} rows={rows} tourCode="pga" />);
+    const items = [...container.querySelectorAll('[data-won-key-item]')];
+    expect(items.map(i => i.querySelector('.cw-key-name')?.textContent)).toEqual(['Brown', 'Runner', 'Runner']);
+    expect(items.map(i => i.querySelector('.cw-key-score')?.textContent)).toEqual([' −9', ' −8', ' +3']);
+    expect(items.map(i => i.getAttribute('data-champion'))).toEqual(['true', 'false', 'false']);
+    expect(items.map(i => i.getAttribute('data-score-tone'))).toEqual(['under', 'under', 'ink']);
+    const css = readFileSync('src/features/tourhub/tournament-v2/sections/completedWeek.css', 'utf8');
+    expect(css).toContain('.cw-key-item[data-score-tone="under"] .cw-key-score{color:var(--cw-under)}');
+    expect(css).toContain('.cw-key-score{flex:none;font-weight:700;color:var(--cw-ink)');
+  });
+  it('no end labels and no caption render', () => {
+    const { container } = render(<WonChart facts={WWT} rows={field()} tourCode="pga" />);
+    expect(container.querySelector('[data-won-end-label], .cw-chart-end, .cw-chart-caption')).toBeNull();
+    expect(container.querySelector('svg')?.getAttribute('height')).toBe('126');
+  });
+  it('finished more-players row overrides the Button gap with the 4px grid column gap', () => {
+    const css = readFileSync('src/features/tourhub/tournament-v2/sections/completedWeek.css', 'utf8');
+    expect(css).toMatch(/\.cw-block \.cw-more\{display:grid;gap:0 4px;/);
+    const { container } = render(<CompletedWeekBlock facts={WWT} rows={field()} onFullBoard={() => {}} />);
+    expect(container.querySelector('[data-hero-full-leaderboard]')).toHaveClass('cw-lr', 'cw-more');
   });
   it.each(['MC', 'CUT', 'WD', 'DQ'])('never selects %s finishers', status => {
     const rows=field(); rows[1]={...rows[1],status};

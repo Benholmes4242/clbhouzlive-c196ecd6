@@ -21,7 +21,4 @@
 .hero-round-nines { display:flex; gap:12px; font-size:9.5px; font-weight:700; letter-spacing:.14em; color:var(--hero-round-dim); }
 .hero-round-nines b { color:var(--hero-round-ink); }
 .hero-round-footer .hero-scorecard-button { height:30px; border-radius:15px; border:1px solid var(--hero-round-outline); background:transparent; color:var(--hero-round-ink); font-size:12px; font-weight:700; padding:0 12px; }
-.hero-expand-board .hero-full-leaderboard { display:flex; justify-content:space-between; width:calc(100% - 2 * var(--hero-board-side)); margin:14px var(--hero-board-side) 0; height:46px; border-radius:14px; border:1px solid var(--hero-round-outline); background:transparent; padding:0 16px; color:var(--hero-round-ink); font-size:14px; font-weight:700; }
-.hero-full-leaderboard-count { display:flex; align-items:center; gap:8px; color:var(--hero-round-mute); font-size:12.5px; font-weight:600; }
-.hero-full-leaderboard-count b { color:var(--hero-round-ink); font-size:15px; }
 @media(max-width:340px) { .hero-expand-board { --hero-board-side:16px; } }

@@ -9,11 +9,14 @@
 .cw-week-cell{min-width:0}.cw-week-cell b{display:block;font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;color:var(--cw-ink)}.cw-week-cell b[data-under]{color:var(--cw-under)}
 .cw-week-cell span{display:block;margin-top:6px;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--cw-dim)}
 .cw-week-cell em{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px;font-style:normal;font-size:10.5px;font-weight:600;color:var(--cw-detail)}
-.cw-chart{margin:12px var(--cw-side) 0;min-width:0}.cw-chart svg{display:block;overflow:visible}.cw-chart-guide{stroke:var(--cw-guide);stroke-width:1}.cw-chart-round{fill:var(--cw-dim);font-size:9px;font-weight:800;letter-spacing:1.2px}
+.cw-chart{margin:6px var(--cw-side) 0;min-width:0}.cw-chart svg{display:block;overflow:visible}.cw-chart-guide{stroke:var(--cw-guide);stroke-width:1}.cw-chart-round{fill:var(--cw-dim);font-size:9px;font-weight:800;letter-spacing:1.2px}
 .cw-chart polyline{fill:none;stroke-linejoin:round}.cw-chart-other{stroke:var(--cw-other);stroke-width:1.6}.cw-chart-champion{stroke:var(--cw-ink);stroke-width:2.4}.cw-chart-dot{fill:var(--cw-ink);stroke:var(--cw-canvas);stroke-width:2}.cw-chart-position{fill:var(--cw-ink);font-size:10.5px;font-weight:700}
-.cw-chart-end{fill:var(--cw-mute);font-size:10px;font-weight:600}.cw-chart-end-champion{fill:var(--cw-ink);font-size:10.5px;font-weight:700}.cw-chart-score{fill:var(--cw-ink);font-weight:700}
-[data-score-tone="under"] .cw-chart-champion{stroke:var(--cw-under)}[data-score-tone="under"] .cw-chart-dot,[data-score-tone="under"] .cw-chart-score{fill:var(--cw-under)}
-.cw-chart-caption{margin:0;padding:8px var(--cw-side) 0;font-size:11.5px;line-height:1.45;color:var(--cw-dim)}
+[data-score-tone="under"] .cw-chart-champion{stroke:var(--cw-under)}[data-score-tone="under"] .cw-chart-dot{fill:var(--cw-under)}
+.cw-key{display:flex;flex-wrap:nowrap;gap:14px;padding:8px var(--cw-side) 0;font-size:11px;font-weight:600;color:var(--cw-mute);white-space:nowrap;min-width:0}
+.cw-key-item{display:inline-flex;align-items:center;min-width:0}.cw-key-item>i{flex:none;display:inline-block;width:12px;height:2px;border-radius:1px;margin-right:6px;background:var(--cw-other)}
+.cw-key-name{min-width:0;overflow:hidden;text-overflow:ellipsis}.cw-key-score{flex:none;font-weight:700;color:var(--cw-ink);white-space:pre}
+.cw-key-item[data-champion="true"] .cw-key-name{color:var(--cw-ink);font-weight:700}.cw-key-item[data-champion="true"]>i{height:2.4px;background:var(--cw-ink)}
+.cw-key-item[data-champion="true"][data-score-tone="under"]>i{background:var(--cw-under)}.cw-key-item[data-score-tone="under"] .cw-key-score{color:var(--cw-under)}
 .cw-cell{padding:var(--hero-cell-pad);min-width:0;text-align:center}
 .cw-cell b{display:block;line-height:var(--hero-cell-line);white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--cw-ink)}
 .cw-cell b i{font-style:normal;color:var(--cw-ink);margin-right:6px}
@@ -32,7 +35,7 @@
 .cw-lr .cw-n{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cw-lr .cw-r{text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .cw-lr .cw-v{text-align:right;font-variant-numeric:tabular-nums}
-.cw-block .cw-more{display:grid;width:100%;height:auto;border:0;border-radius:0;background:none;text-align:left;font-family:inherit;justify-content:stretch}.cw-more .cw-n{color:var(--cw-mute)}.cw-more .cw-v{font-size:16px;color:var(--cw-ink)}
+.cw-block .cw-more{display:grid;gap:0 4px;width:100%;height:auto;border:0;border-radius:0;background:none;text-align:left;font-family:inherit;justify-content:stretch}.cw-more .cw-n{color:var(--cw-mute)}.cw-more .cw-v{font-size:16px;color:var(--cw-ink)}
 @media(max-width:340px){:root{--hero-label-tracking:.04em;--hero-cell-pad:0 1px}.cw-block{--cw-side:16px}}
 .tv-section[data-tv-section="completed-week"]{padding:0}
 /* PLAYOFF reads in ink, as the signed-off champion block. */

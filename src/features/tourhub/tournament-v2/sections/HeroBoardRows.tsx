@@ -213,6 +213,8 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
     `${HERO_TOT_W}px`,
   ].filter(Boolean).join(' ');
   const heroGap = HERO_GAP;
+  // "N more players": every entry not already displayed above (rows plus extraRows).
+  const moreCount = Math.max(0, entries.length - rows.length - (extraRows?.length ?? 0));
   const teeRound = heroTeeRound(entries, rows, heroRounds, currentRound, phase === 'completed');
   const { data: teeGroups } = useTeeTimesAll(tournamentId, teeRound ?? 1, { enabled: teeRound != null });
   const teesByPlayer = useMemo(() => {
@@ -387,9 +389,13 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
             {extraRows.map((r, i) => renderRow(r, rows.length + i, true))}
           </>
         ) : null}
-        {onFullBoard ? <Button variant="ghost" className="hero-full-leaderboard" data-hero-full-leaderboard data-field-size={entries.length} onClick={onFullBoard}>
-          {t('overview.board.fullLeaderboard', { defaultValue: 'Full leaderboard' })}
-          <span className="hero-full-leaderboard-count">{t('overview.board.fieldSize', { count: entries.length, defaultValue_one: '{{count}} player', defaultValue_other: '{{count}} players', defaultValue: `${entries.length} ${entries.length === 1 ? 'player' : 'players'}` })}<b aria-hidden="true">›</b></span>
+        {onFullBoard && moreCount > 0 ? <Button variant="ghost" data-hero-full-leaderboard data-field-size={entries.length} onClick={onFullBoard}
+          aria-label={t('overview.board.fullLeaderboardAria', { count: entries.length, defaultValue: `Full leaderboard, ${entries.length} players` })}
+          style={{ display: 'grid', gridTemplateColumns: overviewGrid, gap: heroGap, alignItems: 'center', justifyContent: 'stretch', width: bleed ? `calc(100% + ${2 * HERO_PAD_X}px)` : '100%', margin: bleed ? `0 -${HERO_PAD_X}px` : 0, height: 'auto', minHeight: 31, padding: `4px ${HERO_PAD_X}px`, borderWidth: 0, borderStyle: 'none', borderRadius: 0, background: 'transparent', textAlign: 'left', fontFamily: FONT }}>
+          {showOverviewPosition ? <span aria-hidden="true" /> : null}
+          <span data-hero-more-name style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 600, color: OVERVIEW.mute }}>{t('overview.board.morePlayers', { count: moreCount, defaultValue_one: '{{count}} more player', defaultValue_other: '{{count}} more players', defaultValue: `${moreCount} more ${moreCount === 1 ? 'player' : 'players'}` })}</span>
+          {heroRounds.map((round) => <span key={round} aria-hidden="true" />)}
+          <span aria-hidden="true" style={{ textAlign: 'center', fontSize: 16, fontWeight: 700, color: ink }}>›</span>
         </Button> : null}
       </div>
 
