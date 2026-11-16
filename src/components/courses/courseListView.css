@@ -1,7 +1,6 @@
 .course-view-toggle {display:flex; flex:none; align-items:center; height:34px; padding:2px; gap:2px; border-radius:999px; background:var(--course-list-panel); border:1px solid var(--course-list-view-border)}
 .course-view-segment.course-view-segment {display:flex; align-items:center; justify-content:center; flex:none; width:32px; height:28px; padding:0; border:0; border-radius:999px; background:transparent; color:var(--course-list-dim)}
 .course-view-segment[aria-pressed="true"] {background:var(--course-list-view-active); color:var(--course-list-ink)}
-.course-view-segment:focus-visible,.course-list-row:focus-visible {outline:2px solid var(--course-list-focus); outline-offset:-2px}
 .course-list-row.course-list-row,.course-list-columns {display:grid; grid-template-columns:22px 48px minmax(0,1fr) auto; gap:12px; width:100%; align-items:center}
 .course-list-row.course-list-row {height:auto; padding:7px 16px; border:0; border-radius:0; background:transparent; color:var(--course-list-ink); text-align:left; font:inherit; white-space:normal; transform:none}
 .course-list-columns {padding:0 16px 8px; font-size:9px; font-weight:800; letter-spacing:0.14em; color:var(--course-list-dim)}
