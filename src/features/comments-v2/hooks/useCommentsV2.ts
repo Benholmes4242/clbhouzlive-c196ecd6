@@ -9,6 +9,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
@@ -241,7 +242,9 @@ export function useCommentsV2({
           : Promise.resolve({ data: [] as LikeRow[] }),
       ]);
 
-      const profileMap = new Map((profilesRes.data ?? []).map((p) => [(p as ProfileRow).id, p as ProfileRow]));
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const profileRows = await fillMissingFaces(profilesRes.data as ProfileRow[] | null, personalIds as string[]);
+      const profileMap = new Map(profileRows.map((p) => [p.id, p]));
       const businessMap = new Map((businessRes.data ?? []).map((b) => [(b as BusinessRow).id, b as BusinessRow]));
       const likeCounts = new Map<string, number>();
       (likeCountsRes.data ?? []).forEach((l) =>

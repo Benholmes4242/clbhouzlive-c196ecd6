@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 
 /**
  * THE CANDIDATE INDEX (BRIEF_COURSES_MERGED).
@@ -221,7 +222,9 @@ export function useCourseCandidateIndex(enabled: boolean) {
           .select('id, display_name, username, profile_photo_url')
           .in('id', reviewerIds.slice(i, i + 200));
         if (error) throw error;
-        for (const row of (data ?? []) as Array<{
+        // Unconnected public members come from public_profiles (see readMemberFaces).
+        const filled = await fillMissingFaces(data, reviewerIds.slice(i, i + 200));
+        for (const row of filled as Array<{
           id: string;
           display_name: string | null;
           username: string | null;

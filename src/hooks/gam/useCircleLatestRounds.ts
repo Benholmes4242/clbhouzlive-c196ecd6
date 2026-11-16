@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 import { fetchCircleIds } from '@/lib/social/circle';
 import { useIsGuest } from '@/features/guest/useIsGuest';
@@ -483,11 +484,13 @@ export function useCircleLatestRounds(
 
       // 5. Profiles (name + avatar) — ONE read covering circle AND suggested.
       const surfacedUserIds = Array.from(new Set(rowsWindow.map((r) => r.user_id)));
-      const { data: profiles, error: profilesError } = await supabase
+      const { data: visibleProfiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, display_name, profile_photo_url, primary_club_id, handicap_visibility, eg_visible')
         .in('id', surfacedUserIds);
       if (profilesError) throw profilesError;
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const profiles = await fillMissingFaces(visibleProfiles, surfacedUserIds);
       const profileById = new Map<
         string,
         {

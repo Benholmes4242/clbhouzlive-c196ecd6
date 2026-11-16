@@ -34,18 +34,16 @@ beforeEach(() => {
     : [{ course_id: 'c1', player_ids: ['holder'] }] }));
 });
 
-describe('record and face avatars read public_profiles', () => {
+describe('record and face avatars read visible rows first, then public_profiles', () => {
   it('useCourseRecordHolders gives an unconnected holder their photo', async () => {
     const { result } = renderHook(() => useCourseRecordHolders(['c1']), { wrapper });
     await waitFor(() => expect(result.current.map.get('c1')?.photoUrl).toBe('/danny.jpg'));
-    expect(f.tables).toContain('public_profiles');
-    expect(f.tables).not.toContain('user_profiles');
+    expect(f.tables.filter((t) => t.endsWith('profiles'))).toEqual(['user_profiles', 'public_profiles']);
   });
   it('useTop100Enrichment faces carry photos from public_profiles', async () => {
     const { result } = renderHook(() => useTop100Enrichment(['c1'], undefined, 'test'), { wrapper });
     await waitFor(() => expect(result.current.data.get('c1')?.players[0]?.photoUrl).toBe('/danny.jpg'));
-    expect(f.tables).toContain('public_profiles');
-    expect(f.tables).not.toContain('user_profiles');
+    expect(f.tables.filter((t) => t.endsWith('profiles'))).toEqual(['user_profiles', 'public_profiles']);
   });
 });
 

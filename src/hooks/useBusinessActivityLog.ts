@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 
 export interface BusinessActivityLogEntry {
   id: string;
@@ -46,9 +47,9 @@ export function useBusinessActivityLog(businessId?: string, limit = 50) {
           .select('id, display_name, username, profile_photo_url')
           .in('id', actorIds);
 
-        if (profiles) {
-          actorProfiles = Object.fromEntries(profiles.map(p => [p.id, p]));
-        }
+        // Unconnected public actors come from public_profiles (see readMemberFaces).
+        const filled = await fillMissingFaces(profiles, actorIds);
+        actorProfiles = Object.fromEntries(filled.map(p => [p.id, p]));
       }
 
       return data.map(entry => ({

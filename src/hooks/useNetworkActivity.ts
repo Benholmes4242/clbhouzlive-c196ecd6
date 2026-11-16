@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 
 /**
  * Extended friend profile with activity status
@@ -134,7 +135,7 @@ export function useNetworkActivity(userId: string | undefined) {
       const sevenDaysAgoISO = sevenDaysAgo.toISOString();
 
       // Fetch profiles
-      const { data: profiles, error: profilesError } = await supabase
+      const { data: visibleProfiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, username, display_name, profile_photo_url')
         .in('id', friendIds)
@@ -144,6 +145,8 @@ export function useNetworkActivity(userId: string | undefined) {
         console.error('[useNetworkActivity] Profiles error:', profilesError);
         throw profilesError;
       }
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const profiles = await fillMissingFaces(visibleProfiles, friendIds);
 
       // Fetch recent course ratings for all friends (last 60 days for highlights)
       const sixtyDaysAgo = new Date();

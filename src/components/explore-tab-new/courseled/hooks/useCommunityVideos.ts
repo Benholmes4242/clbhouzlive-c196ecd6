@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
@@ -157,7 +158,7 @@ export function useCommunityVideos() {
             .filter((id): id is string => !!id),
         ),
       );
-      const [{ data: profiles }, { data: businesses }, coursesRes] = await Promise.all([
+      const [{ data: visibleProfiles }, { data: businesses }, coursesRes] = await Promise.all([
         supabase
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url')
@@ -169,6 +170,8 @@ export function useCommunityVideos() {
           ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
           : Promise.resolve({ data: [] as Array<{ id: string; name: string }> }),
       ]);
+      // Unconnected public authors come from public_profiles (see readMemberFaces).
+      const profiles = await fillMissingFaces(visibleProfiles as Array<{ id: string }> | null, userIds);
       const profileById = new Map(
         ((profiles ?? []) as Array<{
           id: string;

@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { useProfileData } from '@/hooks/useProfileData';
 
 export type ReviewReasonKind = 'club' | 'played' | 'posted' | 'followed' | 'popular';
@@ -134,11 +135,14 @@ export async function loadReviewSuggestions(userId: string, t: TFunction<'compos
       .in('user_id', ids).gte('created_at', from(90)).order('created_at', { ascending: false }).order('id')),
   ]);
   const ids = [...new Set([...club.map(c => c.id), ...played.map(p => p.course_id), ...posts.flatMap(p => p.course_id ? [p.course_id] : []), ...followed.map(r => r.course_id)])];
-  const [courses, profiles] = await Promise.all([
+  const followedIds = [...new Set(followed.flatMap(r => r.user_id ? [r.user_id] : []))];
+  const [courses, visibleProfiles] = await Promise.all([
     readIds<SuggestionCourse>(ids, chunk => supabase.from('golf_courses').select('id, name, thumbnail_image').in('id', chunk).order('id')),
-    readIds<SuggestionProfile>([...new Set(followed.flatMap(r => r.user_id ? [r.user_id] : []))], chunk =>
+    readIds<SuggestionProfile>(followedIds, chunk =>
       supabase.from('user_profiles').select('id, display_name, username').in('id', chunk).order('id')),
   ]);
+  // Unconnected public members come from public_profiles (see readMemberFaces).
+  const profiles = await fillMissingFaces(visibleProfiles, followedIds);
   const sources: Sources = { courses, club, played, posts, followed, profiles, reviewed: reviewed.map(r => r.course_id), popular: [] };
   const personal = buildReviewSuggestions(sources, t);
   if (personal.length) return personal;

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -66,7 +67,8 @@ export default function BlockedPage() {
         throw profilesError;
       }
 
-      const byId = new Map((profiles ?? []).map(p => [p.id, p]));
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const byId = new Map((await fillMissingFaces(profiles, ids)).map(p => [p.id, p]));
 
       // A missing profile must NOT drop the row — the block still exists and
       // must stay unblockable. Falls through to the 'Unknown' render branch.

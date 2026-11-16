@@ -28,6 +28,7 @@ import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/Str
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
@@ -369,7 +370,10 @@ const HandicapPage: React.FC = () => {
         .eq('id', ownerUserId!)
         .maybeSingle();
       if (error) throw error;
-      return data ?? null;
+      if (data) return data;
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const [face] = await fillMissingFaces<{ id: string; username: string | null; display_name: string | null; profile_photo_url: string | null }>([], [ownerUserId!]);
+      return face ? { username: face.username, display_name: face.display_name, profile_photo_url: face.profile_photo_url } : null;
     },
   });
 

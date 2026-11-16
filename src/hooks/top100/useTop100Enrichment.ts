@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { batchDigest, top100Keys, viewerId } from '@/lib/queryKeys';
 import { supabase } from '@/integrations/supabase/client';
+import { readMemberFaces } from '@/lib/members/readMemberFaces';
 
 /**
  * Batched enrichment for the Top 100 list.
@@ -171,21 +172,13 @@ export function useTop100Enrichment(
       }
 
       // Sequential on purpose: the face ids are unknown until the RPC resolves.
+      // Visible user_profiles rows first, public_profiles fills the gaps
+      // (readMemberFaces), so unconnected public members and private friends
+      // both keep their faces.
       if (faceIds.size > 0) {
-      // public_profiles, not user_profiles: user_profiles RLS hides members the
-      // viewer is not connected to, so their faces fell back to initials. The
-      // view (latest definition, migration 20260625082640) already filters
-      // deleted_at IS NULL, suspended and unconfirmed accounts, so no
-      // deleted_at filter here (the view has no such column).
-        const profRes = await supabase
-          .from('public_profiles')
-          .select('id, display_name, profile_photo_url')
-          .in('id', Array.from(faceIds));
-        if (profRes.error) throw profRes.error;
+        const faces = await readMemberFaces(Array.from(faceIds));
         const profiles = new Map<string, { display_name: string | null; profile_photo_url: string | null }>();
-        for (const p of (profRes.data ?? []) as any[]) {
-          profiles.set(p.id, { display_name: p.display_name ?? null, profile_photo_url: p.profile_photo_url ?? null });
-        }
+        for (const f of faces.values()) profiles.set(f.id, { display_name: f.displayName, profile_photo_url: f.photoUrl });
         for (const row of (ctxRes.data ?? []) as any[]) {
           const entry = map.get(row.course_id);
           if (!entry) continue;

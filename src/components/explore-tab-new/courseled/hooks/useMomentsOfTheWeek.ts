@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { MOMENTS_KEY } from '../discoverQueryKeys';
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
@@ -232,7 +233,7 @@ export function useMomentsOfTheWeek(
             .map((p) => p.row.actor_id as string),
         ),
       );
-      const [{ data: courses }, { data: profiles }, { data: businesses }] = await Promise.all([
+      const [{ data: courses }, { data: visibleProfiles }, { data: businesses }] = await Promise.all([
         // sub_country rides along on the EXISTING join — no third round trip.
         supabase.from('golf_courses').select('id, name, sub_country').in('id', courseIds),
         supabase
@@ -248,6 +249,8 @@ export function useMomentsOfTheWeek(
               data: [] as Array<{ id: string; name: string; logo_url: string | null; is_verified: boolean | null }>,
             }),
       ]);
+      // Unconnected public authors come from public_profiles (see readMemberFaces).
+      const profiles = await fillMissingFaces(visibleProfiles as Array<{ id: string }> | null, userIds);
       const courseName = new Map<string, string>();
       const courseRegion = new Map<string, string>();
       for (const c of (courses ?? []) as Array<{

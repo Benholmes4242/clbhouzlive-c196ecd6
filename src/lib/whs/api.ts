@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import type {
   WhsConnection,
   WhsHandicapTrend,
@@ -487,7 +488,8 @@ export async function fetchFriendsActivity(
       .from('user_profiles' as any)
       .select('id, profile_photo_url')
       .in('id', friendUserIds);
-    for (const p of ((profiles as any[]) ?? [])) {
+    // Unconnected public members come from public_profiles (see readMemberFaces).
+    for (const p of (await fillMissingFaces(profiles as any[] | null, friendUserIds)) as any[]) {
       photoByUserId[p.id] = p.profile_photo_url ?? null;
     }
   }
@@ -1025,7 +1027,8 @@ export async function fetchFriendRivalries(
         'id, header_photo_url, profile_photo_url, mobile_crop_x, mobile_crop_y, mobile_crop_width, mobile_crop_height',
       )
       .in('id', rivalUserIds);
-    for (const p of (profiles as any[]) ?? []) {
+    // Unconnected public rivals: avatar from public_profiles; header/crop fields stay absent.
+    for (const p of (await fillMissingFaces(profiles as any[] | null, rivalUserIds)) as any[]) {
       profilesByUserId[p.id] = p;
     }
   }

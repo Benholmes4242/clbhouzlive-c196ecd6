@@ -17,6 +17,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 
 export interface ResolvedIdentity {
   userId: string;
@@ -43,7 +44,9 @@ export function useCompareIdentities(
         .in('id', ids);
       if (error) throw error;
       const map: IdentityMap = {};
-      for (const row of (data ?? []) as {
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const filled = await fillMissingFaces(data, ids);
+      for (const row of filled as {
         id: string;
         display_name: string | null;
         username: string | null;

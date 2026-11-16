@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 
 export interface FriendTop100Progress {
   user_id: string;
@@ -50,12 +51,14 @@ export function useFriendsTop100Progress(userId: string | undefined, listId: str
       if (actError) throw actError;
 
       // Get profiles
-      const { data: profiles, error: profileError } = await supabase
+      const { data: visibleProfiles, error: profileError } = await supabase
         .from('user_profiles')
         .select('id, username, display_name, profile_photo_url')
         .in('id', friendIds);
 
       if (profileError) throw profileError;
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const profiles = await fillMissingFaces(visibleProfiles, friendIds);
 
       // Get total Top 100 played for each friend (across all lists)
       const { data: totalCounts, error: totalError } = await supabase

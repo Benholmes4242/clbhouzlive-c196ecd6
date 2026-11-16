@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { batches } from '@/lib/batches';
 import { settled } from './browse/PageLoadGate';
+import { readMemberFaces } from '@/lib/members/readMemberFaces';
 
 /**
  * useCourseRecordHolders — the one holder behind each course record in the
@@ -94,20 +95,14 @@ export function useCourseRecordHolders(courseIds: readonly string[], { includePl
       const playerProfiles = new Map<string, CourseListPlayer>();
       // Sequential on purpose: the holder ids are unknown until the RPC resolves.
       const profiles = new Map<string, string | null>();
+      // Visible user_profiles rows first, public_profiles fills the gaps
+      // (readMemberFaces), so unconnected public holders and private friends
+      // both keep their photos.
       if (holderIds.length > 0) {
-      // public_profiles, not user_profiles: user_profiles RLS hides members the
-      // viewer is not connected to, so their faces fell back to initials. The
-      // view (latest definition, migration 20260625082640) already filters
-      // deleted_at IS NULL, suspended and unconfirmed accounts, so no
-      // deleted_at filter here (the view has no such column).
-        const profRes = await supabase
-          .from('public_profiles')
-          .select('id, display_name, profile_photo_url')
-          .in('id', holderIds);
-        if (profRes.error) throw profRes.error;
-        for (const profile of (profRes.data ?? []) as Array<{ id: string; display_name?: string | null; profile_photo_url: string | null }>) {
-          profiles.set(String(profile.id), profile.profile_photo_url ?? null);
-          playerProfiles.set(String(profile.id), { id: String(profile.id), name: profile.display_name ?? null, photoUrl: profile.profile_photo_url ?? null });
+        const faces = await readMemberFaces(holderIds);
+        for (const face of faces.values()) {
+          profiles.set(face.id, face.photoUrl);
+          playerProfiles.set(face.id, { id: face.id, name: face.displayName, photoUrl: face.photoUrl });
         }
       }
 

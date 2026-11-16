@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { toast } from '@/lib/toast';
 
 export type BusinessRole = 'owner' | 'admin' | 'editor' | 'analyst';
@@ -97,7 +98,8 @@ export function useBusinessInvites(businessId?: string) {
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
         .in('id', userIds);
-      const byId = new Map((profiles || []).map(p => [p.id, p]));
+      const filled = await fillMissingFaces(profiles, userIds);
+      const byId = new Map(filled.map(p => [p.id, p]));
       return rows.map(r => ({
         ...r,
         invitee_profile: r.invitee_user_id ? (byId.get(r.invitee_user_id) as any) ?? null : null,

@@ -11,6 +11,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { mapRowToFeedPost } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
@@ -55,7 +56,8 @@ export async function buildCourseGallery(cache: QueryClient, a: BuildArgs): Prom
     const profiles = await cache.fetchQuery({ queryKey: ['course-place-contributors', ids], queryFn: async () => {
       const { data, error } = await supabase.from('user_profiles').select('id, display_name, profile_photo_url').in('id', ids);
       if (error) throw error;
-      return data ?? [];
+      // Unconnected public contributors come from public_profiles (see readMemberFaces).
+      return fillMissingFaces(data, ids);
     } });
     const members = new Map(profiles.map(row => [row.id, row]));
     return placeShotsToFeedPosts(publicPlaces.map(row => ({ ...row, member_id: row.user_id, member_name: members.get(row.user_id)?.display_name, member_avatar_url: members.get(row.user_id)?.profile_photo_url })), a.courseName, a.courseId, 'all', '');

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 
 /** CB75: summary and card share this key/read; realtime and CB74 invalidate it.
  * Profile-read failures are query failures, never invented club affiliation. */
@@ -37,7 +38,9 @@ export function useBusinessAccessRequests(businessId?: string, enabled = false) 
         .select('id, display_name, username, profile_photo_url, primary_club_id, home_club_visibility')
         .in('id', data.map(r => r.requester_user_profile_id));
       if (profileError) throw profileError;
-      const byId = new Map(profiles?.map(p => [p.id, p]) ?? []);
+      // Unconnected public requesters: face columns from public_profiles; club fields stay absent.
+      const filled = await fillMissingFaces(profiles, data.map(r => r.requester_user_profile_id));
+      const byId = new Map(filled.map(p => [p.id, { primary_club_id: null, home_club_visibility: null, ...p }]));
       return data.map(r => ({ ...r, requester: byId.get(r.requester_user_profile_id) ?? {
         id: r.requester_user_profile_id, display_name: null, username: null, profile_photo_url: null,
         primary_club_id: null, home_club_visibility: null,

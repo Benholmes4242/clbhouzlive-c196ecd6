@@ -14,6 +14,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { fetchCircleIds } from '@/lib/social/circle';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatNumber } from '@/i18n/format';
@@ -103,8 +104,10 @@ function useFollowedGolfers(viewerId: string, businessId: string) {
       if (error) throw error;
       const ids = Array.from(new Set(((data ?? []) as Array<{ follower_actor_id: string }>).map((r) => r.follower_actor_id))).filter((id) => id !== viewerId);
       if (ids.length === 0) return [];
-      const { data: profiles, error: pErr } = await supabase.from('user_profiles').select('id, display_name, profile_photo_url').in('id', ids);
+      const { data: visible, error: pErr } = await supabase.from('user_profiles').select('id, display_name, profile_photo_url').in('id', ids);
       if (pErr) throw pErr;
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const profiles = await fillMissingFaces(visible as Array<{ id: string }> | null, ids);
       const byId = new Map(((profiles ?? []) as Array<{ id: string; display_name: string | null; profile_photo_url: string | null }>).map((p) => [p.id, p]));
       return ids.flatMap((id) => {
         const p = byId.get(id);

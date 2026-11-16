@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { reactionActorOf } from '@/lib/reactionActor';
 
 export interface PostLiker {
@@ -141,7 +142,9 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
 
       if (businessesError) throw businessesError;
 
-      const profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const profileRows = personalIds.length > 0 ? await fillMissingFaces(profiles as Array<{ id: string }> | null, personalIds) : [];
+      const profileMap = new Map((profileRows as any[]).map(p => [p.id, p]));
       const businessMap = new Map((businesses ?? []).map(b => [b.id, b]));
 
       // Return in original like order (deduped). Identity from the actor only.

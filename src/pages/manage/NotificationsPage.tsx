@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -76,7 +77,8 @@ export default function NotificationsPage() {
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url')
           .in('id', mutedUserIds);
-        for (const p of data ?? []) {
+        // Unconnected public members come from public_profiles (see readMemberFaces).
+        for (const p of await fillMissingFaces(data, mutedUserIds)) {
           next[p.id] = {
             name: p.display_name || p.username || '',
             photo: p.profile_photo_url ?? null,

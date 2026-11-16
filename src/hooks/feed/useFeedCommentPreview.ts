@@ -18,6 +18,7 @@
 import { useMemo, useRef } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { batchDigest, feedKeys, viewerId } from '@/lib/queryKeys';
 import { useMergedBatch } from '@/lib/batchQuery';
@@ -136,7 +137,9 @@ export function useFeedCommentPreview(
           ? supabase.from('business_accounts').select('id, name, logo_url, is_verified').in('id', businessIds)
           : Promise.resolve({ data: [] as BusinessRow[] }),
       ]);
-      const profileMap = new Map((profilesRes.data ?? []).map(p => [(p as ProfileRow).id, p as ProfileRow]));
+      // Unconnected public members come from public_profiles (see readMemberFaces).
+      const profileRows = await fillMissingFaces(profilesRes.data as ProfileRow[] | null, personalIds);
+      const profileMap = new Map(profileRows.map(p => [p.id, p]));
       const businessMap = new Map((businessRes.data ?? []).map(b => [(b as BusinessRow).id, b as BusinessRow]));
 
       const resolve = (row: Row) => {

@@ -25,6 +25,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { fetchSharedRoundCounts } from '@/lib/whs/api';
 
 export interface PlayedWithMember {
@@ -60,9 +61,11 @@ async function fetchPlayedWith(userId: string): Promise<PlayedWithMember[]> {
     .select('id, display_name, username, profile_photo_url, is_verified_golfer')
     .in('id', partnerIds);
   if (profErr) throw profErr;
+  // Unconnected public members come from public_profiles (see readMemberFaces).
+  const filled = await fillMissingFaces(profiles as Array<{ id: string } & Record<string, unknown>> | null, partnerIds);
 
   const byId = new Map(
-    (profiles ?? []).map((p) => [
+    filled.map((p) => [
       p.id as string,
       {
         name: (p.display_name as string) || (p.username as string) || 'Golfer',

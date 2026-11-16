@@ -10,6 +10,7 @@
  * or the tagged member deletes.
  */
 import { supabase } from '@/integrations/supabase/client';
+import { fillMissingFaces } from '@/lib/members/readMemberFaces';
 import { MAX_PLAYED_WITH } from './golfPostRules';
 
 export const postWithTable = () => supabase.from('post_with');
@@ -50,8 +51,10 @@ export async function readPostWith(postIds: readonly string[]): Promise<PostWith
   if (error || !data?.length) return [];
   const rows = data as Array<{ post_id: string; user_id: string }>;
   const ids = [...new Set(rows.map((r) => r.user_id))];
-  const { data: profiles } = await supabase.from('user_profiles').select('id, display_name, first_name, username, profile_photo_url').in('id', ids);
-  const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+  const { data: visible } = await supabase.from('user_profiles').select('id, display_name, first_name, username, profile_photo_url').in('id', ids);
+  // Unconnected public members come from public_profiles (see readMemberFaces).
+  const profiles = await fillMissingFaces(visible as Array<{ id: string; display_name: string | null; first_name?: string | null; username: string | null; profile_photo_url: string | null }> | null, ids);
+  const byId = new Map(profiles.map((p) => [p.id, p]));
   return rows.map((r) => {
     const p = byId.get(r.user_id);
     return { postId: r.post_id, userId: r.user_id, name: p?.display_name || p?.first_name || p?.username || 'Golfer', avatarUrl: p?.profile_photo_url ?? null };
