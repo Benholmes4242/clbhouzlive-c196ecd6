@@ -55,32 +55,32 @@ describe('Members badge source contract', () => {
 
   it('defines the exact plate, amber rim and foil tokens and retires the pearl plate', () => {
     expect(tokens).toContain('--member-badge-plate: linear-gradient(180deg, #26272B 0%, #0E0E10 55%, #050506 100%);');
-    expect(tokens).toContain('--member-badge-rim: linear-gradient(135deg, #FFD9A6 0%, #F7931E 35%, #FFC37A 60%, #C46A0E 100%);');
-    expect(tokens).toContain('--member-badge-foil: linear-gradient(180deg, #FFE7C4 0%, #FFB45C 45%, #F7931E 70%, #FFD49A 100%);');
+    expect(tokens).toContain('--member-badge-rim: linear-gradient(135deg, #FFFFFF 0%, #B9BEC6 38%, #FFFFFF 62%, #8A9099 100%);');
+    expect(tokens).toContain('--member-badge-foil: linear-gradient(180deg, #FFFFFF 0%, #E4E7EC 55%, #FFFFFF 100%);');
     expect(tokens).not.toContain('--pro-label-plate');
   });
 
-  it('keeps the normal badge at 20px with an inside-box amber rim', () => {
+  it('keeps the normal badge at 16px with an inside-box white rim', () => {
     const css = rule(label, '.pro-label');
-    for (const declaration of ['height:20px', 'padding:0 7px', 'border-radius:7px', 'border:1px solid transparent', 'box-sizing:border-box', 'var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box']) expect(css).toContain(declaration);
+    for (const declaration of ['height:16px', 'padding:0 5px', 'border-radius:5.4px', 'border:1px solid transparent', 'box-sizing:border-box', 'var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box']) expect(css).toContain(declaration);
     expect(css).not.toContain('box-shadow');
   });
 
   it('uses clipped amber foil letters with the signed-off normal type', () => {
     const css = rule(label, '.pro-label-text');
-    for (const declaration of ['font-size:9.5px', 'font-weight:800', 'letter-spacing:0.14em', 'margin-right:-0.14em', 'background:var(--member-badge-foil)', 'background-clip:text', '-webkit-text-fill-color:transparent']) expect(css).toContain(declaration);
+    for (const declaration of ['font-size:7.5px', 'font-weight:800', 'letter-spacing:0.14em', 'margin-right:-0.14em', 'background:var(--member-badge-foil)', 'background-clip:text', '-webkit-text-fill-color:transparent']) expect(css).toContain(declaration);
   });
 
-  it('keeps the small badge at 16px with 8.5px letters', () => {
+  it('keeps the small badge at 12px with 6.5px letters', () => {
     const css = rule(label, '.pro-label[data-size="small"]');
-    for (const declaration of ['height:16px', 'padding:0 5px', 'border-radius:5.5px']) expect(css).toContain(declaration);
-    expect(rule(label, '.pro-label[data-size="small"] .pro-label-text')).toContain('font-size:8.5px');
+    for (const declaration of ['height:12px', 'padding:0 4px', 'border-radius:4.1px']) expect(css).toContain(declaration);
+    expect(rule(label, '.pro-label[data-size="small"] .pro-label-text')).toContain('font-size:6.5px');
   });
 
-  it('keeps the island badge at 22px with 10.5px letters and no shadow', () => {
+  it('keeps the island badge at 18px with 8.5px letters and no shadow', () => {
     const css = rule(controls, '.pro-island-cell .pro-label[data-size]');
-    for (const declaration of ['height:22px', 'padding:0 8px', 'border-radius:7.5px', 'border:1px solid transparent', 'var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box']) expect(css).toContain(declaration);
-    expect(rule(controls, '.pro-island-cell .pro-label[data-size] .pro-label-text')).toContain('font-size:10.5px');
+    for (const declaration of ['height:18px', 'padding:0 6px', 'border-radius:6.1px', 'border:1px solid transparent', 'var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box']) expect(css).toContain(declaration);
+    expect(rule(controls, '.pro-island-cell .pro-label[data-size] .pro-label-text')).toContain('font-size:8.5px');
     expect(css).not.toContain('box-shadow');
   });
 
