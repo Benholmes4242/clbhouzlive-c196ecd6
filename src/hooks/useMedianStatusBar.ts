@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
+import { hideKeyboardAccessoryOnce } from '@/utils/median/keyboardAccessory';
 
 declare global {
   interface Window {
@@ -154,12 +155,14 @@ export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexCol
 // The module-level chain owns the ready flag.
 if (typeof window !== 'undefined') {
   ensureStatusBarOverlayBooted();
+  hideKeyboardAccessoryOnce();
   const prev = window.median_library_ready;
   window.median_library_ready = () => {
     medianLibraryReady = true;
     console.info('[chrome] median_library_ready fired');
     if (typeof prev === 'function') prev();
     ensureStatusBarOverlayBooted();
+    hideKeyboardAccessoryOnce();
   };
 }
 

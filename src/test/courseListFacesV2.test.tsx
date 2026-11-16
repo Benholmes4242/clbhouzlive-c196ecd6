@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ rpc: vi.fn(), profiles: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: {
   rpc: f.rpc,
-  from: () => ({ select: () => ({ in: (_key: string, ids: string[]) => ({ is: () => f.profiles(ids) }) }) }),
+  from: () => ({ select: () => ({ in: (_key: string, ids: string[]) => f.profiles(ids) }) }),
 } }));
 import { useCourseRecordHolders } from '@/components/courses/useCourseRecordHolders';
 const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>;

@@ -172,11 +172,15 @@ export function useTop100Enrichment(
 
       // Sequential on purpose: the face ids are unknown until the RPC resolves.
       if (faceIds.size > 0) {
+      // public_profiles, not user_profiles: user_profiles RLS hides members the
+      // viewer is not connected to, so their faces fell back to initials. The
+      // view (latest definition, migration 20260625082640) already filters
+      // deleted_at IS NULL, suspended and unconfirmed accounts, so no
+      // deleted_at filter here (the view has no such column).
         const profRes = await supabase
-          .from('user_profiles')
+          .from('public_profiles')
           .select('id, display_name, profile_photo_url')
-          .in('id', Array.from(faceIds))
-          .is('deleted_at', null);
+          .in('id', Array.from(faceIds));
         if (profRes.error) throw profRes.error;
         const profiles = new Map<string, { display_name: string | null; profile_photo_url: string | null }>();
         for (const p of (profRes.data ?? []) as any[]) {

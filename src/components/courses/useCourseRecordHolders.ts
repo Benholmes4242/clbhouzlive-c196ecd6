@@ -95,11 +95,15 @@ export function useCourseRecordHolders(courseIds: readonly string[], { includePl
       // Sequential on purpose: the holder ids are unknown until the RPC resolves.
       const profiles = new Map<string, string | null>();
       if (holderIds.length > 0) {
+      // public_profiles, not user_profiles: user_profiles RLS hides members the
+      // viewer is not connected to, so their faces fell back to initials. The
+      // view (latest definition, migration 20260625082640) already filters
+      // deleted_at IS NULL, suspended and unconfirmed accounts, so no
+      // deleted_at filter here (the view has no such column).
         const profRes = await supabase
-          .from('user_profiles')
+          .from('public_profiles')
           .select('id, display_name, profile_photo_url')
-          .in('id', holderIds)
-          .is('deleted_at', null);
+          .in('id', holderIds);
         if (profRes.error) throw profRes.error;
         for (const profile of (profRes.data ?? []) as Array<{ id: string; display_name?: string | null; profile_photo_url: string | null }>) {
           profiles.set(String(profile.id), profile.profile_photo_url ?? null);
