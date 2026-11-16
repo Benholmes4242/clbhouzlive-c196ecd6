@@ -95,6 +95,8 @@ interface Props {
   isCreator?: boolean;
   isPro?: boolean;
   isAmateur?: boolean;
+  /** BRIEF_MEMBER_BADGES_V2: the profile member's id makes the badge tappable. */
+  badgeUserId?: string;
   /** Pre-joined home club · region; null when neither resolves. */
   subline: string | null;
   /** Optional member coach line, privacy/read ownership remains with its caller. */
@@ -117,6 +119,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
   isCreator = false,
   isPro = false,
   isAmateur = false,
+  badgeUserId,
   subline,
   afterSubline,
   onAddHomeClub,
@@ -261,10 +264,9 @@ export const ProfileCoverBand: React.FC<Props> = ({
             >
               {displayName}
             </h1>
-            {(isPro || isAmateur || isCreator) && <span className="identity-badges">
-              {isPro && <ProLabel size="large" />}
-              {isAmateur && !isPro && <ProLabel size="large" kind="am" />}
-              {isCreator && <span className="profile-creator-label" data-size="large"><span className="pro-label-text">Creator</span></span>}
+            {(isPro || isAmateur) && <span className="identity-badges">
+              {isPro && <ProLabel size="large" userId={badgeUserId} name={displayName} surface="profile" hideProfileButton />}
+              {isAmateur && !isPro && <ProLabel size="large" kind="am" userId={badgeUserId} name={displayName} surface="profile" hideProfileButton />}
             </span>}
             </div>
             {afterSubline}

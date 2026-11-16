@@ -54,18 +54,17 @@ describe('Brief 2 public pro identity', () => {
     f.rpc.mockResolvedValue({ data: [pro], error: new Error('denied') });
     await expect(readProMembers(['pro'])).rejects.toThrow('denied');
   });
-  it('pro identity precedes Creator in the cover identity row', () => {
+  it('a pro-and-creator cover identity row shows PRO alone', () => {
     const { container } = mount(<ProfileCoverBand coverUrl={null} avatar={null} displayName="Long Name" subline={null} isPro isCreator />);
     const row = container.querySelector('.pro-identity-row');
     expect(row?.children[0].tagName).toBe('H1');
     expect(row?.children).toHaveLength(2);
     const badges = row?.children[1];
     expect(badges?.className).toBe('identity-badges');
-    expect(badges?.children).toHaveLength(2);
+    expect(badges?.children).toHaveLength(1);
     expect(badges?.children[0].className).toBe('pro-label');
     expect(badges?.children[0].getAttribute('data-size')).toBe('large');
-    expect(badges?.children[1].className).toBe('profile-creator-label');
-    expect(badges?.children[1].previousElementSibling).toBe(badges?.children[0]);
+    expect(container.querySelector('.profile-creator-label')).toBeNull();
   });
 });
 

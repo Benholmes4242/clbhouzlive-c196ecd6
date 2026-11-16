@@ -49,12 +49,13 @@ for (const Component of [InlineProMemberName, ProMemberName]) {
     });
   });
 }
-it('cover-band AM occupies the large badge slot before Creator', () => {
+it('cover-band AM occupies the large badge slot, with no creator badge', () => {
   const view = render(<ProfileCoverBand coverUrl={null} avatar={null} displayName="Member" subline={null} isAmateur isCreator />);
   const group = view.container.querySelector('.identity-badges');
   expect(group?.firstElementChild).toHaveAttribute('data-kind', 'am');
   expect(group?.firstElementChild).toHaveAttribute('data-size', 'large');
-  expect(group?.lastElementChild).toHaveClass('profile-creator-label');
+  expect(group?.children).toHaveLength(1);
+  expect(view.container.querySelector('.profile-creator-label')).toBeNull();
 });
 it('plain cover-band members have no badge group', () => {
   const view = render(<ProfileCoverBand coverUrl={null} avatar={null} displayName="Member" subline={null} />);

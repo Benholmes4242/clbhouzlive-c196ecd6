@@ -554,7 +554,7 @@ function RailCardView({
       {!source && <div data-follow-tile-avatar="large" className="follow-tile-avatar follow-tile-avatar-large">{avatar(84)}</div>}
       <div className="follow-tile-bottom">
         {source && <div data-follow-tile-avatar="small" className="follow-tile-avatar follow-tile-avatar-small">{avatar(34)}</div>}
-        <div className="follow-tile-name"><span>{name}</span><ProOrVerifiedMark userId={isPerson ? card.person.user_id : null} verified={verified} /></div>
+        <div className="follow-tile-name"><span>{name}</span><ProOrVerifiedMark userId={isPerson ? card.person.user_id : null} verified={verified} name={typeof name === "string" ? name : undefined} /></div>
         <div className="follow-tile-reason">{reason ? t(reason.key, { ...reason.vars, defaultValue: reason.def }) : ''}</div>
         <div data-testid="rail-slot" className="follow-tile-stat">{when ? <span data-testid="rail-when">{when}</span> : figures ? <span data-testid="rail-figures">{figures}</span> : null}</div>
         <Button type="button" variant={null} size={null} onClick={onFollow} disabled={pending} className="follow-tile-follow"

@@ -26,8 +26,8 @@ describe('Members badge source contract', () => {
     expect(rule(label, '.identity-badges')).toContain('flex:none');
   });
 
-  it('shares the plate and rim rule between PRO and Creator', () => {
-    expect(rule(label, '.pro-label, .profile-creator-label')).toContain('var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box');
+  it('keeps the plate and rim rule on the shared badge', () => {
+    expect(rule(label, '.pro-label')).toContain('var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box');
   });
 
   it('uppercases the shared foil letters', () => {
@@ -38,17 +38,16 @@ describe('Members badge source contract', () => {
     expect(creator).not.toMatch(/\.profile-creator-label\s*\{/);
   });
 
-  it('renders the large Creator foil badge directly after PRO on a creator profile', () => {
+  it('shows PRO alone, with no creator badge, on a pro-and-creator profile', () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const band = createElement(ProfileCoverBand, { coverUrl: null, avatar: null, displayName: 'Charlie Okonkwo-Bramwell', subline: null, isPro: true, isCreator: true });
     const { container, unmount } = render(createElement(QueryClientProvider, { client }, createElement(MemoryRouter, null, band)));
-    const badge = container.querySelector('.profile-creator-label');
-    expect(badge?.className).toBe('profile-creator-label');
-    expect(badge?.getAttribute('data-size')).toBe('large');
-    expect(badge?.querySelector('.pro-label-text')?.textContent).toBe('Creator');
-    expect(badge?.previousElementSibling?.className).toBe('pro-label');
-    expect(badge?.parentElement?.className).toBe('identity-badges');
-    expect(badge?.parentElement?.previousElementSibling?.tagName).toBe('H1');
+    expect(container.querySelector('.profile-creator-label')).toBeNull();
+    const group = container.querySelector('.identity-badges');
+    expect(group?.children).toHaveLength(1);
+    expect(group?.children[0].className).toBe('pro-label');
+    expect(group?.previousElementSibling?.tagName).toBe('H1');
+    expect(label).not.toContain('.profile-creator-label');
     unmount();
     client.clear();
   });
@@ -86,7 +85,7 @@ describe('Members badge source contract', () => {
 
   it('keeps badge rules free of pill corners and motion while preserving pending and surname rules', () => {
     expect(rule(controls, '.pro-being-checked')).toContain('border-radius:7px');
-    expect(rule(profile, '.pro-hero-surname .pro-label')).toContain('top:1px');
+    expect(rule(profile, '.pro-hero-surname .pro-label')).toContain('top:0');
     for (const source of [label, controls, profile]) {
       const badges = source.match(/[^{}]*(?:\.pro-label|\.pro-being-checked)[^{}]*\{[^}]*\}/g) ?? [];
       expect(badges.join('\n')).not.toMatch(/border-radius:\s*999px|animation\s*:|transition\s*:/);

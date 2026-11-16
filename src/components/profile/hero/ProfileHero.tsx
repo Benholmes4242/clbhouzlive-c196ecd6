@@ -393,6 +393,7 @@ export const ProfileHero: React.FC<Props> = ({
         isCreator={isCreator}
         isPro={!!proMember}
         isAmateur={amateurs.has(userId)}
+        badgeUserId={userId}
         subline={subline || null}
         afterSubline={coachLine}
         onAddHomeClub={isSelf ? onEdit : undefined}

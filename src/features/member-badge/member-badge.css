@@ -1,0 +1,15 @@
+.pro-label[data-tappable] { position:relative; overflow:visible; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+/* 44px hit area centred on the badge; the drawn badge size is unchanged. */
+.pro-label[data-tappable]::after { content:''; position:absolute; top:50%; left:50%; width:max(100%, 44px); height:max(100%, 44px); transform:translate(-50%, -50%); }
+.pro-label[data-open] { box-shadow:0 0 0 3px rgba(255,255,255,0.18); }
+.member-badge-card { color:#F8FAFC; }
+.mbc-kicker { display:flex; align-items:center; gap:8px; }
+.mbc-kicker > span:last-child { font-size:9.5px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(248,250,252,0.42); }
+.mbc-title { margin-top:12px; font-size:22px; font-weight:800; letter-spacing:-0.02em; }
+.mbc-who { margin-top:4px; font-size:13px; font-weight:600; color:rgba(248,250,252,0.72); overflow-wrap:anywhere; }
+.mbc-facts { display:flex; gap:28px; margin-top:14px; }
+.mbc-fact b { display:block; font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; font-feature-settings:"kern" 1, "liga" 1; }
+.mbc-fact span { display:block; margin-top:4px; font-size:8.5px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(248,250,252,0.42); }
+.mbc-body { margin:12px 0 0; font-size:13px; line-height:1.5; color:rgba(248,250,252,0.62); }
+.mbc-cta { margin-top:16px; width:100%; height:46px; border:0; border-radius:16px; background:#26262B; color:#F8FAFC; display:flex; align-items:center; justify-content:center; font:inherit; font-size:14.5px; font-weight:700; cursor:pointer; }
+.mbc-cta i { font-style:normal; margin-left:4px; }

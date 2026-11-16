@@ -20,17 +20,41 @@ export interface GlanceShellProps {
   align?: 'left' | 'right';
   /** Optional card overrides (TourGlance: width 316, padding 14). */
   cardStyle?: React.CSSProperties;
+  /** BRIEF_MEMBER_BADGES_V2: 'anchored' spans the screen with 16px gutters just
+   * under the anchor itself (not an island), flipping above it when the card
+   * would not clear the bottom nav. Default 'island' keeps every existing glance. */
+  placement?: 'island' | 'anchored';
 }
-export function GlanceShell({ onClose, anchorRef, label, children, align = 'right', cardStyle }: GlanceShellProps) {
+
+/** Anchored placement: below the anchor + 10, or above it (bottom = anchor top − 10)
+ * when the card would cross the floating nav. Pure for tests. */
+export function anchoredGlancePosition(anchor: { top: number; bottom: number }, cardHeight: number, viewportHeight: number, navTop: number) {
+  const below = anchor.bottom + 10;
+  return below + cardHeight <= Math.min(viewportHeight, navTop)
+    ? { top: below }
+    : { bottom: viewportHeight - (anchor.top - 10) };
+}
+
+/** Top edge of the floating bottom nav: measured pill height (--nav-pill-h) + its 20px gap. */
+function floatingNavTop() {
+  const pill = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-pill-h')) || 64;
+  return window.innerHeight - pill - 20;
+}
+export function GlanceShell({ onClose, anchorRef, label, children, align = 'right', cardStyle, placement = 'island' }: GlanceShellProps) {
   const location = useLocation();
   const cardRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState<{ top: number; right?: number; left?: number } | null>(null);
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; right?: number; left?: number } | null>(null);
   // Position: align the card's edge to the matching island's edge,
   // top = island bottom + 10. Fall back to the anchor's own rect when the
   // cell is mounted outside the island row (AppHeader, NewsChromeBridge).
   useLayoutEffect(() => {
     const anchor = anchorRef.current;
     if (!anchor) return;
+    if (placement === 'anchored') {
+      const rect = anchor.getBoundingClientRect();
+      setPos({ ...anchoredGlancePosition(rect, cardRef.current?.offsetHeight ?? 0, window.innerHeight, floatingNavTop()), left: 16, right: 16 });
+      return;
+    }
     const host = (anchor.closest(align === 'left' ? '[data-island-left]' : '[data-island-right]') as HTMLElement | null) ?? anchor;
     const rect = host.getBoundingClientRect();
     setPos(align === 'left'
@@ -74,8 +98,9 @@ export function GlanceShell({ onClose, anchorRef, label, children, align = 'righ
     <div ref={cardRef} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} className="index-glance-shell"
       style={{
         ...GLASS_CARD,
-        top: pos?.top ?? 0,
-        ...(align === 'left' ? { left: pos?.left ?? 12 } : { right: pos?.right ?? 12 }),
+        ...(placement === 'anchored'
+          ? { left: 16, right: 16, width: 'auto', padding: 20, borderRadius: 24, ...(pos?.bottom != null ? { bottom: pos.bottom } : { top: pos?.top ?? 0 }) }
+          : { top: pos?.top ?? 0, ...(align === 'left' ? { left: pos?.left ?? 12 } : { right: pos?.right ?? 12 }) }),
         visibility: pos ? 'visible' : 'hidden', zIndex: Z.header + 1,
         ...cardStyle,
       }}>

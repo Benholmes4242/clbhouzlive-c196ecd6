@@ -461,7 +461,7 @@ function GolferRow({
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-          <ProOrVerifiedMark userId={golfer.user_id} verified={golfer.is_verified} />
+          <ProOrVerifiedMark userId={golfer.user_id} verified={golfer.is_verified} name={name} />
         </div>
         <ReasonLine
           when={when}

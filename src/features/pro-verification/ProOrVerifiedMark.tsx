@@ -7,10 +7,10 @@ import { useProMembers } from './useProMembers';
 import { ProLabel } from './ProLabel';
 import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers';
 
-export function ProOrVerifiedMark({ userId, verified }: { userId?: string | null; verified?: boolean | null }) {
+export function ProOrVerifiedMark({ userId, verified, name }: { userId?: string | null; verified?: boolean | null; name?: string }) {
   const { members } = useProMembers([userId]);
   const { members: amateurs } = useAmateurMembers([userId]);
-  if (userId && members.has(userId)) return <ProLabel />;
-  if (userId && amateurs.has(userId)) return <ProLabel kind="am" />;
+  if (userId && members.has(userId)) return <ProLabel userId={userId} name={name} surface="mark" />;
+  if (userId && amateurs.has(userId)) return <ProLabel kind="am" userId={userId} name={name} surface="mark" />;
   return verified ? <VerifiedBadge size="sm" /> : null;
 }
