@@ -29,6 +29,7 @@ vi.mock('@/components/course-media-tab/hooks/useCourseGallery', () => ({ useCour
 vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: f.loading, isFetched: !f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
 
 import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
+import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import type { LatestHoleMedia } from '@/components/courses/browse/LatestHolesSection';
 import { courseWalkHoles, deriveHoleWalk, UNSCORED_HOLE_COUNT } from '@/lib/courseMedia/holeWalk';
@@ -71,7 +72,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     f.latest = f.latest.slice(0, count); mountRail(); expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
   it('three cards retain RPC order and the specified query contract', () => {
-    mountRail(); expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-label'))).toEqual(['The fourth, Course first, Par 3 · 182 yards, Thomas Holmes · Jun 2025', 'The fourth, Course second, Par 3 · 182 yards, Thomas Holmes · Jun 2025', 'The fourth, Course third, Par 3 · 182 yards, Thomas Holmes · Jun 2025']);
+    mountRail(); expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-label'))).toEqual(['Hole 4, Course first, Par 3, 182 yards, Thomas Holmes · Jun 2025', 'Hole 4, Course second, Par 3, 182 yards, Thomas Holmes · Jun 2025', 'Hole 4, Course third, Par 3, 182 yards, Thomas Holmes · Jun 2025']);
     expect(f.rpc).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite', expect.anything(), false], staleTime: 60_000 }));
     const options = f.rpc.mock.calls[0][0];
     const request = options.queryFn({ pageParam: undefined });
@@ -82,16 +83,18 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     f.latest = [latest('first'), latest('second', { course_id: 'course-first', course_name: 'Course first' }), latest('third')];
     mountRail(); const cards = screen.getAllByRole('button');
     expect(cards).toHaveLength(3);
-    expect(cards.map(c => c.getAttribute('aria-label'))).toEqual(['The fourth, Course first, Par 3 · 182 yards, Thomas Holmes · Jun 2025', 'The fourth, Course first, Par 3 · 182 yards, Thomas Holmes · Jun 2025', 'The fourth, Course third, Par 3 · 182 yards, Thomas Holmes · Jun 2025']);
+    expect(cards.map(c => c.getAttribute('aria-label'))).toEqual(['Hole 4, Course first, Par 3, 182 yards, Thomas Holmes · Jun 2025', 'Hole 4, Course first, Par 3, 182 yards, Thomas Holmes · Jun 2025', 'Hole 4, Course third, Par 3, 182 yards, Thomas Holmes · Jun 2025']);
   });
   it('an RPC error hides even cached rows', () => { f.error = true; mountRail(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
   it('loading draws the shell without interactive cards', () => { f.loading = true; const view = mountRail(); expect(view.container.querySelector('section[aria-hidden]')).not.toBeNull(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
-  it('the par line states par and yardage, and an unscored hole states neither', () => {
+  it('the corner figure shows par and yards, par only, or the number alone', () => {
     f.latest = [latest('first'), latest('second', { par: null, yards: null }), latest('third', { yards: null })];
     const view = mountRail();
-    expect(screen.getByText('Par 3 · 182 yards')).toBeInTheDocument();
-    expect(screen.getByText('Par 3')).toBeInTheDocument();
-    expect(view.container.querySelectorAll('.latest-hole-par')).toHaveLength(2);
+    const figures = view.container.querySelectorAll('.latest-hole-figure');
+    expect([...figures].map(figure => figure.querySelector('.latest-hole-number')?.textContent)).toEqual(['4', '4', '4']);
+    expect(figures[0].querySelector('.latest-hole-label')?.textContent).toBe('PAR 3 · 182 YDS');
+    expect(figures[1].querySelector('.latest-hole-label')).toBeNull();
+    expect(figures[2].querySelector('.latest-hole-label')?.textContent).toBe('PAR 3');
   });
   it('credit uses the added date and ignores EXIF capture', () => {
     f.latest = [latest('first'), latest('second', { exif_captured_at: '2020-01-05T12:00:00Z' }), latest('third', { exif_captured_at: null })];
@@ -122,44 +125,54 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   it('the kicker reads "Through members\' eyes"', () => {
     mountRail(); expect(screen.getByText("Through members' eyes")).toBeInTheDocument(); expect(screen.getByText('Latest holes')).toBeInTheDocument();
   });
-  /* BRIEF_LATEST_HOLES_OPTION_A — the tile is the viewer's bottom stack. */
-  it('the kicker reads the hole as a word, above the course name', () => {
+  /* H1 replaces the five Option A tile tests with Ben's explicit approval. */
+  it('the hole numbers live in the corner figure rather than an amber kicker', () => {
     f.latest = [latest('first', { hole_no: 1 }), latest('second', { hole_no: 9 }), latest('third', { hole_no: 18 })];
-    const view = mountRail(); const kicks = view.container.querySelectorAll('.latest-hole-kick');
-    expect([...kicks].map(k => k.textContent)).toEqual(['THE FIRST', 'THE NINTH', 'THE EIGHTEENTH']);
-    expect(kicks[0].parentElement?.firstElementChild).toBe(kicks[0]);
-    expect(kicks[0].nextElementSibling?.className).toBe('latest-hole-course');
-  });
-  it('the par line sits between the course name and the byline, in sentence case', () => {
-    const view = mountRail(); const stack = view.container.querySelector('.latest-hole-name') as HTMLElement;
-    expect([...stack.children].map(c => c.className)).toEqual(['latest-hole-kick', 'latest-hole-course', 'latest-hole-par', 'latest-hole-credit']);
-    expect(stack.querySelector('.latest-hole-par')?.textContent).toBe('Par 3 · 182 yards');
-    expect(stack.querySelector('.latest-hole-par')?.textContent).not.toMatch(/YDS|yds/);
-  });
-  it('the numeral, the PAR/YDS block and the Plays pill are all absent', () => {
     const view = mountRail();
-    expect(view.container.querySelector('.latest-hole-figure')).toBeNull();
-    expect(view.container.querySelector('.latest-hole-number')).toBeNull();
-    expect(view.container.querySelector('.latest-hole-label')).toBeNull();
+    expect([...view.container.querySelectorAll('.latest-hole-number')].map(n => n.textContent)).toEqual(['1', '9', '18']);
+    expect(view.container.querySelector('.latest-hole-kick')).toBeNull();
+  });
+  it('the bottom stack contains only the course name and byline', () => {
+    const view = mountRail(); const stack = view.container.querySelector('.latest-hole-name') as HTMLElement;
+    expect([...stack.children].map(c => c.className)).toEqual(['latest-hole-course', 'latest-hole-credit']);
+  });
+  it('the numeral and PAR/YDS return while the Plays pill remains absent', () => {
+    const view = mountRail();
+    expect(view.container.querySelectorAll('.latest-hole-figure')).toHaveLength(3);
+    expect(view.container.querySelector('.latest-hole-label')?.textContent).toBe('PAR 3 · 182 YDS');
     expect(view.container.querySelector('.latest-hole-plays')).toBeNull();
     expect(view.container.querySelector('[data-hole-plays]')).toBeNull();
-    expect(view.container.textContent).not.toMatch(/Plays|YDS|yds/);
-    expect(view.container.textContent).not.toMatch(/\bPAR\b/);
+    expect(view.container.querySelector('.latest-hole-par')).toBeNull();
   });
-  it('a long course name clamps to two lines and still leaves room for the par line and byline', () => {
+  it('a short course name retains the two-line clamp and byline', () => {
     f.latest[0] = latest('first', { course_name: 'Sundridge Park Golf Club (East Course)' });
     const view = mountRail(); const card = view.container.querySelectorAll('.latest-hole-card')[0];
     const course = card.querySelector('.latest-hole-course') as HTMLElement;
-    expect(course.textContent).toBe('Sundridge Park Golf Club (East Course)');
+    expect(course.textContent).toBe(shortCoursePart('Sundridge Park Golf Club (East Course)'));
     expect(course.querySelector('br')).toBeNull();
-    expect(card.querySelector('.latest-hole-par')?.textContent).toBe('Par 3 · 182 yards');
     expect(card.querySelector('.latest-hole-credit')?.textContent).toBe('Thomas Holmes · Jun 2025');
     const css = readFileSync(resolve(process.cwd(), 'src/components/courses/browse/latestHoles.css'), 'utf8');
     expect(css).toMatch(/\.latest-hole-course\s*\{[^}]*-webkit-line-clamp: 2;[^}]*overflow: hidden;/);
   });
+  it.each(['Ballybunion Golf Club (Old)', 'Trump International Golf Links'])('the rail uses the viewer shortCoursePart for %s', name => {
+    f.latest[0] = latest('first', { course_name: name });
+    const view = mountRail();
+    expect(view.container.querySelector('.latest-hole-course')?.textContent).toBe(shortCoursePart(name));
+    expect(screen.getAllByRole('button')[0]).toHaveAttribute('aria-label', `Hole 4, ${shortCoursePart(name)}, Par 3, 182 yards, Thomas Holmes · Jun 2025`);
+  });
+  it.each([
+    { par: 4, yards: 303, label: 'PAR 4 · 303 YDS' },
+    { par: 4, yards: null, label: 'PAR 4' },
+    { par: null, yards: null, label: null },
+  ])('H1 number and label with par $par and yards $yards', ({ par, yards, label }) => {
+    f.latest[0] = latest('first', { hole_no: 9, par, yards });
+    const view = mountRail(); const figure = view.container.querySelector('.latest-hole-figure');
+    expect(figure?.querySelector('.latest-hole-number')?.textContent).toBe('9');
+    expect(figure?.querySelector('.latest-hole-label')?.textContent ?? null).toBe(label);
+  });
   it('a tap opens the canonical viewer readOnly on the tapped shot across the whole rail', () => {
     mountRail();
-    fireEvent.click(screen.getByRole('button', { name: 'The fourth, Course second, Par 3 · 182 yards, Thomas Holmes · Jun 2025' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second, Par 3, 182 yards, Thomas Holmes · Jun 2025' }));
     expect(f.holeRpc).not.toHaveBeenCalled();
     expect(f.open).toHaveBeenCalledTimes(1);
     const args = f.open.mock.calls[0][0] as { posts: Array<{ id: string; displayName: string; courseName?: string; mediaItems: Array<{ id: string }> }>; index: number; mediaId: string | null; openedFrom: string; options?: { readOnly?: boolean } };
@@ -180,7 +193,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   });
   it('a tap opens immediately with no network wait', () => {
     f.holeRpc.mockReturnValue(new Promise(() => {}));
-    mountRail(); const card = screen.getByRole('button', { name: 'The fourth, Course second, Par 3 · 182 yards, Thomas Holmes · Jun 2025' });
+    mountRail(); const card = screen.getByRole('button', { name: 'Hole 4, Course second, Par 3, 182 yards, Thomas Holmes · Jun 2025' });
     fireEvent.click(card);
     expect(f.open).toHaveBeenCalledTimes(1);
     expect(f.holeRpc).not.toHaveBeenCalled();
@@ -201,7 +214,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   });
   it('card type reads the signed-off mock letter-spacing and the rail declares no will-change', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/components/courses/browse/latestHoles.css'), 'utf8');
-    expect(css).toMatch(/\.latest-hole-kick\s*\{[^}]*letter-spacing: 1\.2px;/);
+    expect(css).toMatch(/\.latest-hole-number\s*\{[^}]*letter-spacing: -0\.05em;/);
     expect(css).toMatch(/\.latest-hole-course\s*\{[^}]*letter-spacing: -0\.03em;/);
     expect(css).not.toContain('will-change');
   });

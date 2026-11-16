@@ -4,12 +4,10 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
-import { latestHoleRowsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
+import { latestHoleRowsToFeedPosts, shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { SCRIM_STANDOUT, SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
 import { settled, useSectionReady } from './PageLoadGate';
 import { useIsGuest } from '@/features/guest/useIsGuest';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -59,10 +57,8 @@ export interface LatestHoleMedia {
   yards: number | null;
 }
 
-/** BRIEF_LATEST_HOLES_OPTION_A: the tile is the viewer's bottom stack — hole word,
- * course name, par line, credit. No numeral, no PAR/YDS block, no Plays pill; the
- * photograph carries only the video duration. The hole word comes from the same
- * ordinal source the fullscreen viewer's kicker uses (holeWalk.holeOrdinal). */
+/** H1 owns only the rail tile: corner figure, two local scrims and short name.
+ * shortCoursePart is shared with the viewer; no duplicate shortening or reads. */
 function LatestHoleCard({ row, onOpen }: {
   row: LatestHoleMedia;
   onOpen: (row: LatestHoleMedia) => void;
@@ -70,11 +66,10 @@ function LatestHoleCard({ row, onOpen }: {
   const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' · ');
   const seconds = Math.round(row.duration_seconds ?? 0);
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-  const holeWord = `The ${holeOrdinal(row.hole_no)}`;
-  // An unscored hole has no par to state; the kicker still says which hole it is.
-  const parText = row.par == null ? null
-    : `Par ${row.par}${row.yards != null ? ` \u00B7 ${row.yards} yards` : ''}`;
-  const aria = [holeWord, row.course_name, parText, credit].filter(Boolean).join(', ');
+  const courseName = shortCoursePart(row.course_name);
+  const aria = [`Hole ${row.hole_no}`, courseName,
+    row.par != null ? `Par ${row.par}` : null,
+    row.yards != null ? `${row.yards} yards` : null, credit].filter(Boolean).join(', ');
   return (
     <button type="button" className="latest-hole-card" aria-label={aria}
       style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: 1, isolation: 'isolate' }}
@@ -84,12 +79,14 @@ function LatestHoleCard({ row, onOpen }: {
         ? <HoleInlineVideo media={row} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
         : <img src={row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />}
       </div>
-      <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT, zIndex: 1 }} />
-      <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP, zIndex: 1 }} />
+      <div className="latest-hole-scrim latest-hole-bottom" style={{ background: 'var(--latest-hole-bottom-scrim)', zIndex: 1 }} />
+      <div className="latest-hole-scrim latest-hole-corner" style={{ background: 'var(--latest-hole-corner-scrim)', zIndex: 1 }} />
+      <div className="latest-hole-figure" style={{ zIndex: 2 }}>
+        <div className="latest-hole-number">{row.hole_no}</div>
+        {row.par != null && <div className="latest-hole-label">PAR {row.par}{row.yards != null && <>{' \u00B7 '}{row.yards} YDS</>}</div>}
+      </div>
       <div className="latest-hole-name" style={{ zIndex: 2 }}>
-        <div className="latest-hole-kick" style={{ color: A.AMBER }}>{holeWord.toUpperCase()}</div>
-        <div className="latest-hole-course">{row.course_name}</div>
-        {parText && <div className="latest-hole-par">Par {row.par}{row.yards != null && <>{' \u00B7 '}{row.yards} yards</>}</div>}
+        <div className="latest-hole-course">{courseName}</div>
         {credit && <div className="latest-hole-credit">{credit}</div>}
       </div>
       {row.media_type === 'video' && <span className="glass-chip latest-hole-video" style={{ zIndex: 2 }}>

@@ -66,20 +66,23 @@ describe('Courses photo top scrims', () => {
     const card = screen.getAllByRole('button')[0];
     const photo = card.querySelector('[data-photo]') ?? card;
     const children = Array.from(photo.children) as HTMLElement[];
-    const layers = children.filter(child => child.style.background.includes('linear-gradient'));
+    const layers = children.filter(child => child.style.background.includes('linear-gradient') || child.classList.contains('latest-hole-scrim'));
     expect(layers).toHaveLength(2);
     const top = layers[1];
     expect(top.nextElementSibling).not.toBeNull();
     expect(top.nextElementSibling?.textContent).toMatch(/941|20\.5|14|194/);
-    expect(source(name)).toContain('background: SCRIM_STANDOUT_TOP');
+    if (name === 'LatestHolesSection') {
+      expect(source(name)).toContain("background: 'var(--latest-hole-corner-scrim)'");
+      expect(source(name)).toContain("background: 'var(--latest-hole-bottom-scrim)'");
+    } else expect(source(name)).toContain('background: SCRIM_STANDOUT_TOP');
     if (name === 'LatestCoursesSection') expect(source(name)).toContain("background: 'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 45%)'");
-    else expect(source(name)).toContain('background: SCRIM_STANDOUT');
+    else if (name !== 'LatestHolesSection') expect(source(name)).toContain('background: SCRIM_STANDOUT');
   });
   it('an eleven-second video retains course and member/date text beside its shared player', () => {
     f.holes[0] = { ...f.holes[0], course_name: 'Tralee Golf Club', media_type: 'video', duration_seconds: 11, poster_url: '/sky.jpg' };
     mount(<LatestHolesSection />);
-    const card = screen.getByRole('button', { name: 'The third, Tralee Golf Club, Par 3 · 194 yards, Andrew Yetzes · Apr 2026' });
-    expect(within(card).getByText('Tralee Golf Club')).toBeInTheDocument();
+    const card = screen.getByRole('button', { name: 'Hole 3, Tralee, Par 3, 194 yards, Andrew Yetzes · Apr 2026' });
+    expect(within(card).getByText('Tralee')).toBeInTheDocument();
     expect(within(card).getByText('Andrew Yetzes · Apr 2026')).toBeInTheDocument();
     expect(within(card).getByText('0:11')).toHaveClass('glass-chip');
     expect(card.querySelector('.latest-hole-name')).not.toBeNull();
@@ -92,9 +95,9 @@ describe('Courses photo top scrims', () => {
     const media = card.querySelector<HTMLElement>('.latest-hole-media');
     expect(media?.style.zIndex).toBe('0');
     expect(media?.style.position).toBe('absolute');
-    const layers = Array.from(card.children).filter(child => (child as HTMLElement).style.background.includes('linear-gradient')) as HTMLElement[];
+    const layers = Array.from(card.children).filter(child => ((child as HTMLElement).style.background.includes('linear-gradient') || child.classList.contains('latest-hole-scrim'))) as HTMLElement[];
     expect(layers.map(layer => layer.style.zIndex)).toEqual(['1', '1']);
-    for (const selector of ['.latest-hole-name', ...(media_type === 'video' ? ['.latest-hole-video'] : [])]) {
+    for (const selector of ['.latest-hole-figure', '.latest-hole-name', ...(media_type === 'video' ? ['.latest-hole-video'] : [])]) {
       expect(card.querySelector<HTMLElement>(selector)?.style.zIndex).toBe('2');
     }
     expect(media?.querySelector('img')).not.toBeNull();
@@ -107,7 +110,7 @@ describe('Courses photo top scrims', () => {
     const big = screen.getByRole('button', { name: 'Open Course a shot 1 of 14' });
     expect(big.style.isolation).toBe('isolate');
     expect((big.firstElementChild as HTMLElement).style.zIndex).toBe('0');
-    const gradients = Array.from(big.children).filter(child => (child as HTMLElement).style.background.includes('linear-gradient')) as HTMLElement[];
+    const gradients = Array.from(big.children).filter(child => ((child as HTMLElement).style.background.includes('linear-gradient') || child.classList.contains('latest-hole-scrim'))) as HTMLElement[];
     expect(gradients.map(layer => layer.style.zIndex)).toEqual(['1', '1']);
     expect((within(big).getByText('14').parentElement as HTMLElement).style.zIndex).toBe('2');
     expect((within(big).getByText('Course a').parentElement as HTMLElement).style.zIndex).toBe('2');

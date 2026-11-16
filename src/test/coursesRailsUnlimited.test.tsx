@@ -100,8 +100,8 @@ describe.each(kinds)('$kind unlimited rail', spec => {
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size)); nextVisible();
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size + 2));
     const labels = Array.from(cards(view, spec)).map(card => card.getAttribute('aria-label'));
-    expect(labels.filter(label => label === 'The fourth, Course 2, Par 4 · 400 yards, Member · Oct 2026' || label === 'Open Course 2 shot 1 of 3')).toHaveLength(1);
-    expect(labels.slice(-2)).toEqual(spec.kind === 'holes' ? ['The fourth, Course 50, Par 4 · 400 yards, Member · Oct 2026', 'The fourth, Course 51, Par 4 · 400 yards, Member · Oct 2026'] : ['Open Course 50 shot 1 of 3', 'Open Course 51 shot 1 of 3']);
+    expect(labels.filter(label => label === 'Hole 4, Course 2, Par 4, 400 yards, Member · Oct 2026' || label === 'Open Course 2 shot 1 of 3')).toHaveLength(1);
+    expect(labels.slice(-2)).toEqual(spec.kind === 'holes' ? ['Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026', 'Hole 4, Course 51, Par 4, 400 yards, Member · Oct 2026'] : ['Open Course 50 shot 1 of 3', 'Open Course 51 shot 1 of 3']);
   });
   it('shows exactly one end skeleton only while the next page is in flight', async () => {
     pages = [page(spec)]; const view = mount(spec);
@@ -130,7 +130,7 @@ describe('loaded holes run and refresh', () => {
     pages = [page(spec), page(spec, 50, 3)]; const view = mount(spec);
     await waitFor(() => expect(cards(view, spec)).toHaveLength(20)); nextVisible();
     await waitFor(() => expect(cards(view, spec)).toHaveLength(23));
-    fireEvent.click(screen.getByRole('button', { name: 'The fourth, Course 51, Par 4 · 400 yards, Member · Oct 2026' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course 51, Par 4, 400 yards, Member · Oct 2026' }));
     expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ mediaId: 'h-51', options: { readOnly: true, syntheticPosts: true } }));
     expect(f.open.mock.calls[0][0].posts.map((post: { mediaItems: Array<{ id: string }> }) => post.mediaItems[0].id)).toEqual([...Array.from({ length: 20 }, (_, i) => `h-${i}`), 'h-50', 'h-51', 'h-52']);
     expect(f.open.mock.calls[0][0].index).toBe(21);
@@ -158,7 +158,7 @@ describe('loaded holes run and refresh', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     pages = [page(spec, 50, 3)];
     fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
-    await screen.findByRole('button', { name: 'The fourth, Course 50, Par 4 · 400 yards, Member · Oct 2026', hidden: true });
+    await screen.findByRole('button', { name: 'Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026', hidden: true });
     expect(requests(spec)).toHaveLength(2);
     expect(f.rpc).toHaveBeenCalledWith('admin_tag_hole_media', { p_course_id: 'course', p_media_id: 'untagged', p_hole_no: 4 });
     expect(view.cache.getQueryData(['gam_rpc', spec.name, 'infinite', 'admin', false])).toMatchObject({ pages });

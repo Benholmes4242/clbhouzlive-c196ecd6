@@ -66,7 +66,8 @@ function syntheticPost(id: string, courseId: string, courseName: string, display
   }];
 }
 
-const shortCoursePart = (name: string) => {
+// H1: rail names and viewer titles share this exact short/variant presentation.
+export const shortCoursePart = (name: string) => {
   const { short, variant } = shareCourseName(name);
   return short + (variant ? ` (${variant})` : '');
 };

@@ -1,14 +1,4 @@
-/* Local on-photo semantic tokens; the canonical scrim and panel stay imported.
- * BRIEF_LATEST_HOLES_OPTION_A: the tile is the viewer's bottom stack — kicker,
- * course name, par line, credit. The numeral, the PAR/YDS block and the Plays
- * pill are gone, so their tokens and rules went with them. The kicker's colour
- * is read from A.AMBER in LatestHolesSection.tsx, the same token the section
- * head uses, so no amber hex lives here. */
-:root {
-  --latest-hole-ink: #FFFFFF;
-  --latest-hole-credit: rgba(255,255,255,0.78);
-  --latest-hole-par: rgba(255,255,255,0.72);
-}
+/* H1 tile geometry; colours, shadows and local scrims live in global style tokens. */
 .latest-hole-card { flex: none; position: relative; isolation: isolate; overflow: hidden; border-radius: 0; padding: 0; border: none; text-align: left; cursor: pointer; color: var(--latest-hole-ink); }
 /* The local media stack contains the shared player; its overlays never compete with video descendants. */
 .latest-hole-media > div { z-index: 0; }
@@ -16,10 +6,9 @@
 .latest-hole-scrim { position: absolute; inset: 0; z-index: 1; }
 /* The bottom stack, bottom-anchored: kicker, name, par line, credit. */
 .latest-hole-name { position: absolute; left: 16px; right: 16px; bottom: 15px; }
-/* "THE NINTH" — the viewer's kicker grammar, authored in upper case. */
-.latest-hole-kick { font-size: 8.5px; font-weight: 750; letter-spacing: 1.2px; line-height: 1; margin: 0 0 3px; }
+.latest-hole-figure { position: absolute; top: 14px; right: 16px; text-align: right; }
+.latest-hole-number { font-size: 40px; font-weight: 700; letter-spacing: -0.05em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--latest-hole-ink); text-shadow: var(--latest-hole-number-shadow); }
+.latest-hole-label { margin-top: 6px; font-size: 8.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--latest-hole-label-ink); text-shadow: var(--latest-hole-label-shadow); }
 .latest-hole-course { font-size: 17px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-/* "Par 3 · 175 yards" — sentence case with the full word, matching the viewer. */
-.latest-hole-par { margin-top: 4px; font-size: 10.5px; line-height: 1.35; color: var(--latest-hole-par); font-variant-numeric: tabular-nums; }
 .latest-hole-credit { margin-top: 5px; font-size: 11.5px; font-weight: 500; color: var(--latest-hole-credit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .latest-hole-video { position: absolute; top: 16px; left: 16px; display: flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border-radius: 999px; color: var(--latest-hole-ink); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }

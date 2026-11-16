@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Latest holes H1
+- Restore the top-right number/par label, mock scrims and shared short course names; viewer and behaviour frozen.
+- Replace five authorised Option A cases, add H1 examples and verify focused/four-shard tests.
+- Pale-sky 320/375/430 verified without overflow; focused 57/57, full suite 8,899 (2,268 / 2,158 / 2,229 / 2,244). Report: .lovable/reports/latest-holes-h1.md. 
+
 ## Complete: Latest holes Option A closeout
 - Append the committed Option A changes, exact −16/+4 test reconciliation and unchanged course-name audit.
 - Correct shared ordinal suffixes while retaining holes 1–18; run focused tests and four separate full-suite shards.
