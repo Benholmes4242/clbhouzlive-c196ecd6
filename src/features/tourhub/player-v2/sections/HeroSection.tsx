@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../_shared/picksEnabledForTour';
 /** Signed-off player hero: no fixed cinematic band; header season owns figures.
  * PlayerAvatar retains the shared candidate fallback; CSS only opts into this
  * hero's exact size and initials. Follow/pick never submit on page mount. */
@@ -26,7 +27,7 @@ export function HeroSection({player,header,results,tour,race,following,busy,onFo
     </div><h1 ref={nameRef} className="pv-name">{player.full_name}</h1></div><div className="pv-photo"><PlayerAvatar playerId={player.id} playerName={player.full_name} tourCode={tour} photoUrl={player.photo_url} headshotOverride={player.headshot_override} size={118} surface="canvas" imagePosition="50% 15%"/></div></div>
     <PlayerLine className="pv-line" line={heroLine(results,header?.world_rank??null,race,tour)}/>
     {figures.length>0&&<div className="pv-figs num" style={{gridTemplateColumns:`repeat(${figures.length},1fr)`}}>{figures.map(f=><div key={f.key} data-player-figure={f.key}><b>{f.value}</b><span>{copy(`figures.${f.key}`,{label:f.label})}</span></div>)}</div>}
-    {header?.next_tournament_id&&<div className="pv-next" data-next-start><div><small>{copy('next.kicker')}</small><b>{header.next_name}</b>{nextTime?<span>{copy('next.tees',{time:nextTime})}</span>:nextStartDate&&<span>{copy('next.starts',{day:new Intl.DateTimeFormat('en-GB',{weekday:'long'}).format(new Date(nextStartDate))})}</span>}</div><Button variant="ghost" className="pv-pick" onClick={onPick}>{copy('next.pick',{object:pronouns(tour).object})}</Button></div>}
+    {header?.next_tournament_id&&<div className="pv-next" data-next-start><div><small>{copy('next.kicker')}</small><b>{header.next_name}</b>{nextTime?<span>{copy('next.tees',{time:nextTime})}</span>:nextStartDate&&<span>{copy('next.starts',{day:new Intl.DateTimeFormat('en-GB',{weekday:'long'}).format(new Date(nextStartDate))})}</span>}</div>{picksEnabledForTour(tour) && <Button variant="ghost" className="pv-pick" onClick={onPick}>{copy('next.pick',{object:pronouns(tour).object})}</Button>}</div>}
     <div className="pv-actions"><Button variant="ghost" className="pv-pill" data-following={following} disabled={busy} onClick={onFollow}>{copy(following?'following':'follow')}</Button></div>
   </section>;
 }

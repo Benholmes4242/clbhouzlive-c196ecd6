@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../../_shared/picksEnabledForTour';
 /** Name tabs open on the tapped pick; anonymous read ranks are visible, never
  * win probabilities or course-fit scores. Bars come only from our fit RPC;
  * numerical reasons are filtered by the shared pure verification rule. */
@@ -18,7 +19,7 @@ export interface PicksSheetProps {
  neededByPlayer?:Map<string,number>; tournamentId?:string; tourCode?:string; phase?:'upcoming'|'live'|'completed'; currentRound?:number|null;
  initialPlayerId?:string|null; results?:PickResult[]; championIds?:string[]; winner?:PickResult|null; winningMargin?:number|null;
 }
-export function PicksSheet(props:PicksSheetProps) { return props.open ? <PickDocument key={props.initialPlayerId ?? 'first'} {...props}/> : null; }
+export function PicksSheet(props:PicksSheetProps) { return props.open && picksEnabledForTour(props.tourCode) ? <PickDocument key={props.initialPlayerId ?? 'first'} {...props}/> : null; }
 function PickDocument({onClose,picks,predictions,eventName,venueName,tournamentId='',tourCode='pga',phase='upcoming',currentRound,initialPlayerId,results=[],championIds=[],winner,winningMargin}:PicksSheetProps) {
  const {t}=useTranslation('tourhub');
  const copy=(key:string,options:Record<string,unknown>={})=>t(`overview.picksSheet.${key}`,options);

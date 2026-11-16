@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../../_shared/picksEnabledForTour';
 import { overviewQueryReady, useOverviewBandReady } from '../overviewShells';
 /** Opt-in event-scoped additions keep the existing three card engine separate
  * from member/session reads; the real overview supplies the event season.
@@ -20,7 +21,7 @@ import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAva
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { fmtScore } from '../../../utils/fmtScore';
 import { ChevronRight } from 'lucide-react';
-export function PickMemberBands({ tournamentId, tourCode, seasonYear, phase, currentRound, pickResults, startedPlayers, onPick, boardByPlayer }: {
+function PickMemberBandsSession({ tournamentId, tourCode, seasonYear, phase, currentRound, pickResults, startedPlayers, onPick, boardByPlayer }: {
   tournamentId:string; tourCode:string; seasonYear:number; phase:'upcoming'|'live'|'completed'; currentRound:number|null;
   pickResults:PickResult[]; startedPlayers:Set<string>; onPick:(view?:'field'|'board')=>void;
   boardByPlayer?: Map<string, { position: number | null; tied: boolean; score: number | null }>;
@@ -64,4 +65,7 @@ export function PickMemberBands({ tournamentId, tourCode, seasonYear, phase, cur
       </div>
     </div>}
   </>;
+}
+export function PickMemberBands(props: Parameters<typeof PickMemberBandsSession>[0]) {
+  return picksEnabledForTour(props.tourCode) ? <PickMemberBandsSession {...props} /> : null;
 }

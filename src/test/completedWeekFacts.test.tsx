@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 
-import { holeTypeCells, holeTypeHeading, pathCells, weekCells, topThreeRows, championScoreLabel, type WeekFacts } from '@/features/tourhub/tournament-v2/data/weekFactsRules';
+import { holeTypeCells, holeTypeHeading, pathCells, wonChart, weekCells, topThreeRows, championScoreLabel, type WeekFacts } from '@/features/tourhub/tournament-v2/data/weekFactsRules';
 import { championNarrative } from '@/features/tourhub/tournament-v2/data/tournamentRules';
 import { CompletedWeekBlock } from '@/features/tourhub/tournament-v2/sections/CompletedWeekBlock';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
@@ -86,22 +86,16 @@ describe('completed state — HOLE TYPE', () => {
 });
 
 describe('completed state — THE WEEK', () => {
-  const week = (f: WeekFacts) => weekCells(f).map((c) => [c.pos ? `${c.pos} ${c.value}` : c.value, c.label]);
-  it('WWT six cells in order', () => {
-    expect(week(WWT)).toEqual([
-      ['63', 'LOW · 5 PLAYERS'], ['30', 'BIRDIES · KIM'], ['69.7', 'AVG · PAR 72'],
-      ['−5', 'CUT · 75 MADE IT'], ['4th +0.22', 'HARDEST'], ['1st −0.73', 'EASIEST'],
-    ]);
-    expect(weekCells(WWT).find((c) => c.key === 'cut')?.under).toBe(true);
+  const week = (f: WeekFacts) => weekCells(f).map((c) => [c.value, c.label, c.detail]);
+  it('WWT four figures in order', () => {
+    expect(week(WWT)).toEqual([['63', 'Low round', '5 players'], ['30', 'Most birdies', 'Kim'], ['+0.22', 'Hardest', '4th hole'], ['−0.73', 'Easiest', '1st hole']]);
+    expect(weekCells(WWT).map(c => c.key)).toEqual(['low', 'birdies', 'hardest', 'easiest']);
   });
-  it('Abu Dhabi: no cut becomes FIELD', () => {
-    expect(week(ABU)).toEqual([
-      ['62', 'LOW · LAPORTA'], ['29', 'BIRDIES · MCILROY'], ['70.3', 'AVG · PAR 72'],
-      ['70', 'FIELD · NO CUT'], ['9th +0.16', 'HARDEST'], ['2nd −0.54', 'EASIEST'],
-    ]);
+  it('Abu Dhabi omits field and average even without a cut', () => {
+    expect(week(ABU)).toEqual([['62', 'Low round', 'Laporta'], ['29', 'Most birdies', 'McIlroy'], ['+0.16', 'Hardest', '9th hole'], ['−0.54', 'Easiest', '2nd hole']]);
   });
   it('missing hole statistics drop HARDEST and EASIEST', () => {
-    expect(weekCells({ ...WWT, hardest: null, easiest: null }).map((c) => c.key)).toEqual(['low', 'birdies', 'avg', 'cut']);
+    expect(weekCells({ ...WWT, hardest: null, easiest: null }).map((c) => c.key)).toEqual(['low', 'birdies']);
   });
   it('sub-lines starting with a word start with a capital', () => {
     const labels = [WWT, ABU].flatMap((f) => [...pathCells(f), ...(holeTypeCells(f) ?? []), ...weekCells(f)].map((c) => c.label));
@@ -126,10 +120,10 @@ describe('completed state — THE TOP THREE and PLAYOFF', () => {
   });
   it('the block renders the four sections', () => {
     const { container } = render(<CompletedWeekBlock facts={WWT} rows={[row('brown', 'Blades Brown', 1, false, -23, -9)]} onFullBoard={() => {}} />);
-    expect(container.querySelectorAll('[data-cw-section="path"] [data-cw-cell]')).toHaveLength(4);
+    expect(container.querySelectorAll('[data-cw-section="path"] circle')).toHaveLength(4);
     expect(container.querySelectorAll('[data-cw-section="holes"] [data-cw-cell]')).toHaveLength(3);
     expect(container.querySelectorAll('[data-cw-top-row]')).toHaveLength(1);
-    expect(container.querySelectorAll('[data-cw-section="week"] [data-cw-cell]')).toHaveLength(6);
+    expect(container.querySelectorAll('[data-cw-section="week"] [data-cw-cell]')).toHaveLength(4);
     expect(container.querySelector('[data-hero-full-leaderboard]')).not.toBeNull();
   });
   it('both pages render the same block through the one hook', () => {
@@ -152,11 +146,10 @@ describe('championNarrative — no repeated final round', () => {
 });
 
 describe('two-line completed figures', () => {
-  it('contains no separate sub-line or 11.5px style', () => {
+  it('hole cells retain two lines while week cells have the supplied detail', () => {
     const { container } = render(<CompletedWeekBlock facts={WWT} rows={[]} />);
-    expect(container.querySelectorAll('[data-cw-cell] em')).toHaveLength(0);
-    expect(readFileSync('src/features/tourhub/tournament-v2/sections/completedWeek.css', 'utf8')).not.toContain('11.5px');
-    for (const cell of container.querySelectorAll('[data-cw-cell]')) expect(cell.children).toHaveLength(2);
+    for (const cell of container.querySelectorAll('[data-cw-section="holes"] [data-cw-cell]')) expect(cell.children).toHaveLength(2);
+    expect(container.querySelectorAll('[data-cw-section="week"] em')).toHaveLength(4);
   });
   it('uses the shared score helper for negative, even and positive top-three values', async () => {
     const { getScoreColor } = await import('@/features/tourhub/_shared/scoreColor');
@@ -165,5 +158,51 @@ describe('two-line completed figures', () => {
     for (const [index, score] of [-23, 0, 2].entries()) {
       expect(rows[index]?.querySelector('.cw-v')).toHaveStyle({ color: getScoreColor(score, 'dark', 'ink-neutral') });
     }
+  });
+});
+
+
+describe('finished week chart', () => {
+  const field = () => [row('brown', 'Blades Brown', 1, true, -23, -9), row('a', 'First Runner', 2, true, -22, -8), row('b', 'Second Runner', 2, true, -22, -8), row('c', 'Third Player', 4, false, -20, -6)];
+  it('champion plus next two retain board order on ties and cumulative values', () => {
+    const chart = wonChart(WWT, field(), 335);
+    expect(chart?.lines.map(p => p.id)).toEqual(['brown', 'a', 'b']);
+    expect(chart?.lines[0]?.values).toEqual([0, 0, 0, -9]);
+    expect(chart?.lines[0]?.points.map(p => p.x)).toEqual([14, 86.33333333333333, 158.66666666666666, 231]);
+    expect(chart?.lines[0]?.points[3]?.y).toBeLessThan(chart?.lines[0]?.points[0]?.y ?? 0);
+  });
+  it('labels with equal finish scores are at least 13px apart', () => {
+    const labels = wonChart(WWT, field(), 335)?.lines.map(p => p.labelY).sort((a,b)=>a-b) ?? [];
+    expect(labels).toHaveLength(3);
+    expect(labels[1] - labels[0]).toBeGreaterThanOrEqual(13);
+    expect(labels[2] - labels[1]).toBeGreaterThanOrEqual(13);
+  });
+  it.each(['MC', 'CUT', 'WD', 'DQ'])('never selects %s finishers', status => {
+    const rows=field(); rows[1]={...rows[1],status};
+    expect(wonChart(WWT, rows, 335)?.lines.map(p=>p.id)).toEqual(['brown','b','c']);
+  });
+  it('drops an incomplete selected player without substituting a fourth', () => {
+    const rows=field(); rows[1]={...rows[1],round_2:null};
+    expect(wonChart(WWT, rows, 335)?.lines.map(p=>p.id)).toEqual(['brown','b']);
+  });
+  it('three rounds use three cumulative values and path positions', () => {
+    const chart=wonChart({...WWT,rounds:3,path:WWT.path.slice(0,3)},field(),335);
+    expect(chart?.lines[0]?.values).toEqual([0,0,0]);
+    expect(chart?.rounds.map(r=>r.label)).toEqual(['R1','R2','R3']);
+    expect(chart?.lines[0]?.points.map(p=>p.position?.position)).toEqual([9,6,9]);
+  });
+  it('hides for one round, no path or incomplete champion', () => {
+    expect(wonChart({...WWT,rounds:1},field(),335)).toBeNull();
+    expect(wonChart({...WWT,path:[]},field(),335)).toBeNull();
+    const rows=field(); rows[0]={...rows[0],round_1:null};
+    expect(wonChart(WWT,rows,335)).toBeNull();
+  });
+  it('full board row counts undisplayed rows and opens the existing board', () => {
+    const tap=vi.fn(); const {container}=render(<CompletedWeekBlock facts={WWT} rows={field()} onFullBoard={tap}/>);
+    const button=container.querySelector('[data-hero-full-leaderboard]');
+    expect(button).toHaveAttribute('data-field-size','4');
+    expect(button).toHaveAttribute('aria-label','Full leaderboard, 4 players');
+    expect(button?.querySelector('.cw-n')?.textContent).toBe('1 more players');
+    if(!button)throw new Error('Missing full board row');fireEvent.click(button);expect(tap).toHaveBeenCalledOnce();
   });
 });

@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../../_shared/picksEnabledForTour';
 import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
 /** Shared picks presentation owns both overview and tournament cards. Defaults
  * preserve the signed-off overview; no event reads or automatic mutations here.
@@ -109,7 +110,7 @@ export function pickStatusToken(raw: string | null | undefined): string | null {
   return s === 'CUT' || s === 'MC' ? 'MC' : statusWord(s);
 }
 
-export function PicksBlock({
+function PicksBlockSession({
   picks,
   tourCode,
   phase,
@@ -314,3 +315,7 @@ export function PicksBlock({
   );
 }
 
+
+export function PicksBlock(props: Parameters<typeof PicksBlockSession>[0]) {
+  return picksEnabledForTour(props.tourCode) ? <PicksBlockSession {...props} /> : null;
+}

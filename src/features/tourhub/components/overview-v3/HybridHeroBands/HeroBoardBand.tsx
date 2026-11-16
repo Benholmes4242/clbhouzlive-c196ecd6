@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../../_shared/picksEnabledForTour';
 import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
 /**
  * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
@@ -51,7 +52,7 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, TOPAR_UNDER_DARK, LIVE_INK, STATUS_NEGATIVE } from '../../../_shared/tokens';
+import { AMBER, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_65, TOPAR_UNDER_DARK, LIVE_INK, STATUS_NEGATIVE } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { CompletedWeekBlock } from '../../../tournament-v2/sections/CompletedWeekBlock';
@@ -349,9 +350,10 @@ export function HeroBoardSection({
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = eventTourCode ?? viewingTourSlug ?? 'pga';
   const picksTid = picksOnly ? tournamentId : (viewingTournamentId ?? tournamentId);
-  const predictionsQuery = useAIPredictions(picksTid);
+  const picksEnabled = picksEnabledForTour(pickTourCode);
+  const predictionsQuery = useAIPredictions(picksEnabled ? picksTid : null);
   const predictions = predictionsQuery.data;
-  const picks = (predictions?.topContenders ?? []) as AITopContender[];
+  const picks = (picksEnabled ? predictions?.topContenders ?? [] : []) as AITopContender[];
   const hasPicks = picks.length > 0;
   const [picksOpen, setPicksOpen] = useState(false);
   const [tappedPick, setTappedPick] = useState<string | null>(null);
@@ -367,7 +369,7 @@ export function HeroBoardSection({
   /* Picks tee line: the stored tee sheet for the current round (round 1 when
      upcoming), and which picks have started under the one has-started rule. */
   const teeRound = phase === 'upcoming' ? 1 : (currentRound ?? 1);
-  const pickTeesQuery = usePickTeeTimes(picksTid, teeRound, picks.map((p) => String(p?.playerId ?? '')), { enabled: phase !== 'completed' });
+  const pickTeesQuery = usePickTeeTimes(picksTid, teeRound, picks.map((p) => String(p?.playerId ?? '')), { enabled: picksEnabled && phase !== 'completed' });
   const pickTees = pickTeesQuery.data;
   const startedPlayers = useMemo(() => {
     const set = new Set<string>();
@@ -457,13 +459,13 @@ export function HeroBoardSection({
 
 
   return (
-    <OverviewReadinessBand id="band" base={overviewQueryReady({ isFetched: predictionsQuery.ready }, !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
-    <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
+    <OverviewReadinessBand id="band" base={overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
+    <div style={{ background: PAGE_CANVAS }}>
       {!picksOnly && movementCards.length > 0 && currentRound != null ? (
         <RoundMovementBand round={currentRound} cards={movementCards} />
       ) : null}
 
-      {weekFacts ? <CompletedWeekBlock facts={weekFacts} rows={entries} onFullBoard={onFullBoard} /> : null}
+      {weekFacts ? <CompletedWeekBlock facts={weekFacts} rows={entries} onFullBoard={onFullBoard} tourCode={pickTourCode} /> : null}
 
       {!picksOnly && hasBoard && !weekFacts && !(completedStroke && weekFactsQuery.isLoading) ? (
         <MiniBoard

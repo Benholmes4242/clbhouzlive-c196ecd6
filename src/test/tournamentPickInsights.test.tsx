@@ -100,7 +100,7 @@ describe('tournament picks surfaces',()=>{
  it.each(['CUT','MC','WD','DQ'])('finished viewer and shared pick cards preserve the canonical %s token',(status)=>{
   const expected=status==='CUT'?'MC':status;
   mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:80,my_status:status,my_score:0}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);
-  expect(document.querySelector('.pick-mine-figure')?.textContent).toBe(expected);
+  expect(document.querySelector('[data-your-pick-card]')).toBeNull();
   expect(pickStatusToken(status)).toBe(expected);
  });
  it.each(['live','completed'] as const)('guest %s renders no pick card',(phase)=>{
@@ -129,7 +129,7 @@ describe('tournament picks surfaces',()=>{
  it('live picked card shows resolved comparison, score and thru',()=>{mount(<YourPickCard state={{...state,locked:true,my_player_id:'c',my_player_name:'Tom Kim',my_position:11,my_tied:true,my_score:-12,my_thru:9}} phase="live" ourResults={[result('a',80,'MC'),result('b',8),result('c',11)]} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toBe('Behind Ghim.');expect(document.querySelector('.pick-mine-figure')?.textContent).toContain('T11 −12THRU 9');});
  it('not-started live pick has tee text and no figures',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:1,my_score:0}} phase="live" ourResults={ours} started={false} teeTime="2026-11-05T13:05:00Z" tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toMatch(/^Tees off/);expect(document.querySelector('.pick-mine-figure')).toBeNull();});
  it('missed-cut card prints muted MC without score',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:80,my_status:'CUT',my_score:-12}} phase="live" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toBe('Missed the cut.');expect(document.querySelector('.pick-mine-figure')?.textContent).toBe('MC');});
- it('finished card separates real percentile from the best-pick heading',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:8,my_percentile:95}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toBe('Beat 95% of the field.');expect(document.querySelector('[data-pick-question]')?.textContent).toBe('You matched our best pick');});
+ it('finished card is absent even with a scored member pick',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:8,my_percentile:95}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('[data-your-pick-card]')).toBeNull();});
  it('guest Pick calls the gate and never opens sheet',async()=>{
   mocks.guest=true;mocks.user=null;mocks.gate.mockReturnValue(true);const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick}/>);
   fireEvent.click(await screen.findByRole('button',{name:'Pick'}));expect(mocks.gate).toHaveBeenCalledWith('pick');expect(onPick).not.toHaveBeenCalled();
@@ -152,7 +152,18 @@ describe('tournament picks surfaces',()=>{
   expect(document.querySelector('[data-overview-picks-sheet-fit]')).toBeNull();expect(document.querySelector('[data-overview-picks-sheet]')?.textContent).not.toContain('99%');
  });
  it('Why hides unchecked reason and keeps valid claim',async()=>{mount(<PicksSheet open onClose={()=>{}} picks={picks} predictions={null} eventName="Event" venueName={null} tournamentId="event"/>);await waitFor(()=>expect(document.querySelector('.pick-panel-case')?.textContent).toContain('Hits 72.3%'));expect(document.querySelector('.pick-panel-case')?.textContent).not.toContain('scrambling');});
- it('record tour chips have canonical order and switching uses event season',async()=>{mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await screen.findByRole('button',{name:'PGA TOUR'});expect(Array.from(document.querySelectorAll('.pick-record-tours button')).map(b=>b.textContent)).toEqual(['PGA TOUR','DP World','LPGA','Champions','Korn Ferry']);fireEvent.click(screen.getByRole('button',{name:'LPGA'}));await waitFor(()=>expect(mocks.rpc).toHaveBeenCalledWith('get_our_pick_record',{p_tour:'lpga',p_year:2026}));});
+ it('record tour chips have canonical order and switching uses event season',async()=>{mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await screen.findByRole('button',{name:'PGA TOUR'});expect(Array.from(document.querySelectorAll('.pick-record-tours button')).map(b=>b.textContent)).toEqual(['PGA TOUR','LPGA','Champions']);fireEvent.click(screen.getByRole('button',{name:'LPGA'}));await waitFor(()=>expect(mocks.rpc).toHaveBeenCalledWith('get_our_pick_record',{p_tour:'lpga',p_year:2026}));});
  it('record shows own dot, sorted board and newest-first ledger result tones',async()=>{mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await waitFor(()=>expect(document.querySelector('[data-chance-row="you"]')).not.toBeNull());expect(Array.from(document.querySelectorAll('[data-beat-user]')).map(row=>row.getAttribute('data-beat-user'))).toEqual(['clbhouz','viewer','other']);expect(Array.from(document.querySelectorAll('[data-record-event]')).map(row=>row.getAttribute('data-record-event'))).toEqual(['new','old']);expect(document.querySelector('[data-result-tone="out"]')?.textContent).toBe('MC');expect(document.querySelector('[data-result-tone="win"]')?.textContent).toBe('1st');});
  it('no YOUR PICK rows when the member has no scored picks',async()=>{members=members.filter(m=>!m.is_viewer);myOdds={events:0,wins:0,random_win_pct:null};mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await screen.findByRole('button',{name:'PGA TOUR'});expect(document.querySelector('[data-chance-row="you"]')).toBeNull();});
+});
+
+describe('disabled tour pick entry points',()=>{
+ it.each(['euro','pgad'])('%s never mounts sheets or member reads',tour=>{
+  const view=mount(<><OurRecordSheet open onClose={()=>{}} tour={tour} year={2026}/><YourPickCard state={state} phase="completed" ourResults={ours} tourCode={tour} onPick={()=>{}}/><PicksSheet open tourCode={tour} tournamentId="event" onClose={()=>{}} picks={picks} predictions={null} eventName="Event" venueName={null}/><PickMemberBands tournamentId="event" tourCode={tour} seasonYear={2026} phase="live" currentRound={2} pickResults={ours} startedPlayers={new Set()} onPick={()=>{}}/></>);
+  expect(view.container).toBeEmptyDOMElement();expect(mocks.rpc).not.toHaveBeenCalled();
+ });
+ it.each(['upcoming','live','completed'] as const)('member card visibility in %s',phase=>{
+  const view=mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim'}} phase={phase} ourResults={ours} tourCode="pga" onPick={()=>{}}/>);
+  expect(view.container.querySelector('[data-your-pick-card]')!==null).toBe(phase!=='completed');
+ });
 });

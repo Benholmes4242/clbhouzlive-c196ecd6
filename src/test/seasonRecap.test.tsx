@@ -140,7 +140,7 @@ describe('recap body', () => {
     expect(css).toContain('.recap-block{padding-top:var(--hero-section-gap)}');
     expect(css).toContain('.recap-figs{margin-top:var(--hero-content-gap)}');
     expect(css).toContain('.recap-record-figs{margin:var(--hero-content-gap) 0 0}');
-    expect(css).toContain('grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(var(--recap-rows-3),auto);grid-auto-flow:column;column-gap:12px');
+    expect(css).toContain('grid-template-columns:repeat(3,minmax(0,max-content));justify-content:space-between;grid-template-rows:repeat(var(--recap-rows-3),auto);grid-auto-flow:column;column-gap:12px');
     expect(css).toContain('grid-template-columns:16px minmax(0,1fr);column-gap:7px');
     expect(css).toContain('.recap-cards span{text-align:right;');
   });
@@ -203,14 +203,14 @@ describe('recap body', () => {
     const { container: c2 } = wrap(<SeasonRecapBody tour="lpga" year={2026} data={kf({ cardLine: { label: 'TOP 20', n: 20 } })} />);
     expect(c2.querySelector('[data-recap-youngest]')!.textContent).toContain('earned her card');
   });
-  it('Our record hidden with no picks, shown with picks', () => {
+  it('Korn Ferry record remains hidden even with historical picks', () => {
     record.value = null;
     const { container, unmount } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
     expect(container.querySelector('[data-recap-record]')).toBeNull();
     unmount();
     record.value = { event_count: 21, won: 4, top10: 17 };
     const { container: c2 } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={kf()} />);
-    expect(c2.querySelector('[data-recap-record]')!.textContent).toContain('OUR RECORD · 2026');
+    expect(c2.querySelector('[data-recap-record]')).toBeNull();
     record.value = null;
   });
   it('Champions with no standings shows EVENTS / WINNERS / MOST WINS only', () => {
@@ -261,10 +261,12 @@ describe('card list A', () => {
     expect(first.tagName).toBe('DIV');
     expect(container.querySelector('[data-recap-card="2"]')!.tagName).toBe('BUTTON');
   });
-  it('hybrid-hero.css has no centred max-content card grid and no 340px card rule', () => {
+  it('hybrid-hero.css spreads intrinsic columns in both widths without centring', () => {
     const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
     const cardRules = css.split('}').filter((r) => r.includes('.recap-cards'));
-    expect(cardRules.join('}')).not.toContain('max-content');
+    expect(cardRules.join('}')).toContain('repeat(3,minmax(0,max-content))');
+    expect(cardRules.join('}')).toContain('repeat(2,minmax(0,max-content))');
+    expect(cardRules.join('}')).toContain('justify-content:space-between');
     expect(cardRules.join('}')).not.toContain('justify-content:center');
     expect(css).not.toContain('max-width:340px){.recap-cards');
   });

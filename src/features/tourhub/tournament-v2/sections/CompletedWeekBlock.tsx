@@ -11,7 +11,8 @@ import { Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { copy, score } from '../data/tournamentRules';
-import { holeTypeCells, holeTypeHeading, pathCells, topThreeRows, weekCells, type FactCell, type WeekFacts } from '../data/weekFactsRules';
+import { holeTypeCells, holeTypeHeading, wonChart, topThreeRows, weekCells, type FactCell, type WeekFacts } from '../data/weekFactsRules';
+import { WonChart } from './WonChart';
 import { HERO_POS_TYPE, HERO_TOT_TYPE } from './HeroBoardRows';
 import { getScoreColor } from '../../_shared/scoreColor';
 import './heroRoundPanel.css';
@@ -29,17 +30,17 @@ function Cell({ c }: { c: FactCell }) {
   );
 }
 
-export function CompletedWeekBlock({ facts, rows, onFullBoard }: { facts: WeekFacts; rows: BoardEntry[]; onFullBoard?: () => void }) {
-  const path = pathCells(facts);
+export function CompletedWeekBlock({ facts, rows, onFullBoard, tourCode = 'pga' }: { facts: WeekFacts; rows: BoardEntry[]; onFullBoard?: () => void; tourCode?: string }) {
+  const chart = wonChart(facts, rows, 335);
   const holes = holeTypeCells(facts);
   const week = weekCells(facts);
   const last = facts.rounds || facts.path.length;
   const top = topThreeRows(rows, facts.champion_player_id, last);
   return (
     <div className="cw-block" data-completed-week>
-      {path.length > 0 ? <>
+      {chart ? <>
         <h3 className="cw-kick">{copy('wasWon')}</h3>
-        <div className="cw-figs cw-path" data-cw-section="path" style={{ ['--cw-n' as string]: path.length }}>{path.map((c) => <Cell key={c.key} c={c} />)}</div>
+        <WonChart facts={facts} rows={rows} tourCode={tourCode} />
       </> : null}
       {holes ? <>
         <h4 className="cw-sub">{holeTypeHeading(facts)}</h4>
@@ -60,16 +61,13 @@ export function CompletedWeekBlock({ facts, rows, onFullBoard }: { facts: WeekFa
         ))}
       </> : null}
       {onFullBoard ? (
-        <div className="hero-expand-board">
-          <Button variant="ghost" className="hero-full-leaderboard" data-hero-full-leaderboard data-field-size={rows.length} onClick={onFullBoard}>
-            {copy('wkFullLeaderboard')}
-            <span className="hero-full-leaderboard-count">{copy('wkFieldSize', { n: rows.length })}<b aria-hidden="true">›</b></span>
-          </Button>
-        </div>
+        <Button variant={null} size={null} className="cw-lr cw-more" data-hero-full-leaderboard data-field-size={rows.length} aria-label={`Full leaderboard, ${rows.length} players`} onClick={onFullBoard}>
+          <span /><span className="cw-n">{rows.length - top.length} more players</span><span /><span className="cw-v" aria-hidden>›</span>
+        </Button>
       ) : null}
       {week.length > 0 ? <>
         <h3 className="cw-kick">{copy('wkWeek')}</h3>
-        <div className="cw-grid" data-cw-section="week">{week.map((c) => <Cell key={c.key} c={c} />)}</div>
+        <div className="cw-grid" data-cw-section="week">{week.map(c => <div className="cw-week-cell" data-cw-cell={c.key} key={c.key}><b data-under={c.under || undefined}>{c.value}</b><span>{c.label}</span><em>{c.detail}</em></div>)}</div>
       </> : null}
     </div>
   );

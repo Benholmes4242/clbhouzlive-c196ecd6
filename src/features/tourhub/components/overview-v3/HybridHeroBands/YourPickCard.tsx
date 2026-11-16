@@ -21,6 +21,7 @@ export function YourPickCard({state,phase,ourResults,tourCode,onPick,onSeePicks,
   const { t } = useTranslation('tourhub');
   const copy=(key:string,options:Record<string,unknown>={})=>t(`overview.yourPick.${key}`,options);
   const hasPick=!guest && Boolean(state?.my_player_id && state.my_still_in_field!==false);
+  if (phase === 'completed') return null;
   if (!hasPick && (state?.locked || phase!=='upcoming')) return null;
   if (!state && !guest) return null;
   const name=state?.my_player_name ?? '';
@@ -38,14 +39,14 @@ export function YourPickCard({state,phase,ourResults,tourCode,onPick,onSeePicks,
   const line=!hasPick ? (guest ? lock ? copy('guestWinnerLine',lock) : copy('guestWinnerLineNoTime') : lock ? copy('winnerLine',lock) : copy('winnerLineNoTime')) : phase==='upcoming' ? (lock ? copy('pickedLine',lock) : copy('pickedLineNoTime')) : phase==='live' ? liveOurLine(mine,ourResults,copy) : state ? finishedCircleLine(circleRank,state,copy) : '';
   const best=state?.followed_best;
   const mostPicked=groupTournamentPicks(boardRows)[0];
-  const circleLine=phase==='completed' ? '' : phase==='upcoming' && (state?.followed_pickers ?? 0)>0 ? copy('circlePicked',{count:state?.followed_pickers,name:surnameOf(state?.followed_top[0]?.player_name ?? '')}) : phase==='live' && best ? copy('circleBest',{name:surnameOf(best.player_name),position:resultPosition({playerId:best.player_id??'',playerName:best.player_name,position:best.position,tied:best.tied})}) : mostPicked ? copy('membersPicked',{count:boardRows.length,name:surnameOf(mostPicked.playerName)}) : '';
+  const circleLine=phase==='upcoming' && (state?.followed_pickers ?? 0)>0 ? copy('circlePicked',{count:state?.followed_pickers,name:surnameOf(state?.followed_top[0]?.player_name ?? '')}) : phase==='live' && best ? copy('circleBest',{name:surnameOf(best.player_name),position:resultPosition({playerId:best.player_id??'',playerName:best.player_name,position:best.position,tied:best.tied})}) : mostPicked ? copy('membersPicked',{count:boardRows.length,name:surnameOf(mostPicked.playerName)}) : '';
   return <div className="pick-mine" data-your-pick-card>
     {heading && <div className="pick-mine-heading" data-pick-question>{heading}</div>}
     {line && <div className="pick-mine-how" data-pick-how>{line}</div>}
     <div className="pick-mine-row">
       {hasPick ? <span className="pick-mine-face"><PlayerAvatar playerId={mine.playerId} playerName={name} tourCode={tourCode} size={36} className="pick-mine-avatar" ringGradient={ACTIVE_RING_GRADIENT}/></span> : <span className="pick-mine-placeholder"><Plus size={18}/></span>}
       <div className="pick-mine-text"><div className="pick-mine-label">{copy('kicker')}</div><div className="pick-mine-name">{hasPick ? name : state?.my_player_id ? copy('withdrawnBefore',{name}) : copy('noPickYet')}</div>{sub && <div className="pick-mine-sub">{sub}</div>}</div>
-      {!hasPick ? <Button variant={null} size={null} className="pick-mine-action" onClick={onPick}>{copy('pickAction')}</Button> : phase==='upcoming' && !state?.locked ? <Button variant={null} size={null} className="pick-mine-change" onClick={onPick}>{copy('changeAction')}</Button> : (status || started || phase==='completed') && <div className="pick-mine-figure tabular-nums"><span className={status ? 'pick-panel-dim':''}>{resultPosition(mine)}</span>{!status && mine.score!=null && <> <span className={mine.score<0 ? 'pick-panel-under':''}>{fmtScore(mine.score)}</span></>}{phase==='live' && !status && state?.my_thru!=null && <small>{state.my_thru>=18 ? 'F' : copy('thru',{count:state.my_thru})}</small>}</div>}
+      {!hasPick ? <Button variant={null} size={null} className="pick-mine-action" onClick={onPick}>{copy('pickAction')}</Button> : phase==='upcoming' && !state?.locked ? <Button variant={null} size={null} className="pick-mine-change" onClick={onPick}>{copy('changeAction')}</Button> : (status || started) && <div className="pick-mine-figure tabular-nums"><span className={status ? 'pick-panel-dim':''}>{resultPosition(mine)}</span>{!status && mine.score!=null && <> <span className={mine.score<0 ? 'pick-panel-under':''}>{fmtScore(mine.score)}</span></>}{phase==='live' && !status && state?.my_thru!=null && <small>{state.my_thru>=18 ? 'F' : copy('thru',{count:state.my_thru})}</small>}</div>}
     </div>
     {circleLine && <Button variant={null} size={null} className="pick-follow-line" data-followed-picks onClick={()=>onSeePicks?.(hasPick?'field':'board')}><span className="pick-follow-stack">{state?.followed_top.slice(0,3).map(top=><span key={top.player_id}><PlayerAvatar playerId={top.player_id} playerName={top.player_name} tourCode={tourCode} size={18}/></span>)}</span><span data-pick-circle-text>{circleLine}</span><span className="pick-see-picks">{copy('seePicks')}</span></Button>}
   </div>;

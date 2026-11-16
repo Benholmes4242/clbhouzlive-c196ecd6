@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../_shared/picksEnabledForTour';
 /** Full boards share follow/pick display and parent-owned scorecard taps.
  * No board hole read: ScorecardSheet alone fetches the selected player.
  * `boardHead` (Leaderboards page only) replaces the default LEADERBOARD
@@ -18,8 +19,8 @@ export function LiveBoard({entries, fullEntries = entries, tournamentId, current
 }) {
   const {t} = useTranslation('tourhub');
   const follows = useTourPlayerFollows(enabled);
-  const {data:predictions} = useAIPredictions(enabled ? tournamentId : null);
-  const pickIds = new Set((predictions?.topContenders ?? []).map(p => p.playerId));
+  const {data:predictions} = useAIPredictions(enabled && picksEnabledForTour(tourSlug) ? tournamentId : null);
+  const pickIds = new Set((picksEnabledForTour(tourSlug) ? predictions?.topContenders ?? [] : []).map(p => p.playerId));
   const mine = fullEntries.filter(e => e.player?.id && follows.ids.has(e.player.id)).sort((a,b)=>(a.position ?? Infinity)-(b.position ?? Infinity));
   const shared = { currentRound, complete, followedIds:follows.ids, pickPlayerIds:pickIds,
     tourSlug,

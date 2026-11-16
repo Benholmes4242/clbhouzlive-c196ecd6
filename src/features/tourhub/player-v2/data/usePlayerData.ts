@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../_shared/picksEnabledForTour';
 /** Player detail reads are exclusively header-season scoped. Null/error payloads
  * never borrow another season. Pick history follows the inspected public RPC JSON. */
 import { useQuery } from '@tanstack/react-query';
@@ -65,12 +66,12 @@ export function usePlayerRaceRank(playerId: string, tour: string, year: number |
     if (error) throw error; return data?.position ?? null;
   } });
 }
-export function usePlayerNextEvent(tournamentId: string | null) {
-  return useQuery({queryKey:['player-v3','next-event',tournamentId],enabled:!!tournamentId,staleTime:300_000,queryFn:async()=>{
+export function usePlayerNextEvent(tournamentId: string | null, tourCode?: string) {
+  return useQuery({queryKey:['player-v3','next-event',tournamentId,picksEnabledForTour(tourCode)],enabled:!!tournamentId,staleTime:300_000,queryFn:async()=>{
     if(!tournamentId)return null;
     const [event,predictions]=await Promise.all([
       supabase.from('sr_tournaments').select('start_date').eq('id',tournamentId).maybeSingle(),
-      supabase.from('ai_predictions').select('predictions').eq('tournament_id',tournamentId).order('generated_at',{ascending:false}).limit(1).maybeSingle(),
+      picksEnabledForTour(tourCode) ? supabase.from('ai_predictions').select('predictions').eq('tournament_id',tournamentId).order('generated_at',{ascending:false}).limit(1).maybeSingle() : Promise.resolve({data:null}),
     ]);
     if(event.error)throw event.error;
     const picks=Array.isArray(predictions.data?.predictions)?predictions.data.predictions.flatMap(row=>{

@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../../_shared/picksEnabledForTour';
 /** Session owns field/board/summary navigation. Public board and guest locks
  * never call member state; saved picks return to summary without dismissing. */
 import { useEffect, useId, useState } from 'react';
@@ -29,7 +30,7 @@ export interface YourPickSheetProps {
 }
 
 export function YourPickSheet(props: YourPickSheetProps) {
-  return props.open ? <PickSession key={props.tournamentId} {...props} /> : null;
+  return props.open && picksEnabledForTour(props.tourCode) ? <PickSession key={props.tournamentId} {...props} /> : null;
 }
 
 function PickSession({ onClose, tournamentId, eventName, ourPicks, tourCode, initialPlayerId, initialView = 'field' }: YourPickSheetProps) {

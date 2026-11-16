@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../../_shared/picksEnabledForTour';
 import { overviewQueryReady, useOverviewBandReady } from './overviewShells';
 /**
  * SEASON RECAP SURFACES (rules: seasonRecapRules.ts; data: useSeasonRecap.ts).
@@ -155,8 +156,8 @@ export function RecapOurRecord({ tour, year }: { tour: TourId; year: number }) {
   const [open, setOpen] = useState(false);
   const recordQuery = useOurPickRecord(tour, year);
   const { data: record, isError } = recordQuery;
-  useOverviewBandReady('recapRecord', overviewQueryReady(recordQuery, !!tour && !!year));
-  if (isError || !record || !((record.event_count ?? 0) > 0)) return null;
+  useOverviewBandReady('recapRecord', overviewQueryReady(recordQuery, picksEnabledForTour(tour) && !!tour && !!year));
+  if (!picksEnabledForTour(tour) || isError || !record || !((record.event_count ?? 0) > 0)) return null;
   return <section data-recap-record className="upcoming-block recap-block">
     <div className="recap-head"><h2 className="upcoming-kicker">{t('overview.recap.ourRecord', { year })}</h2><Button variant="ghost" className="recap-link" onClick={() => setOpen(true)}>{t('overview.recap.howWePick')}</Button></div>
     <div className="upcoming-facts recap-figs recap-record-figs">

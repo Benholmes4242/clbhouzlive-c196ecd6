@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../_shared/picksEnabledForTour';
 /** Tournament-pick insights use the published RPCs only. Member rows are
  * viewer-keyed; event-owned tour/year must be supplied, never device defaults. */
 import { useQuery } from '@tanstack/react-query';
@@ -10,9 +11,9 @@ export interface MyPickOdds { events:number; wins:number; random_win_pct:number|
 export interface FitStat { player_id: string; stat: string; value: number; percentile: number; players: number; wins: number }
 export interface BeatRow { user_id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; picks: number; wins: number; top10: number; avg_percentile: number; is_viewer: boolean }
 export function useOurPickRecord(tour: string, year: number | null) {
-  return useQuery({ queryKey: ['tourhub', 'our-pick-record', tour, year], enabled: Boolean(tour && year), staleTime: 60_000,
+  return useQuery({ queryKey: ['tourhub', 'our-pick-record', tour, year], enabled: Boolean(picksEnabledForTour(tour) && tour && year), staleTime: 60_000,
     queryFn: async (): Promise<PickRecord | null> => {
-      if (year == null) return null;
+      if (!picksEnabledForTour(tour) || year == null) return null;
       const { data, error } = await supabase.rpc('get_our_pick_record', { p_tour: tour, p_year: year });
       if (error) throw error;
       return data as unknown as PickRecord | null;
@@ -20,9 +21,9 @@ export function useOurPickRecord(tour: string, year: number | null) {
 }
 export function useBeatTheModel(tour: string, year: number | null) {
   const { user } = useSupabaseSession();
-  return useQuery({ queryKey: ['tourhub', 'beat-the-model', tour, year, user?.id], enabled: Boolean(tour && year && user && !user.is_anonymous && !getGuestUser()), staleTime: 60_000,
+  return useQuery({ queryKey: ['tourhub', 'beat-the-model', tour, year, user?.id], enabled: Boolean(picksEnabledForTour(tour) && tour && year && user && !user.is_anonymous && !getGuestUser()), staleTime: 60_000,
     queryFn: async (): Promise<BeatRow[]> => {
-      if (year == null) return [];
+      if (!picksEnabledForTour(tour) || year == null) return [];
       const { data, error } = await supabase.rpc('get_beat_the_model', { p_tour: tour, p_year: year });
       if (error) throw error;
       return data ?? [];
@@ -30,9 +31,9 @@ export function useBeatTheModel(tour: string, year: number | null) {
 }
 export function useMyPickOdds(tour:string,year:number|null) {
   const {user}=useSupabaseSession();
-  return useQuery({queryKey:['tourhub','my-pick-odds',tour,year,user?.id],enabled:Boolean(tour && year && user && !user.is_anonymous && !getGuestUser()),staleTime:60_000,
+  return useQuery({queryKey:['tourhub','my-pick-odds',tour,year,user?.id],enabled:Boolean(picksEnabledForTour(tour) && tour && year && user && !user.is_anonymous && !getGuestUser()),staleTime:60_000,
     queryFn:async():Promise<MyPickOdds|null>=>{
-      if(year==null)return null;
+      if(!picksEnabledForTour(tour)||year==null)return null;
       const {data,error}=await supabase.rpc('get_my_pick_odds',{p_tour:tour,p_year:year});
       if(error)throw error;
       return data as unknown as MyPickOdds|null;

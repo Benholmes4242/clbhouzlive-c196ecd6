@@ -1,5 +1,12 @@
 # Roadmap
 
+## In progress: Tour finished week
+- Shared cumulative champion/next-two chart and collision-free labels; keep hole-type row.
+- Inline full-board row and four week figures.
+- Shared DP World/Korn Ferry picks gate across tournament entry points/readers and records; completed viewer card absent.
+- Spread recap columns; inherit touched Tour fonts.
+- Verify 320/375/430, authorised tests and four separate full-suite shards from 8,954; report and commit.
+
 ## Complete: Authorised profile rail test correction
 - Replace contour fallback in member/business covers; preserve photo layers.
 - Time-scale index points and interpolate last-five dots; replace tiles with newest-first rail.

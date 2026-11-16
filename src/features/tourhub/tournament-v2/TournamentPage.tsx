@@ -1,3 +1,4 @@
+import { picksEnabledForTour } from '../_shared/picksEnabledForTour';
 /**
  * TournamentPage (tournament-v2) — TD1 rebuild.
  *
@@ -56,7 +57,7 @@ import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, TOUR_CANVAS, HAIRLINE_INK_8, SURFACE,
+  INK, INK_MUTE, INK_FAINT, TOUR_CANVAS, HAIRLINE_INK_8, SURFACE,
 } from '../_shared/tokens';
 
 import {usePickField,useTournamentPickState} from '../hooks/useTournamentPick';
@@ -96,10 +97,12 @@ export function TournamentPage() {
   const fieldQuery=usePickField(tournamentId??'');
   const courseHolesQuery=useTournamentCourseHoles(tournamentId);
   const {data:lastYear}=useTournamentLastYearTop4(pulse.state==='upcoming'?tournamentId:null);
-  const pickState=useTournamentPickState(tournamentId??'');
-  const predictions=useAIPredictions(tournamentId);
+  const tourCode = (meta?.tour_code ?? 'pga').toLowerCase();
+  const picksEnabled = !!meta && picksEnabledForTour(tourCode);
+  const pickState=useTournamentPickState(picksEnabled ? tournamentId??'' : '');
+  const predictions=useAIPredictions(picksEnabled ? tournamentId ?? null : null);
   const playerFollows=useTourPlayerFollows();
-  const ourPickIds=new Set((predictions.data?.topContenders??[]).map(p=>p.playerId));
+  const ourPickIds=new Set((picksEnabled ? predictions.data?.topContenders??[] : []).map(p=>p.playerId));
   const champion=winnerRow(leaderboard??[],meta?.winner_id??null);
   const runner=(leaderboard??[]).filter(r=>r.id!==champion?.id&&r.score!=null).sort((a,b)=>(a.score??0)-(b.score??0))[0];
 
@@ -162,7 +165,7 @@ export function TournamentPage() {
 
 
 
-  const tourCode = (meta?.tour_code ?? 'pga').toLowerCase();
+
 
   // Inbound ?tab= mapping from legacy deep links:
   //   tab=leaderboard  -> scroll to #the-act
@@ -193,7 +196,7 @@ export function TournamentPage() {
     return (
       <TourHubShell immersive immersiveStatusBar>
         <div style={{
-          background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT,
+          background: TOUR_CANVAS, minHeight: '100dvh', 
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '32px 20px', textAlign: 'center',
         }}>
@@ -212,7 +215,7 @@ export function TournamentPage() {
                 style={{
                   background: INK, color: TOUR_CANVAS, border: 'none', borderRadius: 999,
                   padding: '10px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                  fontFamily: FONT, letterSpacing: '0.02em',
+                   letterSpacing: '0.02em',
                 }}
               >
                 {t('tournament.error.retry')}
@@ -223,7 +226,7 @@ export function TournamentPage() {
                 style={{
                   background: 'transparent', color: INK, border: `0.5px solid ${HAIRLINE_INK_8}`,
                   borderRadius: 999, padding: '10px 18px', fontSize: 12, fontWeight: 700,
-                  cursor: 'pointer', fontFamily: FONT, letterSpacing: '0.02em',
+                  cursor: 'pointer',  letterSpacing: '0.02em',
                 }}
               >
                 {t('tournament.error.back')}
@@ -287,15 +290,15 @@ export function TournamentPage() {
         subtitle={meta?.venue_name ?? undefined}
         backFallback="/tourhub?tab=schedule"
       >
-      <div className="tournament-v3" style={{fontFamily:FONT}}>
+      <div className="tournament-v3" style={{fontFamily:'inherit'}}>
         <TournamentHero nameRef={nameRef} meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl} firstTee={earliestTeeTime(heroTeeGroups)} drawnField={heroTeeGroups.length?new Set(heroTeeGroups.flatMap(g=>g.players.map(p=>p.id).filter(Boolean))).size:null}/>
         {pulse.state==='completed' && champion?.player && champion.score!=null && <ChampionStrip name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={score(champion.score)} scoreValue={champion.score} scoreLabel={runner?.score!=null?championScoreLabel(runner.score-champion.score,runner.score===champion.score):undefined} narrativeParts={championNarrative(meta,leaderboardRows)}/>}
         <section id="the-act">
           {situationCopy ? <div data-tournament-situation><SituationBand segments={situationCopy} note={situationNote} /></div> : null}
-          {weekBlock&&<section className="tv-section" data-tv-section="completed-week"><CompletedWeekBlock facts={weekFacts} rows={leaderboardRows} onFullBoard={openFullBoard}/></section>}
+          {weekBlock&&<section className="tv-section" data-tv-section="completed-week"><CompletedWeekBlock facts={weekFacts} rows={leaderboardRows} onFullBoard={openFullBoard} tourCode={tourCode}/></section>}
           {pulse.state!=='upcoming'&&hasBoard&&!weekBlock&&!(completedStroke&&weekFactsQuery.isLoading)&&<section className="tv-section" data-tv-section="board"><SectionHead title={copy(pulse.state==='completed'?'finalBoard':'board')} action={copy('fullBoard')} onAction={openFullBoard}/><MiniBoard tournamentId={tournamentId??meta.id} entries={leaderboardRows} currentRound={meta.current_round??playedRounds(leaderboardRows)} phase={pulse.state==='completed'?'completed':'live'} presentation="tournament" winnerPlayerId={champion?.player?.id??null} tourSlug={tourCode}/></section>}
         </section>
-        <div data-tv-section="picks"><HeroBoardSection picksOnly tournamentId={tournamentId??meta.id} entries={leaderboardRows} phase={pulse.state} currentRound={meta.current_round??null} championSrId={meta.winner_id} eventName={meta.name??''} eventTourCode={tourCode} eventSeasonYear={meta.start_date?new Date(meta.start_date).getFullYear():undefined} venuePar={meta.venue_par} totalRounds={scheduledRounds}/></div>
+        {picksEnabled && <div data-tv-section="picks"><HeroBoardSection picksOnly tournamentId={tournamentId??meta.id} entries={leaderboardRows} phase={pulse.state} currentRound={meta.current_round??null} championSrId={meta.winner_id} eventName={meta.name??''} eventTourCode={tourCode} eventSeasonYear={meta.start_date?new Date(meta.start_date).getFullYear():undefined} venuePar={meta.venue_par} totalRounds={scheduledRounds}/></div>}
         {pulse.state==='live'&&strokeBoard&&<RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
         {strokeBoard&&<TeeV3Section groups={teeGroups} phase={pulse.state} round={selectedTeeRound} rounds={drawnRounds} onRound={setTeeRoundChoice} onAll={()=>setTeeTimesOpen(true)} meta={meta} mine={pickState.data?.my_player_id??null} picks={ourPickIds} follows={playerFollows.ids} field={fieldQuery.data??[]} defender={lastYear?.[0]?.name??meta.defending_champion} rows={leaderboardRows}/>}
         {pulse.state==='upcoming'&&<><FieldSection field={fieldQuery.isError?[]:fieldQuery.data??[]} tour={tourCode}/><UpcomingLastYear rows={lastYear??[]}/></>}

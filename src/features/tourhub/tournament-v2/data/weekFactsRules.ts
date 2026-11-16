@@ -11,7 +11,8 @@
  * toPar alone carries score colour; counts/strokes/positions stay neutral.
  */
 import type { BoardEntry } from '../../leaderboard/BoardTable';
-import { copy, ordinal, roundScores, score, words } from './tournamentRules';
+import { copy, cumulative, ordinal, roundScores, score, words } from './tournamentRules';
+import { surnameOf } from '../../_shared/playerName';
 
 export interface WeekFactsPathEntry { round: number; position: number; tied: boolean; to_par: number; back: number | null; lead_by: number | null }
 export interface WeekFactsHoleType { par: number; to_par: number; rank: number; tied: boolean; field: number }
@@ -33,7 +34,7 @@ export interface WeekFacts {
   easiest: { hole: number; par: number; avg_to_par: number } | null;
 }
 
-export interface FactCell { key: string; pos?: string; value: string; under: boolean; toPar?: number; label: string; longLabel?: boolean }
+export interface FactCell { key: string; pos?: string; value: string; under: boolean; toPar?: number; label: string; detail?: string; longLabel?: boolean }
 
 const under = (n: number | null | undefined) => n != null && n < 0;
 const posText = (position: number, tied: boolean) => `${tied ? 'T' : ''}${position}`;
@@ -66,19 +67,44 @@ export function holeTypeHeading(f: WeekFacts): string {
 }
 
 const signedAvg = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}`;
-const shared = (surname: string | null, players: number) => surname ?? copy('wkPlayers', { n: players });
+const shared = (surname: string | null, players: number) => players > 1 ? copy('wkPlayers', { n: players }) : surname ?? copy('wkPlayers', { n: players });
 
-/** THE WEEK: LOW ROUND · MOST BIRDIES · FIELD AVG · CUT|FIELD · HARDEST · EASIEST (null cells drop). */
+/** THE WEEK: only four supplied figures, with sentence-case detail beneath. */
 export function weekCells(f: WeekFacts): FactCell[] {
   const out: FactCell[] = [];
-  if (f.low_round) out.push({ key: 'low', value: String(f.low_round.strokes), under: false, label: `LOW · ${shared(f.low_round.surname, f.low_round.players).toUpperCase()}`, longLabel: f.low_round.surname != null });
-  if (f.most_birdies) out.push({ key: 'birdies', value: String(f.most_birdies.count), under: false, label: `BIRDIES · ${shared(f.most_birdies.surname, f.most_birdies.players).toUpperCase()}`, longLabel: f.most_birdies.surname != null });
-  if (f.field_avg != null) out.push({ key: 'avg', value: f.field_avg.toFixed(1), under: false, label: f.par != null ? `AVG · ${copy('wkPar', { n: f.par }).toUpperCase()}` : 'AVG' });
-  if (f.cut) out.push({ key: 'cut', value: score(f.cut.line), toPar: f.cut.line, under: under(f.cut.line), label: `${copy('wkCut')} · ${copy('wkMadeIt', { n: f.cut.made }).toUpperCase()}` });
-  else if (f.field_size != null) out.push({ key: 'field', value: String(f.field_size), under: false, label: `${copy('wkField')} · ${copy('wkNoCut').toUpperCase()}` });
-  if (f.hardest) out.push({ key: 'hardest', pos: ordinal(f.hardest.hole), value: signedAvg(f.hardest.avg_to_par), toPar: f.hardest.avg_to_par, under: under(f.hardest.avg_to_par), label: copy('wkHardest') });
-  if (f.easiest) out.push({ key: 'easiest', pos: ordinal(f.easiest.hole), value: signedAvg(f.easiest.avg_to_par), toPar: f.easiest.avg_to_par, under: under(f.easiest.avg_to_par), label: copy('wkEasiest') });
+  if (f.low_round) out.push({ key: 'low', value: String(f.low_round.strokes), under: false, label: 'Low round', detail: shared(f.low_round.surname, f.low_round.players) });
+  if (f.most_birdies) out.push({ key: 'birdies', value: String(f.most_birdies.count), under: false, label: 'Most birdies', detail: shared(f.most_birdies.surname, f.most_birdies.players) });
+  if (f.hardest) out.push({ key: 'hardest', value: signedAvg(f.hardest.avg_to_par), toPar: f.hardest.avg_to_par, under: under(f.hardest.avg_to_par), label: 'Hardest', detail: `${ordinal(f.hardest.hole)} hole` });
+  if (f.easiest) out.push({ key: 'easiest', value: signedAvg(f.easiest.avg_to_par), toPar: f.easiest.avg_to_par, under: under(f.easiest.avg_to_par), label: 'Easiest', detail: `${ordinal(f.easiest.hole)} hole` });
   return out;
+}
+
+/** Finished chart uses the champion plus the next two by final position,
+ * stable on ties. Select first, then drop incomplete players (no replacement).
+ * Geometry stays here so both callers use the same 150px date-independent plot. */
+export function wonChart(f: WeekFacts, rows: BoardEntry[], width: number) {
+  if (f.rounds < 2 || !f.path.length || !f.champion_player_id) return null;
+  const eligible = rows.filter(r => r.player && r.position != null && !['MC', 'CUT', 'WD', 'DQ'].includes((r.status ?? '').toUpperCase()));
+  const champion = eligible.find(r => r.player?.id === f.champion_player_id || r.player?.sr_id === f.champion_player_id);
+  if (!champion) return null;
+  const next = eligible.filter(r => r !== champion).sort((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity)).slice(0, 2);
+  const players = [champion, ...next].flatMap(row => {
+    const values = Array.from({ length: f.rounds }, (_, i) => cumulative(row, i + 1));
+    if (values.some(v => v == null || !Number.isFinite(v))) return [];
+    return [{ id: row.id, name: row === champion ? f.champion_surname ?? surnameOf(row.player?.full_name) : surnameOf(row.player?.full_name), champion: row === champion, values: values as number[] }];
+  });
+  if (!players.some(p => p.champion)) return null;
+  const values = players.flatMap(p => p.values);
+  const min = Math.min(...values) - 1, max = Math.max(0, ...values);
+  const x = (i: number) => 14 + i * (width - 118) / (f.rounds - 1);
+  const y = (v: number) => 22 + (v - min) / (max - min) * 106;
+  const lines = players.map(p => ({ ...p, points: p.values.map((value, i) => ({ x: x(i), y: y(value), value, position: p.champion ? f.path.find(entry => entry.round === i + 1) : undefined })), labelY: y(p.values[p.values.length - 1] ?? 0) + 4 }));
+  const labels = [...lines].sort((a, b) => a.labelY - b.labelY);
+  for (let i = 1; i < labels.length; i++) {
+    const previous = labels[i - 1], current = labels[i];
+    if (previous && current) current.labelY = Math.max(current.labelY, previous.labelY + 13);
+  }
+  return { lines, rounds: Array.from({ length: f.rounds }, (_, i) => ({ x: x(i), label: `R${i + 1}` })) };
 }
 
 export interface TopRow { id: string; pos: string; winner: boolean; name: string; last: number | null; total: number | null }
