@@ -283,7 +283,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
         {/* minmax(0, 1fr) + minWidth 0 on each tile: a 1fr track will not shrink below
             min-content, and the nowrap region line used to widen column 2 and push
             tile 3 off the right edge. The pair is now always exactly equal halves. */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 9, marginTop: 9 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 6, marginTop: 6 }}>
           {[two, three].map((c) => (
             <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={{ ...btnReset, minWidth: 0 }}>
               <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>

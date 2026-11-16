@@ -130,6 +130,12 @@ describe('profile rail follow-up',()=>{
   expect(container.querySelector('[data-form-round="middle"] .profile-form-course')?.textContent).toBe('Royal County Down (Championship)');
   expect(container.querySelector('[data-form-round="middle"] .profile-form-course')?.textContent).toBe(shortCoursePart('Royal County Down Golf Club (Championship)'));
  });
+ it('the first form tile stacks top row, course and date in DOM order',()=>{
+  const {container}=display();const tile=container.querySelector('[data-form-round]') as HTMLElement;
+  expect([...tile.children].map(e=>e.className)).toEqual(['profile-form-top','profile-form-course','profile-form-date']);
+  expect(tile.querySelector('.profile-form-course')?.textContent).toBe(shortCoursePart(tile.querySelector('.profile-form-course')?.textContent??''));
+  expect(tile.querySelector('.profile-form-course')?.textContent).not.toBe('');
+ });
  it('dates include a year only outside the current year',()=>{
   const {container}=display({bars:[{...bars[2],date:'2025-11-12'}]});
   expect(container.querySelector('.profile-form-date')?.textContent).toBe('12 Nov 2025');

@@ -126,3 +126,15 @@ describe('BRIEF_TOP_TEN_OWNER_NAME_LABEL render', () => {
     expect(labelCount('Them')).toBe(0);
   });
 });
+
+describe('FIX_PROFILE_FORM_RAIL_AND_TOP10_GAP Top 10 spacing', () => {
+  it('the #1 button is block and the 2/3 grid sits 6px below with a 6px gap', () => {
+    renderRail({ isOwnProfile: true });
+    const one = document.querySelector('[data-top-ten-course-id="c1"]') as HTMLElement;
+    expect(one.style.display).toBe('block');
+    expect(one.style.width).toBe('100%');
+    const grid = (document.querySelector('[data-top-ten-course-id="c2"]') as HTMLElement).parentElement as HTMLElement;
+    expect(grid.style.gap).toBe('6px');
+    expect(grid.style.marginTop).toBe('6px');
+  });
+});
