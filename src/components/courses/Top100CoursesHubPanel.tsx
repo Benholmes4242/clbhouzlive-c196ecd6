@@ -3,6 +3,7 @@ import { Award, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
+import { useCourseRecordHolders } from './useCourseRecordHolders';
 import type { StatBrowseRow } from './useStatBrowse';
 import { RailChips, railChipStyle } from '@/components/ui/RailChips';
 import { communityOrder } from './top100/communityOrder';
@@ -23,7 +24,7 @@ import { TheArgumentSection } from './top100/TheArgumentSection';
 import { ArgumentShell, Top100CardListShell, Top100PageShell } from './top100/top100Shells';
 
 /** Gap between cards in the Top 100 list; its shell reads this (BRIEF_COURSES_SKELETONS_3A). */
-export const TOP100_CARD_GAP = 24;
+export const TOP100_CARD_GAP = 0;
 import { argumentGroups, compareRows, MIN_QUALIFYING } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline';
@@ -174,6 +175,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   }, [data, renderedList]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
   const { data: enrichment, isLoading: enrichmentLoading } = useTop100Enrichment(ids, user?.id, renderedList);
+  const holders = useCourseRecordHolders(ids, { includePlayers: false });
   const visibleCourses = useMemo(() => {
     const q = nameQuery.trim().toLowerCase();
     if (!q) return courses;
@@ -211,6 +213,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           viewerRounds={item?.yourRounds ?? 0}
           viewerBest={item?.yourBest ?? null}
           recordHolder={item?.recordHolder ?? null}
+          holder={holders.map.get(course.id) ?? null}
           players={item?.players ?? []}
           difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
           onClick={() => openCourse(course.id)}

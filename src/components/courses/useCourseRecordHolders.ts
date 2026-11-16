@@ -6,7 +6,8 @@ import { settled } from './browse/PageLoadGate';
 
 /**
  * useCourseRecordHolders — the one holder behind each course record in the
- * Courses list (BRIEF_COURSES_LIST_PHOTO_CARDS §3b).
+ * Courses list and Top 100. Browse player ids join holder ids in one profile
+ * read; Top 100 keeps its existing player enrichment and opts out of context.
  *
  * `get_course_record_holders(p_course_ids)` reads the same row, with the same
  * ordering, as `get_post_course_context`'s record — so the list names the same
@@ -30,6 +31,8 @@ export interface CourseRecordHolder {
 }
 
 /** That row plus the holder's face, from the one batched profile read. */
+export interface CourseListPlayer { id: string; name: string | null; photoUrl: string | null }
+
 export type CourseRecordHolderEntry = CourseRecordHolder & { photoUrl: string | null };
 
 const EMPTY = new Map<string, CourseRecordHolderEntry>();
@@ -61,21 +64,25 @@ export function toRecordHolderMap(
 }
 
 /** One read per loaded page of rows, keyed on the sorted, de-duplicated id set. */
-export function useCourseRecordHolders(courseIds: readonly string[]) {
+export function useCourseRecordHolders(courseIds: readonly string[], { includePlayers = true }: { includePlayers?: boolean } = {}) {
   const ids = useMemo(
     () => Array.from(new Set(courseIds.filter(Boolean))).sort(),
     [courseIds],
   );
   const query = useQuery({
-    queryKey: ['course-record-holders', ids],
+    queryKey: ['course-record-holders', ids, includePlayers],
     enabled: ids.length > 0,
     staleTime: 10 * 60 * 1000,
-    queryFn: async (): Promise<Map<string, CourseRecordHolderEntry>> => {
-      const results = await Promise.all(
+    queryFn: async () => {
+      const [results, contexts] = await Promise.all([Promise.all(
         batches(ids, RECORD_HOLDERS_MAX_IDS).map((chunk) =>
           supabase.rpc('get_course_record_holders' as never, { p_course_ids: chunk } as never),
         ),
-      );
+      ), includePlayers ? Promise.all(batches(ids, 100).map(chunk =>
+        supabase.rpc('get_post_course_context', { p_course_ids: chunk }),
+      )) : Promise.resolve([])]);
+      for (const result of contexts) if (result.error) throw result.error;
+      const contextRows = contexts.flatMap(result => (result.data ?? []) as Array<{ course_id: string; player_ids?: string[] }>);
       for (const result of results) if (result.error) throw result.error;
 
       const rows = results.flatMap((result) => (result.data ?? []) as Record<string, unknown>[]);
@@ -83,23 +90,30 @@ export function useCourseRecordHolders(courseIds: readonly string[]) {
         new Set(rows.map((row) => (row.holder_id == null ? '' : String(row.holder_id))).filter(Boolean)),
       );
 
+      for (const row of contextRows) for (const id of row.player_ids ?? []) if (!holderIds.includes(id)) holderIds.push(id);
+      const playerProfiles = new Map<string, CourseListPlayer>();
       // Sequential on purpose: the holder ids are unknown until the RPC resolves.
       const profiles = new Map<string, string | null>();
       if (holderIds.length > 0) {
         const profRes = await supabase
           .from('user_profiles')
-          .select('id, profile_photo_url')
+          .select('id, display_name, profile_photo_url')
           .in('id', holderIds)
           .is('deleted_at', null);
         if (profRes.error) throw profRes.error;
-        for (const profile of (profRes.data ?? []) as Array<{ id: string; profile_photo_url: string | null }>) {
+        for (const profile of (profRes.data ?? []) as Array<{ id: string; display_name?: string | null; profile_photo_url: string | null }>) {
           profiles.set(String(profile.id), profile.profile_photo_url ?? null);
+          playerProfiles.set(String(profile.id), { id: String(profile.id), name: profile.display_name ?? null, photoUrl: profile.profile_photo_url ?? null });
         }
       }
 
-      return toRecordHolderMap(rows, profiles);
+      const players = new Map<string, CourseListPlayer[]>();
+      for (const row of contextRows) players.set(row.course_id, (row.player_ids ?? []).flatMap(id => {
+        const p = playerProfiles.get(id); return p ? [p] : [];
+      }).slice(0, 3));
+      return { map: toRecordHolderMap(rows, profiles), players };
     },
   });
 
-  return { map: query.data ?? EMPTY, settled: settled(query) };
+  return { map: query.data?.map ?? EMPTY, players: query.data?.players, settled: settled(query) };
 }

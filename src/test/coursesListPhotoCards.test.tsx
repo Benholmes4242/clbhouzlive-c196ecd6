@@ -211,20 +211,17 @@ describe('courses list photo cards — the record row', () => {
 });
 
 describe('courses list photo cards — the card body', () => {
-  it('the plays sentence keeps its wording and may wrap instead of overflowing', () => {
+  it('the removed plays sentence is absent', () => {
     const view = render(<BrowseCourseCard row={fx.rows[0] as StatBrowseRow} holder={RECORD_HOLDER} onClick={() => {}} />);
-    const line = Array.from(view.container.querySelectorAll('div')).find((el) => el.textContent?.startsWith('Plays to'));
-    expect(line).toBeTruthy();
-    expect(line!.textContent).toContain('on average');
-    expect(line!.style.whiteSpace).not.toBe('nowrap');
+    expect(view.container.textContent).not.toContain('Plays to');
   });
 
-  it('a card with nothing under the name is still a 190px photo card', () => {
+  it('both cards use a 150px straight-edge photo', () => {
     const bare = { ...fx.rows[1], course_record: null, avg_to_par: null, rounds: 0 } as StatBrowseRow;
     const view = render(<BrowseCourseCard row={bare} onClick={() => {}} />);
-    const box = view.container.querySelector('button > div') as HTMLElement;
-    expect(box.style.minHeight).toBe('190px');
-    expect(PHOTO_H).toBe(190);
+    expect((view.container.querySelector('.course-list-photo') as HTMLElement).style.height).toBe('150px');
+    expect(PHOTO_H).toBe(150);
+    expect(TOP100_PHOTO_H).toBe(150);
     expect(view.container.textContent).not.toContain('Plays to');
     expect(view.container.textContent).not.toContain('COURSE RECORD');
   });
@@ -238,21 +235,12 @@ describe('courses list photo cards — the card body', () => {
     expect(container).toBeTruthy();
   });
 
-  it('the Top 100 card is the card it was: members line, best-by record, its own photo height', () => {
-    const view = render(
-      <BrowseCourseCard
-        row={fx.rows[0] as StatBrowseRow}
-        variant="top100"
-        recordHolder="Thomas"
-        players={[]}
-        onClick={() => {}}
-      />,
-    );
+  it('Top 100 replaces its members best-by line and photo height', () => {
+    const view = render(<BrowseCourseCard row={fx.rows[0] as StatBrowseRow} variant="top100" recordHolder="Thomas" holder={RECORD_HOLDER} players={[]} onClick={() => {}} />);
     expect(view.container.textContent).toContain('12 members');
-    expect(view.container.textContent).toMatch(/Best 62 by Thomas/);
-    expect(view.container.textContent).not.toContain('COURSE RECORD');
-    expect(view.container.textContent).not.toContain('GROSS');
-    expect(view.container.querySelector('div[style*="height: 178px"]')).not.toBeNull();
-    expect(TOP100_PHOTO_H).toBe(178);
+    expect(view.container.textContent).not.toMatch(/Best 62 by Thomas/);
+    expect(view.container.querySelector('.course-list-record')).not.toBeNull();
+    expect((view.container.querySelector('.course-list-photo') as HTMLElement).style.height).toBe('150px');
+    expect(TOP100_PHOTO_H).toBe(150);
   });
 });

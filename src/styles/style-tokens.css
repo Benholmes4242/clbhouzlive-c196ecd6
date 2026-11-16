@@ -4,6 +4,21 @@
  */
 
 :root {
+  /* Course list V2, shared by browse and Top 100; photo recipes remain local. */
+  --course-list-canvas: #0A0A0C;
+  --course-list-panel: #141418;
+  --course-list-ink: #F8FAFC;
+  --course-list-photo-ink: #FFFFFF;
+  --course-list-mute: rgba(248,250,252,0.62);
+  --course-list-dim: rgba(248,250,252,0.42);
+  --course-list-faint: rgba(248,250,252,0.30);
+  --course-list-record: #E2B04A;
+  --course-list-focus: #F7931E;
+  --course-list-position: rgba(255,255,255,0.82);
+  --course-list-area: rgba(255,255,255,0.85);
+  --course-list-position-shadow: 0 1px 10px rgba(0,0,0,0.5);
+  --course-list-name-shadow: 0 1px 8px rgba(0,0,0,0.35);
+  --course-list-scrim: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.42) 100%);
   /* H1 Latest holes only; shared photo-scrim recipes stay unchanged. */
   --latest-hole-ink: #FFFFFF;
   --latest-hole-credit: rgba(255,255,255,0.78);

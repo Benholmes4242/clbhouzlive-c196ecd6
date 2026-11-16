@@ -46,6 +46,7 @@ import {
   browseFiguresForScope,
 } from './useStatBrowse';
 import { useCourseRecordHolders } from './useCourseRecordHolders';
+import { courseListPositions } from './courseListCardRules';
 import { ListScopeHeader } from './browse/ListScopeHeader';
 import { RailChips } from '@/components/ui/RailChips';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
@@ -228,6 +229,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
      adds ids and an inline name search never refetches. */
   const holderIds = useMemo(() => rows.map((row) => row.course_id), [rows]);
   const holders = useCourseRecordHolders(holderIds);
+  const positions = useMemo(() => courseListPositions(rows), [rows]);
 
   /* The head's three figures, from the same stat_browse_base rows the By region
      tiles are grouped from, so a region's header equals that region's tile. */
@@ -935,6 +937,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               <div key={row.course_id} style={{ marginBottom: i < visibleRows.length - 1 ? STAT_BROWSE_CARD_GAP : 0 }}>
                 <BrowseCourseCard
                   row={row}
+                  lens={lens}
+                  rank={positions.get(row.course_id)}
+                  players={holders.players?.get(row.course_id) ?? []}
                   difficultyPercentile={browseTruth?.difficultyPercentiles.get(row.course_id)}
                   holder={holders.map.get(row.course_id) ?? null}
                   onClick={() => {

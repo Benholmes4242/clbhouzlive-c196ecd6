@@ -1,374 +1,84 @@
+/** Course list V2 has one presentation for browse and Top 100. Leads are
+ * display-only; record identity comes from the existing batched holder read.
+ * shortCoursePart owns names across this card, Latest holes and the viewer. */
 import React from 'react';
-
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
-import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
-import type { StatBrowseRow } from './useStatBrowse';
-import type { CourseRecordHolderEntry } from './useCourseRecordHolders';
-import { courseRankLabels, RANK_LIST_BY_SLUG as SLUG } from '@/features/courses/_shared/courseRankLabels';
-import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Button } from '@/components/ui/button';
+import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
+import type { StatBrowseRow, StatLens } from './useStatBrowse';
+import type { CourseRecordHolderEntry, CourseListPlayer } from './useCourseRecordHolders';
+import { courseListLead } from './courseListCardRules';
+import './courseListCard.css';
 
-/** The browse variant's photo height; read by StatBrowse's shell (BRIEF_COURSES_SKELETONS 4.4). */
-export const PHOTO_H = 190;
-/** The top100 variant's photo height; read by its shell (BRIEF_COURSES_SKELETONS 3.3). */
-export const TOP100_PHOTO_H = 178;
-const PHOTO_MUTE = 'rgba(255,255,255,0.66)';
-const PHOTO_DIM = 'rgba(255,255,255,0.55)';
-const RANK_GLASS = 'rgba(15,23,42,0.42)';
-/** The record row's gold — the one loud element a list card is allowed (BRIEF_COURSES_LIST_PHOTO_CARDS §3b). */
-export const RECORD_GOLD = '#E2B04A';
-/** The Courses hero's own five-stop fade, ending in the page colour so the cards
- *  run into each other instead of stopping at an edge. */
-const BROWSE_FADE =
-  'linear-gradient(180deg, rgba(10,10,12,0.15) 0%, rgba(10,10,12,0) 20%, rgba(10,10,12,0.62) 48%, rgba(10,10,12,0.97) 88%, #0A0A0C 100%)';
-const GLASS_CHIP: React.CSSProperties = {
-  position: 'absolute', top: 14, padding: '5px 10px', borderRadius: 999,
-  background: RANK_GLASS, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-  color: A.INK, fontSize: 10.5, fontWeight: 700,
-  fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
-};
-
-function RankBadge({ memberships, left = 20 }: { memberships: StatBrowseRow['memberships']; left?: number }) {
-  const labels = courseRankLabels(
-    memberships
-      .filter((entry) => entry.list_slug in SLUG && entry.rank != null)
-      .map((entry) => ({ list: SLUG[entry.list_slug], rank: Number(entry.rank) })),
-  );
-  if (labels.length === 0) return null;
-  return (
-    <div
-      style={{
-        position: 'absolute', top: 14, left, padding: '5px 10px', borderRadius: 999,
-        background: RANK_GLASS, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-        color: A.INK, fontFamily: SANS, fontSize: 11, fontWeight: 700,
-        fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
-      }}
-    >
-      {labels.join(' \u00B7 ')}
-    </div>
-  );
-}
-
+export const PHOTO_H = 150;
+export const TOP100_PHOTO_H = 150;
+export const RECORD_GOLD = 'var(--course-list-record)';
 interface BrowseCourseCardProps {
   row: StatBrowseRow;
-  difficultyPercentile?: number | null;
   onClick: () => void;
   variant?: 'browse' | 'top100';
+  lens?: StatLens;
   rank?: number | null;
-  /** Top 100 community view only: the official rank, printed under the name. */
   officialRank?: number | null;
+  difficultyPercentile?: number | null;
   viewerRounds?: number;
-  /** Top 100 only: the viewer's best gross here, or null when unknown. */
   viewerBest?: number | null;
-  /** Top 100 only: display name pairing with row.course_record. The record
-      line renders only when BOTH are present (the course hero's rule), which
-      is why no username can reach this card. */
   recordHolder?: string | null;
-  /** Top 100 only: up to three members, most rounds first. */
-  players?: Array<{ id: string; name: string | null; photoUrl: string | null }>;
-  /** Browse only: the record's holder — name, face, and the gross the RPC read
-      with it. The row renders only when that gross equals row.course_record
-      (the Top 100 card's rule), which is why no username can reach this card. */
+  players?: CourseListPlayer[];
   holder?: CourseRecordHolderEntry | null;
 }
-
-const NO_PLAYERS: NonNullable<BrowseCourseCardProps['players']> = [];
-
-export function BrowseCourseCard({
-  row,
-  difficultyPercentile,
-  onClick,
-  variant = 'browse',
-  rank = null,
-  officialRank = null,
-  viewerRounds = 0,
-  viewerBest = null,
-  recordHolder = null,
-  players = NO_PLAYERS,
-  holder = null,
-}: BrowseCourseCardProps) {
+export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'played', rank = null,
+  officialRank = null, recordHolder = null, players = [], holder = null }: BrowseCourseCardProps) {
   const top100 = variant === 'top100';
-  const hasRoundFacts = row.rounds > 0 && row.avg_to_par != null;
-  const avg = row.avg_to_par == null
-    ? null
-    : row.avg_to_par > 0
-      ? `+${row.avg_to_par.toFixed(1)}`
-      : row.avg_to_par < 0
-        ? `−${Math.abs(row.avg_to_par).toFixed(1)}`
-        : null;
-  const fig: React.CSSProperties = { ...FIGS, color: A.INK, fontSize: 13, fontWeight: 700, letterSpacing: '-0.04em' };
-  /* Comparison only at the ends of the field (>=80 harder, <=20 easier).
-     "Easier" uses 100 - pct: the complement absorbs ties, immaterial at whole
-     percentages — deliberate, do not "fix". */
-  const pct = difficultyPercentile;
-  const comparison = pct == null
-    ? null
-    : pct >= 80
-      ? { word: 'harder', value: pct }
-      : pct <= 20
-        ? { word: 'easier', value: 100 - pct }
-        : null;
+  const effectiveLens = top100 ? (officialRank != null ? 'rated' : 'played') : lens;
+  const lead = courseListLead(effectiveLens, row);
+  const shortName = shortCoursePart(row.name);
   const location = [row.region, row.sub_country].filter(Boolean).join(', ') || row.country;
-  const hasMembersLine = top100 && row.members > 0;
-  const lead = row.community_rating != null ? (
-    <>
-      {/* Below nine stays INK: the headline is never dimmed and must not use the category tone helper. */}
-      <div style={{ ...FIGS, fontSize: 24, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 1, color: A.INK }}>
-        {row.community_rating.toFixed(1)}
-      </div>
-      <div style={{ marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: A.DIM, whiteSpace: 'nowrap' }}>
-        {row.review_count} {row.review_count === 1 ? 'rating' : 'ratings'}
-      </div>
-    </>
-  ) : null;
-
-  /* The browse card's own headline: bigger, lighter weight, and its count label
-     one tier fainter. The Top 100 lead above is unchanged. */
-  const browseLead = row.community_rating != null ? (
-    <>
-      <div style={{ ...FIGS, fontSize: 28, fontWeight: 700, lineHeight: 1, color: A.INK }}>
-        {row.community_rating.toFixed(1)}
-      </div>
-      <div style={{ marginTop: 5, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: A.DIM, whiteSpace: 'nowrap' }}>
-        {row.review_count} {row.review_count === 1 ? 'rating' : 'ratings'}
-      </div>
-    </>
-  ) : null;
-
-  /* ── BROWSE VARIANT (BRIEF_COURSES_LIST_PHOTO_CARDS §3) ───────────────────
-     Text ON the photograph. The photo is absolutely positioned at the top, the
-     hero's five-stop fade runs over it, and the content flows from 63px down:
-     the name starts a third of the way into the picture and everything else
-     runs on over and below it, the fade ending in the page colour so the cards
-     meet without a seam. The Top 100 card below is a different card and is
-     untouched — this branch returns before it. */
-  if (!top100) {
-    // The course hero's rule, stated once: a record needs a holder whose gross
-    // IS this record. No holder row, no name, or a different gross → no row.
-    const record =
-      holder && row.course_record != null && holder.holderName.trim() !== '' && holder.recordGross === row.course_record
-        ? holder
-        : null;
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        aria-label={`View ${row.name}`}
-        style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', fontFamily: SANS }}
-      >
-        <div style={{ position: 'relative', overflow: 'hidden', background: A.CANVAS, minHeight: PHOTO_H }}>
-          <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: PHOTO_H, overflow: 'hidden', background: A.PANEL }}>
-            {row.image_url ? (
-              <img
-                src={getOptimizedImageUrl(row.image_url, { width: 640 })}
-                srcSet={generateImageSrcSet(row.image_url, [{ width: 400 }, { width: 640 }, { width: 800 }])}
-                sizes="100vw"
-                alt=""
-                loading="lazy"
-                decoding="async"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
-              />
-            ) : null}
-          </div>
-          <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, top: 0, height: PHOTO_H, background: BROWSE_FADE }} />
-          <RankBadge memberships={row.memberships} left={16} />
-          <div style={{ position: 'relative', zIndex: 1, padding: '63px 0 14px' }}>
-            <div style={{ padding: '0 16px' }}>
-              <div
-                style={{
-                  color: A.INK, fontSize: 22, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.15,
-                  textShadow: '0 1px 8px rgba(0,0,0,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}
-              >
-                {row.name}
-              </div>
-              <div style={{ marginTop: 3, fontSize: 12.5, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {location}
-              </div>
-            </div>
-            {record ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 0' }}>
-                <SquircleAvatar src={record.photoUrl} userId={record.holderId} size={26} alt={record.holderName} hairlineRing />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: RECORD_GOLD }}>
-                    COURSE RECORD
-                  </div>
-                  <div style={{ marginTop: 4, fontSize: 13.5, fontWeight: 600, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {record.holderName}
-                  </div>
-                </div>
-                {/* The score is the one figure that may never wrap: it holds its
-                    own column open with flex none + nowrap. */}
-                <div style={{ marginLeft: 'auto', flex: 'none', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                  <div style={{ ...FIGS, fontSize: 22, fontWeight: 700, lineHeight: 1, color: RECORD_GOLD }}>{record.recordGross}</div>
-                  <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: A.DIM }}>
-                    GROSS
-                  </div>
-                </div>
-              </div>
-            ) : null}
-            {/* The plays sentence keeps its wording and its 80/20 comparison
-                rule; it may now wrap rather than overflow a narrow screen. */}
-            {hasRoundFacts ? (
-              <div style={{ padding: '10px 16px 0', fontSize: 13, color: A.MUTE }}>
-                Plays to{' '}
-                {avg == null ? 'level par' : <span style={fig}>{avg}</span>}
-                {' '}on average{comparison ? (
-                  <>, {comparison.word} than <span style={fig}>{comparison.value}%</span> of courses.</>
-                ) : '.'}
-              </div>
-            ) : null}
-            <div style={{ padding: '10px 16px 6px' }}>
-              <CategoryScores
-                scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }}
-                layout="split"
-                lead={browseLead}
-                marginTop={0}
-              />
-            </div>
-          </div>
-        </div>
-      </button>
-    );
-  }
-
-  /* ── TOP 100 VARIANT — frozen (BRIEF_COURSES_LIST_PHOTO_CARDS) ───────────
-     Everything below renders for the Top 100 card only; its `!top100`
-     conditionals are unreachable now that browse returns above. */
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={`View ${row.name}`}
-      style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', fontFamily: SANS }}
-    >
-      <div style={{ position: 'relative', height: top100 ? TOP100_PHOTO_H : PHOTO_H, overflow: 'hidden' }}>
-        {row.image_url ? (
-          <img
-            src={getOptimizedImageUrl(row.image_url, { width: 640 })}
-            srcSet={generateImageSrcSet(row.image_url, [{ width: 400 }, { width: 640 }, { width: 800 }])}
-            sizes="100vw"
-            alt=""
-            loading="lazy"
-            decoding="async"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : <div style={{ width: '100%', height: '100%', background: A.PANEL }} />}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: '58%',
-            background: `linear-gradient(0deg, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.68)} 0%, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.4)} 48%, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0)} 100%)`,
-          }}
-        />
-        {!top100 ? <RankBadge memberships={row.memberships} /> : null}
-        {/* THE PHOTOGRAPH IS ABOUT YOU, THE STRIP BELOW IT IS ABOUT EVERYONE ELSE.
-            The amber "You played" chip is the only chip the photograph carries.
-            The old top-right chip counted rounds and lied about crowds (a dozen
-            rounds by one member read as a crowd), so it is gone. The member
-            count, the faces and the course record now arrive in the batched
-            enrichment read the page already makes (get_post_course_context +
-            one user_profiles read) and render in the strip below.
-            DELIBERATE OMISSION: no per-card "Rate it" control. This card's
-            root is a button, so a control here would nest a button inside a
-            button. */}
-        {top100 && viewerRounds > 0 ? (
-          <div style={{ ...GLASS_CHIP, left: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: A.AMBER }} />
-            {viewerBest != null ? <>You played · Best <span style={FIGS}>{viewerBest}</span></> : 'You played'}
-          </div>
-        ) : null}
-        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, display: 'flex', alignItems: 'flex-end', gap: 16 }}>
-          {top100 && rank != null ? (
-            <div
-              className="tabular-nums lining-nums"
-              style={{ flexShrink: 0, color: PHOTO_DIM, fontSize: 30, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}
-            >
-              {rank}
-            </div>
-          ) : null}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: A.INK, fontSize: 18, fontWeight: 700, letterSpacing: '-0.028em', lineHeight: 1.12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {row.name}
-            </div>
-            {!top100 ? (
-              <div style={{ marginTop: 3, color: PHOTO_MUTE, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {location}
-              </div>
-            ) : null}
-            {top100 && officialRank != null ? (
-              <div style={{ marginTop: 3, color: PHOTO_MUTE, fontSize: 12, whiteSpace: 'nowrap' }}>
-                Official <span style={FIGS}>#{officialRank}</span>
-              </div>
-            ) : null}
-          </div>
+  const record = holder && row.course_record != null && holder.holderName.trim() &&
+    (top100 ? Boolean(recordHolder) : holder.recordGross === row.course_record) ? holder : null;
+  const noRounds = top100 && row.rounds === 0;
+  const faces = players.slice(0, 3);
+  const ratingLead = effectiveLens !== 'rated' && row.community_rating != null ? <>
+    <div className="course-list-rating">{row.community_rating.toFixed(1)}</div>
+    <div className="course-list-rating-count">{row.review_count} {row.review_count === 1 ? 'RATING' : 'RATINGS'}</div>
+  </> : null;
+  return <Button variant="ghost" type="button" className="course-list-card" onClick={onClick}
+    aria-label={`View ${row.name}`} style={{ '--course-list-under': TOPAR_RED } as React.CSSProperties}>
+    <div className="course-list-photo" style={{ height: top100 ? TOP100_PHOTO_H : PHOTO_H }}>
+      {row.image_url ? <img src={getOptimizedImageUrl(row.image_url, { width: 640 })}
+        srcSet={generateImageSrcSet(row.image_url, [{ width: 400 }, { width: 640 }, { width: 800 }])}
+        sizes="100vw" alt="" loading="lazy" decoding="async" /> : null}
+      <div aria-hidden className="course-list-scrim" />
+      <div className="course-list-name-block">
+        {rank != null ? <div className="course-list-position">{rank}</div> : null}
+        <div className="course-list-name-column"><h3 className="course-list-name">{shortName}</h3>
+          <div className="course-list-area">{location}{top100 && officialRank != null ? ` · Official #${officialRank}` : ''}</div>
         </div>
       </div>
-      <div style={{ padding: '0 20px' }}>
-        {hasMembersLine ? (
-          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, fontSize: 11, color: A.DIM }}>
-            {players.length > 0 ? (
-              <span
-                aria-hidden="true"
-                style={{ flex: 'none', position: 'relative', height: 20, width: 19 + (players.length - 1) * 12 }}
-              >
-                {players.map((player, index) => (
-                  <span
-                    key={player.id}
-                    style={{
-                      position: 'absolute', left: index * 12, top: 0, width: 19, height: 20,
-                      borderRadius: '34%', zIndex: 3 - index, boxShadow: `0 0 0 1.5px ${A.CANVAS}`,
-                    }}
-                  >
-                    <SquircleAvatar src={player.photoUrl} userId={player.id} size={19} alt={player.name ?? ''} hairlineRing />
-                  </span>
-                ))}
-              </span>
-            ) : null}
-            <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              <span style={{ color: A.BODY, fontWeight: 600 }}>
-                <span style={FIGS}>{row.members}</span> {row.members === 1 ? 'member' : 'members'}
-              </span>
-              {row.course_record != null && recordHolder ? (
-                <>
-                  {' · Best '}
-                  <span style={fig}>{row.course_record}</span>
-                  {' by '}
-                  <span style={{ color: A.BODY, fontWeight: 600 }}>{recordHolder}</span>
-                </>
-              ) : null}
-            </span>
-          </div>
-        ) : null}
-        {hasRoundFacts ? (
-          <div style={{ marginTop: hasMembersLine ? 8 : 10, whiteSpace: 'nowrap', color: A.DIM, fontSize: 11 }}>
-            Plays to{' '}
-            {avg == null ? 'level par' : <span style={fig}>{avg}</span>}
-            {' '}on average{comparison ? (
-              <>, {comparison.word} than <span style={fig}>{comparison.value}%</span> of courses.</>
-            ) : '.'}
-          </div>
-        ) : null}
-        {top100 && row.rounds === 0 && viewerRounds === 0 ? (
-          <div style={{ marginTop: hasMembersLine ? 8 : 10, fontSize: 11, lineHeight: 1.5 }}>
-            <span style={{ color: A.FAINT }}>No member has logged an official round yet.</span>{' '}
-            <span style={{ color: A.DIM }}>Be the first.</span>
-          </div>
-        ) : null}
-        <CategoryScores
-          scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }}
-          layout="split"
-          lead={lead}
-          marginTop={12}
-        />
+    </div>
+    {noRounds ? <div className="course-list-no-rounds">No member has logged an official round yet. <span>Be the first.</span></div> : <>
+      <div className="course-list-lead">
+        <div className="course-list-lead-value"><div className="course-list-figure" data-tone={lead.tone}>{lead.value}</div><div className="course-list-lead-label">{lead.label}</div></div>
+        {row.members > 0 ? <div className="course-list-members">
+          {faces.length > 0 ? <span className="course-list-faces" aria-hidden style={{ width: 22 + (faces.length - 1) * 17 }}>
+            {faces.map((player, index) => <span key={player.id} className="course-list-face" style={{ left: index * 17, zIndex: 3 - index }}>
+              <SquircleAvatar src={player.photoUrl} userId={player.id} size={22} alt={player.name ?? ''} surface="canvas" hairlineRing />
+            </span>)}
+          </span> : null}
+          <span><b>{row.members}</b> {row.members === 1 ? 'member' : 'members'}</span>
+        </div> : null}
       </div>
-    </button>
-  );
+      {record ? <div className="course-list-record">
+        <SquircleAvatar src={record.photoUrl} userId={record.holderId} size={30} alt={top100 ? recordHolder ?? record.holderName : record.holderName} surface="canvas" hairlineRing />
+        <div className="course-list-holder"><div className="course-list-record-label">COURSE RECORD</div><div className="course-list-holder-name">{top100 ? recordHolder : record.holderName}</div></div>
+        {effectiveLens !== 'lowest' ? <div className="course-list-record-score" style={{ flex: 'none', whiteSpace: 'nowrap' }}><div className="course-list-gross">{row.course_record}</div><div className="course-list-gross-label">GROSS</div></div> : null}
+      </div> : null}
+    </>}
+    {ratingLead || [row.design_score, row.condition_score, row.clubhouse_score, row.facilities_score].some(value => value != null) ?
+      <div className="course-list-ratings"><CategoryScores scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }} layout="split" lead={ratingLead} marginTop={0} /></div> : null}
+  </Button>;
 }
-
 export default BrowseCourseCard;

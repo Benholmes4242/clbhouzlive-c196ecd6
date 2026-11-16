@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Course list card V2
+- Share the signed-off 150px card across Courses and Top 100, with sort-led figures, short names, record row and existing ratings.
+- Batch member faces with holder profiles, preserve full-list positions under search, and inherit the app font.
+- Add authorised tests, verify 320/375/430 layouts and four separate full-suite shards against 8,899; report every changed assertion.
+
 ## Complete: Latest holes H1
 - Restore the top-right number/par label, mock scrims and shared short course names; viewer and behaviour frozen.
 - Replace five authorised Option A cases, add H1 examples and verify focused/four-shard tests.
