@@ -40,6 +40,20 @@ function floatingNavTop() {
   const pill = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-pill-h')) || 64;
   return window.innerHeight - pill - 20;
 }
+/** BRIEF_BADGE_TAP_ISOLATION: the anchored dismiss layer swallows every phase of
+ * the tap and closes on CLICK only, so it stays mounted until the tap has ended
+ * and nothing beneath (or above it in the React tree) sees any phase. Touch
+ * phases are not preventDefault-ed: that would cancel the click that closes. */
+export function swallowTap(onClick: () => void) {
+  const stop = (event: React.SyntheticEvent) => { event.stopPropagation(); };
+  const stopAndPrevent = (event: React.SyntheticEvent) => { event.preventDefault(); event.stopPropagation(); };
+  return {
+    onPointerDown: stopAndPrevent, onPointerUp: stopAndPrevent,
+    onTouchStart: stop, onTouchEnd: stop, onMouseDown: stop, onMouseUp: stop,
+    onClick: (event: React.MouseEvent) => { stopAndPrevent(event); onClick(); },
+  };
+}
+
 export function GlanceShell({ onClose, anchorRef, label, children, align = 'right', cardStyle, placement = 'island' }: GlanceShellProps) {
   const location = useLocation();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -82,7 +96,7 @@ export function GlanceShell({ onClose, anchorRef, label, children, align = 'righ
   useEffect(() => {
     const card = cardRef.current;
     card?.focus();
-    return () => anchorRef.current?.focus();
+    return () => anchorRef.current?.focus(placement === 'anchored' ? { preventScroll: true } : undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -94,7 +108,9 @@ export function GlanceShell({ onClose, anchorRef, label, children, align = 'righ
   }, []);
 
   return createPortal(<>
-    <div aria-hidden data-testid="index-glance-backdrop" onClick={onClose} className="index-glance-backdrop" style={{ ...GLASS_BACKDROP, zIndex: Z.header - 1 }} />
+    <div aria-hidden data-testid="index-glance-backdrop" className="index-glance-backdrop"
+      {...(placement === 'anchored' ? swallowTap(onClose) : { onClick: onClose })}
+      style={{ ...GLASS_BACKDROP, zIndex: Z.header - 1, ...(placement === 'anchored' ? { touchAction: 'none' } : null) }} />
     <div ref={cardRef} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} className="index-glance-shell"
       style={{
         ...GLASS_CARD,

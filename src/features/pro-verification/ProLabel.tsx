@@ -21,6 +21,7 @@ export function ProLabel({ size = 'small', kind = 'pro', userId, name, surface =
   const word = kind === 'am' ? 'AM' : 'PRO';
   const inner = <span className="pro-label-text">{word}</span>;
   if (!userId) return <span className="pro-label" data-size={size} data-kind={kind}>{inner}</span>;
+  const stopOnly = (event: { stopPropagation(): void }) => { event.stopPropagation(); };
   const show = (event: { preventDefault(): void; stopPropagation(): void }) => {
     event.preventDefault();
     event.stopPropagation();
@@ -32,11 +33,14 @@ export function ProLabel({ size = 'small', kind = 'pro', userId, name, surface =
   return <>
     <span ref={ref} className="pro-label" data-size={size} data-kind={kind} data-tappable="" data-open={open ? '' : undefined}
       role="button" tabIndex={0} aria-label={`${word}, what this means`} aria-haspopup="dialog" aria-expanded={open}
+      onPointerDown={stopOnly} onPointerUp={stopOnly} onTouchStart={stopOnly} onTouchEnd={stopOnly} onMouseDown={stopOnly} onMouseUp={stopOnly}
       onClick={show}
       onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') show(event); }}>
       {inner}
     </span>
-    {open && <MemberBadgeCard userId={userId} name={name ?? ''} labelKind={kind} anchorRef={ref} onClose={() => setOpen(false)} hideProfileButton={hideProfileButton} />}
+    {/* The card portals to <body>, but React still bubbles its events through this
+        tree into the tile around the badge; this wrapper is the wall. */}
+    {open && <span style={{ display: 'contents' }} onClick={stopOnly} onPointerDown={stopOnly} onPointerUp={stopOnly} onTouchStart={stopOnly} onTouchEnd={stopOnly} onMouseDown={stopOnly} onMouseUp={stopOnly} onKeyDown={stopOnly}><MemberBadgeCard userId={userId} name={name ?? ''} labelKind={kind} anchorRef={ref} onClose={() => setOpen(false)} hideProfileButton={hideProfileButton} /></span>}
   </>;
 }
 

@@ -181,3 +181,51 @@ describe('member badge interaction', () => {
     expect(anchoredGlancePosition({ top: 600, bottom: 612 }, 300, 800, 716)).toEqual({ bottom: 210 });
   });
 });
+
+describe('BRIEF_BADGE_TAP_ISOLATION', () => {
+  const touchSequence = (el: Element) => {
+    fireEvent.pointerDown(el); fireEvent.touchStart(el); fireEvent.mouseDown(el);
+    fireEvent.pointerUp(el); fireEvent.touchEnd(el); fireEvent.mouseUp(el); fireEvent.click(el);
+  };
+  const backdrop = () => document.querySelector('[data-testid="index-glance-backdrop"]') as HTMLElement;
+  const tiles = {
+    click: (fn: () => void) => <button type="button" data-tile onClick={fn}><span>Jay Kelly</span><ProLabel userId="jay" name="Jay Kelly" /></button>,
+    pointerup: (fn: () => void) => <div role="button" tabIndex={0} data-tile onPointerUp={fn} onTouchEnd={fn}><span>Jay Kelly</span><ProLabel userId="jay" name="Jay Kelly" /></div>,
+  };
+  it.each(Object.keys(tiles) as Array<keyof typeof tiles>)('a %s tile: the full touch sequence on the badge opens the card only', (kind) => {
+    const open = vi.fn();
+    mount(tiles[kind](open));
+    touchSequence(screen.getByRole('button', { name: 'PRO, what this means' }));
+    expect(card()).not.toBeNull();
+    expect(open).not.toHaveBeenCalled();
+  });
+  it.each(Object.keys(tiles) as Array<keyof typeof tiles>)('a %s tile: the full sequence on the backdrop closes the card only', (kind) => {
+    const open = vi.fn();
+    mount(tiles[kind](open));
+    fireEvent.click(screen.getByRole('button', { name: 'PRO, what this means' }));
+    const layer = backdrop();
+    touchSequence(layer);
+    expect(card()).toBeNull();
+    expect(open).not.toHaveBeenCalled();
+  });
+  it('the backdrop closes on click, not on pointerdown or touchstart', () => {
+    mount(tiles.click(vi.fn()));
+    fireEvent.click(screen.getByRole('button', { name: 'PRO, what this means' }));
+    fireEvent.pointerDown(backdrop()); fireEvent.touchStart(backdrop());
+    expect(card()).not.toBeNull();
+    fireEvent.click(backdrop());
+    expect(card()).toBeNull();
+  });
+  it('Escape closes the card, fires nothing beneath and returns focus without scrolling', () => {
+    const open = vi.fn();
+    mount(<div onKeyDown={open} onClick={open}><ProLabel userId="jay" name="Jay Kelly" /></div>);
+    const badge = screen.getByRole('button', { name: 'PRO, what this means' });
+    fireEvent.click(badge);
+    const focus = vi.spyOn(badge, 'focus');
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(card()).toBeNull();
+    expect(open).not.toHaveBeenCalled();
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(h.track).toHaveBeenCalledTimes(1);
+  });
+});
