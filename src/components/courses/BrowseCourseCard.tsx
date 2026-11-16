@@ -4,7 +4,7 @@
 import React from 'react';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
@@ -16,11 +16,6 @@ import './courseListCard.css';
 
 export const PHOTO_H = 190;
 export const TOP100_PHOTO_H = 190;
-/** Card breakdown order; a missing score keeps an empty column, never a zero or dash. */
-const BREAKDOWN = [
-  { key: 'design_score', label: 'Design' }, { key: 'condition_score', label: 'Condition' },
-  { key: 'clubhouse_score', label: 'Clubhouse' }, { key: 'facilities_score', label: 'Facilities' },
-] as const;
 export const RECORD_GOLD = 'var(--course-list-record)';
 interface BrowseCourseCardProps {
   row: StatBrowseRow;
@@ -51,7 +46,6 @@ export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'pla
   const leadIsRounds = /^rounds?$/.test(lead.label);
   const sideCount = leadIsRounds ? row.members : row.rounds;
   const sideWord = leadIsRounds ? (row.members === 1 ? 'member' : 'members') : (row.rounds === 1 ? 'round' : 'rounds');
-  const breakdown = BREAKDOWN.map(({ key, label }) => ({ key, label, value: row[key] }));
   return <Button variant="ghost" type="button" className="course-list-card" onClick={onClick}
     aria-label={`View ${row.name}`} style={{ '--course-list-under': TOPAR_RED } as React.CSSProperties}>
     <div className="course-list-photo" style={{ height: top100 ? TOP100_PHOTO_H : PHOTO_H }}>
@@ -85,14 +79,8 @@ export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'pla
         {effectiveLens !== 'lowest' ? <div className="course-list-record-score" style={{ flex: 'none', whiteSpace: 'nowrap' }}><div className="course-list-gross">{row.course_record}</div><div className="course-list-gross-label">GROSS</div></div> : null}
       </div> : null}
     </>}
-    {breakdown.some(cell => cell.value != null) ? <div className="course-list-breakdown" data-course-breakdown>
-      {breakdown.map(cell => cell.value == null
-        ? <div key={cell.key} data-category={cell.key} aria-hidden />
-        : <div key={cell.key} data-category={cell.key}>
-          <b data-category-score={cell.value.toFixed(1)} style={{ color: courseSubScoreTone(cell.value) }}>{cell.value.toFixed(1)}</b>
-          <span>{cell.label}</span>
-        </div>)}
-    </div> : null}
+    {[row.design_score, row.condition_score, row.clubhouse_score, row.facilities_score].some(value => value != null) ?
+      <CategoryScores layout="strip" scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }} /> : null}
   </div>
   </Button>;
 }

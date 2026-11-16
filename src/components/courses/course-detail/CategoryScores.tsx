@@ -74,10 +74,27 @@ const CategoryScorePairs: React.FC<{ scores: CategoryScoreValues; marginTop: num
   </div>
 );
 
-export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?: number; layout?: 'grid4' | 'pairs' | 'split'; lead?: React.ReactNode }> = ({ scores, marginTop = 0, layout = 'grid4', lead }) => {
+export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?: number; layout?: 'grid4' | 'pairs' | 'split' | 'strip'; lead?: React.ReactNode }> = ({ scores, marginTop = 0, layout = 'grid4', lead }) => {
   const hasScores = ORDER.some(({ key }) => scores[key] != null);
   const hasLead = lead != null && lead !== false;
   if (!hasScores && !(layout === 'split' && hasLead)) return null;
+  /* BRIEF_COURSE_CARD_V3 §3: the course list card's breakdown — four centred
+     columns, value over label, no lead. Tone stays with this one helper. */
+  if (layout === 'strip') return (
+    <div data-course-breakdown style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 4, marginTop }}>
+      {ORDER.map(({ key, label }) => {
+        const value = scores[key];
+        if (value == null) return <div key={key} data-category={key} aria-hidden style={{ minWidth: 0 }} />;
+        const tone = courseSubScoreTone(value);
+        return (
+          <div key={key} data-category={key} style={{ minWidth: 0, textAlign: 'center' }}>
+            <div data-category-figure data-category-score={value.toFixed(1)} style={{ ...FIGS, fontSize: 13, fontWeight: 700, lineHeight: 1, color: tone }}>{value.toFixed(1)}</div>
+            <div style={{ marginTop: 3, fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
   if (layout === 'split') return (
     <div
       data-category-scores

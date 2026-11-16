@@ -117,11 +117,12 @@ describe('courses list photo cards — the list head', () => {
     expect(h.textContent).toContain('Every course played');
     expect(h.textContent).toContain('Courses');
     expect(h.textContent).toContain('Rounds');
-    expect(h.textContent).toContain('Plays to');
-    // Whole scope: 4 courses, 40+10+5+2 = 57 rounds, rounds-weighted to-par.
+    expect(h.textContent).toContain('Holes');
+    expect(h.textContent).not.toContain('Plays to');
+    // Whole scope: 4 courses, 40+10+5+2 = 57 rounds, 57 × 18 = 1,026 holes.
     expect(h.textContent).toContain('4');
     expect(h.textContent).toContain('57');
-    expect(h.textContent).toContain('\u22121.4');
+    expect(h.textContent).toContain('1,026');
     expect(h.style.position).not.toBe('sticky');
     const bar = container.querySelector('[role="tablist"]') as HTMLElement;
     // eslint-disable-next-line no-bitwise
@@ -134,10 +135,11 @@ describe('courses list photo cards — the list head', () => {
     expect(h.textContent).toContain('Every course in Kent');
     const tile = groupBrowseRegions(fx.baseRows).find((r) => r.region === 'Kent')!;
     const figures = browseFiguresForScope(fx.baseRows, { region: 'Kent' });
-    expect(figures).toEqual({ courses: tile.courses, rounds: tile.rounds, avgToPar: tile.avgToPar });
+    expect(figures).toEqual({ courses: tile.courses, rounds: tile.rounds, holes: tile.rounds * 18, avgToPar: tile.avgToPar });
     expect(h.textContent).toContain(String(tile.courses));
     expect(h.textContent).toContain(String(tile.rounds));
-    expect(h.textContent).toContain('\u22121.6');
+    expect(h.textContent).toContain(String(tile.rounds * 18));
+    expect(h.textContent).not.toContain('\u22121.6');
   });
 
   it('an area scope with no region captions the head with the area', () => {
@@ -146,7 +148,7 @@ describe('courses list photo cards — the list head', () => {
   });
 
   it('a scope with no played courses is the caption alone, never a row of placeholder figures', () => {
-    const view = render(<ListScopeHeader region={null} country={null} figures={{ courses: 0, rounds: 0, avgToPar: null }} />);
+    const view = render(<ListScopeHeader region={null} country={null} figures={{ courses: 0, rounds: 0, holes: 0, avgToPar: null }} />);
     expect(view.container.textContent).toContain('Every course played');
     expect(view.container.textContent).not.toContain('Courses');
     expect(view.container.textContent).not.toContain('Rounds');
@@ -216,22 +218,20 @@ describe('courses list photo cards — the card body', () => {
     expect(view.container.textContent).not.toContain('Plays to');
   });
 
-  it('both cards use a 150px straight-edge photo', () => {
+  it('both cards use a 190px straight-edge photo', () => {
     const bare = { ...fx.rows[1], course_record: null, avg_to_par: null, rounds: 0 } as StatBrowseRow;
     const view = render(<BrowseCourseCard row={bare} onClick={() => {}} />);
-    expect((view.container.querySelector('.course-list-photo') as HTMLElement).style.height).toBe('150px');
-    expect(PHOTO_H).toBe(150);
-    expect(TOP100_PHOTO_H).toBe(150);
+    expect((view.container.querySelector('.course-list-photo') as HTMLElement).style.height).toBe('190px');
+    expect(PHOTO_H).toBe(190);
+    expect(TOP100_PHOTO_H).toBe(190);
     expect(view.container.textContent).not.toContain('Plays to');
     expect(view.container.textContent).not.toContain('COURSE RECORD');
   });
 
-  it('browse cards meet without a gap', () => {
+  it('browse cards sit 10px apart in card view', () => {
     const { container } = renderBrowse();
-    for (const name of ['View Royal Ashdown', 'View Sunningdale']) {
-      const wrapper = screen.getByRole('button', { name }).parentElement as HTMLElement;
-      expect(wrapper.style.marginBottom).toBe('0px');
-    }
+    const wrapper = screen.getByRole('button', { name: 'View Royal Ashdown' }).parentElement as HTMLElement;
+    expect(wrapper.style.marginBottom).toBe('10px');
     expect(container).toBeTruthy();
   });
 
@@ -240,7 +240,35 @@ describe('courses list photo cards — the card body', () => {
     expect(view.container.textContent).toContain('12 members');
     expect(view.container.textContent).not.toMatch(/Best 62 by Thomas/);
     expect(view.container.querySelector('.course-list-record')).not.toBeNull();
-    expect((view.container.querySelector('.course-list-photo') as HTMLElement).style.height).toBe('150px');
-    expect(TOP100_PHOTO_H).toBe(150);
+    expect((view.container.querySelector('.course-list-photo') as HTMLElement).style.height).toBe('190px');
+    expect(TOP100_PHOTO_H).toBe(190);
+  });
+});
+
+describe('BRIEF_COURSE_CARD_V3 — gaps and scope header', () => {
+  it('list view keeps rows flush (0px) while card view spaces tiles 10px', () => {
+    localStorage.setItem('courses-list-view', 'list');
+    try {
+      renderBrowse();
+      const wrapper = screen.getByRole('button', { name: 'View Royal Ashdown' }).parentElement as HTMLElement;
+      expect(wrapper.style.marginBottom).toBe('0px');
+    } finally { localStorage.removeItem('courses-list-view'); }
+  });
+  it.each([
+    ['all areas', {}],
+    ['a country', { country: 'England' }],
+    ['a region', { region: 'Kent' }],
+  ] as const)('holes are exactly 18 × rounds for %s', (_name, scope) => {
+    const figures = browseFiguresForScope(fx.baseRows, scope);
+    expect(figures.rounds).toBeGreaterThan(0);
+    expect(figures.holes).toBe(figures.rounds * 18);
+  });
+  it('labels the header COURSES / ROUNDS / HOLES in order with no Plays to', () => {
+    const view = render(<ListScopeHeader region={null} country={null} figures={{ courses: 312, rounds: 4314, holes: 77652, avgToPar: -1.2 }} />);
+    const text = view.container.textContent ?? '';
+    expect(text.indexOf('Courses')).toBeLessThan(text.indexOf('Rounds'));
+    expect(text.indexOf('Rounds')).toBeLessThan(text.indexOf('Holes'));
+    expect(text).toContain('77,652');
+    expect(text).not.toContain('Plays to');
   });
 });

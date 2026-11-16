@@ -18,7 +18,7 @@ const row: StatBrowseRow = {
 const holder = { courseId: 'one', holderId: 'h', holderName: 'A very long holder name', recordGross: 63, photoUrl: null };
 describe('Course list V2 lead rules', () => {
   it.each([
-    ['played', '869', 'rounds'], ['rated', '8.3', 'from 2 ratings'],
+    ['played', '869', 'rounds'], ['rated', '8.3', '2 ratings'],
     ['toughest', '+6.2', 'on average'], ['scoreable', '+6.2', 'on average'],
     ['lowest', '63', 'course record'], ['longest', '6,400', 'yards'], ['chase', '4', 'open crowns'],
   ] as const)('%s has the sort figure', (lens, value, label) => {
@@ -29,7 +29,7 @@ describe('Course list V2 lead rules', () => {
   });
   it('one round and one rating have singular labels', () => {
     expect(courseListLead('played', { ...row, rounds: 1 }).label).toBe('round');
-    expect(courseListLead('rated', { ...row, review_count: 1 }).label).toBe('from 1 rating');
+    expect(courseListLead('rated', { ...row, review_count: 1 }).label).toBe('1 rating');
   });
   it('under par uses true minus and the under tone', () => {
     expect(courseListLead('scoreable', { ...row, avg_to_par: -2.4 })).toEqual({ value: '−2.4', label: 'on average', tone: 'under' });
