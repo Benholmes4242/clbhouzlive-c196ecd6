@@ -3,6 +3,9 @@ import { Award, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
+import { useCourseListView } from './useCourseListView';
+import { CourseListViewToggle } from './CourseListViewToggle';
+import { CourseListRow, CourseListColumns, CourseListRowsShell } from './CourseListRow';
 import { useCourseRecordHolders } from './useCourseRecordHolders';
 import type { StatBrowseRow } from './useStatBrowse';
 import { RailChips, railChipStyle } from '@/components/ui/RailChips';
@@ -138,6 +141,7 @@ interface Props {
 }
 
 const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
+  const { view, changeView } = useCourseListView('top100');
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const memberId = user && !isGuestUser(user) ? user.id : undefined;
@@ -205,7 +209,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
     // The id is an anchor with no current consumer, kept for deep links.
     return (
       <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: gapBelow ? TOP100_CARD_GAP : 0 }}>
-        <BrowseCourseCard
+        {view === 'list' ? <CourseListRow row={row} lens={ranking === 'community' ? 'rated' : 'played'} rank={rank} top100 onClick={() => openCourse(course.id)} /> : <BrowseCourseCard
           row={row}
           variant="top100"
           rank={rank}
@@ -217,7 +221,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           players={item?.players ?? []}
           difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
           onClick={() => openCourse(course.id)}
-        />
+        />}
       </div>
     );
   };
@@ -297,7 +301,9 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           ariaLabel="Top 100 region"
           align="center-when-fit"
           size="sm"
+          fixedTrailing
           trailing={(
+            <div className="course-view-trailing">
             <button
               type="button"
               onClick={() => {
@@ -320,6 +326,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
                 <Search className="h-4 w-4" style={{ color: 'currentColor' }} aria-hidden />
               )}
             </button>
+            <CourseListViewToggle view={view} onChange={changeView} />
+            </div>
           )}
         />
         {searchOpen ? (
@@ -334,7 +342,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           </div>
         ) : null}
       </div>
-      <PageLoadGate expect={TOP100_GATE_IDS} fallback={<Top100PageShell comparison={shape.cmp} near={shape.near} />}>
+      <PageLoadGate expect={TOP100_GATE_IDS} fallback={<Top100PageShell comparison={shape.cmp} near={shape.near} listView={view === 'list'} />}>
       <div className="t100b">
       <GateReport id="list" ready={!isLoading} />
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
@@ -366,7 +374,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       </section>
 
       <div style={{ paddingTop: 24 }}>
-        {isLoading || (ranking === 'community' && communityPending) ? <Top100CardListShell /> : isError ? (
+        {view === 'list' ? <CourseListColumns lens={ranking === 'community' ? 'rated' : 'played'} /> : null}
+        {isLoading || (ranking === 'community' && communityPending) ? (view === 'list' ? <CourseListRowsShell /> : <Top100CardListShell />) : isError ? (
           <div style={{ padding: '48px 0', textAlign: 'center', color: A.MUTE }}>
             <Award size={20} aria-hidden />
             <p>Could not load this list.</p>

@@ -22,6 +22,7 @@ import {
   HEAD_GAP, HEAD_KICKER_SIZE, HEAD_TITLE_GAP, HEAD_TITLE_LINE_HEIGHT, HEAD_TITLE_SIZE, SECTION_WRAP,
 } from '@/components/courses/browse/SectionHead';
 import { TOP100_PHOTO_H } from '../BrowseCourseCard';
+import { CourseListRowsShell } from '../CourseListRow';
 import { TOP100_CARD_GAP } from '../Top100CoursesHubPanel';
 import { ARGUMENT_ROW_GAP, ARGUMENT_THUMB } from './TheArgumentSection';
 import './top100Compare.css';
@@ -150,13 +151,13 @@ export function ListHeadShell() {
 }
 
 /** The Top 100 tab's gate fallback, in page order. A section the list was last seen without is left out, so the reveal only ever grows. */
-export function Top100PageShell({ comparison = true, near = true }: { comparison?: boolean; near?: boolean }) {
+export function Top100PageShell({ comparison = true, near = true, listView = false }: { comparison?: boolean; near?: boolean; listView?: boolean }) {
   return (
     <div className="t100b" aria-hidden data-top100-fallback>
       {comparison ? <ComparisonShell /> : null}
       {near ? <OneRatingAwayShell /> : null}
       <ListHeadShell />
-      <div style={{ paddingTop: 24 }}><Top100CardListShell /></div>
+      <div style={{ paddingTop: 24 }}>{listView ? <CourseListRowsShell /> : <Top100CardListShell />}</div>
     </div>
   );
 }

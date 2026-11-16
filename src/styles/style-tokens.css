@@ -4,6 +4,9 @@
  */
 
 :root {
+  --course-list-view-border: rgba(255,255,255,0.1);
+  --course-list-view-active: rgba(255,255,255,0.12);
+  --course-list-chip-fade: linear-gradient(90deg, #000 85%, transparent);
   /* Course list V2, shared by browse and Top 100; photo recipes remain local. */
   --course-list-canvas: #0A0A0C;
   --course-list-panel: #141418;

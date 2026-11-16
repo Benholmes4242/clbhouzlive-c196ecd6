@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Course list view toggle
+- Add one storage-safe preference and signed-off switch across Courses and Top 100; cards remain unchanged.
+- Add compact rows, shared lead formatting, list skeletons and opt-in chip overflow fade; preserve taps/search/paging.
+- Verify 320/375/430, focused tests and four separate shards against 8,927; update the Latest holes comment and report results.
+
 ## Complete: Course list card V2
 - Share the signed-off 150px card across Courses and Top 100, with sort-led figures, short names, record row and existing ratings.
 - Batch member faces with holder profiles, preserve full-list positions under search, and inherit the app font.

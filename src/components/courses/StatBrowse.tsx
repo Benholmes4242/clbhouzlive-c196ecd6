@@ -47,6 +47,9 @@ import {
 } from './useStatBrowse';
 import { useCourseRecordHolders } from './useCourseRecordHolders';
 import { courseListPositions } from './courseListCardRules';
+import { useCourseListView } from './useCourseListView';
+import { CourseListViewToggle } from './CourseListViewToggle';
+import { CourseListRow, CourseListColumns, CourseListRowsShell } from './CourseListRow';
 import { ListScopeHeader } from './browse/ListScopeHeader';
 import { RailChips } from '@/components/ui/RailChips';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
@@ -144,6 +147,7 @@ const menuStyle: React.CSSProperties = {
 
 
 export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
+  const { view, changeView } = useCourseListView('courses');
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -788,6 +792,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             onChange={(value) => onLensChange(value as StatLens)}
             ariaLabel="Choose course board"
             align="center-when-fit"
+            fixedTrailing
+            trailing={<CourseListViewToggle view={view} onChange={changeView} />}
           />
         </div>
       </div>
@@ -800,7 +806,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
            photo is the card's smallest settled state. Square: the real photo is
            full-bleed with no radius. */
         <div aria-hidden className="mt-4 -mx-4">
-          {Array.from({ length: STAT_BROWSE_PAGE_SIZE }, (_, i) => (
+          {view === 'list' ? <CourseListRowsShell count={STAT_BROWSE_PAGE_SIZE} /> : Array.from({ length: STAT_BROWSE_PAGE_SIZE }, (_, i) => (
             <Skeleton
               key={i}
               className="w-full"
@@ -922,6 +928,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )
       ) : (
         <div className="mt-4 -mx-4">
+          {view === 'list' && visibleRows.length > 0 ? <CourseListColumns lens={lens} /> : null}
           {/* A SEARCH THAT MATCHES NOTHING IS NOT AN EMPTY AREA: it says so in
               its own words and leaves the area's empty states alone. */}
           {searching && visibleRows.length === 0 ? (
@@ -933,24 +940,21 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </div>
           ) : null}
           {visibleRows.map((row, i) => {
+            const onOpen = () => {
+              analyticsEvents.track('stat_browse_course_opened', { course_id: row.course_id, lens, rank: i + 1 });
+              navigate(`/courses/${row.course_id}`);
+            };
             return (
               <div key={row.course_id} style={{ marginBottom: i < visibleRows.length - 1 ? STAT_BROWSE_CARD_GAP : 0 }}>
-                <BrowseCourseCard
+                {view === 'list' ? <CourseListRow row={row} lens={lens} rank={positions.get(row.course_id)} onClick={onOpen} /> : <BrowseCourseCard
                   row={row}
                   lens={lens}
                   rank={positions.get(row.course_id)}
                   players={holders.players?.get(row.course_id) ?? []}
                   difficultyPercentile={browseTruth?.difficultyPercentiles.get(row.course_id)}
                   holder={holders.map.get(row.course_id) ?? null}
-                  onClick={() => {
-                    analyticsEvents.track('stat_browse_course_opened', {
-                      course_id: row.course_id,
-                      lens,
-                      rank: i + 1,
-                    });
-                    navigate(`/courses/${row.course_id}`);
-                  }}
-                />
+                  onClick={onOpen}
+                />}
               </div>
             );
           })}

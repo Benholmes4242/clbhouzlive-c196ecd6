@@ -1,4 +1,4 @@
-import React, { type CSSProperties } from 'react';
+import React, { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -125,6 +125,8 @@ export interface RailChipsProps {
    * with the chips and stays reachable when the row overflows.
    */
   trailing?: React.ReactNode;
+  /** Opt-in course view toolbar: pin trailing actions beside the scrolling chips. */
+  fixedTrailing?: boolean;
 
   /**
    * ADDITIVE — A BOUNDED LABEL. Some rows name things too long to sit in a
@@ -208,10 +210,31 @@ export function railChipStyle(active: boolean, size: 'sm' | 'md' = 'md'): CSSPro
 /** The canonical chip-row gap. */
 export const RAIL_CHIP_GAP = 6;
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing, maxChipWidth, toggleSemantics = false, fill = false }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing, fixedTrailing = false, maxChipWidth, toggleSemantics = false, fill = false }: RailChipsProps) {
   const filled = ground === 'filled';
   /* ONE geometry pair, stated once. 'md' is the canonical chip. */
   const geo = RAIL_CHIP_GEOMETRY[size];
+  const scrollHost = useRef<HTMLDivElement>(null);
+  const [overflow, setOverflow] = useState(false);
+  useEffect(() => {
+    if (!fixedTrailing) return;
+    const host = scrollHost.current;
+    const rail = host?.firstElementChild;
+    if (!(rail instanceof HTMLElement)) return;
+    const measure = () => setOverflow(rail.scrollWidth > rail.clientWidth);
+    measure();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(rail);
+    window.addEventListener('resize', measure);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', measure); };
+  }, [fixedTrailing, options, trailing]);
+
+  if (fixedTrailing) return <div className={className} style={{ display:'flex', alignItems:'center', gap:8, minWidth:0, ...style }}>
+    <div ref={scrollHost} data-course-chip-overflow={overflow} style={{ flex:1, minWidth:0, ...(overflow ? { maskImage:'var(--course-list-chip-fade)', WebkitMaskImage:'var(--course-list-chip-fade)' } : {}) }}>
+      <RailChips options={options} value={value} onChange={onChange} ariaLabel={ariaLabel} locked={locked} ground={ground} align={align} size={size} distribute={distribute} maxChipWidth={maxChipWidth} toggleSemantics={toggleSemantics} fill={fill} />
+    </div>
+    {trailing ? <div style={{ display:'flex', flex:'none', alignItems:'center' }}>{trailing}</div> : null}
+  </div>;
 
 
   return (
