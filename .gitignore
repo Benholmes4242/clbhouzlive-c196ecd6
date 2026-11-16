@@ -28,3 +28,6 @@ supabase/.temp/
 .env
 .env.local
 .env.*.local
+
+# Raw test-run logs stay out of the repo; reports carry summaries only
+.lovable/reports/*.log
