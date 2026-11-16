@@ -32,7 +32,9 @@ export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLE
     observedRef.current = anchor;
     if (!anchor) { setPast(false); return; }
     const boundary = measureIslandBoundary();
-    setPast(anchor.getBoundingClientRect().bottom < boundary);
+    const rect = anchor.getBoundingClientRect();
+    // An anchor with no layout box has not been scrolled past; jsdom and not-yet-laid-out nodes report all-zero rects.
+    setPast(!(rect.width === 0 && rect.height === 0) && rect.bottom < boundary);
     const observer = new IntersectionObserver(([entry]) => {
       if (entry) setPast(!entry.isIntersecting && entry.boundingClientRect.bottom < (entry.rootBounds?.top ?? boundary));
     }, { root: getPrimaryScrollElement() ?? null, rootMargin: `-${boundary}px 0px 0px 0px`, threshold: [0, 1] });
