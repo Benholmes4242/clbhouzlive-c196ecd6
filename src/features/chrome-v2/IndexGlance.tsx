@@ -26,7 +26,6 @@ import { GlanceShell } from './GlanceShell';
 import { useAllScores, useHandicapHistory, useLastRound } from '@/lib/whs/hooks';
 import type { HcpMoveDetail } from './ChromeIsland';
 
-const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#F8FAFC';
 const DIM = 'rgba(248,250,252,0.42)';
 const MOVE_IMPROVING = '#34D77F';
@@ -154,7 +153,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
   };
 
   return (
-    <GlanceShell onClose={onClose} anchorRef={anchorRef} label="Your handicap index">
+    <GlanceShell onClose={onClose} anchorRef={anchorRef} label="Your handicap index" cardStyle={{ fontFamily: 'inherit' }}>
         <div
           style={{
             fontSize: 9.5,
@@ -263,7 +262,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
             fontSize: 14,
             fontWeight: 650,
             color: INK,
-            fontFamily: SANS,
+            fontFamily: 'inherit',
             cursor: 'pointer',
           }}
         >
