@@ -1,5 +1,15 @@
 /* Signed-off sign-in only. Safe-area bottoms use the clarified minimum,
    never add the full inset to the mock's minimum. No shared auth/OTP styles. */
+/* Every control takes the top islands' corner: 34% of the control's height
+   (the islands are 16px on 46px). Stated once here; compact pairs apply inside
+   the max-height: 640px block where the controls shrink. */
+:root {
+  --auth-radius-control: 18px; /* 54px pill / input / code box */
+  --auth-radius-social: 21px; /* 62px Apple / Google circle */
+  --auth-radius-back: 12px; /* 36px back button */
+  --auth-radius-control-compact: 17px; /* 50px compact pill / input / code box */
+  --auth-radius-social-compact: 18px; /* 54px compact social circle */
+}
 .auth-hero-screen { position: fixed; inset: 0; margin: 0 auto; width: 100%; max-width: 480px; display: flex; flex-direction: column; background: var(--bg-page); color: var(--auth-ink); overflow-y: auto; overflow-x: hidden; will-change: transform; }
 .auth-hero-brand { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 54px) 24px 0; text-align: center; }
 .auth-hero-brand img { width: 68px; height: 68px; }
@@ -9,11 +19,12 @@
 .auth-hero-panel { padding: 0 24px; }
 .auth-hero-panel-bottom { padding-bottom: max(34px, calc(14px + env(safe-area-inset-bottom, 0px))); }
 .auth-hero-social { display: flex; justify-content: center; gap: 20px; }
-.auth-hero-screen .auth-hero-circle, .auth-hero-screen .auth-hero-back { flex-shrink: 0; width: 62px; height: 62px; padding: 0; border-radius: 50%; background: var(--auth-control); border: 1px solid var(--auth-control-border); color: var(--auth-ink); }
+.auth-hero-screen .auth-hero-circle, .auth-hero-screen .auth-hero-back { flex-shrink: 0; width: 62px; height: 62px; padding: 0; background: var(--auth-control); border: 1px solid var(--auth-control-border); color: var(--auth-ink); }
+.auth-hero-screen .auth-hero-circle { border-radius: var(--auth-radius-social); display: flex; align-items: center; justify-content: center; }
 .auth-hero-screen .auth-hero-circle svg { width: 24px; height: 24px; }
 .auth-hero-screen .auth-hero-circle svg[viewBox="0 0 48 48"] { width: 22px; height: 22px; }
 .auth-hero-or { text-align: center; font-size: 13px; color: var(--auth-dim); margin: 18px 0; }
-.auth-hero-screen .auth-hero-pill { width: 100%; height: 54px; padding: 0; border: none; border-radius: 999px; background: var(--auth-ink); color: var(--bg-page); gap: 10px; font-size: 16px; font-weight: 700; letter-spacing: -.01em; box-shadow: none; }
+.auth-hero-screen .auth-hero-pill { width: 100%; height: 54px; padding: 0; border: none; border-radius: var(--auth-radius-control); background: var(--auth-ink); color: var(--bg-page); display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 700; letter-spacing: -.01em; box-shadow: none; }
 .auth-hero-screen .auth-hero-pill:active { opacity: .85; transform: none; }
 .auth-hero-screen .auth-hero-pill svg { width: 19px; height: 19px; }
 .auth-hero-screen .auth-hero-send:disabled { background: var(--auth-input-ground); color: var(--auth-disabled-ink); border: 1px solid var(--auth-disabled-border); opacity: 1; }
@@ -21,10 +32,10 @@
 .auth-hero-terms a { color: var(--auth-ink); font-weight: 600; text-decoration: none; }
 .auth-hero-screen .auth-hero-band { width: 100%; height: auto; border-radius: 0; border: 0; margin-top: 22px; background: var(--auth-band); padding: 20px 24px max(34px, calc(14px + env(safe-area-inset-bottom, 0px))); color: var(--auth-muted); font-size: 15px; font-weight: 600; gap: 0; }
 .auth-hero-band span { margin-left: 6px; color: var(--auth-dim); }
-.auth-hero-screen .auth-hero-back { width: 36px; height: 36px; font-size: 20px; line-height: 1; margin-bottom: 16px; }
+.auth-hero-screen .auth-hero-back { width: 36px; height: 36px; border-radius: var(--auth-radius-back); font-size: 20px; line-height: 1; margin-bottom: 16px; }
 .auth-hero-panel h2 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -.025em; line-height: normal; }
 .auth-hero-hint { margin: 6px 0 16px; color: var(--auth-muted); font-size: 14px; line-height: 1.45; }
-.auth-hero-input { display: block; width: 100%; height: 54px; border-radius: 14px; background: var(--auth-input-ground); border: 1px solid var(--auth-input-border); padding: 0 18px; font-size: 16px; font-weight: 500; color: var(--auth-ink); margin-bottom: 12px; outline: none; }
+.auth-hero-input { display: block; width: 100%; height: 54px; border-radius: var(--auth-radius-control); background: var(--auth-input-ground); border: 1px solid var(--auth-input-border); padding: 0 18px; font-size: 16px; font-weight: 500; color: var(--auth-ink); margin-bottom: 12px; outline: none; }
 .auth-hero-input:focus { border-color: var(--auth-input-focus); }
 .auth-hero-input::placeholder { color: var(--auth-disabled-ink); }
 .auth-hero-error { font-size: 14px; color: var(--auth-error); margin: 0 0 12px; }
@@ -32,7 +43,7 @@
 .auth-hero-otp-email { color: var(--auth-ink); font-weight: 600; }
 .auth-hero-screen .auth-hero-otp-change { margin-left: 8px; background: none; border: none; padding: 0; color: var(--auth-ink); font-weight: 700; font-size: inherit; line-height: inherit; cursor: pointer; }
 .auth-hero-otp-boxes { display: flex; gap: 8px; margin-bottom: 12px; }
-.auth-hero-otp-box { flex: 1 1 0; min-width: 0; height: 54px; border-radius: 14px; background: var(--auth-input-ground); border: 1px solid var(--auth-input-border); padding: 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--auth-ink); text-align: center; outline: none; caret-color: #FFFFFF; }
+.auth-hero-otp-box { flex: 1 1 0; min-width: 0; height: 54px; border-radius: var(--auth-radius-control); background: var(--auth-input-ground); border: 1px solid var(--auth-input-border); padding: 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--auth-ink); text-align: center; outline: none; caret-color: #FFFFFF; }
 .auth-hero-otp-box:focus { border-color: var(--auth-input-focus); }
 .auth-hero-otp-info { font-size: 14px; color: var(--auth-ink); margin: 0 0 12px; }
 .auth-hero-otp-foot { margin-top: 14px; text-align: center; font-size: 13px; line-height: 1.5; color: var(--auth-dim); }
@@ -59,15 +70,15 @@
 @media (max-height: 640px) {
   .auth-hero-brand img { width: 52px; height: 52px; }
   .auth-hero-brand h1 { font-size: 28px; margin-top: 14px; }
-  .auth-hero-screen .auth-hero-circle { width: 54px; height: 54px; }
+  .auth-hero-screen .auth-hero-circle { width: 54px; height: 54px; border-radius: var(--auth-radius-social-compact); }
   .auth-hero-or { margin: 12px 0; }
-  .auth-hero-screen .auth-hero-pill { height: 50px; font-size: 15px; }
+  .auth-hero-screen .auth-hero-pill { height: 50px; font-size: 15px; border-radius: var(--auth-radius-control-compact); }
   .auth-hero-terms { font-size: 11.5px; margin-top: 12px; }
   .auth-hero-screen .auth-hero-band { margin-top: 14px; padding: 14px 24px max(18px, calc(14px + env(safe-area-inset-bottom, 0px))); font-size: 14px; }
   .auth-hero-panel h2 { font-size: 21px; }
   .auth-hero-hint { font-size: 13px; margin-bottom: 12px; }
-  .auth-hero-input { height: 50px; font-size: 15px; }
-  .auth-hero-otp-box { height: 50px; font-size: 20px; }
+  .auth-hero-input { height: 50px; font-size: 15px; border-radius: var(--auth-radius-control-compact); }
+  .auth-hero-otp-box { height: 50px; font-size: 20px; border-radius: var(--auth-radius-control-compact); }
   .auth-hero-otp-foot { font-size: 12px; margin-top: 12px; }
 }
 @media (max-height: 640px) { .auth-hero-screen.is-keyboard-open .auth-hero-brand h1 { margin-top: 0; } }

@@ -1,5 +1,14 @@
 # Roadmap
 
+## Stopped: Courses dock anchor — awaiting ruling
+- IslandDock re-observes replaced anchors with same-frame recompute; Courses tab row rendered once; 9/9 dock tests pass.
+- 12 failures in four jsdom consumer test files (zero rects read as "above the islands"). Awaiting ruling: A (product zero-rect guard) or B (rect stubs in four test files). Report: .lovable/reports/courses-dock-anchor-stop.md. Commit 8dbdb60d48.
+
+## In progress: Auth squircles
+- 34%-of-height radii on sign-in/code controls via named custom properties, compact-block pairs, square look-around band.
+- Centre Verify/social spinners via flex on .auth-hero-pill (and .auth-hero-circle if needed).
+- Update old radius assertions; add CSS-radius test and OtpSheetContent spinner test; width/height checks with spinner centre measurement; four shards.
+
 ## Complete: Profile rail follow-up — authorised test closeout
 - Replace stretched SVG dots with fixed 8px HTML markers below the end dot.
 - Add missing date/interpolation, round markers, rail/taps, comment-link, counters and cover regressions.
