@@ -51,8 +51,6 @@ import {
 import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
 import { useWatchProgress } from './useWatchSignals';
-import { RoundsThisWeekShelf } from './RoundsThisWeekShelf';
-import { StandoutRoundsShelf } from './StandoutRoundsShelf';
 import { CourseVideosShelf, ShelfHeading } from './CourseVideosShelf';
 import { RegionsShelf } from './RegionsShelf';
 import { scrollPageToTop } from '@/lib/getScrollParent';
@@ -201,8 +199,6 @@ export function WatchFeed({
   onDepart,
   initialFilter = 'all',
   onOpenComments,
-  onOpenRound,
-  onOpenMember,
 }: {
   userId: string | undefined;
   onDepart: () => void;
@@ -210,10 +206,6 @@ export function WatchFeed({
   initialFilter?: string;
   /** Opens ExploreMagazine's one mounted CommentsSheetV2 — never a second sheet here. */
   onOpenComments?: (postId: string) => void;
-  /** RS — the rounds shelf's cards open the scorecard sheet Explore hosts. */
-  onOpenRound?: (scoreId: string, ownerUserId: string | null) => void;
-  /** RS — a shelf card's avatar or name opens the member, as elsewhere. */
-  onOpenMember?: (userId: string) => void;
 }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
@@ -618,17 +610,8 @@ export function WatchFeed({
             </>
           ) : null}
 
-          {/* RS — ROUNDS THIS WEEK: once, directly after Quick hits, on the All
-              chip only (onAll excludes an active search, like Continue watching).
-              Signed-in members only; the shelf hides itself for guests. */}
-          {onAll ? (
-            <RoundsThisWeekShelf userId={userId} onOpenRound={onOpenRound} onOpenMember={onOpenMember} />
-          ) : null}
-
-          {onAll ? <StandoutRoundsShelf userId={userId} onOpenRound={onOpenRound} onOpenMember={onOpenMember} /> : null}
-
-          {/* WS2 — FILMED AT YOUR COURSES and BY REGION: For you only, after Rounds this
-              week and before Watch. Both hide themselves for guests and thin data. */}
+          {/* WS2 — FILMED AT YOUR COURSES and BY REGION: For you only, directly after Quick
+              hits and before Watch. Both hide themselves for guests and thin data. */}
           {onAll ? (
             <>
               <CourseVideosShelf userId={userId} onDepart={onDepart} />

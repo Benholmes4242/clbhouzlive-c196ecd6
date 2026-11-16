@@ -40,7 +40,6 @@ vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({
 vi.mock('@/components/explore-tab-new/courseled/MomentTile', () => ({ MomentTile: () => <div /> }));
 vi.mock('@/features/explore-magazine/watch/CreatorsRow', () => ({ CreatorsRow: () => null }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => null }));
-vi.mock('@/features/explore-magazine/watch/RoundsThisWeekShelf', () => ({ RoundsThisWeekShelf: () => null }));
 vi.mock('@/features/explore-magazine/watch/RegionsShelf', () => ({ RegionsShelf: () => <div data-stub="regions" /> }));
 vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useCourseVideos: () => ({ data: [], isLoading: false, isError: false }),

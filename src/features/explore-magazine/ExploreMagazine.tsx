@@ -1373,7 +1373,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
 
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
           (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely. */}
-      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} onOpenRound={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)} onOpenMember={(id) => opener.openProfile(id)} /> : null}
+      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} /> : null}
       {view === 'all' && featured.isLoading ? (
         <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
           <FeaturedRoundSkeleton />

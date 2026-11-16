@@ -15,7 +15,6 @@ vi.mock('@/hooks/gam/useUserAnalyticsCourses', () => ({ useUserAnalyticsCourses:
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
 vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({ useClubhouseLikes: () => ({ getActiveLikeState: () => ({ isLiked: false, count: 0 }), handleLike: vi.fn() }) }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => null }));
-vi.mock('@/features/explore-magazine/watch/RoundsThisWeekShelf', () => ({ RoundsThisWeekShelf: () => null }));
 vi.mock('@/features/explore-magazine/watch/RegionsShelf', () => ({ RegionsShelf: () => null }));
 vi.mock('@/features/explore-magazine/watch/CreatorSpotlight', () => ({ CreatorSpotlight: () => null }));
 vi.mock('@/features/explore-magazine/watch/Top100FilmShelf', () => ({ Top100FilmShelf: () => null }));

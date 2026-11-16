@@ -68,7 +68,7 @@ export const WIRED = [
 export const DELEGATES: Record<string, string> = {
   "src/components/courses/course-detail/CourseReviewsTab.tsx": "src/components/courses/course-detail/reviews/reviewFlatBits.tsx",
   "src/components/courses/top100/Top100RaceSection.tsx": "src/components/courses/top100/HundredRaceParts.tsx",
-  "src/features/explore-magazine/watch/RoundsThisWeekShelf.tsx": "src/features/explore-magazine/watch/RoundTileParts.tsx",
+  "src/features/explore-magazine/watch/RoundCard.tsx": "src/features/explore-magazine/watch/RoundTileParts.tsx",
   "src/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet.tsx": "src/features/courses/_shared/scorecard/scorecardParts.tsx",
   "src/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown.tsx": "src/components/profile/handicap/whs/sections/course-legends/flat/championsFlatBits.tsx",
   "src/components/shared/overlay/ReviewTileOverlay.tsx": "src/components/shared/overlay/ReviewOverlayCore.tsx"

@@ -8,7 +8,6 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 
 const f = vi.hoisted(() => ({
   recentRows: [] as Array<Record<string, unknown>>,
-  standoutRounds: [] as Array<Record<string, unknown>>,
   snapshot: null as unknown,
   rpcCalls: [] as Array<Record<string, unknown>>,
 }));
@@ -18,7 +17,6 @@ vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     rpc: (name: string, args: Record<string, unknown>) => {
       f.rpcCalls.push({ name, ...args });
-      if (name === 'get_recent_rounds') return Promise.resolve({ data: f.recentRows, error: null });
       if (name === 'get_friend_hybrid_snapshot') return Promise.resolve({ data: f.snapshot, error: null });
       return Promise.resolve({ data: [], error: null });
     },
@@ -29,21 +27,9 @@ vi.mock('@/hooks/messaging/useStartConversation', () => ({ useStartConversation:
 vi.mock('@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes', () => ({ useRoundHoleShapes: () => new Map() }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => null }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
-/* The Standout shelf's own reads; the Recent shelf reads get_recent_rounds. */
-vi.mock('@/features/explore-magazine/useViewerScoreScope', () => ({
-  useViewerScoreScope: () => ({ isFetched: true, unresolved: false, scope: { county: null, nation: null } }),
-}));
-vi.mock('@/components/explore-tab-new/courseled/hooks/useStandoutRounds', () => ({
-  useStandoutRounds: () => ({ data: f.standoutRounds, isFetched: true, isError: false }),
-}));
-vi.mock('@/features/explore-magazine/watch/useStandoutFeats', () => ({
-  useStandoutFeats: () => ({ data: [], isFetched: true, isError: false }),
-}));
-
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
-import { RoundsThisWeekShelf } from '@/features/explore-magazine/watch/RoundsThisWeekShelf';
-import { StandoutRoundsShelf } from '@/features/explore-magazine/watch/StandoutRoundsShelf';
+import { RoundCard } from '@/features/explore-magazine/watch/RoundCard';
 
 /* ------------------------------------------------------------- fixtures */
 
@@ -81,25 +67,19 @@ const loc = () => {
   return { path: el.getAttribute('data-path'), search: el.getAttribute('data-search') ?? '' };
 };
 
-/** The REAL opener, wired the way ExploreMagazine/RoundsPage wire it. */
-function ShelfHarness({ shelf }: { shelf: 'recent' | 'standout' }) {
+/** The REAL opener, wired the way ExploreMagazine/RoundsPage wire it, on the shared round card. */
+function CardHarness() {
   const opener = useScorecardOpener();
   return (
     <>
       <LocationView />
-      {shelf === 'recent' ? (
-        <RoundsThisWeekShelf
-          userId="me"
-          onOpenRound={(scoreId, owner) => opener.openByScore(scoreId, null, owner)}
-          onOpenMember={(id) => opener.openProfile(id)}
-        />
-      ) : (
-        <StandoutRoundsShelf
-          userId="me"
-          onOpenRound={(scoreId, owner) => opener.openByScore(scoreId, null, owner)}
-          onOpenMember={(id) => opener.openProfile(id)}
-        />
-      )}
+      <RoundCard
+        round={f.recentRows[0] as unknown as Parameters<typeof RoundCard>[0]['round']}
+        shapes={new Map()}
+        locale="en"
+        onOpenRound={(scoreId, owner) => opener.openByScore(scoreId, null, owner)}
+        onOpenMember={(id) => opener.openProfile(id)}
+      />
       {opener.target ? <div data-testid="scorecard-open" data-score={opener.target.scoreId} /> : null}
     </>
   );
@@ -143,7 +123,6 @@ function mount(node: React.ReactNode) {
 beforeEach(() => {
   vi.clearAllMocks();
   f.recentRows = [round('a')];
-  f.standoutRounds = [round('b')];
   f.snapshot = null;
   f.rpcCalls = [];
 });
@@ -165,24 +144,16 @@ describe('member taps outside the handicap area open the profile', () => {
     expect(loc().path).toBe('/profile/me');
   });
 
-  it('Recent rounds: the name/avatar opens the owner profile and not the scorecard', async () => {
-    mount(<ShelfHarness shelf="recent" />);
+  it('Round card: the name/avatar opens the owner profile and not the scorecard', async () => {
+    mount(<CardHarness />);
     const who = await screen.findByRole('button', { name: 'Player a' });
     fireEvent.click(who);
     expect(loc().path).toBe('/profile/u-a');
     expect(screen.queryByTestId('scorecard-open')).toBeNull();
   });
 
-  it('Standout rounds: the name/avatar opens the owner profile and not the scorecard', async () => {
-    mount(<ShelfHarness shelf="standout" />);
-    const who = await screen.findByRole('button', { name: 'Player b' });
-    fireEvent.click(who);
-    expect(loc().path).toBe('/profile/u-b');
-    expect(screen.queryByTestId('scorecard-open')).toBeNull();
-  });
-
   it('the tile body still opens the scorecard', async () => {
-    mount(<ShelfHarness shelf="recent" />);
+    mount(<CardHarness />);
     await screen.findByRole('button', { name: 'Player a' });
     fireEvent.click(document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement);
     expect(screen.getByTestId('scorecard-open').getAttribute('data-score')).toBe('s-a');

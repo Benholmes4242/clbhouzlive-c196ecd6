@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import { RoundCard } from '@/features/explore-magazine/watch/RoundsThisWeekShelf';
+import { RoundCard } from '@/features/explore-magazine/watch/RoundCard';
 import { SHELF_CARD, SHELF_SKELETON } from '@/features/explore-magazine/watch/roundsShelfRules';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';

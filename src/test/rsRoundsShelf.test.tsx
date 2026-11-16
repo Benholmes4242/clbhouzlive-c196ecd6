@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
@@ -79,8 +79,7 @@ vi.mock('@/features/guest/useGuestSurfaceGate', () => ({ useGuestScrollGate: () 
 vi.mock('@/hooks/useDiscoverLastSeen', () => ({ useDiscoverLastSeen: () => ({ markSeen: vi.fn() }), useMarkDiscoverSeenOnExit: () => {} }));
 
 import { supabase } from '@/integrations/supabase/client';
-import { RoundsThisWeekShelf } from '@/features/explore-magazine/watch/RoundsThisWeekShelf';
-import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
+import { RoundCard } from '@/features/explore-magazine/watch/RoundCard';
 import RoundsPage from '@/pages/RoundsPage';
 import { resolveChrome } from '@/features/chrome-v2/registry';
 import AmateurPage from '@/pages/AmateurPage';
@@ -173,28 +172,10 @@ afterEach(() => {
   rpcSpy = null;
 });
 
-const shelf = (props: Partial<Parameters<typeof RoundsThisWeekShelf>[0]> = {}) =>
-  mount(<RoundsThisWeekShelf userId="me" {...props} />);
+/* The card, mounted directly with the first circle round (Recent rounds shelf retired). */
+const mountCard = (props: Partial<Parameters<typeof RoundCard>[0]> = {}) =>
+  mount(<RoundCard round={f.pools.circle[0] as StandoutRound} shapes={f.shapes as Parameters<typeof RoundCard>[0]['shapes']} locale="en" {...props} />);
 
-const roundCards = () => Array.from(document.querySelectorAll('[data-rounds-shelf-card="round"]'));
-
-/** Installs an IntersectionObserver whose callbacks the test can fire. */
-function captureObservers() {
-  const callbacks: IntersectionObserverCallback[] = [];
-  const original = window.IntersectionObserver;
-  window.IntersectionObserver = class {
-    constructor(cb: IntersectionObserverCallback) { callbacks.push(cb); }
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  } as unknown as typeof IntersectionObserver;
-  return {
-    fireAll: () => act(() => {
-      for (const cb of callbacks) cb([{ isIntersecting: true, intersectionRatio: 1 } as IntersectionObserverEntry], {} as IntersectionObserver);
-    }),
-    restore: () => { window.IntersectionObserver = original; },
-  };
-}
 
 /* ---------------------------------------------------------------- rules */
 
@@ -304,111 +285,10 @@ describe('RR the line under each card', () => {
 
 /* ---------------------------------------------------------------- shelf */
 
-describe('RR Recent rounds shelf', () => {
-  it('renders newest first from get_recent_rounds, with the new heading and circle sub-line', async () => {
-    shelf();
-    expect(await screen.findByText('Recent rounds')).toBeInTheDocument();
-    expect(screen.getByText('Your circle, last 14 days')).toBeInTheDocument();
-    expect(roundCards()).toHaveLength(4);
-    expect(roundCards()[0].textContent).toContain('Player a');
-    expect(f.rpcCalls).toContainEqual({ name: 'get_recent_rounds', p_scope: 'circle', p_window: '14', p_limit: 10, p_offset: 0 });
-  });
-
-  it('loads the next page when the sentinel shows, with a skeleton, and stops at total_count', async () => {
-    f.pools.circle = Array.from({ length: 12 }, (_, i) => round(`p${i}`));
-    const io = captureObservers();
-    let release: (() => void) | null = null;
-    shelf();
-    await waitFor(() => expect(roundCards()).toHaveLength(10));
-    expect(document.querySelector('[data-rounds-shelf-end]')).toBeNull();
-    /* Hold page two back so the end skeleton is observable. */
-    f.rpcImpl = async (name, args) => {
-      if (name === 'get_recent_rounds' && (args.p_offset as number) > 0) {
-        await new Promise<void>((resolve) => { release = resolve; });
-      }
-      return pagedRpc(name, args);
-    };
-    io.fireAll();
-    await waitFor(() => expect(document.querySelector('[data-rounds-shelf-skeleton]')).toBeInTheDocument());
-    release!();
-    await waitFor(() => expect(roundCards()).toHaveLength(12));
-    expect(f.rpcCalls.filter((c) => c.name === 'get_recent_rounds').map((c) => c.p_offset)).toEqual([0, 10]);
-    expect(document.querySelector('[data-rounds-shelf-skeleton]')).toBeNull();
-    expect(document.querySelector('[data-rounds-shelf-end]')).toBeNull();
-    io.restore();
-  });
-
-  it('ends on the final round without an end tile or Rounds navigation', async () => {
-    f.pools.circle = [round('a'), round('b'), round('c')];
-    shelf();
-    await waitFor(() => expect(roundCards()).toHaveLength(3));
-    expect(document.querySelector('[data-rounds-shelf-end]')).toBeNull();
-    expect(screen.queryByText("That's the last 14 days")).toBeNull();
-    expect(screen.queryByText('Leaderboards, feats and every round')).toBeNull();
-    expect(screen.queryByTestId('rounds-route')).toBeNull();
-    expect(f.track).not.toHaveBeenCalledWith('rounds_door_tapped', { from: 'end' });
-  });
-
-  it('the header has no Leaderboards pill or Rounds door', async () => {
-    f.pools.circle = Array.from({ length: 12 }, (_, i) => round(`p${i}`));
-    shelf();
-    await screen.findByText('Recent rounds');
-    expect(screen.queryByText('Leaderboards')).toBeNull();
-    expect(document.querySelector('[data-rounds-shelf-door]')).toBeNull();
-    expect(screen.queryByText('Leaderboards, feats and every round')).toBeNull();
-    expect(screen.queryByText('All rounds')).toBeNull();
-    expect(screen.queryByTestId('rounds-route')).toBeNull();
-    expect(f.track).not.toHaveBeenCalledWith('rounds_door_tapped', { from: 'header' });
-  });
-
-  it('the rail snaps to the 16px inset, not the screen edge', async () => {
-    shelf();
-    await screen.findByText('Recent rounds');
-    const rail = document.querySelector('[data-rounds-shelf-rail]') as HTMLElement;
-    expect(rail.style.scrollPaddingInline).toBe('16px');
-    expect(rail.style.padding).toBe('0px 16px');
-  });
-
-  it('falls back to everyone under two circle rounds and says so', async () => {
-    f.pools.circle = [round('only')];
-    shelf();
-    expect(await screen.findByText('Everyone, last 14 days')).toBeInTheDocument();
-    expect(await screen.findByText('Player w')).toBeInTheDocument();
-    expect(f.rpcCalls).toContainEqual({ name: 'get_recent_rounds', p_scope: 'everyone', p_window: '14', p_limit: 10, p_offset: 0 });
-  });
-
-  it('hides the heading when there are no rounds', async () => {
-    f.pools = { circle: [], everyone: [] };
-    shelf();
-    await waitFor(() => expect(document.querySelector('[data-rounds-shelf="empty"]')).toBeInTheDocument());
-    expect(screen.queryByText('Recent rounds')).toBeNull();
-  });
-
-  it('hides the shelf quietly on error and logs', async () => {
-    f.rpcImpl = async () => ({ data: null, error: new Error('boom') });
-    shelf();
-    await waitFor(() => expect(f.warn).toHaveBeenCalled());
-    expect(screen.queryByText('Recent rounds')).toBeNull();
-  });
-
-  it('renders nothing for a signed-out visitor', () => {
-    mount(<RoundsThisWeekShelf userId={undefined} />);
-    expect(document.querySelector('[data-rounds-shelf]')).toBeNull();
-    expect(f.rpcCalls).toHaveLength(0);
-  });
-
-  it('reserves the heading and two cards while loading, with no door bar', async () => {
-    f.rpcImpl = () => new Promise(() => {});
-    shelf();
-    expect(document.querySelector('[data-rounds-shelf="loading"]')).toBeInTheDocument();
-    expect(document.querySelector('[data-rounds-shelf-door]')).toBeNull();
-    expect(screen.queryByText('Leaderboards, feats and every round')).toBeNull();
-  });
-
+describe('RR round card', () => {
   it('round card: the Standout tile — NET/GROSS foot with red under-par, COMP and date bottom right, marks and the full sentence', async () => {
     f.pools.circle = [round('a', { is_competition: true }), round('b')];
-    shelf();
-    await screen.findByText('Recent rounds');
+    mountCard();
     const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
     expect(card.className).toContain('standout-card');
     /* EXPLORE TILES A: the 34px score and the "Net · gross" kicker are gone. */
@@ -434,8 +314,7 @@ describe('RR Recent rounds shelf', () => {
   it('round card: level par reads E in the NET figure and no marks render without shapes', async () => {
     f.pools.circle = [round('a', { net_score: 71 }), round('b')];
     f.shapes = null;
-    shelf();
-    await screen.findByText('Recent rounds');
+    mountCard();
     const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
     expect(card.querySelector('[data-kind="net"]')).toHaveTextContent('NET71E');
     expect(card.querySelector('[data-kind="net"] i')).toHaveAttribute('data-under', 'false');
@@ -445,8 +324,7 @@ describe('RR Recent rounds shelf', () => {
   it('taps open the right score id and the avatar opens the member', async () => {
     const onOpenRound = vi.fn();
     const onOpenMember = vi.fn();
-    shelf({ onOpenRound, onOpenMember });
-    await screen.findByText('Recent rounds');
+    mountCard({ onOpenRound, onOpenMember });
     fireEvent.click(document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement);
     expect(onOpenRound).toHaveBeenCalledWith('s-a', 'u-a');
     expect(f.track).toHaveBeenCalledWith('rounds_shelf_card_tapped', { kind: 'round' });
@@ -460,8 +338,7 @@ describe('RR Recent rounds shelf', () => {
 describe('EXPLORE TILES A guards', () => {
   it('the date lives in .standout-when, never in the header', async () => {
     f.pools.circle = [round('a'), round('b')];
-    shelf();
-    await screen.findByText('Recent rounds');
+    mountCard();
     const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
     expect(card.querySelector('.standout-when')).toHaveTextContent('Oct 31');
     expect(card.querySelector('.standout-who')).not.toHaveTextContent('Oct 31');
@@ -469,8 +346,7 @@ describe('EXPLORE TILES A guards', () => {
 
   it('the sentence carries no line clamp and the tile uses min-height, never height', async () => {
     f.pools.circle = [round('a'), round('b')];
-    shelf();
-    await screen.findByText('Recent rounds');
+    mountCard();
     const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
     const story = card.querySelector('.standout-story') as HTMLElement;
     expect(story.style.getPropertyValue('-webkit-line-clamp')).toBe('');
@@ -498,38 +374,15 @@ describe('EXPLORE TILES A guards', () => {
       round('a', { course_name: 'Sundridge Park Golf Club (East Course)', last_better: '2026-06-10', delta: -2 }),
       round('b'),
     ];
-    shelf();
-    await screen.findByText('Recent rounds');
+    mountCard();
     const story = document.querySelector('[data-rounds-shelf-card="round"] .standout-story') as HTMLElement;
     expect(story).toHaveTextContent('Best at Sundridge Park Golf Club (East Course) since June');
     expect(story.textContent).not.toContain('…');
   });
 
-  it('Recent rounds still reads the last 14 days', async () => {
-    shelf();
-    await screen.findByText('Recent rounds');
-    expect(f.rpcCalls).toContainEqual({ name: 'get_recent_rounds', p_scope: 'circle', p_window: '14', p_limit: 10, p_offset: 0 });
-  });
 });
 
 /* ------------------------------------------------------- Watch placement */
-
-describe('RS shelf placement on Watch', () => {
-  /* WS1 — chips renamed: All → For you, Quick hits → Shorts. Same shelf rules. */
-  it('shows on the For you chip for a signed-in member, after Quick hits, and not on other chips', async () => {
-    mount(<WatchFeed userId="me" onDepart={() => {}} />);
-    await waitFor(() => expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('tab', { name: 'Shorts' }));
-    expect(document.querySelector('[data-rounds-shelf]')).toBeNull();
-    fireEvent.click(screen.getByRole('tab', { name: 'For you' }));
-    expect(document.querySelector('[data-rounds-shelf]')).toBeInTheDocument();
-  });
-
-  it('is absent for a signed-out visitor', () => {
-    mount(<WatchFeed userId={undefined} onDepart={() => {}} />);
-    expect(document.querySelector('[data-rounds-shelf]')).toBeNull();
-  });
-});
 
 /* ------------------------------------------------------------- /rounds */
 

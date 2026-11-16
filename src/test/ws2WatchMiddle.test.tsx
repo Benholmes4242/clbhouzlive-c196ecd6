@@ -37,7 +37,6 @@ vi.mock('@/components/explore-tab-new/courseled/MomentTile', () => ({ MomentTile
 vi.mock('@/features/explore-magazine/watch/CreatorsRow', () => ({ CreatorsRow: () => null }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => <div data-stub="lead" /> }));
 vi.mock('@/features/explore-magazine/watch/useWatchFeatured', () => ({ useWatchFeatured: () => ({ data: [], error: null, isFetched: true, isError: false, isPending: false, isLoading: false }) }));
-vi.mock('@/features/explore-magazine/watch/RoundsThisWeekShelf', () => ({ RoundsThisWeekShelf: () => <div data-stub="rounds" /> }));
 vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useCourseVideos: () => f.courseVideos,
   useWatchRegions: () => f.regions,
@@ -143,20 +142,26 @@ describe('WS2 order on For you', () => {
     expect(poster?.style.aspectRatio).toBe('126 / 224');
     expect(poster?.style.height).toBe('');
   });
-  it('lead → Shorts → Rounds this week → Filmed at your courses → By region → Long form', () => {
+  it('lead → Shorts → Filmed at your courses → By region → Long form', () => {
     const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const lead = container.querySelector('[data-stub="lead"]')!;
     const shorts = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.tagName === 'B')!;
-    const rounds = container.querySelector('[data-stub="rounds"]')!;
     const course = container.querySelector('[data-course-shelf]')!;
     const regions = container.querySelector('[data-regions-shelf]')!;
     /* WS3 §4 renamed the Watch column "Long form" (brief-authorised encoding update). */
     const watch = screen.getAllByText('Long form').find((e) => e.tagName === 'B')!;
-    const seq = [lead, shorts, rounds, course, regions, watch];
+    const seq = [lead, shorts, course, regions, watch];
     seq.forEach((el) => expect(el).toBeTruthy());
     for (let i = 0; i < seq.length - 1; i++) expect(before(seq[i], seq[i + 1])).toBe(true);
   });
 
+  it.each([['signed in', 'me'], ['guest', undefined]] as const)('neither round shelf heading renders on Explore (%s)', (_label, userId) => {
+    const { container } = wrap(<WatchFeed userId={userId} onDepart={() => {}} />);
+    expect(screen.queryByText('Recent rounds')).toBeNull();
+    expect(screen.queryByText('Standout rounds')).toBeNull();
+    expect(container.querySelector('[data-rounds-shelf]')).toBeNull();
+    expect(container.querySelector('[data-standout-scopes]')).toBeNull();
+  });
   it.each(['quick', 'long'])('neither new shelf on the %s chip', (chip) => {
     const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} initialFilter={chip} />);
     expect(container.querySelector('[data-course-shelf]')).toBeNull();
