@@ -1,3 +1,4 @@
+/** Ownership: a ProLabel with a member id opens this card through GlanceShell placement="anchored"; id-less badges (island, settings, admin) stay static, so one shell owns glance lifecycle. */
 /** The tap-a-badge card: GlanceShell's anchored placement and material; content
  * from the member's verification (memberBadgeRules). Mounted only while open. */
 import type React from 'react';
