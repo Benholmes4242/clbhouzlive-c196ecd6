@@ -160,7 +160,7 @@ export interface StatBrowseBaseRow {
 export function browseFiguresForScope(
   rows: readonly StatBrowseBaseRow[],
   scope: { country?: string | null; region?: string | null },
-): { courses: number; rounds: number; avgToPar: number | null } {
+): { courses: number; rounds: number; holes: number; avgToPar: number | null } {
   const matches = (row: StatBrowseBaseRow) =>
     scope.region
       ? row.region === scope.region
@@ -181,7 +181,9 @@ export function browseFiguresForScope(
       parN += r;
     }
   }
-  return { courses, rounds, avgToPar: parN > 0 ? parSum / parN : null };
+  // Holes are exact, not estimated: stat_browse_base counts only 18-hole
+  // rounds (COALESCE(holes_played, 18) = 18), so every round here is 18 holes.
+  return { courses, rounds, holes: rounds * 18, avgToPar: parN > 0 ? parSum / parN : null };
 }
 
 /** Group stat_browse_base rows by region, null regions dropped, courses descending. */

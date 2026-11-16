@@ -1,37 +1,40 @@
 .course-list-card.course-list-card {
-  display:block; width:100%; height:auto; padding:0 0 30px; border:0; border-radius:0;
-  background:var(--course-list-canvas); color:var(--course-list-ink); text-align:left;
+  display:block; width:100%; height:auto; padding:0; border:0; border-radius:0;
+  background:var(--course-list-panel); color:var(--course-list-ink); text-align:left;
   font:inherit; white-space:normal; transform:none;
 }
 .course-list-photo {position:relative; overflow:hidden; background:var(--course-list-panel)}
 .course-list-photo>img {width:100%; height:100%; object-fit:cover; display:block}
 .course-list-scrim {position:absolute; inset:0; background:var(--course-list-scrim)}
-.course-list-name-block {position:absolute; left:16px; right:16px; bottom:12px; display:flex; align-items:flex-end; gap:12px}
-.course-list-position {flex:none; font-size:30px; font-weight:700; letter-spacing:-0.04em; line-height:1; color:var(--course-list-position); text-shadow:var(--course-list-position-shadow)}
+.course-list-name-block {position:absolute; left:16px; right:16px; bottom:10px; display:flex; align-items:flex-end; gap:10px}
+.course-list-position {flex:none; font-size:24px; font-weight:700; letter-spacing:-0.04em; line-height:1; color:var(--course-list-position); text-shadow:var(--course-list-position-shadow)}
 .course-list-name-column {min-width:0; flex:1}
-.course-list-name {margin:0; font-size:21px; font-weight:800; letter-spacing:-0.01em; line-height:1.1; color:var(--course-list-photo-ink); text-shadow:var(--course-list-name-shadow); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.course-list-area {margin-top:3px; font-size:12.5px; font-weight:400; color:var(--course-list-area); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.course-list-lead {padding:16px 16px 0; display:flex; align-items:center; justify-content:space-between; gap:12px}
-.course-list-lead-value {display:flex; align-items:baseline; gap:7px; min-width:0}
-.course-list-figure {flex:none; font-size:30px; font-weight:700; letter-spacing:-0.035em; line-height:1}
+.course-list-name {margin:0; font-size:18px; font-weight:800; letter-spacing:-0.01em; line-height:1.1; color:var(--course-list-photo-ink); text-shadow:var(--course-list-name-shadow); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.course-list-area {margin-top:2px; font-size:12px; font-weight:400; color:var(--course-list-area); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.course-list-body {padding:10px 16px 14px; display:flex; flex-direction:column; gap:12px}
+@media (max-width:340px) {.course-list-body {padding:10px 14px 14px}}
+.course-list-lead { display:flex; align-items:center; justify-content:space-between; gap:12px}
+.course-list-lead-value {display:flex; align-items:baseline; gap:6px; min-width:0}
+.course-list-figure {flex:none; font-size:20px; font-weight:700; letter-spacing:-0.02em; line-height:1}
 .course-list-figure[data-tone="under"] {color:var(--course-list-under)}
 .course-list-figure[data-tone="record"] {color:var(--course-list-record)}
-.course-list-lead-label {min-width:0; font-size:13px; font-weight:400; color:var(--course-list-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.course-list-members {display:flex; align-items:center; gap:7px; flex:none; font-size:11.5px; font-weight:400; color:var(--course-list-mute); white-space:nowrap}
+.course-list-lead-label {min-width:0; font-size:12px; font-weight:400; color:var(--course-list-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.course-list-members {display:flex; align-items:center; gap:6px; flex:none; font-size:11.5px; font-weight:400; color:var(--course-list-mute); white-space:nowrap}
 .course-list-members b {color:var(--course-list-ink); font-weight:700}
-.course-list-faces {position:relative; height:23.1px; flex:none}
-.course-list-face {position:absolute; top:0; border-radius:34%; box-shadow:0 0 0 1.5px var(--course-list-canvas)}
-.course-list-record {padding:16px 16px 0; display:flex; align-items:center; gap:10px}
+.course-list-faces {position:relative; height:20px; flex:none}
+.course-list-face {position:absolute; top:0; border-radius:34%; box-shadow:0 0 0 1.5px var(--course-list-panel)}
+.course-list-record { display:flex; align-items:center; gap:10px}
 .course-list-holder {flex:1; min-width:0}
-.course-list-record-label {font-size:9px; font-weight:800; letter-spacing:0.14em; line-height:1.1; color:var(--course-list-record)}
-.course-list-holder-name {margin-top:4px; font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.course-list-record-label {font-size:8.5px; font-weight:800; letter-spacing:0.14em; line-height:1.1; color:var(--course-list-record)}
+.course-list-holder-name {margin-top:2px; font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .course-list-record-score {flex:none; text-align:right; white-space:nowrap}
-.course-list-gross {font-size:24px; font-weight:700; line-height:1; margin-bottom:4px; color:var(--course-list-record)}
-.course-list-gross-label {font-size:9px; font-weight:800; letter-spacing:0.14em; color:var(--course-list-dim)}
-.course-list-ratings {padding:16px 16px 0}
-.course-list-rating {font-size:28px; font-weight:700; line-height:1}
-.course-list-rating-count {margin-top:5px; font-size:8.5px; font-weight:800; letter-spacing:0.14em; line-height:1; color:var(--course-list-dim); white-space:nowrap}
-.course-list-no-rounds {padding:16px 16px 0; font-size:13px; font-weight:400; line-height:1.5; color:var(--course-list-faint)}
+.course-list-gross {font-size:17px; font-weight:700; line-height:1; color:var(--course-list-record)}
+.course-list-gross-label {margin-top:2px; font-size:8px; font-weight:800; letter-spacing:0.14em; color:var(--course-list-dim)}
+.course-list-breakdown {display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px}
+.course-list-breakdown>div {min-width:0; text-align:center}
+.course-list-breakdown b {display:block; font-size:13px; font-weight:700; line-height:1}
+.course-list-breakdown span {display:block; margin-top:3px; font-size:8px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:var(--course-list-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.course-list-no-rounds {font-size:12.5px; font-weight:400; line-height:1.5; color:var(--course-list-faint)}
 .course-list-no-rounds span {color:var(--course-list-dim)}
-.course-list-position,.course-list-figure,.course-list-gross,.course-list-rating,.course-list-members b {font-variant-numeric:tabular-nums; font-feature-settings:"kern" 1,"liga" 1}
+.course-list-position,.course-list-figure,.course-list-gross,.course-list-breakdown b,.course-list-members b {font-variant-numeric:tabular-nums; font-feature-settings:"kern" 1,"liga" 1}
 .course-list-card:focus-visible {outline:2px solid var(--course-list-focus); outline-offset:-2px}

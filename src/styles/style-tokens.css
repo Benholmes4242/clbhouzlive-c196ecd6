@@ -28,7 +28,7 @@
   --course-list-area: rgba(255,255,255,0.85);
   --course-list-position-shadow: 0 1px 10px rgba(0,0,0,0.5);
   --course-list-name-shadow: 0 1px 8px rgba(0,0,0,0.35);
-  --course-list-scrim: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.42) 100%);
+  --course-list-scrim: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 100%);
   /* H1 Latest holes only; shared photo-scrim recipes stay unchanged. */
   --latest-hole-ink: #FFFFFF;
   --latest-hole-credit: rgba(255,255,255,0.78);

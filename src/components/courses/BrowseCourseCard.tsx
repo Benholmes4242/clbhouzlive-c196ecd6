@@ -4,17 +4,23 @@
 import React from 'react';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
 import type { StatBrowseRow, StatLens } from './useStatBrowse';
 import type { CourseRecordHolderEntry, CourseListPlayer } from './useCourseRecordHolders';
 import { courseListLead } from './courseListCardRules';
+import { fmtCount } from './browse/format';
 import './courseListCard.css';
 
-export const PHOTO_H = 150;
-export const TOP100_PHOTO_H = 150;
+export const PHOTO_H = 190;
+export const TOP100_PHOTO_H = 190;
+/** Card breakdown order; a missing score keeps an empty column, never a zero or dash. */
+const BREAKDOWN = [
+  { key: 'design_score', label: 'Design' }, { key: 'condition_score', label: 'Condition' },
+  { key: 'clubhouse_score', label: 'Clubhouse' }, { key: 'facilities_score', label: 'Facilities' },
+] as const;
 export const RECORD_GOLD = 'var(--course-list-record)';
 interface BrowseCourseCardProps {
   row: StatBrowseRow;
@@ -41,10 +47,11 @@ export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'pla
     (top100 ? Boolean(recordHolder) : holder.recordGross === row.course_record) ? holder : null;
   const noRounds = top100 && row.rounds === 0;
   const faces = players.slice(0, 3);
-  const ratingLead = effectiveLens !== 'rated' && row.community_rating != null ? <>
-    <div className="course-list-rating">{row.community_rating.toFixed(1)}</div>
-    <div className="course-list-rating-count">{row.review_count} {row.review_count === 1 ? 'RATING' : 'RATINGS'}</div>
-  </> : null;
+  // The same number never prints twice: a rounds lead pairs with members.
+  const leadIsRounds = /^rounds?$/.test(lead.label);
+  const sideCount = leadIsRounds ? row.members : row.rounds;
+  const sideWord = leadIsRounds ? (row.members === 1 ? 'member' : 'members') : (row.rounds === 1 ? 'round' : 'rounds');
+  const breakdown = BREAKDOWN.map(({ key, label }) => ({ key, label, value: row[key] }));
   return <Button variant="ghost" type="button" className="course-list-card" onClick={onClick}
     aria-label={`View ${row.name}`} style={{ '--course-list-under': TOPAR_RED } as React.CSSProperties}>
     <div className="course-list-photo" style={{ height: top100 ? TOP100_PHOTO_H : PHOTO_H }}>
@@ -59,26 +66,34 @@ export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'pla
         </div>
       </div>
     </div>
+    <div className="course-list-body">
     {noRounds ? <div className="course-list-no-rounds">No member has logged an official round yet. <span>Be the first.</span></div> : <>
       <div className="course-list-lead">
         <div className="course-list-lead-value"><div className="course-list-figure" data-tone={lead.tone}>{lead.value}</div><div className="course-list-lead-label">{lead.label}</div></div>
-        {row.members > 0 ? <div className="course-list-members">
-          {faces.length > 0 ? <span className="course-list-faces" aria-hidden style={{ width: 22 + (faces.length - 1) * 17 }}>
-            {faces.map((player, index) => <span key={player.id} className="course-list-face" style={{ left: index * 17, zIndex: 3 - index }}>
-              <SquircleAvatar src={player.photoUrl} userId={player.id} size={22} alt={player.name ?? ''} surface="canvas" hairlineRing />
+        {sideCount > 0 ? <div className="course-list-members" data-side={leadIsRounds ? 'members' : 'rounds'}>
+          {faces.length > 0 ? <span className="course-list-faces" aria-hidden style={{ width: 20 + (faces.length - 1) * 15 }}>
+            {faces.map((player, index) => <span key={player.id} className="course-list-face" style={{ left: index * 15, zIndex: 3 - index }}>
+              <SquircleAvatar src={player.photoUrl} userId={player.id} size={20} alt={player.name ?? ''} surface="canvas" hairlineRing />
             </span>)}
           </span> : null}
-          <span><b>{row.members}</b> {row.members === 1 ? 'member' : 'members'}</span>
+          <span><b>{fmtCount(sideCount)}</b> {sideWord}</span>
         </div> : null}
       </div>
       {record ? <div className="course-list-record">
-        <SquircleAvatar src={record.photoUrl} userId={record.holderId} size={30} alt={top100 ? recordHolder ?? record.holderName : record.holderName} surface="canvas" hairlineRing />
+        <SquircleAvatar src={record.photoUrl} userId={record.holderId} size={26} alt={top100 ? recordHolder ?? record.holderName : record.holderName} surface="canvas" hairlineRing />
         <div className="course-list-holder"><div className="course-list-record-label">COURSE RECORD</div><div className="course-list-holder-name">{top100 ? recordHolder : record.holderName}</div></div>
         {effectiveLens !== 'lowest' ? <div className="course-list-record-score" style={{ flex: 'none', whiteSpace: 'nowrap' }}><div className="course-list-gross">{row.course_record}</div><div className="course-list-gross-label">GROSS</div></div> : null}
       </div> : null}
     </>}
-    {ratingLead || [row.design_score, row.condition_score, row.clubhouse_score, row.facilities_score].some(value => value != null) ?
-      <div className="course-list-ratings"><CategoryScores scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }} layout="split" lead={ratingLead} marginTop={0} /></div> : null}
+    {breakdown.some(cell => cell.value != null) ? <div className="course-list-breakdown" data-course-breakdown>
+      {breakdown.map(cell => cell.value == null
+        ? <div key={cell.key} data-category={cell.key} aria-hidden />
+        : <div key={cell.key} data-category={cell.key}>
+          <b data-category-score={cell.value.toFixed(1)} style={{ color: courseSubScoreTone(cell.value) }}>{cell.value.toFixed(1)}</b>
+          <span>{cell.label}</span>
+        </div>)}
+    </div> : null}
+  </div>
   </Button>;
 }
 export default BrowseCourseCard;

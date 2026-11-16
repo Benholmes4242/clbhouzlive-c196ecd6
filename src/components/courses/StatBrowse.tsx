@@ -60,7 +60,8 @@ import { BrowseCourseCard, PHOTO_H as BROWSE_PHOTO_H } from './BrowseCourseCard'
 /** Gap between browse cards; the list and its shell both read it. Zero because
  *  the card's fade now ends in the page colour — cards run into each other
  *  instead of stopping at an edge (BRIEF_COURSES_LIST_PHOTO_CARDS §3). */
-const STAT_BROWSE_CARD_GAP = 0;
+/** Card view only: tiles sit 10px apart; list rows keep 0. */
+const STAT_BROWSE_CARD_GAP = 10;
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
@@ -945,7 +946,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               navigate(`/courses/${row.course_id}`);
             };
             return (
-              <div key={row.course_id} style={{ marginBottom: i < visibleRows.length - 1 ? STAT_BROWSE_CARD_GAP : 0 }}>
+              <div key={row.course_id} style={{ marginBottom: view !== 'list' && i < visibleRows.length - 1 ? STAT_BROWSE_CARD_GAP : 0 }}>
                 {view === 'list' ? <CourseListRow row={row} lens={lens} rank={positions.get(row.course_id)} onClick={onOpen} /> : <BrowseCourseCard
                   row={row}
                   lens={lens}

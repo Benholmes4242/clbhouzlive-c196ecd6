@@ -20,7 +20,7 @@ export function CourseListRow({ row, lens, rank, top100 = false, onClick }: { ro
     <span className="course-list-row-photo">{row.image_url ? <img alt="" loading="lazy" decoding="async" src={getOptimizedImageUrl(row.image_url, { width:96 })} srcSet={`${getOptimizedImageUrl(row.image_url, { width:144 })} 144w`} sizes="48px" /> : null}</span>
     <span className="course-list-row-name-block"><span className="course-list-row-name">{shortCoursePart(row.name)}</span>
       <span className="course-list-row-detail">
-        {lens === 'lowest' ? <span className="course-list-row-record">{row.rounds} {row.rounds === 1 ? 'round' : 'rounds'}{area ? ' · ' : ''}</span> : !noRounds && row.course_record != null ? <span className="course-list-row-record">Record <b>{row.course_record}</b>{area ? ' · ' : ''}</span> : null}
+        {lens === 'lowest' ? <span className="course-list-row-record">{row.rounds} {row.rounds === 1 ? 'round' : 'rounds'}{area ? ' · ' : ''}</span> : null}
         <span className="course-list-row-area">{area}</span>
       </span>
     </span>

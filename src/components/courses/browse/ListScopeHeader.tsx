@@ -1,7 +1,7 @@
 import React from 'react';
-import { A, FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { ALL_COURSES_ANCHOR } from './ByRegionSection';
-import { fmtCount, fmtToPar } from './format';
+import { fmtCount } from './format';
 
 /**
  * ListScopeHeader — the Courses list's own head (BRIEF_COURSES_LIST_PHOTO_CARDS §2).
@@ -47,25 +47,19 @@ const FIGURE_VALUE: React.CSSProperties = {
 export interface ListScopeFigures {
   courses: number;
   rounds: number;
-  avgToPar: number | null;
+  /** rounds × 18 for the same scope; exact (see browseFiguresForScope). */
+  holes: number;
+  avgToPar?: number | null;
 }
 
-/** The three columns, in order. PLAYS TO is withheld when the scope has no
- *  to-par figure at all: an absent value renders nothing, never a placeholder. */
+/** The three columns, in order: Courses, Rounds, Holes — all ink. Plays to
+ *  is not part of this header (BRIEF_COURSE_CARD_V3 §5). */
 function scopeCells(figures: ListScopeFigures): Array<{ label: string; value: string; colour: string }> {
-  const cells: Array<{ label: string; value: string; colour: string }> = [
+  return [
     { label: 'Courses', value: fmtCount(figures.courses), colour: A.INK },
     { label: 'Rounds', value: fmtCount(figures.rounds), colour: A.INK },
+    { label: 'Holes', value: fmtCount(figures.holes), colour: A.INK },
   ];
-  const par = fmtToPar(figures.avgToPar);
-  if (par != null) {
-    cells.push({
-      label: 'Plays to',
-      value: par === 'level' ? 'Level' : par,
-      colour: par.startsWith('\u2212') ? TOPAR_RED : A.INK,
-    });
-  }
-  return cells;
 }
 
 export function ListScopeHeader({

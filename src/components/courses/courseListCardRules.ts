@@ -10,7 +10,7 @@ export function courseListLead(lens: StatLens, row: StatBrowseRow, fallbackToRou
   const missing = fallbackToRounds ? rounds : null;
   switch (lens) {
     case 'rated':
-      return row.community_rating == null ? missing : { value: row.community_rating.toFixed(1), label: `from ${fmtCount(row.review_count)} ${row.review_count === 1 ? 'rating' : 'ratings'}`, tone: 'ink' };
+      return row.community_rating == null ? missing : { value: row.community_rating.toFixed(1), label: `${fmtCount(row.review_count)} ${row.review_count === 1 ? 'rating' : 'ratings'}`, tone: 'ink' };
     case 'toughest':
     case 'scoreable': {
       const par = fmtToPar(row.avg_to_par);

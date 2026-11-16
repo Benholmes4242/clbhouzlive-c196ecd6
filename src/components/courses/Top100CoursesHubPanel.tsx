@@ -27,7 +27,8 @@ import { TheArgumentSection } from './top100/TheArgumentSection';
 import { ArgumentShell, Top100CardListShell, Top100PageShell } from './top100/top100Shells';
 
 /** Gap between cards in the Top 100 list; its shell reads this (BRIEF_COURSES_SKELETONS_3A). */
-export const TOP100_CARD_GAP = 0;
+/** Card view only: tiles sit 10px apart; list rows keep 0. */
+export const TOP100_CARD_GAP = 10;
 import { argumentGroups, compareRows, MIN_QUALIFYING } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline';
@@ -206,7 +207,7 @@ const Top100CoursesHubPanel: React.FC = () => {
     const row = toBrowseRow(course, item, renderedList);
     // The id is an anchor with no current consumer, kept for deep links.
     return (
-      <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: gapBelow ? TOP100_CARD_GAP : 0 }}>
+      <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: gapBelow && view !== 'list' ? TOP100_CARD_GAP : 0 }}>
         {view === 'list' ? <CourseListRow row={row} lens={ranking === 'community' ? 'rated' : 'played'} rank={rank} top100 onClick={() => openCourse(course.id)} /> : <BrowseCourseCard
           row={row}
           variant="top100"
