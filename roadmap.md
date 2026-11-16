@@ -1,9 +1,9 @@
 # Roadmap
 
-## In progress: Course list card V2
+## Complete: Course list card V2
 - Share the signed-off 150px card across Courses and Top 100, with sort-led figures, short names, record row and existing ratings.
 - Batch member faces with holder profiles, preserve full-list positions under search, and inherit the app font.
-- Add authorised tests, verify 320/375/430 layouts and four separate full-suite shards against 8,899; report every changed assertion.
+- Verified 320/375/430 real-card matrices and live search/Top 100/course navigation. Full suite 8,927 (2,258 / 2,181 / 2,230 / 2,258), +28 from 8,899. Report: .lovable/reports/course-list-card-v2.md. Authenticated member-face appearance remains unavailable.
 
 ## Complete: Latest holes H1
 - Restore the top-right number/par label, mock scrims and shared short course names; viewer and behaviour frozen.
