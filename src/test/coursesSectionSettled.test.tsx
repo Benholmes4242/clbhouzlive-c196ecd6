@@ -7,7 +7,6 @@ const f = vi.hoisted(() => ({ session: { user: null as { id: string } | null, lo
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => f.session }));
 vi.mock('@/hooks/gam/useCircleLatestRounds', () => ({ useCircleLatestRounds: () => f.rounds }));
-vi.mock('@/components/courses/browse/usePlayedRounds', () => ({ usePlayedRounds: () => ({ rounds: f.rounds, courses: f.meta, ids: [...new Set((f.rounds.data as Array<{ course_id?: string }>).map((r) => r.course_id).filter(Boolean))], home: null, homeReady: !f.session.user || f.rounds.isFetched }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useCourseCardMeta', () => ({ useCourseCardMeta: () => f.meta }));
 vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => f.home }));
 vi.mock('@/components/courses/useStatBrowse', () => ({ useCourseBrowseTruth: () => f.truth }));
@@ -21,8 +20,7 @@ afterEach(cleanup);
 describe('Section first-read readiness', () => {
   it('WhoPlaying waits while the session is loading', () => { render(tree()); expect(screen.getByTestId('held')).toBeVisible(); });
   it('WhoPlaying waits for a member rounds read that has not started', () => { f.session = { user: { id: 'u' }, loading: false }; render(tree()); expect(screen.getByTestId('held')).toBeVisible(); });
-  it('WhoPlaying waits for the everyone-rounds read for a resolved signed-out viewer', () => { f.session.loading = false; render(tree()); expect(screen.getByTestId('held')).toBeVisible(); });
-  it('WhoPlaying is ready for a resolved signed-out viewer once the everyone-rounds read settles', () => { f.session.loading = false; f.rounds.isFetched = true; render(tree()); expect(screen.queryByTestId('held')).toBeNull(); });
+  it('WhoPlaying is ready for a resolved signed-out viewer without rounds', () => { f.session.loading = false; render(tree()); expect(screen.queryByTestId('held')).toBeNull(); });
   it('empty course ids apply only after rounds have settled', () => { f.session = { user: { id: 'u' }, loading: false }; f.rounds.isFetched = true; render(tree()); expect(screen.queryByTestId('held')).toBeNull(); });
   it('WhoPlaying waits for metadata when settled rounds provide course ids', () => { f.session = { user: { id: 'u' }, loading: false }; f.rounds = { data: [{ course_id: 'c', round_id: 'r', play_date: '2026-11-11', user_id: 'u' }], isFetched: true, isError: false }; render(tree()); expect(screen.getByTestId('held')).toBeVisible(); });
   it('ByRegion waits for session resolution', () => { render(tree(true)); expect(screen.getByTestId('held')).toBeVisible(); });

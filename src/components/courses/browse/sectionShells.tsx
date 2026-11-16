@@ -27,7 +27,7 @@ import {
 } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import {
-  RING_GAP, RING_ITEM_W, RING_RAIL_PAD, RING_RAIL_TOP, RING_SIZE, TAB_ROW_H,
+  WHO_CARD_RADIUS, WHO_CARD_W, WHO_FACE_H, WHO_FOOTER_PAD, WHO_PHOTO_H, WHO_RAIL_GAP,
 } from './WhoPlayingSection';
 import { REGION_GAP, REGION_TILE_H, REGION_TILES_NO_LEAD } from './ByRegionSection';
 import { PHOTO_FIGURE_GAP, PHOTO_FIGURE_H, PHOTO_FIGURE_W } from './PhotoFigureCard';
@@ -62,19 +62,31 @@ function HeadShell({ title = true, children }: { title?: boolean; children: Reac
   );
 }
 
-/** Recently played: tab row and five ring squircles. */
+/** Recently played: two cards and a clipped third. */
 export function WhoPlayingShell() {
-  /* BRIEF_PLAYED_RINGS_AND_AREA_TABS §6: the tab row height, then five ring
-     squircles. Shorter than the real section, so it only expands outwards. */
+  const footH = WHO_FOOTER_PAD.top + WHO_FACE_H + WHO_FOOTER_PAD.bottom;
   return (
     <HeadShell>
-      <div style={{ height: TAB_ROW_H, display: 'flex', gap: 8, alignItems: 'center', ...BLEED, paddingLeft: 16, overflow: 'hidden' }}>
-        {[64, 52, 60, 70].map((w, i) => <Bar key={i} style={{ height: TAB_ROW_H, width: w, flex: 'none', borderRadius: 13 }} />)}
-      </div>
-      <div data-played-ring-shell style={{ ...BLEED, display: 'flex', overflow: 'hidden', gap: RING_GAP, padding: RING_RAIL_PAD, marginTop: RING_RAIL_TOP }}>
-        {[0, 1, 2, 3, 4].map((i) => (
-          <div key={i} style={{ width: RING_ITEM_W, flex: 'none', display: 'flex', justifyContent: 'center' }}>
-            <Bar style={{ width: RING_SIZE, height: RING_SIZE, borderRadius: '34%' }} />
+      <div style={{ ...RAIL_CLIPPED, gap: WHO_RAIL_GAP }}>
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            style={{
+              width: WHO_CARD_W, flex: 'none', overflow: 'hidden',
+              border: `1px solid ${A.BORDER}`, borderRadius: WHO_CARD_RADIUS,
+            }}
+          >
+            {/* Photo is clipped square by the card's own overflow. */}
+            <Bar style={{ height: WHO_PHOTO_H, width: '100%', borderRadius: 0 }} />
+            <div
+              style={{
+                height: footH, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 8,
+                padding: `${WHO_FOOTER_PAD.top}px ${WHO_FOOTER_PAD.x}px ${WHO_FOOTER_PAD.bottom}px`,
+              }}
+            >
+              <Bar style={{ height: WHO_FACE_H, width: WHO_FACE_H - 1, borderRadius: '34%' }} />
+              <Bar style={{ height: 9, width: 140 }} />
+            </div>
           </div>
         ))}
       </div>

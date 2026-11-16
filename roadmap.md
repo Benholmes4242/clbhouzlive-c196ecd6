@@ -1,9 +1,5 @@
 # Roadmap
 
-## In progress: Played rings — authorised test rewrites
-- Ben authorised rewriting the two failing older tests to the new behaviour (area tabs + course rings), keeping coverage, listing each changed assertion old → new in the report.
-- Any other failure: stop and report.
-
 ## Stopped: Courses dock anchor — awaiting ruling
 - IslandDock re-observes replaced anchors with same-frame recompute; Courses tab row rendered once; 9/9 dock tests pass.
 - 12 failures in four jsdom consumer test files (zero rects read as "above the islands"). Awaiting ruling: A (product zero-rect guard) or B (rect stubs in four test files). Report: .lovable/reports/courses-dock-anchor-stop.md. Commit 8dbdb60d48.
