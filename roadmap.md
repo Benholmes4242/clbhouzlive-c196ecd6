@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Profile index and form
+- Replace contour fallback in member/business covers; preserve photo layers.
+- Time-scale index points and interpolate last-five dots; replace tiles with newest-first rail.
+- Remove member counters and number-one reaction/count reads; preserve notification comments deep links.
+- Verify 320/375/430 and focused/full suites against 8,954; report authorised test inventory changes.
+
 ## Complete: Three fixes Nov 16
 - Capitalise shared long news ages; retain short forms and digit/date forms.
 - Match handicap glance move/dot to drawn round window, preserving no-line fallback and island chip.
