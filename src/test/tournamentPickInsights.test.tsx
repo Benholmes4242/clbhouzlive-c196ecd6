@@ -12,7 +12,7 @@ vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:mocks.u
 vi.mock('@/features/guest/guestGateStore',()=>({getGuestUser:()=>mocks.guest?{id:'guest'}:null}));
 vi.mock('@/features/guest/useGuestActionGate',()=>({useGuestActionGate:()=>mocks.gate}));
 vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes',()=>({usePickTeeTimes:()=>({data:new Map()})}));
-import { finishedVerdict, compareLivePick, compareFinishedPick, chooseFitStats, ordinal, filterCheckedReasons, lowestFit, catchSentence, agreementNote, winningScoreRange, sortedBeatRows, type PickResult } from '@/features/tourhub/components/overview-v3/HybridHeroBands/pickInsightRules';
+import { finishedVerdict, compareLivePick, compareFinishedPick, chooseFitStats, ordinal, filterCheckedReasons, lowestFit, catchSentence, agreementNote, winningScoreRange, type PickResult } from '@/features/tourhub/components/overview-v3/HybridHeroBands/pickInsightRules';
 import { YourPickCard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickCard';
 import { PicksBlock, pickStatusToken } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock';
 import { PicksSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet';
@@ -94,7 +94,6 @@ describe('tournament picks pure rules',()=>{
   expect(agreementNote([{model:'claude',rank:3},{model:'gpt4',rank:4},{model:'gemini',rank:3}])).toBe('Third in two of our three reads, fourth in the other.');
  });
  it('winning scores omit none, distinguish one and span several',()=>{expect(winningScoreRange([])).toBeNull();expect(winningScoreRange([-18])).toEqual({single:true,best:-18,worst:-18});expect(winningScoreRange([-17,-24,-20])).toEqual({single:false,best:-24,worst:-17});});
- it('beat rows include weekly-best clbhouz sorted by wins top10 Beat then events',()=>{expect(sortedBeatRows([...members,{...members[1],user_id:'tie',avg_percentile:73,picks:31}],record).map(r=>r.user_id)).toEqual(['clbhouz','viewer','other','tie']);});
 });
 describe('tournament picks surfaces',()=>{
  it.each(['CUT','MC','WD','DQ'])('finished viewer and shared pick cards preserve the canonical %s token',(status)=>{
@@ -153,8 +152,8 @@ describe('tournament picks surfaces',()=>{
  });
  it('Why hides unchecked reason and keeps valid claim',async()=>{mount(<PicksSheet open onClose={()=>{}} picks={picks} predictions={null} eventName="Event" venueName={null} tournamentId="event"/>);await waitFor(()=>expect(document.querySelector('.pick-panel-case')?.textContent).toContain('Hits 72.3%'));expect(document.querySelector('.pick-panel-case')?.textContent).not.toContain('scrambling');});
  it('record tour chips have canonical order and switching uses event season',async()=>{mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await screen.findByRole('button',{name:'PGA TOUR'});expect(Array.from(document.querySelectorAll('.pick-record-tours button')).map(b=>b.textContent)).toEqual(['PGA TOUR','LPGA','Champions']);fireEvent.click(screen.getByRole('button',{name:'LPGA'}));await waitFor(()=>expect(mocks.rpc).toHaveBeenCalledWith('get_our_pick_record',{p_tour:'lpga',p_year:2026}));});
- it('record shows own dot, sorted board and newest-first ledger result tones',async()=>{mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await waitFor(()=>expect(document.querySelector('[data-chance-row="you"]')).not.toBeNull());expect(Array.from(document.querySelectorAll('[data-beat-user]')).map(row=>row.getAttribute('data-beat-user'))).toEqual(['clbhouz','viewer','other']);expect(Array.from(document.querySelectorAll('[data-record-event]')).map(row=>row.getAttribute('data-record-event'))).toEqual(['new','old']);expect(document.querySelector('[data-result-tone="out"]')?.textContent).toBe('MC');expect(document.querySelector('[data-result-tone="win"]')?.textContent).toBe('1st');});
- it('no YOUR PICK rows when the member has no scored picks',async()=>{members=members.filter(m=>!m.is_viewer);myOdds={events:0,wins:0,random_win_pct:null};mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await screen.findByRole('button',{name:'PGA TOUR'});expect(document.querySelector('[data-chance-row="you"]')).toBeNull();});
+ it('record shows newest-first ledger result tones',async()=>{mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await waitFor(()=>expect(document.querySelector('[data-record-event]')).not.toBeNull());expect(Array.from(document.querySelectorAll('[data-record-event]')).map(row=>row.getAttribute('data-record-event'))).toEqual(['new','old']);expect(document.querySelector('[data-result-tone="out"]')?.textContent).toBe('MC');expect(document.querySelector('[data-result-tone="win"]')?.textContent).toBe('1st');});
+ it('no chance, YOUR PICK or circle rows render even with member picks and odds',async()=>{mount(<OurRecordSheet open onClose={()=>{}} tour="pga" year={2026}/>);await screen.findByRole('button',{name:'PGA TOUR'});expect(document.querySelector('[data-chance-group], [data-chance-row], [data-beat-model], [data-beat-user], .pick-chance-foot')).toBeNull();});
 });
 
 describe('disabled tour pick entry points',()=>{

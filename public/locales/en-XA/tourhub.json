@@ -580,9 +580,6 @@
       "us": "Us {{value}}%",
       "you": "You {{value}}%",
       "youName": "You",
-      "beatTitle": "YOUR CIRCLE · THIS SEASON",
-      "beat": "BEAT",
-      "beatCaption": "Most wins first, then top 10s, then Beat: the share of the field a pick finished ahead of, averaged over the season. For clbhouz we count our best pick each week, so everyone has one pick per event.",
       "events": "EVENT BY EVENT",
       "loading": "Loading our record…",
       "error": "Could not load our record.",
@@ -600,32 +597,7 @@
       "followed_other": "{{count}} people you follow have picked. Most picked: {{name}}.",
       "bestFollowed": "Best pick among people you follow: {{name}}, {{position}}.",
       "roundLive": "ROUND {{round}} · LIVE",
-      "final": "FINAL",
-      "chance": {
-        "winner_one": "[~~Ŵé ƥíĉķéđ ţĥé ŵíññéř íñ <b>{{wins}} őƒ {{events}} éṽéñţ</b>, őđđš őƒ <b>{{odds}}</b>.~~]",
-        "winner_other": "[~~Ŵé ƥíĉķéđ ţĥé ŵíññéř íñ <b>{{wins}} őƒ {{events}} éṽéñţš</b>, őđđš őƒ <b>{{odds}}</b>.~~]",
-        "noWinner_one": "[~~Ŵé ĥáṽéñ'ţ ƥíĉķéđ á ŵíññéř ýéţ íñ <b>{{events}} éṽéñţ</b>.~~]",
-        "noWinner_other": "[~~Ŵé ĥáṽéñ'ţ ƥíĉķéđ á ŵíññéř ýéţ íñ <b>{{events}} éṽéñţš</b>.~~]",
-        "blind": "[~~Ţĥřéé ƥļáýéřš ƥíĉķéđ áţ řáñđőɱ ŵőúļđ ƀé <b>{{odds}}</b>: áƀőúţ őñé ŵééķ íñ {{n}}.~~]",
-        "ours": "[~~ŐÚŘ ƤÍĈĶŠ~~]",
-        "randomThree": "[~~3 ÁŢ ŘÁÑĐŐṀ~~]",
-        "you": "[~~ÝŐÚŘ ƤÍĈĶ~~]",
-        "randomOne": "[~~1 ÁŢ ŘÁÑĐŐṀ~~]",
-        "odds": "[~~őđđš {{odds}}~~]",
-        "footnote": "[~~Áţ řáñđőɱ ɱéáñš ƥíĉķíñĝ ƀļíñđ ƒřőɱ ţĥáţ ŵééķ'š ƒúļļ ƒíéļđ. Éáĉĥ éṽéñţ ĉőúñţš íţš őŵñ ƒíéļđ šížé.~~]",
-        "headBoth": "[~~Őúr pícks fíñd á tőp 10 <b>{{a}}×</b> ás őftéñ ás blíñd pícks, áñd thé wíññér <b>{{b}}×</b> ás őftéñ.~~]",
-        "headTop10": "[~~Őúr pícks fíñd á tőp 10 <b>{{a}}×</b> ás őftéñ ás blíñd pícks.~~]",
-        "headWinner": "[~~Őúr pícks fíñd thé wíññér <b>{{b}}×</b> ás őftéñ ás blíñd pícks.~~]",
-        "groupTop10": "[~~Á TŐP 10~~]",
-        "groupWinner": "[~~THÉ WÍÑÑÉR~~]",
-        "blindPicks": "[~~blíñd pícks~~]",
-        "countOf": "[~~{{count}} őf {{events}}~~]",
-        "events_one": "[~~évéñt~~]",
-        "events_other": "[~~évéñts~~]",
-        "aboutOneIn": "[~~ábőút 1 íñ {{n}}~~]",
-        "youMultiple": "[~~{{x}}× á blíñd píck~~]",
-        "blindFoot": "[~~Blíñd pícks méáñs píckíñg át ráñdőm frőm thát wéék's fúll fíéld. Éách évéñt cőúñts íts őwñ fíéld sízé.~~]"
-      }
+      "final": "FINAL"
     }
   },
   "empty": {

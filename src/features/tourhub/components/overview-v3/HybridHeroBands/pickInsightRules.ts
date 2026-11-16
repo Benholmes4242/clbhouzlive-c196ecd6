@@ -1,6 +1,6 @@
 /** One event stat order and active-only comparisons apply on every picker
  * surface. Numeric model claims must be checked here, never inferred in JSX. */
-import type { FitStat, BeatRow, PickRecord, RecordPick } from '../../../hooks/usePickInsights';
+import type { FitStat, RecordPick } from '../../../hooks/usePickInsights';
 import { surnameOf } from '../../../_shared/playerName';
 export const FIT_STATS = ['driving_distance', 'driving_accuracy', 'greens_in_reg', 'strokes_gained_tee_green', 'strokes_gained_putting', 'scoring_average'] as const;
 export type FitKey = typeof FIT_STATS[number];
@@ -109,11 +109,6 @@ export function agreementNote(votes: { model: string; rank: number }[]) {
   return `${parts.join(', ')}, ${missing===1?'one read unavailable':'two reads unavailable'}.`;
 }
 export function winningScoreRange(scores: number[]) { return !scores.length ? null : scores.length === 1 ? { single:true, best:scores[0], worst:scores[0] } : { single:false, best:Math.min(...scores), worst:Math.max(...scores) }; }
-export function sortedBeatRows(rows: BeatRow[], record: PickRecord): (BeatRow & { is_model?: boolean })[] {
-  const best=record.best;
-  const house: (BeatRow & {is_model?:boolean})[] = best && best.avg_percentile!=null ? [{user_id:'clbhouz',display_name:'clbhouz',username:'clbhouz',profile_photo_url:null,picks:best.events,wins:best.wins,top10:best.top10,avg_percentile:best.avg_percentile,is_viewer:false,is_model:true}] : [];
-  return [...rows.filter(row=>row.picks>0), ...house].sort((a,b)=>b.wins-a.wins || b.top10-a.top10 || b.avg_percentile-a.avg_percentile || b.picks-a.picks);
-}
 export const recordPickWon=(pick:RecordPick)=>!outStatus(pick.status)&&pick.position===1&&!pick.tied;
 export function recordEventSummary(picks:RecordPick[]) {
   const winner=picks.find(recordPickWon);

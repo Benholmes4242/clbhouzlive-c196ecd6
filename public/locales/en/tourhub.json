@@ -691,9 +691,6 @@
       "us": "Us {{value}}%",
       "you": "You {{value}}%",
       "youName": "You",
-      "beatTitle": "YOUR CIRCLE · THIS SEASON",
-      "beat": "BEAT",
-      "beatCaption": "Most wins first, then top 10s, then Beat: the share of the field a pick finished ahead of, averaged over the season. For clbhouz we count our best pick each week, so everyone has one pick per event.",
       "events": "EVENT BY EVENT",
       "loading": "Loading our record…",
       "error": "Could not load our record.",
@@ -711,32 +708,7 @@
       "followed_other": "{{count}} people you follow have picked. Most picked: {{name}}.",
       "bestFollowed": "Best pick among people you follow: {{name}}, {{position}}.",
       "roundLive": "ROUND {{round}} · LIVE",
-      "final": "FINAL",
-      "chance": {
-        "winner_one": "We picked the winner in <b>{{wins}} of {{events}} event</b>, odds of <b>{{odds}}</b>.",
-        "winner_other": "We picked the winner in <b>{{wins}} of {{events}} events</b>, odds of <b>{{odds}}</b>.",
-        "noWinner_one": "We haven't picked a winner yet in <b>{{events}} event</b>.",
-        "noWinner_other": "We haven't picked a winner yet in <b>{{events}} events</b>.",
-        "blind": "Three players picked at random would be <b>{{odds}}</b>: about one week in {{n}}.",
-        "ours": "OUR PICKS",
-        "randomThree": "3 AT RANDOM",
-        "you": "YOUR PICK",
-        "randomOne": "1 AT RANDOM",
-        "odds": "odds {{odds}}",
-        "footnote": "At random means picking blind from that week's full field. Each event counts its own field size.",
-        "headBoth": "Our picks find a top 10 <b>{{a}}×</b> as often as blind picks, and the winner <b>{{b}}×</b> as often.",
-        "headTop10": "Our picks find a top 10 <b>{{a}}×</b> as often as blind picks.",
-        "headWinner": "Our picks find the winner <b>{{b}}×</b> as often as blind picks.",
-        "groupTop10": "A TOP 10",
-        "groupWinner": "THE WINNER",
-        "blindPicks": "blind picks",
-        "countOf": "{{count}} of {{events}}",
-        "events_one": "event",
-        "events_other": "events",
-        "aboutOneIn": "about 1 in {{n}}",
-        "youMultiple": "{{x}}× a blind pick",
-        "blindFoot": "Blind picks means picking at random from that week's full field. Each event counts its own field size."
-      }
+      "final": "FINAL"
     }
   },
   "empty": {
