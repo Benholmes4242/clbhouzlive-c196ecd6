@@ -64,11 +64,13 @@ export interface IndexWindowChartProps {
   rounds?: ReadonlyArray<{ id: string; date: string; counts: boolean }>;
   height?: number;
   scrub?: { active: number | null };
+  /** FIX_INDEX_WINDOW_PARTIAL_HISTORY: the caller's windowSpanLabel; defaults to the window's own word. */
+  spanLabel?: string;
   /** Hide the axis row (the profile's connect example). */
   hideAxis?: boolean;
 }
 
-export const IndexWindowChart: React.FC<IndexWindowChartProps> = ({ points, windowDays, rounds = [], height = 64, scrub, hideAxis }) => {
+export const IndexWindowChart: React.FC<IndexWindowChartProps> = ({ points, windowDays, spanLabel, rounds = [], height = 64, scrub, hideAxis }) => {
   const { t } = useTranslation(['common']);
   const gid = React.useId().replace(/:/g, '');
   const line = indexLine(points);
@@ -80,9 +82,9 @@ export const IndexWindowChart: React.FC<IndexWindowChartProps> = ({ points, wind
   const sy = height / 64;
   const d = line.coords.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
   const low = formatIndexValue(line.min);
-  const windowWord = windowDays >= 365
+  const windowWord = spanLabel ?? (windowDays >= 365
     ? t('common:handicap.chart.months', { count: Math.round(windowDays / 30.4), defaultValue: `${Math.round(windowDays / 30.4)} months` })
-    : t('common:handicap.chart.days', { count: windowDays, defaultValue: `${windowDays} days` });
+    : t('common:handicap.chart.days', { count: windowDays, defaultValue: `${windowDays} days` }));
   const active = scrub?.active != null ? sorted[Math.min(Math.max(scrub.active, 0), sorted.length - 1)] : null;
   const activeXY = active ? { x: line.xOf(Date.parse(active.observed_at)), y: line.yOf(active.value) } : null;
   return (

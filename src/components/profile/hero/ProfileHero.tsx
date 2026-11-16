@@ -25,7 +25,7 @@ import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/wh
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
-import { indexWindow } from '@/lib/whs/indexWindow';
+import { indexWindow, windowSpanLabel } from '@/lib/whs/indexWindow';
 import { lastFiveRounds } from '@/lib/whs/lastFive';
 import { numberWord } from '@/lib/text/numbers';
 import { useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
@@ -252,13 +252,15 @@ export const ProfileHero: React.FC<Props> = ({
   // The 90 DAYS figure reads the SAME net as the chart line (indexWindow), so they cannot disagree.
   const shortDelta = win90.pts.length >= 2 ? Math.round(win90.net * 10) / 10 : null;
   const shortDirection = win90.direction;
+  // FIX_INDEX_WINDOW_PARTIAL_HISTORY: name the span the member actually has.
+  const span90 = windowSpanLabel(win90);
 
   const delta = trend12.delta;
   const improved = trend12.direction === 'down';
   const drifted = trend12.direction === 'up';
 
   const deltaLines: Array<{ key: string; delta: number; direction: 'down' | 'up' | 'flat'; window: string }> = [];
-  if (shortDelta != null) deltaLines.push({ key: 'short', delta: shortDelta, direction: shortDirection, window: t('hero.window90d', '90 days') });
+  if (shortDelta != null) deltaLines.push({ key: 'short', delta: shortDelta, direction: shortDirection, window: span90 });
   if (delta != null) deltaLines.push({ key: 'long', delta, direction: improved ? 'down' : drifted ? 'up' : 'flat', window: t('hero.window12mo', '12 months') });
 
   const allMonths = allHistory ? windowMonths(allHistory.oldestMs) : null;
@@ -403,7 +405,7 @@ export const ProfileHero: React.FC<Props> = ({
         {showIndexBlocks && (
           <HeroHandicapDisplay
             t={t} shownIndex={shownIndex} deltaLines={deltaLines} slot={slot}
-            verdict={verdict} series={series} windowDays={90}
+            verdict={verdict} series={series} windowDays={90} axisWindow={span90}
             bars={bars} byId={byId} countingKnown={countingKnown} countingN={countingN}
             countingIds={countingIds} tilesWord={tilesWord} isSelf={isSelf}
             ownerFirstName={ownerFirstName} onStatTap={onStatTap} tap={tap} onOpenRound={onOpenRound}

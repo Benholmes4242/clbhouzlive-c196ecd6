@@ -26,7 +26,7 @@ import { GlanceShell } from './GlanceShell';
 import { useHandicapHistory, useLastRound } from '@/lib/whs/hooks';
 import type { HcpMoveDetail } from './ChromeIsland';
 import { IndexWindowChart } from '@/components/handicap/IndexWindowChart';
-import { indexWindow, indexDirection, indexToneOf } from '@/lib/whs/indexWindow';
+import { indexWindow, indexDirection, indexToneOf, windowSpanLabel } from '@/lib/whs/indexWindow';
 import { useLastFiveChartRounds } from '@/lib/whs/lastFive';
 
 const INK = '#F8FAFC';
@@ -60,10 +60,10 @@ export function glanceMoveText(move: HcpMoveDetail, now: Date = new Date()): str
 }
 
 /** BRIEF_ONE_INDEX_CHART: the headline reads the 90-day window's net, the same net that tones the chart. */
-export function glanceNinetyDayText(net: number): { text: string; color: string } {
+export function glanceNinetyDayText(net: number, span = '90 days'): { text: string; color: string } {
   const d = indexDirection(net);
-  if (d === 'flat') return { text: 'Level · 90 days', color: 'rgba(248,250,252,0.62)' };
-  return { text: `${d === 'down' ? '▼' : '▲'} ${Math.abs(net).toFixed(1)} · 90 days`, color: indexToneOf(net) };
+  if (d === 'flat') return { text: `Level · ${span}`, color: 'rgba(248,250,252,0.62)' };
+  return { text: `${d === 'down' ? '▼' : '▲'} ${Math.abs(net).toFixed(1)} · ${span}`, color: indexToneOf(net) };
 }
 
 /** adjusted_gross − course_par, written +1, E or −2. Null when either side is missing. */
@@ -112,7 +112,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
   if (lastRoundGross != null) stats.push({ value: String(lastRoundGross), label: 'Last round' });
   if (vsPar != null) stats.push({ value: vsPar, label: 'vs par' });
 
-  const windowMove = chartPoints.length >= 2 ? glanceNinetyDayText(win90.net) : null;
+  const windowMove = chartPoints.length >= 2 ? glanceNinetyDayText(win90.net, windowSpanLabel(win90)) : null;
   const moveText = windowMove?.text ?? glanceMoveText(move);
   const moveColor = windowMove?.color ?? (move.direction === 'improving' ? MOVE_IMPROVING : MOVE_DRIFTING);
 
@@ -148,7 +148,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
 
         {chartPoints.length >= 2 && (
           <div data-testid="index-glance-chart" style={{ marginTop: 14 }}>
-            <IndexWindowChart points={chartPoints} windowDays={90} rounds={rounds} height={60} />
+            <IndexWindowChart points={chartPoints} windowDays={90} spanLabel={windowSpanLabel(win90)} rounds={rounds} height={60} />
           </div>
         )}
 

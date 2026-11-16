@@ -212,6 +212,15 @@ describe('IndexGlance', () => {
     mockRounds = [];
   });
 
+  it('short history names the real span, never 90 days', () => {
+    mockHistory = [{ observed_at: iso(20), handicap_index: 12.9 }, { observed_at: iso(3), handicap_index: 12.4 }];
+    openGlance();
+    const dialog = screen.getByRole('dialog', { name: 'Your handicap index' });
+    expect(dialog.textContent).toContain('▼ 0.5 · 20 days');
+    expect(dialog.textContent).toContain('20 days ago');
+    expect(dialog.textContent).not.toContain('90 days');
+  });
+
   it('hides the chart when there is no index history', () => {
     mockHistory = [];
     openGlance();

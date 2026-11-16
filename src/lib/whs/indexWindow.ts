@@ -17,7 +17,14 @@ import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 export const DAY_MS = 86_400_000;
 export interface IndexWindowPoint { ts: number; v: number; edge?: 'lead' | 'trail' }
 export type IndexWindowDirection = 'down' | 'up' | 'flat';
-export interface IndexWindow { pts: IndexWindowPoint[]; start: number; end: number; net: number; direction: IndexWindowDirection; tone: string }
+export interface IndexWindow {
+  pts: IndexWindowPoint[]; start: number; end: number; net: number; direction: IndexWindowDirection; tone: string;
+  /** FIX_INDEX_WINDOW_PARTIAL_HISTORY: true when history reaches the window start (a lead edge exists). */
+  covered: boolean;
+  /** Days from the first plotted point to the end, at least 1. */
+  spanDays: number;
+  days: number;
+}
 
 export const INDEX_LEVEL_INK = '#F8FAFC';
 
@@ -48,5 +55,20 @@ export function indexWindow(
   const last = pts[pts.length - 1];
   if (last && last.ts < end) pts.push({ ts: end, v: last.v, edge: 'trail' });
   const net = pts.length ? pts[pts.length - 1].v - pts[0].v : 0;
-  return { pts, start, end, net, direction: indexDirection(net), tone: indexToneOf(net) };
+  const covered = pts[0]?.edge === 'lead';
+  const spanDays = Math.max(1, Math.round((end - (pts[0]?.ts ?? end)) / DAY_MS));
+  return { pts, start, end, net, direction: indexDirection(net), tone: indexToneOf(net), covered, spanDays, days };
+}
+
+/** Words for a span of days: under 60 → "{n} days" ("1 day"); otherwise "{round(n / 30.4)} months". */
+export function daysWord(n: number): string {
+  if (n < 60) return n === 1 ? '1 day' : `${n} days`;
+  const m = Math.round(n / 30.4);
+  return m === 1 ? '1 month' : `${m} months`;
+}
+
+/** ONE span label for every caller: the window's own word when covered, else the real span. */
+export function windowSpanLabel(w: Pick<IndexWindow, 'covered' | 'spanDays' | 'days'>): string {
+  if (w.covered) return w.days >= 365 ? '12 months' : `${w.days} days`;
+  return daysWord(w.spanDays);
 }

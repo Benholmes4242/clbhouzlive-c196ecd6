@@ -7,7 +7,7 @@ import { render } from '@testing-library/react';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
-import { indexWindow, indexToneOf, DAY_MS } from '@/lib/whs/indexWindow';
+import { indexWindow, indexToneOf, DAY_MS, windowSpanLabel, daysWord } from '@/lib/whs/indexWindow';
 import { IndexWindowChart, indexLine } from '@/components/handicap/IndexWindowChart';
 import LastTwentyBars from '@/components/profile/handicap/whs/charts/LastTwentyBars';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -71,5 +71,31 @@ describe('Eight of your last twenty cut line', () => {
     const cut = [...container.querySelectorAll<HTMLElement>('div[aria-hidden]')].find((d) => d.style.height === '1px')!;
     expect(cut.style.background).toBe('rgba(248, 250, 252, 0.9)');
     expect(cut.style.background).not.toMatch(/247, 147, 30/);
+  });
+});
+
+describe('FIX_INDEX_WINDOW_PARTIAL_HISTORY span labels', () => {
+  it('history starting 20 days ago: not covered, axis "20 days ago", profile wiring names the span', () => {
+    const w = indexWindow([{ observed_at: ago(20), handicap_index: 12 }, { observed_at: ago(3), handicap_index: 11.5 }], 90, NOW);
+    expect(w.covered).toBe(false);
+    expect(w.spanDays).toBe(20);
+    expect(windowSpanLabel(w)).toBe('20 days');
+    vi.spyOn(Date, 'now').mockReturnValue(NOW);
+    const { container } = render(<IndexWindowChart points={toPoints(w)} windowDays={90} spanLabel={windowSpanLabel(w)} />);
+    expect(container.querySelector('[data-index-axis]')?.textContent).toBe('20 days agoToday');
+    vi.restoreAllMocks();
+    const src = readFileSync('src/components/profile/hero/ProfileHero.tsx', 'utf8');
+    expect(src).toMatch(/window: span90 \}/);
+    expect(src).toMatch(/axisWindow=\{span90\}/);
+  });
+  it('full history: covered, labels unchanged', () => {
+    const w = indexWindow([{ observed_at: ago(200), handicap_index: 12 }, { observed_at: ago(3), handicap_index: 11.5 }], 90, NOW);
+    expect(w.covered).toBe(true);
+    expect(windowSpanLabel(w)).toBe('90 days');
+    expect(windowSpanLabel(indexWindow([{ observed_at: ago(500), handicap_index: 12 }], 365, NOW))).toBe('12 months');
+  });
+  it('1-day span reads "1 day"; 5 months reads "5 months"', () => {
+    expect(windowSpanLabel(indexWindow([{ observed_at: ago(1), handicap_index: 12 }], 90, NOW))).toBe('1 day');
+    expect(daysWord(150)).toBe('5 months');
   });
 });

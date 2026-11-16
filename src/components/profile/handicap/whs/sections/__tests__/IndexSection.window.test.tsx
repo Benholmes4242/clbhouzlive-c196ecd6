@@ -76,6 +76,14 @@ describe('Index block — window anchored to today, headline mutated in place', 
     expect(row?.lastElementChild?.textContent).toBe('12.0Low');
   });
 
+  it('history starting 5 months ago with 12M: axis names the real span, range keeps the chip', () => {
+    history = [{ observed_at: iso(152), handicap_index: 14 }, { observed_at: iso(40), handicap_index: 12 }];
+    const { container } = render(<IndexSection connection={conn} />);
+    fireEvent.click(screen.getByText('12M'));
+    expect(screen.getByText('5 months ago')).toBeTruthy();
+    expect(container.querySelector('[data-hcp-range]')?.textContent).toContain('12M high');
+  });
+
   it('no history: no chart, quiet line, chips still live', () => {
     history = [];
     const { container } = render(<IndexSection connection={conn} />);

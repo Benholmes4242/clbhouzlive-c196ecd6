@@ -43,7 +43,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { HcpSection } from './HcpSection';
 import { CHART, DEAD_BAND } from '../charts/tokens';
 import { IndexWindowChart } from '@/components/handicap/IndexWindowChart';
-import { indexWindow } from '@/lib/whs/indexWindow';
+import { indexWindow, windowSpanLabel } from '@/lib/whs/indexWindow';
 import type { ChartRound } from '@/lib/whs/lastFive';
 
 interface Props {
@@ -131,7 +131,7 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null, round
   const view = useMemo(() => {
     if (all.length === 0) return null;
     const w = indexWindow(history, DAYS[win]);
-    return { pts: w.pts as Pt[], start: w.start, end: w.end };
+    return { pts: w.pts as Pt[], start: w.start, end: w.end, span: windowSpanLabel(w) };
   }, [all, history, win]);
 
   /* THE RANGE ROW follows the chips (BRIEF_ONE_INDEX_CHART): high and low of
@@ -338,6 +338,7 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null, round
             <IndexWindowChart
               points={chartPoints}
               windowDays={DAYS[win]}
+              spanLabel={view?.span}
               rounds={rounds}
               scrub={{ active: idx }}
             />

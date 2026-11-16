@@ -31,10 +31,10 @@ const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpaci
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
-const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; countingIds?: ReadonlySet<string>; windowDays: number; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, windowDays, onTap, tabIndex, example, bars = [], countingIds }) => (
+const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; countingIds?: ReadonlySet<string>; windowDays: number; spanLabel?: string; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, windowDays, spanLabel, onTap, tabIndex, example, bars = [], countingIds }) => (
   <button type="button" data-example-chart={example ? '' : undefined} onClick={onTap} tabIndex={tabIndex} style={{ display: 'block', width: '100%', marginTop: 12, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
     {/* BRIEF_ONE_INDEX_CHART: the shared chart; its tone comes from the window's own net. */}
-    <IndexWindowChart points={points} windowDays={windowDays} hideAxis={example}
+    <IndexWindowChart points={points} windowDays={windowDays} spanLabel={spanLabel} hideAxis={example}
       rounds={bars.map(b => ({ id: b.id, date: b.date, counts: !!countingIds?.has(b.id) }))} />
   </button>
 );
@@ -46,9 +46,10 @@ interface Props {
   slot: { value: string; label: string; color: string } | null;
   verdict: React.ReactNode;
   series: HeroIndexPoint[];
-  /** Retired by BRIEF_ONE_INDEX_CHART: IndexWindowChart tones itself from the window's net and names its own axis. Accepted and ignored. */
+  /** Retired by BRIEF_ONE_INDEX_CHART: IndexWindowChart tones itself from the window's net. Accepted and ignored. */
   chartColor?: string;
   chartFillTop?: number;
+  /** The window's span label (windowSpanLabel); the axis reads "{axisWindow} ago". */
   axisWindow?: string;
   windowDays: number | null;
   bars: FormBar[];
@@ -74,7 +75,7 @@ interface Props {
 }
 export const HeroHandicapDisplay: React.FC<Props> = ({
   t, shownIndex, deltaLines, slot, verdict, series,
-  windowDays, bars, byId, countingKnown, countingN, countingIds = NO_COUNTING,
+  axisWindow, windowDays, bars, byId, countingKnown, countingN, countingIds = NO_COUNTING,
   tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false, afterChart, afterIndex,
 }) => {
   return (
@@ -124,6 +125,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                 points={series}
                 countingIds={countingKnown ? countingIds : undefined} bars={bars}
                 windowDays={90}
+                spanLabel={axisWindow}
                 tabIndex={example ? -1 : undefined}
                 onTap={example ? undefined : () => {
                   analyticsEvents.track('profile_index_chart_tap', { window_days: windowDays });
