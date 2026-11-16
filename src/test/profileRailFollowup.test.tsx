@@ -96,7 +96,7 @@ const bars:FormBar[]=[{id:'old',date:'2026-08-01',value:3,movement:1},{id:'middl
 const english=createInstance();void english.init({lng:'en'});
 const byId=new Map([['old',{gross_score:90,course_name:'Old Golf Club'}],['middle',{gross_score:78,course_name:'Royal County Down Golf Club (Championship)'}],['new',{gross_score:81,course_name:'Sundridge Park Golf Club (East)'}]]);
 function display(over:Partial<React.ComponentProps<typeof HeroHandicapDisplay>>={}) {
- return render(<HeroHandicapDisplay t={english.getFixedT('en','profile')} shownIndex={15} deltaLines={[]} slot={null} verdict={null} series={series} chartColor="currentColor" chartFillTop={.16} axisWindow="90 days" windowDays={90} bars={bars} byId={byId} countingKnown={false} countingN={0} loweredN={1} tilesWord="three" isSelf onStatTap={()=>{}} tap={()=>()=>{}} {...over}/>);
+ return render(<HeroHandicapDisplay t={english.getFixedT('en','profile')} shownIndex={15} deltaLines={[]} slot={null} verdict={null} series={series} chartColor="currentColor" chartFillTop={.16} axisWindow="90 days" windowDays={90} bars={bars} byId={byId} countingKnown={false} countingN={0} tilesWord="three" isSelf onStatTap={()=>{}} tap={()=>()=>{}} {...over}/>);
 }
 beforeEach(()=>{vi.spyOn(Date,'now').mockReturnValue(TODAY);db.hang=false;db.clubRows=[];state.homeClub=null;state.topTen=[];vi.mocked(analyticsEvents.track).mockClear();});
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
@@ -111,12 +111,12 @@ describe('profile rail follow-up',()=>{
   expect(line?.at('2026-11-11')?.x).toBeCloseTo(361*85/90);
   expect(line?.at('2026-11-11')?.y).toBeCloseTo(39.5);
  });
- it('each in-window round has an HTML marker at its interpolated position and lowering state',()=>{
+ it('each in-window round has an HTML marker at its interpolated position and counting state',()=>{
   const {container}=display();const line=indexLine(series,TODAY);
   expect(container.querySelectorAll('[data-form-round-dot]')).toHaveLength(2);
   for(const bar of bars.slice(1)){
    const marker=container.querySelector<HTMLElement>(`[data-form-round-dot="${bar.id}"]`),point=line?.at(bar.date);
-   expect(marker?.tagName).toBe('SPAN');expect(marker?.getAttribute('data-lowered')).toBe(String(bar.movement<0));
+   expect(marker?.tagName).toBe('SPAN');expect(marker?.getAttribute('data-counts')).toBe('false');
    expect(parseFloat(marker?.style.left??'')).toBeCloseTo((point?.x??0)/361*100);
    expect(parseFloat(marker?.style.top??'')).toBeCloseTo(point?.y??0);
   }

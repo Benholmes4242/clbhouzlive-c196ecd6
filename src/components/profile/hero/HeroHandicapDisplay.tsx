@@ -11,7 +11,7 @@ import type { NavigateFunction } from 'react-router-dom';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
-import { formBarLowered, fmtSigned, type FormBar } from '@/features/profile-sheet-v2/sheetState';
+import { fmtSigned, type FormBar } from '@/features/profile-sheet-v2/sheetState';
 import type { ProfileRound } from '@/components/profile/rounds/useProfileRounds';
 import { numberWord } from '@/lib/text/numbers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -21,6 +21,7 @@ import { indexLine, type HeroIndexPoint } from './indexLine';
 import './profile-form.css';
 import { W_40 } from './HeroShell';
 const GREEN = INDEX_DELTA.dark.improved;
+const NO_COUNTING: ReadonlySet<string> = new Set();
 const RED = INDEX_DELTA.dark.drifted;
 const AXIS_INK = 'rgba(248,250,252,0.30)';
 const LOW_LINE = 'rgba(255,255,255,0.14)';
@@ -32,7 +33,7 @@ const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpaci
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
-const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap, tabIndex, example, bars = [] }) => {
+const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; countingIds?: ReadonlySet<string>; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap, tabIndex, example, bars = [], countingIds }) => {
   const gid = React.useId().replace(/:/g, '');
   const line = indexLine(points);
   if (!line) return null;
@@ -54,7 +55,7 @@ const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; color: 
         </svg>
         {bars.map(bar => {
           const point = line.at(bar.date);
-          return point ? <span key={bar.id} aria-hidden data-form-round-dot={bar.id} data-lowered={formBarLowered(bar)} className="profile-index-round-dot" style={{ left: `${point.x / 361 * 100}%`, top: point.y }} /> : null;
+          return point ? <span key={bar.id} aria-hidden data-form-round-dot={bar.id} data-counts={countingIds?.has(bar.id) ? 'true' : 'false'} className="profile-index-round-dot" style={{ left: `${point.x / 361 * 100}%`, top: point.y }} /> : null;
         })}
         <span style={{ position: 'absolute', left: 0, top: lowY, transform: 'translateY(-50%)', ...MICRO, color: A.DIM, background: A.CANVAS, paddingRight: 6, ...FIGS }}>
           {lowLabel}
@@ -83,7 +84,8 @@ interface Props {
   byId: Map<string, Pick<ProfileRound, 'gross_score' | 'course_name'>>;
   countingKnown: boolean;
   countingN: number;
-  loweredN: number;
+  /** Ids of bars whose round counts towards the index; empty when counting is unknown. */
+  countingIds?: ReadonlySet<string>;
   tilesWord: string;
   isSelf: boolean;
   ownerFirstName?: string | null;
@@ -101,7 +103,7 @@ interface Props {
 }
 export const HeroHandicapDisplay: React.FC<Props> = ({
   t, shownIndex, deltaLines, slot, verdict, series, chartColor, chartFillTop,
-  axisWindow, windowDays, bars, byId, countingKnown, countingN, loweredN,
+  axisWindow, windowDays, bars, byId, countingKnown, countingN, countingIds = NO_COUNTING,
   tilesWord, isSelf, ownerFirstName, onStatTap, tap, onOpenRound, example = false, afterChart, afterIndex,
 }) => {
   return (
@@ -149,7 +151,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
               <IndexChart
                 example={example}
                 points={series}
-                bars={bars}
+                countingIds={countingKnown ? countingIds : undefined} bars={bars}
                 color={chartColor}
                 fillTop={chartFillTop}
                 lowLabel={t('hero.low', { value: formatIndex(Math.min(...series.map(p => p.value))), defaultValue: `Low ${formatIndex(Math.min(...series.map(p => p.value)))}` })}
@@ -175,7 +177,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                     const r = byId.get(bar.id);
                     const date = new Date(bar.date);
                     const dateText = Number.isFinite(date.getTime()) ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(date.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) }) : '';
-                    return <Button key={bar.id} variant="ghost" className="profile-form-round" data-form-round={bar.id} data-lowered={formBarLowered(bar)} data-example-form-tile={example ? '' : undefined} tabIndex={example ? -1 : undefined}
+                    return <Button key={bar.id} variant="ghost" className="profile-form-round" data-form-round={bar.id} data-counts={countingKnown && countingIds.has(bar.id) ? 'true' : 'false'} data-example-form-tile={example ? '' : undefined} tabIndex={example ? -1 : undefined}
                       onClick={example ? undefined : () => { analyticsEvents.track('profile_form_tile_tap', { whs_score_id: bar.id, position: i + 1 }); onOpenRound?.(bar.id); }}>
                       <span className="profile-form-top"><i className="profile-form-dot" aria-hidden /><b className="profile-form-gross" style={FIGS}>{r?.gross_score ?? '\u00A0'}</b><span className="profile-form-figure" style={FIGS}>{fmtSigned(bar.value)}</span></span>
                       <span className="profile-form-course">{shortCoursePart(r?.course_name ?? '')}</span>
@@ -184,35 +186,28 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                   })}
                 </div>
                 {/*
-                  "Counting" and "lowered your index" are DIFFERENT FACTS and they come
-                  apart: a round can enter the best eight without displacing a worse
-                  score (counting, did not lower), and a round that lowered the index
-                  months ago can since have been pushed out (lowered, not counting). On
-                  a five-round window they correlate strongly, which is exactly why one
-                  mark claiming both looks right until the day it is wrong. The tiles
-                  draw the one fact a colour can carry honestly — green for lowered —
-                  and the sentence states the one it cannot. Do not add a counting
-                  marker to these tiles.
+                  The tiles mark COUNTING: a green dot means the round is one of the
+                  rounds counting towards the index (is_counter via countsTowardIndex),
+                  the same fact the counting eight on the Handicap page shows, and the
+                  matching dot on the chart line above is green too. "Lowered your
+                  index" is a different fact and is no longer shown anywhere on these
+                  tiles: the figure stays dim at every value. With counting unknown
+                  there is no green and no sentence.
                 */}
-                {(countingKnown || loweredN > 0) && (
-                  <div style={{ marginTop: 12, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
-                    {countingKnown && (
-                      <>
-                        {countingN === 0 ? (
-                          <><b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.countingNone', 'None')}</b>{(isSelf ? t('hero.countingNoneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` }) : ownerFirstName ? t('hero.countingNoneRestNamed', { n: tilesWord, name: ownerFirstName, defaultValue: ` of these ${tilesWord} are counting towards ${ownerFirstName}'s index.` }) : t('hero.countingNoneRestTheir', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards their index.` }))}</>
-                        ) : (
-                          <><b style={{ color: A.INK, fontWeight: 700 }}>{numberWord(countingN)}</b>{countingN === 1
-                            ? (isSelf ? t('hero.countingOneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} is counting towards your index.` }) : ownerFirstName ? t('hero.countingOneRestNamed', { n: tilesWord, name: ownerFirstName, defaultValue: ` of these ${tilesWord} is counting towards ${ownerFirstName}'s index.` }) : t('hero.countingOneRestTheir', { n: tilesWord, defaultValue: ` of these ${tilesWord} is counting towards their index.` }))
-                            : (isSelf ? t('hero.countingManyRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` }) : ownerFirstName ? t('hero.countingManyRestNamed', { n: tilesWord, name: ownerFirstName, defaultValue: ` of these ${tilesWord} are counting towards ${ownerFirstName}'s index.` }) : t('hero.countingManyRestTheir', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards their index.` }))}</>
-                        )}
-                      </>
-                    )}
-                    {countingKnown && loweredN > 0 && ' '}
-                    {loweredN > 0 && (loweredN === 1
-                      ? <>{t('hero.loweredOnePre', 'The ')}<span style={{ color: GREEN }}>{t('hero.loweredOneGreen', 'green')}</span>{t('hero.loweredOnePost', ' round lowered it.')}</>
-                      : <><span style={{ color: GREEN }}>{t('hero.loweredManyGreen', 'Green')}</span>{t('hero.loweredManyPost', ' rounds lowered it.')}</>)}
-                  </div>
-                )}
+                {countingKnown && (() => {
+                  const whose = isSelf ? t('hero.countingYour', 'your index') : ownerFirstName ? t('hero.countingNamed', { name: ownerFirstName, defaultValue: `${ownerFirstName}'s index` }) : t('hero.countingTheir', 'their index');
+                  return (
+                    <div data-counting-sentence style={{ marginTop: 12, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
+                      {countingN === 0
+                        ? <>{t('hero.countingNoneLine', { n: tilesWord, whose, defaultValue: `None of these ${tilesWord} counts towards ${whose}.` })}</>
+                        : countingN === bars.length && countingN > 1
+                          ? <>{t('hero.countingAllLine', { n: tilesWord, whose, defaultValue: `All ${tilesWord} count towards ${whose}.` })}</>
+                          : <><b style={{ color: A.INK, fontWeight: 700 }}>{numberWord(countingN)}</b>{countingN === 1
+                            ? <>{t('hero.countingOneLine', { n: tilesWord, whose, defaultValue: ` of these ${tilesWord} counts towards ${whose}: the ` })}<span style={{ color: GREEN }}>{t('hero.countingGreen', 'green')}</span>{t('hero.countingOneEnd', ' one.')}</>
+                            : <>{t('hero.countingManyLine', { n: tilesWord, whose, defaultValue: ` of these ${tilesWord} count towards ${whose}: the ` })}<span style={{ color: GREEN }}>{t('hero.countingGreen', 'green')}</span>{t('hero.countingManyEnd', ' ones.')}</>}</>}
+                    </div>
+                  );
+                })()}
               </>
             )}
           </div>

@@ -1,5 +1,5 @@
 .profile-index-round-dot { position:absolute; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:var(--profile-form-ink); box-shadow:0 0 0 2px var(--profile-form-dot-stroke); }
-.profile-index-round-dot[data-lowered=true] { background:var(--profile-form-green); }
+.profile-index-round-dot[data-counts=true] { background:var(--profile-form-green); }
 .profile-form-rail { display:flex; gap:20px; margin:10px -16px 0; padding:0 16px; overflow-x:auto; scrollbar-width:none; will-change:transform; }
 .profile-form-rail::-webkit-scrollbar { display:none; }
 .profile-form-round.profile-form-round { flex:none; width:104px; height:auto; display:block; gap:0; justify-content:normal; align-items:normal; padding:0; border:0; border-radius:0; background:transparent; text-align:left; color:var(--profile-form-ink); font-family:inherit; }
@@ -9,5 +9,4 @@
 .profile-form-figure { font-size:11px; font-weight:700; color:var(--profile-form-dim); }
 .profile-form-course { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:12.5px; font-weight:600; line-height:1.25; margin-top:7px; }
 .profile-form-date { display:block; font-size:10.5px; color:var(--profile-form-dim); margin-top:3px; }
-.profile-form-round[data-lowered=true] .profile-form-dot { background:var(--profile-form-green); }
-.profile-form-round[data-lowered=true] .profile-form-figure { color:var(--profile-form-green); }
+.profile-form-round[data-counts=true] .profile-form-dot { background:var(--profile-form-green); }

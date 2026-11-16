@@ -136,7 +136,7 @@ it('HeroHandicapDisplay form tile calls onOpenRound with the score id and never 
   const { container } = render(<MemoryRouter><HeroHandicapDisplay
     t={t} shownIndex={12.3} deltaLines={[]} slot={null} verdict={null} series={[{ value: 12, observed_at: '2026-01-01' }, { value: 12.3, observed_at: new Date().toISOString() }]} chartColor="currentColor" chartFillTop={0.28}
     axisWindow="90 days" windowDays={90} bars={[{ id: 'score-9', value: 2 }] as React.ComponentProps<typeof HeroHandicapDisplay>['bars']}
-    byId={new Map()} countingKnown={false} countingN={0} loweredN={0} tilesWord="one" isSelf={false}
+    byId={new Map()} countingKnown={false} countingN={0} tilesWord="one" isSelf={false}
     onStatTap={() => {}} tap={() => () => {}} navigate={navigate} onOpenRound={onOpenRound}
   /></MemoryRouter>);
   const buttons = container.querySelectorAll('button');

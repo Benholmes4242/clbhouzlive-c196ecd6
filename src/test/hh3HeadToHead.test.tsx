@@ -102,7 +102,7 @@ describe('HH3 entry row', () => {
     const { container } = render(<HeroHandicapDisplay
       t={t} shownIndex={5.6} deltaLines={[]} slot={null} verdict={null} series={[{ value: 5, observed_at: '2026-01-01' }, { value: 5.6, observed_at: new Date().toISOString() }]} chartColor="currentColor" chartFillTop={0.28}
       axisWindow="90 days" windowDays={90} bars={[{ id: 's1', value: 2 }] as React.ComponentProps<typeof HeroHandicapDisplay>['bars']}
-      byId={new Map()} countingKnown={false} countingN={0} loweredN={0} tilesWord="one" isSelf={false}
+      byId={new Map()} countingKnown={false} countingN={0} tilesWord="one" isSelf={false}
       onStatTap={() => {}} tap={() => () => {}} afterChart={<div data-testid="entry" />}
     />);
     const all = Array.from(container.querySelectorAll('svg, [data-testid="entry"], button'));

@@ -53,7 +53,7 @@ export const HeroConnectExample: React.FC<{ t: TFunction<'profile'>; onConnect?:
           axisWindow={CONNECT_EXAMPLE.movements[0].window} windowDays={90}
           bars={CONNECT_EXAMPLE.rounds.map((round) => ({ ...round }))}
           byId={new Map(CONNECT_EXAMPLE.rounds.map((round) => [round.id, round]))}
-          countingKnown={false} countingN={0} loweredN={0}
+          countingKnown={false} countingN={0} countingIds={new Set()}
           tilesWord="five" isSelf onStatTap={NO_TAP} tap={() => NO_TAP} navigate={navigate} example
         />
       </div>

@@ -27,7 +27,7 @@ import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { countsTowardIndex } from '@/lib/whs/counting';
 import { numberWord } from '@/lib/text/numbers';
-import { formBars, formBarLowered, type FormScoreLike } from '@/features/profile-sheet-v2/sheetState';
+import { formBars, type FormScoreLike } from '@/features/profile-sheet-v2/sheetState';
 import { isFullEighteen, useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useClubCoverPhoto } from '@/components/profile/hooks/useClubCoverPhoto';
@@ -370,7 +370,7 @@ export const ProfileHero: React.FC<Props> = ({
   const countingN = barRows.filter((r) => r && countsTowardIndex(r)).length;
   // Counting state is unknown when no tile carries is_counter at all.
   const countingKnown = barRows.some((r) => r?.is_counter != null);
-  const loweredN = bars.filter(formBarLowered).length;
+  const countingIds = new Set(bars.filter((b, i) => { const r = barRows[i]; return r ? countsTowardIndex(r) : false; }).map((b) => b.id));
   const tilesN = bars.length;
   const tilesWord = numberWord(tilesN, false);
   const showIndexBlocks = !proMember && chip.settled && chip.connected;
@@ -465,7 +465,7 @@ export const ProfileHero: React.FC<Props> = ({
             verdict={verdict} series={series} chartColor={chartColor}
             chartFillTop={chartFillTop} axisWindow={axisWindow} windowDays={windowDays}
             bars={bars} byId={byId} countingKnown={countingKnown} countingN={countingN}
-            loweredN={loweredN} tilesWord={tilesWord} isSelf={isSelf}
+            countingIds={countingIds} tilesWord={tilesWord} isSelf={isSelf}
             ownerFirstName={ownerFirstName} onStatTap={onStatTap} tap={tap} onOpenRound={onOpenRound}
             afterIndex={rankingLine}
             afterChart={showCompareEntry && !isSelf && viewerUserId ? (

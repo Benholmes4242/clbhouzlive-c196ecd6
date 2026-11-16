@@ -72,7 +72,7 @@ describe('CE1 fixed connected example', () => {
     const text = screen.getByTestId('hero-connect-panel').textContent ?? '';
     expect(text).not.toContain('90 days ago');
     expect(text).not.toContain('Today');
-    expect(text).not.toContain('Two of these five are counting towards your index.');
+    expect(text).not.toContain('Two of these five count towards your index: the green ones.');
     expect(text).not.toContain('Green rounds lowered it.');
   });
   it('retains the connected axis and known counting sentence', () => {
@@ -81,12 +81,12 @@ describe('CE1 fixed connected example', () => {
       slot={null} verdict={null} series={[...CONNECT_EXAMPLE.series]} chartColor="currentColor" chartFillTop={0.28}
       axisWindow="90 days" windowDays={90} bars={CONNECT_EXAMPLE.rounds.map((round) => ({ ...round }))}
       byId={new Map(CONNECT_EXAMPLE.rounds.map((round) => [round.id, round]))}
-      countingKnown countingN={2} loweredN={2} tilesWord="five" isSelf
+      countingKnown countingN={2} countingIds={new Set(CONNECT_EXAMPLE.rounds.slice(0, 2).map((round) => round.id))} tilesWord="five" isSelf
       onStatTap={() => {}} tap={() => () => {}} navigate={f.navigate}
     />);
     expect(view.container.textContent).toContain('90 days ago');
     expect(view.container.textContent).toContain('Today');
-    expect(view.container.textContent).toContain('Two of these five are counting towards your index.');
+    expect(view.container.textContent).toContain('Two of these five count towards your index: the green ones.');
   });
   it('clicking every example form tile fires no analytics or navigation', () => {
     render(hero());
