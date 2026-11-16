@@ -7,10 +7,10 @@ import { useProMembers } from './useProMembers';
 import { ProLabel } from './ProLabel';
 import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers';
 
-export function ProOrVerifiedMark({ userId, verified, name }: { userId?: string | null; verified?: boolean | null; name?: string }) {
+export function ProOrVerifiedMark({ userId, verified, name, tickClassName }: { userId?: string | null; verified?: boolean | null; name?: string; /** Class for the fallback tick only, so a caller keeps its tick layout. */ tickClassName?: string }) {
   const { members } = useProMembers([userId]);
   const { members: amateurs } = useAmateurMembers([userId]);
   if (userId && members.has(userId)) return <ProLabel userId={userId} name={name} surface="mark" />;
   if (userId && amateurs.has(userId)) return <ProLabel kind="am" userId={userId} name={name} surface="mark" />;
-  return verified ? <VerifiedBadge size="sm" /> : null;
+  return verified ? <VerifiedBadge size="sm" className={tickClassName} /> : null;
 }

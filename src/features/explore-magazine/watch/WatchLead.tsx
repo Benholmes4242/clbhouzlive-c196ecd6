@@ -25,7 +25,7 @@ import { MapPin, Volume2, VolumeX } from 'lucide-react';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { autoplayBlocked } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 import { registerRailVideo } from '@/components/explore-tab-new/courseled/mediaRailAutoplay';
 import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
@@ -415,8 +415,8 @@ function LeadCard({ row, onDepart }: { row: WatchLeadRow; onDepart: () => void }
             >
               {whoAvatar(30)}
               <span style={{ fontSize: 14, fontWeight: 600, textShadow: TEXT_SHADOW, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <InlineProMemberName userId={row.actor_type === 'personal' ? row.actor_id : undefined}>{row.display_name}</InlineProMemberName>
-                {row.is_verified ? <VerifiedBadge size="sm" /> : null}
+                {row.display_name}
+                <ProOrVerifiedMark userId={row.actor_type === 'personal' ? row.actor_id : undefined} verified={row.is_verified} name={row.display_name} />
               </span>
             </button>
             {caption ? (

@@ -1,4 +1,3 @@
-import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * ER2 — CREATORS TO FOLLOW. Up to five creators from get_watch_spotlights,
  * picked once per Explore visit: WatchFeed mints the
@@ -14,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
@@ -156,8 +155,8 @@ function SpotlightCard({ row, activity, visitKey, position, onDepart }: { row: S
           </ActiveAvatarDoor>
           <div style={{ minWidth: 0, flex: 1 }}>
             <b data-spotlight-name style={{ display: 'block', fontSize: 17, fontWeight: 700, overflowWrap: 'anywhere' }}>
-              <InlineProMemberName userId={business ? undefined : row.actor_id}>{row.display_name}</InlineProMemberName>
-              {row.is_verified ? <> <VerifiedBadge size="sm" className="inline align-middle" /></> : null}
+              {row.display_name}
+              {' '}<ProOrVerifiedMark userId={business ? undefined : row.actor_id} verified={row.is_verified} name={row.display_name} tickClassName="inline align-middle" />
             </b>
             <span data-spotlight-line className="spotlight-line">{spotlightLine(row, vids.isError ? null : videos[0]?.created_at)}</span>
           </div>

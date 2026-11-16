@@ -45,7 +45,6 @@
  * figures row under the author line are the only score surfaces.
  */
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
-import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
@@ -69,7 +68,7 @@ import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
 import { formatHcp } from '@/lib/formatHcp';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { FullscreenHoleChipSlot, FullscreenRoundPill } from '@/components/feed/PostGolfContext';
 import { golfRoundToPar, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
@@ -773,7 +772,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         >
           {/* Name row — name ellipses first, follow never pushed off */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <ProMemberName userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId}><span
+            <span
               onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
               style={{
                 fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
@@ -783,8 +782,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               }}
             >
               {activePost.displayName}
-            </span></ProMemberName>
-            {activePost.isVerified && <VerifiedBadge size="sm" />}
+            </span>
+            <ProOrVerifiedMark userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId} verified={activePost.isVerified} name={activePost.displayName} />
           </div>
 
           {/* Sub-row: index · home club · time · Follow pill */}

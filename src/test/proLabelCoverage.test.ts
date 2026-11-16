@@ -83,7 +83,7 @@ export const EXCLUDED: Record<string, string> = {
 };
 
 const source = (file: string) => readFileSync(resolve(process.cwd(), file), 'utf8');
-const labelImport = /import\s*\{[^}]*\b(?:InlineProMemberName|ProMemberName|ProLabel)\b[^}]*\}\s*from\s*['"][^'"]+['"]/;
+const labelImport = /import\s*\{[^}]*\b(?:InlineProMemberName|ProMemberName|ProLabel|ProOrVerifiedMark)\b[^}]*\}\s*from\s*['"][^'"]+['"]/;
 describe('PRO member-name coverage', () => {
   for (const file of WIRED) it(`wired: ${file}`, () => { expect(source(file)).toMatch(labelImport); });
   for (const [file, target] of Object.entries(DELEGATES)) it(`delegates: ${file}`, () => { expect(source(file).length).toBeGreaterThan(0); expect(WIRED).toContain(target); expect(source(target)).toMatch(labelImport); });

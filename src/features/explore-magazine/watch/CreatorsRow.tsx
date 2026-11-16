@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -127,7 +127,7 @@ function CreatorsSheet({ userId, pending, onClose, onOpen }: { userId: string | 
       <h2 id="watch-creators-sheet-title" style={{ margin: 0, padding: '4px 0 12px', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>{t('amateur.watch.creators.title', 'Creators')}</h2>
       {(people.data ?? []).filter((p) => p.tier !== 'you').map((person, i) => <div key={person.actor_id} role="button" tabIndex={0} aria-busy={pending === person.actor_id} onClick={() => void onOpen(person, i + 1)} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); void onOpen(person, i + 1); } }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', cursor: 'pointer', borderTop: i ? `0.5px solid ${A.BORDER}` : undefined, textAlign: 'left' }}>
         <PersonAvatar person={person} size={44} />
-        <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, fontWeight: 600, color: A.INK }}><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><InlineProMemberName userId={person.actor_id}>{person.display_name}</InlineProMemberName></span>{person.is_verified ? <VerifiedBadge size="sm" /> : null}</div></div>
+        <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, fontWeight: 600, color: A.INK }}><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{person.display_name}</span><ProOrVerifiedMark userId={person.actor_id} verified={person.is_verified} name={person.display_name} /></div></div>
         <CreatorFollowPill creator={person} />
       </div>)}
     </div>
