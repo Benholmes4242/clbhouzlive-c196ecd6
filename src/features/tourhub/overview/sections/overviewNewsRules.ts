@@ -11,8 +11,8 @@ import { getScoreColor } from '../../_shared/scoreColor';
 export const NEWS_TOUR_LABELS: Record<string, string> = { pga: 'PGA Tour', lpga: 'LPGA', euro: 'DP World', pgad: 'Korn Ferry', champ: 'Champions', liv: 'LIV Golf' };
 export function newsAge(at: string | null, short = false, now = new Date()): string {
   const age = storyTime(at, now);
-  if (age === 'JUST NOW') return short ? 'now' : 'just now';
-  if (age === 'YESTERDAY') return short ? '1d' : 'yesterday';
+  if (age === 'JUST NOW') return short ? 'now' : 'Just now';
+  if (age === 'YESTERDAY') return short ? '1d' : 'Yesterday';
   if (age.endsWith('H AGO')) return age.replace('H AGO', short ? 'h' : 'h ago');
   if (age.endsWith(' DAYS AGO')) return age.replace(' DAYS AGO', short ? 'd' : ' days ago');
   return age.replace(/[A-Z]+/g, month => month[0] + month.slice(1).toLowerCase());

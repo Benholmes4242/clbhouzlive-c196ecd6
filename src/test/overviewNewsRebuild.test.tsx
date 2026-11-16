@@ -59,7 +59,7 @@ describe('device News freshness', () => {
 describe('Overview details rules', () => {
   for (const [slug,label] of Object.entries(NEWS_TOUR_LABELS)) it(`${slug} uses its signed-off tour label`,()=>expect(newsDetails(story('a',{tour_slug:slug}),null,false,now).tour).toBe(label));
   for (const slug of [null,'all']) it(`omits tour ${slug}`,()=>expect(newsDetails(story('a',{tour_slug:slug}),null,false,now).tour).toBe(''));
-  for (const [hours,long,short] of [[0,'just now','now'],[1,'1h ago','1h'],[23,'23h ago','23h'],[24,'yesterday','1d'],[47,'yesterday','1d'],[48,'2 days ago','2d'],[144,'6 days ago','6d'],[168,'25 Oct','25 Oct']] as const) {
+  for (const [hours,long,short] of [[0,'Just now','now'],[1,'1h ago','1h'],[23,'23h ago','23h'],[24,'Yesterday','1d'],[47,'Yesterday','1d'],[48,'2 days ago','2d'],[144,'6 days ago','6d'],[168,'25 Oct','25 Oct']] as const) {
     it(`long age at ${hours}h`,()=>expect(newsAge(new Date(now.getTime()-hours*3600000).toISOString(),false,now)).toBe(long));
     it(`short age at ${hours}h`,()=>expect(newsAge(new Date(now.getTime()-hours*3600000).toISOString(),true,now)).toBe(short));
   }

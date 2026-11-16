@@ -4,7 +4,7 @@
  * - pill input (MentionsComposerInput)
  * - image attach (compressed, uploaded to comment-images bucket)
  * - "Replying to <name>" context row
- * - amber send when non-empty
+ * - white send when non-empty
  *
  * Keyboard math is handled by CommentsSheetV2 via the shared visualViewport
  * hook (`useKeyboardHeight`), which pads the sheet bottom.
@@ -336,11 +336,11 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
           aria-label="Send"
           style={{
             width: 38, height: 38, borderRadius: '50%',
-            background: canSend ? AMBER : 'rgba(255,255,255,0.08)',
-            color: canSend ? '#FFFFFF' : MUTED,
+            background: canSend ? 'var(--comment-send-bg)' : 'rgba(255,255,255,0.08)',
+            color: canSend ? 'var(--comment-send-ink)' : MUTED,
             border: 0, cursor: canSend ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: canSend ? '0 2px 6px rgba(247,147,30,0.35)' : 'none',
+            boxShadow: 'none',
             transition: 'background 150ms',
           }}
         >

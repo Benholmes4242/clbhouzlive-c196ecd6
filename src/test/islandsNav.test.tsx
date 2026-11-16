@@ -57,7 +57,7 @@ vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null 
 vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: () => mockPro }));
 
 import { HcpCell, lastIndexMove } from '@/features/chrome-v2/ChromeIsland';
-import { glanceMoveText, formatVsPar } from '@/features/chrome-v2/IndexGlance';
+import { glanceMoveText, glanceWindowMove, formatVsPar } from '@/features/chrome-v2/IndexGlance';
 
 const DAY = 86_400_000;
 const iso = (daysAgo: number) => new Date(Date.now() - daysAgo * DAY).toISOString();
@@ -191,7 +191,7 @@ describe('IndexGlance', () => {
     mockLastRound = { adjusted_gross: 73, course_par: 72 };
     openGlance();
     const dialog = screen.getByRole('dialog', { name: 'Your handicap index' });
-    expect(dialog.textContent).toContain('▾ 0.2 this month');
+    expect(dialog.textContent).toContain('▴ 0.2 over 3 rounds');
     // 3 rounds carry an index; the current index is appended as "Now".
     expect(dialog.textContent).toContain('3 rounds ago');
     expect(dialog.textContent).toContain('Now');
@@ -203,6 +203,34 @@ describe('IndexGlance', () => {
   it('hides the sparkline when fewer than 2 points exist', () => {
     mockScores = [];
     openGlance();
+    expect(screen.queryByTestId('index-glance-sparkline')).toBeNull();
+  });
+
+  it.each([
+    [13.4, '▾ 1.0 over 7 rounds', '#34D77F'],
+    [11.4, '▴ 1.0 over 7 rounds', '#FF5A4E'],
+    [12.43, 'No change over 7 rounds', '#F8FAFC'],
+  ])('matches its seven-round text and end dot from oldest %s', (oldest, text, dot) => {
+    mockScores = Array.from({ length: 7 }, (_, i) => ({ handicap_index_at_time: i === 6 ? oldest : 12.4 }));
+    openGlance();
+    const dialog = screen.getByRole('dialog', { name: 'Your handicap index' });
+    expect(dialog.textContent).toContain(text);
+    expect(dialog.textContent).toContain('7 rounds ago');
+    expect(dialog.querySelector('circle')?.getAttribute('fill')).toBe(dot);
+  });
+
+  it('uses the singular one-round window and caption', () => {
+    mockScores = [{ handicap_index_at_time: 13.4 }];
+    openGlance();
+    const dialog = screen.getByRole('dialog', { name: 'Your handicap index' });
+    expect(dialog.textContent).toContain('▾ 1.0 over 1 round');
+    expect(dialog.textContent).toContain('1 round ago');
+  });
+
+  it('retains the latest-revision wording without a sparkline', () => {
+    mockHistory = [{ observed_at: iso(2), handicap_index: 12.6 }, { observed_at: iso(1), handicap_index: 12.4 }];
+    openGlance();
+    expect(screen.getByRole('dialog', { name: 'Your handicap index' }).textContent).toContain('▾ 0.2 this month');
     expect(screen.queryByTestId('index-glance-sparkline')).toBeNull();
   });
 
@@ -244,6 +272,10 @@ describe('IndexGlance', () => {
 // Glance helpers
 // ---------------------------------------------------------------------------
 describe('glanceMoveText', () => {
+  it('rounds the drawn change to one decimal and uses dim text with an ink level dot', () => {
+    expect(glanceWindowMove(12.4, 12.43, 7)).toEqual({ text: 'No change over 7 rounds', color: 'rgba(248,250,252,0.42)', dotColor: '#F8FAFC' });
+    expect(glanceWindowMove(12.4, 13.66, 7).text).toBe('▾ 1.3 over 7 rounds');
+  });
   it('writes "this month" for a move in the current calendar month', () => {
     const now = new Date(2026, 9, 28);
     const text = glanceMoveText(

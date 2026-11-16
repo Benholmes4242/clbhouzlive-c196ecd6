@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Three fixes Nov 16
+- Capitalise shared long news ages; retain short forms and digit/date forms.
+- Match handicap glance move/dot to drawn round window, preserving no-line fallback and island chip.
+- White enabled comment send button, disabled/business identity unchanged; check 320/375 and four shards against 8,948.
+
 ## Complete: Course list view toggle
 - Add one storage-safe preference and signed-off switch across Courses and Top 100; cards remain unchanged.
 - Add compact rows, shared lead formatting, list skeletons and opt-in chip overflow fade; preserve taps/search/paging.

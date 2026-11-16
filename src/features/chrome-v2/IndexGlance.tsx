@@ -29,7 +29,6 @@ import type { HcpMoveDetail } from './ChromeIsland';
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#F8FAFC';
 const DIM = 'rgba(248,250,252,0.42)';
-const AMBER = '#F7931E';
 const MOVE_IMPROVING = '#34D77F';
 const MOVE_DRIFTING = '#FF5A4E';
 const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
@@ -60,6 +59,16 @@ export function glanceMoveText(move: HcpMoveDetail, now: Date = new Date()): str
   if (sameMonth) return `${triangle} ${size} this month`;
   const date = moved.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   return `${triangle} ${size} on ${date}`;
+}
+
+/** The glance alone measures the exact drawn window; the island keeps its latest revision. */
+export function glanceWindowMove(currentIndex: number, oldestIndex: number, roundsDrawn: number) {
+  const delta = Math.round((currentIndex - oldestIndex) * 10) / 10;
+  const rounds = `${roundsDrawn} ${roundsDrawn === 1 ? 'round' : 'rounds'}`;
+  if (delta === 0) return { text: `No change over ${rounds}`, color: DIM, dotColor: INK };
+  const improving = delta < 0;
+  const color = improving ? MOVE_IMPROVING : MOVE_DRIFTING;
+  return { text: `${improving ? '▾' : '▴'} ${Math.abs(delta).toFixed(1)} over ${rounds}`, color, dotColor: color };
 }
 
 /** adjusted_gross − course_par, written +1, E or −2. Null when either side is missing. */
@@ -135,8 +144,9 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
   if (lastRoundGross != null) stats.push({ value: String(lastRoundGross), label: 'Last round' });
   if (vsPar != null) stats.push({ value: vsPar, label: 'vs par' });
 
-  const moveText = glanceMoveText(move);
-  const moveColor = move.direction === 'improving' ? MOVE_IMPROVING : MOVE_DRIFTING;
+  const windowMove = spark ? glanceWindowMove(currentIndex, spark.values[0], spark.roundsDrawn) : null;
+  const moveText = windowMove?.text ?? glanceMoveText(move);
+  const moveColor = windowMove?.color ?? (move.direction === 'improving' ? MOVE_IMPROVING : MOVE_DRIFTING);
 
   const openHandicap = () => {
     onClose();
@@ -187,7 +197,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
                 cx={sparkPath[sparkPath.length - 1].x}
                 cy={sparkPath[sparkPath.length - 1].y}
                 r={3.5}
-                fill={AMBER}
+                fill={windowMove?.dotColor ?? INK}
               />
             </svg>
             <div
@@ -200,7 +210,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
                 ...NUM,
               }}
             >
-              <span>{spark.roundsDrawn} rounds ago</span>
+              <span>{spark.roundsDrawn} {spark.roundsDrawn === 1 ? 'round' : 'rounds'} ago</span>
               <span>Now</span>
             </div>
           </div>

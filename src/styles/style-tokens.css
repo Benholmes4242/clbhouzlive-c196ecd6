@@ -4,6 +4,8 @@
  */
 
 :root {
+  --comment-send-bg: #FFFFFF;
+  --comment-send-ink: #0A0A0C;
   --course-list-view-border: rgba(255,255,255,0.1);
   --course-list-view-active: rgba(255,255,255,0.12);
   --course-list-chip-fade: linear-gradient(90deg, #000 85%, transparent);
