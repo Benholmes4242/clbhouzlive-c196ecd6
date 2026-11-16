@@ -93,7 +93,7 @@ vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
 
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
 import { ProfileCoverBand } from '@/components/profile/hero/ProfileCoverBand';
-import { ContourCover, CONTOUR_COVER_GRADIENT } from '@/components/profile/hero/ContourCover';
+import { FallbackCover, FALLBACK_COVER_GRADIENT } from '@/components/profile/hero/FallbackCover';
 import { ClubProfileHero } from '@/components/business/hero/ClubProfileHero';
 import { useClubCoverPhoto } from '@/components/profile/hooks/useClubCoverPhoto';
 import { arrivalAction } from '@/features/edit-profile/completionRules';
@@ -159,7 +159,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the cover chain', () => {
     state.topTen = [{ position: 1, thumbnail_image: 'top10.jpg' }];
     const { container } = renderHero({ coverUrl: 'own.jpg' });
     expect(container.querySelector('[data-cover-img]')?.getAttribute('src')).toBe('own.jpg');
-    expect(container.querySelector('[data-contour-cover]')).toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).toBeNull();
     await new Promise((r) => setTimeout(r, 20));
     expect(clubReads()).toHaveLength(0);
   });
@@ -186,7 +186,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the cover chain', () => {
   it('with nothing to show the contours appear instead of a flat canvas', () => {
     const { container } = renderHero({ coverUrl: null });
     expect(container.querySelector('[data-cover-img]')).toBeNull();
-    expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
     expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
   });
 
@@ -197,7 +197,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the cover chain', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(clubReads()).toHaveLength(0);
     expect(container.querySelector('[data-cover-img]')).toBeNull();
-    expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
   });
 
   it("a legacy 'text-fallback' home club never reaches the club photo read and falls through to the Top 10 photo", async () => {
@@ -218,7 +218,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the cover chain', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(clubReads().length).toBeGreaterThan(0);
     expect(container.querySelector('[data-cover-img]')).toBeNull();
-    expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
   });
 
   it('a club photo read returning null still shows the Top 10 photo', async () => {
@@ -256,17 +256,17 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the band', () => {
     const { container } = band({ coverUrl: 'broken.jpg' });
     const img = container.querySelector('[data-cover-img]');
     expect(img).not.toBeNull();
-    expect(container.querySelector('[data-contour-cover]')).toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).toBeNull();
     fireEvent.error(img!);
     expect(container.querySelector('[data-cover-img]')).toBeNull();
-    expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
     expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
   });
 
   it('a working cover keeps the photograph and shows no contours', () => {
     const { container } = band({ coverUrl: 'own.jpg' });
     expect(container.querySelector('[data-cover-img]')).not.toBeNull();
-    expect(container.querySelector('[data-contour-cover]')).toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).toBeNull();
     expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
   });
 
@@ -287,7 +287,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the band', () => {
     expect((pill.parentElement as HTMLElement).style.position).toBe('relative');
     fireEvent.click(pill);
     expect(onAddCover).toHaveBeenCalledTimes(1);
-    expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
   });
 
   it('no pill without a callback', () => {
@@ -341,7 +341,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the business hero', () => {
 
   it('with no course image it falls back to contours plus the shared fade', () => {
     const { container } = hero(null);
-    expect(container.querySelector('[data-contour-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
     expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
     expect(container.querySelector('[data-club-cover] > img')).toBeNull();
     expect(screen.queryByRole('button', { name: '+ Add a cover' })).toBeNull();
@@ -350,45 +350,25 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the business hero', () => {
   it('with a course image it keeps the photograph and shows no contours', () => {
     const { container } = hero('course.jpg');
     expect(container.querySelector('[data-club-cover] > img')?.getAttribute('src')).toBe('course.jpg');
-    expect(container.querySelector('[data-contour-cover]')).toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).toBeNull();
     expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
   });
 });
 
 describe('BRIEF_PROFILE_COVER_FALLBACK — the contour artwork', () => {
-  it('draws 14 closed polylines, 1px strokes, no fill, deterministic for everyone', () => {
-    const a = render(<ContourCover />);
-    const ringsA = Array.from(a.container.querySelectorAll('polyline'));
-    expect(ringsA).toHaveLength(14);
-    expect(a.container.querySelector('svg')?.getAttribute('viewBox')).toBe('0 0 390 255');
-    expect(a.container.querySelector('svg')?.getAttribute('preserveAspectRatio')).toBe('xMidYMid slice');
-    ringsA.forEach((ring, k) => {
-      const pts = ring.getAttribute('points')!.trim().split(' ');
-      expect(pts.length).toBeGreaterThanOrEqual(36);
-      expect(pts[0]).toBe(pts[pts.length - 1]);
-      pts.forEach((p) => {
-        const [x, y] = p.split(',').map(Number);
-        expect(Number.isFinite(x)).toBe(true);
-        expect(Number.isFinite(y)).toBe(true);
-      });
-      expect(ring.getAttribute('fill')).toBe('none');
-      expect(ring.getAttribute('stroke-width')).toBe('1');
-      expect(ring.getAttribute('stroke')).toBe(k % 4 === 0 ? 'rgba(255,255,255,0.11)' : 'rgba(255,255,255,0.07)');
-    });
-    a.unmount();
-
-    const b = render(<ContourCover />);
-    const ringsB = Array.from(b.container.querySelectorAll('polyline'));
-    expect(ringsB.map((r) => r.getAttribute('points'))).toEqual(ringsA.map((r) => r.getAttribute('points')));
-    b.unmount();
+  it('draws no SVG or patterned artwork', () => {
+    const { container } = render(<FallbackCover />);
+    expect(container.querySelector('svg')).toBeNull();
+    expect(container.querySelector('polyline')).toBeNull();
   });
 
   it('sits on the fairway green gradient as an inset-0 layer', () => {
-    const { container } = render(<ContourCover />);
-    const layer = container.querySelector('[data-contour-cover]') as HTMLElement;
+    const { container } = render(<FallbackCover />);
+    const layer = container.querySelector('[data-fallback-cover]') as HTMLElement;
     expect(layer.style.position).toBe('absolute');
     // jsdom serialises `inset: 0` bare; a browser reports 0px.
     expect(['0', '0px']).toContain(layer.style.inset);
-    expect(CONTOUR_COVER_GRADIENT).toBe('linear-gradient(165deg, #33503b 0%, #1f2e25 50%, #0A0A0C 100%)');
+    expect(FALLBACK_COVER_GRADIENT).toBe('var(--profile-fallback-cover-gradient)');
+    expect(src('styles/style-tokens.css')).toContain('--profile-fallback-cover-gradient: linear-gradient(180deg, #1C2A22 0%, #131B16 58%, #0A0A0C 100%)');
   });
 });

@@ -32,13 +32,14 @@ import { isFullEighteen, useProfileRounds } from '@/components/profile/rounds/us
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useClubCoverPhoto } from '@/components/profile/hooks/useClubCoverPhoto';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { HeroPill } from './HeroShell';
 import { ProfileCoverBand } from './ProfileCoverBand';
+import type { HeroIndexPoint } from './indexLine';
 import { HeroHandicapDisplay } from './HeroHandicapDisplay';
 import { HeroConnectExample } from './HeroConnectExample';
 import { LinkedHandicapNotice } from './LinkedHandicapNotice';
@@ -75,8 +76,8 @@ interface Props {
   /** Resolved index (resolveDisplayHandicap) as the page already resolves it. */
   indexValue: number | null;
   /** PLAIN ROUND TOTAL — see useMemberRoundTotal. Owner-only by construction. */
-  roundsCount: number | null;
-  ratedCount: number | null;
+  roundsCount?: number | null;
+  ratedCount?: number | null;
   roundsCountState?: 'ok' | 'loading' | 'error';
   ratedCountState?: 'ok' | 'loading' | 'error';
   friendsCount?: number | null;
@@ -129,20 +130,6 @@ const ExternalGlyph = () => (
   </svg>
 );
 
-const CounterCell: React.FC<{ label: string; value: number | null; state?: 'ok' | 'loading' | 'error'; onTap: () => void }> = ({ label, value, state = 'ok', onTap }) => (
-  <button
-    type="button"
-    onClick={onTap}
-    disabled={state === 'error'}
-    style={{ minWidth: 0, padding: 0, border: 0, background: 'transparent', textAlign: 'center', cursor: state === 'error' ? 'default' : 'pointer', fontFamily: SANS }}
-  >
-    <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: A.INK, ...FIGS }}>
-      {state === 'error' ? '\u00A0' : value == null ? '\u2014' : formatNumber(value)}
-    </div>
-    <div style={{ marginTop: 4, ...MICRO, color: A.DIM }}>{label}</div>
-  </button>
-);
-
 /** Grid columns follow the controls that actually render — never a placeholder. */
 const ActionsRow: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const n = React.Children.toArray(
@@ -172,10 +159,6 @@ export const ProfileHero: React.FC<Props> = ({
   isSelf,
   hideConnectPrompt = false,
   indexValue,
-  roundsCount,
-  ratedCount,
-  roundsCountState = 'ok',
-  ratedCountState = 'ok',
   friendsCount,
   followersCount,
   mutualCount,
@@ -231,7 +214,7 @@ export const ProfileHero: React.FC<Props> = ({
   );
 
   // Fallback chain: own cover → home club course photo → #1 Top 10 course
-  // image → contours. The club photo is read only while no own cover exists,
+  // image → flat fallback. The club photo is read only while no own cover exists,
   // and a hidden home club never supplies one (useProfileClubs owns that).
   const topCourse = React.useMemo(
     () => [...(topTen ?? [])].sort((a, b) => a.position - b.position)[0] ?? null,
@@ -241,23 +224,23 @@ export const ProfileHero: React.FC<Props> = ({
   // with the sentinel id 'text-fallback'; passing it to the club photo read
   // would hit golf_courses.club_id (a uuid column) with a non-uuid and error
   // on every view. Only a real UUID reaches the hook; legacy clubs fall
-  // through to the Top 10 photo or the contours.
+  // through to the Top 10 photo or the flat fallback.
   const clubId = !coverUrl && homeClub && UUID_RE.test(homeClub.id) ? homeClub.id : null;
   const clubCover = useClubCoverPhoto(clubId);
   // While the club read is in flight, do not fall through to the Top 10
-  // photo — show the contours for that moment, then the club photo once it
+  // photo — show the flat fallback for that moment, then the club photo once it
   // resolves. A null result continues to the Top 10 photo as before.
   const cover = coverUrl || clubCover.coverPhoto || (clubId && clubCover.isLoading ? null : topCourse?.thumbnail_image || null);
 
   // Ninety-day rule: points inside 90 days, else the whole history.
   const { series, oldestMs, windowHeld } = React.useMemo(() => {
-    if (!history || history.length < 2) return { series: [] as number[], oldestMs: null as number | null, windowHeld: false };
+    if (!history || history.length < 2) return { series: [] as HeroIndexPoint[], oldestMs: null as number | null, windowHeld: false };
     const cutoff = Date.now() - 90 * MS_PER_DAY;
     const recent = history.filter((p) => new Date(p.observed_at).getTime() >= cutoff);
     const held = recent.length >= 2;
     const use = (held ? recent : history).filter((p) => Number.isFinite(Number(p.handicap_index)));
     return {
-      series: use.map((p) => Number(p.handicap_index)),
+      series: use.map((p) => ({ value: Number(p.handicap_index), observed_at: p.observed_at })),
       oldestMs: use.length ? new Date(use[0].observed_at).getTime() : null,
       windowHeld: held,
     };
@@ -395,25 +378,14 @@ export const ProfileHero: React.FC<Props> = ({
   const loweredN = bars.filter(formBarLowered).length;
   const tilesN = bars.length;
   const tilesWord = numberWord(tilesN, false);
-  // COURSES = distinct courses in POSTED ROUNDS (get_profile_rounds, gated by
-  // can_view_handicap). It will NOT necessarily equal the Your Courses
-  // analytics list (gam_user_courses: mapped, non-penalty) — do not "fix"
-  // the two into agreement.
-  const coursesCount = rows.length > 0 ? new Set(rows.map((r) => r.course_id).filter((c): c is string => !!c)).size : null;
-
   const showIndexBlocks = !proMember && chip.settled && chip.connected;
   const showConnectCard = !proMember && chip.settled && !chip.linked && isSelf && !hideConnectPrompt;
   const showLinkedNotice = !proMember && chip.settled && chip.linked && !chip.connected && isSelf;
 
-  const counters: Array<{ key: HeroStat; label: string; value: number | null; state?: 'ok' | 'loading' | 'error' }> = [];
-  if (isSelf) counters.push({ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, state: roundsCountState });
-  if (coursesCount != null) counters.push({ key: 'courses', label: t('hero.courses', 'Courses'), value: coursesCount });
-  counters.push({ key: 'rated', label: t('hero.rated', 'Reviewed'), value: ratedCount, state: ratedCountState });
-
   const socialFig = (n: number | null | undefined) => (socialCountState === 'ok' && n != null ? formatNumber(n) : null);
   const friendsFig = socialFig(friendsCount);
   const followersFig = socialFig(followersCount);
-  const metaItem: React.CSSProperties = { padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase' };
+  const metaItem: React.CSSProperties = { padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 10, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase' };
   const hasMeta = !!website || friendsFig != null || followersFig != null || bioOverflows || bioExpanded;
 
   return (
@@ -436,7 +408,7 @@ export const ProfileHero: React.FC<Props> = ({
         avatar={<SquircleAvatar size={56} src={avatarUrl ?? undefined} alt={displayName} userId={userId} hideRing className="w-full h-full" />}
       />
 
-      <div style={{ padding: '0 16px', background: A.CANVAS, fontFamily: SANS }}>
+      <div style={{ padding: '0 16px', background: A.CANVAS, fontFamily: 'inherit' }}>
         {bio ? (
           <div
             ref={bioRef}
@@ -517,23 +489,7 @@ export const ProfileHero: React.FC<Props> = ({
         {showConnectCard && <HeroConnectExample t={t} onConnect={onConnect} />}
         {showLinkedNotice && <LinkedHandicapNotice provider={chip.connection?.provider} />}
 
-        {counters.length > 0 && (
-          <div
-            style={{
-              // 16 in both states: the panel ends on its action, and this row's
-              // own border is the panel's bottom rule (16 below, per CP1 spec).
-              marginTop: 16,
-              paddingTop: 13,
-              borderTop: `1px solid ${A.SOFT}`,
-              display: 'grid',
-              gridTemplateColumns: `repeat(${counters.length}, 1fr)`,
-            }}
-          >
-            {counters.map((c) => (
-              <CounterCell key={c.key} label={c.label} value={c.value} state={c.state} onTap={tap(c.key)} />
-            ))}
-          </div>
-        )}
+
       </div>
     </>
   );

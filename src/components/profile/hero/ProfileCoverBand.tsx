@@ -8,13 +8,13 @@ import React from 'react';
 import { ProLabel } from '@/features/pro-verification/ProLabel';
 import '@/features/creator/profile-creator.css';
 import { MoreHorizontal } from 'lucide-react';
-import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 import { W_55 } from './HeroShell';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
-import { ContourCover } from './ContourCover';
+import { FallbackCover } from './FallbackCover';
 
 /** Control skin over the band (EDIT pill and the overflow dots). */
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
@@ -40,7 +40,7 @@ export const BandPill = React.forwardRef<
       color: solid ? A.CANVAS : '#FFFFFF',
       display: 'inline-flex',
       alignItems: 'center',
-      fontFamily: SANS,
+      fontFamily: 'inherit',
       fontSize: 10,
       fontWeight: 700,
       letterSpacing: '0.14em',
@@ -137,7 +137,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
         paddingBottom: HERO_CONTENT_BOTTOM,
         overflow: 'hidden',
         background: A.CANVAS,
-        fontFamily: SANS,
+        fontFamily: 'inherit',
         isolation: 'isolate',
       }}
     >
@@ -154,7 +154,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
           />
         ) : (
-          <ContourCover />
+          <FallbackCover />
         )}
         <PhotoBandFade />
       </div>
@@ -181,7 +181,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
               border: `1px solid ${BAND_CONTROL_BORDER}`,
               background: BAND_CONTROL_GROUND,
               color: '#FFFFFF',
-              fontFamily: SANS,
+              fontFamily: 'inherit',
               fontSize: 9.5,
               fontWeight: 800,
               letterSpacing: '0.14em',
@@ -205,7 +205,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
             <button
               type="button"
               onClick={onAddHomeClub}
-              style={{ ...MASTHEAD_KICKER, minWidth: 0, color: W_55, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, textAlign: 'left' }}
+              style={{ ...MASTHEAD_KICKER, minWidth: 0, color: W_55, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
             >
               {addHomeClubLabel}
             </button>

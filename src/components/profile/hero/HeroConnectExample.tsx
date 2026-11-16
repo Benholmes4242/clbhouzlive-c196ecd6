@@ -9,7 +9,7 @@ import React from 'react';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 import { HeroHandicapDisplay } from './HeroHandicapDisplay';
@@ -21,7 +21,7 @@ export const CONNECT_EXAMPLE = {
     { key: 'short', delta: -0.8, direction: 'down', window: '90 days' },
     { key: 'long', delta: -2.1, direction: 'down', window: '12 months' },
   ],
-  series: [13.2, 13.1, 13.0, 12.95, 12.92, 12.89, 12.88, 12.85, 12.82, 12.8, 12.77, 12.75, 12.76, 12.73, 12.7, 12.67, 12.64, 12.65, 12.62, 12.59, 12.56, 12.57, 12.54, 12.51, 12.53, 12.5, 12.47, 12.48, 12.45, 12.4],
+  series: [13.2, 13.1, 13.0, 12.95, 12.92, 12.89, 12.88, 12.85, 12.82, 12.8, 12.77, 12.75, 12.76, 12.73, 12.7, 12.67, 12.64, 12.65, 12.62, 12.59, 12.56, 12.57, 12.54, 12.51, 12.53, 12.5, 12.47, 12.48, 12.45, 12.4].map((value, i, values) => ({ value, observed_at: new Date(Date.now() - (values.length - 1 - i) * 90 * 86400000 / (values.length - 1)).toISOString() })),
   rounds: [
     { id: 'example-1', date: '2026-01-01', gross_score: 86, value: 3.5, movement: 0, course_name: 'Sundridge Park' },
     { id: 'example-2', date: '2026-01-02', gross_score: 91, value: 5.4, movement: 0, course_name: 'The London Golf Club' },
@@ -61,10 +61,10 @@ export const HeroConnectExample: React.FC<{ t: TFunction<'profile'>; onConnect?:
         <b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.connectExampleLead', { defaultValue: 'Connect your official handicap' })}</b>{t('hero.connectExampleRest', { defaultValue: ' and this becomes yours.' })}
       </div>
       <div data-example-actions="" style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 11 }}>
-        <Button variant="ghost" className="h-auto rounded-none p-0" onClick={onConnect} style={{ padding: 0, border: 0, background: 'transparent', fontFamily: SANS, fontSize: 13, fontWeight: 700, color: A.INK, cursor: 'pointer' }}>
+        <Button variant="ghost" className="h-auto rounded-none p-0" onClick={onConnect} style={{ padding: 0, border: 0, background: 'transparent', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, color: A.INK, cursor: 'pointer' }}>
           {t('hero.connectExampleAction', { defaultValue: 'Connect ›' })}
         </Button>
-        <Button variant="ghost" className="h-auto rounded-none p-0" onClick={decline} style={{ padding: 0, border: 0, background: 'transparent', fontFamily: SANS, fontSize: 12.5, fontWeight: 600, color: A.DIM, cursor: 'pointer' }}>
+        <Button variant="ghost" className="h-auto rounded-none p-0" onClick={decline} style={{ padding: 0, border: 0, background: 'transparent', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 600, color: A.DIM, cursor: 'pointer' }}>
           {t('hero.connectExampleHide', { defaultValue: 'Hide this' })}
         </Button>
       </div>

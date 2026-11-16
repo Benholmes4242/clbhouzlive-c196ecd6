@@ -269,8 +269,6 @@ const ProfilePageV2Content: React.FC = () => {
     isError: reviewsCountError,
   } = usePersonalReviewsCount(profileUserId);
   const reviewsCount = reviewsCountData ?? 0;
-  const ratedCountState: 'ok' | 'loading' | 'error' =
-    reviewsCountError ? 'error' : !profileUserId || !reviewsCountFetched ? 'loading' : 'ok';
   const { data: achievements, isLoading: achievementsLoading } = useProfileAchievements(profileUserId);
 
   // Two-flag model:
@@ -1066,10 +1064,6 @@ const ProfilePageV2Content: React.FC = () => {
             showCompareEntry={canCompareInPlace}
             hideConnectPrompt={!!profile.hide_handicap_chip}
             indexValue={resolvedHcp.value ?? null}
-            roundsCount={shellRoundsCount}
-            roundsCountState={isSelf ? shellRoundsState : 'ok'}
-            ratedCount={reviewsCountFetched && !reviewsCountError ? reviewsCount : null}
-            ratedCountState={ratedCountState}
             friendsCount={isPersonal ? friendsCount : null}
             followersCount={followersCount}
             socialCountState={socialCountState}

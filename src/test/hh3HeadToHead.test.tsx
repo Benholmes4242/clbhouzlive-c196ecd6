@@ -100,7 +100,7 @@ describe('HH3 entry row', () => {
   it('sits under the index chart and above Form · last five', () => {
     const t = ((_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '') as unknown as React.ComponentProps<typeof HeroHandicapDisplay>['t'];
     const { container } = render(<HeroHandicapDisplay
-      t={t} shownIndex={5.6} deltaLines={[]} slot={null} verdict={null} series={[5, 5.6]} chartColor="currentColor" chartFillTop={0.28}
+      t={t} shownIndex={5.6} deltaLines={[]} slot={null} verdict={null} series={[{ value: 5, observed_at: '2026-01-01' }, { value: 5.6, observed_at: new Date().toISOString() }]} chartColor="currentColor" chartFillTop={0.28}
       axisWindow="90 days" windowDays={90} bars={[{ id: 's1', value: 2 }] as React.ComponentProps<typeof HeroHandicapDisplay>['bars']}
       byId={new Map()} countingKnown={false} countingN={0} loweredN={0} tilesWord="one" isSelf={false}
       onStatTap={() => {}} tap={() => () => {}} afterChart={<div data-testid="entry" />}

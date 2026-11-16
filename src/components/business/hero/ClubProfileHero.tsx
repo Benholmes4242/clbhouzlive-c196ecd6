@@ -13,11 +13,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Share, MoreHorizontal, Plus, MessageCircle, Pencil, ArrowUpRight } from 'lucide-react';
 import { getInitialsFromName, avatarFallbackFill, AVATAR_FALLBACK_INK } from '@/lib/avatarFallback';
-import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
-import { ContourCover } from '@/components/profile/hero/ContourCover';
+import { FallbackCover } from '@/components/profile/hero/FallbackCover';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 
 const CANVAS = '#0B0B0D';
@@ -124,7 +124,7 @@ interface Props {
 const pill = (kind: 'white' | 'glass'): React.CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', gap: 7, height: 38, padding: '0 16px',
   borderRadius: 999, fontSize: 14.5, fontWeight: 600, whiteSpace: 'nowrap', flex: 'none',
-  fontFamily: SANS, cursor: 'pointer',
+  fontFamily: 'inherit', cursor: 'pointer',
   ...(kind === 'white'
     ? { background: INK, color: CANVAS, border: 'none' }
     : { background: GLASS_BG, border: GLASS_BORDER, color: INK }),
@@ -189,8 +189,8 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
           </>
         );
         const style: React.CSSProperties = placement === 'beside'
-          ? { textAlign: 'center', background: 'none', border: 0, padding: 0, minHeight: 38, display: 'flex', flexDirection: 'column', justifyContent: 'center', color: INK, fontFamily: SANS }
-          : { textAlign: 'left', background: 'none', border: 0, padding: 0, color: INK, fontFamily: SANS };
+          ? { textAlign: 'center', background: 'none', border: 0, padding: 0, minHeight: 38, display: 'flex', flexDirection: 'column', justifyContent: 'center', color: INK, fontFamily: 'inherit' }
+          : { textAlign: 'left', background: 'none', border: 0, padding: 0, color: INK, fontFamily: 'inherit' };
         return c.onTap ? (
           <button key={c.key} type="button" data-cell={c.key} style={style} onClick={c.onTap}>{body}</button>
         ) : (
@@ -211,7 +211,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
   }, [p.about]);
 
   return (
-    <section data-club-hero="" style={{ background: CANVAS, fontFamily: SANS, color: INK }}>
+    <section data-club-hero="" style={{ background: CANVAS, fontFamily: 'inherit', color: INK }}>
       <div
         data-club-cover=""
         style={{
@@ -225,7 +225,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         {p.coverUrl ? (
           <img src={p.coverUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <ContourCover />
+          <FallbackCover />
         )}
         <PhotoBandFade canvas={CANVAS} />
 
@@ -357,7 +357,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
               type="button"
               data-club-about-toggle=""
               onClick={() => setExpanded((v) => !v)}
-              style={{ padding: '6px 18px 0', minHeight: 36, background: 'none', border: 'none', fontSize: 14, fontWeight: 600, color: INK, display: 'flex', alignItems: 'center', fontFamily: SANS }}
+              style={{ padding: '6px 18px 0', minHeight: 36, background: 'none', border: 'none', fontSize: 14, fontWeight: 600, color: INK, display: 'flex', alignItems: 'center', fontFamily: 'inherit' }}
             >
               {expanded ? t('business.clubHero.aboutLess', 'Less') : t('business.clubHero.aboutMore', 'More')}
             </button>

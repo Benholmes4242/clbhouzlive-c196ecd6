@@ -4,6 +4,11 @@
  */
 
 :root {
+  --profile-fallback-cover-gradient: linear-gradient(180deg, #1C2A22 0%, #131B16 58%, #0A0A0C 100%);
+  --profile-form-ink: #F8FAFC;
+  --profile-form-dim: rgba(248,250,252,0.42);
+  --profile-form-green: #34D77F;
+  --profile-form-dot-stroke: #0A0A0C;
   --comment-send-bg: #FFFFFF;
   --comment-send-ink: #0A0A0C;
   --course-list-view-border: rgba(255,255,255,0.1);

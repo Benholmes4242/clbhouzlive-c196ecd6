@@ -24,21 +24,17 @@
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCourses';
-import { useTopTenReactions, REACTION_CONFIG, type ReactionType } from '@/hooks/useTopTenReactions';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
-import { commentsKeys, viewerId as commentsViewerKey } from '@/lib/queryKeys';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenShareSheet';
-import { MessageCircle } from 'lucide-react';
 import { numberWord } from '@/lib/text/numbers';
 // Used by the owner progress invitation (unchanged), not by any header copy.
 const Word = (n: number) => numberWord(n);
@@ -51,7 +47,6 @@ const PILL_KICKER = 'rgba(255,255,255,0.7)';
 const CAPTION_SUB = 'rgba(255,255,255,0.74)';
 const SLOT_DASH = 'rgba(248,250,252,0.26)';
 const SLOT_NEXT = 'rgba(248,250,252,0.55)';
-const PRESSED_BORDER = 'rgba(247,147,30,0.55)';
 
 /**
  * Every real rating uses INK. Missing ratings retain the row's DIM treatment.
@@ -146,7 +141,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const { topTen: rawTopTen, isLoading } = useUserTopTenCourses(userId);
   const [commentsOpen, setCommentsOpen] = React.useState(false);
   const [commentsCourseId, setCommentsCourseId] = React.useState<string | null>(initialCourseId);
@@ -213,48 +207,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     },
   });
 
-  const firstCourseId = topTen[0]?.course_id ?? '';
-  const stripOn = topTen.length >= 3;
-  const { counts, myReaction, toggleReaction } = useTopTenReactions(stripOn ? userId : '', firstCourseId);
-  /*
-   * NEAR COUNT, ON PURPOSE. One head count against comments_v2 instead of the
-   * full thread loader (which refetches on every mount). Replies are included.
-   * Hidden comments (from the cache the sheet already filled — no new query) and
-   * blocked authors (shared blocked-ids cache) are excluded using the sheet's own
-   * columns: user_id, and actor_id for non-business actors.
-   * DELIBERATELY NOT DONE: a reply whose PARENT is hidden or blocked still counts,
-   * because a flat count cannot see a reply's parent. The strip can read one or
-   * two higher than the sheet for such a viewer, and that is accepted — the
-   * strip is a doorway label, not a promise about the thread. Do not "fix" this.
-   */
-  const blockedIds = useBlockedUserIds(viewerId ?? null);
-  const hiddenIds = qc.getQueryData<Set<string>>(commentsKeys.hidden(commentsViewerKey(viewerId)));
-  const hiddenList = hiddenIds ? [...hiddenIds] : [];
-  const blockedList = [...blockedIds];
-  const { data: visibleCount = 0, isFetched: threadFetched } = useQuery({
-    queryKey: ['top-ten-comment-near-count', userId, firstCourseId, hiddenList.sort().join(','), blockedList.sort().join(',')],
-    enabled: stripOn && !!firstCourseId,
-    staleTime: 60_000,
-    queryFn: async () => {
-      let q = supabase
-        .from('comments_v2')
-        .select('id', { count: 'exact', head: true })
-        .eq('target_type', 'top_ten')
-        .eq('target_id', userId)
-        .eq('target_secondary_id', firstCourseId);
-      if (hiddenList.length) q = q.not('id', 'in', `(${hiddenList.join(',')})`);
-      if (blockedList.length) {
-        const ids = blockedList.join(',');
-        q = q
-          .not('user_id', 'in', `(${ids})`)
-          .or(`actor_type.eq.business,actor_id.is.null,actor_id.not.in.(${ids})`);
-      }
-      const { count, error } = await q;
-      if (error) throw error;
-      return count ?? 0;
-    },
-  });
-
   if (isLoading) return null;
   if (visibilityLoading && !isOwnProfile) return null;
   if (!isOwnProfile && !canView) return null;
@@ -281,11 +233,11 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       ? t('topTen.lineOther', { name: ownerName.trim(), defaultValue: "{{name}}'s top ten rated golf courses." })
       : t('topTen.lineOtherFallback', 'Their top ten rated golf courses.');
   const header = (
-    <div style={{ fontFamily: SANS }}>
+    <div style={{ fontFamily: 'inherit' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
         <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>{t('topTen.kicker', 'Top 10')}</span>
         {isOwnProfile && onManage && n > 0 && (
-          <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
+          <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: 'inherit', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
             {t('topTen.manage', 'Manage')}
           </button>
         )}
@@ -308,7 +260,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     );
   };
 
-  const btnReset: React.CSSProperties = { background: 'transparent', border: 'none', padding: 0, textAlign: 'left', fontFamily: SANS, cursor: 'pointer', display: 'block', width: '100%' };
+  const btnReset: React.CSSProperties = { background: 'transparent', border: 'none', padding: 0, textAlign: 'left', fontFamily: 'inherit', cursor: 'pointer', display: 'block', width: '100%' };
 
   // ── Full / partial list (3+) ──────────────────────────────────────────
   const renderList = () => {
@@ -328,39 +280,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             </div>
           </CourseImageFallback>
         </button>
-
-        {/* Reaction strip — belongs to the number-one pick, sits directly under it. */}
-        <div style={{ marginTop: 9, padding: '9px 11px', background: 'rgba(255,255,255,0.045)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap' }}>{isOwnProfile ? t('topTen.onYourNumberOne', 'Your number one') : t('topTen.onTheirNumberOne', 'Their number one')}</span>
-          {(Object.keys(REACTION_CONFIG) as ReactionType[]).map((k) => {
-            const pressed = myReaction === k;
-            const pressable = !isOwnProfile && !!viewerId;
-            return (
-              <button
-                key={k}
-                type="button"
-                aria-label={REACTION_CONFIG[k].label}
-                aria-pressed={pressable ? pressed : undefined}
-                disabled={!pressable}
-                onClick={pressable ? () => toggleReaction(k) : undefined}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 999, border: `1px solid ${pressed ? PRESSED_BORDER : A.HAIRLINE}`, background: 'transparent', fontFamily: SANS, cursor: pressable ? 'pointer' : 'default', opacity: 1 }}
-              >
-                <span style={{ fontSize: 12 }}>{REACTION_CONFIG[k].emoji}</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: pressed ? A.AMBER : A.MUTE, ...FIGS }}>{counts[k] ?? 0}</span>
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            aria-label={t('topTen.commentsLabel', 'Comments')}
-            onClick={() => { setCommentsCourseId(firstCourseId); setCommentsOpen(true); }}
-            style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, color: A.MUTE, cursor: 'pointer' }}
-          >
-            {/* Same icon as FeedCard / FeedActionRail. A zero still renders — it is the way in. */}
-            <MessageCircle size={17} stroke="currentColor" strokeWidth={2} fill="none" />
-            <span style={{ fontSize: 12, fontWeight: 700, color: A.MUTE, ...FIGS }}>{threadFetched ? visibleCount : 0}</span>
-          </button>
-        </div>
 
         {/* minmax(0, 1fr) + minWidth 0 on each tile: a 1fr track will not shrink below
             min-content, and the nowrap region line used to widen column 2 and push
@@ -418,7 +337,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
               {t('topTen.progress.lede', { count: n, word: Word(n), left: Word(10 - n), defaultValue: '{{word}} down. {{left}} to go.' })}
             </div>
             <button type="button" onClick={() => onAddCourse?.()}
-              style={{ marginTop: 11, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: SANS, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ marginTop: 11, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
               {t('topTen.progress.cta', { next: n + 1, defaultValue: 'Add your number {{next}}' })}
             </button>
           </div>
@@ -455,7 +374,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           })}
         </div>
         <button type="button" onClick={() => onAddCourse?.()}
-          style={{ marginTop: 16, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: SANS, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+          style={{ marginTop: 16, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
           {n === 0 ? t('topTen.empty.cta', 'Start with your number one') : t('topTen.progress.cta', { next, defaultValue: 'Add your number {{next}}' })}
         </button>
       </>
@@ -475,7 +394,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: A.DIM, lineHeight: 1.4 }}>{t('topTen.share.body', 'A card for Instagram, WhatsApp or the group chat.')}</div>
         </div>
         <button type="button" onClick={() => setShareOpen(true)}
-          style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 12, padding: '9px 14px', fontFamily: SANS, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+          style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 12, padding: '9px 14px', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
           {t('topTen.share.cta', 'Create')}
         </button>
       </div>
@@ -491,7 +410,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   );
 
   return (
-    <section style={{ marginTop: 16, marginBottom: 8, padding: '0 16px 4px', fontFamily: SANS }}>
+    <section style={{ marginTop: 16, marginBottom: 8, padding: '0 16px 4px', fontFamily: 'inherit' }}>
       {header}
       {n >= 3 ? <>{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
 

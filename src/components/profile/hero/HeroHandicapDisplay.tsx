@@ -8,20 +8,23 @@
 import React from 'react';
 import type { TFunction } from 'i18next';
 import type { NavigateFunction } from 'react-router-dom';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { formBarLowered, fmtSigned, type FormBar } from '@/features/profile-sheet-v2/sheetState';
 import type { ProfileRound } from '@/components/profile/rounds/useProfileRounds';
 import { numberWord } from '@/lib/text/numbers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { Button } from '@/components/ui/button';
+import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
+import { indexLine, type HeroIndexPoint } from './indexLine';
+import './profile-form.css';
 import { W_40 } from './HeroShell';
 const GREEN = INDEX_DELTA.dark.improved;
 const RED = INDEX_DELTA.dark.drifted;
 const AXIS_INK = 'rgba(248,250,252,0.30)';
 const LOW_LINE = 'rgba(255,255,255,0.14)';
 const MARKER_HALO = '0 0 0 3px rgba(10,10,12,0.9)';
-const TILE_GROUND = 'rgba(255,255,255,0.02)';
 const KICK: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM };
 const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' };
 
@@ -29,19 +32,14 @@ const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpaci
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
-const IndexChart: React.FC<{ points: number[]; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap, tabIndex, example }) => {
+const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap?: () => void; tabIndex?: number; example?: boolean }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap, tabIndex, example, bars = [] }) => {
   const gid = React.useId().replace(/:/g, '');
-  if (points.length < 2) return null;
-  const min = Math.min(...points);
-  const max = Math.max(...points);
-  const span = max - min;
-  const yOf = (v: number) => (span === 0 ? 8 : 8 + ((max - v) / span) * 42);
-  const n = points.length;
-  const d = points.map((p, i) => `${((i / (n - 1)) * 361).toFixed(1)},${yOf(p).toFixed(1)}`).join(' ');
-  const lowY = yOf(min);
-  const lastY = yOf(points[n - 1]);
+  const line = indexLine(points);
+  if (!line) return null;
+  const { lowY, lastY } = line;
+  const d = line.coords.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
   return (
-    <button type="button" data-example-chart={example ? '' : undefined} onClick={onTap} tabIndex={tabIndex} style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: SANS }}>
+    <button type="button" data-example-chart={example ? '' : undefined} onClick={onTap} tabIndex={tabIndex} style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
       <div style={{ marginTop: 12, height: 64, position: 'relative' }}>
         <svg width="100%" height={64} viewBox="0 0 361 64" preserveAspectRatio="none" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
           <defs>
@@ -53,6 +51,7 @@ const IndexChart: React.FC<{ points: number[]; color: string; fillTop: number; a
           <polygon points={`0,64 ${d} 361,64`} fill={`url(#hcpfill-${gid})`} stroke="none" />
           <line x1={0} y1={lowY} x2={361} y2={lowY} stroke={LOW_LINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
           <polyline points={d} fill="none" stroke={color} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          {bars.map(bar => { const point = line.at(bar.date); return point ? <circle key={bar.id} data-form-round-dot={bar.id} cx={point.x} cy={point.y} r={4} fill={formBarLowered(bar) ? GREEN : A.INK} stroke="var(--profile-form-dot-stroke)" strokeWidth={2} /> : null; })}
         </svg>
         <span style={{ position: 'absolute', left: 0, top: lowY, transform: 'translateY(-50%)', ...MICRO, color: A.DIM, background: A.CANVAS, paddingRight: 6, ...FIGS }}>
           {lowLabel}
@@ -72,7 +71,7 @@ interface Props {
   deltaLines: Array<{ key: string; delta: number; direction: 'down' | 'up' | 'flat'; window: string }>;
   slot: { value: string; label: string; color: string } | null;
   verdict: React.ReactNode;
-  series: number[];
+  series: HeroIndexPoint[];
   chartColor: string;
   chartFillTop: number;
   axisWindow: string;
@@ -108,7 +107,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
               <>
                 <div data-ghost-label={example ? '' : undefined} style={KICK}>{t('hero.handicapIndex', 'Handicap index')}</div>
                 <div style={{ marginTop: 5, display: 'flex', alignItems: 'flex-end', gap: 14 }}>
-                  <button type="button" data-example-index={example ? '' : undefined} onClick={example ? undefined : tap('index')} tabIndex={example ? -1 : undefined} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 46, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.92, color: A.INK, ...FIGS }}>
+                  <button type="button" data-example-index={example ? '' : undefined} onClick={example ? undefined : tap('index')} tabIndex={example ? -1 : undefined} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 46, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.92, color: A.INK, ...FIGS }}>
                     {formatIndex(shownIndex)}
                   </button>
                   {deltaLines.length > 0 && (
@@ -147,9 +146,10 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
               <IndexChart
                 example={example}
                 points={series}
+                bars={bars}
                 color={chartColor}
                 fillTop={chartFillTop}
-                lowLabel={t('hero.low', { value: formatIndex(Math.min(...series)), defaultValue: `Low ${formatIndex(Math.min(...series))}` })}
+                lowLabel={t('hero.low', { value: formatIndex(Math.min(...series.map(p => p.value))), defaultValue: `Low ${formatIndex(Math.min(...series.map(p => p.value)))}` })}
                 axisLeft={t('hero.windowAgo', { window: axisWindow, defaultValue: `${axisWindow} ago` })}
                 axisRight={t('hero.today', 'Today')}
                 tabIndex={example ? -1 : undefined}
@@ -164,50 +164,20 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
 
             {bars.length > 0 && (
               <>
-                <div style={{ marginTop: 18 }}>
-                  <span data-ghost-label={example ? '' : undefined} style={KICK}>{t('hero.formLastFive', 'Form \u00B7 last five')}</span>
+                <div style={{ marginTop: 16 }}>
+                  <span data-ghost-label={example ? '' : undefined} style={KICK}>LAST FIVE ROUNDS</span>
                 </div>
-                <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                  {bars.map((bar, i) => {
+                <div className="profile-form-rail">
+                  {[...bars].reverse().map((bar, i) => {
                     const r = byId.get(bar.id);
-                    const fig = fmtSigned(bar.value);
-                    const hasSign = fig.startsWith('+') || fig.startsWith('\u2212');
-                    return (
-                      <button
-                        key={bar.id}
-                        data-example-form-tile={example ? '' : undefined}
-                        type="button"
-                        tabIndex={example ? -1 : undefined}
-                        onClick={example ? undefined : () => {
-                          analyticsEvents.track('profile_form_tile_tap', { whs_score_id: bar.id, position: i + 1 });
-                          onOpenRound?.(bar.id);
-                        }}
-                        style={{
-                          minWidth: 0,
-                          border: `1px solid ${A.SOFT}`,
-                          background: TILE_GROUND,
-                          borderRadius: 11,
-                          padding: '8px 5px 7px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          fontFamily: SANS,
-                        }}
-                      >
-                        <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: A.INK, ...FIGS }}>
-                          {r?.gross_score ?? '\u00A0'}
-                        </div>
-                        <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, textAlign: 'center', color: formBarLowered(bar) ? GREEN : A.DIM, ...FIGS }}>
-                          {/* The sign hangs outside the centring so the digits sit under the gross. */}
-                          <span style={{ position: 'relative', display: 'inline-block' }}>
-                            {hasSign && <span style={{ position: 'absolute', right: '100%', marginRight: 0.5 }}>{fig[0]}</span>}
-                            {hasSign ? fig.slice(1) : fig}
-                          </span>
-                        </div>
-                        <div style={{ marginTop: 5, fontSize: 7, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: AXIS_INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {r?.course_name ?? '\u00A0'}
-                        </div>
-                      </button>
-                    );
+                    const date = new Date(bar.date);
+                    const dateText = Number.isFinite(date.getTime()) ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(date.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) }) : '';
+                    return <Button key={bar.id} variant="ghost" className="profile-form-round" data-form-round={bar.id} data-lowered={formBarLowered(bar)} data-example-form-tile={example ? '' : undefined} tabIndex={example ? -1 : undefined}
+                      onClick={example ? undefined : () => { analyticsEvents.track('profile_form_tile_tap', { whs_score_id: bar.id, position: i + 1 }); onOpenRound?.(bar.id); }}>
+                      <span className="profile-form-top"><i className="profile-form-dot" aria-hidden /><b className="profile-form-gross" style={FIGS}>{r?.gross_score ?? '\u00A0'}</b><span className="profile-form-figure" style={FIGS}>{fmtSigned(bar.value)}</span></span>
+                      <span className="profile-form-course">{shortCoursePart(r?.course_name ?? '')}</span>
+                      <span className="profile-form-date">{dateText}</span>
+                    </Button>;
                   })}
                 </div>
                 {/*
@@ -222,7 +192,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                   marker to these tiles.
                 */}
                 {(countingKnown || loweredN > 0) && (
-                  <div style={{ marginTop: 10, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
+                  <div style={{ marginTop: 12, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
                     {countingKnown && (
                       <>
                         {countingN === 0 ? (
