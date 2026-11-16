@@ -56,8 +56,6 @@ function renderHero(p: { isSelf?: boolean; hideConnectPrompt?: boolean; indexVal
         isSelf={p.isSelf ?? true}
         hideConnectPrompt={p.hideConnectPrompt}
         indexValue={p.indexValue ?? null}
-        roundsCount={null}
-        ratedCount={null}
         onStatTap={() => {}}
         onConnect={() => {}}
       />

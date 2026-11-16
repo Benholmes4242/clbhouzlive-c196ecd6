@@ -22,7 +22,7 @@ vi.mock('@/features/pro-verification/useMyProStatus', () => ({ useMyProStatus: (
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
 import ProfileRoundsTab from '@/components/profile/rounds/ProfileRoundsTab';
 function Path() { const l = useLocation(); return <output data-testid="path">{l.pathname}</output>; }
-function hero(own = true) { return render(<MemoryRouter><ProfileHero userId="member" displayName="Member" isSelf={own} indexValue={null} roundsCount={0} ratedCount={0} onStatTap={f.stat} /><Path /></MemoryRouter>); }
+function hero(own = true) { return render(<MemoryRouter><ProfileHero userId="member" displayName="Member" isSelf={own} indexValue={null} onStatTap={f.stat} /><Path /></MemoryRouter>); }
 beforeEach(() => { f.linked = true; f.connected = false; f.settled = true; f.stat.mockClear(); });
 describe('linked owner profile', () => {
   it('replaces the example and connect panel with the provider management notice', () => { const r = hero(); expect(r.container.querySelector('[data-linked-handicap-notice]')).not.toBeNull(); expect(r.container.querySelector('[data-example-pill]')).toBeNull(); expect(r.container.querySelector('[data-example-chart]')).toBeNull(); expect(screen.queryByTestId('hero-connect-panel')).toBeNull(); fireEvent.click(screen.getByRole('button', { name: 'England Golf ›' })); expect(screen.getByTestId('path')).toHaveTextContent('/manage/handicap'); });

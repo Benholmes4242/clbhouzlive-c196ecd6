@@ -65,8 +65,6 @@ function renderHero({
         displayName="Alex Doe"
         isSelf
         indexValue={null}
-        roundsCount={null}
-        ratedCount={null}
         onStatTap={() => {}}
         bio={bio}
         bioRef={bioRef}

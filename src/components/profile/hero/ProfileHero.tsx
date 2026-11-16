@@ -2,8 +2,8 @@
  * ProfileHero — BRIEF_PROFILE_TOP_REBUILD.
  *
  * The personal profile top: the content-sized ProfileCoverBand, then ON CANVAS the
- * bio + meta row, the index block, the index chart, the form strip and the
- * counter strip. HeroShell is NOT used here any more — it stays as the
+ * bio + meta row, the index block, the index chart and the form rail.
+ * HeroShell is NOT used here any more — it stays as the
  * business profile's hero, untouched.
  *
  * Every figure reuses a hook the page (or another tab) already mounts:
@@ -75,11 +75,6 @@ interface Props {
   hideConnectPrompt?: boolean;
   /** Resolved index (resolveDisplayHandicap) as the page already resolves it. */
   indexValue: number | null;
-  /** PLAIN ROUND TOTAL — see useMemberRoundTotal. Owner-only by construction. */
-  roundsCount?: number | null;
-  ratedCount?: number | null;
-  roundsCountState?: 'ok' | 'loading' | 'error';
-  ratedCountState?: 'ok' | 'loading' | 'error';
   friendsCount?: number | null;
   followersCount?: number | null;
   /** Viewer-scoped mutual count when an existing source supplies it; omitted otherwise. */

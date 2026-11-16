@@ -51,8 +51,11 @@ const IndexChart: React.FC<{ points: HeroIndexPoint[]; bars?: FormBar[]; color: 
           <polygon points={`0,64 ${d} 361,64`} fill={`url(#hcpfill-${gid})`} stroke="none" />
           <line x1={0} y1={lowY} x2={361} y2={lowY} stroke={LOW_LINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
           <polyline points={d} fill="none" stroke={color} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          {bars.map(bar => { const point = line.at(bar.date); return point ? <circle key={bar.id} data-form-round-dot={bar.id} cx={point.x} cy={point.y} r={4} fill={formBarLowered(bar) ? GREEN : A.INK} stroke="var(--profile-form-dot-stroke)" strokeWidth={2} /> : null; })}
         </svg>
+        {bars.map(bar => {
+          const point = line.at(bar.date);
+          return point ? <span key={bar.id} aria-hidden data-form-round-dot={bar.id} data-lowered={formBarLowered(bar)} className="profile-index-round-dot" style={{ left: `${point.x / 361 * 100}%`, top: point.y }} /> : null;
+        })}
         <span style={{ position: 'absolute', left: 0, top: lowY, transform: 'translateY(-50%)', ...MICRO, color: A.DIM, background: A.CANVAS, paddingRight: 6, ...FIGS }}>
           {lowLabel}
         </span>
@@ -165,7 +168,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
             {bars.length > 0 && (
               <>
                 <div style={{ marginTop: 16 }}>
-                  <span data-ghost-label={example ? '' : undefined} style={KICK}>LAST FIVE ROUNDS</span>
+                  <span data-ghost-label={example ? '' : undefined} style={KICK}>{t('hero.lastFiveRounds', 'Last five rounds')}</span>
                 </div>
                 <div className="profile-form-rail">
                   {[...bars].reverse().map((bar, i) => {

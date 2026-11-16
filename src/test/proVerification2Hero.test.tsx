@@ -21,7 +21,7 @@ afterEach(cleanup);
 const base: ProMember = { user_id: 'pro', pro_kind: 'tour_pro', pro_tour: 'DP World Tour', pro_tour_code: 'euro', pro_club: null, pro_player_id: 'p' };
 describe('Brief 2 professional hero figures', () => {
   it.each(['tour_pro', 'teaching_pro'] as const)('%s replaces index and connect content with the professional descriptor', kind => {
-    const { container } = render(<MemoryRouter><ProfileHero userId="pro" displayName="Member" isSelf proMember={{ ...base, pro_kind: kind, pro_club: 'Club' }} indexValue={4.2} roundsCount={null} ratedCount={null} onStatTap={() => {}} /></MemoryRouter>);
+    const { container } = render(<MemoryRouter><ProfileHero userId="pro" displayName="Member" isSelf proMember={{ ...base, pro_kind: kind, pro_club: 'Club' }} indexValue={4.2} onStatTap={() => {}} /></MemoryRouter>);
     expect(container.querySelector('.pro-hero-descriptor')).not.toBeNull();
     expect(container.querySelector('.pro-label')?.getAttribute('data-size')).toBe('large');
     expect(container.querySelectorAll('[data-example-index], [data-testid="hero-connect-panel"]')).toHaveLength(0);

@@ -31,7 +31,7 @@ const pro: ProMember = { user_id: 'pro', pro_kind: 'tour_pro', pro_tour: 'Tour',
 function Hero({ index = -2.1, professional = false }: { index?: number | null; professional?: boolean }) {
   const [, setSearchParams] = useSearchParams();
   const location = useLocation();
-  return <><ProfileHero userId="lewy" displayName="Lewy Hayward" isSelf={false} indexValue={index} roundsCount={null} ratedCount={null} proMember={professional ? pro : null} onStatTap={() => {}} onOpenRanking={() => setSearchParams({ tab: 'ranking' })} /><output data-testid="search">{location.search}</output></>;
+  return <><ProfileHero userId="lewy" displayName="Lewy Hayward" isSelf={false} indexValue={index} proMember={professional ? pro : null} onStatTap={() => {}} onOpenRanking={() => setSearchParams({ tab: 'ranking' })} /><output data-testid="search">{location.search}</output></>;
 }
 function mount(props: React.ComponentProps<typeof Hero> = {}) { return render(<MemoryRouter><Hero {...props} /></MemoryRouter>); }
 const line = () => screen.queryByRole('button', { name: 'World amateur ranking 318. Open the Ranking tab' });

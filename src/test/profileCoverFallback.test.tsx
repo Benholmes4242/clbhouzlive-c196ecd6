@@ -115,8 +115,6 @@ const renderHero = (over: Record<string, unknown> = {}) => {
           displayName="Alex Doe"
           isSelf
           indexValue={null}
-          roundsCount={null}
-          ratedCount={null}
           onStatTap={() => {}}
           onConnect={() => {}}
           {...over}

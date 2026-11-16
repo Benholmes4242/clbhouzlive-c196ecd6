@@ -42,7 +42,7 @@ import { HeroHandicapDisplay } from '@/components/profile/hero/HeroHandicapDispl
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 function hero(p: { hideConnectPrompt?: boolean; isSelf?: boolean; indexValue?: number } = {}) {
-  return <MemoryRouter><ProfileHero userId="u1" viewerUserId="u1" displayName="Alex Doe" isSelf={p.isSelf ?? true} hideConnectPrompt={p.hideConnectPrompt} indexValue={p.indexValue ?? 41.9} roundsCount={null} ratedCount={null} onStatTap={() => {}} /></MemoryRouter>;
+  return <MemoryRouter><ProfileHero userId="u1" viewerUserId="u1" displayName="Alex Doe" isSelf={p.isSelf ?? true} hideConnectPrompt={p.hideConnectPrompt} indexValue={p.indexValue ?? 41.9} onStatTap={() => {}} /></MemoryRouter>;
 }
 const panel = () => screen.queryByTestId('hero-connect-panel');
 const english = createInstance();

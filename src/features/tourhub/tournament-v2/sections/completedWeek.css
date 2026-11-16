@@ -32,7 +32,7 @@
 .cw-lr .cw-n{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cw-lr .cw-r{text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .cw-lr .cw-v{text-align:right;font-variant-numeric:tabular-nums}
-.cw-more{width:100%;height:auto;border:0;border-radius:0;background:none;text-align:left;font-family:inherit}.cw-more .cw-n{color:var(--cw-mute)}.cw-more .cw-v{font-size:16px;color:var(--cw-ink)}
+.cw-block .cw-more{display:grid;width:100%;height:auto;border:0;border-radius:0;background:none;text-align:left;font-family:inherit;justify-content:stretch}.cw-more .cw-n{color:var(--cw-mute)}.cw-more .cw-v{font-size:16px;color:var(--cw-ink)}
 @media(max-width:340px){:root{--hero-label-tracking:.04em;--hero-cell-pad:0 1px}.cw-block{--cw-side:16px}}
 .tv-section[data-tv-section="completed-week"]{padding:0}
 /* PLAYOFF reads in ink, as the signed-off champion block. */

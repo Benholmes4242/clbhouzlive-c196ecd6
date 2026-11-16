@@ -1,5 +1,6 @@
 {
   "hero": {
+    "lastFiveRounds": "Last five rounds",
     "addCover": "+ Add a cover",
     "linkedNoIndex": "You're connected. Your rounds will start arriving once {{provider}} gives you an official handicap.",
     "linkedNoIndexNext": "Not got one yet? Keep submitting scores and they'll show here soon after it arrives.",

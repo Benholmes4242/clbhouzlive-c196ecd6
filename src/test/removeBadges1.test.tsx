@@ -26,7 +26,7 @@ import type { ActivityFeedRowV2 } from '@/features/activity-v2/hooks/useActivity
 
 beforeEach(() => { f.linked = false; f.connected = false; f.settled = true; f.stat.mockClear(); cleanup(); });
 function heroStats(isSelf: boolean, pro = false) {
-  const r = render(<MemoryRouter><ProfileHero userId="member" displayName="Member" isSelf={isSelf} indexValue={null} roundsCount={4} ratedCount={2} onStatTap={f.stat} proMember={pro ? { user_id: 'member', pro_kind: 'tour_pro' } as any : null} /></MemoryRouter>);
+  const r = render(<MemoryRouter><ProfileHero userId="member" displayName="Member" isSelf={isSelf} indexValue={null} onStatTap={f.stat} proMember={pro ? { user_id: 'member', pro_kind: 'tour_pro' } as any : null} /></MemoryRouter>);
   r.container.querySelectorAll('button').forEach(b => fireEvent.click(b));
   return f.stat.mock.calls.map(c => c[0]);
 }

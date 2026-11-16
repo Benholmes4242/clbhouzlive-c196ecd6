@@ -2,9 +2,8 @@
  * ProfileTopTenRail - BRIEF_PROFILE_TOP_TEN_REBUILD (mock: top-ten-final.html).
  *
  * A member's top ten drawn as a RANKING, not a shelf: a kicker and one sentence, number
- * one as a 186px photograph, two and three side by side at 104px, a reaction
- * strip beneath the number-one card (scoped to the position-1 course, because
- * useTopTenReactions is keyed by course), then positions four to ten as rows
+ * one as a 186px photograph, two and three side by side at 104px,
+ * then positions four to ten as rows
  * carrying our clbhouz rank beside the member's own score.
  *
  * The empty, partial and full states are ONE component. Everything that is

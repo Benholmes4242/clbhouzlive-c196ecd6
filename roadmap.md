@@ -1,11 +1,17 @@
 # Roadmap
 
+## Stopped: Profile rail follow-up
+- Replace stretched SVG dots with fixed 8px HTML markers below the end dot.
+- Add missing date/interpolation, round markers, rail/taps, comment-link, counters and cover regressions.
+- Localise the heading; remove obsolete hero counter props/callers without deleting share figures.
+- STOP: profileRailFollowup.test.tsx:104:36 / :127:99 / :159:109 (four new assertion failures); 82/86 passed. Expected inventory 8,991 (+13), full suite and width checks pending authorisation. Report: .lovable/reports/profile-rail-followup-stop.md.
+
 ## In progress: Tour finished week
 - Shared cumulative champion/next-two chart and collision-free labels; keep hole-type row.
 - Inline full-board row and four week figures.
 - Shared DP World/Korn Ferry picks gate across tournament entry points/readers and records; completed viewer card absent.
 - Spread recap columns; inherit touched Tour fonts.
-- Verify 320/375/430, authorised tests and four separate full-suite shards from 8,954; report and commit.
+- Four shards passed 8,978 (2,284 / 2,196 / 2,237 / 2,261), +24 from 8,954; 777 files. Actual-component chart/recap widths checked. More-row misalignment specificity fix awaits visual verification after the profile stop. Production authenticated checks unavailable.
 
 ## Complete: Authorised profile rail test correction
 - Replace contour fallback in member/business covers; preserve photo layers.
