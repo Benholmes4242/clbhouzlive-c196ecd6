@@ -1,9 +1,9 @@
 # Roadmap
 
-## Latest holes Option A closeout
+## Complete: Latest holes Option A closeout
 - Append the committed Option A changes, exact −16/+4 test reconciliation and unchanged course-name audit.
 - Correct shared ordinal suffixes while retaining holes 1–18; run focused tests and four separate full-suite shards.
-- Check the longest live rail course name at 430px without page overflow; leave chipForLens unchanged.
+- Verified longest live rail name at 430px: all page widths 430, no overflow. chipForLens unchanged. Focused 62/62; shards 2,268 / 2,158 / 2,229 / 2,239 = 8,894. Report appended.
 
 ## Complete: Admin side menu v3
 - Match the signed-off drawer, share Do now totals, preserve open-only full-admin reads and search behaviour.

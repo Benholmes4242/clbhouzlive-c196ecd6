@@ -143,3 +143,214 @@ first, then signs it, at the stat chip's one decimal" (`:143`), asserting
 '+2.0'` and the round-to-par cases. Two existing pill assertions updated for one
 decimal (`:213-214`, `:245-248`). No test deleted, and no test in another file touched.
 Commits: report 2's work `c24bc64a38`; this closeout `8771d99b96`.
+
+
+---
+
+## BRIEF_LATEST_HOLES_OPTION_A + CLOSEOUT — 16 Nov 2026
+
+### Committed Option A work
+Option A was already committed as **63beb8ca0b**. Latest holes now shows the uppercase
+amber hole-word kicker, the unchanged two-line course name, sentence-case
+`Par 3 · 175 yards`, and the unchanged byline. The numeral, PAR/YDS block and entire
+Plays pill are removed. Existing tile geometry, photographs, scrims and video duration
+remain. The sole application ranks consumer was LatestHolesSection; its ranks read,
+query key, batching, stale time and ranks readiness dependency were removed together
+with holePlays. Generated RPC types are not a consumer.
+
+ImmersiveFullscreenChrome removes the course-name/location/record block only from the
+synthetic member-shot top bar, retaining the chevron and clbhouz rating chip. Its
+bottom caption/title remains unchanged; ordinary real-post headers remain unchanged.
+
+### Exact Option A inventory reconciliation
+**8,899 − 16 + 4 = 8,887**, exact, not approximate. Historical passing shards were
+**2,268 / 2,158 / 2,229 / 2,232**. This corrects the earlier approximate wording.
+The 16 removals all belong to `src/test/coursesMembersSections.test.tsx`.
+Each removed case and its original assertions are quoted below. The reason for every
+removal is the explicitly authorised retirement of the Plays pill and its ranks read;
+reviewer-strip tests remain.
+
+- **rounds the average first, then signs it, at the stat chip\'s one decimal** — removed because the Plays pill/ranks read was retired.
+```tsx
+expect(playsFigure(0)).toBe('level');
+expect(playsFigure(0.42)).toBe('+0.4');
+expect(playsFigure(-0.16)).toBe('\u22120.2');
+expect(playsFigure(2)).toBe('+2.0');
+expect(playsFigure(0.004)).toBe('level');
+expect(playsFigure(-0.004)).toBe('level');
+expect(playsFigure(0.049)).toBe('level');
+expect(playsFigure(0.06)).toBe('+0.1');
+expect(playsFigure(-0.06)).toBe('\u22120.1');
+```
+
+- **names rank one outright and every other rank by ordinal** — removed because the Plays pill/ranks read was retired.
+```tsx
+expect(rankPhrase(1)).toBe('Hardest hole');
+expect(rankPhrase(2)).toBe('2nd hardest hole');
+expect(rankPhrase(3)).toBe('3rd hardest hole');
+expect(rankPhrase(4)).toBe('4th hardest hole');
+expect(rankPhrase(11)).toBe('11th hardest hole');
+expect(rankPhrase(12)).toBe('12th hardest hole');
+expect(rankPhrase(13)).toBe('13th hardest hole');
+expect(rankPhrase(18)).toBe('18th hardest hole');
+expect(rankPhrase(21)).toBe('21st hardest hole');
+expect(rankPhrase(22)).toBe('22nd hardest hole');
+expect(rankPhrase(23)).toBe('23rd hardest hole');
+```
+
+- **keys ranks by course AND hole and drops incomplete rows** — removed because the Plays pill/ranks read was retired.
+```tsx
+expect([...map.keys()]).toEqual(['course-a|4']);
+expect(map.get(rankKey('course-a', 4))?.difficulty_rank).toBe(2);
+expect(toRanksMap(undefined).size).toBe(0);
+expect(toRanksMap('nope').size).toBe(0);
+```
+
+- **marks only the tile whose course and hole the RPC ranked** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent) .toBe('Plays +0.4· 3rd hardest hole');
+expect(view.container.querySelectorAll('button')[0].getAttribute('aria-label')) .toBe('Hole 4, Course course-a, plays +0.4, 3rd hardest hole');
+```
+
+- **leaves an unranked tile exactly as it was** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+expect(cards[1].querySelector('[data-hole-plays]')).toBeNull();
+expect(cards[1].getAttribute('aria-label')).toBe('Hole 7, Course course-b');
+expect(cards[2].getAttribute('aria-label')).toBe('Hole 11, Course course-c');
+```
+
+- **asks for exactly the courses on the rail, once** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('get_course_hole_ranks', { p_course_ids: ['course-a', 'course-b', 'course-c'] }));
+expect(f.rpc.mock.calls.filter(call => call[0] === 'get_course_hole_ranks')).toHaveLength(1);
+```
+
+- **never marks a tile from a rank belonging to another hole** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(held(view.container)).toBeNull());
+expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(0);
+```
+
+- **paints an under-par average in the red figure and names rank one outright** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+expect(figure.textContent).toBe('Plays \u22120.1');
+expect(figure.style.color).toBe('rgb(226, 75, 63)');
+expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent) .toBe('Plays \u22120.1· Hardest hole');
+```
+
+- **keeps the Plays figure and states no ordinal below ten plays** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent).toBe('Plays +0.4');
+expect(view.container.querySelector('[data-hole-plays] em')).toBeNull();
+expect(view.container.querySelectorAll('button')[0].getAttribute('aria-label')) .toBe('Hole 4, Course course-a, plays +0.4');
+expect(view.container.querySelectorAll('button')).toHaveLength(3);
+```
+
+- **states the ordinal at exactly ten plays** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+expect((view.container.querySelector('[data-hole-plays]') as HTMLElement).textContent) .toBe('Plays +0.4· 3rd hardest hole');
+```
+
+- **reads a hole that rounds to par as Plays level, in no colour** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+expect(figure.textContent).toBe('Plays level');
+expect(figure.style.color).toBe('');
+expect(view.container.textContent).not.toContain('0.0');
+```
+
+- **keeps an over-par figure under CSS control** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1));
+expect((view.container.querySelector('[data-plays-figure]') as HTMLElement).style.color).toBe('');
+```
+
+- **settles the rail with no pills when the ranks read fails** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('button')).toHaveLength(3));
+expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(0);
+```
+
+- **holds the rail while the ranks read is unresolved** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(view.container.querySelectorAll('button')).toHaveLength(3));
+expect(held(view.container)).not.toBeNull();
+expect((view.container.querySelector('section')?.parentElement as HTMLElement).style.display).toBe('none');
+```
+
+- **opens the rail once the ranks read has settled** — removed because the Plays pill/ranks read was retired.
+```tsx
+expect(held(view.container)).not.toBeNull();
+await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('get_course_hole_ranks', { p_course_ids: ['course-a', 'course-b', 'course-c'] }));
+await waitFor(() => expect(held(view.container)).toBeNull());
+expect(view.container.querySelectorAll('button')).toHaveLength(3);
+expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(1);
+```
+
+- **opens the rail with no pills when the ranks read fails** — removed because the Plays pill/ranks read was retired.
+```tsx
+await waitFor(() => expect(held(view.container)).toBeNull());
+expect(view.container.querySelectorAll('button')).toHaveLength(3);
+expect(view.container.querySelectorAll('[data-hole-plays]')).toHaveLength(0);
+```
+
+Four added cases in `src/test/latestHolesSection.test.tsx`:
+- “the kicker reads the hole as a word, above the course name”
+- “the par line sits between the course name and the byline, in sentence case”
+- “the numeral, the PAR/YDS block and the Plays pill are all absent”
+- “a long course name clamps to two lines and still leaves room for the par line and byline”
+The former par-label case was rewritten as “the par line states par and yardage, and an
+unscored hole states neither”; that rewrite adds no case. The two tap assertions were
+restored to `expect(f.holeRpc).not.toHaveBeenCalled()` as authorised. QueryClient
+providers in the three protected test files were retained.
+
+### Unchanged name audit
+The live rail prints `course_name` directly from `get_latest_hole_media`, the stored
+long course name, not a client-shortened label. The viewer derives its shorter title
+client-side: `shortCoursePart` in `src/lib/courseMedia/memberShotPosts.ts` calls
+`shareCourseName`, strips trailing suffixes such as “Golf Club”, and preserves the
+parenthetical variant. Thus “Sundridge Park Golf Club (East Course)” on the rail and
+“Sundridge Park (East Course)” in the viewer are different presentations of the same
+source, not two edited stored names. Neither source/presentation was changed.
+
+### Closeout ordinal correction
+`holeOrdinal` in `src/lib/courseMedia/holeWalk.ts` retains the exact word list for
+holes 1–18. Its numeric fallback now uses st/nd/rd/th, with every 11–13 ending using
+th, so the shared rail and fullscreen kicker agree. Added seven cases to the existing
+`src/test/holeWalk.test.tsx`: six parameterised cases named “uses the correct English
+ordinal for hole 19/21/22/23/27/111”, asserting respectively 19th/21st/22nd/23rd/27th/111th;
+and “preserves all eighteen hole words and the teen suffix exceptions”, asserting the
+full existing word list plus 112th/113th. No existing test was deleted, renamed or
+rewritten in this closeout.
+
+### 430px live render check
+Public `/courses`, real live data, 430×1800 viewport: 20 loaded Latest holes tiles.
+The longest loaded course name was **Royal County Down Golf Club (Championship)**.
+Its name clamps to two lines; the par and byline remain visible. Tile height 293px,
+bottom stack height 88.640625px. documentElement, body and #root scrollWidth were
+all **430px**, matching the viewport: no horizontal page overflow. The rail was
+scrolled to its actual longest-name tile and visually checked without bottom-nav
+occlusion. No fixtures, guest minting or authentication bypass were used. 320/375
+checks were already verified and were not rerun, as requested.
+
+### Closeout verification and totals
+Focused command: `npx vitest run src/test/holeWalk.test.tsx src/test/latestHolesSection.test.tsx src/test/latestHolesSwipeCaption.test.tsx --maxWorkers=2` — **62/62 passed**.
+Four separate sequential commands:
+- `npx vitest run --maxWorkers=2 --shard=1/4` — **2,268 passed**, 194 files.
+- `npx vitest run --maxWorkers=2 --shard=2/4` — **2,158 passed**, 194 files.
+- `npx vitest run --maxWorkers=2 --shard=3/4` — **2,229 passed**, 194 files.
+- `npx vitest run --maxWorkers=2 --shard=4/4` — **2,239 passed**, 191 files.
+**8,894 executed / 8,894 passed**, 773 files, zero failures/skips.
+Delta: **8,887 + 7 = 8,894**, entirely the named ordinal cases above.
+No pre-existing or intermittent failure appeared; no shard rerun was needed.
+Preview harness: `build OK` at 2026-11-16T07:07:21Z.
+
+`chipForLens` is unchanged: its test-only ASCII hyphen has no application caller.
+No SQL, migration files, RPC/edge edits, feed_config edits or native configuration
+changes. round_pool_cap remains 30. The report and ordinal correction are committed
+together in the closeout commit (hash supplied in the closing reply).
