@@ -11,12 +11,13 @@ import { useIslandsCondensed } from './useIslandsCondensed';
 import './island-dock.css';
 import { measureIslandBoundary } from './islandBoundary';
 
-export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLElement>; children: (shown: boolean) => ReactNode }) {
+/** `suppressed` forces shown = false (another bar is docked); the observer is untouched. */
+export function IslandDock({ anchorRef, children, suppressed = false }: { anchorRef: RefObject<HTMLElement>; children: (shown: boolean) => ReactNode; suppressed?: boolean }) {
   const condensed = useIslandsCondensed();
   const [past, setPast] = useState(false);
   const [focused, setFocused] = useState(false);
   const releaseRef = useRef<(() => void) | null>(null);
-  const shown = focused || (past && !condensed);
+  const shown = !suppressed && (focused || (past && !condensed));
 
   const observerRef = useRef<IntersectionObserver | null>(null);
   const observedRef = useRef<HTMLElement | null>(null);

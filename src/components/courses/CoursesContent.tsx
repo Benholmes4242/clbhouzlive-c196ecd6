@@ -28,6 +28,7 @@ import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/
 import { FIGS } from '@/lib/tokens/type';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { IslandDock } from '@/features/chrome-v2/IslandDock';
+import { CoursesListStuckContext } from './coursesListStuck';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -213,6 +214,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   // HB3: one in-flow anchor for either hub tab; IslandDock alone owns docking.
   const shellTabsAnchor = useRef<HTMLDivElement>(null);
   const dockCoursesTabs = location.pathname === '/courses';
+  // One docked bar at a time: the list's stuck chip row suppresses the hub dock.
+  const [listChipsStuck, setListChipsStuck] = useState(false);
 
   
   
@@ -425,7 +428,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                   is the same element on Courses and Top 100. */}
               {shellTabsNode}
               {dockCoursesTabs && (
-                <IslandDock anchorRef={shellTabsAnchor}>
+                <IslandDock anchorRef={shellTabsAnchor} suppressed={listChipsStuck}>
                   {() => <CoursesShellTabs docked activeTab={activeTab as 'explore' | 'top100'} onTabChange={handleTabChange} />}
                 </IslandDock>
               )}
@@ -436,12 +439,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               ) : (
                 <>
                   <div className="px-4 pt-0">
+                    <CoursesListStuckContext.Provider value={setListChipsStuck}>
                     <CoursesBrowsePage
                       onOpenDirectory={(c) => {
                         setDirectoryCountry(c);
                         setDirectoryOpen(true);
                       }}
                     />
+                    </CoursesListStuckContext.Provider>
                     {/* Clears the floating bottom nav; 0px where it hides. */}
                     <div
                       aria-hidden="true"

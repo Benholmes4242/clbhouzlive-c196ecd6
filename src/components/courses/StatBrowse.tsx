@@ -28,6 +28,11 @@ import {
 
 } from '@/components/ui/select';
 import CountryFlag from '@/components/ui/country-flag';
+import { CHROME_ISLAND_H_FALLBACK, CHROME_ISLAND_H_VAR, CHROME_TOP_GAP } from '@/lib/chromeClearance';
+import { CoursesListStuckContext } from './coursesListStuck';
+
+/** Chip row sticks just below the measured islands (8px gap); follows condensing. */
+export const CHIP_ROW_TOP = `calc(var(--sat, 0px) + var(${CHROME_ISLAND_H_VAR}, ${CHROME_ISLAND_H_FALLBACK}px) + ${CHROME_TOP_GAP + 8}px)`;
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOwnHandicapState } from '@/lib/whs/useOwnHandicapState';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -52,7 +57,6 @@ import { CourseListViewToggle } from './CourseListViewToggle';
 import { CourseListRow, CourseListColumns, CourseListRowsShell } from './CourseListRow';
 import { ListScopeHeader } from './browse/ListScopeHeader';
 import { RailChips } from '@/components/ui/RailChips';
-import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
 import { useSectionReady } from './browse/PageLoadGate';
 import { BrowseCourseCard, PHOTO_H as BROWSE_PHOTO_H } from './BrowseCourseCard';
@@ -154,7 +158,28 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { user } = useSupabaseSession();
   const ownHandicap = useOwnHandicapState(user?.id);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { sentinelRef, stuck: condensed } = useStickySafeAreaState();
+  const chipSentinelRef = useRef<HTMLDivElement | null>(null);
+  const chipRowRef = useRef<HTMLDivElement | null>(null);
+  const [chipStuck, setChipStuck] = useState(false);
+  const reportStuck = React.useContext(CoursesListStuckContext);
+  useEffect(() => {
+    const measure = () => {
+      const sentinel = chipSentinelRef.current;
+      const row = chipRowRef.current;
+      if (!sentinel || !row || sentinel.getClientRects().length === 0) { setChipStuck(false); return; }
+      const top = Number.parseFloat(getComputedStyle(row).top) || 0;
+      setChipStuck(sentinel.getBoundingClientRect().top <= top);
+    };
+    measure();
+    document.addEventListener('scroll', measure, { capture: true, passive: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      document.removeEventListener('scroll', measure, { capture: true });
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+  useEffect(() => { reportStuck?.(chipStuck); }, [chipStuck, reportStuck]);
+  useEffect(() => () => { reportStuck?.(false); }, [reportStuck]);
   const loadSentinelRef = useRef<HTMLDivElement | null>(null);
   const viewedRef = useRef(false);
 
@@ -722,29 +747,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           three figures for the scope the dropdowns have selected. Above the
           sticky bar, and not sticky itself. */}
       <ListScopeHeader region={region} country={country} figures={scopeFigures} />
-      {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
-      <div ref={sentinelRef} style={{ height: 0 }} aria-hidden="true" />
-      <StickySafeAreaScrim visible={condensed} background={A.CANVAS} />
-
-      {/* ── Applied filters + board order ───────────────────────── */}
-      <div
-        className="-mx-4 px-4 pt-2 pb-3 sticky"
-        data-stuck={condensed ? 'true' : 'false'}
-        style={{
-          top: 'calc(var(--sat, 0px))',
-          zIndex: Z.stickyTabs,
-          // The bar sits on the same page canvas as the hero and the post
-          // wizard step 1 surface. No glass treatment — a solid band reads as
-          // part of the page, not a floating darker banner.
-          background: A.CANVAS,
-        }}
-      >
+      {/* ── Applied filters (scroll away with the scope header) ──── */}
+      <div className="-mx-4 px-4 pt-2" data-courses-list-dropdowns>
         {/* ITEMS-STRETCH IS THE DERIVATION. The search control is as tall as
             the two dropdowns because the row makes all three the same height -
             there is no matching number to go stale when the wells change. */}
         <div className="flex items-stretch gap-2">
-          <div className="min-w-0 flex-1">{countrySelect(condensed)}</div>
-          <div className="min-w-0 flex-1">{regionSelect(condensed)}</div>
+          <div className="min-w-0 flex-1">{countrySelect(false)}</div>
+          <div className="min-w-0 flex-1">{regionSelect(false)}</div>
           {/* INLINE SEARCH OVER WHAT IS ON SCREEN. The old "Edit" text opened the
               full directory sheet; that sheet keeps its three other doors (both
               empty states and the footer CTA), so nothing lost its entrance. */}
@@ -758,13 +768,13 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             aria-expanded={searchOpen}
             /* WIDTH UNCHANGED, HEIGHT INHERITED. The glyph keeps its own size
                and centres in the taller box; it is not scaled to fill it. */
-            className={`${condensed ? 'w-8' : 'w-10'} shrink-0 flex items-center justify-center`}
+            className={`w-10 shrink-0 flex items-center justify-center`}
             style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: WELL_RADIUS }}
           >
             {searchOpen ? (
-              <X className={condensed ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+              <X className="h-4 w-4" style={{ color: INK }} aria-hidden="true" />
             ) : (
-              <Search className={condensed ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+              <Search className="h-4 w-4" style={{ color: INK }} aria-hidden="true" />
             )}
           </button>
         </div>
@@ -786,8 +796,29 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             />
           </div>
         ) : null}
-        <div className="mt-2.5">
-          <RailChips
+      </div>
+
+      {/* Sentinel: the chip row is stuck once this passes the row's own top. */}
+      <div ref={chipSentinelRef} style={{ height: 0 }} aria-hidden="true" />
+      {/* ── Board order: the ONLY sticky element, just below the islands ── */}
+      <div
+        ref={chipRowRef}
+        className="-mx-4 px-4 sticky mt-2.5"
+        data-courses-list-chips
+        data-stuck={chipStuck ? 'true' : 'false'}
+        style={{
+          top: CHIP_ROW_TOP,
+          zIndex: Z.stickyTabs,
+          background: A.CANVAS,
+          padding: '6px 16px 8px',
+        }}
+      >
+        {/* Solid band up to the screen top behind the islands while stuck,
+            so nothing shows above the row (replaces StickySafeAreaScrim). */}
+        {chipStuck ? (
+          <div aria-hidden="true" data-chip-row-band style={{ position: 'absolute', left: 0, right: 0, bottom: '100%', height: CHIP_ROW_TOP, background: A.CANVAS, pointerEvents: 'none' }} />
+        ) : null}
+        <RailChips
             options={browseBoards}
             value={lens}
             onChange={(value) => onLensChange(value as StatLens)}
@@ -795,8 +826,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             align="center-when-fit"
             fixedTrailing
             trailing={<CourseListViewToggle view={view} onChange={changeView} />}
-          />
-        </div>
+        />
+        <div aria-hidden="true" data-chip-row-fade style={{ position: 'absolute', left: 0, right: 0, top: '100%', height: 12, background: `linear-gradient(${A.CANVAS}, transparent)`, pointerEvents: 'none' }} />
       </div>
 
       {/* ── List ────────────────────────────────────────────────── */}
