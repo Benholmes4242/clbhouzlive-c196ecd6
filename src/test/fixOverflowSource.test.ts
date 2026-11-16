@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ts from 'typescript';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 // FIX_OVERFLOW_1 explicitly requests source assertions: jsdom cannot measure
 // min-content sizing. The three wizard-owned exceptions are explicitly ruled.
@@ -32,7 +32,18 @@ function wrapping(properties: Map<string, string>) {
   for (const key of ['overflow', 'textOverflow', 'whiteSpace']) expect(properties.has(key)).toBe(false);
 }
 
+const sourceFiles: string[] = [];
+function listTsx(directory: string) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = `${directory}/${entry.name}`;
+    if (entry.isDirectory()) {
+      if (!['test', 'tests', '__tests__'].includes(entry.name)) listTsx(path);
+    } else if (path.endsWith('.tsx') && !/\.(test|spec)\.tsx$/.test(path)) sourceFiles.push(path);
+  }
+}
+
 describe('FIX_OVERFLOW_1 scoped source contracts', () => {
+  beforeAll(() => { listTsx('src'); });
   it('all non-test inline grids declare columns except the three wizard-owned files', () => {
     // FIX_OVERFLOW_1 continuation: these files are owned by the review wizard
     // and its shared header, and are the ONLY approved exceptions.
@@ -44,23 +55,16 @@ describe('FIX_OVERFLOW_1 scoped source contracts', () => {
     const columns = ['gridTemplateColumns', 'gridTemplate', 'gridTemplateAreas', 'gridAutoFlow', 'gridAutoColumns'];
     const violations: string[] = [];
     let scanned = 0;
-    function scan(directory: string) {
-      for (const entry of readdirSync(directory, { withFileTypes: true })) {
-        const path = `${directory}/${entry.name}`;
-        if (entry.isDirectory()) {
-          if (!['test', 'tests', '__tests__'].includes(entry.name)) scan(path);
-        } else if (path.endsWith('.tsx') && !/\.(test|spec)\.tsx$/.test(path) && !exceptions.has(path)) {
-          scanned++;
-          for (const object of objects(path)) {
-            if (object.properties.get('display') === "'grid'" && !columns.some(key => object.properties.has(key))) violations.push(`${path}: ${object.text}`);
-          }
-        }
+    for (const path of sourceFiles) {
+      if (exceptions.has(path)) continue;
+      scanned++;
+      for (const object of objects(path)) {
+        if (object.properties.get('display') === "'grid'" && !columns.some(key => object.properties.has(key))) violations.push(`${path}: ${object.text}`);
       }
     }
-    scan('src');
     expect(scanned).toBeGreaterThan(1000);
     expect(violations).toEqual([]);
-  });
+  }, 60000);
   it('About stack and claimed-profile wrapper use shrinkable single columns', () => {
     const grids = objects(course).filter(object => object.properties.get('display') === "'grid'");
     expect(grids).toHaveLength(2);

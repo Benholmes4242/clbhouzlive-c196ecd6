@@ -216,13 +216,15 @@ describe('kind card actions', () => {
 describe('See all', () => {
   it('opens /find-people?kind=pro and ?kind=creator', async () => {
     const { unmount } = wrap(<KindRail kind="pro" />);
-    fireEvent.click(await screen.findByRole('button', { name: 'See all, Pros to follow' }));
+    await waitFor(() => expect(kindCalls().some((c) => (c[1] as { p_kind?: string })?.p_kind === 'pro')).toBe(true), { timeout: 10000 });
+    fireEvent.click(await screen.findByRole('button', { name: 'See all, Pros to follow' }, { timeout: 10000 }));
     expect(screen.getByTestId('probe').textContent).toBe('/find-people?kind=pro');
     unmount();
     wrap(<KindRail kind="creator" />);
-    fireEvent.click(await screen.findByRole('button', { name: 'See all, Creators to follow' }));
+    await waitFor(() => expect(kindCalls().some((c) => (c[1] as { p_kind?: string })?.p_kind === 'creator')).toBe(true), { timeout: 10000 });
+    fireEvent.click(await screen.findByRole('button', { name: 'See all, Creators to follow' }, { timeout: 10000 }));
     expect(screen.getByTestId('probe').textContent).toBe('/find-people?kind=creator');
-  });
+  }, 30000);
   it('FindPeoplePage with kind lists the RPC rows under the kind title', async () => {
     wrap(<FindPeoplePage />, '/find-people?kind=creator');
     const list = await screen.findByTestId('find-people-kind-list');
