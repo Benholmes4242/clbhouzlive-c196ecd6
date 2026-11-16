@@ -185,7 +185,7 @@ describe('CE1 fixed connected example', () => {
     render(hero());
     const tiles = panel()?.querySelectorAll('[data-example-form-tile]');
     expect(tiles).toHaveLength(5);
-    expect(Array.from(tiles ?? []).map((tile) => tile.firstElementChild?.textContent)).toEqual(['86', '91', '84', '88', '90']);
+    expect(Array.from(tiles ?? []).map((tile) => tile.querySelector('.profile-form-gross')?.textContent)).toEqual(['90', '88', '84', '91', '86']);
   });
   it('Hide calls the decline hook once and waits for the loaded flag, even after its promise resolves', async () => {
     const view = render(hero());

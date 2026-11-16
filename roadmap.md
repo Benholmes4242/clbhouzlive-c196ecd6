@@ -1,11 +1,11 @@
 # Roadmap
 
-## Stopped: Profile index and form
+## Complete: Authorised profile rail test correction
 - Replace contour fallback in member/business covers; preserve photo layers.
 - Time-scale index points and interpolate last-five dots; replace tiles with newest-first rail.
 - Remove member counters and number-one reaction/count reads; preserve notification comments deep links.
-- Verify 320/375/430 and focused/full suites against 8,954; report authorised test inventory changes.
-- Blocked by heroConnectExample.test.tsx:188 old oldest-first firstElementChild assertion; focused 87 passed / 1 failed. No full-suite or browser checks run. Report: .lovable/reports/profile-index-and-form-stop.md.
+- Full suite 8,954 passed (2,276 / 2,176 / 2,240 / 2,262), unchanged count; only the authorised rendered gross-score selector/order expectation changed.
+- Original profile width checks and new geometry/deep-link tests remain unverified/not added under this limited follow-up. Report: .lovable/reports/profile-rail-test-correction.md.
 
 ## Complete: Three fixes Nov 16
 - Capitalise shared long news ages; retain short forms and digit/date forms.
