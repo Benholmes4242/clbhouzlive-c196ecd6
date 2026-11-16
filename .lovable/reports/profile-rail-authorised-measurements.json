@@ -1,0 +1,168 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+{
+  "checks": [
+    {
+      "width": 320,
+      "own": true,
+      "dots": [
+        {
+          "id": "lowered",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(52, 215, 127)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 250.78125,
+          "y": 146.1875
+        },
+        {
+          "id": "other",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(248, 250, 252)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 285.796875,
+          "y": 136.203125
+        }
+      ],
+      "chartWidth": 288
+    },
+    {
+      "width": 320,
+      "own": false,
+      "dots": [
+        {
+          "id": "lowered",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(52, 215, 127)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 250.78125,
+          "y": 146.1875
+        },
+        {
+          "id": "other",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(248, 250, 252)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 285.796875,
+          "y": 136.203125
+        }
+      ],
+      "chartWidth": 288
+    },
+    {
+      "width": 375,
+      "own": true,
+      "dots": [
+        {
+          "id": "lowered",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(52, 215, 127)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 296.375,
+          "y": 146.1875
+        },
+        {
+          "id": "other",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(248, 250, 252)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 338.09375,
+          "y": 136.203125
+        }
+      ],
+      "chartWidth": 343
+    },
+    {
+      "width": 375,
+      "own": false,
+      "dots": [
+        {
+          "id": "lowered",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(52, 215, 127)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 296.375,
+          "y": 146.1875
+        },
+        {
+          "id": "other",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(248, 250, 252)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 338.09375,
+          "y": 136.203125
+        }
+      ],
+      "chartWidth": 343
+    },
+    {
+      "width": 430,
+      "own": true,
+      "dots": [
+        {
+          "id": "lowered",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(52, 215, 127)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 341.984375,
+          "y": 146.1875
+        },
+        {
+          "id": "other",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(248, 250, 252)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 390.375,
+          "y": 136.203125
+        }
+      ],
+      "chartWidth": 398
+    },
+    {
+      "width": 430,
+      "own": false,
+      "dots": [
+        {
+          "id": "lowered",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(52, 215, 127)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 341.984375,
+          "y": 146.1875
+        },
+        {
+          "id": "other",
+          "width": 8,
+          "height": 8,
+          "color": "rgb(248, 250, 252)",
+          "shadow": "rgb(10, 10, 12) 0px 0px 0px 2px",
+          "radius": "50%",
+          "x": 390.375,
+          "y": 136.203125
+        }
+      ],
+      "chartWidth": 398
+    }
+  ],
+  "pageErrors": []
+}

@@ -1,10 +1,10 @@
 # Roadmap
 
-## Stopped: Profile rail follow-up
+## Complete: Profile rail follow-up — authorised test closeout
 - Replace stretched SVG dots with fixed 8px HTML markers below the end dot.
 - Add missing date/interpolation, round markers, rail/taps, comment-link, counters and cover regressions.
 - Localise the heading; remove obsolete hero counter props/callers without deleting share figures.
-- STOP: profileRailFollowup.test.tsx:104:36 / :127:99 / :159:109 (four new assertion failures); 82/86 passed. Expected inventory 8,991 (+13), full suite and width checks pending authorisation. Report: .lovable/reports/profile-rail-followup-stop.md.
+- Authorised four assertion repairs only; no product changes. Full suite 8,991 passed (2,284 / 2,196 / 2,237 / 2,274), 778 files, +13 from 8,978. Own/visitor actual-chart fixtures measured 8×8 dots at 320/375/430; authenticated profiles unavailable. Report: .lovable/reports/profile-rail-followup-authorised.md. Earlier stop report retained.
 
 ## In progress: Tour finished week
 - Shared cumulative champion/next-two chart and collision-free labels; keep hole-type row.

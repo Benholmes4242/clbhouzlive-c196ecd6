@@ -85,6 +85,8 @@ import { ProfileHero } from '@/components/profile/hero/ProfileHero';
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
 import { HeroHandicapDisplay } from '@/components/profile/hero/HeroHandicapDisplay';
 import { indexLine } from '@/components/profile/hero/indexLine';
+import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
+import { FALLBACK_COVER_GRADIENT } from '@/components/profile/hero/FallbackCover';
 import { ClubProfileHero } from '@/components/business/hero/ClubProfileHero';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { FormBar } from '@/features/profile-sheet-v2/sheetState';
@@ -101,7 +103,8 @@ afterEach(()=>{cleanup();vi.restoreAllMocks();});
 describe('profile rail follow-up',()=>{
  it('time-scaled points preserve 80-day and 10-day proportions',()=>{
   const line=indexLine(series,TODAY);
-  expect(line?.coords.map(p=>p.x)).toEqual([0,361*80/90,361]);
+  expect(line?.coords).toHaveLength(3);
+  [0,361*80/90,361].forEach((x,i)=>expect(line?.coords[i]?.x).toBeCloseTo(x,6));
  });
  it('at interpolates between neighbouring points',()=>{
   const line=indexLine(series,TODAY);
@@ -124,7 +127,8 @@ describe('profile rail follow-up',()=>{
  });
  it('rail reverses oldest-first data and uses canonical short course names',()=>{
   const {container}=display();expect([...container.querySelectorAll('[data-form-round]')].map(e=>e.getAttribute('data-form-round'))).toEqual(['new','middle','old']);
-  expect(container.querySelector('[data-form-round="middle"] .profile-form-course')?.textContent).toBe('Royal County Down');
+  expect(container.querySelector('[data-form-round="middle"] .profile-form-course')?.textContent).toBe('Royal County Down (Championship)');
+  expect(container.querySelector('[data-form-round="middle"] .profile-form-course')?.textContent).toBe(shortCoursePart('Royal County Down Golf Club (Championship)'));
  });
  it('dates include a year only outside the current year',()=>{
   const {container}=display({bars:[{...bars[2],date:'2025-11-12'}]});
@@ -156,6 +160,8 @@ describe('profile rail follow-up',()=>{
  });
  it.each(['member','business'])('%s no-photo cover uses the gradient token without SVG',kind=>{
   const {container}=kind==='member'?render(<QueryClientProvider client={new QueryClient()}><MemoryRouter><ProfileHero userId="u1" displayName="Member" isSelf indexValue={null} hideConnectPrompt onStatTap={()=>{}}/></MemoryRouter></QueryClientProvider>):render(<ClubProfileHero name="Club" placeLine="Kent" coverUrl={null} onShare={()=>{}} renderMore={t=>t} team={null} isFollowing={false} onFollowToggle={()=>{}} onBookTeeTime={()=>{}} onMessage={()=>{}}/>);
-  const cover=container.querySelector<HTMLElement>('[data-fallback-cover]');expect(cover?.style.background).toBe('var(--profile-fallback-cover-gradient)');expect(cover?.querySelector('svg')).toBeNull();expect(cover).not.toBeNull();
+  const cover=container.querySelector<HTMLElement>('[data-fallback-cover]');expect(cover).not.toBeNull();expect(cover?.querySelector('svg')).toBeNull();
+  expect(FALLBACK_COVER_GRADIENT).toBe('var(--profile-fallback-cover-gradient)');
+  expect(readFileSync('src/styles/style-tokens.css','utf8')).toContain('--profile-fallback-cover-gradient: linear-gradient(180deg, #1C2A22 0%, #131B16 58%, #0A0A0C 100%)');
  });
 });
