@@ -136,11 +136,9 @@ function toBrowseRow(
   };
 }
 
-interface Props {
-  shellTabs?: React.ReactNode;
-}
-
-const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
+/* The in-flow shell tab row is rendered once by CoursesContent above both
+   branches, so this panel no longer takes it as a prop. */
+const Top100CoursesHubPanel: React.FC = () => {
   const { view, changeView } = useCourseListView('top100');
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -292,7 +290,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
 
   return (
     <div>
-      {shellTabs}
       <div style={{ padding: '0 16px' }}>
         <RailChips
           options={LISTS}

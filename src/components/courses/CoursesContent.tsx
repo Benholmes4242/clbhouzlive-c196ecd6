@@ -421,18 +421,20 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           return (
             <div>
               <CoursesPageHero />
+              {/* One in-flow tab row for both branches, so the dock's anchor
+                  is the same element on Courses and Top 100. */}
+              {shellTabsNode}
               {dockCoursesTabs && (
                 <IslandDock anchorRef={shellTabsAnchor}>
                   {() => <CoursesShellTabs docked activeTab={activeTab as 'explore' | 'top100'} onTabChange={handleTabChange} />}
                 </IslandDock>
               )}
 
-              {activeTab === 'top100' ? (
+               {activeTab === 'top100' ? (
 
-                <Top100CoursesHubPanel shellTabs={shellTabsNode} />
+                <Top100CoursesHubPanel />
               ) : (
                 <>
-                  {shellTabsNode}
                   <div className="px-4 pt-0">
                     <CoursesBrowsePage
                       onOpenDirectory={(c) => {

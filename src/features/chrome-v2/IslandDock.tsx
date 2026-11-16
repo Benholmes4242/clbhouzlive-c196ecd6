@@ -3,7 +3,7 @@
  * Callers own the in-flow anchor, both copies' state and tab geometry; the shared
  * dock owns solid-glass paint so future tab surfaces cannot fork that material.
  */
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Z } from '@/config/zIndex';
 import { getPrimaryScrollElement } from '@/lib/getScrollParent';
 import { pushForceExpand } from '@/hooks/useScrollDirection';
@@ -18,16 +18,29 @@ export function IslandDock({ anchorRef, children }: { anchorRef: RefObject<HTMLE
   const releaseRef = useRef<(() => void) | null>(null);
   const shown = focused || (past && !condensed);
 
-  useEffect(() => {
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const observedRef = useRef<HTMLElement | null>(null);
+
+  /* No dependency array: runs after every commit so a replaced anchor (a tab
+   * row that unmounts and remounts elsewhere) is re-observed and `past` is
+   * recomputed from its rect on the same frame. */
+  useLayoutEffect(() => {
     const anchor = anchorRef.current;
-    if (!anchor) return;
+    if (anchor === observedRef.current) return;
+    observerRef.current?.disconnect();
+    observerRef.current = null;
+    observedRef.current = anchor;
+    if (!anchor) { setPast(false); return; }
     const boundary = measureIslandBoundary();
+    setPast(anchor.getBoundingClientRect().bottom < boundary);
     const observer = new IntersectionObserver(([entry]) => {
       if (entry) setPast(!entry.isIntersecting && entry.boundingClientRect.bottom < (entry.rootBounds?.top ?? boundary));
     }, { root: getPrimaryScrollElement() ?? null, rootMargin: `-${boundary}px 0px 0px 0px`, threshold: [0, 1] });
     observer.observe(anchor);
-    return () => observer.disconnect();
-  }, [anchorRef]);
+    observerRef.current = observer;
+  });
+
+  useEffect(() => () => { observerRef.current?.disconnect(); observerRef.current = null; observedRef.current = null; }, []);
 
   useEffect(() => () => { releaseRef.current?.(); releaseRef.current = null; }, []);
 
