@@ -6,11 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, topUps: { byRail: new Map(), ready: true } as any, counts: 0, calls: [] as any[] }));
+const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, counts: 0, calls: [] as any[] }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => f.tile }));
-vi.mock('@/components/courses/browse/useRailTopUps', () => ({ useRailTopUps: () => f.topUps }));
 vi.mock('@/hooks/useCourseMediaCounts', () => ({ useCourseMediaCounts: () => ({ data: { photos: f.counts, videos: 0, total: f.counts } }) }));
 vi.mock('@/features/pro-verification/InlineProMemberName', () => ({ InlineProMemberName: ({ children }: { children: React.ReactNode }) => <span>{children}</span> }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span data-face="" /> }));
@@ -43,7 +42,7 @@ function setHook(o: { rounds?: any[]; posts?: any[]; reviews?: any[]; courses: R
     courses: q(new Map(o.courses.map((x) => [x.id, x]))), ids: o.courses.map((x) => x.id), home, homeReady: true };
 }
 const mount = () => render(<QueryClientProvider client={new QueryClient()}><MemoryRouter><WhoPlayingSection /></MemoryRouter></QueryClientProvider>);
-beforeEach(() => { window.localStorage.clear(); f.counts = 0; f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.topUps = { byRail: new Map(), ready: true }; f.calls = []; });
+beforeEach(() => { window.localStorage.clear(); f.counts = 0; f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.calls = []; });
 afterEach(cleanup);
 
 describe('activity counting', () => {

@@ -8,13 +8,12 @@ import { fmtCount } from './format';
 import { useSectionReady } from './PageLoadGate';
 import { settled } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
-import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, writeSeen, UKI_GROUPING, type RingGroup, type SeenMap } from './playedRings';
+import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, writeSeen, type RingGroup, type SeenMap } from './playedRings';
 type MemberFacesMap = Map<string, { displayName: string | null; username: string | null; photoUrl: string | null }>;
 const NO_FACES: MemberFacesMap = new Map();
 import { postCourseIds, usePlayedRounds, type PlayedCourse, type PlayedPostRow, type PlayedReviewRow, type PlayedRoundRow } from './usePlayedRounds';
 import { usePlayedTile } from './usePlayedTile';
-import { useRailTopUps } from './useRailTopUps';
-import { PlayedHead, GLASS, type Face } from './playedParts';
+import { PlayedHead, type Face } from './playedParts';
 import { PlayedTile } from './PlayedTile';
 import { RegionRails } from './RegionRails';
 
@@ -25,7 +24,7 @@ import { RegionRails } from './RegionRails';
  * the selected ring's tile, then region rails for every active course outside
  * the first tab.
  * Reads: usePlayedRounds (rounds, course geography, home), usePlayedTile (the
- * selected course's photos), useRailTopUps. All of them gate 'whoPlaying'.
+ * selected course's photos). All of them gate 'whoPlaying'.
  * Guests see nothing (get_recent_rounds is 401 signed out).
  */
 /* Geometry, read by the section AND WhoPlayingShell. Whole pixels only. */
@@ -37,7 +36,8 @@ export const RING_RADIUS = 21.76;
 export const RING_INSET = 2.5;
 export const RING_PHOTO_RADIUS = 17.76;
 export const RING_ROW_TOP = 14;
-export const RING_ROW_PAD_TOP = 4;
+/** V3 §1: 10px so the corner count (top -7px) is never clipped by the row. */
+export const RING_ROW_PAD_TOP = 10;
 export const RING_LABEL_GAP = 9;
 export const RING_LABEL_LINE = 13;
 export const RING_VARIANT_LINE = 12;
@@ -132,16 +132,13 @@ export function WhoPlayingSection() {
   // §6: rails hold every active course outside the FIRST tab only.
   const tabIds = useMemo(() => new Set(tabs[0]?.courseIds ?? []), [tabs]);
   const rails = useMemo(() => buildRails(courses, groups, tabIds, played.home), [courses, groups, tabIds, played.home]);
-  const grouping = played.home?.country ?? UKI_GROUPING;
-  const topUps = useRailTopUps(rails, grouping, userId);
   const tile = usePlayedTile(current?.courseId ?? null, userId);
 
   const opt = (q: Parameters<typeof settled>[0] | undefined) => !q || settled(q);
   const roundsReady = settled(played.rounds) && opt(played.posts) && opt(played.reviews)
     && (played.ids.length === 0 || settled(played.courses))
-    && (!played.memberIds?.length || opt(played.faces))
-    && (!played.unplayedIds?.length || opt(played.ratings));
-  const firstReady = !sessionLoading && (!user || (roundsReady && played.homeReady && (!current || tile.ready) && topUps.ready));
+    && (!played.memberIds?.length || opt(played.faces));
+  const firstReady = !sessionLoading && (!user || (roundsReady && played.homeReady && (!current || tile.ready)));
   // Latched: after the first ready the section never returns to the shell;
   // later selections re-render in place and only the photo row waits.
   const everReady = useRef(false);
@@ -179,11 +176,10 @@ export function WhoPlayingSection() {
               style={{ flex: 'none', width: RING_ITEM_W, padding: 0, background: 'none', border: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start', alignSelf: 'flex-start', textAlign: 'center', cursor: 'pointer', color: A.INK }}>
               <span style={{ position: 'relative', display: 'block', width: RING_SIZE, height: RING_SIZE, margin: '0 4px', boxSizing: 'border-box', borderRadius: RING_RADIUS, border: `${RING_BORDER}px solid ${edge}` }}>
                 <CourseImageFallback courseId={g.courseId} courseName={c?.name} imageUrl={c?.imageUrl} initialsSize={14}
-                  style={{ position: 'absolute', inset: RING_INSET, borderRadius: RING_PHOTO_RADIUS, overflow: 'hidden' }}>
-                  <span data-ring-count="" style={{ ...GLASS, position: 'absolute', top: 5, right: 5, minWidth: 20, height: 17, padding: '0 5px', boxSizing: 'border-box', borderRadius: BADGE_RADIUS, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: badge }}>
-                    {fmtCount(g.activity)}
-                  </span>
-                </CourseImageFallback>
+                  style={{ position: 'absolute', inset: RING_INSET, borderRadius: RING_PHOTO_RADIUS, overflow: 'hidden' }} />
+                <span data-ring-count="" style={{ position: 'absolute', top: -7, right: -7, zIndex: 2, minWidth: 20, height: 18, padding: '0 5px', boxSizing: 'border-box', borderRadius: BADGE_RADIUS, background: A.CANVAS, border: `1.5px solid ${edge}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: badge }}>
+                  {fmtCount(g.activity)}
+                </span>
               </span>
               <span style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', marginTop: RING_LABEL_GAP, fontSize: 10.5, fontWeight: 600, lineHeight: `${RING_LABEL_LINE}px`, color: state === 'seen' ? A.MUTE : A.INK, overflowWrap: 'anywhere' }}>{short}</span>
               {variant ? <span style={{ display: 'block', marginTop: 1, fontSize: 9.5, fontWeight: 600, lineHeight: `${RING_VARIANT_LINE}px`, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{variant}</span> : null}
@@ -192,9 +188,9 @@ export function WhoPlayingSection() {
         })}
       </div>
       {current && courseMap?.get(current.courseId) ? (
-        <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} tile={tile} />
+        <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} tile={tile} faces={faceMap ?? NO_FACES} />
       ) : null}
-      <RegionRails rails={rails} groups={groups} courseMap={courseMap} topUps={topUps.byRail} tabIds={tabIds} ratings={played.ratings?.data as Map<string, number | null> | undefined} />
+      <RegionRails rails={rails} groups={groups} courseMap={courseMap} />
     </section>
   );
 }

@@ -9,7 +9,6 @@
  *   review text present, created_at in the window), paged, cap 500;
  * - member faces: readMemberFaces (user_profiles, public_profiles filling gaps)
  *   for every active member, so unconnected members keep names and faces;
- * - ratings for active courses with no round: stat_browse_base.community_rating.
  * One golf_courses read for every active course id; the viewer's home course is
  * the first golf_courses row of their canonical club (user_profiles.primary_club_id,
  * via useViewerHomeClubId — home_club_id is deprecated and never written).
@@ -107,18 +106,6 @@ export function usePlayedRounds(userId: string | undefined) {
     ...(reviews.data ?? []).map((r) => r.user_id),
   ].filter((v): v is string => !!v))).sort(), [rounds.data, posts.data, reviews.data]);
   const faces = useQuery({ queryKey: ['courses', 'played-faces', memberIds.join('|')], enabled: memberIds.length > 0, staleTime: 5 * 60_000, queryFn: () => readMemberFaces(memberIds) });
-  const roundCourseIds = useMemo(() => new Set((rounds.data ?? []).map((r) => r.course_id)), [rounds.data]);
-  const unplayedIds = useMemo(() => ids.filter((id) => !roundCourseIds.has(id)), [ids, roundCourseIds]);
-  const ratings = useQuery({
-    queryKey: ['courses', 'played-ratings', unplayedIds.join('|')],
-    enabled: unplayedIds.length > 0,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase.from('stat_browse_base' as never).select('course_id, community_rating').in('course_id', unplayedIds);
-      if (error) throw error;
-      return new Map(((data ?? []) as Array<{ course_id: string; community_rating: number | null }>).map((r) => [String(r.course_id), r.community_rating == null ? null : Number(r.community_rating)]));
-    },
-  });
   const courses = useQuery({
     queryKey: ['courses', 'played-courses', ids.join('|')],
     enabled: ids.length > 0,
@@ -141,5 +128,5 @@ export function usePlayedRounds(userId: string | undefined) {
     },
   });
   const homeReady = !userId || (homeClub.ready && (!homeClub.clubId || home.isFetched || home.isError));
-  return { rounds, posts, reviews, faces, ratings, memberIds, unplayedIds, courses, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady };
+  return { rounds, posts, reviews, faces, memberIds, courses, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady };
 }

@@ -18,7 +18,6 @@ export const UKI_GROUPING = 'Britain & Ireland';
 /** Ireland and Northern Ireland share one rail (countryVocabulary's Ireland set). */
 export const IRELAND_NATIONS = ['Ireland', 'Northern Ireland'] as const;
 export const RAIL_MAX = 10;
-export const RAIL_MIN = 3;
 export const TILE_PHOTO_CAP = 12;
 
 export interface PlacedCourse {
@@ -103,78 +102,66 @@ export function hardestHoleFromRanks(rows: Array<{ hole_no: number; difficulty_r
 }
 export const isNewRing = (g: RingGroup, seen: SeenMap | null) => !seen || seen[g.courseId] !== g.latestKey;
 
-/* ── §4 region rails ───────────────────────────────────────────────────── */
-export type RailKind = 'home' | 'nation' | 'ireland' | 'abroad';
+/* ── §4 region rails (BRIEF_WHATS_BEEN_PLAYED_V3 §4) ──────────────────── */
+export type RailKind = 'home' | 'rest' | 'abroad';
 export interface RailPlan { key: string; kind: RailKind; nations: string[]; kicker: string; title: string; courseIds: string[]; playedTotal: number; activity: number }
 
 const isIreland = (n: string | null) => !!n && (IRELAND_NATIONS as readonly string[]).includes(n);
-/** Rail key for one course inside the grouping: the nation, Ireland merged. */
+/** Nation key inside the grouping: the nation, Ireland merged. */
 export const nationKey = (n: string | null) => (isIreland(n) ? 'ireland' : n);
 
-export function railHeading(kind: RailKind, nation: string | null): { kicker: string; title: string } {
+/** Rail headings. `nation` is the home nation (rest rail) or the rail's nation (home rail). */
+export function railHeading(kind: RailKind, nation: string | null, grouping: string = UKI_GROUPING): { kicker: string; title: string } {
   if (kind === 'abroad') return { kicker: 'FURTHER AFIELD', title: 'Abroad' };
-  const label = kind === 'ireland' ? 'IRELAND' : (nation ?? '').toUpperCase();
+  const label = (nation ?? '').toUpperCase();
   if (kind === 'home') return { kicker: `ACROSS ${label}`, title: 'Played lately' };
-  if (kind === 'ireland') return { kicker: 'IRELAND', title: 'Across the water' };
-  return { kicker: label, title: nation === 'Scotland' ? 'North of the border' : 'Played lately' };
+  const title = grouping === UKI_GROUPING ? 'The rest of GB&I' : 'Played lately';
+  // No home nation: nothing to be "beyond"; the rail covers the whole grouping.
+  return { kicker: nation ? `BEYOND ${label}` : (grouping === UKI_GROUPING ? 'ACROSS GB&I' : `ACROSS ${grouping.toUpperCase()}`), title };
 }
 
 /**
- * Every active course outside the first tab, grouped by nation inside the home's
- * grouping (no home → Britain & Ireland), everything else in one Abroad rail.
- * Home nation first, other nations by activity, Abroad last. Each rail
- * holds its played courses busiest first, capped at RAIL_MAX.
+ * Every active course outside the first tab: the home nation rail, ONE rail
+ * for every other nation in the home's grouping (no home → Britain & Ireland),
+ * then one Abroad rail. Each holds its courses busiest first (ties to most
+ * recent), capped at RAIL_MAX. A rail shows only when it has a course.
  */
 export function buildRails<T extends RingGroup>(courses: PlacedCourse[], groups: T[], tabCourseIds: ReadonlySet<string>, home: HomePlace | null): RailPlan[] {
   const grouping = home?.country ?? UKI_GROUPING;
   const homeKey = home ? nationKey(home.subCountry) : null;
   const byId = new Map(courses.map((c) => [c.id, c]));
-  const buckets = new Map<string, { nations: Set<string>; groups: T[] }>();
+  const buckets: Record<RailKind, { nations: Set<string>; groups: T[] }> = {
+    home: { nations: new Set(), groups: [] }, rest: { nations: new Set(), groups: [] }, abroad: { nations: new Set(), groups: [] },
+  };
   for (const g of groups) {
     if (tabCourseIds.has(g.courseId)) continue;
     const c = byId.get(g.courseId);
     if (!c) continue;
-    const key = c.country !== grouping ? '__abroad' : nationKey(c.subCountry);
-    if (!key) continue;
-    const b = buckets.get(key) ?? { nations: new Set<string>(), groups: [] };
-    if (c.subCountry) b.nations.add(c.subCountry);
-    b.groups.push(g);
-    buckets.set(key, b);
+    const key = nationKey(c.subCountry);
+    const kind: RailKind = c.country !== grouping ? 'abroad' : homeKey && key === homeKey ? 'home' : 'rest';
+    if (kind !== 'abroad' && !key) continue;
+    if (c.subCountry) buckets[kind].nations.add(c.subCountry);
+    buckets[kind].groups.push(g);
   }
+  const homeLabel = homeKey === 'ireland' ? 'Ireland' : home?.subCountry ?? null;
   const plans: RailPlan[] = [];
-  for (const [key, b] of buckets) {
+  for (const kind of ['home', 'rest', 'abroad'] as const) {
+    const b = buckets[kind];
     if (b.groups.length === 0) continue;
-    const kind: RailKind = key === '__abroad' ? 'abroad' : key === homeKey ? 'home' : key === 'ireland' ? 'ireland' : 'nation';
-    const nations = key === 'ireland' ? [...IRELAND_NATIONS] : key === '__abroad' ? [...b.nations] : [key];
-    const nation = key === 'ireland' ? 'Ireland' : key === '__abroad' ? null : key;
+    const nations = kind === 'home' && homeKey === 'ireland' ? [...IRELAND_NATIONS] : kind === 'home' ? [homeKey as string] : [...b.nations];
     const ordered = orderRings(b.groups);
     plans.push({
-      key, kind, nations, ...railHeading(kind, nation),
+      key: kind, kind, nations, ...railHeading(kind, kind === 'abroad' ? null : homeLabel, grouping),
       courseIds: ordered.slice(0, RAIL_MAX).map((g) => g.courseId),
       playedTotal: ordered.length,
       activity: b.groups.reduce((n, g) => n + g.activity, 0),
     });
   }
-  const rank = (p: RailPlan) => (p.kind === 'home' ? 0 : p.kind === 'abroad' ? 2 : 1);
-  return plans.sort((a, b) => rank(a) - rank(b) || b.activity - a.activity || a.key.localeCompare(b.key));
+  return plans;
 }
 
-/** "See all ›": single-nation rails only, more played courses than a rail shows. */
-export const railShowsSeeAll = (p: RailPlan) => (p.kind === 'home' || p.kind === 'nation') && p.playedTotal > RAIL_MAX;
-
-export interface RatedCandidate { courseId: string; rating: number | null; country: string | null; subCountry: string | null }
-/** Tops a rail with fewer than RAIL_MIN played courses up with the best rated
- *  courses nobody played lately, best first, skipping anything already shown. */
-export function topUpRail(playedIds: string[], candidates: RatedCandidate[], onPage: ReadonlySet<string>): string[] {
-  const need = RAIL_MIN - playedIds.length;
-  if (need <= 0) return [];
-  return [...candidates]
-    .filter((c) => c.rating != null && !onPage.has(c.courseId))
-    .sort((a, b) => (b.rating as number) - (a.rating as number))
-    .filter((c, i, arr) => arr.findIndex((x) => x.courseId === c.courseId) === i)
-    .slice(0, need)
-    .map((c) => c.courseId);
-}
+/** "See all ›": the home nation rail only, more active courses than a rail shows. */
+export const railShowsSeeAll = (p: RailPlan) => p.kind === 'home' && p.playedTotal > RAIL_MAX;
 
 /* ── §3 tile rules ─────────────────────────────────────────────────────── */
 export interface ScoredRound { whs_score_id: string; user_id: string; play_date: string; gross_score: number | null }

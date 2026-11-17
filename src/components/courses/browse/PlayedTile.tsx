@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { shareCourseName } from '@/lib/courses/shareCourseName';
-import { firstName } from '@/lib/whs/share';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
 import { Bar } from '@/components/skeletons/shellVocabulary';
@@ -38,7 +37,23 @@ const BUTTON_BG = '#1B1B20';
 /** §5 head right: the course's county (golf_courses.region), else its nation. */
 export const tilePlaceText = (course: Pick<PlayedCourse, 'region' | 'subCountry'>): string | null => course.region || course.subCountry || null;
 
-export function PlayedTile({ group, course, tile }: { group: CourseGroup; course: PlayedCourse; tile: ReturnType<typeof usePlayedTile> }) {
+type FacesMap = ReadonlyMap<string, { displayName: string | null; username: string | null; photoUrl: string | null }>;
+const NO_FACES: FacesMap = new Map();
+
+/** V3 §2 caption credit: 14px face + 5px + full name (filled from the shared faces). */
+function Credit({ id, name, photo, day, faces }: { id: string | null; name: string | null; photo: string | null; day?: string | null; faces: FacesMap }) {
+  const f = id ? faces.get(id) : undefined;
+  const full = name || f?.displayName || f?.username || null;
+  if (!full) return null;
+  return (
+    <span data-photo-credit="" style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 10, lineHeight: '14px', color: 'rgba(255,255,255,.85)', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+      <MemberFace face={{ userId: id ?? full, photo: photo || f?.photoUrl || null, name: full }} size={14} />
+      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{day ? `${full} \u00B7 ${day}` : full}</span>
+    </span>
+  );
+}
+
+export function PlayedTile({ group, course, tile, faces = NO_FACES }: { group: CourseGroup; course: PlayedCourse; tile: ReturnType<typeof usePlayedTile>; faces?: FacesMap }) {
   const navigate = useNavigate();
   const open = () => navigate(`/courses/${course.id}`);
   const { short, variant } = shareCourseName(course.name);
@@ -66,7 +81,7 @@ export function PlayedTile({ group, course, tile }: { group: CourseGroup; course
         {group.rows.length > 0 ? (
         <button type="button" data-best-lately="" onClick={open}
           style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: 10, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK }}>
-          <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.AMBER, lineHeight: '10px' }}>BEST LATELY</span>
+          <span data-best-kicker="" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>BEST LATELY</span>
           {best.map((r) => {
             const par = toParText(r.gross_score as number, r.course_par);
             const under = par != null && par.startsWith('\u2212');
@@ -74,13 +89,16 @@ export function PlayedTile({ group, course, tile }: { group: CourseGroup; course
               <span key={r.whs_score_id} data-best-entry="" style={{ display: 'block', minWidth: 0 }}>
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <MemberFace face={{ userId: r.user_id, photo: r.profile_photo_url, name: r.display_name }} size={20} />
-                  <b style={{ fontSize: 18, lineHeight: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.gross_score}</b>
+                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <b style={{ fontSize: 18, lineHeight: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.gross_score}</b>
+                    {par != null ? <span data-to-par="" style={{ fontSize: 10.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: under ? UNDER_RED : A.DIM }}>{par}</span> : null}
+                  </span>
                 </span>
                 <span style={{ ...ell, marginTop: 5, fontSize: 11.5, lineHeight: '14px', fontWeight: 600 }}>
                   <InlineProMemberName userId={r.user_id}>{r.display_name ?? ''}</InlineProMemberName>
                 </span>
                 <span style={{ ...ell, marginTop: 1, fontSize: 9.5, lineHeight: '12px', color: A.DIM }}>
-                  {dayLabel(r.play_date)}{par != null ? <> {'\u00B7'} <span data-to-par="" style={under ? { color: UNDER_RED } : undefined}>{par}</span></> : null}
+                  {dayLabel(r.play_date)}
                 </span>
               </span>
             );
@@ -133,15 +151,15 @@ export function PlayedTile({ group, course, tile }: { group: CourseGroup; course
                 {tile.hardestHole === p.holeNo ? <span data-hardest="" style={{ position: 'absolute', top: 10, right: 8, padding: '3px 6px', borderRadius: 6, background: 'rgba(10,10,12,.6)', color: A.AMBER, fontSize: 8, fontWeight: 800, letterSpacing: '.1em', lineHeight: '10px' }}>HARDEST</span> : null}
                 <span style={capBase}>
                   <b style={{ ...ell, fontSize: 11.5, fontWeight: 700 }}>{[p.par != null ? `Par ${p.par}` : null, p.yards != null ? `${p.yards} yds` : null].filter(Boolean).join(' \u00B7 ')}</b>
-                  {p.memberName ? <span style={{ ...ell, marginTop: 2, fontSize: 10, color: 'rgba(255,255,255,.75)' }}>{`by ${firstName(p.memberName)}`}</span> : null}
+                  <Credit id={p.memberId} name={p.memberName} photo={p.memberPhoto} faces={faces} />
                 </span>
               </>
             ) : (
               <>
-                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 800, letterSpacing: '.12em', lineHeight: '10px', color: 'rgba(255,255,255,.85)' }}>COURSE</span>
+                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 800, letterSpacing: '.12em', lineHeight: '10px', color: '#FFFFFF' }}>COURSE</span>
                 <span style={capBase}>
                   <b style={{ ...ell, fontSize: 11.5, fontWeight: 700 }}>{p.caption || short}</b>
-                  <span style={{ ...ell, marginTop: 2, fontSize: 10, color: 'rgba(255,255,255,.75)' }}>{[p.memberName ? `by ${firstName(p.memberName)}` : null, dayLabel(p.createdAt)].filter(Boolean).join(' \u00B7 ')}</span>
+                  <Credit id={p.memberId} name={p.memberName} photo={p.memberPhoto} day={dayLabel(p.createdAt)} faces={faces} />
                 </span>
               </>
             )}

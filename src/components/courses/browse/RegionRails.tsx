@@ -1,7 +1,7 @@
 /**
  * Region rails under the tile (BRIEF_WHATS_BEEN_PLAYED §4, signed-off
- * region-rails mock). Rail plans come from playedRings.buildRails; top-ups from
- * useRailTopUps. Since BRIEF_WHATS_BEEN_PLAYED_V2 rails hold every active
+ * region-rails mock, revised by BRIEF_WHATS_BEEN_PLAYED_V3: home nation, one
+ * rest-of-grouping rail, Abroad; no top-ups). Rail plans come from playedRings.buildRails. Since BRIEF_WHATS_BEEN_PLAYED_V2 rails hold every active
  * course outside the first tab, so a course may sit in a tab and a rail. Every card opens the
  * course page; "See all ›" opens section 08 on the Played board scoped to the
  * nation, the way ByRegionSection's tiles write the country param.
@@ -10,15 +10,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import type React from 'react';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { useCourseMediaCounts } from '@/hooks/useCourseMediaCounts';
-import { formatFrostRating } from '@/lib/frostPanel';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ALL_COURSES_ANCHOR } from './ByRegionSection';
 import { fmtCount } from './format';
-import { railShowsSeeAll, topUpRail, type RailPlan } from './playedRings';
+import { bestLately, railShowsSeeAll, type RailPlan } from './playedRings';
 import type { PlayedCourse } from './usePlayedRounds';
-import type { RatedCourse } from './useRailTopUps';
-import { FaceStack, GLASS, GOLD, PLAYED_SCRIM, PlayedHead } from './playedParts';
+import { GLASS, MemberFace, PLAYED_SCRIM, PlayedHead } from './playedParts';
 import type { CourseGroup } from './WhoPlayingSection';
 
 export const RAIL_CARD_W = 156;
@@ -31,79 +29,55 @@ const cardStyle: React.CSSProperties = { flex: 'none', width: RAIL_CARD_W, heigh
 const bottom: React.CSSProperties = { position: 'absolute', left: 10, right: 10, bottom: 10 };
 const nameStyle: React.CSSProperties = { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', fontSize: 14, fontWeight: 800, lineHeight: 1.15 };
 const countyStyle: React.CSSProperties = { display: 'block', marginTop: 2, fontSize: 10.5, color: 'rgba(255,255,255,.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
-const statStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 6, marginTop: 7, fontSize: 10.5, color: 'rgba(255,255,255,.85)', whiteSpace: 'nowrap', overflow: 'hidden' };
 
-function PlayedCard({ group, course, rating, onOpen }: { group: CourseGroup; course: PlayedCourse; rating: number | null; onOpen: () => void }) {
-  const played = group.rows.length > 0;
+function PlayedCard({ group, course, onOpen }: { group: CourseGroup; course: PlayedCourse; onOpen: () => void }) {
+  const best = bestLately(group.rows, 1)[0] ?? null;
   return (
     <button type="button" data-rail-card="played" onClick={onOpen} style={cardStyle}>
       <CourseImageFallback courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
         <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
-        <span style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: A.AMBER }}>{fmtCount(group.activity)}</span>
+        <span data-rail-count="" style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF' }}>{fmtCount(group.activity)}</span>
         <span style={bottom}>
           <b style={nameStyle}>{shortCoursePart(course.name)}</b>
           {course.region ? <span style={countyStyle}>{course.region}</span> : null}
-          {played ? (
-            <span style={statStyle} data-played-stat="">
-              <FaceStack faces={group.faces.slice(0, 2)} size={16} overlap={6} />
-              {group.best != null ? <span><span style={{ color: 'rgba(255,255,255,.85)' }}>Best round</span> <span style={{ color: GOLD, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{group.best}</span></span> : null}
-            </span>
-          ) : <ActivityStat courseId={course.id} rating={rating} />}
+          {best ? (
+            <>
+              <span data-best-golfer="" style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 7, fontSize: 11, fontWeight: 600, lineHeight: '16px', color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                <MemberFace face={{ userId: best.user_id, photo: best.profile_photo_url, name: best.display_name }} size={16} />
+                <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{best.display_name ?? ''}</span>
+              </span>
+              <span data-played-stat="" style={{ display: 'block', marginTop: 3, fontSize: 10.5, color: 'rgba(255,255,255,.85)', whiteSpace: 'nowrap' }}>
+                Best round <b data-best-gross="" style={{ color: '#FFFFFF', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{best.gross_score}</b>
+              </span>
+            </>
+          ) : group.rows.length === 0 ? <ActivityStat courseId={course.id} /> : null}
         </span>
       </CourseImageFallback>
     </button>
   );
 }
 
-/** Posts or reviews, no round: the not-played card's rating and photos line. */
-function ActivityStat({ courseId, rating }: { courseId: string; rating: number | null }) {
+/** §3 "{v} video(s) & {p} photo(s)"; either part drops at 0, both 0 → nothing. */
+export function mediaLine(videos: number, photos: number): string | null {
+  const v = videos > 0 ? `${fmtCount(videos)} ${videos === 1 ? 'video' : 'videos'}` : null;
+  const p = photos > 0 ? `${fmtCount(photos)} ${photos === 1 ? 'photo' : 'photos'}` : null;
+  return v && p ? `${v} & ${p}` : v ?? p;
+}
+
+/** Posts or reviews, no round: the course's media counts (get_course_media_counts). */
+function ActivityStat({ courseId }: { courseId: string }) {
   const counts = useCourseMediaCounts(courseId);
-  return <RatingPhotos rating={rating} photos={counts.data?.photos ?? 0} attr="data-activity-stat" />;
-}
-function RatingPhotos({ rating, photos, attr }: { rating: number | null; photos: number; attr: string }) {
-  return (
-    <span style={statStyle} {...{ [attr]: '' }}>
-      <span>{'\u2605 '}<b style={{ fontVariantNumeric: 'tabular-nums' }}>{rating != null ? formatFrostRating(rating) : ''}</b>{photos > 0 ? ` \u00B7 ${fmtCount(photos)} ${photos === 1 ? 'photo' : 'photos'}` : ''}</span>
-    </span>
-  );
+  const text = mediaLine(counts.data?.videos ?? 0, counts.data?.photos ?? 0);
+  return text ? <span data-activity-stat="" style={{ display: 'block', marginTop: 7, fontSize: 10.5, color: 'rgba(255,255,255,.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{text}</span> : null;
 }
 
-function NotPlayedCard({ course, onOpen }: { course: RatedCourse; onOpen: () => void }) {
-  const counts = useCourseMediaCounts(course.courseId);
-  const photos = counts.data?.photos ?? 0;
-  return (
-    <button type="button" data-rail-card="not-played" onClick={onOpen} style={cardStyle}>
-      <CourseImageFallback courseId={course.courseId} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
-        <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
-        <span style={{ ...glassTop, fontSize: 9, fontWeight: 800, letterSpacing: '.12em', color: 'rgba(255,255,255,.7)' }}>NOT PLAYED LATELY</span>
-        <span style={bottom}>
-          <b style={nameStyle}>{shortCoursePart(course.name)}</b>
-          {course.region ? <span style={countyStyle}>{course.region}</span> : null}
-          <RatingPhotos rating={course.rating} photos={photos} attr="data-not-played-stat" />
-        </span>
-      </CourseImageFallback>
-    </button>
-  );
-}
-
-export function RegionRails({ rails, groups, courseMap, topUps, tabIds, ratings }: {
+export function RegionRails({ rails, groups, courseMap }: {
   rails: RailPlan[]; groups: CourseGroup[]; courseMap: Map<string, PlayedCourse> | undefined;
-  topUps: Map<string, RatedCourse[]>; tabIds: ReadonlySet<string>;
-  /** Community rating for active courses with no round (stat_browse_base). */
-  ratings?: ReadonlyMap<string, number | null>;
 }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   if (!rails.length || !courseMap) return null;
   const byGroup = new Map(groups.map((g) => [g.courseId, g]));
-  // Every active course is on the page already (first tab or a rail); top-ups skip it and each other.
-  const onPage = new Set<string>([...tabIds, ...groups.map((g) => g.courseId)]);
-  const resolved = rails.map((rail) => {
-    const cands = topUps.get(rail.key) ?? [];
-    const extra = topUpRail(rail.courseIds, cands, onPage);
-    extra.forEach((id) => onPage.add(id));
-    return { rail, extra: extra.map((id) => cands.find((c) => c.courseId === id)).filter((c): c is RatedCourse => !!c) };
-  });
   const open = (id: string) => navigate(`/courses/${id}`);
   const seeAll = (nation: string) => {
     const params = new URLSearchParams(searchParams);
@@ -115,7 +89,7 @@ export function RegionRails({ rails, groups, courseMap, topUps, tabIds, ratings 
   };
   return (
     <div data-region-rails="" style={{ marginTop: RAILS_TOP, display: 'flex', flexDirection: 'column', gap: RAIL_GAP_Y }}>
-      {resolved.map(({ rail, extra }) => (
+      {rails.map((rail) => (
         <div key={rail.key} data-region-rail={rail.kind}>
           <PlayedHead kicker={rail.kicker} title={rail.title} right={railShowsSeeAll(rail) ? (
             <button type="button" data-rail-see-all="" onClick={() => seeAll(rail.nations[0])}
@@ -124,9 +98,8 @@ export function RegionRails({ rails, groups, courseMap, topUps, tabIds, ratings 
           <div className="scrollbar-hide" style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', marginTop: 12, padding: '0 16px' }}>
             {rail.courseIds.map((id) => {
               const g = byGroup.get(id); const c = courseMap.get(id);
-              return g && c ? <PlayedCard key={id} group={g} course={c} rating={ratings?.get(id) ?? null} onOpen={() => open(id)} /> : null;
+              return g && c ? <PlayedCard key={id} group={g} course={c} onOpen={() => open(id)} /> : null;
             })}
-            {extra.map((c) => <NotPlayedCard key={c.courseId} course={c} onOpen={() => open(c.courseId)} />)}
           </div>
         </div>
       ))}

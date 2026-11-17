@@ -1,21 +1,20 @@
-/** BRIEF_WHATS_BEEN_PLAYED §6 — tabs, rails, top-up, See all, tile row, best
+/** BRIEF_WHATS_BEEN_PLAYED §6 (V3-revised) — tabs, rails, See all, tile row, best
  *  lately, distance, seen state, card states and the 320 containment. */
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, topUps: { byRail: new Map(), ready: true } as any, counts: 0, session: { user: { id: 'me' }, loading: false } as any }));
+const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, counts: 0, session: { user: { id: 'me' }, loading: false } as any }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => f.session }));
 vi.mock('@/components/courses/browse/usePlayedRounds', () => ({ usePlayedRounds: () => f.hook }));
 vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => f.tile }));
-vi.mock('@/components/courses/browse/useRailTopUps', () => ({ useRailTopUps: () => f.topUps }));
 vi.mock('@/hooks/useCourseMediaCounts', () => ({ useCourseMediaCounts: () => ({ data: { photos: f.counts, videos: 0, total: f.counts } }) }));
 vi.mock('@/features/pro-verification/InlineProMemberName', () => ({ InlineProMemberName: ({ children }: { children: React.ReactNode }) => <span>{children}</span> }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span data-face="" /> }));
 import {
-  bestLately, buildAreaTabs, buildRails, dayLabel, interleaveTilePhotos, railHeading, railShowsSeeAll, seenKey, toParText, topUpRail, hardestHoleFromRanks,
+  bestLately, buildAreaTabs, buildRails, dayLabel, interleaveTilePhotos, railHeading, railShowsSeeAll, seenKey, toParText, hardestHoleFromRanks,
   type HomePlace, type PlacedCourse,
 } from '@/components/courses/browse/playedRings';
 import { WhoPlayingSection, groupRounds } from '@/components/courses/browse/WhoPlayingSection';
@@ -60,39 +59,33 @@ describe('region rails', () => {
   const all = [near, kent, surrey, fife, kerry, down, spain];
   const groups = [g('near', 9), g('kent', 4), g('surrey', 3), g('fife', 2), g('kerry', 1), g('down', 5), g('spain', 1)];
   const tabIds = new Set(['near', 'kent']);
-  it('groups by nation with Ireland merged and Abroad last, home nation first', () => {
+  it('home nation, one rail for the rest of the grouping busiest first, Abroad last (V3 §4)', () => {
     const rails = buildRails(all, groups, tabIds, home);
-    expect(rails.map((r) => r.key)).toEqual(['England', 'ireland', 'Scotland', '__abroad']);
-    expect(rails[1].courseIds).toEqual(['down', 'kerry']);
-    expect(rails[3].courseIds).toEqual(['spain']);
+    expect(rails.map((r) => r.key)).toEqual(['home', 'rest', 'abroad']);
+    expect(rails[1].courseIds).toEqual(['down', 'fife', 'kerry']);
+    expect(rails[2].courseIds).toEqual(['spain']);
     expect(rails.flatMap((r) => r.courseIds)).not.toContain('near');
   });
   it('a rail only appears with a played course; nothing repeats from the tabs', () => {
     const rails = buildRails(all, groups, new Set(['near', 'kent', 'surrey']), home);
-    expect(rails.some((r) => r.key === 'England')).toBe(false);
+    expect(rails.some((r) => r.key === 'home')).toBe(false);
   });
   it('no home groups by Britain & Ireland', () => {
-    expect(buildRails([spain, fife], [g('spain', 1), g('fife', 1)], new Set(), null).map((r) => r.kind)).toEqual(['nation', 'abroad']);
+    expect(buildRails([spain, fife], [g('spain', 1), g('fife', 1)], new Set(), null).map((r) => r.kind)).toEqual(['rest', 'abroad']);
   });
   it('maps the headings', () => {
     expect(railHeading('home', 'England')).toEqual({ kicker: 'ACROSS ENGLAND', title: 'Played lately' });
-    expect(railHeading('nation', 'Scotland')).toEqual({ kicker: 'SCOTLAND', title: 'North of the border' });
-    expect(railHeading('ireland', 'Ireland')).toEqual({ kicker: 'IRELAND', title: 'Across the water' });
-    expect(railHeading('nation', 'Wales')).toEqual({ kicker: 'WALES', title: 'Played lately' });
+    expect(railHeading('rest', 'England')).toEqual({ kicker: 'BEYOND ENGLAND', title: 'The rest of GB&I' });
+    expect(railHeading('rest', 'California', 'Rest of World')).toEqual({ kicker: 'BEYOND CALIFORNIA', title: 'Played lately' });
     expect(railHeading('abroad', null)).toEqual({ kicker: 'FURTHER AFIELD', title: 'Abroad' });
   });
-  it('tops up to three in rating order, skipping anything on the page', () => {
-    const cands = [{ courseId: 'a', rating: 8.1 }, { courseId: 'b', rating: 9.6 }, { courseId: 'kent', rating: 9.9 }, { courseId: 'c', rating: null }].map((x) => ({ ...x, country: UKI, subCountry: 'Scotland' }));
-    expect(topUpRail(['fife'], cands, new Set(['fife', 'kent']))).toEqual(['b', 'a']);
-    expect(topUpRail(['x', 'y', 'z'], cands, new Set())).toEqual([]);
-  });
-  it('See all only on a single-nation rail with more than ten played', () => {
+  it('See all only on the home nation rail with more than ten active', () => {
     const many = Array.from({ length: 11 }, (_, i) => c(`e${i}`, { subCountry: 'England' }));
     const [rail] = buildRails(many, many.map((x) => g(x.id, 1)), new Set(), home);
     expect(rail.courseIds).toHaveLength(10);
     expect(railShowsSeeAll(rail)).toBe(true);
     expect(railShowsSeeAll({ ...rail, playedTotal: 10 })).toBe(false);
-    expect(railShowsSeeAll({ ...rail, kind: 'ireland' })).toBe(false);
+    expect(railShowsSeeAll({ ...rail, kind: 'rest' })).toBe(false);
     expect(railShowsSeeAll({ ...rail, kind: 'abroad' })).toBe(false);
   });
 });
@@ -142,7 +135,7 @@ const mount = () => render(<QueryClientProvider client={new QueryClient()}><Memo
 describe('section', () => {
   beforeEach(() => {
     window.localStorage.clear();
-    f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.topUps = { byRail: new Map(), ready: true }; f.counts = 0;
+    f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.counts = 0;
     setHook([row('1', 'near', 'ann', 71), row('2', 'near', 'bob', 77, '2026-11-08'), row('3', 'near', 'cy', 80), row('4', 'kent', 'ann', 72), row('5', 'fife', 'dee', 79)],
       [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
   });
@@ -155,14 +148,14 @@ describe('section', () => {
     expect(container.querySelectorAll('[data-played-ring]')).toHaveLength(3);
     expect(container.querySelector('[data-played-tile]')?.getAttribute('data-played-tile')).toBe('near');
   });
-  it('best lately shows the two lowest with to par, under par in red', () => {
+  it('best lately shows the two lowest with to par beside the score, under par red, otherwise dim (V3 §2)', () => {
     const { container } = mount();
     const entries = [...container.querySelectorAll('[data-best-entry]')];
     expect(entries).toHaveLength(2);
     const pars = [...container.querySelectorAll('[data-to-par]')] as HTMLElement[];
     expect(pars.map((p) => p.textContent)).toEqual(['\u22121', '+5']);
     expect(pars[0].style.color).toBe('rgb(240, 84, 74)');
-    expect(pars[1].style.color).toBe('');
+    expect(pars[1].style.color).toBe('rgba(248, 250, 252, 0.42)');
   });
   it('no photos shows the single empty tile', () => {
     const { container } = mount();
@@ -179,16 +172,13 @@ describe('section', () => {
     fireEvent.click(container.querySelectorAll('[data-played-ring]')[0]);
     expect(container.querySelectorAll('[data-played-ring]')[1].getAttribute('data-played-ring')).toBe('seen');
   });
-  it('played and not-played rail cards', () => {
+  it('rest-of rail card with no top-ups (V3 §3, §4)', () => {
     f.counts = 0;
-    f.topUps = { byRail: new Map([['Scotland', [{ courseId: 'glen', name: 'Gleneagles (King\u2019s)', region: 'Perth & Kinross', imageUrl: null, rating: 10, country: UKI, subCountry: 'Scotland' }]]]), ready: true };
     const { container } = mount();
     const rail = container.querySelector('[data-region-rail]') as HTMLElement;
-    expect(rail.textContent).toContain('SCOTLAND');
+    expect(rail.textContent).toContain('BEYOND ENGLAND');
     expect(rail.querySelectorAll('[data-rail-card="played"]')).toHaveLength(1);
-    const np = rail.querySelector('[data-rail-card="not-played"]') as HTMLElement;
-    expect(np.textContent).toContain('NOT PLAYED LATELY');
-    expect(np.querySelector('[data-not-played-stat]')?.textContent).toBe('\u2605 10');
+    expect(rail.querySelector('[data-rail-card="not-played"]')).toBeNull();
     expect(rail.querySelector('[data-rail-see-all]')).toBeNull();
   });
   it('contains every row at 320: the section clips and each row scrolls', () => {
@@ -210,7 +200,7 @@ describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
   beforeEach(() => {
     window.localStorage.clear();
     f.session = { user: { id: 'me' }, loading: false };
-    f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.topUps = { byRail: new Map(), ready: true }; f.counts = 0;
+    f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.counts = 0;
     setHook([row('1', 'near', 'ann', 71), row('2', 'near', 'bob', 77, '2026-11-08'), row('4', 'kent', 'ann', 72), row('5', 'fife', 'dee', 79)],
       [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
   });
