@@ -226,3 +226,9 @@ through the test, not by eye.
 - **Suite:** run sequentially in four shards: 2,275 / 2,227 / 2,259 / 2,342 = 9,103 (9,097 + 6). One failure on shard 1: `coursesRailsUnlimited.test.tsx` › "admin hole-tag predicate invalidation refetches the active infinite holes rail" (could not find hole button). File untouched by this brief; passed 3/3 alone. A first attempt with shards in parallel had 4 timeouts/flakes in untouched files (ms1MessagesHeadToHead, guestStage24, avatarFallbackCanonical, claimClub), all passed alone.
 - **Typecheck:** `npx tsgo -b --noEmit` clean.
 - **Device:** unchecked (sign-in unavailable); 320 overflow unchecked visually, no geometry changed.
+
+### Shard 1 rerun (ruling 2026-11-17)
+- Ruling: the `coursesRailsUnlimited.test.tsx` failure is a flake; test left unedited.
+- Shard 1 rerun alone: 2,275 passed, 0 failed. Suite: 2,275 / 2,227 / 2,259 / 2,342 = 9,103, all passing.
+- **Known flaky:** `src/test/coursesRailsUnlimited.test.tsx` › "admin hole-tag predicate invalidation refetches the active infinite holes rail". Failure message, 2026-11-17: `TestingLibraryElementError: Unable to find role="button" and name "Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026"`.
+- Process: the four shards always run one after another, never in parallel.
