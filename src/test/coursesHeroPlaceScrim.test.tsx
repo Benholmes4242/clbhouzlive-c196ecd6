@@ -15,6 +15,13 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/components/explore-tab-new/hooks/useExploreHero', () => ({ useExploreHero: () => ({ data: state.hero, isLoading: false }) }));
 vi.mock('@/components/explore-tab-new/hooks/useExploreMood', () => ({ useExploreMood: () => ({ mood: 'all' }) }));
 vi.mock('@/hooks/courses/useHeroCourseFact', () => ({ useHeroCourseFact: () => ({ data: state.fact }) }));
+// BRIEF_WHATS_BEEN_PLAYED_V2 §1: the header reads record holders through a
+// query. This file's checks are all about the place line and the scrim, so the
+// read is mocked to an empty map — no holder, so the crown fact line stays and
+// every assertion below is untouched.
+vi.mock('@/components/courses/useCourseRecordHolders', () => ({
+  useCourseRecordHolders: () => ({ map: new Map(), players: undefined, settled: true }),
+}));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 
 import { CoursesPageHero } from '@/components/courses/CoursesPageHero';
