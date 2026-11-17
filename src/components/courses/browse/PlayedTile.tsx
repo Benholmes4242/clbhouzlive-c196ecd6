@@ -148,8 +148,8 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
               </span>
             </CourseImageFallback>
           </button>
-        ) : photos.map((p) => (
-          <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { openTilePhoto(p, course, tile.coursePosts ?? [], inSheet); }}
+        ) : photos.map((p, pi) => (
+          <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { openTilePhoto(photos, pi, course, tile.coursePosts ?? [], inSheet); }}
             style={{ flex: 'none', width: PHOTO_TILE_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS, overflow: 'hidden', position: 'relative', padding: 0, border: 0, cursor: 'pointer', textAlign: 'left', color: '#FFFFFF', backgroundColor: A.CANVAS, backgroundImage: `url("${p.imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
             {p.kind === 'hole' ? (

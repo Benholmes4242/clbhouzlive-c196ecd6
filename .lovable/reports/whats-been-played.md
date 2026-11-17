@@ -204,3 +204,6 @@ through the test, not by eye.
 **Suite:** 9,084 → 9,094 (+11 new, −1 deleted). Shards 2,275 / 2,231 / 2,260 / 2,328, all passing (baseline 2,275 / 2,231 / 2,254 / 2,324). Typecheck clean.
 
 **Unchecked:** device checks at 375 and 320 (signed-in only; the test browser cannot sign in). Scroll position kept on sheet close is left to the BottomSheet's own scroll lock and is not asserted in jsdom.
+
+## Amendment V4 §3 — one sideways viewer page
+`tilePhotoViewerArgs(row, tapped, course, coursePosts)` builds ONE synthetic post (`shots:played:<courseId>`) from the tile's already-loaded rows, mediaItems in row order, landing on the tapped photo via mediaId; posts length 1 so no vertical neighbours. Credits/videos from the canonical converters. In the sheet the viewer uses VIEWER_ABOVE_SHEETS_Z (FS_OVERLAY_Z sits below the sheet layer; reported, unchanged from V4). whatsBeenPlayedV4.test.tsx: replaced "hole and course photos open the viewer…" (asserted per-photo single post) with the row-order/index 2 test; extended the sheet test. Count unchanged at 11 in file; full suite not rerun.
