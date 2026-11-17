@@ -54,7 +54,7 @@ export async function fetchPlayedRounds(): Promise<PlayedRoundRow[]> {
 }
 
 export const ACTIVITY_CAP = 500;
-export interface PlayedPostRow { id: string; user_id: string | null; actor_type: string | null; created_at: string; course_id: string | null; tagged_course_ids: string[] | null; post_type?: string | null; whs_score_id?: string | null; attached_score_id?: string | null; media_count?: number | null }
+export interface PlayedPostRow { id: string; user_id: string | null; actor_type: string | null; created_at: string; course_id: string | null; tagged_course_ids: string[] | null; post_type?: string | null; whs_score_id?: string | null; attached_score_id?: string | null; source_review_id?: string | null; media_count?: number | null }
 export interface PlayedReviewRow { id: string; course_id: string | null; user_id: string | null; rating: number | null; review: string | null; created_at: string }
 export const windowStartIso = (now = Date.now()) => new Date(now - ACTIVITY_WINDOW_DAYS * 86_400_000).toISOString();
 
@@ -72,7 +72,7 @@ async function pageRows<T>(read: (from: number, to: number) => PromiseLike<{ dat
 type RawPostRow = Omit<PlayedPostRow, 'media_count'> & { post_media?: Array<{ id: string }> | null };
 export async function fetchPlayedPosts(since = windowStartIso()): Promise<PlayedPostRow[]> {
   const rows = await pageRows<RawPostRow>((from, to) => supabase.from('posts')
-    .select('id, user_id, actor_type, created_at, course_id, tagged_course_ids, post_type, whs_score_id, attached_score_id, post_media(id)')
+    .select('id, user_id, actor_type, created_at, course_id, tagged_course_ids, post_type, whs_score_id, attached_score_id, source_review_id, post_media(id)')
     .eq('status', 'published').or('course_id.not.is.null,tagged_course_ids.neq.{}')
     .gte('created_at', since).order('created_at', { ascending: false }).range(from, to));
   return rows.map(({ post_media, ...r }) => ({ ...r, media_count: post_media?.length ?? 0 })).filter(countsAsActivity);

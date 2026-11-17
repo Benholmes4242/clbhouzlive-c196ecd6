@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 
 import { INK, INK_FAINT, INK_MUTE } from '@/features/courses/_shared/tokens';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import type { ReviewAuthorRound } from './reviewAuthorRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -38,21 +37,9 @@ export function reviewMediaLine(videos: number, photos: number): string {
   return v && p ? `${v} & ${p}` : v || p;
 }
 
-/** Footer tail after the name: " · {n} round(s) here · best {gross}" ("your best" for the viewer's own). */
-export function reviewFootTail(author: ReviewAuthorRound | undefined, mine: boolean): string {
-  if (!author || !(author.rounds_here > 0)) return '';
-  const rounds = `${author.rounds_here} ${author.rounds_here === 1 ? 'round' : 'rounds'} here`;
-  const best = author.best_gross != null ? ` \u00B7 ${mine ? 'your best' : 'best'} ${author.best_gross}` : '';
-  return ` \u00B7 ${rounds}${best}`;
-}
-
 interface Props {
   reviews: LatestReview[];
   onReviewPress: (r: LatestReview) => void;
-  /** The reviewer's own rounds, keyed by review id; absent means name only. */
-  authorRounds?: Map<string, ReviewAuthorRound>;
-  /** The viewer: their own review names the best score as theirs. */
-  viewerId?: string | null;
 }
 
 export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {

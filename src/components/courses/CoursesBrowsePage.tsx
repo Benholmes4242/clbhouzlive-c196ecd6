@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
 import { useBrowseReviews } from './useBrowseReviews';
-import { useReviewAuthorRounds } from './useReviewAuthorRounds';
 import { useOpenLatestReview } from './browse/useOpenLatestReview';
 import StatBrowse from './StatBrowse';
 import { useCourseBrowseTruth } from './useStatBrowse';
@@ -47,9 +46,6 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
   const truthQuery = useCourseBrowseTruth();
   // The reviews rail is app-wide: no country, no region.
   const { pool: reviewPool, isLoading: reviewsLoading, isPending: reviewsPending } = useBrowseReviews(null, null);
-  // The reviewer's own rounds behind each review (BRIEF_COURSES_MEMBERS_SECTIONS §2).
-  const reviewIds = useMemo(() => reviewPool.map(review => review.reviewId), [reviewPool]);
-  const authorRounds = useReviewAuthorRounds(reviewIds, user?.id ?? null);
   const handleReviewTile = useOpenLatestReview();
 
   return (
@@ -63,12 +59,12 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         </div>
       }>
       <div style={BLEED}>
-        <GateReport id="latestReviews" ready={!sessionLoading && settled({ status: reviewsPending ? 'pending' : 'success' }) && authorRounds.settled} />
+        <GateReport id="latestReviews" ready={!sessionLoading && settled({ status: reviewsPending ? 'pending' : 'success' }) } />
         <GateReport id="figures" ready={!sessionLoading && settled(truthQuery)} />
         <WhoPlayingSection />
         <MostPlayedSection />
         <LatestHolesSection />
-        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} authorRounds={authorRounds.map} viewerId={user?.id ?? null} />
+        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} />
       </div>
       <StatBrowse onOpenDirectory={onOpenDirectory} />
       </PageLoadGate>

@@ -324,3 +324,15 @@ None deleted.
 - Active slugs found: not checked against live data — SQL is not run by the agent. The code accepts exactly the four RANK_LIST_BY_SLUG slugs; Ben can confirm with `select slug, is_active from top100_lists;`.
 - Tests: new `src/test/featuredTop100Active.test.ts` (+2): two active lists → +10 once; inactive-only → 0. No existing test changed.
 - Full suite 9,148 vs 9,146 (2,292 / 2,249 / 2,267 / 2,340), all passing; +2 = featuredTop100Active.test.ts. Typecheck clean.
+
+## FIX_V6_REVIEW_POSTS_AND_AUTHOR_ROUNDS (17 Nov 2026)
+
+§1 What identifies a review post: `posts.source_review_id` (set by the Review Wizard; the same test `isReviewPost` in src/lib/postHelpers.ts uses) or `post_type = 'review'`. `countsAsActivity` now returns false for either; the activity read selects `source_review_id`. Rounds, media posts and reviews unchanged. New test `src/test/featuredReviewPostOnce.test.ts` (+1): a review with photos plus its auto-post → activity 1, keys `['review:rv1']`.
+
+§2 Removed: the `useReviewAuthorRounds` read from CoursesBrowsePage and its `authorRounds.settled` term from the latestReviews gate; the `authorRounds`/`viewerId` props from LatestReviewsSection and ReviewRailSlot; the unused `reviewFootTail`. Nothing else in the app used the read, so `useReviewAuthorRounds.ts` and `reviewAuthorRounds.ts` were deleted. The RPC itself is untouched (no SQL).
+
+Tests deleted (each covered only the removed read or old footer):
+- `src/test/coursesMembersSections.test.tsx` (whole file, 10): "writes the to-par figure, the round label and the best label as specified" (`expect(toParFigure(7)).toBe('+7')`…); "keys author rounds by review and keeps a null best as rounds-only" (`expect([...map.keys()]).toEqual(['r1','r2'])`); "shows only for the review the RPC answered", "draws rounds only when the reviewer has no eighteen at that course", "calls the best score the viewer's own when the review is theirs", "reads one round as ROUND HERE and an under-par best in the red figure", "shows the gross alone when the to-par is unknown", "draws nothing for a caller that supplies no rounds at all" (each `expect(footOf(...).textContent).toBe('Ada r1'|'Ada r2')` with an authorRounds map); "holds the page while the reviewer-rounds read is unresolved, then opens with the strip" (`expect(f.rpc).toHaveBeenCalledWith('get_review_author_rounds', …)`); "never asks for rounds the page has no reviews for" (`…filter(call => call[0] === 'get_review_author_rounds')).toHaveLength(0)`).
+- `src/test/coursesPageV5Sections.test.tsx` (4): "V6 §5 footer: name only even with rounds and best", "V6 §5 footer: name only with rounds and no best", "footer: name only with no row", "V6 §5 footer: the viewer's own review is name only too" — each `expect(foot(container)).toBe('Benjamin Holmes')` with an authorRounds prop that no longer exists.
+
+Suite 9,135 vs 9,148 (2,288 / 2,248 / 2,265 / 2,334), all passing, shards sequential: −10 −4 +1 = −13 reconciles. Typecheck clean.

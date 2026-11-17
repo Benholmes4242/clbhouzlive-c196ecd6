@@ -229,8 +229,11 @@ export function interleaveTilePhotos<H extends TileHole, C extends TileCoursePho
 /* ── BRIEF_WHATS_BEEN_PLAYED_V6 ─────────────────────────────────────────── */
 /** §1: a post counts only with at least one photo/video and when it is not a
  *  round post (no whs_score_id / attached_score_id, post_type not 'round'). */
-export function countsAsActivity(p: { post_type?: string | null; whs_score_id?: string | null; attached_score_id?: string | null; media_count?: number | null }): boolean {
+export function countsAsActivity(p: { post_type?: string | null; whs_score_id?: string | null; attached_score_id?: string | null; source_review_id?: string | null; media_count?: number | null }): boolean {
   if (p.whs_score_id || p.attached_score_id) return false;
+  // FIX_V6_REVIEW_POSTS: a review's auto-post (source_review_id, or post_type
+  // 'review') is not activity; the review itself already counts once.
+  if (p.source_review_id || (p.post_type ?? '').toLowerCase() === 'review') return false;
   if ((p.post_type ?? '').toLowerCase() === 'round') return false;
   return (p.media_count ?? 0) > 0;
 }

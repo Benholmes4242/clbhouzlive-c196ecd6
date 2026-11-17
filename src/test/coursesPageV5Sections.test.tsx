@@ -23,7 +23,6 @@ vi.mock('@/components/mentions/MentionText', () => ({ MentionText: ({ text }: { 
 import { MostPlayedSection } from '@/components/courses/browse/MostPlayedSection';
 import { WhoPlayingShell, LatestReviewsShell } from '@/components/courses/browse/sectionShells';
 import { ReviewRailSlot } from '@/components/courses/ReviewRailSlot';
-import { toAuthorRoundsMap } from '@/components/courses/reviewAuthorRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 afterEach(() => { cleanup(); listMock.mockReset(); });
@@ -78,22 +77,6 @@ describe('V5 §4 Latest reviews card B', () => {
     expect(container.querySelector('[data-review-played]')).toBeNull();
     expect(container.textContent).not.toMatch(/ROUNDS? HERE|THEIR BEST/);
     expect((container.querySelector('[data-review-foot]') as HTMLElement).style.marginTop).toBe('auto');
-  });
-  it('V6 §5 footer: name only even with rounds and best', () => {
-    const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a')]} onReviewPress={() => {}} authorRounds={toAuthorRoundsMap([{ review_id: 'r1', rounds_here: 1, best_gross: 78, best_to_par: 6 }])} />);
-    expect(foot(container)).toBe('Benjamin Holmes');
-  });
-  it('V6 §5 footer: name only with rounds and no best', () => {
-    const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a')]} onReviewPress={() => {}} authorRounds={toAuthorRoundsMap([{ review_id: 'r1', rounds_here: 3, best_gross: null, best_to_par: null }])} />);
-    expect(foot(container)).toBe('Benjamin Holmes');
-  });
-  it('footer: name only with no row', () => {
-    const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a')]} onReviewPress={() => {}} authorRounds={new Map()} />);
-    expect(foot(container)).toBe('Benjamin Holmes');
-  });
-  it("V6 §5 footer: the viewer's own review is name only too", () => {
-    const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'me')]} onReviewPress={() => {}} viewerId="me" authorRounds={toAuthorRoundsMap([{ review_id: 'r1', rounds_here: 2, best_gross: 74, best_to_par: 2 }])} />);
-    expect(foot(container)).toBe('Benjamin Holmes');
   });
   it('a tap still opens the review', () => {
     const press = vi.fn();
