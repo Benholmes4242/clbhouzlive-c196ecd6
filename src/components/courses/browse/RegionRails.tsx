@@ -9,6 +9,9 @@
  */
 import { useSearchParams } from 'react-router-dom';
 import type React from 'react';
+import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useNearViewport, useNewestCourseMedia } from './useNewestCourseMedia';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { useCourseMediaCounts } from '@/hooks/useCourseMediaCounts';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
@@ -33,9 +36,20 @@ const countyStyle: React.CSSProperties = { display: 'block', marginTop: 2, fontS
 
 function PlayedCard({ group, course, onOpen }: { group: CourseGroup; course: PlayedCourse; onOpen: () => void }) {
   const best = bestLately(group.rows, 1)[0] ?? null;
+  const { user } = useSupabaseSession();
+  const [ref, near] = useNearViewport<HTMLButtonElement>();
+  // §1: newest member media over the course image; the fallback stays drawn beneath while pending or absent.
+  const media = useNewestCourseMedia(course.id, user?.id ?? null, near).data ?? null;
   return (
-    <button type="button" data-rail-card="played" onClick={onOpen} style={cardStyle}>
+    <button ref={ref} type="button" data-rail-card="played" onClick={onOpen} style={cardStyle}>
       <CourseImageFallback courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
+        {media ? (
+          <span data-rail-media={media.media_type} style={{ position: 'absolute', inset: 0 }}>
+            {media.media_type === 'video'
+              ? <HoleInlineVideo media={media} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
+              : <img src={media.media_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.hidden = true; }} />}
+          </span>
+        ) : null}
         <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
         <span data-rail-count="" style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF' }}>{fmtCount(group.activity)}</span>
         <span style={bottom}>

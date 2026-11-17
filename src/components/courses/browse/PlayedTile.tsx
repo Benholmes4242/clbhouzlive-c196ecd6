@@ -14,6 +14,7 @@ import { CourseImageFallback } from '@/components/explore-tab-new/courseled/Cour
 import { shareCourseName } from '@/lib/courses/shareCourseName';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
 import { courseLatelyHref } from '@/lib/courses/courseLatelyLink';
+import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
 import { openTilePhoto } from './tilePhotoViewer';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
@@ -167,6 +168,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
         ) : photos.map((p, pi) => (
           <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { openTilePhoto(photos, pi, course, tile.coursePosts ?? [], inSheet); }}
             style={{ flex: 'none', width: PHOTO_TILE_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS, overflow: 'hidden', position: 'relative', padding: 0, border: 0, cursor: 'pointer', textAlign: 'left', color: '#FFFFFF', backgroundColor: A.CANVAS, backgroundImage: `url("${p.imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            {p.video ? <span data-tile-video="" style={{ position: 'absolute', inset: 0 }}><HoleInlineVideo media={p.video} alt="" fit="cover" autoplayGroup="courses-member-shots" active /></span> : null}
             <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
             {p.kind === 'hole' ? (
               <>
