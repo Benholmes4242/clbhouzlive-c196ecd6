@@ -2,7 +2,8 @@
  * V6 §3 Featured signals — existing table reads only, no RPCs:
  * - played any time: user_course_activity.has_played (the viewer's courses-played read);
  * - reviewed any time: course_ratings for the viewer (is_mock false);
- * - Top 100: course_top100_memberships joined to an active top100_lists row;
+ * - Top 100: ANY active list (World/GB&I/Europe/USA, slugs per RANK_LIST_BY_SLUG),
+ *   counted once per course; inactive lists ignored (activeTop100CourseIds);
  * - connected: follows, personal↔personal, both directions (people the viewer
  *   follows via fetchCircleIds, plus followers; accepted friendships already
  *   carry a follow edge — see lib/social/circle.ts);
@@ -13,6 +14,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchCircleIds } from '@/lib/social/circle';
+import { activeTop100CourseIds, type Top100MembershipRow } from './playedRings';
 
 const ids = <T,>(rows: unknown, pick: (r: T) => string | null | undefined) => new Set(((rows ?? []) as T[]).map(pick).filter((v): v is string => !!v));
 
@@ -29,9 +31,9 @@ export function useFeaturedSignals(userId: string | undefined, courseIds: string
     return ids<{ course_id: string | null }>(data, (r) => r.course_id);
   } });
   const top100 = useQuery({ queryKey: ['courses', 'featured-top100', courseIds.join('|')], enabled: on && courseIds.length > 0, retry: false, staleTime: 10 * 60_000, queryFn: async () => {
-    const { data, error } = await supabase.from('course_top100_memberships').select('course_id, top100_lists!inner(is_active)').in('course_id', courseIds).eq('top100_lists.is_active', true);
+    const { data, error } = await supabase.from('course_top100_memberships').select('course_id, top100_lists!inner(slug, is_active)').in('course_id', courseIds).eq('top100_lists.is_active', true);
     if (error) throw error;
-    return ids<{ course_id: string }>(data, (r) => r.course_id);
+    return activeTop100CourseIds(data as Top100MembershipRow[] | null);
   } });
   const connected = useQuery({ queryKey: ['courses', 'featured-connected', userId ?? null], enabled: on, retry: false, staleTime: 5 * 60_000, queryFn: async () => {
     const [following, followers] = await Promise.all([

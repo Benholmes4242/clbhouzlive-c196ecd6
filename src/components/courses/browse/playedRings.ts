@@ -1,3 +1,4 @@
+import { RANK_LIST_BY_SLUG } from '@/features/courses/_shared/courseRankLabels';
 import { HOLE_DIFFICULTY_MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
 /**
  * WHAT'S BEEN PLAYED — pure rules (BRIEF_WHATS_BEEN_PLAYED_V2, on top of
@@ -276,4 +277,16 @@ export function golfersLine(golfers: number, rounds: number): { bold: string; re
   return rounds > 0
     ? { bold: plural(golfers, 'golfer', 'golfers'), rest: ` played ${plural(rounds, 'round', 'rounds')} lately` }
     : { bold: plural(golfers, 'golfer', 'golfers'), rest: ' shared it lately' };
+}
+
+/** V6 §3 amendment: a course on ANY active Top 100 list (slug in RANK_LIST_BY_SLUG)
+ *  counts once; inactive lists are ignored. The Set dedupes multi-list courses. */
+export type Top100MembershipRow = { course_id: string | null; top100_lists: { slug?: string | null; is_active?: boolean | null } | { slug?: string | null; is_active?: boolean | null }[] | null };
+export function activeTop100CourseIds(rows: readonly Top100MembershipRow[] | null | undefined): Set<string> {
+  const out = new Set<string>();
+  for (const r of rows ?? []) {
+    const lists = Array.isArray(r.top100_lists) ? r.top100_lists : r.top100_lists ? [r.top100_lists] : [];
+    if (r.course_id && lists.some((l) => l.is_active === true && !!l.slug && l.slug in RANK_LIST_BY_SLUG)) out.add(r.course_id);
+  }
+  return out;
 }

@@ -317,3 +317,10 @@ None deleted.
 **New tests (+15)**: `src/test/whatsBeenPlayedV6.test.tsx`.
 **Suite**: 9,131 → 9,146 (2,292 / 2,249 / 2,272 / 2,333), all passing, shards one after another. Shard 3 first failed `fixOverflowSource.test.ts` on my new add-tile grid; fixed in code (flex), shard 3 rerun 2,272 passed. Typecheck clean.
 **Device checks**: 375/320 signed in unchecked (sign-in unavailable).
+
+## V6 §3 amendment — Top 100 means every active list (17 Nov 2026)
+
+- Featured Top 100 signal now selects `top100_lists(slug, is_active)` and passes rows through `activeTop100CourseIds` (playedRings.ts): a course counts when on ANY active list whose slug is in RANK_LIST_BY_SLUG (`global`, `gb-i`, `europe`, `usa`), once however many lists (+10, never per list); inactive lists ignored.
+- Active slugs found: not checked against live data — SQL is not run by the agent. The code accepts exactly the four RANK_LIST_BY_SLUG slugs; Ben can confirm with `select slug, is_active from top100_lists;`.
+- Tests: new `src/test/featuredTop100Active.test.ts` (+2): two active lists → +10 once; inactive-only → 0. No existing test changed.
+- Full suite 9,148 vs 9,146 (2,292 / 2,249 / 2,267 / 2,340), all passing; +2 = featuredTop100Active.test.ts. Typecheck clean.
