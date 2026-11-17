@@ -6,14 +6,14 @@ import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
 const locales = ['en', 'de', 'es', 'ja', 'ko', 'en-XA'] as const;
 
 function coursesFor(locale: (typeof locales)[number]) {
-  const file = path.resolve(process.cwd(), 'public', 'locales', locale, 'courses.json');
+  const file = path.resolve(process.cwd(), 'src', 'locales', locale, 'courses.json');
   return JSON.parse(fs.readFileSync(file, 'utf8')) as {
     scorecard: Record<string, string>;
   };
 }
 
 function handicapFor(locale: (typeof locales)[number]) {
-  const file = path.resolve(process.cwd(), 'public', 'locales', locale, 'handicap.json');
+  const file = path.resolve(process.cwd(), 'src', 'locales', locale, 'handicap.json');
   return JSON.parse(fs.readFileSync(file, 'utf8')) as {
     roundResults: {
       columns: Record<string, string>;

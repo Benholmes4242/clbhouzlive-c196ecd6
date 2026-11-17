@@ -15,7 +15,7 @@ const EXPECTED = {
 
 describe('Explore course-shelf rating count', () => {
   it.each(Object.entries(EXPECTED))('%s supplies singular and plural copy', async (locale, expected) => {
-    const file = path.resolve(process.cwd(), 'public', 'locales', locale, 'courses.json');
+    const file = path.resolve(process.cwd(), 'src', 'locales', locale, 'courses.json');
     const courses = JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, unknown>;
     const instance = i18next.createInstance();
     await instance.init({ lng: locale, fallbackLng: false, resources: { [locale]: { courses } } });
