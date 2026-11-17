@@ -7,7 +7,8 @@ import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import StatBrowse from './StatBrowse';
 import { useCourseBrowseTruth } from './useStatBrowse';
-import { WhoPlayingShell } from './browse/sectionShells';
+import { PhotoRailShell, WhoPlayingShell } from './browse/sectionShells';
+import { MOST_PLAYED_COUNT } from './browse/PhotoFigureCard';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
@@ -74,7 +75,9 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
       <style>{GLASS_CHIP_CSS}</style>
       <PageLoadGate expect={GATE_IDS} fallback={
         <div data-courses-fallback="" style={BLEED}>
-          {user && <WhoPlayingShell />}
+          {/* FIX_COURSES_GUEST_LOADING_SHELL: signed out, the first section a
+              visitor actually sees is Most played, so its own shell leads. */}
+          {user ? <WhoPlayingShell /> : <PhotoRailShell count={MOST_PLAYED_COUNT} />}
         </div>
       }>
       <div style={BLEED}>

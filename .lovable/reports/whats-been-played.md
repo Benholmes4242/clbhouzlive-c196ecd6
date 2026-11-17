@@ -139,3 +139,37 @@ Signed-out page at 320 checked: By region and Tough tracks absent, no horizontal
 
 ### Suite
 `npx vitest run --shard=i/4` ×4: 2,274 / 2,231 / 2,254 / 2,324 = 9,083 passing, 0 failing. Baseline 9,074 → 9,083: +10 (whatsBeenPlayedV3.test.tsx) −1 (deleted top-up test) = +9. Typecheck (`npx tsgo -b --noEmit`) clean.
+
+---
+
+## FIX_COURSES_GUEST_LOADING_SHELL (2026-11-17)
+
+**Fault.** Since 95dcf08fbd removed ByRegionSection, the PageLoadGate fallback in
+`src/components/courses/CoursesBrowsePage.tsx` rendered only `{user && <WhoPlayingShell />}`,
+so a signed-out visitor saw an empty area until the gate opened.
+
+**Fix.** The fallback now renders the first section a signed-out visitor actually sees, using
+that section's own existing shell:
+
+```
+{user ? <WhoPlayingShell /> : <PhotoRailShell count={MOST_PLAYED_COUNT} />}
+```
+
+`PhotoRailShell` is imported from `./browse/sectionShells` and `MOST_PLAYED_COUNT` from
+`./browse/PhotoFigureCard` — the same shell and the same count `MostPlayedSection` uses for
+itself. No new shell, no geometry change, no other section touched. Signed-in visitors keep
+`WhoPlayingShell` first.
+
+**Test.** `src/test/coursesWholePageHold.test.tsx` gains one test: signed out the fallback shows
+the Most played shell and not the circle shell; signed in it shows the circle shell and not the
+Most played shell. No existing assertion changed. The `sectionShells` mock gained a
+`PhotoRailShell` entry — a mock export, not an assertion (a mock missing an export the page now
+imports is broken, not smaller).
+
+**Suite.** 9,083 -> 9,084 (one test added, none deleted, renamed or rewritten).
+Shards: 2,275 / 2,231 / 2,254 / 2,324, all passing; baseline shards were 2,274 / 2,231 / 2,254 / 2,324.
+Typecheck clean (`npx tsgo -b --noEmit`).
+
+**Not checked.** The signed-out Courses page in a real browser: the preview at
+http://localhost:8080 renders the page, but the shell-to-content handover was verified only
+through the test, not by eye.
