@@ -73,7 +73,7 @@ Typecheck: clean.
 
 ## BRIEF_WHATS_BEEN_PLAYED_V2
 
-**STOP: 8 unauthorised failures** — all in `src/test/coursesHeroPlaceScrim.test.tsx` ("Courses-only place line", every test except two): `Error: No QueryClient set, use QueryClientProvider to set one`. §1 requires `useCourseRecordHolders` in CoursesPageHero, which is a query; that test renders the hero without a QueryClientProvider. No assertion is wrong. Not edited — needs a ruling: wrap its `showHero` render in a QueryClientProvider, or mock `useCourseRecordHolders` there.
+**STOP resolved by ruling** — the 8 failures were all in `src/test/coursesHeroPlaceScrim.test.tsx` ("Courses-only place line"): `Error: No QueryClient set, use QueryClientProvider to set one`. §1 requires `useCourseRecordHolders` in CoursesPageHero, which is a query; that test rendered the hero without a QueryClientProvider. No assertion was wrong. Ben ruled: "Mock useCourseRecordHolders" — one `vi.mock` returning an empty map, no assertions changed. Added at src/test/coursesHeroPlaceScrim.test.tsx:19; with no holder the crown fact line stays, so all 10 tests in that file pass untouched.
 
 Reads: `get_recent_rounds('everyone','30')` paged (cap 500); `posts` status published, `course_id not null or tagged_course_ids <> {}`, created_at ≥ window start (useMomentsOfTheWeek filters); `course_ratings` is_mock false, review not null, created_at ≥ window start (useLatestReviews filters); readMemberFaces; `stat_browse_base.community_rating` for active courses without a round; useCourseMediaCounts; useCourseRecordHolders([hero], {includePlayers:false}). No new RPCs, no SQL.
 
@@ -92,4 +92,4 @@ Changed assertions in whatsBeenPlayed.test.tsx:
 - Added: best lately distinct golfers.
 New: whatsBeenPlayedV2.test.tsx (10), whatsBeenPlayedHero.test.tsx (3).
 
-Suite: 9,059 → 9,074 (2,241 incl. 8 failed / 2,249 / 2,252 / 2,332). +15 = whatsBeenPlayed +2, V2 +10, hero +3. Typecheck clean. Device checks: unchecked (signed-in flows unavailable in the test browser).
+Suite: 9,059 → 9,074 (2,241 / 2,249 / 2,252 / 2,332), all passing. +15 = whatsBeenPlayed +2, V2 +10, hero +3. Typecheck clean. Device checks: unchecked (signed-in flows unavailable in the test browser).
