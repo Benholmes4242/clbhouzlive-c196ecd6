@@ -12,7 +12,7 @@ import { render, fireEvent, act, cleanup, waitFor } from '@testing-library/react
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import auth from '../../public/locales/en/auth.json';
+import auth from '../../src/locales/en/auth.json';
 
 const signInWithOtp = vi.fn<(...a: unknown[]) => unknown>();
 const verifyOtp = vi.fn<(...a: unknown[]) => unknown>();

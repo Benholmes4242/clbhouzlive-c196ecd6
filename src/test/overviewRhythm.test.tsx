@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18next from 'i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';

@@ -4,8 +4,8 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import courses from '../../public/locales/en/courses.json';
-import tourhub from '../../public/locales/en/tourhub.json';
+import courses from '../../src/locales/en/courses.json';
+import tourhub from '../../src/locales/en/tourhub.json';
 
 const state = vi.hoisted(() => ({
   meta: null as Record<string, unknown> | null,

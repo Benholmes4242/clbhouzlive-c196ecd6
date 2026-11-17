@@ -17,9 +17,33 @@
 import i18n from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import HttpBackend from 'i18next-http-backend';
+import type { BackendModule, ReadCallback } from 'i18next';
 import { useCallback } from 'react';
-import authEn from '../../public/locales/en/auth.json';
+import authEn from '@/locales/en/auth.json';
+
+/**
+ * Locale JSON lives in src/locales and is bundled by Vite: each namespace is
+ * its own lazy chunk (never eager, never fetched from public/ — Vite cannot
+ * import public files, see FIX_LOCALES_OUT_OF_PUBLIC). A missing file calls
+ * back with an error, exactly as the old HTTP 404 did.
+ */
+const LOCALE_MODULES = import.meta.glob<{ default: Record<string, unknown> }>('../locales/*/*.json');
+
+export const bundledBackend: BackendModule = {
+  type: 'backend',
+  init() {},
+  read(lng: string, ns: string, callback: ReadCallback) {
+    const load = LOCALE_MODULES[`../locales/${lng}/${ns}.json`];
+    if (!load) {
+      callback(`failed loading ../locales/${lng}/${ns}.json; status code: 404`, false);
+      return;
+    }
+    load().then(
+      (mod) => callback(null, mod.default),
+      (err) => callback(err instanceof Error ? err.message : String(err), true),
+    );
+  },
+};
 
 export const LOCALE_STORAGE_KEY = 'clbhouz.locale';
 /** Every locale that HAS files on disk. Kept intact — nothing is deleted. */
@@ -60,7 +84,7 @@ pruneStoredLocale();
 
 if (!i18n.isInitialized) {
   i18n
-    .use(HttpBackend)
+    .use(bundledBackend)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
@@ -91,13 +115,6 @@ if (!i18n.isInitialized) {
       interpolation: { escapeValue: false },
       // Suspense off — we don't want the feed to blank while a namespace loads.
       react: { useSuspense: false },
-      backend: {
-        loadPath: '/locales/{{lng}}/{{ns}}.json',
-        // Build-stamped so a device never serves a cached bundle that predates
-        // newly added keys (which would render raw key names to the member).
-        queryStringParams: { v: __BUILD_ID__ },
-      },
-
       detection: {
         // ENGLISH ONLY: `navigator` is deliberately NOT in this list, so the
         // device / OS / WebView language no longer selects a locale. Only an

@@ -6,7 +6,7 @@ import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { readFileSync } from 'node:fs';
-import common from '../../public/locales/en/courses.json';
+import common from '../../src/locales/en/courses.json';
 
 const f = vi.hoisted(() => ({ board: vi.fn(), tiles: vi.fn(), user: { id: 'me', is_anonymous: false } as { id: string; is_anonymous: boolean } | null, courses: vi.fn(), enrichment: vi.fn(), progress: vi.fn() }));
 vi.mock('@/hooks/top100/useTop100Race', () => ({ useTop100Race: f.board, useCareerBoard: f.board, TOP100_METRIC: { 'gb-i': 'top_100_gbni_distinct', global: 'top_100_worldwide_distinct', europe: 'top_100_europe_distinct', usa: 'top_100_usa_distinct' } }));

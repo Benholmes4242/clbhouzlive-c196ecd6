@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/common.json';
+import en from '../../src/locales/en/common.json';
 
 const mocks = vi.hoisted(() => ({
   rpc: vi.fn(), from: vi.fn(),

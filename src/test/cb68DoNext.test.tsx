@@ -7,7 +7,7 @@ import {
   type DoNextBusiness, type DoNextInputs, type DoNextMsg,
 } from '@/components/business/home/doNext';
 import i18next from 'i18next';
-import enCommon from '../../public/locales/en/common.json';
+import enCommon from '../../src/locales/en/common.json';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));

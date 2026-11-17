@@ -5,8 +5,8 @@ import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
-import composerFlow from '../../public/locales/en/composerFlow.json';
+import courses from '../../src/locales/en/courses.json';
+import composerFlow from '../../src/locales/en/composerFlow.json';
 
 const h = vi.hoisted(() => ({ submit: vi.fn(), state: null as any }));
 vi.mock('@/lib/routeChrome', () => ({ claimOverlayChrome: vi.fn(), releaseOverlayChrome: vi.fn() }));

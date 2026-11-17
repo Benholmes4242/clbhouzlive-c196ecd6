@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import enCourses from '../../public/locales/en/courses.json';
+import enCourses from '../../src/locales/en/courses.json';
 import { RoundsGate, roundsGateState } from '@/features/explore-magazine/RoundsGate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { __resetScrollerCache } from '@/lib/getScrollParent';

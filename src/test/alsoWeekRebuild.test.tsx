@@ -4,7 +4,7 @@ import { MemoryRouter,useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider,initReactI18next } from 'react-i18next';
 import { QueryClient,QueryClientProvider } from '@tanstack/react-query';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { AlsoWeekEvent } from '@/features/tourhub/overview/sections/AlsoWeekEvent';
 import { isAlsoThisWeek } from '@/features/tourhub/overview/sections/AlsoThisWeek';
 import { chasePlayers,onCourse,situation,startsValues,weekFacts,weekRows,weekTotalRounds } from '@/features/tourhub/overview/sections/alsoWeekRules';

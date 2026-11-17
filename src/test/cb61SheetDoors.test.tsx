@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@/hooks/useReviewerStats', () => ({ useReviewerStats: () => ({ data: null }) }));

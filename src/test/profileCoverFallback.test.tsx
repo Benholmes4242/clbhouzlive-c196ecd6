@@ -316,7 +316,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the band', () => {
     expect(arrivalAction('nudge_username')).toBe('username');
     expect(arrivalAction(null)).toBeNull();
     expect(src('pages/EditProfile.tsx')).toContain("if (action === 'cover') photos.current?.open('cover')");
-    expect(src('../public/locales/en/profile.json')).toContain('"addCover": "+ Add a cover"');
+    expect(src('../src/locales/en/profile.json')).toContain('"addCover": "+ Add a cover"');
   });
 });
 

@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { upcomingSentence, winnerInField, followedUpcomingPlayers, venueTee } from '@/features/tourhub/components/overview-v3/upcomingOverviewRules';
 import { UpcomingFacts, YourUpcomingPlayers, UpcomingLastYear, UpcomingCourse, upcomingFactCells } from '@/features/tourhub/components/overview-v3/UpcomingOverviewSections';

@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/common.json';
+import en from '../../src/locales/en/common.json';
 import { TeamInvitesSection } from '@/components/business/TeamInvitesSection';
 import { agoBucket, cardInvites, untilBucket, INVITE_ACCEPT_BASE } from '@/components/business/teamInvites';
 import type { BusinessInvite, BusinessMember, BusinessRole } from '@/hooks/useBusinessTeam';

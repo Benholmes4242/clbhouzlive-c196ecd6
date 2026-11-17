@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/common.json';
+import en from '../../src/locales/en/common.json';
 import { TeamSummary } from '@/components/business/TeamSummary';
 import { inviteName, requestPlaysHere, requestWhen, summaryInvites, teamAvatarMembers, teamSummaryRule } from '@/components/business/teamSummary';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';

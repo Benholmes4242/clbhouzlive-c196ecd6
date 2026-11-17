@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 import { BoardDaySeparator, BoardHeaderRow, BoardRowView } from '@/components/explore-tab-new/courseled/BoardRows';
 import { BOARD_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';

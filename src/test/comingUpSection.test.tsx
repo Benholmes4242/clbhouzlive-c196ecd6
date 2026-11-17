@@ -3,7 +3,7 @@ import { describe,it,expect,vi,afterEach,beforeEach } from 'vitest';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18next from 'i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
 import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 const state=vi.hoisted(()=>({rows:[] as any[],photos:new Map<string,string>(),own:undefined as Map<string,{best:number,rounds:number}>|undefined,last:null as any,calendar:vi.fn()}));

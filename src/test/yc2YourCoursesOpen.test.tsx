@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { I18nextProvider } from 'react-i18next';
 import i18next from 'i18next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import en from '../../public/locales/en/courses.json';
+import en from '../../src/locales/en/courses.json';
 import YourCourseAnalyticsSheet from '@/features/profile-sheet-v2/components/YourCourseAnalyticsSheet';
 import { useMyRoundsByCourse, type CourseRoundPoint } from '@/hooks/gam/useMyRoundsByCourse';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';

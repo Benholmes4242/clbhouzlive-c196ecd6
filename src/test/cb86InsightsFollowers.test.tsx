@@ -113,7 +113,7 @@ describe('CB86 inset', () => {
     const c = await card(container);
     expect((c.querySelector('[data-bar]') as HTMLElement).style.width).toBe('0%');
     expect(last('saw_30')?.o).toMatchObject({ count: 1 });
-    const en = JSON.parse(fs.readFileSync('public/locales/en/common.json', 'utf8')).business.insights.followersCard;
+    const en = JSON.parse(fs.readFileSync('src/locales/en/common.json', 'utf8')).business.insights.followersCard;
     expect(en.saw_30_one.startsWith('follower saw')).toBe(true);
   });
   it('absent when has_posts is false or followers is 0', async () => {

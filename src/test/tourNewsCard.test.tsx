@@ -54,7 +54,7 @@ describe('news card masthead', () => {
   });
 
   it('no user-facing string in src or the English locale says "from the wire"', () => {
-    const en = readFileSync(join(process.cwd(), 'public/locales/en/tourhub.json'), 'utf8');
+    const en = readFileSync(join(process.cwd(), 'src/locales/en/tourhub.json'), 'utf8');
     expect(/from the wire/i.test(en)).toBe(false);
     const hits: string[] = [];
     const walk = (dir: string) => {

@@ -26,7 +26,7 @@ const el = (s: string) => { const node = document.querySelector(s); if (!node) t
 const click = (s: string) => fireEvent.click(el(s));
 const ready = () => waitFor(() => expect(client.isFetching()).toBe(0));
 const invite = (props: Partial<React.ComponentProps<typeof BusinessCoachInvite>> = {}) => mount(<BusinessCoachInvite business={business} viewerId="me" isClub={false} isTeam={false} membershipReady {...props} />);
-const locale = JSON.parse(readFileSync('public/locales/en/common.json', 'utf8'));
+const locale = JSON.parse(readFileSync('src/locales/en/common.json', 'utf8'));
 const t = (key: string, opts?: Record<string, unknown>) => { const text = key.split('.').reduce((v, k) => v?.[k], locale) ?? ''; return String(text).replace(/\{\{(\w+)\}\}/g, (_, k) => String(opts?.[k] ?? '')); };
 beforeEach(() => { Object.assign(state, { mine: null, member: null, results: null, golfers: null, current: 12, errors: {}, calls: [], filters: [], search: [] }); success.mockClear(); errorToast.mockClear(); });
 afterEach(() => { cleanup(); client?.clear(); });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import tourhubEn from '../../public/locales/en/tourhub.json';
+import tourhubEn from '../../src/locales/en/tourhub.json';
 
 /**
  * Build 2 explicitly retires the old four steps in favour of four method

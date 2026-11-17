@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import i18n from 'i18next';
-import enTourhub from '../../public/locales/en/tourhub.json';
+import enTourhub from '../../src/locales/en/tourhub.json';
 import { resolveChampionPlayerId, pickWonTournament } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { cleanup, render } from '@testing-library/react';
 import { createElement } from 'react';

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import i18next from 'i18next';
 import type { TFunction } from 'i18next';
 
-import en from '../../public/locales/en/courses.json';
+import en from '../../src/locales/en/courses.json';
 import {
   chooseRarityFeat,
   congratulationName,

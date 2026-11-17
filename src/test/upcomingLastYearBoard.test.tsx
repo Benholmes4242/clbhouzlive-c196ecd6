@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import tourhubEn from '../../public/locales/en/tourhub.json';
+import tourhubEn from '../../src/locales/en/tourhub.json';
 
 const fixture = vi.hoisted(() => ({ rows: [
   { rank: '1', name: 'Winner', country: 'USA', score: '−20', year: '2025' },

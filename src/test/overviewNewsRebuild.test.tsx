@@ -4,7 +4,7 @@ import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import { OverviewNews } from '@/features/tourhub/overview/sections/OverviewNews';
 import { NewsDetails, OverviewNewsStory } from '@/features/tourhub/overview/sections/OverviewNewsStory';

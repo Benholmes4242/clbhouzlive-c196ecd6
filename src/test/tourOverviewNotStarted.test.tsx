@@ -1,6 +1,6 @@
 /* FIX — TOUR OVERVIEW: "THE SITUATION" BEFORE ANYONE HAS TEED OFF. */
 import { describe, expect, it } from 'vitest';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { tournamentHeadlineSegments } from '@/features/tourhub/overview/magazineCopy';
 import { earliestTeeTime, fieldHasStarted, rowHasStarted } from '@/features/tourhub/overview/boardStarted';
 import { formatTimeHm24 } from '@/i18n/format';

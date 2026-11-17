@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import auth from '../../public/locales/en/auth.json';
+import auth from '../../src/locales/en/auth.json';
 
 const state = vi.hoisted(() => ({ native: true, enabled: true, user: null as null | { is_anonymous: boolean }, loading: false }));
 vi.mock('@/utils/median/isMedianApp', () => ({ isMedianApp: () => state.native }));

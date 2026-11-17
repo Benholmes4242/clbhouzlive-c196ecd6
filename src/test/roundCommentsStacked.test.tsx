@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import common from '../../public/locales/en/common.json';
+import common from '../../src/locales/en/common.json';
 
 const history = vi.hoisted(() => ({ entries: [] as { close: () => void }[] }));
 vi.mock('@/components/ui/sheetHistory', () => ({

@@ -5,7 +5,7 @@ import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import locale from '../../public/locales/en/courses.json';
+import locale from '../../src/locales/en/courses.json';
 import { readFileSync } from 'node:fs';
 import WatchGridPage from '@/pages/WatchGridPage';
 import { resolveChrome } from '@/features/chrome-v2/registry';

@@ -13,7 +13,7 @@ function lookup(data: unknown, key: string): unknown {
 }
 describe('Tour and chrome English interpolation contract', () => {
   it('supplies every English placeholder in literal t(key, options) calls', () => {
-    const resources = Object.fromEntries(readdirSync('public/locales/en').filter(name => name.endsWith('.json')).map(name => [name.slice(0, -5), JSON.parse(readFileSync(join('public/locales/en', name), 'utf8'))]));
+    const resources = Object.fromEntries(readdirSync('src/locales/en').filter(name => name.endsWith('.json')).map(name => [name.slice(0, -5), JSON.parse(readFileSync(join('src/locales/en', name), 'utf8'))]));
     const mismatches: string[] = [];
     let inspected = 0;
     for (const file of [...files('src/features/tourhub'), ...files('src/features/chrome-v2')]) {

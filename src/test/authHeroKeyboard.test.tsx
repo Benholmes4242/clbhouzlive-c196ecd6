@@ -5,7 +5,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import auth from '../../public/locales/en/auth.json';
+import auth from '../../src/locales/en/auth.json';
 
 vi.mock('@/utils/median/isMedianApp', () => ({ isMedianApp: () => false }));
 vi.mock('@/features/guest/guestConfig', () => ({ GUEST_BROWSING_ENABLED: true }));

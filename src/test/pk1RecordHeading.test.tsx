@@ -4,7 +4,7 @@ import {cleanup,fireEvent,render} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import {createInstance} from 'i18next';
 import {I18nextProvider,initReactI18next} from 'react-i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 const h=vi.hoisted(()=>({record:{picks:30,won:5,top10:13,event_count:8 as number|undefined},error:false,user:{id:'me',is_anonymous:false} as {id:string;is_anonymous:boolean}|null}));
 vi.mock('@/features/tourhub/hooks/usePickInsights',()=>({useOurPickRecord:()=>({data:h.record,isError:h.error})}));
 vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:h.user})}));

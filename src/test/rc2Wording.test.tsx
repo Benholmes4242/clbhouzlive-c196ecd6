@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import en from '../../public/locales/en/courses.json';
+import en from '../../src/locales/en/courses.json';
 import { courseHeadline } from '@/features/explore-magazine/courseHeadline';
 import { RecordBookSection } from '@/features/business/clubAnalytics/sections';
 

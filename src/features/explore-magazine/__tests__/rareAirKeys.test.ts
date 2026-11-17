@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import en from '../../../../public/locales/en/courses.json';
+import en from '../../../../src/locales/en/courses.json';
 import { FEAT_I18N } from '../rareAir';
 
 /**

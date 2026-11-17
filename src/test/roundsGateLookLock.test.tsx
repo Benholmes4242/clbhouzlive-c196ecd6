@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import enCourses from '../../public/locales/en/courses.json';
+import enCourses from '../../src/locales/en/courses.json';
 import { GATE_LINKS, RoundsGate } from '@/features/explore-magazine/RoundsGate';
 import { ScoreWithToPar } from '@/components/explore-tab-new/courseled/ScoreWithToPar';
 import { BoardRowView } from '@/components/explore-tab-new/courseled/BoardRows';

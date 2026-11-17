@@ -3,7 +3,7 @@ import {afterEach,describe,it,expect,vi} from 'vitest';
 import {MemoryRouter} from 'react-router-dom';
 import i18next from 'i18next';
 import {I18nextProvider} from 'react-i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import {RaceSection,TeeV3Section,FieldSection,LastYearSection,CourseV3Section,NumbersSection,TournamentHero} from '@/features/tourhub/tournament-v2/sections/TournamentV3Sections';
 import type {TournamentMeta} from '@/features/tourhub/leaderboard/useTournamentMeta';
 import type {BoardEntry} from '@/features/tourhub/leaderboard/BoardTable';

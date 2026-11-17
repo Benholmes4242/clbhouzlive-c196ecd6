@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/courses.json';
+import en from '../../src/locales/en/courses.json';
 import { legendCategoryLabel } from '@/lib/gam/visuals';
 import { pickProBenchmark } from '@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/proBenchmark';
 import { insightFor } from '@/components/explore-tab-new/friendRoundParts';

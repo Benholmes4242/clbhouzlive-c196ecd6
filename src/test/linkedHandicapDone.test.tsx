@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import handicap from '../../public/locales/en/handicap.json';
+import handicap from '../../src/locales/en/handicap.json';
 const f = vi.hoisted(() => ({ counts: null as { rounds: number; courses: number; friends: number } | null, fetching: false, continue: vi.fn() }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@/components/profile/handicap/whs/connect/useImportedCounts', () => ({ useImportedCounts: () => ({ data: f.counts, isFetching: f.fetching }) }));

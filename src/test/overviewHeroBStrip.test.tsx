@@ -6,7 +6,7 @@ import { I18nextProvider, initReactI18next } from 'react-i18next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import type { HeroState } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import type { TournamentPicksBoardRow } from '@/features/tourhub/hooks/useTournamentPick';
 const f=vi.hoisted(()=>({mine:null as string|null,rows:[] as TournamentPicksBoardRow[]}));

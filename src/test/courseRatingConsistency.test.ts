@@ -8,7 +8,7 @@ const locales = ['en', 'de', 'es', 'ja', 'ko', 'en-XA'] as const;
 
 describe('C1 course rating consistency', () => {
   it.each(locales)('%s defines both empty-score messages', (locale) => {
-    const courses = JSON.parse(src(`public/locales/${locale}/courses.json`));
+    const courses = JSON.parse(src(`src/locales/${locale}/courses.json`));
     expect(courses.discover.scores.noOnePlayed).toContain('{{course}}');
     expect(courses.discover.scores.beTheFirst).toBeTruthy();
   });

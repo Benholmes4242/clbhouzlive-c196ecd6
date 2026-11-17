@@ -10,7 +10,7 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { I18nextProvider } from 'react-i18next';
 import i18next from 'i18next';
-import en from '../../public/locales/en/courses.json';
+import en from '../../src/locales/en/courses.json';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
 import {
   figureLabel,

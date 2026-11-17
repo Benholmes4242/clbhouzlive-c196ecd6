@@ -12,7 +12,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18next from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 
 import { MiniBoard } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { BoardTable, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';

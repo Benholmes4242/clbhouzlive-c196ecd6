@@ -5,7 +5,7 @@ import { I18nextProvider, initReactI18next } from 'react-i18next';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { readFileSync } from 'node:fs';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 import type { ReviewReceipt as Data } from '@/features/review-v2/hooks/useReviewReceipt';
 import type { ReviewPublishState } from '@/features/review-v2/lib/reviewUploadController';
 import type { ReviewCourseRow } from '@/features/composer-flow/reviewCourseSearchRules';

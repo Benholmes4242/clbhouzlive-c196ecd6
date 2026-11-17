@@ -4,7 +4,7 @@ import {cleanup,fireEvent,render,screen,waitFor,act} from '@testing-library/reac
 import {MemoryRouter} from 'react-router-dom';
 import {I18nextProvider} from 'react-i18next';
 import {createInstance} from 'i18next';
-import en from '../../public/locales/en/composer.json';
+import en from '../../src/locales/en/composer.json';
 const h=vi.hoisted(()=>({snapshot:null as any,listener:null as any,share:vi.fn(),rpc:vi.fn(),reads:[] as any[],count:23296,courses:[{id:'c1',name:'Kingsbarns',country:'Scotland',sub_country:'Fife',thumbnail_image:'/cover.jpg'}],rounds:[{course_id:'c1',play_date:'2026-10-28'}],club:[] as any[],search:[] as any[]}));
 vi.mock('@/integrations/supabase/client',()=>({supabase:{rpc:h.rpc,from:(table:string)=>{const ops:any[]=[];const b:any={};for(const op of ['select','eq','in','order','or','limit'])b[op]=(...args:any[])=>{ops.push([op,...args]);return b;};const read=()=>{h.reads.push({table,ops});if(ops.some(o=>o[0]==='select'&&o[2]?.head))return {count:h.count,error:null};if(table==='business_accounts')return {data:{club_id:'club1'},error:null};if(table==='gam_round_stats')return {data:h.rounds,error:null};const eq=ops.find(o=>o[0]==='eq');return {data:ops.some(o=>o[0]==='or')?h.search:eq?.[1]==='club_id'?h.club:h.courses,error:null};};b.maybeSingle=()=>Promise.resolve({...read(),data:table==='business_accounts'?{club_id:'club1'}:{thumbnail_image:'/fallback.jpg'}});b.then=(r:any)=>Promise.resolve(read()).then(r);return b;}}}));
 vi.mock('@/features/post-v2/hooks/usePopularCourses',()=>({usePopularCourses:()=>({rows:[{id:'c1',name:'Kingsbarns',country:'Scotland',sub_country:'Fife',thumbnail_image:'/cover.jpg'},{id:'p',name:'Popular',country:'England',sub_country:'Kent',thumbnail_image:'/popular.jpg'}],loaded:true})}));

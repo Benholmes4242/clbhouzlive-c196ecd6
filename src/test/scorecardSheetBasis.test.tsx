@@ -10,8 +10,8 @@ import type { RoundAwardsResult } from '@/hooks/gam/useRoundAwards';
 
 /* BRIEF_SCORECARD_SHEET — C.1 key, C.2/C.3/C.4 strip, C.5 placing column, C.6 basis. */
 
-const en = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'public/locales/en/courses.json'), 'utf8')).scorecard;
-const enH = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'public/locales/en/handicap.json'), 'utf8')).roundResults.scope;
+const en = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'src/locales/en/courses.json'), 'utf8')).scorecard;
+const enH = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'src/locales/en/handicap.json'), 'utf8')).roundResults.scope;
 const sheetSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/features/courses/_shared/scorecard/CardScorecardSheet.tsx'), 'utf8');
 
 const scope = { courseName: 'Sundridge Park', roundsHere: 33, subjectName: "James's", subject: 'He', possessive: 'his', verb: 'has', pronoun: 'he' as const };

@@ -6,7 +6,7 @@ import { cleanup, render } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import i18next from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import enTourhub from '../../public/locales/en/tourhub.json';
+import enTourhub from '../../src/locales/en/tourhub.json';
 import { readFileSync } from 'node:fs';
 
 import {

@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18next from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import enTourhub from '../../public/locales/en/tourhub.json';
+import enTourhub from '../../src/locales/en/tourhub.json';
 import { HeroBoardSection } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { OVERVIEW } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';

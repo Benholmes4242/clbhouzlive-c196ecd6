@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { YourPickCard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickCard';
 import { liveCircleHeading, liveOurLine, finishedCircleLine, finishedOurHeading } from '@/features/tourhub/components/overview-v3/HybridHeroBands/integratedPickRules';
 import type { TournamentPickState } from '@/features/tourhub/hooks/useTournamentPick';

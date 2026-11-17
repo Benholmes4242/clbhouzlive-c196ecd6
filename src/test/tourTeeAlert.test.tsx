@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { tourOptimisticToggle } from '@/features/tourhub/hooks/tourOptimisticToggle';
 import { TeeAlertControl } from '@/features/tourhub/components/overview-v3/HybridHeroBands/TeeAlertButton';
 import { confirmedLastGroup, dispatchTeeAlerts, enqueueAndStamp } from '../../supabase/functions/tournament-live-sync/teeAlerts';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 
 vi.mock('react-i18next', async (importOriginal) => ({
   ...await importOriginal<typeof import('react-i18next')>(),

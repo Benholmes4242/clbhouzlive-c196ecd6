@@ -69,7 +69,7 @@ describe('CB65 §2 claim sheet keys resolve', () => {
   const keys = [...src.matchAll(/\bt\('(business\.[^']+)'/g)].map((m) => m[1]);
   for (const locale of ['en', 'en-XA']) {
     it(`every key the sheet reads is a string in ${locale}`, () => {
-      const json = JSON.parse(readFileSync(resolve(__dirname, `../../public/locales/${locale}/common.json`), 'utf8'));
+      const json = JSON.parse(readFileSync(resolve(__dirname, `../../src/locales/${locale}/common.json`), 'utf8'));
       expect(keys.length).toBeGreaterThan(0);
       for (const k of keys) {
         const v = k.split('.').reduce<unknown>((o, p) => (o as Record<string, unknown> | undefined)?.[p], json);

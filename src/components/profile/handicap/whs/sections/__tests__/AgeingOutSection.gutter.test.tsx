@@ -11,7 +11,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import common from '../../../../../../../public/locales/en/common.json';
+import common from '../../../../../../../src/locales/en/common.json';
 import AgeingOutSection from '../AgeingOutSection';
 import { HcpSection } from '../HcpSection';
 

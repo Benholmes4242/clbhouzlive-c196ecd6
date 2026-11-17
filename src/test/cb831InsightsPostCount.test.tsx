@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import common from '../../public/locales/en/common.json';
+import common from '../../src/locales/en/common.json';
 import { InsightsVisitsCards } from '@/components/business/insights/InsightsVisitsSection';
 import type { BusinessInsights } from '@/hooks/useBusinessInsights';
 import type { BusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';

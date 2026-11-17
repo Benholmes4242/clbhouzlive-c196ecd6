@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createInstance } from 'i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 
 describe('tight overview picks intro', () => {
   it('reads James leads for us without a NEEDS explanation', async () => {

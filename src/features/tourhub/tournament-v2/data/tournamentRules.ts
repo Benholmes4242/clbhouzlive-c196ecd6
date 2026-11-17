@@ -1,7 +1,7 @@
 /** Tournament-v3 facts use only the selected event's supplied rows. Missing
  * histories never become zeros. Round fields are to-par; gross adds venue par.
  * Complete-round counts are leaderboard-derived, never hole distinct players. */
-import en from '../../../../../public/locales/en/tourhub.json';
+import en from '@/locales/en/tourhub.json';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { PickFieldPlayer } from '../../hooks/useTournamentPick';

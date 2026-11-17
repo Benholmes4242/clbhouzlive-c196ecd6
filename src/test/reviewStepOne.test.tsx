@@ -188,7 +188,7 @@ describe('header forms', () => {
   });
   it('splits the members copy into singular and plural in every locale', () => {
     for (const loc of ['en', 'en-XA', 'de', 'es', 'ja', 'ko']) {
-      const json = JSON.parse(readFileSync(resolve(__dirname, `../../public/locales/${loc}/courses.json`), 'utf8'));
+      const json = JSON.parse(readFileSync(resolve(__dirname, `../../src/locales/${loc}/courses.json`), 'utf8'));
       const stepOne = json.review.wizard.stepOne;
       expect(stepOne.fromMembers).toBeUndefined();
       expect(stepOne.fromMembers_one).toBe('from {{count}} member');

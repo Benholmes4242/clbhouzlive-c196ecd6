@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { courseHeadline, spokenToPar, tournamentHeadline, tournamentHeadlineSegments } from '@/features/tourhub/overview/magazineCopy';
 
 // The real English strings, so the tests follow the copy rather than a copy of it.

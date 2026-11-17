@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('react-i18next', async () => {
   /* Resolves against the real English catalogue: call sites carry no fallbacks. */
-  const en = (await import('../../../../public/locales/en/courses.json')).default as Record<string, unknown>;
+  const en = (await import('../../../../src/locales/en/courses.json')).default as Record<string, unknown>;
   const look = (k: string) => k.split('.').reduce<unknown>((o, p) => (o && typeof o === 'object' ? (o as Record<string, unknown>)[p] : undefined), en);
   const t = (k: string, o?: unknown) => {
     const opts = (typeof o === 'object' && o) ? (o as Record<string, unknown>) : {};

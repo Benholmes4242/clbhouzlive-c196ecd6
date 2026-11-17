@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';

@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import handicap from '../../public/locales/en/handicap.json';
+import handicap from '../../src/locales/en/handicap.json';
 import type { WhsConnection } from '@/lib/whs/types';
 
 const f = vi.hoisted(() => ({ current: null as number | null, anyError: false }));

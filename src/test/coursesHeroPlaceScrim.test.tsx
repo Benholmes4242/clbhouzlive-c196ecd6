@@ -6,7 +6,7 @@ import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import english from '../../public/locales/en/courses.json';
+import english from '../../src/locales/en/courses.json';
 import type { ExploreHeroRow } from '@/components/explore-tab-new/hooks/useExploreHero';
 import type { HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 

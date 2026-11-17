@@ -1,6 +1,6 @@
 /* BRIEF — PICK TEE TIMES: 24-HOUR CLOCK AND THE HEADING FALLBACK. */
 import { describe, expect, it } from 'vitest';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { tournamentHeadlineSegments } from '@/features/tourhub/overview/magazineCopy';
 import { formatMonthDayHm24, formatTimeHm, formatTimeHm24 } from '@/i18n/format';
 import { teeHeadingFits } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';

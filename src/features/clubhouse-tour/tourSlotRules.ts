@@ -6,7 +6,7 @@ import type { CachedTournament } from '@/hooks/useTournamentsCache';
 import type { PickRecord } from '@/features/tourhub/hooks/usePickInsights';
 import { surnameOf } from '@/features/tourhub/_shared/playerName';
 import { countInWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
-import en from '../../../public/locales/en/tourhub.json';
+import en from '@/locales/en/tourhub.json';
 
 export const TOUR_DISPLAY = { pga: 'PGA Tour', lpga: 'LPGA Tour', euro: 'DP World Tour', champ: 'Champions Tour', pgad: 'Korn Ferry Tour' } as const;
 export type SlotTour = keyof typeof TOUR_DISPLAY;

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 // LeadersGroup builds t(`board.columns.${key}`) for these five keys.
 const KEYS = ['pos', 'player', 'thru', 'today', 'tot'];
-const ROOT = join(process.cwd(), 'public/locales');
+const ROOT = join(process.cwd(), 'src/locales');
 const columns = (loc: string) =>
   JSON.parse(readFileSync(join(ROOT, loc, 'tourhub.json'), 'utf8')).board?.columns ?? {};
 

@@ -3,7 +3,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
 import { createInstance } from 'i18next';
-import en from '../../public/locales/en/courses.json';
+import en from '../../src/locales/en/courses.json';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
 import { StandoutRounds } from '@/components/explore-tab-new/courseled/StandoutRounds';
 import { standoutRpcArgs, type StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';

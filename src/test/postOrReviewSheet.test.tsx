@@ -5,7 +5,7 @@ import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import { readFileSync } from 'node:fs';
-import en from '../../public/locales/en/composerFlow.json';
+import en from '../../src/locales/en/composerFlow.json';
 
 const h = vi.hoisted(() => ({
   suggestions: [] as any[], error: false, profile: { id: 'member' } as { id: string } | null,

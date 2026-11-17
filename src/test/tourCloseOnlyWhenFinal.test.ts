@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import i18next from 'i18next';
 import { readFileSync } from 'node:fs';
-import enTourhub from '../../public/locales/en/tourhub.json';
+import enTourhub from '../../src/locales/en/tourhub.json';
 import { shouldDateClose, dateClosePayload, STALE_CLOSE_BACKSTOP_DAYS } from '../../supabase/functions/tournament-live-sync/liveStatus';
 import { championNarrative } from '@/features/tourhub/overview/situationCopy';
 import type { HeroState } from '@/features/tourhub/components/overview-v3/HybridHero.utils';

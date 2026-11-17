@@ -3,7 +3,7 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, waitFor, cleanup } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createInstance } from 'i18next';
-import en from '../../public/locales/en/composerFlow.json';
+import en from '../../src/locales/en/composerFlow.json';
 
 const h = vi.hoisted(() => ({ profile: { id: 'member' } as { id: string } | null, requests: [] as any[], fail: '', tables: {} as Record<string, any[]> }));
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: h.profile }) }));

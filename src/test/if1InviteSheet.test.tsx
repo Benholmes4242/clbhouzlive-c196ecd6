@@ -4,7 +4,7 @@ import { describe,it,expect,vi,beforeEach,afterEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
 import i18next from 'i18next';
-import en from '../../public/locales/en/common.json';
+import en from '../../src/locales/en/common.json';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 const h=vi.hoisted(()=>({friends:[] as any[],sent:[] as any[],friendsLoading:false,sentLoading:false,friendsError:false,sentError:false,club:'Sundridge Park Golf Club' as string|null,create:vi.fn(),share:vi.fn(),bulk:vi.fn(),rpc:vi.fn(),track:vi.fn(),error:vi.fn(),connected:true}));
 vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:{id:'owner'}})}));

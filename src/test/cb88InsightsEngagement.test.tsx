@@ -123,7 +123,7 @@ describe('CB88 bar, tiles, fine print', () => {
     a.unmount();
     const b = renderCard({ ...base, likes: 0, comments: 0 });
     expect((await card(b.container)).querySelector('[data-tiles]')).toBeNull();
-    const en = JSON.parse(fs.readFileSync('public/locales/en/common.json', 'utf8')).business.insights.engagementCard;
+    const en = JSON.parse(fs.readFileSync('src/locales/en/common.json', 'utf8')).business.insights.engagementCard;
     expect([en.likes_one, en.likes_other, en.comments_one, en.comments_other]).toEqual(['like', 'likes', 'comment', 'comments']);
   });
   it('fine print: both wordings', async () => {

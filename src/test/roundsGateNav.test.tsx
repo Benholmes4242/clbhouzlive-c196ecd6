@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import enCourses from '../../public/locales/en/courses.json';
+import enCourses from '../../src/locales/en/courses.json';
 import { MotionGlobalConfig } from 'framer-motion';
 import { Z } from '@/config/zIndex';
 import { RoundsGate } from '@/features/explore-magazine/RoundsGate';

@@ -4,7 +4,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/tourhub.json';
+import en from '../../src/locales/en/tourhub.json';
 import { ACTIVE_TOUR_SLUGS, TOUR_MAP, isRetiredTour } from '@/features/tourhub/constants/tourMap';
 import { OVERVIEW_TOUR_ORDER } from '@/features/tourhub/_shared/tourOrder';
 import { TOUR_ROW_SLUGS } from '@/features/tourhub/hooks/useTourPickerRows';

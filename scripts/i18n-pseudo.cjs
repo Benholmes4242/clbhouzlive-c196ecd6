@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const dir = 'public/locales';
+const dir = 'src/locales';
 // Wave 3d — include every catalog. Regenerating en-XA is idempotent and
 // mirrors en for the source locales that aren't translated yet.
 const nss = ['common', 'auth', 'composer', 'messaging', 'achievements', 'courses'];

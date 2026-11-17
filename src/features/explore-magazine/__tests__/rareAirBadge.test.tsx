@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import i18next from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../../../public/locales/en/courses.json';
+import en from '../../../../src/locales/en/courses.json';
 import { RareAirRail } from '../RareAirSection';
 import { rareAirRarestFeat } from '../rareAir';
 import type { FeatKind, FeatYearRow } from '../useFeatsWindow';

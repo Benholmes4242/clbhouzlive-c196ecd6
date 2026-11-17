@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 const f = vi.hoisted(() => ({ long: [] as unknown[], short: [] as unknown[], members: [] as unknown[], more: false, fetching: false, next: vi.fn(), momentRead: vi.fn(), open: vi.fn(), scroll: vi.fn() }));
 vi.mock('@/features/explore-magazine/watch/useWatchVideos', () => ({ useWatchVideos: () => ({ data: { pages: [f.long] }, isFetched: true, hasNextPage: false }) }));
 vi.mock('@/features/explore-magazine/watch/useWatchClips', () => ({ useWatchClips: () => ({ data: { pages: [f.short] }, isFetched: true, hasNextPage: f.more, isFetchingNextPage: f.fetching, fetchNextPage: f.next }) }));

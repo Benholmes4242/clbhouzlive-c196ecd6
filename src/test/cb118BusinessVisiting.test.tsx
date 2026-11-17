@@ -111,7 +111,7 @@ beforeEach(() => { vi.clearAllMocks(); rpc.mockResolvedValue({ data: null, error
 afterEach(() => { cleanup(); vi.useRealTimers(); pageState.business = null; pageState.courses = []; clubCoursesResponse = undefined; });
 
 
-const en = JSON.parse(readFileSync('public/locales/en/common.json', 'utf8'));
+const en = JSON.parse(readFileSync('src/locales/en/common.json', 'utf8'));
 const title = (id: string) => row(id).querySelector('b')?.textContent;
 const sub = (id: string) => row(id).querySelector('i')?.textContent;
 const kicker = () => document.querySelector('.club-visiting-kicker')?.textContent;

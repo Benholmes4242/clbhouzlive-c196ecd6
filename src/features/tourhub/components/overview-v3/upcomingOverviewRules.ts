@@ -3,7 +3,7 @@
  * the fallback when the historical winner has no id. No draw invents times. */
 import type { LastYearFinisher } from '../../hooks/useTournamentLastYearTop4';
 import type { HeadlineSegment } from '../../overview/magazineCopy';
-import en from '../../../../../public/locales/en/tourhub.json';
+import en from '@/locales/en/tourhub.json';
 import { surnameOf } from '../../_shared/playerName';
 
 export interface UpcomingPlayer { id: string; name: string; worldRank?: number | null; teeTime?: string | null }

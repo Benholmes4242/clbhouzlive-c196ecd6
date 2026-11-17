@@ -3,7 +3,7 @@ import { act, cleanup, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import enCourses from '../../public/locales/en/courses.json';
+import enCourses from '../../src/locales/en/courses.json';
 import { RoundsGate } from '@/features/explore-magazine/RoundsGate';
 
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));

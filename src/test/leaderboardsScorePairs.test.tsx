@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 import { BoardRowView, boardValue, boardSecondary, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

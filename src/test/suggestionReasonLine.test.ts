@@ -6,7 +6,7 @@ import { suggestionReasonLine } from '@/features/social-suggestions/suggestionRe
 import type { EmptyStateSuggestion } from '@/features/search-v2/hooks/useSearchEmptyStateV2';
 import type { FindGolferRow } from '@/components/explore-tab-new/courseled/hooks/useFindGolfers';
 
-const common = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'public/locales/en/common.json'), 'utf8'));
+const common = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'src/locales/en/common.json'), 'utf8'));
 const i = i18next.createInstance();
 beforeAll(async () => { await i.init({ lng: 'en', resources: { en: { common } }, defaultNS: 'common' }); });
 const t = (k: string, o?: Record<string, unknown>) => i.t(k, o) as string;

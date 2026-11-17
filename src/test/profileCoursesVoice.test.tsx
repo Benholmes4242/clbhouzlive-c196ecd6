@@ -3,8 +3,8 @@ import { beforeAll, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import common from '../../public/locales/en/common.json';
-import courses from '../../public/locales/en/courses.json';
+import common from '../../src/locales/en/common.json';
+import courses from '../../src/locales/en/courses.json';
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 
 let rows = Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, course_id: 'c', rating: 8, design_score: 9, condition_score: 8, clubhouse_score: 7, facilities_score: 6 }));

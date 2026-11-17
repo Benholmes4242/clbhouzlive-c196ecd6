@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { MemoryRouter, Route, Routes, useLocation, useNavigationType } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import en from '../../public/locales/en/common.json';
+import en from '../../src/locales/en/common.json';
 import { TeamListSection } from '@/components/business/TeamListSection';
 import { activityLine, activityWhen, memberMenu, sortTeam, type TeamActivity } from '@/components/business/teamList';
 import type { BusinessMember, BusinessRole } from '@/hooks/useBusinessTeam';

@@ -3,7 +3,7 @@ import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import common from '../../../../../../../public/locales/en/common.json';
+import common from '../../../../../../../src/locales/en/common.json';
 import RoundsThatCountSection from '../RoundsThatCountSection';
 
 const state = vi.hoisted(() => ({ sheet: vi.fn() }));

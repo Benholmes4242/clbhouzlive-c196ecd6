@@ -4,7 +4,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 vi.mock('@/features/amateur-ranking/useAmateurRanking', () => ({ useAmateurSummary: () => ({ data: null, isSuccess: true }), useAmateurHistory: () => ({ data: [], isSuccess: true }), useAmateurEvents: () => ({ data: [], isSuccess: true }), useAmateurCareer: () => ({ data: [], isSuccess: true }) }));
 import { createInstance } from 'i18next';
-import profileEnglish from '../../public/locales/en/profile.json';
+import profileEnglish from '../../src/locales/en/profile.json';
 
 vi.mock('@/features/coach/BusinessCoachCards', async importOriginal => ({ ...(await importOriginal<typeof import('@/features/coach/BusinessCoachCards')>()), CoachProfileLine: () => null }));
 

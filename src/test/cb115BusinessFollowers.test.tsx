@@ -205,7 +205,7 @@ describe('CB114 tidy', () => {
     expect(seen).toEqual([['business.nearby.noRounds', undefined], ['business.nearby.rounds', 1], ['business.nearby.rounds', 2], ['business.nearby.rounds', 7]]);
     const c = { id: 'x', name: 'X', distanceKm: null } as unknown as Parameters<typeof metaLine>[0];
     expect(metaLine(c, { id: 'x', name: 'X', rounds_tracked: 1, avg_over_par: null, your_rounds: null, your_best: null }, false, tr).line).toBe('business.nearby.rounds');
-    const en = JSON.parse(readFileSync(resolve(process.cwd(), 'public/locales/en/common.json'), 'utf8'));
+    const en = JSON.parse(readFileSync(resolve(process.cwd(), 'src/locales/en/common.json'), 'utf8'));
     expect(Object.keys(en.business.nearby)).toEqual(expect.arrayContaining(['noRounds', 'rounds_one', 'rounds_other']));
     expect(Object.keys(en.business.followers)).toEqual(expect.arrayContaining(['withHandicap_one', 'withHandicap_other', 'firstRounds_one', 'rounds_one']));
   });

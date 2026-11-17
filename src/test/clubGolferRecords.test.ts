@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import i18next from 'i18next';
-import coursesEn from '../../public/locales/en/courses.json';
+import coursesEn from '../../src/locales/en/courses.json';
 
 import {
   assignClubRecordCategories,

@@ -3,7 +3,7 @@ import { fireEvent, render, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 import { APPLIED_FILL, SELECTED_EDGE } from '@/components/ui/RailChips';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { LeaderboardsSection, LEADERBOARD_BOARDS } from '@/features/explore-magazine/LeaderboardsSection';

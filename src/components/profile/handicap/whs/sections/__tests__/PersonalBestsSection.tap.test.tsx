@@ -2,7 +2,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import common from '../../../../../../../public/locales/en/common.json';
+import common from '../../../../../../../src/locales/en/common.json';
 import type { WhsScore } from '@/lib/whs/types';
 import PersonalBestsSection from '../PersonalBestsSection';
 

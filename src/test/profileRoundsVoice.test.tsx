@@ -3,8 +3,8 @@ import { beforeAll, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import common from '../../public/locales/en/common.json';
-import profile from '../../public/locales/en/profile.json';
+import common from '../../src/locales/en/common.json';
+import profile from '../../src/locales/en/profile.json';
 import ProfileRoundsTab from '@/components/profile/rounds/ProfileRoundsTab';
 import type { ProfileRound } from '@/components/profile/rounds/useProfileRounds';
 

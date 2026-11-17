@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import courses from '../../public/locales/en/courses.json';
+import courses from '../../src/locales/en/courses.json';
 
 const h = vi.hoisted(() => ({ rpc: vi.fn(), toggle: vi.fn(), rows: [] as unknown[], activity: [] as unknown[] }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: h.rpc } }));
