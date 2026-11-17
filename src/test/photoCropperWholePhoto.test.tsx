@@ -5,7 +5,7 @@ import { join } from 'node:path';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/components/profile/edit-v2/ImageCropperModal', () => ({ getCroppedImg: vi.fn(async () => new Blob(['c'], { type: 'image/jpeg' })) }));
-vi.mock('react-easy-crop', () => ({ default: (p: { onCropComplete: (a: unknown, b: unknown) => void }) => { p.onCropComplete({}, { x: 0, y: 0, width: 10, height: 10 }); return <div data-testid="cropper" />; } }));
+vi.mock('react-easy-crop', () => ({ default: (p: { onCropComplete: (a: unknown, b: unknown) => void }) => <div data-testid="cropper"><button onClick={() => p.onCropComplete({}, { x: 0, y: 0, width: 10, height: 10 })}>Position</button></div> }));
 
 import { WelcomeCropper } from '@/features/onboarding/WelcomeCropper';
 
@@ -40,9 +40,8 @@ describe('FIX_PHOTO_CROPPER_WHOLE_PHOTO', () => {
   it('Cancel and Use photo call their handlers', async () => {
     const onCancel = vi.fn(); const onUse = vi.fn();
     render(<WelcomeCropper image="x" onCancel={onCancel} onUse={onUse} />);
-    const [cancel, use] = screen.getAllByRole('button');
-    fireEvent.click(cancel); expect(onCancel).toHaveBeenCalledTimes(1);
-    fireEvent.click(use); await waitFor(() => expect(onUse).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' })); expect(onCancel).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Position' })); fireEvent.click(screen.getByRole('button', { name: 'Use photo' })); await waitFor(() => expect(onUse).toHaveBeenCalledTimes(1));
     expect(onUse.mock.calls[0][0]).toBeInstanceOf(File);
   });
 
