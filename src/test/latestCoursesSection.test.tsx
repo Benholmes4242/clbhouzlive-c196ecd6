@@ -308,10 +308,10 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
 
   it('CoursesBrowsePage no longer gates or mounts latestCourses (BRIEF_WHATS_BEEN_PLAYED §5)', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/components/courses/CoursesBrowsePage.tsx'), 'utf8');
-    expect(source).toMatch(/'byRegion', 'mostPlayed'/);
+    expect(source).toMatch(/'whoPlaying', 'mostPlayed'/);
     expect(source).not.toContain("'latestCourses'");
     expect(source).not.toContain('<LatestCoursesSection />');
-    expect(source.indexOf('<ByRegionSection />')).toBeLessThan(source.indexOf('<MostPlayedSection />'));
+    expect(source.indexOf('<WhoPlayingSection />')).toBeLessThan(source.indexOf('<MostPlayedSection />'));
   });
 
 });

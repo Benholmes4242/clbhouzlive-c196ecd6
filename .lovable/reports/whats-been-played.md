@@ -93,3 +93,46 @@ Changed assertions in whatsBeenPlayed.test.tsx:
 New: whatsBeenPlayedV2.test.tsx (10), whatsBeenPlayedHero.test.tsx (3).
 
 Suite: 9,059 → 9,074 (2,241 / 2,249 / 2,252 / 2,332), all passing. +15 = whatsBeenPlayed +2, V2 +10, hero +3. Typecheck clean. Device checks: unchecked (signed-in flows unavailable in the test browser).
+
+---
+
+## BRIEF_WHATS_BEEN_PLAYED_V3
+
+### What changed
+- §1 Ring count moved onto the ring box's top-right corner (top/right -7px, z-index 2, 18px tall, min 20px, radius 6px, canvas #0A0A0C, 1.5px border in the ring's own colour, 9.5px/800 tabular number amber/ink/mute by state; no glass/blur). `RING_ROW_PAD_TOP` 4 → 10, shared by WhoPlayingShell.
+- §2 BEST LATELY kicker ink; to par beside the gross (10.5px/700 tabular, baseline, dim, red under par, E level, true minus); day alone under the name. Photo captions: title one line ellipsis; credit = 14px face + 5px + full name (10px, .85 white, ellipsis); course photos add " · {day}". Names fill from the section's member faces (readMemberFaces), then username. COURSE tag #FFFFFF; HARDEST unchanged.
+- §3 Rail count white. Played course: 16px face + best golfer's full name (bestLately n=1: lowest gross, ties more recent), then "Best round {gross}" white 800. Posts/reviews only: get_course_media_counts → "{v} video(s) & {p} photo(s)" / one part / nothing. Star and rating removed.
+- §4 Rails: home nation ("ACROSS {NATION}" / "Played lately"), ONE rest-of-grouping rail ("BEYOND {HOME NATION}" / "The rest of GB&I", or "Played lately" outside B&I), Abroad. Rest rail busiest first, max 10, never See all; See all only on home rail.
+- §5 ByRegionSection and HardestSection unmounted; `byRegion`/`hardest` removed from GATE_IDS. Files kept.
+
+### Deleted
+- `useRailTopUps.ts` (stopped reading get_stat_browse_courses for this section), NotPlayedCard, `topUpRail`, `RAIL_MIN`, `RatedCandidate`, the per-nation/Ireland rail kinds and Scotland/Ireland heading map, FaceStack use on rail cards, GOLD use on rails.
+- The `stat_browse_base` community-rating read in usePlayedRounds (`ratings`, `unplayedIds`) — only fed the removed star line.
+- `ByRegionShell` from the page's loading fallback (its section no longer mounts). Signed-out fallback is now empty until the page is ready. The shell export remains in sectionShells.tsx.
+
+### Points to note
+- With no home club there is no home nation; the rest rail's kicker reads "ACROSS GB&I" (brief has no wording for this case).
+- A course with rounds but no gross shows no best-golfer line.
+
+### Changed assertions (old → new)
+whatsBeenPlayed.test.tsx:
+- rails `key` `['England','ireland','Scotland','__abroad']`, `rails[1]` `['down','kerry']` → `['home','rest','abroad']`, rest `['down','fife','kerry']`, abroad `['spain']` (test renamed to V3 §4 wording).
+- `rails.some(r => r.key === 'England')` → `r.key === 'home'`.
+- no-home kinds `['nation','abroad']` → `['rest','abroad']`.
+- headings `railHeading('nation','Scotland')` North of the border / `('ireland')` Across the water / `('nation','Wales')` → `railHeading('rest','England')` = BEYOND ENGLAND / The rest of GB&I and `('rest','California','Rest of World')` title Played lately.
+- DELETED "tops up to three in rating order…" (`topUpRail(['fife'],…)).toEqual(['b','a'])`) — top-ups removed by §3.
+- See all: `kind:'ireland'` false → `kind:'rest'` false; renamed to home-rail wording.
+- best lately `pars[1].style.color` `''` → `'rgba(248, 250, 252, 0.42)'` (renamed).
+- "played and not-played rail cards" (`'SCOTLAND'`, NOT PLAYED LATELY, `'★ 10'`) → "rest-of rail card with no top-ups": BEYOND ENGLAND, one played card, no not-played card, no See all.
+- Removed the `useRailTopUps` mock and `f.topUps` fixture (module deleted).
+whatsBeenPlayedV2.test.tsx:
+- `[data-activity-stat]` `'★ 9.1 · 4 photos'` → `'4 photos'` (renamed "…or media counts (V3 §3)"); removed `useRailTopUps` mock/fixture.
+coursesWholePageHold.test.tsx:
+- `getByTestId('region-shell')` visible (both tests) → `queryByTestId('region-shell')` null; hidden/ready id lists drop `byRegion`,`hardest`; list parent check uses `mostPlayed` instead of `byRegion`.
+latestCoursesSection.test.tsx:
+- `/'byRegion', 'mostPlayed'/` → `/'whoPlaying', 'mostPlayed'/`; `<ByRegionSection />` before MostPlayed → `<WhoPlayingSection />` before MostPlayed.
+
+New: `src/test/whatsBeenPlayedV3.test.tsx` (10 tests).
+
+### Device checks
+Signed-out page at 320 checked: By region and Tough tracks absent, no horizontal overflow. Signed-in section at 375/320 unchecked (sign-in unavailable in automated browser).

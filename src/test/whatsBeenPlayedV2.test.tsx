@@ -143,7 +143,7 @@ describe('section', () => {
     expect(container.querySelector('[data-latest-review]')).toBeNull();
     expect(container.querySelector('[data-tile-empty]')).not.toBeNull();
   });
-  it('rails hold active courses outside the first tab with Best round, or rating and photos', () => {
+  it('rails hold active courses outside the first tab with Best round, or media counts (V3 §3)', () => {
     f.counts = 4;
     const { container } = mount();
     const rail = container.querySelector('[data-region-rail="home"]') as HTMLElement;
@@ -151,7 +151,7 @@ describe('section', () => {
     expect(ids.some((t) => t?.includes('Sundridge'))).toBe(false);
     const played = rail.querySelector('[data-played-stat]') as HTMLElement;
     expect(played.textContent).toBe('Best round 77');
-    expect(rail.querySelector('[data-activity-stat]')?.textContent).toBe('\u2605 9.1 \u00B7 4 photos');
+    expect(rail.querySelector('[data-activity-stat]')?.textContent).toBe('4 photos');
     const counts = [...rail.querySelectorAll('[data-rail-card="played"]')].map((n) => n.querySelector('span span:nth-child(2)')?.textContent);
     expect(counts.length).toBe(2);
   });
