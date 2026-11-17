@@ -1,17 +1,19 @@
 import { HOLE_DIFFICULTY_MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
 /**
- * WHAT'S BEEN PLAYED — pure rules (BRIEF_WHATS_BEEN_PLAYED, replacing
- * BRIEF_PLAYED_RINGS_AND_AREA_TABS). Tabs cover the member's own patch only
- * (Near you, home county; nation fallbacks); every other played course goes to
- * a region rail, so no course appears twice on the page. New/seen is per
- * device: localStorage holds the newest whs_score_id seen per course, and any
- * storage failure reads every course as new.
+ * WHAT'S BEEN PLAYED — pure rules (BRIEF_WHATS_BEEN_PLAYED_V2, on top of
+ * BRIEF_WHATS_BEEN_PLAYED). Activity = rounds + published posts + reviews in
+ * the 30-day window. Tabs run from the home county outwards (county, nation,
+ * then fixed world tabs); tabs overlap by design. Rails hold every active
+ * course outside the FIRST tab, so a course may sit in a tab and a rail.
+ * New/seen is per device: localStorage holds the newest activity key seen per
+ * course ("round:<id>", "post:<id>", "review:<id>"); a storage failure reads
+ * every course as new.
  *
  * Geography: golf_courses.country is a REGION GROUPING ("Britain & Ireland",
  * "Continental Europe", "Rest of World"), not a country (see
  * lib/whs/countryVocabulary.ts); nations key on sub_country.
  */
-export const NEAR_KM = 40;
+export const ACTIVITY_WINDOW_DAYS = 30;
 export const UKI_GROUPING = 'Britain & Ireland';
 /** Ireland and Northern Ireland share one rail (countryVocabulary's Ireland set). */
 export const IRELAND_NATIONS = ['Ireland', 'Northern Ireland'] as const;
@@ -31,47 +33,53 @@ export interface PlacedCourse {
 export interface HomePlace { lat: number | null; lng: number | null; region: string | null; subCountry: string | null; country: string | null; continent: string | null }
 export interface AreaTab { id: string; label: string; courseIds: string[] }
 
-export function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
-  const r = (d: number) => (d * Math.PI) / 180;
-  const dLat = r(bLat - aLat), dLng = r(bLng - aLng);
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(aLat)) * Math.cos(r(bLat)) * Math.sin(dLng / 2) ** 2;
-  return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(h)));
-}
+/** USA tab nations. countryVocabulary holds no US spellings; these are the brief's. */
+export const USA_NATIONS = ['United States', 'United States of America', 'USA'] as const;
+/** Middle East tab nations. countryVocabulary holds none of these; the brief's spellings. */
+export const MIDDLE_EAST_NATIONS = ['United Arab Emirates', 'Qatar', 'Bahrain', 'Oman', 'Saudi Arabia', 'Kuwait', 'Jordan', 'Israel', 'Lebanon'] as const;
+const inList = (list: readonly string[], v: string | null) => !!v && list.some((x) => x.toLowerCase() === v.trim().toLowerCase());
+const isGbi = (c: Pick<PlacedCourse, 'country'>) => c.country === UKI_GROUPING;
+const isEurope = (c: Pick<PlacedCourse, 'country' | 'continent'>) => !isGbi(c) && ((c.continent ?? '').toLowerCase() === 'europe' || c.country === 'Continental Europe');
+const isUsa = (c: Pick<PlacedCourse, 'subCountry'>) => inList(USA_NATIONS, c.subCountry);
+const isMiddleEast = (c: Pick<PlacedCourse, 'subCountry'>) => inList(MIDDLE_EAST_NATIONS, c.subCountry);
+/** The fixed world tabs, in order. Rest of world = none of the others. */
+export const WORLD_TABS: ReadonlyArray<{ id: string; label: string; pick: (c: PlacedCourse) => boolean; nations?: readonly string[] }> = [
+  { id: 'gbi', label: 'GB&I', pick: isGbi },
+  { id: 'europe', label: 'Europe', pick: isEurope },
+  { id: 'usa', label: 'USA', pick: isUsa, nations: USA_NATIONS },
+  { id: 'middle-east', label: 'Middle East', pick: isMiddleEast },
+  { id: 'world', label: 'Rest of world', pick: (c) => !isGbi(c) && !isEurope(c) && !isUsa(c) && !isMiddleEast(c) },
+];
 
 /**
- * §1: "Near you" then the home county, each only with a course, a repeated
- * label skipped. Neither → the home nation; that empty or no home → the nation
- * with the most rounds lately (`roundsByCourse` counts rounds per course id).
+ * §3: the home county (golf_courses.region), the home nation (sub_country),
+ * then the world tabs. Each only with an active course (`courses` holds active
+ * courses only); a tab whose label repeats an earlier one is skipped (USA also
+ * when the home nation is a US spelling). No home → world tabs only.
  */
-export function buildAreaTabs(courses: PlacedCourse[], home: HomePlace | null, roundsByCourse: ReadonlyMap<string, number> = new Map()): AreaTab[] {
+export function buildAreaTabs(courses: PlacedCourse[], home: HomePlace | null): AreaTab[] {
   const tabs: AreaTab[] = [];
   const push = (id: string, label: string | null, pick: (c: PlacedCourse) => boolean) => {
     if (!label) return;
+    if (tabs.some((t) => t.label.toLowerCase() === label.toLowerCase())) return;
     const ids = courses.filter(pick).map((c) => c.id);
     if (ids.length === 0) return;
-    if (tabs.some((t) => t.label.toLowerCase() === label.toLowerCase())) return;
     tabs.push({ id, label, courseIds: ids });
   };
-  if (home) {
-    if (home.lat != null && home.lng != null) {
-      push('near', 'Near you', (c) => c.lat != null && c.lng != null && haversineKm(home.lat!, home.lng!, c.lat, c.lng) <= NEAR_KM);
-    }
-    if (home.region) push('region', home.region, (c) => c.region === home.region);
-    if (tabs.length) return tabs;
-    if (home.subCountry) push('nation', home.subCountry, (c) => c.subCountry === home.subCountry);
-    if (tabs.length) return tabs;
+  if (home?.region) push('region', home.region, (c) => c.region === home.region);
+  if (home?.subCountry) push('nation', home.subCountry, (c) => c.subCountry === home.subCountry);
+  for (const w of WORLD_TABS) {
+    if (w.nations && home && inList(w.nations, home.subCountry)) continue;
+    push(w.id, w.label, w.pick);
   }
-  const byNation = new Map<string, number>();
-  for (const c of courses) if (c.subCountry) byNation.set(c.subCountry, (byNation.get(c.subCountry) ?? 0) + (roundsByCourse.get(c.id) ?? 0));
-  const busiest = [...byNation.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? null;
-  push('nation', busiest, (c) => c.subCountry === busiest);
   return tabs;
 }
 
-export interface RingGroup { courseId: string; rounds: number; latestDate: string; latestScoreId: string }
-/** Busiest first; ties go to the most recent round. */
+/** `activity` = rounds + posts + reviews in the window; `latestKey` = the newest activity's seen key. */
+export interface RingGroup { courseId: string; activity: number; latestDate: string; latestKey: string }
+/** Busiest by activity first; ties go to the most recent activity. */
 export function orderRings<T extends RingGroup>(groups: T[]): T[] {
-  return [...groups].sort((a, b) => b.rounds - a.rounds || b.latestDate.localeCompare(a.latestDate));
+  return [...groups].sort((a, b) => b.activity - a.activity || b.latestDate.localeCompare(a.latestDate));
 }
 
 export type SeenMap = Record<string, string>;
@@ -93,11 +101,11 @@ export function hardestHoleFromRanks(rows: Array<{ hole_no: number; difficulty_r
   const top = rows.find((r) => r.difficulty_rank === 1);
   return top && (top.rounds ?? 0) >= HOLE_DIFFICULTY_MIN_ROUNDS ? top.hole_no : null;
 }
-export const isNewRing = (g: RingGroup, seen: SeenMap | null) => !seen || seen[g.courseId] !== g.latestScoreId;
+export const isNewRing = (g: RingGroup, seen: SeenMap | null) => !seen || seen[g.courseId] !== g.latestKey;
 
 /* ── §4 region rails ───────────────────────────────────────────────────── */
 export type RailKind = 'home' | 'nation' | 'ireland' | 'abroad';
-export interface RailPlan { key: string; kind: RailKind; nations: string[]; kicker: string; title: string; courseIds: string[]; playedTotal: number; rounds: number }
+export interface RailPlan { key: string; kind: RailKind; nations: string[]; kicker: string; title: string; courseIds: string[]; playedTotal: number; activity: number }
 
 const isIreland = (n: string | null) => !!n && (IRELAND_NATIONS as readonly string[]).includes(n);
 /** Rail key for one course inside the grouping: the nation, Ireland merged. */
@@ -112,9 +120,9 @@ export function railHeading(kind: RailKind, nation: string | null): { kicker: st
 }
 
 /**
- * Every played course not in a tab, grouped by nation inside the home's
+ * Every active course outside the first tab, grouped by nation inside the home's
  * grouping (no home → Britain & Ireland), everything else in one Abroad rail.
- * Home nation first, other nations by rounds lately, Abroad last. Each rail
+ * Home nation first, other nations by activity, Abroad last. Each rail
  * holds its played courses busiest first, capped at RAIL_MAX.
  */
 export function buildRails<T extends RingGroup>(courses: PlacedCourse[], groups: T[], tabCourseIds: ReadonlySet<string>, home: HomePlace | null): RailPlan[] {
@@ -144,11 +152,11 @@ export function buildRails<T extends RingGroup>(courses: PlacedCourse[], groups:
       key, kind, nations, ...railHeading(kind, nation),
       courseIds: ordered.slice(0, RAIL_MAX).map((g) => g.courseId),
       playedTotal: ordered.length,
-      rounds: b.groups.reduce((n, g) => n + g.rounds, 0),
+      activity: b.groups.reduce((n, g) => n + g.activity, 0),
     });
   }
   const rank = (p: RailPlan) => (p.kind === 'home' ? 0 : p.kind === 'abroad' ? 2 : 1);
-  return plans.sort((a, b) => rank(a) - rank(b) || b.rounds - a.rounds || a.key.localeCompare(b.key));
+  return plans.sort((a, b) => rank(a) - rank(b) || b.activity - a.activity || a.key.localeCompare(b.key));
 }
 
 /** "See all ›": single-nation rails only, more played courses than a rail shows. */
@@ -170,11 +178,13 @@ export function topUpRail(playedIds: string[], candidates: RatedCandidate[], onP
 
 /* ── §3 tile rules ─────────────────────────────────────────────────────── */
 export interface ScoredRound { whs_score_id: string; user_id: string; play_date: string; gross_score: number | null }
-/** The two lowest gross rounds, ties to the more recent. */
+const byGross = (a: ScoredRound, b: ScoredRound) => (a.gross_score as number) - (b.gross_score as number) || b.play_date.localeCompare(a.play_date);
+/** Each golfer's best round (lowest gross, ties to the more recent), then the
+ *  n lowest of those, ties to the more recent. Never one golfer twice. */
 export function bestLately<T extends ScoredRound>(rows: T[], n = 2): T[] {
-  return rows.filter((r) => r.gross_score != null)
-    .sort((a, b) => (a.gross_score as number) - (b.gross_score as number) || b.play_date.localeCompare(a.play_date))
-    .slice(0, n);
+  const best = new Map<string, T>();
+  for (const r of [...rows].filter((x) => x.gross_score != null).sort(byGross)) if (!best.has(r.user_id)) best.set(r.user_id, r);
+  return [...best.values()].sort(byGross).slice(0, n);
 }
 
 /** To par with a true minus, "E" when level. */
@@ -194,13 +204,6 @@ export function dayLabel(iso: string, now: Date = new Date()): string {
   const start = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
   const days = Math.round((start(now) - start(d)) / DAY_MS);
   return days >= 0 && days <= 6 ? WEEKDAYS[d.getDay()] : `${d.getDate()} ${MONTHS[d.getMonth()]}`;
-}
-
-/** Whole miles from the home course: "Under a mile away", "1 mile away". */
-export function milesAwayText(km: number): string {
-  const miles = Math.round(km / 1.609344);
-  if (miles < 1) return 'Under a mile away';
-  return miles === 1 ? '1 mile away' : `${miles.toLocaleString('en-GB')} miles away`;
 }
 
 export interface TileHole { kind: 'hole'; holeNo: number; addedAt: string }

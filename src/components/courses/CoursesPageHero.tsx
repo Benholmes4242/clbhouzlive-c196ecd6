@@ -15,6 +15,9 @@ import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/Hybri
 
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 import { CourseMasthead, CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useCourseRecordHolders } from './useCourseRecordHolders';
+import './courseListCard.css';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 
 /**
@@ -151,6 +154,14 @@ function CoursesPageHeroInner() {
     [fact, t],
   );
 
+  /* BRIEF_WHATS_BEEN_PLAYED_V2 §1: a course_record fact shows the course list
+     card's own record row when that card's rule holds (the holder's gross
+     equals the fact's); otherwise the crown line stays. */
+  const recordIds = useMemo(() => (hero?.course_id && fact?.fact_kind === 'course_record' ? [hero.course_id] : []), [hero?.course_id, fact?.fact_kind]);
+  const holders = useCourseRecordHolders(recordIds, { includePlayers: false });
+  const holder = hero?.course_id ? holders.map.get(hero.course_id) : undefined;
+  const recordRow = fact?.fact_kind === 'course_record' && holder && fact.record_gross != null && holder.recordGross === Number(fact.record_gross) ? holder : null;
+
   // Analytics: how often a blurb actually exists decides whether
   // course_mood_blurbs is worth investing in.
   useEffect(() => {
@@ -261,9 +272,6 @@ function CoursesPageHeroInner() {
           >
             {(blurb || factLine) ? (
               <>
-                {/* HELD (record line): get_hero_course_fact carries no runner-up /
-                    contested flag, so COURSE RECORD vs BEST ROUND HERE cannot be
-                    decided. The existing fact line stays until that field lands. */}
                 {blurb && (
                   <div
                     style={{
@@ -281,7 +289,13 @@ function CoursesPageHeroInner() {
                     {blurb}
                   </div>
                 )}
-                {factLine && (
+                {recordRow ? (
+                  <div className="course-list-record" data-hero-record="" style={{ marginTop: blurb ? 0 : 5, width: '100%' }}>
+                    <SquircleAvatar src={recordRow.photoUrl} userId={recordRow.holderId} size={26} alt={recordRow.holderName} surface="canvas" hairlineRing />
+                    <div className="course-list-holder"><div className="course-list-record-label">COURSE RECORD</div><div className="course-list-holder-name" style={{ color: A.INK }}>{recordRow.holderName}</div></div>
+                    <div className="course-list-record-score" style={{ flex: 'none', whiteSpace: 'nowrap' }}><div className="course-list-gross">{recordRow.recordGross}</div><div className="course-list-gross-label">GROSS</div></div>
+                  </div>
+                ) : factLine && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                     {fact && (
                       <span style={{ display: 'flex', flexShrink: 0 }}>

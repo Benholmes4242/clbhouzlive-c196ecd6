@@ -9,7 +9,9 @@ import { useSectionReady } from './PageLoadGate';
 import { settled } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
 import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, writeSeen, UKI_GROUPING, type RingGroup, type SeenMap } from './playedRings';
-import { usePlayedRounds, type PlayedCourse, type PlayedRoundRow } from './usePlayedRounds';
+type MemberFacesMap = Map<string, { displayName: string | null; username: string | null; photoUrl: string | null }>;
+const NO_FACES: MemberFacesMap = new Map();
+import { postCourseIds, usePlayedRounds, type PlayedCourse, type PlayedPostRow, type PlayedReviewRow, type PlayedRoundRow } from './usePlayedRounds';
 import { usePlayedTile } from './usePlayedTile';
 import { useRailTopUps } from './useRailTopUps';
 import { PlayedHead, GLASS, type Face } from './playedParts';
@@ -18,8 +20,10 @@ import { RegionRails } from './RegionRails';
 
 /**
  * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_WHATS_BEEN_PLAYED, three signed-off
- * mocks). Area tabs for the member's own patch, course rings busiest first,
- * the selected ring's tile, then region rails for every other played course.
+ * mocks, revised by BRIEF_WHATS_BEEN_PLAYED_V2). Tabs from the home county
+ * outwards, course rings busiest by activity first,
+ * the selected ring's tile, then region rails for every active course outside
+ * the first tab.
  * Reads: usePlayedRounds (rounds, course geography, home), usePlayedTile (the
  * selected course's photos), useRailTopUps. All of them gate 'whoPlaying'.
  * Guests see nothing (get_recent_rounds is 401 signed out).
@@ -42,32 +46,63 @@ export const TABS_TOP = 12;
 export const TAB_H = 34;
 const SEEN_EDGE = 'rgba(255,255,255,.16)';
 
-export interface CourseGroup extends RingGroup { rows: PlayedRoundRow[]; faces: Face[]; best: number | null }
+export interface CourseGroup extends RingGroup {
+  rows: PlayedRoundRow[];
+  /** Reviews in the window, newest first. */
+  reviews: PlayedReviewRow[];
+  posts: number;
+  faces: Face[];
+  best: number | null;
+}
+type MemberFaces = ReadonlyMap<string, { displayName: string | null; username: string | null; photoUrl: string | null }>;
+type Item = { courseId: string; userId: string | null; at: string; key: string; round?: PlayedRoundRow; review?: PlayedReviewRow; post?: true };
 
-export function groupRounds(rows: PlayedRoundRow[]): CourseGroup[] {
-  const sorted = [...rows].sort((a, b) => b.play_date.localeCompare(a.play_date) || b.whs_score_id.localeCompare(a.whs_score_id));
+/**
+ * §2 activity per course: rounds + posts + reviews. Members are the distinct
+ * people behind any of it, newest first; names and faces come from the round
+ * row, then readMemberFaces. Business-actor posts count as activity but not
+ * as a member.
+ */
+export function groupActivity(rows: PlayedRoundRow[], posts: PlayedPostRow[] = [], reviews: PlayedReviewRow[] = [], faces: MemberFaces = new Map()): CourseGroup[] {
+  const items: Item[] = [];
+  for (const r of rows) if (r.course_id) items.push({ courseId: r.course_id, userId: r.user_id, at: r.play_date, key: `round:${r.whs_score_id}`, round: r });
+  for (const p of posts) for (const id of postCourseIds(p)) items.push({ courseId: id, userId: p.actor_type === 'business' ? null : p.user_id, at: p.created_at, key: `post:${p.id}`, post: true });
+  for (const r of reviews) if (r.course_id) items.push({ courseId: r.course_id, userId: r.user_id, at: r.created_at, key: `review:${r.id}`, review: r });
+  items.sort((a, b) => b.at.localeCompare(a.at) || b.key.localeCompare(a.key));
   const map = new Map<string, CourseGroup>();
-  for (const r of sorted) {
-    if (!r.course_id) continue;
-    let g = map.get(r.course_id);
-    if (!g) { g = { courseId: r.course_id, rounds: 0, latestDate: r.play_date, latestScoreId: r.whs_score_id, rows: [], faces: [], best: null }; map.set(r.course_id, g); }
-    g.rounds += 1;
-    g.rows.push(r);
-    if (r.gross_score != null && (g.best == null || r.gross_score < g.best)) g.best = r.gross_score;
-    if (!g.faces.some((f) => f.userId === r.user_id)) g.faces.push({ userId: r.user_id, photo: r.profile_photo_url, name: r.display_name });
+  for (const it of items) {
+    let g = map.get(it.courseId);
+    if (!g) { g = { courseId: it.courseId, activity: 0, latestDate: it.at, latestKey: it.key, rows: [], reviews: [], posts: 0, faces: [], best: null }; map.set(it.courseId, g); }
+    g.activity += 1;
+    const face = it.userId ? faces.get(it.userId) : undefined;
+    const name = it.round?.display_name || face?.displayName || face?.username || null;
+    if (it.round) {
+      const r = it.round;
+      g.rows.push(r.display_name ? r : { ...r, display_name: name, profile_photo_url: r.profile_photo_url ?? face?.photoUrl ?? null });
+      if (r.gross_score != null && (g.best == null || r.gross_score < g.best)) g.best = r.gross_score;
+    } else if (it.review) g.reviews.push(it.review);
+    else g.posts += 1;
+    if (it.userId && !g.faces.some((f) => f.userId === it.userId)) g.faces.push({ userId: it.userId, photo: it.round?.profile_photo_url ?? face?.photoUrl ?? null, name });
   }
   return orderRings([...map.values()]);
 }
+/** Rounds only (kept for callers and tests that group rounds alone). */
+export const groupRounds = (rows: PlayedRoundRow[]) => groupActivity(rows);
 
 export function WhoPlayingSection() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id;
   const played = usePlayedRounds(userId);
   const courseMap = played.courses.data as Map<string, PlayedCourse> | undefined;
-  const groups = useMemo(() => groupRounds((played.rounds.data ?? []) as PlayedRoundRow[]).filter((g) => !courseMap || courseMap.has(g.courseId)), [played.rounds.data, courseMap]);
+  const postRows = played.posts?.data as PlayedPostRow[] | undefined;
+  const reviewRows = played.reviews?.data as PlayedReviewRow[] | undefined;
+  const faceMap = played.faces?.data as MemberFacesMap | undefined;
+  const groups = useMemo(
+    () => groupActivity((played.rounds.data ?? []) as PlayedRoundRow[], postRows ?? [], reviewRows ?? [], faceMap ?? NO_FACES).filter((g) => !courseMap || courseMap.has(g.courseId)),
+    [played.rounds.data, postRows, reviewRows, faceMap, courseMap],
+  );
   const courses = useMemo(() => groups.map((g) => courseMap?.get(g.courseId)).filter((c): c is PlayedCourse => !!c), [groups, courseMap]);
-  const roundsByCourse = useMemo(() => new Map(groups.map((g) => [g.courseId, g.rounds])), [groups]);
-  const tabs = useMemo(() => buildAreaTabs(courses, played.home, roundsByCourse), [courses, played.home, roundsByCourse]);
+  const tabs = useMemo(() => buildAreaTabs(courses, played.home), [courses, played.home]);
   const [tabId, setTabId] = useState<string | null>(null);
   const tab = tabs.find((t) => t.id === tabId) ?? tabs[0] ?? null;
   const ringGroups = useMemo(() => (tab ? groups.filter((g) => tab.courseIds.includes(g.courseId)) : []), [groups, tab]);
@@ -83,24 +118,29 @@ export function WhoPlayingSection() {
   const seenWritten = useRef<string | null>(null);
   useEffect(() => {
     if (!current || !userId) return;
-    const stamp = `${userId}|${current.courseId}:${current.latestScoreId}`;
+    const stamp = `${userId}|${current.courseId}:${current.latestKey}`;
     if (seenWritten.current === stamp) return;
     seenWritten.current = stamp;
     // Build from storage, not state: on the render where userId changes the
     // state can still hold the previous key's map (the read effect has not
     // landed yet), and merging that would overwrite the new member's history.
-    const next = { ...(readSeen(userId) ?? {}), [current.courseId]: current.latestScoreId };
+    const next = { ...(readSeen(userId) ?? {}), [current.courseId]: current.latestKey };
     setSeen(next);
     writeSeen(userId, next);
   }, [current, userId]);
 
-  const tabIds = useMemo(() => new Set(tabs.flatMap((t) => t.courseIds)), [tabs]);
+  // §6: rails hold every active course outside the FIRST tab only.
+  const tabIds = useMemo(() => new Set(tabs[0]?.courseIds ?? []), [tabs]);
   const rails = useMemo(() => buildRails(courses, groups, tabIds, played.home), [courses, groups, tabIds, played.home]);
   const grouping = played.home?.country ?? UKI_GROUPING;
   const topUps = useRailTopUps(rails, grouping, userId);
   const tile = usePlayedTile(current?.courseId ?? null, userId);
 
-  const roundsReady = settled(played.rounds) && (played.ids.length === 0 || settled(played.courses));
+  const opt = (q: Parameters<typeof settled>[0] | undefined) => !q || settled(q);
+  const roundsReady = settled(played.rounds) && opt(played.posts) && opt(played.reviews)
+    && (played.ids.length === 0 || settled(played.courses))
+    && (!played.memberIds?.length || opt(played.faces))
+    && (!played.unplayedIds?.length || opt(played.ratings));
   const firstReady = !sessionLoading && (!user || (roundsReady && played.homeReady && (!current || tile.ready) && topUps.ready));
   // Latched: after the first ready the section never returns to the shell;
   // later selections re-render in place and only the photo row waits.
@@ -125,7 +165,7 @@ export function WhoPlayingSection() {
         onChange={(id) => { setTabId(id); setSelected(null); }}
         style={{ marginTop: TABS_TOP, padding: '0 16px' }}
       />
-      <div className="scrollbar-hide" data-played-rings="" style={{ display: 'flex', gap: RING_GAP, overflowX: 'auto', scrollbarWidth: 'none', marginTop: RING_ROW_TOP, padding: `${RING_ROW_PAD_TOP}px 16px 2px` }}>
+      <div className="scrollbar-hide" data-played-rings="" style={{ display: 'flex', alignItems: 'flex-start', gap: RING_GAP, overflowX: 'auto', scrollbarWidth: 'none', marginTop: RING_ROW_TOP, padding: `${RING_ROW_PAD_TOP}px 16px 2px` }}>
         {ringGroups.map((g) => {
           const c = courseMap?.get(g.courseId);
           const { short, variant } = shareCourseName(c?.name ?? '');
@@ -136,12 +176,12 @@ export function WhoPlayingSection() {
           const state = isSel ? 'selected' : isNew ? 'new' : 'seen';
           return (
             <button key={g.courseId} type="button" data-played-ring={state} aria-pressed={isSel} onClick={() => select(g)}
-              style={{ flex: 'none', width: RING_ITEM_W, padding: 0, background: 'none', border: 0, textAlign: 'center', cursor: 'pointer', color: A.INK }}>
+              style={{ flex: 'none', width: RING_ITEM_W, padding: 0, background: 'none', border: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start', alignSelf: 'flex-start', textAlign: 'center', cursor: 'pointer', color: A.INK }}>
               <span style={{ position: 'relative', display: 'block', width: RING_SIZE, height: RING_SIZE, margin: '0 4px', boxSizing: 'border-box', borderRadius: RING_RADIUS, border: `${RING_BORDER}px solid ${edge}` }}>
                 <CourseImageFallback courseId={g.courseId} courseName={c?.name} imageUrl={c?.imageUrl} initialsSize={14}
                   style={{ position: 'absolute', inset: RING_INSET, borderRadius: RING_PHOTO_RADIUS, overflow: 'hidden' }}>
                   <span data-ring-count="" style={{ ...GLASS, position: 'absolute', top: 5, right: 5, minWidth: 20, height: 17, padding: '0 5px', boxSizing: 'border-box', borderRadius: BADGE_RADIUS, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: badge }}>
-                    {fmtCount(g.rounds)}
+                    {fmtCount(g.activity)}
                   </span>
                 </CourseImageFallback>
               </span>
@@ -152,9 +192,9 @@ export function WhoPlayingSection() {
         })}
       </div>
       {current && courseMap?.get(current.courseId) ? (
-        <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} home={played.home} tile={tile} />
+        <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} tile={tile} />
       ) : null}
-      <RegionRails rails={rails} groups={groups} courseMap={courseMap} topUps={topUps.byRail} tabIds={tabIds} />
+      <RegionRails rails={rails} groups={groups} courseMap={courseMap} topUps={topUps.byRail} tabIds={tabIds} ratings={played.ratings?.data as Map<string, number | null> | undefined} />
     </section>
   );
 }

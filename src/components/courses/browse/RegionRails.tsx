@@ -1,7 +1,8 @@
 /**
  * Region rails under the tile (BRIEF_WHATS_BEEN_PLAYED §4, signed-off
  * region-rails mock). Rail plans come from playedRings.buildRails; top-ups from
- * useRailTopUps. A course appears once on the page. Every card opens the
+ * useRailTopUps. Since BRIEF_WHATS_BEEN_PLAYED_V2 rails hold every active
+ * course outside the first tab, so a course may sit in a tab and a rail. Every card opens the
  * course page; "See all ›" opens section 08 on the Played board scoped to the
  * nation, the way ByRegionSection's tiles write the country param.
  */
@@ -32,22 +33,38 @@ const nameStyle: React.CSSProperties = { display: '-webkit-box', WebkitBoxOrient
 const countyStyle: React.CSSProperties = { display: 'block', marginTop: 2, fontSize: 10.5, color: 'rgba(255,255,255,.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 const statStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 6, marginTop: 7, fontSize: 10.5, color: 'rgba(255,255,255,.85)', whiteSpace: 'nowrap', overflow: 'hidden' };
 
-function PlayedCard({ group, course, onOpen }: { group: CourseGroup; course: PlayedCourse; onOpen: () => void }) {
+function PlayedCard({ group, course, rating, onOpen }: { group: CourseGroup; course: PlayedCourse; rating: number | null; onOpen: () => void }) {
+  const played = group.rows.length > 0;
   return (
     <button type="button" data-rail-card="played" onClick={onOpen} style={cardStyle}>
       <CourseImageFallback courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
         <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
-        <span style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: A.AMBER }}>{fmtCount(group.rounds)}</span>
+        <span style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: A.AMBER }}>{fmtCount(group.activity)}</span>
         <span style={bottom}>
           <b style={nameStyle}>{shortCoursePart(course.name)}</b>
           {course.region ? <span style={countyStyle}>{course.region}</span> : null}
-          <span style={statStyle}>
-            <FaceStack faces={group.faces.slice(0, 2)} size={16} overlap={6} />
-            {group.best != null ? <span>best <span style={{ color: GOLD, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{group.best}</span></span> : null}
-          </span>
+          {played ? (
+            <span style={statStyle} data-played-stat="">
+              <FaceStack faces={group.faces.slice(0, 2)} size={16} overlap={6} />
+              {group.best != null ? <span><span style={{ color: 'rgba(255,255,255,.85)' }}>Best round</span> <span style={{ color: GOLD, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{group.best}</span></span> : null}
+            </span>
+          ) : <ActivityStat courseId={course.id} rating={rating} />}
         </span>
       </CourseImageFallback>
     </button>
+  );
+}
+
+/** Posts or reviews, no round: the not-played card's rating and photos line. */
+function ActivityStat({ courseId, rating }: { courseId: string; rating: number | null }) {
+  const counts = useCourseMediaCounts(courseId);
+  return <RatingPhotos rating={rating} photos={counts.data?.photos ?? 0} attr="data-activity-stat" />;
+}
+function RatingPhotos({ rating, photos, attr }: { rating: number | null; photos: number; attr: string }) {
+  return (
+    <span style={statStyle} {...{ [attr]: '' }}>
+      <span>{'\u2605 '}<b style={{ fontVariantNumeric: 'tabular-nums' }}>{rating != null ? formatFrostRating(rating) : ''}</b>{photos > 0 ? ` \u00B7 ${fmtCount(photos)} ${photos === 1 ? 'photo' : 'photos'}` : ''}</span>
+    </span>
   );
 }
 
@@ -62,24 +79,24 @@ function NotPlayedCard({ course, onOpen }: { course: RatedCourse; onOpen: () => 
         <span style={bottom}>
           <b style={nameStyle}>{shortCoursePart(course.name)}</b>
           {course.region ? <span style={countyStyle}>{course.region}</span> : null}
-          <span style={statStyle} data-not-played-stat="">
-            <span>{'\u2605 '}<b style={{ fontVariantNumeric: 'tabular-nums' }}>{course.rating != null ? formatFrostRating(course.rating) : ''}</b>{photos > 0 ? ` \u00B7 ${fmtCount(photos)} ${photos === 1 ? 'photo' : 'photos'}` : ''}</span>
-          </span>
+          <RatingPhotos rating={course.rating} photos={photos} attr="data-not-played-stat" />
         </span>
       </CourseImageFallback>
     </button>
   );
 }
 
-export function RegionRails({ rails, groups, courseMap, topUps, tabIds }: {
+export function RegionRails({ rails, groups, courseMap, topUps, tabIds, ratings }: {
   rails: RailPlan[]; groups: CourseGroup[]; courseMap: Map<string, PlayedCourse> | undefined;
   topUps: Map<string, RatedCourse[]>; tabIds: ReadonlySet<string>;
+  /** Community rating for active courses with no round (stat_browse_base). */
+  ratings?: ReadonlyMap<string, number | null>;
 }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   if (!rails.length || !courseMap) return null;
   const byGroup = new Map(groups.map((g) => [g.courseId, g]));
-  // Everything played is on the page already (tabs or a rail); top-ups skip it and each other.
+  // Every active course is on the page already (first tab or a rail); top-ups skip it and each other.
   const onPage = new Set<string>([...tabIds, ...groups.map((g) => g.courseId)]);
   const resolved = rails.map((rail) => {
     const cands = topUps.get(rail.key) ?? [];
@@ -107,7 +124,7 @@ export function RegionRails({ rails, groups, courseMap, topUps, tabIds }: {
           <div className="scrollbar-hide" style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', marginTop: 12, padding: '0 16px' }}>
             {rail.courseIds.map((id) => {
               const g = byGroup.get(id); const c = courseMap.get(id);
-              return g && c ? <PlayedCard key={id} group={g} course={c} onOpen={() => open(id)} /> : null;
+              return g && c ? <PlayedCard key={id} group={g} course={c} rating={ratings?.get(id) ?? null} onOpen={() => open(id)} /> : null;
             })}
             {extra.map((c) => <NotPlayedCard key={c.courseId} course={c} onOpen={() => open(c.courseId)} />)}
           </div>

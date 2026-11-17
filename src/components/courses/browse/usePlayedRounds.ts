@@ -1,8 +1,16 @@
 /**
- * Reads for What's been played (BRIEF_WHATS_BEEN_PLAYED; guests read nothing —
- * get_recent_rounds is 401 signed out). Rounds come
- * from get_recent_rounds ('everyone', '14'), paged to total_count and capped at
- * 500; one golf_courses read for the grouped ids; the viewer's home course is
+ * Reads for What's been played (BRIEF_WHATS_BEEN_PLAYED_V2; guests read nothing —
+ * get_recent_rounds is 401 signed out). All look back ACTIVITY_WINDOW_DAYS:
+ * - rounds: get_recent_rounds ('everyone', '30'), paged to total_count, cap 500;
+ * - posts: the posts table with useMomentsOfTheWeek's filters (status
+ *   'published', course_id or tagged_course_ids set, created_at in the window;
+ *   RLS decides visibility), paged, cap 500;
+ * - reviews: course_ratings with useLatestReviews' filters (is_mock false,
+ *   review text present, created_at in the window), paged, cap 500;
+ * - member faces: readMemberFaces (user_profiles, public_profiles filling gaps)
+ *   for every active member, so unconnected members keep names and faces;
+ * - ratings for active courses with no round: stat_browse_base.community_rating.
+ * One golf_courses read for every active course id; the viewer's home course is
  * the first golf_courses row of their canonical club (user_profiles.primary_club_id,
  * via useViewerHomeClubId — home_club_id is deprecated and never written).
  */
@@ -10,7 +18,8 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useViewerHomeClubId } from '@/components/explore-tab-new/courseled/hooks/useGolfThisWeek';
-import type { HomePlace, PlacedCourse } from './playedRings';
+import { readMemberFaces } from '@/lib/members/readMemberFaces';
+import { ACTIVITY_WINDOW_DAYS, type HomePlace, type PlacedCourse } from './playedRings';
 
 export const PLAYED_ROUND_CAP = 500;
 const PAGE = 100;
@@ -33,7 +42,7 @@ export async function fetchPlayedRounds(): Promise<PlayedRoundRow[]> {
   const out: PlayedRoundRow[] = [];
   for (let offset = 0; offset < PLAYED_ROUND_CAP; offset += PAGE) {
     const { data, error } = await supabase.rpc('get_recent_rounds', {
-      p_scope: 'everyone', p_window: '14', p_limit: Math.min(PAGE, PLAYED_ROUND_CAP - offset), p_offset: offset,
+      p_scope: 'everyone', p_window: String(ACTIVITY_WINDOW_DAYS), p_limit: Math.min(PAGE, PLAYED_ROUND_CAP - offset), p_offset: offset,
     });
     if (error) throw error;
     const rows = (data ?? []) as PlayedRoundRow[];
@@ -44,6 +53,37 @@ export async function fetchPlayedRounds(): Promise<PlayedRoundRow[]> {
   return out.slice(0, PLAYED_ROUND_CAP);
 }
 
+export const ACTIVITY_CAP = 500;
+export interface PlayedPostRow { id: string; user_id: string | null; actor_type: string | null; created_at: string; course_id: string | null; tagged_course_ids: string[] | null }
+export interface PlayedReviewRow { id: string; course_id: string | null; user_id: string | null; rating: number | null; review: string | null; created_at: string }
+export const windowStartIso = (now = Date.now()) => new Date(now - ACTIVITY_WINDOW_DAYS * 86_400_000).toISOString();
+
+async function pageRows<T>(read: (from: number, to: number) => PromiseLike<{ data: unknown; error: unknown }>): Promise<T[]> {
+  const out: T[] = [];
+  for (let from = 0; from < ACTIVITY_CAP; from += PAGE) {
+    const { data, error } = await read(from, Math.min(from + PAGE, ACTIVITY_CAP) - 1);
+    if (error) throw error;
+    const rows = (data ?? []) as T[];
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out.slice(0, ACTIVITY_CAP);
+}
+export function fetchPlayedPosts(since = windowStartIso()): Promise<PlayedPostRow[]> {
+  return pageRows<PlayedPostRow>((from, to) => supabase.from('posts')
+    .select('id, user_id, actor_type, created_at, course_id, tagged_course_ids')
+    .eq('status', 'published').or('course_id.not.is.null,tagged_course_ids.neq.{}')
+    .gte('created_at', since).order('created_at', { ascending: false }).range(from, to));
+}
+export function fetchPlayedReviews(since = windowStartIso()): Promise<PlayedReviewRow[]> {
+  return pageRows<PlayedReviewRow>((from, to) => supabase.from('course_ratings')
+    .select('id, course_id, user_id, rating, review, created_at')
+    .eq('is_mock', false).not('review', 'is', null)
+    .gte('created_at', since).order('created_at', { ascending: false }).range(from, to));
+}
+/** Every course a post names: course_id plus tagged_course_ids, once each. */
+export const postCourseIds = (p: Pick<PlayedPostRow, 'course_id' | 'tagged_course_ids'>) => Array.from(new Set([p.course_id, ...(p.tagged_course_ids ?? [])].filter((v): v is string => !!v)));
+
 const COURSE_COLS = 'id, name, thumbnail_image, region, sub_country, country, continent, latitude, longitude';
 type CourseRow = { id: string; name: string; thumbnail_image: string | null; region: string | null; sub_country: string | null; country: string | null; continent: string | null; latitude: number | null; longitude: number | null };
 const toCourse = (c: CourseRow): PlayedCourse => ({
@@ -52,8 +92,33 @@ const toCourse = (c: CourseRow): PlayedCourse => ({
 });
 
 export function usePlayedRounds(userId: string | undefined) {
-  const rounds = useQuery({ queryKey: ['courses', 'played-rounds', 'everyone', '14', userId ?? null], queryFn: fetchPlayedRounds, enabled: !!userId, staleTime: 60_000 });
-  const ids = useMemo(() => Array.from(new Set((rounds.data ?? []).map((r) => r.course_id).filter((v): v is string => !!v))).sort(), [rounds.data]);
+  const win = String(ACTIVITY_WINDOW_DAYS);
+  const rounds = useQuery({ queryKey: ['courses', 'played-rounds', 'everyone', win, userId ?? null], queryFn: fetchPlayedRounds, enabled: !!userId, staleTime: 60_000 });
+  const posts = useQuery({ queryKey: ['courses', 'played-posts', win, userId ?? null], queryFn: () => fetchPlayedPosts(), enabled: !!userId, staleTime: 60_000 });
+  const reviews = useQuery({ queryKey: ['courses', 'played-reviews', win, userId ?? null], queryFn: () => fetchPlayedReviews(), enabled: !!userId, staleTime: 60_000 });
+  const ids = useMemo(() => Array.from(new Set([
+    ...(rounds.data ?? []).map((r) => r.course_id),
+    ...(posts.data ?? []).flatMap(postCourseIds),
+    ...(reviews.data ?? []).map((r) => r.course_id),
+  ].filter((v): v is string => !!v))).sort(), [rounds.data, posts.data, reviews.data]);
+  const memberIds = useMemo(() => Array.from(new Set([
+    ...(rounds.data ?? []).map((r) => r.user_id),
+    ...(posts.data ?? []).filter((p) => p.actor_type !== 'business').map((p) => p.user_id),
+    ...(reviews.data ?? []).map((r) => r.user_id),
+  ].filter((v): v is string => !!v))).sort(), [rounds.data, posts.data, reviews.data]);
+  const faces = useQuery({ queryKey: ['courses', 'played-faces', memberIds.join('|')], enabled: memberIds.length > 0, staleTime: 5 * 60_000, queryFn: () => readMemberFaces(memberIds) });
+  const roundCourseIds = useMemo(() => new Set((rounds.data ?? []).map((r) => r.course_id)), [rounds.data]);
+  const unplayedIds = useMemo(() => ids.filter((id) => !roundCourseIds.has(id)), [ids, roundCourseIds]);
+  const ratings = useQuery({
+    queryKey: ['courses', 'played-ratings', unplayedIds.join('|')],
+    enabled: unplayedIds.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('stat_browse_base' as never).select('course_id, community_rating').in('course_id', unplayedIds);
+      if (error) throw error;
+      return new Map(((data ?? []) as Array<{ course_id: string; community_rating: number | null }>).map((r) => [String(r.course_id), r.community_rating == null ? null : Number(r.community_rating)]));
+    },
+  });
   const courses = useQuery({
     queryKey: ['courses', 'played-courses', ids.join('|')],
     enabled: ids.length > 0,
@@ -76,5 +141,5 @@ export function usePlayedRounds(userId: string | undefined) {
     },
   });
   const homeReady = !userId || (homeClub.ready && (!homeClub.clubId || home.isFetched || home.isError));
-  return { rounds, courses, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady };
+  return { rounds, posts, reviews, faces, ratings, memberIds, unplayedIds, courses, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady };
 }

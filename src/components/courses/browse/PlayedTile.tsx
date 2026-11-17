@@ -12,7 +12,8 @@ import { firstName } from '@/lib/whs/share';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
 import { Bar } from '@/components/skeletons/shellVocabulary';
-import { bestLately, dayLabel, haversineKm, interleaveTilePhotos, milesAwayText, toParText, type HomePlace } from './playedRings';
+import { formatRatingValue } from '@/utils/formatters';
+import { bestLately, dayLabel, interleaveTilePhotos, toParText } from './playedRings';
 import type { PlayedCourse } from './usePlayedRounds';
 import type { usePlayedTile, TileCoursePhoto, TileHolePhoto } from './usePlayedTile';
 import { FaceStack, MemberFace, PLAYED_SCRIM, UNDER_RED, GLASS } from './playedParts';
@@ -34,19 +35,16 @@ export const BUTTON_H = 44;
 const BEST_BG = '#16161B';
 const BUTTON_BG = '#1B1B20';
 
-/** Distance wording from the home course; no home → the course's county. */
-export function tileDistanceText(course: Pick<PlayedCourse, 'lat' | 'lng' | 'region'>, home: HomePlace | null): string | null {
-  if (home && home.lat != null && home.lng != null && course.lat != null && course.lng != null) {
-    return milesAwayText(haversineKm(home.lat, home.lng, course.lat, course.lng));
-  }
-  return course.region;
-}
+/** §5 head right: the course's county (golf_courses.region), else its nation. */
+export const tilePlaceText = (course: Pick<PlayedCourse, 'region' | 'subCountry'>): string | null => course.region || course.subCountry || null;
 
-export function PlayedTile({ group, course, home, tile }: { group: CourseGroup; course: PlayedCourse; home: HomePlace | null; tile: ReturnType<typeof usePlayedTile> }) {
+export function PlayedTile({ group, course, tile }: { group: CourseGroup; course: PlayedCourse; tile: ReturnType<typeof usePlayedTile> }) {
   const navigate = useNavigate();
   const open = () => navigate(`/courses/${course.id}`);
   const { short, variant } = shareCourseName(course.name);
-  const distance = tileDistanceText(course, home);
+  const place = tilePlaceText(course);
+  const review = group.rows.length === 0 ? group.reviews[0] ?? null : null;
+  const reviewer = review ? group.faces.find((f) => f.userId === review.user_id) ?? null : null;
   const best = bestLately(group.rows);
   const photos = interleaveTilePhotos<TileHolePhoto, TileCoursePhoto>(tile.holes, tile.photos, tile.hardestHole);
   const members = group.faces.length;
@@ -58,13 +56,14 @@ export function PlayedTile({ group, course, home, tile }: { group: CourseGroup; 
       <button type="button" onClick={open} style={{ all: 'unset', display: 'block', width: '100%', cursor: 'pointer' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
           <b style={{ ...ell, minWidth: 0, fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 800, color: A.INK }}>{short}</b>
-          {distance ? <span data-tile-distance="" style={{ flex: 'none', fontSize: 11.5, color: A.MUTE }}>{distance}</span> : null}
+          {place ? <span data-tile-place="" style={{ flex: 'none', fontSize: 11.5, color: A.MUTE }}>{place}</span> : null}
         </div>
         <div style={{ marginTop: 3, fontSize: 12, lineHeight: `${TILE_SUB_LINE}px`, color: A.MUTE, ...ell }}>
           {variant ? `${variant} \u00B7 Through members\u2019 eyes` : 'Through members\u2019 eyes'}
         </div>
       </button>
       <div className="scrollbar-hide" data-tile-row="" style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none', margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
+        {group.rows.length > 0 ? (
         <button type="button" data-best-lately="" onClick={open}
           style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: 10, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK }}>
           <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.AMBER, lineHeight: '10px' }}>BEST LATELY</span>
@@ -78,7 +77,7 @@ export function PlayedTile({ group, course, home, tile }: { group: CourseGroup; 
                   <b style={{ fontSize: 18, lineHeight: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.gross_score}</b>
                 </span>
                 <span style={{ ...ell, marginTop: 5, fontSize: 11.5, lineHeight: '14px', fontWeight: 600 }}>
-                  <InlineProMemberName userId={r.user_id}>{firstName(r.display_name)}</InlineProMemberName>
+                  <InlineProMemberName userId={r.user_id}>{r.display_name ?? ''}</InlineProMemberName>
                 </span>
                 <span style={{ ...ell, marginTop: 1, fontSize: 9.5, lineHeight: '12px', color: A.DIM }}>
                   {dayLabel(r.play_date)}{par != null ? <> {'\u00B7'} <span data-to-par="" style={under ? { color: UNDER_RED } : undefined}>{par}</span></> : null}
@@ -87,9 +86,30 @@ export function PlayedTile({ group, course, home, tile }: { group: CourseGroup; 
             );
           })}
           <span style={{ marginTop: 'auto', fontSize: 10.5, lineHeight: '13px', color: A.MUTE }}>
-            {group.rounds === 1 ? '1 round lately \u203A' : `${fmtCount(group.rounds)} rounds lately \u203A`}
+            {group.rows.length === 1 ? '1 round lately \u203A' : `${fmtCount(group.rows.length)} rounds lately \u203A`}
           </span>
         </button>
+        ) : null}
+        {review ? (
+          <button type="button" data-latest-review="" onClick={open}
+            style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: 10, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK, overflow: 'hidden' }}>
+            <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.AMBER, lineHeight: '10px' }}>LATEST REVIEW</span>
+            <span style={{ display: 'block', minWidth: 0 }}>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <MemberFace face={reviewer ?? { userId: review.user_id ?? '', photo: null, name: null }} size={20} />
+                {review.rating != null ? <b data-review-rating="" style={{ fontSize: 18, lineHeight: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatRatingValue(Number(review.rating))}</b> : null}
+              </span>
+              <span style={{ ...ell, marginTop: 5, fontSize: 11.5, lineHeight: '14px', fontWeight: 600 }}>
+                {review.user_id ? <InlineProMemberName userId={review.user_id}>{reviewer?.name ?? ''}</InlineProMemberName> : null}
+              </span>
+              <span style={{ ...ell, marginTop: 1, fontSize: 9.5, lineHeight: '12px', color: A.DIM }}>{dayLabel(review.created_at)}</span>
+            </span>
+            <span data-review-text="" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', fontSize: 10.5, lineHeight: 1.35, color: 'rgba(248,250,252,.78)' }}>{review.review}</span>
+            <span style={{ marginTop: 'auto', fontSize: 10.5, lineHeight: '13px', color: A.MUTE }}>
+              {group.reviews.length === 1 ? '1 review lately \u203A' : `${fmtCount(group.reviews.length)} reviews lately \u203A`}
+            </span>
+          </button>
+        ) : null}
         {!tile.ready ? (
           [0, 1].map((i) => <span key={i} data-tile-pending="" style={{ flex: 'none', display: 'block', width: PHOTO_TILE_W, height: TILE_ROW_H }}><Bar style={{ width: '100%', height: '100%', borderRadius: TILE_RADIUS }} /></span>)
         ) : photos.length === 0 ? (
@@ -131,7 +151,7 @@ export function PlayedTile({ group, course, home, tile }: { group: CourseGroup; 
       <button type="button" data-tile-faces="" onClick={open} style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 8, marginTop: FACES_TOP, fontSize: 12, color: A.MUTE, cursor: 'pointer', maxWidth: '100%' }}>
         <FaceStack faces={group.faces.slice(0, 4)} size={FACE_SIZE} overlap={6} ring={A.CANVAS} />
         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-          <b style={{ color: A.INK, fontWeight: 600 }}>{members === 1 ? '1 member' : `${fmtCount(members)} members`}</b> played it lately
+          <b style={{ color: A.INK, fontWeight: 600 }}>{members === 1 ? '1 member' : `${fmtCount(members)} members`}</b> {group.rows.length > 0 ? 'played' : 'shared'} it lately
         </span>
       </button>
       <button type="button" data-tile-explore="" onClick={open}
