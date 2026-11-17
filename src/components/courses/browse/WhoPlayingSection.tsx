@@ -8,7 +8,7 @@ import { fmtCount } from './format';
 import { useSectionReady } from './PageLoadGate';
 import { settled } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
-import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, writeSeen, type RingGroup, type SeenMap } from './playedRings';
+import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, ringKeys, writeSeen, type RingGroup, type SeenMap } from './playedRings';
 /** V5 §1 G1: a NEW ring's border is an amber gradient, bright top right where the count sits. */
 export const NEW_RING_BG = 'linear-gradient(#0A0A0C, #0A0A0C) padding-box, linear-gradient(225deg, #FFC069 0%, #F7931E 40%, #8C4512 100%) border-box';
 export const NEW_COUNT = '#FFB24D';
@@ -77,8 +77,9 @@ export function groupActivity(rows: PlayedRoundRow[], posts: PlayedPostRow[] = [
   const map = new Map<string, CourseGroup>();
   for (const it of items) {
     let g = map.get(it.courseId);
-    if (!g) { g = { courseId: it.courseId, activity: 0, latestDate: it.at, latestKey: it.key, rows: [], reviews: [], posts: 0, faces: [], best: null }; map.set(it.courseId, g); }
+    if (!g) { g = { courseId: it.courseId, activity: 0, latestDate: it.at, latestKey: it.key, keys: [], rows: [], reviews: [], posts: 0, faces: [], best: null }; map.set(it.courseId, g); }
     g.activity += 1;
+    g.keys!.push(it.key);
     const face = it.userId ? faces.get(it.userId) : undefined;
     const name = it.round?.display_name || face?.displayName || face?.username || null;
     if (it.round) {
@@ -133,13 +134,14 @@ export function WhoPlayingSection() {
     if (sheetGroup) shown.push([sheetGroup, sheetSeenWritten]);
     let next: SeenMap | null = null;
     for (const [g, ref] of shown) {
-      const stamp = `${userId}|${g.courseId}:${g.latestKey}`;
+      const keys = ringKeys(g);
+      const stamp = `${userId}|${g.courseId}:${keys.join(',')}`;
       if (ref.current === stamp) continue;
       ref.current = stamp;
       // Build from storage, not state: on the render where userId changes the
       // state can still hold the previous key's map (the read effect has not
       // landed yet), and merging that would overwrite the new member's history.
-      next = { ...(next ?? readSeen(userId) ?? {}), [g.courseId]: g.latestKey };
+      next = { ...(next ?? readSeen(userId) ?? {}), [g.courseId]: keys };
     }
     if (!next) return;
     setSeen(next);

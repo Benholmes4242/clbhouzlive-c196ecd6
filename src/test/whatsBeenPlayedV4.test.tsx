@@ -128,7 +128,7 @@ describe('V4 §4 rail card sheet', () => {
     const sheet = document.querySelector('[data-played-sheet="surrey"]') as HTMLElement;
     expect(sheet).not.toBeNull();
     expect(sheet.querySelector('[data-played-tile="surrey"]')).not.toBeNull();
-    expect(readSeen('me')?.surrey).toBe('round:3');
+    expect(readSeen('me')?.surrey).toEqual(['round:3']);
     expect(where(container)).toBe('/courses');
   });
   it('photos inside the sheet open the same one-page row above the sheet; the sheet stays for the return', () => {

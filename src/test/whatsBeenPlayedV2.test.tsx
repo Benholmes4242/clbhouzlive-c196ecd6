@@ -134,7 +134,7 @@ describe('section', () => {
     const faces = container.querySelector('[data-tile-faces]')?.textContent ?? '';
     expect(faces).toContain('2 members');
     expect(faces).toContain('shared it lately');
-    expect(JSON.parse(window.localStorage.getItem('clbhouz:played-seen:me') ?? '{}').knole).toBe('review:v1');
+    expect(JSON.parse(window.localStorage.getItem('clbhouz:played-seen:me') ?? '{}').knole).toEqual(['review:v1', 'post:p1']);
   });
   it('no rounds and no review: no first card', () => {
     setHook({ posts: [post('p1', 'knole', 'mason')], courses: [knole] });

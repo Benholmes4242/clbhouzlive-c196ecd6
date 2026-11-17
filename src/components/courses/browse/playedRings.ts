@@ -5,9 +5,12 @@ import { HOLE_DIFFICULTY_MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
  * the 30-day window. Tabs run from the home county outwards (county, nation,
  * then fixed world tabs); tabs overlap by design. Rails hold every active
  * course outside the FIRST tab, so a course may sit in a tab and a rail.
- * New/seen is per device: localStorage holds the newest activity key seen per
- * course ("round:<id>", "post:<id>", "review:<id>"); a storage failure reads
- * every course as new.
+ * New/seen is per device: localStorage holds, per course, the SET of
+ * activity keys seen ("round:<id>", "post:<id>", "review:<id>"), replaced by the
+ * course's full current window set whenever its tile shows. A ring is new when
+ * any current key is missing from that set; dates and order never decide it
+ * (FIX_RING_NEW_ANY_UNSEEN). Old single-string values read as a one-key set; a
+ * storage failure reads every course as new.
  *
  * Geography: golf_courses.country is a REGION GROUPING ("Britain & Ireland",
  * "Continental Europe", "Rest of World"), not a country (see
@@ -75,19 +78,27 @@ export function buildAreaTabs(courses: PlacedCourse[], home: HomePlace | null): 
 }
 
 /** `activity` = rounds + posts + reviews in the window; `latestKey` = the newest activity's seen key. */
-export interface RingGroup { courseId: string; activity: number; latestDate: string; latestKey: string }
+export interface RingGroup { courseId: string; activity: number; latestDate: string; latestKey: string; keys?: string[] }
+/** Every activity key the course has in the window (falls back to latestKey). */
+export const ringKeys = (g: RingGroup): string[] => g.keys ?? [g.latestKey];
 /** Busiest by activity first; ties go to the most recent activity. */
 export function orderRings<T extends RingGroup>(groups: T[]): T[] {
   return [...groups].sort((a, b) => b.activity - a.activity || b.latestDate.localeCompare(a.latestDate));
 }
 
-export type SeenMap = Record<string, string>;
+export type SeenMap = Record<string, string[]>;
 export const seenKey = (userId: string | null | undefined) => `clbhouz:played-seen:${userId || 'guest'}`;
 export function readSeen(userId: string | null | undefined): SeenMap | null {
   try {
     const raw = window.localStorage.getItem(seenKey(userId));
     const parsed = raw ? JSON.parse(raw) : {};
-    return parsed && typeof parsed === 'object' ? (parsed as SeenMap) : {};
+    if (!parsed || typeof parsed !== 'object') return {};
+    const out: SeenMap = {};
+    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof v === 'string') out[k] = [v];
+      else if (Array.isArray(v)) out[k] = v.filter((x): x is string => typeof x === 'string');
+    }
+    return out;
   } catch {
     return null;
   }
@@ -100,7 +111,11 @@ export function hardestHoleFromRanks(rows: Array<{ hole_no: number; difficulty_r
   const top = rows.find((r) => r.difficulty_rank === 1);
   return top && (top.rounds ?? 0) >= HOLE_DIFFICULTY_MIN_ROUNDS ? top.hole_no : null;
 }
-export const isNewRing = (g: RingGroup, seen: SeenMap | null) => !seen || seen[g.courseId] !== g.latestKey;
+export function isNewRing(g: RingGroup, seen: SeenMap | null): boolean {
+  if (!seen) return true;
+  const have = new Set(seen[g.courseId] ?? []);
+  return ringKeys(g).some((k) => !have.has(k));
+}
 
 /* ── §4 region rails (BRIEF_WHATS_BEEN_PLAYED_V3 §4) ──────────────────── */
 export type RailKind = 'home' | 'rest' | 'abroad';
