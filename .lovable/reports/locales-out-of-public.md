@@ -1,6 +1,6 @@
 # FIX_LOCALES_OUT_OF_PUBLIC
 
-## Status: STOPPED — 10 unexpected test failures (not path-related), awaiting ruling
+## Status: COMPLETE (ruling applied — see Resolution)
 
 ## Moved
 `git mv public/locales src/locales` — 62 files (6 locales), contents unchanged (rename-only in git).
@@ -152,3 +152,13 @@ Example: `expected 'DARound of the week…' to contain 'courseDetail.featured.la
 Options, need a ruling:
 A. Authorise updating these 10 assertions to the real English (or to structure).
 B. Keep the backend inert under Vitest (`import.meta.env.MODE === 'test'` → 404 callback), reproducing the old test behaviour without editing tests. This is an app-code branch for tests.
+
+## Resolution (Ben's ruling)
+- Inline backend moved to `src/i18n/localeBackend.ts` (`bundledBackend`), imported by `src/i18n/index.ts`. No test/Vitest checks in app code.
+- `src/test/setup.ts`: `vi.mock('@/i18n/localeBackend')` with a backend whose read() calls back `('failed loading /locales/<lng>/<ns>.json; TypeError: Failed to fetch', true)` — HttpBackend's network-failure callback. Bundled auth English unchanged. No assertion changed.
+- The 10 tests: 65/65 passing across the four files plus signInRedesign.
+
+## Final suite (against 9,054)
+2,271 / 2,224 / 2,251 / 2,308 = 9,054, delta 0, all passing.
+Shard 2's first run had one failure in an untouched file: activeRing.test.tsx › "a card without media keeps its figures and its avatar opens the post, not the profile" (Unable to find role="button" and name "Open Danny Holmes's latest post"). It passed 3/3 alone and the full shard 2 rerun passed 2,224/2,224. The log is kept at `.lovable/reports/locales-shard2-activeRing-fail.log`. This is not one of the two documented flakes, so it is reported here and the test was not edited.
+Typecheck clean. Preview boot confirmed earlier: English on first paint, no Boot Recovery.
