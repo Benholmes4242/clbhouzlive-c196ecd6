@@ -214,3 +214,15 @@ through the test, not by eye.
 - Kicker amber → ink #F8FAFC (A.INK). Nothing else changed.
 - Tests: new `src/test/latestReviewTap.test.tsx` (+3). No existing assertion changed.
 - Full suite after 7a7bec2b4e + this fix: 2,275 / 2,227 / 2,260 / 2,335 = 9,097 passing (9,094 + 3). Typecheck clean (tsgo). Device checks unchecked (signed-in).
+
+## BRIEF_PLAYED_MEMBER_MEDIA_AUTOPLAY (2026-11-17)
+
+- **Read per rail card:** `get_course_media_v2` with `p_filter 'all'`, `p_page_size 1`, first row only, own key `['course-newest-media', courseId, userId, actorType, actorId]` (new `useNewestCourseMedia.ts`). Signed in passes `p_user_id` plus viewer actor; signed out passes `p_user_id: null` and no actor. Verified against the live API with the public key: for Yas Links Abu Dhabi the signed-out call returns rows. `get_latest_course_media` is denied to signed-out callers ("permission denied"), so it was not usable; no new RPC needed.
+- **Deferral:** `useNearViewport` IntersectionObserver, rootMargin 400px, disconnects after first hit; query is disabled until then.
+- **Review media:** yes. The Yas Links row returned is review media (`source_review_id` set).
+- **Fallback:** `CourseImageFallback` with `thumbnail_image` always drawn; member media layers on top only once loaded (pending or none → stock image, no blank, no shift). Overlays and tap unchanged.
+- **Autoplay:** hole videos and course post/review videos in the tile row (main and sheet) and video rail cards render `HoleInlineVideo` fit cover, active, group `courses-member-shots`; poster underneath. Photo tiles unchanged; video tile taps open the sideways viewer as before.
+- **Tests:** new `src/test/playedMemberMediaAutoplay.test.tsx` (6). No existing assertion changed.
+- **Suite:** run sequentially in four shards: 2,275 / 2,227 / 2,259 / 2,342 = 9,103 (9,097 + 6). One failure on shard 1: `coursesRailsUnlimited.test.tsx` › "admin hole-tag predicate invalidation refetches the active infinite holes rail" (could not find hole button). File untouched by this brief; passed 3/3 alone. A first attempt with shards in parallel had 4 timeouts/flakes in untouched files (ms1MessagesHeadToHead, guestStage24, avatarFallbackCanonical, claimClub), all passed alone.
+- **Typecheck:** `npx tsgo -b --noEmit` clean.
+- **Device:** unchecked (sign-in unavailable); 320 overflow unchecked visually, no geometry changed.
