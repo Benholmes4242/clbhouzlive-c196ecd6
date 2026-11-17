@@ -1,12 +1,12 @@
 /**
  * LATEST REVIEWS card B (BRIEF_COURSES_PAGE_V5 §4, whats-been-played-v5 mock):
  * a 260 × 216 text card in the Best lately grammar — REVIEW kicker, face and
- * rating, course name, three-line quote, footer of the reviewer's name and
- * their rounds here. Only LatestReviewsSection renders this rail (the shell
+ * rating, course name, three-line quote. V6 §5 (card A): the footer is the
+ * reviewer's name only, with the review's own media line 5px above it, both
+ * pinned to the bottom; the whole card (course name included) opens the review. Only LatestReviewsSection renders this rail (the shell
  * reads its geometry). Placement and selection belong to the section.
  */
 
-import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import React from 'react';
 import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,13 @@ const QUOTE_INK = 'rgba(248,250,252,.78)';
 const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"zero" 0' };
 const ELL: React.CSSProperties = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
+/** V6 §5: "{v} video(s) & {p} photo(s)", or one part alone; '' without media. */
+export function reviewMediaLine(videos: number, photos: number): string {
+  const v = videos > 0 ? `${videos} ${videos === 1 ? 'video' : 'videos'}` : '';
+  const p = photos > 0 ? `${photos} ${photos === 1 ? 'photo' : 'photos'}` : '';
+  return v && p ? `${v} & ${p}` : v || p;
+}
+
 /** Footer tail after the name: " · {n} round(s) here · best {gross}" ("your best" for the viewer's own). */
 export function reviewFootTail(author: ReviewAuthorRound | undefined, mine: boolean): string {
   if (!author || !(author.rounds_here > 0)) return '';
@@ -48,7 +55,7 @@ interface Props {
   viewerId?: string | null;
 }
 
-export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, authorRounds, viewerId }) => {
+export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
   const { t } = useTranslation('courses');
   if (reviews.length === 0) return null;
 
@@ -56,10 +63,10 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, author
     <section>
       <div style={{ display: 'flex', gap: REVIEW_GAP, overflowX: 'auto', padding: `0 ${REVIEW_RAIL_X}px`, scrollbarWidth: 'none' }}>
         {reviews.map((r) => {
-          const mine = !!viewerId && !!r.userId && r.userId === viewerId;
+          const media = reviewMediaLine(r.videoCount ?? 0, r.photoCount ?? 0);
           const name = r.reviewerName || t('discover.reviews.member', 'A member');
           return (
-          // CB69 — non-button tile so the course name can be a real button.
+          // V6 §5: the whole card opens the review; the course name is plain text.
           <div
             key={r.reviewId}
             role="button"
@@ -86,23 +93,15 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, author
                 <span style={{ fontSize: 10.5, fontWeight: 700, color: INK_FAINT }}>/10</span>
               </span>
             </div>
-            <CourseNameLink
-              as="div"
-              courseId={r.courseId}
-              textProps={{ 'data-review-rail-course': '' }}
-              wrapperStyle={{ marginTop: 8, minWidth: 0, maxWidth: '100%' }}
-              style={{
-                ...(r.courseId ? null : { marginTop: 8 }),
-                display: 'block', fontSize: 13.5, fontWeight: 700, lineHeight: 1.25, color: INK, ...ELL,
-              }}
-            >
+            <div data-review-rail-course="" style={{ marginTop: 8, display: 'block', fontSize: 13.5, fontWeight: 700, lineHeight: 1.25, color: INK, ...ELL }}>
               {r.courseName}
-            </CourseNameLink>
+            </div>
             <p style={{ marginTop: 4, fontSize: 11.5, lineHeight: 1.4, color: QUOTE_INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
               <MentionText text={r.quote} disableNavigation />
             </p>
-            <div data-review-foot="" style={{ marginTop: 'auto', fontSize: 11, lineHeight: '14px', color: INK_MUTE, ...ELL }}>
-              <b style={{ fontWeight: 600, color: INK }}>{name}</b>{reviewFootTail(authorRounds?.get(r.reviewId), mine)}
+            {media ? <div data-review-media="" style={{ marginTop: 'auto', marginBottom: 5, fontSize: 11, lineHeight: '14px', color: INK_MUTE, ...ELL }}>{media}</div> : null}
+            <div data-review-foot="" style={{ marginTop: media ? 0 : 'auto', fontSize: 11, lineHeight: '14px', fontWeight: 600, color: INK, ...ELL }}>
+              {name}
             </div>
           </div>
           );

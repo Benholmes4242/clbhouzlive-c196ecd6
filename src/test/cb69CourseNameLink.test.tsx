@@ -75,6 +75,14 @@ describe('CB69 review course names open the course page', () => {
   for (const s of surfaces) {
     it(`${s.name}: the name is a button that opens /courses/:id without the tile's tap`, () => {
       const { c, tile } = s.mount('course-1');
+      if (s.name === 'ReviewRailSlot') {
+        // V6 §5: the rail card's course name is plain text; the whole card opens the review.
+        expect(c.querySelectorAll('button[data-course-name-link]')).toHaveLength(0);
+        fireEvent.click(c.querySelector('[data-review-rail-course]')!);
+        expect(tile).toHaveBeenCalledTimes(1);
+        expect(path).not.toBe('/courses/course-1');
+        return;
+      }
       const btns = c.querySelectorAll('button[data-course-name-link]');
       expect(btns.length).toBeGreaterThan(0);
       fireEvent.pointerDown(btns[0]);
@@ -110,8 +118,7 @@ describe('CB69 review course names open the course page', () => {
     fireEvent.keyDown(root, { key: 'Enter' });
     fireEvent.keyDown(root, { key: ' ' });
     expect(tile).toHaveBeenCalledTimes(2);
-    fireEvent.keyDown(link(container)!, { key: 'Enter' });
-    expect(tile).toHaveBeenCalledTimes(2);
+    expect(link(container)).toBeNull(); // V6 §5: no course-name link on the rail card
   });
 
   it('the hit area is an invisible absolute overlay of at least 44px that takes no layout space', () => {

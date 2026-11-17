@@ -5,6 +5,8 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, counts: 0, videos: 0, calls: [] as any[] }));
+// V6 §3: the section waits for Featured's reads; empty, ready signals here (ruled).
+vi.mock('@/components/courses/browse/useFeaturedSignals', () => ({ useFeaturedSignals: () => ({ played: undefined, reviewed: undefined, top100: undefined, connected: undefined, likedPosts: undefined, ready: true }) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => f.tile }));
@@ -60,27 +62,14 @@ const base = () => setHook({
 });
 
 describe('V3 §1 ring count on the corner', () => {
-  it('sits on the ring corner in canvas with a border and number per state', () => {
+  it('V6 §2: rings carry no count in any state', () => {
     const went = c('went', { region: 'Surrey', subCountry: 'England', name: 'Wentworth Club' });
     setHook({ rounds: [round('1', 'kenta', 'ann', 71), round('3', 'surrey', 'cy', 80, '2026-11-08'), round('6', 'went', 'gus', 75, '2026-11-01')], courses: [kentA, surrey, went] });
-    const { container, getAllByRole } = mount();
-    fireEvent.click(getAllByRole('tab')[1]);
+    const { container } = mount();
     fireEvent.click(container.querySelectorAll('[data-played-ring]')[1]);
     const rings = [...container.querySelectorAll('[data-played-ring]')] as HTMLElement[];
-    const badge = (state: string) => rings.find((r) => r.getAttribute('data-played-ring') === state)!.querySelector('[data-ring-count]') as HTMLElement;
-    const sel = badge('selected');
-    expect([sel.style.position, sel.style.top, sel.style.right, sel.style.height, sel.style.borderRadius, sel.style.background]).toEqual(['absolute', '-7px', '-7px', '18px', '6px', 'rgb(10, 10, 12)']);
-    expect(sel.style.backdropFilter || '').toBe('');
-    expect(sel.style.border).toMatch(/^1.5px solid (#f8fafc|rgb\(248, 250, 252\))$/i);
-    expect(sel.style.color).toBe('rgb(248, 250, 252)');
-    const seen = badge('seen');
-    expect(seen.style.border.replace(/\s/g, '')).toBe('1.5pxsolidrgba(255,255,255,.16)');
-    expect(seen.style.color).toBe('rgba(248, 250, 252, 0.62)');
-    const fresh = badge('new');
-    expect(fresh.style.border).toMatch(/^1.5px solid (#ffb24d|rgb\(255, 178, 77\))$/i);
-    expect(fresh.style.color).toBe('rgb(255, 178, 77)');
-    // The badge is a child of the ring box, not the photo.
-    expect(sel.parentElement?.querySelector(':scope > [data-ring-count]')).toBe(sel);
+    expect(new Set(rings.map((r) => r.getAttribute('data-played-ring')))).toEqual(new Set(['selected', 'seen', 'new']));
+    expect(container.querySelectorAll('[data-ring-count]')).toHaveLength(0);
   });
   it('the ring row takes 10px top padding', () => {
     base();
@@ -91,17 +80,18 @@ describe('V3 §1 ring count on the corner', () => {
 });
 
 describe('V3 §2 tile', () => {
-  it('BEST LATELY kicker is ink; to par sits beside the score, red under, dim over, E level; day alone', () => {
+  it('ROUNDS LATELY kicker is ink; to par sits beside the score, red under, dim over; day alone', () => {
     setHook({ rounds: [round('1', 'kenta', 'ann', 71), round('2', 'kenta', 'bob', 72, '2026-11-09'), round('3', 'kenta', 'cy', 80)], courses: [kentA] });
     const { container } = mount();
     expect((container.querySelector('[data-best-kicker]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
     const entries = [...container.querySelectorAll('[data-best-entry]')] as HTMLElement[];
     const pars = entries.map((e) => e.querySelector('[data-to-par]') as HTMLElement);
-    expect(pars.map((p) => p.textContent)).toEqual(['\u22121', 'E']);
-    expect(pars[0].style.color).toBe('rgb(240, 84, 74)');
-    expect(pars[1].style.color).toBe('rgba(248, 250, 252, 0.42)');
-    expect(pars[0].previousElementSibling?.textContent).toBe('71');
-    expect((pars[0].parentElement as HTMLElement).style.alignItems).toBe('baseline');
+    expect((container.querySelector('[data-best-kicker]') as HTMLElement).textContent).toBe('ROUNDS LATELY');
+    expect(pars.map((p) => p.textContent)).toEqual(['+8', '\u22121']);
+    expect(pars[0].style.color).toBe('rgba(248, 250, 252, 0.42)');
+    expect(pars[1].style.color).toBe('rgb(240, 84, 74)');
+    expect(pars[1].previousElementSibling?.textContent).toBe('71');
+    expect((pars[1].parentElement as HTMLElement).style.alignItems).toBe('baseline');
     expect(entries[0].lastElementChild?.textContent).not.toContain('\u00B7');
   });
   it('captions carry face and full name; course photos keep the day; COURSE tag white', () => {

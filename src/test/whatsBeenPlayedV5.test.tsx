@@ -5,6 +5,8 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, counts: 0, videos: 0, calls: [] as any[] }));
+// V6 §3: the section waits for Featured's reads; empty, ready signals here (ruled).
+vi.mock('@/components/courses/browse/useFeaturedSignals', () => ({ useFeaturedSignals: () => ({ played: undefined, reviewed: undefined, top100: undefined, connected: undefined, likedPosts: undefined, ready: true }) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => f.tile }));
@@ -61,29 +63,26 @@ const ringSetup = () => {
   const went = c('went', { region: 'Surrey', subCountry: 'England', name: 'Wentworth Club' });
   setHook({ rounds: [round('1', 'kenta', 'ann', 71), round('3', 'surrey', 'cy', 80, '2026-11-08'), round('6', 'went', 'gus', 75, '2026-11-01')], courses: [kentA, surrey, went] });
   const v = mount();
-  fireEvent.click(v.getAllByRole('tab')[1]);
   fireEvent.click(v.container.querySelectorAll('[data-played-ring]')[1]);
   return v;
 };
 
 describe('V5 §1 G1 gradient on new rings', () => {
-  it('draws a new ring with a transparent border over the amber gradient and a #FFB24D count', () => {
+  it('draws a new ring with a transparent border over the amber gradient and no count', () => {
     const { container } = ringSetup();
     const fresh = ringsOf(container).find((r) => r.getAttribute('data-played-ring') === 'new')!;
-    const box = fresh.querySelector('[data-ring-count]')!.parentElement as HTMLElement;
+    const box = fresh.firstElementChild as HTMLElement;
     expect(box.style.border).toBe('1.5px solid transparent');
     // jsdom drops a layered background shorthand, so the applied value is the exported constant.
     expect(NEW_RING_BG).toBe('linear-gradient(#0A0A0C, #0A0A0C) padding-box, linear-gradient(225deg, #FFC069 0%, #F7931E 40%, #8C4512 100%) border-box');
     expect(box.style.borderRadius).toBe('21.76px');
-    const count = fresh.querySelector('[data-ring-count]') as HTMLElement;
-    expect(count.style.border).toMatch(/^1.5px solid (#ffb24d|rgb\(255, 178, 77\))$/i);
-    expect(count.style.color).toBe('rgb(255, 178, 77)');
+    expect(fresh.querySelector('[data-ring-count]')).toBeNull();
   });
 
   it('leaves selected and seen rings solid, as before', () => {
     const { container } = ringSetup();
     const rings = ringsOf(container);
-    const box = (state: string) => rings.find((r) => r.getAttribute('data-played-ring') === state)!.querySelector('[data-ring-count]')!.parentElement as HTMLElement;
+    const box = (state: string) => rings.find((r) => r.getAttribute('data-played-ring') === state)!.firstElementChild as HTMLElement;
     expect(box('selected').style.border).toMatch(/^1.5px solid (#f8fafc|rgb\(248, 250, 252\))$/i);
     expect(box('selected').style.background).toBe('');
     expect(box('seen').style.border.replace(/\s/g, '')).toBe('1.5pxsolidrgba(255,255,255,.16)');
@@ -122,10 +121,10 @@ describe('V5 §2 tile row at rail-card size', () => {
     expect(card.style.padding).toBe('12px');
   });
 
-  it('keeps the no-photos tile 230 wide at 216 high, radius 16', () => {
+  it('V6 §4: the no-photos add tile is 156 wide at 216 high, radius 16', () => {
     base();
     const { container } = mount();
-    const empty = container.querySelector('[data-tile-empty]') as HTMLElement;
-    expect(cardSize(empty)).toEqual(['230px', '216px', '16px']);
+    const empty = container.querySelector('[data-tile-add]') as HTMLElement;
+    expect(cardSize(empty)).toEqual(['156px', '216px', '16px']);
   });
 });

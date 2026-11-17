@@ -224,3 +224,56 @@ export function interleaveTilePhotos<H extends TileHole, C extends TileCoursePho
   }
   return out;
 }
+
+/* ── BRIEF_WHATS_BEEN_PLAYED_V6 ─────────────────────────────────────────── */
+/** §1: a post counts only with at least one photo/video and when it is not a
+ *  round post (no whs_score_id / attached_score_id, post_type not 'round'). */
+export function countsAsActivity(p: { post_type?: string | null; whs_score_id?: string | null; attached_score_id?: string | null; media_count?: number | null }): boolean {
+  if (p.whs_score_id || p.attached_score_id) return false;
+  if ((p.post_type ?? '').toLowerCase() === 'round') return false;
+  return (p.media_count ?? 0) > 0;
+}
+
+/** §2: unseen rings first, then seen, each group keeping the given order. */
+export function unseenFirst<T extends RingGroup>(groups: T[], seen: SeenMap | null): T[] {
+  const fresh: T[] = []; const old: T[] = [];
+  for (const g of groups) (isNewRing(g, seen) ? fresh : old).push(g);
+  return [...fresh, ...old];
+}
+
+/** §3 Featured. */
+export const FEATURED_CAP = 15;
+export const FEATURED_TAB_ID = 'featured';
+export interface FeaturedSignals {
+  homeCourseIds: ReadonlySet<string>;
+  playedIds: ReadonlySet<string>;
+  top100Ids: ReadonlySet<string>;
+  reviewedIds: ReadonlySet<string>;
+  /** Courses where a connected member was active in the window. */
+  connectedIds: ReadonlySet<string>;
+  likedIds: ReadonlySet<string>;
+}
+export const NO_SIGNALS: FeaturedSignals = { homeCourseIds: new Set(), playedIds: new Set(), top100Ids: new Set(), reviewedIds: new Set(), connectedIds: new Set(), likedIds: new Set() };
+export function featuredScore(g: RingGroup, s: FeaturedSignals, seen: SeenMap | null): number {
+  const id = g.courseId;
+  return (s.homeCourseIds.has(id) ? 10 : 0) + (s.playedIds.has(id) ? 10 : 0) + (s.top100Ids.has(id) ? 10 : 0) + (isNewRing(g, seen) ? 10 : 0)
+    + (s.reviewedIds.has(id) ? 5 : 0) + (s.connectedIds.has(id) ? 5 : 0) + (s.likedIds.has(id) ? 2 : 0);
+}
+/** Top FEATURED_CAP by score; ties to activity, then the most recent. */
+export function featuredCourses<T extends RingGroup>(groups: T[], s: FeaturedSignals, seen: SeenMap | null): T[] {
+  return groups.map((g) => ({ g, n: featuredScore(g, s, seen) }))
+    .sort((a, b) => b.n - a.n || b.g.activity - a.g.activity || b.g.latestDate.localeCompare(a.g.latestDate))
+    .slice(0, FEATURED_CAP).map((x) => x.g);
+}
+
+/** §4 ROUNDS LATELY: the n most recent rounds (play_date desc, ties whs_score_id desc); one golfer may repeat. */
+export function roundsLately<T extends { whs_score_id: string; play_date: string }>(rows: T[], n = 2): T[] {
+  return [...rows].sort((a, b) => b.play_date.localeCompare(a.play_date) || b.whs_score_id.localeCompare(a.whs_score_id)).slice(0, n);
+}
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+/** §4 faces line: "{g} golfer(s)" bold part and the rest. */
+export function golfersLine(golfers: number, rounds: number): { bold: string; rest: string } {
+  return rounds > 0
+    ? { bold: plural(golfers, 'golfer', 'golfers'), rest: ` played ${plural(rounds, 'round', 'rounds')} lately` }
+    : { bold: plural(golfers, 'golfer', 'golfers'), rest: ' shared it lately' };
+}

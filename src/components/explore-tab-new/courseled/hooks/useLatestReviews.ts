@@ -45,6 +45,9 @@ export interface LatestReview {
   mediaType: 'image' | 'video' | null;
   posterUrl: string | null;
   mediaCount?: number;
+  /** V6 §5: this review's own photos and videos (course_review_media). */
+  photoCount?: number;
+  videoCount?: number;
   mediaId?: string | null;
   courseCountry: string | null;
   courseRegion: string | null;
@@ -147,6 +150,8 @@ function mapRow(row: Row): LatestReview | null {
     mediaType: type as 'image' | 'video' | null,
     posterUrl: media?.poster_url ?? null,
     mediaCount: (row.course_review_media ?? []).filter((item) => !!item.media_url).length,
+    photoCount: (row.course_review_media ?? []).filter((item) => !!item.media_url && !String(item.media_type ?? '').toLowerCase().includes('video')).length,
+    videoCount: (row.course_review_media ?? []).filter((item) => !!item.media_url && String(item.media_type ?? '').toLowerCase().includes('video')).length,
     mediaId: media?.id ?? null,
     courseCountry: row.course.country ?? null,
     courseRegion: row.course.region ?? null,

@@ -283,3 +283,37 @@ None deleted or renamed.
 - `src/test/activeRing.test.tsx` (3 tests in FindPeoplePage rows / WhoToFollowRail) — 17 Nov 2026: `TestingLibraryElementError: Unable to find role="button" and name "Open Danny Holmes's latest post"`.
 - `src/test/holeTagBatchV3.test.tsx` › "remove tag in the batch window › tagged state selects the hole, locks and dims the grid, and shows the line and Remove tag" — 17 Nov 2026: `Error: Test timed out in 15000ms.`
 Reruns, one after the other: shard 2 2,260 passed; shard 3 2,265 passed. Typecheck (`npx tsgo -b --noEmit`) clean after the final test edits. Suite 9,126 (2,259 / 2,260 / 2,265 / 2,342); shard 1's only failure is the known coursesRailsUnlimited flake.
+
+## BRIEF_WHATS_BEEN_PLAYED_V6
+
+**§1 activity**: `fetchPlayedPosts` now also selects `post_type, whs_score_id, attached_score_id, post_media(id)` (same table, same filters) and keeps only `countsAsActivity` posts: ≥1 post_media row, whs_score_id and attached_score_id both null, post_type not 'round'. post_type values: not queried (SQL is Ben's); values the code writes/reads are `'round'`, `'review'`, `'regular'`, `'post'` and null. Note for ruling: a review's auto-post (`post_type 'review'`, source_review_id) with media still counts as a post alongside the review itself — the brief excludes only round posts, so it is left counting.
+**§2 rings**: corner count removed in every state (shell had none). Row order = unseen first, then seen, each in the tab's order, computed from a layout snapshot of the seen map taken on load/member change and on tab switch only; taps mark seen immediately without reordering.
+**§3 Featured**: first tab, top 15 by score, then §2 on top. Signals and sources (existing table reads, no RPCs, in `useFeaturedSignals.ts`): home course = golf_courses.club_id equal to the viewer's primary club (club_id added to the existing played-courses select); played any time = `user_course_activity.has_played` plus the viewer's own rounds in the window; Top 100 = `course_top100_memberships` with `top100_lists!inner(is_active=true)`; unseen = §2 snapshot; reviewed = `course_ratings` for the viewer (is_mock false); connected = `follows` personal↔personal both directions (following via `fetchCircleIds`, plus followers; friendships already carry a follow edge), active at the course in the window; liked = `post_likes` by the viewer on the window's counted posts. None dropped. Reads fail soft (no retry); the section waits for them (Ben ruled) so rings never reshuffle after load. Rails still exclude the first AREA tab (home county).
+**§4 tile**: ROUNDS LATELY = latest two rounds (play_date desc, whs_score_id desc; same golfer may repeat), entries as before (null gross shows no figure). 230px no-photos tile deleted; add tile 156×216 r16 rgba(247,147,30,.12), 44px 34% squircle "+", "Add a photo or video of {short}" two-line clamp; tap = course page top (what "Add a photo" opened). The "+" is centred with flex because the FIX_OVERFLOW_1 source contract forbids column-less inline grids. Faces line: "{g} golfer(s) played {r} round(s) lately" / "{g} golfer(s) shared it lately".
+**§5 card A**: footer name only (11px/600 ink); media line "{v} video(s) & {p} photo(s)" from the review's course_review_media (new photoCount/videoCount on LatestReview), 11px rgba(248,250,252,.62), 5px above the name, both pinned bottom; course name is plain text, the whole card opens the review. `reviewFootTail` and the reviewer-rounds read/page gate are left in place but no longer drawn (report: candidate for removal).
+
+**Test setup change (ruled)**: `vi.mock('@/components/courses/browse/useFeaturedSignals')` returning empty, ready signals added to whatsBeenPlayed, V2, V3, V4, V5, latestReviewTap, coursesSectionSettled. No assertion changed by it.
+
+**Changed assertions (authorised §7), old → new**:
+- whatsBeenPlayed.test.tsx "rings follow the tab": `['selected','new']` → `['selected','new','new']` (Featured holds all three); after GB&I tile `'near'` → `'fife'` (seen near moves back).
+- whatsBeenPlayed "best lately shows the two lowest…" renamed "rounds lately shows the latest two…": pars `['−1','+5']` red/dim → `['+8','−1']` dim/red.
+- whatsBeenPlayed "no photos shows the single empty tile" renamed "…shows the add tile": `[data-tile-empty]` → `[data-tile-add]`.
+- whatsBeenPlayed "selecting a ring stores…": Kent ring[1] `'new'` then tap → Kent rings `['selected','seen']` on switch; tapping ring[1] leaves ring[0] in place reading `'seen'`.
+- whatsBeenPlayed "counts as seen on load and after a tab change": `{ kent }` → `{ fife }` on load; then `{ fife, kent }`; rings `['selected','seen','new']` → `['selected','new','seen']`.
+- whatsBeenPlayedV2 tabs: `['Kent','England','GB&I']` → `['Featured','Kent','England','GB&I']` (test renamed to include Featured).
+- V2 top-aligned: ring counts `['4','2']` → no `[data-ring-count]`.
+- V2 "best lately is two different golfers…" renamed "rounds lately is the latest two rounds…": `['72','78']`, ben/tom → `['80','78']`, raj/tom; faces `contains 'played it lately'` → `'3 golfers played 4 rounds lately'`.
+- V2 no-rounds review: faces `'2 members'` → `'2 golfers'`. V2 no rounds/no review: `[data-tile-empty]` → `[data-tile-add]`. V2 England tab: `getAllByRole('tab')[1]` → `[2]`.
+- whatsBeenPlayedV3 "sits on the ring corner in canvas with a border and number per state" → rewritten as "V6 §2: rings carry no count in any state" (three states present, zero counts).
+- V3 "BEST LATELY kicker…E level" renamed "ROUNDS LATELY kicker…": pars `['−1','E']` → `['+8','−1']`, kicker text ROUNDS LATELY, figure 71 on the second entry.
+- whatsBeenPlayedV4 "Best lately and the faces line…" renamed "Rounds lately…": storage cleared before the second mount (a seen course now moves to the back on reload).
+- whatsBeenPlayedV5 ring gradient tests: no Kent-tab click; ring box found as the ring's first child; `#FFB24D count` assertions → no count. "keeps the no-photos tile 230 wide" → "V6 §4: the no-photos add tile is 156 wide" (`['156px','216px','16px']`).
+- coursesPageV5Sections three footer tests (rounds/best, rounds-only, your best) → name only `'Benjamin Holmes'` (renamed V6 §5).
+- coursesMembersSections played-strip five footers → name only; withRounds `1` → `0`; page gate `withRounds` `1` → `0`.
+- cb69CourseNameLink ReviewRailSlot "name is a button…" → plain text, tap opens the card; "converted tiles…Enter on the name" → asserts no course-name link.
+- latestReviewTap main tile: taps the Kent tab first (Featured leads).
+None deleted.
+
+**New tests (+15)**: `src/test/whatsBeenPlayedV6.test.tsx`.
+**Suite**: 9,131 → 9,146 (2,292 / 2,249 / 2,272 / 2,333), all passing, shards one after another. Shard 3 first failed `fixOverflowSource.test.ts` on my new add-tile grid; fixed in code (flex), shard 3 rerun 2,272 passed. Typecheck clean.
+**Device checks**: 375/320 signed in unchecked (sign-in unavailable).

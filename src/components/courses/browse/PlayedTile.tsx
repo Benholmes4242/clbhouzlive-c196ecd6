@@ -1,16 +1,17 @@
 /**
  * The selected ring's tile (BRIEF_WHATS_BEEN_PLAYED §3, signed-off
  * whats-been-played-top mock), revised by BRIEF_WHATS_BEEN_PLAYED_V4 §2-3:
- * full course name title, no county. Taps: Best lately and the faces line open
- * the course page at Lately (courseLatelyHref); a photo opens the canonical
- * viewer (tilePhotoViewer); Explore, the no-photos tile and the latest review
- * card open the course page top. The rail sheet renders this same tile and
+ * full course name title, no county. V6 §4: ROUNDS LATELY (latest two rounds),
+ * an add tile when the course has no photos or videos, golfers wording. Taps:
+ * Rounds lately and the faces line open the course page at Lately
+ * (courseLatelyHref); a photo opens the canonical viewer (tilePhotoViewer);
+ * Explore and the add tile open the course page top; the latest review card
+ * opens the review sheet. The rail sheet renders this same tile and
  * passes onNavigate (closes the sheet first) and inSheet (viewer above sheet).
  */
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
-import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { shareCourseName } from '@/lib/courses/shareCourseName';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
 import { courseLatelyHref } from '@/lib/courses/courseLatelyLink';
@@ -20,7 +21,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
 import { Bar } from '@/components/skeletons/shellVocabulary';
 import { formatRatingValue } from '@/utils/formatters';
-import { bestLately, dayLabel, interleaveTilePhotos, toParText } from './playedRings';
+import { dayLabel, golfersLine, interleaveTilePhotos, roundsLately, toParText } from './playedRings';
 import type { PlayedCourse } from './usePlayedRounds';
 import { useOpenLatestReview } from './useOpenLatestReview';
 import type { usePlayedTile, TileCoursePhoto, TileHolePhoto } from './usePlayedTile';
@@ -30,7 +31,10 @@ import type { CourseGroup } from './WhoPlayingSection';
 export const TILE_ROW_H = 216;
 export const BEST_CARD_W = 156;
 export const PHOTO_TILE_W = 156;
-export const EMPTY_TILE_W = 230;
+/** V6 §4 add tile. */
+export const ADD_TILE_W = 156;
+export const ADD_TILE_BG = 'rgba(247,147,30,.12)';
+export const ADD_PLUS_BG = 'rgba(247,147,30,.2)';
 export const TILE_RADIUS = 16;
 export const TILE_ROW_GAP = 8;
 export const TILE_CARD_PAD = 12;
@@ -88,9 +92,10 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
       breakdown: { design: null, conditions: null, clubhouse: null, facilities: null },
     });
   };
-  const best = bestLately(group.rows);
+  const latest = roundsLately(group.rows);
   const photos = interleaveTilePhotos<TileHolePhoto, TileCoursePhoto>(tile.holes, tile.photos, tile.hardestHole);
-  const members = group.faces.length;
+  const golfers = group.rows.length > 0 ? new Set(group.rows.map((r) => r.user_id)).size : group.faces.length;
+  const line = golfersLine(golfers, group.rows.length);
   const capBase: React.CSSProperties = { position: 'absolute', left: 10, right: 10, bottom: 9 };
   const ell: React.CSSProperties = { display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
@@ -103,16 +108,16 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
         {group.rows.length > 0 ? (
         <button type="button" data-best-lately="" onClick={openLately}
           style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: TILE_CARD_PAD, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK }}>
-          <span data-best-kicker="" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>BEST LATELY</span>
-          {best.map((r) => {
-            const par = toParText(r.gross_score as number, r.course_par);
+          <span data-best-kicker="" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>ROUNDS LATELY</span>
+          {latest.map((r) => {
+            const par = r.gross_score != null ? toParText(r.gross_score, r.course_par) : null;
             const under = par != null && par.startsWith('\u2212');
             return (
               <span key={r.whs_score_id} data-best-entry="" style={{ display: 'block', minWidth: 0 }}>
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <MemberFace face={{ userId: r.user_id, photo: r.profile_photo_url, name: r.display_name }} size={20} />
                   <span style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                    <b style={{ fontSize: 18, lineHeight: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.gross_score}</b>
+                    {r.gross_score != null ? <b style={{ fontSize: 18, lineHeight: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.gross_score}</b> : null}
                     {par != null ? <span data-to-par="" style={{ fontSize: 10.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: under ? UNDER_RED : A.DIM }}>{par}</span> : null}
                   </span>
                 </span>
@@ -153,15 +158,10 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
         {!tile.ready ? (
           [0, 1].map((i) => <span key={i} data-tile-pending="" style={{ flex: 'none', display: 'block', width: PHOTO_TILE_W, height: TILE_ROW_H }}><Bar style={{ width: '100%', height: '100%', borderRadius: TILE_RADIUS }} /></span>)
         ) : photos.length === 0 ? (
-          <button type="button" data-tile-empty="" onClick={open} style={{ all: 'unset', flex: 'none', width: EMPTY_TILE_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS, overflow: 'hidden', cursor: 'pointer', position: 'relative' }}>
-            <CourseImageFallback courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
-              <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.2) 0%, rgba(0,0,0,.8) 100%)' }} />
-              <span style={{ position: 'absolute', left: 12, right: 12, bottom: 12, color: '#FFFFFF' }}>
-                <b style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>No photos yet</b>
-                <span style={{ display: 'block', marginTop: 3, fontSize: 11.5, lineHeight: 1.4, color: 'rgba(255,255,255,.78)', whiteSpace: 'normal' }}>{`Played it lately? Add the first photo of ${short}.`}</span>
-                <span style={{ display: 'inline-flex', marginTop: 9, padding: '6px 10px', borderRadius: 10, background: 'rgba(247,147,30,.16)', color: A.AMBER, fontSize: 11.5, fontWeight: 700 }}>Add a photo</span>
-              </span>
-            </CourseImageFallback>
+          <button type="button" data-tile-add="" onClick={open}
+            style={{ flex: 'none', width: ADD_TILE_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: ADD_TILE_BG, border: 0, padding: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer' }}>
+            <span aria-hidden="true" style={{ width: 44, height: 44, borderRadius: '34%', background: ADD_PLUS_BG, color: A.AMBER, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 600, lineHeight: 1 }}>+</span>
+            <b data-tile-add-text="" style={{ marginTop: 12, fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: A.AMBER, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere' }}>{`Add a photo or video of ${short}`}</b>
           </button>
         ) : photos.map((p, pi) => (
           <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { openTilePhoto(photos, pi, course, tile.coursePosts ?? [], inSheet); }}
@@ -192,7 +192,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
       <button type="button" data-tile-faces="" onClick={openLately} style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 8, marginTop: FACES_TOP, fontSize: 12, color: A.MUTE, cursor: 'pointer', maxWidth: '100%' }}>
         <FaceStack faces={group.faces.slice(0, 4)} size={FACE_SIZE} overlap={6} ring={A.CANVAS} />
         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-          <b style={{ color: A.INK, fontWeight: 600 }}>{members === 1 ? '1 member' : `${fmtCount(members)} members`}</b> {group.rows.length > 0 ? 'played' : 'shared'} it lately
+          <b style={{ color: A.INK, fontWeight: 600 }}>{line.bold}</b>{line.rest}
         </span>
       </button>
       <button type="button" data-tile-explore="" onClick={open}

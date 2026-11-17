@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// V6 §3: the section waits for Featured's reads; empty, ready signals here (ruled).
+vi.mock('@/components/courses/browse/useFeaturedSignals', () => ({ useFeaturedSignals: () => ({ played: undefined, reviewed: undefined, top100: undefined, connected: undefined, likedPosts: undefined, ready: true }) }));
 vi.mock('@/stores/reviewSheetStore', () => ({ useReviewSheetStore: (select: any) => select({ open: (a: any) => { f.reviews.push(a); }, isOpen: false }) }));
 const f = vi.hoisted(() => ({ hook: null as any, tile: null as any, opened: [] as any[], reviews: [] as any[], scrolled: [] as any[] }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -82,6 +84,7 @@ afterEach(cleanup);
 describe('FIX_LATEST_REVIEW_TAP', () => {
   it('the main tile card opens the tapped review in the review sheet and never navigates', () => {
     const r = mount();
+    fireEvent.click(r.getByRole('tab', { name: 'Kent' })); // V6 §3: Featured leads; Kent holds sun
     fireEvent.click(r.container.querySelector('[data-played-tile="sun"] [data-latest-review]')!);
     expect(f.reviews).toHaveLength(1);
     expect(f.reviews[0].reviewId).toBe('v1');

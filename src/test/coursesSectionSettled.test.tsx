@@ -4,6 +4,8 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ session: { user: null as { id: string } | null, loading: true }, rounds: { data: [] as unknown[], isFetched: false, isError: false }, meta: { data: new Map(), isFetched: false, isError: false }, home: { clubId: null as string | null, isFetched: false }, truth: { data: { regions: [] }, isFetched: true } }));
+// V6 §3: the section waits for Featured's reads; empty, ready signals here (ruled).
+vi.mock('@/components/courses/browse/useFeaturedSignals', () => ({ useFeaturedSignals: () => ({ played: undefined, reviewed: undefined, top100: undefined, connected: undefined, likedPosts: undefined, ready: true }) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => f.session }));
 vi.mock('@/hooks/gam/useCircleLatestRounds', () => ({ useCircleLatestRounds: () => f.rounds }));

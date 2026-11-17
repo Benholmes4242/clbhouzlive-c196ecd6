@@ -4,12 +4,12 @@ import { CourseImageFallback } from '@/components/explore-tab-new/courseled/Cour
 import { RailChips } from '@/components/ui/RailChips';
 import { shareCourseName } from '@/lib/courses/shareCourseName';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { fmtCount } from './format';
 import { useSectionReady } from './PageLoadGate';
 import { settled } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
-import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, ringKeys, writeSeen, type RingGroup, type SeenMap } from './playedRings';
-/** V5 §1 G1: a NEW ring's border is an amber gradient, bright top right where the count sits. */
+import { buildAreaTabs, buildRails, featuredCourses, FEATURED_TAB_ID, isNewRing, NO_SIGNALS, orderRings, readSeen, ringKeys, unseenFirst, writeSeen, type FeaturedSignals, type RingGroup, type SeenMap } from './playedRings';
+import { useFeaturedSignals } from './useFeaturedSignals';
+/** V5 §1 G1: a NEW ring's border is an amber gradient (V6 §2: rings carry no count). */
 export const NEW_RING_BG = 'linear-gradient(#0A0A0C, #0A0A0C) padding-box, linear-gradient(225deg, #FFC069 0%, #F7931E 40%, #8C4512 100%) border-box';
 export const NEW_COUNT = '#FFB24D';
 
@@ -41,7 +41,7 @@ export const RING_RADIUS = 21.76;
 export const RING_INSET = 2.5;
 export const RING_PHOTO_RADIUS = 17.76;
 export const RING_ROW_TOP = 14;
-/** V3 §1: 10px so the corner count (top -7px) is never clipped by the row. */
+/** V3 §1 row top padding, kept by V6 §2 after the corner count's removal. */
 export const RING_ROW_PAD_TOP = 10;
 export const RING_LABEL_GAP = 9;
 export const RING_LABEL_LINE = 13;
@@ -108,14 +108,46 @@ export function WhoPlayingSection() {
     [played.rounds.data, postRows, reviewRows, faceMap, courseMap],
   );
   const courses = useMemo(() => groups.map((g) => courseMap?.get(g.courseId)).filter((c): c is PlayedCourse => !!c), [groups, courseMap]);
-  const tabs = useMemo(() => buildAreaTabs(courses, played.home), [courses, played.home]);
+  const areaTabs = useMemo(() => buildAreaTabs(courses, played.home), [courses, played.home]);
+  const [seen, setSeen] = useState<SeenMap | null>(() => readSeen(userId));
+  // V6 §2: the seen state the row is LAID OUT with — taken on load (mount or
+  // member change) and on a tab switch, never while tapping through the row.
+  const [layoutSeen, setLayoutSeen] = useState<SeenMap | null>(() => readSeen(userId));
+  useEffect(() => { const s = readSeen(userId); setSeen(s); setLayoutSeen(s); }, [userId]);
+  // V6 §3: Featured first, scored for the viewer.
+  const postIds = useMemo(() => (postRows ?? []).map((p) => p.id), [postRows]);
+  const groupIds = useMemo(() => groups.map((g) => g.courseId), [groups]);
+  const sig = useFeaturedSignals(userId, groupIds, postIds);
+  const signals = useMemo<FeaturedSignals>(() => {
+    if (!userId) return NO_SIGNALS;
+    const homeClubId = (played as { homeClubId?: string | null }).homeClubId ?? null;
+    const likedCourses = new Set<string>();
+    for (const p of postRows ?? []) if (sig.likedPosts?.has(p.id)) for (const id of postCourseIds(p)) likedCourses.add(id);
+    const playedIds = new Set(sig.played ?? []);
+    for (const r of (played.rounds.data ?? []) as PlayedRoundRow[]) if (r.user_id === userId && r.course_id) playedIds.add(r.course_id);
+    const connectedIds = new Set<string>();
+    if (sig.connected?.size) for (const g of groups) if (g.faces.some((f) => sig.connected!.has(f.userId))) connectedIds.add(g.courseId);
+    const homeCourseIds = new Set(homeClubId ? courses.filter((c) => c.clubId === homeClubId).map((c) => c.id) : []);
+    return { homeCourseIds, playedIds, top100Ids: sig.top100 ?? new Set(), reviewedIds: sig.reviewed ?? new Set(), connectedIds, likedIds: likedCourses };
+  }, [userId, played, postRows, sig.likedPosts, sig.played, sig.connected, sig.top100, sig.reviewed, groups, courses]);
+  const tabs = useMemo(() => {
+    if (groups.length === 0) return areaTabs;
+    const featured = featuredCourses(groups, signals, layoutSeen);
+    return [{ id: FEATURED_TAB_ID, label: 'Featured', courseIds: featured.map((g) => g.courseId) }, ...areaTabs];
+  }, [groups, signals, layoutSeen, areaTabs]);
   const [tabId, setTabId] = useState<string | null>(null);
   const tab = tabs.find((t) => t.id === tabId) ?? tabs[0] ?? null;
-  const ringGroups = useMemo(() => (tab ? groups.filter((g) => tab.courseIds.includes(g.courseId)) : []), [groups, tab]);
+  const ringGroups = useMemo(() => {
+    if (!tab) return [];
+    const byId = new Map(groups.map((g) => [g.courseId, g]));
+    // Featured keeps its score order; area tabs keep busiest-then-recent (groups' order).
+    const inTab = tab.id === FEATURED_TAB_ID
+      ? tab.courseIds.map((id) => byId.get(id)).filter((g): g is CourseGroup => !!g)
+      : groups.filter((g) => tab.courseIds.includes(g.courseId));
+    return unseenFirst(inTab, layoutSeen);
+  }, [groups, tab, layoutSeen]);
   const [selected, setSelected] = useState<string | null>(null);
   const current = ringGroups.find((g) => g.courseId === selected) ?? ringGroups[0] ?? null;
-  const [seen, setSeen] = useState<SeenMap | null>(() => readSeen(userId));
-  useEffect(() => { setSeen(readSeen(userId)); }, [userId]);
 
   // §2 (BRIEF_WHATS_BEEN_PLAYED_FIXES): the ring whose tile is showing counts as
   // seen. One owner writes it — the default on load, the default after a tab
@@ -148,8 +180,8 @@ export function WhoPlayingSection() {
     writeSeen(userId, next);
   }, [current, sheetGroup, userId]);
 
-  // §6: rails hold every active course outside the FIRST tab only.
-  const tabIds = useMemo(() => new Set(tabs[0]?.courseIds ?? []), [tabs]);
+  // §6: rails hold every active course outside the first AREA tab (V6 §3: not Featured).
+  const tabIds = useMemo(() => new Set(areaTabs[0]?.courseIds ?? []), [areaTabs]);
   const rails = useMemo(() => buildRails(courses, groups, tabIds, played.home), [courses, groups, tabIds, played.home]);
   const tile = usePlayedTile(current?.courseId ?? null, userId);
 
@@ -157,7 +189,7 @@ export function WhoPlayingSection() {
   const roundsReady = settled(played.rounds) && opt(played.posts) && opt(played.reviews)
     && (played.ids.length === 0 || settled(played.courses))
     && (!played.memberIds?.length || opt(played.faces));
-  const firstReady = !sessionLoading && (!user || (roundsReady && played.homeReady && (!current || tile.ready)));
+  const firstReady = !sessionLoading && (!user || (roundsReady && played.homeReady && sig.ready && (!current || tile.ready)));
   // Latched: after the first ready the section never returns to the shell;
   // later selections re-render in place and only the photo row waits.
   const everReady = useRef(false);
@@ -178,7 +210,7 @@ export function WhoPlayingSection() {
         ariaLabel="Choose area"
         options={tabs.map((t) => ({ id: t.id, label: t.label }))}
         value={tab.id}
-        onChange={(id) => { setTabId(id); setSelected(null); }}
+        onChange={(id) => { setTabId(id); setSelected(null); setLayoutSeen(seen); }}
         style={{ marginTop: TABS_TOP, padding: '0 16px' }}
       />
       <div className="scrollbar-hide" data-played-rings="" style={{ display: 'flex', alignItems: 'flex-start', gap: RING_GAP, overflowX: 'auto', scrollbarWidth: 'none', marginTop: RING_ROW_TOP, padding: `${RING_ROW_PAD_TOP}px 16px 2px` }}>
@@ -188,7 +220,6 @@ export function WhoPlayingSection() {
           const isSel = current?.courseId === g.courseId;
           const isNew = isNewRing(g, seen);
           const edge = isSel ? A.INK : isNew ? 'transparent' : SEEN_EDGE;
-          const badge = isSel ? A.INK : isNew ? NEW_COUNT : A.MUTE;
           const state = isSel ? 'selected' : isNew ? 'new' : 'seen';
           return (
             <button key={g.courseId} type="button" data-played-ring={state} aria-pressed={isSel} onClick={() => select(g)}
@@ -196,9 +227,6 @@ export function WhoPlayingSection() {
               <span style={{ position: 'relative', display: 'block', width: RING_SIZE, height: RING_SIZE, margin: '0 4px', boxSizing: 'border-box', borderRadius: RING_RADIUS, border: `${RING_BORDER}px solid ${edge}`, ...(state === 'new' ? { background: NEW_RING_BG } : null) }}>
                 <CourseImageFallback courseId={g.courseId} courseName={c?.name} imageUrl={c?.imageUrl} initialsSize={14}
                   style={{ position: 'absolute', inset: RING_INSET, borderRadius: RING_PHOTO_RADIUS, overflow: 'hidden' }} />
-                <span data-ring-count="" style={{ position: 'absolute', top: -7, right: -7, zIndex: 2, minWidth: 20, height: 18, padding: '0 5px', boxSizing: 'border-box', borderRadius: BADGE_RADIUS, background: A.CANVAS, border: `1.5px solid ${state === 'new' ? NEW_COUNT : edge}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: badge }}>
-                  {fmtCount(g.activity)}
-                </span>
               </span>
               <span style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', marginTop: RING_LABEL_GAP, fontSize: 10.5, fontWeight: 600, lineHeight: `${RING_LABEL_LINE}px`, color: state === 'seen' ? A.MUTE : A.INK, overflowWrap: 'anywhere' }}>{short}</span>
               {variant ? <span style={{ display: 'block', marginTop: 1, fontSize: 9.5, fontWeight: 600, lineHeight: `${RING_VARIANT_LINE}px`, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{variant}</span> : null}

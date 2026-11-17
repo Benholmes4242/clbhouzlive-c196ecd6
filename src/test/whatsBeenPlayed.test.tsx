@@ -6,6 +6,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, counts: 0, session: { user: { id: 'me' }, loading: false } as any }));
+// V6 §3: the section waits for Featured's reads; empty, ready signals here (ruled).
+vi.mock('@/components/courses/browse/useFeaturedSignals', () => ({ useFeaturedSignals: () => ({ played: undefined, reviewed: undefined, top100: undefined, connected: undefined, likedPosts: undefined, ready: true }) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => f.session }));
 vi.mock('@/components/courses/browse/usePlayedRounds', () => ({ usePlayedRounds: () => f.hook }));
@@ -137,35 +139,33 @@ describe('section', () => {
   afterEach(cleanup);
   it('rings follow the tab; the first ring is selected and its tile shows', () => {
     const { container } = mount();
-    expect([...container.querySelectorAll('[data-played-ring]')].map((n) => n.getAttribute('data-played-ring'))).toEqual(['selected', 'new']);
+    expect([...container.querySelectorAll('[data-played-ring]')].map((n) => n.getAttribute('data-played-ring'))).toEqual(['selected', 'new', 'new']);
     expect(container.querySelector('[data-played-tile]')?.getAttribute('data-played-tile')).toBe('near');
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     expect(container.querySelectorAll('[data-played-ring]')).toHaveLength(3);
-    expect(container.querySelector('[data-played-tile]')?.getAttribute('data-played-tile')).toBe('near');
+    expect(container.querySelector('[data-played-tile]')?.getAttribute('data-played-tile')).toBe('fife');
   });
-  it('best lately shows the two lowest with to par beside the score, under par red, otherwise dim (V3 §2)', () => {
+  it('rounds lately shows the latest two with to par beside the score, under par red, otherwise dim (V6 §4)', () => {
     const { container } = mount();
     const entries = [...container.querySelectorAll('[data-best-entry]')];
     expect(entries).toHaveLength(2);
     const pars = [...container.querySelectorAll('[data-to-par]')] as HTMLElement[];
-    expect(pars.map((p) => p.textContent)).toEqual(['\u22121', '+5']);
-    expect(pars[0].style.color).toBe('rgb(240, 84, 74)');
-    expect(pars[1].style.color).toBe('rgba(248, 250, 252, 0.42)');
+    expect(pars.map((p) => p.textContent)).toEqual(['+8', '\u22121']);
+    expect(pars[0].style.color).toBe('rgba(248, 250, 252, 0.42)');
+    expect(pars[1].style.color).toBe('rgb(240, 84, 74)');
   });
-  it('no photos shows the single empty tile', () => {
+  it('no photos shows the add tile', () => {
     const { container } = mount();
-    expect(container.querySelector('[data-tile-empty]')).not.toBeNull();
+    expect(container.querySelector('[data-tile-add]')).not.toBeNull();
     expect(container.querySelectorAll('[data-tile-photo]')).toHaveLength(0);
   });
   it('selecting a ring stores its newest round as seen', () => {
     const { container } = mount();
     fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
-    const kentRing = container.querySelectorAll('[data-played-ring]')[1];
-    expect(kentRing.getAttribute('data-played-ring')).toBe('new');
-    fireEvent.click(kentRing);
+    expect([...container.querySelectorAll('[data-played-ring]')].map((n) => n.getAttribute('data-played-ring'))).toEqual(['selected', 'seen']);
     expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: ['round:3', 'round:1', 'round:2'], kent: ['round:4'] });
-    fireEvent.click(container.querySelectorAll('[data-played-ring]')[0]);
-    expect(container.querySelectorAll('[data-played-ring]')[1].getAttribute('data-played-ring')).toBe('seen');
+    fireEvent.click(container.querySelectorAll('[data-played-ring]')[1]);
+    expect(container.querySelectorAll('[data-played-ring]')[0].getAttribute('data-played-ring')).toBe('seen');
   });
   it('rest-of rail card with no top-ups (V3 §3, §4)', () => {
     f.counts = 0;
@@ -243,10 +243,10 @@ describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
     setHook([row('1', 'near', 'ann', 71), row('2', 'kent', 'bob', 70, '2026-11-08'), row('3', 'kent', 'cy', 75, '2026-11-12'), row('6', 'fife', 'dee', 80), row('7', 'fife', 'ed', 81), row('8', 'fife', 'fi', 82, '2026-11-13')],
       [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
     const { container } = mount();
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: ['round:3', 'round:2'] });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ fife: ['round:8', 'round:7', 'round:6'] });
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: ['round:3', 'round:2'], fife: ['round:8', 'round:7', 'round:6'] });
-    expect([...container.querySelectorAll('[data-played-ring]')].map((r) => r.getAttribute('data-played-ring'))).toEqual(['selected', 'seen', 'new']);
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ fife: ['round:8', 'round:7', 'round:6'], kent: ['round:3', 'round:2'] });
+    expect([...container.querySelectorAll('[data-played-ring]')].map((r) => r.getAttribute('data-played-ring'))).toEqual(['selected', 'new', 'seen']);
   });
 });
 

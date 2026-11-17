@@ -5,6 +5,8 @@ import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ hook: null as any, tile: null as any, opened: [] as any[], scrolled: [] as any[] }));
+// V6 §3: the section waits for Featured's reads; empty, ready signals here (ruled).
+vi.mock('@/components/courses/browse/useFeaturedSignals', () => ({ useFeaturedSignals: () => ({ played: undefined, reviewed: undefined, top100: undefined, connected: undefined, likedPosts: undefined, ready: true }) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => f.tile }));
@@ -84,11 +86,12 @@ describe('V4 §2 tile head', () => {
 });
 
 describe('V4 §3 tile taps', () => {
-  it('Best lately and the faces line open the course page at Lately', () => {
+  it('Rounds lately and the faces line open the course page at Lately', () => {
     const a = mount();
     fireEvent.click(a.container.querySelector('[data-best-lately]')!);
     expect(where(a.container)).toBe(courseLatelyHref('sun'));
     cleanup();
+    window.localStorage.clear(); // V6 §2: a seen course moves to the back on reload
     const b = mount();
     fireEvent.click(b.container.querySelector('[data-tile-faces]')!);
     expect(where(b.container)).toBe('/courses/sun?tab=course&section=lately');

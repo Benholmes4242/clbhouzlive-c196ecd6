@@ -4,7 +4,8 @@
  * - rounds: get_recent_rounds ('everyone', '30'), paged to total_count, cap 500;
  * - posts: the posts table with useMomentsOfTheWeek's filters (status
  *   'published', course_id or tagged_course_ids set, created_at in the window;
- *   RLS decides visibility), paged, cap 500;
+ *   RLS decides visibility), paged, cap 500; V6 §1 keeps only posts with a
+ *   photo/video that are not round posts (countsAsActivity);
  * - reviews: course_ratings with useLatestReviews' filters (is_mock false,
  *   review text present, created_at in the window), paged, cap 500;
  * - member faces: readMemberFaces (user_profiles, public_profiles filling gaps)
@@ -18,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useViewerHomeClubId } from '@/components/explore-tab-new/courseled/hooks/useGolfThisWeek';
 import { readMemberFaces } from '@/lib/members/readMemberFaces';
-import { ACTIVITY_WINDOW_DAYS, type HomePlace, type PlacedCourse } from './playedRings';
+import { ACTIVITY_WINDOW_DAYS, countsAsActivity, type HomePlace, type PlacedCourse } from './playedRings';
 
 export const PLAYED_ROUND_CAP = 500;
 const PAGE = 100;
@@ -35,7 +36,7 @@ export interface PlayedRoundRow {
   course_par: number | null;
   total_count: number;
 }
-export interface PlayedCourse extends PlacedCourse { name: string; imageUrl: string | null }
+export interface PlayedCourse extends PlacedCourse { name: string; imageUrl: string | null; clubId?: string | null }
 
 export async function fetchPlayedRounds(): Promise<PlayedRoundRow[]> {
   const out: PlayedRoundRow[] = [];
@@ -53,7 +54,7 @@ export async function fetchPlayedRounds(): Promise<PlayedRoundRow[]> {
 }
 
 export const ACTIVITY_CAP = 500;
-export interface PlayedPostRow { id: string; user_id: string | null; actor_type: string | null; created_at: string; course_id: string | null; tagged_course_ids: string[] | null }
+export interface PlayedPostRow { id: string; user_id: string | null; actor_type: string | null; created_at: string; course_id: string | null; tagged_course_ids: string[] | null; post_type?: string | null; whs_score_id?: string | null; attached_score_id?: string | null; media_count?: number | null }
 export interface PlayedReviewRow { id: string; course_id: string | null; user_id: string | null; rating: number | null; review: string | null; created_at: string }
 export const windowStartIso = (now = Date.now()) => new Date(now - ACTIVITY_WINDOW_DAYS * 86_400_000).toISOString();
 
@@ -68,11 +69,13 @@ async function pageRows<T>(read: (from: number, to: number) => PromiseLike<{ dat
   }
   return out.slice(0, ACTIVITY_CAP);
 }
-export function fetchPlayedPosts(since = windowStartIso()): Promise<PlayedPostRow[]> {
-  return pageRows<PlayedPostRow>((from, to) => supabase.from('posts')
-    .select('id, user_id, actor_type, created_at, course_id, tagged_course_ids')
+type RawPostRow = Omit<PlayedPostRow, 'media_count'> & { post_media?: Array<{ id: string }> | null };
+export async function fetchPlayedPosts(since = windowStartIso()): Promise<PlayedPostRow[]> {
+  const rows = await pageRows<RawPostRow>((from, to) => supabase.from('posts')
+    .select('id, user_id, actor_type, created_at, course_id, tagged_course_ids, post_type, whs_score_id, attached_score_id, post_media(id)')
     .eq('status', 'published').or('course_id.not.is.null,tagged_course_ids.neq.{}')
     .gte('created_at', since).order('created_at', { ascending: false }).range(from, to));
+  return rows.map(({ post_media, ...r }) => ({ ...r, media_count: post_media?.length ?? 0 })).filter(countsAsActivity);
 }
 export function fetchPlayedReviews(since = windowStartIso()): Promise<PlayedReviewRow[]> {
   return pageRows<PlayedReviewRow>((from, to) => supabase.from('course_ratings')
@@ -83,10 +86,10 @@ export function fetchPlayedReviews(since = windowStartIso()): Promise<PlayedRevi
 /** Every course a post names: course_id plus tagged_course_ids, once each. */
 export const postCourseIds = (p: Pick<PlayedPostRow, 'course_id' | 'tagged_course_ids'>) => Array.from(new Set([p.course_id, ...(p.tagged_course_ids ?? [])].filter((v): v is string => !!v)));
 
-const COURSE_COLS = 'id, name, thumbnail_image, region, sub_country, country, continent, latitude, longitude';
-type CourseRow = { id: string; name: string; thumbnail_image: string | null; region: string | null; sub_country: string | null; country: string | null; continent: string | null; latitude: number | null; longitude: number | null };
+const COURSE_COLS = 'id, club_id, name, thumbnail_image, region, sub_country, country, continent, latitude, longitude';
+type CourseRow = { id: string; club_id?: string | null; name: string; thumbnail_image: string | null; region: string | null; sub_country: string | null; country: string | null; continent: string | null; latitude: number | null; longitude: number | null };
 const toCourse = (c: CourseRow): PlayedCourse => ({
-  id: c.id, name: c.name, imageUrl: c.thumbnail_image ?? null, region: c.region || null, subCountry: c.sub_country || null,
+  id: c.id, clubId: c.club_id ?? null, name: c.name, imageUrl: c.thumbnail_image ?? null, region: c.region || null, subCountry: c.sub_country || null,
   country: c.country || null, continent: c.continent || null, lat: c.latitude ?? null, lng: c.longitude ?? null,
 });
 
@@ -128,5 +131,5 @@ export function usePlayedRounds(userId: string | undefined) {
     },
   });
   const homeReady = !userId || (homeClub.ready && (!homeClub.clubId || home.isFetched || home.isError));
-  return { rounds, posts, reviews, faces, memberIds, courses, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady };
+  return { rounds, posts, reviews, faces, memberIds, courses, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady, homeClubId: homeClub.clubId ?? null };
 }

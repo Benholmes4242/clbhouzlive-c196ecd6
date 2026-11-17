@@ -7,6 +7,8 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, counts: 0, calls: [] as any[] }));
+// V6 §3: the section waits for Featured's reads; empty, ready signals here (ruled).
+vi.mock('@/components/courses/browse/useFeaturedSignals', () => ({ useFeaturedSignals: () => ({ played: undefined, reviewed: undefined, top100: undefined, connected: undefined, likedPosts: undefined, ready: true }) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => f.tile }));
@@ -97,9 +99,9 @@ describe('section', () => {
     ratings: new Map([['wob', 9.1]]),
     courses: [kentA, knole, surrey, woburn, spain],
   }));
-  it('tabs run county, nation, then world tabs with activity; the first is selected', () => {
+  it('tabs run Featured, county, nation, then world tabs with activity; the first is selected', () => {
     const { getAllByRole } = mount();
-    expect(getAllByRole('tab').map((t) => t.textContent)).toEqual(['Kent', 'England', 'GB&I']);
+    expect(getAllByRole('tab').map((t) => t.textContent)).toEqual(['Featured', 'Kent', 'England', 'GB&I']);
     expect(getAllByRole('tab')[0].getAttribute('aria-selected')).toBe('true');
   });
   it('rings are top-aligned whatever their label lines', () => {
@@ -111,16 +113,16 @@ describe('section', () => {
       expect(ring.style.flexDirection).toBe('column');
       expect(ring.style.justifyContent).toBe('flex-start');
     }
-    expect([...container.querySelectorAll('[data-ring-count]')].map((n) => n.textContent)).toEqual(['4', '2']);
+    expect(container.querySelectorAll('[data-ring-count]')).toHaveLength(0);
   });
-  it('best lately is two different golfers with full names; no county in the head; played line', () => {
+  it('rounds lately is the latest two rounds with full names; no county in the head; played line', () => {
     const { container } = mount();
     const entries = [...container.querySelectorAll('[data-best-entry]')];
-    expect(entries.map((e) => e.textContent?.slice(0, 2))).toEqual(['72', '78']);
-    expect(entries[0].textContent).toContain('ben Smith');
+    expect(entries.map((e) => e.textContent?.slice(0, 2))).toEqual(['80', '78']);
+    expect(entries[0].textContent).toContain('raj Smith');
     expect(entries[1].textContent).toContain('tom Smith');
     expect(container.querySelector('[data-tile-place]')).toBeNull();
-    expect(container.querySelector('[data-tile-faces]')?.textContent).toContain('played it lately');
+    expect(container.querySelector('[data-tile-faces]')?.textContent).toBe('3 golfers played 4 rounds lately');
   });
   it('a course with no rounds opens on its latest review and is "shared it lately"', () => {
     const { container } = mount();
@@ -132,7 +134,7 @@ describe('section', () => {
     expect(card.querySelector('[data-review-text]')?.textContent).toBe('Greens quick and true.');
     expect(card.textContent).toContain('1 review lately');
     const faces = container.querySelector('[data-tile-faces]')?.textContent ?? '';
-    expect(faces).toContain('2 members');
+    expect(faces).toContain('2 golfers');
     expect(faces).toContain('shared it lately');
     expect(JSON.parse(window.localStorage.getItem('clbhouz:played-seen:me') ?? '{}').knole).toEqual(['review:v1', 'post:p1']);
   });
@@ -141,7 +143,7 @@ describe('section', () => {
     const { container } = mount();
     expect(container.querySelector('[data-best-lately]')).toBeNull();
     expect(container.querySelector('[data-latest-review]')).toBeNull();
-    expect(container.querySelector('[data-tile-empty]')).not.toBeNull();
+    expect(container.querySelector('[data-tile-add]')).not.toBeNull();
   });
   it('rails hold active courses outside the first tab with Best round, or media counts (V3 §3)', () => {
     f.counts = 4;
@@ -157,7 +159,7 @@ describe('section', () => {
   });
   it('a course may sit in a tab and a rail: England tab courses outside Kent are on a rail too', () => {
     const { container, getAllByRole } = mount();
-    fireEvent.click(getAllByRole('tab')[1]);
+    fireEvent.click(getAllByRole('tab')[2]);
     expect(container.querySelectorAll('[data-played-ring]')).toHaveLength(4);
     expect(container.querySelector('[data-region-rail="home"]')?.textContent).toContain('The Addington');
   });
