@@ -573,6 +573,7 @@ const BusinessProfilePage: React.FC = () => {
         open={showReportDialog}
         onOpenChange={setShowReportDialog}
         reportType="user"
+        subject="business"
         reportedUserId={business.id}
       />
 

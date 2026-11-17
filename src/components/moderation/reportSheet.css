@@ -1,0 +1,16 @@
+.report-sheet { padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+.report-reasons { display: flex; flex-direction: column; gap: 8px; padding: 0 16px; }
+.report-reason { display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; text-align: left; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid transparent; color: #F8FAFC; font-family: inherit; cursor: pointer; }
+.report-reason.on { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.55); }
+.report-reason-text { flex: 1; min-width: 0; }
+.report-reason-title { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: #F8FAFC; }
+.report-reason-sub { display: block; font-size: 12.5px; font-weight: 400; color: rgba(248,250,252,0.62); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.report-radio { width: 20px; height: 20px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.32); flex: none; display: flex; align-items: center; justify-content: center; }
+.report-reason.on .report-radio { background: #F8FAFC; border-color: #F8FAFC; }
+.report-reason.on .report-radio::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #0A0A0C; }
+.report-details { margin: 10px 16px 0; }
+.report-details textarea { display: block; width: 100%; box-sizing: border-box; min-height: 76px; resize: none; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid transparent; color: #F8FAFC; font-family: inherit; font-size: 14.5px; font-weight: 400; line-height: 1.5; padding: 11px 14px; outline: 0; }
+.report-details textarea:focus { border-color: rgba(248,250,252,0.32); }
+.report-details textarea::placeholder { color: rgba(248,250,252,0.36); }
+.report-send { display: block; width: calc(100% - 32px); margin: 14px 16px 0; height: 50px; border-radius: 14px; border: 0; background: #F8FAFC; color: #0A0A0C; font-family: inherit; font-size: 15px; font-weight: 700; line-height: 50px; cursor: pointer; }
+.report-send:disabled { background: rgba(255,255,255,0.08); color: #6C7885; cursor: default; }

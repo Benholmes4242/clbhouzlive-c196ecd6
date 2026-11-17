@@ -1,26 +1,18 @@
 /**
- * ReportSheet - Report a user, group, review, or message
+ * ReportSheet - Report a user, group, review, or message.
+ * REPORT_SHEET_CANON: canonical BottomSheet + dark SheetHeader, white
+ * controls, no amber/red/emoji. Submit payload is unchanged.
  */
 
 import { useState } from 'react';
 import { useGuestSheetGate } from '@/features/guest/useGuestActionGate';
-import { Loader2 } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-} from '@/components/ui/sheet';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SheetHeader } from '@/components/ui/SheetHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
-import { cn } from '@/lib/utils';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
-
-/** White-alpha hairline. Named for what it is, not for the ink it replaced. */
-const HAIRLINE = A.BORDER;
+import './reportSheet.css';
 
 interface ReportSheetProps {
   open: boolean;
@@ -30,15 +22,24 @@ interface ReportSheetProps {
   reportedReviewId?: string;
   reportedMessageId?: string;
   reportType: 'user' | 'group' | 'review' | 'message';
+  /** Only for reportType 'user': titles the sheet "Report business". */
+  subject?: 'golfer' | 'business';
 }
 
 const REPORT_REASONS = [
-  { id: 'spam', label: 'Spam', icon: '📧' },
-  { id: 'harassment', label: 'Harassment', icon: '😤' },
-  { id: 'inappropriate', label: 'Inappropriate content', icon: '🚫' },
-  { id: 'impersonation', label: 'Impersonation', icon: '🎭' },
-  { id: 'other', label: 'Other', icon: '❓' },
+  { id: 'spam', label: 'Spam', sub: 'Ads, scams or repeated messages' },
+  { id: 'harassment', label: 'Harassment', sub: 'Bullying, threats or abuse' },
+  { id: 'inappropriate', label: 'Inappropriate content', sub: 'Nudity, hate or violence' },
+  { id: 'impersonation', label: 'Impersonation', sub: 'Pretending to be someone else' },
+  { id: 'other', label: 'Something else', sub: "Tell us what's wrong" },
 ];
+
+export function reportSheetTitle(reportType: ReportSheetProps['reportType'], subject: ReportSheetProps['subject'] = 'golfer'): string {
+  if (reportType === 'message') return 'Report message';
+  if (reportType === 'review') return 'Report review';
+  if (reportType === 'group') return 'Report group';
+  return subject === 'business' ? 'Report business' : 'Report golfer';
+}
 
 export function ReportSheet({
   open: openProp,
@@ -48,6 +49,7 @@ export function ReportSheet({
   reportedReviewId,
   reportedMessageId,
   reportType,
+  subject = 'golfer',
 }: ReportSheetProps) {
   // GUEST §5: a guest never reaches the report form; the action card opens.
   const open = useGuestSheetGate(openProp, () => onOpenChange(false), 'report');
@@ -78,109 +80,52 @@ export function ReportSheet({
 
       if (error) throw error;
 
-      toast.success('Report submitted', {
-        description: "We'll review this shortly. Thank you for helping keep the community safe.",
-      });
+      toast.success('Report sent', { description: "Thanks. We'll take a look." });
 
       onOpenChange(false);
       setSelectedReason(null);
       setDetails('');
     } catch (error) {
       AppLog.error('[ReportSheet]', 'Error submitting report:', error);
-      toast.error('Failed to submit report');
+      toast.error("Couldn't send your report");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const typeLabel = 
-    reportType === 'group' ? 'Group' : 
-    reportType === 'review' ? 'Review' :
-    reportType === 'message' ? 'Message' : 'User';
+  const disabled = !selectedReason || (selectedReason === 'other' && !details.trim()) || submitting;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85dvh] overflow-y-auto">
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.22)', margin: '8px auto 0' }} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
-          <SectionHeader tier="standard" kicker={`Report ${typeLabel}`} tone="danger" />
-        </div>
-
-        <div className="space-y-4">
-          <p className="text-sm text-center" style={{ color: A.MUTE }}>
-            Why are you reporting this {reportType}?
-          </p>
-
-          {/* Reason selection */}
-          <div className="space-y-2">
-            {REPORT_REASONS.map((reason) => (
-              <button
-                key={reason.id}
-                onClick={() => {
-                  haptic('light');
-                  setSelectedReason(reason.id);
-                }}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all text-left active:scale-[0.97]",
-                  selectedReason === reason.id
-                    ? "border-border/[0.02] hover:border-border/[0.04]"
-                    : "border-border/[0.02] hover:border-border/[0.04]"
-                )}
-                /* 16% wash, not 5%: the light-tuned 5% has no presence on the
-                   dark sheet. Matches BIZ.amberTint. */
-                style={selectedReason === reason.id ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.16)' } : undefined}
-              >
-                <span className="text-xl">{reason.icon}</span>
-                <span className="font-medium" style={{ color: A.INK }}>{reason.label}</span>
-                {selectedReason === reason.id && (
-                   <div className="ml-auto w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#F7931E' }}>
-                    <span className="text-white text-xs">✓</span>
-                  </div>
-                )}
+    <BottomSheet open={open} onClose={() => onOpenChange(false)} ariaLabelledBy="report-sheet-title">
+      <div className="report-sheet">
+        <SheetHeader dark borderBottom={false} title={<span id="report-sheet-title">{reportSheetTitle(reportType, subject)}</span>}
+          sub="The clbhouz team reviews every report." onClose={() => onOpenChange(false)} />
+        <div className="report-reasons" role="radiogroup">
+          {REPORT_REASONS.map((reason) => {
+            const on = selectedReason === reason.id;
+            return (
+              <button key={reason.id} type="button" role="radio" aria-checked={on}
+                className={on ? 'report-reason on' : 'report-reason'}
+                onClick={() => { haptic('light'); setSelectedReason(reason.id); }}>
+                <span className="report-reason-text">
+                  <span className="report-reason-title">{reason.label}</span>
+                  <span className="report-reason-sub">{reason.sub}</span>
+                </span>
+                <span className="report-radio" aria-hidden />
               </button>
-            ))}
-          </div>
-
-          {/* Details textarea (show for "other" or always) */}
-          {selectedReason && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: A.MUTE }}>
-                Additional details {selectedReason !== 'other' && '(optional)'}
-              </label>
-              <Textarea
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                placeholder="Provide more context about this report..."
-                className="min-h-[80px] resize-none rounded-2xl border-amber-200/30"
-              />
-            </div>
-          )}
-
-          {/* Submit button */}
-          <Button
-            onClick={handleSubmit}
-            disabled={!selectedReason || (selectedReason === 'other' && !details.trim()) || submitting}
-            className="w-full h-12 rounded-full"
-            style={{ background: '#F7931E', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              'Submit Report'
-            )}
-          </Button>
-
-          <button
-            onClick={() => onOpenChange(false)}
-            className="w-full py-3 text-center text-muted-foreground font-medium"
-          >
-            Cancel
-          </button>
+            );
+          })}
         </div>
-      </SheetContent>
-    </Sheet>
+        {selectedReason && (
+          <div className="report-details">
+            <textarea value={details} onChange={(e) => setDetails(e.target.value)} aria-label="Report details"
+              placeholder={selectedReason === 'other' ? "Tell us what's wrong" : 'Anything else we should know? (optional)'} />
+          </div>
+        )}
+        <button type="button" className="report-send" disabled={disabled} onClick={handleSubmit}>
+          {submitting ? 'Sending...' : 'Send report'}
+        </button>
+      </div>
+    </BottomSheet>
   );
 }
