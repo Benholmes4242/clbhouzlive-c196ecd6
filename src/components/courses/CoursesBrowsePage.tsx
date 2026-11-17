@@ -3,8 +3,7 @@ import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
 import { useBrowseReviews } from './useBrowseReviews';
 import { useReviewAuthorRounds } from './useReviewAuthorRounds';
-import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
-import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useOpenLatestReview } from './browse/useOpenLatestReview';
 import StatBrowse from './StatBrowse';
 import { useCourseBrowseTruth } from './useStatBrowse';
 import { PhotoRailShell, WhoPlayingShell } from './browse/sectionShells';
@@ -51,24 +50,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
   // The reviewer's own rounds behind each review (BRIEF_COURSES_MEMBERS_SECTIONS §2).
   const reviewIds = useMemo(() => reviewPool.map(review => review.reviewId), [reviewPool]);
   const authorRounds = useReviewAuthorRounds(reviewIds, user?.id ?? null);
-  const openReviewSheet = useReviewSheetStore((st) => st.open);
-  const handleReviewTile = useCallback(
-    (r: LatestReview) => {
-      openReviewSheet({
-        user: { id: r.userId ?? '', name: r.reviewerName, username: r.reviewerUsername ?? undefined, avatar: r.reviewerAvatar },
-        courseId: r.courseId,
-        courseName: r.courseName,
-        rating: r.rating,
-        reviewId: r.reviewId,
-        courseCountry: r.courseCountry,
-        courseRegion: r.courseRegion,
-        courseSubCountry: r.courseSubCountry,
-        reviewText: r.quote,
-        breakdown: r.breakdown,
-      });
-    },
-    [openReviewSheet],
-  );
+  const handleReviewTile = useOpenLatestReview();
 
   return (
     <div>

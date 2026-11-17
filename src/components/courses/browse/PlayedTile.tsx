@@ -21,6 +21,7 @@ import { Bar } from '@/components/skeletons/shellVocabulary';
 import { formatRatingValue } from '@/utils/formatters';
 import { bestLately, dayLabel, interleaveTilePhotos, toParText } from './playedRings';
 import type { PlayedCourse } from './usePlayedRounds';
+import { useOpenLatestReview } from './useOpenLatestReview';
 import type { usePlayedTile, TileCoursePhoto, TileHolePhoto } from './usePlayedTile';
 import { FaceStack, MemberFace, PLAYED_SCRIM, UNDER_RED, GLASS } from './playedParts';
 import type { CourseGroup } from './WhoPlayingSection';
@@ -57,11 +58,14 @@ function Credit({ id, name, photo, day, faces }: { id: string | null; name: stri
   );
 }
 
-export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, inSheet = false, topGap = TILE_TOP }: {
+export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, inSheet = false, topGap = TILE_TOP, beforeReview }: {
   group: CourseGroup; course: PlayedCourse; tile: ReturnType<typeof usePlayedTile>; faces?: FacesMap;
   /** Sheet host: closes itself, then navigates. Defaults to a plain navigate. */
   onNavigate?: (to: string) => void; inSheet?: boolean; topGap?: number;
+  /** Sheet host: closes itself before the review sheet opens (the review sheet sits below BottomSheet's layer). */
+  beforeReview?: () => void;
 }) {
+  const openLatestReview = useOpenLatestReview();
   const navigate = useNavigate();
   const go = (to: string) => (onNavigate ? onNavigate(to) : navigate(to));
   const open = () => go(`/courses/${course.id}`);
@@ -70,6 +74,18 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
   const title = shortCoursePart(course.name);
   const review = group.rows.length === 0 ? group.reviews[0] ?? null : null;
   const reviewer = review ? group.faces.find((f) => f.userId === review.user_id) ?? null : null;
+  const openReview = () => {
+    if (!review) return;
+    beforeReview?.();
+    openLatestReview({
+      reviewId: review.id, courseId: course.id, courseName: course.name, courseImage: course.imageUrl,
+      rating: Number(review.rating ?? 0), quote: review.review ?? '', at: review.created_at,
+      userId: review.user_id, reviewerName: reviewer?.name ?? '', reviewerUsername: null, reviewerAvatar: reviewer?.photo ?? null,
+      mediaUrl: null, mediaType: null, posterUrl: null,
+      courseCountry: course.country, courseRegion: course.region, courseSubCountry: course.subCountry,
+      breakdown: { design: null, conditions: null, clubhouse: null, facilities: null },
+    });
+  };
   const best = bestLately(group.rows);
   const photos = interleaveTilePhotos<TileHolePhoto, TileCoursePhoto>(tile.holes, tile.photos, tile.hardestHole);
   const members = group.faces.length;
@@ -116,9 +132,9 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
         </button>
         ) : null}
         {review ? (
-          <button type="button" data-latest-review="" onClick={open}
+          <button type="button" data-latest-review="" onClick={openReview}
             style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: 10, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK, overflow: 'hidden' }}>
-            <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.AMBER, lineHeight: '10px' }}>LATEST REVIEW</span>
+            <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>LATEST REVIEW</span>
             <span style={{ display: 'block', minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <MemberFace face={reviewer ?? { userId: review.user_id ?? '', photo: null, name: null }} size={20} />

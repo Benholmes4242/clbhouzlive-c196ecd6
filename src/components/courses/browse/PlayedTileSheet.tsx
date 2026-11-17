@@ -30,7 +30,7 @@ export function PlayedTileSheet({ group, course, userId, faces, onClose }: {
       grabberColor="rgba(255,255,255,0.22)" grabberPadding="8px 0 0"
       style={{ paddingBottom: 'calc(30px + env(safe-area-inset-bottom, 0px))' }}>
       <div data-played-sheet={course.id}>
-        <PlayedTile group={group} course={course} tile={tile} faces={faces} onNavigate={go} inSheet topGap={SHEET_TILE_GAP} />
+        <PlayedTile group={group} course={course} tile={tile} faces={faces} onNavigate={go} beforeReview={onClose} inSheet topGap={SHEET_TILE_GAP} />
       </div>
     </BottomSheet>
   );

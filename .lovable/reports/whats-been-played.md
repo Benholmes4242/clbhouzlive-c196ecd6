@@ -207,3 +207,10 @@ through the test, not by eye.
 
 ## Amendment V4 §3 — one sideways viewer page
 `tilePhotoViewerArgs(row, tapped, course, coursePosts)` builds ONE synthetic post (`shots:played:<courseId>`) from the tile's already-loaded rows, mediaItems in row order, landing on the tapped photo via mediaId; posts length 1 so no vertical neighbours. Credits/videos from the canonical converters. In the sheet the viewer uses VIEWER_ABOVE_SHEETS_Z (FS_OVERLAY_Z sits below the sheet layer; reported, unchanged from V4). whatsBeenPlayedV4.test.tsx: replaced "hole and course photos open the viewer…" (asserted per-photo single post) with the row-order/index 2 test; extended the sheet test. Count unchanged at 11 in file; full suite not rerun.
+
+## FIX_LATEST_REVIEW_TAP (2026-11-17)
+- LATEST REVIEW card (incl. "{n} reviews lately ›") now opens that review in the review sheet; never navigates. The handleReviewTile mapping moved verbatim into `browse/useOpenLatestReview.ts`; CoursesBrowsePage and PlayedTile both use it (one copy). Tile fields the card lacks (username, breakdown, media) pass null.
+- Rail sheet: the sheets cannot stack — ReviewBottomSheet sits at REVIEW_SHEET_Z 240, below BottomSheet's 1400 — so the tile sheet closes first, then the review sheet opens.
+- Kicker amber → ink #F8FAFC (A.INK). Nothing else changed.
+- Tests: new `src/test/latestReviewTap.test.tsx` (+3). No existing assertion changed.
+- Full suite after 7a7bec2b4e + this fix: 2,275 / 2,227 / 2,260 / 2,335 = 9,097 passing (9,094 + 3). Typecheck clean (tsgo). Device checks unchecked (signed-in).
