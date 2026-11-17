@@ -15,11 +15,12 @@ vi.mock('@/hooks/useCourseMediaCounts', () => ({ useCourseMediaCounts: () => ({ 
 vi.mock('@/features/pro-verification/InlineProMemberName', () => ({ InlineProMemberName: ({ children }: { children: React.ReactNode }) => <span>{children}</span> }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span data-face="" /> }));
 import {
-  bestLately, buildAreaTabs, buildRails, dayLabel, interleaveTilePhotos, milesAwayText, railHeading, railShowsSeeAll, seenKey, toParText, topUpRail,
+  bestLately, buildAreaTabs, buildRails, dayLabel, interleaveTilePhotos, milesAwayText, railHeading, railShowsSeeAll, seenKey, toParText, topUpRail, hardestHoleFromRanks,
   type HomePlace, type PlacedCourse,
 } from '@/components/courses/browse/playedRings';
 import { WhoPlayingSection, groupRounds } from '@/components/courses/browse/WhoPlayingSection';
 import { tileDistanceText } from '@/components/courses/browse/PlayedTile';
+import { HOLE_DIFFICULTY_MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
 
 const UKI = 'Britain & Ireland';
 const c = (id: string, o: Partial<PlacedCourse>): PlacedCourse => ({ id, region: null, subCountry: null, country: UKI, continent: 'Europe', lat: null, lng: null, ...o });
@@ -195,5 +196,49 @@ describe('section', () => {
     const groups = groupRounds(f.hook.rounds.data);
     expect(groups.map((x) => x.courseId)).toEqual(['near', 'fife', 'kent']);
     expect(groups[0].faces.map((x) => x.userId)).toEqual(['cy', 'ann', 'bob']);
+  });
+});
+
+describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.topUps = { byRail: new Map(), ready: true }; f.counts = 0;
+    setHook([row('1', 'near', 'ann', 71), row('2', 'near', 'bob', 77, '2026-11-08'), row('4', 'kent', 'ann', 72), row('5', 'fife', 'dee', 79)],
+      [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
+  });
+  afterEach(cleanup);
+  const present = (c: HTMLElement) => {
+    expect(c.querySelector('[data-who-shell]')).toBeNull();
+    for (const sel of ['[data-played-rings]', '[data-played-tile]', '[data-best-entry]']) expect(c.querySelector(sel)).not.toBeNull();
+    expect(screen.getAllByRole('tab').length).toBeGreaterThan(0);
+  };
+  const photo = { kind: 'course', key: 'c:1', createdAt: '2026-11-10', imageUrl: 'x.jpg', caption: '', memberName: null };
+  it('a ring selected with pending photo reads stays mounted with two placeholders, then swaps', () => {
+    const { container, rerender } = mount();
+    fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
+    const rails = container.querySelector('[data-whats-been-played]')!.lastElementChild;
+    f.tile = { holes: [], photos: [], hardestHole: null, ready: false };
+    fireEvent.click(container.querySelectorAll('[data-played-ring]')[1]);
+    present(container);
+    expect(container.querySelectorAll('[data-tile-pending]')).toHaveLength(2);
+    expect(container.querySelector('[data-whats-been-played]')!.lastElementChild).toBe(rails);
+    f.tile = { holes: [], photos: [photo], hardestHole: null, ready: true };
+    rerender(<QueryClientProvider client={new QueryClient()}><MemoryRouter><WhoPlayingSection /></MemoryRouter></QueryClientProvider>);
+    expect(container.querySelectorAll('[data-tile-pending]')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-tile-photo]')).toHaveLength(1);
+  });
+  it('a tab change with pending reads behaves the same', () => {
+    const { container } = mount();
+    f.tile = { holes: [], photos: [], hardestHole: null, ready: false };
+    fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
+    present(container);
+    expect(container.querySelectorAll('[data-tile-pending]')).toHaveLength(2);
+  });
+});
+
+describe('hardest hole minimum', () => {
+  it('shows at the minimum rounds and not one fewer', () => {
+    expect(hardestHoleFromRanks([{ hole_no: 7, difficulty_rank: 1, rounds: HOLE_DIFFICULTY_MIN_ROUNDS }])).toBe(7);
+    expect(hardestHoleFromRanks([{ hole_no: 7, difficulty_rank: 1, rounds: HOLE_DIFFICULTY_MIN_ROUNDS - 1 }])).toBeNull();
   });
 });

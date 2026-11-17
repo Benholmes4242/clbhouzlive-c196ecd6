@@ -1,3 +1,4 @@
+import { HOLE_DIFFICULTY_MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
 /**
  * WHAT'S BEEN PLAYED — pure rules (BRIEF_WHATS_BEEN_PLAYED, replacing
  * BRIEF_PLAYED_RINGS_AND_AREA_TABS). Tabs cover the member's own patch only
@@ -86,6 +87,11 @@ export function readSeen(userId: string | null | undefined): SeenMap | null {
 }
 export function writeSeen(userId: string | null | undefined, map: SeenMap): void {
   try { window.localStorage.setItem(seenKey(userId), JSON.stringify(map)); } catch { /* storage unavailable */ }
+}
+/** Rank-1 hole only once its row has HOLE_DIFFICULTY_MIN_ROUNDS rounds; else none. */
+export function hardestHoleFromRanks(rows: Array<{ hole_no: number; difficulty_rank: number; rounds: number | null }>): number | null {
+  const top = rows.find((r) => r.difficulty_rank === 1);
+  return top && (top.rounds ?? 0) >= HOLE_DIFFICULTY_MIN_ROUNDS ? top.hole_no : null;
 }
 export const isNewRing = (g: RingGroup, seen: SeenMap | null) => !seen || seen[g.courseId] !== g.latestScoreId;
 

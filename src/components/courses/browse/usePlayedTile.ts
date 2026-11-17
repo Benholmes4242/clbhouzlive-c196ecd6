@@ -6,7 +6,7 @@
  *   fetchHolePhotos) names the tagged holes; each hole's credited rows come
  *   from get_hole_media via holeMediaQuery, the same path useCourseGallery
  *   uses, which supplies hole number, par, yards and member.
- * - hardest hole: get_course_hole_ranks rank 1, only when ranks exist.
+ * - hardest hole: get_course_hole_ranks rank 1, only at HOLE_DIFFICULTY_MIN_ROUNDS.
  * - course photos: galleryCourseMediaQuery (get_course_media_v2, filter all).
  */
 import { useMemo } from 'react';
@@ -18,6 +18,7 @@ import { holeMediaQuery } from '@/lib/courseMedia/holeMediaQuery';
 import type { MemberShotRow } from '@/lib/courseMedia/memberShotPosts';
 import { galleryCourseMediaQuery } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
 import { settled } from './PageLoadGate';
+import { hardestHoleFromRanks } from './playedRings';
 
 export interface TileHolePhoto { kind: 'hole'; key: string; holeNo: number; addedAt: string; imageUrl: string; par: number | null; yards: number | null; memberName: string | null; sourcePostId: string | null }
 export interface TileCoursePhoto { kind: 'course'; key: string; createdAt: string; imageUrl: string; caption: string; memberName: string | null }
@@ -61,8 +62,7 @@ export function usePlayedTile(courseId: string | null, userId: string | undefine
   }, [holeReads, holeNumbers]);
 
   const hardestHole = useMemo(() => {
-    const rows = (ranks.data ?? []) as Array<{ hole_no: number; difficulty_rank: number }>;
-    return rows.find((r) => r.difficulty_rank === 1)?.hole_no ?? null;
+    return hardestHoleFromRanks((ranks.data ?? []) as Array<{ hole_no: number; difficulty_rank: number; rounds: number }>);
   }, [ranks.data]);
 
   const photos = useMemo<TileCoursePhoto[]>(() => {

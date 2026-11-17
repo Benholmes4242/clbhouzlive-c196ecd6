@@ -40,3 +40,11 @@ Authorised rewrites, old → new:
 - Signed-in checks at 375 and 320 are unchecked, because I can't sign in.
 - Signed out, /courses at 375 and 320 renders with no section (guests see nothing), no sideways overflow and no page errors.
 - The 320 containment for the signed-in section is checked structurally in jsdom only.
+
+## BRIEF_WHATS_BEEN_PLAYED_FIXES
+
+- §1 Built. The section's readiness is latched after its first ready, and useSectionReady reports only that first ready. Later ring or tab changes re-render in place. While a course's photo reads are pending, the photo row shows two 140×186 radius-14 shell Bars after BEST LATELY. The row stays 186px high.
+- §2 NOT BUILT (held). It would change an existing assertion: `selecting a ring stores its newest round as seen` expects `toEqual({ kent: '4' })`. With the default ring written on load, the map becomes `{ near: '1', kent: '4' }`.
+- §3 Built. `HOLE_DIFFICULTY_MIN_ROUNDS` (20) lives in src/lib/courses/holeDifficulty.ts and is read by AllHolesSheet and by `hardestHoleFromRanks` (playedRings.ts, used by usePlayedTile). HARDEST appears only when the rank-1 row's rounds reach that minimum.
+- New tests (+3): pending ring stays mounted, then swaps; pending tab change; hardest at the minimum and at one fewer. The §2 test waits on the ruling.
+- Shards: 2,271 / 2,224 / 2,249 / 2,308 = 9,052 (9,049 + 3). No existing assertion changed.

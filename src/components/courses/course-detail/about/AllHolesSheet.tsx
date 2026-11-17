@@ -17,7 +17,7 @@ import { BUCKETS, courseBucketShares, type BucketShares } from '@/features/cours
 import { buildParTypeRows, type ParTypeRow } from '@/features/courses/components/holes/analytical/parTypeRows';
 import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
 
-const MIN_ROUNDS = 20;
+import { HOLE_DIFFICULTY_MIN_ROUNDS as MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
 const ROW_KICKER: React.CSSProperties = {
   fontFamily: SANS,
   fontSize: 7,

@@ -11,6 +11,7 @@ import { shareCourseName } from '@/lib/courses/shareCourseName';
 import { firstName } from '@/lib/whs/share';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
+import { Bar } from '@/components/skeletons/shellVocabulary';
 import { bestLately, dayLabel, haversineKm, interleaveTilePhotos, milesAwayText, toParText, type HomePlace } from './playedRings';
 import type { PlayedCourse } from './usePlayedRounds';
 import type { usePlayedTile, TileCoursePhoto, TileHolePhoto } from './usePlayedTile';
@@ -89,7 +90,9 @@ export function PlayedTile({ group, course, home, tile }: { group: CourseGroup; 
             {group.rounds === 1 ? '1 round lately \u203A' : `${fmtCount(group.rounds)} rounds lately \u203A`}
           </span>
         </button>
-        {photos.length === 0 ? (
+        {!tile.ready ? (
+          [0, 1].map((i) => <span key={i} data-tile-pending="" style={{ flex: 'none', display: 'block', width: PHOTO_TILE_W, height: TILE_ROW_H }}><Bar style={{ width: '100%', height: '100%', borderRadius: TILE_RADIUS }} /></span>)
+        ) : photos.length === 0 ? (
           <button type="button" data-tile-empty="" onClick={open} style={{ all: 'unset', flex: 'none', width: EMPTY_TILE_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS, overflow: 'hidden', cursor: 'pointer', position: 'relative' }}>
             <CourseImageFallback courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
               <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.2) 0%, rgba(0,0,0,.8) 100%)' }} />

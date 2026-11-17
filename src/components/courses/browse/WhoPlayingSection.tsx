@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { RailChips } from '@/components/ui/RailChips';
@@ -83,7 +83,12 @@ export function WhoPlayingSection() {
   const tile = usePlayedTile(current?.courseId ?? null, userId);
 
   const roundsReady = settled(played.rounds) && (played.ids.length === 0 || settled(played.courses));
-  const ready = !sessionLoading && (!user || (roundsReady && played.homeReady && (!current || tile.ready) && topUps.ready));
+  const firstReady = !sessionLoading && (!user || (roundsReady && played.homeReady && (!current || tile.ready) && topUps.ready));
+  // Latched: after the first ready the section never returns to the shell;
+  // later selections re-render in place and only the photo row waits.
+  const everReady = useRef(false);
+  if (firstReady) everReady.current = true;
+  const ready = everReady.current;
   useSectionReady('whoPlaying', ready);
 
   if (!ready) return <WhoPlayingShell />;
