@@ -27,14 +27,15 @@ import type { usePlayedTile, TileCoursePhoto, TileHolePhoto } from './usePlayedT
 import { FaceStack, MemberFace, PLAYED_SCRIM, UNDER_RED, GLASS } from './playedParts';
 import type { CourseGroup } from './WhoPlayingSection';
 
-export const TILE_ROW_H = 186;
-export const BEST_CARD_W = 120;
-export const PHOTO_TILE_W = 140;
+export const TILE_ROW_H = 216;
+export const BEST_CARD_W = 156;
+export const PHOTO_TILE_W = 156;
 export const EMPTY_TILE_W = 230;
-export const TILE_RADIUS = 14;
+export const TILE_RADIUS = 16;
+export const TILE_ROW_GAP = 8;
+export const TILE_CARD_PAD = 12;
 export const TILE_TOP = 18;
 export const TILE_NAME_LINE = 22;
-export const TILE_SUB_LINE = 15;
 export const TILE_ROW_TOP = 12;
 export const FACES_TOP = 12;
 export const FACE_SIZE = 22;
@@ -97,14 +98,11 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
     <div data-played-tile={course.id} style={{ margin: `${topGap}px 16px 0` }}>
       <div data-tile-head="" style={{ display: 'block', width: '100%' }}>
         <b data-tile-title="" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere', fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 800, color: A.INK }}>{title}</b>
-        <div data-tile-sub="" style={{ marginTop: 3, fontSize: 12, lineHeight: `${TILE_SUB_LINE}px`, color: A.MUTE, ...ell }}>
-          Through members{'\u2019'} eyes
-        </div>
       </div>
-      <div className="scrollbar-hide" data-tile-row="" style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none', margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
+      <div className="scrollbar-hide" data-tile-row="" style={{ display: 'flex', gap: TILE_ROW_GAP, overflowX: 'auto', scrollbarWidth: 'none', margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
         {group.rows.length > 0 ? (
         <button type="button" data-best-lately="" onClick={openLately}
-          style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: 10, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK }}>
+          style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: TILE_CARD_PAD, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK }}>
           <span data-best-kicker="" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>BEST LATELY</span>
           {best.map((r) => {
             const par = toParText(r.gross_score as number, r.course_par);
@@ -134,7 +132,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
         ) : null}
         {review ? (
           <button type="button" data-latest-review="" onClick={openReview}
-            style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: 10, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK, overflow: 'hidden' }}>
+            style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: TILE_CARD_PAD, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK, overflow: 'hidden' }}>
             <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>LATEST REVIEW</span>
             <span style={{ display: 'block', minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

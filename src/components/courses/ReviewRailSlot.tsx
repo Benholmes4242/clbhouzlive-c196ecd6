@@ -1,14 +1,9 @@
 /**
- * SLOT A — "What members say": a horizontal rail of three compact reviews,
- * placed between the course cards on the Courses browse.
- *
- * WHY IT LOOKS NOTHING LIKE THE DISCOVER MOSAIC: that mosaic is 265px
- * photo-led tiles, and alternating those with the course cards — which are
- * ALSO full-bleed photographs with glass chips — would put two card systems on
- * one page. These panels use a PANEL surface rather than a card surface and
- * carry NO photograph, so the photography stays on the courses.
- *
- * Presentation only. Placement and selection belong to reviewSlots.ts.
+ * LATEST REVIEWS card B (BRIEF_COURSES_PAGE_V5 §4, whats-been-played-v5 mock):
+ * a 260 × 216 text card in the Best lately grammar — REVIEW kicker, face and
+ * rating, course name, three-line quote, footer of the reviewer's name and
+ * their rounds here. Only LatestReviewsSection renders this rail (the shell
+ * reads its geometry). Placement and selection belong to the section.
  */
 
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
@@ -16,97 +11,41 @@ import React from 'react';
 import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
 
-import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
-import { A, LABEL, TOPAR_RED, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { bestLabel, roundsLabel, toParFigure, type ReviewAuthorRound } from './reviewAuthorRounds';
+import { INK, INK_FAINT, INK_MUTE } from '@/features/courses/_shared/tokens';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import type { ReviewAuthorRound } from './reviewAuthorRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
-/* Panel geometry, read by the panel AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
-export const CARD_W = 244;
-export const REVIEW_RADIUS = 14;
+/* Card geometry, read by the card AND its shell. */
+export const CARD_W = 260;
+export const REVIEW_H = 216;
+export const REVIEW_RADIUS = 16;
 export const REVIEW_PAD = 12;
-export const REVIEW_GAP = 10;
-export const REVIEW_RAIL_X = 20;
-export const REVIEW_RATING_SIZE = 17;
-export const REVIEW_NAME = { marginTop: 8, size: 13.5, lineHeight: 1.25 } as const;
-export const REVIEW_QUOTE = { marginTop: 6, size: 12.5, lineHeight: 1.45 } as const;
-export const REVIEW_FOOT = { marginTop: 12, avatar: 20 } as const;
+export const REVIEW_GAP = 8;
+export const REVIEW_RAIL_X = 16;
+export const REVIEW_AVATAR = 24;
+export const REVIEW_BG = '#16161B';
+const QUOTE_INK = 'rgba(248,250,252,.78)';
 
-const FIGS: React.CSSProperties = {
-  fontVariantNumeric: 'tabular-nums',
-  fontFeatureSettings: '"zero" 0',
-};
+const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"zero" 0' };
+const ELL: React.CSSProperties = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
-const clamp = (lines: number): React.CSSProperties => ({
-  display: '-webkit-box',
-  WebkitBoxOrient: 'vertical',
-  WebkitLineClamp: lines,
-  overflow: 'hidden',
-});
-
-function Reviewer({ r }: { r: LatestReview }) {
-  const { t } = useTranslation('courses');
-  const name = r.reviewerName || t('discover.reviews.member', 'A member');
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-      <SquircleAvatar src={r.reviewerAvatar} userId={r.userId} alt={name} size={REVIEW_FOOT.avatar} hairlineRing />
-      <span
-        style={{
-          fontSize: 11.5,
-          fontWeight: 600,
-          color: INK_MUTE,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {name}
-      </span>
-    </div>
-  );
+/** Footer tail after the name: " · {n} round(s) here · best {gross}" ("your best" for the viewer's own). */
+export function reviewFootTail(author: ReviewAuthorRound | undefined, mine: boolean): string {
+  if (!author || !(author.rounds_here > 0)) return '';
+  const rounds = `${author.rounds_here} ${author.rounds_here === 1 ? 'round' : 'rounds'} here`;
+  const best = author.best_gross != null ? ` \u00B7 ${mine ? 'your best' : 'best'} ${author.best_gross}` : '';
+  return ` \u00B7 ${rounds}${best}`;
 }
 
 interface Props {
   reviews: LatestReview[];
   onReviewPress: (r: LatestReview) => void;
-  /** BRIEF_COURSES_MEMBERS_SECTIONS §2 — the reviewer's own rounds, keyed by
-   * review id. Only the Courses browse passes it, so every other render of the
-   * rail is unchanged. */
+  /** The reviewer's own rounds, keyed by review id; absent means name only. */
   authorRounds?: Map<string, ReviewAuthorRound>;
   /** The viewer: their own review names the best score as theirs. */
   viewerId?: string | null;
-}
-
-/* The played strip (mock .played): a value line above a label line, no
-   dividers, tabular figures. */
-const PLAYED: React.CSSProperties = { marginTop: 10, display: 'flex', gap: 16 };
-const PLAYED_VALUE: React.CSSProperties = { ...FIGS, display: 'block', fontSize: 16, fontWeight: 700, lineHeight: 1, color: INK };
-const PLAYED_LABEL: React.CSSProperties = { display: 'block', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: INK_FAINT };
-const PLAYED_TO_PAR: React.CSSProperties = { fontStyle: 'normal', fontSize: 11, marginLeft: 2, color: INK_MUTE };
-
-function PlayedStrip({ author, mine }: { author: ReviewAuthorRound; mine: boolean }) {
-  return (
-    <div data-review-played style={PLAYED}>
-      <div data-played-figure="rounds">
-        <span style={PLAYED_VALUE}>{author.rounds_here}</span>
-        <span style={PLAYED_LABEL}>{roundsLabel(author.rounds_here)}</span>
-      </div>
-      {author.best_gross != null && (
-        <div data-played-figure="best">
-          <span style={PLAYED_VALUE}>
-            {author.best_gross}
-            {author.best_to_par != null && (
-              <em data-played-to-par style={{ ...PLAYED_TO_PAR, color: author.best_to_par < 0 ? TOPAR_RED : INK_MUTE }}>
-                {toParFigure(author.best_to_par)}
-              </em>
-            )}
-          </span>
-          <span style={PLAYED_LABEL}>{bestLabel(mine)}</span>
-        </div>
-      )}
-    </div>
-  );
 }
 
 export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, authorRounds, viewerId }) => {
@@ -115,24 +54,17 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, author
 
   return (
     <section>
-      <div
-        style={{
-          display: 'flex',
-          gap: REVIEW_GAP,
-          overflowX: 'auto',
-          padding: `0 ${REVIEW_RAIL_X}px`,
-          scrollbarWidth: 'none',
-        }}
-      >
+      <div style={{ display: 'flex', gap: REVIEW_GAP, overflowX: 'auto', padding: `0 ${REVIEW_RAIL_X}px`, scrollbarWidth: 'none' }}>
         {reviews.map((r) => {
-          const author = authorRounds?.get(r.reviewId);
           const mine = !!viewerId && !!r.userId && r.userId === viewerId;
+          const name = r.reviewerName || t('discover.reviews.member', 'A member');
           return (
           // CB69 — non-button tile so the course name can be a real button.
           <div
             key={r.reviewId}
             role="button"
             tabIndex={0}
+            data-review-card=""
             onClick={() => onReviewPress(r)}
             onKeyDown={(e) => {
               if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
@@ -141,68 +73,37 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, author
               }
             }}
             style={{
-              width: CARD_W,
-              flexShrink: 0,
-              textAlign: 'left',
-              background: SURFACE,
-              border: `1px solid ${HAIRLINE_INK_8}`,
-              borderRadius: REVIEW_RADIUS,
-              padding: REVIEW_PAD,
-              cursor: 'pointer',
+              width: CARD_W, height: REVIEW_H, flexShrink: 0, boxSizing: 'border-box', textAlign: 'left',
+              background: REVIEW_BG, border: 0, borderRadius: REVIEW_RADIUS, padding: REVIEW_PAD,
+              display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer', color: INK,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span
-                style={{
-                  ...FIGS,
-                  fontSize: REVIEW_RATING_SIZE,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  letterSpacing: '-0.02em',
-                  color: courseSubScoreTone(r.rating),
-                }}
-              >
-                {r.rating.toFixed(1)}
-              </span>
-              <span style={{ ...LABEL, color: INK_FAINT }}>
-                {t('statBrowse.reviews.outOfTen')}
+            <span data-review-kicker="" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', lineHeight: '10px', color: INK }}>REVIEW</span>
+            <div style={{ marginTop: 9, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <SquircleAvatar src={r.reviewerAvatar} userId={r.userId} alt={name} size={REVIEW_AVATAR} surface="canvas" hairlineRing />
+              <span data-review-score="" style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
+                <b style={{ ...FIGS, fontSize: 22, fontWeight: 700, lineHeight: 1, color: courseSubScoreTone(r.rating) }}>{r.rating.toFixed(1)}</b>
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: INK_FAINT }}>/10</span>
               </span>
             </div>
-
             <CourseNameLink
               as="div"
               courseId={r.courseId}
               textProps={{ 'data-review-rail-course': '' }}
-              wrapperStyle={{ marginTop: REVIEW_NAME.marginTop }}
+              wrapperStyle={{ marginTop: 8, minWidth: 0, maxWidth: '100%' }}
               style={{
-                ...(r.courseId ? null : { marginTop: REVIEW_NAME.marginTop }),
-                fontSize: REVIEW_NAME.size,
-                fontWeight: 700,
-                lineHeight: REVIEW_NAME.lineHeight,
-                color: INK,
-                ...clamp(2),
+                ...(r.courseId ? null : { marginTop: 8 }),
+                display: 'block', fontSize: 13.5, fontWeight: 700, lineHeight: 1.25, color: INK, ...ELL,
               }}
             >
               {r.courseName}
             </CourseNameLink>
-
-            <p
-              style={{
-                marginTop: REVIEW_QUOTE.marginTop,
-                fontSize: REVIEW_QUOTE.size,
-                lineHeight: REVIEW_QUOTE.lineHeight,
-                color: INK_MUTE,
-                ...clamp(3),
-              }}
-            >
+            <p style={{ marginTop: 4, fontSize: 11.5, lineHeight: 1.4, color: QUOTE_INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
               <MentionText text={r.quote} disableNavigation />
             </p>
-
-            <div style={{ marginTop: REVIEW_FOOT.marginTop }}>
-              <Reviewer r={r} />
+            <div data-review-foot="" style={{ marginTop: 'auto', fontSize: 11, lineHeight: '14px', color: INK_MUTE, ...ELL }}>
+              <b style={{ fontWeight: 600, color: INK }}>{name}</b>{reviewFootTail(authorRounds?.get(r.reviewId), mine)}
             </div>
-
-            {author && <PlayedStrip author={author} mine={mine} />}
           </div>
           );
         })}

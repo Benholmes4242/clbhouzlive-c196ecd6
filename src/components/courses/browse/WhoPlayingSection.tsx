@@ -9,6 +9,10 @@ import { useSectionReady } from './PageLoadGate';
 import { settled } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
 import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, writeSeen, type RingGroup, type SeenMap } from './playedRings';
+/** V5 §1 G1: a NEW ring's border is an amber gradient, bright top right where the count sits. */
+export const NEW_RING_BG = 'linear-gradient(#0A0A0C, #0A0A0C) padding-box, linear-gradient(225deg, #FFC069 0%, #F7931E 40%, #8C4512 100%) border-box';
+export const NEW_COUNT = '#FFB24D';
+
 type MemberFacesMap = Map<string, { displayName: string | null; username: string | null; photoUrl: string | null }>;
 const NO_FACES: MemberFacesMap = new Map();
 import { postCourseIds, usePlayedRounds, type PlayedCourse, type PlayedPostRow, type PlayedReviewRow, type PlayedRoundRow } from './usePlayedRounds';
@@ -181,16 +185,16 @@ export function WhoPlayingSection() {
           const { short, variant } = shareCourseName(c?.name ?? '');
           const isSel = current?.courseId === g.courseId;
           const isNew = isNewRing(g, seen);
-          const edge = isSel ? A.INK : isNew ? A.AMBER : SEEN_EDGE;
-          const badge = isSel ? A.INK : isNew ? A.AMBER : A.MUTE;
+          const edge = isSel ? A.INK : isNew ? 'transparent' : SEEN_EDGE;
+          const badge = isSel ? A.INK : isNew ? NEW_COUNT : A.MUTE;
           const state = isSel ? 'selected' : isNew ? 'new' : 'seen';
           return (
             <button key={g.courseId} type="button" data-played-ring={state} aria-pressed={isSel} onClick={() => select(g)}
               style={{ flex: 'none', width: RING_ITEM_W, padding: 0, background: 'none', border: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start', alignSelf: 'flex-start', textAlign: 'center', cursor: 'pointer', color: A.INK }}>
-              <span style={{ position: 'relative', display: 'block', width: RING_SIZE, height: RING_SIZE, margin: '0 4px', boxSizing: 'border-box', borderRadius: RING_RADIUS, border: `${RING_BORDER}px solid ${edge}` }}>
+              <span style={{ position: 'relative', display: 'block', width: RING_SIZE, height: RING_SIZE, margin: '0 4px', boxSizing: 'border-box', borderRadius: RING_RADIUS, border: `${RING_BORDER}px solid ${edge}`, ...(state === 'new' ? { background: NEW_RING_BG } : null) }}>
                 <CourseImageFallback courseId={g.courseId} courseName={c?.name} imageUrl={c?.imageUrl} initialsSize={14}
                   style={{ position: 'absolute', inset: RING_INSET, borderRadius: RING_PHOTO_RADIUS, overflow: 'hidden' }} />
-                <span data-ring-count="" style={{ position: 'absolute', top: -7, right: -7, zIndex: 2, minWidth: 20, height: 18, padding: '0 5px', boxSizing: 'border-box', borderRadius: BADGE_RADIUS, background: A.CANVAS, border: `1.5px solid ${edge}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: badge }}>
+                <span data-ring-count="" style={{ position: 'absolute', top: -7, right: -7, zIndex: 2, minWidth: 20, height: 18, padding: '0 5px', boxSizing: 'border-box', borderRadius: BADGE_RADIUS, background: A.CANVAS, border: `1.5px solid ${state === 'new' ? NEW_COUNT : edge}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: badge }}>
                   {fmtCount(g.activity)}
                 </span>
               </span>

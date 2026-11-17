@@ -77,7 +77,7 @@ describe('V4 §2 tile head', () => {
     expect(title.textContent).toBe('Sundridge Park (East Course)');
     expect(title.style.webkitLineClamp || (title.style as any).WebkitLineClamp).toBe('2');
     expect(title.style.lineHeight).toBe('22px');
-    expect(container.querySelector('[data-tile-sub]')?.textContent).toBe('Through members\u2019 eyes');
+    expect(container.querySelector('[data-tile-sub]')).toBeNull();
     expect(container.querySelector('[data-tile-place]')).toBeNull();
     expect(container.querySelector('[data-tile-explore]')?.textContent).toBe('Explore Sundridge Park \u203A');
   });

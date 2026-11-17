@@ -15,12 +15,11 @@
  */
 import React from 'react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { HAIRLINE_INK_8 } from '@/features/courses/_shared/tokens';
 import { Bar } from '@/components/skeletons/shellVocabulary';
 import { HERO_FIGURE_LABEL, HERO_FIGURE_VALUE } from '../CourseMasthead';
 import {
-  CARD_W as REVIEW_W, REVIEW_FOOT, REVIEW_GAP, REVIEW_NAME, REVIEW_PAD, REVIEW_QUOTE,
-  REVIEW_RADIUS, REVIEW_RAIL_X, REVIEW_RATING_SIZE,
+  CARD_W as REVIEW_W, REVIEW_AVATAR, REVIEW_BG, REVIEW_GAP, REVIEW_H, REVIEW_PAD,
+  REVIEW_RADIUS, REVIEW_RAIL_X,
 } from '../ReviewRailSlot';
 import {
   HEAD_GAP, HEAD_KICKER_SIZE, HEAD_TITLE_GAP, HEAD_TITLE_LINE_HEIGHT, HEAD_TITLE_SIZE, SECTION_WRAP,
@@ -30,7 +29,7 @@ import {
   RING_GAP, RING_ITEM_W, RING_LABEL_GAP, RING_LABEL_LINE, RING_RADIUS, RING_ROW_PAD_TOP, RING_ROW_TOP, RING_SIZE, TAB_H, TABS_TOP,
 } from './WhoPlayingSection';
 import {
-  BEST_CARD_W, BUTTON_H, BUTTON_TOP, FACE_SIZE, FACES_TOP, PHOTO_TILE_W, TILE_NAME_LINE, TILE_RADIUS, TILE_ROW_H, TILE_ROW_TOP, TILE_SUB_LINE, TILE_TOP,
+  BEST_CARD_W, BUTTON_H, BUTTON_TOP, FACE_SIZE, FACES_TOP, PHOTO_TILE_W, TILE_NAME_LINE, TILE_RADIUS, TILE_ROW_GAP, TILE_ROW_H, TILE_ROW_TOP, TILE_TOP,
 } from './PlayedTile';
 import { PLAYED_KICKER, PLAYED_TITLE } from './playedParts';
 import { REGION_GAP, REGION_TILE_H, REGION_TILES_NO_LEAD } from './ByRegionSection';
@@ -101,8 +100,7 @@ export function WhoPlayingShell() {
         <div style={{ height: TILE_NAME_LINE, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Bar style={{ height: 15, width: 150 }} />
         </div>
-        <div style={{ marginTop: 3 }}>{line(TILE_SUB_LINE, 170, 9)}</div>
-        <div style={{ display: 'flex', overflow: 'hidden', gap: 6, margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
+        <div style={{ display: 'flex', overflow: 'hidden', gap: TILE_ROW_GAP, margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
           <Bar style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS }} />
           {[0, 1].map((i) => <Bar key={i} style={{ flex: 'none', width: PHOTO_TILE_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS }} />)}
         </div>
@@ -200,8 +198,6 @@ export function HardestShell() {
  * only grow when the 2- and 3-line clamps fill.
  */
 export function LatestReviewsShell() {
-  const nameH = REVIEW_NAME.size * REVIEW_NAME.lineHeight;
-  const quoteH = REVIEW_QUOTE.size * REVIEW_QUOTE.lineHeight;
   return (
     <HeadShell>
       <div style={BLEED}>
@@ -209,22 +205,22 @@ export function LatestReviewsShell() {
           {[0, 1].map((i) => (
             <div
               key={i}
+              data-review-shell-card=""
               style={{
-                width: REVIEW_W, flexShrink: 0, boxSizing: 'border-box',
-                border: `1px solid ${HAIRLINE_INK_8}`, borderRadius: REVIEW_RADIUS, padding: REVIEW_PAD,
+                width: REVIEW_W, height: REVIEW_H, flexShrink: 0, boxSizing: 'border-box', background: REVIEW_BG,
+                borderRadius: REVIEW_RADIUS, padding: REVIEW_PAD, display: 'flex', flexDirection: 'column',
               }}
             >
-              <Bar style={{ height: REVIEW_RATING_SIZE, width: 54 }} />
-              <div style={{ marginTop: REVIEW_NAME.marginTop, height: nameH, display: 'flex', alignItems: 'center' }}>
-                <Bar style={{ height: REVIEW_NAME.size - 3, width: '70%' }} />
+              <Bar style={{ height: 7, width: 44 }} />
+              <div style={{ marginTop: 9, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Bar style={{ height: REVIEW_AVATAR, width: REVIEW_AVATAR, borderRadius: '34%' }} />
+                <Bar style={{ height: 16, width: 48 }} />
               </div>
-              <div style={{ marginTop: REVIEW_QUOTE.marginTop, height: quoteH, display: 'flex', alignItems: 'center' }}>
-                <Bar style={{ height: REVIEW_QUOTE.size - 3, width: '92%' }} />
-              </div>
-              <div style={{ marginTop: REVIEW_FOOT.marginTop, display: 'flex', alignItems: 'center', gap: 7 }}>
-                <Bar style={{ height: REVIEW_FOOT.avatar, width: REVIEW_FOOT.avatar, borderRadius: '34%' }} />
-                <Bar style={{ height: 9, width: 80 }} />
-              </div>
+              <div style={{ marginTop: 8, height: 17, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 10.5, width: '70%' }} /></div>
+              {[92, 86, 60].map((w, j) => (
+                <div key={j} style={{ marginTop: j === 0 ? 4 : 0, height: 16, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 8.5, width: `${w}%` }} /></div>
+              ))}
+              <div style={{ marginTop: 'auto', height: 14, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 8, width: '75%' }} /></div>
             </div>
           ))}
         </div>

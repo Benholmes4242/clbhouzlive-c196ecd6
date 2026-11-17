@@ -77,8 +77,8 @@ describe('V3 §1 ring count on the corner', () => {
     expect(seen.style.border.replace(/\s/g, '')).toBe('1.5pxsolidrgba(255,255,255,.16)');
     expect(seen.style.color).toBe('rgba(248, 250, 252, 0.62)');
     const fresh = badge('new');
-    expect(fresh.style.border).toMatch(/^1.5px solid (#f7931e|rgb\(247, 147, 30\))$/i);
-    expect(fresh.style.color).toBe('rgb(247, 147, 30)');
+    expect(fresh.style.border).toMatch(/^1.5px solid (#ffb24d|rgb\(255, 178, 77\))$/i);
+    expect(fresh.style.color).toBe('rgb(255, 178, 77)');
     // The badge is a child of the ring box, not the photo.
     expect(sel.parentElement?.querySelector(':scope > [data-ring-count]')).toBe(sel);
   });

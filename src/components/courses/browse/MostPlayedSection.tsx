@@ -3,7 +3,7 @@ import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { useStatBrowseList } from '../useStatBrowse';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
-import { fmtCount, playsToPar, plural, RAIL_BLEED } from './format';
+import { fmtCount, playsToPar, RAIL_BLEED } from './format';
 import { PhotoFigureCard, MOST_PLAYED_COUNT, PHOTO_FIGURE_GAP } from './PhotoFigureCard';
 import { PhotoRailShell } from './sectionShells';
 
@@ -25,7 +25,7 @@ export function MostPlayedSection() {
       <SectionHead tone="amber" kicker="Most played" title="The regulars" />
       <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
         {rows.slice(0, MOST_PLAYED_COUNT).map((row) => {
-          const pill = [row.members > 0 ? plural(row.members, 'member', 'members') : null, playsToPar(row.avg_to_par)]
+          const pill = [row.rounds > 0 ? `${fmtCount(row.rounds * 18)} holes played` : null, playsToPar(row.avg_to_par)]
             .filter(Boolean)
             .join(' \u00B7 ');
           return (
