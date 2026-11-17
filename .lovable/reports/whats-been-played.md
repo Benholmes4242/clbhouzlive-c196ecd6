@@ -44,7 +44,9 @@ Authorised rewrites, old → new:
 ## BRIEF_WHATS_BEEN_PLAYED_FIXES
 
 - §1 Built. The section's readiness is latched after its first ready, and useSectionReady reports only that first ready. Later ring or tab changes re-render in place. While a course's photo reads are pending, the photo row shows two 140×186 radius-14 shell Bars after BEST LATELY. The row stays 186px high.
-- §2 NOT BUILT (held). It would change an existing assertion: `selecting a ring stores its newest round as seen` expects `toEqual({ kent: '4' })`. With the default ring written on load, the map becomes `{ near: '1', kent: '4' }`.
+- §2 Built after Ben's ruling. One owner writes the seen map: an effect keyed on the shown course writes its newest `whs_score_id` to state and localStorage once per change of selection — the default on load, the default after a tab change, and a tap. `select` now only sets the selection. The shown ring still draws as selected (ink border, ink count); it draws as seen (grey border, mute count) as soon as another is picked.
+- §2 assertion changed (authorised): `selecting a ring stores its newest round as seen` expected `toEqual({ kent: '4' })`, now `toEqual({ near: '3', kent: '4' })`. The near entry is the default ring's write; its newest round is `3`, not `1`, because rounds `1` and `3` share the play date and `groupRounds` breaks that tie on `whs_score_id` descending.
 - §3 Built. `HOLE_DIFFICULTY_MIN_ROUNDS` (20) lives in src/lib/courses/holeDifficulty.ts and is read by AllHolesSheet and by `hardestHoleFromRanks` (playedRings.ts, used by usePlayedTile). HARDEST appears only when the rank-1 row's rounds reach that minimum.
-- New tests (+3): pending ring stays mounted, then swaps; pending tab change; hardest at the minimum and at one fewer. The §2 test waits on the ruling.
-- Shards: 2,271 / 2,224 / 2,249 / 2,308 = 9,052 (9,049 + 3). No existing assertion changed.
+- New tests (+3): pending ring stays mounted, then swaps; pending tab change; hardest at the minimum and at one fewer.
+- New test (+1, §2): `the ring whose tile is showing counts as seen on load and after a tab change` — asserts `{ near: '1' }` on load, `{ near: '1', kent: '3' }` after the tab change, and rings `['selected', 'seen']`.
+- Shards: 2,271 / 2,224 / 2,250 / 2,308 = 9,053 (9,052 + 1). The §2 assertion above is the only existing assertion changed.
