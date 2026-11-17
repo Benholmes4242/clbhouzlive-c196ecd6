@@ -4,7 +4,8 @@ import { Check, AlertCircle, AlertTriangle } from 'lucide-react';
 /** The one Toaster. GLASS_TOASTS_ONE_CONFIRMATION: unstyled Sonner with
  * classNames into src/styles/glassToast.css (ISLAND_GLASS material), so no
  * call site styles a toast and no Sonner colours, close button or rich
- * colours remain. Plain toast() shows no icon unless the caller passes one. */
+ * colours remain. Code outside BrowserRouter (toast actions) navigates via
+ * src/lib/appNavigate.ts. Plain toast() shows no icon unless the caller passes one. */
 export const Toaster = () => (
   <SonnerToaster
     visibleToasts={2}
