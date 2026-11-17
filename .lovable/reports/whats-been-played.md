@@ -278,3 +278,8 @@ None deleted or renamed.
 
 **Suite**: 9,120 → 9,126 (2,259 / 2,260 / 2,265 / 2,342), shards run one after another. Delta +6 = new file. Failures in untouched files: shard 1 the known flake `coursesRailsUnlimited.test.tsx` › "admin hole-tag predicate invalidation refetches the active infinite holes rail" (`Unable to find role="button" and name "Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026"`); shard 2/3 `activeRing.test.tsx` (3 tests: `Unable to find role="button" and name "Open Danny Holmes's latest post"`) and `holeTagBatchV3.test.tsx` › "tagged state selects the hole…" (`Test timed out in 15000ms`). All three files pass 3/3 alone (71/71); none edited. activeRing and holeTagBatchV3 are NOT on the known-flake list — awaiting ruling.
 **Typecheck**: clean. **Device checks**: signed-in unchecked.
+
+**Ruling (FIX_RING_NEW_ANY_UNSEEN follow-up)**: Ben ruled both flakes; added to the known-flaky list, tests unedited:
+- `src/test/activeRing.test.tsx` (3 tests in FindPeoplePage rows / WhoToFollowRail) — 17 Nov 2026: `TestingLibraryElementError: Unable to find role="button" and name "Open Danny Holmes's latest post"`.
+- `src/test/holeTagBatchV3.test.tsx` › "remove tag in the batch window › tagged state selects the hole, locks and dims the grid, and shows the line and Remove tag" — 17 Nov 2026: `Error: Test timed out in 15000ms.`
+Reruns, one after the other: shard 2 2,260 passed; shard 3 2,265 passed. Typecheck (`npx tsgo -b --noEmit`) clean after the final test edits. Suite 9,126 (2,259 / 2,260 / 2,265 / 2,342); shard 1's only failure is the known coursesRailsUnlimited flake.
