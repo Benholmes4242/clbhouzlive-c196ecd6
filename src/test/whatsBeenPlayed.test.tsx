@@ -18,7 +18,6 @@ import {
   type HomePlace, type PlacedCourse,
 } from '@/components/courses/browse/playedRings';
 import { WhoPlayingSection, groupRounds } from '@/components/courses/browse/WhoPlayingSection';
-import { tilePlaceText } from '@/components/courses/browse/PlayedTile';
 import { HOLE_DIFFICULTY_MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
 
 const UKI = 'Britain & Ireland';
@@ -113,10 +112,6 @@ describe('tile rules', () => {
     const now = new Date(2026, 10, 17, 10);
     expect(dayLabel('2026-11-15', now)).toBe('Sun');
     expect(dayLabel('2026-11-09', now)).toBe('9 Nov');
-  });
-  it('head right reads the county, else the nation', () => {
-    expect(tilePlaceText({ region: 'Kent', subCountry: 'England' })).toBe('Kent');
-    expect(tilePlaceText({ region: null, subCountry: 'England' })).toBe('England');
   });
   it('best lately is each golfer\u2019s best, then the two lowest golfers, never one twice', () => {
     const r = (id: string, user: string, gross: number, date: string) => ({ whs_score_id: id, user_id: user, play_date: date, gross_score: gross });

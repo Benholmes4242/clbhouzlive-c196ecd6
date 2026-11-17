@@ -16,6 +16,7 @@ import { usePlayedTile } from './usePlayedTile';
 import { PlayedHead, type Face } from './playedParts';
 import { PlayedTile } from './PlayedTile';
 import { RegionRails } from './RegionRails';
+import { PlayedTileSheet } from './PlayedTileSheet';
 
 /**
  * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_WHATS_BEEN_PLAYED, three signed-off
@@ -115,19 +116,31 @@ export function WhoPlayingSection() {
   // seen. One owner writes it — the default on load, the default after a tab
   // change and a tap all land here — once per change of selection. The selected
   // ring still draws as selected; it reads as seen as soon as another is picked.
+  // V4 §4: a rail card's sheet showing a course's tile counts as seen through
+  // this same owner (one stamp per shown course).
+  const [sheetId, setSheetId] = useState<string | null>(null);
+  const sheetGroup = sheetId ? groups.find((g) => g.courseId === sheetId) ?? null : null;
   const seenWritten = useRef<string | null>(null);
+  const sheetSeenWritten = useRef<string | null>(null);
   useEffect(() => {
-    if (!current || !userId) return;
-    const stamp = `${userId}|${current.courseId}:${current.latestKey}`;
-    if (seenWritten.current === stamp) return;
-    seenWritten.current = stamp;
-    // Build from storage, not state: on the render where userId changes the
-    // state can still hold the previous key's map (the read effect has not
-    // landed yet), and merging that would overwrite the new member's history.
-    const next = { ...(readSeen(userId) ?? {}), [current.courseId]: current.latestKey };
+    if (!userId) return;
+    const shown: Array<[CourseGroup, typeof seenWritten]> = [];
+    if (current) shown.push([current, seenWritten]);
+    if (sheetGroup) shown.push([sheetGroup, sheetSeenWritten]);
+    let next: SeenMap | null = null;
+    for (const [g, ref] of shown) {
+      const stamp = `${userId}|${g.courseId}:${g.latestKey}`;
+      if (ref.current === stamp) continue;
+      ref.current = stamp;
+      // Build from storage, not state: on the render where userId changes the
+      // state can still hold the previous key's map (the read effect has not
+      // landed yet), and merging that would overwrite the new member's history.
+      next = { ...(next ?? readSeen(userId) ?? {}), [g.courseId]: g.latestKey };
+    }
+    if (!next) return;
     setSeen(next);
     writeSeen(userId, next);
-  }, [current, userId]);
+  }, [current, sheetGroup, userId]);
 
   // §6: rails hold every active course outside the FIRST tab only.
   const tabIds = useMemo(() => new Set(tabs[0]?.courseIds ?? []), [tabs]);
@@ -190,7 +203,10 @@ export function WhoPlayingSection() {
       {current && courseMap?.get(current.courseId) ? (
         <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} tile={tile} faces={faceMap ?? NO_FACES} />
       ) : null}
-      <RegionRails rails={rails} groups={groups} courseMap={courseMap} />
+      <RegionRails rails={rails} groups={groups} courseMap={courseMap} onOpen={setSheetId} />
+      {sheetGroup && courseMap?.get(sheetGroup.courseId) ? (
+        <PlayedTileSheet group={sheetGroup} course={courseMap.get(sheetGroup.courseId) as PlayedCourse} userId={userId} faces={faceMap ?? NO_FACES} onClose={() => setSheetId(null)} />
+      ) : null}
     </section>
   );
 }

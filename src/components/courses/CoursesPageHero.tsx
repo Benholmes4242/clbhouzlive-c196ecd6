@@ -252,7 +252,7 @@ function CoursesPageHeroInner() {
             kicker={null}
             name={hero.course_name}
             place={placeParts.length > 0 ? placeParts.join(' \u00b7 ') : null}
-            placeColor={A.AMBER}
+            placeColor={A.INK}
             nameClamp={2}
             nameLead={hero.list_rank != null ? (
               <span

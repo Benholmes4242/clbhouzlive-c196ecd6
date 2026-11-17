@@ -20,8 +20,10 @@ import { galleryCourseMediaQuery } from '@/components/explore-tab-new/courseled/
 import { settled } from './PageLoadGate';
 import { hardestHoleFromRanks } from './playedRings';
 
-export interface TileHolePhoto { kind: 'hole'; key: string; holeNo: number; addedAt: string; imageUrl: string; par: number | null; yards: number | null; memberName: string | null; memberId: string | null; memberPhoto: string | null; sourcePostId: string | null }
-export interface TileCoursePhoto { kind: 'course'; key: string; createdAt: string; imageUrl: string; caption: string; memberName: string | null; memberId: string | null; memberPhoto: string | null }
+const EMPTY_POSTS: never[] = [];
+
+export interface TileHolePhoto { kind: 'hole'; key: string; holeNo: number; addedAt: string; imageUrl: string; par: number | null; yards: number | null; memberName: string | null; memberId: string | null; memberPhoto: string | null; sourcePostId: string | null; mediaId?: string; rows?: MemberShotRow[] }
+export interface TileCoursePhoto { kind: 'course'; key: string; postId?: string; mediaId?: string; createdAt: string; imageUrl: string; caption: string; memberName: string | null; memberId: string | null; memberPhoto: string | null }
 
 export function usePlayedTile(courseId: string | null, userId: string | undefined) {
   const { activeActor } = useActiveActor();
@@ -56,7 +58,7 @@ export function usePlayedTile(courseId: string | null, userId: string | undefine
       const r = [...rows].sort((a, b) => (b.added_at ?? '').localeCompare(a.added_at ?? ''))[0];
       const img = holeMediaPoster(r);
       if (!img) return;
-      out.push({ kind: 'hole', key: `h:${r.id}`, holeNo: r.hole_no ?? holeNumbers[i], addedAt: r.added_at ?? '', imageUrl: img, par: r.par ?? null, yards: r.yards ?? null, memberName: r.member_name ?? null, memberId: r.member_id ?? null, memberPhoto: r.member_avatar_url ?? null, sourcePostId: r.source_post_id ?? null });
+      out.push({ kind: 'hole', key: `h:${r.id}`, holeNo: r.hole_no ?? holeNumbers[i], addedAt: r.added_at ?? '', imageUrl: img, par: r.par ?? null, yards: r.yards ?? null, memberName: r.member_name ?? null, memberId: r.member_id ?? null, memberPhoto: r.member_avatar_url ?? null, sourcePostId: r.source_post_id ?? null, mediaId: r.id, rows });
     });
     return out;
   }, [holeReads, holeNumbers]);
@@ -73,12 +75,14 @@ export function usePlayedTile(courseId: string | null, userId: string | undefine
       const img = m ? (m.type === 'video' ? m.thumbnailUrl : m.imageUrl || m.thumbnailUrl) : null;
       if (!img) return [];
       const caption = (p.caption ?? '').split('\n').map((l) => l.trim()).find(Boolean) ?? '';
-      return [{ kind: 'course' as const, key: `c:${p.id}`, createdAt: p.createdAt, imageUrl: img, caption, memberName: p.displayName || p.username || null, memberId: p.userId || null, memberPhoto: p.avatarUrl || null }];
+      return [{ kind: 'course' as const, key: `c:${p.id}`, postId: p.id, mediaId: m?.id, createdAt: p.createdAt, imageUrl: img, caption, memberName: p.displayName || p.username || null, memberId: p.userId || null, memberPhoto: p.avatarUrl || null }];
     });
   }, [media.data, holes]);
 
   const ready = !courseId || !userId || (
     settled(tags) && holeReads.every((q) => settled(q)) && settled(ranks) && settled(media)
   );
-  return { holes, photos, hardestHole, ready };
+  /** V4 §3: the course's media set, opened by course photo taps. */
+  const coursePosts = media.data ?? EMPTY_POSTS;
+  return { holes, photos, hardestHole, ready, coursePosts };
 }

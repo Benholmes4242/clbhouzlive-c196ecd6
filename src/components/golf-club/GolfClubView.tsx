@@ -41,6 +41,7 @@ import { SURFACE } from '@/lib/tokens/surface';
 import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
 import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
 import { getScrollAncestor } from '@/lib/getScrollParent';
+import { useLatelyDeepLink } from '@/components/courses/course-detail/about/useLatelyDeepLink';
 
 
 interface GolfClubViewProps {
@@ -94,6 +95,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const [activeTab, setActiveTab] = useState<CourseTabId>(initialTab);
 
   const highlightReviewId = searchParams.get('review');
+  // BRIEF_WHATS_BEEN_PLAYED_V4 §3: ?section=lately scrolls once to Lately, then clears.
+  useLatelyDeepLink(isInModal);
 
   const [visitedTabs, setVisitedTabs] = useState<Set<CourseTabId>>(new Set([initialTab]));
   const courseTabsRef = useRef<HTMLDivElement>(null);
@@ -523,6 +526,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         as="h1"
         nameRef={nameRef}
         kicker={courseMastheadKicker(course, standing)}
+        kickerColor={A.INK}
         name={course.name}
         place={course.country || null}
       >

@@ -1,13 +1,20 @@
 /**
  * The selected ring's tile (BRIEF_WHATS_BEEN_PLAYED §3, signed-off
- * whats-been-played-top mock). Every tap opens the course page at the route
- * the old course card used (`/courses/:id`).
+ * whats-been-played-top mock), revised by BRIEF_WHATS_BEEN_PLAYED_V4 §2-3:
+ * full course name title, no county. Taps: Best lately and the faces line open
+ * the course page at Lately (courseLatelyHref); a photo opens the canonical
+ * viewer (tilePhotoViewer); Explore, the no-photos tile and the latest review
+ * card open the course page top. The rail sheet renders this same tile and
+ * passes onNavigate (closes the sheet first) and inSheet (viewer above sheet).
  */
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { shareCourseName } from '@/lib/courses/shareCourseName';
+import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
+import { courseLatelyHref } from '@/lib/courses/courseLatelyLink';
+import { openTilePhoto } from './tilePhotoViewer';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
 import { Bar } from '@/components/skeletons/shellVocabulary';
@@ -34,9 +41,6 @@ export const BUTTON_H = 44;
 const BEST_BG = '#16161B';
 const BUTTON_BG = '#1B1B20';
 
-/** §5 head right: the course's county (golf_courses.region), else its nation. */
-export const tilePlaceText = (course: Pick<PlayedCourse, 'region' | 'subCountry'>): string | null => course.region || course.subCountry || null;
-
 type FacesMap = ReadonlyMap<string, { displayName: string | null; username: string | null; photoUrl: string | null }>;
 const NO_FACES: FacesMap = new Map();
 
@@ -53,11 +57,17 @@ function Credit({ id, name, photo, day, faces }: { id: string | null; name: stri
   );
 }
 
-export function PlayedTile({ group, course, tile, faces = NO_FACES }: { group: CourseGroup; course: PlayedCourse; tile: ReturnType<typeof usePlayedTile>; faces?: FacesMap }) {
+export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, inSheet = false, topGap = TILE_TOP }: {
+  group: CourseGroup; course: PlayedCourse; tile: ReturnType<typeof usePlayedTile>; faces?: FacesMap;
+  /** Sheet host: closes itself, then navigates. Defaults to a plain navigate. */
+  onNavigate?: (to: string) => void; inSheet?: boolean; topGap?: number;
+}) {
   const navigate = useNavigate();
-  const open = () => navigate(`/courses/${course.id}`);
-  const { short, variant } = shareCourseName(course.name);
-  const place = tilePlaceText(course);
+  const go = (to: string) => (onNavigate ? onNavigate(to) : navigate(to));
+  const open = () => go(`/courses/${course.id}`);
+  const openLately = () => go(courseLatelyHref(course.id));
+  const { short } = shareCourseName(course.name);
+  const title = shortCoursePart(course.name);
   const review = group.rows.length === 0 ? group.reviews[0] ?? null : null;
   const reviewer = review ? group.faces.find((f) => f.userId === review.user_id) ?? null : null;
   const best = bestLately(group.rows);
@@ -67,19 +77,16 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES }: { group: C
   const ell: React.CSSProperties = { display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
   return (
-    <div data-played-tile={course.id} style={{ margin: `${TILE_TOP}px 16px 0` }}>
-      <button type="button" onClick={open} style={{ all: 'unset', display: 'block', width: '100%', cursor: 'pointer' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
-          <b style={{ ...ell, minWidth: 0, fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 800, color: A.INK }}>{short}</b>
-          {place ? <span data-tile-place="" style={{ flex: 'none', fontSize: 11.5, color: A.MUTE }}>{place}</span> : null}
+    <div data-played-tile={course.id} style={{ margin: `${topGap}px 16px 0` }}>
+      <div data-tile-head="" style={{ display: 'block', width: '100%' }}>
+        <b data-tile-title="" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere', fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 800, color: A.INK }}>{title}</b>
+        <div data-tile-sub="" style={{ marginTop: 3, fontSize: 12, lineHeight: `${TILE_SUB_LINE}px`, color: A.MUTE, ...ell }}>
+          Through members{'\u2019'} eyes
         </div>
-        <div style={{ marginTop: 3, fontSize: 12, lineHeight: `${TILE_SUB_LINE}px`, color: A.MUTE, ...ell }}>
-          {variant ? `${variant} \u00B7 Through members\u2019 eyes` : 'Through members\u2019 eyes'}
-        </div>
-      </button>
+      </div>
       <div className="scrollbar-hide" data-tile-row="" style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none', margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
         {group.rows.length > 0 ? (
-        <button type="button" data-best-lately="" onClick={open}
+        <button type="button" data-best-lately="" onClick={openLately}
           style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: 10, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK }}>
           <span data-best-kicker="" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>BEST LATELY</span>
           {best.map((r) => {
@@ -142,7 +149,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES }: { group: C
             </CourseImageFallback>
           </button>
         ) : photos.map((p) => (
-          <button key={p.key} type="button" data-tile-photo={p.kind} onClick={open}
+          <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { openTilePhoto(p, course, tile.coursePosts ?? [], inSheet); }}
             style={{ flex: 'none', width: PHOTO_TILE_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS, overflow: 'hidden', position: 'relative', padding: 0, border: 0, cursor: 'pointer', textAlign: 'left', color: '#FFFFFF', backgroundColor: A.CANVAS, backgroundImage: `url("${p.imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
             {p.kind === 'hole' ? (
@@ -166,7 +173,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES }: { group: C
           </button>
         ))}
       </div>
-      <button type="button" data-tile-faces="" onClick={open} style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 8, marginTop: FACES_TOP, fontSize: 12, color: A.MUTE, cursor: 'pointer', maxWidth: '100%' }}>
+      <button type="button" data-tile-faces="" onClick={openLately} style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 8, marginTop: FACES_TOP, fontSize: 12, color: A.MUTE, cursor: 'pointer', maxWidth: '100%' }}>
         <FaceStack faces={group.faces.slice(0, 4)} size={FACE_SIZE} overlap={6} ring={A.CANVAS} />
         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
           <b style={{ color: A.INK, fontWeight: 600 }}>{members === 1 ? '1 member' : `${fmtCount(members)} members`}</b> {group.rows.length > 0 ? 'played' : 'shared'} it lately

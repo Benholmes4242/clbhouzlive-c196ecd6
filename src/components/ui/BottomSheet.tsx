@@ -16,6 +16,8 @@ import { pushSheetEntry, releaseSheetEntry } from './sheetHistory';
  */
 import { SHEET_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 export { SHEET_SURFACE };
+/** The 'panel' named variant's surface (BRIEF_WHATS_BEEN_PLAYED_V4 §4). */
+export const PANEL_SHEET_SURFACE = '#141418';
 
 
 interface BottomSheetProps {
@@ -45,6 +47,12 @@ interface BottomSheetProps {
    * NAMED variant on this component, not a free-form colour prop.
    */
 
+  /**
+   * BRIEF_WHATS_BEEN_PLAYED_V4 §4 — NAMED SURFACE VARIANT. 'canon' (default)
+   * paints SHEET_SURFACE; 'panel' paints PANEL_SHEET_SURFACE (#141418, the
+   * played-tile sheet) with a 0.6 backdrop. Every other consumer is unchanged.
+   */
+  surface?: 'canon' | 'panel';
   /** Optional max-height override (default '85dvh'). Use e.g. '75dvh' for dvh-aware caps. */
   maxHeight?: string;
   /** Optional analytical-sheet corner radius. Defaults to the existing 20px. */
@@ -145,7 +153,10 @@ export function BottomSheet({
   midDebug,
   onDetentChange,
   onHorizontalDrag = null,
+  surface = 'canon',
 }: BottomSheetProps) {
+  const surfaceColor = surface === 'panel' ? PANEL_SHEET_SURFACE : SHEET_SURFACE;
+  const backdropColor = surface === 'panel' ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.55)';
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentTranslateY = useRef(0);
@@ -506,7 +517,7 @@ export function BottomSheet({
         )}
         style={{
           zIndex: zIndexBase,
-          backgroundColor: 'rgba(0,0,0,0.55)',
+          backgroundColor: backdropColor,
           ...(detented
             ? { opacity: isAnimating ? 0.35 + 0.65 * revealed : 0, transition: dragging ? 'none' : undefined }
             : null),
@@ -550,7 +561,7 @@ export function BottomSheet({
              so chrome and body cannot show a seam. It is applied AFTER
              `...style` deliberately: a caller's own background cannot win, or
               the canon is advisory. Value = the canonical SHEET_SURFACE. */
-          background: SHEET_SURFACE,
+          background: surfaceColor,
         }}
         role="dialog"
         aria-modal="true"
@@ -578,7 +589,7 @@ export function BottomSheet({
             style={{
               position: 'absolute', left: 0, right: 0, bottom: offset, height: 56,
               pointerEvents: 'none',
-              background: `linear-gradient(to bottom, ${surfaceWithAlpha(SHEET_SURFACE, 0)} 0%, ${SHEET_SURFACE} 100%)`,
+              background: `linear-gradient(to bottom, ${surfaceWithAlpha(surfaceColor, 0)} 0%, ${surfaceColor} 100%)`,
             }}
           />
         )}

@@ -99,7 +99,7 @@ export function WhoPlayingShell() {
       </div>
       <div style={{ margin: `${TILE_TOP}px 16px 0` }}>
         <div style={{ height: TILE_NAME_LINE, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Bar style={{ height: 15, width: 150 }} /><Bar style={{ height: 9, width: 72 }} />
+          <Bar style={{ height: 15, width: 150 }} />
         </div>
         <div style={{ marginTop: 3 }}>{line(TILE_SUB_LINE, 170, 9)}</div>
         <div style={{ display: 'flex', overflow: 'hidden', gap: 6, margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>

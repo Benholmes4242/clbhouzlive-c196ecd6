@@ -74,10 +74,10 @@ describe('Courses-only place line', () => {
     showHero();
     expect(screen.getByText('Essex Links').nextElementSibling?.textContent).toBe('Top 100 · 172 rounds');
   });
-  it('keeps the existing one-line place style, with amber and no uppercase or tracking', () => {
+  it('keeps the existing one-line place style, in ink and no uppercase or tracking', () => {
     showHero();
     const line = screen.getByText('Essex Links').nextElementSibling as HTMLElement;
-    const probe = document.createElement('div'); probe.style.color = A.AMBER;
+    const probe = document.createElement('div'); probe.style.color = A.INK;
     expect(line.style.color).toBe(probe.style.color);
     expect(line.style.fontSize).toBe('12.5px'); expect(line.style.fontWeight).toBe('600');
     expect(line.style.whiteSpace).toBe('nowrap'); expect(line.style.textOverflow).toBe('ellipsis');

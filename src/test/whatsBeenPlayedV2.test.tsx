@@ -113,13 +113,13 @@ describe('section', () => {
     }
     expect([...container.querySelectorAll('[data-ring-count]')].map((n) => n.textContent)).toEqual(['4', '2']);
   });
-  it('best lately is two different golfers with full names; county in the head; played line', () => {
+  it('best lately is two different golfers with full names; no county in the head; played line', () => {
     const { container } = mount();
     const entries = [...container.querySelectorAll('[data-best-entry]')];
     expect(entries.map((e) => e.textContent?.slice(0, 2))).toEqual(['72', '78']);
     expect(entries[0].textContent).toContain('ben Smith');
     expect(entries[1].textContent).toContain('tom Smith');
-    expect(container.querySelector('[data-tile-place]')?.textContent).toBe('Kent');
+    expect(container.querySelector('[data-tile-place]')).toBeNull();
     expect(container.querySelector('[data-tile-faces]')?.textContent).toContain('played it lately');
   });
   it('a course with no rounds opens on its latest review and is "shared it lately"', () => {

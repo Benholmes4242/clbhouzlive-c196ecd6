@@ -2,11 +2,12 @@
  * Region rails under the tile (BRIEF_WHATS_BEEN_PLAYED §4, signed-off
  * region-rails mock, revised by BRIEF_WHATS_BEEN_PLAYED_V3: home nation, one
  * rest-of-grouping rail, Abroad; no top-ups). Rail plans come from playedRings.buildRails. Since BRIEF_WHATS_BEEN_PLAYED_V2 rails hold every active
- * course outside the first tab, so a course may sit in a tab and a rail. Every card opens the
- * course page; "See all ›" opens section 08 on the Played board scoped to the
+ * course outside the first tab, so a course may sit in a tab and a rail. Since
+ * BRIEF_WHATS_BEEN_PLAYED_V4 §4 a card opens that course's tile in a sheet
+ * (onOpen, owned by WhoPlayingSection) and never navigates itself; "See all ›" opens section 08 on the Played board scoped to the
  * nation, the way ByRegionSection's tiles write the country param.
  */
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import type React from 'react';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { useCourseMediaCounts } from '@/hooks/useCourseMediaCounts';
@@ -71,14 +72,12 @@ function ActivityStat({ courseId }: { courseId: string }) {
   return text ? <span data-activity-stat="" style={{ display: 'block', marginTop: 7, fontSize: 10.5, color: 'rgba(255,255,255,.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{text}</span> : null;
 }
 
-export function RegionRails({ rails, groups, courseMap }: {
-  rails: RailPlan[]; groups: CourseGroup[]; courseMap: Map<string, PlayedCourse> | undefined;
+export function RegionRails({ rails, groups, courseMap, onOpen }: {
+  rails: RailPlan[]; groups: CourseGroup[]; courseMap: Map<string, PlayedCourse> | undefined; onOpen: (courseId: string) => void;
 }) {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   if (!rails.length || !courseMap) return null;
   const byGroup = new Map(groups.map((g) => [g.courseId, g]));
-  const open = (id: string) => navigate(`/courses/${id}`);
   const seeAll = (nation: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('country', nation);
@@ -98,7 +97,7 @@ export function RegionRails({ rails, groups, courseMap }: {
           <div className="scrollbar-hide" style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', marginTop: 12, padding: '0 16px' }}>
             {rail.courseIds.map((id) => {
               const g = byGroup.get(id); const c = courseMap.get(id);
-              return g && c ? <PlayedCard key={id} group={g} course={c} onOpen={() => open(id)} /> : null;
+              return g && c ? <PlayedCard key={id} group={g} course={c} onOpen={() => onOpen(id)} /> : null;
             })}
           </div>
         </div>

@@ -98,6 +98,8 @@ export interface CourseMastheadProps {
   name: string;
   place: string | null;
   placeColor?: string;
+  /** Kicker tone (BRIEF_WHATS_BEEN_PLAYED_V4 §5); default amber, course detail passes ink. */
+  kickerColor?: string;
   photoBand?: boolean;
   /** Each hero keeps its own clamp; undefined = no clamp. */
   nameClamp?: number;
@@ -118,7 +120,7 @@ export function MastheadRule({ children }: { children: React.ReactNode }) {
 }
 
 export const CourseMasthead: React.FC<CourseMastheadProps> = ({
-  kicker, name, place, placeColor = PLACE_INK, photoBand = false, nameClamp, nameLead, nameRef, as = 'div', children,
+  kicker, name, place, placeColor = PLACE_INK, kickerColor = A.AMBER, photoBand = false, nameClamp, nameLead, nameRef, as = 'div', children,
 }) => {
   const NameTag = as;
   const clamp: React.CSSProperties = nameClamp
@@ -126,7 +128,7 @@ export const CourseMasthead: React.FC<CourseMastheadProps> = ({
     : {};
   return (
     <div>
-      {kicker && <div style={{ ...MASTHEAD_KICKER, marginBottom: photoBand ? 4 : 8 }}>{kicker}</div>}
+      {kicker && <div data-masthead-kicker="" style={{ ...MASTHEAD_KICKER, color: kickerColor, marginBottom: photoBand ? 4 : 8 }}>{kicker}</div>}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
         {nameLead}
         <div style={{ minWidth: 0, flex: 1 }}>
