@@ -232,3 +232,31 @@ through the test, not by eye.
 - Shard 1 rerun alone: 2,275 passed, 0 failed. Suite: 2,275 / 2,227 / 2,259 / 2,342 = 9,103, all passing.
 - **Known flaky:** `src/test/coursesRailsUnlimited.test.tsx` › "admin hole-tag predicate invalidation refetches the active infinite holes rail". Failure message, 2026-11-17: `TestingLibraryElementError: Unable to find role="button" and name "Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026"`.
 - Process: the four shards always run one after another, never in parallel.
+
+## BRIEF_COURSES_PAGE_V5 — gradient rings, rail-card tile row, holes on The regulars, review card B
+
+**Changed**
+- §1 `WhoPlayingSection.tsx`: NEW rings use `border: 1.5px solid transparent` over `NEW_RING_BG` (canvas padding-box + 225deg #FFC069 0% / #F7931E 40% / #8C4512 100% border-box); NEW count border and number `NEW_COUNT` #FFB24D. Radius, inset, photo corners and selected/seen states unchanged.
+- §2 `PlayedTile.tsx`: "Through members' eyes" sub line removed (and `TILE_SUB_LINE`); `TILE_ROW_H` 216, `BEST_CARD_W`/`PHOTO_TILE_W` 156, `TILE_RADIUS` 16, new `TILE_ROW_GAP` 8 and `TILE_CARD_PAD` 12 (Best lately and Latest review cards). The no-photos tile stays 230 wide and picks up 216/16 through the shared constants. Placeholders and the rail sheet's tile use the same constants. `WhoPlayingShell` drops the sub line bar and uses the new sizes and gap.
+- §3 `MostPlayedSection.tsx`: pill reads `{fmtCount(rounds × 18)} holes played · Plays to …`; holes alone when no plays-to figure.
+- §4 `ReviewRailSlot.tsx` rebuilt as card B (260 × 216, #16161B, no border, radius 16, padding 12, 8px gap, 16px rail padding; REVIEW kicker, 24px SquircleAvatar canvas surface, 22px rating + "/10", course name one line, 3-line quote, pinned footer via `reviewFootTail`). Rating colour still reads `courseSubScoreTone` (returns ink for a value) so the C1 rating-consistency test holds. `CourseNameLink` kept for the course name, so CB69 taps are unchanged. `LatestReviewsShell` draws the new card size.
+- ReviewRailSlot other users: none in app code. Only `LatestReviewsSection` renders it; `sectionShells.tsx` imports its geometry constants. Test users: cb69CourseNameLink, coursesMembersSections, reviewMentionsPreview, courseRatingConsistency.
+- `roundsLabel`/`bestLabel` in reviewAuthorRounds.ts are no longer used by the card; I kept them because tests cover them.
+
+**Changed assertions (authorised by §6)**
+- `whatsBeenPlayedV3.test.tsx` › ring count: new count `1.5px solid #f7931e` / `rgb(247, 147, 30)` → `#ffb24d` / `rgb(255, 178, 77)`.
+- `whatsBeenPlayedV4.test.tsx` › tile head: `[data-tile-sub]` text `'Through members’ eyes'` → element is null.
+- `coursesMembersSections.test.tsx` › the played strip (old bordered card stat block → card B footer):
+  - "shows only for the review the RPC answered": strip count 1 + `'4ROUNDS HERE78+6THEIR BEST'` + 2 figures + previous sibling → one footer with rounds; `'Ada r1 · 4 rounds here · best 78'`; second footer `'Ada r2'`.
+  - "draws rounds only…": `'2ROUNDS HERE'`, no best figure → `'Ada r2 · 2 rounds here'`.
+  - "calls the best score the viewer's own…": `'4ROUNDS HERE78+6YOUR BEST'` → `'Ada r1 · 4 rounds here · your best 78'`.
+  - "reads one round as ROUND HERE and an under-par best in the red figure": `'1ROUND HERE71−2THEIR BEST'` + to-par red → `'Ada r1 · 1 round here · best 71'` (card B shows no to-par). The test title still names the old rule.
+  - "shows the gross alone when the to-par is unknown": `'3ROUNDS HERE74THEIR BEST'`, no to-par → `'Ada r1 · 3 rounds here · best 74'`.
+  - "draws nothing for a caller that supplies no rounds": no `[data-review-played]` → footer `'Ada r1'`.
+  - page gate: `[data-review-played]` length 1 → one footer containing "here".
+- No tests deleted or renamed.
+
+**New tests (+17)**: `whatsBeenPlayedV5.test.tsx` (6) and `coursesPageV5Sections.test.tsx` (11). jsdom drops layered `background` shorthands, so the gradient is asserted through the exported `NEW_RING_BG` plus the transparent border. The in-row loading placeholders aren't mounted in a test: the section shows its shell until the tile is ready. They use the same constants, and the shell row is tested.
+
+**Suite**: 9,103 → 9,120 (2,259 / 2,260 / 2,266 / 2,335), all passing, four shards run one after another. Typecheck clean.
+**Device checks**: 375/320 signed-in unchecked (sign-in unavailable).
