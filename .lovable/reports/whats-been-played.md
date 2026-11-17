@@ -136,3 +136,6 @@ New: `src/test/whatsBeenPlayedV3.test.tsx` (10 tests).
 
 ### Device checks
 Signed-out page at 320 checked: By region and Tough tracks absent, no horizontal overflow. Signed-in section at 375/320 unchecked (sign-in unavailable in automated browser).
+
+### Suite
+`npx vitest run --shard=i/4` ×4: 2,274 / 2,231 / 2,254 / 2,324 = 9,083 passing, 0 failing. Baseline 9,074 → 9,083: +10 (whatsBeenPlayedV3.test.tsx) −1 (deleted top-up test) = +9. Typecheck (`npx tsgo -b --noEmit`) clean.
