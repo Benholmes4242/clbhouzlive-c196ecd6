@@ -15,11 +15,11 @@ vi.mock('@/hooks/useCourseMediaCounts', () => ({ useCourseMediaCounts: () => ({ 
 vi.mock('@/features/pro-verification/InlineProMemberName', () => ({ InlineProMemberName: ({ children }: { children: React.ReactNode }) => <span>{children}</span> }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span data-face="" /> }));
 import {
-  bestLately, buildAreaTabs, buildRails, dayLabel, interleaveTilePhotos, milesAwayText, railHeading, railShowsSeeAll, seenKey, toParText, topUpRail, hardestHoleFromRanks,
+  bestLately, buildAreaTabs, buildRails, dayLabel, interleaveTilePhotos, railHeading, railShowsSeeAll, seenKey, toParText, topUpRail, hardestHoleFromRanks,
   type HomePlace, type PlacedCourse,
 } from '@/components/courses/browse/playedRings';
 import { WhoPlayingSection, groupRounds } from '@/components/courses/browse/WhoPlayingSection';
-import { tileDistanceText } from '@/components/courses/browse/PlayedTile';
+import { tilePlaceText } from '@/components/courses/browse/PlayedTile';
 import { HOLE_DIFFICULTY_MIN_ROUNDS } from '@/lib/courses/holeDifficulty';
 
 const UKI = 'Britain & Ireland';
@@ -32,23 +32,27 @@ const fife = c('fife', { region: 'Fife', subCountry: 'Scotland' });
 const kerry = c('kerry', { region: 'Kerry', subCountry: 'Ireland' });
 const down = c('down', { region: 'Down', subCountry: 'Northern Ireland' });
 const spain = c('spain', { region: 'Andalusia', subCountry: 'Spain', country: 'Continental Europe' });
-const g = (courseId: string, rounds: number, latestDate = '2026-11-10') => ({ courseId, rounds, latestDate, latestScoreId: `${courseId}-s` });
+const g = (courseId: string, activity: number, latestDate = '2026-11-10') => ({ courseId, activity, latestDate, latestKey: `round:${courseId}-s` });
 
 describe('area tabs', () => {
-  it('Near you then the home county, each only with a course', () => {
-    const tabs = buildAreaTabs([near, kent, surrey], home);
-    expect(tabs.map((t) => t.label)).toEqual(['Near you', 'Kent']);
-    expect(tabs[0].courseIds).toEqual(['near']);
-    expect(buildAreaTabs([kent, surrey], { ...home, lat: null }).map((t) => t.id)).toEqual(['region']);
+  const usa = c('usa', { region: 'California', subCountry: 'United States', country: 'Rest of World', continent: 'North America' as never });
+  const dubai = c('dubai', { region: 'Dubai', subCountry: 'United Arab Emirates', country: 'Rest of World', continent: 'Asia' as never });
+  const japan = c('japan', { region: 'Chiba', subCountry: 'Japan', country: 'Rest of World', continent: 'Asia' as never });
+  it('county, nation, then GB&I, Europe, USA, Middle East and Rest of world in that order', () => {
+    const tabs = buildAreaTabs([kent, surrey, fife, spain, usa, dubai, japan], home);
+    expect(tabs.map((t) => t.label)).toEqual(['Kent', 'England', 'GB&I', 'Europe', 'USA', 'Middle East', 'Rest of world']);
+    expect(tabs.map((t) => t.courseIds)).toEqual([['kent'], ['kent', 'surrey'], ['kent', 'surrey', 'fife'], ['spain'], ['usa'], ['dubai'], ['japan']]);
   });
-  it('skips a tab whose label repeats one already shown', () => {
-    expect(buildAreaTabs([near], { ...home, region: 'Near You' }).map((t) => t.label)).toEqual(['Near you']);
+  it('hides a tab with no active course', () => {
+    expect(buildAreaTabs([surrey, japan], home).map((t) => t.label)).toEqual(['England', 'GB&I', 'Rest of world']);
   });
-  it('falls back to the home nation, then the busiest nation', () => {
-    expect(buildAreaTabs([surrey, fife], { ...home, lat: null }).map((t) => t.label)).toEqual(['England']);
-    const rounds = new Map([['fife', 5], ['kerry', 2]]);
-    expect(buildAreaTabs([fife, kerry], { ...home, lat: null }, rounds).map((t) => t.label)).toEqual(['Scotland']);
-    expect(buildAreaTabs([fife, kerry], null, new Map([['kerry', 9], ['fife', 1]])).map((t) => t.label)).toEqual(['Ireland']);
+  it('skips a world tab whose label repeats an earlier tab', () => {
+    const usHome: HomePlace = { lat: null, lng: null, region: 'California', subCountry: 'USA', country: 'Rest of World', continent: null };
+    expect(buildAreaTabs([usa, c('usa2', { region: 'Florida', subCountry: 'USA', country: 'Rest of World', continent: null })], usHome).map((t) => t.label)).toEqual(['California', 'USA']);
+    expect(buildAreaTabs([usa], { ...usHome, subCountry: 'United States' }).map((t) => t.label)).toEqual(['California', 'United States']);
+  });
+  it('no home club: world tabs only', () => {
+    expect(buildAreaTabs([kent, spain, dubai], null).map((t) => t.label)).toEqual(['GB&I', 'Europe', 'Middle East']);
   });
 });
 
@@ -117,11 +121,14 @@ describe('tile rules', () => {
     expect(dayLabel('2026-11-15', now)).toBe('Sun');
     expect(dayLabel('2026-11-09', now)).toBe('9 Nov');
   });
-  it('distance wording', () => {
-    expect(milesAwayText(0.5)).toBe('Under a mile away');
-    expect(milesAwayText(1.7)).toBe('1 mile away');
-    expect(milesAwayText(4.9)).toBe('3 miles away');
-    expect(tileDistanceText({ lat: 51.2, lng: 1.35, region: 'Kent' }, null)).toBe('Kent');
+  it('head right reads the county, else the nation', () => {
+    expect(tilePlaceText({ region: 'Kent', subCountry: 'England' })).toBe('Kent');
+    expect(tilePlaceText({ region: null, subCountry: 'England' })).toBe('England');
+  });
+  it('best lately is each golfer\u2019s best, then the two lowest golfers, never one twice', () => {
+    const r = (id: string, user: string, gross: number, date: string) => ({ whs_score_id: id, user_id: user, play_date: date, gross_score: gross });
+    expect(bestLately([r('1', 'ann', 70, '2026-11-01'), r('2', 'ann', 71, '2026-11-02'), r('3', 'bob', 74, '2026-11-03'), r('4', 'cy', 74, '2026-11-08')]).map((x) => x.whs_score_id)).toEqual(['1', '4']);
+    expect(bestLately([r('1', 'ann', 72, '2026-11-01'), r('2', 'ann', 72, '2026-11-05')]).map((x) => x.whs_score_id)).toEqual(['2']);
   });
 });
 
@@ -142,10 +149,10 @@ describe('section', () => {
   afterEach(cleanup);
   it('rings follow the tab; the first ring is selected and its tile shows', () => {
     const { container } = mount();
-    expect([...container.querySelectorAll('[data-played-ring]')].map((n) => n.getAttribute('data-played-ring'))).toEqual(['selected']);
+    expect([...container.querySelectorAll('[data-played-ring]')].map((n) => n.getAttribute('data-played-ring'))).toEqual(['selected', 'new']);
     expect(container.querySelector('[data-played-tile]')?.getAttribute('data-played-tile')).toBe('near');
-    fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
-    expect(container.querySelectorAll('[data-played-ring]')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
+    expect(container.querySelectorAll('[data-played-ring]')).toHaveLength(3);
     expect(container.querySelector('[data-played-tile]')?.getAttribute('data-played-tile')).toBe('near');
   });
   it('best lately shows the two lowest with to par, under par in red', () => {
@@ -168,7 +175,7 @@ describe('section', () => {
     const kentRing = container.querySelectorAll('[data-played-ring]')[1];
     expect(kentRing.getAttribute('data-played-ring')).toBe('new');
     fireEvent.click(kentRing);
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: '3', kent: '4' });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: 'round:3', kent: 'round:4' });
     fireEvent.click(container.querySelectorAll('[data-played-ring]')[0]);
     expect(container.querySelectorAll('[data-played-ring]')[1].getAttribute('data-played-ring')).toBe('seen');
   });
@@ -231,7 +238,7 @@ describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
   it('a tab change with pending reads behaves the same', () => {
     const { container } = mount();
     f.tile = { holes: [], photos: [], hardestHole: null, ready: false };
-    fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     present(container);
     expect(container.querySelectorAll('[data-tile-pending]')).toHaveLength(2);
   });
@@ -244,17 +251,17 @@ describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
     expect(window.localStorage.getItem(seenKey(null))).toBeNull();
     f.session = { user: { id: 'me' }, loading: false };
     rerender(<QueryClientProvider client={new QueryClient()}><MemoryRouter><WhoPlayingSection /></MemoryRouter></QueryClientProvider>);
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ fife: '5', near: '3' });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ fife: '5', near: 'round:3' });
     expect(window.localStorage.getItem(seenKey(null))).toBeNull();
   });
   it('the ring whose tile is showing counts as seen on load and after a tab change', () => {
-    setHook([row('1', 'near', 'ann', 71), row('2', 'kent', 'bob', 70, '2026-11-08'), row('3', 'kent', 'cy', 75, '2026-11-12')],
-      [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club')]);
+    setHook([row('1', 'near', 'ann', 71), row('2', 'kent', 'bob', 70, '2026-11-08'), row('3', 'kent', 'cy', 75, '2026-11-12'), row('6', 'fife', 'dee', 80), row('7', 'fife', 'ed', 81), row('8', 'fife', 'fi', 82, '2026-11-13')],
+      [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
     const { container } = mount();
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: '1' });
-    fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: '1', kent: '3' });
-    expect([...container.querySelectorAll('[data-played-ring]')].map((r) => r.getAttribute('data-played-ring'))).toEqual(['selected', 'seen']);
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: 'round:3' });
+    fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: 'round:3', fife: 'round:8' });
+    expect([...container.querySelectorAll('[data-played-ring]')].map((r) => r.getAttribute('data-played-ring'))).toEqual(['selected', 'seen', 'new']);
   });
 });
 

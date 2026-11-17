@@ -70,3 +70,26 @@ mock became controllable via the hoisted fixture (default unchanged:
 
 Suite: 9,053 → 9,054 (2,271 / 2,224 / 2,251 / 2,308). Delta: +1 new test.
 Typecheck: clean.
+
+## BRIEF_WHATS_BEEN_PLAYED_V2
+
+**STOP: 8 unauthorised failures** — all in `src/test/coursesHeroPlaceScrim.test.tsx` ("Courses-only place line", every test except two): `Error: No QueryClient set, use QueryClientProvider to set one`. §1 requires `useCourseRecordHolders` in CoursesPageHero, which is a query; that test renders the hero without a QueryClientProvider. No assertion is wrong. Not edited — needs a ruling: wrap its `showHero` render in a QueryClientProvider, or mock `useCourseRecordHolders` there.
+
+Reads: `get_recent_rounds('everyone','30')` paged (cap 500); `posts` status published, `course_id not null or tagged_course_ids <> {}`, created_at ≥ window start (useMomentsOfTheWeek filters); `course_ratings` is_mock false, review not null, created_at ≥ window start (useLatestReviews filters); readMemberFaces; `stat_browse_base.community_rating` for active courses without a round; useCourseMediaCounts; useCourseRecordHolders([hero], {includePlayers:false}). No new RPCs, no SQL.
+
+Middle East / USA spellings: countryVocabulary.ts has no US or Middle East entries, so the brief's spellings are used verbatim (United States / United States of America / USA; United Arab Emirates, Qatar, Bahrain, Oman, Saudi Arabia, Kuwait, Jordan, Israel, Lebanon).
+
+Removed: NEAR_KM, haversineKm, milesAwayText, tileDistanceText (replaced by tilePlaceText), the hero HELD comment. hero.factBestRound kept (crown fallback uses it).
+
+Changed assertions in whatsBeenPlayed.test.tsx:
+- area tabs (3 tests: Near you / patch-only) → 4 tests: county, nation, GB&I, Europe, USA, Middle East, Rest of world order; empty tabs hidden; label-repeat skip; no home → world only.
+- `milesAwayText(...)` / `tileDistanceText(...) toBe('Kent')` → `tilePlaceText` county else nation.
+- `g()` fixture `rounds/latestScoreId` → `activity/latestKey`.
+- rings follow the tab: `toEqual(['selected'])` then Kent `toHaveLength(2)` → `['selected','new']` then GB&I `toHaveLength(3)`.
+- seen `{ near: '3', kent: '4' }` → `{ near: 'round:3', kent: 'round:4' }`; `{ fife: '5', near: '3' }` → `{ fife: '5', near: 'round:3' }`.
+- tab change with pending reads: clicks GB&I instead of Kent (Kent is now first).
+- seen on load/tab change: fixture adds fife; `{ near: '1' }`/`{ near:'1', kent:'3' }`/`['selected','seen']` → `{ kent:'round:3' }`/`{ kent:'round:3', fife:'round:8' }`/`['selected','seen','new']`.
+- Added: best lately distinct golfers.
+New: whatsBeenPlayedV2.test.tsx (10), whatsBeenPlayedHero.test.tsx (3).
+
+Suite: 9,059 → 9,074 (2,241 incl. 8 failed / 2,249 / 2,252 / 2,332). +15 = whatsBeenPlayed +2, V2 +10, hero +3. Typecheck clean. Device checks: unchecked (signed-in flows unavailable in the test browser).

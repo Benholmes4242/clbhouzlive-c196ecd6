@@ -270,7 +270,7 @@ function CoursesPageHeroInner() {
               </span>
             ) : null}
           >
-            {(blurb || factLine) ? (
+            {(blurb || factLine || recordRow) ? (
               <>
                 {blurb && (
                   <div
