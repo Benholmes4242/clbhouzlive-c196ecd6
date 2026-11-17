@@ -111,7 +111,7 @@ import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
-import { ImageCropModal } from '@/components/business/ImageCropModal';
+import { WelcomeCropper } from '@/features/onboarding/WelcomeCropper';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 import { ReportSheet } from '@/components/moderation/ReportSheet';
@@ -1560,13 +1560,13 @@ const ProfilePageV2Content: React.FC = () => {
 
       {/* Crop Modal */}
       {isCropModalOpen && cropImageSrc && (
-        <ImageCropModal
-          open={isCropModalOpen}
-          onOpenChange={handleCropCancel}
-          imageSrc={cropImageSrc}
-          aspectRatio={AVATAR_CROP_ASPECT}
-          onCropComplete={handleCropComplete}
-          title="Crop Profile Photo"
+        <WelcomeCropper
+          image={cropImageSrc}
+          aspect={AVATAR_CROP_ASPECT}
+          frameShape="squircle"
+          subtitle="This is how golfers will see you"
+          onCancel={() => handleCropCancel(false)}
+          onUse={handleCropComplete}
         />
       )}
       <ScrollToTopGlass />
