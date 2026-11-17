@@ -173,3 +173,34 @@ Typecheck clean (`npx tsgo -b --noEmit`).
 **Not checked.** The signed-out Courses page in a real browser: the preview at
 http://localhost:8080 renders the page, but the shell-to-content handover was verified only
 through the test, not by eye.
+
+## BRIEF_WHATS_BEEN_PLAYED_V4
+
+**What changed**
+- Courses page hero location line: amber → ink #F8FAFC (`placeColor={A.INK}`); size, weight, position and record row unchanged.
+- Tile head: title is `shortCoursePart` (full name, e.g. "Sundridge Park (East Course)"), 18px/800 ink, line-height 22px, 2-line clamp; sub line "Through members' eyes" only; county removed (`tilePlaceText` deleted, now unused). Explore keeps the short name. The head is no longer a tap target. WhoPlayingShell keeps its one 22px title bar; its county bar (72px) was removed so the shell draws no bar for absent content.
+- Taps: Best lately (incl. "{n} rounds lately ›") and the faces line → `courseLatelyHref(id)` = `/courses/:id?tab=course&section=lately`. Photos → canonical viewer (`tilePhotoViewer.ts`), never navigate. Explore, the no-photos tile and Add a photo → course page top (unchanged).
+- Rail cards no longer navigate; they open `PlayedTileSheet` (canonical BottomSheet, the one OurRecordSheet uses): top radius 22, grabber 36×4 rgba(255,255,255,.22) 8px from top, tile 8px under it with 16px sides, bottom 30px + safe area, max 90vh, swipe/backdrop close. Same PlayedTile + usePlayedTile for that course; placeholders while photos load. Sheet navigation closes the sheet then navigates via `afterSheetHistorySettled`.
+- Seen: WhoPlayingSection's single seen effect now also stamps the sheet's course.
+- Course detail masthead kicker: new `kickerColor` prop on CourseMasthead (default amber); GolfClubView passes `A.INK`. Other mastheads unchanged.
+- GolfClubView: `useLatelyDeepLink` reads `section=lately` once, waits for `[data-course-lately="ready"]`, scrolls it under the islands with `chromeClearancePx()` on its scroll owner, then deletes `section` with replace. Absent Lately (loading then gone, error, or 10s with nothing) → tab top, param cleared.
+
+**Tab id used for Lately:** `course` (CourseLatelySection renders in CourseAboutTab, the default course tab).
+
+**Viewer paths:** hole photos → the hole's get_hole_media rows (holeMediaQuery, already read by usePlayedTile) → `holeShotsToFeedPosts` → `openWithOrigin`, opened on the tapped row's media id. Course photos → the course's get_course_media_v2 set (galleryCourseMediaQuery) → `coursePostsToShotPosts` → `openWithOrigin`, opened on the tapped post's media. `openedFrom: 'courses-whats-played'`, readOnly, synthetic.
+
+**Departures to rule on**
+1. Viewer above the sheet: FS_OVERLAY_Z (200) sits below every BottomSheet (1400), so from the sheet the viewer opens at `VIEWER_ABOVE_SHEETS_Z` (12200), the registry's value for a viewer opened from a sheet. From the page it stays FS_OVERLAY_Z.
+2. Sheet surface #141418 and backdrop 0.6: the BottomSheet canon forbids caller backgrounds, so I added a named variant `surface="panel"` (default `canon` unchanged for every other sheet).
+3. NOT BUILT — LATEST REVIEW card: §3 says open "the course page on its reviews the way Latest reviews does today", but Latest reviews does not open the course page; it opens the read-review sheet (`useReviewSheetStore.open`). The clauses disagree, so the card keeps its V3 tap (course page top) pending your ruling.
+
+**Changed assertions (authorised §7)**
+- `whatsBeenPlayed.test.tsx` — deleted "head right reads the county, else the nation" (`tilePlaceText({ region: 'Kent', … })` → `'Kent'`; null region → `'England'`): the county and its helper are removed.
+- `whatsBeenPlayedV2.test.tsx` — "…county in the head; played line" → "…no county in the head; played line"; `[data-tile-place]` text `'Kent'` → element `null`.
+- `coursesHeroPlaceScrim.test.tsx` — "keeps the existing one-line place style, with amber…" → "…in ink…"; colour `A.AMBER` → `A.INK`.
+
+**New tests:** `src/test/whatsBeenPlayedV4.test.tsx` (11): tile head; Best lately/faces → Lately link; photo taps open viewer (hole + course) without navigating; Explore → top; rail card → sheet, seen, no navigation; sheet photo above sheet; sheet Best lately closes then navigates; deep link scrolls once and clears; absent Lately lands at top; GolfClubView wiring; kicker tone.
+
+**Suite:** 9,084 → 9,094 (+11 new, −1 deleted). Shards 2,275 / 2,231 / 2,260 / 2,328, all passing (baseline 2,275 / 2,231 / 2,254 / 2,324). Typecheck clean.
+
+**Unchecked:** device checks at 375 and 320 (signed-in only; the test browser cannot sign in). Scroll position kept on sheet close is left to the BottomSheet's own scroll lock and is not asserted in jsdom.
