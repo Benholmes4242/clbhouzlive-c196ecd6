@@ -25,7 +25,7 @@ describe('account door small-phone fit', () => {
     const door = css.match(/\.account-glance button\.account-door \{([^}]*)\}/)?.[1] ?? '';
     expect(door).toContain('flex: 1 1 0');
     expect(door).toContain('min-width: 0');
-    expect(door).toContain('overflow: hidden');
+    expect(door).not.toContain('overflow: hidden');
     expect(door).toContain('padding: 0 10px');
     expect(door).toContain('gap: 9px');
     const labelRule = css.match(/\.account-door-label \{([^}]*)\}/)?.[1] ?? '';

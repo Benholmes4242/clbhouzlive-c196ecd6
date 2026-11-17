@@ -44,6 +44,24 @@ export type Database = {
         }
         Relationships: []
       }
+      _fn_backup_20261117: {
+        Row: {
+          def: string
+          fn: string
+          saved_at: string
+        }
+        Insert: {
+          def: string
+          fn: string
+          saved_at?: string
+        }
+        Update: {
+          def?: string
+          fn?: string
+          saved_at?: string
+        }
+        Relationships: []
+      }
       _par_race_test: {
         Row: {
           actual_gross: number | null

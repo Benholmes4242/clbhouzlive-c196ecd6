@@ -55,7 +55,7 @@ serve(async (req) => {
     // Longer queries: focus on addresses
     const types = query.length < 6 
       ? 'postcode,place,locality,neighborhood,poi'
-      : 'address,poi,postcode'
+      : 'address,poi,postcode,place,locality,neighborhood'
     
     // Build Mapbox URL
     let mapboxUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`
