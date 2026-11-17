@@ -168,7 +168,7 @@ describe('section', () => {
     const kentRing = container.querySelectorAll('[data-played-ring]')[1];
     expect(kentRing.getAttribute('data-played-ring')).toBe('new');
     fireEvent.click(kentRing);
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: '4' });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: '3', kent: '4' });
     fireEvent.click(container.querySelectorAll('[data-played-ring]')[0]);
     expect(container.querySelectorAll('[data-played-ring]')[1].getAttribute('data-played-ring')).toBe('seen');
   });
@@ -233,6 +233,15 @@ describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
     present(container);
     expect(container.querySelectorAll('[data-tile-pending]')).toHaveLength(2);
+  });
+  it('the ring whose tile is showing counts as seen on load and after a tab change', () => {
+    setHook([row('1', 'near', 'ann', 71), row('2', 'kent', 'bob', 70, '2026-11-08'), row('3', 'kent', 'cy', 75, '2026-11-12')],
+      [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club')]);
+    const { container } = mount();
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: '1' });
+    fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: '1', kent: '3' });
+    expect([...container.querySelectorAll('[data-played-ring]')].map((r) => r.getAttribute('data-played-ring'))).toEqual(['selected', 'seen']);
   });
 });
 

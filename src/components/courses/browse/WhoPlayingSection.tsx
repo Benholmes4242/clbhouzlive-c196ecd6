@@ -76,6 +76,21 @@ export function WhoPlayingSection() {
   const [seen, setSeen] = useState<SeenMap | null>(() => readSeen(userId));
   useEffect(() => { setSeen(readSeen(userId)); }, [userId]);
 
+  // §2 (BRIEF_WHATS_BEEN_PLAYED_FIXES): the ring whose tile is showing counts as
+  // seen. One owner writes it — the default on load, the default after a tab
+  // change and a tap all land here — once per change of selection. The selected
+  // ring still draws as selected; it reads as seen as soon as another is picked.
+  const seenWritten = useRef<string | null>(null);
+  useEffect(() => {
+    if (!current) return;
+    const stamp = `${userId}|${current.courseId}:${current.latestScoreId}`;
+    if (seenWritten.current === stamp) return;
+    seenWritten.current = stamp;
+    const next = { ...(seen ?? {}), [current.courseId]: current.latestScoreId };
+    setSeen(next);
+    writeSeen(userId, next);
+  }, [current, seen, userId]);
+
   const tabIds = useMemo(() => new Set(tabs.flatMap((t) => t.courseIds)), [tabs]);
   const rails = useMemo(() => buildRails(courses, groups, tabIds, played.home), [courses, groups, tabIds, played.home]);
   const grouping = played.home?.country ?? UKI_GROUPING;
@@ -94,12 +109,7 @@ export function WhoPlayingSection() {
   if (!ready) return <WhoPlayingShell />;
   if (!user || groups.length === 0 || !tab) return null;
 
-  const select = (g: CourseGroup) => {
-    setSelected(g.courseId);
-    const next = { ...(seen ?? {}), [g.courseId]: g.latestScoreId };
-    setSeen(next);
-    writeSeen(userId, next);
-  };
+  const select = (g: CourseGroup) => { setSelected(g.courseId); };
 
   return (
     <section data-whats-been-played="" style={{ padding: '20px 0 14px', overflow: 'hidden' }}>
