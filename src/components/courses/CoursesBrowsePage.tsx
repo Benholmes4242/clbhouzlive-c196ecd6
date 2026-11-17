@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import { HardestSection } from './browse/HardestSection';
-import { LatestCoursesSection } from './browse/LatestCoursesSection';
 import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
 import { useBrowseReviews } from './useBrowseReviews';
@@ -9,7 +8,7 @@ import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import StatBrowse from './StatBrowse';
 import { useCourseBrowseTruth } from './useStatBrowse';
-import { WhoPlayingShell, ByRegionShell, LatestCoursesShell } from './browse/sectionShells';
+import { WhoPlayingShell, ByRegionShell } from './browse/sectionShells';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
 import { ByRegionSection } from './browse/ByRegionSection';
@@ -17,7 +16,7 @@ import { MostPlayedSection } from './browse/MostPlayedSection';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageLoadGate, settled, useSectionReady } from './browse/PageLoadGate';
 
-const GATE_IDS = ['whoPlaying', 'byRegion', 'latestCourses', 'mostPlayed', 'hardest', 'latestHoles', 'latestReviews', 'figures', 'list'] as const;
+const GATE_IDS = ['whoPlaying', 'byRegion', 'mostPlayed', 'hardest', 'latestHoles', 'latestReviews', 'figures', 'list'] as const;
 
 /** Reports page-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
@@ -79,7 +78,6 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <div data-courses-fallback="" style={BLEED}>
           {user && <WhoPlayingShell />}
           <ByRegionShell />
-          <LatestCoursesShell />
         </div>
       }>
       <div style={BLEED}>
@@ -87,7 +85,6 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <GateReport id="figures" ready={!sessionLoading && settled(truthQuery)} />
         <WhoPlayingSection />
         <ByRegionSection />
-        <LatestCoursesSection />
         <MostPlayedSection />
         <HardestSection />
         <LatestHolesSection />

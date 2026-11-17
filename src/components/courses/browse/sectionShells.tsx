@@ -27,8 +27,12 @@ import {
 } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import {
-  WHO_CARD_RADIUS, WHO_CARD_W, WHO_FACE_H, WHO_FOOTER_PAD, WHO_PHOTO_H, WHO_RAIL_GAP,
+  RING_GAP, RING_ITEM_W, RING_LABEL_GAP, RING_LABEL_LINE, RING_RADIUS, RING_ROW_PAD_TOP, RING_ROW_TOP, RING_SIZE, TAB_H, TABS_TOP,
 } from './WhoPlayingSection';
+import {
+  BEST_CARD_W, BUTTON_H, BUTTON_TOP, FACE_SIZE, FACES_TOP, PHOTO_TILE_W, TILE_NAME_LINE, TILE_RADIUS, TILE_ROW_H, TILE_ROW_TOP, TILE_SUB_LINE, TILE_TOP,
+} from './PlayedTile';
+import { PLAYED_KICKER, PLAYED_TITLE } from './playedParts';
 import { REGION_GAP, REGION_TILE_H, REGION_TILES_NO_LEAD } from './ByRegionSection';
 import { PHOTO_FIGURE_GAP, PHOTO_FIGURE_H, PHOTO_FIGURE_W } from './PhotoFigureCard';
 import { TOUGH_COUNT, TOUGH_GAP, TOUGH_TILE_H } from './HardestSection';
@@ -62,35 +66,52 @@ function HeadShell({ title = true, children }: { title?: boolean; children: Reac
   );
 }
 
-/** Recently played: two cards and a clipped third. */
+/**
+ * What's been played (BRIEF_WHATS_BEEN_PLAYED §5): the signed-off head, a 34px
+ * chip row, 64px squircle rings at a 72px pitch with two label lines, the tile
+ * head and sub line, the 186px row, faces line and 44px button. Rails need no
+ * shell — the page gate holds them. Every bar sits inside its real line box.
+ */
 export function WhoPlayingShell() {
-  const footH = WHO_FOOTER_PAD.top + WHO_FACE_H + WHO_FOOTER_PAD.bottom;
+  const clip: React.CSSProperties = { display: 'flex', overflow: 'hidden', padding: '0 16px' };
+  const line = (h: number, w: number | string, bar: number) => (
+    <div style={{ height: h, display: 'flex', alignItems: 'center' }}><Bar style={{ height: bar, width: w }} /></div>
+  );
   return (
-    <HeadShell>
-      <div style={{ ...RAIL_CLIPPED, gap: WHO_RAIL_GAP }}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            style={{
-              width: WHO_CARD_W, flex: 'none', overflow: 'hidden',
-              border: `1px solid ${A.BORDER}`, borderRadius: WHO_CARD_RADIUS,
-            }}
-          >
-            {/* Photo is clipped square by the card's own overflow. */}
-            <Bar style={{ height: WHO_PHOTO_H, width: '100%', borderRadius: 0 }} />
-            <div
-              style={{
-                height: footH, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 8,
-                padding: `${WHO_FOOTER_PAD.top}px ${WHO_FOOTER_PAD.x}px ${WHO_FOOTER_PAD.bottom}px`,
-              }}
-            >
-              <Bar style={{ height: WHO_FACE_H, width: WHO_FACE_H - 1, borderRadius: '34%' }} />
-              <Bar style={{ height: 9, width: 140 }} />
+    <section aria-hidden data-who-shell="" style={{ padding: '20px 0 14px' }}>
+      <div style={{ padding: '0 16px' }}>
+        {line(PLAYED_KICKER.lineHeight, 72, 8)}
+        <div style={{ marginTop: PLAYED_TITLE.gap }}>{line(PLAYED_TITLE.lineHeight, 190, 17)}</div>
+      </div>
+      <div style={{ ...clip, gap: 8, marginTop: TABS_TOP }}>
+        {[84, 64].map((w) => <Bar key={w} style={{ height: TAB_H, width: w, borderRadius: 13, flex: 'none' }} />)}
+      </div>
+      <div style={{ ...clip, gap: RING_GAP, marginTop: RING_ROW_TOP, paddingTop: RING_ROW_PAD_TOP, paddingBottom: 2 }}>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} style={{ flex: 'none', width: RING_ITEM_W }}>
+            <Bar style={{ width: RING_SIZE, height: RING_SIZE, margin: '0 4px', borderRadius: RING_RADIUS }} />
+            <div style={{ marginTop: RING_LABEL_GAP }}>
+              <div style={{ height: RING_LABEL_LINE, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Bar style={{ height: 8, width: 56 }} /></div>
+              <div style={{ height: RING_LABEL_LINE, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Bar style={{ height: 8, width: 36 }} /></div>
             </div>
           </div>
         ))}
       </div>
-    </HeadShell>
+      <div style={{ margin: `${TILE_TOP}px 16px 0` }}>
+        <div style={{ height: TILE_NAME_LINE, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Bar style={{ height: 15, width: 150 }} /><Bar style={{ height: 9, width: 72 }} />
+        </div>
+        <div style={{ marginTop: 3 }}>{line(TILE_SUB_LINE, 170, 9)}</div>
+        <div style={{ display: 'flex', overflow: 'hidden', gap: 6, margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
+          <Bar style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS }} />
+          {[0, 1].map((i) => <Bar key={i} style={{ flex: 'none', width: PHOTO_TILE_W, height: TILE_ROW_H, borderRadius: TILE_RADIUS }} />)}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: FACES_TOP, height: FACE_SIZE }}>
+          <Bar style={{ height: FACE_SIZE, width: FACE_SIZE * 3, borderRadius: '34%' }} /><Bar style={{ height: 9, width: 150 }} />
+        </div>
+        <Bar style={{ marginTop: BUTTON_TOP, height: BUTTON_H, width: '100%', borderRadius: 14 }} />
+      </div>
+    </section>
   );
 }
 

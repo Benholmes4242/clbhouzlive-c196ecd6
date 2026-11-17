@@ -306,14 +306,12 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     expect(source).toContain('openWithOrigin');
   });
 
-  it('CoursesBrowsePage gates latestCourses after byRegion and renders the section between By region and The regulars', () => {
+  it('CoursesBrowsePage no longer gates or mounts latestCourses (BRIEF_WHATS_BEEN_PLAYED §5)', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/components/courses/CoursesBrowsePage.tsx'), 'utf8');
-    expect(source).toMatch(/'byRegion', 'latestCourses', 'mostPlayed'/);
-    const byRegion = source.indexOf('<ByRegionSection />');
-    const latest = source.indexOf('<LatestCoursesSection />');
-    const regulars = source.indexOf('<MostPlayedSection />');
-    expect(byRegion).toBeGreaterThan(-1);
-    expect(byRegion).toBeLessThan(latest);
-    expect(latest).toBeLessThan(regulars);
+    expect(source).toMatch(/'byRegion', 'mostPlayed'/);
+    expect(source).not.toContain("'latestCourses'");
+    expect(source).not.toContain('<LatestCoursesSection />');
+    expect(source.indexOf('<ByRegionSection />')).toBeLessThan(source.indexOf('<MostPlayedSection />'));
   });
+
 });

@@ -23,6 +23,16 @@ vi.mock('@/features/search-v2/hooks/useGlobalSearchV2', () => ({ useGlobalSearch
 vi.mock('@/features/activity-v2/hooks/useFriendRequestsV2', () => ({ useFriendRequestsV2: () => ({ data: h.requests, isLoading: false, acceptRequest: { isPending: false }, declineRequest: { isPending: false } }) }));
 vi.mock('@/hooks/gam/useCircleLatestRounds', () => ({ useCircleLatestRounds: () => ({ data: h.rounds, isLoading: false, isFetched: true }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useCourseCardMeta', () => ({ useCourseCardMeta: () => ({ data: new Map(), isLoading: false, isFetched: true }) }));
+// What's been played reads rounds and course geography through its own hook;
+// best lately needs a gross, so each round carries one.
+vi.mock('@/components/courses/browse/usePlayedRounds', () => ({ usePlayedRounds: () => {
+  const rows = h.rounds.map((r: any, i: number) => ({ whs_score_id: r.round_id ?? `s${i}`, course_id: r.course_id ?? null, course_name: r.course_name ?? null, play_date: r.play_date, user_id: r.user_id, display_name: r.display_name ?? null, profile_photo_url: r.profile_photo_url ?? null, gross_score: r.gross ?? 80 + i, course_par: 72, total_count: h.rounds.length }));
+  const ids = [...new Set(rows.map((r: any) => r.course_id).filter(Boolean))].sort() as string[];
+  const courses = new Map(ids.map((id) => [id, { id, name: 'Course', imageUrl: null, region: 'Europe', subCountry: 'England', country: 'Britain & Ireland', continent: 'Europe', lat: 52, lng: -1 }]));
+  return { rounds: { data: rows, isFetched: true, isError: false }, courses: { data: courses, isFetched: true, isError: false }, ids, home: null, homeReady: true };
+} }));
+vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => ({ holes: [], photos: [], hardestHole: null, ready: true }) }));
+vi.mock('@/components/courses/browse/useRailTopUps', () => ({ useRailTopUps: () => ({ byRail: new Map(), ready: true }) }));
 vi.mock('@/components/courses/browse/PageLoadGate', async original => ({ ...await original<typeof import('@/components/courses/browse/PageLoadGate')>(), useSectionReady: () => {} }));
 vi.mock('@/components/explore-tab-new/courseled/CourseImageFallback', () => ({ CourseImageFallback: ({ children }: any) => <div>{children}</div> }));
 vi.mock('@/features/explore-magazine/useClubGolfers', () => ({ useClubGolfers: () => ({ golfers: h.club, isFetched: true }) }));
@@ -48,6 +58,9 @@ const proReadIds = (): string[] | undefined => {
   return call ? call[1]?.p_user_ids as string[] : undefined;
 };
 const ids = ['pro', 'ordinary', 'pending'];
+// What's been played mounts names only in the selected course's BEST LATELY
+// card (the two lowest rounds there); every other surface mounts all three ids.
+const mountedIds = (name: string) => (name === 'course members' ? ids.slice(0, 2) : ids);
 const SIBLING_SURFACES = ['rail', 'find people'];
 const getByTextIn = (root: HTMLElement, text: string) => within(root).getByText(text, { selector: 'span' });
 const person = (id: string) => ({ user_id: id, display_name: id, username: id, profile_photo_url: null, reason_type: 'club', reason_club_name: 'Club', reason_course_name: null, reason_date: null, mutual_count: null, recent_rounds: null, rounds_total: 3, handicap_index: null, is_verified: false });
@@ -86,7 +99,7 @@ describe('Brief 2B mounted member names', () => {
       const { container } = mount(surface(name));
       await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));
       expect(h.rpc.mock.calls.filter((c: unknown[]) => c[0] === 'get_pro_members')).toHaveLength(1);
-      expect(proReadIds()?.sort()).toEqual([...ids].sort());
+      expect(proReadIds()?.sort()).toEqual([...mountedIds(name)].sort());
       if (SIBLING_SURFACES.includes(name)) {
         expect(container.querySelector('.pro-label')?.previousElementSibling?.textContent).toBe('pro');
         expect(container.querySelector('.pro-inline-name')).toBeNull();
@@ -95,6 +108,7 @@ describe('Brief 2B mounted member names', () => {
       const labelled = container.querySelector('.pro-inline-name:has(.pro-label)');
       expect(labelled?.querySelector('.pro-inline-text')?.textContent).toBe('pro');
       expect([...container.querySelectorAll('.pro-inline-name')].filter(node => node.querySelector('.pro-inline-text')?.textContent !== 'pro').every(node => !node.querySelector('.pro-label'))).toBe(true);
+      if (name === 'course members') expect(container.querySelectorAll('[data-best-entry]').length).toBe(2);
     });
   }
   it('business grid names never enter the pro read', () => {

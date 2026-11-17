@@ -7,6 +7,7 @@ const f = vi.hoisted(() => ({ session: { user: null as { id: string } | null, lo
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => f.session }));
 vi.mock('@/hooks/gam/useCircleLatestRounds', () => ({ useCircleLatestRounds: () => f.rounds }));
+vi.mock('@/components/courses/browse/usePlayedRounds', () => ({ usePlayedRounds: () => ({ rounds: f.rounds, courses: f.meta, ids: [...new Set((f.rounds.data as Array<{ course_id?: string }>).map((r) => r.course_id).filter(Boolean))], home: null, homeReady: !f.session.user || f.rounds.isFetched }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useCourseCardMeta', () => ({ useCourseCardMeta: () => f.meta }));
 vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => f.home }));
 vi.mock('@/components/courses/useStatBrowse', () => ({ useCourseBrowseTruth: () => f.truth }));

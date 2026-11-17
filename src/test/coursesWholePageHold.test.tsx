@@ -29,9 +29,10 @@ it('holds the list and all sections together until the list is ready, preserving
   const view = render(tree());
   expect(screen.getByTestId('who-shell')).toBeVisible();
   expect(screen.getByTestId('region-shell')).toBeVisible();
-  expect(screen.getByTestId('courses-shell')).toBeVisible();
-  for (const id of ['whoPlaying', 'byRegion', 'latestCourses', 'mostPlayed', 'hardest', 'latestHoles', 'list']) expect(screen.getByTestId(id)).not.toBeVisible();
-  f.ready = Object.fromEntries(['whoPlaying', 'byRegion', 'latestCourses', 'mostPlayed', 'hardest', 'latestHoles', 'latestReviews', 'figures'].map(id => [id, true]));
+  expect(screen.queryByTestId('courses-shell')).toBeNull();
+  expect(screen.queryByTestId('latestCourses')).toBeNull();
+  for (const id of ['whoPlaying', 'byRegion', 'mostPlayed', 'hardest', 'latestHoles', 'list']) expect(screen.getByTestId(id)).not.toBeVisible();
+  f.ready = Object.fromEntries(['whoPlaying', 'byRegion', 'mostPlayed', 'hardest', 'latestHoles', 'latestReviews', 'figures'].map(id => [id, true]));
   view.rerender(tree());
   expect(screen.getByTestId('list')).not.toBeVisible();
   f.ready.list = true; view.rerender(tree());
@@ -39,4 +40,4 @@ it('holds the list and all sections together until the list is ready, preserving
   expect(screen.getByTestId('list')).toBeVisible();
   expect(screen.getByTestId('list').parentElement).toBe(screen.getByTestId('byRegion').parentElement?.parentElement);
 });
-it('the signed-out fallback omits the circle shell', () => { render(tree()); expect(screen.queryByTestId('who-shell')).toBeNull(); expect(screen.getByTestId('region-shell')).toBeVisible(); expect(screen.getByTestId('courses-shell')).toBeVisible(); });
+it('the signed-out fallback omits the circle shell', () => { render(tree()); expect(screen.queryByTestId('who-shell')).toBeNull(); expect(screen.getByTestId('region-shell')).toBeVisible(); expect(screen.queryByTestId('courses-shell')).toBeNull(); });

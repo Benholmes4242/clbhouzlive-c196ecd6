@@ -1,134 +1,142 @@
-import { useMemo } from 'react';
-import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useMemo, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
-import { relativeDay } from '@/components/explore-tab-new/courseled/discoverWhen';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
-import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
-import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { RailChips } from '@/components/ui/RailChips';
+import { shareCourseName } from '@/lib/courses/shareCourseName';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
-import { fmtCount, plural, RAIL_BLEED } from './format';
-import { firstName } from '@/lib/whs/share';
-import { settled, useSectionReady } from './PageLoadGate';
+import { fmtCount } from './format';
+import { useSectionReady } from './PageLoadGate';
+import { settled } from './PageLoadGate';
 import { WhoPlayingShell } from './sectionShells';
+import { buildAreaTabs, buildRails, isNewRing, orderRings, readSeen, writeSeen, UKI_GROUPING, type RingGroup, type SeenMap } from './playedRings';
+import { usePlayedRounds, type PlayedCourse, type PlayedRoundRow } from './usePlayedRounds';
+import { usePlayedTile } from './usePlayedTile';
+import { useRailTopUps } from './useRailTopUps';
+import { PlayedHead, GLASS, type Face } from './playedParts';
+import { PlayedTile } from './PlayedTile';
+import { RegionRails } from './RegionRails';
 
 /**
- * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_COURSES_PAGE_DEVICE_REVISION §3).
- * Clubhouse asks WHO played; this asks WHAT got played. Same rounds hook,
- * grouped client-side: one card per course, most recent first, capped at 10.
- * No RoundShape — it describes a round, and this card's subject is a course.
+ * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_WHATS_BEEN_PLAYED, three signed-off
+ * mocks). Area tabs for the member's own patch, course rings busiest first,
+ * the selected ring's tile, then region rails for every other played course.
+ * Reads: usePlayedRounds (rounds, course geography, home), usePlayedTile (the
+ * selected course's photos), useRailTopUps. All of them gate 'whoPlaying'.
+ * Guests see nothing (get_recent_rounds is 401 signed out).
  */
-const CAP = 10;
-/* Card geometry, read by the card AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
-export const WHO_CARD_W = 300;
-export const WHO_CARD_RADIUS = 12;
-export const WHO_PHOTO_H = 150;
-export const WHO_RAIL_GAP = 10;
-export const WHO_FOOTER_PAD = { top: 10, x: 12, bottom: 11 } as const;
-export const WHO_FACE_H = 20;
-/** Rounds read before grouping — the hook's own cap, unchanged. */
-const ROUND_LIMIT = 24;
+/* Geometry, read by the section AND WhoPlayingShell. Whole pixels only. */
+export const RING_ITEM_W = 72;
+export const RING_SIZE = 64;
+export const RING_GAP = 8;
+export const RING_BORDER = 1.5;
+export const RING_RADIUS = 21.76;
+export const RING_INSET = 2.5;
+export const RING_PHOTO_RADIUS = 17.76;
+export const RING_ROW_TOP = 14;
+export const RING_ROW_PAD_TOP = 4;
+export const RING_LABEL_GAP = 9;
+export const RING_LABEL_LINE = 13;
+export const RING_VARIANT_LINE = 12;
+export const BADGE_RADIUS = 6;
+export const TABS_TOP = 12;
+export const TAB_H = 34;
+const SEEN_EDGE = 'rgba(255,255,255,.16)';
 
-interface CourseGroup {
-  key: string;
-  courseId: string | null;
-  courseName: string;
-  best: number | null;
-  latestDate: string;
-  rounds: number;
-  members: CircleRoundRow[]; // one row per distinct member, most recent first
+export interface CourseGroup extends RingGroup { rows: PlayedRoundRow[]; faces: Face[]; best: number | null }
+
+export function groupRounds(rows: PlayedRoundRow[]): CourseGroup[] {
+  const sorted = [...rows].sort((a, b) => b.play_date.localeCompare(a.play_date) || b.whs_score_id.localeCompare(a.whs_score_id));
+  const map = new Map<string, CourseGroup>();
+  for (const r of sorted) {
+    if (!r.course_id) continue;
+    let g = map.get(r.course_id);
+    if (!g) { g = { courseId: r.course_id, rounds: 0, latestDate: r.play_date, latestScoreId: r.whs_score_id, rows: [], faces: [], best: null }; map.set(r.course_id, g); }
+    g.rounds += 1;
+    g.rows.push(r);
+    if (r.gross_score != null && (g.best == null || r.gross_score < g.best)) g.best = r.gross_score;
+    if (!g.faces.some((f) => f.userId === r.user_id)) g.faces.push({ userId: r.user_id, photo: r.profile_photo_url, name: r.display_name });
+  }
+  return orderRings([...map.values()]);
 }
 
-
 export function WhoPlayingSection() {
-  const { t } = useTranslation('courses');
-  const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
-  const roundsQuery = useCircleLatestRounds(user?.id, { limit: ROUND_LIMIT, allowMultiplePerFriend: true });
-  const groups = useMemo(() => {
-    const rows = [...(roundsQuery.data ?? [])].sort((a, b) => b.play_date.localeCompare(a.play_date));
-    const map = new Map<string, CourseGroup>();
-    for (const r of rows) {
-      const key = r.course_id ?? `name:${r.course_name ?? r.round_id}`;
-      let g = map.get(key);
-      if (!g) {
-        g = { key, courseId: r.course_id ?? null, courseName: r.course_name ?? '', best: null, latestDate: r.play_date, rounds: 0, members: [] };
-        map.set(key, g);
-      }
-      g.rounds += 1;
-      if (r.gross != null && (g.best == null || r.gross < g.best)) g.best = r.gross;
-      if (!g.members.some((m) => m.user_id === r.user_id)) g.members.push(r);
-    }
-    return [...map.values()].slice(0, CAP);
-  }, [roundsQuery.data]);
-  const courseIds = useMemo(() => groups.map((g) => g.courseId).filter((v): v is string => !!v), [groups]);
-  const metaQuery = useCourseCardMeta(courseIds);
-  const meta = metaQuery.data;
-  const ready = !sessionLoading && (!user || (settled(roundsQuery) && (courseIds.length === 0 || settled(metaQuery))));
+  const userId = user?.id;
+  const played = usePlayedRounds(userId);
+  const courseMap = played.courses.data as Map<string, PlayedCourse> | undefined;
+  const groups = useMemo(() => groupRounds((played.rounds.data ?? []) as PlayedRoundRow[]).filter((g) => !courseMap || courseMap.has(g.courseId)), [played.rounds.data, courseMap]);
+  const courses = useMemo(() => groups.map((g) => courseMap?.get(g.courseId)).filter((c): c is PlayedCourse => !!c), [groups, courseMap]);
+  const roundsByCourse = useMemo(() => new Map(groups.map((g) => [g.courseId, g.rounds])), [groups]);
+  const tabs = useMemo(() => buildAreaTabs(courses, played.home, roundsByCourse), [courses, played.home, roundsByCourse]);
+  const [tabId, setTabId] = useState<string | null>(null);
+  const tab = tabs.find((t) => t.id === tabId) ?? tabs[0] ?? null;
+  const ringGroups = useMemo(() => (tab ? groups.filter((g) => tab.courseIds.includes(g.courseId)) : []), [groups, tab]);
+  const [selected, setSelected] = useState<string | null>(null);
+  const current = ringGroups.find((g) => g.courseId === selected) ?? ringGroups[0] ?? null;
+  const [seen, setSeen] = useState<SeenMap | null>(() => readSeen(userId));
+  useEffect(() => { setSeen(readSeen(userId)); }, [userId]);
+
+  const tabIds = useMemo(() => new Set(tabs.flatMap((t) => t.courseIds)), [tabs]);
+  const rails = useMemo(() => buildRails(courses, groups, tabIds, played.home), [courses, groups, tabIds, played.home]);
+  const grouping = played.home?.country ?? UKI_GROUPING;
+  const topUps = useRailTopUps(rails, grouping, userId);
+  const tile = usePlayedTile(current?.courseId ?? null, userId);
+
+  const roundsReady = settled(played.rounds) && (played.ids.length === 0 || settled(played.courses));
+  const ready = !sessionLoading && (!user || (roundsReady && played.homeReady && (!current || tile.ready) && topUps.ready));
   useSectionReady('whoPlaying', ready);
 
-  const loading = !ready;
-  if (loading) return <WhoPlayingShell />;
-  if (groups.length === 0) return loading ? <WhoPlayingShell /> : null;
+  if (!ready) return <WhoPlayingShell />;
+  if (!user || groups.length === 0 || !tab) return null;
+
+  const select = (g: CourseGroup) => {
+    setSelected(g.courseId);
+    const next = { ...(seen ?? {}), [g.courseId]: g.latestScoreId };
+    setSeen(next);
+    writeSeen(userId, next);
+  };
 
   return (
-    <section style={SECTION_WRAP}>
-      <SectionHead
-        tone="amber"
-        kicker="Recently"
-        title="What's been played"
+    <section data-whats-been-played="" style={{ padding: '20px 0 14px', overflow: 'hidden' }}>
+      <PlayedHead kicker="RECENTLY" title="What's been played" />
+      <RailChips
+        size="tile"
+        ariaLabel="Choose area"
+        options={tabs.map((t) => ({ id: t.id, label: t.label }))}
+        value={tab.id}
+        onChange={(id) => { setTabId(id); setSelected(null); }}
+        style={{ marginTop: TABS_TOP, padding: '0 16px' }}
       />
-      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: WHO_RAIL_GAP, marginTop: HEAD_GAP }}>
-        {groups.map((g) => {
-          const m = g.courseId ? meta?.get(g.courseId) : undefined;
-          const name = m?.name ?? g.courseName;
-          const tail = g.rounds === 1 ? relativeDay(g.latestDate, t as never) : plural(g.rounds, 'round', 'rounds');
-          const faces = g.members.slice(0, 3);
+      <div className="scrollbar-hide" data-played-rings="" style={{ display: 'flex', gap: RING_GAP, overflowX: 'auto', scrollbarWidth: 'none', marginTop: RING_ROW_TOP, padding: `${RING_ROW_PAD_TOP}px 16px 2px` }}>
+        {ringGroups.map((g) => {
+          const c = courseMap?.get(g.courseId);
+          const { short, variant } = shareCourseName(c?.name ?? '');
+          const isSel = current?.courseId === g.courseId;
+          const isNew = isNewRing(g, seen);
+          const edge = isSel ? A.INK : isNew ? A.AMBER : SEEN_EDGE;
+          const badge = isSel ? A.INK : isNew ? A.AMBER : A.MUTE;
+          const state = isSel ? 'selected' : isNew ? 'new' : 'seen';
           return (
-            <button
-              key={g.key}
-              type="button"
-              onClick={() => (g.courseId ? navigate(`/courses/${g.courseId}`) : undefined)}
-              style={{ width: WHO_CARD_W, flex: 'none', background: MEMBER_PANEL, border: `1px solid ${A.BORDER}`, borderRadius: WHO_CARD_RADIUS, overflow: 'hidden', padding: 0, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
-            >
-              <CourseImageFallback courseId={g.courseId} courseName={name} imageUrl={m?.imageUrl} pending={metaQuery.isLoading} style={{ height: WHO_PHOTO_H, flexShrink: 0 }}>
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
-                {g.best != null ? (
-                  <span className={GLASS_CHIP_CLASS} style={{ position: 'absolute', right: 10, top: 10, padding: '5px 10px', borderRadius: 10, textAlign: 'right' }}>
-                    <span style={{ display: 'block', fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: '#FFFFFF', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>{g.best}</span>
-                    <span style={{ display: 'block', fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.72)', textAlign: 'right' }}>BEST</span>
+            <button key={g.courseId} type="button" data-played-ring={state} aria-pressed={isSel} onClick={() => select(g)}
+              style={{ flex: 'none', width: RING_ITEM_W, padding: 0, background: 'none', border: 0, textAlign: 'center', cursor: 'pointer', color: A.INK }}>
+              <span style={{ position: 'relative', display: 'block', width: RING_SIZE, height: RING_SIZE, margin: '0 4px', boxSizing: 'border-box', borderRadius: RING_RADIUS, border: `${RING_BORDER}px solid ${edge}` }}>
+                <CourseImageFallback courseId={g.courseId} courseName={c?.name} imageUrl={c?.imageUrl} initialsSize={14}
+                  style={{ position: 'absolute', inset: RING_INSET, borderRadius: RING_PHOTO_RADIUS, overflow: 'hidden' }}>
+                  <span data-ring-count="" style={{ ...GLASS, position: 'absolute', top: 5, right: 5, minWidth: 20, height: 17, padding: '0 5px', boxSizing: 'border-box', borderRadius: BADGE_RADIUS, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: badge }}>
+                    {fmtCount(g.rounds)}
                   </span>
-                ) : null}
-                <div style={{ position: 'absolute', left: 12, right: 70, bottom: 28, fontSize: 18, fontWeight: 700, letterSpacing: '-0.028em', color: '#FFFFFF', lineHeight: 1.1, textShadow: '0 1px 6px rgba(0,0,0,0.55)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
-                  {name}
-                </div>
-                {m?.region ? (
-                  <div style={{ position: 'absolute', left: 12, bottom: 11, fontSize: 11.5, fontWeight: 500, color: 'rgba(255,255,255,0.74)' }}>{m.region}</div>
-                ) : null}
-              </CourseImageFallback>
-              <div style={{ padding: `${WHO_FOOTER_PAD.top}px ${WHO_FOOTER_PAD.x}px ${WHO_FOOTER_PAD.bottom}px`, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                <span aria-hidden="true" style={{ position: 'relative', flex: 'none', height: WHO_FACE_H, width: 19 + (faces.length - 1) * 12 }}>
-                  {faces.map((f, i) => (
-                    <span key={f.user_id} style={{ position: 'absolute', top: 0, left: i * 12, width: 19, height: 20, borderRadius: '34%', boxShadow: `0 0 0 1.5px ${MEMBER_PANEL}`, zIndex: 3 - i }}>
-                      <SquircleAvatar src={f.profile_photo_url} userId={f.user_id} size={19} alt={f.display_name} hairlineRing />
-                    </span>
-                  ))}
-                </span>
-                <span style={{ fontSize: 11.5, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-                  <span style={{ color: A.BODY, fontWeight: 600 }}>{g.members.slice(0, 2).map((member, i) => <span key={member.user_id}>{i > 0 ? g.members.length > 2 ? ', ' : ' and ' : ''}<InlineProMemberName userId={member.user_id}>{firstName(member.display_name)}</InlineProMemberName></span>)}{g.members.length > 2 ? ` and ${fmtCount(g.members.length - 2)} more` : ''}</span>
-                  {` \u00B7 ${tail}`}
-                </span>
-              </div>
+                </CourseImageFallback>
+              </span>
+              <span style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', marginTop: RING_LABEL_GAP, fontSize: 10.5, fontWeight: 600, lineHeight: `${RING_LABEL_LINE}px`, color: state === 'seen' ? A.MUTE : A.INK, overflowWrap: 'anywhere' }}>{short}</span>
+              {variant ? <span style={{ display: 'block', marginTop: 1, fontSize: 9.5, fontWeight: 600, lineHeight: `${RING_VARIANT_LINE}px`, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{variant}</span> : null}
             </button>
           );
         })}
       </div>
+      {current && courseMap?.get(current.courseId) ? (
+        <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} home={played.home} tile={tile} />
+      ) : null}
+      <RegionRails rails={rails} groups={groups} courseMap={courseMap} topUps={topUps.byRail} tabIds={tabIds} />
     </section>
   );
 }
