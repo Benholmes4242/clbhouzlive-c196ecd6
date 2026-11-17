@@ -163,7 +163,7 @@ describe('section', () => {
     const kentRing = container.querySelectorAll('[data-played-ring]')[1];
     expect(kentRing.getAttribute('data-played-ring')).toBe('new');
     fireEvent.click(kentRing);
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: 'round:3', kent: 'round:4' });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ near: ['round:3', 'round:1', 'round:2'], kent: ['round:4'] });
     fireEvent.click(container.querySelectorAll('[data-played-ring]')[0]);
     expect(container.querySelectorAll('[data-played-ring]')[1].getAttribute('data-played-ring')).toBe('seen');
   });
@@ -236,16 +236,16 @@ describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
     expect(window.localStorage.getItem(seenKey(null))).toBeNull();
     f.session = { user: { id: 'me' }, loading: false };
     rerender(<QueryClientProvider client={new QueryClient()}><MemoryRouter><WhoPlayingSection /></MemoryRouter></QueryClientProvider>);
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ fife: '5', near: 'round:3' });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ fife: ['5'], near: ['round:3', 'round:1', 'round:2'] });
     expect(window.localStorage.getItem(seenKey(null))).toBeNull();
   });
   it('the ring whose tile is showing counts as seen on load and after a tab change', () => {
     setHook([row('1', 'near', 'ann', 71), row('2', 'kent', 'bob', 70, '2026-11-08'), row('3', 'kent', 'cy', 75, '2026-11-12'), row('6', 'fife', 'dee', 80), row('7', 'fife', 'ed', 81), row('8', 'fife', 'fi', 82, '2026-11-13')],
       [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
     const { container } = mount();
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: 'round:3' });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: ['round:3', 'round:2'] });
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
-    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: 'round:3', fife: 'round:8' });
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ kent: ['round:3', 'round:2'], fife: ['round:8', 'round:7', 'round:6'] });
     expect([...container.querySelectorAll('[data-played-ring]')].map((r) => r.getAttribute('data-played-ring'))).toEqual(['selected', 'seen', 'new']);
   });
 });

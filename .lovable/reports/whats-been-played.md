@@ -260,3 +260,21 @@ through the test, not by eye.
 
 **Suite**: 9,103 → 9,120 (2,259 / 2,260 / 2,266 / 2,335), all passing, four shards run one after another. Typecheck clean.
 **Device checks**: 375/320 signed-in unchecked (sign-in unavailable).
+
+## FIX_RING_NEW_ANY_UNSEEN
+
+**Change**: the seen map stores each course's SET of activity keys (`SeenMap = Record<string, string[]>`). `isNewRing` reads a ring as new when any current window key is missing from the stored set. Showing a tile (same single owner/stamp; the stamp now joins the full key set) replaces that course's set with its current keys. `readSeen` migrates old single-string values to one-key sets; storage failure still returns null (all new). Storage-first write and no-member guard unchanged. Ring order and counts unchanged. `CourseGroup.keys` holds keys in the existing activity sort order; `RingGroup.keys` is optional (falls back to `[latestKey]`).
+
+**Assertions changed (authorised by Ben, two rulings)**, shape only:
+- whatsBeenPlayedV2.test.tsx:137 `.knole).toBe('review:v1')` → `.toEqual(['review:v1', 'post:p1'])` (knole's full set includes the post).
+- whatsBeenPlayedV4.test.tsx:131 `?.surrey).toBe('round:3')` → `.toEqual(['round:3'])`.
+- whatsBeenPlayed.test.tsx:166 `{ near: 'round:3', kent: 'round:4' }` → `{ near: ['round:3','round:1','round:2'], kent: ['round:4'] }`.
+- whatsBeenPlayed.test.tsx:239 `{ fife: '5', near: 'round:3' }` → `{ fife: ['5'], near: ['round:3','round:1','round:2'] }`; fife survives (migrated shape) and the guest-key null assertions remain.
+- whatsBeenPlayed.test.tsx:246 `{ kent: 'round:3' }` → `{ kent: ['round:3','round:2'] }`.
+- whatsBeenPlayed.test.tsx:248 `{ kent: 'round:3', fife: 'round:8' }` → `{ kent: ['round:3','round:2'], fife: ['round:8','round:7','round:6'] }`.
+None deleted or renamed.
+
+**New tests (+6)**: `src/test/ringNewAnyUnseen.test.ts` — older-dated unseen round, same-day round after seen post, full stored set reads seen, aged-out key, single-string migration, storage failure.
+
+**Suite**: 9,120 → 9,126 (2,259 / 2,260 / 2,265 / 2,342), shards run one after another. Delta +6 = new file. Failures in untouched files: shard 1 the known flake `coursesRailsUnlimited.test.tsx` › "admin hole-tag predicate invalidation refetches the active infinite holes rail" (`Unable to find role="button" and name "Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026"`); shard 2/3 `activeRing.test.tsx` (3 tests: `Unable to find role="button" and name "Open Danny Holmes's latest post"`) and `holeTagBatchV3.test.tsx` › "tagged state selects the hole…" (`Test timed out in 15000ms`). All three files pass 3/3 alone (71/71); none edited. activeRing and holeTagBatchV3 are NOT on the known-flake list — awaiting ruling.
+**Typecheck**: clean. **Device checks**: signed-in unchecked.
