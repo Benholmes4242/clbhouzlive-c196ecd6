@@ -63,15 +63,40 @@ export function faceRows(map: ReadonlyMap<string, MemberFace>): Row[] {
 }
 
 /**
+ * Every column of the public_profiles projection (generated types), so
+ * fillMissingFaces can carry a caller's extra columns. A requested column NOT
+ * on this list is left absent on filled rows — e.g. handicap_visibility,
+ * eg_visible, home_club_visibility, mobile_crop_* (user_profiles only).
+ */
+export const PUBLIC_PROFILE_COLUMNS = [
+  'actor_type', 'background_image_url', 'bio', 'city', 'college_id', 'country', 'cover_photo_url',
+  'created_at', 'display_name', 'eg_handicap_index', 'first_name', 'header_photo_url', 'home_club',
+  'home_club_business_id', 'home_club_id', 'id', 'instagram_handle', 'is_business_verified',
+  'is_official_club', 'is_public', 'is_verified', 'is_verified_business', 'is_verified_golfer',
+  'last_name', 'manual_handicap_index', 'primary_club_id', 'profile_photo_url', 'profile_type',
+  'profile_video_thumbnail_url', 'profile_video_url', 'social_links', 'tiktok_handle',
+  'twitter_handle', 'user_type', 'username', 'website_url', 'websites', 'youtube_handle',
+] as const;
+const PUBLIC_SET = new Set<string>(PUBLIC_PROFILE_COLUMNS);
+
+/** The four face columns plus each requested extra the projection carries. */
+export function fillColumns(extraColumns: readonly string[] = []): string {
+  const extras = extraColumns.filter((c) => PUBLIC_SET.has(c) && !COLUMNS.includes(c));
+  return [COLUMNS, ...Array.from(new Set(extras))].join(', ');
+}
+
+/**
  * For callers that already read user_profiles with extra columns: keep their
- * visible rows exactly as read, and append public_profiles face rows (id,
- * display_name, username, profile_photo_url; extra columns absent) for ids
- * the visible read did not return. No missing ids → no request.
+ * visible rows exactly as read, and append public_profiles rows (four face
+ * columns plus every extraColumns entry on PUBLIC_PROFILE_COLUMNS; others
+ * absent) for ids the visible read did not return. No missing ids → no request.
  */
 export async function fillMissingFaces<T extends { id: string }>(
   rows: readonly T[] | null | undefined,
   ids: readonly (string | null | undefined)[],
+  extraColumns: readonly string[] = [],
 ): Promise<T[]> {
+  const select = fillColumns(extraColumns);
   const visible = (rows ?? []) as T[];
   const have = new Set(visible.map((r) => String(r.id)));
   const missing = Array.from(new Set(ids.filter((id): id is string => !!id && !have.has(id))));
@@ -79,7 +104,7 @@ export async function fillMissingFaces<T extends { id: string }>(
   const out = visible.slice();
   for (const chunk of batches(missing, MEMBER_FACES_BATCH)) {
     const { data, error } = await (supabase.from('public_profiles' as never) as any)
-      .select(COLUMNS).in('id', chunk);
+      .select(select).in('id', chunk);
     if (error) throw error;
     for (const r of (data ?? []) as Row[]) {
       if (have.has(String(r.id))) continue;

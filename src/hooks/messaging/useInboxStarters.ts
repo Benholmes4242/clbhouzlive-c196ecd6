@@ -56,7 +56,7 @@ async function fetchProfiles(ids: string[]) {
     .in('id', ids);
   if (error) throw error;
   // Unconnected public members come from public_profiles (see readMemberFaces).
-  const filled = await fillMissingFaces(data as Array<{ id: string } & Record<string, unknown>> | null, ids);
+  const filled = await fillMissingFaces(data as Array<{ id: string } & Record<string, unknown>> | null, ids, ['is_verified_golfer']);
   return new Map(
     filled.map((p) => [
       p.id as string,

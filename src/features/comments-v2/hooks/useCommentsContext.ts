@@ -12,6 +12,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { readMemberFaces } from '@/lib/members/readMemberFaces';
 import { RECORD_CATEGORY } from '@/features/explore-magazine/useCourseRecordSignal';
 import type { TargetType } from './useCommentsV2';
 import { standingFor, likerStandingFor, chunkIds, familiarityMap, familiarityDetailMap, type LegendHit, type Standing, type LikerStanding } from '../lib/standing';
@@ -148,7 +149,11 @@ export function useCommentsSubject(targetType: TargetType, targetId: string, ena
         business
           ? supabase.from('business_accounts').select('name').eq('id', business.id).maybeSingle()
           : userId
-            ? supabase.from('user_profiles').select('display_name, username').eq('id', userId).maybeSingle()
+            // Unconnected public authors resolve through public_profiles; a failed read stays null.
+            ? readMemberFaces([userId]).then(
+                (m) => { const f = m.get(userId!); return { data: f ? { display_name: f.displayName, username: f.username } : null }; },
+                () => ({ data: null }),
+              )
             : Promise.resolve({ data: null }),
         courseId && !courseName
           ? supabase.from('golf_courses').select('name').eq('id', courseId).maybeSingle()

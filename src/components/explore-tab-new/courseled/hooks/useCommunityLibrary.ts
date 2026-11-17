@@ -164,7 +164,7 @@ export function useCommunityLibrary() {
           : Promise.resolve({ data: [] as Array<{ id: string; name: string }> }),
       ]);
       // Unconnected public authors come from public_profiles (see readMemberFaces).
-      const profiles = await fillMissingFaces(visibleProfiles as Array<{ id: string }> | null, userIds);
+      const profiles = await fillMissingFaces(visibleProfiles as Array<{ id: string }> | null, userIds, ['is_verified']);
       const profileById = new Map(
         ((profiles ?? []) as Array<{
           id: string;

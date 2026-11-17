@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { fillMissingFaces } from '@/lib/members/readMemberFaces';
+import { fillMissingFaces, readMemberFaces } from '@/lib/members/readMemberFaces';
 import { toast } from '@/lib/toast';
 
 export type BusinessRole = 'owner' | 'admin' | 'editor' | 'analyst';
@@ -72,7 +72,17 @@ export function useBusinessTeam(businessId?: string) {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      return data as unknown as BusinessMember[];
+      const members = (data ?? []) as unknown as BusinessMember[];
+      // Embed is RLS-scoped: unconnected members come back null; fill name/photo.
+      const missing = members.filter((m) => !m.user_profile).map((m) => m.user_profile_id);
+      if (missing.length) {
+        const faces = await readMemberFaces(missing);
+        for (const m of members) {
+          const f = !m.user_profile ? faces.get(m.user_profile_id) : undefined;
+          if (f) m.user_profile = { id: f.id, display_name: f.displayName, username: f.username, profile_photo_url: f.photoUrl };
+        }
+      }
+      return members;
     },
   });
 }

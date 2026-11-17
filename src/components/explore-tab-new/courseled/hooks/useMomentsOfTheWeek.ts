@@ -250,7 +250,7 @@ export function useMomentsOfTheWeek(
             }),
       ]);
       // Unconnected public authors come from public_profiles (see readMemberFaces).
-      const profiles = await fillMissingFaces(visibleProfiles as Array<{ id: string }> | null, userIds);
+      const profiles = await fillMissingFaces(visibleProfiles as Array<{ id: string }> | null, userIds, ['is_verified']);
       const courseName = new Map<string, string>();
       const courseRegion = new Map<string, string>();
       for (const c of (courses ?? []) as Array<{

@@ -53,7 +53,7 @@ export async function readPostWith(postIds: readonly string[]): Promise<PostWith
   const ids = [...new Set(rows.map((r) => r.user_id))];
   const { data: visible } = await supabase.from('user_profiles').select('id, display_name, first_name, username, profile_photo_url').in('id', ids);
   // Unconnected public members come from public_profiles (see readMemberFaces).
-  const profiles = await fillMissingFaces(visible as Array<{ id: string; display_name: string | null; first_name?: string | null; username: string | null; profile_photo_url: string | null }> | null, ids);
+  const profiles = await fillMissingFaces(visible as Array<{ id: string; display_name: string | null; first_name?: string | null; username: string | null; profile_photo_url: string | null }> | null, ids, ['first_name']);
   const byId = new Map(profiles.map((p) => [p.id, p]));
   return rows.map((r) => {
     const p = byId.get(r.user_id);

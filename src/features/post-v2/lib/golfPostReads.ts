@@ -73,7 +73,7 @@ export async function fetchPlayedWithSuggestions(userId: string, round: { course
   }
   const { data: visible } = await supabase.from('user_profiles').select('id, display_name, first_name, username, profile_photo_url, home_club').in('id', ids);
   // Unconnected public members come from public_profiles (see readMemberFaces).
-  const profiles = await fillMissingFaces(visible as Array<{ id: string; display_name: string | null; first_name?: string | null; username: string | null; profile_photo_url: string | null; home_club?: string | null }> | null, ids);
+  const profiles = await fillMissingFaces(visible as Array<{ id: string; display_name: string | null; first_name?: string | null; username: string | null; profile_photo_url: string | null; home_club?: string | null }> | null, ids, ['first_name', 'home_club']);
   const rows: WithCandidate[] = profiles.map((p) => ({
     id: p.id, name: p.display_name || p.first_name || p.username || 'Golfer', avatarUrl: p.profile_photo_url ?? null,
     sameRound: same.has(p.id), lastInteraction: mutual.get(p.id) ?? '', username: p.username, homeClub: p.home_club ?? null,

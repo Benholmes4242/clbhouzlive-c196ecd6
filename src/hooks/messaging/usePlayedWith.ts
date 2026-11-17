@@ -62,7 +62,7 @@ async function fetchPlayedWith(userId: string): Promise<PlayedWithMember[]> {
     .in('id', partnerIds);
   if (profErr) throw profErr;
   // Unconnected public members come from public_profiles (see readMemberFaces).
-  const filled = await fillMissingFaces(profiles as Array<{ id: string } & Record<string, unknown>> | null, partnerIds);
+  const filled = await fillMissingFaces(profiles as Array<{ id: string } & Record<string, unknown>> | null, partnerIds, ['is_verified_golfer']);
 
   const byId = new Map(
     filled.map((p) => [

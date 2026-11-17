@@ -490,7 +490,7 @@ export function useCircleLatestRounds(
         .in('id', surfacedUserIds);
       if (profilesError) throw profilesError;
       // Unconnected public members come from public_profiles (see readMemberFaces).
-      const profiles = await fillMissingFaces(visibleProfiles, surfacedUserIds);
+      const profiles = await fillMissingFaces(visibleProfiles, surfacedUserIds, ['primary_club_id']);
       const profileById = new Map<
         string,
         {

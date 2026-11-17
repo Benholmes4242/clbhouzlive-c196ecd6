@@ -1028,7 +1028,7 @@ export async function fetchFriendRivalries(
       )
       .in('id', rivalUserIds);
     // Unconnected public rivals: avatar from public_profiles; header/crop fields stay absent.
-    for (const p of (await fillMissingFaces(profiles as any[] | null, rivalUserIds)) as any[]) {
+    for (const p of (await fillMissingFaces(profiles as any[] | null, rivalUserIds, ['header_photo_url'])) as any[]) {
       profilesByUserId[p.id] = p;
     }
   }
