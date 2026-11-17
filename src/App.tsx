@@ -71,6 +71,7 @@ import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 
 import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
+import { AppNavigateRegistrar } from '@/lib/AppNavigateRegistrar';
 import { PendingPostsController } from '@/uploads/PendingPostsController';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import UpdateReadyBar from '@/components/system/UpdateReadyBar';
@@ -1129,6 +1130,7 @@ const AppInner: React.FC = () => {
     <TooltipProvider>
       <SecurityHeaders />
       <BrowserRouter>
+        <AppNavigateRegistrar />
         <MaintenanceGate>
         <NavTimingProvider>
         <PushTapMarkRead />

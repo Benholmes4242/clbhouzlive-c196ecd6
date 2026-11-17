@@ -1,7 +1,9 @@
 // Upload toasts bridge - shows toast notifications for upload events
 // Also handles cache invalidation when uploads complete
 
-import { useEffect } from 'react';
+import { createElement, useEffect } from 'react';
+import { Clock } from 'lucide-react';
+import { appNavigate } from '@/lib/appNavigate';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { uploadEventBus } from './uploadEventBus';
@@ -35,14 +37,18 @@ export function UploadToastsBridge() {
           description: evt.scheduledAt
             ? `Goes live ${format(new Date(evt.scheduledAt), 'EEE d MMM')} at ${format(new Date(evt.scheduledAt), 'HH:mm')}`
             : undefined,
-
+          icon: createElement(Clock, { size: 17, strokeWidth: 1.9 }),
           duration: 4000,
         });
       } else if (evt.uploadType === 'review') {
         toast.success('Your review is live', { duration: 4000 });
         triggerHaptic('success');
       } else {
-        toast.success('Your post is live.', { duration: 4000 });
+        const postId = evt.postId;
+        toast.success('Your post is live', {
+          duration: 4000,
+          action: postId ? { label: 'View', onClick: () => appNavigate(`/post/${postId}`) } : undefined,
+        });
         triggerHaptic('success');
       }
 

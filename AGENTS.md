@@ -100,3 +100,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
+- Toast appearance is set once on the Toaster (unstyled + classNames, glassToast.css); call sites never style toasts, and code outside BrowserRouter navigates via src/lib/appNavigate.ts.

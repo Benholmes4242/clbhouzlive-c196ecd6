@@ -10,7 +10,8 @@
  * Deduped via sessionStorage — max 3 hints per session, then quiet.
  */
 
-import { useEffect } from 'react';
+import { createElement, useEffect } from 'react';
+import { VolumeX } from 'lucide-react';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { toast } from '@/lib/toast';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -45,7 +46,9 @@ export function useSilentSwitchHint() {
           bumpCount();
           void analyticsEvents.track('video_silent_switch_hint', { platform: 'ios' });
           try {
-            toast('No sound? Check your device silent switch', {
+            toast('No sound?', {
+              description: "Check your device's silent switch",
+              icon: createElement(VolumeX, { size: 17, strokeWidth: 1.9 }),
               duration: 3500,
               id: 'silent-switch-hint',
             });

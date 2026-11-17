@@ -18,10 +18,9 @@ afterEach(() => { cleanup(); poster.mockClear(); });
 describe('posting upload and cover corrections', () => {
   it('in-progress upload spinner/fill use pf-ink and track uses pf-track without changing review Star', () => {
     const banner = source('src/components/uploads/UploadProgressBanner.tsx');
-    expect(banner).toContain('<Loader2 className="h-4 w-4 text-[var(--pf-ink)] animate-spin"');
-    expect(banner).toContain('isUploading ? "bg-[var(--pf-track)]" : "bg-muted"');
-    expect(banner).toContain('isComplete ? "bg-green-500" : isFailed ? "bg-destructive" : "bg-[var(--pf-ink)]"');
-    expect(banner).toContain('<Star className="h-4 w-4 text-primary animate-pulse"');
+    expect(banner).toContain('<span className="glass-tile-icon"><span className="glass-spin" aria-hidden /></span>');
+    expect(banner).toContain('<span className="glass-tile-bar" aria-hidden>');
+    expect(banner).not.toContain('bg-green-500');
     const tokens = source('src/index.css');
     expect(tokens).toContain('--pf-ink: #F8FAFC');
     expect(tokens).toContain('--pf-track: rgba(255,255,255,.10)');
