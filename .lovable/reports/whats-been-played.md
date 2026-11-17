@@ -50,3 +50,23 @@ Authorised rewrites, old → new:
 - New tests (+3): pending ring stays mounted, then swaps; pending tab change; hardest at the minimum and at one fewer.
 - New test (+1, §2): `the ring whose tile is showing counts as seen on load and after a tab change` — asserts `{ near: '1' }` on load, `{ near: '1', kent: '3' }` after the tab change, and rings `['selected', 'seen']`.
 - Shards: 2,271 / 2,224 / 2,250 / 2,308 = 9,053 (9,052 + 1). The §2 assertion above is the only existing assertion changed.
+
+## BRIEF_WHATS_BEEN_PLAYED_SEEN_GUARD (seen write must never overwrite a saved map)
+
+Fault: the §2 write effect merged into `seen` state with no signed-in member; on
+the render where userId changed, state still held the previous key's map and the
+write saved {old map + current ring} under the new member's key, wiping history.
+
+Fix (src/components/courses/browse/WhoPlayingSection.tsx):
+- No write until a signed-in userId: `if (!current || !userId) return;`.
+- Write built from storage, not state: `{ ...(readSeen(userId) ?? {}), [current.courseId]: current.latestScoreId }`.
+- Single owner, stamp and once-per-selection rule unchanged.
+
+Tests: +1 in src/test/whatsBeenPlayed.test.tsx — "a session resolving after
+cached rounds keeps the stored seen map" (stored { fife: '5' } ends as
+{ fife: '5', near: '3' }; nothing written under the guest key). The session
+mock became controllable via the hoisted fixture (default unchanged:
+{ user: { id: 'me' }, loading: false }); no existing assertion changed.
+
+Suite: 9,053 → 9,054 (2,271 / 2,224 / 2,251 / 2,308). Delta: +1 new test.
+Typecheck: clean.
