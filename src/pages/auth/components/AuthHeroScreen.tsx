@@ -229,11 +229,12 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   };
 
   const panelStep = otpActive ? 'code' : step;
+  const [logoEntered, setLogoEntered] = useState(false);
 
   return (
     <div ref={screenRef} className={`auth-hero-screen${keyboardOpen ? ' is-keyboard-open' : ''}${keyboardTight ? ' is-keyboard-tight' : ''}`}>
       <div className="auth-hero-brand">
-        <img src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png" alt="clbhouz" className="auth-logo-animate" />
+        <img src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png" alt="clbhouz" className={logoEntered ? undefined : 'auth-logo-animate'} onAnimationEnd={() => setLogoEntered(true)} />
         <h1 className="auth-tagline-animate">{t('auth:hero.tagline')}<span className="auth-hero-dot" aria-hidden="true" /></h1>
       </div>
       <div className="auth-button-6">

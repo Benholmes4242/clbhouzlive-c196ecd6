@@ -12,8 +12,12 @@
 }
 .auth-hero-screen { position: fixed; inset: 0; margin: 0 auto; width: 100%; max-width: 480px; display: flex; flex-direction: column; background: var(--bg-page); color: var(--auth-ink); overflow-y: auto; overflow-x: hidden; will-change: transform; }
 .auth-hero-brand { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 54px) 24px 0; text-align: center; }
-.auth-hero-brand img { width: 68px; height: 68px; }
-.auth-hero-brand h1 { margin: 18px 0 0; font-size: 34px; font-weight: 800; letter-spacing: -.035em; line-height: 1.05; color: var(--auth-ink); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-synthesis: none; }
+/* FIX_AUTH_LOGO_TRANSITION: keyboard mode collapses the logo with one 240ms
+   movement (opacity, scale, height and the tagline's margin-top together);
+   the bounce entrance (auth-logo-animate) runs on first load only and is
+   removed on animationend so its fill cannot pin opacity/transform. */
+.auth-hero-brand img { width: 68px; height: 68px; opacity: 1; transform: scale(1); transition: opacity 240ms cubic-bezier(.2,.8,.2,1), transform 240ms cubic-bezier(.2,.8,.2,1), height 240ms cubic-bezier(.2,.8,.2,1); }
+.auth-hero-brand h1 { margin: 18px 0 0; font-size: 34px; font-weight: 800; letter-spacing: -.035em; line-height: 1.05; color: var(--auth-ink); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-synthesis: none; transition: margin-top 240ms cubic-bezier(.2,.8,.2,1); }
 .auth-hero-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 2px; background: var(--auth-amber); }
 .auth-button-6 { position: relative; flex-shrink: 0; }
 .auth-hero-panel { padding: 0 24px; }
@@ -60,7 +64,7 @@
 .auth-button-6 { animation: auth-button-in .4s ease-out .45s both; }
 .auth-step-enter { animation: auth-step-in 180ms ease-out both; }
 .auth-error-fade { animation: auth-error-fade-in .25s ease-out both; }
-.auth-hero-screen.is-keyboard-open .auth-hero-brand img { display: none; }
+.auth-hero-screen.is-keyboard-open .auth-hero-brand img { opacity: 0; transform: scale(.88); height: 0; }
 .auth-hero-screen.is-keyboard-open .auth-hero-brand h1 { font-size: 34px; margin-top: 0; }
 .auth-hero-screen.is-keyboard-open .auth-hero-panel-bottom { padding-bottom: 16px; }
 .auth-hero-screen.is-keyboard-tight .auth-hero-brand h1 { display: none; }
@@ -84,4 +88,5 @@
 @media (max-height: 640px) { .auth-hero-screen.is-keyboard-open .auth-hero-brand h1 { margin-top: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .auth-logo-animate, .auth-tagline-animate, .auth-button-6, .auth-error-fade, .auth-step-enter { animation: none; opacity: 1; transform: none; }
+  .auth-hero-brand img, .auth-hero-brand h1 { transition: none; }
 }
