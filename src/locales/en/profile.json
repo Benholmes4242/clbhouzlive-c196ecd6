@@ -134,5 +134,13 @@
       "body": "Connect your handicap and every round you play lands here, hole by hole.",
       "cta": "Connect your handicap"
     }
+  },
+  "businessCreate": {
+    "countryLabel": "Country",
+    "countryPlaceholder": "Choose a country",
+    "addressPlaceholder": "Enter postcode, zip or town",
+    "countryFirst": "Choose a country first, then add the address",
+    "cantFind": "Can't find it?",
+    "dropPin": "Drop a pin"
   }
 }

@@ -38,5 +38,13 @@
     "subtitleOther": "The very best they have played",
     "manage": "Manage",
     "rated": "Rated"
+  },
+  "businessCreate": {
+    "countryLabel": "Country",
+    "countryPlaceholder": "Choose a country",
+    "addressPlaceholder": "Enter postcode, zip or town",
+    "countryFirst": "Choose a country first, then add the address",
+    "cantFind": "Can't find it?",
+    "dropPin": "Drop a pin"
   }
 }

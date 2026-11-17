@@ -1,3 +1,4 @@
+import './addressPanel.css';
 import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Loader2, X, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -310,8 +311,32 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         </button>
       )}
 
+      {/* BIZ_ADDRESS_COUNTRY_FIRST: bare variant panel (addressPanel.css). */}
+      {bare && showDropdown && suggestions.length > 0 && (
+        <div className="addr-panel" data-testid="address-results-panel">
+          {suggestions.map((result, i) => (
+            <button key={result.place_id} type="button" onClick={() => handleSelect(result)}
+              className={i === 0 ? 'addr-row first' : 'addr-row'}>
+              <span className="addr-pin" aria-hidden="true"><MapPin size={15} /></span>
+              <span className="addr-text">
+                <span className="addr-primary">{result.primary}</span>
+                {result.secondary && <span className="addr-secondary">{result.secondary}</span>}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+      {bare && showDropdown && query.length >= 3 && suggestions.length === 0 && !loading && !searchError && (
+        <div className="addr-panel addr-empty">
+          <p>No results — try adding postcode/ZIP</p>
+          {onDropPinClick && (
+            <p className="addr-empty-sub">Or{' '}<button type="button" onClick={onDropPinClick}>drop a pin on the map</button></p>
+          )}
+        </div>
+      )}
+
       {/* Suggestions dropdown */}
-      {showDropdown && suggestions.length > 0 && (
+      {!bare && showDropdown && suggestions.length > 0 && (
         <div className="absolute z-50 mt-1 w-full rounded-sq-md border bg-background shadow-lg max-h-60 overflow-auto">
           {suggestions.map((result) => {
             const isPrecise = isPreciseEnough(result.precision as LocationPrecision);
@@ -340,7 +365,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       )}
 
       {/* No results state */}
-      {showDropdown && query.length >= 3 && suggestions.length === 0 && !loading && !searchError && (
+      {!bare && showDropdown && query.length >= 3 && suggestions.length === 0 && !loading && !searchError && (
         <div className="absolute z-50 mt-1 w-full rounded-sq-md border bg-background shadow-lg p-3">
           <p className="text-sm text-muted-foreground text-center">
             No results — try adding postcode/ZIP

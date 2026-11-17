@@ -369,7 +369,7 @@ describe('BC2 everyone-else branch', () => {
     renderAt(['/business/create-v2']);
     toStep2('Brand / Manufacturer');
     await waitFor(() => expect(screen.getByTestId('bizc-country-line').textContent).toContain('United Kingdom'));
-    fireEvent.click(screen.getByText('Change'));
+    fireEvent.click(screen.getByTestId('bizc-country-line'));
     expect(screen.getByTestId('bizc-country-picker')).toBeTruthy();
     fireEvent.click(screen.getByText('Drop a pin'));
     expect(screen.getByTestId('pin-drop-modal')).toBeTruthy();

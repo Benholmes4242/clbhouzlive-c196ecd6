@@ -40,5 +40,13 @@
     "rated": "Rated",
     "emptyOwn": "Nothing here yet - add the courses you rate above all others.",
     "emptyOther": "Their top 10 builds up as they rate the courses they play."
+  },
+  "businessCreate": {
+    "countryLabel": "País",
+    "countryPlaceholder": "Elige un país",
+    "addressPlaceholder": "Introduce código postal o ciudad",
+    "countryFirst": "Elige primero un país y luego añade la dirección",
+    "cantFind": "¿No lo encuentras?",
+    "dropPin": "Coloca un pin"
   }
 }

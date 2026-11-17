@@ -21,7 +21,8 @@ import { countryNameToCode } from '@/utils/countryCodeMapping';
 import { formatNumber } from '@/i18n/format';
 import { AppLog } from '@/lib/logger';
 import { nameInitial } from './step2Rules';
-import { Field } from './step2Bits';
+import { Field, StepMark } from './step2Bits';
+import { ChevronDown, Lock } from 'lucide-react';
 import type { BusinessCreateDraft } from './createRules';
 
 interface Props {
@@ -185,34 +186,24 @@ export function Step2Other({ draft, setDraft, userId, onContinue }: Props) {
           </div>
         )}
 
-        <Field label={t('businessCreate.addressLabel', { defaultValue: 'Address' })} testId="bizc-address">
-          <AddressAutocomplete
-            bare
-            value={draft.address}
-            onChange={(v: AddressValue | null) => setDraft(d => ({ ...d, address: v }))}
-            onDropPinClick={() => setShowPinDrop(true)}
-            countryCode={countryCode}
-            countryDisplayName={countryName}
-            placeholder={t('businessCreate.addressPlaceholder', { defaultValue: 'Start typing an address' })}
-          />
-        </Field>
-        <div className="bizc-cline" data-testid="bizc-country-line">
-          {countryCode ? (
-            <>
-              In <b>{countryName}</b>
-              {' · '}<button type="button" onClick={() => setShowCountry(v => !v)}>{t('businessCreate.changeCountry', { defaultValue: 'Change' })}</button>
-              {' · '}<button type="button" onClick={() => setShowPinDrop(true)}>{t('businessCreate.dropPin', { defaultValue: 'Drop a pin' })}</button>
-            </>
-          ) : (
-            <>
-              <button type="button" onClick={() => setShowCountry(v => !v)}>{t('businessCreate.chooseCountry', { defaultValue: 'Choose a country' })}</button>
-              {' · '}<button type="button" onClick={() => setShowPinDrop(true)}>{t('businessCreate.dropPin', { defaultValue: 'Drop a pin' })}</button>
-            </>
-          )}
-        </div>
+        {/* BIZ_ADDRESS_COUNTRY_FIRST: country is step 1 and unlocks the address. */}
+        <button type="button" className="bizc-field bizc-pick" data-testid="bizc-country-line" aria-expanded={showCountry}
+          onClick={() => setShowCountry(v => !v)}>
+          <span className="bizc-steprow">
+            <StepMark n={1} done={!!countryCode} />
+            <span className="bizc-field-label">{t('businessCreate.countryLabel', { defaultValue: 'Country' })}</span>
+          </span>
+          <span className="bizc-pick-row">
+            <span className={countryCode ? 'bizc-pick-value' : 'bizc-pick-value empty'}>
+              {countryCode ? countryName : t('businessCreate.countryPlaceholder', { defaultValue: 'Choose a country' })}
+            </span>
+            <ChevronDown size={16} aria-hidden="true" />
+          </span>
+        </button>
         {showCountry && (
           <div className="bizc-country" data-testid="bizc-country-picker">
             <CountrySelector
+              listOnly
               value={draft.countrySelection}
               onChange={(n) => {
                 setDraft(d => ({ ...d, countrySelection: n, address: null }));
@@ -220,6 +211,35 @@ export function Step2Other({ draft, setDraft, userId, onContinue }: Props) {
               }}
             />
           </div>
+        )}
+
+        <Field
+          label={t('businessCreate.addressLabel', { defaultValue: 'Address' })}
+          marker={<StepMark n={2} done={!!draft.address} />}
+          testId="bizc-address"
+          locked={!countryCode}
+          onLockedTap={() => setShowCountry(true)}
+        >
+          <AddressAutocomplete
+            bare
+            value={draft.address}
+            onChange={(v: AddressValue | null) => setDraft(d => ({ ...d, address: v }))}
+            onDropPinClick={() => setShowPinDrop(true)}
+            countryCode={countryCode}
+            countryDisplayName={countryName}
+            placeholder={t('businessCreate.addressPlaceholder', { defaultValue: 'Enter postcode, zip or town' })}
+          />
+        </Field>
+        {countryCode ? (
+          <p className="bizc-cantfind" data-testid="bizc-cant-find">
+            {t('businessCreate.cantFind', { defaultValue: "Can't find it?" })}{' '}
+            <button type="button" onClick={() => setShowPinDrop(true)}>{t('businessCreate.dropPin', { defaultValue: 'Drop a pin' })}</button>
+          </p>
+        ) : (
+          <p className="bizc-lockline" data-testid="bizc-country-first">
+            <Lock size={13} aria-hidden="true" />
+            {t('businessCreate.countryFirst', { defaultValue: 'Choose a country first, then add the address' })}
+          </p>
         )}
 
         {area && (

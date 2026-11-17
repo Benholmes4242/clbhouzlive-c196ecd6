@@ -33,6 +33,9 @@ interface CountrySelectorProps {
   onChange: (name: string) => void;
   disabled?: boolean;
   className?: string;
+  /** Show only the search + list panel, open and in flow, with no trigger
+   *  button (business create step 2 owns its own country card). */
+  listOnly?: boolean;
 }
 
 export const CountrySelector: React.FC<CountrySelectorProps> = ({
@@ -40,8 +43,10 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   onChange,
   disabled = false,
   className,
+  listOnly = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenState, setIsOpen] = useState(listOnly);
+  const isOpen = listOnly || isOpenState;
   const [searchQuery, setSearchQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -80,7 +85,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
 
   return (
     <div ref={containerRef} className={cn('relative', className)}>
-      <button
+      {!listOnly && <button
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
@@ -113,11 +118,11 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
         <ChevronDown
           className={cn('h-4 w-4 text-muted-foreground transition-transform flex-shrink-0', isOpen && 'rotate-180')}
         />
-      </button>
+      </button>}
 
       {isOpen && (
         <div
-          className="absolute z-50 mt-1 w-full rounded-[12px] shadow-lg overflow-hidden"
+          className={listOnly ? 'w-full rounded-[12px] overflow-hidden' : 'absolute z-50 mt-1 w-full rounded-[12px] shadow-lg overflow-hidden'}
           /* Floating panel, not a field: A.PANEL + A.BORDER. */
           style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >

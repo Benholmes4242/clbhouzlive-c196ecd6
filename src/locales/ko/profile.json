@@ -40,5 +40,13 @@
     "rated": "Rated",
     "emptyOwn": "Nothing here yet - add the courses you rate above all others.",
     "emptyOther": "Their top 10 builds up as they rate the courses they play."
+  },
+  "businessCreate": {
+    "countryLabel": "국가",
+    "countryPlaceholder": "국가 선택",
+    "addressPlaceholder": "우편번호 또는 도시 입력",
+    "countryFirst": "먼저 국가를 선택한 다음 주소를 추가하세요",
+    "cantFind": "찾을 수 없나요?",
+    "dropPin": "핀 놓기"
   }
 }

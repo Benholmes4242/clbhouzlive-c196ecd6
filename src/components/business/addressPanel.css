@@ -1,0 +1,13 @@
+/* Bare AddressAutocomplete results panel (BIZ_ADDRESS_COUNTRY_FIRST).
+   A wrapping card can set --addr-panel-inset-x/-y (its border + padding)
+   so the panel sits 6px below the card at the card's width. */
+.addr-panel{position:absolute;z-index:50;left:calc(-1 * var(--addr-panel-inset-x,0px));right:calc(-1 * var(--addr-panel-inset-x,0px));top:calc(100% + var(--addr-panel-inset-y,0px) + 6px);background:#1B1B20;border:1px solid rgba(255,255,255,0.10);border-radius:16px;padding:6px;max-height:300px;overflow:auto;text-transform:none;letter-spacing:normal}
+.addr-row{display:flex;align-items:center;gap:11px;width:100%;padding:9px 8px;border-radius:11px;border:0;background:none;color:#F8FAFC;text-align:left;font-family:inherit;cursor:pointer}
+.addr-row.first{background:rgba(255,255,255,0.06)}
+.addr-pin{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex:none;color:rgba(248,250,252,0.62)}
+.addr-text{flex:1;min-width:0}
+.addr-primary{display:block;font-size:14.5px;font-weight:600;color:#F8FAFC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.addr-secondary{display:block;font-size:12.5px;color:rgba(248,250,252,0.62);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.addr-empty{padding:12px;text-align:center;font-size:14px;color:rgba(248,250,252,0.62)}
+.addr-empty-sub{font-size:12.5px;margin-top:4px}
+.addr-empty-sub button{background:none;border:0;padding:0;color:#F8FAFC;font-weight:600;font-family:inherit;cursor:pointer}
