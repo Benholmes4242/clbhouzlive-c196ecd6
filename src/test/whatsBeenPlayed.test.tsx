@@ -5,9 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, topUps: { byRail: new Map(), ready: true } as any, counts: 0 }));
+const f = vi.hoisted(() => ({ hook: null as any, tile: { holes: [], photos: [], hardestHole: null, ready: true } as any, topUps: { byRail: new Map(), ready: true } as any, counts: 0, session: { user: { id: 'me' }, loading: false } as any }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
-vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => f.session }));
 vi.mock('@/components/courses/browse/usePlayedRounds', () => ({ usePlayedRounds: () => f.hook }));
 vi.mock('@/components/courses/browse/usePlayedTile', () => ({ usePlayedTile: () => f.tile }));
 vi.mock('@/components/courses/browse/useRailTopUps', () => ({ useRailTopUps: () => f.topUps }));
@@ -202,6 +202,7 @@ describe('section', () => {
 describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    f.session = { user: { id: 'me' }, loading: false };
     f.tile = { holes: [], photos: [], hardestHole: null, ready: true }; f.topUps = { byRail: new Map(), ready: true }; f.counts = 0;
     setHook([row('1', 'near', 'ann', 71), row('2', 'near', 'bob', 77, '2026-11-08'), row('4', 'kent', 'ann', 72), row('5', 'fife', 'dee', 79)],
       [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
@@ -233,6 +234,18 @@ describe('BRIEF_WHATS_BEEN_PLAYED_FIXES', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Kent' }));
     present(container);
     expect(container.querySelectorAll('[data-tile-pending]')).toHaveLength(2);
+  });
+  it('a session resolving after cached rounds keeps the stored seen map', () => {
+    window.localStorage.setItem(seenKey('me'), JSON.stringify({ fife: '5' }));
+    setHook([row('1', 'near', 'ann', 71), row('2', 'near', 'bob', 77, '2026-11-08'), row('3', 'near', 'cy', 80), row('4', 'kent', 'ann', 72), row('5', 'fife', 'dee', 79)],
+      [placed(near, 'Sundridge Park Golf Club (East Course)'), placed(kent, 'Knole Park Golf Club'), placed(fife, 'St Andrews Links (Old Course)')]);
+    f.session = { user: null, loading: true };
+    const { rerender } = mount();
+    expect(window.localStorage.getItem(seenKey(null))).toBeNull();
+    f.session = { user: { id: 'me' }, loading: false };
+    rerender(<QueryClientProvider client={new QueryClient()}><MemoryRouter><WhoPlayingSection /></MemoryRouter></QueryClientProvider>);
+    expect(JSON.parse(window.localStorage.getItem(seenKey('me')) ?? '{}')).toEqual({ fife: '5', near: '3' });
+    expect(window.localStorage.getItem(seenKey(null))).toBeNull();
   });
   it('the ring whose tile is showing counts as seen on load and after a tab change', () => {
     setHook([row('1', 'near', 'ann', 71), row('2', 'kent', 'bob', 70, '2026-11-08'), row('3', 'kent', 'cy', 75, '2026-11-12')],

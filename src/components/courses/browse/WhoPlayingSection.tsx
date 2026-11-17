@@ -82,14 +82,17 @@ export function WhoPlayingSection() {
   // ring still draws as selected; it reads as seen as soon as another is picked.
   const seenWritten = useRef<string | null>(null);
   useEffect(() => {
-    if (!current) return;
+    if (!current || !userId) return;
     const stamp = `${userId}|${current.courseId}:${current.latestScoreId}`;
     if (seenWritten.current === stamp) return;
     seenWritten.current = stamp;
-    const next = { ...(seen ?? {}), [current.courseId]: current.latestScoreId };
+    // Build from storage, not state: on the render where userId changes the
+    // state can still hold the previous key's map (the read effect has not
+    // landed yet), and merging that would overwrite the new member's history.
+    const next = { ...(readSeen(userId) ?? {}), [current.courseId]: current.latestScoreId };
     setSeen(next);
     writeSeen(userId, next);
-  }, [current, seen, userId]);
+  }, [current, userId]);
 
   const tabIds = useMemo(() => new Set(tabs.flatMap((t) => t.courseIds)), [tabs]);
   const rails = useMemo(() => buildRails(courses, groups, tabIds, played.home), [courses, groups, tabIds, played.home]);
