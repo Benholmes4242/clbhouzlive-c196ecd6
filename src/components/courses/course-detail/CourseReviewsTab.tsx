@@ -74,7 +74,8 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { AlertCircle } from 'lucide-react';
-import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
+import type { FeedPost } from '@/components/media-system/types/media';
+import { reviewFeedPost } from '@/lib/reviews/reviewFeedPost';
 
 export type SortOption = ReviewsSortBy;
 
@@ -346,61 +347,37 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   /* ── fullscreen viewer (unchanged contract) ─────────────────────────────── */
   const buildReviewFeedPost = useCallback((review: CourseReview): FeedPost => {
     const userProfile = review.user_profiles;
-    const mediaItems: MediaItemType[] = (review.media ?? []).map((item) => {
-      const isVideo = item.media_type === 'video';
-      return {
-        id: item.id,
-        type: isVideo ? 'video' : 'image',
-        hlsUrl: isVideo ? item.media_url : undefined,
-        imageUrl: !isVideo ? item.media_url : undefined,
-        thumbnailUrl: item.poster_url || undefined,
-        width: item.width || 1080,
-        height: item.height || 1080,
-      };
-    });
-    return {
-      id: review.id,
+    const num = (v: unknown) => (v != null ? Number(v) : null);
+    return reviewFeedPost({
+      reviewId: review.id,
       userId: review.user_id,
-      actorType: 'personal' as const,
-      actorId: review.user_id,
-      username: userProfile?.username || '',
-      displayName: userProfile?.display_name || 'Golfer',
-      avatarUrl: userProfile?.profile_photo_url || '',
-      isVerified: false,
-      creatorRelation: 'none' as const,
-      caption: review.review || '',
-      mediaItems,
-      createdAt: review.review_date || new Date().toISOString(),
-      // ⚠️ HARDCODED 0/false engagement fields — SAFE ONLY because this surface
-      // opens the viewer with readOnly:true. See the original note: wire real
-      // engagement before ever flipping readOnly off.
-      likeCount: 0,
-      commentCount: 0,
-      shareCount: 0,
-      review: {
-        reviewId: review.id,
-        courseId: review.course_id,
-        courseName: review.course?.name ?? courseName ?? '',
-        courseImageUrl: review.course?.thumbnail_image ?? null,
-        rating: review.rating ?? 0,
-        courseCountry: review.course?.country ?? null,
-        courseRegion: review.course?.region ?? null,
-        courseSubCountry: review.course?.sub_country ?? null,
-        reviewText: review.review ?? null,
-        breakdown: {
-          design: review.design_score != null ? Number(review.design_score) : null,
-          conditions: review.condition_score != null ? Number(review.condition_score) : null,
-          clubhouse: review.clubhouse_score != null ? Number(review.clubhouse_score) : null,
-          facilities: review.facilities_score != null ? Number(review.facilities_score) : null,
-        },
-      },
-      isReview: true,
+      username: userProfile?.username,
+      displayName: userProfile?.display_name,
+      avatarUrl: userProfile?.profile_photo_url,
+      text: review.review,
+      createdAt: review.review_date,
+      media: (review.media ?? []).map((item) => {
+        const raw = item as typeof item & { stream_id?: string | null; duration_seconds?: number | null };
+        return {
+          id: item.id, type: item.media_type === 'video' ? 'video' as const : 'image' as const,
+          url: item.media_url, posterUrl: item.poster_url ?? null, streamId: raw.stream_id ?? null,
+          width: item.width ?? null, height: item.height ?? null, durationSeconds: raw.duration_seconds ?? null,
+        };
+      }),
       courseId: review.course_id,
-      courseName: review.course?.name ?? courseName,
-      isLikedByMe: false,
-      isFollowedByMe: false,
-      tags: [],
-    };
+      courseName: review.course?.name ?? courseName ?? '',
+      courseImageUrl: review.course?.thumbnail_image ?? null,
+      rating: review.rating ?? 0,
+      courseCountry: review.course?.country ?? null,
+      courseRegion: review.course?.region ?? null,
+      courseSubCountry: review.course?.sub_country ?? null,
+      breakdown: {
+        design: num(review.design_score),
+        conditions: num(review.condition_score),
+        clubhouse: num(review.clubhouse_score),
+        facilities: num(review.facilities_score),
+      },
+    });
   }, [courseName]);
 
   const handleReviewMediaClick = useCallback((
@@ -427,7 +404,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       posterUrl,
       mediaId,
       openedFrom: 'course-reviews',
-      options: { readOnly: true, hasNextPage: false },
+      options: { hasNextPage: false },
     });
   }, [myReview, otherReviews, buildReviewFeedPost, courseId]);
 

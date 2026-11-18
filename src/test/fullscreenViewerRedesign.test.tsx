@@ -51,13 +51,14 @@ beforeEach(() => {
 afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 
 describe('FULLSCREEN_VIEWER_REDESIGN', () => {
-  it('(a) a real post header has no rating chip; the member-shot viewer keeps it', () => {
+  it('(a) neither a real post nor a course photo header has a rating chip', () => {
     mount(base);
     expect(screen.queryByRole('button', { name: /^clbhouz rating/ })).toBeNull();
     expect(screen.getByRole('button', { name: 'Open Real El Prat (Pink)' })).toBeInTheDocument();
     cleanup();
     mount(shot, { synthetic: true, readOnly: true });
-    expect(screen.getByRole('button', { name: /^clbhouz rating/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^clbhouz rating/ })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Open Course' })).toBeInTheDocument();
   });
 
   it('(b) pills run like, comment, share, more; liked is amber', () => {

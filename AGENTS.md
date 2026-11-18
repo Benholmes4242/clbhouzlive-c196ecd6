@@ -100,3 +100,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
+- Fullscreen viewer is one layout app-wide: review opens build posts only via `src/lib/reviews/reviewFeedPost.ts` (engagementTarget review, routed by `useViewerEngagement.ts`), and course photos share the canonical chrome, so surfaces differ only in data.

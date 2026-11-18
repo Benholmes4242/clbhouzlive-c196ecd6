@@ -69,6 +69,11 @@ export const MomentMediaStrip: React.FC<{
 );
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { mapRow, WORDS_SELECT } from '@/components/courses/useBrowseReviews';
+import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
+import { reviewFeedPost, latestReviewInput } from '@/lib/reviews/reviewFeedPost';
 // groupMultiMedia intentionally not imported: posts are built one-per-parent-id already grouped.
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
@@ -138,6 +143,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
 
   interface ClubMediaItem {
     id: string;
+    source?: 'post' | 'review';
     sourceId?: string;
     type: 'image' | 'video';
     url?: string;
@@ -154,6 +160,36 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
     };
   }
   const rawMedia = rawMediaRaw as ClubMediaItem[] | undefined;
+
+  /* CANONICAL_FULLSCREEN_VIEWER §3: review parents open as real reviews. ONE
+     batched course_ratings read by id (useBrowseReviews' columns, viewer RLS)
+     feeds the shared adapter; post parents get the course header from one
+     golf_courses row. Post parents stay readOnly: no client read returns post
+     like/comment counts and viewer-liked by id. */
+  const reviewParentIds = useMemo(() => Array.from(new Set((rawMedia ?? [])
+    .filter((item) => item.source === 'review' && item.sourceId).map((item) => item.sourceId as string))).sort(), [rawMedia]);
+  const { data: parentReviews } = useQuery({
+    queryKey: ['about-strip-reviews', clubId, reviewParentIds.join(',')],
+    enabled: reviewParentIds.length > 0,
+    staleTime: 60_000,
+    queryFn: async (): Promise<LatestReview[]> => {
+      const { data, error } = await supabase.from('course_ratings').select(WORDS_SELECT).in('id', reviewParentIds);
+      if (error) throw error;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return ((data ?? []) as any[]).map((row) => mapRow(row)).filter((r): r is LatestReview => !!r);
+    },
+  });
+  const { data: stripCourse } = useQuery({
+    queryKey: ['about-strip-course', clubId],
+    enabled: !!clubId,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('golf_courses')
+        .select('id, name, country, region, sub_country').eq('id', clubId).maybeSingle();
+      if (error) throw error;
+      return data as { id: string; name: string | null; country: string | null; region: string | null; sub_country: string | null } | null;
+    },
+  });
 
   // (Removed dependency on the legacy explore adapter; tiles derive
   //  directly from `rawMedia` below.)
@@ -191,9 +227,26 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
         visibleParentIds.push(parentId);
       }
     }
+    const reviewsById = new Map((parentReviews ?? []).map((r) => [r.reviewId, r]));
     const posts: FeedPost[] = visibleParentIds.map((parentId) => {
       const group = byParent.get(parentId) ?? [];
       const first = group[0];
+      const media = group.map((item) => ({
+        id: item.id, type: item.type, url: item.url ?? '', posterUrl: item.thumbnailUrl ?? null,
+        width: item.width ?? null, height: item.height ?? null, durationSeconds: item.duration ?? null,
+      }));
+      const fetched = first?.source === 'review' ? reviewsById.get(parentId) : undefined;
+      if (first?.source === 'review') {
+        // Review parent: the shared adapter, the strip's own tiles as its media.
+        const base = fetched ? latestReviewInput(fetched) : {
+          reviewId: parentId, userId: first.author?.id ?? null, username: first.author?.username,
+          displayName: first.author?.displayName, avatarUrl: first.author?.avatarUrl, createdAt: first.createdAt,
+          courseId: clubId, courseName: stripCourse?.name ?? '', rating: null,
+          courseCountry: stripCourse?.country ?? null, courseRegion: stripCourse?.region ?? null,
+          courseSubCountry: stripCourse?.sub_country ?? null, media: [],
+        };
+        return reviewFeedPost({ ...base, media });
+      }
       const mediaItems: MediaItem[] = group.map((item) => {
         const isVideo = item.type === 'video';
         return {
@@ -220,29 +273,29 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
         caption: '',
         mediaItems,
         createdAt: first?.createdAt || new Date().toISOString(),
-        // ⚠️ HARDCODED 0/false engagement fields.
-        // SAFE ONLY because AboutMediaStrip opens the fullscreen viewer with
-        // readOnly:true — likes/comments UI is suppressed and no mutation
-        // paths can fire against these stub values. If this surface is ever
-        // switched to an interactive viewer, wire real engagement (fetch
-        // like_count / comment_count / is_liked_by_me for each parent post)
-        // BEFORE flipping readOnly off, or every viewed item will appear
-        // zeroed and any like will patch a stale delta.
-        likeCount: 0, // RPC lacks field
-        commentCount: 0, // RPC lacks field
-        shareCount: 0, // RPC lacks field
+        // Zero engagement is safe ONLY because post parents are per-post
+        // readOnly (no by-id post engagement read exists client-side).
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
         review: null,
         isReview: false,
-        isLikedByMe: false, // RPC lacks field
-        isFollowedByMe: false, // RPC lacks field
+        isLikedByMe: false,
+        isFollowedByMe: false,
         tags: [],
+        readOnly: true,
+        courseId: clubId,
+        courseName: stripCourse?.name ?? undefined,
+        courseCountry: stripCourse?.country ?? undefined,
+        courseRegion: stripCourse?.region ?? undefined,
+        courseSubCountry: stripCourse?.sub_country ?? undefined,
       };
     });
     // Map each visible tile (by index) to its parent id, so click handlers
     // can resolve the post index quickly.
     const tileParentIds = visible.map((item) => item.sourceId || item.id);
     return { feedPosts: posts, tileParentIds };
-  }, [rawMedia, maxItems]);
+  }, [rawMedia, maxItems, parentReviews, stripCourse, clubId]);
 
   const extractStreamUidFromHls = (hls: string) => {
     try {
@@ -406,7 +459,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
                     posterUrl,
                     mediaId,
                     openedFrom: 'about-strip',
-                    options: { readOnly: true, hasNextPage: false },
+                    options: { hasNextPage: false },
                   });
                 }
               }}

@@ -22,8 +22,13 @@
  *     bar's slot (COMMENT_BAR_BOTTOM, COMMENT_BAR_H). Hidden when readOnly.
  *     While scrubbing, the stack and top bar fade to 0, the pills to 0.35.
  *
- * Member-shot viewer (syntheticPosts): chevron + rating chip top bar,
- * MemberShotCredit, edge-to-edge scrubber and a corner mute — unchanged.
+ * Course photos (syntheticPosts) use the SAME layout (CANONICAL_FULLSCREEN_VIEWER
+ * part 1): same top bar (no rating chip anywhere), the author row from the
+ * active item's memberShot (sub-row = added month), a glass hole strip in the
+ * score-strip slot, "View post ›" when the shot came from a live post, and the
+ * canonical video row. No pills: hole photos have no likes or comments.
+ * Review targets (engagementTarget review) hide More: MoreOptionsDrawer has
+ * no review mode.
  *
  * NO TEXT FIELDS. The comment pill opens CommentsSheetV2 (composer focused when
  * signed in); the chrome contains no input/textarea/contentEditable, because a
@@ -45,11 +50,10 @@ import { COMMENT_BAR_H, BAND_H_CSS } from '@/lib/media/fullscreenBand';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
-import { MemberShotCredit } from './MemberShotCredit';
+import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { Z } from '@/config/zIndex';
-import { formatRatingValue } from '@/utils/formatters';
 import { formatHcp } from '@/lib/formatHcp';
 import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
@@ -57,7 +61,6 @@ import { FullscreenHoleChipSlot, FullscreenRoundPill } from '@/components/feed/P
 import { golfRoundToPar, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
 import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
-import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -73,7 +76,6 @@ import { roundChapterLabel } from '@/features/video-details/roundVideoModel';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
-const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
 // 16 is a FLOOR, not a fixed offset: on home-indicator phones the pill sits above the indicator.
 const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
 // The scrubber's 32px hit area, centred on the band's top edge.
@@ -87,6 +89,7 @@ const FS_GLASS: React.CSSProperties = {
 };
 const FS_SHADE_BG = 'linear-gradient(0deg, rgba(6,6,8,0.92) 0%, rgba(6,6,8,0.78) 30%, rgba(6,6,8,0.35) 62%, rgba(6,6,8,0) 100%)';
 const MUTE = 'rgba(248,250,252,0.68)';
+const HOLE_KICKER = /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|[1-9]\d*(st|nd|rd|th))$/i;
 const BODY = 'rgba(248,250,252,0.9)';
 const GUTTER_L = 'max(16px, env(safe-area-inset-left, 0px))';
 const GUTTER_R = 'max(16px, env(safe-area-inset-right, 0px))';
@@ -94,7 +97,6 @@ const GUTTER_R = 'max(16px, env(safe-area-inset-right, 0px))';
 const VIDEO_ROW_BOTTOM = `calc(${COMMENT_BAR_BOTTOM} + ${COMMENT_BAR_H}px + 10px)`;
 const META = 'rgba(255,255,255,0.62)';
 const META_STRONG = 'rgba(255,255,255,0.78)';
-const MICRO_LABEL = 'rgba(255,255,255,0.50)';
 const FIG: React.CSSProperties = { color: '#FFFFFF', fontWeight: 700 };
 const TABULAR: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
 
@@ -322,9 +324,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // THE ONE resolved course id — the header, chip and record all read it.
   const resolvedCourseId =
     shotCourse?.courseId ?? hookPost?.review?.courseId ?? golfCourse?.id ?? hookPost?.courseId ?? null;
-  const { data: ratingAggregate } = useCourseRatingAggregates(
-    hooksLive && syntheticPosts && (shotCourse || hookPost?.courseRating == null) ? resolvedCourseId ?? undefined : undefined,
-  );
   // The VIEWER's own record at this course. Lazy: only while the viewer is live.
   const personal = useCoursePersonalStatus(hooksLive ? resolvedCourseId ?? undefined : undefined);
   const recordStats = useCourseStatsDetail(resolvedCourseId, hooksLive);
@@ -332,7 +331,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   if (feedEnded) {
     return (
       <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-        {!syntheticPosts && <div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
+        {<div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
         <div
           style={{
             position: 'fixed',
@@ -383,18 +382,16 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     (activePost as any).courseCountry ??
     golfCourse?.courseCountry ??
     null;
-  // Fallback: not every feed-post payload path carries course_avg_overall_score
-  // (tag-only posts, older RPCs). Resolve the community rating from
-  // course_rating_aggregates when the payload is missing it.
-  const courseRating =
-    (shotCourse ? null : activePost.courseRating) ??
-    (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
-  // The chip lives only in the member-shot viewer (a post is one golfer's).
-  const showCourseChip = syntheticPosts && courseRating != null;
-  const courseRatingLabel = courseRating == null ? '' : formatRatingValue(courseRating);
-
   const showPills = !syntheticPosts && !readOnly;
-  const showVideoRow = !syntheticPosts && activeMediaIsVideo;
+  const showVideoRow = activeMediaIsVideo;
+  const reviewTarget = activePost.engagementTarget?.type === 'review' ? activePost.engagementTarget.id : null;
+  // Course photos: the active item's member credit (media-local identity).
+  const shot = syntheticPosts ? activeMediaItem?.memberShot ?? null : null;
+  const shotDate = shot ? (shot.credit.startsWith(shot.memberName) ? shot.credit.slice(shot.memberName.length) : shot.credit).replace(/^\s*·\s*/, '').trim() : '';
+  // Only hole rows carry an ordinal kicker ("The 4th" / "The fifteenth", from
+  // holeOrdinal); place labels and course-tile shots never do.
+  const shotHasHole = !!shot && HOLE_KICKER.test(shot.kicker.trim());
+  const shotSourcePostId = shot?.sourcePostId ?? null;
   const stackBottom = showVideoRow ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`;
   const handleCommentPill = () => { if (activeActor && onCompose) onCompose(); else onComment(); };
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
@@ -441,52 +438,20 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     navigate(`/courses/${cid}`);
   };
 
-  /* BRIEF_LATEST_HOLES_OPTION_A §B: the clbhouz rating chip sits alone at the right
-     edge of the member-shot viewer. FULLSCREEN_VIEWER_REDESIGN removed it from posts. */
-  const courseChip = showCourseChip ? (
-    <button
-      type="button"
-      onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-      aria-label={`clbhouz rating ${courseRatingLabel}`}
-      style={{
-        flexShrink: 0, display: 'inline-flex', alignItems: 'baseline', gap: 5,
-        background: 'rgba(0,0,0,0.42)', border: '1px solid rgba(255,255,255,0.16)',
-        borderRadius: 999, padding: '4px 10px', cursor: 'pointer',
-        backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-        pointerEvents: 'auto', fontFamily: 'inherit', textShadow: 'none',
-      }}
-    >
-      <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1, ...TABULAR }}>
-        {courseRatingLabel}
-      </span>
-      <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL }}>
-        CLBHOUZ
-      </span>
-    </button>
-  ) : null;
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
       {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} round={videoRound} chapter={chapter} onScorecard={onOpenScorecard && videoRound ? () => onOpenScorecard(videoRound.context.roundScoreId ?? '') : undefined} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
-      {!syntheticPosts && <div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
-      {syntheticPosts ? (
-        <FullscreenVideoScrubber
-          activePost={activePost}
-          chapters={detailedVideo ? videoChapters : undefined}
-          bottom="env(safe-area-inset-bottom, 0px)"
-          onDraggingChange={setScrubbing}
-        />
-      ) : (
-        <FullscreenVideoScrubber
-          activePost={activePost}
-          chapters={detailedVideo ? videoChapters : undefined}
-          bottom={`calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
-          left={`calc(${GUTTER_L} + 40px)`}
-          right={GUTTER_R}
-          showTime
-          onDraggingChange={setScrubbing}
-        />
-      )}
+      {<div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
+      <FullscreenVideoScrubber
+        activePost={activePost}
+        chapters={detailedVideo ? videoChapters : undefined}
+        bottom={`calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
+        left={`calc(${GUTTER_L} + 40px)`}
+        right={GUTTER_R}
+        showTime
+        onDraggingChange={setScrubbing}
+      />
       {/* FeedSlide owns the slide-level notch scrim for top-0 non-gallery rects. */}
       <div
         {...inertWhileScrubbing}
@@ -522,7 +487,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         <FullscreenHoleChipSlot context={golfContext} hole={golfHole} holes={golfHoles} item={activePost?.mediaItems[activeSlide]} activeSlide={activeSlide} />
         <RoundVideoChip round={videoRound} chapter={chapter} follows={videoDetails?.scoreFollows !== false} />
 
-        {courseName && !syntheticPosts && (
+        {courseName && (
           <div data-fullscreen-course-header style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingTop: 2, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
             <button
               type="button"
@@ -583,22 +548,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             )}
           </div>
         )}
-        {/* The member-shot viewer: chevron left, rating chip right, nothing between. */}
-        {syntheticPosts && <><div style={{ flex: 1, minWidth: 0 }} />{courseChip}</>}
       </div>
 
-      {syntheticPosts && <div style={{ zIndex: Z.echo, position: 'relative', ...fadeWhileScrubbing }} {...inertWhileScrubbing}><MemberShotCredit syntheticPosts={syntheticPosts} item={activePost.mediaItems[activeSlide]} onViewPost={handleViewSourcePost} /></div>}
-      {/* Member-shot viewer: its corner mute, unchanged position. */}
-      {syntheticPosts && activeMediaIsVideo && (
-        <div {...inertWhileScrubbing} style={{ position: 'fixed', right: 'max(12px, env(safe-area-inset-right, 0px))', bottom: 'calc(24px + env(safe-area-inset-bottom))', zIndex: Z.echo, pointerEvents: 'none', ...fadeWhileScrubbing }}>
-          <button type="button" onClick={(e) => { e.stopPropagation(); handleMuteTap(); }} aria-label={shownMuted ? 'Unmute' : 'Mute'} style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto', filter: ICON_SHADOW }}>
-            {shownMuted ? <VolumeX size={32} stroke="#fff" strokeWidth={2} /> : <Volume2 size={32} stroke="#fff" strokeWidth={2} />}
-          </button>
-        </div>
-      )}
-
-      {/* Bottom stack (real posts only) */}
-      {!syntheticPosts && <div
+      {/* Bottom stack — one grammar for posts, reviews and course photos. */}
+      {<div
         {...inertWhileScrubbing}
         data-fullscreen-stack
         style={{
@@ -623,6 +576,19 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </div>
         )}
 
+        {shot ? (
+          <div data-fullscreen-author data-fullscreen-shot-author style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+            <SquircleAvatar key={activeMediaItem?.id} size={38} src={shot.avatarUrl} alt={shot.memberName} hairlineRing />
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                <InlineProMemberName userId={shot.memberUserId}>{shot.memberName}</InlineProMemberName>
+              </span>
+              {shotDate && (
+                <span data-fullscreen-shot-date style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: MUTE, lineHeight: 1.2, ...TABULAR }}>{shotDate}</span>
+              )}
+            </div>
+          </div>
+        ) : !syntheticPosts && (
         <div data-fullscreen-author style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
           <button
             type="button"
@@ -679,6 +645,30 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             </div>
           </div>
         </div>
+        )}
+
+        {shot && shotHasHole && (
+          <div data-fullscreen-hole-strip style={{ ...FS_GLASS, marginTop: 12, borderRadius: 14, padding: '11px 14px 10px', minWidth: 0 }}>
+            <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE, lineHeight: 1.2 }}>{shot.kicker}</div>
+            {shot.detail && <div style={{ marginTop: 3, fontSize: 15, fontWeight: 600, color: '#FFFFFF', lineHeight: 1.25, ...TABULAR }}>{shot.detail}</div>}
+          </div>
+        )}
+
+        {shot && shotSourcePostId && (
+          <button
+            type="button"
+            data-fullscreen-view-post
+            onClick={(e) => { e.stopPropagation(); handleViewSourcePost(shotSourcePostId); }}
+            style={{
+              marginTop: 10, minHeight: 28, alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 3,
+              background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
+              fontFamily: 'inherit', fontSize: 14, fontWeight: 600, color: '#FFFFFF',
+            }}
+          >
+            View post
+            <ChevronRight size={13} strokeWidth={2.6} aria-hidden />
+          </button>
+        )}
 
         {golfContext?.roundScoreId && onOpenScorecard && (
           <FullscreenRoundPill
@@ -705,7 +695,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </div>
         )}
 
-        {detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} chapterLabel={videoRound && chapter ? roundChapterLabel(chapter, videoRound.shape) : undefined} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
+        {syntheticPosts ? null : detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} chapterLabel={videoRound && chapter ? roundChapterLabel(chapter, videoRound.shape) : undefined} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
           <CaptionBlock
             caption={activePost.caption ?? ''}
             resetKey={activeIndex}
@@ -718,9 +708,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         {/* Likers row — LikedByRow reserves its line at zero (CB56); the stack is bottom-anchored. */}
         {!syntheticPosts && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
           <LikedByRow
-            postId={activePost.id}
+            postId={reviewTarget ?? activePost.id}
             count={likeState.count}
-            source="post"
+            source={reviewTarget ? 'review' : 'post'}
+            subject={reviewTarget && review ? { authorName: activePost.displayName || null, courseId: review.courseId ?? null, courseName: review.courseName ?? null, kind: 'review', gross: null, toPar: null, rating: review.rating ?? null } : undefined}
             /* isRound is false by construction: rounds do not appear in this feed. */
             kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
             avatarRing="media"
@@ -777,9 +768,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           <Pill pill="share" onClick={() => onShare(activePost)} ariaLabel="Share">
             <Share size={19} stroke="currentColor" strokeWidth={2} />
           </Pill>
-          <Pill pill="more" onClick={onMore} ariaLabel="More options" square>
-            <MoreHorizontal size={18} stroke="currentColor" strokeWidth={2} />
-          </Pill>
+          {!reviewTarget && (
+            <Pill pill="more" onClick={onMore} ariaLabel="More options" square>
+              <MoreHorizontal size={18} stroke="currentColor" strokeWidth={2} />
+            </Pill>
+          )}
         </div>
       )}
     </div>

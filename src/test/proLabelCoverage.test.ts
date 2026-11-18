@@ -56,7 +56,7 @@ export const WIRED = [
   "src/features/activity-v2/components/ActivityFoldedRoundsRow.tsx",
   "src/components/profile/handicap/whs/sections/course-legends/flat/championsFlatBits.tsx",
   "src/components/feed/FeedCommentPreview.tsx",
-  "src/components/fullscreen-feed/MemberShotCredit.tsx",
+  "src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx",
   "src/components/course-media-tab/ShotTagCard.tsx",
   "src/features/comments-v2/CommentsSheetV2.tsx",
   "src/components/sheets/SubjectContextLine.tsx",

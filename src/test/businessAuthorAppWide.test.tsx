@@ -161,11 +161,9 @@ describe('fullscreen author avatar — business with no logo', () => {
     expect(screen.queryByText('M')).toBeNull();
   });
 
-  it('neither fullscreen surface passes a one-letter fallback prop', () => {
+  it('the one fullscreen chrome passes no one-letter fallback prop', () => {
     const chrome = readFileSync('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx', 'utf8');
-    const credit = readFileSync('src/components/fullscreen-feed/MemberShotCredit.tsx', 'utf8');
     expect(chrome).not.toMatch(/fallback=/);
-    expect(credit).not.toMatch(/fallback=/);
   });
 });
 

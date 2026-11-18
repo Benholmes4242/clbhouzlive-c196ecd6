@@ -52,8 +52,8 @@ import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useReviewMedia, type ReviewMediaItem } from './useReviewMedia';
-import { useReviewPost } from './useReviewPost';
-import { extractStreamId } from '@/components/media-system/utils/feedMapper';
+import { reviewFeedPost } from '@/lib/reviews/reviewFeedPost';
+import { shareReview } from '@/lib/reviews/shareReview';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z, VIEWER_ABOVE_SHEETS_Z } from '@/lib/zLayers';
@@ -72,8 +72,6 @@ import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { analyticsEvents } from '@/utils/analyticsEvents';
-import { toast } from '@/lib/toast';
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
@@ -342,18 +340,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
   const handleShare = useCallback(() => {
     if (!reviewId || !courseId) return;
-    const shareUrl = `${window.location.origin}/courses/${courseId}?tab=reviews&review=${reviewId}`;
-    analyticsEvents.track('review_share_opened', { review_id: reviewId, course_id: courseId });
-    if (navigator.share) {
-      navigator.share({
-        title: courseName,
-        text: `${user.name}'s review of ${courseName}`,
-        url: shareUrl,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(shareUrl);
-      toast.success('Link copied');
-    }
+    shareReview({ reviewId, courseId, courseName, authorName: user.name });
   }, [courseId, courseName, reviewId, user.name]);
 
   const locationStr = [courseSubCountry || courseRegion, courseCountry]
@@ -384,8 +371,19 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
   // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
   const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
-  const { data: reviewPost } = useReviewPost(reviewId ?? null, isOpen);
   const allMedia = (resolvedMedia !== undefined ? resolvedMedia : (media?.length ? media : fetchedMedia)) ?? [];
+  /* CANONICAL_FULLSCREEN_VIEWER: the viewer post is the one review adapter's,
+     carrying engagementTarget review, so the viewer's pills act on the review. */
+  const reviewPost = useMemo(() => (reviewId ? reviewFeedPost({
+    reviewId, userId: user.id, username: user.username, displayName: user.name, avatarUrl: user.avatar,
+    text: effectiveReviewText, createdAt: reviewDate, courseId, courseName, rating,
+    courseCountry, courseRegion, courseSubCountry,
+    breakdown: effectiveBreakdown ? {
+      design: effectiveBreakdown.design ?? null, conditions: effectiveBreakdown.conditions ?? null,
+      clubhouse: effectiveBreakdown.clubhouse ?? null, facilities: effectiveBreakdown.facilities ?? null,
+    } : null,
+    media: allMedia.map((m) => ({ id: m.id, type: m.mediaType, url: m.mediaUrl, posterUrl: m.posterUrl, streamId: m.streamId, width: m.width, height: m.height })),
+  }) : null), [reviewId, user.id, user.username, user.name, user.avatar, effectiveReviewText, reviewDate, courseId, courseName, rating, courseCountry, courseRegion, courseSubCountry, effectiveBreakdown, allMedia]);
   const mediaTotal = allMedia.length;
   /* §3 — at most nine tiles (three rows); the ninth carries "+N" when more exist.
      Order is fetchReviewMedia's (cover first, then created_at) — never re-sorted here. */
@@ -627,12 +625,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         onClick={(e) => {
                           const post = reviewPost;
                           if (!post || post.mediaItems.length === 0) return;
-                          const streamId = m.mediaType === 'video' ? extractStreamId(m.mediaUrl) : null;
-                          const matchedIndex = post.mediaItems.findIndex((item) =>
-                            m.mediaType === 'image'
-                              ? item.type === 'image' && item.imageUrl === m.mediaUrl
-                              : item.type === 'video' && streamId !== null && item.streamId === streamId,
-                          );
+                          // The adapter keeps media ids, so the tapped tile resolves by id.
+                          const matchedIndex = post.mediaItems.findIndex((item) => item.id === m.id);
                           const mediaIndex = matchedIndex >= 0
                             ? matchedIndex
                             : Math.max(0, Math.min(index, post.mediaItems.length - 1));

@@ -1,6 +1,4 @@
 import React from 'react';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
@@ -55,52 +53,52 @@ afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: n
 describe('Latest holes active-shot caption and course header', () => {
   it('detail renders only when present and disappears as the active shot changes', () => {
     const view = mount(true);
-    expect(view.container.querySelector('.member-shot-detail')).toHaveTextContent('Par 4 · 412 yards');
+    const strip = () => view.container.querySelector('[data-fullscreen-hole-strip]');
+    expect(strip()).toHaveTextContent('The fifteenth');
+    expect(strip()).toHaveTextContent('Par 4 · 412 yards');
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
-    expect(view.container.querySelector('.member-shot-detail')).toBeNull();
+    expect(strip()).toHaveTextContent('The second');
+    expect(strip()?.textContent).not.toContain('Par');
   });
   it('empty detail is omitted', () => {
     const view = mount(true, { ...post, mediaItems: [{ ...post.mediaItems[0], memberShot: { ...post.mediaItems[0].memberShot, kicker: 'The first', title: 'Course', credit: '', avatarUrl: null, memberName: '', detail: '' } }] });
-    expect(view.container.querySelector('.member-shot-detail')).toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-hole-strip]')?.textContent).toBe('The first');
   });
-  it('all member-shot titles use one-line ellipsis with a shrinking text column', () => {
-    const css = readFileSync(resolve(process.cwd(), 'src/components/fullscreen-feed/member-shot-credit.css'), 'utf8');
-    expect(css).toMatch(/\.member-shot-text\s*\{[^}]*flex: 1;[^}]*min-width: 0;/);
-    expect(css).toMatch(/\.member-shot-title\s*\{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis;/);
-    expect(css).not.toContain('-webkit-line-clamp');
+  it('course-photo course names use the canonical header name element', () => {
+    const view = mount(true);
+    const name = view.container.querySelector('[data-fullscreen-course-name]') as HTMLElement | null;
+    expect(name).toHaveTextContent('Druids Glen Golf Club');
+    expect(name).toHaveAttribute('title', 'Druids Glen Golf Club');
+    expect(name?.closest('[data-fullscreen-course-header]')).not.toBeNull();
   });
-  it('Latest from the courses caption keeps its title alone without detail', () => {
+  it('Latest from the courses opens name the course in the header with no hole strip or members kicker', () => {
     const [course] = coursePostsToShotPosts([{ ...post, courseName: 'Royal Portrush Golf Club (Dunluce)' }]);
     const view = mount(true, course);
-    expect(view.container.querySelector('.member-shot-title')).toHaveTextContent('Royal Portrush Golf Club (Dunluce)');
-    expect(view.container.querySelector('.member-shot-detail')).toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-course-name]')).toHaveTextContent('Royal Portrush Golf Club (Dunluce)');
+    expect(view.container.querySelector('[data-fullscreen-hole-strip]')).toBeNull();
+    expect(view.container.textContent).not.toContain("Through members' eyes");
   });
-  it('rating and course navigation follow horizontal active-shot changes, and the top bar carries no course name', () => {
+  it('course header and navigation follow horizontal active-shot changes, with no rating chip', () => {
     const view = mount(true);
-    // BRIEF_LATEST_HOLES_OPTION_A §B: the member-shot top bar keeps only the chevron and
-    // the rating chip — the chip is its one course door and it follows the active shot.
-    expect(screen.queryByRole('button', { name: /^Open / })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Open Druids Glen Golf Club' })).toBeInTheDocument();
     expect(courses.personal).toHaveBeenLastCalledWith('druids');
     expect(courses.stats).toHaveBeenLastCalledWith('druids', true);
-    expect(courses.rating).toHaveBeenLastCalledWith('druids');
-    expect(view.container.textContent).not.toContain('79');
-    expect(screen.getByRole('button', { name: 'clbhouz rating 8.6' })).toBeInTheDocument();
+    expect(courses.rating).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: /^clbhouz rating/ })).toBeNull();
+    expect(view.container.textContent).toContain('79');
     expect(view.container.textContent).not.toContain('Fallback location');
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
-    expect(screen.queryByRole('button', { name: /^Open / })).toBeNull();
     expect(courses.personal).toHaveBeenLastCalledWith('sundridge');
     expect(courses.stats).toHaveBeenLastCalledWith('sundridge', true);
-    expect(courses.rating).toHaveBeenLastCalledWith('sundridge');
-    expect(view.container.textContent).not.toContain('75');
-    expect(screen.getByRole('button', { name: 'clbhouz rating 9.1' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'clbhouz rating 9.1' }));
+    expect(screen.queryByRole('button', { name: /^clbhouz rating/ })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Open Sundridge Park Golf Club' }));
     expect(screen.getByTestId('location')).toHaveTextContent('/courses/sundridge');
   });
   it.each([false, true])('legacy review/golfCourse/post precedence remains when no eligible override (synthetic %s)', synthetic => {
     const shown = synthetic ? { ...post, mediaItems: post.mediaItems.map(item => ({ ...item, memberShot: item.memberShot ? { ...item.memberShot, courseId: undefined } : undefined })) } : post;
     const reviewed = { ...shown, review: { reviewId: 'r', courseId: 'review', courseName: 'Review course', courseImageUrl: null, rating: 8 } };
-    // A real post's header names the course; the member-shot viewer's only door is the chip.
-    const door = (name: string) => screen.getByRole('button', { name: synthetic ? /^clbhouz rating/ : name });
+    // One viewer: posts and course photos both name the course in the header.
+    const door = (name: string) => screen.getByRole('button', { name });
     mount(synthetic, reviewed, { id: 'golf', name: 'Golf course' });
     expect(door('Open Review course')).toBeInTheDocument();
     expect(courses.personal).toHaveBeenLastCalledWith('review');

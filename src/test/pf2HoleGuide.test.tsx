@@ -7,8 +7,19 @@ vi.mock('@/components/courses/course-detail/about/AboutSection', () => ({ VERDIC
 import { effectiveHoleGuide, golfPostPatch, composerDestinations } from '@/features/post-v2/lib/composerGolfRules';
 import { ComposerHoleGuide } from '@/features/post-v2/components/golf/ComposerGolf';
 import { holeShotsToFeedPosts, placeShotsToFeedPosts, latestHolesToFeedPosts, type MemberShotRow } from '@/lib/courseMedia/memberShotPosts';
-import { MemberShotCredit } from '@/components/fullscreen-feed/MemberShotCredit';
-import type { MediaItem } from '@/components/media-system/types/media';
+import { MemoryRouter } from 'react-router-dom';
+import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useClubhouseStore } from '@/store/clubhouseStore';
+import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
+vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
+vi.mock('@/hooks/useFollowState', () => ({ useFollowState: () => ({ isFollowing: false }) }));
+vi.mock('@/hooks/useCoursePersonalStatus', () => ({ useCoursePersonalStatus: () => ({ status: null, isLoading: false }) }));
+vi.mock('@/hooks/feed/useCourseStatsDetail', () => ({ useCourseStatsDetail: () => ({ data: null, isLoading: false }) }));
+vi.mock('@/audio/useLaneAudioBlocked', () => ({ useLaneAudioBlocked: () => false }));
+vi.mock('@/video/useVideoProgressWriter', () => ({ useVideoProgressWriter: () => {} }));
+vi.mock('@/components/likes/LikedByRow', () => ({ LikedByRow: () => null }));
+vi.mock('@/components/fullscreen-feed/FullscreenVideoScrubber', () => ({ FullscreenVideoScrubber: () => null }));
 
 afterEach(cleanup);
 
@@ -98,26 +109,39 @@ const shotItem = (sourcePostId: string | null, type: 'image' | 'video' = 'image'
   memberShot: { kicker: 'The 15th', title: 'Machrihanish', credit: 'Benjamin Holmes · November 2026', avatarUrl: null, memberName: 'Benjamin Holmes', sourcePostId },
 });
 
-describe('PF2 View post pill', () => {
-  it('renders only with a sourcePostId and lifts the caption only then', () => {
-    const { container, rerender } = render(<MemberShotCredit syntheticPosts item={shotItem('post-1')} onViewPost={() => {}} />);
+const shotPost = (item: MediaItem): FeedPost => ({
+  id: 'shots:hole:c1:15', userId: '', actorId: '', actorType: 'personal', username: '', displayName: 'Machrihanish',
+  avatarUrl: '', isVerified: false, creatorRelation: 'none', caption: '', createdAt: '2026-11-06T10:00:00Z',
+  mediaItems: [item], likeCount: 0, commentCount: 0, shareCount: 0, review: null, isReview: false,
+  isLikedByMe: false, isFollowedByMe: false, courseId: 'c1', courseName: 'Machrihanish',
+});
+const chrome = (item: MediaItem) => <MemoryRouter><ImmersiveFullscreenChrome
+  posts={[shotPost(item)]} activeIndex={0} syntheticPosts readOnly
+  onClose={vi.fn()} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()}
+  getLikeState={() => ({ isLiked: false, count: 0 })} getCommentCount={() => 0} getFollowState={() => false}
+  onFollow={vi.fn()} onViewProfile={vi.fn()} onReviewTap={vi.fn()} isOwnPost={false} /></MemoryRouter>;
+
+describe('PF2 View post line in the canonical viewer', () => {
+  it('renders only with a sourcePostId, on its own line in the Full review style', () => {
+    useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null });
+    useClubhouseStore.setState({ isTournamentCardActive: false });
+    const { container, rerender } = render(chrome(shotItem('post-1')));
     expect(screen.getByRole('button', { name: 'View post' })).toBeTruthy();
-    expect(container.querySelector('.member-shot-caption')?.className).toContain('member-shot-caption-lifted');
-    rerender(<MemberShotCredit syntheticPosts item={shotItem(null)} onViewPost={() => {}} />);
+    expect(container.querySelector('[data-fullscreen-view-post]')).not.toBeNull();
+    rerender(chrome(shotItem(null)));
     expect(screen.queryByRole('button', { name: 'View post' })).toBeNull();
-    expect(container.querySelector('.member-shot-caption')?.className).not.toContain('member-shot-caption-lifted');
   });
-  it('the tap reports the post and never reaches the slide', () => {
-    const onViewPost = vi.fn();
+  it('the tap opens the post and never reaches the slide', () => {
+    useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null });
     const onSlideTap = vi.fn();
-    render(<div onClick={onSlideTap}><MemberShotCredit syntheticPosts item={shotItem('post-1')} onViewPost={onViewPost} /></div>);
+    render(<div onClick={onSlideTap}>{chrome(shotItem('post-1'))}</div>);
     fireEvent.click(screen.getByRole('button', { name: 'View post' }));
-    expect(onViewPost).toHaveBeenCalledWith('post-1');
     expect(onSlideTap).not.toHaveBeenCalled();
   });
-  it('video shots use the video geometry classes', () => {
-    const { container } = render(<MemberShotCredit syntheticPosts item={shotItem('post-1', 'video')} onViewPost={() => {}} />);
-    expect(container.querySelector('.member-shot-caption')?.className).toContain('member-shot-caption-video');
-    expect(container.querySelector('.member-shot-viewpost')?.className).toContain('member-shot-viewpost-video');
+  it('video shots keep View post in the stack with the canonical video row below it', () => {
+    useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null });
+    const { container } = render(chrome(shotItem('post-1', 'video')));
+    expect(container.querySelector('[data-fullscreen-stack] [data-fullscreen-view-post]')).not.toBeNull();
+    expect(container.querySelector('[data-fullscreen-video-row]')).not.toBeNull();
   });
 });

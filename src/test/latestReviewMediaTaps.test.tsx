@@ -10,7 +10,7 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: calls.trac
 vi.mock('@/components/course-media-tab/HoleInlineVideo', () => ({ HoleInlineVideo: () => <span /> }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /> }));
 import { ReviewRailSlot } from '@/components/courses/ReviewRailSlot';
-import { latestReviewFeedPost } from '@/components/courses/browse/latestReviewFeedPost';
+import { reviewFeedPost, latestReviewInput } from '@/lib/reviews/reviewFeedPost';
 const review = (id: string, count = 4): LatestReview => ({
   reviewId: id, courseId: 'course', courseName: 'Course', courseImage: null, userId: 'member',
   reviewerName: 'Member', reviewerUsername: null, reviewerAvatar: null, rating: 8,
@@ -28,9 +28,10 @@ describe('Latest review media entry', () => {
     if (!tile) throw new Error('third media tile missing');
     fireEvent.click(tile);
     expect(sheet).not.toHaveBeenCalled();
-    expect(calls.open).toHaveBeenCalledWith(expect.objectContaining({ index: 0, mediaId: 'a-2', originEl: tile, posterUrl: 'https://example.com/a-2.jpg', openedFrom: 'courses-latest-reviews', options: { readOnly: true, hasNextPage: false } }));
+    expect(calls.open).toHaveBeenCalledWith(expect.objectContaining({ index: 0, mediaId: 'a-2', originEl: tile, posterUrl: 'https://example.com/a-2.jpg', openedFrom: 'courses-latest-reviews', options: { hasNextPage: false } }));
     const posts = calls.open.mock.calls[0]?.[0].posts;
     expect(posts.map((p: { id: string }) => p.id)).toEqual(['a', 'b']);
+    expect(posts.map((p: { engagementTarget?: unknown }) => p.engagementTarget)).toEqual([{ type: 'review', id: 'a' }, { type: 'review', id: 'b' }]);
     expect(posts[0].mediaItems.map((m: { id: string }) => m.id)).toEqual(['a-0', 'a-1', 'a-2', 'a-3']);
     expect(calls.track).toHaveBeenCalledWith('review_photo_opened', { course_id: 'course', review_id: 'a', source: 'courses-latest-reviews' });
   });
@@ -44,8 +45,9 @@ describe('Latest review media entry', () => {
     expect(sheet.mock.calls.map(c => c[0].reviewId)).toEqual(['a', 'written']);
     expect(calls.open).not.toHaveBeenCalled();
   });
-  it('carries dimensions with 1080 fallback and keeps zero engagement read-only shape', () => {
-    const post = latestReviewFeedPost(review('a'));
+  it('carries dimensions with 1080 fallback and routes engagement to the review', () => {
+    const post = reviewFeedPost(latestReviewInput(review('a')));
+    expect(post.engagementTarget).toEqual({ type: 'review', id: 'a' });
     expect([post.mediaItems[0].width, post.mediaItems[0].height]).toEqual([600, 900]);
     expect([post.mediaItems[1].width, post.mediaItems[1].height]).toEqual([1080, 1080]);
     expect([post.likeCount, post.commentCount, post.shareCount, post.isLikedByMe, post.isFollowedByMe]).toEqual([0, 0, 0, false, false]);

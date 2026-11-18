@@ -26,7 +26,7 @@ import { imageSrc } from '@/utils/imageSrc';
 import { shortAge } from '@/features/explore-magazine/watch/watchMiddle';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { latestReviewFeedPost } from './browse/latestReviewFeedPost';
+import { reviewFeedPost, latestReviewInput } from '@/lib/reviews/reviewFeedPost';
 import { Button } from '@/components/ui/button';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 
@@ -322,9 +322,9 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
   const openMedia = (r: LatestReview, item: ReviewMediaItem, el: HTMLElement) => {
     analyticsEvents.track('review_photo_opened', { course_id: r.courseId, review_id: r.reviewId, source: 'courses-latest-reviews' });
     openWithOrigin({
-      posts: mediaRail.map(latestReviewFeedPost), index: mediaRail.indexOf(r), mediaId: item.id,
+      posts: mediaRail.map((row) => reviewFeedPost(latestReviewInput(row))), index: mediaRail.indexOf(r), mediaId: item.id,
       originEl: el, posterUrl: item.type === 'video' ? reviewVideoPoster(item) || null : item.posterUrl ?? item.url,
-      openedFrom: 'courses-latest-reviews', options: { readOnly: true, hasNextPage: false },
+      openedFrom: 'courses-latest-reviews', options: { hasNextPage: false },
     });
   };
 

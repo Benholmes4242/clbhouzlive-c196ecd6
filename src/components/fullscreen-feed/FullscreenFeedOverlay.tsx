@@ -92,6 +92,7 @@ import { resolveViewerRect } from '@/components/feed/FeedSlide';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { trace as perfTrace } from '@/perf/trace';
 import { vperfCloseMotionMark } from '@/perf/vperf';
+import { useViewerEngagement, reviewTargetOf } from './useViewerEngagement';
 
 
 
@@ -220,7 +221,10 @@ export function FullscreenFeedOverlay() {
   const showFeedEnd = openedFrom === 'clubhouse';
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
-  const readOnly = useFullscreenFeedStore(s => s.readOnly);
+  const storeReadOnly = useFullscreenFeedStore(s => s.readOnly);
+  /* CANONICAL_FULLSCREEN_VIEWER: a post may be read-only on its own inside an
+     interactive open (About Photos post parents); the open-wide flag still wins. */
+  const readOnly = storeReadOnly || !!posts[activeIndex]?.readOnly;
   const syntheticPosts = useFullscreenFeedStore(s => s.syntheticPosts);
   const courseGallery = useFullscreenFeedStore(s => s.courseGallery);
   const origin = useFullscreenFeedStore(s => s.origin);
@@ -534,11 +538,6 @@ export function FullscreenFeedOverlay() {
   const activeActor = ctxActor ?? { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
   // CB49: double-tap only ever likes — same path as the rail's like button.
-  const handleDoubleTapLike = useCallback((post: FeedPost) => {
-    if (readOnly) return;
-    const fired = likeOnlyOnDoubleTap(getActiveLikeState(post).isLiked, () => handleLike(post));
-    triggerHaptic(fired ? 'medium' : 'light');
-  }, [readOnly, getActiveLikeState, handleLike]);
   const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   // Two entry points, two intents: the rail glyph lands on the thread, the
@@ -559,11 +558,22 @@ export function FullscreenFeedOverlay() {
   // syntheticPosts opens carry synthetic post ids — never look them up in
   // posts / gam_round_stats (BRIEF_SYNTHETIC_SHOT_GATES).
   const activeScoreIdMap = usePostScoreIds(
-    useMemo(() => (activePostIdForScore && !syntheticPosts ? [activePostIdForScore] : []), [activePostIdForScore, syntheticPosts]),
+    useMemo(() => (activePostIdForScore && !syntheticPosts && !reviewTargetOf(activePost) ? [activePostIdForScore] : []), [activePostIdForScore, syntheticPosts, activePost]),
     'fullscreen',
   );
   const commentScoreId = activePost?.id ? activeScoreIdMap.get(activePost.id) ?? null : null;
-  const commentReviewId = activePost?.review?.reviewId ?? null;
+  // CANONICAL_FULLSCREEN_VIEWER §2: review targets engage the review (see useViewerEngagement).
+  const { getViewerLikeState, handleViewerLike, getViewerCommentCount, handleViewerShare, commentTargetFor } = useViewerEngagement({
+    posts, handleLike, getActiveLikeState, getCommentCount, handleShare,
+  });
+  // A review target's comments live on the review (CommentsSheetV2 targetType "review").
+  const commentReviewId = commentTargetFor(activePost)?.id ?? activePost?.review?.reviewId ?? null;
+  // CB49: double-tap only ever likes — same routing as the like pill.
+  const handleDoubleTapLike = useCallback((post: FeedPost) => {
+    if (storeReadOnly || post.readOnly) return;
+    const fired = likeOnlyOnDoubleTap(getViewerLikeState(post).isLiked, () => handleViewerLike(post));
+    triggerHaptic(fired ? 'medium' : 'light');
+  }, [storeReadOnly, getViewerLikeState, handleViewerLike]);
 
   /* PF1B — the viewer's golf context (hole chip + round pill), ONE batched
      read for whatever posts the viewer shows (feed, profile, deep link).
@@ -1055,22 +1065,22 @@ export function FullscreenFeedOverlay() {
                     activeIndexOverride={activeIndex}
                     isFullscreen
                     surface="fullscreen"
-                    readOnly={readOnly}
+                    readOnly={storeReadOnly}
                   />
 
                   {courseGallery ? <CourseGalleryChrome onClose={handleClose} /> : <ImmersiveFullscreenChrome
                     posts={posts}
                     activeIndex={activeIndex}
                     onClose={handleClose}
-                    onLike={handleLike}
+                    onLike={handleViewerLike}
                     onComment={safeOpenComments}
                     onCompose={safeComposeComment}
-                    onShare={handleShare}
+                    onShare={handleViewerShare}
                     onMore={() => setMoreOptionsOpen(true)}
 
 
-                    getLikeState={getActiveLikeState}
-                    getCommentCount={getCommentCount}
+                    getLikeState={getViewerLikeState}
+                    getCommentCount={getViewerCommentCount}
                     getFollowState={getFollowState}
                     onFollow={(post, followedNow) => handleFollow({ ...post, isFollowedByMe: followedNow })}
                     onViewProfile={handleViewProfile}
