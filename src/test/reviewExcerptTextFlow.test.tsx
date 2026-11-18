@@ -13,17 +13,23 @@ import { ReviewPostCard } from '@/components/feed/ReviewPostCard';
 const post = { id: 'post', userId: 'member', actorType: 'personal', displayName: 'Ben Loveard', createdAt: '2026-11-18', caption: 'A full review excerpt with enough words to wrap onto the second line.', review: { courseName: 'Reflection Bay', rating: 9, reviewText: 'A full review excerpt with enough words to wrap onto the second line.' }, mediaItems: [] } as unknown as FeedPost;
 afterEach(cleanup);
 describe('review excerpt text flow', () => {
-  it('media-first review body opts every nested member name into text flow', () => {
+  it('media-first review body lead is plain text with no badge; the header keeps the AM badge', () => {
     const { container } = render(<MemoryRouter><ReviewPostCard post={post} layout="mediaFirst" articleRef={null} onProfile={() => {}} onReadReview={() => {}} onPrefetch={() => {}} media={<span data-media />} footer={null} /></MemoryRouter>);
     const body = container.querySelector('[data-review-body]');
-    expect(body?.querySelector('[data-flow="text"]')).not.toBeNull();
-    expect(body?.querySelector('.pro-inline-name:not([data-flow])')).toBeNull();
-    expect(body?.querySelector('.pro-label')).toHaveAttribute('data-kind', 'am');
+    expect(body?.querySelector('.pro-label')).toBeNull();
+    expect(container.querySelector('[data-review-body-lead]')?.textContent).toBe('Ben Loveard');
+    expect(container.querySelector('[data-review-who] .pro-label')).toHaveAttribute('data-kind', 'am');
     expect(container.querySelector('[data-review-who] .pro-inline-name')).not.toHaveAttribute('data-flow');
     const css = readFileSync('src/features/pro-verification/pro-label.css', 'utf8');
     const badgeRule = css.match(/\.pro-inline-name\[data-flow="text"\] \.pro-label\s*\{([^}]*)\}/)?.[1];
     expect(badgeRule).toMatch(/(?:^|;)\s*font-size:\s*7\.5px\s*;/);
     expect(badgeRule).toMatch(/(?:^|;)\s*line-height:\s*1\s*;/);
+  });
+  it('feed caption lead stays plain text with no badge', () => {
+    const src = readFileSync('src/components/feed/FeedCard.tsx', 'utf8');
+    const lead = src.match(/<span data-caption-lead[^>]*>([\s\S]*?)<\/span>/)?.[1];
+    expect(lead).toBeDefined();
+    expect(lead).not.toMatch(/InlineProMemberName|ProLabel|pro-label/);
   });
   it('default member name preserves its existing structure including badge attributes', () => {
     const { container } = render(<InlineProMemberName userId="member">Ben Loveard</InlineProMemberName>);

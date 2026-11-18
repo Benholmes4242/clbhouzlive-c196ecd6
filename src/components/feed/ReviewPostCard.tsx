@@ -110,7 +110,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       {body ? (
         <div data-review-body-wrap style={{ flex: 'none', display: 'flex', padding: `0 ${GUTTER}px 6px` }}>
           <div data-review-body style={{ fontSize: 15, lineHeight: 1.4, color: A.INK, ...REVIEW_BODY_CLAMP }}>
-            {mediaLeads ? <><span data-review-body-lead style={{ fontWeight: 600, color: A.INK }}><InlineProMemberName flow="text" userId={post.actorType === 'business' || post.actorType === 'system' ? undefined : post.userId}>{post.displayName}</InlineProMemberName></span>{' '}</> : null}
+            {mediaLeads ? <><span data-review-body-lead style={{ fontWeight: 600, color: A.INK }}>{post.displayName}</span>{' '}</> : null}
             <MentionText text={body} />
           </div>
         </div>
