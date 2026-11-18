@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 const captured: any[] = [];
 vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({ getQueryData: () => undefined }),
   useInfiniteQuery: (opts: any) => { captured.push(opts); return { data: undefined, dataUpdatedAt: 0 }; },
 }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: vi.fn() } }));

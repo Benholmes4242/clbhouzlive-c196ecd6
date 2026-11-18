@@ -7,7 +7,6 @@ interface UseFeedNavOptions {
   activeFeed: {
     fetchNextPage: () => void;
     refetch: () => Promise<unknown>;
-    resetSeen: () => void;
     hasNextPage: boolean | undefined;
     isFetchingNextPage: boolean;
   };
@@ -39,7 +38,6 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
   const {
     fetchNextPage,
     refetch,
-    resetSeen,
     hasNextPage,
     isFetchingNextPage,
   } = activeFeed;
@@ -51,12 +49,11 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleRefresh = useCallback(async () => {
-    resetSeen();
     // Refresh resets the current tab to the top
     useClubhouseStore.getState().setActiveIndex(0, activeTab);
     onTabSwitch();
     await refetch();
-  }, [resetSeen, onTabSwitch, refetch, activeTab]);
+  }, [onTabSwitch, refetch, activeTab]);
 
   return { handleNearEnd, handleRefresh };
 }

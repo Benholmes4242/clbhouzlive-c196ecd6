@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Feed pages by seen posts
+- Replace date cursor/ref with actor-scoped cached exclusions and numeric pages; remove reset caller.
+- Added 7 tests; targeted 6/8 passed, stopped on two observer-state failures at useSuggestedFeed.paging.test.tsx:48 and :67. Shards/typecheck unrun; expected inventory 9,149 against 9,142.
+- Real-account paging unavailable on external Supabase; document the 500-id exclusion limitation.
+
 ## Stopped: Courses dock anchor — awaiting ruling
 - IslandDock re-observes replaced anchors with same-frame recompute; Courses tab row rendered once; 9/9 dock tests pass.
 - 12 failures in four jsdom consumer test files (zero rects read as "above the islands"). Awaiting ruling: A (product zero-rect guard) or B (rect stubs in four test files). Report: .lovable/reports/courses-dock-anchor-stop.md. Commit 8dbdb60d48.
