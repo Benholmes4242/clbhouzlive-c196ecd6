@@ -1,8 +1,12 @@
 # Roadmap
 
-## In progress: Two authorised rulings and full-suite closeout
+## Stopped: Latest reviews magazine — brief/mock ruling
+- New request: replace the Courses Latest reviews card with separate media-magazine and written rails, review-owned media, active Top 100 stamps, matching shells and sequential suite verification.
+- Width conflict: brief §3 specifies min(300px, 100vw - 64px) for both rails; signed-off mock .wr specifies min(290px, width - 64px). Awaiting Ben's ruling before implementation. Report: .lovable/reports/latest-reviews-magazine.md.
+
+## Complete: Two authorised rulings and full-suite closeout
 - Apply only the two remaining paging observer waits and the featured-connected async thunk; preserve every expected value and proVerification2B tests.
-- Run focused regressions, then four shards sequentially with retained logs; stop on any other unexpected failure and report totals against expected 9,156.
+- Focused 56/56 passed. Four sequential shards: 2,290 / 2,253 / 2,269 / 2,344 = 9,156 passed, 806 files, zero failures; expected inventory unchanged. Prior feed/business test stops resolved; authenticated checks remain unavailable. Report: .lovable/reports/two-rulings-suite-closeout.md.
 
 ## Stopped: Business posts always Everyone — verification
 - Force public audience across create/edit/draft/schedule/shot writes and remove business audience doors; preserve personal choices.
