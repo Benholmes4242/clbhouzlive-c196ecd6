@@ -1106,3 +1106,40 @@ index bf408d4ad2..d7614c9b1d 100644
 ```
 
 Logs: `/tmp/tee-group-fix/focused.log`, `shard1.log`, `shard2.log`.
+
+## Authorised stop ruling — full-suite closeout
+
+Replaced only the authorised case in `src/test/tourPlayerHeroBand.test.tsx` and removed `onPick:vi.fn()` from its `props()` helper. No application changes; every other test unchanged.
+
+Deleted case: **`next-start pick action opens only on an explicit tap`**. Original assertions/guard:
+```ts
+expect(p.onPick).not.toHaveBeenCalled();
+const button=container.querySelector('[data-next-start] button');
+if(!button)throw Error('Missing pick');
+fireEvent.click(button);
+expect(p.onPick).toHaveBeenCalledTimes(1);
+expect(container.querySelector('[data-next-start]')).not.toBeNull();
+```
+Reason: this encoded the player-page pick button retired by Your pick removal; the explicit stop ruling authorised its replacement.
+
+Added replacement: **`next-start block shows the event with no pick action`**, exactly as supplied:
+```ts
+const next=container.querySelector('[data-next-start]');
+expect(next).not.toBeNull();
+expect(next?.querySelector('button, .pv-pick')).toBeNull();
+```
+File count **4 before / 4 after**; full inventory **9,071 before / 9,071 after** (one deleted, one added; net zero). No other case deleted, renamed or rewritten by this ruling.
+
+Focused command: `npx vitest run src/test/tourPlayerHeroBand.test.tsx src/test/playerRebuildPage.test.tsx --maxWorkers=2`: **17/17 passed**, two files (4 + 13).
+
+Remaining shards ran sequentially, restarting shard two from the beginning:
+| Command | Passing tests | Passing files |
+| --- | ---: | ---: |
+| `npx vitest run --maxWorkers=2 --shard=1/4` — retained preceding successful run, as instructed | 2,225 | 202 |
+| `npx vitest run --maxWorkers=2 --shard=2/4` — new complete rerun | 2,245 | 202 |
+| `npx vitest run --maxWorkers=2 --shard=3/4` | 2,273 | 202 |
+| `npx vitest run --maxWorkers=2 --shard=4/4` | 2,328 | 202 |
+
+**Final full-suite total: 9,071/9,071 passed across 808 files; zero failures.** The earlier failed shard-two attempt is superseded, not counted twice. Against expected 9,071: **zero delta**. Against the 9,164 baseline: **9,164 − 100 + 4 + 2 + 1 − 1 + 1 = 9,071**. All historical names/assertions are retained above; the final −1/+1 is the explicitly named replacement here.
+
+Latest harness: **2026-11-18T12:06:22Z — build OK**. No manual build/typecheck or authenticated browser check run for this test-only ruling. Physical iPhone excerpt validation remains unverified. Logs: `/tmp/tee-group-ruling/focused.log`, `shard2.log`, `shard3.log`, `shard4.log`.

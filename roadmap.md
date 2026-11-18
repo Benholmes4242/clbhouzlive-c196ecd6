@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Authorised player next-start test replacement and remaining shards
+- Replaced only tourPlayerHeroBand's retired pick-button case with the supplied no-pick-action case; removed its onPick fixture. File count 4 → 4; focused player checks 17/17.
+- Retained successful shard one (2,225), restarted two then ran three/four sequentially: 2,245 / 2,273 / 2,328. Full suite 9,071/9,071 across 808 files; zero inventory delta (one deleted, one added). Historical stops below are superseded by this passing closeout.
+- Exact replaced case/assertions and full reconciliation in .lovable/reports/tee-time-group-duplicate.md; physical iPhone excerpt validation remains unverified.
+
 ## Stopped: Tee-time group duplicate fix — unrelated retired pick-action test
 - Requested one-expression fix and single regression complete; four focused Tour files pass 81/81, including unchanged duplicate-tag assertion.
 - Sequential shards: 1 passes 2,225; 2 has 2,244 passed / one failed of 2,245 at untouched tourPlayerHeroBand.test.tsx:18:310, "Error: Missing pick". Shards 3–4 not run per stop rule.
