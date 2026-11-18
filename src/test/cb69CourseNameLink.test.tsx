@@ -78,7 +78,7 @@ describe('CB69 review course names open the course page', () => {
       if (s.name === 'ReviewRailSlot') {
         // V6 §5: the rail card's course name is plain text; the whole card opens the review.
         expect(c.querySelectorAll('button[data-course-name-link]')).toHaveLength(0);
-        fireEvent.click(c.querySelector('[data-review-rail-course]')!);
+        fireEvent.click(c.querySelector('[data-review-course]')!);
         expect(tile).toHaveBeenCalledTimes(1);
         expect(path).not.toBe('/courses/course-1');
         return;

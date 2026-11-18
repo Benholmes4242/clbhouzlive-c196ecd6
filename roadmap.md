@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stopped: Approved review selector and sequential suite rerun
+- Change only cb69CourseNameLink.test.tsx:81 to [data-review-course]; preserve all assertions and test inventory (expected 9,160).
+- Shards 1/2 passed 2,293 and 2,253; corrected file passed 19/19. Shard 3: 2,267 passed / 2 failed, at courseRatingConsistency.test.ts:119:20 and fixOverflowSource.test.ts:66:24. Shard 4 stopped; 6,815 executed / 6,813 passed. Further repairs need a ruling; exact failures in persisted-sets report.
+
 ## Stopped: Persisted sets fix — unrelated existing tap test
 - Convert Featured signals and browse review stamps to JSON-safe arrays with memoized Set consumers and legacy-object guards.
 - Audit all allowlisted query payloads; add restoration regressions; run focused tests and four sequential shards, stopping on any unexpected failure.

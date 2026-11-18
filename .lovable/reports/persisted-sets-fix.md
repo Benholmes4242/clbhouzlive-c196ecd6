@@ -156,3 +156,24 @@ No assertion or component was changed to mask this prior unrelated failure.
 
 ## Final stop
 Current run reproduces the exact prior cb69 failure quoted above: `Error: Unable to fire a "click" event - please provide a DOM element.` at `src/test/cb69CourseNameLink.test.tsx:81:19`. Stopped all further verification immediately, no isolated rerun or assertion repair. Focused restoration regression and Top 100 scoring passed 3/3 before shards. Current run logs: `/tmp/persisted-sets-suite/shard1.log`, `shard2.log`, `status.txt`. Preview harness build OK at 09:01:56 UTC; typecheck not run because the harness owns build/type verification and the suite stop precludes additional checks.
+
+## Approved selector-only rerun — 2026-11-18
+- Changed only `src/test/cb69CourseNameLink.test.tsx:81`: `[data-review-rail-course]` → `[data-review-course]`.
+- Existing case: “ReviewRailSlot: the name is a button that opens /courses/:id without the tile's tap”. No test renamed/deleted, no assertion changed. Preserved `expect(c.querySelectorAll('button[data-course-name-link]')).toHaveLength(0)`, `expect(tile).toHaveBeenCalledTimes(1)`, and `expect(path).not.toBe('/courses/course-1')` exactly. Reason: explicitly approved selector repair following the magazine card's attribute rename.
+- Test-file count before/after: **19 → 19**; file passed **19/19** in shard 2. Expected full-suite inventory before/after this request: **9,160 → 9,160** (zero delta). Last full pass remains 9,156; intervening +3 Latest reviews and +1 persistence regression were reconciled above.
+- Commands, sequentially: `npx vitest run --maxWorkers=2 --shard=1/4`, then `--shard=2/4`, then `--shard=3/4`. Shard 4 was not started.
+- Results: shard 1 **2,293/2,293**, shard 2 **2,253/2,253**, shard 3 **2,267 passed / 2 failed / 2,269 executed**. Total executed **6,815**, passed **6,813**, failed **2**; full-suite executed total remains unavailable because shard 4 was stopped.
+- STOP: no source repair, other test edit, or further verification after these unexpected failures:
+```
+FAIL src/test/courseRatingConsistency.test.ts > C1 course rating consistency > routes every C3 display caller through the canonical helper
+AssertionError: expected '/**\n * LATEST REVIEWS rails (LATEST_…' to contain 'courseSubScoreTone'
+❯ src/test/courseRatingConsistency.test.ts:119:20
+expect(file).toContain('courseSubScoreTone');
+
+FAIL src/test/fixOverflowSource.test.ts > FIX_OVERFLOW_1 scoped source contracts > all non-test inline grids declare columns except the three wizard-owned files
+AssertionError: expected [ Array(1) ] to deeply equal []
+Received: ["src/components/courses/ReviewRailSlot.tsx: { position: 'relative', height: MOSAIC_H, display: 'grid', gap: 2, ...grid }"]
+❯ src/test/fixOverflowSource.test.ts:66:24
+expect(violations).toEqual([]);
+```
+- Preview harness: build OK at 2026-11-18T09:22:00Z. No manual build/typecheck. Logs retained in `/tmp/review-selector-suite/` (shard1.log, shard2.log, shard3.log, status.txt); runner recorded STOPPED at shard 3.
