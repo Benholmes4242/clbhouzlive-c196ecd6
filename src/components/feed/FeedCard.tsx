@@ -59,7 +59,6 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseBand } from './PostCourseBand';
-import { CourseStatsSheet } from './CourseStatsSheet';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
@@ -418,8 +417,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // Double-tap-to-like: burst overlay + like-only (never unlike) commit.
   const [burstKey, setBurstKey] = useState(0);
   const [burstVisible, setBurstVisible] = useState(false);
-  // Course stats sheet. Mounting it is what enables the detail RPC.
-  const [statsOpen, setStatsOpen] = useState(false);
   // The course name's own destination. The legacy `onCourse` prop is left
   // exactly as shipped for its existing callers.
   const navigate = useNavigate();
@@ -1151,20 +1148,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                * place the region appears at all.
                */
               courseLocation={courseLocation || null}
-              ctx={courseContext ?? null}
-              onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
+              /**
+               * THE BAND STATES WHERE THE POST WAS AND LINKS TO THE COURSE —
+               * nothing else. No ctx and no onOpenStats are passed, so line two
+               * shows only the location and the band is not a tap target; the
+               * course name above stays the door to /courses/:courseId.
+               * PostCourseBand itself is unchanged: review cards and the light
+               * profile feed keep their figure and stats sheet.
+               */
               surface="solid"
             />
-            {post.courseId && statsOpen && (
-              <CourseStatsSheet
-                open={statsOpen}
-                onClose={() => setStatsOpen(false)}
-                courseId={post.courseId}
-                courseName={post.courseName}
-                courseLocation={courseLocation || null}
-                courseRating={courseContext?.community_rating ?? post.courseRating ?? null}
-              />
-            )}
           </>
         );
       })();
