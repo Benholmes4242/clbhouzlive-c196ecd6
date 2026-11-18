@@ -66,6 +66,7 @@ import { SubmitBar } from './components/SubmitBar';
 import { ReviewReceipt, ordinal } from './components/ReviewReceipt';
 import { useMyRatedScores, calibrationRank } from './hooks/useMyRatedScores';
 
+import { EditLossSheet, editLoss, type EditLoss } from './components/EditLossSheet';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
@@ -646,7 +647,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
    * uploads every file then publishes in one transaction — or marks the
    * staged row failed. The review never exists half-finished.
    */
-  const handleSubmit = useCallback(async () => {
+  const commitSubmit = useCallback(async () => {
     if (!composer.canSubmit || submit.submitting) return;
     const overallTouched = composer.state.overall != null;
     try {
@@ -659,6 +660,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           courseId: course.id,
           state: composer.state,
         });
+        // §1: the save succeeded — only now do removed published media go.
+        media.commitRemovals({ courseId: course.id, mode });
         submittedRef.current = true;
         notifyComposerCompleted();
         composer.clearDraft();
@@ -695,7 +698,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         // NOT AWAITED, and NO cache sweep here: nothing the app reads has
         // changed yet; a refetch now would show the old review as current.
         media.writeUploadedHolePhotos(holeJob);
-        media.startBackgroundPublish(pendingId, { queryClient: qc, holeJob });
+        media.startBackgroundPublish(pendingId, { queryClient: qc, holeJob, commit: { courseId: course.id, mode } });
 
         onSuccess({
           ratingId: null,
@@ -736,12 +739,33 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         facilities: composer.state.scores.facilities ?? undefined,
       });
     } catch (e) {
+      // §1: a failed save keeps every published photo on the review.
+      media.discardRemovals();
       // R1 §1.3a — the silent `.catch(() => {})` that used to swallow the whole
       // flush is gone. Every failure in this function now ends in a sentence.
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode, holeTags]);
+
+  /* REVIEW_EDITOR_SAFETY §2: an edit that loses published words or media asks first. */
+  const [loss, setLoss] = useState<EditLoss | null>(null);
+  const handleSubmit = useCallback(async () => {
+    if (!composer.canSubmit || submit.submitting) return;
+    const found = isEditMode ? editLoss((existing?.review ?? ''), composer.state.reviewText, media.pendingRemovals()) : null;
+    if (found) { setLoss(found); return; }
+    await commitSubmit();
+  }, [composer.canSubmit, composer.state.reviewText, submit.submitting, isEditMode, existing, media, commitSubmit]);
+  const keepLoss = useCallback(() => {
+    if (loss) analyticsEvents.track('review_edit_loss_kept', { course_id: course.id, text_removed: loss.textRemoved, media_removed: loss.photos + loss.videos });
+    setLoss(null);
+  }, [loss, course.id]);
+  const confirmLoss = useCallback(async () => {
+    if (!loss) return;
+    analyticsEvents.track('review_edit_loss_confirmed', { course_id: course.id, text_removed: loss.textRemoved, media_removed: loss.photos + loss.videos });
+    setLoss(null);
+    await commitSubmit();
+  }, [loss, course.id, commitSubmit]);
 
   const overallCardRef = useRef<HTMLDivElement>(null);
   const scoreRowsRef = useRef<HTMLDivElement>(null);
@@ -1323,8 +1347,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         onDiscard={exitGuard.discard}
       />
 
+      <EditLossSheet loss={loss} onKeep={keepLoss} onConfirm={() => void confirmLoss()} />
+
       <RemoveReviewSheetV2
         open={removeOpen}
+        hasText={(existing?.review ?? '').trim().length > 0}
+        photos={existingMedia.filter(m => m.media_type !== 'video').length}
+        videos={existingMedia.filter(m => m.media_type === 'video').length}
         submitting={submit.submitting}
         onCancel={() => setRemoveOpen(false)}
         onConfirm={handleRemove}

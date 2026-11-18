@@ -14,9 +14,19 @@ interface Props {
   submitting?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
+  /** REVIEW_EDITOR_SAFETY §3 — what the removal takes with it. */
+  hasText?: boolean;
+  photos?: number;
+  videos?: number;
 }
 
-export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: Props) {
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+export function removeReviewCopy({ hasText = false, photos = 0, videos = 0 }: { hasText?: boolean; photos?: number; videos?: number }): string {
+  const parts = ['your review', hasText ? 'its written review' : null, photos ? `its ${plural(photos, 'photo')}` : null, videos ? `its ${plural(videos, 'video')}` : null, 'its post'].filter(Boolean) as string[];
+  return `This deletes ${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}. This can't be undone.`;
+}
+
+export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm, hasText, photos, videos }: Props) {
   useEffect(() => {
     if (!open) return;
     lockBodyScroll();
@@ -74,7 +84,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
           <div style={{ flex: 1 }}>
             <div style={{ ...TITLE, color: RV2.ink }}>Remove review?</div>
             <div style={{ fontSize: 13, color: RV2.secondary, marginTop: 2 }}>
-              Your score, verdict, and any media go with it.
+              {removeReviewCopy({ hasText, photos, videos })}
             </div>
           </div>
           <button

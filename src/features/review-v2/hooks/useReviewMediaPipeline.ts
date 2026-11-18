@@ -27,6 +27,7 @@ import { startReviewUpload, uploadAndPublishReview, enqueueReviewUpload, subscri
 import { probeVideo } from '../lib/probeVideo';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { writeComposerHolePhoto, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 
 /*
@@ -102,6 +103,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     })),
   );
   const uploadKeyRef = useRef<string>(`rv2-${nid()}`);
+  const pendingRemovalsRef = useRef<MediaItem[]>([]);
   const submitted = useRef(false);
   const [pickerError, setPickerError] = useState<string | null>(null);
 
@@ -195,20 +197,11 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     patchItems(prev => prev.filter(i => i.id !== id));
     if (!target.isExisting) { removeReviewPreupload(uploadKeyRef.current, id); return; }
 
-    // Existing media -> delete DB row + cleanup asset.
-    if (target.isExisting && target.dbRowId) {
-      supabase.functions
-        .invoke('cleanup-review-media', {
-          body: {
-            mediaItems: [{
-              id: target.dbRowId,
-              media_url: target.uploadedUrl ?? '',
-              media_type: target.type,
-              stream_id: target.streamId ?? null,
-            }],
-          },
-        })
-        .catch((err) => { console.warn('[review-v2] cleanup-review-media failed', err); });
+    // REVIEW_EDITOR_SAFETY §1: removing published media is provisional. It
+    // leaves the composer list only; the server copy is cleaned up once, after
+    // a successful save (commitRemovals). Abandon / failed save keep it.
+    if (target.isExisting) {
+      if (target.dbRowId) pendingRemovalsRef.current = [...pendingRemovalsRef.current, target];
       return;
     }
 
@@ -724,11 +717,14 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
 
   /** Fire-and-forget: the controller uploads then publishes, surviving unmount. */
   const startBackgroundPublish = useCallback(
-    (pendingId: string, opts?: { queryClient?: QueryClient; holeJob?: ComposerHoleJob }) => {
+    (pendingId: string, opts?: { queryClient?: QueryClient; holeJob?: ComposerHoleJob; commit?: { courseId: string; mode: string } }) => {
       const pending = itemsRef.current.filter(
         (i) => !i.isExisting && !!i.file,
       );
       if (!userId || pending.length === 0) return;
+      // Removals captured now; committed only when the staged publish succeeds.
+      const removals = pendingRemovalsRef.current; pendingRemovalsRef.current = [];
+      const commitOpts = opts?.commit;
 
       submitted.current = true; retainReviewPreuploads(uploadKeyRef.current);
 
@@ -748,7 +744,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           durationSeconds: i.durationSeconds ?? null,
           uploadedUrl: i.uploadedUrl, streamId: i.streamId, posterUrl: i.posterUrl, trackBytes: true,
         })),
-        () => { if (qc) invalidateCourseRatingCaches(qc); },
+        () => { if (commitOpts) cleanupRemovedMedia(removals, commitOpts); if (qc) invalidateCourseRatingCaches(qc); },
         opts?.holeJob,
       );
     },
@@ -768,8 +764,24 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     }
   }, [userId]);
 
+  /** Published media the member removed this session (not yet deleted). */
+  const pendingRemovals = useCallback(() => pendingRemovalsRef.current, []);
+  /** After a successful save: one cleanup call for exactly the removed rows. */
+  const commitRemovals = useCallback((opts: { courseId: string; mode: string }) => {
+    const removals = pendingRemovalsRef.current; pendingRemovalsRef.current = [];
+    cleanupRemovedMedia(removals, opts);
+  }, []);
+  /** Failed save: forget the removals and put the media back in the editor. */
+  const discardRemovals = useCallback(() => {
+    const removals = pendingRemovalsRef.current; pendingRemovalsRef.current = [];
+    if (removals.length) patchItems(prev => [...removals.filter(r => !prev.some(i => i.id === r.id)), ...prev]);
+  }, [patchItems]);
+
   return {
     items,
+    pendingRemovals,
+    commitRemovals,
+    discardRemovals,
     abandon: () => abandonReviewPreuploads(uploadKeyRef.current),
     addFiles,
     removeItem,
@@ -786,4 +798,22 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     writeUploadedHolePhotos,
     uploadKey: uploadKeyRef.current,
   };
+}
+
+/** REVIEW_EDITOR_SAFETY §1/§5 — the only place removed published media is deleted. */
+export function cleanupRemovedMedia(removals: readonly MediaItem[], opts: { courseId: string; mode: string }) {
+  if (removals.length === 0) return;
+  supabase.functions
+    .invoke('cleanup-review-media', {
+      body: {
+        mediaItems: removals.map((r) => ({
+          id: r.dbRowId as string,
+          media_url: r.uploadedUrl ?? '',
+          media_type: r.type,
+          stream_id: r.streamId ?? null,
+        })),
+      },
+    })
+    .catch((err) => { console.warn('[review-v2] cleanup-review-media failed', err); });
+  analyticsEvents.track('review_media_removed', { course_id: opts.courseId, mode: opts.mode, count: removals.length });
 }
