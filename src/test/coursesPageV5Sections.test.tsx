@@ -100,7 +100,7 @@ describe('LATEST_REVIEWS_MAGAZINE rails', () => {
   it('a review appears once across the two rails, each under its label', () => {
     const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a'), mediaReview('r2')]} onReviewPress={() => {}} />);
     const labels = [...container.querySelectorAll('[data-review-rail-label]')].map((l) => l.textContent);
-    expect(labels).toEqual(['SEEN ON THE COURSE', 'WRITTEN REVIEWS']);
+    expect(labels).toEqual(['WRITTEN REVIEWS']);
     expect(container.querySelectorAll('[data-review-media-card]')).toHaveLength(1);
     expect(container.querySelectorAll('[data-review-written-card]')).toHaveLength(1);
   });

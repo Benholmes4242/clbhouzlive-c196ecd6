@@ -16,6 +16,7 @@ import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/Hybri
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 import { CourseMasthead, CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseRecordHolders } from './useCourseRecordHolders';
 import './courseListCard.css';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
@@ -161,6 +162,7 @@ function CoursesPageHeroInner() {
   const holders = useCourseRecordHolders(recordIds, { includePlayers: false });
   const holder = hero?.course_id ? holders.map.get(hero.course_id) : undefined;
   const recordRow = fact?.fact_kind === 'course_record' && holder && fact.record_gross != null && holder.recordGross === Number(fact.record_gross) ? holder : null;
+  const recordLoading = fact?.fact_kind === 'course_record' && !holders.settled;
 
   // Analytics: how often a blurb actually exists decides whether
   // course_mood_blurbs is worth investing in.
@@ -270,7 +272,7 @@ function CoursesPageHeroInner() {
               </span>
             ) : null}
           >
-            {(blurb || factLine || recordRow) ? (
+            {(blurb || factLine || recordRow || recordLoading) ? (
               <>
                 {blurb && (
                   <div
@@ -289,7 +291,19 @@ function CoursesPageHeroInner() {
                     {blurb}
                   </div>
                 )}
-                {recordRow ? (
+                {recordLoading ? (
+                  <div aria-hidden data-hero-record-loading="" className="course-list-record" style={{ marginTop: blurb ? 0 : 5, width: '100%' }}>
+                    <Skeleton style={{ width: 26, height: 26, borderRadius: '34%', flex: 'none' }} />
+                    <div className="course-list-holder">
+                      <Skeleton style={{ height: 9.35, width: 72, maxWidth: '100%' }} />
+                      <Skeleton style={{ height: 15.6, marginTop: 2, width: 120, maxWidth: '100%' }} />
+                    </div>
+                    <div className="course-list-record-score">
+                      <Skeleton style={{ width: 25, height: 17, marginLeft: 'auto' }} />
+                      <Skeleton style={{ width: 32, height: 9.6, marginTop: 2 }} />
+                    </div>
+                  </div>
+                ) : recordRow ? (
                   <div className="course-list-record" data-hero-record="" style={{ marginTop: blurb ? 0 : 5, width: '100%' }}>
                     <SquircleAvatar src={recordRow.photoUrl} userId={recordRow.holderId} size={26} alt={recordRow.holderName} surface="canvas" hairlineRing />
                     <div className="course-list-holder"><div className="course-list-record-label">COURSE RECORD</div><div className="course-list-holder-name" style={{ color: A.INK }}>{recordRow.holderName}</div></div>

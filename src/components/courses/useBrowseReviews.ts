@@ -51,7 +51,7 @@ const SELECT = `
   facilities_score,
   user_profiles:user_id ( id, username, display_name, profile_photo_url ),
   course:golf_courses!course_id!inner ( id, name, country, region, sub_country, thumbnail_image ),
-  course_review_media ( id, media_type, media_url, poster_url, stream_id, is_cover, duration_seconds, created_at )
+  course_review_media ( id, media_type, media_url, poster_url, stream_id, is_cover, duration_seconds, created_at, width, height )
 `;
 
 interface MediaRow {
@@ -63,6 +63,8 @@ interface MediaRow {
   is_cover: boolean | null;
   duration_seconds: number | null;
   created_at: string | null;
+  width: number | null;
+  height: number | null;
 }
 
 interface Row {
@@ -105,6 +107,8 @@ function orderMedia(rows: MediaRow[] | null): ReviewMediaItem[] {
     posterUrl: m.poster_url ?? null,
     streamId: m.stream_id ?? null,
     durationSeconds: m.duration_seconds ?? null,
+    width: m.width ?? null,
+    height: m.height ?? null,
   }));
 }
 

@@ -202,7 +202,6 @@ export function LatestReviewsShell() {
   return (
     <HeadShell>
       <div style={BLEED}>
-        <div style={{ ...RAIL_LABEL_STYLE, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 7, width: 108 }} /></div>
         <div style={{ display: 'flex', gap: RAIL_GAP, overflow: 'hidden', padding: `0 ${RAIL_X}px` }}>
           <div
             data-review-shell-card=""

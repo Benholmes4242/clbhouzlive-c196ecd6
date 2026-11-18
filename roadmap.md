@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stopped: Latest reviews taps and gaps
+- Record-shaped hero loading, remove media rail label, isolated media viewer taps with full review media and dimensions, and section-owned equal end gap.
+- Focused 80/81 passed; new hero mock rerender fails at latestReviewHeroLoading.test.tsx:24:67 (placeholder stays). No further test edits; shards and 390/320 checks stopped pending ruling. Expected 9,164 (+4). Report: .lovable/reports/latest-reviews-taps-and-gaps.md.
+
 ## Complete: Review card contract repairs and sequential suite
 - Apply only the approved courseSubScoreTone calls and explicit mosaic columns/rows in ReviewRailSlot; no test edits.
 - Focused 74/74; sequential shards 2,293 / 2,253 / 2,269 / 2,345 = 9,160/9,160 across 807 files, zero count delta; no tests edited. Both prior stops resolved. Report: .lovable/reports/persisted-sets-fix.md.

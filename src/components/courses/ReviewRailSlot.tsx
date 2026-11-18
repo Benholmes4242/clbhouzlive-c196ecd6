@@ -24,6 +24,10 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
 import { imageSrc } from '@/utils/imageSrc';
 import { shortAge } from '@/features/explore-magazine/watch/watchMiddle';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { latestReviewFeedPost } from './browse/latestReviewFeedPost';
+import { Button } from '@/components/ui/button';
 
 /* Rail + card geometry, read by the cards AND their shell. */
 export const RAIL_GAP = 10;
@@ -151,9 +155,12 @@ function VideoBadge({ seconds }: { seconds: number | null }) {
 
 /** One mosaic tile. The big tile autoplays a video muted in the shared
  *  "courses-member-shots" group; small video tiles show the poster only. */
-function MediaTile({ item, big, more, style }: { item: ReviewMediaItem; big: boolean; more: number; style?: React.CSSProperties }) {
+function MediaTile({ item, big, more, style, onOpen }: { item: ReviewMediaItem; big: boolean; more: number; style?: React.CSSProperties; onOpen: (item: ReviewMediaItem, el: HTMLElement) => void }) {
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', minWidth: 0, minHeight: 0, background: '#1B1B20', ...style }}>
+    <Button variant="ghost" className="active:scale-100" aria-label="Open review media" data-review-media-id={item.id}
+      onClick={e => { e.stopPropagation(); onOpen(item, e.currentTarget); }}
+      onKeyDown={e => e.stopPropagation()}
+      style={{ position: 'relative', overflow: 'hidden', minWidth: 0, minHeight: 0, padding: 0, width: '100%', height: '100%', borderRadius: 0, background: REVIEW_BG, ...style }}>
       {item.type === 'video' ? (
         big ? (
           <span style={{ position: 'absolute', inset: 0 }}>
@@ -175,7 +182,7 @@ function MediaTile({ item, big, more, style }: { item: ReviewMediaItem; big: boo
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, color: INK,
         }}>+{more}</span>
       ) : null}
-    </div>
+    </Button>
   );
 }
 
@@ -195,7 +202,7 @@ function cardProps(r: LatestReview, onReviewPress: (r: LatestReview) => void) {
 }
 
 /** SEEN ON THE COURSE — the magazine card for a review with media. */
-function MediaReviewCard({ r, name, onReviewPress }: { r: LatestReview; name: string; onReviewPress: (r: LatestReview) => void }) {
+function MediaReviewCard({ r, name, onReviewPress, onMediaOpen }: { r: LatestReview; name: string; onReviewPress: (r: LatestReview) => void; onMediaOpen: (item: ReviewMediaItem, el: HTMLElement) => void }) {
   const media = (r.media ?? []).slice(0, 3);
   const more = (r.media ?? []).length - media.length;
   const count = media.length;
@@ -223,7 +230,7 @@ function MediaReviewCard({ r, name, onReviewPress }: { r: LatestReview; name: st
       ) : null}
       <div data-review-mosaic="" style={{ position: 'relative', height: MOSAIC_H, display: 'grid', gridTemplateColumns: gridColumns, gridTemplateRows: gridRows, gap: 2 }}>
         {media.map((m, i) => (
-          <MediaTile key={m.id} item={m} big={i === 0} more={i === media.length - 1 ? more : 0}
+          <MediaTile key={m.id} item={m} big={i === 0} more={i === media.length - 1 ? more : 0} onOpen={onMediaOpen}
             style={i === 0 && count >= 3 ? { gridRow: '1 / 3' } : undefined} />
         ))}
       </div>
@@ -279,10 +286,10 @@ function WrittenReviewCard({ r, name, onReviewPress }: { r: LatestReview; name: 
   );
 }
 
-function ReviewRail({ label, labelStyle, children }: { label: string; labelStyle?: React.CSSProperties; children: React.ReactNode }) {
+function ReviewRail({ label, labelStyle, children }: { label?: string; labelStyle?: React.CSSProperties; children: React.ReactNode }) {
   return (
     <div>
-      <div data-review-rail-label="" style={{ ...RAIL_LABEL_STYLE, ...labelStyle }}>{label}</div>
+      {label ? <div data-review-rail-label="" style={{ ...RAIL_LABEL_STYLE, ...labelStyle }}>{label}</div> : null}
       <div className="scrollbar-hide" style={{ display: 'flex', gap: RAIL_GAP, overflowX: 'auto', padding: `0 ${RAIL_X}px`, scrollbarWidth: 'none', alignItems: 'stretch' }}>
         {children}
       </div>
@@ -303,16 +310,24 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
   if (mediaRail.length === 0 && writtenRail.length === 0) return null;
 
   const nameOf = (r: LatestReview) => r.reviewerName || t('discover.reviews.member', 'A member');
+  const openMedia = (r: LatestReview, item: ReviewMediaItem, el: HTMLElement) => {
+    analyticsEvents.track('review_photo_opened', { course_id: r.courseId, review_id: r.reviewId, source: 'courses-latest-reviews' });
+    openWithOrigin({
+      posts: mediaRail.map(latestReviewFeedPost), index: mediaRail.indexOf(r), mediaId: item.id,
+      originEl: el, posterUrl: item.posterUrl ?? (item.type === 'image' ? item.url : null),
+      openedFrom: 'courses-latest-reviews', options: { readOnly: true, hasNextPage: false },
+    });
+  };
 
   return (
     <section>
       {mediaRail.length > 0 ? (
-        <ReviewRail label="SEEN ON THE COURSE">
-          {mediaRail.map((r) => <MediaReviewCard key={r.reviewId} r={r} name={nameOf(r)} onReviewPress={onReviewPress} />)}
+        <ReviewRail>
+          {mediaRail.map((r) => <MediaReviewCard key={r.reviewId} r={r} name={nameOf(r)} onReviewPress={onReviewPress} onMediaOpen={(item, el) => openMedia(r, item, el)} />)}
         </ReviewRail>
       ) : null}
       {writtenRail.length > 0 ? (
-        <ReviewRail label="WRITTEN REVIEWS" labelStyle={mediaRail.length > 0 ? { marginTop: 24 } : undefined}>
+        <ReviewRail label="WRITTEN REVIEWS" labelStyle={{ marginTop: mediaRail.length > 0 ? 24 : 0 }}>
           {writtenRail.map((r) => <WrittenReviewCard key={r.reviewId} r={r} name={nameOf(r)} onReviewPress={onReviewPress} />)}
         </ReviewRail>
       ) : null}

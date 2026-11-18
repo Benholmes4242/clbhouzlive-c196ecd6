@@ -36,6 +36,8 @@ export interface ReviewMediaItem {
   posterUrl: string | null;
   streamId: string | null;
   durationSeconds: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 
 export interface LatestReview {
