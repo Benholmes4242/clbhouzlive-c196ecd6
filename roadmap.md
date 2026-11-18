@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete: Review card contract repairs and sequential suite
+- Apply only the approved courseSubScoreTone calls and explicit mosaic columns/rows in ReviewRailSlot; no test edits.
+- Focused 74/74; sequential shards 2,293 / 2,253 / 2,269 / 2,345 = 9,160/9,160 across 807 files, zero count delta; no tests edited. Both prior stops resolved. Report: .lovable/reports/persisted-sets-fix.md.
+
 ## Stopped: Approved review selector and sequential suite rerun
 - Change only cb69CourseNameLink.test.tsx:81 to [data-review-course]; preserve all assertions and test inventory (expected 9,160).
 - Shards 1/2 passed 2,293 and 2,253; corrected file passed 19/19. Shard 3: 2,267 passed / 2 failed, at courseRatingConsistency.test.ts:119:20 and fixOverflowSource.test.ts:66:24. Shard 4 stopped; 6,815 executed / 6,813 passed. Further repairs need a ruling; exact failures in persisted-sets report.

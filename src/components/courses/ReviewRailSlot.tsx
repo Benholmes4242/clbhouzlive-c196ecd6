@@ -18,6 +18,7 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
 
 import { INK, INK_FAINT, INK_MUTE } from '@/features/courses/_shared/tokens';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview, ReviewMediaItem } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
@@ -98,7 +99,7 @@ function ScoreNumbers({ r, style }: { r: LatestReview; style?: React.CSSProperti
     <div data-review-scores="" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 4, ...style }}>
       {cells.map((c) => (
         <div key={c.label}>
-          <b style={{ ...FIGS, display: 'block', fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: INK }}>{c.value.toFixed(1)}</b>
+          <b style={{ ...FIGS, display: 'block', fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: courseSubScoreTone(c.value) }}>{c.value.toFixed(1)}</b>
           <i style={{ display: 'block', fontStyle: 'normal', fontSize: 7.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: INK_FAINT, marginTop: 5, ...ELL }}>{c.label}</i>
         </div>
       ))}
@@ -129,7 +130,7 @@ function ScoreDisc({ rating }: { rating: number }) {
       border: '1px solid rgba(255,255,255,0.16)', boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
     }}>
-      <b style={{ ...FIGS, fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: INK }}>{rating.toFixed(1)}</b>
+      <b style={{ ...FIGS, fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: courseSubScoreTone(rating) }}>{rating.toFixed(1)}</b>
       <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '.06em', color: INK_MUTE, marginTop: 2 }}>/10</span>
     </div>
   );
@@ -198,11 +199,8 @@ function MediaReviewCard({ r, name, onReviewPress }: { r: LatestReview; name: st
   const media = (r.media ?? []).slice(0, 3);
   const more = (r.media ?? []).length - media.length;
   const count = media.length;
-  const grid: React.CSSProperties = count === 1
-    ? { gridTemplateColumns: '1fr', gridTemplateRows: '1fr' }
-    : count === 2
-      ? { gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr' }
-      : { gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr 1fr' };
+  const gridColumns = count === 1 ? '1fr' : '2fr 1fr';
+  const gridRows = count >= 3 ? '1fr 1fr' : '1fr';
   const cover = media[0];
   const ambient = cover ? imageSrc(cover.type === 'video' ? cover.posterUrl ?? cover.url : cover.url, 480) : undefined;
   return (
@@ -223,7 +221,7 @@ function MediaReviewCard({ r, name, onReviewPress }: { r: LatestReview; name: st
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,12,0.55)' }} />
         </div>
       ) : null}
-      <div data-review-mosaic="" style={{ position: 'relative', height: MOSAIC_H, display: 'grid', gap: 2, ...grid }}>
+      <div data-review-mosaic="" style={{ position: 'relative', height: MOSAIC_H, display: 'grid', gridTemplateColumns: gridColumns, gridTemplateRows: gridRows, gap: 2 }}>
         {media.map((m, i) => (
           <MediaTile key={m.id} item={m} big={i === 0} more={i === media.length - 1 ? more : 0}
             style={i === 0 && count >= 3 ? { gridRow: '1 / 3' } : undefined} />
@@ -262,7 +260,7 @@ function WrittenReviewCard({ r, name, onReviewPress }: { r: LatestReview; name: 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
         <PlaceLine r={r} style={{ flex: 1 }} />
         <span data-review-score="" style={{ display: 'flex', alignItems: 'baseline', gap: 2, flex: 'none' }}>
-          <b style={{ ...FIGS, fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: INK }}>{r.rating.toFixed(1)}</b>
+          <b style={{ ...FIGS, fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: courseSubScoreTone(r.rating) }}>{r.rating.toFixed(1)}</b>
           <span style={{ fontSize: 11, fontWeight: 700, color: INK_FAINT }}>/10</span>
         </span>
       </div>

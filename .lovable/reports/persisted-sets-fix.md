@@ -177,3 +177,11 @@ Received: ["src/components/courses/ReviewRailSlot.tsx: { position: 'relative', h
 expect(violations).toEqual([]);
 ```
 - Preview harness: build OK at 2026-11-18T09:22:00Z. No manual build/typecheck. Logs retained in `/tmp/review-selector-suite/` (shard1.log, shard2.log, shard3.log, status.txt); runner recorded STOPPED at shard 3.
+
+## Approved component contract repairs — complete, 2026-11-18
+- `ReviewRailSlot.tsx`: imported courseSubScoreTone and used it for the category numbers, score disc, and written-card score. Replaced the mosaic grid object/spread with gridColumns/gridRows strings and explicit inline gridTemplateColumns/gridTemplateRows. No other component changes; no tests edited, deleted, renamed or rewritten.
+- Focused command: `npx vitest run src/test/courseRatingConsistency.test.ts src/test/fixOverflowSource.test.ts src/test/coursesPageV5Sections.test.tsx src/test/whatsBeenPlayedV6.test.tsx src/test/cb69CourseNameLink.test.tsx src/test/reviewMentionsPreview.test.tsx --maxWorkers=2`: **74/74**, six files.
+- Sequential full-suite commands: `npx vitest run --maxWorkers=2 --shard=1/4`, then `--shard=2/4`, then `--shard=3/4`, then `--shard=4/4`. All completed with exit 0, no failures or unhandled-error summary.
+- Shards: **2,293 / 2,253 / 2,269 / 2,345 = 9,160 passed / 9,160 executed**, **807 files**. Inventory before/after this request **9,160 → 9,160**, zero delta. Against last full pass 9,156: +3 Latest reviews cases and +1 persistedCourseSignals regression, as reconciled above. This run resolves both prior shard stops without changing their tests.
+- Harness build OK at 2026-11-18T09:47:10Z; no manual build/typecheck. Logs retained at `/tmp/review-contract-suite/` including focused.log, shard1–4.log and COMPLETE status.
+- No SQL, migrations, feed_config, round_pool_cap, query contracts or unrelated font/branding changes. Authenticated browser/device checks remain unavailable and are not claimed by this test-only verification closeout.
