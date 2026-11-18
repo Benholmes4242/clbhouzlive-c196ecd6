@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Tee-time group duplicate fix — unrelated retired pick-action test
+- Requested one-expression fix and single regression complete; four focused Tour files pass 81/81, including unchanged duplicate-tag assertion.
+- Sequential shards: 1 passes 2,225; 2 has 2,244 passed / one failed of 2,245 at untouched tourPlayerHeroBand.test.tsx:18:310, "Error: Missing pick". Shards 3–4 not run per stop rule.
+- Expected inventory 9,071 = 9,164 − 100 Your pick cases + 4 removal regressions + 2 excerpt regressions + 1 duplicate regression; full passing total unavailable. All historical names/assertions and exact stop in .lovable/reports/tee-time-group-duplicate.md. Needs ruling on the untouched retired pick-action test.
+
 ## Stopped: iPhone review excerpt text flow — existing Tour test blocker
 - Opt in clamped member names/badges to inline text flow; preserve default names, two-line review clamp and badge artwork.
 - Inline flow applied to review/comment/overlay names and two verified business-name wrappers. New structure regressions plus existing coverage pass 16/16; preview build OK.

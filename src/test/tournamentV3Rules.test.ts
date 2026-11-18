@@ -54,6 +54,16 @@ describe('Tournament-v3 selected-event rules',()=>{
  const groups=[{teeTime:'2026-10-29T08:00Z',startingHole:1,players:[{id:'our',name:'Our Pick'}]},{teeTime:'2026-10-29T09:00Z',startingHole:10,players:[{id:'mine',name:'My Pick'}]},{teeTime:'2026-10-29T10:00Z',startingHole:1,players:[{id:'follow',name:'Following Player'}]},{teeTime:'2026-10-29T11:00Z',startingHole:1,players:[{id:'def',name:'Brian Campbell'}]}];
  it('your groups include our picks and followed players in time order',()=>expect(selectTeeGroups([...groups].reverse(),'upcoming',new Set(['our']),new Set(['follow']),[],'def').your.map(g=>g.players[0].id)).toEqual(['our','follow']));
  it('marquee is defender group',()=>expect(selectTeeGroups(groups,'upcoming',new Set(),new Set(),[],'def').feature[0].players[0].id).toBe('def'));
+ it('defender sharing a followed group appears once in your and marquee uses the top-ranked non-your group or stays empty',()=>{
+  const shared={...groups[3],players:[...groups[3].players,{id:'follow',name:'Following Player'}]};
+  const top={...groups[0],players:[{id:'p2',name:'Player 2'}]};
+  const lower={...groups[1],players:[{id:'p8',name:'Player 8'}]};
+  const field=[player(8),{...player(1),player_id:'def'},player(2)];
+  const selected=selectTeeGroups([shared,lower,top],'upcoming',new Set<string>(),new Set(['follow']),field,'def');
+  expect(selected.your).toEqual([shared]);
+  expect(selected.feature).toEqual([top]);
+  expect(selectTeeGroups([shared],'upcoming',new Set<string>(),new Set(['follow']),field,'def').feature).toEqual([]);
+ });
  it('live last3 time order',()=>expect(selectTeeGroups([...groups].reverse(),'live',new Set(),new Set(),[],null).feature.map(g=>g.players[0].id)).toEqual(['mine','follow','def']));
  it('absent timezone omits guessed offset',()=>expect(teeCaption(null,'2026-10-29T08:00Z')).toBe('Your time.'));
  it('finished count is scored leaderboard rounds not hole players',()=>expect(completeCount(mexicoRows,'completed',4)).toBe(mexicoRows.length*4));
