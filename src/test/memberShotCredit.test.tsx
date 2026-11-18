@@ -85,7 +85,7 @@ describe('member-shot caption in the real fullscreen chrome', () => {
 
   it('real-post opens retain their footer, author row and relative time without the synthetic caption', () => {
     const view = mount(false);
-    expect(view.container.querySelector('[data-fullscreen-band]')).not.toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-shade]')).not.toBeNull();
     expect(screen.getByRole('button', { name: "View Royal Portrush's profile" })).toBeInTheDocument();
     expect(view.container.textContent).toMatch(/\d+[smhdw]/);
     expect(view.container.querySelector('[data-member-shot-credit]')).toBeNull();

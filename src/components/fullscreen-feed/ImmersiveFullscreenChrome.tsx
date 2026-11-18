@@ -1,64 +1,47 @@
 /**
  * ImmersiveFullscreenChrome — persistent top+bottom chrome for the fullscreen
- * viewer. Chrome-only; playback machinery (SnapFeed / VideoEngine / lanes) is
- * untouched.
+ * viewer (signed-off FULLSCREEN_VIEWER_REDESIGN mock). Chrome-only; playback
+ * machinery (SnapFeed / VideoEngine / lanes), resting rects and every
+ * fullscreenBand constant are untouched, so media geometry never moves.
  *
- * Layout:
- *   TOP (FeedSlide supplies a slide-local notch scrim only for top-0,
- *   non-gallery media; the back chevron and course block keep their shadows):
- *     - Back chevron top-LEFT (circular rgba(0,0,0,.32))
- *     - Course header LEFT-aligned after the chevron: row one name 15/700
- *       ellipsis + rating chip at right; location · World #n at 10.5/600;
- *       row two the VIEWER's own record at the course (status pill, rounds,
- *       best). No course on the post -> no header.
- *   Synthetic member-shot opens replace the author row with the active media
- *   caption and reserve no comment footer; normal-post geometry stays frozen.
- *   BOTTOM: a fixed solid comment band reserves the same floor on every slide;
- *   author and rail carry drop-shadows over the media above it. From the top down:
- *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
- *       caption with one inline CTA at the end of line three — "Read more"
- *       (expands in place) or, on reviews, "Full review" (opens the sheet;
- *       own line when the review has no text) · likers row). LikedByRow
- *       with avatarRing="media"; it reserves its full size at first paint.
- *     - RIGHT: vertical action rail (mute, heart, comment, send, more)
- *     - BOTTOM-MOST: the comment bar (viewer avatar + "Add a comment…"),
- *       an inset pill 44px tall inside the solid band. The band always renders,
- *       including signed-out/read-only views; author and rail sit 16px above
- *       its top edge on photos and videos. There are no bottom carousel dots.
- *     - VIDEO SCRUBBER: FullscreenVideoScrubber, a draggable 32px hit area at
- *       centred on the band's top edge, shown only on a video slide.
- *       It runs edge to edge without lifting the author column or rail.
- *       While dragging, the author column, rail and top row fade to 0 and the
- *       comment bar to 0.35.
- *   TOP STRIP: FullscreenTopProgress — a segmented strip carrying carousel
- *   position only (2+ items; not draggable; no seeking). The top chrome
- *   row is pushed down to clear it whenever it renders (showsTopProgress).
+ * Layout (real posts):
+ *   TOP: 40px glass back circle inside a 44px hit area, then the course
+ *     header — name 17/700 two-line clamp, location 12.5/500 (· World #n),
+ *     and the VIEWER's own record row (status pill, rounds, best). No rating
+ *     chip on a post: a post is one golfer's. Hole chip / RoundVideoChip and
+ *     the slide-local notch scrim are unchanged.
+ *   SHADE: one fixed, pointer-events-none bottom gradient (62vh) where the
+ *     solid band used to be. No hard edge.
+ *   BOTTOM STACK (16px gutters, full width, bottom-anchored), top down:
+ *     dots (2+ items, active slide) · author row (38px squircle, name, sub-row
+ *     index · club · time · Follow) · round pill · review scores in a glass
+ *     strip · caption (two lines; tap expands non-review captions in place;
+ *     reviews print "Full review ›" on its own line) · likers row · video row
+ *     (mute, FullscreenVideoScrubber with persistent time) · pill row.
+ *   PILL ROW: like, comment, share, more — glass pills in the old comment
+ *     bar's slot (COMMENT_BAR_BOTTOM, COMMENT_BAR_H). Hidden when readOnly.
+ *     While scrubbing, the stack and top bar fade to 0, the pills to 0.35.
  *
- * THE COMMENT BAR IS A BUTTON, NOT AN INPUT. It opens CommentsSheetV2 with its
- * composer focused and contains no input/textarea/contentEditable, because a
+ * Member-shot viewer (syntheticPosts): chevron + rating chip top bar,
+ * MemberShotCredit, edge-to-edge scrubber and a corner mute — unchanged.
+ *
+ * NO TEXT FIELDS. The comment pill opens CommentsSheetV2 (composer focused when
+ * signed in); the chrome contains no input/textarea/contentEditable, because a
  * focused field inside this fixed full-screen overlay raises the keyboard over
- * a fixed layer on iOS/WKWebView (the same class of bug
- * lockFullscreenViewportScroll exists for) and would be a second composer.
- * Do not "fix" it into a real field.
- *
- * NO fade-on-idle. NO score eyebrow. The header chip and, on reviews, the
- * figures row under the author line are the only score surfaces.
+ * a fixed layer on iOS/WKWebView and would be a second composer.
  */
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
-import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, MessageCircle, Share, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
 import { LikedByRow } from '@/components/likes/LikedByRow';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenMuteControl } from './useFullscreenMuteControl';
-import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
 import { FullscreenVideoScrubber } from './FullscreenVideoScrubber';
 import { COMMENT_BAR_H, BAND_H_CSS } from '@/lib/media/fullscreenBand';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -90,14 +73,25 @@ import { roundChapterLabel } from '@/features/video-details/roundVideoModel';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
-const CHEVRON_BG = 'rgba(0,0,0,0.32)';
-const CHIP_BG = 'rgba(0,0,0,0.40)';
 const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
-const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
 // 16 is a FLOOR, not a fixed offset: on home-indicator phones the pill sits above the indicator.
 const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
 // The scrubber's 32px hit area, centred on the band's top edge.
 const SCRUBBER_H = 32;
+// Glass shared by the back circle, score strip and pills (signed-off mock).
+const FS_GLASS: React.CSSProperties = {
+  background: 'rgba(22,22,26,0.42)',
+  backdropFilter: 'blur(18px) saturate(150%)',
+  WebkitBackdropFilter: 'blur(18px) saturate(150%)',
+  border: '1px solid rgba(255,255,255,0.12)',
+};
+const FS_SHADE_BG = 'linear-gradient(0deg, rgba(6,6,8,0.92) 0%, rgba(6,6,8,0.78) 30%, rgba(6,6,8,0.35) 62%, rgba(6,6,8,0) 100%)';
+const MUTE = 'rgba(248,250,252,0.68)';
+const BODY = 'rgba(248,250,252,0.9)';
+const GUTTER_L = 'max(16px, env(safe-area-inset-left, 0px))';
+const GUTTER_R = 'max(16px, env(safe-area-inset-right, 0px))';
+// The video row (28px) sits 10px above the pill row.
+const VIDEO_ROW_BOTTOM = `calc(${COMMENT_BAR_BOTTOM} + ${COMMENT_BAR_H}px + 10px)`;
 const META = 'rgba(255,255,255,0.62)';
 const META_STRONG = 'rgba(255,255,255,0.78)';
 const MICRO_LABEL = 'rgba(255,255,255,0.50)';
@@ -110,15 +104,12 @@ function formatCount(n: number | null | undefined): string | null {
 }
 
 /**
- * FullscreenCaption — the post caption beneath the author sub-row.
- *
- * Cut to 3 lines by a measured mirror; the inline CTA renders ONLY when the text really overflows
- * (measured scrollHeight vs clientHeight, same approach as the tour hero
- * insight line). Collapses again whenever the pager moves to another post.
+ * FullscreenCaption — two-line clamp. A non-review caption expands in place on
+ * tap (no printed "Read more"); a review never expands here and prints
+ * "Full review ›" on its own line instead. Collapses when the post changes.
  */
-const CAPTION_FONT_SIZE = 13.5;
-const CAPTION_LINE_HEIGHT = 1.35;
-const CAPTION_LINE_PX = `${CAPTION_FONT_SIZE}px * ${CAPTION_LINE_HEIGHT}`;
+const CAPTION_FONT_SIZE = 15;
+const CAPTION_LINE_HEIGHT = 1.45;
 
 const CaptionBlock: React.FC<{
   caption: string;
@@ -128,170 +119,55 @@ const CaptionBlock: React.FC<{
   onFullReview?: () => void;
 }> = ({ caption, resetKey, onMentionTap, variant, onFullReview }) => {
   const [expanded, setExpanded] = useState(false);
-  // null = caption fits (no CTA). A string = the word-snapped prefix that fits
-  // three lines WITH the CTA inline. This is the sole overflow answer.
-  const [visibleText, setVisibleText] = useState<string | null>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const mirrorRef = useRef<HTMLDivElement>(null);
-  const slotRef = useRef<HTMLSpanElement>(null);
   const isReview = variant === 'review';
   const isExpanded = !isReview && expanded;
-  const label = isReview ? 'Full review' : 'Read more';
   const isEmpty = !caption.trim();
-
-  useEffect(() => {
-    setExpanded(false);
-  }, [resetKey]);
-
-  // Measured cut (real geometry in a hidden mirror; never string-length estimates).
-  useLayoutEffect(() => {
-    const el = textRef.current;
-    if (!el || isEmpty) return;
-    const measure = () => {
-      const node = textRef.current;
-      const mirror = mirrorRef.current;
-      const slot = slotRef.current;
-      if (!node || !mirror || !slot) return;
-      if (isExpanded) return; // clamp is off — nothing meaningful to measure
-      mirror.style.width = `${node.clientWidth}px`;
-      const MAXH = CAPTION_FONT_SIZE * CAPTION_LINE_HEIGHT * 3 + 1;
-      slot.textContent = caption;
-      if (mirror.scrollHeight <= MAXH) {
-        setVisibleText(null);
-        return;
-      }
-      let lo = 0;
-      let hi = caption.length;
-      while (lo < hi) {
-        const mid = Math.ceil((lo + hi) / 2);
-        slot.textContent = caption.slice(0, mid);
-        if (mirror.scrollHeight <= MAXH) lo = mid;
-        else hi = mid - 1;
-      }
-      const n = lo;
-      // Word-boundary snap keeps @mention tokens whole — do not remove.
-      let cut = caption.lastIndexOf(' ', n);
-      if (cut <= 0) cut = n;
-      setVisibleText(caption.slice(0, cut).replace(/\s+$/, ''));
-    };
-    measure();
-    let ro: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(measure);
-      ro.observe(el);
-    } else {
-      window.addEventListener('resize', measure);
-    }
-    return () => {
-      if (ro) ro.disconnect();
-      else window.removeEventListener('resize', measure);
-    };
-  }, [caption, variant, isExpanded, isEmpty]);
-
+  useEffect(() => { setExpanded(false); }, [resetKey]);
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 
-  const ctaStyle: React.CSSProperties = {
-    fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT, fontWeight: 600,
-    color: '#fff', opacity: 0.72, whiteSpace: 'nowrap', textShadow: TEXT_SHADOW,
-    pointerEvents: 'auto', background: 'transparent', border: 'none', padding: 0,
-    margin: 0, fontFamily: 'inherit', cursor: 'pointer',
-  };
-  const onCta = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isReview) onFullReview?.();
-    else setExpanded(true);
-  };
-
-  // Review with no text: the CTA alone, on its own line, where the old
-  // "read review ›" button sat. Non-review empty captions never mount.
-  if (isEmpty) {
-    if (!isReview) return null;
-    return (
-      <button
-        type="button"
-        onClick={onCta}
-        style={{ ...ctaStyle, marginTop: 3, alignSelf: 'flex-start' }}
-      >
-        {label}
-      </button>
-    );
-  }
-
-  const showCta = !isExpanded && visibleText !== null;
-
   return (
-    <div
-      style={{ marginTop: 6, minWidth: 0, pointerEvents: 'auto', position: 'relative' }}
-      onClick={stop}
-      onPointerDown={stop}
-      onTouchStart={stop}
-      onTouchMove={stop}
-    >
-      <div
-        ref={mirrorRef}
-        aria-hidden
-        style={{
-          position: 'absolute', visibility: 'hidden', pointerEvents: 'none',
-          top: 0, left: -9999, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-          fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT,
-        }}
-      >
-        <span ref={slotRef} />
-        <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
-          <span style={{ fontWeight: 400, opacity: 0.8 }}>… </span>
-          {label}
-        </span>
-      </div>
-      <div
-        ref={textRef}
-        style={{
-          fontSize: CAPTION_FONT_SIZE,
-          lineHeight: CAPTION_LINE_HEIGHT,
-          color: '#fff',
-          opacity: 0.92,
-          textShadow: TEXT_SHADOW,
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-          ...(isExpanded
-            ? { overflow: 'auto', maxHeight: '40vh', overscrollBehavior: 'contain' }
-            : { maxHeight: `calc(${CAPTION_LINE_PX} * 3)`, overflow: 'hidden' }),
-        }}
-      >
-        <MentionText
-          text={isExpanded ? caption : (visibleText ?? caption)}
-          onMentionTap={onMentionTap}
-          style={{ pointerEvents: 'auto' }}
-        />
-        {showCta && (
-          <button
-            type="button"
-            onClick={onCta}
-            aria-expanded={isReview ? undefined : false}
-            style={ctaStyle}
-          >
-            <span style={{ fontWeight: 400, opacity: 0.8 }}>… </span>
-            {label}
-          </button>
-        )}
-      </div>
-      {isExpanded && (
-        <button
-          type="button"
-          aria-expanded
-          onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
+    <>
+      {!isEmpty && (
+        <div
+          data-fullscreen-caption
+          data-expanded={isExpanded ? '' : undefined}
+          aria-expanded={isReview ? undefined : isExpanded}
+          role={isReview ? undefined : 'button'}
+          onClick={(e) => { e.stopPropagation(); if (!isReview) setExpanded((v) => !v); }}
+          onPointerDown={stop}
+          onTouchStart={stop}
+          onTouchMove={stop}
           style={{
-            marginTop: 4, alignSelf: 'flex-start', background: 'transparent',
-            border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-            fontFamily: 'inherit', fontSize: 12.5, fontWeight: 600, color: '#fff',
-            opacity: 0.7, textShadow: TEXT_SHADOW, lineHeight: 1.2,
+            marginTop: 12, minWidth: 0, pointerEvents: 'auto', cursor: isReview ? 'default' : 'pointer',
+            fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT, color: BODY,
+            whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+            ...(isExpanded
+              ? { overflow: 'auto', maxHeight: '40vh', overscrollBehavior: 'contain' }
+              : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }),
           }}
         >
-          See less
+          <MentionText text={caption} onMentionTap={onMentionTap} style={{ pointerEvents: 'auto' }} />
+        </div>
+      )}
+      {isReview && (
+        <button
+          type="button"
+          data-full-review
+          onClick={(e) => { e.stopPropagation(); onFullReview?.(); }}
+          style={{
+            marginTop: 10, minHeight: 28, alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 3,
+            background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
+            fontFamily: 'inherit', fontSize: 14, fontWeight: 600, color: '#FFFFFF',
+          }}
+        >
+          Full review
+          <ChevronRight size={13} strokeWidth={2.6} aria-hidden />
         </button>
       )}
-    </div>
+    </>
   );
 };
+
 
 
 
@@ -361,7 +237,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation('common');
 
   // Mentions inside the caption must dismiss the fullscreen overlay BEFORE
   // routing, otherwise the profile mounts underneath the still-open viewer.
@@ -448,7 +323,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const resolvedCourseId =
     shotCourse?.courseId ?? hookPost?.review?.courseId ?? golfCourse?.id ?? hookPost?.courseId ?? null;
   const { data: ratingAggregate } = useCourseRatingAggregates(
-    hooksLive && (shotCourse || hookPost?.courseRating == null) ? resolvedCourseId ?? undefined : undefined,
+    hooksLive && syntheticPosts && (shotCourse || hookPost?.courseRating == null) ? resolvedCourseId ?? undefined : undefined,
   );
   // The VIEWER's own record at this course. Lazy: only while the viewer is live.
   const personal = useCoursePersonalStatus(hooksLive ? resolvedCourseId ?? undefined : undefined);
@@ -457,7 +332,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   if (feedEnded) {
     return (
       <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-        {!syntheticPosts && <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />}
+        {!syntheticPosts && <div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
         <div
           style={{
             position: 'fixed',
@@ -473,14 +348,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             type="button"
             onClick={(e) => { e.stopPropagation(); onClose(); }}
             aria-label="Back"
-            style={{
-              width: 44, height: 44, borderRadius: '50%', background: CHEVRON_BG,
-              border: 'none', display: 'inline-flex', alignItems: 'center',
-              justifyContent: 'center', color: '#fff', cursor: 'pointer',
-              pointerEvents: 'auto', padding: 0, flexShrink: 0,
-            }}
+            style={BACK_HIT}
           >
-            <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} style={{ display: 'block', marginLeft: -2 }} />
+            <BackCircle />
           </button>
         </div>
       </div>
@@ -519,14 +389,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const courseRating =
     (shotCourse ? null : activePost.courseRating) ??
     (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
-  const showCourseChip = courseRating != null;
+  // The chip lives only in the member-shot viewer (a post is one golfer's).
+  const showCourseChip = syntheticPosts && courseRating != null;
   const courseRatingLabel = courseRating == null ? '' : formatRatingValue(courseRating);
 
-  // Same guard the rail's comment glyph uses (!readOnly), plus a signed-in
-  // actor to comment as.
-  const showCommentBar = !syntheticPosts && !readOnly && !!activeActor && !!onCompose;
-  const showTopStrip = showsTopProgress(activePost);
-  const stackBottom = syntheticPosts ? 'calc(24px + env(safe-area-inset-bottom))' : `calc(${BAND_H_CSS} + 16px)`;
+  const showPills = !syntheticPosts && !readOnly;
+  const showVideoRow = !syntheticPosts && activeMediaIsVideo;
+  const stackBottom = showVideoRow ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`;
+  const handleCommentPill = () => { if (activeActor && onCompose) onCompose(); else onComment(); };
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
     ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
     : { opacity: 1, transition: 'opacity 150ms' };
@@ -571,9 +441,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     navigate(`/courses/${cid}`);
   };
 
-  /* BRIEF_LATEST_HOLES_OPTION_A §B: the clbhouz rating chip is one element with two
-     homes — inside the course header on a real post, and alone at the right edge of
-     the member-shot viewer, whose top bar carries nothing but the chevron and it. */
+  /* BRIEF_LATEST_HOLES_OPTION_A §B: the clbhouz rating chip sits alone at the right
+     edge of the member-shot viewer. FULLSCREEN_VIEWER_REDESIGN removed it from posts. */
   const courseChip = showCourseChip ? (
     <button
       type="button"
@@ -599,18 +468,26 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
       {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} round={videoRound} chapter={chapter} onScorecard={onOpenScorecard && videoRound ? () => onOpenScorecard(videoRound.context.roundScoreId ?? '') : undefined} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
-      {!syntheticPosts && <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />}
-      <div style={{ ...fadeWhileScrubbing, pointerEvents: 'none' }}>
-        <FullscreenTopProgress activePost={activePost} />
-      </div>
-      <FullscreenVideoScrubber
-        activePost={activePost}
-        chapters={detailedVideo ? videoChapters : undefined}
-        bottom={syntheticPosts ? 'env(safe-area-inset-bottom, 0px)' : `calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
-        onDraggingChange={setScrubbing}
-      />
-      {/* FeedSlide owns the slide-level notch scrim for top-0 non-gallery
-          rects. Chrome positions and text/icon drop-shadows stay unchanged. */}
+      {!syntheticPosts && <div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
+      {syntheticPosts ? (
+        <FullscreenVideoScrubber
+          activePost={activePost}
+          chapters={detailedVideo ? videoChapters : undefined}
+          bottom="env(safe-area-inset-bottom, 0px)"
+          onDraggingChange={setScrubbing}
+        />
+      ) : (
+        <FullscreenVideoScrubber
+          activePost={activePost}
+          chapters={detailedVideo ? videoChapters : undefined}
+          bottom={`calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
+          left={`calc(${GUTTER_L} + 40px)`}
+          right={GUTTER_R}
+          showTime
+          onDraggingChange={setScrubbing}
+        />
+      )}
+      {/* FeedSlide owns the slide-level notch scrim for top-0 non-gallery rects. */}
       <div
         {...inertWhileScrubbing}
         style={{
@@ -620,82 +497,69 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           right: 0,
           zIndex: Z.echo + 2,
           pointerEvents: 'none',
-          paddingTop: showTopStrip ? 'calc(max(env(safe-area-inset-top, 0px), 44px) + 19px)' : 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)',
           paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
-          paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
+          paddingRight: GUTTER_R,
           paddingBottom: 10,
           ...fadeWhileScrubbing,
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          gap: 12,
+          gap: 10,
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
-        {/* LEFT — back chevron */}
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onClose(); }}
           aria-label="Back"
-          style={{
-            width: 44, height: 44, borderRadius: '50%', background: CHEVRON_BG,
-            border: 'none', display: 'inline-flex', alignItems: 'center',
-            justifyContent: 'center', color: '#fff', cursor: 'pointer',
-            pointerEvents: 'auto', padding: 0, flexShrink: 0,
-          }}
+          style={BACK_HIT}
         >
-          <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} style={{ display: 'block', marginLeft: -2 }} />
+          <BackCircle />
         </button>
 
-        {/* PF1B hole chip (mock B): below the top bar, left aligned with the
-            caption block, FIRST slide only. Absolute against this fixed
-            container so it tracks the bar's real height. */}
+        {/* PF1B hole chip (mock B): below the top bar, first slide only. */}
         <FullscreenHoleChipSlot context={golfContext} hole={golfHole} holes={golfHoles} item={activePost?.mediaItems[activeSlide]} activeSlide={activeSlide} />
         <RoundVideoChip round={videoRound} chapter={chapter} follows={videoDetails?.scoreFollows !== false} />
 
-        {/* Course header — left edge is 70px = chevron left (14) + chevron (44)
-            + row gap (12). The header FOLLOWS the chevron: change the chevron's
-            size or inset and this edge moves with it. The chip shows the
-            course's clbhouz (community) score only — never the author's. */}
         {courseName && !syntheticPosts && (
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingTop: 2, textShadow: TEXT_SHADOW }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-                aria-label={`Open ${courseName}`}
+          <div data-fullscreen-course-header style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingTop: 2, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
+              aria-label={`Open ${courseName}`}
+              style={{
+                minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                textAlign: 'left', background: 'transparent', border: 'none', padding: 0, margin: 0,
+                cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit', color: 'inherit',
+              }}
+            >
+              <span
+                data-fullscreen-course-name
+                title={courseName}
                 style={{
-                  flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-                  textAlign: 'left', background: 'transparent', border: 'none', padding: 0, margin: 0,
-                  cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit', color: 'inherit',
+                  fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#FFFFFF',
+                  maxWidth: '100%', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                  wordBreak: 'break-word',
                 }}
               >
+                {courseName}
+              </span>
+              {(courseLocation || worldRank != null) && (
                 <span
-                  title={courseName}
                   style={{
-                    fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2, color: '#FFFFFF',
-                    maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    marginTop: 1, fontSize: 12.5, fontWeight: 500, color: MUTE, lineHeight: 1.3,
+                    maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...TABULAR,
                   }}
                 >
-                  {courseName}
+                  {courseLocation}
+                  {courseLocation && worldRank != null && ' · '}
+                  {worldRank != null && (
+                    <span style={{ color: META_STRONG, fontWeight: 700 }}>World #{worldRank}</span>
+                  )}
                 </span>
-                {(courseLocation || worldRank != null) && (
-                  <span
-                    style={{
-                      marginTop: 2, fontSize: 10.5, fontWeight: 600, color: META, lineHeight: 1.3,
-                      maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...TABULAR,
-                    }}
-                  >
-                    {courseLocation}
-                    {courseLocation && worldRank != null && ' · '}
-                    {worldRank != null && (
-                      <span style={{ color: META_STRONG, fontWeight: 700 }}>World #{worldRank}</span>
-                    )}
-                  </span>
-                )}
-              </button>
-              {courseChip}
-            </div>
+              )}
+            </button>
             {showRecord && (
               <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 600, color: META, ...TABULAR }}>
                 <span
@@ -723,113 +587,113 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         {syntheticPosts && <><div style={{ flex: 1, minWidth: 0 }} />{courseChip}</>}
       </div>
 
-      {/* Bottom scrim removed — author strip + action rail sit on the
-          blurred backdrop; each element carries its own drop-shadow. */}
-
       {syntheticPosts && <div style={{ zIndex: Z.echo, position: 'relative', ...fadeWhileScrubbing }} {...inertWhileScrubbing}><MemberShotCredit syntheticPosts={syntheticPosts} item={activePost.mediaItems[activeSlide]} onViewPost={handleViewSourcePost} /></div>}
-      {/* Bottom-LEFT — author + info stack (real posts only) */}
+      {/* Member-shot viewer: its corner mute, unchanged position. */}
+      {syntheticPosts && activeMediaIsVideo && (
+        <div {...inertWhileScrubbing} style={{ position: 'fixed', right: 'max(12px, env(safe-area-inset-right, 0px))', bottom: 'calc(24px + env(safe-area-inset-bottom))', zIndex: Z.echo, pointerEvents: 'none', ...fadeWhileScrubbing }}>
+          <button type="button" onClick={(e) => { e.stopPropagation(); handleMuteTap(); }} aria-label={shownMuted ? 'Unmute' : 'Mute'} style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto', filter: ICON_SHADOW }}>
+            {shownMuted ? <VolumeX size={32} stroke="#fff" strokeWidth={2} /> : <Volume2 size={32} stroke="#fff" strokeWidth={2} />}
+          </button>
+        </div>
+      )}
+
+      {/* Bottom stack (real posts only) */}
       {!syntheticPosts && <div
         {...inertWhileScrubbing}
+        data-fullscreen-stack
         style={{
           position: 'fixed',
           bottom: stackBottom,
-          left: 'max(14px, env(safe-area-inset-left, 0px))',
-          right: 64, // reserve space for right rail
+          left: GUTTER_L,
+          right: GUTTER_R,
           zIndex: Z.echo,
           pointerEvents: 'none',
           ...fadeWhileScrubbing,
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           display: 'flex',
-          alignItems: 'flex-start',
-          gap: 10,
+          flexDirection: 'column',
           minWidth: 0,
         }}
       >
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
-          aria-label={`View ${activePost.displayName}'s profile`}
-          style={{
-            width: 40, height: 40, padding: 0, background: 'transparent',
-            border: 'none', cursor: 'pointer', pointerEvents: 'auto',
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0, filter: ICON_SHADOW,
-          }}
-        >
-          <SquircleAvatar
-            size={40}
-            src={activePost.avatarUrl}
-            alt={activePost.displayName}
-            userId={activePost.actorId ?? activePost.userId}
-            hairlineRing
-          />
-        </button>
-
-        <div
-          style={{
-            display: 'flex', flexDirection: 'column', minWidth: 0, gap: 3, flex: 1,
-          }}
-        >
-          {/* Name row — name ellipses first, follow never pushed off */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <span
-              onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
-              style={{
-                fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
-                textShadow: TEXT_SHADOW,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
-              }}
-            >
-              {activePost.displayName}
-            </span>
-            <ProOrVerifiedMark userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId} verified={activePost.isVerified} name={activePost.displayName} />
+        {mediaCount >= 2 && (
+          <div data-fullscreen-dots aria-hidden style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 14 }}>
+            {Array.from({ length: mediaCount }, (_, i) => (
+              <span key={i} data-dot-active={i === activeSlide ? '' : undefined} style={{ width: 6, height: 6, borderRadius: '50%', background: i === activeSlide ? '#FFFFFF' : 'rgba(255,255,255,0.38)' }} />
+            ))}
           </div>
+        )}
 
-          {/* Sub-row: index · home club · time · Follow pill */}
-          <div
+        <div data-fullscreen-author style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
+            aria-label={`View ${activePost.displayName}'s profile`}
             style={{
-              display: 'flex', alignItems: 'center', gap: 6, minHeight: 20, minWidth: 0,
-              fontSize: 11, fontWeight: 600, color: META, lineHeight: 1,
-              textShadow: TEXT_SHADOW, ...TABULAR,
+              width: 38, height: 38, padding: 0, background: 'transparent',
+              border: 'none', cursor: 'pointer', pointerEvents: 'auto',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}
           >
-            {authorMeta.map((node, i) => (
-              <React.Fragment key={i}>
-                {i > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
-                {node}
-              </React.Fragment>
-            ))}
-            {!readOnly && !isOwnPost && (
-              <>
-                {authorMeta.length > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
-                <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
-                  <FeedFollowPill
-                    isFollowed={isFollowed}
-                    onFollow={() => onFollow(activePost, isFollowed)}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* PF1B round pill (mock B): one glass pill under the course/time
-              line; opens the same scorecard sheet over the viewer. */}
-          {golfContext?.roundScoreId && onOpenScorecard && (
-            <FullscreenRoundPill
-              gross={golfContext.roundGross}
-              toPar={golfRoundToPar(golfContext)}
-              onOpen={() => onOpenScorecard(golfContext.roundScoreId as string)}
+            <SquircleAvatar
+              size={38}
+              src={activePost.avatarUrl}
+              alt={activePost.displayName}
+              userId={activePost.actorId ?? activePost.userId}
+              hairlineRing
             />
-          )}
+          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+              <span
+                onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
+                style={{
+                  fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
+                }}
+              >
+                {activePost.displayName}
+              </span>
+              <ProOrVerifiedMark userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId} verified={activePost.isVerified} name={activePost.displayName} />
+            </div>
+            <div
+              style={{
+                marginTop: 2, display: 'flex', alignItems: 'center', gap: 6, minWidth: 0,
+                fontSize: 12, fontWeight: 500, color: MUTE, lineHeight: 1.2, ...TABULAR,
+              }}
+            >
+              {authorMeta.map((node, i) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
+                  {node}
+                </React.Fragment>
+              ))}
+              {!readOnly && !isOwnPost && (
+                <>
+                  {authorMeta.length > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
+                  <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
+                    <FeedFollowPill isFollowed={isFollowed} onFollow={() => onFollow(activePost, isFollowed)} />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
 
-          {/* Review figures — shown, not only linked. Null sub-scores omitted. */}
-          {review && (
+        {golfContext?.roundScoreId && onOpenScorecard && (
+          <FullscreenRoundPill
+            gross={golfContext.roundGross}
+            toPar={golfRoundToPar(golfContext)}
+            onOpen={() => onOpenScorecard(golfContext.roundScoreId as string)}
+          />
+        )}
+
+        {review && (
+          <div data-review-score-strip style={{ ...FS_GLASS, marginTop: 12, borderRadius: 14, padding: '11px 14px 10px', minWidth: 0 }}>
             <ReviewScoreRow
               variant="caption"
               align="left"
-              textShadow={TEXT_SHADOW}
-              style={{ marginTop: 11 }}
+              textShadow="none"
               overall={review.rating ?? null}
               breakdown={{
                 design: review.breakdown?.design ?? null,
@@ -838,189 +702,132 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                 facilities: review.breakdown?.facilities ?? null,
               }}
             />
-          )}
+          </div>
+        )}
 
-          {/* Caption — measured 3-line cut + one inline CTA. Non-review posts
-              with an empty caption render nothing; reviews always mount so the
-              empty-text "Full review" fallback can reach the sheet. */}
-          {detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} chapterLabel={videoRound && chapter ? roundChapterLabel(chapter, videoRound.shape) : undefined} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
-            <CaptionBlock
-              caption={activePost.caption ?? ''}
-              resetKey={activeIndex}
-              onMentionTap={handleMentionTap}
-              variant={activePost.isReview ? 'review' : 'caption'}
-              onFullReview={onReviewTap}
-            />
-          ) : null}
+        {detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} chapterLabel={videoRound && chapter ? roundChapterLabel(chapter, videoRound.shape) : undefined} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
+          <CaptionBlock
+            caption={activePost.caption ?? ''}
+            resetKey={activeIndex}
+            onMentionTap={handleMentionTap}
+            variant={activePost.isReview ? 'review' : 'caption'}
+            onFullReview={onReviewTap}
+          />
+        ) : null}
 
-          {/* Likers row — LikedByRow reserves its line at zero (CB56); no second guard. */}
-          {!syntheticPosts && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
-            <LikedByRow
-              postId={activePost.id}
-              count={likeState.count}
-              source="post"
-              /* isRound is false by construction: rounds do not appear in this feed
-                 (auto-posting of rounds to Clubhouse was discontinued). The derivation is
-                 kept rather than hardcoding 'like' so that if rounds ever return to this
-                 surface, only the flag changes. */
-              kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
-              avatarRing="media"
-              /* CB56 — the stack is bottom-anchored: a line growing in would lift the caption and author. */
-              reserve
-              lines={1}
-              fontSize={12.5}
-              fontWeight={500}
-              color="rgba(255,255,255,0.86)"
-              style={{ marginTop: 9, textShadow: TEXT_SHADOW }}
-            />
-          </div>}
-        </div>
-
+        {/* Likers row — LikedByRow reserves its line at zero (CB56); the stack is bottom-anchored. */}
+        {!syntheticPosts && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
+          <LikedByRow
+            postId={activePost.id}
+            count={likeState.count}
+            source="post"
+            /* isRound is false by construction: rounds do not appear in this feed. */
+            kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
+            avatarRing="media"
+            reserve
+            lines={1}
+            fontSize={12.5}
+            fontWeight={500}
+            color={MUTE}
+            style={{ marginTop: 10 }}
+          />
+        </div>}
       </div>}
 
-      {/* Bottom-RIGHT — vertical action rail (no avatar).
-          ONE wrapper, always mounted. Mute is exempt from the !readOnly gate
-          (read-only / gallery opens still need audio control on videos) but is
-          gated on the active slide BEING a video — a photograph has no audio to
-          control. Only the engagement buttons below it are gated on !readOnly.
-          The column is bottom-anchored, so dropping mute (its first child)
-          shortens it from the top and the buttons beneath do not move. */}
-      <div
-        {...inertWhileScrubbing}
-        style={{
-          position: 'fixed',
-          right: 'max(12px, env(safe-area-inset-right, 0px))',
-          bottom: stackBottom,
-          zIndex: Z.echo,
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          gap: 20, pointerEvents: 'none',
-          ...fadeWhileScrubbing,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        }}
-      >
-        {activeMediaIsVideo && (
-          <RailButton
-            onClick={handleMuteTap}
-            ariaLabel={shownMuted ? 'Unmute' : 'Mute'}
+      {/* Video row: mute at the left; the scrubber (fixed, inset) fills the rest with its time. */}
+      {showVideoRow && (
+        <div
+          {...inertWhileScrubbing}
+          data-fullscreen-video-row
+          style={{ position: 'fixed', left: GUTTER_L, bottom: VIDEO_ROW_BOTTOM, height: 28, width: 28, zIndex: Z.echo + 1, pointerEvents: 'none', ...fadeWhileScrubbing }}
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); handleMuteTap(); }}
+            aria-label={shownMuted ? 'Unmute' : 'Mute'}
+            style={{
+              position: 'absolute', left: -8, top: -8, width: 44, height: 44,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
+            }}
           >
-            {shownMuted ? (
-              <VolumeX size={32} stroke="#fff" strokeWidth={2} />
-            ) : (
-              <Volume2 size={32} stroke="#fff" strokeWidth={2} />
-            )}
-          </RailButton>
-        )}
+            {shownMuted ? <VolumeX size={18} stroke="#fff" strokeWidth={2} /> : <Volume2 size={18} stroke="#fff" strokeWidth={2} />}
+          </button>
+        </div>
+      )}
 
-        {!readOnly && (
-          <>
-          <RailButton
-
-            onClick={() => onLike(activePost)}
-            ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'}
-            count={likeStr}
-            accent={likeState.isLiked}
-          >
-            <ReactionGlyph reacted={likeState.isLiked} size={32} tone="chrome" />
-          </RailButton>
-
-          <RailButton onClick={onComment} ariaLabel="Comments" count={commentStr}>
-            <MessageCircle size={32} stroke="#fff" strokeWidth={2} />
-          </RailButton>
-
-          <RailButton onClick={() => onShare(activePost)} ariaLabel="Share">
-            <Send size={32} stroke="#fff" strokeWidth={2} />
-          </RailButton>
-
-          <RailButton onClick={onMore} ariaLabel="More options">
-            <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
-          </RailButton>
-          </>
-        )}
-      </div>
-
-      {/* Comment bar — a BUTTON styled as a field (see header). Inside the
-          data-immersive-chrome root so the scrubber's tap-to-pause skips it. */}
-      {showCommentBar && (
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onCompose?.(); }}
-          aria-label={t('comments.placeholder')}
+      {/* Pill row — in the old comment bar's slot. Buttons only; never a field. */}
+      {showPills && (
+        <div
+          {...(scrubbing ? { inert: '' } : {})}
+          data-fullscreen-pills
           style={{
-            position: 'fixed',
-            left: 'max(14px, env(safe-area-inset-left, 0px))',
-            right: 'max(14px, env(safe-area-inset-right, 0px))',
-            bottom: COMMENT_BAR_BOTTOM,
-            height: COMMENT_BAR_H, boxSizing: 'border-box',
-            zIndex: Z.echo + 1,
-            display: 'flex', alignItems: 'center', gap: 10,
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            padding: '0 5px', margin: 0,
-            cursor: 'pointer', pointerEvents: 'auto', textAlign: 'left',
-            opacity: scrubbing ? 0.35 : 1, transition: 'opacity 150ms',
+            position: 'fixed', left: GUTTER_L, right: GUTTER_R, bottom: COMMENT_BAR_BOTTOM,
+            height: COMMENT_BAR_H, zIndex: Z.echo + 1, display: 'flex', gap: 8,
+            pointerEvents: 'none', opacity: scrubbing ? 0.35 : 1, transition: 'opacity 150ms',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >
-          <SquircleAvatar
-            size={30}
-            src={activeActor!.avatarUrl ?? undefined}
-            alt={activeActor!.name ?? ''}
-            hairlineRing
-          />
-          <span style={{ flex: 1, minWidth: 0, fontSize: 13, color: META, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {t('comments.placeholder')}
-          </span>
-          <span
-            aria-hidden
-            style={{
-              width: 32, height: 32, borderRadius: 999, flexShrink: 0,
-              background: 'rgba(255,255,255,0.08)',
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <Send size={15} stroke="#fff" strokeWidth={2} />
-          </span>
-        </button>
+          <Pill pill="like" onClick={() => onLike(activePost)} ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'} count={likeStr} accent={likeState.isLiked}>
+            <ReactionGlyph reacted={likeState.isLiked} size={20} tone="chrome" />
+          </Pill>
+          <Pill pill="comment" onClick={handleCommentPill} ariaLabel="Comments" count={commentStr}>
+            <MessageCircle size={20} stroke="currentColor" strokeWidth={2} />
+          </Pill>
+          <Pill pill="share" onClick={() => onShare(activePost)} ariaLabel="Share">
+            <Share size={19} stroke="currentColor" strokeWidth={2} />
+          </Pill>
+          <Pill pill="more" onClick={onMore} ariaLabel="More options" square>
+            <MoreHorizontal size={18} stroke="currentColor" strokeWidth={2} />
+          </Pill>
+        </div>
       )}
     </div>
   );
 });
 
+const BACK_HIT: React.CSSProperties = {
+  width: 44, height: 44, borderRadius: '50%', background: 'transparent',
+  border: 'none', display: 'inline-flex', alignItems: 'center',
+  justifyContent: 'center', color: '#fff', cursor: 'pointer',
+  pointerEvents: 'auto', padding: 0, flexShrink: 0,
+};
+const BackCircle: React.FC = () => (
+  <span data-fullscreen-back-circle style={{ ...FS_GLASS, width: 40, height: 40, borderRadius: '50%', boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+    <ChevronLeft size={18} stroke="#fff" strokeWidth={2.4} style={{ display: 'block' }} />
+  </span>
+);
 
-interface RailButtonProps {
+interface PillProps {
+  pill: 'like' | 'comment' | 'share' | 'more';
   onClick: () => void;
   ariaLabel: string;
   count?: string | null;
   accent?: boolean;
+  square?: boolean;
   children: React.ReactNode;
 }
-const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, accent, children }) => (
+const Pill: React.FC<PillProps> = ({ pill, onClick, ariaLabel, count, accent, square, children }) => (
   <button
     type="button"
+    data-pill={pill}
+    data-reacted={accent ? '' : undefined}
     onClick={(e) => { e.stopPropagation(); onClick(); }}
     aria-label={ariaLabel}
     style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-      background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
-      pointerEvents: 'auto', filter: ICON_SHADOW,
-      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      ...FS_GLASS,
+      height: COMMENT_BAR_H, borderRadius: 22, boxSizing: 'border-box',
+      flex: square ? '0 0 44px' : '1 1 0', minWidth: 0, width: square ? 44 : undefined,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: 0,
+      color: accent ? AMBER : '#F8FAFC', cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit',
     }}
   >
-    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-      {children}
-    </span>
+    {children}
     {count && (
-      <span
-        style={{
-          fontSize: 13, fontWeight: 700, color: accent ? AMBER : '#fff',
-          lineHeight: 1, fontVariantNumeric: 'tabular-nums lining-nums', textShadow: TEXT_SHADOW,
-        }}
-      >
+      <span style={{ fontSize: 14, fontWeight: 600, lineHeight: 1, fontVariantNumeric: 'tabular-nums lining-nums' }}>
         {count}
       </span>
     )}
-
   </button>
 );
 

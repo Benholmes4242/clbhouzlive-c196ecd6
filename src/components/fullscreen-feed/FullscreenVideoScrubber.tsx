@@ -1,6 +1,6 @@
 /**
- * FullscreenVideoScrubber — draggable video position bar just above the
- * comment bar (signed-off mock A). Owns the viewer's ONE playback rAF poll,
+ * FullscreenVideoScrubber — draggable video position bar. Edge to edge by
+ * default; the fullscreen viewer opts into insets and a persistent time label. Owns the viewer's ONE playback rAF poll,
  * which writes --fs-progress on the track root with zero React commits per
  * frame. Seeking uses VideoEngine.seek/play/pause/snapshot only.
  *
@@ -35,10 +35,16 @@ interface Props {
   chapters?: VideoChapter[];
   activePost: FeedPost | null;
   bottom: string;
+  /** Opt-in horizontal insets (CSS lengths). Default 0 keeps edge-to-edge callers identical. */
+  left?: string | number;
+  right?: string | number;
+  /** Opt-in persistent "m:ss / m:ss" label at the right, with a 3px track and
+   *  an always-visible 11px knob (fullscreen viewer video row). */
+  showTime?: boolean;
   onDraggingChange: (dragging: boolean) => void;
 }
 
-export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, onDraggingChange, chapters }) => {
+export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, onDraggingChange, chapters, left = 0, right = 0, showTime = false }) => {
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const activeSlide = clampSlide(activePost, activePagerIdx);
@@ -212,8 +218,8 @@ export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, o
         onClick={(e) => e.stopPropagation()}
         onKeyDown={onKeyDown}
         style={{
-          position: 'fixed', left: 0, right: 0, bottom, height: 32,
-          display: 'flex', alignItems: 'center',
+          position: 'fixed', left, right, bottom, height: 32,
+          display: 'flex', alignItems: 'center', gap: showTime ? 12 : undefined,
           pointerEvents: 'auto', touchAction: 'none',
           zIndex: Z.echo,
         }}
@@ -221,21 +227,31 @@ export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, o
         <div
           ref={trackRef}
           style={{
-            width: '100%', height: dragging ? 4 : 2, borderRadius: 0,
+            width: showTime ? undefined : '100%', flex: showTime ? 1 : undefined, minWidth: 0,
+            height: showTime ? 3 : dragging ? 4 : 2, borderRadius: showTime ? 2 : 0,
             background: EMPTY, position: 'relative',
             transition: 'height 120ms ease',
           }}
         >
           <div
             style={{
-              height: '100%', borderRadius: 0, background: FILLED,
+              height: '100%', borderRadius: showTime ? 2 : 0, background: showTime ? '#FFFFFF' : FILLED,
               width: total > 0 ? 'calc(var(--fs-progress, 0) * 100%)' : 0,
             }}
           />
           {total > 0 && chapters && chapters.length > 1 && <div data-video-chapter-segments aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             {chapters.slice(1).map(c => <span key={c.seconds} data-chapter-boundary={c.seconds} style={{ position: 'absolute', left: `calc(${c.seconds / total * 100}% - 1px)`, top: 0, bottom: 0, width: 2, background: 'var(--video-scrubber-gap)' }} />)}
           </div>}
-          {dragging && (
+          {showTime && total > 0 && (
+            <div
+              data-fs-scrubber-knob
+              style={{
+                position: 'absolute', top: '50%', left: 'calc(var(--fs-progress, 0) * 100%)',
+                width: 11, height: 11, margin: '-5.5px 0 0 -5.5px', borderRadius: '50%', background: '#FFFFFF',
+              }}
+            />
+          )}
+          {dragging && !showTime && (
             <div
               style={{
                 position: 'absolute', top: '50%', left: 'calc(var(--fs-progress, 0) * 100%)',
@@ -245,6 +261,11 @@ export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, o
             />
           )}
         </div>
+        {showTime && (
+          <span data-fs-scrubber-time aria-hidden style={{ flex: 'none', fontSize: 12, fontWeight: 600, color: 'rgba(248,250,252,0.68)', fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>
+            {formatClock(total > 0 ? nowSec : 0)} / {formatClock(total)}
+          </span>
+        )}
       </div>
       {dragging && (
         <div
