@@ -1,5 +1,9 @@
 # Roadmap
 
+## In progress: Two authorised rulings and full-suite closeout
+- Apply only the two remaining paging observer waits and the featured-connected async thunk; preserve every expected value and proVerification2B tests.
+- Run focused regressions, then four shards sequentially with retained logs; stop on any other unexpected failure and report totals against expected 9,156.
+
 ## Stopped: Business posts always Everyone — verification
 - Force public audience across create/edit/draft/schedule/shot writes and remove business audience doors; preserve personal choices.
 - Six new rule tests pass; typecheck/build clean. Shard 1: 2,290 passed plus unhandled `supabase.from is not a function` at circle.ts:44 from untouched proVerification2B.test.tsx; shards 2–4 stopped. Expected inventory 9,156; report business-posts-always-everyone.md. Feed paging remains separately stopped without further test authorisation.

@@ -50,7 +50,7 @@ describe('suggested feed cache paging', () => {
     expect(f.rpc.mock.calls[2][1].p_seen_post_ids).toEqual(['a', 'b', 'c']);
     expect(f.rpc.mock.calls[2][1]).not.toHaveProperty('p_cursor');
     expect(client.getQueryData<{ pageParams: number[] }>(key)?.pageParams).toEqual([0, 1, 2]);
-    expect(result.current.hasNextPage).toBe(false);
+    await waitFor(() => expect(result.current.hasNextPage).toBe(false));
     await act(async () => { await result.current.fetchNextPage(); });
     expect(f.rpc).toHaveBeenCalledTimes(3);
   });
@@ -88,7 +88,7 @@ describe('suggested feed cache paging', () => {
     await act(async () => { await result.current.refetch(); });
     expect(f.rpc.mock.calls[0][1]).not.toHaveProperty('p_seen_post_ids');
     expect(f.rpc.mock.calls[0][1]).not.toHaveProperty('p_cursor');
-    expect(result.current.posts.map(post => post.id)).toEqual(['fresh']);
+    await waitFor(() => expect(result.current.posts.map(post => post.id)).toEqual(['fresh']));
   });
 
   it('a full refetch of page 1 excludes only cached page 0, not its own posts', async () => {

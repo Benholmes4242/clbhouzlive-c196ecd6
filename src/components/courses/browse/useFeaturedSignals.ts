@@ -38,7 +38,7 @@ export function useFeaturedSignals(userId: string | undefined, courseIds: string
   const connected = useQuery({ queryKey: ['courses', 'featured-connected', userId ?? null], enabled: on, retry: false, staleTime: 5 * 60_000, queryFn: async () => {
     const [following, followers] = await Promise.all([
       fetchCircleIds(userId as string),
-      supabase.from('follows').select('follower_actor_id').eq('following_actor_id', userId as string).eq('follower_actor_type', 'personal').eq('following_actor_type', 'personal'),
+      (async () => supabase.from('follows').select('follower_actor_id').eq('following_actor_id', userId as string).eq('follower_actor_type', 'personal').eq('following_actor_type', 'personal'))(),
     ]);
     if (followers.error) throw followers.error;
     const out = new Set(following);
