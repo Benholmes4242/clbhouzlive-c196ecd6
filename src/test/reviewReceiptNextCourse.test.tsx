@@ -13,7 +13,7 @@ vi.mock('@/lib/routeChrome', () => ({ claimOverlayChrome: vi.fn(), releaseOverla
 vi.mock('@/components/AccessControl', () => ({ default: ({ children }: { children: React.ReactNode }) => children }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'player' }, loading: false }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
-vi.mock('@/features/review-v2/hooks/useReviewMediaPipeline', () => ({ useReviewMediaPipeline: () => ({ items: [], count: 0, pickerError: null, pendingMediaCount: () => 0, writeUploadedHolePhotos: vi.fn(), attachToReview: async () => ({ failed: 0, held: 0 }) }) }));
+vi.mock('@/features/review-v2/hooks/useReviewMediaPipeline', () => ({ useReviewMediaPipeline: () => ({ items: [], count: 0, pickerError: null, pendingMediaCount: () => 0, writeUploadedHolePhotos: vi.fn(), attachToReview: async () => ({ failed: 0, held: 0 }), pendingRemovals: () => [], commitRemovals: vi.fn(), discardRemovals: vi.fn() }) }));
 vi.mock('@/features/review-v2/hooks/useReviewSubmit', () => ({ useReviewSubmit: () => ({ submitting: false, submit: h.submit }) }));
 vi.mock('@/features/review-v2/hooks/useReviewHoleTags', () => ({ useReviewHoleTags: () => ({ holes: [], assignments: {}, capture: () => null }) }));
 vi.mock('@/features/review-v2/hooks/useReviewHeaderFacts', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/review-v2/hooks/useReviewHeaderFacts')>()), useReviewHeaderFacts: () => ({ avg: null, count: 0, rank: null }) }));

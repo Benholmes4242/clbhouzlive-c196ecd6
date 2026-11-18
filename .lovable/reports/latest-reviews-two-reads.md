@@ -19,3 +19,4 @@ Before 9,089 → after **9,093/9,093** (2,224 / 2,249 / 2,284 / 2,336), +4 added
 - Updated assertion: persistedCourseSignals.test.tsx:85 `query.queryKey[1] === 'browse-reviews-v2'` → `'browse-reviews-v3'` (key bump).
 - Added 4 tests in latestReviewsTwoReads.test.tsx ("Latest reviews content-led order" a–d).
 - Shards: 2,226 / 2,262 / 2,282 / 2,344 passed + 4 failed (9,118 total, 9,114 + 4). STOPPED: the 4 failures are the pre-existing reviewReceiptNextCourse.test.tsx `media.discardRemovals is not a function` mock gap awaiting ruling; reproduce in isolation.
+- Ruling applied: added `pendingRemovals: () => [], commitRemovals: vi.fn(), discardRemovals: vi.fn()` to the useReviewMediaPipeline mocks in reviewReceiptNextCourse.test.tsx:16 and reviewComposerChrome.test.tsx:17; no assertions changed. Rerun: 2,226 / 2,262 / 2,282 / 2,348 = 9,118/9,118 passed.
