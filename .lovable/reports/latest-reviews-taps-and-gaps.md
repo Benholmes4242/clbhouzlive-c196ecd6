@@ -37,3 +37,13 @@ Harness build OK at 10:20:29 UTC, after correcting an intermediate unsupported B
 390px gap measurements **not run**; both measured numbers unavailable. 320px containment and canonical viewer swipe/browser acceptance **not run**, blocked by stop; no authenticated acceptance claim.
 No brief/data contradiction established. No SQL, migrations, maintenance/feed_config changes; round_pool_cap unchanged. Existing record hook and CourseReviewsTab/viewer remain untouched.
 Logs: `/tmp/latest-taps-suite/focused.log`.
+
+## Approved fresh-mount closeout — 2026-11-18
+- Changed only latestReviewHeroLoading.test.tsx:23 to `rerender(<MemoryRouter key="settled"><CoursesPageHero /></MemoryRouter>)`; all five assertions preserved. Case “shows only the record-shaped placeholder until settled, even with cached matching data” retains its original name and count **1 → 1**. Reason: explicitly approved fresh mount bypasses memoization of identical props with a non-reactive mock. No component changes in this follow-up.
+- Focused command `npx vitest run src/test/latestReviewHeroLoading.test.tsx --maxWorkers=2`: **1/1 passed**.
+- Sequential commands: `npx vitest run --maxWorkers=2 --shard=1/4`, then `--shard=2/4`, then `--shard=3/4`, then `--shard=4/4`.
+- Shards **2,296 / 2,267 / 2,267 / 2,334 = 9,164 passed / 9,164 executed**, **809 files**, zero failures. Before/after this follow-up **9,164 → 9,164**, zero delta. Against last passing 9,160: +3 latestReviewMediaTaps cases and +1 latestReviewHeroLoading case, listed above. Different shard distributions reflect Vitest allocation, not added/removed tests.
+- Preview at 390px: **34px above Latest reviews**, **34px below the written rail to Every course played**; measured element rectangle edges. Title-to-first-mosaic **12px**. At 320px document/root scroll widths both **320px**, no page overflow; screenshots reviewed at both widths.
+- Important measurement limitation: external unmanaged Supabase, public Courses visit. What's been played is signed-in-only and absent; the actual preceding visible rail is Latest holes. Its bottom-to-In golfers' words seam measured 34px. The signed-in What's been played seam is not browser-measured; source uses the same 14px end + 20px next top. Do not represent this as authenticated acceptance of the exact requested seam.
+- Screenshots/log script: `/tmp/browser/latest-gaps/reviews390.png`, `reviews320.png`, `check_gaps.py`. Suite logs `/tmp/latest-taps-rerun/shard1–4.log`, COMPLETE status.
+- Harness build OK at 10:25:24 UTC; no manual build/typecheck. Canonical viewer sideways/vertical swipes and authenticated cold load remain unverified in browser; media entry and record state assertions pass in the suite. No SQL, migrations or frozen-setting changes.

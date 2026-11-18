@@ -20,7 +20,7 @@ describe('Latest reviews hero record waiting', () => {
     expect(container.querySelector('[data-hero-record]')).toBeNull();
     expect(container.querySelector('.lucide-crown')).toBeNull();
     state.settled = true;
-    rerender(<MemoryRouter><CoursesPageHero /></MemoryRouter>);
+    rerender(<MemoryRouter key="settled"><CoursesPageHero /></MemoryRouter>);
     expect(container.querySelector('[data-hero-record-loading]')).toBeNull();
     expect(container.querySelector('[data-hero-record]')).not.toBeNull();
   });
