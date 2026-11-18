@@ -28,6 +28,14 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { latestReviewFeedPost } from './browse/latestReviewFeedPost';
 import { Button } from '@/components/ui/button';
+import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
+
+/** Review videos share canonical poster derivation, but never paint playback
+ * URLs when the legacy helper returns an unrecognised source unchanged. */
+function reviewVideoPoster(item: ReviewMediaItem): string {
+  const poster = holeMediaPoster({ media_type: 'video', media_url: item.url, poster_url: item.posterUrl, stream_id: item.streamId });
+  return poster !== item.url ? poster : '';
+}
 
 /* Rail + card geometry, read by the cards AND their shell. */
 export const RAIL_GAP = 10;
@@ -156,6 +164,7 @@ function VideoBadge({ seconds }: { seconds: number | null }) {
 /** One mosaic tile. The big tile autoplays a video muted in the shared
  *  "courses-member-shots" group; small video tiles show the poster only. */
 function MediaTile({ item, big, more, style, onOpen }: { item: ReviewMediaItem; big: boolean; more: number; style?: React.CSSProperties; onOpen: (item: ReviewMediaItem, el: HTMLElement) => void }) {
+  const poster = item.type === 'video' ? reviewVideoPoster(item) : '';
   return (
     <Button variant="ghost" className="active:scale-100" aria-label="Open review media" data-review-media-id={item.id}
       onClick={e => { e.stopPropagation(); onOpen(item, e.currentTarget); }}
@@ -170,7 +179,7 @@ function MediaTile({ item, big, more, style, onOpen }: { item: ReviewMediaItem; 
             />
           </span>
         ) : (
-          <img src={imageSrc(item.posterUrl ?? item.url, 220)} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          poster ? <img src={imageSrc(poster, 220)} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null
         )
       ) : (
         <img src={imageSrc(item.url, big ? 800 : 440)} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -209,7 +218,7 @@ function MediaReviewCard({ r, name, onReviewPress, onMediaOpen }: { r: LatestRev
   const gridColumns = count === 1 ? '1fr' : '2fr 1fr';
   const gridRows = count >= 3 ? '1fr 1fr' : '1fr';
   const cover = media[0];
-  const ambient = cover ? imageSrc(cover.type === 'video' ? cover.posterUrl ?? cover.url : cover.url, 480) : undefined;
+  const ambient = cover ? imageSrc(cover.type === 'video' ? reviewVideoPoster(cover) : cover.url, 480) : undefined;
   return (
     <div
       {...cardProps(r, onReviewPress)}
@@ -314,7 +323,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
     analyticsEvents.track('review_photo_opened', { course_id: r.courseId, review_id: r.reviewId, source: 'courses-latest-reviews' });
     openWithOrigin({
       posts: mediaRail.map(latestReviewFeedPost), index: mediaRail.indexOf(r), mediaId: item.id,
-      originEl: el, posterUrl: item.posterUrl ?? (item.type === 'image' ? item.url : null),
+      originEl: el, posterUrl: item.type === 'video' ? reviewVideoPoster(item) || null : item.posterUrl ?? item.url,
       openedFrom: 'courses-latest-reviews', options: { readOnly: true, hasNextPage: false },
     });
   };

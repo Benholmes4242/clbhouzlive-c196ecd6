@@ -17,6 +17,7 @@ export interface ReviewMediaItem {
   mediaType: 'image' | 'video';
   mediaUrl: string;
   posterUrl: string | null;
+  streamId: string | null;
   isCover: boolean;
   width: number | null;
   height: number | null;
@@ -27,7 +28,7 @@ export const reviewMediaKey = (reviewId: string) => ['review-media', reviewId] a
 export async function fetchReviewMedia(reviewId: string): Promise<ReviewMediaItem[]> {
   const { data, error } = await supabase
     .from('course_review_media' as any)
-    .select('id, media_type, media_url, poster_url, is_cover, width, height, created_at')
+    .select('id, media_type, media_url, poster_url, stream_id, is_cover, width, height, created_at')
     .eq('review_id', reviewId)
     .order('created_at', { ascending: true });
   if (error) throw error;
@@ -38,6 +39,7 @@ export async function fetchReviewMedia(reviewId: string): Promise<ReviewMediaIte
       mediaType: String(m.media_type ?? '').toLowerCase().includes('video') ? ('video' as const) : ('image' as const),
       mediaUrl: String(m.media_url),
       posterUrl: m.poster_url ?? null,
+      streamId: m.stream_id ?? null,
       isCover: !!m.is_cover,
       width: typeof m.width === 'number' && m.width > 0 ? m.width : null,
       height: typeof m.height === 'number' && m.height > 0 ? m.height : null,

@@ -1,6 +1,7 @@
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
+import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 /**
  * ReviewBottomSheet — DARK floating glass review card.
  *
@@ -741,6 +742,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       const index = allMedia.indexOf(m);
                       const isOverflowTile = i === REVIEW_MEDIA_GRID_CAP - 1 && hiddenCount > 0;
                       const kindLabel = m.mediaType === 'video' ? 'Video' : 'Photo';
+                      const derivedPoster = m.mediaType === 'video' ? holeMediaPoster({ media_type: 'video', media_url: m.mediaUrl, poster_url: m.posterUrl, stream_id: m.streamId }) : '';
+                      // The shared helper may return an unrecognised source unchanged.
+                      // A playback URL is never a review tile image or opening poster.
+                      const videoPoster = derivedPoster !== m.mediaUrl ? derivedPoster : '';
                       return (
                       <button
                         key={m.id}
@@ -765,7 +770,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                             ...(matchedIndex >= 0 ? { mediaId: post.mediaItems[matchedIndex]?.id } : {}),
                             mediaIndex,
                             originEl: e.currentTarget,
-                            posterUrl: m.posterUrl ?? m.mediaUrl,
+                            posterUrl: m.mediaType === 'video' ? videoPoster || null : m.posterUrl ?? m.mediaUrl,
                             zIndex: VIEWER_ABOVE_SHEETS_Z,
                           });
                         }}
@@ -784,18 +789,18 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         }}
                         className="review-photo-tile"
                       >
-                        <img
+                        {(m.mediaType === 'image' || videoPoster) && <img
                           // Grid tiles request their drawn size x DPR via Cloudflare
                           // (tiles are ≤115 x 78px). Originals (24MP+) trip iOS
                           // subsampling, which drops EXIF orientation. Fullscreen
                           // still opens the original.
                           src={m.mediaType === 'video'
-                            ? (m.posterUrl ?? m.mediaUrl)
+                            ? videoPoster
                             : buildImageThumbnailUrl(m.mediaUrl, { width: Math.round(REVIEW_TILE_MAX_W * tileDpr()) })}
                           alt=""
                           loading="lazy"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        />
+                        />}
                         {m.mediaType === 'video' && !isOverflowTile && (
                           <div
                             style={{

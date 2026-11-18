@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Review video tile posters — new incomplete avatar mock
+- JSON-safe stream identity and canonical posters implemented for sheet/Latest reviews; unknown video URLs suppressed, photos unchanged.
+- Focused 22 passed / 2 failed of 24: new reviewVideoTilePosters.test.tsx:20 mock omits DARK_HAIRLINE, failing at ReviewBottomSheet.tsx:584:138 with the missing-export error. Mock/assertions left unchanged; shards unrun per stop rule.
+- Expected inventory 9,076 = 9,071 + five named regressions (three passed, two blocked). Needs authorisation to fix the mock then run focused/four sequential shards. Report .lovable/reports/review-video-tile-posters.md; Ben's Dundonald iPhone playback check remains required.
+
 ## Complete: Text-flow AM/PRO badge height
 - Changed only the two supplied text-flow CSS rules; extended the existing review text-flow case, preserving every original assertion. No test count delta.
 - Focused 16/16; four sequential shards 2,225 / 2,245 / 2,273 / 2,328 = 9,071/9,071 (808 files), before/after unchanged. Chromium geometry: both badges 16px, labels centred, two-line clamp preserved. Ben's iPhone check remains required; report .lovable/reports/text-flow-badge-height.md.
