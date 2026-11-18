@@ -20,7 +20,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { formatRatingValue } from '@/utils/formatters';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
 
@@ -68,9 +67,6 @@ const TONES: Record<CourseBandTone, ToneMap> = {
 };
 /** Solid feed card surface, used to keep the actions row off the photo backdrop. */
 const OPAQUE_SURFACE = FEED_CARD_SURFACE;
-
-const MONO =
-  'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
 
 const figureValueStyle: React.CSSProperties = {
   // SF Pro tabular numerals rather than the mono stack: Menlo/Consolas draw a
@@ -144,7 +140,6 @@ interface Props {
    */
   onOpenCourse?: () => void;
   courseLocation?: string | null;
-  courseRating?: number | null;
   ctx?: PostCourseContext | null;
   /** Opens the course stats sheet. Not wired when there is no figure. */
   onOpenStats?: () => void;
@@ -180,7 +175,6 @@ export const PostCourseBand: React.FC<Props> = ({
   courseName,
   onOpenCourse,
   courseLocation,
-  courseRating,
   ctx,
   onOpenStats,
   actions,
@@ -194,12 +188,6 @@ export const PostCourseBand: React.FC<Props> = ({
 
   const hasYourBest = (ctx?.your_rounds ?? 0) > 0 && ctx?.your_best != null;
   const figure = identityOnly ? null : pickCourseBandFigure(ctx, t, tone);
-
-  // Prefer ctx: it is keyed off resolvePostCourseId (course_id, else the first
-  // golf_club tag), which is the SAME course line 2's figures describe. The
-  // courseRating prop comes from the feed payload's course_avg_overall_score,
-  // joined via review_course_id-or-course_id, and is absent on tag-only posts.
-  const rating = identityOnly ? null : (ctx?.community_rating ?? courseRating ?? null);
 
   const tappable = !!figure && !!onOpenStats;
 
@@ -286,36 +274,6 @@ export const PostCourseBand: React.FC<Props> = ({
           courseName
         )}
       </div>
-      {rating != null ? (
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 3,
-            flexShrink: 0,
-            marginLeft: 8,
-          }}
-        >
-          <img
-            src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-            alt=""
-            aria-hidden="true"
-            style={{ width: 10, height: 10, objectFit: 'contain' }}
-          />
-          <span
-            style={{
-              fontSize: 11.5,
-              fontFamily: MONO,
-              fontVariantNumeric: 'tabular-nums',
-              fontWeight: 700,
-              color: C.mute,
-              lineHeight: 1,
-            }}
-          >
-            {formatRatingValue(rating)}
-          </span>
-        </span>
-      ) : null}
     </div>
   );
 
@@ -376,9 +334,9 @@ export const PostCourseBand: React.FC<Props> = ({
         <ChevronRight
           size={16}
           color={C.dim}
-          // Optical alignment with the community rating on line 1. lucide
-          // leaves ~5px of dead space right of the glyph inside its 16px box,
-          // so the box edges align but the ink does not. Pull it out by 4.
+          // Optical right-edge alignment. lucide leaves ~5px of dead space
+          // right of the glyph inside its 16px box, so the box edges align
+          // but the ink does not. Pull it out by 4.
           style={{ flexShrink: 0, marginLeft: 'auto', marginRight: -4 }}
         />
       )}

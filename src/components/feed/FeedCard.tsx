@@ -1151,7 +1151,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                * place the region appears at all.
                */
               courseLocation={courseLocation || null}
-              courseRating={post.courseRating ?? null}
               ctx={courseContext ?? null}
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
               surface="solid"
