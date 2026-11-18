@@ -78,3 +78,42 @@ describe('Latest reviews two reads', () => {
     expect(l.container.querySelector('[data-head]')).toBeNull();
   });
 });
+
+describe('Latest reviews content-led order', () => {
+  const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+  it('(a) a three-day-old review that gained a photo today sorts ahead of a photo from yesterday', async () => {
+    const created = day(3);
+    reads.rows.media = [
+      row('yesterday', day(1), null, [{ ...photo, id: 'y', created_at: day(1) }]),
+      row('old-new-photo', created, null, [{ ...photo, id: 'o1', created_at: day(3) }, { ...photo, id: 'o2', is_cover: false, created_at: day(0) }]),
+    ];
+    reads.rows.words = [];
+    const { result } = renderHook(() => useBrowseReviews(null, null), { wrapper });
+    await waitFor(() => expect(result.current.pool.map(r => r.reviewId)).toEqual(['old-new-photo', 'yesterday']));
+    expect(result.current.pool[0].at).toBe(created);
+  });
+  it('(b) a words-only review edited today sorts by review_date', async () => {
+    const edited = { ...row('edited', day(10), 'Updated words'), review_date: day(0) };
+    reads.rows.media = [row('photo', day(2), null, [{ ...photo, created_at: day(2) }])];
+    reads.rows.words = [row('recent', day(1), 'Fresh'), edited];
+    const { result } = renderHook(() => useBrowseReviews(null, null), { wrapper });
+    await waitFor(() => expect(result.current.pool.map(r => r.reviewId)).toEqual(['edited', 'recent', 'photo']));
+    expect(result.current.pool[0].contentAt).toBe(edited.review_date);
+    expect(result.current.pool[0].at).toBe(edited.created_at);
+  });
+  it('(c) both reads order by review_date, nulls last, and select it', async () => {
+    reads.rows.media = []; reads.rows.words = [];
+    renderHook(() => useBrowseReviews(null, null), { wrapper });
+    await waitFor(() => expect(reads.calls.filter(c => c.table === 'course_ratings')).toHaveLength(2));
+    for (const c of reads.calls.filter(c => c.table === 'course_ratings')) {
+      expect(c.ops.filter(o => o[0] === 'order').map(o => JSON.stringify(o[1]))).toEqual([JSON.stringify(['review_date', { ascending: false, nullsFirst: false }])]);
+      expect(String(c.ops.find(o => o[0] === 'select')![1][0])).toContain('review_date');
+    }
+  });
+  it('(d) the pool query key is v3', async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    reads.rows.media = []; reads.rows.words = [];
+    renderHook(() => useBrowseReviews(null, null), { wrapper: ({ children }) => <QueryClientProvider client={client}>{children}</QueryClientProvider> });
+    expect(client.getQueryCache().find({ queryKey: ['courses', 'browse-reviews-v3', 'all', 'all'] })).toBeDefined();
+  });
+});

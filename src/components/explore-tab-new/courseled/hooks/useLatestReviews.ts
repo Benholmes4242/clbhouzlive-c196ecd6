@@ -48,6 +48,8 @@ export interface LatestReview {
   rating: number;
   quote: string;
   at: string;
+  /** Browse pool only: when the review's content last arrived (ordering, not display). */
+  contentAt?: string;
   userId: string | null;
   reviewerName: string;
   reviewerUsername: string | null;

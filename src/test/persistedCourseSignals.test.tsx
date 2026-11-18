@@ -82,7 +82,7 @@ it('persists Featured signals and browse Top 100 as arrays, restores membership,
   second.unmount();
   const legacy = setup();
   for (const query of restoredData.queries) {
-    legacy.client.setQueryData(query.queryKey, query.queryKey[1] === 'browse-reviews-v2' ? query.state.data : {});
+    legacy.client.setQueryData(query.queryKey, query.queryKey[1] === 'browse-reviews-v3' ? query.state.data : {});
   }
   const third = renderHook(useSignals, { wrapper: legacy.wrapper });
   for (const ids of [third.result.current.featured.played, third.result.current.featured.reviewed, third.result.current.featured.top100, third.result.current.featured.connected, third.result.current.featured.likedPosts]) {

@@ -8,7 +8,13 @@
  * Toughest / Records to chase) is an ORDERING and a review is not ordered by
  * toughness, so it is deliberately NOT part of the key.
  *
- * ORDER: created_at DESC. Never by rating (that would make the page an
+ * ORDER: CONTENT-LED, newest content first. A review that gains photos or
+ * words later keeps its original created_at, so ordering by it buried such a
+ * review among its old neighbours (or past the read caps). Both reads order
+ * by review_date (set to now() on every save) and the merged pool sorts by
+ * contentAt: the newest usable media row's created_at for a media review,
+ * else coalesce(review_date, created_at). The card's date label still reads
+ * the review's own date (`at`). Never by rating (that would make the page an
  * advertisement) and never by reactions (they average 2.4 and cannot rank
  * anything).
  *
@@ -49,6 +55,7 @@ const SELECT_BASE = `
   rating,
   review,
   created_at,
+  review_date,
   design_score,
   condition_score,
   clubhouse_score,
@@ -84,6 +91,7 @@ interface Row {
   rating: number | null;
   review: string | null;
   created_at: string;
+  review_date?: string | null;
   design_score: number | null;
   condition_score: number | null;
   clubhouse_score: number | null;
@@ -123,6 +131,13 @@ function orderMedia(rows: MediaRow[] | null): ReviewMediaItem[] {
   }));
 }
 
+/** When this review's content last arrived: newest usable media, else the last save. */
+export function contentAt(row: Pick<Row, 'created_at' | 'review_date' | 'course_review_media'>): string {
+  const media = (row.course_review_media ?? []).filter((m) => !!m.media_url && !!m.created_at).map((m) => m.created_at as string);
+  if (media.length > 0) return media.reduce((a, b) => (new Date(b).getTime() > new Date(a).getTime() ? b : a));
+  return row.review_date ?? row.created_at;
+}
+
 export function mapRow(row: Row): LatestReview | null {
   const quote = String(row.review ?? '').trim();
   if (!row.course?.id) return null;
@@ -138,6 +153,7 @@ export function mapRow(row: Row): LatestReview | null {
     rating: Number(row.rating ?? 0),
     quote,
     at: row.created_at,
+    contentAt: contentAt(row),
     userId: row.user_id ?? null,
     reviewerName: (profile?.display_name ?? profile?.username ?? '').trim(),
     reviewerUsername: profile?.username ?? null,
@@ -164,7 +180,7 @@ export function mapRow(row: Row): LatestReview | null {
 
 export function useBrowseReviews(country: string | null, region: string | null) {
   const query = useQuery({
-    queryKey: ['courses', 'browse-reviews-v2', country ?? 'all', region ?? 'all'],
+    queryKey: ['courses', 'browse-reviews-v3', country ?? 'all', region ?? 'all'],
     staleTime: 60_000,
     queryFn: async (): Promise<LatestReview[]> => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -179,7 +195,7 @@ export function useBrowseReviews(country: string | null, region: string | null) 
         .select(MEDIA_SELECT)
         .eq('is_mock', false)
         .not('course_review_media.media_url', 'is', null)
-        .order('created_at', { ascending: false })
+        .order('review_date', { ascending: false, nullsFirst: false })
         .limit(MEDIA_LIMIT));
       const wordsQ = scope(supabase
         .from('course_ratings')
@@ -187,7 +203,7 @@ export function useBrowseReviews(country: string | null, region: string | null) 
         .eq('is_mock', false)
         .not('review', 'is', null)
         .neq('review', '')
-        .order('created_at', { ascending: false })
+        .order('review_date', { ascending: false, nullsFirst: false })
         .limit(WORDS_LIMIT));
       const [mediaRes, wordsRes] = (await Promise.all([mediaQ, wordsQ])) as Array<{ data: unknown[] | null; error: unknown }>;
       if (mediaRes.error) throw mediaRes.error;
@@ -200,7 +216,9 @@ export function useBrowseReviews(country: string | null, region: string | null) 
         if (!prev || (r.course_review_media?.length ?? 0) > (prev.course_review_media?.length ?? 0)) byId.set(r.id, r);
       }
       const merged = [...byId.values()]
-        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+        .map((r) => ({ r, t: new Date(contentAt(r)).getTime() || 0 }))
+        .sort((a, b) => b.t - a.t)
+        .map(({ r }) => r)
         .slice(0, POOL_CAP);
 
       const rows = merged
