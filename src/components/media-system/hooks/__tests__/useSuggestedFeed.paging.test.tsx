@@ -45,7 +45,7 @@ describe('suggested feed cache paging', () => {
     expect(f.rpc.mock.calls[1][1]).toEqual({
       p_user_id: 'u1', p_page_size: 60, p_viewer_actor_type: 'personal', p_viewer_actor_id: 'u1', p_seen_post_ids: ['a', 'b'],
     });
-    expect(result.current.posts.map(post => post.id)).toEqual(['a', 'b', 'c']);
+    await waitFor(() => expect(result.current.posts.map(post => post.id)).toEqual(['a', 'b', 'c']));
     await act(async () => { await result.current.fetchNextPage(); });
     expect(f.rpc.mock.calls[2][1].p_seen_post_ids).toEqual(['a', 'b', 'c']);
     expect(f.rpc.mock.calls[2][1]).not.toHaveProperty('p_cursor');
@@ -64,7 +64,7 @@ describe('suggested feed cache paging', () => {
     await act(async () => { await result.current.fetchNextPage(); });
     expect(f.rpc.mock.calls[0][1].p_seen_post_ids).toEqual(['restored-a', 'restored-b']);
     expect(client.getQueryData<{ pageParams: unknown[] }>(key)?.pageParams.at(-1)).toBe(2);
-    expect(result.current.hasNextPage).toBe(false);
+    await waitFor(() => expect(result.current.hasNextPage).toBe(false));
   });
 
   it('caps cached exclusions at the newest 500 unique ids in cache order', async () => {
@@ -89,6 +89,20 @@ describe('suggested feed cache paging', () => {
     expect(f.rpc.mock.calls[0][1]).not.toHaveProperty('p_seen_post_ids');
     expect(f.rpc.mock.calls[0][1]).not.toHaveProperty('p_cursor');
     expect(result.current.posts.map(post => post.id)).toEqual(['fresh']);
+  });
+
+  it('a full refetch of page 1 excludes only cached page 0, not its own posts', async () => {
+    f.rpc.mockResolvedValueOnce({ data: rows('a', 'b'), error: null })
+      .mockResolvedValueOnce({ data: rows('c', 'd'), error: null });
+    const { result } = setup({ pages: [
+      { posts: [{ id: 'a' }, { id: 'b' }], rawRowCount: 2 },
+      { posts: [{ id: 'c' }, { id: 'd' }], rawRowCount: 2 },
+    ], pageParams: [0, 1] });
+    await act(async () => { await result.current.refetch(); });
+    expect(f.rpc).toHaveBeenCalledTimes(2);
+    expect(f.rpc.mock.calls[0][1]).not.toHaveProperty('p_seen_post_ids');
+    expect(f.rpc.mock.calls[1][1].p_seen_post_ids).toEqual(['a', 'b']);
+    expect(f.rpc.mock.calls[1][1]).not.toHaveProperty('p_cursor');
   });
 
   it('only reads the cache for the selected business actor', async () => {

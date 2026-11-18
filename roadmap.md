@@ -1,8 +1,8 @@
 # Roadmap
 
-## Stopped: Feed pages by seen posts
+## Stopped: Feed pages by seen posts — authorised correction
 - Replace date cursor/ref with actor-scoped cached exclusions and numeric pages; remove reset caller.
-- Added 7 tests; targeted 6/8 passed, stopped on two observer-state failures at useSuggestedFeed.paging.test.tsx:48 and :67. Shards/typecheck unrun; expected inventory 9,149 against 9,142.
+- Earlier-page exclusions, two approved waits and [a,b]/[c,d] regression complete. Focused 7/9 passed; stopped on new failures at useSuggestedFeed.paging.test.tsx:53 and :91. Shards/typecheck unrun; expected inventory 9,150 against 9,142.
 - Real-account paging unavailable on external Supabase; document the 500-id exclusion limitation.
 
 ## Stopped: Courses dock anchor — awaiting ruling

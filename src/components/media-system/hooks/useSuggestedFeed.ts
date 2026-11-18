@@ -11,8 +11,9 @@ const PAGE_SIZE = 60;
 
 type SuggestedPage = { posts: FeedPost[]; rawRowCount: number };
 
-// Paging excludes cached posts for this exact viewer/actor identity, including
-// hydrated pages. Dates cannot cursor a feed ordered by ranked slot position.
+// Paging excludes only earlier cached pages for this exact viewer/actor identity,
+// including hydrated pages; refetch must not exclude its own or later pages.
+// Dates cannot cursor a feed ordered by ranked slot position.
 export function useSuggestedFeed(userId: string | undefined) {
   const { activeActor } = useActiveActor();
   const queryClient = useQueryClient();
@@ -23,7 +24,7 @@ export function useSuggestedFeed(userId: string | undefined) {
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], rawRowCount: 0 };
       const cachedPages = queryClient.getQueryData<InfiniteData<SuggestedPage>>(queryKey)?.pages ?? [];
-      const seenIds = Array.from(new Set(cachedPages.flatMap(page => page.posts.map(post => post.id)))).slice(-500);
+      const seenIds = Array.from(new Set(cachedPages.slice(0, pageParam).flatMap(page => page.posts.map(post => post.id)))).slice(-500);
 
       const { data, error } = await supabase.rpc('get_suggested_feed_v3', {
         p_user_id: userId,

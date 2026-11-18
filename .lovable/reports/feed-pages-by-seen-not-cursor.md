@@ -41,3 +41,25 @@ No tests deleted, renamed or assertion-rewritten. Existing `useSuggestedFeed.ref
 The required 500-id cap cannot guarantee exclusion of **every** earlier post beyond 500 unique ids. Dedupe preserves unique rendered posts, but older dropped ids can be returned again; if server selection repeats nonempty batches, zero-row termination is not guaranteed. Implemented the explicitly requested cap without adding another stop heuristic or changing the RPC; acceptance A/C cannot be guaranteed for a >500-post candidate pool under these rules.
 
 Authenticated network/restart/scroll verification unavailable: browser auth status is `external_unmanaged`. No account session or live RPC flow was exercised, and no signed-out/demo check is claimed as verification.
+
+## Authorised correction — 2026-11-18 07:27 UTC — stopped again
+- Corrected exclusions to `unique(cachedPages.slice(0, pageParam).flatMap(...post ids)).slice(-500)`. A full refetch of page N no longer excludes its own or later cached pages; normal append still covers all existing pages.
+- Applied exactly the two authorised waits, expected values unchanged:
+  - **later pages exclude every earlier cached post, use numeric pages and dedupe output**: `expect(result.current.posts.map(post => post.id)).toEqual(['a', 'b', 'c']);` → `await waitFor(() => expect(result.current.posts.map(post => post.id)).toEqual(['a', 'b', 'c']));`. Reason: wait for observer notification. This check passed.
+  - **restored old cursor pages still exclude their posts and continue at page index 2**: `expect(result.current.hasNextPage).toBe(false);` → `await waitFor(() => expect(result.current.hasNextPage).toBe(false));`. Same reason; this test passed.
+- Added one test, **a full refetch of page 1 excludes only cached page 0, not its own posts**. Cache `[a,b]`, `[c,d]`; asserts second RPC `p_seen_post_ids` equals `['a', 'b']`, and page 0 omits exclusions. Passed.
+- No deleted or renamed tests; no other assertions changed.
+
+Focused command (same as above): `npx vitest run src/components/media-system/hooks/__tests__/useSuggestedFeed.paging.test.tsx src/components/media-system/hooks/__tests__/useSuggestedFeed.refetch.test.ts --maxWorkers=2`.
+
+**9 executed / 7 passed / 2 failed**. New failing checks, both left unchanged:
+1. `src/components/media-system/hooks/__tests__/useSuggestedFeed.paging.test.tsx:53:40`, **later pages exclude every earlier cached post, use numeric pages and dedupe output** (a later check than the approved posts wait):
+   `AssertionError: expected true to be false // Object.is equality`
+   Assertion: `expect(result.current.hasNextPage).toBe(false);`
+2. Same file `:91:55`, **a first-page refetch omits exclusions even when cached posts exist**:
+   `AssertionError: expected [ 'old' ] to deeply equal [ 'fresh' ]`
+   Assertion: `expect(result.current.posts.map(post => post.id)).toEqual(['fresh']);`
+
+Stopped on these unexpected failures as requested. No rerun, shards or typecheck after this stop. Shards 1/2/3/4: not run. The passing cache/RPC assertions and earlier approved waits suggest the same observer-notification timing issue; not asserted as a confirmed diagnosis.
+
+Expected inventory **9,150**, +1 from the previous stopped inventory of 9,149, +8 new cases overall versus last measured full scope **9,142**. Full-suite total remains unmeasured this turn. Preview build log: `build OK` at 2026-11-18T07:27:19Z. Authenticated checks and the 500-id limitation remain as documented above.
