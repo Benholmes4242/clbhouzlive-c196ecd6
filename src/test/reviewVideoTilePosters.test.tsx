@@ -17,7 +17,7 @@ vi.mock('@/components/posts/useReviewMedia', async importOriginal => ({ ...await
 vi.mock('@/components/posts/useReviewPost', () => ({ useReviewPost: () => ({ data: { id: 'post', mediaItems: [{ id: 'video', type: 'video', streamId: '0123456789abcdef0123456789abcdef' }] } }) }));
 vi.mock('@/features/pro-verification/useProMembers', () => ({ useProMembers: () => ({ members: new Map() }) }));
 vi.mock('@/features/amateur-ranking/useAmateurMembers', () => ({ useAmateurMembers: () => ({ members: new Map() }) }));
-vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /> }));
+vi.mock('@/components/ui/SquircleAvatar', async importOriginal => ({ ...await importOriginal<typeof import('@/components/ui/SquircleAvatar')>(), SquircleAvatar: () => <span /> }));
 vi.mock('@/components/likes/LikedByRow', () => ({ LikedByRow: () => null }));
 vi.mock('@/features/comments-v2/CommentsSheetV2', () => ({ CommentsSheetV2: () => null }));
 vi.mock('@/components/explore-tab-new/courseled/RoundEngagementActions', () => ({ RoundEngagementActions: () => null }));
