@@ -58,25 +58,23 @@ beforeEach(() => {
 });
 afterEach(() => vi.restoreAllMocks());
 
-describe('calibration strip', () => {
-  it('two cells with true-minus deviations when both figures exist', () => {
+describe('comparison sentence', () => {
+  it('one <p> with both clauses when both figures exist', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
-    const figs = Array.from(q('[data-review-calibration-figure]')).map((n) => n.textContent);
-    expect(figs).toEqual(['+0.7', '\u22120.4']);
-    expect(screen.getByText((_text, element) => element?.textContent === 'mikem84 rates 7.6' && element?.querySelector('.pro-inline-text') !== null)).toBeTruthy();
-    expect(screen.getByText('3 ratings, 8.7 average')).toBeTruthy();
+    const cal = q('[data-review-calibration]');
+    expect(cal.length).toBe(1);
+    expect(cal[0].tagName).toBe('P');
+    expect(cal[0].textContent).toBe("0.7 above mikem84's usual 7.6 \u00b7 0.4 below the course's 8.7 from 3 ratings");
   });
 
-  it('em dash and explanation where one figure is missing', () => {
+  it('course clause drops below three ratings', () => {
     sheet({ count: 1, reviewerAvg: 7.6 });
-    const figs = Array.from(q('[data-review-calibration-figure]')).map((n) => n.textContent);
-    expect(figs).toEqual(['+0.7', '\u2014']);
-    expect(screen.getByText('First rating here')).toBeTruthy();
+    expect(q('[data-review-calibration]')[0].textContent).toBe("0.7 above mikem84's usual 7.6");
   });
 
-  it('reviewer below three ratings explains it', () => {
-    sheet({ count: 3, reviewerAvg: null });
-    expect(screen.getByText('Too few reviews to average')).toBeTruthy();
+  it('level with when the difference rounds to nothing', () => {
+    sheet({ count: 3, reviewerAvg: 8.32, avg: 8.28 });
+    expect(q('[data-review-calibration]')[0].textContent).toBe("Level with mikem84's usual 8.3 \u00b7 Level with the course's 8.3 from 3 ratings");
   });
 
   it('does not render when neither figure exists', () => {
@@ -84,9 +82,9 @@ describe('calibration strip', () => {
     expect(q('[data-review-calibration]').length).toBe(0);
   });
 
-  it('figures are ink, never green or red', () => {
+  it('bold parts are ink, never green or red', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
-    q('[data-review-calibration-figure]').forEach((n) => {
+    q('[data-review-calibration] b').forEach((n) => {
       const c = (n as HTMLElement).style.color;
       expect(c).not.toBe('');
       const div = document.createElement('div');
@@ -104,23 +102,21 @@ describe('calibration strip', () => {
 
 describe('score row', () => {
   const row = () => document.body.querySelector('[data-review-score-row]') as HTMLElement;
-  it('sits below the comparison cards at three or more ratings, with no header overall, bars, ticks or key line', () => {
+  it('sits above the comparison sentence, with no header overall, bars, ticks or key line', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
     const cal = document.body.querySelector('[data-review-calibration]')!;
-    expect(cal.compareDocumentPosition(row()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(row().compareDocumentPosition(cal) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect([...row().querySelectorAll('[data-score-figure]')].map((n) => n.textContent)).toEqual(['8.3', '8.8', '8.7', '8.4', '6.5']);
     expect(q('[data-review-rating]').length).toBe(0);
     expect(q('[data-review-subscore-tick]').length).toBe(0);
     expect(q('[data-review-subscore-key]').length).toBe(0);
     expect(q('[data-review-subscore-track]').length).toBe(0);
   });
-  it.each([1, 2])('no bars and no ticks at %i rating(s); the first-rating note follows the row only at one', (n) => {
+  it.each([1, 2])('no bars, no ticks and no first-rating note at %i rating(s)', (n) => {
     sheet({ count: n, reviewerAvg: 7.6 });
     expect(q('[data-review-subscore-track]').length).toBe(0);
     expect(q('[data-review-subscore-tick]').length).toBe(0);
-    const note = document.body.querySelector('[data-review-subscore-first]');
-    if (n === 1) expect(row().closest('[data-review-score-container]')?.nextElementSibling).toBe(note);
-    else expect(note).toBeNull();
+    expect(document.body.querySelector('[data-review-subscore-first]')).toBeNull();
   });
   it('a null category drops its cell', () => {
     sheet({ count: 3, reviewerAvg: 7.6, breakdown: { ...FULL, clubhouse: null } });
@@ -131,9 +127,9 @@ describe('score row', () => {
 });
 
 describe('reviewer line', () => {
-  it('reads Reviewed n months ago and no avg', () => {
+  it('reads Reviewed n months ago with courses rated and no avg', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
-    expect(screen.getByText('Reviewed 9 months ago')).toBeTruthy();
+    expect(screen.getByText('Reviewed 9 months ago \u00b7 5 courses rated')).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/avg \d/);
   });
   it('never falls back to a join year', () => {
@@ -150,12 +146,13 @@ describe('see-all row and footer', () => {
     sheet({ count: 2, reviewerAvg: 7.6 });
     expect(screen.getByText('See all 2 ratings of Swinley Forest Golf Club')).toBeTruthy();
   });
-  it('share in the engagement row, player row has exactly two doors', () => {
+  it('share in the engagement row, the player row is one button with no doors', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
     const eng = document.body.querySelector('[data-review-engagement]')!;
     expect(eng.querySelector('[data-review-share]')).not.toBeNull();
     const playerRow = document.body.querySelector('[data-review-player-row]');
-    expect(playerRow?.querySelectorAll('button').length).toBe(2);
+    expect(playerRow?.tagName).toBe('BUTTON');
+    expect(playerRow?.querySelectorAll('button').length).toBe(0);
     expect(playerRow?.querySelector('[data-review-share]')).toBeNull();
     expect(playerRow?.textContent).toContain('mikem84');
     expect(document.body.querySelector('[data-review-foot-actions]')).toBeNull();

@@ -71,15 +71,14 @@ describe('review COURSE navigation', () => {
     const close = vi.fn();
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(<MemoryRouter><QueryClientProvider client={client}><ReviewBottomSheet isOpen onClose={close} user={{ id: 'member', name: 'Member' }} courseId="course" courseName="Course" rating={8} reviewId={reviewId} resolvedMedia={[]} resolvedReviewText="Review" /><LocationProbe /></QueryClientProvider></MemoryRouter>);
-    const playerRow = document.querySelector('[data-review-player-row]');
-    const courseButton = playerRow?.querySelector('[data-sheet-door="course"]');
+    const courseButton = document.querySelector('[data-review-sheet-course-name]')?.closest('button');
     expect(courseButton).toBeDefined();
-    if (!courseButton) throw new Error('Missing COURSE action');
+    if (!courseButton) throw new Error('Missing course name link');
     fireEvent.click(courseButton);
     expect(close).toHaveBeenCalledOnce();
     expect(fixture.closeFullscreen).toHaveBeenCalledOnce();
     expect(close.mock.invocationCallOrder[0]).toBeLessThan(fixture.closeFullscreen.mock.invocationCallOrder[0]);
-    expect(screen.getByTestId('location').textContent).toBe(`/courses/course?tab=reviews${reviewId ? '&highlight=r0' : ''}`);
+    expect(screen.getByTestId('location').textContent).toBe('/courses/course');
     expect(screen.getByTestId('location').textContent).not.toContain('review=');
   });
 });

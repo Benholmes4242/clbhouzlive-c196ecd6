@@ -43,7 +43,10 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, MapPin, Play, Share, User } from 'lucide-react';
+import { ChevronRight, Play, Share } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { activeTop100CourseIds, type Top100MembershipRow } from '@/components/courses/browse/playedRings';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
@@ -58,54 +61,33 @@ import { footerTapProbeEnabled, recordFooterTap } from './footerTapProbe';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { GLASS_CARD, GLASS_BACKDROP } from '@/lib/tokens/glass';
-import { SheetDoorButton } from '@/features/courses/_shared/scorecard/SheetDoorButton';
 import { LikedByRow } from '@/components/likes/LikedByRow';
-/* ReactionAction is now reached through RoundEngagementActions, which owns the
-   canonical comment+reaction pair; the direct import is gone, the module is not.
-   A REVIEW TAKES THE THUMB (kind="helpful"), not the heart: it is an opinion
-   with a score, and agreement is the useful signal on it. The verb stays
-   "like" — thumb and word agree — so LikedByRow below keeps no kind. */
-import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
-import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+/* REVIEW CARD REDESIGN — this sheet renders ReactionAction then CommentAction
+   directly (like, comment, share). RoundEngagementActions keeps its
+   comment-then-heart order for round surfaces. A REVIEW TAKES THE THUMB
+   (kind="helpful"); the verb stays "like", so LikedByRow keeps no kind. */
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
    prose, and body copy needs more separation than a label does. */
-/** BRIEF_REVIEW_SHEET_MEDIA_GRID §3 — first value chosen to bound sheet height. */
-export const REVIEW_MEDIA_GRID_CAP = 9;
+/** REVIEW CARD REDESIGN — two rows of three; the sixth carries "+N". */
+export const REVIEW_MEDIA_GRID_CAP = 6;
 
-/**
- * §1 — name only what is there. Photos and videos counted separately, each
- * part singular/plural on its own, a zero never printed. (AboutMediaStrip
- * always prints both parts — deliberately not copied.)
- */
-export function reviewMediaHeading(items: { mediaType: 'image' | 'video' }[]): string {
-  const videos = items.filter((m) => m.mediaType === 'video').length;
-  const photos = items.length - videos;
-  const parts: string[] = [];
-  if (photos > 0) parts.push(`${photos} ${photos === 1 ? 'PHOTO' : 'PHOTOS'}`);
-  if (videos > 0) parts.push(`${videos} ${videos === 1 ? 'VIDEO' : 'VIDEOS'}`);
-  return parts.join(' · ');
-}
-
-const CANVAS = SHEET_SURFACE;
-const BORDER = 'rgba(255,255,255,0.10)';
 const INK = '#F8FAFC';
-const BODY = 'rgba(248,250,252,0.72)';
+const BODY = 'rgba(248,250,252,0.82)';
 const MUTE = 'rgba(248,250,252,0.62)';
+const DIM = 'rgba(248,250,252,0.42)';
 /* The photo placeholder needs one step more fill than a hairline border; the
    fill is not brightened to compensate for the dark surface. */
 const TRACK = 'rgba(255,255,255,0.14)';
-const FONT_SF =
-  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 
 export interface ReviewBottomSheetProps {
@@ -161,16 +143,10 @@ export interface ReviewBottomSheetProps {
   reactionHidden?: boolean;
   /** G7.2(c) — comments_v2 target_type 'review', keyed on the review id. */
   commentCount?: number;
+  /** Accepted for caller compatibility; the redesigned card shows no comment preview. */
   commentPreview?: FeedCommentPreviewData | null;
 }
 
-const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
-const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
-  design: 'DESIGN',
-  conditions: 'CONDITIONS',
-  clubhouse: 'CLUBHOUSE',
-  facilities: 'FACILITIES',
-};
 
 /** §S.1 / §S.2 — one threshold for every comparison against the course. Below
  *  three ratings the course "average" is substantially this review. */
@@ -202,12 +178,11 @@ export function playedAgo(iso?: string | null, now: number = Date.now()): string
   return unit(Math.floor(d / 365), 'year');
 }
 
-const CATEGORY_AVG_FIELD = {
-  design: 'avg_design_score',
-  conditions: 'avg_condition_score',
-  clubhouse: 'avg_clubhouse_score',
-  facilities: 'avg_facilities_score',
-} as const;
+/** REVIEW CARD REDESIGN — "{|d|} above" / "{|d|} below" / "Level with", one decimal. */
+export function comparisonLead(delta: number): string {
+  if (Math.abs(delta) < 0.05) return 'Level with';
+  return `${Math.abs(Math.round(delta * 10) / 10).toFixed(1)} ${delta > 0 ? 'above' : 'below'}`;
+}
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
@@ -235,7 +210,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   onToggleReaction,
   reactionHidden = false,
   commentCount = 0,
-  commentPreview = null,
 }) => {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const navigate = useNavigate();
@@ -350,18 +324,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     navigate(getPublicProfilePath({ id: user.id, username: user.username }));
   }, [user.id, user.username, navigate, onClose, closeFullscreen]);
 
-  const handleGoToReview = useCallback(() => {
-    if (!courseId) return;
-    onClose();
-    closeFullscreen();
-    const url = reviewId
-      ? `/courses/${courseId}?tab=reviews&highlight=${reviewId}`
-      : `/courses/${courseId}?tab=reviews`;
-    navigate(url);
-  }, [courseId, reviewId, navigate, onClose, closeFullscreen]);
-
   /* CB69 — the title's course name: close the sheet, then fullscreen, then
-     CourseNameLink opens /courses/:courseId (handleGoToReview's order). */
+     CourseNameLink opens /courses/:courseId. */
   const handleCourseNameBeforeNavigate = useCallback(() => {
     onClose();
     closeFullscreen();
@@ -427,41 +391,39 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const mediaGrid = allMedia.slice(0, REVIEW_MEDIA_GRID_CAP);
   const hiddenCount = Math.max(0, mediaTotal - REVIEW_MEDIA_GRID_CAP);
 
-  /* §S.2 — all four columns whenever any category was scored; a skipped one
-     keeps an em dash and draws no track. The tick is the course's average for
-     THAT category, gated on the same threshold as the strip. */
-  const breakdownEntries = useMemo(() => {
-    if (!effectiveBreakdown) return [];
-    const any = BREAKDOWN_KEYS.some((k) => effectiveBreakdown[k] != null && !Number.isNaN(effectiveBreakdown[k] as number));
-    if (!any) return [];
-    return BREAKDOWN_KEYS.map((k) => {
-      const raw = effectiveBreakdown[k];
-      const value = raw == null || Number.isNaN(raw) ? null : raw;
-      const avgRaw = effectiveAggregate?.[CATEGORY_AVG_FIELD[k]];
-      const courseAvg = value != null && canCompareCourse && avgRaw != null && Number.isFinite(Number(avgRaw))
-        ? Number(avgRaw)
-        : null;
-      return { key: k, label: BREAKDOWN_LABELS[k], value, courseAvg };
-    });
-  }, [effectiveBreakdown, effectiveAggregate, canCompareCourse]);
-  const anyTick = breakdownEntries.some((e) => e.courseAvg != null);
-
   const metaSeg = playedAgo(reviewDate);
 
-  /* §S.1 — THE CALIBRATION STRIP. Two figures, never coloured. */
+  /* Comparison sentence — two plain clauses, never coloured. */
   const reviewerAvg = effectiveStats?.averageRating ?? null;
   const firstName = user.name.trim().split(/\s+/)[0] || user.name;
-  const ownFigure = rating != null && reviewerAvg != null ? formatDeviation(rating - reviewerAvg) : null;
-  const courseFigure = showReference && communityAvg != null ? formatDeviation(rating - communityAvg) : null;
-  const ownSub = reviewerAvg != null
-    ? <><InlineProMemberName userId={user.id}>{firstName}</InlineProMemberName>{` rates ${reviewerAvg.toFixed(1)}`}</>
-    : 'Too few reviews to average';
-  const courseSub = courseFigure != null
-    ? `${ratingCount} ratings, ${communityAvg!.toFixed(1)} average`
-    : ratingCount <= 1
-      ? 'First rating here'
-      : `${ratingCount} ratings so far`;
-  const showStrip = ownFigure != null || courseFigure != null;
+  const ownClause = rating != null && reviewerAvg != null
+    ? <><b style={{ fontWeight: 600, color: INK }}>{comparisonLead(rating - reviewerAvg)}</b>{` ${firstName}'s usual ${reviewerAvg.toFixed(1)}`}</>
+    : null;
+  const courseClause = showReference && communityAvg != null
+    ? <><b style={{ fontWeight: 600, color: INK }}>{comparisonLead(rating - communityAvg)}</b>{` the course's ${communityAvg.toFixed(1)} from ${ratingCount} ratings`}</>
+    : null;
+  const coursesRated = effectiveStats?.coursesRated ?? null;
+  const metaLine = [
+    metaSeg,
+    coursesRated ? `${coursesRated} ${coursesRated === 1 ? 'course' : 'courses'} rated` : null,
+  ].filter(Boolean).join(' \u00b7 ');
+
+  /* TOP 100 stamp — one read while open; loading or a failed read = no stamp. */
+  const top100Query = useQuery({
+    queryKey: ['courses', 'review-sheet-top100', courseId],
+    enabled: isOpen && !!courseId,
+    staleTime: 60_000,
+    queryFn: async (): Promise<boolean> => {
+      const { data, error } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id, top100_lists!inner(slug, is_active)')
+        .eq('course_id', courseId)
+        .eq('top100_lists.is_active', true);
+      if (error) throw error;
+      return activeTop100CourseIds((data ?? []) as unknown as Top100MembershipRow[]).has(courseId);
+    },
+  });
+  const onTop100 = top100Query.data === true;
 
   const paragraphs = useMemo(() => {
     if (!effectiveReviewText) return [];
@@ -519,103 +481,60 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               overflow: 'hidden',
               ...GLASS_CARD,
               color: INK,
-              fontFamily: FONT_SF,
+              containerType: 'inline-size',
               translate: `0 calc(-50% + ${dragY}px)`,
               willChange: cardAnimating ? 'transform, opacity' : 'auto',
             }}
           >
             <style>{`@media (prefers-reduced-motion: reduce) { [data-review-glass-card="true"] { transform: none !important; } }`}</style>
+            <style>{`[data-liked-stack-short]{display:none}@container (max-width:300px){[data-liked-stack-long]{display:none}[data-liked-stack-short]{display:inline}}`}</style>
             {/* ─── PINNED HEADER ─────────────────────────────── */}
-            <div
-              style={{
-                flex: '0 0 auto',
-                padding: '14px 18px',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              {/* Scorecard-shaped head: identity left, primary figure right. */}
-              <div data-review-sheet-header="true" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative', zIndex: 2 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h1
-                    id="review-sheet-title"
-                    style={{
-                      margin: 0,
-                      fontSize: 19,
-                      fontWeight: 800,
-                      letterSpacing: '-0.01em',
-                      lineHeight: 1.08,
-                      color: INK,
-                      // CB69 — no overflow clip here: it would clip the name's
-                      // 44px hit area; the ellipsis lives on the name itself.
-                      minWidth: 0,
-                    }}
+            <div style={{ flex: '0 0 auto', padding: '20px 20px 0', position: 'relative' }}>
+              <div data-review-sheet-header="true" style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
+                {(locationStr || onTop100) && (
+                  <div data-review-kicker="true" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                    {locationStr && (
+                      <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+                        {locationStr}
+                      </span>
+                    )}
+                    {onTop100 && (
+                      <span data-review-top100="true" style={{ flex: 'none', height: 18, padding: '0 7px', borderRadius: 5, border: '1px solid rgba(255,255,255,0.28)', display: 'inline-flex', alignItems: 'center', boxSizing: 'border-box', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', color: INK }}>
+                        TOP 100
+                      </span>
+                    )}
+                  </div>
+                )}
+                {/* CB69 — no overflow clip on the h1: it would clip the name's 44px hit area. */}
+                <h1 id="review-sheet-title" style={{ margin: 0, marginTop: 7, fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: INK, minWidth: 0 }}>
+                  <CourseNameLink
+                    as="div"
+                    courseId={courseId || null}
+                    onBeforeNavigate={handleCourseNameBeforeNavigate}
+                    textProps={{ 'data-review-sheet-course-name': 'true' }}
+                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
                   >
-                    <CourseNameLink
-                      as="div"
-                      courseId={courseId || null}
-                      onBeforeNavigate={handleCourseNameBeforeNavigate}
-                      style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      {courseName}
-                    </CourseNameLink>
-                  </h1>
+                    {courseName}
+                  </CourseNameLink>
+                </h1>
 
-                  {locationStr && (
-                    <div
-                      style={{
-                        marginTop: 2,
-                        fontSize: 12,
-                        lineHeight: 1.2,
-                        color: MUTE,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {locationStr}
-                    </div>
-                  )}
-                </div>
-
+                <button
+                  type="button"
+                  data-review-player-row="true"
+                  aria-label={`View ${user.name}'s profile`}
+                  onClick={handleGoToProfile}
+                  style={{ display: 'flex', alignItems: 'center', gap: 11, minHeight: 44, width: '100%', padding: 0, margin: '14px 0 0', border: 0, background: 'none', color: 'inherit', font: 'inherit', textAlign: 'left', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                >
+                  <SquircleAvatar size={36} src={user.avatar} alt={user.name} userId={user.id} fallback={initials} hairlineRing ringColor={DARK_HAIRLINE} />
+                  <span data-sheet-player-name="true" style={{ flex: 1, minWidth: 0, display: 'block' }}>
+                    <span style={{ display: 'block', fontSize: 15, fontWeight: 600, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={user.id}>{user.name}</InlineProMemberName></span>
+                    {metaLine && <span data-review-meta="true" style={{ display: 'block', marginTop: 2, fontSize: 12, lineHeight: 1.35, color: DIM }}>{metaLine}</span>}
+                  </span>
+                  <ChevronRight size={16} strokeWidth={2.2} color={DIM} aria-hidden style={{ flex: 'none' }} />
+                </button>
               </div>
 
-              <div data-review-player-row="true" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
-                <SquircleAvatar size={28} src={user.avatar} alt={user.name} userId={user.id} fallback={initials} hairlineRing ringColor={DARK_HAIRLINE} />
-                <div data-sheet-player-name="true" style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={user.id}>{user.name}</InlineProMemberName></div>
-                  {metaSeg && <div style={{ marginTop: 2, fontSize: 12, color: BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{metaSeg}</div>}
-                </div>
-                {(courseId || user.id) && <div data-sheet-doors="true" style={{ display: 'flex', gap: 6, flex: 'none' }}>
-                  {courseId && <SheetDoorButton door="course" label={t('courses:scorecard.viewCourse')} icon={MapPin} onClick={handleGoToReview} />}
-                  {user.id && <SheetDoorButton door="profile" label={t('courses:scorecard.viewProfile')} icon={User} onClick={handleGoToProfile} />}
-                </div>}
-              </div>
-
-              {/* §S.1 — THE CALIBRATION STRIP. Both cells always, or none: two
-                  em dashes side by side say nothing. NEITHER FIGURE IS COLOURED —
-                  a deviation is not a verdict, and green here means 9.0+. */}
-              {showStrip && (
-                <div data-review-calibration="true" style={{ display: 'flex', gap: 9, marginTop: 13 }}>
-                  {[
-                    { key: 'own', label: 'Against their own', figure: ownFigure, sub: ownSub },
-                    { key: 'course', label: 'Against this course', figure: courseFigure, sub: courseSub },
-                  ].map((c) => (
-                    <div
-                      key={c.key}
-                      data-review-calibration-cell={c.key}
-                      style={{ flex: 1, minWidth: 0, background: A.SOFT, border: `1px solid ${BORDER}`, borderRadius: 11, padding: '9px 10px' }}
-                    >
-                      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</div>
-                      <div data-review-calibration-figure style={{ marginTop: 3, fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', color: INK }}>{c.figure ?? '\u2014'}</div>
-                      <div style={{ marginTop: 2, fontSize: 10, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.sub}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* §S.2 — the shared review score row (signed-off mock), below the
-                  comparison cards; the first-rating note sits directly under it. */}
+              {/* Shared review score row (signed-off mock), unchanged. */}
               <ReviewScoreRow
                 style={{ marginTop: 16 }}
                 overall={rating ?? null}
@@ -626,12 +545,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   facilities: effectiveBreakdown?.facilities ?? null,
                 }}
               />
-              {breakdownEntries.length > 0 && !anyTick && ratingCount === 1 && (
-                <div data-review-subscore-first style={{ marginTop: 10, fontSize: 10.5, color: A.DIM }}>
-                  No course average yet &mdash; this is the first rating here.
-                </div>
-              )}
 
+              {(ownClause || courseClause) && (
+                <p data-review-calibration="true" style={{ margin: 0, marginTop: 14, fontSize: 12.5, lineHeight: 1.45, color: MUTE, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  {ownClause}
+                  {ownClause && courseClause ? ' \u00b7 ' : null}
+                  {courseClause}
+                </p>
+              )}
             </div>
 
             {/* ─── SCROLL REGION ──────────────────────────────── */}
@@ -643,7 +564,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 overflowX: 'hidden',
                 overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
-                padding: '4px 18px 16px',
+                padding: '18px 20px 8px',
                 minHeight: 0,
               }}
             >
@@ -655,12 +576,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 <div
                   style={{
                     fontSize: 15,
-                    lineHeight: 1.6,
+                    lineHeight: 1.55,
                     color: MUTE,
-                    padding: '6px 0',
                   }}
                 >
-                  No written review — the score speaks for itself.
+                  No written review. The score speaks for itself.
                 </div>
               ) : (
                 paragraphs.map((para, i) => (
@@ -670,49 +590,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     text={para}
                     style={{
                       fontSize: 15,
-                      lineHeight: 1.6,
+                      lineHeight: 1.55,
                       color: BODY,
                       margin: 0,
-                      marginBottom: i === paragraphs.length - 1 ? 0 : 14,
+                      marginBottom: i === paragraphs.length - 1 ? 0 : 12,
                     }}
                   />
                 ))
               )}
-
-              {/* §S.5 — the next question after one opinion is everyone else's.
-                  At one rating there is nothing else to see. */}
-              {courseId && ratingCount >= 2 && (
-                <button
-                  type="button"
-                  data-review-see-all="true"
-                  onClick={handleSeeAll}
-                  style={{
-                    marginTop: 16,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 10,
-                    border: `1px solid ${BORDER}`,
-                    borderRadius: 11,
-                    padding: '11px 13px',
-                    background: 'transparent',
-                    color: INK,
-                    fontFamily: FONT_SF,
-                    fontSize: 12.5,
-                    fontWeight: 700,
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    WebkitTapHighlightColor: 'transparent',
-                  }}
-                >
-                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {`See all ${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'} of ${courseName}`}
-                  </span>
-                  <ChevronRight size={15} strokeWidth={2} color={MUTE} aria-hidden style={{ flexShrink: 0 }} />
-                </button>
-              )}
-
 
               {/* MEDIA STRIP (§3c) — up to three thumbnails, 78 tall, r12.
                   INTERACTIVE: each tile is a real button that opens the
@@ -722,21 +607,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   autoplays here. */}
               {mediaGrid.length > 0 && (
                 <div style={{ marginTop: 16 }}>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      letterSpacing: '0.12em',
-                      color: MUTE,
-                      textTransform: 'uppercase',
-                      marginBottom: 6,
-                    }}
-                  >
-                    {reviewMediaHeading(allMedia)}
-                  </div>
-                  {/* GRID (BRIEF_REVIEW_SHEET_MEDIA_GRID §2). Last row stays ragged:
-                      tiles keep their column width, never stretch. */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                  {/* Square three-wide grid; the grid owns the rounded corners. */}
+                  <div data-review-media-grid="true" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 4, borderRadius: 14, overflow: 'hidden' }}>
                     {mediaGrid.map((m, i) => {
                       // §4a — index off allMedia explicitly, not the rendered slice.
                       const index = allMedia.indexOf(m);
@@ -776,10 +648,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         }}
                         style={{
                           minWidth: 0,
-                          height: 78,
+                          aspectRatio: '1 / 1',
                           padding: 0,
                           border: 'none',
-                          borderRadius: 12,
+                          borderRadius: 0,
                           overflow: 'hidden',
                           background: TRACK,
                           position: 'relative',
@@ -813,8 +685,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           >
                             <div
                               style={{
-                                width: 26,
-                                height: 26,
+                                width: 28,
+                                height: 28,
                                 borderRadius: 999,
                                 background: 'rgba(14,18,22,0.55)',
                                 display: 'flex',
@@ -833,7 +705,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                             style={{
                               position: 'absolute',
                               inset: 0,
-                              background: 'rgba(10,10,12,0.66)',
+                              background: 'rgba(10,10,12,0.62)',
                               color: '#FFFFFF',
                               fontSize: 15,
                               fontWeight: 700,
@@ -851,6 +723,20 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   </div>
                 </div>
               )}
+              {/* §S.5 — every rating of the course; at one rating there is nothing else to see. */}
+              {courseId && ratingCount >= 2 && (
+                <button
+                  type="button"
+                  data-review-see-all="true"
+                  onClick={handleSeeAll}
+                  style={{ marginTop: 18, minHeight: 44, width: '100%', display: 'flex', alignItems: 'center', gap: 4, border: 'none', padding: 0, background: 'transparent', color: INK, font: 'inherit', fontSize: 13.5, fontWeight: 600, textAlign: 'left', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                >
+                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {`See all ${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'} of ${courseName}`}
+                  </span>
+                  <ChevronRight size={14} strokeWidth={2.4} color={MUTE} aria-hidden style={{ flexShrink: 0 }} />
+                </button>
+              )}
               {/* §S.4 — the text runs UNDER the boundary rather than stopping
                   dead at it. Sticky, so it holds the bottom edge while scrolling;
                   no clamp, no "read more" — this sheet is the full review. */}
@@ -859,11 +745,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 data-review-scroll-fade="true"
                 style={{
                   position: 'sticky',
-                  bottom: -16,
-                  height: 46,
-                  marginTop: -30,
-                  marginLeft: -18,
-                  marginRight: -18,
+                  bottom: -8,
+                  height: 28,
+                  marginTop: -28,
+                  marginLeft: -20,
+                  marginRight: -20,
                   pointerEvents: 'none',
                   background: `linear-gradient(to bottom, transparent, ${GLASS_CARD.background})`,
                 }}
@@ -871,67 +757,53 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             </div>
 
 
-            {/* ─── PINNED FOOTER ─────────────────────────────── */}
+            {/* ─── PINNED FOOTER — one 44px row: like, comment, share; likers right. */}
             <div
               ref={footerRef}
-              style={{
-                flex: '0 0 auto',
-                padding: '10px 18px calc(env(safe-area-inset-bottom, 0px) + 14px)',
-                borderTop: `1px solid ${BORDER}`,
-              }}
-
+              data-review-engagement="true"
+              style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, padding: '2px 12px calc(env(safe-area-inset-bottom, 0px) + 10px)' }}
             >
-              {/* G7.2(c) — THE SAME PAIR THE ROUND CARRIES, through the same
-                  component, so the two feet read as one object. Both glyphs are
-                  bare at zero, so a review with nothing on it can still take its
-                  first like and its first comment. */}
-              {/* §S.6 — share sits in the engagement row, as everywhere else. */}
-              {reviewId && (onToggleReaction || courseId) && (
-                <div data-review-engagement="true" style={{ marginBottom: 2, display: 'flex', alignItems: 'center', gap: 12 }}>
-                  {onToggleReaction && (
-                    <RoundEngagementActions
-                      comment={{
-                        count: commentCount,
-                        label: t('scorecard.commentReview', 'Comment on this review'),
-                        onOpen: () => setCommentsOpen(true),
-                      }}
-                      like={{
-                        count: reactionCount,
-                        reacted: reactionMine,
-                        onToggle: onToggleReaction,
-                        label: t('scorecard.likeReview', 'Like this review'),
-                        hidden: reactionHidden,
-                      }}
-                      kind="helpful"
-                    />
-                  )}
-                  {courseId && (
-                    <button
-                      type="button"
-                      data-review-share="true"
-                      aria-label="Share this review"
-                      onClick={handleShare}
-                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 32, minHeight: 32, padding: 0, background: 'none', border: 0, color: MUTE, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
-                    >
-                      <Share size={15} strokeWidth={1.75} />
-                    </button>
-                  )}
-                </div>
-              )}
-              {/* CB56 — content-sized bottom sheet: a growing line would lift its top edge. */}
-              {reviewId && (
-                <LikedByRow reserve postId={reviewId} count={reactionCount} source="review" subject={{ authorName: user.name || null, courseId: courseId ?? null, courseName: courseName ?? null, kind: 'review', gross: null, toPar: null, rating: rating ?? null }} surfaceColor={CANVAS} style={{ marginBottom: 8 }} />
-              )}
-              {reviewId && commentCount > 0 && commentPreview && (
-                <div style={{ marginBottom: 8 }}>
-                  <FeedCommentPreview
-                    preview={commentPreview}
-                    commentCount={commentCount}
-                    onOpenComments={() => setCommentsOpen(true)}
-                    topRule={false}
-                    padding="0"
+              {reviewId && onToggleReaction && (
+                <>
+                  <ReactionAction
+                    hidden={reactionHidden}
+                    count={reactionCount}
+                    reacted={reactionMine}
+                    onToggle={onToggleReaction}
+                    label={t('scorecard.likeReview', 'Like this review')}
+                    size={19}
+                    kind="helpful"
+                    footerBox={{ color: MUTE, reactedColor: INK }}
                   />
-                </div>
+                  <CommentAction
+                    count={commentCount}
+                    onOpen={() => setCommentsOpen(true)}
+                    label={t('scorecard.commentReview', 'Comment on this review')}
+                    size={19}
+                    footerBox={{ color: MUTE }}
+                  />
+                </>
+              )}
+              {reviewId && courseId && (
+                <button
+                  type="button"
+                  data-review-share="true"
+                  aria-label="Share this review"
+                  onClick={handleShare}
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none', width: 44, height: 44, padding: 0, background: 'none', border: 0, color: MUTE, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                >
+                  <Share size={18} strokeWidth={1.9} />
+                </button>
+              )}
+              {reviewId && (
+                <LikedByRow
+                  variant="stack"
+                  postId={reviewId}
+                  count={reactionCount}
+                  source="review"
+                  subject={{ authorName: user.name || null, courseId: courseId ?? null, courseName: courseName ?? null, kind: 'review', gross: null, toPar: null, rating: rating ?? null }}
+                  surfaceColor={GLASS_CARD.background as string}
+                />
               )}
             </div>
           </motion.div>

@@ -18,7 +18,6 @@ vi.mock('@/features/courses/_shared/scorecard/ScorecardGlassOverlay', () => ({ S
 
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
-import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
 const i18n = createInstance();
 void i18n.init({ lng: 'en', resources: { en: { courses } }, interpolation: { escapeValue: false } });
@@ -26,7 +25,6 @@ function mount(node: React.ReactNode) {
   return render(<MemoryRouter><I18nextProvider i18n={i18n}>{node}</I18nextProvider></MemoryRouter>);
 }
 const round = { open: true, onClose: vi.fn(), eyebrowText: '', courseName: 'Course', playerName: 'Christopher Montgomerie-Smith', playerUserId: 'member', holes: [], presentation: 'page' as const };
-const review = { isOpen: true, onClose: vi.fn(), courseId: 'course', courseName: 'Course', rating: 9.6, user: { id: 'member', name: 'Christopher Montgomerie-Smith' }, resolvedMedia: [], resolvedReviewText: 'Review' };
 afterEach(cleanup);
 
 describe('CB61 player-row doors', () => {
@@ -63,22 +61,6 @@ describe('CB61 player-row doors', () => {
     mount(<CardScorecardSheet {...round} surface="tour" onViewCourse={vi.fn()} onViewProfile={vi.fn()} />);
     expect(document.querySelector('[data-scorecard-exit-links]')).toBeNull();
     expect(Array.from(document.querySelectorAll('[data-sheet-door]')).map(n => n.getAttribute('data-sheet-door'))).toEqual(['course', 'profile']);
-  });
-  it('review doors render in the player row with no foot actions', () => {
-    mount(<ReviewBottomSheet {...review} />);
-    const row = document.querySelector('[data-review-player-row]');
-    expect(Array.from(row?.querySelectorAll('[data-sheet-door]') ?? []).map(n => n.getAttribute('data-sheet-door'))).toEqual(['course', 'profile']);
-    expect(document.querySelector('[data-review-foot-actions]')).toBeNull();
-  });
-  it('review omits Course entirely without a course id', () => {
-    mount(<ReviewBottomSheet {...review} courseId="" />);
-    expect(document.querySelector('[data-sheet-door="course"]')).toBeNull();
-    expect(document.querySelector('[data-sheet-door="profile"]')).not.toBeNull();
-  });
-  it('review omits Profile entirely without a user id', () => {
-    mount(<ReviewBottomSheet {...review} user={{ id: '', name: 'Member' }} />);
-    expect(document.querySelector('[data-sheet-door="profile"]')).toBeNull();
-    expect(document.querySelector('[data-sheet-door="course"]')).not.toBeNull();
   });
   it('swipe preview doors are aria-hidden spans without handlers or focus targets', () => {
     mount(<RoundPagePreview seed={{ scoreId: 'round', courseName: 'Course', playerName: round.playerName, gross: 78, toPar: 6, holes: [] }} />);

@@ -53,6 +53,10 @@ interface Props {
    *  on a meta line with tappable content directly above it: a centred box
    *  there reaches into the title and steals the card's own tap. */
   hitBias?: 'center' | 'down';
+  /** OPT-IN (ReviewBottomSheet footer only): a laid-out 44px box (padding 0 8,
+   *  gap 6, 13.5px/600 count) in the given colours instead of the zero-footprint
+   *  hit area; reacted takes reactedColor. Unset keeps every other caller as is. */
+  footerBox?: { color: string; reactedColor: string };
 }
 
 export function ReactionAction({
@@ -68,8 +72,30 @@ export function ReactionAction({
   reserveCount = false,
   kind = 'like',
   hitBias = 'center',
+  footerBox,
 }: Props) {
   if (hidden) return null;
+  if (footerBox && !readOnly) {
+    const c = reacted ? footerBox.reactedColor : footerBox.color;
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        aria-label={label}
+        aria-pressed={reacted}
+        data-footer-action="like"
+        onClick={(ev: React.MouseEvent) => { ev.stopPropagation(); ev.preventDefault(); onToggle(); }}
+        onKeyDown={(ev: React.KeyboardEvent) => {
+          if (ev.key !== 'Enter' && ev.key !== ' ') return;
+          ev.stopPropagation(); ev.preventDefault(); onToggle();
+        }}
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none', boxSizing: 'border-box', height: 44, minWidth: 44, padding: '0 8px', gap: 6, color: c, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+      >
+        <ReactionGlyph reacted={reacted} size={sizeProp ?? 19} color={c} />
+        {count > 0 && <span style={{ ...FIGS, fontSize: 13.5, fontWeight: 600, lineHeight: 1, color: c }}>{count}</span>}
+      </span>
+    );
+  }
   // DEFAULT stays 15 for every heart; a celebrate with no explicit size takes
   // the shared constant (lib/reactionKind) and its count scales with it.
   const celebrateDefault = kind === 'celebrate' && sizeProp == null;

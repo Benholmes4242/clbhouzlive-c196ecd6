@@ -26,6 +26,8 @@ interface Props {
   figureSize?: number;
   /** Reserve the count column so glyphs line up down a column. */
   reserveCount?: boolean;
+  /** OPT-IN (ReviewBottomSheet footer only): laid-out 44px box, gap 6, 13.5px/600 count. */
+  footerBox?: { color: string };
 }
 
 export function CommentAction({
@@ -37,8 +39,28 @@ export function CommentAction({
   size = 15,
   figureSize = 11.5,
   reserveCount = false,
+  footerBox,
 }: Props) {
   if (hidden) return null;
+  if (footerBox) {
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        aria-label={label}
+        data-footer-action="comment"
+        onClick={(ev: React.MouseEvent) => { ev.stopPropagation(); ev.preventDefault(); onOpen(); }}
+        onKeyDown={(ev: React.KeyboardEvent) => {
+          if (ev.key !== 'Enter' && ev.key !== ' ') return;
+          ev.stopPropagation(); ev.preventDefault(); onOpen();
+        }}
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none', boxSizing: 'border-box', height: 44, minWidth: 44, padding: '0 8px', gap: 6, color: footerBox.color, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+      >
+        <MessageCircle size={size} strokeWidth={1.9} color={footerBox.color} fill="none" aria-hidden />
+        {count > 0 && <span className="tabular-nums" style={{ ...FIGS, fontSize: 13.5, fontWeight: 600, lineHeight: 1, color: footerBox.color }}>{count}</span>}
+      </span>
+    );
+  }
 
   const glass = tone === 'glass';
   const color = glass ? WHITE_72 : A.MUTE;

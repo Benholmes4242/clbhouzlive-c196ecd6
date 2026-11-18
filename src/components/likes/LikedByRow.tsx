@@ -84,6 +84,11 @@ export interface LikedByRowProps {
    *  nothing above or below moves. aria-hidden, no tap target. Default off:
    *  without it zero still renders nothing. */
   reserve?: boolean;
+  /** REVIEW CARD REDESIGN — opt-in 'stack': up to three 22px faces then
+   *  "Tom", "Tom and Amy" or "Tom and 3 others" ("+3" in a ≤300px container,
+   *  via [data-liked-stack-long]/[data-liked-stack-short] rules the host
+   *  declares). Nothing at zero, no reserve. Same likers read and LikesSheet. */
+  variant?: 'line' | 'stack';
 }
 
 export function LikedByRow({
@@ -102,6 +107,7 @@ export function LikedByRow({
   subject = null,
   color = 'rgba(248,250,252,0.65)',
   reserve = false,
+  variant = 'line',
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
@@ -147,6 +153,48 @@ export function LikedByRow({
     return () => window.clearTimeout(id);
   }, [count, shown, reserve]);
   const n = count > 0 ? count : lastCountRef.current;
+
+  if (variant === 'stack') {
+    if (!postId || count <= 0) return null;
+    const first = likerFirstNames(likers, 2);
+    const long = first.length === 0
+      ? ''
+      : count === 1
+        ? first[0]
+        : count === 2 && first.length === 2
+          ? `${first[0]} and ${first[1]}`
+          : `${first[0]} and ${(count - 1).toLocaleString()} other${count - 1 === 1 ? '' : 's'}`;
+    const slots = Math.min(count, 3);
+    return (
+      <>
+        <button
+          type="button"
+          data-liked-by-stack="true"
+          onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
+          style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 8px', minWidth: 0, border: 0, background: 'none', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', ...style }}
+        >
+          <span aria-hidden="true" style={{ display: 'flex', flex: 'none' }}>
+            {Array.from({ length: slots }, (_, i) => {
+              const liker = isLoading ? undefined : likers[i];
+              const ring: React.CSSProperties = { display: 'block', flex: 'none', width: 22, height: 22, boxSizing: 'content-box', borderRadius: '34%', border: `2px solid ${surfaceColor}`, marginLeft: i === 0 ? 0 : -7, position: 'relative', zIndex: 3 - i };
+              if (!liker) return <span key={i} data-liked-stack-face="true" style={{ ...ring, background: getAvatarFallbackGradient(null) }} />;
+              return (
+                <span key={i} data-liked-stack-face="true" style={ring}>
+                  <SquircleAvatar size={22} src={liker.avatarUrl} alt={liker.displayName ?? ''} userId={liker.actorId ?? liker.userId} fallback={getInitialsFromName(liker.displayName ?? '')} />
+                </span>
+              );
+            })}
+          </span>
+          {long && <span data-liked-stack-long="true" style={{ minWidth: 0, fontSize: 12, color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{long}</span>}
+          {count > 1 && <span data-liked-stack-short="true" style={{ minWidth: 0, fontSize: 12, color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{`+${(count - 1).toLocaleString()}`}</span>}
+        </button>
+        <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} style={{ display: 'contents' }}>
+          <LikesSheet open={open} onClose={() => setOpen(false)} postId={postId} count={count} source={source} kind={kind} subject={subject} />
+        </span>
+      </>
+    );
+  }
 
   /* ONE style for the row and its reserved box, so the two match in height by
      construction: same element style, same minHeight, same text line. */

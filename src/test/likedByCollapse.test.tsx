@@ -110,7 +110,6 @@ describe('the fixed-layout sheets keep the reserve at zero', () => {
   const read = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8');
   it.each([
     'components/fullscreen-feed/ImmersiveFullscreenChrome.tsx',
-    'components/posts/ReviewBottomSheet.tsx',
     'features/courses/_shared/scorecard/CardScorecardSheet.tsx',
   ])('%s still passes reserve to LikedByRow', (p) => {
     expect(read(p)).toMatch(/<LikedByRow[\s\S]{0,900}?\breserve\b/);
