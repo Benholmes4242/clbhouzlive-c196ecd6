@@ -68,6 +68,7 @@ import { LikedByRow } from '@/components/likes/LikedByRow';
    comment-then-heart order for round surfaces. A REVIEW TAKES THE THUMB
    (kind="helpful"); the verb stays "like", so LikedByRow keeps no kind. */
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
@@ -773,7 +774,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     label={t('scorecard.likeReview', 'Like this review')}
                     size={19}
                     kind="helpful"
-                    footerBox={{ color: MUTE, reactedColor: INK }}
+                    footerBox={{ color: MUTE, reactedColor: A.AMBER }}
                   />
                   <CommentAction
                     count={commentCount}

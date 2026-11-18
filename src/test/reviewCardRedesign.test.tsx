@@ -139,3 +139,23 @@ describe('review card redesign', () => {
     expect(src).not.toMatch(/fontFamily/);
   });
 });
+
+describe('review card liked thumb colour', () => {
+  it('liked uses the shared amber like token; unliked stays MUTE', async () => {
+    const { ReactionAction } = await import('@/components/explore-tab-new/courseled/ReactionAction');
+    const { A } = await import('@/components/explore-tab-new/courseled/tokens');
+    const src = readFileSync(resolve(process.cwd(), 'src/components/posts/ReviewBottomSheet.tsx'), 'utf8');
+    expect(src).toContain('footerBox={{ color: MUTE, reactedColor: A.AMBER }}');
+    const MUTE = 'rgba(248,250,252,0.62)';
+    const box = { color: MUTE, reactedColor: A.AMBER };
+    const liked = render(<ReactionAction count={2} reacted onToggle={() => {}} label="like" footerBox={box} />);
+    const a = liked.container.querySelector('[data-footer-action="like"]') as HTMLElement;
+    const amber = document.createElement('i'); amber.style.color = A.AMBER;
+    expect(a.style.color).toBe(amber.style.color);
+    liked.unmount();
+    const idle = render(<ReactionAction count={2} reacted={false} onToggle={() => {}} label="like" footerBox={box} />);
+    const b = idle.container.querySelector('[data-footer-action="like"]') as HTMLElement;
+    const mute = document.createElement('i'); mute.style.color = MUTE;
+    expect(b.style.color).toBe(mute.style.color);
+  });
+});
