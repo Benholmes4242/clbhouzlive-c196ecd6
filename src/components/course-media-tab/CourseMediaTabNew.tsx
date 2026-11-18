@@ -43,6 +43,7 @@ import { memberTagConfirmation } from '@/lib/courseMedia/holeTagConfirmation';
 import { toast } from 'sonner';
 import { CoursePhotoRetagPicker, CourseMediaNoShots, CourseMediaNotLive } from './CourseMediaEmptyStates';
 import { useAddShotFlow } from './CourseMediaAddShot';
+import { linkedGalleryFilter } from '@/lib/courseMedia/courseGallery';
 
 interface CourseMediaTabNewProps {
   courseId: string;
@@ -73,6 +74,9 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const deepLinkFocused = useRef(false);
   const linkedHole = searchParams.get('hole');
   const linkedShot = searchParams.get('shot');
+  // Grid Share links carry ?filter=; consumed once with the same deep-link gate as ?shot=.
+  const rawLinkedFilter = searchParams.get('filter');
+  const linkedFilter = linkedGalleryFilter(rawLinkedFilter);
   const [fastPending, setFastPending] = useState(false);
   const [fastError, setFastError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -196,12 +200,12 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     holeTags: tagging.tags.data ?? [], placeTags: places.tags.data ?? [], pagePosts: posts,
     tagsReady: tagging.tags.isSuccess && places.tags.isSuccess });
   useEffect(() => {
-    if (deepLinkFocused.current || !linkedShot && !linkedHole || !tagging.tags.isSuccess || !places.tags.isSuccess || !analysis.isSuccess) return;
+    if (deepLinkFocused.current || !linkedShot && !linkedHole && !rawLinkedFilter || !tagging.tags.isSuccess || !places.tags.isSuccess || !analysis.isSuccess) return;
     if (linkedHole && !knownHoles?.includes(Number(linkedHole))) return;
     deepLinkFocused.current = true;
     const origin = gridRef.current ?? document.querySelector<HTMLElement>('.hole-walk');
-    void openGallery(linkedHole ? 'holes' : 'all', linkedShot ?? undefined, origin, 'deep-link', linkedHole ? Number(linkedHole) : undefined);
-  }, [linkedHole, linkedShot, tagging.tags.isSuccess, places.tags.isSuccess, analysis.isSuccess, knownHoles, openGallery]);
+    void openGallery(linkedHole ? 'holes' : linkedFilter ?? 'all', linkedShot ?? undefined, origin, 'deep-link', linkedHole ? Number(linkedHole) : undefined);
+  }, [linkedHole, linkedShot, rawLinkedFilter, linkedFilter, tagging.tags.isSuccess, places.tags.isSuccess, analysis.isSuccess, knownHoles, openGallery]);
 
   if (!user) {
     return (

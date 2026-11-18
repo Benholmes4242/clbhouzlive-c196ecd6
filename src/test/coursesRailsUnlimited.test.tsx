@@ -153,12 +153,12 @@ describe('loaded holes run and refresh', () => {
   });
   it('admin hole-tag predicate invalidation refetches the active infinite holes rail', async () => {
     pages = [page(spec, 0, 3)]; const view = mount(spec, true);
-    await waitFor(() => expect(cards(view, spec)).toHaveLength(3));
-    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' }));
+    await waitFor(() => expect(cards(view, spec)).toHaveLength(3), { timeout: 5000 });
+    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' }, { timeout: 5000 }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     pages = [page(spec, 50, 3)];
     fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
-    await screen.findByRole('button', { name: 'Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026', hidden: true });
+    await screen.findByRole('button', { name: 'Hole 4, Course 50, Par 4, 400 yards, Member · Oct 2026', hidden: true }, { timeout: 5000 });
     expect(requests(spec)).toHaveLength(2);
     expect(f.rpc).toHaveBeenCalledWith('admin_tag_hole_media', { p_course_id: 'course', p_media_id: 'untagged', p_hole_no: 4 });
     expect(view.cache.getQueryData(['gam_rpc', spec.name, 'infinite', 'admin', false])).toMatchObject({ pages });

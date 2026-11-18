@@ -9,6 +9,12 @@ import { COURSE_PLACES, type CoursePlace } from './places';
 import { holeOrdinal } from './holeWalk';
 
 export type GalleryFilter = 'all' | 'holes' | CoursePlace;
+/** ?filter= on the Media tab: a known gallery filter, else null (the default applies). */
+export function linkedGalleryFilter(raw: string | null | undefined): GalleryFilter | null {
+  if (!raw) return null;
+  if (raw === 'all' || raw === 'holes') return raw;
+  return COURSE_PLACES.some(place => place.id === raw) ? raw as GalleryFilter : null;
+}
 export interface CourseGalleryOptions { courseId: string; courseName: string; filter: GalleryFilter; startShotId?: string }
 export interface GalleryShot {
   id: string; item: MediaItem; post: FeedPost; ownerId: string; name: string; avatar: string; addedAt: string;

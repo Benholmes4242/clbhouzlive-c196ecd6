@@ -15,3 +15,9 @@
 - `src/test/coursesRailsUnlimited.test.tsx` › "loaded holes run and refresh › admin hole-tag predicate invalidation refetches the active infinite holes rail" failed in shard 1 (2,225 passed, 1 failed of 2,226) after 7,434 ms. The error text was not captured on the failing run.
 - Same shard rerun: passed (4,664 ms). Isolated: 15/15 passed (1,837 ms).
 - Untouched file; this is the same test previously accepted once. Timing points to a load-sensitive wait. Shards 2–4 not run.
+
+## Follow-up run (flaky-wait fix + gallery filter link)
+- coursesRailsUnlimited.test.tsx: only the three authorised `{ timeout: 5000 }` additions (lines 156, 157, 161). Passed in shard 1.
+- Media tab consumes `?filter=` once through the same deep-link gate as `?shot=` (`linkedGalleryFilter` in courseGallery.ts; unknown → default 'all'). Note: `?shot=` is not cleared from the URL today (a one-shot ref only), so `?filter=` follows the same and is not cleared either. Test added in canonicalGalleryChrome.test.tsx.
+- Shards: 1 = 2,226 passed, 2 = 2,258 passed, 3 = 2,282 passed, 4 STOPPED: 4 failures in `src/test/reviewReceiptNextCourse.test.tsx`, all `TestingLibraryElementError: Unable to find an element by: [data-testid="receipt-score-card"]` (~1,035–1,159 ms each), with unhandled `TypeError: media.discardRemovals is not a function`. Isolated rerun: same 4 failures (deterministic).
+- Cause: REVIEW_EDITOR_SAFETY. The test's partial mock of useReviewMediaPipeline (line 16) lacks commitRemovals / discardRemovals / pendingRemovals, so the submit throws. Not edited; awaiting ruling.

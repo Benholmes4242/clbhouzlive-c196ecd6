@@ -6,7 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import type { PlaceMedia } from '@/components/course-media-tab/hooks/useCoursePlaceMedia';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { filteredGallery, galleryPost, galleryShots, type GalleryFilter } from '@/lib/courseMedia/courseGallery';
+import { filteredGallery, galleryPost, galleryShots, linkedGalleryFilter, type GalleryFilter } from '@/lib/courseMedia/courseGallery';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 const f = vi.hoisted(() => ({ viewer: 'me' as string | undefined, admin: false }));
@@ -98,5 +98,14 @@ describe('canonical course gallery chrome', () => {
     const css = readFileSync('src/components/fullscreen-feed/course-gallery.css', 'utf8');
     const tsx = readFileSync('src/components/fullscreen-feed/CourseGalleryChrome.tsx', 'utf8');
     for (const src of [css, tsx]) { expect(src).not.toMatch(/amber/i); expect(src).not.toMatch(/F7931E/i); }
+  });
+  it('a ?filter= landing opens on that filter; an unknown value falls back to the default', () => {
+    let view = mount(linkedGalleryFilter('holes') ?? 'all', 'h');
+    expect(screen.getByRole('button', { name: 'Holes 1' }).getAttribute('aria-pressed')).toBe('true');
+    cleanup();
+    expect(linkedGalleryFilter('nonsense')).toBeNull();
+    view = mount(linkedGalleryFilter('nonsense') ?? 'all', 'h');
+    expect(screen.getByRole('button', { name: 'All 3' }).getAttribute('aria-pressed')).toBe('true');
+    expect(view.container.querySelector('[data-gallery-filter]')?.getAttribute('data-gallery-filter')).toBe('all');
   });
 });
