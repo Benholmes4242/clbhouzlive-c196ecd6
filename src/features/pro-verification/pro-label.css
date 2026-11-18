@@ -8,8 +8,8 @@
 /* WebKit line-clamp must not contain atomic inline-flex/inline-block name boxes. */
 .pro-inline-name[data-flow="text"] { display:inline; }
 .pro-inline-name[data-flow="text"] .pro-inline-text { display:inline; white-space:normal; overflow:visible; }
-.pro-inline-name[data-flow="text"] .pro-label { display:inline; height:auto; padding:1px 5px; vertical-align:2px; overflow:visible; margin-left:4px; }
-.pro-inline-name[data-flow="text"] .pro-label .pro-label-text { font-size:7.5px; }
+.pro-inline-name[data-flow="text"] .pro-label { display:inline; height:auto; font-size:7.5px; line-height:1; padding:2.5px 5px; vertical-align:3px; overflow:visible; margin-left:4px; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
+.pro-inline-name[data-flow="text"] .pro-label .pro-label-text { display:inline; font-size:7.5px; }
 .pro-identity-row, .profile-creator-identity { display:flex; align-items:center; flex-wrap:wrap; column-gap:7px; row-gap:6px; min-width:0; }
 .pro-identity-row > h1, .profile-creator-identity > h1 { flex:0 1 auto; min-width:0; max-width:100%; }
 .identity-badges { display:inline-flex; align-items:center; gap:7px; flex:none; }

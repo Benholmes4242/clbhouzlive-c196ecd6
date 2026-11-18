@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -19,6 +20,10 @@ describe('review excerpt text flow', () => {
     expect(body?.querySelector('.pro-inline-name:not([data-flow])')).toBeNull();
     expect(body?.querySelector('.pro-label')).toHaveAttribute('data-kind', 'am');
     expect(container.querySelector('[data-review-who] .pro-inline-name')).not.toHaveAttribute('data-flow');
+    const css = readFileSync('src/features/pro-verification/pro-label.css', 'utf8');
+    const badgeRule = css.match(/\.pro-inline-name\[data-flow="text"\] \.pro-label\s*\{([^}]*)\}/)?.[1];
+    expect(badgeRule).toMatch(/(?:^|;)\s*font-size:\s*7\.5px\s*;/);
+    expect(badgeRule).toMatch(/(?:^|;)\s*line-height:\s*1\s*;/);
   });
   it('default member name preserves its existing structure including badge attributes', () => {
     const { container } = render(<InlineProMemberName userId="member">Ben Loveard</InlineProMemberName>);

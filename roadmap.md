@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete: Text-flow AM/PRO badge height
+- Changed only the two supplied text-flow CSS rules; extended the existing review text-flow case, preserving every original assertion. No test count delta.
+- Focused 16/16; four sequential shards 2,225 / 2,245 / 2,273 / 2,328 = 9,071/9,071 (808 files), before/after unchanged. Chromium geometry: both badges 16px, labels centred, two-line clamp preserved. Ben's iPhone check remains required; report .lovable/reports/text-flow-badge-height.md.
+
 ## Complete: Authorised player next-start test replacement and remaining shards
 - Replaced only tourPlayerHeroBand's retired pick-button case with the supplied no-pick-action case; removed its onPick fixture. File count 4 → 4; focused player checks 17/17.
 - Retained successful shard one (2,225), restarted two then ran three/four sequentially: 2,245 / 2,273 / 2,328. Full suite 9,071/9,071 across 808 files; zero inventory delta (one deleted, one added). Historical stops below are superseded by this passing closeout.
