@@ -13,7 +13,7 @@ vi.mock('@/features/tourhub/hooks/useTourHubData',()=>({useTourLeaderboard:()=>(
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages',()=>({useBatchCourseImages:()=>({data:new Map()})}));
 vi.mock('@/features/tourhub/hooks/useLeaderboardRealtime',()=>({useLeaderboardRealtime:()=>{}}));
 vi.mock('@/features/tourhub/hooks/useTournamentStatusRealtime',()=>({useTournamentStatusRealtime:()=>{}}));
-vi.mock('@/features/tourhub/hooks/useTournamentPick',()=>({usePickField:()=>({data:[]}),useTournamentPickState:()=>({data:null})}));
+vi.mock('@/features/tourhub/hooks/useTournamentPick',()=>({usePickField:()=>({data:[]})}));
 vi.mock('@/features/tourhub/hooks/useAIPredictions',()=>({useAIPredictions:()=>({data:null})}));
 vi.mock('@/features/tourhub/hooks/useTournamentLastYearTop4',()=>({useTournamentLastYearTop4:()=>({data:[]})}));
 vi.mock('@/features/tourhub/leaderboard/useTourPlayerFollows',()=>({useTourPlayerFollows:()=>({ids:new Set()})}));

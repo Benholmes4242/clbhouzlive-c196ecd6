@@ -47,7 +47,6 @@ import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGo
 import { SuggestedGolferRow } from '@/features/social-suggestions/SuggestedGolferRow';
 import { FriendRequestsRail } from '@/features/activity-v2/components/FriendRequestsRail';
 import { WhoPlayingSection } from '@/components/courses/browse/WhoPlayingSection';
-import { TournamentPicksBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/TournamentPicksBoard';
 import { PeopleShelf } from '@/features/explore-magazine/PeopleShelf';
 import { FeedCard } from '@/components/feed-cards/FeedCard';
 import { invalidateProMembers } from '@/features/pro-verification/proMembersCache';
@@ -76,7 +75,6 @@ function surface(name: string) {
     case 'suggested row': return <>{ids.map(id => <SuggestedGolferRow key={id} golfer={person(id) as any} />)}</>;
     case 'friend requests': return <FriendRequestsRail />;
     case 'course members': return <WhoPlayingSection />;
-    case 'picks members': return <TournamentPicksBoard rows={ids.map(id => ({ user_id: id, display_name: id, username: id, profile_photo_url: null, player_id: 'player', player_name: 'Tour Player', is_viewer: false, is_followed: false }))} field={[]} ourPicks={[]} tourCode="pga" pending={false} failed={false} retry={() => {}} />;
     case 'people shelf': return <PeopleShelf viewerId="viewer" clubId="club" clubName="Club" enabled pos={1} />;
     default: return <>{ids.map(id => gridCard(id))}</>;
   }
@@ -94,7 +92,7 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe('Brief 2B mounted member names', () => {
-  for (const name of ['rail', 'find people', 'suggested block', 'suggested row', 'friend requests', 'course members', 'picks members', 'people shelf', 'grid card']) {
+  for (const name of ['rail', 'find people', 'suggested block', 'suggested row', 'friend requests', 'course members', 'people shelf', 'grid card']) {
     it(`${name}: verified-only labels with one batched screen read`, async () => {
       const { container } = mount(surface(name));
       await waitFor(() => expect(container.querySelectorAll('.pro-label')).toHaveLength(1));

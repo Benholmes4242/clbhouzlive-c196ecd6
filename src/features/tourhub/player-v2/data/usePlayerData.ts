@@ -10,14 +10,14 @@ export type PlayerResult = Functions['get_player_season_results']['Returns'][num
 export type PlayerHoles = Functions['get_player_hole_scoring']['Returns'][number];
 export type PlayerStat = Functions['get_player_stat_percentiles']['Returns'][number];
 export interface PlayerPick { won: boolean; name: string; end_date: string; position: string; tournament_id: string }
-export interface PlayerPickHistory { picks: PlayerPick[]; member_picks: number }
+export interface PlayerPickHistory { picks: PlayerPick[] }
 export function parsePickHistory(data: Json): PlayerPickHistory | null {
   if (!data || typeof data !== 'object' || Array.isArray(data) || !Array.isArray(data.picks)) return null;
   const picks = data.picks.flatMap(row => {
     if (!row || typeof row !== 'object' || Array.isArray(row) || typeof row.won !== 'boolean' || typeof row.name !== 'string' || typeof row.position !== 'string' || typeof row.end_date !== 'string' || typeof row.tournament_id !== 'string') return [];
     return [{ won: row.won, name: row.name, position: row.position, end_date: row.end_date, tournament_id: row.tournament_id }];
   });
-  return { picks, member_picks: typeof data.member_picks === 'number' ? data.member_picks : 0 };
+  return { picks };
 }
 export function usePlayerHeader(playerId: string) {
   return useQuery({ queryKey: ['player-v3', 'header', playerId], enabled: !!playerId, staleTime: 300_000, queryFn: async () => {

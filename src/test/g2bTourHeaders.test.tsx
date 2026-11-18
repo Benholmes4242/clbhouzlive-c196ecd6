@@ -34,7 +34,7 @@ function Name({ name, kind }: { name: string | null; kind: 'tournament' | 'playe
   if (!name) return null;
   return kind === 'tournament'
     ? <TournamentHero nameRef={ref} meta={{ id: 'e', name } as TournamentMeta} phase="upcoming" rows={[]} field={[]} last={[]} holes={[]} image={null} />
-    : <HeroSection nameRef={ref} player={{ id: 'p', full_name: name } as TourPlayer} header={null} results={[]} tour="pga" race={null} following={false} busy={false} onFollow={() => {}} onPick={() => {}} />;
+    : <HeroSection nameRef={ref} player={{ id: 'p', full_name: name } as TourPlayer} header={null} results={[]} tour="pga" race={null} following={false} busy={false} onFollow={() => {}} />;
 }
 function NamedPage({ name, kind }: { name: string | null; kind: 'tournament' | 'player' }) {
   return <><IslandBackCapsule label="Go back" onBack={() => {}} /><Name name={name} kind={kind} /></>;

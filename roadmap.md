@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: Your pick removal
+- Remove member pick entrypoints, reads, unused modules and unreachable copy; preserve Our picks and Clubhouse tour.
+- Focused checks: 251 executed / 246 passed / 5 failed, plus 2 unhandled errors. Shards not run. Expected inventory 9,068 (9,164 − 100 retired cases + 4 regressions).
+- Blocked by missing PicksBlock expect array (TS2741 / overviewShells every error) and new tee-tag regression expecting one occurrence of a group rendered twice; failed tests left unchanged after stop.
+- Report: .lovable/reports/your-pick-removal.md.
+
 ## Complete: Latest reviews taps and gaps — suite and public spacing
 - Record-shaped hero loading, remove media rail label, isolated media viewer taps with full review media and dimensions, and section-owned equal end gap.
 - Approved fresh mount passes; sequential shards 2,296 / 2,267 / 2,267 / 2,334 = 9,164/9,164 (809 files, +4 from 9,160). Public preview gaps 34/34px, title gap 12px, 320 containment verified. Signed-in What’s been played seam and viewer swipes unavailable/unverified. Report: .lovable/reports/latest-reviews-taps-and-gaps.md.

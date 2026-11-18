@@ -13,20 +13,16 @@ vi.mock('@/features/guest/guestGateStore',()=>({getGuestUser:()=>mocks.guest?{id
 vi.mock('@/features/guest/useGuestActionGate',()=>({useGuestActionGate:()=>mocks.gate}));
 vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes',()=>({usePickTeeTimes:()=>({data:new Map()})}));
 import { finishedVerdict, compareLivePick, compareFinishedPick, chooseFitStats, ordinal, filterCheckedReasons, lowestFit, catchSentence, agreementNote, winningScoreRange, type PickResult } from '@/features/tourhub/components/overview-v3/HybridHeroBands/pickInsightRules';
-import { YourPickCard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickCard';
 import { PicksBlock, pickStatusToken } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock';
 import { PicksSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet';
 import { OurRecordSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/OurRecordSheet';
-import { PickMemberBands } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PickMemberBands';
 import type { PickRecord, FitStat, BeatRow } from '@/features/tourhub/hooks/usePickInsights';
-import type { TournamentPickState } from '@/features/tourhub/hooks/useTournamentPick';
 import type { AITopContender } from '@/features/tourhub/hooks/useAIPredictions';
 const language=createInstance();
 void language.use(initReactI18next).init({lng:'en',resources:{en:{tourhub:en}},interpolation:{escapeValue:false},initAsync:false});
 let client:QueryClient;
 let record:PickRecord;
 let members:BeatRow[];
-let state:TournamentPickState;
 let myOdds:{events:number;wins:number;random_win_pct:number|null}|null;
 const result=(id:string,position:number,status:string|null=null):PickResult=>({playerId:id,playerName:{a:'Wyndham Clark',b:'Doug Ghim',c:'Tom Kim',me:'Tony Finau'}[id]??id,position,status,score:-18,tied:true});
 const ours=[result('a',20),result('b',8),result('c',11)];
@@ -36,11 +32,10 @@ const wrapper=({children}:{children:React.ReactNode})=><QueryClientProvider clie
 const mount=(node:React.ReactNode)=>render(node,{wrapper});
 beforeEach(()=>{
  client=new QueryClient({defaultOptions:{queries:{retry:false},mutations:{retry:false}}}); mocks.guest=false;mocks.user={id:'viewer',is_anonymous:false};mocks.gate.mockReset().mockReturnValue(false);
- state={my_player_id:null,locked:false,locks_at:'2026-11-05T07:40:00Z',followed_pickers:1,followed_top:[{player_id:'a',player_name:'Wyndham Clark',picks:1}]};
  record={tours:['liv','pgad','champ','lpga','euro','pga'],picks:30,event_count:10,best:{events:10,wins:3,top10:9,avg_percentile:94},won:3,top10:13,avg_percentile:73,first_event_date:'2026-03-15',events:[{tournament_id:'old',name:'Old event',end_date:'2026-10-01',picks:[{player_id:'a',player_name:'Clark',position:1,tied:false,status:null,percentile:100}]},{tournament_id:'new',name:'Mexico Open',end_date:'2026-11-01',picks:[{player_id:'a',player_name:'Clark',position:80,tied:false,status:'CUT',percentile:19},{player_id:'b',player_name:'Ghim',position:6,tied:true,status:null,percentile:95}]}]};
  members=[{user_id:'viewer',display_name:'Me',username:'me',profile_photo_url:null,picks:9,wins:1,top10:3,avg_percentile:81,is_viewer:true},{user_id:'other',display_name:'Danny',username:'danny',profile_photo_url:null,picks:10,wins:0,top10:2,avg_percentile:77,is_viewer:false}];
  myOdds={events:9,wins:1,random_win_pct:1.4};
- mocks.rpc.mockReset().mockImplementation(async(name:string)=>({data:name==='get_my_pick_odds'?myOdds:name==='get_our_pick_record'?record:name==='get_beat_the_model'?members:name==='get_tournament_pick_state'?[state]:name==='get_pick_fit'?fits:name==='get_pick_field'?picks.map(p=>({player_id:p.playerId,full_name:p.playerName,world_rank:p.worldRanking,photo_url:null,headshot_override:null,country:p.country})):name==='get_event_winning_scores'?[{winning_score:-24},{winning_score:-17}]:[],error:null}));
+ mocks.rpc.mockReset().mockImplementation(async(name:string)=>({data:name==='get_my_pick_odds'?myOdds:name==='get_our_pick_record'?record:name==='get_beat_the_model'?members:name==='get_pick_fit'?fits:name==='get_pick_field'?picks.map(p=>({player_id:p.playerId,full_name:p.playerName,world_rank:p.worldRanking,photo_url:null,headshot_override:null,country:p.country})):name==='get_event_winning_scores'?[{winning_score:-24},{winning_score:-17}]:[],error:null}));
 });
 afterEach(()=>{cleanup();client.clear();});
 describe('tournament picks pure rules',()=>{
@@ -96,48 +91,15 @@ describe('tournament picks pure rules',()=>{
  it('winning scores omit none, distinguish one and span several',()=>{expect(winningScoreRange([])).toBeNull();expect(winningScoreRange([-18])).toEqual({single:true,best:-18,worst:-18});expect(winningScoreRange([-17,-24,-20])).toEqual({single:false,best:-24,worst:-17});});
 });
 describe('tournament picks surfaces',()=>{
- it.each(['CUT','MC','WD','DQ'])('finished viewer and shared pick cards preserve the canonical %s token',(status)=>{
+ it.each(['CUT','MC','WD','DQ'])('shared pick cards preserve the canonical %s token',(status)=>{
   const expected=status==='CUT'?'MC':status;
-  mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:80,my_status:status,my_score:0}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);
   expect(document.querySelector('[data-your-pick-card]')).toBeNull();
   expect(pickStatusToken(status)).toBe(expected);
  });
- it.each(['live','completed'] as const)('guest %s renders no pick card',(phase)=>{
-  const view=mount(<YourPickCard guest state={null} phase={phase} ourResults={ours} tourCode="pga" onPick={vi.fn()}/>);
-  expect(view.container).toBeEmptyDOMElement();
- });
- it('guest locked upcoming renders no pick card',()=>{
-  const view=mount(<YourPickCard guest state={{...state,locked:true}} phase="upcoming" ourResults={ours} tourCode="pga" onPick={vi.fn()}/>);
-  expect(view.container).toBeEmptyDOMElement();
- });
- it('guest upcoming renders the card and Pick goes to the guest gate',async()=>{
-  mocks.guest=true;mocks.user=null;mocks.gate.mockReturnValue(true);
-  const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick}/>);
-  const pick=await screen.findByRole('button',{name:'Pick'});
-  expect(document.querySelector('[data-your-pick-card]')).not.toBeNull();
-  fireEvent.click(pick);expect(mocks.gate).toHaveBeenCalledWith('pick');expect(onPick).not.toHaveBeenCalled();
- });
- it('upcoming no-pick card opens Pick and named current pick opens Change',()=>{
-  const tap=vi.fn();const v=mount(<YourPickCard state={state} phase="upcoming" ourResults={ours} tourCode="pga" onPick={tap}/>);
-  fireEvent.click(screen.getByRole('button',{name:'Pick'}));expect(tap).toHaveBeenCalledOnce();
-  v.rerender(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim'}} phase="upcoming" ourResults={ours} tourCode="pga" onPick={tap}/>);
-  expect(screen.getByRole('button',{name:'Change'})).toBeInTheDocument();
- });
- it('withdrawn pre-lock pick offers a new pick with withdrawal copy',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_still_in_field:false}} phase="upcoming" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-name')?.textContent).toBe('Tom Kim has withdrawn');expect(screen.getByRole('button',{name:'Pick'})).toBeInTheDocument();});
- it('locked no-pick card is absent on live and finished',()=>{const v=mount(<YourPickCard state={{...state,locked:true}} phase="live" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('[data-your-pick-card]')).toBeNull();v.rerender(<YourPickCard state={{...state,locked:true}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('[data-your-pick-card]')).toBeNull();});
- it('live picked card shows resolved comparison, score and thru',()=>{mount(<YourPickCard state={{...state,locked:true,my_player_id:'c',my_player_name:'Tom Kim',my_position:11,my_tied:true,my_score:-12,my_thru:9}} phase="live" ourResults={[result('a',80,'MC'),result('b',8),result('c',11)]} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toBe('Behind Ghim.');expect(document.querySelector('.pick-mine-figure')?.textContent).toContain('T11 −12THRU 9');});
- it('not-started live pick has tee text and no figures',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:1,my_score:0}} phase="live" ourResults={ours} started={false} teeTime="2026-11-05T13:05:00Z" tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toMatch(/^Tees off/);expect(document.querySelector('.pick-mine-figure')).toBeNull();});
- it('missed-cut card prints muted MC without score',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:80,my_status:'CUT',my_score:-12}} phase="live" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('.pick-mine-sub')?.textContent).toBe('Missed the cut.');expect(document.querySelector('.pick-mine-figure')?.textContent).toBe('MC');});
- it('finished card is absent even with a scored member pick',()=>{mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim',my_position:8,my_percentile:95}} phase="completed" ourResults={ours} tourCode="pga" onPick={()=>{}}/>);expect(document.querySelector('[data-your-pick-card]')).toBeNull();});
- it('guest Pick calls the gate and never opens sheet',async()=>{
-  mocks.guest=true;mocks.user=null;mocks.gate.mockReturnValue(true);const onPick=vi.fn();mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={onPick}/>);
-  fireEvent.click(await screen.findByRole('button',{name:'Pick'}));expect(mocks.gate).toHaveBeenCalledWith('pick');expect(onPick).not.toHaveBeenCalled();
- });
- it('followed singular and record row use server counts; zero hides both',async()=>{
-  record.won=1;record.top10=1;const onRecord=vi.fn();const bands=mount(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onPick={()=>{}}/>);
-  await waitFor(()=>expect(document.querySelector('[data-followed-picks]')?.textContent).toContain('1 of your circle has picked.'));
-  bands.unmount();
-  const block=mount(<PicksBlock picks={[]} tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onOpenYourPick={()=>{}} onOpenRecord={onRecord} onOpenPick={()=>{}} boardByPlayer={new Map()} teeByPlayer={null} championPlayerId={null} championPlayerIds={[]} intro={null}/>);
+
+ it('record row uses server counts; zero hides it',async()=>{
+  record.won=1;record.top10=1;const onRecord=vi.fn();  
+  const block=mount(<PicksBlock picks={[]} tournamentId="event" tourCode="pga" seasonYear={2026} phase="upcoming" currentRound={null} pickResults={ours} startedPlayers={new Set()} onOpenRecord={onRecord} onOpenPick={()=>{}} boardByPlayer={new Map()} teeByPlayer={null} championPlayerId={null} championPlayerIds={[]} intro={null}/>);
   await waitFor(()=>expect(document.querySelector('[data-our-record-door]')).not.toBeNull());
   const door=document.querySelector('[data-our-record-door]');expect(door?.textContent).toContain('1 win · 1 top 10');if(door)fireEvent.click(door);expect(onRecord).toHaveBeenCalledOnce();
   record={...record,picks:0};client.setQueryData(['tourhub','our-pick-record','pga',2026],record);
@@ -158,11 +120,8 @@ describe('tournament picks surfaces',()=>{
 
 describe('disabled tour pick entry points',()=>{
  it.each(['euro','pgad'])('%s never mounts sheets or member reads',tour=>{
-  const view=mount(<><OurRecordSheet open onClose={()=>{}} tour={tour} year={2026}/><YourPickCard state={state} phase="completed" ourResults={ours} tourCode={tour} onPick={()=>{}}/><PicksSheet open tourCode={tour} tournamentId="event" onClose={()=>{}} picks={picks} predictions={null} eventName="Event" venueName={null}/><PickMemberBands tournamentId="event" tourCode={tour} seasonYear={2026} phase="live" currentRound={2} pickResults={ours} startedPlayers={new Set()} onPick={()=>{}}/></>);
+  const view=mount(<><OurRecordSheet open onClose={()=>{}} tour={tour} year={2026}/><PicksSheet open tourCode={tour} tournamentId="event" onClose={()=>{}} picks={picks} predictions={null} eventName="Event" venueName={null}/></>);
   expect(view.container).toBeEmptyDOMElement();expect(mocks.rpc).not.toHaveBeenCalled();
  });
- it.each(['upcoming','live','completed'] as const)('member card visibility in %s',phase=>{
-  const view=mount(<YourPickCard state={{...state,my_player_id:'c',my_player_name:'Tom Kim'}} phase={phase} ourResults={ours} tourCode="pga" onPick={()=>{}}/>);
-  expect(view.container.querySelector('[data-your-pick-card]')!==null).toBe(phase!=='completed');
- });
+ 
 });

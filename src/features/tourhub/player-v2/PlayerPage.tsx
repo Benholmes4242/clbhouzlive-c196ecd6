@@ -1,4 +1,3 @@
-import { picksEnabledForTour } from '../_shared/picksEnabledForTour';
 /** Player detail owns one header-selected season and tour. Analytical readers
  * never fall back across seasons; only the unchanged live strip is live-owned.
  * Race ranks retain their existing source through the isolated header-year reader.
@@ -21,7 +20,6 @@ import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsGuest } from '@/features/guest/useIsGuest';
-import { useGuestActionGate } from '@/features/guest/useGuestActionGate';
 import { useTourPlayerFollows } from '../leaderboard/useTourPlayerFollows';
 import { useTourHoleAverages,useMyHoleScoring } from '../players-v2/you/useYouAndTour';
 import { usePlayerHeader,usePlayerSeasonResults,usePlayerHoleScoring,usePlayerStatPercentiles,usePlayerPickHistory,usePlayerRaceRank,usePlayerNextEvent } from './data/usePlayerData';
@@ -34,7 +32,6 @@ import { PlayerShots } from './sections/PlayerShots';
 import { PlayerRoundByRound,PlayerMajors,PlayerPicks } from './sections/PlayerSeasonDetails';
 import { TournamentsSection } from './sections/TournamentsSection';
 import { AboutSection } from './sections/AboutSection';
-import { YourPickSheet } from '../components/overview-v3/HybridHeroBands/YourPickSheet';
 import { OurRecordSheet } from '../components/overview-v3/HybridHeroBands/OurRecordSheet';
 import './playerPage.css';
 export function PlayerPage() {
@@ -43,18 +40,17 @@ export function PlayerPage() {
  const resultsQuery=usePlayerSeasonResults(playerId,year),holesQuery=usePlayerHoleScoring(playerId,year),statsQuery=usePlayerStatPercentiles(playerId,year),picksQuery=usePlayerPickHistory(playerId,year),raceQuery=usePlayerRaceRank(playerId,tour,year);
  const nextQuery=usePlayerNextEvent(header?.next_tournament_id??null,tour);
  const tourQuery=useTourHoleAverages(tour,year),{user}=useSupabaseSession(),guest=useIsGuest(),mineQuery=useMyHoleScoring(!guest&&!user?.is_anonymous?user?.id:null);
- const follows=useTourPlayerFollows(),gate=useGuestActionGate(),state=usePlayerState(playerId),[pickOpen,setPickOpen]=useState(false),[recordOpen,setRecordOpen]=useState(false);
+ const follows=useTourPlayerFollows(),state=usePlayerState(playerId),[recordOpen,setRecordOpen]=useState(false);
  const nameRef=useRef<HTMLHeadingElement>(null);
  useIslandBackName(!playerQuery.isLoading&&!headerQuery.isLoading&&!(year!=null&&resultsQuery.isLoading)&&!playerQuery.isError&&!headerQuery.isError?playerQuery.data?.full_name??null:null,nameRef);
- useEffect(()=>{scrollPageToTop('auto');setPickOpen(false);setRecordOpen(false);},[playerId]);
+ useEffect(()=>{scrollPageToTop('auto');setRecordOpen(false);},[playerId]);
  if(playerQuery.isLoading||headerQuery.isLoading||year!=null&&resultsQuery.isLoading)return <TourHubShell><PlayerPageSkeleton/></TourHubShell>;
  const player=playerQuery.data;
  if(playerQuery.isError||!player||headerQuery.isError)return <TourHubShell><div className="player-v3 px-5 py-20"><p>{t('player.error.loadFailed')}</p><Button onClick={()=>{void playerQuery.refetch();void headerQuery.refetch();}}>{t('player.error.retry')}</Button></div></TourHubShell>;
  const results=resultsQuery.isError?[]:resultsQuery.data??[],stats=statsQuery.isError?[]:statsQuery.data??[],holes=holesQuery.isError?null:holesQuery.data??null,tourHoles=tourQuery.isError?null:tourQuery.data??null,mine=mineQuery.isError?null:mineQuery.data??null;
  const visible=sectionVisibility(results.length,stats,holes,tourHoles,mine,!!user&&!guest&&!user.is_anonymous),liveId=state.state==='live'?state.liveData?.tournamentId??null:null;
- const onPick=()=>{if(!picksEnabledForTour(tour)||gate('other')||!user||user.is_anonymous)return;setPickOpen(true);};
  return <TourHubShell><TourPageShell headerB immersive background="var(--player-canvas)" title={player.full_name} backFallback="/tourhub?tab=players"><div className="player-v3" style={{paddingTop:CHROME_CLEARANCE}}>
- <HeroSection nameRef={nameRef} player={player} header={header} results={results} tour={tour} race={raceQuery.isError?null:raceQuery.data??null} following={follows.ids.has(player.id)} busy={follows.busy} onFollow={()=>follows.toggle(player.id)} onPick={onPick} nextStartDate={nextQuery.data?.start_date}/>
+ <HeroSection nameRef={nameRef} player={player} header={header} results={results} tour={tour} race={raceQuery.isError?null:raceQuery.data??null} following={follows.ids.has(player.id)} busy={follows.busy} onFollow={()=>follows.toggle(player.id)} nextStartDate={nextQuery.data?.start_date}/>
  <AnimatePresence initial={false}>{state.state==='live'&&state.liveData&&<motion.div key="live-now" initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{duration:.25,ease:'easeOut'}} style={{overflow:'hidden'}}><LiveNowStrip liveData={state.liveData} playerName={player.full_name}/></motion.div>}</AnimatePresence>
  {year!=null&&<PlayerForm results={results} year={year} name={player.full_name} tour={tour}/>}
  {visible.game&&<PlayerGame stats={stats} tour={tour} label={playerTourLabel(tour)}/>}
@@ -62,7 +58,6 @@ export function PlayerPage() {
  <PlayerRoundByRound results={results} tour={tour}/>{year!=null&&<PlayerMajors results={results} year={year}/>}
  <PlayerPicks history={picksQuery.isError?null:picksQuery.data??null} tour={tour} onRecord={()=>setRecordOpen(true)}/>
  <TournamentsSection results={results} playerId={player.id} playerName={player.full_name} liveTournamentId={liveId}/><AboutSection player={player}/>
- {header?.next_tournament_id&&<YourPickSheet open={pickOpen} onClose={()=>setPickOpen(false)} tournamentId={header.next_tournament_id} eventName={header.next_name} ourPicks={nextQuery.isError?[]:nextQuery.data?.picks??[]} tourCode={tour} initialPlayerId={player.id}/>}
  {year!=null&&<OurRecordSheet open={recordOpen} onClose={()=>setRecordOpen(false)} tour={tour} year={year}/>}
  </div></TourPageShell></TourHubShell>;
 }

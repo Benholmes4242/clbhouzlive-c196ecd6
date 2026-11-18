@@ -82,8 +82,6 @@ import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { LeadersGroup } from './LeadersGroup';
-import { PickMemberBands } from './PickMemberBands';
-import { YourPickSheet } from './YourPickSheet';
 import { OurRecordSheet } from './OurRecordSheet';
 import { finishedVerdict, resultPosition, type PickResult } from './pickInsightRules';
 import { Button } from '@/components/ui/button';
@@ -357,8 +355,6 @@ export function HeroBoardSection({
   const hasPicks = picks.length > 0;
   const [picksOpen, setPicksOpen] = useState(false);
   const [tappedPick, setTappedPick] = useState<string | null>(null);
-  const [yourPickOpen, setYourPickOpen] = useState(false);
-  const [yourPickView, setYourPickView] = useState<'field'|'board'>('field');
   const [recordOpen, setRecordOpen] = useState(false);
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
@@ -495,7 +491,6 @@ export function HeroBoardSection({
           seasonYear={eventSeasonYear ?? null}
           currentRound={currentRound}
           pickResults={pickResults.filter(r=>picks.some(p=>p.playerId===r.playerId))}
-          onOpenYourPick={(view='field')=>{setYourPickView(view);setYourPickOpen(true);}}
           onOpenRecord={()=>setRecordOpen(true)}
           phase={phase}
           boardByPlayer={boardByPlayer}
@@ -534,7 +529,6 @@ export function HeroBoardSection({
           winningMargin={winner?.score!=null && runnerUp?.score!=null ? runnerUp.score-winner.score : null}
         />
       ) : null}
-      <YourPickSheet open={yourPickOpen} onClose={()=>setYourPickOpen(false)} tournamentId={picksTid} eventName={eventName ?? predictions?.tournament?.name ?? ''} ourPicks={picks.map(p=>({playerId:p.playerId,playerName:p.playerName}))} tourCode={pickTourCode} initialView={yourPickView}/>
       {eventSeasonYear != null && <OurRecordSheet open={recordOpen} onClose={()=>setRecordOpen(false)} tour={pickTourCode} year={eventSeasonYear}/>}
 
     </div>

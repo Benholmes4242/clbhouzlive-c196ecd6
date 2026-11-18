@@ -17,7 +17,6 @@ vi.mock('@/features/tourhub/hooks/useTournamentTeeTimes', () => ({ useTournament
 vi.mock('@/features/tourhub/hooks/useTournamentLastYearTop4', () => ({ useTournamentLastYearTop4: () => ({ data: fixture.rows }) }));
 vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes', () => ({ usePickTeeTimes: () => ({ data: new Map() }) }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet', () => ({ PicksSheet: () => null }));
-vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickSheet', () => ({ YourPickSheet: () => null }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup', () => ({ LeadersGroup: () => null }));
 
 import { HeroBoardSection } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';

@@ -17,8 +17,6 @@ vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn() } }));
 
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ACTIVE_RING_GRADIENT } from '@/features/find-people/ActiveRing';
-import { YourPickCard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickCard';
-import { YourPickSheet } from '@/features/tourhub/components/overview-v3/HybridHeroBands/YourPickSheet';
 import type { PickFieldPlayer } from '@/features/tourhub/hooks/useTournamentPick';
 
 const i18n = createInstance();
@@ -66,43 +64,3 @@ describe('SquircleAvatar ringGradient', () => {
   });
 });
 
-describe('pick surfaces use the gradient ring instead of ActiveRing', () => {
-  it('YourPickCard pick face has the gradient ring and no data-active-ring', () => {
-    const { container } = render(<MemoryRouter><QueryClientProvider client={client}><I18nextProvider i18n={i18n}>
-      <YourPickCard state={{ ...state, my_player_name: 'Tom Kim' } as never} phase="upcoming" ourResults={[]} tourCode="pga" onPick={() => {}} />
-    </I18nextProvider></QueryClientProvider></MemoryRouter>);
-    const face = container.querySelector('.pick-mine-face') as HTMLElement;
-    expect(face).not.toBeNull();
-    expect(face.querySelector('[data-active-ring]')).toBeNull();
-    expect(face.querySelector('[data-avatar-ring-gradient]')).not.toBeNull();
-  });
-
-  it('YourPickSheet header pick face has the gradient ring and no data-active-ring', async () => {
-    render(<YourPickSheet open onClose={() => {}} tournamentId="event" eventName="Mexico Open" ourPicks={ourPicks} tourCode="pga" />, { wrapper });
-    await screen.findByRole('button', { name: 'Change pick' });
-    const mine = document.querySelector('[data-sheet-your-pick]') as HTMLElement;
-    expect(mine).not.toBeNull();
-    expect(mine.querySelector('[data-active-ring]')).toBeNull();
-    expect(mine.querySelector('[data-avatar-ring-gradient]')).not.toBeNull();
-  });
-
-  it('chosen sheet row carries the gradient ring, unchosen rows the hairline, all at 36px', async () => {
-    render(<YourPickSheet open onClose={() => {}} tournamentId="event" eventName="Mexico Open" ourPicks={ourPicks} tourCode="pga" />, { wrapper });
-    await screen.findByRole('button', { name: 'Change pick' });
-    fireEvent.click(screen.getByRole('button', { name: 'Change pick' }));
-    const chosenRow = await screen.findByRole('radio', { name: 'Wyndham Clark' });
-    const unchosenRow = screen.getByRole('radio', { name: 'Doug Ghim' });
-    fireEvent.click(chosenRow);
-    expect(chosenRow.getAttribute('aria-checked')).toBe('true');
-    const chosenAvatar = chosenRow.querySelector('.your-pick-avatar') as HTMLElement;
-    const unchosenAvatar = unchosenRow.querySelector('.your-pick-avatar') as HTMLElement;
-    expect(chosenAvatar.querySelector('[data-avatar-ring-gradient]')).not.toBeNull();
-    expect(unchosenAvatar.querySelector('[data-avatar-ring-gradient]')).toBeNull();
-    expect(unchosenAvatar.querySelector('[data-active-ring]')).toBeNull();
-    expect(chosenAvatar.querySelector('[data-active-ring]')).toBeNull();
-    // Same 36px footprint whether chosen or not — selecting a row moves nothing.
-    const sizeOf = (el: HTMLElement) => (el.querySelector('.relative.overflow-hidden') as HTMLElement).style.width;
-    expect(sizeOf(chosenAvatar)).toBe('36px');
-    expect(sizeOf(unchosenAvatar)).toBe('36px');
-  });
-});

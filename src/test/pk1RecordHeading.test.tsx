@@ -11,14 +11,12 @@ vi.mock('@/hooks/useSupabaseSession',()=>({useSupabaseSession:()=>({user:h.user}
 vi.mock('@/features/guest/guestGateStore',()=>({getGuestUser:()=>null}));
 vi.mock('@/features/guest/useGuestActionGate',()=>({useGuestActionGate:()=>()=>false}));
 vi.mock('@/features/tourhub/hooks/useTournamentPick',()=>({useGuestTournamentPickLock:()=>({data:null,isError:false}),useTournamentPickState:()=>({data:null,isError:false}),useTournamentPicksBoard:()=>({data:[],isError:false})}));
-vi.mock('@/features/tourhub/hooks/useTournamentCircleRank',()=>({useTournamentCircleRank:()=>({data:null,isError:false})}));
 vi.mock('@/features/tourhub/tournament-v2/data/usePickTeeTimes',()=>({usePickTeeTimes:()=>({data:new Map()})}));
 import {PicksBlock} from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock';
-import {PickMemberBands} from '@/features/tourhub/components/overview-v3/HybridHeroBands/PickMemberBands';
 const language=createInstance();
 void language.use(initReactI18next).init({lng:'en',resources:{en:{tourhub:en}},initAsync:false,interpolation:{escapeValue:false}});
 const wrap=({children}:{children:React.ReactNode})=><MemoryRouter><I18nextProvider i18n={language}>{children}</I18nextProvider></MemoryRouter>;
-const props={picks:[],tournamentId:'event',tourCode:'pga',seasonYear:2026,phase:'live' as const,currentRound:2,pickResults:[],startedPlayers:new Set<string>(),onOpenYourPick:vi.fn(),onOpenRecord:vi.fn(),onOpenPick:vi.fn(),boardByPlayer:new Map(),teeByPlayer:null,championPlayerId:null,championPlayerIds:[],intro:'Intro',neededByPlayer:null,toReachScore:null,leaderTotal:null};
+const props={picks:[],tournamentId:'event',tourCode:'pga',seasonYear:2026,phase:'live' as const,currentRound:2,pickResults:[],startedPlayers:new Set<string>(),onOpenRecord:vi.fn(),onOpenPick:vi.fn(),boardByPlayer:new Map(),teeByPlayer:null,championPlayerId:null,championPlayerIds:[],intro:'Intro',neededByPlayer:null,toReachScore:null,leaderTotal:null};
 beforeEach(()=>{h.record={picks:30,won:5,top10:13,event_count:8};h.error=false;h.user={id:'me',is_anonymous:false};props.onOpenRecord.mockClear();});
 afterEach(cleanup);
 describe('PK1 record placement and visibility',()=>{
@@ -29,7 +27,7 @@ describe('PK1 record placement and visibility',()=>{
  });
  it('zero picks hides record',()=>{h.record.picks=0;const {container}=render(<PicksBlock {...props}/>,{wrapper:wrap});expect(container.querySelector('[data-our-record-door]')).toBeNull();});
  it('error suppresses even stale record',()=>{h.error=true;const {container}=render(<PicksBlock {...props}/>,{wrapper:wrap});expect(container.querySelector('[data-our-record-door]')).toBeNull();});
- it('member bands no longer own a record door',()=>{const {container}=render(<PickMemberBands tournamentId="event" tourCode="pga" seasonYear={2026} phase="live" currentRound={2} pickResults={[]} startedPlayers={new Set()} onPick={()=>{}}/>,{wrapper:wrap});expect(container.querySelector('[data-our-record-door]')).toBeNull();});
+ 
  it('no intro places record directly above tiles',()=>{const {container}=render(<PicksBlock {...props} intro={null}/>,{wrapper:wrap});expect(container.querySelector('[data-our-record-door]')?.nextElementSibling).toBe(container.querySelector('[data-overview-picks-grid]'));});
  it('guest record still opens existing record callback once',()=>{h.user=null;const {container}=render(<PicksBlock {...props}/>,{wrapper:wrap});const door=container.querySelector('[data-our-record-door]');expect(door).not.toBeNull();if(door)fireEvent.click(door);expect(props.onOpenRecord).toHaveBeenCalledOnce();});
  it('unknown event count omits only events part',()=>{h.record.event_count=undefined;const {container}=render(<PicksBlock {...props}/>,{wrapper:wrap});expect(container.querySelector('[data-pick-record-figures]')).not.toBeNull();expect(container.querySelector('[data-pick-record-events]')).toBeNull();});

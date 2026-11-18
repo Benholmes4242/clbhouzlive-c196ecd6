@@ -17,7 +17,6 @@ import {normalizeStatus} from '../../../_shared/resultStatus';
 import {EVEN_ROW_COLUMNS, EVEN_ROW_GRID, OVERVIEW} from '../overviewTokens';
 import {fmtScore} from '../../../utils/fmtScore';
 import {finishedVerdict,type PickResult} from './pickInsightRules';
-import {PickMemberBands} from './PickMemberBands';
 import {Button} from '@/components/ui/button';
 import {useOurPickRecord} from '../../../hooks/usePickInsights';
 const pickWonTournament=(id:string,champion:string|null,ids:string[])=>id===champion||ids.includes(id);
@@ -125,7 +124,6 @@ function PicksBlockSession({
   seasonYear,
   currentRound,
   pickResults,
-  onOpenYourPick,
   onOpenRecord,
 }: {
   /** Pick tee times by sr_players.id; null/empty renders no tee line. */
@@ -136,7 +134,6 @@ function PicksBlockSession({
   seasonYear:number|null;
   currentRound:number|null;
   pickResults:PickResult[];
-  onOpenYourPick:(view?:'field'|'board')=>void;
   onOpenRecord:()=>void;
   /** §E.1 where the picks stand; null renders no line. */
   intro: string | null;
@@ -193,8 +190,8 @@ function PicksBlockSession({
   }, [teeDay]);
 
   return (
-<OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={seasonYear != null ? ['members'] : []}>
-    <div data-overview-picks style={{ paddingTop: 8 }}>
+<OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)}>
+    <div data-overview-picks style={{ paddingTop: 8, paddingBottom: 10 }}>
       <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
@@ -309,7 +306,6 @@ function PicksBlockSession({
           );
         })}
       </div>
-      {seasonYear != null && <PickMemberBands tournamentId={tournamentId} tourCode={tourCode} seasonYear={seasonYear} phase={phase} currentRound={currentRound} pickResults={pickResults} startedPlayers={startedPlayers} boardByPlayer={boardByPlayer} onPick={onOpenYourPick}/>}
     </div>
     </OverviewReadinessBand>
   );
