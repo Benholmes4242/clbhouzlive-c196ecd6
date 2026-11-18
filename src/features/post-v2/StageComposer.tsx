@@ -24,6 +24,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Pencil, X } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useComposerActor } from './hooks/useComposerActor';
+import { composerVisibility, useComposerVisibility } from './hooks/useComposerVisibility';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -196,9 +197,12 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const [roundFind, setRoundFind] = useState<{ courseId: string; day: string } | null>(null);
   const [withSuggestions, setWithSuggestions] = useState<WithCandidate[]>([]);
   const [withTagged, setWithTagged] = useState<WithCandidate[]>([]);
-  const [visibility, setVisibility] = useState<PostVisibility>('anyone');
+  // Edit writes belong to the stored post actor, not the current global actor.
+  const visibilityActorType = isEditMode ? editable.data?.actorType ?? activeActor?.type : activeActor?.type;
+  const { visibility, setVisibility } = useComposerVisibility(visibilityActorType);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
+  useEffect(() => { if (visibilityActorType === 'business') setVisibilityOpen(false); }, [visibilityActorType]);
   const initialVisibilityRef = useRef<PostVisibility>('anyone');
   const initialWithIdsRef = useRef<string[]>([]);
   const existingTagsRef = useRef<ExistingTags>({ holes: [], places: [] });
@@ -294,7 +298,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       if(cancelled || !saved) return;
       applyDraftActor(saved.row.actor_type,saved.row.actor_id);
       memberChoseCourseRef.current=true;
-      restoreDraft(saved.state);setShotTagMap(saved.shotTagMap);setVisibility(saved.visibility);setRestoredDraftId(saved.row.id);
+      restoreDraft(saved.state);setShotTagMap(saved.shotTagMap);setVisibility(composerVisibility(saved.row.actor_type,saved.visibility));setRestoredDraftId(saved.row.id);
     }).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft, applyDraftActor]);
@@ -595,7 +599,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   const authorAvatar = activeActor?.type==='business' ? activeActor.avatarUrl??null : activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
   const authorUsername = activeActor?.slug ?? profile?.username ?? null;
 
-  const isPersonalActor = activeActor?.type !== 'business';
+  const isPersonalActor = visibilityActorType !== 'business';
   /* PF2_GUIDE: the guide is written and announced only when the post can
      actually feed it — personal actor, Everyone audience, with media. The
      member's own switch (state.addToGuide) is never rewritten by audience
@@ -667,7 +671,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         content: state.caption?.length ? state.caption : null,
         course_id: state.course?.id ?? null,
         tagged_course_ids: state.courses.map((c) => c.id),
-        ...(visibility !== initialVisibilityRef.current ? { visibility } : {}),
+        ...(!isPersonalActor || visibility !== initialVisibilityRef.current ? { visibility } : {}),
 
       };
       // Only touch scheduled_at when the post is still scheduled.
@@ -787,7 +791,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
     } finally {
       setSaving(false);
     }
-  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode, visibility, withTagged, shotTags, profile?.id, tagHoles, newShotTagJob]);
+  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode, visibility, isPersonalActor, withTagged, shotTags, profile?.id, tagHoles, newShotTagJob]);
 
   const onPrimary = () => {
     if (isEditMode) return void doSaveEdit();
@@ -956,7 +960,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           onClose={() => setTagIndex(null)}
           onEditPhoto={() => { if (tagIndex !== null) { setActiveIndex(tagIndex); setOpenMediaIndex(tagIndex); } }}
         />
-        <VisibilitySheet open={visibilityOpen} value={visibility} onChange={setVisibility} onClose={() => setVisibilityOpen(false)} />
+        {isPersonalActor && <VisibilitySheet open={visibilityOpen} value={visibility} onChange={setVisibility} onClose={() => setVisibilityOpen(false)} />}
         <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => selectActor(a)} selectedId={activeActor?.id ?? null} />
   
         <ScheduleSheetV2
@@ -975,7 +979,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           drafts={drafts.drafts}
           onRestore={(d) => {
             if(!profile?.id)return;
-            void loadComposerDraft(d.id,profile.id).then(saved=>{if(!saved)return;applyDraftActor(saved.row.actor_type,saved.row.actor_id);memberChoseCourseRef.current=true;restoreDraft(saved.state);setShotTagMap(saved.shotTagMap);setVisibility(saved.visibility);setRestoredDraftId(d.id);}).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
+            void loadComposerDraft(d.id,profile.id).then(saved=>{if(!saved)return;applyDraftActor(saved.row.actor_type,saved.row.actor_id);memberChoseCourseRef.current=true;restoreDraft(saved.state);setShotTagMap(saved.shotTagMap);setVisibility(composerVisibility(saved.row.actor_type,saved.visibility));setRestoredDraftId(d.id);}).catch(error=>toast.error(error instanceof Error?error.message:'Could not restore draft'));
           }}
           onDelete={drafts.remove}
         />
@@ -1188,7 +1192,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           <span style={{minWidth:0,whiteSpace:'normal',overflowWrap:'anywhere',textAlign:'right'}}>{authorName}</span>
           <SquircleAvatar src={authorAvatar} alt={authorName} size={24} hairlineRing ringColor={DARK_HAIRLINE} />
         </>, () => { openDetail('actor'); setSheet('actor'); }, true)}
-        {metaRow('Who can see this', visibilityLabel(visibility), () => setVisibilityOpen(true), false)}
+        {isPersonalActor && metaRow('Who can see this', visibilityLabel(visibility), () => setVisibilityOpen(true), false)}
         {showScheduleRow && metaRow(t('stage.scheduleForLater'),
           <span style={{ color: state.scheduledAt ? GP.ink : GP.mute }}>{state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}</span>,
           () => { openDetail('schedule'); setSheet('schedule'); }, false)}
@@ -1247,7 +1251,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       ) : (
         /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
         <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
-          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} visibility={visibility} personal={isPersonalActor} onVisibility={() => setVisibilityOpen(true)} />
+          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} visibility={visibility} personal={isPersonalActor} onVisibility={isPersonalActor ? () => setVisibilityOpen(true) : undefined} />
           {videoComposer ? <VideoTitleDescription details={videoData} description={state.caption} duration={videoItem ? videoDuration(videoItem) : undefined} long={longVideo} currentUserId={profile?.id ?? null} onChange={setVideoData} onDetails={() => setVideoDetailsOpen(true)} /> : <div style={{ padding: '14px 16px 0' }}>
             <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
               placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />

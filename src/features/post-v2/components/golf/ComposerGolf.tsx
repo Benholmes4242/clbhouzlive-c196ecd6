@@ -21,7 +21,8 @@ export function ComposerAttachRound({round,on,onToggle,onDifferent,shape,hole}:{
 /* PF2_GUIDE: with any audience other than Everyone the switch shows off at 40%
  * and cannot be turned on; tapping anywhere on the row opens Who can see this.
  * The member's own choice is kept by the caller and restored on Everyone. */
-export function ComposerHoleGuide({course,hole,on,audienceOk,onToggle,onRowTap}:{course:StageCourse;hole:number;on:boolean;audienceOk:boolean;onToggle:()=>void;onRowTap:()=>void}) {
+export function ComposerHoleGuide({course,hole,on,audienceOk,onToggle,onRowTap,personal=true}:{course:StageCourse;hole:number;on:boolean;audienceOk:boolean;onToggle:()=>void;onRowTap:()=>void;personal?:boolean}) {
+ if(!personal) return null;
  if(!audienceOk) return <section className="composer-golf"><div className="composer-golf-box"><div className="composer-golf-att composer-golf-att-tap" role="button" tabIndex={0} onClick={onRowTap} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onRowTap();}}}><div><b>Add to the {ordinal(hole)}'s hole guide</b><p>Hole guides are public. Change <em>Who can see this</em> to Everyone.</p></div><Switch label="Add to hole guide" on={false} disabled onChange={()=>{}}/></div></div></section>;
  return <section className="composer-golf"><div className="composer-golf-box" data-on={on}><div className="composer-golf-att"><div><b>Add to the {ordinal(hole)}'s hole guide</b><p>Golfers planning a round see it on the {shortCourseName(course.name)} course page, credited to you.</p></div><Switch label="Add to hole guide" on={on} onChange={onToggle}/></div></div></section>;
 }

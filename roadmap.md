@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stopped: Business posts always Everyone — verification
+- Force public audience across create/edit/draft/schedule/shot writes and remove business audience doors; preserve personal choices.
+- Six new rule tests pass; typecheck/build clean. Shard 1: 2,290 passed plus unhandled `supabase.from is not a function` at circle.ts:44 from untouched proVerification2B.test.tsx; shards 2–4 stopped. Expected inventory 9,156; report business-posts-always-everyone.md. Feed paging remains separately stopped without further test authorisation.
+
 ## Stopped: Feed pages by seen posts — authorised correction
 - Replace date cursor/ref with actor-scoped cached exclusions and numeric pages; remove reset caller.
 - Earlier-page exclusions, two approved waits and [a,b]/[c,d] regression complete. Focused 7/9 passed; stopped on new failures at useSuggestedFeed.paging.test.tsx:53 and :91. Shards/typecheck unrun; expected inventory 9,150 against 9,142.
