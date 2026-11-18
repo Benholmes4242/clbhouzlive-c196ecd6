@@ -35,33 +35,32 @@ beforeEach(() => { useSessionAudio.setState({ isMuted: true }); });
 afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ isOpen: false, courseGallery: null, galleryData: null, restoreStack: [] }); useSessionAudio.setState({ isMuted: true }); });
 
 describe('course gallery controls', () => {
-  it('the top row renders close, heading, Share and grid in that order', () => {
+  it('the top row renders the back circle then the heading, with no Share or grid circle', () => {
     const view = mount([{ id: 'a' }], 'a');
     const top = view.container.querySelector('.course-gallery-top') as HTMLElement;
     const children = [...top.children];
-    expect(children[0]).toBe(screen.getByRole('button', { name: 'Close' }));
+    expect(children).toHaveLength(2);
+    expect(children[0]).toBe(screen.getByRole('button', { name: 'Back' }));
     expect(children[1].className).toContain('course-gallery-heading');
-    expect(children[2]).toBe(screen.getByRole('button', { name: 'Share' }));
-    expect(children[3]).toBe(screen.getByRole('button', { name: 'Grid view' }));
   });
-  it('grid view hides Share and keeps close and grid', () => {
+  it('grid view keeps back, Share and the grid pill', () => {
     mount([{ id: 'a' }], 'a');
     fireEvent.click(screen.getByRole('button', { name: 'Grid view' }));
-    expect(screen.queryByRole('button', { name: 'Share' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Close' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Share' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Back' })).not.toBeNull();
     expect(screen.getByRole('button', { name: 'Full screen' })).not.toBeNull();
   });
-  it('a video shot renders Tag then mute in the bottom row', () => {
+  it('a video shot renders the canonical video row mute and Tag in the pill row', () => {
     const view = mount([{ id: 'v1', type: 'video' }], 'v1');
-    const actions = [...(view.container.querySelector('.course-gallery-actions') as HTMLElement).children];
-    expect(actions[0]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
-    expect(actions[1]).toBe(screen.getByRole('button', { name: 'Unmute' }));
+    const pills = [...(view.container.querySelector('[data-gallery-pills]') as HTMLElement).children];
+    expect(pills[0]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
+    expect(view.container.querySelector('[data-fullscreen-video-row]')?.contains(screen.getByRole('button', { name: 'Unmute' }))).toBe(true);
   });
   it('a photo shot renders Tag with no mute and no blank slot', () => {
     const view = mount([{ id: 'a' }], 'a');
-    const actions = view.container.querySelector('.course-gallery-actions') as HTMLElement;
-    expect(actions.children).toHaveLength(1);
-    expect(actions.children[0]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
+    const pills = view.container.querySelector('[data-gallery-pills]') as HTMLElement;
+    expect(pills.children).toHaveLength(3);
+    expect(pills.children[0]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
     expect(screen.queryByRole('button', { name: 'Unmute' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Mute' })).toBeNull();
   });
@@ -76,13 +75,13 @@ describe('course gallery controls', () => {
     expect(useSessionAudio.getState().isMuted).toBe(false);
     view.unmount();
   });
-  it('the credit avatar is the 32px squircle with the hairline ring', () => {
+  it('the credit avatar is the 38px squircle with the hairline ring', () => {
     const view = mount([{ id: 'a' }], 'a');
     const credit = view.container.querySelector('.course-gallery-credit') as HTMLElement;
     expect(credit.querySelector('.course-gallery-avatar')).toBeNull();
     const squircle = credit.querySelector('[style*="border-radius: 34%"]') as HTMLElement;
     expect(squircle).not.toBeNull();
-    expect(squircle.style.width).toBe('32px');
+    expect(squircle.style.width).toBe('38px');
     const ring = credit.querySelector('[style*="rgba(255,255,255,0.22)"]') as HTMLElement;
     expect(ring).not.toBeNull();
     expect(ring.style.border).toContain('1px');

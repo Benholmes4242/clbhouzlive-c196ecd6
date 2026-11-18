@@ -37,7 +37,7 @@
  */
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import React, { memo, useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, MessageCircle, Share, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
+import { ChevronRight, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -45,7 +45,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenMuteControl } from './useFullscreenMuteControl';
-import { FullscreenVideoScrubber } from './FullscreenVideoScrubber';
+import { BACK_HIT, BackCircle, COMMENT_BAR_BOTTOM, FS_GLASS, FS_SHADE_BG, FullscreenVideoRow, GUTTER_L, GUTTER_R } from './fullscreenCanon';
 import { COMMENT_BAR_H, BAND_H_CSS } from '@/lib/media/fullscreenBand';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -76,25 +76,9 @@ import { roundChapterLabel } from '@/features/video-details/roundVideoModel';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
-// 16 is a FLOOR, not a fixed offset: on home-indicator phones the pill sits above the indicator.
-const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
-// The scrubber's 32px hit area, centred on the band's top edge.
-const SCRUBBER_H = 32;
-// Glass shared by the back circle, score strip and pills (signed-off mock).
-const FS_GLASS: React.CSSProperties = {
-  background: 'rgba(22,22,26,0.42)',
-  backdropFilter: 'blur(18px) saturate(150%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(150%)',
-  border: '1px solid rgba(255,255,255,0.12)',
-};
-const FS_SHADE_BG = 'linear-gradient(0deg, rgba(6,6,8,0.92) 0%, rgba(6,6,8,0.78) 30%, rgba(6,6,8,0.35) 62%, rgba(6,6,8,0) 100%)';
 const MUTE = 'rgba(248,250,252,0.68)';
 const HOLE_KICKER = /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|[1-9]\d*(st|nd|rd|th))$/i;
 const BODY = 'rgba(248,250,252,0.9)';
-const GUTTER_L = 'max(16px, env(safe-area-inset-left, 0px))';
-const GUTTER_R = 'max(16px, env(safe-area-inset-right, 0px))';
-// The video row (28px) sits 10px above the pill row.
-const VIDEO_ROW_BOTTOM = `calc(${COMMENT_BAR_BOTTOM} + ${COMMENT_BAR_H}px + 10px)`;
 const META = 'rgba(255,255,255,0.62)';
 const META_STRONG = 'rgba(255,255,255,0.78)';
 const FIG: React.CSSProperties = { color: '#FFFFFF', fontWeight: 700 };
@@ -443,15 +427,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
       {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} round={videoRound} chapter={chapter} onScorecard={onOpenScorecard && videoRound ? () => onOpenScorecard(videoRound.context.roundScoreId ?? '') : undefined} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
       {<div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
-      <FullscreenVideoScrubber
-        activePost={activePost}
-        chapters={detailedVideo ? videoChapters : undefined}
-        bottom={`calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
-        left={`calc(${GUTTER_L} + 40px)`}
-        right={GUTTER_R}
-        showTime
-        onDraggingChange={setScrubbing}
-      />
       {/* FeedSlide owns the slide-level notch scrim for top-0 non-gallery rects. */}
       <div
         {...inertWhileScrubbing}
@@ -725,27 +700,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         </div>}
       </div>}
 
-      {/* Video row: mute at the left; the scrubber (fixed, inset) fills the rest with its time. */}
-      {showVideoRow && (
-        <div
-          {...inertWhileScrubbing}
-          data-fullscreen-video-row
-          style={{ position: 'fixed', left: GUTTER_L, bottom: VIDEO_ROW_BOTTOM, height: 28, width: 28, zIndex: Z.echo + 1, pointerEvents: 'none', ...fadeWhileScrubbing }}
-        >
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); handleMuteTap(); }}
-            aria-label={shownMuted ? 'Unmute' : 'Mute'}
-            style={{
-              position: 'absolute', left: -8, top: -8, width: 44, height: 44,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-            }}
-          >
-            {shownMuted ? <VolumeX size={18} stroke="#fff" strokeWidth={2} /> : <Volume2 size={18} stroke="#fff" strokeWidth={2} />}
-          </button>
-        </div>
-      )}
+      <FullscreenVideoRow activePost={activePost} chapters={detailedVideo ? videoChapters : undefined} showMute={showVideoRow} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />
 
       {/* Pill row — in the old comment bar's slot. Buttons only; never a field. */}
       {showPills && (
@@ -779,17 +734,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   );
 });
 
-const BACK_HIT: React.CSSProperties = {
-  width: 44, height: 44, borderRadius: '50%', background: 'transparent',
-  border: 'none', display: 'inline-flex', alignItems: 'center',
-  justifyContent: 'center', color: '#fff', cursor: 'pointer',
-  pointerEvents: 'auto', padding: 0, flexShrink: 0,
-};
-const BackCircle: React.FC = () => (
-  <span data-fullscreen-back-circle style={{ ...FS_GLASS, width: 40, height: 40, borderRadius: '50%', boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-    <ChevronLeft size={18} stroke="#fff" strokeWidth={2.4} style={{ display: 'block' }} />
-  </span>
-);
 
 interface PillProps {
   pill: 'like' | 'comment' | 'share' | 'more';

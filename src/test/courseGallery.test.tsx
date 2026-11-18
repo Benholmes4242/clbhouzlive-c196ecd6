@@ -86,7 +86,7 @@ describe('course gallery rules', () => {
   it('grid filter changes retain grid mode', () => { const view=mount(); fireEvent.click(screen.getByRole('button',{name:'Grid view'})); fireEvent.click(screen.getByRole('button',{name:'Views 1'})); expect(view.container.querySelector('[data-gallery-grid]')).not.toBeNull(); expect(useFullscreenFeedStore.getState().courseGallery?.filter).toBe('views'); });
   it('grid square returns to same shot fullscreen', () => { const view=mount(); fireEvent.click(screen.getByRole('button',{name:'Grid view'})); fireEvent.click(screen.getByRole('button',{name:'View shot u'})); expect(useFullscreenFeedStore.getState().mediaId).toBe('u'); expect(view.container.querySelector('[data-gallery-grid]')).toBeNull(); });
   it('successful tagging keeps shot and updates exact filter counts', () => { mount('all','u'); fireEvent.click(screen.getByRole('button',{name:'Tag this shot'})); act(()=>f.saved?.(holeTag('u',1))); const state=useFullscreenFeedStore.getState(); expect(state.mediaId).toBe('u'); expect(galleryFilters(state.galleryData?.shots??[]).find(f=>f.filter==='holes')?.count).toBe(3); expect(state.courseGallery?.filter).toBe('all'); });
-  it('removing a filtered tag keeps the shot by changing to All', () => { mount('holes','h1'); fireEvent.click(screen.getByRole('button',{name:'Retag'})); act(()=>f.saved?.()); expect(useFullscreenFeedStore.getState().mediaId).toBe('h1'); expect(useFullscreenFeedStore.getState().courseGallery?.filter).toBe('all'); });
+  it('removing a filtered tag keeps the shot by changing to All', () => { mount('holes','h1'); fireEvent.click(screen.getByRole('button',{name:'Fix tag'})); act(()=>f.saved?.()); expect(useFullscreenFeedStore.getState().mediaId).toBe('h1'); expect(useFullscreenFeedStore.getState().courseGallery?.filter).toBe('all'); });
   it('hole cards pass origin and hole straight to gallery with no inline panel', () => { const open=vi.fn(); const view=render(<HoleWalk available holes={[hole()]} rows={[holeTag('h1',1)]} totalMedia={1} onAddFirst={vi.fn()} onOpen={open} />); const card=screen.getByRole('button',{name:'Hole 1'}); fireEvent.click(card); expect(open).toHaveBeenCalledWith(1,card,'hole-card'); expect(view.container.querySelector('.hole-walk-panel')).toBeNull(); });
   it('shot coverage segment passes its exact origin', () => { const open=vi.fn(); render(<HoleWalk available holes={[hole()]} rows={[holeTag('h1',1)]} totalMedia={1} onAddFirst={vi.fn()} onOpen={open} />); const segment=screen.getByRole('button',{name:'Coverage hole 1'}); fireEvent.click(segment); expect(open).toHaveBeenCalledWith(1,segment,'coverage'); });
   it('place card passes the approved newest list and exact origin', () => { const open=vi.fn(); render(<CoursePlaceTiles rows={[placeTag('v','views')]} onOpen={open} />); const card=screen.getByRole('button',{name:'Views'}); fireEvent.click(card); expect(open).toHaveBeenCalledWith('views',[placeTag('v','views')],card); });
@@ -103,10 +103,10 @@ describe('course viewer round 2', () => {
     useFullscreenFeedStore.setState({ isOpen: true, courseGallery: options, galleryData: data, posts: galleryPost(shown, options), activePagerIdx: Math.max(0, shown.findIndex(s=>s.id===start)), syntheticPosts: true, readOnly: true });
     return render(<CourseGalleryChrome onClose={vi.fn()} />);
   }
-  it('the panel holds close, title, grid and chips, and the hole strip on Holes only', () => {
+  it('the panel holds back, title and chips, and the hole strip on Holes only', () => {
     const view = mount('holes'); const panel = view.container.querySelector('[data-gallery-panel]') as HTMLElement;
     expect(panel).not.toBeNull();
-    for (const name of ['Close','Grid view','All 5','Holes 2']) expect(panel.contains(screen.getByRole('button',{name}))).toBe(true);
+    for (const name of ['Back','All 5','Holes 2']) expect(panel.contains(screen.getByRole('button',{name}))).toBe(true);
     expect(panel.textContent).toContain('Sundridge Park (East)');
     expect(panel.querySelector('[data-gallery-jump] .course-gallery-holes')).not.toBeNull();
     fireEvent.click(screen.getByRole('button',{name:'All 5'}));
@@ -119,10 +119,10 @@ describe('course viewer round 2', () => {
     expect([...bar(7)].map(e=>e.getAttribute('data-piece'))).toEqual(['shot']);
     expect([...bar(1)].map(e=>e.getAttribute('data-piece'))).toEqual(['empty']);
   });
-  it('renders JUMP TO A HOLE and THE 4TH · SHOT 1 OF 2', () => {
+  it('renders JUMP TO A HOLE and 4TH · 1 OF 2', () => {
     const view = mountShots(four(), 'holes', 'a');
     expect(view.container.querySelector('[data-gallery-jump]')?.textContent).toContain('JUMP TO A HOLE');
-    expect(view.container.querySelector('[data-gallery-position]')?.textContent).toBe('THE 4TH · SHOT 1 OF 2');
+    expect(view.container.querySelector('[data-gallery-position]')?.textContent).toBe('4TH · 1 OF 2');
   });
   it('jumping to a hole works in full screen and in grid', () => {
     const view = mountShots(four(), 'holes', 'a');
