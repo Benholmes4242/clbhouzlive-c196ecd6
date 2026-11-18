@@ -18,7 +18,11 @@ const QUOTE = 'Great to play West Kent with @[Danny Holmes](u:36f22cdf-4099-44f0
 describe('review previews render mentions', () => {
   it('rail card shows names, never markup, and one tap opens the review', () => {
     const onReviewPress = vi.fn();
-    const review = { id: 'r1', quote: QUOTE, rating: 8, course_name: 'West Kent', course_id: 'c1' } as never;
+    const review = {
+      reviewId: 'r1', quote: QUOTE, rating: 8, courseName: 'West Kent', courseId: 'c1', at: '2026-11-10T10:00:00Z',
+      media: [], courseCountry: null, courseRegion: null, courseSubCountry: null,
+      breakdown: { design: null, conditions: null, clubhouse: null, facilities: null },
+    } as never;
     const { container } = render(
       <MemoryRouter><ReviewRailSlot reviews={[review]} onReviewPress={onReviewPress} /></MemoryRouter>,
     );

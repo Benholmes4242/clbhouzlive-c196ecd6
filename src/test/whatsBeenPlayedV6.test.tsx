@@ -184,31 +184,34 @@ describe('V6 §4 tile', () => {
   });
 });
 
-describe('V6 §5 review card A', () => {
-  const rv = (o: Record<string, unknown> = {}) => ({ reviewId: 'r1', courseId: 'c1', courseName: 'Vale do Lobo (Ocean)', courseImage: null, rating: 8.7, quote: 'Fantastic.', at: '2026-11-10', userId: 'u', reviewerName: 'Benjamin Holmes', reviewerUsername: null, reviewerAvatar: null, mediaUrl: null, mediaType: null, posterUrl: null, courseCountry: null, courseRegion: null, courseSubCountry: null, breakdown: { design: null, conditions: null, clubhouse: null, facilities: null }, ...o }) as never;
+describe('V6 §5 review card (magazine rails)', () => {
+  const rv = (o: Record<string, unknown> = {}) => ({ reviewId: 'r1', courseId: 'c1', courseName: 'Vale do Lobo (Ocean)', courseImage: null, rating: 8.7, quote: 'Fantastic.', at: '2026-11-10', userId: 'u', reviewerName: 'Benjamin Holmes', reviewerUsername: null, reviewerAvatar: null, mediaUrl: null, mediaType: null, posterUrl: null, media: [], courseCountry: null, courseRegion: null, courseSubCountry: null, breakdown: { design: null, conditions: null, clubhouse: null, facilities: null }, ...o }) as never;
   const wrap = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
   it('media line variants', () => {
-    expect(reviewMediaLine(2, 6)).toBe('2 videos & 6 photos');
-    expect(reviewMediaLine(1, 1)).toBe('1 video & 1 photo');
+    expect(reviewMediaLine(2, 6)).toBe('2 videos · 6 photos');
+    expect(reviewMediaLine(1, 1)).toBe('1 video · 1 photo');
     expect(reviewMediaLine(0, 4)).toBe('4 photos');
     expect(reviewMediaLine(3, 0)).toBe('3 videos');
     expect(reviewMediaLine(0, 0)).toBe('');
   });
-  it('name-only footer with the media line 5px above it; no media, no line', () => {
-    const { container } = wrap(<ReviewRailSlot reviews={[rv({ videoCount: 2, photoCount: 6 }), rv({ reviewId: 'r2' })]} onReviewPress={() => {}} />);
-    const cards = container.querySelectorAll('[data-review-card]');
-    const m = cards[0].querySelector('[data-review-media]') as HTMLElement;
-    expect(m.textContent).toBe('2 videos & 6 photos');
-    expect([m.style.marginTop, m.style.marginBottom, m.style.fontSize]).toEqual(['auto', '5px', '11px']);
-    expect(cards[0].querySelector('[data-review-foot]')?.textContent).toBe('Benjamin Holmes');
-    expect(cards[1].querySelector('[data-review-media]')).toBeNull();
-    expect((cards[1].querySelector('[data-review-foot]') as HTMLElement).style.marginTop).toBe('auto');
+  it('the media card footer carries the media counts and age; the written card footer carries the age only', () => {
+    const withMedia = rv({
+      videoCount: 2, photoCount: 6,
+      media: [{ id: 'm1', type: 'image', url: 'https://x/a.jpg', posterUrl: null, streamId: null, durationSeconds: null }],
+    });
+    const { container } = wrap(<ReviewRailSlot reviews={[withMedia, rv({ reviewId: 'r2' })]} onReviewPress={() => {}} />);
+    const mediaFoot = container.querySelector('[data-review-media-card] [data-review-foot]') as HTMLElement;
+    expect(mediaFoot.textContent).toContain('Benjamin Holmes');
+    expect(mediaFoot.querySelector('[data-review-media-line]')!.textContent).toBe('2 videos · 6 photos · Nov');
+    const writtenFoot = container.querySelector('[data-review-written-card] [data-review-foot]') as HTMLElement;
+    expect(writtenFoot.textContent).toContain('Benjamin Holmes');
+    expect(writtenFoot.querySelector('[data-review-media-line]')!.textContent).toBe('Nov');
   });
   it('the whole card, course name included, opens the review sheet', () => {
     const press = vi.fn();
     const { container } = wrap(<ReviewRailSlot reviews={[rv()]} onReviewPress={press} />);
     expect(container.querySelector('button[data-course-name-link]')).toBeNull();
-    fireEvent.click(container.querySelector('[data-review-rail-course]')!);
+    fireEvent.click(container.querySelector('[data-review-course]')!);
     fireEvent.click(container.querySelector('[data-review-foot]')!);
     expect(press).toHaveBeenCalledTimes(2);
   });

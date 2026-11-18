@@ -28,6 +28,16 @@ import { LATEST_REVIEWS_KEY } from '../discoverQueryKeys';
 
 export const LATEST_REVIEWS_PAGE_SIZE = 24;
 
+/** One photo or video attached to a review (course_review_media). */
+export interface ReviewMediaItem {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  posterUrl: string | null;
+  streamId: string | null;
+  durationSeconds: number | null;
+}
+
 export interface LatestReview {
   reviewId: string;
   courseId: string;
@@ -49,6 +59,11 @@ export interface LatestReview {
   photoCount?: number;
   videoCount?: number;
   mediaId?: string | null;
+  /** LATEST_REVIEWS_MAGAZINE: every attached media row, cover first then
+   *  created_at ascending. Absent on readers that do not select the embed. */
+  media?: ReviewMediaItem[];
+  /** LATEST_REVIEWS_MAGAZINE: the course sits on an active Top 100 list. */
+  top100?: boolean;
   courseCountry: string | null;
   courseRegion: string | null;
   courseSubCountry: string | null;

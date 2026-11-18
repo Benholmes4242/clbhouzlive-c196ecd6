@@ -22,7 +22,7 @@ vi.mock('@/components/mentions/MentionText', () => ({ MentionText: ({ text }: { 
 
 import { MostPlayedSection } from '@/components/courses/browse/MostPlayedSection';
 import { WhoPlayingShell, LatestReviewsShell } from '@/components/courses/browse/sectionShells';
-import { ReviewRailSlot } from '@/components/courses/ReviewRailSlot';
+import { MEDIA_CARD_W, ReviewRailSlot, WRITTEN_CARD_W } from '@/components/courses/ReviewRailSlot';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 afterEach(() => { cleanup(); listMock.mockReset(); });
@@ -54,29 +54,61 @@ describe('V5 §3 The regulars pill', () => {
 
 const review = (id: string, userId: string): LatestReview => ({
   reviewId: id, userId, courseId: 'c1', courseName: 'Vale do Lobo (Ocean)', reviewerName: 'Benjamin Holmes', reviewerUsername: null, reviewerAvatar: null,
-  rating: 8.7, quote: 'Fantastic golf course.', at: '2026-11-10T10:00:00Z',
+  rating: 8.7, quote: 'Fantastic golf course.', at: '2026-11-10T10:00:00Z', media: [],
+  courseCountry: 'Portugal', courseRegion: 'Algarve', courseSubCountry: 'Portugal',
+  breakdown: { design: 9, conditions: 8.5, clubhouse: 8, facilities: 8.5 },
 } as unknown as LatestReview);
-const foot = (c: HTMLElement) => c.querySelector('[data-review-foot]')!.textContent;
+const mediaReview = (id: string): LatestReview => ({
+  ...review(id, 'a'), top100: true,
+  media: [
+    { id: 'm1', type: 'image', url: 'https://x/a.jpg', posterUrl: null, streamId: null, durationSeconds: null },
+    { id: 'm2', type: 'video', url: 'https://x/b.mp4', posterUrl: 'https://x/b.jpg', streamId: null, durationSeconds: 42 },
+    { id: 'm3', type: 'image', url: 'https://x/c.jpg', posterUrl: null, streamId: null, durationSeconds: null },
+    { id: 'm4', type: 'image', url: 'https://x/d.jpg', posterUrl: null, streamId: null, durationSeconds: null },
+  ],
+} as unknown as LatestReview);
 
-describe('V5 §4 Latest reviews card B', () => {
-  it('is a 260 × 216 borderless #16161B card, radius 16, padding 12, 8px apart on a 16px rail', () => {
+describe('LATEST_REVIEWS_MAGAZINE rails', () => {
+  it('the written card is min(290px, 100vw-64px), radius 20, padding 16, on a 10px / 16px rail', () => {
+    // jsdom drops min()/calc() widths, so the signed-off width is pinned at the exported constant.
+    expect(WRITTEN_CARD_W).toBe('min(290px, calc(100vw - 64px))');
     const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a'), review('r2', 'b')]} onReviewPress={() => {}} />);
-    const card = container.querySelector('[data-review-card]') as HTMLElement;
-    expect([card.style.width, card.style.height, card.style.borderRadius, card.style.padding, card.style.background]).toEqual(['260px', '216px', '16px', '12px', 'rgb(22, 22, 27)']);
-    expect(card.style.border).toMatch(/^(0|0px|medium none|)$/);
-    expect(card.style.flexDirection).toBe('column');
+    const card = container.querySelector('[data-review-written-card]') as HTMLElement;
+    expect([card.style.borderRadius, card.style.padding, card.style.background]).toEqual(['20px', '16px', 'rgb(22, 22, 27)']);
     const rail = card.parentElement as HTMLElement;
-    expect([rail.style.gap, rail.style.padding]).toEqual(['8px', '0px 16px']);
+    expect([rail.style.gap, rail.style.padding]).toEqual(['10px', '0px 16px']);
   });
-  it('orders kicker, 24px face and rating /10, course, quote, footer; no OUT OF 10 or stat block', () => {
+  it('the written card shows the score, place line, course, quote, four scores and the golfer', () => {
     const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a')]} onReviewPress={() => {}} />);
-    expect(container.querySelector('[data-review-kicker]')!.textContent).toBe('REVIEW');
-    expect(container.querySelector('[data-face="24"]')).not.toBeNull();
     expect(container.querySelector('[data-review-score]')!.textContent).toBe('8.7/10');
-    expect(container.querySelector('[data-review-rail-course]')!.textContent).toBe('Vale do Lobo (Ocean)');
-    expect(container.querySelector('[data-review-played]')).toBeNull();
-    expect(container.textContent).not.toMatch(/ROUNDS? HERE|THEIR BEST/);
-    expect((container.querySelector('[data-review-foot]') as HTMLElement).style.marginTop).toBe('auto');
+    expect(container.querySelector('[data-review-loc]')!.textContent).toBe('Algarve · Portugal');
+    expect(container.querySelector('[data-review-course]')!.textContent).toBe('Vale do Lobo (Ocean)');
+    expect(container.querySelector('[data-review-scores]')!.textContent).toContain('Design');
+    expect(container.querySelector('[data-review-foot]')!.textContent).toContain('Benjamin Holmes');
+    expect(container.querySelector('[data-review-stamp]')).toBeNull();
+  });
+  it('the media card is min(300px, 100vw-64px) with the mosaic, glass disc, TOP 100 stamp and +N on the third tile', () => {
+    const { container } = wrap(<ReviewRailSlot reviews={[mediaReview('r1')]} onReviewPress={() => {}} />);
+    const card = container.querySelector('[data-review-media-card]') as HTMLElement;
+    expect(MEDIA_CARD_W).toBe('min(300px, calc(100vw - 64px))');
+    expect(card.querySelector('[data-review-mosaic]')).not.toBeNull();
+    expect(card.querySelector('[data-review-disc]')!.textContent).toBe('8.7/10');
+    expect(card.querySelector('[data-review-stamp]')!.textContent).toBe('TOP 100');
+    expect(card.querySelector('[data-review-more]')!.textContent).toBe('+1');
+    expect(card.querySelector('[data-review-vid]')!.textContent).toContain('0:42');
+  });
+  it('a review appears once across the two rails, each under its label', () => {
+    const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a'), mediaReview('r2')]} onReviewPress={() => {}} />);
+    const labels = [...container.querySelectorAll('[data-review-rail-label]')].map((l) => l.textContent);
+    expect(labels).toEqual(['SEEN ON THE COURSE', 'WRITTEN REVIEWS']);
+    expect(container.querySelectorAll('[data-review-media-card]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-review-written-card]')).toHaveLength(1);
+  });
+  it('an empty rail hides with its label', () => {
+    const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a')]} onReviewPress={() => {}} />);
+    const labels = [...container.querySelectorAll('[data-review-rail-label]')].map((l) => l.textContent);
+    expect(labels).toEqual(['WRITTEN REVIEWS']);
+    expect(container.querySelector('[data-review-media-card]')).toBeNull();
   });
   it('a tap still opens the review', () => {
     const press = vi.fn();
@@ -84,9 +116,10 @@ describe('V5 §4 Latest reviews card B', () => {
     fireEvent.click(container.querySelector('[data-review-card]')!);
     expect(press).toHaveBeenCalledWith(expect.objectContaining({ reviewId: 'r1' }));
   });
-  it('the shell draws the same card size', () => {
+  it('the shell draws both new card shapes', () => {
     const { container } = wrap(<LatestReviewsShell />);
-    const card = container.querySelector('[data-review-shell-card]') as HTMLElement;
-    expect([card.style.width, card.style.height, card.style.borderRadius]).toEqual(['260px', '216px', '16px']);
+    const cards = [...container.querySelectorAll('[data-review-shell-card]')] as HTMLElement[];
+    expect(cards).toHaveLength(2);
+    expect([cards[0].style.borderRadius, cards[1].style.borderRadius]).toEqual(['20px', '20px']);
   });
 });

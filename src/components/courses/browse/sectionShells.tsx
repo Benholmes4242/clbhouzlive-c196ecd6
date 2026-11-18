@@ -18,8 +18,8 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { Bar } from '@/components/skeletons/shellVocabulary';
 import { HERO_FIGURE_LABEL, HERO_FIGURE_VALUE } from '../CourseMasthead';
 import {
-  CARD_W as REVIEW_W, REVIEW_AVATAR, REVIEW_BG, REVIEW_GAP, REVIEW_H, REVIEW_PAD,
-  REVIEW_RADIUS, REVIEW_RAIL_X,
+  MEDIA_CARD_W, MOSAIC_H, RAIL_GAP, RAIL_LABEL_STYLE, RAIL_X, REVIEW_AVATAR, REVIEW_BG,
+  REVIEW_RADIUS, WRITTEN_CARD_W,
 } from '../ReviewRailSlot';
 import {
   HEAD_GAP, HEAD_KICKER_SIZE, HEAD_TITLE_GAP, HEAD_TITLE_LINE_HEIGHT, HEAD_TITLE_SIZE, SECTION_WRAP,
@@ -193,36 +193,80 @@ export function HardestShell() {
 }
 
 /**
- * Latest reviews: one panel and a clipped second. Each panel draws its
- * SMALLEST settled content — one name line and one quote line — so it can
- * only grow when the 2- and 3-line clamps fill.
+ * Latest reviews (LATEST_REVIEWS_MAGAZINE): the two rails in their new card
+ * shapes — a media card (236px mosaic block, then body lines) and a written
+ * card (lines) — each under its rail label bar. Bars stand only for lines
+ * the settled card can show; the cards clip, so a bar never escapes its cell.
  */
 export function LatestReviewsShell() {
   return (
     <HeadShell>
       <div style={BLEED}>
-        <div style={{ display: 'flex', gap: REVIEW_GAP, overflow: 'hidden', padding: `0 ${REVIEW_RAIL_X}px` }}>
-          {[0, 1].map((i) => (
-            <div
-              key={i}
-              data-review-shell-card=""
-              style={{
-                width: REVIEW_W, height: REVIEW_H, flexShrink: 0, boxSizing: 'border-box', background: REVIEW_BG,
-                borderRadius: REVIEW_RADIUS, padding: REVIEW_PAD, display: 'flex', flexDirection: 'column',
-              }}
-            >
-              <Bar style={{ height: 7, width: 44 }} />
-              <div style={{ marginTop: 9, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Bar style={{ height: REVIEW_AVATAR, width: REVIEW_AVATAR, borderRadius: '34%' }} />
-                <Bar style={{ height: 16, width: 48 }} />
+        <div style={{ ...RAIL_LABEL_STYLE, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 7, width: 108 }} /></div>
+        <div style={{ display: 'flex', gap: RAIL_GAP, overflow: 'hidden', padding: `0 ${RAIL_X}px` }}>
+          <div
+            data-review-shell-card=""
+            style={{
+              width: MEDIA_CARD_W, flexShrink: 0, boxSizing: 'border-box', background: REVIEW_BG,
+              borderRadius: REVIEW_RADIUS, overflow: 'hidden', paddingBottom: 16,
+            }}
+          >
+            <Bar style={{ height: MOSAIC_H, width: '100%', borderRadius: 0 }} />
+            <div style={{ padding: '14px 16px 0' }}>
+              <Bar style={{ height: 9, width: '46%' }} />
+              <div style={{ marginTop: 10 }}><Bar style={{ height: 14, width: '78%' }} /></div>
+              <div style={{ marginTop: 7 }}><Bar style={{ height: 9, width: '94%' }} /></div>
+              <div style={{ marginTop: 6 }}><Bar style={{ height: 9, width: '88%' }} /></div>
+              <div style={{ marginTop: 6 }}><Bar style={{ height: 9, width: '52%' }} /></div>
+              <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 4 }}>
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i}>
+                    <Bar style={{ height: 12, width: '60%' }} />
+                    <div style={{ marginTop: 5 }}><Bar style={{ height: 6, width: '80%' }} /></div>
+                  </div>
+                ))}
               </div>
-              <div style={{ marginTop: 8, height: 17, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 10.5, width: '70%' }} /></div>
-              {[92, 86, 60].map((w, j) => (
-                <div key={j} style={{ marginTop: j === 0 ? 4 : 0, height: 16, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 8.5, width: `${w}%` }} /></div>
-              ))}
-              <div style={{ marginTop: 'auto', height: 14, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 8, width: '75%' }} /></div>
+              <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Bar style={{ height: REVIEW_AVATAR, width: REVIEW_AVATAR, borderRadius: '34%' }} />
+                <Bar style={{ height: 9, width: '34%' }} />
+                <Bar style={{ height: 8, width: '22%', marginLeft: 'auto' }} />
+              </div>
             </div>
-          ))}
+          </div>
+        </div>
+        <div style={{ ...RAIL_LABEL_STYLE, marginTop: 24, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 7, width: 96 }} /></div>
+        <div style={{ display: 'flex', gap: RAIL_GAP, overflow: 'hidden', padding: `0 ${RAIL_X}px` }}>
+          <div
+            data-review-shell-card=""
+            style={{
+              width: WRITTEN_CARD_W, flexShrink: 0, boxSizing: 'border-box', background: REVIEW_BG,
+              borderRadius: REVIEW_RADIUS, overflow: 'hidden', padding: 16,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+              <Bar style={{ height: 9, width: '42%' }} />
+              <Bar style={{ height: 20, width: 44 }} />
+            </div>
+            <div style={{ marginTop: 12 }}><Bar style={{ height: 14, width: '72%' }} /></div>
+            <div style={{ marginTop: 10, paddingLeft: 16, borderLeft: '3px solid rgba(248,250,252,.24)', borderRadius: 2 }}>
+              <Bar style={{ height: 10, width: '96%' }} />
+              <div style={{ marginTop: 7 }}><Bar style={{ height: 10, width: '90%' }} /></div>
+              <div style={{ marginTop: 7 }}><Bar style={{ height: 10, width: '58%' }} /></div>
+            </div>
+            <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 4 }}>
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i}>
+                  <Bar style={{ height: 12, width: '60%' }} />
+                  <div style={{ marginTop: 5 }}><Bar style={{ height: 6, width: '80%' }} /></div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Bar style={{ height: REVIEW_AVATAR, width: REVIEW_AVATAR, borderRadius: '34%' }} />
+              <Bar style={{ height: 9, width: '34%' }} />
+              <Bar style={{ height: 8, width: '14%', marginLeft: 'auto' }} />
+            </div>
+          </div>
         </div>
       </div>
     </HeadShell>
