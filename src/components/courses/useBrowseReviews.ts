@@ -12,9 +12,13 @@
  * advertisement) and never by reactions (they average 2.4 and cannot rank
  * anything).
  *
- * ONE read, no pagination: the slots consume at most a few dozen reviews on the
- * deepest scroll, so a single capped page covers every position the list can
- * reach. Shape is LatestReview so the shipped review sheet consumes it unchanged.
+ * TWO parallel reads, no pagination: a MEDIA read (inner-joined
+ * course_review_media with a URL, 40 newest) and a WORDS read (non-blank
+ * review text, 60 newest), merged, deduped by id, sorted created_at desc and
+ * capped at POOL_CAP. One read of the newest ratings of any kind let
+ * score-only ratings crowd every rail-worthy review out of the cap, leaving
+ * the heading with no rails. Either read failing throws; never a half pool.
+ * Shape is LatestReview so the shipped review sheet consumes it unchanged.
  *
  * LATEST_REVIEWS_MAGAZINE: the select embeds course_review_media and the
  * `review IS NOT NULL` filter is gone, so a media review without text
@@ -38,7 +42,7 @@ import { activeTop100CourseIds, type Top100MembershipRow } from './browse/played
 /** Ceiling on the pool. Deepest reachable list consumes well under this. */
 const POOL_CAP = 80;
 
-const SELECT = `
+const SELECT_BASE = `
   id,
   course_id,
   user_id,
@@ -50,9 +54,16 @@ const SELECT = `
   clubhouse_score,
   facilities_score,
   user_profiles:user_id ( id, username, display_name, profile_photo_url ),
-  course:golf_courses!course_id!inner ( id, name, country, region, sub_country, thumbnail_image ),
-  course_review_media ( id, media_type, media_url, poster_url, stream_id, is_cover, duration_seconds, created_at, width, height )
+  course:golf_courses!course_id!inner ( id, name, country, region, sub_country, thumbnail_image ),`;
+const MEDIA_COLS = 'id, media_type, media_url, poster_url, stream_id, is_cover, duration_seconds, created_at, width, height';
+export const MEDIA_SELECT = `${SELECT_BASE}
+  course_review_media!inner ( ${MEDIA_COLS} )
 `;
+export const WORDS_SELECT = `${SELECT_BASE}
+  course_review_media ( ${MEDIA_COLS} )
+`;
+const MEDIA_LIMIT = 40;
+const WORDS_LIMIT = 60;
 
 interface MediaRow {
   id: string;
@@ -112,11 +123,13 @@ function orderMedia(rows: MediaRow[] | null): ReviewMediaItem[] {
   }));
 }
 
-function mapRow(row: Row): LatestReview | null {
+export function mapRow(row: Row): LatestReview | null {
   const quote = String(row.review ?? '').trim();
   if (!row.course?.id) return null;
   const profile = row.user_profiles;
   const media = orderMedia(row.course_review_media);
+  // Neither words nor usable media: no rail can show it.
+  if (!quote && media.length === 0) return null;
   return {
     reviewId: row.id,
     courseId: row.course.id,
@@ -151,22 +164,46 @@ function mapRow(row: Row): LatestReview | null {
 
 export function useBrowseReviews(country: string | null, region: string | null) {
   const query = useQuery({
-    queryKey: ['courses', 'browse-reviews', country ?? 'all', region ?? 'all'],
+    queryKey: ['courses', 'browse-reviews-v2', country ?? 'all', region ?? 'all'],
     staleTime: 60_000,
     queryFn: async (): Promise<LatestReview[]> => {
-      let q = supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const scope = (q: any) => {
+        let out = q;
+        if (country) out = out.eq('course.sub_country', country);
+        if (country && region) out = out.eq('course.region', region);
+        return out;
+      };
+      const mediaQ = scope(supabase
         .from('course_ratings')
-        .select(SELECT)
+        .select(MEDIA_SELECT)
         .eq('is_mock', false)
+        .not('course_review_media.media_url', 'is', null)
         .order('created_at', { ascending: false })
-        .limit(POOL_CAP);
-      if (country) q = q.eq('course.sub_country', country);
-      if (country && region) q = q.eq('course.region', region);
+        .limit(MEDIA_LIMIT));
+      const wordsQ = scope(supabase
+        .from('course_ratings')
+        .select(WORDS_SELECT)
+        .eq('is_mock', false)
+        .not('review', 'is', null)
+        .neq('review', '')
+        .order('created_at', { ascending: false })
+        .limit(WORDS_LIMIT));
+      const [mediaRes, wordsRes] = (await Promise.all([mediaQ, wordsQ])) as Array<{ data: unknown[] | null; error: unknown }>;
+      if (mediaRes.error) throw mediaRes.error;
+      if (wordsRes.error) throw wordsRes.error;
 
-      const { data, error } = await q;
-      if (error) throw error;
+      const byId = new Map<string, Row>();
+      for (const r of [...((mediaRes.data ?? []) as unknown as Row[]), ...((wordsRes.data ?? []) as unknown as Row[])]) {
+        // The words read carries the full media list; the inner media read may be filtered.
+        const prev = byId.get(r.id);
+        if (!prev || (r.course_review_media?.length ?? 0) > (prev.course_review_media?.length ?? 0)) byId.set(r.id, r);
+      }
+      const merged = [...byId.values()]
+        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+        .slice(0, POOL_CAP);
 
-      const rows = ((data ?? []) as unknown as Row[])
+      const rows = merged
         .map(mapRow)
         .filter((r): r is LatestReview => !!r);
 

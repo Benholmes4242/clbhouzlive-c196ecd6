@@ -35,7 +35,7 @@ it('persists Featured signals and browse Top 100 as arrays, restores membership,
   };
   reads.from.mockImplementation((table: string) => {
     const chain: Record<string, unknown> = {};
-    for (const method of ['select', 'eq', 'in', 'order', 'limit']) chain[method] = () => chain;
+    for (const method of ['select', 'eq', 'in', 'order', 'limit', 'not', 'neq']) chain[method] = () => chain;
     chain.then = (resolve: (value: unknown) => unknown) => Promise.resolve({ data: rows[table] ?? [], error: null }).then(resolve);
     return chain;
   });
@@ -82,7 +82,7 @@ it('persists Featured signals and browse Top 100 as arrays, restores membership,
   second.unmount();
   const legacy = setup();
   for (const query of restoredData.queries) {
-    legacy.client.setQueryData(query.queryKey, query.queryKey[1] === 'browse-reviews' ? query.state.data : {});
+    legacy.client.setQueryData(query.queryKey, query.queryKey[1] === 'browse-reviews-v2' ? query.state.data : {});
   }
   const third = renderHook(useSignals, { wrapper: legacy.wrapper });
   for (const ids of [third.result.current.featured.played, third.result.current.featured.reviewed, third.result.current.featured.top100, third.result.current.featured.connected, third.result.current.featured.likedPosts]) {

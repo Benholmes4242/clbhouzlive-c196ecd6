@@ -15,7 +15,9 @@ export function LatestReviewsSection({ reviews, onReviewPress, loading = false }
   loading?: boolean;
   onReviewPress: (r: LatestReview) => void;
 }) {
-  if (reviews.length === 0) return loading ? <LatestReviewsShell /> : null;
+  // No heading without a rail: only a review a rail can show counts (same rules as ReviewRailSlot).
+  const qualifies = reviews.some((r) => (r.media ?? []).length >= 1 || !!r.quote?.trim());
+  if (!qualifies) return loading ? <LatestReviewsShell /> : null;
   return (
     <section style={LATEST_REVIEWS_WRAP}>
       <SectionHead tone="amber" kicker="In golfers' words" title="Latest reviews" />
