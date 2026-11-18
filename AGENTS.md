@@ -100,4 +100,3 @@ Report the suite total before and after, and name the source of any delta. A cou
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
-- Canonical fullscreen pieces (glass, shade, back circle, FullscreenVideoRow) live in fullscreen-feed/fullscreenCanon.tsx; Immersive and course gallery chrome both import them, so the two viewers cannot drift.
