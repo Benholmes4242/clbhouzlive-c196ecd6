@@ -1253,3 +1253,8 @@ Command: `npx vitest run src/test/yourPickRemoval.test.tsx src/test/pickSheetV2.
 Current harness typecheck (2026-11-18T11:33:06Z): src/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock.tsx(193,2): `error TS2741: Property 'expect' is missing in type '{ id: string; base: boolean; children: Element; }' but required in type '{ id: string; base: boolean; expect: readonly string[]; hero?: boolean; children?: ReactNode; }'.` No manual typecheck/build run. Preview is not clean; end-to-end/browser checks not performed.
 
 Static RPC audit found no retired member-pick calls in surviving feature files outside the explicitly protected Clubhouse tour area. Memory save was rejected by project capacity; no new project memory was saved.
+
+## Preview-error follow-up
+Restored the required `expect={[]}` on PicksBlock's readiness band; it no longer waits for the removed member band. No tests or assertions changed; inventory remains expected **9,068**, baseline **9,164**, full suite still unrun.
+Command: `npx vitest run src/test/pickSheetV2.test.tsx src/test/pk1RecordHeading.test.tsx src/test/tournamentPickInsights.test.tsx --maxWorkers=2`: **55/55 passed**, 3 files, no unhandled errors. This resolves the readiness failures in those three files. Latest harness result **2026-11-18T11:35:57Z: build OK**.
+The previously reported tee-tag assertion at yourPickRemoval.test.tsx:31 remains unchanged and unresolved; four shards and browser checks were not run in this build-error-only follow-up.

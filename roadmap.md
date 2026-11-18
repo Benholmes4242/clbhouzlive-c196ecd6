@@ -3,7 +3,7 @@
 ## Stopped: Your pick removal
 - Remove member pick entrypoints, reads, unused modules and unreachable copy; preserve Our picks and Clubhouse tour.
 - Focused checks: 251 executed / 246 passed / 5 failed, plus 2 unhandled errors. Shards not run. Expected inventory 9,068 (9,164 − 100 retired cases + 4 regressions).
-- Blocked by missing PicksBlock expect array (TS2741 / overviewShells every error) and new tee-tag regression expecting one occurrence of a group rendered twice; failed tests left unchanged after stop.
+- Preview follow-up: required empty expect array restored; affected Our picks tests pass 55/55 and harness build OK. Still blocked by new tee-tag regression expecting one occurrence of a group rendered twice; assertions unchanged, shards not run.
 - Report: .lovable/reports/your-pick-removal.md.
 
 ## Complete: Latest reviews taps and gaps — suite and public spacing

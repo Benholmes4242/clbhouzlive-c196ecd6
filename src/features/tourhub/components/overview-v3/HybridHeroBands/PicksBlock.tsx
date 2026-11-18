@@ -190,7 +190,7 @@ function PicksBlockSession({
   }, [teeDay]);
 
   return (
-<OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)}>
+<OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
     <div data-overview-picks style={{ paddingTop: 8, paddingBottom: 10 }}>
       <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
