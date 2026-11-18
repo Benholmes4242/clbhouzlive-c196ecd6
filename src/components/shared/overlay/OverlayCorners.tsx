@@ -214,7 +214,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
               style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
               onClick={onCreatorClick}
             >
-              <InlineProMemberName userId={actorType === 'personal' ? userId : undefined}>{creatorName}</InlineProMemberName>
+              <InlineProMemberName flow="text" userId={actorType === 'personal' ? userId : undefined}>{creatorName}</InlineProMemberName>
             </button>
           )}
         </div>

@@ -371,7 +371,7 @@ export function BusinessCommandCard({
             >
               {business.name}
               {isVerified && (
-                <span className="inline-flex align-middle ml-1.5"><VerifiedBadge size="sm" /></span>
+                <span className="inline align-middle ml-1.5"><VerifiedBadge size="sm" className="inline" /></span>
               )}
             </div>
             <p style={{ color: BIZ.inkMute, fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}>

@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: iPhone review excerpt text flow — existing Tour test blocker
+- Opt in clamped member names/badges to inline text flow; preserve default names, two-line review clamp and badge artwork.
+- Inline flow applied to review/comment/overlay names and two verified business-name wrappers. New structure regressions plus existing coverage pass 16/16; preview build OK.
+- Shard 1 stopped: 2,224 passed / 1 failed of 2,225 at unchanged yourPickRemoval.test.tsx:31:18 (duplicated tee tags). Shards 2–4 not run; expected inventory 9,070 (+2 from 9,068). Ben's iPhone validation remains unverified.
+- Report: .lovable/reports/review-excerpt-iphone.md.
+
 ## Stopped: Your pick removal
 - Remove member pick entrypoints, reads, unused modules and unreachable copy; preserve Our picks and Clubhouse tour.
 - Focused checks: 251 executed / 246 passed / 5 failed, plus 2 unhandled errors. Shards not run. Expected inventory 9,068 (9,164 − 100 retired cases + 4 regressions).

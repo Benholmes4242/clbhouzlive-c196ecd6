@@ -170,7 +170,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
               overflow: 'hidden',
             }}
           >
-            <span style={{ color: INK, fontWeight: 700 }}><InlineProMemberName userId={l.actor_type === 'personal' ? l.actor_id : undefined}>{l.display_name}</InlineProMemberName></span>
+            <span style={{ color: INK, fontWeight: 700 }}><InlineProMemberName flow="text" userId={l.actor_type === 'personal' ? l.actor_id : undefined}>{l.display_name}</InlineProMemberName></span>
             <span style={{ color: MID, fontWeight: 500, marginLeft: 5 }}>
               <MentionText text={(l.content ?? '').trim()} />
             </span>

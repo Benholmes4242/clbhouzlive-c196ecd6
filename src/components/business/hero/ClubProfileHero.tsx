@@ -265,8 +265,8 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
               <h1 ref={p.nameRef} style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: 0, lineHeight: 1.1, color: INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
                 {p.name}
                 {p.verified && (
-                  <span aria-label="Verified" style={{ display: 'inline-flex', marginLeft: 7, verticalAlign: -1 }}>
-                    <VerifiedBadge size="lg" />
+                  <span aria-label="Verified" style={{ display: 'inline', marginLeft: 7, verticalAlign: -1 }}>
+                    <VerifiedBadge size="lg" className="inline" />
                   </span>
                 )}
               </h1>
