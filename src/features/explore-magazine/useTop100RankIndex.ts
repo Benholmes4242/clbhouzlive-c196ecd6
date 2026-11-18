@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -53,7 +54,7 @@ function isRankSlug(slug: string): slug is RankListSlug {
 }
 
 export function useTop100RankIndex(enabled = true) {
-  const query = useQuery<Top100RankIndex>({
+  const query = useQuery<Array<[string, CourseRankStanding]>>({
     queryKey: ['top100-rank-index'],
     enabled,
     staleTime: 60 * 60_000,
@@ -82,9 +83,11 @@ export function useTop100RankIndex(enabled = true) {
         }
         out.set(row.course_id, { rank: row.rank, scope: slug });
       }
-      return out;
+      return Array.from(out.entries());
     },
   });
 
-  return { index: query.data ?? null, isFetched: !enabled ? true : query.isFetched };
+  // Persist tuples, reconstruct only at the consumer boundary; legacy {} is empty.
+  const index = useMemo(() => query.data == null ? null : new Map<string, CourseRankStanding>(Array.isArray(query.data) ? query.data : []), [query.data]);
+  return { index, isFetched: !enabled ? true : query.isFetched };
 }

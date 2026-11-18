@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Persisted sets fix — unrelated existing tap test
+- Convert Featured signals and browse review stamps to JSON-safe arrays with memoized Set consumers and legacy-object guards.
+- Audit all allowlisted query payloads; add restoration regressions; run focused tests and four sequential shards, stopping on any unexpected failure.
+- Restoration focused tests 3/3; shard 1 2,293 passed, shard 2 2,252 passed / 1 failed at cb69CourseNameLink.test.tsx:81:19 (missing old data-review-rail-course target). Shards 3–4 stopped; needs explicit test-repair ruling. Expected inventory 9,160; report .lovable/reports/persisted-sets-fix.md. Authenticated reload unavailable on external Supabase.
+
 ## Stopped: Latest reviews magazine — brief/mock ruling
 - New request: replace the Courses Latest reviews card with separate media-magazine and written rails, review-owned media, active Top 100 stamps, matching shells and sequential suite verification.
 - Width conflict: brief §3 specifies min(300px, 100vw - 64px) for both rails; signed-off mock .wr specifies min(290px, width - 64px). Awaiting Ben's ruling before implementation. Report: .lovable/reports/latest-reviews-magazine.md.

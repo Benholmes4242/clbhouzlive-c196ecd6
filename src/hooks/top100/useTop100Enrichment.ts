@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { batchDigest, top100Keys, viewerId } from '@/lib/queryKeys';
 import { supabase } from '@/integrations/supabase/client';
@@ -90,7 +90,7 @@ export function useTop100Enrichment(
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
-    queryFn: async (): Promise<Map<string, Top100Enrichment>> => {
+    queryFn: async (): Promise<Top100Enrichment[]> => {
       const ids = courseIds;
 
       const [aggRes, ctxRes, mineRes, actRes] = await Promise.all([
@@ -206,11 +206,13 @@ export function useTop100Enrichment(
       // Merge over what we already had: a row that has a block keeps it.
       const merged = new Map(previousRef.current);
       map.forEach((value, id) => merged.set(id, value));
-      return merged;
+      return Array.from(merged.values());
     },
   });
 
-  if (data && data !== previousRef.current) previousRef.current = data;
+  // Persist plain rows; keep the monotonic merge and Map API outside the cache.
+  const map = useMemo(() => data == null ? EMPTY : new Map((Array.isArray(data) ? data : []).map((entry) => [entry.courseId, entry])), [data]);
+  if (map !== previousRef.current) previousRef.current = map;
 
-  return { data: data ?? EMPTY, isLoading };
+  return { data: map, isLoading };
 }

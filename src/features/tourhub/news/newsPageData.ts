@@ -2,7 +2,7 @@
  * for the By-event chip names, one sr_leaderboards read for the lead's event
  * card, and the search read — which exists only while searching. Story chips
  * and followed names keep their shared overview reads (useOverviewNewsData). */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { BoardEntry } from '../leaderboard/BoardTable';
@@ -12,16 +12,19 @@ import { isRetiredTour } from '../constants/tourMap';
 /** Real tournament names for the By-event chips. One read for every chip id. */
 export function useNewsEventNames(ids: string[]) {
   const sorted = [...ids].sort();
-  return useQuery({
+  const query = useQuery({
     queryKey: ['tour-news-event-names', sorted],
     enabled: sorted.length > 0,
     staleTime: Infinity,
     queryFn: async () => {
       const { data, error } = await supabase.from('sr_tournaments').select('id,name').in('id', sorted);
       if (error) throw error;
-      return new Map((data ?? []).map((row) => [row.id as string, row.name as string]));
+      return (data ?? []).map((row) => [row.id as string, row.name as string] as [string, string]);
     },
   });
+  // Persist tuples, never Maps; legacy objects restore as an empty map.
+  const data = useMemo(() => query.data == null ? undefined : new Map<string, string>(Array.isArray(query.data) ? query.data : []), [query.data]);
+  return { ...query, data };
 }
 
 /** The lead event's board — position-ordered, for the event card's states. */

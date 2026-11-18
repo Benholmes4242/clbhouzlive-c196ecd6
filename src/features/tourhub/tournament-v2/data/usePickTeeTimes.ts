@@ -6,6 +6,7 @@
  * sr_players.id). A failed or empty read yields an empty map, so pick cards
  * render exactly as they do without tee times.
  */
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -16,7 +17,7 @@ export function usePickTeeTimes(
   options?: { enabled?: boolean },
 ) {
   const ids = [...new Set(playerIds.filter(Boolean))].sort();
-  return useQuery<Map<string, string>>({
+  const query = useQuery<Array<[string, string]>>({
     queryKey: ['tournament-v2', 'pick-tee-times', tournamentId, round, ids.join(',')],
     enabled: !!tournamentId && ids.length > 0 && (options?.enabled ?? true),
     staleTime: 5 * 60_000,
@@ -33,7 +34,10 @@ export function usePickTeeTimes(
         if (!row.tee_time) continue;
         for (const p of row.players ?? []) if (p.player_id && !map.has(String(p.player_id))) map.set(String(p.player_id), row.tee_time);
       }
-      return map;
+      return Array.from(map.entries());
     },
   });
+  // Only tuples enter persistence; consumers retain their memoized Map API.
+  const data = useMemo(() => query.data == null ? undefined : new Map<string, string>(Array.isArray(query.data) ? query.data : []), [query.data]);
+  return { ...query, data };
 }

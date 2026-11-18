@@ -22,11 +22,14 @@
  * then created_at ascending) plus photo/video counts. A second read marks
  * pool courses on any active Top 100 list (activeTop100CourseIds); a failed
  * Top 100 read means no stamps, never an error.
+ * Top 100 query data stays JSON-safe (sorted unique arrays); Sets exist only
+ * in the memoized consumer layer, which treats legacy non-array data as empty.
  *
  * NO SURFACE MAY PRINT A REVIEW TOTAL from this pool: it is capped at POOL_CAP
  * (80) and the sheet it feeds does not page, so any count is a cap, not a truth.
  */
 
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { LatestReview, ReviewMediaItem } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
@@ -200,21 +203,21 @@ export function useBrowseReviews(country: string | null, region: string | null) 
     queryKey: ['courses', 'browse-reviews-top100', courseIds.join(',')],
     enabled: courseIds.length > 0,
     staleTime: 60_000,
-    queryFn: async (): Promise<Set<string>> => {
+    queryFn: async (): Promise<string[]> => {
       const { data, error } = await supabase
         .from('course_top100_memberships')
         .select('course_id, top100_lists!inner(slug, is_active)')
         .in('course_id', courseIds)
         .eq('top100_lists.is_active', true);
-      if (error) return new Set<string>();
-      return activeTop100CourseIds((data ?? []) as unknown as Top100MembershipRow[]);
+      if (error) return [];
+      return Array.from(activeTop100CourseIds((data ?? []) as unknown as Top100MembershipRow[])).sort();
     },
   });
-  const top100 = top100Query.data;
+  const top100 = useMemo(() => new Set(Array.isArray(top100Query.data) ? top100Query.data : []), [top100Query.data]);
 
   return {
     /** Newest first, already scoped, stamped. Empty means NO slots — the correct absence. */
-    pool: top100 ? pool.map((r) => ({ ...r, top100: top100.has(r.courseId) })) : pool,
+    pool: pool.map((r) => ({ ...r, top100: top100.has(r.courseId) })),
     isPending: query.isPending,
     isLoading: query.isLoading,
   };

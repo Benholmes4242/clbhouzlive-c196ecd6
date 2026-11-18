@@ -10,6 +10,8 @@
  *   review text present, created_at in the window), paged, cap 500;
  * - member faces: readMemberFaces (user_profiles, public_profiles filling gaps)
  *   for every active member, so unconnected members keep names and faces;
+ * Persisted faces/courses payloads are arrays; memoized Maps preserve callers
+ * and reject non-array legacy cache entries.
  * One golf_courses read for every active course id; the viewer's home course is
  * the first golf_courses row of their canonical club (user_profiles.primary_club_id,
  * via useViewerHomeClubId — home_club_id is deprecated and never written).
@@ -108,16 +110,18 @@ export function usePlayedRounds(userId: string | undefined) {
     ...(posts.data ?? []).filter((p) => p.actor_type !== 'business').map((p) => p.user_id),
     ...(reviews.data ?? []).map((r) => r.user_id),
   ].filter((v): v is string => !!v))).sort(), [rounds.data, posts.data, reviews.data]);
-  const faces = useQuery({ queryKey: ['courses', 'played-faces', memberIds.join('|')], enabled: memberIds.length > 0, staleTime: 5 * 60_000, queryFn: () => readMemberFaces(memberIds) });
+  const faces = useQuery({ queryKey: ['courses', 'played-faces', memberIds.join('|')], enabled: memberIds.length > 0, staleTime: 5 * 60_000, queryFn: async () => Array.from((await readMemberFaces(memberIds)).values()) });
   const courses = useQuery({
     queryKey: ['courses', 'played-courses', ids.join('|')],
     enabled: ids.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase.from('golf_courses').select(COURSE_COLS).in('id', ids);
       if (error) throw error;
-      return new Map(((data ?? []) as CourseRow[]).map((c) => [c.id, toCourse(c)]));
+      return ((data ?? []) as CourseRow[]).map(toCourse);
     },
   });
+  const faceMap = useMemo(() => new Map((Array.isArray(faces.data) ? faces.data : []).map((f) => [f.id, f])), [faces.data]);
+  const courseMap = useMemo(() => new Map((Array.isArray(courses.data) ? courses.data : []).map((c) => [c.id, c])), [courses.data]);
   const homeClub = useViewerHomeClubId(userId);
   const home = useQuery({
     queryKey: ['courses', 'played-home', homeClub.clubId],
@@ -131,5 +135,5 @@ export function usePlayedRounds(userId: string | undefined) {
     },
   });
   const homeReady = !userId || (homeClub.ready && (!homeClub.clubId || home.isFetched || home.isError));
-  return { rounds, posts, reviews, faces, memberIds, courses, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady, homeClubId: homeClub.clubId ?? null };
+  return { rounds, posts, reviews, faces: { ...faces, data: faceMap }, memberIds, courses: { ...courses, data: courseMap }, ids, home: homeClub.clubId ? home.data ?? null : null, homeReady, homeClubId: homeClub.clubId ?? null };
 }
