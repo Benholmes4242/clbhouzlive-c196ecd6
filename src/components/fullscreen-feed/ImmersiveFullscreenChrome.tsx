@@ -180,6 +180,8 @@ interface Props {
   readOnly?: boolean;
   /** A successful source batch omitted this post: no phantom mutations/share. */
   actionsUnavailable?: boolean;
+  /** Only ids returned by the viewer's successful RLS source-post batch. */
+  confirmedSourcePostIds?: readonly string[];
   /** Member-shot opens only: synthetic post ids — the progress writer stays off. */
   syntheticPosts?: boolean;
   onBeforeNavigate?: () => void;
@@ -214,6 +216,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   golfCourse,
   readOnly = false,
   actionsUnavailable = false,
+  confirmedSourcePostIds = [],
   syntheticPosts = false,
   onBeforeNavigate,
   feedEnded = false,
@@ -377,11 +380,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // Only hole rows carry an ordinal kicker ("The 4th" / "The fifteenth", from
   // holeOrdinal); place labels and course-tile shots never do.
   const shotHasHole = !!shot && HOLE_KICKER.test(shot.kicker.trim());
-  const shotSourcePostId = shot?.sourcePostId ?? null;
+  const shotSourcePostId = shot?.sourcePostId && confirmedSourcePostIds.includes(shot.sourcePostId) ? shot.sourcePostId : null;
   const hasPostActions = !syntheticPosts || !!shotSourcePostId;
   const standaloneCourseId = shot?.courseId || activePost.courseId;
   // Tag previews without a post/course have no valid share destination.
-  const showPills = !readOnly && !actionsUnavailable && (hasPostActions || !!standaloneCourseId);
+  const showPills = !readOnly && (syntheticPosts || !actionsUnavailable) && (hasPostActions || !!standaloneCourseId);
   const shareShot = () => {
     if (hasPostActions) { onShare(activePost); return; }
     if (!standaloneCourseId) return;

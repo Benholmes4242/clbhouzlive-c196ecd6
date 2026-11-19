@@ -31,8 +31,8 @@ export interface MediaItem {
     avatarUrl: string | null;
     memberName: string;
     memberUserId?: string | null;
-    /** PF2_GUIDE: the live public post this shot came from; null for every
-     *  other tag path (Media tab, places, course posts). */
+    /** Carried from every tag path; the viewer acts on it only once the
+     * viewer's batch read confirms the post. */
     sourcePostId?: string | null;
   };
 }

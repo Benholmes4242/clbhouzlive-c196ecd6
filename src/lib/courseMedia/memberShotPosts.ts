@@ -38,8 +38,8 @@ export interface MemberShotRow {
   hole_no?: number;
   par?: number | null;
   yards?: number | null;
-  /* PF2_GUIDE: the live Everyone post this shot came from, when the server
-     supplies one; only ever non-null when that post is safe to open. */
+  /* Carried from every tag path; the viewer acts on it only once the
+     viewer's batch read confirms the post. */
   source_post_id?: string | null;
 }
 

@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Confirmed source-post viewer rule
+- Confirmed synthetic actions/View post implemented; loading/failed/unmatched use standalone sharing; exact place assertion and one passing lifecycle test added. Expected inventory 9,118 → 9,134 (+16); harness build OK.
+- Focused 41/48: seven unchanged fixtures lack confirmation/engagement in canonicalFullscreenViewer, canonicalGalleryChrome, galleryControls and pf2HoleGuide. Each file-alone rerun reproduced. Four shards blocked on ruling; errors/lines/timings in .lovable/reports/fullscreen-viewer-action-pills.md.
+- Ben's iPhone public-place actions/View post, Tag preview and JohnL Media/Watch score checks remain unverified.
+
 ## Stopped: Viewer read-only rulings and Tag preview guard
 - Applied exactly three authorised options edits/two renames; unlinked synthetic previews have no pills; valid course shots share only. Added one case; focused 61/61; no other expected readOnly opens found. Harness build OK.
 - Sequential shards 1 and 2 passed 2,239 and 2,266; shard 3 passed 2,278 and failed pf2HoleGuide.test.tsx:103:61 (“expected 'post-9' to be null”, 7ms). Isolated reproduces 13/14, 10ms; shard 4 blocked on ruling. Failed test untouched. Inventory 9,118 → expected 9,133 (+15); report .lovable/reports/fullscreen-viewer-action-pills.md.

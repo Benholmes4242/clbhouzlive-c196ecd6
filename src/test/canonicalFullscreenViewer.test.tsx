@@ -77,6 +77,33 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.clearAllMocks(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 
 describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
+  it('place shot actions and View post require a resolved source batch; unmatched shots share only', () => {
+    const shot = { ...realPost, id: 'shots:place', courseId: 'c1', mediaItems: [{ ...realPost.mediaItems[0],
+      memberShot: { kicker: 'The clubhouse', title: 'Course', credit: '', memberName: '', avatarUrl: null, courseId: 'c1', sourcePostId: 'post-9' } }] } as FeedPost;
+    const rows = [{ id: 'post-9', userId: 'u1', actorId: 'u1', actorType: 'personal' as const,
+      caption: '', createdAt: '', likeCount: 4, commentCount: 2, isLikedByMe: false }];
+    const renderState = (resolved: boolean, returned: typeof rows) => <MemoryRouter><ImmersiveFullscreenChrome
+      posts={[shot]} activeIndex={0} syntheticPosts confirmedSourcePostIds={resolved ? returned.map(row => row.id) : []}
+      onClose={vi.fn()} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()}
+      getLikeState={() => ({ isLiked: false, count: 0 })} getCommentCount={() => 0} getFollowState={() => false}
+      onFollow={vi.fn()} onViewProfile={vi.fn()} onReviewTap={vi.fn()} isOwnPost={false} /></MemoryRouter>;
+    const view = render(renderState(false, []));
+    const pills = () => [...view.container.querySelectorAll('[data-pill]')].map(p => p.getAttribute('data-pill'));
+    expect(viewerActionPost(shot, shot.mediaItems[0], rows, false)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'View post' })).toBeNull();
+    expect(pills()).toEqual(['share']);
+    view.rerender(renderState(true, rows));
+    expect(viewerActionPost(shot, shot.mediaItems[0], rows, true)?.id).toBe('post-9');
+    expect(screen.getByRole('button', { name: 'View post' })).toBeInTheDocument();
+    expect(pills()).toEqual(['like', 'comment', 'share', 'more']);
+    view.rerender(renderState(true, []));
+    expect(viewerActionPost(shot, shot.mediaItems[0], [], true)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'View post' })).toBeNull();
+    expect(pills()).toEqual(['share']);
+    view.rerender(renderState(false, rows));
+    expect(screen.queryByRole('button', { name: 'View post' })).toBeNull();
+    expect(pills()).toEqual(['share']);
+  });
   it('untagged Tag previews have no pills; standalone course photos share a valid Media URL only', () => {
     openTagShot({ url: '/untagged.jpg', mediaType: 'image' }, document.createElement('button'));
     const args = h.open.mock.calls.at(-1)?.[0];

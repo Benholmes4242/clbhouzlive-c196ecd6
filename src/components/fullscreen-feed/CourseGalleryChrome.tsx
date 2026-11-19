@@ -88,7 +88,7 @@ export function CourseGalleryChrome({ onClose, engagement }: { onClose: () => vo
   const age = place ? placeAge(filteredGallery(data.shots, place.id)[0]?.addedAt ?? '') : null;
   const action = shot ? galleryAction(shot, user?.id, admin) : null;
   const sourcePostId = shot?.item.memberShot?.sourcePostId ?? (!shot?.post.id.startsWith('shots:') ? shot?.post.id : null);
-  const hasPostActions = !!sourcePostId;
+  const hasPostActions = !!sourcePostId && !!engagement;
   const run = galleryRun(data.shots, shot);
   const runIndex = shot ? Math.max(0, run.findIndex(row => row.id === shot.id)) : 0;
   const currentHole = !grid ? shot?.holeTag?.hole_no : undefined;

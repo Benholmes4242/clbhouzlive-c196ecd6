@@ -98,9 +98,9 @@ describe('PF2 holeShotItems source post', () => {
     const posts = latestHolesToFeedPosts([shotRow('a', 'post-9', '2026-11-06T10:00:00Z')]);
     expect(posts[0].mediaItems[0].memberShot?.sourcePostId).toBe('post-9');
   });
-  it('place shots never get one', () => {
+  it('place shots carry their source post', () => {
     const posts = placeShotsToFeedPosts([shotRow('a', 'post-9', '2026-11-06T10:00:00Z')], 'Machrihanish', 'c1', 'clubhouse', 'The clubhouse');
-    expect(posts[0].mediaItems[0].memberShot?.sourcePostId).toBeNull();
+    expect(posts[0].mediaItems[0].memberShot?.sourcePostId).toBe('post-9');
   });
 });
 

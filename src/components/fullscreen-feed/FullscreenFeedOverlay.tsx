@@ -544,8 +544,8 @@ export function FullscreenFeedOverlay() {
   const actionPostFor = useCallback((post: FeedPost): FeedPost | null => {
     const item = post.mediaItems[pager ?? 0] ?? post.mediaItems[0];
     const gallerySource = courseGallery && galleryData ? filteredGallery(galleryData.shots, courseGallery.filter)[pager ?? 0]?.post : null;
-    return viewerActionPost(gallerySource ?? post, item, sourceContent.posts, sourceContent.resolved);
-  }, [pager, sourceContent.posts, sourceContent.resolved, courseGallery, galleryData]);
+    return viewerActionPost(gallerySource ?? post, item, sourceContent.posts, sourceContent.resolved, syntheticPosts);
+  }, [pager, sourceContent.posts, sourceContent.resolved, courseGallery, galleryData, syntheticPosts]);
   // CB49: double-tap only ever likes — same path as the rail's like button.
   const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
@@ -1101,7 +1101,8 @@ export function FullscreenFeedOverlay() {
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
                     readOnly={readOnly}
-                    actionsUnavailable={!activeActionPost && !!activePost && !(syntheticPosts && !activePost.mediaItems[pager ?? 0]?.memberShot?.sourcePostId)}
+                    actionsUnavailable={!syntheticPosts && !activeActionPost && !!activePost}
+                    confirmedSourcePostIds={sourceContent.resolved ? sourceContent.posts.map(post => post.id) : []}
                     syntheticPosts={syntheticPosts}
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}

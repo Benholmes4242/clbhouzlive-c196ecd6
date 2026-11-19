@@ -18,10 +18,11 @@ export function viewerPostIds(posts: readonly FeedPost[]): string[] {
 }
 
 /** A successful batch is authoritative; a loading/failed read is not absence. */
-export function viewerActionPost(post: FeedPost, item: MediaItem | undefined, rows: Awaited<ReturnType<typeof readViewerPosts>>, resolved: boolean): FeedPost | null {
+export function viewerActionPost(post: FeedPost, item: MediaItem | undefined, rows: Awaited<ReturnType<typeof readViewerPosts>>, resolved: boolean, synthetic = !!item?.memberShot): FeedPost | null {
   const id = viewerPostId(post, item);
   if (!id) return post.engagementTarget?.type === 'review' ? post : null;
   const fetched = rows.find(row => row.id === id);
+  if (synthetic && (!resolved || !fetched)) return null;
   if (resolved && !fetched) return null;
   return { ...post, ...fetched, id, isReview: false, review: null, engagementTarget: undefined };
 }
