@@ -870,6 +870,51 @@
     "featured": {
       "featuredPill": "주목",
       "birdieRun": "{{count}}연속 버디"
+    },
+    "lately": {
+      "tile": {
+        "you": "나",
+        "circle": "서클",
+        "par": "PAR",
+        "gross": "GROSS",
+        "toPar": "TO PAR",
+        "net": "NET",
+        "points": "POINTS",
+        "playedOff": "PLAYED OFF",
+        "your": "내",
+        "their": "그의",
+        "firstRound": "여기서 <b>첫 라운드</b>",
+        "bestEver": "<b>Best</b> of {{possessive}} {{n}} rounds here · <b>{{delta}}</b> against {{possessive}} average here",
+        "bestEverNoDelta": "<b>Best</b> of {{possessive}} {{n}} rounds here",
+        "bestSince": "<b>Best here since {{month}}</b> · <b>{{delta}}</b> against {{possessive}} average here",
+        "bestSinceNoDelta": "<b>Best here since {{month}}</b>",
+        "ordinalRound": "<b>{{ordinal}} round</b> here",
+        "average": "<b>{{delta}}</b> against {{possessive}} average here",
+        "level": "<b>Level</b> with {{possessive}} average here",
+        "factRounds": "ROUNDS",
+        "factGolfers": "GOLFERS",
+        "factAvg": "AVG TO PAR",
+        "factAvgShort": "AVG",
+        "factBest": "BEST",
+        "factBestShort": "BEST",
+        "keyUnder": "언더파",
+        "keyBogey": "보기",
+        "keyDouble": "더블",
+        "keyTriple": "트리플+"
+      }
+    },
+    "honours": {
+      "kicker": "HONOURS",
+      "title": "명예의 전당",
+      "lede": "회원이 여기서 기록한 모든 홀인원과 알바트로스.",
+      "aces": "HOLES IN ONE",
+      "albatrosses": "ALBATROSSES",
+      "pageOf": "{{k}} of {{pages}}",
+      "aceSub": "<b>{{hole}}</b>",
+      "albatrossSub": "<b>{{strokes}} on the {{hole}}</b>",
+      "yards": "{{n}} yds",
+      "par": "par {{n}}",
+      "competition": "대회"
     }
   },
   "directorySheet": {

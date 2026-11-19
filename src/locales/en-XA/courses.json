@@ -1407,6 +1407,51 @@
       "featuredPill": "[~~Ƒéáţúřéđ~~]",
       "birdieRun": "[~~{{count}} ƀířđíéš íñ á řőŵ~~]",
       "courseRecordJoint": "[~~Ĵőíñţ ĉőúřšé řéĉőřđ~~]"
+    },
+    "lately": {
+      "tile": {
+        "you": "[You]",
+        "circle": "[Circle]",
+        "par": "[PAR]",
+        "gross": "[GROSS]",
+        "toPar": "[TO PAR]",
+        "net": "[NET]",
+        "points": "[POINTS]",
+        "playedOff": "[PLAYED OFF]",
+        "your": "[your]",
+        "their": "[their]",
+        "firstRound": "[<b>First round</b> here]",
+        "bestEver": "[<b>Best</b> of {{possessive}} {{n}} rounds here · <b>{{delta}}</b> against {{possessive}} average here]",
+        "bestEverNoDelta": "[<b>Best</b> of {{possessive}} {{n}} rounds here]",
+        "bestSince": "[<b>Best here since {{month}}</b> · <b>{{delta}}</b> against {{possessive}} average here]",
+        "bestSinceNoDelta": "[<b>Best here since {{month}}</b>]",
+        "ordinalRound": "[<b>{{ordinal}} round</b> here]",
+        "average": "[<b>{{delta}}</b> against {{possessive}} average here]",
+        "level": "[<b>Level</b> with {{possessive}} average here]",
+        "factRounds": "[ROUNDS]",
+        "factGolfers": "[GOLFERS]",
+        "factAvg": "[AVG TO PAR]",
+        "factAvgShort": "[AVG]",
+        "factBest": "[BEST]",
+        "factBestShort": "[BEST]",
+        "keyUnder": "[Under par]",
+        "keyBogey": "[Bogey]",
+        "keyDouble": "[Double]",
+        "keyTriple": "[Triple+]"
+      }
+    },
+    "honours": {
+      "kicker": "[HONOURS]",
+      "title": "[The honours board]",
+      "lede": "[Every hole-in-one and albatross a member has recorded here.]",
+      "aces": "[HOLES IN ONE]",
+      "albatrosses": "[ALBATROSSES]",
+      "pageOf": "[{{k}} of {{pages}}]",
+      "aceSub": "[<b>{{hole}}</b>]",
+      "albatrossSub": "[<b>{{strokes}} on the {{hole}}</b>]",
+      "yards": "[{{n}} yds]",
+      "par": "[par {{n}}]",
+      "competition": "[COMPETITION]"
     }
   },
   "courseHero": {

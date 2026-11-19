@@ -55,7 +55,7 @@ export function recentSentenceParts(row: StandoutRound, locale = 'en', options: 
   return { ...s, key, defaultValue };
 }
 
-function recentSentenceCourse(row: StandoutRound, locale: string): RecentSentence | null {
+export function recentSentenceCourse(row: StandoutRound, locale: string): RecentSentence | null {
   const course = row.course_name ?? '';
   /* (1) no course, or gross/par missing: no line. "Missing" means the round
      carries no comparison figures at all and the par is not a plausible

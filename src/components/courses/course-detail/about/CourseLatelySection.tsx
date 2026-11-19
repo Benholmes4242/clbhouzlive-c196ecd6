@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { RoundCard } from '@/features/explore-magazine/watch/RoundCard';
+import '@/features/explore-magazine/watch/lately-tile.css';
 import { SHELF_CARD, SHELF_SKELETON } from '@/features/explore-magazine/watch/roundsShelfRules';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -18,12 +19,10 @@ import { LATELY_TILES_MIN, latelyShortDate, signedAvg } from './latelyRules';
  * nothing from the RPC, so nothing renders. Zero rounds renders nothing; an
  * errored read hides quietly (Recent rounds' behaviour), never as empty.
  * The rail reuses Recent rounds' RoundCard; it is never forked.
+ * COURSE_PAGE_ROUND_TILES: the boxed tiles became a plain four-cell facts row
+ * (same LATELY_TILES_MIN rule) and a colour key sits under the rail.
  */
 const RAIL_INSET = 16;
-const TILE: React.CSSProperties = {
-  flex: 1, minWidth: 0, background: '#17171B', border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: 12, padding: '10px 12px', boxSizing: 'border-box',
-};
 
 const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefined }> = ({ courseId, userId }) => {
   const { t, i18n } = useTranslation('courses');
@@ -83,8 +82,6 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
   const anyCircle = rounds.some((r) => r.in_circle);
   const roundsText = `${total} ${total === 1 ? t('courseDetail.lately.round', 'round') : t('courseDetail.lately.rounds', 'rounds')}`;
   const golfersText = `${golfers} ${golfers === 1 ? t('courseDetail.lately.golfer', 'golfer') : t('courseDetail.lately.golfers', 'golfers')}`;
-  const valueStyle: React.CSSProperties = { display: 'block', fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1.15 };
-  const labelStyle: React.CSSProperties = { display: 'block', fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, marginTop: 3 };
 
   return (
     <div data-course-lately="ready">
@@ -97,31 +94,35 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
             <b style={{ color: A.INK, fontWeight: 700 }}>{golfersText}</b>
             .
           </p>
-          {total >= LATELY_TILES_MIN ? (
-            <div data-course-lately-tiles style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-              <div style={TILE}>
-                <b className="tabular-nums" style={valueStyle}>{total}</b>
-                <small style={labelStyle}>{t('courseDetail.lately.tileRounds', 'ROUNDS')}</small>
-              </div>
-              <div style={TILE}>
-                <b className="tabular-nums" style={valueStyle}>{signedAvg(first.window_avg_topar)}</b>
-                <small style={labelStyle}>{t('courseDetail.lately.tileAvg', 'AVG OVER PAR')}</small>
-              </div>
-              <div style={TILE}>
-                <b className="tabular-nums" style={valueStyle}>{first.best_gross ?? '–'}</b>
-                <small style={labelStyle}>
-                  {t('courseDetail.lately.tileBest', 'BEST GROSS')}
-                  {first.best_gross_date ? ` · ${latelyShortDate(first.best_gross_date, locale)}` : ''}
-                </small>
-              </div>
-            </div>
-          ) : null}
         </div>
+        {total >= LATELY_TILES_MIN ? (
+          <div data-course-lately-facts className="lately-facts">
+            <div><b>{total}</b><small>{t('courseDetail.lately.tile.factRounds', 'ROUNDS')}</small></div>
+            <div><b>{golfers}</b><small>{t('courseDetail.lately.tile.factGolfers', 'GOLFERS')}</small></div>
+            <div>
+              <b>{signedAvg(first.window_avg_topar)}</b>
+              <small>
+                <span className="lately-long">{t('courseDetail.lately.tile.factAvg', 'AVG TO PAR')}</span>
+                <span className="lately-short">{t('courseDetail.lately.tile.factAvgShort', 'AVG')}</span>
+              </small>
+            </div>
+            <div>
+              <b>{first.best_gross ?? '–'}</b>
+              <small>
+                <span className="lately-long">
+                  {t('courseDetail.lately.tile.factBest', 'BEST')}
+                  {first.best_gross_date ? ` · ${latelyShortDate(first.best_gross_date, locale)}` : ''}
+                </span>
+                <span className="lately-short">{t('courseDetail.lately.tile.factBestShort', 'BEST')}</span>
+              </small>
+            </div>
+          </div>
+        ) : null}
         <div
           ref={railRef}
           data-course-lately-rail
           style={{
-            display: 'flex', gap: SHELF_CARD.gap, marginTop: 14, padding: `0 ${RAIL_INSET}px 2px`, overflowX: 'auto',
+            display: 'flex', gap: SHELF_CARD.gap, padding: `16px ${RAIL_INSET}px 2px`, overflowX: 'auto', alignItems: 'stretch',
             scrollbarWidth: 'none', scrollSnapType: 'x proximity', scrollPaddingInline: RAIL_INSET,
             overscrollBehaviorX: 'contain', willChange: 'transform',
           }}
@@ -143,6 +144,12 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
           {isFetchingNextPage ? (
             <div style={{ flex: 'none', width: SHELF_SKELETON.width, minHeight: SHELF_SKELETON.minHeight, borderRadius: SHELF_SKELETON.radius, background: SHELF_SKELETON.background }} />
           ) : null}
+        </div>
+        <div data-course-lately-key className="lately-key">
+          <span><i data-key="under" />{t('courseDetail.lately.tile.keyUnder', 'Under par')}</span>
+          <span><i data-key="bogey" />{t('courseDetail.lately.tile.keyBogey', 'Bogey')}</span>
+          <span><i data-key="double" />{t('courseDetail.lately.tile.keyDouble', 'Double')}</span>
+          <span><i data-key="triple" />{t('courseDetail.lately.tile.keyTriple', 'Triple+')}</span>
         </div>
         <div data-course-lately-foot style={{ padding: `0 ${GUTTER}px`, marginTop: 12, fontSize: 12, color: A.DIM }}>
           {anyCircle

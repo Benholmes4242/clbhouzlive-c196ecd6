@@ -87,20 +87,21 @@ describe('CS1 Lately here', () => {
     expect([...document.querySelectorAll('[data-course-lately-lede] b')].map((b) => b.textContent)).toEqual(['23 rounds', '9 golfers']);
   });
 
-  it('(c) tiles show at 4, hide at 3; signed average', async () => {
+  it('(c) facts row shows at 4, hides at 3; signed average', async () => {
     f.rows = Array.from({ length: 4 }, (_, i) => row(i));
     mount();
     await ready();
-    const tiles = document.querySelector('[data-course-lately-tiles]');
-    expect(tiles?.children.length).toBe(3);
+    const tiles = document.querySelector('[data-course-lately-facts]');
+    expect(tiles?.children.length).toBe(4);
     expect(tiles?.querySelectorAll('b')[0].textContent).toBe('4');
-    expect(tiles?.querySelectorAll('b')[1].textContent).toBe('+10.8');
-    expect(tiles?.querySelectorAll('b')[2].textContent).toBe('74');
+    expect(tiles?.querySelectorAll('b')[1].textContent).toBe('3');
+    expect(tiles?.querySelectorAll('b')[2].textContent).toBe('+10.8');
+    expect(tiles?.querySelectorAll('b')[3].textContent).toBe('74');
     cleanup();
     f.rows = Array.from({ length: 3 }, (_, i) => row(i, { total_count: 3 }));
     mount();
     await ready();
-    expect(document.querySelector('[data-course-lately-tiles]')).toBeNull();
+    expect(document.querySelector('[data-course-lately-facts]')).toBeNull();
     expect(document.querySelectorAll('[data-rounds-shelf-card="round"]').length).toBe(3);
     expect(signedAvg(0)).toBe('E');
     expect(signedAvg(-1.2)).toBe('\u22121.2');
@@ -109,7 +110,7 @@ describe('CS1 Lately here', () => {
     expect(latelyShortDate('2025-10-29', 'en', new Date('2026-11-05'))).toContain('2025');
   });
 
-  it('(d) no second line without a circle, CIRCLE only when in_circle, amber own round', async () => {
+  it('(d) meta line reads You / Circle with the date, amber own round', async () => {
     f.rows = [row(1, { user_id: 'me', total_count: 2 }), row(2, { in_circle: true, total_count: 2 })];
     mount();
     await ready();
@@ -118,15 +119,10 @@ describe('CS1 Lately here', () => {
     expect((cards[0] as HTMLElement).style.border.replace(/\s/g, '')).toContain('rgba(247,147,30,0.35)');
     expect((cards[0].querySelector('[data-round-card-name]') as HTMLElement).style.color).toBe('rgb(247, 147, 30)');
     expect(cards[1].getAttribute('data-own-round')).toBeNull();
-    /* EXPLORE TILES A: a non-circle round has no second header line; a circle
-       round's second line carries only CIRCLE. The date lives in the foot. */
-    expect(cards[0].querySelector('[data-round-card-circle]')).toBeNull();
-    expect(cards[0].querySelector('[data-round-card-name]')?.nextElementSibling).toBeNull();
-    expect(cards[1].querySelector('[data-round-card-circle]')).not.toBeNull();
-    const circleSub = cards[1].querySelector('[data-round-card-name]')?.nextElementSibling;
-    expect(circleSub?.textContent).toBe('CIRCLE');
-    expect(cards[0].querySelector('.standout-when')).toHaveTextContent('Nov 4');
-    expect(cards[0].querySelector('.standout-who')).not.toHaveTextContent('Nov 4');
+    /* COURSE_PAGE_ROUND_TILES 1c: the meta line under the name carries the
+       date, led by You for your own round and Circle for a circle round. */
+    expect(cards[0].querySelector('[data-round-card-meta]')?.textContent).toBe('You · Nov 4');
+    expect(cards[1].querySelector('[data-round-card-meta]')?.textContent).toBe('Circle · Nov 4');
     expect(document.querySelector('[data-course-lately-foot]')?.textContent).toBe('Newest first. Your circle is marked.');
     fireEvent.click(cards[1]);
     expect(f.openByScore).toHaveBeenCalledWith('s2', null, 'u2');

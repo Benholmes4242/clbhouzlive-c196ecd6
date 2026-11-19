@@ -871,6 +871,51 @@
     "featured": {
       "featuredPill": "Destacada",
       "birdieRun": "{{count}} birdies seguidos"
+    },
+    "lately": {
+      "tile": {
+        "you": "Tú",
+        "circle": "Círculo",
+        "par": "PAR",
+        "gross": "BRUTO",
+        "toPar": "AL PAR",
+        "net": "NETO",
+        "points": "PUNTOS",
+        "playedOff": "JUGÓ CON",
+        "your": "tu",
+        "their": "su",
+        "firstRound": "<b>Primera vuelta</b> aquí",
+        "bestEver": "<b>La mejor</b> de {{possessive}}s {{n}} vueltas aquí · <b>{{delta}}</b> respecto a {{possessive}} media aquí",
+        "bestEverNoDelta": "<b>La mejor</b> de {{possessive}}s {{n}} vueltas aquí",
+        "bestSince": "<b>La mejor aquí desde {{month}}</b> · <b>{{delta}}</b> respecto a {{possessive}} media aquí",
+        "bestSinceNoDelta": "<b>La mejor aquí desde {{month}}</b>",
+        "ordinalRound": "<b>{{ordinal}} vuelta</b> aquí",
+        "average": "<b>{{delta}}</b> respecto a {{possessive}} media aquí",
+        "level": "<b>Igual</b> que {{possessive}} media aquí",
+        "factRounds": "VUELTAS",
+        "factGolfers": "GOLFISTAS",
+        "factAvg": "MEDIA AL PAR",
+        "factAvgShort": "MEDIA",
+        "factBest": "MEJOR",
+        "factBestShort": "MEJOR",
+        "keyUnder": "Bajo par",
+        "keyBogey": "Bogey",
+        "keyDouble": "Doble",
+        "keyTriple": "Triple+"
+      }
+    },
+    "honours": {
+      "kicker": "HONORES",
+      "title": "El cuadro de honor",
+      "lede": "Cada hoyo en uno y albatros que un miembro ha registrado aquí.",
+      "aces": "HOYOS EN UNO",
+      "albatrosses": "ALBATROS",
+      "pageOf": "{{k}} de {{pages}}",
+      "aceSub": "<b>{{hole}}</b>",
+      "albatrossSub": "<b>{{strokes}} en el {{hole}}</b>",
+      "yards": "{{n}} yds",
+      "par": "par {{n}}",
+      "competition": "COMPETICIÓN"
     }
   },
   "directorySheet": {

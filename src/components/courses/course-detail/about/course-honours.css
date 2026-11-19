@@ -1,0 +1,23 @@
+/* The honours board (signed-off mock, 390/320). */
+.honours-group { margin-top: 18px; }
+.honours-group + .honours-group { margin-top: 22px; }
+.honours-head { display: flex; justify-content: space-between; padding: 0 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(248,250,252,0.62); }
+.honours-head b { color: #F8FAFC; font-weight: 700; font-variant-numeric: tabular-nums; }
+.honours-pos { color: rgba(248,250,252,0.42); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.honours-pages { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; will-change: transform; }
+.honours-pages::-webkit-scrollbar { display: none; }
+.honours-page { flex: 0 0 100%; padding: 0 20px; box-sizing: border-box; scroll-snap-align: start; }
+.honours-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+.honours-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.18); }
+.honours-dots i[data-on="true"] { background: #F8FAFC; }
+.honours-row {
+  display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; column-gap: 12px; align-items: center; min-height: 56px;
+  width: 100%; background: none; border: 0; padding: 0; margin: 0; color: #F8FAFC; font: inherit; text-align: left; cursor: pointer;
+}
+.honours-mark { width: 28px; height: 28px; border-radius: 50%; border: 1.6px solid #E24B3F; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.honours-nm { min-width: 0; }
+.honours-name { display: block; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.honours-sub { display: block; margin-top: 2px; font-size: 12px; color: rgba(248,250,252,0.42); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.honours-sub em { font-style: normal; font-weight: 600; color: rgba(248,250,252,0.78); }
+.honours-dt { text-align: right; font-size: 12.5px; color: rgba(248,250,252,0.62); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.honours-dt small { display: block; margin-top: 3px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: rgba(248,250,252,0.42); }

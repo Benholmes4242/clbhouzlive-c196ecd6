@@ -871,6 +871,51 @@
     "featured": {
       "featuredPill": "Ausgewählt",
       "birdieRun": "{{count}} Birdies in Folge"
+    },
+    "lately": {
+      "tile": {
+        "you": "Du",
+        "circle": "Kreis",
+        "par": "PAR",
+        "gross": "BRUTTO",
+        "toPar": "ZUM PAR",
+        "net": "NETTO",
+        "points": "PUNKTE",
+        "playedOff": "GESPIELT MIT",
+        "your": "deinem",
+        "their": "ihrem",
+        "firstRound": "<b>Erste Runde</b> hier",
+        "bestEver": "<b>Beste</b> von {{n}} Runden hier · <b>{{delta}}</b> gegenüber {{possessive}} Schnitt hier",
+        "bestEverNoDelta": "<b>Beste</b> von {{n}} Runden hier",
+        "bestSince": "<b>Beste hier seit {{month}}</b> · <b>{{delta}}</b> gegenüber {{possessive}} Schnitt hier",
+        "bestSinceNoDelta": "<b>Beste hier seit {{month}}</b>",
+        "ordinalRound": "<b>{{ordinal}} Runde</b> hier",
+        "average": "<b>{{delta}}</b> gegenüber {{possessive}} Schnitt hier",
+        "level": "<b>Gleichauf</b> mit {{possessive}} Schnitt hier",
+        "factRounds": "RUNDEN",
+        "factGolfers": "GOLFER",
+        "factAvg": "Ø ZUM PAR",
+        "factAvgShort": "Ø",
+        "factBest": "BESTE",
+        "factBestShort": "BESTE",
+        "keyUnder": "Unter Par",
+        "keyBogey": "Bogey",
+        "keyDouble": "Doppel",
+        "keyTriple": "Triple+"
+      }
+    },
+    "honours": {
+      "kicker": "EHRENTAFEL",
+      "title": "Die Ehrentafel",
+      "lede": "Jedes Hole-in-One und jeder Albatros, die ein Mitglied hier erzielt hat.",
+      "aces": "HOLE-IN-ONES",
+      "albatrosses": "ALBATROSSE",
+      "pageOf": "{{k}} von {{pages}}",
+      "aceSub": "<b>{{hole}}</b>",
+      "albatrossSub": "<b>{{strokes}} auf der {{hole}}</b>",
+      "yards": "{{n}} yds",
+      "par": "par {{n}}",
+      "competition": "WETTSPIEL"
     }
   },
   "directorySheet": {

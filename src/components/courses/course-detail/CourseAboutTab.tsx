@@ -18,6 +18,7 @@ import CourseFactsAndTees from './about/CourseFactsAndTees';
 import AboutThisPlace from './about/AboutThisPlace';
 import TheVerdict from './about/TheVerdict';
 import CourseLatelySection from './about/CourseLatelySection';
+import CourseHonoursSection from './about/CourseHonoursSection';
 import DefendsPar from './about/DefendsPar';
 import RecordBook from './about/RecordBook';
 import WhatPeopleSay from './about/WhatPeopleSay';
@@ -148,6 +149,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <TheVerdict courseId={course.id} courseName={course.name} />
         {/* CS1 — Lately here, between the verdict and About this course. */}
         <CourseLatelySection courseId={course.id} userId={user?.id} />
+        {/* The honours board, directly after Lately here. */}
+        <CourseHonoursSection courseId={course.id} userId={user?.id} />
         <AboutThisPlace courseId={course.id} description={course.description} />
         <CourseFactsAndTees courseId={course.id} />
         <DefendsPar courseId={course.id} courseName={course.name} />

@@ -1,0 +1,55 @@
+/* COURSE_PAGE_ROUND_TILES — the Lately here tile (signed-off mock, 390/320). */
+.lately-tile {
+  flex: none; width: min(300px, calc(100vw - 64px)); box-sizing: border-box;
+  padding: 16px; border-radius: 18px; background: #17171B;
+  display: flex; flex-direction: column; scroll-snap-align: start;
+  container-type: inline-size; container-name: lately-tile; cursor: pointer; text-align: left;
+}
+.lately-tile-who {
+  display: flex; align-items: center; gap: 11px; min-height: 40px; min-width: 0;
+  background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.lately-tile-identity { display: block; min-width: 0; flex: 1; }
+.lately-tile-name { display: block; font-size: 15px; font-weight: 600; color: #F8FAFC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lately-tile-meta { display: block; margin-top: 2px; font-size: 12px; color: rgba(248,250,252,0.42); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lately-tile-line { margin-top: 12px; min-height: 36px; font-size: 12.5px; line-height: 1.45; color: rgba(248,250,252,0.62); }
+.lately-tile-line b { color: #F8FAFC; font-weight: 600; }
+.lately-tile-nines { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.lately-nine {
+  display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)) 28px; column-gap: 1px; row-gap: 3px;
+  padding: 7px 6px 7px 3px; border-radius: 10px; background: rgba(255,255,255,0.06);
+}
+.lately-nine > span { display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lately-nine-n { font-size: 9px; font-weight: 600; color: rgba(248,250,252,0.42); }
+.lately-nine-n.lately-nine-t { font-size: 8.5px; font-weight: 700; letter-spacing: 0.06em; color: rgba(248,250,252,0.62); justify-content: flex-end; }
+.lately-nine-s { height: 21px; font-size: 12px; font-weight: 700; color: #F8FAFC; }
+.lately-nine-s.lately-nine-st { justify-content: flex-end; font-size: 12.5px; }
+.lately-nine i { font-style: normal; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+.lately-nine i[data-mark="under"] { border: 1.4px solid #E24B3F; border-radius: 50%; }
+.lately-nine i[data-mark="bogey"] { border: 1.4px solid rgba(248,250,252,0.78); border-radius: 4px; }
+.lately-nine i[data-mark="double"] { border: 1.4px solid #3B82F6; border-radius: 4px; color: #9CC1FF; }
+.lately-nine i[data-mark="triple"] { background: #3B82F6; border-radius: 4px; }
+@container lately-tile (max-width: 250px) {
+  .lately-nine { grid-template-columns: repeat(9, minmax(0, 1fr)) 24px; padding: 6px 4px 6px 2px; }
+  .lately-nine i { width: 18px; height: 18px; }
+  .lately-nine-s { font-size: 11.5px; height: 19px; }
+}
+
+/* Facts row and key (CourseLatelySection). */
+.lately-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 16px 20px 0; }
+.lately-facts > div { min-width: 0; }
+.lately-facts > div:last-child { text-align: right; }
+.lately-facts b { display: block; font-size: 17px; font-weight: 700; line-height: 1; color: #F8FAFC; font-variant-numeric: tabular-nums; }
+.lately-facts small { display: block; margin-top: 7px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248,250,252,0.42); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lately-facts .lately-short { display: none; }
+@media (max-width: 340px) {
+  .lately-facts .lately-long { display: none; }
+  .lately-facts .lately-short { display: inline; }
+}
+.lately-key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 12px 20px 0; font-size: 11px; color: rgba(248,250,252,0.42); }
+.lately-key span { display: inline-flex; align-items: center; gap: 6px; }
+.lately-key i { width: 11px; height: 11px; box-sizing: border-box; }
+.lately-key i[data-key="under"] { border: 1.4px solid #E24B3F; border-radius: 50%; }
+.lately-key i[data-key="bogey"] { border: 1.4px solid rgba(248,250,252,0.78); border-radius: 2px; }
+.lately-key i[data-key="double"] { border: 1.4px solid #3B82F6; border-radius: 2px; }
+.lately-key i[data-key="triple"] { background: #3B82F6; border-radius: 2px; }

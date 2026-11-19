@@ -31,6 +31,12 @@ export interface ScoreFigureRowProps {
   /** Hold the cells after the hairline (data pending): the lead and divider
    *  draw, the breakdown reserves its height and prints nothing. */
   held?: boolean;
+  /** Space either side of the hairline; default 16 (unchanged callers). */
+  dividerSpace?: number;
+  /** Replaces the default narrow-container rules when set (opt-in). */
+  rules?: string;
+  /** Lead figure/label alignment; default start (unchanged callers). */
+  leadAlign?: 'center';
 }
 
 const TAB = 'tabular-nums lining-nums';
@@ -53,7 +59,7 @@ export function scoreFigureRules(name: string, leadKey: string): string {
 `;
 }
 
-export const ScoreFigureRow: React.FC<ScoreFigureRowProps> = ({ name, lead, cells, dividerColor, cellWeight, style, held = false }) => {
+export const ScoreFigureRow: React.FC<ScoreFigureRowProps> = ({ name, lead, cells, dividerColor, cellWeight, style, held = false, dividerSpace = 16, rules, leadAlign }) => {
   if (!lead && cells.length === 0 && !held) return null;
   const showCells = !held && cells.length > 0;
   const split = held || cells.length > 0;
@@ -62,10 +68,10 @@ export const ScoreFigureRow: React.FC<ScoreFigureRowProps> = ({ name, lead, cell
   const rowAttrs = { [`data-${name}-row`]: '', 'data-variant': 'card' } as Record<string, string>;
   return (
     <div {...containerAttrs} style={{ containerType: 'inline-size', width: '100%', minWidth: 0 }}>
-      <style {...rulesAttrs}>{scoreFigureRules(name, lead?.key ?? 'overall')}</style>
+      <style {...rulesAttrs}>{rules ?? scoreFigureRules(name, lead?.key ?? 'overall')}</style>
       <div {...rowAttrs} style={{ display: 'grid', gridTemplateColumns: lead && split ? 'auto 1fr' : '1fr', alignItems: 'end', width: '100%', ...style }}>
         {lead && (
-          <div data-score-cell={lead.key} data-score-divider={split ? '' : undefined} style={split ? { paddingRight: 16, marginRight: 16, borderRight: `1px solid ${dividerColor}` } : undefined}>
+          <div data-score-cell={lead.key} data-score-divider={split ? '' : undefined} style={{ ...(split ? { paddingRight: dividerSpace, marginRight: dividerSpace, borderRight: `1px solid ${dividerColor}` } : {}), ...(leadAlign ? { textAlign: leadAlign } : {}) }}>
             <div data-score-figure style={{ fontSize: 26, fontWeight: 700, lineHeight: 1, color: lead.color ?? '#FFFFFF', fontVariantNumeric: TAB }}>{lead.value}</div>
             <div data-score-label style={SCORE_FIGURE_LABEL}>{lead.label}</div>
           </div>
