@@ -1,9 +1,9 @@
 # Roadmap
 
-## Stopped: WAGR career-best tile — focused observer timing
+## Stopped: WAGR career-best tile — existing failed-read timing
 - Extract Career's rank/week/id selection into one shared helper; tile uses loaded history with summary fallback. Chart, Career output and Settings remain unchanged.
-- Three new checks pass; two superseded summary assertions updated. Focused 45/46 stops at wagrRankingTab.test.tsx:213:17 (318th absent while history still loading); isolated reproduces 29/30. Four shards not started; timing-fix ruling needed. Full report: .lovable/reports/wagr-career-best-tile.md.
-- Baseline 9,169 = requested 9,165 + four NET follow-up cases; expected 9,172. Ben's iPhone check remains external.
+- Pending history now holds the empty tile; settled rows use shared career best, failed/empty history uses summary. Authorised findByText change plus two new tests pass; earlier three cases unchanged. Focused 47/48 stopped at unchanged wagrRankingTab.test.tsx:223:17 (312th absent while history pending); isolated reproduces 31/32. Four shards not started; failed-read wait ruling needed.
+- Baseline 9,169; expected 9,174 (+ five cases across this work). Full report: .lovable/reports/wagr-career-best-tile.md. Ben's iPhone check remains external.
 
 ## Complete: Source-post fixture ruling and sequential suite
 - Supplied confirmation/engagement only in the seven authorised fixtures; all assertions/names and negative checks preserved. No application changes or inventory delta in this request.

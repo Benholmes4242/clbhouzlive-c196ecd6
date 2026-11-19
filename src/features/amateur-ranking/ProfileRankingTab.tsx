@@ -1,7 +1,9 @@
 /** Verified elite-amateur Ranking tab. ProfilePageV2 gates on the summary read,
  * so this never mounts without a row. A failed history or events read removes
  * only its own sections — no figure is ever shown from a failed read. Chart
- * colours come from INDEX_DELTA.dark; wins use the gam gold #FBBC2E. */
+ * colours come from INDEX_DELTA.dark; wins use the gam gold #FBBC2E.
+ * BEST RANK holds its empty state while history is pending, preventing a
+ * rolling-summary number flashing before the shared career-high settles. */
 import { useId, useState } from 'react';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { useAmateurCareer, useAmateurEvents, useAmateurHistory, useAmateurSummary } from './useAmateurRanking';
@@ -70,7 +72,7 @@ export function ProfileRankingTab({ userId, isOwner = false }: { userId: string;
         <text x="346" y="115" className="amr-ax" textAnchor="end">{axisLabel(rows[rows.length - 1].week)}</text>
       </svg>}
       <div className="amr-tiles">
-        {tile('BEST RANK', bestRank != null ? wagrOrdinal(bestRank) : null)}
+        {tile('BEST RANK', !history.isPending && bestRank != null ? wagrOrdinal(bestRank) : null)}
         {tile('WINS', totals?.wins ?? null, true)}
         {tile('TOP 10S', totals?.top10s ?? null)}
         {tile('EVENTS', totals?.events ?? null)}

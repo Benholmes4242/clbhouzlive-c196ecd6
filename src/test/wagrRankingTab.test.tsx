@@ -10,6 +10,7 @@ const h = vi.hoisted(() => ({
   history: [] as any[],
   events: [] as any[],
   historyError: false,
+  historyPending: null as Promise<{ data: any[]; error: null }> | null,
   eventsError: false,
   link: null as any,
   invoke: vi.fn(),
@@ -24,10 +25,10 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { functions: { invo
     delete: () => chain,
     single: () => Promise.resolve({ data: { show_tour_results: true }, error: null }),
     maybeSingle: () => Promise.resolve({ data: table === 'amateur_rank_links' ? h.link : h.summary, error: null }),
-    then: (resolve: any) => Promise.resolve(table === 'amateur_career_moments' ? { data: [], error: null } : {
+    then: (resolve: any) => (table === 'amateur_rank_history' && h.historyPending ? h.historyPending : Promise.resolve(table === 'amateur_career_moments' ? { data: [], error: null } : {
       data: table === 'amateur_rank_history' ? (h.historyError ? null : h.history) : h.eventsError ? null : h.events,
       error: (table === 'amateur_rank_history' ? h.historyError : h.eventsError) ? new Error('read failed') : null,
-    }).then(resolve),
+    })).then(resolve),
   };
   return chain;
 } } }));
@@ -68,6 +69,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.summary = LEWY_SUMMARY; h.history = LEWY_HISTORY; h.events = LEWY_EVENTS;
   h.historyError = false; h.eventsError = false; h.link = null;
+  h.historyPending = null;
   h.invoke.mockImplementation(async () => ({ data: {}, error: null }));
 });
 afterEach(() => { cleanup(); clients.splice(0).forEach(client => client.clear()); });
@@ -210,7 +212,7 @@ it('A failed events read removes only the events section', async () => {
   mount(<ProfileRankingTab userId="member" />);
   await screen.findByText('#318');
   expect(screen.queryByText('RECENT EVENTS')).toBeNull();
-  expect(screen.getByText('318th')).toBeInTheDocument();
+  expect(await screen.findByText('318th')).toBeInTheDocument();
 });
 it('A failed history read removes movement and chart but keeps figures', async () => {
   h.historyError = true;
@@ -222,6 +224,26 @@ it('A failed history read removes movement and chart but keeps figures', async (
 });
 
 // --- Settings card through the shared hook ---
+it('BEST RANK stays empty while history is pending, then shows 318th without 312th', async () => {
+  let resolveHistory: ((result: { data: any[]; error: null }) => void) | undefined;
+  h.historyPending = new Promise(resolve => { resolveHistory = resolve; });
+  mount(<ProfileRankingTab userId="member" />);
+  await screen.findByText('#318');
+  const tile = screen.getByText('BEST RANK').parentElement;
+  expect(tile?.querySelector('b')?.textContent).toBe('–');
+  expect(screen.queryByText('312th')).toBeNull();
+  expect(screen.queryByText('318th')).toBeNull();
+  expect(resolveHistory).toBeTypeOf('function');
+  resolveHistory?.({ data: LEWY_HISTORY, error: null });
+  expect(await screen.findByText('318th')).toBeInTheDocument();
+  expect(screen.queryByText('312th')).toBeNull();
+});
+it('BEST RANK shows summary 312th when the history read fails', async () => {
+  h.historyError = true;
+  mount(<ProfileRankingTab userId="member" />);
+  expect(await screen.findByText('312th')).toBeInTheDocument();
+  expect(screen.queryByText('318th')).toBeNull();
+});
 it('BEST RANK uses Ben’s history minimum 1306 rather than summary 1944', async () => {
   h.summary = { ...LEWY_SUMMARY, rank: 1952, best_rank: 1944 };
   h.history = [{ ...LEWY_HISTORY[0], week: 202149, rank: 1306 }, { ...LEWY_HISTORY[4], rank: 1952 }];

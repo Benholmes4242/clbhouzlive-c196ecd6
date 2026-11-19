@@ -29,3 +29,18 @@ Duration: 23ms. DOM at failure shows 312th fallback, no chart/movement, and dash
 Required isolated rerun: `bunx vitest run src/test/wagrRankingTab.test.tsx --maxWorkers=2` (full output `/tmp/wagr-career-best-isolated.log`). Reproduced at the same line with the same error: 29 passed / 1 failed, failing case 15ms.
 
 Four shards not started. No manual typecheck run (harness owns typechecking). Ben’s actual profile/iPhone check remains outstanding. Proposed ruling: allow this one updated case to await `318th` before its existing assertion, so the history read settles independently of the headline; no expected-value changes.
+
+## No-flash ruling — source updated, new focused stop
+- Pending history renders the existing null/dash tile. Settled nonempty history uses amateurCareerHigh; empty/failed reads use the summary. Only BEST RANK rendering changed; shared helper and the three earlier cases remain exactly as written.
+- Authorised existing-case change: `A failed events read removes only the events section`: `expect(screen.getByText('318th')).toBeInTheDocument();` → `expect(await screen.findByText('318th')).toBeInTheDocument();`. Expected value unchanged; this case now passes.
+- Added `BEST RANK stays empty while history is pending, then shows 318th without 312th` and `BEST RANK shows summary 312th when the history read fails`; both pass.
+- No tests deleted or renamed. Ranking file 30 → 32; original baseline 9,169 → expected 9,174 (five added cases across the two requests). Full suite not executed.
+
+Focused command: `bunx vitest run src/test/wagrRankingTab.test.tsx src/test/wagrCareer.test.tsx --maxWorkers=2`, full output `/tmp/wagr-best-no-flash-focused.log`: 47 passed / 1 failed out of 48 (Career 16/16, Ranking 31/32).
+
+STOP: unchanged case `A failed history read removes movement and chart but keeps figures`, `src/test/wagrRankingTab.test.tsx:223:17`, 20ms:
+`TestingLibraryElementError: Unable to find an element with the text: 312th. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.`
+
+At the assertion the headline has loaded but history is still pending, so BEST RANK correctly shows the dash. The new awaited failed-read case passes after history settles; this existing case asserts synchronously after awaiting only the summary headline. No change applied to this case after the stop.
+
+Required isolated rerun: `bunx vitest run src/test/wagrRankingTab.test.tsx --maxWorkers=2`, full output `/tmp/wagr-best-no-flash-isolated.log`: reproduced at the same file/line with the same error, 31 passed / 1 failed, failing case 17ms. Four shards not started. Proposed next ruling: allow only this case's `getByText('312th')` to become awaited `findByText('312th')`, retaining the expected value and other assertions. Ben's iPhone/no-flash check remains outstanding.
