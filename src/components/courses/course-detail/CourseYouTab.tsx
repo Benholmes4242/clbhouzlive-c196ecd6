@@ -706,7 +706,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         onMoments={(index) => {
           const m = moments[index];
           if (m) analyticsEvents.track('course_you_moment_opened', { course_id: courseId, moment_id: m.id });
-          if (momentPosts.length > 0) useFullscreenFeedStore.getState().open(momentPosts, index, { readOnly: true });
+          if (momentPosts.length > 0) useFullscreenFeedStore.getState().open(momentPosts, index);
         }}
       />
 

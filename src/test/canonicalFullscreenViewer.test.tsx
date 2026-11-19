@@ -73,6 +73,31 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.clearAllMocks(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 
 describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
+  it('a source-post course photo shows all four action pills', () => {
+    const shot = { ...realPost, id: 'shots:source', mediaItems: [{ ...realPost.mediaItems[0], memberShot: { kicker: '', title: 'Royal Dornoch', credit: '', memberName: 'Ben', avatarUrl: null, sourcePostId: 'post-1' } }] } as FeedPost;
+    const view = chrome(shot, { synthetic: true });
+    expect([...view.container.querySelectorAll('[data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['like', 'comment', 'share', 'more']);
+  });
+  it('the review score strip uses the full-width card row and its divider', () => {
+    const view = chrome(reviewPost);
+    const row = view.container.querySelector('[data-review-score-strip] [data-review-score-row]');
+    expect(row?.getAttribute('data-variant')).toBe('card');
+    expect(row?.querySelector('[data-score-divider]')).not.toBeNull();
+    expect(row?.querySelectorAll('[data-score-figure]')).toHaveLength(5);
+  });
+  it('no application viewer open passes readOnly', () => {
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir)) {
+        const full = join(dir, name);
+        if (full.startsWith(join('src', 'test'))) continue;
+        if (statSync(full).isDirectory()) walk(full);
+        else if (/\.tsx?$/.test(name) && !/\.(test|spec)\./.test(name) && /readOnly:\s*true/.test(readFileSync(full, 'utf8'))) offenders.push(full);
+      }
+    };
+    walk('src');
+    expect(offenders).toEqual([]);
+  });
   it('(a) review opens carry engagementTarget review, open interactive, and show the pills (no More)', () => {
     expect(reviewPost.engagementTarget).toEqual({ type: 'review', id: 'rev-1' });
     const view = chrome(reviewPost);
@@ -119,7 +144,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(overlay).toMatch(/targetType=\{commentScoreId \? "round" : commentReviewId \? "review" : "post"\}/);
   });
 
-  it('(d) About Photos review parents carry the course name and review scores; post parents stay read-only with the header', async () => {
+  it('(d) About Photos review parents carry the course name and review scores; post parents are interactive with the header', async () => {
     h.clubMedia = [
       { id: 'rm1', source: 'review', sourceId: 'rev-9', type: 'image', url: 'https://x/r.jpg', author: { id: 'u9', displayName: 'Ed' } },
       { id: 'pm1', source: 'post', sourceId: 'post-9', type: 'image', url: 'https://x/p.jpg', author: { id: 'u8', displayName: 'Al' } },
@@ -144,7 +169,9 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(args.options).toEqual({ hasNextPage: false });
     expect(rev.engagementTarget).toEqual({ type: 'review', id: 'rev-9' });
     expect(rev.review).toEqual(expect.objectContaining({ courseName: 'Royal Dornoch', breakdown: { design: 9, conditions: 8, clubhouse: 7, facilities: 8 } }));
-    expect(post.readOnly).toBe(true);
+    expect('readOnly' in post).toBe(false);
+    const postView = chrome(post);
+    expect([...postView.container.querySelectorAll('[data-fullscreen-pills] [data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['like', 'comment', 'share', 'more']);
     expect(post.courseName).toBe('Royal Dornoch');
     expect(post.engagementTarget).toBeUndefined();
   });
@@ -156,7 +183,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
         memberShot: { kicker: 'The fourth', title: 'Royal Dornoch', detail: 'Par 4 · 303 yards', credit: 'Ed Smith · Sep 2026', avatarUrl: null, memberName: 'Ed Smith', courseId: 'c1', courseName: 'Royal Dornoch' },
       }],
     } as FeedPost;
-    const view = chrome(shot, { synthetic: true, readOnly: true });
+    const view = chrome(shot, { synthetic: true });
     expect(view.container.querySelector('[data-fullscreen-back-circle]')).not.toBeNull();
     expect(screen.getByRole('button', { name: 'Open Royal Dornoch' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^clbhouz rating/ })).toBeNull();
@@ -168,7 +195,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(view.container.textContent).not.toContain("Through members' eyes");
     expect(view.container.querySelector('[data-fullscreen-video-row]')).not.toBeNull();
     expect(scrubber.render).toHaveBeenLastCalledWith(expect.objectContaining({ showTime: true }));
-    expect(view.container.querySelector('[data-fullscreen-pills]')).toBeNull();
+    expect([...view.container.querySelectorAll('[data-fullscreen-pills] [data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['share']);
   });
 
   it('(f) no app file imports latestReviewFeedPost or MemberShotCredit', () => {

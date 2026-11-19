@@ -26,7 +26,7 @@
  * part 1): same top bar (no rating chip anywhere), the author row from the
  * active item's memberShot (sub-row = added month), a glass hole strip in the
  * score-strip slot, "View post ›" when the shot came from a live post, and the
- * canonical video row. No pills: hole photos have no likes or comments.
+ * canonical video row. Source-post pills target the post; standalone shots share the Media link.
  * Review targets (engagementTarget review) hide More: MoreOptionsDrawer has
  * no review mode.
  *
@@ -366,7 +366,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     (activePost as any).courseCountry ??
     golfCourse?.courseCountry ??
     null;
-  const showPills = !syntheticPosts && !readOnly;
+  const showPills = !readOnly;
   const showVideoRow = activeMediaIsVideo;
   const reviewTarget = activePost.engagementTarget?.type === 'review' ? activePost.engagementTarget.id : null;
   // Course photos: the active item's member credit (media-local identity).
@@ -376,6 +376,13 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // holeOrdinal); place labels and course-tile shots never do.
   const shotHasHole = !!shot && HOLE_KICKER.test(shot.kicker.trim());
   const shotSourcePostId = shot?.sourcePostId ?? null;
+  const hasPostActions = !syntheticPosts || !!shotSourcePostId;
+  const shareShot = () => {
+    if (hasPostActions) { onShare(activePost); return; }
+    const url = `${window.location.origin}/courses/${shot?.courseId || activePost.courseId}?tab=media&shot=${encodeURIComponent(activeMediaItem?.id ?? '')}`;
+    if (navigator.share) void navigator.share({ title: courseName ?? undefined, url }).catch(() => {});
+    else void navigator.clipboard.writeText(url);
+  };
   const stackBottom = showVideoRow ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`;
   const handleCommentPill = () => { if (activeActor && onCompose) onCompose(); else onComment(); };
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
@@ -446,7 +453,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           gap: 10,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
         <button
@@ -537,7 +543,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           zIndex: Z.echo,
           pointerEvents: 'none',
           ...fadeWhileScrubbing,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           display: 'flex',
           flexDirection: 'column',
           minWidth: 0,
@@ -656,9 +661,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         {review && (
           <div data-review-score-strip style={{ ...FS_GLASS, marginTop: 12, borderRadius: 14, padding: '11px 14px 10px', minWidth: 0 }}>
             <ReviewScoreRow
-              variant="caption"
-              align="left"
-              textShadow="none"
+              variant="card"
               overall={review.rating ?? null}
               breakdown={{
                 design: review.breakdown?.design ?? null,
@@ -711,19 +714,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             position: 'fixed', left: GUTTER_L, right: GUTTER_R, bottom: COMMENT_BAR_BOTTOM,
             height: COMMENT_BAR_H, zIndex: Z.echo + 1, display: 'flex', gap: 8,
             pointerEvents: 'none', opacity: scrubbing ? 0.35 : 1, transition: 'opacity 150ms',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >
-          <Pill pill="like" onClick={() => onLike(activePost)} ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'} count={likeStr} accent={likeState.isLiked}>
+          {hasPostActions && <><Pill pill="like" onClick={() => onLike(activePost)} ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'} count={likeStr} accent={likeState.isLiked}>
             <ReactionGlyph reacted={likeState.isLiked} size={20} tone="chrome" />
           </Pill>
           <Pill pill="comment" onClick={handleCommentPill} ariaLabel="Comments" count={commentStr}>
             <MessageCircle size={20} stroke="currentColor" strokeWidth={2} />
-          </Pill>
-          <Pill pill="share" onClick={() => onShare(activePost)} ariaLabel="Share">
+          </Pill></>}
+          <Pill pill="share" onClick={shareShot} ariaLabel="Share">
             <Share size={19} stroke="currentColor" strokeWidth={2} />
           </Pill>
-          {!reviewTarget && (
+          {hasPostActions && !reviewTarget && (
             <Pill pill="more" onClick={onMore} ariaLabel="More options" square>
               <MoreHorizontal size={18} stroke="currentColor" strokeWidth={2} />
             </Pill>

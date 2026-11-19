@@ -5,7 +5,7 @@
  * and a Tag / Share / Grid pill row. Canonical pieces come from fullscreenCanon. */
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Flag, Grid2X2, Share, Tag } from 'lucide-react';
+import { Flag, Grid2X2, MessageCircle, Share, Tag } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
@@ -17,6 +17,7 @@ import { postedDateLabel } from '@/lib/courseMedia/addedMonth';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenMuteControl } from './useFullscreenMuteControl';
 import { BACK_HIT, BackCircle, FullscreenVideoRow } from './fullscreenCanon';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import { BAND_H_CSS } from '@/lib/media/fullscreenBand';
 import { PLACE_LABELS } from '@/components/course-media-tab/ShotTagChoices';
 import { placeAge } from '@/components/course-media-tab/CoursePlaceTiles';
@@ -28,7 +29,10 @@ import { toast } from 'sonner';
 import './course-gallery.css';
 
 const PLACE_TITLES: Record<CoursePlace, string> = { clubhouse: 'The clubhouse', food_drink: 'Food and drink', practice: 'The practice ground', pro_shop: 'The pro shop', views: 'The views', golfers: 'The golfers', conditions: 'Course conditions', stay: 'Where to stay', other: 'Around the club' };
-export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
+export function CourseGalleryChrome({ onClose, engagement }: { onClose: () => void; engagement?: {
+  likeState: { isLiked: boolean; count: number }; commentCount: number;
+  onLike: () => void; onComment: () => void; onShare: () => void;
+} }) {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession(); const admin = useIsAdmin();
   const options = useFullscreenFeedStore(s => s.courseGallery);
@@ -71,7 +75,7 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
     // Grid shares the Media tab for the current filter; the viewer shares the shot.
     const url = grid
       ? `${window.location.origin}/courses/${options.courseId}?tab=media&filter=${encodeURIComponent(options.filter)}`
-      : `${window.location.origin}/courses/${options.courseId}?tab=media&shot=${encodeURIComponent(shot!.id)}`;
+      : `${window.location.origin}/courses/${options.courseId}?tab=media&shot=${encodeURIComponent(shot?.id ?? '')}`;
     try {
       if (navigator.share) await navigator.share({ title: options.courseName, url });
       else { await navigator.clipboard.writeText(url); toast(t('media.gallery.copied', { defaultValue: 'Link copied' })); }
@@ -83,6 +87,8 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
   const placeCount = place ? filteredGallery(data.shots, place.id).length : 0;
   const age = place ? placeAge(filteredGallery(data.shots, place.id)[0]?.addedAt ?? '') : null;
   const action = shot ? galleryAction(shot, user?.id, admin) : null;
+  const sourcePostId = shot?.item.memberShot?.sourcePostId ?? (!shot?.post.id.startsWith('shots:') ? shot?.post.id : null);
+  const hasPostActions = !!sourcePostId;
   const run = galleryRun(data.shots, shot);
   const runIndex = shot ? Math.max(0, run.findIndex(row => row.id === shot.id)) : 0;
   const currentHole = !grid ? shot?.holeTag?.hole_no : undefined;
@@ -99,8 +105,12 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
   const isVideo = !grid && shot?.item.type === 'video';
   const toggleGrid = () => { setGrid(on => !on); void analyticsEvents.track('course_gallery_grid_toggle', { on: !grid }); };
   const pills = <div className="course-gallery-pills" data-gallery-pills>
-    {!grid && action && <Button variant="ghost" data-pill="tag" className={`course-gallery-pill${action === 'tag' ? ' is-primary' : ''}`} onClick={() => { if (!shot) return; setTagShot(shot); void analyticsEvents.track('course_gallery_tag_open', { mode: action }); }}><Tag size={17} />{t(action === 'tag' ? 'media.gallery.tag' : 'media.gallery.retag', { defaultValue: action === 'tag' ? 'Tag this shot' : 'Fix tag' })}</Button>}
-    <Button variant="ghost" data-pill="share" className="course-gallery-pill" onClick={() => void share()}><Share size={18} />{t('media.gallery.share', { defaultValue: 'Share' })}</Button>
+    {!grid && hasPostActions && <>
+      <Button variant="ghost" data-pill="like" className="course-gallery-pill" aria-label={engagement?.likeState.isLiked ? 'Unlike' : 'Like'} onClick={engagement?.onLike}><ReactionGlyph reacted={engagement?.likeState.isLiked ?? shot?.post.isLikedByMe ?? false} size={20} tone="chrome" />{(engagement?.likeState.count ?? shot?.post.likeCount ?? 0) || null}</Button>
+      <Button variant="ghost" data-pill="comment" className="course-gallery-pill" aria-label="Comments" onClick={engagement?.onComment}><MessageCircle size={20} />{(engagement?.commentCount ?? shot?.post.commentCount ?? 0) || null}</Button>
+    </>}
+    {!grid && action && <Button variant="ghost" data-pill="tag" aria-label={action === 'tag' ? 'Tag this shot' : 'Fix tag'} className={`course-gallery-pill is-square${action === 'tag' ? ' is-primary' : ''}`} onClick={() => { if (!shot) return; setTagShot(shot); void analyticsEvents.track('course_gallery_tag_open', { mode: action }); }}><Tag size={17} /></Button>}
+    <Button variant="ghost" data-pill="share" aria-label="Share" className="course-gallery-pill is-square" onClick={() => { if (!grid && hasPostActions && engagement) engagement.onShare(); else void share(); }}><Share size={18} /></Button>
     <Button variant="ghost" data-pill="grid" className="course-gallery-pill is-square" aria-label={t(grid ? 'media.gallery.fullscreen' : 'media.gallery.grid', { defaultValue: grid ? 'Full screen' : 'Grid view' })} aria-pressed={grid} onClick={toggleGrid}><Grid2X2 size={18} /></Button>
   </div>;
   const kickerHole = (n: number) => t('media.gallery.holeKicker', { ordinal: holeOrdinal(n), defaultValue: `The ${holeOrdinal(n)}` });

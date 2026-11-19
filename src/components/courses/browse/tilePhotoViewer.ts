@@ -54,7 +54,7 @@ export function openTilePhoto(row: readonly TilePhoto[], tapped: number, course:
     ...args,
     originEl: null,
     openedFrom: PLAYED_VIEWER_ORIGIN,
-    options: { readOnly: true, syntheticPosts: true, ...(inSheet ? { zIndex: VIEWER_ABOVE_SHEETS_Z } : {}) },
+    options: { syntheticPosts: true, ...(inSheet ? { zIndex: VIEWER_ABOVE_SHEETS_Z } : {}) },
   });
   return true;
 }

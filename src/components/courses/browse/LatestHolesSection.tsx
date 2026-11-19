@@ -136,7 +136,7 @@ export function LatestHolesSection() {
       posterUrl: tapped.media_type === 'video' ? holeMediaPoster(tapped) : tapped.media_url,
       mediaId: tapped.id,
       openedFrom: 'courses-latest-holes',
-      options: { readOnly: true, syntheticPosts: true },
+      options: { syntheticPosts: true },
     });
   };
 

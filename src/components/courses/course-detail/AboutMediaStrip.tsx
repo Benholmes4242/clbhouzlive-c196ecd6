@@ -164,8 +164,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
   /* CANONICAL_FULLSCREEN_VIEWER §3: review parents open as real reviews. ONE
      batched course_ratings read by id (useBrowseReviews' columns, viewer RLS)
      feeds the shared adapter; post parents get the course header from one
-     golf_courses row. Post parents stay readOnly: no client read returns post
-     like/comment counts and viewer-liked by id. */
+     golf_courses row. The viewer batches post engagement for post parents. */
   const reviewParentIds = useMemo(() => Array.from(new Set((rawMedia ?? [])
     .filter((item) => item.source === 'review' && item.sourceId).map((item) => item.sourceId as string))).sort(), [rawMedia]);
   const { data: parentReviews } = useQuery({
@@ -273,8 +272,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
         caption: '',
         mediaItems,
         createdAt: first?.createdAt || new Date().toISOString(),
-        // Zero engagement is safe ONLY because post parents are per-post
-        // readOnly (no by-id post engagement read exists client-side).
+        // The canonical viewer seeds these counters from its batched post read.
         likeCount: 0,
         commentCount: 0,
         shareCount: 0,
@@ -283,7 +281,6 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
         isLikedByMe: false,
         isFollowedByMe: false,
         tags: [],
-        readOnly: true,
         courseId: clubId,
         courseName: stripCourse?.name ?? undefined,
         courseCountry: stripCourse?.country ?? undefined,

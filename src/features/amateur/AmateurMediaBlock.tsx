@@ -255,7 +255,6 @@ export function AmateurMediaBlock({
       posterUrl: pending.posterUrl,
       mediaId: media?.id ?? null,
       openedFrom: 'course-media',
-      options: { readOnly: true },
     });
     setPending(null);
   }, [courseMedia.data, onDepart, pending]);

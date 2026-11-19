@@ -3,7 +3,7 @@
  * memberShot captions belong to media items.
  * Latest holes maps the rail snapshot; HoleWalk keeps get_hole_media. Shared
  * hole captions split course title from scored detail, avoiding entrypoint drift.
- * Every caller must set readOnly and syntheticPosts. Synthetic ids never
+ * Every caller sets syntheticPosts. Source-post actions resolve media-local ids; synthetic ids never
  * enter real-post requests; real-post and vertical paging behaviour is frozen. */
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
@@ -141,8 +141,7 @@ export function placeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName
       kicker: label, title: shortCoursePart(courseName), detail: undefined,
       credit: shot.item.memberShot?.credit ?? '', memberName: shot.item.memberShot?.memberName ?? '',
       avatarUrl: shot.item.memberShot?.avatarUrl ?? null,
-      /* PF2_GUIDE: place shots never link back to a post. */
-      sourcePostId: null,
+      sourcePostId: shot.item.memberShot?.sourcePostId ?? null,
     } },
   }));
   return syntheticPost(`shots:place:${courseId}:${place}`, courseId, courseName, label, null, shots);
@@ -178,7 +177,7 @@ export function courseTilesToShotPost(row: Pick<LatestCourseMedia, 'course_id' |
     item: { ...item, memberShot: {
       kicker: "Through members' eyes", title: row.course_name,
       courseId: row.course_id, courseName: row.course_name,
-      credit: '', memberName: '', avatarUrl: null,
+      credit: '', memberName: '', avatarUrl: null, sourcePostId: tile.post_id,
     } }, date: tile.created_at,
   })));
   // Keep a typed placeholder even if every tile is processing; open() owns
@@ -202,6 +201,7 @@ export function coursePostsToShotPosts(posts: readonly FeedPost[],
       kicker: "Through members' eyes", title: courseName,
       credit: credit(post.displayName, post.createdAt),
       avatarUrl: post.avatarUrl || null, memberName: post.displayName,
+      sourcePostId: post.id,
       memberUserId: post.actorType === 'business' || post.actorType === 'system' ? null : post.userId,
     } }, date: post.createdAt,
   })));

@@ -170,7 +170,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     expect(figure?.querySelector('.latest-hole-number')?.textContent).toBe('9');
     expect(figure?.querySelector('.latest-hole-label')?.textContent ?? null).toBe(label);
   });
-  it('a tap opens the canonical viewer readOnly on the tapped shot across the whole rail', () => {
+  it('a tap opens the canonical viewer interactively on the tapped shot across the whole rail', () => {
     mountRail();
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second, Par 3, 182 yards, Thomas Holmes · Jun 2025' }));
     expect(f.holeRpc).not.toHaveBeenCalled();
@@ -182,7 +182,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     expect(args.index).toBe(1);
     expect(args.mediaId).toBe('second');
     expect(args.openedFrom).toBe('courses-latest-holes');
-    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
+    expect(args.options).toEqual({ syntheticPosts: true });
     expect(args.posts[0].displayName).toBe('Latest holes');
     expect(args.posts[0].courseName).toBe('');
   });

@@ -124,9 +124,6 @@ export interface FeedPost {
   /** CANONICAL_FULLSCREEN_VIEWER: where the viewer's like/comment/likers/share
    *  land. Absent = 'post' (the post's own id), today's behaviour. */
   engagementTarget?: { type: 'post' | 'review'; id: string };
-  /** Per-post read-only in a mixed open (About Photos post parents without an
-   *  engagement read): the viewer hides pills/Follow for this post only. */
-  readOnly?: boolean;
 }
 
 

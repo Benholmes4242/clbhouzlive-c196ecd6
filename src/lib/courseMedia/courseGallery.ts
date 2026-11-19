@@ -78,5 +78,7 @@ export function galleryPost(shots: readonly GalleryShot[], options: CourseGaller
   return [{ ...first.post, id: `shots:gallery:${options.courseId}:${options.filter}`, userId: '', actorId: '', caption: '',
     courseId: options.courseId, courseName: options.courseName, mediaItems: shots.map(shot => ({ ...shot.item,
       memberShot: { kicker: shot.holeTag ? `The ${holeOrdinal(shot.holeTag.hole_no)}` : '', title: options.courseName,
-        credit: '', memberName: shot.name, avatarUrl: shot.avatar || null } })) }];
+        credit: '', memberName: shot.name, avatarUrl: shot.avatar || null,
+        courseId: options.courseId, courseName: options.courseName,
+        sourcePostId: shot.item.memberShot?.sourcePostId ?? (!shot.post.id.startsWith('shots:') && !shot.post.id.startsWith('library:') ? shot.post.id : null) } })) }];
 }

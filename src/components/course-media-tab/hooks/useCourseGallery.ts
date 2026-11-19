@@ -66,7 +66,7 @@ export async function buildCourseGallery(cache: QueryClient, a: BuildArgs): Prom
   const tags = new Map<string, { user_id: string; added_at: string }>([...approvedTagsByKey(publicPlaces), ...approvedTagsByKey(publicHoles)]);
   const taggedPosts = [...holePosts.flat(), ...placePosts].flatMap(post => post.mediaItems.map(item => {
     const tag = tags.get(holeMediaKey(item));
-    return { ...post, id: item.id, userId: tag?.user_id ?? '', displayName: item.memberShot?.memberName ?? '', avatarUrl: item.memberShot?.avatarUrl ?? '', createdAt: tag?.added_at ?? '', mediaItems: [item] };
+    return { ...post, id: `library:${item.id}`, userId: tag?.user_id ?? '', displayName: item.memberShot?.memberName ?? '', avatarUrl: item.memberShot?.avatarUrl ?? '', createdAt: tag?.added_at ?? '', mediaItems: [item] };
   }));
   const authority = new Map<string, FeedPost>();
   for (const post of taggedPosts) { const key = holeMediaKey(post.mediaItems[0]); if (!authority.has(key)) authority.set(key, post); }
@@ -85,7 +85,7 @@ export function pageGalleryShots(posts: readonly FeedPost[], holeTags: readonly 
     const key = holeMediaKey(item);
     if (known.has(key)) return [];
     known.add(key);
-    return [{ id: row.id, userId: row.user_id, actorId: row.user_id, actorType: 'personal', displayName: '', avatarUrl: '', username: '', isVerified: false, creatorRelation: 'none',
+    return [{ id: `library:${row.id}`, userId: row.user_id, actorId: row.user_id, actorType: 'personal', displayName: '', avatarUrl: '', username: '', isVerified: false, creatorRelation: 'none',
       caption: '', createdAt: row.added_at, courseId, courseName, mediaItems: [item], likeCount: 0, commentCount: 0, shareCount: 0, review: null, isReview: false, isLikedByMe: false, isFollowedByMe: false } as unknown as FeedPost];
   });
   return galleryShots([...posts, ...extra], holeTags, placeTags);
@@ -123,7 +123,7 @@ export function useCourseGallery({ courseId, courseName, userId, holes, scored, 
       openedOptions = options;
       openingIndex = list.indexOf(start);
       openWithOrigin({ posts: galleryPost(list, options), index: 0, mediaIndex: openingIndex, originEl, mediaId: start.id, posterUrl: start.item.thumbnailUrl ?? start.item.imageUrl,
-        openedFrom: 'course-media', options: { readOnly: true, syntheticPosts: true, courseGallery: options, galleryData: data } });
+        openedFrom: 'course-media', options: { syntheticPosts: true, courseGallery: options, galleryData: data } });
       void analyticsEvents.track('course_gallery_open', { filter, entry });
       return true;
     };

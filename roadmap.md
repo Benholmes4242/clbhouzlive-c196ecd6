@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Fullscreen viewer action pills everywhere
+- Implemented source-post batch/actions, interactive opens, card score strip and missing-score fallback; scoped font ruling applied, matching app stack.
+- Focused 97/99; isolated 18/20 reproduces canonicalFullscreenViewer:99 scan matching an obsolete comment and memberShotsVerticalPaging:49 exact object omitting new sourcePostId. No shards run; inventory 9,118 → expected 9,125 (+7).
+- Await failure rulings; ShotTagCard source/course identity and precise JohnL dropping-source audit remain incomplete. Full error/assertion report: .lovable/reports/fullscreen-viewer-action-pills.md.
+
 ## Complete: Review video tile posters
 - JSON-safe stream identity and canonical posters implemented for sheet/Latest reviews; unknown video URLs suppressed, photos unchanged.
 - Corrected only this brief's new avatar fixture to preserve real exports; no assertion changed. Focused 24/24; typecheck clean.

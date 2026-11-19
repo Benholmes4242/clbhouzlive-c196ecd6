@@ -87,7 +87,6 @@ export function FeedCard({
   hideCourseAttribution = false,
   hideFormatBadge = false,
   bareTile = false,
-  readOnlyFullscreen = false,
   hideLikeCount = false,
   onOpenMedia,
   tileRadius = 4,
@@ -133,7 +132,6 @@ export function FeedCard({
   /** Open the fullscreen viewer in read-only / gallery mode: no like,
    *  comment, share or follow chrome. Used by course-detail surfaces.
    *  Watch surfaces must NOT set this. */
-  readOnlyFullscreen?: boolean;
   /** Suppress the like-count overlay / meta figure on the tile. Opt-in;
    *  used by the course-details Media tab. Watch surfaces must NOT set it. */
   hideLikeCount?: boolean;
@@ -203,7 +201,6 @@ export function FeedCard({
       originEl: rootRef.current as HTMLElement | null,
       posterUrl,
       railOwnerKey: ownerKey,
-      ...(readOnlyFullscreen ? { options: { readOnly: true } } : {}),
     });
   };
 

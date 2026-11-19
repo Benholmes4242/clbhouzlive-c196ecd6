@@ -89,7 +89,7 @@ const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) =
         onOpen={(index) => {
           const moment = moments[index];
           if (moment) onOpen?.(moment.id);
-          if (posts.length > 0) useFullscreenFeedStore.getState().open(posts, index, { readOnly: true });
+          if (posts.length > 0) useFullscreenFeedStore.getState().open(posts, index);
         }}
       />
     </AboutSection>

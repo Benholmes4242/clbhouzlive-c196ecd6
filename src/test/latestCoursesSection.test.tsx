@@ -186,7 +186,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     expect(args.index).toBe(0);
     expect(args.mediaId).toBe('m5');
     expect(args.openedFrom).toBe('courses-latest-courses');
-    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
+    expect(args.options).toEqual({ syntheticPosts: true });
     expect(args.posts[0].displayName).toBe('Course alpha');
   });
 

@@ -33,6 +33,18 @@ function mount(filter: GalleryFilter, start: string, extra: FeedPost[] = []) {
 afterEach(() => { cleanup(); f.viewer = 'me'; f.admin = false; useFullscreenFeedStore.setState({ isOpen: false, courseGallery: null, galleryData: null, restoreStack: [] }); });
 
 describe('canonical course gallery chrome', () => {
+  it('source-post gallery actions are two flex pills plus three 44px squares and four 8px gaps', () => {
+    const view = mount('all', 'u');
+    const pills = [...view.container.querySelectorAll('[data-gallery-pills] [data-pill]')];
+    expect(pills.map(p => p.getAttribute('data-pill'))).toEqual(['like', 'comment', 'tag', 'share', 'grid']);
+    expect(pills.filter(p => !p.classList.contains('is-square'))).toHaveLength(2);
+    expect(pills.filter(p => p.classList.contains('is-square'))).toHaveLength(3);
+    const css = readFileSync('src/components/fullscreen-feed/course-gallery.css', 'utf8');
+    expect(css).toMatch(/course-gallery-pills\s*\{[^}]*gap:8px/);
+    expect(css).toMatch(/course-gallery-pill\s*\{[^}]*flex:1 1 0; min-width:0/);
+    expect(css).toMatch(/course-gallery-pill\.is-square\s*\{[^}]*flex:0 0 44px; width:44px/);
+    expect(320 - 32 - 3 * 44 - 4 * 8).toBe(124);
+  });
   it('(a) the top bar renders the canonical back circle and no share or grid circles', () => {
     const view = mount('all', 'h');
     const top = view.container.querySelector('.course-gallery-top') as HTMLElement;
@@ -43,10 +55,10 @@ describe('canonical course gallery chrome', () => {
   it('(b) the Tag pill follows galleryAction: tag primary, retag glass, null absent', () => {
     let view = mount('all', 'u');
     const tag = view.container.querySelector('[data-pill="tag"]') as HTMLElement;
-    expect(tag.textContent).toBe('Tag this shot'); expect(tag.className).toContain('is-primary');
+    expect(tag.getAttribute('aria-label')).toBe('Tag this shot'); expect(tag.className).toContain('is-primary');
     cleanup(); view = mount('holes', 'h');
     const retag = view.container.querySelector('[data-pill="tag"]') as HTMLElement;
-    expect(retag.textContent).toBe('Fix tag'); expect(retag.className).not.toContain('is-primary');
+    expect(retag.getAttribute('aria-label')).toBe('Fix tag'); expect(retag.className).not.toContain('is-primary');
     cleanup(); f.viewer = undefined; view = mount('holes', 'h');
     expect(view.container.querySelector('[data-pill="tag"]')).toBeNull();
   });

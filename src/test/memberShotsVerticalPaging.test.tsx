@@ -97,7 +97,7 @@ describe('member-shot vertical paging', () => {
     expect(state.activeIndex).toBe(2);
     expect(state.mediaId).toBe('m2-1');
     expect(state.openedFrom).toBe('courses-latest-courses');
-    expect([state.readOnly, state.syntheticPosts]).toEqual([true, true]);
+    expect([state.readOnly, state.syntheticPosts]).toEqual([false, true]);
     expect(state.posts[2].mediaItems.map(m => m.id)).toEqual([0, 1, 2, 3, 4].map(n => `m2-${n}`));
     expect(state.posts[1].mediaItems.map(m => m.id)).toEqual(['m1-0', 'm1-1', 'm1-2']);
   });

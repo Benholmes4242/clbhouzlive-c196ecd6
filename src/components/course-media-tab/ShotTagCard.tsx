@@ -24,7 +24,7 @@ export function openTagShot(shot: TagShot, originEl: HTMLElement) {
     added_at: shot.createdAt, member_name: shot.ownerName, member_id: shot.actorType === 'personal' ? shot.ownerUserId : null }], '', '', 'preview', '');
   if (!posts.length) return;
   openWithOrigin({ posts, index: 0, originEl, posterUrl: shot.posterUrl ?? shot.url,
-    mediaId: shot.url, openedFrom: 'course-media', options: { readOnly: true, syntheticPosts: true } });
+    mediaId: shot.url, openedFrom: 'course-media', options: { syntheticPosts: true } });
 }
 
 export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole, onPlace,

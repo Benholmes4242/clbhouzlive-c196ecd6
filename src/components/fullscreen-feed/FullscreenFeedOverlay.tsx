@@ -93,6 +93,9 @@ import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { trace as perfTrace } from '@/perf/trace';
 import { vperfCloseMotionMark } from '@/perf/vperf';
 import { useViewerEngagement, reviewTargetOf } from './useViewerEngagement';
+import { useViewerContent } from './useViewerContent';
+import { viewerPostId } from './viewerContent';
+import { filteredGallery } from '@/lib/courseMedia/courseGallery';
 
 
 
@@ -222,9 +225,7 @@ export function FullscreenFeedOverlay() {
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const storeReadOnly = useFullscreenFeedStore(s => s.readOnly);
-  /* CANONICAL_FULLSCREEN_VIEWER: a post may be read-only on its own inside an
-     interactive open (About Photos post parents); the open-wide flag still wins. */
-  const readOnly = storeReadOnly || !!posts[activeIndex]?.readOnly;
+  const readOnly = storeReadOnly;
   const syntheticPosts = useFullscreenFeedStore(s => s.syntheticPosts);
   const courseGallery = useFullscreenFeedStore(s => s.courseGallery);
   const origin = useFullscreenFeedStore(s => s.origin);
@@ -536,7 +537,18 @@ export function FullscreenFeedOverlay() {
   // back to a personal-shaped object during auth loading.
   const { activeActor: ctxActor } = useActiveActor();
   const activeActor = ctxActor ?? { type: "personal" as const, id: userId ?? "" };
+  const sourcePosts = useViewerContent(posts, isOpen, userId, activeActor);
+  const galleryData = useFullscreenFeedStore(s => s.galleryData);
+  const pager = useFullscreenFeedStore(s => s.activePagerIdx);
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
+  const actionPostFor = useCallback((post: FeedPost): FeedPost | null => {
+    const item = post.mediaItems[pager ?? 0] ?? post.mediaItems[0];
+    const id = viewerPostId(post, item);
+    if (!id) return post.isReview && !syntheticPosts ? post : null;
+    const fetched = sourcePosts.find(row => row.id === id);
+    const gallerySource = courseGallery && galleryData ? filteredGallery(galleryData.shots, courseGallery.filter)[pager ?? 0]?.post : null;
+    return { ...(gallerySource ?? post), ...(fetched ?? {}), id, isReview: false, review: null, engagementTarget: undefined };
+  }, [pager, sourcePosts, syntheticPosts, courseGallery, galleryData]);
   // CB49: double-tap only ever likes — same path as the rail's like button.
   const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
@@ -564,16 +576,20 @@ export function FullscreenFeedOverlay() {
   const commentScoreId = activePost?.id ? activeScoreIdMap.get(activePost.id) ?? null : null;
   // CANONICAL_FULLSCREEN_VIEWER §2: review targets engage the review (see useViewerEngagement).
   const { getViewerLikeState, handleViewerLike, getViewerCommentCount, handleViewerShare, commentTargetFor } = useViewerEngagement({
-    posts, handleLike, getActiveLikeState, getCommentCount, handleShare,
+    posts, handleLike: post => { const target = actionPostFor(post); if (target) handleLike(target); },
+    getActiveLikeState: post => { const target = actionPostFor(post); return target ? getActiveLikeState(target) : { isLiked: false, count: 0 }; },
+    getCommentCount: post => { const target = actionPostFor(post); return target ? getCommentCount(target) : 0; },
+    handleShare: post => { const target = actionPostFor(post); if (target) handleShare(target); },
   });
   // A review target's comments live on the review (CommentsSheetV2 targetType "review").
   const commentReviewId = commentTargetFor(activePost)?.id ?? activePost?.review?.reviewId ?? null;
+  const activeActionPost = activePost ? actionPostFor(activePost) : null;
   // CB49: double-tap only ever likes — same routing as the like pill.
   const handleDoubleTapLike = useCallback((post: FeedPost) => {
-    if (storeReadOnly || post.readOnly) return;
+    if (storeReadOnly || !actionPostFor(post)) return;
     const fired = likeOnlyOnDoubleTap(getViewerLikeState(post).isLiked, () => handleViewerLike(post));
     triggerHaptic(fired ? 'medium' : 'light');
-  }, [storeReadOnly, getViewerLikeState, handleViewerLike]);
+  }, [storeReadOnly, actionPostFor, getViewerLikeState, handleViewerLike]);
 
   /* PF1B — the viewer's golf context (hole chip + round pill), ONE batched
      read for whatever posts the viewer shows (feed, profile, deep link).
@@ -1068,7 +1084,7 @@ export function FullscreenFeedOverlay() {
                     readOnly={storeReadOnly}
                   />
 
-                  {courseGallery ? <CourseGalleryChrome onClose={handleClose} /> : <ImmersiveFullscreenChrome
+                  {courseGallery ? <CourseGalleryChrome onClose={handleClose} engagement={activePost && activeActionPost ? { likeState: getViewerLikeState(activePost), commentCount: getViewerCommentCount(activePost), onLike: () => handleViewerLike(activePost), onComment: safeOpenComments, onShare: () => handleViewerShare(activePost) } : undefined} /> : <ImmersiveFullscreenChrome
                     posts={posts}
                     activeIndex={activeIndex}
                     onClose={handleClose}
@@ -1269,7 +1285,7 @@ export function FullscreenFeedOverlay() {
           isOpen={commentsOpen}
           onClose={closeComments}
           targetType={commentScoreId ? "round" : commentReviewId ? "review" : "post"}
-          targetId={commentScoreId ?? commentReviewId ?? activePost?.id ?? ""}
+          targetId={commentScoreId ?? commentReviewId ?? activeActionPost?.id ?? ""}
           initialCommentId={initialCommentId}
           autoFocusComposer={composeOnOpen}
         />
@@ -1286,16 +1302,16 @@ export function FullscreenFeedOverlay() {
         />
       )}
 
-      {!readOnly && activePost && (
+      {!readOnly && activeActionPost && !reviewTargetOf(activePost) && (
         <MoreOptionsDrawer
           open={moreOptionsOpen}
           onOpenChange={setMoreOptionsOpen}
-          post={activePost}
+          post={activeActionPost}
           currentUserId={userId}
-          onReport={() => handleReport(activePost)}
-          onNotInterested={() => handleNotInterested(activePost)}
+          onReport={() => handleReport(activeActionPost)}
+          onNotInterested={() => handleNotInterested(activeActionPost)}
           onCopyLink={() => {
-            navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+            navigator.clipboard.writeText(`${window.location.origin}/post/${activeActionPost.id}`);
             toast.success('Link copied');
             setMoreOptionsOpen(false);
           }}

@@ -53,14 +53,14 @@ describe('course gallery controls', () => {
   it('a video shot renders the canonical video row mute and Tag in the pill row', () => {
     const view = mount([{ id: 'v1', type: 'video' }], 'v1');
     const pills = [...(view.container.querySelector('[data-gallery-pills]') as HTMLElement).children];
-    expect(pills[0]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
+    expect(pills[2]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
     expect(view.container.querySelector('[data-fullscreen-video-row]')?.contains(screen.getByRole('button', { name: 'Unmute' }))).toBe(true);
   });
   it('a photo shot renders Tag with no mute and no blank slot', () => {
     const view = mount([{ id: 'a' }], 'a');
     const pills = view.container.querySelector('[data-gallery-pills]') as HTMLElement;
-    expect(pills.children).toHaveLength(3);
-    expect(pills.children[0]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
+    expect(pills.children).toHaveLength(5);
+    expect(pills.children[2]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
     expect(screen.queryByRole('button', { name: 'Unmute' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Mute' })).toBeNull();
   });

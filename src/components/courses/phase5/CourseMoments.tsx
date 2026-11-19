@@ -78,7 +78,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 
   const handleMomentTap = useCallback((index: number) => {
     if (fullscreenPosts.length > 0) {
-      useFullscreenFeedStore.getState().open(fullscreenPosts, index, { readOnly: true });
+      useFullscreenFeedStore.getState().open(fullscreenPosts, index);
     }
   }, [fullscreenPosts]);
 

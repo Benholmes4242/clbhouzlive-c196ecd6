@@ -249,7 +249,7 @@ export function LatestCoursesSection() {
       posterUrl: pending.posterUrl,
       mediaId,
       openedFrom: 'courses-latest-courses',
-      options: { readOnly: true, syntheticPosts: true },
+      options: { syntheticPosts: true },
     });
     setPending(null);
   }, [gallery.data, gallery.isError, pending]);

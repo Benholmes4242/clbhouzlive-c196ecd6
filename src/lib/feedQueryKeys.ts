@@ -37,6 +37,7 @@
 
 /** Feeds that load posts from multiple actors (not scoped to one profile). */
 export const FEED_QUERY_KEYS: readonly (readonly unknown[])[] = [
+  ['viewer-source-posts'],
   // Clubhouse
   ['media-feed', 'suggested'],
   ['media-feed', 'friends'],

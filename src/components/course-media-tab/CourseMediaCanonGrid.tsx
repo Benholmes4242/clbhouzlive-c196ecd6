@@ -9,14 +9,8 @@
  * Orientation frames: FeedCard's canonical rule (w > h → 16/9, else
  * 9/14) via packColumns.
  *
- * Tap wiring (canonical) — FeedCard emits
- * openWithOrigin({ openedFrom: 'course-media', options: { readOnly: true } })
- * via the opt-in readOnlyFullscreen prop set on both mosaic columns
- * below. Read-only matches every other course-detail surface (About
- * strip, Reviews tab): no like / comment / share / follow chrome, mute
- * still available on videos. Photos and videos share the SAME
- * fullscreen viewer (no split lightbox path), and the pagination
- * callbacks are mirrored into the fullscreen store below.
+ * Tap wiring uses the canonical interactive viewer or the gallery override.
+ * Source-post engagement is hydrated centrally; pagination stays shared.
  */
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -249,7 +243,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   if (noHolePreviewCount != null && !showAll) {
     return <div ref={setGridRef}>
       <div className="media-empty-mosaic">{cardRows.slice(0, 4).map((item, i) => <div key={posts[i]?.mediaItems[0]?.id ?? `${item.post_id}-${i}`} className="media-empty-mosaic-tile">
-        <FeedCard row={item} feedPost={posts[i]} posts={posts} flatIndex={i} isAutoplayActive={activeIndices.has(i)} openedFrom="course-media" hideCourseAttribution hideFormatBadge bareTile readOnlyFullscreen onOpenMedia={onOpenGallery} hideLikeCount />
+        <FeedCard row={item} feedPost={posts[i]} posts={posts} flatIndex={i} isAutoplayActive={activeIndices.has(i)} openedFrom="course-media" hideCourseAttribution hideFormatBadge bareTile onOpenMedia={onOpenGallery} hideLikeCount />
       </div>)}</div>
       <Button variant="ghost" className="media-empty-see-all" onClick={() => { setShowAll(true); if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}>See all {spellPhotoCount(noHolePreviewCount)}</Button>
     </div>;
@@ -285,7 +279,6 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideCourseAttribution
                 hideFormatBadge
               bareTile
-                readOnlyFullscreen
                 onOpenMedia={onOpenGallery}
                 hideLikeCount
               />
@@ -309,7 +302,6 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideCourseAttribution
                 hideFormatBadge
               bareTile
-                readOnlyFullscreen
                 onOpenMedia={onOpenGallery}
                 hideLikeCount
               />

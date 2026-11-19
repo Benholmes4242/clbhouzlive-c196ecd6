@@ -34,7 +34,7 @@ function renderGrid() {
     <div>
       {flat.map((p, i) => (
         <FeedCard key={p.mediaItems[0].id} row={row(p)} feedPost={p} posts={flat} flatIndex={i}
-          isAutoplayActive={false} openedFrom="course-media" bareTile hideCourseAttribution hideFormatBadge readOnlyFullscreen hideLikeCount />
+          isAutoplayActive={false} openedFrom="course-media" bareTile hideCourseAttribution hideFormatBadge hideLikeCount />
       ))}
     </div>,
   );
@@ -101,7 +101,7 @@ describe('CB70 broken course media image', () => {
     const p = photo('Z', 'z1');
     const { container } = render(
       <FeedCard row={row(p)} feedPost={p} posts={[p]} flatIndex={0} isAutoplayActive={false}
-        openedFrom="course-media" bareTile hideCourseAttribution hideFormatBadge readOnlyFullscreen hideLikeCount />,
+        openedFrom="course-media" bareTile hideCourseAttribution hideFormatBadge hideLikeCount />,
     );
     fireEvent.error(container.querySelector('img')!);
     const frame = container.querySelector('[data-media-failed]') as HTMLElement;

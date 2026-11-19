@@ -156,7 +156,6 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       posterUrl,
       mediaId,
       openedFrom: 'course-media',
-      options: { readOnly: true },
     });
   }, [rememberDiscoverPosition]);
 
