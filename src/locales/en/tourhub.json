@@ -281,7 +281,9 @@
       "more": "and {{count}} more",
       "course": "THE COURSE",
       "courseGuide": "Course guide ›",
-      "tot": "TOT"
+      "tot": "TOT",
+      "out": "OUT",
+      "in": "IN"
     },
     "recap": {
       "kicker": "{{tour}} · {{year}} SEASON",

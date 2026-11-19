@@ -83,7 +83,15 @@ describe('Merged Airy lower sections', () => {
     expect((root?.firstElementChild as HTMLElement)?.style.padding).toBe('8px 16px');
     expect(root?.querySelector('button')?.style.padding).toBe('10px 16px');
   });
-  it.each(['upcoming', 'live', 'completed'] as const)('adds no picks hairline and keeps the tighter cards in %s', phase => {
+  it('upcoming picks are 48px rows under a 30px section top with no hairline', () => {
+    const v = mount(<HeroBoardSection tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase="upcoming" />);
+    const picks = v.container.querySelector<HTMLElement>('[data-overview-picks]');
+    expect(picks).not.toBeNull(); if (!picks) return;
+    expect(picks.querySelectorAll('[data-overview-pick-row]').length).toBeGreaterThan(0);
+    expect(picks.style.paddingTop).toBe('30px'); expect(picks.querySelector('[data-overview-picks-hairline]')).toBeNull();
+    for (const row of picks.querySelectorAll<HTMLElement>('[data-overview-pick-row]')) expect(row.style.height).toBe('48px');
+  });
+  it.each(['live', 'completed'] as const)('adds no picks hairline and keeps the tighter cards in %s', phase => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase={phase} />);
     const picks = v.container.querySelector<HTMLElement>('[data-overview-picks]');
     expect(picks?.style.paddingTop).toBe('8px'); expect(picks?.querySelector('[data-overview-picks-hairline]')).toBeNull();
@@ -99,9 +107,9 @@ describe('Merged Airy lower sections', () => {
     // Board headers without POS/PLAYER: the heading and TOT label share the
     // upcoming-last-header line, so it is the section's first child.
     const lastHead = last?.children[0] as HTMLElement;
-    expect(lastHead.classList.contains('upcoming-last-header')).toBe(true);
-    expect(lastHead.querySelector('h2')?.classList.contains('upcoming-kicker')).toBe(true);
-    expect((last?.children[1] as HTMLElement)?.style.padding).toBe('0px');
+    expect(lastHead.classList.contains('upcoming-sec-head')).toBe(true);
+    expect(lastHead.querySelector('h2')?.classList.contains('upcoming-sec-kick')).toBe(true);
+    expect((last?.children[1]?.firstElementChild as HTMLElement)?.style.height).toBe('36px');
   });
   it('tightens movers and their figure gap', () => {
     const v = mount(<RoundMovementBand round={2} cards={[{ key: 'a', name: 'Player A', candidates: [], delta: 2, toPar: -2, gross: 70 }]} />);

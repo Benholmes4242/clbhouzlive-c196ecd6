@@ -1,5 +1,6 @@
 /** Upcoming-only facts/players/history/course. Each block self-hides; the
- * caller inserts unchanged picks between facts and these lower sections.
+ * overview appends picks after the course (upcoming hero new order). The
+ * overview course shows OUT/IN scorecards; the tournament page keeps CourseGlance.
  * HERO BLOCKS: the upcoming hero block (PhotoBand + UpcomingFacts +
  * UpcomingLastYear) is ONE block shared by the overview and the tournament
  * page, at the overview's sizes — the tournament page imports these same
@@ -11,12 +12,10 @@
  * passed from the same start-day decision the kicker renders. */
 import '@/styles/hybrid-hero.css';
 import '../../tournament-v2/sections/completedWeek.css';
-import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { playerRoute, tournamentRoute } from '../../routes';
-import { CourseGlance } from '../../tournament-v2/sections/CourseGlance';
 import { glanceFacts } from '../../tournament-v2/data/tournamentRules';
 import { LastYearRow } from './HybridHeroBands/LastYearRow';
 import { followedUpcomingPlayers, venueTee, type UpcomingPlayer } from './upcomingOverviewRules';
@@ -36,7 +35,7 @@ export function UpcomingFacts({ first, zone, field, purse, par, yards = null, st
   const { t } = useTranslation('tourhub');
   const cells = upcomingFactCells(first, zone, field, purse, par, yards, startDayNamed);
   if (!cells.length) return null;
-  return <section data-overview-event className="cw-block upcoming-event"><h2 className="cw-kick">{t('overview.upcomingPlus.event', { defaultValue: 'THE EVENT' })}</h2><div data-overview-facts className="upcoming-facts upcoming-event-facts">{cells.map(cell => <div className="cw-cell" key={cell.key} data-upcoming-fact={cell.key}><b style={HERO_TOT_TYPE}>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div></section>;
+  return <section data-overview-event className="upcoming-event"><div data-overview-facts className="upcoming-event-facts">{cells.map(cell => <div key={cell.key} data-upcoming-fact={cell.key}><b>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div></section>;
 }
 export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { member: boolean; followed: Set<string>; field: UpcomingPlayer[]; drawn: boolean; zone: string | null }) {
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
@@ -52,17 +51,31 @@ export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { 
 export function UpcomingLastYear({ rows }: { rows: LastYearFinisher[] }) {
   const { t } = useTranslation('tourhub'); const shown = rows.slice(0, 4);
   if (!shown.length) return null;
-  return <section data-overview-last-year className="upcoming-block upcoming-history">
-    <div data-overview-board-header data-overview-band="board" className="upcoming-last-header">
-      <h2 className="upcoming-kicker" style={{ textTransform: 'uppercase' }}>{t('overview.hero.lastYear')}{shown.every(row => row.year === shown[0].year) ? ` · ${shown[0].year}` : null}</h2>
-      <span>{t('overview.upcomingPlus.tot')}</span>
+  return <section data-overview-last-year className="upcoming-sec upcoming-history">
+    <div data-overview-board-header data-overview-band="board" className="upcoming-sec-head">
+      <h2 className="upcoming-sec-kick">{t('overview.hero.lastYear')}{shown.every(row => row.year === shown[0].year) ? ` · ${shown[0].year}` : null}</h2>
+      <span className="upcoming-sec-kick">{t('overview.upcomingPlus.tot')}</span>
     </div>
-    {shown.map((row, i) => <LastYearRow key={`${row.rank}-${row.name}`} rank={i > 0 && row.rank === shown[i - 1].rank ? '' : row.rank} name={row.name} score={row.score} isWinner={i === 0 && (row.rank === '1' || row.rank === 'T1')} />)}
+    <div className="upcoming-ly-rows">{shown.map((row, i) => <LastYearRow key={`${row.rank}-${row.name}`} rank={i > 0 && row.rank === shown[i - 1].rank ? '' : row.rank} name={row.name} score={row.score} isWinner={i === 0 && (row.rank === '1' || row.rank === 'T1')} />)}</div>
   </section>;
+}
+/** OUT/IN scorecard cards; null unless all 18 holes carry par and yards (then the lead line stands alone). */
+export function scorecardNines(holes: CourseHole[]) {
+  const byNo = new Map(holes.filter(h => h.par > 0 && h.yards > 0).map(h => [h.hole_no, h]));
+  const all = Array.from({ length: 18 }, (_, i) => byNo.get(i + 1));
+  if (all.some(h => !h)) return null;
+  const full = all as CourseHole[];
+  return [['OUT', full.slice(0, 9)], ['IN', full.slice(9)]].map(([label, nine]) => ({ label: label as 'OUT' | 'IN', holes: nine as CourseHole[], yards: (nine as CourseHole[]).reduce((a, h) => a + h.yards, 0), par: (nine as CourseHole[]).reduce((a, h) => a + h.par, 0) }));
 }
 export function UpcomingCourse({ holes, tournamentId }: { holes: CourseHole[]; tournamentId: string }) {
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
-  if (!glanceFacts(holes)) return null;
+  const glance = glanceFacts(holes);
+  if (!glance) return null;
+  const cards = scorecardNines(holes);
   const target = tournamentRoute(tournamentId, { kind: 'overview' });
-  return <section data-overview-course className="upcoming-block upcoming-course"><div className="upcoming-course-head"><h2 className="upcoming-kicker">{t('overview.upcomingPlus.course')}</h2><Button variant="ghost" className="upcoming-course-link" onClick={() => navigate(`${target.to}?section=course`, { state: target.state })}>{t('overview.upcomingPlus.courseGuide')}</Button></div><CourseGlance holes={holes} overview /></section>;
+  return <section data-overview-course className="upcoming-sec upcoming-course"><div className="upcoming-sec-head"><h2 className="upcoming-sec-kick">{t('overview.upcomingPlus.course')}</h2><Button variant={null} size={null} data-course-guide className="upcoming-sec-kick upcoming-course-link" onClick={() => navigate(`${target.to}?section=course`, { state: target.state })}>{t('overview.upcomingPlus.courseGuide')}</Button></div><p className="tv-lead">{glance.parts.map((part, i) => part.bold ? <b key={i}>{part.text}</b> : <span key={i}>{part.text}</span>)}</p>{cards ? <div data-overview-scorecard className="upcoming-scorecard">{cards.map(card => <div key={card.label} data-scorecard-card={card.label} className="upcoming-sct">
+      {card.holes.map(h => <span key={`n${h.hole_no}`} className="n">{h.hole_no}</span>)}<span className="n tot">{t(`overview.upcomingPlus.${card.label === 'OUT' ? 'out' : 'in'}`, { defaultValue: card.label })}</span>
+      {card.holes.map(h => <span key={`y${h.hole_no}`} className="y">{h.yards}</span>)}<span className="y tot" data-scorecard-yards-total>{card.yards.toLocaleString('en-GB')}</span>
+      {card.holes.map(h => <span key={`p${h.hole_no}`} className="p" data-par5={h.par === 5 ? '' : undefined}>{h.par}</span>)}<span className="p tot" data-scorecard-par-total>{card.par}</span>
+    </div>)}</div> : null}</section>;
 }

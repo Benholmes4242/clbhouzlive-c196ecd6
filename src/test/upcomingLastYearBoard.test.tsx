@@ -37,54 +37,47 @@ describe('upcoming LAST YEAR condensed board', () => {
     // Board headers without POS/PLAYER: the heading shares the header line
     // with the TOT label, so the year text lives on the h2 inside it.
     expect(header?.querySelector('h2')?.textContent).toBe('Last year · 2025');
-    expect(header?.querySelector('h2')?.style.textTransform).toBe('uppercase');
-    expect(block?.classList.contains('upcoming-block')).toBe(true);
+    expect(block?.classList.contains('upcoming-sec')).toBe(true);
     expect(block?.style.paddingBottom).toBe('');
-    expect(block?.querySelector('.upcoming-last-header')?.children).toHaveLength(2);
-    expect(header?.querySelector('h2')?.classList.contains('upcoming-kicker')).toBe(true);
-    expect(block?.children[1].children).toHaveLength(3);
-    expect(block?.children[2].textContent).not.toContain('2025');
+    expect(block?.querySelector('.upcoming-sec-head')?.children).toHaveLength(2);
+    expect(header?.querySelector('h2')?.classList.contains('upcoming-sec-kick')).toBe(true);
+    expect(block?.children[1].children).toHaveLength(2);
+    expect(block?.children[1].children[1].textContent).not.toContain('2025');
   });
   it('omits the heading year when the displayed rows have different years', () => {
     fixture.rows[1].year = '2024';
     const view = mount();
     const header = view.container.querySelector<HTMLElement>('[data-overview-last-year] [data-overview-board-header]');
     expect(header?.querySelector('h2')?.textContent).toBe('Last year');
-    expect(header?.querySelector('h2')?.style.textTransform).toBe('uppercase');
+    expect(header?.querySelector('h2')?.classList.contains('upcoming-sec-kick')).toBe(true);
   });
   it('uses the live row tracks without avatars or flags', () => {
     const view = render(<LastYearRow rank="2" name="Fredrik Jacobson" score="−19" />);
     const row = view.container.firstElementChild as HTMLElement;
-    expect(row.style.gridTemplateColumns).toBe('24px minmax(0,1fr) 40px');
-    expect(row.style.gap).toBe('4px');
-    expect(row.style.padding).toBe('0px');
-    expect(row.style.minHeight).toBe('31px');
-    const player = row.children[1] as HTMLElement;
-    expect(player.querySelector('img')).toBeNull();
-    expect(player.children).toHaveLength(1);
-    const name = player.lastElementChild as HTMLElement;
-    expect(name.style.fontSize).toBe('13px');
+    expect(row.style.gridTemplateColumns).toBe('26px minmax(0,1fr) 44px');
+    expect(row.style.height).toBe('36px');
+    const name = row.children[1] as HTMLElement;
+    expect(row.querySelector('img')).toBeNull();
+    expect(name.style.fontSize).toBe('15px');
     expect(name.style.fontWeight).toBe('600');
     expect(name.style.textOverflow).toBe('ellipsis');
     expect(name.style.minWidth).toBe('0');
     expect(row.children).toHaveLength(3);
     expect(row.querySelector('[class*="fi-"]')).toBeNull();
   });
-  it('keeps the winner the same size with the shared 13px outline trophy and canonical score without wash', () => {
+  it('keeps the winner the same size with a neutral 14px outline trophy and canonical score without wash', () => {
     // HERO BLOCKS §1d: the outline lucide Trophy (13px, #FBBC2E via
     // .recap-trophy) replaces the old filled cup glyph.
     const view = render(<LastYearRow rank="1" name="Winner" score="−20" isWinner />);
     const row = view.container.firstElementChild as HTMLElement;
-    expect(row.style.padding).toBe('0px');
-    expect(row.style.minHeight).toBe('31px');
+    expect(row.style.height).toBe('36px');
     expect(row.firstElementChild?.tagName).toBe('svg');
-    expect(row.firstElementChild?.getAttribute('width')).toBe('13');
-    expect(row.firstElementChild?.getAttribute('height')).toBe('13');
+    expect(row.firstElementChild?.getAttribute('width')).toBe('14');
+    expect(row.firstElementChild?.getAttribute('height')).toBe('14');
     expect(row.firstElementChild?.getAttribute('fill')).toBe('none');
-    expect(row.firstElementChild?.classList.contains('recap-trophy')).toBe(true);
+    expect(row.firstElementChild?.getAttribute('stroke-width')).toBe('2');
     const expected = document.createElement('span'); expected.style.color = getScoreColor(-20, 'dark');
     expect((row.lastElementChild as HTMLElement).style.color).toBe(expected.style.color);
-    expect(row.style.background).toBe('transparent');
     expect((row.lastElementChild as HTMLElement).style.fontSize).toBe('15px');
     expect(row.children).toHaveLength(3);
   });
@@ -94,6 +87,6 @@ describe('upcoming LAST YEAR condensed board', () => {
     const expected = document.createElement('span');
     expected.style.color = getScoreColor(score === 'E' ? 0 : Number(score.replace('−', '-')), 'dark');
     expect((row.lastElementChild as HTMLElement).style.color).toBe(expected.style.color);
-    expect((row.lastElementChild as HTMLElement).style.textAlign).toBe('center');
+    expect((row.lastElementChild as HTMLElement).style.textAlign).toBe('right');
   });
 });

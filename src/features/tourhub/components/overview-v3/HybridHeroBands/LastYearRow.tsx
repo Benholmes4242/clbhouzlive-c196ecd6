@@ -19,9 +19,7 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
 import { NUMERIC_STYLE } from '../HybridHero.constants';
-import { INK } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
-import { HERO_PAD_X, HERO_POS_W, HERO_TOT_W, HERO_GAP } from '../../../tournament-v2/sections/MiniBoard';
 
 interface LastYearRowProps {
   rank: string;
@@ -44,59 +42,17 @@ export function LastYearRow({
   playerId,
   isLast,
 }: LastYearRowProps) {
+  /* Upcoming hero new order §3: 26 | 1fr | 44 rows at 36px; winner mark is a
+     neutral 14px Trophy here only (completed/recap keep the gold one). */
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `${HERO_POS_W}px minmax(0,1fr) ${HERO_TOT_W}px`,
-        gap: HERO_GAP,
-        padding: 0,
-        minHeight: 31,
-        alignItems: 'center',
-        background: 'transparent',
-        borderBottom: 'none',
-      }}
-    >
+    <div data-last-year-row style={{ display: 'grid', gridTemplateColumns: '26px minmax(0,1fr) 44px', height: 36, alignItems: 'center' }}>
       {isWinner ? (
-        /* HERO BLOCKS §1d: the winner's mark is the ONE outline lucide Trophy
-           the completed state and the recap use — 13px, #FBBC2E via
-           .recap-trophy — never the old filled cup glyph. */
-        <Trophy size={13} className="recap-trophy" aria-hidden />
+        <Trophy data-last-year-trophy size={14} strokeWidth={2} color="rgba(248,250,252,.78)" aria-hidden />
       ) : (
-        <span style={{ ...NUMERIC_STYLE, fontSize: 12.5, fontWeight: 700, color: INK }}>
-          {rank}
-        </span>
+        <span style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 600, color: 'rgba(248,250,252,.62)' }}>{rank}</span>
       )}
-      <div style={{ display: 'flex', gap: 6, alignItems: 'center', minWidth: 0 }}>
-          <span
-            style={{
-              minWidth: 0,
-              fontSize: 13,
-              fontWeight: 600,
-              lineHeight: 1.15,
-              color: INK,
-              letterSpacing: 0,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {name}
-          </span>
-      </div>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
-          fontSize: 15,
-          fontWeight: 700,
-          // Upcoming history uses the board's score colour, never winner gold.
-          color: getScoreColor(score.trim() === 'E' ? 0 : Number(score.replace('−', '-')), 'dark'),
-          textAlign: 'center',
-          letterSpacing: 0,
-        }}
-      >
-        {score}
-      </span>
+      <span style={{ minWidth: 0, fontSize: 15, fontWeight: 600, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+      <span style={{ ...NUMERIC_STYLE, fontSize: 15, fontWeight: 700, textAlign: 'right', color: getScoreColor(score.trim() === 'E' ? 0 : Number(score.replace('−', '-')), 'dark') }}>{score}</span>
     </div>
   );
 }

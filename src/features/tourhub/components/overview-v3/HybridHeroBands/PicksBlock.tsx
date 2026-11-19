@@ -164,6 +164,11 @@ function PicksBlockSession({
     const iso = teeByPlayer?.get(id) ?? null;
     return iso && pickTeeText(iso) ? iso : null;
   };
+  /* Upcoming hero new order §5: upcoming picks are rows, tee time ascending,
+     untimed picks after in pick order. Live/completed keep the card row. */
+  const up = phase === 'upcoming';
+  const upRows = up ? cards.map((p, i) => ({ p, i, at: (() => { const iso = teeFor(p); return iso ? Date.parse(iso) : null; })() }))
+    .sort((a, b) => a.at != null && b.at != null ? a.at - b.at || a.i - b.i : a.at != null ? -1 : b.at != null ? 1 : a.i - b.i).map(x => x.p) : [];
   const shownTees = cards.map(teeFor).filter((x): x is string => !!x);
   const teeDay = shownTees.length ? pickTeeDayLabel(shownTees, new Date(), t as unknown as TeeT) : null;
   const teeDayOnly = shownTees.length ? pickTeeDayLabel(shownTees, new Date(), t as unknown as TeeT, true) : null;
@@ -191,20 +196,26 @@ function PicksBlockSession({
 
   return (
 <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
-    <div data-overview-picks style={{ paddingTop: 8, paddingBottom: 10 }}>
-      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+    <div data-overview-picks data-picks-layout={up ? 'rows' : 'cards'} style={up ? { padding: '30px 20px 10px' } : { paddingTop: 8, paddingBottom: 10 }}>
+      <div ref={rowRef} data-overview-picks-heading style={up ? { position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, overflow: 'hidden' } : { position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
-        <span ref={picksRef} style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
+        <span ref={picksRef} style={{ fontSize: up ? 10 : 11, fontWeight: up ? 700 : 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
         {teeDay && phase !== 'completed' ? (
           <>
-            <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
-            <span ref={fullRef} data-overview-picks-tee-measure aria-hidden style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: 0, top: 0, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{teeDay}</span>
+            <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: up ? 10 : 9.5, fontWeight: up ? 700 : 800, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', color: up ? 'rgba(248,250,252,0.62)' : 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
+            <span ref={fullRef} data-overview-picks-tee-measure aria-hidden style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: 0, top: 0, fontSize: up ? 10 : 9.5, fontWeight: up ? 700 : 800, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{teeDay}</span>
           </>
         ) : phase !== 'upcoming' ? <span className="pick-panel-dim" style={{marginLeft:'auto',fontSize:9.5,fontWeight:800,letterSpacing:'.12em'}}>{phase==='completed'?recordCopy('final'):recordCopy('roundLive',{round:currentRound??''})}</span> : null}
       </div>
-      {record && record.picks > 0 && <Button variant={null} size={null} data-our-record-door onClick={onOpenRecord}
+      {record && record.picks > 0 && up && <Button variant={null} size={null} data-our-record-door onClick={onOpenRecord}
+        style={{ display:'flex', alignItems:'baseline', width:'100%', padding:0, margin:'8px 0 0', border:0, borderRadius:0, background:'transparent', textAlign:'left', lineHeight:1.35, fontFamily:'inherit', fontSize:13.5, height:'auto', whiteSpace:'normal', ...FIGS }}>
+        <span style={{ minWidth:0 }}><span data-pick-record-figures style={{ fontWeight:700, color:'#F8FAFC', whiteSpace:'nowrap' }}>{recordCopy('wins',{count:record.won})} · {recordCopy('topTens',{count:record.top10})}</span>
+        {record.event_count != null && <span data-pick-record-events style={{ marginLeft:'0.28em', fontWeight:400, color:'rgba(248,250,252,.78)', whiteSpace:'nowrap' }}>{recordCopy('fromEvents',{count:record.event_count})}</span>}</span>
+        <span aria-hidden style={{ marginLeft:'auto', paddingLeft:8, fontSize:15, color:'rgba(248,250,252,.42)' }}>›</span>
+      </Button>}
+      {record && record.picks > 0 && !up && <Button variant={null} size={null} data-our-record-door onClick={onOpenRecord}
         style={{ display:'flex', alignItems:'baseline', flexWrap:'wrap', columnGap:5, width:'100%', padding:'8px 20px', margin:'-12px 0 2px', border:0, borderRadius:0, background:'transparent', textAlign:'left', lineHeight:1.35, fontFamily:'inherit', fontSize:13, fontWeight:700, color:'var(--pick-ink)', height:'auto', minHeight:32, whiteSpace:'normal', ...FIGS }}>
         <span data-pick-record-figures style={{ whiteSpace:'nowrap' }}>{recordCopy('wins',{count:record.won})} · {recordCopy('topTens',{count:record.top10})}</span>
         {record.event_count != null && <span data-pick-record-events style={{ fontWeight:500, color:'var(--text-secondary)', whiteSpace:'nowrap' }}>{recordCopy('fromEvents',{count:record.event_count})}</span>}
@@ -215,7 +226,17 @@ function PicksBlockSession({
         <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
       ) : null}
 
-      <div data-overview-picks-grid style={cards.length === 2
+      {up ? <div data-overview-picks-rows style={{ marginTop: 6 }}>{upRows.map(p => {
+        const tee = teeFor(p); const teeText = tee ? pickTeeText(tee) : null;
+        return <button type="button" key={p.playerId} data-overview-pick-card data-overview-pick-row onClick={()=>onOpenPick(p.playerId)}
+          aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
+          className="active:opacity-70 transition-opacity"
+          style={{ display: 'grid', gridTemplateColumns: '32px minmax(0,1fr) auto', gap: 12, alignItems: 'center', height: 48, width: '100%', margin: 0, padding: 0, border: 0, background: 'transparent', color: 'inherit', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer' }}>
+          <div data-overview-pick-avatar style={{ display: 'flex' }}><PlayerAvatar playerId={String(p.playerId ?? '')} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl ?? null} headshotOverride={p.headshotOverride ?? null} size={32} /></div>
+          <span data-overview-pick-name style={{ minWidth: 0, fontSize: 15, fontWeight: 600, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.playerName}</span>
+          {teeText ? <span data-overview-pick-tee data-overview-pick-tee-time style={{ fontSize: 15, fontWeight: 600, color: '#F8FAFC', textAlign: 'right', whiteSpace: 'nowrap', ...FIGS }}>{teeText}</span> : <span />}
+        </button>;
+      })}</div> : <div data-overview-picks-grid style={cards.length === 2
         ? { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', columnGap: 32, padding: '0 20px' }
         : cards.length === 1
           ? { display: 'flex', justifyContent: 'center', padding: 0 }
@@ -239,7 +260,7 @@ function PicksBlockSession({
 
           /* A WD/DQ/DNS/CUT/MDF pick shows the board's own token, never a
              position or score; locked picks are never swapped (CB54). */
-          const statusToken = phase !== 'upcoming' && !isChampion ? pickStatusToken(line?.status) : null;
+          const statusToken = !isChampion ? pickStatusToken(line?.status) : null;
           let figureLine: React.ReactNode;
           if (statusToken) {
             figureLine = <span data-overview-pick-status style={{ color: WHITE_ALPHA_65 }}>{statusToken}</span>;
@@ -305,7 +326,7 @@ function PicksBlockSession({
             </button>
           );
         })}
-      </div>
+      </div>}
     </div>
     </OverviewReadinessBand>
   );

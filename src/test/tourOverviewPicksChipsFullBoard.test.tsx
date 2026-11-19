@@ -182,9 +182,9 @@ describe('picks chips (Board B)', () => {
     expect((name.parentElement as HTMLElement).style.minWidth).toBe('0');
   });
 
-  it('uses a 46px border-box chip for a pre-round tee with a 1px gap', () => {
+  it('uses a 46px border-box chip for a live pre-round tee with a 1px gap', () => {
     f.picks = [{ playerId: 'p3', playerName: 'B Three' }];
-    const { container } = mountPicks({ phase: 'upcoming', entries: [] });
+    const { container } = mountPicks({ phase: 'live', entries: [] });
     const card = container.querySelector<HTMLElement>('[data-overview-pick-card]');
     expect(card?.style.height).toBe('46px');
     expect(card?.style.boxSizing).toBe('border-box');

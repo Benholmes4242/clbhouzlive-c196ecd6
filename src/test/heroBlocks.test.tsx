@@ -81,10 +81,10 @@ describe('one upcoming block on both pages', () => {
 });
 
 describe('upcoming completed rhythm', () => {
-  it('shared THE EVENT band uses board TOT figures for both page callers', () => {
+  it('shared facts band has no THE EVENT kicker and four figure cells for both page callers', () => {
     const { container } = render(<UpcomingFacts first={first} zone={zone} field={132} purse={3000000} par={71} yards={6860} startDayNamed />);
-    expect(container.querySelector('[data-overview-event] h2')).not.toBeNull();
-    for (const value of container.querySelectorAll('[data-upcoming-fact] b')) expect(value).toHaveStyle({ fontSize: '15px', fontWeight: '700' });
+    expect(container.querySelector('[data-overview-event] h2')).toBeNull();
+    expect(container.querySelectorAll('.upcoming-event-facts>[data-upcoming-fact] b')).toHaveLength(4);
   });
   it('all upcoming seams reference the shared completed tokens', () => {
     const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
@@ -106,18 +106,18 @@ describe('recap board header removal', () => {
 });
 
 describe('one winner trophy glyph', () => {
-  it('upcoming LAST YEAR uses the 13px outline recap trophy', () => {
+  it('upcoming LAST YEAR uses a neutral 14px outline Trophy', () => {
     const view = render(<LastYearRow rank="1" name="Winner" score="−20" isWinner />);
-    const trophy = view.container.querySelector('svg.recap-trophy');
+    const trophy = view.container.querySelector('svg[data-last-year-trophy]');
     expect(trophy).not.toBeNull();
-    expect(trophy?.getAttribute('width')).toBe('13');
+    expect(trophy?.getAttribute('width')).toBe('14');
     expect(trophy?.getAttribute('fill')).toBe('none');
   });
   it('the recap and the completed state use the same lucide Trophy treatment', () => {
     const recap = readFileSync('src/features/tourhub/components/overview-v3/SeasonRecapSections.tsx', 'utf8');
     expect(recap).toContain('<Trophy data-recap-trophy size={13} className="recap-trophy"');
     const row = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/LastYearRow.tsx', 'utf8');
-    expect(row).toContain('<Trophy size={13} className="recap-trophy"');
+    expect(row).toContain('<Trophy data-last-year-trophy size={14} strokeWidth={2}');
     const band = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand.tsx', 'utf8');
     expect(band).toContain("import { Trophy } from 'lucide-react'");
   });

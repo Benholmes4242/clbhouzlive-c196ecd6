@@ -453,6 +453,26 @@ export function HeroBoardSection({
     return t('overview.picksIntro.behind', { name: best.name, pos, count: gap });
   }, [inPlay, leader, picks, boardByPlayer, entries, t]);
 
+  /* Upcoming: picks close the band after the course; live/completed keep them after the board. */
+  const picksBlock = hasPicks ? (
+        <PicksBlock
+          picks={picks}
+          tourCode={pickTourCode}
+          tournamentId={picksTid}
+          seasonYear={eventSeasonYear ?? null}
+          currentRound={currentRound}
+          pickResults={pickResults.filter(r=>picks.some(p=>p.playerId===r.playerId))}
+          onOpenRecord={()=>setRecordOpen(true)}
+          phase={phase}
+          boardByPlayer={boardByPlayer}
+          teeByPlayer={phase === 'completed' ? null : pickTees ?? null}
+          startedPlayers={startedPlayers}
+          championPlayerId={championPlayerId}
+          championPlayerIds={championPlayerIds}
+          intro={picksIntro}
+          onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }}
+        />
+  ) : null;
 
   return (
     <OverviewReadinessBand id="band" base={overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
@@ -483,30 +503,13 @@ export function HeroBoardSection({
 
       {!picksOnly && phase === 'upcoming' ? <UpcomingFacts first={upcoming.first} zone={upcoming.zone} field={upcoming.field.length} purse={purse} par={venuePar} yards={glanceFacts(upcoming.holes)?.yards ?? venueYardage} startDayNamed={startWeekday(upcoming.startDate, upcoming.zone) != null} /> : null}
 
-      {hasPicks ? (
-        <PicksBlock
-          picks={picks}
-          tourCode={pickTourCode}
-          tournamentId={picksTid}
-          seasonYear={eventSeasonYear ?? null}
-          currentRound={currentRound}
-          pickResults={pickResults.filter(r=>picks.some(p=>p.playerId===r.playerId))}
-          onOpenRecord={()=>setRecordOpen(true)}
-          phase={phase}
-          boardByPlayer={boardByPlayer}
-          teeByPlayer={phase === 'completed' ? null : pickTees ?? null}
-          startedPlayers={startedPlayers}
-          championPlayerId={championPlayerId}
-          championPlayerIds={championPlayerIds}
-          intro={picksIntro}
-          onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }}
-        />
-      ) : null}
+      {phase !== 'upcoming' ? picksBlock : null}
       {!picksOnly && phase === 'upcoming' ? <>
         <YourUpcomingPlayers member={follows.ids.size > 0} followed={follows.ids} field={upcoming.field} drawn={upcoming.drawn} zone={upcoming.zone} />
         <UpcomingLastYear rows={upcoming.last} />
         <UpcomingCourse holes={upcoming.holes} tournamentId={tournamentId} />
       </> : null}
+      {phase === 'upcoming' ? picksBlock : null}
       {!picksOnly && <LeadersGroup tournamentId={tournamentId} entries={entries} currentRound={currentRound} totalRounds={totalRounds}
         phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} onRowTap={onRowTap} />}
       {hasPicks ? (
