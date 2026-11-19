@@ -23833,6 +23833,21 @@ export type Database = {
           rounds: number
         }[]
       }
+      get_course_honours: {
+        Args: { p_course_id: string }
+        Returns: {
+          display_name: string
+          hole_no: number
+          is_competition: boolean
+          kind: string
+          par: number
+          play_date: string
+          strokes: number
+          user_id: string
+          whs_score_id: string
+          yards: number
+        }[]
+      }
       get_course_lately: {
         Args: { p_course_id: string; p_limit?: number; p_offset?: number }
         Returns: {
