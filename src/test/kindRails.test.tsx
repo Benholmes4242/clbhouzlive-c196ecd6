@@ -203,6 +203,7 @@ describe('kind card actions', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Hide Pat One' }));
     await waitFor(() => expect(h.from).toHaveBeenCalledWith('suggestion_dismissals'));
     expect(h.insert).toHaveBeenCalledWith({ actor_type: 'personal', actor_id: 'pro0' });
+    await waitFor(() => expect(screen.queryByText('Pat One')).toBeNull());
   });
   it('follow goes through useToggleFollow', async () => {
     wrap(<KindRail kind="creator" />);
