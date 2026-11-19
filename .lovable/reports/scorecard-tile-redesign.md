@@ -27,3 +27,6 @@ New: scorecardTileRedesign.test.tsx (a)-(g), 7 tests. Typecheck clean.
 - Shard 1: 2,246 passed. Shard 2: 2,269 passed.
 - Shard 3: 1 failed / 2,296 passed — untouched `src/test/ob1Welcome.test.tsx` "OB1.2 first sign-in fixes > cropper has no slider, grid or reset and Use photo hands the file to the existing upload". Error text was not captured (output filtered). Isolated file rerun 81/81; full shard-3 rerun 2,297/2,297 passed.
 - Shard 4 not run.
+
+## Full rerun (19 Nov 14:11, unfiltered logs /tmp/scorecard-shard-1..4.log)
+Expected 9,158 (9,152 + 7 new tile tests − 1 tourScorecardProfileDoor). Sequential: 2,246 / 2,269 / 2,297 / 2,346 = 9,158/9,158 across 822 files. No failures; ob1Welcome passed. No source or test changes.
