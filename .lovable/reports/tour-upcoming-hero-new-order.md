@@ -63,3 +63,11 @@ Proposed smallest fix (test only, NOT applied; needs Ben's authorisation). In sr
 Alternative (component change, also not applied): track the dismiss timeout in a ref and clear it in RailBody's unmount effect, the same way removeTimers already is.
 
 Outstanding: Ben's iPhone checks (gap between Nicolas Echavarria's row and THE COURSE matches the gap between the facts and LAST YEAR; 08:30 and 70 sit flush with the page edges).
+
+## kindRails test fix (authorised) and STOP
+
+Applied: one line in src/test/kindRails.test.tsx, "kind card actions > dismiss writes suggestion_dismissals with actor_type personal", after the h.insert assertion: `await waitFor(() => expect(screen.queryByText('Pat One')).toBeNull());`. Nothing else changed. WhoToFollowRail.tsx not touched. The file alone passed 20/20.
+
+Shards: 1 = 2,234 passed, 2 = 2,265 passed, 3 = STOP (2,292 passed / 1 failed), 4 = 2,350 passed. Shard 4 ran before the shard 3 stop was read: the shards were sent as one batch. That breaks the rule.
+Failure: src/test/linePicks.test.tsx:121:66, "Open state > toggling calls set_line_pick with the key/position and flips the button": `AssertionError: expected +0 to be 1 // Object.is equality` (set_line_pick never called), 1,120ms. Shard 3 rerun: same failure. Isolated rerun: same failure (17 passed / 1 failed, 1,083ms).
+Likely cause (not changed): the fixture CLOSE is '2026-11-19T12:00:00Z', which is today at noon. LinePicksCard.tsx:137 checks the toggle against the real `new Date()`, not the `now` prop (NOW = 10 Nov), so since 12:00 UTC today the click is treated as closed. The kindRails fix does not cause this; it depends on the clock. Ruling needed: either the test pins the clock or moves CLOSE, or line 137 uses `now`.
