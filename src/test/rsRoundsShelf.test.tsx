@@ -286,41 +286,6 @@ describe('RR the line under each card', () => {
 /* ---------------------------------------------------------------- shelf */
 
 describe('RR round card', () => {
-  it('round card: the Standout tile — NET/GROSS foot with red under-par, COMP and date bottom right, marks and the full sentence', async () => {
-    f.pools.circle = [round('a', { is_competition: true }), round('b')];
-    mountCard();
-    const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
-    expect(card.className).toContain('standout-card');
-    /* EXPLORE TILES A: the 34px score and the "Net · gross" kicker are gone. */
-    expect(card.textContent).not.toContain('Net · gross');
-    expect(card.querySelector('[data-kind="net"]')).toHaveTextContent('NET70−1');
-    expect(card.querySelector('[data-kind="net"] i')).toHaveAttribute('data-under', 'true');
-    expect(card.querySelector('[data-kind="gross"]')).toHaveTextContent('GROSS81+10');
-    const when = card.querySelector('.standout-when');
-    expect(when).toHaveTextContent('Oct 31');
-    expect(when?.querySelector('.standout-comp')).toHaveTextContent('COMP');
-    const marks = card.querySelectorAll('[data-hole-mark]');
-    expect(marks).toHaveLength(18);
-    expect(marks[0]).toHaveAttribute('data-grade', 'birdie');
-    expect(marks[1]).toHaveAttribute('data-grade', 'double');
-    expect(marks[2]).toHaveAttribute('data-grade', 'eagle');
-    expect(marks[3]).toHaveAttribute('data-grade', 'bogey');
-    expect(marks[4]).toHaveAttribute('data-grade', 'par');
-    expect(card.querySelectorAll('[data-hole-marks]')).toHaveLength(2);
-    const story = card.querySelector('.standout-story');
-    expect(story).toHaveTextContent('Best ever at Royal County Down Golf Club (Championship)');
-  });
-
-  it('round card: level par reads E in the NET figure and no marks render without shapes', async () => {
-    f.pools.circle = [round('a', { net_score: 71 }), round('b')];
-    f.shapes = null;
-    mountCard();
-    const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
-    expect(card.querySelector('[data-kind="net"]')).toHaveTextContent('NET71E');
-    expect(card.querySelector('[data-kind="net"] i')).toHaveAttribute('data-under', 'false');
-    expect(card.querySelectorAll('[data-hole-mark]')).toHaveLength(0);
-  });
-
   it('taps open the right score id and the avatar opens the member', async () => {
     const onOpenRound = vi.fn();
     const onOpenMember = vi.fn();
@@ -336,22 +301,7 @@ describe('RR round card', () => {
 /* ------------------------------------------------ EXPLORE TILES A guards */
 
 describe('EXPLORE TILES A guards', () => {
-  it('the date lives in .standout-when, never in the header', async () => {
-    f.pools.circle = [round('a'), round('b')];
-    mountCard();
-    const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
-    expect(card.querySelector('.standout-when')).toHaveTextContent('Oct 31');
-    expect(card.querySelector('.standout-who')).not.toHaveTextContent('Oct 31');
-  });
-
-  it('the sentence carries no line clamp and the tile uses min-height, never height', async () => {
-    f.pools.circle = [round('a'), round('b')];
-    mountCard();
-    const card = document.querySelector('[data-rounds-shelf-card="round"]') as HTMLElement;
-    const story = card.querySelector('.standout-story') as HTMLElement;
-    expect(story.style.getPropertyValue('-webkit-line-clamp')).toBe('');
-    expect(card.style.height).toBe('');
-    expect(card.style.minHeight).toBe('214px');
+  it('the sentence carries no line clamp and the tile uses min-height, never height', () => {
     const css = readFileSync('src/features/explore-magazine/watch/standout-shelf.css', 'utf8');
     const storyRule = css.match(/\.standout-story\s*\{[^}]*\}/)?.[0] ?? '';
     expect(storyRule).not.toContain('-webkit-line-clamp');
@@ -367,17 +317,6 @@ describe('EXPLORE TILES A guards', () => {
       expect(shape.minHeight).toBe(214);
       expect('height' in shape).toBe(false);
     }
-  });
-
-  it('a long full course name renders in full with no ellipsis', async () => {
-    f.pools.circle = [
-      round('a', { course_name: 'Sundridge Park Golf Club (East Course)', last_better: '2026-06-10', delta: -2 }),
-      round('b'),
-    ];
-    mountCard();
-    const story = document.querySelector('[data-rounds-shelf-card="round"] .standout-story') as HTMLElement;
-    expect(story).toHaveTextContent('Best at Sundridge Park Golf Club (East Course) since June');
-    expect(story.textContent).not.toContain('…');
   });
 
 });

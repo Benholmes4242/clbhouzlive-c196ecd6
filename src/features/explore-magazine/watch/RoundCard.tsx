@@ -6,10 +6,11 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { ScoreFigureRow, type ScoreFigureCell } from '@/components/shared/ScoreFigureRow';
 import {
-  LATELY_UNDER_RED, boldParts, fillTemplate, latelyNines, latelyShortDate, latelyTileLine,
+  LATELY_UNDER_RED, boldParts, fillTemplate, latelyNines, latelyTileLine,
   playedOffLabel, signedWhole, stablefordPoints,
 } from '@/components/courses/course-detail/about/latelyRules';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { formatDayMonthShortGB } from '@/i18n/format';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 
 import './lately-tile.css';
@@ -56,7 +57,8 @@ export function RoundCard({
   const { t } = useTranslation('courses');
   const shape = round.whs_score_id ? shapes?.get(round.whs_score_id) ?? null : null;
   const name = round.display_name || t('discover.aMember', 'A member');
-  const date = latelyShortDate(round.play_date, locale);
+  /* Day before month ("18 Nov"), the shared en-GB formatter. */
+  const date = round.play_date ? formatDayMonthShortGB(`${round.play_date.slice(0, 10)}T12:00:00`) : '';
   const meta = own
     ? `${t('courseDetail.lately.tile.you', 'You')} · ${date}`
     : inCircle

@@ -7,7 +7,8 @@ import { readFileSync } from 'node:fs';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '', i18n: { language: 'en' } }) }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => null }));
-vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+const track = vi.hoisted(() => vi.fn());
+vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track } }));
 
 import { RoundCard } from '@/features/explore-magazine/watch/RoundCard';
 import { latelyNines, latelyTileLine, stablefordPoints, fillTemplate, playedOffLabel } from '@/components/courses/course-detail/about/latelyRules';
@@ -113,7 +114,7 @@ describe('Lately tile — the line', () => {
   it('(d2) bold spans render; the meta line is the date alone for others', () => {
     mount(round({ prior_n: 0 }));
     expect(document.querySelector('[data-lately-line] b')?.textContent).toBe('First round');
-    expect(document.querySelector('[data-round-card-meta]')?.textContent).toBe('Nov 4');
+    expect(document.querySelector('[data-round-card-meta]')?.textContent).toBe('4 Nov');
   });
 });
 
@@ -141,5 +142,16 @@ describe('Lately tile — the nines', () => {
     expect(onOpenRound).not.toHaveBeenCalled();
     fireEvent.click(document.querySelector('[data-rounds-shelf-card="round"]')!);
     expect(onOpenRound).toHaveBeenCalledWith('s1', 'u1');
+    expect(track).toHaveBeenCalledWith('rounds_shelf_card_tapped', { kind: 'round' });
+  });
+  it('(e3) level par reads E in TO PAR; a long name ellipsises on one line', () => {
+    mount(round({ gross_score: 72, display_name: 'A Very Long Member Name That Cannot Possibly Fit On The Tile' }));
+    expect(document.querySelector('[data-score-cell="topar"] [data-score-figure]')?.textContent).toBe('E');
+    expect(document.querySelector('[data-round-card-name]')?.className).toBe('lately-tile-name');
+    const css = readFileSync('src/features/explore-magazine/watch/lately-tile.css', 'utf8');
+    const rule = css.match(/\.lately-tile-name \{[^}]*\}/)?.[0] ?? '';
+    expect(rule).toContain('white-space: nowrap');
+    expect(rule).toContain('text-overflow: ellipsis');
+    expect(rule).toContain('overflow: hidden');
   });
 });

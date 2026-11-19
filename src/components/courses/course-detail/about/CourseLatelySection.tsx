@@ -10,7 +10,8 @@ import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpe
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import AboutSection, { GUTTER } from './AboutSection';
 import { useCourseLately } from './useCourseLately';
-import { LATELY_TILES_MIN, latelyShortDate, signedAvg } from './latelyRules';
+import { LATELY_TILES_MIN, signedAvg } from './latelyRules';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 /**
  * CS1 — LATELY HERE. Course tab, after the verdict and before About this
@@ -111,7 +112,7 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
               <small>
                 <span className="lately-long">
                   {t('courseDetail.lately.tile.factBest', 'BEST')}
-                  {first.best_gross_date ? ` · ${latelyShortDate(first.best_gross_date, locale)}` : ''}
+                  {first.best_gross_date ? ` · ${formatDayMonthShortGB(`${first.best_gross_date.slice(0, 10)}T12:00:00`)}` : ''}
                 </span>
                 <span className="lately-short">{t('courseDetail.lately.tile.factBestShort', 'BEST')}</span>
               </small>

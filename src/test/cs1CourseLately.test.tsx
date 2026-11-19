@@ -121,8 +121,8 @@ describe('CS1 Lately here', () => {
     expect(cards[1].getAttribute('data-own-round')).toBeNull();
     /* COURSE_PAGE_ROUND_TILES 1c: the meta line under the name carries the
        date, led by You for your own round and Circle for a circle round. */
-    expect(cards[0].querySelector('[data-round-card-meta]')?.textContent).toBe('You · Nov 4');
-    expect(cards[1].querySelector('[data-round-card-meta]')?.textContent).toBe('Circle · Nov 4');
+    expect(cards[0].querySelector('[data-round-card-meta]')?.textContent).toBe('You · 4 Nov');
+    expect(cards[1].querySelector('[data-round-card-meta]')?.textContent).toBe('Circle · 4 Nov');
     expect(document.querySelector('[data-course-lately-foot]')?.textContent).toBe('Newest first. Your circle is marked.');
     fireEvent.click(cards[1]);
     expect(f.openByScore).toHaveBeenCalledWith('s2', null, 'u2');

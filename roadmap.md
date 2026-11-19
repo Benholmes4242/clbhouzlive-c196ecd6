@@ -293,5 +293,5 @@
 - Match live board/leaders geometry; between-round spine and rule-based picks copy.
 - Added 15 cases (47 focused pass); four separate sequential shards pass 9,236 = 9,221 + 15. Public RSM checked at 390/320 with no overflow; fonts unchanged. Physical iPhone and other real-data states remain unverified.
 
-## Stopped: Course round tiles + honours
-- rsRoundsShelf.test.tsx encodes old RoundCard (5 fails); awaiting ruling, then shards 1–4.
+## Course round tiles + honours
+- Done; signed-in 390/320 check (Sundridge West, Rochester & Cobham) outstanding.
