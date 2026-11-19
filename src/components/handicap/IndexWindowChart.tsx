@@ -90,7 +90,7 @@ export const IndexWindowChart: React.FC<IndexWindowChartProps> = ({ points, wind
   return (
     <div data-index-window-chart={windowDays}>
       <div style={{ height, position: 'relative' }}>
-        <svg width="100%" height={height} viewBox={`0 0 ${W} 64`} preserveAspectRatio="none" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
+        <svg width="100%" height={height} viewBox={`0 0 ${W} 64`} preserveAspectRatio="none" aria-hidden style={{ display: 'block', overflow: 'visible', clipPath: 'inset(-12px -12px -12px 0)' }}>
           <defs>
             <linearGradient id={`iwc-fill-${gid}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor={color} stopOpacity={fillTop} />

@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { ProMemberName } from '@/features/pro-verification/ProLabel';
+import { navigateOverViewer } from '@/lib/fullscreen/navigateOverViewer';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThumbsUp, MoreHorizontal } from 'lucide-react';
@@ -99,7 +100,7 @@ export function CommentCard({
           onClick={() => {
             if (deleted) return;
             onClose?.();
-            navigate(getActorRouteByType(comment.actor_type, comment.actor_id, comment.slug));
+            navigateOverViewer(navigate, getActorRouteByType(comment.actor_type, comment.actor_id, comment.slug));
           }}
           className="shrink-0 bg-transparent border-0 p-0"
           style={{ cursor: deleted ? 'default' : 'pointer' }}
@@ -143,7 +144,7 @@ export function CommentCard({
                 : { fontSize: 14.5, lineHeight: 1.52, color: BODY_INK }}
               onMentionTap={(m) => {
                 onClose?.();
-                navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
+                navigateOverViewer(navigate, m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
               }}
             />
           )}
@@ -164,13 +165,13 @@ export function CommentCard({
                 size={15}
                 strokeWidth={2}
                 style={{
-                  fill: comment.has_liked ? AMBER : 'none',
-                  color: comment.has_liked ? AMBER : MUTE,
+                  fill: comment.has_liked ? '#FFFFFF' : 'none',
+                  color: comment.has_liked ? '#FFFFFF' : MUTE,
                   transition: 'color 150ms, fill 150ms',
                 }}
               />
               {comment.likes_count > 0 && (
-                <span style={{ ...FIGS, fontSize: 13, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
+                <span style={{ ...FIGS, fontSize: 13, fontWeight: 600, color: comment.has_liked ? '#FFFFFF' : MUTE }}>
                   {comment.likes_count}
                 </span>
               )}

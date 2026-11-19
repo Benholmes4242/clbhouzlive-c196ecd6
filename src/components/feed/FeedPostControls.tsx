@@ -5,7 +5,7 @@ import { MessageCircle, Share } from 'lucide-react';
 import Pressable from '@/components/ui/Pressable';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FeedActorPicker } from './FeedActorPicker';
-import { ReactionGlyph, reactionGlyph, AMBER } from '@/lib/reactionKind';
+import { ReactionGlyph, reactionGlyph, REACTED } from '@/lib/reactionKind';
 import { T100, T60 } from './feedTokens';
 import { INK_FAINT } from '@/features/tourhub/_shared/tokens';
 import { formatCountKilo } from '@/i18n/format';
@@ -33,7 +33,7 @@ export function FeedPostActions({ actor, onActorChange, showActor = false, liked
   return <div style={{ display: 'flex', alignItems: 'center', gap, padding }}>
     {showActor && <FeedActorPicker value={actor} onChange={onActorChange} />}
     <div style={{ marginLeft: 'auto' }} />
-    <FooterButton icon={LikeGlyph} label={likeCount > 0 ? formatCountKilo(likeCount) : undefined} active={liked} onClick={onLike} activeColor={AMBER} glyph={<ReactionGlyph reacted={liked} size={21} />} haptic={!liked ? 'selection' : 'none'} />
+    <FooterButton icon={LikeGlyph} label={likeCount > 0 ? formatCountKilo(likeCount) : undefined} active={liked} onClick={onLike} activeColor={REACTED} glyph={<ReactionGlyph reacted={liked} size={21} />} haptic={!liked ? 'selection' : 'none'} />
     <FooterButton icon={MessageCircle} label={commentCount > 0 ? formatCountKilo(commentCount) : undefined} onClick={onComment} />
     <FooterButton icon={Share} onClick={onShare} ariaLabel="Send" />
   </div>;

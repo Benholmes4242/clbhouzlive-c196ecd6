@@ -767,7 +767,7 @@ const Pill: React.FC<PillProps> = ({ pill, onClick, ariaLabel, count, accent, sq
       height: COMMENT_BAR_H, borderRadius: 22, boxSizing: 'border-box',
       flex: square ? '0 0 44px' : '1 1 0', minWidth: 0, width: square ? 44 : undefined,
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: 0,
-      color: accent ? AMBER : '#F8FAFC', cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit',
+      color: accent ? '#FFFFFF' : '#F8FAFC', cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit',
     }}
   >
     {children}

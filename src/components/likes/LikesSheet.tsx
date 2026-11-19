@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import type { ReactionKind } from '@/lib/reactionKind';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { navigateOverViewer } from '@/lib/fullscreen/navigateOverViewer';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -115,9 +116,9 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
         onClick={() => {
           onClose();
           if (isBusiness) {
-            if (l.username) navigate(`/business/${l.actorId ?? l.userId}`);
+            if (l.username) navigateOverViewer(navigate, `/business/${l.actorId ?? l.userId}`);
           } else if (l.username) {
-            navigate(`/profile/${l.username}`);
+            navigateOverViewer(navigate, `/profile/${l.username}`);
           }
         }}
         style={{

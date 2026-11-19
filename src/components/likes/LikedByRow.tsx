@@ -177,11 +177,11 @@ export function LikedByRow({
           <span aria-hidden="true" style={{ display: 'flex', flex: 'none' }}>
             {Array.from({ length: slots }, (_, i) => {
               const liker = isLoading ? undefined : likers[i];
-              const ring: React.CSSProperties = { display: 'block', flex: 'none', width: 22, height: 22, boxSizing: 'content-box', borderRadius: '34%', border: `2px solid ${surfaceColor}`, marginLeft: i === 0 ? 0 : -7, position: 'relative', zIndex: 3 - i };
-              if (!liker) return <span key={i} data-liked-stack-face="true" style={{ ...ring, background: getAvatarFallbackGradient(null) }} />;
+              const ring: React.CSSProperties = { display: 'block', flex: 'none', width: 22, height: 22, boxSizing: 'content-box', borderRadius: '34%', boxShadow: `0 0 0 1.5px ${surfaceColor}`, marginLeft: i === 0 ? 0 : -7, position: 'relative', zIndex: 3 - i };
+              if (!liker) return <span key={i} data-liked-stack-face="true" style={{ ...ring, background: getAvatarFallbackGradient(null), boxShadow: `${ring.boxShadow}, inset 0 0 0 1px rgba(255,255,255,0.22)` }} />;
               return (
                 <span key={i} data-liked-stack-face="true" style={ring}>
-                  <SquircleAvatar size={22} src={liker.avatarUrl} alt={liker.displayName ?? ''} userId={liker.actorId ?? liker.userId} fallback={getInitialsFromName(liker.displayName ?? '')} />
+                  <SquircleAvatar size={22} src={liker.avatarUrl} alt={liker.displayName ?? ''} userId={liker.actorId ?? liker.userId} fallback={getInitialsFromName(liker.displayName ?? '')} hairlineRing />
                 </span>
               );
             })}

@@ -485,7 +485,7 @@ function WhoLine({
   const likeLabel = helpful
     ? (engagement?.liked ? 'Marked helpful' : 'Mark this review helpful')
     : engagement?.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round');
-  const likeColour = engagement?.liked ? A.AMBER : subColor;
+  const likeColour = engagement?.liked ? '#FFFFFF' : subColor;
 
   /* The names line carries the count on lead/std; LikedByRow only returns null
      for a missing post or zero likes, both excluded here, and its loading state
@@ -509,7 +509,7 @@ function WhoLine({
     >
       {engagement?.likeAvailable && (!pair || showPairLike) ? (
         pair ? (
-          <span aria-label={likeLabel} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
+          <span aria-label={likeLabel} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? '#FFFFFF' : subColor }}>
             <ReactionGlyph reacted={engagement.liked} size={14} />
             <span style={countStyle}>{engagement.likeCount}</span>
           </span>
@@ -517,7 +517,7 @@ function WhoLine({
           <span role="button" tabIndex={0} aria-pressed={engagement.liked} aria-label={likeLabel}
             onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
             onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onToggleLike?.(); }}
-            style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
+            style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? '#FFFFFF' : subColor, cursor: 'pointer' }}>
             <ReactionGlyph reacted={engagement.liked} size={CELEBRATE_GLYPH_SIZE} />
             {engagement.likeCount > 0 && !namesLineShows ? <span style={countStyle}>{engagement.likeCount}</span> : null}
           </span>

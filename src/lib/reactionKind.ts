@@ -1,6 +1,5 @@
 import React from 'react';
 import ThumbIcon from '@/components/icons/ThumbIcon';
-import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 
 /**
  * THE POST TYPE DECIDES THE REACTION (BRIEF_CELEBRATE_REACTION_BUILD).
@@ -39,7 +38,7 @@ export function celebrateFigureSize(size: number): number {
    Every kind draws the SAME thumbs-up (ThumbIcon); the kind decides size and
    wording only. State is WEIGHT AND COLOUR together
    (BRIEF_REACTION_GLYPH_OUTLINE_TO_FILL): idle is the regular-weight outline
-   in a muted tone, reacted is the fill weight in amber. ReactionGlyph is the
+   in a muted tone, reacted is the fill weight in white (FOUR_FIXES §2). ReactionGlyph is the
    ONLY thing that decides either — a call site that picks a weight or writes
    an amber hex for this glyph is a bug. The swap is instant: never animate it. */
 export type ReactionKind = 'like' | 'celebrate' | 'helpful';
@@ -50,8 +49,11 @@ export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }
   return 'like';
 }
 
-/** THE reaction amber. Declared once, here. */
+/** Brand amber. NOT a reaction colour since FOUR_FIXES §2 (reacted = REACTED, white);
+ *  kept exported for identity/kicker consumers. */
 export const AMBER = '#F7931E';
+/** Reacted state, every tone (Ben's ruling FOUR_FIXES §2): white; the fill weight tells it apart. */
+export const REACTED = '#FFFFFF';
 const IDLE_PANEL = 'rgba(255,255,255,0.72)';
 const IDLE_MEDIA = '#FFFFFF';
 
@@ -60,9 +62,7 @@ export function ReactionGlyph({
 }: {
   reacted: boolean;
   size: number;
-  /** 'panel' = muted idle, AMBER reacted. 'media' = on bare photography:
-   *  white idle, AMBER_ON_MEDIA reacted. 'chrome' = on photography but behind a
-   *  drop-shadow (fullscreen/feed rails): white idle, AMBER reacted. */
+  /** 'panel' = muted idle; 'media'/'chrome' = white idle. Reacted is white in every tone. */
   tone?: 'panel' | 'media' | 'chrome';
   /** HelpfulReviewsShelf ONLY: inherit the row colour. Do not use elsewhere. */
   color?: string;
@@ -70,7 +70,7 @@ export function ReactionGlyph({
   return React.createElement(ThumbIcon, {
     weight: reacted ? 'fill' : 'regular',
     size,
-    color: color ?? (reacted ? (tone === 'media' ? AMBER_ON_MEDIA : AMBER) : tone === 'panel' ? IDLE_PANEL : IDLE_MEDIA),
+    color: color ?? (reacted ? REACTED : tone === 'panel' ? IDLE_PANEL : IDLE_MEDIA),
     'aria-hidden': true,
   });
 }

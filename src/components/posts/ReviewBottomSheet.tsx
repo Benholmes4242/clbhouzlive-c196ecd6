@@ -47,7 +47,8 @@ import { ChevronRight, Play, Share } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { activeTop100CourseIds, type Top100MembershipRow } from '@/components/courses/browse/playedRings';
-import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { REACTED } from '@/lib/reactionKind';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
@@ -524,7 +525,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   onClick={handleGoToProfile}
                   style={{ display: 'flex', alignItems: 'center', gap: 11, minHeight: 44, width: '100%', padding: 0, margin: '14px 0 0', border: 0, background: 'none', color: 'inherit', font: 'inherit', textAlign: 'left', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
                 >
-                  <SquircleAvatar size={36} src={user.avatar} alt={user.name} userId={user.id} fallback={initials} hairlineRing ringColor={DARK_HAIRLINE} />
+                  <SquircleAvatar size={36} src={user.avatar} alt={user.name} userId={user.id} fallback={initials} hairlineRing />
                   <span data-sheet-player-name="true" style={{ flex: 1, minWidth: 0, display: 'block' }}>
                     <span style={{ display: 'block', fontSize: 15, fontWeight: 600, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><InlineProMemberName userId={user.id}>{user.name}</InlineProMemberName></span>
                     {metaLine && <span data-review-meta="true" style={{ display: 'block', marginTop: 2, fontSize: 12, lineHeight: 1.35, color: DIM }}>{metaLine}</span>}
@@ -768,7 +769,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     label={t('scorecard.likeReview', 'Like this review')}
                     size={19}
                     kind="helpful"
-                    footerBox={{ color: MUTE, reactedColor: A.AMBER }}
+                    footerBox={{ color: MUTE, reactedColor: REACTED }}
                   />
                   <CommentAction
                     count={commentCount}

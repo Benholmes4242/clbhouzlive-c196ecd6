@@ -9,7 +9,7 @@
  * `onDone` on the same schedule.
  */
 import React, { useEffect } from 'react';
-import { AMBER } from '@/lib/reactionKind';
+import { REACTED } from '@/lib/reactionKind';
 import ThumbIcon from '@/components/icons/ThumbIcon';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
@@ -47,7 +47,7 @@ export const HeartBurst: React.FC<Props> = ({ onDone }) => {
       <ThumbIcon
         weight="fill"
         size={112}
-        color={AMBER}
+        color={REACTED}
         style={{
           filter: 'drop-shadow(0 4px 18px rgba(0,0,0,0.35))',
           animation: reduced

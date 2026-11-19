@@ -61,14 +61,14 @@ describe('FULLSCREEN_VIEWER_REDESIGN', () => {
     expect(screen.getByRole('button', { name: 'Open Course' })).toBeInTheDocument();
   });
 
-  it('(b) pills run like, comment, share, more; liked is amber', () => {
+  it('(b) pills run like, comment, share, more; liked is white', () => {
     const v = mount(base, { liked: true });
     const pills = [...v.container.querySelectorAll('[data-fullscreen-pills] [data-pill]')].map(p => p.getAttribute('data-pill'));
     expect(pills).toEqual(['like', 'comment', 'share', 'more']);
-    expect((v.container.querySelector('[data-pill="like"]') as HTMLElement).style.color).toBe('rgb(247, 147, 30)');
+    expect((v.container.querySelector('[data-pill="like"]') as HTMLElement).style.color).toBe('rgb(255, 255, 255)');
     cleanup();
     const u = mount(base);
-    expect((u.container.querySelector('[data-pill="like"]') as HTMLElement).style.color).not.toBe('rgb(247, 147, 30)');
+    expect((u.container.querySelector('[data-pill="like"]') as HTMLElement).style.color).not.toBe('rgb(255, 255, 255)');
   });
 
   it('(b) readOnly renders no pills but keeps mute on a video', () => {

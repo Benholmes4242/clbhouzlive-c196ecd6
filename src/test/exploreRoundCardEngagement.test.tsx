@@ -80,10 +80,10 @@ describe('Explore round-card who-line engagement', () => {
   /* BRIEF_CELEBRATE_GLYPH_AND_NAMES_LINE: a ROUND is celebrated with the
      clap (Phosphor hands-clapping fill, one path), not the Heart. State is
      carried by colour, so the path stays currentColor. */
-  it('uses amber for the celebrated clap and count, never the under-par red', () => {
+  it('uses white for the celebrated clap and count, never the under-par red', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement({ liked: true, likeCount: 4 })} />);
     const control = view.getByRole('button', { name: 'Celebrated' });
-    expect(control.style.color).toBe('rgb(247, 147, 30)');
+    expect(control.style.color).toBe('rgb(255, 255, 255)');
     const svg = control.querySelector('svg');
     expect(svg?.getAttribute('viewBox')).toBe('0 0 256 256');
     expect(svg?.classList.contains('lucide-heart')).toBe(false);

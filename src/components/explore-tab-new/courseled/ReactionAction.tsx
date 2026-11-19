@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactionGlyph, CELEBRATE_GLYPH_SIZE, celebrateFigureSize, type ReactionKind } from '@/lib/reactionKind';
+import { ReactionGlyph, CELEBRATE_GLYPH_SIZE, celebrateFigureSize, REACTED, type ReactionKind } from '@/lib/reactionKind';
 
 import { A, FIGS, SANS } from './tokens';
 
@@ -11,7 +11,7 @@ import { A, FIGS, SANS } from './tokens';
  * carried by COLOUR only (BRIEF_ONE_REACTION_GLYPH).
  *
  *   not reacted   the solid shape in MUTE / white at 72% on photography
- *   reacted       the FILL weight in AMBER via ReactionGlyph; idle is the regular outline (the one legitimate amber: you)
+ *   reacted       the FILL weight in white via ReactionGlyph (FOUR_FIXES §2); idle is the regular outline
  *   count         beside the glyph, tabular, HIDDEN ENTIRELY at zero
  *   own content   the count alone, no tappable glyph
  *   signed out    not rendered at all (the caller passes readOnly=false only
@@ -23,7 +23,6 @@ import { A, FIGS, SANS } from './tokens';
  */
 
 const WHITE_72 = 'rgba(255,255,255,0.72)';
-import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 
 interface Props {
   count: number;
@@ -107,8 +106,7 @@ export function ReactionAction({
 
   const glass = tone === 'glass';
   const idle = glass ? WHITE_72 : A.MUTE;
-  const amber = glass ? AMBER_ON_MEDIA : A.AMBER;
-  const countColor = reacted ? amber : glass ? WHITE_72 : A.MUTE;
+  const countColor = reacted ? REACTED : glass ? WHITE_72 : A.MUTE;
 
   const figure =
     count > 0 || reserveCount ? (

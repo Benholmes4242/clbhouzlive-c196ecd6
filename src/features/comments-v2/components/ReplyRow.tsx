@@ -2,6 +2,7 @@
  * ReplyRow - in-thread reply row. Same row treatment as CommentCard:
  * no background, no radius, no shadow; hairline separated, indented.
  */
+import { navigateOverViewer } from '@/lib/fullscreen/navigateOverViewer';
 import { useNavigate } from 'react-router-dom';
 import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +62,7 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
         onClick={() => {
           if (deleted) return;
           onClose?.();
-          navigate(getActorRouteByType(comment.actor_type, comment.actor_id, comment.slug));
+          navigateOverViewer(navigate, getActorRouteByType(comment.actor_type, comment.actor_id, comment.slug));
         }}
         className="shrink-0 bg-transparent border-0 p-0"
         style={{ cursor: deleted ? 'default' : 'pointer' }}
@@ -105,7 +106,7 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
               : { fontSize: 14.5, lineHeight: 1.52, color: BODY_INK }}
             onMentionTap={(m) => {
               onClose?.();
-              navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
+              navigateOverViewer(navigate, m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
             }}
           />
         )}
@@ -125,12 +126,12 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
               size={13}
               strokeWidth={2}
               style={{
-                fill: comment.has_liked ? AMBER : 'none',
-                color: comment.has_liked ? AMBER : MUTE,
+                fill: comment.has_liked ? '#FFFFFF' : 'none',
+                color: comment.has_liked ? '#FFFFFF' : MUTE,
               }}
             />
             {comment.likes_count > 0 && (
-              <span className="tabular-nums" style={{ fontSize: 13, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
+              <span className="tabular-nums" style={{ fontSize: 13, fontWeight: 600, color: comment.has_liked ? '#FFFFFF' : MUTE }}>
                 {comment.likes_count}
               </span>
             )}

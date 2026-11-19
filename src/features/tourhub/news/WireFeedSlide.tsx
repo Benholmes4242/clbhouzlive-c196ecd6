@@ -8,7 +8,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SLAB } from '@/components/feed/feedSurfaces';
 import { LINE, T60 } from '@/components/feed/feedTokens';
 import { FooterButton } from '@/components/feed/FeedCard';
-import { ReactionGlyph, AMBER as REACTION_AMBER } from '@/lib/reactionKind';
+import { ReactionGlyph, REACTED } from '@/lib/reactionKind';
 import { formatCountKilo } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
@@ -153,7 +153,7 @@ export function WireFeedSlide({
               icon={MessageCircle}
               label={like.count > 0 ? formatCountKilo(like.count) : undefined}
               active={like.mine}
-              activeColor={REACTION_AMBER}
+              activeColor={REACTED}
               glyph={<ReactionGlyph reacted={like.mine} size={21} />}
               ariaLabel={like.mine ? tc('story.unlikeAria') : tc('story.likeAria')}
               onClick={() => { if (signedIn) toggle(targetType, story.id); }}
