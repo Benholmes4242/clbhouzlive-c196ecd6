@@ -288,3 +288,7 @@
 - Four separate shards: 2,155 / 2,026 / 2,159 / 2,187 passed; full suite 8,527 passed, 748 files, zero failures.
 - Notch/tie, observer repair, Option E and saved Tour slot are suite-verified; all new/changed cases, old assertions and count reconciliation: .lovable/reports/combined-tour-final-tests.md.
 - Ben's 390/320 comparison and real-member like/comment verification remain pending; no application code changed in these final repairs.
+
+## Complete: Tour live exact-match fixes
+- Match live board/leaders geometry; between-round spine and rule-based picks copy.
+- Added 15 cases (47 focused pass); four separate sequential shards pass 9,236 = 9,221 + 15. Public RSM checked at 390/320 with no overflow; fonts unchanged. Physical iPhone and other real-data states remain unverified.

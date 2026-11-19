@@ -245,7 +245,7 @@ export function PhotoBand({
           {segments.map((segment, index) => segment.figure ? <strong key={index} style={{ fontWeight: 700, fontStyle: 'normal', color: 'var(--th-text-primary)', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' }}>{segment.text}</strong> : <span key={index}>{segment.text}</span>)}
         </p> : null}
         {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
-        {inPlay ? <RoundSpine round={state.round} totalRounds={state.totalRounds} suspended={pauseSpine && isSuspended} /> : null}
+        {inPlay ? <RoundSpine round={afterRound ?? state.round} between={afterRound != null} totalRounds={state.totalRounds} suspended={pauseSpine && isSuspended} /> : null}
       </div>
     </div>
   );

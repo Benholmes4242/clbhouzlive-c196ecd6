@@ -4,7 +4,7 @@
  * and Also this week keep HeroBoardRows' R1…Rn grammar; this sibling never
  * changes it.
  *
- * Columns: POS | PLAYER (22px face + name) | THRU | TODAY | TOT.
+ * Columns: POS | PLAYER (26px hairline face + name) | THRU | TODAY | TOT.
  *  - round 1 drops TODAY (it equals TOT);
  *  - between rounds THRU becomes "R{n} TEE", each player's next tee time dim,
  *    and TODAY is absent;
@@ -20,14 +20,13 @@ import { useTranslation } from 'react-i18next';
 
 import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../../leaderboard/ScorecardSheet';
-import { FONT, WHITE_ALPHA_45, TOUR_LIVE_GREEN } from '../../../_shared/tokens';
+import { FONT, TOUR_LIVE_GREEN } from '../../../_shared/tokens';
 import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
-import { OVERVIEW } from '../overviewTokens';
 import { useTeeTimesAll } from '../../../tournament-v2/data/useTeeTimesAll';
 import { HeroRoundPanel } from '../../../tournament-v2/sections/HeroRoundPanel';
 import { heroDefaultRound, heroStartedRounds } from '../../../tournament-v2/sections/heroRoundRules';
@@ -40,7 +39,7 @@ import '../../../leaderboard/leaderboard.css';
 import './liveStates.css';
 
 export const LIVE_BOARD_ROWS = 10;
-const GREY = 'rgba(248,250,252,.42)';
+const GREY = 'var(--live-dim)';
 
 export interface LiveBoardLayout { today: boolean; nextTee: number | null; thruLive: boolean }
 export function liveBoardLayout(stage: LiveStage, round: number, nextRound: number | null): LiveBoardLayout {
@@ -49,7 +48,7 @@ export function liveBoardLayout(stage: LiveStage, round: number, nextRound: numb
 }
 
 export function liveBoardGrid(layout: LiveBoardLayout): string {
-  return ['24px', 'minmax(0,1fr)', layout.nextTee != null ? '50px' : '38px', layout.today ? '44px' : null, '40px'].filter(Boolean).join(' ');
+  return ['28px', 'minmax(0,1fr)', layout.nextTee != null ? '48px' : '40px', layout.today ? '44px' : null, '44px'].filter(Boolean).join(' ');
 }
 
 interface Props {
@@ -93,8 +92,8 @@ export function LiveHeroBoard({ tournamentId, entries, stage, round, nextRound, 
   return (
     <>
       <div className="live-board" data-live-board data-live-stage={stage} data-live-today={layout.today || undefined} style={{ fontFamily: FONT, padding: '30px 0 0' }}>
-        <div data-live-board-header style={{ display: 'grid', gridTemplateColumns: grid, gap: 4, alignItems: 'end', padding: '0 20px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
-          <span style={{ gridColumn: '1 / 3', fontWeight: 800, letterSpacing: '0.16em' }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
+        <div data-live-board-header style={{ display: 'grid', gridTemplateColumns: grid, gap: 4, alignItems: 'end', padding: '0 20px 6px', minHeight: 22, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: GREY }}>
+          <span style={{ gridColumn: '1 / 3' }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
           <span data-live-col="thru" style={{ textAlign: 'center', whiteSpace: 'nowrap', color: layout.nextTee != null ? GREY : layout.thruLive ? TOUR_LIVE_GREEN : GREY }}>
             {layout.nextTee != null ? t('overview.live.board.nextTee', { round: layout.nextTee }) : t('overview.live.board.thru')}
           </span>
@@ -132,16 +131,16 @@ export function LiveHeroBoard({ tournamentId, entries, stage, round, nextRound, 
                 style={{ display: 'grid', gridTemplateColumns: grid, gap: 4, alignItems: 'center', width: '100%', height: 'auto', minHeight: 40, padding: '4px 20px', border: 'none', borderRadius: 0, background: 'transparent', color: '#FFFFFF', textAlign: 'left', fontFamily: FONT }}
               >
                 <span data-live-pos style={{ fontSize: 12.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{role === 'middle' || role === 'last' ? <span className="sr-only">{pos}</span> : pos}</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                  {r.player ? <span className="live-board-face" style={{ display: 'inline-flex', flex: 'none' }}><SquircleAvatar size={22} srcCandidates={resolvePlayerAvatarCandidates({ name, photoUrl: r.player.photo_url ?? null, tourSlug })} alt={name} userId={pid ?? name} hideRing /></span> : null}
-                  <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 13, fontWeight: 600 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                  {r.player ? <span className="live-board-face" style={{ display: 'inline-flex', flex: 'none' }}><SquircleAvatar size={26} srcCandidates={resolvePlayerAvatarCandidates({ name, photoUrl: r.player.photo_url ?? null, tourSlug })} alt={name} userId={pid ?? name} hairlineRing /></span> : null}
+                  <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 14, fontWeight: 600 }}>
                     <span className="live-board-name-full">{name}</span>
                     <span className="live-board-name-short">{r.player ? initialSurname(name) : name}</span>
                   </span>
                   {pid && pickPlayerIds?.has(pid) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </span>
-                <span data-live-cell="thru" style={{ textAlign: 'center', fontVariantNumeric: 'tabular-nums', fontSize: layout.nextTee != null ? 11.5 : 12, fontWeight: 600, color: layout.nextTee != null ? WHITE_ALPHA_45 : 'rgba(248,250,252,.78)' }}>{thru}</span>
-                {layout.today ? <span data-live-cell="today" style={{ textAlign: 'center', fontVariantNumeric: 'tabular-nums', fontSize: 12.5, fontWeight: 600, color: getScoreColor(today, 'dark') }}>{today == null ? '' : fmtScore(today)}</span> : null}
+                <span data-live-cell="thru" style={{ textAlign: 'center', fontVariantNumeric: 'tabular-nums', fontSize: layout.nextTee != null ? 11.5 : 12.5, fontWeight: 600, color: layout.nextTee != null || thru === 'F' ? GREY : 'var(--live-secondary)' }}>{thru}</span>
+                {layout.today ? <span data-live-cell="today" style={{ textAlign: 'center', fontVariantNumeric: 'tabular-nums', fontSize: 12.5, fontWeight: 700, color: getScoreColor(today, 'dark') }}>{today == null ? '' : fmtScore(today)}</span> : null}
                 <span data-live-cell="tot" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, 'dark') }}>{r.score == null ? '' : fmtScore(r.score)}</span>
               </Tag>
               {isOpen && expanded && pid ? <HeroRoundPanel key={pid} tournamentId={tournamentId} playerId={pid} round={expanded.round} rounds={totalRounds ?? Math.max(colRound, 1)} startedRounds={started} boardUpdatedAt={boardUpdatedAt} onRound={rd => setExpanded({ playerId: pid, round: rd })} onFull={openScorecard} /> : null}
@@ -149,9 +148,9 @@ export function LiveHeroBoard({ tournamentId, entries, stage, round, nextRound, 
           );
         })}
         {onFullBoard && entries.length > rows.length ? (
-          <Button variant="ghost" data-live-full-leaderboard data-hero-full-leaderboard onClick={onFullBoard} style={{ display: 'flex', justifyContent: 'space-between', width: '100%', height: 'auto', minHeight: 36, padding: '8px 20px', border: 'none', borderRadius: 0, background: 'transparent', fontFamily: FONT, fontSize: 13, fontWeight: 600, color: OVERVIEW.mute }}>
+          <Button variant="ghost" data-live-full-leaderboard data-hero-full-leaderboard onClick={onFullBoard} style={{ display: 'flex', justifyContent: 'space-between', width: '100%', height: 'auto', minHeight: 44, padding: '0 20px', border: 'none', borderRadius: 0, background: 'transparent', fontFamily: FONT, fontSize: 14, fontWeight: 600, color: 'var(--live-secondary)' }}>
             <span>{t('overview.live.board.fullLeaderboard', { count: entries.length })}</span>
-            <span aria-hidden style={{ color: '#FFFFFF', fontSize: 16 }}>›</span>
+            <span aria-hidden style={{ color: 'var(--live-ink)', fontSize: 15 }}>›</span>
           </Button>
         ) : null}
       </div>

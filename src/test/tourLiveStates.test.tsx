@@ -187,3 +187,97 @@ describe('frozen siblings', () => {
     expect(screen.queryByText('K')).toBeNull();
   });
 });
+
+
+// Exact-match ruling: existing 32 cases remain unchanged.
+import { readFileSync } from 'node:fs';
+import { livePickSentences, pickGapNumber } from '@/features/tourhub/components/overview-v3/HybridHeroBands/livePickSentences';
+import { LeadersGroupContent } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup';
+import type { TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
+
+const pick = (id: string, name = 'Max Greyserman') => ({ playerId: id, playerName: name });
+const picked = (o: Partial<BoardEntry> = {}) => e({ player: { id: 'mg', full_name: 'Max Greyserman' }, position: 4, score: -3, round_4: -1, thru: 18, ...o });
+const projected = { status: 'inprogress', currentRound: 2, cutRound: 2, projectedCutline: -2 };
+const sentences = (stage: Parameters<typeof livePickSentences>[0], rows: BoardEntry[], picks = [pick('mg')]) => livePickSentences(stage, stage === 'final' ? 4 : 2, picks, rows, projected);
+
+describe('exact-match board and leaders', () => {
+  it('board columns use 28/40/44/44 and between-round tee uses 48', () => {
+    expect(liveBoardGrid(liveBoardLayout('cutRound', 2, null))).toBe('28px minmax(0,1fr) 40px 44px 44px');
+    expect(liveBoardGrid(liveBoardLayout('between', 1, 2))).toBe('28px minmax(0,1fr) 48px 44px');
+  });
+  it('board faces use canonical hairline and header/row values match the ruling', () => {
+    const source = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/LiveHeroBoard.tsx', 'utf8');
+    expect(source).toContain('size={26}'); expect(source).toContain('hairlineRing'); expect(source).not.toContain('hideRing');
+    expect(source).toContain('minHeight: 22, fontSize: 9.5'); expect(source).toContain("letterSpacing: '0.1em'");
+    expect(source).toContain('fontSize: 14, fontWeight: 600'); expect(source).toContain('fontSize: 12.5, fontWeight: 700');
+    expect(source).toContain("minHeight: 44, padding: '0 20px'");
+  });
+  it('leaders live and non-live grids stay independent', () => {
+    const row = picked({ round_2: -1, thru: 12 });
+    const group = { teeTime: '2026-11-19T10:00:00Z', players: [{ id: 'mg', name: 'Max Greyserman' }] } as TeeGroup;
+    const props = { tournamentId: 't', entries: [row], group, groups: [group], round: 2, currentRound: 2, totalRounds: 4, phase: 'live' as const };
+    const { container, rerender } = render(<LeadersGroupContent {...props} live />);
+    expect((container.querySelector('[data-leaders-group-row]') as HTMLElement).style.gridTemplateColumns).toBe('28px minmax(0,1fr) 40px 44px 44px');
+    expect(container.querySelector('.live-leaders-name-short')?.textContent).toBe('M. Greyserman');
+    expect(container.querySelector('[data-leaders-today]')).not.toBeNull();
+    rerender(<LeadersGroupContent {...props} />);
+    expect((container.querySelector('[data-leaders-group-row]') as HTMLElement).style.gridTemplateColumns).toBe('24px minmax(0,1fr) 40px 40px 40px');
+    expect(container.querySelector('.live-leaders-name-short')).toBeNull();
+  });
+  it('leaders before tee use three columns and narrow CSS only drops faces with TODAY', () => {
+    const group = { teeTime: '2026-11-19T10:00:00Z', players: [{ id: 'mg', name: 'Max Greyserman' }] } as TeeGroup;
+    const { container } = render(<LeadersGroupContent tournamentId="t" entries={[picked({ round_2: null, round_4: null, thru: 0 })]} group={group} groups={[group]} round={2} currentRound={2} totalRounds={4} phase="live" live />);
+    expect((container.querySelector('[data-leaders-group-row]') as HTMLElement).style.gridTemplateColumns).toBe('28px minmax(0,1fr) 44px');
+    expect(container.querySelector('[data-group-today]')).toBeNull();
+    const css = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/liveStates.css','utf8');
+    expect(css).toContain('.live-leaders[data-leaders-today] .live-leaders-face{display:none}');
+  });
+});
+
+describe('between-round spine provider shapes', () => {
+  for (const providerRound of [1, 2]) it(`provider round ${providerRound}: finished node done, next todo, no live`, () => {
+    const stage = liveStage({ kind: 'live', round: providerRound, totalRounds: 4, entries: [e({ round_1: -2, thru: 18 })] });
+    const { container } = render(<RoundSpine round={stage.round} totalRounds={4} between={stage.stage === 'between'} />);
+    expect([...container.querySelectorAll('[data-round-node]')].map(n => n.getAttribute('data-round-node'))).toEqual(['done','todo','todo','todo']);
+  });
+});
+
+describe('ruled pick sentences', () => {
+  it('one outside projected cut; score at cut stays inside', () => {
+    expect(sentences('cutRound', [picked({ score: -1 })])[0]).toMatchObject({ key: 'overview.live.picks.outsideOne', values: { name: 'Greyserman' }, replace: false });
+    expect(sentences('cutRound', [picked({ score: -2 })])).toEqual([]);
+  });
+  it('two outside projected cut', () => {
+    expect(sentences('cutRound', [picked({ score: 0 }), e({ player: { id:'b', full_name:'Ben Smith' }, score:1 })], [pick('mg'),pick('b','Ben Smith')])[0]).toMatchObject({ key:'overview.live.picks.outsideTwo', values:{a:'Greyserman',b:'Smith'} });
+  });
+  it('all three outside projected cut', () => {
+    expect(sentences('cutRound', ['a','b','c'].map(id => e({ player:{id,full_name:id},score:0 })), ['a','b','c'].map(id => pick(id,id)))[0].key).toBe('overview.live.picks.outsideThree');
+  });
+  it('no cut display or actual cut never appends projected sentence', () => {
+    expect(livePickSentences('cutRound',2,[pick('mg')],[picked({score:0})],{})).toEqual([]);
+    expect(livePickSentences('cutRound',2,[pick('mg')],[picked({score:0})],{currentRound:3,cutRound:2,cutline:-2,projectedCutline:-2})).toEqual([]);
+  });
+  it('suspended singular hole and plural holes use 18 minus thru', () => {
+    expect(sentences('suspended',[picked({round_2:0,thru:17})])[0]).toMatchObject({key:'overview.live.picks.finishOneHole',values:{count:1}});
+    expect(sentences('suspended',[picked({round_2:0,thru:12})])[0]).toMatchObject({key:'overview.live.picks.finishHoles',values:{count:6}});
+  });
+  it('suspended multiple unfinished picks; unstarted and finished excluded', () => {
+    const rows = [picked({round_2:0,thru:12}),e({player:{id:'b',full_name:'Ben Smith'},round_2:1,thru:4})];
+    expect(sentences('suspended',rows,[pick('mg'),pick('b','Ben Smith')])[0].key).toBe('overview.live.picks.finishMany');
+    expect(sentences('suspended',[picked({round_2:null,thru:0})])).toEqual([]);
+    expect(sentences('suspended',[picked({round_2:0,thru:18})])).toEqual([]);
+  });
+  it('final clubhouse replaces base with score and gap; numbers through ten then digits', () => {
+    expect(sentences('final',[picked(),e({position:1,score:-5,player:{id:'leader',full_name:'Ben Smith'}})])[0]).toMatchObject({key:'overview.live.picks.clubhouseBehind',values:{name:'Greyserman',score:'−3',gap:2,leader:'Smith'},replace:true});
+    expect(pickGapNumber(1,echo)).toBe('overview.live.picks.numbers.1');
+    expect(pickGapNumber(10,echo)).toBe('overview.live.picks.numbers.10');
+    expect(pickGapNumber(11,echo)).toBe('11');
+  });
+  it('tied lead replaces base with clubhouse-level wording', () => {
+    expect(sentences('final',[picked({position:1,position_tied:true}),e({position:1,score:-3})])[0]).toMatchObject({key:'overview.live.picks.clubhouseLevel',replace:true});
+  });
+  it('sole leading pick retains base leads sentence; unfinished pick retains base', () => {
+    expect(sentences('final',[picked({position:1}),e({position:2,score:-1})])).toEqual([]);
+    expect(sentences('final',[picked({thru:17}),e({position:1,score:-5})])).toEqual([]);
+  });
+});

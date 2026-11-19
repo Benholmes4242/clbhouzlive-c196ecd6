@@ -20,3 +20,12 @@
 .live-tee small{display:block;font-size:11px;font-weight:600;margin-top:1px;color:rgba(248,250,252,.42)}
 .live-picks-short{display:none}
 @media (max-width:340px){.live-picks-full{display:none}.live-picks-short{display:inline}}
+
+.live-board,.live-leaders,[data-live-picks]{--live-dim:rgba(248,250,252,.42);--live-secondary:rgba(248,250,252,.62);--live-ink:#F8FAFC;--live-prose:rgba(248,250,252,.78)}
+.live-leaders-name-short{display:none}
+@media(max-width:340px){
+.live-leaders-name-full{display:none}
+.live-leaders-name-short{display:inline}
+.live-leaders[data-leaders-today] .live-leaders-face{display:none}
+}
+[data-live-picks] strong{font-weight:700;color:var(--live-ink)}

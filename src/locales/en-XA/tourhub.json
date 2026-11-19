@@ -560,7 +560,29 @@
         "finished": "[{{pos}} · Finished]",
         "thru": "[{{pos}} · Thru {{thru}}]",
         "missedCut": "[Missed the cut]",
-        "mc": "[MC]"
+        "mc": "[MC]",
+          "outsideOne": "<b>{{name}}</b> is outside the projected cut.",
+          "outsideTwo": "<b>{{a}}</b> and <b>{{b}}</b> are outside the projected cut.",
+          "outsideThree": "All three are outside the projected cut.",
+          "finishOneHole": "<b>{{name}}</b> has <b>{{count}}</b> hole to finish.",
+          "finishHoles": "<b>{{name}}</b> has <b>{{count}}</b> holes to finish.",
+          "finishMany": "<b>{{a}}</b> and <b>{{b}}</b> still have holes to finish.",
+          "finishThree": "<b>{{a}}</b>, <b>{{b}}</b> and <b>{{c}}</b> still have holes to finish.",
+          "clubhouseBehind_one": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, <b>{{gap}} shot</b> behind <b>{{leader}}</b>.",
+          "clubhouseBehind_other": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, <b>{{gap}} shots</b> behind <b>{{leader}}</b>.",
+          "clubhouseLevel": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, level with the lead.",
+          "numbers": {
+            "1": "one",
+            "2": "two",
+            "3": "three",
+            "4": "four",
+            "5": "five",
+            "6": "six",
+            "7": "seven",
+            "8": "eight",
+            "9": "nine",
+            "10": "ten"
+          }
       }
     }
   },

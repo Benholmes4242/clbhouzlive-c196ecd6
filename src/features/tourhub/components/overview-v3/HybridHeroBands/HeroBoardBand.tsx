@@ -89,6 +89,7 @@ import './pickPanels.css';
 import {PicksBlock} from './PicksBlock';
 import { LiveHeroBoard } from './LiveHeroBoard';
 import { LivePicksBlock } from './LivePicksBlock';
+import { livePickSentences } from './livePickSentences';
 import { LiveCourse, LiveFacts, LiveFirstTees, useLiveOverview } from '../LiveOverviewSections';
 import { liveFactCells } from '../liveStateRules';
 
@@ -518,6 +519,8 @@ export function HeroBoardSection({
         <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={liveStageNow.stage} round={liveStageNow.round} analysis={live.analysis} />
         {hasPicks ? <LivePicksBlock picks={picks} tourCode={pickTourCode} seasonYear={eventSeasonYear ?? null} stage={liveStageNow.stage} round={liveStageNow.round}
           boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntro}
+          sentences={livePickSentences(liveStageNow.stage, liveStageNow.round, picks, entries, live.cut)}
+          introFigures={picks.flatMap(p => { const row = liveLines.get(String(p.playerId)); return [surnameOf(p.playerName), row?.position != null ? `${row.tied ? 'T' : ''}${row.position}` : '', row?.score != null && leader?.total != null ? String(row.score - leader.total) : '']; })}
           onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }} onOpenRecord={() => setRecordOpen(true)} /> : null}
       </> : <>
       {!picksOnly && movementCards.length > 0 && currentRound != null ? (

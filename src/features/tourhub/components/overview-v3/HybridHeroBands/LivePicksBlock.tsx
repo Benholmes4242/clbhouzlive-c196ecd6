@@ -7,7 +7,7 @@
  *  - started: "T17 · Thru 12" / "T17 · Finished" and the total on the right;
  *  - missed the cut: "Missed the cut" and MC.
  * Reuses the season-record door, the picks intro and the PicksSheet opener. */
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { AMBER } from '../../../_shared/tokens';
 import { PlayerAvatar } from '../../PlayerAvatar';
 import type { AITopContender } from '../../../hooks/useAIPredictions';
@@ -16,7 +16,8 @@ import { getScoreColor } from '../../../_shared/scoreColor';
 import { fmtScore } from '../../../utils/fmtScore';
 import { Button } from '@/components/ui/button';
 import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
-import { OVERVIEW } from '../overviewTokens';
+import { pickGapNumber, type PickSentence } from './livePickSentences';
+import './liveStates.css';
 import { pickStatusToken, pickTeeText } from './PicksBlock';
 import { venueTee } from '../upcomingOverviewRules';
 import { livePicksHeading, teeStartKey, type LiveStage } from '../liveStateRules';
@@ -41,10 +42,17 @@ export function livePickRow(stage: LiveStage, line: Line | undefined, teeIso: st
   return { sub: pos, subScore: pos && line?.score != null ? line.score : null, right: tee, rightKind: tee ? 'tee' : null, rightScore: null };
 }
 
-export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boardByPlayer, teeByPlayer, startHoleByPlayer, zone, intro, onOpenPick, onOpenRecord }: {
+function boldIntro(text: string, figures: string[]) {
+  const tokens = [...new Set(figures.filter(Boolean))].sort((a, b) => b.length - a.length);
+  if (!tokens.length) return text;
+  const pattern = new RegExp(`(${tokens.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
+  return text.split(pattern).map((part, i) => tokens.includes(part) ? <strong key={i}>{part}</strong> : part);
+}
+
+export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boardByPlayer, teeByPlayer, startHoleByPlayer, zone, intro, sentences = [], introFigures = [], onOpenPick, onOpenRecord }: {
   picks: AITopContender[]; tourCode: string; seasonYear: number | null; stage: LiveStage; round: number;
   boardByPlayer: Map<string, Line>; teeByPlayer: Map<string, string> | null; startHoleByPlayer?: Map<string, number> | null; zone: string | null;
-  intro: string | null; onOpenPick: (id: string) => void; onOpenRecord: () => void;
+  intro: string | null; sentences?: PickSentence[]; introFigures?: string[]; onOpenPick: (id: string) => void; onOpenRecord: () => void;
 }) {
   const { t } = useTranslation('tourhub');
   const recordQuery = useOurPickRecord(tourCode, seasonYear);
@@ -66,7 +74,11 @@ export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boar
             {record.event_count != null ? <span data-pick-record-events style={{ marginLeft: '0.28em', fontWeight: 400, color: 'rgba(248,250,252,.78)', whiteSpace: 'nowrap' }}>{recordCopy('fromEvents', { count: record.event_count })}</span> : null}</span>
           <span aria-hidden style={{ marginLeft: 'auto', paddingLeft: 8, fontSize: 15, color: 'rgba(248,250,252,.42)' }}>›</span>
         </Button> : null}
-        {intro ? <p data-overview-picks-intro style={{ margin: '4px 0 0', fontSize: 13.5, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p> : null}
+        {intro || sentences.length ? <p data-overview-picks-intro style={{ margin: '4px 0 0', fontSize: 13.5, lineHeight: 1.45, color: 'var(--live-prose)' }}>
+          {!sentences.some(s => s.replace) && intro ? <>{boldIntro(intro, introFigures)}{sentences.length ? ' ' : ''}</> : null}
+          {sentences.map((s, i) => <span key={s.key}>{i ? ' ' : ''}<Trans t={t} i18nKey={s.key === 'overview.live.picks.clubhouseBehind' ? `${s.key}_${s.values.gap === 1 ? 'one' : 'other'}` : s.key}
+            values={{ ...s.values, gap: typeof s.values.gap === 'number' ? pickGapNumber(s.values.gap, t) : s.values.gap }} components={{ b: <strong /> }} /></span>)}
+        </p> : null}
         <div data-overview-picks-rows style={{ marginTop: 6 }}>
           {picks.slice(0, 3).map(p => {
             const id = String(p.playerId ?? '');
