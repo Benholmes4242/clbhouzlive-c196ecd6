@@ -220,7 +220,7 @@ it('A failed history read removes movement and chart but keeps figures', async (
   await screen.findByText('#318');
   expect(view.container.querySelector('svg.amr-ch')).toBeNull();
   expect(screen.queryByText(/this week/)).toBeNull();
-  expect(screen.getByText('312th')).toBeInTheDocument();
+  expect(await screen.findByText('312th')).toBeInTheDocument();
 });
 
 // --- Settings card through the shared hook ---
