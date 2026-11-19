@@ -67,6 +67,12 @@ interface PhotoBandProps {
   figure?: { value: string; caps: string } | null;
   /** Overrides data-overview-photo-state (the recap reports 'recap'). */
   stateKey?: string;
+  /** Overview live states: the round just finished, when between rounds. */
+  afterRound?: number | null;
+  /** Overview live states: before anyone tees off, the first tee time (HH:MM) in the leader slot. */
+  firstTee?: string | null;
+  /** Overview live states: the suspended spine node shows a pause mark. */
+  pauseSpine?: boolean;
 }
 
 export function PhotoBand({
@@ -87,6 +93,9 @@ export function PhotoBand({
   kicker,
   figure,
   stateKey,
+  afterRound = null,
+  firstTee = null,
+  pauseSpine = false,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   /* The band paints venueImageUrl as a CSS background, which nothing waits
@@ -117,6 +126,7 @@ export function PhotoBand({
     totalRounds: inPlay ? state.totalRounds : undefined,
     playoff: state.kind === 'results' && state.variant === 'awaiting-playoff', // never RESULTS; no live dot
     startDay: isUpcoming ? startDay : null,
+    afterRound,
   });
 
   /* THE BAND IS SHORTER by exactly each live-only line this state doesn't
@@ -210,6 +220,13 @@ export function PhotoBand({
           </div>
         ) : null}
 
+        {inPlay && !leader && firstTee ? (
+          <div data-overview-first-tee style={{ flex: 'none', alignSelf: 'flex-end', textAlign: 'right' }}>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, color: INK }}>{firstTee}</div>
+            <div style={{ marginTop: 4, fontSize: 10, lineHeight: 1.2, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps }}>{t('overview.hero.firstTee')}</div>
+          </div>
+        ) : null}
+
         {!inPlay && figure ? (
           <div data-overview-recap-figure style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
             <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: INK }}>{figure.value}</div>
@@ -228,7 +245,7 @@ export function PhotoBand({
           {segments.map((segment, index) => segment.figure ? <strong key={index} style={{ fontWeight: 700, fontStyle: 'normal', color: 'var(--th-text-primary)', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' }}>{segment.text}</strong> : <span key={index}>{segment.text}</span>)}
         </p> : null}
         {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
-        {inPlay ? <RoundSpine round={state.round} totalRounds={state.totalRounds} /> : null}
+        {inPlay ? <RoundSpine round={state.round} totalRounds={state.totalRounds} suspended={pauseSpine && isSuspended} /> : null}
       </div>
     </div>
   );

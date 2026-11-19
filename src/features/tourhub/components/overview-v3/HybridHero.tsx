@@ -26,7 +26,10 @@ import { earliestTeeTime, fieldHasStarted } from '../../overview/boardStarted';
 import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { useOverviewChampion } from './useOverviewChampion';
 import {useUpcomingOverview} from './useUpcomingOverview';
-import {upcomingSentence} from './upcomingOverviewRules';
+import {upcomingSentence, venueTee} from './upcomingOverviewRules';
+import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
+import { betweenRounds } from './liveStateRules';
+import { formatTimeHm24 } from '@/i18n/format';
 import { startWeekday } from '../../tournament-v2/data/tournamentRules';
 
 export interface HybridHeroProps {
@@ -133,7 +136,13 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   useOverviewBandReady('photo', overviewQueryReady(currentTeesQuery, notStarted));
   const firstTeeTime = notStarted ? earliestTeeTime(currentTees) : null;
 
-  const leader = isInPlayState(state) ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
+  const leader = isInPlayState(state) && !notStarted ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
+  /* Live states: AFTER ROUND n between rounds; the first tee in the leader slot before anyone starts. */
+  const liveMeta = useTournamentMeta(state.kind === 'live' ? tournament.id : null);
+  const zone = liveMeta.data?.course_timezone ?? liveMeta.data?.timezone ?? null;
+  const done = state.kind === 'live' ? betweenRounds(rows, state.round, tournament.currentRoundStatus) : null;
+  const afterRound = state.kind === 'live' && done != null && done < state.totalRounds ? done : null;
+  const firstTee = firstTeeTime ? venueTee(firstTeeTime, zone)?.time ?? formatTimeHm24(firstTeeTime) : null;
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
@@ -169,6 +178,9 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
          block (below the tour chip row) tells the story. */
       segments={showChampion ? [] : situation}
       note={situationNote}
+      afterRound={afterRound}
+      firstTee={firstTee}
+      pauseSpine
     />
   );
 }

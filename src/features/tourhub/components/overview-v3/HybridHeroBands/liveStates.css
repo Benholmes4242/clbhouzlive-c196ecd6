@@ -1,0 +1,22 @@
+/* Tour overview live states only (LiveHeroBoard / LiveOverviewSections). */
+.live-board .live-board-name-short{display:none}
+@media (max-width:340px){
+  .live-board[data-live-today] .live-board-name-full{display:none}
+  .live-board[data-live-today] .live-board-name-short{display:inline}
+  .live-board[data-live-today] .live-board-face{display:none}
+  .live-facts .live-fact-full{display:none}
+  .live-facts .live-fact-short{display:inline}
+}
+.live-facts .live-fact-short{display:none}
+.upcoming-sct>.a{font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums;position:relative}
+.upcoming-sct>.a.tot{text-align:right}
+.upcoming-sct>.a[data-mark]::after{content:"";position:absolute;left:50%;bottom:-6px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}
+@media (max-width:340px){.upcoming-sct>.a{font-size:9.5px;letter-spacing:-.02em}}
+.live-key{display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:rgba(248,250,252,.42)}.live-key b{color:#F8FAFC;font-weight:700}
+.live-tees{margin-top:6px}
+.live-tee{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;min-height:44px;column-gap:10px}
+.live-tee b{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:#F8FAFC}
+.live-tee span{min-width:0;font-size:13.5px;font-weight:600;color:rgba(248,250,252,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-tee small{display:block;font-size:11px;font-weight:600;margin-top:1px;color:rgba(248,250,252,.42)}
+.live-picks-short{display:none}
+@media (max-width:340px){.live-picks-full{display:none}.live-picks-short{display:inline}}

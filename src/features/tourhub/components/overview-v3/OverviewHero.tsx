@@ -492,6 +492,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             currentRound={boardRound}
             totalRounds={heroState && isInPlayState(heroState) ? heroState.totalRounds : null}
             phase={bandPhase}
+            liveKind={heroState && isInPlayState(heroState) ? heroState.kind as 'live' | 'suspended' : null}
+            currentRoundStatus={activeSlide?.tournament.currentRoundStatus ?? null}
             /* The SAME champion the strip crowns: only passed once the winner
                gate has resolved a name, so a pending playoff marks nobody. */
             championSrId={

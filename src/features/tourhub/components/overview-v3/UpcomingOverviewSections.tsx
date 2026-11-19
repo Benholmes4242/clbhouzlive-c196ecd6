@@ -14,6 +14,9 @@ import '@/styles/hybrid-hero.css';
 import '../../tournament-v2/sections/completedWeek.css';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import { formatHoleAvg, holeAvgColor, type HoleAvgRow } from './liveStateRules';
+import './HybridHeroBands/liveStates.css';
 import { Button } from '@/components/ui/button';
 import { playerRoute, tournamentRoute } from '../../routes';
 import { glanceFacts } from '../../tournament-v2/data/tournamentRules';
@@ -67,15 +70,21 @@ export function scorecardNines(holes: CourseHole[]) {
   const full = all as CourseHole[];
   return [['OUT', full.slice(0, 9)], ['IN', full.slice(9)]].map(([label, nine]) => ({ label: label as 'OUT' | 'IN', holes: nine as CourseHole[], yards: (nine as CourseHole[]).reduce((a, h) => a + h.yards, 0), par: (nine as CourseHole[]).reduce((a, h) => a + h.par, 0) }));
 }
-export function UpcomingCourse({ holes, tournamentId }: { holes: CourseHole[]; tournamentId: string }) {
+/** Live states opt in to a round kicker, a field-average lead line, a fourth
+ * per-hole averages row and a key line; the defaults are the upcoming card. */
+export interface LiveCourseExtras { kicker: string; lead: ReactNode | null; averages: HoleAvgRow | null; keyLine: ReactNode | null }
+export function UpcomingCourse({ holes, tournamentId, live }: { holes: CourseHole[]; tournamentId: string; live?: LiveCourseExtras }) {
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
   const glance = glanceFacts(holes);
   if (!glance) return null;
+  const avg = live?.averages ?? null;
   const cards = scorecardNines(holes);
   const target = tournamentRoute(tournamentId, { kind: 'overview' });
-  return <section data-overview-course className="upcoming-sec upcoming-course"><div className="upcoming-sec-head"><h2 className="upcoming-sec-kick">{t('overview.upcomingPlus.course')}</h2><Button variant={null} size={null} data-course-guide className="upcoming-sec-kick upcoming-course-link" onClick={() => navigate(`${target.to}?section=course`, { state: target.state })}>{t('overview.upcomingPlus.courseGuide')}</Button></div><p className="tv-lead">{glance.parts.map((part, i) => part.bold ? <b key={i}>{part.text}</b> : <span key={i}>{part.text}</span>)}</p>{cards ? <div data-overview-scorecard className="upcoming-scorecard">{cards.map(card => <div key={card.label} data-scorecard-card={card.label} className="upcoming-sct">
+  return <section data-overview-course className="upcoming-sec upcoming-course"><div className="upcoming-sec-head"><h2 className="upcoming-sec-kick">{live?.kicker ?? t('overview.upcomingPlus.course')}</h2><Button variant={null} size={null} data-course-guide className="upcoming-sec-kick upcoming-course-link" onClick={() => navigate(`${target.to}?section=course`, { state: target.state })}>{t('overview.upcomingPlus.courseGuide')}</Button></div><p className="tv-lead">{live?.lead ? live.lead : glance.parts.map((part, i) => part.bold ? <b key={i}>{part.text}</b> : <span key={i}>{part.text}</span>)}</p>{cards ? <div data-overview-scorecard className="upcoming-scorecard">{cards.map(card => <div key={card.label} data-scorecard-card={card.label} className="upcoming-sct">
       {card.holes.map(h => <span key={`n${h.hole_no}`} className="n">{h.hole_no}</span>)}<span className="n tot">{t(`overview.upcomingPlus.${card.label === 'OUT' ? 'out' : 'in'}`, { defaultValue: card.label })}</span>
       {card.holes.map(h => <span key={`y${h.hole_no}`} className="y">{h.yards}</span>)}<span className="y tot" data-scorecard-yards-total>{card.yards.toLocaleString('en-GB')}</span>
       {card.holes.map(h => <span key={`p${h.hole_no}`} className="p" data-par5={h.par === 5 ? '' : undefined}>{h.par}</span>)}<span className="p tot" data-scorecard-par-total>{card.par}</span>
-    </div>)}</div> : null}</section>;
+      {avg ? <>{card.holes.map(h => { const c = avg.holes[h.hole_no - 1]; return <span key={`a${h.hole_no}`} className="a" data-hole-avg={h.hole_no} data-mark={c?.mark ?? undefined} style={{ color: holeAvgColor(c?.value ?? null, c?.mark ?? null) }}>{c?.text ?? ''}</span>; })}
+        {(() => { const v = card.label === 'OUT' ? avg.out : avg.in; return <span className="a tot" data-hole-avg-total={card.label} style={{ color: holeAvgColor(v) }}>{v == null ? '' : formatHoleAvg(v)}</span>; })()}</> : null}
+    </div>)}</div> : null}{live?.keyLine && avg ? <div className="live-key" data-live-course-key>{live.keyLine}</div> : null}</section>;
 }

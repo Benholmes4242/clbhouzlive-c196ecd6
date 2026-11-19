@@ -87,6 +87,10 @@ import { finishedVerdict, resultPosition, type PickResult } from './pickInsightR
 import { Button } from '@/components/ui/button';
 import './pickPanels.css';
 import {PicksBlock} from './PicksBlock';
+import { LiveHeroBoard } from './LiveHeroBoard';
+import { LivePicksBlock } from './LivePicksBlock';
+import { LiveCourse, LiveFacts, LiveFirstTees, useLiveOverview } from '../LiveOverviewSections';
+import { liveFactCells } from '../liveStateRules';
 
 
 /**
@@ -211,6 +215,10 @@ interface HeroBoardSectionProps {
   eventSeasonYear?: number;
   /** Event page opts into the SAME picks/sheets, without overview-only bands. */
   picksOnly?: boolean;
+  /** Overview live phase only: 'live' | 'suspended' opts into the live-state
+   * sections (LiveOverviewSections / LiveHeroBoard / LivePicksBlock). */
+  liveKind?: 'live' | 'suspended' | null;
+  currentRoundStatus?: string | null;
   entries: BoardEntry[];
   leaderboardLoading?: boolean;
   eventType?: string | null;
@@ -334,8 +342,14 @@ export function HeroBoardSection({
   eventTourCode,
   eventSeasonYear,
   picksOnly = false,
+  liveKind = null,
+  currentRoundStatus = null,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
+  /* LIVE STATES: one stage decision for facts, board, course and picks. */
+  const live = useLiveOverview(!picksOnly && phase === 'live' && liveKind && currentRound != null && totalRounds != null ? tournamentId : null,
+    liveKind && currentRound != null && totalRounds != null ? { kind: liveKind, round: currentRound, totalRounds, entries, currentRoundStatus } : null);
+  const liveStageNow = live.on ? live.stage : null;
   /* Before the first tee the feed gives every row position 1 and a 0 score;
      a board of T1 E is false, so the board waits for the first started row. */
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
@@ -364,7 +378,7 @@ export function HeroBoardSection({
 
   /* Picks tee line: the stored tee sheet for the current round (round 1 when
      upcoming), and which picks have started under the one has-started rule. */
-  const teeRound = phase === 'upcoming' ? 1 : (currentRound ?? 1);
+  const teeRound = phase === 'upcoming' ? 1 : (liveStageNow?.nextRound ?? currentRound ?? 1);
   const pickTeesQuery = usePickTeeTimes(picksTid, teeRound, picks.map((p) => String(p?.playerId ?? '')), { enabled: picksEnabled && phase !== 'completed' });
   const pickTees = pickTeesQuery.data;
   const startedPlayers = useMemo(() => {
@@ -453,6 +467,22 @@ export function HeroBoardSection({
     return t('overview.picksIntro.behind', { name: best.name, pos, count: gap });
   }, [inPlay, leader, picks, boardByPlayer, entries, t]);
 
+  const liveLines = useMemo(() => {
+    const map = new Map<string, { position: number | null; tied: boolean; score: number | null; status?: string | null; thru?: number | null; started?: boolean }>();
+    if (!liveStageNow) return map;
+    for (const e of entries) {
+      const id = e?.player?.id;
+      if (id) map.set(String(id), { position: e.position ?? null, tied: Boolean(e.position_tied), score: e.score ?? null, status: e.status ?? null, thru: e.thru ?? null, started: todayFromEntry(e, liveStageNow.round) != null });
+    }
+    return map;
+  }, [entries, liveStageNow]);
+  const startHoles = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const g of live.firstTees) for (const p of g.players) if (p.id && !map.has(p.id)) map.set(p.id, g.startingHole);
+    return map;
+  }, [live.firstTees]);
+  const liveCells = liveStageNow ? liveFactCells({ stage: liveStageNow.stage, round: liveStageNow.round, entries, par: venuePar ?? live.meta?.venue_par ?? null, yards: glanceFacts(live.holes)?.yards ?? venueYardage ?? live.meta?.venue_yardage ?? null, purse: purse ?? live.meta?.purse ?? null, cut: live.cut }) : [];
+
   /* Upcoming: picks close the band after the course; live/completed keep them after the board. */
   const picksBlock = hasPicks ? (
         <PicksBlock
@@ -475,8 +505,21 @@ export function HeroBoardSection({
   ) : null;
 
   return (
-    <OverviewReadinessBand id="band" base={overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
+    <OverviewReadinessBand id="band" base={live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
     <div style={{ background: PAGE_CANVAS }}>
+      {liveStageNow ? <>
+        <LiveFacts cells={liveCells} />
+        {movementCards.length > 0 && currentRound != null ? <RoundMovementBand round={currentRound} cards={movementCards} padding="24px 20px 0" /> : null}
+        {liveStageNow.stage === 'beforeTee'
+          ? <LiveFirstTees groups={live.firstTees} zone={live.zone} tournamentId={tournamentId} tournamentName={eventName ?? null} />
+          : <LiveHeroBoard tournamentId={tournamentId} entries={entries} stage={liveStageNow.stage} round={liveStageNow.round} nextRound={liveStageNow.nextRound} totalRounds={totalRounds} tourSlug={pickTourCode} zone={live.zone} pickPlayerIds={pickPlayerIds} onRowTap={onRowTap} onFullBoard={onFullBoard} boardUpdatedAt={boardUpdatedAt} />}
+        <LeadersGroup tournamentId={tournamentId} entries={entries} currentRound={currentRound} totalRounds={totalRounds}
+          phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} onRowTap={onRowTap} live suspended={liveStageNow.stage === 'suspended'} />
+        <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={liveStageNow.stage} round={liveStageNow.round} analysis={live.analysis} />
+        {hasPicks ? <LivePicksBlock picks={picks} tourCode={pickTourCode} seasonYear={eventSeasonYear ?? null} stage={liveStageNow.stage} round={liveStageNow.round}
+          boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntro}
+          onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }} onOpenRecord={() => setRecordOpen(true)} /> : null}
+      </> : <>
       {!picksOnly && movementCards.length > 0 && currentRound != null ? (
         <RoundMovementBand round={currentRound} cards={movementCards} />
       ) : null}
@@ -512,6 +555,7 @@ export function HeroBoardSection({
       {phase === 'upcoming' ? picksBlock : null}
       {!picksOnly && <LeadersGroup tournamentId={tournamentId} entries={entries} currentRound={currentRound} totalRounds={totalRounds}
         phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} onRowTap={onRowTap} />}
+      </>}
       {hasPicks ? (
         <PicksSheet
           open={picksOpen}

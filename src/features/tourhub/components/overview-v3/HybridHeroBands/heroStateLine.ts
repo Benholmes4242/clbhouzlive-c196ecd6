@@ -10,9 +10,12 @@ export interface HeroStateLineInput {
   /** Results variant: a decided playoff, never FINAL. */
   playoff?: boolean;
   startDay?: string | null;
+  /** Overview live states: between rounds the line reads AFTER ROUND n. */
+  afterRound?: number | null;
 }
 
 export function heroStateLine(t: TFunction, state: HeroStateLineInput): string {
+  if (state.kind === 'live' && state.afterRound != null) return t('overview.hero.afterRound', { round: state.afterRound });
   if (state.kind === 'live') {
     return state.round != null && state.totalRounds != null && state.round === state.totalRounds
       ? t('overview.hero.finalRound')

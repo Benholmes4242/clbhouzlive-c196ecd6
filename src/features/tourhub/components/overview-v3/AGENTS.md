@@ -1,1 +1,2 @@
 - Season recap: between-seasons and fresh-standings rules live only in seasonRecapRules.ts (see header), so stale lists can never render as FINAL.
+- Live phase (seven states): rules in liveStateRules.ts, sections in LiveOverviewSections.tsx and HybridHeroBands/Live*; shared HeroBoardRows/PicksBlock stay frozen for completed, upcoming and Also this week.

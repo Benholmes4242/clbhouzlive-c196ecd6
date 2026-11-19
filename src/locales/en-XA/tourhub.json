@@ -183,7 +183,8 @@
         "one_one": "[<names/>, also at {{score}}, is in another group.]",
         "named_other": "[<names/>, also at {{score}}, are in other groups.]",
         "many_other": "[{{count}} other leaders, also at {{score}}, are in other groups.]"
-      }
+      },
+      "stopped": "[Stopped]"
     },
     "ticker": {
       "top10Label": "[~~ŢŐƤ 10~~]",
@@ -249,7 +250,8 @@
       "tiedCaps": "[~~{{words}} ţíéđ~~]",
       "picksTeeTimes": "TEE TIMES · {{day}}",
       "picksTeeToday": "TODAY",
-      "picksTeeTomorrow": "TOMORROW"
+      "picksTeeTomorrow": "TOMORROW",
+      "afterRound": "[AFTER ROUND {{round}}]"
     },
     "leaderboardBand": {
       "ctaUpcoming": "[~~View tournament~~]",
@@ -502,6 +504,64 @@
       "bestFollowed": "Best pick among people you follow: {{name}}, {{position}}.",
       "roundLive": "ROUND {{round}} · LIVE",
       "final": "FINAL"
+    },
+    "live": {
+      "facts": {
+        "field": "[FIELD]",
+        "purse": "[PURSE]",
+        "par": "[PAR]",
+        "yards": "[YARDS]",
+        "onCourse": "[ON COURSE]",
+        "finished": "[FINISHED]",
+        "toFinish": "[TO FINISH]",
+        "lowRound": "[LOW ROUND]",
+        "scoringAvg": "[SCORING AVG]",
+        "scoringAvgShort": "[AVG]",
+        "underPar": "[UNDER PAR]",
+        "projCut": "[PROJ. CUT]",
+        "cut": "[CUT]",
+        "madeCut": "[MADE CUT]",
+        "lead": "[LEAD]",
+        "tied": "[TIED]"
+      },
+      "board": {
+        "thru": "[THRU]",
+        "today": "[TODAY]",
+        "tot": "[TOT]",
+        "nextTee": "[R{{round}} TEE]",
+        "fullLeaderboard": "[Full leaderboard · {{count}} players]"
+      },
+      "tees": {
+        "kicker": "[ROUND 1 TEE TIMES]",
+        "groups_one": "[1 GROUP]",
+        "groups_other": "[{{count}} GROUPS]",
+        "first": "[1st tee]",
+        "tenth": "[10th tee]",
+        "all": "[All tee times]"
+      },
+      "course": {
+        "kicker": "[THE COURSE · ROUND {{round}}]",
+        "playing": "[Playing <b>{{value}} {{dir}} par</b>. The <b>{{hard}}</b> is the hardest hole today, the <b>{{easy}}</b> the easiest.]",
+        "played": "[Played <b>{{value}} {{dir}} par</b>. The <b>{{hard}}</b> is the hardest hole, the <b>{{easy}}</b> the easiest.]",
+        "under": "[under]",
+        "over": "[over]",
+        "key": "[Bottom row: <b>field average</b> to par]"
+      },
+      "picks": {
+        "teeToday": "[TEE TIMES · TODAY]",
+        "today": "[TODAY]",
+        "roundLive": "[ROUND {{round}} · LIVE]",
+        "live": "[LIVE]",
+        "teeTimes": "[ROUND {{round}} · TEE TIMES]",
+        "teeTimesShort": "[TEE TIMES]",
+        "suspended": "[ROUND {{round}} · SUSPENDED]",
+        "suspendedShort": "[SUSPENDED]",
+        "finalLive": "[FINAL ROUND · LIVE]",
+        "finished": "[{{pos}} · Finished]",
+        "thru": "[{{pos}} · Thru {{thru}}]",
+        "missedCut": "[Missed the cut]",
+        "mc": "[MC]"
+      }
     }
   },
   "empty": {
