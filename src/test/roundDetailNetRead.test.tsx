@@ -11,7 +11,7 @@ describe('RoundDetailSheet net read', () => {
     expect(host).toMatch(/useRoundNetScores\(open \? scoreIdList : \[\]\)/);
     expect(hook).toContain("select('whs_score_id, net_score, course_handicap')");
   });
-  it('(g) a failed read leaves the fallback row: absent net means no NET props and nothing waits', () => {
+  it('(g) a failed read settles to the fallback row: no NET props, PLAYED OFF shown once', () => {
     expect(host).toMatch(/net=\{roundNet\?\.net \?\? null\}/);
     expect(host).toMatch(/courseHandicap=\{roundNet\?\.courseHandicap \?\? null\}/);
     expect(hook).toMatch(/return data \?\? EMPTY/);
