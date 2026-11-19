@@ -19,6 +19,7 @@ vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet', 
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup', () => ({ LeadersGroup: () => null }));
 vi.mock('@/features/tourhub/components/overview-v3/useUpcomingOverview', () => ({ useUpcomingOverview: () => ({ field: [{ id: 'x', name: 'X' }], drawn: false, first: null, last: [{ rank: '1', name: 'Winner', country: 'USA', score: '−20', year: '2025' }], zone: null, startDate: null, holes }) }));
 
+import { UpcomingLastYear } from '@/features/tourhub/components/overview-v3/UpcomingOverviewSections';
 import { HeroBoardSection } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { UpcomingCourse, UpcomingFacts } from '@/features/tourhub/components/overview-v3/UpcomingOverviewSections';
 
@@ -84,5 +85,20 @@ describe('upcoming hero new order', () => {
     const rule = css.slice(css.indexOf('@media (max-width:340px){.upcoming-event-facts'));
     expect(rule).toContain('grid-template-columns:repeat(9,minmax(0,1fr)) 36px');
     expect(rule).toContain('.upcoming-sct .y{font-size:10.5px;letter-spacing:-.01em}');
+  });
+  it('computed: course sits 30px under Last year and fact cells carry no padding', () => {
+    const style = document.createElement('style');
+    style.textContent = readFileSync('src/styles/hybrid-hero.css', 'utf8').replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '');
+    document.head.appendChild(style);
+    try {
+      const v = wrap(<><UpcomingFacts first={null} zone={null} field={132} purse={3000000} par={71} yards={6860} /><UpcomingLastYear rows={[{ rank: '1', name: 'Winner', country: 'USA', score: '−20', year: '2025' }]} /><UpcomingCourse holes={holes} tournamentId="e" /></>);
+      const course = v.container.querySelector<HTMLElement>('[data-overview-course]')!;
+      expect(course.previousElementSibling?.hasAttribute('data-overview-last-year')).toBe(true);
+      expect(getComputedStyle(course).paddingTop).toBe('30px');
+      const cells = v.container.querySelectorAll<HTMLElement>('[data-upcoming-fact]');
+      expect(cells.length).toBe(4);
+      // jsdom reports an undeclared padding as '' (initial 0px); the old var() rule would report its own value.
+      cells.forEach(cell => { const cs = getComputedStyle(cell); for (const v of [cs.padding, cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft]) expect(['', '0px']).toContain(v); });
+    } finally { style.remove(); }
   });
 });

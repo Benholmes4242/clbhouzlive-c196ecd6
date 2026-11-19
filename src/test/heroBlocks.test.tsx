@@ -86,11 +86,11 @@ describe('upcoming completed rhythm', () => {
     expect(container.querySelector('[data-overview-event] h2')).toBeNull();
     expect(container.querySelectorAll('.upcoming-event-facts>[data-upcoming-fact] b')).toHaveLength(4);
   });
-  it('all upcoming seams reference the shared completed tokens', () => {
+  it('upcoming seams use the signed-off block, the tournament course seam keeps its token', () => {
     const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
-    expect(css).toContain('.upcoming-event-facts{margin-top:var(--hero-content-gap)}');
-    expect(css).toContain('.upcoming-history{padding-top:var(--hero-section-gap)}');
-    expect(css).toContain('padding-top:calc(var(--hero-section-gap) - 2px)');
+    expect(css).not.toContain('.upcoming-event-facts{margin-top:var(--hero-content-gap)}');
+    expect(css).not.toContain('.upcoming-history{padding-top:var(--hero-section-gap)}');
+    expect(css).not.toContain('[data-overview-last-year]+.upcoming-course');
     expect(css).toContain('[data-overview-last-year]+.tv-section[data-tv-section="course"]{padding-top:var(--hero-section-gap)}');
   });
 });

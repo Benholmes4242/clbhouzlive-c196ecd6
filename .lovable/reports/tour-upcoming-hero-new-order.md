@@ -28,3 +28,14 @@ Before 9,134. After 9,141 (2,233 / 2,265 / 2,293 / 2,350), sequential, no failur
 
 ## Not checked
 Browser/iPhone comparison of the RSM Classic upcoming overview at 390/320 (Ben).
+
+# Follow-up: remove old spacing rules (CSS only)
+Deleted from src/styles/hybrid-hero.css:
+- `[data-overview-last-year]+.upcoming-course{padding-top:calc(var(--hero-section-gap) - 2px)}`
+- `.upcoming-event-facts{margin-top:var(--hero-content-gap)}`, `.upcoming-event-facts>div{padding:var(--hero-cell-pad)}`, `.upcoming-event-facts b{line-height:var(--hero-cell-line)}`, `.upcoming-event-facts span{margin-top:var(--hero-label-gap);letter-spacing:var(--hero-label-tracking);line-height:13px}`
+- Sweep, old upcoming layout only: `.upcoming-history{padding-top:var(--hero-section-gap)}`, `.upcoming-history .upcoming-last-header{margin-top:0}` (class no longer rendered), `.upcoming-course-head{…}.upcoming-course-link{padding:0;height:auto;background:none;font-size:12px;font-weight:700;color:…}`, the old `.upcoming-course .tv-lead{margin:6px 0 0;…}` rule.
+- Kept and reported: `.upcoming-course .tv-strip…` and `.upcoming-course .tv-strip-key…`. They no longer render on the overview and set no property the new block sets. completedWeek.css has no matching rule. `[data-overview-last-year]+.tv-section[data-tv-section="course"]` is unchanged.
+
+Tests: heroBlocks "all upcoming seams reference the shared completed tokens" was renamed "upcoming seams use the signed-off block, the tournament course seam keeps its token". Three `toContain` checks (`.upcoming-event-facts{margin-top:var(--hero-content-gap)}`, `.upcoming-history{padding-top:var(--hero-section-gap)}`, `padding-top:calc(var(--hero-section-gap) - 2px)`) became `not.toContain`, the last of them on the deleted `[data-overview-last-year]+.upcoming-course` selector. These rules were removed by this brief. Added "computed: course sits 30px under Last year and fact cells carry no padding" (+1). jsdom reports undeclared padding as '' (initial 0), so '' or '0px' is accepted.
+
+Suite: shard 1 2,234, shard 2 2,265, shard 4 2,350 passed. STOP: shard 3 had 2,292 passed and 1 failed. The failure was in untouched src/test/kindRails.test.tsx, "See all > opens /find-people?kind=pro and ?kind=creator": `TestingLibraryElementError: Unable to find role="button" and name "See all, Pros to follow"` (body rendered `<div />`, via waitForWrapper). An isolated rerun passed 15/15. This is the same failure as the earlier BIZADDRESSCOUNTRYFIRST stop. Note: shard 4 ran after shard 3 in the same command before the stop was read. No full pass is claimed.
