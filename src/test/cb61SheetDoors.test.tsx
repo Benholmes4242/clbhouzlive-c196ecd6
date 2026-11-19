@@ -28,51 +28,44 @@ const round = { open: true, onClose: vi.fn(), eyebrowText: '', courseName: 'Cour
 afterEach(cleanup);
 
 describe('CB61 player-row doors', () => {
-  it('member scorecard doors stay in the player row and retain their handlers', () => {
+  it('member scorecard: course name and player row are the doors (no pills) and retain their handlers', () => {
     const course = vi.fn(); const profile = vi.fn();
     mount(<CardScorecardSheet {...round} onViewCourse={course} onViewProfile={profile} />);
-    const row = document.querySelector('[data-scorecard-player-row]');
-    const doors = row?.querySelectorAll('[data-sheet-door]');
-    expect(Array.from(doors ?? []).map(n => n.getAttribute('data-sheet-door'))).toEqual(['course', 'profile']);
-    for (const door of doors ?? []) fireEvent.click(door);
+    expect(document.querySelector('[data-sheet-door]')).toBeNull();
+    fireEvent.click(document.querySelector('button[data-scorecard-course-name]')!);
+    fireEvent.click(document.querySelector('button[data-scorecard-player-row]')!);
     expect(course).toHaveBeenCalledOnce(); expect(profile).toHaveBeenCalledOnce();
   });
-  it('member scorecard omits Course when its handler is absent', () => {
+  it('member scorecard course name is plain text when its handler is absent', () => {
     mount(<CardScorecardSheet {...round} onViewProfile={vi.fn()} />);
-    expect(document.querySelector('[data-sheet-door="course"]')).toBeNull();
-    expect(document.querySelector('[data-sheet-door="profile"]')).not.toBeNull();
+    expect(document.querySelector('button[data-scorecard-course-name]')).toBeNull();
+    expect(document.querySelector('button[data-scorecard-player-row]')).not.toBeNull();
   });
   it('member scorecard has no exit container or interactive foot without Share', () => {
     mount(<CardScorecardSheet {...round} onViewCourse={vi.fn()} onViewProfile={vi.fn()} />);
     expect(document.querySelector('[data-scorecard-exit-links]')).toBeNull();
     expect(document.querySelector('[data-scorecard-interactive]')).toBeNull();
   });
-  it('member scorecard foot retains only Share and its original handler', () => {
+  it('member scorecard footer row carries Share with its original handler, and no door', () => {
     const share = vi.fn();
     mount(<CardScorecardSheet {...round} onViewCourse={vi.fn()} onViewProfile={vi.fn()} onShareRound={share} />);
-    const foot = document.querySelector('[data-scorecard-exit-links]');
-    const buttons = foot?.querySelectorAll('button');
-    expect(buttons?.length).toBe(1);
+    const foot = document.querySelector('[data-scorecard-footer]');
     expect(foot?.querySelector('[data-sheet-door]')).toBeNull();
-    for (const button of buttons ?? []) fireEvent.click(button);
+    fireEvent.click(foot!.querySelector('[data-scorecard-share]')!);
     expect(share).toHaveBeenCalledOnce();
   });
-  it('tour moves its doors into the identity row and drops the foot actions', () => {
+  it('tour uses the same course-name and player-row doors and no foot actions', () => {
     mount(<CardScorecardSheet {...round} surface="tour" onViewCourse={vi.fn()} onViewProfile={vi.fn()} />);
     expect(document.querySelector('[data-scorecard-exit-links]')).toBeNull();
-    expect(Array.from(document.querySelectorAll('[data-sheet-door]')).map(n => n.getAttribute('data-sheet-door'))).toEqual(['course', 'profile']);
+    expect(document.querySelector('[data-sheet-door]')).toBeNull();
+    expect(document.querySelector('button[data-scorecard-course-name]')).not.toBeNull();
+    expect(document.querySelector('button[data-scorecard-player-row]')).not.toBeNull();
   });
-  it('swipe preview doors are aria-hidden spans without handlers or focus targets', () => {
+  it('swipe preview draws the same header inert: no buttons, links or focus targets', () => {
     mount(<RoundPagePreview seed={{ scoreId: 'round', courseName: 'Course', playerName: round.playerName, gross: 78, toPar: 6, holes: [] }} />);
     const preview = document.querySelector('[data-round-page-preview]');
-    const doors = preview?.querySelectorAll('[data-sheet-door]');
-    expect(doors?.length).toBe(2);
-    for (const door of doors ?? []) {
-      expect(door.tagName).toBe('SPAN');
-      expect(door.getAttribute('aria-hidden')).toBe('true');
-      expect(door.hasAttribute('tabindex')).toBe(false);
-      expect(door.hasAttribute('onclick')).toBe(false);
-    }
+    expect(preview?.querySelector('[data-scorecard-player-row]')).not.toBeNull();
+    expect(preview?.querySelector('[data-sheet-door]')).toBeNull();
     expect(preview?.querySelector('button, a, [tabindex]')).toBeNull();
   });
 });

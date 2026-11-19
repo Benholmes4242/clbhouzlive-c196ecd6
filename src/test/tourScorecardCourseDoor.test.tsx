@@ -70,25 +70,25 @@ function mount(node: React.ReactNode) {
 afterEach(cleanup);
 
 describe('Tour scorecard course door', () => {
-  it('renders the course door when the tournament is linked and navigates to the course', () => {
+  it('the course name is the door when the tournament is linked and navigates to the course', () => {
     state.navigate.mockClear();
     const onClose = vi.fn();
     state.meta = { name: 'Vidanta Vallarta', golf_course_id: 'course-1' };
     mount(<ScorecardSheet open onClose={onClose} tournamentId="event-1" target={target} />);
-    const courseDoor = document.querySelector('[data-sheet-door="course"]');
+    const courseDoor = document.querySelector('button[data-scorecard-course-name]');
     expect(courseDoor).not.toBeNull();
-    expect(document.querySelector('[data-sheet-door="profile"]')).not.toBeNull();
+    expect(document.querySelector('button[data-scorecard-player-row]')).not.toBeNull();
     fireEvent.click(courseDoor as Element);
     expect(state.navigate).toHaveBeenCalledWith('/courses/course-1');
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it('shows Profile alone when the tournament has no linked course', () => {
+  it('the course name is plain and the player row alone is a door when the tournament has no linked course', () => {
     state.navigate.mockClear();
     const onClose = vi.fn();
     state.meta = { name: 'Vidanta Vallarta', golf_course_id: null };
     mount(<ScorecardSheet open onClose={onClose} tournamentId="event-1" target={target} />);
-    expect(document.querySelector('[data-sheet-door="course"]')).toBeNull();
-    expect(document.querySelector('[data-sheet-door="profile"]')).not.toBeNull();
+    expect(document.querySelector('button[data-scorecard-course-name]')).toBeNull();
+    expect(document.querySelector('button[data-scorecard-player-row]')).not.toBeNull();
   });
 });

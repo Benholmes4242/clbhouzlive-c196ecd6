@@ -15,6 +15,8 @@ import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPage
 
 /** The harness prints i18n KEYS, so the suffix is asserted on the key. */
 const PAR_SUFFIX = 'scorecard.parN';
+const grossLabel = (c: HTMLElement) => c.querySelector('[data-round-score-row] [data-score-cell="gross"] [data-score-label]')?.textContent ?? '';
+
 
 const rows = (n: number, playedTo = n) =>
   Array.from({ length: n }, (_, i) => ({
@@ -46,27 +48,27 @@ const seed = (
 describe('the swipe preview par', () => {
   it('prints the stored par on a complete eighteen — the settled sheet shows the same 72', () => {
     const { container } = render(<RoundPagePreview seed={seed(rows(18), 72)} />);
-    expect(container.textContent).toContain(PAR_SUFFIX);
+    expect(grossLabel(container)).toContain(PAR_SUFFIX);
   });
 
   it('prints NO par on a ten-of-eighteen card, because the stored par is NULL', () => {
     const { container } = render(
       <RoundPagePreview seed={seed(rows(10), null, null)} />,
     );
-    expect(container.textContent).not.toContain(PAR_SUFFIX);
+    expect(grossLabel(container)).not.toContain(PAR_SUFFIX);
   });
 
   it('falls back to the one client rule when only a declared length is seeded', () => {
     const { container } = render(
       <RoundPagePreview seed={seed(rows(18), null, 18)} />,
     );
-    expect(container.textContent).toContain(PAR_SUFFIX);
+    expect(grossLabel(container)).toContain(PAR_SUFFIX);
   });
 
   it('still prints no par when neither a stored par nor a length is seeded', () => {
     const { container } = render(
       <RoundPagePreview seed={seed(rows(18), null, null)} />,
     );
-    expect(container.textContent).not.toContain(PAR_SUFFIX);
+    expect(grossLabel(container)).not.toContain(PAR_SUFFIX);
   });
 });

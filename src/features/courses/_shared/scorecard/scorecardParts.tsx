@@ -493,7 +493,7 @@ function playedWhen(iso: string | null | undefined, t: (k: string, o?: Record<st
 export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
   isTour = false, kickerText, memberDateText, playDate = null, roundsHere = null,
   courseName, courseLocation, top100Slot = null,
-  showScore, gross, toPar, heroMuted,
+  showScore, gross, toPar, heroMuted, shownPar = 0, playedHoles = 0, coursePar = null,
   playerName, playerAvatarUrl, playerUserId, tourAvatarCandidates = [], isOwner = false,
   cells = [], comparison = null,
   onViewCourse, onViewProfile, previewDoors = false,
@@ -505,6 +505,11 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
     roundsHere != null ? t('courses:scorecard.tile.roundsHere', { count: roundsHere }) : '',
   ].filter(Boolean).join(' \u00B7 ');
   const sub = isTour ? (kickerText ?? '') : memberSub;
+  /* Ruling: the head-par rule, unchanged, now labels the gross figure. */
+  const parShown = shownPar != null && shownPar > 0 ? shownPar : coursePar;
+  const grossLabel = parShown != null
+    ? t('courses:scorecard.parN', { n: parShown })
+    : playedHoles > 0 ? t('courses:scorecard.thruN', { n: playedHoles }) : t('courses:scorecard.gross');
   const toParTone = heroMuted ? EVEN_GRAY : toParColor(toPar);
   const scoreCells: { key: string; value: string; label: string; color?: string }[] = [
     ...(toPar != null ? [{ key: 'toPar', value: fmtRel(toPar), label: t('courses:scorecard.toPar'), color: toParTone }] : []),
@@ -572,7 +577,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
       {showScore && gross != null && (
         <ScoreFigureRow
           name="round-score"
-          lead={{ key: 'gross', value: String(gross), label: t('courses:scorecard.gross'), color: heroMuted ? EVEN_GRAY : TILE_INK }}
+          lead={{ key: 'gross', value: String(gross), label: grossLabel, color: heroMuted ? EVEN_GRAY : TILE_INK }}
           cells={scoreCells}
           dividerColor="rgba(255,255,255,0.14)"
           cellWeight={700}

@@ -15,3 +15,15 @@ Authorised categories (pills / header rule / boxed pair / stacked footer), pendi
 
 Material mismatch: mock card is 28px radius / .78 glass; canonical GLASS_CARD is 22px / .92 — left canonical, needs ruling.
 New tests (a)–(g) not yet written.
+
+## Rulings applied (19 Nov)
+1. Head par now labels the gross figure: "PAR n" (complete, same rule) / "THRU n" / else GROSS. scorecardHeadPar (3) and roundShapeCarriesPar (2): `expect(container.textContent).toContain(PAR_SUFFIX|THRU_SUFFIX)` -> `expect(grossLabel(container))...` (same expected values, negatives too).
+2. scorecardSheetBasis: "awards render inside the own-rounds section, after its heading" (`heading.compareDocumentPosition(awards) & FOLLOWING`) replaced by "AWARDS is its own section before the own-rounds section, whose scope note renders under its heading". Strip case: slice end marker `'const rail = useMemo'` -> `'const headCells = useMemo'`; assertions unchanged.
+3. GLASS_CARD kept.
+4. Authorised rewrites: cb61SheetDoors 5 (pill selectors `[data-sheet-door]` -> course-name / player-row buttons; footer `[data-scorecard-exit-links]` -> `[data-scorecard-footer]`; preview asserts inert header); tourScorecardCourseDoor 2 (renamed, same selector swap, navigate assertions kept); tourScorecardProfileDoor: 4 door/foot cases rewritten, the three "doors at the right edge" cases (head-flex gap 14, `[data-sheet-doors]` last child, marginLeft 10px) replaced by two player-row cases (chevron last, ellipsis) — net -1; likedByCollapse: CardScorecardSheet removed from "still passes reserve" each (`/<LikedByRow[\s\S]{0,900}?\breserve\b/`), replaced by one-row footer/stack case (net 0).
+New: scorecardTileRedesign.test.tsx (a)-(g), 7 tests. Typecheck clean.
+
+## Shards (STOPPED)
+- Shard 1: 2,246 passed. Shard 2: 2,269 passed.
+- Shard 3: 1 failed / 2,296 passed — untouched `src/test/ob1Welcome.test.tsx` "OB1.2 first sign-in fixes > cropper has no slider, grid or reset and Use photo hands the file to the existing upload". Error text was not captured (output filtered). Isolated file rerun 81/81; full shard-3 rerun 2,297/2,297 passed.
+- Shard 4 not run.

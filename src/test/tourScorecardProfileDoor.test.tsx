@@ -31,32 +31,29 @@ const tour = {
 afterEach(cleanup);
 
 describe('Tour scorecard profile door', () => {
-  it('renders the profile door in the identity row and opens the profile', () => {
+  it('the player row is the profile door and opens the profile (no pill)', () => {
     const profile = vi.fn();
     mount(<CardScorecardSheet {...tour} onViewProfile={profile} />);
-    const door = document.querySelector('[data-sheet-door="profile"]');
-    expect(door).not.toBeNull();
-    // The door sits in the player identity row, beside the player name.
-    const row = door?.closest('div');
+    const row = document.querySelector('button[data-scorecard-player-row]');
     expect(row?.textContent).toContain('Kris Ventura');
-    // The tour identity row now renders at full tile width, after the head's
-    // left/score flex, carrying the same marker as the member row.
-    expect(document.querySelector('[data-scorecard-player-row]')).not.toBeNull();
-    fireEvent.click(door as Element);
+    expect(document.querySelector('[data-sheet-door]')).toBeNull();
+    fireEvent.click(row as Element);
     expect(profile).toHaveBeenCalledOnce();
   });
 
-  it('omits the profile door when no profile handler is passed', () => {
+  it('the player row is not a button when no profile handler is passed', () => {
     mount(<CardScorecardSheet {...tour} />);
-    expect(document.querySelector('[data-sheet-door]')).toBeNull();
+    expect(document.querySelector('button[data-scorecard-player-row]')).toBeNull();
+    expect(document.querySelector('[data-scorecard-player-row]')).not.toBeNull();
   });
 
-  it('a course door, when passed, sits beside Profile in the row, course first', () => {
+  it('a course handler makes the course name the course door, above the player row', () => {
     const course = vi.fn(); const profile = vi.fn();
     mount(<CardScorecardSheet {...tour} onViewCourse={course} onViewProfile={profile} />);
-    const doors = document.querySelectorAll('[data-sheet-door]');
-    expect(Array.from(doors).map(n => n.getAttribute('data-sheet-door'))).toEqual(['course', 'profile']);
-    for (const door of doors) fireEvent.click(door);
+    const name = document.querySelector('button[data-scorecard-course-name]')!;
+    const row = document.querySelector('button[data-scorecard-player-row]')!;
+    expect(name.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(name); fireEvent.click(row);
     expect(course).toHaveBeenCalledOnce(); expect(profile).toHaveBeenCalledOnce();
   });
 
@@ -66,58 +63,32 @@ describe('Tour scorecard profile door', () => {
     expect(document.querySelector('[data-scorecard-interactive]')).toBeNull();
   });
 
-  it('keeps Share in its foot slot, alone, when passed', () => {
+  it('keeps Share in the one-row footer when passed', () => {
     const share = vi.fn();
     mount(<CardScorecardSheet {...tour} onViewProfile={vi.fn()} onShareRound={share} />);
-    const foot = document.querySelector('[data-scorecard-exit-links]');
-    const buttons = foot?.querySelectorAll('button');
-    expect(buttons?.length).toBe(1);
-    expect(foot?.querySelector('[data-sheet-door]')).toBeNull();
-    for (const button of buttons ?? []) fireEvent.click(button);
+    const foot = document.querySelector('[data-scorecard-footer]');
+    expect(foot?.querySelectorAll('button').length).toBe(1);
+    fireEvent.click(foot!.querySelector('[data-scorecard-share]')!);
     expect(share).toHaveBeenCalledOnce();
   });
 });
 
-describe('Tour scorecard doors at the right edge', () => {
-  it('the identity row is a sibling after the head left/score flex, not inside the left column', () => {
+describe('Tour scorecard player row', () => {
+  it('the player row follows the course name in the head and ends with the chevron', () => {
     mount(<CardScorecardSheet {...tour} onViewProfile={vi.fn()} />);
-    const row = document.querySelector('[data-scorecard-player-row]') as HTMLElement;
+    const head = document.querySelector('[data-scorecard-head]')!;
+    const row = head.querySelector('[data-scorecard-player-row]') as HTMLElement;
     expect(row).not.toBeNull();
-    // The row follows the head flex (the left/score container, gap 14) directly.
-    const headFlex = row.previousElementSibling as HTMLElement;
-    expect(headFlex).not.toBeNull();
-    expect(headFlex.style.display).toBe('flex');
-    expect(headFlex.style.gap).toBe('14px');
-    // The left column (flex 1 1 auto) must not contain the row.
-    const leftCol = headFlex.firstElementChild as HTMLElement;
-    expect(leftCol.style.flex).toBe('1 1 auto');
-    expect(leftCol.contains(row)).toBe(false);
+    expect(row.lastElementChild?.getAttribute('data-scorecard-player-chevron')).toBe('true');
   });
 
-  it('the doors are the last children of the identity row and the name takes the remaining width', () => {
-    mount(<CardScorecardSheet {...tour} onViewProfile={vi.fn()} />);
-    const doors = document.querySelector('[data-sheet-doors]') as HTMLElement;
-    expect(doors).not.toBeNull();
-    const row = doors.parentElement as HTMLElement;
-    expect(row.lastElementChild).toBe(doors);
-    const nameSpan = row.querySelector('span[title]') as HTMLElement;
-    expect(nameSpan.style.flex).toBe('1 1 auto');
-    expect(nameSpan.style.minWidth).toBe('0'); // jsdom keeps the written '0'
-    expect(nameSpan.style.textOverflow).toBe('ellipsis');
-  });
-
-  it('a long name truncates without moving or wrapping the doors', () => {
+  it('a long name truncates with an ellipsis and keeps the chevron last', () => {
     mount(<CardScorecardSheet {...tour} playerName={'A'.repeat(160)} onViewProfile={vi.fn()} />);
-    const doors = document.querySelector('[data-sheet-doors]') as HTMLElement;
-    expect(doors).not.toBeNull();
-    const row = doors.parentElement as HTMLElement;
-    expect(row.lastElementChild).toBe(doors);
-    const nameSpan = row.querySelector('span[title]') as HTMLElement;
-    expect(nameSpan.style.overflow).toBe('hidden');
-    expect(nameSpan.style.whiteSpace).toBe('nowrap');
-    expect(nameSpan.style.textOverflow).toBe('ellipsis');
-    // jsdom expands the written `flex: 'none'` to its longhand form.
-    expect(['none', '0 0 auto']).toContain(doors.style.flex);
-    expect(doors.style.marginLeft).toBe('10px');
+    const row = document.querySelector('[data-scorecard-player-row]') as HTMLElement;
+    const name = row.querySelector('[data-sheet-player-name]') as HTMLElement;
+    expect(name.style.overflow).toBe('hidden');
+    expect(name.style.whiteSpace).toBe('nowrap');
+    expect(name.style.textOverflow).toBe('ellipsis');
+    expect(row.lastElementChild?.getAttribute('data-scorecard-player-chevron')).toBe('true');
   });
 });

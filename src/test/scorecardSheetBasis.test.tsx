@@ -32,7 +32,7 @@ describe('scorecard sheet basis and strip', () => {
   });
 
   it('the strip carries no tone and no handicap item', () => {
-    const block = sheetSrc.slice(sheetSrc.indexOf('const courseSection = useMemo'), sheetSrc.indexOf('const rail = useMemo'));
+    const block = sheetSrc.slice(sheetSrc.indexOf('const courseSection = useMemo'), sheetSrc.indexOf('const headCells = useMemo'));
     expect(block).not.toMatch(/tone:/);
     expect(block).not.toMatch(/indexthen|figHcpAtTime/);
     expect((block.match(/items\.push\(/g) ?? []).length).toBe(2);
@@ -57,17 +57,21 @@ describe('scorecard sheet basis and strip', () => {
     expect(container.querySelectorAll('[data-scorecard-key-item]')).toHaveLength(4);
   });
 
-  it('awards render inside the own-rounds section, after its heading', () => {
+  it('AWARDS is its own section before the own-rounds section, whose scope note renders under its heading', () => {
     const result: RoundAwardsResult = {
       efforts: [],
       awards: [{ award_kind: 'new_best', unit_kind: 'front_nine', unit_key: 0, tier: 'gold', value: 0, previous_value: 1, delta: 1, rank_here: 1, attempts: 41 }],
     };
     const { container } = render(<RoundResults result={result} scope={scope} />);
-    const own = container.querySelector('[data-round-results-own]');
-    const heading = own?.querySelector('[data-round-results-scope]');
-    const awards = own?.querySelector('[data-round-results-block="awards"]');
-    expect(heading && awards).toBeTruthy();
-    expect(heading!.compareDocumentPosition(awards!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const awards = container.querySelector('[data-scorecard-tile-section="awards"]');
+    const own = container.querySelector('[data-round-results-scope]');
+    expect(awards && own).toBeTruthy();
+    expect(own!.contains(awards!)).toBe(false);
+    expect(awards!.compareDocumentPosition(own!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const heading = own!.querySelector('h3');
+    const note = own!.querySelector('p');
+    expect(heading && note).toBeTruthy();
+    expect(heading!.compareDocumentPosition(note!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('no rendered string claims own-rounds-only beside the field comparison', () => {
