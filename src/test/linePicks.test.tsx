@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, renderHook, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -96,6 +96,19 @@ describe('state resolution', () => {
 });
 
 describe('Open state', () => {
+  beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('a tap after the close does not save, even on a card rendered open', async () => {
+    vi.setSystemTime(new Date('2026-11-19T12:01:00Z'));
+    const { container } = mount(<LinePicksCard stake={stake()} data={pageData()} now={NOW} />);
+    await waitFor(() => expect(rpcCalls('get_line_picks').length).toBe(1));
+    expect(container.querySelector('[data-picks-state]')!.getAttribute('data-picks-state')).toBe('open');
+    fireEvent.click(container.querySelector('[data-pick-row="101"] [data-pick-button]')!);
+    await new Promise((r) => setTimeout(r, 20));
+    expect(rpcCalls('set_line_pick')).toHaveLength(0);
+  });
+
   it('six rows L−2…L+3 with THE LINE after L', async () => {
     const { container } = mount(<LinePicksCard stake={stake()} data={pageData()} now={NOW} />);
     const rows = container.querySelector('[data-pick-rows]')!;

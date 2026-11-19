@@ -71,3 +71,10 @@ Applied: one line in src/test/kindRails.test.tsx, "kind card actions > dismiss w
 Shards: 1 = 2,234 passed, 2 = 2,265 passed, 3 = STOP (2,292 passed / 1 failed), 4 = 2,350 passed. Shard 4 ran before the shard 3 stop was read: the shards were sent as one batch. That breaks the rule.
 Failure: src/test/linePicks.test.tsx:121:66, "Open state > toggling calls set_line_pick with the key/position and flips the button": `AssertionError: expected +0 to be 1 // Object.is equality` (set_line_pick never called), 1,120ms. Shard 3 rerun: same failure. Isolated rerun: same failure (17 passed / 1 failed, 1,083ms).
 Likely cause (not changed): the fixture CLOSE is '2026-11-19T12:00:00Z', which is today at noon. LinePicksCard.tsx:137 checks the toggle against the real `new Date()`, not the `now` prop (NOW = 10 Nov), so since 12:00 UTC today the click is treated as closed. The kindRails fix does not cause this; it depends on the clock. Ruling needed: either the test pins the clock or moves CLOSE, or line 137 uses `now`.
+
+## linePicks clock pin (authorised, test only)
+
+src/test/linePicks.test.tsx: the "Open state" describe now fakes Date only (`vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW)`) and restores real timers afterEach. `afterEach` was added to the vitest import. CLOSE, NOW and every assertion are unchanged. LinePicksCard.tsx:137 is unchanged: the real-time check at tap stays.
+Added: "Open state > a tap after the close does not save, even on a card rendered open". The system time is set to 2026-11-19T12:01:00Z, the card is rendered with now={NOW} and shows open, and a tap on 101 makes no set_line_pick call.
+linePicks alone: 5/5 runs passed (19/19 each). kindRails alone: 15/15.
+Shards, run one at a time, each read before the next: 2,234 / 2,265 / 2,294 / 2,350 = 9,143/9,143. That is 9,142 + 1 (the new linePicks case).
