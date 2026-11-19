@@ -5,7 +5,7 @@
 import { useId, useState } from 'react';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { useAmateurCareer, useAmateurEvents, useAmateurHistory, useAmateurSummary } from './useAmateurRanking';
-import { amateurCareerEntries, amateurCareerTotals, axisLabel, eventMonthLabel, finishLabel, rankingChartPoints, rankingLabelY, rankingMovement, type RankingMovementPart } from './rankingTabRules';
+import { amateurCareerHigh, amateurCareerEntries, amateurCareerTotals, axisLabel, eventMonthLabel, finishLabel, rankingChartPoints, rankingLabelY, rankingMovement, type RankingMovementPart } from './rankingTabRules';
 import { wagrOrdinal } from './wagrSettingsRules';
 import { Button } from '@/components/ui/button';
 import { ProCollectionSheet, type CollectionPanel } from '@/features/pro-profile/ProCollectionSheets';
@@ -33,6 +33,7 @@ export function ProfileRankingTab({ userId, isOwner = false }: { userId: string;
   const data = summary.data;
   if (!data) return null;
   const rows = history.isSuccess ? history.data ?? [] : [];
+  const bestRank = amateurCareerHigh(rows)?.rank ?? data.best_rank;
   const moments = career.isSuccess ? career.data ?? [] : [];
   const entries = amateurCareerEntries(rows, moments);
   const totals = history.isSuccess ? amateurCareerTotals(rows) : null;
@@ -69,7 +70,7 @@ export function ProfileRankingTab({ userId, isOwner = false }: { userId: string;
         <text x="346" y="115" className="amr-ax" textAnchor="end">{axisLabel(rows[rows.length - 1].week)}</text>
       </svg>}
       <div className="amr-tiles">
-        {tile('BEST RANK', data.best_rank != null ? wagrOrdinal(data.best_rank) : null)}
+        {tile('BEST RANK', bestRank != null ? wagrOrdinal(bestRank) : null)}
         {tile('WINS', totals?.wins ?? null, true)}
         {tile('TOP 10S', totals?.top10s ?? null)}
         {tile('EVENTS', totals?.events ?? null)}

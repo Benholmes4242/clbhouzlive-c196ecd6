@@ -121,6 +121,11 @@ export function amateurCareerTotals(history: AmateurHistoryRow[]) {
   return { wins: ids(row => row.finish === '1'), top10s: ids(row => /^(?:[1-9]|10)$/.test(row.finish ?? '')), events: ids(() => true) };
 }
 /** Shared ordering mirrors pro careerEntries: year, kind, descending date, id. */
+/** Tile and Career share the same rank/week/id ordering; empty history lets
+ * the tile retain WAGR's rolling-summary fallback without inventing a rank. */
+export function amateurCareerHigh(rows: AmateurHistoryRow[]): AmateurHistoryRow | undefined {
+  return [...rows].sort((a,b) => a.rank-b.rank || a.week-b.week || a.id-b.id)[0];
+}
 export function amateurCareerEntries(history: AmateurHistoryRow[], moments: AmateurCareerMoment[]): AmateurCareerEntry[] {
   const rows = [...history].sort((a,b) => a.week-b.week || a.id-b.id);
   const events = rows.filter(row => row.event_id != null && row.event_name);
@@ -130,7 +135,7 @@ export function amateurCareerEntries(history: AmateurHistoryRow[], moments: Amat
     const date = isoWeekThursday(row.week);
     entries.push({ id: `${kind}-${row.id}`, year: date.getUTCFullYear(), text, is_win, created_at: date.toISOString(), derived: true, kind, order: date.toISOString() });
   };
-  const high = [...rows].sort((a,b) => a.rank-b.rank || a.week-b.week || a.id-b.id)[0];
+  const high = amateurCareerHigh(rows);
   if (high) add(high,0,`Career-high world amateur ranking, #${high.rank}`);
   unique.filter(row => row.finish === '1').forEach(row => add(row,1,`Won ${row.event_name}`,true));
   unique.filter(row => row.finish === '2' || row.finish === '3').reverse().slice(0,5).forEach(row => add(row,1,`${row.finish === '2' ? '2nd' : '3rd'}, ${row.event_name}`));

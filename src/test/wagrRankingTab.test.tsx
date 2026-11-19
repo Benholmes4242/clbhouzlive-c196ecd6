@@ -36,6 +36,7 @@ import { ProfileRankingTab } from '@/features/amateur-ranking/ProfileRankingTab'
 import { SettingsWagrCard } from '@/features/amateur-ranking/SettingsWagrCard';
 import { axisLabel, eventMonthLabel, finishLabel, insertRankingTab, rankingChartPoints, rankingLabelY, rankingMovement, rankingTabVisible } from '@/features/amateur-ranking/rankingTabRules';
 import { wagrOrdinal } from '@/features/amateur-ranking/wagrSettingsRules';
+import { readFileSync } from 'node:fs';
 
 const LEWY_SUMMARY = { user_id: 'member', rank: 318, best_rank: 312, wins: 3, top10s: 15, counting_events: 36, points_average: 590.49, divisor: 40, rank_week: 202645, fetched_at: '2026-11-12T00:00:00Z' };
 const LEWY_HISTORY = [
@@ -162,7 +163,7 @@ it('Tab renders Lewy headline, movement, tiles and foot', async () => {
   expect(screen.getByText('WORLD AMATEUR RANKING')).toBeInTheDocument();
   expect(screen.getByText('▲ 3')).toBeInTheDocument();
   expect(screen.getByText('▲ 325')).toBeInTheDocument();
-  expect(screen.getByText('312th')).toBeInTheDocument();
+  expect(screen.getByText('318th')).toBeInTheDocument();
   expect(screen.getByText('BEST RANK')).toBeInTheDocument();
   expect(screen.getByText('TOP 10S')).toBeInTheDocument();
   expect(screen.getByText('Points average 590.49 · last 104 weeks · updated weekly from WAGR®')).toBeInTheDocument();
@@ -209,7 +210,7 @@ it('A failed events read removes only the events section', async () => {
   mount(<ProfileRankingTab userId="member" />);
   await screen.findByText('#318');
   expect(screen.queryByText('RECENT EVENTS')).toBeNull();
-  expect(screen.getByText('312th')).toBeInTheDocument();
+  expect(screen.getByText('318th')).toBeInTheDocument();
 });
 it('A failed history read removes movement and chart but keeps figures', async () => {
   h.historyError = true;
@@ -221,6 +222,25 @@ it('A failed history read removes movement and chart but keeps figures', async (
 });
 
 // --- Settings card through the shared hook ---
+it('BEST RANK uses Ben’s history minimum 1306 rather than summary 1944', async () => {
+  h.summary = { ...LEWY_SUMMARY, rank: 1952, best_rank: 1944 };
+  h.history = [{ ...LEWY_HISTORY[0], week: 202149, rank: 1306 }, { ...LEWY_HISTORY[4], rank: 1952 }];
+  mount(<ProfileRankingTab userId="member" />);
+  await screen.findByText('1306th');
+  expect(screen.queryByText('1944th')).toBeNull();
+});
+it('BEST RANK falls back to summary 1944 with no history rows', async () => {
+  h.summary = { ...LEWY_SUMMARY, best_rank: 1944 };
+  h.history = [];
+  mount(<ProfileRankingTab userId="member" />);
+  expect(await screen.findByText('1944th')).toBeInTheDocument();
+});
+it('BEST RANK and the Career-high line share amateurCareerHigh', () => {
+  const tab = readFileSync('src/features/amateur-ranking/ProfileRankingTab.tsx', 'utf8');
+  const rules = readFileSync('src/features/amateur-ranking/rankingTabRules.ts', 'utf8');
+  expect(tab).toContain('const bestRank = amateurCareerHigh(rows)?.rank ?? data.best_rank;');
+  expect(rules).toContain('const high = amateurCareerHigh(rows);');
+});
 it('SettingsWagrCard still shows 318, 312th and 36 through the shared summary hook', async () => {
   h.link = { status: 'verified', last_synced_at: null };
   const view = mount(<SettingsWagrCard userId="member" />);
