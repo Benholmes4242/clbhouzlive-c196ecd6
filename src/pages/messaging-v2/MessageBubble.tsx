@@ -405,6 +405,7 @@ export const MessageBubble: React.FC<Props> = ({
                 userId={message.sender_user_id ?? undefined}
                 alt={message.sender_name ?? ''}
                 size={28}
+                hairlineRing
               />
             ) : null}
           </div>

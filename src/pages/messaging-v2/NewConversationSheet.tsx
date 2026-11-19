@@ -472,7 +472,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                   key={m.user_id}
                   style={{
                     marginLeft: i === 0 ? 0 : -8,
-                    border: '2px solid #1E1E23',
+                    boxShadow: '0 0 0 1.5px #1E1E23',
                     borderRadius: '34%',
                     lineHeight: 0,
                   }}
@@ -482,6 +482,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                     userId={m.user_id}
                     alt={m.display_name}
                     size={34}
+                    hairlineRing
                   />
                 </div>
               ))}
