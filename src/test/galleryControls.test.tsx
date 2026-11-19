@@ -22,13 +22,16 @@ const holeTag = (id: string, hole_no: number, added_at = '2026-03-01T00:00:00Z')
 const type_of = (id: string) => (id.startsWith('v') ? 'video' : 'image') as 'video' | 'image';
 const type_url = (id: string) => (id.startsWith('v') ? `/${id}.m3u8` : `/${id}.jpg`);
 
-function mount(ids: { id: string; type?: 'image' | 'video' }[], startShotId: string, tags: HolePhoto[] = []) {
+function mount(ids: { id: string; type?: 'image' | 'video' }[], startShotId: string, tags: HolePhoto[] = [], confirmedSource = false) {
   const shots = galleryShots(ids.map(row => post(row.id, row.type ?? 'image')), tags, []);
   const options = { courseId: 'course', courseName: 'Sundridge Park (East)', filter: 'all' as const, startShotId };
   const data = { shots, holes: [], scored: false };
   const list = filteredGallery(shots, 'all');
   useFullscreenFeedStore.setState({ isOpen: true, courseGallery: options, galleryData: data, posts: galleryPost(list, options), activePagerIdx: Math.max(0, list.findIndex(shot => shot.id === startShotId)), syntheticPosts: true, readOnly: true });
-  return render(<CourseGalleryChrome onClose={vi.fn()} />);
+  const shot = list.find(s => s.id === startShotId);
+  const sourcePostId = shot?.item.memberShot?.sourcePostId ?? (!shot?.post.id.startsWith('shots:') ? shot?.post.id : null);
+  const engagement = confirmedSource && sourcePostId ? { likeState: { isLiked: false, count: 0 }, commentCount: 0, onLike: vi.fn(), onComment: vi.fn(), onShare: vi.fn() } : undefined;
+  return render(<CourseGalleryChrome onClose={vi.fn()} engagement={engagement} />);
 }
 
 beforeEach(() => { useSessionAudio.setState({ isMuted: true }); });
@@ -51,13 +54,13 @@ describe('course gallery controls', () => {
     expect(screen.getByRole('button', { name: 'Full screen' })).not.toBeNull();
   });
   it('a video shot renders the canonical video row mute and Tag in the pill row', () => {
-    const view = mount([{ id: 'v1', type: 'video' }], 'v1');
+    const view = mount([{ id: 'v1', type: 'video' }], 'v1', [], true);
     const pills = [...(view.container.querySelector('[data-gallery-pills]') as HTMLElement).children];
     expect(pills[2]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
     expect(view.container.querySelector('[data-fullscreen-video-row]')?.contains(screen.getByRole('button', { name: 'Unmute' }))).toBe(true);
   });
   it('a photo shot renders Tag with no mute and no blank slot', () => {
-    const view = mount([{ id: 'a' }], 'a');
+    const view = mount([{ id: 'a' }], 'a', [], true);
     const pills = view.container.querySelector('[data-gallery-pills]') as HTMLElement;
     expect(pills.children).toHaveLength(5);
     expect(pills.children[2]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));

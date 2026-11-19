@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Source-post fixture ruling and sequential suite
+- Supplied confirmation/engagement only in the seven authorised fixtures; all assertions/names and negative checks preserved. No application changes or inventory delta in this request.
+- Focused 48/48; sequential shards from start 2,239 / 2,266 / 2,280 / 2,349 = 9,134/9,134 across 819 files. Reconciled 9,118 + sixteen previously added cases, all named in the report. Historical viewer stops below are superseded.
+- External device checks await Ben: physical iPhone public-place actions/View post, You review likes, Tag preview without buttons and JohnL's five Media/Watch scores; cannot be verified by fixture-only work.
+
 ## Stopped: Confirmed source-post viewer rule
 - Confirmed synthetic actions/View post implemented; loading/failed/unmatched use standalone sharing; exact place assertion and one passing lifecycle test added. Expected inventory 9,118 → 9,134 (+16); harness build OK.
 - Focused 41/48: seven unchanged fixtures lack confirmation/engagement in canonicalFullscreenViewer, canonicalGalleryChrome, galleryControls and pf2HoleGuide. Each file-alone rerun reproduced. Four shards blocked on ruling; errors/lines/timings in .lovable/reports/fullscreen-viewer-action-pills.md.

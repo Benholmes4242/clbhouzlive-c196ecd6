@@ -22,19 +22,22 @@ const holeTag = (id: string, hole_no: number): HolePhoto => ({ id, hole_no, medi
 const placeTag = (id: string, place: string): PlaceMedia => ({ id, place, media_url: `/${id}.jpg`, media_type: 'image', user_id: 'me', course_id: 'course', added_at: '2026-10-28T00:00:00Z', status: 'approved' }) as PlaceMedia;
 const hole = (n: number): CourseHole => ({ hole_no: n, par: 4, yards: 303, stroke_index: 7, avg_to_par: .4, avg_gross: 4.4, rounds: 2, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 1, bogey: 1, double: 0 } });
 
-function mount(filter: GalleryFilter, start: string, extra: FeedPost[] = []) {
+function mount(filter: GalleryFilter, start: string, extra: FeedPost[] = [], confirmedSource = false) {
   const shots = galleryShots([post('h'), post('c'), post('u'), ...extra], [holeTag('h', 4)], [placeTag('c', 'clubhouse')]);
   const data = { shots, holes: [hole(4)], scored: true };
   const options = { courseId: 'course', courseName: 'The London Club (Heritage)', filter, startShotId: start };
   const list = filteredGallery(shots, filter);
   useFullscreenFeedStore.setState({ isOpen: true, courseGallery: options, galleryData: data, posts: galleryPost(list, options), activePagerIdx: Math.max(0, list.findIndex(s => s.id === start)), syntheticPosts: true, readOnly: true });
-  return render(<CourseGalleryChrome onClose={vi.fn()} />);
+  const shot = list.find(s => s.id === start);
+  const sourcePostId = shot?.item.memberShot?.sourcePostId ?? (!shot?.post.id.startsWith('shots:') ? shot?.post.id : null);
+  const engagement = confirmedSource && sourcePostId ? { likeState: { isLiked: false, count: 0 }, commentCount: 0, onLike: vi.fn(), onComment: vi.fn(), onShare: vi.fn() } : undefined;
+  return render(<CourseGalleryChrome onClose={vi.fn()} engagement={engagement} />);
 }
 afterEach(() => { cleanup(); f.viewer = 'me'; f.admin = false; useFullscreenFeedStore.setState({ isOpen: false, courseGallery: null, galleryData: null, restoreStack: [] }); });
 
 describe('canonical course gallery chrome', () => {
   it('source-post gallery actions are two flex pills plus three 44px squares and four 8px gaps', () => {
-    const view = mount('all', 'u');
+    const view = mount('all', 'u', [], true);
     const pills = [...view.container.querySelectorAll('[data-gallery-pills] [data-pill]')];
     expect(pills.map(p => p.getAttribute('data-pill'))).toEqual(['like', 'comment', 'tag', 'share', 'grid']);
     expect(pills.filter(p => !p.classList.contains('is-square'))).toHaveLength(2);

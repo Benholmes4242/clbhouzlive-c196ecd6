@@ -61,9 +61,9 @@ const reviewPost = reviewFeedPost({
 });
 const realPost = { ...reviewPost, id: 'post-1', engagementTarget: undefined, isReview: false, review: null } as FeedPost;
 
-function chrome(post: FeedPost, opts: { synthetic?: boolean; readOnly?: boolean } = {}) {
+function chrome(post: FeedPost, opts: { synthetic?: boolean; readOnly?: boolean; confirmedSourcePostIds?: string[] } = {}) {
   return render(<MemoryRouter><ImmersiveFullscreenChrome
-    posts={[post]} activeIndex={0} syntheticPosts={opts.synthetic} readOnly={opts.readOnly}
+    posts={[post]} activeIndex={0} syntheticPosts={opts.synthetic} readOnly={opts.readOnly} confirmedSourcePostIds={opts.confirmedSourcePostIds}
     onClose={vi.fn()} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()}
     getLikeState={() => ({ isLiked: false, count: 1 })} getCommentCount={() => 0} getFollowState={() => false}
     onFollow={vi.fn()} onViewProfile={vi.fn()} onReviewTap={vi.fn()} isOwnPost={false} /></MemoryRouter>);
@@ -161,7 +161,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
   });
   it('a source-post course photo shows all four action pills', () => {
     const shot = { ...realPost, id: 'shots:source', mediaItems: [{ ...realPost.mediaItems[0], memberShot: { kicker: '', title: 'Royal Dornoch', credit: '', memberName: 'Ben', avatarUrl: null, sourcePostId: 'post-1' } }] } as FeedPost;
-    const view = chrome(shot, { synthetic: true });
+    const view = chrome(shot, { synthetic: true, confirmedSourcePostIds: ['post-1'] });
     expect([...view.container.querySelectorAll('[data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['like', 'comment', 'share', 'more']);
   });
   it('the review score strip uses the full-width card row and its divider', () => {

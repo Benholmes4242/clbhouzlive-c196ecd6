@@ -117,6 +117,7 @@ const shotPost = (item: MediaItem): FeedPost => ({
 });
 const chrome = (item: MediaItem) => <MemoryRouter><ImmersiveFullscreenChrome
   posts={[shotPost(item)]} activeIndex={0} syntheticPosts readOnly
+  confirmedSourcePostIds={item.memberShot?.sourcePostId ? [item.memberShot.sourcePostId] : []}
   onClose={vi.fn()} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()}
   getLikeState={() => ({ isLiked: false, count: 0 })} getCommentCount={() => 0} getFollowState={() => false}
   onFollow={vi.fn()} onViewProfile={vi.fn()} onReviewTap={vi.fn()} isOwnPost={false} /></MemoryRouter>;

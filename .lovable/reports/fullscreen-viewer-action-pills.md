@@ -1,4 +1,51 @@
-# Fullscreen viewer action pills — stopped at focused verification
+# Fullscreen viewer action pills — fixture ruling and full suite passed
+
+## Source-post fixture ruling — complete
+Test fixtures only: no application/source, font, SQL, migration, feed_config or round_pool_cap changes. All seven case names and assertions are unchanged. No tests were added, deleted, renamed or rewritten in this request; only their supplied props changed.
+
+### Each authorised fixture change
+1. `src/test/canonicalFullscreenViewer.test.tsx`, “a source-post course photo shows all four action pills”: the shared `chrome` helper forwards optional `confirmedSourcePostIds`; this case explicitly supplies `['post-1']`.
+2. `src/test/pf2HoleGuide.test.tsx`, “renders only with a sourcePostId, on its own line in the Full review style”: shared `chrome` supplies `confirmedSourcePostIds: ['post-1']` for the source shot; the null-source rerender supplies `[]`, retaining the negative check.
+3. Same file, “the tap opens the post and never reaches the slide”: shared `chrome` supplies `confirmedSourcePostIds: ['post-1']`.
+4. Same file, “video shots keep View post in the stack with the canonical video row below it”: shared `chrome` supplies `confirmedSourcePostIds: ['post-1']`.
+5. `src/test/canonicalGalleryChrome.test.tsx`, “source-post gallery actions are two flex pills plus three 44px squares and four 8px gaps”: opts into the shared mount helper's confirmed-source engagement.
+6. `src/test/galleryControls.test.tsx`, “a video shot renders the canonical video row mute and Tag in the pill row”: opts into shared mount confirmation/engagement for `post-v1`.
+7. Same file, “a photo shot renders Tag with no mute and no blank slot”: opts into shared mount confirmation/engagement for `post-a`.
+
+Both gallery helpers add exactly `{ likeState: { isLiked: false, count: 0 }, commentCount: 0, onLike: vi.fn(), onComment: vi.fn(), onShare: vi.fn() }` only when the case opts in and its shot carries a source post. Other calls retain `engagement: undefined`; standalone cases are not confirmed by default.
+
+### Commands and results
+Focused: `bunx vitest run src/test/canonicalFullscreenViewer.test.tsx src/test/pf2HoleGuide.test.tsx src/test/canonicalGalleryChrome.test.tsx src/test/galleryControls.test.tsx src/test/viewerContent.test.tsx --maxWorkers=2 --minWorkers=2` — **48/48**, five files, 10.48s.
+
+Full commands: `bunx vitest run --shard=N/4 --maxWorkers=2 --minWorkers=2`, N=1, then 2, then 3, then 4, separate sequential runs from the start:
+- Shard 1: **2,239/2,239**, 205 files, 312.33s.
+- Shard 2: **2,266/2,266**, 205 files, 312.07s.
+- Shard 3: **2,280/2,280**, 205 files, 332.51s.
+- Shard 4: **2,349/2,349**, 204 files, 312.36s.
+- Full suite: **9,134 passed / 9,134 executed**, 819 files; no failures or isolated reruns. This supersedes the historical stops below.
+
+### Before/after reconciliation: 9,118 → 9,134 (+16)
+This request changes inventory by zero. All sixteen intervening additions, retained from the prior viewer work:
+1. `canonicalFullscreenViewer.test.tsx`: “a source-post course photo shows all four action pills”.
+2. Same file: “the review score strip uses the full-width card row and its divider”.
+3. Same file: “no application viewer open passes readOnly”.
+4. `canonicalGalleryChrome.test.tsx`: “source-post gallery actions are two flex pills plus three 44px squares and four 8px gaps”.
+5. `viewerContent.test.tsx`: “source-post counts and active-actor likes come from one batch, and the canonical cache patches them”.
+6. Same file: “an open review with null breakdown hydrates all four scores in one batched read”.
+7. Same file: “a standalone course photo has no post target or post batch”.
+8. `momentReviewPages.test.tsx`: “CourseMoments opens grouped reviews at the tapped media and likes the review”.
+9. Same file: “YourMomentsSection opens grouped reviews at the tapped media and likes the review”.
+10. Same file: “CourseYouTab shares the moments opener with review targets and tapped media”.
+11. `userCourseMomentsReviewRead.test.tsx`: “own moments retain review identity, text and all scores from one ratings batch”.
+12. `canonicalFullscreenViewer.test.tsx`: “a resolved unmatched post has no pills and double-tap cannot call a like”.
+13. Same file: “a course-media RPC review without score columns reads its review once and renders all five figures”.
+14. `viewerContent.test.tsx`: “a successful missing-source batch warns once per open and reports absence authoritatively”.
+15. `canonicalFullscreenViewer.test.tsx`: “untagged Tag previews have no pills; standalone course photos share a valid Media URL only”.
+16. Same file: “place shot actions and View post require a resolved source batch; unmatched shots share only”.
+
+Historical authorised assertion changes/renames are listed in the earlier sections below; none removes a case or changes this +16 reconciliation. No assertion text changed in this request. Diff whitespace and assertion/name preservation checks passed. Harness preview status checked at closeout; no manual build/typecheck was run for this fixture-only request.
+
+Ben's physical iPhone checks remain external/unverified: public clubhouse/range source actions and View post; You moment review like; untagged Tag preview without buttons; JohnL's Sunningdale (Old) five scores via Media and Watch. This fixture-only request did not perform a live/device check.
 
 ## Confirmed-source ruling — STOP at focused checks
 - Synthetic member-shot source actions now require a successful source batch that returned the id. The overlay passes confirmed ids to ImmersiveFullscreenChrome; View post is hidden during loading/failure/unmatched. viewerActionPost returns null for unconfirmed synthetic targets, so likes/double-taps cannot target them. Synthetic chrome uses standalone Share when a courseId exists and no pills otherwise; non-synthetic unmatched posts retain the phantom guard. Gallery like/comment/source Share require the confirmed engagement supplied by the overlay; its existing Tag/Grid controls remain independent.
