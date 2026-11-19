@@ -39,3 +39,27 @@ Deleted from src/styles/hybrid-hero.css:
 Tests: heroBlocks "all upcoming seams reference the shared completed tokens" was renamed "upcoming seams use the signed-off block, the tournament course seam keeps its token". Three `toContain` checks (`.upcoming-event-facts{margin-top:var(--hero-content-gap)}`, `.upcoming-history{padding-top:var(--hero-section-gap)}`, `padding-top:calc(var(--hero-section-gap) - 2px)`) became `not.toContain`, the last of them on the deleted `[data-overview-last-year]+.upcoming-course` selector. These rules were removed by this brief. Added "computed: course sits 30px under Last year and fact cells carry no padding" (+1). jsdom reports undeclared padding as '' (initial 0), so '' or '0px' is accepted.
 
 Suite: shard 1 2,234, shard 2 2,265, shard 4 2,350 passed. STOP: shard 3 had 2,292 passed and 1 failed. The failure was in untouched src/test/kindRails.test.tsx, "See all > opens /find-people?kind=pro and ?kind=creator": `TestingLibraryElementError: Unable to find role="button" and name "See all, Pros to follow"` (body rendered `<div />`, via waitForWrapper). An isolated rerun passed 15/15. This is the same failure as the earlier BIZADDRESSCOUNTRYFIRST stop. Note: shard 4 ran after shard 3 in the same command before the stop was read. No full pass is claimed.
+
+## Rerun and kindRails diagnosis (no source or test changes)
+
+Rerun: four shards run one after another, each as its own command, from shard 1: 2,234 / 2,265 / 2,293 / 2,350 = 9,142/9,142, 820 files. Matches the expected 9,142. No failures.
+
+kindRails repeats: the file alone 20/20 passed. Shard 3 repeated three more times: 3/3 passed (plus the rerun above, 4/4). The flake did not reproduce.
+
+Module/session state that KindRail and WhoToFollowRail read:
+- `HIDDEN` Set (session hides). Reset by `resetWhoToFollowRailSessionForTests()` in beforeEach: yes. But it can be written AFTER the reset by a timer left over from an earlier test (see below).
+- `VIEWED` Set (view event once per session). Reset in beforeEach: yes. It only affects analytics, not whether the rail shows.
+- `proMembersCache` (cache, pending, queue, listeners, scheduled, generation). `invalidateProMembers()` in beforeEach: yes. It only affects the PRO label, not whether the rail shows.
+- QueryClient: `wrap()` makes a new one on every render, so no data carries over.
+- Dismiss and follow-removal `window.setTimeout`s in RailBody: no reset. Unmount clears follow-removal timers, but the 200ms dismiss timer in `dismiss()` (WhoToFollowRail.tsx ~316) is never cleared.
+- `h` mock state (user, kind, people, activity, rpc and so on): reassigned in beforeEach: yes.
+
+What makes the rail empty: KindRail returns null when `all.length === 0` (WhoToFollowRail.tsx:303). That happens when `kindRailVisible(q.data, HIDDEN)` (railRules.ts:170) has fewer than 3 visible rows after `HIDDEN` is applied. The fixture has exactly 3 pros, so a single `p:pro0` in `HIDDEN` makes the pro rail empty. That fits the failure: the RPC ran, `<div />` rendered, and nothing showed for the full 10s.
+
+What leaves that condition set: "kind card actions > dismiss writes suggestion_dismissals" clicks "Hide Pat One". The test ends once the insert is seen, which is before the 200ms dismiss timer fires. `cleanup` unmounts the rail but does not clear the timer. One test later ("follow goes through useToggleFollow", which is usually quick), the timer can fire after the "See all" beforeEach has already reset `HIDDEN`. It then adds `p:pro0`, and the pro rail renders nothing. Whether this happens depends on how long the follow test takes on a busy worker. That explains why it fails only inside a full shard and passes alone. This is inferred from the code, not reproduced (0 failures in 24 runs).
+
+Proposed smallest fix (test only, NOT applied; needs Ben's authorisation). In src/test/kindRails.test.tsx, "dismiss writes suggestion_dismissals with actor_type personal", add one line after the insert assertion so the dismiss timer fires inside its own test:
+    await waitFor(() => expect(screen.queryByText('Pat One')).toBeNull());
+Alternative (component change, also not applied): track the dismiss timeout in a ref and clear it in RailBody's unmount effect, the same way removeTimers already is.
+
+Outstanding: Ben's iPhone checks (gap between Nicolas Echavarria's row and THE COURSE matches the gap between the facts and LAST YEAR; 08:30 and 70 sit flush with the page edges).
