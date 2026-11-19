@@ -52,6 +52,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { viewerActionPost } from '@/components/fullscreen-feed/viewerContent';
 import { mapRowToFeedPost } from '@/components/media-system/utils/feedMapper';
 import { useViewerContent } from '@/components/fullscreen-feed/useViewerContent';
+import { openTagShot } from '@/components/course-media-tab/ShotTagCard';
 
 const reviewPost = reviewFeedPost({
   reviewId: 'rev-1', userId: 'u1', displayName: 'Ben Holmes', text: 'Firm and fast.', createdAt: '2026-11-01T10:00:00Z',
@@ -76,6 +77,30 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.clearAllMocks(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 
 describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
+  it('untagged Tag previews have no pills; standalone course photos share a valid Media URL only', () => {
+    openTagShot({ url: '/untagged.jpg', mediaType: 'image' }, document.createElement('button'));
+    const args = h.open.mock.calls.at(-1)?.[0];
+    expect(args?.options).toEqual({ syntheticPosts: true });
+    const preview = args?.posts[0] as FeedPost;
+    expect(preview.mediaItems[0].memberShot?.sourcePostId).toBeFalsy();
+    expect(preview.courseId).toBeFalsy();
+    const view = chrome(preview, { synthetic: true });
+    expect(view.container.querySelector('[data-fullscreen-pills]')).toBeNull();
+    view.unmount();
+    const coursePhoto = { ...preview, courseId: 'course-1' };
+    const share = vi.fn().mockResolvedValue(undefined);
+    const original = Object.getOwnPropertyDescriptor(navigator, 'share');
+    Object.defineProperty(navigator, 'share', { configurable: true, value: share });
+    try {
+      const courseView = chrome(coursePhoto, { synthetic: true });
+      expect([...courseView.container.querySelectorAll('[data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['share']);
+      fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+      expect(share).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/courses/course-1?tab=media&shot=') }));
+    } finally {
+      if (original) Object.defineProperty(navigator, 'share', original);
+      else Reflect.deleteProperty(navigator, 'share');
+    }
+  });
   it('a course-media RPC review without score columns reads its review once and renders all five figures', async () => {
     const post = mapRowToFeedPost({ post_id: 'post-score', user_id: 'author', source_review_id: 'review-score',
       media_id: 'score-media', media_type: 'image', media_url: '/score.jpg', course_id: 'course',

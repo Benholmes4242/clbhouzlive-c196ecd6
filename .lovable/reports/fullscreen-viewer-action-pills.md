@@ -1,5 +1,33 @@
 # Fullscreen viewer action pills — stopped at focused verification
 
+## Read-only rulings / Tag preview guard — STOP in shard 3
+- Applied exactly the three authorised options changes in coursesRailsUnlimited, mediaV3 and holeInlineAutoplay: `options: { readOnly: true, syntheticPosts: true }` → `options: { syntheticPosts: true }`. mediaV3's “single thumbnail opens canonical read-only viewer without saving” renamed “single thumbnail opens the canonical viewer without saving”; retained `expect(save).not.toHaveBeenCalled()`. holeInlineAutoplay's “batch glass thumbnail stays still and opens the canonical read-only video viewer” renamed “…opens the canonical video viewer”; every other assertion in each case remains unchanged. coursesRailsUnlimited's case name is unchanged. memberShotPosts.test.ts was untouched.
+- ImmersiveFullscreenChrome suppresses the entire pill row when synthetic media lacks both sourcePostId and courseId. Valid standalone course shots retain Share only, with a guarded `/courses/<courseId>?tab=media&shot=` URL. No font changes or SQL/migration/feed_config/pool-cap changes.
+- Added exactly one case in canonicalFullscreenViewer.test.tsx: “untagged Tag previews have no pills; standalone course photos share a valid Media URL only”. It exercises openTagShot, renders its output with no pills, then renders a course-id photo with exactly ['share'] and checks the actual share callback URL.
+- Before/after inventory: **9,118 → expected 9,133**, +15: seven original viewer additions + seven follow-up additions listed below + this one case. This request deletes no cases; the two authorised renames above do not change the count. Full-suite passing total is unavailable because shard 3 stopped.
+
+### Pre-shard readOnly audit
+`rg -n -U 'expect\([^;]*(?:readOnly:\s*true)' src/test` returned no other expected open-options assertions after the authorised changes. `rg -n 'readOnly:\s*true' src/test` retained only setup/exercise calls: canonicalGalleryChrome:30; courseGallery:31,42,103; fullscreenViewerRedesign:59,75; galleryControls:30; memberShotPosts:161,167. These are not expected open-options objects, were left untouched, and have no matching assertion to quote for §1e. Explicitly retained `store.open([post], 0, { readOnly: true, syntheticPosts: true })` at memberShotPosts:161 and `.open([post], 0, { readOnly: true })` at :167.
+
+### Commands and exact STOP
+Focused: `bunx vitest run src/test/canonicalFullscreenViewer.test.tsx src/test/coursesRailsUnlimited.test.tsx src/test/mediaV3.test.tsx src/test/holeInlineAutoplay.test.tsx --maxWorkers=2 --minWorkers=2` — **61/61**, four files.
+
+All full shards started sequentially from shard 1, command `bunx vitest run --shard=N/4 --maxWorkers=2 --minWorkers=2`:
+- Shard 1: **2,239/2,239**, 205 files, 303.62s.
+- Shard 2: **2,266/2,266**, 205 files, 331.65s.
+- Shard 3: **2,278 passed / 1 failed / 2,279 executed**, 204 passed files / one failed, 304.91s.
+- Shard 4: NOT RUN due required stop. Executed full-run subtotal: **6,783 passed / 1 failed / 6,784 executed**.
+
+Failure: `src/test/pf2HoleGuide.test.tsx:103:61`, “PF2 holeShotItems source post > place shots never get one”, 7ms:
+```text
+AssertionError: expected 'post-9' to be null
+```
+Assertion: `expect(posts[0].mediaItems[0].memberShot?.sourcePostId).toBeNull()`; received `"post-9"`. This test and the place-shot builder were unchanged in this request; the preceding viewer work carries source-post identity. No unauthorised correction made.
+
+Isolated: `bunx vitest run src/test/pf2HoleGuide.test.tsx --maxWorkers=1 --minWorkers=1` — **13 passed / 1 failed / 14 executed**, same error and line, failed case 10ms, duration 4.31s. Logs: /tmp/viewer-tag-focused.log, /tmp/viewer-tag-shard{1,2,3}.log, /tmp/viewer-tag-isolated.log.
+
+Harness build/typecheck: **build OK**, 09:01:40 UTC after final edits; no manual build/typecheck. Diff whitespace check passed. Ben's physical iPhone Tag/You/JohnL Media/Watch checks remain unverified; no further live work performed after the required stop.
+
 ## 19 November follow-up — implemented; STOP in shard 1
 
 ### Changes

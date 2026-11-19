@@ -131,7 +131,7 @@ describe('loaded holes run and refresh', () => {
     await waitFor(() => expect(cards(view, spec)).toHaveLength(20)); nextVisible();
     await waitFor(() => expect(cards(view, spec)).toHaveLength(23));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course 51, Par 4, 400 yards, Member · Oct 2026' }));
-    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ mediaId: 'h-51', options: { readOnly: true, syntheticPosts: true } }));
+    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ mediaId: 'h-51', options: { syntheticPosts: true } }));
     expect(f.open.mock.calls[0][0].posts.map((post: { mediaItems: Array<{ id: string }> }) => post.mediaItems[0].id)).toEqual([...Array.from({ length: 20 }, (_, i) => `h-${i}`), 'h-50', 'h-51', 'h-52']);
     expect(f.open.mock.calls[0][0].index).toBe(21);
     expect(f.open.mock.calls[0][0].openedFrom).toBe('courses-latest-holes');

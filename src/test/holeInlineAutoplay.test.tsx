@@ -94,14 +94,14 @@ describe('active hole tile autoplay', () => {
   it('image and processing slides do not register or create a player — course gallery', () => {
     render(<HoleWalk available holes={[hole]} rows={[row('a','image'),row('b','video',null)]} totalMedia={2} onAddFirst={()=>{}} />); expect(document.querySelector('.media-v2-hole-card img')).toHaveAttribute('src',media.media_url); expect(f.register).not.toHaveBeenCalled(); expect(document.querySelector('video')).toBeNull();
   });
-  it('batch glass thumbnail stays still and opens the canonical read-only video viewer', () => {
+  it('batch glass thumbnail stays still and opens the canonical video viewer', () => {
     const exif = { capturedAt: null, captureDay: null, latitude: null, longitude: null };
     const photos = ['a', 'b'].map(id => ({ url: `https://example.test/${id}.m3u8`, createdAt: '', exif, mediaType: 'video' as const, streamId: id.repeat(32), posterUrl: `/${id}.jpg`, durationSeconds: 42 }));
     render(<HolePhotoBatchPath photos={photos} knownHoles={[1]} onTag={async () => row('a')} onClose={() => {}} />);
     expect(f.register).not.toHaveBeenCalled(); expect(document.querySelector('video')).toBeNull();
     expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/a.jpg');
     fireEvent.click(screen.getByRole('button', { name: 'View shot' }));
-    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ options: { readOnly: true, syntheticPosts: true } }));
+    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ options: { syntheticPosts: true } }));
     fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' }));
     expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/b.jpg');
   });

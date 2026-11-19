@@ -54,10 +54,10 @@ describe('Media v3 selection rules', () => {
     expect(screen.getByRole('button', { name: 'Views' })).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' })); expect(primary()).toBeDisabled();
   });
-  it('single thumbnail opens canonical read-only viewer without saving', () => {
+  it('single thumbnail opens the canonical viewer without saving', () => {
     const save = vi.fn(); render(<HolePhotoTagDialog imageUrl="/a.jpg" holeCount={0} knownHoleNumbers={[]} pending={false} error={null} onClose={() => {}} onSubmit={save} />);
     fireEvent.click(screen.getByRole('button', { name: 'View shot' }));
-    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ options: { readOnly: true, syntheticPosts: true }, mediaId: '/a.jpg' })); expect(save).not.toHaveBeenCalled();
+    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ options: { syntheticPosts: true }, mediaId: '/a.jpg' })); expect(save).not.toHaveBeenCalled();
   });
   it('no hole list renders place choices without a hole section', () => {
     render(<HolePhotoTagDialog imageUrl="/a.jpg" holeCount={0} knownHoleNumbers={[]} pending={false} error={null} onClose={() => {}} onSubmit={vi.fn()} />);

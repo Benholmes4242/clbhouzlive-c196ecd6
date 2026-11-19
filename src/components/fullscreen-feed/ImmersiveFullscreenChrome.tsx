@@ -369,7 +369,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     (activePost as any).courseCountry ??
     golfCourse?.courseCountry ??
     null;
-  const showPills = !readOnly && !actionsUnavailable;
   const showVideoRow = activeMediaIsVideo;
   const reviewTarget = activePost.engagementTarget?.type === 'review' ? activePost.engagementTarget.id : null;
   // Course photos: the active item's member credit (media-local identity).
@@ -380,9 +379,13 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const shotHasHole = !!shot && HOLE_KICKER.test(shot.kicker.trim());
   const shotSourcePostId = shot?.sourcePostId ?? null;
   const hasPostActions = !syntheticPosts || !!shotSourcePostId;
+  const standaloneCourseId = shot?.courseId || activePost.courseId;
+  // Tag previews without a post/course have no valid share destination.
+  const showPills = !readOnly && !actionsUnavailable && (hasPostActions || !!standaloneCourseId);
   const shareShot = () => {
     if (hasPostActions) { onShare(activePost); return; }
-    const url = `${window.location.origin}/courses/${shot?.courseId || activePost.courseId}?tab=media&shot=${encodeURIComponent(activeMediaItem?.id ?? '')}`;
+    if (!standaloneCourseId) return;
+    const url = `${window.location.origin}/courses/${standaloneCourseId}?tab=media&shot=${encodeURIComponent(activeMediaItem?.id ?? '')}`;
     if (navigator.share) void navigator.share({ title: courseName ?? undefined, url }).catch(() => {});
     else void navigator.clipboard.writeText(url);
   };

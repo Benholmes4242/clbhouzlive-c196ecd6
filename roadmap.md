@@ -1,6 +1,11 @@
 # Roadmap
 
-## Stopped: Fullscreen viewer follow-up
+## Stopped: Viewer read-only rulings and Tag preview guard
+- Applied exactly three authorised options edits/two renames; unlinked synthetic previews have no pills; valid course shots share only. Added one case; focused 61/61; no other expected readOnly opens found. Harness build OK.
+- Sequential shards 1 and 2 passed 2,239 and 2,266; shard 3 passed 2,278 and failed pf2HoleGuide.test.tsx:103:61 (“expected 'post-9' to be null”, 7ms). Isolated reproduces 13/14, 10ms; shard 4 blocked on ruling. Failed test untouched. Inventory 9,118 → expected 9,133 (+15); report .lovable/reports/fullscreen-viewer-action-pills.md.
+- Ben's iPhone Tag/You/JohnL Media/Watch checks remain external and unverified.
+
+## Previous stop: Fullscreen viewer follow-up
 - Authorised stops cleared; grouped review moments and tapped-media opens implemented on all three surfaces; unmatched post guard/warning and RPC missing-score coverage added. Focused 106/106; harness build OK.
 - Shard 1: 2,238 passed / 1 failed; coursesRailsUnlimited.test.tsx:134:20 still expects removed readOnly:true. Isolated reproduces 14/15, 336ms. Test untouched; shards 2–4 blocked on ruling. Inventory 9,118 → expected 9,132 (+14 across previous build and follow-up); full report .lovable/reports/fullscreen-viewer-action-pills.md.
 - Ben's physical iPhone/live-data verification remains external: You moments engagement and JohnL's five Media/Watch review scores.
