@@ -93,7 +93,7 @@ describe('composer tagging', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Searching…');
     await act(async () => { resolve([]); });
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('No golfers match "missing"'));
-    fireEvent.blur(input, { relatedTarget: null });
+    fireEvent.pointerDown(document.body);
     expect(screen.queryByRole('status')).toBeNull();
   });
   it('searchMembers ranks Thomas Holmes, Al Thomas, then Ian Thomasson', async () => {

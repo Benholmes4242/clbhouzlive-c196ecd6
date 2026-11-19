@@ -103,3 +103,13 @@ export async function searchMembers(q: string, selfId: string | null): Promise<W
     id: u.id, name: u.display_name || u.username || 'Golfer', avatarUrl: u.profile_photo_url ?? null, sameRound: false, lastInteraction: '', username: u.username, homeClub: 'home_club' in u ? u.home_club as string | null : null,
   }));
 }
+
+/** Caption-mention ids → Played with candidates, through the same batched
+ * profile read (and public-face fill) the suggestions use. No new RPC. */
+export async function readWithCandidates(ids: readonly string[]): Promise<WithCandidate[]> {
+  if (!ids.length) return [];
+  const { data: visible } = await supabase.from('user_profiles').select('id, display_name, first_name, username, profile_photo_url, home_club').in('id', ids as string[]);
+  const profiles = await fillMissingFaces(visible as Array<{ id: string; display_name: string | null; first_name?: string | null; username: string | null; profile_photo_url: string | null; home_club?: string | null }> | null, [...ids], ['first_name', 'home_club']);
+  const byId = new Map(profiles.map((p) => [p.id, p]));
+  return ids.flatMap((id) => { const p = byId.get(id); return p ? [{ id, name: p.display_name || p.first_name || p.username || 'Golfer', avatarUrl: p.profile_photo_url ?? null, sameRound: false, lastInteraction: '', username: p.username, homeClub: p.home_club ?? null }] : []; });
+}

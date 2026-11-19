@@ -77,8 +77,8 @@ import { GolfShotStrip, ShotTagSheet, WhereSection, PlayedWithSection, Visibilit
 import { PostPreview, buildDraftFeedPost } from './components/golf/PostPreview';
 import { ShareFooter } from './components/golf/ShareFooter';
 import { GP } from './components/golf/golfPageTokens';
-import { isHoleTag, roundReason, shareSubLine, toggleWith, visibilityLabel, type PostVisibility, type ShotTag, type WithCandidate } from './lib/golfPostRules';
-import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstCaptureDay, searchMembers } from './lib/golfPostReads';
+import { captionMentionIds, isHoleTag, roundReason, shareSubLine, toggleWith, visibilityLabel, type PostVisibility, type ShotTag, type WithCandidate } from './lib/golfPostRules';
+import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstCaptureDay, readWithCandidates, searchMembers } from './lib/golfPostReads';
 import { readPostWith, syncPostWith } from './lib/postWith';
 import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
 import { refreshAuthorPosts } from './lib/refreshAuthorPosts';
@@ -502,6 +502,18 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
     }
   }, [isEditMode, hydrated, editPostId, profile?.id, state.courses, state.media]);
 
+  /* Caption mentions offered as Played with one-tap adds: personal users only,
+     self excluded; resolved through the Played with member read. */
+  const mentionIdKey = captionMentionIds(state.caption, profile?.id ?? null).join(',');
+  const [captionPeople, setCaptionPeople] = useState<WithCandidate[]>([]);
+  useEffect(() => {
+    const ids = mentionIdKey ? mentionIdKey.split(',') : [];
+    if (!ids.length) { setCaptionPeople([]); return; }
+    let cancelled = false;
+    void readWithCandidates(ids).then(rows => { if (!cancelled) setCaptionPeople(rows); }).catch(() => { if (!cancelled) setCaptionPeople([]); });
+    return () => { cancelled = true; };
+  }, [mentionIdKey]);
+  const [withActive, setWithActive] = useState(false);
   const searchPeople = useCallback((q: string) => searchMembers(q, profile?.id ?? null), [profile?.id]);
   const chooseShotTag = (itemId: string, tag: ShotTag | null) => {
     setShotTagMap((cur) => {
@@ -1025,7 +1037,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           </div>
         </BottomSheet>
   
-        <ComposerRoundsSheet open={roundSheetOpen} onClose={()=>setRoundSheetOpen(false)} rounds={golfRounds} onPick={r=>{setSelectedRoundId(r.whs_score_id);if(state.attachedScoreId)setGolf({attachedScoreId:r.whs_score_id});}} />
+        <ComposerRoundsSheet open={roundSheetOpen} onClose={()=>setRoundSheetOpen(false)} rounds={golfRounds} selectedId={selectedRound?.whs_score_id ?? null} attachedId={state.attachedScoreId ?? null} onPick={r=>{setSelectedRoundId(r.whs_score_id);if(state.attachedScoreId)setGolf({attachedScoreId:r.whs_score_id});}} />
         <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title={isEditMode?'Unsaved changes':t('closeGuard.title')}>
           <div style={{padding:'0 18px 34px',display:'flex',flexDirection:'column',gap:16,color:GP.ink}}>
             <p style={{fontSize:14,color:GP.mute,lineHeight:1.45,margin:0}}>{t('closeGuard.body')}</p>
@@ -1182,6 +1194,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           onToggle={(p) => setWithTagged((cur) => toggleWith(cur, p, profile?.id ?? null))}
           search={searchPeople}
           selfId={profile?.id ?? null}
+          mentioned={captionPeople}
+          onActiveChange={setWithActive}
         />
       )}
 
@@ -1263,13 +1277,13 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
       {/* SHARE — 54px pill and its sub-line. ONE owner (ShareFooter) shared
           with the Preview page so the two cannot drift (PV1). */}
-      <ShareFooter
+      {!withActive && <ShareFooter
         label={primaryLabel}
         subLine={(state.scheduledAt ? `Scheduled for ${state.scheduledAt.toLocaleString()}` : shareSubLine(isPersonalActor ? withNames : [], isPersonalActor && visibility === 'anyone' ? holeShotCount : 0)) + (videoComposer ? longVideo ? ' · Long form on your profile' : ' · Shorts on your profile' : '')}
         disabled={!canSubmit}
         busy={submitting || saving}
         onShare={onPrimary}
-      />
+      />}
 
       {profile?.id && (
         <PostPreview

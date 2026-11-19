@@ -143,17 +143,36 @@ export function WhereSection({ course, reason, changing, recent, onChange, onCan
 }
 
 /* ---- PLAYED WITH ------------------------------------------------------- */
-/** PF4: inline search reuses the mention member source; chosen ids never appear in results. */
-export function PlayedWithSection({ suggestions, tagged, onToggle, search, selfId }: {
+/** PF4 + post-flow-round-played-with mock. Inline search reuses the mention
+ * member source. iOS: a result tap first blurs the input, so the list never
+ * collapses on blur; it closes on a tap outside the section, on Escape, and a
+ * result selects on pointer-up from a container that prevents the blur.
+ * Added people stay listed as "Added"; caption mentions (resolved by the
+ * caller) are offered as one-tap adds. Nothing is written into the caption. */
+const addedTick = <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12l5 5 9-10" /></svg>;
+export function PlayedWithSection({ suggestions, tagged, onToggle, search, selfId, mentioned = [], onActiveChange }: {
   suggestions: WithCandidate[]; tagged: WithCandidate[]; onToggle: (p: WithCandidate) => void;
   search: (q: string) => Promise<WithCandidate[]>; selfId: string | null;
+  mentioned?: WithCandidate[]; onActiveChange?: (active: boolean) => void;
 }) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const pointerPicked = useRef(false);
   const [focused, setFocused] = useState(false);
   const [results, setResults] = useState<WithCandidate[]>([]);
   const [loading, setLoading] = useState(false);
   const limited = tagged.length >= MAX_PLAYED_WITH;
+  const activeRef = useRef(onActiveChange); activeRef.current = onActiveChange;
+  useEffect(() => { activeRef.current?.(focused); }, [focused]);
+  useEffect(() => () => { activeRef.current?.(false); }, []);
+  useEffect(() => {
+    if (!focused) return;
+    const outside = (e: Event) => { if (!sectionRef.current?.contains(e.target as Node)) setFocused(false); };
+    document.addEventListener('pointerdown', outside, true);
+    const frame = requestAnimationFrame(() => sectionRef.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' }));
+    return () => { document.removeEventListener('pointerdown', outside, true); cancelAnimationFrame(frame); };
+  }, [focused]);
   useEffect(() => {
     if (!focused || !query.trim() || limited) { setResults([]); setLoading(false); return; }
     let cancelled = false;
@@ -163,20 +182,32 @@ export function PlayedWithSection({ suggestions, tagged, onToggle, search, selfI
     }, 180);
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query, focused, limited, search]);
-  const shown = (query.trim() ? results : suggestions).filter(p => p.id !== selfId && !tagged.some(t => t.id === p.id));
-  return <section data-testid="played-with" className="composer-golf pf4-with" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false); }}>
-    <div className="composer-golf-head"><span className="composer-golf-kicker">Played with</span>{focused && <span className="pf4-with-limit">Up to 8</span>}</div>
+  const isAdded = (id: string) => tagged.some(t => t.id === id);
+  const mentionIds = new Set(mentioned.map(m => m.id));
+  const shown = (query.trim() ? results : suggestions).filter(p => p.id !== selfId);
+  const offers = mentioned.filter(p => p.id !== selfId && !isAdded(p.id));
+  const add = (p: WithCandidate) => { if (isAdded(p.id) || limited) return; onToggle(p); setQuery(''); inputRef.current?.focus(); };
+  const avatar = (p: WithCandidate, size: number) => <SquircleAvatar src={p.avatarUrl} alt="" fallback={getInitialsFromName(p.name)} userId={p.id} size={size} hairlineRing ringColor={DARK_HAIRLINE}/>;
+  return <section ref={sectionRef} data-testid="played-with" className="composer-golf pf4-with" style={{ scrollMarginTop: 72 }} onKeyDown={e => { if (e.key === 'Escape') setFocused(false); }}>
+    <div className="composer-golf-head"><span className="composer-golf-kicker">Played with</span>{focused && <span className="pf4-with-limit">{tagged.length} of {MAX_PLAYED_WITH}</span>}</div>
     <label className="pf4-with-input"><Search size={17} aria-hidden="true"/><input ref={inputRef} aria-label="Who did you play with?" placeholder={limited ? '8 people tagged' : 'Who did you play with?'} disabled={limited} value={query} onFocus={() => setFocused(true)} onChange={e => setQuery(e.target.value)}/></label>
-    {focused && !limited && (shown.length > 0 || loading || !!query.trim()) && <div className="pf4-with-results" aria-busy={loading}>
-      {loading ? <div role="status" style={{ fontSize: 13, color: GP.mute, padding: 12 }}>Searching…</div> : !shown.length ? <div role="status" style={{ fontSize: 13, color: GP.mute, padding: 12, overflowWrap: 'anywhere' }}>No golfers match "{query}"</div> : shown.map(p => <Button variant="ghost" className="pf4-with-result" key={p.id} onPointerDown={e => e.preventDefault()} onClick={() => { onToggle(p); setQuery(''); inputRef.current?.focus(); }}>
-        <SquircleAvatar src={p.avatarUrl} alt="" fallback={getInitialsFromName(p.name)} userId={p.id} size={34} hairlineRing ringColor={DARK_HAIRLINE}/>
-        <span className="pf4-with-person"><b>{p.name}</b><small>{[p.username ? `@${p.username}` : null, p.homeClub].filter(Boolean).join(' · ')}</small></span><span className="pf4-with-add">Add</span>
-      </Button>)}
+    {focused && !limited && (shown.length > 0 || loading || !!query.trim()) && <div className="pf4-with-results" aria-busy={loading} onPointerDown={e => e.preventDefault()} onMouseDown={e => e.preventDefault()}>
+      {loading ? <div role="status" style={{ fontSize: 13, color: GP.mute, padding: 12 }}>Searching…</div> : !shown.length ? <div role="status" style={{ fontSize: 13, color: GP.mute, padding: 12, overflowWrap: 'anywhere' }}>No golfers match "{query}"</div> : shown.map(p => { const added = isAdded(p.id); return <Button variant="ghost" className="pf4-with-result" key={p.id} data-added={added || undefined} aria-disabled={added || undefined}
+        onPointerUp={() => { pointerPicked.current = true; add(p); }}
+        onClick={() => { if (pointerPicked.current) { pointerPicked.current = false; return; } add(p); }}>
+        {avatar(p, 34)}
+        <span className="pf4-with-person"><b>{p.name}{mentionIds.has(p.id) && <span className="pf4-with-tagcap">IN CAPTION</span>}</b><small>{[p.username ? `@${p.username}` : null, p.homeClub].filter(Boolean).join(' · ')}</small></span>
+        {added ? <span className="pf4-with-done">{addedTick}Added</span> : <span className="pf4-with-add">Add</span>}
+      </Button>; })}
     </div>}
-    {tagged.length > 0 && <div className="pf4-with-chips">{tagged.map(p => <div className="pf4-with-chip" key={p.id}>
-      <SquircleAvatar src={p.avatarUrl} alt="" fallback={getInitialsFromName(p.name)} userId={p.id} size={26} hairlineRing ringColor={DARK_HAIRLINE}/><span>{p.name}</span>
-      <Button variant="ghost" className="pf4-with-remove" aria-label={`Remove ${p.name}`} onClick={() => onToggle(p)}><X size={12}/></Button>
-    </div>)}</div>}
+    {offers.length > 0 && !limited && <div className="pf4-with-sugg" data-testid="with-mentions"><small>Mentioned in your caption</small><div className="pf4-with-chips" style={{ marginTop: 0 }}>{offers.map(p => <button type="button" className="pf4-with-offer" key={p.id} data-offer={p.id} onClick={() => add(p)}>{avatar(p, 26)}<span><span className="pf4-with-plus">+</span>{p.name}</span></button>)}</div></div>}
+    {tagged.length > 0 && <>
+      <div className="pf4-with-selhead"><span><b>{tagged.length} played with you</b></span><span>Up to {MAX_PLAYED_WITH}</span></div>
+      <div className="pf4-with-chips" style={{ marginTop: 8 }}>{tagged.map(p => <div className="pf4-with-chip" key={p.id} data-chip={p.id}>
+        {avatar(p, 26)}<span>{p.name}</span>
+        <Button variant="ghost" className="pf4-with-remove" aria-label={`Remove ${p.name}`} onClick={() => onToggle(p)}><X size={12}/></Button>
+      </div>)}</div>
+    </>}
   </section>;
 }
 

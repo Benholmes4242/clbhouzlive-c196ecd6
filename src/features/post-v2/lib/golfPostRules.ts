@@ -1,3 +1,4 @@
+import { extractMentions } from '@/lib/mentions/format';
 /** THE POST PAGE, REBUILT AROUND GOLF — pure rules shared by the composer,
  * the feed card and their tests. No reads, no writes: every figure here comes
  * from the caller, so the page, the preview and the feed card cannot drift.
@@ -102,4 +103,10 @@ export function slideChip(t: SlideTag | null | undefined): string | null {
   if (!t) return null;
   if (t.hole != null) return t.par ? `Hole ${t.hole} · Par ${t.par}` : `Hole ${t.hole}`;
   return t.place ? PLACE_LABELS[t.place] : null;
+}
+
+/** Personal-user ids @mentioned in a caption, in order, deduplicated; business
+ * mentions and the poster are excluded (Played with caption offers). */
+export function captionMentionIds(caption: string, selfId: string | null): string[] {
+  return extractMentions(caption).filter((m) => m.entityType === 'user' && m.entityId !== selfId).map((m) => m.entityId);
 }
