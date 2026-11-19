@@ -13,14 +13,16 @@ import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { IMMERSIVE_FEED_CANVAS, INK_ON_LIGHT, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { MSG } from '@/features/messaging-dark/tokens';
 import { RoundShareCardView, CourseShareCardView } from './ShareCards';
 import type { RoundShareCard } from '@/hooks/messaging/useRoundShareCards';
 
 /**
- * BRIEF_MESSAGES_DARK §6 — AMBER IS NARROWED TO MATCH ECHO. The member's own
- * bubble is WHITE WITH BLACK TEXT (the amber bubble of the previous brief is
- * WITHDRAWN); amber survives on this surface only on the member's own score on
- * a shared-round card. Theirs are glass over the dark canvas.
+ * MESSAGES AMBER GLASS (signed-off message-bubbles-amber-glass mock). The
+ * member's own text bubble is AMBER GLASS WITH WHITE TEXT: an amber gradient
+ * with an inset amber edge (box-shadow, so size is unchanged; no blur).
+ * Amber otherwise appears only on the member's own score on a shared-round
+ * card. Theirs are glass over the dark canvas. Reaction chips stay white.
  * §2.4 no faded colour: three solid ink values, no alpha on text.
  */
 const INK = '#F5F7F8';
@@ -30,8 +32,10 @@ const HAIRLINE = 'rgba(255,255,255,0.10)';
 
 // Incoming: flat fill base (blur is an enhancement, applied via .ec-glass).
 const IN_BG = 'rgba(255,255,255,0.10)';
-const OUT_BG = '#F4F6F8';
-const OUT_FG = INK_ON_LIGHT;
+const OUT_BG = 'linear-gradient(155deg, rgba(247,147,30,0.30) 0%, rgba(247,147,30,0.16) 100%)';
+const OUT_EDGE = 'inset 0 0 0 1px rgba(247,147,30,0.48)';
+const OUT_FG = MSG.INK;
+const OUT_SOFT = '#E6CDAA';
 
 
 interface Props {
@@ -136,9 +140,9 @@ export const MessageBubble: React.FC<Props> = ({
   const hugMedia = hasMedia && !hasBody && !message.reply_preview;
 
   const reply = message.reply_preview;
-  const replyRule = isOutgoing ? 'rgba(21,16,7,0.38)' : 'rgba(255,255,255,0.28)';
-  const replyName = isOutgoing ? '#3A2C10' : SUB;
-  const replySnippet = isOutgoing ? '#5B4718' : HINT;
+  const replyRule = isOutgoing ? 'rgba(247,147,30,0.70)' : 'rgba(255,255,255,0.28)';
+  const replyName = isOutgoing ? '#FFD9A8' : SUB;
+  const replySnippet = isOutgoing ? OUT_SOFT : HINT;
 
 
   const [showReport, setShowReport] = useState(false);
@@ -179,6 +183,7 @@ export const MessageBubble: React.FC<Props> = ({
              fixed radius means "Hi" comes out as a short rounded rectangle. */
           minWidth: isDeleted || hugMedia ? 0 : 58,
           background: isDeleted || hugMedia ? 'transparent' : bg,
+          boxShadow: isOutgoing && !isDeleted && !hugMedia ? OUT_EDGE : undefined,
           color: fg,
           borderRadius,
           padding: isDeleted ? '0' : hugMedia ? '0' : '8px 12px',
@@ -224,7 +229,7 @@ export const MessageBubble: React.FC<Props> = ({
                 <span
                   style={{ position: "relative", 
                     fontSize: 12,
-                    fontWeight: 500,
+                    fontWeight: isOutgoing ? 600 : 500,
                     color: replyName,
                     lineHeight: 1.3,
                   }}
@@ -305,7 +310,7 @@ export const MessageBubble: React.FC<Props> = ({
                 {message.edited_at ? (
                   <span
                     style={{ position: "relative", 
-                      color: isOutgoing ? 'rgba(245,246,247,0.55)' : HINT,
+                      color: isOutgoing ? OUT_SOFT : HINT,
                       fontSize: 11,
                       marginLeft: 6,
                     }}
@@ -325,12 +330,12 @@ export const MessageBubble: React.FC<Props> = ({
                   position: 'relative',
                   marginTop: 6,
                   paddingTop: 8,
-                  borderTop: `0.5px solid ${isOutgoing ? surfaceWithAlpha(IMMERSIVE_FEED_CANVAS, 0.12) : HAIRLINE}`,
+                  borderTop: `0.5px solid ${isOutgoing ? 'rgba(247,147,30,0.35)' : HAIRLINE}`,
                   background: 'transparent',
                   border: 'none',
                   borderTopWidth: '0.5px',
                   borderTopStyle: 'solid',
-                  borderTopColor: isOutgoing ? surfaceWithAlpha(IMMERSIVE_FEED_CANVAS, 0.12) : HAIRLINE,
+                  borderTopColor: isOutgoing ? 'rgba(247,147,30,0.35)' : HAIRLINE,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -442,7 +447,7 @@ export const MessageBubble: React.FC<Props> = ({
                 padding: '1px 7px',
                 fontSize: 12,
                 lineHeight: '18px',
-                color: OUT_FG,
+                color: INK_ON_LIGHT,
                 gap: 3,
               }}
             >

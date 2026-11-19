@@ -31,7 +31,7 @@ export const MSG = {
   INK_2: EC.INK_2,
   /** Ink tier 3 — context lines, timestamps, basis. Solid. */
   INK_3: EC.INK_3,
-  /** THE VIEWING MEMBER. Own bubbles, own scores. Never chrome, never unread. */
+  /** THE VIEWING MEMBER. Covers own bubbles (amber glass, white text) and own scores. Never chrome, never unread. */
   AMBER: EC.AMBER,
   /** Hairline on glass and between rows. A border, not a semantic tone. */
   EDGE: EC.LINE,
