@@ -13,6 +13,9 @@
  * all dismissals to that guard while open, keeping draft and return ownership.
  */
 
+import { useRoundNetScores } from '@/components/explore-tab-new/courseled/hooks/useRoundNetScores';
+import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { feedStrokesReceived } from '@/components/feed/roundTilePlot';
 import { DIAG_ON, roundDiag } from '@/diag/roundPushDiag'; // TEMPORARY diag
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -367,6 +370,16 @@ export const RoundDetailSheet: React.FC<Props> = ({
   /* FEAT RARITY LINES §1 — one read for the one round this sheet is showing:
      the frozen rows plus the owner fields, which arrive NULL for anyone who is
      not the round's owner. */
+  /* NET IN THE SCORE ROW — the ONE gam_round_net read, through the shared
+     hook (same key family, gating and cache as Lowest net / Rounds that count).
+     Failed or empty = not nettable; nothing waits on it. */
+  const netMap = useRoundNetScores(open ? scoreIdList : []);
+  const roundNet = scoreId ? netMap.get(scoreId) ?? null : null;
+  const netAllowanceOk = useMemo(() => {
+    if (!roundSettled || sortedHoles.length === 0) return true;
+    const shape = { holes: sortedHoles.filter((h) => h.played !== false).map((h) => ({ strokeIndex: h.stroke_index ?? null, strokesAllowed: null })) } as unknown as HoleShape;
+    return feedStrokesReceived(shape, roundNet?.courseHandicap ?? null) != null;
+  }, [roundSettled, sortedHoles, roundNet]);
   const featRarity = useRoundFeatRarity(open ? scoreId : null);
   const roundAwardsQuery = useRoundAwards(scoreId, open);
   const roundEngagement = useStoryEngagement('round', scoreIdList);
@@ -511,6 +524,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
         /* SCORECARD_TILE_REDESIGN §1d — already on userQuery; no new read. */
         differential: (userData as { handicap_differential?: number | null } | undefined)?.handicap_differential ?? null,
       } : null}
+      net={roundNet?.net ?? null}
+      courseHandicap={roundNet?.courseHandicap ?? null}
+      netAllowanceOk={netAllowanceOk}
       playerName={displayName}
       ownerDisplayName={profile?.display_name ?? null}
       playerAvatarUrl={profile?.profile_photo_url ?? (usingSeed ? seed?.playerAvatarUrl ?? null : null)}

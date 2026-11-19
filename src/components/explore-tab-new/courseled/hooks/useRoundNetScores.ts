@@ -32,10 +32,13 @@ const MISSING_TABLE = new Set(['42P01', 'PGRST205', 'PGRST204']);
 interface Row {
   whs_score_id: string;
   net_score: number | null;
+  course_handicap: number | null;
 }
 
 export interface RoundNet {
   net: number;
+  /** gam_round_net.course_handicap, read in the same call (scorecard NET row). */
+  courseHandicap?: number | null;
 }
 
 const EMPTY = new Map<string, RoundNet>();
@@ -54,7 +57,7 @@ export function useRoundNetScores(scoreIds: readonly (string | null | undefined)
     queryFn: async () => {
       const { data: rows, error } = await supabase
         .from('gam_round_net' as never)
-        .select('whs_score_id, net_score')
+        .select('whs_score_id, net_score, course_handicap')
         .in('whs_score_id', ids);
       if (error) {
         if (MISSING_TABLE.has(String((error as { code?: string }).code ?? ''))) {
@@ -66,7 +69,7 @@ export function useRoundNetScores(scoreIds: readonly (string | null | undefined)
       const out = new Map<string, RoundNet>();
       for (const r of ((rows ?? []) as unknown) as Row[]) {
         if (r.whs_score_id && r.net_score != null && Number.isFinite(Number(r.net_score))) {
-          out.set(r.whs_score_id, { net: Number(r.net_score) });
+          out.set(r.whs_score_id, { net: Number(r.net_score), courseHandicap: r.course_handicap != null && Number.isFinite(Number(r.course_handicap)) ? Number(r.course_handicap) : null });
         }
       }
       return out;

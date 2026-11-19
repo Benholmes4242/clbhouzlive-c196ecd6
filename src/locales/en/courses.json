@@ -3302,6 +3302,7 @@
       "roundsHere_one": "{{count}} round here",
       "points": "POINTS",
       "diff": "DIFF",
+      "net": "NET",
       "playedOffLabel": "PLAYED OFF",
       "best": "Best",
       "vsAvgSelf": "against your average here",

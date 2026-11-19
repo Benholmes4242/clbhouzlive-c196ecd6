@@ -178,6 +178,17 @@ export interface CardScorecardSheetProps {
   playerHeadshotOverride?: string | null;
   /** Tour: shows a position ("T4") in place of the handicap index. */
   identityStat?: { label: string; value: string } | null;
+  /**
+   * SCORECARD_TILE · NET IN THE SCORE ROW — gam_round_net.net_score for this
+   * score, read by the host through useRoundNetScores. Never derived here: the
+   * sheet holds no gross-minus-handicap arithmetic. Member surface only.
+   */
+  net?: number | null;
+  /** gam_round_net.course_handicap — FN1's first nettable condition. */
+  courseHandicap?: number | null;
+  /** FN1's second condition, decided by the host with feedStrokesReceived once
+   *  the hole shape has settled: false = no computable per-hole allowance. */
+  netAllowanceOk?: boolean;
   // FOOTER
   onViewProfile?: () => void;
   onViewCourse?: () => void;
@@ -373,7 +384,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
-  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, playerGender = null, identityStat,
+  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, playerGender = null, identityStat, net = null, courseHandicap = null, netAllowanceOk = true,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   presentation = 'overlay',
@@ -654,14 +665,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       if (identityStat) items.push({ key: 'identity', value: identityStat.value, label: identityStat.label });
       return items;
     }
+    /* NET IN THE SCORE ROW — nettable exactly as the feed (FN1): a course
+       handicap and a computable allowance; NET replaces PLAYED OFF. */
+    const netShown = courseHandicap != null && netAllowanceOk && net != null && Number.isFinite(Number(net));
+    if (netShown) items.push({ key: 'net', value: String(net), label: t('courses:scorecard.tile.net') });
     const points = roundResults?.efforts.find((e) => e.unit_kind === 'round_stableford')?.value;
     if (points != null) items.push({ key: 'points', value: String(Math.round(points)), label: t('courses:scorecard.tile.points') });
     const diff = courseContext?.differential;
     if (diff != null && Number.isFinite(Number(diff))) items.push({ key: 'diff', value: Number(diff).toFixed(1), label: t('courses:scorecard.tile.diff') });
     const idx = courseContext?.indexAtTime;
-    if (idx != null) items.push({ key: 'playedOff', value: formatHcp(idx), label: t('courses:scorecard.tile.playedOffLabel') });
+    if (idx != null && !netShown) items.push({ key: 'playedOff', value: formatHcp(idx), label: t('courses:scorecard.tile.playedOffLabel') });
     return items;
-  }, [isTour, identityStat, roundResults, courseContext, t]);
+  }, [isTour, identityStat, roundResults, courseContext, net, courseHandicap, netAllowanceOk, t]);
 
   /**
    * §1e — THE COMPARISON LINE, from the courseSection figures and their rules

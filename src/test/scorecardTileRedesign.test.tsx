@@ -108,3 +108,35 @@ describe('SCORECARD_TILE_REDESIGN', () => {
     expect(document.querySelector('[data-round-score-container-rules]')?.textContent).toContain('max-width: 330px');
   });
 });
+
+describe('SCORECARD_TILE · NET IN THE SCORE ROW', () => {
+  it('(a) nettable member round: GROSS, TO PAR, NET, POINTS, DIFF and no PLAYED OFF', () => {
+    mount(<CardScorecardSheet {...base} roundResults={awardsWith} courseContext={ctx} net={70} courseHandicap={9} />);
+    expect(cellKeys()).toEqual(['gross', 'toPar', 'net', 'points', 'diff']);
+  });
+  it('(b) no course handicap: TO PAR, POINTS, DIFF, PLAYED OFF and no NET', () => {
+    mount(<CardScorecardSheet {...base} roundResults={awardsWith} courseContext={ctx} net={70} courseHandicap={null} />);
+    expect(cellKeys()).toEqual(['gross', 'toPar', 'points', 'diff', 'playedOff']);
+    cleanup();
+    mount(<CardScorecardSheet {...base} roundResults={awardsWith} courseContext={ctx} net={70} courseHandicap={9} netAllowanceOk={false} />);
+    expect(cellKeys()).not.toContain('net');
+  });
+  it('(c) NET is the passed value; the sheet holds no gross-minus-handicap arithmetic', async () => {
+    mount(<CardScorecardSheet {...base} courseContext={ctx} net={61} courseHandicap={9} />);
+    expect(document.querySelector('[data-score-cell="net"] [data-score-figure]')?.textContent).toBe('61');
+    const fs = await import('node:fs');
+    const src = fs.readFileSync('src/features/courses/_shared/scorecard/CardScorecardSheet.tsx', 'utf8');
+    expect(src).not.toMatch(/gross\w*\s*-\s*\(?\s*courseHandicap/i);
+    expect(src).not.toMatch(/courseHandicap\s*[-+]/);
+  });
+  it('(d) tour renders no NET', () => {
+    mount(<CardScorecardSheet {...base} surface="tour" identityStat={{ value: 'T4', label: 'POS' }} net={70} courseHandicap={9} />);
+    expect(cellKeys()).toEqual(['gross', 'toPar', 'identity']);
+  });
+  it('(e) 320: the five-figure row keeps its narrow-width rules', () => {
+    mount(<CardScorecardSheet {...base} roundResults={awardsWith} courseContext={ctx} net={70} courseHandicap={9} />);
+    const rules = document.querySelector('[data-round-score-container-rules]')?.textContent ?? '';
+    expect(rules).toContain('max-width: 330px');
+    expect(document.querySelectorAll('[data-round-score-row] [data-score-cell]').length).toBe(5);
+  });
+});
