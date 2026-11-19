@@ -189,7 +189,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   const playedReady = settled && hasTrackedRounds && Boolean(connection);
   const { data: allRounds, isLoading: allRoundsLoading } = useAllMyRoundsAtCourse(courseId, playedReady);
   const { data: holeField } = useCourseHoleField(courseId, user?.id, { enabled: playedReady });
-  const { moments, posts: momentPosts } = useMomentPosts(courseId, courseName);
+  const { moments, openMoment } = useMomentPosts(courseId, courseName);
 
   /* BRIEF_YOU_TAB_BRANCH_C_SCOUTING_REPORT — branch C's reads. trend and
      differentials are inert without a connection; analytics courses only fire
@@ -706,7 +706,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         onMoments={(index) => {
           const m = moments[index];
           if (m) analyticsEvents.track('course_you_moment_opened', { course_id: courseId, moment_id: m.id });
-          if (momentPosts.length > 0) useFullscreenFeedStore.getState().open(momentPosts, index);
+          openMoment(index);
         }}
       />
 

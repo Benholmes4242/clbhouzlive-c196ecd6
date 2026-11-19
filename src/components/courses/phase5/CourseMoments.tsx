@@ -9,6 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Panel } from '@/features/courses/components/holes/analytical/tokens';
+import { momentPages, momentPageIndex } from '@/lib/reviews/momentPages';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
@@ -29,58 +30,19 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 
   const fullscreenPosts = useMemo<FeedPost[]>(() => {
     if (!moments?.length) return [];
-    return moments.map((m) => ({
-      id: m.id,
-      userId: user?.id ?? '',
-      actorType: 'personal',
-      // Author id, NOT viewer id. Safe today because useUserCourseMoments is
-      // viewer-scoped (fetches only the signed-in user's own moments), so
-      // author === viewer. If this hook is ever broadened to include other
-      // users' moments, switch this to the moment's real author id — otherwise
-      // the fullscreen follow pill (canonical cache) will key on the wrong
-      // actor and any Follow tap will land on self.
-      actorId: user?.id ?? '',
-      username: profile?.username ?? '',
-      displayName: profile?.display_name ?? profile?.username ?? '',
-      avatarUrl: profile?.profile_photo_url ?? '',
-      isVerified: profile?.is_verified ?? false,
-      creatorRelation: 'none',
-      caption: m.caption ?? '',
-      mediaItems: [{
-        id: m.id,
-        type: m.mediaType,
-        hlsUrl: m.mediaType === 'video' ? m.mediaUrl : undefined,
-        imageUrl: m.mediaType === 'image' ? m.mediaUrl : undefined,
-        thumbnailUrl: m.posterUrl,
-        width: 0,
-        height: 0,
-      }],
-      createdAt: m.createdAt,
-      // ⚠️ HARDCODED 0/false engagement fields.
-      // SAFE ONLY because CourseMoments opens the fullscreen viewer with
-      // readOnly:true — likes/comments UI is suppressed and no mutation
-      // paths can fire against these stub values. If this surface is ever
-      // switched to an interactive viewer, wire real engagement (fetch
-      // like_count / comment_count / is_liked_by_me for the moment's
-      // underlying post) BEFORE flipping readOnly off, or every viewed
-      // moment will appear zeroed and any like will patch a stale delta.
-      likeCount: 0, // RPC lacks field
-      commentCount: 0, // RPC lacks field
-      shareCount: 0, // RPC lacks field
-      review: null,
-      isReview: false,
-      isLikedByMe: false, // RPC lacks field
-      isFollowedByMe: false, // RPC lacks field
-      courseName,
-      courseId,
-    }) as FeedPost);
+    return momentPages(moments, {
+      userId: user?.id ?? '', username: profile?.username,
+      displayName: profile?.display_name ?? profile?.username,
+      avatarUrl: profile?.profile_photo_url,
+    }, courseId, courseName);
   }, [moments, user?.id, courseName, courseId, profile]);
 
   const handleMomentTap = useCallback((index: number) => {
-    if (fullscreenPosts.length > 0) {
-      useFullscreenFeedStore.getState().open(fullscreenPosts, index);
-    }
-  }, [fullscreenPosts]);
+    const moment = moments?.[index];
+    if (!moment) return;
+    const page = momentPageIndex(fullscreenPosts, moment.id);
+    if (page >= 0) useFullscreenFeedStore.getState().open(fullscreenPosts, page, { mediaId: moment.id });
+  }, [fullscreenPosts, moments]);
 
   if (isLoading) {
     return (

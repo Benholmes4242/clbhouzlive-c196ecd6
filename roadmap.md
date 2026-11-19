@@ -1,6 +1,11 @@
 # Roadmap
 
-## Stopped: Fullscreen viewer action pills everywhere
+## Stopped: Fullscreen viewer follow-up
+- Authorised stops cleared; grouped review moments and tapped-media opens implemented on all three surfaces; unmatched post guard/warning and RPC missing-score coverage added. Focused 106/106; harness build OK.
+- Shard 1: 2,238 passed / 1 failed; coursesRailsUnlimited.test.tsx:134:20 still expects removed readOnly:true. Isolated reproduces 14/15, 336ms. Test untouched; shards 2–4 blocked on ruling. Inventory 9,118 → expected 9,132 (+14 across previous build and follow-up); full report .lovable/reports/fullscreen-viewer-action-pills.md.
+- Ben's physical iPhone/live-data verification remains external: You moments engagement and JohnL's five Media/Watch review scores.
+
+## Previous stop: Fullscreen viewer action pills everywhere
 - Implemented source-post batch/actions, interactive opens, card score strip and missing-score fallback; scoped font ruling applied, matching app stack.
 - Focused 97/99; isolated 18/20 reproduces canonicalFullscreenViewer:99 scan matching an obsolete comment and memberShotsVerticalPaging:49 exact object omitting new sourcePostId. No shards run; inventory 9,118 → expected 9,125 (+7).
 - Await failure rulings; ShotTagCard source/course identity and precise JohnL dropping-source audit remain incomplete. Full error/assertion report: .lovable/reports/fullscreen-viewer-action-pills.md.

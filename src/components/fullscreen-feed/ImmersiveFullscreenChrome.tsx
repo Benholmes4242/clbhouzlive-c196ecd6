@@ -178,6 +178,8 @@ interface Props {
   isOwnPost: boolean;
   golfCourse?: { id?: string | null; name?: string | null; courseCountry?: string | null } | null;
   readOnly?: boolean;
+  /** A successful source batch omitted this post: no phantom mutations/share. */
+  actionsUnavailable?: boolean;
   /** Member-shot opens only: synthetic post ids — the progress writer stays off. */
   syntheticPosts?: boolean;
   onBeforeNavigate?: () => void;
@@ -211,6 +213,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   isOwnPost,
   golfCourse,
   readOnly = false,
+  actionsUnavailable = false,
   syntheticPosts = false,
   onBeforeNavigate,
   feedEnded = false,
@@ -366,7 +369,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     (activePost as any).courseCountry ??
     golfCourse?.courseCountry ??
     null;
-  const showPills = !readOnly;
+  const showPills = !readOnly && !actionsUnavailable;
   const showVideoRow = activeMediaIsVideo;
   const reviewTarget = activePost.engagementTarget?.type === 'review' ? activePost.engagementTarget.id : null;
   // Course photos: the active item's member credit (media-local identity).

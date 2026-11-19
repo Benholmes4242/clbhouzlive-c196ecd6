@@ -1,6 +1,6 @@
 /** One actor-scoped batch per open list; registered post cache receives the same
  * engagement patches as the feed. Reviews hydrate once, including genuine nulls. */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { patchEngagement } from '@/lib/engagementCache';
@@ -25,6 +25,17 @@ export function useViewerContent(posts: readonly FeedPost[], enabled: boolean, u
     enabled: enabled && reviewIds.length > 0, staleTime: 60_000, retry: false,
     queryFn: () => readViewerReviewScores(reviewIds),
   });
+  const warned = useRef(false);
+  useEffect(() => {
+    if (!enabled) { warned.current = false; return; }
+    if (!postQuery.isSuccess || warned.current) return;
+    const returned = new Set(postQuery.data.map(row => row.id));
+    const unmatched = ids.filter(id => !returned.has(id));
+    if (unmatched.length) {
+      warned.current = true;
+      console.warn('[fullscreen viewer] unmatched source post ids', unmatched);
+    }
+  }, [enabled, ids, postQuery.isSuccess, postQuery.data]);
   useEffect(() => {
     if (!enabled || !scores.data?.length) return;
     const byId = new Map(scores.data.map(row => [row.id, row.breakdown]));
@@ -35,5 +46,5 @@ export function useViewerContent(posts: readonly FeedPost[], enabled: boolean, u
     });
     useFullscreenFeedStore.setState({ posts: next });
   }, [enabled, scores.data]);
-  return postQuery.isError ? [] : postQuery.data ?? [];
+  return { posts: postQuery.isError ? [] : postQuery.data ?? [], resolved: postQuery.isSuccess };
 }

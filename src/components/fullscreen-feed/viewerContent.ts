@@ -17,6 +17,15 @@ export function viewerPostIds(posts: readonly FeedPost[]): string[] {
     : viewerPostId(post) ?? []))].sort();
 }
 
+/** A successful batch is authoritative; a loading/failed read is not absence. */
+export function viewerActionPost(post: FeedPost, item: MediaItem | undefined, rows: Awaited<ReturnType<typeof readViewerPosts>>, resolved: boolean): FeedPost | null {
+  const id = viewerPostId(post, item);
+  if (!id) return post.engagementTarget?.type === 'review' ? post : null;
+  const fetched = rows.find(row => row.id === id);
+  if (resolved && !fetched) return null;
+  return { ...post, ...fetched, id, isReview: false, review: null, engagementTarget: undefined };
+}
+
 export async function readViewerPosts(ids: readonly string[], userId?: string, activeActor?: { type: string; id: string } | null) {
   if (!ids.length) return [];
   const [postRead, likeRead] = await Promise.all([

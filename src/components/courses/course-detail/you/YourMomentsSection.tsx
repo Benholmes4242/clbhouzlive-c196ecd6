@@ -1,9 +1,8 @@
 /**
  * BRIEF_YOU_TAB_REBUILD §3.7 — YOUR MOMENTS.
  *
- * Behaviour unchanged from the Panel version: the same viewer-scoped read and
- * the same read-only fullscreen viewer. Three tiles, equal width, 84px, radius
- * 12, 8px gap; absent at zero. CourseMoments.tsx is untouched.
+ * Viewer-scoped tiles open canonical review pages shared with CourseMoments
+ * and CourseYouTab; tapped media identity is independent of grouped page index.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +11,7 @@ import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { momentPages, momentPageIndex } from '@/lib/reviews/momentPages';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AboutSection from '../about/AboutSection';
 import { MomentMediaStrip } from '../AboutMediaStrip';
@@ -22,58 +22,29 @@ interface Props {
   onOpen?: (momentId: string) => void;
 }
 
-/** The viewer's moments here and their read-only fullscreen posts (shared with the played-state record section). */
 export function useMomentPosts(courseId: string, courseName: string) {
   const { data: moments } = useUserCourseMoments(courseId);
   const { user } = useSupabaseSession();
   const { profile } = useProfileData();
 
-  /* Viewer-scoped read, so author === viewer; the viewer opens read-only and no
-     engagement mutation can fire against these stub values (ported rule). */
-  const posts = React.useMemo<FeedPost[]>(
-    () =>
-      (moments ?? []).map((m) => ({
-        id: m.id,
-        userId: user?.id ?? '',
-        actorType: 'personal',
-        actorId: user?.id ?? '',
-        username: profile?.username ?? '',
-        displayName: profile?.display_name ?? profile?.username ?? '',
-        avatarUrl: profile?.profile_photo_url ?? '',
-        isVerified: profile?.is_verified ?? false,
-        creatorRelation: 'none',
-        caption: m.caption ?? '',
-        mediaItems: [
-          {
-            id: m.id,
-            type: m.mediaType,
-            hlsUrl: m.mediaType === 'video' ? m.mediaUrl : undefined,
-            imageUrl: m.mediaType === 'image' ? m.mediaUrl : undefined,
-            thumbnailUrl: m.posterUrl,
-            width: 0,
-            height: 0,
-          },
-        ],
-        createdAt: m.createdAt,
-        likeCount: 0,
-        commentCount: 0,
-        shareCount: 0,
-        review: null,
-        isReview: false,
-        isLikedByMe: false,
-        isFollowedByMe: false,
-        courseName,
-        courseId,
-      }) as FeedPost),
-    [moments, user?.id, profile, courseName, courseId],
-  );
+  const posts = React.useMemo<FeedPost[]>(() => momentPages(moments ?? [], {
+    userId: user?.id ?? '', username: profile?.username,
+    displayName: profile?.display_name ?? profile?.username,
+    avatarUrl: profile?.profile_photo_url,
+  }, courseId, courseName), [moments, user?.id, profile, courseId, courseName]);
+  const openMoment = React.useCallback((index: number) => {
+    const moment = moments?.[index];
+    if (!moment) return;
+    const page = momentPageIndex(posts, moment.id);
+    if (page >= 0) useFullscreenFeedStore.getState().open(posts, page, { mediaId: moment.id });
+  }, [moments, posts]);
 
-  return { moments: moments ?? [], posts };
+  return { moments: moments ?? [], posts, openMoment };
 }
 
 const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) => {
   const { t } = useTranslation('courses');
-  const { moments, posts } = useMomentPosts(courseId, courseName);
+  const { moments, openMoment } = useMomentPosts(courseId, courseName);
   if (moments.length === 0) return null;
 
   return (
@@ -89,7 +60,7 @@ const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) =
         onOpen={(index) => {
           const moment = moments[index];
           if (moment) onOpen?.(moment.id);
-          if (posts.length > 0) useFullscreenFeedStore.getState().open(posts, index);
+          openMoment(index);
         }}
       />
     </AboutSection>

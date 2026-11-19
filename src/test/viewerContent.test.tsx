@@ -17,6 +17,18 @@ const review = reviewFeedPost({ reviewId: 'review-1', userId: 'author', courseId
 const shot = { ...review, id: 'shots:one', isReview: false, review: null, engagementTarget: undefined, mediaItems: [{ ...review.mediaItems[0], memberShot: { kicker: '', title: '', credit: '', memberName: '', avatarUrl: null, sourcePostId: 'post-1' } }] } as FeedPost;
 afterEach(() => { cleanup(); f.reads.length = 0; useFullscreenFeedStore.setState({ isOpen: false, posts: [], restoreStack: [] }); });
 describe('viewer batched content', () => {
+  it('a successful missing-source batch warns once per open and reports absence authoritatively', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const missing = { ...shot, id: 'phantom-media', mediaItems: [{ ...shot.mediaItems[0], memberShot: undefined }] } as FeedPost;
+    const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={cache}>{children}</QueryClientProvider>;
+    const { result, rerender } = renderHook(() => useViewerContent([missing], true), { wrapper });
+    await waitFor(() => expect(result.current.resolved).toBe(true));
+    expect(warn).toHaveBeenCalledExactlyOnceWith('[fullscreen viewer] unmatched source post ids', ['phantom-media']);
+    rerender();
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
   it('source-post counts and active-actor likes come from one batch, and the canonical cache patches them', async () => {
     expect(viewerPostIds([shot, shot])).toEqual(['post-1']);
     const rows = await readViewerPosts(viewerPostIds([shot]), 'viewer', { type: 'business', id: 'business-1' });

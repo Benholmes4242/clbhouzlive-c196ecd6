@@ -5,11 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { FeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 const h = vi.hoisted(() => ({
   toggle: vi.fn(), engagement: new Map<string, { likeCount: number; commentCount: number; viewerLiked: boolean }>(),
-  open: vi.fn(), clubMedia: [] as unknown[], reviewRows: [] as unknown[],
+  open: vi.fn(), clubMedia: [] as unknown[], reviewRows: [] as unknown[], scoreRead: vi.fn(),
   course: { id: 'c1', name: 'Royal Dornoch', country: 'Scotland', region: null, sub_country: 'Highlands' },
 }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -36,7 +36,7 @@ vi.mock('@/integrations/supabase/client', () => {
   const chain = (table: string) => {
     const q: Record<string, unknown> = {};
     q.select = () => q; q.eq = () => q;
-    q.in = () => Promise.resolve({ data: table === 'course_ratings' ? h.reviewRows : [], error: null });
+    q.in = (_key: string, ids: string[]) => { if (table === 'course_ratings') h.scoreRead(ids); return Promise.resolve({ data: table === 'course_ratings' ? h.reviewRows : [], error: null }); };
     q.maybeSingle = () => Promise.resolve({ data: h.course, error: null });
     return q;
   };
@@ -49,6 +49,9 @@ import { reviewFeedPost } from '@/lib/reviews/reviewFeedPost';
 import AboutMediaStrip from '@/components/courses/course-detail/AboutMediaStrip';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { viewerActionPost } from '@/components/fullscreen-feed/viewerContent';
+import { mapRowToFeedPost } from '@/components/media-system/utils/feedMapper';
+import { useViewerContent } from '@/components/fullscreen-feed/useViewerContent';
 
 const reviewPost = reviewFeedPost({
   reviewId: 'rev-1', userId: 'u1', displayName: 'Ben Holmes', text: 'Firm and fast.', createdAt: '2026-11-01T10:00:00Z',
@@ -73,6 +76,37 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.clearAllMocks(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 
 describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
+  it('a course-media RPC review without score columns reads its review once and renders all five figures', async () => {
+    const post = mapRowToFeedPost({ post_id: 'post-score', user_id: 'author', source_review_id: 'review-score',
+      media_id: 'score-media', media_type: 'image', media_url: '/score.jpg', course_id: 'course',
+      course_name: 'Sunningdale (Old)', review_rating: 9.1 } as unknown as FeedRpcRow);
+    h.reviewRows = [{ id: 'review-score', design_score: 9.6, condition_score: 9.1, clubhouse_score: 9.2, facilities_score: 8.6 }];
+    useFullscreenFeedStore.setState({ isOpen: true, posts: [post] });
+    const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>;
+    renderHook(() => useViewerContent([post], true), { wrapper });
+    await waitFor(() => expect(useFullscreenFeedStore.getState().posts[0].review?.breakdown?.design).toBe(9.6));
+    expect(h.scoreRead).toHaveBeenCalledExactlyOnceWith(['review-score']);
+    const view = chrome(useFullscreenFeedStore.getState().posts[0]);
+    const row = view.container.querySelector('[data-review-score-strip] [data-review-score-row]');
+    expect(row?.getAttribute('data-variant')).toBe('card');
+    expect([...row?.querySelectorAll('[data-score-figure]') ?? []].map(el => el.textContent)).toEqual(['9.1', '9.6', '9.1', '9.2', '8.6']);
+  });
+  it('a resolved unmatched post has no pills and double-tap cannot call a like', () => {
+    const missing = { ...realPost, id: 'phantom-media' };
+    const target = viewerActionPost(missing, missing.mediaItems[0], [], true);
+    expect(target).toBeNull();
+    expect(viewerActionPost(missing, missing.mediaItems[0], [], false)?.id).toBe('phantom-media');
+    const like = vi.fn();
+    const doubleTap = () => { if (target) like(target); };
+    doubleTap();
+    expect(like).not.toHaveBeenCalled();
+    const view = render(<MemoryRouter><ImmersiveFullscreenChrome
+      posts={[missing]} activeIndex={0} actionsUnavailable onClose={vi.fn()} onLike={like}
+      onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()} getLikeState={() => ({ isLiked: false, count: 0 })}
+      getCommentCount={() => 0} getFollowState={() => false} onFollow={vi.fn()}
+      onViewProfile={vi.fn()} onReviewTap={vi.fn()} isOwnPost={false} /></MemoryRouter>);
+    expect(view.container.querySelector('[data-fullscreen-pills]')).toBeNull();
+  });
   it('a source-post course photo shows all four action pills', () => {
     const shot = { ...realPost, id: 'shots:source', mediaItems: [{ ...realPost.mediaItems[0], memberShot: { kicker: '', title: 'Royal Dornoch', credit: '', memberName: 'Ben', avatarUrl: null, sourcePostId: 'post-1' } }] } as FeedPost;
     const view = chrome(shot, { synthetic: true });

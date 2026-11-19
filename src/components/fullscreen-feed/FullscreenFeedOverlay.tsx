@@ -94,7 +94,7 @@ import { trace as perfTrace } from '@/perf/trace';
 import { vperfCloseMotionMark } from '@/perf/vperf';
 import { useViewerEngagement, reviewTargetOf } from './useViewerEngagement';
 import { useViewerContent } from './useViewerContent';
-import { viewerPostId } from './viewerContent';
+import { viewerActionPost } from './viewerContent';
 import { filteredGallery } from '@/lib/courseMedia/courseGallery';
 
 
@@ -537,18 +537,15 @@ export function FullscreenFeedOverlay() {
   // back to a personal-shaped object during auth loading.
   const { activeActor: ctxActor } = useActiveActor();
   const activeActor = ctxActor ?? { type: "personal" as const, id: userId ?? "" };
-  const sourcePosts = useViewerContent(posts, isOpen, userId, activeActor);
+  const sourceContent = useViewerContent(posts, isOpen, userId, activeActor);
   const galleryData = useFullscreenFeedStore(s => s.galleryData);
   const pager = useFullscreenFeedStore(s => s.activePagerIdx);
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
   const actionPostFor = useCallback((post: FeedPost): FeedPost | null => {
     const item = post.mediaItems[pager ?? 0] ?? post.mediaItems[0];
-    const id = viewerPostId(post, item);
-    if (!id) return post.isReview && !syntheticPosts ? post : null;
-    const fetched = sourcePosts.find(row => row.id === id);
     const gallerySource = courseGallery && galleryData ? filteredGallery(galleryData.shots, courseGallery.filter)[pager ?? 0]?.post : null;
-    return { ...(gallerySource ?? post), ...(fetched ?? {}), id, isReview: false, review: null, engagementTarget: undefined };
-  }, [pager, sourcePosts, syntheticPosts, courseGallery, galleryData]);
+    return viewerActionPost(gallerySource ?? post, item, sourceContent.posts, sourceContent.resolved);
+  }, [pager, sourceContent.posts, sourceContent.resolved, courseGallery, galleryData]);
   // CB49: double-tap only ever likes — same path as the rail's like button.
   const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
@@ -1104,6 +1101,7 @@ export function FullscreenFeedOverlay() {
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
                     readOnly={readOnly}
+                    actionsUnavailable={!activeActionPost && !!activePost && !(syntheticPosts && !activePost.mediaItems[pager ?? 0]?.memberShot?.sourcePostId)}
                     syntheticPosts={syntheticPosts}
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}

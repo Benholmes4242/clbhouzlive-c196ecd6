@@ -46,7 +46,7 @@ describe('member-shot vertical paging', () => {
     const post = courseTilesToShotPost(row(1));
     expect(post.id).toBe('shots:course:c1');
     expect(post.mediaItems.map(m => m.id)).toEqual(['m1-0', 'm1-1', 'm1-2']);
-    for (const m of post.mediaItems) expect(m.memberShot).toEqual({ kicker: "Through members' eyes", title: 'Course 1', courseId: 'c1', courseName: 'Course 1', credit: '', memberName: '', avatarUrl: null });
+    for (const m of post.mediaItems) expect(m.memberShot).toEqual({ kicker: "Through members' eyes", title: 'Course 1', courseId: 'c1', courseName: 'Course 1', credit: '', memberName: '', avatarUrl: null, sourcePostId: 'p1' });
   });
   it('course placeholders use gallery video mapping and exclude processing videos', () => {
     const course = row(1);
