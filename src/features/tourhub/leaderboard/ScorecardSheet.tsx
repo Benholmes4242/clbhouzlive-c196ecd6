@@ -168,6 +168,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
       eyebrowText={eyebrowText}
       courseName={courseName}
       courseLocation={courseLocation}
+      courseId={golfCourseId}
       coursePar={coursePar}
       courseSlope={null}
       holes={roundHoles}

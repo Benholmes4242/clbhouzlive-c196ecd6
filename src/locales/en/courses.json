@@ -3296,6 +3296,20 @@
     "figVsYourAvgNeutralHere": "vs your average here",
     "figVsTheirAvgNeutralHere": "vs {{possessive}} average here",
     "playedOff": "Played off {{index}}",
+    "tile": {
+      "played": "Played {{when}}",
+      "roundsHere": "{{count}} rounds here",
+      "roundsHere_one": "{{count}} round here",
+      "points": "POINTS",
+      "diff": "DIFF",
+      "playedOffLabel": "PLAYED OFF",
+      "best": "Best",
+      "vsAvgSelf": "against your average here",
+      "vsAvgOther": "against {{possessive}} average here",
+      "fieldFigure": "{{n}} of {{m}} holes",
+      "featKicker": "Feat",
+      "roundsKicker": "Rounds"
+    },
     "key": {
       "under": "Under par",
       "bogey": "Bogey",

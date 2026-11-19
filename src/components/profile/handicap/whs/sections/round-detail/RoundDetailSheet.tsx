@@ -483,6 +483,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
       dateLongText={dateLongText}
       courseName={courseName}
       courseLocation={courseLocation}
+      courseId={analysisCourseId ?? null}
+      playDate={userData?.play_date ?? (usingSeed ? seed?.playDate ?? null : null)}
       coursePar={coursePar}
       courseSlope={courseSlope}
       holes={shownHoles}
@@ -506,6 +508,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
            score record. No new query: userQuery already carries it. Null stays
            null; the sheet omits the figure rather than showing today's index. */
         indexAtTime: userData?.handicap_index_at_time ?? null,
+        /* SCORECARD_TILE_REDESIGN §1d — already on userQuery; no new read. */
+        differential: (userData as { handicap_differential?: number | null } | undefined)?.handicap_differential ?? null,
       } : null}
       playerName={displayName}
       ownerDisplayName={profile?.display_name ?? null}

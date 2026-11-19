@@ -24,7 +24,7 @@ import { fmtDateEyebrow } from '@/components/profile/handicap/whs/sections/round
 import { fmtDateLong } from '@/i18n/format';
 import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import {
-  Nine, NotPlayedLine, RoundSummaryHead, SANS, ScorecardSection,
+  NotPlayedLine, RoundSummaryHead, SANS, TileKey, TileNine, TileSection,
   SyncingMiddle, UnavailableMiddle,
 } from './scorecardParts';
 
@@ -87,6 +87,7 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
         courseLocation={seed?.placeLine ?? null}
         kickerText={fmtDateEyebrow(seed?.playDate ?? null)}
         memberDateText={fmtDateLong(seed?.playDate ?? null)}
+        playDate={seed?.playDate ?? null}
         showScore={seed?.gross != null}
         gross={seed?.gross ?? null}
         toPar={seed?.toPar ?? null}
@@ -100,18 +101,19 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
       <div
         style={{
           flex: 1, minHeight: 0, overflow: 'hidden',
-          padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 24px)',
-          display: 'flex', flexDirection: 'column', gap: 12,
+          padding: '22px 20px 8px',
+          display: 'flex', flexDirection: 'column', gap: 26,
         }}
       >
         {hasCard ? (
-          <ScorecardSection kicker={t('courses:scorecard.theCard')} flat>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <Nine rows={out} label={t('courses:scorecard.out')} />
-              {back.length > 0 && <Nine rows={back} label={t('courses:scorecard.in')} />}
-              {hasUnplayedHole && <NotPlayedLine />}
+          <TileSection kicker={t('courses:scorecard.theCard')} testId="card">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10, minWidth: 0 }}>
+              <TileNine rows={out} label={t('courses:scorecard.out')} />
+              {back.length > 0 && <TileNine rows={back} label={t('courses:scorecard.in')} />}
             </div>
-          </ScorecardSection>
+            {hasUnplayedHole && <div style={{ marginTop: 10 }}><NotPlayedLine /></div>}
+            <TileKey />
+          </TileSection>
         ) : emptyVariant === 'unavailable' ? (
           <UnavailableMiddle />
         ) : (

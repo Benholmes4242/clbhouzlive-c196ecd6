@@ -1,4 +1,3 @@
-import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { BirdieCountIcon } from '@/features/explore-magazine/achievementIcons';
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import { roundCoursePar } from '@/lib/whs/api';
@@ -8,12 +7,17 @@ import { Share } from 'lucide-react';
 
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { ScorecardGlassOverlay } from './ScorecardGlassOverlay';
-import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
-import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
+import { REACTED } from '@/lib/reactionKind';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { QueryClientContext, useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { activeTop100CourseIds, type Top100MembershipRow } from '@/components/courses/browse/playedRings';
+import { GLASS_CARD } from '@/lib/tokens/glass';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import type { LikeSource } from '@/hooks/usePostLikes';
-import { GlassCardFootAction } from './GlassCardFootAction';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { FEAT_BAND_STYLE, scorecardFeatFor } from './scorecardFeat';
 import {
@@ -41,7 +45,7 @@ import {
  */
 import {
   CAPTION, LABEL, LABEL_READ, RAIL_FIG,
-  NohbhMiddle, Nine, NotPlayedLine, RoundSummaryHead, ScorecardSection,
+  NohbhMiddle, NotPlayedLine, RoundSummaryHead, TileKey, TileNine, TileSection, Top100Stamp, TILE_KICKER, TILE_MUTE,
   SkeletonMiddle, SyncingMiddle, UnavailableMiddle,
   fmtRel, nineSummary,
 } from './scorecardParts';
@@ -85,6 +89,9 @@ export interface CardScorecardCourseContext {
    * nothing renders, and today's index is NOT substituted.
    */
   indexAtTime?: number | null;
+  /** SCORECARD_TILE_REDESIGN §1d — whs_scores.handicap_differential, already on
+   *  the host's round read. Absent/null drops the DIFF cell. */
+  differential?: number | null;
 }
 
 export interface CardScorecardSheetProps {
@@ -96,6 +103,10 @@ export interface CardScorecardSheetProps {
   dateLongText?: string;
   courseName: string;
   courseLocation?: string | null;
+  /** SCORECARD_TILE_REDESIGN §1a — the course id for the TOP 100 stamp. */
+  courseId?: string | null;
+  /** Member sub-line: the round's play date (ISO), for "Played {day}". */
+  playDate?: string | null;
   coursePar?: number | null;
   courseSlope?: number | null;
   // MIDDLE
@@ -358,7 +369,7 @@ export const ScoringKey: React.FC = () => {
 
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText, dateLongText = '',
-  courseName, courseLocation, coursePar, courseSlope,
+  courseName, courseLocation, courseId = null, playDate = null, coursePar, courseSlope,
   holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
@@ -630,32 +641,55 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     return items;
   }, [isTour, courseContext, totals, isOwner, scopeVoice.possessive, t]);
 
-  const rail = useMemo(() => {
+  /**
+   * SCORECARD_TILE_REDESIGN §1d — THE SCORE ROW'S CELLS AFTER TO PAR, each only
+   * when its data exists. Member: POINTS (the round_stableford effort value),
+   * DIFF (whs_scores.handicap_differential, already on the host's read), PLAYED
+   * OFF (the index at the time; today's index is never substituted). Tour: the
+   * identity stat (position) as today.
+   */
+  const headCells = useMemo(() => {
     const items: { key: string; value: string; label: string; tone?: string }[] = [];
-    /**
-     * §E2 — THE BEAT-FIELD FIGURE HAS LEFT THE RAIL. It is the one figure on
-     * this sheet drawn from the FIELD pool rather than the member's own history,
-     * so it cannot sit beside self-history figures with no basis stated. It is
-     * now a sentence under the trajectory, gated by `fieldGateOpen`.
-     * `figBeatField` is deleted 10 Sep 2026.
-     */
-    /**
-     * The tour position keeps the rail — a pro has no history section to move
-     * into. The member's CURRENT index no longer appears here at all when the
-     * course section renders: that section carries INDEX THEN, and showing both
-     * put two different indexes on one sheet.
-     */
-    if (identityStat) {
-      items.push({ key: 'identity', value: identityStat.value, label: identityStat.label });
-    } else if (playerHcp != null && courseSection.length === 0) {
-      items.push({
-        key: 'hcp',
-        value: formatHcp(playerHcp),
-        label: t('courses:scorecard.handicapIndex'),
-      });
+    if (isTour) {
+      if (identityStat) items.push({ key: 'identity', value: identityStat.value, label: identityStat.label });
+      return items;
     }
+    const points = roundResults?.efforts.find((e) => e.unit_kind === 'round_stableford')?.value;
+    if (points != null) items.push({ key: 'points', value: String(Math.round(points)), label: t('courses:scorecard.tile.points') });
+    const diff = courseContext?.differential;
+    if (diff != null && Number.isFinite(Number(diff))) items.push({ key: 'diff', value: Number(diff).toFixed(1), label: t('courses:scorecard.tile.diff') });
+    const idx = courseContext?.indexAtTime;
+    if (idx != null) items.push({ key: 'playedOff', value: formatHcp(idx), label: t('courses:scorecard.tile.playedOffLabel') });
     return items;
-  }, [identityStat, playerHcp, courseSection.length, t]);
+  }, [isTour, identityStat, roundResults, courseContext, t]);
+
+  /**
+   * §1e — THE COMPARISON LINE, from the courseSection figures and their rules
+   * (rank needs rankHere and roundsHere; the average half needs avgToParOthers;
+   * the sign carries the direction). A missing half is omitted; both missing,
+   * no line. Replaces the boxed rank / vs-average pair. Tour: none.
+   */
+  const comparison = useMemo(() => {
+    if (isTour) return null;
+    const parts: React.ReactNode[] = [];
+    const rank = courseSection.find((c) => c.key === 'rank');
+    const vs = courseSection.find((c) => c.key === 'vsavg');
+    if (rank && courseContext?.rankHere != null) {
+      const head = courseContext.rankHere === 1 ? t('courses:scorecard.tile.best') : rank.value;
+      parts.push(<span key="rank" data-comparison-part="rank"><b style={{ color: '#F8FAFC', fontWeight: 600 }}>{head}</b> {rank.label}</span>);
+    }
+    if (vs) {
+      parts.push(<span key="vs" data-comparison-part="vsavg"><b style={{ color: '#F8FAFC', fontWeight: 600 }}>{vs.value}</b> {t(isOwner ? 'courses:scorecard.tile.vsAvgSelf' : 'courses:scorecard.tile.vsAvgOther', { possessive: scopeVoice.possessive })}</span>);
+    }
+    if (parts.length === 0) return null;
+    return parts.length === 2 ? <>{parts[0]}{' \u00B7 '}{parts[1]}</> : parts[0];
+  }, [isTour, courseSection, courseContext, isOwner, scopeVoice.possessive, t]);
+
+  /* §1a — TOP 100 stamp: drawn by a child that owns the review tile's read
+     (same key, shared cache); only mounted under a query provider, so the
+     sheet keeps rendering standalone. Loading/failed draws no stamp. */
+  const hasQueryClient = React.useContext(QueryClientContext) != null;
+  const top100Slot = courseId && hasQueryClient ? <SheetTop100Stamp courseId={courseId} enabled={open} /> : null;
 
 
 
@@ -758,6 +792,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * takes the same explained state as a round with no rows at all.
    */
   const hasHoles = cardCause === 'ok' || cardCause === 'partial';
+  const fieldSentence = (() => {
+    if (isTour || !fieldGateOpen || !withField || beatFieldOn == null) return null;
+    const text = t(isOwner ? 'courses:scorecard.beatFieldSelf' : 'courses:scorecard.beatFieldOther', { name: playerName, n: beatFieldOn, m: fieldHoles.length });
+    const fig = t('courses:scorecard.tile.fieldFigure', { n: beatFieldOn, m: fieldHoles.length });
+    const at = fig ? text.indexOf(fig) : -1;
+    if (at < 0) return text;
+    return <>{text.slice(0, at)}<b style={{ color: '#F8FAFC', fontWeight: 600 }}>{fig}</b>{text.slice(at + fig.length)}</>;
+  })();
+  /* §2f / §3 — the ground the fade and the liker rings read. */
+  const ground = presentation === 'page' ? PAGE_CANVAS : (GLASS_CARD.background as string);
+  const showFooter = !!engagement || !!onShareRound;
+
   return (
     <ScorecardGlassOverlay
       open={open}
@@ -769,8 +815,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       presentation={presentation}
     >
       <div
+        data-scorecard-tile="true"
         style={{
-          display: 'flex', flexDirection: 'column', fontFamily: SANS, flex: 1, minHeight: 0, ...FIGS,
+          display: 'flex', flexDirection: 'column', fontFamily: SANS, flex: 1, minHeight: 0, minWidth: 0, containerType: 'inline-size', ...FIGS,
           ...(pageShift
             ? {
                 transform: `translate3d(${pageShift.dx}px, 0, 0)`,
@@ -783,71 +830,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             : null),
         }}
       >
-
-        {/*
-          S1 — THE FIXED SUMMARY (BRIEF_ROUND_SHEET_SPLIT).
-
-          The score used to appear only at the FOOT of the expanded grid, after a
-          date, a course, a handicap index and two links. It is now the first
-          thing on the sheet and it does not scroll: the card, the breakdown and
-          the card scroll beneath this block.
-
-          §2.2 — A HORIZONTAL drag is read anywhere on the glass card and pages
-          between rounds; the axis locks after 8px and only goes horizontal when
-          it is clearly horizontal, so neither the dismiss nor the body scroll
-          loses a gesture to it. This block does NOT print the breakdown any
-          more: the fixed summary is the gross, the to-par, the player and the
-          date, and nothing else.
-        */}
-        {/* S7 — ONE FLAT MEMBER BAND. Metal and its rarity separation retired
-            18 Sep 2026 when this widened from two permanent facts to five. */}
-        {feat && (
-          <div data-scorecard-feat={feat.kind} style={{ ...FEAT_BAND_STYLE, alignItems: 'center' }}>
-            {feat.kind === 'birdies' ? (
-              // The Explore callout's mark, not a redraw: one component, no drift.
-              <BirdieCountIcon count={feat.count} />
-            ) : (
-              <span
-                aria-hidden="true"
-                style={{
-                  flex: '0 0 14px', width: 14, fontSize: 14, lineHeight: 1,
-                  fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
-                }}
-              >
-                {feat.kind === 'ace' ? '⛳' : feat.kind === 'albatross' ? '🔥' : feat.kind === 'eagle' ? '🦅' : '🛡️'}
-              </span>
-            )}
-            <span style={{ display: 'flex', minWidth: 0, flexDirection: 'column', gap: 3 }}>
-              <span
-                // Headline in INK, as AchievementCallout: amber is a tag's job,
-                // never a headline's. No tag here — the sheet has nothing extra to say.
-                style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK }}
-              >
-                {t(
-                  feat.kind === 'eagle' && feat.count >= 2
-                    ? 'courses:scorecard.feat.eagleBrace.label'
-                    : `courses:scorecard.feat.${feat.kind}.label`,
-                )}
-              </span>
-              {surface === 'member' && (rarity.ownerLine ?? rarity.viewerLine) ? (
-                <span
-                  data-feat-rarity-lines="true"
-                  data-feat-rarity-owner={rarity.ownerLine ? 'true' : undefined}
-                  data-feat-rarity-viewer={rarity.ownerLine ? undefined : 'true'}
-                  style={{ fontSize: 11.5, fontWeight: rarity.ownerLine ? 700 : 600, lineHeight: 1.3, color: rarity.ownerLine ? SC_FILL_GOLD : A.MUTE, whiteSpace: 'normal', overflowWrap: 'break-word' }}
-                >
-                  {rarity.ownerLine ?? rarity.viewerLine}
-                </span>
-              ) : (feat.hole != null || feat.kind === 'birdies' || feat.kind === 'clean') ? (
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: A.MUTE }}>
-                  {feat.hole != null
-                    ? t('courses:scorecard.feat.onHole', { hole: formatOrdinal(feat.hole) })
-                    : t(`courses:scorecard.feat.${feat.kind}.sub`)}
-                </span>
-              ) : null}
-            </span>
-          </div>
-        )}
+        <style>{`[data-scorecard-tile] [data-liked-stack-short]{display:none}@container (max-width:300px){[data-scorecard-tile] [data-liked-stack-long]{display:none}[data-scorecard-tile] [data-liked-stack-short]{display:inline}}`}</style>
         {/*
           §3 — PAGING FOR A READER WHO IS NOT SWIPING. Two real buttons, hidden
           from sight and not from focus or a screen reader, disabled at the ends;
@@ -877,50 +860,95 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </div>
           </div>
         )}
-        {/* S1 — THE FIXED SUMMARY, now the shared RoundSummaryHead so the sheet
-            and the swipe preview draw the identical block (BRIEF_ROUND_SHEET_PEEK). */}
+        {/* SCORECARD_TILE_REDESIGN §1 — THE FIXED HEADER (shared with the swipe
+            preview): kicker, course, player row, score row, comparison. The
+            Course/Profile pills and the hairline under the header are gone. */}
         <RoundSummaryHead
           isTour={isTour}
           kickerText={kickerText}
           memberDateText={memberDateText}
+          playDate={playDate}
+          roundsHere={isTour ? null : (courseContext?.roundsHere ?? null)}
           courseName={courseName}
           courseLocation={courseLocation}
+          top100Slot={top100Slot}
           showScore={totals.played}
           gross={totals.gross}
           toPar={totals.toPar}
-          shownPar={shownPar}
-          playedHoles={playedHolesForHead}
-          coursePar={coursePar ?? null}
           heroMuted={heroMuted}
           playerName={playerName}
           playerAvatarUrl={playerAvatarUrl}
           playerUserId={playerUserId}
           tourAvatarCandidates={tourAvatarCandidates}
           isOwner={isOwner}
-          playerHcp={playerHcp}
-          playerHcpDelta={playerHcpDelta}
-          playedOffIndex={isTour ? null : (courseContext?.indexAtTime ?? null)}
+          cells={headCells}
+          comparison={comparison}
           onViewCourse={onViewCourse}
           onViewProfile={onViewProfile}
-          rail={rail}
         />
-
 
         <div
           data-scorecard-scroll="true"
           style={{
-            flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
-            /* No fill — the sheet surface shows through
-               (BRIEF_SHEET_BACKGROUND_CANON). */
-            padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 14px)',
-            display: 'flex', flexDirection: 'column', gap: 12,
+            flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', position: 'relative',
+            padding: '22px 20px 8px',
+            display: 'flex', flexDirection: 'column', gap: 26, minWidth: 0,
           }}
         >
-          {/* ROUND SELECTOR */}
+          {feat && (
+            <TileSection kicker={t('courses:scorecard.tile.featKicker')} testId="feat">
+            <div data-scorecard-feat={feat.kind} style={{ ...FEAT_BAND_STYLE, alignItems: 'center', marginTop: 10 }}>
+              {feat.kind === 'birdies' ? (
+                // The Explore callout's mark, not a redraw: one component, no drift.
+                <BirdieCountIcon count={feat.count} />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  style={{
+                    flex: '0 0 14px', width: 14, fontSize: 14, lineHeight: 1,
+                    fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
+                  }}
+                >
+                  {feat.kind === 'ace' ? '⛳' : feat.kind === 'albatross' ? '🔥' : feat.kind === 'eagle' ? '🦅' : '🛡️'}
+                </span>
+              )}
+              <span style={{ display: 'flex', minWidth: 0, flexDirection: 'column', gap: 3 }}>
+                <span
+                  // Headline in INK, as AchievementCallout: amber is a tag's job,
+                  // never a headline's. No tag here — the sheet has nothing extra to say.
+                  style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK }}
+                >
+                  {t(
+                    feat.kind === 'eagle' && feat.count >= 2
+                      ? 'courses:scorecard.feat.eagleBrace.label'
+                      : `courses:scorecard.feat.${feat.kind}.label`,
+                  )}
+                </span>
+                {surface === 'member' && (rarity.ownerLine ?? rarity.viewerLine) ? (
+                  <span
+                    data-feat-rarity-lines="true"
+                    data-feat-rarity-owner={rarity.ownerLine ? 'true' : undefined}
+                    data-feat-rarity-viewer={rarity.ownerLine ? undefined : 'true'}
+                    style={{ fontSize: 11.5, fontWeight: rarity.ownerLine ? 700 : 600, lineHeight: 1.3, color: rarity.ownerLine ? SC_FILL_GOLD : A.MUTE, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+                  >
+                    {rarity.ownerLine ?? rarity.viewerLine}
+                  </span>
+                ) : (feat.hole != null || feat.kind === 'birdies' || feat.kind === 'clean') ? (
+                  <span style={{ fontSize: 11.5, fontWeight: 600, color: A.MUTE }}>
+                    {feat.hole != null
+                      ? t('courses:scorecard.feat.onHole', { hole: formatOrdinal(feat.hole) })
+                      : t(`courses:scorecard.feat.${feat.kind}.sub`)}
+                  </span>
+                ) : null}
+              </span>
+            </div>
+            </TileSection>
+          )}
           {rounds && rounds.available.length > 1 && (
+            <TileSection kicker={t('courses:scorecard.tile.roundsKicker')} testId="rounds">
             <div
               onClick={(event) => event.stopPropagation()}
-              style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}
+              style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, marginTop: 10 }}
             >
               {rounds.available.map((r) => {
                 const active = r === rounds.active;
@@ -952,6 +980,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 );
               })}
             </div>
+            </TileSection>
           )}
 
           {loading || cardCause === 'pending' ? (
@@ -972,57 +1001,17 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </div>
           ) : (
             <>
-              {/*
-                S4.1 — THE CARD LEADS, because that is what the sheet is for. It
-                is no longer behind a "Full scorecard" toggle: the grid was on
-                the same screen as its own CTA. The scoring key stays with the
-                card, directly beneath it (S4.2).
-              */}
-              <div>
-              <ScorecardSection kicker={t('courses:scorecard.theCard')} flat={!isTour}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <Nine rows={out} label={t('courses:scorecard.out')} />
-                  {back.length > 0 && (
-                    <Nine rows={back} label={t('courses:scorecard.in')} />
-                  )}
-
-                  {/*
-                    BRIEF_ROUND_SCORECARD_REBUILD §B — THE GRAND TOTALS BLOCK IS
-                    GONE. It printed the gross, the round par and the to-par a
-                    second time, directly under a fixed header that shows all
-                    three and never scrolls away. THE PER-NINE TOTALS SURVIVE:
-                    each <Nine> still carries its own par and strokes total in
-                    the right-hand column beside its OUT / IN label, which is the
-                    figure a reader actually adds. Nothing else moved.
-                  */}
-
-
-                  {/* §1.4 — THE SCORING KEY IS GONE. Circles and boxes are
-                      standard golf notation; a card does not carry its own
-                      glossary. `Legend` is now DELETED (follow-up B).
-
-                      FOLLOW-UP A — THE ONE MARK THAT IS NOT NOTATION. The faint
-                      mid-dot for a hole the member never played was only ever
-                      explained inside the key, so it left with it. It is named
-                      here instead, in the key's own quiet style, and ONLY while
-                      the round has an unplayed hole: a complete card says
-                      nothing. Every consumer of this sheet gets the line. */}
-                  {hasUnplayedHole && <NotPlayedLine />}
-                  {/* BRIEF_SCORECARD_SHEET C.1 — THE KEY RETURNS, four items on one
-                      line, each swatch the REAL ScoreMark treatment (never a
-                      redraw). Par carries no mark, so it gets no entry. */}
-                  <ScoringKey />
+              {/* §2a — THE CARD: two glass nines (one for a nine-hole round),
+                  then the key. The not-played line stays while a hole is unplayed. */}
+              <TileSection kicker={t('courses:scorecard.theCard')} testId="card">
+                <div data-scorecard-nines="true" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10, minWidth: 0 }}>
+                  <TileNine rows={out} label={t('courses:scorecard.out')} />
+                  {back.length > 0 && <TileNine rows={back} label={t('courses:scorecard.in')} />}
                 </div>
-              </ScorecardSection>
-              </div>
+                {hasUnplayedHole && <div style={{ marginTop: 10 }}><NotPlayedLine /></div>}
+                <TileKey />
+              </TileSection>
 
-              {/*
-                BRIEF_SCORECARD_SHEET C.6 — TWO BASES, EACH NAMED BEFORE ITS
-                FIGURES. The own-rounds section leads with its heading and line;
-                the awards, the two-item strip and the efforts table sit inside
-                it. The field sentence sits in its own block under its own
-                heading, so no string claims "own rounds only" beside it.
-              */}
               {!isTour && (
                 <div ref={statsRef}>
                   <RoundResults
@@ -1033,131 +1022,97 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       ...scopeVoice,
                     } : null}
                     voice={playerName || isOwner ? scopeVoice : null}
-                    strip={courseSection.length > 0 ? (
-                      <div data-scorecard-course-figures="true" style={{ display: 'grid', gridTemplateColumns: `repeat(${courseSection.length}, minmax(0, 1fr))`, alignItems: 'start' }}>
-                        {courseSection.map((it) => (
-                          <div key={it.key} data-scorecard-strip-item={it.key} style={{ minWidth: 0, textAlign: 'center', padding: '0 4px' }}>
-                            <div style={{ ...RAIL_FIG, color: A.INK }}>{it.value}</div>
-                            <div style={{ ...LABEL, fontSize: 9.5, marginTop: 5, lineHeight: 1.25 }}>{it.label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
                   />
                 </div>
               )}
-              {!isTour && fieldGateOpen && withField && beatFieldOn != null && (
+              {fieldSentence != null && (
                 <section data-scorecard-field-block="true">
-                  <h3 style={{ ...LABEL, margin: 0, fontSize: 9.5, color: A.DIM }}>
+                  <h3 style={{ ...TILE_KICKER, margin: 0 }}>
                     {tH('roundResults.scope.fieldHeading')}
                   </h3>
-                  <p style={{ ...CAPTION, marginTop: 5 }}>
-                    {t(isOwner ? 'courses:scorecard.beatFieldSelf' : 'courses:scorecard.beatFieldOther', {
-                      name: playerName,
-                      n: beatFieldOn,
-                      m: fieldHoles.length,
-                    })}
+                  <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.5, color: 'rgba(248,250,252,0.82)' }}>
+                    {fieldSentence}
                   </p>
                 </section>
               )}
-
-              {/* §1.4 — THE ROUND BREAKDOWN IS GONE. It recounted, as four
-                  figures and a bar, the card that sits directly above it.
-                  `RoundSplit` and the `split` derivation are DEAD-LISTED, not
-                  deleted, and `courses:scorecard.split*` keys stay in all six
-                  locale files. */}
-
             </>
           )}
-
-          {/* TOUR SCORECARD TILE — the tour Course/Profile foot actions moved
-              up into the identity row (scorecardParts); with no engagement row
-              and no Share the whole foot block does not render, so the tile
-              ends at the scroll padding below the card. */}
-          {(engagement || onShareRound) && (
-            <div
-              data-scorecard-interactive="true"
-              onClick={(event) => event.stopPropagation()}
-              style={{ paddingTop: 2 }}
-            >
-              {engagement && (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <RoundEngagementActions
-                    /* A scorecard is always a ROUND: the clap (lib/reactionKind). */
-                    kind="celebrate"
-                    comment={engagement.comment ?? null}
-                    like={{
-                      hidden: engagement.likeHidden,
-                      count: engagement.likeCount,
-                      reacted: engagement.likeMine,
-                      onToggle: engagement.onToggleLike,
-                      label: engagement.likeLabel,
-                    }}
-                  />
-                  {/* C.7 — SHARE JOINS THE ENGAGEMENT ROW, where it sits elsewhere. */}
-                  {onShareRound && (
-                    <button
-                      type="button"
-                      data-scorecard-share="true"
-                      aria-label={t('courses:scorecard.shareRound')}
-                      onClick={onShareRound}
-                      style={{ marginLeft: 18, display: 'inline-flex', alignItems: 'center', background: 'none', border: 0, padding: 0, color: A.MUTE, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
-                    >
-                      <Share size={18} strokeWidth={1.8} aria-hidden="true" />
-                    </button>
-                  )}
-                </div>
-              )}
-              {/* CB56 — content-sized bottom sheet: a growing line would lift its top edge. */}
-              {engagement?.postId && (
-                <LikedByRow
-                  reserve
-                  postId={engagement.postId}
-                  count={engagement.likeCount}
-                  source={engagement.likeSource ?? 'post'}
-                  kind="celebrate"
-                  /* No course id is held here: the context line shows, the
-                     per-liker course segment stays silent (H.5). */
-                  subject={{
-                    authorName: (ownerDisplayName ?? playerName) || null,
-                    courseId: null,
-                    courseName: courseName ?? null,
-                    kind: 'round',
-                    gross: totals.played ? totals.gross : null,
-                    toPar: totals.played ? totals.toPar : null,
-                    rating: null,
-                  }}
-                  isOwnRound={isOwner}
-                  ownerName={isTour ? null : (playerName.trim().split(/\s+/)[0] || null)}
-                  surfaceColor={SHEET_SURFACE}
-                  style={{ marginTop: 8 }}
-                />
-              )}
-              {engagement?.comment && engagement.comment.count > 0 && engagement.commentPreview && (
-                <div style={{ marginTop: 8 }}>
-                  <FeedCommentPreview
-                    preview={engagement.commentPreview}
-                    commentCount={engagement.comment.count}
-                    onOpenComments={engagement.comment.onOpen}
-                    topRule={false}
-                    padding="0"
-                  />
-                </div>
-              )}
-              {/* With no engagement row there is nowhere else for Share to sit. */}
-              {!engagement && onShareRound && <div
-                data-scorecard-exit-links="true"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'minmax(0, 1fr)',
-                  marginTop: 14,
-                }}
-              >
-                <GlassCardFootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />
-              </div>}
-            </div>
-          )}
+          {/* §2f — the body runs under a 28px fade into the card ground. */}
+          <div
+            aria-hidden
+            data-scorecard-scroll-fade="true"
+            style={{
+              position: 'sticky', bottom: -8, height: 28, flex: 'none',
+              marginTop: -54, marginLeft: -20, marginRight: -20,
+              pointerEvents: 'none',
+              background: `linear-gradient(to bottom, transparent, ${ground})`,
+            }}
+          />
         </div>
+
+        {/* §3 — THE FOOTER: one row. Like, comment, share (where offered), then
+            the likers stack at the right. No comment preview, no stacked rows;
+            with no likes the right side is empty and the row height holds. */}
+        {showFooter && (
+          <div
+            data-scorecard-interactive="true"
+            data-scorecard-footer="true"
+            onClick={(event) => event.stopPropagation()}
+            style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, minHeight: 44, padding: '2px 12px calc(env(safe-area-inset-bottom, 0px) + 10px)' }}
+          >
+            {engagement && (
+              <ReactionAction
+                hidden={engagement.likeHidden}
+                count={engagement.likeCount}
+                reacted={engagement.likeMine}
+                onToggle={engagement.onToggleLike}
+                label={engagement.likeLabel}
+                size={19}
+                kind="celebrate"
+                footerBox={{ color: TILE_MUTE, reactedColor: REACTED }}
+              />
+            )}
+            {engagement?.comment && (
+              <CommentAction
+                count={engagement.comment.count}
+                onOpen={engagement.comment.onOpen}
+                label={engagement.comment.label}
+                size={19}
+                footerBox={{ color: TILE_MUTE }}
+              />
+            )}
+            {onShareRound && (
+              <button
+                type="button"
+                data-scorecard-share="true"
+                aria-label={t('courses:scorecard.shareRound')}
+                onClick={onShareRound}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none', width: 44, height: 44, padding: 0, background: 'none', border: 0, color: TILE_MUTE, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+              >
+                <Share size={18} strokeWidth={1.9} aria-hidden="true" />
+              </button>
+            )}
+            {engagement?.postId && (
+              <LikedByRow
+                variant="stack"
+                postId={engagement.postId}
+                count={engagement.likeCount}
+                source={engagement.likeSource ?? 'post'}
+                kind="celebrate"
+                subject={{
+                  authorName: (ownerDisplayName ?? playerName) || null,
+                  courseId: null,
+                  courseName: courseName ?? null,
+                  kind: 'round',
+                  gross: totals.played ? totals.gross : null,
+                  toPar: totals.played ? totals.toPar : null,
+                  rating: null,
+                }}
+                surfaceColor={ground}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/*
@@ -1191,6 +1146,24 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     </ScorecardGlassOverlay>
   );
 };
+
+function SheetTop100Stamp({ courseId, enabled }: { courseId: string; enabled: boolean }) {
+  const q = useQuery({
+    queryKey: ['courses', 'review-sheet-top100', courseId],
+    enabled,
+    staleTime: 60_000,
+    queryFn: async (): Promise<boolean> => {
+      const { data, error } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id, top100_lists!inner(slug, is_active)')
+        .eq('course_id', courseId)
+        .eq('top100_lists.is_active', true);
+      if (error) throw error;
+      return activeTop100CourseIds((data ?? []) as unknown as Top100MembershipRow[]).has(courseId);
+    },
+  });
+  return q.data === true ? <Top100Stamp /> : null;
+}
 
 export default CardScorecardSheet;
 

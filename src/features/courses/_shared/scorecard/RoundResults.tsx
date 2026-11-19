@@ -3,12 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { fmtToPar } from '@/components/feed/fmtToPar';
 import type { RoundAwardRow, RoundAwardsResult, RoundAwardUnitKind, RoundEffortRow } from '@/hooks/gam/useRoundAwards';
-import {
-  HAIRLINE_INK_8,
-  INK,
-  INK_FAINT,
-  LIVE_INK,
-} from '@/features/tourhub/_shared/tokens';
+import { TILE_DIM, TILE_INK, TILE_KICKER, TILE_MUTE, TileSection } from './scorecardParts';
 import { SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AwardMark } from '@/components/awards/AwardMark';
 import { formatOrdinal } from '@/i18n/format';
@@ -157,22 +152,13 @@ function AwardRow({ award, voice }: { award: RoundAwardRow; voice?: RoundResults
   const subline = awardSentence(award, t, voice);
 
   return (
-    <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '22px minmax(0,1fr)', alignItems: 'center', gap: 10, padding: '10px 0' }}>
-      <AwardMark tier={award.tier} size="sheet" />
+    <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '32px minmax(0,1fr)', alignItems: 'center', gap: 12, marginTop: 12 }}>
+      <AwardMark tier={award.tier} size="tile" />
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', color: INK, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25 }}>{awardTitle(award, t, voice)}</span>
-        {subline && <span data-round-award-line="true" style={{ display: 'block', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.35, marginTop: 3 }}>{subline}</span>}
+        <span style={{ display: 'block', color: TILE_INK, fontSize: 14.5, fontWeight: 600, lineHeight: 1.3 }}>{awardTitle(award, t, voice)}</span>
+        {subline && <span data-round-award-line="true" style={{ display: 'block', color: TILE_MUTE, fontSize: 12.5, lineHeight: 1.35, marginTop: 2 }}>{subline}</span>}
       </span>
     </div>
-  );
-}
-
-function Block({ title, children, testId }: { title: string; children: React.ReactNode; testId: string }) {
-  return (
-    <section data-round-results-block={testId} style={{ borderTop: `0.5px solid ${HAIRLINE_INK_8}`, paddingTop: 12 }}>
-      <h3 style={{ margin: '0 0 3px', color: INK_FAINT, fontSize: 10, fontWeight: 700, lineHeight: 1.2, textTransform: 'uppercase' }}>{title}</h3>
-      {children}
-    </section>
   );
 }
 
@@ -201,70 +187,81 @@ export function RoundResults({ result, scope, voice, strip = null }: {
   if (awards.length === 0 && holes.length === 0 && efforts.length === 0 && !strip) return null;
 
   /* C.5 — THE PLACING COLUMN EXISTS ONLY WHEN SOMETHING PLACED. A dash means the
-     RPC supplied no rank; there is no best value to fill it with, so with every
-     row unplaced the column and its header are not drawn at all. */
+     RPC supplied no rank; with every row unplaced the column and its header
+     are not drawn at all. SCORECARD_TILE_REDESIGN §2d: no green; a 1st is ink. */
   const anyPlaced = efforts.some((e) => placingText(e.rank_here, e.top_ten, t) != null);
-  const cols = anyPlaced ? 'minmax(0,1fr) 48px minmax(96px,112px)' : 'minmax(0,1fr) 48px';
-  const headStyle: React.CSSProperties = { color: INK_FAINT, fontSize: 8.5, fontWeight: 700, lineHeight: 1.2, textTransform: 'uppercase' };
+  const cols = anyPlaced ? 'minmax(0,1fr) 56px 64px' : 'minmax(0,1fr) 56px';
+  const headStyle: React.CSSProperties = { color: TILE_DIM, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', lineHeight: 1.2, textTransform: 'uppercase', whiteSpace: 'nowrap' };
+  const possessive = scope?.possessive ?? t('roundResults.scope.their');
 
   const resultsTable = efforts.length > 0 ? (
-    <Block title={t('roundResults.sections.efforts')} testId="efforts">
-      <div data-round-efforts-table="true" data-round-efforts-columns={anyPlaced ? 3 : 2} style={{ minWidth: 0, overflowX: 'clip' }}>
-        <div data-round-efforts-header="true" style={{ display: 'grid', gridTemplateColumns: cols, alignItems: 'end', gap: 8, paddingBottom: 7 }}>
-          <span style={headStyle}>{t('roundResults.columns.round')}</span>
-          <span style={{ ...headStyle, textAlign: 'right' }}>{t('roundResults.columns.score')}</span>
-          {anyPlaced && (
-            <span data-round-efforts-placing-header="true" style={{ ...headStyle, textAlign: 'right' }}>
-              {t('roundResults.columns.best', { possessive: scope?.possessive ?? t('roundResults.scope.their') })}
-            </span>
-          )}
-        </div>
-        {efforts.map((effort) => {
-          const placing = placingText(effort.rank_here, effort.top_ten, t);
-          return (
-            <div key={effort.unit_kind} data-round-effort={effort.unit_kind} style={{ minHeight: 46, display: 'grid', gridTemplateColumns: cols, alignItems: 'center', gap: 8 }}>
-              <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', color: INK, fontSize: 13, fontWeight: 600, lineHeight: 1.2 }}>{t(unitKey(effort.unit_kind))}</span>
-                <span data-round-effort-span="true" style={{ display: 'block', color: INK_FAINT, fontSize: 10.5, lineHeight: 1.2, marginTop: 3 }}>{t(spanKey(effort.unit_kind))}</span>
-              </span>
-              <span style={{ color: INK, fontSize: 15, fontWeight: 700, lineHeight: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatValue(effort.unit_kind, effort.value)}</span>
-              {anyPlaced && (
-                <span data-round-effort-placing={placing ?? undefined} style={{ color: placing ? LIVE_INK : INK_FAINT, fontSize: 11.5, fontWeight: placing ? 700 : 500, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing ?? '\u2014'}</span>
-              )}
-            </div>
-          );
-        })}
+    <div data-round-efforts-table="true" data-round-efforts-columns={anyPlaced ? 3 : 2} style={{ minWidth: 0, overflowX: 'clip', marginTop: 6, fontVariantNumeric: 'tabular-nums' }}>
+      <div data-round-efforts-header="true" style={{ display: 'grid', gridTemplateColumns: cols, alignItems: 'center', height: 24 }}>
+        <span style={headStyle}>{t('roundResults.columns.round')}</span>
+        <span style={{ ...headStyle, textAlign: 'right' }}>{t('roundResults.columns.score')}</span>
+        {anyPlaced && (
+          <span data-round-efforts-placing-header="true" style={{ ...headStyle, textAlign: 'right' }}>
+            {t('roundResults.columns.best', { possessive })}
+          </span>
+        )}
       </div>
-    </Block>
+      {efforts.map((effort) => {
+        const placing = placingText(effort.rank_here, effort.top_ten, t);
+        const first = effort.rank_here === 1;
+        return (
+          <div key={effort.unit_kind} data-round-effort={effort.unit_kind} style={{ height: 46, display: 'grid', gridTemplateColumns: cols, alignItems: 'center' }}>
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: 'block', color: TILE_INK, fontSize: 14.5, fontWeight: 600, lineHeight: 1.2 }}>{t(unitKey(effort.unit_kind))}</span>
+              <span data-round-effort-span="true" style={{ display: 'block', color: TILE_DIM, fontSize: 12, lineHeight: 1.2, marginTop: 1 }}>{t(spanKey(effort.unit_kind))}</span>
+            </span>
+            <span style={{ color: TILE_INK, fontSize: 15, fontWeight: 700, lineHeight: 1, textAlign: 'right' }}>{formatValue(effort.unit_kind, effort.value)}</span>
+            {anyPlaced && (
+              <span data-round-effort-placing={placing ?? undefined} data-round-effort-first={first ? 'true' : undefined} style={{ color: first ? TILE_INK : TILE_MUTE, fontSize: 14, fontWeight: first ? 700 : 600, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing ?? '\u2014'}</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
   ) : null;
 
+  /* SCORECARD_TILE_REDESIGN §2c/§2d — three titled sections in the tile's
+     grammar: AWARDS, the hole awards (kept, same kicker treatment), then the
+     own-rounds section (heading, scope note, efforts table). No rules. */
   return (
-    <section data-round-results="true" data-round-results-own="true" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS }}>
-      {scope && (
-        <div data-round-results-scope="true" style={{ minWidth: 0 }}>
-          <h3 style={{ margin: 0, color: INK_FAINT, fontSize: 9.5, fontWeight: 700, lineHeight: 1.2, letterSpacing: '0.13em', textTransform: 'uppercase' }}>
-            {t('roundResults.scope.ownHeading', { possessive: scope.possessive })}
-          </h3>
-          <p style={{ margin: '5px 0 0', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.45 }}>
-            {t('roundResults.scope.ownLine', {
-              count: scope.roundsHere,
-              object: t(`roundResults.scope.object.${scope.pronoun ?? 'they'}`),
-            })}
-          </p>
-        </div>
-      )}
+    <div data-round-results="true" data-round-results-own="true" style={{ display: 'flex', flexDirection: 'column', gap: 26, fontFamily: SANS, minWidth: 0 }}>
       {awards.length > 0 && (
-        <Block title={t('roundResults.sections.awards')} testId="awards">
-          {awards.map((award, index) => <AwardRow key={`${award.unit_kind}:${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
-        </Block>
+        <TileSection kicker={t('roundResults.sections.awards')} testId="awards">
+          <div data-round-results-block="awards">
+            {awards.map((award, index) => <AwardRow key={`${award.unit_kind}:${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
+          </div>
+        </TileSection>
       )}
       {holes.length > 0 && (
-        <Block title={t('roundResults.sections.holes')} testId="holes">
-          {holes.map((award, index) => <AwardRow key={`${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
-        </Block>
+        <TileSection kicker={t('roundResults.sections.holes')} testId="holes">
+          <div data-round-results-block="holes">
+            {holes.map((award, index) => <AwardRow key={`${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
+          </div>
+        </TileSection>
       )}
       {strip}
-      {resultsTable}
-    </section>
+      {(scope || resultsTable) && (
+        <section data-round-results-scope={scope ? 'true' : undefined} data-round-results-block={resultsTable ? 'efforts' : undefined} style={{ minWidth: 0 }}>
+          {scope && (
+            <>
+              <h3 style={{ ...TILE_KICKER, margin: 0 }}>
+                {t('roundResults.scope.ownHeading', { possessive: scope.possessive })}
+              </h3>
+              <p style={{ margin: '6px 0 0', color: TILE_MUTE, fontSize: 12.5, lineHeight: 1.45 }}>
+                {t('roundResults.scope.ownLine', {
+                  count: scope.roundsHere,
+                  object: t(`roundResults.scope.object.${scope.pronoun ?? 'they'}`),
+                })}
+              </p>
+            </>
+          )}
+          {resultsTable}
+        </section>
+      )}
+    </div>
   );
 }

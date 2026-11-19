@@ -1,6 +1,4 @@
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
-import { formatHcp } from '@/lib/formatHcp';
-import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 /**
  * BRIEF_ROUND_SHEET_PEEK §1 — THE SCORECARD'S SHARED PARTS.
  *
@@ -16,15 +14,15 @@ import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap'
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapPin, RefreshCw, Table, User } from 'lucide-react';
-import { SheetDoorButton } from './SheetDoorButton';
+import { ChevronRight, RefreshCw, Table } from 'lucide-react';
+import { ScoreFigureRow } from '@/components/shared/ScoreFigureRow';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { TREND_UP, TREND_DOWN, TOPAR_EVEN_DARK } from '@/features/tourhub/_shared/tokens';
 import {
-  A, SANS, NUM, KICKER, Panel, StatRow, Hairline,
+  A, SANS, NUM, KICKER, Panel, StatRow,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
@@ -343,208 +341,246 @@ export interface RailFigure {
   tone?: string;
 }
 
+/* ------------------------------------------- SCORECARD_TILE_REDESIGN parts */
+
+/** The tile's quiet tones (signed-off scorecard-tile mock). */
+export const TILE_DIM = 'rgba(248,250,252,0.42)';
+export const TILE_MUTE = 'rgba(248,250,252,0.62)';
+export const TILE_BODY = 'rgba(248,250,252,0.82)';
+export const TILE_INK = '#F8FAFC';
+
+/** Section / header kicker: 9.5px / 700, .16em, uppercase, dim. */
+export const TILE_KICKER: React.CSSProperties = {
+  fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: TILE_DIM, lineHeight: 1.2,
+};
+
+/** One body section: kicker then content; sections sit 26px apart (host gap). */
+export const TileSection: React.FC<{ kicker: string; children: React.ReactNode; testId?: string; sectionRef?: React.Ref<HTMLElement> }> = ({ kicker, children, testId, sectionRef }) => (
+  <section ref={sectionRef} data-scorecard-tile-section={testId} style={{ minWidth: 0 }}>
+    <h3 style={{ ...TILE_KICKER, margin: 0 }}>{kicker}</h3>
+    {children}
+  </section>
+);
+
+/** The TOP 100 stamp — the review tile's, by construction (one component). */
+export const Top100Stamp: React.FC<{ attr?: string }> = ({ attr = 'data-scorecard-top100' }) => (
+  <span {...{ [attr]: 'true' }} style={{ flex: 'none', height: 18, padding: '0 7px', borderRadius: 5, border: '1px solid rgba(255,255,255,0.28)', display: 'inline-flex', alignItems: 'center', boxSizing: 'border-box', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', color: TILE_INK }}>
+    TOP 100
+  </span>
+);
+
+const TILE_NINE_GRID = 'repeat(9, minmax(0, 1fr)) 36px';
+
+/**
+ * One glass nine: hole numbers, par, strokes (ScoreMark at 24px — the canon
+ * notation and colours), and a right-aligned OUT/IN total column. The partial
+ * nine rules are nineSummary's, unchanged from <Nine>.
+ */
+export const TileNine: React.FC<{ rows: ScorecardHoleRow[]; label: string }> = ({ rows, label }) => {
+  const { par, strokes, playedCount, parPlayed } = nineSummary(rows);
+  const started = playedCount > 0;
+  const partial = started && playedCount < rows.length;
+  const parTotal = !started ? '' : partial ? parPlayed : (par || '\u2014');
+  const strokesTotal = started ? strokes : '';
+  const cell: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0, whiteSpace: 'nowrap', lineHeight: 1.2, ...NUM };
+  const tot: React.CSSProperties = { ...cell, justifyContent: 'flex-end' };
+  return (
+    <div
+      data-scorecard-nine={label}
+      style={{
+        display: 'grid', gridTemplateColumns: TILE_NINE_GRID, columnGap: 2, rowGap: 5,
+        padding: '10px 8px 10px 4px', borderRadius: 12, background: 'rgba(255,255,255,0.06)', minWidth: 0,
+      }}
+    >
+      {rows.map((h) => <span key={`n${h.holeNo}`} data-nine-cell="hole" style={{ ...cell, fontSize: 10, fontWeight: 600, color: TILE_DIM }}>{h.holeNo}</span>)}
+      <span data-nine-total="label" style={{ ...tot, fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', color: TILE_MUTE, textTransform: 'uppercase' }}>{label}</span>
+      {rows.map((h) => <span key={`p${h.holeNo}`} data-nine-cell="par" style={{ ...cell, fontSize: 11, fontWeight: 600, color: TILE_DIM }}>{h.par ?? '\u2014'}</span>)}
+      <span data-nine-total="par" style={{ ...tot, fontSize: 11, fontWeight: 700, color: TILE_MUTE }}>{parTotal}</span>
+      {rows.map((h) => (
+        <span key={`s${h.holeNo}`} data-nine-cell="strokes" style={{ ...cell, height: 26, fontSize: 13.5, fontWeight: 700, color: TILE_INK }}>
+          <ScoreMark strokes={h.strokes} par={h.par ?? 4} size={24} numeralSize={13.5} parNumeralColor={TILE_INK} surface="dark" glassDoubleRings />
+        </span>
+      ))}
+      <span data-nine-total="strokes" style={{ ...tot, height: 26, fontSize: 14, fontWeight: 700, color: TILE_INK }}>{strokesTotal}</span>
+    </div>
+  );
+};
+
+const TILE_KEY_ITEMS = [
+  { key: 'under', strokes: 3 },
+  { key: 'bogey', strokes: 5 },
+  { key: 'double', strokes: 6 },
+  { key: 'triple', strokes: 7 },
+] as const;
+
+/** The key under the nines: the card's own ScoreMark at 11px, wrapping at 320. */
+export const TileKey: React.FC = () => {
+  const { t } = useTranslation(['courses']);
+  return (
+    <div data-scorecard-key="true" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 10, fontSize: 11, color: TILE_DIM, lineHeight: 1.2 }}>
+      {TILE_KEY_ITEMS.map((it) => (
+        <span key={it.key} data-scorecard-key-item={it.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <ScoreMark strokes={it.strokes} par={4} size={11} showStroke={false} surface="dark" glassDoubleRings />
+          {t(`courses:scorecard.key.${it.key}`)}
+        </span>
+      ))}
+    </div>
+  );
+};
+
 export interface RoundSummaryHeadProps {
   isTour?: boolean;
+  /** Tour sub-line: the existing date/eyebrow text. */
   kickerText?: string;
-  /** Member place line date (long form, sentence case). */
+  /** Member sub-line fallback when no play date is known (long date). */
   memberDateText?: string;
+  /** Member: the round's play date, for "Played {relative day}". */
+  playDate?: string | null;
+  /** Member: rounds at this course; null drops the "· N rounds here" part. */
+  roundsHere?: number | null;
   courseName: string;
   courseLocation?: string | null;
-  /** Shown only when the round has a score to show. */
+  /** The TOP 100 stamp node (or null) after the place. */
+  top100Slot?: React.ReactNode;
   showScore: boolean;
   gross: number | null;
   toPar: number | null;
-  /**
-   * The ROUND par the to-par is measured against, from roundCoursePar and
-   * nowhere else. NULL or 0 falls back to coursePar, and with neither the
-   * "· par N" suffix is dropped — the correct outcome for an incomplete card.
-   */
-  shownPar?: number | null;
-  /** Strict count of rows with `played === true && par != null`. */
-  playedHoles?: number;
-  coursePar?: number | null;
   heroMuted?: boolean;
   playerName?: string | null;
   playerAvatarUrl?: string | null;
   playerUserId?: string | null;
-  /** Tour only — the ordered candidate chain from the canonical resolver. */
   tourAvatarCandidates?: string[];
   isOwner?: boolean;
-  /** Member surface: the index under the player's name (handicapPairDisplay). */
-  playerHcp?: number | null;
-  playerHcpDelta?: number | null;
-  /**
-   * BRIEF_SCORECARD_SHEET C.4 — THE INDEX THE ROUND WAS PLAYED OFF. When present
-   * the identity line reads "Played off {index}" and the handicap appears
-   * nowhere else on the sheet. Null keeps the existing HCP line; today's index
-   * is never relabelled as the index at the time.
-   */
-  playedOffIndex?: number | null;
+  /** Cells after TO PAR, in order, only those with data. */
+  cells?: RailFigure[];
+  /** The comparison line (member only); null draws nothing. */
+  comparison?: React.ReactNode;
   onViewCourse?: () => void;
   onViewProfile?: () => void;
-  /** CB61: draw the same doors in the seed-only preview, without handlers. */
+  /** Swipe preview: draw the same row, inert. */
   previewDoors?: boolean;
+  /* Retained for caller compatibility; the tile head prints no par suffix,
+     no handicap pair and no stat rail (SCORECARD_TILE_REDESIGN §1). */
+  shownPar?: number | null;
+  playedHoles?: number;
+  coursePar?: number | null;
+  playerHcp?: number | null;
+  playerHcpDelta?: number | null;
+  playedOffIndex?: number | null;
   rail?: RailFigure[];
 }
 
+function playedWhen(iso: string | null | undefined, t: (k: string, o?: Record<string, unknown>) => string): string {
+  if (!iso) return '';
+  const day = iso.slice(0, 10);
+  const then = new Date(`${day}T12:00:00`).getTime();
+  if (!Number.isFinite(then)) return '';
+  const days = Math.max(0, Math.round((Date.now() - then) / 86_400_000));
+  if (days === 0) return t('courses:discover.when.today');
+  if (days === 1) return t('courses:discover.when.yesterday');
+  if (days < 7) return t('courses:discover.when.fullDaysAgo', { count: days });
+  if (days < 70) return t('courses:discover.when.fullWeeksAgo', { count: Math.max(1, Math.round(days / 7)) });
+  if (days < 365) return t('courses:discover.when.fullMonthsAgo', { count: Math.max(1, Math.round(days / 30.44)) });
+  return t('courses:discover.when.fullYearsAgo', { count: Math.max(1, Math.round(days / 365.25)) });
+}
+
 /**
- * S1 — THE FIXED SUMMARY. Course, place, member, gross, to-par, and the rail
- * when a figure resolves. One component for the sheet and for the neighbour
- * preview drawn during a swipe.
+ * S1 — THE FIXED SUMMARY, rebuilt to the signed-off scorecard tile: kicker
+ * (place + TOP 100), two-line course name (taps to the course), the player row
+ * (taps to the profile, chevron right), the GROSS figure row and the member
+ * comparison line. One component for the sheet and the swipe preview.
  */
 export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
-  isTour = false, kickerText, memberDateText, courseName, courseLocation,
-  showScore, gross, toPar, shownPar = 0, playedHoles = 0, coursePar,
-  heroMuted, playerName, playerAvatarUrl, playerUserId,
-  tourAvatarCandidates = [], isOwner = false, playerHcp, playerHcpDelta, playedOffIndex = null, rail = [],
+  isTour = false, kickerText, memberDateText, playDate = null, roundsHere = null,
+  courseName, courseLocation, top100Slot = null,
+  showScore, gross, toPar, heroMuted,
+  playerName, playerAvatarUrl, playerUserId, tourAvatarCandidates = [], isOwner = false,
+  cells = [], comparison = null,
   onViewCourse, onViewProfile, previewDoors = false,
 }) => {
   const { t } = useTranslation(['courses']);
-  const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
-  const showIdentity = !!playerName;
-  // Member surface: the round's date joins the place line (both are
-  // circumstances of the round); the identity row carries the player + HCP.
-  const memberPlace = !isTour
-    ? [courseLocation, memberDateText].filter(Boolean).join(' \u00B7 ')
-    : courseLocation;
-  const hcpPair = !isTour ? handicapPairDisplay({ handicapIndex: playerHcp, deltaIndex: playerHcpDelta }) : null;
-
+  const when = playedWhen(playDate, t as never);
+  const memberSub = [
+    when ? t('courses:scorecard.tile.played', { when: when.charAt(0).toLowerCase() + when.slice(1) }) : (memberDateText || ''),
+    roundsHere != null ? t('courses:scorecard.tile.roundsHere', { count: roundsHere }) : '',
+  ].filter(Boolean).join(' \u00B7 ');
+  const sub = isTour ? (kickerText ?? '') : memberSub;
+  const toParTone = heroMuted ? EVEN_GRAY : toParColor(toPar);
+  const scoreCells: { key: string; value: string; label: string; color?: string }[] = [
+    ...(toPar != null ? [{ key: 'toPar', value: fmtRel(toPar), label: t('courses:scorecard.toPar'), color: toParTone }] : []),
+    ...cells.map((c) => ({ key: c.key, value: c.value, label: c.label, color: c.tone })),
+  ];
+  const courseTap = previewDoors ? undefined : onViewCourse;
+  const profileTap = previewDoors ? undefined : onViewProfile;
   return (
-    <div
-      style={{
-        padding: '12px 16px 10px',
-        borderBottom: `1px solid ${A.BORDER}`,
-        flexShrink: 0,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-        {/* LEFT — date, course, member */}
-        <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-          {!!kickerText && isTour && (
-            <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {kickerText}
-            </div>
+    <div data-scorecard-head="true" style={{ flex: 'none', padding: '20px 20px 0', minWidth: 0 }}>
+      {(courseLocation || top100Slot) && (
+        <div data-scorecard-kicker="true" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          {courseLocation && (
+            <span style={{ ...TILE_KICKER, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{courseLocation}</span>
           )}
-          <div
-            style={{
-              fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em',
-              color: A.INK, marginTop: 3, lineHeight: 1.18,
-              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-            }}
+          {top100Slot}
+        </div>
+      )}
+      <h2 style={{ margin: 0, marginTop: 7, minWidth: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: TILE_INK }}>
+        {courseTap ? (
+          <button
+            type="button"
+            data-scorecard-course-name="true"
+            onClick={(e) => { e.stopPropagation(); courseTap(); }}
+            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', width: '100%', padding: 0, margin: 0, border: 0, background: 'none', color: 'inherit', font: 'inherit', letterSpacing: 'inherit', lineHeight: 'inherit', textAlign: 'left', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
           >
             {courseName}
-          </div>
-          {memberPlace && (
-            <div style={{ fontSize: 12, color: A.DIM, marginTop: 2 }}>{memberPlace}</div>
-          )}
-        </div>
-
-        {/* RIGHT — THE SCORE. Visible the moment the sheet opens. */}
-        {showScore && (
-          <div style={{ flex: 'none', textAlign: 'right' }}>
-            <div
-              style={{
-                ...NUM, fontSize: 34, fontWeight: 800, lineHeight: 0.9,
-                letterSpacing: '-0.05em',
-                color: heroMuted ? EVEN_GRAY : A.INK,
-              }}
-            >
-              {gross}
-            </div>
-            <div style={{ ...NUM, fontSize: 12, fontWeight: 700, marginTop: 6, color: A.MUTE, whiteSpace: 'nowrap' }}>
-              <span style={{ color: heroMuted ? EVEN_GRAY : toParColor(toPar) }}>{fmtRel(toPar)}</span>
-              {((shownPar != null && shownPar > 0) || coursePar != null) && (
-                <span> {'\u00B7'} {t('courses:scorecard.parN', { n: shownPar != null && shownPar > 0 ? shownPar : coursePar })}</span>
-              )}
-              {shownPar == null && coursePar == null && playedHoles > 0 && (
-                <span> {'\u00B7'} {t('courses:scorecard.thruN', { n: playedHoles })}</span>
-              )}
-            </div>
-          </div>
+          </button>
+        ) : (
+          <span data-scorecard-course-name="true" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{courseName}</span>
         )}
-      </div>
-
-      {/* TOUR SCORECARD TILE — the identity row renders AFTER the head's
-          left/score flex, at full tile width, exactly where the member row
-          renders, so the doors' right edge lines up with the score's right
-          edge above. The Profile door moved up from the foot into this row,
-          the same SheetDoorButton the member head uses; a course door, when
-          the tournament is linked, sits first. */}
-      {showIdentity && isTour && (
-        <div data-scorecard-player-row="true" style={{ display: 'flex', alignItems: 'center', marginTop: 10, minWidth: 0 }}>
-          <span style={{ flexShrink: 0, marginRight: 8 }}>
-            <SquircleAvatar
-              srcCandidates={tourAvatarCandidates}
-              alt={playerName as string}
-              userId={playerUserId ?? undefined}
-              size={22}
-              hairlineRing
-            />
-          </span>
-          <span
-            style={{
-              fontSize: 12.5, fontWeight: 700,
-              color: isOwner ? A.AMBER : A.INK,
-              flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-            }}
-            title={playerName as string}
+      </h2>
+      {!!playerName && (() => {
+        const inner = (
+          <>
+            <span style={{ flex: 'none', display: 'flex' }}>
+              {isTour ? (
+                <SquircleAvatar srcCandidates={tourAvatarCandidates} alt={playerName} userId={playerUserId ?? undefined} size={36} hairlineRing />
+              ) : (
+                <SquircleAvatar src={playerAvatarUrl ?? null} alt={playerName} userId={playerUserId ?? undefined} size={36} hairlineRing />
+              )}
+            </span>
+            <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <span data-sheet-player-name="true" style={{ display: 'block', fontSize: 15, fontWeight: 600, color: isOwner ? A.AMBER : TILE_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <InlineProMemberName userId={isTour ? undefined : playerUserId}>{playerName}</InlineProMemberName>
+              </span>
+              {sub && <span data-scorecard-player-sub="true" style={{ display: 'block', fontSize: 12, lineHeight: 1.35, color: TILE_DIM, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</span>}
+            </span>
+            <ChevronRight data-scorecard-player-chevron="true" size={16} strokeWidth={2.2} color={TILE_DIM} aria-hidden style={{ flex: 'none' }} />
+          </>
+        );
+        const rowStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 11, marginTop: 14, minHeight: 44, minWidth: 0, width: '100%' };
+        return profileTap ? (
+          <button
+            type="button"
+            data-scorecard-player-row="true"
+            onClick={(e) => { e.stopPropagation(); profileTap(); }}
+            style={{ ...rowStyle, padding: 0, border: 0, background: 'none', color: 'inherit', font: 'inherit', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
           >
-            <InlineProMemberName userId={isTour ? undefined : playerUserId}>{playerName}</InlineProMemberName>
-          </span>
-          {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
-          {(onViewCourse || onViewProfile) && (
-            <span data-sheet-doors="true" style={{ display: 'flex', gap: 6, flex: 'none', marginLeft: 10 }}>
-              {onViewCourse && <SheetDoorButton door="course" label={t('courses:scorecard.viewCourse')} icon={MapPin} onClick={onViewCourse} />}
-              {onViewProfile && <SheetDoorButton door="profile" label={t('courses:scorecard.viewProfile')} icon={User} onClick={onViewProfile} />}
-            </span>
-          )}
-        </div>
+            {inner}
+          </button>
+        ) : (
+          <div data-scorecard-player-row="true" style={rowStyle}>{inner}</div>
+        );
+      })()}
+      {showScore && gross != null && (
+        <ScoreFigureRow
+          name="round-score"
+          lead={{ key: 'gross', value: String(gross), label: t('courses:scorecard.gross'), color: heroMuted ? EVEN_GRAY : TILE_INK }}
+          cells={scoreCells}
+          dividerColor="rgba(255,255,255,0.14)"
+          cellWeight={700}
+          style={{ marginTop: 16 }}
+        />
       )}
-
-      {!isTour && showIdentity && (
-        <div data-scorecard-player-row="true" style={{ display: 'flex', alignItems: 'center', marginTop: 10, minWidth: 0 }}>
-          <span style={{ flexShrink: 0, marginRight: 8 }}>
-            <SquircleAvatar src={playerAvatarUrl ?? null} alt={playerName as string} userId={playerUserId ?? undefined} size={24} hairlineRing />
-          </span>
-          <span data-sheet-player-name="true" style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              <InlineProMemberName userId={isTour ? undefined : playerUserId}>{playerName}</InlineProMemberName>
-            </span>
-            {!isTour && playedOffIndex != null ? (
-              <span data-scorecard-played-off="true" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.DIM, marginTop: 2, whiteSpace: 'nowrap' }}>
-                {t('courses:scorecard.playedOff', { index: formatHcp(playedOffIndex) })}
-              </span>
-            ) : hcpPair && (
-              <span data-scorecard-hcp="true" style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 2, whiteSpace: 'nowrap' }}>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: A.MUTE }}>{t('courses:scorecard.hcpLabel', { defaultValue: 'HCP' })}</span>
-                <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: A.INK }}>{hcpPair.index}</span>
-                {hcpPair.delta && (
-                  <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: hcpPair.delta.tone }}>{hcpPair.delta.arrow}{hcpPair.delta.text}</span>
-                )}
-              </span>
-            )}
-          </span>
-          {(previewDoors || onViewCourse || onViewProfile) && (
-            <span data-sheet-doors="true" style={{ display: 'flex', gap: 6, flex: 'none', marginLeft: 10 }}>
-              {(previewDoors || onViewCourse) && <SheetDoorButton door="course" label={t('courses:scorecard.viewCourse')} icon={MapPin} onClick={onViewCourse} inert={previewDoors} />}
-              {(previewDoors || onViewProfile) && <SheetDoorButton door="profile" label={t('courses:scorecard.viewProfile')} icon={User} onClick={onViewProfile} inert={previewDoors} />}
-            </span>
-          )}
-        </div>
-      )}
-
-      {rail.length > 0 && (
-        <>
-          <Hairline style={{ margin: '12px 0 10px' }} />
-          <div style={{ display: 'flex', gap: STAT_RAIL_ITEM_GAP, flexWrap: 'wrap' }}>
-            {rail.map((it) => (
-              <div key={it.key} style={{ minWidth: 0 }}>
-                <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
-                <div style={{ ...LABEL, fontSize: 9.5, letterSpacing: '0.12em', marginTop: 3 }}>{it.label}</div>
-              </div>
-            ))}
-          </div>
-        </>
+      {comparison && (
+        <p data-scorecard-comparison="true" style={{ margin: '14px 0 0', fontSize: 12.5, lineHeight: 1.45, color: TILE_MUTE, ...NUM }}>{comparison}</p>
       )}
     </div>
   );

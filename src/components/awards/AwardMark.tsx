@@ -10,12 +10,14 @@ import { INK } from '@/features/tourhub/_shared/tokens';
 import { medalTierTone } from '@/lib/tokens/medals';
 
 export type AwardTier = 'gold' | 'silver' | 'bronze';
-export type AwardMarkSize = 'sheet' | 'row' | 'pill';
+export type AwardMarkSize = 'sheet' | 'row' | 'pill' | 'tile';
 
 export const AWARD_MARK_SIZES = {
   sheet: { w: 22, h: 26, radius: 6, icon: 14 },
   row: { w: 15, h: 18, radius: 5, icon: 10 },
   pill: { w: 12, h: 14, radius: 4, icon: 8 },
+  /** SCORECARD_TILE_REDESIGN §2c — the 32px squircle (34%) medal. */
+  tile: { w: 32, h: 32, radius: '34%', icon: 17 },
 } as const;
 
 /** glyph 'crown' is the record book's lucide Crown — for crowns held. */
