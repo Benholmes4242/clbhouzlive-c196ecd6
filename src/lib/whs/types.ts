@@ -276,6 +276,8 @@ export interface WhsScoreHole {
   stroke_index: number | null;
   played: boolean;
   hole_alias: string | null;
+  /** Provider per-hole strokes received (whs_score_holes.strokes_allowed); feeds feedStrokesReceived exactly as the feed. */
+  strokes_allowed?: number | null;
 }
 
 // ─── Phase 2.1: Time-scoped friend leaderboards ─────────────────────────

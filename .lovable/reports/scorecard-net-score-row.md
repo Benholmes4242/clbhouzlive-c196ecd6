@@ -23,3 +23,12 @@ So host `RoundDetailSheet` (and every wrapper through it) cannot supply `net` or
 - §4 feed cache seeding: not done (optional); NET appears once the read lands.
 - Tests: +5 in scorecardTileRedesign.test.tsx (a–e), +2 in new roundDetailNetRead.test.tsx (f, g; static source checks). No existing assertion changed — the existing `['gross','toPar','points','diff','playedOff']` cases pass no net and still hold.
 - Shards: 2,246 / 2,269 / 2,289 / 2,361 = 9,165 (9,158 + 7). Typecheck clean. Logs /tmp/net-shard-1..4.log.
+
+## Follow-ups to 4b251434d9 — strokes received and no reshuffle
+
+1. `strokes_allowed` added to both `whs_score_holes` selects in `src/lib/whs/api.ts` (round detail, friend round detail); `WhsScoreHole.strokes_allowed?` added; `RoundDetailSheet` passes `strokesAllowed: h.strokes_allowed ?? null` into the same `feedStrokesReceived` check the feed uses (was hard-coded `null`). Nine-hole cards with a provider allocation now net; 18-hole cards prefer the provider allocation, as the feed.
+2. Pending net read holds the cells: `useRoundNetScores` now wraps a new exported `useRoundNetQuery` (same key, so one read). The host derives `netPending = open && !!scoreId && !isSuccess && !isError` and passes it; `CardScorecardSheet` → `RoundSummaryHead cellsHeld` → `ScoreFigureRow held`. While held: gross + label + hairline draw, the breakdown is an empty block with `minHeight: HELD_CELL_HEIGHT` (30 = 16 figure + 5 gap + 9 label). Settled draws one set once. Tour never holds.
+
+Tests added (4, `scorecardTileRedesign.test.tsx`, "SCORECARD_TILE · NET follow-ups"): (a) nine-hole NET / PLAYED OFF, (b) static selects, (c) held row and reserved height, (d) failed read → PLAYED OFF once, never NET. No existing assertion changed. Note: `roundDetailNetRead.test.tsx` (g) is titled "nothing waits"; its assertions still hold and were not edited, but the title is now stale.
+
+Typecheck clean. Shards sequential, full logs `/tmp/net2-shard-1..4.log`: 2,246 / 2,269 / 2,289 / 2,365 = 9,169 (before 9,165, +4 new). No failures.

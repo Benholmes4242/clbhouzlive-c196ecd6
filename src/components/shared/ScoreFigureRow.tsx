@@ -28,9 +28,14 @@ export interface ScoreFigureRowProps {
   /** Breakdown figure weight (review 600, scorecard 700). */
   cellWeight: 600 | 700;
   style?: React.CSSProperties;
+  /** Hold the cells after the hairline (data pending): the lead and divider
+   *  draw, the breakdown reserves its height and prints nothing. */
+  held?: boolean;
 }
 
 const TAB = 'tabular-nums lining-nums';
+/** A breakdown cell's height (16px figure + 5px gap + 9px label line), reserved while held. */
+export const HELD_CELL_HEIGHT = 30;
 export const SCORE_FIGURE_LABEL: React.CSSProperties = { marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap' };
 
 export function scoreFigureRules(name: string, leadKey: string): string {
@@ -48,22 +53,25 @@ export function scoreFigureRules(name: string, leadKey: string): string {
 `;
 }
 
-export const ScoreFigureRow: React.FC<ScoreFigureRowProps> = ({ name, lead, cells, dividerColor, cellWeight, style }) => {
-  if (!lead && cells.length === 0) return null;
+export const ScoreFigureRow: React.FC<ScoreFigureRowProps> = ({ name, lead, cells, dividerColor, cellWeight, style, held = false }) => {
+  if (!lead && cells.length === 0 && !held) return null;
+  const showCells = !held && cells.length > 0;
+  const split = held || cells.length > 0;
   const containerAttrs = { [`data-${name}-container`]: '' } as Record<string, string>;
   const rulesAttrs = { [`data-${name}-container-rules`]: '' } as Record<string, string>;
   const rowAttrs = { [`data-${name}-row`]: '', 'data-variant': 'card' } as Record<string, string>;
   return (
     <div {...containerAttrs} style={{ containerType: 'inline-size', width: '100%', minWidth: 0 }}>
       <style {...rulesAttrs}>{scoreFigureRules(name, lead?.key ?? 'overall')}</style>
-      <div {...rowAttrs} style={{ display: 'grid', gridTemplateColumns: lead && cells.length ? 'auto 1fr' : '1fr', alignItems: 'end', width: '100%', ...style }}>
+      <div {...rowAttrs} style={{ display: 'grid', gridTemplateColumns: lead && split ? 'auto 1fr' : '1fr', alignItems: 'end', width: '100%', ...style }}>
         {lead && (
-          <div data-score-cell={lead.key} data-score-divider={cells.length ? '' : undefined} style={cells.length ? { paddingRight: 16, marginRight: 16, borderRight: `1px solid ${dividerColor}` } : undefined}>
+          <div data-score-cell={lead.key} data-score-divider={split ? '' : undefined} style={split ? { paddingRight: 16, marginRight: 16, borderRight: `1px solid ${dividerColor}` } : undefined}>
             <div data-score-figure style={{ fontSize: 26, fontWeight: 700, lineHeight: 1, color: lead.color ?? '#FFFFFF', fontVariantNumeric: TAB }}>{lead.value}</div>
             <div data-score-label style={SCORE_FIGURE_LABEL}>{lead.label}</div>
           </div>
         )}
-        {cells.length > 0 && (
+        {held && <div data-score-held="" aria-hidden style={{ minHeight: HELD_CELL_HEIGHT }} />}
+        {showCells && (
           <div data-score-breakdown style={{ display: 'flex', justifyContent: 'space-between', columnGap: 8 }}>
             {cells.map((c) => (
               <div key={c.key} data-score-cell={c.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>

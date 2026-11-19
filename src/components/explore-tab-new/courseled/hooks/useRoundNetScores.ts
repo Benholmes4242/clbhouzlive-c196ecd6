@@ -43,14 +43,16 @@ export interface RoundNet {
 
 const EMPTY = new Map<string, RoundNet>();
 
-export function useRoundNetScores(scoreIds: readonly (string | null | undefined)[]) {
+/** The query itself, for hosts that must know when the read settles (scorecard
+ *  NET row holds its cells while pending). Same key, so no second read. */
+export function useRoundNetQuery(scoreIds: readonly (string | null | undefined)[]) {
   const ids = useMemo(() => {
     const seen = new Set<string>();
     for (const id of scoreIds) if (id) seen.add(id);
     return [...seen].sort();
   }, [scoreIds]);
 
-  const { data } = useQuery<Map<string, RoundNet>>({
+  return useQuery<Map<string, RoundNet>>({
     queryKey: ['gam-round-net', ids.join(',')],
     enabled: ids.length > 0,
     staleTime: 60_000,
@@ -75,7 +77,10 @@ export function useRoundNetScores(scoreIds: readonly (string | null | undefined)
       return out;
     },
   });
+}
 
+export function useRoundNetScores(scoreIds: readonly (string | null | undefined)[]) {
+  const { data } = useRoundNetQuery(scoreIds);
   return data ?? EMPTY;
 }
 

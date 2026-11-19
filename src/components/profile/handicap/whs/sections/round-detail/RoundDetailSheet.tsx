@@ -13,7 +13,7 @@
  * all dismissals to that guard while open, keeping draft and return ownership.
  */
 
-import { useRoundNetScores } from '@/components/explore-tab-new/courseled/hooks/useRoundNetScores';
+import { useRoundNetScores, useRoundNetQuery } from '@/components/explore-tab-new/courseled/hooks/useRoundNetScores';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { feedStrokesReceived } from '@/components/feed/roundTilePlot';
 import { DIAG_ON, roundDiag } from '@/diag/roundPushDiag'; // TEMPORARY diag
@@ -372,12 +372,15 @@ export const RoundDetailSheet: React.FC<Props> = ({
      not the round's owner. */
   /* NET IN THE SCORE ROW — the ONE gam_round_net read, through the shared
      hook (same key family, gating and cache as Lowest net / Rounds that count).
-     Failed or empty = not nettable; nothing waits on it. */
+     Failed or empty = not nettable. While it is pending the tile holds the
+     cells after the hairline (no reshuffle when NET arrives). */
   const netMap = useRoundNetScores(open ? scoreIdList : []);
+  const netQuery = useRoundNetQuery(open ? scoreIdList : []);
+  const netPending = open && !!scoreId && !netQuery.isSuccess && !netQuery.isError;
   const roundNet = scoreId ? netMap.get(scoreId) ?? null : null;
   const netAllowanceOk = useMemo(() => {
     if (!roundSettled || sortedHoles.length === 0) return true;
-    const shape = { holes: sortedHoles.filter((h) => h.played !== false).map((h) => ({ strokeIndex: h.stroke_index ?? null, strokesAllowed: null })) } as unknown as HoleShape;
+    const shape = { holes: sortedHoles.filter((h) => h.played !== false).map((h) => ({ strokeIndex: h.stroke_index ?? null, strokesAllowed: h.strokes_allowed ?? null })) } as unknown as HoleShape;
     return feedStrokesReceived(shape, roundNet?.courseHandicap ?? null) != null;
   }, [roundSettled, sortedHoles, roundNet]);
   const featRarity = useRoundFeatRarity(open ? scoreId : null);
@@ -527,6 +530,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       net={roundNet?.net ?? null}
       courseHandicap={roundNet?.courseHandicap ?? null}
       netAllowanceOk={netAllowanceOk}
+      netPending={netPending}
       playerName={displayName}
       ownerDisplayName={profile?.display_name ?? null}
       playerAvatarUrl={profile?.profile_photo_url ?? (usingSeed ? seed?.playerAvatarUrl ?? null : null)}

@@ -189,6 +189,9 @@ export interface CardScorecardSheetProps {
   /** FN1's second condition, decided by the host with feedStrokesReceived once
    *  the hole shape has settled: false = no computable per-hole allowance. */
   netAllowanceOk?: boolean;
+  /** The host's gam_round_net read is pending: hold every cell after the
+   *  hairline (height reserved) so NET never swaps in over PLAYED OFF. */
+  netPending?: boolean;
   // FOOTER
   onViewProfile?: () => void;
   onViewCourse?: () => void;
@@ -384,7 +387,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
-  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, playerGender = null, identityStat, net = null, courseHandicap = null, netAllowanceOk = true,
+  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, playerGender = null, identityStat, net = null, courseHandicap = null, netAllowanceOk = true, netPending = false,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   presentation = 'overlay',
@@ -900,6 +903,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           tourAvatarCandidates={tourAvatarCandidates}
           isOwner={isOwner}
           cells={headCells}
+          cellsHeld={!isTour && netPending}
           comparison={comparison}
           onViewCourse={onViewCourse}
           onViewProfile={onViewProfile}

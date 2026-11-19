@@ -140,3 +140,56 @@ describe('SCORECARD_TILE · NET IN THE SCORE ROW', () => {
     expect(document.querySelectorAll('[data-round-score-row] [data-score-cell]').length).toBe(5);
   });
 });
+
+describe('SCORECARD_TILE · NET follow-ups', () => {
+  it('(a) nine-hole round: provider strokes_allowed on every played hole + course handicap renders NET; without them PLAYED OFF', async () => {
+    const { feedStrokesReceived } = await import('@/components/feed/roundTilePlot');
+    const nine = Array.from({ length: 9 }, (_, i) => ({ stroke_index: i * 2 + 1, strokes_allowed: i < 5 ? 1 : 0, played: true }));
+    // The host's exact mapping (RoundDetailSheet netAllowanceOk).
+    const shapeOf = (hs: { stroke_index: number; strokes_allowed?: number | null }[]) => ({ holes: hs.map((h) => ({ strokeIndex: h.stroke_index ?? null, strokesAllowed: h.strokes_allowed ?? null })) }) as never;
+    const withOk = feedStrokesReceived(shapeOf(nine), 5) != null;
+    const withoutOk = feedStrokesReceived(shapeOf(nine.map(({ strokes_allowed: _s, ...h }) => h)), 5) != null;
+    expect(withOk).toBe(true);
+    expect(withoutOk).toBe(false);
+    const nineHoles = holes.slice(0, 9);
+    mount(<CardScorecardSheet {...base} holes={nineHoles} roundResults={awardsWith} courseContext={ctx} net={33} courseHandicap={5} netAllowanceOk={withOk} />);
+    expect(cellKeys()).toContain('net');
+    expect(cellKeys()).not.toContain('playedOff');
+    cleanup();
+    mount(<CardScorecardSheet {...base} holes={nineHoles} roundResults={awardsWith} courseContext={ctx} net={33} courseHandicap={5} netAllowanceOk={withoutOk} />);
+    expect(cellKeys()).not.toContain('net');
+    expect(cellKeys()).toContain('playedOff');
+  });
+  it('(b) both whs_score_holes selects include strokes_allowed, carried into the host shape', async () => {
+    const fs = await import('node:fs');
+    const api = fs.readFileSync('src/lib/whs/api.ts', 'utf8');
+    const selects = [...api.matchAll(/from\('whs_score_holes' as any\)\s*\.select\(([\s\S]*?)\)\s*\.eq/g)].map((m) => m[1]);
+    expect(selects).toHaveLength(2);
+    for (const s of selects) expect(s).toContain('strokes_allowed');
+    const host = fs.readFileSync('src/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet.tsx', 'utf8');
+    expect(host).toContain('strokesAllowed: h.strokes_allowed ?? null');
+  });
+  it('(c) net read pending: gross shows, no cells after the hairline, height reserved for the cells', async () => {
+    const { HELD_CELL_HEIGHT } = await import('@/components/shared/ScoreFigureRow');
+    mount(<CardScorecardSheet {...base} roundResults={awardsWith} courseContext={ctx} netPending />);
+    expect(cellKeys()).toEqual(['gross']);
+    expect(document.querySelector('[data-score-cell="gross"]')?.hasAttribute('data-score-divider')).toBe(true);
+    const held = document.querySelector('[data-round-score-row] [data-score-held]') as HTMLElement;
+    expect(held.style.minHeight).toBe(`${HELD_CELL_HEIGHT}px`);
+    expect(HELD_CELL_HEIGHT).toBe(16 + 5 + 9);
+    cleanup();
+    mount(<CardScorecardSheet {...base} roundResults={awardsWith} courseContext={ctx} net={70} courseHandicap={9} />);
+    expect(document.querySelector('[data-score-held]')).toBeNull();
+    expect(cellKeys()).toEqual(['gross', 'toPar', 'net', 'points', 'diff']);
+  });
+  it('(d) failed net read: the PLAYED OFF row once, never NET', async () => {
+    const fs = await import('node:fs');
+    const host = fs.readFileSync('src/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet.tsx', 'utf8');
+    expect(host).toMatch(/netPending = open && !!scoreId && !netQuery\.isSuccess && !netQuery\.isError/);
+    // Failure settles: not held, no net in the map.
+    mount(<CardScorecardSheet {...base} roundResults={awardsWith} courseContext={ctx} net={null} courseHandicap={null} netPending={false} />);
+    expect(cellKeys()).toEqual(['gross', 'toPar', 'points', 'diff', 'playedOff']);
+    expect(document.querySelectorAll('[data-score-cell="playedOff"]')).toHaveLength(1);
+    expect(document.querySelector('[data-score-cell="net"]')).toBeNull();
+  });
+});

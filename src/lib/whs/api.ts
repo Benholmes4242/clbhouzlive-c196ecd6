@@ -774,7 +774,8 @@ export async function fetchRoundDetail(
         distance_yards,
         stroke_index,
         played,
-        hole_alias
+        hole_alias,
+        strokes_allowed
       `)
       .eq('score_id', r.id)
       .order('hole_no', { ascending: true });
@@ -842,7 +843,7 @@ export async function fetchFriendRoundDetail(
   const { data: holes, error: holesErr } = await supabase
     .from('whs_score_holes' as any)
     .select(
-      'hole_no, par, actual_gross, adjusted_gross, distance_yards, stroke_index, played, hole_alias',
+      'hole_no, par, actual_gross, adjusted_gross, distance_yards, stroke_index, played, hole_alias, strokes_allowed',
     )
     .eq('score_id', s.id)
     .order('hole_no', { ascending: true });

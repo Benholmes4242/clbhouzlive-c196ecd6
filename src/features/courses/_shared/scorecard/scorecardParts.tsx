@@ -453,6 +453,8 @@ export interface RoundSummaryHeadProps {
   isOwner?: boolean;
   /** Cells after TO PAR, in order, only those with data. */
   cells?: RailFigure[];
+  /** Hold every cell after the hairline while the net read is pending. */
+  cellsHeld?: boolean;
   /** The comparison line (member only); null draws nothing. */
   comparison?: React.ReactNode;
   onViewCourse?: () => void;
@@ -495,7 +497,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
   courseName, courseLocation, top100Slot = null,
   showScore, gross, toPar, heroMuted, shownPar = 0, playedHoles = 0, coursePar = null,
   playerName, playerAvatarUrl, playerUserId, tourAvatarCandidates = [], isOwner = false,
-  cells = [], comparison = null,
+  cells = [], cellsHeld = false, comparison = null,
   onViewCourse, onViewProfile, previewDoors = false,
 }) => {
   const { t } = useTranslation(['courses']);
@@ -579,6 +581,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
           name="round-score"
           lead={{ key: 'gross', value: String(gross), label: grossLabel, color: heroMuted ? EVEN_GRAY : TILE_INK }}
           cells={scoreCells}
+          held={cellsHeld}
           dividerColor="rgba(255,255,255,0.14)"
           cellWeight={700}
           style={{ marginTop: 16 }}
