@@ -91,7 +91,7 @@ describe('upcoming hero new order', () => {
     style.textContent = readFileSync('src/styles/hybrid-hero.css', 'utf8').replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '');
     document.head.appendChild(style);
     try {
-      const v = wrap(<><UpcomingFacts first={null} zone={null} field={132} purse={3000000} par={71} yards={6860} /><UpcomingLastYear rows={[{ rank: '1', name: 'Winner', country: 'USA', score: '−20', year: '2025' }]} /><UpcomingCourse holes={holes} tournamentId="e" /></>);
+      const v = wrap(<><UpcomingFacts first={null} zone={null} field={132} purse={3000000} par={71} yards={6860} /><UpcomingLastYear rows={[{ rank: '1', name: 'Winner', country: 'USA', score: '−20', year: '2025', photoUrl: null }]} /><UpcomingCourse holes={holes} tournamentId="e" /></>);
       const course = v.container.querySelector<HTMLElement>('[data-overview-course]')!;
       expect(course.previousElementSibling?.hasAttribute('data-overview-last-year')).toBe(true);
       expect(getComputedStyle(course).paddingTop).toBe('30px');
