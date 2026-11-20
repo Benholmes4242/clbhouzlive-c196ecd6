@@ -12293,6 +12293,32 @@ export type Database = {
         }
         Relationships: []
       }
+      review_with: {
+        Row: {
+          created_at: string
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          review_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_with_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rivals: {
         Row: {
           created_at: string | null
@@ -28972,6 +28998,10 @@ export type Database = {
       retag_hole_photo: {
         Args: { p_hole_no: number; p_id: string }
         Returns: undefined
+      }
+      review_with_count_for_author: {
+        Args: { p_review_id: string }
+        Returns: number
       }
       revoke_business_verification: {
         Args: {
