@@ -24,7 +24,7 @@ const post: FeedPost = {
   id: 'post-1', userId: 'author', actorId: 'author', actorType: 'personal',
   username: 'author', displayName: 'Author', avatarUrl: '', isVerified: false,
   creatorRelation: 'none', caption: 'A round together', createdAt: '2026-11-20T12:00:00Z',
-  mediaItems: [{ id: 'photo-1', type: 'image', url: '/photo.jpg' }],
+  mediaItems: [{ id: 'photo-1', type: 'image', imageUrl: '/photo.jpg', width: 1200, height: 1600 }],
   likeCount: 0, commentCount: 0, shareCount: 0, isLikedByMe: false,
   isFollowedByMe: false, isReview: false, review: null,
 };
@@ -38,7 +38,7 @@ function chrome(item: FeedPost, count: number) {
 
 describe('fullscreen stack and white review upload progress', () => {
   it('(a) a zero-like review has no reserve and Full review is the last stack child', () => {
-    const view = chrome({ ...post, isReview: true, review: { rating: 8, courseId: 'course-1', courseName: 'Course' } }, 0);
+    const view = chrome({ ...post, isReview: true, review: { reviewId: 'review-1', rating: 8, courseId: 'course-1', courseName: 'Course', courseImageUrl: null } }, 0);
     expect(view.container.querySelector('[data-liked-by-reserve]')).toBeNull();
     expect(view.container.querySelector('[data-liked-by-row]')).toBeNull();
     const stack = view.container.querySelector('[data-fullscreen-stack]');

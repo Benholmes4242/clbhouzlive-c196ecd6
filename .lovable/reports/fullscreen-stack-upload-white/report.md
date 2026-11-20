@@ -47,3 +47,11 @@ src/test/fullscreenStackAndUploadWhite.test.tsx(27,48): error TS2353: Object lit
 src/test/fullscreenStackAndUploadWhite.test.tsx(41,52): error TS2739: Type '{ rating: number; courseId: string; courseName: string; }' is missing the following properties from type 'ReviewData': reviewId, courseImageUrl
 ```
 These are errors in the new test fixtures despite Vitest passing them; no successful build claimed. No manual build/typecheck. Following the stop instruction, no failed-test repairs or subsequent shards were attempted. Browser/device 14px comparison and authenticated end-to-end flow remain unverified. No SQL, migrations, feed_config, pool-cap, shared architecture or unrelated application changes.
+
+## Follow-up: preview type errors repaired
+The subsequent explicit preview-error instruction authorized correcting only the fixture fields in `fullscreenStackAndUploadWhite.test.tsx`:
+- Photo fixture `url: '/photo.jpg'` → `imageUrl: '/photo.jpg', width: 1200, height: 1600` (the canonical MediaItem fields).
+- Case (a) review fixture adds `reviewId: 'review-1'` and `courseImageUrl: null` (required ReviewData fields).
+All three case names and every assertion stay exactly unchanged; no test deleted, renamed or assertion rewritten. Fixture-only change; no app code changed in this follow-up. Inventory **9,355 → 9,355 expected**, last verified full suite still **9,352**.
+
+`bunx vitest run src/test/fullscreenStackAndUploadWhite.test.tsx`: **3 executed / 3 passed / 0 failed**, one file, full output `type-fixture-focused.log`. Harness entry **2026-11-20T19:30:07Z: build OK** confirms both reported type errors cleared. No manual build/typecheck. The previous four unexpected shard failures remain untouched, no failed-file reruns, and shards 2–4 remain unrun under the original stop rule; device/authenticated checks remain unverified.

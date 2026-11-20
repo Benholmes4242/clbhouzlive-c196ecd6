@@ -3,7 +3,7 @@
 ## Stopped: Fullscreen stack and white review upload progress
 - Changed only fullscreen zero-like trailing space and review progress fill token/ring/bar; stackBottom/feed usages unchanged. Added three requested tests, no existing tests changed.
 - Focused 35/35 passed; shard 1 stopped at 2,289 passed / 4 failed: activeRing.test.tsx:202:30 and :210:18 missing button; memberShotPosts.test.ts:155:81 source assertion; ms1MessagesHeadToHead.test.tsx:405:3 timeout. Shards 2–4 not run; no reruns/repairs. Expected inventory 9,352 → 9,355; last verified full pass 9,352.
-- Harness also reports two new fixture type errors at fullscreenStackAndUploadWhite.test.tsx:27:48 and :41:52. All surviving errors retained verbatim in .lovable/reports/fullscreen-stack-upload-white/report.md; browser/device checks unverified. Await ruling before repairs.
+- Follow-up preview repair corrected only the new photo/review fixture fields; all assertions unchanged, focused 3/3 passed and harness build OK at 19:30:07Z. Prior four shard failures remain untouched and await ruling; inventory stays 9,355 expected. Browser/device checks unverified; report/full output in .lovable/reports/fullscreen-stack-upload-white/.
 
 ## Complete: Review media-array safeguard ruling
 - Guarded only ReviewPostCard.tsx:105 with post.mediaItems?.[activeMediaIndex]; both commit audits found the same single index and no sibling new indices. All tests unchanged; all 13 stopped cases pass.
