@@ -1,7 +1,7 @@
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
 import { isPortraitAdmissible } from './mediaOrientation';
-import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
+import { usablePoster } from '@/features/review-v2/lib/persistedPoster';
 
 // LEGACY FALLBACK ONLY. The feed RPCs project post_media.stream_id, which is
 // the primary source of a Cloudflare Stream uid. This pattern exists only for
@@ -70,7 +70,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     // downloads not enabled). HLS is the always-present primary path.
     mp4Url: undefined,
     thumbnailUrl: isReview
-      ? persistedPoster([row.poster_url], streamId) ?? undefined
+      ? usablePoster(row.poster_url) || (streamId ? buildThumbnailUrl(streamId) : undefined)
       : row.poster_url || (streamId ? buildThumbnailUrl(streamId) : undefined),
     imageUrl: row.media_type === 'image' ? row.media_url : undefined,
     // Threaded through so AnimatedTileThumb can request the animated variant.

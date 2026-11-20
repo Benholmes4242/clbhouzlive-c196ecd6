@@ -1,11 +1,16 @@
 # Roadmap
 
+## Complete: Review video poster ruling and combined verification
+- Keep relative/remote stored posters, reject the five case-insensitive local schemes, and restore all nine readers' original fallbacks; seven write sites remain unchanged.
+- Change only reviewVideoPoster cases (b)/(f) and add (g); preserve all seven stopped tests. Inventory 9,389 → 9,390 (+relative-poster case), scores-below adds no tests.
+- Four separate sequential shards passed 2,297 / 2,287 / 2,352 / 2,454 = 9,390/9,390 across 838 files; all seven stopped assertions pass unchanged and scores-below scope passes. Full logs and exact assertion/stream_id audit: .lovable/reports/review-video-poster-ruling/. Build OK; authenticated live save/readback remains unavailable (external_unmanaged).
+
 ## Complete focused work: Every feed review's scores below media
 - Shared below-media block now renders for all media-first reviews; feed glass/measurement removed and media/video Played with offsets adopted. Fullscreen, standard/no-media, header/footer and shared media CSS unchanged.
 - Only authorized assertions/case names updated; five requested focused files pass 63/63. Actual card/media controls checked at 320/390 for six states and panel opening/course tap; long name ellipsizes at 320, no horizontal overflow. Report/screenshots: .lovable/reports/review-scores-below/.
-- Four shards explicitly deferred until the queued poster ruling covers both builds; no shards run. Current expected inventory remains 9,389 (last full pass 9,383 plus six prior poster cases), no new/deleted tests. Live authenticated feed remains unverified; isolated browser cards had no page errors. Preview build OK.
+- Deferred shards now complete in the poster ruling above: 9,390/9,390 passes; this scores-below work adds/deletes no tests. Live authenticated feed remains unverified; isolated browser cards had no page errors. Preview build OK.
 
-## Stopped: Review video persisted posters
+## Resolved by poster ruling above: Review video persisted posters
 - Added persistedPoster and routed review poster writes/database readers through it; local new-media composer preview frames and presentation unchanged.
 - Six new cases pass; focused run 47 passed / 7 failed of 54, in unchanged holeMediaVideos (five relative-poster assertions) and reviewVideoTilePosters (two exact legacy-thumbnail assertions). No repairs/reruns or shards under the stop rule; requires Ben's ruling. Exact errors and all sites: .lovable/reports/review-video-persisted-posters/.
 - Expected inventory 9,383 → 9,389 (+six reviewVideoPoster cases), full suite unverified. Latest harness build OK; authenticated save/readback unavailable on external_unmanaged. Legacy no-stream-id batch fixture now receives its manifest as poster; recorded without a follow-up fix after the stop.

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
-import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
+import { usablePoster } from '@/features/review-v2/lib/persistedPoster';
 
 export interface ReviewBreakdown {
   design: number | null;
@@ -91,14 +91,14 @@ export function pickReviewCardMedia(rows: ReviewMediaRow[]): ReviewCardMedia | n
   const usable = rows.filter(isAttached);
 
   const video = usable.find(
-    (row) => row.media_type === 'video' && !!persistedPoster([row.poster_url], row.stream_id) && !!row.media_url?.trim(),
+    (row) => row.media_type === 'video' && !!usablePoster(row.poster_url) && !!row.media_url?.trim(),
   );
   if (video) {
     return {
       mediaId: video.id,
       kind: 'video',
       url: video.media_url as string,
-      posterUrl: persistedPoster([video.poster_url], video.stream_id),
+      posterUrl: usablePoster(video.poster_url),
       streamId: video.stream_id,
       durationS: video.duration_seconds,
     };

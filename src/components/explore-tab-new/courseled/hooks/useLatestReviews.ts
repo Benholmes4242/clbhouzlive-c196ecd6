@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { LATEST_REVIEWS_KEY } from '../discoverQueryKeys';
-import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
+import { usablePoster } from '@/features/review-v2/lib/persistedPoster';
 
 /**
  * useLatestReviews (BRIEF_LATEST_REVIEWS, section 2).
@@ -110,7 +110,6 @@ interface Row {
     media_type: string | null;
     media_url: string | null;
     poster_url: string | null;
-    stream_id?: string | null;
     is_cover: boolean | null;
     created_at: string | null;
   }> | null;
@@ -129,7 +128,7 @@ const SELECT = `
   facilities_score,
   user_profiles:user_id ( id, username, display_name, profile_photo_url ),
   course:golf_courses!course_id ( id, name, country, region, sub_country, thumbnail_image ),
-  course_review_media ( id, media_type, media_url, poster_url, stream_id, is_cover, created_at )
+  course_review_media ( id, media_type, media_url, poster_url, is_cover, created_at )
 `;
 
 function firstMedia(row: Row) {
@@ -169,7 +168,7 @@ function mapRow(row: Row): LatestReview | null {
     reviewerAvatar: profile?.profile_photo_url ?? null,
     mediaUrl: media?.media_url ?? null,
     mediaType: type as 'image' | 'video' | null,
-    posterUrl: persistedPoster([media?.poster_url], media?.stream_id),
+    posterUrl: usablePoster(media?.poster_url),
     mediaCount: (row.course_review_media ?? []).filter((item) => !!item.media_url).length,
     photoCount: (row.course_review_media ?? []).filter((item) => !!item.media_url && !String(item.media_type ?? '').toLowerCase().includes('video')).length,
     videoCount: (row.course_review_media ?? []).filter((item) => !!item.media_url && String(item.media_type ?? '').toLowerCase().includes('video')).length,

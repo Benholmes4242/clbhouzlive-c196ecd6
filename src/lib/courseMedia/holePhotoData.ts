@@ -14,7 +14,7 @@ import { streamPosterFrom } from '@/utils/mediaThumbs';
 import { buildHlsUrl, extractCloudflareUid } from '@/utils/streamId';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { ALLOWED_VIDEO_TYPES, POST_LIMITS } from '@/constants/postLimits';
-import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
+import { persistedPoster, usablePoster } from '@/features/review-v2/lib/persistedPoster';
 
 // useMediaUpload's SUPPORTED_VIDEO_TYPES is private to that hook. Compose its
 // same four-type set from the shared list without changing the review composer.
@@ -34,8 +34,7 @@ export interface OwnMediaSource {
 }
 export function holeMediaPoster(media: { media_url: string; media_type?: string; poster_url?: string | null; stream_id?: string | null }): string {
   return media.media_type === 'video'
-    ? persistedPoster([media.poster_url], media.stream_id)
-      ?? persistedPoster([streamPosterFrom(buildHlsUrl(media.media_url) || media.media_url)], null) ?? ''
+    ? usablePoster(media.poster_url) || streamPosterFrom(buildHlsUrl(media.stream_id || media.media_url) || media.media_url) || ''
     : media.media_url;
 }
 export const holeSourceUrl = (media: FeedPost['mediaItems'][number] | undefined) => media?.imageUrl || media?.hlsUrl || media?.mp4Url || '';

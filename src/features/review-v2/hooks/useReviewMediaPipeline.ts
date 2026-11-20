@@ -25,7 +25,7 @@ import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsSt
 import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
 import { startReviewUpload, uploadAndPublishReview, enqueueReviewUpload, subscribeToPreuploads, removeReviewPreupload, abandonReviewPreuploads, retainReviewPreuploads } from '../lib/reviewUploadController';
 import { probeVideo } from '../lib/probeVideo';
-import { persistedPoster } from '../lib/persistedPoster';
+import { persistedPoster, usablePoster } from '../lib/persistedPoster';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -94,8 +94,8 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
       id: `existing-${m.id}`,
       dbRowId: m.id,
       type: m.media_type === 'video' ? 'video' : 'image',
-      previewUrl: persistedPoster([m.poster_url], m.stream_id) ?? m.media_url,
-      posterUrl: persistedPoster([m.poster_url], m.stream_id),
+      previewUrl: usablePoster(m.poster_url) ?? m.media_url,
+      posterUrl: usablePoster(m.poster_url),
       streamId: m.stream_id ?? null,
       uploadedUrl: m.media_url,
       status: 'existing',

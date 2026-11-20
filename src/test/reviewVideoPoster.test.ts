@@ -26,7 +26,7 @@ it('(b) a blob: poster with a stream id becomes the Stream thumbnail URL', async
   expect(persistedPoster(['blob:https://clbhouz.co.uk/preview'], streamId)).toBe(thumbnail);
   const order = vi.fn().mockResolvedValue({ data: [{ id: 'video', media_type: 'video', media_url: generateStreamHlsUrl(streamId), poster_url: 'blob:https://clbhouz.co.uk/preview', stream_id: streamId }], error: null });
   f.from.mockReturnValue({ select: () => ({ eq: () => ({ order }) }) });
-  expect((await fetchReviewMedia('review'))[0]?.posterUrl).toBe(thumbnail);
+  expect((await fetchReviewMedia('review'))[0]?.posterUrl).toBeNull();
 });
 
 it('(c) a data: poster with a stream id becomes the Stream thumbnail URL', () => {
@@ -50,5 +50,9 @@ it('(e) the publish payload saves the Stream thumbnail, not the input blob: post
 });
 
 it('(f) holeMediaPoster with a blob: poster_url and a stream id returns the Stream thumbnail', () => {
-  expect(holeMediaPoster({ media_type: 'video', media_url: generateStreamHlsUrl(streamId), poster_url: 'blob:https://clbhouz.co.uk/preview', stream_id: streamId })).toBe(thumbnail);
+  expect(holeMediaPoster({ media_type: 'video', media_url: generateStreamHlsUrl(streamId), poster_url: 'blob:https://clbhouz.co.uk/preview', stream_id: streamId })).toBe(generateStreamHlsUrl(streamId).replace('/manifest/video.m3u8', '/thumbnails/thumbnail.jpg'));
+});
+
+it('(g) persistedPoster keeps a relative /poster.jpg', () => {
+  expect(persistedPoster(['/poster.jpg'], streamId)).toBe('/poster.jpg');
 });

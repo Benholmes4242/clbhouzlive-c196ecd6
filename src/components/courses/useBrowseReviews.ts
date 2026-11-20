@@ -44,7 +44,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { LatestReview, ReviewMediaItem } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { activeTop100CourseIds, type Top100MembershipRow } from './browse/playedRings';
-import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
+import { usablePoster } from '@/features/review-v2/lib/persistedPoster';
 
 /** Ceiling on the pool. Deepest reachable list consumes well under this. */
 const POOL_CAP = 80;
@@ -124,7 +124,7 @@ function orderMedia(rows: MediaRow[] | null): ReviewMediaItem[] {
     id: m.id,
     type: String(m.media_type ?? '').toLowerCase().includes('video') ? 'video' : 'image',
     url: m.media_url as string,
-    posterUrl: persistedPoster([m.poster_url], m.stream_id),
+    posterUrl: usablePoster(m.poster_url),
     streamId: m.stream_id ?? null,
     durationSeconds: m.duration_seconds ?? null,
     width: m.width ?? null,
