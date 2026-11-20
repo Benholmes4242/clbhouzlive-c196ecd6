@@ -708,8 +708,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           />
         ) : null}
 
-        {/* Likers row — LikedByRow reserves its line at zero (CB56); the stack is bottom-anchored. */}
-        {!syntheticPosts && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
+        {/* Fullscreen only: no empty trailing wrapper at zero; positive counts retain the reserved row while avatars load. */}
+        {!syntheticPosts && likeState.count > 0 && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
           <LikedByRow
             postId={reviewTarget ?? activePost.id}
             count={likeState.count}
@@ -718,7 +718,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             /* isRound is false by construction: rounds do not appear in this feed. */
             kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
             avatarRing="media"
-            reserve
+            reserve={likeState.count > 0}
             lines={1}
             fontSize={12.5}
             fontWeight={500}
