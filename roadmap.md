@@ -1,5 +1,10 @@
 # Roadmap
 
+## Active: Feed review glass
+- Match media-review overlay and header stamps; retain standard/no-media layout and feed engagement.
+- Batch active Top 100 memberships at both feed hosts with per-course cache; lift media controls above measured strip.
+- Add scoped coverage, run four sequential shards from 9,254, report and commit; authenticated device check unavailable for external unmanaged Supabase.
+
 ## Stopped: WAGR career-best tile — existing failed-read timing
 - Extract Career's rank/week/id selection into one shared helper; tile uses loaded history with summary fallback. Chart, Career output and Settings remain unchanged.
 - Pending history now holds the empty tile; settled rows use shared career best, failed/empty history uses summary. Authorised findByText change plus two new tests pass; earlier three cases unchanged. Focused 47/48 stopped at unchanged wagrRankingTab.test.tsx:223:17 (312th absent while history pending); isolated reproduces 31/32. Four shards not started; failed-read wait ruling needed.

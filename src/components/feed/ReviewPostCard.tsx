@@ -16,7 +16,10 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * natural article height; only words-first/no-media reviews retain the cap.
  */
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
+import { FS_GLASS } from '@/components/fullscreen-feed/fullscreenCanon';
+import { useFeedReviewTop100 } from '@/hooks/feed/useTop100CourseIds';
+import './feedReviewGlass.css';
 import { useTranslation } from 'react-i18next';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -33,7 +36,7 @@ const NAME_LINE = 1.25;
 
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
-  fontSize: 19, fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK,
+  fontSize: 19, fontWeight: 700, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK,
   ...REVIEW_COURSE_CLAMP,
 };
 
@@ -91,8 +94,25 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
 
   const isMediaFirst = layout === 'mediaFirst';
   const mediaLeads = isMediaFirst && !!media;
+  const glassRegion = [review?.courseRegion, review?.courseSubCountry, review?.courseCountry].find(value => value?.trim()) ?? '';
+  const showGlass = mediaLeads && (!!courseName || [rating, ...Object.values(scores)].some(value => value != null && Number.isFinite(Number(value))));
+  const mediaRef = useRef<HTMLDivElement>(null);
+  const glassRef = useRef<HTMLDivElement>(null);
+  const top100Ids = useFeedReviewTop100();
+  const isTop100 = top100Ids.has(review?.courseId ?? post.courseId ?? '');
+  useLayoutEffect(() => {
+    const host = mediaRef.current;
+    const strip = glassRef.current;
+    if (!host || !strip || !showGlass) return;
+    const measure = () => host.style.setProperty('--review-glass-h', `${strip.getBoundingClientRect().height}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(strip);
+    return () => { observer.disconnect(); host.style.removeProperty('--review-glass-h'); };
+  }, [showGlass]);
   const reviewBlock = (
     <>
+      {!mediaLeads ? <>
       {/* B — the full-width subject; scores live together in D. */}
       <div data-review-subject style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: mediaLeads ? `12px ${GUTTER}px 12px` : `8px ${GUTTER}px 14px` }}>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -107,6 +127,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
       </div>
       <ReviewScoreRow overall={rating} breakdown={scores} style={{ flex: 'none', padding: `0 ${GUTTER}px 14px` }} />
+      </> : null}
       {body ? (
         <div data-review-body-wrap style={{ flex: 'none', display: 'flex', padding: `0 ${GUTTER}px 6px` }}>
           <div data-review-body style={{ fontSize: 15, lineHeight: 1.4, color: A.INK, ...REVIEW_BODY_CLAMP }}>
@@ -172,6 +193,11 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             {followPill}
           </div>
         </div>
+        <div data-review-header-pills style={{ marginLeft: 'auto', flex: 'none', display: 'flex', gap: 6, alignSelf: 'center' }}>
+          {[['review', t('feed.reviewPost.pillReview')], ...(isTop100 ? [['top100', t('feed.reviewPost.pillTop100')]] : [])].map(([key, label]) => (
+            <span key={key} data-review-pill={key} style={{ height: 18, padding: '0 7px', borderRadius: 5, border: '1px solid rgba(255,255,255,0.28)', display: 'inline-flex', alignItems: 'center', boxSizing: 'border-box', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', color: A.INK }}>{label}</span>
+          ))}
+        </div>
       </div>
 
       {!mediaLeads ? reviewBlock : null}
@@ -180,8 +206,9 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           only flexible child: square cap and remaining-height 120px floor. */}
       {media ? (
         <div
+          ref={mediaRef}
           data-review-media
-          style={mediaLeads ? { display: 'block', marginTop: 10 } : {
+          style={mediaLeads ? { display: 'block', marginTop: 10, position: 'relative' } : {
             flex: '1 1 auto',
             minHeight: REVIEW_MEDIA_MIN_HEIGHT,
             maxHeight: '100cqw',
@@ -191,6 +218,16 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           }}
         >
           {mediaLeads ? media : <div style={{ position: 'absolute', inset: 0 }}>{media}</div>}
+          {showGlass ? <>
+            <div data-review-glass-fade style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '42%', pointerEvents: 'none', zIndex: 2 }} />
+            <div ref={glassRef} data-review-score-strip style={{ ...FS_GLASS, position: 'absolute', left: 12, right: 12, bottom: 12, borderRadius: 14, padding: '11px 14px 10px', containerType: 'inline-size', pointerEvents: 'none', zIndex: 2 }}>
+              <div data-review-glass-name style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginBottom: 10, minWidth: 0 }}>
+                {courseName ? <CourseNameLink as="div" onNavigate={onOpenCourse} courseId={review?.courseId ?? post.courseId} wrapperStyle={{ pointerEvents: 'auto', flex: '1 1 auto', minWidth: 0 }} textProps={{ 'data-review-course': '' }} style={{ ...COURSE_NAME_STYLE, fontSize: 16, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{courseName}</CourseNameLink> : null}
+                {glassRegion ? <span data-review-glass-region style={{ fontSize: 11.5, color: A.MUTE, whiteSpace: 'nowrap', flex: 'none' }}>{glassRegion}</span> : null}
+              </div>
+              <ReviewScoreRow variant="card" overall={rating} breakdown={scores} />
+            </div>
+          </> : null}
         </div>
       ) : null}
 

@@ -43,6 +43,7 @@ import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 import { usePostGolfTags } from '@/hooks/feed/usePostGolfTags';
 import { FeedCard } from './FeedCard';
+import { FeedReviewTop100Provider } from '@/hooks/feed/useTop100CourseIds';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
@@ -1243,6 +1244,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const spinnerRotation = isRefreshing ? 0 : pull * 3;
 
   return (
+    <FeedReviewTop100Provider posts={posts}>
     <div
       ref={containerRef}
       style={{
@@ -1342,6 +1344,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       </div>
 
     </div>
+    </FeedReviewTop100Provider>
   );
 });
 

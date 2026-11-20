@@ -336,6 +336,8 @@
       "most_birdies_all_time": "[~~Ṁőšţ ƀířđíéš~~]"
     },
     "reviewPost": {
+      "pillReview": "REVIEW",
+      "pillTop100": "TOP 100",
       "hcp": "[~~ĤĈƤ {{index}}~~]",
       "readFullReview": "[~~Řéáđ ţĥé ƒúļļ řéṽíéŵ~~]",
       "coursesReviewed_one": "[~~{{count}} řéṽíéŵ~~]",

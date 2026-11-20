@@ -626,11 +626,12 @@ export const MediaCarousel: React.FC<Props> = ({
 
       {/* Dots */}
       <div
+        data-feed-carousel-dots
         style={{
           position: 'absolute',
           left: 0,
           right: 0,
-          bottom: 10,
+          bottom: 'calc(var(--review-glass-h, -8px) + 18px)',
           display: 'flex',
           justifyContent: 'center',
           pointerEvents: 'none',

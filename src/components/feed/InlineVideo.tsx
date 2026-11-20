@@ -472,7 +472,7 @@ const InlineVideoEngine: React.FC<Props> = ({
           bottom-RIGHT, where every video product puts it and where the
           Discover rails already put it. Two things cannot own one corner. */}
       {isActive && !isProcessing && (
-        <div style={{ position: 'absolute', left: 6, bottom: 6, zIndex: 30 }}>
+        <div data-inline-video-mute style={{ position: 'absolute', left: 6, bottom: 'calc(var(--review-glass-h, -12px) + 18px)', zIndex: 30 }}>
           <MuteButton size="sm" laneId={laneId} />
         </div>
       )}
@@ -484,7 +484,7 @@ const InlineVideoEngine: React.FC<Props> = ({
           style={{
             position: 'absolute',
             right: 6,
-            bottom: 6,
+            bottom: 'calc(var(--review-glass-h, -12px) + 18px)',
             zIndex: 30,
             display: 'inline-flex',
             alignItems: 'center',

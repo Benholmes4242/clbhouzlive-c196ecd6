@@ -182,6 +182,10 @@
     }
   },
   "feed": {
+    "reviewPost": {
+      "pillReview": "REVIEW",
+      "pillTop100": "TOP 100"
+    },
     "crownCategory": {
       "lowest_gross_all_time": "Golpes brutos más bajos",
       "best_score_diff_all_time": "Mejor diferencial de score",

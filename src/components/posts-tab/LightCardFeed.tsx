@@ -44,6 +44,7 @@ import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted, vperfFeedActivateVideo, vperfSupersede, vperfFeedScrollTick } from '@/perf/vperf';
 import { FeedCard } from '@/components/feed/FeedCard';
+import { FeedReviewTop100Provider } from '@/hooks/feed/useTop100CourseIds';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const PAGE_BG = A.CANVAS;
@@ -716,6 +717,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   }, [hasNextPage, onNearEnd]);
 
   return (
+    <FeedReviewTop100Provider posts={posts}>
     <div style={{ width: '100%', background: PAGE_BG }} data-card-feed="light">
       {scrollParent && (
         <Virtuoso
@@ -742,6 +744,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         />
       )}
     </div>
+    </FeedReviewTop100Provider>
   );
 
 };

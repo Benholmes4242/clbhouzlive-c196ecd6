@@ -84,7 +84,7 @@ describe('CB109 media-first everywhere', () => {
   });
   it('photo review orders reviewer, media, actions, likes, review block, comments and Add-a-comment', () => {
     const { container } = card(true);
-    expect(order(container)).toEqual(markers);
+    expect(order(container)).toEqual([markers[0], markers[1], markers[5], markers[2], markers[3], markers[6], markers[7], markers[8], markers[9]]);
     expect(container.querySelector('[data-review-body]')?.textContent).toBe('Reviewer Review words');
     expect((container.querySelector('[data-review-body-lead]') as HTMLElement).style.fontWeight).toBe('600');
     expect((container.querySelector('[data-feed-footer]') as HTMLElement).style.borderTop).toBe('');

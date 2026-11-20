@@ -386,6 +386,8 @@
       "most_birdies_all_time": "Most birdies"
     },
     "reviewPost": {
+      "pillReview": "REVIEW",
+      "pillTop100": "TOP 100",
       "hcp": "HCP {{index}}",
       "readFullReview": "Read the full review",
       "coursesReviewed_one": "{{count}} review",
