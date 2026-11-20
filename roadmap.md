@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stopped: Review Played with stop ruling
+- Apply only the four CSS media offsets and shared chip/panel attributes; preserve the place/hole lift and fullscreen positioning. Replace the authorised bottom assertions and keyboard-open fixture only.
+- Focused tests pass 36/36 (23 review cases + 13 post cases). Shard 1: 2,280 passed / 13 failed of 2,293; untouched feedReviewGlass (10 cases) and reviewPostScoreCompact (3) crash at ReviewPostCard.tsx:105:37, `TypeError: Cannot read properties of undefined (reading '0')`. No repairs/reruns; shards 2–4 not run. Expected inventory 9,352 before/after, zero additions/removals; last verified full pass 9,329. Further ruling required; report/full output: .lovable/reports/review-played-with-ruling/. Browser/authenticated checks unverified.
+
 ## Stopped: Review Played with and notifying mentions
 - Mirror review_with writes/reads without client notifications; add personal-only wizard selection/edit hydration and nonblocking save/mention sync, including staged publication.
 - Reuse shared media/text/viewer displays and tagged-member removal; batch review reads at feed/viewer hosts; audit review tag/mention notification routing and 320px containment.

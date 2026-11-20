@@ -1,0 +1,7 @@
+/* Played with chip/panel bottom offsets on media (PostGolfTags.tsx). Kept in
+   CSS because jsdom drops inline calc(var()) values; the panel shares its
+   chip's data-pw-offset. Place/hole-chip lift (bottom 50) stays inline. */
+[data-pw-offset="media"]{bottom:12px}
+[data-pw-offset="media-video"]{bottom:calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)}
+[data-pw-offset="review"]{bottom:calc(var(--review-glass-h, -12px) + 18px)}
+[data-pw-offset="review-video"]{bottom:calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)}

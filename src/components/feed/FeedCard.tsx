@@ -74,7 +74,7 @@ import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
-import { PLAYED_WITH_VIDEO_BOTTOM, PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, RemoveMeMenu, SlideTagChip, type PlayedWithPerson } from './PostGolfTags';
+import { PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, RemoveMeMenu, SlideTagChip, type PlayedWithPerson } from './PostGolfTags';
 import { getActorRouteByType } from '@/types/actor';
 import type { SlideTag } from '@/features/post-v2/lib/golfPostRules';
 import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
@@ -596,7 +596,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
         {!(photoGrid && !fill) && <>{shotPlaceChip(isMulti ? visibleSlide : 0, !!withPeople)}{shotHoleChip(isMulti ? visibleSlide : 0)}</>}
-        {withPeople && <PlayedWithMediaOverlay people={withPeople} onOpenProfile={openWithProfile} resetKey={visibleSlide} chipBottom={items[isMulti && !(photoGrid && !fill) ? visibleSlide : 0]?.type === 'video' && !(photoGrid && !fill) ? PLAYED_WITH_VIDEO_BOTTOM : undefined} />}
+        {withPeople && <PlayedWithMediaOverlay people={withPeople} onOpenProfile={openWithProfile} resetKey={visibleSlide} offset={items[isMulti && !(photoGrid && !fill) ? visibleSlide : 0]?.type === 'video' && !(photoGrid && !fill) ? 'media-video' : 'media'} />}
         {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} perTileOverlay={index => <>{shotPlaceChip(index, !!withPeople && index === gridBottomLeft)}{shotHoleChip(index)}</>} /> : isMulti ? (
           <MediaCarousel
             items={items}

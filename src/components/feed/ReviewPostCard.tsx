@@ -29,9 +29,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { CARD, LINE, T100, T60, T40 } from './feedTokens';
 import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP } from './reviewPostCard';
-import { PLAYED_WITH_VIDEO_BOTTOM, PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, type PlayedWithPerson } from './PostGolfTags';
-
-const REVIEW_WITH_BOTTOM = 'calc(var(--review-glass-h, -12px) + 18px)';
+import { PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, type PlayedWithPerson } from './PostGolfTags';
 
 const GUTTER = 14;
 const NAME_SIZE = 15;
@@ -104,7 +102,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   const showGlass = mediaLeads && (!!courseName || [rating, ...Object.values(scores)].some(value => value != null && Number.isFinite(Number(value))));
   const people = post.actorType !== 'business' && playedWith?.length ? playedWith : null;
   const [withSheetOpen, setWithSheetOpen] = useState(false);
-  const withBottom = post.mediaItems[activeMediaIndex]?.type === 'video' ? PLAYED_WITH_VIDEO_BOTTOM : REVIEW_WITH_BOTTOM;
+  const withBottom = post.mediaItems[activeMediaIndex]?.type === 'video' ? 'review-video' as const : 'review' as const;
   const mediaRef = useRef<HTMLDivElement>(null);
   const glassRef = useRef<HTMLDivElement>(null);
   const top100Ids = useFeedReviewTop100();
@@ -230,7 +228,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           }}
         >
           {mediaLeads ? media : <div style={{ position: 'absolute', inset: 0 }}>{media}</div>}
-          {people && onPlayedWithProfile && <PlayedWithMediaOverlay key={post.id} people={people} onOpenProfile={onPlayedWithProfile} resetKey={activeMediaIndex} chipBottom={withBottom} panelBottom={withBottom} />}
+          {people && onPlayedWithProfile && <PlayedWithMediaOverlay key={post.id} people={people} onOpenProfile={onPlayedWithProfile} resetKey={activeMediaIndex} offset={withBottom} />}
           {showGlass ? <>
             <div data-review-glass-fade style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '42%', pointerEvents: 'none', zIndex: 2 }} />
             <div ref={glassRef} data-review-score-strip style={{ ...FS_GLASS, position: 'absolute', left: 12, right: 12, bottom: 12, borderRadius: 14, padding: '11px 14px 10px', containerType: 'inline-size', pointerEvents: 'none', zIndex: 2 }}>

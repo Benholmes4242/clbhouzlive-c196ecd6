@@ -1,6 +1,7 @@
 /** Review tags reuse the post UI, write only after publication, and notify only
  * through the server's tag/mention triggers. Real composer/providers retained. */
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -93,6 +94,7 @@ const people = [{ userId: 'a', name: 'Thomas Holmes', username: 'a', avatarUrl: 
 const candidate: WithCandidate = { id: 'b', name: 'Danny Holmes', username: 'b', avatarUrl: null, sameRound: false, lastInteraction: '' };
 const failure = { code: '23503', message: 'Foreign key refused', details: 'Member key missing', hint: 'Check identity' };
 const markup = '@[Thomas](u:11111111-1111-1111-1111-111111111111)';
+const pwCss = readFileSync('src/components/feed/played-with.css', 'utf8');
 const required = (root: ParentNode, selector: string): HTMLElement => { const node = root.querySelector<HTMLElement>(selector); if (!node) throw new Error(`Missing ${selector}`); return node; };
 const providers = (node: React.ReactNode, client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity } } })) => <QueryClientProvider client={client}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>;
 beforeEach(() => { vi.clearAllMocks(); sessionStorage.clear(); h.actor = 'personal'; h.reviewRows = []; h.postRows = []; h.withError = null; h.deleteError = null; h.newMedia = false;
@@ -158,12 +160,14 @@ describe('review Played with', () => {
     await waitFor(() => expect(h.mentions).toHaveBeenCalledWith({ sourceType: 'review', sourceId: 'review-new', content: markup, mentionerId: 'author' }));
   });
   it('(e) review photo chip and upward panel clear the measured glass strip', () => {
-    const view = card(); const chip = required(view.container, '[data-testid="played-with-chip"]'); expect(chip.style.bottom).toBe('calc(var(--review-glass-h, -12px) + 18px)');
-    fireEvent.click(chip); const panel = required(view.container, '[data-testid="played-with-panel"]'); expect(panel.style.bottom).toBe(chip.style.bottom);
+    const view = card(); const chip = required(view.container, '[data-testid="played-with-chip"]'); expect(chip).toHaveAttribute('data-pw-offset', 'review');
+    expect(pwCss).toContain('[data-pw-offset="review"]{bottom:calc(var(--review-glass-h, -12px) + 18px)}');
+    fireEvent.click(chip); const panel = required(view.container, '[data-testid="played-with-panel"]'); expect(panel).toHaveAttribute('data-pw-offset', 'review');
     expect(panel.querySelectorAll('[data-played-with-row]')).toHaveLength(2); expect(view.container.querySelector('[data-review-score-strip]')).not.toBeNull();
   });
   it('(e) review video chip clears the mute tap area by eight pixels', () => {
-    const view = card(post(true, true)); expect(required(view.container, '[data-testid="played-with-chip"]').style.bottom).toBe('calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)');
+    const view = card(post(true, true)); expect(required(view.container, '[data-testid="played-with-chip"]')).toHaveAttribute('data-pw-offset', 'review-video');
+    expect(pwCss).toContain('[data-pw-offset="review-video"]{bottom:calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)}');
   });
   it('(f) review without media opens the sheet from both faces and byline', async () => {
     const view = card(post(false)); expect(view.container.querySelector('[data-testid="played-with-chip"]')).toBeNull();
@@ -182,7 +186,7 @@ describe('review Played with', () => {
     expect(result.withByReview.get('review-1')).toEqual([{ reviewId: 'review-1', userId: 'a', name: 'Thomas Holmes', username: 'a', avatarUrl: null }]);
   });
   it('(i) tagged viewer gets Remove me on the review and deletes their review tag', async () => {
-    const view = card(post(), { currentUserId: 'a' }); const trigger = screen.getByRole('button', { name: 'Post options' }); fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false });
+    const view = card(post(), { currentUserId: 'a' }); const trigger = screen.getByRole('button', { name: 'Post options' }); trigger.focus(); fireEvent.keyDown(trigger, { key: 'Enter' });
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Remove me' }));
     await waitFor(() => expect(h.deleted).toHaveBeenCalledWith('review_with', [['review_id', 'review-1'], ['user_id', 'a']]));
     expect(view.container.querySelector('[data-review-post-card]')).not.toBeNull();

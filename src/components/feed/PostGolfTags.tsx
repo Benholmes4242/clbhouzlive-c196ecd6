@@ -14,15 +14,16 @@ import { slideChip, withLine, withNames, type SlideTag } from '@/features/post-v
 import { removeMeFromPost } from '@/features/post-v2/lib/postWith';
 import { removeMeFromReview } from '@/features/review-v2/lib/reviewWith';
 import { toast } from '@/lib/toast';
+import './played-with.css';
 
 const WITH_COLOUR = 'rgba(248,250,252,0.62)';
 const INK = '#F8FAFC';
 
 export interface PlayedWithPerson { userId: string; name: string; username?: string | null; avatarUrl?: string | null }
 
-/** Bottom offset of the chip over a video slide: 8px above the top edge of
- *  InlineVideo's 44px mute control, which sits at var(--review-glass-h) + 18. */
-export const PLAYED_WITH_VIDEO_BOTTOM = 'calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)';
+/** Media chip/panel bottom offsets, defined in played-with.css. Video variants
+ *  sit 8px above InlineVideo's 44px mute control (var(--review-glass-h) + 18). */
+export type PlayedWithOffset = 'media' | 'media-video' | 'review' | 'review-video';
 /** A hole/place chip sits 8px above the 30px played-with chip. */
 export const PLAYED_WITH_LIFTED_BOTTOM = 50;
 
@@ -49,18 +50,19 @@ function useEscape(open: boolean, close: () => void) {
   }, [open, close]);
 }
 
-export function PlayedWithChip({ people, expanded, onToggle, style }: { people: ReadonlyArray<PlayedWithPerson>; expanded: boolean; onToggle: () => void; style?: React.CSSProperties }) {
+export function PlayedWithChip({ people, expanded, onToggle, style, offset }: { people: ReadonlyArray<PlayedWithPerson>; expanded: boolean; onToggle: () => void; style?: React.CSSProperties; offset?: PlayedWithOffset }) {
   const text = withLine(people.map((p) => p.name));
   if (!text) return null;
   return (
     <button
       type="button"
       data-testid="played-with-chip"
+      data-pw-offset={offset}
       aria-expanded={expanded}
       aria-label={`Played with: ${people.map((p) => p.name).join(', ')}`}
       onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggle(); }}
       style={{
-        position: 'absolute', left: 12, bottom: 12, zIndex: 20, height: 30, padding: '0 11px 0 4px', borderRadius: 999,
+        position: 'absolute', left: 12, zIndex: 20, height: 30, padding: '0 11px 0 4px', borderRadius: 999,
         display: 'flex', alignItems: 'center', gap: 7, maxWidth: 'calc(100% - 24px)', boxSizing: 'border-box',
         background: 'rgba(22,22,26,0.42)', backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR,
         border: '1px solid rgba(255,255,255,0.16)', fontFamily: 'inherit', fontSize: 12, fontWeight: 700, color: INK,
@@ -73,7 +75,7 @@ export function PlayedWithChip({ people, expanded, onToggle, style }: { people: 
   );
 }
 
-export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRef }: { people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string) => void; style?: React.CSSProperties; panelRef?: React.Ref<HTMLDivElement> }) {
+export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRef, offset }: { people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string) => void; style?: React.CSSProperties; panelRef?: React.Ref<HTMLDivElement>; offset?: PlayedWithOffset }) {
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
   return (
     <div
@@ -81,9 +83,10 @@ export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRe
       role="dialog"
       aria-label="Played with"
       data-testid="played-with-panel"
+      data-pw-offset={offset}
       onClick={stop} onDoubleClick={stop} onPointerDown={stop} onTouchStart={stop}
       style={{
-        position: 'absolute', left: 12, bottom: 12, zIndex: 21, width: 'min(300px, calc(100% - 24px))', boxSizing: 'border-box',
+        position: 'absolute', left: 12, zIndex: 21, width: 'min(300px, calc(100% - 24px))', boxSizing: 'border-box',
         borderRadius: 16, padding: '6px 6px 6px 12px', background: 'rgba(22,22,26,0.55)', backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR,
         border: '1px solid rgba(255,255,255,0.16)', color: INK, pointerEvents: 'auto', textAlign: 'left', ...style,
       }}
@@ -114,7 +117,7 @@ export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRe
  *  media close the panel and are swallowed (no like, no full-screen open);
  *  `resetKey` (the visible slide) closes it on swipe; leaving the screen
  *  closes it. */
-export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, chipBottom, panelBottom }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string) => void; resetKey?: unknown; chipBottom?: number | string; panelBottom?: number | string }) {
+export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, offset = 'media' }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string) => void; resetKey?: unknown; offset?: PlayedWithOffset }) {
   const [open, setOpen] = useState(false);
   const anchor = useRef<HTMLSpanElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -141,8 +144,8 @@ export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, chipBo
     <>
       <span ref={anchor} hidden aria-hidden data-played-with-anchor />
       {open
-        ? <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id) => { setOpen(false); onOpenProfile(id); }} panelRef={panel} style={panelBottom != null ? { bottom: panelBottom } : undefined} />
-        : <PlayedWithChip people={people} expanded={false} onToggle={() => setOpen(true)} style={chipBottom != null ? { bottom: chipBottom } : undefined} />}
+        ? <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id) => { setOpen(false); onOpenProfile(id); }} panelRef={panel} offset={offset} />
+        : <PlayedWithChip people={people} expanded={false} onToggle={() => setOpen(true)} offset={offset} />}
     </>
   );
 }

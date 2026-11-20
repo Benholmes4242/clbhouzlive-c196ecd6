@@ -123,7 +123,8 @@ describe('(d) stacking with a place chip', () => {
     const v = mount(p, { playedWith: PEOPLE, slideTags: tags as never });
     const chip = q(v.container, '[data-testid="slide-tag-chip"]')!;
     expect(chip.style.bottom).toBe('50px');
-    expect(q(v.container, '[data-testid="played-with-chip"]')!.style.bottom).toBe('12px');
+    expect(q(v.container, '[data-testid="played-with-chip"]')!.getAttribute('data-pw-offset')).toBe('media');
+    expect(src('src/components/feed/played-with.css')).toContain('[data-pw-offset="media"]{bottom:12px}');
   });
 });
 
