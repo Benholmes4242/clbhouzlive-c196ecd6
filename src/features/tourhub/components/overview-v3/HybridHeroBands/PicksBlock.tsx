@@ -196,7 +196,7 @@ function PicksBlockSession({
 
   return (
 <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
-    <div data-overview-picks data-picks-layout={up ? 'rows' : 'cards'} style={up ? { padding: 'var(--hero-section-gap) 20px 10px' } : { paddingTop: 8, paddingBottom: 10 }}>
+    <div data-overview-picks data-picks-layout={up ? 'rows' : 'cards'} className={up ? 'overview-picks-up' : undefined} style={up ? undefined : { paddingTop: 8, paddingBottom: 10 }}>
       <div ref={rowRef} data-overview-picks-heading style={up ? { position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, overflow: 'hidden' } : { position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one

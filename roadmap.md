@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stopped: Authorized upcoming picks CSS assertion ruling
+- Apply only the upcoming wrapper class, identical CSS padding and the two authorized assertions; preserve cards and all other assertions. No prior ≤340px wrapper override exists, so add none.
+- Shards 1/2 pass 2,279/2,281; authorized Merged Airy case passes 17/17. Shard 3 stops at 2,333 passed/4 failed: upcomingLastYearBoard.test.tsx:58:30 and :73:30 expect 36px; two postWithErrorSurface edit fixtures fail at StageComposer.tsx:222:8 (`supabase.from(...).select(...).eq is not a function`). Shard 4 not run, failures untouched; further repairs need authorization. Expected inventory remains 9,329 (9,301 + 6 Overview + 13 Played with + 9 subsequent save-error tests); no cases added or removed by this ruling. Full output/report: .lovable/reports/upcoming-picks-ruling/.
+
 ## Stopped: Played with save-error reporting
 - Return exact Supabase diagnostics, show eight-second create/edit errors and track failures without rolling back posts or displaying unsaved names.
 - Two authorised string-array mocks updated; nine new tests. Focused 50/52 stops on two edit fixtures: StageComposer.tsx:222:8, `TypeError: supabase.from(...).select(...).eq is not a function`. No test repair or shards run; needs fixture-repair authorisation. Expected inventory 9,320 → 9,329; last complete passing suite 9,301. Report: .lovable/reports/played-with-save-errors.md. Authenticated end-to-end checks unavailable on external Supabase.

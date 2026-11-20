@@ -109,6 +109,7 @@
 .upcoming-event-facts b{display:block;line-height:var(--hero-cell-line);font-variant-numeric:tabular-nums;color:#F8FAFC;white-space:nowrap}
 .upcoming-event-facts span{display:block;margin-top:var(--hero-label-gap);font-size:9.5px;font-weight:800;letter-spacing:var(--hero-label-tracking);line-height:13px;text-transform:uppercase;color:rgba(248,250,252,.42);white-space:nowrap}
 .upcoming-sec{padding:var(--hero-section-gap) 20px 0;color:#F8FAFC}
+.overview-picks-up{padding:var(--hero-section-gap) 20px 10px}
 .upcoming-sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .upcoming-sec-kick{margin:0;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,250,252,.62);line-height:1.4}
 .upcoming-course-link.upcoming-sec-kick{padding:0;height:auto;border:0;background:none;white-space:nowrap}

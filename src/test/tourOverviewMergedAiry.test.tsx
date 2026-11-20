@@ -88,7 +88,8 @@ describe('Merged Airy lower sections', () => {
     const picks = v.container.querySelector<HTMLElement>('[data-overview-picks]');
     expect(picks).not.toBeNull(); if (!picks) return;
     expect(picks.querySelectorAll('[data-overview-pick-row]').length).toBeGreaterThan(0);
-    expect(picks.getAttribute('style')).toContain('padding: var(--hero-section-gap) 20px 10px'); expect(picks.querySelector('[data-overview-picks-hairline]')).toBeNull();
+    expect(picks.classList.contains('overview-picks-up')).toBe(true);
+    expect(readFileSync('src/styles/hybrid-hero.css', 'utf8')).toContain('.overview-picks-up{padding:var(--hero-section-gap) 20px 10px}'); expect(picks.querySelector('[data-overview-picks-hairline]')).toBeNull();
     for (const row of picks.querySelectorAll<HTMLElement>('[data-overview-pick-row]')) expect(row.style.height).toBe('48px');
   });
   it.each(['live', 'completed'] as const)('adds no picks hairline and keeps the tighter cards in %s', phase => {
