@@ -1114,7 +1114,7 @@ export function FullscreenFeedOverlay() {
                     golfContext={activeGolfContext}
                     videoRoundShape={videoRoundShapes?.get(activeGolfContext?.roundScoreId ?? '') ?? null}
                     videoDetails={activePost ? videoDetailsMap.get(activePost.id) ?? null : null}
-                    playedWith={activePost ? viewerGolfTags.withByPost.get(activePost.id) : undefined}
+                    playedWith={activePost?.isReview && activePost.review?.reviewId ? viewerGolfTags.withByReview?.get(activePost.review.reviewId) : activePost ? viewerGolfTags.withByPost.get(activePost.id) : undefined}
                     golfHole={activeGolfHole}
                     golfHoles={golfHoleMap.get(activeGolfContext?.courseId ?? '')}
                     onOpenScorecard={(scoreId) => { if (!activePost) return; if (videoDetailsMap.get(activePost.id)?.holeMarks && Object.keys(videoDetailsMap.get(activePost.id)?.holeMarks ?? {}).length >= 2) videoScorecard.openByScore(scoreId, null, activePost.userId); else setGolfScorecard({ scoreId, userId: activePost.userId }); }}

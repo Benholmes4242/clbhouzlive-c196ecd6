@@ -12,6 +12,7 @@ import BottomSheet from '@/features/post-v2/components/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { slideChip, withLine, withNames, type SlideTag } from '@/features/post-v2/lib/golfPostRules';
 import { removeMeFromPost } from '@/features/post-v2/lib/postWith';
+import { removeMeFromReview } from '@/features/review-v2/lib/reviewWith';
 import { toast } from '@/lib/toast';
 
 const WITH_COLOUR = 'rgba(248,250,252,0.62)';
@@ -113,7 +114,7 @@ export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRe
  *  media close the panel and are swallowed (no like, no full-screen open);
  *  `resetKey` (the visible slide) closes it on swipe; leaving the screen
  *  closes it. */
-export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, chipBottom }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string) => void; resetKey?: unknown; chipBottom?: number | string }) {
+export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, chipBottom, panelBottom }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string) => void; resetKey?: unknown; chipBottom?: number | string; panelBottom?: number | string }) {
   const [open, setOpen] = useState(false);
   const anchor = useRef<HTMLSpanElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -140,7 +141,7 @@ export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, chipBo
     <>
       <span ref={anchor} hidden aria-hidden data-played-with-anchor />
       {open
-        ? <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id) => { setOpen(false); onOpenProfile(id); }} panelRef={panel} />
+        ? <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id) => { setOpen(false); onOpenProfile(id); }} panelRef={panel} style={panelBottom != null ? { bottom: panelBottom } : undefined} />
         : <PlayedWithChip people={people} expanded={false} onToggle={() => setOpen(true)} style={chipBottom != null ? { bottom: chipBottom } : undefined} />}
     </>
   );
@@ -243,15 +244,16 @@ export function SlideTagChip({ tag, lifted }: { tag: SlideTag | null | undefined
   );
 }
 
-export function RemoveMeMenu({ postId, memberId }: { postId: string; memberId: string }) {
+export function RemoveMeMenu({ postId, memberId, reviewId }: { postId: string; memberId: string; reviewId?: string }) {
   const qc = useQueryClient();
   const remove = async () => {
     try {
-      await removeMeFromPost(postId, memberId);
+      if (reviewId) await removeMeFromReview(reviewId, memberId);
+      else await removeMeFromPost(postId, memberId);
       qc.invalidateQueries({ queryKey: ['post-golf-tags'] });
-      toast.success('Removed from this post');
+      toast.success(reviewId ? 'Removed from this review' : 'Removed from this post');
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "You couldn't be removed from this post.");
+      toast.error(e instanceof Error ? e.message : reviewId ? "You couldn't be removed from this review." : "You couldn't be removed from this post.");
     }
   };
   return (

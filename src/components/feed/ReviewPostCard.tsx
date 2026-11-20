@@ -16,7 +16,7 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * natural article height; only words-first/no-media reviews retain the cap.
  */
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { FS_GLASS } from '@/components/fullscreen-feed/fullscreenCanon';
 import { useFeedReviewTop100 } from '@/hooks/feed/useTop100CourseIds';
 import './feedReviewGlass.css';
@@ -29,6 +29,9 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { CARD, LINE, T100, T60, T40 } from './feedTokens';
 import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP } from './reviewPostCard';
+import { PLAYED_WITH_VIDEO_BOTTOM, PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, type PlayedWithPerson } from './PostGolfTags';
+
+const REVIEW_WITH_BOTTOM = 'calc(var(--review-glass-h, -12px) + 18px)';
 
 const GUTTER = 14;
 const NAME_SIZE = 15;
@@ -60,11 +63,14 @@ export interface ReviewPostCardProps {
   layout?: 'standard' | 'mediaFirst';
   /** FeedCard owns actions, liked-by, comments and Add-a-comment in both states. */
   mediaFirstFooter?: (reviewBlock: React.ReactNode) => React.ReactNode;
+  playedWith?: ReadonlyArray<PlayedWithPerson>;
+  onPlayedWithProfile?: (userId: string) => void;
+  activeMediaIndex?: number;
 }
 
 export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   post, articleRef, feedIndex, onProfile, onReadReview, onPrefetch, onOpenCourse, followPill, ownerMenu, media, footer,
-  layout = 'standard', mediaFirstFooter,
+  layout = 'standard', mediaFirstFooter, playedWith, onPlayedWithProfile, activeMediaIndex = 0,
 }) => {
   const { t } = useTranslation('common');
   const { t: tCourses } = useTranslation('courses');
@@ -96,6 +102,9 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   const mediaLeads = isMediaFirst && !!media;
   const glassRegion = [review?.courseRegion, review?.courseSubCountry, review?.courseCountry].find(value => value?.trim()) ?? '';
   const showGlass = mediaLeads && (!!courseName || [rating, ...Object.values(scores)].some(value => value != null && Number.isFinite(Number(value))));
+  const people = post.actorType !== 'business' && playedWith?.length ? playedWith : null;
+  const [withSheetOpen, setWithSheetOpen] = useState(false);
+  const withBottom = post.mediaItems[activeMediaIndex]?.type === 'video' ? PLAYED_WITH_VIDEO_BOTTOM : REVIEW_WITH_BOTTOM;
   const mediaRef = useRef<HTMLDivElement>(null);
   const glassRef = useRef<HTMLDivElement>(null);
   const top100Ids = useFeedReviewTop100();
@@ -173,6 +182,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           />
         </button>
         <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
           <button
             type="button"
             onClick={onProfile}
@@ -184,12 +194,14 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           >
             <InlineProMemberName userId={post.actorType === 'business' || post.actorType === 'system' ? undefined : post.userId}>{post.displayName}</InlineProMemberName>
           </button>
+          {people && !media && <PlayedWithNameFaces people={people} onOpen={() => setWithSheetOpen(true)} />}
+          </div>
           {/* A.1 — the meta line reads exactly like a normal post: the owner
               menu, then the date, then the follow pill, all inline. The earlier
               deliberate top-right departure was removed by user decision. */}
           <div data-review-who-line style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
             {ownerMenu}
-            <span style={{ fontSize: 12, lineHeight: NAME_LINE, color: T60, whiteSpace: 'nowrap' }}>{whoLine}</span>
+            {people && !media ? <PlayedWithByline people={people} onOpen={() => setWithSheetOpen(true)} tail={whoLine} style={{ fontSize: 12, lineHeight: NAME_LINE, color: T60, flex: '0 1 auto' }} /> : <span style={{ fontSize: 12, lineHeight: NAME_LINE, color: T60, whiteSpace: 'nowrap' }}>{whoLine}</span>}
             {followPill}
           </div>
         </div>
@@ -218,6 +230,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           }}
         >
           {mediaLeads ? media : <div style={{ position: 'absolute', inset: 0 }}>{media}</div>}
+          {people && onPlayedWithProfile && <PlayedWithMediaOverlay key={post.id} people={people} onOpenProfile={onPlayedWithProfile} resetKey={activeMediaIndex} chipBottom={withBottom} panelBottom={withBottom} />}
           {showGlass ? <>
             <div data-review-glass-fade style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '42%', pointerEvents: 'none', zIndex: 2 }} />
             <div ref={glassRef} data-review-score-strip style={{ ...FS_GLASS, position: 'absolute', left: 12, right: 12, bottom: 12, borderRadius: 14, padding: '11px 14px 10px', containerType: 'inline-size', pointerEvents: 'none', zIndex: 2 }}>
@@ -233,6 +246,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
 
       {/* G — engagement, unchanged objects */}
       <div style={{ flex: 'none' }}>{isMediaFirst && mediaFirstFooter ? mediaFirstFooter(mediaLeads ? reviewBlock : null) : <>{mediaLeads ? reviewBlock : null}{footer}</>}</div>
+      {people && onPlayedWithProfile && <PlayedWithSheet open={withSheetOpen} people={people} onClose={() => setWithSheetOpen(false)} onOpenProfile={onPlayedWithProfile} />}
     </article>
   );
 };

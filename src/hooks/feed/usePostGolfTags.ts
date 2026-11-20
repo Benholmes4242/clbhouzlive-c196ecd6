@@ -3,35 +3,42 @@
  * LightCardFeed), beside useFeedCommentPreview: ONE post_with read (+ one
  * profile read), ONE course_hole_media and ONE course_place_media read for the
  * page's media, and one hole-analysis read per distinct tagged course for pars.
- * Never one query per card.
+ * ONE review_with read (+ its profile read) joins review tags in this same
+ * host batch, including fullscreen; cards never fetch either tag source.
  */
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
 import { readPostWith, type PostWithPerson } from '@/features/post-v2/lib/postWith';
+import { readReviewWith, type ReviewWithPerson } from '@/features/review-v2/lib/reviewWith';
 import type { SlideTag } from '@/features/post-v2/lib/golfPostRules';
 import type { CourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 
 export interface PostGolfTags {
   withByPost: Map<string, PostWithPerson[]>;
+  withByReview: Map<string, ReviewWithPerson[]>;
   slideTags: Map<string, SlideTag>;
 }
-const EMPTY: PostGolfTags = { withByPost: new Map(), slideTags: new Map() };
+const EMPTY: PostGolfTags = { withByPost: new Map(), withByReview: new Map(), slideTags: new Map() };
 
 export async function fetchPostGolfTags(posts: readonly FeedPost[]): Promise<PostGolfTags> {
   const ids = posts.map((p) => p.id);
+  const reviewIds = [...new Set(posts.map(p => p.review?.reviewId).filter((id): id is string => !!id))];
   const media = posts.flatMap((p) => p.mediaItems ?? []);
   const urls = [...new Set(media.flatMap((m) => [m.imageUrl, m.hlsUrl].filter((u): u is string => !!u)))];
   const streams = [...new Set(media.map((m) => m.streamId).filter((s): s is string => !!s))];
   const orFilter = [urls.length ? `media_url.in.(${urls.map((u) => `"${u}"`).join(',')})` : null, streams.length ? `stream_id.in.(${streams.join(',')})` : null].filter(Boolean).join(',');
-  const [people, holes, places] = await Promise.all([
+  const [people, reviewPeople, holes, places] = await Promise.all([
     readPostWith(ids),
+    readReviewWith(reviewIds),
     orFilter ? supabase.from('course_hole_media').select('course_id, hole_no, media_url, media_type, stream_id').eq('status', 'approved').or(orFilter) : Promise.resolve({ data: [] }),
     orFilter ? supabase.from('course_place_media').select('course_id, place, media_url, media_type, stream_id').eq('status', 'approved').or(orFilter) : Promise.resolve({ data: [] }),
   ]);
   const withByPost = new Map<string, PostWithPerson[]>();
   for (const p of people) withByPost.set(p.postId, [...(withByPost.get(p.postId) ?? []), p]);
+  const withByReview = new Map<string, ReviewWithPerson[]>();
+  for (const p of reviewPeople) withByReview.set(p.reviewId, [...(withByReview.get(p.reviewId) ?? []), p]);
 
   const holeRows = (holes.data ?? []) as Array<{ course_id: string; hole_no: number; media_url: string; media_type: string; stream_id: string | null }>;
   const courseIds = [...new Set(holeRows.map((r) => r.course_id))];
@@ -47,13 +54,14 @@ export async function fetchPostGolfTags(posts: readonly FeedPost[]): Promise<Pos
   for (const r of holeRows) {
     slideTags.set(holeMediaKey({ mediaType: r.media_type, url: r.media_url, streamId: r.stream_id }), { hole: r.hole_no, par: pars.get(`${r.course_id}:${r.hole_no}`) ?? null });
   }
-  return { withByPost, slideTags };
+  return { withByPost, withByReview, slideTags };
 }
 
 export function usePostGolfTags(posts: readonly FeedPost[], scope: string): PostGolfTags {
   const ids = posts.map((p) => p.id);
+  const reviewIds = posts.map(p => p.review?.reviewId ?? '').join(',');
   const q = useQuery({
-    queryKey: ['post-golf-tags', scope, ids.join(',')],
+    queryKey: ['post-golf-tags', scope, ids.join(','), reviewIds],
     enabled: ids.length > 0,
     queryFn: () => fetchPostGolfTags(posts),
     staleTime: 60_000,

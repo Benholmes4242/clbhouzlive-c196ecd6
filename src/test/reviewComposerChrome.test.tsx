@@ -16,6 +16,9 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
 vi.mock('@/features/review-v2/hooks/useReviewMediaPipeline', () => ({ useReviewMediaPipeline: () => ({ items: [], count: 0, pickerError: null, pendingRemovals: () => [], commitRemovals: vi.fn(), discardRemovals: vi.fn() }) }));
 vi.mock('@/features/review-v2/hooks/useReviewSubmit', () => ({ useReviewSubmit: () => ({ submitting: false }) }));
+vi.mock('@/features/post-v2/lib/golfPostReads', () => ({ fetchPlayedWithSuggestions: async () => [], readWithCandidates: async () => [], searchMembers: async () => [] }));
+vi.mock('@/features/review-v2/lib/reviewWith', () => ({ readReviewWith: async () => [], writeReviewWith: async () => ({ saved: [], error: null }), syncReviewWith: async () => null }));
+vi.mock('@/lib/mentions/syncMentions', () => ({ syncMentionsForContent: async () => ({ added: 0, removed: 0, kept: 0 }) }));
 vi.mock('@/features/review-v2/hooks/useReviewHoleTags', () => ({ useReviewHoleTags: () => ({ holes: [], assignments: {} }) }));
 vi.mock('@/features/review-v2/hooks/useReviewHeaderFacts', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/review-v2/hooks/useReviewHeaderFacts')>()), useReviewHeaderFacts: () => ({ avg: null, count: 0, rank: null }) }));
 vi.mock('@/features/review-v2/hooks/useMyRatedScores', () => ({ useMyRatedScores: () => ({ data: [] }), calibrationRank: () => null }));

@@ -76,6 +76,9 @@ import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { missingScores, scoreAction, scoreFooter, scoreShareKey } from './lib/scoreStepRules';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { PlayedWithSection } from '@/features/post-v2/components/golf/GolfPostSections';
+import { useReviewPlayedWith } from './hooks/useReviewPlayedWith';
+import { saveReviewSocial } from './lib/saveReviewSocial';
 
 /**
  * THE HEADER'S OWN GEOMETRY — one expression, two consumers.
@@ -440,6 +443,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const composer = useReviewComposer(existing, course.id, draftMediaCounts, {
     retry: !!retryOfPendingId,
   });
+  const personal = activeActor?.type !== 'business';
+  // This wizard has no played-date field; null deliberately avoids inventing a
+  // round from publication time. A future known date is supplied to this hook.
+  const playedWith = useReviewPlayedWith({ userId, reviewId: existing?.id ?? null, personal, content: composer.state.reviewText, round: null });
 
   /* The one sentence that names the loss (_05 §1). Built from separate singular
      and plural keys rather than an interpolated count, because the six locales
@@ -622,7 +629,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     composer.overallTouched ||
     composer.catsSet > 0 ||
     composer.state.reviewText.trim().length > 0 ||
-    media.count > 0;
+    media.count > 0 ||
+    playedWith.tagged.length > 0;
 
   const exitForReal = useCallback(() => {
     composer.clearDraft();
@@ -650,6 +658,12 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const commitSubmit = useCallback(async () => {
     if (!composer.canSubmit || submit.submitting) return;
     const overallTouched = composer.state.overall != null;
+    const saveSocial = async (reviewId: string) => {
+      if (!userId) return;
+      await saveReviewSocial({ reviewId, userId, content: composer.state.reviewText, previous: playedWith.previous.current,
+        next: playedWith.tagged.map(person => person.id), edit: isEditMode, personal });
+      void qc.invalidateQueries({ queryKey: ['post-golf-tags'] });
+    };
     try {
       const mediaExpected = media.pendingMediaCount();
       const holeJob = holeTags.capture();
@@ -660,6 +674,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           courseId: course.id,
           state: composer.state,
         });
+        await saveSocial(ratingId);
         // §1: the save succeeded — only now do removed published media go.
         media.commitRemovals({ courseId: course.id, mode });
         submittedRef.current = true;
@@ -698,7 +713,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         // NOT AWAITED, and NO cache sweep here: nothing the app reads has
         // changed yet; a refetch now would show the old review as current.
         media.writeUploadedHolePhotos(holeJob);
-        media.startBackgroundPublish(pendingId, { queryClient: qc, holeJob, commit: { courseId: course.id, mode } });
+        media.startBackgroundPublish(pendingId, { queryClient: qc, holeJob, commit: { courseId: course.id, mode }, onPublished: saveSocial });
 
         onSuccess({
           ratingId: null,
@@ -746,7 +761,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode, holeTags]);
+  }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode, holeTags, userId, personal, playedWith]);
 
   /* REVIEW_EDITOR_SAFETY §2: an edit that loses published words or media asks first. */
   const [loss, setLoss] = useState<EditLoss | null>(null);
@@ -1236,6 +1251,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
               />
             </div>
           </section>
+
+          {personal && <PlayedWithSection suggestions={playedWith.suggestions} tagged={playedWith.tagged}
+            mentioned={playedWith.mentioned} selfId={userId} search={playedWith.search} onToggle={playedWith.onToggle} />}
 
           {/* PHOTOS AND VIDEOS (§4). Tray chips open the existing tagging sheet. */}
           <section data-step1-photos style={{ padding: '0 20px' }}>

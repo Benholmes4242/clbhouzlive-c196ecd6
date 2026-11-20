@@ -717,7 +717,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
 
   /** Fire-and-forget: the controller uploads then publishes, surviving unmount. */
   const startBackgroundPublish = useCallback(
-    (pendingId: string, opts?: { queryClient?: QueryClient; holeJob?: ComposerHoleJob; commit?: { courseId: string; mode: string } }) => {
+    (pendingId: string, opts?: { queryClient?: QueryClient; holeJob?: ComposerHoleJob; commit?: { courseId: string; mode: string }; onPublished?: (reviewId: string) => Promise<void> }) => {
       const pending = itemsRef.current.filter(
         (i) => !i.isExisting && !!i.file,
       );
@@ -746,7 +746,11 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
         })),
         () => { if (commitOpts) cleanupRemovedMedia(removals, commitOpts); if (qc) invalidateCourseRatingCaches(qc); },
         opts?.holeJob,
-      );
+      ).then(async outcome => {
+        // Social writes need the published review id, never the pending id;
+        // the captured callback survives receipt navigation and editor unmount.
+        if (outcome.ok && outcome.ratingId) await opts?.onPublished?.(outcome.ratingId);
+      }).catch(error => console.warn('[review-v2] post-publication sync failed:', error));
     },
     [userId, updateItem],
   );

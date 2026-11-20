@@ -955,7 +955,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             reviewCourseId={post.review?.courseId ?? null}
             variant="inline"
           />
-        ) : null}
+        ) : currentUserId && post.review?.reviewId && playedWith?.some(person => person.userId === currentUserId) ? <RemoveMeMenu postId={post.id} reviewId={post.review.reviewId} memberId={currentUserId} /> : null}
+        playedWith={playedWith}
+        onPlayedWithProfile={openWithProfile}
+        activeMediaIndex={visibleSlide}
         media={items.length ? renderMedia(layout !== 'mediaFirst') : null}
         footer={renderFooter(14, true)}
         mediaFirstFooter={(caption) => renderFooter(14, true, { caption, addComment })}

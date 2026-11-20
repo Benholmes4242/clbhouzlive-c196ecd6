@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Review Played with and notifying mentions
+- Mirror review_with writes/reads without client notifications; add personal-only wizard selection/edit hydration and nonblocking save/mention sync, including staged publication.
+- Reuse shared media/text/viewer displays and tagged-member removal; batch review reads at feed/viewer hosts; audit review tag/mention notification routing and 320px containment.
+- Added 23 cases and mock-only stubs in two existing wizard files; focused 68/71 (new file 20/23) stops on reviewPlayedWith.test.tsx:161:127, :166:124 (jsdom drops calc/var bottom) and :186:34 (Remove me menu not opened by the fixture event). No failing-test repair or shards run; further test rulings required. Expected 9,329 → 9,352; last complete pass 9,329. Report/full output: .lovable/reports/review-played-with/. Authenticated and 320px checks unverified.
+
 ## Complete: Two authorized test-only stop repairs
 - Fix only postWithErrorSurface's chainable select/then/posts maybeSingle fixture and upcomingLastYearBoard's two row heights/name size; no rank size assertions exist to update. Keep all nine save-error assertions and all other board assertions unchanged; no app code changes.
 - Focused 16/16; four separate sequential shards pass 2,279 / 2,281 / 2,337 / 2,432 = 9,329/9,329 across 832 files, zero failures. Inventory 9,329 before/after; no cases added, removed or renamed. Prior Overview/Played with CSS and save-error test stops below are superseded by this full pass. Full output and old→new assertion report: .lovable/reports/two-test-only-rulings/. No app code changed; real-account/device checks remain unverified.

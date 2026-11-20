@@ -641,7 +641,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         </div>
         )}
 
-        {!shot && !syntheticPosts && activePost.actorType !== 'business' && !activePost.isReview && playedWith && playedWith.length > 0 && (
+        {!shot && !syntheticPosts && activePost.actorType !== 'business' && playedWith && playedWith.length > 0 && (
           <PlayedWithViewerChip
             key={activePost.id}
             people={playedWith}

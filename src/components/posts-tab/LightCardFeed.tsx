@@ -658,7 +658,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                 layout={layout}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
-                playedWith={golfTags.withByPost.get(post.id)}
+                playedWith={post.isReview && post.review?.reviewId ? golfTags.withByReview?.get(post.review.reviewId) : golfTags.withByPost.get(post.id)}
                 slideTags={golfTags.slideTags}
                 golfContext={golfContextMap?.get(post.id) ? { ...golfContextMap.get(post.id), roundScoreId: null } as import('@/hooks/feed/usePostGolfContext').PostGolfContext : null}
                 golfHoles={golfHoleMap.get(golfContextMap?.get(post.id)?.courseId ?? '')}

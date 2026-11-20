@@ -92,6 +92,17 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   } = row;
   const data = (rawData && typeof rawData === 'object' ? rawData : {}) as Record<string, string | undefined>;
 
+  // Review tags and mentions prefer their actual feed post; without one the
+  // course Reviews tab consumes the exact review target. Never infer a post id.
+  if ((type === 'tag' || type === 'mention') && data.source_type === 'review') {
+    if (data.post_id) return `/post/${data.post_id}`;
+    const cid = data.course_id;
+    const rid = data.review_id ?? data.source_id ?? data.rating_id ?? (entity_type === 'review' ? entity_id : null);
+    if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
+    if (cid) return `/courses/${cid}?tab=reviews`;
+    return '';
+  }
+
   // --- rounds win outright (MICRO_BRIEF_ROUND_LINK_FLASH S1.2) -----------
   // This check USED to live in the `new_post` case at the bottom of the
   // resolver, where it never ran: a round notification carries
