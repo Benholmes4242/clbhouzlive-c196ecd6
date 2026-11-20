@@ -207,10 +207,10 @@ describe('exact-match board and leaders', () => {
   });
   it('board faces use canonical hairline and header/row values match the ruling', () => {
     const source = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/LiveHeroBoard.tsx', 'utf8');
-    expect(source).toContain('size={26}'); expect(source).toContain('hairlineRing'); expect(source).not.toContain('hideRing');
-    expect(source).toContain('minHeight: 22, fontSize: 9.5'); expect(source).toContain("letterSpacing: '0.1em'");
-    expect(source).toContain('fontSize: 14, fontWeight: 600'); expect(source).toContain('fontSize: 12.5, fontWeight: 700');
-    expect(source).toContain("minHeight: 44, padding: '0 20px'");
+    expect(source).toContain('size={22}'); expect(source).toContain('hairlineRing'); expect(source).not.toContain('hideRing');
+    expect(source).toContain('fontSize: 10'); expect(source).toContain("letterSpacing: '0.08em'");
+    expect(source).toContain('fontSize: 13, fontWeight: 600'); expect(source).toContain('fontSize: 12, fontWeight: 700');
+    expect(source).toContain("minHeight: 31, padding: '0 20px'");
   });
   it('leaders live and non-live grids stay independent', () => {
     const row = picked({ round_2: -1, thru: 12 });

@@ -40,7 +40,7 @@ describe('upcoming hero new order', () => {
     expect(v.container.querySelector('[data-overview-facts]')?.classList.contains('upcoming-event-facts')).toBe(true);
     expect(v.container.querySelectorAll('[data-upcoming-fact]')).toHaveLength(4);
     const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
-    expect(css).toContain('.upcoming-event-facts{display:flex;justify-content:space-between;gap:8px;margin:20px 20px 0}');
+    expect(css).toContain('.upcoming-event-facts{display:flex;justify-content:space-between;gap:8px;margin:var(--hero-section-gap) 20px 0}');
   });
   it('course renders OUT/IN scorecards with summed totals, par-5 marks and no bar strip', () => {
     const v = wrap(<UpcomingCourse holes={holes} tournamentId="e" />);
@@ -68,7 +68,7 @@ describe('upcoming hero new order', () => {
     fireEvent.click(btn!);
     expect(screen.getByRole('status').textContent).toBe('?section=course');
   });
-  it('upcoming picks are full-name rows sorted by tee time with 32px avatars', () => {
+  it('upcoming picks are full-name rows sorted by tee time with 26px avatars', () => {
     f.picks = [{ playerId: 'a', playerName: 'Alpha One' }, { playerId: 'b', playerName: 'Bravo Two' }, { playerId: 'c', playerName: 'Charlie Three' }];
     const base = Date.now() + 3 * 86_400_000;
     f.tees = new Map([['a', new Date(base + 7_200_000).toISOString()], ['c', new Date(base).toISOString()]]);
@@ -78,7 +78,7 @@ describe('upcoming hero new order', () => {
     expect(rows[2].querySelector('[data-overview-pick-tee]')).toBeNull();
     expect(v.container.querySelector('[data-overview-picks-grid]')).toBeNull();
     const avatar = rows[0].querySelector<HTMLElement>('[data-overview-pick-avatar] > *');
-    expect(avatar?.outerHTML).toMatch(/32px|"32"/);
+    expect(avatar?.outerHTML).toMatch(/26px|"26"/);
   });
   it('≤340px rule narrows the total column to 36px and yards to 10.5px', () => {
     const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
@@ -86,7 +86,7 @@ describe('upcoming hero new order', () => {
     expect(rule).toContain('grid-template-columns:repeat(9,minmax(0,1fr)) 36px');
     expect(rule).toContain('.upcoming-sct .y{font-size:10.5px;letter-spacing:-.01em}');
   });
-  it('computed: course sits 30px under Last year and fact cells carry no padding', () => {
+  it('computed: course uses shared section gap under Last year and fact cells carry no padding', () => {
     const style = document.createElement('style');
     style.textContent = readFileSync('src/styles/hybrid-hero.css', 'utf8').replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '');
     document.head.appendChild(style);
@@ -94,7 +94,7 @@ describe('upcoming hero new order', () => {
       const v = wrap(<><UpcomingFacts first={null} zone={null} field={132} purse={3000000} par={71} yards={6860} /><UpcomingLastYear rows={[{ rank: '1', name: 'Winner', country: 'USA', score: '−20', year: '2025', photoUrl: null }]} /><UpcomingCourse holes={holes} tournamentId="e" /></>);
       const course = v.container.querySelector<HTMLElement>('[data-overview-course]')!;
       expect(course.previousElementSibling?.hasAttribute('data-overview-last-year')).toBe(true);
-      expect(getComputedStyle(course).paddingTop).toBe('30px');
+      expect(style.textContent).toContain('.upcoming-sec{padding:var(--hero-section-gap) 20px 0');
       const cells = v.container.querySelectorAll<HTMLElement>('[data-upcoming-fact]');
       expect(cells.length).toBe(4);
       // jsdom reports an undeclared padding as '' (initial 0px); the old var() rule would report its own value.

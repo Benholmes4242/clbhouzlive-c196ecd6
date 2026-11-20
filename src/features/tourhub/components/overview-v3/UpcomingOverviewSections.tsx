@@ -20,6 +20,7 @@ import './HybridHeroBands/liveStates.css';
 import { Button } from '@/components/ui/button';
 import { playerRoute, tournamentRoute } from '../../routes';
 import { glanceFacts } from '../../tournament-v2/data/tournamentRules';
+import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import { LastYearRow } from './HybridHeroBands/LastYearRow';
 import { followedUpcomingPlayers, venueTee, type UpcomingPlayer } from './upcomingOverviewRules';
 import type { LastYearFinisher } from '../../hooks/useTournamentLastYearTop4';
@@ -38,7 +39,7 @@ export function UpcomingFacts({ first, zone, field, purse, par, yards = null, st
   const { t } = useTranslation('tourhub');
   const cells = upcomingFactCells(first, zone, field, purse, par, yards, startDayNamed);
   if (!cells.length) return null;
-  return <section data-overview-event className="upcoming-event"><div data-overview-facts className="upcoming-event-facts">{cells.map(cell => <div key={cell.key} data-upcoming-fact={cell.key}><b>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div></section>;
+  return <section data-overview-event className="upcoming-event"><div data-overview-facts className="upcoming-event-facts">{cells.map(cell => <div key={cell.key} data-upcoming-fact={cell.key}><b style={HERO_TOT_TYPE}>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div></section>;
 }
 export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { member: boolean; followed: Set<string>; field: UpcomingPlayer[]; drawn: boolean; zone: string | null }) {
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();

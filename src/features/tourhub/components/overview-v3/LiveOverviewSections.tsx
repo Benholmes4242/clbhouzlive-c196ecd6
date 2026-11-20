@@ -10,6 +10,7 @@ import { useTournamentCourseHoles } from '../../tournament-v2/data/useTournament
 import { useTournamentHoleAnalysis } from '../../tournament-v2/data/useTournamentHoleAnalysis';
 import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { AllTeeTimesSheet } from '../../tournament-v2/sections/AllTeeTimesSheet';
+import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { surnameOf } from '../../_shared/playerName';
 import { formatTimeHm24 } from '@/i18n/format';
@@ -53,7 +54,7 @@ export function LiveFacts({ cells }: { cells: LiveFactCell[] }) {
     <div data-live-facts className="upcoming-event-facts live-facts">
       {cells.map(c => (
         <div key={c.key} data-live-fact={c.key}>
-          <b style={c.toPar != null ? { color: getScoreColor(c.toPar, 'dark') } : undefined}>{c.value}</b>
+          <b style={{ ...HERO_TOT_TYPE, ...(c.toPar != null ? { color: getScoreColor(c.toPar, 'dark') } : {}) }}>{c.value}</b>
           {c.key === 'scoringAvg'
             ? <span><span className="live-fact-full">{t('overview.live.facts.scoringAvg')}</span><span className="live-fact-short">{t('overview.live.facts.scoringAvgShort')}</span></span>
             : <span>{t(`overview.live.facts.${c.key}`)}</span>}
@@ -85,7 +86,7 @@ export function LiveFirstTees({ groups, zone, tournamentId, tournamentName }: { 
           </div>
         ))}
       </div>
-      <Button variant={null} size={null} data-live-all-tees style={{ display: 'flex', justifyContent: 'space-between', width: '100%', height: 'auto', minHeight: 40, padding: 0, border: 0, background: 'none', fontSize: 13, fontWeight: 600, color: 'rgba(248,250,252,.62)' }} onClick={() => setOpen(true)}><span>{t('overview.live.tees.all')}</span><span aria-hidden style={{ color: '#FFFFFF', fontSize: 16 }}>›</span></Button>
+      <Button variant={null} size={null} data-live-all-tees style={{ display: 'flex', justifyContent: 'space-between', width: '100%', height: 'auto', minHeight: 31, padding: 0, border: 0, background: 'none', fontSize: 13, fontWeight: 600, color: 'rgba(248,250,252,.62)' }} onClick={() => setOpen(true)}><span>{t('overview.live.tees.all')}</span><span aria-hidden style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 700 }}>›</span></Button>
       <AllTeeTimesSheet open={open} onClose={() => setOpen(false)} tournamentId={tournamentId} tournamentName={tournamentName} defaultRound={1} />
     </section>
   );

@@ -69,8 +69,8 @@
 .upcoming-facts>div{padding:12px 0;min-width:0;text-align:center}.upcoming-facts>div+div{padding-left:0}
 .upcoming-facts b{display:block;font-size:19px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upcoming-facts span{display:block;margin-top:6px;font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--tv-dim);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.upcoming-block{padding:18px var(--upcoming-side) 0}.upcoming-kicker{margin:0;font-size:10px;font-weight:800;letter-spacing:.16em;color:rgba(248,250,252,.62);text-transform:uppercase;line-height:1.4}
-.upcoming-players-line{margin:6px 0 0;font-size:13.5px;line-height:1.4;color:var(--tv-soft)}.upcoming-players-line strong{color:var(--th-text-primary)}
+.upcoming-block{padding:var(--hero-section-gap) var(--upcoming-side) 0}.upcoming-kicker{margin:0;font-size:10px;font-weight:800;letter-spacing:.16em;color:rgba(248,250,252,.62);text-transform:uppercase;line-height:1.4}
+.upcoming-players-line{margin:6px 0 0;font-size:12.5px;line-height:1.45;color:var(--tv-soft)}.upcoming-players-line strong{color:var(--th-text-primary)}
 .upcoming-player-row{display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;min-height:31px;height:auto;gap:8px;padding:0;border-radius:0;background:none;text-align:left;font-size:13px;font-weight:600;color:var(--th-text-primary)}
 .upcoming-player-name{min-width:0;display:flex;align-items:center}.upcoming-player-name>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upcoming-player-name i{flex:none;font-style:normal;font-size:11px;margin-left:4px;color:var(--brand-amber)}
 .upcoming-player-time,.upcoming-more{font-size:12px;font-weight:600;color:rgba(248,250,252,.62);font-variant-numeric:tabular-nums}.upcoming-more{min-height:31px;display:flex;align-items:center}
@@ -104,16 +104,16 @@
    existing band sizes. No extra container padding may extend these seams. */
 [data-overview-last-year]+.tv-section[data-tv-section="course"]{padding-top:var(--hero-section-gap)}
 /* TOUR OVERVIEW · UPCOMING HERO new order (signed-off mock). Fonts inherit. */
-.upcoming-event-facts{display:flex;justify-content:space-between;gap:8px;margin:20px 20px 0}
+.upcoming-event-facts{display:flex;justify-content:space-between;gap:8px;margin:var(--hero-section-gap) 20px 0}
 .upcoming-event-facts>div{text-align:center;min-width:0}
-.upcoming-event-facts b{display:block;font-size:17px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:#F8FAFC;white-space:nowrap}
-.upcoming-event-facts span{display:block;margin-top:7px;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,250,252,.42);white-space:nowrap}
-.upcoming-sec{padding:30px 20px 0;color:#F8FAFC}
+.upcoming-event-facts b{display:block;line-height:var(--hero-cell-line);font-variant-numeric:tabular-nums;color:#F8FAFC;white-space:nowrap}
+.upcoming-event-facts span{display:block;margin-top:var(--hero-label-gap);font-size:9.5px;font-weight:800;letter-spacing:var(--hero-label-tracking);line-height:13px;text-transform:uppercase;color:rgba(248,250,252,.42);white-space:nowrap}
+.upcoming-sec{padding:var(--hero-section-gap) 20px 0;color:#F8FAFC}
 .upcoming-sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.upcoming-sec-kick{margin:0;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,250,252,.62);line-height:1.4}
+.upcoming-sec-kick{margin:0;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,250,252,.62);line-height:1.4}
 .upcoming-course-link.upcoming-sec-kick{padding:0;height:auto;border:0;background:none;white-space:nowrap}
-.upcoming-ly-rows{margin-top:8px}
-.upcoming-course .tv-lead{margin:8px 0 0;font-size:13.5px;line-height:1.45;color:rgba(248,250,252,.78)}.upcoming-course .tv-lead b{color:#F8FAFC;font-weight:700}
+.upcoming-ly-rows{margin-top:var(--hero-content-gap)}
+.upcoming-course .tv-lead{margin:var(--hero-content-gap) 0 0;font-size:12.5px;line-height:1.45;color:rgba(248,250,252,.78)}.upcoming-course .tv-lead b{color:#F8FAFC;font-weight:700}
 .upcoming-scorecard{margin-top:14px;display:flex;flex-direction:column;gap:8px}
 .upcoming-sct{display:grid;grid-template-columns:repeat(9,minmax(0,1fr)) 42px;column-gap:3px;row-gap:6px;padding:10px 10px 11px 6px;border-radius:12px;background:rgba(255,255,255,.06)}
 .upcoming-sct>span{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.2}

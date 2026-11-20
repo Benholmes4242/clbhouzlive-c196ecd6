@@ -300,3 +300,7 @@
 
 ## Course round tiles + honours
 - Done; signed-in 390/320 check (Sundridge West, Rochester & Cobham) outstanding.
+
+## Stopped: Overview upcoming/live type scale
+- Adopt existing completed numeric types and rhythm only in the brief-listed surfaces; completed picks and Tour fonts remain unchanged.
+- Six added cases pass (focused 110/110); expected 9,307 = 9,301 + 6. Shard 1 passes 2,279; shard 2 has two authorised old-spacing failures. Updated those only; isolated 16/17 stops on new null-style assertion at tourOverviewMergedAiry.test.tsx:91:41. Shards 3–4 not run. Needs ruling on source-token assertion; report .lovable/reports/overview-upcoming-live-type-scale.md. Browser/iPhone checks unverified.

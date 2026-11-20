@@ -61,7 +61,7 @@ export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boar
   const recordCopy = (key: string, o: Record<string, unknown> = {}) => t(`overview.pickRecord.${key}`, o);
   return (
     <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
-      <div data-overview-picks data-picks-layout="live-rows" data-live-picks style={{ padding: '30px 20px 10px' }}>
+      <div data-overview-picks data-picks-layout="live-rows" data-live-picks style={{ padding: 'var(--hero-section-gap) 20px 10px' }}>
         <div data-overview-picks-heading style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, overflow: 'hidden' }}>
           <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
           <span data-live-picks-heading style={{ minWidth: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -69,12 +69,12 @@ export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boar
           </span>
         </div>
         {record && record.picks > 0 ? <Button variant={null} size={null} data-our-record-door onClick={onOpenRecord}
-          style={{ display: 'flex', alignItems: 'baseline', width: '100%', padding: 0, margin: '8px 0 0', border: 0, borderRadius: 0, background: 'transparent', textAlign: 'left', lineHeight: 1.35, fontFamily: 'inherit', fontSize: 13.5, height: 'auto', whiteSpace: 'normal', ...FIGS }}>
+          style={{ display: 'flex', alignItems: 'baseline', width: '100%', padding: 0, margin: '8px 0 0', border: 0, borderRadius: 0, background: 'transparent', textAlign: 'left', lineHeight: 1.35, fontFamily: 'inherit', fontSize: 12.5, height: 'auto', whiteSpace: 'normal', ...FIGS }}>
           <span style={{ minWidth: 0 }}><span data-pick-record-figures style={{ fontWeight: 700, color: '#F8FAFC', whiteSpace: 'nowrap' }}>{recordCopy('wins', { count: record.won })} · {recordCopy('topTens', { count: record.top10 })}</span>
             {record.event_count != null ? <span data-pick-record-events style={{ marginLeft: '0.28em', fontWeight: 400, color: 'rgba(248,250,252,.78)', whiteSpace: 'nowrap' }}>{recordCopy('fromEvents', { count: record.event_count })}</span> : null}</span>
           <span aria-hidden style={{ marginLeft: 'auto', paddingLeft: 8, fontSize: 15, color: 'rgba(248,250,252,.42)' }}>›</span>
         </Button> : null}
-        {intro || sentences.length ? <p data-overview-picks-intro style={{ margin: '4px 0 0', fontSize: 13.5, lineHeight: 1.45, color: 'var(--live-prose)' }}>
+        {intro || sentences.length ? <p data-overview-picks-intro style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.45, color: 'var(--live-prose)' }}>
           {!sentences.some(s => s.replace) && intro ? <>{boldIntro(intro, introFigures)}{sentences.length ? ' ' : ''}</> : null}
           {sentences.map((s, i) => <span key={s.key}>{i ? ' ' : ''}<Trans t={t} i18nKey={s.key === 'overview.live.picks.clubhouseBehind' ? `${s.key}_${s.values.gap === 1 ? 'one' : 'other'}` : s.key}
             values={{ ...s.values, gap: typeof s.values.gap === 'number' ? pickGapNumber(s.values.gap, t) : s.values.gap }} components={{ b: <strong /> }} /></span>)}
@@ -87,15 +87,15 @@ export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boar
               <button type="button" key={id} data-overview-pick-card data-overview-pick-row onClick={() => onOpenPick(p.playerId)}
                 aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
                 className="active:opacity-70 transition-opacity"
-                style={{ display: 'grid', gridTemplateColumns: '32px minmax(0,1fr) auto', gap: 12, alignItems: 'center', height: 48, width: '100%', margin: 0, padding: 0, border: 0, background: 'transparent', color: 'inherit', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer' }}>
-                <div data-overview-pick-avatar style={{ display: 'flex' }}><PlayerAvatar playerId={id} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl ?? null} headshotOverride={p.headshotOverride ?? null} size={32} /></div>
+                style={{ display: 'grid', gridTemplateColumns: '26px minmax(0,1fr) auto', gap: 12, alignItems: 'center', height: 48, width: '100%', margin: 0, padding: 0, border: 0, background: 'transparent', color: 'inherit', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer' }}>
+                <div data-overview-pick-avatar style={{ display: 'flex' }}><PlayerAvatar playerId={id} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl ?? null} headshotOverride={p.headshotOverride ?? null} size={26} /></div>
                 <span style={{ minWidth: 0 }}>
-                  <span data-overview-pick-name style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.playerName}</span>
-                  {row.sub ? <span data-live-pick-sub style={{ display: 'block', marginTop: 2, fontSize: 12, fontWeight: 400, color: 'rgba(248,250,252,.42)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
+                  <span data-overview-pick-name style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.playerName}</span>
+                  {row.sub ? <span data-live-pick-sub style={{ display: 'block', marginTop: 2, fontSize: 11.5, fontWeight: 400, color: 'rgba(248,250,252,.42)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
                     {row.sub}{row.subScore != null ? <> · <span style={{ color: getScoreColor(row.subScore, 'dark') }}>{fmtScore(row.subScore)}</span></> : null}
                   </span> : null}
                 </span>
-                {row.right ? <span data-live-pick-right={row.rightKind ?? undefined} style={{ fontSize: 15, fontWeight: row.rightKind === 'score' ? 700 : 600, textAlign: 'right', whiteSpace: 'nowrap', color: row.rightKind === 'score' ? getScoreColor(row.rightScore, 'dark') : row.rightKind === 'mc' ? 'rgba(248,250,252,.42)' : '#F8FAFC', ...FIGS }}>{row.right}</span> : <span />}
+                {row.right ? <span data-live-pick-right={row.rightKind ?? undefined} style={{ fontSize: row.rightKind === 'score' ? 15 : 12.5, fontWeight: row.rightKind === 'score' ? 700 : 600, textAlign: 'right', whiteSpace: 'nowrap', color: row.rightKind === 'score' ? getScoreColor(row.rightScore, 'dark') : row.rightKind === 'mc' ? 'rgba(248,250,252,.42)' : '#F8FAFC', ...FIGS }}>{row.right}</span> : <span />}
               </button>
             );
           })}
