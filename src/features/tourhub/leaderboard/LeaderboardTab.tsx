@@ -18,7 +18,6 @@ import { useSearchParams } from 'react-router-dom';
 import { formatTournamentDateRange } from '@/i18n/format';
 import { betweenRounds } from '../components/overview-v3/liveStateRules';
 import { roundsFromSchedule } from '../components/overview-v3/HybridHero.utils';
-import { boardHasMovementMark } from './BoardTable';
 import { teeTimeLabels, wonByUnitKey } from './leaderboardRules';
 import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
@@ -399,38 +398,31 @@ export function LeaderboardTab() {
     if (low) figures.push({ key: 'lowround', value: fmtScore(low.low), small: lowSmall, label: t('rebuilt.lowRound', { defaultValue: 'LOW ROUND' }), color: getScoreColor(low.low, 'dark') });
   }
 
-  /* SECTION HEAD — LEADERBOARD in ink, the movement legend and the 32px
-     search button; the search box opens beneath it. Passed INTO LiveBoard
-     so "Your players" stays pinned above it. */
-  const boardHead = (
+  /* BOARD HEADER LEAD (Option B) — LEADERBOARD and the 26px search button
+     sit in the sticky column-header row; the search field opens above it. */
+  const headerLead = (
     <>
-      <div className="tour-board-section-head">
-        <h2 className="tour-board-section-title">{t('rebuilt.leaderboard')}</h2>
-        <div className="tour-board-section-right">
-          {(currentRound ?? 0) > 1 && boardHasMovementMark(boardEntries, currentRound) && <span>{t('rebuilt.placesSince', { round: (currentRound ?? 1) - 1 })}</span>}
-          <button
-            type="button"
-            className="tour-board-search-btn"
-            aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')}
-            onClick={() => { if (searchOpen) setSearchQuery(''); setSearchOpen(!searchOpen); }}
-          >
-            {searchOpen ? <X size={15} /> : <Search size={15} />}
-          </button>
-        </div>
-      </div>
-      {searchOpen && (
-        <div style={{ margin: '10px 20px 0', display: 'flex' }}>
-          <SearchFieldBox
-            ref={searchInputRef}
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder={t('board.search.placeholder')}
-          />
-        </div>
-      )}
+      <h2 className="tour-board-section-title">{t('rebuilt.leaderboard')}</h2>
+      <button
+        type="button"
+        className="tour-board-search-btn"
+        aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')}
+        onClick={() => { if (searchOpen) setSearchQuery(''); setSearchOpen(!searchOpen); }}
+      >
+        {searchOpen ? <X size={13} /> : <Search size={13} />}
+      </button>
     </>
   );
-
+  const searchField = searchOpen ? (
+    <div className="tour-board-search-field" style={{ display: 'flex' }}>
+      <SearchFieldBox
+        ref={searchInputRef}
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder={t('board.search.placeholder')}
+      />
+    </div>
+  ) : null;
 
   // Column header is owned by BoardTable now (ONE grid definition).
 
@@ -524,7 +516,8 @@ export function LeaderboardTab() {
           headerTop={CHROME_CLEARANCE}
           dockBlur
           onDockChange={onDockChange}
-          boardHead={boardHead}
+          headerLead={headerLead}
+          aboveHeader={searchField}
           teeTimes={teeTimes}
           onFull={(row) => {
             if (!row.player?.id) return;

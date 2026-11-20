@@ -1,6 +1,6 @@
 .tour-board-shell { background:var(--tour-board-canvas); color:var(--tour-board-ink); }
 .tour-board-shell * { letter-spacing:0; }
-.tour-board-events { display:flex; gap:8px; padding:16px 18px 0; overflow-x:auto; scrollbar-width:none; will-change:transform; }
+.tour-board-events { display:flex; gap:8px; padding:4px 18px 0; overflow-x:auto; scrollbar-width:none; will-change:transform; }
 .tour-board-events::-webkit-scrollbar { display:none; }
 .tour-board-shell .tour-event-pill { height:36px; flex:none; padding:0 14px; border-radius:999px; border:1px solid var(--tour-board-pill-line); background:transparent; color:var(--tour-board-mute); font-size:13px; font-weight:700; gap:7px; }
 .tour-board-shell .tour-event-pill[aria-pressed=true], .tour-board-shell .tour-follow-pill[aria-pressed=true] { background:var(--tour-board-ink); color:var(--tour-board-canvas); border-color:var(--tour-board-ink); }
@@ -9,6 +9,7 @@
 /* LEADERBOARDS PAGE TOP BLOCK (8 Nov 2026, leaderboards-page.html "Proposed"):
    kicker / wrapping title / place line / figure row, 20px sides (16 at ≤340). */
 .tour-board-top { padding:0 20px; }
+.tour-board-events + .tour-board-top { margin-top:14px; }
 .tour-board-kicker-row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .tour-board-live { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:800; letter-spacing:.12em; color:#34D77F; }
 .tour-board-live i { width:7px; height:7px; border-radius:50%; background:#34D77F; box-shadow:0 0 0 3px rgba(52,215,127,.18); flex-shrink:0; }
@@ -20,14 +21,15 @@
 .tour-board-figures b { display:block; font-size:19px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .tour-board-figures b small { font-size:12px; font-weight:700; color:var(--tour-board-mute); margin-left:3px; }
 .tour-board-figures span { display:block; margin-top:6px; font-size:9.5px; font-weight:800; letter-spacing:.12em; color:var(--tour-board-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tour-board-section-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:18px 20px 0; }
-.tour-board-section-title { margin:0; font-size:10px; font-weight:800; letter-spacing:.16em; color:var(--tour-board-ink); }
-.tour-board-section-right { display:flex; align-items:center; gap:10px; font-size:11px; font-weight:600; color:var(--tour-board-dim); white-space:nowrap; }
-.tour-board-search-btn { width:32px; height:32px; border-radius:11px; border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; background:transparent; color:var(--tour-board-ink); cursor:pointer; padding:0; }
+.tour-board-section-title { margin:0; font-size:10px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--tour-board-ink); white-space:nowrap; }
+.tour-board-search-btn { width:26px; height:26px; flex:none; border-radius:9px; border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; background:transparent; color:var(--tour-board-ink); cursor:pointer; padding:0; }
+.tour-board-search-field { margin:16px 20px 0; }
+.tour-board-legend-caption.tour-board-legend-caption--page { padding:8px 20px 0; }
 @media (max-width:340px) {
   .tour-board-top { padding:0 16px; }
   .tour-board-figures { margin:14px 16px 0; }
-  .tour-board-section-head { padding:18px 16px 0; }
+  .tour-board-search-field { margin:16px 16px 0; }
+  .tour-board-legend-caption.tour-board-legend-caption--page { padding:8px 16px 0; }
 }
 .tour-board-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:20px 18px 6px; font-size:10.5px; font-weight:800; letter-spacing:.16em; color:var(--tour-board-amber); }
 /* FullBoardSheet only: the kicker reads in the board's ink, not amber. */

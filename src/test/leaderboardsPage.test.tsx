@@ -113,18 +113,18 @@ describe('Leaderboards page — section head and search', () => {
     const v = mountTab();
     expect(v.container.querySelector('.tour-board-section-title')).not.toBeNull();
     const css = source('src/features/tourhub/leaderboard/leaderboard.css');
-    expect(css).toContain('.tour-board-section-title { margin:0; font-size:10px; font-weight:800; letter-spacing:.16em; color:var(--tour-board-ink); }');
+    expect(v.container.querySelector('[data-board-pos-header] .tour-board-section-title')).not.toBeNull();
+    expect(css).toContain('.tour-board-section-title { margin:0; font-size:10px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--tour-board-ink); white-space:nowrap; }');
   });
-  it('the search button toggles the SearchFieldBox row beneath the section head', () => {
+  it('the search button toggles the SearchFieldBox row above the column-header row', () => {
     f.entries = [entry('a')];
     const v = mountTab();
-    const head = v.container.querySelector('.tour-board-section-head');
-    expect(head).not.toBeNull();
     expect(v.container.querySelector('input')).toBeNull();
     fireEvent.click(v.container.querySelector('.tour-board-search-btn') as HTMLElement);
     const input = v.container.querySelector('input');
     expect(input).not.toBeNull();
-    expect(head?.nextElementSibling?.contains(input ?? null)).toBe(true);
+    const header = v.container.querySelector('[data-board-sticky-header]') as HTMLElement;
+    expect(input!.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     fireEvent.click(v.container.querySelector('.tour-board-search-btn') as HTMLElement);
     expect(v.container.querySelector('input')).toBeNull();
   });
@@ -177,7 +177,7 @@ describe('Leaderboards page — the board at the overview board sizes', () => {
 
 describe('Leaderboards page — between rounds and not-yet-started rounds', () => {
   const r1Only = (id: string, position: number): BoardEntry => ({ id, position, score: -2, thru: null, today: null, today_round: null, round_1: -2, round_2: null, player: { id, full_name: `Player ${id}` } });
-  const legend = (c: HTMLElement) => c.querySelector('.tour-board-section-right > span');
+  const legend = (c: HTMLElement) => c.querySelector('.tour-board-legend-caption');
   it('(a) between rounds: AFTER ROUND 1 kicker, no LIVE marker, no figure row, no legend', () => {
     f.meta = { current_round: 2, status: 'inprogress', start_date: '2026-11-19', end_date: '2026-11-22' };
     f.entries = [r1Only('a', 1), { ...r1Only('b', 2), round_1: -1, score: -1 }];
@@ -227,5 +227,32 @@ describe('Leaderboards page — between rounds and not-yet-started rounds', () =
     const w = mountTab();
     expect(w.container.querySelectorAll('.tour-board-movement').length).toBe(0);
     expect(legend(w.container)).toBeNull();
+  });
+});
+
+describe('Leaderboards page — top spacing and title in the board header', () => {
+  it('(f) the events row pads 4px 18px 0 and the top block sits 14px under the pills', () => {
+    const css = source('src/features/tourhub/leaderboard/leaderboard.css');
+    expect(css).toContain('.tour-board-events { display:flex; gap:8px; padding:4px 18px 0;');
+    expect(css).toContain('.tour-board-events + .tour-board-top { margin-top:14px; }');
+  });
+  it('(g) headerLead renders inside [data-board-pos-header]; empty without it; not in the pre-tournament header', () => {
+    const lead = <span data-test-lead />;
+    const withLead = mount(<BoardTable entries={[entry('a')]} cutState={cut} currentRound={2} headerLead={lead} />);
+    expect(withLead.container.querySelector('[data-board-pos-header] [data-test-lead]')).not.toBeNull();
+    cleanup();
+    const without = mount(<BoardTable entries={[entry('a')]} cutState={cut} currentRound={2} />);
+    expect(without.container.querySelector('[data-board-pos-header]')?.childNodes.length).toBe(0);
+    cleanup();
+    const pre: BoardEntry = { id: 'p', position: null, score: null, thru: null, today: null, today_round: null, player: { id: 'p', full_name: 'Player p' } };
+    const preV = mount(<BoardTable entries={[pre]} cutState={cut} currentRound={1} headerLead={lead} />);
+    expect(preV.container.querySelector('[data-board-sticky-header]')).not.toBeNull();
+    expect(preV.container.querySelector('[data-test-lead]')).toBeNull();
+  });
+  it('(h) the page renders no section head and no default LEADERBOARD kicker', () => {
+    f.entries = [entry('a')];
+    const v = mountTab();
+    expect(v.container.querySelector('.tour-board-section-head')).toBeNull();
+    expect(v.container.querySelector('.tour-board-kicker')).toBeNull();
   });
 });

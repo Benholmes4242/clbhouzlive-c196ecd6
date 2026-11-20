@@ -146,6 +146,11 @@ interface Props {
   /** Optional complete field used only to calculate movement when `entries`
    * is a truncated inline board. No additional query is required. */
   movementEntries?: BoardEntry[];
+  /** Leaderboards page only: content for the first (empty) cell of the
+   * sticky column-header row. Not rendered by the pre-tournament header. */
+  headerLead?: React.ReactNode;
+  /** Leaderboards page only: margin above the sticky column-header row. */
+  headerMarginTop?: number;
   /** Event-level team-name convention, computed by the parent when shared. */
   teamInitials?: boolean;
   holesByPlayer?: Map<string, BoardHole[]>;
@@ -476,6 +481,8 @@ export function BoardTable({
   yourPlayers = false,
   expandedId = null,
   renderExpanded,
+  headerLead,
+  headerMarginTop,
 }: Props) {
   const { t } = useTranslation('tourhub');
 
@@ -621,6 +628,7 @@ export function BoardTable({
           gridTemplateColumns: template,
           gap: effColumns.gap,
           alignItems: 'center',
+          marginTop: headerMarginTop,
           minHeight: 26,
           padding: `0 ${padX}px 6px`,
           background: dockBlur && headerStuck ? 'transparent' : 'var(--tour-board-head)',
@@ -640,7 +648,7 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left', minWidth: 0 }} aria-hidden="true" />
+            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'left', minWidth: 0, ...(headerLead ? { display: 'flex', alignItems: 'center', gap: 8 } : null) }} aria-hidden={headerLead ? undefined : true}>{headerLead}</div>
             {effColumns.rounds.map((r) => (
               <div
                 key={r}
