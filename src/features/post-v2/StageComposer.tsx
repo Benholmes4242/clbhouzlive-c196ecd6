@@ -80,6 +80,7 @@ import { GP } from './components/golf/golfPageTokens';
 import { captionMentionIds, isHoleTag, roundReason, shareSubLine, toggleWith, visibilityLabel, type PostVisibility, type ShotTag, type WithCandidate } from './lib/golfPostRules';
 import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstCaptureDay, readWithCandidates, searchMembers } from './lib/golfPostReads';
 import { readPostWith, syncPostWith } from './lib/postWith';
+import { reportPostWithError } from './lib/postWithError';
 import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
 import { refreshAuthorPosts } from './lib/refreshAuthorPosts';
 import {ComposerCourseBlock,ComposerAttachRound,ComposerRoundsSheet} from './components/golf/ComposerGolf';
@@ -762,7 +763,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
       // Played with: bring post_with to the chosen people (trigger notifies).
       if (editable.data.actorType !== 'business') {
-        await syncPostWith(editPostId, editable.data.userId, initialWithIdsRef.current, withTagged.map((p) => p.id));
+        const withError = await syncPostWith(editPostId, editable.data.userId, initialWithIdsRef.current, withTagged.map((p) => p.id));
+        reportPostWithError(withError, withTagged.length, 'edit');
       }
       // Existing photos whose tag changed: remove the old, add the new.
       if (profile?.id) {

@@ -5,7 +5,7 @@ vi.mock('@/integrations/supabase/client',()=>({supabase:{rpc:h.rpc,from:(table:s
 vi.mock('@/context/ActiveActorContext',()=>({useActiveActor:()=>({activeActor:{id:'me',type:'personal'}})}));
 vi.mock('@/hooks/useProfileData',()=>({useProfileData:()=>({profile:{id:'me'}})}));
 vi.mock('@/features/post-v2/lib/postUploadController',()=>({startPostUpload:h.upload}));
-vi.mock('@/features/post-v2/lib/postWith',()=>({writePostWith:async()=>[]}));
+vi.mock('@/features/post-v2/lib/postWith',()=>({writePostWith:async()=>({saved:[],error:null})}));
 import { writeVideoDetails } from '@/features/post-v2/lib/videoDetailsWrites';
 import { emptyVideoDetails } from '@/features/post-v2/lib/videoDetails';
 import { useStageComposer } from '@/features/post-v2/hooks/useStageComposer';

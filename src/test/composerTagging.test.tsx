@@ -31,7 +31,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: { id: 'me', type: 'personal' } }) }));
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: { id: 'me' } }) }));
 vi.mock('@/features/post-v2/lib/postUploadController', () => ({ startPostUpload: h.upload }));
-vi.mock('@/features/post-v2/lib/postWith', () => ({ writePostWith: async () => [] }));
+vi.mock('@/features/post-v2/lib/postWith', () => ({ writePostWith: async () => ({ saved: [], error: null }) }));
 
 import { PlayedWithSection } from '@/features/post-v2/components/golf/GolfPostSections';
 import { searchMembers } from '@/features/post-v2/lib/golfPostReads';

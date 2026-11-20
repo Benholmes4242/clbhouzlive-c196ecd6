@@ -15,24 +15,34 @@ import { MAX_PLAYED_WITH } from './golfPostRules';
 
 export const postWithTable = () => supabase.from('post_with');
 
+export interface PostWithError {
+  code: string | null;
+  message: string;
+  details: string | null;
+  hint: string | null;
+}
+
+const errorFields = ({ code, message, details, hint }: PostWithError): PostWithError => ({ code, message, details, hint });
+
 /** Written after the post row exists. Never self, never past eight. */
-export async function writePostWith(postId: string, authorId: string, userIds: readonly string[]): Promise<string[]> {
+export async function writePostWith(postId: string, authorId: string, userIds: readonly string[]): Promise<{ saved: string[]; error: PostWithError | null }> {
   const ids = [...new Set(userIds)].filter((id) => id !== authorId).slice(0, MAX_PLAYED_WITH);
-  if (!ids.length) return [];
+  if (!ids.length) return { saved: [], error: null };
   const { error } = await postWithTable().insert(ids.map((user_id) => ({ post_id: postId, user_id })));
-  if (error) { console.warn('[post-v2] post_with write failed:', error); return []; }
-  return ids;
+  if (error) { console.warn('[post-v2] post_with write failed:', error); return { saved: [], error: errorFields(error) }; }
+  return { saved: ids, error: null };
 }
 
 /** Edit mode: bring the post's rows to exactly `next`. */
-export async function syncPostWith(postId: string, authorId: string, prev: readonly string[], next: readonly string[]): Promise<void> {
+export async function syncPostWith(postId: string, authorId: string, prev: readonly string[], next: readonly string[]): Promise<PostWithError | null> {
   const removed = prev.filter((id) => !next.includes(id));
   const added = next.filter((id) => !prev.includes(id));
   if (removed.length) {
     const { error } = await postWithTable().delete().eq('post_id', postId).in('user_id', removed);
-    if (error) console.warn('[post-v2] post_with remove failed:', error);
+    if (error) { console.warn('[post-v2] post_with remove failed:', error); return errorFields(error); }
   }
-  if (added.length) await writePostWith(postId, authorId, added.slice(0, Math.max(0, MAX_PLAYED_WITH - (prev.length - removed.length))));
+  if (added.length) return (await writePostWith(postId, authorId, added.slice(0, Math.max(0, MAX_PLAYED_WITH - (prev.length - removed.length))))).error;
+  return null;
 }
 
 /** A tagged member removes themselves. */

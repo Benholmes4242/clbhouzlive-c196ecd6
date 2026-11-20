@@ -20,6 +20,7 @@ import type { StageMediaItem, StageCourse } from './useStageComposer';
 import type { ShotTagJob } from '../lib/shotTagWrites';
 import { isHoleTag, type PostVisibility } from '../lib/golfPostRules';
 import { writePostWith } from '../lib/postWith';
+import { reportPostWithError } from '../lib/postWithError';
 import {golfPostPatch,type PostShotTag} from '../lib/composerGolfRules';
 import type { VideoDetails } from '../lib/videoDetails';
 import { writeVideoDetails } from '../lib/videoDetailsWrites';
@@ -214,8 +215,9 @@ export function usePostSubmit() {
 
       // Played with: rows after the post exists. The notification is a
       // database trigger on post_with; nothing is sent from here.
-      const savedWith = input.playedWith?.length ? await writePostWith(postId, userId, input.playedWith) : [];
-      const playedWithNames = savedWith.flatMap(id => { const p = input.playedWithPeople?.find(p => p.id === id); return p ? [p.name] : []; });
+      const withResult = input.playedWith?.length ? await writePostWith(postId, userId, input.playedWith) : { saved: [], error: null };
+      reportPostWithError(withResult.error, input.playedWith?.length ?? 0, 'create');
+      const playedWithNames = withResult.saved.flatMap(id => { const p = input.playedWithPeople?.find(p => p.id === id); return p ? [p.name] : []; });
       const holeTags = input.actorType !== 'personal' || (input.visibility ?? 'anyone') !== 'anyone' ? [] : Object.values(input.shotTags?.items ?? {}).flatMap(choice => {
         if (!('hole' in choice.tag)) return [];
         const course = (input.courses ?? (input.course ? [input.course] : [])).find(c => c.id === choice.courseId);

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stopped: Played with save-error reporting
+- Return exact Supabase diagnostics, show eight-second create/edit errors and track failures without rolling back posts or displaying unsaved names.
+- Two authorised string-array mocks updated; nine new tests. Focused 50/52 stops on two edit fixtures: StageComposer.tsx:222:8, `TypeError: supabase.from(...).select(...).eq is not a function`. No test repair or shards run; needs fixture-repair authorisation. Expected inventory 9,320 → 9,329; last complete passing suite 9,301. Report: .lovable/reports/played-with-save-errors.md. Authenticated end-to-end checks unavailable on external Supabase.
+
 ## Complete: Feed review glass
 - Match media-review overlay and header stamps; retain standard/no-media layout and feed engagement.
 - Batch active Top 100 memberships at both feed hosts with per-course cache; lift media controls above measured strip.
