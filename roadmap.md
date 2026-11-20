@@ -1,5 +1,10 @@
 # Roadmap
 
+## Blocked: Every feed review's scores below media
+- New signed-off brief recorded; no application/test changes made because its frozen case (e) contradicts removal of the glass measurement.
+- Await Ben's authorization for feedReviewGlass.test.tsx:111, expect(containerHeight()).toBe('0px') → toBe(''); video/carousel source assertions and both source files stay untouched. Report: .lovable/reports/review-scores-below/blocked.md.
+- No tests, shards or screenshots run. Current expected inventory remains 9,389 (last complete pass 9,383 plus six prior poster cases); prior poster-test stop remains independent and unresolved.
+
 ## Stopped: Review video persisted posters
 - Added persistedPoster and routed review poster writes/database readers through it; local new-media composer preview frames and presentation unchanged.
 - Six new cases pass; focused run 47 passed / 7 failed of 54, in unchanged holeMediaVideos (five relative-poster assertions) and reviewVideoTilePosters (two exact legacy-thumbnail assertions). No repairs/reruns or shards under the stop rule; requires Ben's ruling. Exact errors and all sites: .lovable/reports/review-video-persisted-posters/.
