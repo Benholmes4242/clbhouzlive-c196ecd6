@@ -32,6 +32,11 @@ vi.mock('@/perf/vperf', () => ({
 vi.mock('@/hooks/feed/useFeedCommentPreview', () => ({ useFeedCommentPreview: () => ({ map: new Map() }) }));
 vi.mock('@/hooks/feed/usePostGolfTags', () => ({ usePostGolfTags: () => ({ withByPost: new Map(), slideTags: new Map() }) }));
 vi.mock('@/hooks/feed/usePostGolfContext', () => ({ usePostGolfContext: () => null, usePostGolfHoleMeta: () => new Map() }));
+vi.mock('@/hooks/feed/useTop100CourseIds', () => ({
+  FeedReviewTop100Provider: ({ children }: { children: React.ReactNode }) => children,
+  useFeedReviewTop100: () => new Set<string>(),
+  useTop100CourseIds: () => new Set<string>(),
+}));
 vi.mock('@/lib/getScrollParent', () => ({ getPrimaryScrollElement: () => document.body }));
 vi.mock('react-virtuoso', () => ({
   Virtuoso: ({ data, itemContent, computeItemKey }: any) => (

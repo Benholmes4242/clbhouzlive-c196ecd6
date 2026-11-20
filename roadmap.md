@@ -1,9 +1,9 @@
 # Roadmap
 
-## Active: Feed review glass
+## Complete: Feed review glass
 - Match media-review overlay and header stamps; retain standard/no-media layout and feed engagement.
 - Batch active Top 100 memberships at both feed hosts with per-course cache; lift media controls above measured strip.
-- Add scoped coverage, run four sequential shards from 9,254, report and commit; authenticated device check unavailable for external unmanaged Supabase.
+- Ten new cases; authorized profile-feed mock only in follow-up, assertions unchanged. Focused 6/6; full sequential rerun 2,257 / 2,296 / 2,299 / 2,412 = 9,264 against 9,254. Report: .lovable/reports/feed-review-glass.md. Real Camiral 390/320 check remains external because authentication is unmanaged.
 
 ## Stopped: WAGR career-best tile — existing failed-read timing
 - Extract Career's rank/week/id selection into one shared helper; tile uses loaded history with summary fallback. Chart, Career output and Settings remain unchanged.
