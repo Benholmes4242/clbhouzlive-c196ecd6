@@ -9,12 +9,12 @@ vi.mock('@/components/courses/useStatBrowse', () => ({ useCourseBrowseTruth: () 
 vi.mock('@/components/courses/useBrowseReviews', () => ({ useBrowseReviews: () => ({ pool: [], isPending: !f.ready.latestReviews }) }));
 vi.mock('@/stores/reviewSheetStore', () => ({ useReviewSheetStore: () => vi.fn() }));
 vi.mock('@/components/courses/CourseMasthead', () => ({ HERO_FIGURE_LABEL: {}, HERO_FIGURE_VALUE: {} }));
-vi.mock('@/components/courses/browse/sectionShells', () => ({ WhoPlayingShell: () => <div data-testid="who-shell" />, ByRegionShell: () => <div data-testid="region-shell" />, LatestCoursesShell: () => <div data-testid="courses-shell" />, FiguresRowShell: () => null, PhotoRailShell: () => <div data-testid="most-played-shell" /> }));
+vi.mock('@/components/courses/browse/sectionShells', () => ({ WhoPlayingShell: () => <div data-testid="who-shell" />, ByRegionShell: () => <div data-testid="region-shell" />, LatestCoursesShell: () => <div data-testid="courses-shell" />, FiguresRowShell: () => null, LatestHolesShell: () => <div data-testid="latest-holes-shell" /> }));
 vi.mock('@/components/courses/StatBrowse', async () => ({ default: await section('list') }));
 vi.mock('@/components/courses/browse/WhoPlayingSection', async () => ({ WhoPlayingSection: await section('whoPlaying') }));
 vi.mock('@/components/courses/browse/ByRegionSection', async () => ({ ByRegionSection: await section('byRegion'), ALL_COURSES_ANCHOR: 'all-courses' }));
 vi.mock('@/components/courses/browse/LatestCoursesSection', async () => ({ LatestCoursesSection: await section('latestCourses') }));
-vi.mock('@/components/courses/browse/MostPlayedSection', async () => ({ MostPlayedSection: await section('mostPlayed') }));
+vi.mock('@/components/courses/browse/StandoutRoundsSection', async () => ({ StandoutRoundsSection: await section('standoutRounds') }));
 vi.mock('@/components/courses/browse/HardestSection', async () => ({ HardestSection: await section('hardest') }));
 vi.mock('@/components/courses/browse/LatestHolesSection', async () => ({ LatestHolesSection: await section('latestHoles') }));
 vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestReviewsSection: () => null }));
@@ -31,25 +31,25 @@ it('holds the list and all sections together until the list is ready, preserving
   expect(screen.queryByTestId('region-shell')).toBeNull();
   expect(screen.queryByTestId('courses-shell')).toBeNull();
   expect(screen.queryByTestId('latestCourses')).toBeNull();
-  for (const id of ['whoPlaying', 'mostPlayed', 'latestHoles', 'list']) expect(screen.getByTestId(id)).not.toBeVisible();
-  f.ready = Object.fromEntries(['whoPlaying', 'mostPlayed', 'latestHoles', 'latestReviews', 'figures'].map(id => [id, true]));
+  for (const id of ['whoPlaying', 'standoutRounds', 'latestHoles', 'list']) expect(screen.getByTestId(id)).not.toBeVisible();
+  f.ready = Object.fromEntries(['whoPlaying', 'standoutRounds', 'latestHoles', 'latestReviews', 'figures'].map(id => [id, true]));
   view.rerender(tree());
   expect(screen.getByTestId('list')).not.toBeVisible();
   f.ready.list = true; view.rerender(tree());
   expect(screen.queryByTestId('region-shell')).toBeNull();
   expect(screen.getByTestId('list')).toBeVisible();
-  expect(screen.getByTestId('list').parentElement).toBe(screen.getByTestId('mostPlayed').parentElement?.parentElement);
+  expect(screen.getByTestId('list').parentElement).toBe(screen.getByTestId('standoutRounds').parentElement?.parentElement);
 });
 it('the signed-out fallback omits the circle shell', () => { render(tree()); expect(screen.queryByTestId('who-shell')).toBeNull(); expect(screen.queryByTestId('region-shell')).toBeNull(); expect(screen.queryByTestId('courses-shell')).toBeNull(); });
 // FIX_COURSES_GUEST_LOADING_SHELL: the guest fallback must show a shell, and it
 // must be the shell of the first section a signed-out visitor actually sees.
-it('the guest fallback shows the Most played shell and the signed-in fallback the circle shell', () => {
+it('the guest fallback shows the Latest holes shell and the signed-in fallback the circle shell', () => {
   render(tree());
-  expect(screen.getByTestId('most-played-shell')).toBeVisible();
+  expect(screen.getByTestId('latest-holes-shell')).toBeVisible();
   expect(screen.queryByTestId('who-shell')).toBeNull();
   cleanup();
   f.user = { id: 'u' };
   render(tree());
   expect(screen.getByTestId('who-shell')).toBeVisible();
-  expect(screen.queryByTestId('most-played-shell')).toBeNull();
+  expect(screen.queryByTestId('latest-holes-shell')).toBeNull();
 });

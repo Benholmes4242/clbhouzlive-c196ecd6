@@ -5,15 +5,14 @@ import { useBrowseReviews } from './useBrowseReviews';
 import { useOpenLatestReview } from './browse/useOpenLatestReview';
 import StatBrowse from './StatBrowse';
 import { useCourseBrowseTruth } from './useStatBrowse';
-import { PhotoRailShell, WhoPlayingShell } from './browse/sectionShells';
-import { MOST_PLAYED_COUNT } from './browse/PhotoFigureCard';
+import { LatestHolesShell, WhoPlayingShell } from './browse/sectionShells';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
-import { MostPlayedSection } from './browse/MostPlayedSection';
+import { StandoutRoundsSection } from './browse/StandoutRoundsSection';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageLoadGate, settled, useSectionReady } from './browse/PageLoadGate';
 
-const GATE_IDS = ['whoPlaying', 'mostPlayed', 'latestHoles', 'latestReviews', 'figures', 'list'] as const;
+const GATE_IDS = ['whoPlaying', 'standoutRounds', 'latestHoles', 'latestReviews', 'figures', 'list'] as const;
 
 /** Reports page-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
@@ -54,15 +53,16 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
       <PageLoadGate expect={GATE_IDS} fallback={
         <div data-courses-fallback="" style={BLEED}>
           {/* FIX_COURSES_GUEST_LOADING_SHELL: signed out, the first section a
-              visitor actually sees is Most played, so its own shell leads. */}
-          {user ? <WhoPlayingShell /> : <PhotoRailShell count={MOST_PLAYED_COUNT} />}
+              visitor actually sees is Latest holes (Standout rounds renders nothing
+              for guests), so its own shell leads. */}
+          {user ? <WhoPlayingShell /> : <LatestHolesShell />}
         </div>
       }>
       <div style={BLEED}>
         <GateReport id="latestReviews" ready={!sessionLoading && settled({ status: reviewsPending ? 'pending' : 'success' }) } />
         <GateReport id="figures" ready={!sessionLoading && settled(truthQuery)} />
         <WhoPlayingSection />
-        <MostPlayedSection />
+        <StandoutRoundsSection />
         <LatestHolesSection />
         <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} />
       </div>

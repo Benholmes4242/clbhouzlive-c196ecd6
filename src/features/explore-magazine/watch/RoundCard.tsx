@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
@@ -19,7 +20,8 @@ import './lately-tile.css';
  * ROUND CARD — the course page's Lately here tile (CS1), rebuilt in the
  * scorecard tile's grammar (COURSE_PAGE_ROUND_TILES): player row, the shared
  * ScoreFigureRow, the "against their average" line and two glass nines.
- * Its one consumer is CourseLatelySection. RoundTileParts / RoundTileMarks
+ * Consumers: CourseLatelySection and StandoutRoundsSection (opt-in header,
+ * line and points props). RoundTileParts / RoundTileMarks
  * are left for their other users. Geometry and paint live in lately-tile.css.
  */
 
@@ -43,6 +45,9 @@ export function RoundCard({
   onOpenMember,
   inCircle = false,
   own = false,
+  header,
+  line: lineOverride,
+  points: pointsOverride,
 }: {
   round: StandoutRound;
   shapes: ReturnType<typeof useRoundHoleShapes>;
@@ -53,6 +58,12 @@ export function RoundCard({
   here?: boolean;
   inCircle?: boolean;
   own?: boolean;
+  /** Optional first child before the who row; adds lately-tile--photo (Standout rounds). */
+  header?: ReactNode;
+  /** Optional <b>-marked line replacing latelyTileLine. */
+  line?: string;
+  /** When defined, the POINTS cell shows this value instead of the computed points. */
+  points?: number | null;
 }) {
   const { t } = useTranslation('courses');
   const shape = round.whs_score_id ? shapes?.get(round.whs_score_id) ?? null : null;
@@ -79,15 +90,15 @@ export function RoundCard({
   }
   if (round.net_score != null) {
     cells.push({ key: 'net', value: String(round.net_score), label: t('courseDetail.lately.tile.net', 'NET') });
-    const points = stablefordPoints(shape, round.course_handicap);
+    const points = pointsOverride !== undefined ? pointsOverride : stablefordPoints(shape, round.course_handicap);
     if (points != null) cells.push({ key: 'points', value: String(points), label: t('courseDetail.lately.tile.points', 'POINTS') });
   } else {
     const off = playedOffLabel(round.course_handicap);
     if (off != null) cells.push({ key: 'playedoff', value: off, label: t('courseDetail.lately.tile.playedOff', 'PLAYED OFF') });
   }
 
-  const line = latelyTileLine(round, own, locale);
-  const lineText = line
+  const line = lineOverride !== undefined ? null : latelyTileLine(round, own, locale);
+  const lineText = lineOverride !== undefined ? lineOverride : line
     ? fillTemplate(
         t(line.key, { ...line.values, possessive: own ? t('courseDetail.lately.tile.your', 'your') : t('courseDetail.lately.tile.their', 'their'), defaultValue: line.defaultValue }) as string,
         { ...line.values, possessive: own ? t('courseDetail.lately.tile.your', 'your') : t('courseDetail.lately.tile.their', 'their') },
@@ -107,7 +118,7 @@ export function RoundCard({
       tabIndex={0}
       data-rounds-shelf-card="round"
       data-own-round={own ? 'true' : undefined}
-      className="lately-tile"
+      className={header ? 'lately-tile lately-tile--photo' : 'lately-tile'}
       onClick={open}
       onKeyDown={(event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -116,6 +127,7 @@ export function RoundCard({
       }}
       style={{ border: `1px solid ${own ? OWN_ROUND_BORDER : 'rgba(255,255,255,0.08)'}` }}
     >
+      {header}
       <button
         type="button"
         className="lately-tile-who"

@@ -33,7 +33,7 @@ import {
 } from './PlayedTile';
 import { PLAYED_KICKER, PLAYED_TITLE } from './playedParts';
 import { REGION_GAP, REGION_TILE_H, REGION_TILES_NO_LEAD } from './ByRegionSection';
-import { PHOTO_FIGURE_GAP, PHOTO_FIGURE_H, PHOTO_FIGURE_W } from './PhotoFigureCard';
+import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
 import { TOUGH_COUNT, TOUGH_GAP, TOUGH_TILE_H } from './HardestSection';
 import { LATEST_HOLE_W, LATEST_HOLE_H } from './LatestHolesSection';
 import { LATEST_COURSE_W, LATEST_COURSE_H } from './LatestCoursesSection';
@@ -137,13 +137,13 @@ export function ByRegionShell() {
   );
 }
 
-/** Most played and Highest rated: PhotoFigureCards, the real count per rail. */
-export function PhotoRailShell({ count }: { count: number }) {
+/** Standout rounds: two scorecard-tile bars at the tile's own width. */
+export function StandoutRoundsShell() {
   return (
     <HeadShell>
-      <div style={{ ...RAIL_CLIPPED, gap: PHOTO_FIGURE_GAP }}>
-        {Array.from({ length: count }, (_, i) => (
-          <Bar key={i} style={{ width: PHOTO_FIGURE_W, height: PHOTO_FIGURE_H, flex: 'none', borderRadius: 0 }} />
+      <div data-standout-shell style={{ ...RAIL_CLIPPED, gap: 10 }}>
+        {[0, 1].map((i) => (
+          <Bar key={i} style={{ width: 'min(300px, calc(100vw - 64px))', height: 410, flex: 'none', borderRadius: 18 }} />
         ))}
       </div>
     </HeadShell>

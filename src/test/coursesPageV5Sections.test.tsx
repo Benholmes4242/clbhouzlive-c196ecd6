@@ -20,7 +20,6 @@ vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: ({ size }: { 
 vi.mock('@/components/shared/CourseNameLink', () => ({ CourseNameLink: ({ children, textProps }: { children: React.ReactNode; textProps?: Record<string, string> }) => <div {...textProps}>{children}</div> }));
 vi.mock('@/components/mentions/MentionText', () => ({ MentionText: ({ text }: { text: string }) => <>{text}</> }));
 
-import { MostPlayedSection } from '@/components/courses/browse/MostPlayedSection';
 import { WhoPlayingShell, LatestReviewsShell } from '@/components/courses/browse/sectionShells';
 import { MEDIA_CARD_W, ReviewRailSlot, WRITTEN_CARD_W } from '@/components/courses/ReviewRailSlot';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
@@ -35,20 +34,6 @@ describe('V5 §2 shell row', () => {
     expect(big).toHaveLength(3);
     for (const b of big) expect([b.dataset.w, b.dataset.r]).toEqual(['156', '16']);
     expect((big[0].parentElement as HTMLElement).style.gap).toBe('8px');
-  });
-});
-
-describe('V5 §3 The regulars pill', () => {
-  const row = (id: string, rounds: number, avg: number | null) => ({ course_id: id, course_name: id, rounds, members: 3, avg_to_par: avg, community_rating: 8, review_count: 1 });
-  it('reads holes played (rounds × 18, thousands separators) with plays-to', () => {
-    listMock.mockReturnValue({ rows: [row('a', 962, 12.1)], isLoading: false });
-    const { container } = wrap(<MostPlayedSection />);
-    expect(container.querySelector('[data-tile="a"]')!.textContent).toBe('17,316 holes played \u00B7 Plays to +12.1');
-  });
-  it('reads just the holes with no plays-to figure', () => {
-    listMock.mockReturnValue({ rows: [row('b', 4, null)], isLoading: false });
-    const { container } = wrap(<MostPlayedSection />);
-    expect(container.querySelector('[data-tile="b"]')!.textContent).toBe('72 holes played');
   });
 });
 

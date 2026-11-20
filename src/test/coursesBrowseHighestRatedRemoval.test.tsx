@@ -29,7 +29,7 @@ vi.mock('@/components/courses/StatBrowse', async () => ({ default: await readySe
 vi.mock('@/components/courses/browse/WhoPlayingSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/WhoPlayingSection')>()), WhoPlayingSection: await readySection('whoPlaying') }));
 vi.mock('@/components/courses/browse/ByRegionSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/ByRegionSection')>()), ByRegionSection: await readySection('byRegion') }));
 vi.mock('@/components/courses/browse/LatestCoursesSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/LatestCoursesSection')>()), LatestCoursesSection: await readySection('latestCourses') }));
-vi.mock('@/components/courses/browse/MostPlayedSection', async () => ({ MostPlayedSection: await readySection('mostPlayed') }));
+vi.mock('@/components/courses/browse/StandoutRoundsSection', async () => ({ StandoutRoundsSection: await readySection('standoutRounds') }));
 vi.mock('@/components/courses/browse/HardestSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/HardestSection')>()), HardestSection: await readySection('hardest') }));
 vi.mock('@/components/courses/browse/LatestHolesSection', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/components/courses/browse/LatestHolesSection')>()), LatestHolesSection: await readySection('latestHoles') }));
 vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestReviewsSection: () => null }));

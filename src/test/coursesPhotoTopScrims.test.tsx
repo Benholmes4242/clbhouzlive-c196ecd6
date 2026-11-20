@@ -20,7 +20,6 @@ vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', ()
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: vi.fn() }));
 vi.mock('@tanstack/react-query', async original => ({ ...await original<typeof import('@tanstack/react-query')>(), useQueryClient: () => ({ fetchQuery: vi.fn(() => new Promise(() => {})) }), useInfiniteQuery: (options: { queryKey: string[] }) => ({ data: { pages: [options.queryKey[1] === 'get_latest_hole_media' ? f.holes : f.courses] }, isLoading: false, isFetched: true, isError: false, hasNextPage: false, isFetching: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }) }));
 
-import { PhotoFigureCard } from '@/components/courses/browse/PhotoFigureCard';
 import { HardestSection } from '@/components/courses/browse/HardestSection';
 import { LatestCoursesSection } from '@/components/courses/browse/LatestCoursesSection';
 import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
@@ -58,9 +57,8 @@ describe('Courses photo top scrims', () => {
   it('preserves the canonical 32-percent bottom recipe', () => {
     expect(SCRIM_STANDOUT).toBe('linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)');
   });
-  it.each(['PhotoFigureCard', 'HardestSection', 'LatestCoursesSection', 'LatestHolesSection'])('%s mounts its top layer before its figure and keeps the bottom', name => {
-    if (name === 'PhotoFigureCard') mount(<PhotoFigureCard row={f.stats[0]} figure={941} figureLabel="Rounds tracked" />);
-    else if (name === 'HardestSection') mount(<HardestSection />);
+  it.each(['HardestSection', 'LatestCoursesSection', 'LatestHolesSection'])('%s mounts its top layer before its figure and keeps the bottom', name => {
+    if (name === 'HardestSection') mount(<HardestSection />);
     else if (name === 'LatestCoursesSection') mount(<LatestCoursesSection />);
     else mount(<LatestHolesSection />);
     const card = screen.getAllByRole('button')[0];

@@ -3525,5 +3525,50 @@
   },
   "common": {
     "done": "[~~Đőñé~~]"
+  },
+  "browse": {
+    "standout": {
+      "holesOne": "[the {{a}}]",
+      "holesMany": "[the {{list}} and {{last}}]",
+      "on": "[on {{holes}}]",
+      "stamp": {
+        "ace": "[HOLE IN ONE]",
+        "aceMany": "[{{n}} HOLES IN ONE]",
+        "albatross": "[ALBATROSS]",
+        "albatrossMany": "[{{n}} ALBATROSSES]",
+        "underPar": "[UNDER PAR]",
+        "eagle": "[EAGLE]",
+        "eagleMany": "[{{n}} EAGLES]",
+        "points": "[{{n}} POINTS]",
+        "birdies": "[{{n}} BIRDIES]"
+      },
+      "line": {
+        "ace": "[<b>Hole in one</b>]",
+        "aceMany": "[<b>{{n}} holes in one</b>]",
+        "yards": "[, {{n}} yards]",
+        "albatross": "[<b>Albatross</b>]",
+        "albatrossMany": "[<b>{{n}} albatrosses</b>]",
+        "aPar": "[, a par {{n}}]",
+        "underPar": "[<b>{{n}} under par</b>]",
+        "withBirdies": "[, with {{n}} birdies]",
+        "eagle": "[<b>Eagle</b>]",
+        "eagleMany": "[<b>{{n}} eagles</b>]",
+        "points": "[<b>{{n}} points</b>]",
+        "playingOff": "[, playing off {{h}}]",
+        "birdies": "[<b>{{n}} birdies</b>]",
+        "inARow": "[, {{n}} in a row]"
+      },
+      "short": {
+        "ace": "[a hole in one]",
+        "aceMany": "[{{n}} holes in one]",
+        "albatross": "[an albatross]",
+        "albatrossMany": "[{{n}} albatrosses]",
+        "underPar": "[{{n}} under par]",
+        "eagle": "[an eagle]",
+        "eagleMany": "[{{n}} eagles]",
+        "points": "[{{n}} points]",
+        "birdies": "[{{n}} birdies]"
+      }
+    }
   }
 }
