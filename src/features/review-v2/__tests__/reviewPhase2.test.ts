@@ -97,10 +97,10 @@ describe('what came off the composer', () => {
     expect(tray).not.toContain('useState');
   });
 
-  it('marks the dial axis with numerals, not three band names', () => {
+  it('uses a ten-step bar without a numbered axis or band names', () => {
     const scrubber = src('src/features/review-v2/components/OverallScrubber.tsx');
     expect(scrubber).not.toContain('bandLabels');
-    expect(scrubber).toContain('Array.from({ length: 10 }');
-    expect(scrubber).toContain('{i + 1}</span>');
+    expect(src('src/features/review-v2/components/ScoreBar.tsx')).toContain('Array.from({ length: 10 }');
+    expect(scrubber).not.toContain('review-score-axis');
   });
 });

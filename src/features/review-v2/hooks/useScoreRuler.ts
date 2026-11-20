@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type React from 'react';
-import { snapScore } from '../lib/scoreStepRules';
+import { barValueFromX, snapScore } from '../lib/scoreStepRules';
 
 /** Tap commits immediately; moving pointers refine the same 1–10 / 0.1 scale. */
 export function useScoreRuler(value: number | null, onChange: (value: number) => void) {
@@ -9,7 +9,7 @@ export function useScoreRuler(value: number | null, onChange: (value: number) =>
   const setFromPointer = useCallback((clientX: number) => {
     const rect = ref.current?.getBoundingClientRect();
     if (!rect || rect.width <= 0) return;
-    onChange(snapScore(1 + (clientX - rect.left) / rect.width * 9));
+    onChange(barValueFromX(clientX - rect.left, rect.width));
   }, [onChange]);
   useEffect(() => {
     if (!dragging) return;
@@ -34,9 +34,10 @@ export function useScoreRuler(value: number | null, onChange: (value: number) =>
   const onKeyDown = (event: React.KeyboardEvent) => {
     let next: number;
     const current = value ?? 1;
+    const step = event.shiftKey ? 1 : 0.1;
     switch (event.key) {
-      case 'ArrowRight': case 'ArrowUp': next = current + 0.1; break;
-      case 'ArrowLeft': case 'ArrowDown': next = current - 0.1; break;
+      case 'ArrowRight': case 'ArrowUp': next = current + step; break;
+      case 'ArrowLeft': case 'ArrowDown': next = current - step; break;
       case 'Home': next = 1; break;
       case 'End': next = 10; break;
       default: return;

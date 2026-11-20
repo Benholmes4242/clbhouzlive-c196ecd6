@@ -64,7 +64,6 @@ import { useReviewHoleTags } from './hooks/useReviewHoleTags';
 import { ShareToggle } from './components/ShareToggle';
 import { SubmitBar } from './components/SubmitBar';
 import { ReviewReceipt, ordinal } from './components/ReviewReceipt';
-import { useMyRatedScores, calibrationRank } from './hooks/useMyRatedScores';
 
 import { EditLossSheet, editLoss, type EditLoss } from './components/EditLossSheet';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
@@ -75,7 +74,7 @@ import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { missingScores, scoreAction, scoreFooter, scoreShareKey } from './lib/scoreStepRules';
-import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { focusMissingScore } from './lib/scoreStepNavigation';
 import { PlayedWithSection } from '@/features/post-v2/components/golf/GolfPostSections';
 import { useReviewPlayedWith } from './hooks/useReviewPlayedWith';
 import { saveReviewSocial } from './lib/saveReviewSocial';
@@ -482,11 +481,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const submit = useReviewSubmit();
   const holeTags = useReviewHoleTags(course.id, userId, media.items);
 
-  // ONE fetch of the member's own overall ratings (this course excluded, so an
-  // edit never ranks the member against themselves). The ordinal below is
-  // computed client-side on every drag - no query per drag.
-  const myRatedQ = useMyRatedScores(userId, course.id);
-  const calibration = calibrationRank(composer.state.overall, myRatedQ.data);
 
 
   const [removeOpen, setRemoveOpen] = useState(false);
@@ -786,30 +780,18 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
   const overallCardRef = useRef<HTMLDivElement>(null);
   const scoreRowsRef = useRef<HTMLDivElement>(null);
-  const [flaggedCategories, setFlaggedCategories] = useState<CategoryKey[]>([]);
-  const [overallPulsing, setOverallPulsing] = useState(false);
-  const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (pulseTimer.current) clearTimeout(pulseTimer.current); }, []);
   const handlePrimary = useCallback(() => {
     if (submit.submitting) return;
     if (step === LAST_STEP) {
       const missing = missingScores(composer.state);
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (missing.overall) {
         analyticsEvents.track('review_score_nudge', { missing: 'overall', count: 1 });
-        if (overallCardRef.current) scrollElementIntoView(overallCardRef.current, { offset: 100, behavior: reduced ? 'auto' : 'smooth' });
-        if (!reduced) {
-          setOverallPulsing(true);
-          if (pulseTimer.current) clearTimeout(pulseTimer.current);
-          pulseTimer.current = setTimeout(() => setOverallPulsing(false), 600);
-        }
+        focusMissingScore(composer.state, overallCardRef.current, scoreRowsRef.current);
         return;
       }
       if (missing.categories.length) {
         analyticsEvents.track('review_score_nudge', { missing: 'categories', count: missing.categories.length });
-        setFlaggedCategories(missing.categories);
-        const row = scoreRowsRef.current?.querySelector(`[data-score-category="${missing.categories[0]}"]`);
-        if (row) scrollElementIntoView(row, { offset: 100, behavior: reduced ? 'auto' : 'smooth' });
+        focusMissingScore(composer.state, overallCardRef.current, scoreRowsRef.current);
         return;
       }
     }
@@ -1326,18 +1308,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       {step === LAST_STEP && (
         <div className="review-score-theme">
           <ReviewStepHeading step={step - 1} total={REVIEW_TOTAL_STEPS - 1} />
-          <div ref={overallCardRef} className="review-overall-card" data-pulsing={overallPulsing}>
+          <div ref={overallCardRef} className="review-overall-card">
             <OverallScrubber value={composer.state.overall} onChange={composer.setOverall}
               caption={t('review.wizard.step3.rulerHint')} ariaLabel={t('review.wizard.step0.a11y')}
-              calibration={calibration ? t(`review.wizard.step3.${calibration.ordinal === 1 ? 'calibrationFirst' : 'calibration'}`, {
-                ordinal: ordinal(calibration.ordinal), count: calibration.total,
-              }) : null} />
+              members={headerFacts} savedRating={existing?.rating} />
           </div>
           <ReviewCategoriesHeading scores={composer.state.scores} />
           <div ref={scoreRowsRef}>
-            <CategoryGrid values={composer.state.scores} cats={cats} flagged={flaggedCategories}
-              tapToScore={t('review.wizard.step3.tapToScore')} stillToScore={t('review.wizard.step3.stillToScore')}
-              onChange={(key, value) => { composer.setCategory(key, value); setFlaggedCategories(old => old.filter(k => k !== key)); }} />
+            <CategoryGrid values={composer.state.scores} cats={cats} onChange={composer.setCategory} />
           </div>
         </div>
       )}

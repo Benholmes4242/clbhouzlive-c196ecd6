@@ -29,13 +29,13 @@ describe('OverallScrubber empty state', () => {
     expect(container.querySelector('[data-score-thumb]')).toBeNull();
     pointer(rail(), 'pointerdown', 90);
     fireEvent.pointerUp(window);
-    expect(onChange).toHaveBeenCalledWith(5.5);
+    expect(onChange).toHaveBeenCalledWith(5);
   });
   it('commits when the pointer actually moves', () => {
     const onChange = vi.fn();
     render(<OverallScrubber value={null} onChange={onChange} {...props} />);
     pointer(rail(), 'pointerdown', 0);
     pointer(window, 'pointermove', 123);
-    expect(onChange).toHaveBeenLastCalledWith(7.2);
+    expect(onChange).toHaveBeenLastCalledWith(6.8);
   });
 });

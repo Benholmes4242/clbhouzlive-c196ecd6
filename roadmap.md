@@ -1,5 +1,11 @@
 # Roadmap
 
+## Complete: Review step 2 ten-step bars
+- Shared bars, header-aggregate comparison/edit exclusion and first-missing-bar focus implemented; required-score/submit rules and frozen step 1 unchanged.
+- Ten new cases; authorized flags, pointer scale and numbered-axis assertions updated and listed in .lovable/reports/review-step-two-bars/report.md. No deletions. Focused 72/72.
+- Sequential shards 2,304 / 2,287 / 2,349 / 2,443 = 9,383/9,383 across 837 files, baseline 9,373 +10. Shard 2 reran after explicitly authorized old-axis assertion replacement; no unexpected failures.
+- Preview build OK; isolated actual-controls 390/320 empty/part/all and keyboard-focus checks passed. Authenticated live save/edit checks unavailable on external_unmanaged. Earlier keyboard/fullscreen/grid stops below superseded by e4175b225f and this full pass.
+
 ## Stopped: Three stopped-build test ruling
 - ActiveRing passes unchanged alone, 28/28. Apply only the authorized memberShotPosts substring and keyboard actor-fixture field; reviewGridScores name correction already present. No app changes or timeout edits.
 - Separate files: ActiveRing 28/28, fullscreen 3/3, grid 7/7, keyboard 10/11. Keyboard (f) still throws ActorSheet.tsx:21:24, `Cannot read properties of undefined (reading 'map')`: ActorSheet reads availableActors from useActiveActor, not the useComposerActor mock the ruling authorized. No further repair/rerun; memberShotPosts standalone and all four shards not run. Needs authorization to complete the useActiveActor fixture.

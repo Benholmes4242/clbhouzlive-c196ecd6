@@ -1,33 +1,38 @@
-/** Signed-off Step 2 ruler; score ink follows courseSubScoreTone's white rule. */
+/** Step 2 comparison uses only the header's aggregate, not the calibration/receipt read.
+ * Score ink preserves courseSubScoreTone's all-white rule via the score theme. */
 import React from 'react';
-import { useScoreRuler } from '../hooks/useScoreRuler';
-import { scorePercent } from '../lib/scoreStepRules';
+import { useTranslation } from 'react-i18next';
+import { ScoreBar } from './ScoreBar';
+import { membersComparisonBase } from '../lib/scoreStepRules';
+import type { ReviewHeaderFacts } from '../hooks/useReviewHeaderFacts';
 
 interface Props {
   value: number | null;
   onChange: (value: number) => void;
   caption: string;
   ariaLabel: string;
-  calibration?: string | null;
+  members?: ReviewHeaderFacts;
+  savedRating?: number | null;
 }
-export function OverallScrubber({ value, onChange, caption, ariaLabel, calibration }: Props) {
-  const ruler = useScoreRuler(value, onChange);
-  const pct = value == null ? 0 : scorePercent(value);
+export function OverallScrubber({ value, onChange, caption, ariaLabel, members, savedRating }: Props) {
+  const { t } = useTranslation('courses');
+  const base = membersComparisonBase(members?.avg ?? null, members?.count ?? 0, savedRating);
+  const difference = value != null && base != null ? Math.round((value - base) * 10) / 10 : null;
+  const comparison = difference === 0 ? 'membersLevel' : 'membersDifference';
   return <div>
+    <div className="review-score-kicker">{t('review.wizard.step3.overallLabel')}</div>
     <div className="review-overall-number-row">
-      <div className="review-score-number review-overall-number" data-empty={value == null}>{value == null ? '—' : value.toFixed(1)}</div>
-      <div className="review-overall-denominator">/ 10</div>
+      <div className="review-overall-figure">
+        <span className="review-score-number review-overall-number" data-empty={value == null}>{value == null ? '—' : value.toFixed(1)}</span>
+        {value == null && <span className="review-overall-denominator">/ 10</span>}
+      </div>
+      {value != null && base != null && difference != null && <div className="review-overall-members" data-members-comparison data-difference={difference}>
+        <b>{t(`review.wizard.step3.${comparison}`, { difference: Math.abs(difference).toFixed(1), direction: t(`review.wizard.step3.${difference > 0 ? 'above' : 'below'}`) })}</b>{' '}
+        {t(`review.wizard.step3.${difference === 0 ? 'membersWith' : 'membersThe'}`)}<br />
+        {t('review.wizard.step3.membersAverage', { average: base.toFixed(1) })}
+      </div>}
     </div>
-    <div className="review-overall-caption" data-empty={value == null}>{value == null ? caption : calibration}</div>
-    <div ref={ruler.ref} role="slider" tabIndex={0} aria-valuemin={1} aria-valuemax={10}
-      aria-valuenow={value ?? undefined} aria-valuetext={value == null ? 'Not scored' : undefined}
-      aria-label={ariaLabel} onPointerDown={ruler.onPointerDown} onKeyDown={ruler.onKeyDown} className="review-score-ruler">
-      <div className="review-score-track" />
-      {value != null && <div className="review-score-fill" style={{ width: `${pct}%` }} />}
-      {Array.from({ length: 10 }, (_, i) => <div key={i} aria-hidden className="review-score-tick" data-end={i === 0 || i === 9}
-        data-filled={value != null && i / 9 * 100 <= pct} style={{ left: `${i / 9 * 100}%` }} />)}
-      {value != null && <div aria-hidden data-score-thumb className="review-score-thumb" style={{ left: `${pct}%` }} />}
-    </div>
-    <div aria-hidden className="review-score-axis review-score-number">{Array.from({ length: 10 }, (_, i) => <span key={i}>{i + 1}</span>)}</div>
+    <ScoreBar value={value} onChange={onChange} ariaLabel={ariaLabel} />
+    {value == null && <div className="review-overall-caption">{caption}</div>}
   </div>;
 }

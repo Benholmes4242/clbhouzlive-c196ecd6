@@ -7,7 +7,13 @@ import type { CategoryKey, ReviewComposerState } from '../types';
 
 export const SCORE_CATEGORIES: CategoryKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
 export const snapScore = (value: number) => Math.round(Math.max(1, Math.min(10, value)) * 10) / 10;
-export const scorePercent = (value: number) => (value - 1) / 9 * 100;
+export const barValueFromX = (x: number, width: number) => snapScore(width > 0 ? x / width * 10 : 1);
+/** Uses the header aggregate verbatim; edits remove only the saved overall. */
+export function membersComparisonBase(avg: number | null, count: number, savedRating?: number | null) {
+  if (avg == null || !Number.isFinite(avg) || count <= 0) return null;
+  if (savedRating == null) return avg;
+  return count > 1 ? (avg * count - savedRating) / (count - 1) : null;
+}
 export function missingScores(state: Pick<ReviewComposerState, 'overall' | 'scores'>) {
   const categories = SCORE_CATEGORIES.filter(key => state.scores[key] == null);
   return { overall: state.overall == null, categories, ready: state.overall != null && categories.length === 0 };

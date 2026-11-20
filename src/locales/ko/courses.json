@@ -1994,8 +1994,6 @@
         "calibrationFirst": "Your highest of the {{count}} courses you've rated",
         "breakdownLabel": "Now score these four",
         "catsIntro": "Score these on their own, not against your overall.",
-        "tapToScore": "Tap to score",
-        "stillToScore": "Still to score",
         "setScore": "Set your score",
         "oneLeft": "1 left: {{category}}",
         "nLeft": "{{count}} still to score",

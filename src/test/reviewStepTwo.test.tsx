@@ -144,17 +144,17 @@ describe('ruler and category interactions', () => {
     fireEvent.keyDown(slider, { key: 'Home' }); expect(change).toHaveBeenLastCalledWith(1);
     fireEvent.keyDown(slider, { key: 'End' }); expect(change).toHaveBeenLastCalledWith(10);
   });
-  it('unscored rows have no value and flag clears immediately on scoring', () => {
+  it('unscored rows have no aria value and never flag on scoring', () => {
     function Rows() {
       const [values, setValues] = useState(state.scores);
-      return <CategoryGrid values={values} onChange={(key, value) => setValues(old => ({ ...old, [key]: value }))} cats={[{ key: 'facilities', label: 'Facilities', hint: '' }]} flagged={['facilities']} tapToScore="" stillToScore="" />;
+      return <CategoryGrid values={values} onChange={(key, value) => setValues(old => ({ ...old, [key]: value }))} cats={[{ key: 'facilities', label: 'Facilities', hint: '' }]} />;
     }
     const { container } = render(<Rows />);
     const row = container.querySelector('[data-score-category]');
-    expect(row?.getAttribute('data-flagged')).toBe('true');
+    expect(row?.getAttribute('data-flagged')).toBeNull();
     expect(screen.getByRole('slider').hasAttribute('aria-valuenow')).toBe(false);
     fireEvent.keyDown(screen.getByRole('slider'), { key: 'End' });
-    expect(row?.getAttribute('data-flagged')).toBe('false');
+    expect(row?.getAttribute('data-flagged')).toBeNull();
     expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('10');
   });
   it('calibration retains the five-peer minimum and first rank', () => {
