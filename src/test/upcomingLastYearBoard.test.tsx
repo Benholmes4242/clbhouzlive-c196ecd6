@@ -55,10 +55,10 @@ describe('upcoming LAST YEAR condensed board', () => {
     const view = render(<LastYearRow rank="2" name="Fredrik Jacobson" score="−19" />);
     const row = view.container.firstElementChild as HTMLElement;
     expect(row.style.gridTemplateColumns).toBe('26px minmax(0,1fr) 44px');
-    expect(row.style.height).toBe('36px');
+    expect(row.style.minHeight).toBe('31px');
     const name = row.children[1] as HTMLElement;
     expect(row.querySelector('img')).toBeNull();
-    expect(name.style.fontSize).toBe('15px');
+    expect(name.style.fontSize).toBe('13px');
     expect(name.style.fontWeight).toBe('600');
     expect(name.style.textOverflow).toBe('ellipsis');
     expect(name.style.minWidth).toBe('0');
@@ -70,7 +70,7 @@ describe('upcoming LAST YEAR condensed board', () => {
     // .recap-trophy) replaces the old filled cup glyph.
     const view = render(<LastYearRow rank="1" name="Winner" score="−20" isWinner />);
     const row = view.container.firstElementChild as HTMLElement;
-    expect(row.style.height).toBe('36px');
+    expect(row.style.minHeight).toBe('31px');
     expect(row.firstElementChild?.tagName).toBe('svg');
     expect(row.firstElementChild?.getAttribute('width')).toBe('14');
     expect(row.firstElementChild?.getAttribute('height')).toBe('14');

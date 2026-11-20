@@ -9,7 +9,7 @@ vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ active
 vi.mock('@/lib/toast', () => ({ toast: { error: h.toast } }));
 vi.mock('@/features/post-v2/lib/videoDetailsWrites', () => ({ writeVideoDetails: async () => {} }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: h.rpc, from: (table: string) => {
-  const query = { eq: () => query, in: () => query, maybeSingle: async () => ({ data: null, error: null }), select: async () => ({ data: [{ id: 'post-1' }], error: null }), then: (resolve: (v: unknown) => unknown) => Promise.resolve({ data: null, error: null }).then(resolve) };
+  const query = { eq: () => query, in: () => query, maybeSingle: async () => ({ data: table === 'posts' ? { status: 'published', scheduled_at: null, visibility: 'anyone' } : null, error: null }), select: () => query, then: (resolve: (v: unknown) => unknown) => Promise.resolve({ data: [{ id: 'post-1' }], error: null }).then(resolve) };
   return { ...query, insert: h.insert, delete: () => ({ eq: () => ({ in: h.remove, then: query.then }) }), update: (payload: unknown) => { h.patch(table, payload); return query; } };
 } } }));
 vi.mock('@/features/post-v2/lib/postWith', async original => ({ ...await original<typeof import('@/features/post-v2/lib/postWith')>(), readPostWith: async () => [] }));

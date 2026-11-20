@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete: Two authorized test-only stop repairs
+- Fix only postWithErrorSurface's chainable select/then/posts maybeSingle fixture and upcomingLastYearBoard's two row heights/name size; no rank size assertions exist to update. Keep all nine save-error assertions and all other board assertions unchanged; no app code changes.
+- Focused 16/16; four separate sequential shards pass 2,279 / 2,281 / 2,337 / 2,432 = 9,329/9,329 across 832 files, zero failures. Inventory 9,329 before/after; no cases added, removed or renamed. Prior Overview/Played with CSS and save-error test stops below are superseded by this full pass. Full output and old→new assertion report: .lovable/reports/two-test-only-rulings/. No app code changed; real-account/device checks remain unverified.
+
 ## Stopped: Authorized upcoming picks CSS assertion ruling
 - Apply only the upcoming wrapper class, identical CSS padding and the two authorized assertions; preserve cards and all other assertions. No prior ≤340px wrapper override exists, so add none.
 - Shards 1/2 pass 2,279/2,281; authorized Merged Airy case passes 17/17. Shard 3 stops at 2,333 passed/4 failed: upcomingLastYearBoard.test.tsx:58:30 and :73:30 expect 36px; two postWithErrorSurface edit fixtures fail at StageComposer.tsx:222:8 (`supabase.from(...).select(...).eq is not a function`). Shard 4 not run, failures untouched; further repairs need authorization. Expected inventory remains 9,329 (9,301 + 6 Overview + 13 Played with + 9 subsequent save-error tests); no cases added or removed by this ruling. Full output/report: .lovable/reports/upcoming-picks-ruling/.
