@@ -79,6 +79,8 @@ import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { PlayedWithSection } from '@/features/post-v2/components/golf/GolfPostSections';
 import { useReviewPlayedWith } from './hooks/useReviewPlayedWith';
 import { saveReviewSocial } from './lib/saveReviewSocial';
+import { useKeyboardDismiss } from '@/lib/keyboard/useKeyboardDismiss';
+import { KeyboardDonePill } from '@/lib/keyboard/KeyboardDonePill';
 
 /**
  * THE HEADER'S OWN GEOMETRY — one expression, two consumers.
@@ -927,6 +929,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   // one derivation, correct in BOTH render contexts — it never has to know
   // whether .app-shell or the fixed header paid env(safe-area-inset-top).
   const composerRootRef = useRef<HTMLDivElement | null>(null);
+  const keyboard = useKeyboardDismiss(composerRootRef);
   const headerRef = useRef<HTMLElement | null>(null);
   const spacerRef = useRef<HTMLDivElement | null>(null);
   const [spacerH, setSpacerH] = useState<number | null>(null);
@@ -1357,6 +1360,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         onSkip={skipLabel ? handlePrimary : undefined}
       />
       </div>
+
+      <KeyboardDonePill {...keyboard} />
 
       {/* §1a: the one question before several paragraphs are thrown away. */}
       <DiscardDraftDialog

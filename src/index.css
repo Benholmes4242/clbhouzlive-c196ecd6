@@ -21,6 +21,24 @@
 @tailwind components;
 @tailwind utilities;
 
+.keyboard-done-pill.keyboard-done-pill {
+  position: fixed;
+  right: 12px;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--keyboard-done-glass);
+  border: 1px solid var(--keyboard-done-edge);
+  color: var(--keyboard-done-ink);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  transition: none;
+}
+
 @layer base {
   /* Default only: explicit white/grey composer carets remain authoritative. */
   input, textarea, [contenteditable="true"] { caret-color: #F8FAFC; }
@@ -38,6 +56,9 @@
 }
 
 :root {
+  --keyboard-done-glass: rgba(22,22,26,0.6);
+  --keyboard-done-edge: rgba(255,255,255,0.18);
+  --keyboard-done-ink: #F8FAFC;
   --cc3-canvas: #0A0D12;
   --cc3-surface: #12161D;
   --cc3-inset: #181D25;

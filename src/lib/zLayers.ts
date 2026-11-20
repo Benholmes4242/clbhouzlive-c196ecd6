@@ -73,6 +73,9 @@ export const MEDIA_PREVIEW_Z  = 9999;  // MediaPreviewViewer (portals to body)
  */
 export const POST_COMPOSER_Z  = 12000;
 
+/** Wizard keyboard accessory, portalled to body; below sheet backdrop 12002. */
+export const KEYBOARD_DONE_Z = POST_COMPOSER_Z + 1;
+
 /**
  * BRIEF_DISCOVER_STICKY_FILTER_BAR G1.6 — Discover's sticky filter bar.
  *

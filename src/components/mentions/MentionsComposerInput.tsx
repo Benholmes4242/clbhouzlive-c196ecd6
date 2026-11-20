@@ -576,6 +576,7 @@ function AnchoredMentionsPanel({ anchorRef, children, placement = 'dock' }: Anch
   return ReactDOM.createPortal(
     <div
       ref={panelRef}
+      data-keyboard-keep-open="mentions"
       // Preserve textarea focus so react-mentions' click handler lands
       // before blur closes the suggestions overlay.
       onMouseDown={(e) => e.preventDefault()}

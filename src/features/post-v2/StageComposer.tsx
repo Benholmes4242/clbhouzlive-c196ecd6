@@ -19,6 +19,8 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { Button } from '@/components/ui/button';
+import { useKeyboardDismiss } from '@/lib/keyboard/useKeyboardDismiss';
+import { KeyboardDonePill } from '@/lib/keyboard/KeyboardDonePill';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Pencil, X } from 'lucide-react';
@@ -185,6 +187,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
   // Page-2 caption element: focus is chained off the Next tap because autoFocus
   // is unreliable in the WebView.
   const captionElRef = useRef<HTMLTextAreaElement | null>(null);
+  const keyboardScrollRef = useRef<HTMLDivElement>(null);
+  const keyboard = useKeyboardDismiss(keyboardScrollRef);
 
   /* ---- THE POST PAGE, REBUILT AROUND GOLF ------------------------------
      Per-photo tags, the course found from the photo date, Played with, Who
@@ -1239,7 +1243,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
 
       {emptyStage ? (
         /* EMPTY STATE keeps its original single-scroller layout. */
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
+        <div ref={keyboardScrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
           {/* Nothing here auto-fires a picker: no effect opens a file input on
               mount. Both inputs are anchored EXACTLY OVER THEIR OWN BUTTON so
               the iOS chooser opens from the control tapped. Do not consolidate. */}
@@ -1266,7 +1270,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
         </div>
       ) : (
         /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
-        <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
+        <div ref={keyboardScrollRef} data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
           <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} visibility={visibility} personal={isPersonalActor} onVisibility={isPersonalActor ? () => setVisibilityOpen(true) : undefined} />
           {videoComposer ? <VideoTitleDescription details={videoData} description={state.caption} duration={videoItem ? videoDuration(videoItem) : undefined} long={longVideo} currentUserId={profile?.id ?? null} onChange={setVideoData} onDetails={() => setVideoDetailsOpen(true)} /> : <div style={{ padding: '14px 16px 0' }}>
             <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
@@ -1276,6 +1280,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
           {tagAndDetails}
         </div>
       )}
+
+      <KeyboardDonePill {...keyboard} />
 
       {/* SHARE — 54px pill and its sub-line. ONE owner (ShareFooter) shared
           with the Preview page so the two cannot drift (PV1). */}

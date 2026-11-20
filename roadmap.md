@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Wizard keyboard Done and scroll dismissal
+- Shared focus/visualViewport hook and Done pill in post/review wizards; preserve scrollable fields, mentions/results and horizontal gestures, with passive listener cleanup.
+- Added 11 cases; focused 10/11 passes, with case (f) crashing at ActorSheet.tsx:21:24, `Cannot read properties of undefined (reading 'map')`, because the new actor mock omits availableActors. No repair/rerun or shards under the stop rule; requires fixture ruling. Expected inventory 9,362 → 9,373; last full verified pass 9,352, prior stops untouched.
+- Preview build OK at 19:37:39Z. Browser/320 and physical iOS checks unverified; report/full output in .lovable/reports/keyboard-dismiss/.
+
 ## Stopped: Photo-grid review scores Option B
 - Use the shared feed photo-grid rule; move only media-first grid scores/course/region below photos, preserving non-grid glass and footer/header behaviour.
 - Seven requested cases added; existing glass fixtures contain no grid media arrays and remain unchanged. Focused run 39/40; new case (d) crashes at golfPostRules.ts:90:49, `Cannot read properties of undefined (reading 'trim')`, because the new fixture used displayName instead of name. No rerun or shards under the stop rule.
