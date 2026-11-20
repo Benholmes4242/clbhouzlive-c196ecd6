@@ -6,7 +6,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 const h = vi.hoisted(() => ({ actor: { type: 'personal', id: 'me', name: 'Me' }, noop: vi.fn(), rpc: vi.fn() }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
-vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: h.actor }) }));
+vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: h.actor, availableActors: [] }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: { id: 'me' } }) }));
 vi.mock('@/features/post-v2/hooks/useComposerActor', () => ({ useComposerActor: () => ({ activeActor: h.actor, availableActors: [], selectActor: h.noop, applyDraftActor: h.noop }) }));
