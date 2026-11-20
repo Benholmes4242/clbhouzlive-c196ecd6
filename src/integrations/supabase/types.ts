@@ -28700,6 +28700,10 @@ export type Database = {
         Args: { p_actor_ids: string[]; p_post_id: string; p_since: string }
         Returns: boolean
       }
+      post_with_count_for_author: {
+        Args: { p_post_id: string }
+        Returns: number
+      }
       posters_to_check: {
         Args: { p_limit?: number }
         Returns: {
