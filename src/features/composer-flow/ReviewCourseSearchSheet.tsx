@@ -55,7 +55,7 @@ export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick,
 
   return (
     <KeyboardSearchSheet open={open} onClose={onClose} query={q} onQueryChange={setQ} testId="review-course-search"
-      title={t('reviewSearch.title', { defaultValue: 'Review a course' })} closeLabel={t('close', { defaultValue: 'Close' })}
+      title={t('reviewSearch.title', { defaultValue: 'Review a golf course' })} closeLabel={t('close', { defaultValue: 'Close' })}
       clearLabel={t('reviewSearch.clear', { defaultValue: 'Clear search' })} placeholder={t('reviewSearch.placeholder', { defaultValue: 'Search 23,000 courses' })}>
           {searching ? (ready && <>
             {rows.length > 0 && <>

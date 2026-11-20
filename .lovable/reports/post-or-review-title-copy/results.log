@@ -1,0 +1,4 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+Post something {'fontSize': '18px', 'lineHeight': '27px', 'lines': 1, 'width': 201.796875, 'textWidth': 135.015625}
+Review a golf course {'fontSize': '18px', 'lineHeight': '27px', 'lines': 1, 'width': 202, 'textWidth': 179.0625}
+search heading Review a golf course

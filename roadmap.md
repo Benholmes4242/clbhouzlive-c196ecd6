@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Post or review title copy only
+- Updated requested titles in en/de/es/ja/ko/en-XA and search fallback; reviewSearch.title was absent and added. No layout/style/behaviour or other-copy changes.
+- Two authorized assertions updated; 15/15 focused. Sequential shards 2,304 / 2,287 / 2,349 / 2,443 = 9,383/9,383 across 837 files, unchanged inventory and zero failures.
+- Actual sheet at 320: both English titles one line at 18px; search title verified by opening the sheet. Report/full outputs: .lovable/reports/post-or-review-title-copy/.
+
 ## Complete: Review step 2 ten-step bars
 - Shared bars, header-aggregate comparison/edit exclusion and first-missing-bar focus implemented; required-score/submit rules and frozen step 1 unchanged.
 - Ten new cases; authorized flags, pointer scale and numbered-axis assertions updated and listed in .lovable/reports/review-step-two-bars/report.md. No deletions. Focused 72/72.

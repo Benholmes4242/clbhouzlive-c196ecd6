@@ -4,17 +4,20 @@
   "back": "[~~Ɓáĉǩ~~]",
   "title": "Post or review",
   "post": {
-    "title": "Post",
+    "title": "[~~Ƥőšţ šőɱéţĥíñĝ~~]",
     "line": "Photos or video for your circle's feed",
     "camera": "Post from camera",
     "library": "Post from library"
   },
   "or": "OR",
   "review": {
-    "title": "Review a course",
+    "title": "[~~Řéṽíéŵ á ĝőļƒ ĉőúřšé~~]",
     "line": "Score it out of 10 and say how it plays",
     "search": "Find a course to review",
     "cta": "Review"
+  },
+  "reviewSearch": {
+    "title": "[~~Řéṽíéŵ á ĝőļƒ ĉőúřšé~~]"
   },
   "reason": {
     "club": "Your club",

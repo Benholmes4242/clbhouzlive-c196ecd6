@@ -46,8 +46,8 @@ describe('direct entry sheet', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Post or review');
     const boxes = [...container.querySelectorAll('section')];
     expect(boxes).toHaveLength(2);
-    expect(boxes[0].querySelector('h2')).toHaveTextContent('Post');
-    expect(boxes[1].querySelector('h2')).toHaveTextContent('Review a course');
+    expect(boxes[0].querySelector('h2')).toHaveTextContent('Post something');
+    expect(boxes[1].querySelector('h2')).toHaveTextContent('Review a golf course');
     expect(boxes[0].nextElementSibling).toHaveAttribute('aria-hidden', 'true');
     expect(boxes[0].nextElementSibling).toHaveTextContent('OR');
     expect(screen.queryByText(/Step \d of/)).toBeNull();

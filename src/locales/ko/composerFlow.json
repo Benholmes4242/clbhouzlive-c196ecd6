@@ -4,17 +4,20 @@
   "back": "뒤로",
   "title": "Post or review",
   "post": {
-    "title": "Post",
+    "title": "Post something",
     "line": "Photos or video for your circle's feed",
     "camera": "Post from camera",
     "library": "Post from library"
   },
   "or": "OR",
   "review": {
-    "title": "Review a course",
+    "title": "Review a golf course",
     "line": "Score it out of 10 and say how it plays",
     "search": "Find a course to review",
     "cta": "Review"
+  },
+  "reviewSearch": {
+    "title": "Review a golf course"
   },
   "reason": {
     "club": "Your club",
