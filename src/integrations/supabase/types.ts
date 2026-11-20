@@ -24147,6 +24147,37 @@ export type Database = {
         Args: { p_min_rounds?: number }
         Returns: Json
       }
+      get_courses_standout_rounds: {
+        Args: { p_days?: number; p_limit?: number; p_per_member?: number }
+        Returns: {
+          albatrosses: number
+          birdies: number
+          course_handicap: number
+          course_id: string
+          course_image: string
+          course_name: string
+          course_par: number
+          course_region: string
+          course_sub_country: string
+          display_name: string
+          eagles: number
+          feat_holes: number[]
+          feat_kind: string
+          feat_par: number
+          feat_yards: number
+          gross_score: number
+          holes_in_one: number
+          is_competition: boolean
+          longest_birdie_run: number
+          net_score: number
+          play_date: string
+          pos: number
+          profile_photo_url: string
+          stableford_points: number
+          user_id: string
+          whs_score_id: string
+        }[]
+      }
       get_creator_videos: {
         Args: {
           p_actor_id: string
