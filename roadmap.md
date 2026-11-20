@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: Photo-grid review scores Option B
+- Use the shared feed photo-grid rule; move only media-first grid scores/course/region below photos, preserving non-grid glass and footer/header behaviour.
+- Seven requested cases added; existing glass fixtures contain no grid media arrays and remain unchanged. Focused run 39/40; new case (d) crashes at golfPostRules.ts:90:49, `Cannot read properties of undefined (reading 'trim')`, because the new fixture used displayName instead of name. No rerun or shards under the stop rule.
+- Preview reported TS2353 at reviewGridScores.test.tsx:24:108; corrected only the new fixture field displayName → name to clear that preview error, preserving all seven names/assertions. Tests remain unverified after that correction.
+- Expected inventory 9,355 → 9,362 (+7); last verified full pass 9,352. Earlier fullscreen-stack failures remain awaiting ruling. Report/full output: .lovable/reports/review-grid-scores/; browser/320/authenticated checks unverified.
+
 ## Stopped: Fullscreen stack and white review upload progress
 - Changed only fullscreen zero-like trailing space and review progress fill token/ring/bar; stackBottom/feed usages unchanged. Added three requested tests, no existing tests changed.
 - Focused 35/35 passed; shard 1 stopped at 2,289 passed / 4 failed: activeRing.test.tsx:202:30 and :210:18 missing button; memberShotPosts.test.ts:155:81 source assertion; ms1MessagesHeadToHead.test.tsx:405:3 timeout. Shards 2–4 not run; no reruns/repairs. Expected inventory 9,352 → 9,355; last verified full pass 9,352.

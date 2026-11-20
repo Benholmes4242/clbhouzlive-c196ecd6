@@ -2,3 +2,16 @@
 [data-review-glass-fade] {
   background: linear-gradient(0deg, rgba(6,6,8,.55) 0%, rgba(6,6,8,.28) 45%, rgba(6,6,8,0) 100%);
 }
+
+[data-review-grid-scores] {
+  flex: none;
+  min-width: 0;
+  padding: 12px 14px 2px;
+}
+
+@media (max-width: 340px) {
+  [data-review-grid-scores] {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
