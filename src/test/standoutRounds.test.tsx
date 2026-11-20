@@ -1,163 +1,149 @@
-import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { I18nextProvider } from 'react-i18next';
+import { createInstance } from 'i18next';
+import en from '../../src/locales/en/courses.json';
+import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
+import { StandoutRounds } from '@/components/explore-tab-new/courseled/StandoutRounds';
+import { standoutRpcArgs, type StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
+import { standoutSentenceParts } from '@/components/explore-tab-new/courseled/standoutSentence';
+import { fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
+import { A } from '@/components/explore-tab-new/courseled/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
-const f = vi.hoisted(() => ({
-  user: { id: 'viewer' } as { id: string } | null,
-  query: { data: [] as unknown[], isPending: false, isError: false },
-}));
+const f = vi.hoisted(() => ({ rpc: vi.fn() }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
+const i18n = createInstance();
+await i18n.init({ lng: 'en', fallbackLng: 'en', ns: ['courses'], defaultNS: 'courses', resources: { en: { courses: en } }, interpolation: { escapeValue: false } });
 
-vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
-vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: f.user, loading: false }) }));
-vi.mock('@/components/courses/browse/useCoursesStandoutRounds', async (orig) => ({
-  ...(await orig<typeof import('@/components/courses/browse/useCoursesStandoutRounds')>()),
-  useCoursesStandoutRounds: () => f.query,
-}));
-vi.mock('@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes', () => ({ useRoundHoleShapes: () => new Map() }));
-vi.mock('@/features/pro-verification/InlineProMemberName', () => ({ InlineProMemberName: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
-vi.mock('@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet', () => ({
-  RoundDetailSheet: ({ open, scoreId }: { open: boolean; scoreId: string | null }) => (open ? <div data-testid="round-sheet" data-score={scoreId ?? ''} /> : null),
-}));
-vi.mock('@/lib/whs/hooks', () => ({ prefetchRoundDetail: vi.fn() }));
-vi.mock('@/lib/whs/useRoundCourseContext', () => ({ prefetchRoundCourseContext: vi.fn() }));
-
-import { mapCoursesStandoutRow, type CoursesStandoutRound } from '@/components/courses/browse/useCoursesStandoutRounds';
-import { standoutLine, standoutStamp } from '@/components/courses/browse/standoutRoundsRules';
-import { StandoutPhotoHeader, StandoutRoundsSection } from '@/components/courses/browse/StandoutRoundsSection';
-import { RoundCard } from '@/features/explore-magazine/watch/RoundCard';
-import { PageLoadGate } from '@/components/courses/browse/PageLoadGate';
-
-const row = (over: Partial<Record<string, unknown>> = {}): CoursesStandoutRound => mapCoursesStandoutRow({
-  pos: 1, whs_score_id: 's1', user_id: 'u1', display_name: 'Sam Reed', profile_photo_url: null,
-  play_date: '2026-11-04', course_id: 'c1', course_name: 'Sundridge Park (East Course)',
-  course_region: 'Kent', course_sub_country: 'England', course_image: null,
-  gross_score: 80, course_par: 71, net_score: 70, course_handicap: 10, is_competition: false,
-  stableford_points: 30, holes_in_one: 0, albatrosses: 0, eagles: 0, birdies: 0, longest_birdie_run: 0,
-  feat_kind: 'birdies', feat_holes: null, feat_par: null, feat_yards: null, ...over,
-});
-
-beforeEach(() => { f.user = { id: 'viewer' }; f.query = { data: [], isPending: false, isError: false }; });
-afterEach(cleanup);
-
-describe('(a) standoutStamp', () => {
-  it.each([
-    [{ feat_kind: 'ace', holes_in_one: 1 }, 'HOLE IN ONE'],
-    [{ feat_kind: 'ace', holes_in_one: 2 }, '2 HOLES IN ONE'],
-    [{ feat_kind: 'albatross', albatrosses: 1 }, 'ALBATROSS'],
-    [{ feat_kind: 'albatross', albatrosses: 2 }, '2 ALBATROSSES'],
-    [{ feat_kind: 'under_par', gross_score: 69 }, 'UNDER PAR'],
-    [{ feat_kind: 'eagle', eagles: 1 }, 'EAGLE'],
-    [{ feat_kind: 'eagle', eagles: 2 }, '2 EAGLES'],
-    [{ feat_kind: 'points', stableford_points: 42 }, '42 POINTS'],
-    [{ feat_kind: 'birdies', birdies: 6 }, '6 BIRDIES'],
-  ])('%o → %s', (over, want) => expect(standoutStamp(row(over))).toBe(want));
-});
-
-describe('(b) standoutLine primary kinds', () => {
-  it('ace with hole and yards', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], feat_yards: 152, stableford_points: null }))).toBe('<b>Hole in one</b> on the 6th, 152 yards'));
-  it('ace drops yards when null', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], stableford_points: null }))).toBe('<b>Hole in one</b> on the 6th'));
-  it('ace drops the hole part when holes are empty', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [], feat_yards: 152, stableford_points: null }))).toBe('<b>Hole in one</b>'));
-  it('two aces list both holes', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 2, feat_holes: [4, 13], stableford_points: null }))).toBe('<b>2 holes in one</b>, on the 4th and 13th'));
-  it('albatross with par', () => expect(standoutLine(row({ feat_kind: 'albatross', albatrosses: 1, feat_holes: [5], feat_par: 5, stableford_points: null }))).toBe('<b>Albatross</b> on the 5th, a par 5'));
-  it('two albatrosses list three-way', () => expect(standoutLine(row({ feat_kind: 'albatross', albatrosses: 2, feat_holes: [2, 4, 13], stableford_points: null }))).toBe('<b>2 albatrosses</b>, on the 2nd, 4th and 13th'));
-  it('under par with birdies', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69, birdies: 4 }))).toBe('<b>2 under par</b>, with 4 birdies'));
-  it('under par with one birdie has no tail', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69, birdies: 1 }))).toBe('<b>2 under par</b>'));
-  it('single eagle', () => expect(standoutLine(row({ feat_kind: 'eagle', eagles: 1, feat_holes: [13], stableford_points: null }))).toBe('<b>Eagle</b> on the 13th'));
-  it('two eagles', () => expect(standoutLine(row({ feat_kind: 'eagle', eagles: 2, feat_holes: [4, 13], stableford_points: null }))).toBe('<b>2 eagles</b>, on the 4th and 13th'));
-  it('points playing off', () => expect(standoutLine(row({ feat_kind: 'points', stableford_points: 42, course_handicap: 21 }))).toBe('<b>42 points</b>, playing off 21'));
-  it('points with a plus handicap', () => expect(standoutLine(row({ feat_kind: 'points', stableford_points: 42, course_handicap: -2 }))).toBe('<b>42 points</b>, playing off +2'));
-  it('points with a null handicap', () => expect(standoutLine(row({ feat_kind: 'points', stableford_points: 42, course_handicap: null }))).toBe('<b>42 points</b>'));
-  it('birdies in a row', () => expect(standoutLine(row({ feat_kind: 'birdies', birdies: 6, longest_birdie_run: 3 }))).toBe('<b>6 birdies</b>, 3 in a row'));
-  it('birdies without a run', () => expect(standoutLine(row({ feat_kind: 'birdies', birdies: 6, longest_birdie_run: 2 }))).toBe('<b>6 birdies</b>'));
-});
-
-describe('(c) secondary fact', () => {
-  it('ace with 41 points shows · 41 points', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], feat_yards: 152, stableford_points: 41 }))).toBe('<b>Hole in one</b> on the 6th, 152 yards \u00B7 41 points'));
-  it('under par with 6 birdies adds no birdies tail', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69, birdies: 6, stableford_points: 38 }))).toBe('<b>2 under par</b>, with 6 birdies'));
-  it('eagle plus 42 points shows · 42 points', () => expect(standoutLine(row({ feat_kind: 'eagle', eagles: 1, feat_holes: [13], stableford_points: 42 }))).toBe('<b>Eagle</b> on the 13th \u00B7 42 points'));
-  it('birdies primary with 39 points adds nothing', () => expect(standoutLine(row({ feat_kind: 'birdies', birdies: 6, stableford_points: 39 }))).toBe('<b>6 birdies</b>'));
-  it('ace under par shows the under-par fact, never the primary twice', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], gross_score: 69, stableford_points: 44 }))).toBe('<b>Hole in one</b> on the 6th \u00B7 2 under par'));
-});
-
-const wrap = (ui: React.ReactElement) => {
+function row(over: Partial<StandoutRound> = {}): StandoutRound {
+  return { pos: 1, user_id: 'member', display_name: 'Member', profile_photo_url: null,
+    whs_score_id: 'score', play_date: '2026-10-18', course_id: 'course', course_name: 'Full Course Name',
+    gross_score: 75, course_par: 72, net_score: 69, course_handicap: 6, is_competition: true,
+    prior_n: 12, avg_topar: 6, best_topar: 0, last_better: '2026-05-01', delta: -3.6, ...over };
+}
+function mount(over: Partial<React.ComponentProps<typeof StandoutRounds>> = {}) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
-    <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={['/courses']}>
-        <Routes>
-          <Route path="/courses" element={<PageLoadGate expect={['standoutRounds']} fallback={<div data-testid="fallback" />}>{ui}</PageLoadGate>} />
-          <Route path="/profile/:id" element={<div data-testid="profile-page" />} />
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
-  );
-};
+  const props = { viewerId: 'viewer', filters: DEFAULT_FILTERS, enabled: true, onRowPress: vi.fn(), ...over };
+  const wrap = (next: typeof props) => <QueryClientProvider client={client}><I18nextProvider i18n={i18n}><StandoutRounds {...next} /></I18nextProvider></QueryClientProvider>;
+  const result = render(wrap(props));
+  return { ...result, props, update: (next: Partial<typeof props>) => result.rerender(wrap({ ...props, ...next })) };
+}
+const rows = () => document.querySelectorAll('[data-standout-row]');
+beforeEach(() => { f.rpc.mockReset(); f.rpc.mockResolvedValue({ data: [row()], error: null }); });
 
-describe('(d) RoundCard points prop', () => {
-  it('the points prop fills the POINTS cell; without it Lately here keeps its computed (absent) points', () => {
-    const r = row({ feat_kind: 'points', stableford_points: 42 });
-    const { container, unmount } = render(<MemoryRouter><RoundCard round={r} shapes={new Map()} locale="en" points={42} /></MemoryRouter>);
-    expect(container.querySelector('[data-score-cell="points"] [data-score-figure]')?.textContent).toBe('42');
-    unmount();
-    const plain = render(<MemoryRouter><RoundCard round={r} shapes={new Map()} locale="en" /></MemoryRouter>);
-    expect(plain.container.querySelector('[data-score-cell="points"]')).toBeNull();
-    expect(plain.container.querySelector('[data-lately-line]')?.textContent).not.toBe('');
-    expect(plain.container.querySelector('.lately-tile--photo')).toBeNull();
+describe('SR1 standout rules', () => {
+  it('passes every board axis and limit four without default tuning overrides', () => {
+    expect(standoutRpcArgs('viewer', { ...DEFAULT_FILTERS, scope: 'circle', window: '90' })).toEqual({
+      p_viewer: 'viewer', p_scope: 'circle', p_window: '90', p_region_kind: DEFAULT_FILTERS.regionKind,
+      p_region_value: DEFAULT_FILTERS.regionValue, p_courses: DEFAULT_FILTERS.courses, p_course_id: DEFAULT_FILTERS.courseId,
+      p_band: DEFAULT_FILTERS.band, p_competition: DEFAULT_FILTERS.competition, p_limit: 4,
+    });
+  });
+  it('queries the supplied scope and window again rather than storing another filter state', async () => {
+    const result = mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    result.update({ filters: { ...DEFAULT_FILTERS, scope: 'club', window: '30' } });
+    await waitFor(() => expect(f.rpc).toHaveBeenLastCalledWith('get_standout_rounds', expect.objectContaining({ p_scope: 'club', p_window: '30', p_limit: 4 })));
+  });
+  it('keeps unresolved reads entirely absent until success', async () => {
+    let settle: ((value: { data: StandoutRound[]; error: null }) => void) | undefined;
+    f.rpc.mockReturnValue(new Promise((resolve) => { settle = resolve; }));
+    const result = mount();
+    expect(result.container.childElementCount).toBe(0);
+    settle?.({ data: [row()], error: null });
+    await waitFor(() => expect(rows()).toHaveLength(1));
+  });
+  it('renders nothing for successful empty responses', async () => {
+    f.rpc.mockResolvedValue({ data: [], error: null });
+    const result = mount();
+    await waitFor(() => expect(f.rpc).toHaveBeenCalledTimes(1));
+    expect(result.container.childElementCount).toBe(0);
+  });
+  it('does not query before the board is ready', () => {
+    const result = mount({ enabled: false });
+    expect(f.rpc).not.toHaveBeenCalled();
+    expect(result.container.childElementCount).toBe(0);
+  });
+  it.each([1, 2, 3, 4])('renders exactly %i supplied rows', async (count) => {
+    f.rpc.mockResolvedValue({ data: Array.from({ length: count }, (_, pos) => row({ pos, whs_score_id: `score-${pos}` })), error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(count));
+  });
+  it('renders competition only for explicit true, not false or null', async () => {
+    f.rpc.mockResolvedValue({ data: [true, false, null].map((is_competition, pos) => row({ pos, whs_score_id: `s${pos}`, is_competition })), error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(3));
+    expect(rows()[0].querySelector('[data-standout-competition]')).not.toBeNull();
+    expect(rows()[1].querySelector('[data-standout-competition]')).toBeNull();
+    expect(rows()[2].querySelector('[data-standout-competition]')).toBeNull();
+  });
+  it('hands the described round to the supplied board callback exactly once', async () => {
+    const result = mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    fireEvent.click(rows()[0]);
+    expect(result.props.onRowPress).toHaveBeenCalledExactlyOnceWith(row());
+  });
+  it('selects best-ever first when no better round exists', () => {
+    expect(standoutSentenceParts(row({ last_better: null }))).toMatchObject({ key: 'amateur.standout.bestEver', course: 'Full Course Name' });
+  });
+  it('selects best-since at 60 calendar days, but not at 59', () => {
+    expect(standoutSentenceParts(row({ last_better: '2026-08-19' }))).toMatchObject({ key: 'amateur.standout.bestSince', month: 'August' });
+    expect(standoutSentenceParts(row({ last_better: '2026-08-20' }))).toMatchObject({ key: 'amateur.standout.betterAverage', n: 4 });
+  });
+  it('appends the prior month year only across calendar years', () => {
+    expect(standoutSentenceParts(row({ last_better: '2025-12-01' }))).toMatchObject({ month: 'December 2025' });
+    expect(standoutSentenceParts(row({ last_better: '2026-05-01' }))).toMatchObject({ month: 'May' });
+  });
+  it('rounds the absolute delta to a whole shot', () => {
+    expect(standoutSentenceParts(row({ last_better: '2026-10-01', delta: -3.6 }))).toMatchObject({ n: 4 });
+    expect(standoutSentenceParts(row({ last_better: '2026-10-01', delta: 3.4 }))).toMatchObject({ n: 3 });
+  });
+  it('prints score minus par with explicit signs and a true minus', () => {
+    expect(fmtToPar(69 - 71)).toBe('−2');
+    expect(fmtToPar(73 - 72)).toBe('+1');
+    expect(fmtToPar(72 - 72)).toBe('E');
+  });
+  it('prints no to-par when par is missing', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ course_par: null, net_score: 72, gross_score: 78 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(rows()[0].textContent).toContain('NET72GROSS78');
+  });
+  it('renders a level net to-par as E', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ net_score: 72, gross_score: 78, course_par: 72 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(rows()[0].textContent).toContain('NET72EGROSS78+6');
   });
 });
 
-describe('(e) photo header', () => {
-  it('renders course, place and stamp, and the tile gains lately-tile--photo', () => {
-    const r = row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6] });
-    const { container } = render(<MemoryRouter><RoundCard round={r} shapes={new Map()} locale="en" header={<StandoutPhotoHeader row={r} />} line={standoutLine(r)} /></MemoryRouter>);
-    const tile = container.querySelector('.lately-tile')!;
-    expect(tile.classList.contains('lately-tile--photo')).toBe(true);
-    expect(tile.firstElementChild?.hasAttribute('data-standout-photo')).toBe(true);
-    expect(container.querySelector('[data-standout-course]')?.textContent).toBe('Sundridge Park (East Course)');
-    expect(container.querySelector('[data-standout-place]')?.textContent).toBe('Kent, England');
-    expect(container.querySelector('[data-standout-stamp]')?.textContent).toBe('HOLE IN ONE');
-    expect(container.querySelector('[data-lately-line] b')?.textContent).toBe('Hole in one');
+describe('CB9 under-par tone sits on the to-par, never the figure', () => {
+  const tone = (c: string) => { const el = document.createElement('span'); el.style.color = c; return el.style.color; };
+  const columns = () => Array.from(rows()[0].querySelectorAll('span.tabular-nums')).map((fig) => {
+    const fg = fig as HTMLElement; const suffix = fg.querySelector('span') as HTMLElement;
+    return { figure: fg.style.color, suffix: suffix.style.color };
   });
-});
-
-describe('(f) section states', () => {
-  it('signed out renders nothing and reports ready', () => {
-    f.user = null;
-    const { container } = wrap(<StandoutRoundsSection />);
-    expect(screen.queryByTestId('fallback')).toBeNull();
-    expect(container.querySelector('[data-standout-rounds]')).toBeNull();
+  it('net under par: figure is A.INK and the to-par carries TOPAR_UNDER_DARK', async () => {
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    const [net, gross] = columns();
+    expect(net).toEqual({ figure: tone(A.INK), suffix: tone(TOPAR_UNDER_DARK) });
+    expect(gross).toEqual({ figure: tone(A.MUTE), suffix: tone(A.DIM) });
   });
-  it('error renders nothing and warns', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    f.query = { data: undefined as unknown as unknown[], isPending: false, isError: true };
-    const { container } = wrap(<StandoutRoundsSection />);
-    expect(container.querySelector('[data-standout-rounds]')).toBeNull();
-    expect(screen.queryByTestId('fallback')).toBeNull();
-    expect(warn).toHaveBeenCalledWith('[courses standout] read failed; section hidden');
-    warn.mockRestore();
+  it('gross under par paints its own to-par red, figure stays A.MUTE', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ gross_score: 70, net_score: 64 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    const [net, gross] = columns();
+    expect(net.suffix).toBe(tone(TOPAR_UNDER_DARK));
+    expect(gross).toEqual({ figure: tone(A.MUTE), suffix: tone(TOPAR_UNDER_DARK) });
   });
-  it('one row renders nothing', () => {
-    f.query = { data: [row()], isPending: false, isError: false };
-    const { container } = wrap(<StandoutRoundsSection />);
-    expect(container.querySelector('[data-standout-rounds]')).toBeNull();
-  });
-  it('two or more rows render the head and one card each', () => {
-    f.query = { data: [row(), row({ whs_score_id: 's2', user_id: 'u2' }), row({ whs_score_id: 's3', user_id: 'u3' })], isPending: false, isError: false };
-    const { container } = wrap(<StandoutRoundsSection />);
-    expect(container.querySelector('[data-standout-rounds]')).not.toBeNull();
-    expect(container.querySelectorAll('[data-standout-rail] .lately-tile--photo')).toHaveLength(3);
-  });
-});
-
-describe('(g) taps', () => {
-  it('a card tap opens the round sheet; the who row opens the profile', () => {
-    f.query = { data: [row(), row({ whs_score_id: 's2', user_id: 'u2' })], isPending: false, isError: false };
-    const { container } = wrap(<StandoutRoundsSection />);
-    fireEvent.click(container.querySelectorAll('[data-rounds-shelf-card="round"]')[1]);
-    expect(screen.getByTestId('round-sheet').getAttribute('data-score')).toBe('s2');
-    fireEvent.click(container.querySelectorAll('[data-lately-who]')[0]);
-    expect(screen.getByTestId('profile-page')).toBeTruthy();
+  it('level par (E) stays dim', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ gross_score: 80, net_score: 72 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(columns()[0]).toEqual({ figure: tone(A.INK), suffix: tone(A.DIM) });
   });
 });
