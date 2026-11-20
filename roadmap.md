@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Three stopped-build test ruling
+- ActiveRing passes unchanged alone, 28/28. Apply only the authorized memberShotPosts substring and keyboard actor-fixture field; reviewGridScores name correction already present. No app changes or timeout edits.
+- Separate files: ActiveRing 28/28, fullscreen 3/3, grid 7/7, keyboard 10/11. Keyboard (f) still throws ActorSheet.tsx:21:24, `Cannot read properties of undefined (reading 'map')`: ActorSheet reads availableActors from useActiveActor, not the useComposerActor mock the ruling authorized. No further repair/rerun; memberShotPosts standalone and all four shards not run. Needs authorization to complete the useActiveActor fixture.
+- Inventory unchanged at expected 9,373; last full pass 9,352 +3 fullscreen +7 grid +11 keyboard. Build OK; no app changes. Exact assertion/fixture changes and full outputs: .lovable/reports/three-build-ruling/.
+
 ## Stopped: Wizard keyboard Done and scroll dismissal
 - Shared focus/visualViewport hook and Done pill in post/review wizards; preserve scrollable fields, mentions/results and horizontal gestures, with passive listener cleanup.
 - Added 11 cases; focused 10/11 passes, with case (f) crashing at ActorSheet.tsx:21:24, `Cannot read properties of undefined (reading 'map')`, because the new actor mock omits availableActors. No repair/rerun or shards under the stop rule; requires fixture ruling. Expected inventory 9,362 → 9,373; last full verified pass 9,352, prior stops untouched.

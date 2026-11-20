@@ -9,7 +9,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: h.actor }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: { id: 'me' } }) }));
-vi.mock('@/features/post-v2/hooks/useComposerActor', () => ({ useComposerActor: () => ({ activeActor: h.actor, selectActor: h.noop, applyDraftActor: h.noop }) }));
+vi.mock('@/features/post-v2/hooks/useComposerActor', () => ({ useComposerActor: () => ({ activeActor: h.actor, availableActors: [], selectActor: h.noop, applyDraftActor: h.noop }) }));
 vi.mock('@/features/post-v2/hooks/useStageComposer', () => ({ MAX_MEDIA: 10, useStageComposer: () => ({
   state: { media: [], caption: '', courses: [], course: null, activeIndex: 0, scheduledAt: null, dirty: false },
   addFiles: h.noop, removeAt: h.noop, reorder: h.noop, setActiveIndex: h.noop, updateActive: h.noop, setCaption: h.noop, setCourse: h.noop, setCourses: h.noop, setScheduledAt: h.noop, restoreDraft: h.noop, hydrate: h.noop, reset: h.noop, setGolf: h.noop, setVideoData: h.noop,
