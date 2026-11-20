@@ -1,0 +1,7 @@
+dc1aa2c
+diff --git a/src/components/feed/ReviewPostCard.tsx b/src/components/feed/ReviewPostCard.tsx
++  const withBottom = post.mediaItems[activeMediaIndex]?.type === 'video' ? PLAYED_WITH_VIDEO_BOTTOM : REVIEW_WITH_BOTTOM;
+
+b337846
+diff --git a/src/components/feed/ReviewPostCard.tsx b/src/components/feed/ReviewPostCard.tsx
++  const withBottom = post.mediaItems[activeMediaIndex]?.type === 'video' ? 'review-video' as const : 'review' as const;

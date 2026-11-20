@@ -102,7 +102,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   const showGlass = mediaLeads && (!!courseName || [rating, ...Object.values(scores)].some(value => value != null && Number.isFinite(Number(value))));
   const people = post.actorType !== 'business' && playedWith?.length ? playedWith : null;
   const [withSheetOpen, setWithSheetOpen] = useState(false);
-  const withBottom = post.mediaItems[activeMediaIndex]?.type === 'video' ? 'review-video' as const : 'review' as const;
+  const withBottom = post.mediaItems?.[activeMediaIndex]?.type === 'video' ? 'review-video' as const : 'review' as const;
   const mediaRef = useRef<HTMLDivElement>(null);
   const glassRef = useRef<HTMLDivElement>(null);
   const top100Ids = useFeedReviewTop100();

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete: Review media-array safeguard ruling
+- Guarded only ReviewPostCard.tsx:105 with post.mediaItems?.[activeMediaIndex]; both commit audits found the same single index and no sibling new indices. All tests unchanged; all 13 stopped cases pass.
+- Four separate sequential shards pass 2,293 / 2,275 / 2,342 / 2,442 = 9,352/9,352 across 833 files; zero failures. Inventory 9,352 before/after; reconciles last verified 9,329 + 23 reviewPlayedWith cases. Both preceding review stops are superseded by this full pass. Build OK; report/full output: .lovable/reports/review-media-array-ruling/. Browser/authenticated checks remain unverified.
+
 ## Stopped: Review Played with stop ruling
 - Apply only the four CSS media offsets and shared chip/panel attributes; preserve the place/hole lift and fullscreen positioning. Replace the authorised bottom assertions and keyboard-open fixture only.
 - Focused tests pass 36/36 (23 review cases + 13 post cases). Shard 1: 2,280 passed / 13 failed of 2,293; untouched feedReviewGlass (10 cases) and reviewPostScoreCompact (3) crash at ReviewPostCard.tsx:105:37, `TypeError: Cannot read properties of undefined (reading '0')`. No repairs/reruns; shards 2–4 not run. Expected inventory 9,352 before/after, zero additions/removals; last verified full pass 9,329. Further ruling required; report/full output: .lovable/reports/review-played-with-ruling/. Browser/authenticated checks unverified.
