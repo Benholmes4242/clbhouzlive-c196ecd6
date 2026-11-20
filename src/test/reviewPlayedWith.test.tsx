@@ -160,13 +160,13 @@ describe('review Played with', () => {
     await waitFor(() => expect(h.mentions).toHaveBeenCalledWith({ sourceType: 'review', sourceId: 'review-new', content: markup, mentionerId: 'author' }));
   });
   it('(e) review photo chip and upward panel clear the measured glass strip', () => {
-    const view = card(); const chip = required(view.container, '[data-testid="played-with-chip"]'); expect(chip).toHaveAttribute('data-pw-offset', 'review');
+    const view = card(); const chip = required(view.container, '[data-testid="played-with-chip"]'); expect(chip).toHaveAttribute('data-pw-offset', 'media');
     expect(pwCss).toContain('[data-pw-offset="review"]{bottom:calc(var(--review-glass-h, -12px) + 18px)}');
-    fireEvent.click(chip); const panel = required(view.container, '[data-testid="played-with-panel"]'); expect(panel).toHaveAttribute('data-pw-offset', 'review');
-    expect(panel.querySelectorAll('[data-played-with-row]')).toHaveLength(2); expect(view.container.querySelector('[data-review-score-strip]')).not.toBeNull();
+    fireEvent.click(chip); const panel = required(view.container, '[data-testid="played-with-panel"]'); expect(panel).toHaveAttribute('data-pw-offset', 'media');
+    expect(panel.querySelectorAll('[data-played-with-row]')).toHaveLength(2); expect(view.container.querySelector('[data-review-grid-scores]')).not.toBeNull();
   });
   it('(e) review video chip clears the mute tap area by eight pixels', () => {
-    const view = card(post(true, true)); expect(required(view.container, '[data-testid="played-with-chip"]')).toHaveAttribute('data-pw-offset', 'review-video');
+    const view = card(post(true, true)); expect(required(view.container, '[data-testid="played-with-chip"]')).toHaveAttribute('data-pw-offset', 'media-video');
     expect(pwCss).toContain('[data-pw-offset="review-video"]{bottom:calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)}');
   });
   it('(f) review without media opens the sheet from both faces and byline', async () => {

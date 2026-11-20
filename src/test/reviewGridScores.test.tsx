@@ -46,11 +46,13 @@ describe('photo-grid review scores', () => {
     });
   }
   for (const [kind, count, video] of [['single photo', 1, false], ['video', 1, true], ['three-photo carousel', 3, false]] as const) {
-    it(`(c) ${kind} retains the glass score strip`, () => {
+    it(`(c) ${kind} places scores below the media without glass`, () => {
       const { container } = card(post(count, false, video));
-      expect(container.querySelector('[data-review-score-strip]')).not.toBeNull();
-      expect(container.querySelector('[data-review-glass-fade]')).not.toBeNull();
-      expect(container.querySelector('[data-review-grid-scores]')).toBeNull();
+      const block = container.querySelector('[data-review-grid-scores]');
+      expect(block).not.toBeNull();
+      expect(container.querySelector('[data-review-media]')?.nextElementSibling).toBe(block);
+      expect(container.querySelector('[data-review-score-strip]')).toBeNull();
+      expect(container.querySelector('[data-review-glass-fade]')).toBeNull();
     });
   }
   it('(d) grid Played with chip uses the media offset', () => {

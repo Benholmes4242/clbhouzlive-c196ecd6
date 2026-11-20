@@ -14,12 +14,11 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * The two-line body clamp is retained by Ben's explicit CB109 ruling.
  * Media-first reviews with media use FeedCard's intrinsic media sizing and
  * natural article height; only words-first/no-media reviews retain the cap.
- * Grid reviews use feedPhotoGridLayout, exactly like FeedCard; their shared
- * score contents sit below media without glass, keeping small photos clear.
+ * All media-first reviews place course, region and shared card scores below
+ * the media without glass; fullscreen and standard layouts stay independent.
  */
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { FS_GLASS } from '@/components/fullscreen-feed/fullscreenCanon';
+import React, { useState } from 'react';
 import { useFeedReviewTop100 } from '@/hooks/feed/useTop100CourseIds';
 import './feedReviewGlass.css';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +31,6 @@ import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { CARD, LINE, T100, T60, T40 } from './feedTokens';
 import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP } from './reviewPostCard';
 import { PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, type PlayedWithPerson } from './PostGolfTags';
-import { feedPhotoGridLayout } from './feedPhotoGrid';
 
 const GUTTER = 14;
 const NAME_SIZE = 15;
@@ -102,27 +100,16 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   const isMediaFirst = layout === 'mediaFirst';
   const mediaLeads = isMediaFirst && !!media;
   const glassRegion = [review?.courseRegion, review?.courseSubCountry, review?.courseCountry].find(value => value?.trim()) ?? '';
-  const isGridReview = feedPhotoGridLayout(post.mediaItems ?? []) !== null;
   const hasScoreContents = !!courseName || [rating, ...Object.values(scores)].some(value => value != null && Number.isFinite(Number(value)));
-  const showGridScores = mediaLeads && isGridReview && hasScoreContents;
-  const showGlass = mediaLeads && !isGridReview && hasScoreContents;
+  const showGridScores = mediaLeads && hasScoreContents;
   const people = post.actorType !== 'business' && playedWith?.length ? playedWith : null;
   const [withSheetOpen, setWithSheetOpen] = useState(false);
-  const withBottom = mediaLeads && isGridReview ? 'media' as const : post.mediaItems?.[activeMediaIndex]?.type === 'video' ? 'review-video' as const : 'review' as const;
-  const mediaRef = useRef<HTMLDivElement>(null);
-  const glassRef = useRef<HTMLDivElement>(null);
+  const activeVideo = post.mediaItems?.[activeMediaIndex]?.type === 'video';
+  const withBottom = mediaLeads
+    ? activeVideo ? 'media-video' as const : 'media' as const
+    : activeVideo ? 'review-video' as const : 'review' as const;
   const top100Ids = useFeedReviewTop100();
   const isTop100 = top100Ids.has(review?.courseId ?? post.courseId ?? '');
-  useLayoutEffect(() => {
-    const host = mediaRef.current;
-    const strip = glassRef.current;
-    if (!host || !strip || !showGlass) return;
-    const measure = () => host.style.setProperty('--review-glass-h', `${strip.getBoundingClientRect().height}px`);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(strip);
-    return () => { observer.disconnect(); host.style.removeProperty('--review-glass-h'); };
-  }, [showGlass]);
   const scoreContents = <>
     <div data-review-glass-name style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginBottom: 10, minWidth: 0 }}>
       {courseName ? <CourseNameLink as="div" onNavigate={onOpenCourse} courseId={review?.courseId ?? post.courseId} wrapperStyle={{ pointerEvents: 'auto', flex: '1 1 auto', minWidth: 0 }} textProps={{ 'data-review-course': '' }} style={{ ...COURSE_NAME_STYLE, fontSize: 16, letterSpacing: '-0.02em', lineHeight: 1.2, ...(showGridScores ? { display: 'block', whiteSpace: 'nowrap', textOverflow: 'ellipsis' } : null) }}>{courseName}</CourseNameLink> : null}
@@ -229,7 +216,6 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           only flexible child: square cap and remaining-height 120px floor. */}
       {media ? (
         <div
-          ref={mediaRef}
           data-review-media
           style={mediaLeads ? { display: 'block', marginTop: 10, position: 'relative' } : {
             flex: '1 1 auto',
@@ -242,12 +228,6 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         >
           {mediaLeads ? media : <div style={{ position: 'absolute', inset: 0 }}>{media}</div>}
           {people && onPlayedWithProfile && <PlayedWithMediaOverlay key={post.id} people={people} onOpenProfile={onPlayedWithProfile} resetKey={activeMediaIndex} offset={withBottom} />}
-          {showGlass ? <>
-            <div data-review-glass-fade style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '42%', pointerEvents: 'none', zIndex: 2 }} />
-            <div ref={glassRef} data-review-score-strip style={{ ...FS_GLASS, position: 'absolute', left: 12, right: 12, bottom: 12, borderRadius: 14, padding: '11px 14px 10px', containerType: 'inline-size', pointerEvents: 'none', zIndex: 2 }}>
-              {scoreContents}
-            </div>
-          </> : null}
         </div>
       ) : null}
 

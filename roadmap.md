@@ -1,9 +1,9 @@
 # Roadmap
 
-## Blocked: Every feed review's scores below media
-- New signed-off brief recorded; no application/test changes made because its frozen case (e) contradicts removal of the glass measurement.
-- Await Ben's authorization for feedReviewGlass.test.tsx:111, expect(containerHeight()).toBe('0px') → toBe(''); video/carousel source assertions and both source files stay untouched. Report: .lovable/reports/review-scores-below/blocked.md.
-- No tests, shards or screenshots run. Current expected inventory remains 9,389 (last complete pass 9,383 plus six prior poster cases); prior poster-test stop remains independent and unresolved.
+## Complete focused work: Every feed review's scores below media
+- Shared below-media block now renders for all media-first reviews; feed glass/measurement removed and media/video Played with offsets adopted. Fullscreen, standard/no-media, header/footer and shared media CSS unchanged.
+- Only authorized assertions/case names updated; five requested focused files pass 63/63. Actual card/media controls checked at 320/390 for six states and panel opening/course tap; long name ellipsizes at 320, no horizontal overflow. Report/screenshots: .lovable/reports/review-scores-below/.
+- Four shards explicitly deferred until the queued poster ruling covers both builds; no shards run. Current expected inventory remains 9,389 (last full pass 9,383 plus six prior poster cases), no new/deleted tests. Live authenticated feed remains unverified; isolated browser cards had no page errors. Preview build OK.
 
 ## Stopped: Review video persisted posters
 - Added persistedPoster and routed review poster writes/database readers through it; local new-media composer preview frames and presentation unchanged.

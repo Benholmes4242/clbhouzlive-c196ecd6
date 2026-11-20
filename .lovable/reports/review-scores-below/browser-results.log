@@ -1,0 +1,198 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+render errors: []
+{
+  "results": [
+    {
+      "width": 390,
+      "state": "single-photo",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 390,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 318,
+      "nameScroll": 318,
+      "mute": null,
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 390,
+      "state": "single-video",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 390,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 318,
+      "nameScroll": 318,
+      "mute": "6px",
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 390,
+      "state": "video-carousel",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 390,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 318,
+      "nameScroll": 318,
+      "mute": "6px",
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 390,
+      "state": "video-played-with",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 390,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 318,
+      "nameScroll": 318,
+      "mute": "6px",
+      "chip": "58px",
+      "offset": "media-video"
+    },
+    {
+      "width": 390,
+      "state": "long-course",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 390,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 276,
+      "nameScroll": 276,
+      "mute": null,
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 390,
+      "state": "grid",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 390,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 276,
+      "nameScroll": 276,
+      "mute": null,
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 320,
+      "state": "single-photo",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 320,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 244,
+      "nameScroll": 244,
+      "mute": null,
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 320,
+      "state": "single-video",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 320,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 244,
+      "nameScroll": 244,
+      "mute": "6px",
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 320,
+      "state": "video-carousel",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 320,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 244,
+      "nameScroll": 244,
+      "mute": "6px",
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 320,
+      "state": "video-played-with",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 320,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 244,
+      "nameScroll": 244,
+      "mute": "6px",
+      "chip": "58px",
+      "offset": "media-video"
+    },
+    {
+      "width": 320,
+      "state": "long-course",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 320,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 202,
+      "nameScroll": 221,
+      "mute": null,
+      "chip": null,
+      "offset": null
+    },
+    {
+      "width": 320,
+      "state": "grid",
+      "after": true,
+      "glass": false,
+      "unset": "",
+      "scroll": 320,
+      "nameSize": "16px",
+      "ellipsis": "ellipsis",
+      "nameWidth": 202,
+      "nameScroll": 221,
+      "mute": null,
+      "chip": null,
+      "offset": null
+    }
+  ],
+  "pageErrors": []
+}

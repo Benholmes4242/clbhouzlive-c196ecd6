@@ -1,7 +1,4 @@
-/* Media review only; canonical glass/score material remains shared with viewer. */
-[data-review-glass-fade] {
-  background: linear-gradient(0deg, rgba(6,6,8,.55) 0%, rgba(6,6,8,.28) 45%, rgba(6,6,8,0) 100%);
-}
+/* Every media-first feed review uses the same below-media score block. */
 
 [data-review-grid-scores] {
   flex: none;

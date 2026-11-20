@@ -35,9 +35,9 @@ function readWith(result: Promise<unknown>) {
 }
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 describe('feed review glass', () => {
-  it('(a) media review keeps course, first region and shared scores on media only; caption retains body and CTA', () => {
+  it('(a) media review keeps course, first region and shared scores below media; caption retains body and CTA', () => {
     const { container } = render(tree(card()));
-    const strip = container.querySelector('[data-review-score-strip]');
+    const strip = container.querySelector('[data-review-grid-scores]');
     expect(strip?.querySelector('[data-course-name-link]')).not.toBeNull();
     expect(strip?.querySelector('[data-review-glass-region]')?.textContent).toBe('Catalonia');
     expect(strip?.querySelector('[data-review-score-row][data-variant="card"]')).not.toBeNull();
@@ -97,10 +97,10 @@ describe('feed review glass', () => {
     await waitFor(() => expect(client.getQueryState(['courses', 'feed-review-top100', ['c1']])?.status).toBe('error'));
     expect(container.querySelector('[data-review-pill="top100"]')).toBeNull();
   });
-  it('(d) strip passes pointer events through except canonical course door', () => {
+  it('(d) below-media block retains the canonical course door', () => {
     const open = vi.fn(); const { container } = render(tree(card(post, true, 'mediaFirst', open)));
-    expect(container.querySelector<HTMLElement>('[data-review-score-strip]')?.style.pointerEvents).toBe('none');
-    const link = container.querySelector<HTMLElement>('[data-review-score-strip] [data-course-name-link]');
+    expect(container.querySelector('[data-review-grid-scores]')).not.toBeNull();
+    const link = container.querySelector<HTMLElement>('[data-review-grid-scores] [data-course-name-link]');
     expect(link?.style.pointerEvents).toBe('auto'); if (!link) throw new Error('missing course link');
     fireEvent.click(link); expect(open).toHaveBeenCalledTimes(1);
   });
@@ -108,10 +108,11 @@ describe('feed review glass', () => {
     const video = readFileSync('src/components/feed/InlineVideo.tsx', 'utf8');
     expect(video.match(/bottom: 'calc\(var\(--review-glass-h, -12px\) \+ 18px\)'/g)).toHaveLength(2);
     expect(readFileSync('src/components/feed/MediaCarousel.tsx', 'utf8')).toContain("bottom: 'calc(var(--review-glass-h, -8px) + 18px)'");
-    expect(containerHeight()).toBe('0px');
+    expect(containerHeight()).toBe('');
   });
-  it('(f) no name and no scores omit both glass and fade', () => {
+  it('(f) no name and no scores omit the below-media block, glass and fade', () => {
     const { container } = render(tree(card({ ...post, review: null, courseName: null } as FeedPost)));
+    expect(container.querySelector('[data-review-grid-scores]')).toBeNull();
     expect(container.querySelector('[data-review-score-strip]')).toBeNull();
     expect(container.querySelector('[data-review-glass-fade]')).toBeNull();
   });

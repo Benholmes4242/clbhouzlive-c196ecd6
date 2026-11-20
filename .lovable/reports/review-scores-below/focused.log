@@ -1,0 +1,1083 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (a) media review keeps course, first region and shared scores below media; caption retains body and CTA
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewGridScores.test.tsx > photo-grid review scores > (a) wide-lead grid places course, region and card scores after media without glass
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewGridScores.test.tsx > photo-grid review scores > (b) upright-lead grid places course, region and card scores after media without glass
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (a2) region falls back to subcountry then country without joining parts
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewGridScores.test.tsx > photo-grid review scores > (c) single photo places scores below the media without glass
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewGridScores.test.tsx > photo-grid review scores > (c) video places scores below the media without glass
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (b) no-media and standard reviews keep underneath scores and 700 course weight
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewGridScores.test.tsx > photo-grid review scores > (c) three-photo carousel places scores below the media without glass
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewGridScores.test.tsx > photo-grid review scores > (d) grid Played with chip uses the media offset
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+ ✓ src/test/reviewGridScores.test.tsx (7 tests) 201ms
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (c) REVIEW exists in media, no-media and standard headers
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (c2) several posts use one active-membership batch, stamps only active course and reuse per-course cache
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (c3) pending membership never stamps until settled
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (c4) failed membership has no stamp
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (d) below-media block retains the canonical course door
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/feedReviewGlass.test.tsx > feed review glass > (e) video mute and duration use measured strip offset with unchanged six-pixel fallback; dots retain ten
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+ ✓ src/test/feedReviewGlass.test.tsx (10 tests) 397ms
+stdout | src/test/reviewPlayedWith.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stderr | src/test/fullscreenViewerRedesign.test.tsx > FULLSCREEN_VIEWER_REDESIGN > (e) the review score row sits inside the glass strip
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a course-media RPC review without score columns reads its review once and renders all five figures
+[fullscreen viewer] unmatched source post ids [ [32m'post-score'[39m ]
+
+stderr | src/test/fullscreenViewerRedesign.test.tsx > FULLSCREEN_VIEWER_REDESIGN > (f) a review prints Full review on its own line, with or without text
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a course-media RPC review without score columns reads its review once and renders all five figures
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/fullscreenViewerRedesign.test.tsx > FULLSCREEN_VIEWER_REDESIGN > (h) the chrome holds no text field
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+ ✓ src/test/fullscreenViewerRedesign.test.tsx (10 tests) 588ms
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a resolved unmatched post has no pills and double-tap cannot call a like
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > the review score strip uses the full-width card row and its divider
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > the review score strip uses the full-width card row and its divider
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (a) review opens carry engagementTarget review, open interactive, and show the pills (no More)
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (a) review opens carry engagementTarget review, open interactive, and show the pills (no More)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (d) About Photos review parents carry the course name and review scores; post parents are interactive with the header
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+ ✓ src/test/canonicalFullscreenViewer.test.tsx (13 tests) 1054ms
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (a) personal wizard puts unchanged selection after text and before the tray
+Warning: An update to Composer inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at Composer (/dev-server/src/features/review-v2/ReviewComposerV2.tsx:413:21)
+    at InnerComposer (/dev-server/src/features/review-v2/ReviewComposerV2.tsx:148:48)
+    at div
+    at default (/dev-server/src/test/reviewPlayedWith.test.tsx:55:21)
+    at ReviewComposerV2
+    at RenderedRoute (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:539:7)
+    at Routes (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1240:7)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (c) review tag error reports review_create for eight seconds and still shows saved review
+[review-v2] review_with write failed: {
+  code: [32m'23503'[39m,
+  message: [32m'Foreign key refused'[39m,
+  details: [32m'Member key missing'[39m,
+  hint: [32m'Check identity'[39m
+}
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review photo chip and upward panel clear the measured glass strip
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review photo chip and upward panel clear the measured glass strip
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at button
+    at div
+    at div
+    at div
+    at article
+    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:59:27)
+    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:269:25)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review video chip clears the mute tap area by eight pixels
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review video chip clears the mute tap area by eight pixels
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at button
+    at div
+    at div
+    at div
+    at article
+    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:59:27)
+    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:269:25)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (f) review without media opens the sheet from both faces and byline
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (f) review without media opens the sheet from both faces and byline
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (g) real review fullscreen chrome shows the chip under its author and opens the panel
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (g) real review fullscreen chrome shows the chip under its author and opens the panel
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:239:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (i) tagged viewer gets Remove me on the review and deletes their review tag
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > sync returns the first removal error and does not insert
+[review-v2] review_with remove failed: {
+  code: [32m'23503'[39m,
+  message: [32m'Foreign key refused'[39m,
+  details: [32m'Member key missing'[39m,
+  hint: [32m'Check identity'[39m
+}
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > review with no tags renders no new display
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > review with no tags renders no new display
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at button
+    at div
+    at div
+    at div
+    at article
+    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:59:27)
+    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:269:25)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+ ✓ src/test/reviewPlayedWith.test.tsx (23 tests) 1279ms
+   ✓ review Played with > (i) tagged viewer gets Remove me on the review and deletes their review tag  309ms
+
+ Test Files  5 passed (5)
+      Tests  63 passed (63)
+   Start at  22:22:25
+   Duration  9.79s (transform 4.31s, setup 1.72s, collect 15.91s, tests 3.52s, environment 9.33s, prepare 2.49s)
+
