@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 import { fetchOwnMediaSources, holeMediaKey, readAllPages, type OwnMediaSource } from '@/lib/courseMedia/holePhotoData';
 import { COURSE_PLACES, type CoursePlace } from '@/lib/courseMedia/places';
+import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
 
 export type PlaceMedia = Database['public']['Tables']['course_place_media']['Row'];
 export const placeMediaKey = (courseId: string, memberId?: string) => ['course-place-media', courseId, memberId] as const;
@@ -27,7 +28,7 @@ export async function submitCoursePlaceMedia(courseId: string, memberId: string,
     media_url: owned.url, media_type: owned.mediaType,
     file_name: new URL(owned.url).pathname.split('/').pop() || (owned.mediaType === 'video' ? 'video' : 'photo'),
     width: owned.width, height: owned.height, stream_id: owned.streamId,
-    poster_url: owned.posterUrl, duration_seconds: owned.durationSeconds,
+    poster_url: persistedPoster([owned.posterUrl], owned.streamId), duration_seconds: owned.durationSeconds,
   }).select('*').single();
   if (error) throw error;
   return data;

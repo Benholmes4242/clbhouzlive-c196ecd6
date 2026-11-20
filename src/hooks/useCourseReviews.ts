@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useBlockedUserIds } from './useBlockedUserIds';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isReactionByActor, type ReactionActorType } from '@/lib/reactionActor';
+import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
 
 export interface ReviewMediaItem {
   id: string;
@@ -117,6 +118,7 @@ export function useCourseReviews(
             media_type,
             media_url,
             poster_url,
+            stream_id,
             width,
             height
           )
@@ -195,6 +197,7 @@ export function useCourseReviews(
         media: (review.course_review_media || []).map((m: any) => ({
           ...m,
           media_type: m.media_type as 'image' | 'video',
+          poster_url: persistedPoster([m.poster_url], m.stream_id),
         })),
       })) as CourseReview[];
 

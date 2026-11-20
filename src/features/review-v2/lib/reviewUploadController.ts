@@ -41,6 +41,7 @@ import { toast } from '@/lib/toast';
 import i18n from '@/i18n';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { writeComposerHolePhoto, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
+import { persistedPoster } from './persistedPoster';
 
 export interface ReviewUploadInput {
   /** Client item id — echoed back on the result so the caller can match. */
@@ -448,7 +449,7 @@ export async function uploadAndPublishReview(
       media_url: r.uploadedUrl ?? '',
       media_type: input.type,
       stream_id: r.streamId ?? null,
-      poster_url: input.posterUrl ?? r.posterUrl ?? null,
+      poster_url: persistedPoster([input.posterUrl, r.posterUrl], r.streamId ?? input.streamId ?? null),
       width: w,
       height: h,
       aspect_ratio: w && h ? Number((w / h).toFixed(4)) : null,

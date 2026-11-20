@@ -14,6 +14,7 @@ import { streamPosterFrom } from '@/utils/mediaThumbs';
 import { buildHlsUrl, extractCloudflareUid } from '@/utils/streamId';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { ALLOWED_VIDEO_TYPES, POST_LIMITS } from '@/constants/postLimits';
+import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
 
 // useMediaUpload's SUPPORTED_VIDEO_TYPES is private to that hook. Compose its
 // same four-type set from the shared list without changing the review composer.
@@ -32,7 +33,10 @@ export interface OwnMediaSource {
   width: number | null; height: number | null;
 }
 export function holeMediaPoster(media: { media_url: string; media_type?: string; poster_url?: string | null; stream_id?: string | null }): string {
-  return media.media_type === 'video' ? media.poster_url || streamPosterFrom(buildHlsUrl(media.stream_id || media.media_url) || media.media_url) || '' : media.media_url;
+  return media.media_type === 'video'
+    ? persistedPoster([media.poster_url], media.stream_id)
+      ?? persistedPoster([streamPosterFrom(buildHlsUrl(media.media_url) || media.media_url)], null) ?? ''
+    : media.media_url;
 }
 export const holeSourceUrl = (media: FeedPost['mediaItems'][number] | undefined) => media?.imageUrl || media?.hlsUrl || media?.mp4Url || '';
 
@@ -170,7 +174,7 @@ export async function submitHolePhoto(post: FeedPost, courseId: string, memberId
     course_id: courseId, user_id: memberId, hole_no: hole, media_url: canonicalUrl,
     file_name: name, width: source.width || media.width || null, height: source.height || media.height || null,
     media_type: media.type,
-    ...(media.type === 'video' ? { stream_id: source.streamId, poster_url: source.posterUrl, duration_seconds: source.durationSeconds } : {}), ...verdict,
+    ...(media.type === 'video' ? { stream_id: source.streamId, poster_url: persistedPoster([source.posterUrl], source.streamId), duration_seconds: source.durationSeconds } : {}), ...verdict,
   }).select('*').single();
   if (error) throw error;
   return data;

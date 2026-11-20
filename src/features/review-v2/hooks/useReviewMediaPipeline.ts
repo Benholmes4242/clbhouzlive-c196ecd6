@@ -25,6 +25,7 @@ import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsSt
 import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
 import { startReviewUpload, uploadAndPublishReview, enqueueReviewUpload, subscribeToPreuploads, removeReviewPreupload, abandonReviewPreuploads, retainReviewPreuploads } from '../lib/reviewUploadController';
 import { probeVideo } from '../lib/probeVideo';
+import { persistedPoster } from '../lib/persistedPoster';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -93,8 +94,8 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
       id: `existing-${m.id}`,
       dbRowId: m.id,
       type: m.media_type === 'video' ? 'video' : 'image',
-      previewUrl: m.poster_url ?? m.media_url,
-      posterUrl: m.poster_url ?? null,
+      previewUrl: persistedPoster([m.poster_url], m.stream_id) ?? m.media_url,
+      posterUrl: persistedPoster([m.poster_url], m.stream_id),
       streamId: m.stream_id ?? null,
       uploadedUrl: m.media_url,
       status: 'existing',
@@ -266,7 +267,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
               media_url: hls,
               media_type: 'video',
               stream_id: streamId,
-              poster_url: poster,
+              poster_url: persistedPoster([poster], streamId),
               file_name: item.file.name,
               file_size: item.file.size,
               status: 'attached',
@@ -480,7 +481,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           media_url: item.uploadedUrl ?? '',
           media_type: item.type,
           stream_id: item.streamId ?? null,
-          poster_url: item.posterUrl ?? null,
+          poster_url: persistedPoster([item.posterUrl], item.streamId ?? null),
           file_name: item.file?.name ?? null,
           file_size: item.file?.size ?? null,
           status: 'attached',

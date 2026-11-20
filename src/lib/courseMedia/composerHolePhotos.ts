@@ -9,7 +9,8 @@
  * and the same chosen-round proof; a video without a stream id never writes.
  */
 import { supabase } from '@/integrations/supabase/client';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
 import { readHolePhotoExif, type HolePhotoExif } from './holePhotoExif';
 import { holePhotoVerdict } from './holePhotoVerdict';
 
@@ -56,7 +57,7 @@ export async function writeComposerHolePhoto(job: ComposerHoleJob | undefined, u
       course_id: job.courseId, hole_no: hole, user_id: userId,
       media_type: 'video', stream_id: streamId,
       media_url: generateStreamHlsUrl(streamId),
-      poster_url: item.posterUrl ?? generateStreamThumbnailUrl(streamId),
+      poster_url: persistedPoster([item.posterUrl], streamId),
       duration_seconds: item.durationSeconds ?? null,
       width: item.width ?? null, height: item.height ?? null,
       file_name: item.file?.name ?? null, ...verdict,

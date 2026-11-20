@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import type { ReviewFeedPostInput } from '@/lib/reviews/reviewFeedPost';
+import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
 
 export interface CourseMoment {
   id: string;
@@ -43,7 +44,7 @@ export function useUserCourseMoments(courseId: string | undefined) {
       // Get media for those ratings
       const { data: courseMedia, error: mediaError } = await supabase
         .from('course_review_media')
-        .select('id, media_url, media_type, poster_url, created_at, review_id')
+        .select('id, media_url, media_type, poster_url, stream_id, created_at, review_id')
         .in('review_id', Array.from(ratingIds));
       if (mediaError) throw mediaError;
       const ratings = new Map(userRatings?.map(row => [row.id, row]));
@@ -56,7 +57,7 @@ export function useUserCourseMoments(courseId: string | undefined) {
           type: 'review_media',
           mediaUrl: media.media_url,
           mediaType: media.media_type === 'video' ? 'video' : 'image',
-          posterUrl: media.poster_url ?? undefined,
+          posterUrl: persistedPoster([media.poster_url], media.stream_id) ?? undefined,
           createdAt: media.created_at,
           reviewId: media.review_id,
           reviewInput: {

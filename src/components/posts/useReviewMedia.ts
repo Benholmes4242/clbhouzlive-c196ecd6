@@ -11,6 +11,7 @@
 
 import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
 
 export interface ReviewMediaItem {
   id: string;
@@ -38,7 +39,7 @@ export async function fetchReviewMedia(reviewId: string): Promise<ReviewMediaIte
       id: String(m.id),
       mediaType: String(m.media_type ?? '').toLowerCase().includes('video') ? ('video' as const) : ('image' as const),
       mediaUrl: String(m.media_url),
-      posterUrl: m.poster_url ?? null,
+      posterUrl: persistedPoster([m.poster_url], m.stream_id),
       streamId: m.stream_id ?? null,
       isCover: !!m.is_cover,
       width: typeof m.width === 'number' && m.width > 0 ? m.width : null,

@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Review video persisted posters
+- Added persistedPoster and routed review poster writes/database readers through it; local new-media composer preview frames and presentation unchanged.
+- Six new cases pass; focused run 47 passed / 7 failed of 54, in unchanged holeMediaVideos (five relative-poster assertions) and reviewVideoTilePosters (two exact legacy-thumbnail assertions). No repairs/reruns or shards under the stop rule; requires Ben's ruling. Exact errors and all sites: .lovable/reports/review-video-persisted-posters/.
+- Expected inventory 9,383 → 9,389 (+six reviewVideoPoster cases), full suite unverified. Latest harness build OK; authenticated save/readback unavailable on external_unmanaged. Legacy no-stream-id batch fixture now receives its manifest as poster; recorded without a follow-up fix after the stop.
+
 ## Complete: Post or review title copy only
 - Updated requested titles in en/de/es/ja/ko/en-XA and search fallback; reviewSearch.title was absent and added. No layout/style/behaviour or other-copy changes.
 - Two authorized assertions updated; 15/15 focused. Sequential shards 2,304 / 2,287 / 2,349 / 2,443 = 9,383/9,383 across 837 files, unchanged inventory and zero failures.

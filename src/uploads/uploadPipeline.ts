@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
 import { derivePosterUrl } from './posterUrl';
+import { persistedPoster } from '@/features/review-v2/lib/persistedPoster';
 import { createPost } from '@/services/posts/createPost';
 
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
@@ -1654,7 +1655,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
             media_url: publicUrl,
             media_type: mediaType,
             stream_id: streamId,
-            poster_url: posterUrl,
+            poster_url: persistedPoster([posterUrl], streamId),
             width,
             height,
             aspect_ratio: aspectRatio,

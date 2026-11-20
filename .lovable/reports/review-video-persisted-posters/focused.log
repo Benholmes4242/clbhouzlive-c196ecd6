@@ -1,0 +1,321 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/reviewVideoPoster.test.ts (6 tests) 16ms
+ ✓ src/test/userCourseMomentsReviewRead.test.tsx (1 test) 89ms
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/latestReviewsTwoReads.test.tsx (8 tests) 250ms
+ ✓ src/test/reviewUploadProgress.test.tsx (18 tests) 576ms
+stderr | src/test/holeMediaVideos.test.tsx > Stage1 hole video display and lifecycle > video-only hole uses poster and count one and opens the viewer with the stream — course gallery
+react-i18next:: useTranslation: You will need to pass in an i18next instance by using initReactI18next or by passing it via props or context. In monorepo setups, make sure there is only one instance of react-i18next. { code: [32m'NO_I18NEXT_INSTANCE'[39m }
+
+ ❯ src/test/holeMediaVideos.test.tsx (16 tests | 5 failed) 302ms
+   × Stage1 encoded hole-video sources > includes encoded post video and its metadata 26ms
+     → expected [ { ownerUserId: null, …(9) } ] to deeply equal [ { …(10) } ]
+   ✓ Stage1 encoded hole-video sources > excludes post encode status processing 1ms
+   ✓ Stage1 encoded hole-video sources > excludes post encode status pending 0ms
+   ✓ Stage1 encoded hole-video sources > excludes post encode status error 0ms
+   ✓ Stage1 encoded hole-video sources > excludes missing duration 0ms
+   ✓ Stage1 encoded hole-video sources > excludes processing error 0ms
+   ✓ Stage1 encoded hole-video sources > review attached video is eligible but failed and undated encode are excluded 0ms
+   ✓ Stage1 encoded hole-video sources > same URL mirrored in post and review dedupes once 1ms
+   ✓ Stage1 encoded hole-video sources > derives Stream poster when the row lacks one 1ms
+   × Stage1 encoded hole-video sources > tagged video writes its authoritative source metadata 8ms
+     → expected "spy" to be called with arguments: [ ObjectContaining{…} ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[32m-   ObjectContaining {[90m
+[31m+   {[90m
+[31m+     "course_id": "course",[90m
+[2m      "duration_seconds": 42,[22m
+[31m+     "exif_captured_at": null,[90m
+[31m+     "file_name": "clip.m3u8",[90m
+[2m      "height": 480,[22m
+[2m      "hole_no": 7,[22m
+[2m      "media_type": "video",[22m
+[2m      "media_url": "https://example.test/clip.m3u8",[22m
+[32m-     "poster_url": "/poster.jpg",[90m
+[31m+     "poster_url": "https://customer-4ah4gni80ytefpck.cloudflarestream.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s",[90m
+[31m+     "proof_score_id": null,[90m
+[31m+     "status": "approved",[90m
+[2m      "stream_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",[22m
+[31m+     "user_id": "member",[90m
+[2m      "width": 640,[22m
+[2m    },[22m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+   ✓ Stage1 encoded hole-video sources > finished own video is eligible 0ms
+   ✓ Stage1 encoded hole-video sources > processing video is not eligible 1ms
+   × Stage1 hole video display and lifecycle > video-only hole uses poster and count one and opens the viewer with the stream — course gallery 119ms
+     → [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"/poster.jpg"[32m[39m[2m) // element.getAttribute("src") === "/poster.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="/poster.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+   × Stage1 hole video display and lifecycle > known-hole pile shows eligible video poster and duration 87ms
+     → [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"/poster.jpg"[32m[39m[2m) // element.getAttribute("src") === "/poster.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="/poster.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+   × Stage1 hole video display and lifecycle > batch uses video poster rather than manifest 36ms
+     → [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"/poster.jpg"[32m[39m[2m) // element.getAttribute("src") === "/poster.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="/poster.jpg"[39m
+Received:
+[31m  src="https://example.test/clip.m3u8"[39m
+   ✓ Stage1 hole video display and lifecycle > manual play attaches HLS with sound and cleanup detaches it 18ms
+stdout | src/test/reviewVideoTilePosters.test.tsx > review video tile posters > sheet video uses a Stream thumbnail and carries it into viewer opening
+[review-sheet] state {
+  reviewId: [32m'review'[39m,
+  propHasText: [33mfalse[39m,
+  fallbackHasText: [33mfalse[39m,
+  effectiveHasText: [33mtrue[39m
+}
+
+stderr | src/test/reviewVideoTilePosters.test.tsx > review video tile posters > sheet video uses a Stream thumbnail and carries it into viewer opening
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLBodyElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLBodyElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLBodyElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17)
+    at HTMLBodyElementImpl.appendChild (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:598:17)
+    at HTMLBodyElement.appendChild (/dev-server/node_modules/jsdom/lib/jsdom/living/generated/Node.js:411:60) [data-liked-stack-short]{display:none}@container (max-width:300px){[data-liked-stack-long]{display:none}[data-liked-stack-short]{display:inline}}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLBodyElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stdout | src/test/reviewVideoTilePosters.test.tsx > review video tile posters > sheet video without a derivable poster has no image and no playback opening poster
+[review-sheet] state {
+  reviewId: [32m'review'[39m,
+  propHasText: [33mfalse[39m,
+  fallbackHasText: [33mfalse[39m,
+  effectiveHasText: [33mtrue[39m
+}
+
+stderr | src/test/reviewVideoTilePosters.test.tsx > review video tile posters > sheet video without a derivable poster has no image and no playback opening poster
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLBodyElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLBodyElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLBodyElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17)
+    at HTMLBodyElementImpl.appendChild (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:598:17)
+    at HTMLBodyElement.appendChild (/dev-server/node_modules/jsdom/lib/jsdom/living/generated/Node.js:411:60) [data-liked-stack-short]{display:none}@container (max-width:300px){[data-liked-stack-long]{display:none}[data-liked-stack-short]{display:inline}}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLBodyElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+ ❯ src/test/reviewVideoTilePosters.test.tsx (5 tests | 2 failed) 344ms
+   ✓ review video tile posters > fetchReviewMedia selects and maps stream_id with JSON-safe null fallback 4ms
+   × review video tile posters > sheet video uses a Stream thumbnail and carries it into viewer opening 164ms
+     → [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[32m[39m[2m) // element.getAttribute("src") === "https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+   ✓ review video tile posters > sheet video without a derivable poster has no image and no playback opening poster 70ms
+   × review video tile posters > Latest reviews small video tile derives the Stream thumbnail and viewer poster 27ms
+     → [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[32m[39m[2m) // element.getAttribute("src") === "https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+   ✓ review video tile posters > Latest reviews unknown video has no small image, unsafe ambient or opening poster 32ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/holeMediaVideos.test.tsx > Stage1 encoded hole-video sources > includes encoded post video and its metadata
+AssertionError: expected [ { ownerUserId: null, …(9) } ] to deeply equal [ { …(10) } ]
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[33m@@ -4,11 +4,11 @@[39m
+[2m      "createdAt": "2026-10-24",[22m
+[2m      "durationSeconds": 42,[22m
+[2m      "height": 480,[22m
+[2m      "mediaType": "video",[22m
+[2m      "ownerUserId": null,[22m
+[32m-     "posterUrl": "/poster.jpg",[39m
+[31m+     "posterUrl": "https://customer-4ah4gni80ytefpck.cloudflarestream.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s",[39m
+[2m      "streamId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",[22m
+[2m      "url": "https://example.test/clip.m3u8",[22m
+[2m      "width": 640,[22m
+[2m    },[22m
+[2m  ][22m
+
+ ❯ src/test/holeMediaVideos.test.tsx:34:143
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  src/test/holeMediaVideos.test.tsx > Stage1 encoded hole-video sources > tagged video writes its authoritative source metadata
+AssertionError: expected "spy" to be called with arguments: [ ObjectContaining{…} ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[32m-   ObjectContaining {[90m
+[31m+   {[90m
+[31m+     "course_id": "course",[90m
+[2m      "duration_seconds": 42,[22m
+[31m+     "exif_captured_at": null,[90m
+[31m+     "file_name": "clip.m3u8",[90m
+[2m      "height": 480,[22m
+[2m      "hole_no": 7,[22m
+[2m      "media_type": "video",[22m
+[2m      "media_url": "https://example.test/clip.m3u8",[22m
+[32m-     "poster_url": "/poster.jpg",[90m
+[31m+     "poster_url": "https://customer-4ah4gni80ytefpck.cloudflarestream.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s",[90m
+[31m+     "proof_score_id": null,[90m
+[31m+     "status": "approved",[90m
+[2m      "stream_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",[22m
+[31m+     "user_id": "member",[90m
+[2m      "width": 640,[22m
+[2m    },[22m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+ ❯ src/test/holeMediaVideos.test.tsx:41:171
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  src/test/holeMediaVideos.test.tsx > Stage1 hole video display and lifecycle > video-only hole uses poster and count one and opens the viewer with the stream — course gallery
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"/poster.jpg"[32m[39m[2m) // element.getAttribute("src") === "/poster.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="/poster.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+ ❯ src/test/holeMediaVideos.test.tsx:47:223
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  src/test/holeMediaVideos.test.tsx > Stage1 hole video display and lifecycle > known-hole pile shows eligible video poster and duration
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"/poster.jpg"[32m[39m[2m) // element.getAttribute("src") === "/poster.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="/poster.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+ ❯ src/test/holeMediaVideos.test.tsx:49:456
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  src/test/holeMediaVideos.test.tsx > Stage1 hole video display and lifecycle > batch uses video poster rather than manifest
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"/poster.jpg"[32m[39m[2m) // element.getAttribute("src") === "/poster.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="/poster.jpg"[39m
+Received:
+[31m  src="https://example.test/clip.m3u8"[39m
+ ❯ src/test/holeMediaVideos.test.tsx:50:379
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  src/test/reviewVideoTilePosters.test.tsx > review video tile posters > sheet video uses a Stream thumbnail and carries it into viewer opening
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[32m[39m[2m) // element.getAttribute("src") === "https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+ ❯ src/test/reviewVideoTilePosters.test.tsx:57:39
+     55|     sheet(video);
+     56|     const tile = screen.getByRole('button', { name: 'Video 1 of 1' });
+     57|     expect(tile.querySelector('img')).toHaveAttribute('src', thumbnail…
+       |                                       ^
+     58|     expect(document.querySelector(`img[src="${video.mediaUrl}"]`)).toB…
+     59|     fireEvent.click(tile);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  src/test/reviewVideoTilePosters.test.tsx > review video tile posters > Latest reviews small video tile derives the Stream thumbnail and viewer poster
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"src"[32m[39m[2m, [22m[32m[32m"https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[32m[39m[2m) // element.getAttribute("src") === "https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[22m
+
+Expected the element to have attribute:
+[32m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg"[39m
+Received:
+[31m  src="https://customer-4ah4gni80ytefpck.cloudflarestream.com/0123456789abcdef0123456789abcdef/thumbnails/thumbnail.jpg?height=300&fit=crop&time=1s"[39m
+ ❯ src/test/reviewVideoTilePosters.test.tsx:74:39
+     72|     const tile = container.querySelector('[data-review-media-id="video…
+     73|     if (!tile) throw new Error('Missing small video tile');
+     74|     expect(tile.querySelector('img')).toHaveAttribute('src', thumbnail…
+       |                                       ^
+     75|     expect(container.querySelector(`img[src="${video.mediaUrl}"]`)).to…
+     76|     expect(container.querySelector('[data-review-media-id="photo"] img…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  2 failed | 4 passed (6)
+      Tests  7 failed | 47 passed (54)
+   Start at  22:11:50
+   Duration  7.05s (transform 2.40s, setup 1.87s, collect 8.42s, tests 1.58s, environment 10.71s, prepare 1.49s)
+
