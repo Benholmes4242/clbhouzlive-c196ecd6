@@ -74,7 +74,8 @@ import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
-import { PostWithLine, RemoveMeMenu, SlideTagChip } from './PostGolfTags';
+import { PLAYED_WITH_VIDEO_BOTTOM, PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, RemoveMeMenu, SlideTagChip, type PlayedWithPerson } from './PostGolfTags';
+import { getActorRouteByType } from '@/types/actor';
 import type { SlideTag } from '@/features/post-v2/lib/golfPostRules';
 import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
 import { HoleChip, FeedRoundRow } from './PostGolfContext';
@@ -203,7 +204,7 @@ export interface FeedCardProps {
    *  'standard' (default) is the unchanged Clubhouse order. */
   layout?: 'standard' | 'mediaFirst';
   /** Played with (post_with), batched by the host feed — never per card. */
-  playedWith?: ReadonlyArray<{ userId: string; name: string; avatarUrl?: string | null }>;
+  playedWith?: ReadonlyArray<PlayedWithPerson>;
   /** Per-slide course tags keyed by holeMediaKey(mediaItem), batched by the host. */
   slideTags?: ReadonlyMap<string, SlideTag>;
   /** PF1B: batched golf context for this post (usePostGolfContext, page level).
@@ -575,17 +576,28 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     const detail = golfHoles?.find(h => h.hole_no === holeNo) ?? (golfHole?.hole_no === holeNo ? golfHole : local?.par ? { hole_no: holeNo, par: local.par, yards: null, si: null } : null);
     return <HoleChip holeNo={holeNo} hole={detail} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }}/>;
   };
-  const shotPlaceChip = (index: number) => {
+  /* PLAYED WITH (Option C): personal, non-review posts with post_with rows.
+     Media posts carry the chip on the media; no-media posts carry the faces
+     and byline in the author row. */
+  const withPeople = post.actorType !== 'business' && !post.isReview && playedWith?.length ? playedWith : null;
+  const [withSheetOpen, setWithSheetOpen] = useState(false);
+  const openWithProfile = (userId: string) => navigate(getActorRouteByType('personal', userId));
+  const withSheet = withPeople ? <PlayedWithSheet open={withSheetOpen} people={withPeople} onClose={() => setWithSheetOpen(false)} onOpenProfile={openWithProfile} /> : null;
+  /* The grid's bottom-left tile: the lead tile in upright grids, the first
+     small tile in wide ones. */
+  const gridBottomLeft = photoGrid ? (photoGrid.shape === 'upright' ? 0 : 1) : -1;
+  const shotPlaceChip = (index: number, lifted = false) => {
     const item = items[index]; const tag = item ? slideTags?.get(holeMediaKey(item)) : null;
-    return tag?.place ? <SlideTagChip tag={tag}/> : null;
+    return tag?.place ? <SlideTagChip tag={tag} lifted={lifted}/> : null;
   };
   const renderMedia = (fill: boolean) => (
     <>
 {/* Media. A round post never reaches here: it returns the round card
           above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
-        {!(photoGrid && !fill) && <>{shotPlaceChip(isMulti ? visibleSlide : 0)}{shotHoleChip(isMulti ? visibleSlide : 0)}</>}
-        {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} perTileOverlay={index => <>{shotPlaceChip(index)}{shotHoleChip(index)}</>} /> : isMulti ? (
+        {!(photoGrid && !fill) && <>{shotPlaceChip(isMulti ? visibleSlide : 0, !!withPeople)}{shotHoleChip(isMulti ? visibleSlide : 0)}</>}
+        {withPeople && <PlayedWithMediaOverlay people={withPeople} onOpenProfile={openWithProfile} resetKey={visibleSlide} chipBottom={items[isMulti && !(photoGrid && !fill) ? visibleSlide : 0]?.type === 'video' && !(photoGrid && !fill) ? PLAYED_WITH_VIDEO_BOTTOM : undefined} />}
+        {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} perTileOverlay={index => <>{shotPlaceChip(index, !!withPeople && index === gridBottomLeft)}{shotHoleChip(index)}</>} /> : isMulti ? (
           <MediaCarousel
             items={items}
             isCardActive={isActive}
@@ -873,6 +885,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           isCompetition={roundCompetition === true}
           onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
           onWhoTap={() => onProfile(post)}
+          playedWithFaces={withPeople ? <PlayedWithNameFaces people={withPeople} onOpen={() => setWithSheetOpen(true)} /> : undefined}
+          renderPlayedWithByline={withPeople ? (date) => <PlayedWithByline people={withPeople} onOpen={() => setWithSheetOpen(true)} tail={date} style={{ maxWidth: '100%' }} /> : undefined}
           isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
           onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
           engagement={scoreLed ? undefined : {
@@ -910,6 +924,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             },
           } : undefined,
         }) : null}
+        {withSheet}
       </article>
     );
   }
@@ -1001,7 +1016,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           >
             {post.displayName}
           </button></ProMemberName>
-          {playedWith && playedWith.length > 0 && <PostWithLine people={playedWith} />}
+          {withPeople && !items.length && <PlayedWithNameFaces people={withPeople} onOpen={() => setWithSheetOpen(true)} />}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
             {canManage && (
@@ -1016,7 +1031,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             {!canManage && currentUserId && playedWith?.some((p) => p.userId === currentUserId) && (
               <RemoveMeMenu postId={post.id} memberId={currentUserId} />
             )}
-            <span style={{ fontSize: 12, color: T60 }}>{subLine}</span>
+            {withPeople && !items.length
+              ? <PlayedWithByline people={withPeople} onOpen={() => setWithSheetOpen(true)} tail={subLine} style={{ fontSize: 12, color: T60, flex: '0 1 auto' }} />
+              : <span style={{ fontSize: 12, color: T60 }}>{subLine}</span>}
             {mountFollowPill && (
               <FeedFollowPill
                 isFollowed={!!post.isFollowedByMe}
@@ -1110,6 +1127,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </>}
 
       </div>
+      {withSheet}
     </article>
   );
 

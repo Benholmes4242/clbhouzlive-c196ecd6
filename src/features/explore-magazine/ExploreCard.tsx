@@ -839,8 +839,12 @@ function ReviewStatStrip({ breakdown }: { breakdown: ReviewBreakdown | undefined
    normal posts put it. Follow and owner menu never both show: follow is gated
    on not being the viewer, the menu on being the viewer. No score, kicker or
    headline enters this row (FeedCard). */
-function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow, isCompetition }: {
+function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow, isCompetition, playedWithFaces, renderPlayedWithByline }: {
   item: StreamItem;
+  /** FeedCard round posts only: Played with faces after the name, and the
+   *  byline that prefixes "with …" to the date. Absent = unchanged row. */
+  playedWithFaces?: React.ReactNode;
+  renderPlayedWithByline?: (date: React.ReactNode) => React.ReactNode;
   onWhoTap?: () => void;
   isFollowed?: boolean;
   onFollow?: () => void;
@@ -883,10 +887,15 @@ function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow, isCompetition }:
           {/* The shared CompetitionMark, 9px after the member's name; the name
               truncates before the mark does. */}
           {isCompetition === true ? <CompetitionMark style={{ marginLeft: 9 }} /> : null}
+          {playedWithFaces}
         </span>
-        {date || (onFollow && !isViewer) ? (
+        {date || renderPlayedWithByline || (onFollow && !isViewer) ? (
           <span style={{ marginTop: 1, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            {date ? (
+            {renderPlayedWithByline ? (
+              <span style={{ ...NUMF, fontFamily: SANS, fontSize: 11, fontWeight: 600, lineHeight: 1.25, color: A.MUTE, minWidth: 0, flex: '0 1 auto', overflow: 'hidden' }}>
+                {renderPlayedWithByline(date ? <span data-round-identity-date="true">{date}</span> : null)}
+              </span>
+            ) : date ? (
               <span data-round-identity-date="true" style={{ ...NUMF, fontFamily: SANS, fontSize: 11, fontWeight: 600, lineHeight: 1.25, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{date}</span>
             ) : null}
             {/* CB29 FOLLOW, moved here by CB30 with its treatment intact; stop()
@@ -929,6 +938,8 @@ export function ExploreCard({
   feedLayout,
   isFollowed,
   onFollow,
+  playedWithFaces,
+  renderPlayedWithByline,
 }: {
   /** CB29. Optional follow control in the round author row; absent when not supplied. */
   isFollowed?: boolean;
@@ -968,6 +979,9 @@ export function ExploreCard({
    *  FeaturedRoundCard and FeedCard's standard layout render exactly as
    *  today. */
   feedLayout?: 'scoreLed';
+  /** FeedCard round posts only (Played with Option C); see RoundAuthorRow. */
+  playedWithFaces?: React.ReactNode;
+  renderPlayedWithByline?: (date: React.ReactNode) => React.ReactNode;
 }) {
   const { t, i18n } = useTranslation('courses');
   const locale = i18n.language || 'en';
@@ -1668,7 +1682,7 @@ export function ExploreCard({
         style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: A.INK, fontFamily: SANS, ...FIGS }}
       >
         <span style={{ display: 'block', padding: '12px 14px 0' }}>
-          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} />
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} playedWithFaces={playedWithFaces} renderPlayedWithByline={renderPlayedWithByline} />
         </span>
         {/* FEATURED_ROUND_OPTION_A — the body is the shared ScorePostBody, the
             same component the Featured round / Round of the week card renders. */}
@@ -1720,7 +1734,7 @@ export function ExploreCard({
         style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: A.INK, fontFamily: SANS, ...FIGS }}
       >
         <span data-feed-round-head="true" style={{ display: 'block', paddingInline: 4, paddingTop: 12 }}>
-          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} />
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} playedWithFaces={playedWithFaces} renderPlayedWithByline={renderPlayedWithByline} />
           {/* CB60 — no name, no line: the span and its 12px margin are absent. */}
           {feedRoundCourse ? (
             <span data-feed-round-course="true" style={{ display: 'block', marginTop: 12, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -1792,7 +1806,7 @@ export function ExploreCard({
     >
       {item.kind === 'round' && size !== 'pair' && !onPhoto ? (
         <span style={{ display: 'block', paddingInline: 4, paddingBottom: 12 }}>
-          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} />
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} isCompetition={isCompetition} playedWithFaces={playedWithFaces} renderPlayedWithByline={renderPlayedWithByline} />
         </span>
       ) : null}
       <span style={{ position: 'relative', display: 'block', marginInline: bleed != null ? -bleed : undefined }}>{photo}</span>

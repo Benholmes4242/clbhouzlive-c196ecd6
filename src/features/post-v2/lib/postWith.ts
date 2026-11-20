@@ -42,7 +42,7 @@ export async function removeMeFromPost(postId: string, memberId: string): Promis
   if (!data?.length) throw new Error("You couldn't be removed from this post.");
 }
 
-export interface PostWithPerson { postId: string; userId: string; name: string; avatarUrl: string | null }
+export interface PostWithPerson { postId: string; userId: string; name: string; username: string | null; avatarUrl: string | null }
 
 /** ONE read for a whole page of posts (plus one profile read). */
 export async function readPostWith(postIds: readonly string[]): Promise<PostWithPerson[]> {
@@ -57,6 +57,6 @@ export async function readPostWith(postIds: readonly string[]): Promise<PostWith
   const byId = new Map(profiles.map((p) => [p.id, p]));
   return rows.map((r) => {
     const p = byId.get(r.user_id);
-    return { postId: r.post_id, userId: r.user_id, name: p?.display_name || p?.first_name || p?.username || 'Golfer', avatarUrl: p?.profile_photo_url ?? null };
+    return { postId: r.post_id, userId: r.user_id, name: p?.display_name || p?.first_name || p?.username || 'Golfer', username: p?.username ?? null, avatarUrl: p?.profile_photo_url ?? null };
   });
 }

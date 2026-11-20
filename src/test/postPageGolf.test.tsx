@@ -71,7 +71,7 @@ describe('played with', () => {
   it('feed line: one, two, three or more names', () => {
     expect(withLine(['Danny Lee'])).toBe('with Danny');
     expect(withLine(['Danny Lee', 'Thomas Ng'])).toBe('with Danny and Thomas');
-    expect(withLine(['Danny', 'Thomas', 'Sam'])).toBe('with Danny and 2 others');
+    expect(withLine(['Danny', 'Thomas', 'Sam'])).toBe('with Danny, Thomas and Sam');
     expect(withLine([])).toBeNull();
   });
 });

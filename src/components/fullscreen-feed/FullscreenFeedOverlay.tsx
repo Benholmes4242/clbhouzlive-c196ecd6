@@ -53,6 +53,7 @@ function lockFullscreenViewportScroll(): () => void {
 
 
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
+import { usePostGolfTags } from '@/hooks/feed/usePostGolfTags';
 import { CourseGalleryChrome } from './CourseGalleryChrome';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { likeOnlyOnDoubleTap } from '@/components/fullscreen-feed/scrubberMath';
@@ -598,6 +599,10 @@ export function FullscreenFeedOverlay() {
     [posts, syntheticPosts, courseGallery],
   );
   const golfContextMap = usePostGolfContext(golfPostIds);
+  // Played with: ONE batched read for the viewer's own posts (never per slide);
+  // synthetic and course-gallery opens carry no post_with rows.
+  const golfTagPosts = useMemo(() => (isOpen && !syntheticPosts && !courseGallery ? posts : []), [isOpen, posts, syntheticPosts, courseGallery]);
+  const viewerGolfTags = usePostGolfTags(golfTagPosts, 'fullscreen');
   const videoDetailsMap = usePostVideoDetails(useMemo(() => isOpen && !syntheticPosts && !courseGallery ? singleVideoPostIds(posts) : [], [isOpen, posts, syntheticPosts, courseGallery]));
   const golfHoleMap = usePostGolfHoleMeta(
     useMemo(() => {
@@ -1109,6 +1114,7 @@ export function FullscreenFeedOverlay() {
                     golfContext={activeGolfContext}
                     videoRoundShape={videoRoundShapes?.get(activeGolfContext?.roundScoreId ?? '') ?? null}
                     videoDetails={activePost ? videoDetailsMap.get(activePost.id) ?? null : null}
+                    playedWith={activePost ? viewerGolfTags.withByPost.get(activePost.id) : undefined}
                     golfHole={activeGolfHole}
                     golfHoles={golfHoleMap.get(activeGolfContext?.courseId ?? '')}
                     onOpenScorecard={(scoreId) => { if (!activePost) return; if (videoDetailsMap.get(activePost.id)?.holeMarks && Object.keys(videoDetailsMap.get(activePost.id)?.holeMarks ?? {}).length >= 2) videoScorecard.openByScore(scoreId, null, activePost.userId); else setGolfScorecard({ scoreId, userId: activePost.userId }); }}

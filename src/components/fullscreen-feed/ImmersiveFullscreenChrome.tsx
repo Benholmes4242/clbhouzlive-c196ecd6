@@ -53,6 +53,8 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
+import { PlayedWithViewerChip, type PlayedWithPerson } from '@/components/feed/PostGolfTags';
+import { getActorRouteByType } from '@/types/actor';
 import { Z } from '@/config/zIndex';
 import { formatHcp } from '@/lib/formatHcp';
 import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
@@ -195,6 +197,8 @@ interface Props {
   golfHoles?: readonly TeeHole[];
   /** PF1B: opens the attached round's scorecard sheet over the viewer. */
   onOpenScorecard?: (scoreId: string) => void;
+  /** The active post's post_with people (batched once by the overlay). */
+  playedWith?: ReadonlyArray<PlayedWithPerson>;
 }
 
 export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome({
@@ -226,6 +230,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   onOpenScorecard,
   videoDetails,
   videoRoundShape,
+  playedWith,
 }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -634,6 +639,17 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             </div>
           </div>
         </div>
+        )}
+
+        {!shot && !syntheticPosts && activePost.actorType !== 'business' && !activePost.isReview && playedWith && playedWith.length > 0 && (
+          <PlayedWithViewerChip
+            key={activePost.id}
+            people={playedWith}
+            onOpenProfile={(userId) => {
+              if (onBeforeNavigate) onBeforeNavigate(); else onClose();
+              navigate(getActorRouteByType('personal', userId));
+            }}
+          />
         )}
 
         {shot && shotHasHole && (

@@ -88,13 +88,20 @@ export function toggleWith<T extends { id: string }>(list: readonly T[], person:
 }
 
 export const firstName = (name: string) => name.trim().split(/\s+/)[0] || name;
-/** "with Danny" / "with Danny and Thomas" / "with Danny and 2 others". */
-export function withLine(names: readonly string[]): string | null {
+/** Played-with first names: up to three named; four or more name two and count the rest. */
+export function withNames(names: readonly string[]): { shown: string[]; others: number } {
   const f = names.map(firstName);
-  if (f.length === 0) return null;
-  if (f.length === 1) return `with ${f[0]}`;
-  if (f.length === 2) return `with ${f[0]} and ${f[1]}`;
-  return `with ${f[0]} and ${f.length - 1} others`;
+  return f.length <= 3 ? { shown: f, others: 0 } : { shown: f.slice(0, 2), others: f.length - 2 };
+}
+/** "with Thomas" / "with Thomas and Danny" / "with Thomas, Danny and Mike" /
+ *  "with Thomas, Danny and 3 others". */
+export function withLine(names: readonly string[]): string | null {
+  const { shown, others } = withNames(names);
+  if (shown.length === 0) return null;
+  if (shown.length === 1) return `with ${shown[0]}`;
+  if (others > 0) return `with ${shown[0]}, ${shown[1]} and ${others} others`;
+  if (shown.length === 2) return `with ${shown[0]} and ${shown[1]}`;
+  return `with ${shown[0]}, ${shown[1]} and ${shown[2]}`;
 }
 
 export interface SlideTag { hole?: number; par?: number | null; place?: CoursePlace }
