@@ -13,17 +13,20 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import fs from 'node:fs';
 import path from 'node:path';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
-import { BoardTable, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
+import { BoardTable, boardHasMovementMark, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
+import { wonByUnitKey } from '@/features/tourhub/leaderboard/leaderboardRules';
 import { islandDescriptor } from '@/features/tourhub/components/tourIslandRules';
 
 const f = vi.hoisted(() => ({
   entries: [] as BoardEntry[],
   meta: { current_round: 2, status: 'inprogress' as string | null } as Record<string, unknown>,
+  tees: [] as unknown[],
   live: [{ id: 'event', name: 'Event', status: 'inprogress', currentRound: 2, tourSlug: 'pga' }] as unknown[],
 }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '', i18n: { language: 'en' } }), Trans: () => null }));
 vi.mock('@/features/tourhub/hooks/useLiveTournaments', () => ({ useLiveTournaments: () => ({ data: f.live, isLoading: false }) }));
-vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: f.entries, isLoading: false }), useTourTeeTimesEnriched: () => ({ data: [] }) }));
+vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: f.entries, isLoading: false }), useTourTeeTimesEnriched: () => ({ data: f.tees }) }));
+vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/heroStateLine', () => ({ heroStateLine: (_t: unknown, st: { kind: string; round?: number; afterRound?: number | null }) => `STATE:${st.kind}:${st.round ?? ''}:${st.afterRound ?? ''}` }));
 vi.mock('@/features/tourhub/leaderboard/useTournamentMeta', () => ({ useTournamentMeta: () => ({ data: f.meta }) }));
 vi.mock('@/features/tourhub/leaderboard/useTourPlayerFollows', () => ({ useTourPlayerFollows: () => ({ ids: new Set(), toggle: vi.fn() }) }));
 vi.mock('@/features/tourhub/hooks/useAIPredictions', () => ({ useAIPredictions: () => ({ data: null }) }));
@@ -36,7 +39,7 @@ const entry = (id: string, position = 1): BoardEntry => ({ id, position, score: 
 const cut = { kind: 'none' as const, cutline: null, extraCount: 0 };
 const mount = (node: React.ReactNode) => render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>);
 const mountTab = () => mount(<LeaderboardTab />);
-afterEach(() => { cleanup(); f.entries = []; f.meta = { current_round: 2, status: 'inprogress' }; });
+afterEach(() => { cleanup(); f.entries = []; f.meta = { current_round: 2, status: 'inprogress' }; f.tees = []; });
 
 describe('Leaderboards page — islands, not a header bar', () => {
   it('the live tab renders outside TourPageShell, under the shared islands', () => {
@@ -69,24 +72,24 @@ describe('Leaderboards page — top block', () => {
     expect(v.container.querySelector('.tour-event-title-line')).toBeNull();
     expect(v.container.querySelector('.tour-board-stats')).toBeNull();
   });
-  it('live below the field gate shows LEAD, ON COURSE and LOW TODAY, no average', () => {
+  it('live below the field gate shows ON COURSE and LOW TODAY, no lead and no average', () => {
     f.entries = Array.from({ length: 19 }, (_, i) => ({ ...entry(`p${i}`, i + 1), thru: 18 }));
     f.entries.push({ ...entry('out', 20), thru: 3 });
     const v = mountTab();
-    expect(v.container.querySelector('[data-stat="lead"]')).not.toBeNull();
+    expect(v.container.querySelector('[data-stat="lead"]')).toBeNull();
     expect(v.container.querySelector('[data-stat="oncourse"]')).not.toBeNull();
     const low = v.container.querySelector<HTMLElement>('[data-stat="low"]');
     expect(low).not.toBeNull();
     expect(low?.querySelector('b')?.firstChild?.textContent).toBe('−2');
     expect(v.container.querySelector('[data-stat="average"]')).toBeNull();
   });
-  it('live at the gate adds FIELD AVERAGE TODAY as the fourth cell', () => {
+  it('live at the gate adds FIELD AVERAGE TODAY as the third cell', () => {
     f.entries = Array.from({ length: 20 }, (_, i) => ({ ...entry(`p${i}`, i + 1), thru: 18 }));
     f.entries.push({ ...entry('out', 21), thru: 3 });
     const v = mountTab();
     const cells = v.container.querySelectorAll('.tour-board-figures > div[data-stat]');
     expect(v.container.querySelector('[data-stat="average"]')).not.toBeNull();
-    expect(cells.length).toBe(4);
+    expect(cells.length).toBe(3);
   });
   it('finished shows WON BY / FIELD, ROUND n / LOW ROUND', () => {
     f.meta = { current_round: 4, status: 'closed' };
@@ -169,5 +172,60 @@ describe('Leaderboards page — the board at the overview board sizes', () => {
     const sheet = source('src/features/tourhub/tournament-v2/sections/FullBoardSheet.tsx');
     expect(sheet).toContain('<LiveBoard');
     expect(sheet).not.toContain('data-board-round-header');
+  });
+});
+
+describe('Leaderboards page — between rounds and not-yet-started rounds', () => {
+  const r1Only = (id: string, position: number): BoardEntry => ({ id, position, score: -2, thru: null, today: null, today_round: null, round_1: -2, round_2: null, player: { id, full_name: `Player ${id}` } });
+  const legend = (c: HTMLElement) => c.querySelector('.tour-board-section-right > span');
+  it('(a) between rounds: AFTER ROUND 1 kicker, no LIVE marker, no figure row, no legend', () => {
+    f.meta = { current_round: 2, status: 'inprogress', start_date: '2026-11-19', end_date: '2026-11-22' };
+    f.entries = [r1Only('a', 1), { ...r1Only('b', 2), round_1: -1, score: -1 }];
+    const v = mountTab();
+    expect(v.container.querySelectorAll('.tour-board-movement').length).toBe(0);
+    expect(v.container.querySelector('.tour-board-kicker-row')?.textContent).toContain('STATE:live:2:1');
+    expect(v.container.querySelector('.tour-board-live')).toBeNull();
+    expect(v.container.querySelector('.tour-board-figures')).toBeNull();
+    expect(legend(v.container)).toBeNull();
+  });
+  it('(b) between rounds with tee times: venue-zone time in THRU; a started row shows thru', () => {
+    f.meta = { current_round: 2, status: 'inprogress', start_date: '2026-11-19', end_date: '2026-11-22', course_timezone: 'America/New_York' };
+    f.entries = [r1Only('a', 1), { ...r1Only('b', 2), today: -1, today_round: 2, thru: 4 }];
+    f.tees = [{ tee_time: '2026-11-20T17:10:00Z', players: [{ player: { id: 'a' } }] }];
+    const v = mountTab();
+    const cells = Array.from(v.container.querySelectorAll<HTMLElement>('[data-board-thru-cell]')).map(c => c.textContent);
+    expect(cells).toContain('12:10');
+    expect(cells).toContain('4');
+  });
+  it('(c) mid round: started shows thru, unstarted shows tee time, kicker ROUND 2 with LIVE', () => {
+    f.meta = { current_round: 2, status: 'inprogress', start_date: '2026-11-19', end_date: '2026-11-22', timezone: 'America/New_York' };
+    f.entries = [{ ...entry('a'), thru: 9 }, r1Only('b', 2)];
+    f.tees = [{ tee_time: '2026-11-20T18:30:00Z', players: [{ player: { id: 'b' } }] }];
+    const v = mountTab();
+    const cells = Array.from(v.container.querySelectorAll<HTMLElement>('[data-board-thru-cell]')).map(c => c.textContent);
+    expect(cells).toEqual(expect.arrayContaining(['9', '13:30']));
+    expect(v.container.querySelector('.tour-board-kicker-row')?.textContent).toContain('STATE:live:2:');
+    expect(v.container.querySelector('.tour-board-kicker-row')?.textContent).not.toContain('STATE:live:2:1');
+    expect(v.container.querySelector('.tour-board-live')).not.toBeNull();
+  });
+  it('(d) WON BY unit is singular at one shot, plural otherwise', () => {
+    expect(wonByUnitKey(1)).toBe('rebuilt.shot');
+    expect(wonByUnitKey(3)).toBe('rebuilt.shots');
+    expect(source('src/features/tourhub/leaderboard/LeaderboardTab.tsx')).toContain('small: t(wonByUnitKey(lead.lead))');
+  });
+  it('(e) the movement legend renders only when a movement mark exists', () => {
+    const moved = [{ ...entry('a', 1), round_1: 2, round_2: -8, score: -6 }, { ...entry('b', 2), round_1: -4, round_2: 0, score: -4 }];
+    expect(boardHasMovementMark(moved, 2)).toBe(true);
+    f.entries = moved;
+    const v = mountTab();
+    expect(v.container.querySelectorAll('.tour-board-movement').length).toBeGreaterThan(0);
+    expect(legend(v.container)).not.toBeNull();
+    cleanup();
+    const still = [{ ...entry('a', 1), round_1: -4, round_2: -2 }, { ...entry('b', 2), round_1: -2, round_2: -2, score: -4 }];
+    expect(boardHasMovementMark(still, 2)).toBe(false);
+    f.entries = still;
+    const w = mountTab();
+    expect(w.container.querySelectorAll('.tour-board-movement').length).toBe(0);
+    expect(legend(w.container)).toBeNull();
   });
 });

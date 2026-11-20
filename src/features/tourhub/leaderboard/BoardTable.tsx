@@ -302,6 +302,16 @@ export function boardMovementMap(entries: BoardEntry[], currentRound: number | n
   );
 }
 
+/** True when at least one non-demoted row draws a movement mark (same map the rows read). */
+export function boardHasMovementMark(entries: BoardEntry[], currentRound: number | null | undefined): boolean {
+  const map = boardMovementMap(entries, currentRound ?? null);
+  return entries.some((e) => {
+    if (isDemoted(e.status)) return false;
+    const mov = map.get(e.player?.id ?? e.team?.id ?? e.id);
+    return mov != null && mov !== 0;
+  });
+}
+
 /** Fixed width of the R1..Rn block — never sized to its content. */
 export function boardRoundsWidth(c: BoardColumns): number {
   return c.rounds.length * c.cellW + Math.max(0, c.rounds.length - 1) * c.gap;
@@ -674,8 +684,7 @@ export function BoardTable({
     const todayVal = todayFromEntry(e, currentRound);
     // THRU must agree with the live round: if the active round has not started
     // for this player, the stale top-level thru (yesterday's "F") is hidden.
-    const thruEmpty = demotedRow || todayVal == null;
-    const thruDisplay = thruEmpty ? '' : fmtThru(e.thru);
+    const thruDisplay = demotedRow ? '' : todayVal == null ? (e.player?.id && teeTimes?.[e.player.id]) || '' : fmtThru(e.thru);
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const pid = e.player?.id;
     const mov = !demotedRow ? movementMap.get(pid ?? e.team?.id ?? e.id) : undefined;

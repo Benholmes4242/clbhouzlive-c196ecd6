@@ -11,10 +11,8 @@
     "playerPage": "Player page",
     "followError": "Could not update your follow. Try again.",
     "onCourse": "{{count}} of {{field}} on course",
-    "tied": "tied",
+    "shot": "shot",
     "shots": "shots",
-    "atTop": "AT THE TOP",
-    "lead": "{{name}}’S LEAD",
     "fieldAverage": "FIELD AVG TODAY",
     "lowToday": "LOW TODAY",
     "players": "{{count}} players"

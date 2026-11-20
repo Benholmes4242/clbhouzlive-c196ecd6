@@ -3,6 +3,30 @@ import type { BoardEntry } from './BoardTable';
 import { isDemotedStatus } from '../_shared/resultStatus';
 import { surnameOf } from '../_shared/playerName';
 import { fmtScore } from '../utils/fmtScore';
+import { venueTee } from '../components/overview-v3/upcomingOverviewRules';
+import { formatTimeHm24 } from '@/i18n/format';
+
+/** WON BY unit: singular at exactly one shot. */
+export function wonByUnitKey(margin: number | null | undefined): 'rebuilt.shot' | 'rebuilt.shots' {
+  return margin === 1 ? 'rebuilt.shot' : 'rebuilt.shots';
+}
+
+/** playerId -> tee label in the course's own zone (overview hero single-zone
+ * rule), falling back to 24h formatting. One builder for pre-tournament and
+ * not-yet-started rounds. */
+export function teeTimeLabels(groups: Array<{ tee_time?: string | null; players?: Array<{ player?: { id?: string | null } | null }> | null }> | null | undefined, zone: string | null | undefined): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const g of groups ?? []) {
+    if (!g?.tee_time) continue;
+    const label = venueTee(g.tee_time, zone)?.time ?? formatTimeHm24(g.tee_time);
+    if (!label) continue;
+    for (const p of g.players ?? []) {
+      const id = p?.player?.id;
+      if (id) map[id] = label;
+    }
+  }
+  return map;
+}
 
 export const FIELD_GATE = 20;
 export function fieldAverageToday(entries: BoardEntry[], round?: number | null) {

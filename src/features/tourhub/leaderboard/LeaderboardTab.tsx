@@ -16,6 +16,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { formatTournamentDateRange } from '@/i18n/format';
+import { betweenRounds } from '../components/overview-v3/liveStateRules';
+import { roundsFromSchedule } from '../components/overview-v3/HybridHero.utils';
+import { boardHasMovementMark } from './BoardTable';
+import { teeTimeLabels, wonByUnitKey } from './leaderboardRules';
 import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard, useTourTeeTimesEnriched } from '../hooks/useTourHubData';
@@ -47,6 +51,7 @@ import { heroStartDay } from '../tournament-v2/data/tournamentRules';
 import { TOUR_LIVE_GREEN } from '../_shared/tokens';
 import './leaderboard.css';
 import { isRetiredTour } from '../constants/tourMap';
+import { isDemotedStatus } from '../_shared/resultStatus';
 import { stripEventSponsorClause } from '../_shared/eventName';
 
 
@@ -222,9 +227,8 @@ export function LeaderboardTab() {
   const { data: meta } = useTournamentMeta(selected?.id ?? null);
   const { data: boardRaw, isLoading: boardLoading, isError: boardError, refetch: refetchBoard } = useTourLeaderboard(selected?.id ?? '');
 
-  // PRE-TOURNAMENT ONLY: the board carries no tee time, so R1 tee times come
-  // from the EXISTING enriched tee-times hook. Passing '' keeps the query
-  // disabled the moment anyone has posted a score, so live boards are unchanged.
+  // The board carries no tee time, so tee times come from the existing
+  // enriched tee-times hook (rules below).
   const preTournament =
     (boardRaw ?? []).length > 0 &&
     (boardRaw ?? []).every(
@@ -236,20 +240,21 @@ export function LeaderboardTab() {
         e.round_3 == null &&
         e.round_4 == null,
     );
-  const { data: teeTimeRows } = useTourTeeTimesEnriched(preTournament ? selected?.id ?? '' : '', 1);
-  const teeTimes = useMemo(() => {
-    const map: Record<string, string> = {};
-    for (const g of (teeTimeRows ?? []) as any[]) {
-      const label = g.tee_time
-        ? new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-        : '';
-      for (const p of g.players ?? []) {
-        const id = p.player?.id;
-        if (id && label) map[id] = label;
-      }
-    }
-    return map;
-  }, [teeTimeRows]);
+  // BETWEEN ROUNDS / NOT YET STARTED: the same afterRound rule as the Tour
+  // overview hero (HybridHero.tsx), so both pages agree. Tee times are read for
+  // R1 before the tournament and for the current round while anyone active has
+  // not started it; once everyone has teed off the query stays disabled.
+  const hookEntries: BoardEntry[] = boardRaw ?? [];
+  const hookRound = meta?.current_round ?? selected?.currentRound ?? null;
+  const hookLive = (meta?.status ?? selected?.status ?? '').toLowerCase() === 'inprogress';
+  const totalRounds = roundsFromSchedule(meta?.start_date ?? selected?.start_date, meta?.end_date ?? selected?.end_date);
+  const done = betweenRounds(hookEntries, hookRound, meta?.current_round_status);
+  const afterRound = hookLive && done != null && done < totalRounds ? done : null;
+  const someoneUnstarted = hookLive && hookRound != null && hookEntries.some(e => !isDemotedStatus(e.status) && todayFromEntry(e, hookRound) == null);
+  const teeRound = preTournament ? 1 : (afterRound != null || someoneUnstarted) ? hookRound ?? null : null;
+  const { data: teeTimeRows } = useTourTeeTimesEnriched(teeRound != null ? selected?.id ?? '' : '', teeRound ?? 1);
+  const teeZone = meta?.course_timezone ?? meta?.timezone ?? null;
+  const teeTimes = useMemo(() => teeTimeLabels(teeTimeRows as any[] | undefined, teeZone), [teeTimeRows, teeZone]);
 
   useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
@@ -371,7 +376,7 @@ export function LeaderboardTab() {
   const stateLine = finished
     ? heroStateLine(t, { kind: 'results' })
     : isLive
-      ? heroStateLine(t, suspended ? { kind: 'suspended', round: currentRound ?? 1 } : { kind: 'live', round: currentRound ?? 1 })
+      ? heroStateLine(t, suspended ? { kind: 'suspended', round: currentRound ?? 1 } : { kind: 'live', round: currentRound ?? 1, afterRound })
       : startDay
         ? heroStateLine(t, { kind: 'upcoming', startDay })
         : null;
@@ -383,14 +388,13 @@ export function LeaderboardTab() {
   const lowSmall = low ? (low.lowPlayers.length > 1 ? t('rebuilt.players', { count: low.lowPlayers.length }) : surnameOf(low.lowPlayers[0]?.player?.full_name ?? low.lowPlayers[0]?.team?.display_name ?? '')) : undefined;
   const figures: Array<{ key: string; value: string; small?: string; label: string; color?: string }> = [];
   if (isLive) {
-    if (lead) figures.push({ key: 'lead', value: lead.count > 1 ? String(lead.count) : String(lead.lead ?? '—'), small: t(lead.count > 1 ? 'rebuilt.tied' : 'rebuilt.shots'), label: lead.count > 1 ? t('rebuilt.atTop') : t('rebuilt.lead', { name: leaderName }) });
     if (inProgress) figures.push({ key: 'oncourse', value: String(onCourse), small: t('rebuilt.ofField', { field: boardEntries.length, defaultValue: `of ${boardEntries.length}` }), label: t('rebuilt.onCourseLabel', { defaultValue: 'ON COURSE' }) });
     if (low) figures.push({ key: 'low', value: fmtScore(low.low), small: lowSmall, label: t('rebuilt.lowToday'), color: getScoreColor(low.low, 'dark') });
     if (field) figures.push({ key: 'average', value: fmtAvgToPar(field.avg), label: t('rebuilt.fieldAverage'), color: getScoreColor(field.avg, 'dark') });
   } else if (finished) {
     if (lead) figures.push(lead.count > 1
       ? { key: 'wonby', value: t('rebuilt.playoff', { defaultValue: 'PLAYOFF' }), label: t('rebuilt.wonBy', { name: leaderName, defaultValue: `${leaderName} WON BY` }) }
-      : { key: 'wonby', value: String(lead.lead ?? '—'), small: t('rebuilt.shots'), label: t('rebuilt.wonBy', { name: leaderName, defaultValue: `${leaderName} WON BY` }) });
+      : { key: 'wonby', value: String(lead.lead ?? '—'), small: t(wonByUnitKey(lead.lead)), label: t('rebuilt.wonBy', { name: leaderName, defaultValue: `${leaderName} WON BY` }) });
     if (field) figures.push({ key: 'fieldround', value: fmtAvgToPar(field.avg), label: t('rebuilt.fieldRound', { round: currentRound, defaultValue: `FIELD, ROUND ${currentRound}` }), color: getScoreColor(field.avg, 'dark') });
     if (low) figures.push({ key: 'lowround', value: fmtScore(low.low), small: lowSmall, label: t('rebuilt.lowRound', { defaultValue: 'LOW ROUND' }), color: getScoreColor(low.low, 'dark') });
   }
@@ -403,7 +407,7 @@ export function LeaderboardTab() {
       <div className="tour-board-section-head">
         <h2 className="tour-board-section-title">{t('rebuilt.leaderboard')}</h2>
         <div className="tour-board-section-right">
-          {(currentRound ?? 0) > 1 && <span>{t('rebuilt.placesSince', { round: (currentRound ?? 1) - 1 })}</span>}
+          {(currentRound ?? 0) > 1 && boardHasMovementMark(boardEntries, currentRound) && <span>{t('rebuilt.placesSince', { round: (currentRound ?? 1) - 1 })}</span>}
           <button
             type="button"
             className="tour-board-search-btn"
@@ -457,7 +461,7 @@ export function LeaderboardTab() {
       <div className="tour-board-top">
         <div className="tour-board-kicker-row">
           <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{kicker}</span>
-          {isLive && !suspended ? (
+          {isLive && !suspended && afterRound == null ? (
             <span className="tour-board-live"><i aria-hidden />{t('rebuilt.live', { defaultValue: 'LIVE' })}</span>
           ) : suspended ? (
             <LiveMarker status={metaStatus} currentRound={currentRound} />
