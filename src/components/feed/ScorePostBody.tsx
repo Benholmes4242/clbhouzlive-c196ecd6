@@ -2,7 +2,7 @@
  * ScorePostBody — THE STANDARD NEW SCORE POST BODY (FN1/FN1.5).
  *
  * Extracted from ExploreCard's scoreLed branch so the Featured round /
- * Round of the week card (FEATURED_ROUND_OPTION_A) renders the SAME body
+ * Round of the week card renders the SAME body
  * rather than a rebuilt one: the big NET with to-par and the NET label,
  * GROSS (with to-par), HANDICAP and AWARDS when present, the course name,
  * and the animated net line (RoundTilePlot: net only, never gross; not
@@ -13,8 +13,9 @@
  * shape has settled, a computable per-hole allowance. No net row = no NET
  * cell, no line; GROSS, HANDICAP (if known) and AWARDS still show.
  * Engagement is NOT part of this body — FeedCard appends the shared
- * media-first footer on score posts; FeaturedRoundCard renders its own
- * actions row.
+ * media-first footer on score posts; standalone featured slots retain their
+ * actions row. Only an opt-in featCell replaces AWARDS, so ordinary callers
+ * retain identical scoring, layout and award artwork.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,7 +32,7 @@ import { RoundTilePlot } from './roundTilePlot';
 
 const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 
-export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPar, shape, received, scoreId, medals, course, surfaceColor = FEED_CARD_SURFACE, showPlot = true }: {
+export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPar, shape, received, scoreId, medals, course, surfaceColor = FEED_CARD_SURFACE, showPlot = true, featCell }: {
   net: number | null;
   gross: number | null;
   coursePar: number | null;
@@ -47,6 +48,8 @@ export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPa
   /** ExploreCard's scoreLed branch draws a photo instead when feedPlot is
    *  off; the featured card always draws the plot. Default true. */
   showPlot?: boolean;
+  /** Featured figure only: replaces AWARDS without changing any score facts. */
+  featCell?: { value: string; label: string };
 }) {
   const { t } = useTranslation();
   const nettable = courseHandicap != null && (shape ? received != null : true);
@@ -79,7 +82,7 @@ export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPa
             <span style={{ ...cellLabel, marginTop: 6 }}>{t('amateur.stream.stat.gross', 'Gross')}</span>
           </span>
         ) : <span />}
-        <span style={{ display: 'flex', gap: hasAwards ? 18 : 22, paddingBottom: 16, flex: '0 0 auto' }}>
+        <span style={{ display: 'flex', gap: hasAwards || featCell ? 18 : 22, paddingBottom: 16, flex: '0 0 auto' }}>
           {netShown && gross != null ? (
             <span data-round-score-gross="true" style={{ textAlign: 'center' }}>
               <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap' }}>
@@ -95,7 +98,12 @@ export function ScorePostBody({ net, gross, coursePar, courseHandicap, grossToPa
               <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.handicap', 'Handicap')}</span>
             </span>
           ) : null}
-          {hasAwards && medals ? (
+          {featCell ? (
+            <span data-round-score-feat="true" style={{ textAlign: 'center', flex: 'none', color: 'var(--featured-round-gold)' }}>
+              <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, whiteSpace: 'nowrap' }}>{featCell.value}</span>
+              <span style={{ ...cellLabel, marginTop: 5, color: 'var(--featured-round-gold)' }}>{featCell.label}</span>
+            </span>
+          ) : hasAwards && medals ? (
             <span data-round-score-awards="true" style={{ textAlign: 'center', flex: 'none' }}>
               <AwardCluster gold={medals.gold} silver={medals.silver} bronze={medals.bronze} surfaceColor={surfaceColor} figureSize={17} />
               <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.awards', 'Awards')}</span>

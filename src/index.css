@@ -21,6 +21,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Option B's explicit no-800 exception is local to the featured card.
+   The canonical competition glyph, read and every other host stay unchanged. */
+[data-featured-card] [data-featured-competition] > span {
+  font-weight: 700 !important;
+}
+
 .keyboard-done-pill.keyboard-done-pill {
   position: fixed;
   right: 12px;
@@ -56,6 +62,8 @@
 }
 
 :root {
+  --featured-round-gold: #FBBC2E;
+  --featured-round-rule: linear-gradient(90deg, #FBBC2E, rgba(251,188,46,0));
   --keyboard-done-glass: rgba(22,22,26,0.6);
   --keyboard-done-edge: rgba(255,255,255,0.18);
   --keyboard-done-ink: #F8FAFC;

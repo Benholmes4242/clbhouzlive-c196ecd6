@@ -58,7 +58,7 @@ function mount(patch: Partial<FeaturedRound> = {}) {
   );
 }
 
-it('danny.akers1: body NET 68 −2, GROSS 67 −3, HANDICAP +1; header feat is the net to-par −2', () => {
+it('danny.akers1: body NET 68 −2, GROSS 67 −3, HANDICAP +1; kicker is Under par without a duplicate gold cell', () => {
   h.net = { netScore: 68, courseHandicap: -1 };
   const { container } = mount();
   // The big body figure is NET, never the gross −3.
@@ -69,10 +69,9 @@ it('danny.akers1: body NET 68 −2, GROSS 67 −3, HANDICAP +1; header feat is t
   expect(gross.textContent).toContain('67');
   expect(gross.querySelector('[data-round-score-gross-topar="true"]')!.textContent).toBe('−3');
   expect(container.querySelector('[data-round-score-handicap="true"]')!.textContent).toContain('+1');
-  // Tier 3 low_round: the header feat is the NET to-par, never gross.
-  const feat = container.querySelector('[data-featured-feat-figure="true"]')!;
-  expect(feat.textContent).toContain('−2');
-  expect(feat.textContent).not.toContain('−3');
+  // Tier 3 low_round: the NET hero alone owns its figure.
+  expect(container.querySelector('[data-featured-feat-name]')?.textContent).toBe('courseDetail.featured.underPar');
+  expect(container.querySelector('[data-round-score-feat="true"]')).toBeNull();
 });
 
 it('the body line is the net line and its end point agrees with the NET cell', () => {

@@ -1,0 +1,119 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+load errors []
+state feed-record-390 errors []
+state rail-record-390 errors []
+state feed-birdies-390 errors []
+state rail-birdies-390 errors []
+state feed-record-320 errors []
+state rail-record-320 errors []
+state feed-birdies-320 errors []
+state rail-birdies-320 errors []
+{
+  "results": [
+    {
+      "state": "feed-record-390",
+      "kicker": "Featured \u00b7 Course record",
+      "feat": "74Record",
+      "featColour": "rgb(251, 188, 46)",
+      "awards": false,
+      "footer": true,
+      "ownActions": false,
+      "byline": "Fri, Nov 20 \u00b7 BMDwith Benjamin, mikem84 and Danny",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    },
+    {
+      "state": "rail-record-390",
+      "kicker": "Round of the week \u00b7 Course record",
+      "feat": "74Record",
+      "featColour": "rgb(251, 188, 46)",
+      "awards": false,
+      "footer": false,
+      "ownActions": true,
+      "byline": "Fri, Nov 20",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    },
+    {
+      "state": "feed-birdies-390",
+      "kicker": "Featured \u00b7 6 birdies in a row",
+      "feat": null,
+      "featColour": null,
+      "awards": true,
+      "footer": true,
+      "ownActions": false,
+      "byline": "Fri, Nov 20 \u00b7 BMDwith Benjamin, mikem84 and Danny",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    },
+    {
+      "state": "rail-birdies-390",
+      "kicker": "Round of the week \u00b7 6 birdies in a row",
+      "feat": null,
+      "featColour": null,
+      "awards": true,
+      "footer": false,
+      "ownActions": true,
+      "byline": "Fri, Nov 20",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    },
+    {
+      "state": "feed-record-320",
+      "kicker": "Featured \u00b7 Course record",
+      "feat": "74Record",
+      "featColour": "rgb(251, 188, 46)",
+      "awards": false,
+      "footer": true,
+      "ownActions": false,
+      "byline": "Fri, Nov 20 \u00b7 BMDwith Benjamin, mikem84 and Danny",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    },
+    {
+      "state": "rail-record-320",
+      "kicker": "Round of the week \u00b7 Course record",
+      "feat": "74Record",
+      "featColour": "rgb(251, 188, 46)",
+      "awards": false,
+      "footer": false,
+      "ownActions": true,
+      "byline": "Fri, Nov 20",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    },
+    {
+      "state": "feed-birdies-320",
+      "kicker": "Featured \u00b7 6 birdies in a row",
+      "feat": null,
+      "featColour": null,
+      "awards": true,
+      "footer": true,
+      "ownActions": false,
+      "byline": "Fri, Nov 20 \u00b7 BMDwith Benjamin, mikem84 and Danny",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    },
+    {
+      "state": "rail-birdies-320",
+      "kicker": "Round of the week \u00b7 6 birdies in a row",
+      "feat": null,
+      "featColour": null,
+      "awards": true,
+      "footer": false,
+      "ownActions": true,
+      "byline": "Fri, Nov 20",
+      "bylineEllipsis": "ellipsis",
+      "overflow": false,
+      "font800": 0
+    }
+  ],
+  "pageErrors": []
+}

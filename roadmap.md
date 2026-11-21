@@ -1,5 +1,11 @@
 # Roadmap
 
+## Complete: Featured round Option B
+- Shared gold hairline/kicker, normal identity/follow row and opt-in fourth feat cell; scoring/trigger/follow/read rules unchanged. Home feed reuses the normal round footer and played-with sheet; rail/Explore keep their own actions.
+- Five new featuredRoundOptionB cases; only authorised header-feature assertions in featuredRoundChamp/featuredRoundNet rewritten, every assertion and rename quoted in the report; no tests deleted. Baseline 9,402/842 files → 9,407/843 files, delta +five named cases.
+- Focused 72/72; four separate sequential shards pass 2,311 / 2,292 / 2,353 / 2,451. Final eight 390/320 actual-card fixture captures pass overflow, resolved no-800, cell/footer, share and played-with-sheet checks; no page errors. Report/full logs/screenshots: .lovable/reports/featured-round-option-b/.
+- Preview build OK; authenticated live readback unavailable with external_unmanaged authentication, not claimed by the isolated captures.
+
 ## Complete: Bottom navigation Tour live label — preview error correction
 - Tour alone reads Live / Tour, live now from its existing live state; preserve plain labels, colours, geometry and routes.
 - Three new navTourLiveLabel cases pass; existing tests unchanged. Four separate sequential shards pass 2,311 / 2,292 / 2,349 / 2,450 = 9,402 across 842 files; baseline 9,399 + three named cases.

@@ -820,14 +820,28 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
   if (rendersRoundCard) {
     const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources, roundCourseMeta);
-    const roundEngagement = {
-      likeCount,
-      liked,
-      likeAvailable: true,
-      commentCount,
-      onToggleLike: () => onLike(post, effectiveActor),
-      onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
-    };
+    // Featured and ordinary score-led posts share the round reaction context and footer.
+    const roundFooter = () => renderFooter(FOOTER_GUTTER, false, {
+          caption: null,
+          addComment,
+          likedByRound: postRound?.whsScoreId ? {
+            subjectId: postRound.whsScoreId,
+            isOwnRound: item.who?.is_viewer === true,
+            subject: {
+              authorName: post.displayName ?? null,
+              authorUserId: post.actorType === 'personal' ? post.userId : null,
+              actorType: post.actorType,
+              courseId: item.subject?.course_id ?? null,
+              courseName: item.subject?.course_name ?? null,
+              kind: 'round',
+              gross: item.facts.gross ?? null,
+              toPar: item.facts.to_par ?? null,
+              net: item.facts.net ?? null,
+              netToPar: item.facts.net != null && item.facts.course_par != null ? item.facts.net - item.facts.course_par : null,
+              rating: null,
+            },
+          } : undefined,
+        });
     /* FEATURED ROUNDS — Home only (consequence sources are Home's). A
        qualifying round renders the shared hero; its reaction and comments are
        the same post-like path as the ordinary card, which routes to
@@ -845,12 +859,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             shape={roundShape ?? null}
             medals={roundMedals ?? null}
             isCompetition={roundCompetition === true}
-            engagement={roundEngagement}
             square
             isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
             onFollow={mountFollowPill && onFollow ? () => onFollow(post) : undefined}
             onOpen={() => onRoundTap?.(post, postRound)}
+            onWhoTap={() => onProfile(post)}
+            playedWithFaces={withPeople ? <PlayedWithNameFaces people={withPeople} onOpen={() => setWithSheetOpen(true)} /> : undefined}
+            renderPlayedWithByline={withPeople ? () => <PlayedWithByline people={withPeople} onOpen={() => setWithSheetOpen(true)} style={{ display: 'inline', maxWidth: '100%' }} /> : undefined}
           />
+          {roundFooter()}
+          {withSheet}
         </article>
       );
     }
@@ -903,27 +921,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             isOwnRound: item.who?.is_viewer === true,
           }}
         />
-        {scoreLed ? renderFooter(FOOTER_GUTTER, false, {
-          caption: null,
-          addComment,
-          likedByRound: postRound?.whsScoreId ? {
-            subjectId: postRound.whsScoreId,
-            isOwnRound: item.who?.is_viewer === true,
-            subject: {
-              authorName: post.displayName ?? null,
-              authorUserId: post.actorType === 'personal' ? post.userId : null,
-              actorType: post.actorType,
-              courseId: item.subject?.course_id ?? null,
-              courseName: item.subject?.course_name ?? null,
-              kind: 'round',
-              gross: item.facts.gross ?? null,
-              toPar: item.facts.to_par ?? null,
-              net: item.facts.net ?? null,
-              netToPar: item.facts.net != null && item.facts.course_par != null ? item.facts.net - item.facts.course_par : null,
-              rating: null,
-            },
-          } : undefined,
-        }) : null}
+        {scoreLed ? roundFooter() : null}
         {withSheet}
       </article>
     );

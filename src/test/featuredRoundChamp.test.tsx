@@ -1,8 +1,7 @@
 /**
- * FEATURED_ROUND_OPTION_A — the Featured round / Round of the week card is
- * the standard score post body under a champion-block header. No photograph,
- * wash, gold frame, pill or static trace; the header carries the gold ring,
- * the per-surface label, the name, "<date> · Following" and the feat figure.
+ * FEATURED_ROUND_OPTION_B — the shared score post is marked once in gold.
+ * No photograph, wash, gold frame, pill or static trace; the kicker names
+ * the feat and figure feats replace only the fourth stat cell.
  */
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -45,7 +44,7 @@ function mount(patch: Partial<FeaturedRound> = {}, props: Record<string, unknown
   );
 }
 
-describe('FEATURED_ROUND_OPTION_A', () => {
+describe('FEATURED_ROUND_OPTION_B', () => {
   it('renders no photograph, pill, gold frame or static trace', () => {
     const { container } = mount();
     expect(container.querySelector('img')).toBeNull();
@@ -66,23 +65,27 @@ describe('FEATURED_ROUND_OPTION_A', () => {
     expect(champ.textContent).not.toContain('courseDetail.featured.label');
   });
 
-  it('course record renders the gross figure with the COURSE RECORD unit', () => {
+  it('course record renders its kicker and gross fourth cell with the Record label', () => {
     const { container } = mount();
-    const feat = container.querySelector('[data-featured-feat-figure="true"]')!;
+    const feat = container.querySelector('[data-round-score-feat="true"]');
+    if (!feat) throw new Error('Missing featured fourth cell');
     expect(feat.textContent).toContain('74');
-    expect(feat.textContent?.toUpperCase()).toContain('COURSEDETAIL.FEATURED.COURSERECORD');
+    expect(feat.textContent).toContain('Record');
+    expect(container.querySelector('[data-featured-feat-name]')?.textContent).toBe('courseDetail.featured.courseRecord');
   });
 
-  it('hole in one renders the words alone, no unit', () => {
+  it('hole in one renders the words in the kicker, no gold cell', () => {
     const { container } = mount({ tier: 1, reason: 'hole_in_one', holes_in_one: 1 });
-    const words = container.querySelector('[data-featured-feat-words="true"]')!;
+    const words = container.querySelector('[data-featured-feat-name]');
+    if (!words) throw new Error('Missing feat kicker');
     expect(words.textContent).toBe('courseDetail.featured.holeInOne');
-    expect(container.querySelector('[data-featured-feat-figure="true"]')).toBeNull();
+    expect(container.querySelector('[data-round-score-feat="true"]')).toBeNull();
   });
 
-  it('birdie run renders the run words alone', () => {
+  it('birdie run renders the run words in the kicker', () => {
     const { container } = mount({ tier: 3, reason: 'birdie_run', birdie_run: 5 });
-    const words = container.querySelector('[data-featured-feat-words="true"]')!;
+    const words = container.querySelector('[data-featured-feat-name]');
+    if (!words) throw new Error('Missing feat kicker');
     expect(words.textContent).toBe('courseDetail.featured.birdieRun');
   });
 
