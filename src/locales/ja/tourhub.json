@@ -118,6 +118,10 @@
     }
   },
   "overview": {
+    "recap": {
+      "seasonOver": "The {{year}} season is over. ",
+      "nextUp": "NEXT UP"
+    },
     "news": {
       "title": "News",
       "all": "All news",

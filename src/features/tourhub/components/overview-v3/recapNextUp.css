@@ -1,0 +1,22 @@
+/* Signed-off recap-only material differs from GLASS_CARD; colours are global
+ * semantic tokens. This inert footer does not restyle other photo bands. */
+.recap-next-up {
+  margin-top: 16px;
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: var(--recap-next-up-glass);
+  border: 1px solid var(--recap-next-up-edge);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--recap-next-up-ink);
+}
+.recap-next-up-event { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.recap-next-up-kicker { font-size: 9.5px; font-weight: 700; letter-spacing: .15em; color: var(--recap-next-up-accent); margin-bottom: 4px; }
+.recap-next-up-name { display: block; font-size: 15px; font-weight: 700; line-height: 1.2; }
+.recap-next-up-place { font-size: 12px; font-weight: 400; color: var(--recap-next-up-place); margin-top: 3px; }
+.recap-next-up-countdown { flex: none; text-align: right; }
+.recap-next-up-countdown b { display: block; font-size: 26px; font-weight: 700; line-height: 1; }
+.recap-next-up-countdown div { font-size: 10px; font-weight: 700; letter-spacing: .14em; color: var(--recap-next-up-unit); margin-top: 6px; text-transform: uppercase; }

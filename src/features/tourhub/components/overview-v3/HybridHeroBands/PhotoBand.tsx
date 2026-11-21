@@ -1,7 +1,7 @@
 /** The full-bleed, tappable photograph used only by the Tour Overview carousel.
  *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: no "Full board ›" kicker link in ANY
  *  state — the Full leaderboard button under the board owns that navigation. */
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useState, type RefObject, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOverviewBandReady } from '../overviewShells';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
@@ -60,6 +60,8 @@ interface PhotoBandProps {
   /** Tournament page only: the collapsing header observes this full-name h1. */
   titleRef?: RefObject<HTMLHeadingElement>;
   segments?: HeadlineSegment[];
+  /** Recap only: follows its sentence within the existing content block. */
+  footer?: ReactNode;
   note?: string | null;
   /** Season recap only: replaces the tour/state kicker verbatim. */
   kicker?: string | null;
@@ -89,6 +91,7 @@ export function PhotoBand({
   onOpen,
   titleRef,
   segments = [],
+  footer,
   note,
   kicker,
   figure,
@@ -244,6 +247,7 @@ export function PhotoBand({
         {segments.length > 0 ? <p data-overview-photo-situation style={{ margin: `${OVERVIEW_SENTENCE_MARGIN_TOP}px 0 0`, fontSize: OVERVIEW_SENTENCE_FONT_SIZE, lineHeight: OVERVIEW_SENTENCE_LINE_HEIGHT, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
           {segments.map((segment, index) => segment.figure ? <strong key={index} style={{ fontWeight: 700, fontStyle: 'normal', color: 'var(--th-text-primary)', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' }}>{segment.text}</strong> : <span key={index}>{segment.text}</span>)}
         </p> : null}
+        {footer}
         {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
         {inPlay ? <RoundSpine round={afterRound ?? state.round} between={afterRound != null} totalRounds={state.totalRounds} suspended={pauseSpine && isSuspended} /> : null}
       </div>

@@ -56,17 +56,17 @@ function wrap(node: React.ReactNode) {
 
 describe('between-seasons rule', () => {
   const at = (iso: string) => new Date(`${iso}T12:00:00Z`);
-  it('exports the constants', () => { expect(RECAP_AFTER_DAYS).toBe(7); expect(RECAP_NEXT_EVENT_WINDOW_DAYS).toBe(21); });
-  it('7+ days after the last event with nothing in 21 days → recap', () => {
+  it('exports the constants', () => { expect(RECAP_AFTER_DAYS).toBe(3); expect(RECAP_NEXT_EVENT_WINDOW_DAYS).toBe(21); });
+  it('3+ days after the last event with nothing in 21 days → recap', () => {
     expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: null, raceFinal: false, now: at('2026-10-19') })).toBe(true);
     expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: '2027-01-20', raceFinal: false, now: at('2026-11-09') })).toBe(true);
   });
   it('a next event within 21 days → no recap', () => {
     expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: '2026-11-20', raceFinal: true, now: at('2026-11-09') })).toBe(false);
   });
-  it('within 7 days and not final → no recap; final → recap', () => {
-    expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: null, raceFinal: false, now: at('2026-10-15') })).toBe(false);
-    expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: null, raceFinal: true, now: at('2026-10-15') })).toBe(true);
+  it('within 3 days and not final → no recap; final → recap', () => {
+    expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: null, raceFinal: false, now: at('2026-10-13') })).toBe(false);
+    expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: null, raceFinal: true, now: at('2026-10-13') })).toBe(true);
   });
   it('1 January with a loaded next event → upcoming; with none → recap stays', () => {
     expect(isBetweenSeasons({ lastEnd: '2026-10-11', seasonYear: 2026, nextStart: '2027-03-01', raceFinal: false, now: at('2027-01-01') })).toBe(false);
@@ -91,16 +91,15 @@ describe('between-seasons rule', () => {
 });
 
 describe('recap band', () => {
-  it('renders kicker, title, final-event place line, points figure and Korn Ferry sentence', () => {
+  it('renders kicker, title and Korn Ferry season-over sentence without final-event line or points figure', () => {
     const { container } = wrap(<RecapPhotoBand slide={slide('pgad')} state={results} data={kf()} onOpen={() => {}} />);
     const band = container.querySelector('[data-overview-photo-band]')!;
     expect(band.getAttribute('data-overview-photo-state')).toBe('recap');
     expect(band.textContent).toContain('KORN FERRY TOUR · 2026 SEASON');
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('The season in review');
-    expect(band.textContent).toContain('Final event · The Federal Club · 8–11 Oct');
-    const fig = container.querySelector('[data-overview-recap-figure]')!;
-    expect(fig.textContent).toBe('2,221Steelman');
-    expect(container.querySelector('[data-overview-photo-situation]')!.textContent).toBe('Steelman topped the points list. The top 20 earned PGA TOUR cards for 2027.');
+    expect(band.textContent).not.toContain('Final event · The Federal Club · 8–11 Oct');
+    expect(container.querySelector('[data-overview-recap-figure]')).toBeNull();
+    expect(container.querySelector('[data-overview-photo-situation]')?.textContent).toBe('The 2026 season is over. Steelman topped the points list. The top 20 earned PGA TOUR cards for 2027.');
   });
   it.each([
     ['euro', 'Steelman won the Race to Dubai.'],
@@ -109,12 +108,12 @@ describe('recap band', () => {
     ['champ', 'Steelman won the Charles Schwab Cup.'],
   ])('sentence copy for %s', (tour, sentence) => {
     const data = tour === 'euro' || tour === 'champ' ? kf({ cardLine: null }) : kf();
-    expect(recapSentence(tour as never, data, 2026, t).map((s) => s.text).join('')).toBe(sentence);
+    expect(recapSentence(tour as never, data, 2026, t).map((s) => s.text).join('')).toBe(`The 2026 season is over. ${sentence}`);
   });
   it('stale standings hide the figure and use the winners sentence', () => {
     const { container } = wrap(<RecapPhotoBand slide={slide('pgad')} state={results} data={stale(kf())} onOpen={() => {}} />);
     expect(container.querySelector('[data-overview-recap-figure]')).toBeNull();
-    expect(container.querySelector('[data-overview-photo-situation]')!.textContent).toBe('20 different winners across 25 events.');
+    expect(container.querySelector('[data-overview-photo-situation]')?.textContent).toBe('The 2026 season is over. 20 different winners across 25 events.');
   });
 });
 
@@ -149,11 +148,11 @@ describe('recap body', () => {
     const cells = [...container.querySelectorAll('[data-recap-fact]')].map((c) => [c.getAttribute('data-recap-fact'), c.querySelector('b')!.textContent]);
     expect(cells).toEqual([['events', '25'], ['winners', '20'], ['cards', '20'], ['youngest', '19']]);
   });
-  it('facts row without a card line: MOST WINS with surname, or players on a tie', () => {
+  it('facts row without a card line: MOST WINS with surname, or number only on a tie', () => {
     expect(recapFactCells({ events: 30, winners: 22, maxWins: 3, mostWinsSurname: 'Hojgaard', tiedLeaders: 1, cards: null, youngest: null, tiedLabel: (n) => `${n} players` }))
       .toEqual([{ key: 'events', value: '30' }, { key: 'winners', value: '22' }, { key: 'mostWins', value: '3', small: 'Hojgaard' }]);
     expect(recapFactCells({ events: 30, winners: 22, maxWins: 2, mostWinsSurname: null, tiedLeaders: 3, cards: null, youngest: null, tiedLabel: (n) => `${n} players` })[2])
-      .toEqual({ key: 'mostWins', value: '2', small: '3 players' });
+      .toEqual({ key: 'mostWins', value: '2' });
   });
   it('stale standings hide the board, card list and CARDS/YOUNGEST', () => {
     const { container } = wrap(<SeasonRecapBody tour="pgad" year={2026} data={stale(kf())} />);

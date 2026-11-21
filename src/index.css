@@ -62,6 +62,12 @@
 }
 
 :root {
+  --recap-next-up-glass: rgba(255,255,255,0.08);
+  --recap-next-up-edge: rgba(255,255,255,0.12);
+  --recap-next-up-ink: #F8FAFC;
+  --recap-next-up-place: rgba(248,250,252,0.7);
+  --recap-next-up-unit: rgba(248,250,252,0.62);
+  --recap-next-up-accent: #F7931E;
   --featured-round-gold: #FBBC2E;
   --featured-round-rule: linear-gradient(90deg, #FBBC2E, rgba(251,188,46,0));
   --keyboard-done-glass: rgba(22,22,26,0.6);

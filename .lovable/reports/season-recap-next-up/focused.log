@@ -1,0 +1,15 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/seasonRecapPgaStandings.test.ts (5 tests) 43ms
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/seasonRecapNextUp.test.tsx (22 tests) 513ms
+ ✓ src/test/seasonRecap.test.tsx (31 tests) 779ms
+
+ Test Files  3 passed (3)
+      Tests  58 passed (58)
+   Start at  20:32:01
+   Duration  13.64s (transform 4.29s, setup 1.37s, collect 11.79s, tests 1.33s, environment 7.91s, prepare 944ms)
+

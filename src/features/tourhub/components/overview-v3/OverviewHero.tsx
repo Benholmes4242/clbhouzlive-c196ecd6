@@ -19,7 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
 
-import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
+import { useHeroCarouselData, type HeroSlide, type HeroTournament } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { RailChips } from '@/components/ui/RailChips';
 import { OVERVIEW_TOUR_ORDER, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
@@ -62,6 +62,7 @@ export const OVERVIEW_HERO_TOTAL_HEIGHT = `${OVERVIEW_PHOTO_BAND_HEIGHT}px`;
 export function OverviewHero({ height }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
+  const [now, setNow] = useState(() => new Date());
   const carouselQuery = useHeroCarouselData();
   const { data: carouselSlides = [], isLoading: carouselLoading } = carouselQuery;
   /* URGENT_FIX §3: every overview tour always has a slide. The fallback only
@@ -75,20 +76,19 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const recapsQuery = useOverviewRecaps(!carouselLoading);
   const { data: recapCandidates } = recapsQuery;
   const recaps = useMemo(() => {
-    const out = new Map<string, OverviewRecapCandidate>();
+    const out = new Map<string, OverviewRecapCandidate & { nextTournament: HeroTournament | null }>();
     if (!recapCandidates) return out;
-    const now = new Date();
     for (const [tour, candidate] of recapCandidates) {
       const own = mergedSlides.filter((s) => s.tournament.tourSlug === tour);
       if (own.some((s) => s.type === 'live')) continue;
-      const nextStart = own
+      const nextTournament = own
         .filter((s) => s.type === 'upcoming' && s.tournament.startDate && new Date(s.tournament.startDate).getTime() >= now.getTime() - 86_400_000)
-        .map((s) => s.tournament.startDate)
-        .sort()[0] ?? null;
-      if (isBetweenSeasons({ lastEnd: candidate.last.endDate ?? null, seasonYear: candidate.last.seasonYear ?? null, nextStart, raceFinal: candidate.raceFinal, now })) out.set(tour, candidate);
+        .sort((a, b) => a.tournament.startDate.localeCompare(b.tournament.startDate))[0]?.tournament ?? null;
+      const nextStart = nextTournament?.startDate ?? null;
+      if (isBetweenSeasons({ lastEnd: candidate.last.endDate ?? null, seasonYear: candidate.last.seasonYear ?? null, nextStart, raceFinal: candidate.raceFinal, now })) out.set(tour, { ...candidate, nextTournament });
     }
     return out;
-  }, [recapCandidates, mergedSlides]);
+  }, [recapCandidates, mergedSlides, now]);
   const rawSlides = useMemo(() => {
     if (recaps.size === 0) return mergedSlides;
     const kept = mergedSlides.filter((s) => !recaps.has(s.tournament.tourSlug));
@@ -200,7 +200,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const viewingSlug = activeSlide?.tournament.tourSlug;
   const viewingTid = activeSlide?.tournament.id ?? null;
   const activeRecap = activeSlide && recaps.get(activeSlide.tournament.tourSlug)?.last.id === activeSlide.tournament.id
-    ? recaps.get(activeSlide.tournament.tourSlug)!
+    ? recaps.get(activeSlide.tournament.tourSlug) ?? null
     : null;
   const recapQuery = useSeasonRecap(
     activeRecap ? (activeRecap.last.tourSlug as TourId) : null,
@@ -217,7 +217,6 @@ export function OverviewHero({ height }: OverviewHeroProps) {
    * useHeroCarouselData.
    */
   const recapData = recapQuery.data;
-  const [now, setNow] = useState(() => new Date());
   const heroState = useMemo(
     () => (activeSlide ? deriveHeroState(activeSlide.tournament, now) : null),
     [activeSlide, now],
@@ -424,7 +423,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           style={{ height: activeHeroHeight === 'auto' ? 'auto' : '100%' }}
         >
           {activeRecap ? (
-            <RecapPhotoBand slide={active} state={heroState} data={recapData} onOpen={openTournament} />
+            <RecapPhotoBand slide={active} state={heroState} data={recapData} nextTournament={activeRecap.nextTournament} now={now} onOpen={openTournament} />
           ) : <HybridHero
             slide={active}
             state={heroState}

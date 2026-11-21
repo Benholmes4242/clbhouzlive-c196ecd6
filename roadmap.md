@@ -1,5 +1,12 @@
 # Roadmap
 
+## Stopped verification: Season recap Next up
+- Implemented the shared three-day handover, season-over copy and loaded-next-event footer; removed recap points/final-event line and tied-player subline. Standings, card lists, live priority and January hand-back preserved.
+- Height ruling received: preserve today's growing photo; Next up follows the sentence within the existing content block, and content stays clear of the top islands. No sizing change needed.
+- Focused checks passed 58/58 across three files. Added seasonRecapNextUp: 22 cases; seasonRecap retains 31 cases with authorised rule/assertion changes and four named case renames recorded in the report.
+- Shard 1 stopped: 2,376 passed / 1 failed of 2,377, 215 files; tourOverviewHeroFixes.test.tsx:68:86 expected 'Champions · STARTS 14 JAN', received 'Champions · Starts 14 JAN'. No failing-test edits, reruns, shards 2–4 or captures after the stop.
+- Inventory baseline 9,624 / 856 → expected 9,646 / 857 (+22 cases / one file); full passing total unverified. Remaining shards/captures await a ruling on the prior kicker assertion. Full output/report: .lovable/reports/season-recap-next-up/.
+
 ## Stopped verification: Tour overview hero fixes
 - Live fact columns, shared six-day event-zone start wording/FIRST TEE gating, and full WonChart names with wrapping keys implemented.
 - Focused checks: 62 passed / 1 failed of 63; tourOverviewHeroFixes.test.tsx:68:86 expected 'Champions · STARTS 14 JAN', received 'Champions · Starts 14 JAN'. Failed assertion unchanged; no rerun or shards.

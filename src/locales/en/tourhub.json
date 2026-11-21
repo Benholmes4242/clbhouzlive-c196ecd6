@@ -287,6 +287,8 @@
       "in": "IN"
     },
     "recap": {
+      "seasonOver": "The {{year}} season is over. ",
+      "nextUp": "NEXT UP",
       "kicker": "{{tour}} · {{year}} SEASON",
       "title": "The season in review",
       "finalEvent": "Final event · {{venue}}",

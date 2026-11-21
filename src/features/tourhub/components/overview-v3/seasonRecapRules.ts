@@ -5,6 +5,8 @@
  *   (its most recent completed event ended more than RECAP_AFTER_DAYS ago
  *    OR its tour_races row for that season has status 'final')
  *   AND it has no event starting within RECAP_NEXT_EVENT_WINDOW_DAYS.
+ * Every overview tour rolls on after the shared three-day results handover,
+ * with no per-tour setup or gap before the recap.
  * From 1 January of the following year, ANY loaded next event (at any
  * distance) ends the recap and that event's upcoming slide shows; with no next
  * event loaded the recap stays.
@@ -18,8 +20,9 @@
  * WINNERS / MOST WINS facts. A stale list is never shown as FINAL.
  */
 import type { TourId } from '../../hooks/useOverviewData';
+import { RESULTS_HANDOVER_DAYS } from './HybridHero.utils';
 
-export const RECAP_AFTER_DAYS = 7;
+export const RECAP_AFTER_DAYS = RESULTS_HANDOVER_DAYS;
 export const RECAP_NEXT_EVENT_WINDOW_DAYS = 21;
 const DAY = 86_400_000;
 
@@ -132,7 +135,7 @@ export function recapFactCells(args: {
     if (args.youngest != null) out.push({ key: 'youngest', value: String(args.youngest) });
   } else if (args.maxWins > 0) {
     out.push(args.tiedLeaders > 1
-      ? { key: 'mostWins', value: String(args.maxWins), small: args.tiedLabel(args.tiedLeaders) }
+      ? { key: 'mostWins', value: String(args.maxWins) }
       : { key: 'mostWins', value: String(args.maxWins), small: args.mostWinsSurname ?? undefined });
   }
   return out;

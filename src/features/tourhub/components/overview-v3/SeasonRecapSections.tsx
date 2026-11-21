@@ -3,8 +3,9 @@ import { overviewQueryReady, useOverviewBandReady } from './overviewShells';
 /**
  * SEASON RECAP SURFACES (rules: seasonRecapRules.ts; data: useSeasonRecap.ts).
  * RecapPhotoBand renders the shared PhotoBand with the recap kicker, title,
- * final-event place line, points figure and sentence — same start line and
- * bottom anchoring as every state, no spine. SeasonRecapBody renders under the
+ * season-over sentence and loaded-next-event footer, without a final-event
+ * line or points figure. The footer shares the upcoming countdown and adds
+ * no reads. SeasonRecapBody renders under the
  * tour buttons: facts, final standings, card list and Our record. Every list
  * part renders only from fresh standings (isFreshStandings).
  * Recap headings/cells reuse completedWeek.css rhythm. CARD LIST A: the card
@@ -17,7 +18,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { HeroSlide } from '../../hooks/useHeroCarouselData';
+import type { HeroSlide, HeroTournament } from '../../hooks/useHeroCarouselData';
 import type { TourId } from '../../hooks/useOverviewData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { useOurPickRecord } from '../../hooks/usePickInsights';
@@ -26,7 +27,7 @@ import type { HeadlineSegment } from '../../overview/magazineCopy';
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { OurRecordSheet } from './HybridHeroBands/OurRecordSheet';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
-import { formatOverviewDateRange } from './HybridHero';
+import { formatOverviewDateRange, getOverviewCountdown } from './HybridHero';
 import type { HeroState } from './HybridHero.utils';
 import {
   RECAP_CARD_LIST_MAX, fmtPoints, recapFactCells, recapPronoun, surname, youngestEarner,
@@ -35,14 +36,17 @@ import { playerRoute } from '../../routes';
 import type { SeasonRecapData } from './useSeasonRecap';
 import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import '../../tournament-v2/sections/completedWeek.css';
+import './recapNextUp.css';
 
 const playersRace = (tour: TourId) => `/tourhub?tab=players&tour=${encodeURIComponent(tour)}`;
 
 export function recapSentence(tour: TourId, data: SeasonRecapData | undefined, seasonYear: number, t: (k: string, o?: Record<string, unknown>) => string): HeadlineSegment[] {
   if (!data) return [];
+  const seasonOver: HeadlineSegment = { text: t('overview.recap.seasonOver', { year: seasonYear }), figure: false };
   const winner = data.standings?.[0];
   if (winner) {
     const segs: HeadlineSegment[] = [
+      seasonOver,
       { text: surname(winner.name), figure: true },
       { text: ` ${t(`overview.recap.raceVerb.${tour}`)}.`, figure: false },
     ];
@@ -53,6 +57,7 @@ export function recapSentence(tour: TourId, data: SeasonRecapData | undefined, s
   }
   if (data.winners <= 0 || data.events <= 0) return [];
   return [
+    seasonOver,
     { text: String(data.winners), figure: true },
     { text: t('overview.recap.winnersA'), figure: false },
     { text: String(data.events), figure: true },
@@ -60,19 +65,37 @@ export function recapSentence(tour: TourId, data: SeasonRecapData | undefined, s
   ];
 }
 
-export function RecapPhotoBand({ slide, state, data, onOpen }: { slide: HeroSlide; state: HeroState; data: SeasonRecapData | undefined; onOpen: () => void }) {
+/** Presentational footer: only the earliest upcoming tournament already loaded
+ * for this recap's tour is passed in; no independent reads or tap target. */
+export function RecapNextUp({ tournament, now }: { tournament: HeroTournament; now: Date }) {
+  const { t } = useTranslation('tourhub');
+  const countdown = getOverviewCountdown(tournament.startDate, now)[0];
+  const venueDates = [tournament.venueName, formatOverviewDateRange(tournament.startDate, tournament.endDate)].filter(Boolean).join(' · ');
+  return <div data-recap-next-up className="recap-next-up">
+    <div className="recap-next-up-event">
+      <div className="recap-next-up-kicker">{t('overview.recap.nextUp')}</div>
+      <b className="recap-next-up-name">{tournament.name}</b>
+      {venueDates ? <div data-recap-next-up-place className="recap-next-up-place">{venueDates}</div> : null}
+    </div>
+    {countdown ? <div className="recap-next-up-countdown">
+      <b data-recap-next-up-value className="tabular-nums">{countdown.value}</b>
+      <div data-recap-next-up-unit>{t(`overview.upcomingPlus.${countdown.label}`, { count: countdown.value })}</div>
+    </div> : null}
+  </div>;
+}
+
+export function RecapPhotoBand({ slide, state, data, nextTournament = null, now = new Date(), onOpen }: { slide: HeroSlide; state: HeroState; data: SeasonRecapData | undefined; nextTournament?: HeroTournament | null; now?: Date; onOpen: () => void }) {
   const { t } = useTranslation('tourhub');
   const tm = slide.tournament;
   const tour = tm.tourSlug as TourId;
   const venueAdapter = useMemo(() => [{ id: tm.id, venue_name: tm.venueName, venue_course_name: tm.venueCourseName, venue_city: tm.venueCity, venue_state: tm.venueState, venue_country: tm.venueCountry }], [tm.id, tm.venueName, tm.venueCourseName, tm.venueCity, tm.venueState, tm.venueCountry]);
   const { data: imageMap } = useBatchCourseImages(venueAdapter);
-  const winner = data?.standings?.[0];
   const year = tm.seasonYear ?? new Date(tm.endDate ?? tm.startDate).getUTCFullYear();
   return (
     <PhotoBand
       title={t('overview.recap.title')}
-      venueName={tm.venueName ? t('overview.recap.finalEvent', { venue: tm.venueName }) : null}
-      datesString={tm.startDate ? formatOverviewDateRange(tm.startDate, tm.endDate) : null}
+      venueName={null}
+      datesString={null}
       venueImageUrl={imageMap?.get(tm.id) ?? null}
       state={state}
       tourLabel={null}
@@ -83,8 +106,9 @@ export function RecapPhotoBand({ slide, state, data, onOpen }: { slide: HeroSlid
       startDay={null}
       heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
       onOpen={onOpen}
-      figure={winner?.points != null ? { value: fmtPoints(winner.points), caps: surname(winner.name) } : null}
+      figure={null}
       segments={recapSentence(tour, data, year, t)}
+      footer={nextTournament ? <RecapNextUp tournament={nextTournament} now={now} /> : null}
     />
   );
 }
