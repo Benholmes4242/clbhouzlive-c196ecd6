@@ -23,7 +23,7 @@ import type { CourseGroup } from '@/components/courses/browse/WhoPlayingSection'
 import type { RailPlan } from '@/components/courses/browse/playedRings';
 import type { usePlayedTile } from '@/components/courses/browse/usePlayedTile';
 const course = { id: 'course', name: 'St Andrews Links (Jubilee Course)', imageUrl: 'https://photo/fallback.jpg', region: 'Fife', subCountry: 'Scotland', country: 'Britain & Ireland', continent: 'Europe', lat: null, lng: null } satisfies PlayedCourse;
-const group = { courseId: 'course', activity: 3, rows: [{ whs_score_id: 'round', course_id: 'course', course_name: course.name, user_id: 'member', display_name: 'Member', profile_photo_url: null, gross_score: 70, course_par: 72, play_date: '2026-11-20', total_count: 1 }], reviews: [], posts: 0, faces: [], best: null, latestAt: '2026-11-20' } as CourseGroup;
+const group = { courseId: 'course', activity: 3, rows: [{ whs_score_id: 'round', course_id: 'course', course_name: course.name, user_id: 'member', display_name: 'Member', profile_photo_url: null, gross_score: 70, course_par: 72, play_date: '2026-11-20', total_count: 1 }], reviews: [], posts: 0, faces: [], best: null, latestDate: '2026-11-20', latestKey: 'round:round' } as CourseGroup;
 const rail = { key: 'home', kind: 'home', nations: ['Scotland'], kicker: 'ACROSS SCOTLAND', title: 'Played lately', courseIds: ['course'], playedTotal: 1, activity: 3 } as RailPlan;
 function wrap(ui: React.ReactNode) { return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter>{ui}</MemoryRouter></QueryClientProvider>); }
 const mountRail = () => wrap(<RegionRails rails={[rail]} groups={[group]} courseMap={new Map([['course', course]])} onOpen={vi.fn()} />);

@@ -28,7 +28,7 @@ TypeError: Cannot redefine property: IntersectionObserver
 
 No test was repaired or rerun after the failure. Full output: `.lovable/reports/rail-tile-shapes/focused.log`.
 
-The completed-edit preview also reports this surviving type error:
+The original completed-edit preview reported this type error (now resolved by the fixture-only follow-up below):
 
 ```text
 --- typecheck ---
@@ -41,7 +41,7 @@ src/test/railTileShapes.test.tsx(26,15): error TS2352: Conversion of type '{ cou
 Type '{ courseId: string; activity: number; rows: { whs_score_id: string; course_id: string; course_name: string; user_id: string; display_name: string; profile_photo_url: null; gross_score: number; course_par: number; play_date: string; total_count: number; }[]; reviews: ...; posts: number; faces: ...; best: null; latest...' is missing the following properties from type 'CourseGroup': latestDate, latestKey
 ```
 
-The fixture was left untouched under the explicit STOP rule. The app is not reported as passing or complete.
+Follow-up: corrected only the new fixture at railTileShapes.test.tsx:26, replacing unsupported latestAt with required latestDate and latestKey. No test name or assertion changed; the 22 observer setup failures remain untouched and were not rerun. Preview harness: build OK at 2026-11-21T14:11:19Z. Full-suite verification remains stopped.
 
 ## Suite accounting and shards
 Supplied last passing baseline: 9,491 tests / 848 files.
