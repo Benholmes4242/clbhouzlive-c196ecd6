@@ -1,0 +1,17 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/postReviewTab.test.tsx (2 tests) 229ms
+ ✓ src/test/navSq1.test.tsx (3 tests) 248ms
+ ✓ src/test/navTourLiveLabel.test.tsx (3 tests) 512ms
+ ✓ src/test/roundsGateNav.test.tsx (6 tests) 678ms
+   ✓ Locked rounds navigation > renders accessible visible nav above the body shade and card in the same effective stacking context  381ms
+
+ Test Files  4 passed (4)
+      Tests  14 passed (14)
+   Start at  09:36:02
+   Duration  7.25s (transform 1.12s, setup 1.30s, collect 8.49s, tests 1.67s, environment 7.68s, prepare 1.78s)
+

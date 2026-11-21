@@ -1,0 +1,254 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+{
+  "results": [
+    {
+      "width": 390,
+      "live": false,
+      "screenshot": "tour-390.png",
+      "nav": {
+        "x": 11,
+        "width": 368,
+        "centre": 195
+      },
+      "slots": [
+        {
+          "x": 19,
+          "width": 66.171875,
+          "centre": 52.0859375
+        },
+        {
+          "x": 87.171875,
+          "width": 66.1875,
+          "centre": 120.265625
+        },
+        {
+          "x": 155.359375,
+          "width": 79.28125,
+          "centre": 195
+        },
+        {
+          "x": 236.640625,
+          "width": 66.171875,
+          "centre": 269.7265625
+        },
+        {
+          "x": 304.8125,
+          "width": 66.1875,
+          "centre": 337.90625
+        }
+      ],
+      "button": {
+        "x": 304.8125,
+        "width": 66.1875,
+        "centre": 337.90625
+      },
+      "icon": {
+        "x": 326.40625,
+        "width": 23,
+        "centre": 337.90625
+      },
+      "label": {
+        "x": 322.890625,
+        "width": 30.015625,
+        "centre": 337.8984375
+      },
+      "text": "Tour",
+      "aria": "Tour",
+      "colour": "rgba(255, 255, 255, 0.62)",
+      "labelStyle": {
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "tracking": "1.17px",
+        "transform": "uppercase"
+      },
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "live": true,
+      "screenshot": "live-390.png",
+      "nav": {
+        "x": 11,
+        "width": 368,
+        "centre": 195
+      },
+      "slots": [
+        {
+          "x": 19,
+          "width": 66.171875,
+          "centre": 52.0859375
+        },
+        {
+          "x": 87.171875,
+          "width": 66.1875,
+          "centre": 120.265625
+        },
+        {
+          "x": 155.359375,
+          "width": 79.28125,
+          "centre": 195
+        },
+        {
+          "x": 236.640625,
+          "width": 66.171875,
+          "centre": 269.7265625
+        },
+        {
+          "x": 304.8125,
+          "width": 66.1875,
+          "centre": 337.90625
+        }
+      ],
+      "button": {
+        "x": 304.8125,
+        "width": 66.1875,
+        "centre": 337.90625
+      },
+      "icon": {
+        "x": 326.40625,
+        "width": 23,
+        "centre": 337.90625
+      },
+      "label": {
+        "x": 325.5625,
+        "width": 24.6875,
+        "centre": 337.90625
+      },
+      "text": "Live",
+      "aria": "Tour, live now",
+      "colour": "rgba(52, 215, 127, 0.62)",
+      "labelStyle": {
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "tracking": "1.17px",
+        "transform": "uppercase"
+      },
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "live": false,
+      "screenshot": "tour-320.png",
+      "nav": {
+        "x": 11,
+        "width": 298,
+        "centre": 160
+      },
+      "slots": [
+        {
+          "x": 19,
+          "width": 49.4375,
+          "centre": 43.71875
+        },
+        {
+          "x": 70.4375,
+          "width": 57.203125,
+          "centre": 99.0390625
+        },
+        {
+          "x": 129.640625,
+          "width": 59.21875,
+          "centre": 159.25
+        },
+        {
+          "x": 190.859375,
+          "width": 58.703125,
+          "centre": 220.2109375
+        },
+        {
+          "x": 251.5625,
+          "width": 49.4375,
+          "centre": 276.28125
+        }
+      ],
+      "button": {
+        "x": 251.5625,
+        "width": 49.4375,
+        "centre": 276.28125
+      },
+      "icon": {
+        "x": 264.78125,
+        "width": 23,
+        "centre": 276.28125
+      },
+      "label": {
+        "x": 261.265625,
+        "width": 30.015625,
+        "centre": 276.2734375
+      },
+      "text": "Tour",
+      "aria": "Tour",
+      "colour": "rgba(255, 255, 255, 0.62)",
+      "labelStyle": {
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "tracking": "1.17px",
+        "transform": "uppercase"
+      },
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "live": true,
+      "screenshot": "live-320.png",
+      "nav": {
+        "x": 11,
+        "width": 298,
+        "centre": 160
+      },
+      "slots": [
+        {
+          "x": 19,
+          "width": 49.4375,
+          "centre": 43.71875
+        },
+        {
+          "x": 70.4375,
+          "width": 57.203125,
+          "centre": 99.0390625
+        },
+        {
+          "x": 129.640625,
+          "width": 59.21875,
+          "centre": 159.25
+        },
+        {
+          "x": 190.859375,
+          "width": 58.703125,
+          "centre": 220.2109375
+        },
+        {
+          "x": 251.5625,
+          "width": 49.4375,
+          "centre": 276.28125
+        }
+      ],
+      "button": {
+        "x": 251.5625,
+        "width": 49.4375,
+        "centre": 276.28125
+      },
+      "icon": {
+        "x": 264.78125,
+        "width": 23,
+        "centre": 276.28125
+      },
+      "label": {
+        "x": 263.9375,
+        "width": 24.6875,
+        "centre": 276.28125
+      },
+      "text": "Live",
+      "aria": "Tour, live now",
+      "colour": "rgba(52, 215, 127, 0.62)",
+      "labelStyle": {
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "tracking": "1.17px",
+        "transform": "uppercase"
+      },
+      "overflow": false
+    }
+  ],
+  "pageErrors": []
+}

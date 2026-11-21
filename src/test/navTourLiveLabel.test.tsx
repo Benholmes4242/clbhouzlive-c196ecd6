@@ -22,7 +22,7 @@ const mount = () => render(<MemoryRouter><GlobalBottomNavigation /></MemoryRoute
 describe('Tour live navigation label', () => {
   it('(a) not live shows Tour with the Tour accessible name', () => {
     mount();
-    const button = screen.getByRole('button', { name: 'Tour', exact: true });
+    const button = screen.getByRole('button', { name: 'Tour' });
     expect(within(button).getByText('Tour')).toBeInTheDocument();
     expect(button).toHaveAttribute('aria-label', 'Tour');
     expect(within(button).queryByText('Live')).toBeNull();
@@ -31,7 +31,7 @@ describe('Tour live navigation label', () => {
   it('(b) live shows Live with Tour, live now and the existing live colour', () => {
     state.live = true;
     const view = mount();
-    const button = screen.getByRole('button', { name: 'Tour, live now', exact: true });
+    const button = screen.getByRole('button', { name: 'Tour, live now' });
     const label = within(button).getByText('Live');
     expect(button).toHaveAttribute('aria-label', 'Tour, live now');
     const colour = document.createElement('span');
@@ -52,9 +52,9 @@ describe('Tour live navigation label', () => {
       state.live = live;
       const view = mount();
       for (const label of ['Home', 'Explore', 'Courses']) {
-        expect(within(screen.getByRole('button', { name: label, exact: true })).getByText(label)).toBeInTheDocument();
+        expect(within(screen.getByRole('button', { name: label })).getByText(label)).toBeInTheDocument();
       }
-      const post = screen.getByRole('button', { name: 'Post or review', exact: true });
+      const post = screen.getByRole('button', { name: 'Post or review' });
       expect(within(post).getByText('Post')).toBeInTheDocument();
       expect(within(post).getByText('Review')).toBeInTheDocument();
       view.unmount();
