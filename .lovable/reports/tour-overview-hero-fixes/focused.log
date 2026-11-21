@@ -1,0 +1,44 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/heroBlocks.test.tsx (15 tests) 151ms
+ ✓ src/test/completedWeekFacts.test.tsx (31 tests) 297ms
+ ❯ src/test/tourOverviewHeroFixes.test.tsx (13 tests | 1 failed) 189ms
+   ✓ Tour overview hero fixes > LiveFacts with 4 cells declares equal columns 57ms
+   ✓ Tour overview hero fixes > LiveFacts with 3 cells declares equal columns 8ms
+   ✓ Tour overview hero fixes > startDayForm uses the required form at 0 days 25ms
+   ✓ Tour overview hero fixes > startDayForm uses the required form at 6 days 1ms
+   ✓ Tour overview hero fixes > startDayForm uses the required form at 7 days 1ms
+   ✓ Tour overview hero fixes > startDayForm uses the required form at 53 days 1ms
+   ✓ Tour overview hero fixes > heroStartDayForm preserves its output at 2 days 3ms
+   ✓ Tour overview hero fixes > heroStartDayForm preserves its output at 10 days 1ms
+   ✓ Tour overview hero fixes > date-only and timestamp starts retain event-zone calendar handling 3ms
+   ✓ Tour overview hero fixes > missing starts and invalid zones retain safe empty and UTC handling 1ms
+   × Tour overview hero fixes > the overview 53-day kicker reads STARTS 14 JAN and excludes FIRST TEE 52ms
+     → expected 'Champions · Starts 14 JAN' to be 'Champions · STARTS 14 JAN' // Object.is equality
+   ✓ Tour overview hero fixes > WonChart keys use all three full names, champion first, with unchanged scores 31ms
+   ✓ Tour overview hero fixes > the won key wraps with a six-pixel row gap and never ellipsizes names 1ms
+ ✓ src/test/upcomingLastYearWon.test.tsx (4 tests) 148ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/tourOverviewHeroFixes.test.tsx > Tour overview hero fixes > the overview 53-day kicker reads STARTS 14 JAN and excludes FIRST TEE
+AssertionError: expected 'Champions · Starts 14 JAN' to be 'Champions · STARTS 14 JAN' // Object.is equality
+
+Expected: [32m"Champions · S[7mTARTS[27m 14 JAN"[39m
+Received: [31m"Champions · S[7mtarts[27m 14 JAN"[39m
+
+ ❯ src/test/tourOverviewHeroFixes.test.tsx:68:86
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 62 passed (63)
+   Start at  20:05:03
+   Duration  9.28s (transform 3.69s, setup 1.35s, collect 16.10s, tests 784ms, environment 7.39s, prepare 868ms)
+

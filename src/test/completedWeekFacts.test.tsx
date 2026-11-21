@@ -187,7 +187,7 @@ describe('finished week chart', () => {
     const rows = field(); rows[2] = { ...rows[2], round_4: 3 } as BoardEntry;
     const { container } = render(<WonChart facts={WWT} rows={rows} tourCode="pga" />);
     const items = [...container.querySelectorAll('[data-won-key-item]')];
-    expect(items.map(i => i.querySelector('.cw-key-name')?.textContent)).toEqual(['Brown', 'Runner', 'Runner']);
+    expect(items.map(i => i.querySelector('.cw-key-name')?.textContent)).toEqual(['Blades Brown', 'First Runner', 'Second Runner']);
     expect(items.map(i => i.querySelector('.cw-key-score')?.textContent)).toEqual([' −9', ' −8', ' +3']);
     expect(items.map(i => i.getAttribute('data-champion'))).toEqual(['true', 'false', 'false']);
     expect(items.map(i => i.getAttribute('data-score-tone'))).toEqual(['under', 'under', 'ink']);

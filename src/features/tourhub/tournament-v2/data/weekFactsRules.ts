@@ -12,7 +12,6 @@
  */
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { copy, cumulative, ordinal, roundScores, score, words } from './tournamentRules';
-import { surnameOf } from '../../_shared/playerName';
 
 export interface WeekFactsPathEntry { round: number; position: number; tied: boolean; to_par: number; back: number | null; lead_by: number | null }
 export interface WeekFactsHoleType { par: number; to_par: number; rank: number; tied: boolean; field: number }
@@ -91,7 +90,7 @@ export function wonChart(f: WeekFacts, rows: BoardEntry[], width: number) {
   const players = [champion, ...next].flatMap(row => {
     const values = Array.from({ length: f.rounds }, (_, i) => cumulative(row, i + 1));
     if (values.some(v => v == null || !Number.isFinite(v))) return [];
-    return [{ id: row.id, name: row === champion ? f.champion_surname ?? surnameOf(row.player?.full_name) : surnameOf(row.player?.full_name), champion: row === champion, values: values as number[] }];
+    return [{ id: row.id, name: row.player?.full_name ?? '', champion: row === champion, values: values as number[] }];
   });
   if (!players.some(p => p.champion)) return null;
   const values = players.flatMap(p => p.values);

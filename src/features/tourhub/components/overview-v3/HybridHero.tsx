@@ -30,7 +30,7 @@ import {upcomingSentence, venueTee} from './upcomingOverviewRules';
 import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { betweenRounds } from './liveStateRules';
 import { formatTimeHm24 } from '@/i18n/format';
-import { startWeekday } from '../../tournament-v2/data/tournamentRules';
+import { startDayForm } from '../../tournament-v2/data/tournamentRules';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -158,8 +158,8 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       });
   const situationNote = visibleSituationNote(tournament.situationNote, state, tournament.endDate, now);
 
-  // ONE ZONE: the overview's full weekday resolves in the FIRST TEE cell's zone.
-  const startDay = startWeekday(tournament.startDate, upcoming.zone);
+  // ONE ZONE: the kicker and FIRST TEE share the six-day start decision.
+  const startDay = startDayForm(tournament.startDate, upcoming.zone, now).text || null;
 
   return (
     <PhotoBand

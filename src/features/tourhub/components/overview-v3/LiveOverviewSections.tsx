@@ -51,7 +51,7 @@ export function LiveFacts({ cells }: { cells: LiveFactCell[] }) {
   const { t } = useTranslation('tourhub');
   if (cells.length === 0) return null;
   return (
-    <div data-live-facts className="upcoming-event-facts live-facts">
+    <div data-live-facts className="upcoming-event-facts live-facts" style={{ gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))` }}>
       {cells.map(c => (
         <div key={c.key} data-live-fact={c.key}>
           <b style={{ ...HERO_TOT_TYPE, ...(c.toPar != null ? { color: getScoreColor(c.toPar, 'dark') } : {}) }}>{c.value}</b>

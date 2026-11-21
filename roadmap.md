@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped verification: Tour overview hero fixes
+- Live fact columns, shared six-day event-zone start wording/FIRST TEE gating, and full WonChart names with wrapping keys implemented.
+- Focused checks: 62 passed / 1 failed of 63; tourOverviewHeroFixes.test.tsx:68:86 expected 'Champions · STARTS 14 JAN', received 'Champions · Starts 14 JAN'. Failed assertion unchanged; no rerun or shards.
+- Added 13 cases / one file: baseline 9,611 / 855 → expected inventory 9,624 / 856; no tests deleted or renamed. Authorized completedWeekFacts surname assertion updated.
+- Corrected required nullable toPar fields in the new fixture only to clear preview types; no assertions changed. Four shards and 390/320 captures await a ruling on the failed test. Full output/report: .lovable/reports/tour-overview-hero-fixes/.
+
 ## Stopped verification: Authorised shard-one rerun
 - Reran unchanged shard 1 exactly once: 2,351 passed / 1 failed of 2,352; 212 passed / 1 failed of 213 files. Same activeRing.test.tsx:202:30 latest-post button lookup failed again.
 - No test or app edits; no further rerun, shards 2–4 or captures. First-paint widening remains visually unverified. Full output: .lovable/reports/rail-resume-verification/shard-1.log.
