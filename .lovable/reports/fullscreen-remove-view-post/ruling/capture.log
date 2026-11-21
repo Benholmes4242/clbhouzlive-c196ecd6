@@ -1,0 +1,101 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+errors before ready []
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE FIRST
+Par 4 · 269 yards
+2
+render errors [] Sundridge Park Golf Club (East Course)
+TH
+Thomas Holmes
+Nov 2026
+THE NINTH
+Par 3 · 175 yards
+0:00 / 0:00
+2
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE FIRST
+Par 4 · 269 yards
+2
+render errors [] Sundridge Park Golf Club (East Course)
+TH
+Thomas Holmes
+Nov 2026
+THE NINTH
+Par 3 · 175 yards
+0:00 / 0:00
+2
+{
+  "findings": [
+    {
+      "state": "woking-photo",
+      "width": 390,
+      "screenshot": "woking-photo-390.png",
+      "tileWidth": 147.25,
+      "tileClientWidth": 145,
+      "tileScrollWidth": 145,
+      "nameHeight": 19.03125,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "15px",
+      "pageOverflow": false,
+      "viewPost": false,
+      "sharedSource": "source-woking",
+      "videoRow": 0
+    },
+    {
+      "state": "sundridge-video",
+      "width": 390,
+      "screenshot": "sundridge-video-390.png",
+      "tileWidth": 147.25,
+      "tileClientWidth": 145,
+      "tileScrollWidth": 145,
+      "nameHeight": 19.03125,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "15px",
+      "pageOverflow": false,
+      "viewPost": false,
+      "sharedSource": "source-sundridge",
+      "videoRow": 1
+    },
+    {
+      "state": "woking-photo",
+      "width": 320,
+      "screenshot": "woking-photo-320.png",
+      "tileWidth": 135.296875,
+      "tileClientWidth": 133,
+      "tileScrollWidth": 133,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "14px",
+      "pageOverflow": false,
+      "viewPost": false,
+      "sharedSource": "source-woking",
+      "videoRow": 0
+    },
+    {
+      "state": "sundridge-video",
+      "width": 320,
+      "screenshot": "sundridge-video-320.png",
+      "tileWidth": 135.296875,
+      "tileClientWidth": 133,
+      "tileScrollWidth": 133,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "14px",
+      "pageOverflow": false,
+      "viewPost": false,
+      "sharedSource": "source-sundridge",
+      "videoRow": 1
+    }
+  ],
+  "pageErrors": []
+}

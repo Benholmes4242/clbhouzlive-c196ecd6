@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/guestStage24.test.tsx (5 tests) 81ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  08:59:59
+   Duration  2.97s (transform 183ms, setup 155ms, collect 338ms, tests 81ms, environment 612ms, prepare 391ms)
+

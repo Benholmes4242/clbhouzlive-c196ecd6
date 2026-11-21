@@ -1,9 +1,9 @@
 # Roadmap
 
-## Stopped verification: Remove course-photo View post
-- Removed only the source-shot button, unused handler/comment and header reference; source actions, stackBottom and frozen siblings unchanged. Only authorised test changes; pf2HoleGuide tap case deleted. Baseline 9,400 → expected 9,399 (-one named case), full pass unverified.
-- Focused 60/60. Sequential shards one 2,311 passed; two 2,292 passed; three 2,348 passed / 1 failed of 2,349. STOP: guestStage24.test.tsx:85:18, `AssertionError: expected [ '/auth' ] to deeply equal [ '/auth', '/' ]` in untouched `after a guest signs in as a member, Auth redirects once`.
-- No repair/rerun, shard four or 390/320 screenshots; requires ruling on unexpected guest-navigation failure. Report/full logs: .lovable/reports/fullscreen-remove-view-post/. Preview build OK.
+## Verified suite: Remove course-photo View post — guest rerun ruling
+- No app or test files changed in this ruling. guestStage24 alone passes 5/5; authorised shard three rerun 2,349/2,349, then shard four 2,447/2,447; retained shards one 2,311 and two 2,292. Full suite 9,399/9,399 across 841 files.
+- Baseline 9,400 → 9,399: only −1, pf2HoleGuide `the tap opens the post and never reaches the slide` deleted by the original brief; no inventory changes in the rerun.
+- Four fresh 390/320 screenshots verify the actual viewer with isolated source-confirmed Sundridge/Woking presentation inputs; no View post, no overflow, source-share callbacks correct. Live source-post shots/playback remain unavailable with external_unmanaged authentication; fixtures are not live-gallery evidence. Report/full logs/screenshots: .lovable/reports/fullscreen-remove-view-post/ruling/.
 
 ## Complete: Actual played strokes and hole-strip app font
 - Pure evaluator actualGross/holeStrokes and actual-first sheet/seed/strip readers implemented; user-authorised hole strip font now inherits the app. Genuine handicap calculations, evaluator versions and prompt/award/notification code unchanged.

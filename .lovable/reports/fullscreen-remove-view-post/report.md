@@ -1,5 +1,7 @@
 # Fullscreen course photos — remove View post
 
+**2026-11-21 rerun ruling: suite stop resolved.** See `ruling/report.md` for the unchanged guest test's standalone pass, authorised shard 3 rerun and shard 4, full 9,399/9,399 reconciliation, fresh isolated presentation screenshots and live-access limitation. The original stopped-run record below is retained verbatim.
+
 ## Implemented; verification stopped
 Removed the source-shot View post block without replacement/spacing, removed the now-unused handleViewSourcePost and its explanatory comment, and updated the header. shotSourcePostId, confirmedSourcePostIds, hasPostActions, stackBottom, source action targets and frozen viewer siblings are unchanged. CourseGalleryChrome and all other View post buttons untouched. No SQL, migrations, feed_config or round_pool_cap changes.
 
