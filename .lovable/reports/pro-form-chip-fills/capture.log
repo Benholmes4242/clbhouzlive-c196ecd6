@@ -1,0 +1,64 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[
+  {
+    "finish": "MC",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-out",
+    "background": "rgba(0, 0, 0, 0)",
+    "color": "rgba(248, 250, 252, 0.42)"
+  },
+  {
+    "finish": "WD",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-out",
+    "background": "rgba(0, 0, 0, 0)",
+    "color": "rgba(248, 250, 252, 0.42)"
+  },
+  {
+    "finish": "T28",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-made",
+    "background": "rgba(255, 255, 255, 0.06)",
+    "color": "rgb(248, 250, 252)"
+  },
+  {
+    "finish": "DQ",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-out",
+    "background": "rgba(0, 0, 0, 0)",
+    "color": "rgba(248, 250, 252, 0.42)"
+  },
+  {
+    "finish": "T3",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-top",
+    "background": "rgba(255, 255, 255, 0.06)",
+    "color": "rgb(248, 250, 252)"
+  },
+  {
+    "finish": "1st",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-win",
+    "background": "rgba(251, 188, 46, 0.12)",
+    "color": "rgb(251, 188, 46)"
+  },
+  {
+    "finish": "T41",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-made",
+    "background": "rgba(255, 255, 255, 0.06)",
+    "color": "rgb(248, 250, 252)"
+  },
+  {
+    "finish": "T10",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-top",
+    "background": "rgba(255, 255, 255, 0.06)",
+    "color": "rgb(248, 250, 252)"
+  },
+  {
+    "finish": "T19",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-made",
+    "background": "rgba(255, 255, 255, 0.06)",
+    "color": "rgb(248, 250, 252)"
+  },
+  {
+    "finish": "MC",
+    "classes": "inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 pro-season-form-chip pro-finish-out",
+    "background": "rgba(0, 0, 0, 0)",
+    "color": "rgba(248, 250, 252, 0.42)"
+  }
+]
+320px actual-component fixture: fills verified, no strip overflow, win chip opens matching result; page errors: []

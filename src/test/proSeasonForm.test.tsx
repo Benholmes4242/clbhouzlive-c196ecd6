@@ -26,6 +26,15 @@ describe('Season shared finish classification', () => {
 });
 
 describe('Season last-ten form', () => {
+  it('form chips carry no ghost variant classes', () => {
+    const { container } = season(['T28', 'T3', '1st', 'MC'].map((finish, i) => event(String(i), { finish })));
+    const formChips = chips(container);
+    expect(formChips).toHaveLength(4);
+    formChips.forEach(chip => {
+      expect(chip).not.toHaveClass('bg-transparent');
+      expect(chip).not.toHaveClass('text-muted-foreground');
+    });
+  });
   it('caps at ten newest finished events across years using See all ordering', () => {
     const events = Array.from({ length: 12 }, (_, i) => event(`e${i}`, { start_date: `${2026-i}-11-01` })).reverse();
     events.push(event('unfinished', { start_date: '2026-12-01', finish: null }));

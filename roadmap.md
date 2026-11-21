@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Pro form chip fills
+- Changed only the form-chip Button on ProSeasonSection.tsx:39 to variant={null} size={null}; added “form chips carry no ghost variant classes”; all existing cases unchanged.
+- Four separate sequential shards passed 2,315 / 2,308 / 2,391 / 2,463 = 9,477 / 9,477 across 848 files; baseline 9,476 / 848, delta +one named case. Full output: .lovable/reports/pro-form-chip-fills/.
+- Actual-component 320px strip capture verifies made/top fills, gold win wash, no strip overflow and matching win-result opening; no page errors, build OK. Isolated presentation input, not authenticated live-profile readback.
+
 ## Verified: Authorised 26 pro-profile test rulings
 - Supplied patch applied unchanged; exact edits match. No extra app/assertion edits; inventory 9,476 / 848 before and after.
 - Four separate sequential shards pass 2,315 / 2,308 / 2,390 / 2,463 = 9,476 / 9,476; prior three pro-profile stops resolved. Build OK.
