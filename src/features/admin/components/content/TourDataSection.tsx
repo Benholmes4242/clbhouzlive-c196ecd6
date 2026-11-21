@@ -250,7 +250,7 @@ export default function TourDataSection({
           <div style={EMPTY}>No tournament this week</div>
         ) : missing.slice(0, missingShown).map((p) => (
           <div key={p.player_id} style={{ ...ROW, cursor: 'default', gridTemplateColumns: '34px minmax(0, 1fr) auto', columnGap: 10 }}>
-            <span style={{ width: 34, height: 34, borderRadius: '34%', background: 'var(--cc3-initials)', display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 700, color: CC3.mute }}>{initials(p.name)}</span>
+            <span style={{ width: 34, height: 34, borderRadius: '34%', background: 'var(--cc3-initials)', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 700, color: CC3.mute }}>{initials(p.name)}</span>
             <span style={{ minWidth: 0 }}>
               <span style={NAME}>{p.name}</span>
               <span style={SUB}>{p.country ?? '-'}{DOT}{p.position != null && p.position !== '' ? 'on the leaderboard' : 'in the field'}</span>
