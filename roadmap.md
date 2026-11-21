@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped verification: Authorised shard-one rerun
+- Reran unchanged shard 1 exactly once: 2,351 passed / 1 failed of 2,352; 212 passed / 1 failed of 213 files. Same activeRing.test.tsx:202:30 latest-post button lookup failed again.
+- No test or app edits; no further rerun, shards 2–4 or captures. First-paint widening remains visually unverified. Full output: .lovable/reports/rail-resume-verification/shard-1.log.
+- Expected before/after inventory unchanged at 9,550 tests / 850 files, delta zero; full passing total not verified.
+
 ## Stopped verification: Rail observer ruling
 - Authorised setup-only assignment/restore applied in railTileShapes.test.tsx; focused rail/autoplay tests pass 28/28, no assertions or names changed.
 - Shard 1: 2,351 passed / 1 failed of 2,352 (213 files). activeRing.test.tsx:202:30 cannot find Open Danny Holmes's latest post. Stopped without repair/rerun; shards 2–4 and captures not run.
