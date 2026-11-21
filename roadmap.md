@@ -1,5 +1,10 @@
 # Roadmap
 
+## Waiting: Season recap Our picks block
+- Implement the heading/link, figures and locale keys scoped to RecapOurRecord; preserve THE SEASON, THE POINTS LIST, sheet and visibility rules.
+- Blocker: the brief requires exact matching to ourPicks_390.html, but that drawing was not supplied/readable. Await its upload before changing the block.
+- After the drawing arrives, add recapOurPicks tests, retain four separate sequential shard logs against baseline 9,660 tests / 859 files, and capture the block at 390/320.
+
 ## Complete: Live board tee availability and leaders’ course time
 - Gate the between-round tee column on a successful read containing a valid tee time; preserve the specified no-tee layout and all other columns.
 - Pass the live board’s zone to LeadersGroup and reuse venueTee, preserving device-time formatting without a zone; confirm empty tee sections self-hide.
