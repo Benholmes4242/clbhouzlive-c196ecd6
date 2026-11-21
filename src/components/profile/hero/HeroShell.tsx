@@ -14,7 +14,7 @@
  */
 import React from 'react';
 import { FallbackCover } from './FallbackCover';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
@@ -118,7 +118,7 @@ export const HeroCell: React.FC<{
         padding: 0,
         textAlign: 'center',
         cursor: inert ? 'default' : 'pointer',
-        fontFamily: SANS,
+        fontFamily: 'inherit',
         transition: 'opacity 120ms ease',
       }}
     >
@@ -208,7 +208,7 @@ const HeadlineBlock: React.FC<{
     border: 'none',
     textAlign: 'left',
     color: 'inherit',
-    fontFamily: SANS,
+    fontFamily: 'inherit',
     cursor: headline.onTap ? 'pointer' : 'default',
     transition: 'opacity 120ms ease',
   } as const;
@@ -310,7 +310,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        fontFamily: SANS,
+        fontFamily: 'inherit',
         color: '#FFFFFF',
         isolation: 'isolate',
         /* The floor exists to make the crop knowable and to stop a cover
@@ -460,7 +460,7 @@ export const HeroPill: React.FC<{
       border: `1px solid ${W_25}`,
       borderRadius: 999,
       color: '#FFFFFF',
-      fontFamily: SANS,
+      fontFamily: 'inherit',
       fontSize: 11,
       fontWeight: 700,
       letterSpacing: '0.10em',

@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Stopped verification: Tour-pro fallback, owner menu and compact counters
+- Font ruling: make shared HeroShell inherit the app font; existing test failures remain untouched and do not authorise resuming shards.
 - Three scoped opt-ins/menu fixes; other profiles and Tour overview frozen.
 - Added twelve cases without rewriting existing assertions: focused 70 passed / 6 failed of 76. Stop: two counter selectors count extra nodes and four menu interactions leave the trigger closed. No repair/rerun; four shards await an explicit test-fixture ruling. Baseline 9,411 / 844 files → expected 9,423 / 845; not a verified passing total. Full output and exact errors: .lovable/reports/tour-pro-fixes/.
 - Verify 320px appearance; authenticated live checks unavailable with external_unmanaged.
