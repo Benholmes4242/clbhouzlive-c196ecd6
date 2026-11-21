@@ -44,12 +44,12 @@ Preview compilation: latest observed entry `build OK` at 2026-11-21T20:36:08Z. `
 - `src/features/tourhub/components/overview-v3/OverviewHero.tsx:65,78–91,201–205,426`: retain earliest loaded upcoming tournament per recap tour; pass it and the existing shared minute clock into the recap. Recap decisions tick with that clock. Remove a non-null assertion in the touched recap selection.
 - `src/features/tourhub/components/overview-v3/SeasonRecapSections.tsx:4–14,39,43–65,68–111`: prefix season-over copy, inert Next up card, null figure/place/date props, footer handoff. Body untouched.
 - `src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx:4,63–64,94,250`: optional React footer following the sentence, with no geometry/style change.
-- `src/features/tourhub/components/overview-v3/recapNextUp.css:1–24`: exact recap-only card material/type/layout and wrapping event/place text; no font-family declaration.
+- `src/features/tourhub/components/overview-v3/recapNextUp.css:1–21`: exact recap-only card material/type/layout and wrapping event/place text; no font-family declaration.
 - `src/index.css:65–70`: six semantic footer colour/material tokens.
 - `src/locales/en/tourhub.json:290–291`: new seasonOver and nextUp keys; finalEvent and tiedPlayers retained.
 - `src/locales/de/tourhub.json:123–126`, `es/tourhub.json:123–126`, `ja/tourhub.json:121–124`, `ko/tourhub.json:121–124`, `en-XA/tourhub.json:124–127`: same English fallback keys, other text retained.
 - `src/test/seasonRecap.test.tsx:59–70,94–117,151–156`: authorised existing rule/assertion changes, exact diff below.
-- `src/test/seasonRecapNextUp.test.tsx:1–161`: 22 new cases listed below.
+- `src/test/seasonRecapNextUp.test.tsx:1–145`: 22 new cases listed below.
 - `roadmap.md:3–8`: task, height ruling, stop and remaining blockers.
 - `.lovable/reports/season-recap-next-up/`: this report, full focused/shard-one logs and status.
 
