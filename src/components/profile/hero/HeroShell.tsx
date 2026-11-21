@@ -6,10 +6,14 @@
  * geometry, scrim, cover fallback, identity row, headline block and counter
  * strip lives here; each surface passes its own labels, figures and controls.
  *
+ * Tour-pro fallback artwork and compact labels are explicit opt-ins so
+ * existing shell callers retain their material, geometry and typography.
+ *
  * This is the app's ONLY dark block outside media chrome - a deliberate
  * exception to the light-only rule. Do not copy it elsewhere.
  */
 import React from 'react';
+import { FallbackCover } from './FallbackCover';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
@@ -91,7 +95,8 @@ export const HeroCell: React.FC<{
   displayValue?: React.ReactNode;
   state?: 'ok' | 'loading' | 'error';
   onTap?: () => void;
-}> = ({ label, value, displayValue, state = 'ok', onTap }) => {
+  compactCounterLabels?: boolean;
+}> = ({ label, value, displayValue, state = 'ok', onTap, compactCounterLabels = false }) => {
   const inert = !onTap || state === 'error';
   return (
     <button
@@ -137,7 +142,7 @@ export const HeroCell: React.FC<{
           // AXIS floor 10 exception: labels a counter figure over the cover photo.
           fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.12em',
+          letterSpacing: compactCounterLabels ? '0.08em' : '0.12em',
           textTransform: 'uppercase',
           color: W_45,
         }}
@@ -236,6 +241,9 @@ interface HeroShellProps {
   footer?: React.ReactNode;
   /** Resolved cover image; the shell handles the broken-image fallback. */
   coverUrl?: string | null;
+  /** Tour-pro opt-ins: other callers keep their existing artwork and labels. */
+  fallbackCover?: boolean;
+  compactCounterLabels?: boolean;
   /** 56px avatar node (SquircleAvatar on personal, logo on business). */
   avatar: React.ReactNode;
   onAvatarTap?: () => void;
@@ -258,6 +266,8 @@ interface HeroShellProps {
 
 export const HeroShell: React.FC<HeroShellProps> = ({
   coverUrl,
+  fallbackCover = false,
+  compactCounterLabels = false,
   avatar,
   avatarSize = 56,
   identityContent,
@@ -318,9 +328,9 @@ export const HeroShell: React.FC<HeroShellProps> = ({
     >
       {/* Cover photograph under a heavy scrim - decoration only, never a
           control, and it never changes the height of the block. */}
-      {showCover && (
+      {(showCover || fallbackCover) && (
         <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-          <img
+          {showCover ? <img
             src={coverUrl as string}
             alt=""
             loading="lazy"
@@ -334,7 +344,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
               objectFit: 'cover',
               objectPosition: 'center',
             }}
-          />
+          /> : <FallbackCover />}
           <PhotoBandFade />
         </div>
       )}
@@ -426,7 +436,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
           }}
         >
           {counters.map((c) => (
-            <HeroCell key={c.key} label={c.label} value={c.value} displayValue={c.displayValue} state={c.state} onTap={c.onTap} />
+            <HeroCell key={c.key} label={c.label} value={c.value} displayValue={c.displayValue} state={c.state} onTap={c.onTap} compactCounterLabels={compactCounterLabels} />
           ))}
         </div>}
         {footer}

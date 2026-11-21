@@ -1032,7 +1032,20 @@ const ProfilePageV2Content: React.FC = () => {
             onFollow={toggleFollow} following={isFollowing} followBusy={followBusy}
             onMessage={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })} messageBusy={dmStarting}
             onSeeAllResults={isSelf || proResultsGate.visible ? () => { setSearchParams({ tab: 'tour' }); tabBarRef.current?.scrollIntoView({ block: 'start' }); } : undefined}
-            menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>Copy link</DropdownMenuItem>{!isSelfView && <>{viewerActorType !== 'business' && friendshipStatus === 'friends' && <DropdownMenuItem onClick={() => unfriend()}>Remove friend</DropdownMenuItem>}<DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}</DropdownMenuContent></DropdownMenu>}
+            menu={<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Profile options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied to clipboard'); }}>{isSelfView && <Link2 className="w-4 h-4 mr-2" />}Copy link</DropdownMenuItem>
+              {isSelfView ? <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/edit-profile?tab=settings')}><Settings className="w-4 h-4 mr-2" />Settings</DropdownMenuItem>
+                {myBusinesses && myBusinesses.length > 0 && <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => {
+                    const biz = myBusinesses[0];
+                    navigate(`/business/${biz.business.slug || biz.business.id}`);
+                  }}><Building2 className="w-4 h-4 mr-2" />Switch to business</DropdownMenuItem>
+                </>}
+              </> : <>{viewerActorType !== 'business' && friendshipStatus === 'friends' && <DropdownMenuItem onClick={() => unfriend()}>Remove friend</DropdownMenuItem>}<DropdownMenuItem onClick={() => setShowReportDialog(true)}>Report</DropdownMenuItem><DropdownMenuItem onClick={() => setShowBlockDialog(true)}>Block</DropdownMenuItem></>}
+            </DropdownMenuContent></DropdownMenu>}
           /> : <ProfileHero
             userId={profile.id}
             onOpenRanking={() => { setSearchParams({ tab: 'ranking' }); tabBarRef.current?.scrollIntoView({ block: 'start' }); }}

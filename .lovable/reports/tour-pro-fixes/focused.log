@@ -1,0 +1,3211 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/profileCoverFallback.test.tsx (24 tests) 675ms
+stdout | src/test/proProfileOwnerMenu.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+ ❯ src/test/proProfileBuildOneB.test.tsx (48 tests | 2 failed) 1486ms
+   ✓ Pro profile build 1b rules > finish 1 -> 1st 4ms
+   ✓ Pro profile build 1b rules > finish 2 -> 2nd 0ms
+   ✓ Pro profile build 1b rules > finish 3 -> 3rd 0ms
+   ✓ Pro profile build 1b rules > finish 4 -> 4th 0ms
+   ✓ Pro profile build 1b rules > finish 11 -> 11th 0ms
+   ✓ Pro profile build 1b rules > finish 12 -> 12th 0ms
+   ✓ Pro profile build 1b rules > finish 13 -> 13th 0ms
+   ✓ Pro profile build 1b rules > finish 21 -> 21st 0ms
+   ✓ Pro profile build 1b rules > finish 22 -> 22nd 0ms
+   ✓ Pro profile build 1b rules > finish T2 -> T2 0ms
+   ✓ Pro profile build 1b rules > finish T31 -> T31 0ms
+   ✓ Pro profile build 1b rules > finish MC -> MC 0ms
+   ✓ Pro profile build 1b rules > September is Sep 0ms
+   ✓ Pro profile build 1b rules > points 0.01752 0ms
+   ✓ Pro profile build 1b rules > points 0.003 0ms
+   ✓ Pro profile build 1b rules > points 0 0ms
+   ✓ Pro profile build 1b rules > points null 0ms
+   ✓ Pro profile build 1b mounted > pro avatar is72 with full-height wrapper; default shell avatar56 239ms
+   ✓ Pro profile build 1b mounted > identity keeps surname badge together; tour and club form the kicker above 41ms
+   ✓ Pro profile build 1b mounted > missing tour/club omits the kicker 11ms
+   ✓ Pro profile build 1b mounted > strip has top10 and friends action 140ms
+   ✓ Pro profile build 1b mounted > zero top10 uses BEST; no events omits the season cells 73ms
+   ✓ Pro profile build 1b mounted > friend state Add friend 44ms
+   ✓ Pro profile build 1b mounted > friend state Requested 44ms
+   ✓ Pro profile build 1b mounted > friend state Accept 40ms
+   ✓ Pro profile build 1b mounted > friend state Friends 34ms
+   ✓ Pro profile build 1b mounted > business excludes friend 29ms
+   ✓ Pro profile build 1b mounted > owner keeps Edit and Share 73ms
+   ✓ Pro profile build 1b mounted > gross only visitor has no Add par 28ms
+   ✓ Pro profile build 1b mounted > result strokes tiles and formatted rank 14ms
+   ✓ Pro profile build 1b mounted > result sheet with 3 rounds uses 3 columns 13ms
+   ✓ Pro profile build 1b mounted > result sheet with 4 rounds uses 4 columns 9ms
+   ✓ Pro profile build 1b mounted > result sheet with 2 rounds uses 2 columns 9ms
+   ✓ Pro profile build 1b mounted > result sheet with 5 rounds uses 4 columns 11ms
+   ✓ Pro profile build 1b mounted > 320px result sheet keeps all four round columns without auto-fit 9ms
+   ✓ Pro profile build 1b mounted > OWGR row ignores dormant course par and stored to-par 46ms
+   ✓ Pro profile build 1b mounted > no par controls for visitor 103ms
+   ✓ Pro profile build 1b mounted > no par controls for owner 120ms
+   ✓ Pro profile build 1b mounted > no par controls for admin 123ms
+   ✓ Pro profile build 1b mounted > Mason Hulencourt strokes and rounds 11ms
+   ✓ Pro profile build 1b mounted > Mason Bordoni strokes and rounds 13ms
+   ✓ Pro profile build 1b mounted > nonOWGR pro keeps signed to-par and red under par 56ms
+   ✓ Pro profile build 1b mounted > nonOWGR tour keeps signed to-par and red under par 51ms
+   ✓ Pro profile build 1b mounted > worse rank muted and unchanged omitted 16ms
+   ✓ Tour-pro hero fallback and compact counters > a null cover renders fallback artwork 16ms
+   ✓ Tour-pro hero fallback and compact counters > a cover URL renders its image without fallback artwork 13ms
+   × Tour-pro hero fallback and compact counters > four counter labels use compact tracking 30ms
+     → expected …(5) to have a length of 4 but got 5
+   × Tour-pro hero fallback and compact counters > two counter labels keep default tracking 17ms
+     → expected …(3) to have a length of 2 but got 3
+ ❯ src/test/proProfileOwnerMenu.test.tsx (4 tests | 4 failed) 4466ms
+   × Tour-pro owner menu > owner business none keeps ordered account actions and no moderation 1266ms
+     → Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r0:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r0:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   × Tour-pro owner menu > owner business slug keeps ordered account actions and no moderation 1083ms
+     → Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r2:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r2:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   × Tour-pro owner menu > owner business id keeps ordered account actions and no moderation 1062ms
+     → Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r4:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r4:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   × Tour-pro owner menu > visitor keeps Copy link Report and Block without owner actions 1054ms
+     → Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r6:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r6:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/proProfileBuildOneB.test.tsx > Tour-pro hero fallback and compact counters > four counter labels use compact tracking
+AssertionError: expected …(5) to have a length of 4 but got 5
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 4[39m
+[31m+ 5[39m
+
+ ❯ src/test/proProfileBuildOneB.test.tsx:53:269
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/test/proProfileBuildOneB.test.tsx > Tour-pro hero fallback and compact counters > two counter labels keep default tracking
+AssertionError: expected …(3) to have a length of 2 but got 3
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 2[39m
+[31m+ 3[39m
+
+ ❯ src/test/proProfileBuildOneB.test.tsx:54:237
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/test/proProfileOwnerMenu.test.tsx > Tour-pro owner menu > owner business none keeps ordered account actions and no moderation
+TestingLibraryElementError: Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r0:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r0:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ findAllByRole node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/proProfileOwnerMenu.test.tsx:95:32
+     93|     const trigger = await screen.findByRole('button', {name: 'Profile …
+     94|     fireEvent.pointerDown(trigger, {button: 0, ctrlKey: false, pointer…
+     95|     const items = await screen.findAllByRole('menuitem');
+       |                                ^
+     96|     expect(items).toHaveLength(kind === 'none' ? 2 : 3);
+     97|     expect(items[0]).toHaveTextContent('Copy link');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/test/proProfileOwnerMenu.test.tsx > Tour-pro owner menu > owner business slug keeps ordered account actions and no moderation
+TestingLibraryElementError: Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r2:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r2:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ findAllByRole node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/proProfileOwnerMenu.test.tsx:95:32
+     93|     const trigger = await screen.findByRole('button', {name: 'Profile …
+     94|     fireEvent.pointerDown(trigger, {button: 0, ctrlKey: false, pointer…
+     95|     const items = await screen.findAllByRole('menuitem');
+       |                                ^
+     96|     expect(items).toHaveLength(kind === 'none' ? 2 : 3);
+     97|     expect(items[0]).toHaveTextContent('Copy link');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/test/proProfileOwnerMenu.test.tsx > Tour-pro owner menu > owner business id keeps ordered account actions and no moderation
+TestingLibraryElementError: Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r4:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r4:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 mb-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"min-h-[44px] flex items-center active:opacity-70 transition-opacity"[39m
+            [33mstyle[39m=[32m"font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgb(248, 250, 252);"[39m
+          [36m>[39m
+            [0mAdd a bio[0m
+          [36m</button>[39m
+        [36m</section>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 pt-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"position: relative; background: rgb(22, 22, 26); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m""[39m
+              [33mstyle[39m=[32m"position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(248, 250, 252, 0.62); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"lucide lucide-x"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 6 6 18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m6 6 12 12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-right: 28px;"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-label[39m=[32m"Verified"[39m
+                [33mclass[39m=[32m"lucide lucide-badge-check shrink-0 text-[color:var(--brand-amber,#F7931E)]"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mstyle[39m=[32m"color: rgb(247, 147, 30);"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"font-size: 15px; font-weight: 700; color: rgb(248, 250, 252); letter-spacing: -0.01em;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"font-size: 13.5px; line-height: 1.55; color: rgba(248, 250, 252, 0.62); margin: 0px 0px 10px 0px;"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; gap: 4px; background: transparent; padding: 0px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 13px; font-weight: 700; color: rgb(247, 147, 30); cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ findAllByRole node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/proProfileOwnerMenu.test.tsx:95:32
+     93|     const trigger = await screen.findByRole('button', {name: 'Profile …
+     94|     fireEvent.pointerDown(trigger, {button: 0, ctrlKey: false, pointer…
+     95|     const items = await screen.findAllByRole('menuitem');
+       |                                ^
+     96|     expect(items).toHaveLength(kind === 'none' ? 2 : 3);
+     97|     expect(items[0]).toHaveTextContent('Copy link');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/test/proProfileOwnerMenu.test.tsx > Tour-pro owner menu > visitor keeps Copy link Report and Block without owner actions
+TestingLibraryElementError: Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r6:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col min-h-screen"[39m
+      [33mstyle[39m=[32m"position: relative; background-color: rgb(10, 10, 12);"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"pro-hero"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-haspopup[39m=[32m"menu"[39m
+            [33maria-label[39m=[32m"Profile options"[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-transparent text-muted-foreground border-none active:scale-[0.97] h-10 w-10 rounded-[10px]"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+            [33mid[39m=[32m"radix-:r6:"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"lucide lucide-ellipsis"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"19"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"5"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"1"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto"[39m
+      [36m>[39m
+        [36m<div />[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-4 mb-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"border-top: 0.5px solid rgba(255,255,255,0.10);"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"px-4 pt-1 pb-0"[39m
+          [33mstyle[39m=[32m"scroll-margin-top: var(--chrome-clearance); pointer-events: auto;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-center"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"Profile sections"[39m
+              [33mclass[39m=[32m"hide-scrollbar"[39m
+              [33mrole[39m=[32m"tablist"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 6px; min-width: 0; overflow-x: auto; justify-content: safe center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"true"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255, 255, 255, 0.06); color: rgb(248, 250, 252); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mPosts[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mTour[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-selected[39m=[32m"false"[39m
+                [33mrole[39m=[32m"tab"[39m
+                [33mstyle[39m=[32m"flex-shrink: 0; padding: 6px 11px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.10); background: transparent; color: rgba(248, 250, 252, 0.62); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mCourses[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"pt-0 px-0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"profile-posts-content"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div />[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m"image/*"[39m
+        [33mcapture[39m=[32m"user"[39m
+        [33mclass[39m=[32m"hidden"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+    [36m</div>[39m
+    [36m<div[39m
+      [33mdata-search[39m=[32m"/profile/ellie"[39m
+      [33mdata-testid[39m=[32m"location"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ findAllByRole node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/proProfileOwnerMenu.test.tsx:118:25
+    116|     const trigger = await screen.findByRole('button', {name: 'Profile …
+    117|     fireEvent.pointerDown(trigger, {button: 0, ctrlKey: false, pointer…
+    118|     expect(await screen.findAllByRole('menuitem')).toHaveLength(3);
+       |                         ^
+    119|     expect(screen.getByRole('menuitem', {name: 'Copy link'})).toBeInTh…
+    120|     expect(screen.getByRole('menuitem', {name: 'Report'})).toBeInTheDo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  6 failed | 70 passed (76)
+   Start at  10:34:07
+   Duration  12.42s (transform 3.99s, setup 769ms, collect 9.92s, tests 6.63s, environment 3.70s, prepare 932ms)
+

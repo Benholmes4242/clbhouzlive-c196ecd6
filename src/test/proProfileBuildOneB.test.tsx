@@ -45,3 +45,11 @@ describe('Pro profile build 1b mounted',()=>{
  it.each(['pro','tour'])('nonOWGR %s keeps signed to-par and red under par',source=>{mount(<ProSeasonSection events={[event({source,to_par:-2})]} first="Mason" year={2026} linked={source==='tour'}/>);expect(screen.getByText('−2')).toHaveClass('pro-profile-under');fireEvent.click(screen.getByRole('button',{name:/T31 Hulencourt/}));const dialog=screen.getByRole('dialog');expect(within(dialog).getByText('TO PAR')).toBeInTheDocument();expect(within(dialog).getByText('−2')).toHaveClass('pro-profile-under');});
  it('worse rank muted and unchanged omitted',()=>{const v=mount(<ResultDetail event={event({owgr_rank_after:1441})} close={vi.fn()}/>);expect(screen.getByText('▼ 1')).toHaveClass('pro-profile-worse');v.unmount();mount(<ResultDetail event={event({owgr_rank_after:1440})} close={vi.fn()}/>);expect(document.querySelector('.pro-result-rank-movement')).toBeNull();});
 });
+
+
+describe('Tour-pro hero fallback and compact counters', () => {
+ it('a null cover renders fallback artwork', () => {const {container}=mount(<ProProfileBuildOne {...props} cover={null}/>);expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();});
+ it('a cover URL renders its image without fallback artwork', () => {const {container}=mount(<ProProfileBuildOne {...props} cover="cover.jpg"/>);expect(container.querySelector('section > [aria-hidden] > img')?.getAttribute('src')).toBe('cover.jpg');expect(container.querySelector('[data-fallback-cover]')).toBeNull();});
+ it('four counter labels use compact tracking', () => {s.events=[event({finish:'T9'})];const {container}=mount(<ProProfileBuildOne {...props}/>);const labels=container.querySelectorAll('section > div:not([aria-hidden]) > div > button > div:last-child');expect(labels).toHaveLength(4);for(const label of labels)expect(label).toHaveStyle({letterSpacing:'0.08em'});});
+ it('two counter labels keep default tracking', () => {const {container}=mount(<ProProfileBuildOne {...props}/>);const labels=container.querySelectorAll('section > div:not([aria-hidden]) > div > button > div:last-child');expect(labels).toHaveLength(2);for(const label of labels)expect(label).toHaveStyle({letterSpacing:'0.12em'});});
+});

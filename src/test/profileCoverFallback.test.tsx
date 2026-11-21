@@ -91,6 +91,8 @@ vi.mock('@/features/amateur-ranking/useAmateurRanking', () => ({
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
 
+import { HeroShell } from '@/components/profile/hero/HeroShell';
+import { HeroShell as OverviewHeroShell } from '@/features/tourhub/components/overview-v3/overviewShells';
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
 import { ProfileCoverBand } from '@/components/profile/hero/ProfileCoverBand';
 import { FallbackCover, FALLBACK_COVER_GRADIENT } from '@/components/profile/hero/FallbackCover';
@@ -368,5 +370,33 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the contour artwork', () => {
     expect(['0', '0px']).toContain(layer.style.inset);
     expect(FALLBACK_COVER_GRADIENT).toBe('var(--profile-fallback-cover-gradient)');
     expect(src('styles/style-tokens.css')).toContain('--profile-fallback-cover-gradient: linear-gradient(180deg, #1C2A22 0%, #131B16 58%, #0A0A0C 100%)');
+  });
+});
+
+
+describe('Tour-pro HeroShell fallback opt-in', () => {
+  const shell = (over: Record<string, unknown> = {}) => render(<HeroShell avatar={<span>A</span>} displayName="Pro" counters={[]} {...over} />);
+  it('shows fallback artwork and fade without a cover when opted in', () => {
+    const { container } = shell({ fallbackCover: true });
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
+  });
+  it('shows fallback artwork after an opted-in cover fails', () => {
+    const { container } = shell({ fallbackCover: true, coverUrl: 'broken.jpg' });
+    const img = container.querySelector('img');
+    if (!img) throw new Error('Expected cover image');
+    fireEvent.error(img);
+    expect(container.querySelector('[data-fallback-cover]')).not.toBeNull();
+    expect(container.querySelector('[data-photo-band-fade]')).not.toBeNull();
+    expect(container.querySelector('img')).toBeNull();
+  });
+  it('preserves the no-cover shell without the opt-in', () => {
+    const { container } = shell();
+    expect(container.querySelector('[data-fallback-cover]')).toBeNull();
+  });
+  it('preserves the Tour overview skeleton without fallback artwork', () => {
+    const { container } = render(<OverviewHeroShell />);
+    expect(container.querySelector('[data-overview-skeleton-hero]')).not.toBeNull();
+    expect(container.querySelector('[data-fallback-cover]')).toBeNull();
   });
 });
