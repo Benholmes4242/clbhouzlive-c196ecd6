@@ -118,7 +118,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     f.latest[0] = latest('first', { media_type: 'video', poster_url: '/video-poster.jpg' });
     mountRail(); const cards = screen.getAllByRole('button');
     expect(cards[0].querySelector('video')).not.toBeNull();
-    expect(f.register).toHaveBeenCalledWith('courses-member-shots', expect.anything(), expect.any(Function), { threshold: 0.5, maxPlaying: 1 });
+    expect(f.register).toHaveBeenCalledWith('courses-latest-holes', expect.anything(), expect.any(Function), { threshold: 0.5, maxPlaying: 2 });
     expect(cards[1].querySelector('video')).toBeNull(); expect(cards[2].querySelector('video')).toBeNull();
   });
   it('video duration formats longer than one minute', () => { f.latest[0] = latest('first', { media_type: 'video', duration_seconds: 75 }); mountRail(); expect(screen.getByText('1:15')).toBeInTheDocument(); });

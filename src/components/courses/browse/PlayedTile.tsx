@@ -97,7 +97,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
   const photos = interleaveTilePhotos<TileHolePhoto, TileCoursePhoto>(tile.holes, tile.photos, tile.hardestHole);
   const golfers = group.rows.length > 0 ? new Set(group.rows.map((r) => r.user_id)).size : group.faces.length;
   const line = golfersLine(golfers, group.rows.length);
-  const capBase: React.CSSProperties = { position: 'absolute', left: 10, right: 10, bottom: 9 };
+  const capBase: React.CSSProperties = { transform: 'translateZ(0)', position: 'absolute', left: 10, right: 10, bottom: 9 };
   const ell: React.CSSProperties = { display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
   return (
@@ -167,12 +167,12 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
         ) : photos.map((p, pi) => (
           <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { openTilePhoto(photos, pi, course, tile.coursePosts ?? [], inSheet); }}
             style={{ flex: 'none', width: railTileWidth(p.width, p.height), height: TILE_ROW_H, borderRadius: TILE_RADIUS, overflow: 'hidden', position: 'relative', padding: 0, border: 0, cursor: 'pointer', textAlign: 'left', color: '#FFFFFF', backgroundColor: A.CANVAS, backgroundImage: `url("${p.imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            {p.video ? <span data-tile-video="" style={{ position: 'absolute', inset: 0 }}><HoleInlineVideo media={p.video} alt="" fit="cover" autoplayGroup="courses-member-shots" active /></span> : null}
-            <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
+            {p.video ? <span data-tile-video="" style={{ position: 'absolute', inset: 0 }}><HoleInlineVideo media={p.video} alt="" fit="cover" autoplayGroup="courses-played-tile" maxPlaying={2} active /></span> : null}
+            <span style={{ transform: 'translateZ(0)', position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
             {p.kind === 'hole' ? (
               <>
-                <span style={{ position: 'absolute', top: 8, left: 10, fontSize: 28, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1 }}>{p.holeNo}</span>
-                {tile.hardestHole === p.holeNo ? <span data-hardest="" style={{ position: 'absolute', top: 10, right: 8, padding: '3px 6px', borderRadius: 6, background: 'rgba(10,10,12,.6)', color: A.AMBER, fontSize: 8, fontWeight: 800, letterSpacing: '.1em', lineHeight: '10px' }}>HARDEST</span> : null}
+                <span style={{ transform: 'translateZ(0)', position: 'absolute', top: 8, left: 10, fontSize: 28, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1 }}>{p.holeNo}</span>
+                {tile.hardestHole === p.holeNo ? <span data-hardest="" style={{ transform: 'translateZ(0)', position: 'absolute', top: 10, right: 8, padding: '3px 6px', borderRadius: 6, background: 'rgba(10,10,12,.6)', color: A.AMBER, fontSize: 8, fontWeight: 800, letterSpacing: '.1em', lineHeight: '10px' }}>HARDEST</span> : null}
                 <span style={capBase}>
                   <b style={{ ...ell, fontSize: 11.5, fontWeight: 700 }}>{[p.par != null ? `Par ${p.par}` : null, p.yards != null ? `${p.yards} yds` : null].filter(Boolean).join(' \u00B7 ')}</b>
                   <Credit id={p.memberId} name={p.memberName} photo={p.memberPhoto} faces={faces} />
@@ -180,7 +180,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
               </>
             ) : (
               <>
-                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 800, letterSpacing: '.12em', lineHeight: '10px', color: '#FFFFFF' }}>COURSE</span>
+                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', transform: 'translateZ(0)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 800, letterSpacing: '.12em', lineHeight: '10px', color: '#FFFFFF' }}>COURSE</span>
                 <span style={capBase}>
                   <b style={{ ...ell, fontSize: 11.5, fontWeight: 700 }}>{p.caption || short}</b>
                   <Credit id={p.memberId} name={p.memberName} photo={p.memberPhoto} day={dayLabel(p.createdAt)} faces={faces} />

@@ -29,13 +29,14 @@ export const RAIL_CARD_H = 216;
 export const RAILS_TOP = 30;
 export const RAIL_GAP_Y = 30;
 
-const glassTop: React.CSSProperties = { ...GLASS, position: 'absolute', top: 8, right: 8, padding: '3px 7px', borderRadius: 7, lineHeight: '12px' };
+const LAYER: React.CSSProperties = { transform: 'translateZ(0)' };
+const glassTop: React.CSSProperties = { ...GLASS, ...LAYER, position: 'absolute', top: 8, right: 8, padding: '3px 7px', borderRadius: 7, lineHeight: '12px' };
 const cardStyle: React.CSSProperties = { flex: 'none', width: RAIL_CARD_W, height: RAIL_CARD_H, borderRadius: 16, overflow: 'hidden', position: 'relative', padding: 0, border: 0, cursor: 'pointer', textAlign: 'left', color: '#FFFFFF', background: 'none' };
-const bottom: React.CSSProperties = { position: 'absolute', left: 10, right: 10, bottom: 10 };
+const bottom: React.CSSProperties = { ...LAYER, position: 'absolute', left: 10, right: 10, bottom: 10 };
 const nameStyle: React.CSSProperties = { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', fontSize: 14, fontWeight: 800, lineHeight: 1.15 };
 const countyStyle: React.CSSProperties = { display: 'block', marginTop: 2, fontSize: 10.5, color: 'rgba(255,255,255,.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
-function PlayedCard({ group, course, onOpen }: { group: CourseGroup; course: PlayedCourse; onOpen: () => void }) {
+function PlayedCard({ group, course, onOpen, autoplayGroup }: { group: CourseGroup; course: PlayedCourse; onOpen: () => void; autoplayGroup: string }) {
   const best = bestLately(group.rows, 1)[0] ?? null;
   const { user } = useSupabaseSession();
   const [ref, near] = useNearViewport<HTMLButtonElement>();
@@ -47,11 +48,11 @@ function PlayedCard({ group, course, onOpen }: { group: CourseGroup; course: Pla
         {media ? (
           <span data-rail-media={media.media_type} style={{ position: 'absolute', inset: 0 }}>
             {media.media_type === 'video'
-              ? <HoleInlineVideo media={media} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
+              ? <HoleInlineVideo media={media} alt="" fit="cover" autoplayGroup={autoplayGroup} maxPlaying={2} active />
               : <img src={media.media_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.hidden = true; }} />}
           </span>
         ) : null}
-        <span style={{ position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
+        <span style={{ ...LAYER, position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
         <span data-rail-count="" style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF' }}>{fmtCount(group.activity)}</span>
         <span style={bottom}>
           <b style={nameStyle}>{shortCoursePart(course.name)}</b>
@@ -112,7 +113,7 @@ export function RegionRails({ rails, groups, courseMap, onOpen }: {
           <div className="scrollbar-hide" style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', marginTop: 12, padding: '0 16px' }}>
             {rail.courseIds.map((id) => {
               const g = byGroup.get(id); const c = courseMap.get(id);
-              return g && c ? <PlayedCard key={id} group={g} course={c} onOpen={() => onOpen(id)} /> : null;
+              return g && c ? <PlayedCard key={id} group={g} course={c} onOpen={() => onOpen(id)} autoplayGroup={`courses-region-${rail.key}`} /> : null;
             })}
           </div>
         </div>

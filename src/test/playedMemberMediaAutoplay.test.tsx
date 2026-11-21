@@ -74,7 +74,7 @@ describe('rail card member media', () => {
     f.result = [vid];
     const onOpen = vi.fn();
     const { container } = rails(onOpen); near();
-    await waitFor(() => expect(container.querySelector('[data-inline-video="courses-member-shots"]')).not.toBeNull());
+    await waitFor(() => expect(container.querySelector('[data-inline-video="courses-region-abroad"]')).not.toBeNull());
     const v = container.querySelector('[data-inline-video]')!;
     expect(v.getAttribute('data-fit')).toBe('cover');
     expect(v.getAttribute('data-poster')).toBe(vid.poster_url);
@@ -93,7 +93,7 @@ describe('tile row videos', () => {
     const { container } = wrap(<PlayedTile group={tileGroup} course={course} tile={tile} />);
     const tiles = container.querySelectorAll('[data-tile-photo]');
     expect(tiles).toHaveLength(2);
-    const v = tiles[0].querySelector('[data-inline-video="courses-member-shots"]');
+    const v = tiles[0].querySelector('[data-inline-video="courses-played-tile"]');
     expect(v).not.toBeNull();
     expect(v!.getAttribute('data-poster')).toBe('https://p/h.jpg');
     expect(tiles[1].querySelector('[data-inline-video]')).toBeNull();

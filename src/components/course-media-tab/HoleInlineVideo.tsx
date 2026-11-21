@@ -9,10 +9,12 @@ import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPla
 import { buildHlsUrl } from '@/utils/streamId';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 
-export function HoleInlineVideo({ media, alt, fit, autoplayGroup, active, paused = false, fallback }: {
+export function HoleInlineVideo({ media, alt, fit, autoplayGroup, active, paused = false, fallback, maxPlaying = 1 }: {
   media: { media_url: string; stream_id?: string | null; poster_url?: string | null; duration_seconds?: number | null };
   alt: string; fit: 'cover' | 'contain'; autoplayGroup: string;
   active: boolean; paused?: boolean; fallback?: ReactNode;
+  /** Per-group play ceiling; default 1 keeps every non-Courses caller unchanged. */
+  maxPlaying?: number;
 }) {
   const reducedMotion = usePrefersReducedMotion();
   const isOpen = useFullscreenFeedStore(state => state.isOpen);
@@ -31,8 +33,8 @@ export function HoleInlineVideo({ media, alt, fit, autoplayGroup, active, paused
   useEffect(() => {
     const host = hostRef.current;
     if (!eligible || !host) return;
-    return registerReviewVideo(autoplayGroup, host, setWon, { threshold: 0.5, maxPlaying: 1 });
-  }, [eligible, autoplayGroup]);
+    return registerReviewVideo(autoplayGroup, host, setWon, { threshold: 0.5, maxPlaying });
+  }, [eligible, autoplayGroup, maxPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;

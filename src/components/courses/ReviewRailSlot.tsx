@@ -137,7 +137,7 @@ function ReviewFooter({ r, name, withMedia, style }: { r: LatestReview; name: st
 function ScoreDisc({ rating }: { rating: number }) {
   return (
     <div data-review-disc="" style={{
-      position: 'absolute', top: 12, right: 12, zIndex: 3, width: 60, height: 60, borderRadius: '50%',
+      position: 'absolute', top: 12, right: 12, zIndex: 3, transform: 'translateZ(0)', width: 60, height: 60, borderRadius: '50%',
       background: 'rgba(14,14,16,0.56)', backdropFilter: 'blur(16px) saturate(160%)', WebkitBackdropFilter: 'blur(16px) saturate(160%)',
       border: '1px solid rgba(255,255,255,0.16)', boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -151,7 +151,7 @@ function ScoreDisc({ rating }: { rating: number }) {
 function VideoBadge({ seconds }: { seconds: number | null }) {
   return (
     <span data-review-vid="" style={{
-      position: 'absolute', left: 8, bottom: 8, zIndex: 2, height: 22, padding: '0 8px 0 7px', borderRadius: 999,
+      position: 'absolute', left: 8, bottom: 8, zIndex: 2, transform: 'translateZ(0)', height: 22, padding: '0 8px 0 7px', borderRadius: 999,
       background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
       display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: INK,
     }}>
@@ -162,7 +162,7 @@ function VideoBadge({ seconds }: { seconds: number | null }) {
 }
 
 /** One mosaic tile. The big tile autoplays a video muted in the shared
- *  "courses-member-shots" group; small video tiles show the poster only. */
+ *  "courses-latest-reviews" group (up to two); small video tiles show the poster only. */
 function MediaTile({ item, big, more, style, onOpen }: { item: ReviewMediaItem; big: boolean; more: number; style?: React.CSSProperties; onOpen: (item: ReviewMediaItem, el: HTMLElement) => void }) {
   const poster = item.type === 'video' ? reviewVideoPoster(item) : '';
   return (
@@ -175,7 +175,7 @@ function MediaTile({ item, big, more, style, onOpen }: { item: ReviewMediaItem; 
           <span style={{ position: 'absolute', inset: 0 }}>
             <HoleInlineVideo
               media={{ media_url: item.url, stream_id: item.streamId, poster_url: item.posterUrl, duration_seconds: item.durationSeconds }}
-              alt="" fit="cover" autoplayGroup="courses-member-shots" active
+              alt="" fit="cover" autoplayGroup="courses-latest-reviews" maxPlaying={2} active
             />
           </span>
         ) : (
@@ -187,7 +187,7 @@ function MediaTile({ item, big, more, style, onOpen }: { item: ReviewMediaItem; 
       {item.type === 'video' ? <VideoBadge seconds={item.durationSeconds} /> : null}
       {more > 0 ? (
         <span data-review-more="" style={{
-          position: 'absolute', inset: 0, zIndex: 2, background: 'rgba(0,0,0,0.45)',
+          position: 'absolute', inset: 0, zIndex: 2, transform: 'translateZ(0)', background: 'rgba(0,0,0,0.45)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, color: INK,
         }}>+{more}</span>
       ) : null}

@@ -14,3 +14,6 @@ export function railTileWidth(width: number | null | undefined, height: number |
     && width > 0 && height > 0 && width >= height * 0.95
     ? RAIL_TILE_W_WIDE : 156;
 }
+
+/** Latest holes rail gap; matches TILE_ROW_GAP and the region rails. */
+export const LATEST_HOLE_GAP = 8;

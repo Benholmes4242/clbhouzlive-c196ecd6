@@ -135,7 +135,7 @@ function LatestCourseCard({ row, pending, onOpen }: {
             style={{ ...cellStyle, padding: 0, border: 0, cursor: 'pointer', textAlign: 'left' }}
           >
             {i === 0 && tile.media_type === 'video'
-              ? <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}><HoleInlineVideo media={tile} alt="" fit="cover" autoplayGroup="courses-member-shots" active /></div>
+              ? <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}><HoleInlineVideo media={tile} alt="" fit="cover" autoplayGroup="courses-latest-courses" maxPlaying={2} active /></div>
               : <img
               src={tileImage(tile)}
               alt=""
@@ -144,9 +144,9 @@ function LatestCourseCard({ row, pending, onOpen }: {
               onError={event => { event.currentTarget.hidden = true; }}
             />}
             {i === 0 && <>
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 45%)', zIndex: 1 }} />
-              <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP, zIndex: 1 }} />
-              <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2 }}>
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 45%)', zIndex: 1, transform: 'translateZ(0)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP, zIndex: 1, transform: 'translateZ(0)' }} />
+              <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2, transform: 'translateZ(0)' }}>
                 <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.05em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
                   {row.media_count}
                 </div>
@@ -154,7 +154,7 @@ function LatestCourseCard({ row, pending, onOpen }: {
                   {row.media_count === 1 ? 'Member shot' : 'Member shots'}
                 </div>
               </div>
-              <div style={{ position: 'absolute', left: 14, right: 12, bottom: 13, zIndex: 2 }}>
+              <div style={{ position: 'absolute', left: 14, right: 12, bottom: 13, zIndex: 2, transform: 'translateZ(0)' }}>
                 <div style={{
                   fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.08, color: '#FFFFFF',
                   display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden',
@@ -171,7 +171,7 @@ function LatestCourseCard({ row, pending, onOpen }: {
                 className="glass-chip"
                 aria-hidden="true"
                 style={{
-                  position: 'absolute', zIndex: 2, top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                  position: 'absolute', zIndex: 2, top: '50%', left: '50%', transform: 'translate(-50%, -50%) translateZ(0)',
                   width: 30, height: 30, borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#FFFFFF', fontSize: 11, paddingLeft: 2,
@@ -180,7 +180,7 @@ function LatestCourseCard({ row, pending, onOpen }: {
             )}
             {i === 2 && row.media_count > 3 && (
               <div style={{
-                position: 'absolute', inset: 0, zIndex: 2, background: 'rgba(10,10,12,0.55)',
+                position: 'absolute', inset: 0, zIndex: 2, transform: 'translateZ(0)', background: 'rgba(10,10,12,0.55)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: '#FFFFFF', fontSize: 15, fontWeight: 700,
               }}>

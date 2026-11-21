@@ -135,7 +135,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     expect(screen.getByLabelText('Open Course alpha shot 2 of 14').querySelector('video')).toBeNull();
     expect(screen.getByLabelText('Open Course alpha shot 3 of 14').querySelector('video')).toBeNull();
     expect(document.querySelectorAll('video')).toHaveLength(1);
-    expect(f.register).toHaveBeenCalledWith('courses-member-shots', expect.anything(), expect.any(Function), { threshold: 0.5, maxPlaying: 1 });
+    expect(f.register).toHaveBeenCalledWith('courses-latest-courses', expect.anything(), expect.any(Function), { threshold: 0.5, maxPlaying: 2 });
   });
   it('video tiles show the glass disc; image tiles do not', () => {
     f.rows = [

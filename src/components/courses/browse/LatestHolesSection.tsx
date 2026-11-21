@@ -13,7 +13,7 @@ import { useIsGuest } from '@/features/guest/useIsGuest';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
-import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
+import { LATEST_HOLE_GAP } from './railTileHeights';
 import { LatestHolesShell, LatestHoleSkeletonCard } from './sectionShells';
 import { dedupeRailRows, useRailPagination } from './useRailPagination';
 import { LATEST_HOLE_W, LATEST_HOLE_H } from './railTileHeights';
@@ -24,7 +24,7 @@ import './latestHoles.css';
  * The gam_rpc/name prefix preserves AdminHoleTagging predicate invalidation.
  * First-page readiness/minimum are independent of later fetches; fullscreen freezes pagination
  * and receives a snapshot of every loaded row at the moment of the tap.
- * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; in-view video tiles play muted and looping through HoleInlineVideo in the page-wide "courses-member-shots" autoplay group (one video at a time).
+ * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; in-view video tiles play muted and looping through HoleInlineVideo in the rail-own "courses-latest-holes" autoplay group (up to two at a time).
  * Geometry is shared with the loading shell, not PhotoFigureCard.
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §2: a tap opens the CANONICAL
  * full-screen viewer (FullscreenFeedOverlay via openWithOrigin, readOnly)
@@ -76,7 +76,7 @@ function LatestHoleCard({ row, onOpen }: {
       onClick={() => onOpen(row)}>
       <div className="latest-hole-media" style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
       {row.media_type === 'video'
-        ? <HoleInlineVideo media={row} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
+        ? <HoleInlineVideo media={row} alt="" fit="cover" autoplayGroup="courses-latest-holes" maxPlaying={2} active />
         : <img src={row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />}
       </div>
       <div className="latest-hole-scrim latest-hole-bottom" style={{ background: 'var(--latest-hole-bottom-scrim)', zIndex: 1 }} />
@@ -144,7 +144,7 @@ export function LatestHolesSection() {
   if (!visible) return null;
   return <section style={SECTION_WRAP}>
     <SectionHead tone="amber" kicker="Through members' eyes" title="Latest holes" />
-    <div ref={railRef} className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP, willChange: 'transform' }}>
+    <div ref={railRef} className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: LATEST_HOLE_GAP, marginTop: HEAD_GAP, willChange: 'transform' }}>
       {rows.map(row => <LatestHoleCard key={row.id} row={row} onOpen={onOpen} />)}
       {isFetchingNextPage && <LatestHoleSkeletonCard />}
       {hasNextPage && <div ref={sentinelRef} aria-hidden style={{ width: 1, flex: 'none', alignSelf: 'stretch' }} />}
