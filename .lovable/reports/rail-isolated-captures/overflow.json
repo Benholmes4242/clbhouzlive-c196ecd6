@@ -1,0 +1,42 @@
+[
+  {
+    "width": 390,
+    "violations": [],
+    "horizontalScrollOwners": [
+      {
+        "tag": "DIV",
+        "tileRow": false,
+        "regionRail": true,
+        "clientWidth": 390,
+        "scrollWidth": 872
+      },
+      {
+        "tag": "DIV",
+        "tileRow": true,
+        "regionRail": false,
+        "clientWidth": 390,
+        "scrollWidth": 708
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "violations": [],
+    "horizontalScrollOwners": [
+      {
+        "tag": "DIV",
+        "tileRow": false,
+        "regionRail": true,
+        "clientWidth": 320,
+        "scrollWidth": 872
+      },
+      {
+        "tag": "DIV",
+        "tileRow": true,
+        "regionRail": false,
+        "clientWidth": 320,
+        "scrollWidth": 708
+      }
+    ]
+  }
+]
