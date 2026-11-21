@@ -30,8 +30,8 @@ import { ProOwnerSections } from '@/features/pro-profile/ProOwnerSections';
 import { ProCollectionSections } from '@/features/pro-profile/ProCollectionSections';
 
 const bag: BagItem = {id: 'bag', user_id: 'pro', slot: 'driver', brand: 'Titleist', model: 'GT3', detail: null, business_id: null, sort: 0, created_at: '2026-01-01', updated_at: '2026-01-01'};
-const partner: Partner = {id: 'partner', user_id: 'pro', name: 'Sponsor', website: null, business_id: null, sort: 0, created_at: '2026-01-01', updated_at: '2026-01-01'};
-const moment: CareerMoment = {id: 'moment', user_id: 'pro', year: 2020, text: 'Turned pro', is_win: false, sort: 0, created_at: '2026-01-01', updated_at: '2026-01-01'};
+const partner: Partner = {id: 'partner', user_id: 'pro', name: 'Sponsor', website: null, business_id: null, sort: 0, created_at: '2026-01-01'};
+const moment: CareerMoment = {id: 'moment', user_id: 'pro', year: 2020, text: 'Turned pro', is_win: false, created_at: '2026-01-01'};
 function mount(owner = true) {
  return render(<QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}><MemoryRouter><ProOwnerSections userId="pro" owner={owner} first="Alfie" events={[]} eventsReady showCareer viewerId="viewer" /></MemoryRouter></QueryClientProvider>);
 }

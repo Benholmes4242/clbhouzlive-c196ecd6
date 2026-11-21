@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Stopped verification: Signed-off Tour-pro owner redesign
+- Preview correction complete: removed only unsupported Partner.updated_at and CareerMoment.sort/updated_at fixture fields; focused 22/22 pass and harness build OK at 10:45:36Z. No test names/assertions, app code or suite inventory changes; prior counter/menu failures remain stopped separately.
 - Replace empty owner prompts with one settled-read completion card and existing sheet entrypoints; tidy Career header and remove tour-pro clubs/divider.
 - Apply all 43 pro stylesheet weight changes and 40px rank; preserve season row structure, badges and previous hero/menu fixes.
 - Added 22 new cases across two files; focused 22/22 pass. Stop: new Partner fixture has unknown updated_at; new CareerMoment fixture has unknown sort (proOwnerRedesign.test.tsx:33–34, TS2353). No test repair/rerun, shards or browser captures. Projected inventory 9,423 / 845 → 9,445 / 847; last full pass remains 9,411. Prior failures untouched. Full report/output: .lovable/reports/pro-owner-redesign/.
