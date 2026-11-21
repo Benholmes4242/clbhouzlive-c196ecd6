@@ -32,7 +32,7 @@ export function ProProfileBuildOne(p:ProProfileProps){
   const linked=!!playerId,ready=linked?tourResults.isSuccess&&!tourResults.isError:events.isSuccess&&!events.isError;
   const rows=linked?tourEvents(tourResults.data??[],id):events.data??[],summary=seasonSummary(rows,year),movement=rankMovement(rank.isSuccess&&!rank.isError?rank.data:null);
   const rankReady=rank.isSuccess&&!rank.isError;
-  const headline=showResults&&rankReady&&(rank.data||ready&&summary.best)?<div className="pro-hero-headline"><strong>{rank.data?`#${rank.data.rank.toLocaleString('en-GB')}`:finishLabel(summary.best)}</strong><div><b>{rank.data?'WORLD RANKING':`BEST FINISH ${year}`}</b>{movement&&<p><span className={movement.improved?'pro-profile-up':'pro-profile-worse'}>{movement.improved?'▲':'▼'} {movement.difference}</span> {movement.period}</p>}</div></div>:null;
+  const headline=showResults&&rankReady&&(rank.data||ready&&summary.best)?<div className="pro-hero-headline"><strong>{rank.data?`#${rank.data.rank.toLocaleString('en-GB')}`:chipLabel(summary.best)}</strong><div><b>{rank.data?'WORLD RANKING':`BEST FINISH ${year}`}</b>{movement&&<p><span className={movement.improved?'pro-profile-up':'pro-profile-worse'}>{movement.improved?'▲':'▼'} {movement.difference}</span> {movement.period}</p>}</div></div>:null;
   const cover=p.cover||[...(topTen??[])].sort((a,b)=>a.position-b.position)[0]?.thumbnail_image||null;
   const names=p.name.trim().split(/\s+/),last=names.pop()??p.name;
   // pro_profile_viewed — once per mount, ref-guarded, never the owner. Guests
