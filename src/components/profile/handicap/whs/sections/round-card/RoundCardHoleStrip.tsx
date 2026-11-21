@@ -11,9 +11,6 @@
 import React from 'react';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 
-const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
-
 export interface HoleRow {
   hole_no: number;
   par: number | null;
@@ -45,12 +42,12 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
     (h) => h.played === true && h.par != null,
   );
   const total = holes.reduce(
-    (s, h) => s + (h.played ? (h.adjusted_gross ?? h.actual_gross ?? 0) : 0),
+    (s, h) => s + (h.played ? (h.actual_gross ?? h.adjusted_gross ?? 0) : 0),
     0,
   );
   const parTotal = complete ? holes.reduce((s, h) => s + (h.par ?? 0), 0) : null;
   const anyPlayed = holes.some(
-    (h) => h.played && (h.adjusted_gross != null || h.actual_gross != null),
+    (h) => h.played && (h.actual_gross != null || h.adjusted_gross != null),
   );
   const delta = parTotal != null && anyPlayed ? total - parTotal : null;
   const deltaStr = delta != null
@@ -63,7 +60,6 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        fontFamily: FONT_SF,
       }}
     >
       <div
@@ -88,7 +84,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
         }}
       >
         {holes.map((h, i) => {
-          const score = h.played ? (h.adjusted_gross ?? h.actual_gross ?? null) : null;
+          const score = h.played ? (h.actual_gross ?? h.adjusted_gross ?? null) : null;
           return <HoleCell key={i} score={score} par={h.par ?? 0} />;
         })}
       </div>

@@ -1,0 +1,109 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/roundDetailNetRead.test.tsx (2 tests) 7ms
+ ✓ src/test/roundGrossActual.test.ts (4 tests) 5ms
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/roundCardHoleStripActual.test.tsx (1 test) 58ms
+stderr | src/test/scorecardHeadPar.test.tsx > the preview head prints the par only when the card is whole > prints the par suffix on a complete eighteen and keeps OUT / IN at 36 each
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-round-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/scorecardHeadPar.test.tsx > the preview head prints the par only when the card is whole > prints thru 10 but NO par on ten of eighteen, and the front nine still reads 36
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-round-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/scorecardHeadPar.test.tsx > the preview head prints the par only when the card is whole > prints the par on a complete nine, whose own par is 35
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-round-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/scorecardHeadPar.test.tsx > the preview head prints the par only when the card is whole > prints no par when the seed carries no declared length
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container (max-width: 400px) {
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-round-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-round-score-row][data-variant="card"] [data-score-cell="gross"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+ ✓ src/test/scorecardHeadPar.test.tsx (9 tests) 407ms
+ ✓ src/test/roundSheetSeed.test.ts (3 tests) 5ms
+
+ Test Files  5 passed (5)
+      Tests  19 passed (19)
+   Start at  08:28:28
+   Duration  8.44s (transform 2.78s, setup 1.74s, collect 7.33s, tests 483ms, environment 11.85s, prepare 2.71s)
+

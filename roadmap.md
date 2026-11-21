@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Actual played strokes and hole-strip app font
+- Pure evaluator actualGross/holeStrokes and actual-first sheet/seed/strip readers implemented; user-authorised hole strip font now inherits the app. Genuine handicap calculations, evaluator versions and prompt/award/notification code unchanged.
+- Added four roundGrossActual cases and one roundCardHoleStripActual render case; no existing tests changed. Baseline 9,395 → 9,400 (+five named cases, +two files). Focused 19/19; sequential shards 2,311 / 2,292 / 2,350 / 2,447 = 9,400/9,400. Font answer applied after shard one; affected strip checks pass in remaining shards.
+- gam-evaluator deployed after tests; non-mutating GET returns 200/unchanged version. No requeue, reevaluation, SQL, migrations or backfill. Report/full logs: .lovable/reports/actual-played-strokes/. Build OK; authenticated live round readback unavailable on external_unmanaged, Ben owns historical backfill.
+
 ## Verified: Hole-tile path ruling and combined full run
 - Applied only the authorised fullscreenHoleTileRow line 69 path correction; assertions and app files unchanged.
 - Four separate sequential shards passed 2,297 / 2,283 / 2,360 / 2,455 = 9,395/9,395 across 839 files. Delta from 9,390 is four fullscreenHoleTileRow cases and courseLatelyTiles e4; no changes to inventory in this ruling.

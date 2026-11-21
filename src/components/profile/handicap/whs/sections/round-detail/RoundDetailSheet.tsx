@@ -46,7 +46,7 @@ import { useCardOpenGate, useCoalescedBlocks } from '@/hooks/useCardOpenGate';
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 
 function strokesOf(h: WhsScoreHole): number | null {
-  return h.adjusted_gross ?? h.actual_gross ?? null;
+  return h.actual_gross ?? h.adjusted_gross ?? null;
 }
 
 /* The date line moved to ./roundDateEyebrow so the swipe preview prints it
@@ -58,7 +58,7 @@ function strokesOf(h: WhsScoreHole): number | null {
  * The feed has already read every hole of this round (useRoundHoleShapes), so
  * the sheet has no reason to show a skeleton where the card goes. A seed is the
  * feed's own copy of the round, and its strokes MUST be built with the sheet's
- * rule (adjusted_gross ?? actual_gross) so the figure cannot change under the
+ * rule (actual_gross ?? adjusted_gross) so the figure cannot change under the
  * member when the fetch lands. Only the "at this course" section, which the
  * feed genuinely does not have, keeps its skeleton.
  */
@@ -248,7 +248,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
    * §1.3 — THE SEED DRAWS THE CARD WHILE THE QUERY IS UNSETTLED.
    * It is used ONLY when the round has not answered yet AND the seed is a whole
    * round for THIS score. Once the fetch lands the fetched holes take over — and
-   * because both sides use `adjusted_gross ?? actual_gross`, nothing visibly
+   * because both sides use `actual_gross ?? adjusted_gross`, nothing visibly
    * changes. In DEV a per-hole disagreement is logged with the score id.
    */
   const seedUsable = seedIsWhole(seed) && seed?.scoreId === scoreId;

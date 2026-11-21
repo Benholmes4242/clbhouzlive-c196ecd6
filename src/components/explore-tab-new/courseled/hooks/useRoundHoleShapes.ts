@@ -40,8 +40,8 @@ interface Row {
    * BRIEF_ROUND_SHEET §1.3 — READ, BUT NOT DRAWN.
    *
    * The tile curve still uses actual_gross: it says what happened on the course
-   * (see the note at the top of this file). The SHEET, however, prints
-   * `adjusted_gross ?? actual_gross`, so a seed built from this hook must use
+   * (see the note at the top of this file). The SHEET also prints
+   * `actual_gross ?? adjusted_gross`, so a seed built from this hook must use
    * that rule or the number would change under the member when the fetch lands.
    * It is carried alongside, never substituted into the curve.
    */
@@ -99,7 +99,7 @@ export interface HoleShape {
     holeNo: number;
     par: number | null;
     strokes: number | null;
-    /** §1.3 — the sheet's rule: adjusted_gross ?? actual_gross. */
+    /** §1.3 — the sheet's rule: actual_gross ?? adjusted_gross. */
     sheetStrokes: number | null;
     /** FN1 — the course's stroke index for this hole, null when absent. */
     strokeIndex?: number | null;
@@ -139,7 +139,7 @@ function buildShape(rows: Row[]): Omit<HoleShape, 'coursePar'> | null {
       holeNo: h.hole_no,
       par: h.par,
       strokes: h.actual_gross,
-      sheetStrokes: h.adjusted_gross ?? h.actual_gross ?? null,
+      sheetStrokes: h.actual_gross ?? h.adjusted_gross ?? null,
       strokeIndex: h.stroke_index ?? null,
       strokesAllowed: h.strokes_allowed ?? null,
     })),

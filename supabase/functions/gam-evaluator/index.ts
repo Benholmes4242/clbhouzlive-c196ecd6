@@ -9,6 +9,7 @@ import { assignCompetitionRanks, crownSetDelta } from './legendRanks.ts';
 import { countContestedTitles, isTenureCategory, type BoardKeyRow } from './legendTitles.ts';
 import { resolveAwards, unitBetter, type BestsRow, type ResolvedAward, type UnitCandidate } from './awards.ts';
 import { LEGEND_NOTIFY_MAX_AGE_DAYS, playDateFreshness } from './noticeFreshness.ts';
+import { actualRoundGross, holeStrokes } from './roundGross.ts';
 export const FUNCTION_VERSION = '2026-09-20T00:00:00Z-v10-hole-units-best-or-birdie';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
@@ -675,9 +676,9 @@ function rangeToPar(holes: any[], from: number, to: number): number | null {
 // compute_round_stats
 // ─────────────────────────────────────────────────────────────────────────────
 function computeRoundStats(score: any, holes: any[], meta: any) {
-  // WHS leaves actual_gross null on most rounds; the playable gross lives
-  // in adjusted_gross. Prefer adjusted_gross, fall back to actual_gross.
-  const grossScore = score.adjusted_gross ?? score.actual_gross ?? null;
+  // Scored gross sums a complete actual hole card, otherwise uses score-level
+  // actual gross; adjusted gross is the last resort, not a handicap cap here.
+  const grossScore = actualRoundGross(score, holes);
   // golf_courses has no `par` column, and there is NO course-level par to fall
   // back to — the hole rows are the only source, and they stay the only source.
   //
@@ -781,7 +782,7 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     for (const h of holes) {
       if (!h.played) { parOrBetterRun = 0; birdieRun = 0; continue; }
       playedHoles++;
-      const hs = h.adjusted_gross ?? h.actual_gross;
+      const hs = holeStrokes(h);
       if (hs == null || h.par == null) continue;
       scoredHoles++;
       const d = hs - h.par;

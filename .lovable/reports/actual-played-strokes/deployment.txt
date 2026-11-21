@@ -1,0 +1,4 @@
+Successfully deployed edge functions: gam-evaluator
+source_sha256: d4e8e6881c71ce88c5a4931a5aeba06bf7ab3377745e3fcd6f0b187a19dc7b1a
+Non-mutating GET /gam-evaluator: HTTP 200 at 2026-11-21 08:40:45 UTC
+version: 2026-09-20T00:00:00Z-v10-hole-units-best-or-birdie
