@@ -25,8 +25,8 @@ const EMPTY_POSTS: never[] = [];
 /** A video tile's playable source for HoleInlineVideo (BRIEF_PLAYED_MEMBER_MEDIA_AUTOPLAY §2). */
 export interface TileVideo { media_url: string; stream_id: string | null; poster_url: string | null; duration_seconds: number | null }
 
-export interface TileHolePhoto { kind: 'hole'; key: string; holeNo: number; addedAt: string; imageUrl: string; par: number | null; yards: number | null; memberName: string | null; memberId: string | null; memberPhoto: string | null; sourcePostId: string | null; mediaId?: string; rows?: MemberShotRow[]; video?: TileVideo }
-export interface TileCoursePhoto { kind: 'course'; key: string; postId?: string; mediaId?: string; createdAt: string; imageUrl: string; caption: string; memberName: string | null; memberId: string | null; memberPhoto: string | null; video?: TileVideo }
+export interface TileHolePhoto { kind: 'hole'; width?: number | null; height?: number | null; key: string; holeNo: number; addedAt: string; imageUrl: string; par: number | null; yards: number | null; memberName: string | null; memberId: string | null; memberPhoto: string | null; sourcePostId: string | null; mediaId?: string; rows?: MemberShotRow[]; video?: TileVideo }
+export interface TileCoursePhoto { kind: 'course'; width?: number | null; height?: number | null; key: string; postId?: string; mediaId?: string; createdAt: string; imageUrl: string; caption: string; memberName: string | null; memberId: string | null; memberPhoto: string | null; video?: TileVideo }
 
 export function usePlayedTile(courseId: string | null, userId: string | undefined) {
   const { activeActor } = useActiveActor();
@@ -61,7 +61,7 @@ export function usePlayedTile(courseId: string | null, userId: string | undefine
       const r = [...rows].sort((a, b) => (b.added_at ?? '').localeCompare(a.added_at ?? ''))[0];
       const img = holeMediaPoster(r);
       if (!img) return;
-      out.push({ kind: 'hole', key: `h:${r.id}`, holeNo: r.hole_no ?? holeNumbers[i], addedAt: r.added_at ?? '', imageUrl: img, par: r.par ?? null, yards: r.yards ?? null, memberName: r.member_name ?? null, memberId: r.member_id ?? null, memberPhoto: r.member_avatar_url ?? null, sourcePostId: r.source_post_id ?? null, mediaId: r.id, rows, ...(r.media_type === 'video' ? { video: { media_url: r.media_url, stream_id: r.stream_id ?? null, poster_url: img, duration_seconds: r.duration_seconds ?? null } } : {}) });
+      out.push({ kind: 'hole', width: typeof r.width === 'number' ? r.width : null, height: typeof r.height === 'number' ? r.height : null, key: `h:${r.id}`, holeNo: r.hole_no ?? holeNumbers[i], addedAt: r.added_at ?? '', imageUrl: img, par: r.par ?? null, yards: r.yards ?? null, memberName: r.member_name ?? null, memberId: r.member_id ?? null, memberPhoto: r.member_avatar_url ?? null, sourcePostId: r.source_post_id ?? null, mediaId: r.id, rows, ...(r.media_type === 'video' ? { video: { media_url: r.media_url, stream_id: r.stream_id ?? null, poster_url: img, duration_seconds: r.duration_seconds ?? null } } : {}) });
     });
     return out;
   }, [holeReads, holeNumbers]);
@@ -78,7 +78,7 @@ export function usePlayedTile(courseId: string | null, userId: string | undefine
       const img = m ? (m.type === 'video' ? m.thumbnailUrl : m.imageUrl || m.thumbnailUrl) : null;
       if (!img) return [];
       const caption = (p.caption ?? '').split('\n').map((l) => l.trim()).find(Boolean) ?? '';
-      return [{ kind: 'course' as const, key: `c:${p.id}`, postId: p.id, mediaId: m?.id, createdAt: p.createdAt, imageUrl: img, caption, memberName: p.displayName || p.username || null, memberId: p.userId || null, memberPhoto: p.avatarUrl || null, ...(m?.type === 'video' && m.streamId ? { video: { media_url: m.hlsUrl ?? m.streamId, stream_id: m.streamId, poster_url: img, duration_seconds: m.duration ?? null } } : {}) }];
+      return [{ kind: 'course' as const, width: m?.storedWidth ?? null, height: m?.storedHeight ?? null, key: `c:${p.id}`, postId: p.id, mediaId: m?.id, createdAt: p.createdAt, imageUrl: img, caption, memberName: p.displayName || p.username || null, memberId: p.userId || null, memberPhoto: p.avatarUrl || null, ...(m?.type === 'video' && m.streamId ? { video: { media_url: m.hlsUrl ?? m.streamId, stream_id: m.streamId, poster_url: img, duration_seconds: m.duration ?? null } } : {}) }];
     });
   }, [media.data, holes]);
 

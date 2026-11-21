@@ -13,6 +13,9 @@ export interface MediaItem {
   streamId?: string;
   width: number;
   height: number;
+  /** Raw gallery row geometry, separate from viewer fallback dimensions. */
+  storedWidth?: number | null;
+  storedHeight?: number | null;
   duration?: number;
   displayOrder?: number;
   /** True for video items whose Cloudflare Stream encode has not completed

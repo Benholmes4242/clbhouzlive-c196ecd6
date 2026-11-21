@@ -1,0 +1,119 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ❯ src/test/railTileShapes.test.tsx (22 tests | 22 failed) 33ms
+   × railTileWidth(4032, 3024) returns 252 14ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(1000, 1000) returns 252 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(1080, 1920) returns 156 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(950, 1000) returns 252 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(940, 1000) returns 156 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(null, 1000) returns 156 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(1000, null) returns 156 2ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(0, 1000) returns 156 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(1000, 0) returns 156 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(NaN, 1000) returns 156 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(1000, NaN) returns 156 0ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(Infinity, 1000) returns 156 1ms
+     → Cannot redefine property: IntersectionObserver
+   × railTileWidth(1000, Infinity) returns 156 0ms
+     → Cannot redefine property: IntersectionObserver
+   × region member media 4032 x 3024 uses 252 by 216 0ms
+     → Cannot redefine property: IntersectionObserver
+   × region member media 1080 x 1920 uses 156 by 216 1ms
+     → Cannot redefine property: IntersectionObserver
+   × region member media null x null uses 156 by 216 0ms
+     → Cannot redefine property: IntersectionObserver
+   × region fallback without member media stays 156 by 216 1ms
+     → Cannot redefine property: IntersectionObserver
+   × region card widens once on deferred media settlement and never on image load 1ms
+     → Cannot redefine property: IntersectionObserver
+   × region video width uses the media row geometry, not its poster 0ms
+     → Cannot redefine property: IntersectionObserver
+   × PlayedTile landscape hole and course photos are 252 and portrait is 156, all 216 tall 0ms
+     → Cannot redefine property: IntersectionObserver
+   × PlayedTile pending bars stay 156 and do not render photos before ready 0ms
+     → Cannot redefine property: IntersectionObserver
+   × gallery mapping carries raw dimensions while retaining viewer fallbacks for unknown sizes 0ms
+     → Cannot redefine property: IntersectionObserver
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > is lazy: no read for a card that has not come near the viewport
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed out, reads get_course_media_v2 with a null user and one row, then draws the newest member photo
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed out, reads get_course_media_v2 with a null user and one row, then draws the newest member photo
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed in passes the user id
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed in passes the user id
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > keeps the course image while pending and when there is no member media
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > a video card renders HoleInlineVideo in courses-member-shots with its poster, and the tap still opens the sheet
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > a video card renders HoleInlineVideo in courses-member-shots with its poster, and the tap still opens the sheet
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+ ✓ src/test/playedMemberMediaAutoplay.test.tsx (6 tests) 262ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 22 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(4032, 3024) returns 252
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(1000, 1000) returns 252
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(1080, 1920) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(950, 1000) returns 252
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(940, 1000) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(null, 1000) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(1000, null) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(0, 1000) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(1000, 0) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(NaN, 1000) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(1000, NaN) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(Infinity, 1000) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > railTileWidth(1000, Infinity) returns 156
+ FAIL  src/test/railTileShapes.test.tsx > region member media 4032 x 3024 uses 252 by 216
+ FAIL  src/test/railTileShapes.test.tsx > region member media 1080 x 1920 uses 156 by 216
+ FAIL  src/test/railTileShapes.test.tsx > region member media null x null uses 156 by 216
+ FAIL  src/test/railTileShapes.test.tsx > region fallback without member media stays 156 by 216
+ FAIL  src/test/railTileShapes.test.tsx > region card widens once on deferred media settlement and never on image load
+ FAIL  src/test/railTileShapes.test.tsx > region video width uses the media row geometry, not its poster
+ FAIL  src/test/railTileShapes.test.tsx > PlayedTile landscape hole and course photos are 252 and portrait is 156, all 216 tall
+ FAIL  src/test/railTileShapes.test.tsx > PlayedTile pending bars stay 156 and do not render photos before ready
+ FAIL  src/test/railTileShapes.test.tsx > gallery mapping carries raw dimensions while retaining viewer fallbacks for unknown sizes
+TypeError: Cannot redefine property: IntersectionObserver
+ ❯ src/test/railTileShapes.test.tsx:32:38
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/22]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  22 failed | 6 passed (28)
+   Start at  13:58:49
+   Duration  7.39s (transform 2.03s, setup 482ms, collect 5.86s, tests 295ms, environment 2.08s, prepare 283ms)
+

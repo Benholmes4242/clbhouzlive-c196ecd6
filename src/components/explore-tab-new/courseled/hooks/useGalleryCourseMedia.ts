@@ -52,7 +52,15 @@ export function galleryCourseMediaQuery(courseId: string | null, userId: string 
         const rows = (data ?? []) as FeedRpcRow[];
         if (rows.length === 0) break;
 
-        const posts = rows.map(mapRowToFeedPost);
+        const posts = rows.map((row) => {
+          const post = mapRowToFeedPost(row);
+          // Preserve viewer defaults while carrying the stored sizes for rails.
+          for (const item of post.mediaItems) {
+            item.storedWidth = typeof row.width === 'number' ? row.width : null;
+            item.storedHeight = typeof row.height === 'number' ? row.height : null;
+          }
+          return post;
+        });
         flat.push(...posts);
         for (const post of posts) {
           if (!seen.includes(post.id)) seen.push(post.id);

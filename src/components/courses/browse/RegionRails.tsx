@@ -22,6 +22,7 @@ import { bestLately, railShowsSeeAll, type RailPlan } from './playedRings';
 import type { PlayedCourse } from './usePlayedRounds';
 import { GLASS, MemberFace, PLAYED_SCRIM, PlayedHead } from './playedParts';
 import type { CourseGroup } from './WhoPlayingSection';
+import { railTileWidth } from './railTileHeights';
 
 export const RAIL_CARD_W = 156;
 export const RAIL_CARD_H = 216;
@@ -41,7 +42,7 @@ function PlayedCard({ group, course, onOpen }: { group: CourseGroup; course: Pla
   // §1: newest member media over the course image; the fallback stays drawn beneath while pending or absent.
   const media = useNewestCourseMedia(course.id, user?.id ?? null, near).data ?? null;
   return (
-    <button ref={ref} type="button" data-rail-card="played" onClick={onOpen} style={cardStyle}>
+    <button ref={ref} type="button" data-rail-card="played" onClick={onOpen} style={{ ...cardStyle, width: media ? railTileWidth(media.width, media.height) : RAIL_CARD_W }}>
       <CourseImageFallback courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
         {media ? (
           <span data-rail-media={media.media_type} style={{ position: 'absolute', inset: 0 }}>

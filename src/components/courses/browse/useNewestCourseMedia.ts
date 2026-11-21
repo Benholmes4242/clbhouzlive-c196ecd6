@@ -13,7 +13,7 @@ import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 
 export const NEAR_MARGIN = '400px';
 
-export interface NewestCourseMedia { media_type: 'image' | 'video'; media_url: string; stream_id: string | null; poster_url: string | null; duration_seconds: number | null }
+export interface NewestCourseMedia { media_type: 'image' | 'video'; media_url: string; stream_id: string | null; poster_url: string | null; duration_seconds: number | null; width: number | null; height: number | null }
 
 export const newestCourseMediaKey = (courseId: string, userId: string | null, actorType?: string, actorId?: string) =>
   ['course-newest-media', courseId, userId, actorType ?? null, actorId ?? null] as const;
@@ -56,6 +56,8 @@ export function useNewestCourseMedia(courseId: string, userId: string | null, en
         stream_id: (r.stream_id as string | null) ?? null,
         poster_url: (r.poster_url as string | null) ?? null,
         duration_seconds: (r.duration_seconds as number | null) ?? null,
+        width: typeof r.width === 'number' ? r.width : null,
+        height: typeof r.height === 'number' ? r.height : null,
       };
     },
   });

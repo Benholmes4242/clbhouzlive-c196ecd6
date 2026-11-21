@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped verification: Landscape rail tiles
+- Stored media sizes and shared 252/156 width rule implemented; 216 height, overlays and non-photo cards preserved.
+- Focused command: 6 passed / 22 failed; new setup throws Cannot redefine property: IntersectionObserver at railTileShapes.test.tsx:32:38. Surviving fixture type error at :26:15; left untouched under STOP rule.
+- Four shards and 390/320 captures blocked pending permission to repair the new observer setup and CourseGroup fixture. Expected inventory 9,550/850 = 9,491 + 37 Members + 22 rail cases; not a verified passing total. Report: .lovable/reports/rail-tile-shapes/report.md.
+
 ## In progress: Admin Members v3
 - Match cc3-members in the scoped Members, Verified, optional ranking and Team surfaces; preserve reads, sheets and default ranking.
 - Add complete-payload lifecycle, To connect and URL sorting rules plus the named regression file; change only the authorised last-seen test.
