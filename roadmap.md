@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Tour overview narrow-screen fixes
+- Restore the short AVG label through CSS rule ordering; share intrinsic BEHIND/PTS columns across the recap heading and rows, preserving names-only ellipsis and existing row actions.
+- Added four overviewNarrowFixes cases; existing tests unchanged. Baseline 9,646 / 857 → verified 9,650 / 858 (+four cases / one file).
+- Four sequential shards passed 2,377 / 2,341 / 2,419 / 2,513. Actual 320/340/341/390 section captures verify AVG at ≤340, SCORING AVG above, complete aligned Champions figures, 8/12px column gaps and unchanged linked/plain-text names. Full logs/report/captures: .lovable/reports/overview-narrow-fixes/.
+
 ## Complete: Season recap Next up verification
 - Implemented the shared three-day handover, season-over copy and loaded-next-event footer; removed recap points/final-event line and tied-player subline. Standings, card lists, live priority and January hand-back preserved.
 - Height ruling received: preserve today's growing photo; Next up follows the sentence within the existing content block, and content stays clear of the top islands. No sizing change needed.

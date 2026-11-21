@@ -1,5 +1,6 @@
 /* Tour overview live states only (LiveHeroBoard / LiveOverviewSections). */
 .live-board .live-board-name-short{display:none}
+.live-facts .live-fact-short{display:none}
 @media (max-width:340px){
   .live-board[data-live-today] .live-board-name-full{display:none}
   .live-board[data-live-today] .live-board-name-short{display:inline}
@@ -7,7 +8,6 @@
   .live-facts .live-fact-full{display:none}
   .live-facts .live-fact-short{display:inline}
 }
-.live-facts .live-fact-short{display:none}
 .upcoming-sct>.a{font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums;position:relative}
 .upcoming-sct>.a.tot{text-align:right}
 .upcoming-sct>.a[data-mark]::after{content:"";position:absolute;left:50%;bottom:-6px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}

@@ -128,18 +128,19 @@ export function RecapFacts({ data }: { data: SeasonRecapData }) {
 
 export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecapData }) {
   /* Restore only THE POINTS LIST kicker; the Full list link stays retired.
-     CARD LIST A: each name opens that player's tour player page; no id = plain text. */
+     CARD LIST A: each name opens that player's tour player page; no id = plain text.
+     Heading and rows share one intrinsic points grid so only names shorten. */
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const rows = (data.standings ?? []).slice(0, 3);
   if (!rows.length) return null;
   return <section data-recap-board className="upcoming-block recap-block">
+    <div data-recap-table className="recap-table">
     <div className="recap-head-row">
       <h2 className="upcoming-kicker">{t('overview.recap.pointsHeading', { defaultValue: 'THE POINTS LIST' })}</h2>
       <span className="recap-pts-label">{t('overview.recap.behind')}</span>
       <span className="recap-pts-label">{t('overview.recap.pts')}</span>
     </div>
-    <div data-recap-table className="recap-table">
     {rows.map((r) => <div key={r.position} className="recap-grid recap-row" data-recap-row={r.position}>
       <span className="recap-pos">{r.position === 1 ? <Trophy data-recap-trophy size={13} className="recap-trophy" aria-label="1" /> : r.position}</span>
       {r.playerId
