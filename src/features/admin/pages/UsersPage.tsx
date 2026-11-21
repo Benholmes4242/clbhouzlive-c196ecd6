@@ -24,6 +24,9 @@ import AdminSheet from '../components/AdminSheet';
 import { useAdminUserDetail, type AdminUserDetail } from '../hooks/useUsers';
 import { useMembersOverview, type MembersOverview } from '../hooks/useMembersRadar';
 import MembersList from '../components/MembersList';
+import { Button } from '@/components/ui/button';
+import { CC3, NUM, LIST3, PANEL_TITLE } from '../components/InboxPanels';
+import { btnOutline } from '../components/InboxQueueRow';
 import { Skeleton } from '../lib/chartPrimitives';
 import { londonDate } from '../lib/memberRadarDisplay';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
@@ -84,15 +87,18 @@ export default function UsersPage() {
 
   return (
     <div
+      data-members-v3
       style={{
-        padding: '8px 12px 24px',
+        ...NUM,
+        padding: '10px 12px 28px',
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
-        maxWidth: 1180,
+        maxWidth: 720,
         margin: '0 auto',
-        color: t.ink,
-        fontVariantNumeric: 'tabular-nums',
+        color: CC3.ink,
+        lineHeight: 'normal',
+        minWidth: 0,
       }}
     >
       {overview.error ? (
@@ -749,11 +755,11 @@ interface InviteCandidate {
 
 const TEAM_ROW: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '30px minmax(0,1fr) auto',
+  gridTemplateColumns: '28px minmax(0,1fr) auto',
   columnGap: 10,
   alignItems: 'center',
-  padding: '10px 16px',
-  borderTop: `1px solid ${t.hairline}`,
+  padding: '10px 14px',
+  borderTop: `1px solid ${CC3.hair}`,
 };
 
 /** Rows are overview.team then overview.invites, as returned. */
@@ -785,22 +791,22 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
   };
 
   return (
-    <div style={{ background: t.surface, borderRadius: 16, padding: '14px 0 4px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px 10px' }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Team</span>
-        <button
+    <div style={{ ...LIST3, ...NUM }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 14px', marginBottom: 12, gap: 8 }}>
+        <span style={PANEL_TITLE}>Team</span>
+        <Button variant={null} size={null}
           type="button"
           onClick={() => setShowCreate(true)}
-          style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 12, fontWeight: 700, color: t.brandText, cursor: 'pointer' }}
+          style={{ background: 'transparent', border: 'none', padding: 0, height: 'auto', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: CC3.ink, cursor: 'pointer' }}
         >
           Invite
-        </button>
+        </Button>
       </div>
 
       {loading
         ? Array.from({ length: 2 }, (_, i) => (
             <div key={i} style={TEAM_ROW}>
-              <Skeleton height={30} radius={10} />
+              <Skeleton height={28} radius={10} />
               <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <Skeleton height={16} radius={3} />
                 <Skeleton height={13} radius={3} />
@@ -811,29 +817,29 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
         : (
           <>
             {teamRows.map(r => {
-              const full = r.role === 'full';
               const name = r.display_name ?? 'Member';
               const since = `since ${londonDate(r.granted_at, { month: 'short', year: 'numeric' })}`;
               const addedBy = r.granted_by_name && r.granted_by_name !== r.display_name ? ` · added by ${r.granted_by_name}` : '';
               const member = team.data.find(m => m.userId === r.user_id);
               return (
                 <div key={r.user_id} style={TEAM_ROW}>
-                  <SquircleAvatar size={30} src={r.photo_url} alt={name} userId={r.user_id} hairlineRing />
+                  <SquircleAvatar size={28} src={r.photo_url} alt={name} userId={r.user_id} hairlineRing />
                   <span style={{ minWidth: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600 }}>{name}</span>
-                    <span style={{ display: 'block', fontSize: 11, color: t.inkFaint }}>{since}{addedBy}</span>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 600, lineHeight: 1.25, overflowWrap: 'anywhere' }}>{name}</span>
+                    <span style={{ display: 'block', fontSize: 11, color: CC3.faint, marginTop: 1, overflowWrap: 'anywhere' }}>{since}{addedBy}</span>
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                     <span
                       style={{
                         fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: '0.08em',
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
                         textTransform: 'uppercase',
-                        padding: '4px 8px',
-                        borderRadius: 999,
-                        background: full ? t.okSoft : t.neutralSoft,
-                        color: full ? t.okText : t.inkMuted,
+                        padding: '1px 5px',
+                        borderRadius: 5,
+                        border: `1px solid ${CC3.line}`,
+                        color: CC3.mute,
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {adminRoleLabel(r.role) ?? r.role}
@@ -846,37 +852,25 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
             {inviteRows.map(i => {
               const name = i.display_name ?? i.email ?? 'Invite';
               const status = i.expired
-                ? `Invite expired ${formatAgo(i.expires_at, { suffix: true })}`
-                : `Invite sent ${formatAgo(i.created_at, { suffix: true })}`;
+                ? `invite expired ${formatAgo(i.expires_at, { suffix: true })}`
+                : `invite sent ${formatAgo(i.created_at, { suffix: true })}`;
               const role = i.role ? ` · ${(adminRoleLabel(i.role) ?? i.role).toLowerCase()}` : '';
               return (
                 <div key={i.id} style={TEAM_ROW}>
-                  <SquircleAvatar size={30} alt={name} userId={i.id} hairlineRing />
+                  <SquircleAvatar size={28} alt={name} userId={i.id} hairlineRing />
                   <span style={{ minWidth: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600 }}>{name}</span>
-                    <span style={{ display: 'block', fontSize: 11, color: t.warnText }}>{status}{role}</span>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 600, lineHeight: 1.25, overflowWrap: 'anywhere' }}>{name}</span>
+                    <span style={{ display: 'block', fontSize: 11, color: CC3.faint, marginTop: 1, overflowWrap: 'anywhere' }}><span data-tone={i.expired ? 'bad' : 'faint'} style={{ color: i.expired ? CC3.bad : CC3.faint }}>{status}</span>{role}</span>
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                    <button
+                    <Button variant={null} size={null}
                       type="button"
                       disabled={invites.resend.isPending}
                       onClick={() => invites.resend.mutate(i.id)}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        height: 30,
-                        padding: '0 12px',
-                        borderRadius: 999,
-                        border: `1px solid ${t.line}`,
-                        background: 'transparent',
-                        color: t.ink,
-                        fontSize: 11.5,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
+                      style={{ ...btnOutline(invites.resend.isPending), textTransform: 'uppercase' }}
                     >
                       Re-invite
-                    </button>
+                    </Button>
                     <InviteMenu onCancel={() => setConfirmCancel({ id: i.id, name })} />
                   </span>
                 </div>
@@ -932,7 +926,7 @@ function InviteMenu({ onCancel }: { onCancel: () => void }) {
   const [menu, setMenu] = useState(false);
   return (
     <div style={{ position: 'relative', flexShrink: 0 }}>
-      <button
+      <Button variant={null} size={null}
         type="button"
         onClick={() => setMenu(v => !v)}
         aria-label="Invite actions"
@@ -940,9 +934,9 @@ function InviteMenu({ onCancel }: { onCancel: () => void }) {
           width: 30,
           height: 30,
           borderRadius: 999,
-          border: `1px solid ${t.line}`,
+          border: `1px solid ${CC3.line}`,
           background: 'transparent',
-          color: t.ink,
+          color: CC3.mute,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -950,7 +944,7 @@ function InviteMenu({ onCancel }: { onCancel: () => void }) {
         }}
       >
         <MoreVertical size={14} />
-      </button>
+      </Button>
       {menu && (
         <>
           <div onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
@@ -962,10 +956,10 @@ function InviteMenu({ onCancel }: { onCancel: () => void }) {
               marginTop: 6,
               zIndex: 50,
               minWidth: 200,
-              background: t.surface,
-              border: `1px solid ${t.line}`,
-              borderRadius: t.radius.md,
-              boxShadow: t.shadowPop,
+              background: CC3.surface,
+              border: `1px solid ${CC3.line}`,
+              borderRadius: 12,
+
               padding: 4,
             }}
           >
@@ -987,7 +981,7 @@ function TeamMenu({ member, hook, onRevoke }: { member: TeamMember; hook: Return
   };
   return (
     <div style={{ position: 'relative', flexShrink: 0 }}>
-      <button
+      <Button variant={null} size={null}
         type="button"
         onClick={() => setMenu(v => !v)}
         aria-label="Member actions"
@@ -995,9 +989,9 @@ function TeamMenu({ member, hook, onRevoke }: { member: TeamMember; hook: Return
           width: 30,
           height: 30,
           borderRadius: 999,
-          border: `1px solid ${t.line}`,
+          border: `1px solid ${CC3.line}`,
           background: 'transparent',
-          color: t.ink,
+          color: CC3.mute,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1005,7 +999,7 @@ function TeamMenu({ member, hook, onRevoke }: { member: TeamMember; hook: Return
         }}
       >
         <MoreVertical size={14} />
-      </button>
+      </Button>
       {menu && (
         <>
           <div onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
@@ -1017,10 +1011,10 @@ function TeamMenu({ member, hook, onRevoke }: { member: TeamMember; hook: Return
               marginTop: 6,
               zIndex: 50,
               minWidth: 200,
-              background: t.surface,
-              border: `1px solid ${t.line}`,
-              borderRadius: t.radius.md,
-              boxShadow: t.shadowPop,
+              background: CC3.surface,
+              border: `1px solid ${CC3.line}`,
+              borderRadius: 12,
+
               padding: 4,
             }}
           >

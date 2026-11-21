@@ -8,7 +8,7 @@ import { ProLabel } from '@/features/pro-verification/ProLabel';
 import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
 import { supabase } from '@/integrations/supabase/client';
 import { adminVerifiedCount, type AdminVerified } from '../hooks/useAdminVerified';
-import { adminTheme as t } from '../theme';
+import { CC3, NUM, PANEL_TITLE, PANEL_META } from './InboxPanels';
 import { formatAgo } from '../lib/formatAgo';
 import './adminVerified.css';
 import { AdminProWorldRanking } from './AdminProWorldRanking';
@@ -38,18 +38,18 @@ export function AdminVerifiedCard({ data, loading, error, onOpenMember }: { data
     })();
     return () => { alive = false; };
   }, [unlinkedKey]);
-  const row = (id: string, name: string, photo: string | null, sub: React.ReactNode, badge: React.ReactNode, date: string | null, open: () => void, pending = false) => <Button key={id} variant="ghost" className="admin-verified-row" onClick={open}>
-    <SquircleAvatar size={40} src={photo} alt={name} hairlineRing />
+  const row = (id: string, name: string, photo: string | null, sub: React.ReactNode, badge: React.ReactNode, date: string | null, open: () => void, pending = false) => <Button key={id} variant={null} size={null} className="admin-verified-row" style={NUM} onClick={open}>
+    <SquircleAvatar size={34} src={photo} alt={name} hairlineRing />
     <span className="admin-verified-content"><span className="admin-verified-name"><span>{name}</span>{badge}</span><span className="admin-verified-sub">{sub}</span></span>
-    {pending ? <span className="admin-verified-right">Inbox ›</span> : date ? <span className="admin-verified-right">since<br />{verifiedSince(date)}</span> : null}
+    {pending ? <span className="admin-verified-right">Inbox ›</span> : date ? <span className="admin-verified-right">since<b style={NUM}>{verifiedSince(date)}</b></span> : null}
   </Button>;
   const section = (label: string, rows: React.ReactNode[]) => rows.length ? <section key={label} data-verified-section={label}><h4>{label} · {rows.length}</h4>{rows}</section> : null;
-  return <div className="admin-verified-card" data-testid="admin-verified-card"><header><span>VERIFIED</span><span>{adminVerifiedCount(data) ?? '—'}</span></header>
+  return <div className="admin-verified-card" style={NUM} data-testid="admin-verified-card"><header><span style={PANEL_TITLE}>Verified</span><span style={PANEL_META}><b style={{ color: CC3.ink, fontWeight: 700 }}>{adminVerifiedCount(data) ?? '—'}</b> accounts</span></header>
     {loading ? <p role="status">Loading…</p> : error ? <p role="alert">Could not load verified accounts.</p> : data ? <>
       {section('PROS', data.pros.map(p => {
         const noSource = p.pro_kind === 'tour_pro' && !p.pro_player_id && owgrSources !== null && !owgrSources.has(p.id);
         const meta = [p.pro_kind === 'tour_pro' ? 'Tour professional' : 'Teaching professional', p.pro_kind === 'tour_pro' ? p.pro_tour : p.pro_club].filter(Boolean).join(' · ');
-        return <div key={p.id}>{row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, <>{meta}{noSource && <span style={{ color: t.warn, fontSize: 12 }}> · No results source</span>}</>, <ProLabel size="small" />, p.verified_at, () => onOpenMember(p.id))}{p.pro_kind === 'tour_pro' && <AdminProWorldRanking userId={p.id} />}</div>;
+        return <div key={p.id}>{row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, <>{meta}{noSource && <span data-tone="bad" style={{ color: CC3.bad, fontSize: 11 }}> · No results source</span>}</>, <ProLabel size="small" />, p.verified_at, () => onOpenMember(p.id))}{p.pro_kind === 'tour_pro' && <AdminProWorldRanking userId={p.id} variant="v3" />}</div>;
       }))}
       {section('AMATEURS', (data.amateurs ?? []).map(p => row(p.id, p.display_name ?? p.username ?? 'Member', p.avatar_url, [`WAGR ${p.rank ?? '—'}`, p.last_synced_at ? `Synced ${formatAgo(p.last_synced_at, { suffix: true })}` : 'Not synced', p.last_error].filter(Boolean).join(' · '), <ProLabel size="small" kind="am" />, null, () => onOpenMember(p.id))))}
       {section('BEING CHECKED', data.pending.map(p => row(p.request_id, p.display_name ?? p.username ?? 'Member', p.avatar_url, `${p.kind === 'tour_pro' ? 'Tour professional' : 'Teaching professional'} · asked ${formatAgo(p.requested_at, { suffix: true })}`, <span className="admin-verified-pending">BEING CHECKED</span>, null, () => navigate(`/admin-v2/inbox?type=verification&request=${encodeURIComponent(p.request_id)}`), true)))}

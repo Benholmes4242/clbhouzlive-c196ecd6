@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { memberTags, memberSubline, lastSeenColor, resolveListFilter, weekDashColors } from '@/features/admin/components/MembersList';
-import { adminTheme as t } from '@/features/admin/theme';
+import { CC3 } from '@/features/admin/components/InboxPanels';
 import { WEEK_PREJOIN, WEEK_OFF } from '@/features/admin/lib/panels';
 import type { MembersOverviewMember } from '@/features/admin/hooks/useMembersRadar';
 
@@ -21,10 +21,10 @@ describe('Members list rules', () => {
     expect(memberSubline(m({}))).toBe('@ab · no club');
     expect(memberSubline(m({ home_club: 'Sundridge Park GC', rounds_total: 12 }))).toBe('Sundridge Park GC · 12 rds');
   });
-  it('colours last seen green under 24h and amber-warn when quiet', () => {
-    expect(lastSeenColor(m({}), NOW)).toBe(t.okText);
-    expect(lastSeenColor(m({ is_quiet: true, last_seen_at: '2026-09-18T08:00:00Z' }), NOW)).toBe(t.warnText);
-    expect(lastSeenColor(m({ last_seen_at: '2026-09-18T08:00:00Z' }), NOW)).toBe(t.inkFaint);
+  it('colours last seen green under 24h and red when quiet', () => {
+    expect(lastSeenColor(m({}), NOW)).toBe(CC3.good);
+    expect(lastSeenColor(m({ is_quiet: true, last_seen_at: '2026-09-18T08:00:00Z' }), NOW)).toBe(CC3.bad);
+    expect(lastSeenColor(m({ last_seen_at: '2026-09-18T08:00:00Z' }), NOW)).toBe(CC3.faint);
   });
   it('keeps old ?filter= links working with no chip highlighted', () => {
     expect(resolveListFilter('eg_issues')).toEqual({ chip: null, linked: 'eg_issues' });

@@ -1,16 +1,10 @@
-/**
- * BRIEF_MEMBERS_LIST_REBUILD — the Members list, built to Main.html.
- * Member figures come from get_admin_members_overview; the Verified catalogue
- * reads only useAdminVerified and visible pro identities use useProMembers.
- * The one exception is the legacy ?filter=eg_issues deep link, which the
- * overview has no flag for (see useEgIssueUserIds).
- */
+/** Members v3 uses the existing overview and catalogue only. Lifecycle and
+ * eligibility require complete membership; legacy linked filters retain their
+ * existing reader. Pure lifecycle/ordering rules live in membersLifecycle. */
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import { adminTheme as t } from '../theme';
 import { DORMANT_FILL, INK_30, INK_55, WEEK_OFF, WEEK_PREJOIN } from '../lib/panels';
-import { Skeleton } from '../lib/chartPrimitives';
 import { formatAgo } from '../lib/formatAgo';
 import { memberIndexText } from '../lib/memberRadarRules';
 import { londonDate } from '../lib/memberRadarDisplay';
@@ -24,14 +18,16 @@ import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers'
 import type { ProMember } from '@/features/pro-verification/proMembersCache';
 import { useAdminVerified, adminVerifiedCount } from '../hooks/useAdminVerified';
 import { AdminVerifiedCard } from './AdminVerifiedCard';
+import { CC3, NUM, PANEL3, LIST3, PANEL_TITLE, PANEL_META } from './InboxPanels';
+import { ccDelta } from '../pages/cc3Rules';
+import { completeMembership, membersLifecycle, lifecycleSummary, memberActivity, toConnect, resolveMemberSort, sortMembers, memberTags, memberSubline as lifecycleSubline, lastSeenColor as lifecycleLastSeenColor, type LifecycleWeek, type MemberSort } from '../lib/membersLifecycle';
 
 const PAGE = 25;
 const DAY = 86_400_000;
-
-export type ChipFilter = 'all' | 'verified' | 'connected' | 'no_handicap' | 'quiet' | 'new_this_week';
-const CHIP_FILTERS: ChipFilter[] = ['all', 'verified', 'connected', 'no_handicap', 'quiet', 'new_this_week'];
+const DASH = '—';
+export type ChipFilter = 'all' | 'verified' | 'connected' | 'to_connect' | 'no_handicap' | 'quiet' | 'new_this_week';
+const CHIP_FILTERS: ChipFilter[] = ['all', 'verified', 'connected', 'to_connect', 'no_handicap', 'quiet', 'new_this_week'];
 const LEGACY_TO_ALL = new Set(['unverified', 'new_today']);
-
 /** Filters linked from elsewhere: no chip, label shown as the list header. */
 const LINKED_FILTERS: Record<string, { label: string; test: (m: MembersOverviewMember, eg: ReadonlySet<string>, now: number) => boolean }> = {
   active_24h:    { label: 'Active 24h',            test: (m, _e, now) => !!m.last_seen_at && now - new Date(m.last_seen_at).getTime() < DAY },
@@ -42,23 +38,24 @@ const LINKED_FILTERS: Record<string, { label: string; test: (m: MembersOverviewM
   admin:         { label: 'Admins',                test: m => !!m.admin_role },
   not_connected: { label: 'No handicap connected', test: m => !m.connected },
 };
-const CHIP_TEST: Record<ChipFilter, (m: MembersOverviewMember) => boolean> = {
-  all: () => true,
-  verified: () => false,
-  connected: m => m.connected,
-  no_handicap: m => !m.connected,
-  quiet: m => m.is_quiet,
-  new_this_week: m => m.is_new,
+const CHIP_TEST: Record<ChipFilter, (m: MembersOverviewMember, proIds: ReadonlySet<string>, now: number) => boolean> = {
+  all: () => true, verified: () => false, connected: m => m.connected,
+  to_connect: toConnect, no_handicap: m => !m.connected,
+  quiet: m => m.is_quiet, new_this_week: m => m.is_new,
 };
 const CHIP_HEADER: Record<ChipFilter, string> = {
-  all: 'All members', verified: 'Verified', connected: 'Connected', no_handicap: 'No handicap', quiet: 'Quiet', new_this_week: 'New',
+  all: 'All members', verified: 'Verified', connected: 'Connected', to_connect: 'To connect', no_handicap: 'No handicap', quiet: 'Quiet', new_this_week: 'New',
 };
-
-const PANEL_TITLE: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' };
-const CAPTION: React.CSSProperties = { fontSize: 11, color: t.inkFaint };
-const SMALL_LABEL: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.inkFaint };
-const TAG: React.CSSProperties = { flex: 'none', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' };
-const ROLE_LABEL: Record<string, string> = { full: 'Full', limited: 'Limited', moderator: 'Moderator' };
+const MINI: React.CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: CC3.faint };
+const FIG: React.CSSProperties = { ...NUM, fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1 };
+const CAP: React.CSSProperties = { ...NUM, fontSize: 10.5, fontWeight: 600, color: CC3.faint, marginTop: 1, overflowWrap: 'anywhere' };
+const PULSE: React.CSSProperties = { animation: 'admin-pulse 1.4s ease-in-out infinite' };
+const TAG: React.CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' };
+const TONES = { role: CC3.mute, good: CC3.good, bad: CC3.bad, faint: CC3.faint, ink: CC3.ink };
+const HEADER: React.CSSProperties = { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 };
+const rowStyle: React.CSSProperties = { display: 'grid', gridTemplateColumns: '34px minmax(0,1fr) auto', columnGap: 10, alignItems: 'center', padding: '10px 14px', borderTop: `1px solid ${CC3.hair}` };
+const SORT_LABEL: Record<MemberSort, string> = { seen: 'Seen', joined: 'Joined', index: 'Index', rounds: 'Rounds' };
+const SORT_CAP: Record<MemberSort, string> = { seen: 'most recent first', joined: 'newest first', index: 'lowest first', rounds: 'most first' };
 
 export function resolveListFilter(raw: string | null): { chip: ChipFilter | null; linked: string | null } {
   if (!raw || LEGACY_TO_ALL.has(raw)) return { chip: 'all', linked: null };
@@ -68,32 +65,12 @@ export function resolveListFilter(raw: string | null): { chip: ChipFilter | null
   return { chip: 'all', linked: null };
 }
 
-export function memberTags(m: MembersOverviewMember, pro?: ProMember): { label: string; color: string }[] {
-  const tags: { label: string; color: string }[] = [];
-  if (m.admin_role && ROLE_LABEL[m.admin_role]) tags.push({ label: ROLE_LABEL[m.admin_role], color: t.brandText });
-  if (m.is_new) tags.push({ label: 'New', color: t.okText });
-  if (m.is_quiet) tags.push({ label: 'Quiet', color: t.warnText });
-  if (m.is_suspended) tags.push({ label: 'Suspended', color: t.dangerText });
-  if (!m.connected && !pro) tags.push({ label: 'No hcp', color: t.inkFaint });
-  return tags.slice(0, 2);
+export { memberTags } from '../lib/membersLifecycle';
+export function memberSubline(m: MembersOverviewMember, pro?: ProMember, chip?: ChipFilter | null, now = Date.now()) {
+  return lifecycleSubline(m, pro, chip, now);
 }
-
-export function memberSubline(m: MembersOverviewMember, pro?: ProMember): string {
-  if (pro) return [m.home_club, pro.pro_kind === 'tour_pro' ? pro.pro_tour : 'Teaching pro'].filter(Boolean).join(' · ');
-  const handle = m.username ? `@${m.username}` : '—';
-  if (m.is_quiet) return `was weekly · silent since ${londonDate(m.last_seen_at, { day: 'numeric', month: 'short' })}`;
-  if (m.is_new) return `${m.home_club || 'no club'} · joined ${formatAgo(m.created_at, { suffix: true })}`;
-  if (!m.home_club && m.rounds_total === 0) return `${handle} · no club`;
-  return `${m.home_club || handle} · ${m.rounds_total} rds`;
-}
-
-export function lastSeenColor(m: MembersOverviewMember, now = Date.now()): string {
-  if (!m.last_seen_at) return t.inkFaint;
-  const age = now - new Date(m.last_seen_at).getTime();
-  if (age < DAY) return t.okText;
-  if (m.is_quiet) return t.warnText;
-  if (age <= 7 * DAY) return t.ink;
-  return t.inkFaint;
+export function lastSeenColor(m: MembersOverviewMember, now = Date.now()) {
+  return lifecycleLastSeenColor(m, now);
 }
 
 /** weeks_8[0] is 7 weeks ago. The overview's weeks_8 buckets are 7-day steps
@@ -104,319 +81,156 @@ export function weekDashColors(m: MembersOverviewMember, now = Date.now()): stri
   return m.weeks_8.map((active, i) => {
     const weekEnd = now - (7 - i) * 7 * DAY;
     if (weekEnd <= joined) return WEEK_PREJOIN;
-    return active ? t.ink : WEEK_OFF;
+    return active ? CC3.ink : WEEK_OFF;
   });
 }
 
 
-function LastSeenPanel({ o }: { o: MembersOverview | undefined }) {
+function Stats({ children, columns }: { children: React.ReactNode; columns: number }) {
+  return <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0,1fr))`, gap: 8, marginTop: 12, paddingTop: 11, borderTop: `1px solid ${CC3.hair}` }}>{children}</div>;
+}
+function Stat({ label, value, caption, tone = 'ink', loading }: { label: string; value: React.ReactNode; caption: React.ReactNode; tone?: keyof typeof TONES; loading?: boolean }) {
+  return <div data-stat={label} style={{ minWidth: 0 }}>
+    <div style={MINI}>{label}</div>
+    <div data-figure data-tone={tone} style={{ ...FIG, marginTop: 3, color: TONES[tone], ...(loading ? PULSE : {}) }}>{loading ? DASH : value}</div>
+    <div style={CAP}>{loading ? '\u00a0' : caption}</div>
+  </div>;
+}
+function LastSeenPanel({ o, weeks, complete }: { o: MembersOverview | undefined; weeks: LifecycleWeek[]; complete: boolean }) {
   const r = o?.recency;
   const total = o?.total ?? 0;
-  const segs = r ? [
-    { n: r.d1, c: t.ok }, { n: r.d7, c: t.ink }, { n: r.d14, c: INK_55 }, { n: r.d30, c: INK_30 }, { n: r.older, c: DORMANT_FILL },
-  ] : [];
-  const counts = r ? [
-    { n: r.d1, l: '24h', c: t.okText }, { n: r.d7, l: '7d' }, { n: r.d14, l: '14d' }, { n: r.d30, l: '30d' }, { n: r.older, l: 'Over 30d', c: t.dangerText },
-  ] : Array.from({ length: 5 }, () => ({ n: 0, l: '', c: undefined }));
-  const pct = total ? Math.round(((o?.connected ?? 0) / total) * 100) : 0;
-  const figure = (label: string, value: React.ReactNode, color?: string) => (
-    <div>
-      <div style={{ ...SMALL_LABEL, letterSpacing: '0.08em' }}>{label}</div>
-      <div style={{ marginTop: 2, fontSize: 18, fontWeight: 800, color }}>{o ? value : <Skeleton height={22} radius={3} />}</div>
+  const latest = weeks[6];
+  const delta = ccDelta(latest?.active ?? 0, latest?.previous ?? 0);
+  const values = [r?.d1, r?.d7, r?.d14, r?.d30, r?.older];
+  const colors = [CC3.good, CC3.ink, INK_55, INK_30, DORMANT_FILL];
+  return <section style={PANEL3} aria-label="Last seen">
+    <div style={HEADER}><span style={PANEL_TITLE}>Last seen</span><span style={PANEL_META}><b style={{ ...NUM, color: CC3.ink, fontWeight: 700 }}>{o ? total : DASH}</b> members</span></div>
+    <div style={{ display: 'flex', marginTop: 12, height: 12, gap: 2, borderRadius: 4, overflow: 'hidden' }}>
+      {values.map((n, i) => <div key={i} style={{ width: total && n != null ? `${n / total * 100}%` : 0, background: colors[i] }} />)}
     </div>
-  );
-  return (
-    <div style={{ background: t.surface, borderRadius: 16, padding: '14px 16px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={PANEL_TITLE}>Last seen</span>
-        <span style={CAPTION}>
-          <span style={{ color: t.ink, fontWeight: 700 }}>{o ? total : '—'}</span> members
-        </span>
-      </div>
-      <div style={{ marginTop: 12, display: 'flex', gap: 2, height: 14, borderRadius: 4, overflow: 'hidden' }}>
-        {o ? segs.map((s, i) => (
-          <div key={i} style={{ width: total ? `${(s.n / total) * 100}%` : 0, background: s.c }} />
-        )) : <Skeleton height={14} radius={4} />}
-      </div>
-      <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 4 }}>
-        {counts.map((c, i) => (
-          <div key={i}>
-            <div style={{ fontSize: 17, fontWeight: 800, color: c.c }}>{o ? c.n : <Skeleton height={20} radius={3} />}</div>
-            <div style={SMALL_LABEL}>{c.l || ['24h', '7d', '14d', '30d', 'Over 30d'][i]}</div>
-          </div>
-        ))}
-      </div>
-      <div
-        style={{
-          marginTop: 12,
-          paddingTop: 12,
-          borderTop: `1px solid ${t.hairline}`,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-          gap: 8,
-        }}
-      >
-        {figure('Connected', <>{o?.connected} <span style={{ fontSize: 11, fontWeight: 700, color: t.inkMuted }}>{pct}%</span></>)}
-        {figure('New 7d', o?.new_7d)}
-        {figure('Gone quiet', o?.quiet, t.warnText)}
-      </div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,minmax(0,1fr))', gap: 4, marginTop: 10 }}>
+      {['24h', '7d', '14d', '30d', '30d+'].map((label, i) => <div key={label}><div style={{ ...FIG, color: i === 0 ? CC3.good : i === 4 ? CC3.bad : CC3.ink, ...(!o ? PULSE : {}) }}>{values[i] ?? DASH}</div><div style={{ ...MINI, marginTop: 2 }}>{label}</div></div>)}
     </div>
-  );
+    <Stats columns={3}>
+      <Stat label="Connected" value={o?.connected ?? DASH} loading={!o} caption={`${total ? Math.round((o?.connected ?? 0) / total * 100) : 0}% of members`} />
+      <Stat label="Active 7d" value={complete ? latest?.active ?? 0 : DASH} loading={!o} caption={!complete ? 'incomplete data' : <><span data-tone={delta.tone} style={{ color: delta.tone === 'up' ? CC3.good : delta.tone === 'dn' ? CC3.bad : CC3.mute }}>{delta.text}</span> vs {latest?.previous ?? 0}</>} />
+      <Stat label="Gone quiet" value={o?.quiet ?? DASH} loading={!o} tone={(o?.quiet ?? 0) > 0 ? 'bad' : 'ink'} caption="were weekly" />
+    </Stats>
+  </section>;
 }
-
-function Chips({ o, verifiedCount, active, onPick }: { o: MembersOverview | undefined; verifiedCount: number | undefined; active: ChipFilter | null; onPick: (f: ChipFilter) => void }) {
-  const chips: { id: ChipFilter; label: string; n: number | undefined; c?: string }[] = [
-    { id: 'all', label: 'All', n: o?.total },
-    { id: 'verified', label: 'Verified', n: verifiedCount },
-    { id: 'connected', label: 'Connected', n: o?.connected },
-    { id: 'no_handicap', label: 'No handicap', n: o?.no_handicap },
-    { id: 'quiet', label: 'Quiet', n: o?.quiet, c: t.warnText },
-    { id: 'new_this_week', label: 'New', n: o?.new_7d },
-  ];
-  return (
-    <div style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none' }}>
-      {chips.map(c => {
-        const on = active === c.id;
-        return (
-          <Button variant="ghost"
-            key={c.id}
-            type="button"
-            aria-pressed={on}
-            onClick={() => onPick(c.id)}
-            style={{
-              flex: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              height: 34,
-              padding: '0 12px',
-              borderRadius: 999,
-              border: 'none',
-              background: on ? t.ink : t.surface,
-              color: on ? t.canvas : t.ink,
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            {c.label}
-            <span style={{ fontWeight: 800, color: on ? undefined : c.c }}>{c.n ?? '—'}</span>
-          </Button>
-        );
-      })}
+function LifecyclePanel({ weeks, complete, loading }: { weeks: LifecycleWeek[]; complete: boolean; loading: boolean }) {
+  const grid: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: 6 };
+  const latest = weeks[6];
+  const summary = latest ? lifecycleSummary(latest) : null;
+  const maxUp = Math.max(0, ...weeks.map(w => w.active));
+  const maxLost = Math.max(0, ...weeks.map(w => w.lost));
+  const px = (value: number, max: number, height: number) => complete && value > 0 && max > 0 ? Math.max(2, value / max * height) : 0;
+  const date = (w: LifecycleWeek) => londonDate(new Date(w.start).toISOString(), { day: 'numeric', month: 'short' });
+  const caption = (text: React.ReactNode) => complete ? text : 'incomplete data';
+  return <section style={PANEL3} aria-label="Lifecycle">
+    <div style={HEADER}><span style={PANEL_TITLE}>Lifecycle</span><span style={{ ...PANEL_META, display: 'inline-flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 9 }}>
+      {(['new', 'back', 'kept', 'lost'] as const).map((label, i) => <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><i style={{ width: 8, height: 8, borderRadius: 2, background: [CC3.good, CC3.ink, INK_30, CC3.bad][i] }} />{label}</span>)}
+    </span></div>
+    <div style={{ marginTop: 12 }}>
+      <div style={{ ...grid, height: 56, alignItems: 'end' }}>{weeks.map(w => <div key={w.start} title={complete ? `${date(w)}: ${w.new} new, ${w.back} back, ${w.kept} kept` : undefined} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', borderRadius: '3px 3px 0 0', overflow: 'hidden' }}>
+        {([['new', CC3.good], ['back', CC3.ink], ['kept', INK_30]] as const).map(([key, color]) => <i key={key} style={{ display: 'block', width: '100%', height: px(w[key], maxUp, 56), background: color }} />)}
+      </div>)}</div>
+      <div style={{ height: 1, background: CC3.line, margin: '2px 0' }} />
+      <div style={{ ...grid, height: 20, alignItems: 'start' }}>{weeks.map(w => <i key={w.start} title={complete ? `${date(w)}: ${w.lost} lost` : undefined} style={{ display: 'block', height: px(w.lost, maxLost, 20), background: CC3.bad, borderRadius: '0 0 3px 3px' }} />)}</div>
+      <div style={{ ...grid, marginTop: 5 }}>{weeks.map((w, i) => <span key={w.start} style={{ ...NUM, fontSize: 10, fontWeight: 600, color: i === 6 ? CC3.ink : CC3.faint, textAlign: 'center', whiteSpace: 'nowrap' }}>{i === 6 ? 'now' : i % 2 === 0 ? date(w) : ''}</span>)}</div>
     </div>
-  );
+    <Stats columns={4}>
+      <Stat label="New" value={complete ? latest?.new ?? 0 : DASH} loading={loading} tone={complete && (latest?.new ?? 0) > 0 ? 'good' : 'ink'} caption={caption('joined')} />
+      <Stat label="Back" value={complete ? latest?.back ?? 0 : DASH} loading={loading} caption={caption('after a gap')} />
+      <Stat label="Kept" value={complete ? summary?.keptPercent : DASH} loading={loading} caption={caption(summary?.keptCaption)} />
+      <Stat label="Lost" value={complete ? latest?.lost ?? 0 : DASH} loading={loading} tone={complete && (latest?.lost ?? 0) > 0 ? 'bad' : 'ink'} caption={caption(summary?.lostCaption)} />
+    </Stats>
+  </section>;
 }
-
-function MemberRow({ m, pro, amateur, onOpen }: { m: MembersOverviewMember; pro?: ProMember; amateur?: boolean; onOpen: () => void }) {
+function Chips({ o, verifiedCount, toConnectCount, active, onPick, loading }: { o: MembersOverview | undefined; verifiedCount: number | undefined; toConnectCount: number | undefined; active: ChipFilter | null; onPick: (f: ChipFilter) => void; loading: boolean }) {
+  const chips = [
+    { id: 'all', label: 'All', n: o?.total }, { id: 'verified', label: 'Verified', n: verifiedCount },
+    { id: 'connected', label: 'Connected', n: o?.connected }, { id: 'to_connect', label: 'To connect', n: toConnectCount },
+    { id: 'no_handicap', label: 'No handicap', n: o?.no_handicap }, { id: 'quiet', label: 'Quiet', n: o?.quiet }, { id: 'new_this_week', label: 'New', n: o?.new_7d },
+  ] as const;
+  return <div data-member-chips style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{chips.map(c => {
+    const on = active === c.id;
+    return <Button key={c.id} variant={null} size={null} type="button" aria-pressed={on} onClick={() => onPick(c.id)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 11px', borderRadius: 999, border: 'none', fontSize: 11.5, fontWeight: 600, background: on ? CC3.ink : CC3.surface, color: on ? CC3.canvas : CC3.mute, whiteSpace: 'nowrap', ...(loading ? PULSE : {}) }}>
+      {c.label} <span style={{ ...NUM, fontWeight: 700, color: on ? CC3.canvas : CC3.ink }}>{loading ? DASH : c.n ?? DASH}</span>
+    </Button>;
+  })}</div>;
+}
+function MemberRow({ m, pro, amateur, chip, now, onOpen }: { m: MembersOverviewMember; pro?: ProMember; amateur?: boolean; chip: ChipFilter | null; now: number; onOpen: () => void }) {
   const name = m.display_name ?? m.username ?? 'Member';
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      style={{
-        width: '100%',
-        textAlign: 'left',
-        background: 'transparent',
-        border: 'none',
-        color: t.ink,
-        cursor: 'pointer',
-        display: 'grid',
-        gridTemplateColumns: '38px minmax(0,1fr) auto',
-        columnGap: 11,
-        alignItems: 'center',
-        padding: '11px 16px',
-        borderTop: `1px solid ${t.hairline}`,
-      }}
-    >
-      <SquircleAvatar size={38} src={m.photo_url} alt={name} userId={m.user_id} hairlineRing />
-      <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {name}
-          </span>
-          {pro && <ProLabel size="small" />}
-          {!pro && amateur && <ProLabel size="small" kind="am" />}
-          {memberTags(m, pro).map(tag => (
-            <span key={tag.label} style={{ ...TAG, color: tag.color }}>{tag.label}</span>
-          ))}
-        </span>
-        <span
-          style={{
-            display: 'block',
-            marginTop: 1,
-            fontSize: 11.5,
-            color: t.inkMuted,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {memberSubline(m, pro)}
-        </span>
-        <span style={{ marginTop: 5, display: 'flex', gap: 3 }}>
-          {weekDashColors(m).map((c, i) => (
-            <span key={i} style={{ width: 14, height: 4, borderRadius: 2, background: c }} />
-          ))}
-        </span>
-      </span>
-      <span style={{ textAlign: 'right' }}>
-        <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: m.connected || pro ? t.ink : t.inkFaint }}>
-          {pro ? 'PRO' : memberIndexText(m.index, m.connected)}
-        </span>
-        <span style={{ display: 'block', fontSize: 10.5, fontWeight: 700, color: lastSeenColor(m) }}>
-          {formatAgo(m.last_seen_at)}
-        </span>
-      </span>
-    </button>
-  );
+  const seenColor = lastSeenColor(m, now);
+  const seenTone = seenColor === CC3.good ? 'good' : seenColor === CC3.bad ? 'bad' : seenColor === CC3.ink ? 'ink' : 'faint';
+  return <Button variant={null} size={null} type="button" onClick={onOpen} data-member-id={m.user_id} style={{ ...rowStyle, ...NUM, width: '100%', height: 'auto', borderRadius: 0, textAlign: 'left', background: 'transparent', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', color: CC3.ink, whiteSpace: 'normal' }}>
+    <SquircleAvatar size={34} src={m.photo_url} alt={name} userId={m.user_id} hairlineRing />
+    <span style={{ minWidth: 0 }}><span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 6, rowGap: 2 }}>
+      <span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.25, overflowWrap: 'anywhere' }}>{name}</span>
+      {pro && <ProLabel size="small" />}{!pro && amateur && <ProLabel size="small" kind="am" />}
+      {memberTags(m, pro, chip).map(tag => <span key={tag.label} data-tone={tag.tone} style={{ ...TAG, color: TONES[tag.tone], ...(tag.tone === 'role' ? { padding: '1px 5px', borderRadius: 5, border: `1px solid ${CC3.line}` } : {}) }}>{tag.label}</span>)}
+    </span><span style={{ display: 'block', fontSize: 11, color: CC3.faint, marginTop: 2, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{memberSubline(m, pro, chip, now)}</span>
+      <span style={{ display: 'flex', gap: 3, marginTop: 5 }}>{weekDashColors(m, now).map((c, i) => <i key={i} style={{ width: 14, height: 4, borderRadius: 2, background: c }} />)}</span>
+    </span>
+    <span style={{ textAlign: 'right' }}><span style={{ display: 'block', ...NUM, fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em', color: m.connected || pro ? CC3.ink : CC3.faint }}>{pro ? 'PRO' : memberIndexText(m.index, m.connected).replace(/^-/, '−')}</span><span data-tone={seenTone} style={{ display: 'block', ...NUM, fontSize: 10.5, fontWeight: 700, whiteSpace: 'nowrap', marginTop: 2, color: seenColor }}>{formatAgo(m.last_seen_at, { now })}</span></span>
+  </Button>;
 }
-
 function RowSkeleton() {
-  return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '38px minmax(0,1fr) auto',
-        columnGap: 11,
-        alignItems: 'center',
-        padding: '11px 16px',
-        borderTop: `1px solid ${t.hairline}`,
-      }}
-    >
-      <Skeleton height={38} radius={13} />
-      <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <Skeleton height={17} radius={3} />
-        <Skeleton height={14} radius={3} />
-        <Skeleton height={4} radius={2} />
-      </span>
-      <span style={{ width: 36, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <Skeleton height={19} radius={3} />
-        <Skeleton height={13} radius={3} />
-      </span>
-    </div>
-  );
+  const block = (width: number | string, height: number, radius = 3): React.CSSProperties => ({ width, height, borderRadius: radius, background: CC3.inset, ...PULSE });
+  return <div style={rowStyle}><i style={block(34, 34, 12)} /><span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}><i style={block('60%', 17)} /><i style={block('80%', 14)} /><i style={block(133, 4, 2)} /></span><span style={{ width: 36, display: 'flex', flexDirection: 'column', gap: 4 }}><i style={block(36, 19)} /><i style={block(36, 13)} /></span></div>;
 }
-
-export default function MembersList({
-  overview,
-  loading,
-  onOpenMember,
-}: {
-  overview: MembersOverview | undefined;
-  loading: boolean;
-  onOpenMember: (id: string) => void;
-}) {
+export default function MembersList({ overview, loading, onOpenMember }: { overview: MembersOverview | undefined; loading: boolean; onOpenMember: (id: string) => void }) {
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [shown, setShown] = useState(PAGE);
   const { chip, linked } = resolveListFilter(params.get('filter'));
+  const sort = resolveMemberSort(params.get('sort'));
   const eg = useEgIssueUserIds(linked === 'eg_issues');
   const verified = useAdminVerified();
   const egSet = useMemo(() => new Set(eg.data ?? []), [eg.data]);
-
+  const proIds = useMemo(() => new Set((verified.data?.pros ?? []).map(p => p.id)), [verified.data]);
+  const now = Date.now();
+  const complete = !loading && completeMembership(overview);
+  const weeks = membersLifecycle(complete ? overview?.members ?? [] : [], now);
+  const catalogueReady = !!verified.data && !verified.isPending && !verified.isError;
+  const toConnectCount = complete && catalogueReady ? (overview?.members ?? []).filter(m => toConnect(m, proIds, now)).length : undefined;
   const pick = (f: ChipFilter) => {
     const next = new URLSearchParams(params);
-    if (f === 'all') next.delete('filter');
-    else next.set('filter', f);
-    setParams(next, { replace: true });
-    setShown(PAGE);
+    if (f === 'all' || f === chip) next.delete('filter'); else next.set('filter', f);
+    setParams(next, { replace: true }); setShown(PAGE);
   };
-
-  const rows = useMemo(() => {
-    const now = Date.now();
+  const rows = sortMembers((overview?.members ?? []).filter(m => {
+    if (chip === 'to_connect' && !catalogueReady) return false;
+    if (chip && !CHIP_TEST[chip](m, proIds, now)) return false;
+    if (linked && !LINKED_FILTERS[linked].test(m, egSet, now)) return false;
     const term = search.trim().toLowerCase();
-    return (overview?.members ?? []).filter(m => {
-      if (chip && !CHIP_TEST[chip](m)) return false;
-      if (linked && !LINKED_FILTERS[linked].test(m, egSet, now)) return false;
-      if (!term) return true;
-      return [m.display_name, m.username, m.home_club, m.email].some(v => v?.toLowerCase().includes(term));
-    });
-  }, [overview, chip, linked, egSet, search]);
-
+    return !term || [m.display_name, m.username, m.home_club, m.email].some(v => v?.toLowerCase().includes(term));
+  }), sort, now);
   const header = linked ? LINKED_FILTERS[linked].label : CHIP_HEADER[chip ?? 'all'];
   const { members: pros } = useProMembers(chip === 'verified' ? [] : rows.slice(0, shown).map(m => m.user_id));
   const { members: amateurs } = useAmateurMembers(chip === 'verified' ? [] : rows.slice(0, shown).map(m => m.user_id));
   const more = rows.length - shown;
-
-  return (
-    <>
-      <label
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          height: 44,
-          padding: '0 14px',
-          borderRadius: 12,
-          background: t.surface,
-        }}
-      >
-        <Search size={15} strokeWidth={1.5} color={t.inkFaint} aria-hidden />
-        <input
-          value={search}
-          onChange={e => { setSearch(e.target.value); setShown(PAGE); }}
-          placeholder="Name, @handle, email or club"
-          aria-label="Search members"
-          style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: t.ink }}
-        />
-      </label>
-
-      <LastSeenPanel o={loading ? undefined : overview} />
-
-      {loading ? (
-        <div style={{ display: 'flex', gap: 6 }}>
-          {[64, 96, 108, 72, 64].map((w, i) => (
-            <span key={i} style={{ flex: 'none', width: w }}><Skeleton height={34} radius={999} /></span>
-          ))}
-        </div>
-      ) : (
-        <Chips o={overview} verifiedCount={adminVerifiedCount(verified.data)} active={chip} onPick={pick} />
-      )}
-
-      {chip === 'verified' ? <AdminVerifiedCard data={verified.data} loading={verified.isPending} error={verified.isError} onOpenMember={onOpenMember} /> : <div style={{ background: t.surface, borderRadius: 16, padding: '14px 0 4px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px 10px' }}>
-          <span style={PANEL_TITLE}>{header}</span>
-          <span style={CAPTION}>8 wks · index · seen</span>
-        </div>
-        {loading ? (
-          Array.from({ length: 5 }, (_, i) => <RowSkeleton key={i} />)
-        ) : rows.length === 0 ? (
-          <div style={{ padding: '12px 16px', borderTop: `1px solid ${t.hairline}`, fontSize: 13, color: t.inkFaint }}>
-            No members match
-          </div>
-        ) : (
-          <>
-            {rows.slice(0, shown).map(m => (
-              <MemberRow key={m.user_id} m={m} pro={pros.get(m.user_id)} amateur={amateurs.has(m.user_id)} onOpen={() => onOpenMember(m.user_id)} />
-            ))}
-            {more > 0 && (
-              <button
-                type="button"
-                onClick={() => setShown(s => s + PAGE)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 44,
-                  background: 'transparent',
-                  border: 'none',
-                  borderTop: `1px solid ${t.hairline}`,
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color: t.inkMuted,
-                  cursor: 'pointer',
-                }}
-              >
-                {more} more
-              </button>
-            )}
-          </>
-        )}
-      </div>}
-    </>
-  );
+  return <>
+    <style>{`.members-v3-search::placeholder{color:var(--cc3-faint)}.members-v3-search::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}`}</style>
+    <label style={{ display: 'flex', alignItems: 'center', gap: 10, height: 40, padding: '0 12px', borderRadius: 12, background: CC3.surface }}>
+      <Search size={15} strokeWidth={1.5} color={CC3.faint} aria-hidden />
+      <input type="search" className="members-v3-search" value={search} onChange={e => { setSearch(e.target.value); setShown(PAGE); if (chip === 'verified') { const next = new URLSearchParams(params); next.delete('filter'); setParams(next, { replace: true }); } }} placeholder="Name, @handle, email or club" aria-label="Search members" style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: CC3.ink }} />
+    </label>
+    <LastSeenPanel o={loading ? undefined : overview} weeks={weeks} complete={complete} />
+    <LifecyclePanel weeks={weeks} complete={complete} loading={loading} />
+    <Chips o={overview} verifiedCount={adminVerifiedCount(verified.data)} toConnectCount={toConnectCount} active={chip} onPick={pick} loading={loading} />
+    {chip === 'to_connect' && !loading && toConnectCount == null && <span style={CAP}>{!complete ? 'incomplete data' : DASH}</span>}
+    {chip === 'verified' ? <AdminVerifiedCard data={verified.data} loading={verified.isPending} error={verified.isError} onOpenMember={onOpenMember} /> : <section style={LIST3} aria-label="Members list">
+      <div style={{ ...HEADER, padding: '0 14px', marginBottom: 12 }}><span style={PANEL_TITLE}>{header}</span><span style={PANEL_META}>8 wks · index · seen</span></div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '6px 8px', padding: '0 14px', margin: '-2px 0 10px' }}>
+        <div role="group" aria-label="Sort members" style={{ display: 'inline-flex', background: CC3.inset, borderRadius: 999, padding: 3 }}>{(Object.keys(SORT_LABEL) as MemberSort[]).map(k => <Button variant={null} size={null} key={k} aria-pressed={sort === k} onClick={() => { const next = new URLSearchParams(params); if (k === 'seen') next.delete('sort'); else next.set('sort', k); setParams(next, { replace: true }); setShown(PAGE); }} style={{ height: 24, padding: '0 10px', borderRadius: 999, border: 'none', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', background: sort === k ? CC3.ink : 'transparent', color: sort === k ? CC3.canvas : CC3.faint }}>{SORT_LABEL[k]}</Button>)}</div>
+        <span style={PANEL_META}>{SORT_CAP[sort]}</span>
+      </div>
+      {loading ? Array.from({ length: 5 }, (_, i) => <RowSkeleton key={i} />) : rows.length === 0 ? <div style={{ padding: '24px 14px 26px', textAlign: 'center', borderTop: `1px solid ${CC3.hair}` }}><div style={{ fontSize: 13, fontWeight: 600, color: CC3.ink }}>No members match</div><div style={{ fontSize: 11, color: CC3.faint, marginTop: 2 }}>try a name, @handle or club</div></div> : <>
+        {rows.slice(0, shown).map(m => <MemberRow key={m.user_id} m={m} pro={pros.get(m.user_id)} amateur={amateurs.has(m.user_id)} chip={chip} now={now} onOpen={() => onOpenMember(m.user_id)} />)}
+        {more > 0 && <Button variant={null} size={null} type="button" onClick={() => setShown(s => s + PAGE)} style={{ width: '100%', height: 40, borderRadius: 0, borderTop: `1px solid ${CC3.hair}`, background: 'transparent', ...NUM, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: CC3.faint }}>{more} more</Button>}
+      </>}
+    </section>}
+  </>;
 }

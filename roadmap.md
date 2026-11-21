@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Admin Members v3
+- Match cc3-members in the scoped Members, Verified, optional ranking and Team surfaces; preserve reads, sheets and default ranking.
+- Add complete-payload lifecycle, To connect and URL sorting rules plus the named regression file; change only the authorised last-seen test.
+- Run four separate sequential shards, retain full output and reconcile inventory; check 390/320 or report authenticated access unavailable.
+
 ## Complete: Pro form chip fills
 - Changed only the form-chip Button on ProSeasonSection.tsx:39 to variant={null} size={null}; added “form chips carry no ghost variant classes”; all existing cases unchanged.
 - Four separate sequential shards passed 2,315 / 2,308 / 2,391 / 2,463 = 9,477 / 9,477 across 848 files; baseline 9,476 / 848, delta +one named case. Full output: .lovable/reports/pro-form-chip-fills/.

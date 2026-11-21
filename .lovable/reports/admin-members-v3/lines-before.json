@@ -1,0 +1,8 @@
+{
+  "src/features/admin/components/MembersList.tsx": 422,
+  "src/features/admin/components/AdminVerifiedCard.tsx": 60,
+  "src/features/admin/components/adminVerified.css": 13,
+  "src/features/admin/components/AdminProWorldRanking.tsx": 76,
+  "src/features/admin/pages/UsersPage.tsx": 1202,
+  "src/test/membersListRules.test.ts": 39
+}
