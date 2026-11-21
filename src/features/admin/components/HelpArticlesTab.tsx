@@ -2,7 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { toast } from '@/lib/toast';
 import { adminTheme as t } from '../theme';
 import { useHelpInsight, isPermissionError } from '../hooks/useContentDesk';
-import { SECTION, LIST_SECTION, H, H_RIGHT, FIG_LABEL, MORE, DOT } from './content/deskTokens';
+import { CC3, NUM, PANEL3, LIST3, PANEL_TITLE, PANEL_META } from './InboxPanels';
+import { btnOutline } from './InboxQueueRow';
+import { LABEL10, FIG18, CAPTION, STATS, RULE, LIST_HEAD, PANEL_HEAD, ROW, MORE3, EMPTY } from './content/v3Styles';
 import AdminSheet from './AdminSheet';
 import ConfirmDialog from './ConfirmDialog';
 import {
@@ -32,6 +34,8 @@ const EMPTY_INPUT: HelpArticleInput = {
  * BRIEF_CONTENT_DESK Stage 5 (Pages.html) — Help insight + Articles. Rows open
  * the existing editor; publish toggle and delete now live inside it. Save,
  * publish and delete logic is unchanged.
+ * CONTENT_V3_4_PAGES: list sections in the v3 grammar (cc3-content-pages.html);
+ * editors and ConfirmDialog are detail sheets and stay as they were.
  */
 export default function HelpArticlesTab() {
   const { isLoading, articles, grouped, create, update, remove } =
@@ -85,67 +89,76 @@ export default function HelpArticlesTab() {
   }).filter((g) => g.rows.length > 0);
   const hiddenArticles = allArticles ? 0 : Math.max(0, articles.length - 6);
 
+  const unpublished = articles.filter((a) => !a.is_published).length;
+  const noAnswer = Number(help.data?.no_answer ?? 0);
+
   return (
     <>
-      <section style={SECTION}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <span style={H}>Help</span>
-          <span style={H_RIGHT}>last 30d</span>
+      <section style={PANEL3} data-section="help">
+        <div style={PANEL_HEAD}>
+          <span style={PANEL_TITLE}>Help</span>
+          <span style={PANEL_META}>last 30d</span>
         </div>
         {help.isError && isPermissionError(help.error) ? (
-          <div style={{ marginTop: 10, fontSize: 12, color: t.inkFaint }}>Full admins only</div>
+          <div style={{ marginTop: 10, fontSize: 12, color: CC3.faint }}>Full admins only</div>
         ) : (
           <>
-            <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-              <div><div style={FIG_LABEL}>Visits</div><div style={FIG_18}>{fmt(help.data?.visits)}</div></div>
-              <div><div style={FIG_LABEL}>Searches</div><div style={FIG_18}>{fmt(help.data?.searches)}</div></div>
-              <div><div style={FIG_LABEL}>No answer</div><div style={{ ...FIG_18, color: t.warnText }}>{fmt(help.data?.no_answer)}</div></div>
+            <div style={STATS(3)}>
+              <div><div style={LABEL10}>Visits</div><div style={{ ...FIG18, marginTop: 3 }}>{fmt(help.data?.visits)}</div></div>
+              <div><div style={LABEL10}>Searches</div><div style={{ ...FIG18, marginTop: 3 }}>{fmt(help.data?.searches)}</div></div>
+              <div><div style={LABEL10}>No answer</div><div data-tone={noAnswer > 0 ? 'bad' : 'ink'} style={{ ...FIG18, marginTop: 3, color: noAnswer > 0 ? CC3.bad : CC3.ink }}>{fmt(help.data?.no_answer)}</div></div>
             </div>
-            <div style={{ ...FIG_LABEL, marginTop: 14 }}>Searched for, nothing found</div>
+            {help.data && Number(help.data.visits ?? 0) === 0 && (
+              <div style={{ ...CAPTION, ...RULE }}>Nobody has opened Help in 30 days.</div>
+            )}
+            <div style={{ ...LABEL10, marginTop: 12 }}>Searched for, nothing found</div>
             <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column' }}>
               {!help.isLoading && terms.length === 0 && (
-                <div style={{ padding: '8px 0', borderTop: `1px solid ${t.hairline}`, fontSize: 12, color: t.inkFaint }}>No unanswered searches yet</div>
+                <div style={{ padding: '10px 0 2px', fontSize: 12, color: CC3.faint }}>No unanswered searches yet</div>
               )}
               {shownTerms.map((term) => (
-                <div key={term.q} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto auto', columnGap: 10, alignItems: 'center', padding: '8px 0', borderTop: `1px solid ${t.hairline}` }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: t.ink, overflowWrap: 'anywhere' }}>&ldquo;{term.q}&rdquo;</span>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: t.ink }}>{term.n.toLocaleString('en-GB')}</span>
-                  <button type="button" onClick={() => setCreating({ question: term.q })} style={PILL_28}>Write it</button>
+                <div key={term.q} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto auto', columnGap: 10, alignItems: 'center', padding: '8px 0', borderTop: `1px solid ${CC3.hair}` }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: CC3.ink, overflowWrap: 'anywhere' }}>&ldquo;{term.q}&rdquo;</span>
+                  <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: CC3.ink }}>{term.n.toLocaleString('en-GB')}</span>
+                  <button type="button" onClick={() => setCreating({ question: term.q })} style={btnOutline()}>Write it</button>
                 </div>
               ))}
               {!allTerms && terms.length > 3 && (
-                <button type="button" onClick={() => setAllTerms(true)} style={{ ...MORE, borderTop: `1px solid ${t.hairline}` }}>{terms.length - 3} more</button>
+                <button type="button" onClick={() => setAllTerms(true)} style={MORE3}>{terms.length - 3} more</button>
               )}
             </div>
           </>
         )}
       </section>
 
-      <section style={LIST_SECTION}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px 10px' }}>
-          <span style={H}>Articles</span>
-          <button type="button" onClick={() => setCreating({ question: '' })} style={LINK}>+ New</button>
+      <section style={LIST3} data-section="articles">
+        <div style={LIST_HEAD}>
+          <span style={PANEL_TITLE}>Articles</span>
+          <span style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <span data-figure="articles-meta" style={{ ...PANEL_META, ...NUM }}><span style={{ color: CC3.ink, fontWeight: 700 }}>{articles.length}</span>{unpublished > 0 ? ` \u00b7 ${unpublished} hidden` : ''}</span>
+            <button type="button" onClick={() => setCreating({ question: '' })} style={LINK}>+ New</button>
+          </span>
         </div>
         {isLoading ? (
-          <div style={{ padding: '9px 16px', borderTop: `1px solid ${t.hairline}`, fontSize: 12, color: t.inkFaint }}>Loading</div>
+          <div style={EMPTY}>Loading</div>
         ) : articles.length === 0 ? (
-          <div style={{ padding: '9px 16px 12px', borderTop: `1px solid ${t.hairline}`, fontSize: 12, color: t.inkFaint }}>No help articles yet</div>
+          <div style={EMPTY}>No help articles yet</div>
         ) : groups.map((g) => (
           <React.Fragment key={g.cat}>
-            <div style={GROUP_HEAD}>{g.cat}{DOT}{g.total}</div>
+            <div style={GROUP_HEAD}><span style={LABEL10}>{g.cat}{' \u00b7 '}{g.total}</span></div>
             {g.rows.map((a) => (
               <button key={a.id} type="button" onClick={() => setEditing(a)} style={ARTICLE_ROW}>
                 <span style={{ minWidth: 0 }}>
-                  <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600, color: t.ink }}>{a.question}</span>
-                  <span style={{ display: 'block', fontSize: 11, color: t.inkFaint }}>edited {dMon(a.updated_at)}</span>
+                  <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600, lineHeight: 1.25, overflowWrap: 'anywhere', color: CC3.ink }}>{a.question}</span>
+                  {!a.is_published && <span style={HIDDEN_TAG}>Hidden</span>}
                 </span>
-                <span aria-label={a.is_published ? 'Published' : 'Hidden'} style={{ width: 8, height: 8, borderRadius: 4, background: a.is_published ? t.okText : t.inkFaint }} />
+                <span style={{ ...NUM, fontSize: 11, color: CC3.faint, whiteSpace: 'nowrap' }}>{dMon(a.updated_at)}</span>
               </button>
             ))}
           </React.Fragment>
         ))}
         {hiddenArticles > 0 && (
-          <button type="button" onClick={() => setAllArticles(true)} style={MORE}>{hiddenArticles} more articles</button>
+          <button type="button" onClick={() => setAllArticles(true)} style={MORE3}>{hiddenArticles} more articles</button>
         )}
       </section>
 
@@ -181,11 +194,10 @@ export default function HelpArticlesTab() {
 
 const fmt = (n: number | null | undefined) => (n == null ? '-' : n.toLocaleString('en-GB'));
 const dMon = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/London' });
-const FIG_18: React.CSSProperties = { marginTop: 2, fontSize: 18, fontWeight: 800, color: t.ink };
-const PILL_28: React.CSSProperties = { height: 28, padding: '0 10px', borderRadius: 999, border: `1px solid ${t.line}`, background: 'transparent', color: t.ink, fontSize: 11, fontWeight: 700, cursor: 'pointer' };
-const LINK: React.CSSProperties = { border: 0, background: 'transparent', padding: 0, fontSize: 12, fontWeight: 700, color: t.brandText, cursor: 'pointer' };
-const GROUP_HEAD: React.CSSProperties = { padding: '8px 16px 6px', borderTop: `1px solid ${t.hairline}`, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkFaint };
-const ARTICLE_ROW: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center', padding: '9px 16px', width: '100%', textAlign: 'left', background: 'transparent', border: 0, cursor: 'pointer', font: 'inherit' };
+const LINK: React.CSSProperties = { border: 0, background: 'transparent', padding: 0, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: CC3.ink, cursor: 'pointer' };
+const GROUP_HEAD: React.CSSProperties = { padding: '10px 14px 6px', borderTop: `1px solid ${CC3.hair}` };
+const ARTICLE_ROW: React.CSSProperties = { ...ROW, gridTemplateColumns: 'minmax(0, 1fr) auto', borderTop: 0, padding: '8px 14px' };
+const HIDDEN_TAG: React.CSSProperties = { display: 'block', marginTop: 2, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: CC3.faint };
 
 /* --------------------------- Editor sheet --------------------------- */
 

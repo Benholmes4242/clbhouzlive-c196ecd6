@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from '@/lib/toast';
 import { adminTheme as t } from '../theme';
-import { LIST_SECTION, H, H_RIGHT, MORE } from './content/deskTokens';
+import { CC3, NUM, LIST3, PANEL_TITLE, PANEL_META } from './InboxPanels';
+import { LIST_HEAD, ROW as ROW3, MORE3, EMPTY } from './content/v3Styles';
 import AdminSheet from './AdminSheet';
 import ConfirmDialog from './ConfirmDialog';
 import {
@@ -22,6 +23,7 @@ const EMPTY_INPUT: LegalDocumentInput = {
 /**
  * BRIEF_CONTENT_DESK Stage 5 (Pages.html) — Legal. Rows open the existing
  * editor; publish toggle and delete live inside it. Save logic unchanged.
+ * CONTENT_V3_4_PAGES: list in the v3 grammar; + New moved into the header.
  */
 export default function LegalDocumentsTab() {
   const { isLoading, documents, create, update, remove } = useLegalDocumentsAdmin();
@@ -65,29 +67,29 @@ export default function LegalDocumentsTab() {
 
   return (
     <>
-      <section style={LIST_SECTION}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px 10px' }}>
-          <span style={H}>Legal</span>
-          <span style={H_RIGHT}>effective</span>
+      <section style={LIST3} data-section="legal">
+        <div style={LIST_HEAD}>
+          <span style={PANEL_TITLE}>Legal</span>
+          <span style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <span style={PANEL_META}>effective</span>
+            <button type="button" onClick={() => setCreating(true)} style={LINK}>+ New</button>
+          </span>
         </div>
         {isLoading ? (
-          <div style={{ ...ROW, color: t.inkFaint, fontSize: 12 }}>Loading</div>
+          <div style={EMPTY}>Loading</div>
         ) : documents.length === 0 ? (
-          <div style={{ ...ROW, color: t.inkFaint, fontSize: 12 }}>No legal documents</div>
+          <div style={EMPTY}>No legal documents</div>
         ) : shown.map((d) => {
           const eff = effectiveLabel(d);
           return (
             <button key={d.id} type="button" onClick={() => setEditing(d)} style={ROW}>
-              <span style={{ fontSize: 13.5, fontWeight: 600, color: t.ink }}>{d.title}</span>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: eff.colour }}>{eff.text}</span>
+              <span style={{ minWidth: 0, fontSize: 13.5, fontWeight: 600, overflowWrap: 'anywhere', color: CC3.ink }}>{d.title}</span>
+              <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', color: eff.colour }}>{eff.text}</span>
             </button>
           );
         })}
         {hidden > 0 && (
-          <button type="button" onClick={() => setAll(true)} style={MORE}>{hidden} more documents</button>
-        )}
-        {(all || documents.length <= 6) && !isLoading && (
-          <button type="button" onClick={() => setCreating(true)} style={{ ...ROW, color: t.brandText, fontSize: 13.5, fontWeight: 700 }}>+ New document</button>
+          <button type="button" onClick={() => setAll(true)} style={MORE3}>{hidden} more documents</button>
         )}
       </section>
 
@@ -120,21 +122,18 @@ export default function LegalDocumentsTab() {
   );
 }
 
-/** "d Mon yyyy"; okText within the last 30 days; "Hidden" when unpublished. */
+/** "d Mon yyyy"; "Hidden" when unpublished. CONTENT_V3_4: published reads mute, hidden faint (no recent green). */
 export function effectiveLabel(d: { is_published: boolean; effective_date: string | null }, now = new Date()): { text: string; colour: string } {
-  if (!d.is_published) return { text: 'Hidden', colour: t.inkFaint };
-  if (!d.effective_date) return { text: '-', colour: t.inkMuted };
+  if (!d.is_published) return { text: 'Hidden', colour: CC3.faint };
+  if (!d.effective_date) return { text: '-', colour: CC3.mute };
   const at = new Date(`${d.effective_date.slice(0, 10)}T12:00:00Z`);
   const text = at.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/London' });
-  const days = (now.getTime() - at.getTime()) / 86_400_000;
-  return { text, colour: days >= -1 && days <= 30 ? t.okText : t.inkMuted };
+  void now;
+  return { text, colour: CC3.mute };
 }
 
-const ROW: React.CSSProperties = {
-  display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center',
-  padding: '10px 16px', width: '100%', textAlign: 'left', background: 'transparent',
-  border: 0, borderTop: `1px solid ${t.hairline}`, cursor: 'pointer', font: 'inherit',
-};
+const ROW: React.CSSProperties = { ...ROW3, gridTemplateColumns: 'minmax(0, 1fr) auto' };
+const LINK: React.CSSProperties = { border: 0, background: 'transparent', padding: 0, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: CC3.ink, cursor: 'pointer' };
 
 /* --------------------------- Editor sheet --------------------------- */
 
