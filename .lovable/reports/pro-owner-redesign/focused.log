@@ -1,0 +1,17 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/proOwnerRedesign.test.tsx (18 tests) 577ms
+stdout | src/test/proOwnerClubs.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+ ✓ src/test/proOwnerClubs.test.tsx (4 tests) 249ms
+
+ Test Files  2 passed (2)
+      Tests  22 passed (22)
+   Start at  10:43:26
+   Duration  6.91s (transform 2.99s, setup 340ms, collect 5.69s, tests 826ms, environment 1.60s, prepare 685ms)
+

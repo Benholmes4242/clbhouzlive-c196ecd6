@@ -1,0 +1,12 @@
+=== build 2026-11-21T10:41:54Z ===
+--- typecheck ---
+src/features/pro-profile/ProOwnerSections.tsx(43,138): error TS2322: Type '{ userId: string; owner: boolean; first: string; events: ProEvent[]; eventsReady: boolean; showCareer: boolean; panel: CollectionPanel; onPanelChange: Dispatch<SetStateAction<CollectionPanel>>; }' is not assignable to type 'IntrinsicAttributes & { userId: string; owner: boolean; first: string; events: ProEvent[]; eventsReady: boolean; showCareer?: boolean; }'.
+Property 'panel' does not exist on type 'IntrinsicAttributes & { userId: string; owner: boolean; first: string; events: ProEvent[]; eventsReady: boolean; showCareer?: boolean; }'.
+
+=== build 2026-11-21T10:42:35Z ===
+build OK
+
+=== build 2026-11-21T10:43:36Z ===
+--- typecheck ---
+src/test/proOwnerRedesign.test.tsx(33,144): error TS2353: Object literal may only specify known properties, and 'updated_at' does not exist in type '{ business_id: string; created_at: string; id: string; name: string; sort: number; user_id: string; website: string; }'.
+src/test/proOwnerRedesign.test.tsx(34,108): error TS2353: Object literal may only specify known properties, and 'sort' does not exist in type '{ created_at: string; id: string; is_win: boolean; text: string; user_id: string; year: number; }'.
