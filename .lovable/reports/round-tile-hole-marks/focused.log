@@ -1,0 +1,929 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — score row > (b1) nettable with an 18-hole shape: TO PAR, NET, POINTS
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — score row > (b2) nettable with no shape: no POINTS
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (b) lede uses plural and singular forms
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — score row > (b3) not nettable: PLAYED OFF
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — score row > (b4) no handicap: TO PAR only; under par is red
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — score row > (b5) missing par: GROSS label
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — the line > (d2) bold spans render; the meta line is the date alone for others
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (b) lede uses plural and singular forms
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — the nines > (e) every band, blank unplayed holes and totals
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — the nines > (e2) no shape: no nines; name tap opens the profile, tile tap the round
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — the nines > (e4) two and three under par render eagle with the canonical double-ring and double-square CSS
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/courseLatelyTiles.test.tsx > Lately tile — the nines > (e3) level par reads E in TO PAR; a long name ellipsises on one line
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (c) facts row shows at 4, hides at 3; signed average
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+ ✓ src/test/courseLatelyTiles.test.tsx (16 tests) 297ms
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (c) facts row shows at 4, hides at 3; signed average
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (d) meta line reads You / Circle with the date, amber own round
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (f) one batched hole-shapes call over loaded rounds
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (g) paging requests offset 10 next
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/cs1CourseLately.test.tsx > CS1 Lately here > (g) paging requests offset 10 next
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+ ✓ src/test/cs1CourseLately.test.tsx (11 tests) 501ms
+stdout | src/test/coursesStandoutRounds.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stderr | src/test/coursesStandoutRounds.test.tsx > (d) RoundCard points prop > the points prop fills the POINTS cell; without it Lately here keeps its computed (absent) points
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/coursesStandoutRounds.test.tsx > (e) photo header > renders course, place and stamp, and the tile gains lately-tile--photo
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/coursesStandoutRounds.test.tsx > (f) section states > two or more rows render the head and one card each
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+stderr | src/test/coursesStandoutRounds.test.tsx > (g) taps > a card tap opens the round sheet; the who row opens the profile
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container lately-tile (max-width: 250px) {
+  [data-lately-score-row] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-lately-score-row] [data-score-label] { font-size: 8.5px !important; letter-spacing: 0.05em !important; }
+  [data-lately-score-row] [data-score-divider] { padding-right: 11px !important; margin-right: 11px !important; }
+  [data-lately-score-row] [data-score-divider] [data-score-figure] { font-size: 24px !important; }
+}
+
+ ✓ src/test/coursesStandoutRounds.test.tsx (36 tests) 349ms
+
+ Test Files  3 passed (3)
+      Tests  63 passed (63)
+   Start at  07:59:45
+   Duration  7.71s (transform 2.71s, setup 574ms, collect 6.61s, tests 1.15s, environment 4.62s, prepare 2.02s)
+

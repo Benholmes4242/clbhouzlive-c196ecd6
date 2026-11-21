@@ -3,6 +3,7 @@ import type { StandoutRound } from '@/components/explore-tab-new/courseled/hooks
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { feedStrokesReceived } from '@/components/feed/roundTilePlot';
 import { recentSentenceCourse } from '@/features/explore-magazine/watch/roundsShelfRules';
+import { holeMarkGrade, type HoleMarkGrade } from '@/features/tourhub/leaderboard/BoardRound';
 
 /** The three figures need at least this many rounds in the window. */
 export const LATELY_TILES_MIN = 4;
@@ -57,19 +58,9 @@ export function stablefordPoints(shape: HoleShape | null | undefined, courseHand
   return total;
 }
 
-export type NineMark = 'under' | 'par' | 'bogey' | 'double' | 'triple' | 'blank';
-export interface NineCell { hole: number; strokes: number | null; mark: NineMark }
+/** Tile nines share the Clubhouse HoleMarks grade authority, including eagle+. */
+export interface NineCell { hole: number; strokes: number | null; mark: HoleMarkGrade }
 export interface Nine { label: 'OUT' | 'IN'; cells: NineCell[]; total: number | null }
-
-export function nineMark(strokes: number | null, par: number | null): NineMark {
-  if (strokes == null || par == null) return 'blank';
-  const d = strokes - par;
-  if (d < 0) return 'under';
-  if (d === 0) return 'par';
-  if (d === 1) return 'bogey';
-  if (d === 2) return 'double';
-  return 'triple';
-}
 
 /** OUT 1–9 and IN 10–18 from the shape's actual strokes; unplayed holes blank. */
 export function latelyNines(shape: HoleShape | null | undefined): Nine[] | null {
@@ -83,7 +74,7 @@ export function latelyNines(shape: HoleShape | null | undefined): Nine[] | null 
       const h = byHole.get(n);
       const strokes = h?.strokes ?? null;
       if (strokes != null) { total += strokes; any = true; }
-      cells.push({ hole: n, strokes, mark: strokes == null ? 'blank' : nineMark(strokes, h?.par ?? null) });
+      cells.push({ hole: n, strokes, mark: holeMarkGrade(strokes, h?.par ?? null) });
     }
     return { label, cells, total: any ? total : null };
   };

@@ -122,9 +122,9 @@ describe('Lately tile — the nines', () => {
   it('(e) every band, blank unplayed holes and totals', () => {
     const strokes = [3, 4, 5, 6, 7, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, null, null];
     const nines = latelyNines(shape(strokes))!;
-    expect(nines[0].cells.map((c) => c.mark)).toEqual(['under', 'par', 'bogey', 'double', 'triple', 'under', 'par', 'par', 'par']);
+    expect(nines[0].cells.map((c) => c.mark)).toEqual(['birdie', 'par', 'bogey', 'double', 'triple', 'eagle', 'par', 'par', 'par']);
     expect(nines[0].total).toBe(39);
-    expect(nines[1].cells.slice(7).map((c) => c.mark)).toEqual(['blank', 'blank']);
+    expect(nines[1].cells.slice(7).map((c) => c.mark)).toEqual(['empty', 'empty']);
     expect(nines[1].total).toBe(28);
     mount(round(), shape(strokes));
     const out = document.querySelector('[data-lately-nine="OUT"]')!;
@@ -143,6 +143,18 @@ describe('Lately tile — the nines', () => {
     fireEvent.click(document.querySelector('[data-rounds-shelf-card="round"]')!);
     expect(onOpenRound).toHaveBeenCalledWith('s1', 'u1');
     expect(track).toHaveBeenCalledWith('rounds_shelf_card_tapped', { kind: 'round' });
+  });
+  it('(e4) two and three under par render eagle with the canonical double-ring and double-square CSS', () => {
+    const { container } = mount(round(), shape([2, 1, ...Array(16).fill(4)]));
+    const marks = container.querySelectorAll('[data-lately-nine="OUT"] i[data-mark]');
+    expect(marks[0]).toHaveAttribute('data-mark', 'eagle');
+    expect(marks[1]).toHaveAttribute('data-mark', 'eagle');
+    expect(container.querySelectorAll('i[data-mark="eagle"]')).toHaveLength(2);
+    const css = readFileSync('src/features/explore-magazine/watch/lately-tile.css', 'utf8');
+    const eagle = css.match(/\.lately-nine i\[data-mark="eagle"\] \{[^}]*\}/)?.[0] ?? '';
+    const double = css.match(/\.lately-nine i\[data-mark="double"\] \{[^}]*\}/)?.[0] ?? '';
+    expect(eagle).toContain('box-shadow: 0 0 0 1.5px var(--lately-nine-surface), 0 0 0 2.6px #F5C842');
+    expect(double).toContain('box-shadow: inset 0 0 0 1.6px var(--lately-nine-surface), inset 0 0 0 2.8px #5E8FD9');
   });
   it('(e3) level par reads E in TO PAR; a long name ellipsises on one line', () => {
     mount(round({ gross_score: 72, display_name: 'A Very Long Member Name That Cannot Possibly Fit On The Tile' }));

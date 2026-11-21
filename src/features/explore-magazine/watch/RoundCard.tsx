@@ -22,7 +22,8 @@ import './lately-tile.css';
  * ScoreFigureRow, the "against their average" line and two glass nines.
  * Consumers: CourseLatelySection and StandoutRoundsSection (opt-in header,
  * line and points props). RoundTileParts / RoundTileMarks
- * are left for their other users. Geometry and paint live in lately-tile.css.
+ * are left for their other users. Geometry and paint live in lately-tile.css;
+ * latelyNines uses BoardRound's shared holeMarkGrade so tile/feed grades agree.
  */
 
 /** CS1: the course page's own-round amber, name and edge only. */
@@ -168,7 +169,7 @@ export function RoundCard({
               <span className="lately-nine-n lately-nine-t">{nine.label}</span>
               {nine.cells.map((c) => (
                 <span key={`s${c.hole}`} className="lately-nine-s">
-                  <i data-mark={c.mark}>{c.strokes ?? ''}</i>
+                  <i data-mark={c.mark}>{c.mark === 'empty' ? '' : c.strokes ?? ''}</i>
                 </span>
               ))}
               <span data-lately-nine-total className="lately-nine-s lately-nine-st">{nine.total ?? ''}</span>

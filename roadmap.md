@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped verification: Round tiles match Clubhouse hole marks
+- Adopted holeMarkGrade in latelyNines and score-post shape families at existing tile geometry; preserved totals, score figures, header and rail layouts. Empty grades show no figure.
+- Updated only two authorized courseLatelyTiles (e) arrays and added one eagle/CSS case; focused 63/63, courseLatelyTiles 16/16 also passed in shard two. Baseline inventory 9,394 (9,390 + four fullscreenHoleTileRow cases); expected 9,395 (+one case).
+- Sequential shards: one 2,297 passed; two 2,282 passed / 1 failed of 2,283. Stopped at unchanged fullscreenHoleTileRow.test.tsx:69:17, `TypeError: The URL must be of scheme file`. No repair/rerun; shards three/four and 320/390 Farleigh screenshots unrun. Needs the preceding hole-tile fixture ruling; authenticated real-round comparison unavailable (external_unmanaged). Build OK; full output/report: .lovable/reports/round-tile-hole-marks/.
+
 ## Stopped: Fullscreen course-photo hole tile beside name
 - Moved only the synthetic hole tile into the author row; preserved FS_GLASS and frozen viewer controls, with local 340px geometry and two-line hole names.
 - Added four fullscreenHoleTileRow cases; focused 29 passed / 1 failed of 30. Case (d) stops at src/test/fullscreenHoleTileRow.test.tsx:69:17: `TypeError: The URL must be of scheme file`. All 26 unchanged viewer cases pass. No repair/rerun, shards or 320/390 screenshots under the stop rule; needs a ruling on the new CSS-read fixture.
