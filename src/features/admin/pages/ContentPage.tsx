@@ -794,6 +794,7 @@ export function TourSection() {
 
   const list = players.data ?? [];
   const noPhotoSet = players.data ? list.filter(p => !p.photoUrl && !p.headshotOverride).length : null;
+  const ownPhoto = players.data ? list.filter(p => p.photoUrl || p.headshotOverride).length : null;
   const active = list.find(p => p.id === activePlayerId) ?? (fallback?.id === activePlayerId ? fallback : null);
 
   const sheet = (
@@ -821,6 +822,7 @@ export function TourSection() {
         syncLabel={sync.syncLabel}
         onRunSync={sync.handleSync}
         noPhotoSet={noPhotoSet}
+        ownPhoto={ownPhoto}
         onOpenDirectory={() => setParam('sub', 'players', true)}
         onOpenPlayer={async (id, name) => {
           // Exact-name fallback never chooses between same-name players.

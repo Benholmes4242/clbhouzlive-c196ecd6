@@ -38,13 +38,15 @@ export function normaliseRankingName(name: string | null | undefined): string {
   return name.replace(/\p{L}[\p{L}'’-]*/gu, (word) => {
     const letters = word.replace(/[^\p{L}]/gu, '');
     if (letters.length < 2 || letters !== letters.toUpperCase() || letters === letters.toLowerCase()) return word;
-    return word
+    const cased = word
       .toLowerCase()
       .replace(/(^|['’-])(\p{L})/gu, (_m, sep: string, ch: string) => sep + ch.toUpperCase());
+    // CONTENT_V3_3: "MCILROY" -> "McIlroy" (4+ letters); no Mac rule.
+    return letters.length >= 4 && cased.startsWith('Mc') ? `Mc${cased.charAt(2).toUpperCase()}${cased.slice(3)}` : cased;
   });
 }
 
-const RANKING_TOUR: Record<string, string> = { euro: 'DP World', lpga: 'LPGA', pgad: 'Americas', liv: 'LIV' };
+const RANKING_TOUR: Record<string, string> = { euro: 'DP World', lpga: 'LPGA', pgad: 'Americas', liv: 'LIV', champ: 'Champions' };
 export function rankingTourLabel(code: string): string {
   return RANKING_TOUR[code] ?? code.toUpperCase();
 }

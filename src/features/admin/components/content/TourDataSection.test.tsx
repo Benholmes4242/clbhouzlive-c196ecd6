@@ -74,14 +74,14 @@ describe('BRIEF_TOUR_RANKINGS_OPEN_PLAYER rows', () => {
 
   it('falls back to player_id when there is no manual override', async () => {
     const onOpenPlayer = mount();
-    const btn = await screen.findByRole('button', { name: /Rory Mcilroy/ });
+    const btn = await screen.findByRole('button', { name: /Rory McIlroy/ });
     fireEvent.click(btn);
-    expect(onOpenPlayer).toHaveBeenCalledWith('p2', 'Rory Mcilroy');
+    expect(onOpenPlayer).toHaveBeenCalledWith('p2', 'Rory McIlroy');
   });
 
   it('every row is a button, including unlinked rows', async () => {
     const onOpenPlayer = mount();
-    for (const name of [/Eugenio Chacarra/, /Rory Mcilroy/, /Ghost Player/]) {
+    for (const name of [/Eugenio Chacarra/, /Rory McIlroy/, /Ghost Player/]) {
       expect(await screen.findByRole('button', { name })).toBeInTheDocument();
     }
     fireEvent.click(screen.getByRole('button', { name: /Ghost Player/ }));
