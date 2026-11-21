@@ -94,7 +94,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(pills()).toEqual(['share']);
     view.rerender(renderState(true, rows));
     expect(viewerActionPost(shot, shot.mediaItems[0], rows, true)?.id).toBe('post-9');
-    expect(screen.getByRole('button', { name: 'View post' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'View post' })).toBeNull();
     expect(pills()).toEqual(['like', 'comment', 'share', 'more']);
     view.rerender(renderState(true, []));
     expect(viewerActionPost(shot, shot.mediaItems[0], [], true)).toBeNull();

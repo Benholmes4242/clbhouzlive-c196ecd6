@@ -123,26 +123,20 @@ const chrome = (item: MediaItem) => <MemoryRouter><ImmersiveFullscreenChrome
   onFollow={vi.fn()} onViewProfile={vi.fn()} onReviewTap={vi.fn()} isOwnPost={false} /></MemoryRouter>;
 
 describe('PF2 View post line in the canonical viewer', () => {
-  it('renders only with a sourcePostId, on its own line in the Full review style', () => {
+  it('never renders a View post line, with or without a sourcePostId', () => {
     useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null });
     useClubhouseStore.setState({ isTournamentCardActive: false });
     const { container, rerender } = render(chrome(shotItem('post-1')));
-    expect(screen.getByRole('button', { name: 'View post' })).toBeTruthy();
-    expect(container.querySelector('[data-fullscreen-view-post]')).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'View post' })).toBeNull();
+    expect(container.querySelector('[data-fullscreen-view-post]')).toBeNull();
     rerender(chrome(shotItem(null)));
     expect(screen.queryByRole('button', { name: 'View post' })).toBeNull();
+    expect(container.querySelector('[data-fullscreen-view-post]')).toBeNull();
   });
-  it('the tap opens the post and never reaches the slide', () => {
-    useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null });
-    const onSlideTap = vi.fn();
-    render(<div onClick={onSlideTap}>{chrome(shotItem('post-1'))}</div>);
-    fireEvent.click(screen.getByRole('button', { name: 'View post' }));
-    expect(onSlideTap).not.toHaveBeenCalled();
-  });
-  it('video shots keep View post in the stack with the canonical video row below it', () => {
+  it('video shots show the canonical video row with no View post', () => {
     useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null });
     const { container } = render(chrome(shotItem('post-1', 'video')));
-    expect(container.querySelector('[data-fullscreen-stack] [data-fullscreen-view-post]')).not.toBeNull();
+    expect(container.querySelector('[data-fullscreen-stack] [data-fullscreen-view-post]')).toBeNull();
     expect(container.querySelector('[data-fullscreen-video-row]')).not.toBeNull();
   });
 });

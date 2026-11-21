@@ -1,0 +1,350 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+stderr | src/test/viewPost1Navigation.test.tsx > VIEW_POST_1 post deep-link close and processing fallback > without closeTo a refused open retains the unavailable state
+[PostDeepLink] fullscreen open() refused the post new-post
+
+ ✓ src/test/viewPost1Navigation.test.tsx (13 tests) 537ms
+ ✓ src/test/pf2HoleGuide.test.tsx (13 tests) 232ms
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a course-media RPC review without score columns reads its review once and renders all five figures
+[fullscreen viewer] unmatched source post ids [ [32m'post-score'[39m ]
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a course-media RPC review without score columns reads its review once and renders all five figures
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a resolved unmatched post has no pills and double-tap cannot call a like
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > the review score strip uses the full-width card row and its divider
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > the review score strip uses the full-width card row and its divider
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (a) review opens carry engagementTarget review, open interactive, and show the pills (no More)
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (a) review opens carry engagementTarget review, open interactive, and show the pills (no More)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (d) About Photos review parents carry the course name and review scores; post parents are interactive with the header
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+ ✓ src/test/canonicalFullscreenViewer.test.tsx (13 tests) 1251ms
+stdout | src/test/postFlowScreens.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stderr | src/test/postFlowScreens.test.tsx > course sheet and photo flows > single selection commits and closes on tap
+Warning: An update to CourseTagSheet inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CourseTagSheet (/dev-server/src/features/post-v2/components/CourseTagSheet.tsx:32:27)
+    at I18nextProvider (file:///dev-server/node_modules/react-i18next/dist/es/I18nextProvider.js:4:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/postFlowScreens.test.tsx > course sheet and photo flows > photo from a selected source renders directly without fallback read
+Warning: An update to WhereSection inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at WhereSection (/dev-server/src/features/post-v2/components/golf/GolfPostSections.tsx:397:25)
+    at I18nextProvider (file:///dev-server/node_modules/react-i18next/dist/es/I18nextProvider.js:4:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > posted does not auto-dismiss
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > posted does not auto-dismiss
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > plain edit confirmation preserves auto-dismiss
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > plain edit confirmation preserves auto-dismiss
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > share uses existing share hook and post id
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > share uses existing share hook and post id
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > view post calls destination without closing by bubbling
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > view post calls destination without closing by bubbling
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > keep using closes without cancelling job
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > keep using closes without cancelling job
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > upload progress reflects real job percentage
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > upload progress reflects real job percentage
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > unconfirmed hole tags do not render completion facts
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > unconfirmed hole tags do not render completion facts
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > confirmed hole write adds one completion fact
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > confirmed hole write adds one completion fact
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > scheduled buttons open list and finish separately
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/postFlowScreens.test.tsx > success lifecycle and actions > scheduled buttons open list and finish separately
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+ ✓ src/test/postFlowScreens.test.tsx (21 tests) 1235ms
+   ✓ course sheet and photo flows > dedupes played before popular and preserves metadata after selection  458ms
+
+ Test Files  4 passed (4)
+      Tests  60 passed (60)
+   Start at  08:43:57
+   Duration  11.27s (transform 5.92s, setup 1.26s, collect 17.82s, tests 3.25s, environment 6.28s, prepare 2.26s)
+

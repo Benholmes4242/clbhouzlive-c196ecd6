@@ -25,7 +25,7 @@
  * Course photos (syntheticPosts) use the SAME layout (CANONICAL_FULLSCREEN_VIEWER
  * part 1): same top bar (no rating chip anywhere), the author row from the
  * active item's memberShot (sub-row = added month), a word-sized glass hole tile
- * beside the name (geometry owned by fullscreen-hole-tile.css), "View post ›" when the shot came from a live post, and the
+ * beside the name (geometry owned by fullscreen-hole-tile.css), and the
  * canonical video row. Source-post pills target the post; standalone shots share the Media link.
  * Review targets (engagementTarget review) hide More: MoreOptionsDrawer has
  * no review mode.
@@ -248,18 +248,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       requestAnimationFrame(() => navigate(to));
     },
     [onClose, onBeforeNavigate, navigate],
-  );
-  /* PF2_GUIDE: a member shot that came from a live Everyone post offers
-     "View post ›". The viewer closes first (same contract as mention taps)
-     and the post opens with closeTo = where the viewer was opened from, so
-     closing the post returns to the course or Courses page (VIEW_POST_1). */
-  const handleViewSourcePost = useCallback(
-    (postId: string) => {
-      if (onBeforeNavigate) onBeforeNavigate(); else onClose();
-      const closeTo = `${location.pathname}${location.search}`;
-      requestAnimationFrame(() => navigate(`/post/${postId}`, { state: { closeTo } }));
-    },
-    [onClose, onBeforeNavigate, navigate, location.pathname, location.search],
   );
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
@@ -657,22 +645,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               navigate(getActorRouteByType('personal', userId));
             }}
           />
-        )}
-
-        {shot && shotSourcePostId && (
-          <button
-            type="button"
-            data-fullscreen-view-post
-            onClick={(e) => { e.stopPropagation(); handleViewSourcePost(shotSourcePostId); }}
-            style={{
-              marginTop: 10, minHeight: 28, alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 3,
-              background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-              fontFamily: 'inherit', fontSize: 14, fontWeight: 600, color: '#FFFFFF',
-            }}
-          >
-            View post
-            <ChevronRight size={13} strokeWidth={2.6} aria-hidden />
-          </button>
         )}
 
         {golfContext?.roundScoreId && onOpenScorecard && (

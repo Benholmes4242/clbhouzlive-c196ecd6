@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped verification: Remove course-photo View post
+- Removed only the source-shot button, unused handler/comment and header reference; source actions, stackBottom and frozen siblings unchanged. Only authorised test changes; pf2HoleGuide tap case deleted. Baseline 9,400 → expected 9,399 (-one named case), full pass unverified.
+- Focused 60/60. Sequential shards one 2,311 passed; two 2,292 passed; three 2,348 passed / 1 failed of 2,349. STOP: guestStage24.test.tsx:85:18, `AssertionError: expected [ '/auth' ] to deeply equal [ '/auth', '/' ]` in untouched `after a guest signs in as a member, Auth redirects once`.
+- No repair/rerun, shard four or 390/320 screenshots; requires ruling on unexpected guest-navigation failure. Report/full logs: .lovable/reports/fullscreen-remove-view-post/. Preview build OK.
+
 ## Complete: Actual played strokes and hole-strip app font
 - Pure evaluator actualGross/holeStrokes and actual-first sheet/seed/strip readers implemented; user-authorised hole strip font now inherits the app. Genuine handicap calculations, evaluator versions and prompt/award/notification code unchanged.
 - Added four roundGrossActual cases and one roundCardHoleStripActual render case; no existing tests changed. Baseline 9,395 → 9,400 (+five named cases, +two files). Focused 19/19; sequential shards 2,311 / 2,292 / 2,350 / 2,447 = 9,400/9,400. Font answer applied after shard one; affected strip checks pass in remaining shards.
