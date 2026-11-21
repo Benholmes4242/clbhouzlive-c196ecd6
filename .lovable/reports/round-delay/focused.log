@@ -1,0 +1,37 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/roundDelay.test.ts (29 tests) 18ms
+ ✓ src/test/alsoWeekReads.test.ts (3 tests) 13ms
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/roundDelayOverview.test.tsx (12 tests) 365ms
+ ✓ src/test/tourLiveStates.test.tsx (47 tests) 308ms
+stderr | src/test/liveBoardTeeAndZone.test.tsx > Live board tee availability and leaders course time > HeroBoardBand passes the live board’s course zone to the leaders group
+Warning: An update to HeroBoardSection inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HeroBoardSection (/dev-server/src/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand.tsx:270:29)
+    at I18nextProvider (file:///dev-server/node_modules/react-i18next/dist/es/I18nextProvider.js:4:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at wrapper (/dev-server/src/test/liveBoardTeeAndZone.test.tsx:166:21)
+
+ ✓ src/test/liveBoardTeeAndZone.test.tsx (10 tests) 355ms
+ ✓ src/test/alsoWeekRebuild.test.tsx (64 tests) 1015ms
+ ✓ src/test/tourOverviewHeroFixes.test.tsx (13 tests) 143ms
+
+ Test Files  7 passed (7)
+      Tests  178 passed (178)
+   Start at  22:15:37
+   Duration  8.88s (transform 5.16s, setup 2.30s, collect 17.95s, tests 2.22s, environment 14.62s, prepare 1.63s)
+
