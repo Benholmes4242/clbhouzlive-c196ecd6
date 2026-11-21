@@ -65,7 +65,7 @@ describe('Tour overview hero fixes', () => {
     const form = startDayForm(start, 'UTC', now);
     const slide = { type: 'upcoming', tournament: { id: 'event', name: 'Champions event', startDate: start, endDate: '2027-01-17', tourSlug: 'champ', tourName: 'Champions', venueName: 'Course' } } as HeroSlide;
     const { container } = mount(<><HybridHero slide={slide} state={{ kind: 'upcoming', variant: 'far', countdown: '', meta: '' }} now={now} activeTournamentId="event" onSelectTour={() => {}} onOpenTournament={() => {}} /><UpcomingFacts first="2027-01-14T08:00:00Z" zone="UTC" field={132} purse={3000000} par={72} yards={7000} startDayNamed={form.weekday} /></>);
-    expect(container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('Champions · STARTS 14 JAN');
+    expect(container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('Champions · Starts 14 JAN');
     expect(container.querySelector('[data-upcoming-fact="firstTee"]')).toBeNull();
     expect([...container.querySelectorAll('[data-upcoming-fact]')].map(c => c.getAttribute('data-upcoming-fact'))).toEqual(['field', 'purse', 'par', 'yards']);
     const caller = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand.tsx', 'utf8');

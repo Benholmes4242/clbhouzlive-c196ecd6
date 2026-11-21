@@ -1,17 +1,17 @@
 # Roadmap
 
-## Stopped verification: Season recap Next up
+## Complete: Season recap Next up verification
 - Implemented the shared three-day handover, season-over copy and loaded-next-event footer; removed recap points/final-event line and tied-player subline. Standings, card lists, live priority and January hand-back preserved.
 - Height ruling received: preserve today's growing photo; Next up follows the sentence within the existing content block, and content stays clear of the top islands. No sizing change needed.
 - Focused checks passed 58/58 across three files. Added seasonRecapNextUp: 22 cases; seasonRecap retains 31 cases with authorised rule/assertion changes and four named case renames recorded in the report.
-- Shard 1 stopped: 2,376 passed / 1 failed of 2,377, 215 files; tourOverviewHeroFixes.test.tsx:68:86 expected 'Champions · STARTS 14 JAN', received 'Champions · Starts 14 JAN'. No failing-test edits, reruns, shards 2–4 or captures after the stop.
-- Inventory baseline 9,624 / 856 → expected 9,646 / 857 (+22 cases / one file); full passing total unverified. Remaining shards/captures await a ruling on the prior kicker assertion. Full output/report: .lovable/reports/season-recap-next-up/.
+- Authorised kicker expectation corrected on its one line; four sequential shards passed 2,377 / 2,341 / 2,416 / 2,512 = 9,646 / 9,646 across 857 files. No app changes or inventory delta in this ruling.
+- Champions fixture captures at 390/320 show Next up 16px after the sentence; band grows from 404.27px to 422.27px with a longer title. Isolated sections, not live-data/chrome verification. Full logs/captures/report: .lovable/reports/tour-overview-final/.
 
-## Stopped verification: Tour overview hero fixes
+## Complete: Tour overview hero verification
 - Live fact columns, shared six-day event-zone start wording/FIRST TEE gating, and full WonChart names with wrapping keys implemented.
-- Focused checks: 62 passed / 1 failed of 63; tourOverviewHeroFixes.test.tsx:68:86 expected 'Champions · STARTS 14 JAN', received 'Champions · Starts 14 JAN'. Failed assertion unchanged; no rerun or shards.
+- Corrected only tourOverviewHeroFixes.test.tsx:68 to expect 'Champions · Starts 14 JAN'; name and all other assertions preserved. Full sequential suite passes 9,646 / 9,646 across 857 files.
 - Added 13 cases / one file: baseline 9,611 / 855 → expected inventory 9,624 / 856; no tests deleted or renamed. Authorized completedWeekFacts surname assertion updated.
-- Corrected required nullable toPar fields in the new fixture only to clear preview types; no assertions changed. Four shards and 390/320 captures await a ruling on the failed test. Full output/report: .lovable/reports/tour-overview-hero-fixes/.
+- 390/320 fixture captures confirm one-line live figures, CSS-uppercase STARTS 14 JAN and full Last year names with wrapping at 320. Existing 320 scoring-average label is hidden; app unchanged as instructed. Final logs/captures/report: .lovable/reports/tour-overview-final/.
 
 ## Stopped verification: Authorised shard-one rerun
 - Reran unchanged shard 1 exactly once: 2,351 passed / 1 failed of 2,352; 212 passed / 1 failed of 213 files. Same activeRing.test.tsx:202:30 latest-post button lookup failed again.

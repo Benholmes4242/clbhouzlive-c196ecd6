@@ -1,0 +1,496 @@
+[
+  {
+    "width": 390,
+    "overflow": [],
+    "facts": [
+      {
+        "key": "lowRound",
+        "rect": {
+          "x": 20,
+          "y": 366,
+          "width": 81.5,
+          "height": 35,
+          "bottom": 401,
+          "right": 101.5
+        },
+        "text": "64\nLOW ROUND",
+        "figure": {
+          "x": 20,
+          "y": 366,
+          "width": 81.5,
+          "height": 18,
+          "bottom": 384,
+          "right": 101.5
+        }
+      },
+      {
+        "key": "scoringAvg",
+        "rect": {
+          "x": 109.5,
+          "y": 366,
+          "width": 81.5,
+          "height": 35,
+          "bottom": 401,
+          "right": 191
+        },
+        "text": "70.25\nSCORING AVG",
+        "figure": {
+          "x": 109.5,
+          "y": 366,
+          "width": 81.5,
+          "height": 18,
+          "bottom": 384,
+          "right": 191
+        }
+      },
+      {
+        "key": "underPar",
+        "rect": {
+          "x": 199,
+          "y": 366,
+          "width": 81.5,
+          "height": 35,
+          "bottom": 401,
+          "right": 280.5
+        },
+        "text": "68%\nUNDER PAR",
+        "figure": {
+          "x": 199,
+          "y": 366,
+          "width": 81.5,
+          "height": 18,
+          "bottom": 384,
+          "right": 280.5
+        }
+      },
+      {
+        "key": "cut",
+        "rect": {
+          "x": 288.5,
+          "y": 366,
+          "width": 81.5,
+          "height": 35,
+          "bottom": 401,
+          "right": 370
+        },
+        "text": "\u22123\nCUT",
+        "figure": {
+          "x": 288.5,
+          "y": 366,
+          "width": 81.5,
+          "height": 18,
+          "bottom": 384,
+          "right": 370
+        }
+      }
+    ],
+    "kicker": "DP World Tour \u00b7 ROUND 3",
+    "kickerTransform": "uppercase",
+    "band": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 350,
+      "bottom": 350,
+      "right": 390
+    },
+    "kickerRect": {
+      "x": 20,
+      "y": 184.25,
+      "width": 350,
+      "height": 28,
+      "bottom": 212.25,
+      "right": 370
+    },
+    "keys": [],
+    "card": null,
+    "sentence": {
+      "x": 20,
+      "y": 295.71875,
+      "width": 350,
+      "height": 18.890625,
+      "bottom": 314.609375,
+      "right": 370
+    },
+    "nextUp": null,
+    "bandHeightStyle": "350px",
+    "case": "live",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=live"
+  },
+  {
+    "width": 390,
+    "overflow": [],
+    "facts": [],
+    "kicker": "Champions \u00b7 Starts 14 JAN",
+    "kickerTransform": "uppercase",
+    "band": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 302.96875,
+      "bottom": 302.96875,
+      "right": 390
+    },
+    "kickerRect": {
+      "x": 20,
+      "y": 186.5,
+      "width": 350,
+      "height": 28,
+      "bottom": 214.5,
+      "right": 370
+    },
+    "keys": [],
+    "card": null,
+    "sentence": null,
+    "nextUp": null,
+    "bandHeightStyle": "",
+    "case": "upcoming",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=upcoming"
+  },
+  {
+    "width": 390,
+    "overflow": [],
+    "facts": [],
+    "kicker": null,
+    "kickerTransform": null,
+    "band": null,
+    "kickerRect": null,
+    "keys": [
+      {
+        "text": "David Puig\n \u221218",
+        "rect": {
+          "x": 20,
+          "y": 38,
+          "width": 96.5625,
+          "height": 16.5,
+          "bottom": 54.5,
+          "right": 116.5625
+        }
+      },
+      {
+        "text": "Wenyi Ding\n \u221216",
+        "rect": {
+          "x": 130.5625,
+          "y": 38,
+          "width": 99.421875,
+          "height": 16.5,
+          "bottom": 54.5,
+          "right": 229.984375
+        }
+      },
+      {
+        "text": "Nick Voke\n \u221215",
+        "rect": {
+          "x": 243.984375,
+          "y": 38,
+          "width": 91.5,
+          "height": 16.5,
+          "bottom": 54.5,
+          "right": 335.484375
+        }
+      }
+    ],
+    "card": null,
+    "sentence": null,
+    "nextUp": null,
+    "bandHeightStyle": null,
+    "case": "lastyear",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=lastyear"
+  },
+  {
+    "width": 390,
+    "overflow": [],
+    "facts": [],
+    "kicker": "CHAMPIONS TOUR \u00b7 2026 SEASON",
+    "kickerTransform": "uppercase",
+    "band": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 404.265625,
+      "bottom": 404.265625,
+      "right": 390
+    },
+    "kickerRect": {
+      "x": 20,
+      "y": 186.5,
+      "width": 350,
+      "height": 28,
+      "bottom": 214.5,
+      "right": 370
+    },
+    "keys": [],
+    "card": {
+      "x": 20,
+      "y": 307.015625,
+      "width": 350,
+      "height": 83.25,
+      "bottom": 390.265625,
+      "right": 370
+    },
+    "sentence": {
+      "x": 20,
+      "y": 253.234375,
+      "width": 350,
+      "height": 37.78125,
+      "bottom": 291.015625,
+      "right": 370
+    },
+    "nextUp": "NEXT UP\nSony Championship Hawaii\nWaialae CC \u00b7 14\u201316 Jan\n54\nDAYS",
+    "bandHeightStyle": "",
+    "case": "recap",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=recap",
+    "longTitleBandHeight": 422.265625
+  },
+  {
+    "width": 320,
+    "overflow": [],
+    "facts": [
+      {
+        "key": "lowRound",
+        "rect": {
+          "x": 16,
+          "y": 370,
+          "width": 66,
+          "height": 35,
+          "bottom": 405,
+          "right": 82
+        },
+        "text": "64\nLOW ROUND",
+        "figure": {
+          "x": 16,
+          "y": 370,
+          "width": 66,
+          "height": 18,
+          "bottom": 388,
+          "right": 82
+        }
+      },
+      {
+        "key": "scoringAvg",
+        "rect": {
+          "x": 90,
+          "y": 370,
+          "width": 66,
+          "height": 35,
+          "bottom": 405,
+          "right": 156
+        },
+        "text": "70.25",
+        "figure": {
+          "x": 90,
+          "y": 370,
+          "width": 66,
+          "height": 18,
+          "bottom": 388,
+          "right": 156
+        }
+      },
+      {
+        "key": "underPar",
+        "rect": {
+          "x": 164,
+          "y": 370,
+          "width": 66,
+          "height": 35,
+          "bottom": 405,
+          "right": 230
+        },
+        "text": "68%\nUNDER PAR",
+        "figure": {
+          "x": 164,
+          "y": 370,
+          "width": 66,
+          "height": 18,
+          "bottom": 388,
+          "right": 230
+        }
+      },
+      {
+        "key": "cut",
+        "rect": {
+          "x": 238,
+          "y": 370,
+          "width": 66,
+          "height": 35,
+          "bottom": 405,
+          "right": 304
+        },
+        "text": "\u22123\nCUT",
+        "figure": {
+          "x": 238,
+          "y": 370,
+          "width": 66,
+          "height": 18,
+          "bottom": 388,
+          "right": 304
+        }
+      }
+    ],
+    "kicker": "DP World Tour \u00b7 ROUND 3",
+    "kickerTransform": "uppercase",
+    "band": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 350,
+      "bottom": 350,
+      "right": 320
+    },
+    "kickerRect": {
+      "x": 20,
+      "y": 165.359375,
+      "width": 280,
+      "height": 28,
+      "bottom": 193.359375,
+      "right": 300
+    },
+    "keys": [],
+    "card": null,
+    "sentence": {
+      "x": 20,
+      "y": 276.828125,
+      "width": 280,
+      "height": 37.78125,
+      "bottom": 314.609375,
+      "right": 300
+    },
+    "nextUp": null,
+    "bandHeightStyle": "350px",
+    "case": "live",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=live"
+  },
+  {
+    "width": 320,
+    "overflow": [],
+    "facts": [],
+    "kicker": "Champions \u00b7 Starts 14 JAN",
+    "kickerTransform": "uppercase",
+    "band": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 328.703125,
+      "bottom": 328.703125,
+      "right": 320
+    },
+    "kickerRect": {
+      "x": 20,
+      "y": 186.5,
+      "width": 280,
+      "height": 28,
+      "bottom": 214.5,
+      "right": 300
+    },
+    "keys": [],
+    "card": null,
+    "sentence": null,
+    "nextUp": null,
+    "bandHeightStyle": "",
+    "case": "upcoming",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=upcoming"
+  },
+  {
+    "width": 320,
+    "overflow": [],
+    "facts": [],
+    "kicker": null,
+    "kickerTransform": null,
+    "band": null,
+    "kickerRect": null,
+    "keys": [
+      {
+        "text": "David Puig\n \u221218",
+        "rect": {
+          "x": 16,
+          "y": 38,
+          "width": 96.5625,
+          "height": 16.5,
+          "bottom": 54.5,
+          "right": 112.5625
+        }
+      },
+      {
+        "text": "Wenyi Ding\n \u221216",
+        "rect": {
+          "x": 126.5625,
+          "y": 38,
+          "width": 99.421875,
+          "height": 16.5,
+          "bottom": 54.5,
+          "right": 225.984375
+        }
+      },
+      {
+        "text": "Nick Voke\n \u221215",
+        "rect": {
+          "x": 16,
+          "y": 60.5,
+          "width": 91.5,
+          "height": 16.5,
+          "bottom": 77,
+          "right": 107.5
+        }
+      }
+    ],
+    "card": null,
+    "sentence": null,
+    "nextUp": null,
+    "bandHeightStyle": null,
+    "case": "lastyear",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=lastyear"
+  },
+  {
+    "width": 320,
+    "overflow": [],
+    "facts": [],
+    "kicker": "CHAMPIONS TOUR \u00b7 2026 SEASON",
+    "kickerTransform": "uppercase",
+    "band": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 404.265625,
+      "bottom": 404.265625,
+      "right": 320
+    },
+    "kickerRect": {
+      "x": 20,
+      "y": 186.5,
+      "width": 280,
+      "height": 28,
+      "bottom": 214.5,
+      "right": 300
+    },
+    "keys": [],
+    "card": {
+      "x": 20,
+      "y": 307.015625,
+      "width": 280,
+      "height": 83.25,
+      "bottom": 390.265625,
+      "right": 300
+    },
+    "sentence": {
+      "x": 20,
+      "y": 253.234375,
+      "width": 280,
+      "height": 37.78125,
+      "bottom": 291.015625,
+      "right": 300
+    },
+    "nextUp": "NEXT UP\nSony Championship Hawaii\nWaialae CC \u00b7 14\u201316 Jan\n54\nDAYS",
+    "bandHeightStyle": "",
+    "case": "recap",
+    "errors": [],
+    "url": "http://localhost:8080/.verification/tour-final.html?case=recap",
+    "longTitleBandHeight": 422.265625
+  }
+]
