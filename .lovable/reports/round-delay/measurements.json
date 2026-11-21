@@ -1,0 +1,26 @@
+[
+  {
+    "kicker": "PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+    "leaders": "Round 3\u00b7 Delayed",
+    "weekly": "ROUND 3 \u00b7 DELAYED",
+    "dot": false,
+    "width": 390,
+    "scrollWidth": 390,
+    "captionColor": "rgba(248, 250, 252, 0.62)",
+    "grey": "rgba(248, 250, 252, 0.62)"
+  },
+  {
+    "kicker": "PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+    "leaders": "Round 3\u00b7 Delayed",
+    "weekly": "ROUND 3 \u00b7 DELAYED",
+    "dot": false,
+    "width": 320,
+    "scrollWidth": 320,
+    "captionColor": "rgba(248, 250, 252, 0.62)",
+    "grey": "rgba(248, 250, 252, 0.62)"
+  },
+  {
+    "afterRepublish": "Round 3\n\u00b7 Tees off Sat 17:00",
+    "errors": []
+  }
+]

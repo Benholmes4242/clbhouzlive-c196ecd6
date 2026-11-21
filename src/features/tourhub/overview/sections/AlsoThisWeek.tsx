@@ -8,6 +8,7 @@ import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useOverviewEventsAbove } from './useOverviewEventsAbove';
 export { isAlsoThisWeek } from './overviewEventSelection';
 import { OverviewSectionHead } from './OverviewSectionHead';
+import { useRoundDelayClock } from '../roundDelay';
 
 export function statusFor(slide: HeroSlide, now = new Date()): string {
   if (slide.type === 'live') return `Live${slide.tournament.currentRound ? ` · Round ${slide.tournament.currentRound}` : ''}`;
@@ -27,11 +28,12 @@ export function shouldShowAlsoThisWeekFigures(slide: Pick<HeroSlide, 'type' | 't
 
 export function AlsoThisWeek() {
   const { t } = useTranslation('tourhub');
+  const now = useRoundDelayClock();
   const { alsoWeek: others } = useOverviewEventsAbove();
   const data = useAlsoWeekData(others);
   useSectionReady('alsoThisWeek', others.length === 0 || settled(data));
   const follows = useTourPlayerFollows(others.length > 0);
   const liveCount = others.filter(s => s.type === 'live').length;
   if (others.length === 0) return null;
-  return <section className="also-week" data-overview-band="alsoThisWeek"><OverviewSectionHead title={t('overview.alsoThisWeek.title')} meta={liveCount > 0 ? <span className="also-week-meta">{t('overview.alsoThisWeek.live', {count:liveCount})}</span> : undefined}/><div>{others.map(slide => <AlsoWeekEvent key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} draw={data.isError ? undefined : data.data?.draws.get(slide.tournament.id)} followed={follows.ids}/>)}</div></section>;
+  return <section className="also-week" data-overview-band="alsoThisWeek"><OverviewSectionHead title={t('overview.alsoThisWeek.title')} meta={liveCount > 0 ? <span className="also-week-meta">{t('overview.alsoThisWeek.live', {count:liveCount})}</span> : undefined}/><div>{others.map(slide => <AlsoWeekEvent key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} draw={data.isError ? undefined : data.data?.draws.get(slide.tournament.id)} firstTee={data.isError ? null : data.data?.firstTees?.get(slide.tournament.id)?.get(slide.tournament.currentRound ?? 0)} now={now} followed={follows.ids}/>)}</div></section>;
 }

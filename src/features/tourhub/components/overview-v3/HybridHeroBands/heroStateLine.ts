@@ -12,9 +12,12 @@ export interface HeroStateLineInput {
   startDay?: string | null;
   /** Overview live states: between rounds the line reads AFTER ROUND n. */
   afterRound?: number | null;
+  /** Overview-only opt-in; provider-suspended wording remains authoritative. */
+  delayedRound?: number | null;
 }
 
 export function heroStateLine(t: TFunction, state: HeroStateLineInput): string {
+  if (state.kind === 'live' && state.delayedRound != null) return t('overview.hero.roundDelayed', { round: state.delayedRound });
   if (state.kind === 'live' && state.afterRound != null) return t('overview.hero.afterRound', { round: state.afterRound });
   if (state.kind === 'live') {
     return state.round != null && state.totalRounds != null && state.round === state.totalRounds

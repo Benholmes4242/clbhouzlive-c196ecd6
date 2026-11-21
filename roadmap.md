@@ -1,5 +1,12 @@
 # Roadmap
 
+## Complete: Derived delayed rounds
+- Share the scheduled-round delay rule (>60 minutes after earliest valid tee, in-progress event, no current-round starters) across the overview hero, leaders’ group and Also this week.
+- Preserve suspended handling, tournament pages, live counts, situation notes and all other hero content; batch weekly current-round tee reads.
+- Casing ruling: store ROUND {{round}} · DELAYED; hero textContent keeps the rendered tour label followed by uppercase state text.
+- Added 29 roundDelay and 12 roundDelayOverview cases; existing tests unchanged. Four sequential shards passed 2,391 / 2,368 / 2,420 / 2,522 = 9,701 tests / 861 files, exactly 9,660 / 859 +41 cases / two files. Focused 178/178; preview build OK.
+- Real display-component RSM-shaped captures at 390/320 confirm uppercase delayed kicker, Delayed leaders line, grey weekly caption without a live dot and no overflow. Browser starter/future-tee recovery passed without page errors; temporary page removed. Isolated fixtures, not live hosted data. Full logs, names and captures: .lovable/reports/round-delay/.
+
 ## Waiting: Season recap Our picks block
 - Implement the heading/link, figures and locale keys scoped to RecapOurRecord; preserve THE SEASON, THE POINTS LIST, sheet and visibility rules.
 - Blocker: the brief requires exact matching to ourPicks_390.html, but that drawing was not supplied/readable. Await its upload before changing the block.

@@ -180,6 +180,7 @@
       "onCourse": "[On the course]",
       "finished": "[Finished]",
       "teesOff": "[Tees off {{day}} {{time}}]",
+      "delayed": "[Delayed]",
       "and": " and ",
       "note": {
         "one_one": "[<names/>, also at {{score}}, is in another group.]",
@@ -244,6 +245,7 @@
       "ourPicks": "[OUR TOURNAMENT PICKS]",
       "leaderLabel": "[Leader]",
       "stateSuspended": "[SUSPENDED]",
+      "roundDelayed": "[ROUND {{round}} · DELAYED]",
       "lastYear": "[Last year]",
       "leadersOut": "[Leaders out · R{{round}}]",
       "firstTee": "[First tee]",

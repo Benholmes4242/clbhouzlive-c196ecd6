@@ -161,6 +161,7 @@
       "onCourse": "On course",
       "finished": "Finished",
       "teesOff": "Tees off {{day}} {{time}}",
+      "delayed": "Delayed",
       "and": " and ",
       "note": {
         "one_one": "<names/>, also at {{score}}, is in another group.",
@@ -336,6 +337,7 @@
       "starts": "Starts {{day}}",
       "round": "ROUND {{round}}",
       "finalRound": "FINAL ROUND",
+      "roundDelayed": "ROUND {{round}} · DELAYED",
       "teesOff": "TEES OFF",
       "venueLabel": "VENUE",
       "purse": "PURSE",

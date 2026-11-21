@@ -118,6 +118,9 @@
     }
   },
   "overview": {
+    "leadersGroup": {
+      "delayed": "Delayed"
+    },
     "recap": {
       "seasonOver": "The {{year}} season is over. ",
       "nextUp": "NEXT UP"
@@ -208,6 +211,7 @@
     },
     "hero": {
       "stateLive": "ライブ",
+      "roundDelayed": "ROUND {{round}} · DELAYED",
       "stateFinal": "結果",
       "statePlayoff": "PLAYOFF",
       "factRound": "ラウンド",

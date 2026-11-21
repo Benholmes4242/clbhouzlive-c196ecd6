@@ -19,9 +19,12 @@ import { leaderSummary } from '../../leaderboard/leaderboardRules';
 import { HeroBoardRows } from '../../tournament-v2/sections/HeroBoardRows';
 import { chasePlayers,onCourse,situation,startsValues,weekFacts,weekRows,weekTotalRounds } from './alsoWeekRules';
 import './alsoWeek.css';
+import { isRoundDelayed, roundHasStarter, useRoundDelayClock } from '../roundDelay';
 
-export function AlsoWeekEvent({slide,entries,draw,followed}:{slide:HeroSlide;entries:BoardEntry[];draw?:{first:string|null;players:NonNullable<BoardEntry['player']>[]};followed:Set<string>}) {
+export function AlsoWeekEvent({slide,entries,draw,firstTee,now,followed}:{slide:HeroSlide;entries:BoardEntry[];draw?:{first:string|null;players:NonNullable<BoardEntry['player']>[]};firstTee?:string|null;now?:Date;followed:Set<string>}) {
   const {t,i18n}=useTranslation('tourhub');const navigate=useNavigate();const event=slide.tournament;
+  const clock=useRoundDelayClock(now);
+  const delayed=isRoundDelayed({status:event.status,currentRound:event.currentRound,currentRoundStatus:event.currentRoundStatus,firstTee,started:roundHasStarter(entries,event.currentRound),now:clock});
   const total=weekTotalRounds(slide);const round=event.currentRound??(slide.type==='completed'?total:null);
   const complete=slide.type==='completed';
   const starts=startsValues(event.startDate,draw?.first??null,i18n.language||'en');
@@ -31,13 +34,13 @@ export function AlsoWeekEvent({slide,entries,draw,followed}:{slide:HeroSlide;ent
   const facts=weekFacts(draw?.players.length||null,event.purse,event.currency,event.defendingChampion);
   const mine=draw?.players.filter(p=>followed.has(p.id))??[];
   const sub=[event.venueName,slide.type==='upcoming'&&event.venueCourseName!==event.venueName?event.venueCourseName:null,event.venuePar!=null?t('overview.alsoThisWeek.par',{par:event.venuePar}):null,slide.type==='live'&&started>0?t('overview.alsoThisWeek.onCourse',{count:started,field:entries.length}):null].filter(Boolean).join(' · ');
-  const state=complete?t('overview.alsoThisWeek.final'):slide.type==='upcoming'?starts?t(`overview.alsoThisWeek.${starts.time?'startsTime':'starts'}`,starts):'':round===total?t('overview.alsoThisWeek.finalRound'):round!=null?t(`overview.alsoThisWeek.${total!=null&&total!==4?'roundOf':'round'}`,{round,total}):'';
+  const state=complete?t('overview.alsoThisWeek.final'):slide.type==='upcoming'?starts?t(`overview.alsoThisWeek.${starts.time?'startsTime':'starts'}`,starts):'':delayed?t('overview.hero.roundDelayed',{round:event.currentRound}):round===total?t('overview.alsoThisWeek.finalRound'):round!=null?t(`overview.alsoThisWeek.${total!=null&&total!==4?'roundOf':'round'}`,{round,total}):'';
   const target=tournamentRoute(event.id,{kind:'overview'});
   const {top,extra}=weekRows(entries,followed);
   const winnerClosing=complete&&winner&&event.venuePar!=null&&round!=null?todayFromEntry(winner,round):null;
   return <div className="also-event" data-also-event>
     <Button variant="ghost" className="also-head" onClick={()=>navigate(target.to,{state:target.state})}>
-      <div className="also-kick"><span>{fullTourLabel(event.tourSlug,event.tourName)}</span><span className="also-state" data-state={slide.type}>{slide.type==='live'&&<i className="also-live-dot"/>}{state}</span></div>
+      <div className="also-kick"><span>{fullTourLabel(event.tourSlug,event.tourName)}</span><span className="also-state" data-state={delayed?'delayed':slide.type}>{slide.type==='live'&&!delayed&&<i className="also-live-dot"/>}{state}</span></div>
       <div className="also-title"><span>{event.name}</span><ChevronRight size={16} aria-hidden/></div><div className="also-sub">{sub}</div>
       {slide.type==='live'&&line&&<div className="also-sit"><Trans ns="tourhub" i18nKey={`overview.alsoThisWeek.${line.key}`} values={{...line.values,score:fmtScore(line.values.score)}} components={{b:<strong/>}}/></div>}
       {slide.type==='live'&&line&&<div className="also-chase"><div className="also-track"><i className="also-rule"/>{Array.from({length:7},(_,back)=><i className="also-tick" key={back} style={{left:`calc(4px + ${back} * (100% - 8px) / 6)`}}/>)}{chasePlayers(entries,followed).map(p=><i key={p.entry.id} className="also-pip" data-back={p.back} data-mine={p.mine} data-leader={p.back===0} style={{left:`calc(4px + ${p.back} * (100% - 8px) / 6)`,bottom:12+p.stack*7}}/>)}</div><div className="also-axis">{['leader','threeBack','sixBack'].map(k=><span key={k}>{t(`overview.alsoThisWeek.${k}`)}</span>)}</div></div>}

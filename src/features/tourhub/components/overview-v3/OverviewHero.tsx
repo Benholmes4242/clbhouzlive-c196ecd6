@@ -493,6 +493,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             phase={bandPhase}
             liveKind={heroState && isInPlayState(heroState) ? heroState.kind as 'live' | 'suspended' : null}
             currentRoundStatus={activeSlide?.tournament.currentRoundStatus ?? null}
+            eventStatus={activeSlide?.tournament.status ?? null}
+            now={now}
             /* The SAME champion the strip crowns: only passed once the winner
                gate has resolved a name, so a pending playoff marks nobody. */
             championSrId={

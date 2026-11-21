@@ -118,6 +118,9 @@
     }
   },
   "overview": {
+    "leadersGroup": {
+      "delayed": "Delayed"
+    },
     "recap": {
       "seasonOver": "The {{year}} season is over. ",
       "nextUp": "NEXT UP"
@@ -208,6 +211,7 @@
     },
     "hero": {
       "stateLive": "라이부",
+      "roundDelayed": "ROUND {{round}} · DELAYED",
       "stateFinal": "결과",
       "factRound": "라운드",
       "picksTeeTimes": "TEE TIMES · {{day}}",

@@ -120,6 +120,9 @@
     }
   },
   "overview": {
+    "leadersGroup": {
+      "delayed": "Delayed"
+    },
     "recap": {
       "seasonOver": "The {{year}} season is over. ",
       "nextUp": "NEXT UP"
@@ -210,6 +213,7 @@
     },
     "hero": {
       "stateLive": "LIVE",
+      "roundDelayed": "ROUND {{round}} · DELAYED",
       "stateFinal": "ERGEBNISSE",
       "statePlayoff": "PLAYOFF",
       "factRound": "RUNDE",

@@ -31,6 +31,7 @@ import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { betweenRounds } from './liveStateRules';
 import { formatTimeHm24 } from '@/i18n/format';
 import { startDayForm } from '../../tournament-v2/data/tournamentRules';
+import { isRoundDelayed, roundHasStarter } from '../../overview/roundDelay';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -131,17 +132,21 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   // Live before anyone tees off: the situation names the first tee time, read
   // from the same tee-time source LeadersGroup uses.
   const notStarted = state.kind === 'live' && !fieldHasStarted(rows);
-  const currentTeesQuery = useTeeTimesAll(tournament.id, state.kind === 'live' ? state.round : 1, { enabled: notStarted });
-  const currentTees = currentTeesQuery.data;
-  useOverviewBandReady('photo', overviewQueryReady(currentTeesQuery, notStarted));
-  const firstTeeTime = notStarted ? earliestTeeTime(currentTees) : null;
-
-  const leader = isInPlayState(state) && !notStarted ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
-  /* Live states: AFTER ROUND n between rounds; the first tee in the leader slot before anyone starts. */
   const liveMeta = useTournamentMeta(state.kind === 'live' ? tournament.id : null);
   const zone = liveMeta.data?.course_timezone ?? liveMeta.data?.timezone ?? null;
   const done = state.kind === 'live' ? betweenRounds(rows, state.round, tournament.currentRoundStatus) : null;
   const afterRound = state.kind === 'live' && done != null && done < state.totalRounds ? done : null;
+  const wantTees = notStarted || afterRound != null;
+  const teeRound = afterRound != null ? afterRound + 1 : state.kind === 'live' ? state.round : 1;
+  const currentTeesQuery = useTeeTimesAll(tournament.id, teeRound, { enabled: wantTees });
+  const currentTees = currentTeesQuery.data;
+  useOverviewBandReady('photo', overviewQueryReady(currentTeesQuery, wantTees));
+  const earliest = currentTeesQuery.isError ? null : earliestTeeTime(currentTees);
+  const firstTeeTime = notStarted ? earliest : null;
+  const delayed = state.kind === 'live' && isRoundDelayed({ status: tournament.status, currentRound: state.round, currentRoundStatus: tournament.currentRoundStatus, firstTee: earliest, started: roundHasStarter(rows, state.round), now });
+
+  const leader = isInPlayState(state) && !notStarted ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
+  /* Live states: AFTER ROUND n between rounds; the first tee in the leader slot before anyone starts. */
   const firstTee = firstTeeTime ? venueTee(firstTeeTime, zone)?.time ?? formatTimeHm24(firstTeeTime) : null;
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
@@ -179,6 +184,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       segments={showChampion ? [] : situation}
       note={situationNote}
       afterRound={afterRound}
+      delayedRound={delayed && state.kind === 'live' ? state.round : null}
       firstTee={firstTee}
       pauseSpine
     />

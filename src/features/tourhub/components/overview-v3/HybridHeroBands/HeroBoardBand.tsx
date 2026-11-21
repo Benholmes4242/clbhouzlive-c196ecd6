@@ -220,6 +220,8 @@ interface HeroBoardSectionProps {
    * sections (LiveOverviewSections / LiveHeroBoard / LivePicksBlock). */
   liveKind?: 'live' | 'suspended' | null;
   currentRoundStatus?: string | null;
+  eventStatus?: string | null;
+  now?: Date;
   entries: BoardEntry[];
   leaderboardLoading?: boolean;
   eventType?: string | null;
@@ -345,6 +347,8 @@ export function HeroBoardSection({
   picksOnly = false,
   liveKind = null,
   currentRoundStatus = null,
+  eventStatus = null,
+  now,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   /* LIVE STATES: one stage decision for facts, board, course and picks. */
@@ -515,7 +519,7 @@ export function HeroBoardSection({
           ? <LiveFirstTees groups={live.firstTees} zone={live.zone} tournamentId={tournamentId} tournamentName={eventName ?? null} />
           : <LiveHeroBoard tournamentId={tournamentId} entries={entries} stage={liveStageNow.stage} round={liveStageNow.round} nextRound={liveStageNow.nextRound} totalRounds={totalRounds} tourSlug={pickTourCode} zone={live.zone} pickPlayerIds={pickPlayerIds} onRowTap={onRowTap} onFullBoard={onFullBoard} boardUpdatedAt={boardUpdatedAt} />}
         <LeadersGroup tournamentId={tournamentId} entries={entries} currentRound={currentRound} totalRounds={totalRounds}
-          phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} zone={live.zone} onRowTap={onRowTap} live suspended={liveStageNow.stage === 'suspended'} />
+          phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} zone={live.zone} status={eventStatus ?? live.meta?.status} currentRoundStatus={currentRoundStatus ?? live.meta?.current_round_status} now={now} onRowTap={onRowTap} live suspended={liveStageNow.stage === 'suspended'} />
         <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={liveStageNow.stage} round={liveStageNow.round} analysis={live.analysis} />
         {hasPicks ? <LivePicksBlock picks={picks} tourCode={pickTourCode} seasonYear={eventSeasonYear ?? null} stage={liveStageNow.stage} round={liveStageNow.round}
           boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntro}

@@ -71,6 +71,8 @@ interface PhotoBandProps {
   stateKey?: string;
   /** Overview live states: the round just finished, when between rounds. */
   afterRound?: number | null;
+  /** Overview-only derived delay; absent on tournament pages. */
+  delayedRound?: number | null;
   /** Overview live states: before anyone tees off, the first tee time (HH:MM) in the leader slot. */
   firstTee?: string | null;
   /** Overview live states: the suspended spine node shows a pause mark. */
@@ -97,6 +99,7 @@ export function PhotoBand({
   figure,
   stateKey,
   afterRound = null,
+  delayedRound = null,
   firstTee = null,
   pauseSpine = false,
 }: PhotoBandProps) {
@@ -130,6 +133,7 @@ export function PhotoBand({
     playoff: state.kind === 'results' && state.variant === 'awaiting-playoff', // never RESULTS; no live dot
     startDay: isUpcoming ? startDay : null,
     afterRound,
+    delayedRound,
   });
 
   /* THE BAND IS SHORTER by exactly each live-only line this state doesn't
