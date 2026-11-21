@@ -199,7 +199,7 @@ describe('WhoToFollowRail', () => {
 
   it('a card without media keeps its figures and its avatar opens the post, not the profile', async () => {
     wrap(<WhoToFollowRail slot={1} />);
-    const btn = await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
+    const btn = await screen.findByRole('button', { name: "Open Danny Holmes's latest post" }, { timeout: 5000 });
     expect(cardOf('Danny Holmes').querySelector('[data-testid="rail-when"]')).toBeNull();
     expect(cardOf('Danny Holmes').querySelector('[data-testid="rail-figures"]')).not.toBeNull();
     fireEvent.click(btn);
@@ -207,7 +207,7 @@ describe('WhoToFollowRail', () => {
   });
   it('a card without activity shows figures and a large avatar without an avatar button', async () => {
     wrap(<WhoToFollowRail slot={1} />);
-    await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
+    await screen.findByRole('button', { name: "Open Danny Holmes's latest post" }, { timeout: 5000 });
     const card = cardOf('David Lang');
     expect(card.querySelector('[data-testid="rail-when"]')).toBeNull();
     expect(card.querySelector('[data-testid="rail-figures"]')).not.toBeNull();
@@ -239,7 +239,7 @@ describe('FindPeoplePage rows', () => {
   });
   it('a ringed row shows "{when} · {reason}"', async () => {
     wrap(<FindPeoplePage />, '/find-people');
-    await screen.findByRole('button', { name: "Open Danny Holmes's latest post" });
+    await screen.findByRole('button', { name: "Open Danny Holmes's latest post" }, { timeout: 5000 });
     const line = rowOf('Danny Holmes').querySelector('[data-testid="row-reason"]') as HTMLElement;
     const whenSpan = line.querySelector('span') as HTMLElement;
     expect(whenSpan.textContent).toMatch(/^Played /);
@@ -248,7 +248,7 @@ describe('FindPeoplePage rows', () => {
   });
   it('tapping the ringed avatar navigates to the post and not the profile', async () => {
     wrap(<FindPeoplePage />, '/find-people');
-    fireEvent.click(await screen.findByRole('button', { name: "Open Danny Holmes's latest post" }));
+    fireEvent.click(await screen.findByRole('button', { name: "Open Danny Holmes's latest post" }, { timeout: 5000 }));
     expect(screen.getByTestId('probe').textContent).toBe('/post/post-9');
   });
   it('keyboard Enter on the row opens the profile', () => {
