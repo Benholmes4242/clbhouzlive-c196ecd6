@@ -23,13 +23,23 @@ export function finishPosition(finish: string | null): number | null {
   const match = finish?.match(/^T?(\d+)(?:st|nd|rd|th)?$/i);
   return match && Number(match[1]) > 0 ? Number(match[1]) : null;
 }
-/** Season form and every ProResultRow share this classification; labels remain
- * finishLabel-owned, and no classification changes the stored score source. */
-export function finishClass(finish: string | null): 'out' | 'win' | 'top' | 'made' {
+export type FinishTone = 'win' | 't10' | 't25' | 'other' | 'mc';
+/** Season form and every ProResultRow share this tone. It must stay in step with
+ * Tour's tileTone (src/features/tourhub/players-v2/playersRules.ts): MC/WD/DQ or
+ * no position mc, 1 win, 2–10 t10, 11–25 t25, 26+ other. */
+export function finishTone(finish: string | null): FinishTone {
   const position = finishPosition(finish);
-  if (position == null) return 'out';
+  if (position == null) return 'mc';
   if (position === 1) return 'win';
-  return position <= 10 ? 'top' : 'made';
+  if (position <= 10) return 't10';
+  return position <= 25 ? 't25' : 'other';
+}
+/** Tile/chip label: MC/WD/DQ and tied finishes unchanged, untied positions bare
+ * ("1"). finishLabel stays the ordinal owner for sentences and aria-labels. */
+export function chipLabel(finish: string | null) {
+  if (!finish || /^T/i.test(finish)) return finish ?? '—';
+  const n = finishPosition(finish);
+  return n == null ? finish : String(n);
 }
 export function finishLabel(finish: string | null) {
   if (!finish || /^T/i.test(finish)) return finish ?? '—';

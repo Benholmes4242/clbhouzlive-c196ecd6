@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { ProResultRow, ProSeasonSection } from '@/features/pro-profile/ProSeasonSection';
-import { finishClass, finishLabel, type ProEvent, type ProRound } from '@/features/pro-profile/proProfileRules';
+import { finishTone, chipLabel, finishLabel, type ProEvent, type ProRound } from '@/features/pro-profile/proProfileRules';
 import { ProfileTourTab } from '@/features/pro-verification/ProfileTourTab';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -19,9 +19,15 @@ const season = (events: ProEvent[]) => mount(<ProSeasonSection events={events} y
 const chips = (container: HTMLElement) => [...container.querySelectorAll<HTMLButtonElement>('.pro-season-form-chip')];
 afterEach(cleanup);
 
-describe('Season shared finish classification', () => {
-  it.each([['MC','out'], ['WD','out'], ['DQ','out'], ['1st','win'], ['T2','top'], ['T10','top'], ['T11','made'], ['T28','made']] as const)('%s is %s', (finish, classification) => {
-    expect(finishClass(finish)).toBe(classification);
+describe('Season shared finish tone', () => {
+  it.each([['MC','mc'], ['WD','mc'], ['DQ','mc'], ['1','win'], ['T2','t10'], ['10','t10'], ['T11','t25'], ['25','t25'], ['26','other'], ['T41','other']] as const)('%s is %s', (finish, tone) => {
+    expect(finishTone(finish)).toBe(tone);
+  });
+  it.each([['1st','1'], ['2nd','2'], ['T3','T3'], ['14','14'], ['MC','MC']] as const)('chipLabel %s is %s', (finish, label) => {
+    expect(chipLabel(finish)).toBe(label);
+  });
+  it('finishLabel still returns 1st for DossierCard and ProfileRankingTab', () => {
+    expect(finishLabel('1')).toBe('1st');
   });
 });
 
@@ -54,9 +60,22 @@ describe('Season last-ten form', () => {
     const events = ['MC','1st','T2','T28'].map((finish,i) => event(String(i), { finish }));
     const { container } = season(events);
     chips(container).forEach((chip,i) => {
-      expect(chip).toHaveClass(`pro-finish-${finishClass(events[i].finish)}`);
+      expect(chip).toHaveClass(`pro-finish-${finishTone(events[i].finish)}`);
       expect(chip).toHaveAccessibleName(`${finishLabel(events[i].finish)}, ${events[i].event_name}`);
     });
+  });
+  it('a win chip in the strip has the win class and reads 1', () => {
+    const { container } = season(['T28','1st','MC'].map((finish,i) => event(String(i), { finish })));
+    const win = chips(container)[1];
+    expect(win).toHaveClass('pro-finish-win');
+    expect(win.textContent).toBe('1');
+  });
+  it('no season section or ResultDetail element carries pro-profile-gold', () => {
+    const { container } = season(['1st','T3','MC'].map((finish,i) => event(String(i), { finish })));
+    expect(container.querySelector('.pro-profile-gold')).toBeNull();
+    fireEvent.click(chips(container)[0]);
+    expect(screen.getByRole('dialog').querySelector('.pro-profile-gold')).toBeNull();
+    expect(document.querySelector('.pro-profile-gold')).toBeNull();
   });
   it('a form chip opens ResultDetail for that event, including an older year', () => {
     season([event('current'),event('older', { start_date: '2025-11-01' }),event('oldest', { start_date: '2024-11-01' })]);
@@ -66,9 +85,14 @@ describe('Season last-ten form', () => {
 });
 
 describe('Shared pro result row', () => {
-  it.each([['MC','out'], ['WD','out'], ['DQ','out'], ['1st','win'], ['T2','top'], ['T10','top'], ['T11','made'], ['T28','made']] as const)('%s row uses %s finish chip', (finish, classification) => {
+  it.each([['MC','mc'], ['WD','mc'], ['DQ','mc'], ['1st','win'], ['T2','t10'], ['T10','t10'], ['T11','t25'], ['T28','other']] as const)('%s row uses %s finish chip', (finish, classification) => {
     const { container } = mount(<ProResultRow event={event('a', { finish })} first="Mason" open={vi.fn()} />);
     expect(container.querySelector('.pro-profile-finish')).toHaveClass(`pro-finish-${classification}`);
+  });
+  it('a win row chip has the win class and reads 1', () => {
+    const { container } = mount(<ProResultRow event={event('a', { finish: '1st' })} first="Mason" open={vi.fn()} />);
+    expect(container.querySelector('.pro-profile-finish')).toHaveClass('pro-finish-win');
+    expect(container.querySelector('.pro-profile-finish')?.textContent).toBe('1');
   });
   it('OWGR rounds show total and 72 72 in round order, omitting null strokes', () => {
     const { container } = mount(<ProResultRow event={event('rounds', { rounds: [round(2,72),round(1,72),round(3,null)] })} first="Mason" open={vi.fn()} />);
@@ -97,7 +121,7 @@ describe('Shared pro result row', () => {
   it('ProfileTourTab inherits the same OWGR finish chip and round line', () => {
     state.events = [event('tab', { finish: 'T2', rounds: [round(1,72),round(2,72)] })];
     const { container } = mount(<ProfileTourTab pro={{ user_id:'pro', pro_kind:'tour_pro', pro_player_id:null, pro_club:null, pro_tour:'Alps Tour', pro_tour_code:null }} displayName="Mason Essam" isOwner={false} />);
-    expect(container.querySelector('.pro-profile-finish')).toHaveClass('pro-finish-top');
+    expect(container.querySelector('.pro-profile-finish')).toHaveClass('pro-finish-t10');
     expect(container.querySelector('.pro-result-round-strokes')?.textContent).toBe('72 72');
   });
 });

@@ -103,7 +103,7 @@ describe('pro collections — visitor and own views', () => {
   });
   it('own empty view hides bag and partners and shows the career Add with its helper line', async () => {
     empty(); const { container } = mount(true);
-    expect(await screen.findByText('Turning pro, amateur titles, tour cards. Wins show in gold.')).toBeTruthy();
+    expect(await screen.findByText('Turning pro, amateur titles, tour cards. Wins are highlighted.')).toBeTruthy();
     expect(within(container.querySelector('[data-pro-career]') as HTMLElement).getByRole('button', { name: 'Add' })).toBeTruthy();
     expect(container.querySelector('[data-pro-bag],[data-pro-partners],.pro-profile-add')).toBeNull();
   });
@@ -262,8 +262,8 @@ describe('pro collections — sheet flows', () => {
   });
   it('career: save with the win switch, then edit and remove', async () => {
     empty(); const { unmount } = mountOwner();
-    await openAdd('Turning pro, amateur titles, tour cards. Wins show in gold.');
-    expect(screen.getByText('Shows in gold')).toBeTruthy();
+    await openAdd('Turning pro, amateur titles, tour cards. Wins are highlighted.');
+    expect(screen.getByText('Highlighted on your timeline')).toBeTruthy();
     fireEvent.change(screen.getByLabelText('WHAT HAPPENED'), { target: { value: 'Won the Kent Open' } });
     fireEvent.change(screen.getByLabelText('YEAR'), { target: { value: '2019' } });
     fireEvent.click(screen.getByRole('switch'));

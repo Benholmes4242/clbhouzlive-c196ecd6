@@ -39,7 +39,7 @@ describe('FIX3 pro profile section scale', () => {
     expect(finish).toContain('border-radius:34%');
     expect(finish).toContain('font-size:12.5px');
     expect(finish).toContain('font-weight:700');
-    expect(rule('.pro-profile-finish.pro-finish-out')).toContain('font-size:11px');
+    expect(rule('.pro-profile-finish.pro-finish-mc')).toContain('font-size:11px');
     expect(rule('.pro-profile-eliminated')).toContain('font-size:11.5px');
     const event = rule('.pro-profile-event b');
     expect(event).toContain('font-size:13px');
@@ -91,5 +91,11 @@ describe('FIX3 pro profile section scale', () => {
     expect(rule('.pro-ask-q>b')).toContain('font-size:12.5px');
     expect(rule('.pro-ask-q>p')).toContain('font-size:11.5px');
     expect(rule('.pro-ask-kicker')).toContain('font-size:9px');
+  });
+  it('career win dot uses ink, not gold', () => {
+    const dot = rule('.pro-career-timeline>div[data-win=true]::before');
+    expect(dot).toContain('background:var(--pro-profile-ink)');
+    expect(dot).toContain('border-color:var(--pro-profile-ink)');
+    expect(dot).not.toContain('gold');
   });
 });
