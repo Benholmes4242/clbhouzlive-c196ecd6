@@ -5,6 +5,7 @@
  * adminTheme; nothing here is a new amber.
  */
 import { adminTheme as t } from '../../theme';
+import { INK_55 } from './v3Styles';
 
 export const desk = {
   cellBg: 'rgba(255,255,255,0.035)',
@@ -46,5 +47,6 @@ export function chip(tone: 'danger' | 'warn'): React.CSSProperties {
 }
 
 export function beatColour(kind: 'tour' | 'amateur'): string {
-  return kind === 'tour' ? t.ink : t.brand;
+  // CONTENT_V3_1: amateur is the v3 55% ink, never amber.
+  return kind === 'tour' ? t.ink : INK_55;
 }

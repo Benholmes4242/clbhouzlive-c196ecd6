@@ -42,6 +42,7 @@ import { useCourses, type AdminCourseRow, type CourseFilter } from '../hooks/use
 import { saveDraft, loadDraft, clearDraft, draftKeys, draftsEqual } from '../lib/sheetDrafts';
 import HelpArticlesTab from '../components/HelpArticlesTab';
 import LegalDocumentsTab from '../components/LegalDocumentsTab';
+import { CC3, NUM } from '../components/InboxPanels';
 
 /**
  * BRIEF_CONTENT_DESK — four sections held in ?section=. Old ?tab= links map:
@@ -76,7 +77,7 @@ export default function ContentPage() {
   };
 
   return (
-    <div style={{ padding: '8px 12px 24px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 1180, margin: '0 auto', fontVariantNumeric: 'tabular-nums' }}>
+    <div data-content-v3="" style={{ ...NUM, padding: '10px 12px 28px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 720, margin: '0 auto', lineHeight: 'normal', minWidth: 0, color: CC3.ink }}>
       <ContentSegments sections={visible} active={section} onChange={setSection} />
       {section === 'newsroom' && <NewsroomSection />}
       {section === 'courses' && <CoursesTab />}
