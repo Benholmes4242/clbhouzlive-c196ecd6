@@ -1,0 +1,45 @@
+=== build 2026-11-21T09:22:28Z ===
+--- typecheck ---
+src/test/navTourLiveLabel.test.tsx(25,63): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(34,73): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(55,65): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(57,73): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+
+=== build 2026-11-21T09:34:38Z ===
+--- typecheck ---
+src/test/navTourLiveLabel.test.tsx(25,63): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(34,73): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(55,65): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(57,73): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+
+=== build 2026-11-21T09:35:21Z ===
+--- typecheck ---
+The typecheck did not run on this edit. The errors below are from the last typecheck that ran.
+src/test/navTourLiveLabel.test.tsx(25,63): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(34,73): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(55,65): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/test/navTourLiveLabel.test.tsx(57,73): error TS2769: No overload matches this call.
+The last overload gave the following error.
+Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.

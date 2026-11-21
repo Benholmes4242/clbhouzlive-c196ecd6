@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped verification: Bottom navigation Tour live label
+- Tour alone reads Live / Tour, live now from its existing live state; preserve plain labels, colours, geometry and routes.
+- Three new navTourLiveLabel cases pass; existing tests unchanged. Four separate sequential shards pass 2,311 / 2,292 / 2,349 / 2,450 = 9,402 across 842 files; baseline 9,399 + three named cases.
+- STOP: new test lines 25, 34, 55, 57 have TS2769: Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'. No repair/rerun or screenshots under the finished-edit stop rule. Report/full outputs: .lovable/reports/nav-tour-live-label/. Needs a ruling on the new test selectors.
+
 ## Verified suite: Remove course-photo View post — guest rerun ruling
 - No app or test files changed in this ruling. guestStage24 alone passes 5/5; authorised shard three rerun 2,349/2,349, then shard four 2,447/2,447; retained shards one 2,311 and two 2,292. Full suite 9,399/9,399 across 841 files.
 - Baseline 9,400 → 9,399: only −1, pf2HoleGuide `the tap opens the post and never reaches the slide` deleted by the original brief; no inventory changes in the rerun.

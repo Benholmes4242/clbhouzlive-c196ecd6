@@ -167,7 +167,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const theme = useNavTheme();
   const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
   const navState = useNavScrollState();
-  // Live state for the Tour tab. Fails closed (false) while loading or on error.
+  // One fail-closed live read owns the Tour tab's colour, label and accessible name.
+  // Labels remain plain constants, matching navigationTabs; routes and identities do not change.
   const tourLive = useAnyTourLive();
 
   const condensed = navState === 'condensed' && !REDUCED_MOTION;
@@ -507,7 +508,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                       ) : (
                       <button
                         type="button"
-                        aria-label={tab.label}
+                        aria-label={tab.id === 'tourhub' && tourLive ? 'Tour, live now' : tab.label}
                         aria-current={isActive ? 'page' : undefined}
                         onClick={(e) => {
                           e.preventDefault();
@@ -591,7 +592,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {tab.label}
+                          {tab.id === 'tourhub' && tourLive ? 'Live' : tab.label}
                         </span>
                       </button>
                       )}
