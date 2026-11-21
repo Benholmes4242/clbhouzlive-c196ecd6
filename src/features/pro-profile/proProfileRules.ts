@@ -23,6 +23,14 @@ export function finishPosition(finish: string | null): number | null {
   const match = finish?.match(/^T?(\d+)(?:st|nd|rd|th)?$/i);
   return match && Number(match[1]) > 0 ? Number(match[1]) : null;
 }
+/** Season form and every ProResultRow share this classification; labels remain
+ * finishLabel-owned, and no classification changes the stored score source. */
+export function finishClass(finish: string | null): 'out' | 'win' | 'top' | 'made' {
+  const position = finishPosition(finish);
+  if (position == null) return 'out';
+  if (position === 1) return 'win';
+  return position <= 10 ? 'top' : 'made';
+}
 export function finishLabel(finish: string | null) {
   if (!finish || /^T/i.test(finish)) return finish ?? '—';
   const n = finishPosition(finish);

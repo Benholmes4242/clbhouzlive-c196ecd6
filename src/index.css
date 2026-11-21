@@ -110,6 +110,11 @@
   --video-about-edge: rgba(255,255,255,.14);
   --video-about-grab: rgba(255,255,255,.25);
   --pro-season-outline: rgba(255,255,255,0.12);
+  --pro-finish-wash: rgba(255,255,255,0.06);
+  --pro-finish-top-ring: inset 0 0 0 1px rgba(255,255,255,0.55);
+  --pro-finish-win-wash: rgba(251,188,46,0.12);
+  --pro-finish-win-ring: inset 0 0 0 1px rgba(251,188,46,0.6);
+  --pro-finish-out-ring: inset 0 0 0 1px rgba(255,255,255,0.1);
   --tour-mover-name: #FFFFFF;
   --course-country-bar: rgba(248,250,252,0.55);
   --composer-golf-card: #141418;

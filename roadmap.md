@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stopped verification: Tour-pro season form and result rows
+- Implemented seasonB_390: shared finish classification, all-years last-ten form chips, OWGR rounds and points; surrounding season/detail/gating frozen. Added 31 cases, no existing test edits; focused 31/31 pass. Actual-section fixtures at 320/390/1280 fit, 320 chips 25.1875px, older-event detail opens; authenticated readback unavailable (external_unmanaged).
+- Sequential shard 1 passed 2,315; shard 2 stopped at 2,290 passed / 18 failed of 2,308 across four unchanged test files. Shards 3/4 not run, no repairs/reruns. Baseline inventory 9,445 / 847 → 9,476 / 848 (+31 proSeasonForm); last verified full pass 9,411. Exact names/errors/lines and full logs: .lovable/reports/pro-season-form/. Further test rulings required.
+
 ## Stopped verification: Signed-off Tour-pro owner redesign
 - Preview correction complete: removed only unsupported Partner.updated_at and CareerMoment.sort/updated_at fixture fields; focused 22/22 pass and harness build OK at 10:45:36Z. No test names/assertions, app code or suite inventory changes; prior counter/menu failures remain stopped separately.
 - Replace empty owner prompts with one settled-read completion card and existing sheet entrypoints; tidy Career header and remove tour-pro clubs/divider.

@@ -26,11 +26,25 @@
 .pro-season-results { margin-top:10px; border-top:1px solid var(--pro-profile-hair); }
 .pro-profile-row { display:flex; align-items:center; gap:12px; padding:10px 2px; width:100%; height:auto; border:0; border-radius:0; border-top:1px solid var(--pro-profile-hair); text-align:left; color:var(--pro-profile-ink); background:transparent; }
 .pro-profile-row:first-child { border-top:0; }
-.pro-profile-finish { width:40px; flex:none; font-size:13px; font-weight:700; }
+.pro-profile-finish { width:36px; height:36px; flex:none; border-radius:34%; display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; font-variant-numeric:tabular-nums; }
+.pro-finish-made, .pro-finish-top { background:var(--pro-finish-wash); color:var(--pro-profile-ink); }
+.pro-finish-top { box-shadow:var(--pro-finish-top-ring); }
+.pro-finish-win { background:var(--pro-finish-win-wash); color:var(--pro-profile-gold); box-shadow:var(--pro-finish-win-ring); }
+.pro-finish-out { background:transparent; color:var(--pro-profile-dim); box-shadow:var(--pro-finish-out-ring); }
+.pro-profile-finish.pro-finish-out { font-size:11px; }
+.pro-season-form { margin-top:14px; }
+.pro-season-form-heading { display:flex; justify-content:space-between; margin-bottom:8px; color:var(--pro-profile-dim); }
+.pro-season-form-heading span { font-size:9px; font-weight:700; letter-spacing:.16em; }
+.pro-season-form-heading span:last-child { font-size:10px; letter-spacing:0; }
+.pro-season-form-strip { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:4px; }
+.pro-season-form .pro-season-form-chip { height:30px; min-width:0; padding:0; border-radius:9px; font-size:10.5px; font-weight:700; font-variant-numeric:tabular-nums; }
+.pro-season-form-chip.pro-finish-out { font-size:9.5px; }
 .pro-profile-eliminated { font-size:11.5px; color:var(--pro-profile-dim); }
 .pro-profile-event { flex:1; min-width:0; }
 .pro-profile-event b { display:block; font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.pro-profile-event small { display:block; font-size:11px; font-weight:400; margin-top:2px; color:var(--pro-profile-dim); }
+.pro-profile-event small { display:block; font-size:11px; font-weight:400; margin-top:2px; color:var(--pro-profile-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pro-result-points { color:var(--pro-profile-green); font-weight:600; }
+.pro-result-round-strokes { display:block; margin-top:3px; font-size:10.5px; font-weight:600; letter-spacing:.02em; word-spacing:2px; color:var(--pro-profile-dim); }
 .pro-profile-added { display:inline-flex; margin-left:6px; padding:2px 6px; font-size:9px; font-weight:700; border:1px solid var(--pro-profile-rule); border-radius:999px; }
 .pro-profile-score { font-size:14px; font-weight:700; flex:none; }
 .pro-profile-under { color:var(--pro-profile-under); }
@@ -93,9 +107,9 @@
 .pro-result-line { position:relative; border-top:1px solid var(--pro-profile-hair); }
 .pro-result-line:first-child { border-top:0; }
 .pro-result-line .pro-profile-row { border-top:0; }
-.pro-profile-score { text-align:right; }
+.pro-profile-score { text-align:right; font-variant-numeric:tabular-nums; }
 .pro-profile-score b { display:block; font-size:13.5px; }
-.pro-profile-score b.pro-profile-gross { font-size:13px; }
+.pro-profile-score b.pro-profile-gross { font-size:13.5px; }
 .pro-profile-row .lucide { width:14px; height:14px; flex:none; }
 .pro-result-rank-movement { display:block; margin-top:5px; font-size:11.5px; font-weight:700; }
 .pro-profile-sheet .pro-profile-round b { font-size:20px; }

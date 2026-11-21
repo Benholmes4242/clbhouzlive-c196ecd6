@@ -1,14 +1,18 @@
 /** SEASON shows only what the tour or the world ranking recorded; there is
  * no manual add. "See all" hands off to the Tour tab via the caller, never a
- * sheet. ResultDetail owns count-based round columns. */
+ * sheet. ResultDetail owns count-based round columns. Form uses the same
+ * all-years sortedEvents list as See all; shared ProResultRow owns finish,
+ * OWGR points and gross-round presentation for Season and ProfileTourTab. */
 import { useState } from 'react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, X } from 'lucide-react';
-import { monthLabel, eventYear, finishLabel, scoreLabel, seasonSummary, sortedEvents, formatWorldRank, pointsCopy, type ProEvent } from './proProfileRules';
+import { monthLabel, eventYear, finishLabel, finishClass, scoreLabel, seasonSummary, sortedEvents, formatWorldRank, pointsCopy, type ProEvent } from './proProfileRules';
 export function ProResultRow({ event, first, open }: { event: ProEvent; first: string; open: () => void }) {
   const sub = [monthLabel(event.start_date),event.country].filter(Boolean).join(' · '), gross=event.source==='owgr';
-  return <div className="pro-result-line"><Button variant="ghost" className="pro-profile-row" onClick={open}><span className={`pro-profile-finish ${finishLabel(event.finish)==='1st'?'pro-profile-gold':['MC','WD','DQ'].includes(event.finish??'')?'pro-profile-eliminated':''}`}>{finishLabel(event.finish)}</span><span className="pro-profile-event"><b>{event.event_name}</b><small>{sub}{event.source==='pro'&&<span className="pro-profile-added">ADDED BY {first.toUpperCase()}</span>}</small></span><span className="pro-profile-score">{gross?<b className="pro-profile-gross">{event.total_strokes??''}</b>:event.to_par!=null?<b className={event.to_par<0?'pro-profile-under':''}>{scoreLabel(event.to_par)}</b>:null}</span><ChevronRight /></Button></div>;
+  const rounds = gross ? [...event.rounds].sort((a,b)=>a.round_no-b.round_no).flatMap(r=>r.strokes==null?[]:[r.strokes]).join(' ') : '';
+  const points = event.owgr_points != null && event.owgr_points > 0 ? `${event.owgr_points < .005 ? '<0.01' : event.owgr_points.toFixed(2)} pts` : null;
+  return <div className="pro-result-line"><Button variant="ghost" className="pro-profile-row" onClick={open}><span className={`pro-profile-finish pro-finish-${finishClass(event.finish)}`}>{finishLabel(event.finish)}</span><span className="pro-profile-event"><b>{event.event_name}</b><small>{sub}{points&&<>{sub&&' · '}<span className="pro-result-points">{points}</span></>}{event.source==='pro'&&<span className="pro-profile-added">ADDED BY {first.toUpperCase()}</span>}</small></span><span className="pro-profile-score">{gross?<><b className="pro-profile-gross">{event.total_strokes??''}</b>{rounds&&<span className="pro-result-round-strokes">{rounds}</span>}</>:event.to_par!=null?<b className={event.to_par<0?'pro-profile-under':''}>{scoreLabel(event.to_par)}</b>:null}</span><ChevronRight /></Button></div>;
 }
 export function ResultDetail({ event, close }: { event: ProEvent; close: () => void }) {
   const owgr = event.source === 'owgr', score=owgr?null:event.to_par;
@@ -32,6 +36,7 @@ export function ProSeasonSection({ events, year, first, linked, scoring, onSeeAl
   const tiles=[[summary.events,'EVENTS'],[summary.cuts,'CUTS MADE'],[finishLabel(summary.best),'BEST'],[linked?scoring?.toFixed(1)??'—':summary.average??'—','SCORING']];
   const detail=events.find(e=>e.id===detailId);
   return <section className="pro-profile-section"><div className="pro-profile-heading"><h2>{year} SEASON</h2><span className="pro-profile-source">{source}</span></div><div className="pro-profile-tiles pro-season-tiles">{tiles.map(([value,label])=><div className="pro-profile-tile" key={label}><b className={label==='BEST'&&value==='1st'?'pro-profile-gold':''}>{value}</b><span>{label}</span></div>)}</div>
+    {allRows.length>=3&&<div className="pro-season-form"><div className="pro-season-form-heading"><span>FORM · LAST 10</span><span>newest first</span></div><div className="pro-season-form-strip">{allRows.slice(0,10).map(e=><Button key={e.id} variant="ghost" className={`pro-season-form-chip pro-finish-${finishClass(e.finish)}`} aria-label={`${finishLabel(e.finish)}, ${e.event_name}`} onClick={()=>setDetailId(e.id)}>{finishLabel(e.finish)}</Button>)}</div></div>}
     {rows.length>0&&<div className="pro-season-results">{rows.slice(0,4).map(e=><ProResultRow key={e.id} event={e} first={first} open={()=>setDetailId(e.id)}/>)}{onSeeAll&&<Button variant="ghost" className="pro-profile-all" onClick={onSeeAll}>See all {allRows.length} results ›</Button>}</div>}
     {detail&&<ResultDetail event={detail} close={()=>setDetailId(null)}/>}
   </section>;
