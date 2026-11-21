@@ -1,5 +1,11 @@
 # Roadmap
 
+## Verified: Authorised 26 pro-profile test rulings
+- Supplied patch applied unchanged; exact edits match. No extra app/assertion edits; inventory 9,476 / 848 before and after.
+- Four separate sequential shards pass 2,315 / 2,308 / 2,390 / 2,463 = 9,476 / 9,476; prior three pro-profile stops resolved. Build OK.
+- Fourteen isolated actual-component 390/320 captures confirm fallback, original owner menu, completion, Career Add sheet, ten form chips and rows; no horizontal overflow or final page errors. Live authenticated readback unavailable (external_unmanaged), not claimed.
+- Full logs, exact patch/assertion/name reconciliation and captures: .lovable/reports/pro-tests-rulings/.
+
 ## Stopped verification: Tour-pro season form and result rows
 - Implemented seasonB_390: shared finish classification, all-years last-ten form chips, OWGR rounds and points; surrounding season/detail/gating frozen. Added 31 cases, no existing test edits; focused 31/31 pass. Actual-section fixtures at 320/390/1280 fit, 320 chips 25.1875px, older-event detail opens; authenticated readback unavailable (external_unmanaged).
 - Sequential shard 1 passed 2,315; shard 2 stopped at 2,290 passed / 18 failed of 2,308 across four unchanged test files. Shards 3/4 not run, no repairs/reruns. Baseline inventory 9,445 / 847 → 9,476 / 848 (+31 proSeasonForm); last verified full pass 9,411. Exact names/errors/lines and full logs: .lovable/reports/pro-season-form/. Further test rulings required.

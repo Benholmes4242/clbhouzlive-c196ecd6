@@ -47,6 +47,7 @@ vi.mock('@/integrations/supabase/client', () => {
 });
 
 import { ProAskSection } from '@/features/pro-profile/ProAskSection';
+import { ProOwnerSections } from '@/features/pro-profile/ProOwnerSections';
 import { getActivityLink } from '@/features/activity-v2/utils/activityLinks';
 
 const QA = [
@@ -62,6 +63,14 @@ function mount(owner: boolean, entry = '/u/pro1') {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(<QueryClientProvider client={qc}><MemoryRouter initialEntries={[entry]}><Routes>
     <Route path="/u/pro1" element={<><ProAskSection userId="pro1" owner={owner} first="Mason" viewerId="me" /><Where /></>} />
+    <Route path="*" element={<Where />} />
+  </Routes></MemoryRouter></QueryClientProvider>);
+}
+
+function mountOwner() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<QueryClientProvider client={qc}><MemoryRouter initialEntries={['/u/pro1']}><Routes>
+    <Route path="/u/pro1" element={<><ProOwnerSections userId="pro1" owner first="Mason" events={[]} eventsReady showCareer viewerId="pro1" /><Where /></>} />
     <Route path="*" element={<Where />} />
   </Routes></MemoryRouter></QueryClientProvider>);
 }
@@ -153,11 +162,14 @@ describe('pro ask — visitor view', () => {
 });
 
 describe('pro ask — his own view', () => {
-  it('off shows the See how card', async () => {
+  it('off renders no Ask section for the owner', async () => {
     h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
-    mount(true);
-    expect(await screen.findByText('Answer questions from members')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'See how' })).toBeTruthy();
+    const { container } = mount(true);
+    await waitFor(() => expect(h.rpcCalls.some((c) => c.fn === 'get_pro_answers')).toBe(true));
+    await new Promise((r) => setTimeout(r, 30));
+    expect(container.querySelector('[data-pro-ask]')).toBeNull();
+    expect(screen.queryByText('Answer questions from members')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'See how' })).toBeNull();
   });
   it('on with nothing shows the dashed info card with no button', async () => {
     h.answers = payload({ total: 0, waiting: 0, answers: [] });
@@ -188,10 +200,10 @@ describe('pro ask — his own view', () => {
 describe('pro ask — explainer sheet', () => {
   it('five steps word for word, Turn on calls the RPC, Not now closes', async () => {
     h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
-    mount(true);
-    fireEvent.click(await screen.findByRole('button', { name: 'See how' }));
+    mountOwner();
+    fireEvent.click(await screen.findByRole('button', { name: /Answer member questions/ }));
     expect(await screen.findByText('Members ask you questions')).toBeTruthy();
-    expect(screen.getByText('You choose which to answer')).toBeTruthy();
+    expect(within(screen.getByRole('dialog')).getByText('You choose which to answer')).toBeTruthy();
     expect(screen.getByText('Your answers show on your profile')).toBeTruthy();
     expect(screen.getByText('Askers stay private')).toBeTruthy();
     expect(screen.getByText('Turn it off any time')).toBeTruthy();
@@ -201,8 +213,8 @@ describe('pro ask — explainer sheet', () => {
   });
   it('Turn on invalidates both ask keys, toasts, closes and the section shows the empty card', async () => {
     h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
-    mount(true);
-    fireEvent.click(await screen.findByRole('button', { name: 'See how' }));
+    mountOwner();
+    fireEvent.click(await screen.findByRole('button', { name: /Answer member questions/ }));
     h.answers = payload({ total: 0, waiting: 0, answers: [] });
     fireEvent.click(screen.getByRole('button', { name: 'Turn on Ask Mason' }));
     await waitFor(() => expect(h.toastSuccess).toHaveBeenCalledWith('Ask Mason is on.'));
@@ -212,8 +224,8 @@ describe('pro ask — explainer sheet', () => {
   it('a turn-on error toasts the message and the sheet stays open', async () => {
     h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
     h.rpcError = { message: 'Only verified tour pros can turn on Ask' };
-    mount(true);
-    fireEvent.click(await screen.findByRole('button', { name: 'See how' }));
+    mountOwner();
+    fireEvent.click(await screen.findByRole('button', { name: /Answer member questions/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Turn on Ask Mason' }));
     await waitFor(() => expect(h.toastError).toHaveBeenCalledWith('Only verified tour pros can turn on Ask'));
     expect(screen.getByText('Members ask you questions')).toBeTruthy();
@@ -221,8 +233,8 @@ describe('pro ask — explainer sheet', () => {
   });
   it('Not now closes without calling the RPC', async () => {
     h.answers = payload({ enabled: false, total: 0, waiting: 0, answers: [] });
-    mount(true);
-    fireEvent.click(await screen.findByRole('button', { name: 'See how' }));
+    mountOwner();
+    fireEvent.click(await screen.findByRole('button', { name: /Answer member questions/ }));
     fireEvent.click(await screen.findByRole('button', { name: 'Not now' }));
     await waitFor(() => expect(screen.queryByText('Members ask you questions')).toBeNull());
     expect(h.rpcCalls.some((c) => c.fn === 'set_pro_ask_enabled')).toBe(false);

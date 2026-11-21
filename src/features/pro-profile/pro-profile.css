@@ -298,7 +298,7 @@
 .pro-finish-header>b { font-size:11px; font-weight:700; color:var(--pro-profile-dim); }
 .pro-finish h3 { margin:8px 0 0; font-size:16px; font-weight:700; color:var(--pro-profile-ink); }
 .pro-finish>p { margin:3px 0 0; font-size:12px; font-weight:400; line-height:1.4; color:var(--pro-profile-mute); }
-.pro-finish-row { display:flex; align-items:center; gap:12px; width:100%; height:auto; padding:11px 0; border:0; border-top:1px solid var(--pro-profile-hair); border-radius:0; background:transparent; color:var(--pro-profile-ink); text-align:left; white-space:normal; }
+.pro-finish-row.pro-finish-row { display:flex; align-items:center; gap:12px; width:100%; height:auto; padding:11px 0; border:0; border-top:1px solid var(--pro-profile-hair); border-radius:0; background:transparent; color:var(--pro-profile-ink); text-align:left; white-space:normal; }
 .pro-finish>p+.pro-finish-row { margin-top:10px; }
 .pro-finish-row>i { flex:none; width:28px; height:28px; border-radius:34%; border:1px dashed var(--pro-finish-add-edge); display:flex; align-items:center; justify-content:center; font-style:normal; font-size:15px; color:var(--pro-profile-soft); }
 .pro-finish-main { flex:1; min-width:0; }

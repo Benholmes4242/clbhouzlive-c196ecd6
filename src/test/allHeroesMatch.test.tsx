@@ -144,7 +144,7 @@ describe('ALL_HEROES_MATCH pro profile shell', () => {
   });
   it('the pro name is 26px at normal spacing and the club line is gone', () => {
     const css = src('features/pro-profile/pro-profile.css');
-    expect(css).toContain('.pro-hero-name { margin:0; font-size:26px; font-weight:800; line-height:1.1; letter-spacing:0;');
+    expect(css).toContain('.pro-hero-name { margin:0; font-size:26px; font-weight:700; line-height:1.1; letter-spacing:0;');
     expect(css).not.toContain('.pro-hero-club');
     expect(css).not.toContain('max-width:359px) { .pro-hero-name');
     expect(css).toContain('.pro-hero-profession { font-size:12.5px; font-weight:600;');

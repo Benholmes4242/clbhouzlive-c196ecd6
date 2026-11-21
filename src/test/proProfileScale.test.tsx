@@ -34,15 +34,19 @@ describe('FIX3 pro profile section scale', () => {
   it('result rows match the golfer scale', () => {
     expect(rule('.pro-profile-row')).toContain('padding:10px 2px');
     const finish = rule('.pro-profile-finish');
-    expect(finish).toContain('width:40px');
-    expect(finish).toContain('font-size:13px');
+    expect(finish).toContain('width:36px');
+    expect(finish).toContain('height:36px');
+    expect(finish).toContain('border-radius:34%');
+    expect(finish).toContain('font-size:12.5px');
+    expect(finish).toContain('font-weight:700');
+    expect(rule('.pro-profile-finish.pro-finish-out')).toContain('font-size:11px');
     expect(rule('.pro-profile-eliminated')).toContain('font-size:11.5px');
     const event = rule('.pro-profile-event b');
     expect(event).toContain('font-size:13px');
     expect(event).toContain('font-weight:700');
     expect(rule('.pro-profile-event small')).toContain('font-size:11px');
     expect(rule('.pro-profile-score b')).toContain('font-size:13.5px');
-    expect(rule('.pro-profile-score b.pro-profile-gross')).toContain('font-size:13px');
+    expect(rule('.pro-profile-score b.pro-profile-gross')).toContain('font-size:13.5px');
     expect(rule('.pro-profile-row .lucide')).toContain('width:14px');
     expect(rule('.pro-profile-all')).toContain('font-size:12px');
   });
@@ -72,10 +76,10 @@ describe('FIX3 pro profile section scale', () => {
     expect(rule('.pro-profile-live-position strong')).toContain('font-size:40px');
     const score = rule('.pro-profile-live-score b');
     expect(score).toContain('font-size:19px');
-    expect(score).toContain('font-weight:800');
+    expect(score).toContain('font-weight:700');
     const h3 = rule('.pro-profile-card h3');
     expect(h3).toContain('font-size:15px');
-    expect(h3).toContain('font-weight:800');
+    expect(h3).toContain('font-weight:700');
     expect(h3).toContain('line-height:1.25');
     expect(rule('.pro-profile-live-position small')).toContain('font-size:12px');
     expect(rule('.pro-profile-footnote')).toContain('font-size:11.5px');

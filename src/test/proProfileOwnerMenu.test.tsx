@@ -91,7 +91,8 @@ describe('Tour-pro owner menu', () => {
     if (kind !== 'none') h.businesses = [{business: {slug, id: 'biz-id'}}];
     mountPage();
     const trigger = await screen.findByRole('button', {name: 'Profile options'});
-    fireEvent.pointerDown(trigger, {button: 0, ctrlKey: false, pointerType: 'mouse'});
+    trigger.focus();
+    fireEvent.keyDown(trigger, {key: 'Enter'});
     const items = await screen.findAllByRole('menuitem');
     expect(items).toHaveLength(kind === 'none' ? 2 : 3);
     expect(items[0]).toHaveTextContent('Copy link');
@@ -114,7 +115,8 @@ describe('Tour-pro owner menu', () => {
     h.owner = false;
     mountPage();
     const trigger = await screen.findByRole('button', {name: 'Profile options'});
-    fireEvent.pointerDown(trigger, {button: 0, ctrlKey: false, pointerType: 'mouse'});
+    trigger.focus();
+    fireEvent.keyDown(trigger, {key: 'Enter'});
     expect(await screen.findAllByRole('menuitem')).toHaveLength(3);
     expect(screen.getByRole('menuitem', {name: 'Copy link'})).toBeInTheDocument();
     expect(screen.getByRole('menuitem', {name: 'Report'})).toBeInTheDocument();

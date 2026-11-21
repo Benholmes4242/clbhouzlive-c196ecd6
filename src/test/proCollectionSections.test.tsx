@@ -17,6 +17,14 @@ vi.mock('sonner', () => ({ toast: { error: h.toastError, success: vi.fn() } }));
 vi.mock('@/features/guest/guestGateStore', () => ({ getGuestUser: () => h.guest }));
 vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: h.openExternal }));
 vi.mock('@/hooks/useDebouncedValue', () => ({ useDebouncedValue: (v: unknown) => v }));
+vi.mock('@/features/guest/useGuestActionGate', () => ({ useGuestActionGate: () => () => false }));
+vi.mock('@/features/pro-profile/useProAsk', () => ({
+  askKey: (id: string) => ['pro-profile', 'ask', id],
+  useProAnswers: () => ({ data: { enabled: false, total: 0, waiting: 0, answers: [], my_waiting: [] }, isSuccess: true, isError: false }),
+  useProAskWrite: () => vi.fn(async () => true),
+  useProInbox: () => ({ data: [], isSuccess: true, isError: false }),
+  useMyAskerLabel: () => ({ data: { club: null, public: false }, isSuccess: true, isError: false }),
+}));
 vi.mock('@/integrations/supabase/client', () => {
   const from = (table: string) => {
     let op = 'select'; let payload: unknown; const filters: unknown[] = [];
@@ -43,6 +51,7 @@ vi.mock('@/integrations/supabase/client', () => {
 });
 
 import { ProCollectionSections } from '@/features/pro-profile/ProCollectionSections';
+import { ProOwnerSections } from '@/features/pro-profile/ProOwnerSections';
 
 const base = { user_id: 'pro1', created_at: '2026-01-01T00:00:00Z', sort: 0 };
 const LIVE = { id: 'biz-live', name: 'Titleist', logo_url: null, category: 'Equipment', city: 'London', region: null };
@@ -62,6 +71,13 @@ function mount(owner: boolean) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(<QueryClientProvider client={qc}><MemoryRouter initialEntries={['/u/pro1']}><Routes>
     <Route path="/u/pro1" element={<ProCollectionSections userId="pro1" owner={owner} first="Mason" events={[]} eventsReady />} />
+    <Route path="*" element={<Where />} />
+  </Routes></MemoryRouter></QueryClientProvider>);
+}
+function mountOwner() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<QueryClientProvider client={qc}><MemoryRouter initialEntries={['/u/pro1']}><Routes>
+    <Route path="/u/pro1" element={<ProOwnerSections userId="pro1" owner first="Mason" events={[]} eventsReady showCareer viewerId="pro1" />} />
     <Route path="*" element={<Where />} />
   </Routes></MemoryRouter></QueryClientProvider>);
 }
@@ -85,34 +101,34 @@ describe('pro collections — visitor and own views', () => {
     await new Promise(r => setTimeout(r, 30));
     expect(container.querySelector('[data-pro-bag],[data-pro-partners],[data-pro-career]')).toBeNull();
   });
-  it('own empty view shows the three add cards with signed-off subs', async () => {
-    empty(); mount(true);
-    expect(await screen.findByText('Driver to ball. Brands on clbhouz link to their page.')).toBeTruthy();
-    expect(screen.getByText('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.')).toBeTruthy();
-    expect(screen.getByText('Turning pro, amateur titles, tour cards. Wins show in gold.')).toBeTruthy();
+  it('own empty view hides bag and partners and shows the career Add with its helper line', async () => {
+    empty(); const { container } = mount(true);
+    expect(await screen.findByText('Turning pro, amateur titles, tour cards. Wins show in gold.')).toBeTruthy();
+    expect(within(container.querySelector('[data-pro-career]') as HTMLElement).getByRole('button', { name: 'Add' })).toBeTruthy();
+    expect(container.querySelector('[data-pro-bag],[data-pro-partners],.pro-profile-add')).toBeNull();
   });
   it('own filled view shows Edit on each section', async () => {
     fill(); mount(true);
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' }).length).toBe(3));
   });
-  it('own empty bag has no Edit in its header and shows the add card', async () => {
+  it('own empty bag renders no bag section', async () => {
     h.tables = { pro_bag_items: [], pro_partners: partners, pro_career_moments: moments, business_accounts: [LIVE] };
     const { container } = mount(true);
-    await waitFor(() => expect(container.querySelector('[data-pro-bag]')).not.toBeNull());
-    expect(container.querySelector('[data-pro-bag] .pro-collection-edit')).toBeNull();
-    expect(container.querySelector('[data-pro-bag] .pro-profile-add')).not.toBeNull();
+    await waitFor(() => expect(container.querySelector('[data-pro-partners]')).not.toBeNull());
+    expect(container.querySelector('[data-pro-bag]')).toBeNull();
+    expect(container.querySelector('.pro-profile-add')).toBeNull();
   });
   it('own bag with one item shows Edit', async () => {
     h.tables = { pro_bag_items: [bag[0]], pro_partners: [], pro_career_moments: [], business_accounts: [LIVE] };
     const { container } = mount(true);
     await waitFor(() => expect(container.querySelector('[data-pro-bag] .pro-collection-edit')).not.toBeNull());
   });
-  it('own empty partners has no Edit in its header and shows the add card', async () => {
+  it('own empty partners renders no partners section', async () => {
     h.tables = { pro_bag_items: bag, pro_partners: [], pro_career_moments: moments, business_accounts: [LIVE] };
     const { container } = mount(true);
-    await waitFor(() => expect(container.querySelector('[data-pro-partners]')).not.toBeNull());
-    expect(container.querySelector('[data-pro-partners] .pro-collection-edit')).toBeNull();
-    expect(container.querySelector('[data-pro-partners] .pro-profile-add')).not.toBeNull();
+    await waitFor(() => expect(container.querySelector('[data-pro-bag]')).not.toBeNull());
+    expect(container.querySelector('[data-pro-partners]')).toBeNull();
+    expect(container.querySelector('.pro-profile-add')).toBeNull();
   });
   it('own partners with one item shows Edit', async () => {
     h.tables = { pro_bag_items: [], pro_partners: [partners[0]], pro_career_moments: [], business_accounts: [LIVE] };
@@ -161,10 +177,15 @@ describe('pro collections — visitor and own views', () => {
 });
 
 describe('pro collections — sheet flows', () => {
-  const openAdd = async (sub: string) => { const card = (await screen.findByText(sub)).closest('.pro-profile-add') as HTMLElement; fireEvent.click(within(card).getByRole('button', { name: 'Add' })); };
+  const openAdd = async (sub: string) => {
+    if (sub.startsWith('Turning pro')) { await screen.findByText(sub); fireEvent.click(within(document.querySelector('[data-pro-career]') as HTMLElement).getByRole('button', { name: 'Add' })); return; }
+    const key = sub.startsWith('Driver') ? 'bag' : 'partners';
+    await waitFor(() => expect(document.querySelector(`[data-pro-completion-row="${key}"]`)).not.toBeNull());
+    fireEvent.click(document.querySelector(`[data-pro-completion-row="${key}"]`) as HTMLElement);
+  };
 
   it('Add by name adds the scheme and saves the website with the name', async () => {
-    empty(); mount(true);
+    empty(); mountOwner();
     await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
     expect((screen.getByLabelText('WEBSITE (OPTIONAL)') as HTMLInputElement).placeholder).toBe('e.g. kentautos.co.uk');
     fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
@@ -174,7 +195,7 @@ describe('pro collections — sheet flows', () => {
     expect(h.writes[0].payload).toMatchObject({ name: 'Kent Autos', business_id: null, website: 'https://kentautos.co.uk' });
   });
   it('an invalid website toasts and does not save', async () => {
-    empty(); mount(true);
+    empty(); mountOwner();
     await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
     fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
     fireEvent.change(screen.getByLabelText('WEBSITE (OPTIONAL)'), { target: { value: 'http://' } });
@@ -184,7 +205,7 @@ describe('pro collections — sheet flows', () => {
   });
 
   it('bag: slot is required, brand search links business_id, editing the brand clears it', async () => {
-    empty(); mount(true);
+    empty(); mountOwner();
     await openAdd('Driver to ball. Brands on clbhouz link to their page.');
     const save = screen.getByRole('button', { name: 'Save' }) as HTMLButtonElement;
     fireEvent.change(screen.getByLabelText('BRAND'), { target: { value: 'Tit' } });
@@ -197,7 +218,7 @@ describe('pro collections — sheet flows', () => {
     expect(h.writes[0]).toMatchObject({ table: 'pro_bag_items', op: 'insert', payload: { slot: 'driver', brand: 'Titleist', business_id: 'biz-live' } });
   });
   it('bag: typing after a match clears business_id', async () => {
-    empty(); mount(true);
+    empty(); mountOwner();
     await openAdd('Driver to ball. Brands on clbhouz link to their page.');
     fireEvent.click(screen.getByRole('radio', { name: 'Putter' }));
     fireEvent.change(screen.getByLabelText('BRAND'), { target: { value: 'Tit' } });
@@ -208,7 +229,7 @@ describe('pro collections — sheet flows', () => {
     expect((h.writes[0].payload as { business_id: unknown }).business_id).toBeNull();
   });
   it('cap error from the server shows as a toast', async () => {
-    empty(); h.writeError = { message: 'Cap reached' }; mount(true);
+    empty(); h.writeError = { message: 'Cap reached' }; mountOwner();
     await openAdd('Driver to ball. Brands on clbhouz link to their page.');
     fireEvent.click(screen.getByRole('radio', { name: 'Ball' }));
     fireEvent.change(screen.getByLabelText('BRAND'), { target: { value: 'Pro V1' } });
@@ -217,7 +238,7 @@ describe('pro collections — sheet flows', () => {
   });
   it('partners: Add links a business, Added for existing, Add by name stores no business', async () => {
     h.tables = { pro_bag_items: [], pro_partners: [], pro_career_moments: [], business_accounts: [LIVE, { ...LIVE, id: 'biz-2', name: 'Titan Golf' }] };
-    const { unmount } = mount(true);
+    const { unmount } = mountOwner();
     await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
     expect(screen.getByText('Not on clbhouz?')).toBeTruthy();
     expect((screen.getByLabelText('PARTNER NAME') as HTMLInputElement).placeholder).toBe('e.g. Kent Autos');
@@ -228,7 +249,7 @@ describe('pro collections — sheet flows', () => {
     expect(h.writes[0]).toMatchObject({ table: 'pro_partners', op: 'insert', payload: { business_id: 'biz-live' } });
     unmount();
     h.tables.pro_partners = [partners[0]]; h.writes = [];
-    mount(true);
+    mountOwner();
     await waitFor(() => expect(document.querySelector('[data-pro-partners] .pro-collection-edit')).not.toBeNull());
     fireEvent.click(document.querySelector('[data-pro-partners] .pro-collection-edit')!);
     fireEvent.click(screen.getByRole('button', { name: 'Add a partner' }));
@@ -240,7 +261,7 @@ describe('pro collections — sheet flows', () => {
     expect(h.writes[0].payload).toMatchObject({ name: 'Kent Autos', business_id: null });
   });
   it('career: save with the win switch, then edit and remove', async () => {
-    empty(); const { unmount } = mount(true);
+    empty(); const { unmount } = mountOwner();
     await openAdd('Turning pro, amateur titles, tour cards. Wins show in gold.');
     expect(screen.getByText('Shows in gold')).toBeTruthy();
     fireEvent.change(screen.getByLabelText('WHAT HAPPENED'), { target: { value: 'Won the Kent Open' } });
@@ -251,7 +272,7 @@ describe('pro collections — sheet flows', () => {
     expect(h.writes[0]).toMatchObject({ table: 'pro_career_moments', op: 'insert', payload: { year: 2019, text: 'Won the Kent Open', is_win: true } });
     unmount(); h.writes = [];
     h.tables.pro_career_moments = moments;
-    mount(true);
+    mountOwner();
     const careerEdit = () => document.querySelector('[data-pro-career] .pro-collection-edit') as HTMLElement;
     await waitFor(() => expect(careerEdit()).not.toBeNull());
     fireEvent.click(careerEdit());
