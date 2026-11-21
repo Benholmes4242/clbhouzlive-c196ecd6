@@ -29,8 +29,9 @@ function wrap(ui: React.ReactNode) { return render(<QueryClientProvider client={
 const mountRail = () => wrap(<RegionRails rails={[rail]} groups={[group]} courseMap={new Map([['course', course]])} onOpen={vi.fn()} />);
 function card(container: HTMLElement) { const el = container.querySelector<HTMLElement>('[data-rail-card]'); if (!el) throw new Error('rail card absent'); return el; }
 class IO { constructor(private cb: IntersectionObserverCallback) {} observe(target: Element) { this.cb([{ isIntersecting: true, target } as IntersectionObserverEntry], this as unknown as IntersectionObserver); } disconnect() {} unobserve() {} takeRecords() { return []; } }
-beforeEach(() => { f.result = []; vi.stubGlobal('IntersectionObserver', IO); });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+let origIO: unknown;
+beforeEach(() => { f.result = []; origIO = (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver; (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = IO; });
+afterEach(() => { cleanup(); (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = origIO; });
 it.each([
   [4032, 3024, 252], [1000, 1000, 252], [1080, 1920, 156], [950, 1000, 252], [940, 1000, 156],
   [null, 1000, 156], [1000, null, 156], [0, 1000, 156], [1000, 0, 156], [NaN, 1000, 156], [1000, NaN, 156], [Infinity, 1000, 156], [1000, Infinity, 156],

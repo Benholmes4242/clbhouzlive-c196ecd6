@@ -1,0 +1,44 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > is lazy: no read for a card that has not come near the viewport
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed out, reads get_course_media_v2 with a null user and one row, then draws the newest member photo
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed out, reads get_course_media_v2 with a null user and one row, then draws the newest member photo
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed in passes the user id
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > signed in passes the user id
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > keeps the course image while pending and when there is no member media
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > a video card renders HoleInlineVideo in courses-member-shots with its poster, and the tap still opens the sheet
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+stderr | src/test/playedMemberMediaAutoplay.test.tsx > rail card member media > a video card renders HoleInlineVideo in courses-member-shots with its poster, and the tap still opens the sheet
+[useActiveActor] called outside ActiveActorProvider; returning safe default
+
+ ✓ src/test/railTileShapes.test.tsx (22 tests) 502ms
+ ✓ src/test/playedMemberMediaAutoplay.test.tsx (6 tests) 547ms
+
+ Test Files  2 passed (2)
+      Tests  28 passed (28)
+   Start at  14:34:54
+   Duration  14.25s (transform 3.85s, setup 1.04s, collect 11.16s, tests 1.05s, environment 4.40s, prepare 638ms)
+
