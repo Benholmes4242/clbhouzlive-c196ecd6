@@ -328,6 +328,9 @@
       "youngestLine_his": "<b>{{name}}</b> earned his card at {{age}}, the youngest of the {{count}}.",
       "youngestLine_her": "<b>{{name}}</b> earned her card at {{age}}, the youngest of the {{count}}.",
       "ourRecord": "OUR RECORD · {{year}}",
+      "ourPicks": "OUR PICKS · {{year}}",
+      "winnersPicked": "WINNERS",
+      "inTop10": "IN THE TOP 10",
       "howWePick": "How we pick ›",
       "won": "WON",
       "top10": "TOP 10S"

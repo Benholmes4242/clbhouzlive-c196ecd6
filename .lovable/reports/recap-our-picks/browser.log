@@ -1,0 +1,18 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+Traceback (most recent call last):
+  File "/tmp/browser/recap-our-picks/check_recap.py", line 42, in <module>
+    asyncio.run(main())
+    ~~~~~~~~~~~^^^^^^^^
+  File "/nix/store/9qkpw9669q6w9nl6bmh2k35nq76i52nf-python3-3.13.18/lib/python3.13/asyncio/runners.py", line 196, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/nix/store/9qkpw9669q6w9nl6bmh2k35nq76i52nf-python3-3.13.18/lib/python3.13/asyncio/runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/nix/store/9qkpw9669q6w9nl6bmh2k35nq76i52nf-python3-3.13.18/lib/python3.13/asyncio/base_events.py", line 726, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/tmp/browser/recap-our-picks/check_recap.py", line 32, in main
+    assert all(f['fontWeight']=='700' for f in facts['labels'])
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

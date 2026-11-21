@@ -138,7 +138,7 @@ describe('recap body', () => {
     const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
     expect(css).toContain('.recap-block{padding-top:var(--hero-section-gap)}');
     expect(css).toContain('.recap-figs{margin-top:var(--hero-content-gap)}');
-    expect(css).toContain('.recap-record-figs{margin:var(--hero-content-gap) 0 0}');
+    expect(css).toContain('.recap-record-figs{margin:14px 0 0;');
     expect(css).toContain('grid-template-columns:repeat(3,minmax(0,max-content));justify-content:space-between;grid-template-rows:repeat(var(--recap-rows-3),auto);grid-auto-flow:column;column-gap:12px');
     expect(css).toContain('grid-template-columns:16px minmax(0,1fr);column-gap:7px');
     expect(css).toContain('.recap-cards span{text-align:right;');

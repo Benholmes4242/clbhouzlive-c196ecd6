@@ -179,6 +179,8 @@ export function RecapCardList({ tour, data }: { tour: TourId; data: SeasonRecapD
 }
 
 export function RecapOurRecord({ tour, year }: { tour: TourId; year: number }) {
+  // Record-only heading/figure appearance is scoped by data-recap-record;
+  // card-list links and season cells retain their existing shared styling.
   const { t } = useTranslation('tourhub');
   const [open, setOpen] = useState(false);
   const recordQuery = useOurPickRecord(tour, year);
@@ -186,11 +188,11 @@ export function RecapOurRecord({ tour, year }: { tour: TourId; year: number }) {
   useOverviewBandReady('recapRecord', overviewQueryReady(recordQuery, picksEnabledForTour(tour) && !!tour && !!year));
   if (!picksEnabledForTour(tour) || isError || !record || !((record.event_count ?? 0) > 0)) return null;
   return <section data-recap-record className="upcoming-block recap-block">
-    <div className="recap-head"><h2 className="upcoming-kicker">{t('overview.recap.ourRecord', { year })}</h2><Button variant="ghost" className="recap-link" onClick={() => setOpen(true)}>{t('overview.recap.howWePick')}</Button></div>
+    <div className="recap-head"><h2 className="upcoming-kicker">{t('overview.recap.ourPicks', { year })}</h2><Button variant={null} size={null} className="recap-link" onClick={() => setOpen(true)}>{t('overview.recap.howWePick')}</Button></div>
     <div className="upcoming-facts recap-figs recap-record-figs">
-      <div className="cw-cell"><b style={HERO_TOT_TYPE}>{record.event_count}</b><span>{t('overview.recap.events')}</span></div>
-      <div className="cw-cell"><b style={HERO_TOT_TYPE}>{record.won}</b><span>{t('overview.recap.won')}</span></div>
-      <div className="cw-cell"><b style={HERO_TOT_TYPE}>{record.top10}</b><span>{t('overview.recap.top10')}</span></div>
+      <div className="cw-cell"><b>{record.event_count}</b><span>{t('overview.recap.events')}</span></div>
+      <div className="cw-cell"><b>{record.won}</b><span>{t('overview.recap.winnersPicked')}</span></div>
+      <div className="cw-cell"><b>{record.top10}</b><span>{t('overview.recap.inTop10')}</span></div>
     </div>
     <OurRecordSheet open={open} onClose={() => setOpen(false)} tour={tour} year={year} />
   </section>;

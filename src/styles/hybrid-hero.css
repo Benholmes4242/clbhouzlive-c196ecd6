@@ -99,7 +99,14 @@
 .recap-cards{display:grid;grid-template-columns:repeat(3,minmax(0,max-content));justify-content:space-between;grid-template-rows:repeat(var(--recap-rows-3),auto);grid-auto-flow:column;column-gap:12px;margin-top:var(--hero-content-gap);padding:0}.recap-cards>button,.recap-cards>div{display:grid;grid-template-columns:16px minmax(0,1fr);column-gap:7px;align-items:center;min-height:28px;min-width:0;padding:0;height:auto;background:none;justify-content:stretch;text-align:left}.recap-cards span{text-align:right;font-size:11.5px;font-weight:700;color:var(--tv-dim);font-variant-numeric:tabular-nums}.recap-cards b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .recap-cards>button:active b,button.recap-name:active{opacity:.6}
 .recap-foot{margin:var(--hero-content-gap) 0 0;font-size:12.5px;line-height:1.45;color:var(--cw-mute)}.recap-foot b{color:var(--th-text-primary)}
-.recap-record-figs{margin:var(--hero-content-gap) 0 0}
+/* Signed-off Our picks only; THE SEASON and card-list headings stay frozen. */
+[data-recap-record] .recap-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:nowrap}
+[data-recap-record] .upcoming-kicker,[data-recap-record] .recap-link.recap-link{font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--cw-mute);text-transform:uppercase;line-height:1.4;white-space:nowrap}
+[data-recap-record] .recap-link.recap-link{padding:0;height:auto;min-height:0;background:none;flex:none}
+.recap-record-figs{margin:14px 0 0;grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.recap-record-figs>div{padding:0}
+.recap-record-figs b{font-size:22px;font-weight:700;line-height:normal}
+.recap-record-figs span{margin-top:6px;font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--cw-dim)}
 @media(max-width:359px){.recap-cards{grid-template-columns:repeat(2,minmax(0,max-content));grid-template-rows:repeat(var(--recap-rows-2),auto)}}
 @media(max-width:340px){.upcoming-block,.upcoming-facts{--upcoming-side:16px}}
 /* Upcoming opts into the completed rhythm; recap and member panels keep their

@@ -122,6 +122,9 @@
   },
   "overview": {
     "recap": {
+      "ourPicks": "OUR PICKS · {{year}}",
+      "winnersPicked": "WINNERS",
+      "inTop10": "IN THE TOP 10",
       "seasonOver": "The {{year}} season is over. ",
       "nextUp": "NEXT UP"
     },

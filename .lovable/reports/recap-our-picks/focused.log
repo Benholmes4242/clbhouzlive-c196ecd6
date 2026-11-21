@@ -1,0 +1,14 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/recapOurPicks.test.tsx (9 tests) 151ms
+ ✓ src/test/seasonRecap.test.tsx (31 tests) 455ms
+
+ Test Files  2 passed (2)
+      Tests  40 passed (40)
+   Start at  22:36:00
+   Duration  6.66s (transform 2.41s, setup 399ms, collect 6.82s, tests 606ms, environment 2.00s, prepare 830ms)
+
