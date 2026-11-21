@@ -1,6 +1,8 @@
 /** CB58: all data reads use existing tee hooks; live scoreboard is supplied
  * by the band. No placeholder or height tween. Board scoring, 22px avatar
  * source order, surname shortening and scorecard navigation remain canonical.
+ * The optional course zone uses venueTee, shared with the live board; callers
+ * without a zone retain device-time formatting.
  */
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -22,12 +24,14 @@ import { initialSurname } from '../liveStateRules';
 import './liveStates.css';
 import { HERO_POS_TYPE } from '../../../tournament-v2/sections/HeroBoardRows';
 import { WHITE_ALPHA_06 } from '../../../_shared/tokens';
+import { venueTee } from '../upcomingOverviewRules';
 
 interface Props {
   tournamentId: string; entries: BoardEntry[]; currentRound: number | null;
   totalRounds: number | null; phase: 'live' | 'upcoming' | 'completed';
   leaderboardLoading?: boolean; eventType?: string | null; tourSlug?: string | null;
   onRowTap?: (playerId: string) => void;
+  zone?: string | null;
   /** Overview live states (signed-off tour-live-states mock): dim kicker, no
    * rule, rows without THRU/TODAY before the group tees off, and the Stopped
    * state line when suspended. Selection and reads are unchanged. */
@@ -54,7 +58,7 @@ export function LeadersGroup(props: Props) {
 }
 
 /** Exported real display supports controlled state/height checks without extra reads. */
-export function LeadersGroupContent({ tournamentId, entries, group, groups, round, tourSlug, onRowTap, phase, live = false, suspended = false }: Props & { round: number; group: TeeGroup; groups: TeeGroup[] }) {
+export function LeadersGroupContent({ tournamentId, entries, group, groups, round, tourSlug, onRowTap, phase, zone, live = false, suspended = false }: Props & { round: number; group: TeeGroup; groups: TeeGroup[] }) {
   const { t } = useTranslation('tourhub');
   const upcoming = phase === 'upcoming';
   const scaled = live || upcoming;
@@ -62,7 +66,8 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
   const state = groupState(group, entries, round);
   const note = leadersNote(otherLeaders(group, allLeaders(entries), groups));
   const stateKey = state === 'onCourse' ? 'onCourse' : state === 'finished' ? 'finished' : 'teesOff';
-  const stateText = live && suspended && state === 'onCourse' ? t('overview.leadersGroup.stopped') : state === 'before' ? t('overview.leadersGroup.teesOff', { day: formatWeekdayShort(group.teeTime), time: formatTimeHm24(group.teeTime) }) : t(`overview.leadersGroup.${stateKey}`);
+  const tee = venueTee(group.teeTime, zone);
+  const stateText = live && suspended && state === 'onCourse' ? t('overview.leadersGroup.stopped') : state === 'before' ? t('overview.leadersGroup.teesOff', { day: tee?.day ?? formatWeekdayShort(group.teeTime), time: tee?.time ?? formatTimeHm24(group.teeTime) }) : t(`overview.leadersGroup.${stateKey}`);
   const scoreColor = (v: number | null | undefined) => live ? getScoreColor(v, 'dark') : v != null && v < 0 ? L.under : L.ink;
   const grid = live ? state === 'before' ? '28px minmax(0,1fr) 44px' : '28px minmax(0,1fr) 40px 44px 44px' : L.grid;
   const named = note?.names ?? [];

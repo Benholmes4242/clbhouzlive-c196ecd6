@@ -6,8 +6,8 @@
  *
  * Columns: POS | PLAYER (22px hairline face + name) | THRU | TODAY | TOT.
  *  - round 1 drops TODAY (it equals TOT);
- *  - between rounds THRU becomes "R{n} TEE", each player's next tee time dim,
- *    and TODAY is absent;
+ *  - between rounds THRU becomes "R{n} TEE" only after a successful read
+ *    contains a valid tee time; otherwise the no-tee layout stays. TODAY is absent;
  *  - THRU's header is live green in play, grey when suspended;
  *  - at ≤340px with TODAY present, names become "M. Greyserman" and faces go
  *    (CSS media rule in liveStates.css, so both forms are in the markup).
@@ -68,14 +68,18 @@ interface Props {
 
 export function LiveHeroBoard({ tournamentId, entries, stage, round, nextRound, totalRounds = null, tourSlug = null, zone = null, pickPlayerIds, onRowTap, onFullBoard, boardUpdatedAt = 0 }: Props) {
   const { t } = useTranslation('tourhub');
-  const layout = liveBoardLayout(stage, round, nextRound);
-  const grid = liveBoardGrid(layout);
+  const requestedLayout = liveBoardLayout(stage, round, nextRound);
   const rows = entries.slice(0, LIVE_BOARD_ROWS);
   const ties = heroTieRoles(rows);
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const [expanded, setExpanded] = useState<{ playerId: string; round: number } | null>(null);
   useEffect(() => { setExpanded(null); setTarget(null); }, [tournamentId]);
-  const teeQuery = useTeeTimesAll(tournamentId, layout.nextTee ?? 1, { enabled: layout.nextTee != null });
+  const teeQuery = useTeeTimesAll(tournamentId, requestedLayout.nextTee ?? 1, { enabled: requestedLayout.nextTee != null });
+  const hasTees = teeQuery.isSuccess && (teeQuery.data ?? []).some(g => Number.isFinite(Date.parse(g.teeTime)));
+  const layout = requestedLayout.nextTee != null && !hasTees
+    ? { today: false, nextTee: null, thruLive: false }
+    : requestedLayout;
+  const grid = liveBoardGrid(layout);
   const tees = useMemo(() => {
     const map = new Map<string, string>();
     if (layout.nextTee == null) return map;

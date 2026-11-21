@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Live board tee availability and leaders’ course time
+- Gate the between-round tee column on a successful read containing a valid tee time; preserve the specified no-tee layout and all other columns.
+- Pass the live board’s zone to LeadersGroup and reuse venueTee, preserving device-time formatting without a zone; confirm empty tee sections self-hide.
+- Added ten liveBoardTeeAndZone cases; no existing tests changed. Four separate sequential shards passed 2,377 / 2,341 / 2,419 / 2,523 = 9,660 tests / 859 files, exactly baseline 9,650 / 858 + ten cases / one file. Focused 106/106; preview build OK. Empty tee section confirmed; live-data/browser verification not performed. Full output and named reconciliation: .lovable/reports/live-board-tee-zone/.
+
 ## Complete: Tour overview narrow-screen fixes
 - Restore the short AVG label through CSS rule ordering; share intrinsic BEHIND/PTS columns across the recap heading and rows, preserving names-only ellipsis and existing row actions.
 - Added four overviewNarrowFixes cases; existing tests unchanged. Baseline 9,646 / 857 → verified 9,650 / 858 (+four cases / one file).
