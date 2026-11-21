@@ -66,7 +66,7 @@ describe('fullscreen hole tile row', () => {
     expect(container.querySelector('.fullscreen-shot-name-hole')).toBeNull();
   });
   it('(d) declares the narrow-phone padding and detail size in CSS', () => {
-    const css = readFileSync(new URL('../components/fullscreen-feed/fullscreen-hole-tile.css', import.meta.url), 'utf8');
+    const css = readFileSync('src/components/fullscreen-feed/fullscreen-hole-tile.css', 'utf8');
     expect(css).toContain('@media (max-width: 340px)');
     const narrow = css.slice(css.indexOf('@media (max-width: 340px)'));
     expect(narrow).toContain('.fullscreen-hole-tile { padding: 8px 11px 7px; }');

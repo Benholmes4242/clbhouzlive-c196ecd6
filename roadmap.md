@@ -1,5 +1,11 @@
 # Roadmap
 
+## Verified: Hole-tile path ruling and combined full run
+- Applied only the authorised fullscreenHoleTileRow line 69 path correction; assertions and app files unchanged.
+- Four separate sequential shards passed 2,297 / 2,283 / 2,360 / 2,455 = 9,395/9,395 across 839 files. Delta from 9,390 is four fullscreenHoleTileRow cases and courseLatelyTiles e4; no changes to inventory in this ruling.
+- Captured all five signed-off hole states at 390/320 with the actual viewer in isolated fixtures; no overflow, long name clamps/ellipsizes. Report/full logs/screenshots: .lovable/reports/hole-tile-path-ruling/. Build OK.
+- Open: real Danny Akers Farleigh tile beside its Clubhouse post at 390/320, on both rails; blocked by external_unmanaged authenticated access. No synthetic round substituted. Historical stops below are resolved by this full run.
+
 ## Stopped verification: Round tiles match Clubhouse hole marks
 - Adopted holeMarkGrade in latelyNines and score-post shape families at existing tile geometry; preserved totals, score figures, header and rail layouts. Empty grades show no figure.
 - Updated only two authorized courseLatelyTiles (e) arrays and added one eagle/CSS case; focused 63/63, courseLatelyTiles 16/16 also passed in shard two. Baseline inventory 9,394 (9,390 + four fullscreenHoleTileRow cases); expected 9,395 (+one case).

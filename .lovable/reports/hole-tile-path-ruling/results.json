@@ -1,0 +1,210 @@
+errors before ready []
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE FIRST
+Par 4 · 269 yards
+render errors [] Sundridge Park Golf Club (East Course)
+TH
+Thomas Holmes
+Nov 2026
+THE NINTH
+Par 3 · 175 yards
+View post
+0:00 / 0:00
+2
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE EIGHTEENTH
+Par 5 · 512 yards
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE FOURTEENTH
+render errors [] Woking Golf Club
+AM
+Alexander Montgomery-Whitfield
+Nov 2026
+THE NINTH
+Par 3 · 175 yards
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE FIRST
+Par 4 · 269 yards
+render errors [] Sundridge Park Golf Club (East Course)
+TH
+Thomas Holmes
+Nov 2026
+THE NINTH
+Par 3 · 175 yards
+View post
+0:00 / 0:00
+2
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE EIGHTEENTH
+Par 5 · 512 yards
+render errors [] Woking Golf Club
+BH
+Benjamin Holmes
+Nov 2026
+THE FOURTEENTH
+render errors [] Woking Golf Club
+AM
+Alexander Montgomery-Whitfield
+Nov 2026
+THE NINTH
+Par 3 · 175 yards
+{
+  "findings": [
+    {
+      "state": "woking-first",
+      "width": 390,
+      "screenshot": "woking-first-390.png",
+      "tileWidth": 147.25,
+      "tileClientWidth": 145,
+      "tileScrollWidth": 145,
+      "nameHeight": 19.03125,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "15px",
+      "pageOverflow": false,
+      "viewPost": false
+    },
+    {
+      "state": "sundridge-video",
+      "width": 390,
+      "screenshot": "sundridge-video-390.png",
+      "tileWidth": 147.25,
+      "tileClientWidth": 145,
+      "tileScrollWidth": 145,
+      "nameHeight": 19.03125,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "15px",
+      "pageOverflow": false,
+      "viewPost": true
+    },
+    {
+      "state": "eighteenth",
+      "width": 390,
+      "screenshot": "eighteenth-390.png",
+      "tileWidth": 147.25,
+      "tileClientWidth": 145,
+      "tileScrollWidth": 145,
+      "nameHeight": 19.03125,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "15px",
+      "pageOverflow": false,
+      "viewPost": false
+    },
+    {
+      "state": "fourteenth-no-detail",
+      "width": 390,
+      "screenshot": "fourteenth-no-detail-390.png",
+      "tileWidth": 135.84375,
+      "tileClientWidth": 134,
+      "tileScrollWidth": 134,
+      "nameHeight": 19.03125,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": null,
+      "pageOverflow": false,
+      "viewPost": false
+    },
+    {
+      "state": "long-name",
+      "width": 390,
+      "screenshot": "long-name-390.png",
+      "tileWidth": 147.25,
+      "tileClientWidth": 145,
+      "tileScrollWidth": 145,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "15px",
+      "pageOverflow": false,
+      "viewPost": false
+    },
+    {
+      "state": "woking-first",
+      "width": 320,
+      "screenshot": "woking-first-320.png",
+      "tileWidth": 135.296875,
+      "tileClientWidth": 133,
+      "tileScrollWidth": 133,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "14px",
+      "pageOverflow": false,
+      "viewPost": false
+    },
+    {
+      "state": "sundridge-video",
+      "width": 320,
+      "screenshot": "sundridge-video-320.png",
+      "tileWidth": 135.296875,
+      "tileClientWidth": 133,
+      "tileScrollWidth": 133,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "14px",
+      "pageOverflow": false,
+      "viewPost": true
+    },
+    {
+      "state": "eighteenth",
+      "width": 320,
+      "screenshot": "eighteenth-320.png",
+      "tileWidth": 135.296875,
+      "tileClientWidth": 133,
+      "tileScrollWidth": 133,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "14px",
+      "pageOverflow": false,
+      "viewPost": false
+    },
+    {
+      "state": "fourteenth-no-detail",
+      "width": 320,
+      "screenshot": "fourteenth-no-detail-320.png",
+      "tileWidth": 131.84375,
+      "tileClientWidth": 130,
+      "tileScrollWidth": 130,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": null,
+      "pageOverflow": false,
+      "viewPost": false
+    },
+    {
+      "state": "long-name",
+      "width": 320,
+      "screenshot": "long-name-320.png",
+      "tileWidth": 135.296875,
+      "tileClientWidth": 133,
+      "tileScrollWidth": 133,
+      "nameHeight": 38.0625,
+      "nameLineHeight": "18px",
+      "nameClamp": "2",
+      "detailSize": "14px",
+      "pageOverflow": false,
+      "viewPost": false
+    }
+  ],
+  "pageErrors": []
+}
