@@ -112,6 +112,7 @@ export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecap
   return <section data-recap-board className="upcoming-block recap-block">
     <div className="recap-head-row">
       <h2 className="upcoming-kicker">{t('overview.recap.pointsHeading', { defaultValue: 'THE POINTS LIST' })}</h2>
+      <span className="recap-pts-label">{t('overview.recap.behind')}</span>
       <span className="recap-pts-label">{t('overview.recap.pts')}</span>
     </div>
     <div data-recap-table className="recap-table">
@@ -120,6 +121,7 @@ export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecap
       {r.playerId
         ? <Button variant="ghost" className="recap-name" aria-label={r.name} onClick={() => { const target = playerRoute(r.playerId as string, { kind: 'tour-hub' }); navigate(target.to, { state: target.state }); }}>{r.name}</Button>
         : <span className="recap-name">{r.name}</span>}
+      <span data-recap-behind className="recap-behind">{r === rows[0] ? '—' : rows[0].points != null && r.points != null ? fmtPoints(rows[0].points - r.points) : ''}</span>
       <span className="recap-pts">{r.points != null ? fmtPoints(r.points) : ''}</span>
     </div>)}
     </div>

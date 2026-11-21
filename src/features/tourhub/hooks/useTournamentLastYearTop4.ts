@@ -22,6 +22,15 @@ export interface LastYearFinisher {
   photoUrl: string | null;
 }
 
+/** Keep legacy finisher readers intact; upcoming history also needs the
+ * resolved edition identity and its actual winning to-par score. */
+interface PriorEdition {
+  priorTournamentId: string;
+  year: string;
+  finishers: LastYearFinisher[];
+  winningScore: number | null;
+}
+
 function normaliseName(name: string): string {
   return name
     .toLowerCase()
@@ -34,7 +43,7 @@ function normaliseName(name: string): string {
 }
 
 export function useTournamentLastYearTop4(tournamentId: string | null | undefined) {
-  return useQuery<LastYearFinisher[] | null>({
+  const query = useQuery<PriorEdition | null>({
     queryKey: ['hybrid-hero', 'last-year-top4', tournamentId],
     enabled: !!tournamentId,
     staleTime: 1000 * 60 * 60 * 24, // 24h — matches useTournamentDefendingChamp
@@ -87,17 +96,17 @@ export function useTournamentLastYearTop4(tournamentId: string | null | undefine
         .lte('position', 4)
         .order('position', { ascending: true });
 
-      if (rowsErr || !rows || rows.length === 0) return null;
+      if (rowsErr) return null;
 
       const priorYear = (prior as any)?.season?.year ?? new Date(prior.end_date).getFullYear();
 
       // Tie detection — count occurrences of each position
       const positionCounts: Record<number, number> = {};
-      rows.forEach((r: any) => {
+      (rows ?? []).forEach((r: any) => {
         if (r.position != null) positionCounts[r.position] = (positionCounts[r.position] ?? 0) + 1;
       });
 
-      return rows.map((r: any) => {
+      const finishers = (rows ?? []).map((r: any) => {
         const player = r.player;
         const name =
           player?.full_name ||
@@ -113,6 +122,12 @@ export function useTournamentLastYearTop4(tournamentId: string | null | undefine
           photoUrl: player?.photo_url ?? null,
         };
       });
+      const winner = rows?.find(r => r.position === 1);
+      return { priorTournamentId: prior.id, year: String(priorYear), finishers,
+        winningScore: winner?.score ?? null };
     },
   });
+  return { ...query, data: query.data?.finishers ?? (query.data === null ? null : undefined),
+    priorTournamentId: query.data?.priorTournamentId ?? null,
+    year: query.data?.year ?? null, winningScore: query.data?.winningScore ?? null };
 }

@@ -71,6 +71,7 @@ import {resolvePlayerAvatarCandidates} from '../_shared/resolvePlayerAvatar';
 import {winnerRow,championNarrative,score,words,copy,playedRounds} from './data/tournamentRules';
 import {TournamentHero,RaceSection,FieldSection,CourseV3Section,NumbersSection,TeeV3Section,SectionHead} from './sections/TournamentV3Sections';
 import {UpcomingLastYear} from '../components/overview-v3/UpcomingOverviewSections';
+import { usePriorEditionHistory } from '../components/overview-v3/usePriorEditionHistory';
 import {earliestTeeTime} from '../overview/boardStarted';
 import './tournamentPage.css';
 import { useRetiredTourRedirect } from '../hooks/useRetiredTourRedirect';
@@ -96,7 +97,9 @@ export function TournamentPage() {
   const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
   const fieldQuery=usePickField(tournamentId??'');
   const courseHolesQuery=useTournamentCourseHoles(tournamentId);
-  const {data:lastYear}=useTournamentLastYearTop4(pulse.state==='upcoming'?tournamentId:null);
+  const lastYearQuery=useTournamentLastYearTop4(pulse.state==='upcoming'?tournamentId:null);
+  const lastYear=lastYearQuery.isError?null:lastYearQuery.data;
+  const priorHistory=usePriorEditionHistory(lastYearQuery.priorTournamentId,pulse.state==='upcoming');
   const tourCode = (meta?.tour_code ?? 'pga').toLowerCase();
   const picksEnabled = !!meta && picksEnabledForTour(tourCode);
   const predictions=useAIPredictions(picksEnabled ? tournamentId ?? null : null);
@@ -290,7 +293,7 @@ export function TournamentPage() {
         backFallback="/tourhub?tab=schedule"
       >
       <div className="tournament-v3" style={{fontFamily:'inherit'}}>
-        <TournamentHero nameRef={nameRef} meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl} firstTee={earliestTeeTime(heroTeeGroups)} drawnField={heroTeeGroups.length?new Set(heroTeeGroups.flatMap(g=>g.players.map(p=>p.id).filter(Boolean))).size:null}/>
+        <TournamentHero nameRef={nameRef} meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.isError?[]:fieldQuery.data??[]} last={lastYear??[]} wonAt={lastYearQuery.isError?null:lastYearQuery.winningScore} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} image={courseImageUrl} firstTee={earliestTeeTime(heroTeeGroups)} drawnField={heroTeeGroups.length?new Set(heroTeeGroups.flatMap(g=>g.players.map(p=>p.id).filter(Boolean))).size:null}/>
         {pulse.state==='completed' && champion?.player && champion.score!=null && <ChampionStrip name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={score(champion.score)} scoreValue={champion.score} scoreLabel={runner?.score!=null?championScoreLabel(runner.score-champion.score,runner.score===champion.score):undefined} narrativeParts={championNarrative(meta,leaderboardRows)}/>}
         <section id="the-act">
           {situationCopy ? <div data-tournament-situation><SituationBand segments={situationCopy} note={situationNote} /></div> : null}
@@ -300,7 +303,7 @@ export function TournamentPage() {
         {picksEnabled && <div data-tv-section="picks"><HeroBoardSection picksOnly tournamentId={tournamentId??meta.id} entries={leaderboardRows} phase={pulse.state} currentRound={meta.current_round??null} championSrId={meta.winner_id} eventName={meta.name??''} eventTourCode={tourCode} eventSeasonYear={meta.start_date?new Date(meta.start_date).getFullYear():undefined} venuePar={meta.venue_par} totalRounds={scheduledRounds}/></div>}
         {pulse.state==='live'&&strokeBoard&&<RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
         {strokeBoard&&<TeeV3Section groups={teeGroups} phase={pulse.state} round={selectedTeeRound} rounds={drawnRounds} onRound={setTeeRoundChoice} onAll={()=>setTeeTimesOpen(true)} meta={meta} picks={ourPickIds} follows={playerFollows.ids} field={fieldQuery.data??[]} defender={lastYear?.[0]?.name??meta.defending_champion} rows={leaderboardRows}/>}
-        {pulse.state==='upcoming'&&<><FieldSection field={fieldQuery.isError?[]:fieldQuery.data??[]} tour={tourCode}/><UpcomingLastYear rows={lastYear??[]}/></>}
+        {pulse.state==='upcoming'&&<><FieldSection field={fieldQuery.isError?[]:fieldQuery.data??[]} tour={tourCode}/><UpcomingLastYear rows={lastYear??[]} facts={priorHistory.facts} entries={priorHistory.rows} year={lastYearQuery.year} tourCode={tourCode}/></>}
         {pulse.state!=='upcoming'&&strokeBoard&&!weekBlock&&<NumbersSection meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.data?.length??0} picks={ourPickIds}/>}
         <CourseV3Section id={tournamentId??meta.id} phase={pulse.state} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} analysis={holeAnalysis??null} rows={leaderboardRows} currentRound={meta.current_round??1}/>
         {pulse.state!=='upcoming'&&<div data-tv-section="moments"><MomentsSection tournamentId={tournamentId??meta.id} tourCode={tourCode}/></div>}

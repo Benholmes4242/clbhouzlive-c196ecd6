@@ -5,7 +5,7 @@
  * UpcomingLastYear) is ONE block shared by the overview and the tournament
  * page, at the overview's sizes — the tournament page imports these same
  * builders, so the two pages cannot drift. The fact band fills up to four
- * cells in the order FIRST TEE, FIELD, PURSE, PAR, YARDS from whatever is
+ * cells in the order FIRST TEE, FIELD, PURSE, PAR, YARDS, PAR 5S, WON AT from whatever is
  * available; YARDS is the course glance yards, else venue_yardage.
  * FIRST TEE is time only (24-hour, event zone, UTC fallback) and appears only
  * when the caller's kicker names the start day by weekday (startDayNamed),
@@ -25,21 +25,35 @@ import { LastYearRow } from './HybridHeroBands/LastYearRow';
 import { followedUpcomingPlayers, venueTee, type UpcomingPlayer } from './upcomingOverviewRules';
 import type { LastYearFinisher } from '../../hooks/useTournamentLastYearTop4';
 import type { CourseHole } from '../../tournament-v2/data/tournamentRules';
-export function upcomingFactCells(first: string | null, zone: string | null, field: number, purse: number | null, par: number | null, yards: number | null = null, startDayNamed = false) {
+import type { BoardEntry } from '../../leaderboard/BoardTable';
+import { wonChart, type WeekFacts } from '../../tournament-v2/data/weekFactsRules';
+import { WonChart } from '../../tournament-v2/sections/WonChart';
+import { copy, score } from '../../tournament-v2/data/tournamentRules';
+
+/** Count only a complete numbered par card; yardage is not a prerequisite. */
+export function upcomingPar5Count(holes: CourseHole[]) {
+  const byNo = new Map(holes.map(h => [h.hole_no, h]));
+  const card = Array.from({ length: 18 }, (_, i) => byNo.get(i + 1));
+  if (card.some(h => !h || !(h.par > 0))) return null;
+  return card.filter(h => h?.par === 5).length;
+}
+export function upcomingFactCells(first: string | null, zone: string | null, field: number, purse: number | null, par: number | null, yards: number | null = null, startDayNamed = false, par5s: number | null = null, wonAt: number | null = null) {
   const tee = startDayNamed ? venueTee(first, zone ?? 'UTC') : null;
   return [tee ? { key: 'firstTee', value: tee.time } : null,
     field > 0 ? { key: 'field', value: String(field) } : null,
     purse != null ? { key: 'purse', value: `$${purse >= 1000000 ? `${Number((purse / 1000000).toFixed(1))}M` : purse.toLocaleString('en-GB')}` } : null,
     par != null ? { key: 'par', value: String(par) } : null,
-    yards != null ? { key: 'yards', value: yards.toLocaleString('en-GB') } : null]
+    yards != null ? { key: 'yards', value: yards.toLocaleString('en-GB') } : null,
+    par5s != null ? { key: 'par5s', value: String(par5s) } : null,
+    wonAt != null ? { key: 'wonAt', value: score(wonAt) } : null]
     .filter((cell): cell is { key: string; value: string } => cell !== null)
     .slice(0, 4);
 }
-export function UpcomingFacts({ first, zone, field, purse, par, yards = null, startDayNamed = false }: { first: string | null; zone: string | null; field: number; purse: number | null; par: number | null; yards?: number | null; startDayNamed?: boolean }) {
+export function UpcomingFacts({ first, zone, field, purse, par, yards = null, startDayNamed = false, par5s = null, wonAt = null }: { first: string | null; zone: string | null; field: number; purse: number | null; par: number | null; yards?: number | null; startDayNamed?: boolean; par5s?: number | null; wonAt?: number | null }) {
   const { t } = useTranslation('tourhub');
-  const cells = upcomingFactCells(first, zone, field, purse, par, yards, startDayNamed);
+  const cells = upcomingFactCells(first, zone, field, purse, par, yards, startDayNamed, par5s, wonAt);
   if (!cells.length) return null;
-  return <section data-overview-event className="upcoming-event"><div data-overview-facts className="upcoming-event-facts">{cells.map(cell => <div key={cell.key} data-upcoming-fact={cell.key}><b style={HERO_TOT_TYPE}>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div></section>;
+  return <section data-overview-event className="upcoming-event"><div data-overview-facts className="upcoming-event-facts" style={{ gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))` }}>{cells.map(cell => <div key={cell.key} data-upcoming-fact={cell.key}><b data-under={cell.key === 'wonAt' && wonAt != null && wonAt < 0 ? '' : undefined} style={HERO_TOT_TYPE}>{cell.value}</b><span>{t(cell.key === 'firstTee' || cell.key === 'purse' ? `overview.hero.${cell.key}` : `overview.upcomingPlus.${cell.key}`)}</span></div>)}</div></section>;
 }
 export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { member: boolean; followed: Set<string>; field: UpcomingPlayer[]; drawn: boolean; zone: string | null }) {
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
@@ -52,8 +66,14 @@ export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { 
     {mine.length > 5 ? <div data-upcoming-more className="upcoming-more">{t('overview.upcomingPlus.more', { count: mine.length - 5 })}</div> : null}
   </section>;
 }
-export function UpcomingLastYear({ rows }: { rows: LastYearFinisher[] }) {
+/** Prior-edition history reuses the finished chart without changing its drawing,
+ * copy or styles; every unavailable/invalid chart keeps the original list. */
+export function UpcomingLastYear({ rows, facts = null, entries = [], year = null, tourCode = '' }: { rows: LastYearFinisher[]; facts?: WeekFacts | null; entries?: BoardEntry[]; year?: string | null; tourCode?: string }) {
   const { t } = useTranslation('tourhub'); const shown = rows.slice(0, 4);
+  if (facts && wonChart(facts, entries, 335)) return <section data-overview-last-year className="cw-block upcoming-history">
+    <h2 className="cw-kick">{t('overview.hero.lastYear').toUpperCase()}{year ?? shown[0]?.year ? ` · ${year ?? shown[0]?.year}` : ''}{` · ${copy('wasWon')}`}</h2>
+    <WonChart facts={facts} rows={entries} tourCode={tourCode} />
+  </section>;
   if (!shown.length) return null;
   return <section data-overview-last-year className="upcoming-sec upcoming-history">
     <div data-overview-board-header data-overview-band="board" className="upcoming-sec-head">

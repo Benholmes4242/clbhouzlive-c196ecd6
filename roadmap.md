@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Tour upcoming history and season points
+- Share the prior-edition WonChart with list fallback across overview and tournament pages; upcoming-only reads.
+- Equal fact cells with complete-course PAR 5S and prior winning WON AT; season points gain BEHIND.
+- Baseline 9,407 tests / 843 files → 9,411 / 844 files (+four upcomingLastYearWon cases). Four sequential shards pass 2,311 / 2,292 / 2,346 / 2,462. Eight 390/320 actual-section fixture captures verify chart rounds, fallback, points differences and no overflow; external_unmanaged prevents authenticated live verification. Full logs/assertion report: .lovable/reports/tour-lists/.
+
 ## Complete: Featured round Option B
 - Shared gold hairline/kicker, normal identity/follow row and opt-in fourth feat cell; scoring/trigger/follow/read rules unchanged. Home feed reuses the normal round footer and played-with sheet; rail/Explore keep their own actions.
 - Five new featuredRoundOptionB cases; only authorised header-feature assertions in featuredRoundChamp/featuredRoundNet rewritten, every assertion and rename quoted in the report; no tests deleted. Baseline 9,402/842 files → 9,407/843 files, delta +five named cases.

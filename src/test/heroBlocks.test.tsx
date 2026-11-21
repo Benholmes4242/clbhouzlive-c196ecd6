@@ -75,7 +75,7 @@ describe('one upcoming block on both pages', () => {
     expect(page).toContain('drawnField={heroTeeGroups.length?');
   });
   it('the tournament page upcoming phase uses the overview LAST YEAR block', () => {
-    expect(page).toContain('<UpcomingLastYear rows={lastYear??[]}/>');
+    expect(page).toContain('<UpcomingLastYear rows={lastYear??[]} facts={priorHistory.facts}');
     expect(page).not.toContain('<LastYearSection');
   });
 });

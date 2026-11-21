@@ -1,0 +1,416 @@
+{
+  "results": [
+    {
+      "state": "four",
+      "width": 390,
+      "overflow": false,
+      "rounds": 4,
+      "keys": 3,
+      "behind": [],
+      "heading": "LAST YEAR \u00b7 2026 \u00b7 HOW IT WAS WON",
+      "facts": [
+        [
+          "par",
+          "71"
+        ],
+        [
+          "yards",
+          "7,228"
+        ],
+        [
+          "par5s",
+          "3"
+        ],
+        [
+          "wonAt",
+          "\u221218"
+        ]
+      ],
+      "red": "rgb(226, 75, 63)",
+      "reads": [
+        {
+          "table": "sr_tournaments",
+          "filters": [
+            [
+              "sr_seasons.tour_name",
+              "EURO"
+            ]
+          ]
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        },
+        {
+          "name": "get_tournament_week_facts",
+          "args": {
+            "p_tournament_id": "prior"
+          }
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "state": "three",
+      "width": 390,
+      "overflow": false,
+      "rounds": 3,
+      "keys": 3,
+      "behind": [],
+      "heading": "LAST YEAR \u00b7 2025 \u00b7 HOW IT WAS WON",
+      "facts": [
+        [
+          "par",
+          "71"
+        ],
+        [
+          "yards",
+          "7,228"
+        ],
+        [
+          "par5s",
+          "3"
+        ],
+        [
+          "wonAt",
+          "\u221214"
+        ]
+      ],
+      "red": "rgb(226, 75, 63)",
+      "reads": [
+        {
+          "table": "sr_tournaments",
+          "filters": [
+            [
+              "sr_seasons.tour_name",
+              "EURO"
+            ]
+          ]
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        },
+        {
+          "name": "get_tournament_week_facts",
+          "args": {
+            "p_tournament_id": "prior"
+          }
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "state": "fallback",
+      "width": 390,
+      "overflow": false,
+      "rounds": 0,
+      "keys": 0,
+      "behind": [],
+      "heading": "Last year \u00b7 2026",
+      "facts": [
+        [
+          "par",
+          "71"
+        ],
+        [
+          "yards",
+          "7,228"
+        ],
+        [
+          "par5s",
+          "3"
+        ],
+        [
+          "wonAt",
+          "\u221218"
+        ]
+      ],
+      "red": "rgb(226, 75, 63)",
+      "reads": [
+        {
+          "table": "sr_tournaments",
+          "filters": [
+            [
+              "sr_seasons.tour_name",
+              "EURO"
+            ]
+          ]
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        },
+        {
+          "name": "get_tournament_week_facts",
+          "args": {
+            "p_tournament_id": "prior"
+          }
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "state": "season",
+      "width": 390,
+      "overflow": false,
+      "rounds": 0,
+      "keys": 0,
+      "behind": [
+        "\u2014",
+        "30",
+        "603"
+      ],
+      "heading": "THE POINTS LIST",
+      "facts": [],
+      "red": null,
+      "reads": []
+    },
+    {
+      "state": "four",
+      "width": 320,
+      "overflow": false,
+      "rounds": 4,
+      "keys": 3,
+      "behind": [],
+      "heading": "LAST YEAR \u00b7 2026 \u00b7 HOW IT WAS WON",
+      "facts": [
+        [
+          "par",
+          "71"
+        ],
+        [
+          "yards",
+          "7,228"
+        ],
+        [
+          "par5s",
+          "3"
+        ],
+        [
+          "wonAt",
+          "\u221218"
+        ]
+      ],
+      "red": "rgb(226, 75, 63)",
+      "reads": [
+        {
+          "table": "sr_tournaments",
+          "filters": [
+            [
+              "sr_seasons.tour_name",
+              "EURO"
+            ]
+          ]
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        },
+        {
+          "name": "get_tournament_week_facts",
+          "args": {
+            "p_tournament_id": "prior"
+          }
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "state": "three",
+      "width": 320,
+      "overflow": false,
+      "rounds": 3,
+      "keys": 3,
+      "behind": [],
+      "heading": "LAST YEAR \u00b7 2025 \u00b7 HOW IT WAS WON",
+      "facts": [
+        [
+          "par",
+          "71"
+        ],
+        [
+          "yards",
+          "7,228"
+        ],
+        [
+          "par5s",
+          "3"
+        ],
+        [
+          "wonAt",
+          "\u221214"
+        ]
+      ],
+      "red": "rgb(226, 75, 63)",
+      "reads": [
+        {
+          "table": "sr_tournaments",
+          "filters": [
+            [
+              "sr_seasons.tour_name",
+              "EURO"
+            ]
+          ]
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        },
+        {
+          "name": "get_tournament_week_facts",
+          "args": {
+            "p_tournament_id": "prior"
+          }
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "state": "fallback",
+      "width": 320,
+      "overflow": false,
+      "rounds": 0,
+      "keys": 0,
+      "behind": [],
+      "heading": "Last year \u00b7 2026",
+      "facts": [
+        [
+          "par",
+          "71"
+        ],
+        [
+          "yards",
+          "7,228"
+        ],
+        [
+          "par5s",
+          "3"
+        ],
+        [
+          "wonAt",
+          "\u221218"
+        ]
+      ],
+      "red": "rgb(226, 75, 63)",
+      "reads": [
+        {
+          "table": "sr_tournaments",
+          "filters": [
+            [
+              "sr_seasons.tour_name",
+              "EURO"
+            ]
+          ]
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        },
+        {
+          "name": "get_tournament_week_facts",
+          "args": {
+            "p_tournament_id": "prior"
+          }
+        },
+        {
+          "table": "sr_leaderboards",
+          "filters": [
+            [
+              "tournament_id",
+              "prior"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "state": "season",
+      "width": 320,
+      "overflow": false,
+      "rounds": 0,
+      "keys": 0,
+      "behind": [
+        "\u2014",
+        "30",
+        "603"
+      ],
+      "heading": "THE POINTS LIST",
+      "facts": [],
+      "red": null,
+      "reads": []
+    }
+  ],
+  "errors": [],
+  "authStatus": "external_unmanaged"
+}

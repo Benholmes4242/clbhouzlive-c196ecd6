@@ -64,7 +64,7 @@ import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredi
 import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
 import {useUpcomingOverview} from '../useUpcomingOverview';
-import {UpcomingFacts, YourUpcomingPlayers, UpcomingLastYear, UpcomingCourse} from '../UpcomingOverviewSections';
+import {UpcomingFacts, YourUpcomingPlayers, UpcomingLastYear, UpcomingCourse, upcomingPar5Count} from '../UpcomingOverviewSections';
 import {useTourPlayerFollows} from '../../../leaderboard/useTourPlayerFollows';
 import { inRequiredRoundWindow, leaderOf, neededGross } from './whatsNext';
 import { surnameOf } from '../../../_shared/playerName';
@@ -547,12 +547,12 @@ export function HeroBoardSection({
         />
       ) : null}
 
-      {!picksOnly && phase === 'upcoming' ? <UpcomingFacts first={upcoming.first} zone={upcoming.zone} field={upcoming.field.length} purse={purse} par={venuePar} yards={glanceFacts(upcoming.holes)?.yards ?? venueYardage} startDayNamed={startWeekday(upcoming.startDate, upcoming.zone) != null} /> : null}
+      {!picksOnly && phase === 'upcoming' ? <UpcomingFacts first={upcoming.first} zone={upcoming.zone} field={upcoming.field.length} purse={purse} par={venuePar} yards={glanceFacts(upcoming.holes)?.yards ?? venueYardage} startDayNamed={startWeekday(upcoming.startDate, upcoming.zone) != null} par5s={upcomingPar5Count(upcoming.holes)} wonAt={upcoming.winningScore} /> : null}
 
       {phase !== 'upcoming' ? picksBlock : null}
       {!picksOnly && phase === 'upcoming' ? <>
         <YourUpcomingPlayers member={follows.ids.size > 0} followed={follows.ids} field={upcoming.field} drawn={upcoming.drawn} zone={upcoming.zone} />
-        <UpcomingLastYear rows={upcoming.last} />
+        <UpcomingLastYear rows={upcoming.last} facts={upcoming.priorFacts} entries={upcoming.priorRows} year={upcoming.priorYear} tourCode={pickTourCode} />
         <UpcomingCourse holes={upcoming.holes} tournamentId={tournamentId} />
       </> : null}
       {phase === 'upcoming' ? picksBlock : null}

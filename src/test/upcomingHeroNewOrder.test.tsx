@@ -35,12 +35,12 @@ describe('upcoming hero new order', () => {
     expect(order).toEqual(['data-overview-event', 'data-overview-last-year', 'data-overview-course', 'data-overview-picks']);
     expect(v.container.querySelector('[data-overview-event] h2')).toBeNull();
   });
-  it('facts row is the flex space-between band with four cells', () => {
+  it('facts row is the equal-column grid band with four cells', () => {
     const v = wrap(<UpcomingFacts first={null} zone={null} field={132} purse={3000000} par={71} yards={6860} />);
     expect(v.container.querySelector('[data-overview-facts]')?.classList.contains('upcoming-event-facts')).toBe(true);
     expect(v.container.querySelectorAll('[data-upcoming-fact]')).toHaveLength(4);
     const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
-    expect(css).toContain('.upcoming-event-facts{display:flex;justify-content:space-between;gap:8px;margin:var(--hero-section-gap) 20px 0}');
+    expect(css).toContain('.upcoming-event-facts{display:grid;gap:8px;margin:var(--hero-section-gap) 20px 0}');
   });
   it('course renders OUT/IN scorecards with summed totals, par-5 marks and no bar strip', () => {
     const v = wrap(<UpcomingCourse holes={holes} tournamentId="e" />);

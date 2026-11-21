@@ -9,10 +9,12 @@ import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { useTournamentCourseHoles } from '../../tournament-v2/data/useTournamentCourseHoles';
 import type { UpcomingPlayer } from './upcomingOverviewRules';
+import { usePriorEditionHistory } from './usePriorEditionHistory';
 export function useUpcomingOverview(id: string | null) {
   const fieldQuery = usePickField(id ?? '');
   const drawQuery = useTeeTimesAll(id, 1, { enabled: !!id });
   const lastQuery = useTournamentLastYearTop4(id);
+  const history = usePriorEditionHistory(lastQuery.priorTournamentId, !!id);
   const metaQuery = useTournamentMeta(id);
   const holesQuery = useTournamentCourseHoles(id ?? undefined);
   const groups = !id || drawQuery.isError ? [] : drawQuery.data ?? [];
@@ -26,9 +28,12 @@ export function useUpcomingOverview(id: string | null) {
   } else {
     for (const player of ranked) players.set(player.player_id, { id: player.player_id, name: player.full_name, worldRank: player.world_rank });
   }
-  useOverviewBandReady('upcoming', !id || [fieldQuery, drawQuery, lastQuery, metaQuery, holesQuery].every(query => overviewQueryReady(query)));
+  useOverviewBandReady('upcoming', !id || ([fieldQuery, drawQuery, lastQuery, metaQuery, holesQuery].every(query => overviewQueryReady(query)) && [history.factsQuery, history.boardQuery].every(query => overviewQueryReady(query, !!lastQuery.priorTournamentId))));
   return { field: [...players.values()], drawn, first: drawn ? groups[0]?.teeTime ?? null : null,
     last: !id || lastQuery.isError ? [] : lastQuery.data ?? [],
+    priorYear: !id || lastQuery.isError ? null : lastQuery.year,
+    winningScore: !id || lastQuery.isError ? null : lastQuery.winningScore,
+    priorFacts: history.facts, priorRows: history.rows,
     zone: !id || metaQuery.isError ? null : metaQuery.data?.course_timezone ?? metaQuery.data?.timezone ?? null,
     startDate: !id || metaQuery.isError ? null : metaQuery.data?.start_date ?? null,
     holes: !id || holesQuery.isError ? [] : holesQuery.data ?? [] };

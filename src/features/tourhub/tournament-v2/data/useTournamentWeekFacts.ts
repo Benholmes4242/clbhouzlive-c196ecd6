@@ -4,9 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import type { WeekFacts } from './weekFactsRules';
 
 /**
- * COMPLETED STATE — the ONE read of public.get_tournament_week_facts, shared by
- * the overview hero and the tournament page. Enabled only in the completed
- * phase. Null = no champion (or a failed read): callers keep today's board.
+ * The ONE read of public.get_tournament_week_facts, shared by overview and
+ * tournament pages. Completed callers read the selected event; upcoming
+ * history explicitly reads only its resolved prior edition. Null facts keep
+ * each caller's existing board/list fallback.
  * The generated types do not include the function yet, hence the cast (same
  * bound pattern as useFeaturedRound).
  */
