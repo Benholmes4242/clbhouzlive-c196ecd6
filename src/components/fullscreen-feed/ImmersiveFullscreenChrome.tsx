@@ -24,8 +24,8 @@
  *
  * Course photos (syntheticPosts) use the SAME layout (CANONICAL_FULLSCREEN_VIEWER
  * part 1): same top bar (no rating chip anywhere), the author row from the
- * active item's memberShot (sub-row = added month), a glass hole strip in the
- * score-strip slot, "View post ›" when the shot came from a live post, and the
+ * active item's memberShot (sub-row = added month), a word-sized glass hole tile
+ * beside the name (geometry owned by fullscreen-hole-tile.css), "View post ›" when the shot came from a live post, and the
  * canonical video row. Source-post pills target the post; standalone shots share the Media link.
  * Review targets (engagementTarget review) hide More: MoreOptionsDrawer has
  * no review mode.
@@ -36,6 +36,7 @@
  * a fixed layer on iOS/WKWebView and would be a second composer.
  */
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
+import './fullscreen-hole-tile.css';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { ChevronRight, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
@@ -571,16 +572,22 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         )}
 
         {shot ? (
-          <div data-fullscreen-author data-fullscreen-shot-author style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+          <div data-fullscreen-author data-fullscreen-shot-author className="fullscreen-shot-author">
             <SquircleAvatar key={activeMediaItem?.id} size={38} src={shot.avatarUrl} alt={shot.memberName} hairlineRing />
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                <InlineProMemberName userId={shot.memberUserId}>{shot.memberName}</InlineProMemberName>
+              <span className={shotHasHole ? 'fullscreen-shot-name-hole' : 'fullscreen-shot-name-single'} style={{ fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2, minWidth: 0 }}>
+                <InlineProMemberName userId={shot.memberUserId} flow={shotHasHole ? 'text' : undefined}>{shot.memberName}</InlineProMemberName>
               </span>
               {shotDate && (
                 <span data-fullscreen-shot-date style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: MUTE, lineHeight: 1.2, ...TABULAR }}>{shotDate}</span>
               )}
             </div>
+            {shotHasHole && (
+              <div data-fullscreen-hole-strip className="fullscreen-hole-tile" style={FS_GLASS}>
+                <div className="fullscreen-hole-tile-kicker" style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE, lineHeight: 1.2 }}>{shot.kicker}</div>
+                {shot.detail && <div className="fullscreen-hole-tile-detail" style={{ color: '#FFFFFF' }}>{shot.detail}</div>}
+              </div>
+            )}
           </div>
         ) : !syntheticPosts && (
         <div data-fullscreen-author style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
@@ -650,13 +657,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               navigate(getActorRouteByType('personal', userId));
             }}
           />
-        )}
-
-        {shot && shotHasHole && (
-          <div data-fullscreen-hole-strip style={{ ...FS_GLASS, marginTop: 12, borderRadius: 14, padding: '11px 14px 10px', minWidth: 0 }}>
-            <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE, lineHeight: 1.2 }}>{shot.kicker}</div>
-            {shot.detail && <div style={{ marginTop: 3, fontSize: 15, fontWeight: 600, color: '#FFFFFF', lineHeight: 1.25, ...TABULAR }}>{shot.detail}</div>}
-          </div>
         )}
 
         {shot && shotSourcePostId && (

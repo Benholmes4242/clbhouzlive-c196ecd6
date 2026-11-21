@@ -1,0 +1,42 @@
+/* Course-shot name/tile geometry only; FS_GLASS remains owned by fullscreenCanon.
+   Ordinary author rows and the independent CourseGalleryChrome do not opt in. */
+.fullscreen-shot-author {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.fullscreen-shot-name-single {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fullscreen-shot-name-hole {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+.fullscreen-hole-tile {
+  border-radius: 14px;
+  padding: 9px 13px 8px;
+  flex: none;
+  max-width: 58%;
+  min-width: 0;
+}
+.fullscreen-hole-tile-kicker { white-space: nowrap; }
+.fullscreen-hole-tile-detail {
+  margin-top: 3px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+}
+@media (max-width: 340px) {
+  .fullscreen-hole-tile { padding: 8px 11px 7px; }
+  .fullscreen-hole-tile-detail { font-size: 14px; }
+  .fullscreen-shot-author { gap: 10px; }
+}

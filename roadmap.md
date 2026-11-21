@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped: Fullscreen course-photo hole tile beside name
+- Moved only the synthetic hole tile into the author row; preserved FS_GLASS and frozen viewer controls, with local 340px geometry and two-line hole names.
+- Added four fullscreenHoleTileRow cases; focused 29 passed / 1 failed of 30. Case (d) stops at src/test/fullscreenHoleTileRow.test.tsx:69:17: `TypeError: The URL must be of scheme file`. All 26 unchanged viewer cases pass. No repair/rerun, shards or 320/390 screenshots under the stop rule; needs a ruling on the new CSS-read fixture.
+- Baseline 9,390 → expected inventory 9,394 (+four named cases); full suite unverified. Preview build OK at 07:56:53Z; report/full output: .lovable/reports/fullscreen-hole-tile/.
+
 ## Complete: Review video poster ruling and combined verification
 - Keep relative/remote stored posters, reject the five case-insensitive local schemes, and restore all nine readers' original fallbacks; seven write sites remain unchanged.
 - Change only reviewVideoPoster cases (b)/(f) and add (g); preserve all seven stopped tests. Inventory 9,389 → 9,390 (+relative-poster case), scores-below adds no tests.

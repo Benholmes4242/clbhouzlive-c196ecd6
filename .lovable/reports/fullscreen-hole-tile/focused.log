@@ -1,0 +1,268 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ❯ src/test/fullscreenHoleTileRow.test.tsx (4 tests | 1 failed) 84ms
+   ✓ fullscreen hole tile row > (a) places the hole tile last inside the shot author row 58ms
+   ✓ fullscreen hole tile row > (b) keeps only the kicker when no detail is present 11ms
+   ✓ fullscreen hole tile row > (c) omits the tile and retains the single-line name for a place shot 8ms
+   × fullscreen hole tile row > (d) declares the narrow-phone padding and detail size in CSS 5ms
+     → The URL must be of scheme file
+ ✓ src/test/memberShotCredit.test.tsx (6 tests) 184ms
+ ✓ src/test/latestHolesSwipeCaption.test.tsx (7 tests) 413ms
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a course-media RPC review without score columns reads its review once and renders all five figures
+[fullscreen viewer] unmatched source post ids [ [32m'post-score'[39m ]
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a course-media RPC review without score columns reads its review once and renders all five figures
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > a resolved unmatched post has no pills and double-tap cannot call a like
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > the review score strip uses the full-width card row and its divider
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > the review score strip uses the full-width card row and its divider
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (a) review opens carry engagementTarget review, open interactive, and show the pills (no More)
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (a) review opens carry engagementTarget review, open interactive, and show the pills (no More)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+stderr | src/test/canonicalFullscreenViewer.test.tsx > CANONICAL_FULLSCREEN_VIEWER part 1 > (d) About Photos review parents carry the course name and review scores; post parents are interactive with the header
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:241:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+ ✓ src/test/canonicalFullscreenViewer.test.tsx (13 tests) 794ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/fullscreenHoleTileRow.test.tsx > fullscreen hole tile row > (d) declares the narrow-phone padding and detail size in CSS
+TypeError: The URL must be of scheme file
+ ❯ src/test/fullscreenHoleTileRow.test.tsx:69:17
+     67|   });
+     68|   it('(d) declares the narrow-phone padding and detail size in CSS', (…
+     69|     const css = readFileSync(new URL('../components/fullscreen-feed/fu…
+       |                 ^
+     70|     expect(css).toContain('@media (max-width: 340px)');
+     71|     const narrow = css.slice(css.indexOf('@media (max-width: 340px)'));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 29 passed (30)
+   Start at  07:56:44
+   Duration  6.61s (transform 1.92s, setup 962ms, collect 10.19s, tests 1.47s, environment 4.59s, prepare 548ms)
+
