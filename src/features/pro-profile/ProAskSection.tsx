@@ -1,7 +1,9 @@
 /** ASK {FIRST} — verified tour pros only, mounted after CAREER. One settled
  * read decides the section exists; a failed read renders nothing. Amber is
  * reserved for what only the viewer sees: their own waiting question and the
- * pro's own waiting count. Guests get the gate, never a working control. */
+ * pro's own waiting count. Guests get the gate, never a working control.
+ * Disabled Ask has no section for any viewer; ProOwnerSections alone owns
+ * the owner completion entrypoint to the unchanged explainer sheet. */
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -76,19 +78,12 @@ export function ProAskSection({ userId, owner, first, viewerId }: { userId: stri
       : null;
 
   let body: React.ReactNode = null;
-  if (!owner && !data.enabled) return null;
+  if (!data.enabled) return null;
   if (showInvitation) {
     body = (
       <div className="pro-ask-card">
         <div><b>Ask {first} anything</b><small>Practice, kit, life on tour. His answers show here.</small></div>
         <Button variant={null} size={null} className="pro-ask-card-btn" onClick={() => { if (!gate('other', { firstName: first })) setSheet('ask'); }}>Ask</Button>
-      </div>
-    );
-  } else if (owner && !data.enabled) {
-    body = (
-      <div className="pro-profile-add pro-profile-dashed">
-        <div><b>Answer questions from members</b><small>Members ask about your practice, kit and life on tour. You pick which to answer, and your answers show here on your profile.</small></div>
-        <Button variant={null} size={null} className="pro-ask-card-btn" onClick={() => setSheet('explainer')}>See how</Button>
       </div>
     );
   } else if (owner && data.total === 0 && waiting === 0) {

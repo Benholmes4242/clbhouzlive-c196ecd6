@@ -16,8 +16,7 @@ import { useProEvents, useProWorldRank } from './useProProfile';
 import { rankMovement, seasonSummary, tourEvents, finishLabel, finishPosition } from './proProfileRules';
 import { ProSeasonSection } from './ProSeasonSection';
 import { HowProPlays, LinkedLiveCard, useLinkedProLive, useLinkedProStats } from './LinkedProSections';
-import {ProCollectionSections} from './ProCollectionSections';
-import {ProAskSection} from './ProAskSection';
+import {ProOwnerSections} from './ProOwnerSections';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import './pro-profile.css';
@@ -49,7 +48,6 @@ export function ProProfileBuildOne(p:ProProfileProps){
     {showResults&&linked&&live.isSuccess&&!live.isError&&live.data&&<LinkedLiveCard data={live.data} playerId={playerId} name={p.name} tour={p.pro.pro_tour??'Tour'}/>}
     {showResults&&ready&&rows.length>0&&<ProSeasonSection events={rows} year={year} first={first} linked={linked} scoring={stats.isSuccess&&!stats.isError?stats.data.player?.scoring_average:null} onSeeAll={p.onSeeAllResults}/>}
     {showResults&&linked&&stats.isSuccess&&!stats.isError&&<HowProPlays data={stats.data}/>}
-    <ProCollectionSections userId={id} owner={p.owner} first={first} events={events.data??[]} eventsReady={events.isSuccess&&!events.isError} showCareer={showResults}/>
-    <ProAskSection userId={id} owner={p.owner} first={first} viewerId={p.viewerId}/>
+    <ProOwnerSections userId={id} owner={p.owner} first={first} events={events.data??[]} eventsReady={events.isSuccess&&!events.isError} showCareer={showResults} viewerId={p.viewerId}/>
   </div>;
 }

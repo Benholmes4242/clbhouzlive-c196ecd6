@@ -1447,7 +1447,8 @@ const ProfilePageV2Content: React.FC = () => {
         )}
 
 
-        {/* Divider above Clubs section */}
+        {proMember?.pro_kind !== 'tour_pro' && <>
+        {/* Divider above Clubs section: omitted with the tour-pro card only. */}
         <div className="px-4 mb-3">
           <div style={{ borderTop: `0.5px solid ${A.BORDER}` }} />
         </div>
@@ -1459,6 +1460,7 @@ const ProfilePageV2Content: React.FC = () => {
           isPersonal={isPersonal}
           isSelf={isSelf}
         />
+        </>}
 
         {/* Achievements Rail removed */}
 
