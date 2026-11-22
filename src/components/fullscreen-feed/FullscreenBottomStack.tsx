@@ -21,7 +21,7 @@ export interface FullscreenBottomStackProps {
   people?: ReadonlyArray<PlayedWithPerson> | null;
   onOpenTagged?: (id: string, kind?: 'user' | 'business') => void;
   mute?: { muted: boolean; onToggle: () => void } | null;
-  member: { name: string; nameNode?: React.ReactNode; avatarUrl: string | null; userId?: string | null; time?: string | null; onOpen?: () => void; mark?: React.ReactNode };
+  member: { name: string; nameNode?: React.ReactNode; avatarUrl: string | null; userId?: string | null; time?: string | null; onOpen?: () => void; mark?: React.ReactNode; follow?: { following: boolean; onFollow: () => void } | null };
   onOpenReview?: (() => void) | null;
   /** null = this post has no stat row on any slide. */
   cells: StatCell[] | null;
@@ -76,6 +76,11 @@ export function FullscreenBottomStack({ dots, people, onOpenTagged, mute, member
         <button type="button" className="fs-name" aria-label={member.onOpen ? `View ${member.name}'s profile` : undefined} onClick={(e) => { e.stopPropagation(); member.onOpen?.(); }}>{member.nameNode ?? member.name}</button>
         {member.mark}
         {member.time && <span className="fs-time">· {member.time}</span>}
+        {member.follow && (member.follow.following
+          ? <span className="fs-following" data-fullscreen-following>· {t('fullscreen.following', { defaultValue: 'FOLLOWING' })}</span>
+          : <button type="button" className="fs-follow" data-fullscreen-follow onClick={(e) => { e.stopPropagation(); member.follow?.onFollow(); }}>
+              <span className="fs-follow-sep" aria-hidden>· </span>{t('fullscreen.follow', { defaultValue: 'Follow' })}
+            </button>)}
         {onOpenReview && (
           <button type="button" className="fs-review-chip" data-fullscreen-review-chip aria-label={t('fullscreen.openReview', { defaultValue: 'Open the full review' })}
             style={CHIP_GLASS} onClick={(e) => { e.stopPropagation(); onOpenReview(); }}>

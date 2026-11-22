@@ -540,6 +540,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           member={shot
             ? { name: shot.memberName, nameNode: <InlineProMemberName userId={shot.memberUserId}>{shot.memberName}</InlineProMemberName>, avatarUrl: shot.avatarUrl, userId: shot.memberUserId ?? null, time: shotDate || null }
             : { name: activePost.displayName, avatarUrl: activePost.avatarUrl ?? null, userId: activePost.actorId ?? activePost.userId, time: timeLabel || null, onOpen: onViewProfile,
+                follow: !readOnly && !isOwnPost ? { following: isFollowed, onFollow: () => onFollow(activePost, isFollowed) } : null,
                 mark: <ProOrVerifiedMark userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId} verified={activePost.isVerified} name={activePost.displayName} /> }}
           onOpenReview={!shot && activePost.isReview ? onReviewTap : null}
           extra={golfContext?.roundScoreId && onOpenScorecard ? (
