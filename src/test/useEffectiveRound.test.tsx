@@ -14,7 +14,8 @@ vi.mock('@/integrations/supabase/client', () => {
   const split = (s: string) => { const out: string[] = []; let depth = 0, cur = ''; for (const ch of s) { if (ch === '(') depth++; if (ch === ')') depth--; if (ch === ',' && depth === 0) { out.push(cur); cur = ''; } else cur += ch; } out.push(cur); return out; };
   const term = (row: Record<string, unknown>, t: string) => {
     if (t === 'status.is.null') return row.status == null;
-    const m = t.match(/^status\.not\.in\.\((.*)\)$/); if (m) return row.status != null && !m[1].split(',').includes(String(row.status));
+    const m = t.match(/^and\((.*)\)$/); if (m) return split(m[1]).every(x => term(row, x));
+    const il = t.match(/^status\.not\.ilike\.(.*)$/); if (il) return row.status != null && String(row.status).toLowerCase() !== il[1];
     const r = t.match(/^(round_\d)\.not\.is\.null$/); if (r) return row[r[1]] != null;
     throw new Error(`unknown term ${t}`);
   };
@@ -80,6 +81,7 @@ const CASES: Array<[string, number | null, BoardEntry[]]> = [
   ['provider lags', 2, [row([-1, -2, -3])]],
   ['empty board keeps the provider round', 4, []],
   ['inactive rows do not count', 4, [row([-1, -2, -3], { status: 'MC' }), row([-1, -2], { status: null })]],
+  ['mixed-case status (Cut, Wd) is inactive in both', 4, [row([-1, -2, -3], { status: 'Cut' }), row([-1, -2, -2], { status: 'Wd' }), row([-1, -2], { status: 'active' })]],
 ];
 
 describe('useEffectiveRound matches effectiveCurrentRound', () => {

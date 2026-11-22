@@ -18,9 +18,8 @@ import { useQueries, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 const OUT = ['MC', 'CUT', 'WD', 'DQ', 'DNS', 'MDF'];
-// isActiveEntry upper-cases; PostgREST `in` is exact, so list the stored casings.
-const OUT_ANY_CASE = [...new Set(OUT.flatMap((s) => [s, s.toLowerCase(), s[0] + s.slice(1).toLowerCase()]))];
-const ACTIVE_FILTER = `status.is.null,status.not.in.(${OUT_ANY_CASE.join(',')})`;
+// Case-insensitive like isActiveEntry: ilike without wildcards is a case-insensitive equality.
+export const ACTIVE_FILTER = `status.is.null,and(${OUT.map((o) => `status.not.ilike.${o.toLowerCase()}`).join(',')})`;
 const MAX_CARD = 4; // effectiveCurrentRound reads round_1..round_4
 
 export const EFFECTIVE_ROUND_STALE_MS = 60_000;

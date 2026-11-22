@@ -70,7 +70,7 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
                 <div className="t100b-why">{whyLine(r,ratedCount)}</div>
               </div>
               <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 800, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 700, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
                   <Arrow size={14} strokeWidth={3} aria-hidden />
                   {Math.abs(r.divergence)}
                 </div>
