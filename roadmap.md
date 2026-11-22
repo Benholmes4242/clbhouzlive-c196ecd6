@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: News bottom clearance
+- Measured all five actual news routes before/after at 390/320 with the real nav visible. Tour hub already had canonical clearance and stays unchanged; standalone Tour News lacked it and now reserves it once.
+- Replaced the three duplicated news spacers with the nav variable and canonical fallback; shared PageRoot, nav and tokens untouched. Added three new spacer cases, no existing test changes.
+- Four separate sequential shards passed 2,391 / 2,393 / 2,426 / 2,537 = 9,747 tests / 864 files, baseline 9,744 / 863 +3 cases/+1 file. Preview build OK. Twenty before/after captures show all last elements fully above the pill, gaps 15.53–16.72px (rounding and retained amateur frame border documented); desktop safe-area zero, phone arithmetic/check noted. Full measurements, captures and logs: .lovable/reports/news-bottom-gap/.
+
 ## Complete: Feed Tour post design B
 - Match photo, lead, live rounds, preview facts and inert board for all four signed-off states; preserve data reads and all post doors.
 - Rewrite only the eight named old-layout cases, retain pure sentence/compression tests, add lead-rule coverage; baseline 9,710 tests / 862 files.

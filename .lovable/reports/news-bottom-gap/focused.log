@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/newsBottomClearance.test.ts (3 tests) 4ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  09:11:01
+   Duration  3.91s (transform 89ms, setup 283ms, collect 14ms, tests 4ms, environment 1.25s, prepare 153ms)
+

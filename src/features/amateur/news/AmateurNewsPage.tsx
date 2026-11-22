@@ -13,12 +13,11 @@
  * two /discover/news entries in chrome-v2/registry.ts).
  */
 import { useNavigate } from 'react-router-dom';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
 
 import { NewsTabPage } from '@/components/explore-tab-new/NewsTabPage';
 import { NewsChromeBridge } from '@/features/tourhub/news/NewsChromeBridge';
 import { FONT, TOUR_CANVAS } from '@/features/tourhub/_shared/tokens';
-
-const BOTTOM_SPACER = 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 96px) + 16px)';
 
 export function AmateurNewsPage() {
   const navigate = useNavigate();
@@ -28,7 +27,7 @@ export function AmateurNewsPage() {
       <div style={{ paddingTop: 'var(--news-header-h)' }}>
         <NewsTabPage chrome="none" railBy="category" onOpenStory={(slug) => navigate(`/discover/news/${slug}`)} />
       </div>
-      <div aria-hidden style={{ height: BOTTOM_SPACER }} />
+      <div aria-hidden style={{ height: `var(--bottom-nav-height, ${NAV_CLEARANCE})` }} />
     </main>
   );
 }

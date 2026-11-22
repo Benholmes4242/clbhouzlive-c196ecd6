@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NewsChromeBridge } from './NewsChromeBridge';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
 
 import { useMoreFromTheWire, useTourStory, type TourStory } from './useTourStories';
 import StoryLeaderboardStrip from './StoryLeaderboardStrip';
@@ -252,7 +253,7 @@ export function StoryPage() {
           )}
           <div
             aria-hidden
-            style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 96px) + 16px)' }}
+            style={{ height: `var(--bottom-nav-height, ${NAV_CLEARANCE})` }}
           />
           </>
         )}

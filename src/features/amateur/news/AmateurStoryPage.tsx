@@ -14,6 +14,7 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
 
 import { StoryArticle } from '@/features/tourhub/news/StoryPage';
 import { NewsChromeBridge } from '@/features/tourhub/news/NewsChromeBridge';
@@ -92,7 +93,7 @@ export function AmateurStoryPage() {
           )}
           <div
             aria-hidden
-            style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 96px) + 16px)' }}
+            style={{ height: `var(--bottom-nav-height, ${NAV_CLEARANCE})` }}
           />
           </>
         )}
