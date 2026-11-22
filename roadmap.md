@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stopped verification: Tour overview kicker and round-state parity
+- Move PhotoBand's unchanged kicker into its title column, with the existing title gap and no geometry-constant/height changes.
+- Share the hero's existing round and tee-time decision with live sections and picks; keep LeadersGroup and Also this week logic untouched and audit their captions.
+- Added 19 cases /one file; existing tests untouched. Focused 90/91 stopped at overviewRoundParity.test.tsx:82:75, expected 'ROUND 1 · FIRST TEE', received 'ROUND 1 · First tee'. New fixture typing error TS2352 at :112:63 also survives. No repair/rerun after failure; four shards and 390/320 captures/pixel-gap checks not run. Before full suite 9,747 /864; after inventory 9,766 /865 (+19 /one file), not fully verified. Source-only section audit flags delayed course/facts R2, independent LeadersGroup handover and weekly state differences without repair. Full report/logs: .lovable/reports/overview-round-parity/.
+
 ## Complete: News bottom clearance
 - Measured all five actual news routes before/after at 390/320 with the real nav visible. Tour hub already had canonical clearance and stays unchanged; standalone Tour News lacked it and now reserves it once.
 - Replaced the three duplicated news spacers with the nav variable and canonical fallback; shared PageRoot, nav and tokens untouched. Added three new spacer cases, no existing test changes.

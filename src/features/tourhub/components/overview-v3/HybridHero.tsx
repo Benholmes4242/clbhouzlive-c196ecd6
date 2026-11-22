@@ -22,16 +22,12 @@ import { resolveBoardEntity } from '../../_shared/boardEntity';
 import { situationSegments, visibleSituationNote } from '../../overview/situationCopy';
 import { roundsFromSchedule } from './HybridHero.utils';
 import { tournamentHeadlineSegments } from '../../overview/magazineCopy';
-import { earliestTeeTime, fieldHasStarted } from '../../overview/boardStarted';
-import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { useOverviewChampion } from './useOverviewChampion';
 import {useUpcomingOverview} from './useUpcomingOverview';
 import {upcomingSentence, venueTee} from './upcomingOverviewRules';
-import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
-import { betweenRounds } from './liveStateRules';
+import { useOverviewRoundState } from './useOverviewRoundState';
 import { formatTimeHm24 } from '@/i18n/format';
 import { startDayForm } from '../../tournament-v2/data/tournamentRules';
-import { isRoundDelayed, roundHasStarter } from '../../overview/roundDelay';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -131,19 +127,10 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
 
   // Live before anyone tees off: the situation names the first tee time, read
   // from the same tee-time source LeadersGroup uses.
-  const notStarted = state.kind === 'live' && !fieldHasStarted(rows);
-  const liveMeta = useTournamentMeta(state.kind === 'live' ? tournament.id : null);
-  const zone = liveMeta.data?.course_timezone ?? liveMeta.data?.timezone ?? null;
-  const done = state.kind === 'live' ? betweenRounds(rows, state.round, tournament.currentRoundStatus) : null;
-  const afterRound = state.kind === 'live' && done != null && done < state.totalRounds ? done : null;
-  const wantTees = notStarted || afterRound != null;
-  const teeRound = afterRound != null ? afterRound + 1 : state.kind === 'live' ? state.round : 1;
-  const currentTeesQuery = useTeeTimesAll(tournament.id, teeRound, { enabled: wantTees });
-  const currentTees = currentTeesQuery.data;
-  useOverviewBandReady('photo', overviewQueryReady(currentTeesQuery, wantTees));
-  const earliest = currentTeesQuery.isError ? null : earliestTeeTime(currentTees);
-  const firstTeeTime = notStarted ? earliest : null;
-  const delayed = state.kind === 'live' && isRoundDelayed({ status: tournament.status, currentRound: state.round, currentRoundStatus: tournament.currentRoundStatus, firstTee: earliest, started: roundHasStarter(rows, state.round), now });
+  const shared = useOverviewRoundState(tournament, state, rows, now);
+  const { notStarted = false, afterRound = null, delayedRound = null, firstTeeTime = null } = shared.result ?? {};
+  const zone = shared.meta?.course_timezone ?? shared.meta?.timezone ?? null;
+  useOverviewBandReady('photo', overviewQueryReady(shared.teeQuery, shared.result?.wantTees ?? false));
 
   const leader = isInPlayState(state) && !notStarted ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
   /* Live states: AFTER ROUND n between rounds; the first tee in the leader slot before anyone starts. */
@@ -184,7 +171,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       segments={showChampion ? [] : situation}
       note={situationNote}
       afterRound={afterRound}
-      delayedRound={delayed && state.kind === 'live' ? state.round : null}
+      delayedRound={delayedRound}
       firstTee={firstTee}
       pauseSpine
     />

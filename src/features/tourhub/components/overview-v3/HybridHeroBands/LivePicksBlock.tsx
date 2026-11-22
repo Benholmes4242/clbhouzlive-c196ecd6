@@ -20,7 +20,7 @@ import { pickGapNumber, type PickSentence } from './livePickSentences';
 import './liveStates.css';
 import { pickStatusToken, pickTeeText } from './PicksBlock';
 import { venueTee } from '../upcomingOverviewRules';
-import { livePicksHeading, teeStartKey, type LiveStage } from '../liveStateRules';
+import { livePicksHeading, teeStartKey, type LiveStage, type OverviewRoundStateResult } from '../liveStateRules';
 
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
 type Line = { position: number | null; tied: boolean; score: number | null; status?: string | null; thru?: number | null; started?: boolean };
@@ -49,15 +49,16 @@ function boldIntro(text: string, figures: string[]) {
   return text.split(pattern).map((part, i) => tokens.includes(part) ? <strong key={i}>{part}</strong> : part);
 }
 
-export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boardByPlayer, teeByPlayer, startHoleByPlayer, zone, intro, sentences = [], introFigures = [], onOpenPick, onOpenRecord }: {
+export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, roundState, boardByPlayer, teeByPlayer, startHoleByPlayer, zone, intro, sentences = [], introFigures = [], onOpenPick, onOpenRecord }: {
   picks: AITopContender[]; tourCode: string; seasonYear: number | null; stage: LiveStage; round: number;
+  roundState?: Pick<OverviewRoundStateResult, 'afterRound' | 'delayedRound' | 'notStarted'>;
   boardByPlayer: Map<string, Line>; teeByPlayer: Map<string, string> | null; startHoleByPlayer?: Map<string, number> | null; zone: string | null;
   intro: string | null; sentences?: PickSentence[]; introFigures?: string[]; onOpenPick: (id: string) => void; onOpenRecord: () => void;
 }) {
   const { t } = useTranslation('tourhub');
   const recordQuery = useOurPickRecord(tourCode, seasonYear);
   const record = recordQuery.isError ? null : recordQuery.data;
-  const heading = livePicksHeading(stage, round, t as never);
+  const heading = livePicksHeading(stage, round, t as never, roundState);
   const recordCopy = (key: string, o: Record<string, unknown> = {}) => t(`overview.pickRecord.${key}`, o);
   return (
     <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
@@ -82,7 +83,7 @@ export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, boar
         <div data-overview-picks-rows style={{ marginTop: 6 }}>
           {picks.slice(0, 3).map(p => {
             const id = String(p.playerId ?? '');
-            const row = livePickRow(stage, boardByPlayer.get(id), teeByPlayer?.get(id) ?? null, startHoleByPlayer?.get(id) ?? null, zone, t as never);
+            const row = livePickRow(roundState?.delayedRound != null ? 'between' : stage, boardByPlayer.get(id), teeByPlayer?.get(id) ?? null, startHoleByPlayer?.get(id) ?? null, zone, t as never);
             return (
               <button type="button" key={id} data-overview-pick-card data-overview-pick-row onClick={() => onOpenPick(p.playerId)}
                 aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}

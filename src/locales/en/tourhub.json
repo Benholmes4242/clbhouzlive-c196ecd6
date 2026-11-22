@@ -690,6 +690,8 @@
         "teeTimesShort": "TEE TIMES",
         "suspended": "ROUND {{round}} · SUSPENDED",
         "suspendedShort": "SUSPENDED",
+        "delayed": "ROUND {{round}} · DELAYED",
+        "delayedShort": "DELAYED",
         "finalLive": "FINAL ROUND · LIVE",
         "finished": "{{pos}} · Finished",
         "thru": "{{pos}} · Thru {{thru}}",

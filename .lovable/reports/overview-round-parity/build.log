@@ -1,0 +1,19 @@
+=== build 2026-11-22T09:29:45Z ===
+build OK
+
+=== build 2026-11-22T09:30:42Z ===
+--- typecheck ---
+src/features/tourhub/components/overview-v3/LiveOverviewSections.tsx(31,5): error TS2345: Argument of type 'LiveOverviewInput | { kind: "live" | "suspended"; round: number; totalRounds: number; entries: BoardEntry[]; currentRoundStatus?: string; status?: string; reason: null; }' is not assignable to parameter of type 'HeroState'.
+Type 'LiveOverviewInput' is not assignable to type 'HeroState'.
+Type 'LiveOverviewInput' is not assignable to type '{ kind: "live"; round: number; totalRounds: number; } | { kind: "suspended"; round: number; totalRounds: number; reason: string; }'.
+Property 'reason' is missing in type 'LiveOverviewInput' but required in type '{ kind: "suspended"; round: number; totalRounds: number; reason: string; }'.
+
+=== build 2026-11-22T09:31:17Z ===
+build OK
+
+=== build 2026-11-22T09:32:15Z ===
+--- typecheck ---
+src/test/overviewRoundParity.test.tsx(112,63): error TS2352: Conversion of type '{ name: 'R3 delayed'; kind: 'live'; round: 3; rows: readonly [BoardEntry]; tee: "2026-11-21T14:10:00Z"; hero: 'PGA Tour · ROUND 3 · DELAYED'; picks: 'ROUND 3 · DELAYED'; status: "inprogress"; }' to type '{ readonly name: "in play R3"; readonly kind: "live"; readonly round: 3; readonly rows: readonly [BoardEntry]; readonly status: "inprogress"; readonly tee: "2026-11-21T14:10:00Z"; readonly hero: "PGA Tour · ROUND 3"; readonly picks: "ROUND 3 · LIVE"; } | ... 4 more ... | ...' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+Type '{ name: 'R3 delayed'; kind: 'live'; round: 3; rows: readonly [BoardEntry]; tee: "2026-11-21T14:10:00Z"; hero: 'PGA Tour · ROUND 3 · DELAYED'; picks: 'ROUND 3 · DELAYED'; status: "inprogress"; }' is not comparable to type '{ readonly name: 'R3 delayed'; readonly kind: 'live'; readonly round: 3; readonly rows: readonly [BoardEntry]; readonly status: 'scheduled'; readonly tee: "2026-11-21T14:10:00Z"; readonly hero: 'PGA Tour · ROUND 3 · DELAYED'; readonly picks: 'ROUND 3 · DELAYED'; }'.
+Types of property 'status' are incompatible.
+Type '"inprogress"' is not comparable to type '"scheduled"'.

@@ -9,6 +9,7 @@ import { todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { resolveCutDisplay, type CutInput } from '../../_shared/cutDisplay';
 import { fmtScore } from '../../utils/fmtScore';
 import { surnameOf } from '../../_shared/playerName';
+import { isRoundDelayed, roundHasStarter } from '../../overview/roundDelay';
 
 export type LiveStage = 'beforeTee' | 'round1' | 'inPlay' | 'between' | 'cutRound' | 'afterCut' | 'suspended' | 'final';
 
@@ -69,6 +70,36 @@ export function liveStage({ kind, round, totalRounds, entries, currentRoundStatu
   if (cutRound != null && round === cutRound) return { stage: 'cutRound', round, nextRound: null };
   if (cutRound != null && round > cutRound) return { stage: 'afterCut', round, nextRound: null };
   return { stage: round === 1 ? 'round1' : 'inPlay', round, nextRound: null };
+}
+
+/** Hero-owned live round decision. Preserve betweenRounds and the exact
+ * current-round starter/earliest-tee delay rule; delay is not a new stage. */
+export interface OverviewRoundStateInput extends LiveStageInput {
+  status?: string | null;
+  metaCurrentRoundStatus?: string | null;
+  firstTee?: string | null;
+  now: Date;
+}
+export interface OverviewRoundStateResult extends LiveStageResult {
+  afterRound: number | null;
+  delayedRound: number | null;
+  notStarted: boolean;
+  firstTeeTime: string | null;
+  teeRound: number;
+  wantTees: boolean;
+}
+export function overviewRoundState(input: OverviewRoundStateInput): OverviewRoundStateResult {
+  const currentRoundStatus = input.currentRoundStatus ?? input.metaCurrentRoundStatus ?? null;
+  const stage = liveStage({ ...input, currentRoundStatus });
+  const notStarted = input.kind === 'live' && !fieldHasStarted(input.entries);
+  const done = input.kind === 'live' ? betweenRounds(input.entries, input.round, currentRoundStatus) : null;
+  const afterRound = done != null && done < input.totalRounds ? done : null;
+  const delayed = input.kind === 'live' && isRoundDelayed({ status: input.status, currentRound: input.round,
+    currentRoundStatus, firstTee: input.firstTee, started: roundHasStarter(input.entries, input.round), now: input.now });
+  return { ...stage, afterRound, delayedRound: delayed ? input.round : null, notStarted,
+    firstTeeTime: notStarted ? input.firstTee ?? null : null,
+    teeRound: afterRound != null ? afterRound + 1 : input.round,
+    wantTees: notStarted || afterRound != null };
 }
 
 export type LiveFactKey = 'field' | 'purse' | 'par' | 'yards' | 'onCourse' | 'finished' | 'toFinish' | 'lowRound' | 'scoringAvg' | 'underPar' | 'projCut' | 'cut' | 'madeCut' | 'lead' | 'tied';
@@ -210,7 +241,10 @@ export const NARROW_MAX = 340;
 
 /* ---------- Picks heading ---------- */
 
-export function livePicksHeading(stage: LiveStage, round: number, t: (k: string, o?: Record<string, unknown>) => string): { full: string; short: string } {
+export function livePicksHeading(stage: LiveStage, round: number, t: (k: string, o?: Record<string, unknown>) => string, state?: Pick<OverviewRoundStateResult, 'afterRound' | 'delayedRound' | 'notStarted'>): { full: string; short: string } {
+  if (state?.delayedRound != null) return { full: t('overview.live.picks.delayed', { round: state.delayedRound }), short: t('overview.live.picks.delayedShort') };
+  if (state?.afterRound != null) { const text = t('overview.hero.afterRound', { round: state.afterRound }); return { full: text, short: text }; }
+  if (state?.notStarted) return { full: `${t('overview.hero.round', { round })} · ${t('overview.hero.firstTee')}`, short: t('overview.hero.firstTee') };
   switch (stage) {
     case 'beforeTee': return { full: t('overview.live.picks.teeToday'), short: t('overview.live.picks.today') };
     case 'between': return { full: t('overview.live.picks.teeTimes', { round: round + 1 }), short: t('overview.live.picks.teeTimesShort') };

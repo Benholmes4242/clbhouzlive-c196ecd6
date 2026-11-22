@@ -1,0 +1,55 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/tourLiveStates.test.tsx (47 tests) 332ms
+ ✓ src/test/roundDelayOverview.test.tsx (12 tests) 417ms
+ ✓ src/test/tourOverviewHeroFixes.test.tsx (13 tests) 160ms
+ ❯ src/test/overviewRoundParity.test.tsx (19 tests | 1 failed) 490ms
+   ✓ overview hero and picks share one round state > 'in play R3' names the same round and state 147ms
+   ✓ overview hero and picks share one round state > 'after R3' names the same round and state 31ms
+   ✓ overview hero and picks share one round state > 'R3 delayed' names the same round and state 28ms
+   ✓ overview hero and picks share one round state > 'R3 suspended' names the same round and state 23ms
+   × overview hero and picks share one round state > 'before the first tee' names the same round and state 40ms
+     → expected 'ROUND 1 · First tee' to be 'ROUND 1 · FIRST TEE' // Object.is equality
+   ✓ overview hero and picks share one round state > 'final round' names the same round and state 22ms
+   ✓ overview hero and picks share one round state > kicker is the title column first child immediately before h1 9ms
+   ✓ overview hero and picks share one round state > delayed pick keeps current position/score and published delayed-round tee 24ms
+   ✓ overview hero and picks share one round state > delay with no pick tee keeps position/score without an invented tee 24ms
+   ✓ overview hero and picks share one round state > delay automatically ends on starter without remounting 42ms
+   ✓ overview hero and picks share one round state > delay automatically ends on status without remounting 35ms
+   ✓ overview hero and picks share one round state > delay automatically ends on future tees without remounting 36ms
+   ✓ round status precedence and unchanged delay boundary > tournament round status wins over scheduled meta 0ms
+   ✓ round status precedence and unchanged delay boundary > scheduled tournament status wins over in-progress meta 0ms
+   ✓ round status precedence and unchanged delay boundary > null tournament status falls back to meta 0ms
+   ✓ round status precedence and unchanged delay boundary > only more than sixty minutes delays the current round 0ms
+   ✓ shared tee observers preserve the hero query > 'after R3' has one enabled tee key and one read for photo plus live sections 9ms
+   ✓ shared tee observers preserve the hero query > 'R3 delayed' has one enabled tee key and one read for photo plus live sections 5ms
+   ✓ shared tee observers preserve the hero query > 'before the first tee' has one enabled tee key and one read for photo plus live sections 10ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/overviewRoundParity.test.tsx > overview hero and picks share one round state > 'before the first tee' names the same round and state
+AssertionError: expected 'ROUND 1 · First tee' to be 'ROUND 1 · FIRST TEE' // Object.is equality
+
+Expected: [32m"ROUND 1 · F[7mIRST TEE[27m"[39m
+Received: [31m"ROUND 1 · F[7mirst tee[27m"[39m
+
+ ❯ src/test/overviewRoundParity.test.tsx:82:75
+     80|     const view = render(<Harness fixture={fixture} />, { wrapper: wrap…
+     81|     expect(view.container.querySelector('[data-overview-photo-kicker-r…
+     82|     expect(view.container.querySelector('.live-picks-full')?.textConte…
+       |                                                                           ^
+     83|     if (fixture.round === 1) expect(view.container.querySelector('[dat…
+     84|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 90 passed (91)
+   Start at  09:32:31
+   Duration  9.22s (transform 4.59s, setup 1.75s, collect 14.48s, tests 1.40s, environment 7.60s, prepare 2.07s)
+

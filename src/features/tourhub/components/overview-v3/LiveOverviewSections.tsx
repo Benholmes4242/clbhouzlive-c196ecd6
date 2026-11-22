@@ -5,10 +5,8 @@
  * get_tournament_hole_analysis. A failed read drops its section or cell. */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { useTournamentCourseHoles } from '../../tournament-v2/data/useTournamentCourseHoles';
 import { useTournamentHoleAnalysis } from '../../tournament-v2/data/useTournamentHoleAnalysis';
-import { useTeeTimesAll } from '../../tournament-v2/data/useTeeTimesAll';
 import { AllTeeTimesSheet } from '../../tournament-v2/sections/AllTeeTimesSheet';
 import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -19,24 +17,25 @@ import { overviewQueryReady } from './overviewShells';
 import { UpcomingCourse } from './UpcomingOverviewSections';
 import { venueTee } from './upcomingOverviewRules';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
-import { holeAverages, liveStage, ordinal, teeStartKey, type LiveFactCell, type LiveStage } from './liveStateRules';
+import { holeAverages, ordinal, teeStartKey, type LiveFactCell, type LiveStage } from './liveStateRules';
+import { useOverviewRoundState } from './useOverviewRoundState';
 import type { CourseHole } from '../../tournament-v2/data/tournamentRules';
 import './HybridHeroBands/liveStates.css';
 
-export interface LiveOverviewInput { kind: 'live' | 'suspended'; round: number; totalRounds: number; entries: BoardEntry[]; currentRoundStatus?: string | null }
+export interface LiveOverviewInput { kind: 'live' | 'suspended'; round: number; totalRounds: number; entries: BoardEntry[]; currentRoundStatus?: string | null; status?: string | null }
 
 /** Null input = not a live slide: every read stays disabled. */
-export function useLiveOverview(id: string | null, input: LiveOverviewInput | null) {
+export function useLiveOverview(id: string | null, input: LiveOverviewInput | null, now?: Date) {
   const on = !!id && !!input;
-  const metaQuery = useTournamentMeta(on ? id : null);
-  const meta = metaQuery.isError ? null : metaQuery.data ?? null;
-  const result = on && input ? liveStage({ ...input, currentRoundStatus: input.currentRoundStatus ?? meta?.current_round_status ?? null, cutRound: meta?.cut_round ?? null }) : null;
+  const shared = useOverviewRoundState(on && id ? { id, status: input?.status, currentRoundStatus: input?.currentRoundStatus } : null,
+    input ? input.kind === 'suspended' ? { ...input, reason: null } : input : null, input?.entries ?? [], now);
+  const { metaQuery, meta, result } = shared;
   const stage = result?.stage ?? null;
   const holesQuery = useTournamentCourseHoles(on ? id ?? undefined : undefined);
   const wantAvg = on && stage != null && stage !== 'beforeTee';
   const analysisQuery = useTournamentHoleAnalysis(wantAvg ? id : null, result?.round ?? null);
-  const firstTees = useTeeTimesAll(id, 1, { enabled: on && stage === 'beforeTee' });
-  const ready = !on || [metaQuery, holesQuery, ...(wantAvg ? [analysisQuery] : []), ...(stage === 'beforeTee' ? [firstTees] : [])].every(q => overviewQueryReady(q));
+  const firstTees = shared.teeQuery;
+  const ready = !on || [metaQuery, holesQuery, ...(wantAvg ? [analysisQuery] : []), ...(result?.wantTees ? [firstTees] : [])].every(q => overviewQueryReady(q));
   return {
     on, ready, meta, stage: result,
     zone: meta?.course_timezone ?? meta?.timezone ?? null,

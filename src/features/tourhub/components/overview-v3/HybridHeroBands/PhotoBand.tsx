@@ -187,11 +187,11 @@ export function PhotoBand({
           minWidth: 0,
         }}
       >
-        <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginTop: OVERVIEW_TITLE_GAP, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
+          <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
+          </div>
           <h1
             ref={titleRef}
             style={{
@@ -199,7 +199,7 @@ export function PhotoBand({
               fontSize: OVERVIEW_TITLE_SIZE,
               lineHeight: OVERVIEW_TITLE_LINE_HEIGHT,
               letterSpacing: 0,
-              marginTop: 0,
+              marginTop: OVERVIEW_TITLE_GAP,
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
               WebkitLineClamp: 3,
