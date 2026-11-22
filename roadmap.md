@@ -13,11 +13,11 @@
 - Added 29 roundDelay and 12 roundDelayOverview cases; existing tests unchanged. Four sequential shards passed 2,391 / 2,368 / 2,420 / 2,522 = 9,701 tests / 861 files, exactly 9,660 / 859 +41 cases / two files. Focused 178/178; preview build OK.
 - Real display-component RSM-shaped captures at 390/320 confirm uppercase delayed kicker, Delayed leaders line, grey weekly caption without a live dot and no overflow. Browser starter/future-tee recovery passed without page errors; temporary page removed. Isolated fixtures, not live hosted data. Full logs, names and captures: .lovable/reports/round-delay/.
 
-## Stopped verification: Season recap Our picks block
+## Complete: Season recap Our picks block
 - Implement the heading/link, figures and locale keys scoped to RecapOurRecord; preserve THE SEASON, THE POINTS LIST, sheet and visibility rules.
 - Signed-off drawing received; scoped block implemented. Nine new recapOurPicks cases; one authorised margin assertion updated in seasonRecap, with old/new quoted in the report. No deletions or renames.
 - Four separate sequential shards passed 2,391 / 2,368 / 2,428 / 2,523 = 9,710 / 862 files. Baseline 9,660 / 859 + delayed rounds 41 / two files = 9,701 / 861; this task adds nine / one file. Focused 40/40; preview build OK.
-- Stopped at browser script check_recap.py:32: AssertionError on `assert all(f['fontWeight']=='700' for f in facts['labels'])`. 390 capture confirms one heading line and 14px gap; shared cell label styling still beats the intended record rule. No repair or rerun; 320 capture and browser sheet opening not attempted. Temporary page removed. Full report, logs, script and captures: .lovable/reports/recap-our-picks/.
+- 22 Nov ruling retains existing 800-weight figure labels with no app/test change; the earlier 700 browser expectation is superseded and that stop is closed. Actual-component 320/390 captures confirm no page/block/text overflow, one heading line, 14px figure gap and record-panel opening with no page errors. Heading/action still compute to 700 (THE SEASON heading 800), documented without repair. Temporary fixture removed; isolated cache-seeded evidence, not hosted live data. Latest full-suite inventory remains 9,744 / 863 before/after this capture-only request, delta zero; no shards rerun. Full report, retained historical stop and resumed captures/log/script: .lovable/reports/recap-our-picks/.
 
 ## Complete: Live board tee availability and leaders’ course time
 - Gate the between-round tee column on a successful read containing a valid tee time; preserve the specified no-tee layout and all other columns.

@@ -1,4 +1,4 @@
-# Season recap Our picks — stopped browser verification
+# Season recap Our picks — browser stop closed
 
 ## Scope
 
@@ -114,3 +114,36 @@ The intended `.recap-record-figs span` rule has the same specificity as the shar
 Under the stop rule, the following remain unverified: 320px capture, browser sheet opening, the later Button-base-class assertion, complete record-label geometry and exact visual match. The real sheet action is independently verified by the passing Vitest case. The temporary capture HTML/TSX page was deleted. The original browser script and full failure output are retained unchanged here.
 
 Next step requires a ruling to fix the record-only cascade and resume the outstanding browser checks; no changes to shared THE SEASON styling or failed assertions are needed.
+
+## 22 November 2026 — ruling and resumed verification complete
+
+The user explicitly ruled to retain existing weight 800 and make **no code change**. This supersedes the earlier browser expectation of 700 on the three figure labels; the original failed script/log and stop above are retained as historical evidence, not an open repair request. No app or Vitest test file was changed.
+
+Rendered the actual `SeasonRecapBody` and `OurRecordSheet` in a disposable Vite fixture with real translation, query and router providers. The Champions record cache was seeded with the same 10 events / 3 winners / 15 top tens, with no SQL, server reads, sign-in or guest creation. The fixture was removed after capture.
+
+Command: `python3 /tmp/browser/recap-weight/check_weight.py`. Full successful output: `resume-browser.log`; script: `check_weight.py`. The new script checks the authorised retained 800 figure-label weight; the original `check_recap.py` is unchanged.
+
+| Observation | 320px | 390px |
+|---|---:|---:|
+| Document / root width | 320 / 320 | 390 / 390 |
+| Record block width | 320 | 390 |
+| Heading row height | 14px | 14px |
+| Gap from heading to figures | 14px | 14px |
+| EVENTS / WINNERS / IN THE TOP 10 weight | 800 / 800 / 800 | 800 / 800 / 800 |
+| Published figures | 10 / 3 / 15 | 10 / 3 / 15 |
+| Figure font size / weight | 22px / 700 | 22px / 700 |
+| Record panel opens from How we pick | Yes | Yes |
+| Page errors | None | None |
+
+No horizontal page or block overflow, clipped record labels/figures, or heading/action overlap. All record text remains within its cells and viewport. Visually inspected both recap-context captures and settled record-panel captures.
+
+**Terminology detail, without repair:** the three figure labels are the 800-weight elements that caused the previous stop, matching the existing THE SEASON figure labels. The `OUR PICKS · 2026` heading and its action currently compute to 700; THE SEASON heading computes to 800. These existing values are recorded honestly and left untouched under the explicit no-code-change ruling.
+
+New evidence, retaining the earlier captures separately:
+- `captures/resumed/our-picks-320.png` and `our-picks-390.png`.
+- `captures/resumed/context-320.png` and `context-390.png`.
+- `captures/resumed/sheet-320.png` and `sheet-390.png`.
+
+**Inventory:** last reported full-suite baseline before this request: 9,744/9,744 tests across 863 files (Feed Tour design B); after this request: unchanged 9,744 tests / 863 files, delta zero. No Vitest command or shard was rerun; no tests deleted, renamed, rewritten or added. The historical 9,710/862 verification above remains the original recap implementation run, not a new suite result.
+
+**Stop closed:** the rejected 700-weight browser expectation no longer calls for a repair. Both requested widths and record-panel opening are now verified. Evidence is isolated, cache-seeded presentation verification, not hosted live-data or physical-phone verification. Latest observed harness entry: `build OK`, 2026-11-22T09:05:27Z; no manual build/typecheck run.
