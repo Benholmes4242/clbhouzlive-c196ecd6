@@ -1,4 +1,5 @@
 import React from 'react';
+import { SECTION_EYEBROW, SECTION_TITLE as CANON_SECTION_TITLE } from '@/lib/tokens/type';
 import { A, SANS, KICKER as KICKER_LEGACY, LABEL as LABEL_LEGACY, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SURFACE } from '@/lib/tokens/surface';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -161,13 +162,11 @@ export const NEW_ROW_BAR: React.CSSProperties = {
  * No colour accent, no tile, no background: colour still means over par, under
  * par or the viewing member.
  */
+/* CANONICAL HEADING BRIEF 1: now the canon SECTION_TITLE in ink. */
 export const SECTION_TITLE: React.CSSProperties = {
   fontFamily: SANS,
-  fontSize: 17,
-  fontWeight: 700,
-  letterSpacing: '-0.02em',
-  color: DISCOVER_QUIET,
-  lineHeight: 1.2,
+  ...CANON_SECTION_TITLE,
+  color: INK.ink,
 };
 
 /**
@@ -183,11 +182,12 @@ export const SECTION_TITLE: React.CSSProperties = {
  * takes INK so the aside (FAINT/DIM) stays distinguishable beside it (§4).
  * SECTION_TITLE is left untouched at source.
  */
+/* CANONICAL HEADING BRIEF 1: the section eyebrow is SECTION_EYEBROW in ink;
+ * KICKER/LABEL above are unchanged (they serve other roles). */
 export const EYEBROW_TEXT: React.CSSProperties = {
   fontFamily: SANS,
-  ...KICKER,
-  color: DISCOVER_QUIET,
-  lineHeight: 1,
+  ...SECTION_EYEBROW,
+  color: INK.ink,
 };
 
 export function Eyebrow({

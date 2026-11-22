@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { KICKER, TITLE, BODY } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, SECTION_TITLE, BODY } from '@/lib/tokens/type';
 
 
 const FONT_SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -39,8 +39,11 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   const resolvedCloseLabel = closeAriaLabel ?? t('action.close');
   // Literal dark handicap tokens — sheets portal outside `.hcp-dark`, so
   // `var(--hcp-*)` resolves to nothing. Values copied from handicap-dark.css.
-  const titleColor = dark ? 'rgba(255,255,255,0.96)' : '#0F172A';
-  const eyebrowColor = dark ? 'rgba(255,255,255,0.55)' : '#64748B';
+  // CANONICAL HEADING BRIEF 1: title and eyebrow are the Courses tab heading
+  // (SECTION_TITLE / SECTION_EYEBROW) in ink #F8FAFC for both variants — the
+  // light variant's slate ink was invisible on the dark sheet surface.
+  const titleColor = '#F8FAFC';
+  const eyebrowColor = '#F8FAFC';
   const subColor = dark ? 'rgba(255,255,255,0.55)' : '#64748B';
   const borderColor = dark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)';
   const closeBg = dark ? '#272C37' : 'rgba(15,23,42,0.06)';
@@ -53,18 +56,20 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         alignItems: 'flex-start',
         justifyContent: 'space-between',
         gap: 12,
-        padding: '8px 16px 14px',
+        // Re-tuned once for the 21px / 1.05 title (was 8/14 with 17 / 1.15):
+        // the taller cap height keeps the same optical space above and below.
+        padding: '10px 16px 14px',
         borderBottom: borderBottom ? `0.5px solid ${borderColor}` : 'none',
         flexShrink: 0,
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
         {eyebrow && (
-          <div style={{ marginBottom: 6 }}>
+          <div style={{ marginBottom: 6, lineHeight: 1 }}>
             <span
               style={{
                 fontFamily: FONT_SANS,
-                ...KICKER,
+                ...SECTION_EYEBROW,
                 color: eyebrowColor,
               }}
             >
@@ -75,9 +80,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         <h2
           style={{
             fontFamily: FONT_SANS,
-            ...TITLE,
+            ...SECTION_TITLE,
             color: titleColor,
-            lineHeight: 1.15,
             margin: 0,
           }}
         >

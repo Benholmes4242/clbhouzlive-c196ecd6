@@ -1,5 +1,6 @@
 import React from 'react';
 import { buildEyebrow } from './eyebrowLabel';
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -16,12 +17,8 @@ export const CourseEyebrow: React.FC<{
     <div
       style={{
         fontFamily: FONT,
-        fontSize: 11.5,
-        fontWeight: 700,
-        letterSpacing: '0.16em',
-        color: onPhoto ? '#FFFFFF' : 'var(--hcp-t-100)',
-        textTransform: 'uppercase',
-        lineHeight: 1.2,
+        ...SECTION_EYEBROW,
+        color: onPhoto ? '#FFFFFF' : '#F8FAFC',
         marginBottom: 4,
         ...(onPhoto && { textShadow: '0 1px 3px rgba(0,0,0,0.55)' }),
       }}

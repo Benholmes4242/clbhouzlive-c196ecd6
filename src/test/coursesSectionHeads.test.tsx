@@ -43,8 +43,8 @@ describe('signed-off Courses / Top 100 section head', () => {
   it('.t100b-kicker / .t100b-title carry the signed-off values; .t100b-label keeps the muted row label', () => {
     const css = readFileSync('src/components/courses/top100/top100Compare.css', 'utf8');
     const rule = (sel: string) => css.match(new RegExp(`\\${sel}\\{([^}]*)\\}`))?.[1] ?? '';
-    expect(rule('.t100b-kicker')).toBe('font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;line-height:1;color:var(--t100b-ink)');
-    expect(rule('.t100b-title')).toBe('margin-top:5px;font-size:21px;font-weight:700;line-height:1.05;letter-spacing:-.035em;font-synthesis:none;color:var(--t100b-ink)');
+    expect(rule('.t100b-kicker')).toBe('font-size:var(--section-eyebrow-size);font-weight:var(--section-eyebrow-weight);letter-spacing:var(--section-eyebrow-tracking);text-transform:uppercase;line-height:1;color:var(--t100b-ink)');
+    expect(rule('.t100b-title')).toBe('margin-top:5px;font-size:var(--section-title-size);font-weight:var(--section-title-weight);line-height:var(--section-title-leading);letter-spacing:var(--section-title-tracking);font-synthesis:none;color:var(--t100b-ink)');
     expect(css).not.toContain('.t100b-kicker.amber');
     expect(rule('.t100b-label')).toContain('color:var(--t100b-mute)');
   });

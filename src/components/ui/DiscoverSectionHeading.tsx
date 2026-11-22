@@ -1,11 +1,14 @@
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 
 /**
  * ONE SECTION HEADING FOR DISCOVER (BRIEF_DISCOVER_SECTION_HEADS_SENTENCE_CASE).
  *
  * Scores, News and Watch each had their own treatment; this is the single one.
- * A sports app sets its section heads as HEADINGS — 16 / 700 / sentence case —
+ * CANONICAL HEADING BRIEF 1: the title is SECTION_TITLE (21 / 700 / -0.035em /
+ * 1.05), the Courses tab heading.
+ * A sports app sets its section heads as HEADINGS — sentence case —
  * rather than tracked-out small caps, which read as instrument panel.
  *
  * It lives in components/ui because all three Discover tabs plus the SHARED
@@ -55,10 +58,7 @@ export function DiscoverSectionHeading({ title, right, onRightPress, wrap = fals
         style={{
           minWidth: 0,
           margin: 0,
-          fontSize: 16,
-          fontWeight: 700,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.2,
+          ...SECTION_TITLE,
           color: A.INK,
           ...(wrap
             ? null

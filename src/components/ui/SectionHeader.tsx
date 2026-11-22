@@ -7,7 +7,7 @@ import { memo, type ReactNode } from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { formatNumber } from '@/i18n/format';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 
 const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -16,6 +16,12 @@ const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", 
  * near-black ink because small amber text failed contrast on WHITE. The canvas
  * is dark-only now, so the reasoning inverts — near-black is the failing value
  * and amber is the legible one. The eyebrow is plain A.AMBER.
+ *
+ * CANONICAL HEADING BRIEF 1: superseded. Every role now renders the Courses
+ * tab heading — SECTION_EYEBROW and SECTION_TITLE (src/lib/tokens/type.ts) in
+ * ink (A.INK, #F8FAFC) on every surface. `tone`, `accent` and `surface` are
+ * kept for compatibility but NO LONGER change the eyebrow or title colour;
+ * prime/section/rail all take the one 21px title.
  */
 
 type Tier = 'editorial' | 'standard' | 'rail';
@@ -30,11 +36,6 @@ const TIER_TO_ROLE: Record<Tier, Role> = {
   rail: 'rail',
 };
 
-const EYEBROW_TONE: Record<EyebrowTone, string> = {
-  slate: A.MUTE,
-  amber: A.AMBER,
-  danger: BAND_RED_DARK,
-};
 
 
 interface SectionHeaderProps {
@@ -162,7 +163,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
   const isDark = surface === 'dark';
-  const titleColor = isDark ? 'var(--hcp-t-100)' : A.INK;
+  const titleColor = A.INK;
   const subColor = isDark ? 'var(--hcp-t-60)' : A.BODY;
 
   const pad = { paddingTop, paddingLeft: paddingX, paddingRight: paddingX };
@@ -185,9 +186,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
           style={{
             margin: 0,
             fontFamily: SF_STACK,
-            fontSize: 19,
-            fontWeight: 700,
-            letterSpacing: '-0.01em',
+            ...SECTION_TITLE,
             color: titleColor,
           }}
         >
@@ -200,16 +199,10 @@ function SectionHeaderInner(props: SectionHeaderProps) {
 
   // ── PRIME / SECTION ── share the cut-line signature.
   const isPrime = role === 'prime';
-  const titleSize = isPrime ? 26 : 20;
-  const titleTracking = isPrime ? '-0.02em' : '-0.02em';
   const cutWidth = isPrime ? 34 : 22;
   const cutHeight = isPrime ? 3 : 2;
-  const defaultEyebrowColor = isPrime
-    ? A.AMBER
-    : isDark
-      ? 'var(--hcp-t-60)'
-      : A.MUTE;
-  const eyebrowColor = accent ?? (tone ? EYEBROW_TONE[tone] : defaultEyebrowColor);
+  // Canonical heading: tone/accent no longer colour the eyebrow (see header).
+  const eyebrowColor = A.INK;
   const cutColor = accent ?? A.AMBER;
 
   const hasTitle = Boolean(title);
@@ -223,7 +216,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             alignItems: 'baseline',
             justifyContent: 'space-between',
             gap: 12,
-            marginBottom: 5,
+            marginBottom: SECTION_TITLE_GAP,
           }}
         >
           <div
@@ -232,10 +225,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
               alignItems: 'center',
               gap: 6,
               fontFamily: SF_STACK,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
+              ...SECTION_EYEBROW,
               color: eyebrowColor,
               fontFeatureSettings: '"kern" 1, "liga" 1',
             }}
@@ -282,11 +272,8 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             style={{
               margin: 0,
               fontFamily: SF_STACK,
-              fontSize: titleSize,
-              fontWeight: 700,
-              letterSpacing: titleTracking,
+              ...SECTION_TITLE,
               color: titleColor,
-              lineHeight: 1.15,
             }}
           >
             {title}

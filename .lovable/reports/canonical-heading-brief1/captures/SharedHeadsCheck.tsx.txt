@@ -1,0 +1,56 @@
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
+import { SheetHeader } from '@/components/ui/SheetHeader';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { SheetHeader as FriendSheetHeader } from '@/components/friend-sheet/parts/SheetHeader';
+import { Eyebrow as FriendEyebrow } from '@/components/friend-sheet/parts/_shared/Eyebrow';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { Eyebrow as CourseledEyebrow, SECTION_TITLE as CL_TITLE } from '@/components/explore-tab-new/courseled/tokens';
+import { OverviewSectionHead } from '@/features/tourhub/overview/sections/OverviewSectionHead';
+import { SectionShell } from '@/features/tourhub/overview/sections/SectionShell';
+import { SectionEyebrow } from '@/features/tourhub/tournament-v2/sections/SectionEyebrow';
+import { SectionHead as TvHead } from '@/features/tourhub/tournament-v2/sections/TournamentV3Sections';
+import '@/features/tourhub/tournament-v2/tournamentPage.css';
+import { SearchSectionHeader } from '@/features/search-v2/components/SearchSectionHeader';
+import { CourseEyebrow } from '@/components/profile/handicap/whs/sections/course-legends/_shared/CourseEyebrow';
+import { useSearchParams } from 'react-router-dom';
+
+const box = (label: string, node: React.ReactNode) => (
+  <div data-box={label} style={{ borderTop: '1px dashed #333', padding: '6px 0 10px' }}>
+    <div style={{ fontSize: 9, color: '#666', padding: '0 16px 4px' }}>{label}</div>{node}
+  </div>
+);
+const noop = () => {};
+export default function SharedHeadsCheck() {
+  const [sp] = useSearchParams();
+  const part = sp.get('part') ?? 'a';
+  const long = 'Conversation details and everyone you have added';
+  return (
+    <div id="shared" style={{ background: '#0A0A0C', color: '#F8FAFC', paddingTop: 120, minHeight: '100vh' }}>
+      {part === 'a' && <>
+        {box('SectionHeader prime', <SectionHeader role="prime" kicker="This week" title="Your best rounds" paddingX={16} />)}
+        {box('SectionHeader section tone=amber', <SectionHeader role="section" tone="amber" kicker="Courses" title="Where you play most" paddingX={16} action={{ label: 'See all', onClick: noop }} />)}
+        {box('SectionHeader section accent', <SectionHeader role="section" accent="#D2222D" kicker="Holes" title="Hardest holes on the card" paddingX={16} />)}
+        {box('SectionHeader rail', <SectionHeader role="rail" title="Recently played" paddingX={16} action={{ label: 'All', onClick: noop }} />)}
+        {box('DarkSectionHeader', <DarkSectionHeader eyebrow="Handicap" title="How your index moved" right="12 ROUNDS" />)}
+        {box('DiscoverSectionHeading', <div style={{ padding: '0 16px' }}><DiscoverSectionHeading title="The courses members played this week" right="See all 104" onRightPress={noop} /></div>)}
+        {box('courseled Eyebrow + SECTION_TITLE', <div style={{ padding: '0 16px' }}><CourseledEyebrow aside={<span>3 new</span>}>Community</CourseledEyebrow><div style={CL_TITLE}>Rounds from the members</div></div>)}
+        {box('OverviewSectionHead', <OverviewSectionHead title="Coming up" action="Schedule" onAction={noop} />)}
+        {box('SectionShell', <SectionShell eyebrow="Also this week" eyebrowColor="#F7931E" linkLabel="All" onLinkClick={noop}><div /></SectionShell>)}
+        {box('SectionEyebrow', <SectionEyebrow kicker="Leaderboard" actionLabel="Full board" onAction={noop} />)}
+        {box('tv SectionHead', <div className="tournament-v3" style={{ padding: '0 20px' }}><TvHead title="THE FIELD" aside="WORLD RANKING" /></div>)}
+        {box('SearchSectionHeader', <SearchSectionHeader label="Courses" onSeeAll={noop} />)}
+        {box('CourseEyebrow', <div style={{ padding: '0 16px' }}><CourseEyebrow type="links" region="Fife" country="Scotland" /></div>)}
+        {box('CourseEyebrow onPhoto', <div style={{ padding: '16px', background: '#355' }}><CourseEyebrow type="links" region="Fife" country="Scotland" onPhoto /></div>)}
+        {box('Friend Eyebrow', <div style={{ padding: '0 16px' }}><FriendEyebrow label="Head to head" /></div>)}
+      </>}
+      {part === 'b' && <>
+        {box('SheetHeader dark eyebrow', <SheetHeader dark eyebrow="Leaderboard" title="Your circle" onClose={noop} />)}
+        {box('SheetHeader light', <SheetHeader eyebrow="Tours" title="Switch tour" onClose={noop} />)}
+        {box('SheetHeader long title', <SheetHeader dark title={long} onClose={noop} />)}
+        {box('Friend SheetHeader', <div style={{ padding: '0 16px' }}><FriendSheetHeader avatarUrl={null} name="Danny Holmes" handle="danny" bio="Off 4 at Hollinwell" pill={{ label: 'Friends', tone: 'friends' }} /></div>)}
+      </>}
+      {part === 'c' && <Sheet open><SheetContent side="bottom"><SheetTitle>Choose a breakdown for your courses</SheetTitle></SheetContent></Sheet>}
+    </div>
+  );
+}

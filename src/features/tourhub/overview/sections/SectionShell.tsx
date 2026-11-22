@@ -9,12 +9,16 @@
  * Spec (analytical): eyebrow is the KICKER token in surface ink (A.INK),
  * right link 11/700 muted. Eyebrows are never amber (EYEBROW INK FLIP) —
  * eyebrowColor stays for SEMANTIC overrides only (live green etc).
+ *
+ * CANONICAL HEADING BRIEF 1: the eyebrow is SECTION_EYEBROW in ink #F8FAFC.
+ * `eyebrowColor` is kept for compatibility but no longer changes the colour.
  */
 
 import type { ReactNode } from 'react';
 import { V4 } from '../tokens';
-import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SPACE } from '@/lib/spacing';
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 
 
 export function SectionShell({
@@ -23,7 +27,7 @@ export function SectionShell({
   linkLabel,
   onLinkClick,
   children,
-  eyebrowColor,
+  eyebrowColor: _eyebrowColor,
   rightMeta,
   padX = SPACE.pagePadX,
 }: {
@@ -49,7 +53,7 @@ export function SectionShell({
           {/* DARK EYEBROW: the fallback is the dark MUTE, not A.INK (now
               #F8FAFC) and never amber — amber means the viewing member.
               eyebrowColor remains for SEMANTIC overrides only (live green). */}
-          <span style={{ ...KICKER, color: eyebrowColor ?? 'rgba(255,255,255,0.62)' }}>
+          <span style={{ ...SECTION_EYEBROW, color: A.INK }}>
             {eyebrow}
           </span>
 

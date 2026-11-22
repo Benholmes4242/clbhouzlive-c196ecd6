@@ -1,7 +1,7 @@
 import type React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { KICKER as KICKER_METRICS, LABEL as LABEL_METRICS } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, LABEL as LABEL_METRICS } from '@/lib/tokens/type';
 
 /**
  * Canonical metrics; the surface supplies the ink.
@@ -10,7 +10,8 @@ import { KICKER as KICKER_METRICS, LABEL as LABEL_METRICS } from '@/lib/tokens/t
  * only the size is local. Do NOT repoint KICKER in lib/tokens/type (18
  * importers); this is a trial, not a fork.
  */
-const KICKER: React.CSSProperties = { ...KICKER_METRICS, fontSize: 11, color: A.INK };
+/* CANONICAL HEADING BRIEF 1: the search kicker is SECTION_EYEBROW in ink. */
+const KICKER: React.CSSProperties = { ...SECTION_EYEBROW, color: A.INK };
 
 interface Props {
   label: string;

@@ -36,3 +36,12 @@ describe('canonical section heading tokens', () => {
     });
   }
 });
+
+describe('Top 100 stylesheet heads', () => {
+  it('.t100b-kicker / .t100b-title read the --section-* variables', () => {
+    const css = readFileSync('src/components/courses/top100/top100Compare.css', 'utf8');
+    const rule = (sel: string) => css.match(new RegExp(`\\${sel}\\{([^}]*)\\}`))?.[1] ?? '';
+    expect(rule('.t100b-kicker')).toContain('font-size:var(--section-eyebrow-size);font-weight:var(--section-eyebrow-weight);letter-spacing:var(--section-eyebrow-tracking)');
+    expect(rule('.t100b-title')).toContain('font-size:var(--section-title-size);font-weight:var(--section-title-weight);line-height:var(--section-title-leading);letter-spacing:var(--section-title-tracking)');
+  });
+});

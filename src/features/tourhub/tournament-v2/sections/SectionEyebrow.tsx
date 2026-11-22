@@ -31,7 +31,7 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
         padding: '16px 16px 12px', fontFamily: SANS,
       }}
     >
-      <span style={{ ...KICKER, letterSpacing: cjk ? 0 : KICKER.letterSpacing, textTransform: cjk ? 'none' : KICKER.textTransform }}>{kicker}</span>
+      <span style={{ ...KICKER, lineHeight: 1, letterSpacing: cjk ? 0 : KICKER.letterSpacing, textTransform: cjk ? 'none' : KICKER.textTransform }}>{kicker}</span>
       {actionLabel && onAction && (
         <button
           type="button"

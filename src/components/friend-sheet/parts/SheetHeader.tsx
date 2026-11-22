@@ -2,7 +2,7 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { BG_2, T60, T100, GREEN, LINE_2, FONT } from './_shared/tokens';
 import { formatFriendName } from './_shared/formatName';
-import { TITLE } from '@/lib/tokens/type';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 
 export interface SheetHeaderProps {
   avatarUrl: string | null;
@@ -85,9 +85,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           <h2
             style={{
               margin: 0,
-              ...TITLE,
+              ...SECTION_TITLE,
               color: T100,
-              lineHeight: 1.05,
               fontFamily: FONT,
             }}
           >
