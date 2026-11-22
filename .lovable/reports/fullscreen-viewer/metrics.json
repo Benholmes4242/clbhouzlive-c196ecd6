@@ -1,0 +1,624 @@
+{
+ "review-hole_390": {
+  "scrollW": 390,
+  "dots": {
+   "x": 20,
+   "y": 586,
+   "w": 350,
+   "h": 6
+  },
+  "pill": {
+   "x": 20,
+   "y": 602,
+   "w": 292,
+   "h": 30
+  },
+  "mute": {
+   "x": 326,
+   "y": 598,
+   "w": 44,
+   "h": 44
+  },
+  "member": {
+   "x": 20,
+   "y": 652,
+   "w": 350,
+   "h": 32
+  },
+  "avatar": {
+   "x": 20,
+   "y": 651,
+   "w": 32,
+   "h": 34
+  },
+  "chip": {
+   "x": 282,
+   "y": 654,
+   "w": 88,
+   "h": 28
+  },
+  "stats": {
+   "x": 20,
+   "y": 696,
+   "w": 350,
+   "h": 38
+  },
+  "cells": [
+   "3rdHOLE",
+   "4PAR",
+   "412YARDS",
+   "4STROKE INDEX",
+   "+0.7FIELD LOSES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "review-untagged_390": {
+  "scrollW": 390,
+  "dots": {
+   "x": 20,
+   "y": 586,
+   "w": 350,
+   "h": 6
+  },
+  "pill": {
+   "x": 20,
+   "y": 602,
+   "w": 292,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 20,
+   "y": 652,
+   "w": 350,
+   "h": 32
+  },
+  "avatar": {
+   "x": 20,
+   "y": 651,
+   "w": 32,
+   "h": 34
+  },
+  "chip": {
+   "x": 282,
+   "y": 654,
+   "w": 88,
+   "h": 28
+  },
+  "stats": {
+   "x": 20,
+   "y": 696,
+   "w": 350,
+   "h": 38
+  },
+  "cells": [
+   "8.7OVERALL",
+   "8.7DESIGN",
+   "8.8CONDITION",
+   "8.7CLUBHOUSE",
+   "7.0FACILITIES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "post-hole_390": {
+  "scrollW": 390,
+  "dots": {
+   "x": 20,
+   "y": 586,
+   "w": 350,
+   "h": 6
+  },
+  "pill": {
+   "x": 20,
+   "y": 602,
+   "w": 292,
+   "h": 30
+  },
+  "mute": {
+   "x": 326,
+   "y": 598,
+   "w": 44,
+   "h": 44
+  },
+  "member": {
+   "x": 20,
+   "y": 652,
+   "w": 350,
+   "h": 32
+  },
+  "avatar": {
+   "x": 20,
+   "y": 651,
+   "w": 32,
+   "h": 34
+  },
+  "chip": null,
+  "stats": {
+   "x": 20,
+   "y": 696,
+   "w": 350,
+   "h": 38
+  },
+  "cells": [
+   "3rdHOLE",
+   "4PAR",
+   "412YARDS",
+   "4STROKE INDEX",
+   "+0.7FIELD LOSES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "post-untagged_390": {
+  "scrollW": 390,
+  "dots": {
+   "x": 20,
+   "y": 586,
+   "w": 350,
+   "h": 6
+  },
+  "pill": {
+   "x": 20,
+   "y": 602,
+   "w": 292,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 20,
+   "y": 652,
+   "w": 350,
+   "h": 32
+  },
+  "avatar": {
+   "x": 20,
+   "y": 651,
+   "w": 32,
+   "h": 34
+  },
+  "chip": null,
+  "stats": {
+   "x": 20,
+   "y": 696,
+   "w": 350,
+   "h": 38
+  },
+  "cells": [
+   "70PAR",
+   "6,616YARDS",
+   "8.6MEMBERS"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "gallery-hole_390": {
+  "scrollW": 390,
+  "dots": null,
+  "pill": {
+   "x": 20,
+   "y": 638,
+   "w": 292,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 20,
+   "y": 688,
+   "w": 350,
+   "h": 32
+  },
+  "avatar": {
+   "x": 20,
+   "y": 687,
+   "w": 32,
+   "h": 34
+  },
+  "chip": null,
+  "stats": {
+   "x": 20,
+   "y": 732,
+   "w": 350,
+   "h": 38
+  },
+  "cells": [
+   "18thHOLE",
+   "4PAR",
+   "395YARDS",
+   "12STROKE INDEX",
+   "+0.4FIELD LOSES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "gallery-clubhouse_390": {
+  "scrollW": 390,
+  "dots": null,
+  "pill": {
+   "x": 20,
+   "y": 688,
+   "w": 292,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 20,
+   "y": 738,
+   "w": 350,
+   "h": 32
+  },
+  "avatar": {
+   "x": 20,
+   "y": 737,
+   "w": 32,
+   "h": 34
+  },
+  "chip": null,
+  "stats": null,
+  "cells": [],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "swipe_390": [
+  {
+   "[data-fullscreen-dots]": 586,
+   "[data-fullscreen-pill-row]": 602,
+   "[data-fullscreen-member]": 652,
+   "[data-fullscreen-stats]": 696
+  },
+  {
+   "[data-fullscreen-dots]": 586,
+   "[data-fullscreen-pill-row]": 602,
+   "[data-fullscreen-member]": 652,
+   "[data-fullscreen-stats]": 696
+  },
+  {
+   "[data-fullscreen-dots]": 586,
+   "[data-fullscreen-pill-row]": 602,
+   "[data-fullscreen-member]": 652,
+   "[data-fullscreen-stats]": 696
+  }
+ ],
+ "review-hole_320": {
+  "scrollW": 320,
+  "dots": {
+   "x": 16,
+   "y": 590,
+   "w": 288,
+   "h": 6
+  },
+  "pill": {
+   "x": 16,
+   "y": 606,
+   "w": 234,
+   "h": 30
+  },
+  "mute": {
+   "x": 260,
+   "y": 602,
+   "w": 44,
+   "h": 44
+  },
+  "member": {
+   "x": 16,
+   "y": 656,
+   "w": 288,
+   "h": 32
+  },
+  "avatar": {
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0
+  },
+  "chip": {
+   "x": 216,
+   "y": 658,
+   "w": 88,
+   "h": 28
+  },
+  "stats": {
+   "x": 16,
+   "y": 700,
+   "w": 288,
+   "h": 34
+  },
+  "cells": [
+   "3rdHOLE",
+   "4PAR",
+   "412YARDS",
+   "4STROKE INDEX",
+   "+0.7FIELD LOSES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "review-untagged_320": {
+  "scrollW": 320,
+  "dots": {
+   "x": 16,
+   "y": 590,
+   "w": 288,
+   "h": 6
+  },
+  "pill": {
+   "x": 16,
+   "y": 606,
+   "w": 238,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 16,
+   "y": 656,
+   "w": 288,
+   "h": 32
+  },
+  "avatar": {
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0
+  },
+  "chip": {
+   "x": 216,
+   "y": 658,
+   "w": 88,
+   "h": 28
+  },
+  "stats": {
+   "x": 16,
+   "y": 700,
+   "w": 288,
+   "h": 34
+  },
+  "cells": [
+   "8.7OVERALL",
+   "8.7DESIGN",
+   "8.8CONDITION",
+   "8.7CLUBHOUSE",
+   "7.0FACILITIES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "post-hole_320": {
+  "scrollW": 320,
+  "dots": {
+   "x": 16,
+   "y": 590,
+   "w": 288,
+   "h": 6
+  },
+  "pill": {
+   "x": 16,
+   "y": 606,
+   "w": 234,
+   "h": 30
+  },
+  "mute": {
+   "x": 260,
+   "y": 602,
+   "w": 44,
+   "h": 44
+  },
+  "member": {
+   "x": 16,
+   "y": 656,
+   "w": 288,
+   "h": 32
+  },
+  "avatar": {
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0
+  },
+  "chip": null,
+  "stats": {
+   "x": 16,
+   "y": 700,
+   "w": 288,
+   "h": 34
+  },
+  "cells": [
+   "3rdHOLE",
+   "4PAR",
+   "412YARDS",
+   "4STROKE INDEX",
+   "+0.7FIELD LOSES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "post-untagged_320": {
+  "scrollW": 320,
+  "dots": {
+   "x": 16,
+   "y": 590,
+   "w": 288,
+   "h": 6
+  },
+  "pill": {
+   "x": 16,
+   "y": 606,
+   "w": 238,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 16,
+   "y": 656,
+   "w": 288,
+   "h": 32
+  },
+  "avatar": {
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0
+  },
+  "chip": null,
+  "stats": {
+   "x": 16,
+   "y": 700,
+   "w": 288,
+   "h": 34
+  },
+  "cells": [
+   "70PAR",
+   "6,616YARDS",
+   "8.6MEMBERS"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "gallery-hole_320": {
+  "scrollW": 320,
+  "dots": null,
+  "pill": {
+   "x": 16,
+   "y": 642,
+   "w": 238,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 16,
+   "y": 692,
+   "w": 288,
+   "h": 32
+  },
+  "avatar": {
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0
+  },
+  "chip": null,
+  "stats": {
+   "x": 16,
+   "y": 736,
+   "w": 288,
+   "h": 34
+  },
+  "cells": [
+   "18thHOLE",
+   "4PAR",
+   "395YARDS",
+   "12STROKE INDEX",
+   "+0.4FIELD LOSES"
+  ],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "gallery-clubhouse_320": {
+  "scrollW": 320,
+  "dots": null,
+  "pill": {
+   "x": 16,
+   "y": 688,
+   "w": 238,
+   "h": 30
+  },
+  "mute": null,
+  "member": {
+   "x": 16,
+   "y": 738,
+   "w": 288,
+   "h": 32
+  },
+  "avatar": {
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0
+  },
+  "chip": null,
+  "stats": null,
+  "cells": [],
+  "overflowing": 0,
+  "weights": [
+   "400",
+   "700",
+   "600"
+  ],
+  "errors": []
+ },
+ "swipe_320": [
+  {
+   "[data-fullscreen-dots]": 590,
+   "[data-fullscreen-pill-row]": 606,
+   "[data-fullscreen-member]": 656,
+   "[data-fullscreen-stats]": 700
+  },
+  {
+   "[data-fullscreen-dots]": 590,
+   "[data-fullscreen-pill-row]": 606,
+   "[data-fullscreen-member]": 656,
+   "[data-fullscreen-stats]": 700
+  },
+  {
+   "[data-fullscreen-dots]": 590,
+   "[data-fullscreen-pill-row]": 606,
+   "[data-fullscreen-member]": 656,
+   "[data-fullscreen-stats]": 700
+  }
+ ]
+}

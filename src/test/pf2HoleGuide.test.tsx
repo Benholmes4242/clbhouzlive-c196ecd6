@@ -137,6 +137,7 @@ describe('PF2 View post line in the canonical viewer', () => {
     useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null });
     const { container } = render(chrome(shotItem('post-1', 'video')));
     expect(container.querySelector('[data-fullscreen-stack] [data-fullscreen-view-post]')).toBeNull();
-    expect(container.querySelector('[data-fullscreen-video-row]')).not.toBeNull();
+    expect(container.querySelector('[data-fullscreen-video-row]')).toBeNull();
+    expect(container.querySelector('[data-fullscreen-pill-row] [data-fullscreen-mute]')).not.toBeNull();
   });
 });

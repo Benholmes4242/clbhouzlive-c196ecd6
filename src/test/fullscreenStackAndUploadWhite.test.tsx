@@ -37,21 +37,21 @@ function chrome(item: FeedPost, count: number) {
 }
 
 describe('fullscreen stack and white review upload progress', () => {
-  it('(a) a zero-like review has no reserve and Full review is the last stack child', () => {
+  it('(a) a zero-like review has no liked-by row and the stat row is the last stack child', () => {
     const view = chrome({ ...post, isReview: true, review: { reviewId: 'review-1', rating: 8, courseId: 'course-1', courseName: 'Course', courseImageUrl: null } }, 0);
     expect(view.container.querySelector('[data-liked-by-reserve]')).toBeNull();
     expect(view.container.querySelector('[data-liked-by-row]')).toBeNull();
-    const stack = view.container.querySelector('[data-fullscreen-stack]');
-    const fullReview = view.container.querySelector('[data-full-review]');
-    expect(fullReview).not.toBeNull();
-    expect(stack?.lastElementChild).toBe(fullReview);
+    expect(view.container.querySelector('[data-full-review]')).toBeNull();
+    const stack = view.container.querySelector('[data-fullscreen-bottom-stack]');
+    expect(stack?.lastElementChild).toBe(view.container.querySelector('[data-fullscreen-stats]'));
   });
-  it('(b) a post with three likes keeps the real LikedByRow while avatars load', () => {
+  it('(b) a post with three likes has no liked-by line; the count stays on the like button', () => {
     const view = chrome(post, 3);
-    expect(view.container.querySelector('[data-liked-by-row]')).not.toBeNull();
+    expect(view.container.querySelector('[data-liked-by-row]')).toBeNull();
     const source = readFileSync('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx', 'utf8');
-    expect(source).toContain('reserve={likeState.count > 0}');
+    expect(source).not.toContain('<LikedByRow');
   });
+
   it('(c) the white fill token owns both upload progress fills and retires amber', () => {
     const css = readFileSync('src/index.css', 'utf8');
     expect(css).toMatch(/--review-upload-fill:\s*#F8FAFC;/);

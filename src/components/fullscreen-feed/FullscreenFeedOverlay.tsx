@@ -74,6 +74,10 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useManageableBusinessIds, useTeamBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
+import { useCourseHoleFacts } from '@/hooks/feed/useCourseHoleFacts';
+import { useCourseTeeSets } from '@/features/courses/hooks/useCourseTeeSets';
+import { usePostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import { ratingRankable } from '@/features/explore-magazine/courseRatingFloor';
 
 
 import { isPerfEnabled } from '@/perf/navTiming';
@@ -601,7 +605,17 @@ export function FullscreenFeedOverlay() {
   const golfContextMap = usePostGolfContext(golfPostIds);
   // Played with: ONE batched read for the viewer's own posts (never per slide);
   // synthetic and course-gallery opens carry no post_with rows.
-  const golfTagPosts = useMemo(() => (isOpen && !syntheticPosts && !courseGallery ? posts : []), [isOpen, posts, syntheticPosts, courseGallery]);
+  // Course gallery: the shots' real source posts join the same one batch (FULL-SCREEN VIEWER §6).
+  const galleryDataForTags = useFullscreenFeedStore((s) => s.galleryData);
+  const golfTagPosts = useMemo(() => {
+    if (!isOpen) return [];
+    if (courseGallery) {
+      const seen = new Set<string>(); const out: FeedPost[] = [];
+      for (const shot of galleryDataForTags?.shots ?? []) { if (shot.post.id.startsWith('shots:') || seen.has(shot.post.id)) continue; seen.add(shot.post.id); out.push(shot.post); }
+      return out;
+    }
+    return syntheticPosts ? [] : posts;
+  }, [isOpen, posts, syntheticPosts, courseGallery, galleryDataForTags]);
   const viewerGolfTags = usePostGolfTags(golfTagPosts, 'fullscreen');
   const videoDetailsMap = usePostVideoDetails(useMemo(() => isOpen && !syntheticPosts && !courseGallery ? singleVideoPostIds(posts) : [], [isOpen, posts, syntheticPosts, courseGallery]));
   const golfHoleMap = usePostGolfHoleMeta(
@@ -613,6 +627,28 @@ export function FullscreenFeedOverlay() {
     }, [golfContextMap]),
   );
   const activeGolfContext = activePost ? golfContextMap?.get(activePost.id) ?? null : null;
+  // FULL-SCREEN VIEWER §5/§6: the stat row's reads, once per active course
+  // (shared hole-analysis cache, tee sets and the floor-gated members' rating).
+  const statPagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
+  const statCourseId: string | null = courseGallery
+    ? courseGallery.courseId ?? null
+    : syntheticPosts ? activePost?.mediaItems?.[statPagerIdx ?? 0]?.memberShot?.courseId ?? activePost?.mediaItems?.[0]?.memberShot?.courseId ?? null
+    : activePost?.review?.courseId ?? golfCourse?.id ?? activePost?.courseId ?? null;
+  const viewerHoleFacts = useCourseHoleFacts(statCourseId, isOpen && !!statCourseId);
+  const statNeedsCourse = isOpen && !courseGallery && !syntheticPosts && !!statCourseId && !activePost?.isReview;
+  const statTeeSets = useCourseTeeSets(statNeedsCourse ? statCourseId ?? undefined : undefined);
+  const statCourseCtx = usePostCourseContext(statNeedsCourse && statCourseId ? [statCourseId] : [], 'fullscreen-viewer');
+  const viewerCourseFigures = useMemo(() => {
+    if (!statCourseId) return null;
+    const sets = statTeeSets.data ?? [];
+    const tee = sets.reduce<(typeof sets)[number] | null>((best, s) => (!best || s.rounds_sampled > best.rounds_sampled ? s : best), null);
+    const ctx = statCourseCtx.get(statCourseId);
+    return { par: tee?.par_total ?? null, yards: tee?.total_yards ?? null, members: ctx && ratingRankable(ctx.community_rating, ctx.rating_count) ? ctx.community_rating : null };
+  }, [statCourseId, statTeeSets.data, statCourseCtx]);
+  const openTaggedFromViewer = useCallback((id: string, kind?: 'user' | 'business') => {
+    handleClose({ reason: 'navigating' });
+    requestAnimationFrame(() => navigate(getActorRouteByType(kind === 'business' ? 'business' : 'personal', id)));
+  }, [handleClose, navigate]);
   const videoRoundShapes = useRoundHoleShapes(useMemo(() => isOpen && !syntheticPosts && !courseGallery ? [...(golfContextMap?.values() ?? [])].map(c => c.roundScoreId) : [], [isOpen, syntheticPosts, courseGallery, golfContextMap]));
   const videoScorecard = useScorecardOpener();
   const activeGolfHole = golfHoleFor(activeGolfContext, golfHoleMap);
@@ -1086,7 +1122,7 @@ export function FullscreenFeedOverlay() {
                     readOnly={storeReadOnly}
                   />
 
-                  {courseGallery ? <CourseGalleryChrome onClose={handleClose} engagement={activePost && activeActionPost ? { likeState: getViewerLikeState(activePost), commentCount: getViewerCommentCount(activePost), onLike: () => handleViewerLike(activePost), onComment: safeOpenComments, onShare: () => handleViewerShare(activePost) } : undefined} /> : <ImmersiveFullscreenChrome
+                  {courseGallery ? <CourseGalleryChrome onClose={handleClose} tags={viewerGolfTags} onOpenReview={(post) => { const payload = buildReviewSheetPayload(post, null); if (payload) openReviewSheet(payload); }} onOpenTagged={openTaggedFromViewer} holeWalk={viewerHoleFacts.walk} engagement={activePost && activeActionPost ? { likeState: getViewerLikeState(activePost), commentCount: getViewerCommentCount(activePost), onLike: () => handleViewerLike(activePost), onComment: safeOpenComments, onShare: () => handleViewerShare(activePost) } : undefined} /> : <ImmersiveFullscreenChrome
                     posts={posts}
                     activeIndex={activeIndex}
                     onClose={handleClose}
@@ -1115,6 +1151,10 @@ export function FullscreenFeedOverlay() {
                     videoRoundShape={videoRoundShapes?.get(activeGolfContext?.roundScoreId ?? '') ?? null}
                     videoDetails={activePost ? videoDetailsMap.get(activePost.id) ?? null : null}
                     playedWith={activePost?.isReview && activePost.review?.reviewId ? viewerGolfTags.withByReview?.get(activePost.review.reviewId) : activePost ? viewerGolfTags.withByPost.get(activePost.id) : undefined}
+                    slideTags={viewerGolfTags.slideTags}
+                    holeWalk={viewerHoleFacts.walk}
+                    courseFigures={viewerCourseFigures}
+                    mentionEntities={viewerGolfTags.mentionEntities}
                     golfHole={activeGolfHole}
                     golfHoles={golfHoleMap.get(activeGolfContext?.courseId ?? '')}
                     onOpenScorecard={(scoreId) => { if (!activePost) return; if (videoDetailsMap.get(activePost.id)?.holeMarks && Object.keys(videoDetailsMap.get(activePost.id)?.holeMarks ?? {}).length >= 2) videoScorecard.openByScore(scoreId, null, activePost.userId); else setGolfScorecard({ scoreId, userId: activePost.userId }); }}

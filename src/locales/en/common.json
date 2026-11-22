@@ -746,7 +746,9 @@
       }
     },
     "hero": {
-      "word": { "travel": "Golf travel" },
+      "word": {
+        "travel": "Golf travel"
+      },
       "planTrip": "Plan a trip",
       "communityRating": "Community rating",
       "ratings": "{{count}} ratings",
@@ -2032,6 +2034,24 @@
       "postedMonths_one": "Posted {{count}} month ago",
       "postedMonths_other": "Posted {{count}} months ago",
       "postedOverYear": "Posted over a year ago"
+    }
+  },
+  "fullscreen": {
+    "best": "Best",
+    "review": "REVIEW",
+    "openReview": "Open the full review",
+    "stats": {
+      "hole": "HOLE",
+      "par": "PAR",
+      "yards": "YARDS",
+      "strokeIndex": "STROKE INDEX",
+      "field": "FIELD LOSES",
+      "overall": "OVERALL",
+      "design": "DESIGN",
+      "condition": "CONDITION",
+      "clubhouse": "CLUBHOUSE",
+      "facilities": "FACILITIES",
+      "members": "MEMBERS"
     }
   }
 }

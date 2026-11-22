@@ -174,10 +174,11 @@ describe('review Played with', () => {
     fireEvent.click(required(view.container, '[data-testid="played-with-name-faces"]')); await waitFor(() => expect(document.querySelector('[data-testid="played-with-sheet"]')).not.toBeNull());
     cleanup(); const next = card(post(false)); fireEvent.click(required(next.container, '[data-played-with-open]')); await waitFor(() => expect(document.querySelector('[data-testid="played-with-sheet"]')).not.toBeNull());
   });
-  it('(g) real review fullscreen chrome shows the chip under its author and opens the panel', () => {
+  it('(g) real review fullscreen chrome shows the chip in the pill row above its member line and opens the panel', () => {
     const view = render(providers(<ImmersiveFullscreenChrome posts={[post()]} activeIndex={0} onClose={vi.fn()} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()}
       getLikeState={() => ({ isLiked: false, count: 0 })} getCommentCount={() => 0} getFollowState={() => false} onFollow={vi.fn()} onViewProfile={vi.fn()} onReviewTap={vi.fn()} isOwnPost={false} playedWith={people} />));
-    expect(required(view.container, '[data-fullscreen-author]').nextElementSibling).toHaveAttribute('data-fullscreen-played-with');
+    expect(required(view.container, '[data-fullscreen-pill-row]').firstElementChild).toHaveAttribute('data-fullscreen-played-with');
+    expect(required(view.container, '[data-fullscreen-pill-row]').nextElementSibling).toHaveAttribute('data-fullscreen-member');
     fireEvent.click(required(view.container, '[data-testid="played-with-chip"]')); expect(view.container.querySelector('[data-testid="played-with-panel"]')).not.toBeNull();
   });
   it('(h) one host batch reads distinct review ids once alongside post tags and joins usernames', async () => {

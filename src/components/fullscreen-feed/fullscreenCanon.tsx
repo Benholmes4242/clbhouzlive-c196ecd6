@@ -52,7 +52,9 @@ export const FullscreenVideoRow: React.FC<{
   shownMuted: boolean;
   onMute: () => void;
   onDraggingChange: (dragging: boolean) => void;
-}> = ({ activePost, chapters, showMute, scrubbing, shownMuted, onMute, onDraggingChange }) => {
+  /** FULL-SCREEN VIEWER: the mute lives in the bottom stack's pill row; the scrubber spans the full gutter. */
+  muteInStack?: boolean;
+}> = ({ activePost, chapters, showMute, scrubbing, shownMuted, onMute, onDraggingChange, muteInStack = false }) => {
   const fade: React.CSSProperties = scrubbing
     ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
     : { opacity: 1, transition: 'opacity 150ms' };
@@ -61,12 +63,12 @@ export const FullscreenVideoRow: React.FC<{
       activePost={activePost}
       chapters={chapters}
       bottom={`calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
-      left={`calc(${GUTTER_L} + 40px)`}
+      left={muteInStack ? GUTTER_L : `calc(${GUTTER_L} + 40px)`}
       right={GUTTER_R}
       showTime
       onDraggingChange={onDraggingChange}
     />
-    {showMute && (
+    {showMute && !muteInStack && (
       <div
         {...(scrubbing ? ({ inert: '' } as Record<string, string>) : {})}
         data-fullscreen-video-row

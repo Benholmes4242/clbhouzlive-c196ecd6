@@ -152,7 +152,7 @@ describe('syntheticPosts gates for synthetic post ids (BRIEF_SYNTHETIC_SHOT_GATE
 
   it('synthetic fullscreen slides never mount the post_views tracker or post-keyed likers', () => {
     expect(src('src/components/feed/FeedSlide.tsx')).toContain('{!(isFullscreen && syntheticPosts) && <PostViewSentinel postId={post.id} />}');
-    expect(src('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx')).toContain('{!syntheticPosts && likeState.count > 0 && <div style={{ pointerEvents:');
+    expect(src('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx')).not.toContain('<LikedByRow');
   });
 
   it('the store sets syntheticPosts on open and resets it to false on close', () => {

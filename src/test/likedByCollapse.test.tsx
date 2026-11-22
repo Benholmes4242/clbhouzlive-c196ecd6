@@ -110,8 +110,8 @@ describe('the fixed-layout sheets keep the reserve at zero', () => {
   const read = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8');
   it.each([
     'components/fullscreen-feed/ImmersiveFullscreenChrome.tsx',
-  ])('%s still passes reserve to LikedByRow', (p) => {
-    expect(read(p)).toMatch(/<LikedByRow[\s\S]{0,900}?\breserve\b/);
+  ])('%s no longer renders a LikedByRow (FULL-SCREEN VIEWER removes the liked-by line)', (p) => {
+    expect(read(p)).not.toMatch(/<LikedByRow/);
   });
   it('CardScorecardSheet holds its one-row footer height and draws likers as a stack', () => {
     const src = read('features/courses/_shared/scorecard/CardScorecardSheet.tsx');

@@ -57,7 +57,8 @@ describe('course gallery controls', () => {
     const view = mount([{ id: 'v1', type: 'video' }], 'v1', [], true);
     const pills = [...(view.container.querySelector('[data-gallery-pills]') as HTMLElement).children];
     expect(pills[2]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
-    expect(view.container.querySelector('[data-fullscreen-video-row]')?.contains(screen.getByRole('button', { name: 'Unmute' }))).toBe(true);
+    expect(view.container.querySelector('[data-fullscreen-video-row]')).toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-pill-row]')?.contains(screen.getByRole('button', { name: 'Unmute' }))).toBe(true);
   });
   it('a photo shot renders Tag with no mute and no blank slot', () => {
     const view = mount([{ id: 'a' }], 'a', [], true);
@@ -78,24 +79,23 @@ describe('course gallery controls', () => {
     expect(useSessionAudio.getState().isMuted).toBe(false);
     view.unmount();
   });
-  it('the credit avatar is the 38px squircle with the hairline ring', () => {
+  it('the member-line avatar is the 32px squircle with the hairline ring', () => {
     const view = mount([{ id: 'a' }], 'a');
-    const credit = view.container.querySelector('.course-gallery-credit') as HTMLElement;
+    const credit = view.container.querySelector('[data-fullscreen-member]') as HTMLElement;
     expect(credit.querySelector('.course-gallery-avatar')).toBeNull();
     const squircle = credit.querySelector('[style*="border-radius: 34%"]') as HTMLElement;
     expect(squircle).not.toBeNull();
-    expect(squircle.style.width).toBe('38px');
+    expect(squircle.style.width).toBe('32px');
     const ring = credit.querySelector('[style*="rgba(255,255,255,0.22)"]') as HTMLElement;
     expect(ring).not.toBeNull();
     expect(ring.style.border).toContain('1px');
   });
   it('the date line reads the post createdAt as a full date, not the later tag month', () => {
     const view = mount([{ id: 'a' }], 'a', [holeTag('a', 1, '2026-03-01T00:00:00Z')]);
-    const who = view.container.querySelector('.course-gallery-credit-who') as HTMLElement;
-    expect(who.querySelector('b')?.textContent).toBe('Benjamin Holmes');
-    expect(who.querySelector('small')?.textContent).toBe('14 Jan 2026');
+    const who = view.container.querySelector('[data-fullscreen-member]') as HTMLElement;
+    expect(who.querySelector('.fs-name')?.textContent).toBe('Benjamin Holmes');
+    expect(who.querySelector('.fs-time')?.textContent).toBe('· 14 Jan 2026');
     expect(who.textContent).not.toContain('Mar 2026');
-    expect(who.textContent).not.toContain('·');
   });
   it('postedDateLabel uses a day without a leading zero and rejects bad input', () => {
     expect(postedDateLabel('2026-01-04T23:30:00Z')).toBe('4 Jan 2026');

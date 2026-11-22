@@ -71,3 +71,6 @@
 .course-gallery-thumb-fallback { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:var(--media-v2-canvas); color:var(--media-v2-dim); }
 .course-gallery-media-gradient { position:absolute; inset:0; pointer-events:none; background:var(--course-gallery-media-gradient); z-index:2; }
 .course-gallery-slide img.media-v2-cover { transition:opacity 180ms; }
+/* FULL-SCREEN VIEWER: the shared stack's 20px gutter (16px below 340) includes this panel's 16px inset. */
+.course-gallery-info .fs-stack { padding: 0 4px; }
+@media (max-width: 339.98px) { .course-gallery-info .fs-stack { padding: 0; } }

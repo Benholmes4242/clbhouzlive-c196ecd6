@@ -162,7 +162,7 @@ export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, offset
 
 /** Full-screen viewer: a static chip in the bottom stack; the panel opens
  *  above it, aligned to the author block. Key it by post so paging closes it. */
-export function PlayedWithViewerChip({ people, onOpenProfile }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string) => void }) {
+export function PlayedWithViewerChip({ people, onOpenProfile, style }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void; style?: React.CSSProperties }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
@@ -178,10 +178,10 @@ export function PlayedWithViewerChip({ people, onOpenProfile }: { people: Readon
   }, [open]);
   if (!people.length) return null;
   return (
-    <div ref={wrap} data-fullscreen-played-with style={{ position: 'relative', alignSelf: 'flex-start', marginTop: 8, maxWidth: '100%', minWidth: 0, pointerEvents: 'auto' }}>
+    <div ref={wrap} data-fullscreen-played-with style={{ position: 'relative', alignSelf: 'flex-start', marginTop: 8, maxWidth: '100%', minWidth: 0, pointerEvents: 'auto', ...style }}>
       <PlayedWithChip people={people} expanded={open} onToggle={() => setOpen((v) => !v)} style={{ position: 'relative', left: 0, bottom: 'auto', display: 'inline-flex', maxWidth: '100%', zIndex: 'auto' }} />
       {open && (
-        <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id) => { setOpen(false); onOpenProfile(id); }}
+        <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id, kind) => { setOpen(false); onOpenProfile(id, kind); }}
           style={{ left: 0, bottom: 'calc(100% + 8px)', width: 'min(300px, calc(100vw - 24px))' }} />
       )}
     </div>

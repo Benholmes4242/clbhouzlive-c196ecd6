@@ -98,25 +98,23 @@ describe('FULLSCREEN_VIEWER_REDESIGN', () => {
     expect(active()).toBe(2);
   });
 
-  it('(e) the review score row sits inside the glass strip', () => {
+  it('(e) the review score tile is gone; the review scores print in the stat row', () => {
     const v = mount(review);
-    expect(v.container.querySelector('[data-review-score-strip] [data-review-score-row]')).not.toBeNull();
+    expect(v.container.querySelector('[data-review-score-strip]')).toBeNull();
+    expect([...v.container.querySelectorAll('[data-fullscreen-stats] [data-stat]')].map(c => c.getAttribute('data-stat'))).toEqual(['overall', 'design', 'condition', 'clubhouse', 'facilities']);
   });
 
-  it('(f) a review prints Full review on its own line, with or without text', () => {
+  it('(f) a review opens its full review from the REVIEW chip; no caption or Full review line', () => {
     const onReviewTap = vi.fn();
-    const v = mount(review, { onReviewTap });
-    const cta = v.container.querySelector('[data-full-review]') as HTMLElement;
-    expect(cta).not.toBeNull();
-    expect(cta.closest('[data-fullscreen-caption]')).toBeNull();
-    fireEvent.click(cta);
+    const v = mount({ ...review, caption: 'Lovely greens' } as FeedPost, { onReviewTap });
+    expect(v.container.querySelector('[data-fullscreen-caption]')).toBeNull();
+    expect(v.container.querySelector('[data-full-review]')).toBeNull();
+    const chip = v.container.querySelector('[data-fullscreen-review-chip]') as HTMLElement;
+    expect(chip.closest('[data-fullscreen-member]')).not.toBeNull();
+    fireEvent.click(chip);
     expect(onReviewTap).toHaveBeenCalledTimes(1);
-    cleanup();
-    const w = mount({ ...review, caption: 'Lovely greens' } as FeedPost);
-    expect(w.container.querySelector('[data-fullscreen-caption]')).not.toBeNull();
-    expect(w.container.querySelector('[data-fullscreen-caption] [data-full-review]')).toBeNull();
-    expect(w.container.querySelector('[data-full-review]')).not.toBeNull();
   });
+
 
   it('(g) the comment pill opens the composer when signed in, otherwise the comments', () => {
     actor.current = { id: 'me', type: 'personal', name: 'Me', avatarUrl: null };

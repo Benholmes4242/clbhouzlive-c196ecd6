@@ -23,16 +23,29 @@ import { PLACE_LABELS } from '@/components/course-media-tab/ShotTagChoices';
 import { placeAge } from '@/components/course-media-tab/CoursePlaceTiles';
 import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
 import { CourseGalleryTagger } from '@/components/course-media-tab/CourseGalleryTagger';
-import { holeFacts } from '@/lib/courseMedia/holeFacts';
+import { holeFacts, type HoleWalkData } from '@/lib/courseMedia/holeFacts';
+import { statCells } from '@/lib/fullscreen/statRow';
+import { FullscreenBottomStack } from './FullscreenBottomStack';
+import { mergeTagged } from '@/lib/mentions/taggedEntities';
+import type { PostGolfTags } from '@/hooks/feed/usePostGolfTags';
+import type { FeedPost } from '@/components/media-system/types/media';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from 'sonner';
 import './course-gallery.css';
 
 const PLACE_TITLES: Record<CoursePlace, string> = { clubhouse: 'The clubhouse', food_drink: 'Food and drink', practice: 'The practice ground', pro_shop: 'The pro shop', views: 'The views', golfers: 'The golfers', conditions: 'Course conditions', stay: 'Where to stay', other: 'Around the club' };
-export function CourseGalleryChrome({ onClose, engagement }: { onClose: () => void; engagement?: {
+export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, onOpenTagged, holeWalk }: { onClose: () => void; engagement?: {
   likeState: { isLiked: boolean; count: number }; commentCount: number;
   onLike: () => void; onComment: () => void; onShare: () => void;
-} }) {
+};
+  /** The overlay's one tags batch over the shots' source posts. */
+  tags?: PostGolfTags;
+  /** Opens a review source's full review (same target as the post viewer's chip). */
+  onOpenReview?: (post: FeedPost) => void;
+  onOpenTagged?: (id: string, kind?: 'user' | 'business') => void;
+  /** The course's hole walk from the shared useCourseHoleFacts (read by the overlay). */
+  holeWalk?: HoleWalkData | null;
+}) {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession(); const admin = useIsAdmin();
   const options = useFullscreenFeedStore(s => s.courseGallery);
@@ -82,12 +95,15 @@ export function CourseGalleryChrome({ onClose, engagement }: { onClose: () => vo
     } catch (error) { if (!(error instanceof DOMException && error.name === 'AbortError')) toast(t('media.gallery.shareError', { defaultValue: 'The link could not be shared.' })); }
   };
   // Hole facts rules are shared with the feed hole card (lib/courseMedia/holeFacts).
-  const facts = shot?.holeTag ? holeFacts(data, shot.holeTag.hole_no) : null;
-  const hole = facts?.par != null ? facts : null;
+  const facts = shot?.holeTag ? holeFacts(holeWalk ?? data, shot.holeTag.hole_no) : null;
   const place = COURSE_PLACES.find(place => place.id === shot?.placeTag?.place);
   const placeCount = place ? filteredGallery(data.shots, place.id).length : 0;
   const age = place ? placeAge(filteredGallery(data.shots, place.id)[0]?.addedAt ?? '') : null;
   const action = shot ? galleryAction(shot, user?.id, admin) : null;
+  const galleryTagged = shot && tags && !shot.post.id.startsWith('shots:') ? mergeTagged(
+    shot.post.actorType !== 'business' ? (shot.post.isReview && shot.post.review?.reviewId ? tags.withByReview?.get(shot.post.review.reviewId) : tags.withByPost.get(shot.post.id)) : null,
+    shot.post.isReview ? shot.post.review?.reviewText || shot.post.caption : shot.post.caption,
+    [shot.post.actorId, shot.post.userId], tags.mentionEntities) : [];
   const sourcePostId = shot?.item.memberShot?.sourcePostId ?? (!shot?.post.id.startsWith('shots:') ? shot?.post.id : null);
   const hasPostActions = !!sourcePostId && !!engagement;
   const run = galleryRun(data.shots, shot);
@@ -149,24 +165,24 @@ export function CourseGalleryChrome({ onClose, engagement }: { onClose: () => vo
     </> : shot && <>
       <div className="course-gallery-shade" data-fullscreen-shade aria-hidden />
       <div className="course-gallery-info" data-gallery-stack {...(scrubbing ? { inert: '' } : {})} style={{ bottom: isVideo ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`, opacity: scrubbing ? 0 : 1 }}>
-        {run.length > 1 && <div className="course-gallery-dots" data-gallery-progress aria-hidden>{run.map(row => <i key={row.id} data-current={row.id === shot.id} />)}</div>}
-        {shot.holeTag ? <div className="course-gallery-facts" data-gallery-facts="hole">
-          <div className="course-gallery-facts-main"><div className="course-gallery-kicker">{kickerHole(shot.holeTag.hole_no)}</div>
-            <h2>{hole ? hole.yards != null ? t('media.gallery.parYards', { par: hole.par, yards: hole.yards, defaultValue: `Par ${hole.par} · ${hole.yards} yards` }) : t('media.gallery.par', { par: hole.par, defaultValue: `Par ${hole.par}` }) : t('media.gallery.holeTitle', { ordinal: holeOrdinal(shot.holeTag.hole_no), defaultValue: `The ${holeOrdinal(shot.holeTag.hole_no)} hole` })}</h2></div>
-          {facts && (facts.strokeIndex != null || facts.field != null) && <div className="course-gallery-stats">
-            {facts.strokeIndex != null && <div><b>{facts.strokeIndex}</b><span>{t('media.gallery.strokeIndex', { defaultValue: 'Stroke index' })}</span></div>}
-            {facts.field != null && <div><b>{facts.field}</b><span>{t('media.gallery.fieldLoses', { defaultValue: 'Field loses' })}</span></div>}
-          </div>}
-        </div> : place ? <div className="course-gallery-facts" data-gallery-facts="place">
+        {place && !shot.holeTag ? <div className="course-gallery-facts" data-gallery-facts="place" style={{ margin: '0 0 12px' }}>
           <div className="course-gallery-facts-main"><div className="course-gallery-kicker"><place.icon size={12} strokeWidth={2.4} />{label(place.id)}</div>
             <h2>{t(`media.gallery.titles.${place.id}`, { defaultValue: PLACE_TITLES[place.id] })}</h2>
             <p>{t('media.gallery.membersShots', { count: placeCount, defaultValue: `${placeCount} ${shotWord(placeCount)} from members` })}{place.id === 'conditions' && age && <> · {t('media.gallery.latest', { age: t(`media.gallery.age.${age.key}`, { count: age.count, defaultValue: age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago` }), defaultValue: `Latest ${age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago`}` })}</>}</p></div>
         </div> : null}
-        <div className="course-gallery-credit">{shot.ownerId
-          ? <SquircleAvatar src={shot.avatar || null} alt={shot.name} userId={shot.ownerId} size={38} hairlineRing />
-          : <span className="course-gallery-avatar">{shot.avatar ? <img src={shot.avatar} alt="" /> : shot.name.split(/\s+/).map(word => word[0]).slice(0, 2).join('')}</span>}<span className="course-gallery-credit-who"><b>{shot.name}</b>{postedDateLabel(shot.post.createdAt) && <small>{postedDateLabel(shot.post.createdAt)}</small>}</span></div>
+        <FullscreenBottomStack
+          dotsKind="gallery"
+          dots={run.length > 1 ? { count: run.length, active: runIndex } : null}
+          people={galleryTagged}
+          peopleKey={shot.id}
+          onOpenTagged={onOpenTagged}
+          mute={isVideo ? { muted: shownMuted, onToggle: handleMuteTap } : null}
+          member={{ name: shot.name, avatarUrl: shot.avatar || null, userId: shot.ownerId || null, time: postedDateLabel(shot.post.createdAt) || null }}
+          onOpenReview={shot.post.isReview && onOpenReview ? () => onOpenReview(shot.post) : null}
+          cells={shot.holeTag ? statCells({ holeNo: shot.holeTag.hole_no, facts }) : null}
+        />
       </div>
-      <FullscreenVideoRow activePost={galleryFeedPost} showMute={isVideo} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />
+      <FullscreenVideoRow muteInStack activePost={galleryFeedPost} showMute={isVideo} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />
       {pills}
     </>}
     {tagShot && <CourseGalleryTagger courseId={options.courseId} shot={tagShot} holes={data.holes.map(hole => hole.hole_no)} onClose={() => setTagShot(null)} onSaved={(holeTag, placeTag) => {

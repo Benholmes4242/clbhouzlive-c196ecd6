@@ -1,0 +1,24 @@
+/* FULL-SCREEN VIEWER bottom stack (signed-off fullscreenViewer_390). */
+.fs-stack { box-sizing: border-box; padding: 0 20px; display: flex; flex-direction: column; min-width: 0; }
+.fs-stack-dots { display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 10px; height: 6px; }
+.fs-stack-dots > * { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.45); }
+.fs-stack-dots > [data-on] { background: #fff; }
+.fs-stack-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 36px; min-width: 0; }
+.fs-stack-member { margin-top: 14px; display: flex; align-items: center; gap: 10px; min-width: 0; height: 32px; }
+.fs-stack-member .fs-avatar { display: inline-flex; flex: none; pointer-events: auto; }
+.fs-stack-member .fs-name { font-size: 16px; font-weight: 700; color: #F8FAFC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; background: none; border: 0; padding: 0; font-family: inherit; cursor: pointer; pointer-events: auto; text-align: left; }
+.fs-stack-member .fs-time { font-size: 13px; font-weight: 400; color: rgba(248,250,252,.62); flex: none; white-space: nowrap; }
+.fs-review-chip { margin-left: auto; flex: none; height: 28px; border-radius: 9px; padding: 0 8px 0 12px; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: #F8FAFC; cursor: pointer; pointer-events: auto; box-sizing: border-box; }
+.fs-stats { margin-top: 12px; display: flex; justify-content: space-between; gap: 6px; height: 38px; min-width: 0; }
+.fs-stats > div { text-align: center; min-width: 0; }
+.fs-stats > div:first-child { text-align: left; }
+.fs-stats b { display: block; font-size: 20px; line-height: 24px; font-weight: 700; color: #F8FAFC; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fs-stats span { display: block; margin-top: 4px; font-size: 8.5px; line-height: 10px; font-weight: 700; letter-spacing: .1em; color: rgba(248,250,252,.62); text-transform: uppercase; white-space: nowrap; }
+@media (max-width: 339.98px) {
+  .fs-stack { padding: 0 16px; }
+  .fs-stack-member [data-fs-avatar] { display: none; }
+  .fs-stack-member .fs-name { font-size: 15px; }
+  .fs-stats { height: 34px; }
+  .fs-stats b { font-size: 17px; line-height: 20px; }
+  .fs-stats span { font-size: 7px; letter-spacing: .04em; }
+}

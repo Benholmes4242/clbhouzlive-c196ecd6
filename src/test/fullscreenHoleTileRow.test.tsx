@@ -43,27 +43,21 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 describe('fullscreen hole tile row', () => {
-  it('(a) places the hole tile last inside the shot author row', () => {
+  it('(a) a hole course photo shows the shared stat row, not the retired hole tile', () => {
     const { container } = mount('The first', 'Par 4 · 269 yards');
-    const author = container.querySelector('[data-fullscreen-shot-author]');
-    const tile = container.querySelector('[data-fullscreen-hole-strip]');
-    expect(tile).not.toBeNull();
-    expect(tile?.parentElement).toBe(author);
-    expect(author?.lastElementChild).toBe(tile);
-    expect(author?.querySelector('.fullscreen-shot-name-hole')).not.toBeNull();
-  });
-  it('(b) keeps only the kicker when no detail is present', () => {
-    const { container } = mount('The fourteenth');
-    const tile = container.querySelector('[data-fullscreen-hole-strip]');
-    expect(tile?.children).toHaveLength(1);
-    expect(tile?.firstElementChild).toHaveClass('fullscreen-hole-tile-kicker');
-    expect(tile?.querySelector('.fullscreen-hole-tile-detail')).toBeNull();
-  });
-  it('(c) omits the tile and retains the single-line name for a place shot', () => {
-    const { container } = mount('Clubhouse');
     expect(container.querySelector('[data-fullscreen-hole-strip]')).toBeNull();
-    expect(container.querySelector('[data-fullscreen-shot-author] .fullscreen-shot-name-single')).not.toBeNull();
-    expect(container.querySelector('.fullscreen-shot-name-hole')).toBeNull();
+    expect(container.querySelector('[data-fullscreen-stats] [data-stat="hole"] b')?.textContent).toBe('1st');
+    expect(container.querySelector('[data-fullscreen-member] .fs-name')?.textContent).toBe('Thomas Holmes');
+  });
+  it('(b) without hole analysis only the hole cell prints', () => {
+    const { container } = mount('The fourteenth');
+    expect([...container.querySelectorAll('[data-fullscreen-stats] [data-stat]')].map(c => c.getAttribute('data-stat'))).toEqual(['hole']);
+    expect(container.querySelector('[data-fullscreen-stats] b')?.textContent).toBe('14th');
+  });
+  it('(c) a place course photo has no stat row and keeps the member line', () => {
+    const { container } = mount('Clubhouse');
+    expect(container.querySelector('[data-fullscreen-stats]')).toBeNull();
+    expect(container.querySelector('[data-fullscreen-member] .fs-name')?.textContent).toBe('Thomas Holmes');
   });
   it('(d) declares the narrow-phone padding and detail size in CSS', () => {
     const css = readFileSync('src/components/fullscreen-feed/fullscreen-hole-tile.css', 'utf8');

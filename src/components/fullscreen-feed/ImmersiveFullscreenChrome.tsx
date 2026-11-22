@@ -35,12 +35,18 @@
  * focused field inside this fixed full-screen overlay raises the keyboard over
  * a fixed layer on iOS/WKWebView and would be a second composer.
  */
-import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import './fullscreen-hole-tile.css';
 import React, { memo, useCallback, useEffect, useState } from 'react';
-import { ChevronRight, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
+import { MessageCircle, Share, MoreHorizontal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { FullscreenBottomStack } from './FullscreenBottomStack';
+import { statCells, postHasStatRow, kickerHoleNo, type CourseFigures } from '@/lib/fullscreen/statRow';
+import { holeFacts, type HoleWalkData } from '@/lib/courseMedia/holeFacts';
+import { mergeTagged, type MentionEntityMap } from '@/lib/mentions/taggedEntities';
+import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
+import { mediaHoleNo } from '@/hooks/feed/usePostGolfContext';
+import type { SlideTag } from '@/features/post-v2/lib/golfPostRules';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
-import { LikedByRow } from '@/components/likes/LikedByRow';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -53,8 +59,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 
-import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
-import { PlayedWithViewerChip, type PlayedWithPerson } from '@/components/feed/PostGolfTags';
+import { type PlayedWithPerson } from '@/components/feed/PostGolfTags';
 import { getActorRouteByType } from '@/types/actor';
 import { Z } from '@/config/zIndex';
 import { formatHcp } from '@/lib/formatHcp';
@@ -91,75 +96,6 @@ function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
   return formatCountKilo(n);
 }
-
-/**
- * FullscreenCaption — two-line clamp. A non-review caption expands in place on
- * tap (no printed "Read more"); a review never expands here and prints
- * "Full review ›" on its own line instead. Collapses when the post changes.
- */
-const CAPTION_FONT_SIZE = 15;
-const CAPTION_LINE_HEIGHT = 1.45;
-
-const CaptionBlock: React.FC<{
-  caption: string;
-  resetKey: number;
-  onMentionTap: (m: { entityType: 'user' | 'business'; entityId: string; display: string }) => void;
-  variant: 'caption' | 'review';
-  onFullReview?: () => void;
-}> = ({ caption, resetKey, onMentionTap, variant, onFullReview }) => {
-  const [expanded, setExpanded] = useState(false);
-  const isReview = variant === 'review';
-  const isExpanded = !isReview && expanded;
-  const isEmpty = !caption.trim();
-  useEffect(() => { setExpanded(false); }, [resetKey]);
-  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
-
-  return (
-    <>
-      {!isEmpty && (
-        <div
-          data-fullscreen-caption
-          data-expanded={isExpanded ? '' : undefined}
-          aria-expanded={isReview ? undefined : isExpanded}
-          role={isReview ? undefined : 'button'}
-          onClick={(e) => { e.stopPropagation(); if (!isReview) setExpanded((v) => !v); }}
-          onPointerDown={stop}
-          onTouchStart={stop}
-          onTouchMove={stop}
-          style={{
-            marginTop: 12, minWidth: 0, pointerEvents: 'auto', cursor: isReview ? 'default' : 'pointer',
-            fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT, color: BODY,
-            whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-            ...(isExpanded
-              ? { overflow: 'auto', maxHeight: '40vh', overscrollBehavior: 'contain' }
-              : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }),
-          }}
-        >
-          <MentionText text={caption} onMentionTap={onMentionTap} style={{ pointerEvents: 'auto' }} />
-        </div>
-      )}
-      {isReview && (
-        <button
-          type="button"
-          data-full-review
-          onClick={(e) => { e.stopPropagation(); onFullReview?.(); }}
-          style={{
-            marginTop: 10, minHeight: 28, alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 3,
-            background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-            fontFamily: 'inherit', fontSize: 14, fontWeight: 600, color: '#FFFFFF',
-          }}
-        >
-          Full review
-          <ChevronRight size={13} strokeWidth={2.6} aria-hidden />
-        </button>
-      )}
-    </>
-  );
-};
-
-
-
-
 
 interface Props {
   videoDetails?: PostVideoDetails | null;
@@ -200,6 +136,14 @@ interface Props {
   onOpenScorecard?: (scoreId: string) => void;
   /** The active post's post_with people (batched once by the overlay). */
   playedWith?: ReadonlyArray<PlayedWithPerson>;
+  /** Per-slide hole/place tags keyed by holeMediaKey (the overlay's one batch). */
+  slideTags?: ReadonlyMap<string, SlideTag>;
+  /** The batch's @mention entities, merged into the tagged pill. */
+  mentionEntities?: MentionEntityMap | null;
+  /** The active course's hole walk from the shared useCourseHoleFacts (read by the overlay). */
+  holeWalk?: HoleWalkData | null;
+  /** The active course's par, yards and floor-gated members' rating (read by the overlay). */
+  courseFigures?: CourseFigures | null;
 }
 
 export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome({
@@ -232,7 +176,12 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   videoDetails,
   videoRoundShape,
   playedWith,
+  slideTags,
+  mentionEntities,
+  holeWalk = null,
+  courseFigures = null,
 }: Props) {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -312,6 +261,16 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const personal = useCoursePersonalStatus(hooksLive ? resolvedCourseId ?? undefined : undefined);
   const recordStats = useCourseStatsDetail(resolvedCourseId, hooksLive);
 
+  // FULL-SCREEN VIEWER §5: one stat-row decision per post (no jumping between slides).
+  const slideHoleNo = (item: FeedPost['mediaItems'][number] | undefined, index: number): number | null => {
+    if (!item) return null;
+    if (syntheticPosts) return kickerHoleNo(item.memberShot?.kicker);
+    if (golfContext) { const n = mediaHoleNo(golfContext, item, index); if (n != null) return n; }
+    return slideTags?.get(holeMediaKey(item))?.hole ?? null;
+  };
+  const postItems = hookPost?.mediaItems ?? [];
+  const anyHoleTag = postItems.some((item, i) => slideHoleNo(item, i) != null);
+
   if (feedEnded) {
     return (
       <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
@@ -386,7 +345,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     if (navigator.share) void navigator.share({ title: courseName ?? undefined, url }).catch(() => {});
     else void navigator.clipboard.writeText(url);
   };
-  const stackBottom = showVideoRow ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`;
+  // Constant per post: a post with any video reserves the scrubber on every slide.
+  const postHasVideo = (activePost.mediaItems ?? []).some(m => m.type === 'video');
+  const stackBottom = postHasVideo ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`;
   const handleCommentPill = () => { if (activeActor && onCompose) onCompose(); else onComment(); };
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
     ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
@@ -424,6 +385,23 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   if (timeLabel) authorMeta.push(<span key="t" style={{ flexShrink: 0 }}>{timeLabel}</span>);
 
   const review = activePost.isReview ? activePost.review : null;
+
+  // Course photos: the row exists when any shot in the run is a hole shot; place shots keep the reserved height.
+  const hasStatRow = syntheticPosts ? anyHoleTag : postHasStatRow({ hasCourse: !!resolvedCourseId, anyHoleTag, isReview: !!review });
+  const activeHoleNo = slideHoleNo(activeMediaItem, activeSlide);
+  const teeHole = activeHoleNo != null ? golfHoles?.find(h => h.hole_no === activeHoleNo) ?? (golfHole?.hole_no === activeHoleNo ? golfHole : null) : null;
+  const statRowCells = !hasStatRow ? null : statCells({
+    holeNo: activeHoleNo,
+    facts: activeHoleNo != null ? holeFacts(holeWalk, activeHoleNo, teeHole ? { par: teeHole.par, yards: teeHole.yards } : null) : null,
+    review: !syntheticPosts && review ? { overall: review.rating ?? null, design: review.breakdown?.design ?? null, condition: review.breakdown?.conditions ?? null, clubhouse: review.breakdown?.clubhouse ?? null, facilities: review.breakdown?.facilities ?? null } : null,
+    course: syntheticPosts ? null : courseFigures,
+  });
+  const tagged = shot || syntheticPosts ? [] : mergeTagged(
+    activePost.actorType !== 'business' ? playedWith : null,
+    activePost.isReview ? activePost.review?.reviewText || activePost.caption : activePost.caption,
+    [activePost.actorId, activePost.userId],
+    mentionEntities,
+  );
 
   const handleCourseTap = () => {
     const cid = shotCourse?.courseId ?? activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId;
@@ -525,7 +503,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                   <span>
                     {hasRounds && (<><span style={FIG}>{yourRounds}</span> {yourRounds === 1 ? 'round' : 'rounds'}</>)}
                     {hasRounds && hasBest && ' · '}
-                    {hasBest && (<>best <span style={FIG}>{yourBest}</span></>)}
+                    {hasBest && (<>{t('fullscreen.best', { defaultValue: 'Best' })} <span style={FIG}>{yourBest}</span></>)}
                   </span>
                 )}
               </div>
@@ -534,173 +512,46 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         )}
       </div>
 
-      {/* Bottom stack — one grammar for posts, reviews and course photos. */}
-      {<div
+      {/* Bottom stack (FULL-SCREEN VIEWER): dots · pill/mute · member line · stat row.
+          Caption, Full review link, liked-by line, score strip and hole tile are gone. */}
+      <div
         {...inertWhileScrubbing}
         data-fullscreen-stack
         style={{
-          position: 'fixed',
-          bottom: stackBottom,
-          left: GUTTER_L,
-          right: GUTTER_R,
-          zIndex: Z.echo,
-          pointerEvents: 'none',
-          ...fadeWhileScrubbing,
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: 0,
+          position: 'fixed', bottom: stackBottom, left: 0, right: 0,
+          zIndex: Z.echo, pointerEvents: 'none', ...fadeWhileScrubbing,
+          paddingLeft: 'env(safe-area-inset-left, 0px)', paddingRight: 'env(safe-area-inset-right, 0px)',
         }}
       >
-        {mediaCount >= 2 && (
-          <div data-fullscreen-dots aria-hidden style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 14 }}>
-            {Array.from({ length: mediaCount }, (_, i) => (
-              <span key={i} data-dot-active={i === activeSlide ? '' : undefined} style={{ width: 6, height: 6, borderRadius: '50%', background: i === activeSlide ? '#FFFFFF' : 'rgba(255,255,255,0.38)' }} />
-            ))}
+        {detailedVideo && !syntheticPosts && (
+          <div style={{ padding: '0 20px 12px', pointerEvents: 'auto' }}>
+            <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} chapterLabel={videoRound && chapter ? roundChapterLabel(chapter, videoRound.shape) : undefined} onOpen={() => setVideoAboutOpen(true)} />
           </div>
         )}
-
-        {shot ? (
-          <div data-fullscreen-author data-fullscreen-shot-author className="fullscreen-shot-author">
-            <SquircleAvatar key={activeMediaItem?.id} size={38} src={shot.avatarUrl} alt={shot.memberName} hairlineRing />
-            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-              <span className={shotHasHole ? 'fullscreen-shot-name-hole' : 'fullscreen-shot-name-single'} style={{ fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2, minWidth: 0 }}>
-                <InlineProMemberName userId={shot.memberUserId} flow={shotHasHole ? 'text' : undefined}>{shot.memberName}</InlineProMemberName>
-              </span>
-              {shotDate && (
-                <span data-fullscreen-shot-date style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: MUTE, lineHeight: 1.2, ...TABULAR }}>{shotDate}</span>
-              )}
+        <FullscreenBottomStack
+          dots={{ count: mediaCount, active: activeSlide }}
+          people={tagged}
+          peopleKey={activePost.id}
+          onOpenTagged={(id, kind) => {
+            if (onBeforeNavigate) onBeforeNavigate(); else onClose();
+            navigate(getActorRouteByType(kind === 'business' ? 'business' : 'personal', id));
+          }}
+          mute={activeMediaIsVideo ? { muted: shownMuted, onToggle: handleMuteTap } : null}
+          member={shot
+            ? { name: shot.memberName, nameNode: <InlineProMemberName userId={shot.memberUserId}>{shot.memberName}</InlineProMemberName>, avatarUrl: shot.avatarUrl, userId: shot.memberUserId ?? null, time: shotDate || null }
+            : { name: activePost.displayName, avatarUrl: activePost.avatarUrl ?? null, userId: activePost.actorId ?? activePost.userId, time: timeLabel || null, onOpen: onViewProfile,
+                mark: <ProOrVerifiedMark userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId} verified={activePost.isVerified} name={activePost.displayName} /> }}
+          onOpenReview={!shot && activePost.isReview ? onReviewTap : null}
+          extra={golfContext?.roundScoreId && onOpenScorecard ? (
+            <div style={{ marginTop: 10, pointerEvents: 'auto' }}>
+              <FullscreenRoundPill gross={golfContext.roundGross} toPar={golfRoundToPar(golfContext)} onOpen={() => onOpenScorecard(golfContext.roundScoreId as string)} />
             </div>
-            {shotHasHole && (
-              <div data-fullscreen-hole-strip className="fullscreen-hole-tile" style={FS_GLASS}>
-                <div className="fullscreen-hole-tile-kicker" style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE, lineHeight: 1.2 }}>{shot.kicker}</div>
-                {shot.detail && <div className="fullscreen-hole-tile-detail" style={{ color: '#FFFFFF' }}>{shot.detail}</div>}
-              </div>
-            )}
-          </div>
-        ) : !syntheticPosts && (
-        <div data-fullscreen-author style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
-            aria-label={`View ${activePost.displayName}'s profile`}
-            style={{
-              width: 38, height: 38, padding: 0, background: 'transparent',
-              border: 'none', cursor: 'pointer', pointerEvents: 'auto',
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}
-          >
-            <SquircleAvatar
-              size={38}
-              src={activePost.avatarUrl}
-              alt={activePost.displayName}
-              userId={activePost.actorId ?? activePost.userId}
-              hairlineRing
-            />
-          </button>
-          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-              <span
-                onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
-                style={{
-                  fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
-                }}
-              >
-                {activePost.displayName}
-              </span>
-              <ProOrVerifiedMark userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId} verified={activePost.isVerified} name={activePost.displayName} />
-            </div>
-            <div
-              style={{
-                marginTop: 2, display: 'flex', alignItems: 'center', gap: 6, minWidth: 0,
-                fontSize: 12, fontWeight: 500, color: MUTE, lineHeight: 1.2, ...TABULAR,
-              }}
-            >
-              {authorMeta.map((node, i) => (
-                <React.Fragment key={i}>
-                  {i > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
-                  {node}
-                </React.Fragment>
-              ))}
-              {!readOnly && !isOwnPost && (
-                <>
-                  {authorMeta.length > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
-                  <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
-                    <FeedFollowPill isFollowed={isFollowed} onFollow={() => onFollow(activePost, isFollowed)} />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-        )}
+          ) : null}
+          cells={statRowCells}
+        />
+      </div>
 
-        {!shot && !syntheticPosts && activePost.actorType !== 'business' && playedWith && playedWith.length > 0 && (
-          <PlayedWithViewerChip
-            key={activePost.id}
-            people={playedWith}
-            onOpenProfile={(userId) => {
-              if (onBeforeNavigate) onBeforeNavigate(); else onClose();
-              navigate(getActorRouteByType('personal', userId));
-            }}
-          />
-        )}
-
-        {golfContext?.roundScoreId && onOpenScorecard && (
-          <FullscreenRoundPill
-            gross={golfContext.roundGross}
-            toPar={golfRoundToPar(golfContext)}
-            onOpen={() => onOpenScorecard(golfContext.roundScoreId as string)}
-          />
-        )}
-
-        {review && (
-          <div data-review-score-strip style={{ ...FS_GLASS, marginTop: 12, borderRadius: 14, padding: '11px 14px 10px', minWidth: 0 }}>
-            <ReviewScoreRow
-              variant="card"
-              overall={review.rating ?? null}
-              breakdown={{
-                design: review.breakdown?.design ?? null,
-                condition: review.breakdown?.conditions ?? null,
-                clubhouse: review.breakdown?.clubhouse ?? null,
-                facilities: review.breakdown?.facilities ?? null,
-              }}
-            />
-          </div>
-        )}
-
-        {syntheticPosts ? null : detailedVideo ? <VideoTeaser title={videoDetails?.title ?? ''} description={activePost.caption ?? ''} hasMore={!!(videoChapters.length || activePost.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} chapter={chapter} chapterLabel={videoRound && chapter ? roundChapterLabel(chapter, videoRound.shape) : undefined} onOpen={() => setVideoAboutOpen(true)} /> : activePost.caption?.trim() || activePost.isReview ? (
-          <CaptionBlock
-            caption={activePost.caption ?? ''}
-            resetKey={activeIndex}
-            onMentionTap={handleMentionTap}
-            variant={activePost.isReview ? 'review' : 'caption'}
-            onFullReview={onReviewTap}
-          />
-        ) : null}
-
-        {/* Fullscreen only: no empty trailing wrapper at zero; positive counts retain the reserved row while avatars load. */}
-        {!syntheticPosts && likeState.count > 0 && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
-          <LikedByRow
-            postId={reviewTarget ?? activePost.id}
-            count={likeState.count}
-            source={reviewTarget ? 'review' : 'post'}
-            subject={reviewTarget && review ? { authorName: activePost.displayName || null, courseId: review.courseId ?? null, courseName: review.courseName ?? null, kind: 'review', gross: null, toPar: null, rating: review.rating ?? null } : undefined}
-            /* isRound is false by construction: rounds do not appear in this feed. */
-            kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
-            avatarRing="media"
-            reserve={likeState.count > 0}
-            lines={1}
-            fontSize={12.5}
-            fontWeight={500}
-            color={MUTE}
-            style={{ marginTop: 10 }}
-          />
-        </div>}
-      </div>}
-
-      <FullscreenVideoRow activePost={activePost} chapters={detailedVideo ? videoChapters : undefined} showMute={showVideoRow} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />
+      <FullscreenVideoRow muteInStack activePost={activePost} chapters={detailedVideo ? videoChapters : undefined} showMute={showVideoRow} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />
 
       {/* Pill row — in the old comment bar's slot. Buttons only; never a field. */}
       {showPills && (

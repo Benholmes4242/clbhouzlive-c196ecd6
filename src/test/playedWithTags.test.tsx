@@ -152,14 +152,15 @@ describe('(e) no-media posts', () => {
 });
 
 describe('(f) full-screen viewer', () => {
-  it('chip sits after the author row and before the caption; panel opens', () => {
-    const s = src('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx');
-    const author = s.indexOf('data-fullscreen-author style');
+  it('chip sits in the pill row before the member line; no caption; panel opens', () => {
+    const s = src('src/components/fullscreen-feed/FullscreenBottomStack.tsx');
+    const row = s.indexOf('data-fullscreen-pill-row');
     const chip = s.indexOf('<PlayedWithViewerChip');
-    const caption = s.indexOf('<CaptionBlock\n');
-    expect(author).toBeGreaterThan(-1);
-    expect(chip).toBeGreaterThan(author);
-    expect(caption).toBeGreaterThan(chip);
+    const member = s.indexOf('data-fullscreen-member');
+    expect(row).toBeGreaterThan(-1);
+    expect(chip).toBeGreaterThan(row);
+    expect(member).toBeGreaterThan(chip);
+    expect(src('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx')).not.toContain('<CaptionBlock');
     const v = render(<PlayedWithViewerChip people={PEOPLE} onOpenProfile={vi.fn()} />);
     const btn = q(v.container, '[data-testid="played-with-chip"]')!;
     expect(btn.style.position).toBe('relative');

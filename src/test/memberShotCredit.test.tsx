@@ -51,18 +51,17 @@ afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: n
 describe('member-shot caption in the real fullscreen chrome', () => {
   it('the canonical author row follows the active item and horizontal carousel position', () => {
     const view = mount(true);
-    const author = () => view.container.querySelector('[data-fullscreen-shot-author]');
+    const author = () => view.container.querySelector('[data-fullscreen-member]');
     expect(author()?.querySelector('.pro-inline-text')).toHaveTextContent('Thomas Holmes');
-    expect(author()?.querySelector('[data-fullscreen-shot-date]')).toHaveTextContent('Mar 2026');
+    expect(author()?.querySelector('.fs-time')).toHaveTextContent('Mar 2026');
     expect(screen.queryByText("Through members' eyes")).toBeNull();
     expect(screen.getByAltText('Thomas Holmes')).toHaveAttribute('src', expect.stringContaining('thomas.jpg'));
     expect(view.container.querySelector('[data-fullscreen-hole-strip]')).toBeNull();
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
     expect(author()?.querySelector('.pro-inline-text')).toHaveTextContent('Benjamin Holmes');
-    expect(author()?.querySelector('[data-fullscreen-shot-date]')).toHaveTextContent('Jun 2026');
-    const strip = view.container.querySelector('[data-fullscreen-hole-strip]');
-    expect(strip).toHaveTextContent('The fifteenth');
-    expect(strip).toHaveTextContent('Par 4 · 412 yards');
+    expect(author()?.querySelector('.fs-time')).toHaveTextContent('Jun 2026');
+    expect(view.container.querySelector('[data-fullscreen-hole-strip]')).toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-stats] [data-stat="hole"] b')).toHaveTextContent('15th');
     expect(screen.getByAltText('Benjamin Holmes')).toHaveAttribute('src', expect.stringContaining('ben.jpg'));
     expect(screen.queryByAltText('Thomas Holmes')).toBeNull();
   });
@@ -83,8 +82,8 @@ describe('member-shot caption in the real fullscreen chrome', () => {
     const view = mount(true);
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(2));
     expect(view.container.querySelector('[data-avatar-fallback]')).toHaveTextContent('E');
-    expect(view.container.querySelector('[data-fullscreen-shot-author] .pro-inline-text')).toHaveTextContent('Ed');
-    expect(view.container.querySelector('[data-fullscreen-shot-date]')).toHaveTextContent('Jul 2026');
+    expect(view.container.querySelector('[data-fullscreen-member] .pro-inline-text')).toHaveTextContent('Ed');
+    expect(view.container.querySelector('[data-fullscreen-member] .fs-time')).toHaveTextContent('Jul 2026');
   });
 
   it('real-post opens retain their footer, author row and relative time without the synthetic caption', () => {
@@ -97,9 +96,9 @@ describe('member-shot caption in the real fullscreen chrome', () => {
     expect(view.container.querySelector('[data-member-shot-credit]')).toBeNull();
   });
 
-  it('synthetic scrubber uses the canonical inset video row with time', () => {
+  it('synthetic scrubber uses the canonical video row with time, full gutter (mute moved to the pill row)', () => {
     mount(true);
-    expect(scrubber.render).toHaveBeenLastCalledWith(expect.objectContaining({ showTime: true, right: expect.any(String), left: expect.stringContaining('40px') }));
+    expect(scrubber.render).toHaveBeenLastCalledWith(expect.objectContaining({ showTime: true, right: expect.any(String), left: expect.not.stringContaining('40px') }));
   });
 
   it('the canonical video row (left mute) appears only while the active item is a video', () => {

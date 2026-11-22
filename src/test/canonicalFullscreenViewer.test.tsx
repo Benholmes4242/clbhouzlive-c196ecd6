@@ -139,9 +139,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     await waitFor(() => expect(useFullscreenFeedStore.getState().posts[0].review?.breakdown?.design).toBe(9.6));
     expect(h.scoreRead).toHaveBeenCalledExactlyOnceWith(['review-score']);
     const view = chrome(useFullscreenFeedStore.getState().posts[0]);
-    const row = view.container.querySelector('[data-review-score-strip] [data-review-score-row]');
-    expect(row?.getAttribute('data-variant')).toBe('card');
-    expect([...row?.querySelectorAll('[data-score-figure]') ?? []].map(el => el.textContent)).toEqual(['9.1', '9.6', '9.1', '9.2', '8.6']);
+    expect([...view.container.querySelectorAll('[data-fullscreen-stats] b')].map(el => el.textContent)).toEqual(['9.1', '9.6', '9.1', '9.2', '8.6']);
   });
   it('a resolved unmatched post has no pills and double-tap cannot call a like', () => {
     const missing = { ...realPost, id: 'phantom-media' };
@@ -164,12 +162,10 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     const view = chrome(shot, { synthetic: true, confirmedSourcePostIds: ['post-1'] });
     expect([...view.container.querySelectorAll('[data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['like', 'comment', 'share', 'more']);
   });
-  it('the review score strip uses the full-width card row and its divider', () => {
+  it('the review score strip is replaced by the five-cell stat row', () => {
     const view = chrome(reviewPost);
-    const row = view.container.querySelector('[data-review-score-strip] [data-review-score-row]');
-    expect(row?.getAttribute('data-variant')).toBe('card');
-    expect(row?.querySelector('[data-score-divider]')).not.toBeNull();
-    expect(row?.querySelectorAll('[data-score-figure]')).toHaveLength(5);
+    expect(view.container.querySelector('[data-review-score-strip]')).toBeNull();
+    expect(view.container.querySelectorAll('[data-fullscreen-stats] [data-stat]')).toHaveLength(5);
   });
   it('no application viewer open passes readOnly', () => {
     const offenders: string[] = [];
@@ -189,7 +185,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     const view = chrome(reviewPost);
     const pills = [...view.container.querySelectorAll('[data-fullscreen-pills] [data-pill]')].map(p => p.getAttribute('data-pill'));
     expect(pills).toEqual(['like', 'comment', 'share']);
-    expect(view.container.querySelector('[data-likers="review"]')?.getAttribute('data-likers-id')).toBe('rev-1');
+    expect(view.container.querySelector('[data-likers]')).toBeNull();
     for (const file of ['src/components/courses/ReviewRailSlot.tsx', 'src/components/courses/course-detail/CourseReviewsTab.tsx', 'src/components/posts/ReviewBottomSheet.tsx', 'src/components/courses/course-detail/AboutMediaStrip.tsx']) {
       const src = readFileSync(file, 'utf8');
       expect(src).toMatch(/reviewFeedPost\(/);
@@ -262,7 +258,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(post.engagementTarget).toBeUndefined();
   });
 
-  it('(e) a course-photo open renders the canonical top bar, member author row, hole strip and video row', () => {
+  it('(e) a course-photo open renders the canonical top bar, member line, hole stat row and scrubber', () => {
     const shot = {
       ...realPost, id: 'shots:hole:c1:4', caption: '', mediaItems: [{
         id: 's1', type: 'video', hlsUrl: '/v.m3u8', width: 100, height: 100,
@@ -273,13 +269,12 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(view.container.querySelector('[data-fullscreen-back-circle]')).not.toBeNull();
     expect(screen.getByRole('button', { name: 'Open Royal Dornoch' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^clbhouz rating/ })).toBeNull();
-    expect(view.container.querySelector('[data-fullscreen-shot-author] .pro-inline-text')).toHaveTextContent('Ed Smith');
-    expect(view.container.querySelector('[data-fullscreen-shot-date]')).toHaveTextContent('Sep 2026');
-    const strip = view.container.querySelector('[data-fullscreen-hole-strip]');
-    expect(strip).toHaveTextContent('The fourth');
-    expect(strip).toHaveTextContent('Par 4 · 303 yards');
+    expect(view.container.querySelector('[data-fullscreen-member] .pro-inline-text')).toHaveTextContent('Ed Smith');
+    expect(view.container.querySelector('[data-fullscreen-member] .fs-time')).toHaveTextContent('Sep 2026');
+    expect(view.container.querySelector('[data-fullscreen-hole-strip]')).toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-stats] [data-stat="hole"] b')).toHaveTextContent('4th');
     expect(view.container.textContent).not.toContain("Through members' eyes");
-    expect(view.container.querySelector('[data-fullscreen-video-row]')).not.toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-pill-row] [data-fullscreen-mute]')).not.toBeNull();
     expect(scrubber.render).toHaveBeenLastCalledWith(expect.objectContaining({ showTime: true }));
     expect([...view.container.querySelectorAll('[data-fullscreen-pills] [data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['share']);
   });

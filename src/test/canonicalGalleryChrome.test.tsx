@@ -84,13 +84,11 @@ describe('canonical course gallery chrome', () => {
     expect(view.container.querySelector('[data-gallery-grid]')).toBeNull();
     Reflect.deleteProperty(navigator, 'share');
   });
-  it('(d) the facts strip: hole kicker, par line and white stats; place variant; nothing for untagged', () => {
+  it('(d) the stat row replaces the hole facts card; place variant unchanged; nothing for untagged', () => {
     let view = mount('holes', 'h');
-    const facts = view.container.querySelector('[data-gallery-facts="hole"]') as HTMLElement;
-    expect(facts.querySelector('.course-gallery-kicker')?.textContent).toBe('The fourth');
-    expect(facts.querySelector('h2')?.textContent).toBe('Par 4 · 303 yards');
-    const values = [...facts.querySelectorAll('.course-gallery-stats b')] as HTMLElement[];
-    expect(values.map(v => v.textContent)).toEqual(['7', '+0.4']);
+    expect(view.container.querySelector('[data-gallery-facts="hole"]')).toBeNull();
+    const values = [...view.container.querySelectorAll('[data-fullscreen-stats] b')] as HTMLElement[];
+    expect(values.map(v => v.textContent)).toEqual(['4th', '4', '303', '7', '+0.4']);
     for (const v of values) expect(v.style.color).toBe('');
     expect(view.container.querySelector('hr')).toBeNull();
     cleanup(); view = mount('clubhouse', 'c');
@@ -100,11 +98,12 @@ describe('canonical course gallery chrome', () => {
     expect(place.querySelector('p')?.textContent).toBe('1 shot from members');
     cleanup(); view = mount('all', 'u');
     expect(view.container.querySelector('[data-gallery-facts]')).toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-stats]')).toBeNull();
   });
-  it('(e) a video shot renders the canonical video row and no separate gallery mute', () => {
+  it('(e) a video shot has one mute, in the pill row, and none in the scrubber row', () => {
     const view = mount('all', 'vid', [post('vid', 'video')]);
-    const row = view.container.querySelector('[data-fullscreen-video-row]') as HTMLElement;
-    expect(row).not.toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-video-row]')).toBeNull();
+    const row = view.container.querySelector('[data-fullscreen-pill-row]') as HTMLElement;
     expect(screen.getAllByRole('button', { name: /^(Mute|Unmute)$/ })).toHaveLength(1);
     expect(row.contains(screen.getByRole('button', { name: /^(Mute|Unmute)$/ }))).toBe(true);
     expect(view.container.querySelector('.course-gallery-circle')).toBeNull();

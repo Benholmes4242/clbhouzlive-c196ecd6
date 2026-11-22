@@ -51,19 +51,19 @@ beforeEach(() => {
 afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 
 describe('Latest holes active-shot caption and course header', () => {
-  it('detail renders only when present and disappears as the active shot changes', () => {
+  it('the stat row follows the active shot; the retired hole strip never renders', () => {
     const view = mount(true);
-    const strip = () => view.container.querySelector('[data-fullscreen-hole-strip]');
-    expect(strip()).toHaveTextContent('The fifteenth');
-    expect(strip()).toHaveTextContent('Par 4 · 412 yards');
+    const hole = () => view.container.querySelector('[data-fullscreen-stats] [data-stat="hole"] b')?.textContent;
+    expect(view.container.querySelector('[data-fullscreen-hole-strip]')).toBeNull();
+    expect(hole()).toBe('15th');
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
-    expect(strip()).toHaveTextContent('The second');
-    expect(strip()?.textContent).not.toContain('Par');
+    expect(hole()).toBe('2nd');
   });
-  it('empty detail is omitted', () => {
+  it('a shot without detail still prints its hole cell', () => {
     const view = mount(true, { ...post, mediaItems: [{ ...post.mediaItems[0], memberShot: { ...post.mediaItems[0].memberShot, kicker: 'The first', title: 'Course', credit: '', avatarUrl: null, memberName: '', detail: '' } }] });
-    expect(view.container.querySelector('[data-fullscreen-hole-strip]')?.textContent).toBe('The first');
+    expect(view.container.querySelector('[data-fullscreen-stats] b')?.textContent).toBe('1st');
   });
+
   it('course-photo course names use the canonical header name element', () => {
     const view = mount(true);
     const name = view.container.querySelector('[data-fullscreen-course-name]') as HTMLElement | null;
